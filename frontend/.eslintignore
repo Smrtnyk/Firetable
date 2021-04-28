@@ -1,0 +1,7 @@
+*.png
+*.ico
+*.styl
+*.scss
+*.woff
+*.html
+.eslintrc.js

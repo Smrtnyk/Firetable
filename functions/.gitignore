@@ -1,0 +1,15 @@
+## Compiled JavaScript files
+**/*!(eslintrc).js
+**/*.js.map
+
+service-account.json
+
+# Typescript v1 declaration files
+typings/
+
+node_modules/
+lib
+.vapid-keys
+vapid-keys.json
+
+*.log

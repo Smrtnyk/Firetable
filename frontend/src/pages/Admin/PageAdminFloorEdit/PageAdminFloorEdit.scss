@@ -1,0 +1,34 @@
+.PageAdminFloorEdit {
+    &__svg-container {
+        svg {
+            max-height: calc(100vh - 10rem);
+        }
+    }
+    g.tableGroup.active rect,
+    g.tableGroup.active circle {
+        fill: #ff8a00 !important;
+    }
+    rect.wall {
+        cursor: pointer;
+    }
+    line.horizontal,
+    line.vertical {
+        stroke: #f0f0f0;
+        stroke-width: 1px;
+        shape-rendering: crispEdges;
+    }
+    // RESIZING WALL CONTROLS
+    g.circles circle:hover {
+        cursor: move;
+        fill: blue;
+    }
+}
+
+.body--dark {
+    .PageAdminFloorEdit {
+        line.horizontal,
+        line.vertical {
+            stroke: #444;
+        }
+    }
+}

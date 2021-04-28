@@ -1,0 +1,19 @@
+.FTTitle {
+    display: grid;
+    grid-template-columns: 1fr auto;
+}
+.ft-title {
+    font-size: 2rem;
+    color: #2d3748;
+    font-weight: 900;
+    padding-left: 0.75rem;
+
+    &__right {
+        padding-right: 0.75rem;
+    }
+}
+.body--dark {
+    .ft-title {
+        color: #fff;
+    }
+}

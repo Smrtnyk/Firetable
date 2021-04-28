@@ -1,0 +1,52 @@
+@import "./helpers";
+@import "./gradients";
+@import "./floor";
+
+@font-face {
+    font-family: "Product Sans";
+    src: url("./product-sans.woff");
+}
+
+@-o-viewport {
+    user-zoom: fixed;
+}
+
+* {
+    font-family: "Product Sans", sans-serif;
+    text-rendering: optimizeLegibility;
+}
+
+body {
+    letter-spacing: 0.8px;
+    background: #f8f8f8;
+    -webkit-transition: background-color .3s ease;
+}
+
+.ft-logo {
+    max-width: 256px;
+}
+
+.shadow-light {
+    box-shadow: 0 6px 6px -3px rgba(0,0,0,0.02), 0 10px 14px 1px rgba(0,0,0,0.02), 0 4px 18px 3px rgba(0,0,0,0.02) !important;
+}
+
+.font-black {
+    font-weight: 900;
+}
+
+.font-card-caption {
+    font-size: 0.875rem;
+}
+
+.ft-card {
+    border-radius: .5rem;
+    box-shadow: $box-shadow;
+}
+
+.ft-avatar {
+    border: 1px solid #888;
+}
+
+.firebase-emulator-warning {
+    display: none;
+}

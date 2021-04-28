@@ -1,0 +1,36 @@
+{
+    "name": "functions",
+    "scripts": {
+        "lint": "eslint -c .eslintrc.js src/** --fix",
+        "build": "tsc",
+        "dev": "tsc --watch",
+        "serve": "npm run build && firebase serve --only functions",
+        "shell": "npm run build && firebase functions:shell",
+        "start": "npm run shell",
+        "deploy": "firebase deploy --only functions",
+        "logs": "firebase functions:log",
+        "webpush": "web-push",
+        "find-dead-code": "npx ts-prune"
+    },
+    "engines": {
+        "node": "12"
+    },
+    "main": "lib/functions/src/index.js",
+    "dependencies": {
+        "diff-arrays-of-objects": "1.1.8",
+        "firebase-admin": "9.7.0",
+        "firebase-functions": "3.13.2",
+        "web-push": "3.4.4"
+    },
+    "devDependencies": {
+        "@types/faker": "5.5.3",
+        "@types/web-push": "3.3.0",
+        "@typescript-eslint/eslint-plugin": "4.22.0",
+        "@typescript-eslint/parser": "4.22.0",
+        "eslint": "7.25.0",
+        "eslint-plugin-import": "2.22.1",
+        "faker": "5.5.3",
+        "typescript": "4.2.4"
+    },
+    "private": true
+}
