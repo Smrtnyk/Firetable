@@ -2,6 +2,8 @@ import { computed, defineComponent } from "vue";
 import { User } from "src/types";
 import { useStore } from "src/store";
 
+import { FTTitle } from "components/FTTitle";
+
 import {
     QItem,
     QItemSection,
@@ -22,6 +24,8 @@ export default defineComponent({
         QCard,
         QItemLabel,
         QSeparator,
+
+        FTTitle,
     },
 
     setup() {
