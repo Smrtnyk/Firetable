@@ -18,7 +18,7 @@ import {
     QSpinnerDots,
 } from "quasar";
 import { useRouter } from "vue-router";
-import useFirestore from "src/composables/useFirestore";
+import { useFirestore } from "src/composables/useFirestore";
 import PageAdminEventsListItem from "components/Event/PageAdminEventsListItem";
 import { FTTitle } from "components/FTTitle";
 

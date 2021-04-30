@@ -20,28 +20,28 @@ import { getFirebaseApp } from "src/services/firebase/base";
 import { CollectionRef, Docref, DocumentData } from "src/types/firebase";
 
 // Overload Watch Collection
-export default function <T, M = T>(
+export function useFirestore<T, M = T>(
     options: { queryType: "collection"; type: "watch" } & Options<T, M>
 ): ReturnCollWatch<T, M>;
 
 // Overload Get Collection
-export default function <T, M = T>(
+export function useFirestore<T, M = T>(
     options: { queryType: "collection"; type: "get" } & Options<T, M>
 ): ReturnCollGet<T, M>;
 
 // Overload Watch Doc
-export default function <T, M = T>(
+export function useFirestore<T, M = T>(
     options: { queryType: "doc"; type: "watch" } & Options<T, M>
 ): ReturnDocWatch<T, M>;
 
 // Overload Get Doc
-export default function <T, M = T>(
+export function useFirestore<T, M = T>(
     options: { queryType: "doc"; type: "get" } & Options<T, M>
 ): ReturnDocGet<T, M>;
 
 // The function
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function <T, M = T>(options: Options<T, M>): any {
+export function useFirestore<T, M = T>(options: Options<T, M>): any {
     // get firebase and make sure it's setup
     const firebase = getFirebaseApp();
     if (!firebase) {

@@ -8,7 +8,7 @@ import { defineComponent, ref, withDirectives } from "vue";
 
 import { FloorDoc, Collection } from "src/types";
 import { deleteFloor, saveFloor } from "src/services/firebase/db-floors";
-import useFirestore from "src/composables/useFirestore";
+import { useFirestore } from "src/composables/useFirestore";
 
 import {
     QDialog,

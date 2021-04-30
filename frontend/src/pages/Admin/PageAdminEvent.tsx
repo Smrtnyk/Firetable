@@ -9,7 +9,7 @@ import { defineComponent, onMounted, computed } from "vue";
 import { isTable } from "src/floor-manager/type-guards";
 import { useRouter } from "vue-router";
 import { formatEventDate } from "src/helpers/utils";
-import useFirestore from "src/composables/useFirestore";
+import { useFirestore } from "src/composables/useFirestore";
 
 import { FTTitle } from "components/FTTitle";
 import { EventFeedList } from "components/Event/EventFeedList";

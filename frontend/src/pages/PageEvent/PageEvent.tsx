@@ -52,7 +52,7 @@ import {
 } from "src/types";
 import { useStore } from "src/store";
 import { useI18n } from "vue-i18n";
-import useFirestore from "src/composables/useFirestore";
+import { useFirestore } from "src/composables/useFirestore";
 import { whiteSpaceToUnderscore } from "src/helpers/utils";
 
 interface State {

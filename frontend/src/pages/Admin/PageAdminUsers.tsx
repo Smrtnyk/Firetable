@@ -10,7 +10,7 @@ import { CreateUserPayload, User, FloorDoc, Collection } from "src/types";
 import { computed, defineComponent, ref } from "vue";
 import { createUserWithEmail, deleteUser } from "src/services/firebase/auth";
 import { config } from "src/config";
-import useFirestore from "src/composables/useFirestore";
+import { useFirestore } from "src/composables/useFirestore";
 
 import {
     QBtn,
