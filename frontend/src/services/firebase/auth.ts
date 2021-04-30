@@ -76,7 +76,7 @@ export function routerBeforeEach(
                 } else if (requiresAdmin && isAdmin) {
                     return true;
                 } else if (to.path === "/auth") {
-                    return { name: "auth" };
+                    return { name: "home" };
                 } else {
                     return true;
                 }
