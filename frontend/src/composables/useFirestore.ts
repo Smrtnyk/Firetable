@@ -65,8 +65,7 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
         const stringVars = path.replace(/\s/g, "").match(/\$[^\W]*/g);
         if (!stringVars?.length || !variables) return path;
         let newPath = path;
-        for (let i = 0; i < stringVars.length; i++) {
-            const x = stringVars[i];
+        for (const x of stringVars) {
             const instanceVal = variables[x.split("$").join("")].value;
             if (
                 !["number", "string"].includes(typeof instanceVal) ||
@@ -88,15 +87,11 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
     // firestore Ref computation
     function createComputedFirestoreRef() {
         if (optsAreColl(options)) {
-            return computed(() => {
-                const path = pathReplaced.value;
-                return firebase.firestore().collection(path);
-            });
+            return computed(() =>
+                firebase.firestore().collection(pathReplaced.value)
+            );
         } else {
-            return computed(() => {
-                const path = pathReplaced.value;
-                return firebase.firestore().doc(path);
-            });
+            return computed(() => firebase.firestore().doc(pathReplaced.value));
         }
     }
 
@@ -141,7 +136,10 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
         collectionData.value = receivedData;
         received.value = true;
         loading.value = false;
-        return { data: receivedData, mutatedData: mutatedData.value };
+        return {
+            data: receivedData,
+            mutatedData: mutatedData.value,
+        };
     }
 
     function receiveDocData(receivedData: T | undefined) {
@@ -182,19 +180,17 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
         return void 0;
     }
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     async function getCollData() {
         try {
             const firestoreRefVal = firestoreQuery.value
                 ? firestoreQuery.value
                 : (firestoreRef.value as CollectionRef);
             const collection = await firestoreRefVal.get();
-            let data: T[] = [];
+            let colData: T[] = [];
             if (collection.size) {
-                data = collection.docs.map(firestoreDocSerializer);
+                colData = collection.docs.map(firestoreDocSerializer);
             }
-            return receiveCollData(data);
+            return receiveCollData(colData);
         } catch (e) {
             if (options.onError) {
                 options.onError(e);
@@ -238,9 +234,7 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
     };
 
     if (options.type === "watch") {
-        onUnmounted(() => {
-            stopWatchingData();
-        });
+        onUnmounted(stopWatchingData);
     }
 
     const debounceDataGetter = () => {
