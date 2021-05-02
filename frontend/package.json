@@ -29,7 +29,7 @@
         "@types/d3": "6.3.0",
         "@typescript-eslint/eslint-plugin": "4.22.0",
         "@typescript-eslint/parser": "4.22.0",
-        "@vue/babel-plugin-jsx": "^1.0.5",
+        "@vue/babel-plugin-jsx": "^1.0.6",
         "babel-loader": "8.2.2",
         "dotenv": "8.2.0",
         "eslint": "7.25.0",
