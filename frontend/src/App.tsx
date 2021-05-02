@@ -10,7 +10,7 @@ export default defineComponent({
     setup() {
         const q = useQuasar();
 
-        q.iconMapFn = (iconName: string): { icon: string } | void => {
+        q.iconMapFn = function (iconName: string) {
             const icon = myIcons[iconName];
             if (icon) {
                 return { icon };
