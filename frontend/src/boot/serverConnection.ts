@@ -19,9 +19,10 @@ export default boot(({ router, store }) => {
 
     /* Tell the application what to do when the
        authentication state has changed */
-    auth().onAuthStateChanged((user) => {
-        void handleOnAuthStateChanged(router, store, user);
-    }, showErrorMessage);
+    auth().onAuthStateChanged(
+        handleOnAuthStateChanged.bind(null, router, store),
+        showErrorMessage
+    );
 
     /* Setup the router to be intercepted on each route.
        This allows the application to halt rendering until

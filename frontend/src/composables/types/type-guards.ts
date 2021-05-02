@@ -4,6 +4,7 @@ import {
     OptionsCollWatch,
     OptionsCollGet,
     OptionsDocGet,
+    OptionsDocWatch,
 } from "./Options";
 
 export function firestoreRefIsDoc(
@@ -18,8 +19,32 @@ export function optsAreColl<T, M>(
     return options.queryType === "collection";
 }
 
+export function optsAreGetColl<T, M>(
+    options: Options<T, M>
+): options is OptionsCollGet<T, M> {
+    return options.queryType === "collection" && options.type === "get";
+}
+
+export function optsAreWatchColl<T, M>(
+    options: Options<T, M>
+): options is OptionsCollWatch<T, M> {
+    return options.queryType === "collection" && options.type === "watch";
+}
+
+export function optsAreGetDoc<T, M>(
+    options: Options<T, M>
+): options is OptionsDocGet<T, M> {
+    return options.queryType === "doc" && options.type === "get";
+}
+
+export function optsAreWatchDoc<T, M>(
+    options: Options<T, M>
+): options is OptionsDocWatch<T, M> {
+    return options.queryType === "doc" && options.type === "watch";
+}
+
 export function optsAreGet<T, M>(
     options: Options<T, M>
 ): options is OptionsDocGet<T, M> | OptionsCollGet<T, M> {
-    return options.queryType === "doc" && options.type === "get";
+    return options.type === "get";
 }

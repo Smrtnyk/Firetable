@@ -18,7 +18,7 @@ export interface ReturnColl<T, M> extends ReturnBase {
     /** A reactive computed prop that returns the firestore collection reference query */
     firestoreRef: ComputedRef<CollectionRef>;
     /** A reactive computed prop that returns the firestore Query if the 'query' input function is used, else it will be undefined */
-    firestoreQuery: ComputedRef<Query>;
+    firestoreQuery: ComputedRef<Query | null>;
 }
 
 export interface ReturnDoc<T, M> extends ReturnBase {
@@ -38,23 +38,27 @@ export interface ReturnWatch extends ReturnBase {
     /** Exposes a function to initiate a firestore document/collection listener via the onSnapshot method. */
     watchData: () => void;
     /** Exposes a function for tearing down a firestore onSnapshot listener. Will be called on the onUnmounted hook of this component regardless of the manual mode setting. */
-    stopWatchData: () => void;
+    stopWatchingData: () => void;
 }
+
+type GetDataColl<T, M> = {
+    data: T[];
+    mutatedData: M | undefined;
+};
+
+type GetDataDoc<T, M> = {
+    data: T | undefined;
+    mutatedData: M | undefined;
+};
 
 export interface ReturnGetColl<T, M> extends ReturnBase {
     /** Exposes a function for getting data from firestore. firestore().collection(${path}).get */
-    getData: () => Promise<{
-        data: T[];
-        mutatedData: M | undefined;
-    }>;
+    getData: () => Promise<GetDataColl<T, M> | undefined>;
 }
 
 export interface ReturnGetDoc<T, M> extends ReturnBase {
     /** getData provides a function for getting data from firestore. firestore().doc(${path}).get */
-    getData: () => Promise<{
-        data: T | undefined;
-        mutatedData: M | undefined;
-    }>;
+    getData: () => Promise<GetDataDoc<T, M> | undefined>;
 }
 
 export type ReturnCollWatch<T, M> = ReturnColl<T, M> & ReturnWatch;

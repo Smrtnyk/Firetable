@@ -19,9 +19,18 @@ import {
     firestoreRefIsDoc,
     optsAreColl,
     optsAreGet,
+    optsAreGetColl,
+    optsAreGetDoc,
+    optsAreWatchColl,
 } from "./types/type-guards";
 import { getFirebaseApp } from "src/services/firebase/base";
 import { CollectionRef, Docref, DocumentData } from "src/types/firebase";
+
+type UseFirestoreReturnType<T, M = T> =
+    | ReturnCollGet<T, M>
+    | ReturnDocWatch<T, M>
+    | ReturnDocGet<T, M>
+    | ReturnCollWatch<T, M>;
 
 // Overload Watch Collection
 export function useFirestore<T, M = T>(
@@ -289,35 +298,37 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
         deleteDoc,
     };
 
-    if (optsAreColl(options)) {
-        if (optsAreGet(options)) {
-            return {
-                ...returnVal,
-                data: collectionData,
-                getData: getCollData,
-                firestoreQuery,
-            };
-        } else {
-            return {
-                ...returnVal,
-                data: collectionData,
-                watchData,
-                stopWatchingData,
-                firestoreQuery,
-            };
-        }
-    } else if (optsAreGet(options)) {
+    if (optsAreGetColl(options)) {
+        return {
+            ...returnVal,
+            data: collectionData,
+            getData: getCollData,
+            firestoreQuery,
+        };
+    }
+
+    if (optsAreWatchColl(options)) {
+        return {
+            ...returnVal,
+            data: collectionData,
+            watchData,
+            stopWatchingData,
+            firestoreQuery,
+        };
+    }
+
+    if (optsAreGetDoc(options)) {
         return {
             ...returnVal,
             data,
             getData: getDocData,
         };
-    } else {
-        return {
-            ...returnVal,
-            data,
-            watchData,
-            stopWatchingData,
-        };
     }
+
+    return {
+        ...returnVal,
+        data,
+        watchData,
+        stopWatchingData,
+    };
 }
