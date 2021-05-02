@@ -4,17 +4,23 @@ import { EventCardListSkeleton } from "src/components/Event/EventCardListSkeleto
 import { FTSubtitle } from "src/components/FTSubtitle";
 
 import { defineComponent } from "vue";
-import useFirestore from "src/composables/useFirestore";
+import { useFirestore } from "src/composables/useFirestore";
 import { Collection, EventDoc } from "src/types";
+
+import { QImg } from "quasar";
 
 export default defineComponent({
     name: "Home",
+
     components: {
+        QImg,
+
         FTSubtitle,
         EventCardListSkeleton,
         EventCardList,
         PushMessagesBanner,
     },
+
     setup() {
         const { data: events, loading: isLoading } = useFirestore<EventDoc>({
             type: "watch",
