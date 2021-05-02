@@ -35,7 +35,3 @@ export const initUser = firestoreAction(({ bindFirestoreRef, commit }, uid) => {
         }
     );
 });
-
-export const initUsers = firestoreAction(({ bindFirestoreRef }) => {
-    return bindFirestoreRef("users", usersCollection()).catch(showErrorMessage);
-});
