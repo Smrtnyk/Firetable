@@ -20,6 +20,7 @@ import {
     QSlideItem,
     QIcon,
     Ripple,
+    QImg,
 } from "quasar";
 
 export default defineComponent({
@@ -36,6 +37,7 @@ export default defineComponent({
         QList,
         QSlideItem,
         QIcon,
+        QImg,
     },
 
     setup() {
@@ -134,7 +136,9 @@ export default defineComponent({
                         <q-btn
                             rounded
                             class="button-gradient q-mx-auto"
-                            onClick="showCreateFloorForm = !showCreateFloorForm"
+                            onClick={() =>
+                                (showCreateFloorForm.value = !showCreateFloorForm.value)
+                            }
                             size="lg"
                         >
                             Get Started
