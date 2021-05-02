@@ -1,7 +1,4 @@
-import { computed, defineComponent } from "vue";
-import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { logoutUser } from "src/services/firebase/auth";
-import { User } from "src/types";
+import { defineComponent } from "vue";
 import { useQuasar } from "quasar";
 import { getDarkMode, myIcons } from "src/config";
 
