@@ -15,7 +15,11 @@ import {
 } from "./types/Return";
 
 // Type gates
-import { firestoreRefIsDoc, optsAreColl, optsAreGet } from "./types/type-gates";
+import {
+    firestoreRefIsDoc,
+    optsAreColl,
+    optsAreGet,
+} from "./types/type-guards";
 import { getFirebaseApp } from "src/services/firebase/base";
 import { CollectionRef, Docref, DocumentData } from "src/types/firebase";
 
@@ -50,12 +54,10 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
         );
     }
 
-    const data: Ref<T | undefined> = ref(undefined);
+    const data: Ref<T | undefined> = ref();
     const collectionData: Ref<T[]> = ref([]);
-    const mutatedData: Ref<undefined | M> = ref(undefined);
-    const initialLoading = !options.initialLoading
-        ? true
-        : options.initialLoading;
+    const mutatedData: Ref<undefined | M> = ref();
+    const initialLoading = options.initialLoading ?? true;
     const loading = ref<boolean>(initialLoading);
     const received = ref(false);
 
