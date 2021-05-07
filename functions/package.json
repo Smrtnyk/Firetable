@@ -23,7 +23,7 @@
         "web-push": "3.4.4"
     },
     "devDependencies": {
-        "@types/faker": "5.5.3",
+        "@types/faker": "5.5.4",
         "@types/web-push": "3.3.0",
         "@typescript-eslint/eslint-plugin": "4.22.1",
         "@typescript-eslint/parser": "4.22.1",
