@@ -166,12 +166,12 @@ export default defineComponent({
 
                 {!props.floors.length && (
                     <div class="column justify-center items-center q-mt-md">
-                        <h6 class="text-h6">
+                        <h6 class="text-h6 q-pa-md text-justify">
                             You cannot create events because you have no floors!
                         </h6>
                         <q-btn
                             rounded
-                            className="button-gradient q-mx-auto"
+                            class="button-gradient q-mx-auto"
                             onClick={() => router.replace("/admin/floors")}
                             size="lg"
                         >

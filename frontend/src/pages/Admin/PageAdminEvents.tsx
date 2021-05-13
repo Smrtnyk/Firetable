@@ -16,6 +16,7 @@ import {
     QInfiniteScroll,
     QSeparator,
     QSpinnerDots,
+    QImg,
 } from "quasar";
 import { useRouter } from "vue-router";
 import { useFirestore } from "src/composables/useFirestore";
@@ -39,6 +40,7 @@ export default defineComponent({
         QInfiniteScroll,
         QSeparator,
         QSpinnerDots,
+        QImg,
     },
 
     setup() {
@@ -141,7 +143,8 @@ export default defineComponent({
                                 icon="plus"
                                 class="button-gradient"
                                 onClick={() =>
-                                    (showCreateEventForm.value = !showCreateEventForm.value)
+                                    (showCreateEventForm.value =
+                                        !showCreateEventForm.value)
                                 }
                                 label="new event"
                             />
