@@ -3,8 +3,10 @@ import { getDarkMode } from "src/config";
 
 export function setChartTheme(HighChartsModule: typeof Highcharts): void {
     if (!getDarkMode()) {
+        // @ts-ignore
         HighChartsModule.theme = {};
     } else {
+        // @ts-ignore
         HighChartsModule.theme = {
             colors: [
                 "#905196",
@@ -217,6 +219,6 @@ export function setChartTheme(HighChartsModule: typeof Highcharts): void {
         };
     }
 
-    // Apply the theme
+    // @ts-ignore
     HighChartsModule.setOptions(HighChartsModule.theme);
 }
