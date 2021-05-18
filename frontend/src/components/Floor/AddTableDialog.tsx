@@ -42,12 +42,8 @@ export default defineComponent({
     setup(props) {
         const addTableForm = ref<IForm | null>(null);
 
-        const {
-            dialogRef,
-            onDialogHide,
-            onDialogOK,
-            onDialogCancel,
-        } = useDialogPluginComponent();
+        const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
+            useDialogPluginComponent();
 
         const tableId = ref<string>(
             props.id || String(props.ids.length + 1) || ""

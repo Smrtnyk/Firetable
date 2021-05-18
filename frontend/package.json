@@ -25,7 +25,7 @@
         "vuexfire": "3.2.5"
     },
     "devDependencies": {
-        "@quasar/app": "3.0.0-beta.24",
+        "@quasar/app": "3.0.0-beta.25",
         "@types/d3": "6.3.0",
         "@typescript-eslint/eslint-plugin": "4.24.0",
         "@typescript-eslint/parser": "4.24.0",
@@ -44,7 +44,7 @@
     },
     "engines": {
         "node": ">= 14.16.1",
-        "npm": ">= 6.14.1"
+        "npm": ">= 7.13.0"
     },
     "browserslist": [
         "last 3 Chrome versions"

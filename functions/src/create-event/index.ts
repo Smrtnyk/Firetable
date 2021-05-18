@@ -20,8 +20,6 @@ export async function createEvent(eventPayload: CreateEventPayload, context: fun
         uploadedImg = await uploadFile(`${Collection.EVENTS}/${id}`, base64EncodedImageString);
     }
 
-    console.log(uploadedImg);
-
     const eventPromise = db.collection(Collection.EVENTS)
         .doc(id)
         .set({
@@ -42,7 +40,7 @@ export async function createEvent(eventPayload: CreateEventPayload, context: fun
     );
 
     await Promise.all([eventPromise, ...floorsPromises]);
-    console.log(id);
+
     return id;
 }
 
@@ -71,7 +69,7 @@ async function uploadFile(destination: string, content: string): Promise<string>
                     action: "read",
                     expires: "03-09-2491"
                 });
-                console.log(response[0]);
+
                 resolve(response[0]);
             });
     });

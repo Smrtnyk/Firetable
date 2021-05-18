@@ -209,10 +209,8 @@ export default defineComponent({
                                     rounded
                                     label="Floor name"
                                     {...{
-                                        "onUpdate:modelValue": onFloorChange.bind(
-                                            null,
-                                            "name"
-                                        ),
+                                        "onUpdate:modelValue":
+                                            onFloorChange.bind(null, "name"),
                                     }}
                                     model-value={floorInstance.value.name}
                                 >
@@ -244,10 +242,11 @@ export default defineComponent({
                                         label
                                         color="deep-orange"
                                         {...{
-                                            "onUpdate:modelValue": onFloorChange.bind(
-                                                null,
-                                                "width"
-                                            ),
+                                            "onUpdate:modelValue":
+                                                onFloorChange.bind(
+                                                    null,
+                                                    "width"
+                                                ),
                                         }}
                                     />
                                 </div>
@@ -263,10 +262,11 @@ export default defineComponent({
                                         label
                                         color="deep-orange"
                                         {...{
-                                            "onUpdate:modelValue": onFloorChange.bind(
-                                                null,
-                                                "height"
-                                            ),
+                                            "onUpdate:modelValue":
+                                                onFloorChange.bind(
+                                                    null,
+                                                    "height"
+                                                ),
                                         }}
                                         model-value={floorInstance.value.height}
                                     />

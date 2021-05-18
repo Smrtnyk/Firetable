@@ -64,12 +64,8 @@ export default defineComponent({
         const checked = ref<boolean>(props.reservation.confirmed);
         const confirmGuestSwitchDisabled = ref(false);
 
-        const {
-            dialogRef,
-            onDialogHide,
-            onDialogOK,
-            onDialogCancel,
-        } = useDialogPluginComponent();
+        const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
+            useDialogPluginComponent();
 
         function setConfirmButtonDisabledTimer() {
             confirmGuestSwitchDisabled.value = true;
@@ -227,7 +223,8 @@ export default defineComponent({
                                     <q-toggle
                                         {...{
                                             modelValue: checked.value,
-                                            "onUpdate:modelValue": onReservationConfirm,
+                                            "onUpdate:modelValue":
+                                                onReservationConfirm,
                                             disable:
                                                 confirmGuestSwitchDisabled.value,
                                             size: "lg",

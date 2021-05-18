@@ -66,12 +66,8 @@ export default defineComponent({
 
         const reservationForm = ref<IForm | null>(null);
 
-        const {
-            dialogRef,
-            onDialogHide,
-            onDialogCancel,
-            onDialogOK,
-        } = useDialogPluginComponent();
+        const { dialogRef, onDialogHide, onDialogCancel, onDialogOK } =
+            useDialogPluginComponent();
 
         async function onOKClick() {
             if (!(await reservationForm.value?.validate())) return;

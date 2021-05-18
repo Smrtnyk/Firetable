@@ -306,11 +306,8 @@ export default defineComponent({
         function checkIfReservedTableAndCloseCreateReservationDialog() {
             if (!currentOpenCreateReservationDialog) return;
 
-            const {
-                dialog,
-                tableId,
-                floor,
-            } = currentOpenCreateReservationDialog;
+            const { dialog, tableId, floor } =
+                currentOpenCreateReservationDialog;
             const freeTables = freeTablesPerFloor.value[floor];
             const isTableStillFree = freeTables.includes(tableId);
 
@@ -394,9 +391,8 @@ export default defineComponent({
                                     <q-fab-action
                                         class={[
                                             {
-                                                "button-gradient": isActiveFloor(
-                                                    florInstance
-                                                ),
+                                                "button-gradient":
+                                                    isActiveFloor(florInstance),
                                             },
                                             "text-white",
                                         ]}

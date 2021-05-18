@@ -84,7 +84,8 @@ export default defineComponent({
                                 icon="plus"
                                 class="button-gradient"
                                 onClick={() =>
-                                    (showCreateFloorForm.value = !showCreateFloorForm.value)
+                                    (showCreateFloorForm.value =
+                                        !showCreateFloorForm.value)
                                 }
                                 label="new floor"
                             />
@@ -137,7 +138,8 @@ export default defineComponent({
                             rounded
                             class="button-gradient q-mx-auto"
                             onClick={() =>
-                                (showCreateFloorForm.value = !showCreateFloorForm.value)
+                                (showCreateFloorForm.value =
+                                    !showCreateFloorForm.value)
                             }
                             size="lg"
                         >

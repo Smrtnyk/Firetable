@@ -110,7 +110,8 @@ export default defineComponent({
                                 icon="plus"
                                 class="button-gradient"
                                 onClick={() =>
-                                    (showAddNewGuestForm.value = !showAddNewGuestForm.value)
+                                    (showAddNewGuestForm.value =
+                                        !showAddNewGuestForm.value)
                                 }
                             />
                         ),

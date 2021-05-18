@@ -124,7 +124,8 @@ export default defineComponent({
                                     color="primary"
                                     label="Later"
                                     onClick={() =>
-                                        (showPushNotificationsBanner.value = false)
+                                        (showPushNotificationsBanner.value =
+                                            false)
                                     }
                                 />
                                 <q-btn

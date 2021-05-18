@@ -97,7 +97,8 @@ export default defineComponent({
                                 icon="plus"
                                 class="button-gradient"
                                 onClick={() =>
-                                    (showCreateUserForm.value = !showCreateUserForm.value)
+                                    (showCreateUserForm.value =
+                                        !showCreateUserForm.value)
                                 }
                                 label="new user"
                             />

@@ -222,11 +222,11 @@ export class Floor {
 
                     if (isEditorModeActive(this.mode)) {
                         this.addResizeBehaviorToElement(
-                            (tableG as unknown) as baseElementGroupSelection
+                            tableG as unknown as baseElementGroupSelection
                         );
                         this.addDragBehaviourToElement(
                             this,
-                            (tableG as unknown) as baseElementGroupSelection
+                            tableG as unknown as baseElementGroupSelection
                         );
                     }
                 },
