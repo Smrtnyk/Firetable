@@ -89,13 +89,13 @@ export default defineComponent({
         function instantiateFloor(floor: FloorDoc) {
             if (!svgFloorContainer.value) return;
 
-            floorInstance.value = new Floor({
-                floorDoc: floor,
-                container: svgFloorContainer.value,
-                mode: FloorMode.EDITOR,
-                elementClickHandler: onElementClickHandler,
-                dblClickHandler,
-            });
+            floorInstance.value = new Floor.Builder()
+                .setFloorDocument(floor)
+                .setMode(FloorMode.EDITOR)
+                .setContainer(svgFloorContainer.value)
+                .setElementClickHander(onElementClickHandler)
+                .setFloorDoubleClickHandler(dblClickHandler)
+                .build();
         }
 
         function onFloorSave() {

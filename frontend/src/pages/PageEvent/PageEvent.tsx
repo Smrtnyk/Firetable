@@ -289,12 +289,12 @@ export default defineComponent({
 
             if (!container) return;
 
-            const floorInstance = new Floor({
-                floorDoc: floor,
-                container,
-                mode: FloorMode.LIVE,
-                elementClickHandler: tableClickHandler,
-            });
+            const floorInstance = new Floor.Builder()
+                .setFloorDocument(floor)
+                .setMode(FloorMode.LIVE)
+                .setContainer(container)
+                .setElementClickHander(tableClickHandler)
+                .build();
 
             state.floorInstances.push(floorInstance);
         }
@@ -324,10 +324,12 @@ export default defineComponent({
 
                 for (const floorInstance of state.floorInstances) {
                     const findFloor = eventFloors.value.find(
-                        (floor: FloorDoc) => floor.id === floorInstance.id
+                        ({ id }) => id === floorInstance.id
                     );
 
-                    if (!findFloor) return;
+                    if (!findFloor) {
+                        return;
+                    }
 
                     floorInstance.data = findFloor.data;
                     floorInstance.renderTableElements();

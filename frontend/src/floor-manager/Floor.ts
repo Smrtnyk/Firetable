@@ -42,66 +42,53 @@ import { NumberTuple } from "src/types/generic";
 import { zoom } from "d3-zoom";
 import { D3DragEvent, drag } from "d3-drag";
 
-interface FloorCreateOptions {
-    floorDoc: Readonly<FloorDoc>;
-    container: HTMLElement;
-    mode: FloorMode;
-    elementClickHandler: ElementClickHandler;
-    dblClickHandler?: FloorDoubleClickHandler;
-}
-
 export class Floor {
-    public svg!: Selection<SVGSVGElement, unknown, null, unknown>;
-    public floor!: Selection<SVGGElement, unknown, null, unknown>;
-    private _data: BaseFloorElement[];
-
-    id: string;
-    height: number;
-    width: number;
     name: string;
+    width: number;
+    height: number;
+    data: BaseFloorElement[];
+
+    public readonly id: string;
+
     private readonly mode: FloorMode;
+    private readonly container: HTMLElement;
     private readonly dblClickHandler: FloorDoubleClickHandler;
     private readonly elementClickHandler: ElementClickHandler;
-    private container: HTMLElement;
 
-    constructor({
+    private svg!: Selection<SVGSVGElement, unknown, null, unknown>;
+    private floor!: Selection<SVGGElement, unknown, null, unknown>;
+
+    private constructor({
         floorDoc,
         container,
         mode,
-        elementClickHandler = NOOP,
-        dblClickHandler = NOOP,
-    }: FloorCreateOptions) {
-        if (!container) throw new Error("No container to render the svg");
+        elementClickHandler,
+        dblClickHandler,
+    }: typeof Floor.Builder.prototype) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const { name, width, height, data, id } = floorDoc!;
 
-        const floorCopy: FloorDoc = JSON.parse(JSON.stringify(floorDoc));
-        const { name, width, height, data, id } = floorCopy;
-
-        this.container = container;
-        this.elementClickHandler = elementClickHandler;
-        this.dblClickHandler = dblClickHandler;
-        this.mode = mode;
-        this.name = name;
         this.id = id;
+        this.mode = mode;
+        this.data = data;
+        this.name = name;
         this.width = width;
         this.height = height;
-        this._data = data;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        this.container = container!;
+
+        // Handlers
+        this.dblClickHandler = dblClickHandler;
+        this.elementClickHandler = elementClickHandler;
 
         this.init();
     }
 
-    get data() {
-        return this._data;
-    }
-
-    set data(newData: BaseFloorElement[]) {
-        this._data = JSON.parse(JSON.stringify(newData));
-    }
-
-    get tables(): TableElement[] {
+    public get tables(): TableElement[] {
         return getTables(this);
     }
 
-    get freeTables(): TableElement[] {
+    public get freeTables(): TableElement[] {
         return getFreeTables(this);
     }
 
@@ -113,20 +100,20 @@ export class Floor {
         this.setupEditor();
     }
 
-    addWall([x, y]: NumberTuple) {
-        this._data.push(makeRawWall(x, y));
+    public addWall([x, y]: NumberTuple) {
+        this.data.push(makeRawWall(x, y));
         this.renderWallElements();
     }
 
-    removeElement(element: BaseFloorElement) {
-        this._data = this._data.filter((d) => d.id !== element.id);
+    public removeElement(element: BaseFloorElement) {
+        this.data = this.data.filter((d) => d.id !== element.id);
         isTable(element)
             ? this.renderTableElements()
             : this.renderWallElements();
     }
 
-    addTableElement(rawTableElement: tableElementInit) {
-        this._data.push(
+    public addTableElement(rawTableElement: tableElementInit) {
+        this.data.push(
             makeRawTable({
                 floor: this.name,
                 ...rawTableElement,
@@ -135,13 +122,13 @@ export class Floor {
         this.renderTableElements();
     }
 
-    changeName(newName: string) {
+    public changeName(newName: string) {
         this.name = newName;
         this.tables.forEach((table) => (table.floor = newName));
     }
 
-    renderWallElements() {
-        const wallsData = this._data.filter(isWall);
+    private renderWallElements() {
+        const wallsData = this.data.filter(isWall);
 
         this.floor
             .selectAll("g.wallGroup")
@@ -186,7 +173,7 @@ export class Floor {
             );
     }
 
-    renderTableElements() {
+    public renderTableElements() {
         this.floor
             .selectAll<SVGGElement, TableElement>("g.tableGroup")
 
@@ -256,7 +243,7 @@ export class Floor {
             );
     }
 
-    eachTableDimensions(this: SVGElement, d: TableElement) {
+    private eachTableDimensions(this: SVGElement, d: TableElement) {
         const element = select<SVGElement, TableElement>(this);
         isRoundTable(d)
             ? element.attr("r", getRoundTableRadius)
@@ -265,7 +252,7 @@ export class Floor {
                   .attr("width", getTableWidth);
     }
 
-    addDragBehaviourToElement(
+    private addDragBehaviourToElement(
         instance: Floor,
         element: baseElementGroupSelection
     ) {
@@ -291,22 +278,22 @@ export class Floor {
         }
     }
 
-    elementDragStarted(this: Element): void {
+    private elementDragStarted(this: Element): void {
         select(this).classed("active", true);
     }
 
-    elementDragEnded(this: Element): void {
+    private elementDragEnded(this: Element): void {
         select(this).classed("active", false);
     }
 
-    addResizeBehaviorToElement(element: baseElementGroupSelection) {
+    private addResizeBehaviorToElement(element: baseElementGroupSelection) {
         element
             .append("g")
             .attr("class", "circles")
             .each(this.eachTableForResizeBehaviour(this));
     }
 
-    eachTableForResizeBehaviour(instance: Floor) {
+    private eachTableForResizeBehaviour(instance: Floor) {
         return function (this: SVGGElement, d: BaseFloorElement) {
             const node = instance.floor?.node();
             if (!node) return;
@@ -341,7 +328,7 @@ export class Floor {
         };
     }
 
-    elementResizing(instance: Floor) {
+    private elementResizing(instance: Floor) {
         return function (event: FTDragEvent, d: BaseFloorElement) {
             const { x, y } = event;
             const gridX = possibleXMove(instance.width + d.width, x, d.width);
@@ -382,7 +369,7 @@ export class Floor {
         };
     }
 
-    elementResizeStartEnd({
+    private elementResizeStartEnd({
         type,
         sourceEvent,
     }: D3DragEvent<Element, unknown, unknown>) {
@@ -392,14 +379,14 @@ export class Floor {
         element.attr("r", radius);
     }
 
-    resizerHover({ type, target }: MouseEvent) {
+    private resizerHover({ type, target }: MouseEvent) {
         const element = select(target as Element);
         const radius = type === "mouseenter" ? 6 : 2;
 
         element.attr("r", radius);
     }
 
-    setupEditor() {
+    private setupEditor() {
         if (!isEditorModeActive(this.mode)) return;
 
         this.floor
@@ -423,7 +410,7 @@ export class Floor {
             .attr("y2", (d) => d * RESOLUTION);
     }
 
-    setSVGAttributes() {
+    private setSVGAttributes() {
         this.svg
             .attr("viewBox", `0 0 ${this.width} ${this.height}`)
             .attr("preserveAspectRatio", "xMidYMid")
@@ -433,14 +420,14 @@ export class Floor {
             );
     }
 
-    addClickListenerToSVGContainer() {
+    private addClickListenerToSVGContainer() {
         this.svg.on("dblclick", (event: MouseEvent) => {
             event.preventDefault();
             this.dblClickHandler(this, pointer(event));
         });
     }
 
-    render() {
+    private render() {
         this.setSVGAttributes();
         this.addClickListenerToSVGContainer();
         this.setupEditor();
@@ -448,12 +435,12 @@ export class Floor {
         this.renderTableElements();
     }
 
-    createBaseElements() {
+    private createBaseElements() {
         this.svg = select(this.container).append("svg");
         this.floor = this.svg.append("g");
     }
 
-    addZoomBehaviourToSvgElement() {
+    private addZoomBehaviourToSvgElement() {
         const zoomBehaviour = zoom()
             .scaleExtent([1 / 2, 2])
             .constrain((transform, extent, translateExtent) => {
@@ -476,9 +463,54 @@ export class Floor {
             .on("dblclick.zoom", null);
     }
 
-    init() {
+    private init() {
         this.createBaseElements();
         this.addZoomBehaviourToSvgElement();
         this.render();
     }
+
+    static Builder = class {
+        floorDoc: Readonly<FloorDoc> | undefined;
+        container: HTMLElement | undefined;
+        mode: FloorMode = FloorMode.LIVE;
+        elementClickHandler: ElementClickHandler = NOOP;
+        dblClickHandler: FloorDoubleClickHandler = NOOP;
+
+        public setContainer(container: HTMLElement) {
+            this.container = container;
+            return this;
+        }
+
+        public setMode(mode: FloorMode) {
+            this.mode = mode;
+            return this;
+        }
+
+        public setFloorDocument(floorDoc: FloorDoc) {
+            this.floorDoc = JSON.parse(JSON.stringify(floorDoc));
+            return this;
+        }
+
+        public setElementClickHander(handler: ElementClickHandler) {
+            this.elementClickHandler = handler;
+            return this;
+        }
+
+        public setFloorDoubleClickHandler(handler: FloorDoubleClickHandler) {
+            this.dblClickHandler = handler;
+            return this;
+        }
+
+        public build() {
+            if (!this.container) {
+                throw new Error("Container is no defined!");
+            }
+
+            if (!this.floorDoc) {
+                throw new Error("Floor document is not defined!");
+            }
+
+            return new Floor(this);
+        }
+    };
 }
