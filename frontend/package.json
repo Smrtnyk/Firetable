@@ -20,12 +20,12 @@
         "d3-zoom": "2.0.0",
         "firebase": "8.6.2",
         "highcharts": "9.1.0",
-        "quasar": "2.0.0-beta.18",
+        "quasar": "2.0.0-beta.19",
         "vue-i18n": "9.1.4",
         "vuexfire": "3.2.5"
     },
     "devDependencies": {
-        "@quasar/app": "3.0.0-beta.26",
+        "@quasar/app": "3.0.0-beta.27",
         "@types/d3": "6.7.0",
         "@typescript-eslint/eslint-plugin": "4.25.0",
         "@typescript-eslint/parser": "4.25.0",
@@ -40,7 +40,7 @@
         "eslint-plugin-quasar": "1.0.0",
         "eslint-plugin-vue": "7.9.0",
         "prettier": "2.3.0",
-        "typescript": "4.2.4"
+        "typescript": "4.3.2"
     },
     "engines": {
         "node": ">= 14.16.1",
