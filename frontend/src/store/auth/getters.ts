@@ -1,5 +1,5 @@
 import { Role } from "src/types";
-import { AuthState } from "src/store/auth/state";
+import { AuthState } from "src/store/types";
 
 export function isAdmin(state: AuthState) {
     return !!state.user && state.user.role === Role.ADMIN;

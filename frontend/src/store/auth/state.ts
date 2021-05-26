@@ -1,11 +1,4 @@
-import { User } from "src/types";
-
-export interface AuthState {
-    isAuthenticated: boolean;
-    isReady: boolean;
-    user: User | undefined;
-    users: User[];
-}
+import { AuthState } from "src/store/types";
 
 const state: AuthState = {
     isAuthenticated: false,

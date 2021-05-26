@@ -10,7 +10,6 @@ import EventInfo from "components/Event/EventInfo";
 import {
     DialogChainObject,
     QBtn,
-    QDrawer,
     QFab,
     QFabAction,
     QSeparator,
@@ -58,7 +57,6 @@ import { whiteSpaceToUnderscore } from "src/helpers/utils";
 interface State {
     showMapsExpanded: boolean;
     activeFloor: FloorDoc | null;
-    showGuestList: boolean;
     showEventInfo: boolean;
     floorInstances: Floor[];
 }
@@ -71,7 +69,6 @@ export default defineComponent({
         QBtn,
         QSeparator,
         QSpace,
-        QDrawer,
         EventInfo,
         FTAutocomplete,
         EventGuestList,
@@ -87,7 +84,6 @@ export default defineComponent({
         const state = reactive<State>({
             showMapsExpanded: false,
             activeFloor: null,
-            showGuestList: false,
             showEventInfo: false,
             floorInstances: [],
         });
@@ -423,7 +419,9 @@ export default defineComponent({
                         <q-btn
                             class="button-gradient"
                             onClick={() =>
-                                (state.showGuestList = !state.showGuestList)
+                                store.commit(
+                                    "events/SET_EVENT_GUEST_LIST_DRAWER_VISIBILITY"
+                                )
                             }
                             icon="users"
                             rounded
@@ -456,19 +454,10 @@ export default defineComponent({
                             />
                         ))}
 
-                    <q-drawer
-                        v-model={state.showGuestList}
-                        class="PageEvent__guest-list-drawer"
-                        side="right"
-                        content-class="PageEvent__guest-list-container"
-                    >
-                        <event-guest-list
-                            guest-list-limit={Number(
-                                event.value.guestListLimit
-                            )}
-                            guest-list={guestList.value}
-                        />
-                    </q-drawer>
+                    <event-guest-list
+                        guest-list-limit={Number(event.value.guestListLimit)}
+                        guest-list={guestList.value}
+                    />
 
                     <event-info show-event-info-dialog={state.showEventInfo} />
                 </div>

@@ -1,4 +1,4 @@
-import { AuthState } from "src/store/auth/state";
+import { AuthState } from "src/store/types";
 
 interface AuthStatePayload {
     isReady: boolean;
