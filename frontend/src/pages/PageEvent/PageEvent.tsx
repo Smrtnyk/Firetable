@@ -57,7 +57,6 @@ import { whiteSpaceToUnderscore } from "src/helpers/utils";
 interface State {
     showMapsExpanded: boolean;
     activeFloor: FloorDoc | null;
-    showEventInfo: boolean;
     floorInstances: Floor[];
 }
 
@@ -84,7 +83,6 @@ export default defineComponent({
         const state = reactive<State>({
             showMapsExpanded: false,
             activeFloor: null,
-            showEventInfo: false,
             floorInstances: [],
         });
 
@@ -95,18 +93,19 @@ export default defineComponent({
         } | null = null;
 
         const store = useStore();
-        const $router = useRouter();
+        const router = useRouter();
+        const q = useQuasar();
         const { t } = useI18n();
-        const $q = useQuasar();
 
         const floorSvgs = ref<Record<string, HTMLElement>>({});
 
         const currentUser = computed(() => store.state.auth.user);
 
-        const eventFloorsRef = function (this: any, el: any) {
-            if (el) {
-                floorSvgs.value[this.id] = el;
+        const eventFloorsRef = function (this: FloorDoc, el: any) {
+            if (!el) {
+                return;
             }
+            floorSvgs.value[this.id] = el;
         };
 
         const { data: guestList } = useFirestore<GuestData>({
@@ -171,9 +170,7 @@ export default defineComponent({
                     tableId,
                 },
             };
-            $q.dialog(options).onCancel(
-                onDeleteReservation(floor, reservation)
-            );
+            q.dialog(options).onCancel(onDeleteReservation(floor, reservation));
         }
 
         function handleReservationCreation(floor: Floor) {
@@ -217,7 +214,7 @@ export default defineComponent({
                 },
             };
 
-            const dialog = $q
+            const dialog = q
                 .dialog(options)
                 .onOk(handleReservationCreation(floor))
                 .onDismiss(resetCurrentOpenCreateReservationDialog);
@@ -355,7 +352,7 @@ export default defineComponent({
 
         async function init() {
             if (!props.id) {
-                await $router.replace("/");
+                await router.replace("/");
             }
         }
 
@@ -412,7 +409,9 @@ export default defineComponent({
                             size="md"
                             icon="info"
                             onClick={() =>
-                                (state.showEventInfo = !state.showEventInfo)
+                                store.commit(
+                                    "events/TOGGLE_EVENT_INFO_MODAL_VISIBILITY"
+                                )
                             }
                         />
 
@@ -441,7 +440,7 @@ export default defineComponent({
                         class="q-mb-sm"
                     />
 
-                    {eventFloors.value.length &&
+                    {!!eventFloors.value.length &&
                         eventFloors.value.map((floor) => (
                             <div
                                 ref={eventFloorsRef.bind(floor)}
@@ -459,7 +458,7 @@ export default defineComponent({
                         guest-list={guestList.value}
                     />
 
-                    <event-info show-event-info-dialog={state.showEventInfo} />
+                    <event-info />
                 </div>
             );
         };
