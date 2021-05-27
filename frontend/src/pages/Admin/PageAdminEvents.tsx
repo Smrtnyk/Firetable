@@ -10,7 +10,6 @@ import {
 } from "src/services/firebase/db-events";
 import {
     useQuasar,
-    QDialog,
     QBtn,
     QList,
     QInfiniteScroll,
@@ -22,6 +21,7 @@ import { useRouter } from "vue-router";
 import { useFirestore } from "src/composables/useFirestore";
 import PageAdminEventsListItem from "components/Event/PageAdminEventsListItem";
 import { FTTitle } from "components/FTTitle";
+import { useStore } from "src/store";
 
 interface IPaginator extends Element {
     stop: () => void;
@@ -34,7 +34,6 @@ export default defineComponent({
         FTTitle,
         PageAdminEventsListItem,
         EventCreateForm,
-        QDialog,
         QBtn,
         QList,
         QInfiniteScroll,
@@ -44,9 +43,10 @@ export default defineComponent({
     },
 
     setup() {
-        const $q = useQuasar();
-        const $router = useRouter();
-        const showCreateEventForm = ref(false);
+        const q = useQuasar();
+        const router = useRouter();
+        const store = useStore();
+
         const isLoading = ref(true);
         const events = ref<EventDoc[]>([]);
         const hasMoreEventsToFetch = ref(true);
@@ -63,7 +63,7 @@ export default defineComponent({
             await tryCatchLoadingWrapper(
                 fetchMoreEvents.bind(null, null),
                 [],
-                () => void $router.replace("/")
+                () => void router.replace("/")
             );
             isLoading.value = false;
         }
@@ -82,12 +82,12 @@ export default defineComponent({
         }
 
         function onCreateEvent(eventData: CreateEventPayload) {
-            showCreateEventForm.value = false;
+            store.commit("events/TOGGLE_EVENT_CREATE_MODAL_VISIBILITY");
 
             void tryCatchLoadingWrapper(async () => {
                 const { data: id } = await createNewEvent(eventData);
-                $q.notify("Event created!");
-                await $router.replace({
+                q.notify("Event created!");
+                await router.replace({
                     name: "adminEvent",
                     params: { id },
                 });
@@ -128,12 +128,10 @@ export default defineComponent({
 
         return () => (
             <div class="PageAdminEvents">
-                <q-dialog maximized v-model={showCreateEventForm.value}>
-                    <event-create-form
-                        floors={floors.value}
-                        onCreate={onCreateEvent}
-                    />
-                </q-dialog>
+                <event-create-form
+                    floors={floors.value}
+                    onCreate={onCreateEvent}
+                />
 
                 <f-t-title title="Events">
                     {{
@@ -143,8 +141,9 @@ export default defineComponent({
                                 icon="plus"
                                 class="button-gradient"
                                 onClick={() =>
-                                    (showCreateEventForm.value =
-                                        !showCreateEventForm.value)
+                                    store.commit(
+                                        "events/TOGGLE_EVENT_CREATE_MODAL_VISIBILITY"
+                                    )
                                 }
                                 label="new event"
                             />

@@ -15,5 +15,8 @@ export default {
         TOGGLE_EVENT_INFO_MODAL_VISIBILITY: (state: EventsState) => {
             state.showEventInfoModal = !state.showEventInfoModal;
         },
+        TOGGLE_EVENT_CREATE_MODAL_VISIBILITY: (state: EventsState) => {
+            state.showCreateEventModal = !state.showCreateEventModal;
+        },
     },
 };
