@@ -13,7 +13,10 @@ import { clearOldEvents } from "./clear-old-events";
 setVapidDetails(vapidKeys.subject, vapidKeys.public, vapidKeys.secret);
 
 // Everything that has to do with events
-exports.createEvent = functions.region("europe-west3").https.onCall(createEvent);
+exports.createEvent = functions
+    .region("europe-west3")
+    .https
+    .onCall(createEvent);
 
 exports.handleEventImageWhenEventDeleted = functions
     .region("europe-west3")
@@ -28,11 +31,24 @@ exports.handleWhenEventTablesChange = functions
     .onUpdate(handleReservation);
 
 // Everything that has to do with auth
-exports.createUser = functions.region("europe-west3").https.onCall(createUser);
-exports.deleteUser = functions.region("europe-west3").https.onCall(deleteUser);
+exports.createUser = functions
+    .region("europe-west3")
+    .https
+    .onCall(createUser);
+exports.deleteUser = functions
+    .region("europe-west3")
+    .https
+    .onCall(deleteUser);
 
 // Generic stuff
-exports.deleteCollection = functions.region("europe-west3").https.onCall(deleteDocument);
+exports.deleteCollection = functions
+    .region("europe-west3")
+    .https
+    .onCall(deleteDocument);
 
 // Crons
-exports.clearOldEvents = functions.region("europe-west3").pubsub.schedule("every day 00:00").onRun(clearOldEvents);
+exports.clearOldEvents = functions
+    .region("europe-west3")
+    .pubsub
+    .schedule("every day 00:00")
+    .onRun(clearOldEvents);

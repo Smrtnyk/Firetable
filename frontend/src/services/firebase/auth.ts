@@ -56,30 +56,31 @@ export function routerBeforeEach(
 ) {
     router.beforeEach(async (to) => {
         try {
-            /* Force the app to wait until Firebase has
-               Finished its initialization, and handle the
-               Authentication state of the user properly */
+            // Force the app to wait until Firebase has
+            // finished its initialization, and handle the
+            // authentication state of the user properly
             await ensureAuthIsInitialized(store);
             const requiresAuth = to.meta.requiresAuth;
             const requiresAdmin = to.meta.requiresAdmin;
 
-            if (requiresAuth && !isAuthenticated(store))
+            if (requiresAuth && !isAuthenticated(store)) {
                 return { name: "auth" };
+            }
 
-            if (isAuthenticated(store)) {
-                const token = await auth()?.currentUser?.getIdTokenResult();
-                const role = token?.claims.role;
-                const isAdmin = role === Role.ADMIN;
+            if (!isAuthenticated(store)) {
+                return true;
+            }
 
-                if (requiresAdmin && !isAdmin) {
-                    return { name: "home" };
-                } else if (requiresAdmin && isAdmin) {
-                    return true;
-                } else if (to.path === "/auth") {
-                    return { name: "home" };
-                } else {
-                    return true;
-                }
+            const token = await auth()?.currentUser?.getIdTokenResult();
+            const role = token?.claims.role;
+            const isAdmin = role === Role.ADMIN;
+
+            if (requiresAdmin && !isAdmin) {
+                return { name: "home" };
+            } else if (requiresAdmin && isAdmin) {
+                return true;
+            } else if (to.path === "/auth") {
+                return { name: "home" };
             } else {
                 return true;
             }
