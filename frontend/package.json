@@ -27,8 +27,8 @@
     "devDependencies": {
         "@quasar/app": "3.0.0-beta.28",
         "@types/d3": "6.7.0",
-        "@typescript-eslint/eslint-plugin": "4.25.0",
-        "@typescript-eslint/parser": "4.25.0",
+        "@typescript-eslint/eslint-plugin": "4.26.0",
+        "@typescript-eslint/parser": "4.26.0",
         "@vue/babel-plugin-jsx": "^1.0.6",
         "babel-loader": "8.2.2",
         "dotenv": "10.0.0",
