@@ -1,4 +1,10 @@
-import { computed, defineComponent, ref } from "vue";
+import {
+    computed,
+    defineComponent,
+    ref,
+    resolveDynamicComponent,
+    Transition,
+} from "vue";
 import { useStore } from "src/store";
 
 // Components
@@ -6,6 +12,7 @@ import AppDrawer from "src/components/AppDrawer/AppDrawer";
 import { AppTopMenu } from "src/components/AppTopMenu";
 
 import { QLayout, QDrawer, QPage, QPageContainer } from "quasar";
+import { Component as DynamicComponent } from "@vue/runtime-core";
 
 export default defineComponent({
     name: "MyLayout",
@@ -50,7 +57,19 @@ export default defineComponent({
                             <router-view
                                 style="padding-bottom: 51px"
                                 class="col-xs-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3"
-                            />
+                            >
+                                {({
+                                    Component,
+                                }: {
+                                    Component: DynamicComponent;
+                                }) => (
+                                    <Transition name="fade" mode="out-in">
+                                        {() =>
+                                            resolveDynamicComponent(Component)
+                                        }
+                                    </Transition>
+                                )}
+                            </router-view>
                         </q-page>
 
                         <app-top-menu onToggle={onDrawerToggle} />

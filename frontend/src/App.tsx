@@ -1,9 +1,16 @@
-import { defineComponent } from "vue";
+import {
+    defineComponent,
+    Transition,
+    Component as DynamicComponent,
+    resolveDynamicComponent,
+} from "vue";
 import { useQuasar } from "quasar";
 import { getDarkMode, myIcons } from "src/config";
+import { RouterView } from "vue-router";
 
 export default defineComponent({
     name: "App",
+
     setup() {
         const q = useQuasar();
 
@@ -16,6 +23,14 @@ export default defineComponent({
 
         q.dark.set(getDarkMode());
 
-        return () => <router-view />;
+        return () => (
+            <router-view>
+                {({ Component }: { Component: DynamicComponent }) => (
+                    <Transition name="fade">
+                        {() => resolveDynamicComponent(Component)}
+                    </Transition>
+                )}
+            </router-view>
+        );
     },
 });
