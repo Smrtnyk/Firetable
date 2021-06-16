@@ -104,7 +104,7 @@ module.exports = configure(function (ctx) {
         },
 
         // animations: 'all', // --- includes all animations
-        animations: ["fadeIn", "fadeOut"],
+        animations: [],
 
         ssr: { pwa: false },
 
