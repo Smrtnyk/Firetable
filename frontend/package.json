@@ -19,14 +19,14 @@
         "d3-selection": "3.0.0",
         "d3-zoom": "3.0.0",
         "firebase": "8.6.7",
-        "highcharts": "9.1.1",
-        "quasar": "2.0.0-rc.1",
+        "highcharts": "9.1.2",
+        "quasar": "2.0.0-rc.3",
         "vue-i18n": "9.1.4",
         "vuex": "4.0.1",
         "vuexfire": "3.2.5"
     },
     "devDependencies": {
-        "@quasar/app": "3.0.0-rc.1",
+        "@quasar/app": "3.0.0-rc.3",
         "@types/d3": "6.7.0",
         "@typescript-eslint/eslint-plugin": "4.27.0",
         "@typescript-eslint/parser": "4.27.0",
