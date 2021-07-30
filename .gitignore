@@ -36,5 +36,7 @@ cypress.json
 localhost.pem
 localhost-key.pem
 
+firebase-export-*
+
 *.log
 local-db
