@@ -16,7 +16,6 @@ export async function createEvent(eventPayload: CreateEventPayload, context: fun
 
     if (img) {
         const base64EncodedImageString = img.split(",")[1];
-        console.log(base64EncodedImageString);
         uploadedImg = await uploadFile(`${Collection.EVENTS}/${id}`, base64EncodedImageString);
     }
 
