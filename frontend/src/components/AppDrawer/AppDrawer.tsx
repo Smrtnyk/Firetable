@@ -51,7 +51,6 @@ export default defineComponent({
             { value: "en-GB", label: "English" },
             { value: "de", label: "German" },
         ];
-        const online = ref(false);
 
         const adminLinks = computed(() => [
             {
