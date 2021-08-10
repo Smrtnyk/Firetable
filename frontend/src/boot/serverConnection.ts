@@ -5,6 +5,7 @@ import {
     routerBeforeEach,
 } from "src/services/firebase/auth";
 import { auth, fBInit } from "../services/firebase/base";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default boot(({ router, store }) => {
     fBInit({
@@ -19,7 +20,9 @@ export default boot(({ router, store }) => {
 
     /* Tell the application what to do when the
        authentication state has changed */
-    auth().onAuthStateChanged(
+    onAuthStateChanged(
+        auth(),
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         handleOnAuthStateChanged.bind(null, router, store),
         showErrorMessage
     );

@@ -1,4 +1,8 @@
-import type firebase from "firebase/compat";
+import {
+    signInWithEmailAndPassword,
+    User,
+    UserCredential,
+} from "firebase/auth";
 import { Router } from "vue-router";
 import { Store } from "vuex";
 
@@ -31,7 +35,7 @@ export function isAuthenticated(store: ReturnType<typeof useStore>) {
 export async function handleOnAuthStateChanged(
     router: Router,
     store: ReturnType<typeof useStore>,
-    currentUser: firebase.User | null
+    currentUser: User | null
 ) {
     const initialAuthState = isAuthenticated(store);
     // Save to the store
@@ -103,8 +107,8 @@ export function logoutUser() {
 export function loginWithEmail(
     email: string,
     password: string
-): Promise<firebase.auth.UserCredential> {
-    return auth().signInWithEmailAndPassword(email, password);
+): Promise<UserCredential> {
+    return signInWithEmailAndPassword(auth(), email, password);
 }
 
 /**
