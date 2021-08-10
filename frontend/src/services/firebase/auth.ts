@@ -1,4 +1,4 @@
-import type firebase from "firebase";
+import type firebase from "firebase/compat";
 import { Router } from "vue-router";
 import { Store } from "vuex";
 

@@ -18,7 +18,7 @@
         "d3-drag": "3.0.0",
         "d3-selection": "3.0.0",
         "d3-zoom": "3.0.0",
-        "firebase": "8.9.0",
+        "firebase": "9.0.0-beta.8",
         "highcharts": "9.1.2",
         "quasar": "2.0.3",
         "vue-i18n": "9.1.4",

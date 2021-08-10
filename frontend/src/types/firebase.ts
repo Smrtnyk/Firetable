@@ -1,4 +1,4 @@
-import type firebase from "firebase";
+import type firebase from "firebase/compat";
 
 export type DocumentData = firebase.firestore.DocumentData;
 export type QueryDocumentSnapshot<T> = firebase.firestore.QueryDocumentSnapshot;
