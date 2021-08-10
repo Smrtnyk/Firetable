@@ -89,6 +89,7 @@ export default defineComponent({
                 q.notify("Event created!");
                 await router.replace({
                     name: "adminEvent",
+                    // @ts-ignore - fix this
                     params: { id },
                 });
             });

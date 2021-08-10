@@ -1,7 +1,7 @@
 import firebase from "firebase/compat/app";
 import { getAuth, connectAuthEmulator } from "firebase/auth";
 import "firebase/compat/firestore";
-import "firebase/compat/functions";
+import { getFunctions, connectFunctionsEmulator } from "@firebase/functions";
 
 const { initializeApp } = firebase;
 let app: firebase.app.App;
@@ -11,7 +11,7 @@ function setFirebaseApp(appObj: firebase.app.App) {
     if (location.hostname === "localhost") {
         app.firestore().useEmulator("localhost", 4000);
         connectAuthEmulator(auth(), "http://localhost:9099/");
-        app.functions("europe-west3").useEmulator("localhost", 5001);
+        connectFunctionsEmulator(functions(), "localhost", 5001);
     }
 }
 
@@ -20,7 +20,7 @@ export function getFirebaseApp() {
 }
 
 export function functions() {
-    return app.functions("europe-west3");
+    return getFunctions(app, "europe-west3");
 }
 
 export function auth() {

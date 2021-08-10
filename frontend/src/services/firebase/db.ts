@@ -1,5 +1,6 @@
 import { firestore, functions } from "./base";
 import { Collection } from "src/types";
+import { httpsCallable } from "@firebase/functions";
 
 function collection(collectionName: Collection) {
     return firestore().collection(collectionName);
@@ -38,7 +39,7 @@ export function fcm() {
  * a server-side delete.
  */
 export function deleteCollection(id: string) {
-    const deleteFn = functions().httpsCallable("deleteCollection");
+    const deleteFn = httpsCallable(functions(), "deleteCollection");
     return deleteFn({ col: Collection.EVENTS, id });
 }
 

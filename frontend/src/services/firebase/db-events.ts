@@ -8,6 +8,7 @@ import {
 import { CreateEventPayload, EventDoc, GuestData } from "src/types";
 import { functions } from "src/services/firebase/base";
 import { DocumentData } from "src/types/firebase";
+import { httpsCallable } from "@firebase/functions";
 import type { Floor } from "src/floor-manager/Floor";
 
 export async function getEvents(
@@ -38,7 +39,7 @@ export function deleteEvent(id: string) {
 }
 
 export function createNewEvent(eventPayload: CreateEventPayload) {
-    return functions().httpsCallable("createEvent")(eventPayload);
+    return httpsCallable(functions(), "createEvent")(eventPayload);
 }
 
 export function updateEventFloorData(floor: Floor, eventId: string) {

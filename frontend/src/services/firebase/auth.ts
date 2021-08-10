@@ -11,9 +11,10 @@ import { showErrorMessage } from "src/helpers/ui-helpers";
 import { Role, CreateUserPayload, ValueOf } from "src/types";
 import { usersCollection } from "src/services/firebase/db";
 import { useStore } from "src/store";
+import { httpsCallable } from "@firebase/functions";
 
 export function createUserWithEmail(payload: CreateUserPayload) {
-    return functions().httpsCallable("createUser")(payload);
+    return httpsCallable(functions(), "createUser")(payload);
 }
 
 export function updateUser(
@@ -96,7 +97,7 @@ export function routerBeforeEach(
 }
 
 export function deleteUser(id: string) {
-    const deleteFunction = functions().httpsCallable("deleteUser");
+    const deleteFunction = httpsCallable(functions(), "deleteUser");
     return deleteFunction(id);
 }
 
