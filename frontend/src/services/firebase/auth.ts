@@ -12,6 +12,8 @@ import { Role, CreateUserPayload, ValueOf } from "src/types";
 import { usersCollection } from "src/services/firebase/db";
 import { useStore } from "src/store";
 import { httpsCallable } from "@firebase/functions";
+import { doc, updateDoc } from "@firebase/firestore";
+import { onAuthStateChanged } from "@firebase/auth";
 
 export function createUserWithEmail(payload: CreateUserPayload) {
     return httpsCallable(functions(), "createUser")(payload);
@@ -22,11 +24,9 @@ export function updateUser(
     field: keyof CreateUserPayload,
     value: ValueOf<CreateUserPayload>
 ) {
-    return usersCollection()
-        .doc(uid)
-        .update({
-            [field]: value,
-        });
+    return updateDoc(doc(usersCollection(), uid), {
+        [field]: value,
+    });
 }
 
 export function isAuthenticated(store: ReturnType<typeof useStore>) {
@@ -124,7 +124,8 @@ export function ensureAuthIsInitialized(store: ReturnType<typeof useStore>) {
     // Create the observer only once on init
     return new Promise<void>((resolve, reject) => {
         // Use a promise to make sure that the router will eventually show the route after the auth is initialized.
-        const unsubscribe = auth().onAuthStateChanged(
+        const unsubscribe = onAuthStateChanged(
+            auth(),
             () => {
                 resolve();
                 unsubscribe();

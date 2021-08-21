@@ -86,11 +86,13 @@ export default defineComponent({
             floorInstances: [],
         });
 
-        let currentOpenCreateReservationDialog: {
-            tableId: string;
-            dialog: DialogChainObject;
-            floor: string;
-        } | null = null;
+        let currentOpenCreateReservationDialog:
+            | {
+                  tableId: string;
+                  dialog: DialogChainObject;
+                  floor: string;
+              }
+            | undefined;
 
         const store = useStore();
         const router = useRouter();
@@ -200,7 +202,7 @@ export default defineComponent({
         }
 
         function resetCurrentOpenCreateReservationDialog() {
-            currentOpenCreateReservationDialog = null;
+            currentOpenCreateReservationDialog = void 0;
         }
 
         function showCreateReservationDialog(floor: Floor, tableId: string) {
@@ -229,9 +231,11 @@ export default defineComponent({
         function tableClickHandler(floor: Floor, d: BaseFloorElement) {
             if (!isTable(d)) return;
             const { reservation, tableId } = d;
-            reservation
-                ? showReservation(floor, reservation, tableId)
-                : showCreateReservationDialog(floor, tableId);
+            if (reservation) {
+                showReservation(floor, reservation, tableId);
+            } else {
+                showCreateReservationDialog(floor, tableId);
+            }
         }
 
         function onDeleteReservation(
@@ -307,7 +311,7 @@ export default defineComponent({
             if (isTableStillFree) return;
 
             dialog.hide();
-            currentOpenCreateReservationDialog = null;
+            currentOpenCreateReservationDialog = void 0;
             showErrorMessage(t("PageEvent.reservationAlreadyReserved"));
         }
 

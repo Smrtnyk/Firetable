@@ -1,6 +1,6 @@
 import firebase from "firebase/compat/app";
-import { getAuth, connectAuthEmulator } from "firebase/auth";
-import "firebase/compat/firestore";
+import { getAuth, connectAuthEmulator } from "@firebase/auth";
+import { getFirestore, connectFirestoreEmulator } from "@firebase/firestore";
 import { getFunctions, connectFunctionsEmulator } from "@firebase/functions";
 
 const { initializeApp } = firebase;
@@ -9,7 +9,7 @@ let app: firebase.app.App;
 function setFirebaseApp(appObj: firebase.app.App) {
     app = appObj;
     if (location.hostname === "localhost") {
-        app.firestore().useEmulator("localhost", 4000);
+        connectFirestoreEmulator(firestore(), "localhost", 4000);
         connectAuthEmulator(auth(), "http://localhost:9099/");
         connectFunctionsEmulator(functions(), "localhost", 5001);
     }
@@ -28,7 +28,7 @@ export function auth() {
 }
 
 export function firestore() {
-    return app.firestore();
+    return getFirestore(app);
 }
 
 export function fBInit(config: Record<string, string>) {

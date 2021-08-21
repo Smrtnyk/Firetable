@@ -1,37 +1,41 @@
 import { firestore, functions } from "./base";
 import { Collection } from "src/types";
 import { httpsCallable } from "@firebase/functions";
+import { collection, doc } from "@firebase/firestore";
 
-function collection(collectionName: Collection) {
-    return firestore().collection(collectionName);
+function getCollection(collectionName: Collection) {
+    return collection(firestore(), collectionName);
 }
 
 export function eventsCollection() {
-    return collection(Collection.EVENTS);
+    return getCollection(Collection.EVENTS);
 }
 
 export function floorsCollection() {
-    return collection(Collection.FLOORS);
+    return getCollection(Collection.FLOORS);
 }
 
 export function eventFloorsCollection(eventId: string) {
-    return eventsCollection().doc(eventId).collection(Collection.FLOORS);
+    return doc(eventsCollection(), eventId + "/" + Collection.FLOORS);
 }
 
-export const eventFeedCollection = (eventId: string) => {
-    return eventsCollection().doc(eventId).collection(Collection.EVENT_FEED);
-};
+export function eventFeedCollection(eventId: string) {
+    return doc(eventsCollection(), eventId + "/" + Collection.EVENT_FEED);
+}
 
 export function guestListCollection(eventId: string) {
-    return eventsCollection().doc(eventId).collection(Collection.GUEST_LIST);
+    return collection(
+        eventsCollection(),
+        eventId + "/" + Collection.GUEST_LIST
+    );
 }
 
 export function usersCollection() {
-    return collection(Collection.USERS);
+    return getCollection(Collection.USERS);
 }
 
 export function fcm() {
-    return collection(Collection.FCM);
+    return getCollection(Collection.FCM);
 }
 
 /**
@@ -46,17 +50,17 @@ export function deleteCollection(id: string) {
 // DOCS
 
 export function eventDoc(eventId: string) {
-    return eventsCollection().doc(eventId);
+    return doc(eventsCollection(), eventId);
 }
 
 export function floorDoc(id: string) {
-    return floorsCollection().doc(id);
+    return doc(floorsCollection(), id);
 }
 
 export function eventFloorDoc(eventId: string, floorId: string) {
-    return eventDoc(eventId).collection(Collection.FLOORS).doc(floorId);
+    return doc(eventDoc(eventId), Collection.FLOORS + "/" + floorId);
 }
 
 export function guestDoc(eventId: string, guestId: string) {
-    return guestListCollection(eventId).doc(guestId);
+    return doc(guestListCollection(eventId), guestId);
 }

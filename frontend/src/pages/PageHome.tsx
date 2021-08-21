@@ -6,6 +6,12 @@ import { FTSubtitle } from "src/components/FTSubtitle";
 import { defineComponent } from "vue";
 import { useFirestore } from "src/composables/useFirestore";
 import { Collection, EventDoc } from "src/types";
+import {
+    query as firestoreQuery,
+    where,
+    orderBy,
+    limit,
+} from "@firebase/firestore";
 
 import { QImg } from "quasar";
 
@@ -27,10 +33,19 @@ export default defineComponent({
             queryType: "collection",
             path: Collection.EVENTS,
             query(collectionRef) {
-                return collectionRef
-                    .where("date", ">=", Date.now() - 60 * 60 * 1000 * 8)
-                    .orderBy("date")
-                    .limit(10);
+                const whereConstraint = where(
+                    "date",
+                    ">=",
+                    Date.now() - 60 * 60 * 1000 * 8
+                );
+                const orderByConstraint = orderBy("date");
+                const limitConstraint = limit(10);
+                return firestoreQuery(
+                    collectionRef,
+                    whereConstraint,
+                    orderByConstraint,
+                    limitConstraint
+                );
             },
         });
 

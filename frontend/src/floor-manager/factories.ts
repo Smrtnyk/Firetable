@@ -14,15 +14,16 @@ import {
     FloorDoc,
     TableElement,
 } from "src/types";
+import { DocumentReference } from "@firebase/firestore";
+import { firestore } from "src/services/firebase/base";
 
 type CreateTableElementPayload = Pick<
     TableElement,
     "tableId" | "floor" | "x" | "y" | "tag"
 >;
 
-export function makeRawFloor(name: string): FloorDoc {
+export function makeRawFloor(name: string): Omit<FloorDoc, "id"> {
     return {
-        id: floorsCollection().doc().id,
         name: name,
         data: [
             makeRawTable({

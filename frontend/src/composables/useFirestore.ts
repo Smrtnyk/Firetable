@@ -23,14 +23,17 @@ import {
     optsAreGetDoc,
     optsAreWatchColl,
 } from "./types/type-guards";
-import { getFirebaseApp } from "src/services/firebase/base";
+import { firestore, getFirebaseApp } from "src/services/firebase/base";
 import { CollectionRef, Docref, DocumentData } from "src/types/firebase";
-
-type UseFirestoreReturnType<T, M = T> =
-    | ReturnCollGet<T, M>
-    | ReturnDocWatch<T, M>
-    | ReturnDocGet<T, M>
-    | ReturnCollWatch<T, M>;
+import {
+    onSnapshot,
+    collection,
+    doc,
+    setDoc,
+    deleteDoc as FirestoreDeleteDoc,
+    getDoc,
+    getDocs,
+} from "@firebase/firestore";
 
 // Overload Watch Collection
 export function useFirestore<T, M = T>(
@@ -98,11 +101,9 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
     // firestore Ref computation
     function createComputedFirestoreRef() {
         if (optsAreColl(options)) {
-            return computed(() =>
-                firebase.firestore().collection(pathReplaced.value)
-            );
+            return computed(() => collection(firestore(), pathReplaced.value));
         } else {
-            return computed(() => firebase.firestore().doc(pathReplaced.value));
+            return computed(() => doc(firestore(), pathReplaced.value));
         }
     }
 
@@ -122,14 +123,14 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
 
     function updateDoc(updates: Partial<T>) {
         if (firestoreRefIsDoc(firestoreRef.value)) {
-            return firestoreRef.value.set(updates, { merge: true });
+            return setDoc(firestoreRef.value, updates, { merge: true });
         }
         return Promise.resolve();
     }
 
     function deleteDoc() {
         if (firestoreRefIsDoc(firestoreRef.value)) {
-            return firestoreRef.value.delete();
+            return FirestoreDeleteDoc(firestoreRef.value);
         }
         return Promise.resolve();
     }
@@ -174,8 +175,9 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
 
     async function getDocData() {
         try {
-            const firestoreRefVal = firestoreRef.value as Docref;
-            const doc = await firestoreRefVal.get();
+            const firestoreRefVal = firestoreRef.value;
+            // @ts-ignore
+            const doc = await getDoc(firestoreRefVal);
 
             if (!doc.exists) {
                 return;
@@ -195,8 +197,9 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
         try {
             const firestoreRefVal = firestoreQuery.value
                 ? firestoreQuery.value
-                : (firestoreRef.value as CollectionRef);
-            const collection = await firestoreRefVal.get();
+                : (firestoreRef.value as unknown as CollectionRef);
+            // @ts-ignore
+            const collection = await getDocs(firestoreRefVal);
             let colData: T[] = [];
             if (collection.size) {
                 colData = collection.docs.map(firestoreDocSerializer);
@@ -213,17 +216,18 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
     const watchData = () => {
         try {
             if (firestoreRefIsDoc(firestoreRef.value)) {
-                watcher = firestoreRef.value.onSnapshot((doc) => {
+                watcher = onSnapshot(firestoreRef.value, (doc) => {
                     receiveDocData(
-                        doc.exists ? firestoreDocSerializer(doc) : undefined
+                        doc.exists() ? firestoreDocSerializer(doc) : undefined
                     );
                 });
             } else {
                 const firestoreRefVal =
                     firestoreQuery.value !== null
                         ? firestoreQuery.value
-                        : (firestoreRef.value as CollectionRef);
-                watcher = firestoreRefVal.onSnapshot((collection) => {
+                        : (firestoreRef.value as unknown as CollectionRef);
+                // @ts-ignore
+                watcher = onSnapshot(firestoreRefVal, (collection) => {
                     receiveCollData(
                         collection.size
                             ? collection.docs.map(firestoreDocSerializer)

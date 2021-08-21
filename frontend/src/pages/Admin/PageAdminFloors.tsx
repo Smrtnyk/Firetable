@@ -7,7 +7,11 @@ import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { defineComponent, ref, withDirectives } from "vue";
 
 import { FloorDoc, Collection } from "src/types";
-import { deleteFloor, saveFloor } from "src/services/firebase/db-floors";
+import {
+    deleteFloor,
+    saveFloor,
+    addFloor,
+} from "src/services/firebase/db-floors";
 import { useFirestore } from "src/composables/useFirestore";
 
 import {
@@ -43,7 +47,7 @@ export default defineComponent({
     setup() {
         const showCreateFloorForm = ref(false);
         const { data: floors, loading: isLoading } = useFirestore<FloorDoc>({
-            type: "get",
+            type: "watch",
             queryType: "collection",
             path: Collection.FLOORS,
         });
@@ -69,7 +73,7 @@ export default defineComponent({
         async function onAddNewFloor({ name }: Pick<FloorDoc, "name">) {
             const newFloor = makeRawFloor(name);
             await tryCatchLoadingWrapper(async () => {
-                await saveFloor(newFloor);
+                await addFloor(newFloor);
                 showCreateFloorForm.value = false;
             });
         }

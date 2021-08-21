@@ -1,10 +1,13 @@
-import type firebase from "firebase/compat/app";
+import {
+    DocumentReference,
+    DocumentData,
+    CollectionReference,
+    Query as FirestoreQuery,
+} from "@firebase/firestore";
 
 /** Firestore DocumentReference */
-export type Docref =
-    firebase.firestore.DocumentReference<firebase.firestore.DocumentData>;
+export type Docref = DocumentReference<DocumentData>;
 /** Firestore CollectionReference */
-export type CollectionRef =
-    firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
+export type CollectionRef = CollectionReference<DocumentData>;
 /** Firestore Query */
-export type Query = firebase.firestore.Query<firebase.firestore.DocumentData>;
+export type Query = FirestoreQuery<DocumentData>;
