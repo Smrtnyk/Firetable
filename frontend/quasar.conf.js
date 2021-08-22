@@ -73,22 +73,6 @@ module.exports = configure(function (ctx) {
                         },
                     ],
                 });
-                cfg.module.rules.push({
-                    test: /\.tsx$/,
-                    exclude: /(node_modules|quasar)/,
-                    use: [
-                        {
-                            loader: "babel-loader",
-                        },
-                        {
-                            loader: "ts-loader",
-                            options: {
-                                appendTsxSuffixTo: [/\.vue$/],
-                                transpileOnly: true,
-                            },
-                        },
-                    ],
-                });
             },
         },
 

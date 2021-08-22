@@ -2,7 +2,7 @@ import { EventCreateForm } from "src/components/Event/EventCreateForm";
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { defineComponent, onMounted, ref } from "vue";
 import { EventDoc, CreateEventPayload, Collection, FloorDoc } from "src/types";
-import { DocumentData, QueryDocumentSnapshot } from "src/types/firebase";
+import { DocumentData, QueryDocumentSnapshot } from "@firebase/firestore";
 import {
     createNewEvent,
     deleteEvent,

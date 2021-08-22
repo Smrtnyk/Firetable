@@ -1,18 +1,22 @@
-import firebase from "firebase/compat/app";
+import { initializeApp, FirebaseApp } from "@firebase/app";
 import { getAuth, connectAuthEmulator } from "@firebase/auth";
 import { getFirestore, connectFirestoreEmulator } from "@firebase/firestore";
 import { getFunctions, connectFunctionsEmulator } from "@firebase/functions";
 
-const { initializeApp } = firebase;
-let app: firebase.app.App;
+let app: FirebaseApp;
 
-function setFirebaseApp(appObj: firebase.app.App) {
+function setFirebaseApp(appObj: FirebaseApp) {
     app = appObj;
-    if (location.hostname === "localhost") {
-        connectFirestoreEmulator(firestore(), "localhost", 4000);
-        connectAuthEmulator(auth(), "http://localhost:9099/");
-        connectFunctionsEmulator(functions(), "localhost", 5001);
+    initEmulators();
+}
+
+function initEmulators(): void {
+    if (location.hostname !== "localhost") {
+        return;
     }
+    connectFirestoreEmulator(firestore(), "localhost", 4000);
+    connectAuthEmulator(auth(), "http://localhost:9099/");
+    connectFunctionsEmulator(functions(), "localhost", 5001);
 }
 
 export function getFirebaseApp() {

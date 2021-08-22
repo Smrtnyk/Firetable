@@ -41,14 +41,14 @@ export function showErrorMessage(e: unknown) {
 export async function tryCatchLoadingWrapper<T>(
     hook: (...args: unknown[]) => Promise<T>,
     argums: unknown[] = [],
-    errorHook: () => void = NOOP
+    errorHook: (...args: unknown[]) => void = NOOP
 ): Promise<T | void> {
     try {
         Loading.show();
         return await hook(...argums);
     } catch (e) {
         showErrorMessage(e);
-        errorHook();
+        errorHook(...argums);
     } finally {
         Loading.hide();
     }

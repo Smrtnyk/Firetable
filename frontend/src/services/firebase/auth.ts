@@ -1,8 +1,3 @@
-import {
-    signInWithEmailAndPassword,
-    User,
-    UserCredential,
-} from "firebase/auth";
 import { Router } from "vue-router";
 import { Store } from "vuex";
 
@@ -13,7 +8,13 @@ import { usersCollection } from "src/services/firebase/db";
 import { useStore } from "src/store";
 import { httpsCallable } from "@firebase/functions";
 import { doc, updateDoc } from "@firebase/firestore";
-import { onAuthStateChanged } from "@firebase/auth";
+import {
+    onAuthStateChanged,
+    signOut,
+    signInWithEmailAndPassword,
+    User,
+    UserCredential,
+} from "@firebase/auth";
 
 export function createUserWithEmail(payload: CreateUserPayload) {
     return httpsCallable(functions(), "createUser")(payload);
@@ -33,7 +34,7 @@ export function isAuthenticated(store: ReturnType<typeof useStore>) {
     return store.state.auth.isAuthenticated;
 }
 
-export async function handleOnAuthStateChanged(
+export function handleOnAuthStateChanged(
     router: Router,
     store: ReturnType<typeof useStore>,
     currentUser: User | null
@@ -45,13 +46,13 @@ export async function handleOnAuthStateChanged(
     });
 
     if (currentUser) {
-        await store.dispatch("auth/initUser", currentUser.uid);
+        void store.dispatch("auth/initUser", currentUser.uid);
     }
 
     /* If the user loses authentication route
        redirect them to the login page */
     if (!currentUser && initialAuthState) {
-        await router.replace({ path: "/auth" });
+        void router.replace({ path: "/auth" });
     }
 }
 
@@ -102,7 +103,7 @@ export function deleteUser(id: string) {
 }
 
 export function logoutUser() {
-    return auth().signOut();
+    return signOut(auth());
 }
 
 export function loginWithEmail(

@@ -1,10 +1,11 @@
-import type firebase from "firebase/compat";
-
-export type DocumentData = firebase.firestore.DocumentData;
-export type QueryDocumentSnapshot<T> = firebase.firestore.QueryDocumentSnapshot;
-export type Docref = firebase.firestore.DocumentReference<DocumentData>;
-export type CollectionRef =
-    firebase.firestore.CollectionReference<DocumentData>;
+import {
+    DocumentData,
+    QueryDocumentSnapshot,
+    DocumentReference,
+    CollectionReference,
+} from "@firebase/firestore";
+export type Docref = DocumentReference<DocumentData>;
+export type CollectionRef = CollectionReference<DocumentData>;
 
 export const enum Collection {
     EVENTS = "events",

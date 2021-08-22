@@ -24,7 +24,8 @@ import {
     optsAreWatchColl,
 } from "./types/type-guards";
 import { firestore, getFirebaseApp } from "src/services/firebase/base";
-import { CollectionRef, Docref, DocumentData } from "src/types/firebase";
+import { DocumentData } from "@firebase/firestore";
+import { CollectionRef, Docref } from "src/types/firebase";
 import {
     onSnapshot,
     collection,
