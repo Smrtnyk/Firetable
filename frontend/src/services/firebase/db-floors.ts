@@ -12,7 +12,10 @@ import {
 export async function getFloor(floorID: string): Promise<FloorDoc | void> {
     const doc = await getDoc(floorDoc(floorID));
     if (doc.exists()) {
-        return doc.data() as FloorDoc;
+        return {
+            id: doc.id,
+            ...doc.data(),
+        } as FloorDoc;
     }
 }
 
