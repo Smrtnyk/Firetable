@@ -21,7 +21,7 @@ module.exports = configure(function (ctx) {
             },
         },
 
-        boot: ["i18n", "serverConnection"],
+        boot: ["i18n", "firebase-connection"],
 
         css: ["app.scss"],
 
@@ -87,7 +87,6 @@ module.exports = configure(function (ctx) {
             open: true,
         },
 
-        // animations: 'all', // --- includes all animations
         animations: [],
 
         ssr: { pwa: false },
