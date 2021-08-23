@@ -12,6 +12,7 @@ import { formatEventDate } from "src/helpers/utils";
 import { useFirestore } from "src/composables/useFirestore";
 
 import { FTTitle } from "components/FTTitle";
+import { FTSubtitle } from "components/FTSubtitle";
 import { EventFeedList } from "components/Event/EventFeedList";
 import { EventTablesInfoRadarChart } from "components/Event/EventTablesInfoRadarChart";
 import { EventReservationsByWaiterChart } from "components/Event/EventReservationsByWaiterChart";
@@ -22,6 +23,7 @@ export default defineComponent({
     name: "PageAdminEvent",
     components: {
         FTTitle,
+        FTSubtitle,
         EventTablesInfoRadarChart,
         EventFeedList,
         EventReservationsByWaiterChart,
