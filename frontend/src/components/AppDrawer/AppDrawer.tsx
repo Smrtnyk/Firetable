@@ -4,7 +4,7 @@ import { computed, defineComponent, ref, watch, withDirectives } from "vue";
 import { User } from "src/types";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { logoutUser, updateUser } from "src/services/firebase/auth";
-import { useQuasar, Ripple } from "quasar";
+import { useQuasar, Ripple, LocalStorage } from "quasar";
 import { useStore } from "src/store";
 import { useI18n } from "vue-i18n";
 
@@ -93,9 +93,10 @@ export default defineComponent({
             void tryCatchLoadingWrapper(() => logoutUser());
         }
 
-        watch(lang, (langVal) => {
-            locale.value = langVal;
-        });
+        function setAppLanguage(val: string) {
+            LocalStorage.set("FTLang", val);
+            locale.value = val;
+        }
 
         return () => (
             <q-list>
@@ -158,7 +159,7 @@ export default defineComponent({
                 <q-separator spaced />
                 <q-item>
                     <q-select
-                        v-model={lang.value}
+                        model-value={lang.value}
                         options={langOptions}
                         label="Language"
                         dense
@@ -166,6 +167,7 @@ export default defineComponent({
                         emit-value
                         map-options
                         options-dense
+                        {...{ "onUpdate:modelValue": setAppLanguage }}
                     />
                 </q-item>
                 <q-separator spaced />
