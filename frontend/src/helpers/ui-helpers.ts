@@ -28,8 +28,12 @@ export function showConfirm(title: string) {
 
 export function showErrorMessage(e: unknown) {
     let message = "";
-    if (typeof e === "string") message = e;
-    if (e instanceof Error) message = e.message;
+    if (typeof e === "string") {
+        message = e;
+    }
+    if (e instanceof Error) {
+        message = e.message;
+    }
 
     Dialog.create({
         title: "Error",

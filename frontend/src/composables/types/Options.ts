@@ -1,5 +1,7 @@
 import { CollectionRef, Query } from "./firestoreTypes";
 import { Ref } from "vue";
+import firebase from "firebase/compat";
+import DocumentData = firebase.firestore.DocumentData;
 
 export interface OptionsBase {
     /** Path to the document or collection in firestore. Use $variableName to insert reactive variable data into the path. If the path includes variables, the options object must include a 'variables' key */
@@ -16,6 +18,10 @@ export interface OptionsBase {
     manual?: boolean;
     /** exposes a function to customise error handling. Defaults to console.error(e) */
     onError?: (e: unknown) => void;
+    /** Fired when data is received from firebase server */
+    onFinished?: (data?: DocumentData) => void;
+    /** Tells if hook is used in component. Default is true */
+    inComponent?: boolean;
 }
 
 export interface OptionsColl<T, M> {

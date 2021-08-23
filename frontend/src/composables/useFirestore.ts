@@ -35,6 +35,7 @@ import {
     getDoc,
     getDocs,
 } from "@firebase/firestore";
+import { NOOP } from "src/helpers/utils";
 
 // Overload Watch Collection
 export function useFirestore<T, M = T>(
@@ -59,9 +60,7 @@ export function useFirestore<T, M = T>(
 // The function
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function useFirestore<T, M = T>(options: Options<T, M>): any {
-    // get firebase and make sure it's setup
-    const firebase = getFirebaseApp();
-    if (!firebase) {
+    if (!getFirebaseApp()) {
         throw new Error(
             "[Firestore-Composable] Error: No default firebase app found. Please initialize firebase before calling useFirestore"
         );
@@ -73,6 +72,8 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
     const initialLoading = options.initialLoading ?? true;
     const loading = ref<boolean>(initialLoading);
     const received = ref(false);
+    const onFinished = options.onFinished ?? NOOP;
+    const inComponent = options.inComponent ?? true;
 
     // Path replaced computation
     const pathReplaced = computed(() => {
@@ -117,9 +118,8 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
             options.query !== undefined
         ) {
             return options.query(firestoreRef.value);
-        } else {
-            return null;
         }
+        return null;
     });
 
     function updateDoc(updates: Partial<T>) {
@@ -149,6 +149,7 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
         collectionData.value = receivedData;
         received.value = true;
         loading.value = false;
+        onFinished(receivedData);
         return {
             data: receivedData,
             mutatedData: mutatedData.value,
@@ -168,6 +169,7 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
         data.value = receivedData;
         received.value = true;
         loading.value = false;
+        onFinished(receivedData);
         return {
             data: receivedData,
             mutatedData: mutatedData.value,
@@ -190,8 +192,6 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
                 options.onError(e);
             }
         }
-
-        return void 0;
     }
 
     async function getCollData() {
@@ -214,7 +214,7 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
     }
 
     let watcher: null | (() => void) = null;
-    const watchData = () => {
+    function watchData() {
         try {
             if (firestoreRefIsDoc(firestoreRef.value)) {
                 watcher = onSnapshot(firestoreRef.value, (doc) => {
@@ -241,19 +241,19 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
                 options.onError(e);
             }
         }
-    };
+    }
 
-    const stopWatchingData = () => {
+    function stopWatchingData() {
         if (watcher !== null) {
             watcher();
         }
-    };
+    }
 
-    if (options.type === "watch") {
+    if (options.type === "watch" && inComponent) {
         onUnmounted(stopWatchingData);
     }
 
-    const debounceDataGetter = () => {
+    function debounceDataGetter() {
         void nextTick(() => {
             if (!firestoreRef.value) {
                 return;
@@ -271,12 +271,14 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
                 watchData();
             }
         });
-    };
+    }
 
     watch(
         pathReplaced,
         (v) => {
-            if (options.manual) return;
+            if (options.manual) {
+                return;
+            }
             if (v) {
                 debounceDataGetter();
             } else {

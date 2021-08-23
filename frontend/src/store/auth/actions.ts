@@ -1,39 +1,34 @@
-import { usersCollection } from "src/services/firebase/db";
-import {
-    showErrorMessage,
-    tryCatchLoadingWrapper,
-} from "src/helpers/ui-helpers";
-import { getDoc, doc } from "@firebase/firestore";
+import { showErrorMessage } from "src/helpers/ui-helpers";
+import { useFirestore } from "src/composables/useFirestore";
+import { Collection, User } from "src/types";
 
 export function initUser({ commit }: any, uid: string) {
-    return tryCatchLoadingWrapper(
-        async () => {
-            const user = await getDoc(doc(usersCollection(), uid));
-
-            if (!user.exists()) {
+    useFirestore<User>({
+        type: "watch",
+        queryType: "doc",
+        path: `${Collection.USERS}/${uid}`,
+        inComponent: false,
+        onFinished(user) {
+            if (!user) {
                 commit("setAuthState", {
                     isAuthenticated: false,
                     isReady: true,
                 });
-                return;
+            } else {
+                commit("setUser", user);
+                commit("setAuthState", {
+                    isAuthenticated: true,
+                    isReady: true,
+                });
             }
-
-            commit("setUser", {
-                id: user.id,
-                ...user.data(),
-            });
-            commit("setAuthState", {
-                isAuthenticated: true,
-                isReady: true,
-            });
         },
-        void 0,
-        () => {
+        onError(e) {
+            showErrorMessage(e);
             commit("setUser", void 0);
             commit("setAuthState", {
                 isAuthenticated: false,
                 isReady: true,
             });
-        }
-    );
+        },
+    });
 }
