@@ -6,6 +6,7 @@ const state: AuthState = {
     isReady: false,
     user: void 0,
     users: [],
+    showCreateUserDialog: false,
     unsubscribeUserWatch: NOOP,
 };
 

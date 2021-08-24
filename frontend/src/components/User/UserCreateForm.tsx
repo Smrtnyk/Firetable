@@ -11,7 +11,9 @@ import {
     QBtn,
     QSelect,
     QIcon,
+    QDialog,
 } from "quasar";
+import { useStore } from "src/store";
 
 const user: CreateUserPayload = {
     id: "",
@@ -26,7 +28,16 @@ const user: CreateUserPayload = {
 export default defineComponent({
     name: "UserCreateForm",
 
-    components: { QCard, QBanner, QForm, QInput, QBtn, QSelect, QIcon },
+    components: {
+        QCard,
+        QBanner,
+        QForm,
+        QInput,
+        QBtn,
+        QSelect,
+        QIcon,
+        QDialog,
+    },
 
     emits: ["submit"],
 
@@ -38,6 +49,7 @@ export default defineComponent({
     },
 
     setup(props, { emit }) {
+        const store = useStore();
         const form = ref<CreateUserPayload>({ ...user });
 
         const stringRules = [noEmptyString()];
@@ -55,102 +67,113 @@ export default defineComponent({
 
         return () => (
             <div class="UserCreateForm">
-                <q-card>
-                    <q-banner
-                        inline-actions
-                        rounded
-                        class="bg-gradient text-white"
-                    >
-                        {{
-                            avatar: () =>
-                                withDirectives(
-                                    <q-btn
-                                        round
-                                        class="q-mr-sm"
-                                        flat
-                                        icon="close"
-                                    />,
-                                    [[ClosePopup]]
-                                ),
-                            default: () => "Create new user",
-                        }}
-                    </q-banner>
-                    <q-form
-                        class="q-gutter-md q-pt-md q-pa-md"
-                        onSubmit={onSubmit}
-                        onReset={onReset}
-                    >
-                        <q-input
-                            v-model={form.value.name}
-                            standout
+                <q-dialog
+                    model-value={store.state.auth.showCreateUserDialog}
+                    {...{
+                        "onUpdate:model-value": () =>
+                            store.commit(
+                                "auth/TOGGLE_CREATE_USER_DIALOG_VISIBILITY"
+                            ),
+                    }}
+                    maximized
+                >
+                    <q-card>
+                        <q-banner
+                            inline-actions
                             rounded
-                            label="Fill name *"
-                            hint="Name of the person, e.g. Max Mustermann"
-                            lazy-rules
-                            rules={stringRules}
-                        />
-
-                        <q-input
-                            v-model={form.value.email}
-                            standout
-                            rounded
-                            label="Username *"
-                            hint="Username without spaces and special charactes, e.g. max123"
-                            rules={stringRules}
-                        />
-
-                        <q-input
-                            v-model={form.value.password}
-                            standout
-                            rounded
-                            label="User password *"
-                            hint="Password of the user"
-                            lazy-rules
-                            rules={stringRules}
+                            class="bg-gradient text-white"
                         >
                             {{
-                                prepend: () => <q-icon name="key" />,
+                                avatar: () =>
+                                    withDirectives(
+                                        <q-btn
+                                            round
+                                            class="q-mr-sm"
+                                            flat
+                                            icon="close"
+                                        />,
+                                        [[ClosePopup]]
+                                    ),
+                                default: () => "Create new user",
                             }}
-                        </q-input>
-
-                        <q-select
-                            v-model={form.value.role}
-                            hint="Assign role to user, default is waiter."
-                            standout
-                            rounded
-                            options={roles}
-                            label="Role"
-                        />
-                        <q-select
-                            v-model={form.value.floors}
-                            hint="Assign areas to user, multiple areas are allowed."
-                            standout
-                            rounded
-                            multiple
-                            options={props.floors}
-                            label="Areas"
-                        />
-
-                        <div>
-                            <q-btn
+                        </q-banner>
+                        <q-form
+                            class="q-gutter-md q-pt-md q-pa-md"
+                            onSubmit={onSubmit}
+                            onReset={onReset}
+                        >
+                            <q-input
+                                v-model={form.value.name}
+                                standout
                                 rounded
-                                size="md"
-                                label="Submit"
-                                type="submit"
-                                class="button-gradient"
+                                label="Fill name *"
+                                hint="Name of the person, e.g. Max Mustermann"
+                                lazy-rules
+                                rules={stringRules}
                             />
-                            <q-btn
+
+                            <q-input
+                                v-model={form.value.email}
+                                standout
                                 rounded
-                                size="md"
-                                outline
-                                label="Reset"
-                                type="reset"
-                                color="primary"
-                                class="q-ml-sm"
+                                label="Username *"
+                                hint="Username without spaces and special charactes, e.g. max123"
+                                rules={stringRules}
                             />
-                        </div>
-                    </q-form>
-                </q-card>
+
+                            <q-input
+                                v-model={form.value.password}
+                                standout
+                                rounded
+                                label="User password *"
+                                hint="Password of the user"
+                                lazy-rules
+                                rules={stringRules}
+                            >
+                                {{
+                                    prepend: () => <q-icon name="key" />,
+                                }}
+                            </q-input>
+
+                            <q-select
+                                v-model={form.value.role}
+                                hint="Assign role to user, default is waiter."
+                                standout
+                                rounded
+                                options={roles}
+                                label="Role"
+                            />
+                            <q-select
+                                v-model={form.value.floors}
+                                hint="Assign areas to user, multiple areas are allowed."
+                                standout
+                                rounded
+                                multiple
+                                options={props.floors}
+                                label="Areas"
+                            />
+
+                            <div>
+                                <q-btn
+                                    rounded
+                                    size="md"
+                                    label="Submit"
+                                    type="submit"
+                                    class="button-gradient"
+                                />
+                                <q-btn
+                                    rounded
+                                    size="md"
+                                    outline
+                                    label="Reset"
+                                    type="reset"
+                                    color="primary"
+                                    class="q-ml-sm"
+                                />
+                            </div>
+                        </q-form>
+                    </q-card>
+                </q-dialog>
             </div>
         );
     },

@@ -7,6 +7,10 @@ interface AuthStatePayload {
     unsubscribeUserWatch: () => void;
 }
 
+export function TOGGLE_CREATE_USER_DIALOG_VISIBILITY(state: AuthState) {
+    state.showCreateUserDialog = !state.showCreateUserDialog;
+}
+
 export function setUser(state: AuthState, user: User) {
     state.user = user;
 }

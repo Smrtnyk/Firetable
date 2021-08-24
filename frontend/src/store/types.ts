@@ -5,6 +5,7 @@ export interface AuthState {
     isReady: boolean;
     user: User | undefined;
     users: User[];
+    showCreateUserDialog: boolean;
     unsubscribeUserWatch: () => void;
 }
 

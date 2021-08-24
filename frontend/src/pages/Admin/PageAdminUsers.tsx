@@ -16,12 +16,12 @@ import {
     QBtn,
     QIcon,
     QList,
-    QDialog,
     QItem,
     QSlideItem,
     QItemSection,
     QItemLabel,
 } from "quasar";
+import { useStore } from "src/store";
 
 const { maxNumOfUsers } = config;
 
@@ -34,7 +34,6 @@ export default defineComponent({
         QBtn,
         QIcon,
         QList,
-        QDialog,
         QItem,
         QSlideItem,
         QItemSection,
@@ -42,6 +41,7 @@ export default defineComponent({
     },
 
     setup() {
+        const store = useStore();
         const showCreateUserForm = ref(false);
 
         const floorsMaps = computed(() => floors.value.map(({ name }) => name));
@@ -97,8 +97,9 @@ export default defineComponent({
                                 icon="plus"
                                 class="button-gradient"
                                 onClick={() =>
-                                    (showCreateUserForm.value =
-                                        !showCreateUserForm.value)
+                                    store.commit(
+                                        "auth/TOGGLE_CREATE_USER_DIALOG_VISIBILITY"
+                                    )
                                 }
                                 label="new user"
                             />
@@ -113,13 +114,11 @@ export default defineComponent({
                 </f-t-title>
 
                 {!!floorsMaps.value.length && (
-                    <q-dialog v-model={showCreateUserForm.value}>
-                        <user-create-form
-                            floors={floorsMaps.value}
-                            onClose={() => (showCreateUserForm.value = false)}
-                            onSubmit={onCreateUser}
-                        />
-                    </q-dialog>
+                    <user-create-form
+                        floors={floorsMaps.value}
+                        onClose={() => (showCreateUserForm.value = false)}
+                        onSubmit={onCreateUser}
+                    />
                 )}
 
                 {!!users.value.length && (
