@@ -4,6 +4,7 @@ import { User } from "src/types";
 interface AuthStatePayload {
     isReady: boolean;
     isAuthenticated: boolean;
+    unsubscribeUserWatch: () => void;
 }
 
 export function setUser(state: AuthState, user: User) {
@@ -12,8 +13,9 @@ export function setUser(state: AuthState, user: User) {
 
 export function setAuthState(
     state: AuthState,
-    { isReady, isAuthenticated }: AuthStatePayload
+    { isReady, isAuthenticated, unsubscribeUserWatch }: AuthStatePayload
 ) {
     state.isAuthenticated = isAuthenticated;
     state.isReady = isReady;
+    state.unsubscribeUserWatch = unsubscribeUserWatch;
 }

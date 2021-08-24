@@ -90,7 +90,9 @@ export default defineComponent({
         }
 
         function onLogoutUser() {
-            void tryCatchLoadingWrapper(() => logoutUser());
+            void tryCatchLoadingWrapper(() =>
+                logoutUser().then(store.state.auth.unsubscribeUserWatch)
+            );
         }
 
         function setAppLanguage(val: string) {

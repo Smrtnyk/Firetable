@@ -15,6 +15,7 @@ import {
     User,
     UserCredential,
 } from "@firebase/auth";
+import { State } from "src/store/types";
 
 export function createUserWithEmail(payload: CreateUserPayload) {
     return httpsCallable(functions(), "createUser")(payload);
@@ -36,24 +37,23 @@ export function isAuthenticated(store: ReturnType<typeof useStore>) {
 
 export function handleOnAuthStateChanged(
     router: Router,
-    store: ReturnType<typeof useStore>,
+    { commit, dispatch }: Store<State>,
     currentUser: User | null
 ) {
-    const initialAuthState = isAuthenticated(store);
     // Save to the store
-    store.commit("auth/setAuthState", {
+    commit("auth/setAuthState", {
         isAuthenticated: currentUser !== null,
     });
 
     if (currentUser) {
-        void store.dispatch("auth/initUser", currentUser.uid);
+        void dispatch("auth/initUser", currentUser.uid).catch(showErrorMessage);
+        return;
     }
 
-    /* If the user loses authentication route
-       redirect them to the login page */
-    if (!currentUser && initialAuthState) {
-        void router.replace({ path: "/auth" });
-    }
+    // If the user loses authentication route
+    // redirect them to the login page
+    commit("auth/setUser", void 0);
+    void router.replace({ path: "/auth" }).catch(showErrorMessage);
 }
 
 export function routerBeforeEach(
@@ -128,8 +128,8 @@ export function ensureAuthIsInitialized(store: ReturnType<typeof useStore>) {
         const unsubscribe = onAuthStateChanged(
             auth(),
             () => {
-                resolve();
                 unsubscribe();
+                resolve();
             },
             () => {
                 reject(
