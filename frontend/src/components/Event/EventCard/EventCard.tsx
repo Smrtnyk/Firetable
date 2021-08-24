@@ -48,26 +48,26 @@ export default defineComponent({
                         ratio={4 / 3}
                     />
                 </router-link>
-                <q-card-section class="q-pa-sm">
+                <q-card-section class="q-px-none q-py-sm">
                     <div class="row items-center justify-evenly vertical-middle">
                         <span class="flex-v-center">
                             <q-icon
                                 name="calendar"
                                 color="negative"
-                                class="q-mr-sm gradient-warning q-pa-sm rounded"
-                                size="sm"
+                                class="q-mr-xs gradient-warning q-pa-xs rounded"
+                                size="xs"
                             />
                             <span class="font-black text-caption text-grey-6">
                                 {dateFromTimestamp(props.event.date)}
                             </span>
                         </span>
-                        <q-separator class="q-mx-sm-sm q-mx-md-md" vertical />
+                        <q-separator class="q-mx-sm-xs q-mx-md-sm" vertical />
                         <span class="flex-v-center">
                             <q-icon
                                 name="clock"
                                 color="positive"
-                                class="q-mr-sm gradient-positive q-pa-sm rounded"
-                                size="sm"
+                                class="q-mr-xs gradient-positive q-pa-xs rounded"
+                                size="xs"
                             />
                             <span class="font-black text-caption text-grey-6">
                                 {hourFromTimestamp(props.event.date)}
@@ -78,8 +78,8 @@ export default defineComponent({
                             <q-icon
                                 name="euro"
                                 color="pink"
-                                class="q-mr-sm gradient-pink q-pa-sm rounded"
-                                size="sm"
+                                class="q-mr-xs gradient-pink q-pa-xs rounded"
+                                size="xs"
                             />
                             <span class="text-grey-6 font-black text-caption">
                                 {props.event.entryPrice}
