@@ -124,7 +124,9 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
 
     function updateDoc(updates: Partial<T>) {
         if (firestoreRefIsDoc(firestoreRef.value)) {
-            return setDoc(firestoreRef.value, updates, { merge: true });
+            return setDoc<DocumentData>(firestoreRef.value, updates, {
+                merge: true,
+            });
         }
         return Promise.resolve();
     }
