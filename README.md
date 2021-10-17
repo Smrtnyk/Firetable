@@ -1,6 +1,6 @@
-##FIRETABLE
+## FIRETABLE
 
-###An event management system.
+### An event management system.
 Frontend is made with Quasar which uses Vue as its framework.
 Backend communication is done with Firebase and cloud functions.
 
