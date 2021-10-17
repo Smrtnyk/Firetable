@@ -1,5 +1,9 @@
 import { floorsCollection } from "src/services/firebase/db";
-import { FLOOR_DEFAULT_HEIGHT, FLOOR_DEFAULT_WIDTH } from "./constants";
+import {
+    FLOOR_DEFAULT_HEIGHT,
+    FLOOR_DEFAULT_WIDTH,
+    RESOLUTION,
+} from "./constants";
 import {
     calculateWallHeight,
     calculateWallWidth,
@@ -46,7 +50,7 @@ export function makeRawWall(x: number, y: number): BaseFloorElement {
         type: ElementType.WALL,
         tag: ElementTag.RECT,
         width: calculateWallWidth(),
-        height: calculateWallHeight(),
+        height: RESOLUTION * 5,
         id: uid(),
     };
 }
