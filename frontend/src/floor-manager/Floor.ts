@@ -4,8 +4,6 @@ import { RESOLUTION, SVG_NAMESPACE } from "./constants";
 import {
     calculateBottomResizableCirclePositionX,
     calculateBottomResizableCirclePositionY,
-    calculateTopResizableCirclePositionX,
-    calculateTopResizableCirclePositionY,
     calculateWallWidth,
     generateTableClass,
     generateTableGroupClass,
@@ -49,6 +47,7 @@ export class Floor {
     data: BaseFloorElement[];
 
     public readonly id: string;
+    private selectedElement: BaseFloorElement | null = null;
 
     private readonly mode: FloorMode;
     private readonly container: HTMLElement;
@@ -106,6 +105,7 @@ export class Floor {
     }
 
     public removeElement(element: BaseFloorElement) {
+        this.unsetSelectedElement();
         this.data = this.data.filter((d) => d.id !== element.id);
         isTable(element)
             ? this.renderTableElements()
@@ -132,9 +132,7 @@ export class Floor {
 
         this.floor
             .selectAll("g.wallGroup")
-
             .data(wallsData)
-
             .join(
                 // @ts-ignore 0 fucking idea what d3 types expect from me
                 (enter: baseElementGroupSelection) => {
@@ -151,12 +149,12 @@ export class Floor {
 
                     wallG.on("click", (event: Event, d: BaseFloorElement) => {
                         event.stopPropagation();
+                        this.setSeletectedElement(event.currentTarget, d);
                         this.elementClickHandler(this, d);
                     });
 
                     if (isEditorModeActive(this.mode)) {
                         this.addDragBehaviourToElement(this, wallG);
-                        this.addResizeBehaviorToElement(wallG);
                     }
                 },
                 (update: baseElementGroupSelection) => {
@@ -173,12 +171,36 @@ export class Floor {
             );
     }
 
+    private unsetSelectedElement() {
+        if (!isEditorModeActive(this.mode)) return;
+        const selectedElement = document.querySelector(".selected");
+        if (!selectedElement) {
+            return;
+        }
+        selectedElement.classList.remove("selected");
+        selectedElement.querySelector(".bottomright")?.remove();
+        this.selectedElement = null;
+        this.elementClickHandler(null, null);
+    }
+
+    private setSeletectedElement(
+        selectedElement: EventTarget | null,
+        d: BaseFloorElement
+    ) {
+        if (!isEditorModeActive(this.mode)) return;
+        this.unsetSelectedElement();
+        if (!(selectedElement instanceof Element)) {
+            return;
+        }
+        selectedElement.classList.add("selected");
+        this.selectedElement = d;
+        this.elementResizeBehavior(selectedElement);
+    }
+
     public renderTableElements() {
         this.floor
             .selectAll<SVGGElement, TableElement>("g.tableGroup")
-
             .data(this.tables, (d) => d.tableId)
-
             .join(
                 // @ts-ignore I have 0 fucking idea how to type d3 styff
                 (enter: tableElementGroupSelection) => {
@@ -204,18 +226,15 @@ export class Floor {
                         .attr("class", generateTableClass);
 
                     tableG.on("click", (event: Event, d: BaseFloorElement) => {
+                        event.stopPropagation();
+                        this.setSeletectedElement(event.currentTarget, d);
                         this.elementClickHandler(this, d);
                     });
 
-                    if (isEditorModeActive(this.mode)) {
-                        this.addResizeBehaviorToElement(
-                            tableG as unknown as baseElementGroupSelection
-                        );
-                        this.addDragBehaviourToElement(
-                            this,
-                            tableG as unknown as baseElementGroupSelection
-                        );
-                    }
+                    this.addDragBehaviourToElement(
+                        this,
+                        tableG as unknown as baseElementGroupSelection
+                    );
                 },
                 (update) => {
                     update.attr("transform", translateElementToItsPosition);
@@ -223,10 +242,6 @@ export class Floor {
                         .select(".bottomright")
                         .attr("cx", calculateBottomResizableCirclePositionX)
                         .attr("cy", calculateBottomResizableCirclePositionY);
-                    update
-                        .select(".topleft")
-                        .attr("cx", calculateTopResizableCirclePositionX)
-                        .attr("cy", calculateTopResizableCirclePositionY);
                     update.select(".table").attr("class", generateTableClass);
                     update
                         .select("circle.table")
@@ -268,6 +283,9 @@ export class Floor {
             { x, y }: DragEvent,
             d: BaseFloorElement
         ) {
+            const matchesSelectedElement =
+                this === document.querySelector(".selected");
+            if (!matchesSelectedElement) return;
             const gridX = possibleXMove(instance.width, x, d.width);
             const gridY = possibleYMove(instance.height, y, d.height);
 
@@ -286,46 +304,24 @@ export class Floor {
         select(this).classed("active", false);
     }
 
-    private addResizeBehaviorToElement(element: baseElementGroupSelection) {
-        element
-            .append("g")
-            .attr("class", "circles")
-            .each(this.eachTableForResizeBehaviour(this));
-    }
+    private elementResizeBehavior(element: Element) {
+        const node = this.floor?.node();
+        if (!node) return;
 
-    private eachTableForResizeBehaviour(instance: Floor) {
-        return function (this: SVGGElement, d: BaseFloorElement) {
-            const node = instance.floor?.node();
-            if (!node) return;
+        const circleG = select<Element, TableElement>(element);
+        const dragBehaviour = drag<SVGGElement, BaseFloorElement, unknown>()
+            .container(node)
+            .subject(({ x, y }) => ({ x, y }))
+            .on("drag", this.elementResizing(this));
 
-            const circleG = select<SVGGElement, TableElement>(this);
-            const dragBehaviour = drag<SVGGElement, BaseFloorElement, unknown>()
-                .container(node)
-                .subject(({ x, y }) => ({ x, y }))
-                .on("start end", instance.elementResizeStartEnd)
-                .on("drag", instance.elementResizing(instance));
-
-            // On circular elements we do not need the upper resize handle
-            if (!isRoundTable(d)) {
-                circleG
-                    .append("circle")
-                    .attr("class", "topleft")
-                    .attr("r", 2)
-                    .attr("cx", calculateTopResizableCirclePositionX)
-                    .attr("cy", calculateTopResizableCirclePositionY)
-                    .on("mouseenter mouseleave", instance.resizerHover)
-                    .call(dragBehaviour as any);
-            }
-
-            circleG
-                .append("circle")
-                .attr("class", "bottomright")
-                .attr("r", 2)
-                .attr("cx", calculateBottomResizableCirclePositionX)
-                .attr("cy", calculateBottomResizableCirclePositionY)
-                .on("mouseenter mouseleave", instance.resizerHover)
-                .call(dragBehaviour as any);
-        };
+        circleG
+            .append("circle")
+            .attr("class", "bottomright")
+            .attr("r", 5)
+            .attr("cx", calculateBottomResizableCirclePositionX)
+            .attr("cy", calculateBottomResizableCirclePositionY)
+            .on("mouseenter mouseleave", Floor.resizerHover)
+            .call(dragBehaviour as any);
     }
 
     private elementResizing(instance: Floor) {
@@ -337,29 +333,8 @@ export class Floor {
                 y,
                 d.height
             );
-            const draggedElement = event.sourceEvent.target;
-
-            if (draggedElement.classList.contains("topleft")) {
-                const newWidth = Math.max(
-                    d.width + d.x - gridX,
-                    getDefaultElementWidth(d)
-                );
-                const newHeight = Math.max(
-                    d.height + d.y - gridY,
-                    getDefaultElementWidth(d)
-                );
-
-                if (isSquaredTable(d) || isWall(d)) {
-                    d.x += d.width - newWidth;
-                    d.y += d.height - newHeight;
-                }
-
-                d.width = newWidth;
-                d.height = newHeight;
-            } else {
-                d.width = Math.max(gridX - d.x, getDefaultElementWidth(d));
-                d.height = Math.max(gridY - d.y, getDefaultElementWidth(d));
-            }
+            d.width = Math.max(gridX - d.x, getDefaultElementWidth(d));
+            d.height = Math.max(gridY - d.y, getDefaultElementWidth(d));
 
             if (isTable(d)) {
                 instance.renderTableElements();
@@ -369,19 +344,9 @@ export class Floor {
         };
     }
 
-    private elementResizeStartEnd({
-        type,
-        sourceEvent,
-    }: D3DragEvent<Element, unknown, unknown>) {
-        const element = select(sourceEvent.target as Element);
-        const radius = type === "start" ? 6 : 2;
-
-        element.attr("r", radius);
-    }
-
-    private resizerHover({ type, target }: MouseEvent) {
+    private static resizerHover({ type, target }: MouseEvent) {
         const element = select(target as Element);
-        const radius = type === "mouseenter" ? 6 : 2;
+        const radius = type === "mouseenter" ? 6 : 5;
 
         element.attr("r", radius);
     }
@@ -421,10 +386,15 @@ export class Floor {
     }
 
     private addClickListenerToSVGContainer() {
-        this.svg.on("dblclick", (event: MouseEvent) => {
-            event.preventDefault();
-            this.dblClickHandler(this, pointer(event));
-        });
+        this.svg
+            .on("dblclick", (event: MouseEvent) => {
+                event.preventDefault();
+                this.dblClickHandler(this, pointer(event));
+            })
+            .on("click", () => {
+                this.unsetSelectedElement();
+                this.elementClickHandler(null as unknown as Floor, null);
+            });
     }
 
     private render() {

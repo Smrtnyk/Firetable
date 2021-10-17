@@ -1,4 +1,4 @@
-const { resolve } = require('path');
+const { resolve } = require("path");
 
 module.exports = {
     // https://eslint.org/docs/user-guide/configuring#configuration-cascading-and-hierarchy
@@ -13,51 +13,51 @@ module.exports = {
         // https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/parser#configuration
         // https://github.com/TypeStrong/fork-ts-checker-webpack-plugin#eslint
         // Needed to make the parser take into account 'vue' files
-        extraFileExtensions: ['.vue'],
-        parser: '@typescript-eslint/parser',
-        project: resolve(__dirname, './tsconfig.json'),
+        extraFileExtensions: [".vue"],
+        parser: "@typescript-eslint/parser",
+        project: resolve(__dirname, "./tsconfig.json"),
         tsconfigRootDir: __dirname,
         ecmaVersion: 2018, // Allows for the parsing of modern ECMAScript features
-        sourceType: 'module', // Allows for the use of imports
+        sourceType: "module", // Allows for the use of imports
         ecmaFeatures: {
-            jsx: true
-        }
+            jsx: true,
+        },
     },
 
     env: {
-        browser: true
+        browser: true,
     },
     globals: {
-        ga: 'readonly', // Google Analytics
-        cordova: 'readonly',
-        __statics: 'readonly',
-        __QUASAR_SSR__: 'readonly',
-        __QUASAR_SSR_SERVER__: 'readonly',
-        __QUASAR_SSR_CLIENT__: 'readonly',
-        __QUASAR_SSR_PWA__: 'readonly',
-        process: 'readonly',
-        Capacitor: 'readonly',
-        chrome: 'readonly'
+        ga: "readonly", // Google Analytics
+        cordova: "readonly",
+        __statics: "readonly",
+        __QUASAR_SSR__: "readonly",
+        __QUASAR_SSR_SERVER__: "readonly",
+        __QUASAR_SSR_CLIENT__: "readonly",
+        __QUASAR_SSR_PWA__: "readonly",
+        process: "readonly",
+        Capacitor: "readonly",
+        chrome: "readonly",
     },
-    "plugins": [
+    plugins: [
         "@typescript-eslint",
         "promise",
         "prettier",
 
         // https://eslint.vuejs.org/user-guide/#why-doesn-t-it-work-on-vue-file
         // required to lint *.vue files
-        "vue"
+        "vue",
     ],
-    "extends": [
+    extends: [
         "eslint:recommended",
         "plugin:promise/recommended",
         "plugin:@typescript-eslint/recommended",
         "plugin:@typescript-eslint/recommended-requiring-type-checking",
         "plugin:vue/vue3-strongly-recommended",
         "plugin:prettier/recommended",
-        "prettier"
+        "prettier",
     ],
-    "rules": {
+    rules: {
         "require-await": "error",
         "quasar/check-valid-props": 0,
         "quasar/no-invalid-qfield-usage": 0,
@@ -68,6 +68,7 @@ module.exports = {
         "@typescript-eslint/unbound-method": "off",
         "@typescript-eslint/no-unsafe-member-access": "off",
         "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/no-unsafe-argument": "off",
         "@typescript-eslint/explicit-module-boundary-types": 0,
         "@typescript-eslint/no-unused-vars": "off",
         "@typescript-eslint/no-unused-params": "off",
@@ -76,13 +77,10 @@ module.exports = {
             "error",
             "double",
             {
-                "allowTemplateLiterals": true
-            }
+                allowTemplateLiterals: true,
+            },
         ],
-        "@typescript-eslint/semi": [
-            "error",
-            "always"
-        ],
+        "@typescript-eslint/semi": ["error", "always"],
         "@typescript-eslint/ban-ts-comment": "off",
         // VUE 3
         "vue/no-deprecated-filter": 2,
@@ -90,6 +88,6 @@ module.exports = {
         "vue/no-deprecated-dollar-listeners-api": 2,
         "vue/html-indent": "off",
         "vue/max-attributes-per-line": "off",
-        "vue/singleline-html-element-content-newline": "off"
-    }
-}
+        "vue/singleline-html-element-content-newline": "off",
+    },
+};

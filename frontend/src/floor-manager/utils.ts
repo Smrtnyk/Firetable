@@ -2,19 +2,20 @@ import { RESOLUTION, TABLE_HEIGHT, TABLE_WIDTH } from "./constants";
 import { BaseFloorElement, FloorMode, TableElement } from "src/types";
 import { isRoundTable, isTable, isWall } from "src/floor-manager/type-guards";
 
-export const generateTableGroupClass = ({ tableId }: TableElement) =>
-    `tableGroup tableGroup__${tableId}`;
+export function generateTableGroupClass({ tableId }: TableElement) {
+    return `tableGroup tableGroup__${tableId}`;
+}
 
 export function generateTableClass({ reservation, tableId }: TableElement) {
-    let className = `table table__${tableId} `;
+    const className = ["table", `table__${tableId}`];
     if (reservation) {
-        className += "reserved";
+        className.push("reserved");
 
         if (reservation.confirmed) {
-            className += " confirmed";
+            className.push("confirmed");
         }
     }
-    return className;
+    return className.join(" ");
 }
 
 export function getTableText({ tableId }: TableElement) {
@@ -33,47 +34,31 @@ export function getTableTextPosition(d: TableElement) {
 }
 
 export function getRoundTableRadius(d?: TableElement) {
-    return (d?.width || TABLE_WIDTH) / 2;
+    const largestWidth = Math.max(d?.width || 0, d?.height || 0, TABLE_WIDTH);
+    const diagonal = largestWidth * Math.sqrt(2);
+    return diagonal / 2;
 }
 
 export function getTableHeight(d?: TableElement) {
-    return (d && d.height) || TABLE_HEIGHT;
+    return d?.height || TABLE_HEIGHT;
 }
 
 export function getTableWidth(d?: TableElement) {
     return d?.width || TABLE_WIDTH;
 }
 
-export function calculateTopResizableCirclePositionY(d: BaseFloorElement) {
-    const { height } = d;
-    if (isTable(d) && isRoundTable(d)) {
-        return -(height / 2);
+export function calculateBottomResizableCirclePositionX(d: TableElement) {
+    if (isRoundTable(d)) {
+        return getRoundTableRadius(d) / Math.sqrt(2);
     }
-    return 0;
+    return d.width;
 }
 
-export function calculateTopResizableCirclePositionX(d: BaseFloorElement) {
-    const { width } = d;
-    if (isTable(d) && isRoundTable(d)) {
-        return -(width / 2);
+export function calculateBottomResizableCirclePositionY(d: TableElement) {
+    if (isRoundTable(d)) {
+        return getRoundTableRadius(d) / Math.sqrt(2);
     }
-    return 0;
-}
-
-export function calculateBottomResizableCirclePositionX(d: BaseFloorElement) {
-    const { width } = d;
-    if (isTable(d) && isRoundTable(d)) {
-        return width / 2;
-    }
-    return width;
-}
-
-export function calculateBottomResizableCirclePositionY(d: BaseFloorElement) {
-    const { height } = d;
-    if (isTable(d) && isRoundTable(d)) {
-        return height / 2;
-    }
-    return height;
+    return d.height;
 }
 
 export function possibleXMove(
@@ -122,6 +107,6 @@ export function translateElementToItsPosition({ x, y }: BaseFloorElement) {
     return `translate(${x}, ${y})`;
 }
 
-export function isEditorModeActive(mode: FloorMode) {
+export function isEditorModeActive(mode: FloorMode): boolean {
     return mode === FloorMode.EDITOR;
 }

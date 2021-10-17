@@ -228,8 +228,11 @@ export default defineComponent({
             };
         }
 
-        function tableClickHandler(floor: Floor, d: BaseFloorElement) {
-            if (!isTable(d)) return;
+        function tableClickHandler(
+            floor: Floor | null,
+            d: BaseFloorElement | null
+        ) {
+            if (!d || !floor || !isTable(d)) return;
             const { reservation, tableId } = d;
             if (reservation) {
                 showReservation(floor, reservation, tableId);

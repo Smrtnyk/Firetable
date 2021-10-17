@@ -19,7 +19,7 @@
         shape-rendering: crispEdges;
     }
     // RESIZING WALL CONTROLS
-    g.circles circle:hover {
+    circle.bottomright:hover {
         cursor: move;
         fill: blue;
     }

@@ -6,7 +6,10 @@ import { NumberTuple } from "src/types/generic";
 
 export type FTDragEvent = D3DragEvent<Element, BaseFloorElement, unknown>;
 
-export type ElementClickHandler = (floor: Floor, d: BaseFloorElement) => void;
+export type ElementClickHandler = (
+    floor: Floor | null,
+    d: BaseFloorElement | null
+) => void;
 export type FloorDoubleClickHandler = (
     floor: Floor,
     coords: NumberTuple

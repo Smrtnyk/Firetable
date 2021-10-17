@@ -1,6 +1,7 @@
 import "./PageAdminFloorEdit.scss";
 
 import AddTableDialog from "components/Floor/AddTableDialog";
+import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
 import { Floor } from "src/floor-manager/Floor";
 import { BaseFloorElement, FloorDoc, FloorMode } from "src/types";
 import {
@@ -12,11 +13,7 @@ import {
     showErrorMessage,
     tryCatchLoadingWrapper,
 } from "src/helpers/ui-helpers";
-import {
-    BASE_ELEMENT_ACTIONS,
-    ELEMENTS_TO_ADD_COLLECTION,
-    TABLE_ACTIONS,
-} from "src/floor-manager/constants";
+import { ELEMENTS_TO_ADD_COLLECTION } from "src/floor-manager/constants";
 import { defineComponent, onMounted, ref } from "vue";
 import { isTable, isWall } from "src/floor-manager/type-guards";
 import { NumberTuple } from "src/types/generic";
@@ -26,26 +23,8 @@ import { QBadge, QBtn, QInput, QSlider, useQuasar } from "quasar";
 
 type ElementDescriptor = Pick<BaseFloorElement, "tag" | "type">;
 
-interface ITableAction {
-    id: "edit" | "delete";
-}
-
 interface BottomSheetTableClickResult {
     elementDescriptor: ElementDescriptor;
-}
-
-function makeElementClickBottomSheetOptions(isElementTable: boolean) {
-    return isElementTable
-        ? {
-              message: "Choose action",
-              grid: true,
-              actions: TABLE_ACTIONS,
-          }
-        : {
-              message: "Choose action",
-              grid: true,
-              actions: BASE_ELEMENT_ACTIONS,
-          };
 }
 
 const addNewElementsBottomSheetOptions = {
@@ -57,7 +36,7 @@ const addNewElementsBottomSheetOptions = {
 export default defineComponent({
     name: "PageFloorManager",
 
-    components: { QInput, QBtn, QBadge, QSlider },
+    components: { QInput, QBtn, QBadge, QSlider, ShowSelectedElement },
 
     props: {
         floorID: {
@@ -72,6 +51,8 @@ export default defineComponent({
 
         const floorInstance = ref<Floor | null>(null);
         const svgFloorContainer = ref<HTMLElement | null>(null);
+        const selectedElement = ref<BaseFloorElement | null>(null);
+        const selectedFloor = ref<Floor | null>(null);
 
         async function loadFloor() {
             const floor = await tryCatchLoadingWrapper(() =>
@@ -158,38 +139,12 @@ export default defineComponent({
             );
         }
 
-        function performElementAction(floor: Floor, d: BaseFloorElement) {
-            return function floorElementAction({ id }: ITableAction) {
-                if (id === "delete") floor.removeElement(d);
-
-                if (id === "edit" && isTable(d)) editTable(floor, d.tableId);
-            };
-        }
-
-        function onElementClickHandler(floor: Floor, d: BaseFloorElement) {
-            q.bottomSheet(makeElementClickBottomSheetOptions(isTable(d))).onOk(
-                performElementAction(floor, d)
-            );
-        }
-
-        function handleFloorEdit(floor: Floor, tableId: string) {
-            return function (newId: string) {
-                const findTable = getTable(floor, tableId);
-                if (findTable) {
-                    findTable.tableId = newId;
-                }
-                floor.renderTableElements();
-            };
-        }
-
-        function editTable(floor: Floor, tableId: string) {
-            q.dialog({
-                component: AddTableDialog,
-                componentProps: {
-                    id: tableId,
-                    ids: extractAllTableIds(floor),
-                },
-            }).onOk(handleFloorEdit(floor, tableId));
+        function onElementClickHandler(
+            floor: Floor | null,
+            d: BaseFloorElement | null
+        ) {
+            selectedFloor.value = floor;
+            selectedElement.value = d;
         }
 
         onMounted(loadFloor);
@@ -228,6 +183,10 @@ export default defineComponent({
                                     }}
                                 </q-input>
                             </div>
+                            <show-selected-element
+                                selectedFloor={selectedFloor.value}
+                                selectedFloorElement={selectedElement.value}
+                            />
                             <div class="row q-pa-sm q-col-gutter-md">
                                 <div class="col-6">
                                     <q-badge color="secondary">

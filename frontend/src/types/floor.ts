@@ -46,3 +46,7 @@ export interface TableElement extends BaseFloorElement {
     floor: string;
     reservation?: Reservation;
 }
+
+export interface RoundTable extends TableElement {
+    tag: ElementTag.CIRCLE;
+}

@@ -14,15 +14,6 @@ export const TABLE_ACTIONS = [
     },
 ];
 
-export const BASE_ELEMENT_ACTIONS = [
-    {
-        label: "Delete",
-        icon: "trash",
-        id: "delete",
-        color: "negative",
-    },
-];
-
 export const ELEMENTS_TO_ADD_COLLECTION = [
     {
         label: "Add square table",
