@@ -58,6 +58,7 @@ module.exports = {
         "prettier",
     ],
     rules: {
+        "linebreak-style": ["error", "unix"],
         "require-await": "error",
         "quasar/check-valid-props": 0,
         "quasar/no-invalid-qfield-usage": 0,
