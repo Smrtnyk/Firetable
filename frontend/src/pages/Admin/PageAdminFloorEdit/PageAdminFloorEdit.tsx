@@ -184,8 +184,8 @@ export default defineComponent({
                                 </q-input>
                             </div>
                             <show-selected-element
-                                selectedFloor={selectedFloor.value}
-                                selectedFloorElement={selectedElement.value}
+                                selectedFloor={selectedFloor}
+                                selectedFloorElement={selectedElement}
                             />
                             <div class="row q-pa-sm q-col-gutter-md">
                                 <div class="col-6">

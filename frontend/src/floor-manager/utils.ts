@@ -36,7 +36,7 @@ export function getTableTextPosition(d: TableElement) {
 export function getRoundTableRadius(d?: TableElement) {
     const largestWidth = Math.max(d?.width || 0, d?.height || 0, TABLE_WIDTH);
     const diagonal = largestWidth * Math.sqrt(2);
-    return diagonal / 2;
+    return Math.round(diagonal / 2);
 }
 
 export function getTableHeight(d?: TableElement) {

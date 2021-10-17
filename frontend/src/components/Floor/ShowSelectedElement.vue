@@ -1,19 +1,28 @@
 <template>
     <div class="row q-pa-sm q-col-gutter-md">
         <div class="col-11 flex justify-between">
-            <div class="row flex justify-between">
+            <div class="row">
                 <div class="col-4 q-pa-xs">
                     <q-input
-                        :model-value="props.selectedFloorElement?.width"
+                        v-if="isRoundTableComp"
+                        :model-value="getRoundTableRadiusComp"
+                        disable
+                        readonly
+                        filled
+                        label="Radius"
+                    />
+                    <q-input
+                        v-else
+                        :model-value="props.selectedFloorElement?.value?.width"
                         disable
                         readonly
                         filled
                         label="Width"
                     />
                 </div>
-                <div class="col-4 q-pa-xs">
+                <div class="col-4 q-pa-xs" v-if="!isRoundTableComp">
                     <q-input
-                        :model-value="props.selectedFloorElement?.height"
+                        :model-value="props.selectedFloorElement?.value?.height"
                         disable
                         readonly
                         filled
@@ -22,8 +31,8 @@
                 </div>
                 <div class="col-4 q-pa-xs">
                     <q-input
-                        v-if="props.selectedFloorElement?.tableId"
-                        :model-value="props.selectedFloorElement?.tableId"
+                        v-if="props.selectedFloorElement?.value?.tableId"
+                        :model-value="props.selectedFloorElement?.value.tableId"
                         disable
                         readonly
                         filled
@@ -47,6 +56,9 @@
 import { BaseFloorElement } from "src/types";
 import type { Floor } from "src/floor-manager/Floor";
 import { showConfirm } from "src/helpers/ui-helpers";
+import { computed } from "vue";
+import { getRoundTableRadius } from "src/floor-manager/utils";
+import { isRoundTable } from "src/floor-manager/type-guards";
 
 interface Props {
     selectedFloor: Floor | null;
@@ -55,6 +67,20 @@ interface Props {
 
 // eslint-disable-next-line no-undef
 const props = defineProps<Props>();
+
+const isRoundTableComp = computed(() => {
+    return (
+        props.selectedFloorElement?.value &&
+        isRoundTable(props.selectedFloorElement.value)
+    );
+});
+
+const getRoundTableRadiusComp = computed(() => {
+    return (
+        isRoundTableComp.value &&
+        getRoundTableRadius(props.selectedFloorElement.value)
+    );
+});
 
 async function deleteElement() {
     if (!props.selectedFloor || !props.selectedFloorElement) return;
