@@ -347,8 +347,7 @@ export class Floor {
                 instance.renderWallElements();
             }
             // To trigger the reactivity if vue component registers the handler
-            instance.elementClickHandler(null, null);
-            instance.elementClickHandler(instance, d);
+            instance.elementClickHandler(instance, { ...d });
         };
     }
 
