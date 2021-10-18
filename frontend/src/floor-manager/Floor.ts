@@ -95,8 +95,13 @@ export class Floor {
         this.width = newWidth;
         this.height = newHeight;
 
-        this.setSVGAttributes();
-        this.setupEditor();
+        this.destroy();
+        this.init();
+    }
+
+    private destroy(): void {
+        this.svg.remove();
+        this.floor.remove();
     }
 
     public addWall([x, y]: NumberTuple) {
