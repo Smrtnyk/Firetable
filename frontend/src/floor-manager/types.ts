@@ -1,4 +1,4 @@
-import { EnterElement, Selection } from "d3-selection";
+import { BaseType, EnterElement, Selection } from "d3-selection";
 import { BaseFloorElement, TableElement } from "src/types";
 import { D3DragEvent } from "d3-drag";
 import type { Floor } from "src/floor-manager/Floor";
@@ -23,9 +23,9 @@ export type tableElementGroupSelection = Selection<
 >;
 
 export type baseElementGroupSelection = Selection<
-    SVGGElement,
+    BaseType,
     BaseFloorElement,
-    Element,
+    SVGGElement,
     unknown
 >;
 

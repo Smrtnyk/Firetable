@@ -1,4 +1,4 @@
-import { pointer, select, Selection } from "d3-selection";
+import { EnterElement, pointer, select, Selection } from "d3-selection";
 import { range } from "d3-array";
 import { RESOLUTION, SVG_NAMESPACE } from "./constants";
 import {
@@ -132,48 +132,51 @@ export class Floor {
         this.tables.forEach((table) => (table.floor = newName));
     }
 
+    private onWallsEnter(
+        enter: Selection<EnterElement, BaseFloorElement, SVGGElement, unknown>
+    ) {
+        const wallG = enter
+            .append("g")
+            .attr("class", "wallGroup")
+            .attr("transform", translateElementToItsPosition);
+
+        wallG
+            .append("rect")
+            .attr("class", "wall")
+            .attr("height", (d) => d.height)
+            .attr("width", calculateWallWidth);
+
+        wallG.on("click", (event: Event, d: BaseFloorElement) => {
+            event.stopPropagation();
+            this.setSeletectedElement(event.currentTarget, d);
+            this.elementClickHandler(this, d);
+        });
+
+        if (isEditorModeActive(this.mode)) {
+            this.addDragBehaviourToElement(this, wallG);
+        }
+    }
+
+    private onWallsUpdate(update: baseElementGroupSelection) {
+        update.attr("transform", translateElementToItsPosition);
+        update
+            .select("rect.wall")
+            .attr("height", (d) => d.height)
+            .attr("width", calculateWallWidth);
+        update
+            .select(".bottomright")
+            .attr("cx", (d) => d.width)
+            .attr("cy", (d) => d.height);
+    }
+
     private renderWallElements() {
         const wallsData = this.data.filter(isWall);
 
         this.floor
             .selectAll("g.wallGroup")
             .data(wallsData)
-            .join(
-                // @ts-ignore 0 fucking idea what d3 types expect from me
-                (enter: baseElementGroupSelection) => {
-                    const wallG = enter
-                        .append("g")
-                        .attr("class", "wallGroup")
-                        .attr("transform", translateElementToItsPosition);
-
-                    wallG
-                        .append("rect")
-                        .attr("class", "wall")
-                        .attr("height", (d) => d.height)
-                        .attr("width", calculateWallWidth);
-
-                    wallG.on("click", (event: Event, d: BaseFloorElement) => {
-                        event.stopPropagation();
-                        this.setSeletectedElement(event.currentTarget, d);
-                        this.elementClickHandler(this, d);
-                    });
-
-                    if (isEditorModeActive(this.mode)) {
-                        this.addDragBehaviourToElement(this, wallG);
-                    }
-                },
-                (update: baseElementGroupSelection) => {
-                    update.attr("transform", translateElementToItsPosition);
-                    update
-                        .select("rect.wall")
-                        .attr("height", (d) => d.height)
-                        .attr("width", calculateWallWidth);
-                    update
-                        .select(".bottomright")
-                        .attr("cx", (d) => d.width)
-                        .attr("cy", (d) => d.height);
-                }
-            );
+            // @ts-ignore Whatever
+            .join(this.onWallsEnter.bind(this), this.onWallsUpdate);
     }
 
     private unsetSelectedElement() {
@@ -202,65 +205,59 @@ export class Floor {
         this.elementResizeBehavior(selectedElement);
     }
 
+    private onTablesEnter(enter: tableElementGroupSelection) {
+        const tableG = enter
+            .append("g")
+            .attr("class", generateTableGroupClass)
+            .attr("transform", translateElementToItsPosition);
+
+        const tables = tableG.append((d) =>
+            document.createElementNS(SVG_NAMESPACE, d.tag)
+        );
+
+        tables.each(this.eachTableDimensions);
+
+        tableG
+            .append("text")
+            .attr("transform", getTableTextPosition)
+            .attr("class", "table__id")
+            .text(getTableText);
+
+        tableG.select(":first-child").attr("class", generateTableClass);
+
+        tableG.on("click", (event: Event, d: BaseFloorElement) => {
+            event.stopPropagation();
+            this.setSeletectedElement(event.currentTarget, d);
+            this.elementClickHandler(this, d);
+        });
+
+        this.addDragBehaviourToElement(this, tableG);
+    }
+
+    private onTablesUpdate(update: tableElementGroupSelection) {
+        update.attr("transform", translateElementToItsPosition);
+        update
+            .select(".bottomright")
+            .attr("cx", calculateBottomResizableCirclePositionX)
+            .attr("cy", calculateBottomResizableCirclePositionY);
+        update.select(".table").attr("class", generateTableClass);
+        update.select("circle.table").attr("r", getRoundTableRadius);
+        update
+            .select("rect.table")
+            .attr("height", getTableHeight)
+            .attr("width", getTableWidth);
+        update
+            .select("text")
+            .attr("transform", getTableTextPosition)
+            .text(getTableText);
+    }
+
     public renderTableElements() {
         this.floor
             .selectAll<SVGGElement, TableElement>("g.tableGroup")
             .data(this.tables, (d) => d.tableId)
-            .join(
-                // @ts-ignore I have 0 fucking idea how to type d3 styff
-                (enter: tableElementGroupSelection) => {
-                    const tableG = enter
-                        .append("g")
-                        .attr("class", generateTableGroupClass)
-                        .attr("transform", translateElementToItsPosition);
-
-                    const tables = tableG.append((d) =>
-                        document.createElementNS(SVG_NAMESPACE, d.tag)
-                    );
-
-                    tables.each(this.eachTableDimensions);
-
-                    tableG
-                        .append("text")
-                        .attr("transform", getTableTextPosition)
-                        .attr("class", "table__id")
-                        .text(getTableText);
-
-                    tableG
-                        .select(":first-child")
-                        .attr("class", generateTableClass);
-
-                    tableG.on("click", (event: Event, d: BaseFloorElement) => {
-                        event.stopPropagation();
-                        this.setSeletectedElement(event.currentTarget, d);
-                        this.elementClickHandler(this, d);
-                    });
-
-                    this.addDragBehaviourToElement(
-                        this,
-                        tableG as unknown as baseElementGroupSelection
-                    );
-                },
-                (update) => {
-                    update.attr("transform", translateElementToItsPosition);
-                    update
-                        .select(".bottomright")
-                        .attr("cx", calculateBottomResizableCirclePositionX)
-                        .attr("cy", calculateBottomResizableCirclePositionY);
-                    update.select(".table").attr("class", generateTableClass);
-                    update
-                        .select("circle.table")
-                        .attr("r", getRoundTableRadius);
-                    update
-                        .select("rect.table")
-                        .attr("height", getTableHeight)
-                        .attr("width", getTableWidth);
-                    update
-                        .select("text")
-                        .attr("transform", getTableTextPosition)
-                        .text(getTableText);
-                }
-            );
+            // @ts-ignore I have 0 fucking idea how to type d3 styff
+            .join(this.onTablesEnter.bind(this), this.onTablesUpdate);
     }
 
     private eachTableDimensions(this: SVGElement, d: TableElement) {
@@ -274,7 +271,9 @@ export class Floor {
 
     private addDragBehaviourToElement(
         instance: Floor,
-        element: baseElementGroupSelection
+        element:
+            | Selection<SVGGElement, BaseFloorElement, SVGGElement, unknown>
+            | Selection<SVGGElement, TableElement, SVGGElement, unknown>
     ) {
         const dragBehaviour = drag<Element, BaseFloorElement, Element>()
             .on("start", instance.elementDragStarted)
