@@ -4,7 +4,7 @@
         "deploy:hosting": "firebase deploy --only hosting",
         "deploy:functions": "firebase deploy --only functions",
         "deploy": "firebase deploy",
-        "start:emulators": "firebase emulators:start --import=./local-db --export-on-exit",
+        "start:emulators": "firebase emulators:start --import=./local-db --export-on-exit=./local-db",
         "seed:events": "node ./functions/lib/src/seed/add-events.js",
         "seed:generateAdmminLocal": "node ./functions/lib/functions/src/seed/generate-admin-local.js",
         "seed:adminprod": "node ./functions/lib/src/seed/add-admin-prod.js"
