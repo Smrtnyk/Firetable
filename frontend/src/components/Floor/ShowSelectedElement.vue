@@ -43,6 +43,7 @@
         </div>
         <div class="col-1 flex">
             <q-btn
+                v-if="props.selectedFloorElement?.value"
                 icon="trash"
                 color="negative"
                 stretch
@@ -53,16 +54,16 @@
 </template>
 
 <script setup lang="ts">
-import { BaseFloorElement } from "src/types";
+import { BaseFloorElement, TableElement } from "src/types";
 import type { Floor } from "src/floor-manager/Floor";
 import { showConfirm } from "src/helpers/ui-helpers";
-import { computed } from "vue";
+import { computed, Ref } from "vue";
 import { getRoundTableRadius } from "src/floor-manager/utils";
 import { isRoundTable } from "src/floor-manager/type-guards";
 
 interface Props {
-    selectedFloor: Floor | null;
-    selectedFloorElement: BaseFloorElement | null;
+    selectedFloor: Ref<Floor> | null;
+    selectedFloorElement: Ref<BaseFloorElement> | null;
 }
 
 // eslint-disable-next-line no-undef
@@ -78,14 +79,16 @@ const isRoundTableComp = computed(() => {
 const getRoundTableRadiusComp = computed(() => {
     return (
         isRoundTableComp.value &&
-        getRoundTableRadius(props.selectedFloorElement.value)
+        getRoundTableRadius(props.selectedFloorElement?.value as TableElement)
     );
 });
 
 async function deleteElement() {
     if (!props.selectedFloor || !props.selectedFloorElement) return;
     if (await showConfirm("Do you really want to delete this element?")) {
-        props.selectedFloor.removeElement(props.selectedFloorElement);
+        props.selectedFloor.value.removeElement(
+            props.selectedFloorElement.value
+        );
     }
 }
 </script>
