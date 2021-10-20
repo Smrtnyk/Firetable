@@ -1,5 +1,4 @@
 import { defineComponent, PropType, reactive, ref, toRefs } from "vue";
-import { IForm } from "src/types/generic";
 import { useI18n } from "vue-i18n";
 import { useDialogPluginComponent } from "quasar";
 
@@ -64,7 +63,7 @@ export default defineComponent({
             groupedWith: [],
         });
 
-        const reservationForm = ref<IForm | null>(null);
+        const reservationForm = ref<QForm | null>(null);
 
         const { dialogRef, onDialogHide, onDialogCancel, onDialogOK } =
             useDialogPluginComponent();

@@ -23,10 +23,6 @@ import PageAdminEventsListItem from "components/Event/PageAdminEventsListItem";
 import { FTTitle } from "components/FTTitle";
 import { useStore } from "src/store";
 
-interface IPaginator extends Element {
-    stop: () => void;
-}
-
 export default defineComponent({
     name: "PageAdminEvents",
 
@@ -50,7 +46,7 @@ export default defineComponent({
         const isLoading = ref(true);
         const events = ref<EventDoc[]>([]);
         const hasMoreEventsToFetch = ref(true);
-        const paginator = ref<IPaginator | null>(null);
+        const paginator = ref<QInfiniteScroll | null>(null);
 
         const { data: floors } = useFirestore<FloorDoc>({
             type: "get",

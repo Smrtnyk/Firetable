@@ -7,10 +7,6 @@ import { minLength, noEmptyString } from "src/helpers/form-rules";
 
 import { QInput, QImg, QBtn, QForm, QIcon } from "quasar";
 
-interface IAuthForm extends Element {
-    validate: () => Promise<boolean>;
-}
-
 export default defineComponent({
     name: "Auth",
 
@@ -22,7 +18,7 @@ export default defineComponent({
         const username = ref("");
         const password = ref("");
         const isPwd = ref(true);
-        const authForm = ref<IAuthForm | null>(null);
+        const authForm = ref<QForm | null>(null);
 
         const usernameRule = [noEmptyString()];
 

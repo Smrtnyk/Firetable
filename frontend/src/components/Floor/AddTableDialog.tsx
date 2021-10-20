@@ -1,5 +1,4 @@
 import { computed, defineComponent, PropType, ref } from "vue";
-import { IForm } from "src/types/generic";
 import {
     useDialogPluginComponent,
     QForm,
@@ -40,7 +39,7 @@ export default defineComponent({
     emits: [...useDialogPluginComponent.emits],
 
     setup(props) {
-        const addTableForm = ref<IForm | null>(null);
+        const addTableForm = ref<QForm | null>(null);
 
         const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
             useDialogPluginComponent();
