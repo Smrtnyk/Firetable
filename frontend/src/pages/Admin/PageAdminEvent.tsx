@@ -14,8 +14,6 @@ import { useFirestore } from "src/composables/useFirestore";
 import { FTTitle } from "components/FTTitle";
 import { FTSubtitle } from "components/FTSubtitle";
 import { EventFeedList } from "components/Event/EventFeedList";
-import { EventTablesInfoRadarChart } from "components/Event/EventTablesInfoRadarChart";
-import { EventReservationsByWaiterChart } from "components/Event/EventReservationsByWaiterChart";
 
 import { QSeparator } from "quasar";
 
@@ -24,9 +22,7 @@ export default defineComponent({
     components: {
         FTTitle,
         FTSubtitle,
-        EventTablesInfoRadarChart,
         EventFeedList,
-        EventReservationsByWaiterChart,
 
         QSeparator,
     },
@@ -107,22 +103,6 @@ export default defineComponent({
                             ),
                         }}
                     </f-t-title>
-
-                    {!!eventFloors.value?.length && (
-                        <div class="row">
-                            <event-tables-info-radar-chart
-                                class="col-12 col-sm-6"
-                                reservations-status={reservationsStatus.value}
-                            />
-
-                            <q-separator class="q-my-md" />
-
-                            <event-reservations-by-waiter-chart
-                                class="col-12 col-sm-6"
-                                event-data={eventData.value}
-                            />
-                        </div>
-                    )}
 
                     {!!eventFeed.value?.length && (
                         <>
