@@ -3,9 +3,9 @@
         class="row q-pa-sm q-col-gutter-md"
         v-if="props.selectedFloorElement?.value"
     >
-        <div class="col-11 flex justify-between">
+        <div class="col-10 flex justify-between">
             <div class="row">
-                <div class="col-4 q-pa-xs">
+                <div class="col-4 q-pa-xs q-pl-none">
                     <q-input
                         v-if="isRoundTableComp"
                         :model-value="getRoundTableRadiusComp"
@@ -51,12 +51,11 @@
                 </div>
             </div>
         </div>
-        <div class="col-1 flex">
+        <div class="col-2 flex q-pl-none justify-end">
             <q-btn
                 v-if="props.selectedFloorElement?.value"
                 icon="trash"
                 color="negative"
-                stretch
                 @click="deleteElement"
             />
         </div>
