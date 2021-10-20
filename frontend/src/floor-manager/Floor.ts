@@ -99,6 +99,16 @@ export class Floor {
         this.init();
     }
 
+    public updateElementProperty<
+        T extends BaseFloorElement,
+        S extends keyof BaseFloorElement
+    >(element: T, property: S, value: T[S]): void {
+        element[property] = value;
+        isTable(element)
+            ? this.renderTableElements()
+            : this.renderWallElements();
+    }
+
     private destroy(): void {
         this.svg.remove();
         this.floor.remove();
