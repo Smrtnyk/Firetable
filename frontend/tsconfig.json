@@ -1,6 +1,7 @@
 {
     "extends": "@quasar/app/tsconfig-preset",
     "compilerOptions": {
+        "target": "ESNext",
         "baseUrl": ".",
         "lib": ["ESNext", "DOM"],
         "jsx": "preserve",
