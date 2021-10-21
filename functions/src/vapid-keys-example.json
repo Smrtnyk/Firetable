@@ -2,4 +2,4 @@
     "subject": "mailto:your email",
     "public": "public key",
     "secret": "secret key"
-}
+};
