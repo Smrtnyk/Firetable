@@ -8,6 +8,7 @@
 const { configure } = require("quasar/wrappers");
 const fs = require("fs");
 const path = require("path");
+const ESLintPlugin = require("eslint-webpack-plugin");
 
 // eslint-disable-next-line no-undef
 module.exports = configure(function (ctx) {
@@ -48,6 +49,14 @@ module.exports = configure(function (ctx) {
             env: require("dotenv").config().parsed,
 
             vueRouterMode: "history",
+
+            chainWebpack(chain) {
+                chain
+                    .plugin("eslint-webpack-plugin")
+                    .use(ESLintPlugin, [
+                        { extensions: ["js", "vue", "tsx", "ts"] },
+                    ]);
+            },
 
             extendWebpack(cfg) {
                 cfg.resolve.alias = {
