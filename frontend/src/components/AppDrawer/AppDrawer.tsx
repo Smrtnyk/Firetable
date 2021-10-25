@@ -73,10 +73,14 @@ export default defineComponent({
         const adminLinksCollection = computed(() =>
             props.showAdminLinks ? adminLinks.value : []
         );
-        const avatar = computed(
-            () =>
-                `https://avatars.dicebear.com/api/human/${user.value?.email}.svg`
-        );
+        const avatar = computed(() => {
+            if (!user.value) return "";
+            const [first, last] = user.value.name.split(" ");
+            if (!last) {
+                return first.substr(0, 1);
+            }
+            return `${first.at(0)}${last.at(0)}`;
+        });
 
         function setDarkMode(newValue: boolean) {
             q.dark.set(newValue);
@@ -112,7 +116,7 @@ export default defineComponent({
                                 "status-dot",
                             ]}
                         />
-                        <q-img src={avatar.value} />
+                        {avatar.value}
                     </q-avatar>
                     <div class="q-mt-md text-center">
                         <div class="text-subtitle1">{user.value?.name}</div>
