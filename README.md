@@ -1,3 +1,5 @@
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=Smrtnyk_Firetable&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=Smrtnyk_Firetable)
+
 ## FIRETABLE
 
 ### An event management system.
