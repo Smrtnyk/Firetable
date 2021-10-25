@@ -6,7 +6,6 @@ import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 
 import { defineComponent, ref, withDirectives } from "vue";
 
-import { FloorDoc, Collection } from "src/types";
 import {
     deleteFloor,
     saveFloor,
@@ -26,6 +25,8 @@ import {
     Ripple,
     QImg,
 } from "quasar";
+import { Collection } from "src/types/firebase";
+import { FloorDoc } from "src/types/floor";
 
 export default defineComponent({
     name: "PageAdminFloors",

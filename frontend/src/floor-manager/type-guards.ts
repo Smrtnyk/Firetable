@@ -5,7 +5,7 @@ import {
     RoundTable,
     TableElement,
     WallElement,
-} from "src/types";
+} from "src/types/floor";
 
 export function isWall(d: Pick<BaseFloorElement, "type">): d is WallElement {
     return d.type === ElementType.WALL;

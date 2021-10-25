@@ -17,7 +17,7 @@ import {
     ElementType,
     FloorDoc,
     TableElement,
-} from "src/types";
+} from "src/types/floor";
 import { DocumentReference } from "@firebase/firestore";
 import { firestore } from "src/services/firebase/base";
 

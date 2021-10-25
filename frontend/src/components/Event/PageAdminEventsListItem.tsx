@@ -1,6 +1,6 @@
 import { formatEventDate } from "src/helpers/utils";
 import { defineComponent, PropType } from "vue";
-import { EventDoc } from "src/types";
+import { EventDoc } from "src/types/event";
 
 import { QSlideItem, QItem, QItemSection, QItemLabel, QIcon } from "quasar";
 

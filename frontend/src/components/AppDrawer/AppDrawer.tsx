@@ -1,7 +1,7 @@
 import "./AppDrawer.scss";
 
 import { computed, defineComponent, ref, watch, withDirectives } from "vue";
-import { User } from "src/types";
+import { User } from "src/types/auth";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { logoutUser, updateUser } from "src/services/firebase/auth";
 import { useQuasar, Ripple, LocalStorage } from "quasar";

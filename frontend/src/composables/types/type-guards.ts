@@ -37,12 +37,6 @@ export function optsAreGetDoc<T, M>(
     return options.queryType === "doc" && options.type === "get";
 }
 
-export function optsAreWatchDoc<T, M>(
-    options: Options<T, M>
-): options is OptionsDocWatch<T, M> {
-    return options.queryType === "doc" && options.type === "watch";
-}
-
 export function optsAreGet<T, M>(
     options: Options<T, M>
 ): options is OptionsDocGet<T, M> | OptionsCollGet<T, M> {

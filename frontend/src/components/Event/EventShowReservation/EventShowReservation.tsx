@@ -1,6 +1,6 @@
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { defineComponent, ref, PropType } from "vue";
-import { Reservation } from "src/types";
+import { Reservation } from "src/types/event";
 import { updateEventFloorData } from "src/services/firebase/db-events";
 import type { Floor } from "src/floor-manager/Floor";
 import { useI18n } from "vue-i18n";

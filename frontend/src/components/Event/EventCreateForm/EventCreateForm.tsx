@@ -7,7 +7,6 @@ import {
 } from "vue";
 
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import { FloorDoc, CreateEventForm } from "src/types";
 import { ImageTools } from "src/helpers/ImageTools";
 import { useI18n } from "vue-i18n";
 import {
@@ -35,6 +34,8 @@ import {
     ClosePopup,
 } from "quasar";
 import { useStore } from "src/store";
+import { CreateEventForm } from "src/types/event";
+import { FloorDoc } from "src/types/floor";
 
 interface State {
     form: CreateEventForm;

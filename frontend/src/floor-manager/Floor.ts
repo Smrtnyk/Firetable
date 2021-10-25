@@ -19,7 +19,12 @@ import {
     translateElementToItsPosition,
 } from "./utils";
 import { makeRawTable, makeRawWall } from "./factories";
-import { BaseFloorElement, FloorMode, FloorDoc, TableElement } from "src/types";
+import {
+    BaseFloorElement,
+    FloorMode,
+    FloorDoc,
+    TableElement,
+} from "src/types/floor";
 import {
     isRoundTable,
     isSquaredTable,

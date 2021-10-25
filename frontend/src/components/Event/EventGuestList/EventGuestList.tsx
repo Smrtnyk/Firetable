@@ -4,7 +4,7 @@ import {
     tryCatchLoadingWrapper,
 } from "src/helpers/ui-helpers";
 import { computed, defineComponent, PropType, ref } from "vue";
-import { GuestData } from "src/types";
+import { GuestData } from "src/types/event";
 import {
     addGuestToGuestList,
     confirmGuestFromGuestList,

@@ -1,4 +1,4 @@
-import { CreateGuestPayload } from "src/types";
+import { CreateGuestPayload } from "src/types/event";
 import { defineComponent, ref, withDirectives } from "vue";
 
 import { QCard, QBanner, QForm, QInput, QBtn, ClosePopup } from "quasar";

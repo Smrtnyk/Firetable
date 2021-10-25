@@ -39,20 +39,22 @@ import { isTable } from "src/floor-manager/type-guards";
 import { getFreeTables, getReservedTables } from "src/floor-manager/filters";
 import { updateEventFloorData } from "src/services/firebase/db-events";
 import {
-    BaseFloorElement,
-    Collection,
     CreateReservationPayload,
     EventDoc,
-    FloorDoc,
-    FloorMode,
     GuestData,
     Reservation,
-    TableElement,
-} from "src/types";
+} from "src/types/event";
 import { useStore } from "src/store";
 import { useI18n } from "vue-i18n";
 import { useFirestore } from "src/composables/useFirestore";
 import { whiteSpaceToUnderscore } from "src/helpers/utils";
+import { Collection } from "src/types/firebase";
+import {
+    BaseFloorElement,
+    FloorDoc,
+    FloorMode,
+    TableElement,
+} from "src/types/floor";
 
 interface State {
     showMapsExpanded: boolean;

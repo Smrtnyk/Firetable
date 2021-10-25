@@ -2,7 +2,7 @@ import { CollectionRef, Query } from "./firestoreTypes";
 import { Ref } from "vue";
 import { DocumentData } from "@firebase/firestore";
 
-export interface OptionsBase {
+interface OptionsBase {
     /** Path to the document or collection in firestore. Use $variableName to insert reactive variable data into the path. If the path includes variables, the options object must include a 'variables' key */
     path: string;
     /** Variables that should be used to construct the path to the document or collection in firestore. If a variable changes the path, data will be re-fetched. Variable values should be a vue ref. */
@@ -23,7 +23,7 @@ export interface OptionsBase {
     inComponent?: boolean;
 }
 
-export interface OptionsColl<T, M> {
+interface OptionsColl<T, M> {
     /** The type of this query - collection or doc */
     queryType: "collection";
     /** Exposes a function to extend the firestore query for the collection eg: add a '.where()' function or '.limit()'. The returned Query object will be used to get or watch data */
@@ -34,7 +34,7 @@ export interface OptionsColl<T, M> {
     onReceive?: (data: T[], mutatedData: M | undefined) => unknown;
 }
 
-export interface OptionsDoc<T, M> {
+interface OptionsDoc<T, M> {
     /** The type of this query - collection or doc */
     queryType: "doc";
     /** Exposes a function to mutate the data that is fetched from firestore. The mutated data will be returned as 'mutatedData' */
@@ -43,12 +43,12 @@ export interface OptionsDoc<T, M> {
     onReceive?: (data: T | undefined, mutatedData: M | undefined) => unknown;
 }
 
-export interface OptionsWatch {
+interface OptionsWatch {
     /** The type of the get function - 'watch' or 'get'. 'get' does a single get() from firestore | 'watch' watches for document or collection changes and updates the data received */
     type: "watch";
 }
 
-export interface OptionsGet {
+interface OptionsGet {
     /** The type of the get function - 'watch' or 'get'. 'get' does a single get() from firestore | 'watch' watches for document or collection changes and updates the data received */
     type: "get";
 }

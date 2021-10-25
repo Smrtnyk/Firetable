@@ -1,7 +1,8 @@
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useFirestore } from "src/composables/useFirestore";
-import { Collection, User } from "src/types";
+import { Collection } from "src/types/firebase";
 import { logoutUser } from "src/services/firebase/auth";
+import { User } from "src/types/auth";
 
 export function initUser({ commit }: any, uid: string) {
     const { stopWatchingData } = useFirestore<User>({

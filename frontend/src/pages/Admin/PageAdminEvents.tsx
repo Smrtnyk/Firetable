@@ -1,7 +1,6 @@
 import { EventCreateForm } from "src/components/Event/EventCreateForm";
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { defineComponent, onMounted, ref } from "vue";
-import { EventDoc, CreateEventPayload, Collection, FloorDoc } from "src/types";
 import { DocumentData, QueryDocumentSnapshot } from "@firebase/firestore";
 import {
     createNewEvent,
@@ -22,6 +21,9 @@ import { useFirestore } from "src/composables/useFirestore";
 import PageAdminEventsListItem from "components/Event/PageAdminEventsListItem";
 import { FTTitle } from "components/FTTitle";
 import { useStore } from "src/store";
+import { Collection } from "src/types/firebase";
+import { FloorDoc } from "src/types/floor";
+import { CreateEventPayload, EventDoc } from "src/types/event";
 
 export default defineComponent({
     name: "PageAdminEvents",

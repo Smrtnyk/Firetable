@@ -5,7 +5,6 @@ import { FTSubtitle } from "src/components/FTSubtitle";
 
 import { defineComponent } from "vue";
 import { useFirestore } from "src/composables/useFirestore";
-import { Collection, EventDoc } from "src/types";
 import {
     query as firestoreQuery,
     where,
@@ -14,6 +13,8 @@ import {
 } from "@firebase/firestore";
 
 import { QImg } from "quasar";
+import { Collection } from "src/types/firebase";
+import { EventDoc } from "src/types/event";
 
 export default defineComponent({
     name: "Home",

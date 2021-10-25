@@ -1,5 +1,5 @@
 import { RESOLUTION, TABLE_HEIGHT, TABLE_WIDTH } from "./constants";
-import { BaseFloorElement, FloorMode, TableElement } from "src/types";
+import { BaseFloorElement, FloorMode, TableElement } from "src/types/floor";
 import { isRoundTable, isTable, isWall } from "src/floor-manager/type-guards";
 
 export function generateTableGroupClass({ tableId }: TableElement) {
@@ -22,7 +22,7 @@ export function getTableText({ tableId }: TableElement) {
     return tableId;
 }
 
-export function round(p: number, n: number) {
+function round(p: number, n: number) {
     return p % n < n / 2 ? p - (p % n) : p + n - (p % n);
 }
 

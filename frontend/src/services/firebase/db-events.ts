@@ -5,7 +5,7 @@ import {
     guestDoc,
     eventFloorDoc,
 } from "./db";
-import { CreateEventPayload, EventDoc, GuestData } from "src/types";
+import { CreateEventPayload, EventDoc, GuestData } from "src/types/event";
 import { functions } from "src/services/firebase/base";
 import { DocumentData } from "@firebase/firestore";
 import { httpsCallable } from "@firebase/functions";

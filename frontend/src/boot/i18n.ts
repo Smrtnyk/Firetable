@@ -5,7 +5,7 @@ import { LocalStorage } from "quasar";
 
 const savedLanguage = LocalStorage.getItem<string>("FTLang") ?? "de";
 
-export const i18n = createI18n({
+const i18n = createI18n({
     locale: savedLanguage,
     fallbackLocale: "en-GB",
     messages,

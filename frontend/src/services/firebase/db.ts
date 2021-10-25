@@ -1,7 +1,7 @@
 import { firestore, functions } from "./base";
-import { Collection } from "src/types";
 import { httpsCallable } from "@firebase/functions";
 import { collection, doc } from "@firebase/firestore";
+import { Collection } from "src/types/firebase";
 
 function getCollection(collectionName: Collection) {
     return collection(firestore(), collectionName);
@@ -13,14 +13,6 @@ export function eventsCollection() {
 
 export function floorsCollection() {
     return getCollection(Collection.FLOORS);
-}
-
-export function eventFloorsCollection(eventId: string) {
-    return doc(eventsCollection(), eventId + "/" + Collection.FLOORS);
-}
-
-export function eventFeedCollection(eventId: string) {
-    return doc(eventsCollection(), eventId + "/" + Collection.EVENT_FEED);
 }
 
 export function guestListCollection(eventId: string) {
@@ -49,7 +41,7 @@ export function deleteCollection(id: string) {
 
 // DOCS
 
-export function eventDoc(eventId: string) {
+function eventDoc(eventId: string) {
     return doc(eventsCollection(), eventId);
 }
 

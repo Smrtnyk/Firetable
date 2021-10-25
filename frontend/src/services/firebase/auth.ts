@@ -3,7 +3,6 @@ import { Store } from "vuex";
 
 import { auth, functions } from "./base";
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import { Role, CreateUserPayload, ValueOf } from "src/types";
 import { usersCollection } from "src/services/firebase/db";
 import { useStore } from "src/store";
 import { httpsCallable } from "@firebase/functions";
@@ -16,6 +15,8 @@ import {
     UserCredential,
 } from "@firebase/auth";
 import { State } from "src/store/types";
+import { CreateUserPayload, Role } from "src/types/auth";
+import { ValueOf } from "src/types/generic";
 
 export function createUserWithEmail(payload: CreateUserPayload) {
     return httpsCallable(functions(), "createUser")(payload);
@@ -31,7 +32,7 @@ export function updateUser(
     });
 }
 
-export function isAuthenticated(store: ReturnType<typeof useStore>) {
+function isAuthenticated(store: ReturnType<typeof useStore>) {
     return store.state.auth.isAuthenticated;
 }
 
@@ -118,7 +119,7 @@ export function loginWithEmail(
  * wait for firebase to initialize and determine if a
  * user is authenticated or not with only a single observable
  */
-export function ensureAuthIsInitialized(store: ReturnType<typeof useStore>) {
+function ensureAuthIsInitialized(store: ReturnType<typeof useStore>) {
     if (store.state.auth.isReady) {
         return true;
     }

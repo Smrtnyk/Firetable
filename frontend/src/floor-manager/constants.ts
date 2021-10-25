@@ -1,18 +1,4 @@
-import { ElementTag, ElementType } from "src/types";
-
-export const TABLE_ACTIONS = [
-    {
-        label: "Delete",
-        icon: "trash",
-        id: "delete",
-        color: "negative",
-    },
-    {
-        label: "Edit",
-        icon: "pencil",
-        id: "edit",
-    },
-];
+import { ElementTag, ElementType } from "src/types/floor";
 
 export const ELEMENTS_TO_ADD_COLLECTION = [
     {

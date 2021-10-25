@@ -1,5 +1,5 @@
 import { BaseType, EnterElement, Selection } from "d3-selection";
-import { BaseFloorElement, TableElement } from "src/types";
+import { BaseFloorElement, TableElement } from "src/types/floor";
 import { D3DragEvent } from "d3-drag";
 import type { Floor } from "src/floor-manager/Floor";
 import { NumberTuple } from "src/types/generic";

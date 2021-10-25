@@ -6,7 +6,6 @@ import {
     showErrorMessage,
     tryCatchLoadingWrapper,
 } from "src/helpers/ui-helpers";
-import { CreateUserPayload, User, FloorDoc, Collection } from "src/types";
 import { computed, defineComponent, ref } from "vue";
 import { createUserWithEmail, deleteUser } from "src/services/firebase/auth";
 import { config } from "src/config";
@@ -22,6 +21,9 @@ import {
     QItemLabel,
 } from "quasar";
 import { useStore } from "src/store";
+import { Collection } from "src/types/firebase";
+import { CreateUserPayload, User } from "src/types/auth";
+import { FloorDoc } from "src/types/floor";
 
 const { maxNumOfUsers } = config;
 

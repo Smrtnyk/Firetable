@@ -25,10 +25,3 @@ export function getTable(floor: Floor, tableId: string) {
 export function extractAllTableIds(floor: Floor) {
     return floor.tables.map((table) => table.tableId);
 }
-
-export function getAllReservedTables(floors: Floor[]) {
-    return floors
-        .map((floor) => floor.tables)
-        .flat()
-        .filter((d: TableElement) => !!d.reservation);
-}

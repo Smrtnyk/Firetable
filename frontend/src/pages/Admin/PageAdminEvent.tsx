@@ -1,10 +1,4 @@
-import {
-    FloorDoc,
-    TableElement,
-    Collection,
-    EventDoc,
-    EventFeedDoc,
-} from "src/types";
+import { FloorDoc, TableElement } from "src/types/floor";
 import { defineComponent, onMounted, computed } from "vue";
 import { isTable } from "src/floor-manager/type-guards";
 import { useRouter } from "vue-router";
@@ -16,6 +10,8 @@ import { FTSubtitle } from "components/FTSubtitle";
 import { EventFeedList } from "components/Event/EventFeedList";
 
 import { QSeparator } from "quasar";
+import { Collection } from "src/types/firebase";
+import { EventDoc, EventFeedDoc } from "src/types/event";
 
 export default defineComponent({
     name: "PageAdminEvent",

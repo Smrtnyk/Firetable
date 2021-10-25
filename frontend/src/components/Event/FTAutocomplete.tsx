@@ -1,5 +1,5 @@
 import { defineComponent, ref, PropType } from "vue";
-import { TableElement } from "src/types";
+import { TableElement } from "src/types/floor";
 import { useI18n } from "vue-i18n";
 
 import { QInput, QIcon } from "quasar";

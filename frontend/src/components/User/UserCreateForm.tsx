@@ -1,4 +1,4 @@
-import { ACTIVITY_STATUS, Role, CreateUserPayload } from "src/types";
+import { ACTIVITY_STATUS, Role, CreateUserPayload } from "src/types/auth";
 import { defineComponent, PropType, ref, withDirectives } from "vue";
 import { noEmptyString } from "src/helpers/form-rules";
 import { PROJECT_MAIL } from "src/config";

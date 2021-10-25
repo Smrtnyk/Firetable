@@ -3,7 +3,7 @@ import "./PageAdminFloorEdit.scss";
 import AddTableDialog from "components/Floor/AddTableDialog";
 import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
 import { Floor } from "src/floor-manager/Floor";
-import { BaseFloorElement, FloorDoc, FloorMode } from "src/types";
+import { BaseFloorElement, FloorDoc, FloorMode } from "src/types/floor";
 import {
     extractAllTableIds,
     getTable,

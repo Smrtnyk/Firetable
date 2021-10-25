@@ -1,5 +1,5 @@
 import { AuthState } from "src/store/types";
-import { User } from "src/types";
+import { User } from "src/types/auth";
 
 interface AuthStatePayload {
     isReady: boolean;
