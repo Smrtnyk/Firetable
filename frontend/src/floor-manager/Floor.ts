@@ -57,6 +57,12 @@ export class Floor {
     private svg!: Selection<SVGSVGElement, unknown, null, unknown>;
     private floor!: Selection<SVGGElement, unknown, null, unknown>;
 
+    private elementClickListener = (event: Event, d: BaseFloorElement) => {
+        event.stopPropagation();
+        this.setSeletectedElement(event.currentTarget, d);
+        this.elementClickHandler(this, d);
+    };
+
     private constructor({
         floorDoc,
         container,
@@ -156,11 +162,7 @@ export class Floor {
             .attr("height", (d) => d.height)
             .attr("width", calculateWallWidth);
 
-        wallG.on("click", (event: Event, d: BaseFloorElement) => {
-            event.stopPropagation();
-            this.setSeletectedElement(event.currentTarget, d);
-            this.elementClickHandler(this, d);
-        });
+        wallG.on("click", this.elementClickListener);
 
         if (isEditorModeActive(this.mode)) {
             this.addDragBehaviourToElement(this, wallG);
@@ -235,11 +237,7 @@ export class Floor {
 
         tableG.select(":first-child").attr("class", generateTableClass);
 
-        tableG.on("click", (event: Event, d: BaseFloorElement) => {
-            event.stopPropagation();
-            this.setSeletectedElement(event.currentTarget, d);
-            this.elementClickHandler(this, d);
-        });
+        tableG.on("click", this.elementClickListener);
 
         this.addDragBehaviourToElement(this, tableG);
     }
