@@ -95,10 +95,6 @@ export function getDefaultElementWidth(d: BaseFloorElement) {
     return 0;
 }
 
-export function calculateWallHeight({ height } = { height: RESOLUTION }) {
-    return height;
-}
-
 export function calculateWallWidth({ width } = { width: RESOLUTION }) {
     return width;
 }

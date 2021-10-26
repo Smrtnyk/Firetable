@@ -18,10 +18,6 @@ export function getReservedTables(floor: Floor | FloorDoc) {
     return getTables(floor).filter((table) => !!table.reservation);
 }
 
-export function getTable(floor: Floor, tableId: string) {
-    return floor.tables.find((table) => table.tableId === tableId);
-}
-
 export function extractAllTableIds(floor: Floor) {
     return floor.tables.map((table) => table.tableId);
 }

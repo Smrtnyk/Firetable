@@ -3,7 +3,6 @@ import {
     DocumentReference,
     CollectionReference,
 } from "@firebase/firestore";
-export type Docref = DocumentReference<DocumentData>;
 export type CollectionRef = CollectionReference<DocumentData>;
 
 export const enum Collection {
