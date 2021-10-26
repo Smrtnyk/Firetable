@@ -124,5 +124,3 @@ async function deleteElement() {
     }
 }
 </script>
-
-<style scoped></style>
