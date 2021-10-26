@@ -205,11 +205,11 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
             const firestoreRefVal = firestoreQuery.value
                 ? firestoreQuery.value
                 : (firestoreRef.value as unknown as CollectionRef);
-            // @ts-ignore
-            const collection = await getDocs(firestoreRefVal);
+
+            const fetchedCollection = await getDocs(firestoreRefVal);
             let colData: T[] = [];
-            if (collection.size) {
-                colData = collection.docs.map(firestoreDocSerializer);
+            if (fetchedCollection.size) {
+                colData = fetchedCollection.docs.map(firestoreDocSerializer);
             }
             return receiveCollData(colData);
         } catch (e) {
