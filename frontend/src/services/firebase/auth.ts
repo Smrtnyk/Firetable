@@ -1,5 +1,4 @@
 import { Router } from "vue-router";
-import { Store } from "vuex";
 
 import { auth, functions } from "./base";
 import { showErrorMessage } from "src/helpers/ui-helpers";
