@@ -9,6 +9,7 @@ import EventInfo from "components/Event/EventInfo";
 
 import {
     DialogChainObject,
+    Loading,
     QBtn,
     QFab,
     QFabAction,
@@ -123,6 +124,9 @@ export default defineComponent({
             type: "watch",
             queryType: "doc",
             path: `${Collection.EVENTS}/${props.id}`,
+            onFinished() {
+                Loading.hide();
+            },
         });
         const { data: eventFloors } = useFirestore<FloorDoc>({
             type: "watch",
@@ -365,6 +369,7 @@ export default defineComponent({
             if (!props.id) {
                 await router.replace("/");
             }
+            Loading.show();
         }
 
         watch(eventFloors, handleFloorInstancesData);

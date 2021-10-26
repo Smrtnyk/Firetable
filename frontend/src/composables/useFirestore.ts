@@ -94,11 +94,13 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
                 newPath = newPath.replace(x, `${instanceVal}`);
             }
         }
-        return newPath.startsWith("/")
-            ? newPath.endsWith("/")
-                ? newPath.substr(1).substr(0, newPath.length - 2)
-                : newPath.substr(1)
-            : newPath;
+        if (newPath.startsWith("/")) {
+            if (newPath.endsWith("/")) {
+                return newPath.substr(1).substr(0, newPath.length - 2);
+            }
+            return newPath.substr(1);
+        }
+        return newPath;
     });
 
     // firestore Ref computation
