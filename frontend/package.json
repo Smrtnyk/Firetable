@@ -13,7 +13,7 @@
         "build:pwa": "quasar build -m pwa"
     },
     "dependencies": {
-        "@quasar/extras": "1.11.2",
+        "@quasar/extras": "1.11.3",
         "d3-array": "3.1.1",
         "d3-drag": "3.0.0",
         "d3-selection": "3.0.0",
@@ -26,8 +26,8 @@
     "devDependencies": {
         "@quasar/app": "3.1.6",
         "@types/d3": "7.1.0",
-        "@typescript-eslint/eslint-plugin": "5.1.0",
-        "@typescript-eslint/parser": "5.1.0",
+        "@typescript-eslint/eslint-plugin": "5.2.0",
+        "@typescript-eslint/parser": "5.2.0",
         "@vue/babel-plugin-jsx": "1.1.1",
         "babel-loader": "8.2.3",
         "dotenv": "10.0.0",
