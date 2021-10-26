@@ -56,6 +56,21 @@ module.exports = configure(function (ctx) {
                     .use(ESLintPlugin, [
                         { extensions: ["js", "vue", "tsx", "ts"] },
                     ]);
+                chain.module
+                    .rule("tsx")
+                    .test(/\.ts(x?)$/)
+                    .use("babel-loader")
+                    .loader("babel-loader")
+                    .options({ babelrc: true });
+                chain.module
+                    .rule("tsx")
+                    .test(/\.ts(x?)$/)
+                    .use("ts-loader")
+                    .loader("ts-loader")
+                    .options({
+                        appendTsSuffixTo: [/\.vue$/],
+                        transpileOnly: true,
+                    });
             },
 
             extendWebpack(cfg) {
@@ -65,23 +80,6 @@ module.exports = configure(function (ctx) {
                     "@": path.resolve(__dirname, "./"),
                 };
                 cfg.resolve.extensions.push(".tsx");
-                cfg.module.rules.push({
-                    test: /\.ts(x?)$/,
-                    exclude: /(node_modules|quasar)/,
-                    use: [
-                        {
-                            loader: "babel-loader",
-                            options: { babelrc: true },
-                        },
-                        {
-                            loader: "ts-loader",
-                            options: {
-                                appendTsSuffixTo: [/\.vue$/],
-                                transpileOnly: true,
-                            },
-                        },
-                    ],
-                });
             },
         },
 
