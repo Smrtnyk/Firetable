@@ -26,6 +26,7 @@ import {
 import { firestore, getFirebaseApp } from "src/services/firebase/base";
 import { CollectionRef } from "src/types/firebase";
 import {
+    DocumentReference,
     DocumentData,
     onSnapshot,
     collection,
@@ -180,15 +181,16 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
 
     async function getDocData() {
         try {
-            const firestoreRefVal = firestoreRef.value;
-            // @ts-ignore
-            const doc = await getDoc(firestoreRefVal);
+            const firestoreRefVal =
+                firestoreRef.value as unknown as DocumentReference<DocumentData>;
 
-            if (!doc.exists) {
+            const fetchedDoc = await getDoc(firestoreRefVal);
+
+            if (!fetchedDoc.exists) {
                 return;
             }
 
-            return receiveDocData(firestoreDocSerializer(doc));
+            return receiveDocData(firestoreDocSerializer(fetchedDoc));
         } catch (e) {
             if (options.onError) {
                 options.onError(e);
