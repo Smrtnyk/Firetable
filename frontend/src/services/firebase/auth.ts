@@ -48,7 +48,7 @@ export function handleOnAuthStateChanged(
     // If the user loses authentication route
     // redirect them to the login page
     authStore.setUser(null);
-    void router.replace({ path: "/auth" }).catch(showErrorMessage);
+    router.replace({ path: "/auth" }).catch(showErrorMessage);
 }
 
 export function routerBeforeEach(

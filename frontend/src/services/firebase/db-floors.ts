@@ -1,12 +1,6 @@
 import { floorDoc, floorsCollection } from "src/services/firebase/db";
 import type { Floor } from "src/floor-manager/Floor";
-import {
-    getDoc,
-    getDocs,
-    deleteDoc,
-    updateDoc,
-    addDoc,
-} from "@firebase/firestore";
+import { getDoc, deleteDoc, updateDoc, addDoc } from "@firebase/firestore";
 import { FloorDoc } from "src/types/floor";
 
 export async function getFloor(floorID: string): Promise<FloorDoc | void> {

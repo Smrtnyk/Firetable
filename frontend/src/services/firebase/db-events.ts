@@ -7,10 +7,10 @@ import {
 } from "./db";
 import { CreateEventPayload, EventDoc, GuestData } from "src/types/event";
 import { functions } from "src/services/firebase/base";
-import { DocumentData } from "@firebase/firestore";
 import { httpsCallable } from "@firebase/functions";
 import type { Floor } from "src/floor-manager/Floor";
 import {
+    DocumentData,
     getDocs,
     orderBy,
     limit,

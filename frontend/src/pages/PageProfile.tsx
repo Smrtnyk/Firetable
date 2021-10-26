@@ -1,5 +1,4 @@
 import { computed, defineComponent } from "vue";
-import { User } from "src/types/auth";
 import { useAuthStore } from "src/stores/auth-store";
 
 import { FTTitle } from "components/FTTitle";

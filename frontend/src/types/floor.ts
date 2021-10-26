@@ -1,4 +1,3 @@
-import { User } from "./auth";
 import { Reservation } from "./event";
 
 /**

@@ -25,12 +25,7 @@ import {
     FloorDoc,
     TableElement,
 } from "src/types/floor";
-import {
-    isRoundTable,
-    isSquaredTable,
-    isTable,
-    isWall,
-} from "src/floor-manager/type-guards";
+import { isRoundTable, isTable, isWall } from "src/floor-manager/type-guards";
 import { NOOP, whiteSpaceToUnderscore } from "src/helpers/utils";
 import {
     baseElementGroupSelection,
@@ -43,7 +38,7 @@ import {
 import { getFreeTables, getTables } from "src/floor-manager/filters";
 import { NumberTuple } from "src/types/generic";
 import { zoom } from "d3-zoom";
-import { D3DragEvent, drag } from "d3-drag";
+import { drag } from "d3-drag";
 
 export class Floor {
     name: string;

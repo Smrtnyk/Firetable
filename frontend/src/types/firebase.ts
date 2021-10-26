@@ -1,6 +1,5 @@
 import {
     DocumentData,
-    QueryDocumentSnapshot,
     DocumentReference,
     CollectionReference,
 } from "@firebase/firestore";

@@ -1,4 +1,4 @@
-import { FloorDoc, TableElement } from "src/types/floor";
+import { FloorDoc } from "src/types/floor";
 import { defineComponent, onMounted, computed } from "vue";
 import { isTable } from "src/floor-manager/type-guards";
 import { useRouter } from "vue-router";
@@ -53,12 +53,12 @@ export default defineComponent({
             path: `${Collection.EVENTS}/${props.id}/${Collection.EVENT_FEED}`,
         });
 
-        const eventData = computed(() =>
-            eventFloors.value
-                .map((floor) => floor.data)
-                .flat()
-                .filter(isTable)
-        );
+        // const eventData = computed(() =>
+        //     eventFloors.value
+        //         .map((floor) => floor.data)
+        //         .flat()
+        //         .filter(isTable)
+        // );
 
         // const reservationsStatus = computed(() => {
         //     const tables: TableElement[] = eventData.value;

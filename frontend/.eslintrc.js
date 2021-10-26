@@ -51,6 +51,8 @@ module.exports = {
     extends: [
         "eslint:recommended",
         "plugin:promise/recommended",
+        "plugin:import/recommended",
+        "plugin:import/typescript",
         "plugin:@typescript-eslint/recommended",
         "plugin:@typescript-eslint/recommended-requiring-type-checking",
         "plugin:vue/vue3-strongly-recommended",
@@ -58,6 +60,9 @@ module.exports = {
         "prettier",
     ],
     rules: {
+        "import/no-unresolved": "off",
+        "import/no-duplicates": "error",
+        //
         "linebreak-style": ["error", "unix"],
         "require-await": "error",
         "quasar/check-valid-props": 0,

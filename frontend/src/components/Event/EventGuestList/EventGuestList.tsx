@@ -78,9 +78,9 @@ export default defineComponent({
                 return;
             }
 
-            void tryCatchLoadingWrapper(() =>
+            tryCatchLoadingWrapper(() =>
                 addGuestToGuestList(eventID.value, newGuestData)
-            );
+            ).catch(showErrorMessage);
         }
 
         async function deleteGuest(id: string, reset: () => void) {
@@ -99,9 +99,11 @@ export default defineComponent({
         }
 
         function confirmGuest({ id, confirmed }: GuestData, reset: () => void) {
-            void tryCatchLoadingWrapper(() => {
+            tryCatchLoadingWrapper(() => {
                 return confirmGuestFromGuestList(eventID.value, id, !confirmed);
-            }).then(reset);
+            })
+                .then(reset)
+                .catch(showErrorMessage);
         }
 
         return () => (
