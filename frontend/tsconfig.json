@@ -1,10 +1,28 @@
 {
-    "extends": "@quasar/app/tsconfig-preset",
+    // "extends": "@quasar/app/tsconfig-preset",
     "compilerOptions": {
+        "allowJs": true,
+        "esModuleInterop": true,
+        "module": "esnext",
+        "moduleResolution": "node",
+        "noEmit": true,
+        "resolveJsonModule": true,
+        "sourceMap": true,
+        "strict": true,
         "target": "ESNext",
         "baseUrl": ".",
         "lib": ["ESNext", "DOM"],
         "jsx": "preserve",
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "paths": {
+            "src/*": ["src/*"],
+            "app/*": ["*"],
+            "components/*": ["src/components/*"],
+            "layouts/*": ["src/layouts/*"],
+            "pages/*": ["src/pages/*"],
+            "assets/*": ["src/assets/*"],
+            "boot/*": ["src/boot/*"]
+        }
     },
+    "exclude": ["/dist", ".quasar", "node_modules"]
 }
