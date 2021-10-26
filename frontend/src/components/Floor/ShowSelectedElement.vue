@@ -74,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-import { BaseFloorElement, TableElement } from "src/types";
+import { BaseFloorElement, TableElement } from "src/types/floor";
 import type { Floor } from "src/floor-manager/Floor";
 import { showConfirm } from "src/helpers/ui-helpers";
 import { computed, Ref } from "vue";

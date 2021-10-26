@@ -89,9 +89,10 @@ export class ImageTools {
             let height = image.height;
             let isTooLarge = false;
 
-            if (width >= height && width > maxDimensions.width) {
-                isTooLarge = true;
-            } else if (height > maxDimensions.height) {
+            if (
+                (width >= height && width > maxDimensions.width) ||
+                height > maxDimensions.height
+            ) {
                 isTooLarge = true;
             }
 
@@ -101,8 +102,6 @@ export class ImageTools {
             }
 
             const scaleRatio = maxDimensions.width / width;
-
-            // const steps = Math.ceil(Math.log(width / (width * scaleRatio)) / Math.log(2));
 
             width *= scaleRatio;
             height *= scaleRatio;

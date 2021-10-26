@@ -37,6 +37,7 @@ import {
     getDocs,
 } from "@firebase/firestore";
 import { NOOP } from "src/helpers/utils";
+import { showErrorMessage } from "src/helpers/ui-helpers";
 
 // Overload Watch Collection
 export function useFirestore<T, M = T>(
@@ -223,9 +224,11 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
     function watchData() {
         try {
             if (firestoreRefIsDoc(firestoreRef.value)) {
-                watcher = onSnapshot(firestoreRef.value, (doc) => {
+                watcher = onSnapshot(firestoreRef.value, (receivedDoc) => {
                     receiveDocData(
-                        doc.exists() ? firestoreDocSerializer(doc) : undefined
+                        receivedDoc.exists()
+                            ? firestoreDocSerializer(receivedDoc)
+                            : undefined
                     );
                 });
             } else {
@@ -233,11 +236,13 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
                     firestoreQuery.value !== null
                         ? firestoreQuery.value
                         : (firestoreRef.value as unknown as CollectionRef);
-                // @ts-ignore
-                watcher = onSnapshot(firestoreRefVal, (collection) => {
+
+                watcher = onSnapshot(firestoreRefVal, (receivedCollection) => {
                     receiveCollData(
-                        collection.size
-                            ? collection.docs.map(firestoreDocSerializer)
+                        receivedCollection.size
+                            ? receivedCollection.docs.map(
+                                  firestoreDocSerializer
+                              )
                             : []
                     );
                 });
@@ -260,7 +265,7 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
     }
 
     function debounceDataGetter() {
-        void nextTick(() => {
+        nextTick(() => {
             if (!firestoreRef.value) {
                 return;
             }
@@ -268,15 +273,15 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
             loading.value = true;
             if (optsAreGet(options)) {
                 if (optsAreColl(options)) {
-                    void getCollData();
+                    getCollData().catch(showErrorMessage);
                 } else {
-                    void getDocData();
+                    getDocData().catch(showErrorMessage);
                 }
             } else {
                 stopWatchingData();
                 watchData();
             }
-        });
+        }).catch(NOOP);
     }
 
     watch(
@@ -294,10 +299,10 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
         { immediate: true }
     );
 
-    function firestoreDocSerializer(doc: DocumentData): T {
+    function firestoreDocSerializer(docToSerialize: DocumentData): T {
         return {
-            id: doc.id,
-            ...doc.data(),
+            id: docToSerialize.id,
+            ...docToSerialize.data(),
         };
     }
 
