@@ -6,8 +6,9 @@ import {
 } from "src/services/firebase/auth";
 import { auth, fBInit } from "../services/firebase/base";
 import { onAuthStateChanged } from "@firebase/auth";
+import { useAuthStore } from "src/stores/auth-store";
 
-export default boot(({ router, store }) => {
+export default boot(({ router }) => {
     fBInit({
         appId: "1:604176749699:web:cc48a2a03165a526",
         apiKey: process.env.VUE_APP_FIREBASE_API_KEY,
@@ -18,11 +19,13 @@ export default boot(({ router, store }) => {
         messagingSenderId: process.env.VUE_APP_MESSENGER_SENDER_ID,
     });
 
+    const authStore = useAuthStore();
+
     // Tell the application what to do when the
     // authentication state has changed */
     onAuthStateChanged(
         auth(),
-        handleOnAuthStateChanged.bind(null, router, store),
+        handleOnAuthStateChanged.bind(null, router, authStore),
         showErrorMessage
     );
 
@@ -30,5 +33,5 @@ export default boot(({ router, store }) => {
     // This allows the application to halt rendering until
     // Firebase is finished with its initialization process,
     // and handle the user accordingly
-    routerBeforeEach(router, store);
+    routerBeforeEach(router, authStore);
 });

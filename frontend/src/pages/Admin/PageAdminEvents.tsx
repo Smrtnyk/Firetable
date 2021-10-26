@@ -20,10 +20,11 @@ import { useRouter } from "vue-router";
 import { useFirestore } from "src/composables/useFirestore";
 import PageAdminEventsListItem from "components/Event/PageAdminEventsListItem";
 import { FTTitle } from "components/FTTitle";
-import { useStore } from "src/store";
 import { Collection } from "src/types/firebase";
 import { FloorDoc } from "src/types/floor";
 import { CreateEventPayload, EventDoc } from "src/types/event";
+import { useAuthStore } from "src/stores/auth-store";
+import { useEventsStore } from "src/stores/events-store";
 
 export default defineComponent({
     name: "PageAdminEvents",
@@ -43,7 +44,7 @@ export default defineComponent({
     setup() {
         const q = useQuasar();
         const router = useRouter();
-        const store = useStore();
+        const eventsStore = useEventsStore();
 
         const isLoading = ref(true);
         const events = ref<EventDoc[]>([]);
@@ -80,7 +81,7 @@ export default defineComponent({
         }
 
         function onCreateEvent(eventData: CreateEventPayload) {
-            store.commit("events/TOGGLE_EVENT_CREATE_MODAL_VISIBILITY");
+            eventsStore.toggleEventCreateModalVisiblity();
 
             void tryCatchLoadingWrapper(async () => {
                 const { data: id } = await createNewEvent(eventData);
@@ -139,10 +140,8 @@ export default defineComponent({
                                 rounded
                                 icon="plus"
                                 class="button-gradient"
-                                onClick={() =>
-                                    store.commit(
-                                        "events/TOGGLE_EVENT_CREATE_MODAL_VISIBILITY"
-                                    )
+                                onClick={
+                                    eventsStore.toggleEventCreateModalVisiblity
                                 }
                                 label="new event"
                             />

@@ -33,9 +33,9 @@ import {
     date,
     ClosePopup,
 } from "quasar";
-import { useStore } from "src/store";
 import { CreateEventForm } from "src/types/event";
 import { FloorDoc } from "src/types/floor";
+import { useEventsStore } from "src/stores/events-store";
 
 interface State {
     form: CreateEventForm;
@@ -91,7 +91,7 @@ export default defineComponent({
         const { t } = useI18n();
 
         const router = useRouter();
-        const store = useStore();
+        const eventsStore = useEventsStore();
 
         const state = reactive<State>({
             form: { ...eventObj },
@@ -154,12 +154,10 @@ export default defineComponent({
         return () => (
             <q-dialog
                 maximized
-                model-value={store.state.events.showCreateEventModal}
+                model-value={eventsStore.showCreateEventModal}
                 {...{
-                    "onUpdate:model-value": () =>
-                        store.commit(
-                            "events/TOGGLE_EVENT_CREATE_MODAL_VISIBILITY"
-                        ),
+                    "onUpdate:model-value":
+                        eventsStore.toggleEventCreateModalVisiblity,
                 }}
             >
                 <q-card>

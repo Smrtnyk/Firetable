@@ -20,10 +20,10 @@ import {
     QItemSection,
     QItemLabel,
 } from "quasar";
-import { useStore } from "src/store";
 import { Collection } from "src/types/firebase";
 import { CreateUserPayload, User } from "src/types/auth";
 import { FloorDoc } from "src/types/floor";
+import { useAuthStore } from "src/stores/auth-store";
 
 const { maxNumOfUsers } = config;
 
@@ -43,7 +43,7 @@ export default defineComponent({
     },
 
     setup() {
-        const store = useStore();
+        const authStore = useAuthStore();
         const showCreateUserForm = ref(false);
 
         const floorsMaps = computed(() => floors.value.map(({ name }) => name));
@@ -98,10 +98,8 @@ export default defineComponent({
                                 rounded
                                 icon="plus"
                                 class="button-gradient"
-                                onClick={() =>
-                                    store.commit(
-                                        "auth/TOGGLE_CREATE_USER_DIALOG_VISIBILITY"
-                                    )
+                                onClick={
+                                    authStore.toggleCreateUserDialogVisibility
                                 }
                                 label="new user"
                             />

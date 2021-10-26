@@ -5,7 +5,6 @@ import {
     resolveDynamicComponent,
     Transition,
 } from "vue";
-import { useStore } from "src/store";
 
 // Components
 import AppDrawer from "src/components/AppDrawer/AppDrawer";
@@ -13,6 +12,7 @@ import { AppTopMenu } from "src/components/AppTopMenu";
 
 import { QLayout, QDrawer, QPage, QPageContainer } from "quasar";
 import { Component as DynamicComponent } from "@vue/runtime-core";
+import { useAuthStore } from "src/stores/auth-store";
 
 export default defineComponent({
     name: "MyLayout",
@@ -27,10 +27,10 @@ export default defineComponent({
     },
 
     setup() {
-        const store = useStore();
+        const authStore = useAuthStore();
         const isDrawerOpen = ref(false);
-        const isLoggedIn = computed(() => store.getters["auth/isLoggedIn"]);
-        const isAdmin = computed(() => store.getters["auth/isAdmin"]);
+        const isLoggedIn = computed(() => authStore.isLoggedIn);
+        const isAdmin = computed(() => authStore.isAdmin);
 
         function onDrawerToggle() {
             isDrawerOpen.value = !isDrawerOpen.value;

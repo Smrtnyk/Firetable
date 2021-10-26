@@ -13,7 +13,7 @@ import {
     QIcon,
     QDialog,
 } from "quasar";
-import { useStore } from "src/store";
+import { useAuthStore } from "src/stores/auth-store";
 
 const user: CreateUserPayload = {
     id: "",
@@ -49,7 +49,7 @@ export default defineComponent({
     },
 
     setup(props, { emit }) {
-        const store = useStore();
+        const authStore = useAuthStore();
         const form = ref<CreateUserPayload>({ ...user });
 
         const stringRules = [noEmptyString()];
@@ -68,12 +68,10 @@ export default defineComponent({
         return () => (
             <div class="UserCreateForm">
                 <q-dialog
-                    model-value={store.state.auth.showCreateUserDialog}
+                    model-value={authStore.showCreateUserDialog}
                     {...{
-                        "onUpdate:model-value": () =>
-                            store.commit(
-                                "auth/TOGGLE_CREATE_USER_DIALOG_VISIBILITY"
-                            ),
+                        "onUpdate:model-value":
+                            authStore.toggleCreateUserDialogVisibility,
                     }}
                     maximized
                 >

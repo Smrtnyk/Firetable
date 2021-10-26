@@ -29,7 +29,7 @@ import {
 
 import { EventGuestListCreateGuestForm } from "src/components/Event/EventGuestListCreateGuestForm";
 import { FTTitle } from "components/FTTitle";
-import { useStore } from "src/store";
+import { useEventsStore } from "src/stores/events-store";
 
 export default defineComponent({
     name: "EventGuestList",
@@ -61,7 +61,7 @@ export default defineComponent({
     },
     setup(props) {
         const route = useRoute();
-        const store = useStore();
+        const eventsStore = useEventsStore();
 
         const showAddNewGuestForm = ref(false);
 
@@ -106,12 +106,10 @@ export default defineComponent({
 
         return () => (
             <q-drawer
-                model-value={store.state.events.showEventGuestListDrawer}
+                model-value={eventsStore.showEventGuestListDrawer}
                 {...{
-                    "onUpdate:modelValue": () =>
-                        store.commit(
-                            "events/SET_EVENT_GUEST_LIST_DRAWER_VISIBILITY"
-                        ),
+                    "onUpdate:modelValue":
+                        eventsStore.toggleEventGuestListDrawerVisibility,
                 }}
                 className="PageEvent__guest-list-drawer"
                 side="right"

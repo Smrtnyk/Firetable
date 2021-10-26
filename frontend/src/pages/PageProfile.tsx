@@ -1,6 +1,6 @@
 import { computed, defineComponent } from "vue";
 import { User } from "src/types/auth";
-import { useStore } from "src/store";
+import { useAuthStore } from "src/stores/auth-store";
 
 import { FTTitle } from "components/FTTitle";
 
@@ -29,52 +29,61 @@ export default defineComponent({
     },
 
     setup() {
-        const store = useStore();
-        const user = computed<User>(() => store.state.auth.user as User);
+        const authStore = useAuthStore();
+        const user = computed(() => authStore.user);
         const avatar = computed(
             () =>
-                `https://avatars.dicebear.com/api/human/${user.value.email}.svg`
+                `https://avatars.dicebear.com/api/human/${user.value?.email}.svg`
         );
 
-        return () => (
-            <div class="PageProfile">
-                <f-t-title title={`Profile of ${user.value.name}`} />
-                <q-item>
-                    <q-item-section side>
-                        <q-avatar size="48px" class="ft-avatar">
-                            <q-img src={avatar.value} />
-                        </q-avatar>
-                    </q-item-section>
-                    <q-item-section>
-                        <q-card class="ft-card q-pa-md">
-                            <q-item-label>{user.value.email}</q-item-label>
-                            <q-separator class="q-my-sm" />
+        return () => {
+            if (!user.value) {
+                return <div>Not authenticated1</div>;
+            }
+            return (
+                <div class="PageProfile">
+                    <f-t-title title={`Profile of ${user.value.name}`} />
+                    <q-item>
+                        <q-item-section side>
+                            <q-avatar size="48px" class="ft-avatar">
+                                <q-img src={avatar.value} />
+                            </q-avatar>
+                        </q-item-section>
+                        <q-item-section>
+                            <q-card class="ft-card q-pa-md">
+                                <q-item-label>{user.value.email}</q-item-label>
+                                <q-separator class="q-my-sm" />
 
-                            {user.value.name && (
+                                {user.value.name && (
+                                    <q-item-label>
+                                        Name: {user.value.name}
+                                    </q-item-label>
+                                )}
+
                                 <q-item-label>
-                                    Name: {user.value.name}
+                                    Role: {user.value.role}
                                 </q-item-label>
-                            )}
 
-                            <q-item-label>Role: {user.value.role}</q-item-label>
-
-                            <q-item-label>
-                                Region: {user.value.region}
-                            </q-item-label>
-
-                            {user.value.address && (
                                 <q-item-label>
-                                    {user.value.address}
+                                    Region: {user.value.region}
                                 </q-item-label>
-                            )}
 
-                            {user.value.mobile && (
-                                <q-item-label>{user.value.mobile}</q-item-label>
-                            )}
-                        </q-card>
-                    </q-item-section>
-                </q-item>
-            </div>
-        );
+                                {user.value.address && (
+                                    <q-item-label>
+                                        {user.value.address}
+                                    </q-item-label>
+                                )}
+
+                                {user.value.mobile && (
+                                    <q-item-label>
+                                        {user.value.mobile}
+                                    </q-item-label>
+                                )}
+                            </q-card>
+                        </q-item-section>
+                    </q-item>
+                </div>
+            );
+        };
     },
 });

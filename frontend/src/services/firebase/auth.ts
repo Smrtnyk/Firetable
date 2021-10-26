@@ -4,7 +4,7 @@ import { Store } from "vuex";
 import { auth, functions } from "./base";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { usersCollection } from "src/services/firebase/db";
-import { useStore } from "src/store";
+import { useAuthStore } from "src/stores/auth-store";
 import { httpsCallable } from "@firebase/functions";
 import { doc, updateDoc } from "@firebase/firestore";
 import {
@@ -14,7 +14,6 @@ import {
     User,
     UserCredential,
 } from "@firebase/auth";
-import { State } from "src/store/types";
 import { CreateUserPayload, Role } from "src/types/auth";
 import { ValueOf } from "src/types/generic";
 
@@ -32,34 +31,30 @@ export function updateUser(
     });
 }
 
-function isAuthenticated(store: ReturnType<typeof useStore>) {
-    return store.state.auth.isAuthenticated;
-}
-
 export function handleOnAuthStateChanged(
     router: Router,
-    { commit, dispatch }: Store<State>,
+    authStore: ReturnType<typeof useAuthStore>,
     currentUser: User | null
 ) {
     // Save to the store
-    commit("auth/setAuthState", {
+    authStore.setAuthState({
         isAuthenticated: currentUser !== null,
     });
 
     if (currentUser) {
-        void dispatch("auth/initUser", currentUser.uid).catch(showErrorMessage);
+        authStore.initUser(currentUser.uid);
         return;
     }
 
     // If the user loses authentication route
     // redirect them to the login page
-    commit("auth/setUser", void 0);
+    authStore.setUser(null);
     void router.replace({ path: "/auth" }).catch(showErrorMessage);
 }
 
 export function routerBeforeEach(
     router: Router,
-    store: ReturnType<typeof useStore>
+    store: ReturnType<typeof useAuthStore>
 ) {
     router.beforeEach(async (to) => {
         try {
@@ -70,11 +65,11 @@ export function routerBeforeEach(
             const requiresAuth = to.meta.requiresAuth;
             const requiresAdmin = to.meta.requiresAdmin;
 
-            if (requiresAuth && !isAuthenticated(store)) {
+            if (requiresAuth && !store.isAuthenticated) {
                 return { name: "auth" };
             }
 
-            if (!isAuthenticated(store)) {
+            if (!store.isAuthenticated) {
                 return true;
             }
 
@@ -119,8 +114,8 @@ export function loginWithEmail(
  * wait for firebase to initialize and determine if a
  * user is authenticated or not with only a single observable
  */
-function ensureAuthIsInitialized(store: ReturnType<typeof useStore>) {
-    if (store.state.auth.isReady) {
+function ensureAuthIsInitialized(store: ReturnType<typeof useAuthStore>) {
+    if (store.isReady) {
         return true;
     }
     // Create the observer only once on init

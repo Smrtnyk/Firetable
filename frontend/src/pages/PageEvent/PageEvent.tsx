@@ -44,7 +44,7 @@ import {
     GuestData,
     Reservation,
 } from "src/types/event";
-import { useStore } from "src/store";
+import { useEventsStore } from "src/stores/events-store";
 import { useI18n } from "vue-i18n";
 import { useFirestore } from "src/composables/useFirestore";
 import { whiteSpaceToUnderscore } from "src/helpers/utils";
@@ -55,6 +55,7 @@ import {
     FloorMode,
     TableElement,
 } from "src/types/floor";
+import { useAuthStore } from "src/stores/auth-store";
 
 interface State {
     showMapsExpanded: boolean;
@@ -96,14 +97,15 @@ export default defineComponent({
               }
             | undefined;
 
-        const store = useStore();
+        const eventsStore = useEventsStore();
+        const authStore = useAuthStore();
         const router = useRouter();
         const q = useQuasar();
         const { t } = useI18n();
 
         const floorSvgs = ref<Record<string, HTMLElement>>({});
 
-        const currentUser = computed(() => store.state.auth.user);
+        const currentUser = computed(() => authStore.user);
 
         const eventFloorsRef = function (this: FloorDoc, el: any) {
             if (!el) {
@@ -417,19 +419,13 @@ export default defineComponent({
                             rounded
                             size="md"
                             icon="info"
-                            onClick={() =>
-                                store.commit(
-                                    "events/TOGGLE_EVENT_INFO_MODAL_VISIBILITY"
-                                )
-                            }
+                            onClick={eventsStore.toggleEventInfoModalVisibility}
                         />
 
                         <q-btn
                             class="button-gradient"
-                            onClick={() =>
-                                store.commit(
-                                    "events/SET_EVENT_GUEST_LIST_DRAWER_VISIBILITY"
-                                )
+                            onClick={
+                                eventsStore.toggleEventGuestListDrawerVisibility
                             }
                             icon="users"
                             rounded

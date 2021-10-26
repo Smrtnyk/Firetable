@@ -5,7 +5,6 @@ import { User } from "src/types/auth";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { logoutUser, updateUser } from "src/services/firebase/auth";
 import { useQuasar, Ripple, LocalStorage } from "quasar";
-import { useStore } from "src/store";
 import { useI18n } from "vue-i18n";
 
 import {
@@ -19,6 +18,7 @@ import {
     QIcon,
     QSelect,
 } from "quasar";
+import { useAuthStore } from "src/stores/auth-store";
 
 export default defineComponent({
     name: "AppDrawer",
@@ -42,7 +42,7 @@ export default defineComponent({
     },
 
     setup(props) {
-        const store = useStore();
+        const authStore = useAuthStore();
         const q = useQuasar();
         const { t, locale } = useI18n();
 
@@ -69,7 +69,7 @@ export default defineComponent({
                 text: t("AppDrawer.links.manageFloors"),
             },
         ]);
-        const user = computed(() => store.state.auth.user);
+        const user = computed(() => authStore.user);
         const adminLinksCollection = computed(() =>
             props.showAdminLinks ? adminLinks.value : []
         );
@@ -95,7 +95,7 @@ export default defineComponent({
 
         function onLogoutUser() {
             void tryCatchLoadingWrapper(() =>
-                logoutUser().then(store.state.auth.unsubscribeUserWatch)
+                logoutUser().then(authStore.unsubscribeUserWatch)
             );
         }
 

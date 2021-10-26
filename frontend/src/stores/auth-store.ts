@@ -1,0 +1,91 @@
+import { defineStore } from "pinia";
+import { NOOP } from "src/helpers/utils";
+import { useFirestore } from "src/composables/useFirestore";
+import { Role, User } from "src/types/auth";
+import { Collection } from "src/types/firebase";
+import { showErrorMessage } from "src/helpers/ui-helpers";
+import { logoutUser } from "src/services/firebase/auth";
+
+interface AuthState {
+    isAuthenticated: boolean;
+    isReady: boolean;
+    user: User | null;
+    showCreateUserDialog: boolean;
+    unsubscribeUserWatch: typeof NOOP;
+}
+
+export const useAuthStore = defineStore("auth", {
+    state: () =>
+        ({
+            isAuthenticated: false,
+            isReady: false,
+            user: null,
+            users: [],
+            showCreateUserDialog: false,
+            unsubscribeUserWatch: NOOP,
+        } as AuthState),
+    getters: {
+        isAdmin(): boolean {
+            return !!this.user && this.user.role === Role.ADMIN;
+        },
+
+        isLoggedIn(): boolean {
+            return !!this.user && !!this.user.email;
+        },
+    },
+    actions: {
+        toggleCreateUserDialogVisibility() {
+            this.showCreateUserDialog = !this.showCreateUserDialog;
+        },
+
+        setUser(user: User | null) {
+            this.user = user;
+        },
+
+        setAuthState({
+            isReady,
+            isAuthenticated,
+            unsubscribeUserWatch,
+        }: Partial<
+            Pick<
+                AuthState,
+                "isReady" | "isAuthenticated" | "unsubscribeUserWatch"
+            >
+        >) {
+            if (typeof isAuthenticated !== "undefined") {
+                this.isAuthenticated = isAuthenticated;
+            }
+            if (typeof isReady !== "undefined") {
+                this.isReady = isReady;
+            }
+            if (typeof unsubscribeUserWatch !== "undefined") {
+                this.unsubscribeUserWatch = unsubscribeUserWatch;
+            }
+        },
+        initUser(uid: string) {
+            const { stopWatchingData } = useFirestore<User>({
+                type: "watch",
+                queryType: "doc",
+                path: `${Collection.USERS}/${uid}`,
+                inComponent: false,
+                onFinished: (user) => {
+                    if (!user) {
+                        stopWatchingData();
+                        showErrorMessage("User is not found in database!");
+                        void logoutUser();
+                    } else {
+                        this.user = user as User;
+                        this.isAuthenticated = true;
+                        this.isReady = true;
+                        this.unsubscribeUserWatch = stopWatchingData;
+                    }
+                },
+                onError(e) {
+                    stopWatchingData();
+                    showErrorMessage(e);
+                    void logoutUser();
+                },
+            });
+        },
+    },
+});

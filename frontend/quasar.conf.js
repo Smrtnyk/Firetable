@@ -22,7 +22,7 @@ module.exports = configure(function (ctx) {
             },
         },
 
-        boot: ["i18n", "firebase-connection"],
+        boot: ["register-pinia", "i18n", "firebase-connection"],
 
         css: ["app.scss"],
 

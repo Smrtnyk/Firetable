@@ -1,6 +1,6 @@
 import { defineComponent } from "vue";
 import { QDialog } from "quasar";
-import { useStore } from "src/store";
+import { useEventsStore } from "src/stores/events-store";
 
 export default defineComponent({
     name: "EventInfo",
@@ -10,17 +10,14 @@ export default defineComponent({
     },
 
     setup() {
-        const store = useStore();
+        const eventsStore = useEventsStore();
 
         return () => (
             <q-dialog
-                model-value={store.state.events.showEventInfoModal}
+                model-value={eventsStore.showEventInfoModal}
                 {...{
-                    "onUpdate:model-value": () => {
-                        store.commit(
-                            "events/TOGGLE_EVENT_INFO_MODAL_VISIBILITY"
-                        );
-                    },
+                    "onUpdate:model-value":
+                        eventsStore.toggleEventInfoModalVisibility,
                 }}
             >
                 Event Info
