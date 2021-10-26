@@ -24,7 +24,7 @@
         "pinia": "2.0.0-rc.15"
     },
     "devDependencies": {
-        "@quasar/app": "3.1.6",
+        "@quasar/app": "3.1.7",
         "@types/d3": "7.1.0",
         "@typescript-eslint/eslint-plugin": "5.2.0",
         "@typescript-eslint/parser": "5.2.0",
