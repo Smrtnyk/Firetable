@@ -1,7 +1,6 @@
 import { defineComponent, PropType, reactive, withDirectives } from "vue";
 
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import { ImageTools } from "src/helpers/ImageTools";
 import { useI18n } from "vue-i18n";
 import {
     greaterThanZero,
@@ -30,6 +29,7 @@ import {
 import { CreateEventForm } from "src/types/event";
 import { FloorDoc } from "src/types/floor";
 import { useEventsStore } from "src/stores/events-store";
+import { resizeImage } from "src/helpers/ImageTools";
 
 interface State {
     form: CreateEventForm;
@@ -128,7 +128,7 @@ export default defineComponent({
             if (!chosenFile) return;
 
             try {
-                const file = await ImageTools.resize(chosenFile, {
+                const file = await resizeImage(chosenFile, {
                     width: 600,
                     height: 600,
                 });
