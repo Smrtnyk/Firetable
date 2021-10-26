@@ -1,8 +1,4 @@
-import {
-    DocumentData,
-    DocumentReference,
-    CollectionReference,
-} from "@firebase/firestore";
+import { DocumentData, CollectionReference } from "@firebase/firestore";
 export type CollectionRef = CollectionReference<DocumentData>;
 
 export const enum Collection {

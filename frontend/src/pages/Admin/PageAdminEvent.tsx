@@ -1,6 +1,5 @@
 import { FloorDoc } from "src/types/floor";
-import { defineComponent, onMounted, computed } from "vue";
-import { isTable } from "src/floor-manager/type-guards";
+import { defineComponent, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { formatEventDate } from "src/helpers/utils";
 import { useFirestore } from "src/composables/useFirestore";

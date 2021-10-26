@@ -199,9 +199,9 @@ export default defineComponent({
                         };
                     }
                 }
-                void tryCatchLoadingWrapper(() =>
+                tryCatchLoadingWrapper(() =>
                     updateEventFloorData(floor, props.id)
-                );
+                ).catch(showErrorMessage);
             };
         }
 
