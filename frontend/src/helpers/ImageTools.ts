@@ -4,19 +4,7 @@ export function resizeImage(
 ): Promise<never | Blob> {
     return new Promise((resolve, reject) => {
         try {
-            resizeSync(
-                file,
-                maxDimensions,
-                (receivedFile: Blob, success: boolean) => {
-                    success
-                        ? resolve(receivedFile)
-                        : reject(
-                              new Error(
-                                  "An error ocurred while processing the image!"
-                              )
-                          );
-                }
-            );
+            resizeSync(file, maxDimensions, resolve);
         } catch (e) {
             reject(e);
         }
@@ -26,24 +14,16 @@ export function resizeImage(
 function resizeSync(
     file: File,
     maxDimensions: { width: number; height: number },
-    callback: (file: Blob, success: boolean) => unknown
+    callback: (file: Blob) => void
 ) {
-    if (typeof maxDimensions === "function") {
-        callback = maxDimensions;
-        maxDimensions = {
-            width: 640,
-            height: 480,
-        };
-    }
-
     // eslint-disable-next-line @typescript-eslint/prefer-regexp-exec
     if (!file.type.match(/image.*/)) {
-        callback(file, false);
+        throw new Error("An error ocurred while processing the image!");
     }
 
     if (file.type.match(/image\/gif/)) {
         // Not attempting, could be an animated gif
-        callback(file, false);
+        throw new Error("An error ocurred while processing the image!");
     }
 
     const image = document.createElement("img");
@@ -61,8 +41,7 @@ function resizeSync(
         }
 
         if (!isTooLarge) {
-            // early exit; no need to resize
-            callback(file, false);
+            throw new Error("Image is smaller than it needs to be resized to!");
         }
 
         const scaleRatio = maxDimensions.width / width;
@@ -82,22 +61,9 @@ function resizeSync(
 
         canvas.toBlob((blob) => {
             if (!blob) return;
-            callback(blob, true);
+            callback(blob);
         }, file.type);
     };
 
-    loadImage(image, file);
-}
-
-function loadImage(image: HTMLImageElement, file: Blob) {
-    if (typeof URL === "undefined") {
-        const reader = new FileReader();
-        reader.onload = function (evt) {
-            if (!evt.target?.result) return;
-            image.src = evt.target.result as string;
-        };
-        reader.readAsDataURL(file);
-    } else {
-        image.src = URL.createObjectURL(file);
-    }
+    image.src = URL.createObjectURL(file);
 }
