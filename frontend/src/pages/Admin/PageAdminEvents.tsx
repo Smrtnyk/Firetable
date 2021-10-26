@@ -1,5 +1,11 @@
+import PageAdminEventsListItem from "components/Event/PageAdminEventsListItem";
 import { EventCreateForm } from "src/components/Event/EventCreateForm";
-import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+
+import {
+    showConfirm,
+    showErrorMessage,
+    tryCatchLoadingWrapper,
+} from "src/helpers/ui-helpers";
 import { defineComponent, onMounted, ref } from "vue";
 import { DocumentData, QueryDocumentSnapshot } from "@firebase/firestore";
 import {
@@ -18,12 +24,10 @@ import {
 } from "quasar";
 import { useRouter } from "vue-router";
 import { useFirestore } from "src/composables/useFirestore";
-import PageAdminEventsListItem from "components/Event/PageAdminEventsListItem";
 import { FTTitle } from "components/FTTitle";
 import { Collection } from "src/types/firebase";
 import { FloorDoc } from "src/types/floor";
 import { CreateEventPayload, EventDoc } from "src/types/event";
-import { useAuthStore } from "src/stores/auth-store";
 import { useEventsStore } from "src/stores/events-store";
 
 export default defineComponent({
@@ -62,7 +66,9 @@ export default defineComponent({
             await tryCatchLoadingWrapper(
                 fetchMoreEvents.bind(null, null),
                 [],
-                () => void router.replace("/")
+                () => {
+                    router.replace("/").catch(showErrorMessage);
+                }
             );
             isLoading.value = false;
         }
@@ -83,7 +89,7 @@ export default defineComponent({
         function onCreateEvent(eventData: CreateEventPayload) {
             eventsStore.toggleEventCreateModalVisiblity();
 
-            void tryCatchLoadingWrapper(async () => {
+            tryCatchLoadingWrapper(async () => {
                 const { data: id } = await createNewEvent(eventData);
                 q.notify("Event created!");
                 await router.replace({
@@ -91,7 +97,7 @@ export default defineComponent({
                     // @ts-ignore - fix this
                     params: { id },
                 });
-            });
+            }).catch(showErrorMessage);
         }
 
         async function onEventItemSlideRight({

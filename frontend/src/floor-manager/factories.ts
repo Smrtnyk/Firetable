@@ -1,15 +1,9 @@
-import { floorsCollection } from "src/services/firebase/db";
 import {
     FLOOR_DEFAULT_HEIGHT,
     FLOOR_DEFAULT_WIDTH,
     RESOLUTION,
 } from "./constants";
-import {
-    calculateWallHeight,
-    calculateWallWidth,
-    getTableHeight,
-    getTableWidth,
-} from "./utils";
+import { calculateWallWidth, getTableHeight, getTableWidth } from "./utils";
 import { uid } from "quasar";
 import {
     BaseFloorElement,
@@ -18,8 +12,6 @@ import {
     FloorDoc,
     TableElement,
 } from "src/types/floor";
-import { DocumentReference } from "@firebase/firestore";
-import { firestore } from "src/services/firebase/base";
 
 type CreateTableElementPayload = Pick<
     TableElement,

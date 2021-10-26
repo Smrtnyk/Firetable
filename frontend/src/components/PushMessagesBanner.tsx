@@ -1,6 +1,6 @@
 import { urlBase64ToUint8Array } from "src/helpers/utils";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import { savePushSubscription } from "src/services/firebase/messaging";
 import { useQuasar, QBanner, QIcon, QBtn } from "quasar";
 
@@ -66,10 +66,8 @@ export default defineComponent({
             if (!subscription) await createAndSavePushSubscription(sw);
         }
 
-        async function createAndSavePushSubscription(
-            sw: ServiceWorkerRegistration
-        ) {
-            await tryCatchLoadingWrapper(async () => {
+        function createAndSavePushSubscription(sw: ServiceWorkerRegistration) {
+            return tryCatchLoadingWrapper(async () => {
                 const newSub = await sw.pushManager.subscribe({
                     userVisibleOnly: true,
                     applicationServerKey: urlBase64ToUint8Array(

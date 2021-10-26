@@ -1,12 +1,15 @@
-import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import {
+    showErrorMessage,
+    tryCatchLoadingWrapper,
+} from "src/helpers/ui-helpers";
 import { defineComponent, ref, PropType } from "vue";
 import { Reservation } from "src/types/event";
 import { updateEventFloorData } from "src/services/firebase/db-events";
 import type { Floor } from "src/floor-manager/Floor";
 import { useI18n } from "vue-i18n";
-import { useDialogPluginComponent } from "quasar";
 
 import {
+    useDialogPluginComponent,
     QDialog,
     QCard,
     QCardSection,
@@ -89,11 +92,11 @@ export default defineComponent({
                 table.reservation.confirmed = val;
             }
 
-            void tryCatchLoadingWrapper(async () => {
+            tryCatchLoadingWrapper(async () => {
                 await updateEventFloorData(floor, eventId);
                 setConfirmButtonDisabledTimer();
                 checked.value = !checked.value;
-            });
+            }).catch(showErrorMessage);
         }
 
         return () => {

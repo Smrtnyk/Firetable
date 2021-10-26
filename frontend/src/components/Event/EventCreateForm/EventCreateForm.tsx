@@ -1,10 +1,4 @@
-import {
-    defineComponent,
-    PropType,
-    reactive,
-    toRefs,
-    withDirectives,
-} from "vue";
+import { defineComponent, PropType, reactive, withDirectives } from "vue";
 
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { ImageTools } from "src/helpers/ImageTools";

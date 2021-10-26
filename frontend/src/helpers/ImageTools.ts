@@ -43,9 +43,9 @@ export class ImageTools {
                 ImageTools.resizeSync(
                     file,
                     maxDimensions,
-                    (file: Blob, success: boolean) => {
+                    (receivedFile: Blob, success: boolean) => {
                         success
-                            ? resolve(file)
+                            ? resolve(receivedFile)
                             : reject(
                                   new Error(
                                       "An error ocurred while processing the image!"
@@ -77,11 +77,9 @@ export class ImageTools {
             callback(file, false);
         }
 
-        // eslint-disable-next-line @typescript-eslint/prefer-regexp-exec
         if (file.type.match(/image\/gif/)) {
             // Not attempting, could be an animated gif
             callback(file, false);
-            // TODO: use https://github.com/antimatter15/whammy to convert gif to webm
         }
 
         const image = document.createElement("img");
@@ -104,7 +102,6 @@ export class ImageTools {
 
             const scaleRatio = maxDimensions.width / width;
 
-            // TODO number of resampling steps
             // const steps = Math.ceil(Math.log(width / (width * scaleRatio)) / Math.log(2));
 
             width *= scaleRatio;

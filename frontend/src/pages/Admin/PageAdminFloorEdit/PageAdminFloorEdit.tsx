@@ -4,18 +4,14 @@ import AddTableDialog from "components/Floor/AddTableDialog";
 import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
 import { Floor } from "src/floor-manager/Floor";
 import { BaseFloorElement, FloorDoc, FloorMode } from "src/types/floor";
-import {
-    extractAllTableIds,
-    getTable,
-    hasFloorTables,
-} from "src/floor-manager/filters";
+import { extractAllTableIds, hasFloorTables } from "src/floor-manager/filters";
 import {
     showErrorMessage,
     tryCatchLoadingWrapper,
 } from "src/helpers/ui-helpers";
 import { ELEMENTS_TO_ADD_COLLECTION } from "src/floor-manager/constants";
 import { defineComponent, onMounted, ref } from "vue";
-import { isTable, isWall } from "src/floor-manager/type-guards";
+import { isWall } from "src/floor-manager/type-guards";
 import { NumberTuple } from "src/types/generic";
 import { getFloor, saveFloor } from "src/services/firebase/db-floors";
 import { useRouter } from "vue-router";
@@ -87,9 +83,9 @@ export default defineComponent({
                 return showErrorMessage("You need to add at least one table!");
             }
 
-            void tryCatchLoadingWrapper(() =>
+            tryCatchLoadingWrapper(() =>
                 saveFloor(floorInstance.value as Floor)
-            );
+            ).catch(showErrorMessage);
         }
 
         function onFloorChange(prop: keyof Floor, event: string | number) {

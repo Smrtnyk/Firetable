@@ -1,4 +1,4 @@
-import { FloorDoc, TableElement } from "src/types/floor";
+import { FloorDoc } from "src/types/floor";
 import { isTable } from "src/floor-manager/type-guards";
 import type { Floor } from "src/floor-manager/Floor";
 

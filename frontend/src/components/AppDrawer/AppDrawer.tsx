@@ -1,13 +1,17 @@
 import "./AppDrawer.scss";
 
-import { computed, defineComponent, ref, watch, withDirectives } from "vue";
-import { User } from "src/types/auth";
-import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { computed, defineComponent, ref, withDirectives } from "vue";
+import {
+    showErrorMessage,
+    tryCatchLoadingWrapper,
+} from "src/helpers/ui-helpers";
 import { logoutUser, updateUser } from "src/services/firebase/auth";
-import { useQuasar, Ripple, LocalStorage } from "quasar";
 import { useI18n } from "vue-i18n";
 
 import {
+    useQuasar,
+    Ripple,
+    LocalStorage,
     QSeparator,
     QItem,
     QItemSection,
@@ -90,13 +94,15 @@ export default defineComponent({
         function toggleUserActivityStatus(newValue: boolean) {
             if (!user.value) return;
 
-            void updateUser(user.value.id, "status", Number(newValue));
+            updateUser(user.value.id, "status", Number(newValue)).catch(
+                showErrorMessage
+            );
         }
 
         function onLogoutUser() {
-            void tryCatchLoadingWrapper(() =>
+            tryCatchLoadingWrapper(() =>
                 logoutUser().then(authStore.unsubscribeUserWatch)
-            );
+            ).catch(showErrorMessage);
         }
 
         function setAppLanguage(val: string) {

@@ -6,11 +6,7 @@ import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 
 import { defineComponent, ref, withDirectives } from "vue";
 
-import {
-    deleteFloor,
-    saveFloor,
-    addFloor,
-} from "src/services/firebase/db-floors";
+import { deleteFloor, addFloor } from "src/services/firebase/db-floors";
 import { useFirestore } from "src/composables/useFirestore";
 
 import {

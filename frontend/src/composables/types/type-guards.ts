@@ -4,7 +4,6 @@ import {
     OptionsCollWatch,
     OptionsCollGet,
     OptionsDocGet,
-    OptionsDocWatch,
 } from "./Options";
 
 export function firestoreRefIsDoc(

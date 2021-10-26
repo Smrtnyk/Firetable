@@ -6,7 +6,6 @@ import {
 } from "vue";
 import { useQuasar } from "quasar";
 import { getDarkMode, myIcons } from "src/config";
-import { RouterView } from "vue-router";
 
 export default defineComponent({
     name: "App",

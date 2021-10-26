@@ -12,6 +12,7 @@ import { EventFeedList } from "components/Event/EventFeedList";
 import { QSeparator } from "quasar";
 import { Collection } from "src/types/firebase";
 import { EventDoc, EventFeedDoc } from "src/types/event";
+import { showErrorMessage } from "src/helpers/ui-helpers";
 
 export default defineComponent({
     name: "PageAdminEvent",
@@ -42,7 +43,7 @@ export default defineComponent({
             queryType: "doc",
             path: `${Collection.EVENTS}/${props.id}`,
             onError() {
-                void router.replace("/");
+                router.replace("/").catch(showErrorMessage);
             },
         });
 
@@ -59,18 +60,18 @@ export default defineComponent({
                 .filter(isTable)
         );
 
-        const reservationsStatus = computed(() => {
-            const tables: TableElement[] = eventData.value;
-            const reservations = tables.filter((table) => !!table.reservation);
-            const unreserved = tables.length - reservations.length;
-            const pending = reservations.filter(
-                (table) => !table.reservation?.confirmed
-            ).length;
-            const confirmed = reservations.length - pending;
-            const reserved = reservations.length;
-
-            return [tables.length, reserved, pending, confirmed, unreserved];
-        });
+        // const reservationsStatus = computed(() => {
+        //     const tables: TableElement[] = eventData.value;
+        //     const reservations = tables.filter((table) => !!table.reservation);
+        //     const unreserved = tables.length - reservations.length;
+        //     const pending = reservations.filter(
+        //         (table) => !table.reservation?.confirmed
+        //     ).length;
+        //     const confirmed = reservations.length - pending;
+        //     const reserved = reservations.length;
+        //
+        //     return [tables.length, reserved, pending, confirmed, unreserved];
+        // });
 
         async function init() {
             if (!props.id) {
