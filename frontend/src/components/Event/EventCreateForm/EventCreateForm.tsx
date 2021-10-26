@@ -29,7 +29,7 @@ import {
 import { CreateEventForm } from "src/types/event";
 import { FloorDoc } from "src/types/floor";
 import { useEventsStore } from "src/stores/events-store";
-import { resizeImage } from "src/helpers/ImageTools";
+import { resizeImage } from "src/helpers/image-tools";
 
 interface State {
     form: CreateEventForm;
