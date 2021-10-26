@@ -72,7 +72,7 @@ export const useAuthStore = defineStore("auth", {
                     if (!user) {
                         stopWatchingData();
                         showErrorMessage("User is not found in database!");
-                        void logoutUser();
+                        logoutUser().catch(NOOP);
                     } else {
                         this.user = user as User;
                         this.isAuthenticated = true;
@@ -83,7 +83,7 @@ export const useAuthStore = defineStore("auth", {
                 onError(e) {
                     stopWatchingData();
                     showErrorMessage(e);
-                    void logoutUser();
+                    logoutUser().catch(NOOP);
                 },
             });
         },
