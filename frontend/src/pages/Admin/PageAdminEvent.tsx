@@ -1,5 +1,5 @@
-import { FloorDoc } from "src/types/floor";
-import { defineComponent, onMounted } from "vue";
+import { FloorDoc, TableElement } from "src/types/floor";
+import { computed, defineComponent, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { formatEventDate } from "src/helpers/utils";
 import { useFirestore } from "src/composables/useFirestore";
@@ -7,11 +7,13 @@ import { useFirestore } from "src/composables/useFirestore";
 import { FTTitle } from "components/FTTitle";
 import { FTSubtitle } from "components/FTSubtitle";
 import { EventFeedList } from "components/Event/EventFeedList";
+import AdminEventGeneralInfo from "components/admin/event/AdminEventGeneralInfo.vue";
 
 import { QSeparator } from "quasar";
 import { Collection } from "src/types/firebase";
 import { EventDoc, EventFeedDoc } from "src/types/event";
 import { showErrorMessage } from "src/helpers/ui-helpers";
+import { isTable } from "src/floor-manager/type-guards";
 
 export default defineComponent({
     name: "PageAdminEvent",
@@ -19,6 +21,7 @@ export default defineComponent({
         FTTitle,
         FTSubtitle,
         EventFeedList,
+        AdminEventGeneralInfo,
 
         QSeparator,
     },
@@ -52,25 +55,29 @@ export default defineComponent({
             path: `${Collection.EVENTS}/${props.id}/${Collection.EVENT_FEED}`,
         });
 
-        // const eventData = computed(() =>
-        //     eventFloors.value
-        //         .map((floor) => floor.data)
-        //         .flat()
-        //         .filter(isTable)
-        // );
+        const eventData = computed(() =>
+            eventFloors.value
+                .map((floor) => floor.data)
+                .flat()
+                .filter(isTable)
+        );
 
-        // const reservationsStatus = computed(() => {
-        //     const tables: TableElement[] = eventData.value;
-        //     const reservations = tables.filter((table) => !!table.reservation);
-        //     const unreserved = tables.length - reservations.length;
-        //     const pending = reservations.filter(
-        //         (table) => !table.reservation?.confirmed
-        //     ).length;
-        //     const confirmed = reservations.length - pending;
-        //     const reserved = reservations.length;
-        //
-        //     return [tables.length, reserved, pending, confirmed, unreserved];
-        // });
+        const reservationsStatus = computed(() => {
+            const tables: TableElement[] = eventData.value;
+            const reservations = tables.filter((table) => !!table.reservation);
+            const unreserved = tables.length - reservations.length;
+            const pending = reservations.filter((table) => !table.reservation?.confirmed).length;
+            const confirmed = reservations.length - pending;
+            const reserved = reservations.length;
+
+            return {
+                total: tables.length,
+                reserved,
+                pending,
+                confirmed,
+                unreserved,
+            };
+        });
 
         async function init() {
             if (!props.id) {
@@ -98,6 +105,8 @@ export default defineComponent({
                             ),
                         }}
                     </f-t-title>
+
+                    <admin-event-general-info reservations-status={reservationsStatus.value} />
 
                     {!!eventFeed.value?.length && (
                         <>
