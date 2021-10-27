@@ -32,15 +32,13 @@ export default defineComponent({
                                 size="md"
                             />
                             <q-tooltip>
-                                {props.event.reservedPercentage}% of tables are
-                                reserved. Event is performing well!
+                                {props.event.reservedPercentage}% of tables are reserved. Event is
+                                performing well!
                             </q-tooltip>
                         </div>
                     )}
                 </q-card-section>
-                <router-link
-                    to={{ name: "event", params: { id: props.event.id } }}
-                >
+                <router-link to={{ name: "event", params: { id: props.event.id } }}>
                     <q-img
                         style="background-color: grey"
                         src={props.event.img || "images/default-event-img.jpg"}

@@ -28,22 +28,12 @@ export default defineComponent({
         return () => (
             <div style="max-width: 700px; width: 80vw" class="AddNewFloorForm">
                 <q-card>
-                    <q-banner
-                        inline-actions
-                        rounded
-                        class="bg-gradient text-white"
-                    >
+                    <q-banner inline-actions rounded class="bg-gradient text-white">
                         {{
                             avatar: () =>
-                                withDirectives(
-                                    <q-btn
-                                        round
-                                        class="q-mr-sm"
-                                        flat
-                                        icon="close"
-                                    />,
-                                    [[ClosePopup]]
-                                ),
+                                withDirectives(<q-btn round class="q-mr-sm" flat icon="close" />, [
+                                    [ClosePopup],
+                                ]),
                             default: () => "Add New Floor",
                         }}
                     </q-banner>

@@ -6,14 +6,8 @@ import { NumberTuple } from "src/types/generic";
 
 export type FTDragEvent = D3DragEvent<Element, BaseFloorElement, unknown>;
 
-export type ElementClickHandler = (
-    floor: Floor | null,
-    d: BaseFloorElement | null
-) => void;
-export type FloorDoubleClickHandler = (
-    floor: Floor,
-    coords: NumberTuple
-) => void;
+export type ElementClickHandler = (floor: Floor | null, d: BaseFloorElement | null) => void;
+export type FloorDoubleClickHandler = (floor: Floor, coords: NumberTuple) => void;
 
 export type tableElementGroupSelection = Selection<
     EnterElement,
@@ -22,14 +16,6 @@ export type tableElementGroupSelection = Selection<
     unknown
 >;
 
-export type baseElementGroupSelection = Selection<
-    BaseType,
-    BaseFloorElement,
-    SVGGElement,
-    unknown
->;
+export type baseElementGroupSelection = Selection<BaseType, BaseFloorElement, SVGGElement, unknown>;
 
-export type tableElementInit = Pick<
-    TableElement,
-    "tableId" | "x" | "y" | "tag"
->;
+export type tableElementInit = Pick<TableElement, "tableId" | "x" | "y" | "tag">;

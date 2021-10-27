@@ -32,8 +32,7 @@ export default {
     EventCreateReservation: {
         title: "TABLE",
         reservationGroupWith: "Group with",
-        reservationGroupWithHint:
-            "Group multiple tables under the one reservation.",
+        reservationGroupWithHint: "Group multiple tables under the one reservation.",
         reservationGuestName: "Guest name *",
         reservationNumberOfGuests: "Number of persons *",
         reservationGuestContact: "Guest contact",

@@ -92,8 +92,7 @@ export default defineComponent({
                                 <div class="column">
                                     <span class="text-caption">Event date</span>
                                     <span>
-                                        {!!event.value &&
-                                            formatEventDate(event.value.date)}
+                                        {!!event.value && formatEventDate(event.value.date)}
                                     </span>
                                 </div>
                             ),

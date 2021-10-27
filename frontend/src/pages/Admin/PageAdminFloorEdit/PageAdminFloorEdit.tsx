@@ -5,10 +5,7 @@ import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
 import { Floor } from "src/floor-manager/Floor";
 import { BaseFloorElement, FloorDoc, FloorMode } from "src/types/floor";
 import { extractAllTableIds, hasFloorTables } from "src/floor-manager/filters";
-import {
-    showErrorMessage,
-    tryCatchLoadingWrapper,
-} from "src/helpers/ui-helpers";
+import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { ELEMENTS_TO_ADD_COLLECTION } from "src/floor-manager/constants";
 import { defineComponent, onMounted, ref } from "vue";
 import { isWall } from "src/floor-manager/type-guards";
@@ -51,9 +48,7 @@ export default defineComponent({
         const selectedFloor = ref<Floor | null>(null);
 
         async function loadFloor() {
-            const floor = await tryCatchLoadingWrapper(() =>
-                getFloor(props.floorID)
-            );
+            const floor = await tryCatchLoadingWrapper(() => getFloor(props.floorID));
 
             if (!floor) {
                 await router.replace("/");
@@ -76,16 +71,13 @@ export default defineComponent({
         }
 
         function onFloorSave() {
-            if (
-                !floorInstance.value ||
-                !hasFloorTables(floorInstance.value as Floor)
-            ) {
+            if (!floorInstance.value || !hasFloorTables(floorInstance.value as Floor)) {
                 return showErrorMessage("You need to add at least one table!");
             }
 
-            tryCatchLoadingWrapper(() =>
-                saveFloor(floorInstance.value as Floor)
-            ).catch(showErrorMessage);
+            tryCatchLoadingWrapper(() => saveFloor(floorInstance.value as Floor)).catch(
+                showErrorMessage
+            );
         }
 
         function onFloorChange(prop: keyof Floor, event: string | number) {
@@ -113,9 +105,7 @@ export default defineComponent({
         }
 
         function handleAddNewElement(floor: Floor, coords: NumberTuple) {
-            return function ({
-                elementDescriptor,
-            }: BottomSheetTableClickResult) {
+            return function ({ elementDescriptor }: BottomSheetTableClickResult) {
                 if (isWall(elementDescriptor)) return floor.addWall(coords);
 
                 q.dialog({
@@ -123,9 +113,7 @@ export default defineComponent({
                     componentProps: {
                         ids: extractAllTableIds(floor),
                     },
-                }).onOk(
-                    handleAddTableCallback(floor, elementDescriptor, coords)
-                );
+                }).onOk(handleAddTableCallback(floor, elementDescriptor, coords));
             };
         }
 
@@ -135,10 +123,7 @@ export default defineComponent({
             );
         }
 
-        function onElementClickHandler(
-            floor: Floor | null,
-            d: BaseFloorElement | null
-        ) {
+        function onElementClickHandler(floor: Floor | null, d: BaseFloorElement | null) {
             selectedFloor.value = floor;
             selectedElement.value = d;
         }
@@ -160,8 +145,7 @@ export default defineComponent({
                                     rounded
                                     label="Floor name"
                                     {...{
-                                        "onUpdate:modelValue":
-                                            onFloorChange.bind(null, "name"),
+                                        "onUpdate:modelValue": onFloorChange.bind(null, "name"),
                                     }}
                                     model-value={floorInstance.value.name}
                                 >
@@ -186,8 +170,7 @@ export default defineComponent({
                             <div class="row q-pa-sm q-col-gutter-md">
                                 <div class="col-6">
                                     <q-badge color="secondary">
-                                        Width: {floorInstance.value.width} (300
-                                        to 900)
+                                        Width: {floorInstance.value.width} (300 to 900)
                                     </q-badge>
                                     <q-slider
                                         model-value={floorInstance.value.width}
@@ -197,18 +180,16 @@ export default defineComponent({
                                         label
                                         color="deep-orange"
                                         {...{
-                                            "onUpdate:modelValue":
-                                                onFloorChange.bind(
-                                                    null,
-                                                    "width"
-                                                ),
+                                            "onUpdate:modelValue": onFloorChange.bind(
+                                                null,
+                                                "width"
+                                            ),
                                         }}
                                     />
                                 </div>
                                 <div class="col-6">
                                     <q-badge color="secondary">
-                                        Height: {floorInstance.value.height}{" "}
-                                        (300 to 900)
+                                        Height: {floorInstance.value.height} (300 to 900)
                                     </q-badge>
                                     <q-slider
                                         min={300}
@@ -217,11 +198,10 @@ export default defineComponent({
                                         label
                                         color="deep-orange"
                                         {...{
-                                            "onUpdate:modelValue":
-                                                onFloorChange.bind(
-                                                    null,
-                                                    "height"
-                                                ),
+                                            "onUpdate:modelValue": onFloorChange.bind(
+                                                null,
+                                                "height"
+                                            ),
                                         }}
                                         model-value={floorInstance.value.height}
                                     />

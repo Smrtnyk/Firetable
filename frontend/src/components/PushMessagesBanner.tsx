@@ -37,9 +37,7 @@ export default defineComponent({
         const serviceWorkerSupported = "serviceWorker" in window.navigator;
 
         function initEnablePushNotificationsBanner() {
-            const shouldNeverShow = q.localStorage.getItem(
-                "neverShowPushNotificationsBanner"
-            );
+            const shouldNeverShow = q.localStorage.getItem("neverShowPushNotificationsBanner");
             showPushNotificationsBanner.value = !shouldNeverShow;
         }
 
@@ -48,9 +46,7 @@ export default defineComponent({
             q.localStorage.set("neverShowPushNotificationsBanner", true);
         }
 
-        async function displayGrantedNotification(
-            sw: ServiceWorkerRegistration
-        ) {
+        async function displayGrantedNotification(sw: ServiceWorkerRegistration) {
             await sw.showNotification(
                 "You're subscribed to notifications!",
                 NOTIFICATIONS_GRANTED_OPTIONS
@@ -70,9 +66,7 @@ export default defineComponent({
             return tryCatchLoadingWrapper(async () => {
                 const newSub = await sw.pushManager.subscribe({
                     userVisibleOnly: true,
-                    applicationServerKey: urlBase64ToUint8Array(
-                        process.env.VAPID_PUBLIC_KEY
-                    ),
+                    applicationServerKey: urlBase64ToUint8Array(process.env.VAPID_PUBLIC_KEY),
                 });
 
                 await savePushSubscription(newSub.toJSON());
@@ -87,17 +81,13 @@ export default defineComponent({
 
             neverShowPushNotificationsBanner();
 
-            if (permission === "granted")
-                await checkForExistingPushSubscription();
+            if (permission === "granted") await checkForExistingPushSubscription();
         }
 
         onMounted(initEnablePushNotificationsBanner);
 
         return () => {
-            if (
-                !showPushNotificationsBanner.value ||
-                !pushNotificationsSupported
-            ) {
+            if (!showPushNotificationsBanner.value || !pushNotificationsSupported) {
                 return <div />;
             }
 
@@ -121,10 +111,7 @@ export default defineComponent({
                                     size="md"
                                     color="primary"
                                     label="Later"
-                                    onClick={() =>
-                                        (showPushNotificationsBanner.value =
-                                            false)
-                                    }
+                                    onClick={() => (showPushNotificationsBanner.value = false)}
                                 />
                                 <q-btn
                                     outline

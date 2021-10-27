@@ -53,9 +53,7 @@ interface OptionsGet {
     type: "get";
 }
 
-export type OptionsCollWatch<T, M> = OptionsBase &
-    OptionsColl<T, M> &
-    OptionsWatch;
+export type OptionsCollWatch<T, M> = OptionsBase & OptionsColl<T, M> & OptionsWatch;
 export type OptionsCollGet<T, M> = OptionsBase & OptionsColl<T, M> & OptionsGet;
 export type OptionsDocWatch<T, M> = OptionsBase & OptionsDoc<T, M> & OptionsGet;
 export type OptionsDocGet<T, M> = OptionsBase & OptionsDoc<T, M> & OptionsWatch;

@@ -12,10 +12,7 @@ export default defineComponent({
             <div class="EventCardListSkeleton">
                 <div class="row">
                     {Array.from({ length: 8 }).map((_, index) => (
-                        <div
-                            class="col-12 col-sm-6 col-md-4 q-pa-xs"
-                            key={index}
-                        >
+                        <div class="col-12 col-sm-6 col-md-4 q-pa-xs" key={index}>
                             <q-card class="my-card">
                                 <q-card-section>
                                     <q-skeleton

@@ -23,9 +23,7 @@ export default defineComponent({
         const usernameRule = [noEmptyString()];
 
         const passwordRule = [
-            minLength(
-                "Please enter your password, it has to contain minimum 5 characters."
-            ),
+            minLength("Please enter your password, it has to contain minimum 5 characters."),
         ];
 
         async function onSubmit() {
@@ -44,9 +42,7 @@ export default defineComponent({
                     <div class="col">
                         <q-img class="ft-logo" src="icons/icon-256x256.png" />
                         <q-form ref={authForm}>
-                            <h1 class="text-h5 text-center">
-                                Welcome to Firetable
-                            </h1>
+                            <h1 class="text-h5 text-center">Welcome to Firetable</h1>
                             <q-input
                                 v-model={username.value}
                                 rounded
@@ -71,15 +67,9 @@ export default defineComponent({
                                 {{
                                     append: () => (
                                         <q-icon
-                                            name={
-                                                isPwd.value
-                                                    ? "eye-open"
-                                                    : "eye-off"
-                                            }
+                                            name={isPwd.value ? "eye-open" : "eye-off"}
                                             className="cursor-pointer"
-                                            onClick={() =>
-                                                (isPwd.value = !isPwd.value)
-                                            }
+                                            onClick={() => (isPwd.value = !isPwd.value)}
                                         />
                                     ),
                                 }}

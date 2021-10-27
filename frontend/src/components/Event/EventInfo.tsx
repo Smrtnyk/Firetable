@@ -16,8 +16,7 @@ export default defineComponent({
             <q-dialog
                 model-value={eventsStore.showEventInfoModal}
                 {...{
-                    "onUpdate:model-value":
-                        eventsStore.toggleEventInfoModalVisibility,
+                    "onUpdate:model-value": eventsStore.toggleEventInfoModalVisibility,
                 }}
             >
                 Event Info

@@ -1,22 +1,9 @@
-import {
-    FLOOR_DEFAULT_HEIGHT,
-    FLOOR_DEFAULT_WIDTH,
-    RESOLUTION,
-} from "./constants";
+import { FLOOR_DEFAULT_HEIGHT, FLOOR_DEFAULT_WIDTH, RESOLUTION } from "./constants";
 import { calculateWallWidth, getTableHeight, getTableWidth } from "./utils";
 import { uid } from "quasar";
-import {
-    BaseFloorElement,
-    ElementTag,
-    ElementType,
-    FloorDoc,
-    TableElement,
-} from "src/types/floor";
+import { BaseFloorElement, ElementTag, ElementType, FloorDoc, TableElement } from "src/types/floor";
 
-type CreateTableElementPayload = Pick<
-    TableElement,
-    "tableId" | "floor" | "x" | "y" | "tag"
->;
+type CreateTableElementPayload = Pick<TableElement, "tableId" | "floor" | "x" | "y" | "tag">;
 
 export function makeRawFloor(name: string): Omit<FloorDoc, "id"> {
     return {
@@ -47,9 +34,7 @@ export function makeRawWall(x: number, y: number): BaseFloorElement {
     };
 }
 
-export function makeRawTable(
-    tableElementPayload: CreateTableElementPayload
-): TableElement {
+export function makeRawTable(tableElementPayload: CreateTableElementPayload): TableElement {
     return {
         ...tableElementPayload,
         width: getTableWidth(),

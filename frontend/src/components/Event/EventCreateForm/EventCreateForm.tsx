@@ -2,11 +2,7 @@ import { defineComponent, PropType, reactive, withDirectives } from "vue";
 
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useI18n } from "vue-i18n";
-import {
-    greaterThanZero,
-    noEmptyString,
-    requireNumber,
-} from "src/helpers/form-rules";
+import { greaterThanZero, noEmptyString, requireNumber } from "src/helpers/form-rules";
 import { useRouter } from "vue-router";
 
 import {
@@ -101,9 +97,7 @@ export default defineComponent({
                 return;
             }
 
-            const floors = props.floors.filter((floor) =>
-                state.chosenFloors.includes(floor.id)
-            );
+            const floors = props.floors.filter((floor) => state.chosenFloors.includes(floor.id));
 
             emit("create", {
                 ...state.form,
@@ -150,27 +144,16 @@ export default defineComponent({
                 maximized
                 model-value={eventsStore.showCreateEventModal}
                 {...{
-                    "onUpdate:model-value":
-                        eventsStore.toggleEventCreateModalVisiblity,
+                    "onUpdate:model-value": eventsStore.toggleEventCreateModalVisiblity,
                 }}
             >
                 <q-card>
-                    <q-banner
-                        inline-actions
-                        rounded
-                        class="bg-gradient text-white"
-                    >
+                    <q-banner inline-actions rounded class="bg-gradient text-white">
                         {{
                             avatar: () =>
-                                withDirectives(
-                                    <q-btn
-                                        round
-                                        class="q-mr-sm"
-                                        flat
-                                        icon="close"
-                                    />,
-                                    [[ClosePopup, 1]]
-                                ),
+                                withDirectives(<q-btn round class="q-mr-sm" flat icon="close" />, [
+                                    [ClosePopup, 1],
+                                ]),
                             default: () => "Create new event",
                         }}
                     </q-banner>
@@ -178,8 +161,7 @@ export default defineComponent({
                     {!props.floors.length && (
                         <div class="column justify-center items-center q-mt-md">
                             <h6 class="text-h6 q-pa-md text-justify">
-                                You cannot create events because you have no
-                                floors!
+                                You cannot create events because you have no floors!
                             </h6>
                             <q-btn
                                 rounded
@@ -196,11 +178,7 @@ export default defineComponent({
                     {!!props.floors.length && (
                         <>
                             {!!state.form.img && (
-                                <q-img
-                                    src={state.form.img}
-                                    ratio={1}
-                                    class="q-mb-md"
-                                />
+                                <q-img src={state.form.img} ratio={1} class="q-mb-md" />
                             )}
 
                             <q-form
@@ -260,18 +238,13 @@ export default defineComponent({
                                     {{
                                         prepend: () => (
                                             <>
-                                                <q-icon
-                                                    name="calendar"
-                                                    class="cursor-pointer"
-                                                />
+                                                <q-icon name="calendar" class="cursor-pointer" />
                                                 <q-popup-proxy
                                                     transition-show="scale"
                                                     transition-hide="scale"
                                                 >
                                                     <q-date
-                                                        v-model={
-                                                            state.form.date
-                                                        }
+                                                        v-model={state.form.date}
                                                         mask="DD-MM-YYYY HH:mm"
                                                         today-btn
                                                         options={validDates}
@@ -283,12 +256,7 @@ export default defineComponent({
                                                                     color="primary"
                                                                     flat
                                                                 />,
-                                                                [
-                                                                    [
-                                                                        ClosePopup,
-                                                                        1,
-                                                                    ],
-                                                                ]
+                                                                [[ClosePopup, 1]]
                                                             )}
                                                         </div>
                                                     </q-date>
@@ -297,18 +265,13 @@ export default defineComponent({
                                         ),
                                         append: () => (
                                             <>
-                                                <q-icon
-                                                    name="clock"
-                                                    class="cursor-pointer"
-                                                />
+                                                <q-icon name="clock" class="cursor-pointer" />
                                                 <q-popup-proxy
                                                     transition-show="scale"
                                                     transition-hide="scale"
                                                 >
                                                     <q-time
-                                                        v-model={
-                                                            state.form.date
-                                                        }
+                                                        v-model={state.form.date}
                                                         mask="DD-MM-YYYY HH:mm"
                                                         format24h
                                                     >
@@ -319,12 +282,7 @@ export default defineComponent({
                                                                     color="primary"
                                                                     flat
                                                                 />,
-                                                                [
-                                                                    [
-                                                                        ClosePopup,
-                                                                        1,
-                                                                    ],
-                                                                ]
+                                                                [[ClosePopup, 1]]
                                                             )}
                                                         </div>
                                                     </q-time>

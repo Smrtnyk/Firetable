@@ -20,11 +20,7 @@ import {
 
 import { useRouter } from "vue-router";
 import { Floor } from "src/floor-manager/Floor";
-import {
-    showConfirm,
-    showErrorMessage,
-    tryCatchLoadingWrapper,
-} from "src/helpers/ui-helpers";
+import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 
 import {
     computed,
@@ -39,23 +35,13 @@ import {
 import { isTable } from "src/floor-manager/type-guards";
 import { getFreeTables, getReservedTables } from "src/floor-manager/filters";
 import { updateEventFloorData } from "src/services/firebase/db-events";
-import {
-    CreateReservationPayload,
-    EventDoc,
-    GuestData,
-    Reservation,
-} from "src/types/event";
+import { CreateReservationPayload, EventDoc, GuestData, Reservation } from "src/types/event";
 import { useEventsStore } from "src/stores/events-store";
 import { useI18n } from "vue-i18n";
 import { useFirestore } from "src/composables/useFirestore";
 import { whiteSpaceToUnderscore } from "src/helpers/utils";
 import { Collection } from "src/types/firebase";
-import {
-    BaseFloorElement,
-    FloorDoc,
-    FloorMode,
-    TableElement,
-} from "src/types/floor";
+import { BaseFloorElement, FloorDoc, FloorMode, TableElement } from "src/types/floor";
 import { useAuthStore } from "src/stores/auth-store";
 
 interface State {
@@ -136,18 +122,14 @@ export default defineComponent({
             const freeTablesMap: Record<string, string[]> = {};
 
             for (const floor of eventFloors.value) {
-                freeTablesMap[floor.id] = getFreeTables(floor).map(
-                    (table) => table.tableId
-                );
+                freeTablesMap[floor.id] = getFreeTables(floor).map((table) => table.tableId);
             }
 
             return freeTablesMap;
         });
 
         const allReservedTables = computed(() => {
-            return eventFloors.value
-                .map((floor) => getReservedTables(floor))
-                .flat();
+            return eventFloors.value.map((floor) => getReservedTables(floor)).flat();
         });
 
         function onAutocompleteClear() {
@@ -164,11 +146,7 @@ export default defineComponent({
             floor && (state.activeFloor = floor);
         }
 
-        function showReservation(
-            floor: Floor,
-            reservation: Reservation,
-            tableId: string
-        ) {
+        function showReservation(floor: Floor, reservation: Reservation, tableId: string) {
             const options = {
                 component: EventShowReservation,
                 componentProps: {
@@ -201,9 +179,9 @@ export default defineComponent({
                         };
                     }
                 }
-                tryCatchLoadingWrapper(() =>
-                    updateEventFloorData(floor, props.id)
-                ).catch(showErrorMessage);
+                tryCatchLoadingWrapper(() => updateEventFloorData(floor, props.id)).catch(
+                    showErrorMessage
+                );
             };
         }
 
@@ -234,10 +212,7 @@ export default defineComponent({
             };
         }
 
-        function tableClickHandler(
-            floor: Floor | null,
-            d: BaseFloorElement | null
-        ) {
+        function tableClickHandler(floor: Floor | null, d: BaseFloorElement | null) {
             if (!d || !floor || !isTable(d)) return;
             const { reservation, tableId } = d;
             if (reservation) {
@@ -247,10 +222,7 @@ export default defineComponent({
             }
         }
 
-        function onDeleteReservation(
-            floor: Floor,
-            { groupedWith }: Reservation
-        ) {
+        function onDeleteReservation(floor: Floor, { groupedWith }: Reservation) {
             return async function () {
                 if (!(await showConfirm("Delete reservation?"))) return;
 
@@ -263,9 +235,7 @@ export default defineComponent({
                     }
                 }
 
-                await tryCatchLoadingWrapper(() =>
-                    updateEventFloorData(floor, props.id)
-                );
+                await tryCatchLoadingWrapper(() => updateEventFloorData(floor, props.id));
             };
         }
 
@@ -312,8 +282,7 @@ export default defineComponent({
         function checkIfReservedTableAndCloseCreateReservationDialog() {
             if (!currentOpenCreateReservationDialog) return;
 
-            const { dialog, tableId, floor } =
-                currentOpenCreateReservationDialog;
+            const { dialog, tableId, floor } = currentOpenCreateReservationDialog;
             const freeTables = freeTablesPerFloor.value[floor];
             const isTableStillFree = freeTables.includes(tableId);
 
@@ -329,9 +298,7 @@ export default defineComponent({
                 if (!eventFloors.value.length) return;
 
                 for (const floorInstance of state.floorInstances) {
-                    const findFloor = eventFloors.value.find(
-                        ({ id }) => id === floorInstance.id
-                    );
+                    const findFloor = eventFloors.value.find(({ id }) => id === floorInstance.id);
 
                     if (!findFloor) {
                         return;
@@ -352,10 +319,7 @@ export default defineComponent({
             setActiveFloor(eventFloors.value[0]);
         }
 
-        async function handleFloorInstancesData(
-            newVal: FloorDoc[],
-            old: FloorDoc[]
-        ) {
+        async function handleFloorInstancesData(newVal: FloorDoc[], old: FloorDoc[]) {
             if (!old.length && newVal.length) {
                 await initFloorInstancesData();
                 return;
@@ -372,10 +336,7 @@ export default defineComponent({
 
         watch(eventFloors, handleFloorInstancesData);
 
-        watch(
-            freeTablesPerFloor,
-            checkIfReservedTableAndCloseCreateReservationDialog
-        );
+        watch(freeTablesPerFloor, checkIfReservedTableAndCloseCreateReservationDialog);
 
         onMounted(init);
 
@@ -400,8 +361,7 @@ export default defineComponent({
                                     <q-fab-action
                                         class={[
                                             {
-                                                "button-gradient":
-                                                    isActiveFloor(florInstance),
+                                                "button-gradient": isActiveFloor(florInstance),
                                             },
                                             "text-white",
                                         ]}
@@ -427,19 +387,14 @@ export default defineComponent({
 
                         <q-btn
                             class="button-gradient"
-                            onClick={
-                                eventsStore.toggleEventGuestListDrawerVisibility
-                            }
+                            onClick={eventsStore.toggleEventGuestListDrawerVisibility}
                             icon="users"
                             rounded
                             size="md"
                         />
                     </div>
 
-                    <q-separator
-                        class="q-mx-auto q-my-xs-xs q-my-sm-sm q-my-md-md"
-                        inset
-                    />
+                    <q-separator class="q-mx-auto q-my-xs-xs q-my-sm-sm q-my-md-md" inset />
 
                     <f-t-autocomplete
                         allReservedTables={allReservedTables.value}

@@ -61,11 +61,7 @@ export function calculateBottomResizableCirclePositionY(d: TableElement) {
     return d.height;
 }
 
-export function possibleXMove(
-    width: number,
-    x: number,
-    elemWidth = TABLE_WIDTH
-) {
+export function possibleXMove(width: number, x: number, elemWidth = TABLE_WIDTH) {
     let normalizedX = x;
     if (x + elemWidth > width) {
         normalizedX = width - elemWidth;
@@ -73,11 +69,7 @@ export function possibleXMove(
     return round(Math.max(0, normalizedX), RESOLUTION);
 }
 
-export function possibleYMove(
-    height: number,
-    y: number,
-    elemHeight = TABLE_HEIGHT
-) {
+export function possibleYMove(height: number, y: number, elemHeight = TABLE_HEIGHT) {
     let normalizedY = y;
     if (y + elemHeight > height) {
         normalizedY = height - elemHeight;

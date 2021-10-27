@@ -1,7 +1,4 @@
-import {
-    showErrorMessage,
-    tryCatchLoadingWrapper,
-} from "src/helpers/ui-helpers";
+import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { defineComponent, ref, PropType } from "vue";
 import { Reservation } from "src/types/event";
 import { updateEventFloorData } from "src/services/firebase/db-events";
@@ -67,8 +64,7 @@ export default defineComponent({
         const checked = ref<boolean>(props.reservation.confirmed);
         const confirmGuestSwitchDisabled = ref(false);
 
-        const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
-            useDialogPluginComponent();
+        const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent();
 
         function setConfirmButtonDisabledTimer() {
             confirmGuestSwitchDisabled.value = true;
@@ -83,9 +79,7 @@ export default defineComponent({
             const { tables } = floor;
 
             for (const tableId of groupedWith) {
-                const table = tables.find(
-                    (element) => element.tableId === tableId
-                );
+                const table = tables.find((element) => element.tableId === tableId);
 
                 if (!table?.reservation) continue;
 
@@ -107,22 +101,10 @@ export default defineComponent({
                     </h6>
                 ),
                 avatar: () => (
-                    <q-btn
-                        round
-                        class="q-mr-sm"
-                        flat
-                        icon="close"
-                        onClick={onDialogOK}
-                    />
+                    <q-btn round class="q-mr-sm" flat icon="close" onClick={onDialogOK} />
                 ),
                 action: () => (
-                    <q-btn
-                        round
-                        flat
-                        icon="trash"
-                        color="negative"
-                        onClick={onDialogCancel}
-                    />
+                    <q-btn round flat icon="trash" color="negative" onClick={onDialogCancel} />
                 ),
             };
             return (
@@ -139,16 +121,10 @@ export default defineComponent({
 
                         <q-card-section>
                             <div class="row">
-                                <div class="col-6">
-                                    {t("EventShowReservation.guestNameLabel")}
-                                </div>
-                                <div class="col-6 font-black">
-                                    {props.reservation.guestName}
-                                </div>
+                                <div class="col-6">{t("EventShowReservation.guestNameLabel")}</div>
+                                <div class="col-6 font-black">{props.reservation.guestName}</div>
 
-                                <div class="col-6">
-                                    {t("EventShowReservation.paxLabel")}
-                                </div>
+                                <div class="col-6">{t("EventShowReservation.paxLabel")}</div>
                                 <div class="col-6 font-black">
                                     {props.reservation.numberOfGuests}
                                 </div>
@@ -156,9 +132,7 @@ export default defineComponent({
                                 {props.reservation.guestContact && (
                                     <>
                                         <div class="col-6">
-                                            {t(
-                                                "EventShowReservation.contactLabel"
-                                            )}
+                                            {t("EventShowReservation.contactLabel")}
                                         </div>
                                         <div class="col-6 font-black">
                                             {props.reservation.guestContact}
@@ -169,9 +143,7 @@ export default defineComponent({
                                 {props.reservation.reservationNote && (
                                     <>
                                         <div class="col-6">
-                                            {t(
-                                                "EventShowReservation.noteLabel"
-                                            )}
+                                            {t("EventShowReservation.noteLabel")}
                                         </div>
                                         <div class="col-6 font-black">
                                             {props.reservation.reservationNote}
@@ -179,9 +151,7 @@ export default defineComponent({
                                     </>
                                 )}
 
-                                <div class="col-6">
-                                    {t("EventShowReservation.reservedByLabel")}
-                                </div>
+                                <div class="col-6">{t("EventShowReservation.reservedByLabel")}</div>
                                 <div class="col-6 font-black">
                                     {props.reservation.reservedBy.email}
                                 </div>
@@ -191,23 +161,19 @@ export default defineComponent({
                                 <div class="row items-center">
                                     <q-separator dark class="q-my-md col-12" />
                                     <div class="col-6">
-                                        {t(
-                                            "EventShowReservation.groupedWithLabel"
-                                        )}
+                                        {t("EventShowReservation.groupedWithLabel")}
                                     </div>
                                     <div class="col-6">
-                                        {props.reservation.groupedWith.map(
-                                            (table) => (
-                                                <q-chip
-                                                    key={table}
-                                                    square
-                                                    class="bg-gradient"
-                                                    text-color="white"
-                                                >
-                                                    {table}
-                                                </q-chip>
-                                            )
-                                        )}
+                                        {props.reservation.groupedWith.map((table) => (
+                                            <q-chip
+                                                key={table}
+                                                square
+                                                class="bg-gradient"
+                                                text-color="white"
+                                            >
+                                                {table}
+                                            </q-chip>
+                                        ))}
                                     </div>
                                 </div>
                             )}
@@ -217,19 +183,15 @@ export default defineComponent({
                             <q-item tag="label" class="q-pa-none">
                                 <q-item-section>
                                     <q-item-label>
-                                        {t(
-                                            "EventShowReservation.guestArrivedLabel"
-                                        )}
+                                        {t("EventShowReservation.guestArrivedLabel")}
                                     </q-item-label>
                                 </q-item-section>
                                 <q-item-section avatar>
                                     <q-toggle
                                         {...{
                                             modelValue: checked.value,
-                                            "onUpdate:modelValue":
-                                                onReservationConfirm,
-                                            disable:
-                                                confirmGuestSwitchDisabled.value,
+                                            "onUpdate:modelValue": onReservationConfirm,
+                                            disable: confirmGuestSwitchDisabled.value,
                                             size: "lg",
                                             uncheckedIcon: "close",
                                             checkedIcon: "check",
@@ -243,8 +205,8 @@ export default defineComponent({
                                 <q-item>
                                     <q-item-section>
                                         <span>
-                                            You need to wait a minute until you
-                                            are able to change the status again!
+                                            You need to wait a minute until you are able to change
+                                            the status again!
                                         </span>
                                     </q-item-section>
                                 </q-item>

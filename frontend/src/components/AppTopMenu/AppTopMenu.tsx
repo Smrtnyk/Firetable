@@ -24,11 +24,7 @@ export default defineComponent({
 
     setup(_, { emit }) {
         return () => (
-            <q-page-sticky
-                expand
-                position="bottom"
-                class="shadow-light AppTopMenu"
-            >
+            <q-page-sticky expand position="bottom" class="shadow-light AppTopMenu">
                 <q-tabs
                     switch-indicator
                     narrow-indicator
@@ -36,11 +32,7 @@ export default defineComponent({
                     active-color="white"
                     breakpoint={0}
                 >
-                    <q-btn
-                        flat
-                        aria-label="Menu"
-                        onClick={() => emit("toggle")}
-                    >
+                    <q-btn flat aria-label="Menu" onClick={() => emit("toggle")}>
                         <q-icon class="text-gradient" size="2rem" name="menu" />
                     </q-btn>
                     <q-space />

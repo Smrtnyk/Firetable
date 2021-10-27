@@ -46,12 +46,7 @@ export const useAuthStore = defineStore("auth", {
             isReady,
             isAuthenticated,
             unsubscribeUserWatch,
-        }: Partial<
-            Pick<
-                AuthState,
-                "isReady" | "isAuthenticated" | "unsubscribeUserWatch"
-            >
-        >) {
+        }: Partial<Pick<AuthState, "isReady" | "isAuthenticated" | "unsubscribeUserWatch">>) {
             if (typeof isAuthenticated !== "undefined") {
                 this.isAuthenticated = isAuthenticated;
             }

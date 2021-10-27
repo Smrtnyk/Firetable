@@ -1,9 +1,6 @@
 import { boot } from "quasar/wrappers";
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import {
-    handleOnAuthStateChanged,
-    routerBeforeEach,
-} from "src/services/firebase/auth";
+import { handleOnAuthStateChanged, routerBeforeEach } from "src/services/firebase/auth";
 import { auth, fBInit } from "../services/firebase/base";
 import { onAuthStateChanged } from "@firebase/auth";
 import { useAuthStore } from "src/stores/auth-store";

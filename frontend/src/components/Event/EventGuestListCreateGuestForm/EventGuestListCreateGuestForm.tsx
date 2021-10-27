@@ -19,9 +19,7 @@ export default defineComponent({
     setup(_, { emit }) {
         const guestName = ref("");
 
-        const stringRules = [
-            (val: string) => (val && val.length > 0) || "Please type something",
-        ];
+        const stringRules = [(val: string) => (val && val.length > 0) || "Please type something"];
 
         function onSubmit() {
             emit("create", {
@@ -35,27 +33,14 @@ export default defineComponent({
         }
 
         return () => (
-            <div
-                style="max-width: 700px; width: 80vw"
-                class="EventGuestListCreateGuestForm"
-            >
+            <div style="max-width: 700px; width: 80vw" class="EventGuestListCreateGuestForm">
                 <q-card>
-                    <q-banner
-                        inline-actions
-                        rounded
-                        class="bg-gradient text-white"
-                    >
+                    <q-banner inline-actions rounded class="bg-gradient text-white">
                         {{
                             avatar: () =>
-                                withDirectives(
-                                    <q-btn
-                                        round
-                                        class="q-mr-sm"
-                                        flat
-                                        icon="close"
-                                    />,
-                                    [[ClosePopup]]
-                                ),
+                                withDirectives(<q-btn round class="q-mr-sm" flat icon="close" />, [
+                                    [ClosePopup],
+                                ]),
                             default: () => "Add Guest",
                         }}
                     </q-banner>

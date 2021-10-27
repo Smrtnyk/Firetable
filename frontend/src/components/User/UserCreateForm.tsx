@@ -2,17 +2,7 @@ import { ACTIVITY_STATUS, Role, CreateUserPayload } from "src/types/auth";
 import { defineComponent, PropType, ref, withDirectives } from "vue";
 import { noEmptyString } from "src/helpers/form-rules";
 import { PROJECT_MAIL } from "src/config";
-import {
-    ClosePopup,
-    QCard,
-    QBanner,
-    QForm,
-    QInput,
-    QBtn,
-    QSelect,
-    QIcon,
-    QDialog,
-} from "quasar";
+import { ClosePopup, QCard, QBanner, QForm, QInput, QBtn, QSelect, QIcon, QDialog } from "quasar";
 import { useAuthStore } from "src/stores/auth-store";
 
 const user: CreateUserPayload = {
@@ -70,26 +60,16 @@ export default defineComponent({
                 <q-dialog
                     model-value={authStore.showCreateUserDialog}
                     {...{
-                        "onUpdate:model-value":
-                            authStore.toggleCreateUserDialogVisibility,
+                        "onUpdate:model-value": authStore.toggleCreateUserDialogVisibility,
                     }}
                     maximized
                 >
                     <q-card>
-                        <q-banner
-                            inline-actions
-                            rounded
-                            class="bg-gradient text-white"
-                        >
+                        <q-banner inline-actions rounded class="bg-gradient text-white">
                             {{
                                 avatar: () =>
                                     withDirectives(
-                                        <q-btn
-                                            round
-                                            class="q-mr-sm"
-                                            flat
-                                            icon="close"
-                                        />,
+                                        <q-btn round class="q-mr-sm" flat icon="close" />,
                                         [[ClosePopup]]
                                     ),
                                 default: () => "Create new user",

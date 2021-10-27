@@ -19,12 +19,7 @@ import {
     translateElementToItsPosition,
 } from "./utils";
 import { makeRawTable, makeRawWall } from "./factories";
-import {
-    BaseFloorElement,
-    FloorMode,
-    FloorDoc,
-    TableElement,
-} from "src/types/floor";
+import { BaseFloorElement, FloorMode, FloorDoc, TableElement } from "src/types/floor";
 import { isRoundTable, isTable, isWall } from "src/floor-manager/type-guards";
 import { NOOP, whiteSpaceToUnderscore } from "src/helpers/utils";
 import {
@@ -105,14 +100,13 @@ export class Floor {
         this.init();
     }
 
-    public updateElementProperty<
-        T extends BaseFloorElement,
-        S extends keyof BaseFloorElement
-    >(element: T, property: S, value: T[S]): void {
+    public updateElementProperty<T extends BaseFloorElement, S extends keyof BaseFloorElement>(
+        element: T,
+        property: S,
+        value: T[S]
+    ): void {
         element[property] = value;
-        isTable(element)
-            ? this.renderTableElements()
-            : this.renderWallElements();
+        isTable(element) ? this.renderTableElements() : this.renderWallElements();
     }
 
     private destroy(): void {
@@ -128,9 +122,7 @@ export class Floor {
     public removeElement(element: BaseFloorElement) {
         this.unsetSelectedElement();
         this.data = this.data.filter((d) => d.id !== element.id);
-        isTable(element)
-            ? this.renderTableElements()
-            : this.renderWallElements();
+        isTable(element) ? this.renderTableElements() : this.renderWallElements();
     }
 
     public addTableElement(rawTableElement: tableElementInit) {
@@ -148,9 +140,7 @@ export class Floor {
         this.tables.forEach((table) => (table.floor = newName));
     }
 
-    private onWallsEnter(
-        enter: Selection<EnterElement, BaseFloorElement, SVGGElement, unknown>
-    ) {
+    private onWallsEnter(enter: Selection<EnterElement, BaseFloorElement, SVGGElement, unknown>) {
         const wallG = enter
             .append("g")
             .attr("class", "wallGroup")
@@ -203,10 +193,7 @@ export class Floor {
         this.elementClickHandler(null, null);
     }
 
-    private setSeletectedElement(
-        selectedElement: EventTarget | null,
-        d: BaseFloorElement
-    ) {
+    private setSeletectedElement(selectedElement: EventTarget | null, d: BaseFloorElement) {
         if (!isEditorModeActive(this.mode)) return;
         this.unsetSelectedElement();
         if (!(selectedElement instanceof Element)) {
@@ -223,9 +210,7 @@ export class Floor {
             .attr("class", generateTableGroupClass)
             .attr("transform", translateElementToItsPosition);
 
-        const tables = tableG.append((d) =>
-            document.createElementNS(SVG_NAMESPACE, d.tag)
-        );
+        const tables = tableG.append((d) => document.createElementNS(SVG_NAMESPACE, d.tag));
 
         tables.each(this.eachTableDimensions);
 
@@ -250,14 +235,8 @@ export class Floor {
             .attr("cy", calculateBottomResizableCirclePositionY);
         update.select(".table").attr("class", generateTableClass);
         update.select("circle.table").attr("r", getRoundTableRadius);
-        update
-            .select("rect.table")
-            .attr("height", getTableHeight)
-            .attr("width", getTableWidth);
-        update
-            .select("text")
-            .attr("transform", getTableTextPosition)
-            .text(getTableText);
+        update.select("rect.table").attr("height", getTableHeight).attr("width", getTableWidth);
+        update.select("text").attr("transform", getTableTextPosition).text(getTableText);
     }
 
     public renderTableElements() {
@@ -272,9 +251,7 @@ export class Floor {
         const element = select<SVGElement, TableElement>(this);
         isRoundTable(d)
             ? element.attr("r", getRoundTableRadius)
-            : element
-                  .attr("height", getTableHeight)
-                  .attr("width", getTableWidth);
+            : element.attr("height", getTableHeight).attr("width", getTableWidth);
     }
 
     private addDragBehaviourToElement(
@@ -290,13 +267,8 @@ export class Floor {
 
         dragBehaviour(element as any);
 
-        function elementDragging(
-            this: Element,
-            { x, y }: DragEvent,
-            d: BaseFloorElement
-        ) {
-            const matchesSelectedElement =
-                this === document.querySelector(".selected");
+        function elementDragging(this: Element, { x, y }: DragEvent, d: BaseFloorElement) {
+            const matchesSelectedElement = this === document.querySelector(".selected");
             if (!matchesSelectedElement) return;
             const gridX = possibleXMove(instance.width, x, d.width);
             const gridY = possibleYMove(instance.height, y, d.height);
@@ -340,11 +312,7 @@ export class Floor {
         return function (event: FTDragEvent, d: BaseFloorElement) {
             const { x, y } = event;
             const gridX = possibleXMove(instance.width + d.width, x, d.width);
-            const gridY = possibleYMove(
-                instance.height + d.height,
-                y,
-                d.height
-            );
+            const gridY = possibleYMove(instance.height + d.height, y, d.height);
             d.width = Math.max(gridX - d.x, getDefaultElementWidth(d));
             d.height = Math.max(gridY - d.y, getDefaultElementWidth(d));
 
@@ -393,10 +361,7 @@ export class Floor {
         this.svg
             .attr("viewBox", `0 0 ${this.width} ${this.height}`)
             .attr("preserveAspectRatio", "xMidYMid")
-            .attr(
-                "class",
-                `FloorEditor__SVG ${whiteSpaceToUnderscore(this.name)}`
-            );
+            .attr("class", `FloorEditor__SVG ${whiteSpaceToUnderscore(this.name)}`);
     }
 
     private addClickListenerToSVGContainer() {

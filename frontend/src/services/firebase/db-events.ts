@@ -21,9 +21,7 @@ import {
     query,
 } from "@firebase/firestore";
 
-export async function getEvents(
-    lastDocument: DocumentData | null
-): Promise<EventDoc[]> {
+export async function getEvents(lastDocument: DocumentData | null): Promise<EventDoc[]> {
     const orderByDateQuery = orderBy("date");
     const limitQuery = limit(20);
     const startAfterQuery = startAfter(lastDocument);
@@ -65,10 +63,6 @@ export function deleteGuestFromGuestList(eventID: string, guestID: string) {
     return deleteDoc(guestDoc(eventID, guestID));
 }
 
-export function confirmGuestFromGuestList(
-    eventID: string,
-    guestID: string,
-    confirmed: boolean
-) {
+export function confirmGuestFromGuestList(eventID: string, guestID: string, confirmed: boolean) {
     return updateDoc(guestDoc(eventID, guestID), { confirmed });
 }

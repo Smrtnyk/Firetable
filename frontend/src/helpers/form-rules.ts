@@ -1,15 +1,10 @@
-export function noEmptyString(
-    msg = "Please type something"
-): (val: string) => boolean | string {
+export function noEmptyString(msg = "Please type something"): (val: string) => boolean | string {
     return function (val: string): boolean | string {
         return (val && val.length > 0) || msg;
     };
 }
 
-export function minLength(
-    msg: string,
-    minLen = 5
-): (val: string) => boolean | string {
+export function minLength(msg: string, minLen = 5): (val: string) => boolean | string {
     return function (val: string): boolean | string {
         return (val && val.length >= minLen) || msg;
     };

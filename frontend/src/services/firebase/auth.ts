@@ -51,10 +51,7 @@ export function handleOnAuthStateChanged(
     router.replace({ path: "/auth" }).catch(showErrorMessage);
 }
 
-export function routerBeforeEach(
-    router: Router,
-    store: ReturnType<typeof useAuthStore>
-) {
+export function routerBeforeEach(router: Router, store: ReturnType<typeof useAuthStore>) {
     router.beforeEach(async (to) => {
         try {
             // Force the app to wait until Firebase has
@@ -101,10 +98,7 @@ export function logoutUser() {
     return signOut(auth());
 }
 
-export function loginWithEmail(
-    email: string,
-    password: string
-): Promise<UserCredential> {
+export function loginWithEmail(email: string, password: string): Promise<UserCredential> {
     return signInWithEmailAndPassword(auth(), email, password);
 }
 

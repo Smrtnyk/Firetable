@@ -1,25 +1,13 @@
 import UserCreateForm from "src/components/User/UserCreateForm";
 import { FTTitle } from "src/components/FTTitle";
 
-import {
-    showConfirm,
-    showErrorMessage,
-    tryCatchLoadingWrapper,
-} from "src/helpers/ui-helpers";
+import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { computed, defineComponent, ref } from "vue";
 import { createUserWithEmail, deleteUser } from "src/services/firebase/auth";
 import { config } from "src/config";
 import { useFirestore } from "src/composables/useFirestore";
 
-import {
-    QBtn,
-    QIcon,
-    QList,
-    QItem,
-    QSlideItem,
-    QItemSection,
-    QItemLabel,
-} from "quasar";
+import { QBtn, QIcon, QList, QItem, QSlideItem, QItemSection, QItemLabel } from "quasar";
 import { Collection } from "src/types/firebase";
 import { CreateUserPayload, User } from "src/types/auth";
 import { FloorDoc } from "src/types/floor";
@@ -68,9 +56,7 @@ export default defineComponent({
 
         async function onCreateUser(newUser: CreateUserPayload) {
             if (users.value.length > maxNumOfUsers) {
-                showErrorMessage(
-                    "You have reached the maximum amount of users!"
-                );
+                showErrorMessage("You have reached the maximum amount of users!");
                 return;
             }
 
@@ -98,9 +84,7 @@ export default defineComponent({
                                 rounded
                                 icon="plus"
                                 class="button-gradient"
-                                onClick={
-                                    authStore.toggleCreateUserDialogVisibility
-                                }
+                                onClick={authStore.toggleCreateUserDialogVisibility}
                                 label="new user"
                             />
                         ),
@@ -127,9 +111,7 @@ export default defineComponent({
                             <q-slide-item
                                 key={user.id}
                                 right-color="warning"
-                                onRight={({ reset }: any) =>
-                                    onUserSlideRight(user, reset)
-                                }
+                                onRight={({ reset }: any) => onUserSlideRight(user, reset)}
                                 class="fa-card"
                             >
                                 {{

@@ -25,9 +25,7 @@ export default defineComponent({
         return () => (
             <router-view>
                 {({ Component }: { Component: DynamicComponent }) => (
-                    <Transition name="fade">
-                        {() => resolveDynamicComponent(Component)}
-                    </Transition>
+                    <Transition name="fade">{() => resolveDynamicComponent(Component)}</Transition>
                 )}
             </router-view>
         );

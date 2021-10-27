@@ -7,12 +7,7 @@ import {
     OptionsDocGet,
     OptionsDocWatch,
 } from "./types/Options";
-import {
-    ReturnCollGet,
-    ReturnCollWatch,
-    ReturnDocGet,
-    ReturnDocWatch,
-} from "./types/Return";
+import { ReturnCollGet, ReturnCollWatch, ReturnDocGet, ReturnDocWatch } from "./types/Return";
 
 // Type gates
 import {
@@ -85,10 +80,7 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
         let newPath = path;
         for (const x of stringVars) {
             const instanceVal = variables[x.split("$").join("")].value;
-            if (
-                !["number", "string"].includes(typeof instanceVal) ||
-                instanceVal === ""
-            ) {
+            if (!["number", "string"].includes(typeof instanceVal) || instanceVal === "") {
                 newPath = "";
                 break;
             } else {
@@ -226,9 +218,7 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
             if (firestoreRefIsDoc(firestoreRef.value)) {
                 watcher = onSnapshot(firestoreRef.value, (receivedDoc) => {
                     receiveDocData(
-                        receivedDoc.exists()
-                            ? firestoreDocSerializer(receivedDoc)
-                            : undefined
+                        receivedDoc.exists() ? firestoreDocSerializer(receivedDoc) : undefined
                     );
                 });
             } else {
@@ -240,9 +230,7 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
                 watcher = onSnapshot(firestoreRefVal, (receivedCollection) => {
                     receiveCollData(
                         receivedCollection.size
-                            ? receivedCollection.docs.map(
-                                  firestoreDocSerializer
-                              )
+                            ? receivedCollection.docs.map(firestoreDocSerializer)
                             : []
                     );
                 });

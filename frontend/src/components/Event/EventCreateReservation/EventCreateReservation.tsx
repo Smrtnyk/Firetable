@@ -12,11 +12,7 @@ import {
     QInput,
     QBtn,
 } from "quasar";
-import {
-    minLength,
-    noEmptyString,
-    requireNumber,
-} from "src/helpers/form-rules";
+import { minLength, noEmptyString, requireNumber } from "src/helpers/form-rules";
 
 interface State {
     guestName: string;
@@ -65,8 +61,7 @@ export default defineComponent({
 
         const reservationForm = ref<QForm | null>(null);
 
-        const { dialogRef, onDialogHide, onDialogCancel, onDialogOK } =
-            useDialogPluginComponent();
+        const { dialogRef, onDialogHide, onDialogCancel, onDialogOK } = useDialogPluginComponent();
 
         async function onOKClick() {
             if (!(await reservationForm.value?.validate())) return;
@@ -77,26 +72,12 @@ export default defineComponent({
         }
 
         return () => (
-            <q-dialog
-                ref={dialogRef}
-                persistent
-                onHide={onDialogHide}
-                maximized
-            >
+            <q-dialog ref={dialogRef} persistent onHide={onDialogHide} maximized>
                 <q-card class="q-dialog-plugin AddTableDialog">
-                    <q-banner
-                        inline-actions
-                        rounded
-                        class="bg-gradient text-white"
-                    >
+                    <q-banner inline-actions rounded class="bg-gradient text-white">
                         {{
                             avatar: () => (
-                                <q-btn
-                                    round
-                                    flat
-                                    icon="close"
-                                    onClick={onDialogCancel}
-                                />
+                                <q-btn round flat icon="close" onClick={onDialogCancel} />
                             ),
                             default: () => "TABLE" + props.tableId,
                         }}
@@ -107,16 +88,12 @@ export default defineComponent({
                             {!!props.freeTables.length && (
                                 <q-select
                                     v-model={state.groupedWith}
-                                    hint={t(
-                                        `EventCreateReservation.reservationGroupWithHint`
-                                    )}
+                                    hint={t(`EventCreateReservation.reservationGroupWithHint`)}
                                     standout
                                     rounded
                                     multiple
                                     options={props.freeTables}
-                                    label={t(
-                                        `EventCreateReservation.reservationGroupWith`
-                                    )}
+                                    label={t(`EventCreateReservation.reservationGroupWith`)}
                                     dropdown-icon="selector"
                                 />
                             )}
@@ -126,14 +103,9 @@ export default defineComponent({
                                 rounded
                                 hide-bottom-space
                                 standout
-                                label={t(
-                                    `EventCreateReservation.reservationGuestName`
-                                )}
+                                label={t(`EventCreateReservation.reservationGuestName`)}
                                 lazy-rules="ondemand"
-                                rules={[
-                                    noEmptyString(),
-                                    minLength("Name must be longer!", 2),
-                                ]}
+                                rules={[noEmptyString(), minLength("Name must be longer!", 2)]}
                             />
 
                             <q-input
@@ -142,9 +114,7 @@ export default defineComponent({
                                 rounded
                                 standout
                                 type="number"
-                                label={t(
-                                    `EventCreateReservation.reservationNumberOfGuests`
-                                )}
+                                label={t(`EventCreateReservation.reservationNumberOfGuests`)}
                                 lazy-rules="ondemand"
                                 rules={[requireNumber()]}
                             />
@@ -154,9 +124,7 @@ export default defineComponent({
                                 rounded
                                 standout
                                 class="q-mb-md"
-                                label={t(
-                                    `EventCreateReservation.reservationGuestContact`
-                                )}
+                                label={t(`EventCreateReservation.reservationGuestContact`)}
                             />
 
                             <q-input
@@ -173,9 +141,7 @@ export default defineComponent({
                                     class="button-gradient"
                                     onClick={onOKClick}
                                 >
-                                    {t(
-                                        "EventCreateReservation.reservationCreateBtn"
-                                    )}
+                                    {t("EventCreateReservation.reservationCreateBtn")}
                                 </q-btn>
                             </div>
                         </q-form>

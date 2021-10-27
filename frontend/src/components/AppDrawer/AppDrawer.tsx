@@ -1,10 +1,7 @@
 import "./AppDrawer.scss";
 
 import { computed, defineComponent, ref, withDirectives } from "vue";
-import {
-    showErrorMessage,
-    tryCatchLoadingWrapper,
-} from "src/helpers/ui-helpers";
+import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { logoutUser, updateUser } from "src/services/firebase/auth";
 import { useI18n } from "vue-i18n";
 
@@ -74,9 +71,7 @@ export default defineComponent({
             },
         ]);
         const user = computed(() => authStore.user);
-        const adminLinksCollection = computed(() =>
-            props.showAdminLinks ? adminLinks.value : []
-        );
+        const adminLinksCollection = computed(() => (props.showAdminLinks ? adminLinks.value : []));
         const avatar = computed(() => {
             if (!user.value) return "";
             const [first, last] = user.value.name.split(" ");
@@ -94,15 +89,13 @@ export default defineComponent({
         function toggleUserActivityStatus(newValue: boolean) {
             if (!user.value) return;
 
-            updateUser(user.value.id, "status", Number(newValue)).catch(
-                showErrorMessage
-            );
+            updateUser(user.value.id, "status", Number(newValue)).catch(showErrorMessage);
         }
 
         function onLogoutUser() {
-            tryCatchLoadingWrapper(() =>
-                logoutUser().then(authStore.unsubscribeUserWatch)
-            ).catch(showErrorMessage);
+            tryCatchLoadingWrapper(() => logoutUser().then(authStore.unsubscribeUserWatch)).catch(
+                showErrorMessage
+            );
         }
 
         function setAppLanguage(val: string) {
@@ -126,9 +119,7 @@ export default defineComponent({
                     </q-avatar>
                     <div class="q-mt-md text-center">
                         <div class="text-subtitle1">{user.value?.name}</div>
-                        <div class="text-caption text-grey">
-                            {user.value?.email}
-                        </div>
+                        <div class="text-caption text-grey">{user.value?.email}</div>
                         <div class="text-caption text-grey">
                             {user.value?.status ? "Online" : "Offline"}
                         </div>
@@ -139,11 +130,7 @@ export default defineComponent({
 
                 {adminLinksCollection.value.map((link, index) =>
                     withDirectives(
-                        <q-item
-                            key={index}
-                            to={{ name: link.routeName }}
-                            clickable
-                        >
+                        <q-item key={index} to={{ name: link.routeName }} clickable>
                             <q-item-section avatar>
                                 <q-icon name={link.icon} />
                             </q-item-section>
@@ -161,9 +148,7 @@ export default defineComponent({
                             <q-icon name="logout" />
                         </q-item-section>
 
-                        <q-item-section>
-                            {t("AppDrawer.links.logout")}
-                        </q-item-section>
+                        <q-item-section>{t("AppDrawer.links.logout")}</q-item-section>
                     </q-item>,
                     [[Ripple]]
                 )}

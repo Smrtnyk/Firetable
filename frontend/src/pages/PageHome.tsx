@@ -5,12 +5,7 @@ import { FTSubtitle } from "src/components/FTSubtitle";
 
 import { defineComponent } from "vue";
 import { useFirestore } from "src/composables/useFirestore";
-import {
-    query as firestoreQuery,
-    where,
-    orderBy,
-    limit,
-} from "@firebase/firestore";
+import { query as firestoreQuery, where, orderBy, limit } from "@firebase/firestore";
 
 import { QImg } from "quasar";
 import { Collection } from "src/types/firebase";
@@ -34,11 +29,7 @@ export default defineComponent({
             queryType: "collection",
             path: Collection.EVENTS,
             query(collectionRef) {
-                const whereConstraint = where(
-                    "date",
-                    ">=",
-                    Date.now() - 60 * 60 * 1000 * 8
-                );
+                const whereConstraint = where("date", ">=", Date.now() - 60 * 60 * 1000 * 8);
                 const orderByConstraint = orderBy("date");
                 const limitConstraint = limit(10);
                 return firestoreQuery(
@@ -62,9 +53,7 @@ export default defineComponent({
                 {isLoading.value && <EventCardListSkeleton />}
                 {!isLoading.value && !events.value.length && (
                     <div class="row justify-center items-center q-mt-md">
-                        <f-t-subtitle>
-                            There are no upcoming events
-                        </f-t-subtitle>
+                        <f-t-subtitle>There are no upcoming events</f-t-subtitle>
                         <q-img src="no-events.svg" />
                     </div>
                 )}

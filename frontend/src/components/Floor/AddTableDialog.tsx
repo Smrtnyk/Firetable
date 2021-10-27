@@ -41,24 +41,18 @@ export default defineComponent({
     setup(props) {
         const addTableForm = ref<QForm | null>(null);
 
-        const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
-            useDialogPluginComponent();
+        const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent();
 
-        const tableId = ref<string>(
-            props.id || String(props.ids.length + 1) || ""
-        );
+        const tableId = ref<string>(props.id || String(props.ids.length + 1) || "");
 
         const tableIdRules = [
             noEmptyString(),
             (val: string) =>
-                !props.ids.includes(val) ||
-                props.id === tableId.value ||
-                "Id is taken",
+                !props.ids.includes(val) || props.id === tableId.value || "Id is taken",
         ];
 
         async function onOKClick() {
-            if (!addTableForm.value || !(await addTableForm.value.validate()))
-                return;
+            if (!addTableForm.value || !(await addTableForm.value.validate())) return;
 
             onDialogOK(tableId.value);
         }
@@ -90,12 +84,7 @@ export default defineComponent({
                             label="OK"
                             onClick={onOKClick}
                         />
-                        <q-btn
-                            rounded
-                            color="negative"
-                            label="Cancel"
-                            onClick={onDialogCancel}
-                        />
+                        <q-btn rounded color="negative" label="Cancel" onClick={onDialogCancel} />
                     </q-card-actions>
                 </q-card>
             </q-dialog>

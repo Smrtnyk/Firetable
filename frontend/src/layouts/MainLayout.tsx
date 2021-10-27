@@ -1,10 +1,4 @@
-import {
-    computed,
-    defineComponent,
-    ref,
-    resolveDynamicComponent,
-    Transition,
-} from "vue";
+import { computed, defineComponent, ref, resolveDynamicComponent, Transition } from "vue";
 
 // Components
 import AppDrawer from "src/components/AppDrawer/AppDrawer";
@@ -58,15 +52,9 @@ export default defineComponent({
                                 style="padding-bottom: 51px"
                                 class="col-xs-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3"
                             >
-                                {({
-                                    Component,
-                                }: {
-                                    Component: DynamicComponent;
-                                }) => (
+                                {({ Component }: { Component: DynamicComponent }) => (
                                     <Transition name="fade" mode="out-in">
-                                        {() =>
-                                            resolveDynamicComponent(Component)
-                                        }
+                                        {() => resolveDynamicComponent(Component)}
                                     </Transition>
                                 )}
                             </router-view>

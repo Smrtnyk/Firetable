@@ -1,8 +1,4 @@
-import {
-    showConfirm,
-    showErrorMessage,
-    tryCatchLoadingWrapper,
-} from "src/helpers/ui-helpers";
+import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { computed, defineComponent, PropType, ref } from "vue";
 import { GuestData } from "src/types/event";
 import {
@@ -66,9 +62,7 @@ export default defineComponent({
         const showAddNewGuestForm = ref(false);
 
         const eventID = computed(() => route.params.id as string);
-        const reachedCapacity = computed(
-            () => props.guestList.length / props.guestListLimit
-        );
+        const reachedCapacity = computed(() => props.guestList.length / props.guestListLimit);
 
         function onCreate(newGuestData: GuestData) {
             showAddNewGuestForm.value = false;
@@ -78,17 +72,13 @@ export default defineComponent({
                 return;
             }
 
-            tryCatchLoadingWrapper(() =>
-                addGuestToGuestList(eventID.value, newGuestData)
-            ).catch(showErrorMessage);
+            tryCatchLoadingWrapper(() => addGuestToGuestList(eventID.value, newGuestData)).catch(
+                showErrorMessage
+            );
         }
 
         async function deleteGuest(id: string, reset: () => void) {
-            if (
-                !(await showConfirm(
-                    "Do you really want to delete this guest from the guestlist?"
-                ))
-            )
+            if (!(await showConfirm("Do you really want to delete this guest from the guestlist?")))
                 return reset();
 
             await tryCatchLoadingWrapper(
@@ -110,8 +100,7 @@ export default defineComponent({
             <q-drawer
                 model-value={eventsStore.showEventGuestListDrawer}
                 {...{
-                    "onUpdate:modelValue":
-                        eventsStore.toggleEventGuestListDrawerVisibility,
+                    "onUpdate:modelValue": eventsStore.toggleEventGuestListDrawerVisibility,
                 }}
                 className="PageEvent__guest-list-drawer"
                 side="right"
@@ -126,19 +115,14 @@ export default defineComponent({
                                     icon="plus"
                                     class="button-gradient"
                                     onClick={() =>
-                                        (showAddNewGuestForm.value =
-                                            !showAddNewGuestForm.value)
+                                        (showAddNewGuestForm.value = !showAddNewGuestForm.value)
                                     }
                                 />
                             ),
                         }}
                     </f-t-title>
 
-                    <q-linear-progress
-                        stripe
-                        value={reachedCapacity.value}
-                        size="25px"
-                    >
+                    <q-linear-progress stripe value={reachedCapacity.value} size="25px">
                         <div class="absolute-full flex flex-center">
                             <q-badge
                                 color="white"
@@ -149,17 +133,13 @@ export default defineComponent({
                     </q-linear-progress>
 
                     <q-dialog v-model={showAddNewGuestForm.value}>
-                        <event-guest-list-create-guest-form
-                            onCreate={onCreate}
-                        />
+                        <event-guest-list-create-guest-form onCreate={onCreate} />
                     </q-dialog>
 
                     {!props.guestList.length && (
                         <div class="EventGuestList">
                             <div class="justify-center items-center q-pa-md">
-                                <h6 class="text-h6">
-                                    You should invite some people :)
-                                </h6>
+                                <h6 class="text-h6">You should invite some people :)</h6>
                                 <q-img src="people-confirmation.svg" />
                             </div>
                         </div>
@@ -171,43 +151,26 @@ export default defineComponent({
                                 <q-slide-item
                                     key={guest.id}
                                     right-color="warning"
-                                    left-color={
-                                        guest.confirmed ? "red-5" : "green-5"
+                                    left-color={guest.confirmed ? "red-5" : "green-5"}
+                                    onRight={({ reset }: { reset: () => void }) =>
+                                        deleteGuest(guest.id, reset)
                                     }
-                                    onRight={({
-                                        reset,
-                                    }: {
-                                        reset: () => void;
-                                    }) => deleteGuest(guest.id, reset)}
-                                    onLeft={({
-                                        reset,
-                                    }: {
-                                        reset: () => void;
-                                    }) => confirmGuest(guest, reset)}
+                                    onLeft={({ reset }: { reset: () => void }) =>
+                                        confirmGuest(guest, reset)
+                                    }
                                     v-slots={{
                                         right: () => <q-icon name="trash" />,
                                         left: () => (
                                             <q-icon
                                                 color="white"
-                                                name={
-                                                    guest.confirmed
-                                                        ? "close"
-                                                        : "check"
-                                                }
+                                                name={guest.confirmed ? "close" : "check"}
                                             />
                                         ),
                                     }}
                                 >
-                                    <q-item
-                                        clickable
-                                        class={
-                                            guest.confirmed ? "bg-green-4" : ""
-                                        }
-                                    >
+                                    <q-item clickable class={guest.confirmed ? "bg-green-4" : ""}>
                                         <q-item-section>
-                                            <q-item-label>
-                                                {guest.name}
-                                            </q-item-label>
+                                            <q-item-label>{guest.name}</q-item-label>
                                         </q-item-section>
                                     </q-item>
                                 </q-slide-item>

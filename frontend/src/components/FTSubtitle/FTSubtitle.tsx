@@ -6,8 +6,6 @@ export default defineComponent({
     name: "FTSubtitle",
 
     setup(_, { slots }) {
-        return () => (
-            <h3 class="ft-subtitle font-black">{slots.default?.()}</h3>
-        );
+        return () => <h3 class="ft-subtitle font-black">{slots.default?.()}</h3>;
     },
 });

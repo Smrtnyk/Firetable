@@ -16,10 +16,7 @@ export function floorsCollection() {
 }
 
 export function guestListCollection(eventId: string) {
-    return collection(
-        eventsCollection(),
-        eventId + "/" + Collection.GUEST_LIST
-    );
+    return collection(eventsCollection(), eventId + "/" + Collection.GUEST_LIST);
 }
 
 export function usersCollection() {

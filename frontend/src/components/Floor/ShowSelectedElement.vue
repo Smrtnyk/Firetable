@@ -1,8 +1,5 @@
 <template>
-    <div
-        class="row q-pa-sm q-col-gutter-md"
-        v-if="props.selectedFloorElement?.value"
-    >
+    <div class="row q-pa-sm q-col-gutter-md" v-if="props.selectedFloorElement?.value">
         <div class="col-10 flex justify-between">
             <div class="row">
                 <div class="col-4 q-pa-xs q-pl-none">
@@ -21,9 +18,7 @@
                         type="number"
                         step="5"
                         @keydown.prevent="() => false"
-                        @update:model-value="
-                            (val) => updateTableProp('width', val)
-                        "
+                        @update:model-value="(val) => updateTableProp('width', val)"
                     />
                 </div>
                 <div class="col-4 q-pa-xs" v-if="!isRoundTableComp">
@@ -34,9 +29,7 @@
                         type="number"
                         step="5"
                         @keydown.prevent="() => false"
-                        @update:model-value="
-                            (val) => updateTableProp('height', val)
-                        "
+                        @update:model-value="(val) => updateTableProp('height', val)"
                     />
                 </div>
                 <div class="col-4 q-pa-xs">
@@ -62,13 +55,7 @@
     </div>
     <div class="row q-pa-sm" v-else>
         <div class="col q-pa-xs">
-            <q-input
-                model-value="No element selected..."
-                disable
-                readonly
-                filled
-                autogrow
-            />
+            <q-input model-value="No element selected..." disable readonly filled autogrow />
         </div>
     </div>
 </template>
@@ -90,10 +77,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const isRoundTableComp = computed(() => {
-    return (
-        props.selectedFloorElement?.value &&
-        isRoundTable(props.selectedFloorElement.value)
-    );
+    return props.selectedFloorElement?.value && isRoundTable(props.selectedFloorElement.value);
 });
 
 const getRoundTableRadiusComp = computed(() => {
@@ -103,24 +87,15 @@ const getRoundTableRadiusComp = computed(() => {
     );
 });
 
-function updateTableProp(
-    prop: keyof BaseFloorElement,
-    val: string | number
-): void {
+function updateTableProp(prop: keyof BaseFloorElement, val: string | number): void {
     if (!props.selectedFloor || !props.selectedFloorElement) return;
-    props.selectedFloor.value.updateElementProperty(
-        props.selectedFloorElement.value,
-        prop,
-        val
-    );
+    props.selectedFloor.value.updateElementProperty(props.selectedFloorElement.value, prop, val);
 }
 
 async function deleteElement() {
     if (!props.selectedFloor || !props.selectedFloorElement) return;
     if (await showConfirm("Do you really want to delete this element?")) {
-        props.selectedFloor.value.removeElement(
-            props.selectedFloorElement.value
-        );
+        props.selectedFloor.value.removeElement(props.selectedFloorElement.value);
     }
 }
 </script>

@@ -49,18 +49,13 @@ export default defineComponent({
             path: Collection.FLOORS,
         });
 
-        async function onFloorDelete(
-            { id }: Pick<FloorDoc, "id">,
-            reset: () => void
-        ) {
+        async function onFloorDelete({ id }: Pick<FloorDoc, "id">, reset: () => void) {
             if (!(await showConfirm("Delete floor?"))) return reset();
 
             await tryCatchLoadingWrapper(
                 async () => {
                     await deleteFloor(id);
-                    floors.value = floors.value.filter(
-                        (floor) => floor.id !== id
-                    );
+                    floors.value = floors.value.filter((floor) => floor.id !== id);
                 },
                 [],
                 reset
@@ -85,8 +80,7 @@ export default defineComponent({
                                 icon="plus"
                                 class="button-gradient"
                                 onClick={() =>
-                                    (showCreateFloorForm.value =
-                                        !showCreateFloorForm.value)
+                                    (showCreateFloorForm.value = !showCreateFloorForm.value)
                                 }
                                 label="new floor"
                             />
@@ -100,9 +94,7 @@ export default defineComponent({
                             <q-slide-item
                                 key={floor.id}
                                 right-color="warning"
-                                onRight={({ reset }: any) =>
-                                    onFloorDelete(floor, reset)
-                                }
+                                onRight={({ reset }: any) => onFloorDelete(floor, reset)}
                                 class="fa-card"
                             >
                                 {{
@@ -119,9 +111,7 @@ export default defineComponent({
                                                 }}
                                             >
                                                 <q-item-section>
-                                                    <q-item-label>
-                                                        {floor.name}
-                                                    </q-item-label>
+                                                    <q-item-label>{floor.name}</q-item-label>
                                                 </q-item-section>
                                             </q-item>,
                                             [[Ripple, 1]]
@@ -138,10 +128,7 @@ export default defineComponent({
                         <q-btn
                             rounded
                             class="button-gradient q-mx-auto"
-                            onClick={() =>
-                                (showCreateFloorForm.value =
-                                    !showCreateFloorForm.value)
-                            }
+                            onClick={() => (showCreateFloorForm.value = !showCreateFloorForm.value)}
                             size="lg"
                         >
                             Get Started

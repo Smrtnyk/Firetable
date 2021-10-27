@@ -3,15 +3,7 @@ import { useAuthStore } from "src/stores/auth-store";
 
 import { FTTitle } from "components/FTTitle";
 
-import {
-    QItem,
-    QItemSection,
-    QAvatar,
-    QImg,
-    QCard,
-    QItemLabel,
-    QSeparator,
-} from "quasar";
+import { QItem, QItemSection, QAvatar, QImg, QCard, QItemLabel, QSeparator } from "quasar";
 
 export default defineComponent({
     name: "PageProfile",
@@ -31,8 +23,7 @@ export default defineComponent({
         const authStore = useAuthStore();
         const user = computed(() => authStore.user);
         const avatar = computed(
-            () =>
-                `https://avatars.dicebear.com/api/human/${user.value?.email}.svg`
+            () => `https://avatars.dicebear.com/api/human/${user.value?.email}.svg`
         );
 
         return () => {
@@ -54,29 +45,19 @@ export default defineComponent({
                                 <q-separator class="q-my-sm" />
 
                                 {user.value.name && (
-                                    <q-item-label>
-                                        Name: {user.value.name}
-                                    </q-item-label>
+                                    <q-item-label>Name: {user.value.name}</q-item-label>
                                 )}
 
-                                <q-item-label>
-                                    Role: {user.value.role}
-                                </q-item-label>
+                                <q-item-label>Role: {user.value.role}</q-item-label>
 
-                                <q-item-label>
-                                    Region: {user.value.region}
-                                </q-item-label>
+                                <q-item-label>Region: {user.value.region}</q-item-label>
 
                                 {user.value.address && (
-                                    <q-item-label>
-                                        {user.value.address}
-                                    </q-item-label>
+                                    <q-item-label>{user.value.address}</q-item-label>
                                 )}
 
                                 {user.value.mobile && (
-                                    <q-item-label>
-                                        {user.value.mobile}
-                                    </q-item-label>
+                                    <q-item-label>{user.value.mobile}</q-item-label>
                                 )}
                             </q-card>
                         </q-item-section>

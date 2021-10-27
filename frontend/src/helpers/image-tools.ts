@@ -33,10 +33,7 @@ function resizeSync(
         let height = image.height;
         let isTooLarge = false;
 
-        if (
-            (width >= height && width > maxDimensions.width) ||
-            height > maxDimensions.height
-        ) {
+        if ((width >= height && width > maxDimensions.width) || height > maxDimensions.height) {
             isTooLarge = true;
         }
 

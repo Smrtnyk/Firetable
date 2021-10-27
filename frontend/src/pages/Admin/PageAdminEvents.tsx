@@ -1,27 +1,11 @@
 import PageAdminEventsListItem from "components/Event/PageAdminEventsListItem";
 import { EventCreateForm } from "src/components/Event/EventCreateForm";
 
-import {
-    showConfirm,
-    showErrorMessage,
-    tryCatchLoadingWrapper,
-} from "src/helpers/ui-helpers";
+import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { defineComponent, onMounted, ref } from "vue";
 import { DocumentData, QueryDocumentSnapshot } from "@firebase/firestore";
-import {
-    createNewEvent,
-    deleteEvent,
-    getEvents,
-} from "src/services/firebase/db-events";
-import {
-    useQuasar,
-    QBtn,
-    QList,
-    QInfiniteScroll,
-    QSeparator,
-    QSpinnerDots,
-    QImg,
-} from "quasar";
+import { createNewEvent, deleteEvent, getEvents } from "src/services/firebase/db-events";
+import { useQuasar, QBtn, QList, QInfiniteScroll, QSeparator, QSpinnerDots, QImg } from "quasar";
 import { useRouter } from "vue-router";
 import { useFirestore } from "src/composables/useFirestore";
 import { FTTitle } from "components/FTTitle";
@@ -63,25 +47,18 @@ export default defineComponent({
 
         async function init() {
             isLoading.value = true;
-            await tryCatchLoadingWrapper(
-                fetchMoreEvents.bind(null, null),
-                [],
-                () => {
-                    router.replace("/").catch(showErrorMessage);
-                }
-            );
+            await tryCatchLoadingWrapper(fetchMoreEvents.bind(null, null), [], () => {
+                router.replace("/").catch(showErrorMessage);
+            });
             isLoading.value = false;
         }
 
-        async function fetchMoreEvents(
-            lastDoc: QueryDocumentSnapshot<DocumentData> | null
-        ) {
+        async function fetchMoreEvents(lastDoc: QueryDocumentSnapshot<DocumentData> | null) {
             if (!hasMoreEventsToFetch.value) return;
 
             const eventsDocs = await getEvents(lastDoc);
 
-            if (!eventsDocs.length || eventsDocs.length < 20)
-                hasMoreEventsToFetch.value = false;
+            if (!eventsDocs.length || eventsDocs.length < 20) hasMoreEventsToFetch.value = false;
 
             events.value.push(...eventsDocs);
         }
@@ -112,9 +89,7 @@ export default defineComponent({
             await tryCatchLoadingWrapper(
                 async () => {
                     await deleteEvent(event.id);
-                    events.value = events.value.filter(
-                        ({ id }) => id !== event.id
-                    );
+                    events.value = events.value.filter(({ id }) => id !== event.id);
                 },
                 [],
                 reset
@@ -134,10 +109,7 @@ export default defineComponent({
 
         return () => (
             <div class="PageAdminEvents">
-                <event-create-form
-                    floors={floors.value}
-                    onCreate={onCreateEvent}
-                />
+                <event-create-form floors={floors.value} onCreate={onCreateEvent} />
 
                 <f-t-title title="Events">
                     {{
@@ -146,9 +118,7 @@ export default defineComponent({
                                 rounded
                                 icon="plus"
                                 class="button-gradient"
-                                onClick={
-                                    eventsStore.toggleEventCreateModalVisiblity
-                                }
+                                onClick={eventsStore.toggleEventCreateModalVisiblity}
                                 label="new event"
                             />
                         ),
@@ -157,11 +127,7 @@ export default defineComponent({
 
                 {!!events.value.length && !isLoading.value && (
                     <q-list>
-                        <q-infinite-scroll
-                            ref={paginator}
-                            onLoad={onLoad}
-                            offset={50}
-                        >
+                        <q-infinite-scroll ref={paginator} onLoad={onLoad} offset={50}>
                             {{
                                 default: () => (
                                     <>
@@ -177,10 +143,7 @@ export default defineComponent({
                                 ),
                                 loading: () => (
                                     <div class="row justify-center q-my-md">
-                                        <q-spinner-dots
-                                            color="primary"
-                                            size="40px"
-                                        />
+                                        <q-spinner-dots color="primary" size="40px" />
                                     </div>
                                 ),
                             }}

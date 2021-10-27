@@ -20,9 +20,7 @@ export default defineComponent({
             <q-card class="ft-card q-pa-sm q-mb-md">
                 <div class="FTTitle items-center">
                     <h3 class="ft-title q-ma-none">{props.title}</h3>
-                    <div class="text-right ft-title__right">
-                        {slots.right?.()}
-                    </div>
+                    <div class="text-right ft-title__right">{slots.right?.()}</div>
                 </div>
             </q-card>
         );
