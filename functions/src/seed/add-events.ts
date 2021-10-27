@@ -19,11 +19,11 @@ async function addEvents(): Promise<void> {
                 entryPrice: faker.random.number(NUM_OF_FAKE_DATA),
                 guestListLimit: faker.random.number(NUM_OF_FAKE_DATA),
                 floorIds: ids,
-                img: faker.image.nightlife()
+                img: faker.image.nightlife(),
             });
         }
         process.exit();
-    } catch (e) {
+    } catch (e: any) {
         console.log(e.message ?? e);
         process.exit(1);
     }

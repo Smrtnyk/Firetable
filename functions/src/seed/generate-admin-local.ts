@@ -18,25 +18,22 @@ const ADMIN_NAME = "Admin";
     try {
         const user = await auth.createUser({
             email: ADMIN_MAIL,
-            password: ADMIN_PASSWORD
+            password: ADMIN_PASSWORD,
         });
 
         await auth.setCustomUserClaims(user.uid, { role: Role.ADMIN });
         await admin.auth().getUser(user.uid);
 
-        await db
-            .collection(Collection.USERS)
-            .doc(user.uid)
-            .set({
-                email: ADMIN_MAIL,
-                name: ADMIN_NAME,
-                role: Role.ADMIN,
-                floors: [],
-                status: ACTIVITY_STATUS.OFFLINE
-            });
+        await db.collection(Collection.USERS).doc(user.uid).set({
+            email: ADMIN_MAIL,
+            name: ADMIN_NAME,
+            role: Role.ADMIN,
+            floors: [],
+            status: ACTIVITY_STATUS.OFFLINE,
+        });
 
         process.exit();
-    } catch (err) {
+    } catch (err: any) {
         console.log(err.message ?? err);
         process.exit(1);
     }

@@ -11,12 +11,13 @@ const params = {
     authUri: serviceAccount.auth_uri,
     tokenUri: serviceAccount.token_uri,
     authProviderX509CertUrl: serviceAccount.auth_provider_x509_cert_url,
-    clientC509CertUrl: serviceAccount.client_x509_cert_url
+    clientC509CertUrl: serviceAccount.client_x509_cert_url,
 };
 
 const app = admin.initializeApp({
+    projectId: params.projectId,
     credential: admin.credential.cert(params),
-    storageBucket: "firetable-eu.appspot.com"
+    storageBucket: "firetable-eu.appspot.com",
 });
 
 export const db = app.firestore();

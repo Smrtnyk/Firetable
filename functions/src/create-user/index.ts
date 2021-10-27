@@ -8,7 +8,7 @@ export async function createUser(user: CreateUserPayload): Promise<void> {
     try {
         const createdUser = await auth.createUser({
             email,
-            password
+            password,
         });
         await auth.setCustomUserClaims(createdUser.uid, { role });
         await db.collection(Collection.USERS).doc(createdUser.uid).set({
@@ -16,9 +16,9 @@ export async function createUser(user: CreateUserPayload): Promise<void> {
             email,
             role,
             floors,
-            status: ACTIVITY_STATUS.OFFLINE
+            status: ACTIVITY_STATUS.OFFLINE,
         });
-    } catch (e) {
+    } catch (e: any) {
         throw new functions.https.HttpsError(e.code, e.message);
     }
 }

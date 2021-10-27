@@ -111,7 +111,7 @@ module.exports = {
         // "arrow-body-style": ["error", "always"],
         "arrow-spacing": ["error", { before: true, after: true }],
         "brace-style": "error",
-        "comma-dangle": "error",
+        "comma-dangle": "off",
         "comma-spacing": "off", // Off in the favor of @typescript-eslint/comma-spacing
         "constructor-super": "error",
         curly: "error",

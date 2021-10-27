@@ -6,7 +6,11 @@ import "firebase-functions/lib/logger/compat";
 import diff from "diff-arrays-of-objects";
 import { Collection } from "../../types/database";
 import { db } from "../init";
-import { ChangeType, UpdatedTablesDifference, PushSubscriptionDoc } from "../../types/types";
+import {
+    ChangeType,
+    UpdatedTablesDifference,
+    PushSubscriptionDoc,
+} from "../../types/types";
 import { BaseFloorElement, ElementType, TableElement } from "../../types/floor";
 
 const { logger } = functions;
@@ -21,10 +25,14 @@ async function addToEventFeed(
     const { reservation, tableId } = table;
     switch (change) {
         case ChangeType.ADD:
-            body = `${reservation!.reservedBy.email} made new reservation on table ${tableId}`; // NOSONAR
+            body = `${
+                reservation!.reservedBy.email
+            } made new reservation on table ${tableId}`; // NOSONAR
             break;
         case ChangeType.DELETE:
-            body = `${reservation!.reservedBy.email} deleted a reservation on table ${tableId}`; // NOSONAR
+            body = `${
+                reservation!.reservedBy.email
+            } deleted a reservation on table ${tableId}`; // NOSONAR
             break;
         default:
             body = "";
@@ -32,11 +40,13 @@ async function addToEventFeed(
     await feedCollection.add({
         body,
         timestamp: Date.now(),
-        type
+        type,
     });
 }
 
-async function getMessagingTokensFromFirestore(): Promise<PushSubscriptionDoc[]> {
+async function getMessagingTokensFromFirestore(): Promise<
+    PushSubscriptionDoc[]
+> {
     const tokensColl = await db.collection(Collection.FCM).get();
     const tokens: PushSubscriptionDoc[] = [];
     tokensColl.docs.forEach((doc) => {
@@ -49,19 +59,29 @@ async function getMessagingTokensFromFirestore(): Promise<PushSubscriptionDoc[]>
     return tokens;
 }
 
-async function sendPushMessageToSubscriptions(tokens: PushSubscriptionDoc[], title: string, body: string): Promise<void> {
+async function sendPushMessageToSubscriptions(
+    tokens: PushSubscriptionDoc[],
+    title: string,
+    body: string
+): Promise<void> {
     for (const token of tokens) {
         const { endpoint, keys, id: docID } = token;
         logger.log("Processing token: ", { endpoint, keys });
         if (!endpoint.startsWith("https://fcm.googleapis")) {
-            logger.log("Subscription endpoint does not belong to google cloud!");
+            logger.log(
+                "Subscription endpoint does not belong to google cloud!"
+            );
             continue;
         }
         logger.log("[INFO] Sending push to devices!");
         try {
             await sendNotification({ endpoint, keys }, `${title}|${body}`);
-        } catch (error) {
-            if (error.body.includes("push subscription has unsubscribed or expired")) {
+        } catch (error: any) {
+            if (
+                error.body.includes(
+                    "push subscription has unsubscribed or expired"
+                )
+            ) {
                 await db.collection(Collection.FCM).doc(docID).delete();
             }
             logger.error("Error occurred while sending subscription", error);
@@ -69,7 +89,9 @@ async function sendPushMessageToSubscriptions(tokens: PushSubscriptionDoc[], tit
     }
 }
 
-async function handlePushMessagesOnNewReservation(table: TableElement): Promise<void> {
+async function handlePushMessagesOnNewReservation(
+    table: TableElement
+): Promise<void> {
     logger.log("Reservation is added!", table);
 
     const { id, reservation } = table;
@@ -101,21 +123,36 @@ function getDifferenceBetweenTables(
         logger.error("Invalid data!");
     }
 
-    const prevTablesReservations: TableElement[] = prevData.data.filter(({ reservation }: TableElement) => !!reservation);
-    const newTablesReservations: TableElement[] = newData.data.filter(({ reservation }: TableElement) => !!reservation);
+    const prevTablesReservations: TableElement[] = prevData.data.filter(
+        ({ reservation }: TableElement) => !!reservation
+    );
+    const newTablesReservations: TableElement[] = newData.data.filter(
+        ({ reservation }: TableElement) => !!reservation
+    );
 
     logger.log("Init on new reservation!");
-    const { added, removed } = diff(prevTablesReservations, newTablesReservations, "id");
-    const { updated } = diff(prevTablesReservations, newTablesReservations, "reservation");
+    const { added, removed } = diff(
+        prevTablesReservations,
+        newTablesReservations,
+        "id"
+    );
+    const { updated } = diff(
+        prevTablesReservations,
+        newTablesReservations,
+        "reservation"
+    );
 
     return {
         added,
         removed,
-        updated
+        updated,
     };
 }
 
-async function handleAddedReservation(context: functions.EventContext, added: TableElement[]): Promise<void> {
+async function handleAddedReservation(
+    context: functions.EventContext,
+    added: TableElement[]
+): Promise<void> {
     if (!added || !added.length) {
         return;
     }
@@ -125,14 +162,20 @@ async function handleAddedReservation(context: functions.EventContext, added: Ta
             ChangeType.ADD,
             table,
             "Reservation",
-            db.collection(`${Collection.EVENTS}/${context.params.eventId}/eventFeed`)
+            db.collection(
+                `${Collection.EVENTS}/${context.params.eventId}/eventFeed`
+            )
         );
     }
 }
 
-async function updateEventReservationCount(context: functions.EventContext): Promise<void> {
+async function updateEventReservationCount(
+    context: functions.EventContext
+): Promise<void> {
     const PERCENTILE_BASE = 100;
-    const eventRef = db.collection(Collection.EVENTS).doc(context.params.eventId);
+    const eventRef = db
+        .collection(Collection.EVENTS)
+        .doc(context.params.eventId);
     const allEventFloors = await eventRef.collection(Collection.FLOORS).get();
 
     if (allEventFloors.empty) {
@@ -144,15 +187,19 @@ async function updateEventReservationCount(context: functions.EventContext): Pro
     for (const doc of allEventFloors.docs) {
         const floor = doc.data();
 
-        const tables = floor.data.filter((el: BaseFloorElement) => el.type === ElementType.TABLE);
+        const tables = floor.data.filter(
+            (el: BaseFloorElement) => el.type === ElementType.TABLE
+        );
         overallTables += tables.length;
-        overallReserved += tables.filter((table: TableElement) => !!table.reservation).length;
+        overallReserved += tables.filter(
+            (table: TableElement) => !!table.reservation
+        ).length;
     }
 
     const percentage = (overallReserved / overallTables) * PERCENTILE_BASE;
     console.log(percentage);
     await eventRef.update({
-        reservedPercentage: percentage
+        reservedPercentage: percentage,
     });
 }
 
