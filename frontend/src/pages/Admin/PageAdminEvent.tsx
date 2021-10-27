@@ -8,6 +8,7 @@ import { FTTitle } from "components/FTTitle";
 import { FTSubtitle } from "components/FTSubtitle";
 import { EventFeedList } from "components/Event/EventFeedList";
 import AdminEventGeneralInfo from "components/admin/event/AdminEventGeneralInfo.vue";
+import AdminEventReservationsByPerson from "components/admin/event/AdminEventReservationsByPerson.vue";
 
 import { QSeparator } from "quasar";
 import { Collection } from "src/types/firebase";
@@ -22,6 +23,7 @@ export default defineComponent({
         FTSubtitle,
         EventFeedList,
         AdminEventGeneralInfo,
+        AdminEventReservationsByPerson,
 
         QSeparator,
     },
@@ -107,6 +109,7 @@ export default defineComponent({
                     </f-t-title>
 
                     <admin-event-general-info reservations-status={reservationsStatus.value} />
+                    <admin-event-reservations-by-person reservations={eventData.value} />
 
                     {!!eventFeed.value?.length && (
                         <>
