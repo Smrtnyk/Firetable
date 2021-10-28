@@ -21,10 +21,17 @@ Implemented functions:
 * Trigger function that removes image of an event from storage when event is deleted
 * Trigger function that listens on reservation creation and does various calculations and push messaging to the users
 
+---
+
+App localy communicates with firebase emulator as it's backend service, so make sure to install `firebase-tools` globaly.
+>npm i -g firebase-tools
+
 Translation of an app is in progress.
 
 Feel free to fork and use this however you want.
 All contributions and ideas are welcome.
+
+---
 
 ### Floor editor
 ![Floor editor](https://github.com/Smrtnyk/Firetable/blob/master/screenshots/floor-editor.jpg?raw=true)
