@@ -1,16 +1,15 @@
 import { FloorDoc, TableElement } from "src/types/floor";
-import { computed, defineComponent, onMounted } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { formatEventDate } from "src/helpers/utils";
 import { useFirestore } from "src/composables/useFirestore";
 
 import { FTTitle } from "components/FTTitle";
-import { FTSubtitle } from "components/FTSubtitle";
 import { EventFeedList } from "components/Event/EventFeedList";
 import AdminEventGeneralInfo from "components/admin/event/AdminEventGeneralInfo.vue";
 import AdminEventReservationsByPerson from "components/admin/event/AdminEventReservationsByPerson.vue";
 
-import { QSeparator } from "quasar";
+import { QSeparator, QTab, QTabPanel, QTabPanels, QTabs } from "quasar";
 import { Collection } from "src/types/firebase";
 import { EventDoc, EventFeedDoc } from "src/types/event";
 import { showErrorMessage } from "src/helpers/ui-helpers";
@@ -20,12 +19,15 @@ export default defineComponent({
     name: "PageAdminEvent",
     components: {
         FTTitle,
-        FTSubtitle,
         EventFeedList,
         AdminEventGeneralInfo,
         AdminEventReservationsByPerson,
 
         QSeparator,
+        QTab,
+        QTabPanel,
+        QTabPanels,
+        QTabs,
     },
     props: {
         id: {
@@ -35,6 +37,7 @@ export default defineComponent({
     },
     setup(props) {
         const router = useRouter();
+        const tab = ref("info");
 
         const { data: eventFloors } = useFirestore<FloorDoc>({
             type: "watch",
@@ -107,19 +110,28 @@ export default defineComponent({
                             ),
                         }}
                     </f-t-title>
+                    <q-tabs v-model={tab.value} dense align="justify" narrow-indicator>
+                        <q-tab name="info" label="Info" />
+                        <q-tab name="activity" label="Activity" />
+                    </q-tabs>
+                    <div class="q-gutter-y-md">
+                        <q-tab-panels v-model={tab.value} animated>
+                            <q-tab-panel name="info">
+                                <admin-event-general-info
+                                    reservations-status={reservationsStatus.value}
+                                />
+                                <admin-event-reservations-by-person
+                                    reservations={eventData.value}
+                                />
+                            </q-tab-panel>
 
-                    <admin-event-general-info reservations-status={reservationsStatus.value} />
-                    <admin-event-reservations-by-person reservations={eventData.value} />
-
-                    {!!eventFeed.value?.length && (
-                        <>
-                            <q-separator class="q-my-md" />
-
-                            <f-t-subtitle>Log</f-t-subtitle>
-
-                            <event-feed-list event-feed={eventFeed.value} />
-                        </>
-                    )}
+                            <q-tab-panel name="activity">
+                                {!!eventFeed.value?.length && (
+                                    <event-feed-list event-feed={eventFeed.value} />
+                                )}
+                            </q-tab-panel>
+                        </q-tab-panels>
+                    </div>
                 </div>
             );
         };
