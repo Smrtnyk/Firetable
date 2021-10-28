@@ -24,6 +24,7 @@ export interface EventDoc {
     name: string;
     reservedPercentage: number;
     guestListLimit: number;
+    info?: string;
     _doc: QueryDocumentSnapshot<EventDoc>;
 }
 

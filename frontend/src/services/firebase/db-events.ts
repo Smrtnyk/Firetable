@@ -4,6 +4,7 @@ import {
     deleteCollection,
     guestDoc,
     eventFloorDoc,
+    eventDoc,
 } from "./db";
 import { CreateEventPayload, EventDoc, GuestData } from "src/types/event";
 import { functions } from "src/services/firebase/base";
@@ -44,6 +45,16 @@ export async function getEvents(lastDocument: DocumentData | null): Promise<Even
 
 export function deleteEvent(id: string) {
     return deleteCollection(id);
+}
+
+export function updateEventProperty<T extends keyof EventDoc>(
+    eventId: string,
+    key: T,
+    value: EventDoc[T]
+) {
+    return updateDoc(eventDoc(eventId), {
+        [key]: value,
+    });
 }
 
 export function createNewEvent(eventPayload: CreateEventPayload) {

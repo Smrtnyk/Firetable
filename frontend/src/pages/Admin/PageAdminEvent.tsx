@@ -8,8 +8,10 @@ import { FTTitle } from "components/FTTitle";
 import { EventFeedList } from "components/Event/EventFeedList";
 import AdminEventGeneralInfo from "components/admin/event/AdminEventGeneralInfo.vue";
 import AdminEventReservationsByPerson from "components/admin/event/AdminEventReservationsByPerson.vue";
+import AdminEventEditInfo from "components/admin/event/AdminEventEditInfo.vue";
+import FTDialog from "components/FTDialog.vue";
 
-import { QSeparator, QTab, QTabPanel, QTabPanels, QTabs } from "quasar";
+import { QSeparator, QTab, QTabPanel, QTabPanels, QTabs, QBtn, useQuasar } from "quasar";
 import { Collection } from "src/types/firebase";
 import { EventDoc, EventFeedDoc } from "src/types/event";
 import { showErrorMessage } from "src/helpers/ui-helpers";
@@ -19,7 +21,9 @@ export default defineComponent({
     name: "PageAdminEvent",
     components: {
         FTTitle,
+        FTDialog,
         EventFeedList,
+        AdminEventEditInfo,
         AdminEventGeneralInfo,
         AdminEventReservationsByPerson,
 
@@ -28,6 +32,7 @@ export default defineComponent({
         QTabPanel,
         QTabPanels,
         QTabs,
+        QBtn,
     },
     props: {
         id: {
@@ -37,6 +42,7 @@ export default defineComponent({
     },
     setup(props) {
         const router = useRouter();
+        const quasar = useQuasar();
         const tab = ref("info");
 
         const { data: eventFloors } = useFirestore<FloorDoc>({
@@ -46,7 +52,7 @@ export default defineComponent({
         });
 
         const { data: event } = useFirestore<EventDoc>({
-            type: "get",
+            type: "watch",
             queryType: "doc",
             path: `${Collection.EVENTS}/${props.id}`,
             onError() {
@@ -90,6 +96,20 @@ export default defineComponent({
             }
         }
 
+        function handleShowComponentInDialog(type: string): void {
+            if (!event.value) return;
+            quasar.dialog({
+                component: FTDialog,
+                componentProps: {
+                    component: AdminEventEditInfo,
+                    componentPropsObject: {
+                        eventInfo: event.value.info || "",
+                        eventId: event.value.id,
+                    },
+                },
+            });
+        }
+
         onMounted(init);
 
         return () => {
@@ -113,6 +133,7 @@ export default defineComponent({
                     <q-tabs v-model={tab.value} dense align="justify" narrow-indicator>
                         <q-tab name="info" label="Info" />
                         <q-tab name="activity" label="Activity" />
+                        <q-tab name="edit" label="Edit" />
                     </q-tabs>
                     <div class="q-gutter-y-md">
                         <q-tab-panels v-model={tab.value} animated>
@@ -129,6 +150,11 @@ export default defineComponent({
                                 {!!eventFeed.value?.length && (
                                     <event-feed-list event-feed={eventFeed.value} />
                                 )}
+                            </q-tab-panel>
+                            <q-tab-panel name="edit">
+                                <q-btn onClick={handleShowComponentInDialog.bind("editEvent")}>
+                                    Edit event info
+                                </q-btn>
                             </q-tab-panel>
                         </q-tab-panels>
                     </div>
