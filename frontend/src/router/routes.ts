@@ -37,7 +37,7 @@ const routes: RouteRecordRaw[] = [
                 name: "adminEvent",
                 meta: { requiresAuth: true, requiresAdmin: true },
                 props: true,
-                component: () => import("pages/Admin/PageAdminEvent"),
+                component: () => import("pages/Admin/PageAdminEvent.vue"),
             },
             {
                 path: "/admin/events/:id/edit",
