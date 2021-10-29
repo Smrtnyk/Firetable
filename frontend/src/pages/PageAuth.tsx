@@ -8,7 +8,7 @@ import { minLength, noEmptyString } from "src/helpers/form-rules";
 import { QInput, QImg, QBtn, QForm, QIcon } from "quasar";
 
 export default defineComponent({
-    name: "Auth",
+    name: "PageAuth",
 
     components: { QInput, QImg, QBtn, QForm, QIcon },
 

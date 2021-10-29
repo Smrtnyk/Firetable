@@ -4,7 +4,7 @@ import { useRouter } from "vue-router";
 import { QBtn } from "quasar";
 
 export default defineComponent({
-    name: "Error404",
+    name: "CatchAllPage",
 
     components: { QBtn },
 

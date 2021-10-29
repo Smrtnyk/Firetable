@@ -12,7 +12,7 @@ import { Collection } from "src/types/firebase";
 import { EventDoc } from "src/types/event";
 
 export default defineComponent({
-    name: "Home",
+    name: "PageHome",
 
     components: {
         QImg,

@@ -17,6 +17,6 @@ interface Props {
 // eslint-disable-next-line no-undef
 const props = defineProps<Props>();
 const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent();
-// eslint-disable-next-line no-undef
+// eslint-disable-next-line no-undef,vue/valid-define-emits
 defineEmits(useDialogPluginComponent.emits);
 </script>
