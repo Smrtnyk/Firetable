@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import { useDialogPluginComponent } from "quasar";
-import { ref, ComponentPublicInstance } from "vue";
+import { ComponentPublicInstance } from "vue";
 
 interface Props {
     component: ComponentPublicInstance;

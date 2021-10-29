@@ -16,7 +16,6 @@ import {
     Tooltip,
     SubTitle,
 } from "chart.js";
-import { color } from "chart.js/helpers";
 import { ref, watch } from "vue";
 import { TableElement } from "src/types/floor";
 

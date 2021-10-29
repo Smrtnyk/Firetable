@@ -37,9 +37,9 @@
 
 <script setup lang="ts">
 import { FloorDoc, TableElement } from "src/types/floor";
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import { formatEventDate } from "src/helpers/utils";
+import { formatEventDate } from "src/helpers/utils"; // NOSONAR
 import { useFirestore } from "src/composables/useFirestore";
 
 import { FTTitle } from "components/FTTitle";
@@ -49,7 +49,7 @@ import AdminEventReservationsByPerson from "components/admin/event/AdminEventRes
 import AdminEventEditInfo from "components/admin/event/AdminEventEditInfo.vue";
 import FTDialog from "components/FTDialog.vue";
 
-import { QSeparator, QTab, QTabPanel, QTabPanels, QTabs, QBtn, useQuasar } from "quasar";
+import { useQuasar } from "quasar";
 import { Collection } from "src/types/firebase";
 import { EventDoc, EventFeedDoc } from "src/types/event";
 import { showErrorMessage } from "src/helpers/ui-helpers";
