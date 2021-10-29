@@ -16,7 +16,7 @@ const routes: RouteRecordRaw[] = [
                 name: "event",
                 meta: { requiresAuth: true },
                 props: true,
-                component: () => import("pages/PageEvent"),
+                component: () => import("pages/PageEvent.vue"),
             },
             {
                 path: "/profile",
