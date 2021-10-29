@@ -43,8 +43,8 @@
 
         <f-t-autocomplete
             :all-reserved-tables="allReservedTables"
-            :on-found="onTableFound"
-            :on-clear="onAutocompleteClear"
+            @found="onTableFound"
+            @clear="onAutocompleteClear"
             class="q-mb-sm"
         />
 
@@ -71,7 +71,7 @@ import { EventCreateReservation } from "components/Event/EventCreateReservation"
 import { EventShowReservation } from "components/Event/EventShowReservation"; // NOSONAR
 import { EventGuestList } from "components/Event/EventGuestList";
 import { FTTitle } from "components/FTTitle";
-import FTAutocomplete from "components/Event/FTAutocomplete";
+import FTAutocomplete from "components/Event/FTAutocomplete.vue";
 import EventInfo from "components/Event/EventInfo";
 
 import { DialogChainObject, Loading, useQuasar } from "quasar";
