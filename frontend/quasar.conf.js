@@ -26,23 +26,13 @@ module.exports = configure(function (ctx) {
 
         css: ["app.scss"],
 
-        sourceFiles: {
-            rootComponent: "src/App",
-        },
-
         framework: {
             lang: "de",
 
             cssAddon: true,
 
             // Quasar plugins
-            plugins: [
-                "Notify",
-                "Dialog",
-                "LocalStorage",
-                "Loading",
-                "BottomSheet",
-            ],
+            plugins: ["Notify", "Dialog", "LocalStorage", "Loading", "BottomSheet"],
         },
 
         build: {
@@ -53,9 +43,7 @@ module.exports = configure(function (ctx) {
             chainWebpack(chain) {
                 chain
                     .plugin("eslint-webpack-plugin")
-                    .use(ESLintPlugin, [
-                        { extensions: ["js", "vue", "tsx", "ts"] },
-                    ]);
+                    .use(ESLintPlugin, [{ extensions: ["js", "vue", "tsx", "ts"] }]);
                 chain.module
                     .rule("tsx")
                     .test(/\.ts(x?)$/)
