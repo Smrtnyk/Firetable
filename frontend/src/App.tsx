@@ -13,13 +13,7 @@ export default defineComponent({
     setup() {
         const q = useQuasar();
 
-        q.iconMapFn = function (iconName: string) {
-            const icon = myIcons[iconName];
-            if (icon) {
-                return { icon };
-            }
-        };
-
+        q.iconMapFn = (iconName) => ({ icon: myIcons[iconName] });
         q.dark.set(getDarkMode());
 
         return () => (
