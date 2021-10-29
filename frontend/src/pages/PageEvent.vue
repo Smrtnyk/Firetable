@@ -71,8 +71,8 @@ import { EventCreateReservation } from "components/Event/EventCreateReservation"
 import { EventShowReservation } from "components/Event/EventShowReservation"; // NOSONAR
 import { EventGuestList } from "components/Event/EventGuestList";
 import { FTTitle } from "components/FTTitle";
-import FTAutocomplete from "components/Event/FTAutocomplete.vue";
-import EventInfo from "components/Event/EventInfo";
+import FTAutocomplete from "components/Event/FTAutocomplete.vue"; // NOSONAR
+import EventInfo from "components/Event/EventInfo"; // NOSONAR
 
 import { DialogChainObject, Loading, useQuasar } from "quasar";
 
@@ -80,16 +80,7 @@ import { useRouter } from "vue-router";
 import { Floor } from "src/floor-manager/Floor";
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 
-import {
-    computed,
-    defineComponent,
-    nextTick,
-    onMounted,
-    reactive,
-    ref,
-    watch,
-    withModifiers,
-} from "vue";
+import { computed, nextTick, onMounted, reactive, ref, watch } from "vue";
 import { isTable } from "src/floor-manager/type-guards";
 import { getFreeTables, getReservedTables } from "src/floor-manager/filters";
 import { updateEventFloorData } from "src/services/firebase/db-events";
