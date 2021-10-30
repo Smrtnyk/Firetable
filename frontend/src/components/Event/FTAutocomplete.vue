@@ -28,9 +28,7 @@ interface Props {
     allReservedTables: TableElement[];
 }
 
-// eslint-disable-next-line no-undef
 const props = defineProps<Props>();
-// eslint-disable-next-line no-undef
 const emit = defineEmits(["found", "clear"]);
 
 const searchTerm = ref("");

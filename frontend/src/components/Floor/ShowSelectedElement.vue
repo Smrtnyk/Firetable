@@ -73,7 +73,6 @@ interface Props {
     selectedFloorElement: Ref<BaseFloorElement> | null;
 }
 
-// eslint-disable-next-line no-undef
 const props = defineProps<Props>();
 
 const isRoundTableComp = computed(() => {

@@ -102,7 +102,7 @@ interface State {
 interface Props {
     id: string;
 }
-// eslint-disable-next-line no-undef
+
 const props = defineProps<Props>();
 const state = reactive<State>({
     showMapsExpanded: false,

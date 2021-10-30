@@ -58,9 +58,8 @@ import { isTable } from "src/floor-manager/type-guards";
 interface Props {
     id: string;
 }
-// eslint-disable-next-line no-undef
-const props = defineProps<Props>();
 
+const props = defineProps<Props>();
 const router = useRouter();
 const quasar = useQuasar();
 const tab = ref("info");

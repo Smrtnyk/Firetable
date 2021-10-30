@@ -26,6 +26,7 @@ module.exports = {
 
     env: {
         browser: true,
+        "vue/setup-compiler-macros": true,
     },
     globals: {
         ga: "readonly", // Google Analytics

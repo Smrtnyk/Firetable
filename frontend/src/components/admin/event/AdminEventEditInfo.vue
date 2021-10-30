@@ -12,7 +12,7 @@ interface Props {
     eventId: string;
     eventInfo: string;
 }
-// eslint-disable-next-line no-undef
+
 const props = defineProps<Props>();
 const localEventInfoValue = ref(props.eventInfo);
 

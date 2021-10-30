@@ -21,6 +21,5 @@ interface Props {
     reservationsStatus: ReservationsStatus;
 }
 
-// eslint-disable-next-line no-undef
 const props = defineProps<Props>();
 </script>

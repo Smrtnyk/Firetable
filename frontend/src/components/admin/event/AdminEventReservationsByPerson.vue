@@ -62,7 +62,6 @@ const borderColors = [
 ];
 
 const chartRef = ref<HTMLCanvasElement | null>(null);
-// eslint-disable-next-line no-undef
 const props = defineProps<Props>();
 
 function reservationsReducer(acc: Res, { reservation }: TableElement) {
