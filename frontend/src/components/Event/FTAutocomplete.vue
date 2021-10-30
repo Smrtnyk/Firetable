@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineComponent, ref, PropType } from "vue";
+import { ref } from "vue";
 import { TableElement } from "src/types/floor";
 import { useI18n } from "vue-i18n";
 

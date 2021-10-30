@@ -320,22 +320,17 @@ function checkIfReservedTableAndCloseCreateReservationDialog() {
 }
 
 function updateFloorInstancesData() {
-    try {
-        if (!eventFloors.value.length) return;
+    if (!eventFloors.value.length) return;
 
-        for (const floorInstance of state.floorInstances) {
-            const findFloor = eventFloors.value.find(({ id }) => id === floorInstance.id);
+    for (const floorInstance of state.floorInstances) {
+        const findFloor = eventFloors.value.find(({ id }) => id === floorInstance.id);
 
-            if (!findFloor) {
-                return;
-            }
-
-            floorInstance.data = findFloor.data;
-            floorInstance.renderTableElements();
+        if (!findFloor) {
+            return;
         }
-    } catch (e) {
-        // Seems like there is an issue with rendering the instances before the refs are even created
-        // I guess at the begining the updated lifecycle hook still fires but there is nothing to render into
+
+        floorInstance.data = findFloor.data;
+        floorInstance.renderTableElements();
     }
 }
 
@@ -346,6 +341,7 @@ async function initFloorInstancesData() {
 }
 
 async function handleFloorInstancesData(newVal: FloorDoc[], old: FloorDoc[]) {
+    if (!eventFloors.value) return;
     if (!old.length && newVal.length) {
         await initFloorInstancesData();
         return;
