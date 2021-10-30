@@ -71,7 +71,7 @@ const routes: RouteRecordRaw[] = [
         path: "/auth",
         name: "auth",
         meta: { requiresAuth: false },
-        component: () => import("pages/PageAuth"),
+        component: () => import("pages/PageAuth.vue"),
     },
     // Always leave this as last one,
     // but you can also remove it
