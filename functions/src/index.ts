@@ -10,7 +10,7 @@ import { deleteUser } from "./delete-user";
 import { deleteDocument } from "./delete-document";
 import { clearOldEvents } from "./clear-old-events";
 
-setVapidDetails(vapidKeys.subject, vapidKeys.public, vapidKeys.secret);
+setVapidDetails(vapidKeys.subject, vapidKeys.publicKey, vapidKeys.privateKey);
 
 // Everything that has to do with events
 exports.createEvent = functions

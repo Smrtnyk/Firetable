@@ -1,7 +1,7 @@
 import { deleteDocument } from "../delete-document";
 import { Collection } from "../../types/database";
 import { db } from "../init";
-import { firestore } from "firebase-admin/lib/firestore";
+import { firestore } from "firebase-admin";
 
 export async function clearOldEvents(): Promise<void> {
     const oldEvents = await getOldEvents();

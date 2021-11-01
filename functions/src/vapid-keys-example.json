@@ -1,5 +1,5 @@
 {
     "subject": "mailto:your email",
-    "public": "public key",
-    "secret": "secret key"
-};
+    "publicKey": "public key",
+    "privateKey": "secret key"
+}
