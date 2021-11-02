@@ -56,7 +56,7 @@ const routes: RouteRecordRaw[] = [
                 path: "/admin/floors",
                 name: "adminFloors",
                 meta: { requiresAuth: true, requiresAdmin: true },
-                component: () => import("pages/Admin/PageAdminFloors"),
+                component: () => import("pages/Admin/PageAdminFloors.vue"),
             },
             {
                 path: "/admin/floors/:floorID",
