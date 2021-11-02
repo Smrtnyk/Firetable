@@ -69,6 +69,10 @@ export class Floor {
             throw new Error("Floor document must be defined in order to instantiate a floor map!");
         }
 
+        if (!container) {
+            throw new Error("Container must be set!");
+        }
+
         const { name, width, height, data, id } = floorDoc;
 
         this.id = id;
@@ -77,8 +81,7 @@ export class Floor {
         this.name = name;
         this.width = width;
         this.height = height;
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        this.container = container!;
+        this.container = container;
 
         // Handlers
         this.dblClickHandler = dblClickHandler;
