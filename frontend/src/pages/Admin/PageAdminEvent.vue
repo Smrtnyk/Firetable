@@ -1,40 +1,3 @@
-<template>
-    <div v-if="event" class="PageAdminEvent">
-        <f-t-title :title="event.name">
-            <template #right>
-                <div class="column">
-                    <span class="text-caption">Event date</span>
-                    <span>
-                        {{ formatEventDate(event.date) }}
-                    </span>
-                </div>
-            </template>
-        </f-t-title>
-        <q-tabs v-model="tab" dense align="justify" narrow-indicator>
-            <q-tab name="info" label="Info" />
-            <q-tab name="activity" label="Activity" />
-            <q-tab name="edit" label="Edit" />
-        </q-tabs>
-        <div class="q-gutter-y-md">
-            <q-tab-panels v-model="tab" animated>
-                <q-tab-panel name="info">
-                    <admin-event-general-info :reservations-status="reservationsStatus" />
-                    <admin-event-reservations-by-person :reservations="eventData" />
-                </q-tab-panel>
-
-                <q-tab-panel name="activity">
-                    <event-feed-list v-if="eventFeed.length" :event-feed="eventFeed" />
-                </q-tab-panel>
-                <q-tab-panel name="edit">
-                    <q-btn @click="() => handleShowComponentInDialog('editEvent')">
-                        Edit event info
-                    </q-btn>
-                </q-tab-panel>
-            </q-tab-panels>
-        </div>
-    </div>
-</template>
-
 <script setup lang="ts">
 import { FloorDoc, TableElement } from "src/types/floor";
 import { computed, onMounted, ref } from "vue";
@@ -131,3 +94,40 @@ function handleShowComponentInDialog(type: string): void {
 
 onMounted(init);
 </script>
+
+<template>
+    <div v-if="event" class="PageAdminEvent">
+        <FTTitle :title="event.name">
+            <template #right>
+                <div class="column">
+                    <span class="text-caption">Event date</span>
+                    <span>
+                        {{ formatEventDate(event.date) }}
+                    </span>
+                </div>
+            </template>
+        </FTTitle>
+        <q-tabs v-model="tab" dense align="justify" narrow-indicator>
+            <q-tab name="info" label="Info" />
+            <q-tab name="activity" label="Activity" />
+            <q-tab name="edit" label="Edit" />
+        </q-tabs>
+        <div class="q-gutter-y-md">
+            <q-tab-panels v-model="tab" animated>
+                <q-tab-panel name="info">
+                    <AdminEventGeneralInfo :reservations-status="reservationsStatus" />
+                    <AdminEventReservationsByPerson :reservations="eventData" />
+                </q-tab-panel>
+
+                <q-tab-panel name="activity">
+                    <EventFeedList v-if="eventFeed.length" :event-feed="eventFeed" />
+                </q-tab-panel>
+                <q-tab-panel name="edit">
+                    <q-btn @click="() => handleShowComponentInDialog('editEvent')">
+                        Edit event info
+                    </q-btn>
+                </q-tab-panel>
+            </q-tab-panels>
+        </div>
+    </div>
+</template>
