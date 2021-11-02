@@ -50,12 +50,16 @@
 
         <div
             v-for="floor of eventFloors"
-            :ref="(el) => eventFloorsRef(floor, el)"
             :key="floor.id"
-            :id="floor.id"
-            class="eventFloor tab-pane ft-card"
+            class="tab-pane"
             :class="{ 'active show': isActiveFloor(floor) }"
-        />
+        >
+            <div
+                :id="floor.id"
+                class="eventFloor ft-card"
+                :ref="(el) => eventFloorsRef(floor, el)"
+            ></div>
+        </div>
 
         <EventGuestList :guest-list-limit="Number(event.guestListLimit)" :guest-list="guestList" />
 
@@ -364,29 +368,5 @@ onMounted(init);
 .PageEvent {
     padding-left: 2px;
     padding-right: 2px;
-}
-
-.eventFloor {
-    svg {
-        cursor: default;
-        user-select: none;
-        background-color: #333;
-        border-radius: $border-radius;
-        max-height: 100vh;
-    }
-
-    rect.table__blink,
-    circle.table__blink {
-        animation: blink 500ms linear infinite;
-    }
-
-    @keyframes blink {
-        0% {
-            opacity: 100%;
-        }
-        50% {
-            opacity: 0;
-        }
-    }
 }
 </style>

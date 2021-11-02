@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FloorDoc, TableElement } from "src/types/floor";
+import { FloorDoc, FloorMode, TableElement } from "src/types/floor";
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { formatEventDate } from "src/helpers/utils"; // NOSONAR
@@ -10,6 +10,7 @@ import { EventFeedList } from "components/Event/EventFeedList";
 import AdminEventGeneralInfo from "components/admin/event/AdminEventGeneralInfo.vue";
 import AdminEventReservationsByPerson from "components/admin/event/AdminEventReservationsByPerson.vue";
 import AdminEventEditInfo from "components/admin/event/AdminEventEditInfo.vue";
+import AdminEventFloorViewer from "components/admin/event/AdminEventFloorViewer.vue";
 import FTDialog from "components/FTDialog.vue";
 
 import { useQuasar } from "quasar";
@@ -92,6 +93,21 @@ function handleShowComponentInDialog(type: string): void {
     });
 }
 
+function showFloorEditDialog(floor: FloorDoc): void {
+    if (!event.value) return;
+    quasar.dialog({
+        component: FTDialog,
+        componentProps: {
+            component: AdminEventFloorViewer,
+            componentPropsObject: {
+                floor,
+                mode: FloorMode.EDITOR,
+                eventId: event.value.id,
+            },
+        },
+    });
+}
+
 onMounted(init);
 </script>
 
@@ -123,8 +139,23 @@ onMounted(init);
                     <EventFeedList v-if="eventFeed.length" :event-feed="eventFeed" />
                 </q-tab-panel>
                 <q-tab-panel name="edit">
-                    <q-btn @click="() => handleShowComponentInDialog('editEvent')">
+                    <q-btn
+                        class="button-gradient"
+                        size="md"
+                        rounded
+                        @click="() => handleShowComponentInDialog('editEvent')"
+                    >
                         Edit event info
+                    </q-btn>
+                    <q-btn
+                        class="button-gradient"
+                        size="md"
+                        rounded
+                        v-for="floor in eventFloors"
+                        :key="floor.id"
+                        @click="() => showFloorEditDialog(floor)"
+                    >
+                        Edit event floor: {{ floor.name }}
                     </q-btn>
                 </q-tab-panel>
             </q-tab-panels>

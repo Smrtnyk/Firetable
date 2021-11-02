@@ -54,7 +54,7 @@ export class Floor {
 
     private elementClickListener = (event: Event, d: BaseFloorElement) => {
         event.stopPropagation();
-        this.setSeletectedElement(event.currentTarget, d);
+        this.setSelectedElement(event.currentTarget, d);
         this.elementClickHandler(this, d);
     };
 
@@ -65,8 +65,15 @@ export class Floor {
         elementClickHandler,
         dblClickHandler,
     }: typeof Floor.Builder.prototype) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const { name, width, height, data, id } = floorDoc!;
+        if (!floorDoc) {
+            throw new Error("Floor document must be defined in order to instantiate a floor map!");
+        }
+
+        if (!container) {
+            throw new Error("Container must be set!");
+        }
+
+        const { name, width, height, data, id } = floorDoc;
 
         this.id = id;
         this.mode = mode;
@@ -74,8 +81,7 @@ export class Floor {
         this.name = name;
         this.width = width;
         this.height = height;
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        this.container = container!;
+        this.container = container;
 
         // Handlers
         this.dblClickHandler = dblClickHandler;
@@ -193,7 +199,7 @@ export class Floor {
         this.elementClickHandler(null, null);
     }
 
-    private setSeletectedElement(selectedElement: EventTarget | null, d: BaseFloorElement) {
+    private setSelectedElement(selectedElement: EventTarget | null, d: BaseFloorElement) {
         if (!isEditorModeActive(this.mode)) return;
         this.unsetSelectedElement();
         if (!(selectedElement instanceof Element)) {
