@@ -26,6 +26,14 @@ Implemented functions:
 App localy communicates with firebase emulator as it's backend service, so make sure to install `firebase-tools` globaly.
 >npm i -g firebase-tools
 
+---
+To start frontend dev server cd into `frontend dir` and run
+>npm run dev
+
+In order to run it in https mode you will need to generate `key.pem` and `cert.pem` using `mkcert`, otherwise comment out the `https` field in `quasar.conf.js`
+Make sure to rename `.env-example` to `.env` and fill in the firebase info.
+---
+
 Translation of an app is in progress.
 
 Feel free to fork and use this however you want.
