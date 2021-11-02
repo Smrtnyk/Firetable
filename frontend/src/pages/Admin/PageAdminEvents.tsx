@@ -64,7 +64,7 @@ export default defineComponent({
         }
 
         function onCreateEvent(eventData: CreateEventPayload) {
-            eventsStore.toggleEventCreateModalVisiblity();
+            eventsStore.toggleEventCreateModalVisibility();
 
             tryCatchLoadingWrapper(async () => {
                 const { data: id } = await createNewEvent(eventData);
@@ -118,7 +118,7 @@ export default defineComponent({
                                 rounded
                                 icon="plus"
                                 class="button-gradient"
-                                onClick={eventsStore.toggleEventCreateModalVisiblity}
+                                onClick={eventsStore.toggleEventCreateModalVisibility}
                                 label="new event"
                             />
                         ),

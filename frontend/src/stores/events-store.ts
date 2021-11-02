@@ -13,7 +13,7 @@ export const useEventsStore = defineStore("events", {
         toggleEventInfoModalVisibility() {
             this.showEventInfoModal = !this.showEventInfoModal;
         },
-        toggleEventCreateModalVisiblity() {
+        toggleEventCreateModalVisibility() {
             this.showCreateEventModal = !this.showCreateEventModal;
         },
     },
