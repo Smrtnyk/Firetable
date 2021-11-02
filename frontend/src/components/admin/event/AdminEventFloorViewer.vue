@@ -12,17 +12,13 @@ interface Props {
 }
 
 const quasar = useQuasar();
-const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
-    useDialogPluginComponent();
-// eslint-disable-next-line no-undef
+const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent();
 const props = defineProps<Props>();
-// eslint-disable-next-line no-undef
+// eslint-disable-next-line vue/valid-define-emits
 const emits = defineEmits([...useDialogPluginComponent.emits]);
 const floorContainerRef = ref<HTMLDivElement | null>(null);
-function elementClickHandler(
-    floor: Floor | null,
-    element: BaseFloorElement | null
-): void {
+
+function elementClickHandler(floor: Floor | null, element: BaseFloorElement | null): void {
     if (element && isTable(element)) {
         quasar.dialog({
             component: EventShowReservation,
