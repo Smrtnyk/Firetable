@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AddNewFloorForm from "src/components/Floor/AddNewFloorForm";
+import AddNewFloorForm from "components/Floor/AddNewFloorForm.vue";
 import { FTTitle } from "components/FTTitle";
 
 import { makeRawFloor } from "src/floor-manager/factories";
@@ -9,7 +9,9 @@ import { deleteFloor, addFloor } from "src/services/firebase/db-floors";
 import { useFirestore } from "src/composables/useFirestore";
 import { Collection } from "src/types/firebase";
 import { FloorDoc } from "src/types/floor";
+import { useFloorsStore } from "src/stores/floors-store";
 
+const floorsStore = useFloorsStore();
 const showCreateFloorForm = ref(false);
 const { data: floors, loading: isLoading } = useFirestore<FloorDoc>({
     type: "watch",
@@ -47,7 +49,7 @@ async function onAddNewFloor({ name }: Pick<FloorDoc, "name">) {
                     rounded
                     icon="plus"
                     class="button-gradient"
-                    @click="() => (showCreateFloorForm = !showCreateFloorForm)"
+                    @click="floorsStore.toggleCreateFloorModalVisibility"
                     label="new floor"
                 />
             </template>
@@ -85,19 +87,12 @@ async function onAddNewFloor({ name }: Pick<FloorDoc, "name">) {
             v-if="!floors.length && !isLoading"
         >
             <h6 class="text-h6">You should create some maps :)</h6>
-            <q-btn
-                rounded
-                class="button-gradient q-mx-auto"
-                @click="() => (showCreateFloorForm = !showCreateFloorForm)"
-                size="lg"
-            >
+            <q-btn rounded class="button-gradient q-mx-auto" v-close-popup size="lg">
                 Get Started
             </q-btn>
             <q-img src="no-map.svg" />
         </div>
 
-        <q-dialog v-model="showCreateFloorForm" class="no-padding">
-            <AddNewFloorForm @create="onAddNewFloor" />
-        </q-dialog>
+        <AddNewFloorForm @create="onAddNewFloor" />
     </div>
 </template>
