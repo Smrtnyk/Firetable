@@ -1,5 +1,5 @@
 import PageAdminEventsListItem from "components/Event/PageAdminEventsListItem";
-import { EventCreateForm } from "src/components/Event/EventCreateForm";
+import EventCreateForm from "components/admin/event/EventCreateForm.vue";
 
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { defineComponent, onMounted, ref } from "vue";
