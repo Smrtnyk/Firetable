@@ -1,4 +1,4 @@
-import UserCreateForm from "src/components/User/UserCreateForm";
+import UserCreateForm from "components/User/UserCreateForm.vue";
 import { FTTitle } from "src/components/FTTitle";
 
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
@@ -32,7 +32,6 @@ export default defineComponent({
 
     setup() {
         const authStore = useAuthStore();
-        const showCreateUserForm = ref(false);
 
         const floorsMaps = computed(() => floors.value.map(({ name }) => name));
         const usersStatus = computed(() => {
@@ -62,7 +61,7 @@ export default defineComponent({
 
             await tryCatchLoadingWrapper(async () => {
                 await createUserWithEmail(newUser);
-                showCreateUserForm.value = false;
+                authStore.toggleCreateUserDialogVisibility();
             });
         }
 
@@ -100,7 +99,7 @@ export default defineComponent({
                 {!!floorsMaps.value.length && (
                     <user-create-form
                         floors={floorsMaps.value}
-                        onClose={() => (showCreateUserForm.value = false)}
+                        onClose={authStore.toggleCreateUserDialogVisibility}
                         onSubmit={onCreateUser}
                     />
                 )}
