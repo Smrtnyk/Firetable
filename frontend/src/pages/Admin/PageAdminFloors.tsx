@@ -137,7 +137,7 @@ export default defineComponent({
                     </div>
                 )}
 
-                <q-dialog v-model={showCreateFloorForm.value}>
+                <q-dialog v-model={showCreateFloorForm.value} class="no-padding">
                     <add-new-floor-form onCreate={onAddNewFloor} />
                 </q-dialog>
             </div>
