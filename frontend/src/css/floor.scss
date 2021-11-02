@@ -42,6 +42,8 @@ circle.table.reserved.confirmed {
 }
 
 .eventFloor {
+    display: flex;
+    justify-content: center;
     svg {
         cursor: default;
         user-select: none;
