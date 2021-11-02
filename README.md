@@ -31,7 +31,8 @@ To start frontend dev server cd into `frontend dir` and run
 >npm run dev
 
 ---
-In order to run it in `https` mode you will need to generate `key.pem` and `cert.pem` using `mkcert`, otherwise comment out the `https` field in `quasar.conf.js`
+In order to run it in `https` mode you will need to generate `key.pem` and `cert.pem` using `mkcert`,
+otherwise comment out the `https` field in `quasar.conf.js`.
 Make sure to rename `.env-example` to `.env` and fill in the firebase info.
 ---
 
