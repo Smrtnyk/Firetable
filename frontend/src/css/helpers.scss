@@ -5,3 +5,14 @@
 .border-radius {
     border-radius: $border-radius;
 }
+
+.limited-width {
+    max-width: 600px;
+    width: 100%;
+}
+
+.no-padding {
+    & > .q-dialog__inner--minimized {
+        padding: 0 !important;
+    }
+}

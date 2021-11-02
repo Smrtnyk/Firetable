@@ -57,12 +57,9 @@
             :class="{ 'active show': isActiveFloor(floor) }"
         />
 
-        <event-guest-list
-            :guest-list-limit="Number(event.guestListLimit)"
-            :guest-list="guestList"
-        />
+        <EventGuestList :guest-list-limit="Number(event.guestListLimit)" :guest-list="guestList" />
 
-        <event-info />
+        <EventInfo />
     </div>
 </template>
 
