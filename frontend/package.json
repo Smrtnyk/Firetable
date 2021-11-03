@@ -20,7 +20,7 @@
         "d3-selection": "3.0.0",
         "d3-zoom": "3.0.0",
         "firebase": "9.2.0",
-        "pinia": "2.0.0",
+        "pinia": "2.0.1",
         "quasar": "2.2.2",
         "vue-i18n": "9.1.9"
     },
