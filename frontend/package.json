@@ -21,11 +21,11 @@
         "d3-zoom": "3.0.0",
         "firebase": "9.2.0",
         "pinia": "2.0.2",
-        "quasar": "2.2.2",
+        "quasar": "2.2.3",
         "vue-i18n": "9.1.9"
     },
     "devDependencies": {
-        "@quasar/app": "3.1.8",
+        "@quasar/app": "3.1.9",
         "@types/d3": "7.1.0",
         "@typescript-eslint/eslint-plugin": "5.3.0",
         "@typescript-eslint/parser": "5.3.0",
