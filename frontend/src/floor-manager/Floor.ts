@@ -45,7 +45,7 @@ export class Floor {
     private selectedElement: BaseFloorElement | null = null;
 
     private readonly mode: FloorMode;
-    private readonly container: HTMLElement;
+    private readonly container: Element;
     private readonly dblClickHandler: FloorDoubleClickHandler;
     private readonly elementClickHandler: ElementClickHandler;
 
@@ -426,12 +426,12 @@ export class Floor {
 
     static Builder = class {
         floorDoc: Readonly<FloorDoc> | undefined;
-        container: HTMLElement | undefined;
+        container: Element | undefined;
         mode: FloorMode = FloorMode.LIVE;
         elementClickHandler: ElementClickHandler = NOOP;
         dblClickHandler: FloorDoubleClickHandler = NOOP;
 
-        public setContainer(container: HTMLElement) {
+        public setContainer(container: Element) {
             this.container = container;
             return this;
         }

@@ -29,7 +29,6 @@
                 icon="info"
                 @click="eventsStore.toggleEventInfoModalVisibility"
             />
-
             <q-btn
                 class="button-gradient"
                 @click="eventsStore.toggleEventGuestListDrawerVisibility"
@@ -38,9 +37,7 @@
                 size="md"
             />
         </div>
-
         <q-separator class="q-mx-auto q-my-xs-xs q-my-sm-sm q-my-md-md" inset />
-
         <f-t-autocomplete
             :all-reserved-tables="allReservedTables"
             @found="onTableFound"
@@ -51,7 +48,7 @@
         <div
             v-for="floor of eventFloors"
             :key="floor.id"
-            class="tab-pane"
+            class="ft-tab-pane"
             :class="{ 'active show': isActiveFloor(floor) }"
         >
             <div
@@ -62,7 +59,6 @@
         </div>
 
         <EventGuestList :guest-list-limit="Number(event.guestListLimit)" :guest-list="guestList" />
-
         <EventInfo />
     </div>
 </template>
@@ -104,36 +100,31 @@ interface Props {
     id: string;
 }
 
-const props = defineProps<Props>();
-const state = reactive<State>({
-    showMapsExpanded: false,
-    activeFloor: null,
-    floorInstances: [],
-});
-
 let currentOpenCreateReservationDialog: {
     tableId: string;
     dialog: DialogChainObject;
     floor: string;
 } | null = null;
 
+const props = defineProps<Props>();
+const state = reactive<State>({
+    showMapsExpanded: false,
+    activeFloor: null,
+    floorInstances: [],
+});
 const eventsStore = useEventsStore();
 const authStore = useAuthStore();
 const router = useRouter();
 const q = useQuasar();
 const { t } = useI18n();
-
-const floorSvgs = ref<Record<string, HTMLElement>>({});
-
+const floorSvgs = ref<Record<string, Element>>({});
 const currentUser = computed(() => authStore.user);
-
-const eventFloorsRef = function (floor: FloorDoc, el: any) {
+const eventFloorsRef = function (floor: FloorDoc, el: Element) {
     if (!el) {
         return;
     }
     floorSvgs.value[floor.id] = el;
 };
-
 const { data: guestList } = useFirestore<GuestData>({
     type: "watch",
     queryType: "collection",
@@ -152,7 +143,6 @@ const { data: eventFloors } = useFirestore<FloorDoc>({
     queryType: "collection",
     path: `${Collection.EVENTS}/${props.id}/floors`,
 });
-
 const freeTablesPerFloor = computed(() => {
     const freeTablesMap: Record<string, string[]> = {};
 
@@ -162,7 +152,6 @@ const freeTablesPerFloor = computed(() => {
 
     return freeTablesMap;
 });
-
 const allReservedTables = computed(() => {
     return eventFloors.value.map((floor) => getReservedTables(floor)).flat();
 });
@@ -358,7 +347,6 @@ async function init() {
 }
 
 watch(eventFloors, handleFloorInstancesData);
-
 watch(freeTablesPerFloor, checkIfReservedTableAndCloseCreateReservationDialog);
 
 onMounted(init);
