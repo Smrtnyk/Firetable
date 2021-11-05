@@ -367,7 +367,7 @@ export class Floor {
         this.svg
             .attr("viewBox", `0 0 ${this.width} ${this.height}`)
             .attr("preserveAspectRatio", "xMidYMid")
-            .attr("class", `FloorEditor__SVG ${whiteSpaceToUnderscore(this.name)}`);
+            .attr("class", `FloorEditor__SVG ${whiteSpaceToUnderscore(this.name)} shadow-3`);
     }
 
     private addClickListenerToSVGContainer() {
@@ -395,32 +395,8 @@ export class Floor {
         this.floor = this.svg.append("g");
     }
 
-    private addZoomBehaviourToSvgElement() {
-        const zoomBehaviour = zoom()
-            .scaleExtent([1 / 2, 2])
-            .constrain((transform, extent, translateExtent) => {
-                const cx = transform.invertX((extent[1][0] - extent[0][0]) / 2);
-                const cy = transform.invertY((extent[1][1] - extent[0][1]) / 2);
-                const dcx0 = Math.min(0, cx - translateExtent[0][0]);
-                const dcx1 = Math.max(0, cx - translateExtent[1][0]);
-                const dcy0 = Math.min(0, cy - translateExtent[0][1]);
-                const dcy1 = Math.max(0, cy - translateExtent[1][1]);
-                return transform.translate(
-                    Math.min(0, dcx0) || Math.max(0, dcx1),
-                    Math.min(0, dcy0) || Math.max(0, dcy1)
-                );
-            })
-            .on("zoom", (e) => this.floor.attr("transform", e.transform));
-
-        this.svg
-            .call(zoomBehaviour as any)
-            .on("wheel.zoom", null)
-            .on("dblclick.zoom", null);
-    }
-
     private init() {
         this.createBaseElements();
-        this.addZoomBehaviourToSvgElement();
         this.render();
     }
 

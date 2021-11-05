@@ -63,7 +63,7 @@ const routes: RouteRecordRaw[] = [
                 name: "adminFloorEdit",
                 meta: { requiresAuth: true, requiresAdmin: true },
                 props: true,
-                component: () => import("pages/Admin/PageAdminFloorEdit"),
+                component: () => import("pages/Admin/PageAdminFloorEdit.vue"),
             },
         ],
     },

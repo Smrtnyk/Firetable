@@ -64,12 +64,11 @@
 </template>
 
 <script setup lang="ts">
-import { EventCreateReservation } from "components/Event/EventCreateReservation"; // NOSONAR
-import { EventShowReservation } from "components/Event/EventShowReservation"; // NOSONAR
+import EventCreateReservation from "components/Event/EventCreateReservation.vue";
+import EventShowReservation from "components/Event/EventShowReservation.vue";
 import { EventGuestList } from "components/Event/EventGuestList";
-import { FTTitle } from "components/FTTitle";
-import FTAutocomplete from "components/Event/FTAutocomplete.vue"; // NOSONAR
-import EventInfo from "components/Event/EventInfo"; // NOSONAR
+import FTAutocomplete from "components/Event/FTAutocomplete.vue";
+import EventInfo from "components/Event/EventInfo";
 
 import { DialogChainObject, Loading, useQuasar } from "quasar";
 
@@ -351,10 +350,3 @@ watch(freeTablesPerFloor, checkIfReservedTableAndCloseCreateReservationDialog);
 
 onMounted(init);
 </script>
-
-<style lang="scss">
-.PageEvent {
-    padding-left: 2px;
-    padding-right: 2px;
-}
-</style>

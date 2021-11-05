@@ -1,5 +1,5 @@
 <template>
-    <div class="row q-pa-sm q-col-gutter-md" v-if="props.selectedFloorElement?.value">
+    <div class="row q-pa-sm q-col-gutter-md" v-if="props.selectedFloorElement">
         <div class="col-10 flex justify-between">
             <div class="row">
                 <div class="col-4 q-pa-xs q-pl-none">
@@ -8,11 +8,11 @@
                         :model-value="getRoundTableRadiusComp"
                         filled
                         label="Radius"
-                        @update:model-value="updateTableProp.bind('radius')"
+                        @update:model-value="(event) => updateTableProp('radius', event)"
                     />
                     <q-input
                         v-else
-                        :model-value="props.selectedFloorElement?.value?.width"
+                        :model-value="props.selectedFloorElement.width"
                         filled
                         label="Width"
                         type="number"
@@ -23,7 +23,7 @@
                 </div>
                 <div class="col-4 q-pa-xs" v-if="!isRoundTableComp">
                     <q-input
-                        :model-value="props.selectedFloorElement?.value?.height"
+                        :model-value="props.selectedFloorElement.height"
                         filled
                         label="Height"
                         type="number"
@@ -34,8 +34,8 @@
                 </div>
                 <div class="col-4 q-pa-xs">
                     <q-input
-                        v-if="props.selectedFloorElement?.value?.tableId"
-                        :model-value="props.selectedFloorElement?.value.tableId"
+                        v-if="props.selectedFloorElement.tableId"
+                        :model-value="props.selectedFloorElement.tableId"
                         disable
                         readonly
                         filled
@@ -46,7 +46,7 @@
         </div>
         <div class="col-2 flex q-pl-none justify-end">
             <q-btn
-                v-if="props.selectedFloorElement?.value"
+                v-if="props.selectedFloorElement"
                 icon="trash"
                 color="negative"
                 @click="deleteElement"
@@ -69,32 +69,31 @@ import { getRoundTableRadius } from "src/floor-manager/utils";
 import { isRoundTable } from "src/floor-manager/type-guards";
 
 interface Props {
-    selectedFloor: Ref<Floor> | null;
-    selectedFloorElement: Ref<BaseFloorElement> | null;
+    selectedFloor: Floor | null;
+    selectedFloorElement: BaseFloorElement | null;
 }
 
 const props = defineProps<Props>();
 
 const isRoundTableComp = computed(() => {
-    return props.selectedFloorElement?.value && isRoundTable(props.selectedFloorElement.value);
+    return props.selectedFloorElement && isRoundTable(props.selectedFloorElement);
 });
 
 const getRoundTableRadiusComp = computed(() => {
     return (
-        isRoundTableComp.value &&
-        getRoundTableRadius(props.selectedFloorElement?.value as TableElement)
+        isRoundTableComp.value && getRoundTableRadius(props.selectedFloorElement as TableElement)
     );
 });
 
 function updateTableProp(prop: keyof BaseFloorElement, val: string | number): void {
     if (!props.selectedFloor || !props.selectedFloorElement) return;
-    props.selectedFloor.value.updateElementProperty(props.selectedFloorElement.value, prop, val);
+    props.selectedFloor.updateElementProperty(props.selectedFloorElement, prop, val);
 }
 
 async function deleteElement() {
     if (!props.selectedFloor || !props.selectedFloorElement) return;
     if (await showConfirm("Do you really want to delete this element?")) {
-        props.selectedFloor.value.removeElement(props.selectedFloorElement.value);
+        props.selectedFloor.removeElement(props.selectedFloorElement);
     }
 }
 </script>

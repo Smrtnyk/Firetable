@@ -44,12 +44,14 @@ circle.table.reserved.confirmed {
 .eventFloor {
     display: flex;
     justify-content: center;
+    padding: 1rem;
     svg {
+        text-align: center;
         cursor: default;
         user-select: none;
         background-color: #333;
         border-radius: $border-radius;
-        max-height: 100vh;
+        max-height: calc(100vh - 10rem);
     }
 
     rect.table__blink,
