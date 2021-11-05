@@ -130,33 +130,42 @@ onMounted(init);
         </q-tabs>
         <div class="q-gutter-y-md">
             <q-tab-panels v-model="tab" animated>
+                <!-- General info with charts area -->
                 <q-tab-panel name="info">
                     <AdminEventGeneralInfo :reservations-status="reservationsStatus" />
                     <AdminEventReservationsByPerson :reservations="eventData" />
                 </q-tab-panel>
 
+                <!-- Activity area -->
                 <q-tab-panel name="activity">
                     <EventFeedList v-if="eventFeed.length" :event-feed="eventFeed" />
                 </q-tab-panel>
+
+                <!-- Edit area -->
                 <q-tab-panel name="edit">
-                    <q-btn
-                        class="button-gradient"
-                        size="md"
-                        rounded
-                        @click="() => handleShowComponentInDialog('editEvent')"
-                    >
-                        Edit event info
-                    </q-btn>
-                    <q-btn
-                        class="button-gradient"
-                        size="md"
-                        rounded
-                        v-for="floor in eventFloors"
-                        :key="floor.id"
-                        @click="() => showFloorEditDialog(floor)"
-                    >
-                        Edit event floor: {{ floor.name }}
-                    </q-btn>
+                    <div class="column justify-between">
+                        <q-btn
+                            class="button-gradient"
+                            size="md"
+                            rounded
+                            @click="() => handleShowComponentInDialog('editEvent')"
+                        >
+                            Edit event info
+                        </q-btn>
+
+                        <q-separator class="q-my-md" />
+                        <h2 class="text-subtitle1">Event Floors</h2>
+                        <q-btn
+                            class="button-gradient"
+                            size="md"
+                            rounded
+                            v-for="floor in eventFloors"
+                            :key="floor.id"
+                            @click="() => showFloorEditDialog(floor)"
+                        >
+                            Edit event floor: {{ floor.name }}
+                        </q-btn>
+                    </div>
                 </q-tab-panel>
             </q-tab-panels>
         </div>
