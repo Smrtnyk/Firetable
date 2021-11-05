@@ -79,12 +79,13 @@ async function init() {
     }
 }
 
-function handleShowComponentInDialog(type: string): void {
+function showEventInfoEditDialog(): void {
     if (!event.value) return;
     quasar.dialog({
         component: FTDialog,
         componentProps: {
             component: AdminEventEditInfo,
+            maximized: false,
             componentPropsObject: {
                 eventInfo: event.value.info || "",
                 eventId: event.value.id,
@@ -148,7 +149,7 @@ onMounted(init);
                             class="button-gradient"
                             size="md"
                             rounded
-                            @click="() => handleShowComponentInDialog('editEvent')"
+                            @click="showEventInfoEditDialog"
                         >
                             Edit event info
                         </q-btn>
