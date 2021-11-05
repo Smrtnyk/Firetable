@@ -134,6 +134,7 @@ onMounted(init);
                 <!-- General info with charts area -->
                 <q-tab-panel name="info">
                     <AdminEventGeneralInfo :reservations-status="reservationsStatus" />
+                    <q-separator class="q-my-sm bg-grey-6" />
                     <AdminEventReservationsByPerson :reservations="eventData" />
                 </q-tab-panel>
 
