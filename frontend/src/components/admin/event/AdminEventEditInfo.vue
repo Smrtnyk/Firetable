@@ -1,6 +1,12 @@
 <template>
     <q-input v-model="localEventInfoValue" filled autogrow />
-    <q-btn @click="saveEventInfo">Save event info</q-btn>
+    <q-btn
+        rounded
+        class="button-gradient q-mt-sm"
+        icon="save"
+        @click="saveEventInfo"
+        label="Save"
+    />
 </template>
 
 <script setup lang="ts">
