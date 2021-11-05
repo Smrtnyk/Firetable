@@ -6,7 +6,7 @@ import { formatEventDate } from "src/helpers/utils"; // NOSONAR
 import { useFirestore } from "src/composables/useFirestore";
 
 import { FTTitle } from "components/FTTitle";
-import { EventFeedList } from "components/Event/EventFeedList";
+import EventFeedList from "components/admin/event/EventFeedList.vue";
 import AdminEventGeneralInfo from "components/admin/event/AdminEventGeneralInfo.vue";
 import AdminEventReservationsByPerson from "components/admin/event/AdminEventReservationsByPerson.vue";
 import AdminEventEditInfo from "components/admin/event/AdminEventEditInfo.vue";
@@ -139,8 +139,7 @@ onMounted(init);
 
                 <!-- Activity area -->
                 <q-tab-panel name="activity">
-                    <EventFeedList v-if="eventFeed.length" :event-feed="eventFeed" />
-                    <h5 v-else class="text-subtitle2">No activity</h5>
+                    <EventFeedList :event-feed="eventFeed" />
                 </q-tab-panel>
 
                 <!-- Edit area -->
