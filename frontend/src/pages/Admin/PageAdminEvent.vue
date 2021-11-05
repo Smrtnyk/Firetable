@@ -151,7 +151,7 @@ onMounted(init);
                             rounded
                             @click="showEventInfoEditDialog"
                         >
-                            Edit event info
+                            Event info
                         </q-btn>
 
                         <q-separator class="q-my-md" />
@@ -164,7 +164,7 @@ onMounted(init);
                             :key="floor.id"
                             @click="() => showFloorEditDialog(floor)"
                         >
-                            Edit event floor: {{ floor.name }}
+                            {{ floor.name }}
                         </q-btn>
                     </div>
                 </q-tab-panel>
