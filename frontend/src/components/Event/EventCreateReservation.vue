@@ -40,15 +40,17 @@ async function onOKClick() {
 }
 </script>
 <template>
-    <q-dialog ref="dialogRef" persistent @hide="onDialogHide" maximized>
-        <q-card class="q-dialog-plugin AddTableDialog">
-            <q-banner inline-actions rounded class="bg-gradient text-white">
+    <q-dialog ref="dialogRef" persistent @hide="onDialogHide">
+        <q-card class="ft-card limited-width">
+            <q-banner inline-actions rounded class="shadow-light">
                 <template #avatar>
-                    <q-btn round flat icon="close" @click="onDialogCancel" />
+                    <q-btn round class="q-mr-sm" flat icon="close" @click="onDialogCancel" />
                 </template>
-                {{ "TABLE" + props.tableId }}
+                <h6 class="text-h6 q-ma-none">
+                    {{ t("EventShowReservation.title") }} {{ props.tableId }}
+                </h6>
             </q-banner>
-
+            <q-separator dark inset />
             <q-card-section>
                 <q-form ref="reservationForm" class="q-gutter-md">
                     <q-select
@@ -92,12 +94,15 @@ async function onOKClick() {
                     />
 
                     <q-input v-model="state.reservationNote" rounded standout label="Note" />
-
-                    <div>
-                        <q-btn rounded size="md" class="button-gradient" @click="onOKClick">
-                            {{ t("EventCreateReservation.reservationCreateBtn") }}
-                        </q-btn>
-                    </div>
+                    <q-separator dark inset />
+                    <q-btn
+                        rounded
+                        size="md"
+                        class="button-gradient"
+                        icon="save"
+                        @click="onOKClick"
+                        :label="t(`EventCreateReservation.reservationCreateBtn`)"
+                    />
                 </q-form>
             </q-card-section>
         </q-card>

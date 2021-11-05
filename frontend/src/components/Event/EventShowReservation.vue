@@ -48,7 +48,7 @@ function onReservationConfirm(val: boolean) {
 
 <template>
     <q-dialog ref="dialogRef" persistent @hide="onDialogHide">
-        <q-card class="q-dialog-plugin AddTableDialog ft-card">
+        <q-card class="ft-card limited-width">
             <q-banner inline-actions rounded class="shadow-light">
                 <template #avatar>
                     <q-btn round class="q-mr-sm" flat icon="close" @click="onDialogOK" />
