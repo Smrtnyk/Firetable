@@ -33,12 +33,11 @@ const { dialogRef, onDialogHide, onDialogCancel, onDialogOK } = useDialogPluginC
 
 async function onOKClick() {
     if (!(await reservationForm.value?.validate())) return;
-
     state.groupedWith.push(props.tableId);
-
     onDialogOK(state);
 }
 </script>
+
 <template>
     <q-dialog ref="dialogRef" persistent @hide="onDialogHide">
         <q-card class="ft-card limited-width">
