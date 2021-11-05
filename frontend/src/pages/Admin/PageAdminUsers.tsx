@@ -2,7 +2,7 @@ import UserCreateForm from "components/User/UserCreateForm.vue";
 import { FTTitle } from "src/components/FTTitle";
 
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { computed, defineComponent, ref } from "vue";
+import { computed, defineComponent } from "vue";
 import { createUserWithEmail, deleteUser } from "src/services/firebase/auth";
 import { config } from "src/config";
 import { useFirestore } from "src/composables/useFirestore";

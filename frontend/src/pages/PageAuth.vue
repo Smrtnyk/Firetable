@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { defineComponent, ref } from "vue";
+import { ref } from "vue";
 import { loginWithEmail } from "src/services/firebase/auth";
 import { useRouter } from "vue-router";
 import { PROJECT_MAIL } from "src/config";

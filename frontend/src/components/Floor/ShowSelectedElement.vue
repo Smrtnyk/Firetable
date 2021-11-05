@@ -64,7 +64,7 @@
 import { BaseFloorElement, TableElement } from "src/types/floor";
 import type { Floor } from "src/floor-manager/Floor";
 import { showConfirm } from "src/helpers/ui-helpers";
-import { computed, Ref } from "vue";
+import { computed } from "vue";
 import { getRoundTableRadius } from "src/floor-manager/utils";
 import { isRoundTable } from "src/floor-manager/type-guards";
 

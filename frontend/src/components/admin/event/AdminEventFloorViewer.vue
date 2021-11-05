@@ -16,7 +16,6 @@ import { FloorDoc, FloorMode } from "src/types/floor";
 import { ref, watch } from "vue";
 import { useQuasar } from "quasar";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { saveFloor } from "src/services/firebase/db-floors";
 import { updateEventFloorData } from "src/services/firebase/db-events";
 
 interface Props {

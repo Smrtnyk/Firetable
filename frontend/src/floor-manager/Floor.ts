@@ -32,7 +32,6 @@ import {
 } from "src/floor-manager/types";
 import { getFreeTables, getTables } from "src/floor-manager/filters";
 import { NumberTuple } from "src/types/generic";
-import { zoom } from "d3-zoom";
 import { drag } from "d3-drag";
 
 export class Floor {
