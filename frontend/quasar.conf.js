@@ -72,13 +72,12 @@ module.exports = configure(function (ctx) {
         },
 
         devServer: {
-            http2: true,
-            https: ctx.dev
-                ? {
-                      key: fs.readFileSync("./key.pem"),
-                      cert: fs.readFileSync("./cert.pem"),
-                  }
-                : true,
+            // https: ctx.dev
+            //     ? {
+            //           key: fs.readFileSync("./key.pem"),
+            //           cert: fs.readFileSync("./cert.pem"),
+            //       }
+            //     : true,
             port: 8080,
             open: true,
         },
