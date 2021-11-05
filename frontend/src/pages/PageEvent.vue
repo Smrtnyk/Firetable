@@ -28,6 +28,7 @@
                 size="md"
                 icon="info"
                 @click="eventsStore.toggleEventInfoModalVisibility"
+                v-if="event.info"
             />
             <q-btn
                 class="button-gradient"
@@ -59,7 +60,7 @@
         </div>
 
         <EventGuestList :guest-list-limit="Number(event.guestListLimit)" :guest-list="guestList" />
-        <EventInfo />
+        <EventInfo v-if="event.info" :event-info="event.info" />
     </div>
 </template>
 
@@ -68,7 +69,7 @@ import EventCreateReservation from "components/Event/EventCreateReservation.vue"
 import EventShowReservation from "components/Event/EventShowReservation.vue";
 import { EventGuestList } from "components/Event/EventGuestList";
 import FTAutocomplete from "components/Event/FTAutocomplete.vue";
-import EventInfo from "components/Event/EventInfo";
+import EventInfo from "components/Event/EventInfo.vue";
 
 import { DialogChainObject, Loading, useQuasar } from "quasar";
 
