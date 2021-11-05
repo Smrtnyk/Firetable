@@ -140,6 +140,7 @@ onMounted(init);
                 <!-- Activity area -->
                 <q-tab-panel name="activity">
                     <EventFeedList v-if="eventFeed.length" :event-feed="eventFeed" />
+                    <h5 v-else class="text-subtitle2">No activity</h5>
                 </q-tab-panel>
 
                 <!-- Edit area -->
