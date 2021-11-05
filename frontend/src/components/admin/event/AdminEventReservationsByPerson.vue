@@ -1,6 +1,7 @@
 <template>
     <div>
-        <canvas ref="chartRef"></canvas>
+        <canvas v-if="reservedTables.length" ref="chartRef"></canvas>
+        <h5 v-else class="text-subtitle2">No reservations to show</h5>
     </div>
 </template>
 
@@ -16,7 +17,7 @@ import {
     Tooltip,
     SubTitle,
 } from "chart.js";
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { TableElement } from "src/types/floor";
 
 interface Props {
@@ -63,6 +64,8 @@ const borderColors = [
 
 const chartRef = ref<HTMLCanvasElement | null>(null);
 const props = defineProps<Props>();
+
+const reservedTables = computed(() => props.reservations.filter((table) => !!table.reservation));
 
 function reservationsReducer(acc: Res, { reservation }: TableElement) {
     if (!reservation) return acc;
