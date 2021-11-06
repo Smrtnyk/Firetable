@@ -2,7 +2,7 @@
 import { computed, ref } from "vue";
 
 import AppDrawer from "components/AppDrawer.vue";
-import { AppTopMenu } from "src/components/AppTopMenu";
+import AppTopMenu from "src/components/AppTopMenu.vue";
 import { useAuthStore } from "src/stores/auth-store";
 
 const authStore = useAuthStore();
