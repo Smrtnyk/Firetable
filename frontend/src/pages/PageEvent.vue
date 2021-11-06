@@ -67,7 +67,7 @@
 <script setup lang="ts">
 import EventCreateReservation from "components/Event/EventCreateReservation.vue";
 import EventShowReservation from "components/Event/EventShowReservation.vue";
-import { EventGuestList } from "components/Event/EventGuestList";
+import EventGuestList from "components/Event/EventGuestList.vue";
 import FTAutocomplete from "components/Event/FTAutocomplete.vue";
 import EventInfo from "components/Event/EventInfo.vue";
 
