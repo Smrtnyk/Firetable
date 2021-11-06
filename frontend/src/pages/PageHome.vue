@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import EventCardList from "src/components/Event/EventCardList.vue";
 import PushMessagesBanner from "src/components/PushMessagesBanner";
-import { EventCardListSkeleton } from "src/components/Event/EventCardListSkeleton";
+import EventCardListSkeleton from "src/components/Event/EventCardListSkeleton.vue";
 import { useFirestore } from "src/composables/useFirestore";
 import { query as firestoreQuery, where, orderBy, limit } from "@firebase/firestore";
 import { Collection } from "src/types/firebase";
@@ -30,7 +30,7 @@ const { data: events, loading: isLoading } = useFirestore<EventDoc>({
         <EventCardListSkeleton v-if="isLoading" />
 
         <div v-if="!isLoading && !events.length" class="row justify-center items-center q-mt-md">
-            <f-t-subtitle>There are no upcoming events</f-t-subtitle>
+            <h2 class="text-h4">There are no upcoming events</h2>
             <q-img src="no-events.svg" />
         </div>
     </div>
