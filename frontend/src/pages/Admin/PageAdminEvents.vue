@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import PageAdminEventsListItem from "components/Event/PageAdminEventsListItem";
+import PageAdminEventsListItem from "components/Event/PageAdminEventsListItem.vue";
 import EventCreateForm from "components/admin/event/EventCreateForm.vue";
 
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
