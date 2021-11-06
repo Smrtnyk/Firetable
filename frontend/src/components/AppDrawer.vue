@@ -98,7 +98,7 @@ function setAppLanguage(val: string) {
         <q-item
             v-for="(link, index) of adminLinksCollection"
             :key="index"
-            to="{ name: link.routeName }"
+            :to="{ name: link.routeName }"
             clickable
         >
             <q-item-section avatar>
