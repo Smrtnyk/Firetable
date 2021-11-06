@@ -1,16 +1,10 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { noEmptyString } from "src/helpers/form-rules";
-
 import { useFloorsStore } from "src/stores/floors-store";
 
-const FLOOR = {
-    name: "",
-};
-
 const emit = defineEmits(["create"]);
-
-const form = ref({ ...FLOOR });
+const form = ref({ name: "" });
 const floorsStore = useFloorsStore();
 
 function onSubmit() {
@@ -18,7 +12,7 @@ function onSubmit() {
 }
 
 function onReset() {
-    form.value = { ...FLOOR };
+    form.value = { name: "" };
 }
 </script>
 
