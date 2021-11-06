@@ -21,17 +21,7 @@ function onDrawerToggle() {
             <app-drawer :show-admin-links="isAdmin" />
         </q-drawer>
         <q-page-container>
-            <q-page
-                class="
-                    q-pa-xs-xs q-pa-sm-sm q-pa-md-md
-                    fit
-                    row
-                    wrap
-                    justify-start
-                    items-start
-                    content-start
-                "
-            >
+            <q-page class="q-pa-xs-xs q-pa-sm-sm q-pa-md-md fit row wrap">
                 <router-view
                     v-slot="{ Component }"
                     style="padding-bottom: 51px"
