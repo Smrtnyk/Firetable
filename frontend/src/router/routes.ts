@@ -71,7 +71,7 @@ const routes: RouteRecordRaw[] = [
     {
         path: "/:catchAll(.*)*",
         meta: { requiresAuth: false },
-        component: () => import("pages/Error404"),
+        component: () => import("pages/Error404.vue"),
     },
 ];
 
