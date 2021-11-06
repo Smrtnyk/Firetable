@@ -58,7 +58,7 @@ export function updateEventProperty<T extends keyof EventDoc>(
 }
 
 export function createNewEvent(eventPayload: CreateEventPayload) {
-    return httpsCallable(functions(), "createEvent")(eventPayload);
+    return httpsCallable<CreateEventPayload, string>(functions(), "createEvent")(eventPayload);
 }
 
 export function updateEventFloorData(floor: Floor, eventId: string) {
