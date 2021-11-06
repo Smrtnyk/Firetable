@@ -26,7 +26,7 @@ function onReset() {
         :model-value="eventsStore.showAddNewGuestForm"
         @update:model-value="eventsStore.toggleShowAddNewGuestFormVisibility"
     >
-        <div style="max-width: 700px; width: 80vw" class="EventGuestListCreateGuestForm">
+        <div class="limited-width EventGuestListCreateGuestForm">
             <q-card>
                 <q-banner inline-actions rounded class="bg-gradient text-white">
                     <template #avatar>
