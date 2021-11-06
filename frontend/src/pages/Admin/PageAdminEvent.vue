@@ -124,13 +124,13 @@ onMounted(init);
                 </div>
             </template>
         </FTTitle>
-        <q-tabs v-model="tab" dense align="justify" narrow-indicator>
+        <q-tabs v-model="tab" align="justify" active-class="button-gradient" narrow-indicator>
             <q-tab name="info" label="Info" />
             <q-tab name="activity" label="Activity" />
             <q-tab name="edit" label="Edit" />
         </q-tabs>
         <div class="q-gutter-y-md">
-            <q-tab-panels v-model="tab" animated>
+            <q-tab-panels v-model="tab" animated transition-next="fade" transition-prev="fade">
                 <!-- General info with charts area -->
                 <q-tab-panel name="info">
                     <AdminEventGeneralInfo :reservations-status="reservationsStatus" />
