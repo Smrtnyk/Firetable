@@ -145,7 +145,7 @@ function setAppLanguage(val: string) {
             <q-item>
                 <q-toggle
                     :model-value="q.dark.isActive"
-                    @pdate:model-value="setDarkMode"
+                    @update:model-value="setDarkMode"
                     checked-icon="moon"
                     color="red"
                     label="Toggle dark mode"
