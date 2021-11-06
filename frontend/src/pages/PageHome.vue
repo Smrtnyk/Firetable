@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import EventCardList from "src/components/Event/EventCardList.vue";
-import PushMessagesBanner from "src/components/PushMessagesBanner";
+import PushMessagesBanner from "components/PushMessagesBanner.vue";
 import EventCardListSkeleton from "src/components/Event/EventCardListSkeleton.vue";
 import { useFirestore } from "src/composables/useFirestore";
 import { query as firestoreQuery, where, orderBy, limit } from "@firebase/firestore";
