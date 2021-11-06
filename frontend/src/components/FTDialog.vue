@@ -1,12 +1,19 @@
 <template>
-    <q-dialog ref="dialogRef" :maximized="props.maximized">
+    <q-dialog ref="dialogRef" :maximized="props.maximized" persistent>
         <q-card
-            class="q-pa-md"
+            class="q-pt-none"
             :class="{
                 'limited-width': !props.maximized,
             }"
         >
-            <component v-bind="props.componentPropsObject" :is="props.component" />
+            <q-banner inline-actions class="shadow-light no-padding">
+                <template #action>
+                    <q-btn round flat icon="close" @click="onDialogOK" />
+                </template>
+            </q-banner>
+            <div class="q-pa-sm">
+                <component v-bind="props.componentPropsObject" :is="props.component" />
+            </div>
         </q-card>
     </q-dialog>
 </template>
