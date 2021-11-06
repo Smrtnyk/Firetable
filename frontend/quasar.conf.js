@@ -44,21 +44,6 @@ module.exports = configure(function (ctx) {
                 chain
                     .plugin("eslint-webpack-plugin")
                     .use(ESLintPlugin, [{ extensions: ["js", "vue", "tsx", "ts"] }]);
-                chain.module
-                    .rule("tsx")
-                    .test(/\.ts(x?)$/)
-                    .use("babel-loader")
-                    .loader("babel-loader")
-                    .options({ babelrc: true });
-                chain.module
-                    .rule("tsx")
-                    .test(/\.ts(x?)$/)
-                    .use("ts-loader")
-                    .loader("ts-loader")
-                    .options({
-                        appendTsSuffixTo: [/\.vue$/],
-                        transpileOnly: true,
-                    });
             },
 
             extendWebpack(cfg) {
@@ -67,7 +52,6 @@ module.exports = configure(function (ctx) {
                     vue$: "vue/dist/vue.esm-bundler.js",
                     "@": path.resolve(__dirname, "./"),
                 };
-                cfg.resolve.extensions.push(".tsx");
             },
         },
 
