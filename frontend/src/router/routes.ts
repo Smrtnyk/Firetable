@@ -9,7 +9,7 @@ const routes: RouteRecordRaw[] = [
                 path: "/",
                 name: "home",
                 meta: { requiresAuth: true },
-                component: () => import("pages/PageHome"),
+                component: () => import("pages/PageHome.vue"),
             },
             {
                 path: "/events/:id",
