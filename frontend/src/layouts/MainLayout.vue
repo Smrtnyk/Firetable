@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 
-import AppDrawer from "src/components/AppDrawer/AppDrawer";
+import AppDrawer from "components/AppDrawer.vue";
 import { AppTopMenu } from "src/components/AppTopMenu";
 import { useAuthStore } from "src/stores/auth-store";
 
