@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { EventCardList } from "src/components/Event/EventCardList";
+import EventCardList from "src/components/Event/EventCardList.vue";
 import PushMessagesBanner from "src/components/PushMessagesBanner";
 import { EventCardListSkeleton } from "src/components/Event/EventCardListSkeleton";
 import { FTSubtitle } from "src/components/FTSubtitle";
