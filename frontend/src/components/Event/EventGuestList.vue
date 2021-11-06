@@ -9,7 +9,7 @@ import {
 } from "src/services/firebase/db-events";
 import { useRoute } from "vue-router";
 
-import { EventGuestListCreateGuestForm } from "components/Event/EventGuestListCreateGuestForm";
+import EventGuestListCreateGuestForm from "components/Event/EventGuestListCreateGuestForm.vue";
 import { FTTitle } from "components/FTTitle";
 import { useEventsStore } from "src/stores/events-store";
 
