@@ -17,7 +17,7 @@ function onDrawerToggle() {
 
 <template>
     <q-layout v-if="isLoggedIn" view="hHh lpR fFf">
-        <q-drawer v-model="isDrawerOpen" class="Drawer" show-if-above bordered side="right">
+        <q-drawer v-model="isDrawerOpen" elevated side="right" overlay behavior="mobile">
             <app-drawer :show-admin-links="isAdmin" />
         </q-drawer>
         <q-page-container>
