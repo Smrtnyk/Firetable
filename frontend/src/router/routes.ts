@@ -22,7 +22,7 @@ const routes: RouteRecordRaw[] = [
                 path: "/profile",
                 name: "userProfile",
                 meta: { requiresAuth: true },
-                component: () => import("pages/PageProfile"),
+                component: () => import("pages/PageProfile.vue"),
             },
 
             // ADMIN ROUTES
