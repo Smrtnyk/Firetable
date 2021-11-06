@@ -3,6 +3,7 @@ import "./AppTopMenu.scss";
 import { defineComponent } from "vue";
 
 import { QPageSticky, QTabs, QBtn, QIcon, QSpace, QRouteTab } from "quasar";
+import { useAppStore } from "src/stores/app-store";
 
 const menuLinks = [
     {
@@ -23,6 +24,7 @@ export default defineComponent({
     emits: ["toggle"],
 
     setup(_, { emit }) {
+        const appStore = useAppStore();
         return () => (
             <q-page-sticky expand position="bottom" class="shadow-light AppTopMenu">
                 <q-tabs
@@ -32,7 +34,7 @@ export default defineComponent({
                     active-color="white"
                     breakpoint={0}
                 >
-                    <q-btn flat aria-label="Menu" onClick={() => emit("toggle")}>
+                    <q-btn flat aria-label="Menu" onClick={appStore.toggleAppDrawerVisibility}>
                         <q-icon class="text-gradient" size="2rem" name="menu" />
                     </q-btn>
                     <q-space />

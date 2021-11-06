@@ -17,9 +17,7 @@ function onDrawerToggle() {
 
 <template>
     <q-layout v-if="isLoggedIn" view="hHh lpR fFf">
-        <q-drawer v-model="isDrawerOpen" elevated side="right" overlay behavior="mobile">
-            <app-drawer :show-admin-links="isAdmin" />
-        </q-drawer>
+        <AppDrawer :show-admin-links="isAdmin" />
         <q-page-container>
             <q-page class="q-pa-xs-xs q-pa-sm-sm q-pa-md-md row">
                 <router-view
@@ -33,7 +31,7 @@ function onDrawerToggle() {
                 </router-view>
             </q-page>
 
-            <AppTopMenu @toggle="onDrawerToggle" />
+            <AppTopMenu />
         </q-page-container>
     </q-layout>
 </template>

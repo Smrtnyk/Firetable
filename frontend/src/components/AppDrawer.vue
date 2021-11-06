@@ -6,11 +6,13 @@ import { useI18n } from "vue-i18n";
 
 import { useQuasar, LocalStorage } from "quasar";
 import { useAuthStore } from "src/stores/auth-store";
+import { useAppStore } from "src/stores/app-store";
 
 interface Props {
     showAdminLinks: boolean;
 }
 const props = defineProps<Props>();
+const appStore = useAppStore();
 const authStore = useAuthStore();
 const q = useQuasar();
 const { t, locale } = useI18n();
@@ -73,88 +75,97 @@ function setAppLanguage(val: string) {
 </script>
 
 <template>
-    <q-list>
-        <q-item header class="column items-center q-pt-xl q-pb-lg">
-            <q-avatar size="6rem" class="ft-avatar">
-                <div
-                    :class="{
-                        green: user.status,
-                    }"
-                    class="status-dot"
-                />
-                {{ avatar }}
-            </q-avatar>
-            <div class="q-mt-md text-center">
-                <div class="text-subtitle1">{{ user.name }}</div>
-                <div class="text-caption text-grey">{{ user.email }}</div>
-                <div class="text-caption text-grey">
-                    {{ user.status ? "Online" : "Offline" }}
+    <q-drawer
+        :model-value="appStore.showAppDrawer"
+        @update:model-value="appStore.toggleAppDrawerVisibility"
+        elevated
+        side="right"
+        overlay
+        behavior="mobile"
+    >
+        <q-list>
+            <q-item header class="column items-center q-pt-xl q-pb-lg">
+                <q-avatar size="6rem" class="ft-avatar">
+                    <div
+                        :class="{
+                            green: user.status,
+                        }"
+                        class="status-dot"
+                    />
+                    {{ avatar }}
+                </q-avatar>
+                <div class="q-mt-md text-center">
+                    <div class="text-subtitle1">{{ user.name }}</div>
+                    <div class="text-caption text-grey">{{ user.email }}</div>
+                    <div class="text-caption text-grey">
+                        {{ user.status ? "Online" : "Offline" }}
+                    </div>
                 </div>
-            </div>
-        </q-item>
+            </q-item>
 
-        <q-separator v-if="adminLinksCollection.length" />
+            <q-separator v-if="adminLinksCollection.length" />
 
-        <q-item
-            v-for="(link, index) of adminLinksCollection"
-            :key="index"
-            :to="{ name: link.routeName }"
-            clickable
-        >
-            <q-item-section avatar>
-                <q-icon :name="link.icon" />
-            </q-item-section>
-            <q-item-section>{{ link.text }}</q-item-section>
-        </q-item>
+            <q-item
+                v-for="(link, index) of adminLinksCollection"
+                :key="index"
+                :to="{ name: link.routeName }"
+                clickable
+            >
+                <q-item-section avatar>
+                    <q-icon :name="link.icon" />
+                </q-item-section>
+                <q-item-section>{{ link.text }}</q-item-section>
+            </q-item>
 
-        <q-separator spaced />
+            <q-separator spaced />
 
-        <q-item clickable @click="onLogoutUser">
-            <q-item-section avatar>
-                <q-icon name="logout" />
-            </q-item-section>
+            <q-item clickable @click="onLogoutUser">
+                <q-item-section avatar>
+                    <q-icon name="logout" />
+                </q-item-section>
 
-            <q-item-section>{{ t("AppDrawer.links.logout") }}</q-item-section>
-        </q-item>
+                <q-item-section>{{ t("AppDrawer.links.logout") }}</q-item-section>
+            </q-item>
 
-        <q-separator spaced />
-        <q-item>
-            <q-select
-                :model-value="lang"
-                :options="langOptions"
-                label="Language"
-                dense
-                borderless
-                emit-value
-                map-options
-                options-dense
-                @update:model-value="setAppLanguage"
-            />
-        </q-item>
-        <q-separator spaced />
-        <q-item>
-            <q-toggle
-                :model-value="q.dark.isActive"
-                @pdate:model-value="setDarkMode"
-                checked-icon="moon"
-                color="red"
-                label="Toggle dark mode"
-                unchecked-icon="sun"
-                size="lg"
-            />
-        </q-item>
-        <q-item>
-            <q-toggle
-                :model-value="!!user.status"
-                checked-icon="status-online"
-                color="green"
-                label="Toggle online status"
-                unchecked-icon="status-offline"
-                size="lg"
-                @update:model-value="toggleUserActivityStatus"
-            />
-        </q-item>
-    </q-list>
+            <q-separator spaced />
+            <q-item>
+                <q-select
+                    :model-value="lang"
+                    :options="langOptions"
+                    label="Language"
+                    dense
+                    borderless
+                    emit-value
+                    map-options
+                    options-dense
+                    @update:model-value="setAppLanguage"
+                />
+            </q-item>
+            <q-separator spaced />
+            <q-item>
+                <q-toggle
+                    :model-value="q.dark.isActive"
+                    @pdate:model-value="setDarkMode"
+                    checked-icon="moon"
+                    color="red"
+                    label="Toggle dark mode"
+                    unchecked-icon="sun"
+                    size="lg"
+                />
+            </q-item>
+            <q-item>
+                <q-toggle
+                    :model-value="!!user.status"
+                    checked-icon="status-online"
+                    color="green"
+                    label="Toggle online status"
+                    unchecked-icon="status-offline"
+                    size="lg"
+                    @update:model-value="toggleUserActivityStatus"
+                />
+            </q-item>
+        </q-list>
+    </q-drawer>
 </template>
 
 <style lang="scss">
