@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import PageAdminEventsListItem from "components/Event/PageAdminEventsListItem.vue";
 import EventCreateForm from "components/admin/event/EventCreateForm.vue";
+import FTTitle from "components/FTTitle.vue";
 
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { onMounted, ref } from "vue";
@@ -9,7 +10,6 @@ import { createNewEvent, deleteEvent, getEvents } from "src/services/firebase/db
 import { useQuasar, QInfiniteScroll } from "quasar";
 import { useRouter } from "vue-router";
 import { useFirestore } from "src/composables/useFirestore";
-import { FTTitle } from "components/FTTitle";
 import { Collection } from "src/types/firebase";
 import { FloorDoc } from "src/types/floor";
 import { CreateEventPayload, EventDoc } from "src/types/event";

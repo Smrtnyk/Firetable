@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import UserCreateForm from "components/User/UserCreateForm.vue";
-import { FTTitle } from "src/components/FTTitle";
+import FTTitle from "src/components/FTTitle.vue";
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { computed } from "vue";
 import { createUserWithEmail, deleteUser } from "src/services/firebase/auth";

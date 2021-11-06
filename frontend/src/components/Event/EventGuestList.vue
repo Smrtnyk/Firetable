@@ -10,7 +10,7 @@ import {
 import { useRoute } from "vue-router";
 
 import EventGuestListCreateGuestForm from "components/Event/EventGuestListCreateGuestForm.vue";
-import { FTTitle } from "components/FTTitle";
+import FTTitle from "components/FTTitle.vue";
 import { useEventsStore } from "src/stores/events-store";
 
 interface Props {

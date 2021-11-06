@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AddNewFloorForm from "components/Floor/AddNewFloorForm.vue";
-import { FTTitle } from "components/FTTitle";
+import FTTitle from "components/FTTitle.vue";
 
 import { makeRawFloor } from "src/floor-manager/factories";
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";

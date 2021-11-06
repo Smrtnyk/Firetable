@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useAuthStore } from "src/stores/auth-store";
-import { FTTitle } from "components/FTTitle";
+import FTTitle from "components/FTTitle.vue";
 
 const authStore = useAuthStore();
 const user = computed(() => authStore.user);

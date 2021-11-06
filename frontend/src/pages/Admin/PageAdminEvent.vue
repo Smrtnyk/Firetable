@@ -5,7 +5,7 @@ import { useRouter } from "vue-router";
 import { formatEventDate } from "src/helpers/utils"; // NOSONAR
 import { useFirestore } from "src/composables/useFirestore";
 
-import { FTTitle } from "components/FTTitle";
+import FTTitle from "components/FTTitle.vue";
 import EventFeedList from "components/admin/event/EventFeedList.vue";
 import AdminEventGeneralInfo from "components/admin/event/AdminEventGeneralInfo.vue";
 import AdminEventReservationsByPerson from "components/admin/event/AdminEventReservationsByPerson.vue";
