@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AddTableDialog from "components/Floor/AddTableDialog";
+import AddTableDialog from "components/Floor/AddTableDialog.vue";
 import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
 import { Floor } from "src/floor-manager/Floor";
 import { BaseFloorElement, FloorDoc, FloorMode } from "src/types/floor";
