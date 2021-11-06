@@ -5,6 +5,7 @@ export const useEventsStore = defineStore("events", {
         showCreateEventModal: false,
         showEventGuestListDrawer: false,
         showEventInfoModal: false,
+        showAddNewGuestForm: false,
     }),
     actions: {
         toggleEventGuestListDrawerVisibility() {
@@ -15,6 +16,9 @@ export const useEventsStore = defineStore("events", {
         },
         toggleEventCreateModalVisibility() {
             this.showCreateEventModal = !this.showCreateEventModal;
+        },
+        toggleShowAddNewGuestFormVisibility() {
+            this.showAddNewGuestForm = !this.showAddNewGuestForm;
         },
     },
 });

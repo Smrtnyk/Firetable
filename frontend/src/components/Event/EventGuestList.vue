@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { GuestData } from "src/types/event";
 import {
     addGuestToGuestList,
@@ -23,14 +23,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const route = useRoute();
 const eventsStore = useEventsStore();
-
-const showAddNewGuestForm = ref(false);
-
 const eventID = computed(() => route.params.id as string);
 const reachedCapacity = computed(() => props.guestList.length / props.guestListLimit);
 
 function onCreate(newGuestData: GuestData) {
-    showAddNewGuestForm.value = false;
+    eventsStore.showAddNewGuestForm = false;
 
     if (props.guestList.length >= props.guestListLimit) {
         showErrorMessage("Limit reached!");
@@ -75,7 +72,7 @@ function confirmGuest({ id, confirmed }: GuestData, reset: () => void) {
                         rounded
                         icon="plus"
                         class="button-gradient"
-                        @click="() => (showAddNewGuestForm = !showAddNewGuestForm)"
+                        @click="eventsStore.toggleShowAddNewGuestFormVisibility"
                     />
                 </template>
             </FTTitle>
@@ -90,9 +87,7 @@ function confirmGuest({ id, confirmed }: GuestData, reset: () => void) {
                 </div>
             </q-linear-progress>
 
-            <q-dialog v-model="showAddNewGuestForm">
-                <EventGuestListCreateGuestForm @create="onCreate" />
-            </q-dialog>
+            <EventGuestListCreateGuestForm @create="onCreate" />
 
             <div class="EventGuestList" v-if="!props.guestList.length">
                 <div class="justify-center items-center q-pa-md">
