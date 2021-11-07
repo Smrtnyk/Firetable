@@ -49,6 +49,13 @@ const { data: eventFeed } = useFirestore<EventFeedDoc>({
     path: `${Collection.EVENTS}/${props.id}/${Collection.EVENT_FEED}`,
 });
 
+function isEventFinished(eventTime: number): boolean {
+    const eventFinishedLimit = new Date(eventTime);
+    eventFinishedLimit.setHours(eventFinishedLimit.getHours() + 8);
+    const currentTime = new Date().getTime();
+    return currentTime > eventFinishedLimit.getTime();
+}
+
 const eventData = computed(() =>
     eventFloors.value
         .map((floor) => floor.data)
@@ -133,7 +140,7 @@ onMounted(init);
         >
             <q-tab name="info" label="Info" />
             <q-tab name="activity" label="Activity" />
-            <q-tab name="edit" label="Edit" />
+            <q-tab name="edit" label="Edit" v-if="!isEventFinished(event.date)" />
         </q-tabs>
         <div class="q-gutter-y-md">
             <q-tab-panels v-model="tab" animated transition-next="fade" transition-prev="fade">
@@ -150,7 +157,7 @@ onMounted(init);
                 </q-tab-panel>
 
                 <!-- Edit area -->
-                <q-tab-panel name="edit">
+                <q-tab-panel name="edit" v-if="!isEventFinished(event.date)">
                     <div class="column justify-between">
                         <q-btn
                             class="button-gradient"
