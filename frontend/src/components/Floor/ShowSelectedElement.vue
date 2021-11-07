@@ -46,7 +46,7 @@
         </div>
         <div class="col-2 flex q-pl-none justify-end">
             <q-btn
-                v-if="props.selectedFloorElement"
+                v-if="props.selectedFloorElement && !props.selectedFloorElement.reservation"
                 icon="trash"
                 color="negative"
                 @click="deleteElement"
