@@ -3,8 +3,7 @@ import AddNewFloorForm from "components/Floor/AddNewFloorForm.vue";
 import FTTitle from "components/FTTitle.vue";
 
 import { makeRawFloor } from "src/floor-manager/factories";
-import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { ref } from "vue";
+import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { deleteFloor, addFloor } from "src/services/firebase/db-floors";
 import { useFirestore } from "src/composables/useFirestore";
 import { Collection } from "src/types/firebase";
@@ -12,7 +11,6 @@ import { FloorDoc } from "src/types/floor";
 import { useFloorsStore } from "src/stores/floors-store";
 
 const floorsStore = useFloorsStore();
-const showCreateFloorForm = ref(false);
 const { data: floors, loading: isLoading } = useFirestore<FloorDoc>({
     type: "watch",
     queryType: "collection",
@@ -33,10 +31,14 @@ async function onFloorDelete({ id }: Pick<FloorDoc, "id">, reset: () => void) {
 }
 
 async function onAddNewFloor({ name }: Pick<FloorDoc, "name">) {
+    if (floors.value.find((floor) => floor.name === name)) {
+        showErrorMessage("Floor wit the same name already exists!");
+        return;
+    }
     const newFloor = makeRawFloor(name);
     await tryCatchLoadingWrapper(async () => {
         await addFloor(newFloor);
-        showCreateFloorForm.value = false;
+        floorsStore.toggleCreateFloorModalVisibility();
     });
 }
 </script>
