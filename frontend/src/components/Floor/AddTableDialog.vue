@@ -5,7 +5,7 @@ import { noEmptyString } from "src/helpers/form-rules";
 
 interface Props {
     ids: string[];
-    id: string;
+    id?: string;
 }
 
 const props = defineProps<Props>();
