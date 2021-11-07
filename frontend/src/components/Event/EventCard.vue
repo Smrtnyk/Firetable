@@ -10,82 +10,114 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <q-card class="ft-card q-pa-sm EventCard">
-        <q-card-section class="q-pb-sm q-pl-sm q-pt-none EventCard__header">
-            <div class="text-h6 event-name">{{ props.event.name }}</div>
-            <div v-if="props.event.reservedPercentage >= 75">
+    <router-link :to="{ name: 'event', params: { id: props.event.id } }">
+        <div class="news-card">
+            <div class="event-success-indicator" v-if="props.event.reservedPercentage >= 75">
                 <q-icon name="fire" color="warning" class="bg-warning-shadow rounded" size="md" />
                 <q-tooltip>
                     {{ props.event.reservedPercentage }}% of tables are reserved. Event is
                     performing well!
                 </q-tooltip>
             </div>
-        </q-card-section>
-        <router-link :to="{ name: 'event', params: { id: props.event.id } }">
             <q-img
-                style="background-color: grey"
-                :src="props.event.img || 'images/default-event-img.jpg'"
                 basic
-                :ratio="4 / 3"
+                :src="props.event.img || 'images/default-event-img.jpg'"
+                alt=""
+                class="news-card__image"
+                :ratio="1"
             />
-        </router-link>
-        <q-card-section class="q-px-none q-py-sm">
-            <div class="row items-center justify-evenly vertical-middle">
-                <span class="flex-v-center">
+            <div class="news-card__text-wrapper">
+                <h3 class="news-card__title">{{ props.event.name }}</h3>
+                <div class="news-card__post-date">
                     <q-icon
                         name="calendar"
-                        color="negative"
-                        class="q-mr-xs gradient-warning q-pa-xs rounded"
+                        color="white"
+                        class="gradient-warning q-pa-xs rounded"
                         size="xs"
                     />
-                    <span class="font-black text-caption text-grey-6">
-                        {{ dateFromTimestamp(props.event.date) }}
-                    </span>
-                </span>
-                <q-separator class="q-mx-sm-xs q-mx-md-sm" vertical />
-                <span class="flex-v-center">
+                    {{ dateFromTimestamp(props.event.date) }}
                     <q-icon
                         name="clock"
-                        color="positive"
-                        class="q-mr-xs gradient-positive q-pa-xs rounded"
+                        color="white"
+                        class="q-ml-sm gradient-positive q-pa-xs rounded"
                         size="xs"
                     />
-                    <span class="font-black text-caption text-grey-6">
-                        {{ hourFromTimestamp(props.event.date) }}
-                    </span>
-                </span>
-                <q-separator class="q-mx-md" vertical />
-                <span class="flex-v-center">
+                    {{ hourFromTimestamp(props.event.date) }}
+
                     <q-icon
                         name="euro"
-                        color="pink"
-                        class="q-mr-xs gradient-pink q-pa-xs rounded"
+                        color="white"
+                        class="q-ml-sm gradient-pink q-pa-xs rounded"
                         size="xs"
                     />
-                    <span class="text-grey-6 font-black text-caption">
-                        {{ props.event.entryPrice }}
-                    </span>
-                </span>
+                    {{ props.event.entryPrice || "Free" }}
+                </div>
             </div>
-        </q-card-section>
-    </q-card>
+        </div>
+    </router-link>
 </template>
 
 <style lang="scss">
-.EventCard {
-    &__header {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        place-items: center;
-
-        .event-name {
-            width: 100%;
-            text-align: left;
-        }
-    }
+.news-card {
+    border: 0px solid aqua;
+    position: relative;
+    border-radius: 0.5rem;
+    flex: 1;
+    width: 100%;
+    overflow: hidden;
+    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
+    transform: translate3d(0, 0, 0);
 }
-.flex-v-center {
-    display: flex;
-    align-items: center;
+
+.news-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0)
+        linear-gradient(to bottom, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.7) 80%);
+    z-index: 0;
+}
+
+.news-card__image {
+    transition: transform 3s ease;
+    position: relative;
+    z-index: -1;
+}
+
+.news-card__text-wrapper {
+    right: 0;
+    left: 0;
+    position: absolute;
+    bottom: 0;
+    padding: 1rem;
+    color: white;
+    /*     background-color: rgba(0, 0, 0, 0.4); */
+    transition: background-color 1.5s ease;
+}
+
+.news-card__title {
+    transition: color 1s ease;
+    margin-bottom: 0.5rem;
+}
+
+.news-card__post-date {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: #ccc;
+}
+
+.news-card:hover .news-card__image {
+    transform: scale(1.2);
+    z-index: -1;
+}
+
+.event-success-indicator {
+    position: absolute;
+    top: 5px;
+    right: 5px;
 }
 </style>

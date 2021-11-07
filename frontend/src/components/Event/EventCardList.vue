@@ -9,11 +9,9 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <div class="EventCardList">
-        <div class="row">
-            <div v-for="event of props.events" class="col-12 col-sm-6 q-pa-xs" :key="event.id">
-                <EventCard :event="event" />
-            </div>
+    <div class="EventCardList row">
+        <div v-for="event of props.events" class="col-12 col-sm-6 q-pa-xs" :key="event.id">
+            <EventCard :event="event" />
         </div>
     </div>
 </template>
