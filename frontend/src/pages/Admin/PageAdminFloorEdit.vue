@@ -175,15 +175,6 @@ onMounted(loadFloor);
     g.tableGroup.active circle {
         fill: #ff8a00 !important;
     }
-    rect.wall {
-        cursor: pointer;
-    }
-    line.horizontal,
-    line.vertical {
-        stroke: #444;
-        stroke-width: 1px;
-        shape-rendering: crispEdges;
-    }
     // RESIZING WALL CONTROLS
     circle.bottomright:hover {
         cursor: move;

@@ -41,6 +41,16 @@ circle.table.reserved.confirmed {
     display: block;
 }
 
+rect.wall {
+    cursor: pointer;
+}
+line.horizontal,
+line.vertical {
+    stroke: #444;
+    stroke-width: 1px;
+    shape-rendering: crispEdges;
+}
+
 .eventFloor {
     display: flex;
     justify-content: center;
