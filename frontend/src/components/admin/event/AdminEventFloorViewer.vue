@@ -7,16 +7,21 @@
         size="md"
         rounded
     />
+    <ShowSelectedElement
+        :selected-floor-element="selectedFloorElement"
+        :selected-floor="selectedFloor"
+    />
     <div id="floor-container" class="eventFloor" ref="floorContainerRef" />
 </template>
 
 <script setup lang="ts">
 import { Floor } from "src/floor-manager/Floor";
-import { FloorDoc, FloorMode } from "src/types/floor";
+import { BaseFloorElement, FloorDoc, FloorMode } from "src/types/floor";
 import { ref, watch } from "vue";
 import { useQuasar } from "quasar";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { updateEventFloorData } from "src/services/firebase/db-events";
+import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
 
 interface Props {
     floor: FloorDoc;
@@ -25,6 +30,8 @@ interface Props {
 }
 
 const quasar = useQuasar();
+const selectedFloorElement = ref<null | BaseFloorElement>(null);
+const selectedFloor = ref<null | Floor>(null);
 const props = defineProps<Props>();
 const floorContainerRef = ref<HTMLDivElement | null>(null);
 const floorInstance = ref<Floor | null>(null);
@@ -36,12 +43,18 @@ function saveFloorState(): void {
     ).catch(showErrorMessage);
 }
 
+function onElementClick(floor: null | Floor, element: null | BaseFloorElement): void {
+    selectedFloor.value = floor;
+    selectedFloorElement.value = element;
+}
+
 watch(floorContainerRef, () => {
     if (!floorContainerRef.value) return;
     floorInstance.value = new Floor.Builder()
         .setFloorDocument(props.floor)
         .setMode(props.mode)
         .setContainer(floorContainerRef.value)
+        .setElementClickHander(onElementClick)
         .build();
 });
 </script>
