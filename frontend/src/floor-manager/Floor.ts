@@ -110,8 +110,16 @@ export class Floor {
         property: S,
         value: T[S]
     ): void {
-        element[property] = value;
-        isTable(element) ? this.renderTableElements() : this.renderWallElements();
+        const elementInFloor = this.data.find((floorEl) => {
+            return floorEl.id === element.id;
+        });
+        if (!elementInFloor) return;
+        elementInFloor[property] = value;
+        isTable(elementInFloor) ? this.renderTableElements() : this.renderWallElements();
+    }
+
+    public hasSameTableId(tableId: string): boolean {
+        return !!this.tables.find((table) => table.tableId === tableId);
     }
 
     private destroy(): void {

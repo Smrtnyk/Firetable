@@ -1,5 +1,5 @@
 <template>
-    <div class="row q-pa-sm q-col-gutter-md" v-if="props.selectedFloorElement">
+    <div class="row q-pa-sm q-col-gutter-md" v-if="selectedElement">
         <div class="col-10 flex justify-between">
             <div class="row">
                 <div class="col-4 q-pa-xs q-pl-none">
@@ -12,7 +12,7 @@
                     />
                     <q-input
                         v-else
-                        :model-value="props.selectedFloorElement.width"
+                        :model-value="selectedElement.width"
                         filled
                         label="Width"
                         type="number"
@@ -23,7 +23,7 @@
                 </div>
                 <div class="col-4 q-pa-xs" v-if="!isRoundTableComp">
                     <q-input
-                        :model-value="props.selectedFloorElement.height"
+                        :model-value="selectedElement.height"
                         filled
                         label="Height"
                         type="number"
@@ -34,19 +34,20 @@
                 </div>
                 <div class="col-4 q-pa-xs">
                     <q-input
-                        v-if="props.selectedFloorElement.tableId"
-                        :model-value="props.selectedFloorElement.tableId"
-                        disable
-                        readonly
+                        v-if="selectedElement.tableId"
+                        :model-value="selectedElement.tableId"
+                        @update:model-value="(val) => updateTableProp('tableId', val)"
                         filled
                         label="Table Name"
+                        :error="hasTableIdInputError"
+                        :error-message="tableIdInputErrorMessage"
                     />
                 </div>
             </div>
         </div>
         <div class="col-2 flex q-pl-none justify-end">
             <q-btn
-                v-if="props.selectedFloorElement && !props.selectedFloorElement.reservation"
+                v-if="!selectedElement.reservation"
                 icon="trash"
                 color="negative"
                 @click="deleteElement"
@@ -63,8 +64,8 @@
 <script setup lang="ts">
 import { BaseFloorElement, TableElement } from "src/types/floor";
 import type { Floor } from "src/floor-manager/Floor";
-import { showConfirm } from "src/helpers/ui-helpers";
-import { computed } from "vue";
+import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
+import { computed, ref } from "vue";
 import { getRoundTableRadius } from "src/floor-manager/utils";
 import { isRoundTable } from "src/floor-manager/type-guards";
 
@@ -74,6 +75,13 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const hasTableIdInputError = ref(false);
+const tableIdInputErrorMessage = "Table Id already taken";
+
+const selectedElement = computed(() => {
+    return props.selectedFloorElement;
+});
 
 const isRoundTableComp = computed(() => {
     return props.selectedFloorElement && isRoundTable(props.selectedFloorElement);
@@ -85,9 +93,42 @@ const getRoundTableRadiusComp = computed(() => {
     );
 });
 
-function updateTableProp(prop: keyof BaseFloorElement, val: string | number): void {
-    if (!props.selectedFloor || !props.selectedFloorElement) return;
-    props.selectedFloor.updateElementProperty(props.selectedFloorElement, prop, val);
+function validateTableId() {
+    return function (val: string) {
+        return isTableIdValid(val) || "Table id is already used";
+    };
+}
+
+function isTableIdValid(val: string): boolean {
+    const result = props.selectedFloor?.tables.find((table) => {
+        return table.tableId === val && table.id !== props.selectedFloorElement?.id;
+    });
+    return !result;
+}
+
+function updateTableProp<T extends keyof BaseFloorElement>(
+    prop: T,
+    val: BaseFloorElement[T]
+): void {
+    if (
+        !props.selectedFloor ||
+        !selectedElement.value ||
+        !val ||
+        val === selectedElement.value[prop]
+    ) {
+        hasTableIdInputError.value = false;
+        return;
+    }
+    // @ts-ignore
+    if (prop === "tableId") {
+        const canUpdate = !props.selectedFloor.hasSameTableId(val as string);
+        if (!canUpdate) {
+            hasTableIdInputError.value = true;
+            return;
+        }
+    }
+    props.selectedFloor.updateElementProperty(selectedElement.value, prop, val);
+    selectedElement.value[prop] = val;
 }
 
 async function deleteElement() {

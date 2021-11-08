@@ -104,7 +104,7 @@ function dblClickHandler(floor: Floor, coords: NumberTuple) {
 
 function onElementClickHandler(floor: Floor | null, d: BaseFloorElement | null) {
     selectedFloor.value = floor;
-    selectedElement.value = d;
+    selectedElement.value = d ? { ...d } : null;
 }
 
 onMounted(loadFloor);
