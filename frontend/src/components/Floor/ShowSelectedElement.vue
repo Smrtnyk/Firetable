@@ -64,7 +64,7 @@
 <script setup lang="ts">
 import { BaseFloorElement, TableElement } from "src/types/floor";
 import type { Floor } from "src/floor-manager/Floor";
-import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
+import { showConfirm } from "src/helpers/ui-helpers";
 import { computed, ref } from "vue";
 import { getRoundTableRadius } from "src/floor-manager/utils";
 import { isRoundTable } from "src/floor-manager/type-guards";
@@ -92,19 +92,6 @@ const getRoundTableRadiusComp = computed(() => {
         isRoundTableComp.value && getRoundTableRadius(props.selectedFloorElement as TableElement)
     );
 });
-
-function validateTableId() {
-    return function (val: string) {
-        return isTableIdValid(val) || "Table id is already used";
-    };
-}
-
-function isTableIdValid(val: string): boolean {
-    const result = props.selectedFloor?.tables.find((table) => {
-        return table.tableId === val && table.id !== props.selectedFloorElement?.id;
-    });
-    return !result;
-}
 
 function updateTableProp<T extends keyof BaseFloorElement>(
     prop: T,
