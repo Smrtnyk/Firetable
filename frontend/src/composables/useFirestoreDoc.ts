@@ -16,7 +16,7 @@ import {
 } from "@firebase/firestore";
 import { NOOP } from "src/helpers/utils";
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import { calculatePath, withError } from "src/composables/types/utils";
+import { calculatePath, firestoreDocSerializer, withError } from "src/composables/types/utils";
 
 // Overload Watch Doc
 export function useFirestoreDoc<T, M = T>(
@@ -127,13 +127,6 @@ export function useFirestoreDoc<T, M = T>(options: OptionsDocument<T, M>) {
         },
         { immediate: true }
     );
-
-    function firestoreDocSerializer(docToSerialize: DocumentData): T {
-        return {
-            id: docToSerialize.id,
-            ...docToSerialize.data(),
-        };
-    }
 
     const returnVal = {
         mutatedData,

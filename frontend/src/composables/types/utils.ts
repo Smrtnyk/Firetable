@@ -1,5 +1,13 @@
 import { Ref } from "vue";
 import { OptionsBase } from "src/composables/types/Options";
+import { DocumentData } from "@firebase/firestore";
+
+export function firestoreDocSerializer(docToSerialize: DocumentData): T {
+    return {
+        id: docToSerialize.id,
+        ...docToSerialize.data(),
+    };
+}
 
 export function withError<T extends (...args: any[]) => any>(
     errorHandler: OptionsBase["onError"],

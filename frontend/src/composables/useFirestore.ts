@@ -6,10 +6,10 @@ import { ReturnCollGet, ReturnCollWatch } from "./types/Return";
 import { optsAreGetColl } from "./types/type-guards";
 import { firestore } from "src/services/firebase/base";
 import { CollectionRef } from "src/types/firebase";
-import { DocumentData, onSnapshot, collection, getDocs } from "@firebase/firestore";
+import { onSnapshot, collection, getDocs } from "@firebase/firestore";
 import { NOOP } from "src/helpers/utils";
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import { calculatePath, withError } from "src/composables/types/utils";
+import { calculatePath, firestoreDocSerializer, withError } from "src/composables/types/utils";
 
 export function useFirestore<T, M = T>(
     options: { type: "watch" } & OptionsCollection<T, M>
@@ -77,10 +77,7 @@ export function useFirestore<T, M = T>(options: OptionsCollection<T, M>) {
 
     let watcher: null | (() => void) = null;
     const watchData = withError(options.onError, function () {
-        const firestoreRefVal =
-            firestoreQuery.value !== null
-                ? firestoreQuery.value
-                : (firestoreRef.value as unknown as CollectionRef);
+        const firestoreRefVal = firestoreQuery.value ?? firestoreRef.value;
 
         watcher = onSnapshot(firestoreRefVal, (receivedCollection) => {
             receiveCollData(
@@ -129,13 +126,6 @@ export function useFirestore<T, M = T>(options: OptionsCollection<T, M>) {
         },
         { immediate: true }
     );
-
-    function firestoreDocSerializer(docToSerialize: DocumentData): T {
-        return {
-            id: docToSerialize.id,
-            ...docToSerialize.data(),
-        };
-    }
 
     const returnVal = {
         mutatedData,
