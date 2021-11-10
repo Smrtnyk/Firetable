@@ -10,6 +10,10 @@ export function minLength(msg: string, minLen = 5): (val: string) => boolean | s
     };
 }
 
+export function noWhiteSpaces(val: string): boolean | string {
+    return !/\s/g.test(val) || "No whitespaces are allowed!";
+}
+
 export function requireNumber(
     msg = "You must type in a number!"
 ): (val: unknown) => boolean | string {

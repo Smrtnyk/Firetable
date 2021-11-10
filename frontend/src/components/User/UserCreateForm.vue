@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ACTIVITY_STATUS, Role, CreateUserPayload } from "src/types/auth";
 import { ref } from "vue";
-import { noEmptyString } from "src/helpers/form-rules";
+import { noEmptyString, noWhiteSpaces } from "src/helpers/form-rules";
 import { PROJECT_MAIL } from "src/config";
 import { useAuthStore } from "src/stores/auth-store";
 
@@ -23,6 +23,7 @@ const props = defineProps<Props>();
 const authStore = useAuthStore();
 const form = ref<CreateUserPayload>({ ...user });
 const stringRules = [noEmptyString()];
+const userNameRules = [noEmptyString(), noWhiteSpaces];
 const roles = Object.values(Role);
 
 function onSubmit() {
@@ -67,7 +68,7 @@ function onReset() {
                             rounded
                             label="Username *"
                             hint="Username without spaces and special characters, e.g. max123"
-                            :rules="stringRules"
+                            :rules="userNameRules"
                         />
 
                         <q-input
