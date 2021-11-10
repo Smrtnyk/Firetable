@@ -7,7 +7,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { configure } = require("quasar/wrappers");
 const fs = require("fs");
-const path = require("path");
 const ESLintPlugin = require("eslint-webpack-plugin");
 
 // eslint-disable-next-line no-undef
@@ -48,12 +47,12 @@ module.exports = configure(function (ctx) {
         },
 
         devServer: {
-            // https: ctx.dev
-            //     ? {
-            //           key: fs.readFileSync("./key.pem"),
-            //           cert: fs.readFileSync("./cert.pem"),
-            //       }
-            //     : true,
+            https: ctx.dev
+                ? {
+                      key: fs.readFileSync("./key.pem"),
+                      cert: fs.readFileSync("./cert.pem"),
+                  }
+                : true,
             port: 8080,
             open: true,
         },
