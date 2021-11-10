@@ -55,7 +55,7 @@ function onReset() {
                             v-model="form.name"
                             standout
                             rounded
-                            label="Fill name *"
+                            label="Name *"
                             hint="Name of the person, e.g. Max Mustermann"
                             lazy-rules
                             :rules="stringRules"
@@ -66,7 +66,7 @@ function onReset() {
                             standout
                             rounded
                             label="Username *"
-                            hint="Username without spaces and special charactes, e.g. max123"
+                            hint="Username without spaces and special characters, e.g. max123"
                             :rules="stringRules"
                         />
 
@@ -94,7 +94,7 @@ function onReset() {
                         />
                         <q-select
                             v-model="form.floors"
-                            hint="Assign areas to user, multiple areas are allowed."
+                            hint="Assign Floors to user, multiple Floors are allowed."
                             standout
                             rounded
                             multiple
