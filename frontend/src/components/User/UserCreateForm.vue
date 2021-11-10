@@ -18,15 +18,11 @@ const user: CreateUserPayload = {
     role: Role.WAITER,
     status: ACTIVITY_STATUS.OFFLINE,
 };
-
 const emit = defineEmits(["submit"]);
 const props = defineProps<Props>();
-
 const authStore = useAuthStore();
 const form = ref<CreateUserPayload>({ ...user });
-
 const stringRules = [noEmptyString()];
-
 const roles = Object.values(Role);
 
 function onSubmit() {
