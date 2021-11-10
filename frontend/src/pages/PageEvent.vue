@@ -178,7 +178,9 @@ function showReservation(floor: Floor, reservation: Reservation, tableId: string
             tableId,
         },
     };
-    q.dialog(options).onCancel(onDeleteReservation(floor, reservation));
+    q.dialog(options).onCancel(() => {
+        onDeleteReservation(floor, reservation).catch(showErrorMessage);
+    });
 }
 
 function handleReservationCreation(floor: Floor) {
@@ -240,19 +242,17 @@ function tableClickHandler(floor: Floor | null, d: BaseFloorElement | null) {
     }
 }
 
-function onDeleteReservation(floor: Floor, { groupedWith }: Reservation) {
-    return async function () {
-        if (!(await showConfirm("Delete reservation?"))) return;
+async function onDeleteReservation(floor: Floor, { groupedWith }: Reservation) {
+    if (!(await showConfirm("Delete reservation?"))) return;
 
-        for (const tableId of groupedWith) {
-            const findReservationToDelete = floor.tables.find((table) => table.tableId === tableId);
-            if (findReservationToDelete) {
-                delete findReservationToDelete.reservation;
-            }
+    for (const tableId of groupedWith) {
+        const findReservationToDelete = floor.tables.find((table) => table.tableId === tableId);
+        if (findReservationToDelete) {
+            delete findReservationToDelete.reservation;
         }
+    }
 
-        await tryCatchLoadingWrapper(() => updateEventFloorData(floor, props.id));
-    };
+    await tryCatchLoadingWrapper(() => updateEventFloorData(floor, props.id));
 }
 
 async function onTableFound(tables: TableElement[]) {
