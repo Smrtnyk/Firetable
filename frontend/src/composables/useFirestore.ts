@@ -22,20 +22,13 @@ export function useFirestore<T, M = T>(options: OptionsCollection<T, M>) {
     const loading = ref<boolean>(initialLoading);
     const received = ref(false);
     const inComponent = options.inComponent ?? true;
-
-    // Path replaced computation
     const pathReplaced = computed(() => {
         const { path, variables } = options;
         return calculatePath(path, variables);
     });
-
     const firestoreRef = computed(() => collection(firestore(), pathReplaced.value));
-
     const firestoreQuery = computed(() => {
-        if (options.query !== undefined) {
-            return options.query(firestoreRef.value);
-        }
-        return null;
+        return options.query?.(firestoreRef.value);
     });
 
     function receiveCollData(receivedData: T[]) {
@@ -88,9 +81,7 @@ export function useFirestore<T, M = T>(options: OptionsCollection<T, M>) {
 
     function debounceDataGetter() {
         nextTick(() => {
-            if (!firestoreRef.value) {
-                return;
-            }
+            if (!firestoreRef.value) return;
 
             loading.value = true;
             if (optsAreGetColl(options)) {

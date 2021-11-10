@@ -28,13 +28,10 @@ export function useFirestoreDoc<T, M = T>(options: OptionsDocument<T, M>) {
     const loading = ref<boolean>(initialLoading);
     const received = ref(false);
     const inComponent = options.inComponent ?? true;
-
-    // Path replaced computation
     const pathReplaced = computed(() => {
         const { path, variables } = options;
         return calculatePath(path, variables);
     });
-
     const firestoreRef = computed(() => doc(firestore(), pathReplaced.value));
 
     function updateDoc(updates: Partial<T>) {
@@ -82,10 +79,7 @@ export function useFirestoreDoc<T, M = T>(options: OptionsDocument<T, M>) {
 
     function debounceDataGetter() {
         nextTick(() => {
-            if (!firestoreRef.value) {
-                return;
-            }
-
+            if (!firestoreRef.value) return;
             loading.value = true;
             if (optsAreGetDoc(options)) {
                 getDocData()?.catch(showErrorMessage);

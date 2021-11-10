@@ -18,7 +18,7 @@ interface ReturnColl<T, M> extends ReturnBase {
     /** A reactive computed prop that returns the firestore collection reference query */
     firestoreRef: ComputedRef<CollectionRef>;
     /** A reactive computed prop that returns the firestore Query if the 'query' input function is used, else it will be undefined */
-    firestoreQuery: ComputedRef<Query | null>;
+    firestoreQuery: ComputedRef<Query | undefined>;
 }
 
 interface ReturnDoc<T, M> extends ReturnBase {
