@@ -14,6 +14,7 @@ text.table__id {
 
 rect.wall {
     fill: #666;
+    cursor: pointer;
 }
 
 body.body--dark {
@@ -41,9 +42,6 @@ circle.table.reserved.confirmed {
     display: block;
 }
 
-rect.wall {
-    cursor: pointer;
-}
 line.horizontal,
 line.vertical {
     stroke: #444;
