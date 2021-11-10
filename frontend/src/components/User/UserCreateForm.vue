@@ -45,12 +45,13 @@ function onReset() {
         >
             <div class="limited-width">
                 <q-card>
-                    <q-banner inline-actions rounded class="bg-gradient text-white">
+                    <q-banner inline-actions rounded class="shadow-light">
                         <template #avatar>
                             <q-btn round class="q-mr-sm" flat icon="close" v-close-popup />
                         </template>
-                        Create new user
+                        <h6 class="text-h6 q-ma-none">Create new user</h6>
                     </q-banner>
+                    <q-separator dark inset />
                     <q-form class="q-gutter-md q-pt-md q-pa-md" @submit="onSubmit" @reset="onReset">
                         <q-input
                             v-model="form.name"
