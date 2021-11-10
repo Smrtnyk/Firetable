@@ -101,7 +101,7 @@ function onReset() {
                             rounded
                             multiple
                             :options="props.floors"
-                            label="Areas"
+                            label="Floors"
                         />
 
                         <div>
