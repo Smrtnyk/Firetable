@@ -62,13 +62,13 @@ export const useAuthStore = defineStore("auth", {
                 type: "watch",
                 path: `${Collection.USERS}/${uid}`,
                 inComponent: false,
-                onFinished: (user) => {
+                onReceive: (user) => {
                     if (!user) {
                         stopWatchingData();
                         showErrorMessage("User is not found in database!");
                         logoutUser().catch(NOOP);
                     } else {
-                        this.user = user as User;
+                        this.user = user;
                         this.isAuthenticated = true;
                         this.isReady = true;
                         this.unsubscribeUserWatch = stopWatchingData;

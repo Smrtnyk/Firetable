@@ -133,7 +133,7 @@ const { data: guestList } = useFirestore<GuestData>({
 const { data: event } = useFirestoreDoc<EventDoc>({
     type: "watch",
     path: `${Collection.EVENTS}/${props.id}`,
-    onFinished() {
+    onReceive() {
         Loading.hide();
     },
 });

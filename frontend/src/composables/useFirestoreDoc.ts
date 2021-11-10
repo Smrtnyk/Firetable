@@ -1,8 +1,7 @@
 import { computed, nextTick, onUnmounted, ref, Ref, watch } from "vue";
 
-import { OptionsDocument, OptionsDocGet, OptionsDocWatch } from "./types/Options";
+import { OptionsDocument } from "./types/Options";
 import { ReturnDocGet, ReturnDocWatch } from "./types/Return";
-
 import { optsAreGetDoc } from "./types/type-guards";
 import { firestore } from "src/services/firebase/base";
 import {
@@ -14,15 +13,12 @@ import {
     deleteDoc as FirestoreDeleteDoc,
     getDoc,
 } from "@firebase/firestore";
-import { NOOP } from "src/helpers/utils";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { calculatePath, firestoreDocSerializer, withError } from "src/composables/types/utils";
 
-// Overload Watch Doc
 export function useFirestoreDoc<T, M = T>(
     options: { type: "watch" } & OptionsDocument<T, M>
 ): ReturnDocWatch<T, M>;
-// Overload Get Doc
 export function useFirestoreDoc<T, M = T>(
     options: { type: "get" } & OptionsDocument<T, M>
 ): ReturnDocGet<T, M>;
@@ -32,7 +28,6 @@ export function useFirestoreDoc<T, M = T>(options: OptionsDocument<T, M>) {
     const initialLoading = options.initialLoading ?? true;
     const loading = ref<boolean>(initialLoading);
     const received = ref(false);
-    const onFinished = options.onFinished ?? NOOP;
     const inComponent = options.inComponent ?? true;
 
     // Path replaced computation
@@ -54,19 +49,11 @@ export function useFirestoreDoc<T, M = T>(options: OptionsDocument<T, M>) {
     }
 
     function receiveDocData(receivedData: T | undefined) {
-        const opts = options as OptionsDocGet<T, M> | OptionsDocWatch<T, M>;
-        if (opts.mutate) {
-            mutatedData.value = opts.mutate(receivedData);
-        }
-
-        if (opts.onReceive) {
-            opts.onReceive(receivedData, mutatedData.value);
-        }
-
+        mutatedData.value = options.mutate?.(receivedData);
+        options.onReceive?.(receivedData, mutatedData.value);
         data.value = receivedData;
         received.value = true;
         loading.value = false;
-        onFinished(receivedData);
         return {
             data: receivedData,
             mutatedData: mutatedData.value,

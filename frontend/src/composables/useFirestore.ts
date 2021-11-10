@@ -1,13 +1,11 @@
 import { computed, nextTick, onUnmounted, ref, Ref, watch } from "vue";
 
-import { OptionsCollection, OptionsCollGet, OptionsCollWatch } from "./types/Options";
+import { OptionsCollection } from "./types/Options";
 import { ReturnCollGet, ReturnCollWatch } from "./types/Return";
-
 import { optsAreGetColl } from "./types/type-guards";
 import { firestore } from "src/services/firebase/base";
 import { CollectionRef } from "src/types/firebase";
 import { onSnapshot, collection, getDocs } from "@firebase/firestore";
-import { NOOP } from "src/helpers/utils";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { calculatePath, firestoreDocSerializer, withError } from "src/composables/types/utils";
 
@@ -24,7 +22,6 @@ export function useFirestore<T, M = T>(options: OptionsCollection<T, M>) {
     const initialLoading = options.initialLoading ?? true;
     const loading = ref<boolean>(initialLoading);
     const received = ref(false);
-    const onFinished = options.onFinished ?? NOOP;
     const inComponent = options.inComponent ?? true;
 
     // Path replaced computation
@@ -43,19 +40,11 @@ export function useFirestore<T, M = T>(options: OptionsCollection<T, M>) {
     });
 
     function receiveCollData(receivedData: T[]) {
-        const opts = options as OptionsCollWatch<T, M> | OptionsCollGet<T, M>;
-        if (opts.mutate) {
-            mutatedData.value = opts.mutate(receivedData);
-        }
-
-        if (opts.onReceive) {
-            opts.onReceive(receivedData, mutatedData.value);
-        }
-
+        mutatedData.value = options.mutate?.(receivedData);
+        options.onReceive?.(receivedData, mutatedData.value);
         collectionData.value = receivedData;
         received.value = true;
         loading.value = false;
-        onFinished(receivedData);
         return {
             data: receivedData,
             mutatedData: mutatedData.value,

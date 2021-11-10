@@ -17,8 +17,6 @@ export interface OptionsBase {
     manual?: boolean;
     /** exposes a function to customise error handling. Defaults to console.error(e) */
     onError?: (e: unknown) => void;
-    /** Fired when data is received from firebase server */
-    onFinished?: (data?: DocumentData) => void;
     /** Tells if hook is used in component. Default is true */
     inComponent?: boolean;
 }
