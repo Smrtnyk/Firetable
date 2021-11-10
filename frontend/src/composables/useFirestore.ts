@@ -4,7 +4,6 @@ import { OptionsCollection } from "./types/Options";
 import { ReturnCollGet, ReturnCollWatch } from "./types/Return";
 import { optsAreGetColl } from "./types/type-guards";
 import { firestore } from "src/services/firebase/base";
-import { CollectionRef } from "src/types/firebase";
 import { onSnapshot, collection, getDocs } from "@firebase/firestore";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { calculatePath, firestoreDocSerializer, withError } from "src/composables/types/utils";
@@ -52,9 +51,7 @@ export function useFirestore<T, M = T>(options: OptionsCollection<T, M>) {
     }
 
     const getCollData = withError(options.onError, async () => {
-        const firestoreRefVal = firestoreQuery.value
-            ? firestoreQuery.value
-            : (firestoreRef.value as unknown as CollectionRef);
+        const firestoreRefVal = firestoreQuery.value ?? firestoreRef.value;
 
         const fetchedCollection = await getDocs(firestoreRefVal);
         let colData: T[] = [];

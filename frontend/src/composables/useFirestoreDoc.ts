@@ -5,7 +5,6 @@ import { ReturnDocGet, ReturnDocWatch } from "./types/Return";
 import { optsAreGetDoc } from "./types/type-guards";
 import { firestore } from "src/services/firebase/base";
 import {
-    DocumentReference,
     DocumentData,
     onSnapshot,
     doc,
@@ -61,8 +60,7 @@ export function useFirestoreDoc<T, M = T>(options: OptionsDocument<T, M>) {
     }
 
     const getDocData = withError(options.onError, async () => {
-        const firestoreRefVal = firestoreRef.value as unknown as DocumentReference;
-        const fetchedDoc = await getDoc(firestoreRefVal);
+        const fetchedDoc = await getDoc(firestoreRef.value);
         if (!fetchedDoc.exists) return;
         return receiveDocData(firestoreDocSerializer(fetchedDoc));
     });
@@ -100,15 +98,9 @@ export function useFirestoreDoc<T, M = T>(options: OptionsDocument<T, M>) {
 
     watch(
         pathReplaced,
-        (v) => {
-            if (options.manual) {
-                return;
-            }
-            if (v) {
-                debounceDataGetter();
-            } else {
-                stop();
-            }
+        function (val) {
+            if (options.manual) return;
+            val ? debounceDataGetter() : stop();
         },
         { immediate: true }
     );
