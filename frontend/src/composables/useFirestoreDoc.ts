@@ -16,7 +16,7 @@ import {
 } from "@firebase/firestore";
 import { NOOP } from "src/helpers/utils";
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import { calculatePath } from "src/composables/types/utils";
+import { calculatePath, withError } from "src/composables/types/utils";
 
 // Overload Watch Doc
 export function useFirestoreDoc<T, M = T>(
@@ -73,17 +73,7 @@ export function useFirestoreDoc<T, M = T>(options: OptionsDocument<T, M>) {
         };
     }
 
-    function withError<T extends (...args: any[]) => any>(fn: T) {
-        return function (...args: Parameters<T>): ReturnType<T> | undefined {
-            try {
-                return fn(...args);
-            } catch (e) {
-                options.onError?.(e);
-            }
-        };
-    }
-
-    const getDocData = withError(async () => {
+    const getDocData = withError(options.onError, async () => {
         const firestoreRefVal = firestoreRef.value as unknown as DocumentReference;
         const fetchedDoc = await getDoc(firestoreRefVal);
         if (!fetchedDoc.exists) return;
@@ -91,7 +81,7 @@ export function useFirestoreDoc<T, M = T>(options: OptionsDocument<T, M>) {
     });
 
     let watcher: null | (() => void) = null;
-    const watchData = withError(function () {
+    const watchData = withError(options.onError, function () {
         watcher = onSnapshot(firestoreRef.value, (receivedDoc) => {
             receiveDocData(receivedDoc.exists() ? firestoreDocSerializer(receivedDoc) : undefined);
         });

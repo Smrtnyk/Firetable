@@ -2,7 +2,7 @@ import { CollectionRef, Query } from "./firestoreTypes";
 import { Ref } from "vue";
 import { DocumentData } from "@firebase/firestore";
 
-interface OptionsBase {
+export interface OptionsBase {
     /** Path to the document or collection in firestore. Use $variableName to insert reactive variable data into the path. If the path includes variables, the options object must include a 'variables' key */
     path: string;
     /** Variables that should be used to construct the path to the document or collection in firestore. If a variable changes the path, data will be re-fetched. Variable values should be a vue ref. */

@@ -1,4 +1,18 @@
 import { Ref } from "vue";
+import { OptionsBase } from "src/composables/types/Options";
+
+export function withError<T extends (...args: any[]) => any>(
+    errorHandler: OptionsBase["onError"],
+    fn: T
+) {
+    return function (...args: Parameters<T>): ReturnType<T> | undefined {
+        try {
+            return fn(...args);
+        } catch (e) {
+            errorHandler?.(e);
+        }
+    };
+}
 
 export function calculatePath(
     path: string,

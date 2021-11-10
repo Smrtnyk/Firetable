@@ -9,7 +9,7 @@ import { CollectionRef } from "src/types/firebase";
 import { DocumentData, onSnapshot, collection, getDocs } from "@firebase/firestore";
 import { NOOP } from "src/helpers/utils";
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import { calculatePath } from "src/composables/types/utils";
+import { calculatePath, withError } from "src/composables/types/utils";
 
 export function useFirestore<T, M = T>(
     options: { type: "watch" } & OptionsCollection<T, M>
@@ -62,17 +62,7 @@ export function useFirestore<T, M = T>(options: OptionsCollection<T, M>) {
         };
     }
 
-    function withError<T extends (...args: any[]) => any>(fn: T) {
-        return function (...args: Parameters<T>): ReturnType<T> | undefined {
-            try {
-                return fn(...args);
-            } catch (e) {
-                options.onError?.(e);
-            }
-        };
-    }
-
-    const getCollData = withError(async () => {
+    const getCollData = withError(options.onError, async () => {
         const firestoreRefVal = firestoreQuery.value
             ? firestoreQuery.value
             : (firestoreRef.value as unknown as CollectionRef);
@@ -86,7 +76,7 @@ export function useFirestore<T, M = T>(options: OptionsCollection<T, M>) {
     });
 
     let watcher: null | (() => void) = null;
-    const watchData = withError(function () {
+    const watchData = withError(options.onError, function () {
         const firestoreRefVal =
             firestoreQuery.value !== null
                 ? firestoreQuery.value
