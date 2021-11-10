@@ -1,14 +1,11 @@
 import { CollectionRef, Query } from "./firestoreTypes";
 import { Ref } from "vue";
-import { DocumentData } from "@firebase/firestore";
 
 export interface OptionsBase {
     /** Path to the document or collection in firestore. Use $variableName to insert reactive variable data into the path. If the path includes variables, the options object must include a 'variables' key */
     path: string;
     /** Variables that should be used to construct the path to the document or collection in firestore. If a variable changes the path, data will be re-fetched. Variable values should be a vue ref. */
-    variables?: {
-        [key: string]: Ref<string | number>;
-    };
+    variables?: Record<string, Ref<string | number>>;
     /** The debounce amount in milliseconds that should be waited between a path change and getting the data from firestore. Useful to change if a variable is bound to a text input. Defaults to 200 */
     debounce?: number;
     /** The initial state of the loading return value. Defaults to true. Setting to false could be helpful in manual mode */
@@ -38,12 +35,12 @@ interface OptionsDoc<T, M> {
 }
 
 interface OptionsWatch {
-    /** The type of the get function - 'watch' or 'get'. 'get' does a single get() from firestore | 'watch' watches for document or collection changes and updates the data received */
+    /** The type of the get function - 'watch' watches for document or collection changes and updates the data received */
     type: "watch";
 }
 
 interface OptionsGet {
-    /** The type of the get function - 'watch' or 'get'. 'get' does a single get() from firestore | 'watch' watches for document or collection changes and updates the data received */
+    /** The type of the get function - 'get' does a single get() from firestore*/
     type: "get";
 }
 
