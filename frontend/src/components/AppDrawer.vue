@@ -106,7 +106,7 @@ function setAppLanguage(val: string) {
             <q-separator v-if="adminLinksCollection.length" />
 
             <q-item
-                v-for="(link, index) of adminLinksCollection"
+                v-for="(link, index) in adminLinksCollection"
                 :key="index"
                 :to="{ name: link.routeName }"
                 clickable

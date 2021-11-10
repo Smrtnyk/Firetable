@@ -13,7 +13,7 @@
             >
                 <q-fab-action
                     :key="florInstance.id"
-                    v-for="florInstance of state.floorInstances"
+                    v-for="florInstance in state.floorInstances"
                     class="text-white"
                     :class="{ 'button-gradient': isActiveFloor(florInstance) }"
                     @click.prevent="() => setActiveFloor(florInstance)"
@@ -47,7 +47,7 @@
         />
 
         <div
-            v-for="floor of eventFloors"
+            v-for="floor in eventFloors"
             :key="floor.id"
             class="ft-tab-pane"
             :class="{ 'active show': isActiveFloor(floor) }"
