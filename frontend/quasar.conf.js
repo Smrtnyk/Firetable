@@ -45,14 +45,6 @@ module.exports = configure(function (ctx) {
                     .plugin("eslint-webpack-plugin")
                     .use(ESLintPlugin, [{ extensions: ["js", "vue", "tsx", "ts"] }]);
             },
-
-            extendWebpack(cfg) {
-                cfg.resolve.alias = {
-                    ...cfg.resolve.alias,
-                    vue$: "vue/dist/vue.esm-bundler.js",
-                    "@": path.resolve(__dirname, "./"),
-                };
-            },
         },
 
         devServer: {
