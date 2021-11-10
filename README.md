@@ -6,13 +6,13 @@
 Frontend is made with Quasar which uses Vue as its framework.
 Backend communication is done with Firebase and cloud functions.
 
-Current capabilities on fronted are:
+Current capabilities on frontend are:
 * Floor management
 * Event management
 * User management
 * Dark mode
 
-Implemented functions:
+Implemented firebase cloud functions:
 * Event creation
 * User creation
 * User removal
@@ -23,7 +23,7 @@ Implemented functions:
 
 ---
 
-App localy communicates with firebase emulator as it's backend service, so make sure to install `firebase-tools` globaly.
+App locally communicates with firebase emulator as it's backend service, so make sure to install `firebase-tools` globaly.
 >npm i -g firebase-tools
 
 ---
