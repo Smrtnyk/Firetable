@@ -9,6 +9,7 @@ import { CollectionRef } from "src/types/firebase";
 import { DocumentData, onSnapshot, collection, getDocs } from "@firebase/firestore";
 import { NOOP } from "src/helpers/utils";
 import { showErrorMessage } from "src/helpers/ui-helpers";
+import { calculatePath } from "src/composables/types/utils";
 
 export function useFirestore<T, M = T>(
     options: { type: "watch" } & OptionsCollection<T, M>
@@ -29,25 +30,7 @@ export function useFirestore<T, M = T>(options: OptionsCollection<T, M>) {
     // Path replaced computation
     const pathReplaced = computed(() => {
         const { path, variables } = options;
-        const stringVars = path.replace(/\s/g, "").match(/\$[^\W]*/g);
-        if (!stringVars?.length || !variables) return path;
-        let newPath = path;
-        for (const x of stringVars) {
-            const instanceVal = variables[x.split("$").join("")].value;
-            if (!["number", "string"].includes(typeof instanceVal) || instanceVal === "") {
-                newPath = "";
-                break;
-            } else {
-                newPath = newPath.replace(x, `${instanceVal}`);
-            }
-        }
-        if (newPath.startsWith("/")) {
-            if (newPath.endsWith("/")) {
-                return newPath.substr(1).substr(0, newPath.length - 2);
-            }
-            return newPath.substr(1);
-        }
-        return newPath;
+        return calculatePath(path, variables);
     });
 
     const firestoreRef = computed(() => collection(firestore(), pathReplaced.value));
