@@ -9,7 +9,6 @@ import {
 } from "./types/Options";
 import { ReturnCollGet, ReturnCollWatch, ReturnDocGet, ReturnDocWatch } from "./types/Return";
 
-// Type gates
 import {
     firestoreRefIsDoc,
     optsAreColl,
@@ -174,73 +173,59 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
         };
     }
 
-    async function getDocData() {
-        try {
-            const firestoreRefVal =
-                firestoreRef.value as unknown as DocumentReference<DocumentData>;
-
-            const fetchedDoc = await getDoc(firestoreRefVal);
-
-            if (!fetchedDoc.exists) {
-                return;
+    function withError<T extends (...args: any[]) => any>(fn: T) {
+        return function (...args: Parameters<T>): ReturnType<T> | undefined {
+            try {
+                return fn(...args);
+            } catch (e) {
+                options.onError?.(e);
             }
-
-            return receiveDocData(firestoreDocSerializer(fetchedDoc));
-        } catch (e) {
-            if (options.onError) {
-                options.onError(e);
-            }
-        }
+        };
     }
 
-    async function getCollData() {
-        try {
-            const firestoreRefVal = firestoreQuery.value
-                ? firestoreQuery.value
-                : (firestoreRef.value as unknown as CollectionRef);
+    const getDocData = withError(async () => {
+        const firestoreRefVal = firestoreRef.value as unknown as DocumentReference;
+        const fetchedDoc = await getDoc(firestoreRefVal);
+        if (!fetchedDoc.exists) return;
+        return receiveDocData(firestoreDocSerializer(fetchedDoc));
+    });
 
-            const fetchedCollection = await getDocs(firestoreRefVal);
-            let colData: T[] = [];
-            if (fetchedCollection.size) {
-                colData = fetchedCollection.docs.map(firestoreDocSerializer);
-            }
-            return receiveCollData(colData);
-        } catch (e) {
-            if (options.onError) {
-                options.onError(e);
-            }
+    const getCollData = withError(async () => {
+        const firestoreRefVal = firestoreQuery.value
+            ? firestoreQuery.value
+            : (firestoreRef.value as unknown as CollectionRef);
+
+        const fetchedCollection = await getDocs(firestoreRefVal);
+        let colData: T[] = [];
+        if (fetchedCollection.size) {
+            colData = fetchedCollection.docs.map(firestoreDocSerializer);
         }
-    }
+        return receiveCollData(colData);
+    });
 
     let watcher: null | (() => void) = null;
-    function watchData() {
-        try {
-            if (firestoreRefIsDoc(firestoreRef.value)) {
-                watcher = onSnapshot(firestoreRef.value, (receivedDoc) => {
-                    receiveDocData(
-                        receivedDoc.exists() ? firestoreDocSerializer(receivedDoc) : undefined
-                    );
-                });
-            } else {
-                const firestoreRefVal =
-                    firestoreQuery.value !== null
-                        ? firestoreQuery.value
-                        : (firestoreRef.value as unknown as CollectionRef);
+    const watchData = withError(function () {
+        if (firestoreRefIsDoc(firestoreRef.value)) {
+            watcher = onSnapshot(firestoreRef.value, (receivedDoc) => {
+                receiveDocData(
+                    receivedDoc.exists() ? firestoreDocSerializer(receivedDoc) : undefined
+                );
+            });
+        } else {
+            const firestoreRefVal =
+                firestoreQuery.value !== null
+                    ? firestoreQuery.value
+                    : (firestoreRef.value as unknown as CollectionRef);
 
-                watcher = onSnapshot(firestoreRefVal, (receivedCollection) => {
-                    receiveCollData(
-                        receivedCollection.size
-                            ? receivedCollection.docs.map(firestoreDocSerializer)
-                            : []
-                    );
-                });
-            }
-        } catch (e) {
-            if (options.onError) {
-                options.onError(e);
-            }
+            watcher = onSnapshot(firestoreRefVal, (receivedCollection) => {
+                receiveCollData(
+                    receivedCollection.size
+                        ? receivedCollection.docs.map(firestoreDocSerializer)
+                        : []
+                );
+            });
         }
-    }
+    });
 
     function stopWatchingData() {
         if (watcher !== null) {
@@ -261,15 +246,15 @@ export function useFirestore<T, M = T>(options: Options<T, M>): any {
             loading.value = true;
             if (optsAreGet(options)) {
                 if (optsAreColl(options)) {
-                    getCollData().catch(showErrorMessage);
+                    getCollData()?.catch(showErrorMessage);
                 } else {
-                    getDocData().catch(showErrorMessage);
+                    getDocData()?.catch(showErrorMessage);
                 }
             } else {
                 stopWatchingData();
                 watchData();
             }
-        }).catch(NOOP);
+        }).catch(showErrorMessage);
     }
 
     watch(
