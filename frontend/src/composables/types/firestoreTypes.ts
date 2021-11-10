@@ -6,8 +6,8 @@ import {
 } from "@firebase/firestore";
 
 /** Firestore DocumentReference */
-export type Docref = DocumentReference<DocumentData>;
+export type Docref = DocumentReference;
 /** Firestore CollectionReference */
-export type CollectionRef = CollectionReference<DocumentData>;
+export type CollectionRef = CollectionReference;
 /** Firestore Query */
 export type Query = FirestoreQuery<DocumentData>;

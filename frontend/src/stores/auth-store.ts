@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { NOOP } from "src/helpers/utils";
-import { useFirestore } from "src/composables/useFirestore";
+import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
 import { Role, User } from "src/types/auth";
 import { Collection } from "src/types/firebase";
 import { showErrorMessage } from "src/helpers/ui-helpers";
@@ -58,9 +58,8 @@ export const useAuthStore = defineStore("auth", {
             }
         },
         initUser(uid: string) {
-            const { stopWatchingData } = useFirestore<User>({
+            const { stopWatchingData } = useFirestoreDoc<User>({
                 type: "watch",
-                queryType: "doc",
                 path: `${Collection.USERS}/${uid}`,
                 inComponent: false,
                 onFinished: (user) => {

@@ -24,8 +24,6 @@ interface OptionsBase {
 }
 
 interface OptionsColl<T, M> {
-    /** The type of this query - collection or doc */
-    queryType: "collection";
     /** Exposes a function to extend the firestore query for the collection eg: add a '.where()' function or '.limit()'. The returned Query object will be used to get or watch data */
     query?: (CollectionRef: CollectionRef) => Query;
     /** Exposes a function to mutate the data that is fetched from firestore. The mutated data will be returned as 'mutatedData' */
@@ -35,8 +33,6 @@ interface OptionsColl<T, M> {
 }
 
 interface OptionsDoc<T, M> {
-    /** The type of this query - collection or doc */
-    queryType: "doc";
     /** Exposes a function to mutate the data that is fetched from firestore. The mutated data will be returned as 'mutatedData' */
     mutate?: (data: T | undefined) => M;
     /** Exposes a hook for when a doc is received. Provides access to the received and mutated received data */
@@ -58,8 +54,5 @@ export type OptionsCollGet<T, M> = OptionsBase & OptionsColl<T, M> & OptionsGet;
 export type OptionsDocWatch<T, M> = OptionsBase & OptionsDoc<T, M> & OptionsGet;
 export type OptionsDocGet<T, M> = OptionsBase & OptionsDoc<T, M> & OptionsWatch;
 
-export type Options<T, M = T> =
-    | OptionsCollWatch<T, M>
-    | OptionsCollGet<T, M>
-    | OptionsDocGet<T, M>
-    | OptionsDocWatch<T, M>;
+export type OptionsDocument<T, M = T> = OptionsDocGet<T, M> | OptionsDocWatch<T, M>;
+export type OptionsCollection<T, M = T> = OptionsCollWatch<T, M> | OptionsCollGet<T, M>;

@@ -89,6 +89,7 @@ import { whiteSpaceToUnderscore } from "src/helpers/utils";
 import { Collection } from "src/types/firebase";
 import { BaseFloorElement, FloorDoc, FloorMode, TableElement } from "src/types/floor";
 import { useAuthStore } from "src/stores/auth-store";
+import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
 
 interface State {
     showMapsExpanded: boolean;
@@ -127,12 +128,10 @@ const eventFloorsRef = function (floor: FloorDoc, el: Element) {
 };
 const { data: guestList } = useFirestore<GuestData>({
     type: "watch",
-    queryType: "collection",
     path: `${Collection.EVENTS}/${props.id}/guestList`,
 });
-const { data: event } = useFirestore<EventDoc>({
+const { data: event } = useFirestoreDoc<EventDoc>({
     type: "watch",
-    queryType: "doc",
     path: `${Collection.EVENTS}/${props.id}`,
     onFinished() {
         Loading.hide();
@@ -140,7 +139,6 @@ const { data: event } = useFirestore<EventDoc>({
 });
 const { data: eventFloors } = useFirestore<FloorDoc>({
     type: "watch",
-    queryType: "collection",
     path: `${Collection.EVENTS}/${props.id}/floors`,
 });
 const freeTablesPerFloor = computed(() => {

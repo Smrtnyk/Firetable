@@ -18,6 +18,7 @@ import { Collection } from "src/types/firebase";
 import { EventDoc, EventFeedDoc } from "src/types/event";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { isTable } from "src/floor-manager/type-guards";
+import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
 
 interface Props {
     id: string;
@@ -30,13 +31,11 @@ const tab = ref("info");
 
 const { data: eventFloors } = useFirestore<FloorDoc>({
     type: "watch",
-    queryType: "collection",
     path: `${Collection.EVENTS}/${props.id}/floors`,
 });
 
-const { data: event } = useFirestore<EventDoc>({
+const { data: event } = useFirestoreDoc<EventDoc>({
     type: "watch",
-    queryType: "doc",
     path: `${Collection.EVENTS}/${props.id}`,
     onError() {
         router.replace("/").catch(showErrorMessage);
@@ -45,7 +44,6 @@ const { data: event } = useFirestore<EventDoc>({
 
 const { data: eventFeed } = useFirestore<EventFeedDoc>({
     type: "get",
-    queryType: "collection",
     path: `${Collection.EVENTS}/${props.id}/${Collection.EVENT_FEED}`,
 });
 

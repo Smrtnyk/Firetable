@@ -9,7 +9,6 @@ import { EventDoc } from "src/types/event";
 
 const { data: events, loading: isLoading } = useFirestore<EventDoc>({
     type: "watch",
-    queryType: "collection",
     path: Collection.EVENTS,
     query(collectionRef) {
         const whereConstraint = where("date", ">=", Date.now() - 60 * 60 * 1000 * 8);

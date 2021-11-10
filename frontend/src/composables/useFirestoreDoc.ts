@@ -1,24 +1,32 @@
 import { computed, nextTick, onUnmounted, ref, Ref, watch } from "vue";
 
-import { OptionsCollection, OptionsCollGet, OptionsCollWatch } from "./types/Options";
-import { ReturnCollGet, ReturnCollWatch } from "./types/Return";
+import { OptionsDocument, OptionsDocGet, OptionsDocWatch } from "./types/Options";
+import { ReturnDocGet, ReturnDocWatch } from "./types/Return";
 
-import { optsAreGetColl } from "./types/type-guards";
+import { optsAreGetDoc } from "./types/type-guards";
 import { firestore } from "src/services/firebase/base";
-import { CollectionRef } from "src/types/firebase";
-import { DocumentData, onSnapshot, collection, getDocs } from "@firebase/firestore";
+import {
+    DocumentReference,
+    DocumentData,
+    onSnapshot,
+    doc,
+    setDoc,
+    deleteDoc as FirestoreDeleteDoc,
+    getDoc,
+} from "@firebase/firestore";
 import { NOOP } from "src/helpers/utils";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 
-export function useFirestore<T, M = T>(
-    options: { type: "watch" } & OptionsCollection<T, M>
-): ReturnCollWatch<T, M>;
-// @ts-ignore -- figure out how to fix this
-export function useFirestore<T, M = T>(
-    options: { type: "get" } & OptionsCollection<T, M>
-): ReturnCollGet<T, M>;
-export function useFirestore<T, M = T>(options: OptionsCollection<T, M>) {
-    const collectionData: Ref<T[]> = ref([]);
+// Overload Watch Doc
+export function useFirestoreDoc<T, M = T>(
+    options: { type: "watch" } & OptionsDocument<T, M>
+): ReturnDocWatch<T, M>;
+// Overload Get Doc
+export function useFirestoreDoc<T, M = T>(
+    options: { type: "get" } & OptionsDocument<T, M>
+): ReturnDocGet<T, M>;
+export function useFirestoreDoc<T, M = T>(options: OptionsDocument<T, M>) {
+    const data: Ref<T | undefined> = ref();
     const mutatedData: Ref<undefined | M> = ref();
     const initialLoading = options.initialLoading ?? true;
     const loading = ref<boolean>(initialLoading);
@@ -50,17 +58,20 @@ export function useFirestore<T, M = T>(options: OptionsCollection<T, M>) {
         return newPath;
     });
 
-    const firestoreRef = computed(() => collection(firestore(), pathReplaced.value));
+    const firestoreRef = computed(() => doc(firestore(), pathReplaced.value));
 
-    const firestoreQuery = computed(() => {
-        if (options.query !== undefined) {
-            return options.query(firestoreRef.value);
-        }
-        return null;
-    });
+    function updateDoc(updates: Partial<T>) {
+        return setDoc<DocumentData>(firestoreRef.value, updates, {
+            merge: true,
+        });
+    }
 
-    function receiveCollData(receivedData: T[]) {
-        const opts = options as OptionsCollWatch<T, M> | OptionsCollGet<T, M>;
+    function deleteDoc() {
+        return FirestoreDeleteDoc(firestoreRef.value);
+    }
+
+    function receiveDocData(receivedData: T | undefined) {
+        const opts = options as OptionsDocGet<T, M> | OptionsDocWatch<T, M>;
         if (opts.mutate) {
             mutatedData.value = opts.mutate(receivedData);
         }
@@ -69,7 +80,7 @@ export function useFirestore<T, M = T>(options: OptionsCollection<T, M>) {
             opts.onReceive(receivedData, mutatedData.value);
         }
 
-        collectionData.value = receivedData;
+        data.value = receivedData;
         received.value = true;
         loading.value = false;
         onFinished(receivedData);
@@ -89,30 +100,17 @@ export function useFirestore<T, M = T>(options: OptionsCollection<T, M>) {
         };
     }
 
-    const getCollData = withError(async () => {
-        const firestoreRefVal = firestoreQuery.value
-            ? firestoreQuery.value
-            : (firestoreRef.value as unknown as CollectionRef);
-
-        const fetchedCollection = await getDocs(firestoreRefVal);
-        let colData: T[] = [];
-        if (fetchedCollection.size) {
-            colData = fetchedCollection.docs.map(firestoreDocSerializer);
-        }
-        return receiveCollData(colData);
+    const getDocData = withError(async () => {
+        const firestoreRefVal = firestoreRef.value as unknown as DocumentReference;
+        const fetchedDoc = await getDoc(firestoreRefVal);
+        if (!fetchedDoc.exists) return;
+        return receiveDocData(firestoreDocSerializer(fetchedDoc));
     });
 
     let watcher: null | (() => void) = null;
     const watchData = withError(function () {
-        const firestoreRefVal =
-            firestoreQuery.value !== null
-                ? firestoreQuery.value
-                : (firestoreRef.value as unknown as CollectionRef);
-
-        watcher = onSnapshot(firestoreRefVal, (receivedCollection) => {
-            receiveCollData(
-                receivedCollection.size ? receivedCollection.docs.map(firestoreDocSerializer) : []
-            );
+        watcher = onSnapshot(firestoreRef.value, (receivedDoc) => {
+            receiveDocData(receivedDoc.exists() ? firestoreDocSerializer(receivedDoc) : undefined);
         });
     });
 
@@ -133,8 +131,8 @@ export function useFirestore<T, M = T>(options: OptionsCollection<T, M>) {
             }
 
             loading.value = true;
-            if (optsAreGetColl(options)) {
-                getCollData()?.catch(showErrorMessage);
+            if (optsAreGetDoc(options)) {
+                getDocData()?.catch(showErrorMessage);
             } else {
                 stopWatchingData();
                 watchData();
@@ -170,22 +168,22 @@ export function useFirestore<T, M = T>(options: OptionsCollection<T, M>) {
         received,
         pathReplaced,
         firestoreRef,
+        updateDoc,
+        deleteDoc,
     };
 
-    if (optsAreGetColl(options)) {
+    if (optsAreGetDoc(options)) {
         return {
             ...returnVal,
-            data: collectionData,
-            getData: getCollData,
-            firestoreQuery,
+            data,
+            getData: getDocData,
         };
     }
 
     return {
         ...returnVal,
-        data: collectionData,
+        data,
         watchData,
         stopWatchingData,
-        firestoreQuery,
     };
 }

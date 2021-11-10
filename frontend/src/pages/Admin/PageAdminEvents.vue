@@ -24,7 +24,6 @@ const hasMoreEventsToFetch = ref(true);
 const paginator = ref<QInfiniteScroll | null>(null);
 const { data: floors } = useFirestore<FloorDoc>({
     type: "get",
-    queryType: "collection",
     path: Collection.FLOORS,
 });
 

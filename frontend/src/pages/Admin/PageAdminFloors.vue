@@ -13,7 +13,6 @@ import { useFloorsStore } from "src/stores/floors-store";
 const floorsStore = useFloorsStore();
 const { data: floors, loading: isLoading } = useFirestore<FloorDoc>({
     type: "watch",
-    queryType: "collection",
     path: Collection.FLOORS,
 });
 

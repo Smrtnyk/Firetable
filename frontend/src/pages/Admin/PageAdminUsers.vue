@@ -22,12 +22,10 @@ const usersStatus = computed(() => {
 });
 const { data: users } = useFirestore<User>({
     type: "watch",
-    queryType: "collection",
     path: Collection.USERS,
 });
 const { data: floors } = useFirestore<FloorDoc>({
     type: "get",
-    queryType: "collection",
     path: Collection.FLOORS,
 });
 
