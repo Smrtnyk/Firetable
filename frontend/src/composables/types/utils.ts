@@ -2,7 +2,7 @@ import { Ref } from "vue";
 import { OptionsBase } from "src/composables/types/Options";
 import { DocumentData } from "@firebase/firestore";
 
-export function firestoreDocSerializer(docToSerialize: DocumentData): T {
+export function firestoreDocSerializer<T>(docToSerialize: DocumentData): T {
     return {
         id: docToSerialize.id,
         ...docToSerialize.data(),

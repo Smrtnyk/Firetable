@@ -70,7 +70,9 @@ export function useFirestore<T, M = T>(options: OptionsCollection<T, M>) {
         const fetchedCollection = await getDocs(firestoreRefVal);
         let colData: T[] = [];
         if (fetchedCollection.size) {
-            colData = fetchedCollection.docs.map(firestoreDocSerializer);
+            colData = fetchedCollection.docs.map((doc) => {
+                return firestoreDocSerializer(doc);
+            });
         }
         return receiveCollData(colData);
     });
@@ -81,15 +83,17 @@ export function useFirestore<T, M = T>(options: OptionsCollection<T, M>) {
 
         watcher = onSnapshot(firestoreRefVal, (receivedCollection) => {
             receiveCollData(
-                receivedCollection.size ? receivedCollection.docs.map(firestoreDocSerializer) : []
+                receivedCollection.size
+                    ? receivedCollection.docs.map((doc) => {
+                          return firestoreDocSerializer(doc);
+                      })
+                    : []
             );
         });
     });
 
     function stopWatchingData() {
-        if (watcher !== null) {
-            watcher();
-        }
+        watcher?.();
     }
 
     if (options.type === "watch" && inComponent) {

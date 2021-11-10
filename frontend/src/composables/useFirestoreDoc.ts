@@ -88,9 +88,7 @@ export function useFirestoreDoc<T, M = T>(options: OptionsDocument<T, M>) {
     });
 
     function stopWatchingData() {
-        if (watcher !== null) {
-            watcher();
-        }
+        watcher?.();
     }
 
     if (options.type === "watch" && inComponent) {
