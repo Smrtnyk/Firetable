@@ -119,13 +119,13 @@ export class Floor {
     }
 
     public updateTableId(element: TableElement, value: TableElement["tableId"]): void {
+        if (this.hasSameTableId(value)) {
+            throw new Error("Table id already taken!");
+        }
         const tableInFloor = this.tables.find((floorEl) => {
             return floorEl.id === element.id;
         });
         if (!tableInFloor) return;
-        if (this.hasSameTableId(value)) {
-            throw new Error("Table id already taken!");
-        }
         tableInFloor["tableId"] = value;
         this.renderTableElements();
     }
