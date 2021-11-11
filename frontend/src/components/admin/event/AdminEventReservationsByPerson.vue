@@ -17,7 +17,7 @@ import {
     Tooltip,
     SubTitle,
 } from "chart.js";
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { TableElement } from "src/types/floor";
 
 interface Props {
@@ -125,8 +125,7 @@ function generateTablesByWaiterChartOptions(
         },
     });
 }
-
-watch(chartRef, () => {
+onMounted(() => {
     if (!chartRef.value) return;
     generateTablesByWaiterChartOptions(chartRef.value, props.reservations);
 });
