@@ -2,10 +2,12 @@ import { LocalStorage } from "quasar";
 
 interface Config {
     maxNumOfUsers: number;
+    eventDuration: number;
 }
 
 export const config: Config = {
     maxNumOfUsers: 10,
+    eventDuration: 8,
 };
 
 export const PROJECT_MAIL = "@firetable.at";

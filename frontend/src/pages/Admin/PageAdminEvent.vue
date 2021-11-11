@@ -19,6 +19,7 @@ import { EventDoc, EventFeedDoc } from "src/types/event";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { isTable } from "src/floor-manager/type-guards";
 import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
+import { config } from "src/config";
 
 interface Props {
     id: string;
@@ -49,7 +50,7 @@ const { data: eventFeed } = useFirestore<EventFeedDoc>({
 
 function isEventFinished(eventTime: number): boolean {
     const eventFinishedLimit = new Date(eventTime);
-    eventFinishedLimit.setHours(eventFinishedLimit.getHours() + 8);
+    eventFinishedLimit.setHours(eventFinishedLimit.getHours() + config.eventDuration);
     const currentTime = new Date().getTime();
     return currentTime > eventFinishedLimit.getTime();
 }
