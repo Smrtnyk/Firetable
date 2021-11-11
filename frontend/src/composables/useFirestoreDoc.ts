@@ -100,6 +100,7 @@ export function useFirestoreDoc<T, M = T>(options: OptionsDocument<T, M>) {
     );
 
     const returnVal = {
+        data,
         mutatedData,
         loading,
         received,
@@ -112,14 +113,12 @@ export function useFirestoreDoc<T, M = T>(options: OptionsDocument<T, M>) {
     if (optsAreGetDoc(options)) {
         return {
             ...returnVal,
-            data,
             getData: getDocData,
         };
     }
 
     return {
         ...returnVal,
-        data,
         watchData,
         stopWatchingData,
     };

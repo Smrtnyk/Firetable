@@ -11,7 +11,7 @@ interface ReturnBase {
 }
 
 interface ReturnColl<T, M> extends ReturnBase {
-    /** The data returned from the collection as a reactive array or an ampty array if no data has been fetched yet */
+    /** The data returned from the collection as a reactive array or an empty array if no data has been fetched yet */
     data: Ref<T[]>;
     /** Reactive mutated data returned from the mutate() function. If no mutate function is passed, will be equal to 'data'. Will be undefined until initialised and 'received' === true */
     mutatedData: Ref<M | undefined>;

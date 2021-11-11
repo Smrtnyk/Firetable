@@ -114,22 +114,20 @@ export function useFirestore<T, M = T>(options: OptionsCollection<T, M>) {
         received,
         pathReplaced,
         firestoreRef,
+        data: collectionData,
+        firestoreQuery,
     };
 
     if (optsAreGetColl(options)) {
         return {
             ...returnVal,
-            data: collectionData,
             getData: getCollData,
-            firestoreQuery,
         };
     }
 
     return {
         ...returnVal,
-        data: collectionData,
         watchData,
         stopWatchingData,
-        firestoreQuery,
     };
 }
