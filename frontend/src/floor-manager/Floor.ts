@@ -118,7 +118,19 @@ export class Floor {
         isTable(elementInFloor) ? this.renderTableElements() : this.renderWallElements();
     }
 
-    public hasSameTableId(tableId: string): boolean {
+    public updateTableId(element: TableElement, value: TableElement["tableId"]): void {
+        const tableInFloor = this.tables.find((floorEl) => {
+            return floorEl.id === element.id;
+        });
+        if (!tableInFloor) return;
+        if (this.hasSameTableId(value)) {
+            throw new Error("Table id already taken!");
+        }
+        tableInFloor["tableId"] = value;
+        this.renderTableElements();
+    }
+
+    private hasSameTableId(tableId: string): boolean {
         return !!this.tables.find((table) => table.tableId === tableId);
     }
 
