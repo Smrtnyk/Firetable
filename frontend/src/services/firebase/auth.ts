@@ -14,16 +14,15 @@ import {
     UserCredential,
 } from "@firebase/auth";
 import { CreateUserPayload, Role } from "src/types/auth";
-import { ValueOf } from "src/types/generic";
 
 export function createUserWithEmail(payload: CreateUserPayload) {
     return httpsCallable(functions(), "createUser")(payload);
 }
 
-export function updateUser(
+export function updateUser<T extends keyof CreateUserPayload>(
     uid: string,
-    field: keyof CreateUserPayload,
-    value: ValueOf<CreateUserPayload>
+    field: T,
+    value: CreateUserPayload[T]
 ) {
     return updateDoc(doc(usersCollection(), uid), {
         [field]: value,
