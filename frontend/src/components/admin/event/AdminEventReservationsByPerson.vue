@@ -19,6 +19,7 @@ import {
 } from "chart.js";
 import { computed, onMounted, ref } from "vue";
 import { TableElement } from "src/types/floor";
+import { showErrorMessage } from "src/helpers/ui-helpers";
 
 interface Props {
     reservations: TableElement[];
@@ -100,30 +101,34 @@ function generateTablesByWaiterChartOptions(
         };
     });
 
-    new Chart(chartContainer, {
-        type: "bar",
-        data: {
-            labels: ["Total reservations", "Confirmed"],
-            datasets: reservationData,
-        },
-        options: {
-            plugins: {
-                title: {
-                    display: true,
-                    text: "Reservation status by person",
+    try {
+        new Chart(chartContainer, {
+            type: "bar",
+            data: {
+                labels: ["Total reservations", "Confirmed"],
+                datasets: reservationData,
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: "Reservation status by person",
+                    },
+                },
+                responsive: true,
+                scales: {
+                    x: {
+                        stacked: false,
+                    },
+                    y: {
+                        stacked: false,
+                    },
                 },
             },
-            responsive: true,
-            scales: {
-                x: {
-                    stacked: false,
-                },
-                y: {
-                    stacked: false,
-                },
-            },
-        },
-    });
+        });
+    } catch (e) {
+        showErrorMessage(e);
+    }
 }
 onMounted(() => {
     if (!chartRef.value) return;
