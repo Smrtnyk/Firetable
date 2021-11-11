@@ -170,7 +170,7 @@ onMounted(init);
                         <q-separator class="q-my-md" />
                         <h2 class="text-subtitle1">Event Floors</h2>
                         <q-btn
-                            class="button-gradient"
+                            class="button-gradient q-mb-sm"
                             size="md"
                             rounded
                             v-for="floor in eventFloors"
