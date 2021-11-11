@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ACTIVITY_STATUS, Role, CreateUserPayload } from "src/types/auth";
+import { Role, CreateUserPayload, User, ACTIVITY_STATUS } from "src/types/auth";
 import { ref } from "vue";
 import { noEmptyString, noWhiteSpaces } from "src/helpers/form-rules";
 import { PROJECT_MAIL } from "src/config";
@@ -7,9 +7,10 @@ import { useAuthStore } from "src/stores/auth-store";
 
 interface Props {
     floors: string[];
+    user?: User;
 }
 
-const user: CreateUserPayload = {
+const userSkeleton: CreateUserPayload = {
     id: "",
     name: "",
     email: "",
@@ -21,7 +22,7 @@ const user: CreateUserPayload = {
 const emit = defineEmits(["submit"]);
 const props = defineProps<Props>();
 const authStore = useAuthStore();
-const form = ref<CreateUserPayload>({ ...user });
+const form = ref<CreateUserPayload | User>(props.user ? { ...props.user } : { ...userSkeleton });
 const stringRules = [noEmptyString()];
 const userNameRules = [noEmptyString(), noWhiteSpaces];
 const roles = Object.values(Role);
@@ -32,99 +33,81 @@ function onSubmit() {
 }
 
 function onReset() {
-    form.value = { ...user };
+    if (props.user) {
+        form.value = { ...props.user };
+    } else {
+        form.value = { ...userSkeleton };
+    }
 }
 </script>
 
 <template>
     <div class="UserCreateForm">
-        <q-dialog
-            class="no-padding"
-            :model-value="authStore.showCreateUserDialog"
-            @update:model-value="authStore.toggleCreateUserDialogVisibility"
-        >
-            <div class="limited-width">
-                <q-card>
-                    <q-banner inline-actions rounded class="shadow-light">
-                        <template #avatar>
-                            <q-btn round class="q-mr-sm" flat icon="close" v-close-popup />
-                        </template>
-                        <h6 class="text-h6 q-ma-none">Create new user</h6>
-                    </q-banner>
-                    <q-separator dark inset />
-                    <q-form class="q-gutter-md q-pt-md q-pa-md" @submit="onSubmit" @reset="onReset">
-                        <q-input
-                            v-model="form.name"
-                            standout
-                            rounded
-                            label="Name *"
-                            hint="Name of the person, e.g. Max Mustermann"
-                            lazy-rules
-                            :rules="stringRules"
-                        />
+        <q-form class="q-gutter-md q-pt-md q-pa-md" @submit="onSubmit" @reset="onReset">
+            <q-input
+                v-model="form.name"
+                standout
+                rounded
+                label="Name *"
+                hint="Name of the person, e.g. Max Mustermann"
+                lazy-rules
+                :rules="stringRules"
+            />
 
-                        <q-input
-                            v-model="form.email"
-                            standout
-                            rounded
-                            label="Username *"
-                            hint="Username without spaces and special characters, e.g. max123"
-                            :rules="userNameRules"
-                        />
+            <q-input
+                v-model="form.email"
+                standout
+                rounded
+                label="Username *"
+                hint="Username without spaces and special characters, e.g. max123"
+                :rules="userNameRules"
+            />
 
-                        <q-input
-                            v-model="form.password"
-                            standout
-                            rounded
-                            label="User password *"
-                            hint="Password of the user"
-                            lazy-rules
-                            :rules="stringRules"
-                        >
-                            <template #prepend>
-                                <q-icon name="key" />
-                            </template>
-                        </q-input>
+            <q-input
+                v-if="!props.user"
+                v-model="form.password"
+                standout
+                rounded
+                label="User password *"
+                hint="Password of the user"
+                lazy-rules
+                :rules="stringRules"
+            >
+                <template #prepend>
+                    <q-icon name="key" />
+                </template>
+            </q-input>
 
-                        <q-select
-                            v-model="form.role"
-                            hint="Assign role to user, default is waiter."
-                            standout
-                            rounded
-                            :options="roles"
-                            label="Role"
-                        />
-                        <q-select
-                            v-model="form.floors"
-                            hint="Assign Floors to user, multiple Floors are allowed."
-                            standout
-                            rounded
-                            multiple
-                            :options="props.floors"
-                            label="Floors"
-                        />
+            <q-select
+                v-model="form.role"
+                hint="Assign role to user, default is waiter."
+                standout
+                rounded
+                :options="roles"
+                label="Role"
+            />
+            <q-select
+                v-model="form.floors"
+                hint="Assign Floors to user, multiple Floors are allowed."
+                standout
+                rounded
+                multiple
+                :options="props.floors"
+                label="Floors"
+            />
 
-                        <div>
-                            <q-btn
-                                rounded
-                                size="md"
-                                label="Submit"
-                                type="submit"
-                                class="button-gradient"
-                            />
-                            <q-btn
-                                rounded
-                                size="md"
-                                outline
-                                label="Reset"
-                                type="reset"
-                                color="primary"
-                                class="q-ml-sm"
-                            />
-                        </div>
-                    </q-form>
-                </q-card>
+            <div>
+                <q-btn rounded size="md" label="Submit" type="submit" class="button-gradient" />
+                <q-btn
+                    rounded
+                    size="md"
+                    outline
+                    label="Reset"
+                    type="reset"
+                    color="primary"
+                    class="q-ml-sm"
+                />
             </div>
-        </q-dialog>
+        </q-form>
     </div>
 </template>
