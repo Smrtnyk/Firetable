@@ -92,10 +92,12 @@ function showEventInfoEditDialog(): void {
         componentProps: {
             component: AdminEventEditInfo,
             maximized: false,
+            title: "Edit event info",
             componentPropsObject: {
                 eventInfo: event.value.info || "",
                 eventId: event.value.id,
             },
+            listeners: {},
         },
     });
 }
@@ -106,11 +108,13 @@ function showFloorEditDialog(floor: FloorDoc): void {
         component: FTDialog,
         componentProps: {
             component: AdminEventFloorViewer,
+            title: `Editing Floor: ${floor.name}`,
             componentPropsObject: {
                 floor,
                 mode: FloorMode.EDITOR,
                 eventId: event.value.id,
             },
+            listeners: {},
         },
     });
 }

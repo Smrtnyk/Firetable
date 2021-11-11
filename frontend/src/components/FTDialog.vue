@@ -6,13 +6,19 @@
                 'limited-width': !props.maximized,
             }"
         >
-            <q-banner inline-actions class="shadow-light no-padding">
+            <q-banner inline-actions class="shadow-light">
                 <template #action>
                     <q-btn round flat icon="close" @click="onDialogOK" />
                 </template>
+                <h6 class="text-h6 q-ma-none q-ml-sm" v-if="props.title">{{ props.title }}</h6>
             </q-banner>
+            <q-separator dark inset />
             <div class="q-pa-sm">
-                <component v-bind="props.componentPropsObject" :is="props.component" />
+                <component
+                    v-bind="props.componentPropsObject"
+                    v-on="props.listeners"
+                    :is="props.component"
+                />
             </div>
         </q-card>
     </q-dialog>
@@ -26,10 +32,13 @@ interface Props {
     component: ComponentPublicInstance;
     maximized?: boolean;
     componentPropsObject: Record<string, any>;
+    listeners: Record<string, (...args: any) => any>;
+    title?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     maximized: true,
+    title: "",
 });
 const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent();
 // eslint-disable-next-line vue/valid-define-emits
