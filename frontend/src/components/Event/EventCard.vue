@@ -110,11 +110,6 @@ const props = defineProps<Props>();
     color: #ccc;
 }
 
-.news-card:hover .news-card__image {
-    transform: scale(1.2);
-    z-index: -1;
-}
-
 .event-success-indicator {
     position: absolute;
     top: 5px;
