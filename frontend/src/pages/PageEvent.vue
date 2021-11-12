@@ -196,26 +196,24 @@ function showReservation(floor: Floor, reservation: Reservation, tableId: string
     });
 }
 
-function handleReservationCreation(floor: Floor) {
-    return function (reservationData: CreateReservationPayload) {
-        if (!currentUser.value) return;
+function handleReservationCreation(floor: Floor, reservationData: CreateReservationPayload) {
+    if (!currentUser.value) return;
 
-        const { groupedWith } = reservationData;
-        const { email, name, role, id } = currentUser.value;
-        const reservedBy = { email, name, role, id };
+    const { groupedWith } = reservationData;
+    const { email, name, role, id } = currentUser.value;
+    const reservedBy = { email, name, role, id };
 
-        for (const idInGroup of groupedWith) {
-            const findTableToReserve = floor.tables.find((table) => table.tableId === idInGroup);
-            if (findTableToReserve) {
-                findTableToReserve.reservation = {
-                    ...reservationData,
-                    confirmed: false,
-                    reservedBy,
-                };
-            }
+    for (const idInGroup of groupedWith) {
+        const findTableToReserve = floor.tables.find((table) => table.tableId === idInGroup);
+        if (findTableToReserve) {
+            findTableToReserve.reservation = {
+                ...reservationData,
+                confirmed: false,
+                reservedBy,
+            };
         }
-        tryCatchLoadingWrapper(() => updateEventFloorData(floor, props.id)).catch(showErrorMessage);
-    };
+    }
+    tryCatchLoadingWrapper(() => updateEventFloorData(floor, props.id)).catch(showErrorMessage);
 }
 
 function resetCurrentOpenCreateReservationDialog() {
@@ -223,19 +221,28 @@ function resetCurrentOpenCreateReservationDialog() {
 }
 
 function showCreateReservationDialog(floor: Floor, tableId: string) {
-    const options = {
-        component: EventCreateReservation,
-        componentProps: {
-            freeTables: floor.freeTables
-                .filter((table) => tableId !== table.tableId)
-                .map((table) => table.tableId),
-            tableId,
-        },
-    };
-
     const dialog = q
-        .dialog(options)
-        .onOk(handleReservationCreation(floor))
+        .dialog({
+            component: FTDialog,
+            componentProps: {
+                component: EventCreateReservation,
+                title: `${t("EventShowReservation.title")} ${tableId}`,
+                maximized: false,
+                componentPropsObject: {
+                    freeTables: floor.freeTables
+                        .filter((table) => tableId !== table.tableId)
+                        .map((table) => table.tableId),
+                    tableId,
+                },
+                listeners: {
+                    createReservation: (reservationData: CreateReservationPayload) => {
+                        resetCurrentOpenCreateReservationDialog();
+                        dialog.hide();
+                        handleReservationCreation(floor, reservationData);
+                    },
+                },
+            },
+        })
         .onDismiss(resetCurrentOpenCreateReservationDialog);
 
     currentOpenCreateReservationDialog = {
