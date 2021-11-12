@@ -8,27 +8,28 @@ import {
     deleteGuestFromGuestList,
 } from "src/services/firebase/db-events";
 import { useRoute } from "vue-router";
+import { useEventsStore } from "src/stores/events-store";
 
 import EventGuestListCreateGuestForm from "components/Event/EventGuestListCreateGuestForm.vue";
 import FTTitle from "components/FTTitle.vue";
-import { useEventsStore } from "src/stores/events-store";
+import FTDialog from "components/FTDialog.vue";
+import { useQuasar } from "quasar";
 
 interface Props {
     guestListLimit: number;
     guestList: GuestData[];
 }
+
 const props = withDefaults(defineProps<Props>(), {
     guestList: () => [],
 });
-
+const quasar = useQuasar();
 const route = useRoute();
 const eventsStore = useEventsStore();
 const eventID = computed(() => route.params.id as string);
 const reachedCapacity = computed(() => props.guestList.length / props.guestListLimit);
 
 function onCreate(newGuestData: GuestData) {
-    eventsStore.showAddNewGuestForm = false;
-
     if (props.guestList.length >= props.guestListLimit) {
         showErrorMessage("Limit reached!");
         return;
@@ -53,6 +54,21 @@ function confirmGuest({ id, confirmed }: GuestData, reset: () => void) {
         .then(reset)
         .catch(showErrorMessage);
 }
+
+function showAddNewGuestForm(): void {
+    quasar.dialog({
+        component: FTDialog,
+        componentProps: {
+            title: "Add Guest",
+            component: EventGuestListCreateGuestForm,
+            maximized: false,
+            componentPropsObject: {},
+            listeners: {
+                create: onCreate,
+            },
+        },
+    });
+}
 </script>
 
 <template>
@@ -72,7 +88,7 @@ function confirmGuest({ id, confirmed }: GuestData, reset: () => void) {
                         rounded
                         icon="plus"
                         class="button-gradient"
-                        @click="eventsStore.toggleShowAddNewGuestFormVisibility"
+                        @click="showAddNewGuestForm"
                     />
                 </template>
             </FTTitle>
@@ -86,8 +102,6 @@ function confirmGuest({ id, confirmed }: GuestData, reset: () => void) {
                     />
                 </div>
             </q-linear-progress>
-
-            <EventGuestListCreateGuestForm @create="onCreate" />
 
             <div class="EventGuestList" v-if="!props.guestList.length">
                 <div class="justify-center items-center q-pa-md">
