@@ -9,12 +9,19 @@ import { deleteFloor, addFloor } from "src/services/firebase/db-floors";
 import { useFirestore } from "src/composables/useFirestore";
 import { Collection } from "src/types/firebase";
 import { FloorDoc } from "src/types/floor";
-import { useQuasar } from "quasar";
+import { Loading, useQuasar } from "quasar";
+import { onMounted } from "vue";
 
 const quasar = useQuasar();
 const { data: floors, loading: isLoading } = useFirestore<FloorDoc>({
     type: "watch",
     path: Collection.FLOORS,
+    onReceive() {
+        Loading.hide();
+    },
+    onError() {
+        Loading.hide();
+    },
 });
 
 async function onFloorDelete({ id }: Pick<FloorDoc, "id">, reset: () => void) {
@@ -57,6 +64,10 @@ function showAddNewFloorForm(): void {
         },
     });
 }
+
+onMounted(() => {
+    Loading.show();
+});
 </script>
 
 <template>
