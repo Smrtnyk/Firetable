@@ -6,7 +6,7 @@ import FTDialog from "components/FTDialog.vue";
 
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { onMounted, ref } from "vue";
-import { DocumentData, QueryDocumentSnapshot } from "@firebase/firestore";
+import { QueryDocumentSnapshot } from "@firebase/firestore";
 import { createNewEvent, deleteEvent, getEvents } from "src/services/firebase/db-events";
 import { useQuasar, QInfiniteScroll } from "quasar";
 import { useRouter } from "vue-router";
@@ -34,7 +34,7 @@ async function init() {
     isLoading.value = false;
 }
 
-async function fetchMoreEvents(lastDoc: QueryDocumentSnapshot<DocumentData> | null) {
+async function fetchMoreEvents(lastDoc: QueryDocumentSnapshot | null) {
     if (!hasMoreEventsToFetch.value) return;
     const eventsDocs = await getEvents(lastDoc);
     if (!eventsDocs.length || eventsDocs.length < 20) {
