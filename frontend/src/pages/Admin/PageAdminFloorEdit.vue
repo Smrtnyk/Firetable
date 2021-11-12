@@ -6,12 +6,14 @@ import { BaseFloorElement, FloorDoc, FloorMode } from "src/types/floor";
 import { extractAllTableIds, hasFloorTables } from "src/floor-manager/filters";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { ELEMENTS_TO_ADD_COLLECTION } from "src/floor-manager/constants";
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import { isWall } from "src/floor-manager/type-guards";
 import { NumberTuple } from "src/types/generic";
-import { getFloor, saveFloor } from "src/services/firebase/db-floors";
+import { saveFloor } from "src/services/firebase/db-floors";
 import { useRouter } from "vue-router";
 import { useQuasar } from "quasar";
+import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
+import { Collection } from "src/types/firebase";
 
 type ElementDescriptor = Pick<BaseFloorElement, "tag" | "type">;
 
@@ -31,22 +33,21 @@ const addNewElementsBottomSheetOptions = {
 const props = defineProps<Props>();
 const router = useRouter();
 const q = useQuasar();
-
 const floorInstance = ref<Floor | null>(null);
 const svgFloorContainer = ref<HTMLElement | null>(null);
 const selectedElement = ref<BaseFloorElement | null>(null);
 const selectedFloor = ref<Floor | null>(null);
-
-async function loadFloor() {
-    const floor = await tryCatchLoadingWrapper(() => getFloor(props.floorID));
-
-    if (!floor) {
-        await router.replace("/");
-        return;
-    }
-
-    instantiateFloor(floor);
-}
+useFirestoreDoc<FloorDoc>({
+    type: "get",
+    path: `${Collection.FLOORS}/${props.floorID}`,
+    onReceive(floor) {
+        if (!floor) {
+            router.replace("/").catch(showErrorMessage);
+        } else {
+            instantiateFloor(floor);
+        }
+    },
+});
 
 function instantiateFloor(floor: FloorDoc) {
     if (!svgFloorContainer.value) return;
@@ -106,8 +107,6 @@ function onElementClickHandler(floor: Floor | null, d: BaseFloorElement | null) 
     selectedFloor.value = floor;
     selectedElement.value = d ? { ...d } : null;
 }
-
-onMounted(loadFloor);
 </script>
 
 <template>
