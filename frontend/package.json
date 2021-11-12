@@ -19,7 +19,7 @@
         "d3-drag": "3.0.0",
         "d3-selection": "3.0.0",
         "d3-zoom": "3.0.0",
-        "firebase": "9.4.0",
+        "firebase": "9.4.1",
         "pinia": "2.0.3",
         "quasar": "2.3.1",
         "vue-i18n": "9.1.9"
