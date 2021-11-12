@@ -10,7 +10,6 @@ interface AuthState {
     isAuthenticated: boolean;
     isReady: boolean;
     user: User | null;
-    showCreateUserDialog: boolean;
     unsubscribeUserWatch: typeof NOOP;
 }
 
@@ -34,10 +33,6 @@ export const useAuthStore = defineStore("auth", {
         },
     },
     actions: {
-        toggleCreateUserDialogVisibility() {
-            this.showCreateUserDialog = !this.showCreateUserDialog;
-        },
-
         setUser(user: User | null) {
             this.user = user;
         },
