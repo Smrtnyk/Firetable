@@ -3,7 +3,7 @@ import { ElementTag, ElementType } from "src/types/floor";
 export const ELEMENTS_TO_ADD_COLLECTION = [
     {
         label: "Add square table",
-        icon: "img:svg-images/square-table.svg",
+        img: "/svg-images/square-table.svg",
         elementDescriptor: {
             type: ElementType.TABLE,
             tag: ElementTag.RECT,
@@ -11,7 +11,7 @@ export const ELEMENTS_TO_ADD_COLLECTION = [
     },
     {
         label: "Add round table",
-        icon: "img:svg-images/round-table.svg",
+        img: "/svg-images/round-table.svg",
         elementDescriptor: {
             type: ElementType.TABLE,
             tag: ElementTag.CIRCLE,
@@ -19,7 +19,7 @@ export const ELEMENTS_TO_ADD_COLLECTION = [
     },
     {
         label: "Add a wall",
-        icon: "img:svg-images/wall.svg",
+        img: "/svg-images/wall.svg",
         elementDescriptor: {
             type: ElementType.WALL,
             tag: ElementTag.RECT,
