@@ -137,7 +137,8 @@ async function onUserSlideRight({ id }: User, reset: () => void) {
                 <q-item clickable class="ft-card">
                     <q-item-section>
                         <q-item-label> {{ user.name }} -{{ user.email }} </q-item-label>
-                        <q-item-label caption> ROLE: {{ user.role }} </q-item-label>
+                        <q-item-label caption> Role: {{ user.role }} </q-item-label>
+                        <q-item-label caption> Floors: {{ user.floors.join(", ") }} </q-item-label>
                     </q-item-section>
                 </q-item>
             </q-slide-item>
