@@ -12,6 +12,7 @@ import { FloorDoc } from "src/types/floor";
 import { useAuthStore } from "src/stores/auth-store";
 import { DialogChainObject, useQuasar } from "quasar";
 import FTDialog from "components/FTDialog.vue";
+import { documentId, query as firestoreQuery, where } from "@firebase/firestore";
 
 const { maxNumOfUsers } = config;
 const authStore = useAuthStore();
@@ -26,6 +27,10 @@ const usersStatus = computed(() => {
 const { data: users } = useFirestore<User>({
     type: "watch",
     path: Collection.USERS,
+    query(collectionRef) {
+        const idConstraint = where(documentId(), "!=", authStore.user?.id);
+        return firestoreQuery(collectionRef, idConstraint);
+    },
 });
 const { data: floors } = useFirestore<FloorDoc>({
     type: "get",
