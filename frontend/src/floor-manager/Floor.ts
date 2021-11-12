@@ -242,7 +242,9 @@ export class Floor {
         tableG
             .append("text")
             .attr("transform", getTableTextPosition)
+            .style("text-anchor", "middle")
             .attr("class", "table__id")
+            .attr("dominant-baseline", "middle")
             .text(getTableText);
 
         tableG.select(":first-child").attr("class", generateTableClass);
