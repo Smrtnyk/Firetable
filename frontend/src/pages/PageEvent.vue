@@ -183,17 +183,25 @@ function showEventInfo(): void {
 
 function showReservation(floor: Floor, reservation: Reservation, tableId: string) {
     const options = {
-        component: EventShowReservation,
+        component: FTDialog,
         componentProps: {
-            eventId: props.id,
-            floor,
-            reservation,
-            tableId,
+            component: EventShowReservation,
+            title: `${t("EventShowReservation.title")} ${tableId}`,
+            maximized: false,
+            componentPropsObject: {
+                eventId: props.id,
+                floor,
+                reservation,
+                tableId,
+            },
+            listeners: {
+                delete: () => {
+                    onDeleteReservation(floor, reservation).catch(showErrorMessage);
+                },
+            },
         },
     };
-    q.dialog(options).onCancel(() => {
-        onDeleteReservation(floor, reservation).catch(showErrorMessage);
-    });
+    q.dialog(options);
 }
 
 function handleReservationCreation(floor: Floor, reservationData: CreateReservationPayload) {
