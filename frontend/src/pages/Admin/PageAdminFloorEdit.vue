@@ -6,12 +6,12 @@ import { BaseFloorElement, FloorDoc, FloorMode } from "src/types/floor";
 import { extractAllTableIds, hasFloorTables } from "src/floor-manager/filters";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { ELEMENTS_TO_ADD_COLLECTION } from "src/floor-manager/constants";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { isWall } from "src/floor-manager/type-guards";
 import { NumberTuple } from "src/types/generic";
 import { saveFloor } from "src/services/firebase/db-floors";
 import { useRouter } from "vue-router";
-import { useQuasar } from "quasar";
+import { Loading, useQuasar } from "quasar";
 import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
 import { Collection } from "src/types/firebase";
 
@@ -41,12 +41,20 @@ useFirestoreDoc<FloorDoc>({
     type: "get",
     path: `${Collection.FLOORS}/${props.floorID}`,
     onReceive(floor) {
+        Loading.hide();
         if (!floor) {
             router.replace("/").catch(showErrorMessage);
         } else {
             instantiateFloor(floor);
         }
     },
+    onError() {
+        Loading.hide();
+    },
+});
+
+onMounted(() => {
+    Loading.show();
 });
 
 function instantiateFloor(floor: FloorDoc) {
