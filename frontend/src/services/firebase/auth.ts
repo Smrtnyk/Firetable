@@ -19,7 +19,7 @@ export function createUserWithEmail(payload: CreateUserPayload) {
     return httpsCallable(functions(), "createUser")(payload);
 }
 
-export function updateUser<T extends keyof CreateUserPayload>(
+export function updateUserField<T extends keyof CreateUserPayload>(
     uid: string,
     field: T,
     value: CreateUserPayload[T]

@@ -13,6 +13,7 @@ interface Props {
 const userSkeleton: CreateUserPayload = {
     id: "",
     name: "",
+    username: "",
     email: "",
     password: "",
     floors: [],
@@ -28,8 +29,16 @@ const userNameRules = [noEmptyString(), noWhiteSpaces];
 const roles = Object.values(Role);
 
 function onSubmit() {
-    form.value.email = form.value.email + PROJECT_MAIL;
-    emit("submit", form.value);
+    if (props.user) {
+        emit("submit", {
+            ...form.value,
+        });
+    } else {
+        emit("submit", {
+            ...form.value,
+            email: form.value.username + PROJECT_MAIL,
+        });
+    }
 }
 
 function onReset() {
@@ -55,7 +64,8 @@ function onReset() {
             />
 
             <q-input
-                v-model="form.email"
+                v-if="!props.user"
+                v-model="form.username"
                 standout
                 rounded
                 label="Username *"
@@ -97,7 +107,14 @@ function onReset() {
             />
 
             <div>
-                <q-btn rounded size="md" label="Submit" type="submit" class="button-gradient" />
+                <q-btn
+                    rounded
+                    size="md"
+                    label="Submit"
+                    type="submit"
+                    class="button-gradient"
+                    v-close-popup
+                />
                 <q-btn
                     rounded
                     size="md"

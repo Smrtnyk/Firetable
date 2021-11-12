@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { logoutUser, updateUser } from "src/services/firebase/auth";
+import { logoutUser, updateUserField } from "src/services/firebase/auth";
 import { useI18n } from "vue-i18n";
 
 import { useQuasar, LocalStorage } from "quasar";
@@ -59,7 +59,7 @@ function setDarkMode(newValue: boolean) {
 function toggleUserActivityStatus(newValue: boolean) {
     if (!user.value) return;
 
-    updateUser(user.value.id, "status", Number(newValue)).catch(showErrorMessage);
+    updateUserField(user.value.id, "status", Number(newValue)).catch(showErrorMessage);
 }
 
 function onLogoutUser() {

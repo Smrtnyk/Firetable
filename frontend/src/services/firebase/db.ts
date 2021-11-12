@@ -37,6 +37,9 @@ export function deleteCollection(id: string) {
 }
 
 // DOCS
+export function userDoc(userId: string) {
+    return doc(usersCollection(), userId);
+}
 
 export function eventDoc(eventId: string) {
     return doc(eventsCollection(), eventId);

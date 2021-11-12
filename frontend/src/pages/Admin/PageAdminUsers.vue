@@ -10,9 +10,10 @@ import { Collection } from "src/types/firebase";
 import { CreateUserPayload, User } from "src/types/auth";
 import { FloorDoc } from "src/types/floor";
 import { useAuthStore } from "src/stores/auth-store";
-import { DialogChainObject, useQuasar } from "quasar";
+import { useQuasar } from "quasar";
 import FTDialog from "components/FTDialog.vue";
 import { documentId, query as firestoreQuery, where } from "@firebase/firestore";
+import { updateUser } from "src/services/firebase/db-users";
 
 const { maxNumOfUsers } = config;
 const authStore = useAuthStore();
@@ -37,7 +38,7 @@ const { data: floors } = useFirestore<FloorDoc>({
     path: Collection.FLOORS,
 });
 
-async function onCreateUser(newUser: CreateUserPayload, dialog: DialogChainObject) {
+async function onCreateUser(newUser: CreateUserPayload) {
     if (users.value.length > maxNumOfUsers) {
         showErrorMessage("You have reached the maximum amount of users!");
         return;
@@ -45,12 +46,15 @@ async function onCreateUser(newUser: CreateUserPayload, dialog: DialogChainObjec
 
     await tryCatchLoadingWrapper(async () => {
         await createUserWithEmail(newUser);
-        dialog.hide();
     });
 }
 
+function onUpdateUser(userId: string, updatedUser: Partial<CreateUserPayload>) {
+    return tryCatchLoadingWrapper(() => updateUser(userId, updatedUser));
+}
+
 function createUser(): void {
-    const dialog = quasar.dialog({
+    quasar.dialog({
         component: FTDialog,
         componentProps: {
             component: UserCreateForm,
@@ -60,13 +64,13 @@ function createUser(): void {
                 floors: floorsMaps.value,
             },
             listeners: {
-                submit: (user: CreateUserPayload) => onCreateUser(user, dialog),
+                submit: onCreateUser,
             },
         },
     });
 }
 
-function editUser(user: User, reset: () => void) {
+function editUser(user: User) {
     quasar.dialog({
         component: FTDialog,
         componentProps: {
@@ -78,7 +82,8 @@ function editUser(user: User, reset: () => void) {
                 floors: floorsMaps.value,
             },
             listeners: {
-                submit: console.log,
+                submit: (updatedUser: Partial<CreateUserPayload>) =>
+                    onUpdateUser(user.id, updatedUser),
             },
         },
     });
@@ -118,7 +123,7 @@ async function onUserSlideRight({ id }: User, reset: () => void) {
                 :key="user.id"
                 right-color="warning"
                 @right="({ reset }) => onUserSlideRight(user, reset)"
-                @left="({ reset }) => editUser(user, reset)"
+                @left="() => editUser(user)"
                 class="fa-card"
             >
                 <template #right>
