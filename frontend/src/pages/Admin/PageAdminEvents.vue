@@ -2,6 +2,7 @@
 import PageAdminEventsListItem from "components/Event/PageAdminEventsListItem.vue";
 import EventCreateForm from "components/admin/event/EventCreateForm.vue";
 import FTTitle from "components/FTTitle.vue";
+import FTDialog from "components/FTDialog.vue";
 
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { onMounted, ref } from "vue";
@@ -13,11 +14,9 @@ import { useFirestore } from "src/composables/useFirestore";
 import { Collection } from "src/types/firebase";
 import { FloorDoc } from "src/types/floor";
 import { CreateEventPayload, EventDoc } from "src/types/event";
-import { useEventsStore } from "src/stores/events-store";
 
-const q = useQuasar();
+const quasar = useQuasar();
 const router = useRouter();
-const eventsStore = useEventsStore();
 const isLoading = ref(true);
 const events = ref<EventDoc[]>([]);
 const hasMoreEventsToFetch = ref(true);
@@ -45,11 +44,9 @@ async function fetchMoreEvents(lastDoc: QueryDocumentSnapshot<DocumentData> | nu
 }
 
 function onCreateEvent(eventData: CreateEventPayload) {
-    eventsStore.toggleEventCreateModalVisibility();
-
     tryCatchLoadingWrapper(async () => {
         const { data: id } = await createNewEvent(eventData);
-        q.notify("Event created!");
+        quasar.notify("Event created!");
         await router.replace({
             name: "adminEvent",
             params: { id },
@@ -79,20 +76,35 @@ async function onLoad(_: number, done: () => void) {
     done();
 }
 
+function showCreateEventForm(): void {
+    quasar.dialog({
+        component: FTDialog,
+        componentProps: {
+            title: "Create new event",
+            maximized: false,
+            component: EventCreateForm,
+            componentPropsObject: {
+                floors: floors.value,
+            },
+            listeners: {
+                create: onCreateEvent,
+            },
+        },
+    });
+}
+
 onMounted(init);
 </script>
 
 <template>
     <div class="PageAdminEvents">
-        <event-create-form :floors="floors" @create="onCreateEvent" />
-
         <FTTitle title="Events">
             <template #right>
                 <q-btn
                     rounded
                     icon="plus"
                     class="button-gradient"
-                    @click="eventsStore.toggleEventCreateModalVisibility"
+                    @click="showCreateEventForm"
                     label="new event"
                 />
             </template>
