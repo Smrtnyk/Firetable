@@ -163,7 +163,9 @@ function isActiveFloor(floor: FloorDoc) {
 }
 
 function setActiveFloor(floor?: FloorDoc) {
-    floor && (state.activeFloor = floor);
+    if (floor) {
+        state.activeFloor = floor;
+    }
 }
 
 function showEventInfo(): void {
