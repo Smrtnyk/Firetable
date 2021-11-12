@@ -10,10 +10,5 @@ const eventsStore = useEventsStore();
 </script>
 
 <template>
-    <q-dialog
-        :model-value="eventsStore.showEventInfoModal"
-        @update:model-value="eventsStore.toggleEventInfoModalVisibility"
-    >
-        <q-card>{{ props.eventInfo }}</q-card>
-    </q-dialog>
+    <div>{{ props.eventInfo }}</div>
 </template>

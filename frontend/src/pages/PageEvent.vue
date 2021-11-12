@@ -27,7 +27,7 @@
                 rounded
                 size="md"
                 icon="info"
-                @click="eventsStore.toggleEventInfoModalVisibility"
+                @click="showEventInfo"
                 v-if="event.info"
             />
             <q-btn
@@ -60,7 +60,6 @@
         </div>
 
         <EventGuestList :guest-list-limit="Number(event.guestListLimit)" :guest-list="guestList" />
-        <EventInfo v-if="event.info" :event-info="event.info" />
     </div>
 </template>
 
@@ -70,6 +69,7 @@ import EventShowReservation from "components/Event/EventShowReservation.vue";
 import EventGuestList from "components/Event/EventGuestList.vue";
 import FTAutocomplete from "components/Event/FTAutocomplete.vue";
 import EventInfo from "components/Event/EventInfo.vue";
+import FTDialog from "components/FTDialog.vue";
 
 import { DialogChainObject, Loading, useQuasar } from "quasar";
 
@@ -164,6 +164,21 @@ function isActiveFloor(floor: FloorDoc) {
 
 function setActiveFloor(floor?: FloorDoc) {
     floor && (state.activeFloor = floor);
+}
+
+function showEventInfo(): void {
+    q.dialog({
+        component: FTDialog,
+        componentProps: {
+            component: EventInfo,
+            title: "Event Info",
+            maximized: false,
+            componentPropsObject: {
+                eventInfo: event.value?.info || "",
+            },
+            listeners: {},
+        },
+    });
 }
 
 function showReservation(floor: Floor, reservation: Reservation, tableId: string) {
