@@ -53,9 +53,7 @@ function onReservationConfirm(val: boolean) {
                 <template #avatar>
                     <q-btn round class="q-mr-sm" flat icon="close" @click="onDialogOK" />
                 </template>
-                <template #action>
-                    <q-btn round flat icon="trash" color="negative" @click="onDialogCancel" />
-                </template>
+                <template #action> </template>
                 <h6 class="text-h6 q-ma-none">
                     {{ t("EventShowReservation.title") }} {{ props.tableId }}
                 </h6>
@@ -122,6 +120,17 @@ function onReservationConfirm(val: boolean) {
                             unchecked-icon="close"
                             checked-icon="check"
                             color="green"
+                        />
+                    </q-item-section>
+                </q-item>
+                <q-item>
+                    <q-item-section>
+                        <q-btn
+                            label="Delete Reservation"
+                            outline
+                            icon="trash"
+                            color="negative"
+                            @click="onDialogCancel"
                         />
                     </q-item-section>
                 </q-item>
