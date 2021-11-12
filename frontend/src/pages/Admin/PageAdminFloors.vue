@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AddNewFloorForm from "components/Floor/AddNewFloorForm.vue";
 import FTTitle from "components/FTTitle.vue";
+import FTDialog from "components/FTDialog.vue";
 
 import { makeRawFloor } from "src/floor-manager/factories";
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
@@ -8,9 +9,9 @@ import { deleteFloor, addFloor } from "src/services/firebase/db-floors";
 import { useFirestore } from "src/composables/useFirestore";
 import { Collection } from "src/types/firebase";
 import { FloorDoc } from "src/types/floor";
-import { useFloorsStore } from "src/stores/floors-store";
+import { useQuasar } from "quasar";
 
-const floorsStore = useFloorsStore();
+const quasar = useQuasar();
 const { data: floors, loading: isLoading } = useFirestore<FloorDoc>({
     type: "watch",
     path: Collection.FLOORS,
@@ -29,7 +30,7 @@ async function onFloorDelete({ id }: Pick<FloorDoc, "id">, reset: () => void) {
     );
 }
 
-async function onAddNewFloor({ name }: Pick<FloorDoc, "name">) {
+async function onAddNewFloor(name: string) {
     if (floors.value.find((floor) => floor.name === name)) {
         showErrorMessage("Floor wit the same name already exists!");
         return;
@@ -37,7 +38,23 @@ async function onAddNewFloor({ name }: Pick<FloorDoc, "name">) {
     const newFloor = makeRawFloor(name);
     await tryCatchLoadingWrapper(async () => {
         await addFloor(newFloor);
-        floorsStore.toggleCreateFloorModalVisibility();
+    });
+}
+
+function showAddNewFloorForm(): void {
+    const dialog = quasar.dialog({
+        component: FTDialog,
+        componentProps: {
+            title: "Add New Floor",
+            component: AddNewFloorForm,
+            maximized: false,
+            listeners: {
+                create: (name: string) => {
+                    onAddNewFloor(name).then(dialog.hide).catch(showErrorMessage);
+                },
+            },
+            componentPropsObject: {},
+        },
     });
 }
 </script>
@@ -50,7 +67,7 @@ async function onAddNewFloor({ name }: Pick<FloorDoc, "name">) {
                     rounded
                     icon="plus"
                     class="button-gradient"
-                    @click="floorsStore.toggleCreateFloorModalVisibility"
+                    @click="showAddNewFloorForm"
                     label="new floor"
                 />
             </template>
@@ -93,7 +110,5 @@ async function onAddNewFloor({ name }: Pick<FloorDoc, "name">) {
             </q-btn>
             <q-img src="no-map.svg" />
         </div>
-
-        <AddNewFloorForm @create="onAddNewFloor" />
     </div>
 </template>
