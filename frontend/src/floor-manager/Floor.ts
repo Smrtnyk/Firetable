@@ -270,7 +270,7 @@ export class Floor {
         this.floor
             .selectAll<SVGGElement, TableElement>("g.tableGroup")
             .data(this.tables, (d) => d.tableId)
-            // @ts-ignore I have 0 fucking idea how to type d3 styff
+            // @ts-ignore I have 0 fucking idea how to type d3 stuff
             .join(this.onTablesEnter.bind(this), this.onTablesUpdate);
     }
 
