@@ -9,7 +9,6 @@ import { ELEMENTS_TO_ADD_COLLECTION } from "src/floor-manager/constants";
 import { onMounted, ref } from "vue";
 import { isWall } from "src/floor-manager/type-guards";
 import { NumberTuple } from "src/types/generic";
-import { saveFloor } from "src/services/firebase/db-floors";
 import { useRouter } from "vue-router";
 import { Loading, useQuasar } from "quasar";
 import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
@@ -37,7 +36,7 @@ const floorInstance = ref<Floor | null>(null);
 const svgFloorContainer = ref<HTMLElement | null>(null);
 const selectedElement = ref<BaseFloorElement | null>(null);
 const selectedFloor = ref<Floor | null>(null);
-useFirestoreDoc<FloorDoc>({
+const { updateDoc: updateFloor } = useFirestoreDoc<FloorDoc>({
     type: "get",
     path: `${Collection.FLOORS}/${props.floorID}`,
     onReceive(floor) {
@@ -74,7 +73,10 @@ function onFloorSave() {
         return showErrorMessage("You need to add at least one table!");
     }
 
-    tryCatchLoadingWrapper(() => saveFloor(floorInstance.value as Floor)).catch(showErrorMessage);
+    return tryCatchLoadingWrapper(() => {
+        const { id, name, data, width, height } = floorInstance.value as Floor;
+        return updateFloor({ id, name, data, width, height }).catch(showErrorMessage);
+    });
 }
 
 function onFloorChange(prop: keyof Floor, event: string | number) {

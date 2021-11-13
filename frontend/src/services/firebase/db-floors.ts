@@ -17,10 +17,6 @@ export function deleteFloor(floorID: string) {
     return deleteDoc(floorDoc(floorID));
 }
 
-export function saveFloor({ id, name, data, width, height }: Floor | FloorDoc) {
-    return updateDoc(floorDoc(id), { id, name, data, width, height });
-}
-
 export function addFloor(floor: Omit<FloorDoc, "id">) {
     return addDoc(floorsCollection(), floor);
 }
