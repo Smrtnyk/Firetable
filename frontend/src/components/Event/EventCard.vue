@@ -112,7 +112,6 @@ const props = defineProps<Props>();
         background: inherit;
         position: absolute;
         bottom: 0;
-        animation: ContentFadeIn 0.8s 1.6s forwards;
     }
 
     &__svg {
