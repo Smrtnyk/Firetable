@@ -10,8 +10,8 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <router-link :to="{ name: 'event', params: { id: props.event.id } }">
-        <div class="card">
+    <router-link class="EventCard__link" :to="{ name: 'event', params: { id: props.event.id } }">
+        <div class="EventCard">
             <div class="event-success-indicator" v-if="props.event.reservedPercentage >= 75">
                 <q-icon name="fire" color="warning" class="bg-warning-shadow rounded" size="md" />
                 <q-tooltip>
@@ -19,22 +19,24 @@ const props = defineProps<Props>();
                     performing well!
                 </q-tooltip>
             </div>
-            <div class="card__image-container">
-                <img
-                    class="card__image"
+
+            <div class="EventCard__image-container">
+                <q-img
+                    class="EventCard__image"
                     :src="props.event.img || 'images/default-event-img.jpg'"
                     alt=""
+                    :ratio="1"
                 />
             </div>
 
-            <svg class="card__svg" viewBox="0 0 800 500">
+            <svg class="EventCard__svg" viewBox="0 0 800 500">
                 <path
                     d="M 0 160 Q 50 200 100 250 Q 250 400 350 300 C 400 250 550 150 650 300 Q 750 400 800 300 L 800 500 L 0 500"
                     stroke="transparent"
                     fill="#333"
                 />
                 <path
-                    class="card__line"
+                    class="EventCard__line"
                     d="M 0 160 Q 50 200 100 250 Q 250 400 350 300 C 400 250 550 150 650 300 Q 750 400 800 300"
                     stroke="pink"
                     stroke-width="3"
@@ -42,7 +44,7 @@ const props = defineProps<Props>();
                 />
             </svg>
 
-            <div class="card__content">
+            <div class="EventCard__content">
                 <h2 class="text-h3 q-ma-none">{{ props.event.name }}</h2>
                 <q-icon
                     name="calendar"
@@ -73,30 +75,24 @@ const props = defineProps<Props>();
 </template>
 
 <style lang="scss">
-img {
-    max-width: 100%;
-    width: 100%;
-}
-
-.card {
+.EventCard {
     position: relative;
     background: #333;
     width: 100%;
     border-radius: 6px;
-    padding: 1rem;
     color: #aaa;
     box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.2), 0 0 1rem rgba(0, 0, 0, 0.2);
     overflow: hidden;
+
+    &__link {
+        text-decoration: none;
+    }
 
     .event-success-indicator {
         position: absolute;
         top: 5px;
         right: 5px;
         z-index: 2;
-    }
-
-    &__image-container {
-        margin: -2rem -2rem 1rem -2rem;
     }
 
     &__line {
@@ -110,15 +106,20 @@ img {
     }
 
     &__content {
-        margin-top: -1rem;
-        opacity: 0;
+        text-decoration: none !important;
+        padding: 1rem;
+        width: 100%;
+        height: 100px;
+        background: inherit;
+        position: absolute;
+        bottom: 0;
         animation: ContentFadeIn 0.8s 1.6s forwards;
     }
 
     &__svg {
         position: absolute;
         left: 0;
-        top: 125px;
+        top: 100px;
     }
 }
 
@@ -138,20 +139,9 @@ img {
     100% {
         opacity: 1;
         d: path(
-            "M -2 100 Q 50 200 100 250 Q 250 400 350 300 C 400 250 550 150 650 300 Q 750 450 802 400"
+            "M -2 160 Q 50 200 100 250 Q 250 400 350 300 C 400 250 550 150 650 300 Q 750 400 800 300"
         );
         stroke: #545581;
-    }
-}
-
-@keyframes ContentFadeIn {
-    0% {
-        transform: translateY(-1rem);
-        opacity: 0;
-    }
-    100% {
-        transform: translateY(0);
-        opacity: 1;
     }
 }
 
