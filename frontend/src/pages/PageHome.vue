@@ -6,12 +6,14 @@ import { useFirestore } from "src/composables/useFirestore";
 import { query as firestoreQuery, where, orderBy, limit } from "@firebase/firestore";
 import { Collection } from "src/types/firebase";
 import { EventDoc } from "src/types/event";
+import { config } from "src/config";
+import { ONE_HOUR } from "src/floor-manager/constants";
 
 const { data: events, loading: isLoading } = useFirestore<EventDoc>({
     type: "watch",
     path: Collection.EVENTS,
     query(collectionRef) {
-        const whereConstraint = where("date", ">=", Date.now() - 60 * 60 * 1000 * 8);
+        const whereConstraint = where("date", ">=", Date.now() - ONE_HOUR * config.eventDuration);
         const orderByConstraint = orderBy("date");
         const limitConstraint = limit(10);
         return firestoreQuery(collectionRef, whereConstraint, orderByConstraint, limitConstraint);

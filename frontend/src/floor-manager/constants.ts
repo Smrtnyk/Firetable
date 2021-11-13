@@ -33,3 +33,7 @@ export const RESOLUTION = 5;
 export const FLOOR_DEFAULT_WIDTH = 400;
 export const FLOOR_DEFAULT_HEIGHT = 650;
 export const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
+
+const ONE_SECOND = 1000;
+const ONE_MINUTE = ONE_SECOND * 60;
+export const ONE_HOUR = 60 * ONE_MINUTE;
