@@ -31,13 +31,13 @@ const props = defineProps<Props>();
 
             <svg class="EventCard__svg" viewBox="0 0 800 500">
                 <path
-                    d="M 0 160 Q 50 200 100 250 Q 250 400 350 300 C 400 250 550 150 650 300 Q 750 400 800 300 L 800 500 L 0 500"
+                    d="M -1 234.242 Q 46.152 228.549 100 250 Q 227.928 327.265 340.124 303.347 C 430.01 284.258 463.499 216.411 635.836 278.559 Q 744.46 320.792 800 300 L 800 500 L 0 500"
                     stroke="transparent"
                     fill="#333"
                 />
                 <path
                     class="EventCard__line"
-                    d="M 0 160 Q 50 200 100 250 Q 250 400 350 300 C 400 250 550 150 650 300 Q 750 400 800 300"
+                    d="M -1 234.242 Q 46.152 228.549 100 250 Q 227.928 327.265 340.124 303.347 C 430.01 284.258 463.499 216.411 635.836 278.559 Q 744.46 320.792 800 300"
                     stroke="pink"
                     stroke-width="3"
                     fill="transparent"
@@ -109,7 +109,6 @@ const props = defineProps<Props>();
         text-decoration: none !important;
         padding: 1rem;
         width: 100%;
-        height: 100px;
         background: inherit;
         position: absolute;
         bottom: 0;
@@ -119,7 +118,7 @@ const props = defineProps<Props>();
     &__svg {
         position: absolute;
         left: 0;
-        top: 100px;
+        bottom: 20px;
     }
 }
 
@@ -139,7 +138,7 @@ const props = defineProps<Props>();
     100% {
         opacity: 1;
         d: path(
-            "M -2 160 Q 50 200 100 250 Q 250 400 350 300 C 400 250 550 150 650 300 Q 750 400 800 300"
+            "M -1 234.242 Q 46.152 228.549 100 250 Q 227.928 327.265 340.124 303.347 C 430.01 284.258 463.499 216.411 635.836 278.559 Q 744.46 320.792 800 300"
         );
         stroke: #545581;
     }
