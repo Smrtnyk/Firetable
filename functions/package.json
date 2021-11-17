@@ -25,8 +25,8 @@
     "devDependencies": {
         "@types/faker": "5.5.9",
         "@types/web-push": "3.3.2",
-        "@typescript-eslint/eslint-plugin": "5.3.1",
-        "@typescript-eslint/parser": "5.3.1",
+        "@typescript-eslint/eslint-plugin": "5.4.0",
+        "@typescript-eslint/parser": "5.4.0",
         "eslint": "8.2.0",
         "eslint-plugin-import": "2.25.3",
         "faker": "5.5.3",

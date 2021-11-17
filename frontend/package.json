@@ -21,14 +21,14 @@
         "d3-zoom": "3.0.0",
         "firebase": "9.4.1",
         "pinia": "2.0.3",
-        "quasar": "2.3.1",
+        "quasar": "2.3.2",
         "vue-i18n": "9.1.9"
     },
     "devDependencies": {
-        "@quasar/app": "3.2.1",
+        "@quasar/app": "3.2.2",
         "@types/d3": "7.1.0",
-        "@typescript-eslint/eslint-plugin": "5.3.1",
-        "@typescript-eslint/parser": "5.3.1",
+        "@typescript-eslint/eslint-plugin": "5.4.0",
+        "@typescript-eslint/parser": "5.4.0",
         "babel-loader": "8.2.3",
         "dotenv": "10.0.0",
         "eslint": "8.2.0",
