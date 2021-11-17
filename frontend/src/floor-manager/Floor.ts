@@ -33,6 +33,7 @@ import {
 import { getFreeTables, getTables } from "src/floor-manager/filters";
 import { NumberTuple } from "src/types/generic";
 import { drag } from "d3-drag";
+import { willCollide } from "src/floor-manager/collision-detection";
 
 export class Floor {
     name: string;
@@ -299,7 +300,7 @@ export class Floor {
             if (!matchesSelectedElement) return;
             const gridX = possibleXMove(instance.width, x, d.width);
             const gridY = possibleYMove(instance.height, y, d.height);
-
+            if (willCollide(instance.data, d, gridX, gridY)) return;
             d.x = gridX;
             d.y = gridY;
 
