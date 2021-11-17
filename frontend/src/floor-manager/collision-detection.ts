@@ -9,10 +9,10 @@ export function willCollide(
     const allElements = data.filter(({ id }) => element.id !== id);
     return allElements.some((currentElement) => {
         return (
-            nextXMove + element.width >= currentElement.x &&
-            nextXMove <= currentElement.x + currentElement.width &&
-            nextYMove + element.height >= currentElement.y &&
-            nextYMove <= currentElement.y + currentElement.height
+            nextXMove + element.width > currentElement.x &&
+            nextXMove < currentElement.x + currentElement.width &&
+            nextYMove + element.height > currentElement.y &&
+            nextYMove < currentElement.y + currentElement.height
         );
     });
 }
