@@ -184,8 +184,12 @@ function onElementClickHandler(floor: Floor | null, d: BaseFloorElement | null) 
     g.tableGroup.active circle {
         fill: #ff8a00 !important;
     }
+    circle.bottom-right {
+        stroke: #000;
+        fill: #333;
+    }
     // RESIZING WALL CONTROLS
-    circle.bottomright:hover {
+    circle.bottom-right:hover {
         cursor: move;
         fill: #ff8a00;
     }

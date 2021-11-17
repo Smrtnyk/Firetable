@@ -7,7 +7,6 @@ import {
     calculateWallWidth,
     generateTableClass,
     generateTableGroupClass,
-    getDefaultElementWidth,
     getRoundTableRadius,
     getTableHeight,
     getTableText,
@@ -34,6 +33,8 @@ import { getFreeTables, getTables } from "src/floor-manager/filters";
 import { NumberTuple } from "src/types/generic";
 import { drag } from "d3-drag";
 import { willCollide } from "src/floor-manager/collision-detection";
+import { addDragBehaviourToElement } from "src/floor-manager/element-drag";
+import { elementResizeBehavior } from "src/floor-manager/element-resize";
 
 export class Floor {
     name: string;
@@ -47,10 +48,10 @@ export class Floor {
     private readonly mode: FloorMode;
     private readonly container: Element;
     private readonly dblClickHandler: FloorDoubleClickHandler;
-    private readonly elementClickHandler: ElementClickHandler;
+    public readonly elementClickHandler: ElementClickHandler;
 
     private svg!: Selection<SVGSVGElement, unknown, null, unknown>;
-    private floor!: Selection<SVGGElement, unknown, null, unknown>;
+    public floor!: Selection<SVGGElement, unknown, null, unknown>;
 
     private elementClickListener = (event: Event, d: BaseFloorElement) => {
         event.stopPropagation();
@@ -188,7 +189,7 @@ export class Floor {
         wallG.on("click", this.elementClickListener);
 
         if (isEditorModeActive(this.mode)) {
-            this.addDragBehaviourToElement(this, wallG);
+            addDragBehaviourToElement(this, wallG);
         }
     }
 
@@ -199,12 +200,12 @@ export class Floor {
             .attr("height", (d) => d.height)
             .attr("width", calculateWallWidth);
         update
-            .select(".bottomright")
+            .select(".bottom-right")
             .attr("cx", (d) => d.width)
             .attr("cy", (d) => d.height);
     }
 
-    private renderWallElements() {
+    public renderWallElements() {
         const wallsData = this.data.filter(isWall);
 
         this.floor
@@ -221,7 +222,7 @@ export class Floor {
             return;
         }
         selectedElement.classList.remove("selected");
-        selectedElement.querySelector(".bottomright")?.remove();
+        selectedElement.querySelector(".bottom-right")?.remove();
         this.selectedElement = null;
         this.elementClickHandler(null, null);
     }
@@ -234,7 +235,7 @@ export class Floor {
         }
         selectedElement.classList.add("selected");
         this.selectedElement = d;
-        this.elementResizeBehavior(selectedElement);
+        elementResizeBehavior(this, selectedElement);
     }
 
     private onTablesEnter(enter: tableElementGroupSelection) {
@@ -259,13 +260,13 @@ export class Floor {
 
         tableG.on("click", this.elementClickListener);
 
-        this.addDragBehaviourToElement(this, tableG);
+        addDragBehaviourToElement(this, tableG);
     }
 
     private onTablesUpdate(update: tableElementGroupSelection) {
         update.attr("transform", translateElementToItsPosition);
         update
-            .select(".bottomright")
+            .select(".bottom-right")
             .attr("cx", calculateBottomResizableCirclePositionX)
             .attr("cy", calculateBottomResizableCirclePositionY);
         update.select(".table").attr("class", generateTableClass);
@@ -287,85 +288,6 @@ export class Floor {
         isRoundTable(d)
             ? element.attr("r", getRoundTableRadius)
             : element.attr("height", getTableHeight).attr("width", getTableWidth);
-    }
-
-    private addDragBehaviourToElement(
-        instance: Floor,
-        element:
-            | Selection<SVGGElement, BaseFloorElement, SVGGElement, unknown>
-            | Selection<SVGGElement, TableElement, SVGGElement, unknown>
-    ) {
-        const dragBehaviour = drag<Element, BaseFloorElement, Element>()
-            .on("start", instance.elementDragStarted)
-            .on("drag", elementDragging)
-            .on("end", instance.elementDragEnded);
-
-        dragBehaviour(element as any);
-
-        function elementDragging(this: Element, { x, y }: DragEvent, d: BaseFloorElement) {
-            const matchesSelectedElement = this === document.querySelector(".selected");
-            if (!matchesSelectedElement) return;
-            const gridX = possibleXMove(instance.width, x, d.width);
-            const gridY = possibleYMove(instance.height, y, d.height);
-            if (willCollide(instance.data, d, gridX, gridY)) return;
-            d.x = gridX;
-            d.y = gridY;
-
-            select(this).attr("transform", `translate(${gridX},${gridY})`);
-        }
-    }
-
-    private elementDragStarted(this: Element): void {
-        select(this).classed("active", true);
-    }
-
-    private elementDragEnded(this: Element): void {
-        select(this).classed("active", false);
-    }
-
-    private elementResizeBehavior(element: Element) {
-        const node = this.floor?.node();
-        if (!node) return;
-
-        const circleG = select<Element, TableElement>(element);
-        const dragBehaviour = drag<SVGGElement, BaseFloorElement, unknown>()
-            .container(node)
-            .subject(({ x, y }) => ({ x, y }))
-            .on("drag", this.elementResizing(this));
-
-        circleG
-            .append("circle")
-            .attr("class", "bottomright")
-            .attr("r", 5)
-            .attr("cx", calculateBottomResizableCirclePositionX)
-            .attr("cy", calculateBottomResizableCirclePositionY)
-            .on("mouseenter mouseleave", Floor.resizerHover)
-            .call(dragBehaviour as any);
-    }
-
-    private elementResizing(instance: Floor) {
-        return function (event: FTDragEvent, d: BaseFloorElement) {
-            const { x, y } = event;
-            const gridX = possibleXMove(instance.width + d.width, x, d.width);
-            const gridY = possibleYMove(instance.height + d.height, y, d.height);
-            d.width = Math.max(gridX - d.x, getDefaultElementWidth(d));
-            d.height = Math.max(gridY - d.y, getDefaultElementWidth(d));
-
-            if (isTable(d)) {
-                instance.renderTableElements();
-            } else {
-                instance.renderWallElements();
-            }
-            // To trigger the reactivity if vue component registers the handler
-            instance.elementClickHandler(instance, { ...d });
-        };
-    }
-
-    private static resizerHover({ type, target }: MouseEvent) {
-        const element = select(target as Element);
-        const radius = type === "mouseenter" ? 6 : 5;
-
-        element.attr("r", radius);
     }
 
     private setupEditor() {

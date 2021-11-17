@@ -47,14 +47,14 @@ export function getTableWidth(d?: TableElement) {
     return d?.width || TABLE_WIDTH;
 }
 
-export function calculateBottomResizableCirclePositionX(d: TableElement) {
+export function calculateBottomResizableCirclePositionX(d: BaseFloorElement) {
     if (isRoundTable(d)) {
         return getRoundTableRadius(d) / Math.sqrt(2);
     }
     return d.width;
 }
 
-export function calculateBottomResizableCirclePositionY(d: TableElement) {
+export function calculateBottomResizableCirclePositionY(d: BaseFloorElement) {
     if (isRoundTable(d)) {
         return getRoundTableRadius(d) / Math.sqrt(2);
     }
