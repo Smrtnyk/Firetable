@@ -1,5 +1,10 @@
-import { FLOOR_DEFAULT_HEIGHT, FLOOR_DEFAULT_WIDTH, RESOLUTION } from "./constants";
-import { calculateWallWidth, getTableHeight, getTableWidth } from "./utils";
+import {
+    FLOOR_DEFAULT_HEIGHT,
+    FLOOR_DEFAULT_WIDTH,
+    INITIAL_WALL_HEIGHT,
+    RESOLUTION,
+} from "./constants";
+import { getTableHeight, getTableWidth } from "./utils";
 import { uid } from "quasar";
 import { BaseFloorElement, ElementTag, ElementType, FloorDoc, TableElement } from "src/types/floor";
 
@@ -28,8 +33,8 @@ export function makeRawWall(x: number, y: number): BaseFloorElement {
         y,
         type: ElementType.WALL,
         tag: ElementTag.RECT,
-        width: calculateWallWidth(),
-        height: RESOLUTION * 5,
+        width: RESOLUTION,
+        height: INITIAL_WALL_HEIGHT,
         id: uid(),
     };
 }

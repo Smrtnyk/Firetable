@@ -1,6 +1,6 @@
 import { EnterElement, pointer, select, Selection } from "d3-selection";
 import { range } from "d3-array";
-import { RESOLUTION, SVG_NAMESPACE } from "./constants";
+import { INITIAL_WALL_HEIGHT, RESOLUTION, SVG_NAMESPACE } from "./constants";
 import {
     calculateBottomResizableCirclePositionX,
     calculateBottomResizableCirclePositionY,
@@ -141,7 +141,12 @@ export class Floor {
     }
 
     public addWall([x, y]: NumberTuple) {
-        this.data.push(makeRawWall(x, y));
+        this.data.push(
+            makeRawWall(
+                possibleXMove(this.width, x, calculateWallWidth()),
+                possibleYMove(this.height, y, INITIAL_WALL_HEIGHT)
+            )
+        );
         this.renderWallElements();
     }
 
@@ -156,6 +161,8 @@ export class Floor {
             makeRawTable({
                 floor: this.name,
                 ...rawTableElement,
+                x: possibleXMove(this.width, rawTableElement.x),
+                y: possibleYMove(this.height, rawTableElement.y),
             })
         );
         this.renderTableElements();
