@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import AddTableDialog from "components/Floor/AddTableDialog.vue";
 import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
+import FTDialog from "components/FTDialog.vue";
+
 import { Floor } from "src/floor-manager/Floor";
 import { BaseFloorElement, FloorDoc, FloorMode } from "src/types/floor";
 import { extractAllTableIds, hasFloorTables } from "src/floor-manager/filters";
@@ -47,9 +49,7 @@ const { updateDoc: updateFloor } = useFirestoreDoc<FloorDoc>({
             instantiateFloor(floor);
         }
     },
-    onError() {
-        Loading.hide();
-    },
+    onError: () => Loading.hide(),
 });
 
 onMounted(() => {
@@ -101,11 +101,19 @@ function handleAddNewElement(floor: Floor, coords: NumberTuple) {
         if (isWall(elementDescriptor)) return floor.addWall(coords);
 
         q.dialog({
-            component: AddTableDialog,
+            component: FTDialog,
             componentProps: {
-                ids: extractAllTableIds(floor),
+                component: AddTableDialog,
+                maximized: false,
+                title: "Table ID",
+                componentPropsObject: {
+                    ids: extractAllTableIds(floor),
+                },
+                listeners: {
+                    create: handleAddTableCallback(floor, elementDescriptor, coords),
+                },
             },
-        }).onOk(handleAddTableCallback(floor, elementDescriptor, coords));
+        });
     };
 }
 
