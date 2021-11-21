@@ -7,6 +7,7 @@ export default {
             manageUsers: "Manage Users",
             toggleDarkMode: "Toggle dark mode",
             toggleOnlineStatus: "Toggle online status",
+            manageRoles: "Manage Roles",
         },
     },
     PageEvent: {

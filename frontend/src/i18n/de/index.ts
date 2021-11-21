@@ -4,6 +4,7 @@ export default {
             logout: "Abmelden",
             manageEvents: "Manage Events",
             manageFloors: "Manage Floors",
+            manageRoles: "Manage Roles",
             manageUsers: "Manage Users",
             toggleDarkMode: "Toggle dark mode",
             toggleOnlineStatus: "Toggle online status",

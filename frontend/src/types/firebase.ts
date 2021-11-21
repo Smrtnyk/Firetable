@@ -1,6 +1,3 @@
-import { DocumentData, CollectionReference } from "@firebase/firestore";
-export type CollectionRef = CollectionReference<DocumentData>;
-
 export const enum Collection {
     EVENTS = "events",
     GUEST_LIST = "guestList",
@@ -8,4 +5,5 @@ export const enum Collection {
     FLOORS = "floors",
     FCM = "fcm",
     EVENT_FEED = "eventFeed",
+    SETTINGS = "settings",
 }

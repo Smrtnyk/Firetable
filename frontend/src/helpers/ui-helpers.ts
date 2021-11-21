@@ -42,6 +42,19 @@ export function showErrorMessage(e: unknown) {
     });
 }
 
+export function loadingWrapper<T extends (...args: any[]) => Promise<any>>(fn: T) {
+    return async function (...args: Parameters<T>): Promise<ReturnType<T> | void> {
+        try {
+            Loading.show();
+            return await fn(...args);
+        } catch (e) {
+            showErrorMessage(e);
+        } finally {
+            Loading.hide();
+        }
+    };
+}
+
 export async function tryCatchLoadingWrapper<T>(
     hook: (...args: unknown[]) => Promise<T>,
     argums: unknown[] = [],

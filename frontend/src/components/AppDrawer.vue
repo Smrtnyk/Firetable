@@ -39,6 +39,11 @@ const adminLinks = computed(() => [
         routeName: "adminFloors",
         text: t("AppDrawer.links.manageFloors"),
     },
+    {
+        icon: "arrow-expand",
+        routeName: "adminRoles",
+        text: t("AppDrawer.links.manageRoles"),
+    },
 ]);
 const user = computed(() => authStore.user);
 const adminLinksCollection = computed(() => (props.showAdminLinks ? adminLinks.value : []));
