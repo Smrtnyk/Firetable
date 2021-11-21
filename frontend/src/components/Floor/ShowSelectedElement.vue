@@ -18,7 +18,7 @@
                         type="number"
                         step="5"
                         @keydown.prevent="() => false"
-                        @update:model-value="(val) => updateElementProp('width', val)"
+                        @update:model-value="(val) => updateElementProp('width', Number(val))"
                     />
                 </div>
                 <div class="col-4 q-pa-xs" v-if="!isRoundTableComp">
@@ -29,7 +29,7 @@
                         type="number"
                         step="5"
                         @keydown.prevent="() => false"
-                        @update:model-value="(val) => updateElementProp('height', val)"
+                        @update:model-value="(val) => updateElementProp('height', Number(val))"
                     />
                 </div>
                 <div class="col-4 q-pa-xs">
