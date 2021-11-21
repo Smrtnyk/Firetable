@@ -51,3 +51,15 @@ All contributions and ideas are welcome.
 
 ### Event info
 ![Event info](https://github.com/Smrtnyk/Firetable/blob/master/screenshots/event-info.jpg?raw=true)
+
+## Some things that would be nice to have
+* [ ] Complete translations for all components
+* [ ] Make cloud function that will remove inactive users that are inactive for more than two months
+* [ ] Limit the amount of users that can be created on functions part
+* [ ] Rate limit the table confirmation on the event to avoid spam
+* [ ] Rate limit the guest confirmation on the guest list
+* [ ] Make table disabled if someone is already reserving it
+* [ ] Make reservations editable
+* [ ] Make event editable
+* [ ] Make floor editable on event level
+* [ ] Add waiters schedule per event so for each event is known who works and where
