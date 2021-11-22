@@ -41,7 +41,6 @@ const appStore = useAppStore();
 
 <style lang="scss">
 .AppTopMenu {
-    z-index: 999;
     &__tabs {
         border-radius: $border-radius;
         padding-left: 1rem;
