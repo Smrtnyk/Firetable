@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import UserCreateForm from "components/User/UserCreateForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
-import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import {
+    loadingWrapper,
+    showConfirm,
+    showErrorMessage,
+    tryCatchLoadingWrapper,
+} from "src/helpers/ui-helpers";
 import { computed } from "vue";
 import { createUserWithEmail, deleteUser } from "src/services/firebase/auth";
 import { config } from "src/config";
@@ -56,9 +61,9 @@ async function onCreateUser(newUser: CreateUserPayload) {
     });
 }
 
-function onUpdateUser(userId: string, updatedUser: Partial<CreateUserPayload>) {
-    return tryCatchLoadingWrapper(() => updateUser(userId, updatedUser));
-}
+const onUpdateUser = loadingWrapper((userId: string, updatedUser: Partial<CreateUserPayload>) => {
+    return updateUser(userId, updatedUser);
+});
 
 function createUser(): void {
     quasar.dialog({
@@ -88,6 +93,7 @@ function editUser(user: User) {
             componentPropsObject: {
                 user: { ...user },
                 floors: floorsMaps.value,
+                roles: rolesDoc.value?.roles || [],
             },
             listeners: {
                 submit: (updatedUser: Partial<CreateUserPayload>) =>
