@@ -16,7 +16,7 @@ const appStore = useAppStore();
 </script>
 
 <template>
-    <q-page-sticky expand position="bottom" class="shadow-light AppTopMenu">
+    <q-header class="bg-primary text-white">
         <q-tabs
             switch-indicator
             narrow-indicator
@@ -24,10 +24,6 @@ const appStore = useAppStore();
             active-color="white"
             :breakpoint="0"
         >
-            <q-btn flat aria-label="Menu" @click="appStore.toggleAppDrawerVisibility">
-                <q-icon class="text-gradient" size="2rem" name="menu" />
-            </q-btn>
-            <q-space />
             <q-route-tab
                 v-for="menu in menuLinks"
                 :key="menu.icon"
@@ -35,12 +31,17 @@ const appStore = useAppStore();
                 exact
                 :icon="menu.icon"
             />
+            <q-space />
+            <q-btn flat aria-label="Menu" @click="appStore.toggleAppDrawerVisibility">
+                <q-icon class="text-gradient" size="2rem" name="menu" />
+            </q-btn>
         </q-tabs>
-    </q-page-sticky>
+    </q-header>
 </template>
 
 <style lang="scss">
 .AppTopMenu {
+    z-index: 999;
     &__tabs {
         border-radius: $border-radius;
         padding-left: 1rem;

@@ -18,11 +18,11 @@ function onDrawerToggle() {
 <template>
     <q-layout v-if="isLoggedIn" view="hHh lpR fFf">
         <AppDrawer :show-admin-links="isAdmin" />
+        <AppTopMenu />
         <q-page-container>
             <q-page class="q-pa-xs-xs q-pa-sm-sm q-pa-md-md row">
                 <router-view
                     v-slot="{ Component }"
-                    style="padding-bottom: 51px"
                     class="col-xs-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3"
                 >
                     <transition name="fade" mode="out-in">
@@ -30,8 +30,6 @@ function onDrawerToggle() {
                     </transition>
                 </router-view>
             </q-page>
-
-            <AppTopMenu />
         </q-page-container>
     </q-layout>
 </template>
