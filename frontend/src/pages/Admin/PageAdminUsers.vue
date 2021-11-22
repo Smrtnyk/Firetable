@@ -14,6 +14,9 @@ import { useQuasar } from "quasar";
 import FTDialog from "components/FTDialog.vue";
 import { documentId, query as firestoreQuery, where } from "@firebase/firestore";
 import { updateUser } from "src/services/firebase/db-users";
+import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
+import { RoleDoc } from "src/types/roles";
+import { ROLES_PATH } from "src/services/firebase/paths";
 
 const { maxNumOfUsers } = config;
 const authStore = useAuthStore();
@@ -36,6 +39,10 @@ const { data: users } = useFirestore<User>({
 const { data: floors } = useFirestore<FloorDoc>({
     type: "get",
     path: Collection.FLOORS,
+});
+const { data: rolesDoc } = useFirestoreDoc<RoleDoc>({
+    type: "get",
+    path: ROLES_PATH,
 });
 
 async function onCreateUser(newUser: CreateUserPayload) {
@@ -62,6 +69,7 @@ function createUser(): void {
             title: "Create new user",
             componentPropsObject: {
                 floors: floorsMaps.value,
+                roles: rolesDoc.value?.roles || [],
             },
             listeners: {
                 submit: onCreateUser,
@@ -103,6 +111,7 @@ async function onUserSlideRight({ id }: User, reset: () => void) {
         <FTTitle title="Users">
             <template #right>
                 <q-btn
+                    v-if="rolesDoc"
                     rounded
                     icon="plus"
                     class="button-gradient"

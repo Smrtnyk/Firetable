@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Role, CreateUserPayload, User, ACTIVITY_STATUS } from "src/types/auth";
+import { CreateUserPayload, User, ACTIVITY_STATUS } from "src/types/auth";
 import { ref } from "vue";
 import { noEmptyString, noWhiteSpaces } from "src/helpers/form-rules";
 import { PROJECT_MAIL } from "src/config";
@@ -7,9 +7,15 @@ import { useAuthStore } from "src/stores/auth-store";
 
 interface Props {
     floors: string[];
+    roles: string[];
     user?: User;
 }
 
+const emit = defineEmits(["submit"]);
+const props = defineProps<Props>();
+const authStore = useAuthStore();
+const stringRules = [noEmptyString()];
+const userNameRules = [noEmptyString(), noWhiteSpaces];
 const userSkeleton: CreateUserPayload = {
     id: "",
     name: "",
@@ -17,16 +23,10 @@ const userSkeleton: CreateUserPayload = {
     email: "",
     password: "",
     floors: [],
-    role: Role.WAITER,
+    role: props.roles[0],
     status: ACTIVITY_STATUS.OFFLINE,
 };
-const emit = defineEmits(["submit"]);
-const props = defineProps<Props>();
-const authStore = useAuthStore();
 const form = ref<CreateUserPayload | User>(props.user ? { ...props.user } : { ...userSkeleton });
-const stringRules = [noEmptyString()];
-const userNameRules = [noEmptyString(), noWhiteSpaces];
-const roles = Object.values(Role);
 
 function onSubmit() {
     if (props.user) {
@@ -93,7 +93,7 @@ function onReset() {
                 hint="Assign role to user, default is waiter."
                 standout
                 rounded
-                :options="roles"
+                :options="props.roles"
                 label="Role"
             />
             <q-select

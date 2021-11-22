@@ -15,7 +15,7 @@ export interface User {
     name: string;
     email: string;
     username: string;
-    role: Role;
+    role: string;
     floors: string[];
     status: ACTIVITY_STATUS;
     address?: string;
