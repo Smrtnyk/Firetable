@@ -50,22 +50,24 @@ const { data: rolesDoc } = useFirestoreDoc<RoleDoc>({
     path: ROLES_PATH,
 });
 
-async function onCreateUser(newUser: CreateUserPayload) {
-    if (users.value.length > maxNumOfUsers) {
-        showErrorMessage("You have reached the maximum amount of users!");
-        return;
-    }
-
-    await tryCatchLoadingWrapper(async () => {
-        await createUserWithEmail(newUser);
-    });
-}
+const createUser = loadingWrapper((newUser: CreateUserPayload) => {
+    return createUserWithEmail(newUser);
+});
 
 const onUpdateUser = loadingWrapper((userId: string, updatedUser: Partial<CreateUserPayload>) => {
     return updateUser(userId, updatedUser);
 });
 
-function createUser(): void {
+function onCreateUser(newUser: CreateUserPayload) {
+    if (users.value.length > maxNumOfUsers) {
+        showErrorMessage("You have reached the maximum amount of users!");
+        return;
+    }
+
+    return createUser(newUser);
+}
+
+function showCreateUserDialog(): void {
     quasar.dialog({
         component: FTDialog,
         componentProps: {
@@ -83,7 +85,7 @@ function createUser(): void {
     });
 }
 
-function editUser(user: User) {
+function showEditUserDialog(user: User) {
     quasar.dialog({
         component: FTDialog,
         componentProps: {
@@ -121,7 +123,7 @@ async function onUserSlideRight({ id }: User, reset: () => void) {
                     rounded
                     icon="plus"
                     class="button-gradient"
-                    @click="createUser"
+                    @click="showCreateUserDialog"
                     label="new user"
                 />
             </template>
@@ -138,7 +140,7 @@ async function onUserSlideRight({ id }: User, reset: () => void) {
                 :key="user.id"
                 right-color="warning"
                 @right="({ reset }) => onUserSlideRight(user, reset)"
-                @left="() => editUser(user)"
+                @left="() => showEditUserDialog(user)"
                 class="fa-card"
             >
                 <template #right>
