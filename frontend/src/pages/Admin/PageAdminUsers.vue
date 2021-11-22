@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import UserCreateForm from "components/User/UserCreateForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
-import {
-    loadingWrapper,
-    showConfirm,
-    showErrorMessage,
-    tryCatchLoadingWrapper,
-} from "src/helpers/ui-helpers";
+import { loadingWrapper, showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed } from "vue";
 import { createUserWithEmail, deleteUser } from "src/services/firebase/auth";
 import { config } from "src/config";
@@ -50,7 +45,7 @@ const { data: rolesDoc } = useFirestoreDoc<RoleDoc>({
     path: ROLES_PATH,
 });
 
-const createUser = loadingWrapper((newUser: CreateUserPayload) => {
+const onCreateUser = loadingWrapper((newUser: CreateUserPayload) => {
     return createUserWithEmail(newUser);
 });
 
@@ -58,13 +53,17 @@ const onUpdateUser = loadingWrapper((userId: string, updatedUser: Partial<Create
     return updateUser(userId, updatedUser);
 });
 
-function onCreateUser(newUser: CreateUserPayload) {
+const onDeleteUser = loadingWrapper((id: string) => {
+    return deleteUser(id);
+});
+
+function onCreateUserFormSubmit(newUser: CreateUserPayload) {
     if (users.value.length > maxNumOfUsers) {
         showErrorMessage("You have reached the maximum amount of users!");
         return;
     }
 
-    return createUser(newUser);
+    return onCreateUser(newUser);
 }
 
 function showCreateUserDialog(): void {
@@ -79,7 +78,7 @@ function showCreateUserDialog(): void {
                 roles: rolesDoc.value?.roles || [],
             },
             listeners: {
-                submit: onCreateUser,
+                submit: onCreateUserFormSubmit,
             },
         },
     });
@@ -107,8 +106,7 @@ function showEditUserDialog(user: User) {
 
 async function onUserSlideRight({ id }: User, reset: () => void) {
     if (await showConfirm("Delete user?")) {
-        await tryCatchLoadingWrapper(() => deleteUser(id));
-        return;
+        return onDeleteUser(id);
     }
     reset();
 }
