@@ -90,9 +90,6 @@ module.exports = {
         "@typescript-eslint/semi": ["error", "always"],
         "@typescript-eslint/ban-ts-comment": "off",
         // VUE 3
-        "vue/no-deprecated-filter": 2,
-        "vue/require-explicit-emits": 2,
-        "vue/no-deprecated-dollar-listeners-api": 2,
         "vue/html-indent": "off",
         "vue/max-attributes-per-line": "off",
         "vue/singleline-html-element-content-newline": "off",
