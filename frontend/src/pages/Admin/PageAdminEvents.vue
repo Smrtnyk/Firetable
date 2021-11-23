@@ -112,7 +112,7 @@ onMounted(init);
 
         <q-list v-if="!!events.length && !isLoading">
             <q-infinite-scroll ref="paginator" @load="onLoad" :offset="50">
-                <page-admin-events-list-item
+                <PageAdminEventsListItem
                     v-for="event in events"
                     :key="event.id"
                     :event="event"

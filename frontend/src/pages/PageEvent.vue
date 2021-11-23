@@ -39,7 +39,7 @@
             />
         </div>
         <q-separator class="q-mx-auto q-my-xs-xs q-my-sm-sm q-my-md-md" inset />
-        <f-t-autocomplete
+        <FTAutocomplete
             :all-reserved-tables="allReservedTables"
             @found="onTableFound"
             @clear="onAutocompleteClear"

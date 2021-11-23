@@ -149,7 +149,7 @@ function onElementClickHandler(floor: Floor | null, d: BaseFloorElement | null) 
                 </template>
             </q-input>
         </div>
-        <show-selected-element
+        <ShowSelectedElement
             :selected-floor="selectedFloor"
             :selected-floor-element="selectedElement"
         />
