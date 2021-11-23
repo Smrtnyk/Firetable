@@ -120,7 +120,7 @@ const q = useQuasar();
 const { t } = useI18n();
 const floorSvgs = ref<Record<string, Element>>({});
 const currentUser = computed(() => authStore.user);
-const eventFloorsRef = function (floor: FloorDoc, el: Element) {
+const eventFloorsRef = function (floor: FloorDoc, el: Element | null) {
     if (!el) {
         return;
     }

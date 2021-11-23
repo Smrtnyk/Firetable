@@ -70,7 +70,7 @@ function createRole(): void {
                 v-for="role in rolesDoc.roles"
                 :key="role"
                 right-color="warning"
-                @right="({ reset }) => deleteRole(role, reset)"
+                @right="() => deleteRole(role)"
                 class="fa-card"
             >
                 <template #right>

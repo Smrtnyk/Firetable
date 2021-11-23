@@ -25,14 +25,11 @@ import {
     baseElementGroupSelection,
     ElementClickHandler,
     FloorDoubleClickHandler,
-    FTDragEvent,
     tableElementGroupSelection,
     tableElementInit,
 } from "src/floor-manager/types";
 import { getFreeTables, getTables } from "src/floor-manager/filters";
 import { NumberTuple } from "src/types/generic";
-import { drag } from "d3-drag";
-import { willCollide } from "src/floor-manager/collision-detection";
 import { addDragBehaviourToElement } from "src/floor-manager/element-drag";
 import { elementResizeBehavior } from "src/floor-manager/element-resize";
 

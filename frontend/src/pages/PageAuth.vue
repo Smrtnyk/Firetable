@@ -63,7 +63,7 @@ async function onSubmit() {
                             <q-icon
                                 :name="isPwd ? 'eye-open' : 'eye-off'"
                                 class-name="cursor-pointer"
-                                @click="() => (isPwd.value = !isPwd.value)"
+                                @click="() => (isPwd = !isPwd)"
                             />
                         </template>
                     </q-input>

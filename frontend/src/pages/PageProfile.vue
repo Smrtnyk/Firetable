@@ -17,7 +17,7 @@ const avatar = computed(() => {
 </script>
 
 <template>
-    <div class="PageProfile">
+    <div class="PageProfile" v-if="user">
         <FTTitle :title="`Profile of ${user.name}`" />
         <q-item>
             <q-item-section side>

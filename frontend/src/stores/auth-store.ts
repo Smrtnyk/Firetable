@@ -14,15 +14,16 @@ interface AuthState {
 }
 
 export const useAuthStore = defineStore("auth", {
-    state: () =>
-        ({
+    state() {
+        return {
             isAuthenticated: false,
             isReady: false,
             user: null,
             users: [],
             showCreateUserDialog: false,
             unsubscribeUserWatch: NOOP,
-        } as AuthState),
+        } as AuthState;
+    },
     getters: {
         isAdmin(): boolean {
             return !!this.user && this.user.role === Role.ADMIN;
