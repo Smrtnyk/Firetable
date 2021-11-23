@@ -66,11 +66,8 @@ module.exports = {
         //
         "linebreak-style": ["error", "unix"],
         "require-await": "error",
-        "quasar/check-valid-props": 0,
-        "quasar/no-invalid-qfield-usage": 0,
         //
         "@typescript-eslint/no-unsafe-return": "off",
-        "@typescript-eslint/no-unsafe-call": "off",
         "@typescript-eslint/restrict-template-expressions": "off",
         "@typescript-eslint/unbound-method": "off",
         "@typescript-eslint/no-unsafe-member-access": "off",
@@ -89,8 +86,5 @@ module.exports = {
         ],
         "@typescript-eslint/semi": ["error", "always"],
         "@typescript-eslint/ban-ts-comment": "off",
-        // VUE 3
-        "vue/max-attributes-per-line": "off",
-        "vue/singleline-html-element-content-newline": "off",
     },
 };

@@ -59,7 +59,7 @@ export function useFirestoreDoc<T, M = T>(options: OptionsDocument<T, M>) {
     const getDocData = withError(options.onError, async () => {
         const fetchedDoc = await getDoc(firestoreRef.value);
         if (!fetchedDoc.exists) return;
-        return receiveDocData(firestoreDocSerializer(fetchedDoc));
+        return receiveDocData(firestoreDocSerializer<T>(fetchedDoc));
     });
 
     let watcher: null | (() => void) = null;
