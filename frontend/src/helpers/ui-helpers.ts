@@ -42,7 +42,7 @@ export function showErrorMessage(e: unknown) {
     });
 }
 
-export function loadingWrapper<T extends (...args: any[]) => Promise<any>>(fn: T) {
+export function loadingWrapper<T extends (...args: unknown[]) => Promise<unknown>>(fn: T) {
     return async function (...args: Parameters<T>): Promise<ReturnType<T> | void> {
         try {
             Loading.show();

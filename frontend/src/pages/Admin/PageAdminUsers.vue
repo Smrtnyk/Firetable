@@ -90,7 +90,7 @@ function showEditUserDialog(user: User) {
         componentProps: {
             component: UserCreateForm,
             maximized: false,
-            title: `Editing user: ${user.floors}`,
+            title: `Editing user: ${user.name}`,
             componentPropsObject: {
                 user: { ...user },
                 floors: floorsMaps.value,

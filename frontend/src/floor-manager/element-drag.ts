@@ -16,7 +16,7 @@ export function addDragBehaviourToElement(
         .on("drag", elementDragging)
         .on("end", elementDragEnded);
 
-    dragBehaviour(element as any);
+    dragBehaviour(element as unknown as Selection<Element, BaseFloorElement, any, any>);
 
     function elementDragging(this: Element, { x, y }: DragEvent, d: BaseFloorElement) {
         const matchesSelectedElement = this === document.querySelector(".selected");

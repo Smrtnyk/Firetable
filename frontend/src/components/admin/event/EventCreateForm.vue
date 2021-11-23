@@ -9,7 +9,6 @@ import { useRouter } from "vue-router";
 import { date } from "quasar";
 import { CreateEventForm } from "src/types/event";
 import { FloorDoc } from "src/types/floor";
-import { useEventsStore } from "src/stores/events-store";
 import { resizeImage } from "src/helpers/image-tools";
 
 interface State {
@@ -40,7 +39,6 @@ const props = defineProps<Props>();
 const emit = defineEmits(["create"]);
 const { t } = useI18n();
 const router = useRouter();
-const eventsStore = useEventsStore();
 const state = reactive<State>({
     form: { ...eventObj },
     chosenFloors: [],

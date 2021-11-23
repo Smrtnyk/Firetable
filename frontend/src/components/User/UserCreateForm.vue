@@ -3,7 +3,6 @@ import { CreateUserPayload, User, ACTIVITY_STATUS } from "src/types/auth";
 import { ref } from "vue";
 import { noEmptyString, noWhiteSpaces } from "src/helpers/form-rules";
 import { PROJECT_MAIL } from "src/config";
-import { useAuthStore } from "src/stores/auth-store";
 
 interface Props {
     floors: string[];
@@ -13,7 +12,6 @@ interface Props {
 
 const emit = defineEmits(["submit"]);
 const props = defineProps<Props>();
-const authStore = useAuthStore();
 const stringRules = [noEmptyString()];
 const userNameRules = [noEmptyString(), noWhiteSpaces];
 const userSkeleton: CreateUserPayload = {

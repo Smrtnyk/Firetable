@@ -1,18 +1,13 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed } from "vue";
 
 import AppDrawer from "components/AppDrawer.vue";
 import AppTopMenu from "src/components/AppTopMenu.vue";
 import { useAuthStore } from "src/stores/auth-store";
 
 const authStore = useAuthStore();
-const isDrawerOpen = ref(false);
 const isLoggedIn = computed(() => authStore.isLoggedIn);
 const isAdmin = computed(() => authStore.isAdmin);
-
-function onDrawerToggle() {
-    isDrawerOpen.value = !isDrawerOpen.value;
-}
 </script>
 
 <template>

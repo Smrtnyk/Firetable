@@ -40,7 +40,7 @@ const props = withDefaults(defineProps<Props>(), {
     maximized: true,
     title: "",
 });
-const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent();
+const { dialogRef, onDialogOK } = useDialogPluginComponent();
 // eslint-disable-next-line vue/valid-define-emits
 defineEmits(useDialogPluginComponent.emits);
 </script>

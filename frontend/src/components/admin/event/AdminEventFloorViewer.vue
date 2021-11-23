@@ -18,7 +18,6 @@
 import { Floor } from "src/floor-manager/Floor";
 import { BaseFloorElement, FloorDoc, FloorMode } from "src/types/floor";
 import { ref, watch } from "vue";
-import { useQuasar } from "quasar";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { updateEventFloorData } from "src/services/firebase/db-events";
 import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
@@ -29,7 +28,6 @@ interface Props {
     eventId: string;
 }
 
-const quasar = useQuasar();
 const selectedFloorElement = ref<null | BaseFloorElement>(null);
 const selectedFloor = ref<null | Floor>(null);
 const props = defineProps<Props>();

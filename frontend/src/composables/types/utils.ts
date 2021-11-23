@@ -7,12 +7,13 @@ export function firestoreDocSerializer<T>(docToSerialize: DocumentSnapshot): T {
     return { id: docToSerialize.id, ...data } as unknown as T;
 }
 
-export function withError<T extends (...args: any[]) => any>(
+export function withError<T extends (...args: unknown[]) => unknown>(
     errorHandler: OptionsBase["onError"],
     fn: T
-) {
-    return function (...args: Parameters<T>): ReturnType<T> | undefined {
+): (...args: Parameters<T>) => ReturnType<T> | void {
+    return function (...args: Parameters<T>): ReturnType<T> | void {
         try {
+            // @ts-expect-error will be inferred on usage
             return fn(...args);
         } catch (e) {
             errorHandler?.(e);
@@ -22,9 +23,7 @@ export function withError<T extends (...args: any[]) => any>(
 
 export function calculatePath(
     path: string,
-    variables?: {
-        [key: string]: Ref<string | number>;
-    }
+    variables?: Record<string, Ref<string | number>>
 ): string {
     const stringVars = path.replace(/\s/g, "").match(/\$[^\W]*/g);
     if (!stringVars?.length || !variables) return path;

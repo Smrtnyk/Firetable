@@ -19,7 +19,7 @@ export function elementResizeBehavior(floorInstance: Floor, element: Element) {
     const circleG = select<Element, BaseFloorElement>(element);
     const dragBehaviour = drag<SVGCircleElement, BaseFloorElement, unknown>()
         .container(node)
-        .subject(({ x, y }) => ({ x, y }))
+        .subject(({ x, y }: { x: number; y: number }) => ({ x, y }))
         .on("drag", elementResizing);
 
     circleG

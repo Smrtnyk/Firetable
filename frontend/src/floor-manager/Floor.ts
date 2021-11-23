@@ -366,7 +366,7 @@ export class Floor {
         }
 
         public setFloorDocument(floorDoc: FloorDoc) {
-            this.floorDoc = JSON.parse(JSON.stringify(floorDoc));
+            this.floorDoc = JSON.parse(JSON.stringify(floorDoc)) as FloorDoc;
             return this;
         }
 
