@@ -71,7 +71,8 @@ function onReset() {
 
 function validDates(calendarDate: Date) {
     return (
-        new Date(calendarDate).toISOString().substr(0, 10) >= new Date().toISOString().substr(0, 10)
+        new Date(calendarDate).toISOString().substring(0, 10) >=
+        new Date().toISOString().substring(0, 10)
     );
 }
 

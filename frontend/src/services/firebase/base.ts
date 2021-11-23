@@ -19,10 +19,6 @@ function initEmulators(): void {
     connectFunctionsEmulator(functions(), "localhost", 5001);
 }
 
-export function getFirebaseApp() {
-    return app;
-}
-
 export function functions() {
     return getFunctions(app, "europe-west3");
 }

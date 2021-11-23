@@ -7,7 +7,7 @@ import { PROJECT_MAIL } from "src/config";
 import { minLength, noEmptyString } from "src/helpers/form-rules";
 import { QForm } from "quasar";
 
-const $router = useRouter();
+const router = useRouter();
 
 const username = ref("");
 const password = ref("");
@@ -26,7 +26,7 @@ async function onSubmit() {
 
     await tryCatchLoadingWrapper(async () => {
         await loginWithEmail(validEmail, password.value);
-        await $router.replace("/");
+        await router.replace("/");
     });
 }
 </script>

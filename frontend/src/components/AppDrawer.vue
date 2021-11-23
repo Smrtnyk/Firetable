@@ -51,7 +51,7 @@ const avatar = computed(() => {
     if (!user.value) return "";
     const [first, last] = user.value.name.split(" ");
     if (!last) {
-        return first.substr(0, 1);
+        return first.substring(0, 1);
     }
     return `${first.at(0)}${last.at(0)}`;
 });

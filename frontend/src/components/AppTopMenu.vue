@@ -40,15 +40,13 @@ const appStore = useAppStore();
 </template>
 
 <style lang="scss">
-.AppTopMenu {
-    &__tabs {
-        border-radius: $border-radius;
-        padding-left: 1rem;
-        padding-right: 1rem;
+.AppTopMenu__tabs {
+    border-radius: $border-radius;
+    padding-left: 1rem;
+    padding-right: 1rem;
 
-        .q-tabs__content {
-            justify-content: space-evenly;
-        }
+    .q-tabs__content {
+        justify-content: space-evenly;
     }
 }
 </style>

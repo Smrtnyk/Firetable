@@ -42,9 +42,9 @@ export function calculatePath(
     }
     if (newPath.startsWith("/")) {
         if (newPath.endsWith("/")) {
-            return newPath.substr(1).substr(0, newPath.length - 2);
+            return newPath.substring(1).substring(0, newPath.length - 2);
         }
-        return newPath.substr(1);
+        return newPath.substring(1);
     }
     return newPath;
 }
