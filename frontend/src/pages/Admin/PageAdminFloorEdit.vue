@@ -39,6 +39,7 @@ const router = useRouter();
 const q = useQuasar();
 const floorInstance = ref<Floor | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
+const pageRef = ref<HTMLDivElement | null>(null);
 const selectedElement = ref<BaseTable | null>(null);
 const { updateDoc: updateFloor } = useFirestoreDoc<FloorDoc>({
     type: "get",
@@ -59,7 +60,7 @@ onMounted(() => {
 });
 
 function instantiateFloor(floorDoc: FloorDoc) {
-    if (!canvasRef.value) return;
+    if (!canvasRef.value || !pageRef.value) return;
 
     floorInstance.value = new Floor({
         canvas: canvasRef.value,
@@ -67,6 +68,7 @@ function instantiateFloor(floorDoc: FloorDoc) {
         dblClickHandler,
         elementClickHandler,
         mode: FloorMode.EDITOR,
+        containerWidth: pageRef.value.clientWidth,
     });
 }
 
@@ -136,7 +138,7 @@ function onDeleteElement(element: BaseTable) {
 </script>
 
 <template>
-    <div class="PageAdminFloorEdit">
+    <div class="PageAdminFloorEdit" ref="pageRef">
         <div v-if="floorInstance" class="PageAdminFloorEdit__controls justify-between">
             <q-input
                 standout
@@ -187,24 +189,6 @@ function onDeleteElement(element: BaseTable) {
             </div>
         </div>
 
-        <canvas ref="canvasRef" class="PageAdminFloorEdit__canvas shadow-3" />
+        <canvas ref="canvasRef" class="shadow-3" />
     </div>
 </template>
-
-<style lang="scss">
-.PageAdminFloorEdit {
-    g.tableGroup.active rect,
-    g.tableGroup.active circle {
-        fill: #ff8a00 !important;
-    }
-    circle.bottom-right {
-        stroke: #000;
-        fill: #333;
-    }
-    // RESIZING WALL CONTROLS
-    circle.bottom-right:hover {
-        cursor: move;
-        fill: #ff8a00;
-    }
-}
-</style>

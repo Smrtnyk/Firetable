@@ -18,11 +18,11 @@ import {
     SubTitle,
 } from "chart.js";
 import { computed, onMounted, ref } from "vue";
-import { TableElement } from "src/types/floor";
 import { showErrorMessage } from "src/helpers/ui-helpers";
+import { BaseTable } from "src/floor-manager/types";
 
 interface Props {
-    reservations: TableElement[];
+    reservations: BaseTable[];
 }
 
 interface ReservationObject {
@@ -68,7 +68,7 @@ const props = defineProps<Props>();
 
 const reservedTables = computed(() => props.reservations.filter((table) => !!table.reservation));
 
-function reservationsReducer(acc: Res, { reservation }: TableElement) {
+function reservationsReducer(acc: Res, { reservation }: BaseTable) {
     if (!reservation) return acc;
     const { reservedBy, confirmed } = reservation;
     const { id, name } = reservedBy;
@@ -87,7 +87,7 @@ function reservationsReducer(acc: Res, { reservation }: TableElement) {
 
 function generateTablesByWaiterChartOptions(
     chartContainer: HTMLCanvasElement,
-    reservations: TableElement[]
+    reservations: BaseTable[]
 ) {
     const data = reservations.reduce(reservationsReducer, {});
 

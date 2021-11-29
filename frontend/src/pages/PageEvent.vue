@@ -53,6 +53,7 @@ const router = useRouter();
 const q = useQuasar();
 const { t } = useI18n();
 const canvases = ref<Record<string, HTMLCanvasElement>>({});
+const pageRef = ref<HTMLDivElement | null>(null);
 const currentUser = computed(() => authStore.user);
 const eventFloorsRef = function (floor: FloorDoc, el: HTMLCanvasElement | null) {
     if (!el) {
@@ -253,7 +254,7 @@ function onTableFound(tables: BaseTable[]) {
 function instantiateFloor(floorDoc: FloorDoc) {
     const canvas = canvases.value[floorDoc.id];
 
-    if (!canvas) return;
+    if (!canvas || !pageRef.value) return;
 
     state.floorInstances.push(
         new Floor({
@@ -261,6 +262,7 @@ function instantiateFloor(floorDoc: FloorDoc) {
             floorDoc,
             elementClickHandler: tableClickHandler,
             mode: FloorMode.LIVE,
+            containerWidth: pageRef.value.clientWidth,
         })
     );
 }
@@ -340,7 +342,7 @@ onMounted(init);
 </script>
 
 <template>
-    <div v-if="event" class="PageEvent">
+    <div v-if="event" class="PageEvent" ref="pageRef">
         <div class="row items-center q-mb-sm">
             <q-fab
                 v-if="state.floorInstances.length"

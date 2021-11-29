@@ -19,6 +19,7 @@ interface FloorCreationOptions {
     mode: FloorMode;
     dblClickHandler?: FloorDoubleClickHandler;
     elementClickHandler: ElementClickHandler;
+    containerWidth: number;
 }
 
 Object.assign(fabric, {
@@ -29,9 +30,11 @@ Object.assign(fabric, {
 export class Floor {
     id: string;
     name: string;
+    scale: number;
     mode: FloorMode;
-    canvas: fabric.Canvas | fabric.StaticCanvas;
     floorDoc: FloorDoc;
+    containerWidth: number;
+    canvas: fabric.Canvas | fabric.StaticCanvas;
     dblClickHandler?: FloorDoubleClickHandler;
     elementClickHandler: ElementClickHandler;
 
@@ -77,7 +80,9 @@ export class Floor {
         dblClickHandler,
         elementClickHandler,
         mode,
+        containerWidth,
     }: FloorCreationOptions) {
+        this.scale = calculateCanvasScale(containerWidth, floorDoc.width);
         const canvasOptions = {
             width: floorDoc.width,
             height: floorDoc.height,
@@ -89,10 +94,12 @@ export class Floor {
             });
         }
 
+        this.containerWidth = containerWidth;
+        this.floorDoc = floorDoc;
         this.canvas = new fabric.Canvas(canvas, canvasOptions);
+        this.setScaling();
         this.id = floorDoc.id;
         this.name = floorDoc.name;
-        this.floorDoc = floorDoc;
         this.mode = mode;
         if (dblClickHandler) {
             this.dblClickHandler = dblClickHandler;
@@ -102,6 +109,12 @@ export class Floor {
         this.canvas.on("mouse:up", this.onMouseUpHandler);
         this.canvas.on("object:moving", this.onObjectMove);
         this.renderData(floorDoc.json);
+    }
+
+    setScaling() {
+        this.canvas.setZoom(this.scale);
+        this.canvas.setWidth(this.floorDoc.width * this.canvas.getZoom());
+        this.canvas.setHeight(this.floorDoc.height * this.canvas.getZoom());
     }
 
     setFloorName(newName: string) {
@@ -185,8 +198,8 @@ export class Floor {
 
     drawGrid() {
         const gridSize = RESOLUTION;
-        const width = this.canvas.getWidth();
-        const height = this.canvas.getHeight();
+        const width = this.floorDoc.width;
+        const height = this.floorDoc.height;
         const left = (width % gridSize) / 2;
         const top = (height % gridSize) / 2;
         const lines = [];
@@ -225,4 +238,8 @@ function getTableFromGroupElement(ev: fabric.IEvent): BaseTable | null {
 
 function containsTables(ev: fabric.IEvent): boolean {
     return !!getTableFromGroupElement(ev);
+}
+
+function calculateCanvasScale(containerWidth: number, floorWidth: number) {
+    return containerWidth / floorWidth;
 }
