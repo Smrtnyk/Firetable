@@ -58,6 +58,8 @@ export class Floor {
     elementReviver = (o: string, object: fabric.Object) => {
         // @ts-ignore - complains about types but this works
         object.on("mouseup", this.onElementClick);
+        object.lockMovementY = this.shouldLockDrag();
+        object.lockMovementX = this.shouldLockDrag();
     };
     onObjectMove = (options: fabric.IEvent) => {
         if (!options.target?.left || !options.target?.top) return;
@@ -161,6 +163,8 @@ export class Floor {
             radius: 50,
             originX: "center",
             originY: "center",
+            lockMovementX: this.shouldLockDrag(),
+            lockMovementY: this.shouldLockDrag(),
         });
         const text = new fabric.Text(label, {
             originX: "center",
@@ -180,6 +184,8 @@ export class Floor {
             label,
             width: TABLE_WIDTH,
             height: TABLE_HEIGHT,
+            lockMovementX: this.shouldLockDrag(),
+            lockMovementY: this.shouldLockDrag(),
         });
         const text = new fabric.Text(label, {
             originX: "center",
@@ -223,6 +229,10 @@ export class Floor {
     setReservationOnTable(element: BaseTable, reservation: Reservation | null) {
         // @ts-ignore
         element.set({ reservation });
+    }
+
+    shouldLockDrag() {
+        return this.mode !== FloorMode.EDITOR;
     }
 }
 
