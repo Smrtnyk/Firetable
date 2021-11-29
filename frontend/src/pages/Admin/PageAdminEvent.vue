@@ -2,7 +2,7 @@
 import { FloorDoc } from "src/types/floor";
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import { formatEventDate } from "src/helpers/utils"; // NOSONAR
+import { formatEventDate } from "src/helpers/utils";
 import { useFirestore } from "src/composables/useFirestore";
 
 import FTTitle from "components/FTTitle.vue";

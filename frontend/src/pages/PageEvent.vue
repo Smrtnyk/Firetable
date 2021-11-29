@@ -22,7 +22,7 @@ import { FloorDoc } from "src/types/floor";
 import { useAuthStore } from "src/stores/auth-store";
 import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
 import { Floor } from "src/floor-manager/Floor";
-import { FloorMode } from "src/floor-manager/types";
+import { BaseTable, FloorMode } from "src/floor-manager/types";
 import { getFreeTables, getReservedTables } from "src/floor-manager/filters";
 
 interface State {
@@ -116,13 +116,13 @@ function showEventInfo(): void {
     });
 }
 
-function showReservation(floor: Floor, reservation: Reservation, element: any) {
+function showReservation(floor: Floor, reservation: Reservation, element: BaseTable) {
     const { label } = element;
     const options = {
         component: FTDialog,
         componentProps: {
             component: EventShowReservation,
-            title: `${t("EventShowReservation.title")} ${label as string}`,
+            title: `${t("EventShowReservation.title")} ${label}`,
             maximized: false,
             componentPropsObject: {
                 reservation,
@@ -138,9 +138,10 @@ function showReservation(floor: Floor, reservation: Reservation, element: any) {
     q.dialog(options);
 }
 
-function onReservationConfirm(floor: Floor, element: any) {
-    const { reservation } = element;
+function onReservationConfirm(floor: Floor, element: BaseTable) {
     return function (val: boolean) {
+        const { reservation } = element;
+        if (!reservation) return;
         floor.setReservationOnTable(element, {
             ...reservation,
             confirmed: val,
@@ -152,7 +153,7 @@ function onReservationConfirm(floor: Floor, element: any) {
 function handleReservationCreation(
     floor: Floor,
     reservationData: CreateReservationPayload,
-    element: any
+    element: BaseTable
 ) {
     if (!currentUser.value) return;
 
@@ -184,19 +185,19 @@ function resetCurrentOpenCreateReservationDialog() {
     currentOpenCreateReservationDialog = null;
 }
 
-function showCreateReservationDialog(floor: Floor, element: any) {
+function showCreateReservationDialog(floor: Floor, element: BaseTable) {
     const { label } = element;
     const dialog = q
         .dialog({
             component: FTDialog,
             componentProps: {
                 component: EventCreateReservation,
-                title: `${t("EventShowReservation.title")} ${label as string}`,
+                title: `${t("EventShowReservation.title")} ${label}`,
                 maximized: false,
                 componentPropsObject: {
-                    freeTables: [] /* floor.freeTables
-                        .filter((table) => tableId !== table.tableId)
-                        .map((table) => table.tableId), */,
+                    freeTables: getFreeTables(floor)
+                        .filter((table) => label !== table.label)
+                        .map(({ label }) => label),
                     label,
                 },
                 listeners: {
@@ -216,8 +217,8 @@ function showCreateReservationDialog(floor: Floor, element: any) {
     };
 }
 
-function tableClickHandler(floor: Floor, element: any | null) {
-    if (!isTable(element)) return;
+function tableClickHandler(floor: Floor, element: BaseTable | null) {
+    if (!element || !isTable(element)) return;
     const { reservation } = element;
     if (reservation) {
         showReservation(floor, reservation, element);
@@ -226,7 +227,7 @@ function tableClickHandler(floor: Floor, element: any | null) {
     }
 }
 
-function onTableFound(tables: any[]) {
+function onTableFound(tables: BaseTable[]) {
     onAutocompleteClear();
     // for (const table of tables) {
     // do something
@@ -296,7 +297,7 @@ function updateFloorInstancesData() {
     }
 }
 
-async function onDeleteReservation(floor: Floor, element: any) {
+async function onDeleteReservation(floor: Floor, element: BaseTable) {
     if (!(await showConfirm("Delete reservation?"))) return;
     // const { groupedWith } = element;
     // for (const tableId of groupedWith) {

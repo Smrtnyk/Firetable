@@ -14,7 +14,7 @@ import { Loading, useQuasar } from "quasar";
 import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
 import { Collection } from "src/types/firebase";
 import { Floor } from "src/floor-manager/Floor";
-import { FloorMode } from "src/floor-manager/types";
+import { BaseTable, FloorMode } from "src/floor-manager/types";
 
 type ElementDescriptor = {
     tag: ElementTag;
@@ -39,7 +39,7 @@ const router = useRouter();
 const q = useQuasar();
 const floorInstance = ref<Floor | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
-const selectedElement = ref<any | null>(null);
+const selectedElement = ref<BaseTable | null>(null);
 const { updateDoc: updateFloor } = useFirestoreDoc<FloorDoc>({
     type: "get",
     path: `${Collection.FLOORS}/${props.floorID}`,
@@ -125,13 +125,13 @@ function dblClickHandler(floor: Floor, coords: NumberTuple) {
     q.bottomSheet(addNewElementsBottomSheetOptions).onOk(handleAddNewElement(floor, coords));
 }
 
-function elementClickHandler(_: Floor, element: any | null) {
+function elementClickHandler(_: Floor, element: BaseTable | null) {
     selectedElement.value = element;
 }
 
-function onDeleteElement(element: any) {
-    element.canvas.remove(element.canvas.getActiveObject());
-    element.canvas.renderAll();
+function onDeleteElement(element: BaseTable) {
+    element.canvas?.remove(element.canvas.getActiveObject());
+    element.canvas?.renderAll();
 }
 </script>
 

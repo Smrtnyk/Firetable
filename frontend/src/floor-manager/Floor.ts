@@ -3,7 +3,13 @@ import { ElementTag, FloorDoc } from "src/types/floor";
 import { TableElement } from "src/floor-manager/TableElement";
 import { NumberTuple } from "src/types/generic";
 import { RESOLUTION, TABLE_HEIGHT, TABLE_WIDTH } from "src/floor-manager/constants";
-import { ElementClickHandler, FloorDoubleClickHandler, FloorMode } from "src/floor-manager/types";
+import {
+    BaseTable,
+    CreateTableOptions,
+    ElementClickHandler,
+    FloorDoubleClickHandler,
+    FloorMode,
+} from "src/floor-manager/types";
 import { Reservation } from "src/types/event";
 import { RoundTableElement } from "src/floor-manager/RoundTableElement";
 
@@ -46,7 +52,8 @@ export class Floor {
             this.elementClickHandler(this, table);
         }
     };
-    elementReviver = (o: string, object: any) => {
+    elementReviver = (o: string, object: fabric.Object) => {
+        // @ts-ignore - complains about types but this works
         object.on("mouseup", this.onElementClick);
     };
     onObjectMove = (options: fabric.IEvent) => {
@@ -121,7 +128,7 @@ export class Floor {
         }
     }
 
-    addTableElement(options: any) {
+    addTableElement(options: CreateTableOptions) {
         const { tag } = options;
         let group;
         if (tag === ElementTag.RECT) {
@@ -130,12 +137,12 @@ export class Floor {
             group = this.addRoundTableElement(options);
         }
 
-        // @ts-ignore - Types suggest that it is mouse:up but it is mouseup
+        // @ts-ignore - Types suggest that it is mouse:up, but it is mouseup
         group.on("mouseup", this.onElementClick);
         this.canvas.add(group);
     }
 
-    addRoundTableElement({ label, x, y }: any) {
+    addRoundTableElement({ label, x, y }: CreateTableOptions) {
         const table = new RoundTableElement({
             label,
             radius: 50,
@@ -155,7 +162,7 @@ export class Floor {
         });
     }
 
-    addRectTableElement({ label, x, y }: any) {
+    addRectTableElement({ label, x, y }: CreateTableOptions) {
         const rect = new TableElement({
             label,
             width: TABLE_WIDTH,
@@ -200,20 +207,22 @@ export class Floor {
         this.canvas.sendToBack(oGridGroup);
     }
 
-    setReservationOnTable(element: fabric.Object, reservation: Reservation | null) {
+    setReservationOnTable(element: BaseTable, reservation: Reservation | null) {
         // @ts-ignore
         element.set({ reservation });
     }
 }
 
-function getTableFromGroupElement(ev: fabric.IEvent): any {
+function getTableFromGroupElement(ev: fabric.IEvent): BaseTable | null {
     const group = ev.target;
     // @ts-ignore
     const table = group?._objects[0];
     if (table instanceof TableElement || table instanceof RoundTableElement) {
         return table;
     }
+    return null;
 }
+
 function containsTables(ev: fabric.IEvent): boolean {
     return !!getTableFromGroupElement(ev);
 }

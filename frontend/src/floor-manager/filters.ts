@@ -1,7 +1,5 @@
 import { Floor } from "src/floor-manager/Floor";
-import { FloorElementTypes } from "src/floor-manager/types";
-import { TableElement } from "src/floor-manager/TableElement";
-import { RoundTableElement } from "src/floor-manager/RoundTableElement";
+import { BaseTable, FloorElementTypes } from "src/floor-manager/types";
 
 export function hasFloorTables(floor: Floor): boolean {
     const allGroups = floor.canvas.getObjects();
@@ -18,7 +16,7 @@ export function hasFloorTables(floor: Floor): boolean {
     return false;
 }
 
-export function getTables(floor: Floor): (TableElement | RoundTableElement)[] {
+export function getTables(floor: Floor): BaseTable[] {
     return floor.canvas
         .getObjects()
         .map((obj) => {
@@ -32,11 +30,11 @@ export function getTables(floor: Floor): (TableElement | RoundTableElement)[] {
         .flat();
 }
 
-export function getFreeTables(floor: Floor): (TableElement | RoundTableElement)[] {
+export function getFreeTables(floor: Floor): BaseTable[] {
     return getTables(floor).filter(({ reservation }) => !reservation);
 }
 
-export function getReservedTables(floor: Floor): (TableElement | RoundTableElement)[] {
+export function getReservedTables(floor: Floor): BaseTable[] {
     return getTables(floor).filter(({ reservation }) => !!reservation);
 }
 

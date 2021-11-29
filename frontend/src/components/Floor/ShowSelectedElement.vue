@@ -55,19 +55,18 @@
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed, nextTick } from "vue";
 import { isRoundTable, isTable } from "src/floor-manager/type-guards";
+import { BaseTable } from "src/floor-manager/types";
 
 interface Props {
-    selectedFloorElement: any | null;
+    selectedFloorElement: BaseTable | null;
 }
 
 const props = defineProps<Props>();
 const emit = defineEmits(["delete"]);
 const selectedElement = computed(() => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return props.selectedFloorElement;
 });
 const isRoundTableComp = computed(() => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return props.selectedFloorElement && isRoundTable(props.selectedFloorElement);
 });
 
