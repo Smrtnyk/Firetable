@@ -1,23 +1,45 @@
-import { FloorDoc } from "src/types/floor";
-import { isTable } from "src/floor-manager/type-guards";
-import type { Floor } from "src/floor-manager/Floor";
+import { Floor } from "src/floor-manager/Floor";
+import { FloorElementTypes } from "src/floor-manager/types";
+import { TableElement } from "src/floor-manager/TableElement";
+import { RoundTableElement } from "src/floor-manager/RoundTableElement";
 
-export function hasFloorTables(floor: Floor) {
-    return !!floor.tables.length;
+export function hasFloorTables(floor: Floor): boolean {
+    const allGroups = floor.canvas.getObjects();
+    for (const group of allGroups) {
+        if (
+            // @ts-ignore
+            group.getObjects(FloorElementTypes.ROUND_TABLE).length ||
+            // @ts-ignore
+            group.getObjects(FloorElementTypes.RECT_TABLE).length
+        ) {
+            return true;
+        }
+    }
+    return false;
 }
 
-export function getTables(floor: Floor | FloorDoc) {
-    return floor.data.filter(isTable);
+export function getTables(floor: Floor): (TableElement | RoundTableElement)[] {
+    return floor.canvas
+        .getObjects()
+        .map((obj) => {
+            return [
+                // @ts-ignore
+                ...obj.getObjects(FloorElementTypes.ROUND_TABLE),
+                // @ts-ignore
+                ...obj.getObjects(FloorElementTypes.RECT_TABLE),
+            ];
+        })
+        .flat();
 }
 
-export function getFreeTables(floor: Floor | FloorDoc) {
-    return getTables(floor).filter((table) => !table.reservation);
+export function getFreeTables(floor: Floor): (TableElement | RoundTableElement)[] {
+    return getTables(floor).filter(({ reservation }) => !reservation);
 }
 
-export function getReservedTables(floor: Floor | FloorDoc) {
-    return getTables(floor).filter((table) => !!table.reservation);
+export function getReservedTables(floor: Floor): (TableElement | RoundTableElement)[] {
+    return getTables(floor).filter(({ reservation }) => !!reservation);
 }
 
-export function extractAllTableIds(floor: Floor) {
-    return floor.tables.map((table) => table.tableId);
+export function extractAllTablesLabels(floor: Floor): string[] {
+    return getTables(floor).map(({ label }) => label);
 }

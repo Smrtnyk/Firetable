@@ -1,21 +1,20 @@
-import { BaseType, EnterElement, Selection } from "d3-selection";
-import { BaseFloorElement, TableElement } from "src/types/floor";
-import { D3DragEvent } from "d3-drag";
-import type { Floor } from "src/floor-manager/Floor";
 import { NumberTuple } from "src/types/generic";
+import { Floor } from "src/floor-manager/Floor";
 
-export type FTDragEvent = D3DragEvent<Element, BaseFloorElement, unknown>;
-
-export type ElementClickHandler = (floor: Floor | null, d: BaseFloorElement | null) => void;
 export type FloorDoubleClickHandler = (floor: Floor, coords: NumberTuple) => void;
+export type ElementClickHandler = (floor: Floor, el: any) => void;
 
-export type tableElementGroupSelection = Selection<
-    EnterElement,
-    TableElement,
-    SVGGElement,
-    unknown
->;
+export const enum FloorElementTypes {
+    ROUND_TABLE = "roundTableElement",
+    RECT_TABLE = "tableElement",
+}
 
-export type baseElementGroupSelection = Selection<BaseType, BaseFloorElement, SVGGElement, unknown>;
-
-export type tableElementInit = Pick<TableElement, "tableId" | "x" | "y" | "tag">;
+/**
+ * EDITOR - When in a map preset editor
+ *
+ * LIVE   - When in a event page where reservations occur
+ */
+export const enum FloorMode {
+    EDITOR = "EDITOR",
+    LIVE = "LIVE",
+}

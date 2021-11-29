@@ -13,7 +13,7 @@ interface State {
 }
 
 interface Props {
-    tableId: string;
+    label: string;
     freeTables: string[];
 }
 
@@ -31,7 +31,7 @@ const reservationForm = ref<QForm | null>(null);
 
 async function onOKClick() {
     if (!(await reservationForm.value?.validate())) return;
-    state.groupedWith.push(props.tableId);
+    state.groupedWith.push(props.label);
     emit("create-reservation", state);
 }
 </script>
@@ -86,6 +86,7 @@ async function onOKClick() {
                 size="md"
                 class="button-gradient"
                 icon="save"
+                v-close-popup
                 @click="onOKClick"
                 :label="t(`EventCreateReservation.reservationCreateBtn`)"
             />

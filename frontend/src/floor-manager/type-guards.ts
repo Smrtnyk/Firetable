@@ -1,20 +1,14 @@
-import {
-    BaseFloorElement,
-    ElementTag,
-    ElementType,
-    RoundTable,
-    TableElement,
-    WallElement,
-} from "src/types/floor";
+import { TableElement } from "src/floor-manager/TableElement";
+import { RoundTableElement } from "src/floor-manager/RoundTableElement";
 
-export function isWall(d: Pick<BaseFloorElement, "type">): d is WallElement {
-    return d.type === ElementType.WALL;
+export function isWall(element: any): element is any {
+    return true;
 }
 
-export function isTable(d: Pick<BaseFloorElement, "type">): d is TableElement {
-    return d.type === ElementType.TABLE;
+export function isTable(element: any): boolean {
+    return element instanceof RoundTableElement || element instanceof TableElement;
 }
 
-export function isRoundTable(d: TableElement | BaseFloorElement): d is RoundTable {
-    return isTable(d) && d.tag === ElementTag.CIRCLE;
+export function isRoundTable(element: any): element is any {
+    return element instanceof RoundTableElement;
 }

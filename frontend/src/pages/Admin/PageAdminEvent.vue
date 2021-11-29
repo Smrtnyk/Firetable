@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FloorDoc, FloorMode, TableElement } from "src/types/floor";
+import { FloorDoc } from "src/types/floor";
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { formatEventDate } from "src/helpers/utils"; // NOSONAR
@@ -17,9 +17,9 @@ import { useQuasar } from "quasar";
 import { Collection } from "src/types/firebase";
 import { EventDoc, EventFeedDoc } from "src/types/event";
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import { isTable } from "src/floor-manager/type-guards";
 import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
 import { config } from "src/config";
+import { FloorMode } from "src/floor-manager/types";
 
 interface Props {
     id: string;
@@ -55,17 +55,20 @@ function isEventFinished(eventTime: number): boolean {
     return currentTime > eventFinishedLimit.getTime();
 }
 
-const eventData = computed(() =>
-    eventFloors.value
-        .map((floor) => floor.data)
-        .flat()
-        .filter(isTable)
+const eventData = computed(
+    () => []
+    // eventFloors.value
+    //     .map((floor) => floor.data)
+    //     .flat()
+    //     .filter(isTable)
 );
 
 const reservationsStatus = computed(() => {
-    const tables: TableElement[] = eventData.value;
+    const tables: any[] = eventData.value;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const reservations = tables.filter((table) => !!table.reservation);
     const unreserved = tables.length - reservations.length;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const pending = reservations.filter((table) => !table.reservation?.confirmed).length;
     const confirmed = reservations.length - pending;
     const reserved = reservations.length;

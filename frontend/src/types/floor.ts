@@ -1,21 +1,11 @@
 import { Reservation } from "./event";
 
-/**
- * EDITOR - When in a map preset editor
- *
- * LIVE   - When in a event page where reservations occur
- */
-export const enum FloorMode {
-    EDITOR = "EDITOR",
-    LIVE = "LIVE",
-}
-
 export interface FloorDoc {
     id: string;
     name: string;
     width: number;
     height: number;
-    data: BaseFloorElement[];
+    json?: string;
 }
 
 export const enum ElementType {

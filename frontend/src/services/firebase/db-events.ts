@@ -9,7 +9,6 @@ import {
 import { CreateEventPayload, EventDoc, GuestData } from "src/types/event";
 import { functions } from "src/services/firebase/base";
 import { httpsCallable } from "@firebase/functions";
-import type { Floor } from "src/floor-manager/Floor";
 import {
     DocumentData,
     getDocs,
@@ -21,6 +20,7 @@ import {
     deleteDoc,
     query,
 } from "@firebase/firestore";
+import { Floor } from "src/floor-manager/Floor";
 
 export async function getEvents(lastDocument: DocumentData | null): Promise<EventDoc[]> {
     const orderByDateQuery = orderBy("date");
@@ -62,8 +62,7 @@ export function createNewEvent(eventPayload: CreateEventPayload) {
 }
 
 export function updateEventFloorData(floor: Floor, eventId: string) {
-    const { data, id } = floor;
-    return updateDoc(eventFloorDoc(eventId, id), { data });
+    return updateDoc(eventFloorDoc(eventId, floor.id), { json: floor.canvas.toJSON() });
 }
 
 export function addGuestToGuestList(eventID: string, payload: GuestData) {

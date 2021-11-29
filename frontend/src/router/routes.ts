@@ -6,6 +6,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import("layouts/MainLayout.vue"),
         children: [
             {
+                path: "/fabric",
+                name: "fabric",
+                component: () => import("pages/PageFabric.vue"),
+            },
+            {
                 path: "/",
                 name: "home",
                 meta: { requiresAuth: true },
