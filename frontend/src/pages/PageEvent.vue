@@ -92,7 +92,7 @@ function onAutocompleteClear() {
     // Implement
 }
 
-function isActiveFloor(floor: Floor) {
+function isActiveFloor(floor: Floor | FloorDoc) {
     return state.activeFloor?.id === floor.id;
 }
 
