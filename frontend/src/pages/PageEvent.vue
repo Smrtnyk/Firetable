@@ -23,7 +23,7 @@ import { useAuthStore } from "src/stores/auth-store";
 import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
 import { Floor } from "src/floor-manager/Floor";
 import { BaseTable, FloorMode } from "src/floor-manager/types";
-import { getFreeTables, getReservedTables } from "src/floor-manager/filters";
+import { getFreeTables, getReservedTables, getTables } from "src/floor-manager/filters";
 
 interface State {
     showMapsExpanded: boolean;
@@ -143,42 +143,37 @@ function onReservationConfirm(floor: Floor, element: BaseTable) {
     return function (val: boolean) {
         const { reservation } = element;
         if (!reservation) return;
-        floor.setReservationOnTable(element, {
-            ...reservation,
-            confirmed: val,
-        });
+        const { groupedWith } = reservation;
+        for (const tableLabel of groupedWith) {
+            const table = getTables(floor).find(({ label }) => label === tableLabel);
+            if (table) {
+                floor.setReservationOnTable(table, {
+                    ...reservation,
+                    confirmed: val,
+                });
+            }
+        }
         return tryCatchLoadingWrapper(() => updateEventFloorData(floor, props.id));
     };
 }
 
-function handleReservationCreation(
-    floor: Floor,
-    reservationData: CreateReservationPayload,
-    element: BaseTable
-) {
+function handleReservationCreation(floor: Floor, reservationData: CreateReservationPayload) {
     if (!currentUser.value) return;
 
-    // const { groupedWith } = reservationData;
+    const { groupedWith } = reservationData;
     const { email, name, role, id } = currentUser.value;
     const reservedBy = { email, name, role, id };
-    const reservation = {
-        ...reservationData,
-        confirmed: false,
-        reservedBy,
-    };
 
-    floor.setReservationOnTable(element, reservation);
-
-    // for (const idInGroup of groupedWith) {
-    // const findTableToReserve = floor.tables.find((table) => table.tableId === idInGroup);
-    // if (findTableToReserve) {
-    //     findTableToReserve.reservation = {
-    //         ...reservationData,
-    //         confirmed: false,
-    //         reservedBy,
-    //     };
-    // }
-    //}
+    for (const idInGroup of groupedWith) {
+        const table = getTables(floor).find(({ label }) => label === idInGroup);
+        if (table) {
+            floor.setReservationOnTable(table, {
+                ...reservationData,
+                confirmed: false,
+                reservedBy,
+            });
+        }
+    }
     tryCatchLoadingWrapper(() => updateEventFloorData(floor, props.id)).catch(showErrorMessage);
 }
 
@@ -204,7 +199,7 @@ function showCreateReservationDialog(floor: Floor, element: BaseTable) {
                 listeners: {
                     createReservation: (reservationData: CreateReservationPayload) => {
                         resetCurrentOpenCreateReservationDialog();
-                        handleReservationCreation(floor, reservationData, element);
+                        handleReservationCreation(floor, reservationData);
                     },
                 },
             },
@@ -301,14 +296,15 @@ function updateFloorInstancesData() {
 
 async function onDeleteReservation(floor: Floor, element: BaseTable) {
     if (!(await showConfirm("Delete reservation?"))) return;
-    // const { groupedWith } = element;
-    // for (const tableId of groupedWith) {
-    // const findReservationToDelete = floor.tables.find((table) => table.tableId === tableId);
-    // if (findReservationToDelete) {
-    //     delete findReservationToDelete.reservation;
-    // }
-    // }
-    floor.setReservationOnTable(element, null);
+    const { reservation } = element;
+    if (!reservation) return;
+    const { groupedWith } = reservation;
+    for (const tableId of groupedWith) {
+        const table = getTables(floor).find(({ label }) => label === tableId);
+        if (table) {
+            floor.setReservationOnTable(table, null);
+        }
+    }
 
     await tryCatchLoadingWrapper(() => updateEventFloorData(floor, props.id));
 }
