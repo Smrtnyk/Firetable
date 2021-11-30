@@ -31,6 +31,8 @@ export class Floor {
     id: string;
     name: string;
     scale: number;
+    width: number;
+    height: number;
     mode: FloorMode;
     floorDoc: FloorDoc;
     containerWidth: number;
@@ -96,10 +98,11 @@ export class Floor {
             });
         }
 
+        this.width = floorDoc.width;
+        this.height = floorDoc.height;
         this.containerWidth = containerWidth;
         this.floorDoc = floorDoc;
         this.canvas = new fabric.Canvas(canvas, canvasOptions);
-        this.setScaling();
         this.id = floorDoc.id;
         this.name = floorDoc.name;
         this.mode = mode;
@@ -115,8 +118,8 @@ export class Floor {
 
     setScaling() {
         this.canvas.setZoom(this.scale);
-        this.canvas.setWidth(this.floorDoc.width * this.canvas.getZoom());
-        this.canvas.setHeight(this.floorDoc.height * this.canvas.getZoom());
+        this.canvas.setWidth(this.width * this.canvas.getZoom());
+        this.canvas.setHeight(this.height * this.canvas.getZoom());
     }
 
     setFloorName(newName: string) {
@@ -124,6 +127,7 @@ export class Floor {
     }
 
     renderData(jsonData?: string) {
+        this.setScaling();
         if (jsonData) {
             this.canvas.loadFromJSON(
                 jsonData,
@@ -233,6 +237,12 @@ export class Floor {
 
     shouldLockDrag() {
         return this.mode !== FloorMode.EDITOR;
+    }
+
+    updateDimensions(newWidth: number, newHeight: number) {
+        this.width = newWidth;
+        this.height = newHeight;
+        this.renderData(this.floorDoc.json);
     }
 }
 

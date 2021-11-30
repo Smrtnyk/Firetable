@@ -6,7 +6,7 @@ import FTDialog from "components/FTDialog.vue";
 import { ElementTag, ElementType, FloorDoc } from "src/types/floor";
 import { extractAllTablesLabels, hasFloorTables } from "src/floor-manager/filters";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { ELEMENTS_TO_ADD_COLLECTION } from "src/floor-manager/constants";
+import { ELEMENTS_TO_ADD_COLLECTION, RESOLUTION } from "src/floor-manager/constants";
 import { onMounted, ref } from "vue";
 import { NumberTuple } from "src/types/generic";
 import { useRouter } from "vue-router";
@@ -81,6 +81,8 @@ function onFloorSave() {
         return updateFloor({
             json: floorInstance.value?.canvas.toJSON(["name"]),
             name: floorInstance.value?.name,
+            width: floorInstance.value?.width,
+            height: floorInstance.value?.height,
         }).catch(showErrorMessage);
     });
 }
@@ -89,11 +91,13 @@ function onFloorChange(prop: keyof Floor, event: string | number) {
     if (!floorInstance.value) return;
 
     if (prop === "name") floorInstance.value.setFloorName(String(event));
-    //
-    // if (prop === "width" || prop === "height") {
-    //     floorInstance.value[prop] = Number(event);
-    //     floorInstance.value.updateDimensions(floorInstance.value.width, floorInstance.value.height);
-    // }
+
+    if (prop === "width" && typeof event === "number") {
+        floorInstance.value.updateDimensions(event, floorInstance.value.height);
+    }
+    if (prop === "height" && typeof event === "number") {
+        floorInstance.value.updateDimensions(floorInstance.value.width, event);
+    }
 }
 
 function handleAddTableCallback(floor: Floor, { tag }: ElementDescriptor, [x, y]: NumberTuple) {
@@ -166,8 +170,8 @@ function onDeleteElement(element: BaseTable) {
                 <q-slider
                     :model-value="floorInstance.width"
                     :min="300"
-                    :max="900"
-                    :step="10"
+                    :max="1000"
+                    :step="RESOLUTION"
                     label
                     color="deep-orange"
                     @update:model-value="(event) => onFloorChange('width', event)"
@@ -179,8 +183,8 @@ function onDeleteElement(element: BaseTable) {
                 </q-badge>
                 <q-slider
                     :min="300"
-                    :max="900"
-                    :step="10"
+                    :max="1000"
+                    :step="RESOLUTION"
                     label
                     color="deep-orange"
                     @update:model-value="(event) => onFloorChange('height', event)"
