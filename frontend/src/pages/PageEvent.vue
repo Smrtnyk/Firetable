@@ -223,7 +223,7 @@ function tableClickHandler(floor: Floor, element: BaseTable | null) {
     }
 }
 
-function onTableFound(tables: BaseTable[]) {
+function onTableFound(/* tables: BaseTable[] */) {
     onAutocompleteClear();
     // for (const table of tables) {
     // do something
