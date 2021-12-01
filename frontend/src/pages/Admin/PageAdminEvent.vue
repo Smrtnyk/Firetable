@@ -16,10 +16,12 @@ import FTDialog from "components/FTDialog.vue";
 import { useQuasar } from "quasar";
 import { Collection } from "src/types/firebase";
 import { EventDoc, EventFeedDoc } from "src/types/event";
-import { showErrorMessage } from "src/helpers/ui-helpers";
+import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
 import { config } from "src/config";
 import { FloorMode } from "src/floor-manager/types";
+import { Floor } from "src/floor-manager/Floor";
+import { updateEventFloorData } from "src/services/firebase/db-events";
 
 interface Props {
     id: string;
@@ -88,6 +90,10 @@ async function init() {
     }
 }
 
+function onFloorUpdate(floor: Floor) {
+    tryCatchLoadingWrapper(() => updateEventFloorData(floor, props.id)).catch(showErrorMessage);
+}
+
 function showEventInfoEditDialog(): void {
     if (!event.value) return;
     quasar.dialog({
@@ -117,7 +123,9 @@ function showFloorEditDialog(floor: FloorDoc): void {
                 mode: FloorMode.EDITOR,
                 eventId: event.value.id,
             },
-            listeners: {},
+            listeners: {
+                update: onFloorUpdate,
+            },
         },
     });
 }
