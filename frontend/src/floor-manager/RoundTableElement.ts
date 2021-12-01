@@ -41,6 +41,6 @@ export class RoundTableElement extends fabric.Circle {
 // @ts-ignore
 fabric.roundTableElement = RoundTableElement;
 // @ts-ignore
-fabric.roundTableElement.fromObject = function (object, callback) {
+fabric.roundTableElement.fromObject = function (object: fabric.Object, callback) {
     return fabric.Object._fromObject("RoundTableElement", object, callback);
 };
