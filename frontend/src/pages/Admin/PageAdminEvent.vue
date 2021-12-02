@@ -19,9 +19,10 @@ import { EventDoc, EventFeedDoc } from "src/types/event";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
 import { config } from "src/config";
-import { FloorMode } from "src/floor-manager/types";
+import { BaseTable, FloorMode } from "src/floor-manager/types";
 import { Floor } from "src/floor-manager/Floor";
 import { updateEventFloorData } from "src/services/firebase/db-events";
+import { getTablesFromFloorDoc } from "src/floor-manager/filters";
 
 interface Props {
     id: string;
@@ -57,16 +58,11 @@ function isEventFinished(eventTime: number): boolean {
     return currentTime > eventFinishedLimit.getTime();
 }
 
-const eventData = computed(
-    () => []
-    // eventFloors.value
-    //     .map((floor) => floor.data)
-    //     .flat()
-    //     .filter(isTable)
-);
+// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+const eventData = computed(() => eventFloors.value.map(getTablesFromFloorDoc).flat());
 
 const reservationsStatus = computed(() => {
-    const tables: any[] = eventData.value;
+    const tables = eventData.value as unknown as BaseTable[];
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const reservations = tables.filter((table) => !!table.reservation);
     const unreserved = tables.length - reservations.length;

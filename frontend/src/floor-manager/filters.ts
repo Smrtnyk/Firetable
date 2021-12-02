@@ -1,5 +1,6 @@
 import { Floor } from "src/floor-manager/Floor";
 import { BaseTable, FloorElementTypes } from "src/floor-manager/types";
+import { FloorDoc } from "src/types/floor";
 
 export function hasFloorTables(floor: Floor): boolean {
     const allGroups = floor.canvas.getObjects();
@@ -14,6 +15,13 @@ export function hasFloorTables(floor: Floor): boolean {
         }
     }
     return false;
+}
+
+export function getTablesFromFloorDoc(floor: FloorDoc): any[] {
+    // @ts-ignore
+    return floor.json.objects.map((obj: any) => {
+        return obj.objects[0];
+    });
 }
 
 export function getTables(floor: Floor): BaseTable[] {
