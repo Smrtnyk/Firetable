@@ -14,10 +14,10 @@
     },
     "dependencies": {
         "@quasar/extras": "1.12.1",
-        "@types/fabric": "^4.5.5",
-        "chart.js": "^3.6.1",
-        "fabric": "^4.6.0",
-        "firebase": "9.5.0",
+        "@types/fabric": "4.5.6",
+        "chart.js": "3.6.1",
+        "fabric": "4.6.0",
+        "firebase": "9.6.0",
         "pinia": "2.0.5",
         "quasar": "2.3.3",
         "vue-i18n": "9.1.9"
