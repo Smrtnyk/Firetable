@@ -27,12 +27,11 @@ export const ELEMENTS_TO_ADD_COLLECTION = [
     },
 ];
 
-export const TABLE_WIDTH = 30;
-export const TABLE_HEIGHT = 30;
-export const RESOLUTION = 5;
-export const FLOOR_DEFAULT_WIDTH = 400;
-export const FLOOR_DEFAULT_HEIGHT = 650;
-export const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
+export const TABLE_WIDTH = 50;
+export const TABLE_HEIGHT = 50;
+export const RESOLUTION = 50;
+export const FLOOR_DEFAULT_WIDTH = 1000;
+export const FLOOR_DEFAULT_HEIGHT = 1000;
 
 const ONE_SECOND = 1000;
 const ONE_MINUTE = ONE_SECOND * 60;

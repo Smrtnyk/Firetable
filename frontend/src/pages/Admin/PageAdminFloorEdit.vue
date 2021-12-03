@@ -3,20 +3,23 @@ import AddTableDialog from "components/Floor/AddTableDialog.vue";
 import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
 import FTDialog from "components/FTDialog.vue";
 
-import { Floor } from "src/floor-manager/Floor";
-import { BaseFloorElement, FloorDoc, FloorMode } from "src/types/floor";
-import { extractAllTableIds, hasFloorTables } from "src/floor-manager/filters";
+import { ElementTag, ElementType, FloorDoc } from "src/types/floor";
+import { extractAllTablesLabels, hasFloorTables } from "src/floor-manager/filters";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { ELEMENTS_TO_ADD_COLLECTION } from "src/floor-manager/constants";
+import { ELEMENTS_TO_ADD_COLLECTION, RESOLUTION } from "src/floor-manager/constants";
 import { onMounted, ref } from "vue";
-import { isWall } from "src/floor-manager/type-guards";
 import { NumberTuple } from "src/types/generic";
 import { useRouter } from "vue-router";
 import { Loading, useQuasar } from "quasar";
 import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
 import { Collection } from "src/types/firebase";
+import { Floor } from "src/floor-manager/Floor";
+import { BaseTable, FloorMode } from "src/floor-manager/types";
 
-type ElementDescriptor = Pick<BaseFloorElement, "tag" | "type">;
+type ElementDescriptor = {
+    tag: ElementTag;
+    type: ElementType;
+};
 
 interface BottomSheetTableClickResult {
     elementDescriptor: ElementDescriptor;
@@ -35,9 +38,9 @@ const props = defineProps<Props>();
 const router = useRouter();
 const q = useQuasar();
 const floorInstance = ref<Floor | null>(null);
-const svgFloorContainer = ref<HTMLElement | null>(null);
-const selectedElement = ref<BaseFloorElement | null>(null);
-const selectedFloor = ref<Floor | null>(null);
+const canvasRef = ref<HTMLCanvasElement | null>(null);
+const pageRef = ref<HTMLDivElement | null>(null);
+const selectedElement = ref<BaseTable | null>(null);
 const { updateDoc: updateFloor } = useFirestoreDoc<FloorDoc>({
     type: "get",
     path: `${Collection.FLOORS}/${props.floorID}`,
@@ -56,16 +59,17 @@ onMounted(() => {
     Loading.show();
 });
 
-function instantiateFloor(floor: FloorDoc) {
-    if (!svgFloorContainer.value) return;
+function instantiateFloor(floorDoc: FloorDoc) {
+    if (!canvasRef.value || !pageRef.value) return;
 
-    floorInstance.value = new Floor.Builder()
-        .setFloorDocument(floor)
-        .setMode(FloorMode.EDITOR)
-        .setContainer(svgFloorContainer.value)
-        .setElementClickHander(onElementClickHandler)
-        .setFloorDoubleClickHandler(dblClickHandler)
-        .build();
+    floorInstance.value = new Floor({
+        canvas: canvasRef.value,
+        floorDoc,
+        dblClickHandler,
+        elementClickHandler,
+        mode: FloorMode.EDITOR,
+        containerWidth: pageRef.value.clientWidth,
+    });
 }
 
 function onFloorSave() {
@@ -74,31 +78,37 @@ function onFloorSave() {
     }
 
     return tryCatchLoadingWrapper(() => {
-        const { id, name, data, width, height } = floorInstance.value as Floor;
-        return updateFloor({ id, name, data, width, height }).catch(showErrorMessage);
+        return updateFloor({
+            json: floorInstance.value?.canvas.toJSON(["name"]),
+            name: floorInstance.value?.name,
+            width: floorInstance.value?.width,
+            height: floorInstance.value?.height,
+        }).catch(showErrorMessage);
     });
 }
 
 function onFloorChange(prop: keyof Floor, event: string | number) {
     if (!floorInstance.value) return;
 
-    if (prop === "name") floorInstance.value.changeName(String(event));
+    if (prop === "name") floorInstance.value.setFloorName(String(event));
 
-    if (prop === "width" || prop === "height") {
-        floorInstance.value[prop] = Number(event);
-        floorInstance.value.updateDimensions(floorInstance.value.width, floorInstance.value.height);
+    if (prop === "width" && typeof event === "number") {
+        floorInstance.value.updateDimensions(event, floorInstance.value.height);
+    }
+    if (prop === "height" && typeof event === "number") {
+        floorInstance.value.updateDimensions(floorInstance.value.width, event);
     }
 }
 
 function handleAddTableCallback(floor: Floor, { tag }: ElementDescriptor, [x, y]: NumberTuple) {
-    return function addTable(tableId: string) {
-        floor.addTableElement({ tableId, x, y, tag });
+    return function addTable(label: string) {
+        floor.addTableElement({ label, x, y, tag });
     };
 }
 
 function handleAddNewElement(floor: Floor, coords: NumberTuple) {
     return function ({ elementDescriptor }: BottomSheetTableClickResult) {
-        if (isWall(elementDescriptor)) return floor.addWall(coords);
+        // if (isWall(elementDescriptor)) return floor.addWall(coords);
 
         q.dialog({
             component: FTDialog,
@@ -107,7 +117,7 @@ function handleAddNewElement(floor: Floor, coords: NumberTuple) {
                 maximized: false,
                 title: "Table ID",
                 componentPropsObject: {
-                    ids: extractAllTableIds(floor),
+                    ids: extractAllTablesLabels(floor),
                 },
                 listeners: {
                     create: handleAddTableCallback(floor, elementDescriptor, coords),
@@ -121,14 +131,18 @@ function dblClickHandler(floor: Floor, coords: NumberTuple) {
     q.bottomSheet(addNewElementsBottomSheetOptions).onOk(handleAddNewElement(floor, coords));
 }
 
-function onElementClickHandler(floor: Floor | null, d: BaseFloorElement | null) {
-    selectedFloor.value = floor;
-    selectedElement.value = d ? { ...d } : null;
+function elementClickHandler(_: Floor, element: BaseTable | null) {
+    selectedElement.value = element;
+}
+
+function onDeleteElement(element: BaseTable) {
+    element.canvas?.remove(element.canvas.getActiveObject());
+    element.canvas?.renderAll();
 }
 </script>
 
 <template>
-    <div class="PageAdminFloorEdit">
+    <div class="PageAdminFloorEdit" ref="pageRef">
         <div v-if="floorInstance" class="PageAdminFloorEdit__controls justify-between">
             <q-input
                 standout
@@ -149,18 +163,15 @@ function onElementClickHandler(floor: Floor | null, d: BaseFloorElement | null) 
                 </template>
             </q-input>
         </div>
-        <ShowSelectedElement
-            :selected-floor="selectedFloor"
-            :selected-floor-element="selectedElement"
-        />
+        <ShowSelectedElement @delete="onDeleteElement" :selected-floor-element="selectedElement" />
         <div class="row q-pa-sm q-col-gutter-md" v-if="floorInstance">
             <div class="col-6">
                 <q-badge color="secondary"> Width: {{ floorInstance.width }} (300 to 900) </q-badge>
                 <q-slider
                     :model-value="floorInstance.width"
                     :min="300"
-                    :max="900"
-                    :step="10"
+                    :max="1000"
+                    :step="RESOLUTION"
                     label
                     color="deep-orange"
                     @update:model-value="(event) => onFloorChange('width', event)"
@@ -172,8 +183,8 @@ function onElementClickHandler(floor: Floor | null, d: BaseFloorElement | null) 
                 </q-badge>
                 <q-slider
                     :min="300"
-                    :max="900"
-                    :step="10"
+                    :max="1000"
+                    :step="RESOLUTION"
                     label
                     color="deep-orange"
                     @update:model-value="(event) => onFloorChange('height', event)"
@@ -182,24 +193,6 @@ function onElementClickHandler(floor: Floor | null, d: BaseFloorElement | null) 
             </div>
         </div>
 
-        <div ref="svgFloorContainer" class="PageAdminFloorEdit__svg-container eventFloor ft-card" />
+        <canvas ref="canvasRef" class="shadow-3" />
     </div>
 </template>
-
-<style lang="scss">
-.PageAdminFloorEdit {
-    g.tableGroup.active rect,
-    g.tableGroup.active circle {
-        fill: #ff8a00 !important;
-    }
-    circle.bottom-right {
-        stroke: #000;
-        fill: #333;
-    }
-    // RESIZING WALL CONTROLS
-    circle.bottom-right:hover {
-        cursor: move;
-        fill: #ff8a00;
-    }
-}
-</style>

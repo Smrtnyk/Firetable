@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { FloorDoc, FloorMode, TableElement } from "src/types/floor";
+import { FloorDoc } from "src/types/floor";
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import { formatEventDate } from "src/helpers/utils"; // NOSONAR
+import { formatEventDate } from "src/helpers/utils";
 import { useFirestore } from "src/composables/useFirestore";
 
 import FTTitle from "components/FTTitle.vue";
@@ -16,10 +16,13 @@ import FTDialog from "components/FTDialog.vue";
 import { useQuasar } from "quasar";
 import { Collection } from "src/types/firebase";
 import { EventDoc, EventFeedDoc } from "src/types/event";
-import { showErrorMessage } from "src/helpers/ui-helpers";
-import { isTable } from "src/floor-manager/type-guards";
+import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
 import { config } from "src/config";
+import { BaseTable, FloorMode } from "src/floor-manager/types";
+import { Floor } from "src/floor-manager/Floor";
+import { updateEventFloorData } from "src/services/firebase/db-events";
+import { getTablesFromFloorDoc } from "src/floor-manager/filters";
 
 interface Props {
     id: string;
@@ -55,17 +58,15 @@ function isEventFinished(eventTime: number): boolean {
     return currentTime > eventFinishedLimit.getTime();
 }
 
-const eventData = computed(() =>
-    eventFloors.value
-        .map((floor) => floor.data)
-        .flat()
-        .filter(isTable)
-);
+// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+const eventData = computed(() => eventFloors.value.map(getTablesFromFloorDoc).flat());
 
 const reservationsStatus = computed(() => {
-    const tables: TableElement[] = eventData.value;
+    const tables = eventData.value as unknown as BaseTable[];
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const reservations = tables.filter((table) => !!table.reservation);
     const unreserved = tables.length - reservations.length;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const pending = reservations.filter((table) => !table.reservation?.confirmed).length;
     const confirmed = reservations.length - pending;
     const reserved = reservations.length;
@@ -83,6 +84,10 @@ async function init() {
     if (!props.id) {
         await router.replace("/");
     }
+}
+
+function onFloorUpdate(floor: Floor) {
+    tryCatchLoadingWrapper(() => updateEventFloorData(floor, props.id)).catch(showErrorMessage);
 }
 
 function showEventInfoEditDialog(): void {
@@ -114,7 +119,9 @@ function showFloorEditDialog(floor: FloorDoc): void {
                 mode: FloorMode.EDITOR,
                 eventId: event.value.id,
             },
-            listeners: {},
+            listeners: {
+                update: onFloorUpdate,
+            },
         },
     });
 }

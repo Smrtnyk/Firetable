@@ -1,78 +1,17 @@
-circle.table, rect.table {
-    stroke-width: 1px;
-    stroke: #000;
-    cursor: pointer;
-    fill: #333;
-}
-
-text.table__id {
-    fill: #fff !important;
-    font-weight: bold;
-    text-anchor: middle;
-    alignment-baseline: middle;
-}
-
-rect.wall {
-    fill: #666;
-    cursor: pointer;
-}
-
 body.body--dark {
     background: #333;
-    rect.table,
-    circle.table {
-        fill: #444;
-    }
-}
-
-rect.table.reserved,
-circle.table.reserved {
-    fill: #2ab7ca !important;
-}
-
-rect.table.reserved.confirmed,
-circle.table.reserved.confirmed {
-    fill: #1a7722 !important;
 }
 
 .ft-tab-pane {
     display: none;
 }
+
 .ft-tab-pane.active.show {
     display: block;
-}
-
-line.horizontal,
-line.vertical {
-    stroke: #444;
-    stroke-width: 1px;
-    shape-rendering: crispEdges;
 }
 
 .eventFloor {
     display: flex;
     justify-content: center;
     padding: 1rem;
-    svg {
-        text-align: center;
-        cursor: default;
-        user-select: none;
-        background-color: #333;
-        border-radius: $border-radius;
-        max-height: calc(100vh - 10rem);
-    }
-
-    rect.table__blink,
-    circle.table__blink {
-        animation: blink 500ms linear infinite;
-    }
-
-    @keyframes blink {
-        0% {
-            opacity: 100%;
-        }
-        50% {
-            opacity: 0;
-        }
-    }
 }

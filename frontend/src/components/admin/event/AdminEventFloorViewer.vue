@@ -1,26 +1,24 @@
 <template>
-    <q-btn
-        class="button-gradient"
-        icon="save"
-        @click="saveFloorState"
-        label="save"
-        size="md"
-        rounded
-    />
-    <ShowSelectedElement
-        :selected-floor-element="selectedFloorElement"
-        :selected-floor="selectedFloor"
-    />
-    <div id="floor-container" class="eventFloor" ref="floorContainerRef" />
+    <div ref="viewerContainerRef">
+        <q-btn
+            class="button-gradient"
+            icon="save"
+            @click="saveFloorState"
+            label="save"
+            size="md"
+            rounded
+        />
+        <ShowSelectedElement :selected-floor-element="selectedFloorElement" />
+        <canvas id="floor-container" class="eventFloor" ref="floorContainerRef" />
+    </div>
 </template>
 
 <script setup lang="ts">
-import { Floor } from "src/floor-manager/Floor";
-import { BaseFloorElement, FloorDoc, FloorMode } from "src/types/floor";
+import { FloorDoc } from "src/types/floor";
 import { ref, watch } from "vue";
-import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { updateEventFloorData } from "src/services/firebase/db-events";
 import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
+import { Floor } from "src/floor-manager/Floor";
+import { BaseTable, FloorMode } from "src/floor-manager/types";
 
 interface Props {
     floor: FloorDoc;
@@ -28,31 +26,30 @@ interface Props {
     eventId: string;
 }
 
-const selectedFloorElement = ref<null | BaseFloorElement>(null);
-const selectedFloor = ref<null | Floor>(null);
+const selectedFloorElement = ref<null | BaseTable>(null);
 const props = defineProps<Props>();
-const floorContainerRef = ref<HTMLDivElement | null>(null);
+const emit = defineEmits(["update"]);
+const floorContainerRef = ref<HTMLCanvasElement | null>(null);
+const viewerContainerRef = ref<HTMLDivElement | null>(null);
 const floorInstance = ref<Floor | null>(null);
 
 function saveFloorState(): void {
     if (!floorInstance.value) return;
-    tryCatchLoadingWrapper(() =>
-        updateEventFloorData(floorInstance.value as Floor, props.eventId)
-    ).catch(showErrorMessage);
+    emit("update", floorInstance.value);
 }
 
-function onElementClick(floor: null | Floor, element: null | BaseFloorElement): void {
-    selectedFloor.value = floor;
+function onElementClick(floor: Floor, element: null | BaseTable): void {
     selectedFloorElement.value = element;
 }
 
 watch(floorContainerRef, () => {
-    if (!floorContainerRef.value) return;
-    floorInstance.value = new Floor.Builder()
-        .setFloorDocument(props.floor)
-        .setMode(props.mode)
-        .setContainer(floorContainerRef.value)
-        .setElementClickHander(onElementClick)
-        .build();
+    if (!floorContainerRef.value || !viewerContainerRef.value) return;
+    floorInstance.value = new Floor({
+        floorDoc: props.floor,
+        canvas: floorContainerRef.value,
+        elementClickHandler: onElementClick,
+        mode: props.mode,
+        containerWidth: viewerContainerRef.value.clientWidth,
+    });
 });
 </script>

@@ -19,8 +19,8 @@ interface Reservation {
 }
 
 export const enum ElementType {
-    WALL = "wall",
-    TABLE = "table"
+    RECT_TABLE = "tableElement",
+    ROUND_TABLE = "roundTableElement"
 }
 
 const enum ElementTag {

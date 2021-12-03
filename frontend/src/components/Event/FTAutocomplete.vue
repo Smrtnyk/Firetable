@@ -21,11 +21,11 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { TableElement } from "src/types/floor";
 import { useI18n } from "vue-i18n";
+import { BaseTable } from "src/floor-manager/types";
 
 interface Props {
-    allReservedTables: TableElement[];
+    allReservedTables: BaseTable[];
 }
 
 const props = defineProps<Props>();

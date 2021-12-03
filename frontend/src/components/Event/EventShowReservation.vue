@@ -1,41 +1,21 @@
 <script setup lang="ts">
-import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { ref } from "vue";
 import { Reservation } from "src/types/event";
-import { updateEventFloorData } from "src/services/firebase/db-events";
-import type { Floor } from "src/floor-manager/Floor";
 import { useI18n } from "vue-i18n";
 
 interface Props {
-    eventId: string;
-    floor: Floor;
     reservation: Reservation;
-    tableId: string;
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits(["delete"]);
+const emit = defineEmits(["delete", "confirm"]);
 const { t } = useI18n();
 const checked = ref<boolean>(props.reservation.confirmed);
 const confirmGuestSwitchDisabled = ref(false);
 
-function onReservationConfirm(val: boolean) {
-    const { floor, reservation, eventId } = props;
-    const { groupedWith } = reservation;
-    const { tables } = floor;
-
-    for (const tableId of groupedWith) {
-        const table = tables.find((element) => element.tableId === tableId);
-
-        if (!table?.reservation) continue;
-
-        table.reservation.confirmed = val;
-    }
-
-    tryCatchLoadingWrapper(async () => {
-        await updateEventFloorData(floor, eventId);
-        checked.value = !checked.value;
-    }).catch(showErrorMessage);
+function onReservationConfirm() {
+    emit("confirm", !checked.value);
+    checked.value = !checked.value;
 }
 </script>
 

@@ -79,4 +79,16 @@ module.exports = {
         "@typescript-eslint/semi": ["error", "always"],
         "@typescript-eslint/ban-ts-comment": "off",
     },
+    "overrides": [
+        {
+            "files": ["*/floor-manager/**/*.ts", "**/*/PageFabric.vue", "**/*/PageAdminFloorEdit.vue", "**/*/PageEvent.vue"],
+            "rules": {
+                "@typescript-eslint/no-unsafe-assignment": "off",
+                "@typescript-eslint/no-unsafe-member-access": "off",
+                "@typescript-eslint/no-unsafe-return": "off",
+                "@typescript-eslint/no-unsafe-call": "off",
+                "@typescript-eslint/no-unsafe-argument": "off"
+            }
+        }
+    ]
 };

@@ -2,41 +2,32 @@
     <div class="row q-pa-sm q-col-gutter-md" v-if="selectedElement">
         <div class="col-10 flex justify-between">
             <div class="row">
-                <div class="col-4 q-pa-xs q-pl-none">
-                    <q-input
-                        v-if="isRoundTableComp"
-                        :model-value="getRoundTableRadiusComp"
-                        filled
-                        label="Radius"
-                        @update:model-value="(event) => updateElementProp('radius', event)"
-                    />
-                    <q-input
-                        v-else
-                        :model-value="selectedElement.width"
-                        filled
-                        label="Width"
-                        type="number"
-                        step="5"
-                        @keydown.prevent="() => false"
-                        @update:model-value="(val) => updateElementProp('width', Number(val))"
-                    />
+                <div v-if="selectedElement.radius" class="col-4 q-pa-xs q-pl-none">
+                    <q-input :model-value="selectedElement.radius" filled label="Radius" readonly />
                 </div>
-                <div class="col-4 q-pa-xs" v-if="!isRoundTableComp">
-                    <q-input
-                        :model-value="selectedElement.height"
-                        filled
-                        label="Height"
-                        type="number"
-                        step="5"
-                        @keydown.prevent="() => false"
-                        @update:model-value="(val) => updateElementProp('height', Number(val))"
-                    />
-                </div>
+                <template v-else>
+                    <div class="col-4 q-pa-xs q-pl-none">
+                        <q-input
+                            :model-value="selectedElement.getScaledWidth()"
+                            filled
+                            label="Width"
+                            readonly
+                        />
+                    </div>
+                    <div class="col-4 q-pa-xs">
+                        <q-input
+                            :model-value="selectedElement.height"
+                            filled
+                            label="Height"
+                            readonly
+                        />
+                    </div>
+                </template>
                 <div class="col-4 q-pa-xs">
                     <q-input
-                        v-if="selectedElement.tableId"
-                        :model-value="selectedElement.tableId"
-                        @update:model-value="updateTableId"
+                        v-if="selectedElement.label"
+                        :model-value="selectedElement.label"
+                        @update:model-value="updateTableLabel"
                         filled
                         label="Table Name"
                     />
@@ -60,57 +51,38 @@
 </template>
 
 <script setup lang="ts">
-import { BaseFloorElement, TableElement } from "src/types/floor";
-import type { Floor } from "src/floor-manager/Floor";
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed, nextTick } from "vue";
-import { getRoundTableRadius } from "src/floor-manager/utils";
-import { isRoundTable, isTable } from "src/floor-manager/type-guards";
+import { isTable } from "src/floor-manager/type-guards";
+import { BaseTable } from "src/floor-manager/types";
 
 interface Props {
-    selectedFloor: Floor | null;
-    selectedFloorElement: BaseFloorElement | null;
+    selectedFloorElement: BaseTable | null;
 }
 
 const props = defineProps<Props>();
+const emit = defineEmits(["delete"]);
 const selectedElement = computed(() => {
     return props.selectedFloorElement;
 });
-const isRoundTableComp = computed(() => {
-    return props.selectedFloorElement && isRoundTable(props.selectedFloorElement);
-});
-const getRoundTableRadiusComp = computed(() => {
-    return (
-        isRoundTableComp.value && getRoundTableRadius(props.selectedFloorElement as TableElement)
-    );
-});
 
-async function updateTableId(newId: string): Promise<void> {
-    if (!props.selectedFloor || !selectedElement.value || !newId) return;
+async function updateTableLabel(newId: string): Promise<void> {
+    if (!selectedElement.value || !newId) return;
     if (!isTable(selectedElement.value)) return;
 
     try {
-        props.selectedFloor.updateTableId(selectedElement.value, newId);
-        selectedElement.value["tableId"] = newId;
+        // props.selectedElement.canvas.updateTableId(selectedElement.value, newId);
+        // selectedElement.value["tableId"] = newId;
     } catch {
         await nextTick();
         showErrorMessage("Table Id already taken");
     }
 }
 
-function updateElementProp<T extends keyof BaseFloorElement>(
-    prop: T,
-    val: BaseFloorElement[T]
-): void {
-    if (!props.selectedFloor || !selectedElement.value) return;
-    props.selectedFloor.updateElementProperty(selectedElement.value, prop, val);
-    selectedElement.value[prop] = val;
-}
-
 async function deleteElement() {
-    if (!props.selectedFloor || !props.selectedFloorElement) return;
+    if (!props.selectedFloorElement) return;
     if (await showConfirm("Do you really want to delete this element?")) {
-        props.selectedFloor.removeElement(props.selectedFloorElement);
+        emit("delete", props.selectedFloorElement);
     }
 }
 </script>

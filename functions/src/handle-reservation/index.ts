@@ -6,12 +6,8 @@ import "firebase-functions/lib/logger/compat";
 import diff from "diff-arrays-of-objects";
 import { Collection } from "../../types/database";
 import { db } from "../init";
-import {
-    ChangeType,
-    UpdatedTablesDifference,
-    PushSubscriptionDoc,
-} from "../../types/types";
-import { BaseFloorElement, ElementType, TableElement } from "../../types/floor";
+import { ChangeType, PushSubscriptionDoc, UpdatedTablesDifference } from "../../types/types";
+import { TableElement } from "../../types/floor";
 
 const { logger } = functions;
 
@@ -44,9 +40,7 @@ async function addToEventFeed(
     });
 }
 
-async function getMessagingTokensFromFirestore(): Promise<
-    PushSubscriptionDoc[]
-> {
+async function getMessagingTokensFromFirestore(): Promise<PushSubscriptionDoc[]> {
     const tokensColl = await db.collection(Collection.FCM).get();
     const tokens: PushSubscriptionDoc[] = [];
     tokensColl.docs.forEach((doc) => {
@@ -122,11 +116,15 @@ function getDifferenceBetweenTables(
     if (!newData || !prevData) {
         logger.error("Invalid data!");
     }
-
-    const prevTablesReservations: TableElement[] = prevData.data.filter(
+    const prevTablesReservations: TableElement[] = prevData.json.objects.map((obj: any) => {
+        return obj.objects[0];
+    }).filter(
         ({ reservation }: TableElement) => !!reservation
     );
-    const newTablesReservations: TableElement[] = newData.data.filter(
+
+    const newTablesReservations: TableElement[] = newData.json.objects.map((obj: any) => {
+        return obj.objects[0];
+    }).filter(
         ({ reservation }: TableElement) => !!reservation
     );
 
@@ -186,10 +184,10 @@ async function updateEventReservationCount(
     let overallReserved = 0;
     for (const doc of allEventFloors.docs) {
         const floor = doc.data();
-
-        const tables = floor.data.filter(
-            (el: BaseFloorElement) => el.type === ElementType.TABLE
-        );
+        const tables = floor.json.objects.map((obj: any) => {
+            return obj.objects[0];
+        });
+        logger.log(tables);
         overallTables += tables.length;
         overallReserved += tables.filter(
             (table: TableElement) => !!table.reservation
@@ -197,7 +195,7 @@ async function updateEventReservationCount(
     }
 
     const percentage = (overallReserved / overallTables) * PERCENTILE_BASE;
-    console.log(percentage);
+    logger.log(percentage);
     await eventRef.update({
         reservedPercentage: percentage,
     });
