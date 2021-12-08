@@ -18,7 +18,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits(["create-reservation"]);
+const emit = defineEmits(["create"]);
 const { t } = useI18n();
 const state = reactive<State>({
     guestName: "",
@@ -32,7 +32,7 @@ const reservationForm = ref<QForm | null>(null);
 async function onOKClick() {
     if (!(await reservationForm.value?.validate())) return;
     state.groupedWith.push(props.label);
-    emit("create-reservation", state);
+    emit("create", state);
 }
 </script>
 

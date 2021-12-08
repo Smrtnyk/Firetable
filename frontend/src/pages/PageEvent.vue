@@ -197,7 +197,7 @@ function showCreateReservationDialog(floor: Floor, element: BaseTable) {
                     label,
                 },
                 listeners: {
-                    createReservation: (reservationData: CreateReservationPayload) => {
+                    create: (reservationData: CreateReservationPayload) => {
                         resetCurrentOpenCreateReservationDialog();
                         handleReservationCreation(floor, reservationData);
                     },
@@ -398,6 +398,6 @@ onMounted(init);
             ></canvas>
         </div>
 
-        <EventGuestList :guest-list-limit="Number(event.guestListLimit)" :guest-list="guestList" />
+        <EventGuestList :guest-list-limit="event.guestListLimit" :guest-list="guestList" />
     </div>
 </template>

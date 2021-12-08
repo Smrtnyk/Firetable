@@ -42,10 +42,11 @@ export function showErrorMessage(e: unknown) {
     });
 }
 
-export function loadingWrapper<T extends (...args: unknown[]) => Promise<unknown>>(fn: T) {
+export function loadingWrapper<T extends (...args: any[]) => Promise<any>>(fn: T) {
     return async function (...args: Parameters<T>): Promise<ReturnType<T> | void> {
         try {
             Loading.show();
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return await fn(...args);
         } catch (e) {
             showErrorMessage(e);
