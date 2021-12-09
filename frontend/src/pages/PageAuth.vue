@@ -8,14 +8,11 @@ import { minLength, noEmptyString } from "src/helpers/form-rules";
 import { QForm } from "quasar";
 
 const router = useRouter();
-
 const username = ref("");
 const password = ref("");
 const isPwd = ref(true);
 const authForm = ref<QForm | null>(null);
-
 const usernameRule = [noEmptyString()];
-
 const passwordRule = [
     minLength("Please enter your password, it has to contain minimum 5 characters."),
 ];
