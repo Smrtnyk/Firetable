@@ -1,13 +1,59 @@
 {
     "name": "firetable",
+    "workspaces": [
+        "packages/functions",
+        "packages/frontend",
+        "packages/backend",
+        "packages/floor-creator",
+        "packages/types",
+        "packages/utils"
+    ],
     "scripts": {
         "deploy:hosting": "firebase deploy --only hosting",
         "deploy:functions": "firebase deploy --only functions",
         "deploy": "firebase deploy",
         "start:emulators": "firebase emulators:start --import=./local-db --export-on-exit=./local-db",
-        "seed:events": "node ./functions/lib/src/seed/add-events.js",
-        "seed:generateAdmminLocal": "node ./functions/lib/src/seed/generate-admin-local.js",
-        "seed:adminprod": "node ./functions/lib/src/seed/add-admin-prod.js"
+        "seed:events": "node packages/functions/lib/src/seed/add-events.js",
+        "seed:generate-admin-local": "node packages/functions/lib/src/seed/generate-admin-local.js",
+        "seed:admin-prod": "node packages/functions/lib/src/seed/add-admin-prod.js",
+        "dev:frontend": "cd packages/frontend && npm run dev",
+        "build:frontend": "cd packages/frontend && quasar build",
+        "build:functions": "cd packages/functions && npm run build"
+    },
+    "devDependencies": {
+        "@quasar/app": "3.3.3",
+        "@types/web-push": "3.3.2",
+        "@typescript-eslint/eslint-plugin": "5.12.1",
+        "@typescript-eslint/parser": "5.12.1",
+        "babel-loader": "8.2.3",
+        "dotenv": "16.0.0",
+        "eslint": "8.10.0",
+        "eslint-config-prettier": "8.4.0",
+        "eslint-plugin-import": "2.25.4",
+        "eslint-plugin-prettier": "4.0.0",
+        "eslint-plugin-promise": "6.0.0",
+        "eslint-plugin-quasar": "1.1.0",
+        "eslint-plugin-vue": "8.5.0",
+        "eslint-webpack-plugin": "3.1.1",
+        "prettier": "2.5.1",
+        "typescript": "4.5.5",
+        "@faker-js/faker": "^6.0.0-alpha.7"
+    },
+    "dependencies": {
+        "@quasar/extras": "1.12.5",
+        "@types/fabric": "4.5.7",
+        "chart.js": "3.7.1",
+        "diff-arrays-of-objects": "1.1.9",
+        "fabric": "5.2.1",
+        "firebase": "9.6.7",
+        "firebase-admin": "10.0.2",
+        "firebase-functions": "3.18.1",
+        "pinia": "2.0.11",
+        "quasar": "2.5.5",
+        "vue": "3.2.31",
+        "vue-i18n": "9.1.9",
+        "vue-router": "4.0.12",
+        "web-push": "3.4.5"
     },
     "private": true
 }

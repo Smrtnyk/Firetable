@@ -1,0 +1,14 @@
+{
+  "name": "@firetable/backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/src/firebase/index.js",
+    "types": "./dist/src/firebase/index.d.ts",
+  "scripts": {
+     "test": "echo \"Error: no test specified\" && exit 1",
+      "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
