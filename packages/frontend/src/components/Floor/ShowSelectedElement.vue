@@ -87,9 +87,7 @@ async function deleteElement() {
 }
 
 function getElementWidth(e: any): number {
-    const width = Math.round(e.group.width * e.group.scaleX);
-    console.log(width);
-    return width;
+    return Math.round(e.group.width * e.group.scaleX);
 }
 
 function getElementHeight(e: any): number {
