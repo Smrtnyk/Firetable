@@ -64,3 +64,4 @@ All contributions and ideas are welcome.
 * [x] Make floor editable on event level
 * [ ] Add waiters schedule per event so for each event is known who works and where
 * [x] Move to package based monorepo
+* [ ] Make it possible to add new table on event map
