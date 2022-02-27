@@ -60,6 +60,7 @@ All contributions and ideas are welcome.
 * [ ] Rate limit the guest confirmation on the guest list
 * [ ] Make table disabled if someone is already reserving it
 * [ ] Make reservations editable
-* [ ] Make event editable
-* [ ] Make floor editable on event level
+* [x] Make event editable
+* [x] Make floor editable on event level
 * [ ] Add waiters schedule per event so for each event is known who works and where
+* [x] Move to package based monorepo
