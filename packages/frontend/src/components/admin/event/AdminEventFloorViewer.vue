@@ -14,10 +14,10 @@
 </template>
 
 <script setup lang="ts">
-import { FloorDoc } from "src/../../../../../types/src/floor";
-import { ref, watch } from "vue";
+import { nextTick, ref, watch } from "vue";
 import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
 import { BaseTable, Floor, FloorMode } from "@firetable/floorcreator";
+import { FloorDoc } from "@firetable/types";
 
 interface Props {
     floor: FloorDoc;
@@ -37,7 +37,9 @@ function saveFloorState(): void {
     emit("update", floorInstance.value);
 }
 
-function onElementClick(floor: Floor, element: null | BaseTable): void {
+async function onElementClick(floor: Floor, element: null | BaseTable): Promise<void> {
+    selectedFloorElement.value = null;
+    await nextTick();
     selectedFloorElement.value = element;
 }
 
