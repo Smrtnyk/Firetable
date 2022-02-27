@@ -8,7 +8,7 @@
                 <template v-else>
                     <div class="col-4 q-pa-xs q-pl-none">
                         <q-input
-                            :model-value="selectedElement.getScaledWidth()"
+                            :model-value="getElementWidth(selectedElement)"
                             filled
                             label="Width"
                             readonly
@@ -16,7 +16,7 @@
                     </div>
                     <div class="col-4 q-pa-xs">
                         <q-input
-                            :model-value="selectedElement.height"
+                            :model-value="getElementHeight(selectedElement)"
                             filled
                             label="Height"
                             readonly
@@ -84,5 +84,15 @@ async function deleteElement() {
     if (await showConfirm("Do you really want to delete this element?")) {
         emit("delete", props.selectedFloorElement);
     }
+}
+
+function getElementWidth(e: any): number {
+    const width = Math.round(e.group.width * e.group.scaleX);
+    console.log(width);
+    return width;
+}
+
+function getElementHeight(e: any): number {
+    return Math.round(e.group.height * e.group.scaleY);
 }
 </script>

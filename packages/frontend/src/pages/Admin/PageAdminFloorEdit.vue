@@ -3,7 +3,7 @@ import AddTableDialog from "components/Floor/AddTableDialog.vue";
 import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
 import FTDialog from "components/FTDialog.vue";
 
-import { onMounted, ref } from "vue";
+import { nextTick, onMounted, ref } from "vue";
 import { NumberTuple } from "src/types/generic";
 import { useRouter } from "vue-router";
 import { Loading, useQuasar } from "quasar";
@@ -135,7 +135,9 @@ function dblClickHandler(floor: Floor, coords: NumberTuple) {
     q.bottomSheet(addNewElementsBottomSheetOptions).onOk(handleAddNewElement(floor, coords));
 }
 
-function elementClickHandler(_: Floor, element: BaseTable | null) {
+async function elementClickHandler(_: Floor, element: BaseTable | null) {
+    selectedElement.value = null;
+    await nextTick();
     selectedElement.value = element;
 }
 

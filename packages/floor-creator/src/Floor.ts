@@ -6,7 +6,8 @@ import {
     CreateTableOptions,
     ElementClickHandler,
     FloorDoubleClickHandler,
-    FloorMode, NumberTuple
+    FloorMode,
+    NumberTuple,
 } from "./types";
 import { RoundTableElement } from "./RoundTableElement";
 import { ElementTag, FloorDoc, Reservation } from "@firetable/types";
@@ -111,6 +112,11 @@ export class Floor {
         this.canvas.on("mouse:dblclick", this.onDblClickHandler);
         this.canvas.on("mouse:up", this.onMouseUpHandler);
         this.canvas.on("object:moving", this.onObjectMove);
+        this.canvas.on("object:scaling", (e) => {
+            const { target } = e;
+            if (!target) return;
+            this.elementClickHandler(this, getTableFromGroupElement(e));
+        });
         this.renderData(floorDoc.json);
     }
 
