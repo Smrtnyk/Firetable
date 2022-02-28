@@ -1,0 +1,26 @@
+{
+    "files": [],
+    "compilerOptions": {
+        "baseUrl": "."
+    },
+    "references": [
+        {
+            "path": "./packages/floor-creator/tsconfig.ref.json"
+        },
+        {
+            "path": "./packages/frontend/tsconfig.ref.json"
+        },
+        {
+            "path": "./packages/functions/tsconfig.ref.json"
+        },
+        {
+            "path": "./packages/backend/tsconfig.ref.json"
+        },
+        {
+            "path": "./packages/types/tsconfig.ref.json"
+        },
+        {
+            "path": "./packages/utils/tsconfig.ref.json"
+        }
+    ],
+}

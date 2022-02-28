@@ -1,0 +1,30 @@
+<template>
+    <q-input v-model="localEventInfoValue" filled autogrow />
+    <q-btn
+        rounded
+        class="button-gradient q-mt-sm"
+        icon="save"
+        @click="saveEventInfo"
+        label="Save"
+    />
+</template>
+
+<script setup lang="ts">
+import { ref } from "vue";
+import { updateEventProperty } from "@firetable/backend";
+import { showErrorMessage, tryCatchLoadingWrapper } from "@firetable/utils";
+
+interface Props {
+    eventId: string;
+    eventInfo: string;
+}
+
+const props = defineProps<Props>();
+const localEventInfoValue = ref(props.eventInfo);
+
+function saveEventInfo(): void {
+    tryCatchLoadingWrapper(() => {
+        return updateEventProperty(props.eventId, "info", localEventInfoValue.value);
+    }).catch(showErrorMessage);
+}
+</script>

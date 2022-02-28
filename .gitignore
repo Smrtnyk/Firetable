@@ -5,7 +5,7 @@
 firebase.config.js
 algolia.config.js
 node_modules
-frontend/dist
+packages/frontend/dist
 /src-cordova/node_modules
 /src-cordova/platforms
 /src-cordova/plugins
@@ -16,8 +16,6 @@ yarn-error.log*
 
 .env
 .firebaserc
-
-**/src-pwa/firebase-messaging-sw.js
 
 serviceAccount.json
 cypress.env.json
@@ -40,3 +38,4 @@ firebase-export-*
 
 *.log
 local-db
+dist

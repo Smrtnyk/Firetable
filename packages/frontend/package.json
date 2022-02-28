@@ -1,0 +1,22 @@
+{
+    "name": "@firetable/ui",
+    "version": "0.2.0",
+    "description": "Firetable reservation management system",
+    "productName": "Firetable",
+    "author": "Milan Keser",
+    "private": true,
+    "scripts": {
+        "lint": "eslint -c .eslintrc.js src/** --fix",
+        "dev": "quasar dev",
+        "dev:pwa": "quasar dev -m pwa",
+        "build:spa": "quasar build",
+        "build:pwa": "quasar build -m pwa"
+    },
+    "engines": {
+        "node": ">= 16",
+        "npm": ">= 7.13.0"
+    },
+    "browserslist": [
+        "last 3 Chrome versions"
+    ]
+}

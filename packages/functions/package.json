@@ -1,0 +1,24 @@
+{
+    "name": "@firetable/functions",
+    "main": "lib/src/index.js",
+    "scripts": {
+        "lint": "eslint -c .eslintrc.js src/** --fix",
+        "build": "tsc",
+        "dev": "tsc --watch",
+        "serve": "npm run build && firebase serve --only functions",
+        "shell": "npm run build && firebase functions:shell",
+        "start": "npm run shell",
+        "deploy": "firebase deploy --only functions",
+        "logs": "firebase functions:log",
+        "webpush": "web-push",
+        "find-dead-code": "npx ts-prune"
+    },
+    "dependencies": {
+        "firebase-admin": "10.0.2",
+        "firebase-functions": "3.18.1"
+    },
+    "engines": {
+        "node": "16"
+    },
+    "private": true
+}
