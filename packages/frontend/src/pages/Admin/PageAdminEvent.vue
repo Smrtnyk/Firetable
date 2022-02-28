@@ -140,6 +140,7 @@ function showAssignStaffDialog(): void {
             componentPropsObject: {
                 eventId: event.value.id,
                 users: users.value,
+                activeStaff: event.value.activeStaff,
             },
             listeners: {},
         },
