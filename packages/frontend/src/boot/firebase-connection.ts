@@ -5,6 +5,10 @@ import { auth, fBInit, handleOnAuthStateChanged, routerBeforeEach } from "@firet
 import { showErrorMessage } from "@firetable/utils";
 
 export default boot(({ router }) => {
+    if (!process.env.VUE_APP_FIREBASE_API_KEY) {
+        showErrorMessage("Firebase credentials missing!");
+        return;
+    }
     fBInit({
         appId: "1:604176749699:web:cc48a2a03165a526",
         apiKey: process.env.VUE_APP_FIREBASE_API_KEY,
