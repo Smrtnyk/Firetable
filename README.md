@@ -65,3 +65,4 @@ All contributions and ideas are welcome.
 * [ ] Add waiters schedule per event so for each event is known who works and where
 * [x] Move to package based monorepo
 * [ ] Make it possible to add new table on event map
+* [ ] Implement an option to add a wall on the floor map
