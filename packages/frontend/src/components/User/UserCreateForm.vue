@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import { noEmptyString, noWhiteSpaces } from "src/helpers/form-rules";
 import { PROJECT_MAIL } from "src/config";
-import { ACTIVITY_STATUS, CreateUserPayload, User } from "@firetable/types";
+import { ACTIVITY_STATUS, CreateUserPayload, Role, User } from "@firetable/types";
 
 interface Props {
     floors: string[];
@@ -21,7 +21,7 @@ const userSkeleton: CreateUserPayload = {
     email: "",
     password: "",
     floors: [],
-    role: props.roles[0],
+    role: props.roles[0] || Role.WAITER,
     status: ACTIVITY_STATUS.OFFLINE,
 };
 const form = ref<CreateUserPayload | User>(props.user ? { ...props.user } : { ...userSkeleton });

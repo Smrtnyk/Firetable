@@ -17,9 +17,10 @@ import { useQuasar } from "quasar";
 import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
 import { config } from "src/config";
 import { BaseTable, Floor, FloorMode, getTablesFromFloorDoc } from "@firetable/floorcreator";
-import { Collection, EventDoc, EventFeedDoc, FloorDoc } from "@firetable/types";
+import { Collection, EventDoc, EventFeedDoc, FloorDoc, Role, User } from "@firetable/types";
 import { showErrorMessage, tryCatchLoadingWrapper } from "@firetable/utils";
 import { updateEventFloorData } from "@firetable/backend";
+import { query as firestoreQuery, where } from "@firebase/firestore";
 
 interface Props {
     id: string;
@@ -33,6 +34,15 @@ const tab = ref("info");
 const { data: eventFloors } = useFirestore<FloorDoc>({
     type: "watch",
     path: `${Collection.EVENTS}/${props.id}/floors`,
+});
+
+const { data: users } = useFirestore<User>({
+    type: "get",
+    path: Collection.USERS,
+    query(collectionRef) {
+        const idConstraint = where("role", "!=", Role.ADMIN);
+        return firestoreQuery(collectionRef, idConstraint);
+    },
 });
 
 const { data: event } = useFirestoreDoc<EventDoc>({
@@ -129,6 +139,7 @@ function showAssignStaffDialog(): void {
             title: `Active Staff`,
             componentPropsObject: {
                 eventId: event.value.id,
+                users: users.value,
             },
             listeners: {},
         },
