@@ -10,6 +10,7 @@ import AdminEventGeneralInfo from "components/admin/event/AdminEventGeneralInfo.
 import AdminEventReservationsByPerson from "components/admin/event/AdminEventReservationsByPerson.vue";
 import AdminEventEditInfo from "components/admin/event/AdminEventEditInfo.vue";
 import AdminEventFloorViewer from "components/admin/event/AdminEventFloorViewer.vue";
+import AdminEventActiveStaff from "components/admin/event/AdminEventActiveStaff.vue";
 import FTDialog from "components/FTDialog.vue";
 
 import { useQuasar } from "quasar";
@@ -119,6 +120,21 @@ function showFloorEditDialog(floor: FloorDoc): void {
     });
 }
 
+function showAssignStaffDialog(): void {
+    if (!event.value) return;
+    quasar.dialog({
+        component: FTDialog,
+        componentProps: {
+            component: AdminEventActiveStaff,
+            title: `Active Staff`,
+            componentPropsObject: {
+                eventId: event.value.id,
+            },
+            listeners: {},
+        },
+    });
+}
+
 onMounted(init);
 </script>
 
@@ -182,6 +198,18 @@ onMounted(init);
                             @click="() => showFloorEditDialog(floor)"
                         >
                             {{ floor.name }}
+                        </q-btn>
+
+                        <!-- Staff assigned to an event -->
+                        <q-separator class="q-my-md" />
+                        <h2 class="text-subtitle1">Active Staff</h2>
+                        <q-btn
+                            class="button-gradient q-mb-sm"
+                            size="md"
+                            rounded
+                            @click="showAssignStaffDialog"
+                        >
+                            Assign active staff
                         </q-btn>
                     </div>
                 </q-tab-panel>
