@@ -5,7 +5,7 @@
                 v-for="user in props.users"
                 :key="user.id"
                 :model-value="isInActiveStaff(user.id)"
-                @update:model-value="(checked) => setUserAsActiveEventStaff(user, checked)"
+                @update:model-value="(active) => setUserAsActiveEventStaff(user.id, active)"
                 :label="user.name"
                 size="lg"
             />
@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
 import { User } from "@firetable/types";
-import { updateEventProperty } from "@firetable/backend";
+import { ref } from "vue";
 
 interface Props {
     eventId: string;
@@ -24,18 +24,21 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const activeStaff = ref(props.activeStaff);
+const emit = defineEmits(["updateActiveStaff"]);
 
-function setUserAsActiveEventStaff(user: User, checked: boolean) {
-    let newActiveStaff = [...(props.activeStaff || [])];
-    if (checked) {
-        newActiveStaff.push(user.id);
+function setUserAsActiveEventStaff(id: User["id"], active: boolean) {
+    let newActiveStaff = [...(activeStaff.value || [])];
+    if (active) {
+        newActiveStaff.push(id);
     } else {
-        newActiveStaff = newActiveStaff.filter((person) => person !== user.id);
+        newActiveStaff = newActiveStaff.filter((person) => person !== id);
     }
-    updateEventProperty(props.eventId, "activeStaff", newActiveStaff);
+    emit("updateActiveStaff", newActiveStaff);
+    activeStaff.value = newActiveStaff;
 }
 
 function isInActiveStaff(userId: User["id"]): boolean {
-    return Array.isArray(props.activeStaff) && props.activeStaff.includes(userId);
+    return Array.isArray(activeStaff.value) && activeStaff.value.includes(userId);
 }
 </script>

@@ -19,7 +19,7 @@ import { config } from "src/config";
 import { BaseTable, Floor, FloorMode, getTablesFromFloorDoc } from "@firetable/floorcreator";
 import { Collection, EventDoc, EventFeedDoc, FloorDoc, Role, User } from "@firetable/types";
 import { showErrorMessage, tryCatchLoadingWrapper } from "@firetable/utils";
-import { updateEventFloorData } from "@firetable/backend";
+import { updateEventFloorData, updateEventProperty } from "@firetable/backend";
 import { query as firestoreQuery, where } from "@firebase/firestore";
 
 interface Props {
@@ -94,6 +94,14 @@ function onFloorUpdate(floor: Floor) {
     tryCatchLoadingWrapper(() => updateEventFloorData(floor, props.id)).catch(showErrorMessage);
 }
 
+function onUpdateActiveStaff(newActiveStaff: User["id"][]) {
+    if (!event.value) return;
+    const eventId = event.value.id;
+    tryCatchLoadingWrapper(() => {
+        return updateEventProperty(eventId, "activeStaff", newActiveStaff);
+    });
+}
+
 function showEventInfoEditDialog(): void {
     if (!event.value) return;
     quasar.dialog({
@@ -142,7 +150,9 @@ function showAssignStaffDialog(): void {
                 users: users.value,
                 activeStaff: event.value.activeStaff,
             },
-            listeners: {},
+            listeners: {
+                updateActiveStaff: onUpdateActiveStaff,
+            },
         },
     });
 }
