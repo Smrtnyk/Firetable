@@ -113,6 +113,10 @@ function setActiveFloor(floor?: Floor) {
     }
 }
 
+function showActiveStaff(): void {
+    // todo: implement
+}
+
 function showEventInfo(): void {
     q.dialog({
         component: FTDialog,
@@ -372,6 +376,14 @@ onMounted(init);
             </q-fab>
 
             <q-space />
+            <q-btn
+                class="button-gradient q-mr-sm"
+                rounded
+                size="md"
+                icon="check"
+                @click="showActiveStaff"
+                v-if="event.activeStaff"
+            />
             <q-btn
                 class="button-gradient q-mr-sm"
                 rounded
