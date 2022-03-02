@@ -36,7 +36,7 @@
         "eslint-plugin-vue": "8.5.0",
         "eslint-webpack-plugin": "3.1.1",
         "prettier": "2.5.1",
-        "typescript": "4.6.2-insiders.20220225",
+        "typescript": "4.6.2",
         "@faker-js/faker": "^6.0.0-alpha.7"
     },
     "dependencies": {
