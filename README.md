@@ -66,3 +66,5 @@ All contributions and ideas are welcome.
 * [x] Move to package based monorepo
 * [ ] Make it possible to add new table on event map
 * [ ] Implement an option to add a wall on the floor map
+* [ ] Center the text on home page when there are no events
+* [ ] Fix the touch behavior on map editor on mobile
