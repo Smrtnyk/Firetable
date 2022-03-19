@@ -15,8 +15,5 @@
     "engines": {
         "node": ">= 16",
         "npm": ">= 7.13.0"
-    },
-    "browserslist": [
-        "last 3 Chrome versions"
-    ]
+    }
 }
