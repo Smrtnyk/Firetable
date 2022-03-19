@@ -107,7 +107,7 @@ function showAddNewGuestForm(): void {
             <div class="EventGuestList" v-if="!props.guestList.length">
                 <div class="justify-center items-center q-pa-md">
                     <h6 class="text-h6">You should invite some people :)</h6>
-                    <q-img src="people-confirmation.svg" />
+                    <q-img src="/people-confirmation.svg" />
                 </div>
             </div>
 

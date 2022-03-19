@@ -108,11 +108,11 @@ async function onFileChosen(chosenFile: File) {
         >
             Go to map manager
         </q-btn>
-        <q-img src="no-events.svg" />
+        <q-img src="/no-events.svg" />
     </div>
 
     <template v-else>
-        <q-img v-if="state.form.img" src="state.form.img" :ratio="1" class="q-mb-md" />
+        <q-img v-if="state.form.img" :src="state.form.img" :ratio="1" class="q-mb-md" />
 
         <q-form class="q-gutter-xs q-pt-md q-pa-md" @submit="onSubmit" @reset="onReset">
             <q-file

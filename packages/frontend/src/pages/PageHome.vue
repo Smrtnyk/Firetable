@@ -27,7 +27,7 @@ const { data: events, loading: isLoading } = useFirestore<EventDoc>({
         <EventCardListSkeleton v-if="isLoading" />
         <div v-if="!isLoading && !events.length" class="row justify-center items-center q-mt-md">
             <h2 class="text-h4">There are no upcoming events</h2>
-            <q-img src="no-events.svg" />
+            <q-img src="/no-events.svg" />
         </div>
     </div>
 </template>
