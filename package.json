@@ -21,7 +21,7 @@
         "build:functions": "cd packages/functions && npm run build"
     },
     "devDependencies": {
-        "@quasar/app-vite": "1.0.0-beta.5",
+        "@quasar/app-vite": "1.0.0-beta.7",
         "autoprefixer": "10.4.4",
         "@types/web-push": "3.3.2",
         "@typescript-eslint/eslint-plugin": "5.15.0",
