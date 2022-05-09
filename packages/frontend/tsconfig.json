@@ -1,29 +1,43 @@
 {
-    // "extends": "@quasar/app/tsconfig-preset",
+    "extends": "@quasar/app-vite/tsconfig-preset",
     "compilerOptions": {
-        "allowJs": true,
-        "esModuleInterop": true,
-        "module": "esnext",
-        "moduleResolution": "node",
-        "noEmit": true,
-        "resolveJsonModule": true,
-        "sourceMap": true,
-        "strict": true,
-        "target": "ESNext",
-        "rootDir": "./",
-        "baseUrl": "./",
-        "lib": ["ESNext", "DOM"],
-        "jsx": "preserve",
-        "skipLibCheck": true,
+        "isolatedModules": false,
+        "baseUrl": ".",
         "paths": {
-            "src/*": ["src/*"],
-            "app/*": ["*"],
-            "components/*": ["src/components/*"],
-            "layouts/*": ["src/layouts/*"],
-            "pages/*": ["src/pages/*"],
-            "assets/*": ["src/assets/*"],
-            "boot/*": ["src/boot/*"]
+            "src/*": [
+                "src/*"
+            ],
+            "app/*": [
+                "*"
+            ],
+            "components/*": [
+                "src/components/*"
+            ],
+            "layouts/*": [
+                "src/layouts/*"
+            ],
+            "pages/*": [
+                "src/pages/*"
+            ],
+            "assets/*": [
+                "src/assets/*"
+            ],
+            "boot/*": [
+                "src/boot/*"
+            ],
+            "stores/*": [
+                "src/stores/*"
+            ]
         }
     },
-    "exclude": ["/dist", ".quasar", "node_modules"]
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.d.ts",
+        "src/**/*.vue"
+    ],
+    "references": [
+        {
+            "path": "./tsconfig.ref.json"
+        }
+    ]
 }

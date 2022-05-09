@@ -133,7 +133,7 @@ onMounted(init);
                     There are no events, you should create one
                 </h6>
             </div>
-            <q-img src="no-events.svg" />
+            <q-img src="/no-events.svg" />
         </div>
     </div>
 </template>

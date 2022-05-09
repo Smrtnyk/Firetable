@@ -4,19 +4,14 @@ module.exports = {
     // Must use parserOptions instead of "parser" to allow vue-eslint-parser to keep working
     // `parser: 'vue-eslint-parser'` is already included with any 'plugin:vue/**' config and should be omitted
     parserOptions: {
-        // https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/parser#configuration
-        // https://github.com/TypeStrong/fork-ts-checker-webpack-plugin#eslint
-        // Needed to make the parser take into account 'vue' files
-        parser: "@typescript-eslint/parser",
-        extraFileExtensions: [".vue"],
-        project: ["./tsconfig.json", "./packages/*/tsconfig.json"],
-        tsconfigRootDir: __dirname,
-        ecmaVersion: 2018, // Allows for the parsing of modern ECMAScript features
-        sourceType: "module", // Allows for the use of imports
+        parser: require.resolve('@typescript-eslint/parser'),
+        extraFileExtensions: [ '.vue' ]
     },
 
     env: {
         browser: true,
+        es2021: true,
+        node: true,
         "vue/setup-compiler-macros": true,
     },
     globals: {
@@ -50,6 +45,8 @@ module.exports = {
         "prettier",
     ],
     rules: {
+        "no-undef": "off",
+        //
         "import/no-unresolved": "off",
         "import/no-duplicates": "error",
         //
@@ -67,5 +64,6 @@ module.exports = {
         ],
         "@typescript-eslint/semi": ["error", "always"],
         "@typescript-eslint/ban-ts-comment": "off",
-    }
+    },
+    ignorePatterns: ["**/dist/*"]
 };

@@ -33,7 +33,7 @@ To start frontend dev server cd into `frontend dir` and run
 ---
 
 In order to run it in `https` mode you will need to generate `key.pem` and `cert.pem` using `mkcert`,
-otherwise comment out the `https` field in `quasar.conf.js`.
+otherwise comment out the `https` field in `quasar.config.js`.
 Make sure to rename `.env-example` to `.env` and fill in the firebase info.
 
 ---
@@ -66,3 +66,5 @@ All contributions and ideas are welcome.
 * [x] Move to package based monorepo
 * [ ] Make it possible to add new table on event map
 * [ ] Implement an option to add a wall on the floor map
+* [ ] Center the text on home page when there are no events
+* [ ] Fix the touch behavior on map editor on mobile

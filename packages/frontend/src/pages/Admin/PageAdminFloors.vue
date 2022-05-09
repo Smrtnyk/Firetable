@@ -119,7 +119,7 @@ onMounted(() => {
             <q-btn rounded class="button-gradient q-mx-auto" v-close-popup size="lg">
                 Get Started
             </q-btn>
-            <q-img src="no-map.svg" />
+            <q-img src="/no-map.svg" />
         </div>
     </div>
 </template>

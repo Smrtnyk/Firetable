@@ -13,6 +13,6 @@
     "compileOnSave": true,
     "include": [
         "types/diff.d.ts",
-      "./src"
+        "./src"
     ]
 }
