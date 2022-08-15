@@ -17,7 +17,7 @@ yarn-error.log*
 .env
 .firebaserc
 
-serviceAccount.json
+packages/backend/src/firebase/fb-config.json
 cypress.env.json
 cypress.json
 **/jest/coverage/

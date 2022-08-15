@@ -1,6 +1,6 @@
 import * as functions from "firebase-functions";
-import * as vapidKeys from "./vapid-keys.json";
-import { setVapidDetails } from "web-push";
+// import * as vapidKeys from "./vapid-keys.json";
+// import { setVapidDetails } from "web-push";
 import { handleReservation } from "./handle-reservation";
 import { handleEventImageWhenEventDeleted } from "./handle-event-image-when-event-deleted";
 import { createEvent } from "./create-event";
@@ -10,7 +10,7 @@ import { deleteDocument } from "./delete-document";
 import { clearOldEvents } from "./clear-old-events";
 import { Collection } from "@firetable/types";
 
-setVapidDetails(vapidKeys.subject, vapidKeys.publicKey, vapidKeys.privateKey);
+// setVapidDetails(vapidKeys.subject, vapidKeys.publicKey, vapidKeys.privateKey);
 
 // Everything that has to do with events
 exports.createEvent = functions

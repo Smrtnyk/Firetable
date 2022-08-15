@@ -12,7 +12,7 @@ import {
     getDoc,
 } from "@firebase/firestore";
 import { calculatePath, firestoreDocSerializer, withError } from "src/composables/types/utils";
-import { firestore } from "@firetable/backend";
+import { initializeFirebase } from "@firetable/backend";
 import { showErrorMessage } from "@firetable/utils";
 
 export function useFirestoreDoc<T, M = T>(
@@ -22,6 +22,7 @@ export function useFirestoreDoc<T, M = T>(
     options: { type: "get" } & OptionsDocument<T, M>
 ): ReturnDocGet<T, M>;
 export function useFirestoreDoc<T, M = T>(options: OptionsDocument<T, M>) {
+    const { firestore } = initializeFirebase();
     const data: Ref<T | undefined> = ref();
     const mutatedData: Ref<undefined | M> = ref();
     const initialLoading = options.initialLoading ?? true;
@@ -32,7 +33,7 @@ export function useFirestoreDoc<T, M = T>(options: OptionsDocument<T, M>) {
         const { path, variables } = options;
         return calculatePath(path, variables);
     });
-    const firestoreRef = computed(() => doc(firestore(), pathReplaced.value));
+    const firestoreRef = computed(() => doc(firestore, pathReplaced.value));
 
     function updateDoc(updates: Partial<T>) {
         return setDoc<DocumentData>(firestoreRef.value, updates, {

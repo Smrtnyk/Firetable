@@ -1,6 +1,6 @@
 import { Router } from "vue-router";
 
-import { auth, functions } from "./base";
+import { initializeFirebase } from "./base";
 import { usersCollection } from "./db";
 import { httpsCallable } from "@firebase/functions";
 import { doc, updateDoc } from "@firebase/firestore";
@@ -15,7 +15,8 @@ import { CreateUserPayload, Role } from "@firetable/types";
 import { showErrorMessage } from "@firetable/utils";
 
 export function createUserWithEmail(payload: CreateUserPayload) {
-    return httpsCallable(functions(), "createUser")(payload);
+    const { functions } = initializeFirebase();
+    return httpsCallable(functions, "createUser")(payload);
 }
 
 export function updateUserField<T extends keyof CreateUserPayload>(
@@ -67,7 +68,9 @@ export function routerBeforeEach(router: Router, store: any /* ReturnType<typeof
                 return true;
             }
 
-            const token = await auth()?.currentUser?.getIdTokenResult();
+            const { auth } = initializeFirebase();
+
+            const token = await auth.currentUser?.getIdTokenResult();
             const role = token?.claims.role;
             const isAdmin = role === Role.ADMIN;
 
@@ -88,16 +91,19 @@ export function routerBeforeEach(router: Router, store: any /* ReturnType<typeof
 }
 
 export function deleteUser(id: string) {
-    const deleteFunction = httpsCallable(functions(), "deleteUser");
+    const { functions } = initializeFirebase();
+    const deleteFunction = httpsCallable(functions, "deleteUser");
     return deleteFunction(id);
 }
 
 export function logoutUser() {
-    return signOut(auth());
+    const { auth } = initializeFirebase();
+    return signOut(auth);
 }
 
 export function loginWithEmail(email: string, password: string): Promise<UserCredential> {
-    return signInWithEmailAndPassword(auth(), email, password);
+    const { auth } = initializeFirebase();
+    return signInWithEmailAndPassword(auth, email, password);
 }
 
 /**
@@ -111,9 +117,10 @@ function ensureAuthIsInitialized(store: any /* ReturnType<typeof useAuthStore> *
     }
     // Create the observer only once on init
     return new Promise<void>((resolve, reject) => {
+        const { auth } = initializeFirebase();
         // Use a promise to make sure that the router will eventually show the route after the auth is initialized.
         const unsubscribe = onAuthStateChanged(
-            auth(),
+            auth,
             () => {
                 unsubscribe();
                 resolve();

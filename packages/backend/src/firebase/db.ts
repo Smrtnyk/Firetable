@@ -1,10 +1,11 @@
-import { firestore, functions } from "./base";
+import { initializeFirebase } from "./base";
 import { httpsCallable } from "@firebase/functions";
 import { collection, doc } from "@firebase/firestore";
 import { Collection } from "@firetable/types";
 
 function getCollection(collectionName: Collection) {
-    return collection(firestore(), collectionName);
+    const { firestore } = initializeFirebase();
+    return collection(firestore, collectionName);
 }
 
 export function eventsCollection() {
@@ -32,7 +33,8 @@ export function fcm() {
  * a server-side delete.
  */
 export function deleteCollection(id: string) {
-    const deleteFn = httpsCallable(functions(), "deleteCollection");
+    const { functions } = initializeFirebase();
+    const deleteFn = httpsCallable(functions, "deleteCollection");
     return deleteFn({ col: Collection.EVENTS, id });
 }
 

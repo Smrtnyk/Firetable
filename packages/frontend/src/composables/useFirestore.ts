@@ -5,7 +5,7 @@ import { ReturnCollGet, ReturnCollWatch } from "./types/Return";
 import { optsAreGetColl } from "./types/type-guards";
 import { onSnapshot, collection, getDocs } from "@firebase/firestore";
 import { calculatePath, firestoreDocSerializer, withError } from "src/composables/types/utils";
-import { firestore } from "@firetable/backend";
+import { initializeFirebase } from "@firetable/backend";
 import { showErrorMessage } from "@firetable/utils";
 
 export function useFirestore<T, M = T>(
@@ -16,6 +16,7 @@ export function useFirestore<T, M = T>(
     options: { type: "get" } & OptionsCollection<T, M>
 ): ReturnCollGet<T, M>;
 export function useFirestore<T, M = T>(options: OptionsCollection<T, M>) {
+    const { firestore } = initializeFirebase();
     const collectionData: Ref<T[]> = ref([]);
     const mutatedData: Ref<undefined | M> = ref();
     const initialLoading = options.initialLoading ?? true;
@@ -26,7 +27,7 @@ export function useFirestore<T, M = T>(options: OptionsCollection<T, M>) {
         const { path, variables } = options;
         return calculatePath(path, variables);
     });
-    const firestoreRef = computed(() => collection(firestore(), pathReplaced.value));
+    const firestoreRef = computed(() => collection(firestore, pathReplaced.value));
     const firestoreQuery = computed(() => {
         return options.query?.(firestoreRef.value);
     });

@@ -9,6 +9,7 @@ const i18n = createI18n({
     locale: savedLanguage,
     fallbackLocale: "en-GB",
     messages,
+    legacy: false,
 });
 
 export default boot(({ app }) => {
