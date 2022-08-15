@@ -4,8 +4,8 @@ import { useRouter } from "vue-router";
 import { PROJECT_MAIL } from "src/config";
 import { minLength, noEmptyString } from "src/helpers/form-rules";
 import { QForm } from "quasar";
-import { tryCatchLoadingWrapper } from "@firetable/utils";
 import { loginWithEmail } from "@firetable/backend";
+import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 
 const router = useRouter();
 const username = ref("");

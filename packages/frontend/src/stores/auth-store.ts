@@ -1,8 +1,9 @@
 import { defineStore } from "pinia";
 import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
 import { Collection, Role, User } from "@firetable/types";
-import { NOOP, showErrorMessage } from "@firetable/utils";
+import { NOOP } from "@firetable/utils";
 import { logoutUser } from "@firetable/backend";
+import { showErrorMessage } from "src/helpers/ui-helpers";
 
 interface AuthState {
     isAuthenticated: boolean;

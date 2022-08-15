@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { showConfirm } from "src/helpers/ui-helpers";
+import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 import { useEventsStore } from "src/stores/events-store";
@@ -9,7 +9,6 @@ import FTTitle from "components/FTTitle.vue";
 import FTDialog from "components/FTDialog.vue";
 import { useQuasar } from "quasar";
 import { GuestData } from "@firetable/types";
-import { showErrorMessage, tryCatchLoadingWrapper } from "@firetable/utils";
 import {
     addGuestToGuestList,
     confirmGuestFromGuestList,

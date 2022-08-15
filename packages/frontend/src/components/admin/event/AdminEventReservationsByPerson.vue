@@ -19,7 +19,7 @@ import {
 } from "chart.js";
 import { computed, onMounted, ref } from "vue";
 import { BaseTable } from "@firetable/floorcreator";
-import { showErrorMessage } from "@firetable/utils";
+import { showErrorMessage } from "src/helpers/ui-helpers";
 
 interface Props {
     reservations: BaseTable[];

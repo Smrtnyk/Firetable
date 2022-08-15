@@ -2,8 +2,8 @@
 import { urlBase64ToUint8Array } from "src/helpers/utils";
 import { onMounted, ref } from "vue";
 import { useQuasar } from "quasar";
-import { tryCatchLoadingWrapper } from "@firetable/utils";
 import { savePushSubscription } from "@firetable/backend";
+import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 
 const ICON_128 = "icons/icon-128x128.png";
 const NOTIFICATIONS_GRANTED_OPTIONS: NotificationOptions = {

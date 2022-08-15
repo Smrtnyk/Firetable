@@ -7,9 +7,8 @@ import { arrayUnion, arrayRemove } from "firebase/firestore";
 import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
 import { RoleDoc } from "src/types/roles";
 import { useQuasar } from "quasar";
-import { showConfirm } from "src/helpers/ui-helpers";
+import { loadingWrapper, showConfirm } from "src/helpers/ui-helpers";
 import { ROLES_PATH } from "@firetable/backend";
-import { loadingWrapper } from "@firetable/utils";
 
 const quasar = useQuasar();
 const { data: rolesDoc, updateDoc } = useFirestoreDoc<RoleDoc>({

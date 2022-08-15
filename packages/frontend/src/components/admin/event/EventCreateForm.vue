@@ -8,7 +8,7 @@ import { useRouter } from "vue-router";
 import { date } from "quasar";
 import { resizeImage } from "src/helpers/image-tools";
 import { CreateEventForm, FloorDoc } from "@firetable/types";
-import { showErrorMessage } from "@firetable/utils";
+import { showErrorMessage } from "src/helpers/ui-helpers";
 
 interface State {
     form: CreateEventForm;

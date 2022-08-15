@@ -6,7 +6,7 @@ import { useQuasar, LocalStorage } from "quasar";
 import { useAuthStore } from "src/stores/auth-store";
 import { useAppStore } from "src/stores/app-store";
 import { logoutUser, updateUserField } from "@firetable/backend";
-import { showErrorMessage, tryCatchLoadingWrapper } from "@firetable/utils";
+import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 
 interface Props {
     showAdminLinks: boolean;

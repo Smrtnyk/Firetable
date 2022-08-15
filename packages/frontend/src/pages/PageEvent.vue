@@ -9,7 +9,7 @@ import FTDialog from "components/FTDialog.vue";
 import { DialogChainObject, Loading, useQuasar } from "quasar";
 
 import { useRouter } from "vue-router";
-import { showConfirm } from "src/helpers/ui-helpers";
+import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { computed, nextTick, onMounted, reactive, ref, watch } from "vue";
 import { useEventsStore } from "src/stores/events-store";
 import { useI18n } from "vue-i18n";
@@ -33,7 +33,6 @@ import {
     GuestData,
     Reservation,
 } from "@firetable/types";
-import { showErrorMessage, tryCatchLoadingWrapper } from "@firetable/utils";
 import { updateEventFloorData } from "@firetable/backend";
 
 interface State {

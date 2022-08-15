@@ -18,7 +18,7 @@ import {
     RESOLUTION,
 } from "@firetable/floorcreator";
 import { Collection, ElementTag, ElementType, FloorDoc } from "@firetable/types";
-import { showErrorMessage, tryCatchLoadingWrapper } from "@firetable/utils";
+import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 
 type ElementDescriptor = {
     tag: ElementTag;

@@ -6,7 +6,7 @@ import { optsAreGetColl } from "./types/type-guards";
 import { onSnapshot, collection, getDocs } from "@firebase/firestore";
 import { calculatePath, firestoreDocSerializer, withError } from "src/composables/types/utils";
 import { initializeFirebase } from "@firetable/backend";
-import { showErrorMessage } from "@firetable/utils";
+import { showErrorMessage } from "src/helpers/ui-helpers";
 
 export function useFirestore<T, M = T>(
     options: { type: "watch" } & OptionsCollection<T, M>

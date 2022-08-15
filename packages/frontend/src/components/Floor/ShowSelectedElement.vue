@@ -51,10 +51,9 @@
 </template>
 
 <script setup lang="ts">
-import { showConfirm } from "src/helpers/ui-helpers";
+import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed, nextTick } from "vue";
 import { BaseTable, isTable } from "@firetable/floorcreator";
-import { showErrorMessage } from "@firetable/utils";
 
 interface Props {
     selectedFloorElement: BaseTable | null;

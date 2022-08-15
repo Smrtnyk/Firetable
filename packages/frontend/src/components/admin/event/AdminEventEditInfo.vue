@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { updateEventProperty } from "@firetable/backend";
-import { showErrorMessage, tryCatchLoadingWrapper } from "@firetable/utils";
+import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 
 interface Props {
     eventId: string;

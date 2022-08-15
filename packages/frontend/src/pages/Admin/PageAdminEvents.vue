@@ -4,14 +4,13 @@ import EventCreateForm from "components/admin/event/EventCreateForm.vue";
 import FTTitle from "components/FTTitle.vue";
 import FTDialog from "components/FTDialog.vue";
 
-import { showConfirm } from "src/helpers/ui-helpers";
+import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { onMounted, ref } from "vue";
 import { QueryDocumentSnapshot } from "@firebase/firestore";
 import { useQuasar, QInfiniteScroll } from "quasar";
 import { useRouter } from "vue-router";
 import { useFirestore } from "src/composables/useFirestore";
 import { Collection, CreateEventPayload, EventDoc, FloorDoc } from "@firetable/types";
-import { showErrorMessage, tryCatchLoadingWrapper } from "@firetable/utils";
 import { createNewEvent, deleteEvent, getEvents } from "@firetable/backend";
 
 const quasar = useQuasar();

@@ -13,7 +13,7 @@ import {
 } from "@firebase/firestore";
 import { calculatePath, firestoreDocSerializer, withError } from "src/composables/types/utils";
 import { initializeFirebase } from "@firetable/backend";
-import { showErrorMessage } from "@firetable/utils";
+import { showErrorMessage } from "src/helpers/ui-helpers";
 
 export function useFirestoreDoc<T, M = T>(
     options: { type: "watch" } & OptionsDocument<T, M>

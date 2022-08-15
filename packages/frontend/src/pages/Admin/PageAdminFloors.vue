@@ -3,13 +3,12 @@ import AddNewFloorForm from "components/Floor/AddNewFloorForm.vue";
 import FTTitle from "components/FTTitle.vue";
 import FTDialog from "components/FTDialog.vue";
 
-import { showConfirm } from "src/helpers/ui-helpers";
+import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useFirestore } from "src/composables/useFirestore";
 import { Loading, useQuasar } from "quasar";
 import { onMounted } from "vue";
 import { makeRawFloor } from "@firetable/floorcreator";
 import { Collection, FloorDoc } from "@firetable/types";
-import { showErrorMessage, tryCatchLoadingWrapper } from "@firetable/utils";
 import { addFloor, deleteFloor } from "@firetable/backend";
 
 const quasar = useQuasar();
