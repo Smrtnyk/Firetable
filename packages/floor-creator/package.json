@@ -10,6 +10,7 @@
         "build": "tsc"
     },
     "devDependencies": {
+        "@types/fabric": "4.5.11",
         "@firetable/types": "workspace:*"
     },
     "keywords": [],
