@@ -1,5 +1,5 @@
 {
-    "name": "@firetable/floorcreator",
+    "name": "@firetable/floor-creator",
     "version": "1.0.0",
     "description": "",
     "main": "./dist/src/index.js",
@@ -8,6 +8,9 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "tsc"
+    },
+    "devDependencies": {
+        "@firetable/types": "workspace:*"
     },
     "keywords": [],
     "author": "",

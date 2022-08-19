@@ -1,4 +1,4 @@
-import { QueryDocumentSnapshot } from "@firebase/firestore";
+import { QueryDocumentSnapshot } from "firebase/firestore";
 import { FloorDoc } from "./floor";
 import { User } from "./auth";
 

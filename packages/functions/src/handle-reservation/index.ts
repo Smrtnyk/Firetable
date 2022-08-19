@@ -5,7 +5,7 @@ import "firebase-functions/lib/logger/compat";
 import diff from "diff-arrays-of-objects";
 import { db } from "../init";
 import { ChangeType, UpdatedTablesDifference } from "../../types/types";
-import { BaseTable } from "@firetable/floorcreator";
+import { BaseTable } from "@firetable/floor-creator";
 import { Collection, PushSubscriptionDoc } from "@firetable/types";
 
 const { logger } = functions;

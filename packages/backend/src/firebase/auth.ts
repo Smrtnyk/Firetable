@@ -1,8 +1,8 @@
 import { initializeFirebase } from "./base";
 import { usersCollection } from "./db";
-import { httpsCallable } from "@firebase/functions";
-import { doc, updateDoc } from "@firebase/firestore";
-import { signOut, signInWithEmailAndPassword, UserCredential } from "@firebase/auth";
+import { httpsCallable } from "firebase/functions";
+import { doc, updateDoc } from "firebase/firestore";
+import { signOut, signInWithEmailAndPassword, UserCredential } from "firebase/auth";
 import { CreateUserPayload } from "@firetable/types";
 
 export function createUserWithEmail(payload: CreateUserPayload) {

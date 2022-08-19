@@ -1,6 +1,6 @@
 import { initializeFirebase } from "./base";
-import { httpsCallable } from "@firebase/functions";
-import { collection, doc } from "@firebase/firestore";
+import { httpsCallable } from "firebase/functions";
+import { collection, doc } from "firebase/firestore";
 import { Collection } from "@firetable/types";
 
 function getCollection(collectionName: Collection) {

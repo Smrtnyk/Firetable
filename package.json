@@ -1,13 +1,5 @@
 {
     "name": "firetable",
-    "workspaces": [
-        "packages/functions",
-        "packages/frontend",
-        "packages/backend",
-        "packages/floor-creator",
-        "packages/types",
-        "packages/utils"
-    ],
     "scripts": {
         "deploy:hosting": "firebase deploy --only hosting",
         "deploy:functions": "firebase deploy --only functions",
@@ -16,17 +8,17 @@
         "seed:events": "node packages/functions/lib/src/seed/add-events.js",
         "seed:generate-admin-local": "node packages/functions/lib/src/seed/generate-admin-local.js",
         "seed:admin-prod": "node packages/functions/lib/src/seed/add-admin-prod.js",
-        "dev:frontend": "cd packages/frontend && npm run dev",
-        "build:frontend": "cd packages/frontend && quasar build",
-        "build:functions": "cd packages/functions && npm run build"
+        "dev:frontend": "pnpm --filter frontend dev",
+        "build:frontend:spa": "pnpmm --filter frontend build:spa",
+        "build:functions": "pnpm --filter functions build"
     },
     "devDependencies": {
         "@faker-js/faker": "7.4.0",
         "@quasar/app-vite": "1.0.6",
         "@types/fabric": "4.5.11",
         "@types/web-push": "3.3.2",
-        "@typescript-eslint/eslint-plugin": "5.33.0",
-        "@typescript-eslint/parser": "5.33.0",
+        "@typescript-eslint/eslint-plugin": "5.33.1",
+        "@typescript-eslint/parser": "5.33.1",
         "autoprefixer": "10.4.8",
         "dotenv": "16.0.1",
         "eslint": "8.22.0",
@@ -36,7 +28,7 @@
         "eslint-plugin-promise": "6.0.0",
         "eslint-plugin-quasar": "1.1.0",
         "eslint-plugin-vue": "9.3.0",
-        "firebase-tools": "^11.6.0",
+        "firebase-tools": "^11.7.0",
         "prettier": "2.7.1",
         "typescript": "4.7.4"
     },
@@ -45,10 +37,10 @@
         "chart.js": "3.9.1",
         "diff-arrays-of-objects": "1.1.9",
         "fabric": "5.2.1",
-        "firebase": "9.9.2",
+        "firebase": "9.9.3",
         "firebase-admin": "11.0.1",
         "firebase-functions": "3.22.0",
-        "pinia": "2.0.18",
+        "pinia": "2.0.19",
         "quasar": "2.7.7",
         "vue": "3.2.37",
         "vue-i18n": "9.2.2",

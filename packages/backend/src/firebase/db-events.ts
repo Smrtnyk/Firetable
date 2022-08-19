@@ -7,7 +7,7 @@ import {
     eventDoc,
 } from "./db";
 import { initializeFirebase } from "./base";
-import { httpsCallable } from "@firebase/functions";
+import { httpsCallable } from "firebase/functions";
 import {
     DocumentData,
     getDocs,
@@ -18,9 +18,9 @@ import {
     addDoc,
     deleteDoc,
     query,
-} from "@firebase/firestore";
+} from "firebase/firestore";
 import { CreateEventPayload, EventDoc, GuestData } from "@firetable/types";
-import { Floor } from "@firetable/floorcreator";
+import { Floor } from "@firetable/floor-creator";
 
 export async function getEvents(lastDocument: DocumentData | null): Promise<EventDoc[]> {
     const orderByDateQuery = orderBy("date");

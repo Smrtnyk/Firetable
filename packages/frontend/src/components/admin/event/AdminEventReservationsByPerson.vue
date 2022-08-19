@@ -18,7 +18,7 @@ import {
     SubTitle,
 } from "chart.js";
 import { computed, onMounted, ref } from "vue";
-import { BaseTable } from "@firetable/floorcreator";
+import { BaseTable } from "@firetable/floor-creator";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 
 interface Props {

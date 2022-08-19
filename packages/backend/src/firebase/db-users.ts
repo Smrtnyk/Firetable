@@ -1,4 +1,4 @@
-import { updateDoc } from "@firebase/firestore";
+import { updateDoc } from "firebase/firestore";
 import { userDoc } from "./db";
 import { CreateUserPayload } from "@firetable/types";
 

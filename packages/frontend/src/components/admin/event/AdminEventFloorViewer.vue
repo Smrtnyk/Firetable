@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from "vue";
 import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
-import { BaseTable, Floor, FloorMode } from "@firetable/floorcreator";
+import { BaseTable, Floor, FloorMode } from "@firetable/floor-creator";
 import { FloorDoc } from "@firetable/types";
 
 interface Props {

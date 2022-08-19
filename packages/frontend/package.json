@@ -1,5 +1,5 @@
 {
-    "name": "@firetable/ui",
+    "name": "@firetable/frontend",
     "version": "0.2.0",
     "description": "Firetable reservation management system",
     "productName": "Firetable",
@@ -12,8 +12,13 @@
         "build:spa": "quasar build",
         "build:pwa": "quasar build -m pwa"
     },
+    "dependencies": {
+        "@firetable/backend": "workspace:*",
+        "@firetable/types": "workspace:*",
+        "@firetable/floor-creator": "workspace:*",
+        "@firetable/utils": "workspace:*"
+    },
     "engines": {
-        "node": ">= 16",
-        "npm": ">= 7.13.0"
+        "node": ">= 16"
     }
 }

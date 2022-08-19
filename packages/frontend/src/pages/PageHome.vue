@@ -3,7 +3,7 @@ import EventCardList from "components/Event/EventCardList.vue";
 import PushMessagesBanner from "components/PushMessagesBanner.vue";
 import EventCardListSkeleton from "components/Event/EventCardListSkeleton.vue";
 import { useFirestore } from "src/composables/useFirestore";
-import { query as firestoreQuery, where, orderBy, limit } from "@firebase/firestore";
+import { query as firestoreQuery, where, orderBy, limit } from "firebase/firestore";
 import { config } from "src/config";
 import { ONE_HOUR } from "src/constants";
 import { Collection, EventDoc } from "@firetable/types";

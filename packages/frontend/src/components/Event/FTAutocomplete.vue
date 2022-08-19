@@ -22,7 +22,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { BaseTable } from "@firetable/floorcreator";
+import { BaseTable } from "@firetable/floor-creator";
 
 interface Props {
     allReservedTables: BaseTable[];

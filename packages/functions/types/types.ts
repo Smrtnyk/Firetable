@@ -1,4 +1,4 @@
-import { BaseTable } from "@firetable/floorcreator";
+import { BaseTable } from "@firetable/floor-creator";
 
 export interface UpdatedTablesDifference {
     added: BaseTable[];

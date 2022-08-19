@@ -3,7 +3,7 @@ import {
     DocumentData,
     CollectionReference,
     Query as FirestoreQuery,
-} from "@firebase/firestore";
+} from "firebase/firestore";
 
 /** Firestore DocumentReference */
 export type Docref = DocumentReference;

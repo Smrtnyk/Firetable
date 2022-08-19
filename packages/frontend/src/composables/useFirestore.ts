@@ -3,7 +3,7 @@ import { computed, nextTick, onUnmounted, ref, Ref, watch } from "vue";
 import { OptionsCollection } from "./types/Options";
 import { ReturnCollGet, ReturnCollWatch } from "./types/Return";
 import { optsAreGetColl } from "./types/type-guards";
-import { onSnapshot, collection, getDocs } from "@firebase/firestore";
+import { onSnapshot, collection, getDocs } from "firebase/firestore";
 import { calculatePath, firestoreDocSerializer, withError } from "src/composables/types/utils";
 import { initializeFirebase } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";

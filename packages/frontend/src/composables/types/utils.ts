@@ -1,6 +1,6 @@
 import { Ref } from "vue";
 import { OptionsBase } from "src/composables/types/Options";
-import { DocumentSnapshot } from "@firebase/firestore";
+import { DocumentSnapshot } from "firebase/firestore";
 
 export function firestoreDocSerializer<T>(docToSerialize: DocumentSnapshot): T {
     const data = docToSerialize.data() || {};

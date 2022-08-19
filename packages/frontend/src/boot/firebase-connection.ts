@@ -1,5 +1,5 @@
 import { boot } from "quasar/wrappers";
-import { onAuthStateChanged, User } from "@firebase/auth";
+import { onAuthStateChanged, User } from "firebase/auth";
 import { useAuthStore } from "src/stores/auth-store";
 import { initializeFirebase } from "@firetable/backend";
 import { Router } from "vue-router";

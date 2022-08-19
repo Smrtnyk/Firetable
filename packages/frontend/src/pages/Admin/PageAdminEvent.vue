@@ -16,10 +16,10 @@ import FTDialog from "components/FTDialog.vue";
 import { useQuasar } from "quasar";
 import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
 import { config } from "src/config";
-import { BaseTable, Floor, FloorMode, getTablesFromFloorDoc } from "@firetable/floorcreator";
+import { BaseTable, Floor, FloorMode, getTablesFromFloorDoc } from "@firetable/floor-creator";
 import { Collection, EventDoc, EventFeedDoc, FloorDoc, Role, User } from "@firetable/types";
 import { updateEventFloorData, updateEventProperty } from "@firetable/backend";
-import { query as firestoreQuery, where } from "@firebase/firestore";
+import { query as firestoreQuery, where } from "firebase/firestore";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 
 interface Props {

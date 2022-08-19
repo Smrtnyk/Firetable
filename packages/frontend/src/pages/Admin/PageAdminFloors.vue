@@ -7,7 +7,7 @@ import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpe
 import { useFirestore } from "src/composables/useFirestore";
 import { Loading, useQuasar } from "quasar";
 import { onMounted } from "vue";
-import { makeRawFloor } from "@firetable/floorcreator";
+import { makeRawFloor } from "@firetable/floor-creator";
 import { Collection, FloorDoc } from "@firetable/types";
 import { addFloor, deleteFloor } from "@firetable/backend";
 

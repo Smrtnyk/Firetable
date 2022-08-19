@@ -1,19 +1,18 @@
 <script setup lang="ts">
 import UserCreateForm from "components/User/UserCreateForm.vue";
 import FTTitle from "components/FTTitle.vue";
-import { showConfirm } from "src/helpers/ui-helpers";
+import { loadingWrapper, showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed } from "vue";
 import { config } from "src/config";
 import { useFirestore } from "src/composables/useFirestore";
 import { useAuthStore } from "src/stores/auth-store";
 import { useQuasar } from "quasar";
 import FTDialog from "components/FTDialog.vue";
-import { documentId, query as firestoreQuery, where } from "@firebase/firestore";
+import { documentId, query as firestoreQuery, where } from "firebase/firestore";
 import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
 import { RoleDoc } from "src/types/roles";
 import { Collection, CreateUserPayload, FloorDoc, User } from "@firetable/types";
 import { createUserWithEmail, deleteUser, ROLES_PATH, updateUser } from "@firetable/backend";
-import { loadingWrapper, showErrorMessage } from "@firetable/utils";
 
 const { maxNumOfUsers } = config;
 const authStore = useAuthStore();

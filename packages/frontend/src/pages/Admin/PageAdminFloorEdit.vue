@@ -16,7 +16,7 @@ import {
     FloorMode,
     hasFloorTables,
     RESOLUTION,
-} from "@firetable/floorcreator";
+} from "@firetable/floor-creator";
 import { Collection, ElementTag, ElementType, FloorDoc } from "@firetable/types";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 

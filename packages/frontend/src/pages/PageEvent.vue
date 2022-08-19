@@ -24,7 +24,7 @@ import {
     getReservedTables,
     getTables,
     isTable,
-} from "@firetable/floorcreator";
+} from "@firetable/floor-creator";
 import {
     Collection,
     CreateReservationPayload,
