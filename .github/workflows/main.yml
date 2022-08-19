@@ -22,7 +22,7 @@ jobs:
         node-version: ${{ matrix.node_version }}
 
     - name: npm install, build and test
-      working-directory: ./frontend
+      working-directory: ./
       run: |
         npm install -g pnpm
         pnpm install
