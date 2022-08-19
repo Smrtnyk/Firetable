@@ -24,7 +24,8 @@ jobs:
     - name: npm install, build and test
       working-directory: ./frontend
       run: |
-        npm install
+        npm install -g pnpm
+        pnpm install
   sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest
