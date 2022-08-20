@@ -14,6 +14,7 @@
         "find-dead-code": "npx ts-prune"
     },
     "dependencies": {
+        "diff-arrays-of-objects": "1.1.9",
         "firebase-admin": "11.0.1",
         "firebase-functions": "3.22.0"
     },

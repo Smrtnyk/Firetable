@@ -9,6 +9,9 @@
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "tsc"
     },
+    "dependencies": {
+        "fabric": "5.2.1"
+    },
     "devDependencies": {
         "@types/fabric": "4.5.11",
         "@firetable/types": "workspace:*"
