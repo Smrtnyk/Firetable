@@ -45,6 +45,9 @@ module.exports = {
         "prettier",
     ],
     rules: {
+        // vue
+        "vue/multi-word-component-names": "off",
+        //
         "no-undef": "off",
         //
         "import/no-unresolved": "off",
