@@ -19,9 +19,10 @@
         "firebase-functions": "3.24.1"
     },
     "devDependencies": {
-        "@faker-js/faker": "7.5.0",
+        "@faker-js/faker": "7.6.0",
         "@firetable/types": "workspace:*",
-        "@firetable/floor-creator": "workspace:*"
+        "@firetable/floor-creator": "workspace:*",
+        "@firebase/app-types": "0.8.0"
     },
     "engines": {
         "node": "16"
