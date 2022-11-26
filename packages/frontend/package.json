@@ -20,13 +20,13 @@
         "@firetable/types": "workspace:*",
         "@firetable/floor-creator": "workspace:*",
         "@firetable/utils": "workspace:*",
-        "pinia": "2.0.23",
-        "quasar": "2.10.0",
-        "vue": "3.2.41",
+        "pinia": "2.0.26",
+        "quasar": "2.10.2",
+        "vue": "3.2.45",
         "vue-i18n": "9.2.2",
         "vue-router": "4.1.6",
-        "@quasar/extras": "1.15.5",
-        "chart.js": "3.9.1"
+        "@quasar/extras": "1.15.6",
+        "chart.js": "4.0.1"
     },
     "engines": {
         "node": ">= 16",
