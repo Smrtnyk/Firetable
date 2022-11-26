@@ -1,29 +1,21 @@
 import { boot } from "quasar/wrappers";
-import { onAuthStateChanged, User } from "firebase/auth";
 import { useAuthStore } from "src/stores/auth-store";
 import { initializeFirebase } from "@firetable/backend";
 import { Router } from "vue-router";
 import { Role } from "@firetable/types";
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import { VueFire, VueFireAuth } from "vuefire";
+import { getCurrentUser, useCurrentUser, VueFire, VueFireAuth } from "vuefire";
+import { watch } from "vue";
 
 export default boot(({ router, app }) => {
-    const { auth, firebaseApp } = initializeFirebase();
+    const { firebaseApp } = initializeFirebase();
     app.use(VueFire, {
         firebaseApp,
         modules: [VueFireAuth()],
     });
 
     const authStore = useAuthStore();
-
-    // Tell the application what to do when the
-    // authentication state has changed */
-    onAuthStateChanged(
-        auth,
-        handleOnAuthStateChanged.bind(null, router, authStore),
-        showErrorMessage
-    );
-
+    handleOnAuthStateChanged(router, authStore);
     // Setup the router to be intercepted on each route.
     // This allows the application to halt rendering until
     // Firebase is finished with its initialization process,
@@ -31,13 +23,15 @@ export default boot(({ router, app }) => {
     routerBeforeEach(router, authStore);
 });
 
-function routerBeforeEach(router: Router, store: any /* ReturnType<typeof useAuthStore> */) {
+function routerBeforeEach(router: Router, store: ReturnType<typeof useAuthStore>) {
     router.beforeEach(async (to) => {
         try {
             // Force the app to wait until Firebase has
             // finished its initialization, and handle the
             // authentication state of the user properly
-            await ensureAuthIsInitialized(store);
+            if (!store.isReady) {
+                await ensureAuthIsInitialized();
+            }
             const requiresAuth = to.meta.requiresAuth;
             const requiresAdmin = to.meta.requiresAdmin;
 
@@ -76,48 +70,29 @@ function routerBeforeEach(router: Router, store: any /* ReturnType<typeof useAut
  * wait for firebase to initialize and determine if a
  * user is authenticated or not with only a single observable
  */
-function ensureAuthIsInitialized(store: any /* ReturnType<typeof useAuthStore> */) {
-    if (store.isReady) {
-        return true;
-    }
-    // Create the observer only once on init
-    return new Promise<void>((resolve, reject) => {
-        const { auth } = initializeFirebase();
-        // Use a promise to make sure that the router will eventually show the route after the auth is initialized.
-        const unsubscribe = onAuthStateChanged(
-            auth,
-            () => {
-                unsubscribe();
-                resolve();
-            },
-            () => {
-                reject(
-                    new Error(
-                        "Looks like there is a problem with the firebase service. Please try again later"
-                    )
-                );
-            }
-        );
-    });
+function ensureAuthIsInitialized() {
+    return getCurrentUser();
 }
 
-export function handleOnAuthStateChanged(
-    router: Router,
-    authStore: any, // ReturnType<typeof useAuthStore>
-    currentUser: User | null
-) {
-    // Save to the store
-    authStore.setAuthState({
-        isAuthenticated: currentUser !== null,
-    });
-
-    if (currentUser) {
-        authStore.initUser(currentUser.uid);
-        return;
-    }
-
-    // If the user loses authentication route
-    // redirect them to the login page
-    authStore.setUser(null);
-    router.replace({ path: "/auth" }).catch(showErrorMessage);
+function handleOnAuthStateChanged(router: Router, authStore: any) {
+    // Tell the application what to do when the
+    // authentication state has changed */
+    const currentUser = useCurrentUser();
+    watch(
+        () => currentUser.value,
+        () => {
+            // Save to the store
+            authStore.setAuthState({
+                isAuthenticated: !!currentUser.value,
+            });
+            if (!currentUser.value) {
+                // If the user loses authentication route
+                // redirect them to the login page
+                authStore.setUser(null);
+                router.replace({ path: "/auth" }).catch(showErrorMessage);
+            } else {
+                authStore.initUser(currentUser.value.uid);
+            }
+        }
+    );
 }
