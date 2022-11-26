@@ -13,7 +13,7 @@ export function initializeFirebase() {
     const auth = getAuth(firebaseApp);
     initEmulators(firestore, auth, functions);
     initialized = true;
-    return { firestore, auth, functions };
+    return { firestore, auth, functions, firebaseApp };
 }
 
 function initEmulators(firestore: Firestore, auth: Auth, functions: Functions): void {

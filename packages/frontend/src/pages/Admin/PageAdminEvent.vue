@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { formatEventDate } from "src/helpers/utils";
-import { useFirestore } from "src/composables/useFirestore";
 
 import FTTitle from "components/FTTitle.vue";
 import EventFeedList from "components/admin/event/EventFeedList.vue";
@@ -14,13 +13,18 @@ import AdminEventActiveStaff from "components/admin/event/AdminEventActiveStaff.
 import FTDialog from "components/FTDialog.vue";
 
 import { useQuasar } from "quasar";
-import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
 import { config } from "src/config";
 import { BaseTable, Floor, FloorMode, getTablesFromFloorDoc } from "@firetable/floor-creator";
 import { Collection, EventDoc, EventFeedDoc, FloorDoc, Role, User } from "@firetable/types";
 import { updateEventFloorData, updateEventProperty } from "@firetable/backend";
-import { query as firestoreQuery, where } from "firebase/firestore";
+import { where } from "firebase/firestore";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import {
+    createQuery,
+    getFirestoreCollection,
+    useFirestoreCollection,
+    useFirestoreDocument,
+} from "src/composables/useFirestore";
 
 interface Props {
     id: string;
@@ -31,32 +35,31 @@ const router = useRouter();
 const quasar = useQuasar();
 const tab = ref("info");
 
-const { data: eventFloors } = useFirestore<FloorDoc>({
-    type: "watch",
-    path: `${Collection.EVENTS}/${props.id}/floors`,
-});
+const { data: eventFloors } = useFirestoreCollection<FloorDoc>(
+    `${Collection.EVENTS}/${props.id}/floors`
+);
 
-const { data: users } = useFirestore<User>({
-    type: "get",
-    path: Collection.USERS,
-    query(collectionRef) {
-        const idConstraint = where("role", "!=", Role.ADMIN);
-        return firestoreQuery(collectionRef, idConstraint);
-    },
-});
+const users = useFirestoreCollection<User>(
+    createQuery(getFirestoreCollection(Collection.USERS), where("role", "!=", Role.ADMIN)),
+    { once: true }
+);
 
-const { data: event } = useFirestoreDoc<EventDoc>({
-    type: "watch",
-    path: `${Collection.EVENTS}/${props.id}`,
-    onError() {
+const {
+    data: event,
+    error: eventError,
+    stop: stopEventWatch,
+} = useFirestoreDocument<EventDoc>(`${Collection.EVENTS}/${props.id}`);
+
+watch(eventError, () => {
+    if (eventError.value) {
         router.replace("/").catch(showErrorMessage);
-    },
+        stopEventWatch();
+    }
 });
 
-const { data: eventFeed } = useFirestore<EventFeedDoc>({
-    type: "get",
-    path: `${Collection.EVENTS}/${props.id}/${Collection.EVENT_FEED}`,
-});
+const { data: eventFeed } = useFirestoreCollection<EventFeedDoc>(
+    `${Collection.EVENTS}/${props.id}/${Collection.EVENT_FEED}`
+);
 
 function isEventFinished(eventTime: number): boolean {
     const eventFinishedLimit = new Date(eventTime);

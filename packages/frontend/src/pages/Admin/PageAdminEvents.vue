@@ -9,9 +9,9 @@ import { onMounted, ref } from "vue";
 import { QueryDocumentSnapshot } from "firebase/firestore";
 import { useQuasar, QInfiniteScroll } from "quasar";
 import { useRouter } from "vue-router";
-import { useFirestore } from "src/composables/useFirestore";
 import { Collection, CreateEventPayload, EventDoc, FloorDoc } from "@firetable/types";
 import { createNewEvent, deleteEvent, getEvents } from "@firetable/backend";
+import { useFirestoreCollection } from "src/composables/useFirestore";
 
 const quasar = useQuasar();
 const router = useRouter();
@@ -19,10 +19,7 @@ const isLoading = ref(true);
 const events = ref<EventDoc[]>([]);
 const hasMoreEventsToFetch = ref(true);
 const paginator = ref<QInfiniteScroll | null>(null);
-const { data: floors } = useFirestore<FloorDoc>({
-    type: "get",
-    path: Collection.FLOORS,
-});
+const { data: floors } = useFirestoreCollection<FloorDoc>(Collection.FLOORS, { once: true });
 
 async function init() {
     isLoading.value = true;

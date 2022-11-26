@@ -1,9 +1,9 @@
 import { defineStore } from "pinia";
-import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
 import { Collection, Role, User } from "@firetable/types";
 import { NOOP } from "@firetable/utils";
 import { logoutUser } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";
+import { useFirestoreDocument } from "src/composables/useFirestore";
 
 interface AuthState {
     isAuthenticated: boolean;
@@ -52,29 +52,30 @@ export const useAuthStore = defineStore("auth", {
                 this.unsubscribeUserWatch = unsubscribeUserWatch;
             }
         },
-        initUser(uid: string) {
-            const { stopWatchingData } = useFirestoreDoc<User>({
-                type: "watch",
-                path: `${Collection.USERS}/${uid}`,
-                inComponent: false,
-                onReceive: (user) => {
-                    if (!user) {
-                        stopWatchingData();
-                        showErrorMessage("User is not found in database!");
-                        logoutUser().catch(NOOP);
-                    } else {
-                        this.user = user;
-                        this.isAuthenticated = true;
-                        this.isReady = true;
-                        this.unsubscribeUserWatch = stopWatchingData;
-                    }
-                },
-                onError(e) {
-                    stopWatchingData();
-                    showErrorMessage(e);
-                    logoutUser().catch(NOOP);
-                },
-            });
+        async initUser(uid: string) {
+            const {
+                promise,
+                data: user,
+                stop,
+                error,
+            } = useFirestoreDocument<User>(`${Collection.USERS}/${uid}`);
+            await promise.value;
+            if (error.value) {
+                stop();
+                showErrorMessage(error.value);
+                logoutUser().catch(NOOP);
+                return;
+            }
+            if (!user.value) {
+                stop();
+                showErrorMessage("User is not found in database!");
+                logoutUser().catch(NOOP);
+            } else {
+                this.user = user.value;
+                this.isAuthenticated = true;
+                this.isReady = true;
+                this.unsubscribeUserWatch = stop;
+            }
         },
     },
 });

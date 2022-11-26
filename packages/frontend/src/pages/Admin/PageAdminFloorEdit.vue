@@ -3,11 +3,10 @@ import AddTableDialog from "components/Floor/AddTableDialog.vue";
 import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
 import FTDialog from "components/FTDialog.vue";
 
-import { nextTick, onMounted, ref } from "vue";
+import { nextTick, onMounted, ref, watch } from "vue";
 import { NumberTuple } from "src/types/generic";
 import { useRouter } from "vue-router";
 import { Loading, useQuasar } from "quasar";
-import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
 import { ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
 import {
     BaseTable,
@@ -19,6 +18,11 @@ import {
 } from "@firetable/floor-creator";
 import { Collection, ElementTag, ElementType, FloorDoc } from "@firetable/types";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import {
+    getFirestoreDocument,
+    updateFirestoreDocument,
+    useFirestoreDocument,
+} from "src/composables/useFirestore";
 
 type ElementDescriptor = {
     tag: ElementTag;
@@ -45,22 +49,22 @@ const floorInstance = ref<Floor | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 const pageRef = ref<HTMLDivElement | null>(null);
 const selectedElement = ref<BaseTable | null>(null);
-const { updateDoc: updateFloor } = useFirestoreDoc<FloorDoc>({
-    type: "get",
-    path: `${Collection.FLOORS}/${props.floorID}`,
-    onReceive(floor) {
-        Loading.hide();
-        if (!floor) {
-            router.replace("/").catch(showErrorMessage);
-        } else {
-            instantiateFloor(floor);
-        }
-    },
-    onError: () => Loading.hide(),
-});
+const { data: floor, promise: floorDataPromise } = useFirestoreDocument<FloorDoc>(
+    `${Collection.FLOORS}/${props.floorID}`,
+    {
+        once: true,
+    }
+);
 
-onMounted(() => {
+onMounted(async () => {
     Loading.show();
+    await floorDataPromise.value;
+    if (floor.value) {
+        instantiateFloor(floor.value);
+    } else {
+        router.replace("/").catch(showErrorMessage);
+    }
+    Loading.hide();
 });
 
 function instantiateFloor(floorDoc: FloorDoc) {
@@ -82,12 +86,15 @@ function onFloorSave() {
     }
 
     return tryCatchLoadingWrapper(() => {
-        return updateFloor({
-            json: floorInstance.value?.canvas.toJSON(["name"]),
-            name: floorInstance.value?.name,
-            width: floorInstance.value?.width,
-            height: floorInstance.value?.height,
-        }).catch(showErrorMessage);
+        return updateFirestoreDocument(
+            getFirestoreDocument(`${Collection.FLOORS}/${props.floorID}`),
+            {
+                json: floorInstance.value?.canvas.toJSON(["name"]),
+                name: floorInstance.value?.name,
+                width: floorInstance.value?.width,
+                height: floorInstance.value?.height,
+            }
+        ).catch(showErrorMessage);
     });
 }
 

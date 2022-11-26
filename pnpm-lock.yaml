@@ -74,6 +74,7 @@ importers:
       vue: 3.2.45
       vue-i18n: 9.2.2
       vue-router: 4.1.6
+      vuefire: 3.0.0-alpha.11
     dependencies:
       '@firetable/backend': link:../backend
       '@firetable/floor-creator': link:../floor-creator
@@ -86,6 +87,7 @@ importers:
       vue: 3.2.45
       vue-i18n: 9.2.2_vue@3.2.45
       vue-router: 4.1.6_vue@3.2.45
+      vuefire: 3.0.0-alpha.11_vue@3.2.45
     devDependencies:
       '@quasar/app-vite': 1.1.3_v57ezttx3dhrbklfyayk6asbwi
 
@@ -7653,6 +7655,21 @@ packages:
       acorn-walk: 8.2.0
     dev: true
 
+  /vue-demi/0.13.11_vue@3.2.45:
+    resolution: {integrity: sha512-IR8HoEEGM65YY3ZJYAjMlKygDQn25D5ajNFNoKh9RSDMQtlzCxtfQjdQgv9jjK+m3377SsJXY8ysq8kLCZL25A==}
+    engines: {node: '>=12'}
+    hasBin: true
+    requiresBuild: true
+    peerDependencies:
+      '@vue/composition-api': ^1.0.0-rc.1
+      vue: ^3.0.0-0 || ^2.6.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+    dependencies:
+      vue: 3.2.45
+    dev: false
+
   /vue-demi/0.13.7_vue@3.2.45:
     resolution: {integrity: sha512-hbhlvpx1gFW3TB5HxJ0mNxyA9Jh5iQt409taOs6zkhpvfJ7YzLs1rsLufJmDsjH5PI1cOyfikY1fE/meyHfU5A==}
     engines: {node: '>=12'}
@@ -7714,6 +7731,22 @@ packages:
       '@vue/runtime-dom': 3.2.45
       '@vue/server-renderer': 3.2.45_vue@3.2.45
       '@vue/shared': 3.2.45
+
+  /vuefire/3.0.0-alpha.11_vue@3.2.45:
+    resolution: {integrity: sha512-OVRC013a/EHH5WLZJ51pRqjqaPKPn91a5a2x3SDjELiaJ8kabfQk2qGZwGiUFmTSJxOzsHvXg3F2uAvQw5jTXw==}
+    peerDependencies:
+      '@vue/composition-api': '*'
+      firebase: ^9.0.0
+      vue: ^2.7.0 || ^3.2.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+      firebase:
+        optional: true
+    dependencies:
+      vue: 3.2.45
+      vue-demi: 0.13.11_vue@3.2.45
+    dev: false
 
   /w3c-hr-time/1.0.2:
     resolution: {integrity: sha512-z8P5DvDNjKDoFIHK7q8r8lackT6l+jo/Ye3HOle7l9nICP9lf1Ci25fy9vHd0JOWewkIFzXIEig3TdKT7JQ5fQ==}
