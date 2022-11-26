@@ -35,12 +35,13 @@ import {
     None,
     Option,
     Some,
+    isSome,
 } from "@firetable/types";
 import { updateEventFloorData } from "@firetable/backend";
 
 interface State {
     showMapsExpanded: boolean;
-    activeFloor: Floor | null;
+    activeFloor: Option<Floor>;
     floorInstances: Floor[];
 }
 
@@ -57,7 +58,7 @@ let currentOpenCreateReservationDialog: Option<{
 const props = defineProps<Props>();
 const state = reactive<State>({
     showMapsExpanded: false,
-    activeFloor: null,
+    activeFloor: None(),
     floorInstances: [],
 });
 const eventsStore = useEventsStore();
@@ -99,12 +100,12 @@ function onAutocompleteClear() {
 }
 
 function isActiveFloor(floor: Floor | FloorDoc) {
-    return state.activeFloor?.id === floor.id;
+    return isSome(state.activeFloor) && state.activeFloor.value.id === floor.id;
 }
 
 function setActiveFloor(floor?: Floor) {
     if (floor) {
-        state.activeFloor = floor;
+        state.activeFloor = Some(floor);
     }
 }
 
@@ -351,7 +352,7 @@ onMounted(init);
             <q-fab
                 v-if="state.floorInstances.length"
                 :model-value="state.showMapsExpanded"
-                :label="state.activeFloor?.name ?? ''"
+                :label="state.activeFloor.value?.name ?? ''"
                 padding="xs"
                 vertical-actions-align="left"
                 icon="chevron_down"

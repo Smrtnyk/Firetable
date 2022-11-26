@@ -21,9 +21,8 @@ export async function createEvent(
 
     const { date, img, floors, entryPrice, guestListLimit, name } = eventPayload;
     const id = db.collection(Collection.EVENTS).doc().id;
+    logger.info(id);
     const creator = context.auth?.token?.email;
-    logger.info(context.auth);
-    logger.info(context);
     let uploadedImg = null;
 
     if (img) {
@@ -47,16 +46,15 @@ export async function createEvent(
             guestListLimit,
         });
 
-    const floorsPromises = floors.map(
-        (floor) =>
-            floor &&
-            db
-                .collection(Collection.EVENTS)
-                .doc(id)
-                .collection("floors")
-                .doc(floor.id)
-                .set(floor)
-    );
+    const floorsPromises = floors.map(function (floor) {
+        return floor &&
+        db
+            .collection(Collection.EVENTS)
+            .doc(id)
+            .collection("floors")
+            .doc(floor.id)
+            .set(floor);
+    });
 
     await Promise.all([eventPromise, ...floorsPromises]);
 

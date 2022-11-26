@@ -4,7 +4,13 @@ import { initializeFirebase } from "@firetable/backend";
 import { Router } from "vue-router";
 import { None, Role } from "@firetable/types";
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import { getCurrentUser, useCurrentUser, VueFire, VueFireAuth } from "vuefire";
+import {
+    getCurrentUser,
+    globalFirestoreOptions,
+    useCurrentUser,
+    VueFire,
+    VueFireAuth,
+} from "vuefire";
 import { watch } from "vue";
 
 export default boot(({ router, app }) => {
@@ -18,6 +24,16 @@ export default boot(({ router, app }) => {
     handleOnAuthStateChanged(router, authStore);
     routerBeforeEach(router, authStore);
 });
+
+const defaultConverter = globalFirestoreOptions.converter;
+globalFirestoreOptions.converter = {
+    toFirestore: defaultConverter.toFirestore,
+    fromFirestore: (snapshot, options) => {
+        const data = defaultConverter.fromFirestore(snapshot, options);
+        // @ts-ignore -- data is unknown unfortunately
+        return { ...data, id: data.id };
+    },
+};
 
 /**
  * Set up the router to be intercepted on each route.

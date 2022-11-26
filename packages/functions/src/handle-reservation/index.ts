@@ -1,12 +1,11 @@
 import { sendNotification } from "web-push";
 import * as functions from "firebase-functions";
-import { QueryDocumentSnapshot } from "firebase-functions/lib/providers/firestore";
-import "firebase-functions/lib/logger/compat";
 import diff from "diff-arrays-of-objects";
 import { db } from "../init";
 import { ChangeType, UpdatedTablesDifference } from "../../types/types";
 import { BaseTable } from "@firetable/floor-creator";
 import { Collection, PushSubscriptionDoc } from "@firetable/types";
+import { QueryDocumentSnapshot } from "firebase-functions/lib/v1/providers/firestore";
 
 const { logger } = functions;
 
