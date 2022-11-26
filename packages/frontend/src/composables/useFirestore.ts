@@ -1,134 +1,48 @@
-import { computed, nextTick, onUnmounted, ref, Ref, watch } from "vue";
-
-import { OptionsCollection } from "./types/Options";
-import { ReturnCollGet, ReturnCollWatch } from "./types/Return";
-import { optsAreGetColl } from "./types/type-guards";
-import { onSnapshot, collection, getDocs } from "firebase/firestore";
-import { calculatePath, firestoreDocSerializer, withError } from "src/composables/types/utils";
+import {
+    collection,
+    doc,
+    query as firestoreQuery,
+    Query,
+    DocumentData,
+    setDoc,
+    DocumentReference,
+} from "firebase/firestore";
 import { initializeFirebase } from "@firetable/backend";
-import { showErrorMessage } from "src/helpers/ui-helpers";
+import { useCollection, useDocument } from "vuefire";
 
-export function useFirestore<T, M = T>(
-    options: { type: "watch" } & OptionsCollection<T, M>
-): ReturnCollWatch<T, M>;
-// @ts-ignore -- figure out how to fix this
-export function useFirestore<T, M = T>(
-    options: { type: "get" } & OptionsCollection<T, M>
-): ReturnCollGet<T, M>;
-export function useFirestore<T, M = T>(options: OptionsCollection<T, M>) {
+export function useFirestoreCollection<T extends DocumentData>(
+    path: string | Query<T>,
+    options = {}
+) {
+    const mergedOpts = { ...options, maxRefDepth: 20 };
     const { firestore } = initializeFirebase();
-    const collectionData: Ref<T[]> = ref([]);
-    const mutatedData: Ref<undefined | M> = ref();
-    const initialLoading = options.initialLoading ?? true;
-    const loading = ref<boolean>(initialLoading);
-    const received = ref(false);
-    const inComponent = options.inComponent ?? true;
-    const pathReplaced = computed(() => {
-        const { path, variables } = options;
-        return calculatePath(path, variables);
+    if (typeof path === "string") {
+        return useCollection<T>(collection(firestore, path), mergedOpts);
+    }
+    return useCollection<T>(path, mergedOpts);
+}
+
+export function useFirestoreDocument<T>(path: string, options = {}) {
+    const { firestore } = initializeFirebase();
+    return useDocument<T>(doc(firestore, path), options);
+}
+
+export function updateFirestoreDocument<T>(documentRef: DocumentReference<T>, updates: Partial<T>) {
+    return setDoc<T>(documentRef, updates, {
+        merge: true,
     });
-    const firestoreRef = computed(() => collection(firestore, pathReplaced.value));
-    const firestoreQuery = computed(() => {
-        return options.query?.(firestoreRef.value);
-    });
+}
 
-    function receiveCollData(receivedData: T[]) {
-        mutatedData.value = options.mutate?.(receivedData);
-        options.onReceive?.(receivedData, mutatedData.value);
-        collectionData.value = receivedData;
-        received.value = true;
-        loading.value = false;
-        return {
-            data: receivedData,
-            mutatedData: mutatedData.value,
-        };
-    }
+export function getFirestoreCollection(path: string) {
+    const { firestore } = initializeFirebase();
+    return collection(firestore, path);
+}
 
-    const getCollData = withError(options.onError, async () => {
-        const firestoreRefVal = firestoreQuery.value ?? firestoreRef.value;
+export function getFirestoreDocument(path: string) {
+    const { firestore } = initializeFirebase();
+    return doc(firestore, path);
+}
 
-        const fetchedCollection = await getDocs(firestoreRefVal);
-        let colData: T[] = [];
-        if (fetchedCollection.size) {
-            colData = fetchedCollection.docs.map((doc) => {
-                return firestoreDocSerializer(doc);
-            });
-        }
-        return receiveCollData(colData);
-    });
-
-    let watcher: null | (() => void) = null;
-    const watchData = withError(options.onError, function () {
-        const firestoreRefVal = firestoreQuery.value ?? firestoreRef.value;
-
-        watcher = onSnapshot(firestoreRefVal, (receivedCollection) => {
-            receiveCollData(
-                receivedCollection.size
-                    ? receivedCollection.docs.map((doc) => {
-                          return firestoreDocSerializer(doc);
-                      })
-                    : []
-            );
-        });
-    });
-
-    function stopWatchingData() {
-        watcher?.();
-    }
-
-    if (options.type === "watch" && inComponent) {
-        onUnmounted(stopWatchingData);
-    }
-
-    function debounceDataGetter() {
-        nextTick(() => {
-            if (!firestoreRef.value) return;
-
-            loading.value = true;
-            if (optsAreGetColl(options)) {
-                getCollData()?.catch(showErrorMessage);
-            } else {
-                stopWatchingData();
-                watchData();
-            }
-        }).catch(showErrorMessage);
-    }
-
-    watch(
-        pathReplaced,
-        (v) => {
-            if (options.manual) {
-                return;
-            }
-            if (v) {
-                debounceDataGetter();
-            } else {
-                stop();
-            }
-        },
-        { immediate: true }
-    );
-
-    const returnVal = {
-        mutatedData,
-        loading,
-        received,
-        pathReplaced,
-        firestoreRef,
-        data: collectionData,
-        firestoreQuery,
-    };
-
-    if (optsAreGetColl(options)) {
-        return {
-            ...returnVal,
-            getData: getCollData,
-        };
-    }
-
-    return {
-        ...returnVal,
-        watchData,
-        stopWatchingData,
-    };
+export function createQuery<T>(collectionRef: any, ...queries: any[]) {
+    return firestoreQuery<T>(collectionRef, ...queries);
 }

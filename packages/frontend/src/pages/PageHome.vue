@@ -2,22 +2,24 @@
 import EventCardList from "components/Event/EventCardList.vue";
 import PushMessagesBanner from "components/PushMessagesBanner.vue";
 import EventCardListSkeleton from "components/Event/EventCardListSkeleton.vue";
-import { useFirestore } from "src/composables/useFirestore";
-import { query as firestoreQuery, where, orderBy, limit } from "firebase/firestore";
+import { where, orderBy, limit } from "firebase/firestore";
 import { config } from "src/config";
 import { ONE_HOUR } from "src/constants";
 import { Collection, EventDoc } from "@firetable/types";
+import {
+    createQuery,
+    getFirestoreCollection,
+    useFirestoreCollection,
+} from "src/composables/useFirestore";
 
-const { data: events, loading: isLoading } = useFirestore<EventDoc>({
-    type: "watch",
-    path: Collection.EVENTS,
-    query(collectionRef) {
-        const whereConstraint = where("date", ">=", Date.now() - ONE_HOUR * config.eventDuration);
-        const orderByConstraint = orderBy("date");
-        const limitConstraint = limit(10);
-        return firestoreQuery(collectionRef, whereConstraint, orderByConstraint, limitConstraint);
-    },
-});
+const { data: events, pending: isLoading } = useFirestoreCollection<EventDoc>(
+    createQuery<EventDoc>(
+        getFirestoreCollection(Collection.EVENTS),
+        where("date", ">=", Date.now() - ONE_HOUR * config.eventDuration),
+        orderBy("date"),
+        limit(10)
+    )
+);
 </script>
 
 <template>

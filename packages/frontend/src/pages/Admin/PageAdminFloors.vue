@@ -4,24 +4,19 @@ import FTTitle from "components/FTTitle.vue";
 import FTDialog from "components/FTDialog.vue";
 
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { useFirestore } from "src/composables/useFirestore";
 import { Loading, useQuasar } from "quasar";
 import { onMounted } from "vue";
 import { makeRawFloor } from "@firetable/floor-creator";
 import { Collection, FloorDoc } from "@firetable/types";
 import { addFloor, deleteFloor } from "@firetable/backend";
+import { useFirestoreCollection } from "src/composables/useFirestore";
 
 const quasar = useQuasar();
-const { data: floors, loading: isLoading } = useFirestore<FloorDoc>({
-    type: "watch",
-    path: Collection.FLOORS,
-    onReceive() {
-        Loading.hide();
-    },
-    onError() {
-        Loading.hide();
-    },
-});
+const {
+    data: floors,
+    promise: floorsDataPromise,
+    pending: isLoading,
+} = useFirestoreCollection<FloorDoc>(Collection.FLOORS);
 
 async function onFloorDelete({ id }: Pick<FloorDoc, "id">, reset: () => void) {
     if (!(await showConfirm("Delete floor?"))) return reset();
@@ -64,8 +59,10 @@ function showAddNewFloorForm(): void {
     });
 }
 
-onMounted(() => {
+onMounted(async () => {
     Loading.show();
+    await floorsDataPromise.value;
+    Loading.hide();
 });
 </script>
 

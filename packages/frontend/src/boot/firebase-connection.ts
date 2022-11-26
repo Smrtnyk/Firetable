@@ -5,9 +5,14 @@ import { initializeFirebase } from "@firetable/backend";
 import { Router } from "vue-router";
 import { Role } from "@firetable/types";
 import { showErrorMessage } from "src/helpers/ui-helpers";
+import { VueFire, VueFireAuth } from "vuefire";
 
-export default boot(({ router }) => {
-    const { auth } = initializeFirebase();
+export default boot(({ router, app }) => {
+    const { auth, firebaseApp } = initializeFirebase();
+    app.use(VueFire, {
+        firebaseApp,
+        modules: [VueFireAuth()],
+    });
 
     const authStore = useAuthStore();
 

@@ -3,29 +3,28 @@ import FTTitle from "components/FTTitle.vue";
 import FTDialog from "components/FTDialog.vue";
 import AddNewRoleForm from "components/admin/roles/AddNewRoleForm.vue";
 
-import { arrayUnion, arrayRemove } from "firebase/firestore";
-import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
 import { RoleDoc } from "src/types/roles";
 import { useQuasar } from "quasar";
 import { loadingWrapper, showConfirm } from "src/helpers/ui-helpers";
 import { ROLES_PATH } from "@firetable/backend";
+import {
+    getFirestoreDocument,
+    updateFirestoreDocument,
+    useFirestoreDocument,
+} from "src/composables/useFirestore";
+import { arrayUnion, arrayRemove } from "firebase/firestore";
 
 const quasar = useQuasar();
-const { data: rolesDoc, updateDoc } = useFirestoreDoc<RoleDoc>({
-    type: "watch",
-    path: ROLES_PATH,
-});
+const rolesDoc = useFirestoreDocument<RoleDoc>(ROLES_PATH);
 
 const onRoleCreate = loadingWrapper((newRoleName: string) => {
-    return updateDoc({
-        // @ts-ignore roles is an array but here it is a FieldValue, should be fine
+    return updateFirestoreDocument(getFirestoreDocument(ROLES_PATH), {
         roles: arrayUnion(newRoleName),
     });
 });
 
 const onDeleteRole = loadingWrapper((roleNameToDelete: string) => {
-    return updateDoc({
-        // @ts-ignore roles is an array but here it is a FieldValue, should be fine
+    return updateFirestoreDocument(getFirestoreDocument(ROLES_PATH), {
         roles: arrayRemove(roleNameToDelete),
     });
 });

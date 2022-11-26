@@ -13,9 +13,8 @@ import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpe
 import { computed, nextTick, onMounted, reactive, ref, watch } from "vue";
 import { useEventsStore } from "src/stores/events-store";
 import { useI18n } from "vue-i18n";
-import { useFirestore } from "src/composables/useFirestore";
+import { useFirestoreCollection, useFirestoreDocument } from "src/composables/useFirestore";
 import { useAuthStore } from "src/stores/auth-store";
-import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
 import {
     BaseTable,
     Floor,
@@ -71,21 +70,14 @@ const eventFloorsRef = function (floor: FloorDoc, el: HTMLCanvasElement | null) 
     }
     canvases.value[floor.id] = el;
 };
-const { data: guestList } = useFirestore<GuestData>({
-    type: "watch",
-    path: `${Collection.EVENTS}/${props.id}/guestList`,
-});
-const { data: event } = useFirestoreDoc<EventDoc>({
-    type: "watch",
-    path: `${Collection.EVENTS}/${props.id}`,
-    onReceive() {
-        Loading.hide();
-    },
-});
-const { data: eventFloors } = useFirestore<FloorDoc>({
-    type: "watch",
-    path: `${Collection.EVENTS}/${props.id}/floors`,
-});
+
+const guestList = useFirestoreCollection<GuestData>(`${Collection.EVENTS}/${props.id}/guestList`);
+const { data: event, promise: eventDataPromise } = useFirestoreDocument<EventDoc>(
+    `${Collection.EVENTS}/${props.id}`
+);
+const { data: eventFloors } = useFirestoreCollection<FloorDoc>(
+    `${Collection.EVENTS}/${props.id}/floors`
+);
 const freeTablesPerFloor = computed(() => {
     const freeTablesMap: Record<string, string[]> = {};
 
@@ -240,10 +232,6 @@ function tableClickHandler(floor: Floor, element: BaseTable | null) {
 function onTableFound(/* tables: BaseTable[] */) {
     onAutocompleteClear();
     // for (const table of tables) {
-    // do something
-    // }
-
-    // for (const table of tables) {
 
     //
     //     const { groupedWith } = reservation;
@@ -331,7 +319,7 @@ async function initFloorInstancesData() {
 
 async function handleFloorInstancesData(newVal: FloorDoc[], old: FloorDoc[]) {
     if (!eventFloors.value) return;
-    if (!old.length && newVal.length) {
+    if ((!old.length && newVal.length) || state.floorInstances.length === 0) {
         await initFloorInstancesData();
         return;
     }
@@ -343,9 +331,11 @@ async function init() {
         await router.replace("/");
     }
     Loading.show();
+    await eventDataPromise.value;
+    Loading.hide();
 }
 
-watch(eventFloors, handleFloorInstancesData);
+watch(() => eventFloors.value, handleFloorInstancesData, { deep: true });
 watch(freeTablesPerFloor, checkIfReservedTableAndCloseCreateReservationDialog);
 
 onMounted(init);

@@ -4,15 +4,19 @@ import FTTitle from "components/FTTitle.vue";
 import { loadingWrapper, showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed } from "vue";
 import { config } from "src/config";
-import { useFirestore } from "src/composables/useFirestore";
 import { useAuthStore } from "src/stores/auth-store";
 import { useQuasar } from "quasar";
 import FTDialog from "components/FTDialog.vue";
-import { documentId, query as firestoreQuery, where } from "firebase/firestore";
-import { useFirestoreDoc } from "src/composables/useFirestoreDoc";
+import { documentId, where } from "firebase/firestore";
 import { RoleDoc } from "src/types/roles";
 import { Collection, CreateUserPayload, FloorDoc, User } from "@firetable/types";
 import { createUserWithEmail, deleteUser, ROLES_PATH, updateUser } from "@firetable/backend";
+import {
+    createQuery,
+    getFirestoreCollection,
+    useFirestoreCollection,
+    useFirestoreDocument,
+} from "src/composables/useFirestore";
 
 const { maxNumOfUsers } = config;
 const authStore = useAuthStore();
@@ -24,22 +28,14 @@ const usersStatus = computed(() => {
         maxUsers: maxNumOfUsers,
     };
 });
-const { data: users } = useFirestore<User>({
-    type: "watch",
-    path: Collection.USERS,
-    query(collectionRef) {
-        const idConstraint = where(documentId(), "!=", authStore.user?.id);
-        return firestoreQuery(collectionRef, idConstraint);
-    },
-});
-const { data: floors } = useFirestore<FloorDoc>({
-    type: "get",
-    path: Collection.FLOORS,
-});
-const { data: rolesDoc } = useFirestoreDoc<RoleDoc>({
-    type: "get",
-    path: ROLES_PATH,
-});
+const { data: users } = useFirestoreCollection<User>(
+    createQuery(
+        getFirestoreCollection(Collection.USERS),
+        where(documentId(), "!=", authStore.user?.id)
+    )
+);
+const { data: floors } = useFirestoreCollection<FloorDoc>(Collection.FLOORS, { once: true });
+const { data: rolesDoc } = useFirestoreDocument<RoleDoc>(ROLES_PATH, { once: true });
 
 const onCreateUser = loadingWrapper((newUser: CreateUserPayload) => {
     return createUserWithEmail(newUser);
