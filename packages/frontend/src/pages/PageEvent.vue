@@ -31,9 +31,12 @@ import {
     FloorDoc,
     GuestData,
     Reservation,
+    isNone,
+    None,
+    Option,
+    Some,
 } from "@firetable/types";
 import { updateEventFloorData } from "@firetable/backend";
-import { isNone, None, Option, Some } from "@firetable/types/dist/src/monads";
 
 interface State {
     showMapsExpanded: boolean;
