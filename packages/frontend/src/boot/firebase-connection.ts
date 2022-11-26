@@ -35,29 +35,17 @@ function routerBeforeEach(router: Router, store: ReturnType<typeof useAuthStore>
             const requiresAuth = to.meta.requiresAuth;
             const requiresAdmin = to.meta.requiresAdmin;
 
-            if (requiresAuth && !store.isAuthenticated) {
-                return { name: "auth" };
-            }
+            if (requiresAuth && !store.isAuthenticated) return { name: "auth" };
+            if (!store.isAuthenticated) return true;
 
-            if (!store.isAuthenticated) {
-                return true;
-            }
-
-            const { auth } = initializeFirebase();
-
-            const token = await auth.currentUser?.getIdTokenResult();
+            const token = await (await getCurrentUser())?.getIdTokenResult();
             const role = token?.claims.role;
             const isAdmin = role === Role.ADMIN;
 
-            if (requiresAdmin && !isAdmin) {
-                return { name: "home" };
-            } else if (requiresAdmin && isAdmin) {
-                return true;
-            } else if (to.path === "/auth") {
-                return { name: "home" };
-            } else {
-                return true;
-            }
+            if (requiresAdmin && isAdmin) return true;
+            if (requiresAdmin && !isAdmin) return { name: "home" };
+            if (to.path === "/auth") return { name: "home" };
+            return true;
         } catch (err) {
             showErrorMessage(err);
             return false;
