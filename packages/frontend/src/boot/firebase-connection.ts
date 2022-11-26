@@ -16,13 +16,15 @@ export default boot(({ router, app }) => {
 
     const authStore = useAuthStore();
     handleOnAuthStateChanged(router, authStore);
-    // Setup the router to be intercepted on each route.
-    // This allows the application to halt rendering until
-    // Firebase is finished with its initialization process,
-    // and handle the user accordingly
     routerBeforeEach(router, authStore);
 });
 
+/**
+ * Set up the router to be intercepted on each route.
+ * This allows the application to halt rendering until
+ * Firebase is finished with its initialization process,
+ * and handle the user accordingly
+ */
 function routerBeforeEach(router: Router, store: ReturnType<typeof useAuthStore>) {
     router.beforeEach(async (to) => {
         try {
