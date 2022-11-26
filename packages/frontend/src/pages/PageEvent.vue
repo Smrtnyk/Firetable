@@ -168,10 +168,10 @@ function onReservationConfirm(floor: Floor, element: BaseTable) {
 }
 
 function handleReservationCreation(floor: Floor, reservationData: CreateReservationPayload) {
-    if (!currentUser.value) return;
+    if (isNone(currentUser.value)) return;
 
     const { groupedWith } = reservationData;
-    const { email, name, role, id } = currentUser.value;
+    const { email, name, role, id } = currentUser.value.value;
     const reservedBy = { email, name, role, id };
 
     for (const idInGroup of groupedWith) {

@@ -9,7 +9,7 @@ import { useQuasar } from "quasar";
 import FTDialog from "components/FTDialog.vue";
 import { documentId, where } from "firebase/firestore";
 import { RoleDoc } from "src/types/roles";
-import { Collection, CreateUserPayload, FloorDoc, User } from "@firetable/types";
+import { Collection, CreateUserPayload, FloorDoc, isSome, User } from "@firetable/types";
 import { createUserWithEmail, deleteUser, ROLES_PATH, updateUser } from "@firetable/backend";
 import {
     createQuery,
@@ -31,7 +31,7 @@ const usersStatus = computed(() => {
 const { data: users } = useFirestoreCollection<User>(
     createQuery(
         getFirestoreCollection(Collection.USERS),
-        where(documentId(), "!=", authStore.user?.id)
+        where(documentId(), "!=", isSome(authStore.user) && authStore.user.value.id)
     )
 );
 const { data: floors } = useFirestoreCollection<FloorDoc>(Collection.FLOORS, { once: true });

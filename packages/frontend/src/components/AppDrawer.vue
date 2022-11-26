@@ -7,6 +7,7 @@ import { useAuthStore } from "src/stores/auth-store";
 import { useAppStore } from "src/stores/app-store";
 import { logoutUser, updateUserField } from "@firetable/backend";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { isNone } from "@firetable/types";
 
 interface Props {
     showAdminLinks: boolean;
@@ -48,8 +49,8 @@ const adminLinks = computed(() => [
 const user = computed(() => authStore.user);
 const adminLinksCollection = computed(() => (props.showAdminLinks ? adminLinks.value : []));
 const avatar = computed(() => {
-    if (!user.value) return "";
-    const [first, last] = user.value.name.split(" ");
+    if (isNone(user.value)) return "";
+    const [first, last] = user.value.value.name.split(" ");
     if (!last) {
         return first[0];
     }
@@ -62,9 +63,9 @@ function setDarkMode(newValue: boolean) {
 }
 
 function toggleUserActivityStatus(newValue: boolean) {
-    if (!user.value) return;
+    if (isNone(user.value)) return;
 
-    updateUserField(user.value.id, "status", Number(newValue)).catch(showErrorMessage);
+    updateUserField(user.value.value.id, "status", Number(newValue)).catch(showErrorMessage);
 }
 
 function onLogoutUser() {

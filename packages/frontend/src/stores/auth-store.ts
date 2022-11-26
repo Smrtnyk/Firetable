@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { Collection, Role, User } from "@firetable/types";
+import { Collection, isSome, None, Option, Role, Some, User } from "@firetable/types";
 import { NOOP } from "@firetable/utils";
 import { logoutUser } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";
@@ -8,7 +8,7 @@ import { useFirestoreDocument } from "src/composables/useFirestore";
 interface AuthState {
     isAuthenticated: boolean;
     isReady: boolean;
-    user: User | null;
+    user: Option<User>;
     unsubscribeUserWatch: typeof NOOP;
 }
 
@@ -17,7 +17,7 @@ export const useAuthStore = defineStore("auth", {
         return {
             isAuthenticated: false,
             isReady: false,
-            user: null,
+            user: None(),
             users: [],
             showCreateUserDialog: false,
             unsubscribeUserWatch: NOOP,
@@ -25,15 +25,15 @@ export const useAuthStore = defineStore("auth", {
     },
     getters: {
         isAdmin(): boolean {
-            return !!this.user && this.user.role === Role.ADMIN;
+            return isSome(this.user) && this.user.value.role === Role.ADMIN;
         },
 
         isLoggedIn(): boolean {
-            return !!this.user && !!this.user.email;
+            return isSome(this.user) && !!this.user.value.email;
         },
     },
     actions: {
-        setUser(user: User | null) {
+        setUser(user: Option<User>) {
             this.user = user;
         },
 
@@ -71,7 +71,7 @@ export const useAuthStore = defineStore("auth", {
                 showErrorMessage("User is not found in database!");
                 logoutUser().catch(NOOP);
             } else {
-                this.user = user.value;
+                this.user = Some(user.value);
                 this.isAuthenticated = true;
                 this.isReady = true;
                 this.unsubscribeUserWatch = stop;
