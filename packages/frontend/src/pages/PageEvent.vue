@@ -33,6 +33,7 @@ import {
     Reservation,
 } from "@firetable/types";
 import { updateEventFloorData } from "@firetable/backend";
+import { isNone, None, Option, Some } from "@firetable/types/dist/src/monads";
 
 interface State {
     showMapsExpanded: boolean;
@@ -44,11 +45,11 @@ interface Props {
     id: string;
 }
 
-let currentOpenCreateReservationDialog: {
+let currentOpenCreateReservationDialog: Option<{
     label: string;
     dialog: DialogChainObject;
     floor: string;
-} | null = null;
+}> = None();
 
 const props = defineProps<Props>();
 const state = reactive<State>({
@@ -184,7 +185,7 @@ function handleReservationCreation(floor: Floor, reservationData: CreateReservat
 }
 
 function resetCurrentOpenCreateReservationDialog() {
-    currentOpenCreateReservationDialog = null;
+    currentOpenCreateReservationDialog = None();
 }
 
 function showCreateReservationDialog(floor: Floor, element: BaseTable) {
@@ -212,11 +213,11 @@ function showCreateReservationDialog(floor: Floor, element: BaseTable) {
         })
         .onDismiss(resetCurrentOpenCreateReservationDialog);
 
-    currentOpenCreateReservationDialog = {
+    currentOpenCreateReservationDialog = Some({
         label,
         dialog,
         floor: floor.id,
-    };
+    });
 }
 
 function tableClickHandler(floor: Floor, element: BaseTable | null) {
@@ -269,16 +270,16 @@ function instantiateFloors() {
 }
 
 function checkIfReservedTableAndCloseCreateReservationDialog() {
-    if (!currentOpenCreateReservationDialog) return;
+    if (isNone(currentOpenCreateReservationDialog)) return;
 
-    const { dialog, label, floor } = currentOpenCreateReservationDialog;
+    const { dialog, label, floor } = currentOpenCreateReservationDialog.value;
     const freeTables = freeTablesPerFloor.value[floor];
     const isTableStillFree = freeTables.includes(label);
 
     if (isTableStillFree) return;
 
     dialog.hide();
-    currentOpenCreateReservationDialog = null;
+    currentOpenCreateReservationDialog = None();
     showErrorMessage(t("PageEvent.reservationAlreadyReserved"));
 }
 

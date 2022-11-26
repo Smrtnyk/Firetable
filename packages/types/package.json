@@ -1,15 +1,15 @@
 {
-  "name": "@firetable/types",
-  "version": "1.0.0",
-  "description": "",
-  "main": "./dist/src/index.js",
+    "name": "@firetable/types",
+    "version": "1.0.0",
+    "description": "",
+    "main": "./dist/src/index.js",
     "types": "./dist/src/index.d.ts",
     "typings": "./dist/src/index.d.ts",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-      "build": "tsc"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "tsc"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
 }
