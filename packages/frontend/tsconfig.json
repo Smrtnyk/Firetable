@@ -3,6 +3,7 @@
     "compilerOptions": {
         "isolatedModules": false,
         "baseUrl": ".",
+        "skipLibCheck": true,
         "paths": {
             "src/*": [
                 "src/*"
@@ -32,12 +33,7 @@
     },
     "include": [
         "src/**/*.ts",
-        "src/**/*.d.ts",
         "src/**/*.vue"
     ],
-    "references": [
-        {
-            "path": "./tsconfig.ref.json"
-        }
-    ]
+    "exclude": ["node_modules"]
 }

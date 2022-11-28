@@ -6,7 +6,7 @@ import { ACTIVITY_STATUS, CreateUserPayload, Role, User } from "@firetable/types
 
 interface Props {
     floors: string[];
-    roles: string[];
+    roles: Role[];
     user?: User;
 }
 

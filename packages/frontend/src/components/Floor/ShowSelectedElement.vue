@@ -1,9 +1,17 @@
 <template>
-    <div class="row q-pa-sm q-col-gutter-md" v-if="selectedElement">
+    <div class="row q-pa-sm q-col-gutter-md" v-if="isSome(selectedElement)">
         <div class="col-10 flex justify-between">
             <div class="row">
-                <div v-if="selectedElement.radius" class="col-4 q-pa-xs q-pl-none">
-                    <q-input :model-value="selectedElement.radius" filled label="Radius" readonly />
+                <div
+                    v-if="isRoundTable(selectedElement.value) && selectedElement.value.radius"
+                    class="col-4 q-pa-xs q-pl-none"
+                >
+                    <q-input
+                        :model-value="selectedElement.value.radius"
+                        filled
+                        label="Radius"
+                        readonly
+                    />
                 </div>
                 <template v-else>
                     <div class="col-4 q-pa-xs q-pl-none">
@@ -25,8 +33,8 @@
                 </template>
                 <div class="col-4 q-pa-xs">
                     <q-input
-                        v-if="selectedElement.label"
-                        :model-value="selectedElement.label"
+                        v-if="selectedElement.value.label"
+                        :model-value="selectedElement.value.label"
                         @update:model-value="updateTableLabel"
                         filled
                         label="Table Name"
@@ -36,7 +44,7 @@
         </div>
         <div class="col-2 flex q-pl-none justify-end">
             <q-btn
-                v-if="!selectedElement.reservation"
+                v-if="!isSome(selectedElement) || !selectedElement.value.reservation"
                 icon="trash"
                 color="negative"
                 @click="deleteElement"
@@ -53,10 +61,11 @@
 <script setup lang="ts">
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed, nextTick } from "vue";
-import { BaseTable, isTable } from "@firetable/floor-creator";
+import { BaseTable, isRoundTable, isTable } from "@firetable/floor-creator";
+import { isNone, isSome, Option, Some } from "@firetable/types";
 
 interface Props {
-    selectedFloorElement: BaseTable | null;
+    selectedFloorElement: Option<BaseTable>;
 }
 
 const props = defineProps<Props>();
@@ -79,9 +88,9 @@ async function updateTableLabel(newId: string): Promise<void> {
 }
 
 async function deleteElement() {
-    if (!props.selectedFloorElement) return;
+    if (isNone(props.selectedFloorElement)) return;
     if (await showConfirm("Do you really want to delete this element?")) {
-        emit("delete", props.selectedFloorElement);
+        emit("delete", props.selectedFloorElement.value);
     }
 }
 
@@ -89,7 +98,7 @@ function getElementWidth(e: any): number {
     return Math.round(e.group.width * e.group.scaleX);
 }
 
-function getElementHeight(e: any): number {
-    return Math.round(e.group.height * e.group.scaleY);
+function getElementHeight(e: Some<BaseTable>): number {
+    return Math.round((e.value.group?.height || 0) * (e.value.group?.scaleY || 0));
 }
 </script>

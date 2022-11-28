@@ -16,7 +16,7 @@ import {
     hasFloorTables,
     RESOLUTION,
 } from "@firetable/floor-creator";
-import { Collection, ElementTag, ElementType, FloorDoc } from "@firetable/types";
+import { Collection, ElementTag, ElementType, FloorDoc, None, Option } from "@firetable/types";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import {
     getFirestoreDocument,
@@ -48,7 +48,7 @@ const q = useQuasar();
 const floorInstance = ref<Floor | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 const pageRef = ref<HTMLDivElement | null>(null);
-const selectedElement = ref<BaseTable | null>(null);
+const selectedElement = ref<Option<BaseTable>>(None());
 const { data: floor, promise: floorDataPromise } = useFirestoreDocument<FloorDoc>(
     `${Collection.FLOORS}/${props.floorID}`,
     {
@@ -142,8 +142,8 @@ function dblClickHandler(floor: Floor, coords: NumberTuple) {
     q.bottomSheet(addNewElementsBottomSheetOptions).onOk(handleAddNewElement(floor, coords));
 }
 
-async function elementClickHandler(_: Floor, element: BaseTable | null) {
-    selectedElement.value = null;
+async function elementClickHandler(_: Floor, element: Option<BaseTable>) {
+    selectedElement.value = None();
     await nextTick();
     selectedElement.value = element;
 }
@@ -161,7 +161,7 @@ function onDeleteElement(element: BaseTable) {
                 standout
                 rounded
                 label="Floor name"
-                @update:model-value="(event) => onFloorChange('name', event)"
+                @update:model-value="(event: string) => onFloorChange('name', event)"
                 :model-value="floorInstance.name"
             >
                 <template #append>
@@ -187,7 +187,7 @@ function onDeleteElement(element: BaseTable) {
                     :step="RESOLUTION"
                     label
                     color="deep-orange"
-                    @update:model-value="(event) => onFloorChange('width', event)"
+                    @update:model-value="(event: number) => onFloorChange('width', event)"
                 />
             </div>
             <div class="col-6">
@@ -200,7 +200,7 @@ function onDeleteElement(element: BaseTable) {
                     :step="RESOLUTION"
                     label
                     color="deep-orange"
-                    @update:model-value="(event) => onFloorChange('height', event)"
+                    @update:model-value="(event: number) => onFloorChange('height', event)"
                     :model-value="floorInstance.height"
                 />
             </div>

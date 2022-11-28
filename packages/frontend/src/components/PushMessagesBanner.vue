@@ -26,7 +26,7 @@ const NOTIFICATIONS_GRANTED_OPTIONS: NotificationOptions = {
 };
 
 const q = useQuasar();
-const showPushNotificationsBanner = ref(false);
+const showPushNotificationsBanner = ref<boolean>(false);
 
 const pushNotificationsSupported = "PushManager" in window;
 const serviceWorkerSupported = "serviceWorker" in window.navigator;

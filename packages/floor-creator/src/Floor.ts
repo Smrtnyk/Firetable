@@ -10,7 +10,7 @@ import {
     NumberTuple,
 } from "./types";
 import { RoundTableElement } from "./RoundTableElement";
-import { ElementTag, FloorDoc, Reservation } from "@firetable/types";
+import { ElementTag, FloorDoc, None, Option, Reservation, Some } from "@firetable/types";
 
 interface FloorCreationOptions {
     canvas: HTMLCanvasElement;
@@ -48,7 +48,7 @@ export class Floor {
     };
     onMouseUpHandler = (ev: fabric.IEvent<MouseEvent>) => {
         if (containsTables(ev)) return;
-        this.elementClickHandler(this, null);
+        this.elementClickHandler(this, None());
     };
     onElementClick = (ev: fabric.IEvent<MouseEvent>) => {
         const table = getTableFromGroupElement(ev);
@@ -250,14 +250,14 @@ export class Floor {
     }
 }
 
-function getTableFromGroupElement(ev: fabric.IEvent): BaseTable | null {
+function getTableFromGroupElement(ev: fabric.IEvent): Option<BaseTable> {
     const group = ev.target;
     // @ts-ignore
     const table = group?._objects[0];
     if (table instanceof TableElement || table instanceof RoundTableElement) {
-        return table;
+        return Some(table);
     }
-    return null;
+    return None();
 }
 
 function containsTables(ev: fabric.IEvent): boolean {

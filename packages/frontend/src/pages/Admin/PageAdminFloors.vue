@@ -84,7 +84,7 @@ onMounted(async () => {
                 v-for="floor in floors"
                 :key="floor.id"
                 right-color="warning"
-                @right="({ reset }) => onFloorDelete(floor, reset)"
+                @right="onFloorDelete.bind(floor)"
                 class="fa-card"
             >
                 <template #right>

@@ -7,7 +7,7 @@ import { useAuthStore } from "src/stores/auth-store";
 import { useAppStore } from "src/stores/app-store";
 import { logoutUser, updateUserField } from "@firetable/backend";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { isNone } from "@firetable/types";
+import { isNone, isSome } from "@firetable/types";
 
 interface Props {
     showAdminLinks: boolean;
@@ -90,21 +90,21 @@ function setAppLanguage(val: string) {
         behavior="mobile"
     >
         <q-list>
-            <q-item header class="column items-center q-pt-xl q-pb-lg">
+            <q-item header class="column items-center q-pt-xl q-pb-lg" v-if="isSome(user)">
                 <q-avatar size="6rem" class="ft-avatar">
                     <div
                         :class="{
-                            green: user.status,
+                            green: user.value.status,
                         }"
                         class="status-dot"
                     />
                     {{ avatar }}
                 </q-avatar>
                 <div class="q-mt-md text-center">
-                    <div class="text-subtitle1">{{ user.name }}</div>
-                    <div class="text-caption text-grey">{{ user.email }}</div>
+                    <div class="text-subtitle1">{{ user.value.name }}</div>
+                    <div class="text-caption text-grey">{{ user.value.email }}</div>
                     <div class="text-caption text-grey">
-                        {{ user.status ? "Online" : "Offline" }}
+                        {{ user.value.status ? "Online" : "Offline" }}
                     </div>
                 </div>
             </q-item>
@@ -161,7 +161,7 @@ function setAppLanguage(val: string) {
             </q-item>
             <q-item>
                 <q-toggle
-                    :model-value="!!user.status"
+                    :model-value="isSome(user) && !!user.value.status"
                     checked-icon="status-online"
                     color="green"
                     label="Toggle online status"

@@ -129,8 +129,8 @@ async function onUserSlideRight({ id }: User, reset: () => void) {
                 v-for="user in users"
                 :key="user.id"
                 right-color="warning"
-                @right="({ reset }) => onUserSlideRight(user, reset)"
-                @left="() => showEditUserDialog(user)"
+                @right="onUserSlideRight.bind(user)"
+                @left="showEditUserDialog.bind(user)"
                 class="fa-card"
             >
                 <template #right>

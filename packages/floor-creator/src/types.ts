@@ -1,10 +1,10 @@
 import { Floor } from "./Floor";
 import { TableElement } from "./TableElement";
 import { RoundTableElement } from "./RoundTableElement";
-import { ElementTag } from "@firetable/types";
+import { ElementTag, Option } from "@firetable/types";
 
 export type FloorDoubleClickHandler = (floor: Floor, coords: NumberTuple) => void;
-export type ElementClickHandler = (floor: Floor, el: BaseTable | null) => void;
+export type ElementClickHandler = (floor: Floor, el: Option<BaseTable>) => void;
 export type BaseTable = TableElement | RoundTableElement;
 export type CreateTableOptions = {
     label: string;

@@ -69,10 +69,7 @@ const { t } = useI18n();
 const canvases = ref<Record<string, HTMLCanvasElement>>({});
 const pageRef = ref<HTMLDivElement | null>(null);
 const currentUser = computed(() => authStore.user);
-const eventFloorsRef = function (floor: FloorDoc, el: HTMLCanvasElement | null) {
-    if (!el) {
-        return;
-    }
+const eventFloorsRef = function (floor: FloorDoc, el: HTMLCanvasElement) {
     canvases.value[floor.id] = el;
 };
 
@@ -224,13 +221,13 @@ function showCreateReservationDialog(floor: Floor, element: BaseTable) {
     });
 }
 
-function tableClickHandler(floor: Floor, element: BaseTable | null) {
-    if (!element || !isTable(element)) return;
-    const { reservation } = element;
+function tableClickHandler(floor: Floor, element: Option<BaseTable>) {
+    if (isNone(element) || !isTable(element.value)) return;
+    const { reservation } = element.value;
     if (reservation) {
-        showReservation(floor, reservation, element);
+        showReservation(floor, reservation, element.value);
     } else {
-        showCreateReservationDialog(floor, element);
+        showCreateReservationDialog(floor, element.value);
     }
 }
 
@@ -352,7 +349,7 @@ onMounted(init);
             <q-fab
                 v-if="state.floorInstances.length"
                 :model-value="state.showMapsExpanded"
-                :label="state.activeFloor.value?.name ?? ''"
+                :label="isSome(state.activeFloor) ? state.activeFloor.value.name : ''"
                 padding="xs"
                 vertical-actions-align="left"
                 icon="chevron_down"
@@ -411,7 +408,7 @@ onMounted(init);
             <canvas
                 :id="floor.id"
                 class="shadow-3"
-                :ref="(el) => eventFloorsRef(floor, el)"
+                :ref="(el: any) => eventFloorsRef(floor, el)"
             ></canvas>
         </div>
 

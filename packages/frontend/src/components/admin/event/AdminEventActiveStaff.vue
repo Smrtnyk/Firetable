@@ -5,7 +5,7 @@
                 v-for="user in props.users"
                 :key="user.id"
                 :model-value="isInActiveStaff(user.id)"
-                @update:model-value="(active) => setUserAsActiveEventStaff(user.id, active)"
+                @update:model-value="setUserAsActiveEventStaff.bind(user.id)"
                 :label="user.name"
                 size="lg"
             />

@@ -8,9 +8,6 @@
             "path": "./packages/floor-creator/tsconfig.json"
         },
         {
-            "path": "./packages/frontend/tsconfig.ref.json"
-        },
-        {
             "path": "./packages/functions/tsconfig.json"
         },
         {

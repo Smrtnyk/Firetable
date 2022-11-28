@@ -7,14 +7,14 @@ interface Props {
 }
 const props = defineProps<Props>();
 const emit = defineEmits(["right"]);
+
+function emitOnRight(reset: () => void): void {
+    emit("right", { event: props.event, reset });
+}
 </script>
 
 <template>
-    <q-slide-item
-        right-color="warning"
-        @right="({ reset }) => emit('right', { event: props.event, reset })"
-        class="fa-card"
-    >
+    <q-slide-item right-color="warning" @right="emitOnRight" class="fa-card">
         <template #right>
             <q-icon name="trash" />
         </template>

@@ -25,7 +25,7 @@
         "@firebase/app-types": "0.8.1"
     },
     "engines": {
-        "node": "16"
+        "node": "18"
     },
     "private": true
 }

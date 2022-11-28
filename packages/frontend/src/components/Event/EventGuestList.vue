@@ -116,8 +116,8 @@ function showAddNewGuestForm(): void {
                     :key="guest.id"
                     right-color="warning"
                     :left-color="guest.confirmed ? 'red-5' : 'green-5'"
-                    @right="({ reset }: { reset: () => void }) => deleteGuest(guest.id, reset)"
-                    @left="({ reset }: { reset: () => void }) => confirmGuest(guest, reset)"
+                    @right="deleteGuest.bind(guest.id)"
+                    @left="confirmGuest.bind(guest)"
                 >
                     <template #right>
                         <q-icon name="trash" />
