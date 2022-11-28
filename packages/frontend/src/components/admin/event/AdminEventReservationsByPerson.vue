@@ -20,6 +20,7 @@ import {
 import { computed, onMounted, ref } from "vue";
 import { BaseTable } from "@firetable/floor-creator";
 import { showErrorMessage } from "src/helpers/ui-helpers";
+import { isNone } from "@firetable/types";
 
 interface Props {
     reservations: BaseTable[];
@@ -68,8 +69,8 @@ const props = defineProps<Props>();
 
 const reservedTables = computed(() => props.reservations.filter((table) => !!table.reservation));
 function reservationsReducer(acc: Res, { reservation }: BaseTable) {
-    if (!reservation) return acc;
-    const { reservedBy, confirmed } = reservation;
+    if (isNone(reservation)) return acc;
+    const { reservedBy, confirmed } = reservation.value;
     const { id, name } = reservedBy;
     if (acc[id]) {
         acc[id].reservations++;

@@ -66,7 +66,7 @@ function onReset() {
     state.form = { ...eventObj };
 }
 
-function validDates(calendarDate: Date) {
+function validDates(calendarDate: string) {
     return (
         new Date(calendarDate).toISOString().substring(0, 10) >=
         new Date().toISOString().substring(0, 10)

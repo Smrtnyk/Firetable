@@ -1,18 +1,18 @@
 import { fabric } from "fabric";
 import { FloorElementTypes } from "./types";
 import { determineTableColor } from "./utils";
-import { Reservation } from "@firetable/types";
+import { isSome, None, Option, Reservation } from "@firetable/types";
 
 interface ITableElementOptions extends fabric.IRectOptions {
     width: number;
     height: number;
-    reservation?: Reservation;
+    reservation: Option<Reservation>;
     label: string;
 }
 
 export class TableElement extends fabric.Rect {
     type: FloorElementTypes = FloorElementTypes.RECT_TABLE;
-    reservation: Reservation | null = null;
+    reservation: Option<Reservation> = None();
     label: string;
 
     constructor(options: ITableElementOptions) {
@@ -22,7 +22,7 @@ export class TableElement extends fabric.Rect {
             fill,
         });
         this.label = options.label;
-        if (options.reservation) this.reservation = options.reservation;
+        if (isSome(options.reservation)) this.reservation = options.reservation;
     }
 
     toObject() {

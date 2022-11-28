@@ -23,6 +23,7 @@
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { BaseTable } from "@firetable/floor-creator";
+import { isNone } from "@firetable/types";
 
 interface Props {
     allReservedTables: BaseTable[];
@@ -41,8 +42,8 @@ function onTablesSearch(val: string) {
     }
 
     const found = props.allReservedTables.filter((table) => {
-        if (!table.reservation) return false;
-        const normalizedGuestName = table.reservation.guestName; // NOSONAR
+        if (isNone(table.reservation)) return false;
+        const normalizedGuestName = table.reservation.value.guestName;
         const normalizedVal = val.toLowerCase();
         return normalizedGuestName.startsWith(normalizedVal);
     });

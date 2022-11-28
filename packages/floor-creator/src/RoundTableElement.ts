@@ -1,16 +1,16 @@
 import { fabric } from "fabric";
 import { FloorElementTypes } from "./types";
 import { determineTableColor } from "./utils";
-import { Reservation } from "@firetable/types";
+import { isSome, None, Option, Reservation } from "@firetable/types";
 
 interface CircleTableElementOptions extends fabric.ICircleOptions {
-    reservation?: Reservation;
+    reservation: Option<Reservation>;
     label: string;
 }
 
 export class RoundTableElement extends fabric.Circle {
     type = FloorElementTypes.ROUND_TABLE;
-    reservation: Reservation | null = null;
+    reservation: Option<Reservation> = None();
     label: string;
 
     constructor(options: CircleTableElementOptions) {
@@ -20,7 +20,7 @@ export class RoundTableElement extends fabric.Circle {
             fill,
         });
         this.label = options.label;
-        if (options.reservation) this.reservation = options.reservation;
+        if (isSome(options.reservation)) this.reservation = options.reservation;
     }
 
     toObject() {

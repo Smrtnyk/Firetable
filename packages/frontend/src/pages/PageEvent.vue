@@ -150,15 +150,18 @@ function showReservation(floor: Floor, reservation: Reservation, element: BaseTa
 function onReservationConfirm(floor: Floor, element: BaseTable) {
     return function (val: boolean) {
         const { reservation } = element;
-        if (!reservation) return;
-        const { groupedWith } = reservation;
+        if (isNone(reservation)) return;
+        const { groupedWith } = reservation.value;
         for (const tableLabel of groupedWith) {
             const table = getTables(floor).find(({ label }) => label === tableLabel);
             if (table) {
-                floor.setReservationOnTable(table, {
-                    ...reservation,
-                    confirmed: val,
-                });
+                floor.setReservationOnTable(
+                    table,
+                    Some({
+                        ...reservation.value,
+                        confirmed: val,
+                    })
+                );
             }
         }
         return tryCatchLoadingWrapper(() => updateEventFloorData(floor, props.id));
@@ -175,11 +178,14 @@ function handleReservationCreation(floor: Floor, reservationData: CreateReservat
     for (const idInGroup of groupedWith) {
         const table = getTables(floor).find(({ label }) => label === idInGroup);
         if (table) {
-            floor.setReservationOnTable(table, {
-                ...reservationData,
-                confirmed: false,
-                reservedBy,
-            });
+            floor.setReservationOnTable(
+                table,
+                Some({
+                    ...reservationData,
+                    confirmed: false,
+                    reservedBy,
+                })
+            );
         }
     }
     tryCatchLoadingWrapper(() => updateEventFloorData(floor, props.id)).catch(showErrorMessage);
@@ -224,8 +230,8 @@ function showCreateReservationDialog(floor: Floor, element: BaseTable) {
 function tableClickHandler(floor: Floor, element: Option<BaseTable>) {
     if (isNone(element) || !isTable(element.value)) return;
     const { reservation } = element.value;
-    if (reservation) {
-        showReservation(floor, reservation, element.value);
+    if (isSome(reservation)) {
+        showReservation(floor, reservation.value, element.value);
     } else {
         showCreateReservationDialog(floor, element.value);
     }
@@ -301,12 +307,12 @@ function updateFloorInstancesData() {
 async function onDeleteReservation(floor: Floor, element: BaseTable) {
     if (!(await showConfirm("Delete reservation?"))) return;
     const { reservation } = element;
-    if (!reservation) return;
-    const { groupedWith } = reservation;
+    if (isNone(reservation)) return;
+    const { groupedWith } = reservation.value;
     for (const tableId of groupedWith) {
         const table = getTables(floor).find(({ label }) => label === tableId);
         if (table) {
-            floor.setReservationOnTable(table, null);
+            floor.setReservationOnTable(table, None());
         }
     }
 

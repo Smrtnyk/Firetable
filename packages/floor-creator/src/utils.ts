@@ -1,10 +1,10 @@
-import { Reservation } from "@firetable/types";
+import { isSome, Option, Reservation } from "@firetable/types";
 
-export function determineTableColor(reservation?: Reservation): string {
+export function determineTableColor(reservation: Option<Reservation>): string {
     let fillColor = "#444";
-    if (reservation) {
+    if (isSome(reservation)) {
         fillColor = "#2ab7ca";
-        if (reservation.confirmed) {
+        if (reservation.value.confirmed) {
             fillColor = "#1a7722";
         }
     }
