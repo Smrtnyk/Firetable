@@ -13,7 +13,7 @@
         "fabric": "5.2.4"
     },
     "devDependencies": {
-        "@types/fabric": "4.5.12",
+        "@types/fabric": "4.5.14",
         "@firetable/types": "workspace:*"
     },
     "keywords": [],

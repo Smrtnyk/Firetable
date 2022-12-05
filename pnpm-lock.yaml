@@ -52,13 +52,13 @@ importers:
   packages/floor-creator:
     specifiers:
       '@firetable/types': workspace:*
-      '@types/fabric': 4.5.12
+      '@types/fabric': 4.5.14
       fabric: 5.2.4
     dependencies:
       fabric: 5.2.4
     devDependencies:
       '@firetable/types': link:../types
-      '@types/fabric': 4.5.12
+      '@types/fabric': 4.5.14
 
   packages/frontend:
     specifiers:
@@ -1179,8 +1179,8 @@ packages:
       '@types/serve-static': 1.15.0
     dev: false
 
-  /@types/fabric/4.5.12:
-    resolution: {integrity: sha512-rhRMpy+LMrRyxsDEjD78N48Qo+v7t1GEQvaEz8sm5efNsV+p4CHQCnN2wvgIyqPAIkiAGPPwSfVIBgluQP89Aw==}
+  /@types/fabric/4.5.14:
+    resolution: {integrity: sha512-Hdi/HlG9+7a6eOCGQ0ViwBRxbgSK2Na8SE2oNMdhbn+dRkrH0jrjZVNnSspQzyxqA4OL6A3DotfavTwj7qEz/A==}
     dev: true
 
   /@types/filesystem/0.0.32:
