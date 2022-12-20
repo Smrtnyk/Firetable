@@ -6,7 +6,7 @@
         "deploy": "firebase deploy",
         "start:emulators": "firebase emulators:start --import=./local-db --export-on-exit=./local-db",
         "seed:events": "node packages/functions/lib/src/seed/add-events.js",
-        "seed:generate-admin-local": "node packages/functions/lib/src/seed/generate-admin-local.js",
+        "seed:generate-admin-local": "ts-node-esm packages/functions/src/seed/generate-admin-local.ts",
         "seed:admin-prod": "node packages/functions/lib/src/seed/add-admin-prod.js",
         "dev:frontend": "pnpm --filter frontend dev",
         "build:frontend:spa": "pnpm --filter frontend build:spa",
@@ -14,8 +14,8 @@
     },
     "devDependencies": {
         "@types/web-push": "3.3.2",
-        "@typescript-eslint/eslint-plugin": "5.47.0",
-        "@typescript-eslint/parser": "5.47.0",
+        "@typescript-eslint/eslint-plugin": "5.46.1",
+        "@typescript-eslint/parser": "5.46.1",
         "autoprefixer": "10.4.13",
         "dotenv": "16.0.3",
         "eslint": "8.30.0",
@@ -25,8 +25,9 @@
         "eslint-plugin-promise": "6.1.1",
         "eslint-plugin-quasar": "1.1.0",
         "eslint-plugin-vue": "9.8.0",
-        "firebase-tools": "^11.19.0",
+        "firebase-tools": "^11.18.0",
         "prettier": "2.8.1",
+        "ts-node": "^10.9.1",
         "typescript": "4.9.4"
     },
     "dependencies": {
