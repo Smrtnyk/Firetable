@@ -53,6 +53,7 @@ All contributions and ideas are welcome.
 ![Event info](https://github.com/Smrtnyk/Firetable/blob/master/screenshots/event-info.jpg?raw=true)
 
 ## Some things that would be nice to have
+* [ ] Improve error message if user that is trying to log in is not found
 * [ ] Complete translations for all components
 * [ ] Make cloud function that will remove inactive users that are inactive for more than two months
 * [ ] Limit the amount of users that can be created on functions part
