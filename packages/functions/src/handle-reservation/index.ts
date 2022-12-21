@@ -6,6 +6,7 @@ import { ChangeType, UpdatedTablesDifference } from "../../types/types";
 import { BaseTable } from "@firetable/floor-creator";
 import { Collection, PushSubscriptionDoc } from "@firetable/types";
 import { QueryDocumentSnapshot } from "firebase-functions/lib/v1/providers/firestore";
+import { isSome } from "@firetable/types/dist/esm/src";
 
 const { logger } = functions;
 
@@ -17,15 +18,18 @@ async function addToEventFeed(
 ): Promise<void> {
     let body: string;
     const { reservation, label } = table;
+    if (!isSome(reservation)) {
+        throw new Error("There is no reservation on this table!");
+    }
     switch (change) {
         case ChangeType.ADD:
             body = `${
-                reservation!.reservedBy.email
+                reservation.value.reservedBy.email
             } made new reservation on table ${label}`; // NOSONAR
             break;
         case ChangeType.DELETE:
             body = `${
-                reservation!.reservedBy.email
+                reservation.value.reservedBy.email
             } deleted a reservation on table ${label}`; // NOSONAR
             break;
         default:
@@ -88,12 +92,12 @@ async function handlePushMessagesOnNewReservation(
 
     const { label, reservation } = table;
 
-    if (!reservation) {
+    if (!isSome(reservation)) {
         logger.error("No reservation found!");
         return;
     }
 
-    const { reservedBy, guestName, numberOfGuests } = reservation;
+    const { reservedBy, guestName, numberOfGuests } = reservation.value;
 
     if (!reservedBy || !guestName || !numberOfGuests) {
         logger.error("Reservation is invalid!");

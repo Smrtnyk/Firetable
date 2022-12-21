@@ -10,7 +10,7 @@
         "build": "tsc"
     },
     "dependencies": {
-        "fabric": "5.2.4"
+        "fabric": "5.3.0"
     },
     "devDependencies": {
         "@types/fabric": "4.5.14",
