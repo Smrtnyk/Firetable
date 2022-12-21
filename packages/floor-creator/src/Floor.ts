@@ -10,7 +10,7 @@ import {
     NumberTuple,
 } from "./types";
 import { RoundTableElement } from "./RoundTableElement";
-import { ElementTag, FloorDoc, None, Option, Reservation, Some } from "@firetable/types";
+import { ElementTag, FloorDoc, isSome, None, Option, Reservation, Some } from "@firetable/types";
 
 interface FloorCreationOptions {
     canvas: HTMLCanvasElement;
@@ -263,7 +263,7 @@ function getTableFromGroupElement(ev: fabric.IEvent): Option<BaseTable> {
 }
 
 function containsTables(ev: fabric.IEvent): boolean {
-    return !!getTableFromGroupElement(ev);
+    return isSome(getTableFromGroupElement(ev));
 }
 
 function calculateCanvasScale(containerWidth: number, floorWidth: number) {
