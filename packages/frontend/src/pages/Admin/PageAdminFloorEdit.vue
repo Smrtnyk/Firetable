@@ -149,7 +149,9 @@ async function elementClickHandler(_: Floor, element: Option<BaseTable>) {
 }
 
 function onDeleteElement(element: BaseTable) {
-    element.canvas?.remove(element.canvas.getActiveObject());
+    const elementToDelete = element.canvas?.getActiveObject();
+    if (!elementToDelete) return;
+    element.canvas?.remove();
     element.canvas?.renderAll();
 }
 </script>
