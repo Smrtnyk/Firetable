@@ -1,13 +1,13 @@
 import * as admin from "firebase-admin";
 import { ACTIVITY_STATUS, Collection, Role } from "@firetable/types";
 
-process.env.FIREBASE_AUTH_EMULATOR_HOST = "localhost:9099";
-process.env.FIRESTORE_EMULATOR_HOST = "localhost:4000";
+process.env.FIREBASE_AUTH_EMULATOR_HOST = "127.0.0.1:9099";
+process.env.FIRESTORE_EMULATOR_HOST = "127.0.0.1:4000";
 
-admin.initializeApp({ projectId: "firetable-eu" });
+const app = admin.initializeApp( { projectId: "firetable-eu" });
 
-const auth = admin.auth();
-const db = admin.firestore();
+const auth = app.auth();
+const db = app.firestore();
 
 const ADMIN_MAIL = "admin@firetable.at";
 const ADMIN_PASSWORD = "admin123";

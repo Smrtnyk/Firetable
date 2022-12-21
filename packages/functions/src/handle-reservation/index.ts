@@ -4,9 +4,8 @@ import diff from "diff-arrays-of-objects";
 import { db } from "../init";
 import { ChangeType, UpdatedTablesDifference } from "../../types/types";
 import { BaseTable } from "@firetable/floor-creator";
-import { Collection, PushSubscriptionDoc } from "@firetable/types";
+import { Collection, isSome, PushSubscriptionDoc } from "@firetable/types";
 import { QueryDocumentSnapshot } from "firebase-functions/lib/v1/providers/firestore";
-import { isSome } from "@firetable/types/dist/esm/src";
 
 const { logger } = functions;
 
@@ -19,7 +18,7 @@ async function addToEventFeed(
     let body: string;
     const { reservation, label } = table;
     if (!isSome(reservation)) {
-        throw new Error("There is no reservation on this table!");
+        throw new Error("Reservation not provided on the table!");
     }
     switch (change) {
         case ChangeType.ADD:
