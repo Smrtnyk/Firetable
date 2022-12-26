@@ -1,6 +1,6 @@
 import { Floor } from "./Floor.js";
 import { BaseTable, FloorElementTypes } from "./types.js";
-import { FloorDoc } from "@firetable/types";
+import { FloorDoc, isNone, isSome } from "@firetable/types";
 
 export function hasFloorTables(floor: Floor): boolean {
     const allGroups = floor.canvas.getObjects();
@@ -40,11 +40,11 @@ export function getTables(floor: Floor): BaseTable[] {
 }
 
 export function getFreeTables(floor: Floor): BaseTable[] {
-    return getTables(floor).filter(({ reservation }) => !reservation);
+    return getTables(floor).filter(({ reservation }) => isNone(reservation));
 }
 
 export function getReservedTables(floor: Floor): BaseTable[] {
-    return getTables(floor).filter(({ reservation }) => !!reservation);
+    return getTables(floor).filter(({ reservation }) => !isSome(reservation));
 }
 
 export function extractAllTablesLabels(floor: Floor): string[] {
