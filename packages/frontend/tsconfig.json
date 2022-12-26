@@ -5,6 +5,8 @@
         "baseUrl": ".",
         "skipLibCheck": true,
         "module": "ESNext",
+        "moduleResolution": "NodeNext",
+        "target": "ESNext",
         "paths": {
             "src/*": [
                 "src/*"

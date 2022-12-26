@@ -3,11 +3,14 @@
         <div class="col-10 flex justify-between">
             <div class="row">
                 <div
-                    v-if="isRoundTable(selectedElement.value) && selectedElement.value.radius"
+                    v-if="
+                        isRoundTable(selectedElement.value.value) &&
+                        selectedElement.value.value.radius
+                    "
                     class="col-4 q-pa-xs q-pl-none"
                 >
                     <q-input
-                        :model-value="selectedElement.value.radius"
+                        :model-value="selectedElement.value.value.radius"
                         filled
                         label="Radius"
                         readonly
@@ -75,8 +78,8 @@ const selectedElement = computed(() => {
 });
 
 async function updateTableLabel(newId: string): Promise<void> {
-    if (!selectedElement.value || !newId) return;
-    if (!isTable(selectedElement.value)) return;
+    if (!selectedElement.value || !isSome(selectedElement.value) || !newId) return;
+    if (!isTable(selectedElement.value.value)) return;
 
     try {
         // props.selectedElement.canvas.updateTableId(selectedElement.value, newId);
@@ -94,8 +97,8 @@ async function deleteElement() {
     }
 }
 
-function getElementWidth(e: any): number {
-    return Math.round(e.group.width * e.group.scaleX);
+function getElementWidth(e: Some<BaseTable>): number {
+    return Math.round((e.value.group?.width || 0) * (e.value.group?.scaleX || 0));
 }
 
 function getElementHeight(e: Some<BaseTable>): number {
