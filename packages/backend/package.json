@@ -1,18 +1,19 @@
 {
-  "name": "@firetable/backend",
-  "version": "1.0.0",
-  "description": "",
-  "main": "./dist/src/firebase/index.js",
+    "name": "@firetable/backend",
+    "version": "1.0.0",
+    "description": "",
+    "type": "module",
     "types": "./dist/src/firebase/index.d.ts",
-  "scripts": {
-     "test": "echo \"Error: no test specified\" && exit 1",
-      "build": "tsc"
-  },
+    "exports": "./dist/src/firebase/index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "tsc"
+    },
     "devDependencies": {
         "@firetable/types": "workspace:*",
         "@firetable/floor-creator": "workspace:*"
     },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
 }

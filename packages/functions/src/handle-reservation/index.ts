@@ -1,11 +1,12 @@
-import { sendNotification } from "web-push";
+import webpush from "web-push";
 import * as functions from "firebase-functions";
 import diff from "diff-arrays-of-objects";
-import { db } from "../init";
-import { ChangeType, UpdatedTablesDifference } from "../../types/types";
+import { db } from "../init.js";
+import { ChangeType, UpdatedTablesDifference } from "../../types/types.js";
 import { BaseTable } from "@firetable/floor-creator";
 import { Collection, isSome, PushSubscriptionDoc } from "@firetable/types";
-import { QueryDocumentSnapshot } from "firebase-functions/lib/v1/providers/firestore";
+import { firestore } from "firebase-admin";
+import QueryDocumentSnapshot = firestore.QueryDocumentSnapshot;
 
 const { logger } = functions;
 
@@ -70,7 +71,7 @@ async function sendPushMessageToSubscriptions(
         }
         logger.log("[INFO] Sending push to devices!");
         try {
-            await sendNotification({ endpoint, keys }, `${title}|${body}`);
+            await webpush.sendNotification({ endpoint, keys }, `${title}|${body}`);
         } catch (error: any) {
             if (
                 error.body.includes(

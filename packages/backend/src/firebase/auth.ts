@@ -1,5 +1,5 @@
-import { initializeFirebase } from "./base";
-import { usersCollection } from "./db";
+import { initializeFirebase } from "./base.js";
+import { usersCollection } from "./db.js";
 import { httpsCallable } from "firebase/functions";
 import { doc, updateDoc } from "firebase/firestore";
 import { signOut, signInWithEmailAndPassword, UserCredential } from "firebase/auth";

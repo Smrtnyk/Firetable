@@ -1,6 +1,6 @@
 import { fabric } from "fabric";
-import { TableElement } from "./TableElement";
-import { RESOLUTION, TABLE_HEIGHT, TABLE_WIDTH } from "./constants";
+import { TableElement } from "./TableElement.js";
+import { RESOLUTION, TABLE_HEIGHT, TABLE_WIDTH } from "./constants.js";
 import {
     BaseTable,
     CreateTableOptions,
@@ -8,8 +8,8 @@ import {
     FloorDoubleClickHandler,
     FloorMode,
     NumberTuple,
-} from "./types";
-import { RoundTableElement } from "./RoundTableElement";
+} from "./types.js";
+import { RoundTableElement } from "./RoundTableElement.js";
 import { ElementTag, FloorDoc, isSome, None, Option, Reservation, Some } from "@firetable/types";
 
 interface FloorCreationOptions {

@@ -1,4 +1,4 @@
-import * as admin from "firebase-admin";
+import { default as admin } from "firebase-admin";
 import { ACTIVITY_STATUS, Collection, Role } from "@firetable/types";
 
 process.env.FIREBASE_AUTH_EMULATOR_HOST = "127.0.0.1:9099";

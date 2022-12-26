@@ -5,8 +5,8 @@ import {
     guestDoc,
     eventFloorDoc,
     eventDoc,
-} from "./db";
-import { initializeFirebase } from "./base";
+} from "./db.js";
+import { initializeFirebase } from "./base.js";
 import { httpsCallable } from "firebase/functions";
 import {
     DocumentData,
@@ -19,13 +19,14 @@ import {
     deleteDoc,
     query,
 } from "firebase/firestore";
-import { CreateEventPayload, EventDoc, GuestData, Option } from "@firetable/types";
+import { CreateEventPayload, EventDoc, GuestData, isSome, Option } from "@firetable/types";
 import { Floor } from "@firetable/floor-creator";
 
 export async function getEvents(lastDocument: Option<DocumentData>): Promise<EventDoc[]> {
+    const startAfterVal = isSome(lastDocument) ? lastDocument.value : null;
     const orderByDateQuery = orderBy("date");
     const limitQuery = limit(20);
-    const startAfterQuery = startAfter(lastDocument);
+    const startAfterQuery = startAfter(startAfterVal);
     const eventsDocs = await getDocs(
         query(eventsCollection(), orderByDateQuery, limitQuery, startAfterQuery)
     );

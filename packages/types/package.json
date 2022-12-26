@@ -2,21 +2,17 @@
     "name": "@firetable/types",
     "version": "1.0.0",
     "description": "",
-    "main": "./dist/cjs/src/index.js",
-    "types": "./dist/cjs/src/index.d.ts",
-    "typings": "./dist/cjs/src/index.d.ts",
+    "type": "module",
     "exports": {
         ".": {
-            "types": "./dist/esm/src/index.d.ts",
-            "import": "./dist/esm/src/index.js",
-            "require": "./dist/cjs/src/index.js"
+            "types": "./dist/src/index.d.ts",
+            "import": "./dist/src/index.js",
+            "require": "./dist/src/index.js"
         }
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "pnpm run build:esm && pnpm run build:cjs",
-        "build:esm": "tsc",
-        "build:cjs": "tsc -p tsconfig.cjs.json"
+        "build": "tsc"
     },
     "keywords": [],
     "author": "",

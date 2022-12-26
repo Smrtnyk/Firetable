@@ -4,6 +4,7 @@
         "isolatedModules": false,
         "baseUrl": ".",
         "skipLibCheck": true,
+        "module": "ESNext",
         "paths": {
             "src/*": [
                 "src/*"

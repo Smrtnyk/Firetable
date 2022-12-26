@@ -1,6 +1,6 @@
-import { Floor } from "./Floor";
-import { TableElement } from "./TableElement";
-import { RoundTableElement } from "./RoundTableElement";
+import { Floor } from "./Floor.js";
+import { TableElement } from "./TableElement.js";
+import { RoundTableElement } from "./RoundTableElement.js";
 import { ElementTag, Option } from "@firetable/types";
 
 export type FloorDoubleClickHandler = (floor: Floor, coords: NumberTuple) => void;

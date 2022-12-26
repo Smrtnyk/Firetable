@@ -1,6 +1,6 @@
 import { QueryDocumentSnapshot } from "firebase/firestore";
-import { FloorDoc } from "./floor";
-import { User } from "./auth";
+import { FloorDoc } from "./floor.js";
+import { User } from "./auth.js";
 
 export interface CreateEventForm {
     name: string;

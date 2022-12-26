@@ -1,4 +1,4 @@
-import * as admin from "firebase-admin";
+import { default as admin } from "firebase-admin";
 import * as functions from "firebase-functions";
 
 const app = admin.initializeApp(functions.config().firebase);

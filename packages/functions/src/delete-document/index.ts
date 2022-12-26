@@ -1,4 +1,4 @@
-import { db } from "../init";
+import { db } from "../init.js";
 
 export async function deleteDocument({ col, id }: { col: string, id: string }): Promise<void> {
     const document = db.collection(col).doc(id);

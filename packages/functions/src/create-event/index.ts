@@ -1,5 +1,5 @@
 import * as functions from "firebase-functions";
-import { db, storage } from "../init";
+import { db, storage } from "../init.js";
 import stream from "stream";
 import { Collection, CreateEventPayload } from "@firetable/types";
 

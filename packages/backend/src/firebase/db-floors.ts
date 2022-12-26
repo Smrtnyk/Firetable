@@ -1,4 +1,4 @@
-import { floorDoc, floorsCollection } from "./db";
+import { floorDoc, floorsCollection } from "./db.js";
 import { deleteDoc, addDoc } from "firebase/firestore";
 import { FloorDoc } from "@firetable/types";
 

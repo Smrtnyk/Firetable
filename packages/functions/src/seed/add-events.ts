@@ -1,4 +1,4 @@
-import { db } from "../init";
+import { db } from "../init.js";
 import { faker } from "@faker-js/faker";
 
 const NUM_OF_FAKE_DATA = 100;

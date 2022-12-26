@@ -1,4 +1,4 @@
-import { auth, db } from "../init";
+import { auth, db } from "../init.js";
 import * as admin from "firebase-admin";
 import { ACTIVITY_STATUS, Collection, Role } from "@firetable/types";
 

@@ -1,4 +1,4 @@
-import { fcm } from "./db";
+import { fcm } from "./db.js";
 import { addDoc } from "firebase/firestore";
 
 export function savePushSubscription(subscription: PushSubscriptionJSON) {

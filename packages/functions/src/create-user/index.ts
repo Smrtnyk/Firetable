@@ -1,4 +1,4 @@
-import { auth, db } from "../init";
+import { auth, db } from "../init.js";
 import * as functions from "firebase-functions";
 import { ACTIVITY_STATUS, Collection, CreateUserPayload } from "@firetable/types";
 

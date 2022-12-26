@@ -1,54 +1,54 @@
 import * as functions from "firebase-functions";
 // import * as vapidKeys from "./vapid-keys.json";
 // import { setVapidDetails } from "web-push";
-import { handleReservation } from "./handle-reservation";
-import { handleEventImageWhenEventDeleted } from "./handle-event-image-when-event-deleted";
-import { createEvent } from "./create-event";
-import { createUser } from "./create-user";
-import { deleteUser } from "./delete-user";
-import { deleteDocument } from "./delete-document";
-import { clearOldEvents } from "./clear-old-events";
+import { handleReservation } from "./handle-reservation/index.js";
+import { handleEventImageWhenEventDeleted as handleEventImageWhenEventDeletedFn } from "./handle-event-image-when-event-deleted/index.js";
+import { createEvent as createEventFn } from "./create-event/index.js";
+import { createUser as createUserFn } from "./create-user/index.js";
+import { deleteUser as deleteUserFn } from "./delete-user/index.js";
+import { deleteDocument } from "./delete-document/index.js";
+import { clearOldEvents as clearOldEventsFn } from "./clear-old-events/index.js";
 import { Collection } from "@firetable/types";
 
 // setVapidDetails(vapidKeys.subject, vapidKeys.publicKey, vapidKeys.privateKey);
 
 // Everything that has to do with events
-exports.createEvent = functions
+export const createEvent = functions
     .region("europe-west3")
     .https
-    .onCall(createEvent);
+    .onCall(createEventFn);
 
-exports.handleEventImageWhenEventDeleted = functions
+export const handleEventImageWhenEventDeleted = functions
     .region("europe-west3")
     .firestore
     .document(`${Collection.EVENTS}/{eventId}`)
-    .onDelete(handleEventImageWhenEventDeleted);
+    .onDelete(handleEventImageWhenEventDeletedFn);
 
-exports.handleWhenEventTablesChange = functions
+export const handleWhenEventTablesChange = functions
     .region("europe-west3")
     .firestore
     .document(`${Collection.EVENTS}/{eventId}/floors/{mapId}`)
     .onUpdate(handleReservation);
 
 // Everything that has to do with auth
-exports.createUser = functions
+export const createUser = functions
     .region("europe-west3")
     .https
-    .onCall(createUser);
-exports.deleteUser = functions
+    .onCall(createUserFn);
+export const deleteUser = functions
     .region("europe-west3")
     .https
-    .onCall(deleteUser);
+    .onCall(deleteUserFn);
 
 // Generic stuff
-exports.deleteCollection = functions
+export const deleteCollection = functions
     .region("europe-west3")
     .https
     .onCall(deleteDocument);
 
 // Crons
-exports.clearOldEvents = functions
+export const clearOldEvents = functions
     .region("europe-west3")
     .pubsub
     .schedule("every day 00:00")
-    .onRun(clearOldEvents);
+    .onRun(clearOldEventsFn);

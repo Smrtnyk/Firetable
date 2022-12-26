@@ -1,4 +1,4 @@
-import { initializeFirebase } from "./base";
+import { initializeFirebase } from "./base.js";
 import { httpsCallable } from "firebase/functions";
 import { collection, doc } from "firebase/firestore";
 import { Collection } from "@firetable/types";

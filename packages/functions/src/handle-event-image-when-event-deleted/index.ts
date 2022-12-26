@@ -1,5 +1,5 @@
 import * as functions from "firebase-functions";
-import { storage } from "../init";
+import { storage } from "../init.js";
 import { Collection } from "@firetable/types";
 
 export function handleEventImageWhenEventDeleted(snapshot: functions.firestore.QueryDocumentSnapshot, context: functions.EventContext): Promise<unknown> {

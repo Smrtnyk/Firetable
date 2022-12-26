@@ -1,6 +1,6 @@
 import { fabric } from "fabric";
-import { FloorElementTypes } from "./types";
-import { determineTableColor } from "./utils";
+import { FloorElementTypes } from "./types.js";
+import { determineTableColor } from "./utils.js";
 import { isSome, None, Option, Reservation } from "@firetable/types";
 
 interface CircleTableElementOptions extends fabric.ICircleOptions {

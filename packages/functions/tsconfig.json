@@ -1,14 +1,16 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
+        "module": "ESNext",
+        "moduleResolution": "NodeNext",
         "noImplicitReturns": true,
         "noUnusedLocals": true,
         "outDir": "./lib",
         "sourceMap": true,
         "strict": true,
-        "target": "es2017",
+        "target": "ES2021",
         "esModuleInterop": true,
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
+        "allowSyntheticDefaultImports": true
     },
     "compileOnSave": true,
     "include": [

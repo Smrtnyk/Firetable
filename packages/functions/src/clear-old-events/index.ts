@@ -1,5 +1,5 @@
-import { deleteDocument } from "../delete-document";
-import { db } from "../init";
+import { deleteDocument } from "../delete-document/index.js";
+import { db } from "../init.js";
 import { firestore } from "firebase-admin";
 import { Collection } from "@firetable/types";
 
