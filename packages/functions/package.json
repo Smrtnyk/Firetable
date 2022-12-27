@@ -3,7 +3,7 @@
     "main": "lib/src/index.js",
     "type": "module",
     "scripts": {
-        "lint": "eslint -c .eslintrc.js src/** --fix",
+        "lint": "eslint -c .eslintrc.cjs src/** --fix",
         "build": "tsc",
         "dev": "tsc --watch",
         "serve": "npm run build && firebase serve --only functions",

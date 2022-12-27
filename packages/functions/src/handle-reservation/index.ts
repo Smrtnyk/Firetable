@@ -23,14 +23,10 @@ async function addToEventFeed(
     }
     switch (change) {
         case ChangeType.ADD:
-            body = `${
-                reservation.value.reservedBy.email
-            } made new reservation on table ${label}`; // NOSONAR
+            body = `${reservation.value.reservedBy.email} made new reservation on table ${label}`;
             break;
         case ChangeType.DELETE:
-            body = `${
-                reservation.value.reservedBy.email
-            } deleted a reservation on table ${label}`; // NOSONAR
+            body = `${reservation.value.reservedBy.email} deleted a reservation on table ${label}`;
             break;
         default:
             body = "";
@@ -44,15 +40,10 @@ async function addToEventFeed(
 
 async function getMessagingTokensFromFirestore(): Promise<PushSubscriptionDoc[]> {
     const tokensColl = await db.collection(Collection.FCM).get();
-    const tokens: PushSubscriptionDoc[] = [];
-    tokensColl.docs.forEach((doc) => {
-        if (doc.exists) {
-            tokens.push({ id: doc.id, ...doc.data() } as PushSubscriptionDoc);
-        }
-    });
-
-    logger.log("[INFO] Found tokens in db " + tokens);
-    return tokens;
+    return tokensColl
+        .docs
+        .filter(doc => doc.exists)
+        .map(doc => ({ id: doc.id, ...doc.data() }) as PushSubscriptionDoc);
 }
 
 async function sendPushMessageToSubscriptions(
@@ -62,25 +53,15 @@ async function sendPushMessageToSubscriptions(
 ): Promise<void> {
     for (const token of tokens) {
         const { endpoint, keys, id: docID } = token;
-        logger.log("Processing token: ", { endpoint, keys });
         if (!endpoint.startsWith("https://fcm.googleapis")) {
-            logger.log(
-                "Subscription endpoint does not belong to google cloud!"
-            );
             continue;
         }
-        logger.log("[INFO] Sending push to devices!");
         try {
             await webpush.sendNotification({ endpoint, keys }, `${title}|${body}`);
         } catch (error: any) {
-            if (
-                error.body.includes(
-                    "push subscription has unsubscribed or expired"
-                )
-            ) {
+            if (error.body.includes("push subscription has unsubscribed or expired")) {
                 await db.collection(Collection.FCM).doc(docID).delete();
             }
-            logger.error("Error occurred while sending subscription", error);
         }
     }
 }
@@ -88,8 +69,6 @@ async function sendPushMessageToSubscriptions(
 async function handlePushMessagesOnNewReservation(
     table: BaseTable
 ): Promise<void> {
-    logger.log("Reservation is added!", table);
-
     const { label, reservation } = table;
 
     if (!isSome(reservation)) {
@@ -115,26 +94,12 @@ function getDifferenceBetweenTables(
     prevData: FirebaseFirestore.DocumentData,
     newData: FirebaseFirestore.DocumentData
 ): UpdatedTablesDifference {
-    if (!newData || !prevData) {
-        logger.error("Invalid data!");
-    }
-    const prevTablesReservations: BaseTable[] = prevData.json.objects.map((obj: any) => {
-        return obj.objects[0];
-    }).filter(
-        ({ reservation }: BaseTable) => !!reservation
-    );
-
-    const newTablesReservations: BaseTable[] = newData.json.objects.map((obj: any) => {
-        return obj.objects[0];
-    }).filter(
-        ({ reservation }: BaseTable) => !!reservation
-    );
-
-    logger.log("Init on new reservation!");
+    const prevTablesReservations: BaseTable[] = extractReservedTablesFrom(prevData.json);
+    const newTablesReservations: BaseTable[] = extractReservedTablesFrom(newData.json);
     const { added, removed } = diff(
         prevTablesReservations,
         newTablesReservations,
-        "id"
+        "label"
     );
     const { updated } = diff(
         prevTablesReservations,
@@ -147,6 +112,13 @@ function getDifferenceBetweenTables(
         removed,
         updated,
     };
+}
+
+function extractReservedTablesFrom(json: any): BaseTable[] {
+    return json
+        .objects
+        .map(({ objects }: any) => objects[0])
+        .filter(({ reservation }: BaseTable) => isSome(reservation));
 }
 
 async function handleAddedReservation(
@@ -186,21 +158,13 @@ async function updateEventReservationCount(
     let overallReserved = 0;
     for (const doc of allEventFloors.docs) {
         const floor = doc.data();
-        const tables = floor.json.objects.map((obj: any) => {
-            return obj.objects[0];
-        });
-        logger.log(tables);
+        const tables = floor.json.objects.map(({ objects }: any) => objects[0]);
         overallTables += tables.length;
-        overallReserved += tables.filter(
-            (table: BaseTable) => !!table.reservation
-        ).length;
+        overallReserved += tables.filter((table: BaseTable) => isSome(table.reservation)).length;
     }
 
     const percentage = (overallReserved / overallTables) * PERCENTILE_BASE;
-    logger.log(percentage);
-    await eventRef.update({
-        reservedPercentage: percentage,
-    });
+    await eventRef.update({ reservedPercentage: percentage });
 }
 
 export async function handleReservation(
@@ -208,7 +172,7 @@ export async function handleReservation(
     context: functions.EventContext
 ): Promise<void> {
     const { added } = getDifferenceBetweenTables(before.data(), after.data());
-
+    logger.info(added);
     await handleAddedReservation(context, added);
     await updateEventReservationCount(context);
 }

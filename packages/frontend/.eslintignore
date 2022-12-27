@@ -4,4 +4,4 @@
 *.scss
 *.woff
 *.html
-.eslintrc.js
+.eslintrc.cjs

@@ -4,8 +4,8 @@ module.exports = {
     // Must use parserOptions instead of "parser" to allow vue-eslint-parser to keep working
     // `parser: 'vue-eslint-parser'` is already included with any 'plugin:vue/**' config and should be omitted
     parserOptions: {
-        parser: require.resolve('@typescript-eslint/parser'),
-        extraFileExtensions: [ '.vue' ]
+        parser: require.resolve("@typescript-eslint/parser"),
+        extraFileExtensions: [".vue"],
     },
 
     env: {
@@ -68,5 +68,5 @@ module.exports = {
         "@typescript-eslint/semi": ["error", "always"],
         "@typescript-eslint/ban-ts-comment": "off",
     },
-    ignorePatterns: ["**/dist/*"]
+    ignorePatterns: ["**/dist/*"],
 };
