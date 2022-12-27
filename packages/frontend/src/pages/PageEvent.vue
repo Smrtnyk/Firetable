@@ -37,12 +37,13 @@ import {
     Some,
     isSome,
 } from "@firetable/types";
-import { updateEventFloorData } from "@firetable/backend";
+import { floorDoc, updateEventFloorData } from "@firetable/backend";
 
 interface State {
     showMapsExpanded: boolean;
     activeFloor: Option<Floor>;
     floorInstances: Floor[];
+    activeTablesAnimationInterval: Option<number>;
 }
 
 interface Props {
@@ -60,6 +61,7 @@ const state = reactive<State>({
     showMapsExpanded: false,
     activeFloor: None(),
     floorInstances: [],
+    activeTablesAnimationInterval: None(),
 });
 const eventsStore = useEventsStore();
 const authStore = useAuthStore();
@@ -93,7 +95,14 @@ const allReservedTables = computed(() => {
 });
 
 function onAutocompleteClear() {
-    // Implement
+    if (isSome(state.activeTablesAnimationInterval)) {
+        clearInterval(state.activeTablesAnimationInterval.value);
+    }
+    state.floorInstances.forEach((floor) => {
+        const tables = getTables(floor);
+        tables.forEach((table) => table.clearAnimation());
+        floor.canvas.renderAll();
+    });
 }
 
 function isActiveFloor(floor: Floor | FloorDoc) {
@@ -237,23 +246,15 @@ function tableClickHandler(floor: Floor, element: Option<BaseTable>) {
     }
 }
 
-function onTableFound(/* tables: BaseTable[] */) {
+function onTableFound(tables: BaseTable[]) {
     onAutocompleteClear();
-    // for (const table of tables) {
-
-    //
-    //     const { groupedWith } = reservation;
-    //
-    //     await nextTick();
-    //
-    //     for (const label of groupedWith) {
-    //         const floorName = whiteSpaceToUnderscore(table.floor);
-    //         const element = document.querySelector(
-    //             `.PageEvent .eventFloor .${floorName} .table__${id}`
-    //         );
-    //         element?.classList.add("table__blink"); // NOSONAR
-    //     }
-    // }
+    function animate() {
+        for (const table of tables) {
+            table.animateWidthAndHeight();
+        }
+        state.floorInstances.forEach((floor) => floor.canvas.renderAll());
+    }
+    state.activeTablesAnimationInterval = Some(window.setInterval(animate, 100));
 }
 
 function instantiateFloor(floorDoc: FloorDoc) {

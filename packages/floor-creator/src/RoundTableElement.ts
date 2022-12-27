@@ -31,11 +31,18 @@ export class RoundTableElement extends fabric.Circle {
         };
     }
 
+    clearAnimation() {
+        super.set("opacity", 1);
+    }
+
     _render(ctx: CanvasRenderingContext2D) {
         super._render(ctx);
         ctx.strokeStyle = "#000";
         ctx.stroke();
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    animateWidthAndHeight() {}
 }
 
 // @ts-ignore

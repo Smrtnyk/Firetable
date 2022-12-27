@@ -44,7 +44,7 @@ export function getFreeTables(floor: Floor): BaseTable[] {
 }
 
 export function getReservedTables(floor: Floor): BaseTable[] {
-    return getTables(floor).filter(({ reservation }) => !isSome(reservation));
+    return getTables(floor).filter(({ reservation }) => isSome(reservation));
 }
 
 export function extractAllTablesLabels(floor: Floor): string[] {

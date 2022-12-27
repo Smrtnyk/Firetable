@@ -14,6 +14,7 @@ export class TableElement extends fabric.Rect {
     type: FloorElementTypes = FloorElementTypes.RECT_TABLE;
     reservation: Option<Reservation> = None();
     label: string;
+    animDirection = "up";
 
     constructor(options: ITableElementOptions) {
         const fill = determineTableColor(options.reservation);
@@ -30,6 +31,7 @@ export class TableElement extends fabric.Rect {
             ...super.toObject(),
             label: this.label,
             reservation: this.reservation,
+            objectCaching: false,
         };
     }
 
@@ -37,6 +39,33 @@ export class TableElement extends fabric.Rect {
         super._render(ctx);
         ctx.strokeStyle = "#000";
         ctx.stroke();
+    }
+
+    clearAnimation() {
+        super.set("opacity", 1);
+    }
+
+    animateWidthAndHeight() {
+        const superOpacity = super.get("opacity");
+        if (typeof superOpacity !== "number") return;
+
+        super.set("dirty", true);
+        console.log("animating");
+        const interval = 0.1;
+
+        if (superOpacity >= 0 && superOpacity <= 1) {
+            const actualInterval = this.animDirection === "up" ? interval : -interval;
+            super.set("opacity", superOpacity + actualInterval);
+        }
+
+        if (superOpacity >= 1) {
+            this.animDirection = "down";
+            super.set("opacity", superOpacity - interval);
+        }
+        if (superOpacity <= 0) {
+            this.animDirection = "up";
+            super.set("opacity", superOpacity + interval);
+        }
     }
 }
 
