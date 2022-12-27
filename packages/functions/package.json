@@ -15,9 +15,9 @@
         "find-dead-code": "npx ts-prune"
     },
     "dependencies": {
-        "@google-cloud/functions-framework": "1.10.0",
+        "@google-cloud/functions-framework": "3.1.3",
         "diff-arrays-of-objects": "1.1.9",
-        "firebase-admin": "11.4.0",
+        "firebase-admin": "11.4.1",
         "firebase-functions": "4.1.1"
     },
     "devDependencies": {

@@ -75,7 +75,7 @@ const reservationsStatus = computed(() => {
     const reservations = tables.filter((table) => isSome(table.reservation));
     const unreserved = tables.length - reservations.length;
     const pending = reservations.filter(
-        (table) => isSome(table.reservation) && table.reservation.value.confirmed
+        (table) => isSome(table.reservation) && !table.reservation.value.confirmed
     ).length;
     const confirmed = reservations.length - pending;
     const reserved = reservations.length;

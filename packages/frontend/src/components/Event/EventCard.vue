@@ -15,8 +15,8 @@ const props = defineProps<Props>();
             <div class="event-success-indicator" v-if="props.event.reservedPercentage >= 75">
                 <q-icon name="fire" color="warning" class="bg-warning-shadow rounded" size="md" />
                 <q-tooltip>
-                    {{ props.event.reservedPercentage }}% of tables are reserved. Event is
-                    performing well!
+                    {{ Math.round(props.event.reservedPercentage) }}% of tables are reserved. Event
+                    is performing well!
                 </q-tooltip>
             </div>
 
