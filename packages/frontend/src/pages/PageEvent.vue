@@ -37,7 +37,7 @@ import {
     Some,
     isSome,
 } from "@firetable/types";
-import { floorDoc, updateEventFloorData } from "@firetable/backend";
+import { updateEventFloorData } from "@firetable/backend";
 
 interface State {
     showMapsExpanded: boolean;
