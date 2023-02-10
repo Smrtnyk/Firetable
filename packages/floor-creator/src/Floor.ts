@@ -12,6 +12,7 @@ import {
 import { RoundTableElement } from "./RoundTableElement.js";
 import { ElementTag, FloorDoc, isSome, None, Option, Reservation, Some } from "@firetable/types";
 import { match } from "ts-pattern";
+import { isTable } from "./type-guards";
 
 interface FloorCreationOptions {
     canvas: HTMLCanvasElement;
@@ -179,10 +180,7 @@ export class Floor {
             fontFamily: "Helvetica",
             fill: "#fff",
         });
-        return new fabric.Group([table, text], {
-            left: x,
-            top: y,
-        });
+        return this.createGroup([table, text], x, y);
     }
 
     private addRectTableElement({ label, x, y }: CreateTableOptions) {
@@ -202,10 +200,11 @@ export class Floor {
             fontFamily: "Helvetica",
             fill: "#fff",
         });
-        return new fabric.Group([rect, text], {
-            left: x,
-            top: y,
-        });
+        return this.createGroup([rect, text], x, y);
+    }
+
+    createGroup(args: fabric.Object[], x: number, y: number): fabric.Group {
+        return new fabric.Group(args, { left: x, top: y });
     }
 
     drawGrid() {
@@ -250,10 +249,10 @@ export class Floor {
 
 function getTableFromGroupElement(ev: fabric.IEvent): Option<BaseTable> {
     const group = ev.target;
-    // @ts-ignore
-    const table = group?._objects[0];
-    if (table instanceof TableElement || table instanceof RoundTableElement) {
-        return Some(table);
+    // @ts-ignore -- table is always set first on the group, text second
+    const maybeTable = group?._objects[0];
+    if (isTable(maybeTable)) {
+        return Some(maybeTable);
     }
     return None();
 }
