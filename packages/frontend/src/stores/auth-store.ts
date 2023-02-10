@@ -25,11 +25,11 @@ export const useAuthStore = defineStore("auth", {
     },
     getters: {
         isAdmin(): boolean {
-            return isSome(this.user) && this.user.value.role === Role.ADMIN;
+            return isSome(this.user) && this.user.unwrap().role === Role.ADMIN;
         },
 
         isLoggedIn(): boolean {
-            return isSome(this.user) && !!this.user.value.email;
+            return isSome(this.user) && !!this.user.unwrap().email;
         },
     },
     actions: {

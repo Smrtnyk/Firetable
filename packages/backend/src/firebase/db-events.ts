@@ -23,7 +23,7 @@ import { CreateEventPayload, EventDoc, GuestData, isSome, Option } from "@fireta
 import { Floor } from "@firetable/floor-creator";
 
 export async function getEvents(lastDocument: Option<DocumentData>): Promise<EventDoc[]> {
-    const startAfterVal = isSome(lastDocument) ? lastDocument.value : null;
+    const startAfterVal = isSome(lastDocument) ? lastDocument.unwrap() : null;
     const orderByDateQuery = orderBy("date");
     const limitQuery = limit(20);
     const startAfterQuery = startAfter(startAfterVal);

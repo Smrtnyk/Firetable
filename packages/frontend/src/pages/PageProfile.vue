@@ -9,7 +9,7 @@ const user = computed(() => authStore.user);
 
 const avatar = computed(() => {
     if (isNone(user.value)) return "";
-    const [first, last] = user.value.value.name.split(" ");
+    const [first, last] = user.value.unwrap().name.split(" ");
     if (!last) {
         return first[0];
     }
@@ -19,7 +19,7 @@ const avatar = computed(() => {
 
 <template>
     <div class="PageProfile" v-if="isSome(user)">
-        <FTTitle :title="`Profile of ${user.value.name}`" />
+        <FTTitle :title="`Profile of ${user.unwrap().name}`" />
         <q-item>
             <q-item-section side>
                 <q-avatar size="48px" class="ft-avatar">
@@ -28,13 +28,19 @@ const avatar = computed(() => {
             </q-item-section>
             <q-item-section>
                 <q-card class="ft-card q-pa-md">
-                    <q-item-label>{{ user.value.email }}</q-item-label>
+                    <q-item-label>{{ user.unwrap().email }}</q-item-label>
                     <q-separator class="q-my-sm" />
-                    <q-item-label v-if="user.value.name">Name: {{ user.value.name }}</q-item-label>
-                    <q-item-label>Role: {{ user.value.role }}</q-item-label>
-                    <q-item-label>Region: {{ user.value.region }}</q-item-label>
-                    <q-item-label v-if="user.value.address">{{ user.value.address }}</q-item-label>
-                    <q-item-label v-if="user.value.mobile">{{ user.value.mobile }}</q-item-label>
+                    <q-item-label v-if="user.unwrap().name"
+                        >Name: {{ user.unwrap().name }}</q-item-label
+                    >
+                    <q-item-label>Role: {{ user.unwrap().role }}</q-item-label>
+                    <q-item-label>Region: {{ user.unwrap().region }}</q-item-label>
+                    <q-item-label v-if="user.unwrap().address">{{
+                        user.unwrap().address
+                    }}</q-item-label>
+                    <q-item-label v-if="user.unwrap().mobile">{{
+                        user.unwrap().mobile
+                    }}</q-item-label>
                 </q-card>
             </q-item-section>
         </q-item>

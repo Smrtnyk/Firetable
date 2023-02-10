@@ -6,14 +6,14 @@ export function isNone<T>(option: Option<T>): option is None {
 }
 export interface Some<T> {
     kind: "someOption";
-    value: T;
+    unwrap: () => T;
 }
 export interface None {
     kind: "noneOption";
 }
 export type Option<T> = Some<T> | None;
 export function Some<T>(value: T): Some<T> {
-    return { kind: "someOption", value };
+    return { kind: "someOption", unwrap: () => value };
 }
 export function None(): None {
     return { kind: "noneOption" };

@@ -15,7 +15,7 @@ import FTDialog from "components/FTDialog.vue";
 import { useQuasar } from "quasar";
 import { config } from "src/config";
 import { BaseTable, Floor, FloorMode, getTablesFromFloorDoc } from "@firetable/floor-creator";
-import { Collection, EventDoc, EventFeedDoc, FloorDoc, isSome, Role, User } from "@firetable/types";
+import { Collection, EventDoc, EventFeedDoc, FloorDoc, Role, User } from "@firetable/types";
 import { updateEventFloorData, updateEventProperty } from "@firetable/backend";
 import { where } from "firebase/firestore";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
@@ -72,11 +72,9 @@ const eventData = computed(() => eventFloors.value.map(getTablesFromFloorDoc).fl
 
 const reservationsStatus = computed(() => {
     const tables = eventData.value as unknown as BaseTable[];
-    const reservations = tables.filter((table) => isSome(table.reservation));
+    const reservations = tables.filter((table) => !!table.reservation);
     const unreserved = tables.length - reservations.length;
-    const pending = reservations.filter(
-        (table) => isSome(table.reservation) && !table.reservation.value.confirmed
-    ).length;
+    const pending = reservations.filter((table) => !table.reservation?.confirmed).length;
     const confirmed = reservations.length - pending;
     const reserved = reservations.length;
 

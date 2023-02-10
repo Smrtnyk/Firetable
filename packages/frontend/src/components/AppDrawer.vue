@@ -50,7 +50,7 @@ const user = computed(() => authStore.user);
 const adminLinksCollection = computed(() => (props.showAdminLinks ? adminLinks.value : []));
 const avatar = computed(() => {
     if (isNone(user.value)) return "";
-    const [first, last] = user.value.value.name.split(" ");
+    const [first, last] = user.value.unwrap().name.split(" ");
     if (!last) {
         return first[0];
     }
@@ -65,7 +65,7 @@ function setDarkMode(newValue: boolean) {
 function toggleUserActivityStatus(newValue: boolean) {
     if (isNone(user.value)) return;
 
-    updateUserField(user.value.value.id, "status", Number(newValue)).catch(showErrorMessage);
+    updateUserField(user.value.unwrap().id, "status", Number(newValue)).catch(showErrorMessage);
 }
 
 function onLogoutUser() {
@@ -94,17 +94,17 @@ function setAppLanguage(val: string) {
                 <q-avatar size="6rem" class="ft-avatar">
                     <div
                         :class="{
-                            green: user.value.status,
+                            green: user.unwrap().status,
                         }"
                         class="status-dot"
                     />
                     {{ avatar }}
                 </q-avatar>
                 <div class="q-mt-md text-center">
-                    <div class="text-subtitle1">{{ user.value.name }}</div>
-                    <div class="text-caption text-grey">{{ user.value.email }}</div>
+                    <div class="text-subtitle1">{{ user.unwrap().name }}</div>
+                    <div class="text-caption text-grey">{{ user.unwrap().email }}</div>
                     <div class="text-caption text-grey">
-                        {{ user.value.status ? "Online" : "Offline" }}
+                        {{ user.unwrap().status ? "Online" : "Offline" }}
                     </div>
                 </div>
             </q-item>
@@ -161,7 +161,7 @@ function setAppLanguage(val: string) {
             </q-item>
             <q-item>
                 <q-toggle
-                    :model-value="isSome(user) && !!user.value.status"
+                    :model-value="isSome(user) && !!user.unwrap().status"
                     checked-icon="status-online"
                     color="green"
                     label="Toggle online status"

@@ -23,10 +23,10 @@ async function addToEventFeed(
     }
     switch (change) {
         case ChangeType.ADD:
-            body = `${reservation.value.reservedBy.email} made new reservation on table ${label}`;
+            body = `${reservation.unwrap().reservedBy.email} made new reservation on table ${label}`;
             break;
         case ChangeType.DELETE:
-            body = `${reservation.value.reservedBy.email} deleted a reservation on table ${label}`;
+            body = `${reservation.unwrap().reservedBy.email} deleted a reservation on table ${label}`;
             break;
         default:
             body = "";
@@ -76,7 +76,7 @@ async function handlePushMessagesOnNewReservation(
         return;
     }
 
-    const { reservedBy, guestName, numberOfGuests } = reservation.value;
+    const { reservedBy, guestName, numberOfGuests } = reservation.unwrap();
 
     if (!reservedBy || !guestName || !numberOfGuests) {
         logger.error("Reservation is invalid!");

@@ -173,7 +173,6 @@ export class Floor {
             originY: "center",
             lockMovementX: this.shouldLockDrag(),
             lockMovementY: this.shouldLockDrag(),
-            reservation: None(),
         });
         const text = new fabric.Text(label, {
             originX: "center",
@@ -195,7 +194,6 @@ export class Floor {
             height: TABLE_HEIGHT,
             lockMovementX: this.shouldLockDrag(),
             lockMovementY: this.shouldLockDrag(),
-            reservation: None(),
         });
         const text = new fabric.Text(label, {
             originX: "center",
@@ -236,9 +234,9 @@ export class Floor {
         this.canvas.sendToBack(oGridGroup);
     }
 
-    setReservationOnTable(element: BaseTable, reservation: Option<Reservation>) {
+    setReservationOnTable(element: BaseTable, reservation: Reservation | null) {
         // @ts-ignore
-        element.set({ reservation: reservation });
+        element.set({ reservation });
     }
 
     shouldLockDrag() {
