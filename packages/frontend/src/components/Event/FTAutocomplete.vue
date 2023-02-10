@@ -23,6 +23,7 @@
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { BaseTable } from "@firetable/floor-creator";
+import { isNumber } from "@firetable/utils";
 
 interface Props {
     allReservedTables: BaseTable[];
@@ -35,7 +36,7 @@ const searchTerm = ref("");
 const { t } = useI18n();
 
 function onTablesSearch(val: string | number | null) {
-    if (!val || typeof val === "number") {
+    if (!val || isNumber(val)) {
         emit("clear");
         return;
     }

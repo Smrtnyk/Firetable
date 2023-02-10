@@ -159,12 +159,11 @@ export class Floor {
             .with(ElementTag.CIRCLE, () => this.addRoundTableElement(options))
             .exhaustive();
 
-        // @ts-ignore - Types suggest that it is mouse:up, but it is mouseup
         group.on("mouseup", this.onElementClick);
         this.canvas.add(group);
     }
 
-    addRoundTableElement({ label, x, y }: CreateTableOptions) {
+    private addRoundTableElement({ label, x, y }: CreateTableOptions) {
         const table = new RoundTableElement({
             label,
             radius: 50,
@@ -186,7 +185,7 @@ export class Floor {
         });
     }
 
-    addRectTableElement({ label, x, y }: CreateTableOptions) {
+    private addRectTableElement({ label, x, y }: CreateTableOptions) {
         const rect = new TableElement({
             label,
             width: TABLE_WIDTH,

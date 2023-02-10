@@ -23,6 +23,7 @@ import {
     updateFirestoreDocument,
     useFirestoreDocument,
 } from "src/composables/useFirestore";
+import { isNumber } from "@firetable/utils";
 
 type ElementDescriptor = {
     tag: ElementTag;
@@ -103,10 +104,10 @@ function onFloorChange(prop: keyof Floor, event: null | number | string) {
 
     if (prop === "name") floorInstance.value.setFloorName(String(event));
 
-    if (prop === "width" && typeof event === "number") {
+    if (prop === "width" && isNumber(event)) {
         floorInstance.value.updateDimensions(event, floorInstance.value.height);
     }
-    if (prop === "height" && typeof event === "number") {
+    if (prop === "height" && isNumber(event)) {
         floorInstance.value.updateDimensions(floorInstance.value.width, event);
     }
 }

@@ -9,6 +9,7 @@ import {
 } from "firebase/firestore";
 import { initializeFirebase } from "@firetable/backend";
 import { useCollection, useDocument } from "vuefire";
+import { isString } from "@firetable/utils";
 
 export function useFirestoreCollection<T extends DocumentData>(
     path: string | Query<T>,
@@ -16,7 +17,7 @@ export function useFirestoreCollection<T extends DocumentData>(
 ) {
     const mergedOpts = { ...options, maxRefDepth: 20 };
     const { firestore } = initializeFirebase();
-    if (typeof path === "string") {
+    if (isString(path)) {
         return useCollection<T>(collection(firestore, path), mergedOpts);
     }
     return useCollection<T>(path, mergedOpts);

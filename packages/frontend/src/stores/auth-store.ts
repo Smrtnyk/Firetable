@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { Collection, isSome, None, Option, Role, Some, User } from "@firetable/types";
-import { NOOP } from "@firetable/utils";
+import { isDefined, NOOP } from "@firetable/utils";
 import { logoutUser } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useFirestoreDocument } from "src/composables/useFirestore";
@@ -42,13 +42,13 @@ export const useAuthStore = defineStore("auth", {
             isAuthenticated,
             unsubscribeUserWatch,
         }: Partial<Pick<AuthState, "isReady" | "isAuthenticated" | "unsubscribeUserWatch">>) {
-            if (typeof isAuthenticated !== "undefined") {
+            if (isDefined(isAuthenticated)) {
                 this.isAuthenticated = isAuthenticated;
             }
-            if (typeof isReady !== "undefined") {
+            if (isDefined(isReady)) {
                 this.isReady = isReady;
             }
-            if (typeof unsubscribeUserWatch !== "undefined") {
+            if (isDefined(unsubscribeUserWatch)) {
                 this.unsubscribeUserWatch = unsubscribeUserWatch;
             }
         },

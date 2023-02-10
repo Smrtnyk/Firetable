@@ -13,6 +13,11 @@ export type CreateTableOptions = {
     tag: ElementTag;
 };
 
+export const enum AnimationDirection {
+    UP = "up",
+    DOWN = "down",
+}
+
 export const enum FloorElementTypes {
     ROUND_TABLE = "roundTableElement",
     RECT_TABLE = "tableElement",

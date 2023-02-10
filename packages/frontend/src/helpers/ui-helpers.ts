@@ -1,5 +1,5 @@
 import { Dialog, Loading } from "quasar";
-import { NOOP } from "@firetable/utils";
+import { isString, NOOP } from "@firetable/utils";
 
 export function showConfirm(title: string) {
     const options = {
@@ -28,7 +28,7 @@ export function showConfirm(title: string) {
 
 export function showErrorMessage(e: unknown) {
     let message = "";
-    if (typeof e === "string") {
+    if (isString(e)) {
         message = e;
     }
     if (e instanceof Error) {

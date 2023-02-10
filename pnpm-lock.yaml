@@ -58,6 +58,7 @@ importers:
   packages/floor-creator:
     specifiers:
       '@firetable/types': workspace:*
+      '@firetable/utils': workspace:*
       '@types/fabric': 4.5.15
       fabric: 5.3.0
       ts-pattern: 4.1.4
@@ -66,6 +67,7 @@ importers:
       ts-pattern: 4.1.4
     devDependencies:
       '@firetable/types': link:../types
+      '@firetable/utils': link:../utils
       '@types/fabric': 4.5.15
 
   packages/frontend:
