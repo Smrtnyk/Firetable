@@ -19,14 +19,13 @@ import {
     deleteDoc,
     query,
 } from "firebase/firestore";
-import { CreateEventPayload, EventDoc, GuestData, isSome, Option } from "@firetable/types";
+import { CreateEventPayload, EventDoc, GuestData } from "@firetable/types";
 import { Floor } from "@firetable/floor-creator";
 
-export async function getEvents(lastDocument: Option<DocumentData>): Promise<EventDoc[]> {
-    const startAfterVal = isSome(lastDocument) ? lastDocument.unwrap() : null;
+export async function getEvents(lastDocument: DocumentData | null): Promise<EventDoc[]> {
     const orderByDateQuery = orderBy("date");
     const limitQuery = limit(20);
-    const startAfterQuery = startAfter(startAfterVal);
+    const startAfterQuery = startAfter(lastDocument);
     const eventsDocs = await getDocs(
         query(eventsCollection(), orderByDateQuery, limitQuery, startAfterQuery)
     );
