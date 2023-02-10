@@ -11,6 +11,7 @@ import {
 } from "./types.js";
 import { RoundTableElement } from "./RoundTableElement.js";
 import { ElementTag, FloorDoc, isSome, None, Option, Reservation, Some } from "@firetable/types";
+import { match } from "ts-pattern";
 
 interface FloorCreationOptions {
     canvas: HTMLCanvasElement;
@@ -153,12 +154,10 @@ export class Floor {
 
     addTableElement(options: CreateTableOptions) {
         const { tag } = options;
-        let group;
-        if (tag === ElementTag.RECT) {
-            group = this.addRectTableElement(options);
-        } else {
-            group = this.addRoundTableElement(options);
-        }
+        const group = match(tag)
+            .with(ElementTag.RECT, () => this.addRectTableElement(options))
+            .with(ElementTag.CIRCLE, () => this.addRoundTableElement(options))
+            .exhaustive();
 
         // @ts-ignore - Types suggest that it is mouse:up, but it is mouseup
         group.on("mouseup", this.onElementClick);

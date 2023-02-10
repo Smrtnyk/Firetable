@@ -70,12 +70,12 @@ export const useAuthStore = defineStore("auth", {
                 stop();
                 showErrorMessage("User is not found in database!");
                 logoutUser().catch(NOOP);
-            } else {
-                this.user = Some(user.value);
-                this.isAuthenticated = true;
-                this.isReady = true;
-                this.unsubscribeUserWatch = stop;
+                return;
             }
+            this.user = Some(user.value);
+            this.isAuthenticated = true;
+            this.isReady = true;
+            this.unsubscribeUserWatch = stop;
         },
     },
 });

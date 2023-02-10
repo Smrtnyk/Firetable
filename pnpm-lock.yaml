@@ -60,8 +60,10 @@ importers:
       '@firetable/types': workspace:*
       '@types/fabric': 4.5.15
       fabric: 5.3.0
+      ts-pattern: 4.1.4
     dependencies:
       fabric: 5.3.0
+      ts-pattern: 4.1.4
     devDependencies:
       '@firetable/types': link:../types
       '@types/fabric': 4.5.15
@@ -77,6 +79,7 @@ importers:
       chart.js: 4.2.1
       pinia: 2.0.30
       quasar: 2.11.5
+      ts-pattern: 4.1.4
       vue: 3.2.47
       vue-i18n: 9.2.2
       vue-router: 4.1.6
@@ -91,6 +94,7 @@ importers:
       chart.js: 4.2.1
       pinia: 2.0.30_hmuptsblhheur2tugfgucj7gc4
       quasar: 2.11.5
+      ts-pattern: 4.1.4
       vue: 3.2.47
       vue-i18n: 9.2.2_vue@3.2.47
       vue-router: 4.1.6_vue@3.2.47
@@ -7568,6 +7572,10 @@ packages:
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
     dev: true
+
+  /ts-pattern/4.1.4:
+    resolution: {integrity: sha512-Mcw65oUd1w5ktKi5BRwrnz16Otwk9iv7P0dKgvbi+A1albCDgnixohSqNLuFwIp5dzxPmTPm0iDQ6p1ZJr9uGw==}
+    dev: false
 
   /tsconfig-paths/3.14.1:
     resolution: {integrity: sha512-fxDhWnFSLt3VuTwtvJt5fpwxBHg5AdKWMsgcPOOIilyjymcYVZoCQF8fvFRezCNfblEXmi+PcM1eYHeOAgXCOQ==}

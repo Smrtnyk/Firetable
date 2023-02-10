@@ -26,6 +26,7 @@
         "chart.js": "4.2.1",
         "pinia": "2.0.30",
         "quasar": "2.11.5",
+        "ts-pattern": "4.1.4",
         "vue": "3.2.47",
         "vue-i18n": "9.2.2",
         "vue-router": "4.1.6",

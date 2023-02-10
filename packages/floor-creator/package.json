@@ -10,11 +10,12 @@
         "build": "tsc"
     },
     "dependencies": {
-        "fabric": "5.3.0"
+        "fabric": "5.3.0",
+        "ts-pattern": "4.1.4"
     },
     "devDependencies": {
-        "@types/fabric": "4.5.15",
-        "@firetable/types": "workspace:*"
+        "@firetable/types": "workspace:*",
+        "@types/fabric": "4.5.15"
     },
     "keywords": [],
     "author": "",
