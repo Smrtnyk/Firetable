@@ -18,7 +18,7 @@ const {
     pending: isLoading,
 } = useFirestoreCollection<FloorDoc>(Collection.FLOORS);
 
-async function onFloorDelete({ id }: Pick<FloorDoc, "id">, reset: () => void) {
+async function onFloorDelete(id: string, reset: () => void) {
     if (!(await showConfirm("Delete floor?"))) return reset();
 
     await tryCatchLoadingWrapper(
@@ -84,7 +84,7 @@ onMounted(async () => {
                 v-for="floor in floors"
                 :key="floor.id"
                 right-color="warning"
-                @right="(id) => onFloorDelete(floor, id)"
+                @right="({ reset }) => onFloorDelete(floor.id, reset)"
                 class="fa-card"
             >
                 <template #right>

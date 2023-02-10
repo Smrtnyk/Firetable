@@ -74,7 +74,7 @@ const selectedElement = computed(() => {
     return props.selectedFloorElement;
 });
 
-async function updateTableLabel(newId: string): Promise<void> {
+async function updateTableLabel(newId: string | number | null): Promise<void> {
     if (!selectedElement.value || !isSome(selectedElement.value) || !newId) return;
     if (!isTable(selectedElement.value.unwrap())) return;
 

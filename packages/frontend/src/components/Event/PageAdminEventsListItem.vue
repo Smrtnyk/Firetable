@@ -8,7 +8,7 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits(["right"]);
 
-function emitOnRight(reset: () => void): void {
+function emitOnRight({ reset }: { reset: () => void }): void {
     emit("right", { event: props.event, reset });
 }
 </script>

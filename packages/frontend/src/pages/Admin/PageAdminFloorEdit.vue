@@ -98,7 +98,7 @@ function onFloorSave() {
     });
 }
 
-function onFloorChange(prop: keyof Floor, event: string | number) {
+function onFloorChange(prop: keyof Floor, event: null | number | string) {
     if (!floorInstance.value) return;
 
     if (prop === "name") floorInstance.value.setFloorName(String(event));
@@ -163,7 +163,7 @@ function onDeleteElement(element: BaseTable) {
                 standout
                 rounded
                 label="Floor name"
-                @update:model-value="(event: string) => onFloorChange('name', event)"
+                @update:model-value="(event) => onFloorChange('name', event)"
                 :model-value="floorInstance.name"
             >
                 <template #append>
@@ -189,7 +189,7 @@ function onDeleteElement(element: BaseTable) {
                     :step="RESOLUTION"
                     label
                     color="deep-orange"
-                    @update:model-value="(event: number) => onFloorChange('width', event)"
+                    @update:model-value="(event) => onFloorChange('width', event)"
                 />
             </div>
             <div class="col-6">
@@ -202,7 +202,7 @@ function onDeleteElement(element: BaseTable) {
                     :step="RESOLUTION"
                     label
                     color="deep-orange"
-                    @update:model-value="(event: number) => onFloorChange('height', event)"
+                    @update:model-value="(event) => onFloorChange('height', event)"
                     :model-value="floorInstance.height"
                 />
             </div>

@@ -34,15 +34,15 @@ const emit = defineEmits(["found", "clear"]);
 const searchTerm = ref("");
 const { t } = useI18n();
 
-function onTablesSearch(val: string) {
-    if (!val) {
+function onTablesSearch(val: string | number | null) {
+    if (!val || typeof val === "number") {
         emit("clear");
         return;
     }
 
     const found = props.allReservedTables.filter((table) => {
         if (!table.reservation) return false;
-        const normalizedGuestName = table.reservation.guestName; // NOSONAR
+        const normalizedGuestName = table.reservation.guestName;
         const normalizedVal = val.toLowerCase();
         return normalizedGuestName.startsWith(normalizedVal);
     });

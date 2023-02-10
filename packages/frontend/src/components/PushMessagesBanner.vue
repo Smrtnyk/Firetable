@@ -99,7 +99,7 @@ onMounted(initEnablePushNotificationsBanner);
                 size="md"
                 color="primary"
                 label="Later"
-                @click="() => (showPushNotificationsBanner.value = false)"
+                @click="() => (showPushNotificationsBanner = false)"
             />
             <q-btn
                 outline
