@@ -7,7 +7,6 @@ import { useAuthStore } from "src/stores/auth-store";
 import { useAppStore } from "src/stores/app-store";
 import { logoutUser, updateUserField } from "@firetable/backend";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { isNone, isSome } from "@firetable/types";
 
 interface Props {
     showAdminLinks: boolean;
@@ -49,8 +48,8 @@ const adminLinks = computed(() => [
 const user = computed(() => authStore.user);
 const adminLinksCollection = computed(() => (props.showAdminLinks ? adminLinks.value : []));
 const avatar = computed(() => {
-    if (isNone(user.value)) return "";
-    const [first, last] = user.value.unwrap().name.split(" ");
+    if (!user.value) return "";
+    const [first, last] = user.value.name.split(" ");
     if (!last) {
         return first[0];
     }
@@ -63,9 +62,9 @@ function setDarkMode(newValue: boolean) {
 }
 
 function toggleUserActivityStatus(newValue: boolean) {
-    if (isNone(user.value)) return;
+    if (!user.value) return;
 
-    updateUserField(user.value.unwrap().id, "status", Number(newValue)).catch(showErrorMessage);
+    updateUserField(user.value.id, "status", Number(newValue)).catch(showErrorMessage);
 }
 
 function onLogoutUser() {
@@ -90,21 +89,21 @@ function setAppLanguage(val: string) {
         behavior="mobile"
     >
         <q-list>
-            <q-item header class="column items-center q-pt-xl q-pb-lg" v-if="isSome(user)">
+            <q-item header class="column items-center q-pt-xl q-pb-lg" v-if="user">
                 <q-avatar size="6rem" class="ft-avatar">
                     <div
                         :class="{
-                            green: user.unwrap().status,
+                            green: user.status,
                         }"
                         class="status-dot"
                     />
                     {{ avatar }}
                 </q-avatar>
                 <div class="q-mt-md text-center">
-                    <div class="text-subtitle1">{{ user.unwrap().name }}</div>
-                    <div class="text-caption text-grey">{{ user.unwrap().email }}</div>
+                    <div class="text-subtitle1">{{ user.name }}</div>
+                    <div class="text-caption text-grey">{{ user.email }}</div>
                     <div class="text-caption text-grey">
-                        {{ user.unwrap().status ? "Online" : "Offline" }}
+                        {{ user.status ? "Online" : "Offline" }}
                     </div>
                 </div>
             </q-item>
@@ -161,7 +160,7 @@ function setAppLanguage(val: string) {
             </q-item>
             <q-item>
                 <q-toggle
-                    :model-value="isSome(user) && !!user.unwrap().status"
+                    :model-value="user?.status"
                     checked-icon="status-online"
                     color="green"
                     label="Toggle online status"

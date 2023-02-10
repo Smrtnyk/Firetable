@@ -31,37 +31,32 @@ import {
     FloorDoc,
     GuestData,
     Reservation,
-    isNone,
-    None,
-    Option,
-    Some,
-    isSome,
 } from "@firetable/types";
 import { updateEventFloorData } from "@firetable/backend";
 
 interface State {
     showMapsExpanded: boolean;
-    activeFloor: Option<Floor>;
+    activeFloor: Floor | null;
     floorInstances: Floor[];
-    activeTablesAnimationInterval: Option<number>;
+    activeTablesAnimationInterval: number | null;
 }
 
 interface Props {
     id: string;
 }
 
-let currentOpenCreateReservationDialog: Option<{
+let currentOpenCreateReservationDialog: {
     label: string;
     dialog: DialogChainObject;
     floor: string;
-}> = None();
+} | null = null;
 
 const props = defineProps<Props>();
 const state = reactive<State>({
     showMapsExpanded: false,
-    activeFloor: None(),
+    activeFloor: null,
     floorInstances: [],
-    activeTablesAnimationInterval: None(),
+    activeTablesAnimationInterval: null,
 });
 const eventsStore = useEventsStore();
 const authStore = useAuthStore();
@@ -86,32 +81,32 @@ const freeTablesPerFloor = computed(() => {
     const freeTablesMap: Record<string, string[]> = {};
 
     for (const floor of state.floorInstances) {
-        freeTablesMap[floor.id] = getFreeTables(floor).map(({ label }) => label);
+        freeTablesMap[floor.id] = getFreeTables(floor as Floor).map(({ label }) => label);
     }
     return freeTablesMap;
 });
 const allReservedTables = computed(() => {
-    return state.floorInstances.map(getReservedTables).flat();
+    return (state.floorInstances as Floor[]).map(getReservedTables).flat();
 });
 
 function onAutocompleteClear() {
-    if (isSome(state.activeTablesAnimationInterval)) {
-        clearInterval(state.activeTablesAnimationInterval.unwrap());
+    if (state.activeTablesAnimationInterval) {
+        clearInterval(state.activeTablesAnimationInterval);
     }
     state.floorInstances.forEach((floor) => {
-        const tables = getTables(floor);
+        const tables = getTables(floor as Floor);
         tables.forEach((table) => table.clearAnimation());
         floor.canvas.renderAll();
     });
 }
 
 function isActiveFloor(floor: Floor | FloorDoc) {
-    return isSome(state.activeFloor) && state.activeFloor.unwrap().id === floor.id;
+    return state.activeFloor?.id === floor.id;
 }
 
 function setActiveFloor(floor?: Floor) {
     if (floor) {
-        state.activeFloor = Some(floor);
+        state.activeFloor = floor;
     }
 }
 
@@ -175,10 +170,10 @@ function onReservationConfirm(floor: Floor, element: BaseTable) {
 }
 
 function handleReservationCreation(floor: Floor, reservationData: CreateReservationPayload) {
-    if (isNone(currentUser.value)) return;
+    if (!currentUser.value) return;
 
     const { groupedWith } = reservationData;
-    const { email, name, role, id } = currentUser.value.unwrap();
+    const { email, name, role, id } = currentUser.value;
     const reservedBy = { email, name, role, id };
 
     for (const idInGroup of groupedWith) {
@@ -195,7 +190,7 @@ function handleReservationCreation(floor: Floor, reservationData: CreateReservat
 }
 
 function resetCurrentOpenCreateReservationDialog() {
-    currentOpenCreateReservationDialog = None();
+    currentOpenCreateReservationDialog = null;
 }
 
 function showCreateReservationDialog(floor: Floor, element: BaseTable) {
@@ -223,20 +218,20 @@ function showCreateReservationDialog(floor: Floor, element: BaseTable) {
         })
         .onDismiss(resetCurrentOpenCreateReservationDialog);
 
-    currentOpenCreateReservationDialog = Some({
+    currentOpenCreateReservationDialog = {
         label,
         dialog,
         floor: floor.id,
-    });
+    };
 }
 
-function tableClickHandler(floor: Floor, element: Option<BaseTable>) {
-    if (isNone(element) || !isTable(element.unwrap())) return;
-    const { reservation } = element.unwrap();
+function tableClickHandler(floor: Floor, element: BaseTable | null) {
+    if (!element || !isTable(element)) return;
+    const { reservation } = element;
     if (reservation) {
-        showReservation(floor, reservation, element.unwrap());
+        showReservation(floor, reservation, element);
     } else {
-        showCreateReservationDialog(floor, element.unwrap());
+        showCreateReservationDialog(floor, element);
     }
 }
 
@@ -248,7 +243,7 @@ function onTableFound(tables: BaseTable[]) {
         }
         state.floorInstances.forEach((floor) => floor.canvas.renderAll());
     }
-    state.activeTablesAnimationInterval = Some(window.setInterval(animate, 100));
+    state.activeTablesAnimationInterval = window.setInterval(animate, 100);
 }
 
 function instantiateFloor(floorDoc: FloorDoc) {
@@ -272,16 +267,16 @@ function instantiateFloors() {
 }
 
 function checkIfReservedTableAndCloseCreateReservationDialog() {
-    if (isNone(currentOpenCreateReservationDialog)) return;
+    if (!currentOpenCreateReservationDialog) return;
 
-    const { dialog, label, floor } = currentOpenCreateReservationDialog.unwrap();
+    const { dialog, label, floor } = currentOpenCreateReservationDialog;
     const freeTables = freeTablesPerFloor.value[floor];
     const isTableStillFree = freeTables.includes(label);
 
     if (isTableStillFree) return;
 
     dialog.hide();
-    currentOpenCreateReservationDialog = None();
+    currentOpenCreateReservationDialog = null;
     showErrorMessage(t("PageEvent.reservationAlreadyReserved"));
 }
 
@@ -317,7 +312,7 @@ async function onDeleteReservation(floor: Floor, element: BaseTable) {
 async function initFloorInstancesData() {
     await nextTick();
     instantiateFloors();
-    setActiveFloor(state.floorInstances[0]);
+    setActiveFloor(state.floorInstances[0] as Floor);
 }
 
 async function handleFloorInstancesData(newVal: FloorDoc[], old: FloorDoc[]) {
@@ -350,7 +345,7 @@ onMounted(init);
             <q-fab
                 v-if="state.floorInstances.length"
                 :model-value="state.showMapsExpanded"
-                :label="isSome(state.activeFloor) ? state.activeFloor.unwrap().name : ''"
+                :label="state.activeFloor ? state.activeFloor.name : ''"
                 padding="xs"
                 vertical-actions-align="left"
                 icon="chevron_down"

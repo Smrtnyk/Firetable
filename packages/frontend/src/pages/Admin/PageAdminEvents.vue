@@ -9,15 +9,7 @@ import { onMounted, ref } from "vue";
 import { QueryDocumentSnapshot } from "firebase/firestore";
 import { useQuasar, QInfiniteScroll } from "quasar";
 import { useRouter } from "vue-router";
-import {
-    Collection,
-    CreateEventPayload,
-    EventDoc,
-    FloorDoc,
-    None,
-    Option,
-    Some,
-} from "@firetable/types";
+import { Collection, CreateEventPayload, EventDoc, FloorDoc } from "@firetable/types";
 import { createNewEvent, deleteEvent, getEvents } from "@firetable/backend";
 import { useFirestoreCollection } from "src/composables/useFirestore";
 
@@ -31,13 +23,13 @@ const { data: floors } = useFirestoreCollection<FloorDoc>(Collection.FLOORS, { o
 
 async function init() {
     isLoading.value = true;
-    await tryCatchLoadingWrapper(fetchMoreEvents.bind(null, None()), [], () => {
+    await tryCatchLoadingWrapper(fetchMoreEvents.bind(null, null), [], () => {
         router.replace("/").catch(showErrorMessage);
     });
     isLoading.value = false;
 }
 
-async function fetchMoreEvents(lastDoc: Option<QueryDocumentSnapshot>) {
+async function fetchMoreEvents(lastDoc: QueryDocumentSnapshot | null) {
     if (!hasMoreEventsToFetch.value) return;
     const eventsDocs = await getEvents(lastDoc);
     if (!eventsDocs.length || eventsDocs.length < 20) {
@@ -74,7 +66,7 @@ async function onLoad(_: number, done: () => void) {
     if (!hasMoreEventsToFetch.value) return paginator.value?.stop();
 
     const lastDoc = events.value[events.value.length - 1]._doc;
-    await fetchMoreEvents(Some(lastDoc));
+    await fetchMoreEvents(lastDoc);
 
     done();
 }

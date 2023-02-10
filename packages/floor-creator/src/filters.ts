@@ -1,6 +1,6 @@
 import { Floor } from "./Floor.js";
 import { BaseTable, FloorElementTypes } from "./types.js";
-import { FloorDoc, isNone, isSome } from "@firetable/types";
+import { FloorDoc } from "@firetable/types";
 
 export function hasFloorTables(floor: Floor): boolean {
     const allGroups = floor.canvas.getObjects();

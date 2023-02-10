@@ -16,7 +16,7 @@ import {
     hasFloorTables,
     RESOLUTION,
 } from "@firetable/floor-creator";
-import { Collection, ElementTag, ElementType, FloorDoc, None, Option } from "@firetable/types";
+import { Collection, ElementTag, ElementType, FloorDoc } from "@firetable/types";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import {
     getFirestoreDocument,
@@ -49,7 +49,7 @@ const q = useQuasar();
 const floorInstance = ref<Floor | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 const pageRef = ref<HTMLDivElement | null>(null);
-const selectedElement = ref<Option<BaseTable>>(None());
+const selectedElement = ref<BaseTable | null>(null);
 const { data: floor, promise: floorDataPromise } = useFirestoreDocument<FloorDoc>(
     `${Collection.FLOORS}/${props.floorID}`,
     {
@@ -143,8 +143,8 @@ function dblClickHandler(floor: Floor, coords: NumberTuple) {
     q.bottomSheet(addNewElementsBottomSheetOptions).onOk(handleAddNewElement(floor, coords));
 }
 
-async function elementClickHandler(_: Floor, element: Option<BaseTable>) {
-    selectedElement.value = None();
+async function elementClickHandler(_: Floor, element: BaseTable | null) {
+    selectedElement.value = null;
     await nextTick();
     selectedElement.value = element;
 }

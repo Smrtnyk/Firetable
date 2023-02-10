@@ -10,9 +10,10 @@ import {
     NumberTuple,
 } from "./types.js";
 import { RoundTableElement } from "./RoundTableElement.js";
-import { ElementTag, FloorDoc, isSome, None, Option, Reservation, Some } from "@firetable/types";
+import { ElementTag, FloorDoc, Reservation } from "@firetable/types";
 import { match } from "ts-pattern";
 import { isTable } from "./type-guards";
+import { isDefined } from "@firetable/utils";
 
 interface FloorCreationOptions {
     canvas: HTMLCanvasElement;
@@ -50,7 +51,7 @@ export class Floor {
     };
     onMouseUpHandler = (ev: fabric.IEvent<MouseEvent>) => {
         if (containsTables(ev)) return;
-        this.elementClickHandler(this, None());
+        this.elementClickHandler(this, null);
     };
     onElementClick = (ev: fabric.IEvent<MouseEvent>) => {
         const table = getTableFromGroupElement(ev);
@@ -247,18 +248,18 @@ export class Floor {
     }
 }
 
-function getTableFromGroupElement(ev: fabric.IEvent): Option<BaseTable> {
+function getTableFromGroupElement(ev: fabric.IEvent): BaseTable | null {
     const group = ev.target;
     // @ts-ignore -- table is always set first on the group, text second
     const maybeTable = group?._objects[0];
     if (isTable(maybeTable)) {
-        return Some(maybeTable);
+        return maybeTable;
     }
-    return None();
+    return null;
 }
 
 function containsTables(ev: fabric.IEvent): boolean {
-    return isSome(getTableFromGroupElement(ev));
+    return isDefined(getTableFromGroupElement(ev));
 }
 
 function calculateCanvasScale(containerWidth: number, floorWidth: number) {

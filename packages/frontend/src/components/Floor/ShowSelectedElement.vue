@@ -1,17 +1,12 @@
 <template>
-    <div class="row q-pa-sm q-col-gutter-md" v-if="isSome(selectedElement)">
+    <div class="row q-pa-sm q-col-gutter-md" v-if="selectedElement">
         <div class="col-10 flex justify-between">
             <div class="row">
                 <div
                     v-if="isSelectedElementRoundTable(selectedElement)"
                     class="col-4 q-pa-xs q-pl-none"
                 >
-                    <q-input
-                        :model-value="selectedElement.unwrap().radius"
-                        filled
-                        label="Radius"
-                        readonly
-                    />
+                    <q-input :model-value="selectedElement.radius" filled label="Radius" readonly />
                 </div>
                 <template v-else>
                     <div class="col-4 q-pa-xs q-pl-none">
@@ -33,8 +28,8 @@
                 </template>
                 <div class="col-4 q-pa-xs">
                     <q-input
-                        v-if="isSome(selectedElement) && selectedElement.unwrap().label"
-                        :model-value="selectedElement.unwrap().label"
+                        v-if="selectedElement?.label"
+                        :model-value="selectedElement.label"
                         @update:model-value="updateTableLabel"
                         filled
                         label="Table Name"
@@ -44,7 +39,7 @@
         </div>
         <div class="col-2 flex q-pl-none justify-end">
             <q-btn
-                v-if="!isSome(selectedElement) || !selectedElement.unwrap().reservation"
+                v-if="!selectedElement || !selectedElement.reservation"
                 icon="trash"
                 color="negative"
                 @click="deleteElement"
@@ -62,10 +57,9 @@
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed, nextTick } from "vue";
 import { BaseTable, isRoundTable, isTable, RoundTableElement } from "@firetable/floor-creator";
-import { isNone, isSome, Option, Some } from "@firetable/types";
 
 interface Props {
-    selectedFloorElement: Option<BaseTable>;
+    selectedFloorElement: BaseTable | null;
 }
 
 const props = defineProps<Props>();
@@ -75,8 +69,8 @@ const selectedElement = computed(() => {
 });
 
 async function updateTableLabel(newId: string | number | null): Promise<void> {
-    if (!selectedElement.value || !isSome(selectedElement.value) || !newId) return;
-    if (!isTable(selectedElement.value.unwrap())) return;
+    if (!selectedElement.value || !selectedElement.value || !newId) return;
+    if (!isTable(selectedElement.value)) return;
 
     try {
         // props.selectedElement.canvas.updateTableId(selectedElement.value, newId);
@@ -88,27 +82,27 @@ async function updateTableLabel(newId: string | number | null): Promise<void> {
 }
 
 async function deleteElement() {
-    if (isNone(props.selectedFloorElement)) return;
+    if (!props.selectedFloorElement) return;
     if (await showConfirm("Do you really want to delete this element?")) {
-        emit("delete", props.selectedFloorElement.unwrap());
+        emit("delete", props.selectedFloorElement);
     }
 }
 
-function getElementWidth(e: Some<BaseTable>): number {
-    return Math.round((e.unwrap().group?.width || 0) * (e.unwrap().group?.scaleX || 0));
+function getElementWidth(e: BaseTable | null): number {
+    return Math.round((e?.group?.width || 0) * (e?.group?.scaleX || 0));
 }
 
-function getElementHeight(e: Some<BaseTable>): number {
-    return Math.round((e.unwrap().group?.height || 0) * (e.unwrap().group?.scaleY || 0));
+function getElementHeight(e: BaseTable | null): number {
+    return Math.round((e?.group?.height || 0) * (e?.group?.scaleY || 0));
 }
 
 function isSelectedElementRoundTable(
-    selectedElement: Option<BaseTable>
-): selectedElement is Some<RoundTableElement> {
-    if (!isSome(selectedElement)) {
+    selectedElement: BaseTable | null
+): selectedElement is RoundTableElement {
+    if (!selectedElement) {
         return false;
     }
-    const element = selectedElement.unwrap();
+    const element = selectedElement;
     return isRoundTable(element) && !!element.radius;
 }
 </script>

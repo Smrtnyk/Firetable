@@ -2,7 +2,7 @@ import { boot } from "quasar/wrappers";
 import { useAuthStore } from "src/stores/auth-store";
 import { initializeFirebase } from "@firetable/backend";
 import { Router } from "vue-router";
-import { None, Role } from "@firetable/types";
+import { Role } from "@firetable/types";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import {
     getCurrentUser,
@@ -94,7 +94,7 @@ function handleOnAuthStateChanged(router: Router, authStore: any) {
             if (!currentUser.value) {
                 // If the user loses authentication route
                 // redirect them to the login page
-                authStore.setUser(None());
+                authStore.setUser(null);
                 router.replace({ path: "/auth" }).catch(showErrorMessage);
             } else {
                 authStore.initUser(currentUser.value.uid);
