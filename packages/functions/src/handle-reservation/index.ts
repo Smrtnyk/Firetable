@@ -4,7 +4,7 @@ import diff from "diff-arrays-of-objects";
 import { db } from "../init.js";
 import { ChangeType, UpdatedTablesDifference } from "../../types/types.js";
 import { BaseTable } from "@firetable/floor-creator";
-import { Collection, isSome, PushSubscriptionDoc } from "@firetable/types";
+import { Collection, PushSubscriptionDoc } from "@firetable/types";
 import { firestore } from "firebase-admin";
 import QueryDocumentSnapshot = firestore.QueryDocumentSnapshot;
 
@@ -18,15 +18,15 @@ async function addToEventFeed(
 ): Promise<void> {
     let body: string;
     const { reservation, label } = table;
-    if (!isSome(reservation)) {
+    if (!reservation) {
         throw new Error("Reservation not provided on the table!");
     }
     switch (change) {
         case ChangeType.ADD:
-            body = `${reservation.unwrap().reservedBy.email} made new reservation on table ${label}`;
+            body = `${reservation.reservedBy.email} made new reservation on table ${label}`;
             break;
         case ChangeType.DELETE:
-            body = `${reservation.unwrap().reservedBy.email} deleted a reservation on table ${label}`;
+            body = `${reservation.reservedBy.email} deleted a reservation on table ${label}`;
             break;
         default:
             body = "";
@@ -71,12 +71,12 @@ async function handlePushMessagesOnNewReservation(
 ): Promise<void> {
     const { label, reservation } = table;
 
-    if (!isSome(reservation)) {
+    if (!reservation) {
         logger.error("No reservation found!");
         return;
     }
 
-    const { reservedBy, guestName, numberOfGuests } = reservation.unwrap();
+    const { reservedBy, guestName, numberOfGuests } = reservation;
 
     if (!reservedBy || !guestName || !numberOfGuests) {
         logger.error("Reservation is invalid!");
@@ -118,7 +118,7 @@ function extractReservedTablesFrom(json: any): BaseTable[] {
     return json
         .objects
         .map(({ objects }: any) => objects[0])
-        .filter(({ reservation }: BaseTable) => isSome(reservation));
+        .filter(({ reservation }: BaseTable) => !!reservation);
 }
 
 async function handleAddedReservation(
@@ -160,7 +160,7 @@ async function updateEventReservationCount(
         const floor = doc.data();
         const tables = floor.json.objects.map(({ objects }: any) => objects[0]);
         overallTables += tables.length;
-        overallReserved += tables.filter((table: BaseTable) => isSome(table.reservation)).length;
+        overallReserved += tables.filter((table: BaseTable) => !!table.reservation).length;
     }
 
     const percentage = (overallReserved / overallTables) * PERCENTILE_BASE;

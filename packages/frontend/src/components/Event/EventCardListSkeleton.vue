@@ -2,7 +2,7 @@
     <div class="EventCardListSkeleton">
         <div class="row">
             <div
-                v-for="index in Array.from({ length: 8 })"
+                v-for="index in Array.from<number>({ length: 8 })"
                 class="col-12 col-sm-6 col-md-6 q-pa-xs"
                 :key="index"
             >
