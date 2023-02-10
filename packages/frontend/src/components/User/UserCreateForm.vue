@@ -72,7 +72,7 @@ function onReset() {
             />
 
             <q-input
-                v-if="!props.user"
+                v-if="'password' in form"
                 v-model="form.password"
                 standout
                 rounded
