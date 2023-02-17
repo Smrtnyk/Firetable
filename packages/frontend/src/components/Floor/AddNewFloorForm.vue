@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { noEmptyString } from "src/helpers/form-rules";
 
 interface Props {
-    allFloorNames: string[];
+    allFloorNames: Set<string>;
 }
 
 const props = defineProps<Props>();
@@ -11,10 +11,7 @@ const emit = defineEmits(["create"]);
 const floorName = ref("");
 
 function noSameFloorName(val: string) {
-    return (
-        !props.allFloorNames.find((name) => name === val) ||
-        "Floor with the same name already exists!"
-    );
+    return !props.allFloorNames.has(val) || "Floor with the same name already exists!";
 }
 
 function onSubmit() {

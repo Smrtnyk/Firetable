@@ -46,7 +46,7 @@ function showAddNewFloorForm(): void {
                 },
             },
             componentPropsObject: {
-                allFloorNames: floors.value.map(({ name }) => name),
+                allFloorNames: new Set(floors.value.map(({ name }) => name)),
             },
         },
     });

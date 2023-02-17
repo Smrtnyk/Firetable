@@ -23,6 +23,7 @@ cypress.json
 **/jest/coverage/
 
 # Editor directories and files
+.fleet
 .idea
 .vscode
 *.suo

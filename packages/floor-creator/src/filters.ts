@@ -1,6 +1,7 @@
 import { Floor } from "./Floor.js";
 import { BaseTable, FloorElementTypes } from "./types.js";
 import { FloorDoc } from "@firetable/types";
+import { takeProp } from "@firetable/utils";
 
 export function hasFloorTables(floor: Floor): boolean {
     const allGroups = floor.canvas.getObjects();
@@ -25,18 +26,10 @@ export function getTablesFromFloorDoc(floor: FloorDoc): BaseTable[] {
 }
 
 export function getTables(floor: Floor): BaseTable[] {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return floor.canvas
-        .getObjects()
-        .map((obj) => {
-            return [
-                // @ts-ignore
-                ...obj.getObjects(FloorElementTypes.ROUND_TABLE),
-                // @ts-ignore
-                ...obj.getObjects(FloorElementTypes.RECT_TABLE),
-            ];
-        })
-        .flat();
+    return [
+        ...(floor.canvas.getObjects(FloorElementTypes.ROUND_TABLE) as BaseTable[]),
+        ...(floor.canvas.getObjects(FloorElementTypes.RECT_TABLE) as BaseTable[]),
+    ];
 }
 
 export function getFreeTables(floor: Floor): BaseTable[] {
@@ -48,5 +41,5 @@ export function getReservedTables(floor: Floor): BaseTable[] {
 }
 
 export function extractAllTablesLabels(floor: Floor): string[] {
-    return getTables(floor).map(({ label }) => label);
+    return getTables(floor).map(takeProp("label"));
 }

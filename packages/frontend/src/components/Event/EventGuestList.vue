@@ -41,7 +41,7 @@ function onCreate(newGuestData: GuestData) {
 }
 
 async function deleteGuest(id: string, reset: () => void) {
-    if (!(await showConfirm("Do you really want to delete this guest from the guestlist?")))
+    if (!(await showConfirm("Do you really want to delete this guest from the guest list?")))
         return reset();
 
     await tryCatchLoadingWrapper(() => deleteGuestFromGuestList(eventID.value, id), void 0, reset);
@@ -116,8 +116,8 @@ function showAddNewGuestForm(): void {
                     :key="guest.id"
                     right-color="warning"
                     :left-color="guest.confirmed ? 'red-5' : 'green-5'"
-                    @right="deleteGuest.bind(guest.id)"
-                    @left="confirmGuest.bind(guest)"
+                    @right="({ reset }) => deleteGuest(guest.id, reset)"
+                    @left="({ reset }) => confirmGuest(guest, reset)"
                 >
                     <template #right>
                         <q-icon name="trash" />

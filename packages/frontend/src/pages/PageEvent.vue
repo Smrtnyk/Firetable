@@ -33,11 +33,12 @@ import {
     Reservation,
 } from "@firetable/types";
 import { updateEventFloorData } from "@firetable/backend";
+import { takeProp } from "@firetable/utils";
 
 interface State {
     showMapsExpanded: boolean;
-    activeFloor: Floor | null;
-    floorInstances: Floor[];
+    activeFloor: { id: string; name: string } | null;
+    floorInstances: Set<Floor>;
     activeTablesAnimationInterval: number | null;
 }
 
@@ -48,14 +49,14 @@ interface Props {
 let currentOpenCreateReservationDialog: {
     label: string;
     dialog: DialogChainObject;
-    floor: string;
+    floorId: string;
 } | null = null;
 
 const props = defineProps<Props>();
 const state = reactive<State>({
     showMapsExpanded: false,
     activeFloor: null,
-    floorInstances: [],
+    floorInstances: new Set<Floor>(),
     activeTablesAnimationInterval: null,
 });
 const eventsStore = useEventsStore();
@@ -63,13 +64,9 @@ const authStore = useAuthStore();
 const router = useRouter();
 const q = useQuasar();
 const { t } = useI18n();
-const canvases = ref<Record<string, HTMLCanvasElement>>({});
+const canvases = reactive<Map<string, HTMLCanvasElement>>(new Map());
 const pageRef = ref<HTMLDivElement | null>(null);
 const currentUser = computed(() => authStore.user);
-const eventFloorsRef = function (floor: FloorDoc, el: HTMLCanvasElement) {
-    canvases.value[floor.id] = el;
-};
-
 const guestList = useFirestoreCollection<GuestData>(`${Collection.EVENTS}/${props.id}/guestList`);
 const { data: event, promise: eventDataPromise } = useFirestoreDocument<EventDoc>(
     `${Collection.EVENTS}/${props.id}`
@@ -78,35 +75,41 @@ const { data: eventFloors } = useFirestoreCollection<FloorDoc>(
     `${Collection.EVENTS}/${props.id}/floors`
 );
 const freeTablesPerFloor = computed(() => {
-    const freeTablesMap: Record<string, string[]> = {};
+    const freeTablesMap = new Map<string, string[]>();
 
     for (const floor of state.floorInstances) {
-        freeTablesMap[floor.id] = getFreeTables(floor as Floor).map(({ label }) => label);
+        freeTablesMap.set(floor.id, getFreeTables(floor).map(takeProp("label")));
     }
     return freeTablesMap;
 });
 const allReservedTables = computed(() => {
-    return (state.floorInstances as Floor[]).map(getReservedTables).flat();
+    return Array.from(state.floorInstances).map(getReservedTables).flat();
 });
 
-function onAutocompleteClear() {
+function mapFloorToCanvas(floor: FloorDoc) {
+    return function (el: HTMLCanvasElement) {
+        canvases.set(floor.id, el);
+    };
+}
+
+function onAutocompleteClear(): void {
     if (state.activeTablesAnimationInterval) {
         clearInterval(state.activeTablesAnimationInterval);
     }
     state.floorInstances.forEach((floor) => {
-        const tables = getTables(floor as Floor);
+        const tables = getTables(floor);
         tables.forEach((table) => table.clearAnimation());
         floor.canvas.renderAll();
     });
 }
 
-function isActiveFloor(floor: Floor | FloorDoc) {
-    return state.activeFloor?.id === floor.id;
+function isActiveFloor(floorId: string): boolean {
+    return state.activeFloor?.id === floorId;
 }
 
-function setActiveFloor(floor?: Floor) {
+function setActiveFloor(floor?: Floor): void {
     if (floor) {
-        state.activeFloor = floor;
+        state.activeFloor = { id: floor.id, name: floor.name };
     }
 }
 
@@ -130,12 +133,11 @@ function showEventInfo(): void {
 }
 
 function showReservation(floor: Floor, reservation: Reservation, element: BaseTable) {
-    const { label } = element;
-    const options = {
+    q.dialog({
         component: FTDialog,
         componentProps: {
             component: EventShowReservation,
-            title: `${t("EventShowReservation.title")} ${label}`,
+            title: `${t("EventShowReservation.title")} ${element.label}`,
             maximized: false,
             componentPropsObject: {
                 reservation,
@@ -147,8 +149,7 @@ function showReservation(floor: Floor, reservation: Reservation, element: BaseTa
                 confirm: onReservationConfirm(floor, element),
             },
         },
-    };
-    q.dialog(options);
+    });
 }
 
 function onReservationConfirm(floor: Floor, element: BaseTable) {
@@ -221,7 +222,7 @@ function showCreateReservationDialog(floor: Floor, element: BaseTable) {
     currentOpenCreateReservationDialog = {
         label,
         dialog,
-        floor: floor.id,
+        floorId: floor.id,
     };
 }
 
@@ -247,11 +248,11 @@ function onTableFound(tables: BaseTable[]) {
 }
 
 function instantiateFloor(floorDoc: FloorDoc) {
-    const canvas = canvases.value[floorDoc.id];
+    const canvas = canvases.get(floorDoc.id);
 
     if (!canvas || !pageRef.value) return;
 
-    state.floorInstances.push(
+    state.floorInstances.add(
         new Floor({
             canvas,
             floorDoc,
@@ -269,9 +270,9 @@ function instantiateFloors() {
 function checkIfReservedTableAndCloseCreateReservationDialog() {
     if (!currentOpenCreateReservationDialog) return;
 
-    const { dialog, label, floor } = currentOpenCreateReservationDialog;
-    const freeTables = freeTablesPerFloor.value[floor];
-    const isTableStillFree = freeTables.includes(label);
+    const { dialog, label, floorId } = currentOpenCreateReservationDialog;
+    const freeTables = freeTablesPerFloor.value.get(floorId);
+    const isTableStillFree = freeTables?.includes(label);
 
     if (isTableStillFree) return;
 
@@ -312,12 +313,12 @@ async function onDeleteReservation(floor: Floor, element: BaseTable) {
 async function initFloorInstancesData() {
     await nextTick();
     instantiateFloors();
-    setActiveFloor(state.floorInstances[0] as Floor);
+    setActiveFloor([...state.floorInstances][0]);
 }
 
 async function handleFloorInstancesData(newVal: FloorDoc[], old: FloorDoc[]) {
     if (!eventFloors.value) return;
-    if ((!old.length && newVal.length) || state.floorInstances.length === 0) {
+    if ((!old.length && newVal.length) || state.floorInstances.size === 0) {
         await initFloorInstancesData();
         return;
     }
@@ -343,7 +344,7 @@ onMounted(init);
     <div v-if="event" class="PageEvent" ref="pageRef">
         <div class="row items-center q-mb-sm">
             <q-fab
-                v-if="state.floorInstances.length"
+                v-if="state.floorInstances.size"
                 :model-value="state.showMapsExpanded"
                 :label="state.activeFloor ? state.activeFloor.name : ''"
                 padding="xs"
@@ -354,9 +355,9 @@ onMounted(init);
             >
                 <q-fab-action
                     :key="florInstance.id"
-                    v-for="florInstance in state.floorInstances"
+                    v-for="florInstance of state.floorInstances"
                     class="text-white"
-                    :class="{ 'button-gradient': isActiveFloor(florInstance) }"
+                    :class="{ 'button-gradient': isActiveFloor(florInstance.id) }"
                     @click.prevent="() => setActiveFloor(florInstance)"
                     :label="florInstance.name"
                 />
@@ -399,13 +400,9 @@ onMounted(init);
             v-for="floor in eventFloors"
             :key="floor.id"
             class="ft-tab-pane"
-            :class="{ 'active show': isActiveFloor(floor) }"
+            :class="{ 'active show': isActiveFloor(floor.id) }"
         >
-            <canvas
-                :id="floor.id"
-                class="shadow-3"
-                :ref="(el: any) => eventFloorsRef(floor, el)"
-            ></canvas>
+            <canvas :id="floor.id" class="shadow-3" :ref="mapFloorToCanvas(floor)"></canvas>
         </div>
 
         <EventGuestList :guest-list-limit="event.guestListLimit" :guest-list="guestList" />
