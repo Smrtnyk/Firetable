@@ -59,6 +59,7 @@ module.exports = {
         //
         "@typescript-eslint/unbound-method": "off",
         "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-unused-vars": "error",
         "@typescript-eslint/quotes": [
             "error",
             "double",

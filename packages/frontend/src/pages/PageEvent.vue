@@ -210,7 +210,7 @@ function showCreateReservationDialog(floor: Floor, element: BaseTable) {
                 componentPropsObject: {
                     freeTables: getFreeTables(floor)
                         .filter((table) => label !== table.label)
-                        .map(({ label }) => label),
+                        .map(takeProp("label")),
                     label,
                 },
                 listeners: {

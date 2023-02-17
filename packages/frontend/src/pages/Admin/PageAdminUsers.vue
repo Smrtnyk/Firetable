@@ -17,11 +17,12 @@ import {
     useFirestoreCollection,
     useFirestoreDocument,
 } from "src/composables/useFirestore";
+import { takeProp } from "@firetable/utils";
 
 const { maxNumOfUsers } = config;
 const authStore = useAuthStore();
 const quasar = useQuasar();
-const floorsMaps = computed(() => floors.value.map(({ name }) => name));
+const floorsMaps = computed(() => floors.value.map(takeProp("name")));
 const usersStatus = computed(() => {
     return {
         totalUsers: users.value.length,

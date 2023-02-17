@@ -1,21 +1,10 @@
 import { Floor } from "./Floor.js";
 import { BaseTable, FloorElementTypes } from "./types.js";
 import { FloorDoc } from "@firetable/types";
-import { takeProp } from "@firetable/utils";
+import { not, propIsTruthy, takeProp } from "@firetable/utils";
 
 export function hasFloorTables(floor: Floor): boolean {
-    const allGroups = floor.canvas.getObjects();
-    for (const group of allGroups) {
-        if (
-            // @ts-ignore
-            group.getObjects(FloorElementTypes.ROUND_TABLE).length ||
-            // @ts-ignore
-            group.getObjects(FloorElementTypes.RECT_TABLE).length
-        ) {
-            return true;
-        }
-    }
-    return false;
+    return getTables(floor).length > 0;
 }
 
 export function getTablesFromFloorDoc(floor: FloorDoc): BaseTable[] {
@@ -33,11 +22,11 @@ export function getTables(floor: Floor): BaseTable[] {
 }
 
 export function getFreeTables(floor: Floor): BaseTable[] {
-    return getTables(floor).filter(({ reservation }) => !reservation);
+    return getTables(floor).filter(not(propIsTruthy("reservation")));
 }
 
 export function getReservedTables(floor: Floor): BaseTable[] {
-    return getTables(floor).filter(({ reservation }) => !!reservation);
+    return getTables(floor).filter(propIsTruthy("reservation"));
 }
 
 export function extractAllTablesLabels(floor: Floor): string[] {

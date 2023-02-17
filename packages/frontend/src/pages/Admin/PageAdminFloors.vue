@@ -3,13 +3,14 @@ import AddNewFloorForm from "components/Floor/AddNewFloorForm.vue";
 import FTTitle from "components/FTTitle.vue";
 import FTDialog from "components/FTDialog.vue";
 
-import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { Loading, useQuasar } from "quasar";
 import { onMounted } from "vue";
 import { makeRawFloor } from "@firetable/floor-creator";
 import { Collection, FloorDoc } from "@firetable/types";
 import { addFloor, deleteFloor } from "@firetable/backend";
 import { useFirestoreCollection } from "src/composables/useFirestore";
+import { takeProp } from "@firetable/utils";
 
 const quasar = useQuasar();
 const {
@@ -42,7 +43,7 @@ function showAddNewFloorForm(): void {
                 },
             },
             componentPropsObject: {
-                allFloorNames: new Set(floors.value.map(({ name }) => name)),
+                allFloorNames: new Set(floors.value.map(takeProp("name"))),
             },
         },
     });

@@ -5,18 +5,19 @@ import FTTitle from "components/FTTitle.vue";
 import FTDialog from "components/FTDialog.vue";
 
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { onMounted, ref } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import { QueryDocumentSnapshot } from "firebase/firestore";
 import { useQuasar, QInfiniteScroll } from "quasar";
 import { useRouter } from "vue-router";
 import { Collection, CreateEventPayload, EventDoc, FloorDoc } from "@firetable/types";
 import { createNewEvent, deleteEvent, getEvents } from "@firetable/backend";
 import { useFirestoreCollection } from "src/composables/useFirestore";
+import { takeLast } from "@firetable/utils";
 
 const quasar = useQuasar();
 const router = useRouter();
 const isLoading = ref(true);
-const events = ref<EventDoc[]>([]);
+const events = reactive<Set<EventDoc>>(new Set());
 const hasMoreEventsToFetch = ref(true);
 const paginator = ref<QInfiniteScroll | null>(null);
 const { data: floors } = useFirestoreCollection<FloorDoc>(Collection.FLOORS, { once: true });
@@ -36,7 +37,7 @@ async function fetchMoreEvents(lastDoc: QueryDocumentSnapshot | null) {
     if (!eventsDocs.length || eventsDocs.length < 20) {
         hasMoreEventsToFetch.value = false;
     }
-    events.value.push(...eventsDocs);
+    eventsDocs.forEach(events.add, events);
 }
 
 function onCreateEvent(eventData: CreateEventPayload) {
@@ -58,7 +59,7 @@ async function onEventItemSlideRight({ event, reset }: { event: EventDoc; reset:
     await tryCatchLoadingWrapper({
         hook: async () => {
             await deleteEvent(event.id);
-            events.value = events.value.filter(({ id }) => id !== event.id);
+            events.delete(event);
         },
         errorHook: reset,
     });
@@ -66,8 +67,7 @@ async function onEventItemSlideRight({ event, reset }: { event: EventDoc; reset:
 
 async function onLoad(_: number, done: () => void) {
     if (!hasMoreEventsToFetch.value) return paginator.value?.stop();
-
-    const lastDoc = events.value[events.value.length - 1]._doc;
+    const lastDoc = takeLast([...events])._doc;
     await fetchMoreEvents(lastDoc);
 
     done();
@@ -107,10 +107,10 @@ onMounted(init);
             </template>
         </FTTitle>
 
-        <q-list v-if="!!events.length && !isLoading">
+        <q-list v-if="events.size > 0 && !isLoading">
             <q-infinite-scroll ref="paginator" @load="onLoad" :offset="50">
                 <PageAdminEventsListItem
-                    v-for="event in events"
+                    v-for="event of events"
                     :key="event.id"
                     :event="event"
                     @right="onEventItemSlideRight"
@@ -125,7 +125,10 @@ onMounted(init);
             </q-infinite-scroll>
         </q-list>
 
-        <div v-if="!events.length && !isLoading" class="row justify-center items-center q-mt-md">
+        <div
+            v-if="events.length === 0 && !isLoading"
+            class="row justify-center items-center q-mt-md"
+        >
             <div style="position: relative">
                 <h6 class="q-ma-sm text-weight-bolder underline">
                     There are no events, you should create one

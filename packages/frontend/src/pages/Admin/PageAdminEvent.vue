@@ -25,6 +25,7 @@ import {
     useFirestoreCollection,
     useFirestoreDocument,
 } from "src/composables/useFirestore";
+import { propIsTruthy } from "@firetable/utils";
 
 interface Props {
     id: string;
@@ -72,7 +73,7 @@ const eventData = computed(() => eventFloors.value.map(getTablesFromFloorDoc).fl
 
 const reservationsStatus = computed(() => {
     const tables = eventData.value as unknown as BaseTable[];
-    const reservations = tables.filter((table) => !!table.reservation);
+    const reservations = tables.filter(propIsTruthy("reservation"));
     const unreserved = tables.length - reservations.length;
     const pending = reservations.filter((table) => !table.reservation?.confirmed).length;
     const confirmed = reservations.length - pending;

@@ -81,12 +81,12 @@ function instantiateFloor(floorDoc: FloorDoc) {
     });
 }
 
-function onFloorSave() {
+function onFloorSave(): void {
     if (!floorInstance.value || !hasFloorTables(floorInstance.value as Floor)) {
         return showErrorMessage("You need to add at least one table!");
     }
 
-    return tryCatchLoadingWrapper({
+    tryCatchLoadingWrapper({
         hook: () =>
             updateFirestoreDocument(getFirestoreDocument(`${Collection.FLOORS}/${props.floorID}`), {
                 json: floorInstance.value?.canvas.toJSON(["name"]),
