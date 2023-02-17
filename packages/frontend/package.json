@@ -15,17 +15,17 @@
     },
     "devDependencies": {
         "@quasar/app-vite": "1.2.0",
-        "vue-tsc": "1.0.24"
+        "vue-tsc": "1.1.2"
     },
     "dependencies": {
         "@firetable/backend": "workspace:*",
         "@firetable/floor-creator": "workspace:*",
         "@firetable/types": "workspace:*",
         "@firetable/utils": "workspace:*",
-        "@quasar/extras": "1.15.10",
+        "@quasar/extras": "1.15.11",
         "chart.js": "4.2.1",
         "pinia": "2.0.30",
-        "quasar": "2.11.5",
+        "quasar": "2.11.6",
         "ts-pattern": "4.1.4",
         "vue": "3.2.47",
         "vue-i18n": "9.2.2",

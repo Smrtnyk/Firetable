@@ -30,22 +30,18 @@ export async function getEvents(lastDocument: DocumentData | null): Promise<Even
         query(eventsCollection(), orderByDateQuery, limitQuery, startAfterQuery)
     );
 
-    if (eventsDocs.empty) {
-        return [];
-    }
-
-    return eventsDocs.docs.map((doc) => {
-        return {
-            ...doc.data(),
-            id: doc.id,
-            _doc: doc,
-        };
-    }) as unknown as EventDoc[];
+    return eventsDocs.docs.map(toEventDoc);
 }
 
-export function deleteEvent(id: string) {
-    return deleteCollection(id);
+function toEventDoc(doc: DocumentData): EventDoc {
+    return {
+        ...doc.data(),
+        id: doc.id,
+        _doc: doc,
+    };
 }
+
+export const deleteEvent = deleteCollection;
 
 export function updateEventProperty<T extends keyof EventDoc>(
     eventId: string,

@@ -160,7 +160,7 @@ function setAppLanguage(val: string) {
             </q-item>
             <q-item>
                 <q-toggle
-                    :model-value="user?.status"
+                    :model-value="user.status"
                     checked-icon="status-online"
                     color="green"
                     label="Toggle online status"

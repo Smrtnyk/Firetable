@@ -17,7 +17,7 @@ export function floorsCollection() {
 }
 
 export function guestListCollection(eventId: string) {
-    return collection(eventsCollection(), eventId + "/" + Collection.GUEST_LIST);
+    return collection(eventsCollection(), `${eventId}/${Collection.GUEST_LIST}`);
 }
 
 export function usersCollection() {
@@ -52,7 +52,7 @@ export function floorDoc(id: string) {
 }
 
 export function eventFloorDoc(eventId: string, floorId: string) {
-    return doc(eventDoc(eventId), Collection.FLOORS + "/" + floorId);
+    return doc(eventDoc(eventId), `${Collection.FLOORS}/${floorId}`);
 }
 
 export function guestDoc(eventId: string, guestId: string) {

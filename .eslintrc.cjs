@@ -10,7 +10,7 @@ module.exports = {
 
     env: {
         browser: true,
-        es2021: true,
+        es2022: true,
         node: true,
         "vue/setup-compiler-macros": true,
     },
@@ -53,6 +53,7 @@ module.exports = {
         "import/no-unresolved": "off",
         "import/no-duplicates": "error",
         //
+        "prefer-template": "error",
         "linebreak-style": ["error", "unix"],
         "require-await": "error",
         //

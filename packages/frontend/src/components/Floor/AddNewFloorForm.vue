@@ -2,8 +2,20 @@
 import { ref } from "vue";
 import { noEmptyString } from "src/helpers/form-rules";
 
+interface Props {
+    allFloorNames: string[];
+}
+
+const props = defineProps<Props>();
 const emit = defineEmits(["create"]);
 const floorName = ref("");
+
+function noSameFloorName(val: string) {
+    return (
+        !props.allFloorNames.find((name) => name === val) ||
+        "Floor with the same name already exists!"
+    );
+}
 
 function onSubmit() {
     emit("create", floorName.value);
@@ -22,7 +34,7 @@ function onReset() {
             rounded
             label="Floor name *"
             lazy-rules
-            :rules="[noEmptyString()]"
+            :rules="[noEmptyString(), noSameFloorName]"
         />
 
         <div>

@@ -31,17 +31,6 @@ async function onFloorDelete(id: string, reset: () => void) {
     );
 }
 
-async function onAddNewFloor(name: string) {
-    if (floors.value.find((floor) => floor.name === name)) {
-        showErrorMessage("Floor wit the same name already exists!");
-        return;
-    }
-    const newFloor = makeRawFloor(name);
-    await tryCatchLoadingWrapper(async () => {
-        await addFloor(newFloor);
-    });
-}
-
 function showAddNewFloorForm(): void {
     const dialog = quasar.dialog({
         component: FTDialog,
@@ -50,11 +39,15 @@ function showAddNewFloorForm(): void {
             component: AddNewFloorForm,
             maximized: false,
             listeners: {
-                create: (name: string) => {
-                    onAddNewFloor(name).then(dialog.hide).catch(showErrorMessage);
+                create: function onFloorCreate(name: string) {
+                    tryCatchLoadingWrapper(() => addFloor(makeRawFloor(name)))
+                        .then(dialog.hide)
+                        .catch(showErrorMessage);
                 },
             },
-            componentPropsObject: {},
+            componentPropsObject: {
+                allFloorNames: floors.value.map(({ name }) => name),
+            },
         },
     });
 }

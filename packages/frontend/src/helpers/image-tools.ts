@@ -18,12 +18,12 @@ function resizeSync(
 ) {
     // eslint-disable-next-line @typescript-eslint/prefer-regexp-exec
     if (!file.type.match(/image.*/)) {
-        throw new Error("An error ocurred while processing the image!");
+        throw new Error("An error occurred while processing the image!");
     }
 
     if (file.type.match(/image\/gif/)) {
         // Not attempting, could be an animated gif
-        throw new Error("An error ocurred while processing the image!");
+        throw new Error("An error occurred while processing the image!");
     }
 
     const image = document.createElement("img");
