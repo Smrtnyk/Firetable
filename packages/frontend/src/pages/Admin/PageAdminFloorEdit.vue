@@ -110,27 +110,25 @@ function onFloorChange(prop: keyof Floor, event: null | number | string) {
     }
 }
 
-function handleAddTableCallback(floor: Floor, { tag }: ElementDescriptor, [x, y]: NumberTuple) {
-    return function addTable(label: string) {
-        floor.addTableElement({ label, x, y, tag });
-    };
-}
-
 function handleAddNewElement(floor: Floor, coords: NumberTuple) {
     return function ({ elementDescriptor }: BottomSheetTableClickResult) {
         // if (isWall(elementDescriptor)) return floor.addWall(coords);
-
-        q.dialog({
+        const [x, y] = coords;
+        const { tag } = elementDescriptor;
+        const dialog = q.dialog({
             component: FTDialog,
             componentProps: {
                 component: AddTableDialog,
                 maximized: false,
                 title: "Table ID",
                 componentPropsObject: {
-                    ids: extractAllTablesLabels(floor),
+                    ids: new Set(extractAllTablesLabels(floor)),
                 },
                 listeners: {
-                    create: handleAddTableCallback(floor, elementDescriptor, coords),
+                    create: function (label: string) {
+                        dialog.hide();
+                        floor.addTableElement({ label, x, y, tag });
+                    },
                 },
             },
         });
@@ -150,8 +148,7 @@ async function elementClickHandler(_: Floor, element: BaseTable | null) {
 function onDeleteElement(element: BaseTable) {
     const elementToDelete = element.canvas?.getActiveObject();
     if (!elementToDelete) return;
-    element.canvas?.remove();
-    element.canvas?.renderAll();
+    element.canvas?.remove(elementToDelete);
 }
 </script>
 

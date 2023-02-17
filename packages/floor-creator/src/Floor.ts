@@ -1,6 +1,6 @@
 import { fabric } from "fabric";
 import { TableElement } from "./TableElement.js";
-import { RESOLUTION, TABLE_HEIGHT, TABLE_WIDTH } from "./constants.js";
+import { FONT_SIZE, RESOLUTION, TABLE_HEIGHT, TABLE_WIDTH } from "./constants.js";
 import {
     BaseTable,
     CreateTableOptions,
@@ -177,8 +177,7 @@ export class Floor {
         const text = new fabric.Text(label, {
             originX: "center",
             originY: "center",
-            fontSize: 20,
-            fontFamily: "Helvetica",
+            fontSize: FONT_SIZE,
             fill: "#fff",
         });
         return this.createGroup([table, text], x, y);
@@ -197,8 +196,7 @@ export class Floor {
             originY: "center",
             left: 0.5 * 50,
             top: 0.5 * 50,
-            fontSize: 20,
-            fontFamily: "Helvetica",
+            fontSize: FONT_SIZE,
             fill: "#fff",
         });
         return this.createGroup([rect, text], x, y);
@@ -233,7 +231,7 @@ export class Floor {
     }
 
     setReservationOnTable(element: BaseTable, reservation: Reservation | null) {
-        // @ts-ignore
+        // @ts-ignore -- FIXME: figure out why it complains about set
         element.set({ reservation });
     }
 

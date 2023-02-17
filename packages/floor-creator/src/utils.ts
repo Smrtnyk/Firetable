@@ -1,12 +1,9 @@
 import { Reservation } from "@firetable/types";
+import { match } from "ts-pattern";
 
 export function determineTableColor(reservation?: Reservation): string {
-    let fillColor = "#444";
-    if (reservation) {
-        fillColor = "#2ab7ca";
-        if (reservation.confirmed) {
-            fillColor = "#1a7722";
-        }
-    }
-    return fillColor;
+    return match(reservation)
+        .with({ confirmed: false }, () => "#2ab7ca")
+        .with({ confirmed: true }, () => "#1a7722")
+        .otherwise(() => "#444");
 }
