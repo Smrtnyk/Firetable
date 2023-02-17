@@ -23,8 +23,9 @@ const { data: floors } = useFirestoreCollection<FloorDoc>(Collection.FLOORS, { o
 
 async function init() {
     isLoading.value = true;
-    await tryCatchLoadingWrapper(fetchMoreEvents.bind(null, null), [], () => {
-        router.replace("/").catch(showErrorMessage);
+    await tryCatchLoadingWrapper({
+        hook: () => fetchMoreEvents(null),
+        errorHook: () => router.replace("/").catch(showErrorMessage),
     });
     isLoading.value = false;
 }
@@ -39,27 +40,28 @@ async function fetchMoreEvents(lastDoc: QueryDocumentSnapshot | null) {
 }
 
 function onCreateEvent(eventData: CreateEventPayload) {
-    tryCatchLoadingWrapper(async () => {
-        const { data: id } = await createNewEvent(eventData);
-        quasar.notify("Event created!");
-        await router.replace({
-            name: "adminEvent",
-            params: { id },
-        });
-    }).catch(showErrorMessage);
+    tryCatchLoadingWrapper({
+        hook: async () => {
+            const { data: id } = await createNewEvent(eventData);
+            quasar.notify("Event created!");
+            await router.replace({
+                name: "adminEvent",
+                params: { id },
+            });
+        },
+    });
 }
 
 async function onEventItemSlideRight({ event, reset }: { event: EventDoc; reset: () => void }) {
     if (!(await showConfirm("Delete Event?"))) return reset();
 
-    await tryCatchLoadingWrapper(
-        async () => {
+    await tryCatchLoadingWrapper({
+        hook: async () => {
             await deleteEvent(event.id);
             events.value = events.value.filter(({ id }) => id !== event.id);
         },
-        [],
-        reset
-    );
+        errorHook: reset,
+    });
 }
 
 async function onLoad(_: number, done: () => void) {

@@ -94,14 +94,16 @@ async function init() {
 }
 
 function onFloorUpdate(floor: Floor) {
-    tryCatchLoadingWrapper(() => updateEventFloorData(floor, props.id)).catch(showErrorMessage);
+    tryCatchLoadingWrapper({
+        hook: () => updateEventFloorData(floor, props.id),
+    });
 }
 
 function onUpdateActiveStaff(newActiveStaff: User["id"][]) {
     if (!event.value) return;
     const eventId = event.value.id;
-    tryCatchLoadingWrapper(() => {
-        return updateEventProperty(eventId, "activeStaff", newActiveStaff);
+    tryCatchLoadingWrapper({
+        hook: () => updateEventProperty(eventId, "activeStaff", newActiveStaff),
     });
 }
 

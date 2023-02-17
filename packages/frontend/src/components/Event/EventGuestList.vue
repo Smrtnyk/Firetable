@@ -35,24 +35,25 @@ function onCreate(newGuestData: GuestData) {
         return;
     }
 
-    tryCatchLoadingWrapper(() => addGuestToGuestList(eventID.value, newGuestData)).catch(
-        showErrorMessage
-    );
+    tryCatchLoadingWrapper({
+        hook: () => addGuestToGuestList(eventID.value, newGuestData),
+    });
 }
 
 async function deleteGuest(id: string, reset: () => void) {
     if (!(await showConfirm("Do you really want to delete this guest from the guest list?")))
         return reset();
 
-    await tryCatchLoadingWrapper(() => deleteGuestFromGuestList(eventID.value, id), void 0, reset);
+    await tryCatchLoadingWrapper({
+        hook: () => deleteGuestFromGuestList(eventID.value, id),
+        errorHook: reset,
+    });
 }
 
 function confirmGuest({ id, confirmed }: GuestData, reset: () => void) {
-    tryCatchLoadingWrapper(() => {
-        return confirmGuestFromGuestList(eventID.value, id, !confirmed);
-    })
-        .then(reset)
-        .catch(showErrorMessage);
+    tryCatchLoadingWrapper({
+        hook: () => confirmGuestFromGuestList(eventID.value, id, !confirmed).then(reset),
+    });
 }
 
 function showAddNewGuestForm(): void {

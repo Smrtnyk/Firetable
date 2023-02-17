@@ -7,6 +7,7 @@ import { useAuthStore } from "src/stores/auth-store";
 import { useAppStore } from "src/stores/app-store";
 import { logoutUser, updateUserField } from "@firetable/backend";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { User } from "@firetable/types";
 
 interface Props {
     showAdminLinks: boolean;
@@ -45,7 +46,7 @@ const adminLinks = computed(() => [
         text: t("AppDrawer.links.manageRoles"),
     },
 ]);
-const user = computed(() => authStore.user);
+const user = computed(() => authStore.user as unknown as NonNullable<User>);
 const adminLinksCollection = computed(() => (props.showAdminLinks ? adminLinks.value : []));
 const avatar = computed(() => {
     if (!user.value) return "";
@@ -68,9 +69,9 @@ function toggleUserActivityStatus(newValue: boolean) {
 }
 
 function onLogoutUser() {
-    tryCatchLoadingWrapper(() => logoutUser().then(authStore.unsubscribeUserWatch)).catch(
-        showErrorMessage
-    );
+    tryCatchLoadingWrapper({
+        hook: () => logoutUser().then(authStore.unsubscribeUserWatch),
+    });
 }
 
 function setAppLanguage(val: string) {

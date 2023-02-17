@@ -55,17 +55,23 @@ export function loadingWrapper<T extends (...args: any[]) => Promise<any>>(fn: T
     };
 }
 
-export async function tryCatchLoadingWrapper<T>(
-    hook: (...args: unknown[]) => Promise<T>,
-    argums: unknown[] = [],
-    errorHook: (...args: unknown[]) => void = NOOP
-): Promise<T | void> {
+type TryCatchLoadingWrapperOptions<T> = {
+    hook: (...args: unknown[]) => Promise<T>;
+    args?: unknown[];
+    errorHook?: (...args: unknown[]) => void;
+};
+
+export async function tryCatchLoadingWrapper<T>({
+    hook,
+    args,
+    errorHook,
+}: TryCatchLoadingWrapperOptions<T>): Promise<T | void> {
     try {
         Loading.show();
-        return await hook(...argums);
+        return await hook(...(args || []));
     } catch (e) {
         showErrorMessage(e);
-        errorHook(...argums);
+        (errorHook || NOOP)(...(args || []));
     } finally {
         Loading.hide();
     }

@@ -166,7 +166,9 @@ function onReservationConfirm(floor: Floor, element: BaseTable) {
                 });
             }
         }
-        return tryCatchLoadingWrapper(() => updateEventFloorData(floor, props.id));
+        return tryCatchLoadingWrapper({
+            hook: () => updateEventFloorData(floor, props.id),
+        });
     };
 }
 
@@ -187,7 +189,9 @@ function handleReservationCreation(floor: Floor, reservationData: CreateReservat
             });
         }
     }
-    tryCatchLoadingWrapper(() => updateEventFloorData(floor, props.id)).catch(showErrorMessage);
+    tryCatchLoadingWrapper({
+        hook: () => updateEventFloorData(floor, props.id),
+    });
 }
 
 function resetCurrentOpenCreateReservationDialog() {
@@ -307,7 +311,9 @@ async function onDeleteReservation(floor: Floor, element: BaseTable) {
         }
     }
 
-    await tryCatchLoadingWrapper(() => updateEventFloorData(floor, props.id));
+    await tryCatchLoadingWrapper({
+        hook: () => updateEventFloorData(floor, props.id),
+    });
 }
 
 async function initFloorInstancesData() {

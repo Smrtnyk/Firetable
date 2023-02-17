@@ -21,14 +21,10 @@ const {
 async function onFloorDelete(id: string, reset: () => void) {
     if (!(await showConfirm("Delete floor?"))) return reset();
 
-    await tryCatchLoadingWrapper(
-        async () => {
-            await deleteFloor(id);
-            floors.value = floors.value.filter((floor) => floor.id !== id);
-        },
-        [],
-        reset
-    );
+    await tryCatchLoadingWrapper({
+        hook: () => deleteFloor(id),
+        errorHook: reset,
+    });
 }
 
 function showAddNewFloorForm(): void {
@@ -40,9 +36,9 @@ function showAddNewFloorForm(): void {
             maximized: false,
             listeners: {
                 create: function onFloorCreate(name: string) {
-                    tryCatchLoadingWrapper(() => addFloor(makeRawFloor(name)))
-                        .then(dialog.hide)
-                        .catch(showErrorMessage);
+                    tryCatchLoadingWrapper({
+                        hook: () => addFloor(makeRawFloor(name)).then(dialog.hide),
+                    });
                 },
             },
             componentPropsObject: {

@@ -55,14 +55,16 @@ async function checkForExistingPushSubscription() {
 }
 
 function createAndSavePushSubscription(sw: ServiceWorkerRegistration) {
-    return tryCatchLoadingWrapper(async () => {
-        const newSub = await sw.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: urlBase64ToUint8Array(process.env.VAPID_PUBLIC_KEY),
-        });
+    return tryCatchLoadingWrapper({
+        hook: async () => {
+            const newSub = await sw.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(process.env.VAPID_PUBLIC_KEY),
+            });
 
-        await savePushSubscription(newSub.toJSON());
-        await displayGrantedNotification(sw);
+            await savePushSubscription(newSub.toJSON());
+            await displayGrantedNotification(sw);
+        },
     });
 }
 

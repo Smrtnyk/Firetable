@@ -21,9 +21,11 @@ async function onSubmit() {
     if (!(await authForm.value?.validate())) return;
     const validEmail = `${username.value}${PROJECT_MAIL}`;
 
-    await tryCatchLoadingWrapper(async () => {
-        await loginWithEmail(validEmail, password.value);
-        await router.replace("/");
+    await tryCatchLoadingWrapper({
+        hook: async () => {
+            await loginWithEmail(validEmail, password.value);
+            return router.replace("/");
+        },
     });
 }
 </script>
