@@ -133,7 +133,7 @@ export class Floor {
         this.name = newName;
     }
 
-    renderData(jsonData?: string) {
+    renderData(jsonData?: FloorDoc["json"]) {
         this.setScaling();
         if (jsonData) {
             this.canvas.loadFromJSON(
@@ -250,12 +250,8 @@ export class Floor {
 
 function getTableFromGroupElement(ev: fabric.IEvent): BaseTable | null {
     const group = ev.target;
-    // @ts-ignore -- table is always set first on the group, text second
-    const maybeTable = group?._objects[0];
-    if (isTable(maybeTable)) {
-        return maybeTable;
-    }
-    return null;
+    // @ts-ignore -- not typed apparently
+    return group?._objects.find(isTable);
 }
 
 function containsTables(ev: fabric.IEvent): boolean {

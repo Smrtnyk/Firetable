@@ -3,7 +3,7 @@ export interface FloorDoc {
     name: string;
     width: number;
     height: number;
-    json?: string;
+    json: Record<string, any>;
 }
 
 export const enum ElementType {
