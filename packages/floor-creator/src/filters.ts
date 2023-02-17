@@ -15,10 +15,17 @@ export function getTablesFromFloorDoc(floor: FloorDoc): BaseTable[] {
 }
 
 export function getTables(floor: Floor): BaseTable[] {
-    return [
-        ...(floor.canvas.getObjects(FloorElementTypes.ROUND_TABLE) as BaseTable[]),
-        ...(floor.canvas.getObjects(FloorElementTypes.RECT_TABLE) as BaseTable[]),
-    ];
+    const allGroups = floor.canvas.getObjects();
+    return allGroups
+        .map((group) => {
+            return [
+                // @ts-ignore -- FIXME: figure out if there is a properly typed API for this
+                ...group.getObjects(FloorElementTypes.ROUND_TABLE),
+                // @ts-ignore
+                ...group.getObjects(FloorElementTypes.RECT_TABLE),
+            ];
+        })
+        .flat();
 }
 
 export function getFreeTables(floor: Floor): BaseTable[] {

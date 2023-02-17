@@ -3,7 +3,7 @@ import AddTableDialog from "components/Floor/AddTableDialog.vue";
 import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
 import FTDialog from "components/FTDialog.vue";
 
-import { nextTick, onMounted, ref } from "vue";
+import { nextTick, onMounted, ref, shallowRef } from "vue";
 import { NumberTuple } from "src/types/generic";
 import { useRouter } from "vue-router";
 import { Loading, useQuasar } from "quasar";
@@ -46,7 +46,7 @@ const addNewElementsBottomSheetOptions = {
 const props = defineProps<Props>();
 const router = useRouter();
 const q = useQuasar();
-const floorInstance = ref<Floor | null>(null);
+const floorInstance = shallowRef<Floor | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 const pageRef = ref<HTMLDivElement | null>(null);
 const selectedElement = ref<BaseTable | null>(null);
