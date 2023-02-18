@@ -296,12 +296,12 @@ function updateFloorInstancesData() {
 }
 
 async function onDeleteReservation(floor: Floor, element: BaseTable) {
-    if (!(await showConfirm("Delete reservation?"))) return;
-    const { reservation } = element;
-    if (!reservation) return;
-    const { groupedWith } = reservation;
+    if (!(await showConfirm("Delete reservation?")) || !element.reservation) return;
+
+    const { groupedWith } = element.reservation;
+    const allFloorTables = getTables(floor);
     for (const tableId of groupedWith) {
-        const table = getTables(floor).find(({ label }) => label === tableId);
+        const table = allFloorTables.find(({ label }) => label === tableId);
         if (table) {
             floor.setReservationOnTable(table, null);
         }

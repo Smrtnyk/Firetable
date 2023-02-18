@@ -4,14 +4,14 @@ export function resizeImage(
 ): Promise<never | Blob> {
     return new Promise((resolve, reject) => {
         try {
-            resizeSync(file, maxDimensions, resolve);
+            resize(file, maxDimensions, resolve);
         } catch (e) {
             reject(e);
         }
     });
 }
 
-function resizeSync(
+function resize(
     file: File,
     maxDimensions: { width: number; height: number },
     callback: (file: Blob) => void

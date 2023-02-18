@@ -6,7 +6,12 @@
                     v-if="isSelectedElementRoundTable(selectedElement)"
                     class="col-4 q-pa-xs q-pl-none"
                 >
-                    <q-input :model-value="selectedElement.radius" filled label="Radius" readonly />
+                    <q-input
+                        :model-value="getElementRadius(selectedElement)"
+                        filled
+                        label="Radius"
+                        readonly
+                    />
                 </div>
                 <template v-else>
                     <div class="col-4 q-pa-xs q-pl-none">
@@ -94,6 +99,10 @@ function getElementWidth(e: BaseTable | null): number {
 
 function getElementHeight(e: BaseTable | null): number {
     return Math.round((e?.group?.height || 0) * (e?.group?.scaleY || 0));
+}
+
+function getElementRadius(e: RoundTableElement): number {
+    return (e.radius || 0) * (e.group?.scaleY || 0);
 }
 
 function isSelectedElementRoundTable(
