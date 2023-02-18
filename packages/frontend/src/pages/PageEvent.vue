@@ -290,11 +290,7 @@ function updateFloorInstancesData() {
 
     for (const floorInstance of state.floorInstances) {
         const findFloor = eventFloors.value.find(({ id }) => id === floorInstance.id);
-
-        if (!findFloor) {
-            return;
-        }
-
+        if (!findFloor) return;
         floorInstance.renderData(findFloor.json);
     }
 }

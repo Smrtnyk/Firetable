@@ -77,7 +77,8 @@ function showCreateUserDialog(): void {
     });
 }
 
-function showEditUserDialog(user: User) {
+async function showEditUserDialog(user: User) {
+    if (!(await showConfirm(`Are you sure you want to edit user ${user.name}?`, ""))) return;
     quasar.dialog({
         component: FTDialog,
         componentProps: {
@@ -97,7 +98,7 @@ function showEditUserDialog(user: User) {
     });
 }
 
-async function onUserSlideRight({ id }: User, reset: () => void) {
+async function onUserSlideRight(id: string, reset: () => void) {
     if (await showConfirm("Delete user?")) {
         return onDeleteUser(id);
     }
@@ -130,8 +131,8 @@ async function onUserSlideRight({ id }: User, reset: () => void) {
                 v-for="user in users"
                 :key="user.id"
                 right-color="warning"
-                @right="onUserSlideRight.bind(user)"
-                @left="showEditUserDialog.bind(user)"
+                @right="({ reset }) => onUserSlideRight(user.id, reset)"
+                @left="({ reset }) => showEditUserDialog(user, reset)"
                 class="fa-card"
             >
                 <template #right>

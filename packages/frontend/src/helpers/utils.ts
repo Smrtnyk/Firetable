@@ -16,9 +16,7 @@ export function urlBase64ToUint8Array(base64String: string) {
 }
 
 function formatFromTimestamp(timestamp: number, format: string) {
-    if (!timestamp) {
-        return "";
-    }
+    if (!timestamp) return "";
     return formatDate(timestamp, format);
 }
 

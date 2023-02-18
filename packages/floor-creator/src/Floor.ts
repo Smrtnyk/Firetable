@@ -1,6 +1,6 @@
 import { fabric } from "fabric";
 import { TableElement } from "./TableElement.js";
-import { FONT_SIZE, RESOLUTION, TABLE_HEIGHT, TABLE_WIDTH } from "./constants.js";
+import { CANVAS_BG_COLOR, FONT_SIZE, RESOLUTION, TABLE_HEIGHT, TABLE_WIDTH } from "./constants.js";
 import {
     BaseTable,
     CreateTableOptions,
@@ -39,16 +39,18 @@ export class Floor {
     floorDoc: FloorDoc;
     containerWidth: number;
     canvas: fabric.Canvas | fabric.StaticCanvas;
-    dblClickHandler?: FloorDoubleClickHandler;
+    dblClickHandler: FloorDoubleClickHandler | undefined;
     elementClickHandler: ElementClickHandler;
 
+    // Check if double click was on the actual table
+    // if it is, then do nothing, but if it is not
+    // then invoke the handler
     onDblClickHandler = (ev: fabric.IEvent<MouseEvent>) => {
         if (containsTables(ev)) return;
         const coords: NumberTuple = [ev.pointer?.x || 50, ev.pointer?.y || 50];
-        if (this.dblClickHandler) {
-            this.dblClickHandler(this, coords);
-        }
+        this.dblClickHandler?.(this, coords);
     };
+
     onMouseUpHandler = (ev: fabric.IEvent<MouseEvent>) => {
         if (containsTables(ev)) return;
         this.elementClickHandler(this, null);
@@ -67,10 +69,10 @@ export class Floor {
     };
     onObjectMove = (options: fabric.IEvent) => {
         if (!options.target?.left || !options.target?.top) return;
-        if (
+        const shouldSnapToGrid =
             Math.round((options.target.left / RESOLUTION) * 4) % 4 == 0 &&
-            Math.round((options.target.top / RESOLUTION) * 4) % 4 == 0
-        ) {
+            Math.round((options.target.top / RESOLUTION) * 4) % 4 == 0;
+        if (shouldSnapToGrid) {
             options.target
                 .set({
                     left: Math.round(options.target.left / RESOLUTION) * RESOLUTION,
@@ -92,7 +94,7 @@ export class Floor {
         const canvasOptions = {
             width: floorDoc.width,
             height: floorDoc.height,
-            backgroundColor: "#333",
+            backgroundColor: CANVAS_BG_COLOR,
         };
         if (mode !== FloorMode.EDITOR) {
             Object.assign(canvasOptions, {
@@ -108,16 +110,13 @@ export class Floor {
         this.id = floorDoc.id;
         this.name = floorDoc.name;
         this.mode = mode;
-        if (dblClickHandler) {
-            this.dblClickHandler = dblClickHandler;
-        }
+        this.dblClickHandler = dblClickHandler;
         this.elementClickHandler = elementClickHandler;
         this.canvas.on("mouse:dblclick", this.onDblClickHandler);
         this.canvas.on("mouse:up", this.onMouseUpHandler);
         this.canvas.on("object:moving", this.onObjectMove);
         this.canvas.on("object:scaling", (e) => {
-            const { target } = e;
-            if (!target) return;
+            if (!e.target) return;
             this.elementClickHandler(this, getTableFromGroupElement(e));
         });
         this.renderData(floorDoc.json);
@@ -135,22 +134,24 @@ export class Floor {
 
     renderData(jsonData?: FloorDoc["json"]) {
         this.setScaling();
-        if (jsonData) {
-            this.canvas.loadFromJSON(
-                jsonData,
-                () => {
-                    if (this.mode === FloorMode.EDITOR) {
-                        this.drawGrid();
-                    }
-                    this.canvas.renderAll();
-                },
-                this.elementReviver
-            );
-        } else {
-            if (this.mode === FloorMode.EDITOR) {
+        if (!jsonData) return this.renderEmptyFloor();
+
+        this.canvas.loadFromJSON(
+            jsonData,
+            () => {
+                if (this.mode === FloorMode.EDITOR) {
+                    this.drawGrid();
+                }
                 this.canvas.renderAll();
-                this.drawGrid();
-            }
+            },
+            this.elementReviver
+        );
+    }
+
+    renderEmptyFloor() {
+        if (this.mode === FloorMode.EDITOR) {
+            this.canvas.renderAll();
+            this.drawGrid();
         }
     }
 

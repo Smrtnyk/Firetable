@@ -1,10 +1,10 @@
 import { Dialog, Loading } from "quasar";
 import { isString, NOOP } from "@firetable/utils";
 
-export function showConfirm(title: string) {
+export function showConfirm(title: string, message = "Confirm delete?") {
     const options = {
         title,
-        message: "Confirm delete?",
+        message,
         persistent: true,
         ok: {
             size: "md",
@@ -61,6 +61,14 @@ type TryCatchLoadingWrapperOptions<T> = {
     errorHook?: (...args: unknown[]) => void;
 };
 
+/**
+ * Immediately executes passed in hook
+ * It first calls a loading spinner, and awaits the hook to finish and then it hides the loading spinner
+ *
+ * @param hook An async function to run
+ * @param args These arguments will be passed in to the hook
+ * @param errorHook In case hook throws, errorHook will be executed
+ */
 export async function tryCatchLoadingWrapper<T>({
     hook,
     args,

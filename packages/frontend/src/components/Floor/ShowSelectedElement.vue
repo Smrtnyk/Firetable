@@ -99,9 +99,7 @@ function getElementHeight(e: BaseTable | null): number {
 function isSelectedElementRoundTable(
     selectedElement: BaseTable | null
 ): selectedElement is RoundTableElement {
-    if (!selectedElement) {
-        return false;
-    }
+    if (!selectedElement) return false;
     const element = selectedElement;
     return isRoundTable(element) && !!element.radius;
 }

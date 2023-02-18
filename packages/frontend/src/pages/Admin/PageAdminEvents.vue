@@ -14,6 +14,8 @@ import { createNewEvent, deleteEvent, getEvents } from "@firetable/backend";
 import { useFirestoreCollection } from "src/composables/useFirestore";
 import { takeLast } from "@firetable/utils";
 
+const EVENTS_PER_PAGE = 20;
+
 const quasar = useQuasar();
 const router = useRouter();
 const isLoading = ref(true);
@@ -33,8 +35,8 @@ async function init() {
 
 async function fetchMoreEvents(lastDoc: QueryDocumentSnapshot | null) {
     if (!hasMoreEventsToFetch.value) return;
-    const eventsDocs = await getEvents(lastDoc);
-    if (!eventsDocs.length || eventsDocs.length < 20) {
+    const eventsDocs = await getEvents(lastDoc, EVENTS_PER_PAGE);
+    if (!eventsDocs.length || eventsDocs.length < EVENTS_PER_PAGE) {
         hasMoreEventsToFetch.value = false;
     }
     eventsDocs.forEach(events.add, events);

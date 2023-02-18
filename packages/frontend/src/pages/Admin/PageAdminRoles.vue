@@ -29,10 +29,11 @@ const onDeleteRole = loadingWrapper((roleNameToDelete: string) => {
     });
 });
 
-async function deleteRole(roleNameToDelete: string): Promise<void> {
+async function deleteRole(roleNameToDelete: string, reset: () => void): Promise<void> {
     if (await showConfirm("Delete Role?")) {
         return onDeleteRole(roleNameToDelete);
     }
+    reset();
 }
 
 function createRole(): void {
@@ -69,7 +70,7 @@ function createRole(): void {
                 v-for="role in rolesDoc.roles"
                 :key="role"
                 right-color="warning"
-                @right="() => deleteRole(role)"
+                @right="({ reset }) => deleteRole(role, reset)"
                 class="fa-card"
             >
                 <template #right>

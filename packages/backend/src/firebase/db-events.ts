@@ -22,9 +22,12 @@ import {
 import { CreateEventPayload, EventDoc, GuestData } from "@firetable/types";
 import { Floor } from "@firetable/floor-creator";
 
-export async function getEvents(lastDocument: DocumentData | null): Promise<EventDoc[]> {
+export async function getEvents(
+    lastDocument: DocumentData | null,
+    countPerPage: number
+): Promise<EventDoc[]> {
     const orderByDateQuery = orderBy("date");
-    const limitQuery = limit(20);
+    const limitQuery = limit(countPerPage);
     const startAfterQuery = startAfter(lastDocument);
     const eventsDocs = await getDocs(
         query(eventsCollection(), orderByDateQuery, limitQuery, startAfterQuery)
