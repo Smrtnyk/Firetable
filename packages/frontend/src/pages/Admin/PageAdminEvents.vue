@@ -127,10 +127,7 @@ onMounted(init);
             </q-infinite-scroll>
         </q-list>
 
-        <div
-            v-if="events.length === 0 && !isLoading"
-            class="row justify-center items-center q-mt-md"
-        >
+        <div v-if="events.size === 0 && !isLoading" class="row justify-center items-center q-mt-md">
             <div style="position: relative">
                 <h6 class="q-ma-sm text-weight-bolder underline">
                     There are no events, you should create one

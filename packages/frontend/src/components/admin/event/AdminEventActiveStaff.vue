@@ -15,30 +15,28 @@
 
 <script setup lang="ts">
 import { User } from "@firetable/types";
-import { ref } from "vue";
+import { reactive } from "vue";
 
 interface Props {
     eventId: string;
     users: User[];
-    activeStaff: User["id"][];
+    activeStaff: Set<User["id"]>;
 }
 
 const props = defineProps<Props>();
-const activeStaff = ref(props.activeStaff);
+const activeStaff = reactive(props.activeStaff);
 const emit = defineEmits(["updateActiveStaff"]);
 
 function setUserAsActiveEventStaff(id: User["id"], active: boolean) {
-    let newActiveStaff = [...(activeStaff.value || [])];
     if (active) {
-        newActiveStaff.push(id);
+        activeStaff.add(id);
     } else {
-        newActiveStaff = newActiveStaff.filter((person) => person !== id);
+        activeStaff.delete(id);
     }
-    emit("updateActiveStaff", newActiveStaff);
-    activeStaff.value = newActiveStaff;
+    emit("updateActiveStaff", Array.from(activeStaff));
 }
 
 function isInActiveStaff(userId: User["id"]): boolean {
-    return Array.isArray(activeStaff.value) && activeStaff.value.includes(userId);
+    return activeStaff.has(userId);
 }
 </script>

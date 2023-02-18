@@ -33,7 +33,7 @@ import {
     Reservation,
 } from "@firetable/types";
 import { updateEventFloorData } from "@firetable/backend";
-import { takeProp } from "@firetable/utils";
+import { matchesValue, takeProp } from "@firetable/utils";
 
 interface State {
     showMapsExpanded: boolean;
@@ -209,9 +209,8 @@ function showCreateReservationDialog(floor: Floor, element: BaseTable) {
                 maximized: false,
                 componentPropsObject: {
                     freeTables: getFreeTables(floor)
-                        .filter((table) => label !== table.label)
-                        .map(takeProp("label")),
-                    label,
+                        .map(takeProp("label"))
+                        .filter(matchesValue(label)),
                 },
                 listeners: {
                     create: (reservationData: CreateReservationPayload) => {

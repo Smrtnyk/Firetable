@@ -77,8 +77,11 @@ function showCreateUserDialog(): void {
     });
 }
 
-async function showEditUserDialog(user: User) {
-    if (!(await showConfirm(`Are you sure you want to edit user ${user.name}?`, ""))) return;
+async function showEditUserDialog(user: User, reset: () => void) {
+    if (!(await showConfirm(`Are you sure you want to edit user ${user.name}?`, ""))) {
+        reset();
+        return;
+    }
     quasar.dialog({
         component: FTDialog,
         componentProps: {
@@ -92,7 +95,7 @@ async function showEditUserDialog(user: User) {
             },
             listeners: {
                 submit: (updatedUser: Partial<CreateUserPayload>) =>
-                    onUpdateUser(user.id, updatedUser),
+                    onUpdateUser(user.id, updatedUser).then(reset),
             },
         },
     });
