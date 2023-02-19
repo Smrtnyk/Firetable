@@ -8,13 +8,16 @@
             size="md"
             rounded
         />
-        <ShowSelectedElement :selected-floor-element="selectedFloorElement" />
+        <ShowSelectedElement
+            :selected-floor-element="selectedFloorElement"
+            :delete-allowed="false"
+        />
         <canvas id="floor-container" class="eventFloor" ref="floorContainerRef" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref, watch } from "vue";
+import { nextTick, ref, shallowRef, watch } from "vue";
 import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
 import { BaseTable, Floor, FloorMode } from "@firetable/floor-creator";
 import { FloorDoc } from "@firetable/types";
@@ -30,7 +33,7 @@ const props = defineProps<Props>();
 const emit = defineEmits(["update"]);
 const floorContainerRef = ref<HTMLCanvasElement | null>(null);
 const viewerContainerRef = ref<HTMLDivElement | null>(null);
-const floorInstance = ref<Floor | null>(null);
+const floorInstance = shallowRef<Floor | null>(null);
 
 function saveFloorState(): void {
     if (!floorInstance.value) return;

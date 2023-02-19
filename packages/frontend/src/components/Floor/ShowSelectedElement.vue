@@ -44,7 +44,7 @@
         </div>
         <div class="col-2 flex q-pl-none justify-end">
             <q-btn
-                v-if="!selectedElement || !selectedElement.reservation"
+                v-if="selectedElement && props.deleteAllowed && !selectedElement.reservation"
                 icon="trash"
                 color="negative"
                 @click="deleteElement"
@@ -65,9 +65,12 @@ import { BaseTable, isRoundTable, isTable, RoundTableElement } from "@firetable/
 
 interface Props {
     selectedFloorElement: BaseTable | null;
+    deleteAllowed?: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    deleteAllowed: true,
+});
 const emit = defineEmits(["delete"]);
 const selectedElement = computed(() => {
     return props.selectedFloorElement;

@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { updateEventProperty } from "@firetable/backend";
-import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { loadingWrapper } from "src/helpers/ui-helpers";
 
 interface Props {
     eventId: string;
@@ -22,9 +22,7 @@ interface Props {
 const props = defineProps<Props>();
 const localEventInfoValue = ref(props.eventInfo);
 
-function saveEventInfo(): void {
-    tryCatchLoadingWrapper({
-        hook: () => updateEventProperty(props.eventId, "info", localEventInfoValue.value),
-    });
-}
+const saveEventInfo = loadingWrapper(() =>
+    updateEventProperty(props.eventId, "info", localEventInfoValue.value)
+);
 </script>

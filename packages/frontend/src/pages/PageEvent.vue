@@ -211,6 +211,7 @@ function showCreateReservationDialog(floor: Floor, element: BaseTable) {
                     freeTables: getFreeTables(floor)
                         .map(takeProp("label"))
                         .filter(matchesValue(label)),
+                    label,
                 },
                 listeners: {
                     create: (reservationData: CreateReservationPayload) => {
