@@ -14,14 +14,12 @@ import {
     ElementClickHandler,
     FloorDoubleClickHandler,
     FloorMode,
-    NumberTuple,
 } from "./types.js";
 import { RoundTableElement } from "./RoundTableElement.js";
 import { ElementTag, FloorDoc, Reservation } from "@firetable/types";
 import { match } from "ts-pattern";
-import { isTable } from "./type-guards";
-import { isDefined } from "@firetable/utils";
 import { createGroup } from "./factories";
+import { InteractionsEngine } from "./InteractionsEngine";
 
 interface FloorCreationOptions {
     canvas: HTMLCanvasElement;
@@ -47,16 +45,15 @@ export class Floor {
     floorDoc: FloorDoc;
     containerWidth: number;
     canvas: fabric.Canvas | fabric.StaticCanvas;
-    dblClickHandler: FloorDoubleClickHandler | undefined;
-    elementClickHandler: ElementClickHandler;
+    private interactionsEngine: InteractionsEngine;
 
     constructor({
         canvas,
         floorDoc,
-        dblClickHandler,
-        elementClickHandler,
         mode,
         containerWidth,
+        elementClickHandler,
+        dblClickHandler,
     }: FloorCreationOptions) {
         this.scale = calculateCanvasScale(containerWidth, floorDoc.width);
         this.width = floorDoc.width;
@@ -72,56 +69,19 @@ export class Floor {
         this.id = floorDoc.id;
         this.name = floorDoc.name;
         this.mode = mode;
-        this.dblClickHandler = dblClickHandler;
-        this.elementClickHandler = elementClickHandler;
-        this.canvas.on("mouse:dblclick", this.onDblClickHandler);
-        this.canvas.on("mouse:up", this.onMouseUpHandler);
-        this.canvas.on("object:moving", this.onObjectMove);
-        this.canvas.on("object:scaling", (e) => {
-            if (!e.target) return;
-            this.elementClickHandler(this, getTableFromTargetElement(e));
-        });
+        this.interactionsEngine = new InteractionsEngine(
+            this,
+            elementClickHandler,
+            dblClickHandler
+        );
         this.renderData(floorDoc.json);
     }
-
-    // Check if double click was on the actual table
-    // if it is, then do nothing, but if it is not
-    // then invoke the handler
-    onDblClickHandler = (ev: fabric.IEvent<MouseEvent>) => {
-        if (containsTables(ev)) return;
-        const coords: NumberTuple = [ev.pointer?.x || 50, ev.pointer?.y || 50];
-        this.dblClickHandler?.(this, coords);
-    };
-
-    onMouseUpHandler = (ev: fabric.IEvent<MouseEvent>) => {
-        if (containsTables(ev)) return;
-        this.elementClickHandler(this, null);
-    };
-
-    onElementClick = (ev: fabric.IEvent<MouseEvent>) => {
-        this.elementClickHandler(this, getTableFromTargetElement(ev));
-    };
 
     elementReviver = (o: string, object: fabric.Object) => {
         // @ts-ignore - complains about types but this works
         object.on("mouseup", this.onElementClick);
         object.lockMovementY = this.shouldLockDrag();
         object.lockMovementX = this.shouldLockDrag();
-    };
-
-    onObjectMove = (options: fabric.IEvent) => {
-        if (!options.target?.left || !options.target?.top) return;
-        const shouldSnapToGrid =
-            Math.round((options.target.left / RESOLUTION) * 4) % 4 === 0 &&
-            Math.round((options.target.top / RESOLUTION) * 4) % 4 === 0;
-        if (shouldSnapToGrid) {
-            options.target
-                .set({
-                    left: Math.round(options.target.left / RESOLUTION) * RESOLUTION,
-                    top: Math.round(options.target.top / RESOLUTION) * RESOLUTION,
-                })
-                .setCoords();
-        }
     };
 
     setScaling() {
@@ -163,7 +123,7 @@ export class Floor {
             .with(ElementTag.CIRCLE, () => this.addRoundTableElement(options))
             .exhaustive();
 
-        group.on("mouseup", this.onElementClick);
+        group.on("mouseup", this.interactionsEngine.onElementClick);
         this.canvas.add(group);
     }
 
@@ -242,15 +202,6 @@ export class Floor {
         this.height = newHeight;
         this.renderData(this.floorDoc.json);
     }
-}
-
-function getTableFromTargetElement(ev: fabric.IEvent): BaseTable | null {
-    // @ts-ignore -- not typed apparently
-    return ev.target?._objects.find(isTable);
-}
-
-function containsTables(ev: fabric.IEvent): boolean {
-    return isDefined(getTableFromTargetElement(ev));
 }
 
 function calculateCanvasScale(containerWidth: number, floorWidth: number) {
