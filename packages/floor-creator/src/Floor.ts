@@ -1,5 +1,5 @@
 import { fabric } from "fabric";
-import { TableElement } from "./TableElement.js";
+import { RectTable } from "./elements/RectTable.js";
 import {
     CANVAS_BG_COLOR,
     FONT_SIZE,
@@ -15,11 +15,11 @@ import {
     FloorDoubleClickHandler,
     FloorMode,
 } from "./types.js";
-import { RoundTableElement } from "./RoundTableElement.js";
+import { RoundTable } from "./elements/RoundTable.js";
 import { ElementTag, FloorDoc, Reservation } from "@firetable/types";
 import { match } from "ts-pattern";
-import { createGroup } from "./factories";
-import { InteractionsEngine } from "./InteractionsEngine";
+import { createGroup } from "./factories.js";
+import { InteractionsEngine } from "./engines/InteractionsEngine.js";
 
 interface FloorCreationOptions {
     canvas: HTMLCanvasElement;
@@ -31,8 +31,8 @@ interface FloorCreationOptions {
 }
 
 Object.assign(fabric, {
-    TableElement,
-    RoundTableElement,
+    RectTable,
+    RoundTable,
 });
 
 export class Floor {
@@ -128,7 +128,7 @@ export class Floor {
     }
 
     private addRoundTableElement({ label, x, y }: CreateTableOptions) {
-        const table = new RoundTableElement({
+        const table = new RoundTable({
             label,
             radius: 50,
             originX: "center",
@@ -146,7 +146,7 @@ export class Floor {
     }
 
     private addRectTableElement({ label, x, y }: CreateTableOptions) {
-        const table = new TableElement({
+        const table = new RectTable({
             label,
             width: TABLE_WIDTH,
             height: TABLE_HEIGHT,

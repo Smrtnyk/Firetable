@@ -1,11 +1,11 @@
-import { TableElement } from "./TableElement.js";
-import { RoundTableElement } from "./RoundTableElement.js";
+import { RectTable } from "./elements/RectTable.js";
+import { RoundTable } from "./elements/RoundTable.js";
 import { BaseTable } from "./types.js";
 
 export function isTable(element: unknown): element is BaseTable {
-    return element instanceof RoundTableElement || element instanceof TableElement;
+    return element instanceof RoundTable || element instanceof RectTable;
 }
 
-export function isRoundTable(element: unknown): element is RoundTableElement {
-    return element instanceof RoundTableElement;
+export function isRoundTable(element: unknown): element is RoundTable {
+    return element instanceof RoundTable;
 }

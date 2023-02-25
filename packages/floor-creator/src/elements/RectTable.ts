@@ -1,6 +1,6 @@
 import { fabric } from "fabric";
-import { AnimationDirection, FloorElementTypes } from "./types.js";
-import { determineTableColor } from "./utils.js";
+import { AnimationDirection, FloorElementTypes } from "../types.js";
+import { determineTableColor } from "../utils.js";
 import { Reservation } from "@firetable/types";
 import { isNumber } from "@firetable/utils";
 
@@ -11,7 +11,7 @@ interface ITableElementOptions extends fabric.IRectOptions {
     label: string;
 }
 
-export class TableElement extends fabric.Rect {
+export class RectTable extends fabric.Rect {
     type: FloorElementTypes = FloorElementTypes.RECT_TABLE;
     reservation: Reservation | null = null;
     label: string;
@@ -71,8 +71,8 @@ export class TableElement extends fabric.Rect {
 }
 
 // @ts-ignore
-fabric.tableElement = TableElement;
+fabric[FloorElementTypes.RECT_TABLE] = RectTable;
 // @ts-ignore
-fabric.tableElement.fromObject = function (object, callback) {
-    return fabric.Object._fromObject("TableElement", object, callback);
+fabric[FloorElementTypes.RECT_TABLE].fromObject = function (object, callback) {
+    return fabric.Object._fromObject(FloorElementTypes.RECT_TABLE, object, callback);
 };

@@ -1,6 +1,6 @@
 import { fabric } from "fabric";
-import { FloorElementTypes } from "./types.js";
-import { determineTableColor } from "./utils.js";
+import { FloorElementTypes } from "../types.js";
+import { determineTableColor } from "../utils.js";
 import { Reservation } from "@firetable/types";
 
 interface CircleTableElementOptions extends fabric.ICircleOptions {
@@ -8,7 +8,7 @@ interface CircleTableElementOptions extends fabric.ICircleOptions {
     label: string;
 }
 
-export class RoundTableElement extends fabric.Circle {
+export class RoundTable extends fabric.Circle {
     type = FloorElementTypes.ROUND_TABLE;
     reservation: Reservation | null = null;
     label: string;
@@ -46,8 +46,8 @@ export class RoundTableElement extends fabric.Circle {
 }
 
 // @ts-ignore
-fabric.roundTableElement = RoundTableElement;
+fabric[FloorElementTypes.ROUND_TABLE] = RoundTable;
 // @ts-ignore
-fabric.roundTableElement.fromObject = function (object: fabric.Object, callback) {
-    return fabric.Object._fromObject("RoundTableElement", object, callback);
+fabric[FloorElementTypes.ROUND_TABLE].fromObject = function (object: fabric.Object, callback) {
+    return fabric.Object._fromObject(FloorElementTypes.ROUND_TABLE, object, callback);
 };

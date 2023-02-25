@@ -1,8 +1,8 @@
 import { fabric } from "fabric";
-import { ElementClickHandler, FloorDoubleClickHandler, NumberTuple } from "./types";
-import { RESOLUTION } from "./constants";
-import type { Floor } from "./Floor";
-import { containsTables, getTableFromTargetElement } from "./utils";
+import { ElementClickHandler, FloorDoubleClickHandler, NumberTuple } from "../types";
+import { RESOLUTION } from "../constants";
+import type { Floor } from "../Floor";
+import { containsTables, getTableFromTargetElement } from "../utils";
 
 export class InteractionsEngine {
     dblClickHandler: FloorDoubleClickHandler | undefined;

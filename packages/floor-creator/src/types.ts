@@ -1,11 +1,11 @@
 import { Floor } from "./Floor.js";
-import { TableElement } from "./TableElement.js";
-import { RoundTableElement } from "./RoundTableElement.js";
+import { RectTable } from "./elements/RectTable.js";
+import { RoundTable } from "./elements/RoundTable.js";
 import { ElementTag } from "@firetable/types";
 
 export type FloorDoubleClickHandler = (floor: Floor, coords: NumberTuple) => void;
 export type ElementClickHandler = (floor: Floor, el: BaseTable | null) => void;
-export type BaseTable = TableElement | RoundTableElement;
+export type BaseTable = RectTable | RoundTable;
 export type CreateTableOptions = {
     label: string;
     x: number;
@@ -19,8 +19,8 @@ export const enum AnimationDirection {
 }
 
 export const enum FloorElementTypes {
-    ROUND_TABLE = "roundTableElement",
-    RECT_TABLE = "tableElement",
+    ROUND_TABLE = "RoundTable",
+    RECT_TABLE = "RectTable",
 }
 
 /**

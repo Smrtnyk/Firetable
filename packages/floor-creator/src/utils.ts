@@ -2,8 +2,8 @@ import { Reservation } from "@firetable/types";
 import { match } from "ts-pattern";
 import { fabric } from "fabric";
 import { isDefined } from "@firetable/utils";
-import { BaseTable } from "./types";
-import { isTable } from "./type-guards";
+import { BaseTable } from "./types.js";
+import { isTable } from "./type-guards.js";
 
 export function determineTableColor(reservation?: Reservation): string {
     return match(reservation)

@@ -61,7 +61,7 @@
 <script setup lang="ts">
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed, nextTick } from "vue";
-import { BaseTable, isRoundTable, isTable, RoundTableElement } from "@firetable/floor-creator";
+import { BaseTable, isRoundTable, isTable, RoundTable } from "@firetable/floor-creator";
 
 interface Props {
     selectedFloorElement: BaseTable | null;
@@ -104,13 +104,13 @@ function getElementHeight(e: BaseTable | null): number {
     return Math.round((e?.group?.height || 0) * (e?.group?.scaleY || 0));
 }
 
-function getElementRadius(e: RoundTableElement): number {
+function getElementRadius(e: RoundTable): number {
     return (e.radius || 0) * (e.group?.scaleY || 0);
 }
 
 function isSelectedElementRoundTable(
     selectedElement: BaseTable | null
-): selectedElement is RoundTableElement {
+): selectedElement is RoundTable {
     if (!selectedElement) return false;
     const element = selectedElement;
     return isRoundTable(element) && !!element.radius;
