@@ -51,9 +51,11 @@ importers:
     specifiers:
       '@firetable/floor-creator': workspace:*
       '@firetable/types': workspace:*
+      '@firetable/utils': workspace:*
     devDependencies:
       '@firetable/floor-creator': link:../floor-creator
       '@firetable/types': link:../types
+      '@firetable/utils': link:../utils
 
   packages/floor-creator:
     specifiers:

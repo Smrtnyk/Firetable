@@ -11,7 +11,8 @@
     },
     "devDependencies": {
         "@firetable/types": "workspace:*",
-        "@firetable/floor-creator": "workspace:*"
+        "@firetable/floor-creator": "workspace:*",
+        "@firetable/utils": "workspace:*"
     },
     "keywords": [],
     "author": "",
