@@ -69,7 +69,7 @@ async function onEventItemSlideRight({ event, reset }: { event: EventDoc; reset:
 
 async function onLoad(_: number, done: () => void) {
     if (!hasMoreEventsToFetch.value) return paginator.value?.stop();
-    const lastDoc = takeLast([...events])._doc;
+    const lastDoc = takeLast([...events])?._doc || null;
     await fetchMoreEvents(lastDoc);
 
     done();
