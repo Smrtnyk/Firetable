@@ -21,6 +21,7 @@ yarn-error.log*
 cypress.env.json
 cypress.json
 **/jest/coverage/
+**/coverage/
 
 # Editor directories and files
 .fleet
