@@ -79,8 +79,7 @@ export class Floor {
     }
 
     elementReviver = (o: string, object: fabric.Object) => {
-        // @ts-ignore - complains about types but this works
-        object.on("mouseup", this.onElementClick);
+        object.on("mouseup", this.interactionsEngine.onElementClick);
         object.lockMovementY = this.shouldLockDrag();
         object.lockMovementX = this.shouldLockDrag();
     };
