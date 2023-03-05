@@ -1,12 +1,11 @@
-import { matchesValue } from "./matches-value";
-import { memoize } from "./memoize";
-import { not } from "./not";
-import { propIsTruthy } from "./prop-is-truthy";
-import { takeLast } from "./take-last";
-import { takeProp } from "./take-prop";
-
+export { matchesValue } from "./matches-value";
+export { memoize } from "./memoize";
+export { not } from "./not";
+export { propIsTruthy } from "./prop-is-truthy";
+export { range } from "./range";
+export { takeLast } from "./take-last";
+export { takeProp } from "./take-prop";
 export * from "./type-guards";
-export { takeLast, not, propIsTruthy, takeProp, matchesValue, memoize };
 
 export function NOOP() {
     /* EMPTY */

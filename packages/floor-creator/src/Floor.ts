@@ -20,6 +20,7 @@ import { ElementTag, FloorDoc, Reservation } from "@firetable/types";
 import { match } from "ts-pattern";
 import { createGroup } from "./factories.js";
 import { InteractionsEngine } from "./engines/InteractionsEngine.js";
+import { range } from "@firetable/utils";
 
 interface FloorCreationOptions {
     canvas: HTMLCanvasElement;
@@ -172,10 +173,10 @@ export class Floor {
         const top = (height % gridSize) / 2;
         const lines = [];
         const lineOption = { stroke: "rgba(0,0,0,1)", strokeWidth: 1, selectable: false };
-        for (let i = Math.ceil(width / gridSize); i--; ) {
+        for (const i of range(0, Math.ceil(width / gridSize))) {
             lines.push(new fabric.Line([gridSize * i, -top, gridSize * i, height], lineOption));
         }
-        for (let i = Math.ceil(height / gridSize); i--; ) {
+        for (const i of range(0, Math.ceil(height / gridSize))) {
             lines.push(new fabric.Line([-left, gridSize * i, width, gridSize * i], lineOption));
         }
         const oGridGroup = createGroup(lines, {

@@ -14,8 +14,8 @@
         "typecheck": "vue-tsc --noEmit -p ./tsconfig.json"
     },
     "devDependencies": {
-        "@quasar/app-vite": "1.2.0",
-        "@playwright/test": "1.31.1",
+        "@quasar/app-vite": "1.2.1",
+        "@playwright/test": "1.31.2",
         "vue-tsc": "1.2.0"
     },
     "dependencies": {
@@ -26,12 +26,12 @@
         "@quasar/extras": "1.15.11",
         "chart.js": "4.2.1",
         "pinia": "2.0.32",
-        "quasar": "2.11.6",
+        "quasar": "2.11.7",
         "ts-pattern": "4.2.1",
         "vue": "3.2.47",
         "vue-i18n": "9.2.2",
         "vue-router": "4.1.6",
-        "vuefire": "3.0.1"
+        "vuefire": "3.1.0"
     },
     "engines": {
         "node": ">= 18",
