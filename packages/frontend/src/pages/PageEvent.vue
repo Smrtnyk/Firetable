@@ -37,7 +37,7 @@ import { matchesValue, not, takeProp } from "@firetable/utils";
 
 interface State {
     showMapsExpanded: boolean;
-    activeFloor: { id: string; name: string } | null;
+    activeFloor: { id: string; name: string } | undefined;
     floorInstances: Set<Floor>;
     activeTablesAnimationInterval: number | null;
 }
@@ -55,7 +55,7 @@ let currentOpenCreateReservationDialog: {
 const props = defineProps<Props>();
 const state = reactive<State>({
     showMapsExpanded: false,
-    activeFloor: null,
+    activeFloor: void 0,
     floorInstances: new Set<Floor>(),
     activeTablesAnimationInterval: null,
 });
@@ -65,7 +65,7 @@ const router = useRouter();
 const q = useQuasar();
 const { t } = useI18n();
 const canvases = reactive<Map<string, HTMLCanvasElement>>(new Map());
-const pageRef = ref<HTMLDivElement | null>(null);
+const pageRef = ref<HTMLDivElement>();
 const currentUser = computed(() => authStore.user);
 const guestList = useFirestoreCollection<GuestData>(`${Collection.EVENTS}/${props.id}/guestList`);
 const { data: event, promise: eventDataPromise } = useFirestoreDocument<EventDoc>(

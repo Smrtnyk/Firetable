@@ -13,20 +13,20 @@ register(process.env.SERVICE_WORKER_FILE, {
 
     // RegistrationOptions: { scope: './' },
 
-    ready(registration) {
+    ready() {
         // eslint-disable-next-line no-console
         console.log("App is being served from cache by a service worker.");
     },
 
-    registered(registration) {
+    registered() {
         console.log("Service worker has been registered.");
     },
 
-    cached(registration) {
+    cached() {
         console.log("Content has been cached for offline use.");
     },
 
-    updatefound(registration) {
+    updatefound() {
         console.log("New content is downloading.");
     },
 

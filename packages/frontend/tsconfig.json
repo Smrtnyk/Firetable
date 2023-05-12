@@ -4,11 +4,7 @@
         "isolatedModules": false,
         "baseUrl": ".",
         "skipLibCheck": true,
-        "module": "ESNext",
-        "moduleResolution": "Node",
         "target": "ESNext",
-        "lib": ["DOM", "ScriptHost"],
-        "types": [],
         "paths": {
             "src/*": [
                 "src/*"
@@ -35,10 +31,5 @@
                 "src/stores/*"
             ]
         }
-    },
-    "include": [
-        "src/**/*.ts",
-        "src/**/*.vue"
-    ],
-    "exclude": ["node_modules"]
+    }
 }

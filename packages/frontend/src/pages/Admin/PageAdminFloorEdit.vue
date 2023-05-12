@@ -159,7 +159,7 @@ function onDeleteElement(element: BaseTable) {
                 standout
                 rounded
                 label="Floor name"
-                @update:model-value="(event) => onFloorChange('name', event)"
+                @update:model-value="(event: string) => onFloorChange('name', event)"
                 :model-value="floorInstance.name"
             >
                 <template #append>

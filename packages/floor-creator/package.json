@@ -11,12 +11,12 @@
     },
     "dependencies": {
         "fabric": "5.3.0",
-        "ts-pattern": "4.2.2"
+        "ts-pattern": "4.3.0"
     },
     "devDependencies": {
         "@firetable/types": "workspace:*",
         "@firetable/utils": "workspace:*",
-        "@types/fabric": "5.3.1"
+        "@types/fabric": "5.3.2"
     },
     "keywords": [],
     "author": "",
