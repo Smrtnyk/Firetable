@@ -42,7 +42,7 @@ Chart.register(
     Legend,
     Tooltip,
     Title,
-    SubTitle
+    SubTitle,
 );
 
 const backgroundColors = [
@@ -87,7 +87,7 @@ function reservationsReducer(acc: Res, { reservation }: BaseTable) {
 
 function generateTablesByWaiterChartOptions(
     chartContainer: HTMLCanvasElement,
-    reservations: BaseTable[]
+    reservations: BaseTable[],
 ) {
     const data = reservations.reduce(reservationsReducer, {});
 

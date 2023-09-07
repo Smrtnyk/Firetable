@@ -54,7 +54,7 @@ const { data: floor, promise: floorDataPromise } = useFirestoreDocument<FloorDoc
     `${Collection.FLOORS}/${props.floorID}`,
     {
         once: true,
-    }
+    },
 );
 
 onMounted(async () => {

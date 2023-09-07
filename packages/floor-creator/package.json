@@ -11,7 +11,7 @@
     },
     "dependencies": {
         "fabric": "5.3.0",
-        "ts-pattern": "4.3.0"
+        "ts-pattern": "5.0.5"
     },
     "devDependencies": {
         "@firetable/types": "workspace:*",

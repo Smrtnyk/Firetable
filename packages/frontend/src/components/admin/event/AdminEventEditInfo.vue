@@ -23,6 +23,6 @@ const props = defineProps<Props>();
 const localEventInfoValue = ref(props.eventInfo);
 
 const saveEventInfo = loadingWrapper(() =>
-    updateEventProperty(props.eventId, "info", localEventInfoValue.value)
+    updateEventProperty(props.eventId, "info", localEventInfoValue.value),
 );
 </script>

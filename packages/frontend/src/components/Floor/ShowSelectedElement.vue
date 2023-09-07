@@ -109,7 +109,7 @@ function getElementRadius(e: RoundTable): number {
 }
 
 function isSelectedElementRoundTable(
-    selectedElement: BaseTable | null
+    selectedElement: BaseTable | null,
 ): selectedElement is RoundTable {
     if (!selectedElement) return false;
     const element = selectedElement;

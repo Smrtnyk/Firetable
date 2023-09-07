@@ -1,6 +1,6 @@
 export function resizeImage(
     file: File,
-    maxDimensions: { width: number; height: number }
+    maxDimensions: { width: number; height: number },
 ): Promise<never | Blob> {
     return new Promise((resolve, reject) => {
         try {
@@ -14,7 +14,7 @@ export function resizeImage(
 function resize(
     file: File,
     maxDimensions: { width: number; height: number },
-    callback: (file: Blob) => void
+    callback: (file: Blob) => void,
 ) {
     // eslint-disable-next-line @typescript-eslint/prefer-regexp-exec
     if (!file.type.match(/image.*/)) {

@@ -15,7 +15,7 @@ export function noWhiteSpaces(val: string): boolean | string {
 }
 
 export function requireNumber(
-    msg = "You must type in a number!"
+    msg = "You must type in a number!",
 ): (val: unknown) => boolean | string {
     return function (val: unknown): boolean | string {
         return !isNaN(Number(val)) || msg;
@@ -23,7 +23,7 @@ export function requireNumber(
 }
 
 export function greaterThanZero(
-    msg = "Number must be greater than 0!"
+    msg = "Number must be greater than 0!",
 ): (val: unknown) => boolean | string {
     return function (val: unknown): boolean | string {
         return (!isNaN(Number(val)) && Number(val) > 0) || msg;

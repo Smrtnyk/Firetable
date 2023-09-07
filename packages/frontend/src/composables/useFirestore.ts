@@ -13,7 +13,7 @@ import { isString } from "@firetable/utils";
 
 export function useFirestoreCollection<T extends DocumentData>(
     path: string | Query<T>,
-    options = {}
+    options = {},
 ) {
     const mergedOpts = { ...options, maxRefDepth: 20 };
     const { firestore } = initializeFirebase();

@@ -4,13 +4,7 @@ import { initializeFirebase } from "@firetable/backend";
 import { Router } from "vue-router";
 import { Role } from "@firetable/types";
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import {
-    getCurrentUser,
-    globalFirestoreOptions,
-    useCurrentUser,
-    VueFire,
-    VueFireAuth,
-} from "vuefire";
+import { getCurrentUser, useCurrentUser, VueFire, VueFireAuth } from "vuefire";
 import { watch } from "vue";
 
 export default boot(({ router, app }) => {
@@ -25,16 +19,6 @@ export default boot(({ router, app }) => {
     routerBeforeEach(router, authStore);
 });
 
-const defaultConverter = globalFirestoreOptions.converter;
-globalFirestoreOptions.converter = {
-    toFirestore: defaultConverter.toFirestore,
-    fromFirestore: (snapshot, options) => {
-        const data = defaultConverter.fromFirestore(snapshot, options);
-        // @ts-ignore -- data is unknown unfortunately
-        return { ...data, id: data.id };
-    },
-};
-
 /**
  * Set up the router to be intercepted on each route.
  * This allows the application to halt rendering until
@@ -48,7 +32,7 @@ function routerBeforeEach(router: Router, store: ReturnType<typeof useAuthStore>
             // finished its initialization, and handle the
             // authentication state of the user properly
             if (!store.isReady) {
-                await ensureAuthIsInitialized();
+                await getCurrentUser();
             }
             const requiresAuth = to.meta.requiresAuth;
             const requiresAdmin = to.meta.requiresAdmin;
@@ -71,15 +55,6 @@ function routerBeforeEach(router: Router, store: ReturnType<typeof useAuthStore>
     });
 }
 
-/**
- * Async function providing the application time to
- * wait for firebase to initialize and determine if a
- * user is authenticated or not with only a single observable
- */
-function ensureAuthIsInitialized() {
-    return getCurrentUser();
-}
-
 function handleOnAuthStateChanged(router: Router, authStore: any) {
     // Tell the application what to do when the
     // authentication state has changed */
@@ -99,6 +74,6 @@ function handleOnAuthStateChanged(router: Router, authStore: any) {
             } else {
                 authStore.initUser(currentUser.value.uid);
             }
-        }
+        },
     );
 }

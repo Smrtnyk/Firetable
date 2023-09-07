@@ -13,26 +13,26 @@
         "build:functions": "pnpm --filter functions build"
     },
     "devDependencies": {
-        "@types/web-push": "3.3.2",
-        "@typescript-eslint/eslint-plugin": "5.59.7",
-        "@typescript-eslint/parser": "5.59.7",
-        "autoprefixer": "10.4.14",
-        "dotenv": "16.0.3",
-        "eslint": "8.41.0",
-        "eslint-config-prettier": "8.8.0",
-        "eslint-plugin-import": "2.27.5",
-        "eslint-plugin-prettier": "4.2.1",
+        "@types/web-push": "3.6.0",
+        "@typescript-eslint/eslint-plugin": "6.6.0",
+        "@typescript-eslint/parser": "6.6.0",
+        "autoprefixer": "10.4.15",
+        "dotenv": "16.3.1",
+        "eslint": "8.48.0",
+        "eslint-config-prettier": "9.0.0",
+        "eslint-plugin-import": "2.28.1",
+        "eslint-plugin-prettier": "5.0.0",
         "eslint-plugin-promise": "6.1.1",
         "eslint-plugin-quasar": "1.1.0",
-        "eslint-plugin-vue": "9.14.1",
-        "firebase-tools": "^12.2.1",
-        "prettier": "2.8.8",
+        "eslint-plugin-vue": "9.17.0",
+        "firebase-tools": "^12.5.2",
+        "prettier": "3.0.3",
         "ts-node": "10.9.1",
-        "typescript": "5.0.4"
+        "typescript": "5.2.2"
     },
     "dependencies": {
-        "firebase": "9.22.1",
-        "web-push": "3.6.1"
+        "firebase": "10.3.1",
+        "web-push": "3.6.5"
     },
     "private": true,
     "engines": {

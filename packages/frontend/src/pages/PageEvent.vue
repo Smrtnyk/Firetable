@@ -69,10 +69,10 @@ const pageRef = ref<HTMLDivElement>();
 const currentUser = computed(() => authStore.user);
 const guestList = useFirestoreCollection<GuestData>(`${Collection.EVENTS}/${props.id}/guestList`);
 const { data: event, promise: eventDataPromise } = useFirestoreDocument<EventDoc>(
-    `${Collection.EVENTS}/${props.id}`
+    `${Collection.EVENTS}/${props.id}`,
 );
 const { data: eventFloors } = useFirestoreCollection<FloorDoc>(
-    `${Collection.EVENTS}/${props.id}/floors`
+    `${Collection.EVENTS}/${props.id}/floors`,
 );
 const freeTablesPerFloor = computed(() => {
     const freeTablesMap = new Map<string, string[]>();
@@ -263,7 +263,7 @@ function instantiateFloor(floorDoc: FloorDoc) {
             elementClickHandler: tableClickHandler,
             mode: FloorMode.LIVE,
             containerWidth: pageRef.value.clientWidth,
-        })
+        }),
     );
 }
 

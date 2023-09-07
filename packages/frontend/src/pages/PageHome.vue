@@ -17,8 +17,8 @@ const { data: events, pending: isLoading } = useFirestoreCollection<EventDoc>(
         getFirestoreCollection(Collection.EVENTS),
         where("date", ">=", Date.now() - ONE_HOUR * config.eventDuration),
         orderBy("date"),
-        limit(10)
-    )
+        limit(10),
+    ),
 );
 </script>
 

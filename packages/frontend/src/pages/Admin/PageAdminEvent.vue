@@ -37,12 +37,12 @@ const quasar = useQuasar();
 const tab = ref("info");
 
 const { data: eventFloors } = useFirestoreCollection<FloorDoc>(
-    `${Collection.EVENTS}/${props.id}/floors`
+    `${Collection.EVENTS}/${props.id}/floors`,
 );
 
 const users = useFirestoreCollection<User>(
     createQuery(getFirestoreCollection(Collection.USERS), where("role", "!=", Role.ADMIN)),
-    { once: true }
+    { once: true },
 );
 
 const {
@@ -59,7 +59,7 @@ watch(eventError, () => {
 });
 
 const { data: eventFeed } = useFirestoreCollection<EventFeedDoc>(
-    `${Collection.EVENTS}/${props.id}/${Collection.EVENT_FEED}`
+    `${Collection.EVENTS}/${props.id}/${Collection.EVENT_FEED}`,
 );
 
 function isEventFinished(eventTime: number): boolean {

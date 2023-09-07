@@ -22,7 +22,7 @@ export function showConfirm(title: string, message = "Confirm delete?") {
     return new Promise((resolve) =>
         Dialog.create(options)
             .onOk(() => resolve(true))
-            .onCancel(() => resolve(false))
+            .onCancel(() => resolve(false)),
     );
 }
 

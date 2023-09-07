@@ -32,8 +32,8 @@ const usersStatus = computed(() => {
 const { data: users } = useFirestoreCollection<User>(
     createQuery(
         getFirestoreCollection(Collection.USERS),
-        where(documentId(), "!=", authStore.user?.id)
-    )
+        where(documentId(), "!=", authStore.user?.id),
+    ),
 );
 const { data: floors } = useFirestoreCollection<FloorDoc>(Collection.FLOORS, { once: true });
 const { data: rolesDoc } = useFirestoreDocument<RoleDoc>(ROLES_PATH, { once: true });
