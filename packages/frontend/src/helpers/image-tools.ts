@@ -16,7 +16,6 @@ function resize(
     maxDimensions: { width: number; height: number },
     callback: (file: Blob) => void,
 ) {
-    // eslint-disable-next-line @typescript-eslint/prefer-regexp-exec
     if (!file.type.match(/image.*/)) {
         throw new Error("An error occurred while processing the image!");
     }

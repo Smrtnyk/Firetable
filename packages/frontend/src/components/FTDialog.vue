@@ -41,6 +41,6 @@ const props = withDefaults(defineProps<Props>(), {
     title: "",
 });
 const { dialogRef, onDialogOK } = useDialogPluginComponent();
-// eslint-disable-next-line vue/valid-define-emits
+
 defineEmits(useDialogPluginComponent.emits);
 </script>

@@ -29,7 +29,7 @@ export function useFirestoreDocument<T>(path: string, options = {}) {
 }
 
 export function updateFirestoreDocument<T>(documentRef: DocumentReference<T>, updates: Partial<T>) {
-    return setDoc<T>(documentRef, updates, {
+    return setDoc<T, DocumentData>(documentRef, updates, {
         merge: true,
     });
 }
@@ -45,5 +45,5 @@ export function getFirestoreDocument(path: string) {
 }
 
 export function createQuery<T>(collectionRef: any, ...queries: any[]) {
-    return firestoreQuery<T>(collectionRef, ...queries);
+    return firestoreQuery<T, DocumentData>(collectionRef, ...queries);
 }

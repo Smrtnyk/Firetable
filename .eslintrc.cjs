@@ -7,7 +7,7 @@ module.exports = {
         parser: require.resolve("@typescript-eslint/parser"),
         extraFileExtensions: [".vue"],
     },
-
+    reportUnusedDisableDirectives: true,
     env: {
         browser: true,
         es2022: true,
