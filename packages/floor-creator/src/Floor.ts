@@ -73,7 +73,7 @@ export class Floor {
         this.interactionsEngine = new InteractionsEngine(
             this,
             elementClickHandler,
-            dblClickHandler
+            dblClickHandler,
         );
         this.renderData(floorDoc.json);
     }
@@ -106,7 +106,7 @@ export class Floor {
                 }
                 this.canvas.renderAll();
             },
-            this.elementReviver
+            this.elementReviver,
         );
     }
 
