@@ -12,6 +12,10 @@ export function eventsCollection() {
     return getCollection(Collection.EVENTS);
 }
 
+export function clubsCollection() {
+    return getCollection(Collection.CLUBS);
+}
+
 export function floorsCollection() {
     return getCollection(Collection.FLOORS);
 }

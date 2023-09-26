@@ -10,17 +10,19 @@ export const enum ACTIVITY_STATUS {
     ONLINE,
 }
 
+export type UserClubs = {
+    id: string;
+    name: string;
+};
+
 export interface User {
     id: string;
     name: string;
     email: string;
     username: string;
+    clubs: UserClubs[];
     role: Role;
-    floors: string[];
     status: ACTIVITY_STATUS;
-    address?: string;
-    mobile?: string;
-    region?: string;
 }
 
 export type CreateUserPayload = User & {

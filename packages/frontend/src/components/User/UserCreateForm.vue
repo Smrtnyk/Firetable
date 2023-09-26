@@ -2,10 +2,10 @@
 import { ref } from "vue";
 import { noEmptyString, noWhiteSpaces } from "src/helpers/form-rules";
 import { PROJECT_MAIL } from "src/config";
-import { ACTIVITY_STATUS, CreateUserPayload, Role, User } from "@firetable/types";
+import { ACTIVITY_STATUS, CreateUserPayload, Role, User, UserClubs } from "@firetable/types";
 
 interface Props {
-    floors: string[];
+    clubs: UserClubs[];
     roles: Role[];
     user?: User;
 }
@@ -20,7 +20,7 @@ const userSkeleton: CreateUserPayload = {
     username: "",
     email: "",
     password: "",
-    floors: [],
+    clubs: [],
     role: props.roles[0] || Role.WAITER,
     status: ACTIVITY_STATUS.OFFLINE,
 };
@@ -95,13 +95,16 @@ function onReset() {
                 label="Role"
             />
             <q-select
-                v-model="form.floors"
-                hint="Assign Floors to user, multiple Floors are allowed."
+                v-model="form.clubs"
+                hint="Assign user to clubs, multiple Clubs are allowed."
                 standout
                 rounded
                 multiple
-                :options="props.floors"
-                label="Floors"
+                use-chips
+                :options="props.clubs"
+                option-label="name"
+                option-value="id"
+                label="Clubs"
             />
 
             <div>

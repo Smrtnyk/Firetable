@@ -6,6 +6,7 @@ export default {
             manageFloors: "Manage Floors",
             manageRoles: "Manage Roles",
             manageUsers: "Manage Users",
+            manageClubs: "Manage Clubs",
             toggleDarkMode: "Toggle dark mode",
             toggleOnlineStatus: "Toggle online status",
         },

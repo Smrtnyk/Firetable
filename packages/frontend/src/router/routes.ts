@@ -7,9 +7,16 @@ const routes: RouteRecordRaw[] = [
         children: [
             {
                 path: "/",
-                name: "home",
+                name: "clubs",
                 meta: { requiresAuth: true },
-                component: () => import("pages/PageHome.vue"),
+                component: () => import("pages/PageClubs.vue"),
+            },
+            {
+                path: "/events/:clubId",
+                name: "events",
+                props: true,
+                meta: { requiresAuth: true },
+                component: () => import("pages/PageEvents.vue"),
             },
             {
                 path: "/events/:id",
@@ -63,6 +70,12 @@ const routes: RouteRecordRaw[] = [
                 name: "adminRoles",
                 meta: { requiresAuth: true, requiresAdmin: true },
                 component: () => import("pages/Admin/PageAdminRoles.vue"),
+            },
+            {
+                path: "/admin/clubs",
+                name: "adminClubs",
+                meta: { requiresAuth: true, requiresAdmin: true },
+                component: () => import("pages/Admin/PageAdminClubs.vue"),
             },
         ],
     },

@@ -4,7 +4,10 @@
     "description": "",
     "type": "module",
     "types": "./dist/src/firebase/index.d.ts",
-    "exports": "./dist/src/firebase/index.js",
+    "exports": {
+        ".": "./dist/src/firebase/index.js",
+        "./types": "./dist/src/firebase/index.d.ts"
+    },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "tsc"

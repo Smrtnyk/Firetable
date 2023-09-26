@@ -31,6 +31,11 @@ const adminLinks = computed(() => [
         text: t("AppDrawer.links.manageEvents"),
     },
     {
+        icon: "house",
+        routeName: "adminClubs",
+        text: t("AppDrawer.links.manageClubs"),
+    },
+    {
         icon: "users",
         routeName: "adminUsers",
         text: t("AppDrawer.links.manageUsers"),

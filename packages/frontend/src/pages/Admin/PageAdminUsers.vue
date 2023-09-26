@@ -9,20 +9,29 @@ import { useQuasar } from "quasar";
 import FTDialog from "components/FTDialog.vue";
 import { documentId, where } from "firebase/firestore";
 import { RoleDoc } from "src/types/roles";
-import { Collection, CreateUserPayload, FloorDoc, User } from "@firetable/types";
-import { createUserWithEmail, deleteUser, ROLES_PATH, updateUser } from "@firetable/backend";
+import { ClubDoc, Collection, CreateUserPayload, User } from "@firetable/types";
+import {
+    clubsCollection,
+    createUserWithEmail,
+    deleteUser,
+    ROLES_PATH,
+    updateUser,
+} from "@firetable/backend";
 import {
     createQuery,
     getFirestoreCollection,
     useFirestoreCollection,
     useFirestoreDocument,
 } from "src/composables/useFirestore";
-import { takeProp } from "@firetable/utils";
 
 const { maxNumOfUsers } = config;
 const authStore = useAuthStore();
 const quasar = useQuasar();
-const floorsMaps = computed(() => floors.value.map(takeProp("name")));
+const clubsMaps = computed(() =>
+    clubs.value.map(function (club) {
+        return { id: club.id, name: club.name };
+    }),
+);
 const usersStatus = computed(() => {
     return {
         totalUsers: users.value.length,
@@ -35,7 +44,12 @@ const { data: users } = useFirestoreCollection<User>(
         where(documentId(), "!=", authStore.user?.id),
     ),
 );
-const { data: floors } = useFirestoreCollection<FloorDoc>(Collection.FLOORS, { once: true });
+
+const { data: clubs } = useFirestoreCollection<ClubDoc>(
+    createQuery(clubsCollection(), where(documentId(), "in", authStore.user?.clubs)),
+    { once: true },
+);
+
 const { data: rolesDoc } = useFirestoreDocument<RoleDoc>(ROLES_PATH, { once: true });
 
 const onCreateUser = loadingWrapper((newUser: CreateUserPayload) => {
@@ -67,7 +81,7 @@ function showCreateUserDialog(): void {
             maximized: false,
             title: "Create new user",
             componentPropsObject: {
-                floors: floorsMaps.value,
+                clubs: clubsMaps.value,
                 roles: rolesDoc.value?.roles || [],
             },
             listeners: {
@@ -90,7 +104,7 @@ async function showEditUserDialog(user: User, reset: () => void) {
             title: `Editing user: ${user.name}`,
             componentPropsObject: {
                 user: { ...user },
-                floors: floorsMaps.value,
+                clubs: clubsMaps.value,
                 roles: rolesDoc.value?.roles || [],
             },
             listeners: {
@@ -114,7 +128,7 @@ async function onUserSlideRight(id: string, reset: () => void) {
         <FTTitle title="Users">
             <template #right>
                 <q-btn
-                    v-if="rolesDoc"
+                    v-if="clubs"
                     rounded
                     icon="plus"
                     class="button-gradient"
@@ -150,7 +164,6 @@ async function onUserSlideRight(id: string, reset: () => void) {
                     <q-item-section>
                         <q-item-label> {{ user.name }} -{{ user.email }} </q-item-label>
                         <q-item-label caption> Role: {{ user.role }} </q-item-label>
-                        <q-item-label caption> Floors: {{ user.floors.join(", ") }} </q-item-label>
                     </q-item-section>
                 </q-item>
             </q-slide-item>

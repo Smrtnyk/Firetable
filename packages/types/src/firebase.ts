@@ -6,6 +6,7 @@ export const enum Collection {
     FCM = "fcm",
     EVENT_FEED = "eventFeed",
     SETTINGS = "settings",
+    CLUBS = "clubs",
 }
 
 export interface PushSubscriptionDoc {
