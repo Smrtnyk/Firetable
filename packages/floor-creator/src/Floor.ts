@@ -1,5 +1,4 @@
 import { fabric } from "fabric";
-import { RectTable } from "./elements/RectTable.js";
 import {
     CANVAS_BG_COLOR,
     FONT_SIZE,
@@ -14,13 +13,15 @@ import {
     ElementClickHandler,
     FloorDoubleClickHandler,
     FloorMode,
+    NumberTuple,
 } from "./types.js";
-import { RoundTable } from "./elements/RoundTable.js";
 import { ElementTag, FloorDoc, Reservation } from "@firetable/types";
 import { match } from "ts-pattern";
-import { createGroup } from "./factories.js";
-import { InteractionsEngine } from "./engines/InteractionsEngine.js";
-import { range } from "@firetable/utils";
+import { isTable } from "./type-guards";
+import { isDefined } from "@firetable/utils";
+import { createGroup } from "./factories";
+import { RoundTable } from "./elements/RoundTable";
+import { RectTable } from "./elements/RectTable";
 
 interface FloorCreationOptions {
     canvas: HTMLCanvasElement;
@@ -46,15 +47,16 @@ export class Floor {
     floorDoc: FloorDoc;
     containerWidth: number;
     canvas: fabric.Canvas | fabric.StaticCanvas;
-    private interactionsEngine: InteractionsEngine;
+    dblClickHandler: FloorDoubleClickHandler | undefined;
+    elementClickHandler: ElementClickHandler;
 
     constructor({
         canvas,
         floorDoc,
+        dblClickHandler,
+        elementClickHandler,
         mode,
         containerWidth,
-        elementClickHandler,
-        dblClickHandler,
     }: FloorCreationOptions) {
         this.scale = calculateCanvasScale(containerWidth, floorDoc.width);
         this.width = floorDoc.width;
@@ -70,18 +72,56 @@ export class Floor {
         this.id = floorDoc.id;
         this.name = floorDoc.name;
         this.mode = mode;
-        this.interactionsEngine = new InteractionsEngine(
-            this,
-            elementClickHandler,
-            dblClickHandler,
-        );
+        this.dblClickHandler = dblClickHandler;
+        this.elementClickHandler = elementClickHandler;
+        this.canvas.on("mouse:dblclick", this.onDblClickHandler);
+        this.canvas.on("mouse:up", this.onMouseUpHandler);
+        this.canvas.on("object:moving", this.onObjectMove);
+        this.canvas.on("object:scaling", (e) => {
+            if (!e.target) return;
+            this.elementClickHandler(this, getTableFromTargetElement(e));
+        });
         this.renderData(floorDoc.json);
     }
 
+    // Check if double click was on the actual table
+    // if it is, then do nothing, but if it is not
+    // then invoke the handler
+    onDblClickHandler = (ev: fabric.IEvent<MouseEvent>) => {
+        if (containsTables(ev)) return;
+        const coords: NumberTuple = [ev.pointer?.x || 50, ev.pointer?.y || 50];
+        this.dblClickHandler?.(this, coords);
+    };
+
+    onMouseUpHandler = (ev: fabric.IEvent<MouseEvent>) => {
+        if (containsTables(ev)) return;
+        this.elementClickHandler(this, null);
+    };
+
+    onElementClick = (ev: fabric.IEvent<MouseEvent>) => {
+        this.elementClickHandler(this, getTableFromTargetElement(ev));
+    };
+
     elementReviver = (o: string, object: fabric.Object) => {
-        object.on("mouseup", this.interactionsEngine.onElementClick);
+        // @ts-ignore - complains about types but this works
+        object.on("mouseup", this.onElementClick);
         object.lockMovementY = this.shouldLockDrag();
         object.lockMovementX = this.shouldLockDrag();
+    };
+
+    onObjectMove = (options: fabric.IEvent) => {
+        if (!options.target?.left || !options.target?.top) return;
+        const shouldSnapToGrid =
+            Math.round((options.target.left / RESOLUTION) * 4) % 4 === 0 &&
+            Math.round((options.target.top / RESOLUTION) * 4) % 4 === 0;
+        if (shouldSnapToGrid) {
+            options.target
+                .set({
+                    left: Math.round(options.target.left / RESOLUTION) * RESOLUTION,
+                    top: Math.round(options.target.top / RESOLUTION) * RESOLUTION,
+                })
+                .setCoords();
+        }
     };
 
     setScaling() {
@@ -123,7 +163,7 @@ export class Floor {
             .with(ElementTag.CIRCLE, () => this.addRoundTableElement(options))
             .exhaustive();
 
-        group.on("mouseup", this.interactionsEngine.onElementClick);
+        group.on("mouseup", this.onElementClick);
         this.canvas.add(group);
     }
 
@@ -172,10 +212,10 @@ export class Floor {
         const top = (height % gridSize) / 2;
         const lines = [];
         const lineOption = { stroke: "rgba(0,0,0,1)", strokeWidth: 1, selectable: false };
-        for (const i of range(0, Math.ceil(width / gridSize))) {
+        for (let i = Math.ceil(width / gridSize); i--; ) {
             lines.push(new fabric.Line([gridSize * i, -top, gridSize * i, height], lineOption));
         }
-        for (const i of range(0, Math.ceil(height / gridSize))) {
+        for (let i = Math.ceil(height / gridSize); i--; ) {
             lines.push(new fabric.Line([-left, gridSize * i, width, gridSize * i], lineOption));
         }
         const oGridGroup = createGroup(lines, {
@@ -202,6 +242,15 @@ export class Floor {
         this.height = newHeight;
         this.renderData(this.floorDoc.json);
     }
+}
+
+function getTableFromTargetElement(ev: fabric.IEvent): BaseTable | null {
+    // @ts-ignore -- not typed apparently
+    return ev.target?._objects.find(isTable);
+}
+
+function containsTables(ev: fabric.IEvent): boolean {
+    return isDefined(getTableFromTargetElement(ev));
 }
 
 function calculateCanvasScale(containerWidth: number, floorWidth: number) {
