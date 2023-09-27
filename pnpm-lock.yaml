@@ -56,8 +56,8 @@ importers:
         specifier: 9.17.0
         version: 9.17.0(eslint@8.50.0)
       firebase-tools:
-        specifier: ^12.5.4
-        version: 12.5.4
+        specifier: 12.6.0
+        version: 12.6.0
       prettier:
         specifier: 3.0.3
         version: 3.0.3
@@ -2440,6 +2440,7 @@ packages:
 
   /@types/rimraf@3.0.2:
     resolution: {integrity: sha512-F3OznnSLAUxFrCEu/L5PY8+ny8DtcFRjx7fZZ9bycvXRi3KPTRS9HOitGZwvPg0juRhXFWIeKX58cnX5YqLohQ==}
+    requiresBuild: true
     dependencies:
       '@types/glob': 8.1.0
       '@types/node': 18.11.9
@@ -4234,6 +4235,7 @@ packages:
 
   /duplexify@4.1.2:
     resolution: {integrity: sha512-fz3OjcNCHmRP12MJoZMPglx8m4rrFP8rovnk4vT8Fs+aonZoCwGg10dSsQsfP/E62eZcPTMSMP6686fu9Qlqtw==}
+    requiresBuild: true
     dependencies:
       end-of-stream: 1.4.4
       inherits: 2.0.4
@@ -5302,8 +5304,8 @@ packages:
       - supports-color
     dev: false
 
-  /firebase-tools@12.5.4:
-    resolution: {integrity: sha512-fLE+91tJp3PNZPyB6kN9zfn5rkQWhzPX3mlsAGKTMJUA5TLeZA1YlfBbgPr2DJUO47cHN/9b0BYUQjYcYsBPgw==}
+  /firebase-tools@12.6.0:
+    resolution: {integrity: sha512-Ij+wai6tgUkP8GoeJQbflWLJ7+0kkzrHCr362eicgt1oL26rnQfzyrUcZuyGnSHoL9DbQPeKGtiQEWiQFIAWDQ==}
     engines: {node: '>=16.13.0 || >=18.0.0'}
     hasBin: true
     dependencies:
@@ -5584,6 +5586,7 @@ packages:
   /gaxios@5.0.2:
     resolution: {integrity: sha512-TjtV2AJOZoMQqRYoy5eM8cCQogYwazWNYLQ72QB0kwa6vHHruYkGmhhyrlzbmgNHK1dNnuP2WSH81urfzyN2Og==}
     engines: {node: '>=12'}
+    requiresBuild: true
     dependencies:
       extend: 3.0.2
       https-proxy-agent: 5.0.1
@@ -5607,6 +5610,7 @@ packages:
   /gcp-metadata@5.0.1:
     resolution: {integrity: sha512-jiRJ+Fk7e8FH68Z6TLaqwea307OktJpDjmYnU7/li6ziwvVvU2RlrCyQo5vkdeP94chm0kcSCOOszvmuaioq3g==}
     engines: {node: '>=12'}
+    requiresBuild: true
     dependencies:
       gaxios: 5.0.2
       json-bigint: 1.0.0
@@ -5862,6 +5866,7 @@ packages:
   /gtoken@6.1.2:
     resolution: {integrity: sha512-4ccGpzz7YAr7lxrT2neugmXQ3hP9ho2gcaityLVkiUecAiwiy60Ii8gRbZeOsXV19fYaRjgBSshs8kXw+NKCPQ==}
     engines: {node: '>=12.0.0'}
+    requiresBuild: true
     dependencies:
       gaxios: 5.0.2
       google-p12-pem: 4.0.1
@@ -7920,6 +7925,7 @@ packages:
   /object-hash@3.0.0:
     resolution: {integrity: sha512-RSn9F68PjH9HqtltsSnqYC1XXoWe9Bju5+213R98cNGttag9q9yAOTzdbsqvIa7aNm5WffBZFpWYr2aWrklWAw==}
     engines: {node: '>= 6'}
+    requiresBuild: true
 
   /object-inspect@1.12.2:
     resolution: {integrity: sha512-z+cPxW0QGUp0mcqcsgQyLVRDoXFQbXOwBaqyF7VIgI4TWNQsDHrBpUQslRmIfAoYWdYzs6UlKJtB2XJpTaNSpQ==}
@@ -8403,6 +8409,7 @@ packages:
   /proto3-json-serializer@1.1.0:
     resolution: {integrity: sha512-SjXwUWe/vANGs/mJJTbw5++7U67nwsymg7qsoPtw6GiXqw3kUy8ByojrlEdVE2efxAdKreX8WkDafxvYW95ZQg==}
     engines: {node: '>=12.0.0'}
+    requiresBuild: true
     dependencies:
       protobufjs: 7.2.3
 
@@ -8410,6 +8417,7 @@ packages:
     resolution: {integrity: sha512-VPWMgIcRNyQwWUv8OLPyGQ/0lQY/QTQAVN5fh+XzfDwsVw1FZ2L3DM/bcBf8WPiRz2tNpaov9lPZfNcmNo6LXA==}
     engines: {node: '>=12.0.0'}
     hasBin: true
+    requiresBuild: true
     peerDependencies:
       protobufjs: ^7.0.0
     dependencies:
@@ -8779,6 +8787,7 @@ packages:
   /retry-request@5.0.2:
     resolution: {integrity: sha512-wfI3pk7EE80lCIXprqh7ym48IHYdwmAAzESdbU8Q9l7pnRCk9LEhpbOTNKjz6FARLm/Bl5m+4F0ABxOkYUujSQ==}
     engines: {node: '>=12'}
+    requiresBuild: true
     dependencies:
       debug: 4.3.4
       extend: 3.0.2
