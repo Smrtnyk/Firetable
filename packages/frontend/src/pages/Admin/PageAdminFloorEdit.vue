@@ -113,6 +113,14 @@ function onFloorChange(prop: keyof Floor, event: null | number | string) {
 function handleAddNewElement(floor: Floor, coords: NumberTuple) {
     return function ({ elementDescriptor }: BottomSheetTableClickResult) {
         // if (isWall(elementDescriptor)) return floor.addWall(coords);
+        if (elementDescriptor.tag === ElementTag.SOFA) {
+            return floor.addTableElement({
+                x: coords[0],
+                y: coords[1],
+                label: "",
+                tag: ElementTag.SOFA,
+            });
+        }
         const [x, y] = coords;
         const { tag } = elementDescriptor;
         const dialog = q.dialog({

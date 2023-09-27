@@ -25,4 +25,12 @@ export const ELEMENTS_TO_ADD_COLLECTION = [
             tag: ElementTag.RECT,
         },
     },
+    {
+        label: "Add a Sofa",
+        img: "/svg-images/wall.svg",
+        elementDescriptor: {
+            type: ElementType.SOFA,
+            tag: ElementTag.SOFA,
+        },
+    },
 ];

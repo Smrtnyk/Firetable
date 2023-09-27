@@ -231,7 +231,7 @@ function showCreateReservationDialog(floor: Floor, element: BaseTable) {
 }
 
 function tableClickHandler(floor: Floor, element: BaseTable | null) {
-    if (!element || !isTable(element)) return;
+    if (!isTable(element)) return;
     const { reservation } = element;
     if (reservation) {
         showReservation(floor, reservation, element);

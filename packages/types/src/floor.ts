@@ -9,9 +9,11 @@ export interface FloorDoc {
 export const enum ElementType {
     WALL = "wall",
     TABLE = "table",
+    SOFA = "sofa",
 }
 
 export const enum ElementTag {
     RECT = "rect",
     CIRCLE = "circle",
+    SOFA = "sofa",
 }
