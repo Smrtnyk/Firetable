@@ -28,6 +28,9 @@ const { data: clubs } = useFirestoreCollection<ClubDoc>(
 function onClubCreate(clubName: string) {
     return tryCatchLoadingWrapper({
         hook: async () => {
+            if (!authStore.user?.id) {
+                throw new Error("User ID is not defined!");
+            }
             await createNewClub({
                 name: clubName,
                 ownerId: authStore.user?.id,
