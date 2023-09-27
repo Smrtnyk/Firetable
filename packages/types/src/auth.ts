@@ -1,3 +1,5 @@
+export const SUPER_ADMIN = "Super Administrator";
+
 export enum Role {
     ADMIN = "Administrator",
     MANAGER = "Manager",
