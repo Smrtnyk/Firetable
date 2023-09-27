@@ -6,7 +6,6 @@ import { ACTIVITY_STATUS, CreateUserPayload, Role, User, UserClubs } from "@fire
 
 interface Props {
     clubs: UserClubs[];
-    roles: Role[];
     user?: User;
 }
 
@@ -21,7 +20,7 @@ const userSkeleton: CreateUserPayload = {
     email: "",
     password: "",
     clubs: [],
-    role: props.roles[0] || Role.WAITER,
+    role: Role.WAITER,
     status: ACTIVITY_STATUS.OFFLINE,
 };
 const form = ref<CreateUserPayload | User>(props.user ? { ...props.user } : { ...userSkeleton });
@@ -91,7 +90,7 @@ function onReset() {
                 hint="Assign role to user, default is waiter."
                 standout
                 rounded
-                :options="props.roles"
+                :options="Object.values(Role)"
                 label="Role"
             />
             <q-select

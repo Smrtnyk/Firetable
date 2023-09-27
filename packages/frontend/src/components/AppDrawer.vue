@@ -31,7 +31,7 @@ const adminLinks = computed(() => [
         text: t("AppDrawer.links.manageEvents"),
     },
     {
-        icon: "house",
+        icon: "home",
         routeName: "adminClubs",
         text: t("AppDrawer.links.manageClubs"),
     },
@@ -44,11 +44,6 @@ const adminLinks = computed(() => [
         icon: "arrow-expand",
         routeName: "adminFloors",
         text: t("AppDrawer.links.manageFloors"),
-    },
-    {
-        icon: "arrow-expand",
-        routeName: "adminRoles",
-        text: t("AppDrawer.links.manageRoles"),
     },
 ]);
 const user = computed(() => authStore.user as unknown as NonNullable<User>);

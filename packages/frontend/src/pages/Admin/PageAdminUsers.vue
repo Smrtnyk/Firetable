@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import UserCreateForm from "components/User/UserCreateForm.vue";
+import UserCreateForm from "components/admin/User/UserCreateForm.vue";
 import FTTitle from "components/FTTitle.vue";
 import { loadingWrapper, showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed } from "vue";
@@ -8,20 +8,12 @@ import { useAuthStore } from "src/stores/auth-store";
 import { useQuasar } from "quasar";
 import FTDialog from "components/FTDialog.vue";
 import { documentId, where } from "firebase/firestore";
-import { RoleDoc } from "src/types/roles";
 import { ClubDoc, Collection, CreateUserPayload, User } from "@firetable/types";
-import {
-    clubsCollection,
-    createUserWithEmail,
-    deleteUser,
-    ROLES_PATH,
-    updateUser,
-} from "@firetable/backend";
+import { clubsCollection, createUserWithEmail, deleteUser, updateUser } from "@firetable/backend";
 import {
     createQuery,
     getFirestoreCollection,
     useFirestoreCollection,
-    useFirestoreDocument,
 } from "src/composables/useFirestore";
 
 const { maxNumOfUsers } = config;
@@ -49,8 +41,6 @@ const { data: clubs } = useFirestoreCollection<ClubDoc>(
     createQuery(clubsCollection(), where(documentId(), "in", authStore.user?.clubs)),
     { once: true },
 );
-
-const { data: rolesDoc } = useFirestoreDocument<RoleDoc>(ROLES_PATH, { once: true });
 
 const onCreateUser = loadingWrapper((newUser: CreateUserPayload) => {
     return createUserWithEmail(newUser);
@@ -82,7 +72,6 @@ function showCreateUserDialog(): void {
             title: "Create new user",
             componentPropsObject: {
                 clubs: clubsMaps.value,
-                roles: rolesDoc.value?.roles || [],
             },
             listeners: {
                 submit: onCreateUserFormSubmit,
@@ -105,7 +94,6 @@ async function showEditUserDialog(user: User, reset: () => void) {
             componentPropsObject: {
                 user: { ...user },
                 clubs: clubsMaps.value,
-                roles: rolesDoc.value?.roles || [],
             },
             listeners: {
                 submit: (updatedUser: Partial<CreateUserPayload>) =>
