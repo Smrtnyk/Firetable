@@ -24,13 +24,13 @@ import { Floor } from "@firetable/floor-creator";
 
 export async function getEvents(
     lastDocument: DocumentData | null,
-    countPerPage: number
+    countPerPage: number,
 ): Promise<EventDoc[]> {
     const orderByDateQuery = orderBy("date");
     const limitQuery = limit(countPerPage);
     const startAfterQuery = startAfter(lastDocument);
     const eventsDocs = await getDocs(
-        query(eventsCollection(), orderByDateQuery, limitQuery, startAfterQuery)
+        query(eventsCollection(), orderByDateQuery, limitQuery, startAfterQuery),
     );
 
     return eventsDocs.docs.map(toEventDoc);
@@ -49,7 +49,7 @@ export const deleteEvent = deleteCollection;
 export function updateEventProperty<T extends keyof EventDoc>(
     eventId: string,
     key: T,
-    value: EventDoc[T]
+    value: EventDoc[T],
 ) {
     return updateDoc(eventDoc(eventId), {
         [key]: value,

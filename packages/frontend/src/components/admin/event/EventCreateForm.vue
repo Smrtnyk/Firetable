@@ -52,7 +52,16 @@ function onSubmit() {
         return;
     }
 
-    const floors = props.floors.filter((floor) => state.chosenFloors.includes(floor.id));
+    const floors = props.floors
+        .filter((floor) => {
+            return state.chosenFloors.includes(floor.id);
+        })
+        .map((floor) => {
+            return {
+                ...floor,
+                id: floor.id,
+            };
+        });
 
     emit("create", {
         ...state.form,
