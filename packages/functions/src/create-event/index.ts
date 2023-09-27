@@ -9,21 +9,23 @@ export async function createEvent(
     eventPayload: CreateEventPayload,
     context: functions.https.CallableContext
 ): Promise<string> {
-    if (!eventPayload.floors) {
-        return "";
+
+    // Check for the presence of floors.
+    if (!eventPayload.floors || eventPayload.floors.length === 0) {
+        throw new functions.https.HttpsError("invalid-argument", "Floors data is required.");
     }
 
-    // Checking that the user is authenticated.
+    // Authentication check.
     if (!context.auth) {
-        // Throwing an HttpsError so that the client gets the error details.
         throw new functions.https.HttpsError("failed-precondition", "The function must be called while authenticated.");
     }
 
     const { date, img, floors, entryPrice, guestListLimit, name } = eventPayload;
     const id = db.collection(Collection.EVENTS).doc().id;
-    logger.info(id);
+    logger.info(`Creating event with ID: ${id}`);
+
     const creator = context.auth?.token?.email;
-    let uploadedImg = null;
+    let uploadedImg: string | null = null;
 
     if (img) {
         const base64EncodedImageString = img.split(",")[1];
@@ -33,10 +35,10 @@ export async function createEvent(
         );
     }
 
-    const eventPromise = db
-        .collection(Collection.EVENTS)
-        .doc(id)
-        .set({
+    return db.runTransaction(async transaction => {
+        const eventRef = db.collection(Collection.EVENTS).doc(id);
+
+        transaction.set(eventRef, {
             name,
             entryPrice,
             date: getTimestampFromDateString(date),
@@ -46,19 +48,18 @@ export async function createEvent(
             guestListLimit,
         });
 
-    const floorsPromises = floors.map(function (floor) {
-        return floor &&
-        db
-            .collection(Collection.EVENTS)
-            .doc(id)
-            .collection("floors")
-            .doc(floor.id)
-            .set(floor);
+        floors.forEach(floor => {
+            logger.info(`Iterating over floor: ${floor.name}`);
+            if (floor && floor.id) {
+                const floorRef = eventRef.collection(Collection.FLOORS).doc(floor.id);
+                transaction.set(floorRef, floor);
+            } else {
+                throw new functions.https.HttpsError("invalid-argument", "Invalid floor data provided.");
+            }
+        });
+
+        return id;
     });
-
-    await Promise.all([eventPromise, ...floorsPromises]);
-
-    return id;
 }
 
 function getTimestampFromDateString(dateString: string): number {
@@ -81,18 +82,16 @@ async function uploadFile(
             .pipe(
                 file.createWriteStream({
                     metadata: {
-                        contentType: "image/jpeg",
+                        contentType: "image/jpeg", // Consider dynamically setting this based on the image type.
                     },
                 })
             )
             .on("error", reject)
             .on("finish", async () => {
-                // The file upload is complete.
                 const [response] = await file.getSignedUrl({
                     action: "read",
                     expires: "03-09-2491",
                 });
-
                 resolve(response);
             });
     });
