@@ -2,7 +2,7 @@ import { fabric } from "fabric";
 import { CANVAS_BG_COLOR, RESOLUTION, TABLE_HEIGHT, TABLE_WIDTH } from "./constants.js";
 import {
     BaseTable,
-    CreateTableOptions,
+    CreateElementOptions,
     ElementClickHandler,
     FloorDoubleClickHandler,
     FloorMode,
@@ -10,7 +10,7 @@ import {
 } from "./types.js";
 import { ElementTag, FloorDoc, Reservation } from "@firetable/types";
 import { match } from "ts-pattern";
-import { isTable } from "./type-guards";
+import { isFloorElement, isTable } from "./type-guards";
 import { createGroup } from "./factories";
 import { RoundTable } from "./elements/RoundTable";
 import { RectTable } from "./elements/RectTable";
@@ -83,7 +83,6 @@ export class Floor {
 
     private initializeCanvasEventHandlers() {
         this.canvas.on("mouse:dblclick", this.onDblClickHandler);
-        this.canvas.on("mouse:up", this.onMouseUpHandler);
         this.canvas.on("object:moving", this.onObjectMove);
         this.canvas.on("mouse:wheel", this.onMouseWheelHandler);
         this.canvas.on("object:scaling", (e) => {
@@ -180,7 +179,7 @@ export class Floor {
     // if it is, then do nothing, but if it is not
     // then invoke the handler
     private onDblClickHandler = (ev: fabric.IEvent) => {
-        if (isTable(ev.target)) return;
+        if (isFloorElement(ev.target)) return;
         const coords: NumberTuple = [
             ev.pointer?.x || DEFAULT_COORDINATE,
             ev.pointer?.y || DEFAULT_COORDINATE,
@@ -188,15 +187,8 @@ export class Floor {
         this.dblClickHandler?.(this, coords);
     };
 
-    onMouseUpHandler = (ev: fabric.IEvent<MouseEvent>) => {
-        if (isTable(ev.target)) return;
-        this.elementClickHandler(this, null);
-    };
-
     onElementClick = (ev: fabric.IEvent<MouseEvent>) => {
-        if (isTable(ev.target)) {
-            this.elementClickHandler(this, ev.target);
-        }
+        this.elementClickHandler(this, ev.target);
     };
 
     elementReviver = (_: string, object: fabric.Object) => {
@@ -253,7 +245,7 @@ export class Floor {
         }
     }
 
-    addTableElement(options: CreateTableOptions) {
+    addTableElement(options: CreateElementOptions) {
         const group = match(options.tag)
             .with(ElementTag.RECT, () => this.addRectTableElement(options))
             .with(ElementTag.CIRCLE, () => this.addRoundTableElement(options))
@@ -265,15 +257,18 @@ export class Floor {
         this.canvas.add(group);
     }
 
-    private addDJBooth({ x, y }: any) {
+    private addDJBooth({ x, y }: CreateElementOptions) {
         return new DJBooth(x, y);
     }
 
-    private addSofaElement({ x, y }: any) {
+    private addSofaElement({ x, y }: CreateElementOptions) {
         return new Sofa(x, y);
     }
 
-    private addRoundTableElement({ label, x, y }: CreateTableOptions) {
+    private addRoundTableElement({ label, x, y }: CreateElementOptions) {
+        if (!label) {
+            throw new Error("Cannot create table without the label!");
+        }
         const table = new RoundTable({
             groupOptions: {
                 label,
@@ -289,7 +284,10 @@ export class Floor {
         return table;
     }
 
-    private addRectTableElement({ label, x, y }: CreateTableOptions) {
+    private addRectTableElement({ label, x, y }: CreateElementOptions) {
+        if (!label) {
+            throw new Error("Cannot create table without the label!");
+        }
         return new RectTable({
             groupOptions: {
                 label,

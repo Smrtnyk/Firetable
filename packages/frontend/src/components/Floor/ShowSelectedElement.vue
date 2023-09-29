@@ -2,10 +2,7 @@
     <div class="row q-pa-sm q-col-gutter-md" v-if="selectedElement">
         <div class="col-10 flex justify-between">
             <div class="row">
-                <div
-                    v-if="isSelectedElementRoundTable(selectedElement)"
-                    class="col-4 q-pa-xs q-pl-none"
-                >
+                <div v-if="isRoundTable(selectedElement)" class="col-4 q-pa-xs q-pl-none">
                     <q-input
                         :model-value="getElementRadius(selectedElement)"
                         filled
@@ -33,7 +30,7 @@
                 </template>
                 <div class="col-4 q-pa-xs">
                     <q-input
-                        v-if="selectedElement?.label"
+                        v-if="isTable(selectedElement)"
                         :model-value="selectedElement.label"
                         @update:model-value="updateTableLabel"
                         filled
@@ -44,7 +41,7 @@
         </div>
         <div class="col-2 flex q-pl-none justify-end">
             <q-btn
-                v-if="selectedElement && props.deleteAllowed && !selectedElement.reservation"
+                v-if="selectedElement && props.deleteAllowed"
                 icon="trash"
                 color="negative"
                 @click="deleteElement"
@@ -61,10 +58,10 @@
 <script setup lang="ts">
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed, nextTick } from "vue";
-import { BaseTable, isRoundTable, isTable, RoundTable } from "@firetable/floor-creator";
+import { FloorEditorElement, isRoundTable, isTable, RoundTable } from "@firetable/floor-creator";
 
 interface Props {
-    selectedFloorElement: BaseTable | null;
+    selectedFloorElement: FloorEditorElement | null;
     deleteAllowed?: boolean;
 }
 
@@ -96,23 +93,15 @@ async function deleteElement() {
     }
 }
 
-function getElementWidth(e: BaseTable | null): number {
+function getElementWidth(e: FloorEditorElement | null): number {
     return Math.round((e?.group?.width || 0) * (e?.group?.scaleX || 0));
 }
 
-function getElementHeight(e: BaseTable | null): number {
+function getElementHeight(e: FloorEditorElement | null): number {
     return Math.round((e?.group?.height || 0) * (e?.group?.scaleY || 0));
 }
 
 function getElementRadius(e: RoundTable): number {
     return (e.radius || 0) * (e.group?.scaleY || 0);
-}
-
-function isSelectedElementRoundTable(
-    selectedElement: BaseTable | null,
-): selectedElement is RoundTable {
-    if (!selectedElement) return false;
-    const element = selectedElement;
-    return isRoundTable(element) && !!element.radius;
 }
 </script>

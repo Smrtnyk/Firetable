@@ -12,6 +12,7 @@ import {
     BaseTable,
     extractAllTablesLabels,
     Floor,
+    FloorEditorElement,
     FloorMode,
     hasFloorTables,
     RESOLUTION,
@@ -49,7 +50,7 @@ const q = useQuasar();
 const floorInstance = shallowRef<Floor | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 const pageRef = ref<HTMLDivElement | null>(null);
-const selectedElement = ref<BaseTable | null>(null);
+const selectedElement = ref<FloorEditorElement | null>(null);
 const { data: floor, promise: floorDataPromise } = useFirestoreDocument<FloorDoc>(
     `${Collection.FLOORS}/${props.floorID}`,
     {
@@ -89,7 +90,7 @@ function onFloorSave(): void {
     tryCatchLoadingWrapper({
         hook: () =>
             updateFirestoreDocument(getFirestoreDocument(`${Collection.FLOORS}/${props.floorID}`), {
-                json: floorInstance.value?.canvas.toJSON(["name"]),
+                json: floorInstance.value?.canvas.toJSON(["label", "reservation", "name", "type"]),
                 name: floorInstance.value?.name,
                 width: floorInstance.value?.width,
                 height: floorInstance.value?.height,
@@ -156,7 +157,7 @@ function dblClickHandler(floor: Floor, coords: NumberTuple) {
     q.bottomSheet(addNewElementsBottomSheetOptions).onOk(handleAddNewElement(floor, coords));
 }
 
-async function elementClickHandler(_: Floor, element: BaseTable | null) {
+async function elementClickHandler(_: Floor, element: FloorEditorElement | null) {
     selectedElement.value = null;
     await nextTick();
     selectedElement.value = element;
