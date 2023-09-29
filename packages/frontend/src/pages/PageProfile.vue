@@ -2,9 +2,10 @@
 import { computed } from "vue";
 import { useAuthStore } from "src/stores/auth-store";
 import FTTitle from "components/FTTitle.vue";
+import { User } from "@firetable/types";
 
 const authStore = useAuthStore();
-const user = computed(() => authStore.user);
+const user = computed<User | null>(() => authStore.user);
 
 const avatar = computed(() => {
     if (!user.value) return "";
@@ -31,9 +32,6 @@ const avatar = computed(() => {
                     <q-separator class="q-my-sm" />
                     <q-item-label v-if="user.name">Name: {{ user.name }}</q-item-label>
                     <q-item-label>Role: {{ user.role }}</q-item-label>
-                    <q-item-label>Region: {{ user.region }}</q-item-label>
-                    <q-item-label v-if="user.address">{{ user.address }}</q-item-label>
-                    <q-item-label v-if="user.mobile">{{ user.mobile }}</q-item-label>
                 </q-card>
             </q-item-section>
         </q-item>
