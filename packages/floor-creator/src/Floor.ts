@@ -15,6 +15,7 @@ import { createGroup } from "./factories";
 import { RoundTable } from "./elements/RoundTable";
 import { RectTable } from "./elements/RectTable";
 import { Sofa } from "./elements/Sofa";
+import { DJBooth } from "./elements/DJBooth";
 
 interface FloorCreationOptions {
     canvas: HTMLCanvasElement;
@@ -257,10 +258,15 @@ export class Floor {
             .with(ElementTag.RECT, () => this.addRectTableElement(options))
             .with(ElementTag.CIRCLE, () => this.addRoundTableElement(options))
             .with(ElementTag.SOFA, () => this.addSofaElement(options))
+            .with(ElementTag.DJ_BOOTH, () => this.addDJBooth(options))
             .exhaustive();
 
         group.on("mouseup", this.onElementClick);
         this.canvas.add(group);
+    }
+
+    private addDJBooth({ x, y }: any) {
+        return new DJBooth(x, y);
     }
 
     private addSofaElement({ x, y }: any) {

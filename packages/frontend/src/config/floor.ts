@@ -33,4 +33,12 @@ export const ELEMENTS_TO_ADD_COLLECTION = [
             tag: ElementTag.SOFA,
         },
     },
+    {
+        label: "Add DJ Booth",
+        img: "/svg-images/wall.svg",
+        elementDescriptor: {
+            type: ElementType.DJ_BOOTH,
+            tag: ElementTag.DJ_BOOTH,
+        },
+    },
 ];

@@ -121,6 +121,15 @@ function handleAddNewElement(floor: Floor, coords: NumberTuple) {
                 tag: ElementTag.SOFA,
             });
         }
+
+        if (elementDescriptor.tag === ElementTag.DJ_BOOTH) {
+            return floor.addTableElement({
+                x: coords[0],
+                y: coords[1],
+                label: "",
+                tag: ElementTag.DJ_BOOTH,
+            });
+        }
         const [x, y] = coords;
         const { tag } = elementDescriptor;
         const dialog = q.dialog({
