@@ -55,7 +55,7 @@ function routerBeforeEach(router: Router, store: ReturnType<typeof useAuthStore>
     });
 }
 
-function handleOnAuthStateChanged(router: Router, authStore: any) {
+function handleOnAuthStateChanged(router: Router, authStore: ReturnType<typeof useAuthStore>) {
     // Tell the application what to do when the
     // authentication state has changed */
     const currentUser = useCurrentUser();

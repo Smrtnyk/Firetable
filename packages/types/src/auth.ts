@@ -8,8 +8,8 @@ export enum Role {
 }
 
 export const enum ACTIVITY_STATUS {
-    OFFLINE,
-    ONLINE,
+    OFFLINE = 0,
+    ONLINE = 1,
 }
 
 export type UserClubs = {

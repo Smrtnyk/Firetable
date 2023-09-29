@@ -4,6 +4,7 @@ import { isDefined, NOOP } from "@firetable/utils";
 import { logoutUser } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useFirestoreDocument } from "src/composables/useFirestore";
+import { watch } from "vue";
 
 interface AuthState {
     isAuthenticated: boolean;
@@ -60,6 +61,17 @@ export const useAuthStore = defineStore("auth", {
                 error,
             } = useFirestoreDocument<User>(`${Collection.USERS}/${uid}`);
             await promise.value;
+
+            // Add watcher for user in case user doc changes
+            watch(
+                () => user.value,
+                (newUser) => {
+                    if (newUser) {
+                        this.user = newUser;
+                    }
+                },
+                { deep: true },
+            );
             if (error.value) {
                 stop();
                 showErrorMessage(error.value);
