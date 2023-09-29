@@ -23,7 +23,7 @@ const props = defineProps<Props>();
             <div class="EventCard__image-container">
                 <q-img
                     class="EventCard__image"
-                    :src="props.event.img || 'images/default-event-img.jpg'"
+                    :src="props.event.img || '/images/default-event-img.jpg'"
                     alt=""
                     :ratio="1"
                 />
