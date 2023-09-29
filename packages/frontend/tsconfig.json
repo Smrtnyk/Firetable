@@ -5,6 +5,7 @@
         "baseUrl": ".",
         "skipLibCheck": true,
         "target": "ESNext",
+        "types": [],
         "paths": {
             "src/*": [
                 "src/*"
