@@ -1,12 +1,5 @@
 import { fabric } from "fabric";
-import {
-    CANVAS_BG_COLOR,
-    FONT_SIZE,
-    RESOLUTION,
-    TABLE_HEIGHT,
-    TABLE_TEXT_FILL_COLOR,
-    TABLE_WIDTH,
-} from "./constants.js";
+import { CANVAS_BG_COLOR, RESOLUTION, TABLE_HEIGHT, TABLE_WIDTH } from "./constants.js";
 import {
     BaseTable,
     CreateTableOptions,
@@ -18,10 +11,10 @@ import {
 import { ElementTag, FloorDoc, Reservation } from "@firetable/types";
 import { match } from "ts-pattern";
 import { isTable } from "./type-guards";
-import { isDefined } from "@firetable/utils";
 import { createGroup } from "./factories";
 import { RoundTable } from "./elements/RoundTable";
 import { RectTable } from "./elements/RectTable";
+import { Sofa } from "./elements/Sofa";
 
 interface FloorCreationOptions {
     canvas: HTMLCanvasElement;
@@ -78,8 +71,8 @@ export class Floor {
         this.canvas.on("mouse:up", this.onMouseUpHandler);
         this.canvas.on("object:moving", this.onObjectMove);
         this.canvas.on("object:scaling", (e) => {
-            if (!e.target) return;
-            this.elementClickHandler(this, getTableFromTargetElement(e));
+            if (!isTable(e.target)) return;
+            this.elementClickHandler(this, e.target);
         });
         this.renderData(floorDoc.json);
     }
@@ -88,22 +81,23 @@ export class Floor {
     // if it is, then do nothing, but if it is not
     // then invoke the handler
     onDblClickHandler = (ev: fabric.IEvent<MouseEvent>) => {
-        if (containsTables(ev)) return;
+        if (isTable(ev.target)) return;
         const coords: NumberTuple = [ev.pointer?.x || 50, ev.pointer?.y || 50];
         this.dblClickHandler?.(this, coords);
     };
 
     onMouseUpHandler = (ev: fabric.IEvent<MouseEvent>) => {
-        if (containsTables(ev)) return;
+        if (isTable(ev.target)) return;
         this.elementClickHandler(this, null);
     };
 
     onElementClick = (ev: fabric.IEvent<MouseEvent>) => {
-        this.elementClickHandler(this, getTableFromTargetElement(ev));
+        if (isTable(ev.target)) {
+            this.elementClickHandler(this, ev.target);
+        }
     };
 
     elementReviver = (o: string, object: fabric.Object) => {
-        // @ts-ignore - complains about types but this works
         object.on("mouseup", this.onElementClick);
         object.lockMovementY = this.shouldLockDrag();
         object.lockMovementX = this.shouldLockDrag();
@@ -161,47 +155,51 @@ export class Floor {
         const group = match(options.tag)
             .with(ElementTag.RECT, () => this.addRectTableElement(options))
             .with(ElementTag.CIRCLE, () => this.addRoundTableElement(options))
+            .with(ElementTag.SOFA, () => this.addSofaElement(options))
             .exhaustive();
 
         group.on("mouseup", this.onElementClick);
         this.canvas.add(group);
     }
 
+    private addSofaElement({ x, y }: any) {
+        return new Sofa(x, y);
+    }
+
     private addRoundTableElement({ label, x, y }: CreateTableOptions) {
         const table = new RoundTable({
-            label,
-            radius: 50,
-            originX: "center",
-            originY: "center",
-            lockMovementX: this.shouldLockDrag(),
-            lockMovementY: this.shouldLockDrag(),
+            groupOptions: {
+                label,
+                lockMovementX: this.shouldLockDrag(),
+                lockMovementY: this.shouldLockDrag(),
+            },
+            circleOptions: {
+                radius: 50,
+            },
+            textOptions: { label },
         });
-        const text = new fabric.Text(label, {
-            originX: "center",
-            originY: "center",
-            fontSize: FONT_SIZE,
-            fill: TABLE_TEXT_FILL_COLOR,
-        });
-        return createGroup([table, text], { left: x, top: y });
+        table.set({ left: x, top: y });
+        return table;
     }
 
     private addRectTableElement({ label, x, y }: CreateTableOptions) {
         const table = new RectTable({
-            label,
-            width: TABLE_WIDTH,
-            height: TABLE_HEIGHT,
-            lockMovementX: this.shouldLockDrag(),
-            lockMovementY: this.shouldLockDrag(),
+            groupOptions: {
+                label,
+                left: x,
+                top: y,
+                lockMovementX: this.shouldLockDrag(),
+                lockMovementY: this.shouldLockDrag(),
+            },
+            rectOptions: {
+                width: TABLE_WIDTH,
+                height: TABLE_HEIGHT,
+            },
+            textOptions: {
+                label,
+            },
         });
-        const text = new fabric.Text(label, {
-            originX: "center",
-            originY: "center",
-            left: 0.5 * 50,
-            top: 0.5 * 50,
-            fontSize: FONT_SIZE,
-            fill: TABLE_TEXT_FILL_COLOR,
-        });
-        return createGroup([table, text], { left: x, top: y });
+        return table;
     }
 
     drawGrid() {
@@ -242,15 +240,6 @@ export class Floor {
         this.height = newHeight;
         this.renderData(this.floorDoc.json);
     }
-}
-
-function getTableFromTargetElement(ev: fabric.IEvent): BaseTable | null {
-    // @ts-ignore -- not typed apparently
-    return ev.target?._objects.find(isTable);
-}
-
-function containsTables(ev: fabric.IEvent): boolean {
-    return isDefined(getTableFromTargetElement(ev));
 }
 
 function calculateCanvasScale(containerWidth: number, floorWidth: number) {

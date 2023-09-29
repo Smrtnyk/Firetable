@@ -62,7 +62,9 @@ export function createNewEvent(eventPayload: CreateEventPayload) {
 }
 
 export function updateEventFloorData(floor: Floor, eventId: string) {
-    return updateDoc(eventFloorDoc(eventId, floor.id), { json: floor.canvas.toJSON() });
+    return updateDoc(eventFloorDoc(eventId, floor.id), {
+        json: floor.canvas.toJSON(["label", "reservation"]),
+    });
 }
 
 export function addGuestToGuestList(eventID: string, payload: GuestData) {

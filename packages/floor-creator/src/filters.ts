@@ -9,20 +9,15 @@ export function hasFloorTables(floor: Floor): boolean {
 }
 
 export function getTablesFromFloorDoc(floor: FloorDoc): BaseTable[] {
-    return floor.json.objects.map((obj: any) => {
-        return obj.objects[0];
-    });
+    return floor.json.objects.filter(isTable);
 }
 
 export function getTables(floor: Floor): BaseTable[] {
     const tables: BaseTable[] = [];
     floor.canvas.forEachObject((group) => {
-        // @ts-ignore
-        group.forEachObject((obj: unknown) => {
-            if (isTable(obj)) {
-                tables.push(obj);
-            }
-        });
+        if (isTable(group)) {
+            tables.push(group);
+        }
     });
     return tables;
 }

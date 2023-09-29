@@ -180,7 +180,9 @@ function handleReservationCreation(floor: Floor, reservationData: CreateReservat
     const reservedBy = { email, name, role, id };
 
     for (const idInGroup of groupedWith) {
-        const table = getTables(floor).find(({ label }) => label === idInGroup);
+        const table = getTables(floor).find(function ({ label }) {
+            return label === idInGroup;
+        });
         if (table) {
             floor.setReservationOnTable(table, {
                 ...reservationData,

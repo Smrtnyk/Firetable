@@ -82,7 +82,7 @@ function instantiateFloor(floorDoc: FloorDoc) {
 }
 
 function onFloorSave(): void {
-    if (!floorInstance.value || !hasFloorTables(floorInstance.value as Floor)) {
+    if (!floorInstance.value || !hasFloorTables(floorInstance.value)) {
         return showErrorMessage("You need to add at least one table!");
     }
 

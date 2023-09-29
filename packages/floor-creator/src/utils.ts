@@ -5,7 +5,7 @@ import { isDefined } from "@firetable/utils";
 import { BaseTable } from "./types.js";
 import { isTable } from "./type-guards.js";
 
-export function determineTableColor(reservation?: Reservation): string {
+export function determineTableColor(reservation?: Reservation | null): string {
     return match(reservation)
         .with({ confirmed: false }, () => "#2ab7ca")
         .with({ confirmed: true }, () => "#1a7722")

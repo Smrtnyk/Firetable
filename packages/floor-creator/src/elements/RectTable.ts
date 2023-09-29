@@ -1,30 +1,47 @@
 import { fabric } from "fabric";
-import { AnimationDirection, FloorElementTypes } from "../types.js";
+import { FloorElementTypes } from "../types.js";
 import { determineTableColor } from "../utils.js";
 import { Reservation } from "@firetable/types";
-import { isNumber } from "@firetable/utils";
+import { FONT_SIZE, TABLE_TEXT_FILL_COLOR } from "../constants";
+import { IGroupOptions } from "fabric/fabric-impl";
 
-interface ITableElementOptions extends fabric.IRectOptions {
-    width: number;
-    height: number;
-    reservation?: Reservation;
-    label: string;
+interface RectTableElementOptions {
+    groupOptions: {
+        reservation?: Reservation;
+        label: string;
+    } & IGroupOptions;
+    textOptions: {
+        label: string;
+    };
+    rectOptions: Record<string, unknown>;
 }
 
-export class RectTable extends fabric.Rect {
-    type: FloorElementTypes = FloorElementTypes.RECT_TABLE;
+export class RectTable extends fabric.Group {
+    type = FloorElementTypes.RECT_TABLE;
     reservation: Reservation | null = null;
     label: string;
-    animDirection = AnimationDirection.UP;
 
-    constructor(options: ITableElementOptions) {
-        const fill = determineTableColor(options.reservation);
-        super({
-            ...options,
+    constructor(options: RectTableElementOptions) {
+        const fill = determineTableColor(options.groupOptions.reservation);
+        const tableRect = new fabric.Rect({
+            ...options.rectOptions,
             fill,
+            stroke: "black",
+            strokeWidth: 2,
         });
-        this.label = options.label;
-        if (options.reservation) this.reservation = options.reservation;
+        const textLabel = new fabric.Text(options.groupOptions.label, {
+            fontSize: FONT_SIZE,
+            fill: TABLE_TEXT_FILL_COLOR,
+            textAlign: "center",
+            originX: "center",
+            originY: "center",
+            left: tableRect.left! + tableRect.width! / 2, // Adjust as necessary
+            top: tableRect.top! + tableRect.height! / 2, // Adjust as necessary
+        });
+        super([tableRect, textLabel], options.groupOptions);
+
+        this.label = options.groupOptions.label;
+        if (options.groupOptions.reservation) this.reservation = options.groupOptions.reservation;
     }
 
     toObject() {
@@ -36,43 +53,17 @@ export class RectTable extends fabric.Rect {
         };
     }
 
-    _render(ctx: CanvasRenderingContext2D) {
-        super._render(ctx);
-        ctx.strokeStyle = "#000";
-        ctx.stroke();
-    }
-
-    clearAnimation() {
-        super.set("opacity", 1);
-    }
-
-    animateWidthAndHeight() {
-        const superOpacity = super.get("opacity");
-        if (!isNumber(superOpacity)) return;
-
-        super.set("dirty", true);
-        const interval = 0.1;
-
-        if (superOpacity >= 0 && superOpacity <= 1) {
-            const actualInterval =
-                this.animDirection === AnimationDirection.UP ? interval : -interval;
-            super.set("opacity", superOpacity + actualInterval);
-        }
-
-        if (superOpacity >= 1) {
-            this.animDirection = AnimationDirection.DOWN;
-            super.set("opacity", superOpacity - interval);
-        }
-        if (superOpacity <= 0) {
-            this.animDirection = AnimationDirection.UP;
-            super.set("opacity", superOpacity + interval);
-        }
+    static fromObject(object: any, callback: (obj: RectTable) => void): void {
+        const rectOpts = object.objects[0];
+        const textOpts = object.objects[1];
+        const instance = new RectTable({
+            groupOptions: object,
+            rectOptions: rectOpts,
+            textOptions: textOpts,
+        });
+        callback(instance);
     }
 }
 
-// @ts-ignore
-fabric[FloorElementTypes.RECT_TABLE] = RectTable;
-// @ts-ignore
-fabric[FloorElementTypes.RECT_TABLE].fromObject = function (object, callback) {
-    return fabric.Object._fromObject(FloorElementTypes.RECT_TABLE, object, callback);
-};
+// @ts-ignore: Unreachable code error
+fabric.RectTable = fabric.util.createClass(RectTable);

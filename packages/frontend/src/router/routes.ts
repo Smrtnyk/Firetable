@@ -19,7 +19,7 @@ const routes: RouteRecordRaw[] = [
                 component: () => import("pages/PageEvents.vue"),
             },
             {
-                path: "/events/:id",
+                path: "/events/:clubId/event/:id",
                 name: "event",
                 meta: { requiresAuth: true },
                 props: true,
