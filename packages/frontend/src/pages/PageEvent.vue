@@ -98,7 +98,7 @@ function onAutocompleteClear(): void {
     }
     state.floorInstances.forEach((floor) => {
         const tables = getTables(floor);
-        tables.forEach((table) => table.clearAnimation());
+        tables.forEach((table) => table.stopSmoothBlinking());
         floor.canvas.renderAll();
     });
 }
@@ -246,7 +246,7 @@ function onTableFound(tables: BaseTable[]) {
     onAutocompleteClear();
     function animate() {
         for (const table of tables) {
-            table.animateWidthAndHeight();
+            table.startSmoothBlinking();
         }
         state.floorInstances.forEach((floor) => floor.canvas.renderAll());
     }

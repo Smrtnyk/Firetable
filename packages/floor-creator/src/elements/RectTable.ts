@@ -20,6 +20,7 @@ export class RectTable extends fabric.Group {
     type = FloorElementTypes.RECT_TABLE;
     reservation: Reservation | null = null;
     label: string;
+    private isAnimating: boolean = false;
 
     constructor(options: RectTableElementOptions) {
         const fill = determineTableColor(options.groupOptions.reservation);
@@ -42,6 +43,38 @@ export class RectTable extends fabric.Group {
 
         this.label = options.groupOptions.label;
         if (options.groupOptions.reservation) this.reservation = options.groupOptions.reservation;
+    }
+
+    startSmoothBlinking() {
+        if (this.isAnimating) return; // Already animating
+
+        this.isAnimating = true;
+        this.smoothBlink();
+    }
+
+    private smoothBlink() {
+        if (!this.isAnimating) return;
+
+        this.animate("opacity", 0, {
+            duration: 500, // Adjust as necessary
+            onChange: this.canvas?.renderAll.bind(this.canvas), // Bind necessary if inside class
+            onComplete: () => {
+                this.animate("opacity", 1, {
+                    duration: 500, // Adjust as necessary
+                    onChange: this.canvas?.renderAll.bind(this.canvas), // Bind necessary if inside class
+                    onComplete: () => {
+                        this.smoothBlink(); // Loop the animation
+                    },
+                });
+            },
+        });
+    }
+
+    stopSmoothBlinking() {
+        this.isAnimating = false;
+        // @ts-ignore
+        this.set({ opacity: 1 }); // Ensure it's fully visible when animation stops
+        this.canvas?.renderAll(); // Re-render canvas to apply opacity change
     }
 
     toObject() {
