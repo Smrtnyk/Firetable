@@ -1,6 +1,6 @@
+import { ACTIVITY_STATUS, Collection, CreateUserPayload } from "../../types/types.js";
 import { auth, db } from "../init.js";
 import * as functions from "firebase-functions";
-import { ACTIVITY_STATUS, Collection, CreateUserPayload } from "@firetable/types";
 
 export async function createUser(user: CreateUserPayload): Promise<{uid: string, message: string}> {
     const { name, password, email, role, clubs } = user;

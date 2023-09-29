@@ -31,8 +31,7 @@
         "typescript": "5.2.2"
     },
     "dependencies": {
-        "firebase": "10.4.0",
-        "web-push": "3.6.6"
+        "firebase": "10.4.0"
     },
     "private": true,
     "engines": {

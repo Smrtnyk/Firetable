@@ -8,13 +8,3 @@ export const enum Collection {
     SETTINGS = "settings",
     CLUBS = "clubs",
 }
-
-export interface PushSubscriptionDoc {
-    id: string;
-    endpoint: string;
-    expirationTime: null | Date;
-    keys: {
-        auth: string;
-        p256dh: string;
-    };
-}

@@ -4,6 +4,7 @@
         "isolatedModules": false,
         "baseUrl": ".",
         "skipLibCheck": true,
+        "lib": ["DOM", "ESNext"],
         "target": "ESNext",
         "types": [],
         "paths": {

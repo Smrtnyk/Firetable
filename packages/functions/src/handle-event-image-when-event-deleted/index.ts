@@ -1,6 +1,6 @@
 import * as functions from "firebase-functions";
 import { storage } from "../init.js";
-import { Collection } from "@firetable/types";
+import { Collection } from "../../types/types.js";
 
 export function handleEventImageWhenEventDeleted(snapshot: functions.firestore.QueryDocumentSnapshot, context: functions.EventContext): Promise<unknown> {
     const eventID = context.params.eventId;

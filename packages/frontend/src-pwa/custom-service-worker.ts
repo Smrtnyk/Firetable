@@ -1,15 +1,20 @@
-/* This file (which will be your service worker)
-   is picked up by the build system ONLY if
-   quasar.conf > pwa > workboxPluginMode is set to "InjectManifest" */
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
+/// <reference lib="webworker" />
+
+/*
+ * This file (which will be your service worker)
+ * is picked up by the build system ONLY if
+ * quasar.config file > pwa > workboxMode is set to "injectManifest"
+ */
+
 import { precacheAndRoute } from "workbox-precaching";
 import { CacheFirst, NetworkFirst } from "workbox-strategies";
 import { registerRoute } from "workbox-routing";
 import { ExpirationPlugin } from "workbox-expiration";
 import { CacheableResponsePlugin } from "workbox-cacheable-response";
 
-precacheAndRoute(self__WB_MANIFEST);
+declare let self: ServiceWorkerGlobalScope;
+
+precacheAndRoute(self.__WB_MANIFEST);
 
 registerRoute(
     ({ url }) => {
@@ -25,7 +30,7 @@ registerRoute(
                 statuses: [0, 200],
             }),
         ],
-    })
+    }),
 );
 
 registerRoute(({ url }) => {
@@ -43,6 +48,6 @@ self.addEventListener("push", (event) => {
     event.waitUntil(
         self.registration.showNotification(title, {
             body,
-        })
+        }),
     );
 });

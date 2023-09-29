@@ -1,5 +1,5 @@
 import { default as admin } from "firebase-admin";
-import { ACTIVITY_STATUS, Collection, Role } from "@firetable/types";
+import { ACTIVITY_STATUS, Collection, Role } from "../../types/types.js";
 
 process.env.FIREBASE_AUTH_EMULATOR_HOST = "127.0.0.1:9099";
 process.env.FIRESTORE_EMULATOR_HOST = "127.0.0.1:4000";

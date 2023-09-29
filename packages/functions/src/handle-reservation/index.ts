@@ -2,9 +2,7 @@ import webpush from "web-push";
 import * as functions from "firebase-functions";
 import diff from "diff-arrays-of-objects";
 import { db } from "../init.js";
-import { ChangeType, UpdatedTablesDifference } from "../../types/types.js";
-import { BaseTable } from "@firetable/floor-creator";
-import { Collection, PushSubscriptionDoc } from "@firetable/types";
+import { ChangeType, PushSubscriptionDoc, UpdatedTablesDifference, Collection, BaseTable } from "../../types/types.js";
 import { firestore } from "firebase-admin";
 import QueryDocumentSnapshot = firestore.QueryDocumentSnapshot;
 

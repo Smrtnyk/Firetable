@@ -8,7 +8,7 @@ import { createUser as createUserFn } from "./create-user/index.js";
 import { deleteUser as deleteUserFn } from "./delete-user/index.js";
 import { deleteDocument } from "./delete-document/index.js";
 import { clearOldEvents as clearOldEventsFn } from "./clear-old-events/index.js";
-import { Collection } from "@firetable/types";
+import { Collection } from "../types/types.js";
 
 // setVapidDetails(vapidKeys.subject, vapidKeys.publicKey, vapidKeys.privateKey);
 

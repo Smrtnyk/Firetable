@@ -6,10 +6,12 @@
     "functions": {
         "predeploy": "npm --prefix \"$RESOURCE_DIR\" run lint",
         "predeploy": "npm --prefix \"$RESOURCE_DIR\" run build",
-        "source": "packages/functions"
+        "source": "packages/functions",
+        "generation": 2,
+        "runtime": "nodejs18"
     },
     "hosting": {
-        "public": "packages/frontend/dist/spa",
+        "public": "packages/frontend/dist/pwa",
         "ignore": [
             "firebase.json",
             "**/.*",
@@ -23,7 +25,7 @@
         ],
         "headers": [
             {
-                "source": "/packages/frontend/custom-service-worker.js",
+                "source": "/custom-service-worker.js",
                 "headers": [
                     {
                         "key": "Cache-Control",
