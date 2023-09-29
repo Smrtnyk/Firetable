@@ -4,11 +4,12 @@ export default {
             logout: "Abmelden",
             manageEvents: "Veranstaltungen verwalten",
             manageFloors: "Etagen verwalten",
-            manageRoles: "Rollen verwalten",
             manageUsers: "Benutzer verwalten",
             manageClubs: "Clubs verwalten",
-            toggleDarkMode: "Dunkelmodus umschalten",
-            toggleOnlineStatus: "Online-Status umschalten",
+        },
+        toggles: {
+            darkMode: "Dunkelmodus umschalten",
+            onlineStatus: "Online-Status umschalten",
         },
     },
     PageEvent: {

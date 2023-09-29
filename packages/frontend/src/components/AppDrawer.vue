@@ -154,7 +154,7 @@ function setAppLanguage(val: string) {
                     @update:model-value="setDarkMode"
                     checked-icon="moon"
                     color="red"
-                    label="Toggle dark mode"
+                    :label="t('AppDrawer.toggles.darkMode')"
                     unchecked-icon="sun"
                     size="lg"
                 />
@@ -164,7 +164,7 @@ function setAppLanguage(val: string) {
                     :model-value="user.status"
                     checked-icon="status-online"
                     color="green"
-                    label="Toggle online status"
+                    :label="t('AppDrawer.toggles.onlineStatus')"
                     unchecked-icon="status-offline"
                     size="lg"
                     @update:model-value="toggleUserActivityStatus"

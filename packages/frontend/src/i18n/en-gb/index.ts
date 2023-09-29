@@ -5,9 +5,10 @@ export default {
             manageEvents: "Manage Events",
             manageFloors: "Manage Floors",
             manageUsers: "Manage Users",
-            toggleDarkMode: "Toggle dark mode",
-            toggleOnlineStatus: "Toggle online status",
-            manageRoles: "Manage Roles",
+        },
+        toggles: {
+            darkMode: "Toggle dark mode",
+            onlineStatus: "Toggle online status",
         },
     },
     PageEvent: {
