@@ -17,7 +17,7 @@ import {
     hasFloorTables,
     RESOLUTION,
 } from "@firetable/floor-creator";
-import { Collection, ElementTag, ElementType, FloorDoc } from "@firetable/types";
+import { Collection, ElementTag, FloorDoc } from "@firetable/types";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import {
     getFirestoreDocument,
@@ -28,7 +28,6 @@ import { isNumber } from "@firetable/utils";
 
 type ElementDescriptor = {
     tag: ElementTag;
-    type: ElementType;
 };
 
 interface BottomSheetTableClickResult {
@@ -113,26 +112,33 @@ function onFloorChange(prop: keyof Floor, event: null | number | string) {
 
 function handleAddNewElement(floor: Floor, coords: NumberTuple) {
     return function ({ elementDescriptor }: BottomSheetTableClickResult) {
-        // if (isWall(elementDescriptor)) return floor.addWall(coords);
-        if (elementDescriptor.tag === ElementTag.SOFA) {
-            return floor.addTableElement({
-                x: coords[0],
-                y: coords[1],
-                label: "",
+        const [x, y] = coords;
+        const { tag } = elementDescriptor;
+
+        if (tag === ElementTag.WALL) {
+            return floor.addElement({
+                x,
+                y,
+                tag: ElementTag.WALL,
+            });
+        }
+
+        if (tag === ElementTag.SOFA) {
+            return floor.addElement({
+                x,
+                y,
                 tag: ElementTag.SOFA,
             });
         }
 
-        if (elementDescriptor.tag === ElementTag.DJ_BOOTH) {
-            return floor.addTableElement({
-                x: coords[0],
-                y: coords[1],
-                label: "",
+        if (tag === ElementTag.DJ_BOOTH) {
+            return floor.addElement({
+                x,
+                y,
                 tag: ElementTag.DJ_BOOTH,
             });
         }
-        const [x, y] = coords;
-        const { tag } = elementDescriptor;
+
         const dialog = q.dialog({
             component: FTDialog,
             componentProps: {
@@ -145,7 +151,7 @@ function handleAddNewElement(floor: Floor, coords: NumberTuple) {
                 listeners: {
                     create: function (label: string) {
                         dialog.hide();
-                        floor.addTableElement({ label, x, y, tag });
+                        floor.addElement({ label, x, y, tag });
                     },
                 },
             },

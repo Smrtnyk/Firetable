@@ -16,6 +16,7 @@ import { RoundTable } from "./elements/RoundTable";
 import { RectTable } from "./elements/RectTable";
 import { Sofa } from "./elements/Sofa";
 import { DJBooth } from "./elements/DJBooth";
+import { Wall } from "./elements/Wall";
 
 interface FloorCreationOptions {
     canvas: HTMLCanvasElement;
@@ -245,16 +246,21 @@ export class Floor {
         }
     }
 
-    addTableElement(options: CreateElementOptions) {
+    addElement(options: CreateElementOptions) {
         const group = match(options.tag)
             .with(ElementTag.RECT, () => this.addRectTableElement(options))
             .with(ElementTag.CIRCLE, () => this.addRoundTableElement(options))
             .with(ElementTag.SOFA, () => this.addSofaElement(options))
             .with(ElementTag.DJ_BOOTH, () => this.addDJBooth(options))
+            .with(ElementTag.WALL, () => this.addWall(options))
             .exhaustive();
 
         group.on("mouseup", this.onElementClick);
         this.canvas.add(group);
+    }
+
+    private addWall({ x, y }: CreateElementOptions) {
+        return new Wall(x, y);
     }
 
     private addDJBooth({ x, y }: CreateElementOptions) {
