@@ -1,37 +1,31 @@
 {
-    "extends": "@quasar/app-vite/tsconfig-preset",
     "compilerOptions": {
+        "esModuleInterop": true,
+        "module": "esnext",
+        "moduleResolution": "node",
         "isolatedModules": false,
+        "noEmit": true,
         "baseUrl": ".",
+        "resolveJsonModule": true,
         "skipLibCheck": true,
-        "lib": ["DOM", "ESNext"],
+        "sourceMap": true,
+        "strict": true,
+        "forceConsistentCasingInFileNames": true,
+        "useDefineForClassFields": true,
+        "jsx": "preserve",
+        "lib": ["esnext", "dom"],
         "target": "ESNext",
         "types": [],
         "paths": {
-            "src/*": [
-                "src/*"
-            ],
-            "app/*": [
-                "*"
-            ],
-            "components/*": [
-                "src/components/*"
-            ],
-            "layouts/*": [
-                "src/layouts/*"
-            ],
-            "pages/*": [
-                "src/pages/*"
-            ],
-            "assets/*": [
-                "src/assets/*"
-            ],
-            "boot/*": [
-                "src/boot/*"
-            ],
-            "stores/*": [
-                "src/stores/*"
-            ]
+            "src/*": ["src/*"],
+            "app/*": ["*"],
+            "components/*": ["src/components/*"],
+            "layouts/*": ["src/layouts/*"],
+            "pages/*": ["src/pages/*"],
+            "assets/*": ["src/assets/*"],
+            "boot/*": ["src/boot/*"],
+            "stores/*": ["src/stores/*"]
         }
-    }
+    },
+    "exclude": ["dist", ".quasar", "node_modules"]
 }
