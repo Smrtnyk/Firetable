@@ -32,9 +32,10 @@ export const enum Collection {
     USER_PROPERTY_MAP = "userPropertyMap",
 }
 
+export const ADMIN = "Administrator";
 // Copy, cannot be imported from types package
 export enum Role {
-    ADMIN = "Administrator",
+    PROPERTY_OWNER = "Property Owner",
     MANAGER = "Manager",
     WAITER = "Waiter",
     ENTRY = "Entry",

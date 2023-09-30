@@ -1,4 +1,4 @@
-import { ACTIVITY_STATUS, Collection, Role } from "../../types/types.js";
+import { ACTIVITY_STATUS, ADMIN, Collection } from "../../types/types.js";
 import { default as admin } from "firebase-admin";
 import serviceAccount from "./service-account.json" assert { type: "json" };
 
@@ -21,13 +21,13 @@ const ADMIN_NAME = "Admin";
             password: ADMIN_PASSWORD,
         });
 
-        await auth.setCustomUserClaims(user.uid, { role: Role.ADMIN });
+        await auth.setCustomUserClaims(user.uid, { role: ADMIN });
         await admin.auth().getUser(user.uid);
 
         await db.collection(Collection.USERS).doc(user.uid).set({
             email: ADMIN_MAIL,
             name: ADMIN_NAME,
-            role: Role.ADMIN,
+            role: ADMIN,
             status: ACTIVITY_STATUS.OFFLINE
         });
 

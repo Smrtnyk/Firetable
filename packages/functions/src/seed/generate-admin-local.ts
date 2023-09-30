@@ -1,5 +1,5 @@
 import { default as admin } from "firebase-admin";
-import { ACTIVITY_STATUS, Collection, Role } from "../../types/types.js";
+import { ACTIVITY_STATUS, ADMIN, Collection } from "../../types/types.js";
 
 process.env.FIREBASE_AUTH_EMULATOR_HOST = "127.0.0.1:9099";
 process.env.FIRESTORE_EMULATOR_HOST = "127.0.0.1:4000";
@@ -20,14 +20,13 @@ const ADMIN_NAME = "Admin";
             password: ADMIN_PASSWORD,
         });
 
-        await auth.setCustomUserClaims(user.uid, { role: Role.ADMIN });
+        await auth.setCustomUserClaims(user.uid, { role: ADMIN });
         await admin.auth().getUser(user.uid);
 
         await db.collection(Collection.USERS).doc(user.uid).set({
             email: ADMIN_MAIL,
             name: ADMIN_NAME,
-            role: Role.ADMIN,
-            floors: [],
+            role: ADMIN,
             status: ACTIVITY_STATUS.OFFLINE,
         });
 
