@@ -6,9 +6,10 @@ import { handleEventImageWhenEventDeleted as handleEventImageWhenEventDeletedFn 
 import { createEvent as createEventFn } from "./create-event/index.js";
 import { createUser as createUserFn } from "./create-user/index.js";
 import { deleteUser as deleteUserFn } from "./delete-user/index.js";
-import { deleteDocument } from "./delete-document/index.js";
 import { clearOldEvents as clearOldEventsFn } from "./clear-old-events/index.js";
 import { Collection } from "../types/types.js";
+import { createPropertyFn } from "./property/create-property.js";
+import { deleteDocument } from "./delete-document/index.js";
 
 // setVapidDetails(vapidKeys.subject, vapidKeys.publicKey, vapidKeys.privateKey);
 
@@ -39,6 +40,12 @@ export const deleteUser = functions
     .region("europe-west3")
     .https
     .onCall(deleteUserFn);
+
+// Properties
+export const createProperty = functions
+    .region("europe-west3")
+    .https
+    .onCall(createPropertyFn);
 
 // Generic stuff
 export const deleteCollection = functions

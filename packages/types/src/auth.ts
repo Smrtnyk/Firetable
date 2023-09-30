@@ -22,7 +22,6 @@ export interface User {
     name: string;
     email: string;
     username: string;
-    clubs: UserClubs[];
     role: Role | typeof ADMIN;
     status: ACTIVITY_STATUS;
 }

@@ -28,7 +28,8 @@ export const enum Collection {
     FCM = "fcm",
     EVENT_FEED = "eventFeed",
     SETTINGS = "settings",
-    CLUBS = "clubs",
+    PROPERTIES = "properties",
+    USER_PROPERTY_MAP = "userPropertyMap",
 }
 
 // Copy, cannot be imported from types package

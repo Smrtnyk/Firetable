@@ -19,7 +19,6 @@ const userSkeleton: CreateUserPayload = {
     username: "",
     email: "",
     password: "",
-    clubs: [],
     role: Role.WAITER,
     status: ACTIVITY_STATUS.OFFLINE,
 };

@@ -26,7 +26,6 @@ const ADMIN_NAME = "Admin";
 
         await db.collection(Collection.USERS).doc(user.uid).set({
             email: ADMIN_MAIL,
-            clubs: [],
             name: ADMIN_NAME,
             role: Role.ADMIN,
             status: ACTIVITY_STATUS.OFFLINE

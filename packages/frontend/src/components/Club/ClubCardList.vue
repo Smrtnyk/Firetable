@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import ClubCard from "components/Club/ClubCard.vue";
-import { ClubDoc } from "@firetable/types";
+import { PropertyDoc } from "@firetable/types";
 
 interface Props {
-    clubs: ClubDoc[];
+    clubs: PropertyDoc[];
 }
 const props = defineProps<Props>();
 </script>

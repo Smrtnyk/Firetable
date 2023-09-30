@@ -10,30 +10,38 @@ import {
     getFirestoreCollection,
     useFirestoreCollection,
 } from "src/composables/useFirestore";
-import { where } from "firebase/firestore";
-import { ClubDoc, Collection } from "@firetable/types";
+import { documentId, where } from "firebase/firestore";
+import { Collection, PropertyDoc } from "@firetable/types";
 import { useAuthStore } from "stores/auth-store";
 import { createNewClub, deleteClub } from "@firetable/backend";
+import { computed, ref, watchEffect } from "vue";
+import { takeProp } from "@firetable/utils";
 
 const authStore = useAuthStore();
 const quasar = useQuasar();
+const clubIds = computed(() => {
+    return authStore.userPropertyMap.map(takeProp("propertyId"));
+});
+const clubs = ref<PropertyDoc[]>([]);
 
-const { data: clubs } = useFirestoreCollection<ClubDoc>(
-    createQuery(
-        getFirestoreCollection(Collection.CLUBS),
-        where("ownerId", "==", authStore.user?.id),
-    ),
-);
+watchEffect(async () => {
+    if (clubIds.value.length) {
+        const res = useFirestoreCollection<PropertyDoc>(
+            createQuery(
+                getFirestoreCollection(Collection.PROPERTIES),
+                where(documentId(), "in", clubIds.value),
+            ),
+        );
+        await res.promise.value;
+        clubs.value = res.data.value;
+    }
+});
 
 function onClubCreate(clubName: string) {
     return tryCatchLoadingWrapper({
         hook: async () => {
-            if (!authStore.user?.id) {
-                throw new Error("User ID is not defined!");
-            }
             await createNewClub({
                 name: clubName,
-                ownerId: authStore.user?.id,
             });
             quasar.notify("Club created!");
         },

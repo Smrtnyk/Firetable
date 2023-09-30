@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import PushMessagesBanner from "components/PushMessagesBanner.vue";
 import EventCardListSkeleton from "components/Event/EventCardListSkeleton.vue";
-import { limit, where } from "firebase/firestore";
-import { ClubDoc, Collection } from "@firetable/types";
+import { documentId, where } from "firebase/firestore";
+import { PropertyDoc, Collection } from "@firetable/types";
 import {
     createQuery,
     getFirestoreCollection,
@@ -10,16 +10,31 @@ import {
 } from "src/composables/useFirestore";
 import ClubCardList from "components/Club/ClubCardList.vue";
 import { useAuthStore } from "stores/auth-store";
+import { takeProp } from "@firetable/utils";
+import { computed, ref, watchEffect } from "vue";
 
 const authStore = useAuthStore();
+const isLoading = ref(true);
+const clubIds = computed(() => {
+    return authStore.userPropertyMap.map(takeProp("propertyId"));
+});
+const clubs = ref<PropertyDoc[]>([]);
 
-const { data: clubs, pending: isLoading } = useFirestoreCollection<ClubDoc>(
-    createQuery<ClubDoc>(
-        getFirestoreCollection(Collection.CLUBS),
-        where("ownerId", "==", authStore.user?.id),
-        limit(10),
-    ),
-);
+watchEffect(async () => {
+    if (clubIds.value.length) {
+        const res = useFirestoreCollection<PropertyDoc>(
+            createQuery(
+                getFirestoreCollection(Collection.PROPERTIES),
+                where(documentId(), "in", clubIds.value),
+            ),
+        );
+        await res.promise.value;
+        clubs.value = res.data.value;
+        isLoading.value = res.pending.value;
+    } else {
+        isLoading.value = false;
+    }
+});
 </script>
 
 <template>
