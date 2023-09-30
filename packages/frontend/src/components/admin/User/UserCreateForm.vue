@@ -12,12 +12,12 @@ interface Props {
     user?: User;
 }
 
-interface Emits {
+type Emits = {
     (
         event: "submit",
         payload: { user: CreateUserPayload["user"] | User; properties: string[] },
     ): void;
-}
+};
 
 const emit = defineEmits<Emits>();
 const props = defineProps<Props>();

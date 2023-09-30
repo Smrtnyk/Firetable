@@ -74,7 +74,7 @@ const selectedElement = computed(() => {
 });
 
 async function updateTableLabel(newId: string | number | null): Promise<void> {
-    if (!selectedElement.value || !selectedElement.value || !newId) return;
+    if (!selectedElement.value || !newId) return;
     if (!isTable(selectedElement.value)) return;
 
     try {

@@ -49,8 +49,7 @@ export async function createEvent(
         });
 
         floors.forEach(floor => {
-            logger.info(`Iterating over floor: ${floor.name}`);
-            if (floor && floor.id) {
+            if (floor.id) {
                 const floorRef = eventRef.collection(Collection.FLOORS).doc(floor.id);
                 transaction.set(floorRef, floor);
             } else {

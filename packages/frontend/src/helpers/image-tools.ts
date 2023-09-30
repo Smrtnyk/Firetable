@@ -1,65 +1,81 @@
 export function resizeImage(
     file: File,
     maxDimensions: { width: number; height: number },
-): Promise<never | Blob> {
+): Promise<Blob> {
     return new Promise((resolve, reject) => {
-        try {
-            resize(file, maxDimensions, resolve);
-        } catch (e) {
-            reject(e);
+        const imageTypePattern = /^image\//;
+
+        if (!imageTypePattern.exec(file.type)) {
+            return reject(new Error("Provided file is not an image"));
         }
+
+        const image = new Image();
+
+        image.onload = () => {
+            try {
+                const resizedBlob = performResize(image, maxDimensions, file.type);
+                resolve(resizedBlob);
+            } catch (error) {
+                reject(error);
+            }
+        };
+
+        image.onerror = () => {
+            reject(new Error("Error loading the image"));
+        };
+
+        image.src = URL.createObjectURL(file);
     });
 }
 
-function resize(
-    file: File,
+function performResize(
+    image: HTMLImageElement,
     maxDimensions: { width: number; height: number },
-    callback: (file: Blob) => void,
+    mimeType: string,
+): Blob {
+    const { width, height } = calculateNewDimensions(image, maxDimensions);
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Canvas context is not available");
+
+    context.drawImage(image, 0, 0, width, height);
+
+    const dataUrl = canvas.toDataURL(mimeType);
+    const resizedBlob = dataURLToBlob(dataUrl, mimeType);
+    return resizedBlob;
+}
+
+function calculateNewDimensions(
+    image: HTMLImageElement,
+    maxDimensions: { width: number; height: number },
 ) {
-    if (!file.type.match(/image.*/)) {
-        throw new Error("An error occurred while processing the image!");
+    let { width, height } = image;
+    const aspectRatio = width / height;
+
+    if (width > maxDimensions.width) {
+        width = maxDimensions.width;
+        height = width / aspectRatio;
     }
 
-    if (file.type.match(/image\/gif/)) {
-        // Not attempting, could be an animated gif
-        throw new Error("An error occurred while processing the image!");
+    if (height > maxDimensions.height) {
+        height = maxDimensions.height;
+        width = height * aspectRatio;
     }
 
-    const image = document.createElement("img");
+    return { width, height };
+}
 
-    image.onload = () => {
-        let width = image.width;
-        let height = image.height;
-        let isTooLarge = false;
+function dataURLToBlob(dataUrl: string, mimeType: string): Blob {
+    const byteString = atob(dataUrl.split(",")[1]);
+    const arrayBuffer = new ArrayBuffer(byteString.length);
+    const uint8Array = new Uint8Array(arrayBuffer);
 
-        if ((width >= height && width > maxDimensions.width) || height > maxDimensions.height) {
-            isTooLarge = true;
-        }
+    for (let i = 0; i < byteString.length; i++) {
+        uint8Array[i] = byteString.charCodeAt(i);
+    }
 
-        if (!isTooLarge) {
-            throw new Error("Image is smaller than it needs to be resized to!");
-        }
-
-        const scaleRatio = maxDimensions.width / width;
-
-        width *= scaleRatio;
-        height *= scaleRatio;
-
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return;
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = "high";
-        ctx.drawImage(image, 0, 0, width, height);
-
-        canvas.toBlob((blob) => {
-            if (!blob) return;
-            callback(blob);
-        }, file.type);
-    };
-
-    image.src = URL.createObjectURL(file);
+    return new Blob([uint8Array], { type: mimeType });
 }

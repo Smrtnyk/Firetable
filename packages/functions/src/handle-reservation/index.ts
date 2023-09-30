@@ -73,7 +73,7 @@ async function sendPushMessageToSubscriptions(
         try {
             await webpush.sendNotification({ endpoint, keys }, `${title}|${body}`);
         } catch (error: any) {
-            if (error.body && error.body.includes("push subscription has unsubscribed or expired")) {
+            if (error.body?.includes("push subscription has unsubscribed or expired")) {
                 await db.collection(Collection.FCM).doc(docID).delete();
             } else {
                 logger.error("Error sending push notification:", error);
@@ -145,7 +145,7 @@ async function handleAddedReservation(
     context: functions.EventContext,
     added: BaseTable[]
 ): Promise<void> {
-    if (!added || !added.length) {
+    if (!added?.length) {
         return;
     }
 

@@ -53,8 +53,8 @@ export async function createUser(user: CreateUserPayload): Promise<{uid: string,
             await auth.deleteUser(createdUserUid);
         }
 
-        const errorCode = e && e.code ? e.code : "unknown";
-        const errorMessage = e && e.message ? e.message : "An unknown error occurred.";
+        const errorCode = e.code ? e.code : "unknown";
+        const errorMessage = e.message ? e.message : "An unknown error occurred.";
         throw new functions.https.HttpsError(errorCode, errorMessage);
     }
 }

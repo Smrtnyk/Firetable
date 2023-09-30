@@ -76,10 +76,10 @@ export async function tryCatchLoadingWrapper<T>({
 }: TryCatchLoadingWrapperOptions<T>): Promise<T | void> {
     try {
         Loading.show();
-        return await hook(...(args || []));
+        return await hook(...(args ?? []));
     } catch (e) {
         showErrorMessage(e);
-        (errorHook || NOOP)(...(args || []));
+        (errorHook ?? NOOP)(...(args ?? []));
     } finally {
         Loading.hide();
     }

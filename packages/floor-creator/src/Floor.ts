@@ -331,8 +331,7 @@ export class Floor {
     }
 
     setReservationOnTable(element: BaseTable, reservation: Reservation | null) {
-        // @ts-ignore -- FIXME: figure out why it complains about set
-        element.set({ reservation });
+        element.reservation = reservation;
     }
 
     shouldLockDrag() {
