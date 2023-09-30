@@ -57,7 +57,7 @@ function onCreateUserFormSubmit(newUser: CreateUserPayload) {
 
 async function showCreateUserDialog(): Promise<void> {
     const properties = await propertiesStore.getPropertiesOnce();
-    quasar.dialog({
+    const dialog = quasar.dialog({
         component: FTDialog,
         componentProps: {
             component: UserCreateForm,
@@ -67,7 +67,10 @@ async function showCreateUserDialog(): Promise<void> {
                 properties,
             },
             listeners: {
-                submit: onCreateUserFormSubmit,
+                submit: function (userPayload: CreateUserPayload) {
+                    onCreateUserFormSubmit(userPayload);
+                    dialog.hide();
+                },
             },
         },
     });
@@ -78,8 +81,11 @@ async function showEditUserDialog(user: User, reset: () => void) {
         reset();
         return;
     }
-    const properties = await propertiesStore.getPropertiesOnce();
-    quasar.dialog({
+    const [properties, selectedProperties] = await Promise.all([
+        propertiesStore.getPropertiesOnce(),
+        propertiesStore.getPropertiesOfUser(user.id),
+    ]);
+    const dialog = quasar.dialog({
         component: FTDialog,
         componentProps: {
             component: UserCreateForm,
@@ -88,10 +94,13 @@ async function showEditUserDialog(user: User, reset: () => void) {
             componentPropsObject: {
                 user: { ...user },
                 properties,
+                selectedProperties,
             },
             listeners: {
-                submit: (updatedUser: Partial<CreateUserPayload>) =>
-                    onUpdateUser(user.id, updatedUser).then(reset),
+                submit: (updatedUser: Partial<CreateUserPayload>) => {
+                    onUpdateUser(user.id, updatedUser).then(reset).catch(showErrorMessage);
+                    dialog.hide();
+                },
             },
         },
     });

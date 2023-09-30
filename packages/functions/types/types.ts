@@ -53,14 +53,17 @@ export interface BaseTable {
 }
 
 // Cannot import this because functions deploy
-export interface CreateUserPayload {
-    id: string;
-    name: string;
-    email: string;
-    username: string;
-    role: Role;
-    status: ACTIVITY_STATUS;
-    password: string;
+export interface CreateUserPayload{
+    user: {
+        id: string;
+        name: string;
+        email: string;
+        username: string;
+        role: Role;
+        status: ACTIVITY_STATUS;
+        password: string;
+    };
+    properties: string[];
 }
 
 export interface CreateEventForm {

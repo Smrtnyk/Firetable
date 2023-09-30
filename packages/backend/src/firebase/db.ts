@@ -16,6 +16,10 @@ export function propertiesCollection() {
     return getCollection(Collection.PROPERTIES);
 }
 
+export function userPropertyMapCollection() {
+    return getCollection(Collection.USER_PROPERTY_MAP);
+}
+
 export function floorsCollection() {
     return getCollection(Collection.FLOORS);
 }

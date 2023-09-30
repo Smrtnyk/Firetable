@@ -21,6 +21,9 @@ export interface User {
     status: ACTIVITY_STATUS;
 }
 
-export type CreateUserPayload = User & {
-    password: string;
-};
+export interface CreateUserPayload {
+    user: User & {
+        password: string;
+    };
+    properties: string[];
+}

@@ -13,7 +13,7 @@ export function createUserWithEmail(payload: CreateUserPayload) {
 export function updateUserField<T extends keyof CreateUserPayload>(
     uid: string,
     field: T,
-    value: CreateUserPayload[T]
+    value: CreateUserPayload[T],
 ) {
     return updateDoc(doc(usersCollection(), uid), {
         [field]: value,
