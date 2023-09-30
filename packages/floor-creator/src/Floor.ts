@@ -27,10 +27,7 @@ interface FloorCreationOptions {
     containerWidth: number;
 }
 
-Object.assign(fabric, {
-    RectTable,
-    RoundTable,
-});
+Object.assign(fabric, { RectTable, RoundTable });
 
 const DEFAULT_ZOOM = 1;
 const ZOOM_INCREMENT = 0.2;
@@ -38,48 +35,48 @@ const MAX_ZOOM_STEPS = 5;
 const DEFAULT_COORDINATE = 50;
 
 export class Floor {
-    id: string;
+    // Class property declarations
+    readonly id: string;
     name: string;
-    scale: number;
-    width: number;
+    readonly scale: number;
     height: number;
+    readonly containerWidth: number;
+    readonly floorDoc: FloorDoc;
+    readonly canvas: fabric.Canvas;
+    readonly dblClickHandler?: FloorDoubleClickHandler;
+    readonly elementClickHandler: ElementClickHandler;
+    private currentZoomSteps = 0;
     mode: FloorMode;
-    floorDoc: FloorDoc;
-    containerWidth: number;
-    canvas: fabric.Canvas;
-    dblClickHandler: FloorDoubleClickHandler | undefined;
-    private currentZoomSteps: number;
-    elementClickHandler: ElementClickHandler;
+    width: number;
 
-    constructor({
-        canvas,
-        floorDoc,
-        dblClickHandler,
-        elementClickHandler,
-        mode,
-        containerWidth,
-    }: FloorCreationOptions) {
+    constructor(options: FloorCreationOptions) {
+        const { canvas, floorDoc, dblClickHandler, elementClickHandler, mode, containerWidth } =
+            options;
+
         this.scale = calculateCanvasScale(containerWidth, floorDoc.width);
+        this.id = floorDoc.id;
+        this.name = floorDoc.name;
         this.width = floorDoc.width;
         this.height = floorDoc.height;
         this.containerWidth = containerWidth;
         this.floorDoc = floorDoc;
-        this.canvas = new fabric.Canvas(canvas, {
-            width: floorDoc.width,
-            height: floorDoc.height,
-            backgroundColor: CANVAS_BG_COLOR,
-            interactive: mode === FloorMode.EDITOR,
-            selection: false,
-        });
-
-        this.currentZoomSteps = 0; // Counter to keep track of current zoom steps
-        this.id = floorDoc.id;
-        this.name = floorDoc.name;
         this.mode = mode;
         this.dblClickHandler = dblClickHandler;
         this.elementClickHandler = elementClickHandler;
+
+        this.canvas = new fabric.Canvas(canvas, {
+            width: this.width,
+            height: this.height,
+            backgroundColor: CANVAS_BG_COLOR,
+            interactive: this.isInEditorMode,
+            selection: false,
+        });
         this.initializeCanvasEventHandlers();
-        this.renderData(floorDoc.json);
+        this.renderData(this.floorDoc.json);
+    }
+
+    private get isInEditorMode(): boolean {
+        return this.mode === FloorMode.EDITOR;
     }
 
     private initializeCanvasEventHandlers() {

@@ -1,4 +1,4 @@
-lockfileVersion: '6.0'
+lockfileVersion: '6.1'
 
 settings:
   autoInstallPeers: true
@@ -2953,9 +2953,9 @@ packages:
     resolution: {integrity: sha512-HSX/Vgec5/Y8fiJRfpf1MR7+um+rdpbilktBGQkYOKw4A9d0smGq4jtSS/K4O2GTXRYqDmZ/5sgCeBcmhB3OCw==}
     engines: {node: '>=12'}
     peerDependencies:
-      '@vitejs/plugin-vue': ^4.0.0
+      '@vitejs/plugin-vue': ^2.0.0 || ^3.0.0 || ^4.0.0
       quasar: ^2.8.0
-      vite: ^4.0.0
+      vite: ^2.0.0 || ^3.0.0 || ^4.0.0
       vue: ^3.0.0
     dependencies:
       '@vitejs/plugin-vue': 4.0.0(vite@4.0.4)(vue@3.3.4)
