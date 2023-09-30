@@ -13,7 +13,7 @@ import {
 import { where } from "firebase/firestore";
 import { ClubDoc, Collection } from "@firetable/types";
 import { useAuthStore } from "stores/auth-store";
-import { createNewClub } from "@firetable/backend";
+import { createNewClub, deleteClub } from "@firetable/backend";
 
 const authStore = useAuthStore();
 const quasar = useQuasar();
@@ -40,15 +40,13 @@ function onClubCreate(clubName: string) {
     });
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const onDeleteClub = loadingWrapper(() => {
-    // implement
-    return Promise.resolve();
+const onDeleteClub = loadingWrapper((id: string) => {
+    return deleteClub(id);
 });
 
-async function deleteClub(clubToDelete: ClubDoc, reset: () => void): Promise<void> {
+async function deleteClubAsync(clubID: string, reset: () => void): Promise<void> {
     if (await showConfirm("Delete Club?")) {
-        return Promise.resolve();
+        return onDeleteClub(clubID);
     }
     reset();
 }
@@ -87,7 +85,7 @@ function createClub(): void {
                 v-for="club in clubs"
                 :key="club.id"
                 right-color="warning"
-                @right="({ reset }) => deleteClub(club, reset)"
+                @right="({ reset }) => deleteClubAsync(club.id, reset)"
                 class="fa-card"
             >
                 <template #right>

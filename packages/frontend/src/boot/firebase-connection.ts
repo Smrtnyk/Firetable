@@ -2,7 +2,7 @@ import { boot } from "quasar/wrappers";
 import { useAuthStore } from "src/stores/auth-store";
 import { initializeFirebase } from "@firetable/backend";
 import { Router } from "vue-router";
-import { Role } from "@firetable/types";
+import { ADMIN } from "@firetable/types";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { getCurrentUser, useCurrentUser, VueFire, VueFireAuth } from "vuefire";
 import { watch } from "vue";
@@ -42,7 +42,7 @@ function routerBeforeEach(router: Router, store: ReturnType<typeof useAuthStore>
 
             const token = await (await getCurrentUser())?.getIdTokenResult();
             const role = token?.claims.role;
-            const isAdmin = role === Role.ADMIN;
+            const isAdmin = role === ADMIN;
 
             if (requiresAdmin && isAdmin) return true;
             if (requiresAdmin && !isAdmin) return { name: "home" };

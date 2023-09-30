@@ -5,6 +5,7 @@ export default {
             manageEvents: "Manage Events",
             manageFloors: "Manage Floors",
             manageUsers: "Manage Users",
+            manageClubs: "Manage Properties",
         },
         toggles: {
             darkMode: "Toggle dark mode",

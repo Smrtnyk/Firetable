@@ -15,7 +15,7 @@ import FTDialog from "components/FTDialog.vue";
 import { useQuasar } from "quasar";
 import { config } from "src/config";
 import { BaseTable, Floor, FloorMode, getTablesFromFloorDoc } from "@firetable/floor-creator";
-import { Collection, EventDoc, EventFeedDoc, FloorDoc, Role, User } from "@firetable/types";
+import { ADMIN, Collection, EventDoc, EventFeedDoc, FloorDoc, User } from "@firetable/types";
 import { updateEventFloorData, updateEventProperty } from "@firetable/backend";
 import { where } from "firebase/firestore";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
@@ -41,7 +41,7 @@ const { data: eventFloors } = useFirestoreCollection<FloorDoc>(
 );
 
 const users = useFirestoreCollection<User>(
-    createQuery(getFirestoreCollection(Collection.USERS), where("role", "!=", Role.ADMIN)),
+    createQuery(getFirestoreCollection(Collection.USERS), where("role", "!=", ADMIN)),
     { once: true },
 );
 

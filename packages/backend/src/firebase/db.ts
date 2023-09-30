@@ -55,6 +55,10 @@ export function floorDoc(id: string) {
     return doc(floorsCollection(), id);
 }
 
+export function clubDoc(id: string) {
+    return doc(clubsCollection(), id);
+}
+
 export function eventFloorDoc(eventId: string, floorId: string) {
     return doc(eventDoc(eventId), `${Collection.FLOORS}/${floorId}`);
 }

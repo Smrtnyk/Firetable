@@ -1,7 +1,7 @@
-export const SUPER_ADMIN = "Super Administrator";
+export const ADMIN = "Administrator";
 
 export enum Role {
-    ADMIN = "Administrator",
+    PROPERTY_OWNER = "Property Owner",
     MANAGER = "Manager",
     WAITER = "Waiter",
     ENTRY = "Entry",
@@ -23,7 +23,7 @@ export interface User {
     email: string;
     username: string;
     clubs: UserClubs[];
-    role: Role;
+    role: Role | typeof ADMIN;
     status: ACTIVITY_STATUS;
 }
 

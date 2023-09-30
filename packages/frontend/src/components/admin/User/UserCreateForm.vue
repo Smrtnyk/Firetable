@@ -93,18 +93,19 @@ function onReset() {
                 :options="Object.values(Role)"
                 label="Role"
             />
-            <q-select
-                v-model="form.clubs"
-                hint="Assign user to clubs, multiple Clubs are allowed."
-                standout
-                rounded
-                multiple
-                use-chips
-                :options="props.clubs"
-                option-label="name"
-                option-value="id"
-                label="Clubs"
-            />
+            <div class="q-gutter-sm q-mb-lg">
+                <div>Clubs:</div>
+                <div>
+                    <q-checkbox
+                        v-for="club in props.clubs"
+                        :key="club.id"
+                        v-model="form.clubs"
+                        :val="club.id"
+                        :label="club.name"
+                        color="accent"
+                    />
+                </div>
+            </div>
 
             <div>
                 <q-btn

@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { Collection, Role, User } from "@firetable/types";
+import { ADMIN, Collection, User } from "@firetable/types";
 import { isDefined, NOOP } from "@firetable/utils";
 import { logoutUser } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";
@@ -26,7 +26,7 @@ export const useAuthStore = defineStore("auth", {
     },
     getters: {
         isAdmin(): boolean {
-            return isDefined(this.user) && this.user.role === Role.ADMIN;
+            return isDefined(this.user) && this.user.role === ADMIN;
         },
 
         isLoggedIn(): boolean {
