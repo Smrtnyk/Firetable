@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ClubDoc } from "@firetable/types";
+import { PropertyDoc } from "@firetable/types";
 
 interface Props {
-    club: ClubDoc;
+    property: PropertyDoc;
 }
 
 const props = defineProps<Props>();
@@ -11,20 +11,20 @@ const props = defineProps<Props>();
 <template>
     <router-link
         class="EventCard__link"
-        :to="{ name: 'events', params: { clubId: props.club.id } }"
+        :to="{ name: 'events', params: { propertyId: props.property.id } }"
     >
         <div class="EventCard">
             <div class="EventCard__image-container">
                 <q-img
                     class="EventCard__image"
-                    :src="props.club.img || 'images/default-event-img.jpg'"
+                    :src="props.property.img || 'images/default-event-img.jpg'"
                     alt=""
                     :ratio="1"
                 />
             </div>
 
             <div class="EventCard__content">
-                <h2 class="text-h3 q-ma-none">{{ props.club.name }}</h2>
+                <h2 class="text-h3 q-ma-none">{{ props.property.name }}</h2>
             </div>
         </div>
     </router-link>

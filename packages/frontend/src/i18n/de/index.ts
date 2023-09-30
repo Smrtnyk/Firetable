@@ -5,7 +5,7 @@ export default {
             manageEvents: "Veranstaltungen verwalten",
             manageFloors: "Etagen verwalten",
             manageUsers: "Benutzer verwalten",
-            manageClubs: "Clubs verwalten",
+            manageProperties: "Immobilien verwalten",
         },
         toggles: {
             darkMode: "Dunkelmodus umschalten",

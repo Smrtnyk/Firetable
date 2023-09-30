@@ -8,22 +8,19 @@ import { useAuthStore } from "src/stores/auth-store";
 import { useQuasar } from "quasar";
 import FTDialog from "components/FTDialog.vue";
 import { documentId, where } from "firebase/firestore";
-import { ClubDoc, Collection, CreateUserPayload, User } from "@firetable/types";
-import { clubsCollection, createUserWithEmail, deleteUser, updateUser } from "@firetable/backend";
+import { Collection, CreateUserPayload, User } from "@firetable/types";
+import { createUserWithEmail, deleteUser, updateUser } from "@firetable/backend";
 import {
     createQuery,
     getFirestoreCollection,
     useFirestoreCollection,
 } from "src/composables/useFirestore";
+import { usePropertiesStore } from "stores/usePropertiesStore";
 
 const { maxNumOfUsers } = config;
 const authStore = useAuthStore();
+const propertiesStore = usePropertiesStore();
 const quasar = useQuasar();
-const clubsMaps = computed(() =>
-    clubs.value.map(function (club) {
-        return { id: club.id, name: club.name };
-    }),
-);
 const usersStatus = computed(() => {
     return {
         totalUsers: users.value.length,
@@ -35,11 +32,6 @@ const { data: users } = useFirestoreCollection<User>(
         getFirestoreCollection(Collection.USERS),
         where(documentId(), "!=", authStore.user?.id),
     ),
-);
-
-const { data: clubs } = useFirestoreCollection<ClubDoc>(
-    createQuery(clubsCollection(), where(documentId(), "in", authStore.user?.clubs)),
-    { once: true },
 );
 
 const onCreateUser = loadingWrapper((newUser: CreateUserPayload) => {
@@ -63,7 +55,8 @@ function onCreateUserFormSubmit(newUser: CreateUserPayload) {
     return onCreateUser(newUser);
 }
 
-function showCreateUserDialog(): void {
+async function showCreateUserDialog(): Promise<void> {
+    const properties = await propertiesStore.getPropertiesOnce();
     quasar.dialog({
         component: FTDialog,
         componentProps: {
@@ -71,7 +64,7 @@ function showCreateUserDialog(): void {
             maximized: false,
             title: "Create new user",
             componentPropsObject: {
-                clubs: clubsMaps.value,
+                properties,
             },
             listeners: {
                 submit: onCreateUserFormSubmit,
@@ -85,6 +78,7 @@ async function showEditUserDialog(user: User, reset: () => void) {
         reset();
         return;
     }
+    const properties = await propertiesStore.getPropertiesOnce();
     quasar.dialog({
         component: FTDialog,
         componentProps: {
@@ -93,7 +87,7 @@ async function showEditUserDialog(user: User, reset: () => void) {
             title: `Editing user: ${user.name}`,
             componentPropsObject: {
                 user: { ...user },
-                clubs: clubsMaps.value,
+                properties,
             },
             listeners: {
                 submit: (updatedUser: Partial<CreateUserPayload>) =>
@@ -116,7 +110,7 @@ async function onUserSlideRight(id: string, reset: () => void) {
         <FTTitle title="Users">
             <template #right>
                 <q-btn
-                    v-if="clubs"
+                    v-if="users"
                     rounded
                     icon="plus"
                     class="button-gradient"

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import FTTitle from "components/FTTitle.vue";
 import FTDialog from "components/FTDialog.vue";
-import AddNewClubForm from "components/admin/club/AddNewClubForm.vue";
+import AddNewPropertyForm from "components/admin/property/AddNewPropertyForm.vue";
 
 import { useQuasar } from "quasar";
 import { loadingWrapper, showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
@@ -13,62 +13,62 @@ import {
 import { documentId, where } from "firebase/firestore";
 import { Collection, PropertyDoc } from "@firetable/types";
 import { useAuthStore } from "stores/auth-store";
-import { createNewClub, deleteClub } from "@firetable/backend";
+import { createNewProperty, deleteProperty } from "@firetable/backend";
 import { computed, ref, watchEffect } from "vue";
 import { takeProp } from "@firetable/utils";
 
 const authStore = useAuthStore();
 const quasar = useQuasar();
-const clubIds = computed(() => {
+const propertyIds = computed(() => {
     return authStore.userPropertyMap.map(takeProp("propertyId"));
 });
-const clubs = ref<PropertyDoc[]>([]);
+const properties = ref<PropertyDoc[]>([]);
 
 watchEffect(async () => {
-    if (clubIds.value.length) {
+    if (propertyIds.value.length) {
         const res = useFirestoreCollection<PropertyDoc>(
             createQuery(
                 getFirestoreCollection(Collection.PROPERTIES),
-                where(documentId(), "in", clubIds.value),
+                where(documentId(), "in", propertyIds.value),
             ),
         );
         await res.promise.value;
-        clubs.value = res.data.value;
+        properties.value = res.data.value;
     }
 });
 
-function onClubCreate(clubName: string) {
+function onPropertyCreate(propertyName: string) {
     return tryCatchLoadingWrapper({
         hook: async () => {
-            await createNewClub({
-                name: clubName,
+            await createNewProperty({
+                name: propertyName,
             });
-            quasar.notify("Club created!");
+            quasar.notify("Property created!");
         },
     });
 }
 
-const onDeleteClub = loadingWrapper((id: string) => {
-    return deleteClub(id);
+const onDeleteProperty = loadingWrapper((id: string) => {
+    return deleteProperty(id);
 });
 
-async function deleteClubAsync(clubID: string, reset: () => void): Promise<void> {
-    if (await showConfirm("Delete Club?")) {
-        return onDeleteClub(clubID);
+async function deletePropertyAsync(propertyId: string, reset: () => void): Promise<void> {
+    if (await showConfirm("Delete property?")) {
+        return onDeleteProperty(propertyId);
     }
     reset();
 }
 
-function createClub(): void {
+function createProperty(): void {
     quasar.dialog({
         component: FTDialog,
         componentProps: {
-            title: "Add new Club",
+            title: "Add new Property",
             maximized: false,
-            component: AddNewClubForm,
+            component: AddNewPropertyForm,
             componentPropsObject: {},
             listeners: {
-                create: onClubCreate,
+                create: onPropertyCreate,
             },
         },
     });
@@ -77,23 +77,23 @@ function createClub(): void {
 
 <template>
     <div>
-        <FTTitle title="Clubs">
+        <FTTitle title="Properties">
             <template #right>
                 <q-btn
                     rounded
                     icon="plus"
                     class="button-gradient"
-                    @click="createClub"
-                    label="Add new club"
+                    @click="createProperty"
+                    label="Add new Property"
                 />
             </template>
         </FTTitle>
-        <q-list v-if="clubs">
+        <q-list v-if="properties">
             <q-slide-item
-                v-for="club in clubs"
-                :key="club.id"
+                v-for="property in properties"
+                :key="property.id"
                 right-color="warning"
-                @right="({ reset }) => deleteClubAsync(club.id, reset)"
+                @right="({ reset }) => deletePropertyAsync(property.id, reset)"
                 class="fa-card"
             >
                 <template #right>
@@ -102,7 +102,7 @@ function createClub(): void {
 
                 <q-item clickable class="ft-card">
                     <q-item-section>
-                        <q-item-label> {{ club.name }}</q-item-label>
+                        <q-item-label> {{ property.name }}</q-item-label>
                     </q-item-section>
                 </q-item>
             </q-slide-item>

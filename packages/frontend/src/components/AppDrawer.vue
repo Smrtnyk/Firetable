@@ -32,8 +32,8 @@ const adminLinks = computed(() => [
     },
     {
         icon: "home",
-        routeName: "adminClubs",
-        text: t("AppDrawer.links.manageClubs"),
+        routeName: "adminProperties",
+        text: t("AppDrawer.links.manageProperties"),
     },
     {
         icon: "users",

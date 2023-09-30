@@ -52,7 +52,7 @@ export interface Reservation {
     guestName: string;
     numberOfGuests: number;
     reservationNote?: string;
-    reservedBy: Omit<User, "status" | "floors" | "password" | "username" | "clubs">;
+    reservedBy: Omit<User, "status" | "floors" | "password" | "username">;
 }
 
 export type CreateReservationPayload = Omit<Reservation, "reservedBy">;

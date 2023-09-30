@@ -2,10 +2,10 @@
 import { ref } from "vue";
 import { noEmptyString, noWhiteSpaces } from "src/helpers/form-rules";
 import { PROJECT_MAIL } from "src/config";
-import { ACTIVITY_STATUS, CreateUserPayload, Role, User, UserClubs } from "@firetable/types";
+import { ACTIVITY_STATUS, CreateUserPayload, PropertyDoc, Role, User } from "@firetable/types";
 
 interface Props {
-    clubs: UserClubs[];
+    properties: PropertyDoc[];
     user?: User;
 }
 
@@ -23,17 +23,26 @@ const userSkeleton: CreateUserPayload = {
     status: ACTIVITY_STATUS.OFFLINE,
 };
 const form = ref<CreateUserPayload | User>(props.user ? { ...props.user } : { ...userSkeleton });
+const chosenProperties = ref<string[]>([]);
 
 function onSubmit() {
     if (props.user) {
-        emit("submit", {
-            ...form.value,
-        });
+        emit(
+            "submit",
+            {
+                ...form.value,
+            },
+            chosenProperties,
+        );
     } else {
-        emit("submit", {
-            ...form.value,
-            email: form.value.username + PROJECT_MAIL,
-        });
+        emit(
+            "submit",
+            {
+                ...form.value,
+                email: form.value.username + PROJECT_MAIL,
+            },
+            chosenProperties,
+        );
     }
 }
 
@@ -43,6 +52,8 @@ function onReset() {
     } else {
         form.value = { ...userSkeleton };
     }
+
+    chosenProperties.value = [];
 }
 </script>
 
@@ -93,14 +104,14 @@ function onReset() {
                 label="Role"
             />
             <div class="q-gutter-sm q-mb-lg">
-                <div>Clubs:</div>
+                <div>Properties:</div>
                 <div>
                     <q-checkbox
-                        v-for="club in props.clubs"
-                        :key="club.id"
-                        v-model="form.clubs"
-                        :val="club.id"
-                        :label="club.name"
+                        v-for="property in props.properties"
+                        :key="property.id"
+                        v-model="chosenProperties"
+                        :val="property.id"
+                        :label="property.name"
                         color="accent"
                     />
                 </div>

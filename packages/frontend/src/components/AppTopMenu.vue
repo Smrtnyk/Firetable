@@ -4,7 +4,7 @@ import { useAppStore } from "src/stores/app-store";
 const menuLinks = [
     {
         icon: "home",
-        routeName: "clubs",
+        routeName: "properties",
     },
     {
         icon: "user-circle",

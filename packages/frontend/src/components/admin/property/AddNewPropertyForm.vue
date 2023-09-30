@@ -4,20 +4,20 @@ import { minLength } from "src/helpers/form-rules";
 import { QForm } from "quasar";
 
 const emit = defineEmits(["create"]);
-const clubRules = [minLength("Club name needs to have at least 3 characters!", 3)];
-const clubName = ref("");
-const createClubForm = ref<null | QForm>(null);
+const propertyRules = [minLength("Property name needs to have at least 3 characters!", 3)];
+const propertyName = ref("");
+const createPropertyForm = ref<null | QForm>(null);
 
 async function submit(): Promise<void> {
-    if (!(await createClubForm.value?.validate())) return;
-    emit("create", clubName.value);
+    if (!(await createPropertyForm.value?.validate())) return;
+    emit("create", propertyName.value);
 }
 </script>
 
 <template>
     <q-card-section>
-        <q-form ref="createClubForm" class="q-gutter-md">
-            <q-input v-model="clubName" rounded standout autofocus :rules="clubRules" />
+        <q-form ref="createPropertyForm" class="q-gutter-md">
+            <q-input v-model="propertyName" rounded standout autofocus :rules="propertyRules" />
         </q-form>
     </q-card-section>
 

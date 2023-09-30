@@ -12,11 +12,6 @@ export const enum ACTIVITY_STATUS {
     ONLINE = 1,
 }
 
-export type UserClubs = {
-    id: string;
-    name: string;
-};
-
 export interface User {
     id: string;
     name: string;

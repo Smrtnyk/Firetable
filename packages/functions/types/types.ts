@@ -52,18 +52,12 @@ export interface BaseTable {
     label: string;
 }
 
-type UserClubs = {
-    id: string;
-    name: string;
-};
-
 // Cannot import this because functions deploy
 export interface CreateUserPayload {
     id: string;
     name: string;
     email: string;
     username: string;
-    clubs: UserClubs[];
     role: Role;
     status: ACTIVITY_STATUS;
     password: string;

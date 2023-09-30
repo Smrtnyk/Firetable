@@ -12,8 +12,8 @@ export function eventsCollection() {
     return getCollection(Collection.EVENTS);
 }
 
-export function clubsCollection() {
-    return getCollection(Collection.CLUBS);
+export function propertiesCollection() {
+    return getCollection(Collection.PROPERTIES);
 }
 
 export function floorsCollection() {
@@ -55,8 +55,8 @@ export function floorDoc(id: string) {
     return doc(floorsCollection(), id);
 }
 
-export function clubDoc(id: string) {
-    return doc(clubsCollection(), id);
+export function propertyDoc(id: string) {
+    return doc(propertiesCollection(), id);
 }
 
 export function eventFloorDoc(eventId: string, floorId: string) {

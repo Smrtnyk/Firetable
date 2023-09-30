@@ -12,18 +12,18 @@ export async function createPropertyFn(data: Data, context: functions.https.Call
         throw new functions.https.HttpsError("unauthenticated", "User must be authenticated");
     }
 
-    // Create a club with data received from the client
-    const clubData = {
+    // Create a property with data received from the client
+    const propertyData = {
         ...data,
         creatorId: context.auth.uid, // Adding the UID from the authenticated request
     };
 
     try {
-        // Adding the club data to Firestore
-        const propertyDocRef = await db.collection(Collection.PROPERTIES).add(clubData);
+        // Adding the property data to Firestore
+        const propertyDocRef = await db.collection(Collection.PROPERTIES).add(propertyData);
         const propertyId = propertyDocRef.id;
 
-        // Add entry to userClubMap collection
+        // Add entry to userPropertyMap collection
         await db.collection(Collection.USER_PROPERTY_MAP).add({
             userId: context.auth.uid,
             propertyId: propertyId

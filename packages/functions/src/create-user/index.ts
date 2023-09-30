@@ -3,7 +3,7 @@ import { auth, db } from "../init.js";
 import * as functions from "firebase-functions";
 
 export async function createUser(user: CreateUserPayload): Promise<{uid: string, message: string}> {
-    const { name, password, email, role, clubs } = user;
+    const { name, password, email, role } = user;
 
     let createdUserUid: string | null = null;
 
@@ -32,7 +32,6 @@ export async function createUser(user: CreateUserPayload): Promise<{uid: string,
             name,
             email,
             role,
-            clubs,
             status: ACTIVITY_STATUS.OFFLINE,
         });
 
