@@ -1,6 +1,14 @@
 import { ACTIVITY_STATUS, Collection, Role } from "../../types/types.js";
-import { auth, db } from "../init.js";
-import * as admin from "firebase-admin";
+import { default as admin } from "firebase-admin";
+import serviceAccount from "./service-account.json" assert { type: "json" };
+
+const app = admin.initializeApp({
+    // @ts-ignore
+    credential: admin.credential.cert(serviceAccount)
+});
+
+export const db = app.firestore();
+export const auth = admin.auth();
 
 const ADMIN_MAIL = "admin@firetable.at";
 const ADMIN_PASSWORD = "admin123";
@@ -18,7 +26,7 @@ const ADMIN_NAME = "Admin";
 
         await db.collection(Collection.USERS).doc(user.uid).set({
             email: ADMIN_MAIL,
-            floors: [],
+            clubs: [],
             name: ADMIN_NAME,
             role: Role.ADMIN,
             status: ACTIVITY_STATUS.OFFLINE
