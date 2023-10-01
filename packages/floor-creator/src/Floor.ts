@@ -35,7 +35,6 @@ const MAX_ZOOM_STEPS = 5;
 const DEFAULT_COORDINATE = 50;
 
 export class Floor {
-    // Class property declarations
     readonly id: string;
     name: string;
     readonly scale: number;
@@ -79,9 +78,8 @@ export class Floor {
         this.canvas.renderAll();
         this.initialScale = this.canvas.getZoom();
         this.initialViewportTransform = this.canvas.viewportTransform?.slice() || [];
-        // After canvas has been initialized
-        // @ts-ignore
-        const upperCanvasEl = this.canvas.upperCanvasEl; // Access the upper canvas
+        // @ts-ignore -- private prop
+        const upperCanvasEl = this.canvas.upperCanvasEl;
         upperCanvasEl.addEventListener("touchstart", this.nativeTouchHandler, { passive: true });
     }
 
@@ -107,12 +105,10 @@ export class Floor {
         let x = touch.clientX;
         let y = touch.clientY;
 
-        // Get the canvas bounding box
         const rect = (e.target as HTMLCanvasElement).getBoundingClientRect();
 
-        // Adjust the coordinates
-        const scale = this.scale; // Use the class property scale
-        x = (x - rect.left) / scale; // if scale is containerWidth / floorWidth
+        const scale = this.scale;
+        x = (x - rect.left) / scale;
         y = (y - rect.top) / scale;
 
         if (this.lastTap) {
@@ -123,10 +119,10 @@ export class Floor {
 
             if (timeDifference < 300 && distance < 20) {
                 // This is considered a double tap
-                this.dblClickHandler?.(this, [x, y]); // Adapt the event object to match your onDblTapHandler method's expected parameter
-                this.lastTap = null; // Reset lastTap to prevent triple-tap, quadruple-tap, etc.
+                this.dblClickHandler?.(this, [x, y]);
+                this.lastTap = null;
             } else {
-                // This is a single tap, update lastTap with the current tap's data
+                // This is a single tap
                 this.lastTap = { timestamp, x, y };
             }
         } else {
@@ -135,7 +131,6 @@ export class Floor {
         }
     };
 
-    // Renamed for clarity
     private onMouseWheelHandler = (opt: fabric.IEvent<WheelEvent>) => {
         if (!opt.e) {
             console.error("Mouse event is undefined");
