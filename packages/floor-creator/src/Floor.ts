@@ -165,47 +165,15 @@ export class Floor {
     };
 
     onObjectMove = (options: fabric.IEvent) => {
-        if (!options.target) return;
-
-        let newLeft = options.target.left!;
-        let newTop = options.target.top!;
-        let shouldUpdate = false;
-
-        // Boundary Checking
-        if (newLeft < 0) {
-            newLeft = 0;
-            shouldUpdate = true;
-        } else if (newLeft + options.target.width! * options.target.scaleX! > this.canvas.width!) {
-            newLeft = this.canvas.width! - options.target.width! * options.target.scaleX!;
-            shouldUpdate = true;
-        }
-
-        if (newTop < 0) {
-            newTop = 0;
-            shouldUpdate = true;
-        } else if (newTop + options.target.height! * options.target.scaleY! > this.canvas.height!) {
-            newTop = this.canvas.height! - options.target.height! * options.target.scaleY!;
-            shouldUpdate = true;
-        }
-
-        // Snap to Grid only if not moved to boundary
-        if (!shouldUpdate) {
-            const gridLeft = Math.round(newLeft / RESOLUTION) * RESOLUTION;
-            const gridTop = Math.round(newTop / RESOLUTION) * RESOLUTION;
-
-            // Update if snap to grid values are different
-            if (newLeft !== gridLeft || newTop !== gridTop) {
-                newLeft = gridLeft;
-                newTop = gridTop;
-                shouldUpdate = true;
-            }
-        }
-
-        if (shouldUpdate) {
+        if (!options.target?.left || !options.target?.top) return;
+        const shouldSnapToGrid =
+            Math.round((options.target.left / RESOLUTION) * 4) % 4 === 0 &&
+            Math.round((options.target.top / RESOLUTION) * 4) % 4 === 0;
+        if (shouldSnapToGrid) {
             options.target
                 .set({
-                    left: newLeft,
-                    top: newTop,
+                    left: Math.round(options.target.left / RESOLUTION) * RESOLUTION,
+                    top: Math.round(options.target.top / RESOLUTION) * RESOLUTION,
                 })
                 .setCoords();
         }
