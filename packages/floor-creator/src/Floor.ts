@@ -279,7 +279,7 @@ export class Floor {
                 lockMovementY: this.shouldLockDrag(),
             },
             circleOptions: {
-                radius: 50,
+                radius: RESOLUTION,
             },
             textOptions: { label },
         });
