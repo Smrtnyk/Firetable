@@ -85,6 +85,7 @@ module.exports = configure(function (/* ctx */) {
             // },
             port: 8080,
             open: true,
+            host: "0.0.0.0",
         },
 
         // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework

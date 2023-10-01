@@ -62,8 +62,11 @@ onMounted(async () => {
     await floorDataPromise.value;
     if (floor.value) {
         instantiateFloor(floor.value);
+        Loading.hide();
     } else {
         router.replace("/").catch(showErrorMessage);
+        Loading.hide();
+        return;
     }
     Loading.hide();
 });
@@ -201,7 +204,9 @@ function onDeleteElement(element: BaseTable) {
         <ShowSelectedElement @delete="onDeleteElement" :selected-floor-element="selectedElement" />
         <div class="row q-pa-sm q-col-gutter-md" v-if="floorInstance">
             <div class="col-6">
-                <q-badge color="secondary"> Width: {{ floorInstance.width }} (300 to 900) </q-badge>
+                <q-badge color="secondary">
+                    Width: {{ floorInstance.width }} (300 to 1000)
+                </q-badge>
                 <q-slider
                     :model-value="floorInstance.width"
                     :min="300"
@@ -214,7 +219,7 @@ function onDeleteElement(element: BaseTable) {
             </div>
             <div class="col-6">
                 <q-badge color="secondary">
-                    Height: {{ floorInstance.height }} (300 to 900)
+                    Height: {{ floorInstance.height }} (300 to 1000)
                 </q-badge>
                 <q-slider
                     :min="300"
