@@ -11,7 +11,6 @@ import {
 import { ElementTag, FloorDoc, Reservation } from "@firetable/types";
 import { match } from "ts-pattern";
 import { isFloorElement, isTable } from "./type-guards";
-import { createGroup } from "./factories";
 import { RoundTable } from "./elements/RoundTable";
 import { RectTable } from "./elements/RectTable";
 import { Sofa } from "./elements/Sofa";
@@ -327,7 +326,7 @@ export class Floor {
         for (let i = Math.ceil(height / gridSize); i--; ) {
             lines.push(new fabric.Line([-left, gridSize * i, width, gridSize * i], lineOption));
         }
-        const oGridGroup = createGroup(lines, {
+        const oGridGroup = new fabric.Group(lines, {
             left: 0,
             top: 0,
             selectable: false,

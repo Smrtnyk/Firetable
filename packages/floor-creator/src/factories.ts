@@ -9,10 +9,3 @@ export function makeRawFloor(name: string): Omit<FloorDoc, "id" | "json"> {
         width: FLOOR_DEFAULT_WIDTH,
     };
 }
-
-export function createGroup(
-    objects: fabric.Object[],
-    options: Record<string, string | number | boolean>
-): fabric.Group {
-    return new fabric.Group(objects, options);
-}
