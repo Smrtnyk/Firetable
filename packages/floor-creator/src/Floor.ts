@@ -133,7 +133,6 @@ export class Floor {
 
     private onMouseWheelHandler = (opt: fabric.IEvent<WheelEvent>) => {
         if (!opt.e) {
-            console.error("Mouse event is undefined");
             return;
         }
 
