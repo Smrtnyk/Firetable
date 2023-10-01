@@ -2,7 +2,7 @@ import { fabric } from "fabric";
 import { FloorElementTypes } from "../types.js";
 import { determineTableColor } from "../utils.js";
 import { Reservation } from "@firetable/types";
-import { FONT_SIZE, TABLE_TEXT_FILL_COLOR } from "../constants";
+import { FONT_SIZE, TABLE_TEXT_FILL_COLOR, RESOLUTION } from "../constants";
 import { IGroupOptions } from "fabric/fabric-impl";
 
 interface RectTableElementOptions {
@@ -62,6 +62,26 @@ export class RectTable extends fabric.Group {
         this.enforceStrokeWidth();
         this.resetFontSize();
         this.enforceMinimumDimensions();
+        this.snapToGrid();
+    }
+
+    private snapToGrid(): void {
+        if (!this.scaleX || !this.scaleY) return;
+
+        const targetWidth = this.initialWidth * this.scaleX;
+        const targetHeight = this.initialHeight * this.scaleY;
+
+        const snappedWidth = Math.round(targetWidth / RESOLUTION) * RESOLUTION;
+        const snappedHeight = Math.round(targetHeight / RESOLUTION) * RESOLUTION;
+
+        const correctedScaleX = snappedWidth / this.initialWidth;
+        const correctedScaleY = snappedHeight / this.initialHeight;
+
+        // @ts-ignore
+        this.set({
+            scaleX: correctedScaleX,
+            scaleY: correctedScaleY,
+        });
     }
 
     private enforceMinimumDimensions(): void {
