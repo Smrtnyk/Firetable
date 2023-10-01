@@ -50,6 +50,7 @@ export class Floor {
     width: number;
     private readonly initialScale: number;
     private initialViewportTransform: number[];
+    private lastTap: { timestamp: number; x: number; y: number } | null = null;
 
     constructor(options: FloorCreationOptions) {
         const { canvas, floorDoc, dblClickHandler, elementClickHandler, mode, containerWidth } =
@@ -78,6 +79,10 @@ export class Floor {
         this.canvas.renderAll();
         this.initialScale = this.canvas.getZoom();
         this.initialViewportTransform = this.canvas.viewportTransform?.slice() || [];
+        // After canvas has been initialized
+        // @ts-ignore
+        const upperCanvasEl = this.canvas.upperCanvasEl; // Access the upper canvas
+        upperCanvasEl.addEventListener("touchstart", this.nativeTouchHandler, { passive: true });
     }
 
     private get isInEditorMode(): boolean {
@@ -93,6 +98,42 @@ export class Floor {
             this.elementClickHandler(this, e.target);
         });
     }
+
+    private nativeTouchHandler = (e: TouchEvent) => {
+        e.preventDefault();
+
+        const timestamp = new Date().getTime();
+        const touch = e.changedTouches[0];
+        let x = touch.clientX;
+        let y = touch.clientY;
+
+        // Get the canvas bounding box
+        const rect = (e.target as HTMLCanvasElement).getBoundingClientRect();
+
+        // Adjust the coordinates
+        const scale = this.scale; // Use the class property scale
+        x = (x - rect.left) / scale; // if scale is containerWidth / floorWidth
+        y = (y - rect.top) / scale;
+
+        if (this.lastTap) {
+            const timeDifference = timestamp - this.lastTap.timestamp;
+            const distance = Math.sqrt(
+                Math.pow(x - this.lastTap.x, 2) + Math.pow(y - this.lastTap.y, 2),
+            );
+
+            if (timeDifference < 300 && distance < 20) {
+                // This is considered a double tap
+                this.dblClickHandler?.(this, [x, y]); // Adapt the event object to match your onDblTapHandler method's expected parameter
+                this.lastTap = null; // Reset lastTap to prevent triple-tap, quadruple-tap, etc.
+            } else {
+                // This is a single tap, update lastTap with the current tap's data
+                this.lastTap = { timestamp, x, y };
+            }
+        } else {
+            // Record the current tap's data if lastTap is not set
+            this.lastTap = { timestamp, x, y };
+        }
+    };
 
     // Renamed for clarity
     private onMouseWheelHandler = (opt: fabric.IEvent<WheelEvent>) => {
