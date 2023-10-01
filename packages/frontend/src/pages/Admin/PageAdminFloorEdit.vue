@@ -236,3 +236,9 @@ function onDeleteElement(element: BaseTable) {
         <canvas ref="canvasRef" class="shadow-3" />
     </div>
 </template>
+<style>
+canvas {
+    width: 100% !important;
+    height: auto !important;
+}
+</style>

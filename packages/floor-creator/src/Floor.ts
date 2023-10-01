@@ -48,6 +48,8 @@ export class Floor {
     private currentZoomSteps = 0;
     mode: FloorMode;
     width: number;
+    private readonly initialScale: number;
+    private initialViewportTransform: number[];
 
     constructor(options: FloorCreationOptions) {
         const { canvas, floorDoc, dblClickHandler, elementClickHandler, mode, containerWidth } =
@@ -73,6 +75,9 @@ export class Floor {
         });
         this.initializeCanvasEventHandlers();
         this.renderData(this.floorDoc.json);
+        this.canvas.renderAll();
+        this.initialScale = this.canvas.getZoom();
+        this.initialViewportTransform = this.canvas.viewportTransform?.slice() || [];
     }
 
     private get isInEditorMode(): boolean {
@@ -87,90 +92,54 @@ export class Floor {
             if (!isTable(e.target)) return;
             this.elementClickHandler(this, e.target);
         });
-
-        this.initializePanning();
     }
 
     // Renamed for clarity
     private onMouseWheelHandler = (opt: fabric.IEvent<WheelEvent>) => {
-        // Added validation to ensure opt.e is defined
         if (!opt.e) {
             console.error("Mouse event is undefined");
             return;
         }
 
-        // Using constants instead of magic numbers
         const delta = opt.e.deltaY;
+        let shouldReset = false;
+
         if (delta > 0 && this.currentZoomSteps < MAX_ZOOM_STEPS) {
             this.currentZoomSteps++;
             this.performZoom(opt.e.offsetX, opt.e.offsetY);
         } else if (delta < 0 && this.currentZoomSteps > 0) {
             this.currentZoomSteps--;
             this.performZoom(opt.e.offsetX, opt.e.offsetY);
+            if (this.currentZoomSteps <= 0) {
+                shouldReset = true;
+            }
         }
+
+        if (shouldReset) {
+            this.resetToInitialState();
+        }
+
         opt.e.preventDefault();
         opt.e.stopPropagation();
-
-        if (this.canvas.getZoom() <= this.scale) {
-            this.resetZoomPan();
-        }
     };
 
-    // Factored out zooming operation into its own method for clarity
     private performZoom(offsetX: number, offsetY: number) {
-        this.canvas.zoomToPoint(
-            new fabric.Point(offsetX, offsetY),
-            DEFAULT_ZOOM + this.currentZoomSteps * ZOOM_INCREMENT,
-        );
+        const newZoom = DEFAULT_ZOOM + this.currentZoomSteps * ZOOM_INCREMENT;
+
+        // Prevent over-zooming out
+        if (newZoom < this.initialScale) {
+            this.resetToInitialState();
+            return;
+        }
+
+        this.canvas.zoomToPoint(new fabric.Point(offsetX, offsetY), newZoom);
+        this.canvas.renderAll();
     }
 
-    private initializePanning(): void {
-        let panning = false;
-
-        this.canvas.on("mouse:down", (opt) => {
-            if (opt.e.altKey) {
-                panning = true;
-                this.canvas.setCursor("grab");
-            }
-        });
-
-        this.canvas.on("mouse:up", () => {
-            panning = false;
-            this.canvas.setCursor("default");
-        });
-
-        this.canvas.on("mouse:move", (opt) => {
-            if (panning && opt.e) {
-                if (this.canvas.viewportTransform) {
-                    const transform = this.canvas.viewportTransform.slice(0);
-                    transform[4] += opt.e.movementX;
-                    transform[5] += opt.e.movementY;
-                    this.canvas.setViewportTransform(transform);
-                }
-            }
-        });
-    }
-
-    resetZoomPan() {
-        const width = this.canvas.getWidth();
-        const height = this.canvas.getHeight();
-
-        // Reset the zoom level to the initial scale
-        this.canvas.setZoom(this.scale);
-
-        // Set the top-left corner of the viewport to be in the top-left corner of the canvas,
-        // adjusted by the scale factor to center the canvas content
-        this.canvas.viewportTransform = [
-            this.scale,
-            0,
-            0,
-            this.scale,
-            (width - this.width * this.scale) / 2,
-            (height - this.height * this.scale) / 2,
-        ];
-
-        // Redraw the canvas to reflect the changes
-        this.canvas.requestRenderAll();
+    private resetToInitialState() {
+        this.canvas.setViewportTransform(this.initialViewportTransform.slice());
+        this.canvas.setZoom(this.initialScale);
+        this.canvas.renderAll();
     }
 
     // Check if double click was on the actual table
