@@ -3,6 +3,8 @@ import {
     CANVAS_BG_COLOR,
     DEFAULT_COORDINATE,
     DEFAULT_ZOOM,
+    DOUBLE_TAP_DISTANCE_THRESHOLD,
+    DOUBLE_TAP_TIME_THRESHOLD,
     MAX_ZOOM_STEPS,
     RESOLUTION,
     ZOOM_INCREMENT,
@@ -117,7 +119,10 @@ export class Floor {
             Math.pow(x - this.lastTap.x, 2) + Math.pow(y - this.lastTap.y, 2),
         );
 
-        if (timeDifference < 300 && distance < 20) {
+        if (
+            timeDifference < DOUBLE_TAP_TIME_THRESHOLD &&
+            distance < DOUBLE_TAP_DISTANCE_THRESHOLD
+        ) {
             // This is considered a double tap
             this.dblClickHandler?.(this, [x, y]);
             this.lastTap = null;
