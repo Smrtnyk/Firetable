@@ -1,5 +1,5 @@
 import { fabric } from "fabric";
-import { CANVAS_BG_COLOR, RESOLUTION, TABLE_HEIGHT, TABLE_WIDTH } from "./constants.js";
+import { CANVAS_BG_COLOR, RESOLUTION } from "./constants.js";
 import {
     BaseTable,
     CreateElementOptions,
@@ -8,14 +8,11 @@ import {
     FloorMode,
     NumberTuple,
 } from "./types.js";
-import { ElementTag, FloorDoc, Reservation } from "@firetable/types";
-import { match } from "ts-pattern";
+import { FloorDoc, Reservation } from "@firetable/types";
 import { isFloorElement, isTable } from "./type-guards";
 import { RoundTable } from "./elements/RoundTable";
 import { RectTable } from "./elements/RectTable";
-import { Sofa } from "./elements/Sofa";
-import { DJBooth } from "./elements/DJBooth";
-import { Wall } from "./elements/Wall";
+import { ElementManager } from "./ElementManager";
 
 interface FloorCreationOptions {
     canvas: HTMLCanvasElement;
@@ -49,6 +46,7 @@ export class Floor {
     private readonly initialScale: number;
     private initialViewportTransform: number[];
     private lastTap: { timestamp: number; x: number; y: number } | null = null;
+    elementManager: ElementManager;
 
     constructor(options: FloorCreationOptions) {
         const { canvas, floorDoc, dblClickHandler, elementClickHandler, mode, containerWidth } =
@@ -72,6 +70,9 @@ export class Floor {
             interactive: this.isInEditorMode,
             selection: false,
         });
+        this.elementManager = new ElementManager({
+            isInEditorMode: mode === FloorMode.EDITOR,
+        });
         this.initializeCanvasEventHandlers();
         this.renderData(this.floorDoc.json);
         this.canvas.renderAll();
@@ -80,6 +81,16 @@ export class Floor {
         // @ts-ignore -- private prop
         const upperCanvasEl = this.canvas.upperCanvasEl;
         upperCanvasEl.addEventListener("touchstart", this.nativeTouchHandler, { passive: true });
+    }
+
+    get json() {
+        return this.canvas.toJSON(["label", "reservation", "name", "type"]);
+    }
+
+    addElement(options: CreateElementOptions) {
+        const element = this.elementManager.addElement(options);
+        element.on("mouseup", this.onElementClick);
+        this.canvas.add(element);
     }
 
     private get isInEditorMode(): boolean {
@@ -244,72 +255,6 @@ export class Floor {
             this.canvas.renderAll();
             this.drawGrid();
         }
-    }
-
-    addElement(options: CreateElementOptions) {
-        const group = match(options.tag)
-            .with(ElementTag.RECT, () => this.addRectTableElement(options))
-            .with(ElementTag.CIRCLE, () => this.addRoundTableElement(options))
-            .with(ElementTag.SOFA, () => this.addSofaElement(options))
-            .with(ElementTag.DJ_BOOTH, () => this.addDJBooth(options))
-            .with(ElementTag.WALL, () => this.addWall(options))
-            .exhaustive();
-
-        group.on("mouseup", this.onElementClick);
-        this.canvas.add(group);
-    }
-
-    private addWall({ x, y }: CreateElementOptions) {
-        return new Wall(x, y);
-    }
-
-    private addDJBooth({ x, y }: CreateElementOptions) {
-        return new DJBooth(x, y);
-    }
-
-    private addSofaElement({ x, y }: CreateElementOptions) {
-        return new Sofa(x, y);
-    }
-
-    private addRoundTableElement({ label, x, y }: CreateElementOptions) {
-        if (!label) {
-            throw new Error("Cannot create table without the label!");
-        }
-        const table = new RoundTable({
-            groupOptions: {
-                label,
-                lockMovementX: this.shouldLockDrag(),
-                lockMovementY: this.shouldLockDrag(),
-            },
-            circleOptions: {
-                radius: RESOLUTION,
-            },
-            textOptions: { label },
-        });
-        table.set({ left: x, top: y });
-        return table;
-    }
-
-    private addRectTableElement({ label, x, y }: CreateElementOptions) {
-        if (!label) {
-            throw new Error("Cannot create table without the label!");
-        }
-        return new RectTable({
-            groupOptions: {
-                label,
-                left: x,
-                top: y,
-                lockMovementX: this.shouldLockDrag(),
-                lockMovementY: this.shouldLockDrag(),
-            },
-            rectOptions: {
-                width: TABLE_WIDTH,
-                height: TABLE_HEIGHT,
-            },
-            textOptions: {
-                label,
-            },
-        });
     }
 
     drawGrid() {

@@ -92,7 +92,7 @@ function onFloorSave(): void {
     tryCatchLoadingWrapper({
         hook: () =>
             updateFirestoreDocument(getFirestoreDocument(`${Collection.FLOORS}/${props.floorID}`), {
-                json: floorInstance.value?.canvas.toJSON(["label", "reservation", "name", "type"]),
+                json: floorInstance.value?.json,
                 name: floorInstance.value?.name,
                 width: floorInstance.value?.width,
                 height: floorInstance.value?.height,
