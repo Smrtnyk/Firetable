@@ -107,6 +107,24 @@ export class Floor {
         });
     }
 
+    private handleDoubleTap(x: number, y: number, timestamp: number) {
+        if (!this.lastTap) return;
+
+        const timeDifference = timestamp - this.lastTap.timestamp;
+        const distance = Math.sqrt(
+            Math.pow(x - this.lastTap.x, 2) + Math.pow(y - this.lastTap.y, 2),
+        );
+
+        if (timeDifference < 300 && distance < 20) {
+            // This is considered a double tap
+            this.dblClickHandler?.(this, [x, y]);
+            this.lastTap = null;
+        } else {
+            // This is a single tap or the start of a double-tap
+            this.lastTap = { timestamp, x, y };
+        }
+    }
+
     private nativeTouchHandler = (e: TouchEvent) => {
         e.preventDefault();
 
@@ -116,29 +134,11 @@ export class Floor {
         let y = touch.clientY;
 
         const rect = (e.target as HTMLCanvasElement).getBoundingClientRect();
-
         const scale = this.scale;
         x = (x - rect.left) / scale;
         y = (y - rect.top) / scale;
 
-        if (this.lastTap) {
-            const timeDifference = timestamp - this.lastTap.timestamp;
-            const distance = Math.sqrt(
-                Math.pow(x - this.lastTap.x, 2) + Math.pow(y - this.lastTap.y, 2),
-            );
-
-            if (timeDifference < 300 && distance < 20) {
-                // This is considered a double tap
-                this.dblClickHandler?.(this, [x, y]);
-                this.lastTap = null;
-            } else {
-                // This is a single tap
-                this.lastTap = { timestamp, x, y };
-            }
-        } else {
-            // Record the current tap's data if lastTap is not set
-            this.lastTap = { timestamp, x, y };
-        }
+        this.handleDoubleTap(x, y, timestamp);
     };
 
     private onMouseWheelHandler = (opt: fabric.IEvent<WheelEvent>) => {
