@@ -1,5 +1,12 @@
 import { fabric } from "fabric";
-import { CANVAS_BG_COLOR, RESOLUTION } from "./constants.js";
+import {
+    CANVAS_BG_COLOR,
+    DEFAULT_COORDINATE,
+    DEFAULT_ZOOM,
+    MAX_ZOOM_STEPS,
+    RESOLUTION,
+    ZOOM_INCREMENT,
+} from "./constants.js";
 import {
     BaseTable,
     CreateElementOptions,
@@ -24,11 +31,6 @@ interface FloorCreationOptions {
 }
 
 Object.assign(fabric, { RectTable, RoundTable });
-
-const DEFAULT_ZOOM = 1;
-const ZOOM_INCREMENT = 0.2;
-const MAX_ZOOM_STEPS = 5;
-const DEFAULT_COORDINATE = 50;
 
 export class Floor {
     readonly id: string;
