@@ -7,7 +7,7 @@ import { useRouter } from "vue-router";
 
 import { date } from "quasar";
 import { resizeImage } from "src/helpers/image-tools";
-import { CreateEventForm, FloorDoc } from "@firetable/types";
+import { CreateEventForm, FloorDoc, PropertyDoc } from "@firetable/types";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 
 interface State {
@@ -20,6 +20,7 @@ interface State {
 
 interface Props {
     floors: FloorDoc[];
+    properties: PropertyDoc[];
 }
 
 const { formatDate } = date;
@@ -193,6 +194,20 @@ async function onFileChosen(chosenFile: File) {
                     </q-popup-proxy>
                 </template>
             </q-input>
+
+            <div class="q-gutter-sm q-mb-lg">
+                <div>Properties:</div>
+                <div>
+                    <q-checkbox
+                        v-for="property in props.properties"
+                        :key="property.id"
+                        v-model="state.chosenFloors"
+                        :val="property.id"
+                        :label="property.name"
+                        color="accent"
+                    />
+                </div>
+            </div>
 
             <div class="q-gutter-sm q-mb-lg">
                 <div>Floors:</div>

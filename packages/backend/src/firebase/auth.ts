@@ -10,10 +10,10 @@ export function createUserWithEmail(payload: CreateUserPayload) {
     return httpsCallable(functions, "createUser")(payload);
 }
 
-export function updateUserField<T extends keyof CreateUserPayload>(
+export function updateUserField<T extends keyof CreateUserPayload["user"]>(
     uid: string,
     field: T,
-    value: CreateUserPayload[T],
+    value: CreateUserPayload["user"][T],
 ) {
     return updateDoc(doc(usersCollection(), uid), {
         [field]: value,

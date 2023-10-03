@@ -10,14 +10,16 @@ import { QueryDocumentSnapshot } from "firebase/firestore";
 import { useQuasar, QInfiniteScroll } from "quasar";
 import { useRouter } from "vue-router";
 import { Collection, CreateEventPayload, EventDoc, FloorDoc } from "@firetable/types";
-import { createNewEvent, deleteEvent, getEvents } from "@firetable/backend";
+import { createNewEvent, deleteEvent, fetchPropertiesForUser, getEvents } from "@firetable/backend";
 import { useFirestoreCollection } from "src/composables/useFirestore";
 import { takeLast } from "@firetable/utils";
+import { useAuthStore } from "stores/auth-store";
 
 const EVENTS_PER_PAGE = 20;
 
 const quasar = useQuasar();
 const router = useRouter();
+const authStore = useAuthStore();
 const isLoading = ref(true);
 const events = reactive<Set<EventDoc>>(new Set());
 const hasMoreEventsToFetch = ref(true);
@@ -75,7 +77,9 @@ async function onLoad(_: number, done: () => void) {
     done();
 }
 
-function showCreateEventForm(): void {
+async function showCreateEventForm(): Promise<void> {
+    const currUserId = authStore.user!.id;
+    const properties = await fetchPropertiesForUser(currUserId);
     quasar.dialog({
         component: FTDialog,
         componentProps: {
@@ -84,6 +88,7 @@ function showCreateEventForm(): void {
             component: EventCreateForm,
             componentPropsObject: {
                 floors: floors.value,
+                properties: properties,
             },
             listeners: {
                 create: onCreateEvent,
