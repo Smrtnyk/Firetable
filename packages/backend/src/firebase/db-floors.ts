@@ -6,6 +6,6 @@ export function deleteFloor(floorID: string) {
     return deleteDoc(floorDoc(floorID));
 }
 
-export function addFloor(floor: Omit<FloorDoc, "id" | "json">) {
+export function addFloor(floor: Partial<FloorDoc> & Pick<FloorDoc, "name">) {
     return addDoc(floorsCollection(), floor);
 }

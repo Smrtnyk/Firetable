@@ -51,21 +51,24 @@ function showAddNewFloorForm(): void {
     });
 }
 
-function duplicateFloor() {
-    // handle duplication here
+function duplicateFloor(floor: FloorDoc) {
+    const duplicatedFloor = { ...floor, name: `${floor.name}_copy` };
+    return tryCatchLoadingWrapper({
+        hook: () => addFloor(duplicatedFloor),
+    });
 }
 
-function onFloorItemClick(floorId: string) {
+function onFloorItemClick(floor: FloorDoc) {
     const actions = [
         {
             label: "Delete",
             icon: "trash",
-            handler: () => onFloorDelete(floorId),
+            handler: () => onFloorDelete(floor.id),
         },
         {
             label: "Duplicate",
             icon: "copy",
-            handler: () => duplicateFloor(),
+            handler: () => duplicateFloor(floor),
         },
     ];
 
@@ -76,28 +79,28 @@ function onFloorItemClick(floorId: string) {
             actions,
         })
         .onOk(function (action) {
-            action.handler(floorId);
+            action.handler(floor);
         });
 }
 
 let pressTimer: number | null = null;
 let longPressTriggered = false;
 
-function handleMouseDown(floorId: string) {
+function handleMouseDown(floor: FloorDoc) {
     longPressTriggered = false;
     pressTimer = setTimeout(() => {
         longPressTriggered = true;
-        onFloorItemClick(floorId);
+        onFloorItemClick(floor);
     }, 1000); // 1000ms = 1s long press
 }
 
-function handleMouseUp(floorId: string) {
+function handleMouseUp(floor: FloorDoc) {
     if (pressTimer !== null) clearTimeout(pressTimer);
     if (!longPressTriggered) {
         // Navigate using the router if the long press hasn't been triggered
         router.push({
             name: "adminFloorEdit",
-            params: { floorID: floorId },
+            params: { floorID: floor.id },
         });
     }
 }
@@ -126,10 +129,10 @@ onMounted(async () => {
             <q-item
                 v-for="floor in floors"
                 :key="floor.id"
-                @mousedown="() => handleMouseDown(floor.id)"
-                @mouseup="() => handleMouseUp(floor.id)"
-                @touchstart="() => handleMouseDown(floor.id)"
-                @touchend="() => handleMouseUp(floor.id)"
+                @mousedown="() => handleMouseDown(floor)"
+                @mouseup="() => handleMouseUp(floor)"
+                @touchstart="() => handleMouseDown(floor)"
+                @touchend="() => handleMouseUp(floor)"
                 clickable
                 v-ripple
             >
