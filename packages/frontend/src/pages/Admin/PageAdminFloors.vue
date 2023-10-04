@@ -3,7 +3,7 @@ import AddNewFloorForm from "components/Floor/AddNewFloorForm.vue";
 import FTTitle from "components/FTTitle.vue";
 import FTDialog from "components/FTDialog.vue";
 
-import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { Loading, useQuasar } from "quasar";
 import { onMounted } from "vue";
 import { makeRawFloor } from "@firetable/floor-creator";
@@ -11,20 +11,22 @@ import { Collection, FloorDoc } from "@firetable/types";
 import { addFloor, deleteFloor } from "@firetable/backend";
 import { useFirestoreCollection } from "src/composables/useFirestore";
 import { takeProp } from "@firetable/utils";
+import { useRouter } from "vue-router";
 
 const quasar = useQuasar();
+const router = useRouter();
 const {
     data: floors,
     promise: floorsDataPromise,
     pending: isLoading,
 } = useFirestoreCollection<FloorDoc>(Collection.FLOORS);
 
-async function onFloorDelete(id: string, reset: () => void) {
-    if (!(await showConfirm("Delete floor?"))) return reset();
+async function onFloorDelete(id: string) {
+    if (!(await showConfirm("Delete floor?"))) return;
 
     await tryCatchLoadingWrapper({
         hook: () => deleteFloor(id),
-        errorHook: reset,
+        errorHook: showErrorMessage,
     });
 }
 
@@ -49,6 +51,57 @@ function showAddNewFloorForm(): void {
     });
 }
 
+function duplicateFloor() {
+    // handle duplication here
+}
+
+function onFloorItemClick(floorId: string) {
+    const actions = [
+        {
+            label: "Delete",
+            icon: "trash",
+            handler: () => onFloorDelete(floorId),
+        },
+        {
+            label: "Duplicate",
+            icon: "copy",
+            handler: () => duplicateFloor(),
+        },
+    ];
+
+    quasar
+        .bottomSheet({
+            message: "Choose action",
+            grid: true,
+            actions,
+        })
+        .onOk(function (action) {
+            action.handler(floorId);
+        });
+}
+
+let pressTimer: number | null = null;
+let longPressTriggered = false;
+
+function handleMouseDown(floorId: string) {
+    longPressTriggered = false;
+    pressTimer = setTimeout(() => {
+        longPressTriggered = true;
+        onFloorItemClick(floorId);
+    }, 1000); // 1000ms = 1s long press
+}
+
+function handleMouseUp(floorId: string) {
+    if (pressTimer !== null) clearTimeout(pressTimer);
+    if (!longPressTriggered) {
+        // Navigate using the router if the long press hasn't been triggered
+        router.push({
+            name: "adminFloorEdit",
+            params: { floorID: floorId },
+        });
+    }
+}
+
 onMounted(async () => {
     Loading.show();
     await floorsDataPromise.value;
@@ -69,32 +122,21 @@ onMounted(async () => {
                 />
             </template>
         </FTTitle>
-        <q-list v-if="floors.length">
-            <q-slide-item
+        <q-list v-if="floors.length" bordered separator>
+            <q-item
                 v-for="floor in floors"
                 :key="floor.id"
-                right-color="warning"
-                @right="({ reset }) => onFloorDelete(floor.id, reset)"
-                class="fa-card"
+                @mousedown="() => handleMouseDown(floor.id)"
+                @mouseup="() => handleMouseUp(floor.id)"
+                @touchstart="() => handleMouseDown(floor.id)"
+                @touchend="() => handleMouseUp(floor.id)"
+                clickable
+                v-ripple
             >
-                <template #right>
-                    <q-icon name="trash" />
-                </template>
-                <q-item
-                    v-ripple
-                    clickable
-                    :to="{
-                        name: 'adminFloorEdit',
-                        params: {
-                            floorID: floor.id,
-                        },
-                    }"
-                >
-                    <q-item-section>
-                        <q-item-label>{{ floor.name }}</q-item-label>
-                    </q-item-section>
-                </q-item>
-            </q-slide-item>
+                <q-item-section>
+                    <q-item-label>{{ floor.name }}</q-item-label>
+                </q-item-section>
+            </q-item>
         </q-list>
 
         <div
