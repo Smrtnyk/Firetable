@@ -8,6 +8,7 @@
         "baseUrl": ".",
         "resolveJsonModule": true,
         "skipLibCheck": true,
+        "skipDefaultLibCheck": true,
         "sourceMap": true,
         "strict": true,
         "forceConsistentCasingInFileNames": true,
@@ -27,5 +28,6 @@
             "stores/*": ["src/stores/*"]
         }
     },
+    "include": ["src"],
     "exclude": ["dist", ".quasar", "node_modules"]
 }
