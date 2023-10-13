@@ -10,7 +10,10 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <router-link class="EventCard__link" :to="{ name: 'event', params: { id: props.event.id } }">
+    <router-link
+        class="EventCard__link"
+        :to="{ name: 'event', params: { eventId: props.event.id } }"
+    >
         <div class="EventCard">
             <div class="event-success-indicator" v-if="props.event.reservedPercentage >= 75">
                 <q-icon name="fire" color="warning" class="bg-warning-shadow rounded" size="md" />
