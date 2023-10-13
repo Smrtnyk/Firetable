@@ -1,45 +1,59 @@
 <script setup lang="ts">
-import PageAdminEventsListItem from "components/Event/PageAdminEventsListItem.vue";
+import AdminPropertyEventsList from "components/admin/event/AdminPropertyEventsList.vue";
 import EventCreateForm from "components/admin/event/EventCreateForm.vue";
 import FTTitle from "components/FTTitle.vue";
 import FTDialog from "components/FTDialog.vue";
 
-import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { onMounted, reactive, ref } from "vue";
-import { QueryDocumentSnapshot } from "firebase/firestore";
-import { useQuasar, QInfiniteScroll } from "quasar";
+import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { nextTick, ref, watch } from "vue";
+import { useQuasar } from "quasar";
 import { useRouter } from "vue-router";
 import { CreateEventPayload, EventDoc } from "@firetable/types";
-import { createNewEvent, deleteEvent, getEvents } from "@firetable/backend";
+import { createNewEvent, deleteEvent } from "@firetable/backend";
 import { takeLast } from "@firetable/utils";
 import { useFloors } from "src/composables/useFloors";
+import { useProperties } from "src/composables/useProperties";
+import { useEvents } from "src/composables/useEvents";
 
 const EVENTS_PER_PAGE = 20;
 
 const quasar = useQuasar();
 const router = useRouter();
-const isLoading = ref(true);
-const events = reactive<Set<EventDoc>>(new Set());
-const hasMoreEventsToFetch = ref(true);
-const paginator = ref<QInfiniteScroll | null>(null);
+const { properties, isLoading } = useProperties();
 const { floors } = useFloors();
+const { eventsByProperty, fetchMoreEvents, hasMoreEventsToFetch } = useEvents();
+const activePropertyId = ref("");
+const initialLoadDone = ref<Record<string, boolean>>({});
 
-async function init() {
-    isLoading.value = true;
-    await tryCatchLoadingWrapper({
-        hook: () => fetchMoreEvents(null),
-        errorHook: () => router.replace("/").catch(showErrorMessage),
-    });
-    isLoading.value = false;
-}
+watch(
+    properties,
+    (newProperties) => {
+        // Check if activePropertyId hasn't been set and properties are available
+        if (!activePropertyId.value && newProperties.length > 0) {
+            activePropertyId.value = newProperties[0].id;
+        }
 
-async function fetchMoreEvents(lastDoc: QueryDocumentSnapshot | null) {
-    if (!hasMoreEventsToFetch.value) return;
-    const eventsDocs = await getEvents(lastDoc, EVENTS_PER_PAGE);
-    if (!eventsDocs.length || eventsDocs.length < EVENTS_PER_PAGE) {
-        hasMoreEventsToFetch.value = false;
+        newProperties.forEach((property) => {
+            eventsByProperty[property.id] = new Set();
+        });
+    },
+    { immediate: true },
+);
+
+watch(
+    activePropertyId,
+    (_, oldVal) => {
+        if (oldVal !== undefined) {
+            fetchEventsForActiveTab();
+        }
+    },
+    { immediate: false },
+);
+
+function fetchEventsForActiveTab() {
+    if (eventsByProperty[activePropertyId.value]?.size === 0) {
+        fetchMoreEvents(activePropertyId.value, null);
     }
-    eventsDocs.forEach(events.add, events);
 }
 
 function onCreateEvent(eventData: CreateEventPayload) {
@@ -61,18 +75,33 @@ async function onEventItemSlideRight({ event, reset }: { event: EventDoc; reset:
     await tryCatchLoadingWrapper({
         hook: async () => {
             await deleteEvent(event.id);
-            events.delete(event);
+            eventsByProperty[activePropertyId.value].delete(event);
         },
         errorHook: reset,
     });
 }
 
-async function onLoad(_: number, done: () => void) {
-    if (!hasMoreEventsToFetch.value) return paginator.value?.stop();
-    const lastDoc = takeLast([...events])?._doc || null;
-    await fetchMoreEvents(lastDoc);
+async function onLoad(propertyId: string, done: (stop: boolean) => void) {
+    if (initialLoadDone.value[propertyId]) {
+        if (!hasMoreEventsToFetch.value) {
+            await nextTick();
+            done(true);
+            return;
+        }
+    } else {
+        initialLoadDone.value[propertyId] = true;
+    }
 
-    done();
+    console.log("onLoad called with:", propertyId, done);
+
+    const lastDoc = takeLast([...eventsByProperty[propertyId]])?._doc || null;
+    const eventsDocs = await fetchMoreEvents(propertyId, lastDoc);
+
+    if (!eventsDocs || eventsDocs.length < EVENTS_PER_PAGE) {
+        hasMoreEventsToFetch.value = false;
+    }
+    await nextTick();
+    done(true);
 }
 
 function showCreateEventForm(): void {
@@ -91,8 +120,6 @@ function showCreateEventForm(): void {
         },
     });
 }
-
-onMounted(init);
 </script>
 
 <template>
@@ -109,31 +136,47 @@ onMounted(init);
             </template>
         </FTTitle>
 
-        <q-list v-if="events.size > 0 && !isLoading">
-            <q-infinite-scroll ref="paginator" @load="onLoad" :offset="50">
-                <PageAdminEventsListItem
-                    v-for="event of events"
-                    :key="event.id"
-                    :event="event"
-                    @right="onEventItemSlideRight"
+        <div
+            v-if="properties.length === 0 && !isLoading"
+            class="row justify-center items-center q-mt-md"
+        >
+            <h6 class="q-ma-sm text-weight-bolder underline">
+                There are no properties created, cannot create events.
+            </h6>
+        </div>
+
+        <div v-else>
+            <q-tabs v-model="activePropertyId" @input="fetchEventsForActiveTab">
+                <q-tab
+                    v-for="property in properties"
+                    :key="property.id"
+                    :label="property.name"
+                    :name="property.id"
                 />
+            </q-tabs>
 
-                <q-separator spaced inset />
-                <template #loading>
-                    <div class="row justify-center q-my-md">
-                        <q-spinner-dots color="primary" size="40px" />
-                    </div>
-                </template>
-            </q-infinite-scroll>
-        </q-list>
-
-        <div v-if="events.size === 0 && !isLoading" class="row justify-center items-center q-mt-md">
-            <div style="position: relative">
-                <h6 class="q-ma-sm text-weight-bolder underline">
-                    There are no events, you should create one
-                </h6>
-            </div>
-            <q-img src="/no-events.svg" />
+            <keep-alive>
+                <q-tab-panels v-model="activePropertyId">
+                    <q-tab-panel
+                        v-for="property in properties"
+                        :key="property.id"
+                        :name="property.id"
+                    >
+                        <AdminPropertyEventsList
+                            :property-id="property.id"
+                            :events-by-property="eventsByProperty"
+                            :on-event-item-slide-right="onEventItemSlideRight"
+                            :on-load="onLoad"
+                        />
+                    </q-tab-panel>
+                </q-tab-panels>
+            </keep-alive>
         </div>
     </div>
 </template>
+
+<style>
+.q-tab-panels {
+    height: 100%;
+}
+</style>

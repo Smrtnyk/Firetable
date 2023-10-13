@@ -18,6 +18,7 @@ import {
     addDoc,
     deleteDoc,
     query,
+    where,
 } from "firebase/firestore";
 import { CreateEventPayload, EventDoc, GuestData } from "@firetable/types";
 import { Floor } from "@firetable/floor-creator";
@@ -25,12 +26,14 @@ import { Floor } from "@firetable/floor-creator";
 export async function getEvents(
     lastDocument: DocumentData | null,
     countPerPage: number,
+    propertyId: string,
 ): Promise<EventDoc[]> {
     const orderByDateQuery = orderBy("date");
     const limitQuery = limit(countPerPage);
     const startAfterQuery = startAfter(lastDocument);
+    const propertyIdQuery = where("propertyId", "==", propertyId);
     const eventsDocs = await getDocs(
-        query(eventsCollection(), orderByDateQuery, limitQuery, startAfterQuery),
+        query(eventsCollection(), propertyIdQuery, orderByDateQuery, limitQuery, startAfterQuery),
     );
 
     return eventsDocs.docs.map(toEventDoc);
