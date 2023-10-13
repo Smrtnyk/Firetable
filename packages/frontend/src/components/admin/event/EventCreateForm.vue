@@ -75,7 +75,6 @@ function onSubmit() {
         return;
     }
 
-    // Use the selectedFloor object as needed
     emit("create", {
         ...state.form,
         propertyId: selectedFloor.propertyId,

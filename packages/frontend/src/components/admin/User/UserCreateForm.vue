@@ -36,7 +36,6 @@ const form = ref<CreateUserPayload["user"] | User>(
 );
 const chosenProperties = ref<string[]>([]);
 
-// Initialize chosenProperties based on selectedProperties prop
 if (props.selectedProperties) {
     chosenProperties.value = props.selectedProperties.map((p) => p.id);
 }

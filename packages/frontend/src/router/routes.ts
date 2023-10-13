@@ -33,7 +33,7 @@ const routes: RouteRecordRaw[] = [
                 component: () => import("pages/PageProfile.vue"),
             },
 
-            // ADMIN ROUTES
+            // Protected routes
             {
                 path: "/admin/events",
                 name: "adminEvents",
@@ -95,8 +95,7 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAuth: false },
         component: () => import("pages/PageAuth.vue"),
     },
-    // Always leave this as last one,
-    // but you can also remove it
+    // Always leave this as last one
     {
         path: "/:catchAll(.*)*",
         meta: { requiresAuth: false },

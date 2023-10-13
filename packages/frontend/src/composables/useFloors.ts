@@ -14,7 +14,7 @@ export type UsePropertyFloors = Record<string, PropertyFloors>;
 
 export function useFloors() {
     const floors = ref<Record<string, PropertyFloors>>({});
-    const isLoading = ref(true); // Initialize loading state as true
+    const isLoading = ref(true);
     const propertiesStore = usePropertiesStore();
 
     const loadingPromise = propertiesStore
@@ -70,7 +70,6 @@ export function useFloors() {
         })
         .catch((err) => {
             showErrorMessage(err);
-            // Handle error in fetching properties here if needed
             isLoading.value = false;
         });
 

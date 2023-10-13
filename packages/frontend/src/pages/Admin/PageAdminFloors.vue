@@ -93,7 +93,6 @@ function handleMouseDown(floor: FloorDoc) {
 function handleMouseUp(floor: FloorDoc) {
     if (pressTimer !== null) clearTimeout(pressTimer);
     if (!longPressTriggered) {
-        // Navigate using the router if the long press hasn't been triggered
         router.push({
             name: "adminFloorEdit",
             params: { floorID: floor.id },
