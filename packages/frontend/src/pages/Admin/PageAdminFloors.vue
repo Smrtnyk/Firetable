@@ -5,21 +5,17 @@ import FTDialog from "components/FTDialog.vue";
 
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { Loading, useQuasar } from "quasar";
-import { onMounted } from "vue";
 import { makeRawFloor } from "@firetable/floor-creator";
-import { Collection, FloorDoc } from "@firetable/types";
+import { FloorDoc } from "@firetable/types";
 import { addFloor, deleteFloor } from "@firetable/backend";
-import { useFirestoreCollection } from "src/composables/useFirestore";
-import { takeProp } from "@firetable/utils";
 import { useRouter } from "vue-router";
+import { useFloors } from "src/composables/useFloors";
+import { onMounted } from "vue";
+import { takeProp } from "@firetable/utils";
 
 const quasar = useQuasar();
 const router = useRouter();
-const {
-    data: floors,
-    promise: floorsDataPromise,
-    pending: isLoading,
-} = useFirestoreCollection<FloorDoc>(Collection.FLOORS);
+const { floors, isLoading, loadingPromise } = useFloors();
 
 async function onFloorDelete(id: string) {
     if (!(await showConfirm("Delete floor?"))) return;
@@ -30,7 +26,7 @@ async function onFloorDelete(id: string) {
     });
 }
 
-function showAddNewFloorForm(): void {
+function showAddNewFloorForm(propertyId: string, floors: FloorDoc[]): void {
     const dialog = quasar.dialog({
         component: FTDialog,
         componentProps: {
@@ -40,12 +36,12 @@ function showAddNewFloorForm(): void {
             listeners: {
                 create: function onFloorCreate(name: string) {
                     tryCatchLoadingWrapper({
-                        hook: () => addFloor(makeRawFloor(name)).then(dialog.hide),
+                        hook: () => addFloor(makeRawFloor(name, propertyId)).then(dialog.hide),
                     });
                 },
             },
             componentPropsObject: {
-                allFloorNames: new Set(floors.value.map(takeProp("name"))),
+                allFloorNames: new Set(floors.map(takeProp("name"))),
             },
         },
     });
@@ -107,49 +103,68 @@ function handleMouseUp(floor: FloorDoc) {
 
 onMounted(async () => {
     Loading.show();
-    await floorsDataPromise.value;
+    await loadingPromise;
     Loading.hide();
 });
 </script>
 
 <template>
     <div class="PageAdminFloors">
-        <FTTitle title="Floors">
-            <template #right>
+        <FTTitle title="Floors" />
+
+        <!-- Outer loop for properties -->
+        <div v-for="(propertyData, propertyKey) in floors" :key="propertyKey">
+            <!-- Display property name -->
+            <div class="property-title text-h5 q-mt-md">
+                {{ propertyData.propertyName }}
+            </div>
+
+            <div class="q-mb-md">
+                <!-- If the property has floors, display them -->
+                <q-list v-if="propertyData.floors.length" bordered separator>
+                    <!-- Inner loop for floors of the current property -->
+                    <q-item
+                        v-for="floor in propertyData.floors"
+                        :key="floor.id"
+                        @mousedown="() => handleMouseDown(floor)"
+                        @mouseup="() => handleMouseUp(floor)"
+                        @touchstart="() => handleMouseDown(floor)"
+                        @touchend="() => handleMouseUp(floor)"
+                        clickable
+                        v-ripple
+                    >
+                        <q-item-section>
+                            <q-item-label>{{ floor.name }}</q-item-label>
+                        </q-item-section>
+                    </q-item>
+                </q-list>
+
+                <!-- If the property doesn't have floors, display a standout message -->
+                <div v-else class="no-floor-message text-h6 bg-grey-9 q-pa-sm rounded-borders">
+                    This property has no floors.
+                </div>
+            </div>
+            <!-- Button to add a new floor for every property -->
+            <div class="add-floor-btn row justify-end">
                 <q-btn
                     rounded
                     icon="plus"
                     class="button-gradient"
-                    @click="showAddNewFloorForm"
-                    label="new floor"
+                    @click="showAddNewFloorForm(propertyData.propertyId, propertyData.floors)"
+                    label="Add New Floor"
                 />
-            </template>
-        </FTTitle>
-        <q-list v-if="floors.length" bordered separator>
-            <q-item
-                v-for="floor in floors"
-                :key="floor.id"
-                @mousedown="() => handleMouseDown(floor)"
-                @mouseup="() => handleMouseUp(floor)"
-                @touchstart="() => handleMouseDown(floor)"
-                @touchend="() => handleMouseUp(floor)"
-                clickable
-                v-ripple
-            >
-                <q-item-section>
-                    <q-item-label>{{ floor.name }}</q-item-label>
-                </q-item-section>
-            </q-item>
-        </q-list>
+            </div>
+        </div>
 
+        <!-- Show "no properties" message when there are no properties and isLoading is false -->
         <div
+            v-if="!Object.keys(floors).length && !isLoading"
             class="justify-center items-center q-pa-md text-center"
-            v-if="!floors.length && !isLoading"
         >
-            <h6 class="text-h6">You should create some maps :)</h6>
-            <q-btn rounded class="button-gradient q-mx-auto" v-close-popup size="lg">
-                Get Started
-            </q-btn>
+            <h6 class="text-h6">
+                You have no properties created, in order to create floor plans you need to first
+                create at least one property. :)
+            </h6>
             <q-img src="/no-map.svg" />
         </div>
     </div>

@@ -26,7 +26,7 @@ export function showConfirm(title: string, message = "Confirm delete?") {
     );
 }
 
-export function showErrorMessage(e: unknown) {
+export function showErrorMessage(e: unknown): void {
     let message = "";
     if (isString(e)) {
         message = e;

@@ -43,10 +43,9 @@ export async function fetchPropertiesForUser(userId: string): Promise<PropertyDo
         const propertyRef = propertyDoc(propertyId);
         const propertyDocRes = await getDoc(propertyRef);
         if (propertyDocRes.exists()) {
-            properties.push(propertyDocRes.data() as PropertyDoc);
+            properties.push({ ...propertyDocRes.data(), id: propertyDocRes.id } as PropertyDoc);
         }
     }
 
-    console.log("Properties:", properties);
     return properties;
 }

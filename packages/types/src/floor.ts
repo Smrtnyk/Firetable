@@ -4,6 +4,7 @@ export interface FloorDoc {
     width: number;
     height: number;
     json: Record<string, any>;
+    propertyId: string;
 }
 
 export const enum ElementTag {

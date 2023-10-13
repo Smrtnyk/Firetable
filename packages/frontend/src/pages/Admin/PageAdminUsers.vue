@@ -56,7 +56,7 @@ function onCreateUserFormSubmit(newUser: CreateUserPayload) {
 }
 
 async function showCreateUserDialog(): Promise<void> {
-    const properties = await propertiesStore.getPropertiesOnce();
+    const properties = await propertiesStore.getPropertiesOfCurrentUser();
     const dialog = quasar.dialog({
         component: FTDialog,
         componentProps: {
@@ -82,7 +82,7 @@ async function showEditUserDialog(user: User, reset: () => void) {
         return;
     }
     const [properties, selectedProperties] = await Promise.all([
-        propertiesStore.getPropertiesOnce(),
+        propertiesStore.getPropertiesOfCurrentUser(),
         propertiesStore.getPropertiesOfUser(user.id),
     ]);
     const dialog = quasar.dialog({
