@@ -11,11 +11,15 @@ import {
     getFirestoreCollection,
     useFirestoreCollection,
 } from "src/composables/useFirestore";
+import { useRoute } from "vue-router";
+
+const route = useRoute();
 
 const { data: events, pending: isLoading } = useFirestoreCollection<EventDoc>(
     createQuery<EventDoc>(
         getFirestoreCollection(Collection.EVENTS),
         where("date", ">=", Date.now() - ONE_HOUR * config.eventDuration),
+        where("propertyId", "==", route.params.propertyId),
         orderBy("date"),
         limit(10),
     ),
