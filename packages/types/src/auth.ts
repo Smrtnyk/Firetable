@@ -3,8 +3,7 @@ export const ADMIN = "Administrator";
 export enum Role {
     PROPERTY_OWNER = "Property Owner",
     MANAGER = "Manager",
-    WAITER = "Waiter",
-    ENTRY = "Entry",
+    STAFF = "Staff",
 }
 
 export const enum ACTIVITY_STATUS {

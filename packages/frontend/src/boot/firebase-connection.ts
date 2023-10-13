@@ -2,7 +2,6 @@ import { boot } from "quasar/wrappers";
 import { useAuthStore } from "src/stores/auth-store";
 import { initializeFirebase } from "@firetable/backend";
 import { Router } from "vue-router";
-import { ADMIN } from "@firetable/types";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { getCurrentUser, useCurrentUser, VueFire, VueFireAuth } from "vuefire";
 import { watch } from "vue";
@@ -35,17 +34,16 @@ function routerBeforeEach(router: Router, store: ReturnType<typeof useAuthStore>
                 await getCurrentUser();
             }
             const requiresAuth = to.meta.requiresAuth;
-            const requiresAdmin = to.meta.requiresAdmin;
+            const allowedRoles: string[] = to.meta.allowedRoles as string[];
 
             if (requiresAuth && !store.isAuthenticated) return { name: "auth" };
             if (!store.isAuthenticated) return true;
 
             const token = await (await getCurrentUser())?.getIdTokenResult();
-            const role = token?.claims.role;
-            const isAdmin = role === ADMIN;
+            const role = token?.claims.role as string;
 
-            if (requiresAdmin && isAdmin) return true;
-            if (requiresAdmin && !isAdmin) return { name: "home" };
+            if (allowedRoles && allowedRoles.includes(role)) return true;
+            if (allowedRoles && !allowedRoles.includes(role)) return { name: "home" };
             if (to.path === "/auth") return { name: "home" };
             return true;
         } catch (err) {

@@ -7,12 +7,11 @@ import { useAuthStore } from "src/stores/auth-store";
 
 const authStore = useAuthStore();
 const isLoggedIn = computed(() => authStore.isLoggedIn);
-const isAdmin = computed(() => authStore.isAdmin);
 </script>
 
 <template>
     <q-layout v-if="isLoggedIn" view="hHh lpR fFf">
-        <AppDrawer :show-admin-links="isAdmin" />
+        <AppDrawer />
         <AppTopMenu />
         <q-page-container>
             <q-page class="q-pa-xs-xs q-pa-sm-sm q-pa-md-md row">

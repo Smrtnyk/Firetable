@@ -2,17 +2,13 @@
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
-import { useQuasar, LocalStorage } from "quasar";
+import { LocalStorage, useQuasar } from "quasar";
 import { useAuthStore } from "src/stores/auth-store";
 import { useAppStore } from "src/stores/app-store";
 import { logoutUser, updateUserField } from "@firetable/backend";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { User } from "@firetable/types";
+import { ADMIN, Role, User } from "@firetable/types";
 
-interface Props {
-    showAdminLinks: boolean;
-}
-const props = defineProps<Props>();
 const appStore = useAppStore();
 const authStore = useAuthStore();
 const q = useQuasar();
@@ -24,30 +20,39 @@ const langOptions = [
     { value: "de", label: "German" },
 ];
 
-const adminLinks = computed(() => [
-    {
-        icon: "calendar",
-        routeName: "adminEvents",
-        text: t("AppDrawer.links.manageEvents"),
-    },
-    {
-        icon: "home",
-        routeName: "adminProperties",
-        text: t("AppDrawer.links.manageProperties"),
-    },
-    {
-        icon: "users",
-        routeName: "adminUsers",
-        text: t("AppDrawer.links.manageUsers"),
-    },
-    {
-        icon: "arrow-expand",
-        routeName: "adminFloors",
-        text: t("AppDrawer.links.manageFloors"),
-    },
-]);
+const adminLinks = computed(() => {
+    const links = [];
+    const role = user.value.role;
+    if (role === Role.PROPERTY_OWNER || role === Role.MANAGER || role === ADMIN) {
+        links.push(
+            {
+                icon: "calendar",
+                routeName: "adminEvents",
+                text: t("AppDrawer.links.manageEvents"),
+            },
+            {
+                icon: "users",
+                routeName: "adminUsers",
+                text: t("AppDrawer.links.manageUsers"),
+            },
+            {
+                icon: "arrow-expand",
+                routeName: "adminFloors",
+                text: t("AppDrawer.links.manageFloors"),
+            },
+        );
+    }
+    if (role === Role.PROPERTY_OWNER || role === ADMIN) {
+        links.push({
+            icon: "home",
+            routeName: "adminProperties",
+            text: t("AppDrawer.links.manageProperties"),
+        });
+    }
+
+    return links;
+});
 const user = computed(() => authStore.user as unknown as NonNullable<User>);
-const adminLinksCollection = computed(() => (props.showAdminLinks ? adminLinks.value : []));
 const avatar = computed(() => {
     if (!user.value) return "";
     const [first, last] = user.value.name.split(" ");
@@ -109,10 +114,10 @@ function setAppLanguage(val: string) {
                 </div>
             </q-item>
 
-            <q-separator v-if="adminLinksCollection.length" />
+            <q-separator v-if="adminLinks.length" />
 
             <q-item
-                v-for="(link, index) in adminLinksCollection"
+                v-for="(link, index) in adminLinks"
                 :key="index"
                 :to="{ name: link.routeName }"
                 clickable

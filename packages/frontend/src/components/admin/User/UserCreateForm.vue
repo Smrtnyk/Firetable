@@ -28,7 +28,7 @@ const userSkeleton: CreateUserPayload["user"] = {
     username: "",
     email: "",
     password: "",
-    role: Role.WAITER,
+    role: Role.STAFF,
     status: ACTIVITY_STATUS.OFFLINE,
 };
 const form = ref<CreateUserPayload["user"] | User>(

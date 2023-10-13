@@ -20,27 +20,37 @@ export function useFloors() {
     const loadingPromise = propertiesStore
         .getPropertiesOfCurrentUser()
         .then((properties) => {
+            console.log("got properties", properties);
             const unsubscribes: (() => void)[] = [];
             const fetchPromises: Promise<void>[] = [];
 
             properties.forEach((property) => {
-                const q = query(floorsCollection(), where("propertyId", "==", property.id));
+                const floorQuery = query(
+                    floorsCollection(),
+                    where("propertyId", "==", property.id),
+                );
 
                 const fetchPromise = new Promise<void>((resolve) => {
-                    const unsubscribe = onSnapshot(q, (snapshot) => {
-                        floors.value[property.id] = {
-                            propertyId: property.id,
-                            propertyName: property.name,
-                            floors: snapshot.docs.map(
-                                (doc) =>
-                                    ({
+                    const unsubscribe = onSnapshot(
+                        floorQuery,
+                        (snapshot) => {
+                            floors.value[property.id] = {
+                                propertyId: property.id,
+                                propertyName: property.name,
+                                floors: snapshot.docs.map(function (doc) {
+                                    console.log("got floor doc ", doc.data());
+                                    return {
                                         ...doc.data(),
                                         id: doc.id,
-                                    }) as FloorDoc,
-                            ),
-                        };
-                        resolve();
-                    });
+                                    } as FloorDoc;
+                                }),
+                            };
+                            resolve();
+                        },
+                        (error) => {
+                            console.error("Error fetching floors:", error);
+                        },
+                    );
                     unsubscribes.push(unsubscribe);
                 });
 
