@@ -9,22 +9,20 @@ import { onMounted, reactive, ref } from "vue";
 import { QueryDocumentSnapshot } from "firebase/firestore";
 import { useQuasar, QInfiniteScroll } from "quasar";
 import { useRouter } from "vue-router";
-import { Collection, CreateEventPayload, EventDoc, FloorDoc } from "@firetable/types";
+import { CreateEventPayload, EventDoc } from "@firetable/types";
 import { createNewEvent, deleteEvent, getEvents } from "@firetable/backend";
-import { useFirestoreCollection } from "src/composables/useFirestore";
 import { takeLast } from "@firetable/utils";
-import { usePropertiesStore } from "stores/usePropertiesStore";
+import { useFloors } from "src/composables/useFloors";
 
 const EVENTS_PER_PAGE = 20;
 
 const quasar = useQuasar();
 const router = useRouter();
-const propertiesStore = usePropertiesStore();
 const isLoading = ref(true);
 const events = reactive<Set<EventDoc>>(new Set());
 const hasMoreEventsToFetch = ref(true);
 const paginator = ref<QInfiniteScroll | null>(null);
-const { data: floors } = useFirestoreCollection<FloorDoc>(Collection.FLOORS, { once: true });
+const { floors } = useFloors();
 
 async function init() {
     isLoading.value = true;
@@ -77,8 +75,7 @@ async function onLoad(_: number, done: () => void) {
     done();
 }
 
-async function showCreateEventForm(): Promise<void> {
-    const properties = await propertiesStore.getPropertiesOfCurrentUser();
+function showCreateEventForm(): void {
     quasar.dialog({
         component: FTDialog,
         componentProps: {
@@ -87,7 +84,6 @@ async function showCreateEventForm(): Promise<void> {
             component: EventCreateForm,
             componentPropsObject: {
                 floors: floors.value,
-                properties: properties,
             },
             listeners: {
                 create: onCreateEvent,

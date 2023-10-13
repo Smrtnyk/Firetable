@@ -20,7 +20,7 @@ export async function createEvent(
         throw new functions.https.HttpsError("failed-precondition", "The function must be called while authenticated.");
     }
 
-    const { date, img, floors, entryPrice, guestListLimit, name } = eventPayload;
+    const { date, img, floors, entryPrice, guestListLimit, name, propertyId } = eventPayload;
     const id = db.collection(Collection.EVENTS).doc().id;
     logger.info(`Creating event with ID: ${id}`);
 
@@ -46,6 +46,7 @@ export async function createEvent(
             creator,
             reservedPercentage: 0,
             guestListLimit,
+            propertyId
         });
 
         floors.forEach(floor => {

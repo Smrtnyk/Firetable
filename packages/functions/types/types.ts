@@ -85,6 +85,7 @@ export interface FloorDoc {
 }
 
 export type CreateEventPayload = CreateEventForm & {
+    propertyId: string;
     id: string;
     floors: FloorDoc[];
 };

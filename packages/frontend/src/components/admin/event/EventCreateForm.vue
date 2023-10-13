@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive } from "vue";
+import { reactive, computed, onMounted } from "vue";
 
 import { useI18n } from "vue-i18n";
 import { greaterThanZero, noEmptyString, requireNumber } from "src/helpers/form-rules";
@@ -7,20 +7,20 @@ import { useRouter } from "vue-router";
 
 import { date } from "quasar";
 import { resizeImage } from "src/helpers/image-tools";
-import { CreateEventForm, FloorDoc, PropertyDoc } from "@firetable/types";
+import { CreateEventForm, CreateEventPayload } from "@firetable/types";
 import { showErrorMessage } from "src/helpers/ui-helpers";
+import { UsePropertyFloors } from "src/composables/useFloors";
 
 interface State {
     form: CreateEventForm;
-    chosenFloors: string[];
+    chosenFloor: string | null;
     capturedImage: string[];
     showDateModal: boolean;
     showTimeModal: boolean;
 }
 
 interface Props {
-    floors: FloorDoc[];
-    properties: PropertyDoc[];
+    floors: UsePropertyFloors;
 }
 
 const { formatDate } = date;
@@ -36,38 +36,51 @@ const eventObj: CreateEventForm = {
     entryPrice: 0,
 };
 const props = defineProps<Props>();
-const emit = defineEmits(["create"]);
+const emit = defineEmits<{
+    (event: "create", payload: CreateEventPayload): void;
+}>();
 const { t } = useI18n();
 const router = useRouter();
 const state = reactive<State>({
     form: { ...eventObj },
-    chosenFloors: [],
+    chosenFloor: null,
     capturedImage: [],
     showDateModal: false,
     showTimeModal: false,
 });
 
+const totalFloors = computed(() => {
+    return Object.values(props.floors).reduce(
+        (acc, propertyFloors) => acc + propertyFloors.floors.length,
+        0,
+    );
+});
+
+onMounted(() => {
+    console.log(props.floors);
+});
+
 function onSubmit() {
-    if (!state.chosenFloors.length) {
+    if (!state.chosenFloor) {
         showErrorMessage(t("EventCreateForm.noChosenFloorsMessage"));
         return;
     }
 
-    const floors = props.floors
-        .filter((floor) => {
-            return state.chosenFloors.includes(floor.id);
-        })
-        .map((floor) => {
-            return {
-                ...floor,
-                id: floor.id,
-            };
-        });
+    const selectedFloor = Object.values(props.floors)
+        .flatMap((propertyFloors) => propertyFloors.floors)
+        .find((floor) => floor.id === state.chosenFloor);
 
+    if (!selectedFloor) {
+        showErrorMessage("Selected floor not found.");
+        return;
+    }
+
+    // Use the selectedFloor object as needed
     emit("create", {
         ...state.form,
+        propertyId: selectedFloor.propertyId,
         img: state.form.img,
-        floors,
+        floors: [selectedFloor],
     });
     state.form = eventObj;
 }
@@ -106,7 +119,7 @@ async function onFileChosen(chosenFile: File) {
 </script>
 
 <template>
-    <div class="column justify-center items-center q-mt-md" v-if="!props.floors.length">
+    <div class="column justify-center items-center q-mt-md" v-if="!totalFloors">
         <h6 class="text-h6 q-pa-md text-justify">
             You cannot create events because you have no floors!
         </h6>
@@ -114,9 +127,10 @@ async function onFileChosen(chosenFile: File) {
             rounded
             class="button-gradient q-mx-auto"
             @click="() => router.replace('/admin/floors')"
+            v-close-popup
             size="lg"
         >
-            Go to map manager
+            Go to floor manager
         </q-btn>
         <q-img src="/no-events.svg" />
     </div>
@@ -195,27 +209,17 @@ async function onFileChosen(chosenFile: File) {
                 </template>
             </q-input>
 
-            <div class="q-gutter-sm q-mb-lg">
-                <div>Properties:</div>
+            <div
+                class="q-gutter-sm q-mb-lg"
+                v-for="(propertyFloors, propertyKey) in props.floors"
+                :key="propertyKey"
+            >
+                <div class="text-h6">{{ propertyFloors.propertyName }}</div>
                 <div>
-                    <q-checkbox
-                        v-for="property in props.properties"
-                        :key="property.id"
-                        v-model="state.chosenFloors"
-                        :val="property.id"
-                        :label="property.name"
-                        color="accent"
-                    />
-                </div>
-            </div>
-
-            <div class="q-gutter-sm q-mb-lg">
-                <div>Floors:</div>
-                <div>
-                    <q-checkbox
-                        v-for="floor in props.floors"
+                    <q-radio
+                        v-for="floor in propertyFloors.floors"
                         :key="floor.id"
-                        v-model="state.chosenFloors"
+                        v-model="state.chosenFloor"
                         :val="floor.id"
                         :label="floor.name"
                         color="accent"

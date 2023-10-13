@@ -10,6 +10,7 @@ type PropertyFloors = {
     propertyId: string;
     floors: FloorDoc[];
 };
+export type UsePropertyFloors = Record<string, PropertyFloors>;
 
 export function useFloors() {
     const floors = ref<Record<string, PropertyFloors>>({});

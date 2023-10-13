@@ -11,7 +11,7 @@ export interface CreateEventForm {
 }
 
 export type CreateEventPayload = CreateEventForm & {
-    id: string;
+    propertyId: string;
     floors: FloorDoc[];
 };
 
@@ -25,6 +25,7 @@ export interface EventDoc {
     reservedPercentage: number;
     guestListLimit: number;
     activeStaff: User["id"][];
+    propertyId: string;
     info?: string;
     _doc: QueryDocumentSnapshot<EventDoc>;
 }
