@@ -1,21 +1,15 @@
 import { defineStore } from "pinia";
-import { ADMIN, Collection, User, UserPropertyMapDoc } from "@firetable/types";
+import { ADMIN, Collection, User } from "@firetable/types";
 import { isDefined, NOOP } from "@firetable/utils";
-import { logoutUser, userPropertyMapCollection } from "@firetable/backend";
+import { logoutUser } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import {
-    createQuery,
-    useFirestoreCollection,
-    useFirestoreDocument,
-} from "src/composables/useFirestore";
+import { useFirestoreDocument } from "src/composables/useFirestore";
 import { watch } from "vue";
-import { where } from "firebase/firestore";
 
 interface AuthState {
     isAuthenticated: boolean;
     isReady: boolean;
     user: User | null;
-    userPropertyMap: UserPropertyMapDoc[];
     unsubscribeUserWatch: typeof NOOP;
 }
 
@@ -58,36 +52,6 @@ export const useAuthStore = defineStore("auth", {
                 this.unsubscribeUserWatch = unsubscribeUserWatch;
             }
         },
-        async initProperties() {
-            const {
-                promise,
-                data: properties,
-                stop,
-                error,
-            } = useFirestoreCollection<UserPropertyMapDoc>(
-                createQuery(userPropertyMapCollection(), where("userId", "==", this.user?.id)),
-            );
-            await promise.value;
-            // Add watcher for user in case user doc changes
-            watch(
-                () => properties.value,
-                (newUserPropertyMap) => {
-                    if (newUserPropertyMap) {
-                        this.userPropertyMap = newUserPropertyMap;
-                    }
-                },
-                { deep: true },
-            );
-
-            if (error.value) {
-                stop();
-                showErrorMessage(error.value);
-                logoutUser().catch(NOOP);
-                return;
-            }
-
-            this.userPropertyMap = properties.value;
-        },
         async initUser(uid: string) {
             const {
                 promise,
@@ -120,7 +84,6 @@ export const useAuthStore = defineStore("auth", {
                 return;
             }
             this.user = user.value;
-            await this.initProperties();
             this.isAuthenticated = true;
             this.isReady = true;
             this.unsubscribeUserWatch = stop;

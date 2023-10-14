@@ -68,7 +68,7 @@ export function useUsers() {
         }
     };
 
-    watch(() => authStore.userPropertyMap, fetchAndSetUsers, { immediate: true });
+    watch(() => propertiesIds, fetchAndSetUsers, { immediate: true });
 
     return { users, fetchAndSetUsers };
 }
