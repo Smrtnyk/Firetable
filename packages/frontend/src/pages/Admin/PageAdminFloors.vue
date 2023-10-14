@@ -94,6 +94,16 @@ onMounted(async () => {
                 :key="propertyKey"
                 :name="propertyKey"
             >
+                <!-- Button to add a new floor for the property in the active tab -->
+                <div class="add-floor-btn row justify-end">
+                    <q-btn
+                        rounded
+                        icon="plus"
+                        class="button-gradient"
+                        @click="showAddNewFloorForm(propertyData.propertyId, propertyData.floors)"
+                        :label="`Add New Floor to ${propertyData.propertyName}`"
+                    />
+                </div>
                 <!-- If the property has floors, display them -->
                 <q-list v-if="propertyData.floors.length">
                     <q-slide-item
@@ -131,17 +141,6 @@ onMounted(async () => {
                 <!-- If the property doesn't have floors, display a standout message -->
                 <div v-else class="no-floor-message text-h6 bg-grey-9 q-pa-sm rounded-borders">
                     This property has no floors.
-                </div>
-
-                <!-- Button to add a new floor for the property in the active tab -->
-                <div class="add-floor-btn row justify-end">
-                    <q-btn
-                        rounded
-                        icon="plus"
-                        class="button-gradient"
-                        @click="showAddNewFloorForm(propertyData.propertyId, propertyData.floors)"
-                        label="Add New Floor"
-                    />
                 </div>
             </q-tab-panel>
         </q-tab-panels>
