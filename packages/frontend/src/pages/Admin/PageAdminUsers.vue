@@ -4,22 +4,16 @@ import FTTitle from "components/FTTitle.vue";
 import { loadingWrapper, showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed } from "vue";
 import { config } from "src/config";
-import { useAuthStore } from "src/stores/auth-store";
 import { useQuasar } from "quasar";
 import FTDialog from "components/FTDialog.vue";
-import { documentId, where } from "firebase/firestore";
-import { Collection, CreateUserPayload, User } from "@firetable/types";
+import { CreateUserPayload, User } from "@firetable/types";
 import { createUserWithEmail, deleteUser, updateUser } from "@firetable/backend";
-import {
-    createQuery,
-    getFirestoreCollection,
-    useFirestoreCollection,
-} from "src/composables/useFirestore";
 import { usePropertiesStore } from "stores/usePropertiesStore";
+import { useUsers } from "src/composables/useUsers";
 
 const { maxNumOfUsers } = config;
-const authStore = useAuthStore();
 const propertiesStore = usePropertiesStore();
+const { users } = useUsers();
 const quasar = useQuasar();
 const usersStatus = computed(() => {
     return {
@@ -27,12 +21,6 @@ const usersStatus = computed(() => {
         maxUsers: maxNumOfUsers,
     };
 });
-const { data: users } = useFirestoreCollection<User>(
-    createQuery(
-        getFirestoreCollection(Collection.USERS),
-        where(documentId(), "!=", authStore.user?.id),
-    ),
-);
 
 const onCreateUser = loadingWrapper((newUser: CreateUserPayload) => {
     return createUserWithEmail(newUser);

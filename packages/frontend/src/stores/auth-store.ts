@@ -1,11 +1,10 @@
 import { defineStore } from "pinia";
 import { ADMIN, Collection, User, UserPropertyMapDoc } from "@firetable/types";
 import { isDefined, NOOP } from "@firetable/utils";
-import { logoutUser } from "@firetable/backend";
+import { logoutUser, userPropertyMapCollection } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import {
     createQuery,
-    getFirestoreCollection,
     useFirestoreCollection,
     useFirestoreDocument,
 } from "src/composables/useFirestore";
@@ -66,10 +65,7 @@ export const useAuthStore = defineStore("auth", {
                 stop,
                 error,
             } = useFirestoreCollection<UserPropertyMapDoc>(
-                createQuery(
-                    getFirestoreCollection(Collection.USER_PROPERTY_MAP),
-                    where("userId", "==", this.user?.id),
-                ),
+                createQuery(userPropertyMapCollection(), where("userId", "==", this.user?.id)),
             );
             await promise.value;
             // Add watcher for user in case user doc changes

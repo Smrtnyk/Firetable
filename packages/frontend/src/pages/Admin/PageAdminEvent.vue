@@ -16,12 +16,11 @@ import { useQuasar } from "quasar";
 import { config } from "src/config";
 import { Floor, FloorMode, getTablesFromFloorDoc } from "@firetable/floor-creator";
 import { ADMIN, Collection, EventDoc, EventFeedDoc, FloorDoc, User } from "@firetable/types";
-import { updateEventFloorData, updateEventProperty } from "@firetable/backend";
+import { updateEventFloorData, updateEventProperty, usersCollection } from "@firetable/backend";
 import { where } from "firebase/firestore";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import {
     createQuery,
-    getFirestoreCollection,
     useFirestoreCollection,
     useFirestoreDocument,
 } from "src/composables/useFirestore";
@@ -41,7 +40,7 @@ const { data: eventFloors } = useFirestoreCollection<FloorDoc>(
 );
 
 const users = useFirestoreCollection<User>(
-    createQuery(getFirestoreCollection(Collection.USERS), where("role", "!=", ADMIN)),
+    createQuery(usersCollection(), where("role", "!=", ADMIN)),
     { once: true },
 );
 

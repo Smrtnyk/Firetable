@@ -34,11 +34,6 @@ export function updateFirestoreDocument<T>(documentRef: DocumentReference<T>, up
     });
 }
 
-export function getFirestoreCollection(path: string) {
-    const { firestore } = initializeFirebase();
-    return collection(firestore, path);
-}
-
 export function getFirestoreDocument(path: string) {
     const { firestore } = initializeFirebase();
     return doc(firestore, path);

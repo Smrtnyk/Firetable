@@ -5,15 +5,11 @@ import AddNewPropertyForm from "components/admin/property/AddNewPropertyForm.vue
 
 import { useQuasar } from "quasar";
 import { loadingWrapper, showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import {
-    createQuery,
-    getFirestoreCollection,
-    useFirestoreCollection,
-} from "src/composables/useFirestore";
+import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
 import { documentId, where } from "firebase/firestore";
-import { Collection, PropertyDoc } from "@firetable/types";
+import { PropertyDoc } from "@firetable/types";
 import { useAuthStore } from "stores/auth-store";
-import { createNewProperty, deleteProperty } from "@firetable/backend";
+import { createNewProperty, deleteProperty, propertiesCollection } from "@firetable/backend";
 import { computed, ref, watchEffect } from "vue";
 import { takeProp } from "@firetable/utils";
 
@@ -27,10 +23,7 @@ const properties = ref<PropertyDoc[]>([]);
 watchEffect(async () => {
     if (propertyIds.value.length) {
         const res = useFirestoreCollection<PropertyDoc>(
-            createQuery(
-                getFirestoreCollection(Collection.PROPERTIES),
-                where(documentId(), "in", propertyIds.value),
-            ),
+            createQuery(propertiesCollection(), where(documentId(), "in", propertyIds.value)),
         );
         await res.promise.value;
         properties.value = res.data.value;

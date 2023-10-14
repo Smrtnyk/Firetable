@@ -5,19 +5,16 @@ import EventCardListSkeleton from "components/Event/EventCardListSkeleton.vue";
 import { where, orderBy, limit } from "firebase/firestore";
 import { config } from "src/config";
 import { ONE_HOUR } from "src/constants";
-import { Collection, EventDoc } from "@firetable/types";
-import {
-    createQuery,
-    getFirestoreCollection,
-    useFirestoreCollection,
-} from "src/composables/useFirestore";
+import { EventDoc } from "@firetable/types";
+import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
 import { useRoute } from "vue-router";
+import { eventsCollection } from "@firetable/backend";
 
 const route = useRoute();
 
 const { data: events, pending: isLoading } = useFirestoreCollection<EventDoc>(
     createQuery<EventDoc>(
-        getFirestoreCollection(Collection.EVENTS),
+        eventsCollection(),
         where("date", ">=", Date.now() - ONE_HOUR * config.eventDuration),
         where("propertyId", "==", route.params.propertyId),
         orderBy("date"),
