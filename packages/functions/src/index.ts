@@ -11,6 +11,7 @@ import { Collection } from "../types/types.js";
 import { createPropertyFn } from "./callable/create-property/create-property.js";
 import { deleteDocument } from "./delete-document/index.js";
 import { db } from "./init.js";
+import { logger } from "firebase-functions";
 
 // setVapidDetails(vapidKeys.subject, vapidKeys.publicKey, vapidKeys.privateKey);
 
@@ -41,23 +42,38 @@ export const deleteUser = functions
     .region("europe-west3")
     .https
     .onCall(deleteUserFn);
-export const onUserDelete = functions.firestore
+export const onUserDeleted = functions.firestore
     .document(`${Collection.USERS}/{userId}`)
     .onDelete(async (snap, context) => {
         const userId = context.params.userId;
+        logger.info(`Cleaning up data for deleted user with id: ${userId}`);
 
         try {
-            const snapshot = await db.collection("userPropertyMap")
+            // Get all userPropertyMap documents associated with the user
+            const userPropertyMapsSnapshot = await db.collection(`${Collection.USER_PROPERTY_MAP}`)
                 .where("userId", "==", userId)
                 .get();
 
+            // Check if there are any documents to delete
+            if (userPropertyMapsSnapshot.empty) {
+                logger.info(`No userPropertyMap documents found for user ${userId}. Exiting function.`);
+                return;
+            }
+
+            // If there are many documents, we might need to handle this in chunks
+            // But for simplicity, we'll use batch here which can handle up to 500 operations
             const batch = db.batch();
-            snapshot.docs.forEach(doc => {
+            userPropertyMapsSnapshot.docs.forEach(doc => {
+                logger.debug(`Scheduling delete for userPropertyMap document with id: ${doc.id}`);
                 batch.delete(doc.ref);
             });
+
             await batch.commit();
+            logger.info(`Successfully deleted userPropertyMap documents for user ${userId}`);
+
         } catch (error) {
-            functions.logger.error("Error deleting userPropertyMap entries:", error);
+            logger.error(`Error cleaning up data for user ${userId}:`, error);
+            throw new functions.https.HttpsError("internal", `Error cleaning up data for user ${userId}`);
         }
     });
 
