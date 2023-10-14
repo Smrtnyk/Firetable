@@ -1,43 +1,43 @@
-[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=Smrtnyk_Firetable&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=Smrtnyk_Firetable)
+# FIRETABLE
 
-## FIRETABLE
+![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=Smrtnyk_Firetable&metric=ncloc)
 
-### An event management system.
-Frontend is made with Quasar which uses Vue as its framework.
-Backend communication is done with Firebase and cloud functions.
+**Firetable** is an event management system designed with a focus on flexibility and user-friendly interfaces.
 
-Some of the capabilities are:
-* Properties creation
-* Floor maps creation
-    - Add various elements onto the floor plan, such as DJ Booth, Sofa, Table etc...
-* Event management
-    - Create event for properties by choosing one of the created floor plans
-* User management
-    - Create users and assign them to the corresponding properties
-* Dark mode
-* Language picker
+## Features:
+- **Properties Management**: Create and manage multiple properties.
+- **Floor Maps**: Design detailed floor plans by adding various elements such as DJ Booths, Sofas, Tables, and more.
+- **Event Management**: Organize events by selecting from one of the available floor plans.
+- **User Management**: Register users and associate them with specific properties.
+- **Dark Mode**: Switch to an eye-friendly dark theme.
+- **Language Picker**: Multi-language support to cater to a global audience.
 
-For implemented firebase cloud functions check `packages/functions` directory.
+## Technology Stack:
+- **Frontend**: Developed using Quasar, which is built over the Vue.js framework.
+- **Backend**: Communicates through Firebase and supplemented with cloud functions.
 
----
+> For the cloud functions implemented with Firebase, refer to the `packages/functions` directory.
 
-App locally communicates with firebase emulator as it's backend service, `firebase-tools` will install locally with `pnpm install` command.
+## Getting Started:
 
----
-To start frontend dev server cd into `frontend` dir and run
->npm run dev
+1. **Setup**:
+    - The app communicates locally with the Firebase emulator. Install the required tools using:
+      ```
+      pnpm install
+      ```
 
----
+2. **Development**:
+    - Navigate to the `frontend` directory and start the development server with:
+      ```
+      npm run dev
+      ```
 
-In order to run it in `https` mode you will need to generate `key.pem` and `cert.pem` using `mkcert`,
-otherwise comment out the `https` field in `quasar.config.js`.
+3. **HTTPS Mode**:
+    - To run the app in HTTPS mode, generate `key.pem` and `cert.pem` using `mkcert`.
+    - If you do not wish to use HTTPS, you can simply comment out the `https` field in `quasar.config.js`.
 
----
+## Translations:
+- The translation of the app is currently ongoing.
 
-Translation of an app is in progress.
-
-Feel free to fork and use this however you want.
-All contributions and ideas are welcome.
-
----
-
+## Contributions:
+Feel free to fork, use, and contribute to this project. All ideas and contributions are welcome!
