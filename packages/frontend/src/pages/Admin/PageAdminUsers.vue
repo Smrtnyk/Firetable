@@ -13,7 +13,7 @@ import { useUsers } from "src/composables/useUsers";
 
 const { maxNumOfUsers } = config;
 const propertiesStore = usePropertiesStore();
-const { users } = useUsers();
+const { users, fetchAndSetUsers } = useUsers();
 const quasar = useQuasar();
 const usersStatus = computed(() => {
     return {
@@ -22,16 +22,18 @@ const usersStatus = computed(() => {
     };
 });
 
-const onCreateUser = loadingWrapper((newUser: CreateUserPayload) => {
-    return createUserWithEmail(newUser);
+const onCreateUser = loadingWrapper(async (newUser: CreateUserPayload) => {
+    await createUserWithEmail(newUser);
+    await fetchAndSetUsers();
 });
 
 const onUpdateUser = loadingWrapper((userId: string, updatedUser: Partial<CreateUserPayload>) => {
     return updateUser(userId, updatedUser);
 });
 
-const onDeleteUser = loadingWrapper((id: string) => {
-    return deleteUser(id);
+const onDeleteUser = loadingWrapper(async (id: string) => {
+    await deleteUser(id);
+    await fetchAndSetUsers();
 });
 
 function onCreateUserFormSubmit(newUser: CreateUserPayload) {

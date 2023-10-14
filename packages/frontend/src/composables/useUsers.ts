@@ -1,50 +1,65 @@
-import { ref, watch, computed } from "vue";
-import { query, where, getDocs, documentId } from "firebase/firestore";
+import { ref, watch } from "vue";
+import { documentId, getDocs, query, where } from "firebase/firestore";
 import { User, UserPropertyMapDoc } from "@firetable/types";
 import { useAuthStore } from "src/stores/auth-store";
 import { userPropertyMapCollection, usersCollection } from "@firetable/backend";
 
-async function fetchUserIds(propertiesIds: string[]): Promise<string[]> {
-    const userPropertyMapQuery = query(
-        userPropertyMapCollection(),
-        where("propertyId", "in", propertiesIds),
-    );
-    const userPropertyMapSnapshot = await getDocs(userPropertyMapQuery);
-    const allUsersIdsDocs = userPropertyMapSnapshot.docs.map(
-        (doc) => doc.data() as UserPropertyMapDoc,
-    );
-    return allUsersIdsDocs.map((map) => map.userId);
-}
-
-async function fetchUsers(userIdsToFetch: string[], excludeId?: string): Promise<User[]> {
-    const baseQuery = excludeId ? [where(documentId(), "!=", excludeId)] : [];
-    const usersQuery = query(
-        usersCollection(),
-        ...baseQuery,
-        where(documentId(), "in", userIdsToFetch),
-    );
-    const usersSnapshot = await getDocs(usersQuery);
-    return usersSnapshot.docs.map((doc) => {
-        const userData = doc.data() as User;
-        return {
-            ...userData,
-            id: doc.id,
-        };
-    });
-}
-
 export function useUsers() {
     const authStore = useAuthStore();
     const users = ref<User[]>([]);
-    const propertiesIds = computed(() => {
-        return authStore.userPropertyMap.map((map) => map.propertyId) || [];
-    });
+    const propertiesIds = ref<string[]>([]);
+    const userIdsToFetch = ref<string[]>([]);
 
-    const fetchAndUpdateUsers = async () => {
+    async function fetchUserPropertyMap() {
+        const userPropertyMapQuery = query(
+            userPropertyMapCollection(),
+            where("userId", "==", authStore.user?.id),
+        );
+
+        const snapshot = await getDocs(userPropertyMapQuery);
+        const properties: UserPropertyMapDoc[] = snapshot.docs.map(
+            (doc) => doc.data() as UserPropertyMapDoc,
+        );
+        propertiesIds.value = properties.map((map) => {
+            return map.propertyId;
+        });
+    }
+
+    async function fetchUserIds(): Promise<string[]> {
+        const userPropertyMapQuery = query(
+            userPropertyMapCollection(),
+            where("propertyId", "in", propertiesIds.value),
+        );
+        const userPropertyMapSnapshot = await getDocs(userPropertyMapQuery);
+        const allUsersIdsDocs = userPropertyMapSnapshot.docs.map(
+            (doc) => doc.data() as UserPropertyMapDoc,
+        );
+        userIdsToFetch.value = allUsersIdsDocs.map((map) => map.userId);
+        return userIdsToFetch.value;
+    }
+
+    async function fetchUsers(): Promise<void> {
+        const usersQuery = query(
+            usersCollection(),
+            where(documentId(), "!=", authStore.user?.id),
+            where(documentId(), "in", userIdsToFetch.value),
+        );
+        const usersSnapshot = await getDocs(usersQuery);
+        users.value = usersSnapshot.docs.map((doc) => {
+            const userData = doc.data() as User;
+            return {
+                ...userData,
+                id: doc.id,
+            };
+        });
+    }
+
+    const fetchAndSetUsers = async () => {
+        await fetchUserPropertyMap();
         if (propertiesIds.value.length > 0) {
-            const userIdsToFetch = await fetchUserIds(propertiesIds.value);
+            const userIdsToFetch = await fetchUserIds();
             if (userIdsToFetch.length > 0) {
-                users.value = await fetchUsers(userIdsToFetch, authStore.user?.id);
+                await fetchUsers();
             } else {
                 users.value = [];
             }
@@ -53,7 +68,7 @@ export function useUsers() {
         }
     };
 
-    watch(() => authStore.userPropertyMap, fetchAndUpdateUsers, { immediate: true });
+    watch(() => authStore.userPropertyMap, fetchAndSetUsers, { immediate: true });
 
-    return { users, fetchUserIds, fetchUsers };
+    return { users, fetchAndSetUsers };
 }
