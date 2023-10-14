@@ -5,30 +5,11 @@ import AddNewPropertyForm from "components/admin/property/AddNewPropertyForm.vue
 
 import { useQuasar } from "quasar";
 import { loadingWrapper, showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
-import { documentId, where } from "firebase/firestore";
-import { PropertyDoc } from "@firetable/types";
-import { useAuthStore } from "stores/auth-store";
-import { createNewProperty, deleteProperty, propertiesCollection } from "@firetable/backend";
-import { computed, ref, watchEffect } from "vue";
-import { takeProp } from "@firetable/utils";
+import { createNewProperty, deleteProperty } from "@firetable/backend";
+import { useProperties } from "src/composables/useProperties";
 
-const authStore = useAuthStore();
 const quasar = useQuasar();
-const propertyIds = computed(() => {
-    return authStore.userPropertyMap.map(takeProp("propertyId"));
-});
-const properties = ref<PropertyDoc[]>([]);
-
-watchEffect(async () => {
-    if (propertyIds.value.length) {
-        const res = useFirestoreCollection<PropertyDoc>(
-            createQuery(propertiesCollection(), where(documentId(), "in", propertyIds.value)),
-        );
-        await res.promise.value;
-        properties.value = res.data.value;
-    }
-});
+const { properties, fetchProperties } = useProperties();
 
 function onPropertyCreate(propertyName: string) {
     return tryCatchLoadingWrapper({
@@ -37,12 +18,14 @@ function onPropertyCreate(propertyName: string) {
                 name: propertyName,
             });
             quasar.notify("Property created!");
+            void fetchProperties();
         },
     });
 }
 
-const onDeleteProperty = loadingWrapper((id: string) => {
-    return deleteProperty(id);
+const onDeleteProperty = loadingWrapper(async (id: string) => {
+    await deleteProperty(id);
+    await fetchProperties();
 });
 
 async function deletePropertyAsync(propertyId: string, reset: () => void): Promise<void> {

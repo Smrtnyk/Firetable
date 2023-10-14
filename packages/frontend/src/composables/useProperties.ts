@@ -16,6 +16,7 @@ export function useProperties() {
     onMounted(fetchProperties);
 
     return {
+        fetchProperties,
         properties,
         isLoading,
     };
