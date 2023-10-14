@@ -1,7 +1,7 @@
 import { Dialog, Loading } from "quasar";
 import { isString, NOOP } from "@firetable/utils";
 
-export function showConfirm(title: string, message = "Confirm delete?") {
+export function showConfirm(title: string, message = "") {
     const options = {
         title,
         message,

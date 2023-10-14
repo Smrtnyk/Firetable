@@ -3,28 +3,17 @@ import AddNewFloorForm from "components/Floor/AddNewFloorForm.vue";
 import FTTitle from "components/FTTitle.vue";
 import FTDialog from "components/FTDialog.vue";
 
-import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { Loading, useQuasar } from "quasar";
 import { makeRawFloor } from "@firetable/floor-creator";
 import { FloorDoc } from "@firetable/types";
 import { addFloor, deleteFloor } from "@firetable/backend";
-import { useRouter } from "vue-router";
 import { useFloors } from "src/composables/useFloors";
 import { onMounted } from "vue";
 import { takeProp } from "@firetable/utils";
 
 const quasar = useQuasar();
-const router = useRouter();
 const { floors, isLoading, loadingPromise } = useFloors();
-
-async function onFloorDelete(id: string) {
-    if (!(await showConfirm("Delete floor?"))) return;
-
-    await tryCatchLoadingWrapper({
-        hook: () => deleteFloor(id),
-        errorHook: showErrorMessage,
-    });
-}
 
 function showAddNewFloorForm(propertyId: string, floors: FloorDoc[]): void {
     const dialog = quasar.dialog({
@@ -47,57 +36,23 @@ function showAddNewFloorForm(propertyId: string, floors: FloorDoc[]): void {
     });
 }
 
-function duplicateFloor(floor: FloorDoc) {
+async function duplicateFloor(floor: FloorDoc, reset: () => void) {
+    if (!(await showConfirm(`Are you sure you want to duplicate "${floor.name}" floor plan?`)))
+        return reset();
+
     const duplicatedFloor = { ...floor, name: `${floor.name}_copy` };
     return tryCatchLoadingWrapper({
         hook: () => addFloor(duplicatedFloor),
+    }).finally(reset);
+}
+
+async function onFloorDelete(id: string, reset: () => void) {
+    if (!(await showConfirm("Delete floor?"))) return reset();
+
+    await tryCatchLoadingWrapper({
+        hook: () => deleteFloor(id),
+        errorHook: reset,
     });
-}
-
-function onFloorItemClick(floor: FloorDoc) {
-    const actions = [
-        {
-            label: "Delete",
-            icon: "trash",
-            handler: () => onFloorDelete(floor.id),
-        },
-        {
-            label: "Duplicate",
-            icon: "copy",
-            handler: () => duplicateFloor(floor),
-        },
-    ];
-
-    quasar
-        .bottomSheet({
-            message: "Choose action",
-            grid: true,
-            actions,
-        })
-        .onOk(function (action) {
-            action.handler(floor);
-        });
-}
-
-let pressTimer: number | null = null;
-let longPressTriggered = false;
-
-function handleMouseDown(floor: FloorDoc) {
-    longPressTriggered = false;
-    pressTimer = setTimeout(() => {
-        longPressTriggered = true;
-        onFloorItemClick(floor);
-    }, 1000); // 1000ms = 1s long press
-}
-
-function handleMouseUp(floor: FloorDoc) {
-    if (pressTimer !== null) clearTimeout(pressTimer);
-    if (!longPressTriggered) {
-        router.push({
-            name: "adminFloorEdit",
-            params: { floorID: floor.id },
-        });
-    }
 }
 
 onMounted(async () => {
@@ -120,22 +75,37 @@ onMounted(async () => {
 
             <div class="q-mb-md">
                 <!-- If the property has floors, display them -->
-                <q-list v-if="propertyData.floors.length" bordered separator>
-                    <!-- Inner loop for floors of the current property -->
-                    <q-item
+                <q-list v-if="propertyData.floors.length">
+                    <q-slide-item
                         v-for="floor in propertyData.floors"
                         :key="floor.id"
-                        @mousedown="() => handleMouseDown(floor)"
-                        @mouseup="() => handleMouseUp(floor)"
-                        @touchstart="() => handleMouseDown(floor)"
-                        @touchend="() => handleMouseUp(floor)"
-                        clickable
-                        v-ripple
+                        right-color="red"
+                        left-color="green"
+                        @right="({ reset }) => onFloorDelete(floor.id, reset)"
+                        @left="({ reset }) => duplicateFloor(floor, reset)"
+                        class="fa-card"
                     >
-                        <q-item-section>
-                            <q-item-label>{{ floor.name }}</q-item-label>
-                        </q-item-section>
-                    </q-item>
+                        <template #right>
+                            <q-icon name="trash" />
+                        </template>
+                        <template #left>
+                            <q-icon name="copy" />
+                        </template>
+                        <q-item
+                            v-ripple
+                            clickable
+                            :to="{
+                                name: 'adminFloorEdit',
+                                params: {
+                                    floorID: floor.id,
+                                },
+                            }"
+                        >
+                            <q-item-section>
+                                <q-item-label>{{ floor.name }}</q-item-label>
+                            </q-item-section>
+                        </q-item>
+                    </q-slide-item>
                 </q-list>
 
                 <!-- If the property doesn't have floors, display a standout message -->
