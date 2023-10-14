@@ -43,6 +43,8 @@ const addNewElementsBottomSheetOptions = {
     actions: ELEMENTS_TO_ADD_COLLECTION,
 };
 
+const NON_TABLE_EL_TO_ADD = [ElementTag.SOFA, ElementTag.DJ_BOOTH, ElementTag.WALL];
+
 const props = defineProps<Props>();
 const router = useRouter();
 const q = useQuasar();
@@ -113,52 +115,36 @@ function onFloorChange(prop: keyof Floor, event: null | number | string) {
     }
 }
 
-function handleAddNewElement(floor: Floor, coords: NumberTuple) {
-    return function ({ elementDescriptor }: BottomSheetTableClickResult) {
-        const [x, y] = coords;
-        const { tag } = elementDescriptor;
-
-        if (tag === ElementTag.WALL) {
-            return floor.addElement({
-                x,
-                y,
-                tag: ElementTag.WALL,
-            });
-        }
-
-        if (tag === ElementTag.SOFA) {
-            return floor.addElement({
-                x,
-                y,
-                tag: ElementTag.SOFA,
-            });
-        }
-
-        if (tag === ElementTag.DJ_BOOTH) {
-            return floor.addElement({
-                x,
-                y,
-                tag: ElementTag.DJ_BOOTH,
-            });
-        }
-
-        const dialog = q.dialog({
-            component: FTDialog,
-            componentProps: {
-                component: AddTableDialog,
-                maximized: false,
-                title: "Table ID",
-                componentPropsObject: {
-                    ids: new Set(extractAllTablesLabels(floor)),
-                },
-                listeners: {
-                    create: function (label: string) {
-                        dialog.hide();
-                        floor.addElement({ label, x, y, tag });
-                    },
+function showTableDialog(floor: Floor, [x, y]: NumberTuple, tag: ElementTag) {
+    const dialog = q.dialog({
+        component: FTDialog,
+        componentProps: {
+            component: AddTableDialog,
+            maximized: false,
+            title: "Table ID",
+            componentPropsObject: {
+                ids: new Set(extractAllTablesLabels(floor)),
+            },
+            listeners: {
+                create: function (label: string) {
+                    dialog.hide();
+                    floor.addElement({ label, x, y, tag });
                 },
             },
-        });
+        },
+    });
+}
+
+function handleAddNewElement(floor: Floor, [x, y]: NumberTuple) {
+    return function ({ elementDescriptor }: BottomSheetTableClickResult) {
+        const { tag } = elementDescriptor;
+
+        if (NON_TABLE_EL_TO_ADD.includes(tag)) {
+            floor.addElement({ x, y, tag });
+            return;
+        }
+
+        showTableDialog(floor, [x, y], tag);
     };
 }
 
