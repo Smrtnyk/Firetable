@@ -3,11 +3,16 @@ import { usersCollection } from "./db.js";
 import { httpsCallable } from "firebase/functions";
 import { doc, updateDoc } from "firebase/firestore";
 import { signOut, signInWithEmailAndPassword, UserCredential } from "firebase/auth";
-import { CreateUserPayload } from "@firetable/types";
+import { CreateUserPayload, EditUserPayload } from "@firetable/types";
 
 export function createUserWithEmail(payload: CreateUserPayload) {
     const { functions } = initializeFirebase();
     return httpsCallable(functions, "createUser")(payload);
+}
+
+export function updateUser(payload: EditUserPayload) {
+    const { functions } = initializeFirebase();
+    return httpsCallable(functions, "updateUser")(payload);
 }
 
 export function updateUserField<T extends keyof CreateUserPayload["user"]>(

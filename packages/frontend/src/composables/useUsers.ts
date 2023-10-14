@@ -70,5 +70,5 @@ export function useUsers() {
 
     watch(() => propertiesIds, fetchAndSetUsers, { immediate: true });
 
-    return { users, fetchAndSetUsers };
+    return { users, fetchAndSetUsers, fetchUsers };
 }

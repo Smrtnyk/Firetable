@@ -12,6 +12,7 @@ import { createPropertyFn } from "./callable/create-property/create-property.js"
 import { deleteDocument } from "./delete-document/index.js";
 import { db } from "./init.js";
 import { logger } from "firebase-functions";
+import { updateUserFn } from "./callable/update-user.js";
 
 // setVapidDetails(vapidKeys.subject, vapidKeys.publicKey, vapidKeys.privateKey);
 
@@ -38,6 +39,10 @@ export const createUser = functions
     .region("europe-west3")
     .https
     .onCall(createUserFn);
+export const updateUser = functions
+    .region("europe-west3")
+    .https
+    .onCall(updateUserFn);
 export const deleteUser = functions
     .region("europe-west3")
     .https

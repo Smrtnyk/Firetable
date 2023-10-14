@@ -20,6 +20,15 @@ export interface User {
     status: ACTIVITY_STATUS;
 }
 
+export interface EditUserPayload {
+    properties: string[];
+    userId: string;
+    updatedUser: {
+        role: string;
+        name: string;
+    };
+}
+
 export interface CreateUserPayload {
     user: User & {
         password: string;

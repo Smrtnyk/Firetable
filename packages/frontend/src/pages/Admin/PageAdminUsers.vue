@@ -6,14 +6,14 @@ import { computed } from "vue";
 import { config } from "src/config";
 import { useQuasar } from "quasar";
 import FTDialog from "components/FTDialog.vue";
-import { CreateUserPayload, User } from "@firetable/types";
+import { CreateUserPayload, EditUserPayload, User } from "@firetable/types";
 import { createUserWithEmail, deleteUser, updateUser } from "@firetable/backend";
 import { usePropertiesStore } from "stores/usePropertiesStore";
 import { useUsers } from "src/composables/useUsers";
 
 const { maxNumOfUsers } = config;
 const propertiesStore = usePropertiesStore();
-const { users, fetchAndSetUsers } = useUsers();
+const { users, fetchAndSetUsers, fetchUsers } = useUsers();
 const quasar = useQuasar();
 const usersStatus = computed(() => {
     return {
@@ -27,8 +27,9 @@ const onCreateUser = loadingWrapper(async (newUser: CreateUserPayload) => {
     await fetchAndSetUsers();
 });
 
-const onUpdateUser = loadingWrapper((userId: string, updatedUser: Partial<CreateUserPayload>) => {
-    return updateUser(userId, updatedUser);
+const onUpdateUser = loadingWrapper(async (updatedUser: EditUserPayload) => {
+    await updateUser(updatedUser);
+    await fetchUsers();
 });
 
 const onDeleteUser = loadingWrapper(async (id: string) => {
@@ -87,8 +88,10 @@ async function showEditUserDialog(user: User, reset: () => void) {
                 selectedProperties,
             },
             listeners: {
-                submit: (updatedUser: Partial<CreateUserPayload>) => {
-                    onUpdateUser(user.id, updatedUser).then(reset).catch(showErrorMessage);
+                submit: ({ user, properties }: CreateUserPayload) => {
+                    onUpdateUser({ userId: user.id, properties, updatedUser: user })
+                        .then(reset)
+                        .catch(showErrorMessage);
                     dialog.hide();
                 },
             },

@@ -66,6 +66,15 @@ export interface CreateUserPayload{
     properties: string[];
 }
 
+export interface EditUserPayload {
+    properties: string[];
+    userId: string;
+    updatedUser: {
+        role: string;
+        name: string;
+    };
+}
+
 export interface CreateEventForm {
     name: string;
     date: string;

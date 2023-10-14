@@ -3,7 +3,6 @@ export * from "./base.js";
 export * from "./db.js";
 export * from "./db-events.js";
 export * from "./db-floors.js";
-export * from "./db-users.js";
 export * from "./messaging.js";
 export * from "./paths.js";
 export * from "./db-properties.js";
