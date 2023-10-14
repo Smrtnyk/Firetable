@@ -1,7 +1,7 @@
 import {
     collection,
     doc,
-    query as firestoreQuery,
+    query,
     Query,
     DocumentData,
     setDoc,
@@ -40,5 +40,5 @@ export function getFirestoreDocument(path: string) {
 }
 
 export function createQuery<T>(collectionRef: any, ...queries: any[]) {
-    return firestoreQuery<T, DocumentData>(collectionRef, ...queries);
+    return query<T, DocumentData>(collectionRef, ...queries);
 }
