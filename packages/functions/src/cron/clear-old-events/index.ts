@@ -1,8 +1,8 @@
-import { deleteDocument } from "../delete-document/index.js";
-import { db } from "../init.js";
+import { deleteDocument } from "../../delete-document/index.js";
+import { db } from "../../init.js";
 import * as functions from "firebase-functions";
 import { firestore } from "firebase-admin";
-import { Collection } from "../../types/types.js";
+import { Collection } from "../../../types/types.js";
 
 const { logger } = functions;
 

@@ -1,7 +1,7 @@
 import * as functions from "firebase-functions";
-import { db, storage } from "../init.js";
+import { db, storage } from "../../init.js";
 import stream from "stream";
-import { Collection, CreateEventPayload } from "../../types/types.js";
+import { Collection, CreateEventPayload } from "../../../types/types.js";
 
 const { logger } = functions;
 

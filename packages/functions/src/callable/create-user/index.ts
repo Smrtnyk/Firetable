@@ -1,5 +1,5 @@
-import { ACTIVITY_STATUS, Collection, CreateUserPayload } from "../../types/types.js";
-import { auth, db } from "../init.js";
+import { ACTIVITY_STATUS, Collection, CreateUserPayload } from "../../../types/types.js";
+import { auth, db } from "../../init.js";
 import * as functions from "firebase-functions";
 
 export async function createUser(user: CreateUserPayload): Promise<{uid: string, message: string}> {

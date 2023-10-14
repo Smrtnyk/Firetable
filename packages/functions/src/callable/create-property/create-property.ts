@@ -1,6 +1,6 @@
 import * as functions from "firebase-functions";
-import { db } from "../init.js";
-import { Collection } from "../../types/types.js";
+import { db } from "../../init.js";
+import { Collection } from "../../../types/types.js";
 
 interface Data {
     name: string;

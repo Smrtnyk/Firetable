@@ -1,14 +1,14 @@
 import * as functions from "firebase-functions";
 // import * as vapidKeys from "./vapid-keys.json";
 // import { setVapidDetails } from "web-push";
-import { handleReservation } from "./handle-reservation/index.js";
-import { handleEventImageWhenEventDeleted as handleEventImageWhenEventDeletedFn } from "./handle-event-image-when-event-deleted/index.js";
-import { createEvent as createEventFn } from "./create-event/index.js";
-import { createUser as createUserFn } from "./create-user/index.js";
-import { deleteUser as deleteUserFn } from "./delete-user/index.js";
-import { clearOldEvents as clearOldEventsFn } from "./clear-old-events/index.js";
+import { handleReservation } from "./trigger/handle-reservation/index.js";
+import { handleEventImageWhenEventDeleted as handleEventImageWhenEventDeletedFn } from "./trigger/handle-event-image-when-event-deleted/index.js";
+import { createEvent as createEventFn } from "./callable/create-event/index.js";
+import { createUser as createUserFn } from "./callable/create-user/index.js";
+import { deleteUser as deleteUserFn } from "./callable/delete-user/index.js";
+import { clearOldEvents as clearOldEventsFn } from "./cron/clear-old-events/index.js";
 import { Collection } from "../types/types.js";
-import { createPropertyFn } from "./property/create-property.js";
+import { createPropertyFn } from "./callable/create-property/create-property.js";
 import { deleteDocument } from "./delete-document/index.js";
 import { db } from "./init.js";
 
