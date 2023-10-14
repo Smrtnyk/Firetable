@@ -9,54 +9,75 @@ export function useUsers() {
     const users = ref<User[]>([]);
     const propertiesIds = ref<string[]>([]);
     const userIdsToFetch = ref<string[]>([]);
+    const isLoading = ref<boolean>(false); // New isLoading ref
 
     async function fetchUserPropertyMap() {
-        const userPropertyMapQuery = query(
-            userPropertyMapCollection(),
-            where("userId", "==", authStore.user?.id),
-        );
+        isLoading.value = true;
+        try {
+            const userPropertyMapQuery = query(
+                userPropertyMapCollection(),
+                where("userId", "==", authStore.user?.id),
+            );
 
-        const snapshot = await getDocs(userPropertyMapQuery);
-        const properties: UserPropertyMapDoc[] = snapshot.docs.map(
-            (doc) => doc.data() as UserPropertyMapDoc,
-        );
-        propertiesIds.value = properties.map((map) => {
-            return map.propertyId;
-        });
+            const snapshot = await getDocs(userPropertyMapQuery);
+            const properties: UserPropertyMapDoc[] = snapshot.docs.map(
+                (doc) => doc.data() as UserPropertyMapDoc,
+            );
+            propertiesIds.value = properties.map((map) => {
+                return map.propertyId;
+            });
+        } finally {
+            isLoading.value = false;
+        }
     }
 
     async function fetchUserIds(): Promise<string[]> {
-        const userPropertyMapQuery = query(
-            userPropertyMapCollection(),
-            where("propertyId", "in", propertiesIds.value),
-        );
-        const userPropertyMapSnapshot = await getDocs(userPropertyMapQuery);
-        const allUsersIdsDocs = userPropertyMapSnapshot.docs.map(
-            (doc) => doc.data() as UserPropertyMapDoc,
-        );
-        userIdsToFetch.value = allUsersIdsDocs.map((map) => map.userId);
-        return userIdsToFetch.value;
+        isLoading.value = true;
+        try {
+            const userPropertyMapQuery = query(
+                userPropertyMapCollection(),
+                where("propertyId", "in", propertiesIds.value),
+            );
+            const userPropertyMapSnapshot = await getDocs(userPropertyMapQuery);
+            const allUsersIdsDocs = userPropertyMapSnapshot.docs.map(
+                (doc) => doc.data() as UserPropertyMapDoc,
+            );
+            userIdsToFetch.value = allUsersIdsDocs.map((map) => map.userId);
+            return userIdsToFetch.value;
+        } finally {
+            isLoading.value = false;
+        }
     }
 
     async function fetchUsers(): Promise<void> {
-        users.value = (await fetchUsersByRole([...new Set(userIdsToFetch.value)])).data;
+        isLoading.value = true;
+        try {
+            users.value = (await fetchUsersByRole([...new Set(userIdsToFetch.value)])).data;
+        } finally {
+            isLoading.value = false;
+        }
     }
 
     const fetchAndSetUsers = async () => {
-        await fetchUserPropertyMap();
-        if (propertiesIds.value.length > 0) {
-            const userIdsToFetch = await fetchUserIds();
-            if (userIdsToFetch.length > 0) {
-                await fetchUsers();
+        isLoading.value = true;
+        try {
+            await fetchUserPropertyMap();
+            if (propertiesIds.value.length > 0) {
+                const userIdsToFetch = await fetchUserIds();
+                if (userIdsToFetch.length > 0) {
+                    await fetchUsers();
+                } else {
+                    users.value = [];
+                }
             } else {
                 users.value = [];
             }
-        } else {
-            users.value = [];
+        } finally {
+            isLoading.value = false;
         }
     };
 
     watch(() => propertiesIds, fetchAndSetUsers, { immediate: true });
 
-    return { users, fetchAndSetUsers, fetchUsers };
+    return { users, fetchAndSetUsers, fetchUsers, isLoading };
 }

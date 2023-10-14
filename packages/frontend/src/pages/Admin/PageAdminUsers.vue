@@ -2,9 +2,9 @@
 import UserCreateForm from "components/admin/User/UserCreateForm.vue";
 import FTTitle from "components/FTTitle.vue";
 import { loadingWrapper, showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
-import { computed } from "vue";
+import { computed, watch } from "vue";
 import { config } from "src/config";
-import { useQuasar } from "quasar";
+import { Loading, useQuasar } from "quasar";
 import FTDialog from "components/FTDialog.vue";
 import { CreateUserPayload, EditUserPayload, User } from "@firetable/types";
 import { createUserWithEmail, deleteUser, updateUser } from "@firetable/backend";
@@ -13,7 +13,7 @@ import { useUsers } from "src/composables/useUsers";
 
 const { maxNumOfUsers } = config;
 const propertiesStore = usePropertiesStore();
-const { users, fetchAndSetUsers, fetchUsers } = useUsers();
+const { users, isLoading, fetchAndSetUsers, fetchUsers } = useUsers();
 const quasar = useQuasar();
 const usersStatus = computed(() => {
     return {
@@ -35,6 +35,14 @@ const onUpdateUser = loadingWrapper(async (updatedUser: EditUserPayload) => {
 const onDeleteUser = loadingWrapper(async (id: string) => {
     await deleteUser(id);
     await fetchAndSetUsers();
+});
+
+watch(isLoading, (loading) => {
+    if (loading) {
+        Loading.show();
+    } else {
+        Loading.hide();
+    }
 });
 
 function onCreateUserFormSubmit(newUser: CreateUserPayload) {
