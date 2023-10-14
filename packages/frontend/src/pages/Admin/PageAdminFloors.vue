@@ -9,11 +9,22 @@ import { makeRawFloor } from "@firetable/floor-creator";
 import { FloorDoc } from "@firetable/types";
 import { addFloor, deleteFloor } from "@firetable/backend";
 import { useFloors } from "src/composables/useFloors";
-import { onMounted } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { takeProp } from "@firetable/utils";
 
 const quasar = useQuasar();
 const { floors, isLoading, loadingPromise } = useFloors();
+const activeTab = ref("");
+
+watch(
+    floors,
+    (newFloors) => {
+        if (Object.keys(newFloors).length && !activeTab.value) {
+            activeTab.value = Object.keys(newFloors)[0];
+        }
+    },
+    { immediate: true, deep: true },
+);
 
 function showAddNewFloorForm(propertyId: string, floors: FloorDoc[]): void {
     const dialog = quasar.dialog({
@@ -66,14 +77,23 @@ onMounted(async () => {
     <div class="PageAdminFloors">
         <FTTitle title="Floors" />
 
-        <!-- Outer loop for properties -->
-        <div v-for="(propertyData, propertyKey) in floors" :key="propertyKey">
-            <!-- Display property name -->
-            <div class="property-title text-h5 q-mt-md">
-                {{ propertyData.propertyName }}
-            </div>
+        <!-- Tabs for each property -->
+        <q-tabs v-model="activeTab" align="left" active-color="primary" indicator-color="primary">
+            <q-tab
+                v-for="(propertyData, propertyKey) in floors"
+                :key="propertyKey"
+                :name="propertyKey"
+                :label="propertyData.propertyName"
+            />
+        </q-tabs>
 
-            <div class="q-mb-md">
+        <!-- Tab panels for each property's floors -->
+        <q-tab-panels v-model="activeTab">
+            <q-tab-panel
+                v-for="(propertyData, propertyKey) in floors"
+                :key="propertyKey"
+                :name="propertyKey"
+            >
                 <!-- If the property has floors, display them -->
                 <q-list v-if="propertyData.floors.length">
                     <q-slide-item
@@ -112,18 +132,19 @@ onMounted(async () => {
                 <div v-else class="no-floor-message text-h6 bg-grey-9 q-pa-sm rounded-borders">
                     This property has no floors.
                 </div>
-            </div>
-            <!-- Button to add a new floor for every property -->
-            <div class="add-floor-btn row justify-end">
-                <q-btn
-                    rounded
-                    icon="plus"
-                    class="button-gradient"
-                    @click="showAddNewFloorForm(propertyData.propertyId, propertyData.floors)"
-                    label="Add New Floor"
-                />
-            </div>
-        </div>
+
+                <!-- Button to add a new floor for the property in the active tab -->
+                <div class="add-floor-btn row justify-end">
+                    <q-btn
+                        rounded
+                        icon="plus"
+                        class="button-gradient"
+                        @click="showAddNewFloorForm(propertyData.propertyId, propertyData.floors)"
+                        label="Add New Floor"
+                    />
+                </div>
+            </q-tab-panel>
+        </q-tab-panels>
 
         <!-- Show "no properties" message when there are no properties and isLoading is false -->
         <div
