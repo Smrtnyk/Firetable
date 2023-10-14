@@ -1,4 +1,4 @@
-import { ref, watchEffect, computed } from "vue";
+import { ref, watch, computed } from "vue";
 import { query, where, getDocs, documentId } from "firebase/firestore";
 import { User, UserPropertyMapDoc } from "@firetable/types";
 import { useAuthStore } from "src/stores/auth-store";
@@ -24,7 +24,13 @@ async function fetchUsers(userIdsToFetch: string[], excludeId?: string): Promise
         where(documentId(), "in", userIdsToFetch),
     );
     const usersSnapshot = await getDocs(usersQuery);
-    return usersSnapshot.docs.map((doc) => doc.data() as User);
+    return usersSnapshot.docs.map((doc) => {
+        const userData = doc.data() as User;
+        return {
+            ...userData,
+            id: doc.id,
+        };
+    });
 }
 
 export function useUsers() {
@@ -34,7 +40,7 @@ export function useUsers() {
         return authStore.userPropertyMap.map((map) => map.propertyId) || [];
     });
 
-    watchEffect(async () => {
+    const fetchAndUpdateUsers = async () => {
         if (propertiesIds.value.length > 0) {
             const userIdsToFetch = await fetchUserIds(propertiesIds.value);
             if (userIdsToFetch.length > 0) {
@@ -45,7 +51,9 @@ export function useUsers() {
         } else {
             users.value = [];
         }
-    });
+    };
+
+    watch(() => authStore.userPropertyMap, fetchAndUpdateUsers, { immediate: true });
 
     return { users, fetchUserIds, fetchUsers };
 }
