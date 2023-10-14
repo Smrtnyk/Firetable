@@ -1,9 +1,9 @@
 import { initializeFirebase } from "./base.js";
 import { usersCollection } from "./db.js";
-import { httpsCallable } from "firebase/functions";
+import { httpsCallable, HttpsCallableResult } from "firebase/functions";
 import { doc, updateDoc } from "firebase/firestore";
 import { signOut, signInWithEmailAndPassword, UserCredential } from "firebase/auth";
-import { CreateUserPayload, EditUserPayload } from "@firetable/types";
+import { CreateUserPayload, EditUserPayload, User } from "@firetable/types";
 
 export function createUserWithEmail(payload: CreateUserPayload) {
     const { functions } = initializeFirebase();
@@ -39,4 +39,9 @@ export function logoutUser() {
 export function loginWithEmail(email: string, password: string): Promise<UserCredential> {
     const { auth } = initializeFirebase();
     return signInWithEmailAndPassword(auth, email, password);
+}
+
+export function fetchUsersByRole(userIdsToFetch: string[]): Promise<HttpsCallableResult<User[]>> {
+    const { functions } = initializeFirebase();
+    return httpsCallable<string[], User[]>(functions, "fetchUsersByRole")(userIdsToFetch);
 }

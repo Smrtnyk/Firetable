@@ -13,6 +13,7 @@ import { deleteDocument } from "./delete-document/index.js";
 import { db } from "./init.js";
 import { logger } from "firebase-functions";
 import { updateUserFn } from "./callable/update-user.js";
+import { fetchUsersByRoleFn } from "./callable/fetch-users-by-role.js";
 
 // setVapidDetails(vapidKeys.subject, vapidKeys.publicKey, vapidKeys.privateKey);
 
@@ -35,6 +36,10 @@ export const handleWhenEventTablesChange = functions
     .onUpdate(handleReservation);
 
 // Everything that has to do with auth
+export const fetchUsersByRole = functions
+    .region("europe-west3")
+    .https
+    .onCall(fetchUsersByRoleFn);
 export const createUser = functions
     .region("europe-west3")
     .https
@@ -47,7 +52,9 @@ export const deleteUser = functions
     .region("europe-west3")
     .https
     .onCall(deleteUserFn);
-export const onUserDeleted = functions.firestore
+export const onUserDeleted = functions
+    .region("europe-west3")
+    .firestore
     .document(`${Collection.USERS}/{userId}`)
     .onDelete(async (snap, context) => {
         const userId = context.params.userId;
@@ -87,7 +94,9 @@ export const createProperty = functions
     .region("europe-west3")
     .https
     .onCall(createPropertyFn);
-export const onPropertyDelete = functions.firestore
+export const onPropertyDelete = functions
+    .region("europe-west3")
+    .firestore
     .document(`${Collection.PROPERTIES}/{propertyId}`)
     .onDelete(async (snap, context) => {
         const propertyId = context.params.propertyId;

@@ -1,8 +1,8 @@
 import { ref, watch } from "vue";
-import { documentId, getDocs, query, where } from "firebase/firestore";
+import { getDocs, query, where } from "firebase/firestore";
 import { User, UserPropertyMapDoc } from "@firetable/types";
 import { useAuthStore } from "src/stores/auth-store";
-import { userPropertyMapCollection, usersCollection } from "@firetable/backend";
+import { fetchUsersByRole, userPropertyMapCollection } from "@firetable/backend";
 
 export function useUsers() {
     const authStore = useAuthStore();
@@ -39,19 +39,7 @@ export function useUsers() {
     }
 
     async function fetchUsers(): Promise<void> {
-        const usersQuery = query(
-            usersCollection(),
-            where(documentId(), "!=", authStore.user?.id),
-            where(documentId(), "in", userIdsToFetch.value),
-        );
-        const usersSnapshot = await getDocs(usersQuery);
-        users.value = usersSnapshot.docs.map((doc) => {
-            const userData = doc.data() as User;
-            return {
-                ...userData,
-                id: doc.id,
-            };
-        });
+        users.value = (await fetchUsersByRole([...new Set(userIdsToFetch.value)])).data;
     }
 
     const fetchAndSetUsers = async () => {

@@ -1,10 +1,18 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { noEmptyString, noWhiteSpaces } from "src/helpers/form-rules";
 import { PROJECT_MAIL } from "src/config";
-import { ACTIVITY_STATUS, CreateUserPayload, PropertyDoc, Role, User } from "@firetable/types";
+import {
+    ACTIVITY_STATUS,
+    ADMIN,
+    CreateUserPayload,
+    PropertyDoc,
+    Role,
+    User,
+} from "@firetable/types";
 import { QForm } from "quasar";
 import { showErrorMessage } from "src/helpers/ui-helpers";
+import { useAuthStore } from "stores/auth-store";
 
 interface Props {
     properties: PropertyDoc[];
@@ -17,6 +25,7 @@ type Emits = (
     payload: { user: CreateUserPayload["user"] | User; properties: string[] },
 ) => void;
 
+const authStore = useAuthStore();
 const emit = defineEmits<Emits>();
 const props = defineProps<Props>();
 const userCreateForm = ref<QForm>();
@@ -31,10 +40,22 @@ const userSkeleton: CreateUserPayload["user"] = {
     role: Role.STAFF,
     status: ACTIVITY_STATUS.OFFLINE,
 };
+
 const form = ref<CreateUserPayload["user"] | User>(
     props.user ? { ...props.user } : { ...userSkeleton },
 );
 const chosenProperties = ref<string[]>([]);
+const isPropertyOwner = computed(() => form.value.role === Role.PROPERTY_OWNER);
+const isAdmin = computed(() => {
+    return authStore.user?.role === ADMIN;
+});
+const availableRoles = computed(() => {
+    if (isAdmin.value) {
+        return Object.values(Role);
+    } else {
+        return Object.values(Role).filter((role) => role !== Role.PROPERTY_OWNER);
+    }
+});
 
 if (props.selectedProperties) {
     chosenProperties.value = props.selectedProperties.map((p) => p.id);
@@ -121,13 +142,13 @@ function onReset() {
 
             <q-select
                 v-model="form.role"
-                hint="Assign role to user, default is waiter."
+                hint="Assign role to user, default is Staff."
                 standout
                 rounded
-                :options="Object.values(Role)"
+                :options="availableRoles"
                 label="Role"
             />
-            <div class="q-gutter-sm q-mb-lg">
+            <div v-if="!isPropertyOwner" class="q-gutter-sm q-mb-lg">
                 <div>Properties:</div>
                 <div>
                     <q-checkbox

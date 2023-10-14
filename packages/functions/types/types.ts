@@ -66,6 +66,15 @@ export interface CreateUserPayload{
     properties: string[];
 }
 
+export interface User {
+    id: string;
+    name: string;
+    email: string;
+    username: string;
+    role: Role | typeof ADMIN;
+    status: ACTIVITY_STATUS;
+}
+
 export interface EditUserPayload {
     properties: string[];
     userId: string;
