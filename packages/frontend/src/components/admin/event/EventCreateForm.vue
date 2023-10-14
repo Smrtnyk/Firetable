@@ -9,7 +9,7 @@ import { date } from "quasar";
 import { resizeImage } from "src/helpers/image-tools";
 import { CreateEventForm, CreateEventPayload } from "@firetable/types";
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import { UsePropertyFloors } from "src/composables/useFloors";
+import { PropertyFloors } from "src/composables/useFloors";
 
 interface State {
     form: CreateEventForm;
@@ -20,7 +20,7 @@ interface State {
 }
 
 interface Props {
-    floors: UsePropertyFloors;
+    property: PropertyFloors;
 }
 
 const { formatDate } = date;
@@ -50,14 +50,11 @@ const state = reactive<State>({
 });
 
 const totalFloors = computed(() => {
-    return Object.values(props.floors).reduce(
-        (acc, propertyFloors) => acc + propertyFloors.floors.length,
-        0,
-    );
+    return props.property.floors.length;
 });
 
 onMounted(() => {
-    console.log(props.floors);
+    console.log(props.property.floors);
 });
 
 function onSubmit() {
@@ -66,9 +63,9 @@ function onSubmit() {
         return;
     }
 
-    const selectedFloor = Object.values(props.floors)
-        .flatMap((propertyFloors) => propertyFloors.floors)
-        .find((floor) => floor.id === state.chosenFloor);
+    const selectedFloor = Object.values(props.property.floors).find(
+        (floor) => floor.id === state.chosenFloor,
+    );
 
     if (!selectedFloor) {
         showErrorMessage("Selected floor not found.");
@@ -208,15 +205,11 @@ async function onFileChosen(chosenFile: File) {
                 </template>
             </q-input>
 
-            <div
-                class="q-gutter-sm q-mb-lg"
-                v-for="(propertyFloors, propertyKey) in props.floors"
-                :key="propertyKey"
-            >
-                <div class="text-h6">{{ propertyFloors.propertyName }}</div>
+            <div class="q-gutter-sm q-mb-lg">
+                <div class="text-h6">{{ props.property.propertyName }}</div>
                 <div>
                     <q-radio
-                        v-for="floor in propertyFloors.floors"
+                        v-for="floor in props.property.floors"
                         :key="floor.id"
                         v-model="state.chosenFloor"
                         :val="floor.id"

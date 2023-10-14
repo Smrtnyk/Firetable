@@ -8,7 +8,7 @@ import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { nextTick, ref, watch } from "vue";
 import { useQuasar } from "quasar";
 import { useRouter } from "vue-router";
-import { CreateEventPayload, EventDoc } from "@firetable/types";
+import { CreateEventPayload, EventDoc, PropertyDoc } from "@firetable/types";
 import { createNewEvent, deleteEvent } from "@firetable/backend";
 import { takeLast } from "@firetable/utils";
 import { useFloors } from "src/composables/useFloors";
@@ -104,7 +104,7 @@ async function onLoad(propertyId: string, done: (stop: boolean) => void) {
     done(true);
 }
 
-function showCreateEventForm(): void {
+function showCreateEventForm(property: PropertyDoc): void {
     quasar.dialog({
         component: FTDialog,
         componentProps: {
@@ -112,7 +112,7 @@ function showCreateEventForm(): void {
             maximized: false,
             component: EventCreateForm,
             componentPropsObject: {
-                floors: floors.value,
+                property: floors.value[property.id],
             },
             listeners: {
                 create: onCreateEvent,
@@ -124,17 +124,7 @@ function showCreateEventForm(): void {
 
 <template>
     <div class="PageAdminEvents">
-        <FTTitle title="Events">
-            <template #right>
-                <q-btn
-                    rounded
-                    icon="plus"
-                    class="button-gradient"
-                    @click="showCreateEventForm"
-                    label="new event"
-                />
-            </template>
-        </FTTitle>
+        <FTTitle title="Events" />
 
         <div
             v-if="properties.length === 0 && !isLoading"
@@ -162,6 +152,13 @@ function showCreateEventForm(): void {
                         :key="property.id"
                         :name="property.id"
                     >
+                        <q-btn
+                            rounded
+                            icon="plus"
+                            class="button-gradient"
+                            @click="showCreateEventForm(property)"
+                            label="new event"
+                        />
                         <AdminPropertyEventsList
                             :property-id="property.id"
                             :events-by-property="eventsByProperty"
