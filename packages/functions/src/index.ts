@@ -2,7 +2,7 @@ import * as functions from "firebase-functions";
 // import * as vapidKeys from "./vapid-keys.json";
 // import { setVapidDetails } from "web-push";
 import { handleReservation } from "./trigger/handle-reservation/index.js";
-import { handleEventImageWhenEventDeleted as handleEventImageWhenEventDeletedFn } from "./trigger/handle-event-image-when-event-deleted/index.js";
+import { deleteEventImage } from "./trigger/delete-event-image/index.js";
 import { createEvent as createEventFn } from "./callable/create-event/index.js";
 import { createUser as createUserFn } from "./callable/create-user/index.js";
 import { deleteUser as deleteUserFn } from "./callable/delete-user/index.js";
@@ -27,7 +27,7 @@ export const handleEventImageWhenEventDeleted = functions
     .region("europe-west3")
     .firestore
     .document(`${Collection.EVENTS}/{eventId}`)
-    .onDelete(handleEventImageWhenEventDeletedFn);
+    .onDelete(deleteEventImage);
 
 export const handleWhenEventTablesChange = functions
     .region("europe-west3")
