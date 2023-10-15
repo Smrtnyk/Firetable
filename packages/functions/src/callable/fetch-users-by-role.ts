@@ -30,9 +30,16 @@ export async function fetchUsersByRoleFn(userIdsToFetch: string[], context: any)
 
     functions.logger.log(`User ${uid} has role: ${userRole}`);
 
-    const baseQuery = db.collection(Collection.USERS)
-        .where(FieldPath.documentId(), "in", userIdsToFetch)
-        .where(FieldPath.documentId(), "!=", uid);
+    let baseQuery;
+
+    if (userRole === ADMIN) {
+        baseQuery = db.collection(Collection.USERS)
+            .where(FieldPath.documentId(), "!=", uid);
+    } else {
+        baseQuery = db.collection(Collection.USERS)
+            .where(FieldPath.documentId(), "in", userIdsToFetch)
+            .where(FieldPath.documentId(), "!=", uid);
+    }
 
     const snapshot = await baseQuery.get();
     let users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User));
@@ -60,3 +67,4 @@ export async function fetchUsersByRoleFn(userIdsToFetch: string[], context: any)
 
     return users;
 }
+

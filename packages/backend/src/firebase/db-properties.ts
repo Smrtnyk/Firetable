@@ -1,6 +1,6 @@
-import { PropertyDoc } from "@firetable/types";
+import { ADMIN, PropertyDoc } from "@firetable/types";
 import { deleteDoc, getDoc, getDocs, query, where } from "firebase/firestore";
-import { propertyDoc, userPropertyMapCollection } from "./db.js";
+import { propertiesCollection, propertyDoc, userPropertyMapCollection } from "./db.js";
 import { initializeFirebase } from "./base.js";
 import { httpsCallable } from "firebase/functions";
 
@@ -18,8 +18,17 @@ export function deleteProperty(propertyId: string) {
     return deleteDoc(propertyDoc(propertyId));
 }
 
-export async function fetchPropertiesForUser(userId: string): Promise<PropertyDoc[]> {
-    // First Query: Get all user-property mappings for a specific userId
+export async function fetchPropertiesForUser(
+    userId: string,
+    role?: string,
+): Promise<PropertyDoc[]> {
+    // If the user is an ADMIN, fetch all properties directly
+    if (role === ADMIN) {
+        const propertiesSnapshot = await getDocs(propertiesCollection());
+        return propertiesSnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }) as PropertyDoc);
+    }
+
+    // Existing logic for non-ADMIN users
     const userPropertyMapRef = userPropertyMapCollection();
     const userPropertiesQuery = query(userPropertyMapRef, where("userId", "==", userId));
     const userPropertiesSnapshot = await getDocs(userPropertiesQuery);
@@ -36,9 +45,7 @@ export async function fetchPropertiesForUser(userId: string): Promise<PropertyDo
         propertyIds.push(data.propertyId);
     });
 
-    // Second Query: Get all properties where propertyId is in propertyIds
     const properties: PropertyDoc[] = [];
-
     for (const propertyId of propertyIds) {
         const propertyRef = propertyDoc(propertyId);
         const propertyDocRes = await getDoc(propertyRef);
