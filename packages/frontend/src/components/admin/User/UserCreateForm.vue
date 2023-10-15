@@ -59,7 +59,8 @@ if (props.selectedProperties) {
 
 async function onSubmit() {
     if (!(await userCreateForm.value?.validate())) return;
-    if (!chosenProperties.value.length) {
+    const chosenRole = form.value.role;
+    if (chosenRole !== Role.PROPERTY_OWNER && !chosenProperties.value.length) {
         showErrorMessage("You must select at least one property!");
         return;
     }
