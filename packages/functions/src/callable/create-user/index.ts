@@ -1,6 +1,7 @@
 import { ACTIVITY_STATUS, Collection, CreateUserPayload } from "../../../types/types.js";
 import { auth, db } from "../../init.js";
 import * as functions from "firebase-functions";
+import { FieldValue } from "firebase-admin/firestore";
 
 /**
  * Creates a new user in Firebase Authentication and stores associated user information in Firestore.
@@ -29,8 +30,7 @@ import * as functions from "firebase-functions";
  * @throws - Throws appropriate errors for any other exceptions encountered during user creation or data storage.
  */
 export async function createUser(user: CreateUserPayload): Promise<{ uid: string, message: string }> {
-    const { name, password, email, role } = user.user;
-    const { properties } = user;
+    const { name, password, email, role, relatedProperties } = user;
 
     let createdUserUid: string | null = null;
 
@@ -47,7 +47,7 @@ export async function createUser(user: CreateUserPayload): Promise<{ uid: string
 
     try {
         const createdUser = await auth.createUser({ email, password });
-        createdUserUid = createdUser.uid; // Storing the UID for potential cleanup
+        createdUserUid = createdUser.uid;
         await auth.setCustomUserClaims(createdUser.uid, { role });
 
         const userDoc = {
@@ -55,25 +55,24 @@ export async function createUser(user: CreateUserPayload): Promise<{ uid: string
             email,
             role,
             status: ACTIVITY_STATUS.OFFLINE,
+            relatedProperties
         };
 
         await db.runTransaction(async (transaction) => {
             const userRef = db.collection(Collection.USERS).doc(createdUser.uid);
             transaction.set(userRef, userDoc);
 
-            properties.forEach(property => {
-                const entryRef = db.collection(Collection.USER_PROPERTY_MAP).doc();
-                transaction.set(entryRef, {
-                    userId: createdUser.uid,
-                    propertyId: property
+            for (const propertyId of relatedProperties) {
+                const propertyRef = db.collection(Collection.PROPERTIES).doc(propertyId);
+                transaction.update(propertyRef, {
+                    relatedUsers: FieldValue.arrayUnion(createdUser.uid)
                 });
-            });
+            }
         });
 
         return { uid: createdUser.uid, message: "User created successfully!" };
 
     } catch (e: any) {
-        // If we've created a user but failed at a later step, cleanup by deleting the created user
         if (createdUserUid) {
             await auth.deleteUser(createdUserUid);
         }

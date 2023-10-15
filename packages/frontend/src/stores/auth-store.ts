@@ -20,7 +20,6 @@ export const useAuthStore = defineStore("auth", {
             isReady: false,
             user: null,
             unsubscribeUserWatch: NOOP,
-            userPropertyMap: [],
         } as AuthState;
     },
     getters: {

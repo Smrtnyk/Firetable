@@ -1,6 +1,7 @@
 import { Collection, EditUserPayload } from "../../types/types.js";
 import { db } from "../init.js";
 import * as functions from "firebase-functions";
+import { FieldValue } from "firebase-admin/firestore";
 const { logger } = functions;
 
 /**
@@ -27,35 +28,29 @@ const { logger } = functions;
  * @returns Returns a promise that resolves once the user and their associated properties have been successfully updated in Firestore.
  */
 export async function updateUserFn(editUserPayload: EditUserPayload): Promise<void> {
-    const { updatedUser, userId, properties } = editUserPayload;
+    const { updatedUser, userId } = editUserPayload;
+    const { relatedProperties } = updatedUser;
 
     if (!userId) {
         throw new functions.https.HttpsError("invalid-argument", "User ID must be provided.");
     }
 
-    if (!updatedUser && (!properties || properties.length === 0)) {
+    if (!updatedUser && (!relatedProperties || relatedProperties.length === 0)) {
         throw new functions.https.HttpsError("invalid-argument", "No data provided to update.");
     }
 
     try {
-        // Retrieve existing property mappings first, outside of the transaction
-        const mappingsSnapshot = await db.collection(Collection.USER_PROPERTY_MAP).where("userId", "==", userId).get();
+        // Fetch the properties associated with this user by checking relatedUsers field
+        const existingPropertiesSnapshot = await db.collection(Collection.PROPERTIES)
+            .where("relatedUsers", "array-contains", userId)
+            .get();
 
-        const existingMappings = mappingsSnapshot.docs.map(function (doc) {
-            return { ref: doc.ref, propertyId: doc.data().propertyId };
-        });
+        const existingProperties = existingPropertiesSnapshot.docs.map(doc => doc.id);
 
-        const mappingsToAdd = properties.filter(function (id) {
-            return !existingMappings.some(function (mapping) {
-                return mapping.propertyId === id;
-            });
-        });
+        const propertiesToAdd = relatedProperties.filter(id => !existingProperties.includes(id));
+        const propertiesToRemove = existingProperties.filter(id => !relatedProperties.includes(id));
 
-        const mappingsToDelete = existingMappings.filter(function (mapping) {
-            return !properties.includes(mapping.propertyId);
-        });
-
-        await db.runTransaction(async function (transaction) {
+        await db.runTransaction(async transaction => {
             const userRef = db.collection(Collection.USERS).doc(userId);
 
             // Update the user's basic information if provided
@@ -63,15 +58,20 @@ export async function updateUserFn(editUserPayload: EditUserPayload): Promise<vo
                 transaction.update(userRef, updatedUser);
             }
 
-            // Add new mappings
-            for (const propertyId of mappingsToAdd) {
-                const newMappingRef = db.collection(Collection.USER_PROPERTY_MAP).doc();
-                transaction.set(newMappingRef, { userId, propertyId });
+            // Add the user to relatedUsers field of the property document for new associations
+            for (const propertyId of propertiesToAdd) {
+                const propertyRef = db.collection(Collection.PROPERTIES).doc(propertyId);
+                transaction.update(propertyRef, {
+                    relatedUsers: FieldValue.arrayUnion(userId)
+                });
             }
 
-            // Delete removed mappings
-            for (const mapping of mappingsToDelete) {
-                transaction.delete(mapping.ref);
+            // Remove the user from relatedUsers field of the property document for removed associations
+            for (const propertyId of propertiesToRemove) {
+                const propertyRef = db.collection(Collection.PROPERTIES).doc(propertyId);
+                transaction.update(propertyRef, {
+                    relatedUsers: FieldValue.arrayRemove(userId)
+                });
             }
         });
     } catch (error: any) {

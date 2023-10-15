@@ -9,11 +9,11 @@ import FTDialog from "components/FTDialog.vue";
 import { CreateUserPayload, EditUserPayload, User } from "@firetable/types";
 import { createUserWithEmail, deleteUser, updateUser } from "@firetable/backend";
 import { usePropertiesStore } from "stores/usePropertiesStore";
-import { useUsers } from "src/composables/useUsers";
+import { useAdminUsers } from "src/composables/useAdminUsers";
 
 const { maxNumOfUsers } = config;
 const propertiesStore = usePropertiesStore();
-const { users, isLoading, fetchAndSetUsers, fetchUsers } = useUsers();
+const { users, isLoading, fetchUsers } = useAdminUsers();
 const quasar = useQuasar();
 const usersStatus = computed(() => {
     return {
@@ -24,7 +24,7 @@ const usersStatus = computed(() => {
 
 const onCreateUser = loadingWrapper(async (newUser: CreateUserPayload) => {
     await createUserWithEmail(newUser);
-    await fetchAndSetUsers();
+    await fetchUsers();
 });
 
 const onUpdateUser = loadingWrapper(async (updatedUser: EditUserPayload) => {
@@ -34,7 +34,7 @@ const onUpdateUser = loadingWrapper(async (updatedUser: EditUserPayload) => {
 
 const onDeleteUser = loadingWrapper(async (id: string) => {
     await deleteUser(id);
-    await fetchAndSetUsers();
+    await fetchUsers();
 });
 
 watch(isLoading, (loading) => {
@@ -96,8 +96,8 @@ async function showEditUserDialog(user: User, reset: () => void) {
                 selectedProperties,
             },
             listeners: {
-                submit: ({ user, properties }: CreateUserPayload) => {
-                    onUpdateUser({ userId: user.id, properties, updatedUser: user })
+                submit: (user: CreateUserPayload) => {
+                    onUpdateUser({ userId: user.id, updatedUser: user })
                         .then(reset)
                         .catch(showErrorMessage);
                     dialog.hide();
@@ -154,7 +154,7 @@ async function onUserSlideRight(id: string, reset: () => void) {
 
                 <q-item clickable class="ft-card">
                     <q-item-section>
-                        <q-item-label> {{ user.name }} -{{ user.email }} </q-item-label>
+                        <q-item-label> {{ user.name }} - {{ user.email }} </q-item-label>
                         <q-item-label caption> Role: {{ user.role }} </q-item-label>
                     </q-item-section>
                 </q-item>

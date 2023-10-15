@@ -1,10 +1,10 @@
 import { ADMIN, PropertyDoc } from "@firetable/types";
-import { deleteDoc, getDoc, getDocs, query, where } from "firebase/firestore";
-import { propertiesCollection, propertyDoc, userPropertyMapCollection } from "./db.js";
+import { deleteDoc, getDocs, query, where } from "firebase/firestore";
+import { propertiesCollection, propertyDoc } from "./db.js";
 import { initializeFirebase } from "./base.js";
 import { httpsCallable } from "firebase/functions";
 
-export type CreatePropertyPayload = Omit<PropertyDoc, "id" | "_doc">;
+export type CreatePropertyPayload = Omit<PropertyDoc, "id" | "_doc" | "relatedUsers">;
 
 export function createNewProperty(propertyPayload: CreatePropertyPayload) {
     const { functions } = initializeFirebase();
@@ -28,9 +28,12 @@ export async function fetchPropertiesForUser(
         return propertiesSnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }) as PropertyDoc);
     }
 
-    // Existing logic for non-ADMIN users
-    const userPropertyMapRef = userPropertyMapCollection();
-    const userPropertiesQuery = query(userPropertyMapRef, where("userId", "==", userId));
+    // New logic for non-ADMIN users
+    const propertiesRef = propertiesCollection();
+    const userPropertiesQuery = query(
+        propertiesRef,
+        where("relatedUsers", "array-contains", userId),
+    );
     const userPropertiesSnapshot = await getDocs(userPropertiesQuery);
 
     if (userPropertiesSnapshot.empty) {
@@ -38,21 +41,5 @@ export async function fetchPropertiesForUser(
         return [];
     }
 
-    // Extract propertyIds from the query results
-    const propertyIds: string[] = [];
-    userPropertiesSnapshot.forEach((doc) => {
-        const data = doc.data();
-        propertyIds.push(data.propertyId);
-    });
-
-    const properties: PropertyDoc[] = [];
-    for (const propertyId of propertyIds) {
-        const propertyRef = propertyDoc(propertyId);
-        const propertyDocRes = await getDoc(propertyRef);
-        if (propertyDocRes.exists()) {
-            properties.push({ ...propertyDocRes.data(), id: propertyDocRes.id } as PropertyDoc);
-        }
-    }
-
-    return properties;
+    return userPropertiesSnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }) as PropertyDoc);
 }

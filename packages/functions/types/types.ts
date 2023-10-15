@@ -1,9 +1,3 @@
-export interface UpdatedTablesDifference {
-    added: BaseTable[];
-    removed: BaseTable[];
-    updated: BaseTable[];
-}
-
 export const enum ChangeType {
     DELETE = "delete",
     ADD = "add"
@@ -27,9 +21,7 @@ export const enum Collection {
     FLOORS = "floors",
     FCM = "fcm",
     EVENT_FEED = "eventFeed",
-    SETTINGS = "settings",
     PROPERTIES = "properties",
-    USER_PROPERTY_MAP = "userPropertyMap",
 }
 
 export const ADMIN = "Administrator";
@@ -54,16 +46,14 @@ export interface BaseTable {
 
 // Cannot import this because functions deploy
 export interface CreateUserPayload{
-    user: {
-        id: string;
-        name: string;
-        email: string;
-        username: string;
-        role: Role;
-        status: ACTIVITY_STATUS;
-        password: string;
-    };
-    properties: string[];
+    id: string;
+    name: string;
+    email: string;
+    username: string;
+    role: Role;
+    status: ACTIVITY_STATUS;
+    password: string;
+    relatedProperties: string[];
 }
 
 export interface User {
@@ -73,12 +63,13 @@ export interface User {
     username: string;
     role: Role | typeof ADMIN;
     status: ACTIVITY_STATUS;
+    relatedProperties: string[];
 }
 
 export interface EditUserPayload {
-    properties: string[];
     userId: string;
     updatedUser: {
+        relatedProperties: string[];
         role: string;
         name: string;
     };

@@ -18,20 +18,18 @@ export interface User {
     username: string;
     role: Role | typeof ADMIN;
     status: ACTIVITY_STATUS;
+    relatedProperties: string[];
 }
 
 export interface EditUserPayload {
-    properties: string[];
     userId: string;
     updatedUser: {
+        relatedProperties: string[];
         role: string;
         name: string;
     };
 }
 
-export interface CreateUserPayload {
-    user: User & {
-        password: string;
-    };
-    properties: string[];
-}
+export type CreateUserPayload = User & {
+    password: string;
+};

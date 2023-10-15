@@ -78,7 +78,7 @@ onMounted(async () => {
         <FTTitle title="Floors" />
 
         <!-- Tabs for each property -->
-        <q-tabs v-model="activeTab" align="left" active-color="primary" indicator-color="primary">
+        <q-tabs v-model="activeTab">
             <q-tab
                 v-for="(propertyData, propertyKey) in floors"
                 :key="propertyKey"
@@ -95,7 +95,7 @@ onMounted(async () => {
                 :name="propertyKey"
             >
                 <!-- Button to add a new floor for the property in the active tab -->
-                <div class="add-floor-btn row justify-end">
+                <div class="add-floor-btn row">
                     <q-btn
                         rounded
                         icon="plus"
@@ -139,8 +139,10 @@ onMounted(async () => {
                 </q-list>
 
                 <!-- If the property doesn't have floors, display a standout message -->
-                <div v-else class="no-floor-message text-h6 bg-grey-9 q-pa-sm rounded-borders">
-                    This property has no floors.
+                <div v-else class="row justify-center items-center q-mt-md">
+                    <h6 class="q-ma-sm text-weight-bolder underline">
+                        This property has no floors.
+                    </h6>
                 </div>
             </q-tab-panel>
         </q-tab-panels>

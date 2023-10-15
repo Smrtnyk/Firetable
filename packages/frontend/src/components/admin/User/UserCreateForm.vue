@@ -20,10 +20,7 @@ interface Props {
     user?: User;
 }
 
-type Emits = (
-    event: "submit",
-    payload: { user: CreateUserPayload["user"] | User; properties: string[] },
-) => void;
+type Emits = (event: "submit", payload: CreateUserPayload | User) => void;
 
 const authStore = useAuthStore();
 const emit = defineEmits<Emits>();
@@ -31,7 +28,7 @@ const props = defineProps<Props>();
 const userCreateForm = ref<QForm>();
 const stringRules = [noEmptyString()];
 const userNameRules = [noEmptyString(), noWhiteSpaces];
-const userSkeleton: CreateUserPayload["user"] = {
+const userSkeleton: CreateUserPayload = {
     id: "",
     name: "",
     username: "",
@@ -39,11 +36,10 @@ const userSkeleton: CreateUserPayload["user"] = {
     password: "",
     role: Role.STAFF,
     status: ACTIVITY_STATUS.OFFLINE,
+    relatedProperties: [],
 };
 
-const form = ref<CreateUserPayload["user"] | User>(
-    props.user ? { ...props.user } : { ...userSkeleton },
-);
+const form = ref<CreateUserPayload | User>(props.user ? { ...props.user } : { ...userSkeleton });
 const chosenProperties = ref<string[]>([]);
 const isPropertyOwner = computed(() => form.value.role === Role.PROPERTY_OWNER);
 const isAdmin = computed(() => {
@@ -70,18 +66,14 @@ async function onSubmit() {
 
     if (props.user) {
         emit("submit", {
-            user: {
-                ...form.value,
-            },
-            properties: chosenProperties.value,
+            ...form.value,
+            relatedProperties: chosenProperties.value,
         });
     } else {
         emit("submit", {
-            user: {
-                ...form.value,
-                email: form.value.username + PROJECT_MAIL,
-            },
-            properties: chosenProperties.value,
+            ...form.value,
+            email: form.value.username + PROJECT_MAIL,
+            relatedProperties: chosenProperties.value,
         });
     }
 }

@@ -171,9 +171,3 @@ function showCreateEventForm(property: PropertyDoc): void {
         </div>
     </div>
 </template>
-
-<style>
-.q-tab-panels {
-    height: 100%;
-}
-</style>

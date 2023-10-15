@@ -7,5 +7,4 @@ export const enum Collection {
     EVENT_FEED = "eventFeed",
     SETTINGS = "settings",
     PROPERTIES = "properties",
-    USER_PROPERTY_MAP = "userPropertyMap",
 }
