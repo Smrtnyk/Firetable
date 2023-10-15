@@ -2,14 +2,20 @@ import webpush from "web-push";
 import * as functions from "firebase-functions";
 import diff from "diff-arrays-of-objects";
 import { db } from "../../init.js";
-import { ChangeType, PushSubscriptionDoc, UpdatedTablesDifference, Collection, BaseTable } from "../../../types/types.js";
+import { ChangeType, PushSubscriptionDoc, Collection, BaseTable } from "../../../types/types.js";
 import { firestore } from "firebase-admin";
 import QueryDocumentSnapshot = firestore.QueryDocumentSnapshot;
 
 const { logger } = functions;
 
 /**
- * Add reservation changes to the event feed.
+ * Adds reservation-related events to the feed collection.
+ *
+ * @param change - Type of the change (e.g., ADD or DELETE).
+ * @param table - Table data where the reservation is made.
+ * @param type - Type of the event (generally "Reservation").
+ * @param feedCollection - Firestore reference to the event feed collection.
+ * @throws Will throw an error if the reservation is not provided on the table or for unsupported change types.
  */
 async function addToEventFeed(
     change: ChangeType,
@@ -46,7 +52,9 @@ async function addToEventFeed(
 }
 
 /**
- * Retrieve all push notification tokens from Firestore.
+ * Retrieves all registered push notification tokens from Firestore.
+ *
+ * @returns A promise that resolves with an array of push subscription documents.
  */
 async function getMessagingTokensFromFirestore(): Promise<PushSubscriptionDoc[]> {
     const tokensColl = await db.collection(Collection.FCM).get();
@@ -56,7 +64,12 @@ async function getMessagingTokensFromFirestore(): Promise<PushSubscriptionDoc[]>
 }
 
 /**
- * Send push notifications to the provided list of tokens.
+ * Sends push notifications to the provided list of tokens.
+ *
+ * @param tokens - Array of push subscription tokens.
+ * @param title - Title of the push notification.
+ * @param body - Body of the push notification.
+ * @throws Will throw an error if there's an issue sending the push notification.
  */
 async function sendPushMessageToSubscriptions(
     tokens: PushSubscriptionDoc[],
@@ -85,7 +98,10 @@ async function sendPushMessageToSubscriptions(
 }
 
 /**
- * Handle sending push notifications for new reservations.
+ * Sends push notifications for new table reservations.
+ *
+ * @param table - Table data where the reservation is made.
+ * @throws Will throw an error if reservation details are incomplete.
  */
 async function handlePushMessagesOnNewReservation(
     table: BaseTable
@@ -111,40 +127,24 @@ async function handlePushMessagesOnNewReservation(
 }
 
 /**
- * Determine differences between the table reservations before and after changes.
+ * Extracts tables with reservations from provided serialized data.
+ *
+ * @param json - Serialized representation of the floor layout.
+ * @returns Array of tables that have reservations.
  */
-function getDifferenceBetweenTables(
-    prevData: FirebaseFirestore.DocumentData,
-    newData: FirebaseFirestore.DocumentData
-): UpdatedTablesDifference {
-    const prevTablesReservations = extractReservedTablesFrom(prevData.json);
-    const newTablesReservations = extractReservedTablesFrom(newData.json);
-    const { added, removed } = diff(prevTablesReservations, newTablesReservations, "label");
-    const { updated } = diff(prevTablesReservations, newTablesReservations, "reservation");
-
-    return {
-        added,
-        removed,
-        updated,
-    };
-}
-
-/**
- * Extract tables from provided data that have reservations.
- */
-function extractReservedTablesFrom(json: any): BaseTable[] {
+function extractReservedTablesFrom(json: Record<PropertyKey, any>): BaseTable[] {
     return json.objects
         .map(({ objects }: any) => objects[0])
         .filter(({ reservation }: BaseTable) => !!reservation);
 }
 
 /**
- * Handle reservations that have been added.
+ * Processes and handles the addition of new reservations.
+ *
+ * @param context - Context of the event that triggered the function.
+ * @param added - Array of newly added reservations.
  */
-async function handleAddedReservation(
-    context: functions.EventContext,
-    added: BaseTable[]
-): Promise<void> {
+async function handleNewReservation(context: functions.EventContext, added: BaseTable[]): Promise<void> {
     if (!added?.length) {
         return;
     }
@@ -163,7 +163,9 @@ async function handleAddedReservation(
 }
 
 /**
- * Update the percentage of reserved tables for an event.
+ * Updates the reservation count for an event to reflect the percentage of tables reserved.
+ *
+ * @param context - Context of the event that triggered the function.
  */
 async function updateEventReservationCount(
     context: functions.EventContext
@@ -191,18 +193,35 @@ async function updateEventReservationCount(
 }
 
 /**
- * Main cloud function to handle reservation changes.
+ * Main cloud function to handle changes in table reservations.
+ * Detects differences between old and new reservation data and updates the event feed and reservation count accordingly.
+ *
+ * @param change - Before and after snapshots of the changed document.
+ * @param context - Context of the event that triggered the function.
+ * @throws Will throw an error if there's an issue handling the reservation or if there's unexpected data loss.
  */
 export async function handleReservation(
     { before, after }: functions.Change<QueryDocumentSnapshot>,
     context: functions.EventContext
 ): Promise<void> {
     try {
-        const { added } = getDifferenceBetweenTables(before.data(), after.data());
-        await handleAddedReservation(context, added);
+        const prevData = before.data();
+        const newData = after.data();
+
+        if (!prevData || !newData) {
+            logger.error("No data in either the before or after snapshot.");
+            throw new functions.https.HttpsError("data-loss", "Unexpected data loss.");
+        }
+
+        const prevTablesReservations = extractReservedTablesFrom(prevData.json);
+        const newTablesReservations = extractReservedTablesFrom(newData.json);
+        const differences = diff(prevTablesReservations, newTablesReservations, "label");
+
+        await handleNewReservation(context, differences.added);
         await updateEventReservationCount(context);
-    } catch (error) {
+
+    } catch (error: any) {
         logger.error("Error handling reservation:", error);
-        throw new functions.https.HttpsError("internal", "Error handling reservation.", error);
+        throw new functions.https.HttpsError("internal", `Error handling reservation: ${error.message}`, error);
     }
 }
