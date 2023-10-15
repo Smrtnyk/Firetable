@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { noEmptyString, noWhiteSpaces } from "src/helpers/form-rules";
-import { PROJECT_MAIL } from "src/config";
 import {
     ACTIVITY_STATUS,
     ADMIN,
     CreateUserPayload,
+    OrganisationDoc,
     PropertyDoc,
     Role,
     User,
@@ -13,79 +12,105 @@ import {
 import { QForm } from "quasar";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useAuthStore } from "stores/auth-store";
+import { noEmptyString, noWhiteSpaces } from "src/helpers/form-rules";
 
 interface Props {
     properties: PropertyDoc[];
-    selectedProperties?: PropertyDoc[];
-    user?: User;
+    organisations: OrganisationDoc[];
 }
 
 type Emits = (event: "submit", payload: CreateUserPayload | User) => void;
+
+const stringRules = [noEmptyString()];
+const userNameRules = [noEmptyString(), noWhiteSpaces];
 
 const authStore = useAuthStore();
 const emit = defineEmits<Emits>();
 const props = defineProps<Props>();
 const userCreateForm = ref<QForm>();
-const stringRules = [noEmptyString()];
-const userNameRules = [noEmptyString(), noWhiteSpaces];
-const userSkeleton: CreateUserPayload = {
-    id: "",
-    name: "",
-    username: "",
-    email: "",
-    password: "",
-    role: Role.STAFF,
-    status: ACTIVITY_STATUS.OFFLINE,
-    relatedProperties: [],
-};
 
-const form = ref<CreateUserPayload | User>(props.user ? { ...props.user } : { ...userSkeleton });
+const form = ref<CreateUserPayload | User>({ ...userSkeleton() });
 const chosenProperties = ref<string[]>([]);
-const isPropertyOwner = computed(() => form.value.role === Role.PROPERTY_OWNER);
-const isAdmin = computed(() => {
-    return authStore.user?.role === ADMIN;
-});
-const availableRoles = computed(() => {
-    if (isAdmin.value) {
-        return Object.values(Role);
-    } else {
-        return Object.values(Role).filter((role) => role !== Role.PROPERTY_OWNER);
-    }
-});
 
-if (props.selectedProperties) {
-    chosenProperties.value = props.selectedProperties.map((p) => p.id);
-}
+const isPropertyOwner = computed(() => form.value.role === Role.PROPERTY_OWNER);
+const role = computed(() => authStore.user!.role);
+const availableRoles = computed(() => availableRolesBasedOn(role.value));
+const organisationOptions = computed(() => props.organisations);
+const chosenOrganisation = ref<OrganisationDoc | null>(
+    props.organisations.length === 1 ? props.organisations[0] : null,
+);
+const emailSuffix = computed(() => {
+    if (chosenOrganisation.value) {
+        return `@${chosenOrganisation.value.name}.at`;
+    }
+    return "";
+});
 
 async function onSubmit() {
-    if (!(await userCreateForm.value?.validate())) return;
-    const chosenRole = form.value.role;
-    if (chosenRole !== Role.PROPERTY_OWNER && !chosenProperties.value.length) {
-        showErrorMessage("You must select at least one property!");
-        return;
-    }
-
-    if (props.user) {
-        emit("submit", {
-            ...form.value,
-            relatedProperties: chosenProperties.value,
-        });
-    } else {
-        emit("submit", {
-            ...form.value,
-            email: form.value.username + PROJECT_MAIL,
-            relatedProperties: chosenProperties.value,
-        });
+    if (await validateForm()) {
+        prepareAndEmitSubmission();
     }
 }
 
 function onReset() {
-    if (props.user) {
-        form.value = { ...props.user };
-    } else {
-        form.value = { ...userSkeleton };
+    form.value = { ...userSkeleton() };
+    resetProperties();
+}
+
+// Utility functions
+function userSkeleton(user?: User): CreateUserPayload {
+    return {
+        id: "",
+        name: "",
+        username: "",
+        email: "",
+        password: "",
+        role: Role.STAFF,
+        status: ACTIVITY_STATUS.OFFLINE,
+        relatedProperties: [],
+        organisationId: "",
+        ...(user || {}),
+    };
+}
+
+function availableRolesBasedOn(role: string) {
+    if (role === ADMIN) {
+        return Object.values(Role);
+    }
+    return Object.values(Role).filter((r) => r !== Role.PROPERTY_OWNER);
+}
+
+async function validateForm() {
+    if (!(await userCreateForm.value?.validate())) return false;
+    const chosenRole = form.value.role;
+
+    if (chosenRole !== Role.PROPERTY_OWNER && !chosenProperties.value.length) {
+        showErrorMessage("You must select at least one property!");
+        return false;
     }
 
+    if (chosenRole === Role.PROPERTY_OWNER && !chosenOrganisation.value) {
+        showErrorMessage("You must select an organisation!");
+        return false;
+    }
+
+    return true;
+}
+
+function prepareAndEmitSubmission() {
+    if (!chosenOrganisation.value) {
+        throw new Error("chosenOrganisation is required");
+    }
+    const submission = {
+        ...form.value,
+        email: `${form.value.username}${emailSuffix.value}`,
+        organisationId: chosenOrganisation.value.id,
+        relatedProperties: chosenProperties.value,
+    };
+    emit("submit", submission);
+}
+
+function resetProperties() {
     chosenProperties.value = [];
 }
 </script>
@@ -109,14 +134,19 @@ function onReset() {
             />
 
             <q-input
-                v-if="!props.user"
                 v-model="form.username"
                 standout
+                prefix="Email:"
                 rounded
                 label="Username *"
                 hint="Username without spaces and special characters, e.g. max123"
                 :rules="userNameRules"
-            />
+                :suffix="emailSuffix"
+            >
+                <template #prepend>
+                    <q-icon name="mail" />
+                </template>
+            </q-input>
 
             <q-input
                 v-if="'password' in form"
@@ -141,6 +171,19 @@ function onReset() {
                 :options="availableRoles"
                 label="Role"
             />
+
+            <q-select
+                v-if="form.role === Role.PROPERTY_OWNER && props.organisations.length"
+                v-model="chosenOrganisation"
+                hint="Select organisation for this user."
+                standout
+                rounded
+                :options="organisationOptions"
+                label="Organisation"
+                option-label="name"
+                option-value="value"
+            />
+
             <div v-if="!isPropertyOwner" class="q-gutter-sm q-mb-lg">
                 <div>Properties:</div>
                 <div>

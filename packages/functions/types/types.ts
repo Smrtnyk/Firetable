@@ -21,6 +21,7 @@ export const enum Collection {
     FLOORS = "floors",
     FCM = "fcm",
     EVENT_FEED = "eventFeed",
+    ORGANISATIONS = "organisations",
     PROPERTIES = "properties",
 }
 
@@ -54,6 +55,7 @@ export interface CreateUserPayload{
     status: ACTIVITY_STATUS;
     password: string;
     relatedProperties: string[];
+    organisationId: string;
 }
 
 export interface User {

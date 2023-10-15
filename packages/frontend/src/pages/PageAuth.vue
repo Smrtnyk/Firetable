@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { PROJECT_MAIL } from "src/config";
 import { minLength, noEmptyString } from "src/helpers/form-rules";
 import { QForm } from "quasar";
 import { loginWithEmail } from "@firetable/backend";
@@ -19,7 +18,7 @@ const passwordRule = [
 
 async function onSubmit() {
     if (!(await authForm.value?.validate())) return;
-    const validEmail = `${username.value}${PROJECT_MAIL}`;
+    const validEmail = username.value;
 
     await tryCatchLoadingWrapper({
         hook: async () => {

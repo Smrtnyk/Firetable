@@ -16,6 +16,10 @@ export function propertiesCollection() {
     return getCollection(Collection.PROPERTIES);
 }
 
+export function organisationsCollection() {
+    return getCollection(Collection.ORGANISATIONS);
+}
+
 export function floorsCollection() {
     return getCollection(Collection.FLOORS);
 }
@@ -57,6 +61,10 @@ export function floorDoc(id: string) {
 
 export function propertyDoc(id: string) {
     return doc(propertiesCollection(), id);
+}
+
+export function organisationDoc(id: string) {
+    return doc(organisationsCollection(), id);
 }
 
 export function eventFloorDoc(eventId: string, floorId: string) {

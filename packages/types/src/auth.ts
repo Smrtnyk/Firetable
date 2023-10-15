@@ -19,6 +19,7 @@ export interface User {
     role: Role | typeof ADMIN;
     status: ACTIVITY_STATUS;
     relatedProperties: string[];
+    organisationId: string;
 }
 
 export interface EditUserPayload {

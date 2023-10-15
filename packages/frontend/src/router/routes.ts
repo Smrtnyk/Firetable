@@ -35,6 +35,15 @@ const routes: RouteRecordRaw[] = [
 
             // Protected routes
             {
+                path: "/admin/organisations",
+                name: "adminOrganisations",
+                meta: {
+                    requiresAuth: true,
+                    allowedRoles: [ADMIN],
+                },
+                component: () => import("pages/Admin/PageAdminOrganisations.vue"),
+            },
+            {
                 path: "/admin/events",
                 name: "adminEvents",
                 meta: {

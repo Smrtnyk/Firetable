@@ -1,17 +1,26 @@
 <script setup lang="ts">
 import UserCreateForm from "components/admin/User/UserCreateForm.vue";
+import UserEditForm from "components/admin/User/UserEditForm.vue";
 import FTTitle from "components/FTTitle.vue";
 import { loadingWrapper, showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed, watch } from "vue";
 import { config } from "src/config";
 import { Loading, useQuasar } from "quasar";
 import FTDialog from "components/FTDialog.vue";
-import { CreateUserPayload, EditUserPayload, User } from "@firetable/types";
-import { createUserWithEmail, deleteUser, updateUser } from "@firetable/backend";
+import { ADMIN, CreateUserPayload, EditUserPayload, User } from "@firetable/types";
+import {
+    createUserWithEmail,
+    deleteUser,
+    fetchOrganisationById,
+    fetchOrganisationsForAdmin,
+    updateUser,
+} from "@firetable/backend";
 import { usePropertiesStore } from "stores/usePropertiesStore";
 import { useAdminUsers } from "src/composables/useAdminUsers";
+import { useAuthStore } from "stores/auth-store";
 
 const { maxNumOfUsers } = config;
+const authStore = useAuthStore();
 const propertiesStore = usePropertiesStore();
 const { users, isLoading, fetchUsers } = useAdminUsers();
 const quasar = useQuasar();
@@ -55,6 +64,10 @@ function onCreateUserFormSubmit(newUser: CreateUserPayload) {
 }
 
 async function showCreateUserDialog(): Promise<void> {
+    const organisations =
+        authStore.user!.role === ADMIN
+            ? await fetchOrganisationsForAdmin()
+            : [await fetchOrganisationById(authStore.user!.organisationId)];
     const properties = await propertiesStore.getPropertiesOfCurrentUser();
     const dialog = quasar.dialog({
         component: FTDialog,
@@ -64,6 +77,7 @@ async function showCreateUserDialog(): Promise<void> {
             title: "Create new user",
             componentPropsObject: {
                 properties,
+                organisations,
             },
             listeners: {
                 submit: function (userPayload: CreateUserPayload) {
@@ -84,16 +98,18 @@ async function showEditUserDialog(user: User, reset: () => void) {
         propertiesStore.getPropertiesOfCurrentUser(),
         propertiesStore.getPropertiesOfUser(user.id),
     ]);
+    const organisation = await fetchOrganisationById(user.organisationId);
     const dialog = quasar.dialog({
         component: FTDialog,
         componentProps: {
-            component: UserCreateForm,
+            component: UserEditForm,
             maximized: false,
             title: `Editing user: ${user.name}`,
             componentPropsObject: {
                 user: { ...user },
                 properties,
                 selectedProperties,
+                organisation,
             },
             listeners: {
                 submit: (user: CreateUserPayload) => {

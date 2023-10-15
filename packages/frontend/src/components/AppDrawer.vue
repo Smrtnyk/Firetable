@@ -23,6 +23,13 @@ const langOptions = [
 const adminLinks = computed(() => {
     const links = [];
     const role = user.value.role;
+    if (role === ADMIN) {
+        links.push({
+            icon: "home",
+            routeName: "adminOrganisations",
+            text: t("AppDrawer.links.manageOrganisations"),
+        });
+    }
     if (role === Role.PROPERTY_OWNER || role === Role.MANAGER || role === ADMIN) {
         links.push(
             {

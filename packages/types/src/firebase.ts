@@ -5,6 +5,6 @@ export const enum Collection {
     FLOORS = "floors",
     FCM = "fcm",
     EVENT_FEED = "eventFeed",
-    SETTINGS = "settings",
+    ORGANISATIONS = "organisations",
     PROPERTIES = "properties",
 }
