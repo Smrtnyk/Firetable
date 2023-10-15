@@ -10,10 +10,10 @@ import { clearOldEvents as clearOldEventsFn } from "./cron/clear-old-events/inde
 import { Collection } from "../types/types.js";
 import { createPropertyFn } from "./callable/create-property/create-property.js";
 import { deleteDocument } from "./delete-document/index.js";
-import { db } from "./init.js";
 import { updateUserFn } from "./callable/update-user.js";
 import { fetchUsersByRoleFn } from "./callable/fetch-users-by-role.js";
 import { onUserDeletedFn } from "./trigger/on-user-deleted.js";
+import { onPropertyDeletedFn } from "./trigger/on-property-deleted.js";
 
 // setVapidDetails(vapidKeys.subject, vapidKeys.publicKey, vapidKeys.privateKey);
 
@@ -67,23 +67,7 @@ export const onPropertyDelete = functions
     .region("europe-west3")
     .firestore
     .document(`${Collection.PROPERTIES}/{propertyId}`)
-    .onDelete(async (snap, context) => {
-        const propertyId = context.params.propertyId;
-
-        try {
-            const snapshot = await db.collection(Collection.USER_PROPERTY_MAP)
-                .where("propertyId", "==", propertyId)
-                .get();
-
-            const batch = db.batch();
-            snapshot.docs.forEach(doc => {
-                batch.delete(doc.ref);
-            });
-            await batch.commit();
-        } catch (error) {
-            functions.logger.error("Error deleting userPropertyMap entries:", error);
-        }
-    });
+    .onDelete(onPropertyDeletedFn);
 
 // Generic stuff
 export const deleteCollection = functions
