@@ -2,3 +2,4 @@
 *.ts text eol=lf
 *.vue text eol=lf
 *.tsx text eol=lf
+*.json text eol=lf
