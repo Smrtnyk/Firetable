@@ -1,33 +1,4 @@
 {
-  "indexes": [
-    {
-      "collectionGroup": "DEV_events",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "daily",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "date",
-          "order": "ASCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "DEV_events",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "month",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "date",
-          "order": "ASCENDING"
-        }
-      ]
-    }
-  ],
+  "indexes": [],
   "fieldOverrides": []
 }
