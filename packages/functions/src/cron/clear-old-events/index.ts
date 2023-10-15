@@ -5,6 +5,7 @@ import { firestore } from "firebase-admin";
 import { Collection } from "../../../types/types.js";
 
 const { logger } = functions;
+const DELETION_AGE_YEARS = 1; // Number of years after which events are considered old
 
 /**
  * Clears events that are a year old from the Firestore collection.
@@ -19,14 +20,14 @@ export async function clearOldEvents(): Promise<void> {
             return;
         }
 
-        // Delete all old events concurrently.
-        const deletePromises = oldEvents.docs.map(event =>
+        // Delete all old events concurrently using the deleteDocument function.
+        const deletePromises = oldEvents.docs.map(eventDoc =>
             deleteDocument({
                 col: Collection.EVENTS,
-                id: event.id
+                id: eventDoc.id
             }).catch(error => {
                 // Individual error handling for each document delete operation
-                logger.error(`Error deleting event with ID ${event.id}:`, error);
+                logger.error(`Error deleting event with ID ${eventDoc.id}:`, error);
             })
         );
 
@@ -46,12 +47,11 @@ export async function clearOldEvents(): Promise<void> {
  */
 function getOldEvents(): Promise<firestore.QuerySnapshot<firestore.DocumentData>> {
     const date = new Date();
-    date.setFullYear(date.getFullYear() - 1);
+    date.setFullYear(date.getFullYear() - DELETION_AGE_YEARS);
     return db.collection(Collection.EVENTS)
         .where("date", "<=", date.getTime())
         .get()
         .catch(error => {
-            // Error handling for the Firestore query
             logger.error("Error fetching old events:", error);
             throw new Error("Failed to fetch old events from Firestore.");
         });
