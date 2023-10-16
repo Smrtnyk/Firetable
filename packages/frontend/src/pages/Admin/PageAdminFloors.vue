@@ -152,11 +152,10 @@ onMounted(async () => {
             v-if="!Object.keys(floors).length && !isLoading"
             class="justify-center items-center q-pa-md text-center"
         >
-            <h6 class="text-h6">
+            <h6 class="q-ma-sm text-weight-bolder underline">
                 You have no properties created, in order to create floor plans you need to first
-                create at least one property. :)
+                create at least one property.
             </h6>
-            <q-img src="/no-map.svg" />
         </div>
     </div>
 </template>

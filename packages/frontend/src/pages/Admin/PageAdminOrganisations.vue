@@ -75,11 +75,11 @@ function createOrganisation(): void {
                     icon="plus"
                     class="button-gradient"
                     @click="createOrganisation"
-                    label="Add new organisation"
+                    label="New organisation"
                 />
             </template>
         </FTTitle>
-        <q-list v-if="organisations">
+        <q-list v-if="organisations.length">
             <q-slide-item
                 v-for="organisation in organisations"
                 :key="organisation.id"
@@ -98,5 +98,14 @@ function createOrganisation(): void {
                 </q-item>
             </q-slide-item>
         </q-list>
+
+        <div
+            v-if="organisations.length === 0 && !isLoading"
+            class="row justify-center items-center q-pa-md"
+        >
+            <h6 class="q-ma-sm text-weight-bolder underline">
+                There are no organisations created.
+            </h6>
+        </div>
     </div>
 </template>

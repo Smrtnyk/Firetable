@@ -115,8 +115,8 @@ async function onFileChosen(chosenFile: File) {
 </script>
 
 <template>
-    <div class="column justify-center items-center q-mt-md" v-if="!totalFloors">
-        <h6 class="text-h6 q-pa-md text-justify">
+    <div class="column justify-center items-center q-pa-md" v-if="!totalFloors">
+        <h6 class="q-ma-sm text-weight-bolder underline">
             You cannot create events because you have no floors!
         </h6>
         <q-btn
@@ -128,7 +128,6 @@ async function onFileChosen(chosenFile: File) {
         >
             Go to floor manager
         </q-btn>
-        <q-img src="/no-events.svg" />
     </div>
 
     <template v-else>

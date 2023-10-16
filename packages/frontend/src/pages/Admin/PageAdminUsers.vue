@@ -151,7 +151,7 @@ async function onUserSlideRight(id: string, reset: () => void) {
             </div>
         </FTTitle>
 
-        <q-list v-if="!!users.length">
+        <q-list v-if="users.length">
             <q-slide-item
                 v-for="user in users"
                 :key="user.id"
@@ -176,5 +176,12 @@ async function onUserSlideRight(id: string, reset: () => void) {
                 </q-item>
             </q-slide-item>
         </q-list>
+
+        <div
+            v-if="users.length === 0 && !isLoading"
+            class="row justify-center items-center q-mt-md"
+        >
+            <h6 class="q-ma-sm text-weight-bolder underline">There are no users created.</h6>
+        </div>
     </div>
 </template>
