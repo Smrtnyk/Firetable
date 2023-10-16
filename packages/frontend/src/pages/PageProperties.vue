@@ -1,15 +1,23 @@
 <script setup lang="ts">
-import EventCardListSkeleton from "components/Event/EventCardListSkeleton.vue";
 import PropertyCardList from "components/Property/PropertyCardList.vue";
 import { useProperties } from "src/composables/useProperties";
+import { watch } from "vue";
+import { Loading } from "quasar";
 
 const { properties, isLoading } = useProperties();
+
+watch(isLoading, (newIsLoading) => {
+    if (!newIsLoading) {
+        Loading.hide();
+    } else {
+        Loading.show();
+    }
+});
 </script>
 
 <template>
     <div class="PageHome">
         <PropertyCardList v-if="!!properties.length && !isLoading" :properties="properties" />
-        <EventCardListSkeleton v-if="isLoading" />
         <div
             v-if="!isLoading && !properties.length"
             class="row justify-center items-center q-mt-md"

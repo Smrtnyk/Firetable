@@ -3,13 +3,22 @@ import FTTitle from "components/FTTitle.vue";
 import FTDialog from "components/FTDialog.vue";
 import AddNewPropertyForm from "components/admin/property/AddNewPropertyForm.vue";
 
-import { useQuasar } from "quasar";
+import { Loading, useQuasar } from "quasar";
 import { loadingWrapper, showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { createNewProperty, deleteProperty } from "@firetable/backend";
 import { useProperties } from "src/composables/useProperties";
+import { watch } from "vue";
 
 const quasar = useQuasar();
-const { properties, fetchProperties } = useProperties();
+const { properties, fetchProperties, isLoading } = useProperties();
+
+watch(isLoading, (newIsLoading) => {
+    if (!newIsLoading) {
+        Loading.hide();
+    } else {
+        Loading.show();
+    }
+});
 
 function onPropertyCreate(propertyName: string) {
     return tryCatchLoadingWrapper({
