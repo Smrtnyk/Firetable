@@ -6,6 +6,7 @@ export default {
             manageFloors: "Manage Floors",
             manageUsers: "Manage Users",
             manageProperties: "Manage Properties",
+            manageOrganisations: "Manage Organisations",
         },
         toggles: {
             darkMode: "Toggle dark mode",

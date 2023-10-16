@@ -6,6 +6,7 @@ export default {
             manageFloors: "Etagen verwalten",
             manageUsers: "Benutzer verwalten",
             manageProperties: "Immobilien verwalten",
+            manageOrganisations: "Manage Organisations",
         },
         toggles: {
             darkMode: "Dunkelmodus umschalten",
