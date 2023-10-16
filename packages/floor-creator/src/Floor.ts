@@ -73,6 +73,8 @@ export class Floor {
             backgroundColor: CANVAS_BG_COLOR,
             interactive: this.isInEditorMode,
             selection: false,
+            // @ts-ignore
+            enablePointerEvents: true,
         });
         this.elementManager = new ElementManager({
             isInEditorMode: mode === FloorMode.EDITOR,
