@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import EventCardList from "components/Event/EventCardList.vue";
-import PushMessagesBanner from "components/PushMessagesBanner.vue";
 import EventCardListSkeleton from "components/Event/EventCardListSkeleton.vue";
 import { where, orderBy, limit } from "firebase/firestore";
 import { config } from "src/config";
@@ -25,7 +24,6 @@ const { data: events, pending: isLoading } = useFirestoreCollection<EventDoc>(
 
 <template>
     <div class="PageHome">
-        <PushMessagesBanner />
         <EventCardList v-if="!!events.length && !isLoading" :events="events" />
         <EventCardListSkeleton v-if="isLoading" />
         <div v-if="!isLoading && !events.length" class="row justify-center items-center q-mt-md">
