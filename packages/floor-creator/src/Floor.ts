@@ -87,7 +87,7 @@ export class Floor {
             this.initialViewportTransform,
         );
 
-        this.touchManager = new TouchManager(this.canvas, this);
+        this.touchManager = new TouchManager(this);
         this.initializeCanvasEventHandlers();
     }
 
