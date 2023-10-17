@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  vite: v5.0.0-beta.8
+  vite: v5.0.0-beta.10
   '@vitejs/plugin-vue': 4.4.0
 
 importers:
@@ -2889,13 +2889,13 @@ packages:
         optional: true
     dependencies:
       '@quasar/render-ssr-error': 1.0.1
-      '@quasar/vite-plugin': 1.3.3(@vitejs/plugin-vue@4.4.0)(quasar@2.12.7)(vite@5.0.0-beta.8)(vue@3.3.4)
+      '@quasar/vite-plugin': 1.3.3(@vitejs/plugin-vue@4.4.0)(quasar@2.12.7)(vite@5.0.0-beta.10)(vue@3.3.4)
       '@rollup/pluginutils': 4.2.1
       '@types/chrome': 0.0.208
       '@types/compression': 1.7.2
       '@types/cordova': 0.0.34
       '@types/express': 4.17.17
-      '@vitejs/plugin-vue': 4.4.0(vite@5.0.0-beta.8)(vue@3.3.4)
+      '@vitejs/plugin-vue': 4.4.0(vite@5.0.0-beta.10)(vue@3.3.4)
       archiver: 5.3.1
       chokidar: 3.5.3
       ci-info: 3.7.1
@@ -2923,7 +2923,7 @@ packages:
       semver: 7.5.4
       serialize-javascript: 6.0.0
       table: 6.8.1
-      vite: 5.0.0-beta.8(@types/node@18.11.9)(sass@1.32.12)
+      vite: 5.0.0-beta.10(@types/node@18.11.9)(sass@1.32.12)
       vue: 3.3.4
       vue-router: 4.2.5(vue@3.3.4)
       webpack-merge: 5.8.0
@@ -2950,18 +2950,18 @@ packages:
       stack-trace: 1.0.0-pre2
     dev: true
 
-  /@quasar/vite-plugin@1.3.3(@vitejs/plugin-vue@4.4.0)(quasar@2.12.7)(vite@5.0.0-beta.8)(vue@3.3.4):
+  /@quasar/vite-plugin@1.3.3(@vitejs/plugin-vue@4.4.0)(quasar@2.12.7)(vite@5.0.0-beta.10)(vue@3.3.4):
     resolution: {integrity: sha512-HSX/Vgec5/Y8fiJRfpf1MR7+um+rdpbilktBGQkYOKw4A9d0smGq4jtSS/K4O2GTXRYqDmZ/5sgCeBcmhB3OCw==}
     engines: {node: '>=12'}
     peerDependencies:
       '@vitejs/plugin-vue': 4.4.0
       quasar: ^2.8.0
-      vite: v5.0.0-beta.8
+      vite: v5.0.0-beta.10
       vue: ^3.0.0
     dependencies:
-      '@vitejs/plugin-vue': 4.4.0(vite@5.0.0-beta.8)(vue@3.3.4)
+      '@vitejs/plugin-vue': 4.4.0(vite@5.0.0-beta.10)(vue@3.3.4)
       quasar: 2.12.7
-      vite: 5.0.0-beta.8(@types/node@18.11.9)(sass@1.32.12)
+      vite: 5.0.0-beta.10(@types/node@18.11.9)(sass@1.32.12)
       vue: 3.3.4
     dev: true
 
@@ -3022,6 +3022,102 @@ packages:
       estree-walker: 2.0.2
       picomatch: 2.3.1
     dev: true
+
+  /@rollup/rollup-android-arm-eabi@4.1.4:
+    resolution: {integrity: sha512-WlzkuFvpKl6CLFdc3V6ESPt7gq5Vrimd2Yv9IzKXdOpgbH4cdDSS1JLiACX8toygihtH5OlxyQzhXOph7Ovlpw==}
+    cpu: [arm]
+    os: [android]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rollup/rollup-android-arm64@4.1.4:
+    resolution: {integrity: sha512-D1e+ABe56T9Pq2fD+R3ybe1ylCDzu3tY4Qm2Mj24R9wXNCq35+JbFbOpc2yrroO2/tGhTobmEl2Bm5xfE/n8RA==}
+    cpu: [arm64]
+    os: [android]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rollup/rollup-darwin-arm64@4.1.4:
+    resolution: {integrity: sha512-7vTYrgEiOrjxnjsgdPB+4i7EMxbVp7XXtS+50GJYj695xYTTEMn3HZVEvgtwjOUkAP/Q4HDejm4fIAjLeAfhtg==}
+    cpu: [arm64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rollup/rollup-darwin-x64@4.1.4:
+    resolution: {integrity: sha512-eGJVZScKSLZkYjhTAESCtbyTBq9SXeW9+TX36ki5gVhDqJtnQ5k0f9F44jNK5RhAMgIj0Ht9+n6HAgH0gUUyWQ==}
+    cpu: [x64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rollup/rollup-linux-arm-gnueabihf@4.1.4:
+    resolution: {integrity: sha512-HnigYSEg2hOdX1meROecbk++z1nVJDpEofw9V2oWKqOWzTJlJf1UXVbDE6Hg30CapJxZu5ga4fdAQc/gODDkKg==}
+    cpu: [arm]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rollup/rollup-linux-arm64-gnu@4.1.4:
+    resolution: {integrity: sha512-TzJ+N2EoTLWkaClV2CUhBlj6ljXofaYzF/R9HXqQ3JCMnCHQZmQnbnZllw7yTDp0OG5whP4gIPozR4QiX+00MQ==}
+    cpu: [arm64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rollup/rollup-linux-arm64-musl@4.1.4:
+    resolution: {integrity: sha512-aVPmNMdp6Dlo2tWkAduAD/5TL/NT5uor290YvjvFvCv0Q3L7tVdlD8MOGDL+oRSw5XKXKAsDzHhUOPUNPRHVTQ==}
+    cpu: [arm64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rollup/rollup-linux-x64-gnu@4.1.4:
+    resolution: {integrity: sha512-77Fb79ayiDad0grvVsz4/OB55wJRyw9Ao+GdOBA9XywtHpuq5iRbVyHToGxWquYWlEf6WHFQQnFEttsAzboyKg==}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rollup/rollup-linux-x64-musl@4.1.4:
+    resolution: {integrity: sha512-/t6C6niEQTqmQTVTD9TDwUzxG91Mlk69/v0qodIPUnjjB3wR4UA3klg+orR2SU3Ux2Cgf2pWPL9utK80/1ek8g==}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rollup/rollup-win32-arm64-msvc@4.1.4:
+    resolution: {integrity: sha512-ZY5BHHrOPkMbCuGWFNpJH0t18D2LU6GMYKGaqaWTQ3CQOL57Fem4zE941/Ek5pIsVt70HyDXssVEFQXlITI5Gg==}
+    cpu: [arm64]
+    os: [win32]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rollup/rollup-win32-ia32-msvc@4.1.4:
+    resolution: {integrity: sha512-XG2mcRfFrJvYyYaQmvCIvgfkaGinfXrpkBuIbJrTl9SaIQ8HumheWTIwkNz2mktCKwZfXHQNpO7RgXLIGQ7HXA==}
+    cpu: [ia32]
+    os: [win32]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rollup/rollup-win32-x64-msvc@4.1.4:
+    resolution: {integrity: sha512-ANFqWYPwkhIqPmXw8vm0GpBEHiPpqcm99jiiAp71DbCSqLDhrtr019C5vhD0Bw4My+LmMvciZq6IsWHqQpl2ZQ==}
+    cpu: [x64]
+    os: [win32]
+    requiresBuild: true
+    dev: true
+    optional: true
 
   /@sinclair/typebox@0.25.24:
     resolution: {integrity: sha512-XJfwUVUKDHF5ugKwIcxEgc9k8b7HbznCp6eUfWgu710hMPNIO4aw4/zB5RogDQz8nd6gyCDpU9O/m6qYEWY6yQ==}
@@ -3569,14 +3665,14 @@ packages:
       eslint-visitor-keys: 3.4.3
     dev: true
 
-  /@vitejs/plugin-vue@4.4.0(vite@5.0.0-beta.8)(vue@3.3.4):
+  /@vitejs/plugin-vue@4.4.0(vite@5.0.0-beta.10)(vue@3.3.4):
     resolution: {integrity: sha512-xdguqb+VUwiRpSg+nsc2HtbAUSGak25DXYvpQQi4RVU1Xq1uworyoH/md9Rfd8zMmPR/pSghr309QNcftUVseg==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
-      vite: v5.0.0-beta.8
+      vite: v5.0.0-beta.10
       vue: ^3.2.25
     dependencies:
-      vite: 5.0.0-beta.8(@types/node@18.11.9)(sass@1.32.12)
+      vite: 5.0.0-beta.10(@types/node@18.11.9)(sass@1.32.12)
       vue: 3.3.4
     dev: true
 
@@ -9935,11 +10031,23 @@ packages:
     optionalDependencies:
       fsevents: 2.3.3
 
-  /rollup@3.29.4:
-    resolution: {integrity: sha512-oWzmBZwvYrU0iJHtDmhsm662rC15FRXmcjCk1xD771dFDx5jJ02ufAQQTn0etB2emNk4J9EZg/yWKpsn9BWGRw==}
-    engines: {node: '>=14.18.0', npm: '>=8.0.0'}
+  /rollup@4.1.4:
+    resolution: {integrity: sha512-U8Yk1lQRKqCkDBip/pMYT+IKaN7b7UesK3fLSTuHBoBJacCE+oBqo/dfG/gkUdQNNB2OBmRP98cn2C2bkYZkyw==}
+    engines: {node: '>=18.0.0', npm: '>=8.0.0'}
     hasBin: true
     optionalDependencies:
+      '@rollup/rollup-android-arm-eabi': 4.1.4
+      '@rollup/rollup-android-arm64': 4.1.4
+      '@rollup/rollup-darwin-arm64': 4.1.4
+      '@rollup/rollup-darwin-x64': 4.1.4
+      '@rollup/rollup-linux-arm-gnueabihf': 4.1.4
+      '@rollup/rollup-linux-arm64-gnu': 4.1.4
+      '@rollup/rollup-linux-arm64-musl': 4.1.4
+      '@rollup/rollup-linux-x64-gnu': 4.1.4
+      '@rollup/rollup-linux-x64-musl': 4.1.4
+      '@rollup/rollup-win32-arm64-msvc': 4.1.4
+      '@rollup/rollup-win32-ia32-msvc': 4.1.4
+      '@rollup/rollup-win32-x64-msvc': 4.1.4
       fsevents: 2.3.3
     dev: true
 
@@ -11159,8 +11267,8 @@ packages:
       extsprintf: 1.3.0
     dev: true
 
-  /vite@5.0.0-beta.8(@types/node@18.11.9)(sass@1.32.12):
-    resolution: {integrity: sha512-jmWSaTTz81ETy74qlwMFhGSmYeZ/RFQlnbqfFxH9FmP+4clw59RCopPX99ETTja1NOylEMWlm5KsRmshsRFjOQ==}
+  /vite@5.0.0-beta.10(@types/node@18.11.9)(sass@1.32.12):
+    resolution: {integrity: sha512-8aqMPLJnbQf8IFG+o/EMihZ+1RtTD6VoP2OJgUZfmaylR+hNyO0DBhWliWmrHXjOarDDuT1kJjowwS+XRWZ+EQ==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
     peerDependencies:
@@ -11190,7 +11298,7 @@ packages:
       '@types/node': 18.11.9
       esbuild: 0.19.4
       postcss: 8.4.31
-      rollup: 3.29.4
+      rollup: 4.1.4
       sass: 1.32.12
     optionalDependencies:
       fsevents: 2.3.3

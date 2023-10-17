@@ -39,7 +39,7 @@
     },
     "pnpm": {
         "overrides": {
-            "vite": "v5.0.0-beta.8",
+            "vite": "v5.0.0-beta.10",
             "@vitejs/plugin-vue": "4.4.0"
         }
     }
