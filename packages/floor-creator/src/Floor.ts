@@ -20,6 +20,7 @@ import { isFloorElement, isTable } from "./type-guards";
 import { RoundTable } from "./elements/RoundTable";
 import { RectTable } from "./elements/RectTable";
 import { ElementManager } from "./ElementManager";
+import { TouchManager } from "./TouchManager";
 
 interface FloorCreationOptions {
     canvas: HTMLCanvasElement;
@@ -42,16 +43,13 @@ export class Floor {
     readonly canvas: fabric.Canvas;
     readonly dblClickHandler?: FloorDoubleClickHandler;
     readonly elementClickHandler: ElementClickHandler;
-    private currentZoomSteps = 0;
+    currentZoomSteps = 0;
     mode: FloorMode;
     width: number;
-    private readonly initialScale: number;
+    readonly initialScale: number;
     private initialViewportTransform: number[];
     elementManager: ElementManager;
-
-    private initialPinchDistance: number | null = null;
-    private initialDragX: number | null = null;
-    private initialDragY: number | null = null;
+    private touchManager: TouchManager;
 
     constructor(options: FloorCreationOptions) {
         const { canvas, floorDoc, dblClickHandler, elementClickHandler, mode, containerWidth } =
@@ -85,131 +83,17 @@ export class Floor {
         this.canvas.renderAll();
         this.initialScale = this.canvas.getZoom();
         this.initialViewportTransform = this.canvas.viewportTransform?.slice() || [];
+        this.touchManager = new TouchManager(this.canvas, this);
         // @ts-ignore -- private prop
         const upperCanvasEl = this.canvas.upperCanvasEl;
-        upperCanvasEl.addEventListener("touchstart", this.onTouchStart, { passive: true });
-        upperCanvasEl.addEventListener("touchmove", this.onTouchMove, { passive: true });
-        upperCanvasEl.addEventListener("touchend", this.onTouchEnd, { passive: true });
+        upperCanvasEl.addEventListener("touchstart", this.touchManager.onTouchStart, {
+            passive: true,
+        });
+        upperCanvasEl.addEventListener("touchmove", this.touchManager.onTouchMove, {
+            passive: true,
+        });
+        upperCanvasEl.addEventListener("touchend", this.touchManager.onTouchEnd, { passive: true });
     }
-
-    private getDistance(touches: TouchList): number {
-        const [touch1, touch2] = [touches[0], touches[1]];
-        return Math.sqrt(
-            Math.pow(touch2.clientX - touch1.clientX, 2) +
-                Math.pow(touch2.clientY - touch1.clientY, 2),
-        );
-    }
-
-    private onTouchStart = (e: TouchEvent) => {
-        if (e.touches.length === 2) {
-            this.initialPinchDistance = this.getDistance(e.touches);
-        } else if (e.touches.length === 1) {
-            this.initialDragX = e.touches[0].clientX;
-            this.initialDragY = e.touches[0].clientY;
-        }
-    };
-
-    private onTouchMove = (e: TouchEvent) => {
-        const activeObject = this.canvas.getActiveObject();
-
-        // If an object is selected, don't pan the canvas
-        if (activeObject) {
-            return;
-        }
-        // Handle pinch to zoom
-        if (e.touches.length === 2 && this.initialPinchDistance !== null) {
-            const newDistance = this.getDistance(e.touches);
-            const scale = newDistance / this.initialPinchDistance;
-
-            const delta = scale > 1 ? 10 : -10; // Adjust these numbers to modify sensitivity
-
-            this.handleZoomLogic({
-                e: { deltaY: delta, offsetX: e.touches[0].clientX, offsetY: e.touches[0].clientY },
-            } as fabric.IEvent<WheelEvent>);
-
-            // Update the initial distance for the next move.
-            this.initialPinchDistance = newDistance;
-        }
-        // Handle single touch move for panning
-        else if (
-            e.touches.length === 1 &&
-            this.initialDragX != undefined &&
-            this.initialDragY != undefined
-        ) {
-            if (this.canvas.getZoom() === this.initialScale) {
-                return; // No panning if not zoomed in
-            }
-
-            const deltaX = e.touches[0].clientX - this.initialDragX;
-            const deltaY = e.touches[0].clientY - this.initialDragY;
-
-            const { newPosX, newPosY } = this.checkBoundaries(deltaX, deltaY);
-
-            const viewportTransform = this.canvas.viewportTransform?.slice() || [1, 0, 0, 1, 0, 0];
-            viewportTransform[4] = newPosX;
-            viewportTransform[5] = newPosY;
-
-            this.canvas.setViewportTransform(viewportTransform);
-            this.canvas.requestRenderAll();
-
-            this.initialDragX = e.touches[0].clientX;
-            this.initialDragY = e.touches[0].clientY;
-        }
-    };
-
-    private onTouchEnd = () => {
-        this.initialPinchDistance = null;
-    };
-
-    checkBoundaries(deltaX: number, deltaY: number) {
-        let newPosX =
-            (this.canvas.viewportTransform ? this.canvas.viewportTransform[4] : 0) + deltaX;
-        let newPosY =
-            (this.canvas.viewportTransform ? this.canvas.viewportTransform[5] : 0) + deltaY;
-
-        // Check boundaries for X
-        if (newPosX > 0) {
-            newPosX = 0;
-        } else if (newPosX + this.width * this.canvas.getZoom() < this.canvas.getWidth()) {
-            newPosX = this.canvas.getWidth() - this.width * this.canvas.getZoom();
-        }
-
-        // Check boundaries for Y
-        if (newPosY > 0) {
-            newPosY = 0;
-        } else if (newPosY + this.height * this.canvas.getZoom() < this.canvas.getHeight()) {
-            newPosY = this.canvas.getHeight() - this.height * this.canvas.getZoom();
-        }
-
-        return { newPosX, newPosY };
-    }
-
-    private handleZoomLogic = (opt: fabric.IEvent<WheelEvent>) => {
-        if (!opt.e) {
-            return;
-        }
-
-        const delta = opt.e.deltaY;
-        let shouldReset = false;
-
-        if (delta > 0 && this.currentZoomSteps < MAX_ZOOM_STEPS) {
-            this.currentZoomSteps++;
-            this.performZoom(opt.e.offsetX, opt.e.offsetY);
-        } else if (delta < 0 && this.currentZoomSteps > 0) {
-            this.currentZoomSteps--;
-            this.performZoom(opt.e.offsetX, opt.e.offsetY);
-            if (this.currentZoomSteps <= 0) {
-                shouldReset = true;
-            }
-        }
-
-        if (shouldReset) {
-            this.resetToInitialState();
-        }
-
-        opt.e.preventDefault();
-        opt.e.stopPropagation();
-    };
 
     get json() {
         return this.canvas.toJSON(["label", "reservation", "name", "type"]);
@@ -262,7 +146,7 @@ export class Floor {
         opt.e.stopPropagation();
     };
 
-    private performZoom(offsetX: number, offsetY: number) {
+    performZoom(offsetX: number, offsetY: number) {
         const newZoom = DEFAULT_ZOOM + this.currentZoomSteps * ZOOM_INCREMENT;
 
         // Prevent over-zooming out
@@ -275,7 +159,7 @@ export class Floor {
         this.canvas.renderAll();
     }
 
-    private resetToInitialState() {
+    resetToInitialState() {
         this.canvas.setViewportTransform(this.initialViewportTransform.slice());
         this.canvas.setZoom(this.initialScale);
         this.canvas.renderAll();
