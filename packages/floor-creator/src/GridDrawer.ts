@@ -1,20 +1,15 @@
 import { RESOLUTION } from "./constants";
-import { Floor } from "./Floor";
 import { fabric } from "fabric";
 
 export class GridDrawer {
     private canvas: fabric.Canvas;
-    private floor: Floor;
 
-    constructor(canvas: fabric.Canvas, floor: Floor) {
+    constructor(canvas: fabric.Canvas) {
         this.canvas = canvas;
-        this.floor = floor;
     }
 
-    drawGrid() {
+    drawGrid(width: number, height: number) {
         const gridSize = RESOLUTION;
-        const width = this.floor.width;
-        const height = this.floor.height;
         const left = (width % gridSize) / 2;
         const top = (height % gridSize) / 2;
 

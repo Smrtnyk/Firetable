@@ -80,22 +80,13 @@ export class Floor {
         this.elementManager = new ElementManager({
             isInEditorMode: mode === FloorMode.EDITOR,
         });
-        this.gridDrawer = new GridDrawer(this.canvas, this);
-        this.initializeCanvasEventHandlers();
+        this.gridDrawer = new GridDrawer(this.canvas);
         this.renderData(this.floorDoc.json);
         this.canvas.renderAll();
         this.initialScale = this.canvas.getZoom();
         this.initialViewportTransform = this.canvas.viewportTransform?.slice() || [];
         this.touchManager = new TouchManager(this.canvas, this);
-        // @ts-ignore -- private prop
-        const upperCanvasEl = this.canvas.upperCanvasEl;
-        upperCanvasEl.addEventListener("touchstart", this.touchManager.onTouchStart, {
-            passive: true,
-        });
-        upperCanvasEl.addEventListener("touchmove", this.touchManager.onTouchMove, {
-            passive: true,
-        });
-        upperCanvasEl.addEventListener("touchend", this.touchManager.onTouchEnd, { passive: true });
+        this.initializeCanvasEventHandlers();
     }
 
     get json() {
@@ -120,6 +111,16 @@ export class Floor {
             if (!isTable(e.target)) return;
             this.elementClickHandler(this, e.target);
         });
+
+        // @ts-ignore -- private prop
+        const upperCanvasEl = this.canvas.upperCanvasEl;
+        upperCanvasEl.addEventListener("touchstart", this.touchManager.onTouchStart, {
+            passive: true,
+        });
+        upperCanvasEl.addEventListener("touchmove", this.touchManager.onTouchMove, {
+            passive: true,
+        });
+        upperCanvasEl.addEventListener("touchend", this.touchManager.onTouchEnd, { passive: true });
     }
 
     private onMouseWheelHandler = (opt: fabric.IEvent<WheelEvent>) => {
@@ -223,7 +224,7 @@ export class Floor {
             jsonData,
             () => {
                 if (this.mode === FloorMode.EDITOR) {
-                    this.gridDrawer.drawGrid();
+                    this.gridDrawer.drawGrid(this.width, this.height);
                 }
                 this.canvas.renderAll();
             },
@@ -234,7 +235,7 @@ export class Floor {
     renderEmptyFloor() {
         if (this.mode === FloorMode.EDITOR) {
             this.canvas.renderAll();
-            this.gridDrawer.drawGrid();
+            this.gridDrawer.drawGrid(this.width, this.height);
         }
     }
 
