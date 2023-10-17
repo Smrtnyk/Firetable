@@ -30,16 +30,22 @@ export class TouchManager {
         if (activeObject) {
             return;
         }
+
         // Handle pinch to zoom
         if (e.touches.length === 2 && this.initialPinchDistance !== null) {
             const newDistance = this.getDistance(e.touches);
             const scale = newDistance / this.initialPinchDistance;
 
-            const delta = scale > 1 ? 10 : -10; // Adjust these numbers to modify sensitivity
+            const midpoint = new fabric.Point(
+                (e.touches[0].clientX + e.touches[1].clientX) / 2,
+                (e.touches[0].clientY + e.touches[1].clientY) / 2,
+            );
 
-            this.handleZoomLogic({
-                e: { deltaY: delta, offsetX: e.touches[0].clientX, offsetY: e.touches[0].clientY },
-            } as fabric.IEvent<WheelEvent>);
+            if (scale > 1 && this.floor.zoomManager.canZoomIn()) {
+                this.floor.zoomIn(midpoint);
+            } else if (scale < 1 && this.floor.zoomManager.canZoomOut()) {
+                this.floor.zoomOut(midpoint);
+            }
 
             // Update the initial distance for the next move.
             this.initialPinchDistance = newDistance;
@@ -116,17 +122,17 @@ export class TouchManager {
 
         if (delta > 0 && this.floor.currentZoomSteps < MAX_ZOOM_STEPS) {
             this.floor.currentZoomSteps++;
-            this.floor.performZoom(opt.e.offsetX, opt.e.offsetY);
+            this.floor.zoomManager.performZoom(opt.e.offsetX, opt.e.offsetY);
         } else if (delta < 0 && this.floor.currentZoomSteps > 0) {
             this.floor.currentZoomSteps--;
-            this.floor.performZoom(opt.e.offsetX, opt.e.offsetY);
+            this.floor.zoomManager.performZoom(opt.e.offsetX, opt.e.offsetY);
             if (this.floor.currentZoomSteps <= 0) {
                 shouldReset = true;
             }
         }
 
         if (shouldReset) {
-            this.floor.resetToInitialState();
+            this.floor.zoomManager.resetZoom();
         }
 
         opt.e.preventDefault();

@@ -1,12 +1,5 @@
 import { fabric } from "fabric";
-import {
-    CANVAS_BG_COLOR,
-    DEFAULT_COORDINATE,
-    DEFAULT_ZOOM,
-    MAX_ZOOM_STEPS,
-    RESOLUTION,
-    ZOOM_INCREMENT,
-} from "./constants.js";
+import { CANVAS_BG_COLOR, DEFAULT_COORDINATE, RESOLUTION } from "./constants.js";
 import {
     BaseTable,
     CreateElementOptions,
@@ -22,6 +15,7 @@ import { RectTable } from "./elements/RectTable";
 import { ElementManager } from "./ElementManager";
 import { TouchManager } from "./TouchManager";
 import { GridDrawer } from "./GridDrawer";
+import { FloorZoomManager } from "./FloorZoomManager";
 
 interface FloorCreationOptions {
     canvas: HTMLCanvasElement;
@@ -48,10 +42,11 @@ export class Floor {
     mode: FloorMode;
     width: number;
     readonly initialScale: number;
-    private initialViewportTransform: number[];
+    private readonly initialViewportTransform: number[];
     elementManager: ElementManager;
     private touchManager: TouchManager;
     private gridDrawer: GridDrawer;
+    zoomManager: FloorZoomManager;
 
     constructor(options: FloorCreationOptions) {
         const { canvas, floorDoc, dblClickHandler, elementClickHandler, mode, containerWidth } =
@@ -85,6 +80,13 @@ export class Floor {
         this.canvas.renderAll();
         this.initialScale = this.canvas.getZoom();
         this.initialViewportTransform = this.canvas.viewportTransform?.slice() || [];
+
+        this.zoomManager = new FloorZoomManager(
+            this.canvas,
+            this.initialScale,
+            this.initialViewportTransform,
+        );
+
         this.touchManager = new TouchManager(this.canvas, this);
         this.initializeCanvasEventHandlers();
     }
@@ -97,6 +99,14 @@ export class Floor {
         const element = this.elementManager.addElement(options);
         element.on("mouseup", this.onElementClick);
         this.canvas.add(element);
+    }
+
+    zoomIn(point: fabric.Point) {
+        this.zoomManager.zoomIn(point);
+    }
+
+    zoomOut(point: fabric.Point) {
+        this.zoomManager.zoomOut(point);
     }
 
     private get isInEditorMode(): boolean {
@@ -129,45 +139,19 @@ export class Floor {
         }
 
         const delta = opt.e.deltaY;
-        let shouldReset = false;
 
-        if (delta > 0 && this.currentZoomSteps < MAX_ZOOM_STEPS) {
-            this.currentZoomSteps++;
-            this.performZoom(opt.e.offsetX, opt.e.offsetY);
-        } else if (delta < 0 && this.currentZoomSteps > 0) {
-            this.currentZoomSteps--;
-            this.performZoom(opt.e.offsetX, opt.e.offsetY);
-            if (this.currentZoomSteps <= 0) {
-                shouldReset = true;
+        if (delta > 0 && this.zoomManager.canZoomIn()) {
+            this.zoomManager.zoomIn(new fabric.Point(opt.e.offsetX, opt.e.offsetY));
+        } else if (delta < 0 && this.zoomManager.canZoomOut()) {
+            this.zoomManager.zoomOut(new fabric.Point(opt.e.offsetX, opt.e.offsetY));
+            if (!this.zoomManager.canZoomOut()) {
+                this.zoomManager.resetZoom();
             }
-        }
-
-        if (shouldReset) {
-            this.resetToInitialState();
         }
 
         opt.e.preventDefault();
         opt.e.stopPropagation();
     };
-
-    performZoom(offsetX: number, offsetY: number) {
-        const newZoom = DEFAULT_ZOOM + this.currentZoomSteps * ZOOM_INCREMENT;
-
-        // Prevent over-zooming out
-        if (newZoom < this.initialScale) {
-            this.resetToInitialState();
-            return;
-        }
-
-        this.canvas.zoomToPoint(new fabric.Point(offsetX, offsetY), newZoom);
-        this.canvas.renderAll();
-    }
-
-    resetToInitialState() {
-        this.canvas.setViewportTransform(this.initialViewportTransform.slice());
-        this.canvas.setZoom(this.initialScale);
-        this.canvas.renderAll();
-    }
 
     // Check if double click was on the actual table
     // if it is, then do nothing, but if it is not
