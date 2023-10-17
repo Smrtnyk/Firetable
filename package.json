@@ -36,11 +36,5 @@
     "private": true,
     "engines": {
         "pnpm": ">= 7.11.0"
-    },
-    "pnpm": {
-        "overrides": {
-            "vite": "v5.0.0-beta.10",
-            "@vitejs/plugin-vue": "4.4.0"
-        }
     }
 }
