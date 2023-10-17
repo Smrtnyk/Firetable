@@ -114,14 +114,33 @@ export class Floor {
     }
 
     private initializeCanvasEventHandlers() {
+        this.registerDoubleClickHandler();
+        this.registerObjectMoveHandler();
+        this.registerMouseWheelHandler();
+        this.registerObjectScalingHandler();
+        this.registerTouchHandlers();
+    }
+
+    private registerDoubleClickHandler() {
         this.canvas.on("mouse:dblclick", this.onDblClickHandler);
+    }
+
+    private registerObjectMoveHandler() {
         this.canvas.on("object:moving", this.onObjectMove);
+    }
+
+    private registerMouseWheelHandler() {
         this.canvas.on("mouse:wheel", this.onMouseWheelHandler);
+    }
+
+    private registerObjectScalingHandler() {
         this.canvas.on("object:scaling", (e) => {
             if (!isTable(e.target)) return;
             this.elementClickHandler(this, e.target);
         });
+    }
 
+    private registerTouchHandlers() {
         // @ts-ignore -- private prop
         const upperCanvasEl = this.canvas.upperCanvasEl;
         upperCanvasEl.addEventListener("touchstart", this.touchManager.onTouchStart, {
