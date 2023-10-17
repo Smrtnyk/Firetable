@@ -21,6 +21,7 @@ import { RoundTable } from "./elements/RoundTable";
 import { RectTable } from "./elements/RectTable";
 import { ElementManager } from "./ElementManager";
 import { TouchManager } from "./TouchManager";
+import { GridDrawer } from "./GridDrawer";
 
 interface FloorCreationOptions {
     canvas: HTMLCanvasElement;
@@ -50,6 +51,7 @@ export class Floor {
     private initialViewportTransform: number[];
     elementManager: ElementManager;
     private touchManager: TouchManager;
+    private gridDrawer: GridDrawer;
 
     constructor(options: FloorCreationOptions) {
         const { canvas, floorDoc, dblClickHandler, elementClickHandler, mode, containerWidth } =
@@ -78,6 +80,7 @@ export class Floor {
         this.elementManager = new ElementManager({
             isInEditorMode: mode === FloorMode.EDITOR,
         });
+        this.gridDrawer = new GridDrawer(this.canvas, this);
         this.initializeCanvasEventHandlers();
         this.renderData(this.floorDoc.json);
         this.canvas.renderAll();
@@ -220,7 +223,7 @@ export class Floor {
             jsonData,
             () => {
                 if (this.mode === FloorMode.EDITOR) {
-                    this.drawGrid();
+                    this.gridDrawer.drawGrid();
                 }
                 this.canvas.renderAll();
             },
@@ -231,50 +234,8 @@ export class Floor {
     renderEmptyFloor() {
         if (this.mode === FloorMode.EDITOR) {
             this.canvas.renderAll();
-            this.drawGrid();
+            this.gridDrawer.drawGrid();
         }
-    }
-
-    drawGrid() {
-        const gridSize = RESOLUTION;
-        const width = this.floorDoc.width;
-        const height = this.floorDoc.height;
-        const left = (width % gridSize) / 2;
-        const top = (height % gridSize) / 2;
-
-        const lines = this.createGridLines(width, height, gridSize, left, top);
-        this.addGridToCanvas(lines);
-    }
-
-    private createGridLines(
-        width: number,
-        height: number,
-        gridSize: number,
-        left: number,
-        top: number,
-    ): fabric.Line[] {
-        const lineOption = { stroke: "rgba(0,0,0,1)", strokeWidth: 1, selectable: false };
-        const lines = [];
-
-        for (let i = Math.ceil(width / gridSize); i--; ) {
-            lines.push(new fabric.Line([gridSize * i, -top, gridSize * i, height], lineOption));
-        }
-        for (let i = Math.ceil(height / gridSize); i--; ) {
-            lines.push(new fabric.Line([-left, gridSize * i, width, gridSize * i], lineOption));
-        }
-
-        return lines;
-    }
-
-    private addGridToCanvas(lines: fabric.Line[]): void {
-        const oGridGroup = new fabric.Group(lines, {
-            left: 0,
-            top: 0,
-            selectable: false,
-            excludeFromExport: true,
-        });
-        this.canvas.add(oGridGroup);
-        this.canvas.sendToBack(oGridGroup);
     }
 
     setReservationOnTable(element: BaseTable, reservation: Reservation | null) {
