@@ -2,55 +2,54 @@ import { fabric } from "fabric";
 
 export class DJBooth extends fabric.Group {
     constructor(left: number, top: number) {
-        // Main Body of DJ Booth
         const body = new fabric.Rect({
             left: 0,
             top: 0,
-            width: 100,
-            height: 40,
-            fill: "black",
+            rx: 15,
+            ry: 15,
+            width: 120,
+            height: 60,
+            fill: "#1C1C1C",
         });
 
-        // Table Surface for placing equipment
-        const tableSurface = new fabric.Rect({
-            left: 10,
-            top: -5,
-            width: 80,
-            height: 5,
-            fill: "grey",
-        });
-
-        // Two Turntables or CDJs
         const turntable1 = new fabric.Circle({
-            left: 5,
-            top: -15,
-            radius: 10,
-            fill: "black",
-            stroke: "white",
+            left: 20,
+            top: 20,
+            radius: 15,
+            fill: "#1C1C1C",
+            stroke: "#2F2F2F", // Dark Grey
             strokeWidth: 2,
         });
 
         const turntable2 = new fabric.Circle({
-            left: 75,
-            top: -15,
-            radius: 10,
-            fill: "black",
-            stroke: "white",
+            left: body.width! - 20 - turntable1.width!,
+            top: 20,
+            radius: 15,
+            fill: "#1C1C1C",
+            stroke: "#2F2F2F",
             strokeWidth: 2,
         });
 
-        // DJ Mixer in the middle
-        const mixer = new fabric.Rect({
-            left: 40,
-            top: -15,
-            width: 20,
-            height: 10,
-            fill: "silver",
+        const djSign = new fabric.Text("DJ", {
+            left: 50,
+            top: 5,
+            fontFamily: "Arial",
+            fontSize: 20,
+            fill: "#FFFFFF",
+            fontWeight: "bold",
         });
 
-        // Optional: You could also add labels or icons on turntables and mixer for more details
+        const ledSpacing = body.width! / 7; // dividing by total LEDs + 1 for even spacing
+        const leds = Array.from({ length: 6 }).map((_, index) => {
+            return new fabric.Circle({
+                left: ledSpacing * (index + 1),
+                top: 57,
+                radius: 2,
+                fill: "#3498DB",
+            });
+        });
 
-        super([body, tableSurface, turntable1, turntable2, mixer], { left, top });
+        super([body, turntable1, turntable2, djSign, ...leds], { left, top });
     }
 }
 
