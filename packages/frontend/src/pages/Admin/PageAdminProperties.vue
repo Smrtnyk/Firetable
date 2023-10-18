@@ -38,7 +38,7 @@ const onDeleteProperty = loadingWrapper(async (id: string) => {
 });
 
 async function deletePropertyAsync(propertyId: string, reset: () => void): Promise<void> {
-    if (await showConfirm("Delete property?")) {
+    if (await showConfirm("Delete property?", "This will also delete all the associated events!")) {
         return onDeleteProperty(propertyId);
     }
     reset();
