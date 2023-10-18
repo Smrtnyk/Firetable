@@ -43,7 +43,12 @@ const addNewElementsBottomSheetOptions = {
     actions: ELEMENTS_TO_ADD_COLLECTION,
 };
 
-const NON_TABLE_EL_TO_ADD = [ElementTag.SOFA, ElementTag.DJ_BOOTH, ElementTag.WALL];
+const NON_TABLE_EL_TO_ADD = [
+    ElementTag.SOFA,
+    ElementTag.SINGLE_SOFA,
+    ElementTag.DJ_BOOTH,
+    ElementTag.WALL,
+];
 
 const props = defineProps<Props>();
 const router = useRouter();

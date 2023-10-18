@@ -30,6 +30,13 @@ export const ELEMENTS_TO_ADD_COLLECTION = [
         },
     },
     {
+        label: "Add a Single sofa",
+        img: "/svg-images/wall.svg",
+        elementDescriptor: {
+            tag: ElementTag.SINGLE_SOFA,
+        },
+    },
+    {
         label: "Add DJ Booth",
         img: "/svg-images/wall.svg",
         elementDescriptor: {

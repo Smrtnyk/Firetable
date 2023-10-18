@@ -7,6 +7,7 @@ import { Sofa } from "./elements/Sofa";
 import { RoundTable } from "./elements/RoundTable";
 import { RESOLUTION, TABLE_HEIGHT, TABLE_WIDTH } from "./constants";
 import { RectTable } from "./elements/RectTable";
+import { SingleSofa } from "./elements/SingleSofa";
 
 interface ElementManagerOptions {
     isInEditorMode: boolean;
@@ -24,6 +25,7 @@ export class ElementManager {
             .with(ElementTag.RECT, () => this.addRectTableElement(options))
             .with(ElementTag.CIRCLE, () => this.addRoundTableElement(options))
             .with(ElementTag.SOFA, () => this.addSofaElement(options))
+            .with(ElementTag.SINGLE_SOFA, () => this.addSingleSofaElement(options))
             .with(ElementTag.DJ_BOOTH, () => this.addDJBooth(options))
             .with(ElementTag.WALL, () => this.addWall(options))
             .exhaustive();
@@ -39,6 +41,10 @@ export class ElementManager {
 
     private addSofaElement({ x, y }: CreateElementOptions) {
         return new Sofa(x, y);
+    }
+
+    private addSingleSofaElement({ x, y }: CreateElementOptions) {
+        return new SingleSofa(x, y);
     }
 
     private addRoundTableElement({ label, x, y }: CreateElementOptions) {

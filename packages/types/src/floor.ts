@@ -11,6 +11,7 @@ export const enum ElementTag {
     RECT = "rect",
     CIRCLE = "circle",
     SOFA = "sofa",
+    SINGLE_SOFA = "SingleSofa",
     DJ_BOOTH = "dj_booth",
     WALL = "wall",
 }
