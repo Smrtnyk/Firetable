@@ -15,6 +15,10 @@ import { fetchUsersByRoleFn } from "./callable/fetch-users-by-role.js";
 import { onUserDeletedFn } from "./trigger/on-user-deleted.js";
 import { onPropertyDeletedFn } from "./trigger/on-property-deleted.js";
 import { onPropertyDeletedCleanEvents } from "./trigger/on-property-deleted-clean-events.js";
+import { auth } from "./init.js";
+import { logger } from "firebase-functions";
+
+const MIN_PASSWORD_LENGTH = 6;
 
 // setVapidDetails(vapidKeys.subject, vapidKeys.publicKey, vapidKeys.privateKey);
 
@@ -37,6 +41,32 @@ export const handleWhenEventTablesChange = functions
     .onUpdate(handleReservation);
 
 // Everything that has to do with auth
+export const changePassword = functions
+    .region("europe-west3")
+    .https
+    .onCall(async (data: { newPassword: string }, context) => {
+        if (!context.auth) {
+            logger.error("Unauthenticated user tried to change password.");
+            throw new functions.https.HttpsError("unauthenticated", "The function must be called while authenticated.");
+        }
+
+        const uid: string = context.auth.uid;
+        const newPassword: string = data.newPassword;
+
+        if (!newPassword || newPassword.length < MIN_PASSWORD_LENGTH) {
+            logger.error("Invalid password provided by user:", uid);
+            throw new functions.https.HttpsError("invalid-argument", "Password must be at least 6 characters long!");
+        }
+
+        try {
+            await auth.updateUser(uid, { password: newPassword });
+            logger.log("Password changed successfully for user:", uid);
+            return { success: true };
+        } catch (error) {
+            logger.error("Failed to update the password for user:", uid, error);
+            throw new functions.https.HttpsError("internal", "Failed to update the user password.");
+        }
+    });
 export const fetchUsersByRole = functions
     .region("europe-west3")
     .https

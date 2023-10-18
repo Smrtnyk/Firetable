@@ -45,3 +45,10 @@ export function fetchUsersByRole(userIdsToFetch: string[]): Promise<HttpsCallabl
     const { functions } = initializeFirebase();
     return httpsCallable<string[], User[]>(functions, "fetchUsersByRole")(userIdsToFetch);
 }
+
+export function submitNewPassword(newPassword: string) {
+    if (!newPassword) return; // Add more validations if needed
+    const { functions } = initializeFirebase();
+    const changePassword = httpsCallable(functions, "changePassword");
+    return changePassword({ newPassword });
+}
