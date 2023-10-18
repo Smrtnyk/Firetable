@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { formatEventDate } from "src/helpers/utils";
 
@@ -15,16 +15,11 @@ import FTDialog from "components/FTDialog.vue";
 import { useQuasar } from "quasar";
 import { config } from "src/config";
 import { Floor, FloorMode, getTablesFromFloorDoc } from "@firetable/floor-creator";
-import { ADMIN, Collection, EventDoc, EventFeedDoc, FloorDoc, User } from "@firetable/types";
-import { updateEventFloorData, updateEventProperty, usersCollection } from "@firetable/backend";
-import { where } from "firebase/firestore";
-import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import {
-    createQuery,
-    useFirestoreCollection,
-    useFirestoreDocument,
-} from "src/composables/useFirestore";
+import { FloorDoc, User } from "@firetable/types";
+import { updateEventFloorData, updateEventProperty } from "@firetable/backend";
+import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { propIsTruthy } from "@firetable/utils";
+import useAdminEvent from "src/composables/useAdminEvent";
 
 interface Props {
     id: string;
@@ -35,31 +30,7 @@ const router = useRouter();
 const quasar = useQuasar();
 const tab = ref("info");
 
-const { data: eventFloors } = useFirestoreCollection<FloorDoc>(
-    `${Collection.EVENTS}/${props.id}/floors`,
-);
-
-const users = useFirestoreCollection<User>(
-    createQuery(usersCollection(), where("role", "!=", ADMIN)),
-    { once: true },
-);
-
-const {
-    data: event,
-    error: eventError,
-    stop: stopEventWatch,
-} = useFirestoreDocument<EventDoc>(`${Collection.EVENTS}/${props.id}`);
-
-watch(eventError, () => {
-    if (eventError.value) {
-        router.replace("/").catch(showErrorMessage);
-        stopEventWatch();
-    }
-});
-
-const { data: eventFeed } = useFirestoreCollection<EventFeedDoc>(
-    `${Collection.EVENTS}/${props.id}/${Collection.EVENT_FEED}`,
-);
+const { eventFloors, users, event, eventFeed } = useAdminEvent(props.id);
 
 function isEventFinished(eventTime: number): boolean {
     const eventFinishedLimit = new Date(eventTime);
