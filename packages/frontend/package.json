@@ -26,7 +26,7 @@
         "@quasar/extras": "1.16.7",
         "chart.js": "4.4.0",
         "pinia": "2.1.7",
-        "quasar": "2.12.7",
+        "quasar": "2.13.0",
         "register-service-worker": "^1.7.2",
         "ts-pattern": "5.0.5",
         "vue": "3.3.4",
