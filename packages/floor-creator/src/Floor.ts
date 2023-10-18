@@ -106,6 +106,10 @@ export class Floor {
         return this.mode === FloorMode.EDITOR;
     }
 
+    toggleGridVisibility = () => {
+        this.gridDrawer.toggleGridVisibility(this.width, this.height);
+    };
+
     onElementClick = (ev: fabric.IEvent<MouseEvent>) => {
         this.elementClickHandler(this, ev.target);
     };

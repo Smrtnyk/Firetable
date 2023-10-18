@@ -73,7 +73,7 @@ function createProperty(): void {
                 />
             </template>
         </FTTitle>
-        <q-list v-if="properties">
+        <q-list v-if="properties.length">
             <q-slide-item
                 v-for="property in properties"
                 :key="property.id"
@@ -92,5 +92,11 @@ function createProperty(): void {
                 </q-item>
             </q-slide-item>
         </q-list>
+        <div
+            v-if="properties.length === 0 && !isLoading"
+            class="row justify-center items-center q-mt-md"
+        >
+            <h6 class="q-ma-sm text-weight-bolder underline">There are no properties created.</h6>
+        </div>
     </div>
 </template>

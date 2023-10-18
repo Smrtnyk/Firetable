@@ -187,7 +187,24 @@ function onDeleteElement(element: BaseTable) {
                 </template>
             </q-input>
         </div>
-        <ShowSelectedElement @delete="onDeleteElement" :selected-floor-element="selectedElement" />
+        <div class="row items-center">
+            <ShowSelectedElement
+                @delete="onDeleteElement"
+                :selected-floor-element="selectedElement"
+                class="col"
+            />
+
+            <div class="col-auto">
+                <q-btn
+                    v-if="floorInstance"
+                    class="button-gradient"
+                    @click="floorInstance.toggleGridVisibility"
+                    label="Toggle Grid"
+                    size="sm"
+                    rounded
+                />
+            </div>
+        </div>
         <div class="row q-pa-sm q-col-gutter-md" v-if="floorInstance">
             <div class="col-6">
                 <q-badge color="secondary">

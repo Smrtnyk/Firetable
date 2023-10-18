@@ -3,6 +3,7 @@ import { fabric } from "fabric";
 
 export class GridDrawer {
     private canvas: fabric.Canvas;
+    private isGridVisible = true;
 
     constructor(canvas: fabric.Canvas) {
         this.canvas = canvas;
@@ -43,8 +44,31 @@ export class GridDrawer {
             top: 0,
             selectable: false,
             excludeFromExport: true,
+            // @ts-ignore
+            isGridLine: true,
         });
         this.canvas.add(oGridGroup);
         this.canvas.sendToBack(oGridGroup);
+    }
+
+    toggleGridVisibility = (width: number, height: number) => {
+        if (this.isGridVisible) {
+            this.clearGrid();
+        } else {
+            this.drawGrid(width, height);
+        }
+        this.isGridVisible = !this.isGridVisible;
+    };
+
+    clearGrid() {
+        const objects = this.canvas.getObjects();
+        for (let i = objects.length - 1; i >= 0; i--) {
+            // @ts-ignore
+            if (objects[i].isGridLine) {
+                // Assuming you've set a flag 'isGridLine' when drawing the grid
+                this.canvas.remove(objects[i]);
+            }
+        }
+        this.canvas.renderAll();
     }
 }
