@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { formatEventDate } from "src/helpers/utils";
 
@@ -12,7 +12,7 @@ import AdminEventFloorViewer from "components/admin/event/AdminEventFloorViewer.
 import AdminEventActiveStaff from "components/admin/event/AdminEventActiveStaff.vue";
 import FTDialog from "components/FTDialog.vue";
 
-import { useQuasar } from "quasar";
+import { Loading, useQuasar } from "quasar";
 import { config } from "src/config";
 import { Floor, FloorMode, getTablesFromFloorDoc } from "@firetable/floor-creator";
 import { FloorDoc, User } from "@firetable/types";
@@ -30,7 +30,20 @@ const router = useRouter();
 const quasar = useQuasar();
 const tab = ref("info");
 
-const { eventFloors, users, event, eventFeed } = useAdminEvent(props.id);
+const { eventFloors, users, event, eventFeed, isLoading } = useAdminEvent(props.id);
+
+watch(
+    isLoading,
+    (newIsLoading) => {
+        console.log("new loading", newIsLoading);
+        if (!newIsLoading) {
+            Loading.hide();
+        } else {
+            Loading.show();
+        }
+    },
+    { immediate: true },
+);
 
 function isEventFinished(eventTime: number): boolean {
     const eventFinishedLimit = new Date(eventTime);
@@ -137,7 +150,7 @@ onMounted(init);
 </script>
 
 <template>
-    <div v-if="event" class="PageAdminEvent">
+    <div v-if="event && !isLoading" class="PageAdminEvent">
         <FTTitle :title="event.name">
             <template #right>
                 <div class="column">

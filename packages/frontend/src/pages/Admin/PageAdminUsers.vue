@@ -46,13 +46,17 @@ const onDeleteUser = loadingWrapper(async (id: string) => {
     await fetchUsers();
 });
 
-watch(isLoading, (loading) => {
-    if (loading) {
-        Loading.show();
-    } else {
-        Loading.hide();
-    }
-});
+watch(
+    isLoading,
+    (loading) => {
+        if (loading) {
+            Loading.show();
+        } else {
+            Loading.hide();
+        }
+    },
+    { immediate: true },
+);
 
 function onCreateUserFormSubmit(newUser: CreateUserPayload) {
     if (users.value.length > maxNumOfUsers) {

@@ -12,13 +12,17 @@ import { watch } from "vue";
 const quasar = useQuasar();
 const { properties, fetchProperties, isLoading } = useProperties();
 
-watch(isLoading, (newIsLoading) => {
-    if (!newIsLoading) {
-        Loading.hide();
-    } else {
-        Loading.show();
-    }
-});
+watch(
+    isLoading,
+    (newIsLoading) => {
+        if (!newIsLoading) {
+            Loading.hide();
+        } else {
+            Loading.show();
+        }
+    },
+    { immediate: true },
+);
 
 function onPropertyCreate(propertyName: string) {
     return tryCatchLoadingWrapper({

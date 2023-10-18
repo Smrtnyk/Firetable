@@ -6,7 +6,7 @@ import FTDialog from "components/FTDialog.vue";
 
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { nextTick, ref, watch } from "vue";
-import { useQuasar } from "quasar";
+import { Loading, useQuasar } from "quasar";
 import { useRouter } from "vue-router";
 import { CreateEventPayload, EventDoc, PropertyDoc } from "@firetable/types";
 import { createNewEvent, deleteEvent } from "@firetable/backend";
@@ -24,6 +24,18 @@ const { floors } = useFloors();
 const { eventsByProperty, fetchMoreEvents, hasMoreEventsToFetch } = useEvents();
 const activePropertyId = ref("");
 const initialLoadDone = ref<Record<string, boolean>>({});
+
+watch(
+    isLoading,
+    (newIsLoading) => {
+        if (!newIsLoading) {
+            Loading.hide();
+        } else {
+            Loading.show();
+        }
+    },
+    { immediate: true },
+);
 
 watch(
     properties,

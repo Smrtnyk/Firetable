@@ -22,13 +22,17 @@ const { data: events, pending: isLoading } = useFirestoreCollection<EventDoc>(
     ),
 );
 
-watch(isLoading, (newIsLoading) => {
-    if (!newIsLoading) {
-        Loading.hide();
-    } else {
-        Loading.show();
-    }
-});
+watch(
+    isLoading,
+    (newIsLoading) => {
+        if (!newIsLoading) {
+            Loading.hide();
+        } else {
+            Loading.show();
+        }
+    },
+    { immediate: true },
+);
 </script>
 
 <template>

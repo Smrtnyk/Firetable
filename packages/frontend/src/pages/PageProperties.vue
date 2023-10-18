@@ -6,13 +6,17 @@ import { Loading } from "quasar";
 
 const { properties, isLoading } = useProperties();
 
-watch(isLoading, (newIsLoading) => {
-    if (!newIsLoading) {
-        Loading.hide();
-    } else {
-        Loading.show();
-    }
-});
+watch(
+    isLoading,
+    (newIsLoading) => {
+        if (!newIsLoading) {
+            Loading.hide();
+        } else {
+            Loading.show();
+        }
+    },
+    { immediate: true },
+);
 </script>
 
 <template>
