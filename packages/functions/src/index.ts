@@ -14,6 +14,7 @@ import { updateUserFn } from "./callable/update-user.js";
 import { fetchUsersByRoleFn } from "./callable/fetch-users-by-role.js";
 import { onUserDeletedFn } from "./trigger/on-user-deleted.js";
 import { onPropertyDeletedFn } from "./trigger/on-property-deleted.js";
+import { onPropertyDeletedCleanEvents } from "./trigger/on-property-deleted-clean-events.js";
 
 // setVapidDetails(vapidKeys.subject, vapidKeys.publicKey, vapidKeys.privateKey);
 
@@ -68,6 +69,11 @@ export const onPropertyDelete = functions
     .firestore
     .document(`${Collection.PROPERTIES}/{propertyId}`)
     .onDelete(onPropertyDeletedFn);
+export const onPropertyDeleteCleanupEvents = functions
+    .region("europe-west3")
+    .firestore
+    .document(`${Collection.PROPERTIES}/{propertyId}`)
+    .onDelete(onPropertyDeletedCleanEvents);
 
 // Generic stuff
 export const deleteCollection = functions
