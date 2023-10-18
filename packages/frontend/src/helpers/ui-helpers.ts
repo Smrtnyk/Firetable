@@ -1,7 +1,7 @@
 import { Dialog, Loading } from "quasar";
 import { isString, NOOP } from "@firetable/utils";
 
-export function showConfirm(title: string, message = "") {
+export function showConfirm(title: string, message = ""): Promise<boolean> {
     const options = {
         title,
         message,
@@ -27,11 +27,10 @@ export function showConfirm(title: string, message = "") {
 }
 
 export function showErrorMessage(e: unknown): void {
-    let message = "";
+    let message = "An unexpected error occurred.";
     if (isString(e)) {
         message = e;
-    }
-    if (e instanceof Error) {
+    } else if (e instanceof Error) {
         message = e.message;
     }
 
@@ -42,10 +41,10 @@ export function showErrorMessage(e: unknown): void {
     });
 }
 
-export function loadingWrapper<T extends (...args: any[]) => Promise<any>>(fn: T) {
+export function withLoading<T extends (...args: any[]) => Promise<any>>(fn: T) {
     return async function (...args: Parameters<T>): Promise<ReturnType<T> | void> {
+        Loading.show();
         try {
-            Loading.show();
             return await fn(...args);
         } catch (e) {
             showErrorMessage(e);

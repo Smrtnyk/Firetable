@@ -2,7 +2,7 @@
 import UserCreateForm from "components/admin/User/UserCreateForm.vue";
 import UserEditForm from "components/admin/User/UserEditForm.vue";
 import FTTitle from "components/FTTitle.vue";
-import { loadingWrapper, showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
+import { showConfirm, showErrorMessage, withLoading } from "src/helpers/ui-helpers";
 import { computed, watch } from "vue";
 import { config } from "src/config";
 import { Loading, useQuasar } from "quasar";
@@ -31,17 +31,17 @@ const usersStatus = computed(() => {
     };
 });
 
-const onCreateUser = loadingWrapper(async (newUser: CreateUserPayload) => {
+const onCreateUser = withLoading(async (newUser: CreateUserPayload) => {
     await createUserWithEmail(newUser);
     await fetchUsers();
 });
 
-const onUpdateUser = loadingWrapper(async (updatedUser: EditUserPayload) => {
+const onUpdateUser = withLoading(async (updatedUser: EditUserPayload) => {
     await updateUser(updatedUser);
     await fetchUsers();
 });
 
-const onDeleteUser = loadingWrapper(async (id: string) => {
+const onDeleteUser = withLoading(async (id: string) => {
     await deleteUser(id);
     await fetchUsers();
 });

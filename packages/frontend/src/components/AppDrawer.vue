@@ -6,7 +6,7 @@ import { LocalStorage, useQuasar } from "quasar";
 import { useAuthStore } from "src/stores/auth-store";
 import { useAppStore } from "src/stores/app-store";
 import { logoutUser, updateUserField } from "@firetable/backend";
-import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { showErrorMessage, withLoading } from "src/helpers/ui-helpers";
 import { ADMIN, Role, User } from "@firetable/types";
 
 const appStore = useAppStore();
@@ -80,11 +80,9 @@ function toggleUserActivityStatus(newValue: boolean) {
     updateUserField(user.value.id, "status", Number(newValue)).catch(showErrorMessage);
 }
 
-function onLogoutUser() {
-    tryCatchLoadingWrapper({
-        hook: () => logoutUser().then(authStore.unsubscribeUserWatch),
-    });
-}
+const onLogoutUser = withLoading(function () {
+    return logoutUser().then(authStore.unsubscribeUserWatch);
+});
 
 function setAppLanguage(val: string) {
     LocalStorage.set("FTLang", val);

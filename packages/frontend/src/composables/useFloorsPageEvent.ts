@@ -254,7 +254,7 @@ export default function useFloorsPageEvent(
                 });
             }
         }
-        tryCatchLoadingWrapper({
+        void tryCatchLoadingWrapper({
             hook: () => updateEventFloorData(floor, eventId),
         });
     }

@@ -4,7 +4,7 @@ import EventCreateForm from "components/admin/event/EventCreateForm.vue";
 import FTTitle from "components/FTTitle.vue";
 import FTDialog from "components/FTDialog.vue";
 
-import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { showConfirm, tryCatchLoadingWrapper, withLoading } from "src/helpers/ui-helpers";
 import { nextTick, ref, watch } from "vue";
 import { Loading, useQuasar } from "quasar";
 import { useRouter } from "vue-router";
@@ -68,18 +68,14 @@ function fetchEventsForActiveTab() {
     }
 }
 
-function onCreateEvent(eventData: CreateEventPayload) {
-    tryCatchLoadingWrapper({
-        hook: async () => {
-            const { data: id } = await createNewEvent(eventData);
-            quasar.notify("Event created!");
-            await router.replace({
-                name: "adminEvent",
-                params: { id },
-            });
-        },
+const onCreateEvent = withLoading(async function (eventData: CreateEventPayload) {
+    const { data: id } = await createNewEvent(eventData);
+    quasar.notify("Event created!");
+    await router.replace({
+        name: "adminEvent",
+        params: { id },
     });
-}
+});
 
 async function onEventItemSlideRight({ event, reset }: { event: EventDoc; reset: () => void }) {
     if (!(await showConfirm("Delete Event?"))) return reset();

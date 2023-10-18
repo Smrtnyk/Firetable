@@ -17,7 +17,7 @@ import { config } from "src/config";
 import { Floor, FloorMode, getTablesFromFloorDoc } from "@firetable/floor-creator";
 import { FloorDoc, User } from "@firetable/types";
 import { updateEventFloorData, updateEventProperty } from "@firetable/backend";
-import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { tryCatchLoadingWrapper, withLoading } from "src/helpers/ui-helpers";
 import { propIsTruthy } from "@firetable/utils";
 import useAdminEvent from "src/composables/useAdminEvent";
 
@@ -77,11 +77,9 @@ async function init() {
     }
 }
 
-function onFloorUpdate(floor: Floor) {
-    tryCatchLoadingWrapper({
-        hook: () => updateEventFloorData(floor, props.id),
-    });
-}
+const onFloorUpdate = withLoading(function (floor: Floor) {
+    return updateEventFloorData(floor, props.id);
+});
 
 function onUpdateActiveStaff(newActiveStaff: User["id"][]) {
     if (!event.value) return;

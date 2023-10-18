@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import {
+    showConfirm,
+    showErrorMessage,
+    tryCatchLoadingWrapper,
+    withLoading,
+} from "src/helpers/ui-helpers";
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 import { useEventsStore } from "src/stores/events-store";
@@ -50,11 +55,9 @@ async function deleteGuest(id: string, reset: () => void) {
     });
 }
 
-function confirmGuest({ id, confirmed }: GuestData, reset: () => void) {
-    tryCatchLoadingWrapper({
-        hook: () => confirmGuestFromGuestList(eventID.value, id, !confirmed).then(reset),
-    });
-}
+const confirmGuest = withLoading(function ({ id, confirmed }: GuestData, reset: () => void) {
+    return confirmGuestFromGuestList(eventID.value, id, !confirmed).then(reset);
+});
 
 function showAddNewGuestForm(): void {
     quasar.dialog({

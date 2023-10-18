@@ -4,7 +4,7 @@ import FTDialog from "components/FTDialog.vue";
 import AddNewPropertyForm from "components/admin/property/AddNewPropertyForm.vue";
 
 import { Loading, useQuasar } from "quasar";
-import { loadingWrapper, showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { showConfirm, withLoading } from "src/helpers/ui-helpers";
 import { createNewProperty, deleteProperty } from "@firetable/backend";
 import { useProperties } from "src/composables/useProperties";
 import { watch } from "vue";
@@ -24,21 +24,15 @@ watch(
     { immediate: true },
 );
 
-function onPropertyCreate(propertyName: string) {
-    return tryCatchLoadingWrapper({
-        hook: async () => {
-            await createNewProperty({
-                name: propertyName,
-            });
-            quasar.notify("Property created!");
-            void fetchProperties();
-        },
-    });
-}
+const onPropertyCreate = withLoading(async function (propertyName: string) {
+    await createNewProperty({ name: propertyName });
+    quasar.notify("Property created!");
+    return fetchProperties();
+});
 
-const onDeleteProperty = loadingWrapper(async (id: string) => {
+const onDeleteProperty = withLoading(async (id: string) => {
     await deleteProperty(id);
-    await fetchProperties();
+    return fetchProperties();
 });
 
 async function deletePropertyAsync(propertyId: string, reset: () => void): Promise<void> {

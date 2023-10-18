@@ -3,7 +3,7 @@ import { urlBase64ToUint8Array } from "src/helpers/utils";
 import { onMounted, ref } from "vue";
 import { useQuasar } from "quasar";
 import { savePushSubscription } from "@firetable/backend";
-import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { withLoading } from "src/helpers/ui-helpers";
 
 const ICON_128 = "icons/icon-128x128.png";
 const NOTIFICATIONS_GRANTED_OPTIONS: NotificationOptions = {
@@ -54,19 +54,15 @@ async function checkForExistingPushSubscription() {
     if (!subscription) await createAndSavePushSubscription(sw);
 }
 
-function createAndSavePushSubscription(sw: ServiceWorkerRegistration) {
-    return tryCatchLoadingWrapper({
-        hook: async () => {
-            const newSub = await sw.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: urlBase64ToUint8Array(process.env.VAPID_PUBLIC_KEY),
-            });
-
-            await savePushSubscription(newSub.toJSON());
-            await displayGrantedNotification(sw);
-        },
+const createAndSavePushSubscription = withLoading(async function (sw: ServiceWorkerRegistration) {
+    const newSub = await sw.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(process.env.VAPID_PUBLIC_KEY),
     });
-}
+
+    await savePushSubscription(newSub.toJSON());
+    await displayGrantedNotification(sw);
+});
 
 async function enableNotifications() {
     if (!pushNotificationsSupported) return;

@@ -4,7 +4,7 @@ import FTDialog from "components/FTDialog.vue";
 import AddNewOrganisationForm from "components/admin/organisation/AddNewOrganisationForm.vue";
 
 import { useQuasar } from "quasar";
-import { loadingWrapper, showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { showConfirm, withLoading } from "src/helpers/ui-helpers";
 import {
     createNewOrganisation,
     deleteOrganisation,
@@ -26,19 +26,15 @@ async function fetchOrganisations() {
     isLoading.value = false;
 }
 
-function onOrganisationCreate(organisationName: string) {
-    return tryCatchLoadingWrapper({
-        hook: async () => {
-            await createNewOrganisation({
-                name: organisationName,
-            });
-            quasar.notify("organisation created!");
-            void fetchOrganisations();
-        },
+const onOrganisationCreate = withLoading(async function (organisationName: string) {
+    await createNewOrganisation({
+        name: organisationName,
     });
-}
+    quasar.notify("organisation created!");
+    return fetchOrganisations();
+});
 
-const onDeleteOrganisation = loadingWrapper(async (id: string) => {
+const onDeleteOrganisation = withLoading(async (id: string) => {
     await deleteOrganisation(id);
     await fetchOrganisations();
 });
