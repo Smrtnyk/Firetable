@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { Component, computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { formatEventDate } from "src/helpers/utils";
 
@@ -91,59 +91,56 @@ function onUpdateActiveStaff(newActiveStaff: User["id"][]) {
     });
 }
 
-function showEventInfoEditDialog(): void {
-    if (!event.value) return;
+function showDialog(
+    component: Component,
+    title: string,
+    componentPropsObject: Record<string, unknown> = {},
+    listeners: Record<string, unknown> = {},
+) {
     quasar.dialog({
         component: FTDialog,
         componentProps: {
-            component: AdminEventEditInfo,
-            maximized: false,
-            title: "Edit event info",
-            componentPropsObject: {
-                eventInfo: event.value.info || "",
-                eventId: event.value.id,
-            },
-            listeners: {},
+            component,
+            title,
+            componentPropsObject,
+            listeners,
         },
     });
+}
+
+function showEventInfoEditDialog(): void {
+    if (event.value) {
+        showDialog(AdminEventEditInfo, "Edit event info", {
+            eventInfo: event.value.info,
+            eventId: event.value.id,
+        });
+    }
 }
 
 function showFloorEditDialog(floor: FloorDoc): void {
-    if (!event.value) return;
-    quasar.dialog({
-        component: FTDialog,
-        componentProps: {
-            component: AdminEventFloorViewer,
-            title: `Editing Floor: ${floor.name}`,
-            componentPropsObject: {
-                floor,
-                mode: FloorMode.EDITOR,
-                eventId: event.value.id,
-            },
-            listeners: {
-                update: onFloorUpdate,
-            },
-        },
-    });
+    if (event.value) {
+        showDialog(
+            AdminEventFloorViewer,
+            `Editing Floor: ${floor.name}`,
+            { floor, mode: FloorMode.EDITOR, eventId: event.value.id },
+            { update: onFloorUpdate },
+        );
+    }
 }
 
 function showAssignStaffDialog(): void {
-    if (!event.value) return;
-    quasar.dialog({
-        component: FTDialog,
-        componentProps: {
-            component: AdminEventActiveStaff,
-            title: `Active Staff`,
-            componentPropsObject: {
+    if (event.value) {
+        showDialog(
+            AdminEventActiveStaff,
+            "Active Staff",
+            {
                 eventId: event.value.id,
                 users: users.value,
                 activeStaff: new Set(event.value.activeStaff || []),
             },
-            listeners: {
-                updateActiveStaff: onUpdateActiveStaff,
-            },
-        },
-    });
+            { updateActiveStaff: onUpdateActiveStaff },
+        );
+    }
 }
 
 onMounted(init);
