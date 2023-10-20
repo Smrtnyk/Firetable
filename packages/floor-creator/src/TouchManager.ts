@@ -164,7 +164,7 @@ export class TouchManager {
         }
     }
 
-    private checkBoundaries(deltaX: number, deltaY: number) {
+    checkBoundaries(deltaX: number, deltaY: number) {
         let newPosX =
             (this.floor.canvas.viewportTransform ? this.floor.canvas.viewportTransform[4] : 0) +
             deltaX;
