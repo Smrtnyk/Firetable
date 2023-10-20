@@ -42,7 +42,10 @@ export class TouchManager {
     private handlePinchZoom(e: TouchEvent) {
         const newDistance = this.getDistance(e.touches);
         const newMidpoint = this.getMidpoint(e.touches);
-        const scaleChange = newDistance / this.initialPinchDistance!;
+        let scaleChange = newDistance / this.initialPinchDistance!;
+
+        // Reduce the scale change effect for slower zoom
+        scaleChange = 1 + (scaleChange - 1) * 0.8; // Adjust the multiplier (0.5) to control zoom speed
 
         this.handleZoomLogic(scaleChange, newMidpoint);
 
@@ -90,11 +93,17 @@ export class TouchManager {
     }
 
     private handleZoomLogic(scaleChange: number, midpoint: fabric.Point) {
-        if (scaleChange > 1 && this.floor.zoomManager.canZoomIn()) {
-            this.floor.zoomManager.zoomIn(midpoint);
-        } else if (scaleChange < 1 && this.floor.zoomManager.canZoomOut()) {
-            this.floor.zoomManager.zoomOut(midpoint);
-        }
+        const zoomFactor = this.floor.canvas.getZoom() * scaleChange;
+        let newZoom =
+            this.floor.canvas.getZoom() + (zoomFactor - this.floor.canvas.getZoom()) * 0.1;
+
+        // Clamp the zoom level between minZoom and maxZoom
+        newZoom = Math.max(
+            this.floor.zoomManager.minZoom,
+            Math.min(newZoom, this.floor.zoomManager.maxZoom),
+        );
+
+        this.floor.canvas.zoomToPoint(midpoint, newZoom);
     }
 
     private checkBoundaries(deltaX: number, deltaY: number) {
