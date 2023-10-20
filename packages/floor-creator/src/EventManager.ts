@@ -16,7 +16,6 @@ export class EventManager {
 
     initializeCanvasEventHandlers() {
         this.floor.canvas.on("mouse:dblclick", this.onDblClickHandler);
-        this.floor.canvas.on("object:moving", this.onObjectMove);
         this.floor.canvas.on("mouse:wheel", this.onMouseWheelHandler);
         this.floor.canvas.on("object:scaling", this.onObjectScaling);
 
@@ -43,17 +42,29 @@ export class EventManager {
         const target = e.target;
 
         if (target) {
-            const snap = 45; // 45 degrees, since we want to snap every 45 degrees (0, 45, 90, 135, ...)
+            // Snapping logic for rotation
+            const snapAngle = 45; // 45 degrees
             const threshold = 5; // degrees
-
-            // Calculate the snapped angle
-            const closestMultipleOfSnap = Math.round(target.angle! / snap) * snap;
+            const closestMultipleOfSnap = Math.round(target.angle! / snapAngle) * snapAngle;
             const differenceFromSnap = Math.abs(target.angle! - closestMultipleOfSnap);
-
             if (differenceFromSnap <= threshold) {
                 target.set("angle", closestMultipleOfSnap).setCoords();
-                this.floor.canvas.renderAll(); // Ensure the canvas is re-rendered with the updated rotation
             }
+
+            // Snapping logic for movement
+            const shouldSnapToGrid =
+                Math.round((target.left! / RESOLUTION) * 4) % 4 === 0 &&
+                Math.round((target.top! / RESOLUTION) * 4) % 4 === 0;
+            if (shouldSnapToGrid) {
+                target
+                    .set({
+                        left: Math.round(target.left! / RESOLUTION) * RESOLUTION,
+                        top: Math.round(target.top! / RESOLUTION) * RESOLUTION,
+                    })
+                    .setCoords();
+            }
+
+            this.floor.canvas.renderAll();
         }
     };
 
@@ -98,21 +109,6 @@ export class EventManager {
     onMouseUpHandler = () => {
         this.isDragging = false;
         this.floor.canvas.defaultCursor = "default"; // Reset cursor
-    };
-
-    onObjectMove = (options: fabric.IEvent) => {
-        if (!options.target?.left || !options.target?.top) return;
-        const shouldSnapToGrid =
-            Math.round((options.target.left / RESOLUTION) * 4) % 4 === 0 &&
-            Math.round((options.target.top / RESOLUTION) * 4) % 4 === 0;
-        if (shouldSnapToGrid) {
-            options.target
-                .set({
-                    left: Math.round(options.target.left / RESOLUTION) * RESOLUTION,
-                    top: Math.round(options.target.top / RESOLUTION) * RESOLUTION,
-                })
-                .setCoords();
-        }
     };
 
     // Check if double click was on the actual table
