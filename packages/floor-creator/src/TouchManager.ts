@@ -6,6 +6,7 @@ export class TouchManager {
     private initialPinchDistance: number | null = null;
     private initialDragX: number | null = null;
     private initialDragY: number | null = null;
+    private isPinching: boolean = false;
 
     constructor(floor: Floor) {
         this.floor = floor;
@@ -13,6 +14,7 @@ export class TouchManager {
 
     onTouchStart = (e: TouchEvent) => {
         if (e.touches.length === 2) {
+            this.isPinching = true;
             this.initialPinchDistance = this.getDistance(e.touches);
         } else if (e.touches.length === 1) {
             this.initialDragX = e.touches[0].clientX;
@@ -28,7 +30,7 @@ export class TouchManager {
             return;
         }
 
-        if (e.touches.length === 2 && this.initialPinchDistance != null) {
+        if (this.isPinching) {
             this.handlePinchZoom(e);
         } else if (
             e.touches.length === 1 &&
@@ -73,6 +75,7 @@ export class TouchManager {
     }
 
     onTouchEnd = () => {
+        this.isPinching = false;
         this.initialPinchDistance = null;
     };
 
