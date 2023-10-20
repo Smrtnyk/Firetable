@@ -8,6 +8,12 @@ export class FloorZoomManager {
     readonly maxZoom: number = DEFAULT_ZOOM * 3; // 3 times the default zoom
     readonly minZoom: number;
 
+    // Define animation properties
+    private animationDuration: number = 150; // Duration of the zoom animation in milliseconds
+    private startTime?: number;
+    private startZoom?: number;
+    private targetZoom?: number;
+
     initialPinchDistance?: number;
 
     constructor(canvas: fabric.Canvas, initialScale: number, initialViewportTransform: number[]) {
@@ -20,19 +26,44 @@ export class FloorZoomManager {
     zoomIn(point: fabric.Point) {
         const newZoom = this.canvas.getZoom() + this.canvas.getZoom() * ZOOM_INCREMENT;
         if (newZoom <= this.maxZoom) {
-            this.canvas.zoomToPoint(new fabric.Point(point.x, point.y), newZoom);
-            this.canvas.renderAll();
+            this.animateZoom(newZoom, point);
         }
     }
 
     zoomOut(point: fabric.Point) {
         const newZoom = this.canvas.getZoom() - this.canvas.getZoom() * ZOOM_INCREMENT;
         if (newZoom >= this.minZoom) {
-            this.canvas.zoomToPoint(new fabric.Point(point.x, point.y), newZoom);
-            this.canvas.renderAll();
+            this.animateZoom(newZoom, point);
         } else {
             this.resetZoom();
         }
+    }
+
+    // New method to animate the zoom transition
+    private animateZoom(targetZoom: number, point: fabric.Point) {
+        this.startTime = undefined;
+        this.startZoom = this.canvas.getZoom();
+        this.targetZoom = targetZoom;
+
+        const animateStep = (timestamp: number) => {
+            if (!this.startTime) {
+                this.startTime = timestamp;
+            }
+
+            const elapsed = timestamp - this.startTime;
+            const progress = Math.min(elapsed / this.animationDuration, 1);
+            const zoom = this.startZoom! + (this.targetZoom! - this.startZoom!) * progress;
+
+            this.canvas.zoomToPoint(point, zoom);
+
+            if (progress < 1) {
+                requestAnimationFrame(animateStep);
+            } else {
+                this.canvas.renderAll();
+            }
+        };
+
+        requestAnimationFrame(animateStep);
     }
 
     canZoomIn(): boolean {

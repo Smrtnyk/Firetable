@@ -8,6 +8,6 @@ export const CANVAS_BG_COLOR = "#333";
 export const TABLE_TEXT_FILL_COLOR = "#fff";
 
 export const DEFAULT_ZOOM = 1;
-export const ZOOM_INCREMENT = 0.2;
+export const ZOOM_INCREMENT = 0.3;
 export const MAX_ZOOM_STEPS = 5;
 export const DEFAULT_COORDINATE = 50;
