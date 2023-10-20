@@ -7,6 +7,7 @@ import { useQuasar } from "quasar";
 import { showConfirm, withLoading } from "src/helpers/ui-helpers";
 import {
     createNewOrganisation,
+    CreateOrganisationPayload,
     deleteOrganisation,
     fetchOrganisationsForAdmin,
 } from "@firetable/backend";
@@ -26,10 +27,10 @@ async function fetchOrganisations() {
     isLoading.value = false;
 }
 
-const onOrganisationCreate = withLoading(async function (organisationName: string) {
-    await createNewOrganisation({
-        name: organisationName,
-    });
+const onOrganisationCreate = withLoading(async function (
+    organisationPayload: CreateOrganisationPayload,
+) {
+    await createNewOrganisation(organisationPayload);
     quasar.notify("organisation created!");
     return fetchOrganisations();
 });

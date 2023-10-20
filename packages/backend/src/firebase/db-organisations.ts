@@ -2,7 +2,10 @@ import { OrganisationDoc } from "@firetable/types";
 import { deleteDoc, getDocs, getDoc, addDoc } from "firebase/firestore";
 import { organisationDoc, organisationsCollection } from "./db.js";
 
-export type CreateOrganisationPayload = Omit<OrganisationDoc, "id">;
+export interface CreateOrganisationPayload {
+    name: string;
+    maxAllowedProperties: number;
+}
 
 export async function createNewOrganisation(
     organisationPayload: CreateOrganisationPayload,
