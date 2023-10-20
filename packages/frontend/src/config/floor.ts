@@ -23,22 +23,22 @@ export const ELEMENTS_TO_ADD_COLLECTION = [
         },
     },
     {
-        label: "Add a Sofa",
-        img: "/svg-images/wall.svg",
+        label: "Add a Double Sofa",
+        img: "/svg-images/double-sofa.svg",
         elementDescriptor: {
             tag: ElementTag.SOFA,
         },
     },
     {
         label: "Add a Single sofa",
-        img: "/svg-images/wall.svg",
+        img: "/svg-images/single-sofa.svg",
         elementDescriptor: {
             tag: ElementTag.SINGLE_SOFA,
         },
     },
     {
         label: "Add DJ Booth",
-        img: "/svg-images/wall.svg",
+        img: "/svg-images/dj-booth.svg",
         elementDescriptor: {
             tag: ElementTag.DJ_BOOTH,
         },
