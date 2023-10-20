@@ -36,7 +36,7 @@ export async function fetchOrganisationById(
     const organisationDocSnapshot = await getDoc(organisationDoc(organisationId));
 
     if (!organisationDocSnapshot.exists()) {
-        console.log("No properties found for the given user");
+        console.log("No organisation found for the given user");
         return null;
     }
 

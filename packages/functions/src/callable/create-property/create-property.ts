@@ -5,12 +5,17 @@ import { FieldValue } from "firebase-admin/firestore";
 
 interface Data {
     name: string;
+    organisationId: string;
 }
 
 export async function createPropertyFn(data: Data, context: functions.https.CallableContext): Promise<string> {
     // Check for authenticated user
     if (!context.auth) {
         throw new functions.https.HttpsError("unauthenticated", "User must be authenticated");
+    }
+
+    if (!data.organisationId) {
+        throw new functions.https.HttpsError("invalid-argument", "organisationId is missing in property payload");
     }
 
     // Create a property with data received from the client

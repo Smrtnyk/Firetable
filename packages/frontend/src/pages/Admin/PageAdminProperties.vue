@@ -5,27 +5,25 @@ import AddNewPropertyForm from "components/admin/property/AddNewPropertyForm.vue
 
 import { Loading, useQuasar } from "quasar";
 import { showConfirm, withLoading } from "src/helpers/ui-helpers";
-import { createNewProperty, deleteProperty } from "@firetable/backend";
+import { createNewProperty, CreatePropertyPayload, deleteProperty } from "@firetable/backend";
 import { useProperties } from "src/composables/useProperties";
-import { watch } from "vue";
+import { watchEffect } from "vue";
+import { useOrganisations } from "src/composables/useOrganisations";
 
 const quasar = useQuasar();
 const { properties, fetchProperties, isLoading } = useProperties();
+const { organisations, isLoading: organisationsIsLoading } = useOrganisations();
 
-watch(
-    isLoading,
-    (newIsLoading) => {
-        if (!newIsLoading) {
-            Loading.hide();
-        } else {
-            Loading.show();
-        }
-    },
-    { immediate: true },
-);
+watchEffect(() => {
+    if (isLoading.value || organisationsIsLoading.value) {
+        Loading.show();
+    } else {
+        Loading.hide();
+    }
+});
 
-const onPropertyCreate = withLoading(async function (propertyName: string) {
-    await createNewProperty({ name: propertyName });
+const onPropertyCreate = withLoading(async function (payload: CreatePropertyPayload) {
+    await createNewProperty(payload);
     quasar.notify("Property created!");
     return fetchProperties();
 });
@@ -49,7 +47,9 @@ function createProperty(): void {
             title: "Add new Property",
             maximized: false,
             component: AddNewPropertyForm,
-            componentPropsObject: {},
+            componentPropsObject: {
+                organisations: organisations.value,
+            },
             listeners: {
                 create: onPropertyCreate,
             },

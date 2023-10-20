@@ -4,7 +4,10 @@ import { propertiesCollection, propertyDoc } from "./db.js";
 import { initializeFirebase } from "./base.js";
 import { httpsCallable } from "firebase/functions";
 
-export type CreatePropertyPayload = Omit<PropertyDoc, "id" | "_doc" | "relatedUsers">;
+export type CreatePropertyPayload = {
+    name: string;
+    organisationId: string;
+};
 
 export function createNewProperty(propertyPayload: CreatePropertyPayload) {
     const { functions } = initializeFirebase();
