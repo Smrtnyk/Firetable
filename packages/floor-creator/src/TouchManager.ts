@@ -143,8 +143,8 @@ export class TouchManager {
             this.floor.canvas.setViewportTransform(viewportTransform);
             this.floor.canvas.requestRenderAll();
 
-            this.velocityX *= this.friction;
-            this.velocityY *= this.friction;
+            this.velocityX *= this.friction - 0.01;
+            this.velocityY *= this.friction - 0.01;
 
             this.animationFrame = requestAnimationFrame(this.animateMomentumPanning.bind(this));
         } else {
@@ -159,6 +159,11 @@ export class TouchManager {
         let newPosY =
             (this.floor.canvas.viewportTransform ? this.floor.canvas.viewportTransform[5] : 0) +
             deltaY;
+
+        // Add a small offset for "bouncing" effect
+        const BOUNCE_OFFSET = 20;
+        newPosX = newPosX > 0 ? BOUNCE_OFFSET : newPosX;
+        newPosY = newPosY > 0 ? BOUNCE_OFFSET : newPosY;
 
         // Check boundaries for X
         if (newPosX > 0) {

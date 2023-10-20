@@ -1,6 +1,10 @@
 import { fabric } from "fabric";
 import { DEFAULT_ZOOM, ZOOM_INCREMENT } from "./constants.js";
 
+function easeInOutQuart(t: number): number {
+    return t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2;
+}
+
 export class FloorZoomManager {
     private canvas: fabric.Canvas;
     private readonly initialScale: number;
@@ -39,7 +43,6 @@ export class FloorZoomManager {
         }
     }
 
-    // New method to animate the zoom transition
     private animateZoom(targetZoom: number, point: fabric.Point) {
         this.startTime = undefined;
         this.startZoom = this.canvas.getZoom();
@@ -51,7 +54,7 @@ export class FloorZoomManager {
             }
 
             const elapsed = timestamp - this.startTime;
-            const progress = Math.min(elapsed / this.animationDuration, 1);
+            const progress = easeInOutQuart(Math.min(elapsed / this.animationDuration, 1));
             const zoom = this.startZoom! + (this.targetZoom! - this.startZoom!) * progress;
 
             this.canvas.zoomToPoint(point, zoom);
@@ -86,7 +89,7 @@ export class FloorZoomManager {
         let scaleChange = newDistance / this.initialPinchDistance!;
 
         // Reduce the scale change effect for slower zoom
-        scaleChange = 1 + (scaleChange - 1) * 0.8; // Adjust the multiplier (0.5) to control zoom speed
+        scaleChange = 1 + (scaleChange - 1) * 2.5;
 
         this.handleZoomLogic(scaleChange, newMidpoint);
 
@@ -114,7 +117,6 @@ export class FloorZoomManager {
         const zoomFactor = this.canvas.getZoom() * scaleChange;
         let newZoom = this.canvas.getZoom() + (zoomFactor - this.canvas.getZoom()) * 0.1;
 
-        // Clamp the zoom level between minZoom and maxZoom
         newZoom = Math.max(this.minZoom, Math.min(newZoom, this.maxZoom));
 
         this.canvas.zoomToPoint(midpoint, newZoom);
