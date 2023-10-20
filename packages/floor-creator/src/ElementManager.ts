@@ -8,6 +8,7 @@ import { RoundTable } from "./elements/RoundTable";
 import { RESOLUTION, TABLE_HEIGHT, TABLE_WIDTH } from "./constants";
 import { RectTable } from "./elements/RectTable";
 import { SingleSofa } from "./elements/SingleSofa";
+import { Stage } from "./elements/Stage";
 
 interface ElementManagerOptions {
     isInEditorMode: boolean;
@@ -28,6 +29,7 @@ export class ElementManager {
             .with(ElementTag.SINGLE_SOFA, () => this.addSingleSofaElement(options))
             .with(ElementTag.DJ_BOOTH, () => this.addDJBooth(options))
             .with(ElementTag.WALL, () => this.addWall(options))
+            .with(ElementTag.STAGE, () => this.addStageElement(options))
             .exhaustive();
     }
 
@@ -45,6 +47,10 @@ export class ElementManager {
 
     private addSingleSofaElement({ x, y }: CreateElementOptions) {
         return new SingleSofa(x, y);
+    }
+
+    private addStageElement({ x, y }: CreateElementOptions) {
+        return new Stage(x, y);
     }
 
     private addRoundTableElement({ label, x, y }: CreateElementOptions) {

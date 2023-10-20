@@ -48,6 +48,7 @@ const NON_TABLE_EL_TO_ADD = [
     ElementTag.SINGLE_SOFA,
     ElementTag.DJ_BOOTH,
     ElementTag.WALL,
+    ElementTag.STAGE,
 ];
 
 const props = defineProps<Props>();

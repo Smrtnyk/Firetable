@@ -43,6 +43,13 @@ export const ELEMENTS_TO_ADD_COLLECTION = [
             tag: ElementTag.DJ_BOOTH,
         },
     },
+    {
+        label: "Add Stage",
+        img: "/svg-images/disco-stage.svg",
+        elementDescriptor: {
+            tag: ElementTag.STAGE,
+        },
+    },
 ];
 
 export const BULK_ADD_COLLECTION = [

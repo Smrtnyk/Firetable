@@ -6,11 +6,12 @@ import { Sofa } from "./elements/Sofa";
 import { DJBooth } from "./elements/DJBooth";
 import { fabric } from "fabric";
 import { SingleSofa } from "./elements/SingleSofa";
+import { Stage } from "./elements/Stage";
 
 export type FloorDoubleClickHandler = (floor: Floor, coords: NumberTuple) => void;
 export type ElementClickHandler = (floor: Floor, el: fabric.Object | undefined) => void;
 export type BaseTable = RectTable | RoundTable;
-export type FloorEditorElement = RectTable | RoundTable | Sofa | DJBooth | SingleSofa;
+export type FloorEditorElement = RectTable | RoundTable | Sofa | DJBooth | SingleSofa | Stage;
 export type CreateElementOptions = {
     label?: string;
     x: number;
@@ -29,6 +30,7 @@ export enum FloorElementTypes {
     DJ_BOOTH = "DJBooth",
     SOFA = "Sofa",
     SINGLE_SOFA = "SingleSofa",
+    STAGE = "Stage",
 }
 
 /**
