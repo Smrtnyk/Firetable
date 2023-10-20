@@ -44,3 +44,20 @@ export const ELEMENTS_TO_ADD_COLLECTION = [
         },
     },
 ];
+
+export const BULK_ADD_COLLECTION = [
+    {
+        label: "Add square table",
+        img: "/svg-images/square-table.svg",
+        elementDescriptor: {
+            tag: ElementTag.RECT,
+        },
+    },
+    {
+        label: "Add round table",
+        img: "/svg-images/round-table.svg",
+        elementDescriptor: {
+            tag: ElementTag.CIRCLE,
+        },
+    },
+];

@@ -7,7 +7,7 @@ import { nextTick, onMounted, ref } from "vue";
 import { NumberTuple } from "src/types/generic";
 import { useRouter } from "vue-router";
 import { Loading, useQuasar } from "quasar";
-import { ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
+import { BULK_ADD_COLLECTION, ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
 import {
     BaseTable,
     extractAllTablesLabels,
@@ -57,6 +57,10 @@ const floorInstance = ref<Floor | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 const pageRef = ref<HTMLDivElement | null>(null);
 const selectedElement = ref<FloorEditorElement | null>(null);
+const bulkMode = ref(false);
+const bulkElement = ref<ElementTag | null>(null);
+const bulkLabelCounter = ref(0); // To auto-increment labels
+
 const { data: floor, promise: floorDataPromise } = useFirestoreDocument<FloorDoc>(
     `${Collection.FLOORS}/${props.floorID}`,
     {
@@ -154,6 +158,11 @@ function handleAddNewElement(floor: Floor, [x, y]: NumberTuple) {
 }
 
 function dblClickHandler(floor: Floor, coords: NumberTuple) {
+    if (bulkMode.value && bulkElement.value) {
+        const label = String(++bulkLabelCounter.value); // Auto-increment label
+        floor.addElement({ label, x: coords[0], y: coords[1], tag: bulkElement.value });
+        return;
+    }
     q.bottomSheet(addNewElementsBottomSheetOptions).onOk(handleAddNewElement(floor, coords));
 }
 
@@ -167,6 +176,32 @@ function onDeleteElement(element: BaseTable) {
     const elementToDelete = element.canvas?.getActiveObject();
     if (!elementToDelete) return;
     element.canvas?.remove(elementToDelete);
+}
+
+function toggleBulkMode() {
+    if (bulkMode.value) {
+        // If already in bulk mode, deactivate it
+        deactivateBulkMode();
+    } else {
+        // If not in bulk mode, show the bottom sheet to select an element for bulk addition
+        q.bottomSheet({ ...addNewElementsBottomSheetOptions, actions: BULK_ADD_COLLECTION }).onOk(
+            ({ elementDescriptor }: BottomSheetTableClickResult) => {
+                activateBulkMode(elementDescriptor.tag);
+            },
+        );
+    }
+}
+
+function activateBulkMode(elementTag: ElementTag) {
+    bulkMode.value = true;
+    bulkElement.value = elementTag;
+    bulkLabelCounter.value = 0; // Reset counter
+}
+
+function deactivateBulkMode() {
+    bulkMode.value = false;
+    bulkElement.value = null;
+    bulkLabelCounter.value = 0;
 }
 </script>
 
@@ -205,6 +240,13 @@ function onDeleteElement(element: BaseTable) {
                     class="button-gradient"
                     @click="floorInstance.toggleGridVisibility"
                     label="Toggle Grid"
+                    size="sm"
+                    rounded
+                />
+                <q-btn
+                    class="button-gradient"
+                    @click="toggleBulkMode"
+                    label="Toggle Bulk Mode"
                     size="sm"
                     rounded
                 />
