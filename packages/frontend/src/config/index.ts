@@ -48,6 +48,8 @@ export const myIcons: Record<string, string> = {
     camera: "svguse:/svg-icons/ft-icons.svg#camera",
     info: "svguse:/svg-icons/ft-icons.svg#info",
     copy: "svguse:/svg-icons/ft-icons.svg#copy",
+    grid: "svguse:/svg-icons/ft-icons.svg#grid",
+    stack: "svguse:/svg-icons/ft-icons.svg#stack",
 };
 
 export function getDarkMode(): boolean {

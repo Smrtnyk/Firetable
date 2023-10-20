@@ -227,29 +227,24 @@ function deactivateBulkMode() {
                 </template>
             </q-input>
         </div>
-        <div class="row items-center">
+        <div class="row">
             <ShowSelectedElement
                 @delete="onDeleteElement"
                 :selected-floor-element="selectedElement"
                 class="col"
             />
 
-            <div class="col-auto">
-                <q-btn
-                    v-if="floorInstance"
-                    class="button-gradient"
-                    @click="floorInstance.toggleGridVisibility"
-                    label="Toggle Grid"
-                    size="sm"
-                    rounded
-                />
-                <q-btn
-                    class="button-gradient"
-                    @click="toggleBulkMode"
-                    label="Toggle Bulk Mode"
-                    size="sm"
-                    rounded
-                />
+            <div class="row q-pa-sm q-col-gutter-md">
+                <div class="col-auto flex q-pl-none justify-end">
+                    <q-btn
+                        v-if="floorInstance"
+                        @click="floorInstance.toggleGridVisibility"
+                        icon="grid"
+                    />
+                </div>
+                <div class="col-auto flex q-pl-none justify-end">
+                    <q-btn @click="toggleBulkMode" icon="stack" />
+                </div>
             </div>
         </div>
         <div class="row q-pa-sm q-col-gutter-md" v-if="floorInstance">
