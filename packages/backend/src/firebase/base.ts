@@ -5,20 +5,22 @@ import { getFunctions, connectFunctionsEmulator, Functions } from "firebase/func
 import fbConfig from "./fb-config.json";
 import { memoize } from "@firetable/utils";
 
+const ipAddressPattern =
+    /^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$/;
+
 export const initializeFirebase = memoize(() => {
     const firebaseApp = initializeApp(fbConfig);
     const firestore = getFirestore(firebaseApp);
     const functions = getFunctions(firebaseApp, "europe-west3");
     const auth = getAuth(firebaseApp);
-    initEmulators(firestore, auth, functions);
+    if (location.hostname === "localhost" || ipAddressPattern.test(location.hostname)) {
+        initEmulators(firestore, auth, functions);
+    }
     return { firestore, auth, functions, firebaseApp };
 });
 
 function initEmulators(firestore: Firestore, auth: Auth, functions: Functions): void {
-    if (location.hostname !== "localhost") {
-        return;
-    }
-    connectAuthEmulator(auth, "http://localhost:9099/", { disableWarnings: true });
-    connectFirestoreEmulator(firestore, "localhost", 4000);
-    connectFunctionsEmulator(functions, "localhost", 5001);
+    connectAuthEmulator(auth, `http://${location.hostname}:9099/`, { disableWarnings: true });
+    connectFirestoreEmulator(firestore, location.hostname, 4000);
+    connectFunctionsEmulator(functions, location.hostname, 5001);
 }
