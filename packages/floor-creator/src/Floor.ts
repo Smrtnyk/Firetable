@@ -99,7 +99,24 @@ export class Floor {
     addElement(options: CreateElementOptions) {
         const element = this.elementManager.addElement(options);
         element.on("mouseup", this.onElementClick);
+        this.setElementPropertiesBasedOnMode(element);
         this.canvas.add(element);
+    }
+
+    private setElementPropertiesBasedOnMode(element: fabric.Object) {
+        if (this.isInEditorMode) {
+            element.lockScalingX = false;
+            element.lockScalingY = false;
+            element.lockMovementX = false;
+            element.lockMovementY = false;
+        } else {
+            element.lockScalingX = true;
+            element.lockScalingY = true;
+            element.lockMovementX = true;
+            element.lockMovementY = true;
+        }
+
+        element.lockScalingFlip = true;
     }
 
     private get isInEditorMode(): boolean {
@@ -116,8 +133,7 @@ export class Floor {
 
     elementReviver = (_: string, object: fabric.Object) => {
         object.on("mouseup", this.onElementClick);
-        object.lockMovementY = this.shouldLockDrag();
-        object.lockMovementX = this.shouldLockDrag();
+        this.setElementPropertiesBasedOnMode(object);
     };
 
     setScaling() {
@@ -155,10 +171,6 @@ export class Floor {
 
     setReservationOnTable(element: BaseTable, reservation: Reservation | null) {
         element.reservation = reservation;
-    }
-
-    shouldLockDrag() {
-        return this.mode !== FloorMode.EDITOR;
     }
 
     updateDimensions(newWidth: number, newHeight: number) {
