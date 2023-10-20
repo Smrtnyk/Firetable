@@ -244,7 +244,11 @@ function deactivateBulkMode() {
                     />
                 </div>
                 <div class="col-auto flex q-pl-none justify-end">
-                    <q-btn @click="toggleBulkMode" icon="stack" />
+                    <q-btn
+                        @click="toggleBulkMode"
+                        icon="stack"
+                        :color="bulkMode ? 'positive' : ''"
+                    />
                 </div>
             </div>
         </div>
