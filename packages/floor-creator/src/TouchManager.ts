@@ -1,9 +1,7 @@
-import { fabric } from "fabric";
 import { Floor } from "./Floor";
 
 export class TouchManager {
     private floor: Floor;
-    private initialPinchDistance?: number;
     private initialDragX?: number;
     private initialDragY?: number;
     private isPinching: boolean = false;
@@ -15,7 +13,9 @@ export class TouchManager {
     onTouchStart = (e: TouchEvent) => {
         if (e.touches.length === 2) {
             this.isPinching = true;
-            this.initialPinchDistance = this.getDistance(e.touches);
+            this.floor.zoomManager.initialPinchDistance = this.floor.zoomManager.getDistance(
+                e.touches,
+            );
         } else if (e.touches.length === 1) {
             this.initialDragX = e.touches[0].clientX;
             this.initialDragY = e.touches[0].clientY;
@@ -31,7 +31,7 @@ export class TouchManager {
         }
 
         if (this.isPinching) {
-            this.handlePinchZoom(e);
+            this.floor.zoomManager.handlePinchZoom(e);
         } else if (
             e.touches.length === 1 &&
             this.initialDragX != null &&
@@ -40,20 +40,6 @@ export class TouchManager {
             this.handlePanning(e);
         }
     };
-
-    private handlePinchZoom(e: TouchEvent) {
-        const newDistance = this.getDistance(e.touches);
-        const newMidpoint = this.getMidpoint(e.touches);
-        let scaleChange = newDistance / this.initialPinchDistance!;
-
-        // Reduce the scale change effect for slower zoom
-        scaleChange = 1 + (scaleChange - 1) * 0.8; // Adjust the multiplier (0.5) to control zoom speed
-
-        this.handleZoomLogic(scaleChange, newMidpoint);
-
-        // Update the initial distance for the next move.
-        this.initialPinchDistance = newDistance;
-    }
 
     private handlePanning(e: TouchEvent) {
         const deltaX = e.touches[0].clientX - this.initialDragX!;
@@ -76,38 +62,8 @@ export class TouchManager {
 
     onTouchEnd = () => {
         this.isPinching = false;
-        this.initialPinchDistance = undefined;
+        this.floor.zoomManager.initialPinchDistance = undefined;
     };
-
-    private getDistance(touches: TouchList): number {
-        const [touch1, touch2] = [touches[0], touches[1]];
-        return Math.sqrt(
-            Math.pow(touch2.clientX - touch1.clientX, 2) +
-                Math.pow(touch2.clientY - touch1.clientY, 2),
-        );
-    }
-
-    private getMidpoint(touches: TouchList): fabric.Point {
-        const [touch1, touch2] = [touches[0], touches[1]];
-        return new fabric.Point(
-            (touch1.clientX + touch2.clientX) / 2,
-            (touch1.clientY + touch2.clientY) / 2,
-        );
-    }
-
-    private handleZoomLogic(scaleChange: number, midpoint: fabric.Point) {
-        const zoomFactor = this.floor.canvas.getZoom() * scaleChange;
-        let newZoom =
-            this.floor.canvas.getZoom() + (zoomFactor - this.floor.canvas.getZoom()) * 0.1;
-
-        // Clamp the zoom level between minZoom and maxZoom
-        newZoom = Math.max(
-            this.floor.zoomManager.minZoom,
-            Math.min(newZoom, this.floor.zoomManager.maxZoom),
-        );
-
-        this.floor.canvas.zoomToPoint(midpoint, newZoom);
-    }
 
     private checkBoundaries(deltaX: number, deltaY: number) {
         let newPosX =
