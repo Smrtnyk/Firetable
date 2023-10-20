@@ -35,7 +35,27 @@ export class EventManager {
         upperCanvasEl.addEventListener("touchend", this.floor.touchManager.onTouchEnd, {
             passive: true,
         });
+
+        this.floor.canvas.on("object:modified", this.onObjectModified);
     }
+
+    private onObjectModified = (e: fabric.IEvent) => {
+        const target = e.target;
+
+        if (target) {
+            const snap = 45; // 45 degrees, since we want to snap every 45 degrees (0, 45, 90, 135, ...)
+            const threshold = 5; // degrees
+
+            // Calculate the snapped angle
+            const closestMultipleOfSnap = Math.round(target.angle! / snap) * snap;
+            const differenceFromSnap = Math.abs(target.angle! - closestMultipleOfSnap);
+
+            if (differenceFromSnap <= threshold) {
+                target.set("angle", closestMultipleOfSnap).setCoords();
+                this.floor.canvas.renderAll(); // Ensure the canvas is re-rendered with the updated rotation
+            }
+        }
+    };
 
     onMouseDownHandler = (opt: fabric.IEvent<MouseEvent>) => {
         const activeObject = this.floor.canvas.getActiveObject();
