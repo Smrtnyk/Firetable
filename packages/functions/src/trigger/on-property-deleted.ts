@@ -18,30 +18,42 @@ export async function onPropertyDeletedFn(
     const propertyId = context.params.propertyId;
 
     try {
-        // Fetch users associated with the property
+        // 1. Cleanup associated user-property mappings
         const usersSnapshot = await db.collection(Collection.USERS)
             .where("relatedProperties", "array-contains", propertyId)
             .get();
 
-        if (usersSnapshot.empty) {
-            functions.logger.info(`No users associated with property ${propertyId}. Exiting function.`);
-            return;
+        const batch = db.batch();
+
+        if (!usersSnapshot.empty) {
+            usersSnapshot.docs.forEach(doc => {
+                const userRef = doc.ref;
+                functions.logger.debug(`Scheduling update to remove property ID from user document with id: ${doc.id}`);
+                batch.update(userRef, {
+                    relatedProperties: FieldValue.arrayRemove(propertyId)
+                });
+            });
         }
 
-        const batch = db.batch();
-        usersSnapshot.docs.forEach(doc => {
-            const userRef = doc.ref;
-            functions.logger.debug(`Scheduling update to remove property ID from user document with id: ${doc.id}`);
-            batch.update(userRef, {
-                relatedProperties: FieldValue.arrayRemove(propertyId) // Use admin.firestore.FieldValue
-            });
-        });
+        // 2. Delete associated floors
+        const floorsSnapshot = await db.collection(Collection.FLOORS)
+            .where("propertyId", "==", propertyId)
+            .get();
 
+        if (!floorsSnapshot.empty) {
+            floorsSnapshot.docs.forEach(doc => {
+                functions.logger.debug(`Scheduling deletion of floor document with id: ${doc.id}`);
+                batch.delete(doc.ref);
+            });
+        }
+
+        // Commit batched operations
         await batch.commit();
-        functions.logger.info(`Successfully removed property ${propertyId} from associated users' relatedProperties field.`);
+
+        functions.logger.info(`Successfully handled deletion tasks for property ${propertyId}`);
 
     } catch (error) {
-        functions.logger.error("Error updating relatedProperties field for users:", error);
-        throw new Error(`Failed to update relatedProperties field for users associated with property ${propertyId}`);
+        functions.logger.error("Error handling property deletion tasks:", error);
+        throw new Error(`Failed to handle deletion tasks for property ${propertyId}`);
     }
 }
