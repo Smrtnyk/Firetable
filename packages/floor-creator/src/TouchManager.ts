@@ -1,4 +1,15 @@
 import { Floor } from "./Floor";
+import { FloorZoomManager } from "./FloorZoomManager";
+
+const VELOCITY_THRESHOLD = 0.01;
+const FRICTION_DECREMENT = 0.01;
+const BOUNCE_OFFSET = 20;
+
+function checkBoundary(value: number, min: number, max: number): number {
+    if (value > max) return max;
+    if (value < min) return min;
+    return value;
+}
 
 export class TouchManager {
     private floor: Floor;
@@ -22,9 +33,7 @@ export class TouchManager {
     onTouchStart = (e: TouchEvent) => {
         if (e.touches.length === 2) {
             this.isPinching = true;
-            this.floor.zoomManager.initialPinchDistance = this.floor.zoomManager.getDistance(
-                e.touches,
-            );
+            this.floor.zoomManager.initialPinchDistance = FloorZoomManager.getDistance(e.touches);
         } else if (e.touches.length === 1) {
             this.initialDragX = e.touches[0].clientX;
             this.initialDragY = e.touches[0].clientY;
@@ -99,7 +108,10 @@ export class TouchManager {
     };
 
     private animateMomentumPanning() {
-        if (Math.abs(this.velocityX) > 0.01 || Math.abs(this.velocityY) > 0.01) {
+        if (
+            Math.abs(this.velocityX) > VELOCITY_THRESHOLD ||
+            Math.abs(this.velocityY) > VELOCITY_THRESHOLD
+        ) {
             // Calculate the new position without clamping
             let newPosX =
                 (this.floor.canvas.viewportTransform ? this.floor.canvas.viewportTransform[4] : 0) +
@@ -143,8 +155,8 @@ export class TouchManager {
             this.floor.canvas.setViewportTransform(viewportTransform);
             this.floor.canvas.requestRenderAll();
 
-            this.velocityX *= this.friction - 0.01;
-            this.velocityY *= this.friction - 0.01;
+            this.velocityX *= this.friction - FRICTION_DECREMENT;
+            this.velocityY *= this.friction - FRICTION_DECREMENT;
 
             this.animationFrame = requestAnimationFrame(this.animateMomentumPanning.bind(this));
         } else {
@@ -160,31 +172,16 @@ export class TouchManager {
             (this.floor.canvas.viewportTransform ? this.floor.canvas.viewportTransform[5] : 0) +
             deltaY;
 
-        // Add a small offset for "bouncing" effect
-        const BOUNCE_OFFSET = 20;
-        newPosX = newPosX > 0 ? BOUNCE_OFFSET : newPosX;
-        newPosY = newPosY > 0 ? BOUNCE_OFFSET : newPosY;
-
-        // Check boundaries for X
-        if (newPosX > 0) {
-            newPosX = 0;
-        } else if (
-            newPosX + this.floor.width * this.floor.canvas.getZoom() <
-            this.floor.canvas.getWidth()
-        ) {
-            newPosX = this.floor.canvas.getWidth() - this.floor.width * this.floor.canvas.getZoom();
-        }
-
-        // Check boundaries for Y
-        if (newPosY > 0) {
-            newPosY = 0;
-        } else if (
-            newPosY + this.floor.height * this.floor.canvas.getZoom() <
-            this.floor.canvas.getHeight()
-        ) {
-            newPosY =
-                this.floor.canvas.getHeight() - this.floor.height * this.floor.canvas.getZoom();
-        }
+        newPosX = checkBoundary(
+            newPosX,
+            -this.floor.width * this.floor.canvas.getZoom() + this.floor.canvas.getWidth(),
+            BOUNCE_OFFSET,
+        );
+        newPosY = checkBoundary(
+            newPosY,
+            -this.floor.height * this.floor.canvas.getZoom() + this.floor.canvas.getHeight(),
+            BOUNCE_OFFSET,
+        );
 
         return { newPosX, newPosY };
     }

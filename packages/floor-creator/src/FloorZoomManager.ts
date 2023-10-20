@@ -84,8 +84,8 @@ export class FloorZoomManager {
     }
 
     handlePinchZoom(e: TouchEvent) {
-        const newDistance = this.getDistance(e.touches);
-        const newMidpoint = this.getMidpoint(e.touches);
+        const newDistance = FloorZoomManager.getDistance(e.touches);
+        const newMidpoint = FloorZoomManager.getMidpoint(e.touches);
         let scaleChange = newDistance / this.initialPinchDistance!;
 
         // Reduce the scale change effect for slower zoom
@@ -97,7 +97,7 @@ export class FloorZoomManager {
         this.initialPinchDistance = newDistance;
     }
 
-    getDistance(touches: TouchList): number {
+    static getDistance(touches: TouchList): number {
         const [touch1, touch2] = [touches[0], touches[1]];
         return Math.sqrt(
             Math.pow(touch2.clientX - touch1.clientX, 2) +
@@ -105,7 +105,7 @@ export class FloorZoomManager {
         );
     }
 
-    private getMidpoint(touches: TouchList): fabric.Point {
+    static getMidpoint(touches: TouchList): fabric.Point {
         const [touch1, touch2] = [touches[0], touches[1]];
         return new fabric.Point(
             (touch1.clientX + touch2.clientX) / 2,
