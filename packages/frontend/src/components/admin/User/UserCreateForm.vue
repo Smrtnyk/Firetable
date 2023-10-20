@@ -32,7 +32,6 @@ const userCreateForm = ref<QForm>();
 const form = ref<CreateUserPayload | User>({ ...userSkeleton() });
 const chosenProperties = ref<string[]>([]);
 
-const isPropertyOwner = computed(() => form.value.role === Role.PROPERTY_OWNER);
 const role = computed(() => authStore.user!.role);
 const availableRoles = computed(() => availableRolesBasedOn(role.value));
 const organisationOptions = computed(() => props.organisations);
@@ -183,8 +182,11 @@ function resetProperties() {
                 option-label="name"
                 option-value="value"
             />
+            <div v-else-if="form.role === Role.PROPERTY_OWNER && !props.organisations.length">
+                You must have at least one organisation created before creating property owner!
+            </div>
 
-            <div v-if="!isPropertyOwner" class="q-gutter-sm q-mb-lg">
+            <div v-if="props.properties.length" class="q-gutter-sm q-mb-lg">
                 <div>Properties:</div>
                 <div>
                     <q-checkbox

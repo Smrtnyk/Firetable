@@ -7,7 +7,7 @@ import { fetchUsersByRole, propertiesCollection } from "@firetable/backend";
 export function useAdminUsers() {
     const authStore = useAuthStore();
     const users = ref<User[]>([]);
-    const isLoading = ref<boolean>(false);
+    const isLoading = ref<boolean>(true);
 
     async function fetchRelatedProperties() {
         isLoading.value = true;

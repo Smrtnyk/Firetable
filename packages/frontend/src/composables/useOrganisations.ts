@@ -9,7 +9,7 @@ export function useOrganisations() {
     const error = ref<null | Error>(null);
     const isLoading = ref(true);
 
-    async function fetchProperties() {
+    async function fetchOrganisations() {
         isLoading.value = true;
         try {
             if (auth.user?.role === ADMIN) {
@@ -27,10 +27,10 @@ export function useOrganisations() {
         }
     }
 
-    onMounted(fetchProperties);
+    onMounted(fetchOrganisations);
 
     return {
-        fetchProperties,
+        fetchOrganisations,
         organisations,
         isLoading,
         error,

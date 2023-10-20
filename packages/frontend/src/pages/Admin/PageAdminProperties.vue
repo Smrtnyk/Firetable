@@ -63,6 +63,7 @@ function createProperty(): void {
         <FTTitle title="Properties">
             <template #right>
                 <q-btn
+                    v-if="organisations.length && !organisationsIsLoading"
                     rounded
                     icon="plus"
                     class="button-gradient"
@@ -71,7 +72,7 @@ function createProperty(): void {
                 />
             </template>
         </FTTitle>
-        <q-list v-if="properties.length">
+        <q-list v-if="properties.length && organisations.length">
             <q-slide-item
                 v-for="property in properties"
                 :key="property.id"
@@ -95,6 +96,15 @@ function createProperty(): void {
             class="row justify-center items-center q-mt-md"
         >
             <h6 class="q-ma-sm text-weight-bolder underline">There are no properties created.</h6>
+        </div>
+
+        <div
+            v-if="organisations.length === 0 && !organisationsIsLoading"
+            class="row justify-center items-center q-mt-md"
+        >
+            <h6 class="q-ma-sm text-weight-bolder underline">
+                In order to create properties, you must first create an organisation.
+            </h6>
         </div>
     </div>
 </template>
