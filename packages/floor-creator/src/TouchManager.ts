@@ -3,9 +3,9 @@ import { Floor } from "./Floor";
 
 export class TouchManager {
     private floor: Floor;
-    private initialPinchDistance: number | null = null;
-    private initialDragX: number | null = null;
-    private initialDragY: number | null = null;
+    private initialPinchDistance?: number;
+    private initialDragX?: number;
+    private initialDragY?: number;
     private isPinching: boolean = false;
 
     constructor(floor: Floor) {
@@ -76,7 +76,7 @@ export class TouchManager {
 
     onTouchEnd = () => {
         this.isPinching = false;
-        this.initialPinchDistance = null;
+        this.initialPinchDistance = undefined;
     };
 
     private getDistance(touches: TouchList): number {
