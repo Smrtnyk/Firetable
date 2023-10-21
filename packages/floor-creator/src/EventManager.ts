@@ -1,56 +1,23 @@
 import { fabric } from "fabric";
 import { Floor } from "./Floor";
 import { NumberTuple } from "./types";
-import { isFloorElement, isTable } from "./type-guards";
+import { isFloorElement } from "./type-guards";
 import { DEFAULT_COORDINATE, RESOLUTION } from "./constants";
-
-import Hammer from "hammerjs";
 
 export class EventManager {
     private readonly floor: Floor;
-    private hammerManager!: HammerManager;
 
     constructor(floor: Floor) {
         this.floor = floor;
     }
 
     initializeCanvasEventHandlers() {
-        // @ts-ignore -- private prop
-        const upperCanvasEl = this.floor.canvas.upperCanvasEl as HTMLElement;
-        this.hammerManager = new Hammer(upperCanvasEl);
         this.floor.canvas.on("mouse:dblclick", this.onDblClickHandler);
         this.floor.canvas.on("mouse:wheel", this.onMouseWheelHandler);
-        this.floor.canvas.on("object:scaling", this.onObjectScaling);
-
-        this.hammerManager.on("pinch", (ev) => {
-            const scale = ev.scale;
-            const dampeningFactor = 0.05; // Adjust this value to control the zoom sensitivity
-
-            const adjustedScale = 1 + (scale - 1) * dampeningFactor;
-
-            const center = new fabric.Point(ev.center.x, ev.center.y);
-            this.floor.zoomManager.zoomToPoint(center, adjustedScale);
-        });
-
-        this.hammerManager.on("panstart", (ev) => {
-            this.floor.touchManager.onTouchStart(ev);
-        });
-
-        this.hammerManager.on("panmove", (ev) => {
-            this.floor.touchManager.onTouchMove(ev);
-        });
-
-        this.hammerManager.on("panend", () => {
-            this.floor.touchManager.onTouchEnd();
-        });
-
-        this.hammerManager.get("pinch").set({ enable: true });
-        this.hammerManager.get("pan").set({ direction: Hammer.DIRECTION_ALL });
-
-        this.floor.canvas.on("object:modified", this.onObjectModified);
+        this.floor.canvas.on("object:modified", this.snapToGridOnModify);
     }
 
-    private onObjectModified = (e: fabric.IEvent) => {
+    private snapToGridOnModify = (e: fabric.IEvent) => {
         const target = e.target;
 
         if (target) {
@@ -85,10 +52,9 @@ export class EventManager {
     // then invoke the handler
     private onDblClickHandler = (ev: fabric.IEvent) => {
         if (isFloorElement(ev.target)) return;
-        const coords: NumberTuple = [
-            ev.pointer?.x || DEFAULT_COORDINATE,
-            ev.pointer?.y || DEFAULT_COORDINATE,
-        ];
+        const x = ev.pointer?.x ?? DEFAULT_COORDINATE;
+        const y = ev.pointer?.y ?? DEFAULT_COORDINATE;
+        const coords: NumberTuple = [x, y];
         this.floor.dblClickHandler?.(this.floor, coords);
     };
 
@@ -110,10 +76,5 @@ export class EventManager {
 
         opt.e.preventDefault();
         opt.e.stopPropagation();
-    };
-
-    private onObjectScaling = (e: fabric.IEvent) => {
-        if (!isTable(e.target)) return;
-        this.floor.elementClickHandler(this.floor, e.target);
     };
 }

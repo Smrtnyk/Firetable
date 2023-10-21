@@ -62,12 +62,13 @@ const bulkMode = ref(false);
 const bulkElement = ref<ElementTag | null>(null);
 const bulkLabelCounter = ref(0); // To auto-increment labels
 
-const { data: floor, promise: floorDataPromise } = useFirestoreDocument<FloorDoc>(
-    `${Collection.FLOORS}/${props.floorID}`,
-    {
-        once: true,
-    },
-);
+const {
+    data: floor,
+    promise: floorDataPromise,
+    pending: isFloorLoading,
+} = useFirestoreDocument<FloorDoc>(`${Collection.FLOORS}/${props.floorID}`, {
+    once: true,
+});
 
 onMounted(async () => {
     Loading.show();
@@ -283,6 +284,6 @@ function deactivateBulkMode() {
             </div>
         </div>
 
-        <canvas v-if="floor" ref="canvasRef" class="shadow-3" />
+        <canvas v-if="floor && !isFloorLoading" ref="canvasRef" class="shadow-3" />
     </div>
 </template>

@@ -28,15 +28,17 @@ export class FloorZoomManager {
     }
 
     zoomIn(point: fabric.Point) {
-        const newZoom = this.canvas.getZoom() + this.canvas.getZoom() * ZOOM_INCREMENT;
-        if (newZoom <= this.maxZoom) {
-            this.animateZoom(newZoom, point);
-        }
+        this.adjustZoom(ZOOM_INCREMENT, point);
     }
 
     zoomOut(point: fabric.Point) {
-        const newZoom = this.canvas.getZoom() - this.canvas.getZoom() * ZOOM_INCREMENT;
-        if (newZoom >= this.minZoom) {
+        this.adjustZoom(-ZOOM_INCREMENT, point);
+    }
+
+    // Adjust the zoom level based on the increment/decrement factor and animate the zoom
+    private adjustZoom(incrementFactor: number, point: fabric.Point) {
+        const newZoom = this.canvas.getZoom() + this.canvas.getZoom() * incrementFactor;
+        if (newZoom <= this.maxZoom && newZoom >= this.minZoom) {
             this.animateZoom(newZoom, point);
         } else {
             this.resetZoom();
