@@ -2,32 +2,12 @@
     <div class="row q-pa-sm q-col-gutter-md" v-if="selectedElement">
         <div class="col-10 flex justify-between">
             <div class="row">
-                <div v-if="isRoundTable(selectedElement)" class="col-4 q-pa-xs q-pl-none">
-                    <q-input
-                        :model-value="getElementRadius(selectedElement)"
-                        filled
-                        label="Radius"
-                        readonly
-                    />
+                <div class="col-4 q-pa-xs q-pl-none">
+                    <q-input :model-value="getElementWidth()" filled label="Width" readonly />
                 </div>
-                <template v-else>
-                    <div class="col-4 q-pa-xs q-pl-none">
-                        <q-input
-                            :model-value="getElementWidth(selectedElement)"
-                            filled
-                            label="Width"
-                            readonly
-                        />
-                    </div>
-                    <div class="col-4 q-pa-xs">
-                        <q-input
-                            :model-value="getElementHeight(selectedElement)"
-                            filled
-                            label="Height"
-                            readonly
-                        />
-                    </div>
-                </template>
+                <div class="col-4 q-pa-xs">
+                    <q-input :model-value="getElementHeight()" filled label="Height" readonly />
+                </div>
                 <div class="col-4 q-pa-xs">
                     <q-input
                         v-if="isTable(selectedElement)"
@@ -58,7 +38,7 @@
 <script setup lang="ts">
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed, nextTick } from "vue";
-import { FloorEditorElement, isRoundTable, isTable, RoundTable } from "@firetable/floor-creator";
+import { FloorEditorElement, isTable } from "@firetable/floor-creator";
 
 interface Props {
     selectedFloorElement: FloorEditorElement | undefined;
@@ -93,15 +73,13 @@ async function deleteElement() {
     }
 }
 
-function getElementWidth(e: FloorEditorElement | null): number {
-    return Math.round((e?.group?.width || 0) * (e?.group?.scaleX || 0));
+function getElementWidth(): number {
+    const el = selectedElement.value!;
+    return Math.round(el.width! * el.scaleX!);
 }
 
-function getElementHeight(e: FloorEditorElement | null): number {
-    return Math.round((e?.group?.height || 0) * (e?.group?.scaleY || 0));
-}
-
-function getElementRadius(e: RoundTable): number {
-    return (e.radius || 0) * (e.group?.scaleY || 0);
+function getElementHeight(): number {
+    const el = selectedElement.value!;
+    return Math.round(el.height! * el.scaleY!);
 }
 </script>
