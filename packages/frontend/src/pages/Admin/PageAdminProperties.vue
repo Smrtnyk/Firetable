@@ -7,9 +7,12 @@ import { Loading, useQuasar } from "quasar";
 import { showConfirm, withLoading } from "src/helpers/ui-helpers";
 import { createNewProperty, CreatePropertyPayload, deleteProperty } from "@firetable/backend";
 import { useProperties } from "src/composables/useProperties";
-import { watchEffect } from "vue";
+import { computed, watchEffect } from "vue";
 import { useOrganisations } from "src/composables/useOrganisations";
+import { useAuthStore } from "stores/auth-store";
+import { ADMIN } from "@firetable/types";
 
+const authStore = useAuthStore();
 const quasar = useQuasar();
 const { properties, fetchProperties, isLoading } = useProperties();
 const { organisations, isLoading: organisationsIsLoading } = useOrganisations();
@@ -20,6 +23,19 @@ watchEffect(() => {
     } else {
         Loading.hide();
     }
+});
+
+const canCreateProperty = computed(() => {
+    const isAdmin = authStore.user!.role === ADMIN;
+    if (isAdmin) {
+        return true;
+    }
+    if (!organisations.value[0]) {
+        return false;
+    }
+    const maxAllowedProperties = organisations.value[0].maxAllowedProperties;
+    const currentNumOfProperties = properties.value.length;
+    return currentNumOfProperties < maxAllowedProperties;
 });
 
 const onPropertyCreate = withLoading(async function (payload: CreatePropertyPayload) {
@@ -63,7 +79,7 @@ function createProperty(): void {
         <FTTitle title="Properties">
             <template #right>
                 <q-btn
-                    v-if="organisations.length && !organisationsIsLoading"
+                    v-if="organisations.length && !organisationsIsLoading && canCreateProperty"
                     rounded
                     icon="plus"
                     class="button-gradient"
@@ -92,19 +108,25 @@ function createProperty(): void {
             </q-slide-item>
         </q-list>
         <div
-            v-if="properties.length === 0 && !isLoading"
-            class="row justify-center items-center q-mt-md"
-        >
-            <h6 class="q-ma-sm text-weight-bolder underline">There are no properties created.</h6>
-        </div>
-
-        <div
             v-if="organisations.length === 0 && !organisationsIsLoading"
             class="row justify-center items-center q-mt-md"
         >
             <h6 class="q-ma-sm text-weight-bolder underline">
                 In order to create properties, you must first create an organisation.
             </h6>
+        </div>
+
+        <div v-else-if="!canCreateProperty">
+            <h6 class="q-ma-sm text-weight-bolder underline">
+                You have reached the maximum amount of created properties!
+            </h6>
+        </div>
+
+        <div
+            v-else-if="properties.length === 0 && !isLoading"
+            class="row justify-center items-center q-mt-md"
+        >
+            <h6 class="q-ma-sm text-weight-bolder underline">There are no properties created.</h6>
         </div>
     </div>
 </template>
