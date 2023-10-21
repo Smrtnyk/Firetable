@@ -6,7 +6,7 @@ interface Config {
 }
 
 export const config: Config = {
-    maxNumOfUsers: 10,
+    maxNumOfUsers: 50,
     eventDuration: 8,
 };
 

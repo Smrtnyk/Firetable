@@ -60,7 +60,7 @@ watch(
 
 function onCreateUserFormSubmit(newUser: CreateUserPayload) {
     if (users.value.length > maxNumOfUsers) {
-        showErrorMessage("You have reached the maximum amount of users!");
+        showErrorMessage(`You have reached the maximum amount of users which is ${maxNumOfUsers}!`);
         return;
     }
 
