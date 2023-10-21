@@ -72,14 +72,7 @@ export class FloorZoomManager {
     }
 
     zoomToPoint(point: fabric.Point, scaleFactor: number) {
-        let newZoom;
-        if (scaleFactor < 1) {
-            // Handle zooming out
-            newZoom = this.canvas.getZoom() * scaleFactor;
-        } else {
-            // Handle zooming in
-            newZoom = this.canvas.getZoom() * scaleFactor;
-        }
+        let newZoom = this.canvas.getZoom() * scaleFactor;
         newZoom = Math.max(this.minZoom, Math.min(newZoom, this.maxZoom));
         this.canvas.zoomToPoint(point, newZoom);
         this.canvas.renderAll();
