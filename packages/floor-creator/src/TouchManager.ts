@@ -16,7 +16,7 @@ function clampValueWithinRange(value: number, min: number, max: number): number 
 }
 
 export class TouchManager {
-    private floor: Floor;
+    private readonly floor: Floor;
 
     // For momentum-based panning
     private lastMoveTimestamp?: number;
@@ -47,6 +47,32 @@ export class TouchManager {
         this.hammerManager.on("panstart", this.onPanStart);
         this.hammerManager.on("panmove", this.onPanMove);
         this.hammerManager.on("panend", this.onPanEnd);
+
+        this.hammerManager.on("doubletap", this.onDoubleTap);
+    }
+
+    private onDoubleTap = (ev: HammerInput) => {
+        const { x, y } = this.extractEventCoordinates(ev);
+        this.floor.dblClickHandler?.(this.floor, [x, y]);
+    };
+
+    private extractEventCoordinates(ev: HammerInput): { x: number; y: number } {
+        // @ts-ignore -- private prop
+        // Get the bounding rectangle of the canvas
+        const boundingRect = this.floor.canvas.lowerCanvasEl.getBoundingClientRect();
+
+        // Calculate the client-relative coordinates
+        let x = ev.center.x - boundingRect.left;
+        let y = ev.center.y - boundingRect.top;
+
+        // Adjust for zoom and viewport position
+        if (this.floor.canvas.viewportTransform) {
+            const zoom = this.floor.canvas.getZoom();
+            x = (x - this.floor.canvas.viewportTransform[4]) / zoom;
+            y = (y - this.floor.canvas.viewportTransform[5]) / zoom;
+        }
+
+        return { x, y };
     }
 
     private onPinch = (ev: HammerInput) => {
