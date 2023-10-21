@@ -25,7 +25,7 @@ function onReservationConfirm() {
             <div class="col-6">{{ t("EventShowReservation.guestNameLabel") }}</div>
             <div class="col-6 font-black">{{ props.reservation.guestName }}</div>
 
-            <div class="col-6">{{ t("EventShowReservation.paxLabel") }}</div>
+            <div class="col-6">{{ t("EventShowReservation.numberOfPeopleLabel") }}</div>
             <div class="col-6 font-black">
                 {{ props.reservation.numberOfGuests }}
             </div>

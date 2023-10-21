@@ -25,7 +25,7 @@ export default {
     EventShowReservation: {
         title: "Tisch",
         guestNameLabel: "Name des Gastes",
-        paxLabel: "Anzahl der Personen",
+        numberOfPeopleLabel: "Anzahl der Personen",
         contactLabel: "Kontakt",
         noteLabel: "Notiz",
         reservedByLabel: "Reserviert von",
