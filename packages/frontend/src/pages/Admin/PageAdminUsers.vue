@@ -4,7 +4,6 @@ import UserEditForm from "components/admin/User/UserEditForm.vue";
 import FTTitle from "components/FTTitle.vue";
 import { showConfirm, showErrorMessage, withLoading } from "src/helpers/ui-helpers";
 import { computed, watch } from "vue";
-import { config } from "src/config";
 import { Loading, useQuasar } from "quasar";
 import FTDialog from "components/FTDialog.vue";
 import { ADMIN, CreateUserPayload, EditUserPayload, User } from "@firetable/types";
@@ -19,7 +18,6 @@ import { usePropertiesStore } from "stores/usePropertiesStore";
 import { useAdminUsers } from "src/composables/useAdminUsers";
 import { useAuthStore } from "stores/auth-store";
 
-const { maxNumOfUsers } = config;
 const authStore = useAuthStore();
 const propertiesStore = usePropertiesStore();
 const { users, isLoading, fetchUsers } = useAdminUsers();
@@ -27,7 +25,6 @@ const quasar = useQuasar();
 const usersStatus = computed(() => {
     return {
         totalUsers: users.value.length,
-        maxUsers: maxNumOfUsers,
     };
 });
 
@@ -59,8 +56,8 @@ watch(
 );
 
 function onCreateUserFormSubmit(newUser: CreateUserPayload) {
-    if (users.value.length > maxNumOfUsers) {
-        showErrorMessage(`You have reached the maximum amount of users which is ${maxNumOfUsers}!`);
+    if (users.value.length > 150) {
+        showErrorMessage(`You have reached the maximum amount of users which is ${150}!`);
         return;
     }
 
@@ -150,8 +147,7 @@ async function onUserSlideRight(id: string, reset: () => void) {
             </template>
 
             <div>
-                <span>{{ usersStatus.totalUsers }}</span> /
-                <span>{{ usersStatus.maxUsers }}</span>
+                <span>{{ usersStatus.totalUsers }}</span>
             </div>
         </FTTitle>
 
