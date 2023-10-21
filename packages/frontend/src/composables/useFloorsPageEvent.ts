@@ -293,8 +293,6 @@ export default function useFloorsPageEvent(
         onTableFound,
         onAutocompleteClear,
         mapFloorToCanvas,
-        instantiateFloors,
-        instantiateFloor,
         isActiveFloor,
         setActiveFloor,
         useFloorsPageEventState: state,
