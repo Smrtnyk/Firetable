@@ -5,6 +5,7 @@ import {
     CreateElementOptions,
     ElementClickHandler,
     FloorDoubleClickHandler,
+    FloorEditorElement,
     FloorMode,
 } from "./types.js";
 import { FloorDoc, Reservation } from "@firetable/types";
@@ -126,7 +127,7 @@ export class Floor {
     };
 
     onElementClick = (ev: fabric.IEvent<MouseEvent>) => {
-        this.elementClickHandler(this, ev.target);
+        this.elementClickHandler(this, ev.target as FloorEditorElement);
     };
 
     elementReviver = (_: string, object: fabric.Object) => {

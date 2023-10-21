@@ -3,6 +3,7 @@ import { CreateReservationPayload, FloorDoc, Reservation } from "@firetable/type
 import {
     BaseTable,
     Floor,
+    FloorEditorElement,
     FloorMode,
     getFreeTables,
     getReservedTables,
@@ -132,7 +133,7 @@ export default function useFloorsPageEvent(
         }
     }
 
-    function tableClickHandler(floor: Floor, element: BaseTable | null) {
+    function tableClickHandler(floor: Floor, element: FloorEditorElement | undefined) {
         if (!isTable(element)) return;
         const { reservation } = element;
         if (reservation) {

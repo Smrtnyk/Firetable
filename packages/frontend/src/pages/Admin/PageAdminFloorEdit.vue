@@ -9,7 +9,6 @@ import { useRouter } from "vue-router";
 import { Loading, useQuasar } from "quasar";
 import { BULK_ADD_COLLECTION, ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
 import {
-    BaseTable,
     extractAllTablesLabels,
     Floor,
     FloorEditorElement,
@@ -57,7 +56,7 @@ const q = useQuasar();
 const floorInstance = ref<Floor | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 const pageRef = ref<HTMLDivElement | null>(null);
-const selectedElement = ref<FloorEditorElement | null>(null);
+const selectedElement = ref<FloorEditorElement | undefined>();
 const bulkMode = ref(false);
 const bulkElement = ref<ElementTag | null>(null);
 const bulkLabelCounter = ref(0); // To auto-increment labels
@@ -168,13 +167,13 @@ function dblClickHandler(floor: Floor, coords: NumberTuple) {
     q.bottomSheet(addNewElementsBottomSheetOptions).onOk(handleAddNewElement(floor, coords));
 }
 
-async function elementClickHandler(_: Floor, element: FloorEditorElement | null) {
-    selectedElement.value = null;
+async function elementClickHandler(_: Floor, element: FloorEditorElement | undefined) {
+    selectedElement.value = undefined;
     await nextTick();
     selectedElement.value = element;
 }
 
-function onDeleteElement(element: BaseTable) {
+function onDeleteElement(element: FloorEditorElement) {
     const elementToDelete = element.canvas?.getActiveObject();
     if (!elementToDelete) return;
     element.canvas?.remove(elementToDelete);

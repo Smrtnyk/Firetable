@@ -61,7 +61,7 @@ import { computed, nextTick } from "vue";
 import { FloorEditorElement, isRoundTable, isTable, RoundTable } from "@firetable/floor-creator";
 
 interface Props {
-    selectedFloorElement: FloorEditorElement | null;
+    selectedFloorElement: FloorEditorElement | undefined;
     deleteAllowed?: boolean;
 }
 

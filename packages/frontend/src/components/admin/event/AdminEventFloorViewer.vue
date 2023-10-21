@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { nextTick, ref, shallowRef, watch } from "vue";
 import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
-import { BaseTable, Floor, FloorMode } from "@firetable/floor-creator";
+import { Floor, FloorEditorElement, FloorMode } from "@firetable/floor-creator";
 import { FloorDoc } from "@firetable/types";
 
 interface Props {
@@ -28,7 +28,7 @@ interface Props {
     eventId: string;
 }
 
-const selectedFloorElement = ref<BaseTable | null>(null);
+const selectedFloorElement = ref<FloorEditorElement | undefined>();
 const props = defineProps<Props>();
 const emit = defineEmits(["update"]);
 const floorContainerRef = ref<HTMLCanvasElement | null>(null);
@@ -40,8 +40,11 @@ function saveFloorState(): void {
     emit("update", floorInstance.value);
 }
 
-async function onElementClick(floor: Floor, element: BaseTable | null): Promise<void> {
-    selectedFloorElement.value = null;
+async function onElementClick(
+    floor: Floor,
+    element: FloorEditorElement | undefined,
+): Promise<void> {
+    selectedFloorElement.value = undefined;
     await nextTick();
     selectedFloorElement.value = element;
 }
