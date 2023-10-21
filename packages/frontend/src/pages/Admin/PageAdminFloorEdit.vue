@@ -228,7 +228,7 @@ function deactivateBulkMode() {
                 </template>
             </q-input>
         </div>
-        <div class="row">
+        <div v-if="floorInstance" class="row">
             <ShowSelectedElement
                 @delete="onDeleteElement"
                 :selected-floor-element="selectedElement"
@@ -283,6 +283,6 @@ function deactivateBulkMode() {
             </div>
         </div>
 
-        <canvas ref="canvasRef" class="shadow-3" />
+        <canvas v-if="floor" ref="canvasRef" class="shadow-3" />
     </div>
 </template>
