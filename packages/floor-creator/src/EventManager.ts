@@ -24,9 +24,12 @@ export class EventManager {
 
         this.hammerManager.on("pinch", (ev) => {
             const scale = ev.scale;
+            const dampeningFactor = 0.05; // Adjust this value to control the zoom sensitivity
+
+            const adjustedScale = 1 + (scale - 1) * dampeningFactor;
 
             const center = new fabric.Point(ev.center.x, ev.center.y);
-            this.floor.zoomManager.zoomToPoint(center, scale);
+            this.floor.zoomManager.zoomToPoint(center, adjustedScale);
         });
 
         this.hammerManager.on("panstart", (ev) => {
