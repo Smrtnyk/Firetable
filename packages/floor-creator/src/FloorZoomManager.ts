@@ -70,21 +70,17 @@ export class FloorZoomManager {
     }
 
     zoomToPoint(point: fabric.Point, scaleFactor: number) {
-        const newZoom = this.canvas.getZoom() * scaleFactor;
-        if (newZoom <= this.maxZoom) {
-            this.canvas.zoomToPoint(point, newZoom);
-            this.canvas.renderAll();
-        }
-    }
-
-    zoomOutToPoint(point: fabric.Point, scaleFactor: number) {
-        const newZoom = this.canvas.getZoom() / scaleFactor;
-        if (newZoom >= this.minZoom) {
-            this.canvas.zoomToPoint(point, newZoom);
-            this.canvas.renderAll();
+        let newZoom;
+        if (scaleFactor < 1) {
+            // Handle zooming out
+            newZoom = this.canvas.getZoom() * scaleFactor;
         } else {
-            this.resetZoom();
+            // Handle zooming in
+            newZoom = this.canvas.getZoom() * scaleFactor;
         }
+        newZoom = Math.max(this.minZoom, Math.min(newZoom, this.maxZoom));
+        this.canvas.zoomToPoint(point, newZoom);
+        this.canvas.renderAll();
     }
 
     canZoomIn(): boolean {
@@ -101,41 +97,11 @@ export class FloorZoomManager {
         this.canvas.renderAll();
     }
 
-    handlePinchZoom(e: HammerInput) {
-        // Assuming you still need to get midpoint for some reason,
-        // I've kept the logic to compute it. If not needed, you can remove it.
-        const newMidpoint = new fabric.Point(e.center.x, e.center.y);
-
-        const scaleChange = e.scale;
-
-        this.handleZoomLogic(scaleChange, newMidpoint);
-
-        // In Hammer, we don't need to update the initial distance after each move
-        // as the scale provided is always relative to the start of the gesture.
-    }
-
     static getDistance(pointers: any[]): number {
         const [pointer1, pointer2] = pointers;
         return Math.sqrt(
             Math.pow(pointer2.clientX - pointer1.clientX, 2) +
                 Math.pow(pointer2.clientY - pointer1.clientY, 2),
         );
-    }
-
-    static getMidpoint(touches: TouchList): fabric.Point {
-        const [touch1, touch2] = [touches[0], touches[1]];
-        return new fabric.Point(
-            (touch1.clientX + touch2.clientX) / 2,
-            (touch1.clientY + touch2.clientY) / 2,
-        );
-    }
-
-    private handleZoomLogic(scaleChange: number, midpoint: fabric.Point) {
-        const zoomFactor = this.canvas.getZoom() * scaleChange;
-        let newZoom = this.canvas.getZoom() + (zoomFactor - this.canvas.getZoom()) * 0.1;
-
-        newZoom = Math.max(this.minZoom, Math.min(newZoom, this.maxZoom));
-
-        this.canvas.zoomToPoint(midpoint, newZoom);
     }
 }
