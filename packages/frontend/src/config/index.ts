@@ -5,7 +5,7 @@ interface Config {
 }
 
 export const config: Config = {
-    eventDuration: 8,
+    eventDuration: 10,
 };
 
 export const myIcons: Record<string, string> = {
