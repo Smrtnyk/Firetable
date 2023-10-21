@@ -4,17 +4,23 @@ import { NumberTuple } from "./types";
 import { isFloorElement, isTable } from "./type-guards";
 import { DEFAULT_COORDINATE, RESOLUTION } from "./constants";
 
+import Hammer from "hammerjs";
+
 export class EventManager {
     private readonly floor: Floor;
     private isDragging: boolean = false;
     private lastPosX: number = 0;
     private lastPosY: number = 0;
+    private hammerManager!: HammerManager;
 
     constructor(floor: Floor) {
         this.floor = floor;
     }
 
     initializeCanvasEventHandlers() {
+        // @ts-ignore -- private prop
+        const upperCanvasEl = this.floor.canvas.upperCanvasEl as HTMLElement;
+        this.hammerManager = new Hammer(upperCanvasEl);
         this.floor.canvas.on("mouse:dblclick", this.onDblClickHandler);
         this.floor.canvas.on("mouse:wheel", this.onMouseWheelHandler);
         this.floor.canvas.on("object:scaling", this.onObjectScaling);
@@ -23,17 +29,34 @@ export class EventManager {
         this.floor.canvas.on("mouse:move", this.onMouseMoveHandler);
         this.floor.canvas.on("mouse:up", this.onMouseUpHandler);
 
-        // @ts-ignore -- private prop
-        const upperCanvasEl = this.floor.canvas.upperCanvasEl as HTMLElement;
-        upperCanvasEl.addEventListener("touchstart", this.floor.touchManager.onTouchStart, {
-            passive: true,
+        this.hammerManager.on("pinch", (ev) => {
+            const scale = ev.scale;
+            const center = new fabric.Point(ev.center.x, ev.center.y);
+            if (scale > 1) {
+                this.floor.zoomManager.zoomToPoint(center, scale);
+            } else {
+                this.floor.zoomManager.zoomOutToPoint(center, 1 / scale);
+            }
         });
-        upperCanvasEl.addEventListener("touchmove", this.floor.touchManager.onTouchMove, {
-            passive: true,
+
+        this.hammerManager.on("panstart", (ev) => {
+            this.floor.touchManager.onTouchStart(ev);
         });
-        upperCanvasEl.addEventListener("touchend", this.floor.touchManager.onTouchEnd, {
-            passive: true,
+
+        this.hammerManager.on("panmove", (ev) => {
+            this.floor.touchManager.onTouchMove(ev);
         });
+
+        this.hammerManager.on("panend", () => {
+            this.floor.touchManager.onTouchEnd();
+        });
+
+        this.hammerManager.on("doubletap", () => {
+            this.floor.zoomManager.resetZoom();
+        });
+
+        this.hammerManager.get("pinch").set({ enable: true });
+        this.hammerManager.get("pan").set({ direction: Hammer.DIRECTION_ALL });
 
         this.floor.canvas.on("object:modified", this.onObjectModified);
     }

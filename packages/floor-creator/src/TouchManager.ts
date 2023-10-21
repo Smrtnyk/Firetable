@@ -30,13 +30,17 @@ export class TouchManager {
         this.floor = floor;
     }
 
-    onTouchStart = (e: TouchEvent) => {
-        if (e.touches.length === 2) {
+    onTouchStart = (e: HammerInput) => {
+        const clientX = e.center.x;
+        const clientY = e.center.y;
+
+        if (e.pointers.length === 2) {
             this.isPinching = true;
-            this.floor.zoomManager.initialPinchDistance = FloorZoomManager.getDistance(e.touches);
-        } else if (e.touches.length === 1) {
-            this.initialDragX = e.touches[0].clientX;
-            this.initialDragY = e.touches[0].clientY;
+            // Assuming FloorZoomManager.getDistance can be adapted to use HammerInput's pointers
+            this.floor.zoomManager.initialPinchDistance = FloorZoomManager.getDistance(e.pointers);
+        } else {
+            this.initialDragX = clientX;
+            this.initialDragY = clientY;
         }
 
         // Reset momentum panning tracking values
@@ -47,7 +51,7 @@ export class TouchManager {
         this.velocityY = 0;
     };
 
-    onTouchMove = (e: TouchEvent) => {
+    onTouchMove = (e: HammerInput) => {
         const activeObject = this.floor.canvas.getActiveObject();
 
         // If an object is selected, don't pan the canvas
@@ -58,7 +62,7 @@ export class TouchManager {
         if (this.isPinching) {
             this.floor.zoomManager.handlePinchZoom(e);
         } else if (
-            e.touches.length === 1 &&
+            e.pointers.length === 1 &&
             this.initialDragX != null &&
             this.initialDragY != null
         ) {
@@ -67,19 +71,21 @@ export class TouchManager {
 
         // For momentum-based panning
         const currentTimestamp = performance.now();
+        const clientX = e.center.x;
+        const clientY = e.center.y;
         if (this.lastMoveTimestamp && this.lastMoveX && this.lastMoveY) {
             const deltaTime = currentTimestamp - this.lastMoveTimestamp;
-            this.velocityX = (e.touches[0].clientX - this.lastMoveX) / deltaTime;
-            this.velocityY = (e.touches[0].clientY - this.lastMoveY) / deltaTime;
+            this.velocityX = (clientX - this.lastMoveX) / deltaTime;
+            this.velocityY = (clientY - this.lastMoveY) / deltaTime;
         }
         this.lastMoveTimestamp = currentTimestamp;
-        this.lastMoveX = e.touches[0].clientX;
-        this.lastMoveY = e.touches[0].clientY;
+        this.lastMoveX = clientX;
+        this.lastMoveY = clientY;
     };
 
-    private handlePanning(e: TouchEvent) {
-        const deltaX = e.touches[0].clientX - this.initialDragX!;
-        const deltaY = e.touches[0].clientY - this.initialDragY!;
+    private handlePanning(e: HammerInput) {
+        const deltaX = e.center.x - this.initialDragX!;
+        const deltaY = e.center.y - this.initialDragY!;
 
         const { newPosX, newPosY } = this.checkBoundaries(deltaX, deltaY);
 
@@ -92,8 +98,8 @@ export class TouchManager {
         this.floor.canvas.setViewportTransform(viewportTransform);
         this.floor.canvas.requestRenderAll();
 
-        this.initialDragX = e.touches[0].clientX;
-        this.initialDragY = e.touches[0].clientY;
+        this.initialDragX = e.center.x;
+        this.initialDragY = e.center.y;
     }
 
     onTouchEnd = () => {

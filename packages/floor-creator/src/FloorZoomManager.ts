@@ -69,6 +69,24 @@ export class FloorZoomManager {
         animateStep(performance.now());
     }
 
+    zoomToPoint(point: fabric.Point, scaleFactor: number) {
+        const newZoom = this.canvas.getZoom() * scaleFactor;
+        if (newZoom <= this.maxZoom) {
+            this.canvas.zoomToPoint(point, newZoom);
+            this.canvas.renderAll();
+        }
+    }
+
+    zoomOutToPoint(point: fabric.Point, scaleFactor: number) {
+        const newZoom = this.canvas.getZoom() / scaleFactor;
+        if (newZoom >= this.minZoom) {
+            this.canvas.zoomToPoint(point, newZoom);
+            this.canvas.renderAll();
+        } else {
+            this.resetZoom();
+        }
+    }
+
     canZoomIn(): boolean {
         return this.canvas.getZoom() < this.maxZoom;
     }
@@ -83,25 +101,24 @@ export class FloorZoomManager {
         this.canvas.renderAll();
     }
 
-    handlePinchZoom(e: TouchEvent) {
-        const newDistance = FloorZoomManager.getDistance(e.touches);
-        const newMidpoint = FloorZoomManager.getMidpoint(e.touches);
-        let scaleChange = newDistance / this.initialPinchDistance!;
+    handlePinchZoom(e: HammerInput) {
+        // Assuming you still need to get midpoint for some reason,
+        // I've kept the logic to compute it. If not needed, you can remove it.
+        const newMidpoint = new fabric.Point(e.center.x, e.center.y);
 
-        // Reduce the scale change effect for slower zoom
-        scaleChange = 1 + (scaleChange - 1) * 2.5;
+        const scaleChange = e.scale;
 
         this.handleZoomLogic(scaleChange, newMidpoint);
 
-        // Update the initial distance for the next move.
-        this.initialPinchDistance = newDistance;
+        // In Hammer, we don't need to update the initial distance after each move
+        // as the scale provided is always relative to the start of the gesture.
     }
 
-    static getDistance(touches: TouchList): number {
-        const [touch1, touch2] = [touches[0], touches[1]];
+    static getDistance(pointers: any[]): number {
+        const [pointer1, pointer2] = pointers;
         return Math.sqrt(
-            Math.pow(touch2.clientX - touch1.clientX, 2) +
-                Math.pow(touch2.clientY - touch1.clientY, 2),
+            Math.pow(pointer2.clientX - pointer1.clientX, 2) +
+                Math.pow(pointer2.clientY - pointer1.clientY, 2),
         );
     }
 
