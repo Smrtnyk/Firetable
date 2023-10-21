@@ -1,14 +1,15 @@
 import { fabric } from "fabric";
+import { RESOLUTION } from "../constants";
 
 export class Stage extends fabric.Group {
     constructor(left: number, top: number) {
         const stageBody = new fabric.Rect({
             left: 0,
             top: 0,
-            rx: 15,
-            ry: 15,
+            rx: 10,
+            ry: 10,
             width: 150,
-            height: 90,
+            height: RESOLUTION * 4,
             fill: "#222",
             stroke: "#111",
             strokeWidth: 1,
@@ -33,29 +34,19 @@ export class Stage extends fabric.Group {
             originY: "center",
         });
 
-        // LEDs for the stage edges
-        const ledSpacingHeight = stageBody.height! / 5; // For even spacing
+        // LEDs for the stage front
+        const ledSpacingWidth = stageBody.width! / 5; // For even spacing
 
-        const ledsLeftRight = Array.from({ length: 4 })
-            .map((_, index) => {
-                return [
-                    new fabric.Circle({
-                        left: -1,
-                        top: ledSpacingHeight * (index + 1),
-                        radius: 2,
-                        fill: "#3498DB",
-                    }),
-                    new fabric.Circle({
-                        left: stageBody.width! - 3,
-                        top: ledSpacingHeight * (index + 1),
-                        radius: 2,
-                        fill: "#3498DB",
-                    }),
-                ];
-            })
-            .flat();
+        const ledsFront = Array.from({ length: 4 }).map((_, index) => {
+            return new fabric.Circle({
+                left: ledSpacingWidth * (index + 1),
+                top: 2,
+                radius: 2,
+                fill: "#3498DB",
+            });
+        });
 
-        super([stageBody, decor, stageLabel, ...ledsLeftRight], {
+        super([stageBody, decor, stageLabel, ...ledsFront], {
             left,
             top,
         });
