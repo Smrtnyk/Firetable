@@ -1,21 +1,22 @@
+import Hammer from "hammerjs";
 import { Floor } from "./Floor";
 import { FloorZoomManager } from "./FloorZoomManager";
+import { fabric } from "fabric";
 
 const VELOCITY_THRESHOLD = 0.01;
 const FRICTION_DECREMENT = 0.01;
 const BOUNCE_OFFSET = 20;
+const DAMPENING_FACTOR = 0.05;
+const PAN_DAMPENING_FACTOR = 0.3;
 
-function checkBoundary(value: number, min: number, max: number): number {
+function clampValueWithinRange(value: number, min: number, max: number): number {
     if (value > max) return max;
     if (value < min) return min;
     return value;
 }
 
 export class TouchManager {
-    private floor: Floor;
-    private initialDragX?: number;
-    private initialDragY?: number;
-    private isPinching: boolean = false;
+    private readonly floor: Floor;
 
     // For momentum-based panning
     private lastMoveTimestamp?: number;
@@ -26,17 +27,65 @@ export class TouchManager {
     private friction: number = 0.95; // Friction factor to reduce velocity
     private animationFrame?: number;
 
+    private hammerManager: HammerManager;
+
     constructor(floor: Floor) {
         this.floor = floor;
+
+        // @ts-ignore -- private prop
+        const upperCanvasEl = this.floor.canvas.upperCanvasEl as HTMLElement;
+        this.hammerManager = new Hammer(upperCanvasEl);
+
+        // Enable pinch and set pan direction
+        this.hammerManager.get("pinch").set({ enable: true });
+        this.hammerManager.get("pan").set({ direction: Hammer.DIRECTION_ALL });
+
+        // Pinch event
+        this.hammerManager.on("pinch", this.onPinch);
+
+        // Pan events
+        this.hammerManager.on("panstart", this.onPanStart);
+        this.hammerManager.on("panmove", this.onPanMove);
+        this.hammerManager.on("panend", this.onPanEnd);
+
+        this.hammerManager.on("doubletap", this.onDoubleTap);
     }
 
-    onTouchStart = (e: TouchEvent) => {
-        if (e.touches.length === 2) {
-            this.isPinching = true;
-            this.floor.zoomManager.initialPinchDistance = FloorZoomManager.getDistance(e.touches);
-        } else if (e.touches.length === 1) {
-            this.initialDragX = e.touches[0].clientX;
-            this.initialDragY = e.touches[0].clientY;
+    private onDoubleTap = (ev: HammerInput) => {
+        const { x, y } = this.extractEventCoordinates(ev);
+        this.floor.dblClickHandler?.(this.floor, [x, y]);
+    };
+
+    private extractEventCoordinates(ev: HammerInput): { x: number; y: number } {
+        // @ts-ignore -- private prop
+        // Get the bounding rectangle of the canvas
+        const boundingRect = this.floor.canvas.lowerCanvasEl.getBoundingClientRect();
+
+        // Calculate the client-relative coordinates
+        let x = ev.center.x - boundingRect.left;
+        let y = ev.center.y - boundingRect.top;
+
+        // Adjust for zoom and viewport position
+        if (this.floor.canvas.viewportTransform) {
+            const zoom = this.floor.canvas.getZoom();
+            x = (x - this.floor.canvas.viewportTransform[4]) / zoom;
+            y = (y - this.floor.canvas.viewportTransform[5]) / zoom;
+        }
+
+        return { x, y };
+    }
+
+    private onPinch = (ev: HammerInput) => {
+        const scale = ev.scale;
+        // Adjust the scale based on a dampening factor to control zoom sensitivity
+        const adjustedScale = 1 + (scale - 1) * DAMPENING_FACTOR;
+        const center = new fabric.Point(ev.center.x, ev.center.y);
+        this.floor.zoomManager.zoomToPoint(center, adjustedScale);
+    };
+
+    private onPanStart = (ev: HammerInput) => {
+        if (ev.pointers.length === 2) {
+            this.floor.zoomManager.initialPinchDistance = FloorZoomManager.getDistance(ev.pointers);
         }
 
         // Reset momentum panning tracking values
@@ -47,7 +96,16 @@ export class TouchManager {
         this.velocityY = 0;
     };
 
-    onTouchMove = (e: TouchEvent) => {
+    setViewportTransform(x: number, y: number) {
+        const viewportTransform = this.floor.canvas.viewportTransform?.slice() || [
+            1, 0, 0, 1, 0, 0,
+        ];
+        viewportTransform[4] = x;
+        viewportTransform[5] = y;
+        this.floor.canvas.setViewportTransform(viewportTransform);
+    }
+
+    onPanMove = (e: HammerInput) => {
         const activeObject = this.floor.canvas.getActiveObject();
 
         // If an object is selected, don't pan the canvas
@@ -55,49 +113,26 @@ export class TouchManager {
             return;
         }
 
-        if (this.isPinching) {
-            this.floor.zoomManager.handlePinchZoom(e);
-        } else if (
-            e.touches.length === 1 &&
-            this.initialDragX != null &&
-            this.initialDragY != null
-        ) {
-            this.handlePanning(e);
-        }
+        const deltaX = e.deltaX * PAN_DAMPENING_FACTOR;
+        const deltaY = e.deltaY * PAN_DAMPENING_FACTOR;
+
+        const { newPosX, newPosY } = this.checkBoundaries(deltaX, deltaY);
+        this.setViewportTransform(newPosX, newPosY);
+        this.floor.canvas.requestRenderAll();
 
         // For momentum-based panning
         const currentTimestamp = performance.now();
         if (this.lastMoveTimestamp && this.lastMoveX && this.lastMoveY) {
             const deltaTime = currentTimestamp - this.lastMoveTimestamp;
-            this.velocityX = (e.touches[0].clientX - this.lastMoveX) / deltaTime;
-            this.velocityY = (e.touches[0].clientY - this.lastMoveY) / deltaTime;
+            this.velocityX = (e.center.x - this.lastMoveX) / deltaTime;
+            this.velocityY = (e.center.y - this.lastMoveY) / deltaTime;
         }
         this.lastMoveTimestamp = currentTimestamp;
-        this.lastMoveX = e.touches[0].clientX;
-        this.lastMoveY = e.touches[0].clientY;
+        this.lastMoveX = e.center.x;
+        this.lastMoveY = e.center.y;
     };
 
-    private handlePanning(e: TouchEvent) {
-        const deltaX = e.touches[0].clientX - this.initialDragX!;
-        const deltaY = e.touches[0].clientY - this.initialDragY!;
-
-        const { newPosX, newPosY } = this.checkBoundaries(deltaX, deltaY);
-
-        const viewportTransform = this.floor.canvas.viewportTransform?.slice() || [
-            1, 0, 0, 1, 0, 0,
-        ];
-        viewportTransform[4] = newPosX;
-        viewportTransform[5] = newPosY;
-
-        this.floor.canvas.setViewportTransform(viewportTransform);
-        this.floor.canvas.requestRenderAll();
-
-        this.initialDragX = e.touches[0].clientX;
-        this.initialDragY = e.touches[0].clientY;
-    }
-
-    onTouchEnd = () => {
-        this.isPinching = false;
+    onPanEnd = () => {
         this.floor.zoomManager.initialPinchDistance = undefined;
 
         // Start momentum-based panning
@@ -112,47 +147,15 @@ export class TouchManager {
             Math.abs(this.velocityX) > VELOCITY_THRESHOLD ||
             Math.abs(this.velocityY) > VELOCITY_THRESHOLD
         ) {
-            // Calculate the new position without clamping
-            let newPosX =
+            const newPosX =
                 (this.floor.canvas.viewportTransform ? this.floor.canvas.viewportTransform[4] : 0) +
                 this.velocityX;
-            let newPosY =
+            const newPosY =
                 (this.floor.canvas.viewportTransform ? this.floor.canvas.viewportTransform[5] : 0) +
                 this.velocityY;
 
-            // Check boundaries for X
-            if (newPosX > 0) {
-                newPosX = 0;
-                this.velocityX = 0; // Stop motion in X direction
-            } else if (
-                newPosX + this.floor.width * this.floor.canvas.getZoom() <
-                this.floor.canvas.getWidth()
-            ) {
-                newPosX =
-                    this.floor.canvas.getWidth() - this.floor.width * this.floor.canvas.getZoom();
-                this.velocityX = 0; // Stop motion in X direction
-            }
-
-            // Check boundaries for Y
-            if (newPosY > 0) {
-                newPosY = 0;
-                this.velocityY = 0; // Stop motion in Y direction
-            } else if (
-                newPosY + this.floor.height * this.floor.canvas.getZoom() <
-                this.floor.canvas.getHeight()
-            ) {
-                newPosY =
-                    this.floor.canvas.getHeight() - this.floor.height * this.floor.canvas.getZoom();
-                this.velocityY = 0; // Stop motion in Y direction
-            }
-
-            const viewportTransform = this.floor.canvas.viewportTransform?.slice() || [
-                1, 0, 0, 1, 0, 0,
-            ];
-            viewportTransform[4] = newPosX;
-            viewportTransform[5] = newPosY;
-
-            this.floor.canvas.setViewportTransform(viewportTransform);
+            const { x, y } = this.applyBoundaries(newPosX, newPosY);
+            this.setViewportTransform(x, y);
             this.floor.canvas.requestRenderAll();
 
             this.velocityX *= this.friction - FRICTION_DECREMENT;
@@ -172,17 +175,42 @@ export class TouchManager {
             (this.floor.canvas.viewportTransform ? this.floor.canvas.viewportTransform[5] : 0) +
             deltaY;
 
-        newPosX = checkBoundary(
+        newPosX = clampValueWithinRange(
             newPosX,
             -this.floor.width * this.floor.canvas.getZoom() + this.floor.canvas.getWidth(),
             BOUNCE_OFFSET,
         );
-        newPosY = checkBoundary(
+        newPosY = clampValueWithinRange(
             newPosY,
             -this.floor.height * this.floor.canvas.getZoom() + this.floor.canvas.getHeight(),
             BOUNCE_OFFSET,
         );
 
         return { newPosX, newPosY };
+    }
+
+    applyBoundaries(newPosX: number, newPosY: number): { x: number; y: number } {
+        // Check boundaries for X
+        if (newPosX > 0) {
+            newPosX = 0;
+        } else if (
+            newPosX + this.floor.width * this.floor.canvas.getZoom() <
+            this.floor.canvas.getWidth()
+        ) {
+            newPosX = this.floor.canvas.getWidth() - this.floor.width * this.floor.canvas.getZoom();
+        }
+
+        // Check boundaries for Y
+        if (newPosY > 0) {
+            newPosY = 0;
+        } else if (
+            newPosY + this.floor.height * this.floor.canvas.getZoom() <
+            this.floor.canvas.getHeight()
+        ) {
+            newPosY =
+                this.floor.canvas.getHeight() - this.floor.height * this.floor.canvas.getZoom();
+        }
+
+        return { x: newPosX, y: newPosY };
     }
 }

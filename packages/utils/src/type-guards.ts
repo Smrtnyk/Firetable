@@ -1,5 +1,5 @@
 export function isNumber(candidate: unknown): candidate is number {
-    return typeof candidate === "number";
+    return !Number.isNaN(candidate) && typeof candidate === "number" && Number.isFinite(candidate);
 }
 
 export function isString(candidate: unknown): candidate is string {

@@ -28,15 +28,17 @@ export class FloorZoomManager {
     }
 
     zoomIn(point: fabric.Point) {
-        const newZoom = this.canvas.getZoom() + this.canvas.getZoom() * ZOOM_INCREMENT;
-        if (newZoom <= this.maxZoom) {
-            this.animateZoom(newZoom, point);
-        }
+        this.adjustZoom(ZOOM_INCREMENT, point);
     }
 
     zoomOut(point: fabric.Point) {
-        const newZoom = this.canvas.getZoom() - this.canvas.getZoom() * ZOOM_INCREMENT;
-        if (newZoom >= this.minZoom) {
+        this.adjustZoom(-ZOOM_INCREMENT, point);
+    }
+
+    // Adjust the zoom level based on the increment/decrement factor and animate the zoom
+    private adjustZoom(incrementFactor: number, point: fabric.Point) {
+        const newZoom = this.canvas.getZoom() + this.canvas.getZoom() * incrementFactor;
+        if (newZoom <= this.maxZoom && newZoom >= this.minZoom) {
             this.animateZoom(newZoom, point);
         } else {
             this.resetZoom();
@@ -69,6 +71,20 @@ export class FloorZoomManager {
         animateStep(performance.now());
     }
 
+    zoomToPoint(point: fabric.Point, scaleFactor: number) {
+        let newZoom;
+        if (scaleFactor < 1) {
+            // Handle zooming out
+            newZoom = this.canvas.getZoom() * scaleFactor;
+        } else {
+            // Handle zooming in
+            newZoom = this.canvas.getZoom() * scaleFactor;
+        }
+        newZoom = Math.max(this.minZoom, Math.min(newZoom, this.maxZoom));
+        this.canvas.zoomToPoint(point, newZoom);
+        this.canvas.renderAll();
+    }
+
     canZoomIn(): boolean {
         return this.canvas.getZoom() < this.maxZoom;
     }
@@ -83,42 +99,11 @@ export class FloorZoomManager {
         this.canvas.renderAll();
     }
 
-    handlePinchZoom(e: TouchEvent) {
-        const newDistance = FloorZoomManager.getDistance(e.touches);
-        const newMidpoint = FloorZoomManager.getMidpoint(e.touches);
-        let scaleChange = newDistance / this.initialPinchDistance!;
-
-        // Reduce the scale change effect for slower zoom
-        scaleChange = 1 + (scaleChange - 1) * 2.5;
-
-        this.handleZoomLogic(scaleChange, newMidpoint);
-
-        // Update the initial distance for the next move.
-        this.initialPinchDistance = newDistance;
-    }
-
-    static getDistance(touches: TouchList): number {
-        const [touch1, touch2] = [touches[0], touches[1]];
+    static getDistance(pointers: any[]): number {
+        const [pointer1, pointer2] = pointers;
         return Math.sqrt(
-            Math.pow(touch2.clientX - touch1.clientX, 2) +
-                Math.pow(touch2.clientY - touch1.clientY, 2),
+            Math.pow(pointer2.clientX - pointer1.clientX, 2) +
+                Math.pow(pointer2.clientY - pointer1.clientY, 2),
         );
-    }
-
-    static getMidpoint(touches: TouchList): fabric.Point {
-        const [touch1, touch2] = [touches[0], touches[1]];
-        return new fabric.Point(
-            (touch1.clientX + touch2.clientX) / 2,
-            (touch1.clientY + touch2.clientY) / 2,
-        );
-    }
-
-    private handleZoomLogic(scaleChange: number, midpoint: fabric.Point) {
-        const zoomFactor = this.canvas.getZoom() * scaleChange;
-        let newZoom = this.canvas.getZoom() + (zoomFactor - this.canvas.getZoom()) * 0.1;
-
-        newZoom = Math.max(this.minZoom, Math.min(newZoom, this.maxZoom));
-
-        this.canvas.zoomToPoint(midpoint, newZoom);
     }
 }

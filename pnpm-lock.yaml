@@ -78,6 +78,9 @@ importers:
       fabric:
         specifier: 5.3.0
         version: 5.3.0
+      hammerjs:
+        specifier: 2.0.8
+        version: 2.0.8
       ts-pattern:
         specifier: 5.0.5
         version: 5.0.5
@@ -91,6 +94,9 @@ importers:
       '@types/fabric':
         specifier: 5.3.5
         version: 5.3.5
+      '@types/hammerjs':
+        specifier: 2.0.43
+        version: 2.0.43
 
   packages/frontend:
     dependencies:
@@ -3130,6 +3136,10 @@ packages:
     resolution: {integrity: sha512-Sig0SNORX9fdW+bQuTEovKj3uHcUL6LQKbCrrqb1X7J6/ReAbhCXRAhc+SMejhLELFj2QcyuxmUooZ4bt5ReSw==}
     dependencies:
       '@types/node': 18.11.9
+    dev: true
+
+  /@types/hammerjs@2.0.43:
+    resolution: {integrity: sha512-wqxfwHk83RS7+6OpytGdo5wqkqtvx+bGaIs1Rwm5NrtQHUfL4OgWs/5p0OipmjmT+fexePh37Ek+mqIpdNjQKA==}
     dev: true
 
   /@types/har-format@1.2.9:
@@ -6734,6 +6744,11 @@ packages:
     transitivePeerDependencies:
       - encoding
       - supports-color
+
+  /hammerjs@2.0.8:
+    resolution: {integrity: sha512-tSQXBXS/MWQOn/RKckawJ61vvsDpCom87JgxiYdGwHdOa0ht0vzUWDlfioofFCRU0L+6NGDt6XzbgoJvZkMeRQ==}
+    engines: {node: '>=0.8.0'}
+    dev: false
 
   /har-schema@2.0.0:
     resolution: {integrity: sha512-Oqluz6zhGX8cyRaTQlFMPw80bSJVG2x/cFb8ZPhUILGgHka9SsokCCOQgpveePerqidZOrT14ipqfJb7ILcW5Q==}
