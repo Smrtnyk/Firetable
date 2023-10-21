@@ -161,7 +161,7 @@ function handleAddNewElement(floor: Floor, [x, y]: NumberTuple) {
 
 function dblClickHandler(floor: Floor, coords: NumberTuple) {
     if (bulkMode.value && bulkElement.value) {
-        const label = String(++bulkLabelCounter.value); // Auto-increment label
+        const label = String(++bulkLabelCounter.value);
         floor.addElement({ label, x: coords[0], y: coords[1], tag: bulkElement.value });
         return;
     }
@@ -197,7 +197,18 @@ function toggleBulkMode() {
 function activateBulkMode(elementTag: ElementTag) {
     bulkMode.value = true;
     bulkElement.value = elementTag;
-    bulkLabelCounter.value = 0; // Reset counter
+
+    // Get all current labels using the helper function
+    const labels = extractAllTablesLabels(floorInstance.value as Floor);
+    // Convert labels to numbers only if they are numeric and find the maximum
+    const numericLabels = labels.map((label) => parseInt(label)).filter(isNumber);
+
+    if (numericLabels.length === 0) {
+        bulkLabelCounter.value = 0;
+    } else {
+        const maxLabel = Math.max(...numericLabels);
+        bulkLabelCounter.value = isNumber(maxLabel) ? maxLabel : 0;
+    }
 }
 
 function deactivateBulkMode() {

@@ -1,8 +1,6 @@
 import { fabric } from "fabric";
 import { Floor } from "./Floor";
-import { NumberTuple } from "./types";
-import { isFloorElement } from "./type-guards";
-import { DEFAULT_COORDINATE, RESOLUTION } from "./constants";
+import { RESOLUTION } from "./constants";
 
 export class EventManager {
     private readonly floor: Floor;
@@ -12,7 +10,6 @@ export class EventManager {
     }
 
     initializeCanvasEventHandlers() {
-        this.floor.canvas.on("mouse:dblclick", this.onDblClickHandler);
         this.floor.canvas.on("mouse:wheel", this.onMouseWheelHandler);
         this.floor.canvas.on("object:modified", this.snapToGridOnModify);
     }
@@ -45,17 +42,6 @@ export class EventManager {
 
             this.floor.canvas.renderAll();
         }
-    };
-
-    // Check if double click was on the actual table
-    // if it is, then do nothing, but if it is not
-    // then invoke the handler
-    private onDblClickHandler = (ev: fabric.IEvent) => {
-        if (isFloorElement(ev.target)) return;
-        const x = ev.pointer?.x ?? DEFAULT_COORDINATE;
-        const y = ev.pointer?.y ?? DEFAULT_COORDINATE;
-        const coords: NumberTuple = [x, y];
-        this.floor.dblClickHandler?.(this.floor, coords);
     };
 
     private onMouseWheelHandler = (opt: fabric.IEvent<WheelEvent>) => {
