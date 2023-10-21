@@ -8,8 +8,6 @@ export const config: Config = {
     eventDuration: 8,
 };
 
-export const PROJECT_MAIL = "@firetable.at";
-
 export const myIcons: Record<string, string> = {
     chevron_left: "svguse:/svg-icons/ft-icons.svg#chevron-left",
     chevron_right: "svguse:/svg-icons/ft-icons.svg#chevron-right",
