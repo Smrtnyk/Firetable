@@ -116,7 +116,7 @@ function createProperty(): void {
             </h6>
         </div>
 
-        <div v-else-if="!canCreateProperty">
+        <div v-else-if="!canCreateProperty && !organisationsIsLoading">
             <h6 class="q-ma-sm text-weight-bolder underline">
                 You have reached the maximum amount of created properties!
             </h6>
