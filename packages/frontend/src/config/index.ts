@@ -27,7 +27,7 @@ export const myIcons: Record<string, string> = {
     key: "svguse:/svg-icons/ft-icons.svg#key",
     "at-symbol": "svguse:/svg-icons/ft-icons.svg#at-symbol",
     calendar: "svguse:/svg-icons/ft-icons.svg#calendar",
-    clock: "svguse:svg-icons/ft-icons.svg#clock",
+    clock: "svguse:/svg-icons/ft-icons.svg#clock",
     logout: "svguse:/svg-icons/ft-icons.svg#logout",
     users: "svguse:/svg-icons/ft-icons.svg#users",
     "eye-open": "svguse:/svg-icons/ft-icons.svg#eye-open",
