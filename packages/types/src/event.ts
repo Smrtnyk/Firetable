@@ -30,12 +30,6 @@ export interface EventDoc {
     _doc: QueryDocumentSnapshot<EventDoc>;
 }
 
-export interface EventFeedDoc {
-    body: string;
-    timestamp: number;
-    type: "Reservation";
-}
-
 export interface CreateGuestPayload {
     name: string;
     confirmedTime: number | null;

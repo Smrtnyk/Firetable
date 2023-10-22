@@ -3,8 +3,6 @@ export const enum Collection {
     GUEST_LIST = "guestList",
     USERS = "users",
     FLOORS = "floors",
-    FCM = "fcm",
-    EVENT_FEED = "eventFeed",
     ORGANISATIONS = "organisations",
     PROPERTIES = "properties",
 }

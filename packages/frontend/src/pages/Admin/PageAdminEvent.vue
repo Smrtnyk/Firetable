@@ -4,7 +4,6 @@ import { useRouter } from "vue-router";
 import { formatEventDate } from "src/helpers/utils";
 
 import FTTitle from "components/FTTitle.vue";
-import EventFeedList from "components/admin/event/EventFeedList.vue";
 import AdminEventGeneralInfo from "components/admin/event/AdminEventGeneralInfo.vue";
 import AdminEventReservationsByPerson from "components/admin/event/AdminEventReservationsByPerson.vue";
 import AdminEventEditInfo from "components/admin/event/AdminEventEditInfo.vue";
@@ -30,7 +29,7 @@ const router = useRouter();
 const quasar = useQuasar();
 const tab = ref("info");
 
-const { eventFloors, users, event, eventFeed, isLoading } = useAdminEvent(props.id);
+const { eventFloors, users, event, isLoading } = useAdminEvent(props.id);
 
 watch(
     isLoading,
@@ -164,7 +163,6 @@ onMounted(init);
             narrow-indicator
         >
             <q-tab name="info" label="Info" />
-            <q-tab name="activity" label="Activity" />
             <q-tab name="edit" label="Edit" v-if="!isEventFinished(event.date)" />
         </q-tabs>
         <div class="q-gutter-y-md">
@@ -174,11 +172,6 @@ onMounted(init);
                     <AdminEventGeneralInfo :reservations-status="reservationsStatus" />
                     <q-separator class="q-my-sm bg-grey-6" />
                     <AdminEventReservationsByPerson :reservations="eventData" />
-                </q-tab-panel>
-
-                <!-- Activity area -->
-                <q-tab-panel name="activity">
-                    <EventFeedList :event-feed="eventFeed" />
                 </q-tab-panel>
 
                 <!-- Edit area -->

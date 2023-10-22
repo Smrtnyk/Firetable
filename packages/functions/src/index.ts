@@ -1,7 +1,4 @@
 import * as functions from "firebase-functions";
-// import * as vapidKeys from "./vapid-keys.json";
-// import { setVapidDetails } from "web-push";
-import { handleReservation } from "./trigger/handle-reservation/index.js";
 import { deleteEventImage } from "./trigger/delete-event-image/index.js";
 import { createEvent as createEventFn } from "./callable/create-event/index.js";
 import { createUser as createUserFn } from "./callable/create-user/index.js";
@@ -33,12 +30,6 @@ export const handleEventImageWhenEventDeleted = functions
     .firestore
     .document(`${Collection.EVENTS}/{eventId}`)
     .onDelete(deleteEventImage);
-
-export const handleWhenEventTablesChange = functions
-    .region("europe-west3")
-    .firestore
-    .document(`${Collection.EVENTS}/{eventId}/floors/{mapId}`)
-    .onUpdate(handleReservation);
 
 // Everything that has to do with auth
 export const changePassword = functions

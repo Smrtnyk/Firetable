@@ -1,6 +1,6 @@
 import { computed, watch } from "vue";
 import { useRouter } from "vue-router";
-import { ADMIN, Collection, EventDoc, EventFeedDoc, FloorDoc, User } from "@firetable/types";
+import { ADMIN, Collection, EventDoc, FloorDoc, User } from "@firetable/types";
 import {
     createQuery,
     useFirestoreCollection,
@@ -30,24 +30,14 @@ export default function useAdminEvent(eventId: string) {
         }
     });
 
-    const eventFeedHook = useFirestoreCollection<EventFeedDoc>(
-        `${Collection.EVENTS}/${eventId}/${Collection.EVENT_FEED}`,
-    );
-
     const isLoading = computed(() => {
-        return (
-            eventFloorsHook.pending.value ||
-            usersHook.pending.value ||
-            eventHook.pending.value ||
-            eventFeedHook.pending.value
-        );
+        return eventFloorsHook.pending.value || usersHook.pending.value || eventHook.pending.value;
     });
 
     return {
         eventFloors: eventFloorsHook.data,
         users: usersHook.data,
         event: eventHook.data,
-        eventFeed: eventFeedHook.data,
         isLoading,
     };
 }
