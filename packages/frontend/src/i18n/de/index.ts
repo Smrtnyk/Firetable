@@ -67,5 +67,11 @@ export default {
             "Sie haben die maximale Anzahl an erstellten Immobilien erreicht!",
         noPropertiesWithoutOrganisationMessage:
             "Um Immobilien zu erstellen, müssen Sie zuerst eine Organisation erstellen.",
+        createPropertyDialogTitle: "Neue Immobilie hinzufügen",
+    },
+    AddNewPropertyForm: {
+        propertyNameLengthValidationMessage: "Der Immobilienname muss mindestens 3 Zeichen haben!",
+        organisationsRadioBoxLabel: "Organisationen:",
+        addPropertyButtonLabel: "Absenden",
     },
 };

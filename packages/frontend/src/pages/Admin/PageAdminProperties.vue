@@ -67,7 +67,7 @@ function createProperty(): void {
     quasar.dialog({
         component: FTDialog,
         componentProps: {
-            title: "Add new Property",
+            title: t("PageAdminProperties.createPropertyDialogTitle"),
             maximized: false,
             component: AddNewPropertyForm,
             componentPropsObject: {

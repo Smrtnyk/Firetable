@@ -68,5 +68,11 @@ export default {
             "You have reached the maximum amount of created properties!",
         noPropertiesWithoutOrganisationMessage:
             "In order to create properties, you must first create an organisation.",
+        createPropertyDialogTitle: "Add new Property",
+    },
+    AddNewPropertyForm: {
+        propertyNameLengthValidationMessage: "Property name needs to have at least 3 characters!",
+        organisationsRadioBoxLabel: "Organisations:",
+        addPropertyButtonLabel: "Submit",
     },
 };

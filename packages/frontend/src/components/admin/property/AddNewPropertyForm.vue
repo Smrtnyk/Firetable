@@ -6,6 +6,7 @@ import { ADMIN, OrganisationDoc } from "@firetable/types";
 import { CreatePropertyPayload } from "@firetable/backend";
 import { useAuthStore } from "stores/auth-store";
 import { showErrorMessage } from "src/helpers/ui-helpers";
+import { useI18n } from "vue-i18n";
 
 interface Props {
     organisations: OrganisationDoc[];
@@ -15,8 +16,9 @@ const props = defineProps<Props>();
 const emit = defineEmits<{
     (eventName: "create", payload: CreatePropertyPayload): void;
 }>();
+const { t } = useI18n();
 const authStore = useAuthStore();
-const propertyRules = [minLength("Property name needs to have at least 3 characters!", 3)];
+const propertyRules = [minLength(t("AddNewPropertyForm.propertyNameLengthValidationMessage"), 3)];
 const propertyName = ref("");
 const createPropertyForm = ref<null | QForm>(null);
 const chosenOrganisation = ref<string | null>(null);
@@ -51,7 +53,7 @@ async function submit(): Promise<void> {
             <q-input v-model="propertyName" rounded standout autofocus :rules="propertyRules" />
 
             <div v-if="!isSingleOrganisation" class="q-gutter-sm q-mb-lg">
-                <div>Organisations:</div>
+                <div>{{ t("AddNewPropertyForm.organisationsRadioBoxLabel") }}</div>
                 <div>
                     <q-radio
                         v-for="organisation in props.organisations"
@@ -71,7 +73,7 @@ async function submit(): Promise<void> {
             rounded
             class="button-gradient"
             size="md"
-            label="Create"
+            :label="t('AddNewPropertyForm.addPropertyButtonLabel')"
             @click="submit"
             v-close-popup
         />
