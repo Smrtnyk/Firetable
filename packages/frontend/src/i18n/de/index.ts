@@ -74,4 +74,13 @@ export default {
         organisationsRadioBoxLabel: "Organisationen:",
         addPropertyButtonLabel: "Absenden",
     },
+    PageAdminFloors: {
+        title: "Grundrisse",
+        noFloorPlansMessage: "Diese Immobilie hat keine Grundrisse.",
+        noPropertiesMessage:
+            "Sie haben keine Immobilien erstellt. Um Grundrisse zu erstellen, müssen Sie zuerst mindestens eine Immobilie erstellen.",
+        deleteFloorMessage: "Grundriss löschen?",
+        duplicateFloorPlanMessage: `Sind Sie sicher, dass Sie den Grundriss "{floorName}" duplizieren möchten?`,
+        addNewFloorMessage: `Neuen Grundriss zu {propertyName} hinzufügen`,
+    },
 };

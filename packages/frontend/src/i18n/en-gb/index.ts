@@ -75,4 +75,13 @@ export default {
         organisationsRadioBoxLabel: "Organisations:",
         addPropertyButtonLabel: "Submit",
     },
+    PageAdminFloors: {
+        title: "Floor Plans",
+        noFloorPlansMessage: "This property has no floor plans.",
+        noPropertiesMessage:
+            "You have no properties created, in order to create floor plans you need to first create at least one property.",
+        deleteFloorMessage: "Delete floor?",
+        duplicateFloorPlanMessage: "Are you sure you want to duplicate {floorName} floor plan?",
+        addNewFloorMessage: "Add New Floor to {propertyName}",
+    },
 };

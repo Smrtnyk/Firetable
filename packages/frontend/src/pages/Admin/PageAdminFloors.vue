@@ -11,8 +11,10 @@ import { addFloor, deleteFloor } from "@firetable/backend";
 import { useFloors } from "src/composables/useFloors";
 import { onMounted, ref, watch } from "vue";
 import { takeProp } from "@firetable/utils";
+import { useI18n } from "vue-i18n";
 
 const quasar = useQuasar();
+const { t } = useI18n();
 const { floors, isLoading, loadingPromise } = useFloors();
 const activeTab = ref("");
 
@@ -48,7 +50,11 @@ function showAddNewFloorForm(propertyId: string, floors: FloorDoc[]): void {
 }
 
 async function duplicateFloor(floor: FloorDoc, reset: () => void) {
-    if (!(await showConfirm(`Are you sure you want to duplicate "${floor.name}" floor plan?`)))
+    if (
+        !(await showConfirm(
+            t("PageAdminFloors.duplicateFloorPlanMessage", { floorName: floor.name }),
+        ))
+    )
         return reset();
 
     const duplicatedFloor = { ...floor, name: `${floor.name}_copy` };
@@ -58,7 +64,7 @@ async function duplicateFloor(floor: FloorDoc, reset: () => void) {
 }
 
 async function onFloorDelete(id: string, reset: () => void) {
-    if (!(await showConfirm("Delete floor?"))) return reset();
+    if (!(await showConfirm(t("PageAdminFloors.deleteFloorMessage")))) return reset();
 
     await tryCatchLoadingWrapper({
         hook: () => deleteFloor(id),
@@ -75,7 +81,7 @@ onMounted(async () => {
 
 <template>
     <div class="PageAdminFloors">
-        <FTTitle title="Floors" />
+        <FTTitle :title="t('PageAdminFloors.title')" />
 
         <!-- Tabs for each property -->
         <q-tabs v-model="activeTab">
@@ -101,7 +107,11 @@ onMounted(async () => {
                         icon="plus"
                         class="button-gradient"
                         @click="showAddNewFloorForm(propertyData.propertyId, propertyData.floors)"
-                        :label="`Add New Floor to ${propertyData.propertyName}`"
+                        :label="
+                            t('PageAdminFloors.addNewFloorMessage', {
+                                propertyName: propertyData.propertyName,
+                            })
+                        "
                     />
                 </div>
                 <!-- If the property has floors, display them -->
@@ -141,7 +151,7 @@ onMounted(async () => {
                 <!-- If the property doesn't have floors, display a standout message -->
                 <div v-else class="row justify-center items-center q-mt-md">
                     <h6 class="q-ma-sm text-weight-bolder underline">
-                        This property has no floors.
+                        {{ t("PageAdminFloors.noFloorPlansMessage") }}
                     </h6>
                 </div>
             </q-tab-panel>
@@ -153,8 +163,7 @@ onMounted(async () => {
             class="justify-center items-center q-pa-md text-center"
         >
             <h6 class="q-ma-sm text-weight-bolder underline">
-                You have no properties created, in order to create floor plans you need to first
-                create at least one property.
+                {{ t("PageAdminFloors.noPropertiesMessage") }}
             </h6>
         </div>
     </div>
