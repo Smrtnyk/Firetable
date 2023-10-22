@@ -43,4 +43,15 @@ export default {
         reservationNote: "Note",
         reservationCreateBtn: "Create",
     },
+    PageAdminProperties: {
+        properties: "Properties",
+        addNewProperty: "Add new property",
+        deletePropertyDialogTitle: "Delete property?",
+        deletePropertyDialogMessage: "This will also delete all the associated events!",
+        noPropertiesCreatedMessage: "There are no properties created.",
+        maxAmountOfPropertiesReachedMessage:
+            "You have reached the maximum amount of created properties!",
+        noPropertiesWithoutOrganisationMessage:
+            "In order to create properties, you must first create an organisation.",
+    },
 };

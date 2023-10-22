@@ -11,9 +11,11 @@ import { computed, watchEffect } from "vue";
 import { useOrganisations } from "src/composables/useOrganisations";
 import { useAuthStore } from "stores/auth-store";
 import { ADMIN } from "@firetable/types";
+import { useI18n } from "vue-i18n";
 
 const authStore = useAuthStore();
 const quasar = useQuasar();
+const { t } = useI18n();
 const { properties, fetchProperties, isLoading } = useProperties();
 const { organisations, isLoading: organisationsIsLoading } = useOrganisations();
 
@@ -50,7 +52,12 @@ const onDeleteProperty = withLoading(async (id: string) => {
 });
 
 async function deletePropertyAsync(propertyId: string, reset: () => void): Promise<void> {
-    if (await showConfirm("Delete property?", "This will also delete all the associated events!")) {
+    if (
+        await showConfirm(
+            t("PageAdminProperties.deletePropertyDialogTitle"),
+            t("PageAdminProperties.deletePropertyDialogMessage"),
+        )
+    ) {
         return onDeleteProperty(propertyId);
     }
     reset();
@@ -76,7 +83,7 @@ function createProperty(): void {
 
 <template>
     <div>
-        <FTTitle title="Properties">
+        <FTTitle :title="t('PageAdminProperties.properties')">
             <template #right>
                 <q-btn
                     v-if="organisations.length && !organisationsIsLoading && canCreateProperty"
@@ -84,7 +91,7 @@ function createProperty(): void {
                     icon="plus"
                     class="button-gradient"
                     @click="createProperty"
-                    label="Add new Property"
+                    :label="t('PageAdminProperties.addNewProperty')"
                 />
             </template>
         </FTTitle>
@@ -112,13 +119,13 @@ function createProperty(): void {
             class="row justify-center items-center q-mt-md"
         >
             <h6 class="q-ma-sm text-weight-bolder underline">
-                In order to create properties, you must first create an organisation.
+                {{ t("PageAdminProperties.noPropertiesWithoutOrganisationMessage") }}
             </h6>
         </div>
 
         <div v-else-if="!canCreateProperty && !organisationsIsLoading">
             <h6 class="q-ma-sm text-weight-bolder underline">
-                You have reached the maximum amount of created properties!
+                {{ t("PageAdminProperties.maxAmountOfPropertiesReachedMessage") }}
             </h6>
         </div>
 
@@ -126,7 +133,9 @@ function createProperty(): void {
             v-else-if="properties.length === 0 && !isLoading"
             class="row justify-center items-center q-mt-md"
         >
-            <h6 class="q-ma-sm text-weight-bolder underline">There are no properties created.</h6>
+            <h6 class="q-ma-sm text-weight-bolder underline">
+                {{ t("PageAdminProperties.noPropertiesCreatedMessage") }}
+            </h6>
         </div>
     </div>
 </template>

@@ -6,7 +6,7 @@ export default {
             manageFloors: "Etagen verwalten",
             manageUsers: "Benutzer verwalten",
             manageProperties: "Immobilien verwalten",
-            manageOrganisations: "Manage Organisations",
+            manageOrganisations: "Organisationen verwalten",
         },
         toggles: {
             darkMode: "Dunkelmodus umschalten",
@@ -41,5 +41,16 @@ export default {
         reservationGuestContact: "Kontakt des Gastes",
         reservationNote: "Notiz",
         reservationCreateBtn: "Weiter",
+    },
+    PageAdminProperties: {
+        properties: "Immobilien",
+        addNewProperty: "Neue Immobilie hinzufügen",
+        deletePropertyDialogTitle: "Immobilie löschen?",
+        deletePropertyDialogMessage: "Dies wird auch alle zugehörigen Veranstaltungen löschen!",
+        noPropertiesCreatedMessage: "Es wurden keine Immobilien erstellt.",
+        maxAmountOfPropertiesReachedMessage:
+            "Sie haben die maximale Anzahl an erstellten Immobilien erreicht!",
+        noPropertiesWithoutOrganisationMessage:
+            "Um Immobilien zu erstellen, müssen Sie zuerst eine Organisation erstellen.",
     },
 };
