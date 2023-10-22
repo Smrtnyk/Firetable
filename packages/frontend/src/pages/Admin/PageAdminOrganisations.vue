@@ -67,13 +67,7 @@ function createOrganisation(): void {
     <div>
         <FTTitle title="Organisations">
             <template #right>
-                <q-btn
-                    rounded
-                    icon="plus"
-                    class="button-gradient"
-                    @click="createOrganisation"
-                    label="New organisation"
-                />
+                <q-btn rounded icon="plus" class="button-gradient" @click="createOrganisation" />
             </template>
         </FTTitle>
         <q-list v-if="organisations.length">

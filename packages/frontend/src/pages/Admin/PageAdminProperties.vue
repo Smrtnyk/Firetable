@@ -91,7 +91,6 @@ function createProperty(): void {
                     icon="plus"
                     class="button-gradient"
                     @click="createProperty"
-                    :label="t('PageAdminProperties.addNewProperty')"
                 />
             </template>
         </FTTitle>

@@ -160,13 +160,15 @@ function showCreateEventForm(property: PropertyDoc): void {
                         :key="property.id"
                         :name="property.id"
                     >
-                        <q-btn
-                            rounded
-                            icon="plus"
-                            class="button-gradient"
-                            @click="showCreateEventForm(property)"
-                            label="new event"
-                        />
+                        <div class="row justify-end">
+                            <q-btn
+                                rounded
+                                icon="plus"
+                                class="button-gradient"
+                                @click="showCreateEventForm(property)"
+                            />
+                        </div>
+
                         <AdminPropertyEventsList
                             :property-id="property.id"
                             :events-by-property="eventsByProperty"

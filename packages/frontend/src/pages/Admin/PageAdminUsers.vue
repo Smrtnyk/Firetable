@@ -142,7 +142,6 @@ async function onUserSlideRight(id: string, reset: () => void) {
                     icon="plus"
                     class="button-gradient"
                     @click="showCreateUserDialog"
-                    label="new user"
                 />
             </template>
 

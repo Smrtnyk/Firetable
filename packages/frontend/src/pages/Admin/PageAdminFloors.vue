@@ -101,17 +101,12 @@ onMounted(async () => {
                 :name="propertyKey"
             >
                 <!-- Button to add a new floor for the property in the active tab -->
-                <div class="add-floor-btn row">
+                <div class="add-floor-btn row justify-end">
                     <q-btn
                         rounded
                         icon="plus"
                         class="button-gradient"
                         @click="showAddNewFloorForm(propertyData.propertyId, propertyData.floors)"
-                        :label="
-                            t('PageAdminFloors.addNewFloorMessage', {
-                                propertyName: propertyData.propertyName,
-                            })
-                        "
                     />
                 </div>
                 <!-- If the property has floors, display them -->
