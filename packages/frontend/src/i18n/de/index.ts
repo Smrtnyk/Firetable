@@ -38,6 +38,7 @@ export default {
         reservedByLabel: "Reserviert von",
         groupedWithLabel: "Gruppiert mit",
         guestArrivedLabel: "Ist der Gast angekommen?",
+        deleteReservationLabel: "Delete Reservation",
     },
     EventCreateReservation: {
         title: "Tisch",

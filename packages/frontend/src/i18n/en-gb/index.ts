@@ -31,7 +31,7 @@ export default {
         noChosenFloorsMessage: "You need to choose at least one floor",
     },
     EventShowReservation: {
-        title: "TABLE",
+        title: "Table",
         guestNameLabel: "Name",
         numberOfPeopleLabel: "Number of people",
         contactLabel: "Contact",
@@ -39,9 +39,10 @@ export default {
         reservedByLabel: "Reserved by",
         groupedWithLabel: "Grouped with",
         guestArrivedLabel: "Guest arrived?",
+        deleteReservationLabel: "Delete Reservation",
     },
     EventCreateReservation: {
-        title: "TABLE",
+        title: "Table",
         reservationGroupWith: "Group with",
         reservationGroupWithHint: "Group multiple tables under the one reservation.",
         reservationGuestName: "Guest name *",

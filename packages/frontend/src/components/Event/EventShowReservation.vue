@@ -85,7 +85,7 @@ function onReservationConfirm() {
         <q-item>
             <q-item-section>
                 <q-btn
-                    label="Delete Reservation"
+                    :label="t('EventShowReservation.deleteReservationLabel')"
                     outline
                     icon="trash"
                     color="negative"
