@@ -27,6 +27,13 @@ export default {
         title: "Guest List",
         guestListEmptyMessage: "Guest list is empty",
     },
+    EventGuestListCreateGuestForm: {
+        guestNameLabel: "Guest name *",
+        guestNameHint: "Name of the guest",
+        guestNameValidationLength: "Name must have at least 3 characters!",
+        guestNameAddSubmit: "Submit",
+        guestNameReset: "Reset",
+    },
     EventCreateForm: {
         noChosenFloorsMessage: "You need to choose at least one floor",
     },

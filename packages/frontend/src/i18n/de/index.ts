@@ -26,6 +26,13 @@ export default {
         title: "Gästeliste",
         guestListEmptyMessage: "Die Gästeliste ist leer",
     },
+    EventGuestListCreateGuestForm: {
+        guestNameLabel: "Gastname *",
+        guestNameHint: "Name des Gastes",
+        guestNameValidationLength: "Der Name muss mindestens 3 Zeichen haben!",
+        guestNameAddSubmit: "Absenden",
+        guestNameReset: "Zurücksetzen",
+    },
     EventCreateForm: {
         noChosenFloorsMessage: "Sie müssen mindestens eine Etage auswählen",
     },

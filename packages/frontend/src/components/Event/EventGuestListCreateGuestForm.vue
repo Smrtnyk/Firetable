@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { minLength } from "src/helpers/form-rules";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const emit = defineEmits(["create"]);
 const guestName = ref("");
 
@@ -24,17 +26,17 @@ function onReset() {
             v-model="guestName"
             standout
             rounded
-            label="Guest name *"
-            hint="Name of the guest"
+            :label="t('EventGuestListCreateGuestForm.guestNameLabel')"
+            :hint="t('EventGuestListCreateGuestForm.guestNameHint')"
             lazy-rules
-            :rules="[minLength('Name must have at least 3 characters!', 3)]"
+            :rules="[minLength(t('EventGuestListCreateGuestForm.guestNameValidationLength'), 3)]"
         />
 
         <div>
             <q-btn
                 rounded
                 size="md"
-                label="Submit"
+                :label="t('EventGuestListCreateGuestForm.guestNameAddSubmit')"
                 type="submit"
                 class="button-gradient"
                 v-close-popup
@@ -43,7 +45,7 @@ function onReset() {
                 rounded
                 size="md"
                 outline
-                label="Reset"
+                :label="t('EventGuestListCreateGuestForm.guestNameReset')"
                 type="reset"
                 color="primary"
                 class="q-ml-sm"
