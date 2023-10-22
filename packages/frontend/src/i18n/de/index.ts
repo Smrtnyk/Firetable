@@ -55,7 +55,7 @@ export default {
         reservationNumberOfGuests: "Anzahl der Gäste *",
         reservationGuestContact: "Kontakt des Gastes",
         reservationNote: "Notiz",
-        reservationCreateBtn: "Weiter",
+        reservationCreateBtn: "Absenden",
     },
     PageAdminProperties: {
         properties: "Immobilien",
