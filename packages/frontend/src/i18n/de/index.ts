@@ -19,6 +19,13 @@ export default {
     FTAutocomplete: {
         label: "Tische suchen...",
     },
+    EventGuestList: {
+        deleteGuestTitle: "Möchten Sie diesen Gast wirklich von der Gästeliste entfernen?",
+        guestLimitReached: "Limit erreicht!",
+        addGuestLabel: "Gast hinzufügen",
+        title: "Gästeliste",
+        guestListEmptyMessage: "Die Gästeliste ist leer",
+    },
     EventCreateForm: {
         noChosenFloorsMessage: "Sie müssen mindestens eine Etage auswählen",
     },

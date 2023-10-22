@@ -20,6 +20,13 @@ export default {
     FTAutocomplete: {
         label: "Search tables...",
     },
+    EventGuestList: {
+        deleteGuestTitle: "Do you really want to remove this guest from the guest list?",
+        guestLimitReached: "Limit reached!",
+        addGuestLabel: "Add Guest",
+        title: "Guest List",
+        guestListEmptyMessage: "Guest list is empty",
+    },
     EventCreateForm: {
         noChosenFloorsMessage: "You need to choose at least one floor",
     },

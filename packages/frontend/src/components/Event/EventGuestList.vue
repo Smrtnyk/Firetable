@@ -19,6 +19,7 @@ import {
     confirmGuestFromGuestList,
     deleteGuestFromGuestList,
 } from "@firetable/backend";
+import { useI18n } from "vue-i18n";
 
 interface Props {
     guestListLimit: number;
@@ -31,13 +32,14 @@ const props = withDefaults(defineProps<Props>(), {
 const quasar = useQuasar();
 const route = useRoute();
 const eventsStore = useEventsStore();
+const { t } = useI18n();
 const eventId = computed(() => route.params.eventId as string);
 const reachedCapacity = computed(() => props.guestList.length / props.guestListLimit);
 const isGuestListFull = computed(() => props.guestList.length >= props.guestListLimit);
 
 function onCreate(newGuestData: GuestData) {
     if (props.guestList.length >= props.guestListLimit) {
-        showErrorMessage("Limit reached!");
+        showErrorMessage(t("EventGuestList.guestLimitReached"));
         return;
     }
 
@@ -47,8 +49,7 @@ function onCreate(newGuestData: GuestData) {
 }
 
 async function deleteGuest(id: string, reset: () => void) {
-    if (!(await showConfirm("Do you really want to delete this guest from the guest list?")))
-        return reset();
+    if (!(await showConfirm(t("EventGuestList.deleteGuestTitle")))) return reset();
 
     await tryCatchLoadingWrapper({
         hook: () => deleteGuestFromGuestList(eventId.value, id),
@@ -64,7 +65,7 @@ function showAddNewGuestForm(): void {
     quasar.dialog({
         component: FTDialog,
         componentProps: {
-            title: "Add Guest",
+            title: t("EventGuestList.addGuestLabel"),
             component: EventGuestListCreateGuestForm,
             maximized: false,
             componentPropsObject: {},
@@ -87,7 +88,7 @@ function showAddNewGuestForm(): void {
         behavior="mobile"
     >
         <div class="EventGuestList">
-            <FTTitle title="Guestlist">
+            <FTTitle :title="t('EventGuestList.title')">
                 <template #right>
                     <q-btn
                         rounded
@@ -110,8 +111,10 @@ function showAddNewGuestForm(): void {
             </q-linear-progress>
 
             <div class="EventGuestList" v-if="!props.guestList.length">
-                <div class="justify-center items-center q-pa-md">
-                    <h6 class="text-h6">Guest-list is empty</h6>
+                <div class="row justify-center items-center q-mt-md">
+                    <h6 class="q-ma-sm text-weight-bolder underline">
+                        {{ t("EventGuestList.guestListEmptyMessage") }}
+                    </h6>
                     <q-img src="/people-confirmation.svg" />
                 </div>
             </div>
