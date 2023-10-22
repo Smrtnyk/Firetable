@@ -31,7 +31,7 @@ const props = withDefaults(defineProps<Props>(), {
 const quasar = useQuasar();
 const route = useRoute();
 const eventsStore = useEventsStore();
-const eventID = computed(() => route.params.id as string);
+const eventId = computed(() => route.params.eventId as string);
 const reachedCapacity = computed(() => props.guestList.length / props.guestListLimit);
 
 function onCreate(newGuestData: GuestData) {
@@ -41,7 +41,7 @@ function onCreate(newGuestData: GuestData) {
     }
 
     tryCatchLoadingWrapper({
-        hook: () => addGuestToGuestList(eventID.value, newGuestData),
+        hook: () => addGuestToGuestList(eventId.value, newGuestData),
     });
 }
 
@@ -50,13 +50,13 @@ async function deleteGuest(id: string, reset: () => void) {
         return reset();
 
     await tryCatchLoadingWrapper({
-        hook: () => deleteGuestFromGuestList(eventID.value, id),
+        hook: () => deleteGuestFromGuestList(eventId.value, id),
         errorHook: reset,
     });
 }
 
 const confirmGuest = withLoading(function ({ id, confirmed }: GuestData, reset: () => void) {
-    return confirmGuestFromGuestList(eventID.value, id, !confirmed).then(reset);
+    return confirmGuestFromGuestList(eventId.value, id, !confirmed).then(reset);
 });
 
 function showAddNewGuestForm(): void {
@@ -109,7 +109,7 @@ function showAddNewGuestForm(): void {
 
             <div class="EventGuestList" v-if="!props.guestList.length">
                 <div class="justify-center items-center q-pa-md">
-                    <h6 class="text-h6">You should invite some people :)</h6>
+                    <h6 class="text-h6">Guest-list is empty</h6>
                     <q-img src="/people-confirmation.svg" />
                 </div>
             </div>

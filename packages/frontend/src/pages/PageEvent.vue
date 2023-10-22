@@ -30,13 +30,13 @@ const router = useRouter();
 const q = useQuasar();
 const pageRef = ref<HTMLDivElement>();
 const guestList = useFirestoreCollection<GuestData>(
-    `${Collection.EVENTS}/${props.eventId}/guestList`,
+    `${Collection.EVENTS}/${props.eventId}/${Collection.GUEST_LIST}`,
 );
 const { data: event, promise: eventDataPromise } = useFirestoreDocument<EventDoc>(
     `${Collection.EVENTS}/${props.eventId}`,
 );
 const { data: eventFloors } = useFirestoreCollection<FloorDoc>(
-    `${Collection.EVENTS}/${props.eventId}/floors`,
+    `${Collection.EVENTS}/${props.eventId}/${Collection.FLOORS}`,
 );
 const {
     onTableFound,
