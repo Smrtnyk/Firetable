@@ -34,20 +34,10 @@ export function useEvents() {
         return eventsDocs;
     }
 
-    function getEventsForProperty(propertyId: string): Set<EventDoc> | undefined {
-        return eventsByProperty[propertyId];
-    }
-
-    function getLastDocForProperty(propertyId: string): QueryDocumentSnapshot | null | undefined {
-        return lastFetchedDocForProperty[propertyId];
-    }
-
     return {
         eventsByProperty,
         lastFetchedDocForProperty,
         hasMoreEventsToFetch,
         fetchMoreEvents,
-        getEventsForProperty,
-        getLastDocForProperty,
     };
 }
