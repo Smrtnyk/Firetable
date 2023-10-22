@@ -33,6 +33,7 @@ const route = useRoute();
 const eventsStore = useEventsStore();
 const eventId = computed(() => route.params.eventId as string);
 const reachedCapacity = computed(() => props.guestList.length / props.guestListLimit);
+const isGuestListFull = computed(() => props.guestList.length >= props.guestListLimit);
 
 function onCreate(newGuestData: GuestData) {
     if (props.guestList.length >= props.guestListLimit) {
@@ -93,6 +94,7 @@ function showAddNewGuestForm(): void {
                         icon="plus"
                         class="button-gradient"
                         @click="showAddNewGuestForm"
+                        :disabled="isGuestListFull"
                     />
                 </template>
             </FTTitle>
