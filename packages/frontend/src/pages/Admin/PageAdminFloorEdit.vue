@@ -258,7 +258,7 @@ function deactivateBulkMode() {
                     <q-btn
                         @click="toggleBulkMode"
                         icon="stack"
-                        :color="bulkMode ? 'positive' : ''"
+                        :color="bulkMode ? 'positive' : undefined"
                     />
                 </div>
             </div>
