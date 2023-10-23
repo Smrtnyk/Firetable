@@ -137,8 +137,8 @@ function resetProperties() {
                 standout
                 prefix="Email:"
                 rounded
-                label="Username *"
-                hint="Username without spaces and special characters, e.g. max123"
+                label="Email *"
+                hint="email username without spaces and special characters, e.g. max123"
                 :rules="userNameRules"
                 :suffix="emailSuffix"
             >
