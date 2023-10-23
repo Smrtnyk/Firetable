@@ -104,6 +104,33 @@ export default {
         eventCreatedNotificationMessage: "Veranstaltung erstellt!",
         createNewEventDialogTitle: "Neue Veranstaltung erstellen",
     },
+    PageAdminUsers: {
+        title: "Benutzer",
+        noUsersCreatedMessage: "Es wurden keine Benutzer erstellt.",
+        maxAmountUsersCreationMessage:
+            "Sie haben die maximale Anzahl an Benutzern erreicht, welche {limit} beträgt!",
+        createNewUserDialogTitle: "Neuen Benutzer erstellen",
+        editUserDialogTitle: "Benutzer bearbeiten: {name}",
+        editUserConfirmationMessage:
+            "Sind Sie sicher, dass Sie den Benutzer {name} bearbeiten möchten?",
+    },
+    UserCreateForm: {
+        noOrganisationsMessage:
+            "Sie müssen mindestens eine Organisation erstellt haben, bevor Sie einen Immobilieneigentümer erstellen können!",
+        userNameInputLabel: "Name *",
+        userNameInputHint: "Name der Person, z.B. Max Mustermann",
+        userMailInputLabel: "E-Mail *",
+        userMailInputHint: "E-Mail-Benutzername ohne Leerzeichen und Sonderzeichen, z.B. max123",
+        userPasswordInputLabel: "Benutzerpasswort *",
+        userPasswordInputHint: "Passwort des Benutzers",
+        userRoleSelectLabel: "Rolle",
+        userRoleSelectHint: "Benutzer eine Rolle zuweisen, standardmäßig ist es Mitarbeiter.",
+        userOrganisationSelectLabel: "Organisation",
+        userOrganisationSelectHint: "Wählen Sie eine Organisation für diesen Benutzer.",
+        usePropertiesCheckboxesTitle: "Immobilien:",
+        buttonSubmitLabel: "Absenden",
+        buttonResetLabel: "Zurücksetzen",
+    },
     PageProfile: {
         title: "Profil von {name}",
         nameLabel: "Name: {name}",

@@ -18,7 +18,9 @@ import { usePropertiesStore } from "stores/usePropertiesStore";
 import { useAdminUsers } from "src/composables/useAdminUsers";
 import { useAuthStore } from "stores/auth-store";
 import { useDialog } from "src/composables/useDialog";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const authStore = useAuthStore();
 const propertiesStore = usePropertiesStore();
 const { users, isLoading, fetchUsers } = useAdminUsers();
@@ -53,7 +55,7 @@ watch(
 
 function onCreateUserFormSubmit(newUser: CreateUserPayload) {
     if (users.value.length > 150) {
-        showErrorMessage(`You have reached the maximum amount of users which is ${150}!`);
+        showErrorMessage(t("PageAdminUsers.maxAmountUsersCreationMessage", { limit: 150 }));
         return;
     }
 
@@ -71,7 +73,7 @@ async function showCreateUserDialog(): Promise<void> {
         componentProps: {
             component: UserCreateForm,
             maximized: false,
-            title: "Create new user",
+            title: t("PageAdminUsers.createNewUserDialogTitle"),
             componentPropsObject: {
                 properties,
                 organisations,
@@ -87,7 +89,9 @@ async function showCreateUserDialog(): Promise<void> {
 }
 
 async function showEditUserDialog(user: User, reset: () => void) {
-    if (!(await showConfirm(`Are you sure you want to edit user ${user.name}?`, ""))) {
+    if (
+        !(await showConfirm(t("PageAdminUsers.editUserConfirmationMessage", { name: user.name })))
+    ) {
         reset();
         return;
     }
@@ -101,7 +105,7 @@ async function showEditUserDialog(user: User, reset: () => void) {
         componentProps: {
             component: UserEditForm,
             maximized: false,
-            title: `Editing user: ${user.name}`,
+            title: t("PageAdminUsers.editUserDialogTitle", { name: user.name }),
             componentPropsObject: {
                 user: { ...user },
                 properties,
@@ -130,7 +134,7 @@ async function onUserSlideRight(id: string, reset: () => void) {
 
 <template>
     <div class="PageAdminUsers">
-        <FTTitle title="Users">
+        <FTTitle :title="t('PageAdminUsers.title')">
             <template #right>
                 <q-btn rounded icon="plus" class="button-gradient" @click="showCreateUserDialog" />
             </template>
@@ -166,7 +170,9 @@ async function onUserSlideRight(id: string, reset: () => void) {
             v-if="users.length === 0 && !isLoading"
             class="row justify-center items-center q-mt-md"
         >
-            <h6 class="q-ma-sm text-weight-bolder underline">There are no users created.</h6>
+            <h6 class="q-ma-sm text-weight-bolder underline">
+                {{ t("PageAdminUsers.noUsersCreatedMessage") }}
+            </h6>
         </div>
     </div>
 </template>

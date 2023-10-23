@@ -13,6 +13,7 @@ import { QForm } from "quasar";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useAuthStore } from "stores/auth-store";
 import { noEmptyString, noWhiteSpaces } from "src/helpers/form-rules";
+import { useI18n } from "vue-i18n";
 
 interface Props {
     properties: PropertyDoc[];
@@ -24,6 +25,7 @@ type Emits = (event: "submit", payload: CreateUserPayload | User) => void;
 const stringRules = [noEmptyString()];
 const userNameRules = [noEmptyString(), noWhiteSpaces];
 
+const { t } = useI18n();
 const authStore = useAuthStore();
 const emit = defineEmits<Emits>();
 const props = defineProps<Props>();
@@ -126,8 +128,8 @@ function resetProperties() {
                 v-model="form.name"
                 standout
                 rounded
-                label="Name *"
-                hint="Name of the person, e.g. Max Mustermann"
+                :label="t('UserCreateForm.userNameInputLabel')"
+                :hint="t('UserCreateForm.userNameInputHint')"
                 lazy-rules
                 :rules="stringRules"
             />
@@ -137,8 +139,8 @@ function resetProperties() {
                 standout
                 prefix="Email:"
                 rounded
-                label="Email *"
-                hint="email username without spaces and special characters, e.g. max123"
+                :label="t('UserCreateForm.userMailInputLabel')"
+                :hint="t('UserCreateForm.userMailInputHint')"
                 :rules="userNameRules"
                 :suffix="emailSuffix"
             >
@@ -152,8 +154,8 @@ function resetProperties() {
                 v-model="form.password"
                 standout
                 rounded
-                label="User password *"
-                hint="Password of the user"
+                :label="t('UserCreateForm.userPasswordInputLabel')"
+                :hint="t('UserCreateForm.userPasswordInputHint')"
                 lazy-rules
                 :rules="stringRules"
             >
@@ -164,30 +166,30 @@ function resetProperties() {
 
             <q-select
                 v-model="form.role"
-                hint="Assign role to user, default is Staff."
+                :hint="t('UserCreateForm.userRoleSelectHint')"
                 standout
                 rounded
                 :options="availableRoles"
-                label="Role"
+                :label="t('UserCreateForm.userRoleSelectLabel')"
             />
 
             <q-select
                 v-if="form.role === Role.PROPERTY_OWNER && props.organisations.length"
                 v-model="chosenOrganisation"
-                hint="Select organisation for this user."
+                :hint="t('UserCreateForm.userOrganisationSelectHint')"
                 standout
                 rounded
                 :options="organisationOptions"
-                label="Organisation"
+                label="t('UserCreateForm.userOrganisationSelectLabel')"
                 option-label="name"
                 option-value="value"
             />
             <div v-else-if="form.role === Role.PROPERTY_OWNER && !props.organisations.length">
-                You must have at least one organisation created before creating property owner!
+                {{ t("UserCreateForm.noOrganisationsMessage") }}
             </div>
 
             <div v-if="props.properties.length" class="q-gutter-sm q-mb-lg">
-                <div>Properties:</div>
+                <div>{{ t("UserCreateForm.usePropertiesCheckboxesTitle") }}</div>
                 <div>
                     <q-checkbox
                         v-for="property in props.properties"
@@ -201,12 +203,18 @@ function resetProperties() {
             </div>
 
             <div>
-                <q-btn rounded size="md" label="Submit" type="submit" class="button-gradient" />
+                <q-btn
+                    rounded
+                    size="md"
+                    :label="t('UserCreateForm.buttonSubmitLabel')"
+                    type="submit"
+                    class="button-gradient"
+                />
                 <q-btn
                     rounded
                     size="md"
                     outline
-                    label="Reset"
+                    :label="t('UserCreateForm.buttonResetLabel')"
                     type="reset"
                     color="primary"
                     class="q-ml-sm"

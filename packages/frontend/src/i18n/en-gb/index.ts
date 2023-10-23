@@ -103,6 +103,32 @@ export default {
         eventCreatedNotificationMessage: "Event created!",
         createNewEventDialogTitle: "Create new event",
     },
+    PageAdminUsers: {
+        title: "Users",
+        noUsersCreatedMessage: "There are no users created.",
+        maxAmountUsersCreationMessage:
+            "You have reached the maximum amount of users which is {limit}!",
+        createNewUserDialogTitle: "Create new user",
+        editUserDialogTitle: "Editing user: {name}",
+        editUserConfirmationMessage: "Are you sure you want to edit user {name}?",
+    },
+    UserCreateForm: {
+        noOrganisationsMessage:
+            "You must have at least one organisation created before creating property owner!",
+        userNameInputLabel: "Name *",
+        userNameInputHint: "Name of the person, e.g. Max Mustermann",
+        userMailInputLabel: "Email *",
+        userMailInputHint: "Email username without spaces and special characters, e.g. max123",
+        userPasswordInputLabel: "User password *",
+        userPasswordInputHint: "Password of the user",
+        userRoleSelectLabel: "Role",
+        userRoleSelectHint: "Assign role to user, default is Staff.",
+        userOrganisationSelectLabel: "Organisation",
+        userOrganisationSelectHint: "Select organisation for this user.",
+        usePropertiesCheckboxesTitle: "Properties:",
+        buttonSubmitLabel: "Submit",
+        buttonResetLabel: "Reset",
+    },
     PageProfile: {
         title: "Profile of {name}",
         nameLabel: "Name: {name}",
