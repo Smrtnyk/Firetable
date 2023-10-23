@@ -14,11 +14,13 @@ import { takeLast } from "@firetable/utils";
 import { useFloors } from "src/composables/useFloors";
 import { useProperties } from "src/composables/useProperties";
 import { useEvents } from "src/composables/useEvents";
+import { useDialog } from "src/composables/useDialog";
 
 const EVENTS_PER_PAGE = 20;
 
 const quasar = useQuasar();
 const router = useRouter();
+const { createDialog } = useDialog();
 const { properties, isLoading: isLoadingProperties } = useProperties();
 const { floors } = useFloors();
 const {
@@ -120,7 +122,7 @@ async function onLoad(propertyId: string, done: (stop: boolean) => void) {
 }
 
 function showCreateEventForm(property: PropertyDoc): void {
-    quasar.dialog({
+    createDialog({
         component: FTDialog,
         componentProps: {
             title: "Create new event",

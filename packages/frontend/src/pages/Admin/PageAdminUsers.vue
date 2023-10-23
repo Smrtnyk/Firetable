@@ -4,7 +4,7 @@ import UserEditForm from "components/admin/User/UserEditForm.vue";
 import FTTitle from "components/FTTitle.vue";
 import { showConfirm, showErrorMessage, withLoading } from "src/helpers/ui-helpers";
 import { watch } from "vue";
-import { Loading, useQuasar } from "quasar";
+import { Loading } from "quasar";
 import FTDialog from "components/FTDialog.vue";
 import { ADMIN, CreateUserPayload, EditUserPayload, User } from "@firetable/types";
 import {
@@ -17,11 +17,12 @@ import {
 import { usePropertiesStore } from "stores/usePropertiesStore";
 import { useAdminUsers } from "src/composables/useAdminUsers";
 import { useAuthStore } from "stores/auth-store";
+import { useDialog } from "src/composables/useDialog";
 
 const authStore = useAuthStore();
 const propertiesStore = usePropertiesStore();
 const { users, isLoading, fetchUsers } = useAdminUsers();
-const quasar = useQuasar();
+const { createDialog } = useDialog();
 
 const onCreateUser = withLoading(async (newUser: CreateUserPayload) => {
     await createUserWithEmail(newUser);
@@ -65,7 +66,7 @@ async function showCreateUserDialog(): Promise<void> {
             ? await fetchOrganisationsForAdmin()
             : [await fetchOrganisationById(authStore.user!.organisationId)];
     const properties = await propertiesStore.getPropertiesOfCurrentUser();
-    const dialog = quasar.dialog({
+    const dialog = createDialog({
         component: FTDialog,
         componentProps: {
             component: UserCreateForm,
@@ -95,7 +96,7 @@ async function showEditUserDialog(user: User, reset: () => void) {
         propertiesStore.getPropertiesOfUser(user.id),
     ]);
     const organisation = await fetchOrganisationById(user.organisationId);
-    const dialog = quasar.dialog({
+    const dialog = createDialog({
         component: FTDialog,
         componentProps: {
             component: UserEditForm,
