@@ -3,10 +3,22 @@
         <div class="col-10 flex justify-between">
             <div class="row">
                 <div class="col-4 q-pa-xs q-pl-none">
-                    <q-input :model-value="getElementWidth()" filled label="Width" readonly />
+                    <q-input
+                        :dense="isMobile"
+                        :model-value="getElementWidth()"
+                        filled
+                        label="Width"
+                        readonly
+                    />
                 </div>
                 <div class="col-4 q-pa-xs">
-                    <q-input :model-value="getElementHeight()" filled label="Height" readonly />
+                    <q-input
+                        :dense="isMobile"
+                        :model-value="getElementHeight()"
+                        filled
+                        label="Height"
+                        readonly
+                    />
                 </div>
                 <div class="col-4 q-pa-xs">
                     <q-input
@@ -15,6 +27,7 @@
                         @update:model-value="updateTableLabel"
                         filled
                         label="Table Name"
+                        :dense="isMobile"
                     />
                 </div>
             </div>
@@ -25,12 +38,20 @@
                 icon="trash"
                 color="negative"
                 @click="deleteElement"
+                :size="buttonSize"
             />
         </div>
     </div>
     <div class="row q-pa-sm" v-else>
         <div class="col q-pa-xs">
-            <q-input model-value="No element selected..." disable readonly filled autogrow />
+            <q-input
+                :dense="isMobile"
+                model-value="No element selected..."
+                disable
+                readonly
+                filled
+                autogrow
+            />
         </div>
     </div>
 </template>
@@ -39,6 +60,11 @@
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed, nextTick } from "vue";
 import { FloorEditorElement, isTable } from "@firetable/floor-creator";
+import { useQuasar } from "quasar";
+
+const q = useQuasar();
+const isMobile = computed(() => q.screen.lt.sm);
+const buttonSize = computed(() => (isMobile.value ? "xs" : "md"));
 
 interface Props {
     selectedFloorElement: FloorEditorElement | undefined;

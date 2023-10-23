@@ -3,7 +3,7 @@ import AddTableDialog from "components/Floor/AddTableDialog.vue";
 import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
 import FTDialog from "components/FTDialog.vue";
 
-import { nextTick, onMounted, ref } from "vue";
+import { computed, nextTick, onMounted, ref } from "vue";
 import { NumberTuple } from "src/types/generic";
 import { useRouter } from "vue-router";
 import { Loading, useQuasar } from "quasar";
@@ -60,6 +60,8 @@ const selectedElement = ref<FloorEditorElement | undefined>();
 const bulkMode = ref(false);
 const bulkElement = ref<ElementTag | null>(null);
 const bulkLabelCounter = ref(0); // To auto-increment labels
+
+const buttonSize = computed(() => (q.screen.lt.sm ? "xs" : "md"));
 
 const {
     data: floor,
@@ -233,7 +235,6 @@ function deactivateBulkMode() {
                         icon="save"
                         @click="onFloorSave"
                         label="save"
-                        size="md"
                         rounded
                     />
                 </template>
@@ -252,6 +253,7 @@ function deactivateBulkMode() {
                         v-if="floorInstance"
                         @click="floorInstance.toggleGridVisibility"
                         icon="grid"
+                        :size="buttonSize"
                     />
                 </div>
                 <div class="col-auto flex q-pl-none justify-end">
@@ -259,6 +261,7 @@ function deactivateBulkMode() {
                         @click="toggleBulkMode"
                         icon="stack"
                         :color="bulkMode ? 'positive' : undefined"
+                        :size="buttonSize"
                     />
                 </div>
             </div>
