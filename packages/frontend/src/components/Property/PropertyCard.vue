@@ -10,50 +10,40 @@ const props = defineProps<Props>();
 
 <template>
     <router-link
-        class="EventCard__link"
+        class="PropertyCard__link"
         :to="{ name: 'events', params: { propertyId: props.property.id } }"
     >
-        <div class="EventCard">
-            <div class="EventCard__image-container">
-                <q-img
-                    class="EventCard__image"
-                    :src="props.property.img || 'images/default-event-img.jpg'"
-                    alt=""
-                    :ratio="1"
-                />
-            </div>
+        <q-card class="PropertyCard">
+            <q-parallax
+                class="PropertyCard__parallax"
+                :src="props.property.img || 'images/default-event-img.jpg'"
+                alt=""
+            />
 
-            <div class="EventCard__content">
-                <h2 class="text-h3 q-ma-none">{{ props.property.name }}</h2>
-            </div>
-        </div>
+            <q-card-section class="PropertyCard__content">
+                <h2 class="text-h3 q-mb-sm q-ml-none q-mt-none">{{ props.property.name }}</h2>
+            </q-card-section>
+        </q-card>
     </router-link>
 </template>
 
 <style lang="scss">
-.EventCard {
+.PropertyCard {
     position: relative;
-    background: #333;
-    width: 100%;
-    border-radius: 6px;
-    color: #aaa;
+    overflow: hidden;
     box-shadow:
         0 0.25rem 0.25rem rgba(0, 0, 0, 0.2),
         0 0 1rem rgba(0, 0, 0, 0.2);
-    overflow: hidden;
 
     &__link {
-        text-decoration: none;
+        text-decoration: none !important;
+        color: currentColor;
+        &:visited {
+            color: currentColor;
+        }
     }
-
-    .event-success-indicator {
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        z-index: 2;
-    }
-
     &__content {
+        overflow: hidden;
         text-decoration: none !important;
         padding: 1rem;
         width: 100%;

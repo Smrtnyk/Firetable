@@ -14,26 +14,15 @@ const props = defineProps<Props>();
         class="EventCard__link"
         :to="{ name: 'event', params: { eventId: props.event.id } }"
     >
-        <div class="EventCard">
-            <div class="event-success-indicator" v-if="props.event.reservedPercentage >= 75">
-                <q-icon name="fire" color="warning" class="bg-warning-shadow rounded" size="md" />
-                <q-tooltip>
-                    {{ Math.round(props.event.reservedPercentage) }}% of tables are reserved. Event
-                    is performing well!
-                </q-tooltip>
-            </div>
+        <q-card class="EventCard">
+            <q-parallax
+                :src="props.event.img || '/images/default-event-img.jpg'"
+                alt=""
+                :ratio="1.5"
+            />
 
-            <div class="EventCard__image-container">
-                <q-img
-                    class="EventCard__image"
-                    :src="props.event.img || '/images/default-event-img.jpg'"
-                    alt=""
-                    :ratio="1"
-                />
-            </div>
-
-            <div class="EventCard__content">
-                <h2 class="text-h3 q-ma-none">{{ props.event.name }}</h2>
+            <q-card-section class="EventCard__content">
+                <h2 class="text-h3 q-mb-sm q-ml-none q-mt-none">{{ props.event.name }}</h2>
                 <q-icon
                     name="calendar"
                     color="white"
@@ -57,32 +46,23 @@ const props = defineProps<Props>();
                     size="xs"
                 />
                 {{ props.event.entryPrice || "Free" }}
-            </div>
-        </div>
+            </q-card-section>
+        </q-card>
     </router-link>
 </template>
 
 <style lang="scss">
 .EventCard {
-    position: relative;
-    background: #333;
-    width: 100%;
-    border-radius: 6px;
-    color: #aaa;
     box-shadow:
         0 0.25rem 0.25rem rgba(0, 0, 0, 0.2),
         0 0 1rem rgba(0, 0, 0, 0.2);
-    overflow: hidden;
 
     &__link {
-        text-decoration: none;
-    }
-
-    .event-success-indicator {
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        z-index: 2;
+        text-decoration: none !important;
+        color: currentColor;
+        &:visited {
+            color: currentColor;
+        }
     }
 
     &__content {
