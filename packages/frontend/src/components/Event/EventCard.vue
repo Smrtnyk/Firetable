@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { dateFromTimestamp, hourFromTimestamp } from "src/helpers/utils";
 import { EventDoc } from "@firetable/types";
+import { useI18n } from "vue-i18n";
 
 interface Props {
     event: EventDoc;
 }
 
 const props = defineProps<Props>();
+const { t } = useI18n();
 </script>
 
 <template>
@@ -45,7 +47,7 @@ const props = defineProps<Props>();
                     class="q-ml-sm gradient-pink q-pa-xs rounded"
                     size="xs"
                 />
-                {{ props.event.entryPrice || "Free" }}
+                {{ props.event.entryPrice || t("EventCard.freeLabel") }}
             </q-card-section>
         </q-card>
     </router-link>

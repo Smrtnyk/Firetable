@@ -13,6 +13,9 @@ export default {
             onlineStatus: "Online-Status umschalten",
         },
     },
+    EventCard: {
+        freeLabel: "Gratis",
+    },
     PageEvent: {
         showFloorPlansExpanded: "Grundrisse anzeigen",
     },

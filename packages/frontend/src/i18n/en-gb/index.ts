@@ -13,6 +13,9 @@ export default {
             onlineStatus: "Toggle online status",
         },
     },
+    EventCard: {
+        freeLabel: "Free",
+    },
     PageEvent: {
         showFloorPlansExpanded: "Floor plans",
         reservationAlreadyReserved: "Someone else already reserved this table.",
