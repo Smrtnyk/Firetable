@@ -63,9 +63,6 @@ export class EventManager {
             this.floor.zoomManager.zoomIn(new fabric.Point(opt.e.offsetX, opt.e.offsetY));
         } else if (delta < 0 && this.floor.zoomManager.canZoomOut()) {
             this.floor.zoomManager.zoomOut(new fabric.Point(opt.e.offsetX, opt.e.offsetY));
-            if (!this.floor.zoomManager.canZoomOut()) {
-                this.floor.zoomManager.resetZoom();
-            }
         }
 
         opt.e.preventDefault();

@@ -40,7 +40,7 @@ export class FloorZoomManager {
         const newZoom = this.canvas.getZoom() + this.canvas.getZoom() * incrementFactor;
         if (newZoom <= this.maxZoom && newZoom >= this.minZoom) {
             this.animateZoom(newZoom, point);
-        } else {
+        } else if (newZoom < this.minZoom) {
             this.resetZoom();
         }
     }
