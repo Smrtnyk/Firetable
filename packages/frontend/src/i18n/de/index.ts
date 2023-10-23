@@ -86,4 +86,13 @@ export default {
         duplicateFloorPlanMessage: `Sind Sie sicher, dass Sie den Grundriss "{floorName}" duplizieren möchten?`,
         addNewFloorMessage: `Neuen Grundriss zu {propertyName} hinzufügen`,
     },
+    PageProfile: {
+        title: "Profil von {name}",
+        nameLabel: "Name: {name}",
+        roleLabel: "Rolle: {role}",
+        passwordInputPlaceholder: "Neues Passwort eingeben",
+        passwordInputEnabledTitle: "Eingabe deaktivieren",
+        passwordInputDisabledTitle: "Eingabe aktivieren",
+        updatePasswordButtonLabel: "Passwort aktualisieren",
+    },
 };

@@ -87,4 +87,13 @@ export default {
         duplicateFloorPlanMessage: "Are you sure you want to duplicate {floorName} floor plan?",
         addNewFloorMessage: "Add New Floor to {propertyName}",
     },
+    PageProfile: {
+        title: "Profile of {name}",
+        nameLabel: "Name: {name}",
+        roleLabel: "Role: {role}",
+        passwordInputPlaceholder: "Enter new password",
+        passwordInputEnabledTitle: "Disable input",
+        passwordInputDisabledTitle: "Enable input",
+        updatePasswordButtonLabel: "Update Password",
+    },
 };

@@ -5,7 +5,9 @@ import FTTitle from "components/FTTitle.vue";
 import { User } from "@firetable/types";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { submitNewPassword } from "@firetable/backend";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const authStore = useAuthStore();
 const user = computed<User | null>(() => authStore.user);
 const isInputEnabled = ref(false);
@@ -41,7 +43,7 @@ async function changePassword() {
 
 <template>
     <div class="PageProfile" v-if="user">
-        <FTTitle :title="`Profile of ${user.name}`" />
+        <FTTitle :title="t('PageProfile.title', { name: user.name })" />
         <q-item>
             <q-item-section side>
                 <q-avatar size="48px" class="ft-avatar">
@@ -52,8 +54,12 @@ async function changePassword() {
                 <q-card class="ft-card q-pa-md">
                     <q-item-label>{{ user.email }}</q-item-label>
                     <q-separator class="q-my-sm" />
-                    <q-item-label v-if="user.name">Name: {{ user.name }}</q-item-label>
-                    <q-item-label>Role: {{ user.role }}</q-item-label>
+                    <q-item-label v-if="user.name">{{
+                        t("PageProfile.nameLabel", { name: user.name })
+                    }}</q-item-label>
+                    <q-item-label>{{
+                        t("PageProfile.roleLabel", { role: user.role })
+                    }}</q-item-label>
                 </q-card>
             </q-item-section>
         </q-item>
@@ -65,7 +71,7 @@ async function changePassword() {
                         ref="passwordInput"
                         v-model="newPassword"
                         :disable="isInputEnabled === false"
-                        placeholder="Enter new password"
+                        :placeholder="t('PageProfile.passwordInputPlaceholder')"
                         clearable
                     ></q-input>
                     <q-btn
@@ -74,7 +80,11 @@ async function changePassword() {
                         icon="pencil"
                         @click="toggleInput"
                         :color="isInputEnabled ? 'primary' : 'grey'"
-                        :title="isInputEnabled ? 'Disable input' : 'Enable input'"
+                        :title="
+                            isInputEnabled
+                                ? t('PageProfile.passwordInputEnabledTitle')
+                                : t('PageProfile.passwordInputDisabledTitle')
+                        "
                         style="
                             position: absolute;
                             right: 8px;
@@ -86,7 +96,7 @@ async function changePassword() {
 
                 <q-btn
                     @click="changePassword"
-                    label="Update Password"
+                    :label="t('PageProfile.updatePasswordButtonLabel')"
                     class="q-mt-sm button-gradient"
                     :disable="!newPassword"
                 />
