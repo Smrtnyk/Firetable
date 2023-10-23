@@ -145,7 +145,7 @@ function resetProperties() {
                 :suffix="emailSuffix"
             >
                 <template #prepend>
-                    <q-icon name="mail" />
+                    <q-icon name="at-symbol" />
                 </template>
             </q-input>
 
