@@ -5,7 +5,7 @@ import FTTitle from "components/FTTitle.vue";
 import FTDialog from "components/FTDialog.vue";
 
 import { showConfirm, tryCatchLoadingWrapper, withLoading } from "src/helpers/ui-helpers";
-import { nextTick, ref, watch } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import { Loading, useQuasar } from "quasar";
 import { useRouter } from "vue-router";
 import { CreateEventPayload, EventDoc, PropertyDoc } from "@firetable/types";
@@ -19,19 +19,26 @@ const EVENTS_PER_PAGE = 20;
 
 const quasar = useQuasar();
 const router = useRouter();
-const { properties, isLoading } = useProperties();
+const { properties, isLoading: isLoadingProperties } = useProperties();
 const { floors } = useFloors();
-const { eventsByProperty, fetchMoreEvents, hasMoreEventsToFetch } = useEvents();
+const {
+    eventsByProperty,
+    fetchMoreEvents,
+    hasMoreEventsToFetch,
+    isLoading: isLoadingEvents,
+} = useEvents();
 const activePropertyId = ref("");
 const initialLoadDone = ref<Record<string, boolean>>({});
 
+const isAnyLoading = computed(() => isLoadingProperties.value || isLoadingEvents.value);
+
 watch(
-    isLoading,
-    (newIsLoading) => {
-        if (!newIsLoading) {
-            Loading.hide();
-        } else {
+    isAnyLoading,
+    (loading) => {
+        if (loading) {
             Loading.show();
+        } else {
+            Loading.hide();
         }
     },
     { immediate: true },
@@ -135,7 +142,7 @@ function showCreateEventForm(property: PropertyDoc): void {
         <FTTitle title="Events" />
 
         <div
-            v-if="properties.length === 0 && !isLoading"
+            v-if="properties.length === 0 && !isAnyLoading"
             class="row justify-center items-center q-mt-md"
         >
             <h6 class="q-ma-sm text-weight-bolder underline">
