@@ -14,11 +14,11 @@ export default {
         },
     },
     PageEvent: {
-        showMapsExpanded: "Floors",
+        showFloorPlansExpanded: "Floor plans",
         reservationAlreadyReserved: "Someone else already reserved this table.",
     },
     FTAutocomplete: {
-        label: "Search tables...",
+        label: "Search tables by guest name...",
     },
     EventGuestList: {
         deleteGuestTitle: "Do you really want to remove this guest from the guest list?",

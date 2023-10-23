@@ -3,7 +3,7 @@ export default {
         links: {
             logout: "Abmelden",
             manageEvents: "Veranstaltungen verwalten",
-            manageFloors: "Etagen verwalten",
+            manageFloors: "Grundrisse verwalten",
             manageUsers: "Benutzer verwalten",
             manageProperties: "Immobilien verwalten",
             manageOrganisations: "Organisationen verwalten",
@@ -14,10 +14,10 @@ export default {
         },
     },
     PageEvent: {
-        showMapsExpanded: "Etage anzeigen",
+        showFloorPlansExpanded: "Grundrisse anzeigen",
     },
     FTAutocomplete: {
-        label: "Tische suchen...",
+        label: "Tische nach Gastnamen suchen...",
     },
     EventGuestList: {
         deleteGuestTitle: "Möchten Sie diesen Gast wirklich von der Gästeliste entfernen?",
