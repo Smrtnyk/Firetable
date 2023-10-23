@@ -15,10 +15,12 @@ import { useFloors } from "src/composables/useFloors";
 import { useProperties } from "src/composables/useProperties";
 import { useEvents } from "src/composables/useEvents";
 import { useDialog } from "src/composables/useDialog";
+import { useI18n } from "vue-i18n";
 
 const EVENTS_PER_PAGE = 20;
 
 const quasar = useQuasar();
+const { t } = useI18n();
 const router = useRouter();
 const { createDialog } = useDialog();
 const { properties, isLoading: isLoadingProperties } = useProperties();
@@ -79,7 +81,7 @@ function fetchEventsForActiveTab() {
 
 const onCreateEvent = withLoading(async function (eventData: CreateEventPayload) {
     const { data: id } = await createNewEvent(eventData);
-    quasar.notify("Event created!");
+    quasar.notify(t("PageAdminEvents.eventCreatedNotificationMessage"));
     await router.replace({
         name: "adminEvent",
         params: { id },
@@ -87,7 +89,7 @@ const onCreateEvent = withLoading(async function (eventData: CreateEventPayload)
 });
 
 async function onEventItemSlideRight({ event, reset }: { event: EventDoc; reset: () => void }) {
-    if (!(await showConfirm("Delete Event?"))) return reset();
+    if (!(await showConfirm(t("PageAdminEvents.deleteEventDialogTitle")))) return reset();
 
     await tryCatchLoadingWrapper({
         hook: async () => {
@@ -125,7 +127,7 @@ function showCreateEventForm(property: PropertyDoc): void {
     createDialog({
         component: FTDialog,
         componentProps: {
-            title: "Create new event",
+            title: t("PageAdminEvents.createNewEventDialogTitle"),
             maximized: false,
             component: EventCreateForm,
             componentPropsObject: {
@@ -148,7 +150,7 @@ function showCreateEventForm(property: PropertyDoc): void {
             class="row justify-center items-center q-mt-md"
         >
             <h6 class="q-ma-sm text-weight-bolder underline">
-                There are no properties created, cannot create events.
+                {{ t("PageAdminEvents.noPropertiesMessage") }}
             </h6>
         </div>
 

@@ -37,7 +37,17 @@ export default {
         guestNameReset: "Zurücksetzen",
     },
     EventCreateForm: {
-        noChosenFloorsMessage: "Sie müssen mindestens eine Etage auswählen",
+        noFloorPlansMessage:
+            "Sie können keine Veranstaltungen erstellen, da Sie keine Grundrisse erstellt haben!",
+        noChosenFloorsMessage: "Sie müssen mindestens einen Grundriss auswählen",
+        selectedFloorNotFoundMessage: "Ausgewählter Grundriss nicht gefunden.",
+        goToFloorPlannerMessage: "Zum Grundrissplaner gehen",
+        eventNameInputLabel: "Veranstaltungsname*",
+        guestListLimitInputLabel: "Limit für Gästeliste",
+        entryPriceInputLabel: "Eintrittspreis, bei kostenlosem Eintritt 0 eingeben",
+        inputDateTimePickerCloseBtnLabel: "Schließen",
+        submitButtonLabel: "Absenden",
+        resetButtonLabel: "Zurücksetzen",
     },
     EventShowReservation: {
         title: "Tisch",
@@ -85,6 +95,14 @@ export default {
         deleteFloorMessage: "Grundriss löschen?",
         duplicateFloorPlanMessage: `Sind Sie sicher, dass Sie den Grundriss "{floorName}" duplizieren möchten?`,
         addNewFloorMessage: `Neuen Grundriss zu {propertyName} hinzufügen`,
+    },
+    PageAdminEvents: {
+        title: "Veranstaltungen",
+        noPropertiesMessage:
+            "Es wurden keine Immobilien erstellt, Veranstaltungen können nicht erstellt werden.",
+        deleteEventDialogTitle: "Veranstaltung löschen?",
+        eventCreatedNotificationMessage: "Veranstaltung erstellt!",
+        createNewEventDialogTitle: "Neue Veranstaltung erstellen",
     },
     PageProfile: {
         title: "Profil von {name}",

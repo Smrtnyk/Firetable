@@ -68,7 +68,7 @@ function onSubmit() {
     );
 
     if (!selectedFloor) {
-        showErrorMessage("Selected floor not found.");
+        showErrorMessage(t("EventCreateForm.selectedFloorNotFoundMessage"));
         return;
     }
 
@@ -117,7 +117,7 @@ async function onFileChosen(chosenFile: File) {
 <template>
     <div class="column justify-center items-center q-pa-md" v-if="!totalFloors">
         <h6 class="q-ma-sm text-weight-bolder underline">
-            You cannot create events because you have no floors!
+            {{ t("EventCreateForm.noFloorPlansMessage") }}
         </h6>
         <q-btn
             rounded
@@ -126,7 +126,7 @@ async function onFileChosen(chosenFile: File) {
             v-close-popup
             size="lg"
         >
-            Go to floor manager
+            {{ t("EventCreateForm.goToFloorPlannerMessage") }}
         </q-btn>
     </div>
 
@@ -151,7 +151,7 @@ async function onFileChosen(chosenFile: File) {
                 v-model="state.form.name"
                 rounded
                 standout
-                label="Event name*"
+                :label="t('EventCreateForm.eventNameInputLabel')"
                 lazy-rules
                 :rules="[noEmptyString()]"
             />
@@ -161,7 +161,7 @@ async function onFileChosen(chosenFile: File) {
                 rounded
                 standout
                 type="number"
-                label="Max number of guests"
+                :label="t('EventCreateForm.guestListLimitInputLabel')"
                 lazy-rules
                 :rules="[requireNumber(), greaterThanZero()]"
             />
@@ -171,7 +171,7 @@ async function onFileChosen(chosenFile: File) {
                 rounded
                 standout
                 type="number"
-                label="Entry price, leave 0 if free"
+                :label="t('EventCreateForm.entryPriceInputLabel')"
                 lazy-rules
                 :rules="[requireNumber()]"
             />
@@ -187,7 +187,12 @@ async function onFileChosen(chosenFile: File) {
                             :options="validDates"
                         >
                             <div class="row items-center justify-end">
-                                <q-btn label="Close" color="primary" flat v-close-popup />
+                                <q-btn
+                                    :label="t('EventCreateForm.inputDateTimePickerCloseBtnLabel')"
+                                    color="primary"
+                                    flat
+                                    v-close-popup
+                                />
                             </div>
                         </q-date>
                     </q-popup-proxy>
@@ -197,7 +202,12 @@ async function onFileChosen(chosenFile: File) {
                     <q-popup-proxy transition-show="scale" transition-hide="scale">
                         <q-time v-model="state.form.date" mask="DD-MM-YYYY HH:mm" format24h>
                             <div class="row items-center justify-end">
-                                <q-btn label="Close" color="primary" flat v-close-popup />
+                                <q-btn
+                                    :label="t('EventCreateForm.inputDateTimePickerCloseBtnLabel')"
+                                    color="primary"
+                                    flat
+                                    v-close-popup
+                                />
                             </div>
                         </q-time>
                     </q-popup-proxy>
@@ -222,7 +232,7 @@ async function onFileChosen(chosenFile: File) {
                 <q-btn
                     rounded
                     size="md"
-                    label="Submit"
+                    :label="t('EventCreateForm.submitButtonLabel')"
                     type="submit"
                     class="button-gradient"
                     v-close-popup
@@ -230,7 +240,7 @@ async function onFileChosen(chosenFile: File) {
                 <q-btn
                     rounded
                     size="md"
-                    label="Reset"
+                    :label="t('EventCreateForm.resetButtonLabel')"
                     type="reset"
                     class="q-ml-sm"
                     outline

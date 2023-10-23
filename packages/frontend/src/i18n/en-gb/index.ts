@@ -38,7 +38,16 @@ export default {
         guestNameReset: "Reset",
     },
     EventCreateForm: {
-        noChosenFloorsMessage: "You need to choose at least one floor",
+        noFloorPlansMessage: "You cannot create events because you have no floor plans created!",
+        noChosenFloorsMessage: "You need to choose at least one floor plan",
+        selectedFloorNotFoundMessage: "Selected floor not found.",
+        goToFloorPlannerMessage: "Go to floor planner",
+        eventNameInputLabel: "Event name*",
+        guestListLimitInputLabel: "Guest list limit",
+        entryPriceInputLabel: "Entry price, leave 0 if free",
+        inputDateTimePickerCloseBtnLabel: "Close",
+        submitButtonLabel: "Submit",
+        resetButtonLabel: "Reset",
     },
     EventShowReservation: {
         title: "Table",
@@ -86,6 +95,13 @@ export default {
         deleteFloorMessage: "Delete floor?",
         duplicateFloorPlanMessage: "Are you sure you want to duplicate {floorName} floor plan?",
         addNewFloorMessage: "Add New Floor to {propertyName}",
+    },
+    PageAdminEvents: {
+        title: "Events",
+        noPropertiesMessage: "There are no properties created, cannot create events.",
+        deleteEventDialogTitle: "Delete Event?",
+        eventCreatedNotificationMessage: "Event created!",
+        createNewEventDialogTitle: "Create new event",
     },
     PageProfile: {
         title: "Profile of {name}",
