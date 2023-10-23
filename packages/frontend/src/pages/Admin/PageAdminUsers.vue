@@ -3,7 +3,7 @@ import UserCreateForm from "components/admin/User/UserCreateForm.vue";
 import UserEditForm from "components/admin/User/UserEditForm.vue";
 import FTTitle from "components/FTTitle.vue";
 import { showConfirm, showErrorMessage, withLoading } from "src/helpers/ui-helpers";
-import { computed, watch } from "vue";
+import { watch } from "vue";
 import { Loading, useQuasar } from "quasar";
 import FTDialog from "components/FTDialog.vue";
 import { ADMIN, CreateUserPayload, EditUserPayload, User } from "@firetable/types";
@@ -22,11 +22,6 @@ const authStore = useAuthStore();
 const propertiesStore = usePropertiesStore();
 const { users, isLoading, fetchUsers } = useAdminUsers();
 const quasar = useQuasar();
-const usersStatus = computed(() => {
-    return {
-        totalUsers: users.value.length,
-    };
-});
 
 const onCreateUser = withLoading(async (newUser: CreateUserPayload) => {
     await createUserWithEmail(newUser);
@@ -138,10 +133,6 @@ async function onUserSlideRight(id: string, reset: () => void) {
             <template #right>
                 <q-btn rounded icon="plus" class="button-gradient" @click="showCreateUserDialog" />
             </template>
-
-            <div>
-                <span>{{ usersStatus.totalUsers }}</span>
-            </div>
         </FTTitle>
 
         <q-list v-if="users.length && !isLoading">
