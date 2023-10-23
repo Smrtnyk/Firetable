@@ -171,7 +171,7 @@ function showCreateEventForm(property: PropertyDoc): void {
                             <q-btn
                                 rounded
                                 icon="plus"
-                                class="button-gradient"
+                                class="button-gradient q-mb-md"
                                 @click="showCreateEventForm(property)"
                             />
                         </div>
