@@ -136,13 +136,7 @@ async function onUserSlideRight(id: string, reset: () => void) {
     <div class="PageAdminUsers">
         <FTTitle title="Users">
             <template #right>
-                <q-btn
-                    v-if="users"
-                    rounded
-                    icon="plus"
-                    class="button-gradient"
-                    @click="showCreateUserDialog"
-                />
+                <q-btn rounded icon="plus" class="button-gradient" @click="showCreateUserDialog" />
             </template>
 
             <div>
@@ -150,7 +144,7 @@ async function onUserSlideRight(id: string, reset: () => void) {
             </div>
         </FTTitle>
 
-        <q-list v-if="users.length">
+        <q-list v-if="users.length && !isLoading">
             <q-slide-item
                 v-for="user in users"
                 :key="user.id"
