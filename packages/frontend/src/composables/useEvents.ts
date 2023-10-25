@@ -33,7 +33,7 @@ export function useEvents() {
     const eventsByProperty = reactive<Record<string, Set<EventDoc>>>({});
     const lastFetchedDocForProperty = reactive<Record<string, QueryDocumentSnapshot | null>>({});
     const hasMoreEventsToFetch = ref(true);
-    const isLoading = ref(true); // Initialize isLoading to true
+    const isLoading = ref(false);
     const hasInitialFetchCompleted = ref(false); // A ref to keep track of whether the initial fetch has completed
 
     async function fetchMoreEvents(propertyId: string, lastDoc: QueryDocumentSnapshot | null) {
@@ -42,28 +42,35 @@ export function useEvents() {
             console.warn("Trying to fetch with same lastDoc for property:", propertyId);
             return [];
         }
-
-        const eventsDocs = await getEvents(lastDoc, EVENTS_PER_PAGE, propertyId);
-        lastFetchedDocForProperty[propertyId] = eventsDocs.length
-            ? eventsDocs[eventsDocs.length - 1]._doc
-            : null;
-
-        eventsByProperty[propertyId] = new Set([
-            ...(eventsByProperty[propertyId] || []),
-            ...eventsDocs,
-        ]);
-
-        if (!eventsDocs || eventsDocs.length < EVENTS_PER_PAGE) {
-            hasMoreEventsToFetch.value = false;
-        }
-
-        // If this is the initial fetch, set isLoading to false and mark the initial fetch as completed
         if (!hasInitialFetchCompleted.value) {
-            isLoading.value = false;
-            hasInitialFetchCompleted.value = true;
+            isLoading.value = true;
         }
 
-        return eventsDocs;
+        try {
+            const eventsDocs = await getEvents(lastDoc, EVENTS_PER_PAGE, propertyId);
+            lastFetchedDocForProperty[propertyId] = eventsDocs.length
+                ? eventsDocs[eventsDocs.length - 1]._doc
+                : null;
+
+            eventsByProperty[propertyId] = new Set([
+                ...(eventsByProperty[propertyId] || []),
+                ...eventsDocs,
+            ]);
+
+            if (!eventsDocs || eventsDocs.length < EVENTS_PER_PAGE) {
+                hasMoreEventsToFetch.value = false;
+            }
+
+            // If this is the initial fetch, set isLoading to false and mark the initial fetch as completed
+            if (!hasInitialFetchCompleted.value) {
+                isLoading.value = false;
+                hasInitialFetchCompleted.value = true;
+            }
+
+            return eventsDocs;
+        } finally {
+            isLoading.value = false;
+        }
     }
 
     return {
