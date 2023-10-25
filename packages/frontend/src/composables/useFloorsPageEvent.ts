@@ -63,13 +63,10 @@ export default function useFloorsPageEvent(
 
     function onTableFound(tables: BaseTable[]) {
         onAutocompleteClear();
-        function animate() {
-            for (const table of tables) {
-                table.startSmoothBlinking();
-            }
-            state.value.floorInstances.forEach((floor) => floor.canvas.renderAll());
+        for (const table of tables) {
+            table.startSmoothBlinking();
         }
-        state.value.activeTablesAnimationInterval = window.setInterval(animate, 100);
+        state.value.floorInstances.forEach((floor) => floor.canvas.renderAll());
     }
 
     function updateFloorInstancesData() {

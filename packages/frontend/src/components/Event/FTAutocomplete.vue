@@ -43,7 +43,7 @@ function onTablesSearch(val: string | number | null) {
 
     const found = props.allReservedTables.filter((table) => {
         if (!table.reservation) return false;
-        const normalizedGuestName = table.reservation.guestName;
+        const normalizedGuestName = table.reservation.guestName.toLowerCase();
         const normalizedVal = val.toLowerCase();
         return normalizedGuestName.startsWith(normalizedVal);
     });
