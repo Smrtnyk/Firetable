@@ -2,13 +2,14 @@
 import { reactive, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
-import { minLength, noEmptyString, requireNumber } from "src/helpers/form-rules";
+import { greaterThanZero, minLength, noEmptyString, requireNumber } from "src/helpers/form-rules";
 
 interface State {
     guestName: string;
     numberOfGuests: number;
     guestContact: string;
     reservationNote: string;
+    consumption: number;
     groupedWith: string[];
 }
 
@@ -25,6 +26,7 @@ const state = reactive<State>({
     numberOfGuests: 2,
     guestContact: "",
     reservationNote: "",
+    consumption: 1,
     groupedWith: [],
 });
 const reservationForm = ref<QForm | null>(null);
@@ -68,7 +70,18 @@ async function onOKClick() {
                 type="number"
                 :label="t(`EventCreateReservation.reservationNumberOfGuests`)"
                 lazy-rules="ondemand"
-                :rules="[requireNumber()]"
+                :rules="[requireNumber(), greaterThanZero()]"
+            />
+
+            <q-input
+                v-model="state.consumption"
+                hide-bottom-space
+                rounded
+                standout
+                type="number"
+                :label="t(`EventCreateReservation.reservationConsumption`)"
+                lazy-rules="ondemand"
+                :rules="[requireNumber(), greaterThanZero()]"
             />
 
             <q-input

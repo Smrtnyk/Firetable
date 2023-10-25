@@ -34,6 +34,10 @@ function onReservationConfirm() {
                 <div class="col-6">{{ t("EventShowReservation.contactLabel") }}</div>
                 <div class="col-6 font-black">{{ props.reservation.guestContact }}</div>
             </template>
+            <template v-if="props.reservation.consumption">
+                <div class="col-6">{{ t("EventShowReservation.reservationConsumption") }}</div>
+                <div class="col-6 font-black">{{ props.reservation.consumption }}</div>
+            </template>
 
             <template v-if="props.reservation.reservationNote">
                 <div class="col-6">{{ t("EventShowReservation.noteLabel") }}</div>

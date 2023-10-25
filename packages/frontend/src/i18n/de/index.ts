@@ -59,6 +59,7 @@ export default {
         groupedWithLabel: "Gruppiert mit",
         guestArrivedLabel: "Ist der Gast angekommen?",
         deleteReservationLabel: "Reservierung löschen",
+        reservationConsumption: "Consumption",
     },
     EventCreateReservation: {
         title: "Tisch",
@@ -69,6 +70,7 @@ export default {
         reservationGuestContact: "Kontakt des Gastes",
         reservationNote: "Notiz",
         reservationCreateBtn: "Absenden",
+        reservationConsumption: "Consumption",
     },
     PageAdminProperties: {
         properties: "Immobilien",
