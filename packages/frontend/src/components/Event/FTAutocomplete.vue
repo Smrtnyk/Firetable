@@ -41,11 +41,14 @@ function onTablesSearch(val: string | number | null) {
         return;
     }
 
+    const tokens = val.toLowerCase().split(/\s+/);
+
     const found = props.allReservedTables.filter((table) => {
         if (!table.reservation) return false;
         const normalizedGuestName = table.reservation.guestName.toLowerCase();
-        const normalizedVal = val.toLowerCase();
-        return normalizedGuestName.startsWith(normalizedVal);
+        const guestNameTokens = normalizedGuestName.split(/\s+/);
+
+        return tokens.every((token) => guestNameTokens.includes(token));
     });
 
     emit("found", found);
