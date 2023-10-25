@@ -6,7 +6,6 @@ import { greaterThanZero, noEmptyString, requireNumber } from "src/helpers/form-
 import { useRouter } from "vue-router";
 
 import { date } from "quasar";
-import { resizeImage } from "src/helpers/image-tools";
 import { CreateEventForm, CreateEventPayload } from "@firetable/types";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { PropertyFloors } from "src/composables/useFloors";
@@ -14,7 +13,6 @@ import { PropertyFloors } from "src/composables/useFloors";
 interface State {
     form: CreateEventForm;
     chosenFloor: string | null;
-    capturedImage: string[];
     showDateModal: boolean;
     showTimeModal: boolean;
 }
@@ -44,7 +42,6 @@ const router = useRouter();
 const state = reactive<State>({
     form: { ...eventObj },
     chosenFloor: null,
-    capturedImage: [],
     showDateModal: false,
     showTimeModal: false,
 });
@@ -91,27 +88,6 @@ function validDates(calendarDate: string) {
         new Date().toISOString().substring(0, 10)
     );
 }
-
-async function onFileChosen(chosenFile: File) {
-    if (!chosenFile) return;
-
-    try {
-        const file = await resizeImage(chosenFile, {
-            width: 600,
-            height: 600,
-        });
-
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onloadend = () => {
-            const base64data = reader.result;
-            if (!base64data) return;
-            state.form.img = base64data.toString();
-        };
-    } catch (e) {
-        showErrorMessage(e);
-    }
-}
 </script>
 
 <template>
@@ -134,19 +110,6 @@ async function onFileChosen(chosenFile: File) {
         <q-img v-if="state.form.img" :src="state.form.img" :ratio="1" class="q-mb-md" />
 
         <q-form class="q-gutter-xs q-pt-md q-pa-md" @submit="onSubmit" @reset="onReset">
-            <q-file
-                standout
-                rounded
-                v-model="state.capturedImage"
-                accept="image/*"
-                @update:model-value="onFileChosen"
-                class="q-mb-lg"
-            >
-                <template #prepend>
-                    <q-icon name="camera" />
-                </template>
-            </q-file>
-
             <q-input
                 v-model="state.form.name"
                 rounded
