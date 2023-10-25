@@ -4,6 +4,7 @@ export enum Role {
     PROPERTY_OWNER = "Property Owner",
     MANAGER = "Manager",
     STAFF = "Staff",
+    HOSTESS = "Hostess",
 }
 
 export const enum ACTIVITY_STATUS {

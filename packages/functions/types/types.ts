@@ -14,6 +14,7 @@ export enum Role {
     PROPERTY_OWNER = "Property Owner",
     MANAGER = "Manager",
     STAFF = "Staff",
+    HOSTESS = "Hostess",
 }
 
 // Copy, cannot be imported from types package
