@@ -12,7 +12,7 @@ import { PropertyFloors } from "src/composables/useFloors";
 
 interface State {
     form: CreateEventForm;
-    chosenFloor: string | null;
+    chosenFloors: string[];
     showDateModal: boolean;
     showTimeModal: boolean;
 }
@@ -41,7 +41,7 @@ const { t } = useI18n();
 const router = useRouter();
 const state = reactive<State>({
     form: { ...eventObj },
-    chosenFloor: null,
+    chosenFloors: [],
     showDateModal: false,
     showTimeModal: false,
 });
@@ -55,25 +55,25 @@ onMounted(() => {
 });
 
 function onSubmit() {
-    if (!state.chosenFloor) {
+    if (!state.chosenFloors.length) {
         showErrorMessage(t("EventCreateForm.noChosenFloorsMessage"));
         return;
     }
 
-    const selectedFloor = Object.values(props.property.floors).find(
-        (floor) => floor.id === state.chosenFloor,
+    const selectedFloors = Object.values(props.property.floors).filter((floor) =>
+        state.chosenFloors.includes(floor.id),
     );
 
-    if (!selectedFloor) {
+    if (!selectedFloors.length) {
         showErrorMessage(t("EventCreateForm.selectedFloorNotFoundMessage"));
         return;
     }
 
     emit("create", {
         ...state.form,
-        propertyId: selectedFloor.propertyId,
+        propertyId: selectedFloors[0].propertyId,
         img: state.form.img,
-        floors: [selectedFloor],
+        floors: selectedFloors,
     });
     state.form = eventObj;
 }
@@ -180,10 +180,10 @@ function validDates(calendarDate: string) {
             <div class="q-gutter-sm q-mb-lg">
                 <div class="text-h6">{{ props.property.propertyName }}</div>
                 <div>
-                    <q-radio
+                    <q-checkbox
                         v-for="floor in props.property.floors"
                         :key="floor.id"
-                        v-model="state.chosenFloor"
+                        v-model="state.chosenFloors"
                         :val="floor.id"
                         :label="floor.name"
                         color="accent"
