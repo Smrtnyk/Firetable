@@ -46,6 +46,7 @@ export const myIcons: Record<string, string> = {
     copy: "svguse:/svg-icons/ft-icons.svg#copy",
     grid: "svguse:/svg-icons/ft-icons.svg#grid",
     stack: "svguse:/svg-icons/ft-icons.svg#stack",
+    "color-picker": "svguse:/svg-icons/ft-icons.svg#color-picker",
 };
 
 export function getDarkMode(): boolean {
