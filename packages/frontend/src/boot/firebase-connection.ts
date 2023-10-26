@@ -42,9 +42,20 @@ function routerBeforeEach(router: Router, store: ReturnType<typeof useAuthStore>
             const token = await (await getCurrentUser())?.getIdTokenResult();
             const role = token?.claims.role as string;
 
-            if (allowedRoles && allowedRoles.includes(role)) return true;
-            if (allowedRoles && !allowedRoles.includes(role)) return { name: "properties" };
-            if (to.path === "/auth") return { name: "properties" };
+            if (allowedRoles && allowedRoles.includes(role)) {
+                return true;
+            }
+
+            if (allowedRoles && !allowedRoles.includes(role)) {
+                return {
+                    name: "properties",
+                };
+            }
+
+            if (to.path === "/auth") {
+                return { name: "properties" };
+            }
+
             return true;
         } catch (err) {
             showErrorMessage(err);
