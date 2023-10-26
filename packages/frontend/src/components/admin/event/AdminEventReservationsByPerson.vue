@@ -17,7 +17,7 @@ import {
     Tooltip,
     SubTitle,
 } from "chart.js";
-import { computed, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { BaseTable } from "@firetable/floor-creator";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { propIsTruthy } from "@firetable/utils";
@@ -66,8 +66,9 @@ const borderColors = [
 
 const chartRef = ref<HTMLCanvasElement | null>(null);
 const props = defineProps<Props>();
-
+let chartInstance: Chart | null = null;
 const reservedTables = computed(() => props.reservations.filter(propIsTruthy("reservation")));
+
 function reservationsReducer(acc: Res, { reservation }: BaseTable) {
     if (!reservation) return acc;
     const { reservedBy, confirmed } = reservation;
@@ -102,7 +103,7 @@ function generateTablesByWaiterChartOptions(
     });
 
     try {
-        new Chart(chartContainer, {
+        chartInstance = new Chart(chartContainer, {
             type: "bar",
             data: {
                 labels: ["Total reservations", "Confirmed"],
@@ -133,5 +134,21 @@ function generateTablesByWaiterChartOptions(
 onMounted(() => {
     if (!chartRef.value) return;
     generateTablesByWaiterChartOptions(chartRef.value, props.reservations);
+});
+
+watch(
+    () => props.reservations,
+    (newReservations) => {
+        if (chartRef.value) {
+            generateTablesByWaiterChartOptions(chartRef.value, newReservations);
+        }
+    },
+    { immediate: true },
+);
+
+onBeforeUnmount(() => {
+    if (chartInstance) {
+        chartInstance.destroy();
+    }
 });
 </script>
