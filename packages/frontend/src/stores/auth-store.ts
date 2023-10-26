@@ -24,11 +24,11 @@ export const useAuthStore = defineStore("auth", {
     },
     getters: {
         isAdmin(): boolean {
-            return isDefined(this.user) && this.user.role === ADMIN;
+            return this.user?.role === ADMIN;
         },
 
         isLoggedIn(): boolean {
-            return isDefined(this.user) && !!this.user.email;
+            return !!this.user?.email;
         },
     },
     actions: {
@@ -60,7 +60,7 @@ export const useAuthStore = defineStore("auth", {
             } = useFirestoreDocument<User>(`${Collection.USERS}/${uid}`);
             await promise.value;
 
-            // Add watcher for user in case user doc changes
+            // Watcher for user data
             watch(
                 () => user.value,
                 (newUser) => {
@@ -70,22 +70,29 @@ export const useAuthStore = defineStore("auth", {
                 },
                 { deep: true },
             );
+
             if (error.value) {
-                stop();
-                showErrorMessage(error.value);
-                logoutUser().catch(NOOP);
+                this.handleError(stop, error.value);
                 return;
             }
+
             if (!user.value) {
-                stop();
-                showErrorMessage("User is not found in database!");
-                logoutUser().catch(NOOP);
+                this.handleError(stop, {
+                    message: "User is not found in database!",
+                });
                 return;
             }
+
             this.user = user.value;
             this.isAuthenticated = true;
             this.isReady = true;
             this.unsubscribeUserWatch = stop;
+        },
+
+        handleError(stop: () => void, errorObj: { message: string }) {
+            stop();
+            showErrorMessage(errorObj.message);
+            logoutUser().catch(NOOP);
         },
     },
 });
