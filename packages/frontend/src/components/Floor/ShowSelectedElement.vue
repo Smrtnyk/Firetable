@@ -1,11 +1,11 @@
 <template>
-    <div class="row q-pa-sm q-col-gutter-md" v-if="selectedElement">
+    <div class="row q-pa-sm q-col-gutter-md" v-if="selectedFloorElement">
         <div class="col-8 flex justify-between">
             <div class="row">
                 <div class="col-4 q-pa-xs q-pl-none">
                     <q-input
                         :dense="isMobile"
-                        :model-value="getElementWidth()"
+                        :model-value="getElementWidth"
                         filled
                         label="Width"
                         readonly
@@ -14,7 +14,7 @@
                 <div class="col-4 q-pa-xs">
                     <q-input
                         :dense="isMobile"
-                        :model-value="getElementHeight()"
+                        :model-value="getElementHeight"
                         filled
                         label="Height"
                         readonly
@@ -23,11 +23,14 @@
                 <div class="col-4 q-pa-xs">
                     <q-input
                         :debounce="500"
-                        v-if="isTable(selectedElement)"
-                        :model-value="selectedElement.label"
+                        v-if="isTable(selectedFloorElement)"
+                        :model-value="selectedFloorElement.label"
                         @update:model-value="
                             (newLabel) =>
-                                updateTableLabel(selectedElement as BaseTable, newLabel as string)
+                                updateTableLabel(
+                                    selectedFloorElement as BaseTable,
+                                    newLabel as string,
+                                )
                         "
                         type="text"
                         filled
@@ -59,7 +62,7 @@
 
             <!-- Delete Button -->
             <q-btn
-                v-if="selectedElement && props.deleteAllowed"
+                v-if="selectedFloorElement && deleteAllowed"
                 icon="trash"
                 color="negative"
                 @click="deleteElement"
@@ -83,7 +86,7 @@
 
 <script setup lang="ts">
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, toRefs } from "vue";
 import { BaseTable, FloorEditorElement, isTable } from "@firetable/floor-creator";
 import { QPopupProxy, useQuasar } from "quasar";
 
@@ -101,29 +104,26 @@ const colorPickerProxy = ref<QPopupProxy | null>(null);
 const props = withDefaults(defineProps<Props>(), {
     deleteAllowed: true,
 });
+const { selectedFloorElement, deleteAllowed, existingLabels } = toRefs(props);
 const emit = defineEmits(["delete"]);
-const selectedElement = computed(() => {
-    return props.selectedFloorElement;
-});
+
 const elementColor = ref<string>("");
 
-watch(
-    () => props.selectedFloorElement,
-    () => {
-        if (props.selectedFloorElement) {
-            elementColor.value = props.selectedFloorElement.getBaseFill?.() || "";
-        }
-    },
-);
+watch(selectedFloorElement, (newEl) => {
+    if (newEl?.getBaseFill) {
+        elementColor.value = newEl.getBaseFill();
+    }
+});
 
 function openColorPicker() {
     colorPickerProxy.value?.show();
 }
 
 function updateTableLabel(tableEl: BaseTable, newLabel: string): void {
-    if (!newLabel) return;
-
-    if (props.existingLabels.has(newLabel)) {
+    if (!newLabel) {
+        return;
+    }
+    if (existingLabels.value.has(newLabel)) {
         showErrorMessage("Table Id already taken");
         return;
     }
@@ -131,24 +131,24 @@ function updateTableLabel(tableEl: BaseTable, newLabel: string): void {
 }
 
 async function deleteElement() {
-    if (!props.selectedFloorElement) return;
+    if (!selectedFloorElement.value) return;
     if (await showConfirm("Do you really want to delete this element?")) {
-        emit("delete", props.selectedFloorElement);
+        emit("delete", selectedFloorElement.value);
     }
 }
 
-function getElementWidth(): number {
-    const el = selectedElement.value!;
-    return Math.round(el.width! * el.scaleX!);
-}
+const getElementWidth = computed(() => {
+    const el = selectedFloorElement.value;
+    return el ? Math.round(el.width! * el.scaleX!) : 0;
+});
 
-function getElementHeight(): number {
-    const el = selectedElement.value!;
-    return Math.round(el.height! * el.scaleY!);
-}
+const getElementHeight = computed(() => {
+    const el = selectedFloorElement.value;
+    return el ? Math.round(el.height! * el.scaleY!) : 0;
+});
 
 function setElementColor(newVal: any) {
     elementColor.value = newVal;
-    props.selectedFloorElement?.setBaseFill?.(newVal);
+    selectedFloorElement.value?.setBaseFill?.(newVal);
 }
 </script>
