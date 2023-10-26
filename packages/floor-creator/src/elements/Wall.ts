@@ -7,6 +7,7 @@ type WalLGroupCreationOptions = { left: number; top: number } & IGroupOptions;
 
 export class Wall extends fabric.Group {
     type = FloorElementTypes.WALL;
+    wallRect: fabric.Rect;
 
     constructor(groupOpts: WalLGroupCreationOptions, wallRectOpts: WallCreationOptions = {}) {
         const wallRect = new fabric.Rect({
@@ -17,6 +18,16 @@ export class Wall extends fabric.Group {
         });
 
         super([wallRect], groupOpts);
+        this.wallRect = wallRect;
+    }
+
+    getBaseFill(): string {
+        return this.wallRect.get("fill") as string;
+    }
+
+    setBaseFill(val: string): void {
+        this.wallRect.set("fill", val);
+        this.canvas?.renderAll();
     }
 
     toObject() {

@@ -21,9 +21,13 @@ export class RoundTable extends fabric.Group {
     reservation: Reservation | null = null;
     label: string;
     private isAnimating: boolean = false;
+    circle: fabric.Circle;
 
     constructor(options: CircleTableElementOptions) {
-        const fill = determineTableColor(options.groupOptions.reservation);
+        const fill = determineTableColor(
+            options.groupOptions.reservation,
+            (options.circleOptions.fill as string) || "#444",
+        );
         const tableCircle = new fabric.Circle({
             ...options.circleOptions,
             originX: "center",
@@ -43,9 +47,18 @@ export class RoundTable extends fabric.Group {
             originY: "center",
         });
         super([tableCircle, textLabel], options.groupOptions);
-
+        this.circle = tableCircle;
         this.label = options.groupOptions.label;
         if (options.groupOptions.reservation) this.reservation = options.groupOptions.reservation;
+    }
+
+    getBaseFill(): string {
+        return this.circle.get("fill") as string;
+    }
+
+    setBaseFill(val: string): void {
+        this.circle.set("fill", val);
+        this.canvas?.renderAll();
     }
 
     startSmoothBlinking() {

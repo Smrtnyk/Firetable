@@ -42,11 +42,11 @@ export class ElementManager {
     }
 
     private addSofaElement({ x, y }: CreateElementOptions) {
-        return new Sofa(x, y);
+        return new Sofa({ left: x, top: y });
     }
 
     private addSingleSofaElement({ x, y }: CreateElementOptions) {
-        return new SingleSofa(x, y);
+        return new SingleSofa({ left: x, top: y });
     }
 
     private addStageElement({ x, y }: CreateElementOptions) {

@@ -1,18 +1,30 @@
 import { fabric } from "fabric";
 import { RESOLUTION } from "../constants";
 import { FloorElementTypes } from "../types";
+import { IGroupOptions } from "fabric/fabric-impl";
+
+type SofaGroupCreationOpts = {
+    top: number;
+    left: number;
+    objects?: fabric.Object[];
+} & IGroupOptions;
 
 export class Sofa extends fabric.Group {
     type = FloorElementTypes.SOFA;
-    constructor(left: number, top: number) {
+    sofaBase: fabric.Rect;
+
+    constructor(sofaGroupOpts: SofaGroupCreationOpts) {
+        const sofaBaseOpts = sofaGroupOpts.objects?.[0] ?? {};
         const base = new fabric.Rect({
-            left: 0,
-            top: 0,
             width: RESOLUTION * 4,
             height: RESOLUTION / 2,
             fill: "#444",
             stroke: "#222",
             strokeWidth: 0.5,
+            ...sofaBaseOpts,
+            // Needs to stay like this all the time, otherwise element gets distorted
+            left: 0,
+            top: 0,
         });
 
         const backrest = new fabric.Rect({
@@ -25,12 +37,22 @@ export class Sofa extends fabric.Group {
             strokeWidth: 0.5,
         });
 
-        super([base, backrest], { left, top });
+        super([base, backrest], sofaGroupOpts);
+        this.sofaBase = base;
     }
 
     static fromObject(object: any, callback: (obj: Sofa) => void): void {
-        const instance = new Sofa(object.left, object.top);
+        const instance = new Sofa(object);
         callback(instance);
+    }
+
+    getBaseFill(): string {
+        return this.sofaBase.get("fill") as string;
+    }
+
+    setBaseFill(val: string): void {
+        this.sofaBase.set("fill", val);
+        this.canvas?.renderAll();
     }
 }
 

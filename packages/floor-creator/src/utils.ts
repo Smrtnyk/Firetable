@@ -5,11 +5,14 @@ import { isDefined } from "@firetable/utils";
 import { BaseTable } from "./types.js";
 import { isTable } from "./type-guards.js";
 
-export function determineTableColor(reservation?: Reservation | null): string {
+export function determineTableColor(
+    reservation: Reservation | undefined,
+    fallback: string,
+): string {
     return match(reservation)
         .with({ confirmed: false }, () => "#2ab7ca")
         .with({ confirmed: true }, () => "#1a7722")
-        .otherwise(() => "#444");
+        .otherwise(() => fallback);
 }
 
 export function containsTables(ev: fabric.IEvent): boolean {

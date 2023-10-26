@@ -54,6 +54,14 @@ export class Stage extends fabric.Group {
         // Ensure this is always in the background
         this.moveTo(-1);
     }
+
+    getBaseFill(): string {
+        return "";
+    }
+
+    setBaseFill(val: string): void {
+        // imp
+    }
 }
 
 // @ts-ignore Register the PerformanceStage class with Fabric

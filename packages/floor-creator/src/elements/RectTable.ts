@@ -25,9 +25,13 @@ export class RectTable extends fabric.Group {
     private readonly initialFontSize: number;
     private readonly initialWidth: number;
     private readonly initialHeight: number;
+    rect: fabric.Rect;
 
     constructor(options: RectTableElementOptions) {
-        const fill = determineTableColor(options.groupOptions.reservation);
+        const fill = determineTableColor(
+            options.groupOptions.reservation,
+            (options.rectOptions.fill as string) || "#444",
+        );
         const tableRect = new fabric.Rect({
             ...options.rectOptions,
             fill,
@@ -47,6 +51,7 @@ export class RectTable extends fabric.Group {
 
         super([tableRect, textLabel], options.groupOptions);
 
+        this.rect = tableRect;
         this.initialWidth = tableRect.width!;
         this.initialHeight = tableRect.height!;
         this.label = options.groupOptions.label;
@@ -56,6 +61,10 @@ export class RectTable extends fabric.Group {
         this.initialFontSize = textLabel.fontSize || FONT_SIZE;
 
         this.on("scaling", this.handleScaling.bind(this));
+    }
+
+    setAttr(value: any) {
+        this.rect.set(value);
     }
 
     private handleScaling(): void {
@@ -143,6 +152,15 @@ export class RectTable extends fabric.Group {
         // @ts-ignore
         this.set({ opacity: 1 }); // Ensure it's fully visible when animation stops
         this.canvas?.renderAll(); // Re-render canvas to apply opacity change
+    }
+
+    getBaseFill(): string {
+        return this.rect.get("fill") as string;
+    }
+
+    setBaseFill(val: string): void {
+        this.rect.set("fill", val);
+        this.canvas?.renderAll();
     }
 
     toObject() {

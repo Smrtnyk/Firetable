@@ -51,6 +51,14 @@ export class DJBooth extends fabric.Group {
 
         super([body, turntable1, turntable2, djSign, ...leds], { left, top });
     }
+
+    getBaseFill(): string {
+        return "";
+    }
+
+    setBaseFill(val: string): void {
+        // imp
+    }
 }
 
 // @ts-ignore Register the DJBooth class with Fabric
