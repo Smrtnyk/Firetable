@@ -4,6 +4,8 @@ import { determineTableColor } from "../utils.js";
 import { Reservation } from "@firetable/types";
 import { FONT_SIZE, TABLE_TEXT_FILL_COLOR, RESOLUTION } from "../constants";
 import { IGroupOptions } from "fabric/fabric-impl";
+import { AnimationStrategy } from "./animation/AnimationStrategy";
+import { SmoothBlinkAnimation } from "./animation/SmoothBlinkAnimation.js";
 
 interface RectTableElementOptions {
     groupOptions: {
@@ -20,13 +22,13 @@ export class RectTable extends fabric.Group {
     type = FloorElementTypes.RECT_TABLE;
     reservation: Reservation | null = null;
     label: string;
-    private isAnimating: boolean = false;
     private readonly initialStrokeWidth: number;
     private readonly initialFontSize: number;
     private readonly initialWidth: number;
     private readonly initialHeight: number;
     private rect: fabric.Rect;
     private textLabel: fabric.Text;
+    private animationStrategy: AnimationStrategy;
 
     constructor(options: RectTableElementOptions) {
         const fill = determineTableColor(
@@ -52,7 +54,7 @@ export class RectTable extends fabric.Group {
         });
 
         super([tableRect, textLabel], options.groupOptions);
-
+        this.animationStrategy = new SmoothBlinkAnimation(this);
         this.rect = tableRect;
         this.textLabel = textLabel;
         this.initialWidth = tableRect.width!;
@@ -123,36 +125,12 @@ export class RectTable extends fabric.Group {
         });
     }
 
-    startSmoothBlinking() {
-        if (this.isAnimating) return; // Already animating
-
-        this.isAnimating = true;
-        this.smoothBlink();
+    startAnimation() {
+        this.animationStrategy.animate();
     }
 
-    private smoothBlink() {
-        if (!this.isAnimating) return;
-
-        this.animate("opacity", 0, {
-            duration: 500, // Adjust as necessary
-            onChange: this.canvas?.renderAll.bind(this.canvas), // Bind necessary if inside class
-            onComplete: () => {
-                this.animate("opacity", 1, {
-                    duration: 500, // Adjust as necessary
-                    onChange: this.canvas?.renderAll.bind(this.canvas), // Bind necessary if inside class
-                    onComplete: () => {
-                        this.smoothBlink(); // Loop the animation
-                    },
-                });
-            },
-        });
-    }
-
-    stopSmoothBlinking() {
-        this.isAnimating = false;
-        // @ts-ignore
-        this.set({ opacity: 1 }); // Ensure it's fully visible when animation stops
-        this.canvas?.renderAll(); // Re-render canvas to apply opacity change
+    stopAnimation() {
+        this.animationStrategy.stop();
     }
 
     getBaseFill(): string {

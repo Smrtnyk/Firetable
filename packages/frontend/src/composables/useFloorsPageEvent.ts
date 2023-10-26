@@ -64,7 +64,7 @@ export default function useFloorsPageEvent(
     function onTableFound(tables: BaseTable[]) {
         onAutocompleteClear();
         for (const table of tables) {
-            table.startSmoothBlinking();
+            table.startAnimation();
         }
         state.value.floorInstances.forEach((floor) => floor.canvas.renderAll());
     }
@@ -281,7 +281,7 @@ export default function useFloorsPageEvent(
         }
         state.value.floorInstances.forEach((floor) => {
             const tables = getTables(floor);
-            tables.forEach((table) => table.stopSmoothBlinking());
+            tables.forEach((table) => table.stopAnimation());
             floor.canvas.renderAll();
         });
     }
