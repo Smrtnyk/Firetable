@@ -10,6 +10,7 @@ import { SmoothBlinkAnimation } from "./animation/SmoothBlinkAnimation.js";
 interface RectTableElementOptions {
     groupOptions: {
         reservation?: Reservation;
+        baseFill?: string;
         label: string;
     } & IGroupOptions;
     textOptions: {
@@ -22,6 +23,7 @@ export class RectTable extends fabric.Group {
     type = FloorElementTypes.RECT_TABLE;
     reservation: Reservation | null = null;
     label: string;
+    baseFill: string;
     private readonly initialStrokeWidth: number;
     private readonly initialFontSize: number;
     private readonly initialWidth: number;
@@ -31,10 +33,8 @@ export class RectTable extends fabric.Group {
     private animationStrategy: AnimationStrategy;
 
     constructor(options: RectTableElementOptions) {
-        const fill = determineTableColor(
-            options.groupOptions.reservation,
-            (options.rectOptions.fill as string) || "#444",
-        );
+        const baseFillComputed = (options.groupOptions.baseFill as string) || "#444";
+        const fill = determineTableColor(options.groupOptions.reservation, baseFillComputed);
         const tableRect = new fabric.Rect({
             ...options.rectOptions,
             fill,
@@ -60,6 +60,7 @@ export class RectTable extends fabric.Group {
         this.initialWidth = tableRect.width!;
         this.initialHeight = tableRect.height!;
         this.label = options.groupOptions.label;
+        this.baseFill = baseFillComputed;
         if (options.groupOptions.reservation) {
             this.reservation = options.groupOptions.reservation;
         }
@@ -138,6 +139,7 @@ export class RectTable extends fabric.Group {
     }
 
     setBaseFill(val: string): void {
+        this.baseFill = val;
         this.rect.set("fill", val);
         this.canvas?.renderAll();
     }
@@ -151,6 +153,7 @@ export class RectTable extends fabric.Group {
     toObject() {
         return {
             ...super.toObject(),
+            baseFill: this.baseFill,
             label: this.label,
             reservation: this.reservation,
             objectCaching: false,

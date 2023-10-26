@@ -10,6 +10,7 @@ import { SmoothBlinkAnimation } from "./animation/SmoothBlinkAnimation";
 interface CircleTableElementOptions {
     groupOptions: {
         reservation?: Reservation;
+        baseFill?: string;
         label: string;
     } & IGroupOptions;
     textOptions: {
@@ -22,15 +23,14 @@ export class RoundTable extends fabric.Group {
     type = FloorElementTypes.ROUND_TABLE;
     reservation: Reservation | null = null;
     label: string;
+    baseFill: string;
     private circle: fabric.Circle;
     private textLabel: fabric.Text;
     private animationStrategy: AnimationStrategy;
 
     constructor(options: CircleTableElementOptions) {
-        const fill = determineTableColor(
-            options.groupOptions.reservation,
-            (options.circleOptions.fill as string) || "#444",
-        );
+        const baseFillComputed = (options.groupOptions.baseFill as string) || "#444";
+        const fill = determineTableColor(options.groupOptions.reservation, baseFillComputed);
         const tableCircle = new fabric.Circle({
             ...options.circleOptions,
             originX: "center",
@@ -54,6 +54,7 @@ export class RoundTable extends fabric.Group {
         this.circle = tableCircle;
         this.textLabel = textLabel;
         this.label = options.groupOptions.label;
+        this.baseFill = baseFillComputed;
         if (options.groupOptions.reservation) {
             this.reservation = options.groupOptions.reservation;
         }
@@ -64,6 +65,7 @@ export class RoundTable extends fabric.Group {
     }
 
     setBaseFill(val: string): void {
+        this.baseFill = val;
         this.circle.set("fill", val);
         this.canvas?.renderAll();
     }
@@ -85,6 +87,7 @@ export class RoundTable extends fabric.Group {
     toObject() {
         return {
             ...super.toObject(),
+            baseFill: this.baseFill,
             label: this.label,
             reservation: this.reservation,
             objectCaching: false,
