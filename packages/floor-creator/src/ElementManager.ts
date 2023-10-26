@@ -65,13 +65,13 @@ export class ElementManager {
             },
             textOptions: { label },
         });
-        table.set({ left: x, top: y });
+        table.set({ left: x, top: y, objectCaching: false });
         return table;
     }
 
     private addRectTableElement({ label, x, y }: CreateElementOptions) {
         this.verifyLabel(label);
-        return new RectTable({
+        const table = new RectTable({
             groupOptions: {
                 label,
                 left: x,
@@ -86,6 +86,8 @@ export class ElementManager {
                 label,
             },
         });
+        table.set({ objectCaching: false });
+        return table;
     }
 
     private verifyLabel(label: string | undefined): asserts label {

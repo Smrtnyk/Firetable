@@ -22,11 +22,16 @@
                 </div>
                 <div class="col-4 q-pa-xs">
                     <q-input
+                        :debounce="500"
                         v-if="isTable(selectedElement)"
                         :model-value="selectedElement.label"
-                        @update:model-value="updateTableLabel"
+                        @update:model-value="
+                            (newLabel) =>
+                                updateTableLabel(selectedElement as BaseTable, newLabel as string)
+                        "
+                        type="text"
                         filled
-                        label="Table Name"
+                        label="Table label"
                         :dense="isMobile"
                     />
                 </div>
@@ -78,13 +83,14 @@
 
 <script setup lang="ts">
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
-import { computed, nextTick, ref, watch } from "vue";
-import { FloorEditorElement, isTable } from "@firetable/floor-creator";
+import { computed, ref, watch } from "vue";
+import { BaseTable, FloorEditorElement, isTable } from "@firetable/floor-creator";
 import { QPopupProxy, useQuasar } from "quasar";
 
 interface Props {
     selectedFloorElement: FloorEditorElement | undefined;
     deleteAllowed?: boolean;
+    existingLabels: Set<string>;
 }
 
 const q = useQuasar();
@@ -105,7 +111,7 @@ watch(
     () => props.selectedFloorElement,
     () => {
         if (props.selectedFloorElement) {
-            elementColor.value = props.selectedFloorElement!.getBaseFill?.() || "";
+            elementColor.value = props.selectedFloorElement.getBaseFill?.() || "";
         }
     },
 );
@@ -114,17 +120,14 @@ function openColorPicker() {
     colorPickerProxy.value?.show();
 }
 
-async function updateTableLabel(newId: string | number | null): Promise<void> {
-    if (!selectedElement.value || !newId) return;
-    if (!isTable(selectedElement.value)) return;
+function updateTableLabel(tableEl: BaseTable, newLabel: string): void {
+    if (!newLabel) return;
 
-    try {
-        // props.selectedElement.canvas.updateTableId(selectedElement.value, newId);
-        // selectedElement.value["tableId"] = newId;
-    } catch {
-        await nextTick();
+    if (props.existingLabels.has(newLabel)) {
         showErrorMessage("Table Id already taken");
+        return;
     }
+    tableEl.setLabel(newLabel);
 }
 
 async function deleteElement() {

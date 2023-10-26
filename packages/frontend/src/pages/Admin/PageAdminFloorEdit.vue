@@ -244,6 +244,7 @@ function deactivateBulkMode() {
             <ShowSelectedElement
                 @delete="onDeleteElement"
                 :selected-floor-element="selectedElement"
+                :existing-labels="new Set(extractAllTablesLabels(floorInstance as Floor))"
                 class="col"
             />
 

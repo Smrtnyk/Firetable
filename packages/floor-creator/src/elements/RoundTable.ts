@@ -21,7 +21,8 @@ export class RoundTable extends fabric.Group {
     reservation: Reservation | null = null;
     label: string;
     private isAnimating: boolean = false;
-    circle: fabric.Circle;
+    private circle: fabric.Circle;
+    private textLabel: fabric.Text;
 
     constructor(options: CircleTableElementOptions) {
         const fill = determineTableColor(
@@ -36,7 +37,7 @@ export class RoundTable extends fabric.Group {
             stroke: "black",
             strokeWidth: 2,
         });
-        const textLabel = new fabric.Text(options.groupOptions.label, {
+        const textLabel = new fabric.Text(options.textOptions.label, {
             ...options.textOptions,
             fontSize: FONT_SIZE,
             fill: TABLE_TEXT_FILL_COLOR,
@@ -48,8 +49,11 @@ export class RoundTable extends fabric.Group {
         });
         super([tableCircle, textLabel], options.groupOptions);
         this.circle = tableCircle;
+        this.textLabel = textLabel;
         this.label = options.groupOptions.label;
-        if (options.groupOptions.reservation) this.reservation = options.groupOptions.reservation;
+        if (options.groupOptions.reservation) {
+            this.reservation = options.groupOptions.reservation;
+        }
     }
 
     getBaseFill(): string {
@@ -58,6 +62,12 @@ export class RoundTable extends fabric.Group {
 
     setBaseFill(val: string): void {
         this.circle.set("fill", val);
+        this.canvas?.renderAll();
+    }
+
+    setLabel(newLabel: string): void {
+        this.label = newLabel;
+        this.textLabel.text = newLabel;
         this.canvas?.renderAll();
     }
 
@@ -98,6 +108,7 @@ export class RoundTable extends fabric.Group {
             ...super.toObject(),
             label: this.label,
             reservation: this.reservation,
+            objectCaching: false,
         };
     }
 

@@ -25,7 +25,8 @@ export class RectTable extends fabric.Group {
     private readonly initialFontSize: number;
     private readonly initialWidth: number;
     private readonly initialHeight: number;
-    rect: fabric.Rect;
+    private rect: fabric.Rect;
+    private textLabel: fabric.Text;
 
     constructor(options: RectTableElementOptions) {
         const fill = determineTableColor(
@@ -39,7 +40,8 @@ export class RectTable extends fabric.Group {
             strokeWidth: 2,
         });
 
-        const textLabel = new fabric.Text(options.groupOptions.label, {
+        const textLabel = new fabric.Text(options.textOptions.label, {
+            ...options.textOptions,
             fontSize: FONT_SIZE,
             fill: TABLE_TEXT_FILL_COLOR,
             textAlign: "center",
@@ -52,19 +54,18 @@ export class RectTable extends fabric.Group {
         super([tableRect, textLabel], options.groupOptions);
 
         this.rect = tableRect;
+        this.textLabel = textLabel;
         this.initialWidth = tableRect.width!;
         this.initialHeight = tableRect.height!;
         this.label = options.groupOptions.label;
-        if (options.groupOptions.reservation) this.reservation = options.groupOptions.reservation;
+        if (options.groupOptions.reservation) {
+            this.reservation = options.groupOptions.reservation;
+        }
 
         this.initialStrokeWidth = tableRect.strokeWidth || 2;
         this.initialFontSize = textLabel.fontSize || FONT_SIZE;
 
         this.on("scaling", this.handleScaling.bind(this));
-    }
-
-    setAttr(value: any) {
-        this.rect.set(value);
     }
 
     private handleScaling(): void {
@@ -160,6 +161,12 @@ export class RectTable extends fabric.Group {
 
     setBaseFill(val: string): void {
         this.rect.set("fill", val);
+        this.canvas?.renderAll();
+    }
+
+    setLabel(newLabel: string): void {
+        this.label = newLabel;
+        this.textLabel.set("text", newLabel);
         this.canvas?.renderAll();
     }
 
