@@ -1,17 +1,22 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { Reservation } from "@firetable/types";
+import { Reservation, Role } from "@firetable/types";
+import { useAuthStore } from "stores/auth-store";
 
 interface Props {
     reservation: Reservation;
 }
 
+const authStore = useAuthStore();
 const props = defineProps<Props>();
 const emit = defineEmits(["delete", "confirm"]);
 const { t } = useI18n();
 const checked = ref<boolean>(props.reservation.confirmed);
 const confirmGuestSwitchDisabled = ref(false);
+const isStaff = computed(() => {
+    return authStore.user?.role === Role.STAFF;
+});
 
 function onReservationConfirm() {
     emit("confirm", !checked.value);
@@ -23,17 +28,20 @@ function onReservationConfirm() {
     <q-card-section>
         <div class="row">
             <div class="col-6">{{ t("EventShowReservation.guestNameLabel") }}</div>
+
             <div class="col-6 font-black">{{ props.reservation.guestName }}</div>
 
             <div class="col-6">{{ t("EventShowReservation.numberOfPeopleLabel") }}</div>
+
             <div class="col-6 font-black">
                 {{ props.reservation.numberOfGuests }}
             </div>
 
-            <template v-if="props.reservation.guestContact">
+            <template v-if="props.reservation.guestContact && !isStaff">
                 <div class="col-6">{{ t("EventShowReservation.contactLabel") }}</div>
                 <div class="col-6 font-black">{{ props.reservation.guestContact }}</div>
             </template>
+
             <template v-if="props.reservation.consumption">
                 <div class="col-6">{{ t("EventShowReservation.reservationConsumption") }}</div>
                 <div class="col-6 font-black">{{ props.reservation.consumption }}</div>
@@ -45,6 +53,7 @@ function onReservationConfirm() {
             </template>
 
             <div class="col-6">{{ t("EventShowReservation.reservedByLabel") }}</div>
+
             <div class="col-6 font-black">
                 {{ props.reservation.reservedBy.email }}
             </div>
