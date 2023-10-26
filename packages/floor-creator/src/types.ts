@@ -30,6 +30,7 @@ export enum FloorElementTypes {
     SOFA = "Sofa",
     SINGLE_SOFA = "SingleSofa",
     STAGE = "Stage",
+    WALL = "Wall",
 }
 
 /**

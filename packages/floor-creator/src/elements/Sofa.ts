@@ -1,7 +1,9 @@
 import { fabric } from "fabric";
 import { RESOLUTION } from "../constants";
+import { FloorElementTypes } from "../types";
 
 export class Sofa extends fabric.Group {
+    type = FloorElementTypes.SOFA;
     constructor(left: number, top: number) {
         const base = new fabric.Rect({
             left: 0,
@@ -25,7 +27,14 @@ export class Sofa extends fabric.Group {
 
         super([base, backrest], { left, top });
     }
+
+    static fromObject(object: any, callback: (obj: Sofa) => void): void {
+        const instance = new Sofa(object.left, object.top);
+        callback(instance);
+    }
 }
 
 // @ts-ignore Register the Sofa class with Fabric
 fabric.Sofa = fabric.util.createClass(Sofa);
+// @ts-ignore Register the Sofa class with Fabric
+fabric.Sofa.fromObject = Sofa.fromObject;

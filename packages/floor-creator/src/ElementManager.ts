@@ -34,7 +34,7 @@ export class ElementManager {
     }
 
     private addWall({ x, y }: CreateElementOptions) {
-        return new Wall(x, y);
+        return new Wall({ left: x, top: y });
     }
 
     private addDJBooth({ x, y }: CreateElementOptions) {

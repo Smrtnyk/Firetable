@@ -1,56 +1,39 @@
 import { fabric } from "fabric";
+import { FloorElementTypes } from "../types";
+import { IGroupOptions } from "fabric/fabric-impl";
 
-export class Wall extends fabric.Rect {
-    static MIN_WIDTH = 10;
-    static MIN_HEIGHT = 10;
-    private readonly initialWidth: number;
-    private readonly initialHeight: number;
-    private readonly initialStrokeWidth: number;
+type WallCreationOptions = Record<string, unknown>;
+type WalLGroupCreationOptions = { left: number; top: number } & IGroupOptions;
 
-    constructor(left: number, top: number) {
-        super({
-            left: left,
-            top: top,
-            width: Wall.MIN_WIDTH,
+export class Wall extends fabric.Group {
+    type = FloorElementTypes.WALL;
+
+    constructor(groupOpts: WalLGroupCreationOptions, wallRectOpts: WallCreationOptions = {}) {
+        const wallRect = new fabric.Rect({
+            width: 10,
             height: 100,
             fill: "#444",
-            stroke: "black",
-            strokeWidth: 2,
+            ...wallRectOpts,
         });
 
-        this.initialWidth = Wall.MIN_WIDTH;
-        this.initialHeight = this.height ?? Wall.MIN_HEIGHT;
-        this.initialStrokeWidth = 2;
-
-        this.on("scaling", this.handleScaling.bind(this));
+        super([wallRect], groupOpts);
     }
 
-    private handleScaling(): void {
-        this.enforceMinimumWidth();
-        this.enforceMinimumHeight();
-        this.enforceStrokeWidth();
+    toObject() {
+        return {
+            ...super.toObject(),
+            objectCaching: false,
+        };
     }
 
-    private enforceMinimumWidth(): void {
-        if (this.scaleX && this.scaleX * this.initialWidth < Wall.MIN_WIDTH) {
-            this.scaleX = Wall.MIN_WIDTH / this.initialWidth;
-        }
-    }
-
-    private enforceMinimumHeight(): void {
-        if (this.scaleY && this.scaleY * this.initialHeight < Wall.MIN_HEIGHT) {
-            this.scaleY = Wall.MIN_HEIGHT / this.initialHeight;
-        }
-    }
-
-    private enforceStrokeWidth(): void {
-        if (!this.scaleX || !this.scaleY) return;
-        // @ts-ignore -- Adjust the strokeWidth based on the scale
-        this.set({
-            strokeWidth: this.initialStrokeWidth / Math.max(this.scaleX, this.scaleY),
-        });
+    static fromObject(object: any, callback: (obj: Wall) => void): void {
+        const wallRect = object.objects[0];
+        const instance = new Wall(object, wallRect);
+        callback(instance);
     }
 }
 
 // @ts-ignore Register the Wall class with Fabric
 fabric.Wall = fabric.util.createClass(Wall);
+// @ts-ignore Register the Wall class with Fabric
+fabric.Wall.fromObject = Wall.fromObject;
