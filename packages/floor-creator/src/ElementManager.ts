@@ -10,16 +10,8 @@ import { RectTable } from "./elements/RectTable";
 import { SingleSofa } from "./elements/SingleSofa";
 import { Stage } from "./elements/Stage";
 
-interface ElementManagerOptions {
-    isInEditorMode: boolean;
-}
-
 export class ElementManager {
-    readonly isInEditorMode: boolean;
-
-    constructor({ isInEditorMode }: ElementManagerOptions) {
-        this.isInEditorMode = isInEditorMode;
-    }
+    constructor() {}
 
     addElement(options: CreateElementOptions) {
         return match(options.tag)
@@ -58,7 +50,6 @@ export class ElementManager {
         const table = new RoundTable({
             groupOptions: {
                 label,
-                ...this.getElementLockingOptions(),
             },
             circleOptions: {
                 radius: RESOLUTION,
@@ -76,7 +67,6 @@ export class ElementManager {
                 label,
                 left: x,
                 top: y,
-                ...this.getElementLockingOptions(),
             },
             rectOptions: {
                 width: TABLE_WIDTH,
@@ -94,16 +84,5 @@ export class ElementManager {
         if (!label) {
             throw new Error("Cannot create element without a label!");
         }
-    }
-
-    private getElementLockingOptions() {
-        return {
-            lockMovementX: this.shouldLockDrag(),
-            lockMovementY: this.shouldLockDrag(),
-        };
-    }
-
-    shouldLockDrag() {
-        return !this.isInEditorMode;
     }
 }

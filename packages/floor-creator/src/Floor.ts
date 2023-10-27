@@ -2,7 +2,6 @@ import { fabric } from "fabric";
 import { CANVAS_BG_COLOR } from "./constants.js";
 import {
     BaseTable,
-    CreateElementOptions,
     ElementClickHandler,
     FloorCreationOptions,
     FloorDoubleClickHandler,
@@ -13,7 +12,6 @@ import {
 import { FloorDoc, Reservation } from "@firetable/types";
 import { RoundTable } from "./elements/RoundTable";
 import { RectTable } from "./elements/RectTable";
-import { ElementManager } from "./ElementManager";
 import { TouchManager } from "./TouchManager";
 import { GridDrawer } from "./GridDrawer";
 import { FloorZoomManager } from "./FloorZoomManager";
@@ -36,7 +34,6 @@ export abstract class Floor {
     width: number;
     readonly initialScale: number;
     private readonly initialViewportTransform: number[];
-    elementManager: ElementManager;
     touchManager: TouchManager;
     protected gridDrawer: GridDrawer;
     zoomManager: FloorZoomManager;
@@ -73,9 +70,6 @@ export abstract class Floor {
             backgroundColor: CANVAS_BG_COLOR,
             interactive: this.isInEditorMode,
             selection: false,
-        });
-        this.elementManager = new ElementManager({
-            isInEditorMode: mode === FloorMode.EDITOR,
         });
         this.gridDrawer = new GridDrawer(this.canvas);
         this.renderData(this.floorDoc.json);

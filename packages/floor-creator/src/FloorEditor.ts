@@ -2,13 +2,16 @@ import { Floor } from "./Floor";
 import { fabric } from "fabric";
 import { CreateElementOptions, FloorCreationOptions } from "./types";
 import { EventManager } from "./EventManager";
+import { ElementManager } from "./ElementManager";
 
 export class FloorEditor extends Floor {
     protected eventManager: EventManager;
+    private elementManager: ElementManager;
 
     constructor(options: FloorCreationOptions) {
         super(options);
         this.eventManager = new EventManager(this);
+        this.elementManager = new ElementManager();
         this.initializeCanvasEventHandlers();
     }
 
