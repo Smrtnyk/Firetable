@@ -38,7 +38,7 @@ export abstract class Floor {
     private readonly initialViewportTransform: number[];
     elementManager: ElementManager;
     touchManager: TouchManager;
-    private gridDrawer: GridDrawer;
+    protected gridDrawer: GridDrawer;
     zoomManager: FloorZoomManager;
     protected abstract eventManager: EventManager;
 
@@ -101,10 +101,6 @@ export abstract class Floor {
     get isInEditorMode(): boolean {
         return this.mode === FloorMode.EDITOR;
     }
-
-    toggleGridVisibility = () => {
-        this.gridDrawer.toggleGridVisibility(this.width, this.height);
-    };
 
     onElementClick = (ev: fabric.IEvent<MouseEvent>) => {
         // Check if there was a move operation. If there was, just return.

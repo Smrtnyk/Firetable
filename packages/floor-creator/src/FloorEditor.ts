@@ -30,4 +30,8 @@ export class FloorEditor extends Floor {
         this.setElementProperties(element);
         this.canvas.add(element);
     }
+
+    toggleGridVisibility = () => {
+        this.gridDrawer.toggleGridVisibility(this.width, this.height);
+    };
 }
