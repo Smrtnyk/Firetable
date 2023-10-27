@@ -32,10 +32,6 @@ export function usersCollection() {
     return getCollection(Collection.USERS);
 }
 
-export function fcm() {
-    return getCollection(Collection.FCM);
-}
-
 /**
  * Call the 'recursiveDelete' callable function with a path to initiate
  * a server-side delete.
