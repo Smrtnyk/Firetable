@@ -19,7 +19,7 @@ export class ViewerEventManager extends EventManager {
     onTableTouchStart = (options: fabric.IEvent) => {
         const target = options.target;
         if (isTable(target)) {
-            this.startElement = target as BaseTable;
+            this.startElement = target;
             this.isPanning = true;
         }
     };

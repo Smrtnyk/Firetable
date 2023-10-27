@@ -11,8 +11,6 @@ import { SingleSofa } from "./elements/SingleSofa";
 import { Stage } from "./elements/Stage";
 
 export class ElementManager {
-    constructor() {}
-
     addElement(options: CreateElementOptions) {
         return match(options.tag)
             .with(ElementTag.RECT, () => this.addRectTableElement(options))

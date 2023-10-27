@@ -34,7 +34,7 @@ function routerBeforeEach(router: Router, store: ReturnType<typeof useAuthStore>
                 await getCurrentUser();
             }
             const requiresAuth = to.meta.requiresAuth;
-            const allowedRoles: string[] = to.meta.allowedRoles as string[];
+            const allowedRoles = to.meta.allowedRoles as string[] | undefined;
 
             if (requiresAuth && !store.isAuthenticated) return { name: "auth" };
             if (!store.isAuthenticated) return true;
@@ -42,7 +42,7 @@ function routerBeforeEach(router: Router, store: ReturnType<typeof useAuthStore>
             const token = await (await getCurrentUser())?.getIdTokenResult();
             const role = token?.claims.role as string;
 
-            if (allowedRoles && allowedRoles.includes(role)) {
+            if (allowedRoles?.includes(role)) {
                 return true;
             }
 

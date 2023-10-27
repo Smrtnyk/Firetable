@@ -17,8 +17,6 @@ import { logger } from "firebase-functions";
 
 const MIN_PASSWORD_LENGTH = 6;
 
-// setVapidDetails(vapidKeys.subject, vapidKeys.publicKey, vapidKeys.privateKey);
-
 // Everything that has to do with events
 export const createEvent = functions
     .region("europe-west3")
