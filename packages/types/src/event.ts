@@ -42,7 +42,6 @@ export type GuestData = CreateGuestPayload & {
 
 export interface Reservation {
     confirmed: boolean;
-    groupedWith: string[];
     guestContact?: string;
     guestName: string;
     numberOfGuests: number;

@@ -84,6 +84,10 @@ export class RoundTable extends fabric.Group {
         this.animationStrategy.stop();
     }
 
+    setReservation(reservation: Reservation | null) {
+        this.reservation = reservation;
+    }
+
     toObject() {
         return {
             ...super.toObject(),

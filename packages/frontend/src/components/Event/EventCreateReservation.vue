@@ -10,15 +10,8 @@ interface State {
     guestContact: string;
     reservationNote: string;
     consumption: number;
-    groupedWith: string[];
 }
 
-interface Props {
-    label: string;
-    freeTables: string[];
-}
-
-const props = defineProps<Props>();
 const emit = defineEmits(["create"]);
 const { t } = useI18n();
 const state = reactive<State>({
@@ -27,13 +20,11 @@ const state = reactive<State>({
     guestContact: "",
     reservationNote: "",
     consumption: 1,
-    groupedWith: [],
 });
 const reservationForm = ref<QForm | null>(null);
 
 async function onOKClick() {
     if (!(await reservationForm.value?.validate())) return;
-    state.groupedWith.push(props.label);
     emit("create", state);
 }
 </script>
@@ -41,17 +32,6 @@ async function onOKClick() {
 <template>
     <q-card-section>
         <q-form ref="reservationForm" class="q-gutter-md">
-            <q-select
-                v-if="props.freeTables.length"
-                v-model="state.groupedWith"
-                :hint="t(`EventCreateReservation.reservationGroupWithHint`)"
-                standout
-                rounded
-                multiple
-                :options="props.freeTables"
-                :label="t(`EventCreateReservation.reservationGroupWith`)"
-                dropdown-icon="selector"
-            />
             <q-input
                 v-model="state.guestName"
                 rounded

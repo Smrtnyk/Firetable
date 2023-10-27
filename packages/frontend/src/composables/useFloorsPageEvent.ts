@@ -185,16 +185,10 @@ export default function useFloorsPageEvent(
         return function (val: boolean) {
             const { reservation } = element;
             if (!reservation) return;
-            const { groupedWith } = reservation;
-            for (const tableLabel of groupedWith) {
-                const table = getTables(floor).find(({ label }) => label === tableLabel);
-                if (table) {
-                    floor.setReservationOnTable(table, {
-                        ...reservation,
-                        confirmed: val,
-                    });
-                }
-            }
+            element?.setReservation({
+                ...reservation,
+                confirmed: val,
+            });
             return tryCatchLoadingWrapper({
                 hook: () => updateEventFloorData(floor, eventId),
             });
@@ -219,7 +213,7 @@ export default function useFloorsPageEvent(
                     listeners: {
                         create: (reservationData: CreateReservationPayload) => {
                             resetCurrentOpenCreateReservationDialog();
-                            handleReservationCreation(floor, reservationData);
+                            handleReservationCreation(floor, reservationData, element);
                         },
                     },
                 },
@@ -239,40 +233,28 @@ export default function useFloorsPageEvent(
 
     async function onDeleteReservation(floor: Floor, element: BaseTable) {
         if (!(await showConfirm("Delete reservation?")) || !element.reservation) return;
-
-        const { groupedWith } = element.reservation;
-        const allFloorTables = getTables(floor);
-        for (const tableId of groupedWith) {
-            const table = allFloorTables.find(({ label }) => label === tableId);
-            if (table) {
-                floor.setReservationOnTable(table, null);
-            }
-        }
+        element?.setReservation(null);
 
         await tryCatchLoadingWrapper({
             hook: () => updateEventFloorData(floor, eventId),
         });
     }
 
-    function handleReservationCreation(floor: Floor, reservationData: CreateReservationPayload) {
+    function handleReservationCreation(
+        floor: Floor,
+        reservationData: CreateReservationPayload,
+        table: BaseTable,
+    ) {
         if (!currentUser.value) return;
 
-        const { groupedWith } = reservationData;
         const { email, name, role, id } = currentUser.value;
         const reservedBy = { email, name, role, id };
 
-        for (const idInGroup of groupedWith) {
-            const table = getTables(floor).find(function ({ label }) {
-                return label === idInGroup;
-            });
-            if (table) {
-                floor.setReservationOnTable(table, {
-                    ...reservationData,
-                    confirmed: false,
-                    reservedBy,
-                });
-            }
-        }
+        table?.setReservation({
+            ...reservationData,
+            confirmed: false,
+            reservedBy,
+        });
         void tryCatchLoadingWrapper({
             hook: () => updateEventFloorData(floor, eventId),
         });
@@ -315,9 +297,13 @@ export default function useFloorsPageEvent(
         if (!shouldTransfer) {
             return;
         }
-        const table1Reservation = table1.reservation;
-        table1.reservation = table2.reservation;
-        table2.reservation = table1Reservation;
+        const table1Reservation = { ...table1.reservation };
+        if (table2.reservation) {
+            table1.setReservation({ ...table2.reservation });
+        } else {
+            table1.setReservation(null);
+        }
+        table2.setReservation(table1Reservation);
 
         await tryCatchLoadingWrapper({
             hook: () => updateEventFloorData(floor, eventId),

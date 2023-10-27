@@ -1,5 +1,5 @@
 import { fabric } from "fabric";
-import { FloorElementTypes } from "../types.js";
+import { BaseTable, FloorElementTypes } from "../types.js";
 import { determineTableColor } from "../utils.js";
 import { Reservation } from "@firetable/types";
 import { FONT_SIZE, TABLE_TEXT_FILL_COLOR, RESOLUTION } from "../constants";
@@ -148,6 +148,10 @@ export class RectTable extends fabric.Group {
         this.label = newLabel;
         this.textLabel.set("text", newLabel);
         this.canvas?.renderAll();
+    }
+
+    setReservation(reservation: Reservation | null) {
+        this.reservation = reservation;
     }
 
     toObject() {

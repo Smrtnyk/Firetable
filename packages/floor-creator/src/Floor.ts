@@ -1,13 +1,12 @@
 import { fabric } from "fabric";
 import { CANVAS_BG_COLOR } from "./constants.js";
 import {
-    BaseTable,
     ElementClickHandler,
     FloorCreationOptions,
     FloorMode,
     TableToTableHandler,
 } from "./types.js";
-import { FloorDoc, Reservation } from "@firetable/types";
+import { FloorDoc } from "@firetable/types";
 import { RoundTable } from "./elements/RoundTable";
 import { RectTable } from "./elements/RectTable";
 import { TouchManager } from "./TouchManager";
@@ -94,10 +93,6 @@ export abstract class Floor {
             },
             this.elementReviver,
         );
-    }
-
-    setReservationOnTable(element: BaseTable, reservation: Reservation | null) {
-        element.reservation = reservation;
     }
 }
 
