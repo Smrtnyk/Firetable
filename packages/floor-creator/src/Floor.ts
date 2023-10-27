@@ -28,7 +28,6 @@ export abstract class Floor {
     readonly dblClickHandler?: FloorDoubleClickHandler;
     readonly elementClickHandler: ElementClickHandler;
     readonly tableToTableHandler?: TableToTableHandler;
-    mode: FloorMode;
     width: number;
     readonly initialScale: number;
     private readonly initialViewportTransform: number[];
@@ -56,7 +55,6 @@ export abstract class Floor {
         this.height = floorDoc.height;
         this.containerWidth = containerWidth;
         this.floorDoc = floorDoc;
-        this.mode = mode;
         this.dblClickHandler = dblClickHandler;
         this.elementClickHandler = elementClickHandler;
         this.tableToTableHandler = tableToTableHandler;
@@ -65,7 +63,7 @@ export abstract class Floor {
             width: this.width,
             height: this.height,
             backgroundColor: CANVAS_BG_COLOR,
-            interactive: this.isInEditorMode,
+            interactive: mode === FloorMode.EDITOR,
             selection: false,
         });
         this.renderData(this.floorDoc.json);
@@ -88,10 +86,6 @@ export abstract class Floor {
 
     protected abstract onElementClick(ev: fabric.IEvent<MouseEvent>): void;
     protected abstract setElementProperties(element: fabric.Object): void;
-
-    get isInEditorMode(): boolean {
-        return this.mode === FloorMode.EDITOR;
-    }
 
     elementReviver = (_: string, object: fabric.Object) => {
         object.on("mouseup", (ev) => {
