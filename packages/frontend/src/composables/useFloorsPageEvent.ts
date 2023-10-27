@@ -43,6 +43,10 @@ export default function useFloorsPageEvent(
         activeFloor: void 0,
     });
 
+    const allReservedTables = computed(() => {
+        return Array.from(state.value.floorInstances).map(getReservedTables).flat();
+    });
+
     // For now, disable reservation ability for staff,
     // but it should be configurable in the future
     const canReserve = computed(() => {
@@ -288,10 +292,6 @@ export default function useFloorsPageEvent(
         showErrorMessage(t("PageEvent.reservationAlreadyReserved"));
     }
 
-    const allReservedTables = computed(() => {
-        return Array.from(state.value.floorInstances).map(getReservedTables).flat();
-    });
-
     function onAutocompleteClear(): void {
         if (state.value.activeTablesAnimationInterval) {
             clearInterval(state.value.activeTablesAnimationInterval);
@@ -303,14 +303,25 @@ export default function useFloorsPageEvent(
         });
     }
 
-    async function swapOrTransferReservations(table1: BaseTable, table2: BaseTable) {
+    async function swapOrTransferReservations(floor: Floor, table1: BaseTable, table2: BaseTable) {
         if (!table1.reservation) {
             return;
         }
         const transferMessage = `This will transfer reservation from table ${table1.label} to table ${table2.label}`;
         const shouldTransfer = await showConfirm("Transfer reservation", transferMessage);
+
         console.log(shouldTransfer);
         console.log(table1.reservation, table2.reservation);
+        if (!shouldTransfer) {
+            return;
+        }
+        const table1Reservation = table1.reservation;
+        table1.reservation = table2.reservation;
+        table2.reservation = table1Reservation;
+
+        await tryCatchLoadingWrapper({
+            hook: () => updateEventFloorData(floor, eventId),
+        });
     }
 
     return {
