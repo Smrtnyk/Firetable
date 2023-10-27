@@ -109,25 +109,11 @@ export abstract class Floor {
     addElement(options: CreateElementOptions) {
         const element = this.elementManager.addElement(options);
         element.on("mouseup", this.onElementClick);
-        this.setElementPropertiesBasedOnMode(element);
+        this.setElementProperties(element);
         this.canvas.add(element);
     }
 
-    private setElementPropertiesBasedOnMode(element: fabric.Object) {
-        if (this.isInEditorMode) {
-            element.lockScalingX = false;
-            element.lockScalingY = false;
-            element.lockMovementX = false;
-            element.lockMovementY = false;
-        } else {
-            element.lockScalingX = true;
-            element.lockScalingY = true;
-            element.lockMovementX = true;
-            element.lockMovementY = true;
-        }
-
-        element.lockScalingFlip = true;
-    }
+    protected abstract setElementProperties(element: fabric.Object): void;
 
     get isInEditorMode(): boolean {
         return this.mode === FloorMode.EDITOR;
@@ -146,7 +132,7 @@ export abstract class Floor {
 
     elementReviver = (_: string, object: fabric.Object) => {
         object.on("mouseup", this.onElementClick);
-        this.setElementPropertiesBasedOnMode(object);
+        this.setElementProperties(object);
     };
 
     setScaling() {
