@@ -22,20 +22,20 @@ export abstract class Floor {
     name: string;
     readonly scale: number;
     height: number;
-    readonly containerWidth: number;
     readonly floorDoc: FloorDoc;
     readonly canvas: fabric.Canvas;
     readonly dblClickHandler?: FloorDoubleClickHandler;
     readonly elementClickHandler: ElementClickHandler;
     readonly tableToTableHandler?: TableToTableHandler;
     width: number;
-    readonly initialScale: number;
-    private readonly initialViewportTransform: number[];
     touchManager: TouchManager;
     zoomManager: FloorZoomManager;
+
     protected abstract eventManager: EventManager;
 
-    abstract initializeCanvasEventHandlers(): void;
+    protected abstract initializeCanvasEventHandlers(): void;
+    protected abstract onElementClick(ev: fabric.IEvent<MouseEvent>): void;
+    protected abstract setElementProperties(element: fabric.Object): void;
 
     constructor(options: FloorCreationOptions) {
         const {
@@ -53,7 +53,6 @@ export abstract class Floor {
         this.name = floorDoc.name;
         this.width = floorDoc.width;
         this.height = floorDoc.height;
-        this.containerWidth = containerWidth;
         this.floorDoc = floorDoc;
         this.dblClickHandler = dblClickHandler;
         this.elementClickHandler = elementClickHandler;
@@ -68,13 +67,11 @@ export abstract class Floor {
         });
         this.renderData(this.floorDoc.json);
         this.canvas.renderAll();
-        this.initialScale = this.canvas.getZoom();
-        this.initialViewportTransform = this.canvas.viewportTransform?.slice() || [];
 
         this.zoomManager = new FloorZoomManager(
             this.canvas,
-            this.initialScale,
-            this.initialViewportTransform,
+            this.canvas.getZoom(),
+            this.canvas.viewportTransform?.slice() || [],
         );
 
         this.touchManager = new TouchManager(this);
@@ -83,9 +80,6 @@ export abstract class Floor {
     get json() {
         return this.canvas.toJSON(["label", "reservation", "name", "type"]);
     }
-
-    protected abstract onElementClick(ev: fabric.IEvent<MouseEvent>): void;
-    protected abstract setElementProperties(element: fabric.Object): void;
 
     elementReviver = (_: string, object: fabric.Object) => {
         object.on("mouseup", (ev) => {
