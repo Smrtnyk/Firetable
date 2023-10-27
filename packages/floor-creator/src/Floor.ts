@@ -96,13 +96,6 @@ export abstract class Floor {
         return this.canvas.toJSON(["label", "reservation", "name", "type"]);
     }
 
-    addElement(options: CreateElementOptions) {
-        const element = this.elementManager.addElement(options);
-        element.on("mouseup", this.onElementClick);
-        this.setElementProperties(element);
-        this.canvas.add(element);
-    }
-
     protected abstract setElementProperties(element: fabric.Object): void;
 
     get isInEditorMode(): boolean {

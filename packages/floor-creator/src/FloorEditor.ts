@@ -1,6 +1,6 @@
 import { Floor } from "./Floor";
 import { fabric } from "fabric";
-import { FloorCreationOptions } from "./types";
+import { CreateElementOptions, FloorCreationOptions } from "./types";
 import { EventManager } from "./EventManager";
 
 export class FloorEditor extends Floor {
@@ -22,5 +22,12 @@ export class FloorEditor extends Floor {
         element.lockMovementX = false;
         element.lockMovementY = false;
         element.lockScalingFlip = true;
+    }
+
+    addElement(options: CreateElementOptions) {
+        const element = this.elementManager.addElement(options);
+        element.on("mouseup", this.onElementClick);
+        this.setElementProperties(element);
+        this.canvas.add(element);
     }
 }
