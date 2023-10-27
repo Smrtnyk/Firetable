@@ -1,11 +1,10 @@
 import { fabric } from "fabric";
-import { Floor } from "./Floor";
-import { RESOLUTION } from "./constants";
-import { BaseTable, FloorMode } from "./types";
-import { isTable } from "./type-guards";
+import { Floor } from "../Floor";
+import { BaseTable, FloorMode } from "../types";
+import { isTable } from "../type-guards";
 
-export class EventManager {
-    private readonly floor: Floor;
+export abstract class EventManager {
+    protected readonly floor: Floor;
     private startElement: BaseTable | null = null;
     hasMouseMoved: boolean = false;
 
@@ -15,7 +14,6 @@ export class EventManager {
 
     initializeCanvasEventHandlers() {
         this.floor.canvas.on("mouse:wheel", this.onMouseWheelHandler);
-        this.floor.canvas.on("object:modified", this.snapToGridOnModify);
         this.floor.canvas.on("mouse:up", this.onMouseUp);
 
         if (this.floor.mode === FloorMode.LIVE) {
@@ -60,36 +58,6 @@ export class EventManager {
             }
 
             this.startElement = null; // reset after use
-        }
-    };
-
-    private snapToGridOnModify = (e: fabric.IEvent) => {
-        const target = e.target;
-
-        if (target) {
-            // Snapping logic for rotation
-            const snapAngle = 45; // 45 degrees
-            const threshold = 5; // degrees
-            const closestMultipleOfSnap = Math.round(target.angle! / snapAngle) * snapAngle;
-            const differenceFromSnap = Math.abs(target.angle! - closestMultipleOfSnap);
-            if (differenceFromSnap <= threshold) {
-                target.set("angle", closestMultipleOfSnap).setCoords();
-            }
-
-            // Snapping logic for movement
-            const shouldSnapToGrid =
-                Math.round((target.left! / RESOLUTION) * 4) % 4 === 0 &&
-                Math.round((target.top! / RESOLUTION) * 4) % 4 === 0;
-            if (shouldSnapToGrid) {
-                target
-                    .set({
-                        left: Math.round(target.left! / RESOLUTION) * RESOLUTION,
-                        top: Math.round(target.top! / RESOLUTION) * RESOLUTION,
-                    })
-                    .setCoords();
-            }
-
-            this.floor.canvas.renderAll();
         }
     };
 

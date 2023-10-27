@@ -1,10 +1,11 @@
 import { Floor } from "./Floor";
 import { fabric } from "fabric";
 import { CreateElementOptions, FloorCreationOptions } from "./types";
-import { EventManager } from "./EventManager";
+import { EventManager } from "./event-manager/EventManager";
 import { ElementManager } from "./ElementManager";
 import { FloorDoc } from "@firetable/types";
 import { GridDrawer } from "./GridDrawer";
+import { EditorEventManager } from "./event-manager/EditorEventManager";
 
 export class FloorEditor extends Floor {
     protected eventManager: EventManager;
@@ -14,7 +15,7 @@ export class FloorEditor extends Floor {
     constructor(options: FloorCreationOptions) {
         super(options);
         this.gridDrawer = new GridDrawer(this.canvas);
-        this.eventManager = new EventManager(this);
+        this.eventManager = new EditorEventManager(this);
         this.elementManager = new ElementManager();
         this.initializeCanvasEventHandlers();
         this.renderGrid();

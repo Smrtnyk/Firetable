@@ -14,7 +14,7 @@ import { RoundTable } from "./elements/RoundTable";
 import { RectTable } from "./elements/RectTable";
 import { TouchManager } from "./TouchManager";
 import { FloorZoomManager } from "./FloorZoomManager";
-import { EventManager } from "./EventManager.js";
+import { EventManager } from "./event-manager/EventManager";
 
 Object.assign(fabric, { RectTable, RoundTable });
 

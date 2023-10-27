@@ -1,14 +1,15 @@
 import { Floor } from "./Floor";
 import { fabric } from "fabric";
 import { FloorCreationOptions } from "./types";
-import { EventManager } from "./EventManager";
+import { EventManager } from "./event-manager/EventManager";
+import { ViewerEventManager } from "./event-manager/ViewerEventManager";
 
 export class FloorViewer extends Floor {
     protected eventManager: EventManager;
 
     constructor(options: FloorCreationOptions) {
         super(options);
-        this.eventManager = new EventManager(this);
+        this.eventManager = new ViewerEventManager(this);
         this.initializeCanvasEventHandlers();
     }
 
