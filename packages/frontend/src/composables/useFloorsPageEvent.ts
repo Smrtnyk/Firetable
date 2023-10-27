@@ -2,7 +2,7 @@ import { watch, reactive, computed, Ref, ref, nextTick } from "vue";
 import { CreateReservationPayload, FloorDoc, Reservation, Role } from "@firetable/types";
 import {
     BaseTable,
-    Floor,
+    FloorViewer,
     FloorEditorElement,
     FloorMode,
     getFreeTables,
@@ -23,7 +23,7 @@ import { useI18n } from "vue-i18n";
 interface State {
     activeTablesAnimationInterval: number | null;
     activeFloor: { id: string; name: string } | undefined;
-    floorInstances: Set<Floor>;
+    floorInstances: Set<FloorViewer>;
 }
 
 export default function useFloorsPageEvent(
@@ -116,7 +116,7 @@ export default function useFloorsPageEvent(
         if (!canvas || !pageRef.value) return;
 
         state.value.floorInstances.add(
-            new Floor({
+            new FloorViewer({
                 canvas,
                 floorDoc,
                 elementClickHandler: tableClickHandler,
@@ -131,13 +131,13 @@ export default function useFloorsPageEvent(
         return state.value.activeFloor?.id === floorId;
     }
 
-    function setActiveFloor(floor?: Floor): void {
+    function setActiveFloor(floor?: FloorViewer): void {
         if (floor) {
             state.value.activeFloor = { id: floor.id, name: floor.name };
         }
     }
 
-    function tableClickHandler(floor: Floor, element: FloorEditorElement | undefined) {
+    function tableClickHandler(floor: FloorViewer, element: FloorEditorElement | undefined) {
         if (!isTable(element)) {
             return;
         }
@@ -156,7 +156,7 @@ export default function useFloorsPageEvent(
         showCreateReservationDialog(floor, element);
     }
 
-    function showReservation(floor: Floor, reservation: Reservation, element: BaseTable) {
+    function showReservation(floor: FloorViewer, reservation: Reservation, element: BaseTable) {
         q.dialog({
             component: FTDialog,
             componentProps: {
@@ -176,7 +176,7 @@ export default function useFloorsPageEvent(
         });
     }
 
-    function onReservationConfirm(floor: Floor, element: BaseTable) {
+    function onReservationConfirm(floor: FloorViewer, element: BaseTable) {
         return function (val: boolean) {
             const { reservation } = element;
             if (!reservation) return;
@@ -196,7 +196,7 @@ export default function useFloorsPageEvent(
         };
     }
 
-    function showCreateReservationDialog(floor: Floor, element: BaseTable) {
+    function showCreateReservationDialog(floor: FloorViewer, element: BaseTable) {
         const { label } = element;
         const dialog = q
             .dialog({
@@ -232,7 +232,7 @@ export default function useFloorsPageEvent(
         currentOpenCreateReservationDialog = null;
     }
 
-    async function onDeleteReservation(floor: Floor, element: BaseTable) {
+    async function onDeleteReservation(floor: FloorViewer, element: BaseTable) {
         if (!(await showConfirm("Delete reservation?")) || !element.reservation) return;
 
         const { groupedWith } = element.reservation;
@@ -249,7 +249,10 @@ export default function useFloorsPageEvent(
         });
     }
 
-    function handleReservationCreation(floor: Floor, reservationData: CreateReservationPayload) {
+    function handleReservationCreation(
+        floor: FloorViewer,
+        reservationData: CreateReservationPayload,
+    ) {
         if (!currentUser.value) return;
 
         const { groupedWith } = reservationData;

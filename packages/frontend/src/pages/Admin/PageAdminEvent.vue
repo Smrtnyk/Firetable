@@ -13,7 +13,7 @@ import FTDialog from "components/FTDialog.vue";
 
 import { Loading, useQuasar } from "quasar";
 import { config } from "src/config";
-import { Floor, FloorMode, getTablesFromFloorDoc } from "@firetable/floor-creator";
+import { FloorEditor, FloorMode, getTablesFromFloorDoc } from "@firetable/floor-creator";
 import { FloorDoc, User } from "@firetable/types";
 import { updateEventFloorData, updateEventProperty } from "@firetable/backend";
 import { tryCatchLoadingWrapper, withLoading } from "src/helpers/ui-helpers";
@@ -76,7 +76,7 @@ async function init() {
     }
 }
 
-const onFloorUpdate = withLoading(function (floor: Floor) {
+const onFloorUpdate = withLoading(function (floor: FloorEditor) {
     return updateEventFloorData(floor, props.id);
 });
 

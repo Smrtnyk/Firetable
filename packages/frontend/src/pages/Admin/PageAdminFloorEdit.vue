@@ -10,7 +10,7 @@ import { Loading, useQuasar } from "quasar";
 import { BULK_ADD_COLLECTION, ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
 import {
     extractAllTablesLabels,
-    Floor,
+    FloorEditor,
     FloorEditorElement,
     FloorMode,
     hasFloorTables,
@@ -53,7 +53,7 @@ const NON_TABLE_EL_TO_ADD = [
 const props = defineProps<Props>();
 const router = useRouter();
 const q = useQuasar();
-const floorInstance = ref<Floor | null>(null);
+const floorInstance = ref<FloorEditor | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 const pageRef = ref<HTMLDivElement | null>(null);
 const selectedElement = ref<FloorEditorElement | undefined>();
@@ -88,7 +88,7 @@ onMounted(async () => {
 function instantiateFloor(floorDoc: FloorDoc) {
     if (!canvasRef.value || !pageRef.value) return;
 
-    floorInstance.value = new Floor({
+    floorInstance.value = new FloorEditor({
         canvas: canvasRef.value,
         floorDoc,
         dblClickHandler,
@@ -99,7 +99,7 @@ function instantiateFloor(floorDoc: FloorDoc) {
 }
 
 function onFloorSave(): void {
-    if (!floorInstance.value || !hasFloorTables(floorInstance.value as Floor)) {
+    if (!floorInstance.value || !hasFloorTables(floorInstance.value as FloorEditor)) {
         return showErrorMessage("You need to add at least one table!");
     }
 
@@ -114,7 +114,7 @@ function onFloorSave(): void {
     });
 }
 
-function onFloorChange(prop: keyof Floor, event: null | number | string) {
+function onFloorChange(prop: keyof FloorEditor, event: null | number | string) {
     if (!floorInstance.value) return;
 
     if (prop === "name") floorInstance.value.setFloorName(String(event));
@@ -127,7 +127,7 @@ function onFloorChange(prop: keyof Floor, event: null | number | string) {
     }
 }
 
-function showTableDialog(floor: Floor, [x, y]: NumberTuple, tag: ElementTag) {
+function showTableDialog(floor: FloorEditor, [x, y]: NumberTuple, tag: ElementTag) {
     const dialog = q.dialog({
         component: FTDialog,
         componentProps: {
@@ -147,7 +147,7 @@ function showTableDialog(floor: Floor, [x, y]: NumberTuple, tag: ElementTag) {
     });
 }
 
-function handleAddNewElement(floor: Floor, [x, y]: NumberTuple) {
+function handleAddNewElement(floor: FloorEditor, [x, y]: NumberTuple) {
     return function ({ elementDescriptor }: BottomSheetTableClickResult) {
         const { tag } = elementDescriptor;
 
@@ -160,7 +160,7 @@ function handleAddNewElement(floor: Floor, [x, y]: NumberTuple) {
     };
 }
 
-function dblClickHandler(floor: Floor, coords: NumberTuple) {
+function dblClickHandler(floor: FloorEditor, coords: NumberTuple) {
     if (bulkMode.value && bulkElement.value) {
         const label = String(++bulkLabelCounter.value);
         floor.addElement({ label, x: coords[0], y: coords[1], tag: bulkElement.value });
@@ -169,7 +169,7 @@ function dblClickHandler(floor: Floor, coords: NumberTuple) {
     q.bottomSheet(addNewElementsBottomSheetOptions).onOk(handleAddNewElement(floor, coords));
 }
 
-async function elementClickHandler(_: Floor, element: FloorEditorElement | undefined) {
+async function elementClickHandler(_: FloorEditor, element: FloorEditorElement | undefined) {
     selectedElement.value = undefined;
     await nextTick();
     selectedElement.value = element;
@@ -200,7 +200,7 @@ function activateBulkMode(elementTag: ElementTag) {
     bulkElement.value = elementTag;
 
     // Get all current labels using the helper function
-    const labels = extractAllTablesLabels(floorInstance.value as Floor);
+    const labels = extractAllTablesLabels(floorInstance.value as FloorEditor);
     // Convert labels to numbers only if they are numeric and find the maximum
     const numericLabels = labels.map((label) => parseInt(label)).filter(isNumber);
 
@@ -244,7 +244,7 @@ function deactivateBulkMode() {
             <ShowSelectedElement
                 @delete="onDeleteElement"
                 :selected-floor-element="selectedElement"
-                :existing-labels="new Set(extractAllTablesLabels(floorInstance as Floor))"
+                :existing-labels="new Set(extractAllTablesLabels(floorInstance as FloorEditor))"
                 class="col"
             />
 

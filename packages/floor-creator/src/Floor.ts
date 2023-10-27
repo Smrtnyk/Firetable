@@ -30,7 +30,7 @@ interface FloorCreationOptions {
 
 Object.assign(fabric, { RectTable, RoundTable });
 
-export class Floor {
+export abstract class Floor {
     readonly id: string;
     name: string;
     readonly scale: number;

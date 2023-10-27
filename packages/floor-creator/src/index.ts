@@ -1,4 +1,5 @@
-export * from "./Floor.js";
+export * from "./FloorEditor.js";
+export * from "./FloorViewer.js";
 export * from "./filters.js";
 export * from "./constants.js";
 export * from "./factories.js";
