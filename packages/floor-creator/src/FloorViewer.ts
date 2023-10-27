@@ -1,17 +1,23 @@
 import { Floor } from "./Floor";
 import { fabric } from "fabric";
-import { FloorCreationOptions } from "./types";
-import { EventManager } from "./event-manager/EventManager";
+import { FloorCreationOptions, FloorEditorElement } from "./types";
 import { ViewerEventManager } from "./event-manager/ViewerEventManager";
 
 export class FloorViewer extends Floor {
-    protected eventManager: EventManager;
+    protected eventManager: ViewerEventManager;
 
     constructor(options: FloorCreationOptions) {
         super(options);
         this.eventManager = new ViewerEventManager(this);
         this.initializeCanvasEventHandlers();
     }
+
+    protected onElementClick = (ev: fabric.IEvent<MouseEvent>) => {
+        // Check if there was a move operation. If there was, just return.
+        if (this.eventManager.hasMouseMoved) return;
+
+        this.elementClickHandler(this, ev.target as FloorEditorElement);
+    };
 
     initializeCanvasEventHandlers() {
         // Put all the event logic for the viewer here

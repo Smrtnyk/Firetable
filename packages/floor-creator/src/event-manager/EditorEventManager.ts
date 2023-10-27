@@ -7,7 +7,15 @@ export class EditorEventManager extends EventManager {
         super.initializeCanvasEventHandlers();
 
         this.floor.canvas.on("object:modified", this.snapToGridOnModify);
+        this.floor.canvas.on("mouse:up", this.onEditorMouseUp);
     }
+
+    private onEditorMouseUp = () => {
+        const hasActiveElement = this.floor.canvas.getActiveObject();
+        if (!hasActiveElement) {
+            this.floor.elementClickHandler(this.floor, void 0);
+        }
+    };
 
     private snapToGridOnModify = (e: fabric.IEvent) => {
         const target = e.target;

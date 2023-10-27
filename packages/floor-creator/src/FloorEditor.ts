@@ -1,6 +1,6 @@
 import { Floor } from "./Floor";
 import { fabric } from "fabric";
-import { CreateElementOptions, FloorCreationOptions } from "./types";
+import { CreateElementOptions, FloorCreationOptions, FloorEditorElement } from "./types";
 import { EventManager } from "./event-manager/EventManager";
 import { ElementManager } from "./ElementManager";
 import { FloorDoc } from "@firetable/types";
@@ -20,6 +20,10 @@ export class FloorEditor extends Floor {
         this.initializeCanvasEventHandlers();
         this.renderGrid();
     }
+
+    protected onElementClick = (ev: fabric.IEvent<MouseEvent>) => {
+        this.elementClickHandler(this, ev.target as FloorEditorElement);
+    };
 
     renderGrid() {
         this.gridDrawer.drawGrid(this.width, this.height);

@@ -5,7 +5,6 @@ import {
     ElementClickHandler,
     FloorCreationOptions,
     FloorDoubleClickHandler,
-    FloorEditorElement,
     FloorMode,
     TableToTableHandler,
 } from "./types.js";
@@ -87,21 +86,17 @@ export abstract class Floor {
         return this.canvas.toJSON(["label", "reservation", "name", "type"]);
     }
 
+    protected abstract onElementClick(ev: fabric.IEvent<MouseEvent>): void;
     protected abstract setElementProperties(element: fabric.Object): void;
 
     get isInEditorMode(): boolean {
         return this.mode === FloorMode.EDITOR;
     }
 
-    onElementClick = (ev: fabric.IEvent<MouseEvent>) => {
-        // Check if there was a move operation. If there was, just return.
-        if (this.eventManager.hasMouseMoved) return;
-
-        this.elementClickHandler(this, ev.target as FloorEditorElement);
-    };
-
     elementReviver = (_: string, object: fabric.Object) => {
-        object.on("mouseup", this.onElementClick);
+        object.on("mouseup", (ev) => {
+            this.onElementClick(ev);
+        });
         this.setElementProperties(object);
     };
 
