@@ -122,6 +122,7 @@ async function showEditUserDialog(user: User, reset: () => void) {
             },
         },
     });
+    dialog.onDismiss(reset);
 }
 
 async function onUserSlideRight(id: string, reset: () => void) {
