@@ -1,5 +1,5 @@
 import { watch, reactive, computed, Ref, ref, nextTick } from "vue";
-import { CreateReservationPayload, FloorDoc, Reservation } from "@firetable/types";
+import { CreateReservationPayload, FloorDoc, Reservation, Role } from "@firetable/types";
 import {
     BaseTable,
     Floor,
@@ -40,6 +40,12 @@ export default function useFloorsPageEvent(
         activeTablesAnimationInterval: null,
         floorInstances: new Set(),
         activeFloor: void 0,
+    });
+
+    // For now, disable reservation ability for staff,
+    // but it should be configurable in the future
+    const canReserve = computed(() => {
+        return currentUser.value?.role !== Role.STAFF;
     });
 
     let currentOpenCreateReservationDialog: {
@@ -131,13 +137,22 @@ export default function useFloorsPageEvent(
     }
 
     function tableClickHandler(floor: Floor, element: FloorEditorElement | undefined) {
-        if (!isTable(element)) return;
+        if (!isTable(element)) {
+            return;
+        }
+
         const { reservation } = element;
+
         if (reservation) {
             showReservation(floor, reservation, element);
-        } else {
-            showCreateReservationDialog(floor, element);
+            return;
         }
+
+        if (!canReserve.value) {
+            return;
+        }
+
+        showCreateReservationDialog(floor, element);
     }
 
     function showReservation(floor: Floor, reservation: Reservation, element: BaseTable) {
