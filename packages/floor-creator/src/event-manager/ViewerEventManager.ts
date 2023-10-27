@@ -1,47 +1,46 @@
 import { EventManager } from "./EventManager";
-import { fabric } from "fabric";
-import { isTable } from "../type-guards";
 import { BaseTable } from "../types";
+import { isTable } from "../type-guards";
+import { fabric } from "fabric";
 
 export class ViewerEventManager extends EventManager {
     private startElement: BaseTable | null = null;
-    hasMouseMoved: boolean = false;
+    private isPanning: boolean = false;
+
+    dragOccurred: boolean = false;
 
     initializeCanvasEventHandlers() {
         super.initializeCanvasEventHandlers();
 
-        this.floor.canvas.on("mouse:up", this.onViewerMouseUp);
-        this.floor.canvas.on("mouse:down", this.onViewerMouseDown);
-        this.floor.canvas.on("mouse:move", this.onViewerMouseMove);
+        this.floor.canvas.on("mouse:down", this.onTableTouchStart);
+        this.floor.canvas.on("mouse:up", this.onTableTouchEnd);
     }
 
-    onViewerMouseMove = () => {
-        this.hasMouseMoved = true;
-    };
-
-    onViewerMouseDown = (opt: fabric.IEvent<MouseEvent>) => {
-        this.hasMouseMoved = false;
-
-        if (isTable(opt.target)) {
-            this.startElement = opt.target;
+    onTableTouchStart = (options: fabric.IEvent) => {
+        const target = options.target;
+        if (isTable(target)) {
+            this.startElement = target as BaseTable;
+            this.isPanning = true;
         }
     };
 
-    private onViewerMouseUp = (opt: fabric.IEvent<MouseEvent>) => {
-        if (this.startElement) {
-            const endElement = this.floor.canvas
-                .getObjects()
-                .find(
-                    (obj) =>
-                        obj.containsPoint(new fabric.Point(opt.e.offsetX, opt.e.offsetY)) &&
-                        obj !== this.startElement,
-                );
+    onTableTouchEnd = (options: fabric.IEvent) => {
+        if (this.isPanning && this.startElement) {
+            const pointer = this.floor.canvas.getPointer(options.e);
+            const endElement = this.floor.canvas.findTarget(
+                new MouseEvent("mousemove", {
+                    clientX: pointer.x,
+                    clientY: pointer.y,
+                }),
+                false,
+            );
 
-            if (isTable(endElement)) {
-                this.floor.tableToTableHandler?.(this.startElement, endElement);
+            if (isTable(endElement) && endElement !== this.startElement) {
+                this.floor.tableToTableHandler?.(this.startElement, endElement as BaseTable);
+                this.dragOccurred = true;
             }
-
-            this.startElement = null; // reset after use
         }
+        this.startElement = null; // reset after use
+        this.isPanning = false;
     };
 }

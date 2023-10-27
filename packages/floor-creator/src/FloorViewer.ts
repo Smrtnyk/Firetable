@@ -17,14 +17,14 @@ export class FloorViewer extends Floor {
     }
 
     protected onElementClick = (ev: fabric.IEvent<MouseEvent>) => {
-        // Check if there was a move operation. If there was, just return.
-        if (this.eventManager.hasMouseMoved) return;
-
+        if (this.eventManager.dragOccurred) {
+            this.eventManager.dragOccurred = false; // Reset the flag
+            return; // Exit early if a drag operation occurred
+        }
         this.elementClickHandler(this, ev.target as FloorEditorElement);
     };
 
     initializeCanvasEventHandlers() {
-        // Put all the event logic for the viewer here
         this.eventManager?.initializeCanvasEventHandlers();
     }
 
