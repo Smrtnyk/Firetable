@@ -53,7 +53,7 @@ export class TouchManager {
 
     private onDoubleTap = (ev: HammerInput) => {
         const { x, y } = this.extractEventCoordinates(ev);
-        this.floor.dblClickHandler?.(this.floor, [x, y]);
+        this.floor.onFloorDoubleTap([x, y]);
     };
 
     private extractEventCoordinates(ev: HammerInput): { x: number; y: number } {

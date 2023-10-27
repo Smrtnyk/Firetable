@@ -10,6 +10,7 @@ import { Loading, useQuasar } from "quasar";
 import { BULK_ADD_COLLECTION, ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
 import {
     extractAllTablesLabels,
+    Floor,
     FloorEditor,
     FloorEditorElement,
     FloorMode,
@@ -169,7 +170,7 @@ function dblClickHandler(floor: FloorEditor, coords: NumberTuple) {
     q.bottomSheet(addNewElementsBottomSheetOptions).onOk(handleAddNewElement(floor, coords));
 }
 
-async function elementClickHandler(_: FloorEditor, element: FloorEditorElement | undefined) {
+async function elementClickHandler(_: Floor, element: FloorEditorElement | undefined) {
     selectedElement.value = undefined;
     await nextTick();
     selectedElement.value = element;

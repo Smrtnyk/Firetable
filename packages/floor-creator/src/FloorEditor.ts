@@ -1,6 +1,11 @@
 import { Floor } from "./Floor";
 import { fabric } from "fabric";
-import { CreateElementOptions, FloorCreationOptions, FloorEditorElement } from "./types";
+import {
+    CreateElementOptions,
+    FloorEditorCreationOptions,
+    FloorEditorDoubleClickHandler,
+    FloorEditorElement,
+} from "./types";
 import { EventManager } from "./event-manager/EventManager";
 import { ElementManager } from "./ElementManager";
 import { FloorDoc } from "@firetable/types";
@@ -12,13 +17,21 @@ export class FloorEditor extends Floor {
     private elementManager: ElementManager;
     private gridDrawer: GridDrawer;
 
-    constructor(options: FloorCreationOptions) {
+    private readonly dblClickHandler?: FloorEditorDoubleClickHandler;
+
+    constructor(options: FloorEditorCreationOptions) {
         super(options);
+
+        this.dblClickHandler = options.dblClickHandler;
         this.gridDrawer = new GridDrawer(this.canvas);
         this.eventManager = new EditorEventManager(this);
         this.elementManager = new ElementManager();
         this.initializeCanvasEventHandlers();
         this.renderGrid();
+    }
+
+    onFloorDoubleTap(coordinates: [x: number, y: number]) {
+        this.dblClickHandler?.(this, coordinates);
     }
 
     protected onElementClick = (ev: fabric.IEvent<MouseEvent>) => {

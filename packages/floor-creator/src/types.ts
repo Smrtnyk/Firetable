@@ -6,18 +6,22 @@ import { Sofa } from "./elements/Sofa";
 import { DJBooth } from "./elements/DJBooth";
 import { SingleSofa } from "./elements/SingleSofa";
 import { Stage } from "./elements/Stage";
+import type { FloorEditor } from "./FloorEditor";
+
+export interface FloorEditorCreationOptions extends FloorCreationOptions {
+    dblClickHandler?: FloorEditorDoubleClickHandler;
+}
 
 export interface FloorCreationOptions {
     canvas: HTMLCanvasElement;
     floorDoc: FloorDoc;
     mode: FloorMode;
-    dblClickHandler?: FloorDoubleClickHandler;
     elementClickHandler: ElementClickHandler;
     tableToTableHandler?: TableToTableHandler;
     containerWidth: number;
 }
 
-export type FloorDoubleClickHandler = (floor: Floor, coords: NumberTuple) => void;
+export type FloorEditorDoubleClickHandler = (floor: FloorEditor, coords: NumberTuple) => void;
 export type ElementClickHandler = (floor: Floor, el: FloorEditorElement | undefined) => void;
 export type TableToTableHandler = (table1: BaseTable, table2: BaseTable) => void;
 export type BaseTable = RectTable | RoundTable;

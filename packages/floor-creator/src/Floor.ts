@@ -4,7 +4,6 @@ import {
     BaseTable,
     ElementClickHandler,
     FloorCreationOptions,
-    FloorDoubleClickHandler,
     FloorMode,
     TableToTableHandler,
 } from "./types.js";
@@ -24,7 +23,6 @@ export abstract class Floor {
     height: number;
     readonly floorDoc: FloorDoc;
     readonly canvas: fabric.Canvas;
-    readonly dblClickHandler?: FloorDoubleClickHandler;
     readonly elementClickHandler: ElementClickHandler;
     readonly tableToTableHandler?: TableToTableHandler;
     width: number;
@@ -34,19 +32,13 @@ export abstract class Floor {
     protected abstract eventManager: EventManager;
 
     protected abstract initializeCanvasEventHandlers(): void;
+    abstract onFloorDoubleTap(coordinates: [x: number, y: number]): void;
     protected abstract onElementClick(ev: fabric.IEvent<MouseEvent>): void;
     protected abstract setElementProperties(element: fabric.Object): void;
 
     constructor(options: FloorCreationOptions) {
-        const {
-            canvas,
-            floorDoc,
-            dblClickHandler,
-            elementClickHandler,
-            mode,
-            containerWidth,
-            tableToTableHandler,
-        } = options;
+        const { canvas, floorDoc, elementClickHandler, mode, containerWidth, tableToTableHandler } =
+            options;
 
         this.scale = calculateCanvasScale(containerWidth, floorDoc.width);
         this.id = floorDoc.id;
@@ -54,7 +46,6 @@ export abstract class Floor {
         this.width = floorDoc.width;
         this.height = floorDoc.height;
         this.floorDoc = floorDoc;
-        this.dblClickHandler = dblClickHandler;
         this.elementClickHandler = elementClickHandler;
         this.tableToTableHandler = tableToTableHandler;
 

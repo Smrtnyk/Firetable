@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { nextTick, ref, shallowRef, watch } from "vue";
 import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
-import { FloorEditor, FloorEditorElement, FloorMode } from "@firetable/floor-creator";
+import { Floor, FloorEditor, FloorEditorElement, FloorMode } from "@firetable/floor-creator";
 import { FloorDoc } from "@firetable/types";
 
 interface Props {
@@ -41,7 +41,7 @@ function saveFloorState(): void {
 }
 
 async function onElementClick(
-    floor: FloorEditor,
+    floor: Floor,
     element: FloorEditorElement | undefined,
 ): Promise<void> {
     selectedFloorElement.value = undefined;

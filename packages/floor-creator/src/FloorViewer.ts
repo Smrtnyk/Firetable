@@ -12,6 +12,10 @@ export class FloorViewer extends Floor {
         this.initializeCanvasEventHandlers();
     }
 
+    onFloorDoubleTap() {
+        /* empty for now */
+    }
+
     protected onElementClick = (ev: fabric.IEvent<MouseEvent>) => {
         // Check if there was a move operation. If there was, just return.
         if (this.eventManager.hasMouseMoved) return;

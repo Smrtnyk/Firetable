@@ -9,6 +9,7 @@ import {
     getReservedTables,
     getTables,
     isTable,
+    Floor,
 } from "@firetable/floor-creator";
 import FTDialog from "components/FTDialog.vue";
 import EventShowReservation from "components/Event/EventShowReservation.vue";
@@ -137,7 +138,7 @@ export default function useFloorsPageEvent(
         }
     }
 
-    function tableClickHandler(floor: FloorViewer, element: FloorEditorElement | undefined) {
+    function tableClickHandler(floor: Floor, element: FloorEditorElement | undefined) {
         if (!isTable(element)) {
             return;
         }
@@ -156,7 +157,7 @@ export default function useFloorsPageEvent(
         showCreateReservationDialog(floor, element);
     }
 
-    function showReservation(floor: FloorViewer, reservation: Reservation, element: BaseTable) {
+    function showReservation(floor: Floor, reservation: Reservation, element: BaseTable) {
         q.dialog({
             component: FTDialog,
             componentProps: {
@@ -176,7 +177,7 @@ export default function useFloorsPageEvent(
         });
     }
 
-    function onReservationConfirm(floor: FloorViewer, element: BaseTable) {
+    function onReservationConfirm(floor: Floor, element: BaseTable) {
         return function (val: boolean) {
             const { reservation } = element;
             if (!reservation) return;
@@ -196,7 +197,7 @@ export default function useFloorsPageEvent(
         };
     }
 
-    function showCreateReservationDialog(floor: FloorViewer, element: BaseTable) {
+    function showCreateReservationDialog(floor: Floor, element: BaseTable) {
         const { label } = element;
         const dialog = q
             .dialog({
@@ -232,7 +233,7 @@ export default function useFloorsPageEvent(
         currentOpenCreateReservationDialog = null;
     }
 
-    async function onDeleteReservation(floor: FloorViewer, element: BaseTable) {
+    async function onDeleteReservation(floor: Floor, element: BaseTable) {
         if (!(await showConfirm("Delete reservation?")) || !element.reservation) return;
 
         const { groupedWith } = element.reservation;
@@ -249,10 +250,7 @@ export default function useFloorsPageEvent(
         });
     }
 
-    function handleReservationCreation(
-        floor: FloorViewer,
-        reservationData: CreateReservationPayload,
-    ) {
+    function handleReservationCreation(floor: Floor, reservationData: CreateReservationPayload) {
         if (!currentUser.value) return;
 
         const { groupedWith } = reservationData;
