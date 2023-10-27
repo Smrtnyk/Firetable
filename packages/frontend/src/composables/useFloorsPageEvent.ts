@@ -214,6 +214,7 @@ export default function useFloorsPageEvent(
                         create: (reservationData: CreateReservationPayload) => {
                             resetCurrentOpenCreateReservationDialog();
                             handleReservationCreation(floor, reservationData, element);
+                            dialog.hide();
                         },
                     },
                 },

@@ -31,7 +31,7 @@ async function onOKClick() {
 
 <template>
     <q-card-section>
-        <q-form ref="reservationForm" class="q-gutter-md">
+        <q-form ref="reservationForm" class="q-gutter-md q-pt-md q-pa-md">
             <q-input
                 v-model="state.guestName"
                 rounded
@@ -73,13 +73,11 @@ async function onOKClick() {
             />
 
             <q-input v-model="state.reservationNote" rounded standout label="Note" />
-            <q-separator dark inset />
+
             <q-btn
                 rounded
                 size="md"
                 class="button-gradient"
-                icon="save"
-                v-close-popup
                 @click="onOKClick"
                 :label="t(`EventCreateReservation.reservationCreateBtn`)"
             />
