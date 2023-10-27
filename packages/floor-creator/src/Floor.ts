@@ -13,7 +13,6 @@ import { FloorDoc, Reservation } from "@firetable/types";
 import { RoundTable } from "./elements/RoundTable";
 import { RectTable } from "./elements/RectTable";
 import { TouchManager } from "./TouchManager";
-import { GridDrawer } from "./GridDrawer";
 import { FloorZoomManager } from "./FloorZoomManager";
 import { EventManager } from "./EventManager.js";
 
@@ -35,7 +34,6 @@ export abstract class Floor {
     readonly initialScale: number;
     private readonly initialViewportTransform: number[];
     touchManager: TouchManager;
-    protected gridDrawer: GridDrawer;
     zoomManager: FloorZoomManager;
     protected abstract eventManager: EventManager;
 
@@ -71,7 +69,6 @@ export abstract class Floor {
             interactive: this.isInEditorMode,
             selection: false,
         });
-        this.gridDrawer = new GridDrawer(this.canvas);
         this.renderData(this.floorDoc.json);
         this.canvas.renderAll();
         this.initialScale = this.canvas.getZoom();
@@ -120,7 +117,6 @@ export abstract class Floor {
 
     renderData(jsonData?: FloorDoc["json"]) {
         this.setScaling();
-        if (!jsonData) return this.renderEmptyFloor();
         this.canvas.loadFromJSON(
             jsonData,
             () => {
@@ -128,13 +124,6 @@ export abstract class Floor {
             },
             this.elementReviver,
         );
-    }
-
-    renderEmptyFloor() {
-        if (this.mode === FloorMode.EDITOR) {
-            this.canvas.renderAll();
-            this.gridDrawer.drawGrid(this.width, this.height);
-        }
     }
 
     setReservationOnTable(element: BaseTable, reservation: Reservation | null) {

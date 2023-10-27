@@ -4,21 +4,28 @@ import { CreateElementOptions, FloorCreationOptions } from "./types";
 import { EventManager } from "./EventManager";
 import { ElementManager } from "./ElementManager";
 import { FloorDoc } from "@firetable/types";
+import { GridDrawer } from "./GridDrawer";
 
 export class FloorEditor extends Floor {
     protected eventManager: EventManager;
     private elementManager: ElementManager;
+    private gridDrawer: GridDrawer;
 
     constructor(options: FloorCreationOptions) {
         super(options);
+        this.gridDrawer = new GridDrawer(this.canvas);
         this.eventManager = new EventManager(this);
         this.elementManager = new ElementManager();
         this.initializeCanvasEventHandlers();
+        this.renderGrid();
+    }
+
+    renderGrid() {
+        this.gridDrawer.drawGrid(this.width, this.height);
     }
 
     renderData(jsonData?: FloorDoc["json"]) {
         super.renderData(jsonData);
-        this.gridDrawer.drawGrid(this.width, this.height);
     }
 
     initializeCanvasEventHandlers() {
