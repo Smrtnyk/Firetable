@@ -3,7 +3,7 @@ import { computed, ref } from "vue";
 import { Role, User, PropertyDoc, CreateUserPayload, OrganisationDoc } from "@firetable/types";
 import { QForm } from "quasar";
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import { noWhiteSpaces } from "src/helpers/form-rules";
+import { noEmptyString, noWhiteSpaces } from "src/helpers/form-rules";
 
 interface Props {
     user: User;
@@ -14,6 +14,7 @@ interface Props {
 
 type Emits = (event: "submit", payload: Partial<User>) => void;
 
+const nameRules = [noEmptyString()];
 const stringRules = [noWhiteSpaces];
 const userNameRules = [noWhiteSpaces];
 
@@ -87,7 +88,7 @@ function resetProperties() {
                 label="Name *"
                 hint="Name of the person, e.g. Max Mustermann"
                 lazy-rules
-                :rules="stringRules"
+                :rules="nameRules"
             />
 
             <q-input
