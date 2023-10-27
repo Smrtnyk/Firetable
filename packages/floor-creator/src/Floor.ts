@@ -121,13 +121,9 @@ export abstract class Floor {
     renderData(jsonData?: FloorDoc["json"]) {
         this.setScaling();
         if (!jsonData) return this.renderEmptyFloor();
-
         this.canvas.loadFromJSON(
             jsonData,
             () => {
-                if (this.mode === FloorMode.EDITOR) {
-                    this.gridDrawer.drawGrid(this.width, this.height);
-                }
                 this.canvas.renderAll();
             },
             this.elementReviver,

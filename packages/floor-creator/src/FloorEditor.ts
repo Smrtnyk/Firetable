@@ -3,6 +3,7 @@ import { fabric } from "fabric";
 import { CreateElementOptions, FloorCreationOptions } from "./types";
 import { EventManager } from "./EventManager";
 import { ElementManager } from "./ElementManager";
+import { FloorDoc } from "@firetable/types";
 
 export class FloorEditor extends Floor {
     protected eventManager: EventManager;
@@ -13,6 +14,11 @@ export class FloorEditor extends Floor {
         this.eventManager = new EventManager(this);
         this.elementManager = new ElementManager();
         this.initializeCanvasEventHandlers();
+    }
+
+    renderData(jsonData?: FloorDoc["json"]) {
+        super.renderData(jsonData);
+        this.gridDrawer.drawGrid(this.width, this.height);
     }
 
     initializeCanvasEventHandlers() {
