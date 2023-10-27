@@ -23,7 +23,7 @@ export interface FloorCreationOptions {
 
 export type FloorEditorDoubleClickHandler = (floor: FloorEditor, coords: NumberTuple) => void;
 export type ElementClickHandler = (floor: Floor, el: FloorEditorElement | undefined) => void;
-export type TableToTableHandler = (table1: BaseTable, table2: BaseTable) => void;
+export type TableToTableHandler = (floor: Floor, table1: BaseTable, table2: BaseTable) => void;
 export type BaseTable = RectTable | RoundTable;
 export type FloorEditorElement = RectTable | RoundTable | Sofa | DJBooth | SingleSofa | Stage;
 export type CreateElementOptions = {

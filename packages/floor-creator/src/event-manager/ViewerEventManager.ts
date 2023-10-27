@@ -36,7 +36,11 @@ export class ViewerEventManager extends EventManager {
             );
 
             if (isTable(endElement) && endElement !== this.startElement) {
-                this.floor.tableToTableHandler?.(this.startElement, endElement as BaseTable);
+                this.floor.tableToTableHandler?.(
+                    this.floor,
+                    this.startElement,
+                    endElement as BaseTable,
+                );
                 this.dragOccurred = true;
             }
         }
