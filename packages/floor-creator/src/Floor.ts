@@ -7,6 +7,7 @@ import {
     FloorDoubleClickHandler,
     FloorEditorElement,
     FloorMode,
+    TableToTableHandler,
 } from "./types.js";
 import { FloorDoc, Reservation } from "@firetable/types";
 import { RoundTable } from "./elements/RoundTable";
@@ -23,6 +24,7 @@ interface FloorCreationOptions {
     mode: FloorMode;
     dblClickHandler?: FloorDoubleClickHandler;
     elementClickHandler: ElementClickHandler;
+    tableToTableHandler?: TableToTableHandler;
     containerWidth: number;
 }
 
@@ -38,6 +40,7 @@ export class Floor {
     readonly canvas: fabric.Canvas;
     readonly dblClickHandler?: FloorDoubleClickHandler;
     readonly elementClickHandler: ElementClickHandler;
+    readonly tableToTableHandler?: TableToTableHandler;
     mode: FloorMode;
     width: number;
     readonly initialScale: number;
@@ -49,8 +52,15 @@ export class Floor {
     eventManager: EventManager;
 
     constructor(options: FloorCreationOptions) {
-        const { canvas, floorDoc, dblClickHandler, elementClickHandler, mode, containerWidth } =
-            options;
+        const {
+            canvas,
+            floorDoc,
+            dblClickHandler,
+            elementClickHandler,
+            mode,
+            containerWidth,
+            tableToTableHandler,
+        } = options;
 
         this.scale = calculateCanvasScale(containerWidth, floorDoc.width);
         this.id = floorDoc.id;
@@ -62,6 +72,7 @@ export class Floor {
         this.mode = mode;
         this.dblClickHandler = dblClickHandler;
         this.elementClickHandler = elementClickHandler;
+        this.tableToTableHandler = tableToTableHandler;
 
         this.canvas = new fabric.Canvas(canvas, {
             width: this.width,
@@ -118,7 +129,7 @@ export class Floor {
         element.lockScalingFlip = true;
     }
 
-    private get isInEditorMode(): boolean {
+    get isInEditorMode(): boolean {
         return this.mode === FloorMode.EDITOR;
     }
 
@@ -127,6 +138,9 @@ export class Floor {
     };
 
     onElementClick = (ev: fabric.IEvent<MouseEvent>) => {
+        // Check if there was a move operation. If there was, just return.
+        if (this.eventManager.hasMouseMoved) return;
+
         this.elementClickHandler(this, ev.target as FloorEditorElement);
     };
 

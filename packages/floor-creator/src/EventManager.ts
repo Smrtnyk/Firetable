@@ -1,9 +1,13 @@
 import { fabric } from "fabric";
 import { Floor } from "./Floor";
 import { RESOLUTION } from "./constants";
+import { BaseTable, FloorMode } from "./types";
+import { isTable } from "./type-guards";
 
 export class EventManager {
     private readonly floor: Floor;
+    private startElement: BaseTable | null = null;
+    hasMouseMoved: boolean = false;
 
     constructor(floor: Floor) {
         this.floor = floor;
@@ -13,12 +17,49 @@ export class EventManager {
         this.floor.canvas.on("mouse:wheel", this.onMouseWheelHandler);
         this.floor.canvas.on("object:modified", this.snapToGridOnModify);
         this.floor.canvas.on("mouse:up", this.onMouseUp);
+
+        if (this.floor.mode === FloorMode.LIVE) {
+            this.floor.canvas.on("mouse:down", this.onMouseDownHandler);
+            this.floor.canvas.on("mouse:move", this.onMouseMoveHandler);
+        }
     }
 
-    onMouseUp = () => {
-        const hasActiveElement = this.floor.canvas.getActiveObject();
-        if (!hasActiveElement) {
-            this.floor.elementClickHandler(this.floor, void 0);
+    onMouseMoveHandler = () => {
+        this.hasMouseMoved = true;
+    };
+
+    onMouseDownHandler = (opt: fabric.IEvent<MouseEvent>) => {
+        if (this.floor.isInEditorMode) return;
+
+        this.hasMouseMoved = false;
+
+        if (isTable(opt.target)) {
+            this.startElement = opt.target;
+        }
+    };
+
+    onMouseUp = (opt: fabric.IEvent<MouseEvent>) => {
+        if (this.floor.isInEditorMode) {
+            // Your existing logic for editor mode here ...
+            const hasActiveElement = this.floor.canvas.getActiveObject();
+            if (!hasActiveElement) {
+                this.floor.elementClickHandler(this.floor, void 0);
+            }
+        } else if (this.startElement) {
+            // Logic for live mode
+            const endElement = this.floor.canvas
+                .getObjects()
+                .find(
+                    (obj) =>
+                        obj.containsPoint(new fabric.Point(opt.e.offsetX, opt.e.offsetY)) &&
+                        obj !== this.startElement,
+                );
+
+            if (isTable(endElement)) {
+                this.floor.tableToTableHandler?.(this.startElement, endElement);
+            }
+
+            this.startElement = null; // reset after use
         }
     };
 

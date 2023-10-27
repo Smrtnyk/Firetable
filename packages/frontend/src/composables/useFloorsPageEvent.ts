@@ -122,6 +122,7 @@ export default function useFloorsPageEvent(
                 elementClickHandler: tableClickHandler,
                 mode: FloorMode.LIVE,
                 containerWidth: pageRef.value.clientWidth,
+                tableToTableHandler: swapOrTransferReservations,
             }),
         );
     }
@@ -299,6 +300,16 @@ export default function useFloorsPageEvent(
             tables.forEach((table) => table.stopAnimation());
             floor.canvas.renderAll();
         });
+    }
+
+    async function swapOrTransferReservations(table1: BaseTable, table2: BaseTable) {
+        if (!table1.reservation) {
+            return;
+        }
+        const transferMessage = `This will transfer reservation from table ${table1.label} to table ${table2.label}`;
+        const shouldTransfer = await showConfirm("Transfer reservation", transferMessage);
+        console.log(shouldTransfer);
+        console.log(table1.reservation, table2.reservation);
     }
 
     return {
