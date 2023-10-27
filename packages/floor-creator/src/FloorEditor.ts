@@ -50,4 +50,14 @@ export class FloorEditor extends Floor {
     toggleGridVisibility = () => {
         this.gridDrawer.toggleGridVisibility(this.width, this.height);
     };
+
+    updateDimensions(newWidth: number, newHeight: number) {
+        this.width = newWidth;
+        this.height = newHeight;
+        this.renderData(this.floorDoc.json);
+    }
+
+    setFloorName(newName: string) {
+        this.name = newName;
+    }
 }

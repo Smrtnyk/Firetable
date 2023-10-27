@@ -111,10 +111,6 @@ export abstract class Floor {
         this.canvas.setHeight(this.height * this.canvas.getZoom());
     }
 
-    setFloorName(newName: string) {
-        this.name = newName;
-    }
-
     renderData(jsonData?: FloorDoc["json"]) {
         this.setScaling();
         this.canvas.loadFromJSON(
@@ -128,12 +124,6 @@ export abstract class Floor {
 
     setReservationOnTable(element: BaseTable, reservation: Reservation | null) {
         element.reservation = reservation;
-    }
-
-    updateDimensions(newWidth: number, newHeight: number) {
-        this.width = newWidth;
-        this.height = newHeight;
-        this.renderData(this.floorDoc.json);
     }
 }
 
