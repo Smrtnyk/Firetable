@@ -1,11 +1,21 @@
 import { Floor } from "./Floor.js";
 import { RectTable } from "./elements/RectTable.js";
 import { RoundTable } from "./elements/RoundTable.js";
-import { ElementTag } from "@firetable/types";
+import { ElementTag, FloorDoc } from "@firetable/types";
 import { Sofa } from "./elements/Sofa";
 import { DJBooth } from "./elements/DJBooth";
 import { SingleSofa } from "./elements/SingleSofa";
 import { Stage } from "./elements/Stage";
+
+export interface FloorCreationOptions {
+    canvas: HTMLCanvasElement;
+    floorDoc: FloorDoc;
+    mode: FloorMode;
+    dblClickHandler?: FloorDoubleClickHandler;
+    elementClickHandler: ElementClickHandler;
+    tableToTableHandler?: TableToTableHandler;
+    containerWidth: number;
+}
 
 export type FloorDoubleClickHandler = (floor: Floor, coords: NumberTuple) => void;
 export type ElementClickHandler = (floor: Floor, el: FloorEditorElement | undefined) => void;

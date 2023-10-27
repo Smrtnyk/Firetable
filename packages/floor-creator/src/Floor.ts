@@ -4,6 +4,7 @@ import {
     BaseTable,
     CreateElementOptions,
     ElementClickHandler,
+    FloorCreationOptions,
     FloorDoubleClickHandler,
     FloorEditorElement,
     FloorMode,
@@ -17,16 +18,6 @@ import { TouchManager } from "./TouchManager";
 import { GridDrawer } from "./GridDrawer";
 import { FloorZoomManager } from "./FloorZoomManager";
 import { EventManager } from "./EventManager.js";
-
-interface FloorCreationOptions {
-    canvas: HTMLCanvasElement;
-    floorDoc: FloorDoc;
-    mode: FloorMode;
-    dblClickHandler?: FloorDoubleClickHandler;
-    elementClickHandler: ElementClickHandler;
-    tableToTableHandler?: TableToTableHandler;
-    containerWidth: number;
-}
 
 Object.assign(fabric, { RectTable, RoundTable });
 
@@ -49,7 +40,9 @@ export abstract class Floor {
     touchManager: TouchManager;
     private gridDrawer: GridDrawer;
     zoomManager: FloorZoomManager;
-    eventManager: EventManager;
+    protected abstract eventManager: EventManager;
+
+    abstract initializeCanvasEventHandlers(): void;
 
     constructor(options: FloorCreationOptions) {
         const {
@@ -97,9 +90,6 @@ export abstract class Floor {
         );
 
         this.touchManager = new TouchManager(this);
-
-        this.eventManager = new EventManager(this);
-        this.eventManager.initializeCanvasEventHandlers();
     }
 
     get json() {
