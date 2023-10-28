@@ -1,5 +1,5 @@
-import { watch, reactive, computed, Ref, ref, nextTick } from "vue";
-import { CreateReservationPayload, FloorDoc, Reservation, Role } from "@firetable/types";
+import { watch, reactive, computed, Ref, ref, nextTick, onBeforeUnmount } from "vue";
+import { CreateReservationPayload, EventDoc, FloorDoc, Reservation, Role } from "@firetable/types";
 import {
     BaseTable,
     FloorViewer,
@@ -27,10 +27,13 @@ interface State {
     floorInstances: Set<FloorViewer>;
 }
 
+const HALF_HOUR = 30 * 60 * 1000; // 30 minutes in milliseconds
+
 export default function useFloorsPageEvent(
     eventFloors: Ref<FloorDoc[]>,
     pageRef: Ref<HTMLDivElement | undefined>,
     eventId: string,
+    event: Ref<EventDoc>,
 ) {
     const { t } = useI18n();
     const q = useQuasar();
@@ -42,6 +45,8 @@ export default function useFloorsPageEvent(
         floorInstances: new Set(),
         activeFloor: void 0,
     });
+    // check every 1 minute
+    const intervalID = setInterval(checkReservationsForTimeAndMarkTableIfNeeded, 60 * 1000);
 
     const allReservedTables = computed(() => {
         return Array.from(state.value.floorInstances).map(getReservedTables).flat();
@@ -88,12 +93,15 @@ export default function useFloorsPageEvent(
             if (!findFloor) return;
             floorInstance.renderData(findFloor.json);
         }
+
+        checkReservationsForTimeAndMarkTableIfNeeded();
     }
 
     async function initFloorInstancesData() {
         await nextTick();
         instantiateFloors();
         setActiveFloor([...state.value.floorInstances][0]);
+        checkReservationsForTimeAndMarkTableIfNeeded();
     }
 
     async function handleFloorInstancesData(newVal: FloorDoc[], old: FloorDoc[]) {
@@ -310,6 +318,44 @@ export default function useFloorsPageEvent(
             hook: () => updateEventFloorData(floor, eventId),
         });
     }
+
+    function checkReservationsForTimeAndMarkTableIfNeeded() {
+        if (!event.value?.date) {
+            return;
+        }
+
+        const baseEventDate = new Date(event.value.date);
+        const allReservedTables = Array.from(state.value.floorInstances).flatMap(getReservedTables);
+
+        if (!allReservedTables.length) {
+            return;
+        }
+
+        const currentDate = new Date();
+
+        for (const table of allReservedTables) {
+            // Only mark non-confirmed reservations
+            if (table.reservation?.confirmed) {
+                continue;
+            }
+            const [hours, minutes] = table.reservation!.time.split(":");
+            const eventDateTime = new Date(baseEventDate);
+            eventDateTime.setHours(parseInt(hours), parseInt(minutes));
+
+            // Check if time is 00:00 and adjust the date to the next day
+            if (hours === "00" && minutes === "00") {
+                eventDateTime.setDate(eventDateTime.getDate() + 1);
+            }
+
+            if (currentDate.getTime() - eventDateTime.getTime() >= HALF_HOUR) {
+                table.setBaseFill("red");
+            }
+        }
+    }
+
+    onBeforeUnmount(() => {
+        clearInterval(intervalID);
+    });
 
     return {
         allReservedTables,

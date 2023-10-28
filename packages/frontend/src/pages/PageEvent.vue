@@ -46,7 +46,7 @@ const {
     onAutocompleteClear,
     allReservedTables,
     useFloorsPageEventState,
-} = useFloorsPageEvent(eventFloors as any, pageRef, props.eventId);
+} = useFloorsPageEvent(eventFloors, pageRef, props.eventId, event);
 
 function showActiveStaff(): void {
     // todo: implement
