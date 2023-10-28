@@ -10,7 +10,10 @@ interface Props {
 
 const authStore = useAuthStore();
 const props = defineProps<Props>();
-const emit = defineEmits(["delete", "confirm"]);
+const emit = defineEmits<{
+    (e: "delete"): void;
+    (e: "confirm", confirmed: boolean): void;
+}>();
 const { t } = useI18n();
 const checked = ref<boolean>(props.reservation.confirmed);
 const confirmGuestSwitchDisabled = ref(false);
@@ -56,22 +59,6 @@ function onReservationConfirm() {
 
             <div class="col-6 font-black">
                 {{ props.reservation.reservedBy.email }}
-            </div>
-        </div>
-
-        <div class="row items-center" v-if="props.reservation.groupedWith?.length > 1">
-            <q-separator dark class="q-my-md col-12" />
-            <div class="col-6">{{ t("EventShowReservation.groupedWithLabel") }}</div>
-            <div class="col-6">
-                <q-chip
-                    v-for="table in props.reservation.groupedWith"
-                    :key="table"
-                    square
-                    class="bg-gradient"
-                    text-color="white"
-                >
-                    {{ table }}
-                </q-chip>
             </div>
         </div>
 
