@@ -25,6 +25,7 @@ import {
     useFirestoreDocument,
 } from "src/composables/useFirestore";
 import { isNumber } from "@firetable/utils";
+import { isMobile } from "src/global-reactives/is-mobile";
 
 type ElementDescriptor = {
     tag: ElementTag;
@@ -62,7 +63,7 @@ const bulkMode = ref(false);
 const bulkElement = ref<ElementTag | null>(null);
 const bulkLabelCounter = ref(0); // To auto-increment labels
 
-const buttonSize = computed(() => (q.screen.lt.sm ? "xs" : "md"));
+const buttonSize = computed(() => (isMobile ? "xs" : "md"));
 
 const {
     data: floor,

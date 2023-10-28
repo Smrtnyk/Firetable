@@ -47,6 +47,7 @@
                 :style="{ 'background-color': elementColor }"
                 @click="openColorPicker"
                 :size="buttonSize"
+                :dense="isMobile"
             >
                 <q-icon name="color-picker" class="cursor-pointer q-ma-none" />
                 <q-popup-proxy
@@ -88,7 +89,8 @@
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed, ref, watch, toRefs } from "vue";
 import { BaseTable, FloorEditorElement, isTable } from "@firetable/floor-creator";
-import { QPopupProxy, useQuasar } from "quasar";
+import { QPopupProxy } from "quasar";
+import { isMobile } from "src/global-reactives/is-mobile";
 
 interface Props {
     selectedFloorElement: FloorEditorElement | undefined;
@@ -96,8 +98,6 @@ interface Props {
     existingLabels: Set<string>;
 }
 
-const q = useQuasar();
-const isMobile = computed(() => q.screen.lt.sm);
 const buttonSize = computed(() => (isMobile.value ? "xs" : "md"));
 const colorPickerProxy = ref<QPopupProxy | null>(null);
 
