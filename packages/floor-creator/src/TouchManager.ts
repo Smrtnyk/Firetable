@@ -5,15 +5,8 @@ import { fabric } from "fabric";
 
 const VELOCITY_THRESHOLD = 0.01;
 const FRICTION_DECREMENT = 0.01;
-const BOUNCE_OFFSET = 20;
 const DAMPENING_FACTOR = 0.05;
-const PAN_DAMPENING_FACTOR = 0.3;
-
-function clampValueWithinRange(value: number, min: number, max: number): number {
-    if (value > max) return max;
-    if (value < min) return min;
-    return value;
-}
+const PAN_DAMPENING_FACTOR = 0.1;
 
 export class TouchManager {
     private readonly floor: Floor;
@@ -107,17 +100,36 @@ export class TouchManager {
 
     onPanMove = (e: HammerInput) => {
         const activeObject = this.floor.canvas.getActiveObject();
-
         // If an object is selected, don't pan the canvas
         if (activeObject) {
             return;
         }
 
+        const zoom = this.floor.canvas.getZoom();
+        const canvasWidth = this.floor.canvas.getWidth();
+        const canvasHeight = this.floor.canvas.getHeight();
+        const viewportWidth = this.floor.width * zoom;
+        const viewportHeight = this.floor.height * zoom;
+
+        const minX = canvasWidth - viewportWidth;
+        const minY = canvasHeight - viewportHeight;
+
         const deltaX = e.deltaX * PAN_DAMPENING_FACTOR;
         const deltaY = e.deltaY * PAN_DAMPENING_FACTOR;
 
-        const { newPosX, newPosY } = this.checkBoundaries(deltaX, deltaY);
-        this.setViewportTransform(newPosX, newPosY);
+        // Calculate the new x and y values after the pan
+        let newX =
+            (this.floor.canvas.viewportTransform ? this.floor.canvas.viewportTransform[4] : 0) +
+            deltaX;
+        let newY =
+            (this.floor.canvas.viewportTransform ? this.floor.canvas.viewportTransform[5] : 0) +
+            deltaY;
+
+        // Clamp the new x and y values to the boundaries
+        newX = Math.min(0, Math.max(minX, newX));
+        newY = Math.min(0, Math.max(minY, newY));
+
+        this.floor.canvas.setViewportTransform([zoom, 0, 0, zoom, newX, newY]);
         this.floor.canvas.requestRenderAll();
 
         // For momentum-based panning
@@ -165,28 +177,6 @@ export class TouchManager {
         } else {
             this.floor.canvas.requestRenderAll();
         }
-    }
-
-    checkBoundaries(deltaX: number, deltaY: number) {
-        let newPosX =
-            (this.floor.canvas.viewportTransform ? this.floor.canvas.viewportTransform[4] : 0) +
-            deltaX;
-        let newPosY =
-            (this.floor.canvas.viewportTransform ? this.floor.canvas.viewportTransform[5] : 0) +
-            deltaY;
-
-        newPosX = clampValueWithinRange(
-            newPosX,
-            -this.floor.width * this.floor.canvas.getZoom() + this.floor.canvas.getWidth(),
-            BOUNCE_OFFSET,
-        );
-        newPosY = clampValueWithinRange(
-            newPosY,
-            -this.floor.height * this.floor.canvas.getZoom() + this.floor.canvas.getHeight(),
-            BOUNCE_OFFSET,
-        );
-
-        return { newPosX, newPosY };
     }
 
     applyBoundaries(newPosX: number, newPosY: number): { x: number; y: number } {
