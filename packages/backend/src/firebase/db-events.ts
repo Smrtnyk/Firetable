@@ -28,13 +28,25 @@ export async function getEvents(
     countPerPage: number,
     propertyId: string,
 ): Promise<EventDoc[]> {
-    const orderByDateQuery = orderBy("date");
+    const orderByDateQuery = orderBy("date", "desc"); // Newest date first
     const limitQuery = limit(countPerPage);
-    const startAfterQuery = startAfter(lastDocument);
     const propertyIdQuery = where("propertyId", "==", propertyId);
-    const eventsDocs = await getDocs(
-        query(eventsCollection(), propertyIdQuery, orderByDateQuery, limitQuery, startAfterQuery),
-    );
+
+    let finalQuery;
+    if (lastDocument) {
+        const startAfterQuery = startAfter(lastDocument);
+        finalQuery = query(
+            eventsCollection(),
+            propertyIdQuery,
+            orderByDateQuery,
+            limitQuery,
+            startAfterQuery,
+        );
+    } else {
+        finalQuery = query(eventsCollection(), propertyIdQuery, orderByDateQuery, limitQuery);
+    }
+
+    const eventsDocs = await getDocs(finalQuery);
 
     return eventsDocs.docs.map(toEventDoc);
 }
