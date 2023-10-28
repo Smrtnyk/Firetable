@@ -60,6 +60,7 @@ export default {
         guestArrivedLabel: "Ist der Gast angekommen?",
         deleteReservationLabel: "Reservierung löschen",
         reservationConsumption: "Consumption",
+        timeLabel: "Time",
     },
     EventCreateReservation: {
         title: "Tisch",
@@ -71,6 +72,7 @@ export default {
         reservationNote: "Notiz",
         reservationCreateBtn: "Absenden",
         reservationConsumption: "Consumption",
+        reservationTime: "Time",
     },
     PageAdminProperties: {
         properties: "Immobilien",

@@ -31,11 +31,16 @@ function onReservationConfirm() {
     <q-card-section>
         <div class="row">
             <div class="col-6">{{ t("EventShowReservation.guestNameLabel") }}</div>
-
             <div class="col-6 font-black">{{ props.reservation.guestName }}</div>
 
-            <div class="col-6">{{ t("EventShowReservation.numberOfPeopleLabel") }}</div>
+            <template v-if="props.reservation.time">
+                <div class="col-6 font-black">{{ t("EventShowReservation.timeLabel") }}</div>
+                <div class="col-6 font-black">
+                    {{ props.reservation.time }}
+                </div>
+            </template>
 
+            <div class="col-6">{{ t("EventShowReservation.numberOfPeopleLabel") }}</div>
             <div class="col-6 font-black">
                 {{ props.reservation.numberOfGuests }}
             </div>
