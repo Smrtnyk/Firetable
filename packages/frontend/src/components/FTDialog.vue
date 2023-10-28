@@ -1,5 +1,5 @@
 <template>
-    <q-dialog ref="dialogRef" :maximized="props.maximized" persistent>
+    <q-dialog ref="dialogRef" :maximized="isMobile" persistent>
         <q-card
             class="q-pt-none"
             :class="{
@@ -27,6 +27,7 @@
 <script setup lang="ts">
 import { useDialogPluginComponent } from "quasar";
 import { ComponentPublicInstance } from "vue";
+import { isMobile } from "src/global-reactives/is-mobile";
 
 interface Props {
     component: ComponentPublicInstance;

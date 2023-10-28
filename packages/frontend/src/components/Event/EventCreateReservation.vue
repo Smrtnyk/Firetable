@@ -31,7 +31,7 @@ async function onOKClick() {
 
 <template>
     <q-card-section>
-        <q-form ref="reservationForm" class="q-gutter-md q-pt-md q-pa-md">
+        <q-form ref="reservationForm" class="q-gutter-md q-pt-md">
             <q-input
                 v-model="state.guestName"
                 rounded
