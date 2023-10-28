@@ -14,6 +14,28 @@ interface Props {
 const props = defineProps<Props>();
 const events = computed(() => [...props.eventsByProperty[props.propertyId]]);
 const eventsLength = computed(() => events.value.length);
+const bucketizedEvents = computed(() => {
+    const eventsArr = [...props.eventsByProperty[props.propertyId]];
+    let bucketized = new Map<string, Map<string, EventDoc[]>>();
+
+    for (let event of eventsArr) {
+        const date = new Date(event.date);
+        const year = date.getFullYear().toString();
+        const month = date.toLocaleString("default", { month: "long" }); // Gets full month name.
+
+        if (!bucketized.has(year)) {
+            bucketized.set(year, new Map());
+        }
+
+        if (!bucketized.get(year)!.has(month)) {
+            bucketized.get(year)!.set(month, []);
+        }
+
+        bucketized.get(year)!.get(month)!.push(event);
+    }
+
+    return bucketized;
+});
 
 function handleLoad() {
     props.onLoad(props.propertyId);
@@ -30,12 +52,20 @@ function handleLoad() {
             </div>
         </template>
         <template v-else>
-            <PageAdminEventsListItem
-                v-for="event in events"
-                :key="event.id"
-                :event="event"
-                @right="onEventItemSlideRight"
-            />
+            <div v-for="[year, yearBuckets] in [...bucketizedEvents.entries()]" :key="year">
+                <p>{{ year }}</p>
+
+                <div v-for="[month, monthEvents] in [...yearBuckets.entries()]" :key="month">
+                    <p>{{ month }}</p>
+
+                    <PageAdminEventsListItem
+                        v-for="event in monthEvents"
+                        :key="event.id"
+                        :event="event"
+                        @right="props.onEventItemSlideRight"
+                    />
+                </div>
+            </div>
 
             <!-- Load More Button -->
             <div class="row justify-center q-my-md">
