@@ -62,7 +62,7 @@ const confirmGuest = withLoading(function ({ id, confirmed }: GuestData, reset: 
 });
 
 function showAddNewGuestForm(): void {
-    quasar.dialog({
+    const dialog = quasar.dialog({
         component: FTDialog,
         componentProps: {
             title: t("EventGuestList.addGuestLabel"),
@@ -70,7 +70,10 @@ function showAddNewGuestForm(): void {
             maximized: false,
             componentPropsObject: {},
             listeners: {
-                create: onCreate,
+                create: (newGuestData: GuestData) => {
+                    onCreate(newGuestData);
+                    dialog.hide();
+                },
             },
         },
     });

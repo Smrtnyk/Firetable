@@ -2,12 +2,17 @@
 import { ref } from "vue";
 import { minLength } from "src/helpers/form-rules";
 import { useI18n } from "vue-i18n";
+import { QForm } from "quasar";
 
 const { t } = useI18n();
 const emit = defineEmits(["create"]);
+const form = ref<QForm>();
 const guestName = ref("");
 
 function onSubmit() {
+    if (!form.value?.validate()) {
+        return;
+    }
     emit("create", {
         confirmed: false,
         confirmedTime: null,
@@ -21,7 +26,7 @@ function onReset() {
 </script>
 
 <template>
-    <q-form class="q-gutter-md q-pt-md q-pa-md" @submit="onSubmit" @reset="onReset">
+    <q-form ref="form" class="q-gutter-md q-pt-md q-pa-md" @submit="onSubmit" @reset="onReset">
         <q-input
             v-model="guestName"
             standout
@@ -39,7 +44,6 @@ function onReset() {
                 :label="t('EventGuestListCreateGuestForm.guestNameAddSubmit')"
                 type="submit"
                 class="button-gradient"
-                v-close-popup
             />
             <q-btn
                 rounded
