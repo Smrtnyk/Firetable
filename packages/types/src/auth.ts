@@ -7,18 +7,12 @@ export enum Role {
     HOSTESS = "Hostess",
 }
 
-export const enum ACTIVITY_STATUS {
-    OFFLINE = 0,
-    ONLINE = 1,
-}
-
 export interface User {
     id: string;
     name: string;
     email: string;
     username: string;
     role: Role | typeof ADMIN;
-    status: ACTIVITY_STATUS;
     relatedProperties: string[];
     organisationId: string;
 }

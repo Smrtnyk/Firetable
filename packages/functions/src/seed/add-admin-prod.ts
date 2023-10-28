@@ -1,4 +1,4 @@
-import { ACTIVITY_STATUS, ADMIN, Collection } from "../../types/types.js";
+import { ADMIN, Collection } from "../../types/types.js";
 import { default as admin } from "firebase-admin";
 import serviceAccount from "./service-account.json" assert { type: "json" };
 
@@ -28,7 +28,6 @@ const ADMIN_NAME = "Admin";
             email: ADMIN_MAIL,
             name: ADMIN_NAME,
             role: ADMIN,
-            status: ACTIVITY_STATUS.OFFLINE
         });
 
         process.exit();

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import {
-    ACTIVITY_STATUS,
     ADMIN,
     CreateUserPayload,
     OrganisationDoc,
@@ -67,7 +66,6 @@ function userSkeleton(user?: User): CreateUserPayload {
         email: "",
         password: "",
         role: Role.STAFF,
-        status: ACTIVITY_STATUS.OFFLINE,
         relatedProperties: [],
         organisationId: "",
         ...(user || {}),

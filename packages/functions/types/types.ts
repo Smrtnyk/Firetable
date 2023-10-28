@@ -17,12 +17,6 @@ export enum Role {
     HOSTESS = "Hostess",
 }
 
-// Copy, cannot be imported from types package
-export const enum ACTIVITY_STATUS {
-    OFFLINE = 0,
-    ONLINE = 1,
-}
-
 // Cannot import this because functions deploy
 export interface BaseTable {
     reservation: Record<string, any>;
@@ -36,7 +30,6 @@ export interface CreateUserPayload{
     email: string;
     username: string;
     role: Role;
-    status: ACTIVITY_STATUS;
     password: string;
     relatedProperties: string[];
     organisationId: string;
@@ -48,7 +41,6 @@ export interface User {
     email: string;
     username: string;
     role: Role | typeof ADMIN;
-    status: ACTIVITY_STATUS;
     relatedProperties: string[];
 }
 

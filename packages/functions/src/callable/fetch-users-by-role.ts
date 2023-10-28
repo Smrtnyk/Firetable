@@ -75,6 +75,7 @@ export async function fetchUsersByRoleFn(userIdsToFetch: string[], context: func
         [Role.PROPERTY_OWNER]: (user: User) => user.role !== ADMIN,
         [Role.MANAGER]: (user: User) => user.role !== ADMIN && user.role !== Role.PROPERTY_OWNER,
         [Role.STAFF]: (user: User) => user.role === Role.STAFF,
+        [Role.HOSTESS]: (user: User) => user.role === Role.HOSTESS,
         default: (user: User) => user.role === Role.STAFF,
     };
 

@@ -5,8 +5,8 @@ import { useI18n } from "vue-i18n";
 import { LocalStorage, useQuasar } from "quasar";
 import { useAuthStore } from "src/stores/auth-store";
 import { useAppStore } from "src/stores/app-store";
-import { logoutUser, updateUserField } from "@firetable/backend";
-import { showErrorMessage, withLoading } from "src/helpers/ui-helpers";
+import { logoutUser } from "@firetable/backend";
+import { withLoading } from "src/helpers/ui-helpers";
 import { ADMIN, Role, User } from "@firetable/types";
 
 const appStore = useAppStore();
@@ -74,12 +74,6 @@ function setDarkMode(newValue: boolean) {
     q.localStorage.set("FTDarkMode", newValue);
 }
 
-function toggleUserActivityStatus(newValue: boolean) {
-    if (!user.value) return;
-
-    updateUserField(user.value.id, "status", Number(newValue)).catch(showErrorMessage);
-}
-
 const onLogoutUser = withLoading(function () {
     return logoutUser().then(authStore.unsubscribeUserWatch);
 });
@@ -102,20 +96,11 @@ function setAppLanguage(val: string) {
         <q-list>
             <q-item header class="column items-center q-pt-xl q-pb-lg" v-if="user">
                 <q-avatar size="6rem" class="ft-avatar">
-                    <div
-                        :class="{
-                            green: user.status,
-                        }"
-                        class="status-dot"
-                    />
                     {{ avatar }}
                 </q-avatar>
                 <div class="q-mt-md text-center">
                     <div class="text-subtitle1">{{ user.name }}</div>
                     <div class="text-caption text-grey">{{ user.email }}</div>
-                    <div class="text-caption text-grey">
-                        {{ user.status ? "Online" : "Offline" }}
-                    </div>
                 </div>
             </q-item>
 
@@ -169,35 +154,11 @@ function setAppLanguage(val: string) {
                     size="lg"
                 />
             </q-item>
-            <q-item>
-                <q-toggle
-                    :model-value="Boolean(user.status)"
-                    checked-icon="status-online"
-                    color="green"
-                    :label="t('AppDrawer.toggles.onlineStatus')"
-                    unchecked-icon="status-offline"
-                    size="lg"
-                    @update:model-value="toggleUserActivityStatus"
-                />
-            </q-item>
         </q-list>
     </q-drawer>
 </template>
 
 <style lang="scss">
-.status-dot {
-    height: 0.8rem;
-    width: 0.8rem;
-    position: absolute;
-    top: 80%;
-    left: 80%;
-    border-radius: 100%;
-    background-color: gray;
-
-    &.green {
-        background-color: green;
-    }
-}
 .q-item.q-router-link--active {
     width: 95%;
     margin: auto;

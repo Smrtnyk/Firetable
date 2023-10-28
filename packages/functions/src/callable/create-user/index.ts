@@ -1,4 +1,4 @@
-import { ACTIVITY_STATUS, Collection, CreateUserPayload } from "../../../types/types.js";
+import { Collection, CreateUserPayload } from "../../../types/types.js";
 import { auth, db } from "../../init.js";
 import * as functions from "firebase-functions";
 import { FieldValue } from "firebase-admin/firestore";
@@ -54,7 +54,6 @@ export async function createUser(user: CreateUserPayload): Promise<{ uid: string
             name,
             email,
             role,
-            status: ACTIVITY_STATUS.OFFLINE,
             relatedProperties,
             organisationId
         };
