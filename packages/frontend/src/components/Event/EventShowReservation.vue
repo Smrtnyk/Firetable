@@ -16,7 +16,6 @@ const emit = defineEmits<{
 }>();
 const { t } = useI18n();
 const checked = ref<boolean>(props.reservation.confirmed);
-const confirmGuestSwitchDisabled = ref(false);
 const isStaff = computed(() => {
     return authStore.user?.role === Role.STAFF;
 });
@@ -69,7 +68,7 @@ function onReservationConfirm() {
 
         <q-separator class="q-my-md" />
 
-        <q-item tag="label" class="q-pa-none">
+        <q-item v-if="!isStaff" tag="label" class="q-pa-none">
             <q-item-section>
                 <q-item-label>
                     {{ t("EventShowReservation.guestArrivedLabel") }}
@@ -79,7 +78,6 @@ function onReservationConfirm() {
                 <q-toggle
                     :model-value="checked"
                     @update:model-value="onReservationConfirm"
-                    :disable="confirmGuestSwitchDisabled"
                     size="lg"
                     unchecked-icon="close"
                     checked-icon="check"
