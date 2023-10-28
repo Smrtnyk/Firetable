@@ -5,9 +5,8 @@ import FTTitle from "components/FTTitle.vue";
 import FTDialog from "components/FTDialog.vue";
 
 import { showConfirm, tryCatchLoadingWrapper, withLoading } from "src/helpers/ui-helpers";
-import { computed, nextTick, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { Loading, useQuasar } from "quasar";
-import { useRouter } from "vue-router";
 import { CreateEventPayload, EventDoc, PropertyDoc } from "@firetable/types";
 import { createNewEvent, deleteEvent } from "@firetable/backend";
 import { takeLast } from "@firetable/utils";
@@ -17,11 +16,8 @@ import { useEvents } from "src/composables/useEvents";
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
 
-const EVENTS_PER_PAGE = 20;
-
 const quasar = useQuasar();
 const { t } = useI18n();
-const router = useRouter();
 const { createDialog } = useDialog();
 const { properties, isLoading: isLoadingProperties } = useProperties();
 const { floors } = useFloors();
@@ -30,9 +26,9 @@ const {
     fetchMoreEvents,
     hasMoreEventsToFetch,
     isLoading: isLoadingEvents,
+    EVENTS_PER_PAGE,
 } = useEvents();
 const activePropertyId = ref("");
-const initialLoadDone = ref<Record<string, boolean>>({});
 
 const isAnyLoading = computed(() => isLoadingProperties.value || isLoadingEvents.value);
 
@@ -58,6 +54,7 @@ watch(
 
         newProperties.forEach((property) => {
             eventsByProperty[property.id] = new Set();
+            hasMoreEventsToFetch[property.id] = true;
         });
     },
     { immediate: true },
@@ -80,12 +77,8 @@ function fetchEventsForActiveTab() {
 }
 
 const onCreateEvent = withLoading(async function (eventData: CreateEventPayload) {
-    const { data: id } = await createNewEvent(eventData);
+    await createNewEvent(eventData);
     quasar.notify(t("PageAdminEvents.eventCreatedNotificationMessage"));
-    await router.replace({
-        name: "adminEvent",
-        params: { id },
-    });
 });
 
 async function onEventItemSlideRight({ event, reset }: { event: EventDoc; reset: () => void }) {
@@ -100,18 +93,12 @@ async function onEventItemSlideRight({ event, reset }: { event: EventDoc; reset:
     });
 }
 
-async function onLoad(propertyId: string, done: (stop: boolean) => void) {
-    if (initialLoadDone.value[propertyId]) {
-        if (!hasMoreEventsToFetch.value) {
-            await nextTick();
-            done(true);
-            return;
-        }
-    } else {
-        initialLoadDone.value[propertyId] = true;
+async function onLoad(propertyId: string) {
+    if (!hasMoreEventsToFetch[propertyId]) {
+        return;
     }
 
-    console.log("onLoad called with:", propertyId, done);
+    console.log("onLoad called with:", propertyId);
 
     const lastDoc = takeLast([...eventsByProperty[propertyId]])?._doc || null;
     const eventsDocs = await fetchMoreEvents(propertyId, lastDoc);
@@ -119,12 +106,10 @@ async function onLoad(propertyId: string, done: (stop: boolean) => void) {
     if (!eventsDocs || eventsDocs.length < EVENTS_PER_PAGE) {
         hasMoreEventsToFetch.value = false;
     }
-    await nextTick();
-    done(true);
 }
 
 function showCreateEventForm(property: PropertyDoc): void {
-    createDialog({
+    const dialog = createDialog({
         component: FTDialog,
         componentProps: {
             title: t("PageAdminEvents.createNewEventDialogTitle"),
@@ -134,7 +119,10 @@ function showCreateEventForm(property: PropertyDoc): void {
                 property: floors.value[property.id],
             },
             listeners: {
-                create: onCreateEvent,
+                create: (eventData: CreateEventPayload) => {
+                    onCreateEvent(eventData);
+                    dialog.hide();
+                },
             },
         },
     });
@@ -185,6 +173,7 @@ function showCreateEventForm(property: PropertyDoc): void {
                             :events-by-property="eventsByProperty"
                             :on-event-item-slide-right="onEventItemSlideRight"
                             :on-load="onLoad"
+                            :done="!hasMoreEventsToFetch[property.id]"
                         />
                     </q-tab-panel>
                 </q-tab-panels>

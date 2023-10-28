@@ -3,7 +3,7 @@ import { QueryDocumentSnapshot } from "firebase/firestore";
 import { EventDoc } from "@firetable/types";
 import { getEvents } from "@firetable/backend";
 
-const EVENTS_PER_PAGE = 10;
+const EVENTS_PER_PAGE = 50;
 
 /**
  * `useEvents` composable.
@@ -32,19 +32,12 @@ const EVENTS_PER_PAGE = 10;
 export function useEvents() {
     const eventsByProperty = reactive<Record<string, Set<EventDoc>>>({});
     const lastFetchedDocForProperty = reactive<Record<string, QueryDocumentSnapshot | null>>({});
-    const hasMoreEventsToFetch = ref(true);
+    const hasMoreEventsToFetch = reactive<Record<string, boolean>>({});
+
     const isLoading = ref(false);
-    const hasInitialFetchCompleted = ref(false); // A ref to keep track of whether the initial fetch has completed
 
     async function fetchMoreEvents(propertyId: string, lastDoc: QueryDocumentSnapshot | null) {
-        // Check if you're trying to fetch with the same lastDoc
-        if (lastFetchedDocForProperty[propertyId] === lastDoc) {
-            console.warn("Trying to fetch with same lastDoc for property:", propertyId);
-            return [];
-        }
-        if (!hasInitialFetchCompleted.value) {
-            isLoading.value = true;
-        }
+        isLoading.value = true;
 
         try {
             const eventsDocs = await getEvents(lastDoc, EVENTS_PER_PAGE, propertyId);
@@ -58,13 +51,7 @@ export function useEvents() {
             ]);
 
             if (!eventsDocs || eventsDocs.length < EVENTS_PER_PAGE) {
-                hasMoreEventsToFetch.value = false;
-            }
-
-            // If this is the initial fetch, set isLoading to false and mark the initial fetch as completed
-            if (!hasInitialFetchCompleted.value) {
-                isLoading.value = false;
-                hasInitialFetchCompleted.value = true;
+                hasMoreEventsToFetch[propertyId] = false;
             }
 
             return eventsDocs;
@@ -74,6 +61,7 @@ export function useEvents() {
     }
 
     return {
+        EVENTS_PER_PAGE,
         eventsByProperty,
         lastFetchedDocForProperty,
         hasMoreEventsToFetch,

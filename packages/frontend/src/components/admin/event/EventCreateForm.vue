@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { reactive, computed, onMounted } from "vue";
+import { reactive, computed, ref } from "vue";
 
 import { useI18n } from "vue-i18n";
 import { greaterThanZero, noEmptyString, requireNumber } from "src/helpers/form-rules";
 import { useRouter } from "vue-router";
 
-import { date } from "quasar";
+import { date, QForm } from "quasar";
 import { CreateEventForm, CreateEventPayload } from "@firetable/types";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { PropertyFloors } from "src/composables/useFloors";
@@ -39,6 +39,7 @@ const emit = defineEmits<{
 }>();
 const { t } = useI18n();
 const router = useRouter();
+const form = ref<QForm>();
 const state = reactive<State>({
     form: { ...eventObj },
     chosenFloors: [],
@@ -48,10 +49,6 @@ const state = reactive<State>({
 
 const totalFloors = computed(() => {
     return props.property.floors.length;
-});
-
-onMounted(() => {
-    console.log(props.property.floors);
 });
 
 function onSubmit() {
@@ -66,6 +63,10 @@ function onSubmit() {
 
     if (!selectedFloors.length) {
         showErrorMessage(t("EventCreateForm.selectedFloorNotFoundMessage"));
+        return;
+    }
+
+    if (!form.value?.validate()) {
         return;
     }
 
@@ -109,7 +110,7 @@ function validDates(calendarDate: string) {
     <template v-else>
         <q-img v-if="state.form.img" :src="state.form.img" :ratio="1" class="q-mb-md" />
 
-        <q-form class="q-gutter-xs q-pt-md q-pa-md" @submit="onSubmit" @reset="onReset">
+        <q-form ref="form" class="q-gutter-xs q-pt-md q-pa-md" @submit="onSubmit" @reset="onReset">
             <q-input
                 v-model="state.form.name"
                 rounded
@@ -198,7 +199,6 @@ function validDates(calendarDate: string) {
                     :label="t('EventCreateForm.submitButtonLabel')"
                     type="submit"
                     class="button-gradient"
-                    v-close-popup
                 />
                 <q-btn
                     rounded

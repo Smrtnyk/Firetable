@@ -7,15 +7,16 @@ interface Props {
     propertyId: string;
     eventsByProperty: Record<string, Set<EventDoc>>;
     onEventItemSlideRight: (eventDetails: { event: any; reset: () => void }) => void;
-    onLoad: (propertyId: string, done: (stop: boolean) => void) => void;
+    onLoad: (propertyId: string) => void;
+    done: boolean;
 }
 
 const props = defineProps<Props>();
 const events = computed(() => [...props.eventsByProperty[props.propertyId]]);
 const eventsLength = computed(() => events.value.length);
 
-function handleLoad(_: number, done: (stop: boolean) => void) {
-    props.onLoad(props.propertyId, done);
+function handleLoad() {
+    props.onLoad(props.propertyId);
 }
 </script>
 
@@ -28,7 +29,7 @@ function handleLoad(_: number, done: (stop: boolean) => void) {
                 </h6>
             </div>
         </template>
-        <q-infinite-scroll v-else @load="handleLoad" :offset="50">
+        <template v-else>
             <PageAdminEventsListItem
                 v-for="event in events"
                 :key="event.id"
@@ -36,12 +37,10 @@ function handleLoad(_: number, done: (stop: boolean) => void) {
                 @right="onEventItemSlideRight"
             />
 
-            <q-separator spaced inset />
-            <template #loading>
-                <div class="row justify-center q-my-md">
-                    <q-spinner-dots color="primary" size="40px" />
-                </div>
-            </template>
-        </q-infinite-scroll>
+            <!-- Load More Button -->
+            <div class="row justify-center q-my-md">
+                <q-btn v-if="!props.done" label="Load More" @click="handleLoad" />
+            </div>
+        </template>
     </div>
 </template>
