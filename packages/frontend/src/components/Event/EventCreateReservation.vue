@@ -3,23 +3,20 @@ import { reactive, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
 import { greaterThanZero, minLength, noEmptyString, requireNumber } from "src/helpers/form-rules";
+import { CreateReservationPayload } from "@firetable/types";
 
-interface State {
-    guestName: string;
-    numberOfGuests: number;
-    guestContact: string;
-    reservationNote: string;
-    consumption: number;
-}
-
-const emit = defineEmits(["create"]);
+const emit = defineEmits<{
+    (e: "create", payload: CreateReservationPayload): void;
+}>();
 const { t } = useI18n();
-const state = reactive<State>({
+const state = reactive<CreateReservationPayload>({
     guestName: "",
     numberOfGuests: 2,
     guestContact: "",
     reservationNote: "",
     consumption: 1,
+    confirmed: false,
+    time: "00:00",
 });
 const reservationForm = ref<QForm | null>(null);
 
@@ -41,6 +38,30 @@ async function onOKClick() {
                 lazy-rules="ondemand"
                 :rules="[noEmptyString(), minLength('Name must be longer!', 2)]"
             />
+
+            <q-input
+                :model-value="state.time"
+                rounded
+                standout
+                readonly
+                :label="t(`EventCreateReservation.reservationTime`)"
+            >
+                <template #append>
+                    <q-icon name="clock" class="cursor-pointer" />
+                    <q-popup-proxy transition-show="scale" transition-hide="scale">
+                        <q-time v-model="state.time" format24h>
+                            <div class="row items-center justify-end">
+                                <q-btn
+                                    :label="t('EventCreateForm.inputDateTimePickerCloseBtnLabel')"
+                                    color="primary"
+                                    flat
+                                    v-close-popup
+                                />
+                            </div>
+                        </q-time>
+                    </q-popup-proxy>
+                </template>
+            </q-input>
 
             <q-input
                 v-model="state.numberOfGuests"

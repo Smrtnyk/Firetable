@@ -47,6 +47,7 @@ export interface Reservation {
     numberOfGuests: number;
     reservationNote?: string;
     consumption: number;
+    time: string;
     reservedBy: Omit<
         User,
         "status" | "floors" | "password" | "username" | "relatedProperties" | "organisationId"
