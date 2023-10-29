@@ -42,10 +42,12 @@ export interface User {
     username: string;
     role: Role | typeof ADMIN;
     relatedProperties: string[];
+    organisationId: string;
 }
 
 export interface EditUserPayload {
     userId: string;
+    organisationId: string;
     updatedUser: {
         relatedProperties: string[];
         role: string;
@@ -72,6 +74,7 @@ export interface FloorDoc {
 
 export type CreateEventPayload = CreateEventForm & {
     propertyId: string;
+    organisationId: string;
     id: string;
     floors: FloorDoc[];
 };

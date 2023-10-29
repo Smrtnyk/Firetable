@@ -1,35 +1,41 @@
 import { initializeFirebase } from "./base.js";
 import { httpsCallable } from "firebase/functions";
 import { collection, doc } from "firebase/firestore";
-import { Collection } from "@firetable/types";
+import { Collection, EventDoc, PropertyDoc } from "@firetable/types";
 
-function getCollection(collectionName: Collection) {
+export type EventOwner = Pick<EventDoc, "organisationId" | "propertyId" | "id">;
+
+function getCollection(collectionName: string) {
     const { firestore } = initializeFirebase();
     return collection(firestore, collectionName);
 }
 
-export function eventsCollection() {
-    return getCollection(Collection.EVENTS);
+export function eventsCollection(owner: EventOwner) {
+    return getCollection(
+        `${Collection.ORGANISATIONS}/${owner.organisationId}/${Collection.PROPERTIES}/${owner.propertyId}/${Collection.EVENTS}`,
+    );
 }
 
-export function propertiesCollection() {
-    return getCollection(Collection.PROPERTIES);
+export function propertiesCollection(organisationId: string) {
+    return getCollection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}`);
 }
 
 export function organisationsCollection() {
     return getCollection(Collection.ORGANISATIONS);
 }
 
-export function floorsCollection() {
-    return getCollection(Collection.FLOORS);
+export function floorsCollection(organisationId: string, propertyId: string) {
+    return getCollection(
+        `${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}/${propertyId}/${Collection.FLOORS}`,
+    );
 }
 
-export function guestListCollection(eventId: string) {
-    return collection(eventsCollection(), `${eventId}/${Collection.GUEST_LIST}`);
+export function guestListCollection(owner: EventOwner) {
+    return collection(eventsCollection(owner), `${owner.id}/${Collection.GUEST_LIST}`);
 }
 
-export function usersCollection() {
-    return getCollection(Collection.USERS);
+export function usersCollection(organisationId: string) {
+    return getCollection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`);
 }
 
 /**
@@ -43,30 +49,30 @@ export function deleteCollection(id: string) {
 }
 
 // DOCS
-export function userDoc(userId: string) {
-    return doc(usersCollection(), userId);
+export function userDoc(organisationId: string, userId: string) {
+    return doc(usersCollection(organisationId), userId);
 }
 
-export function eventDoc(eventId: string) {
-    return doc(eventsCollection(), eventId);
+export function eventDoc(owner: EventOwner) {
+    return doc(eventsCollection(owner), owner.id);
 }
 
-export function floorDoc(id: string) {
-    return doc(floorsCollection(), id);
+export function floorDoc(property: Pick<PropertyDoc, "organisationId" | "id">, id: string) {
+    return doc(floorsCollection(property.organisationId, property.id), id);
 }
 
-export function propertyDoc(id: string) {
-    return doc(propertiesCollection(), id);
+export function propertyDoc(id: string, organisationId: string) {
+    return doc(propertiesCollection(organisationId), id);
 }
 
 export function organisationDoc(id: string) {
     return doc(organisationsCollection(), id);
 }
 
-export function eventFloorDoc(eventId: string, floorId: string) {
-    return doc(eventDoc(eventId), `${Collection.FLOORS}/${floorId}`);
+export function eventFloorDoc(owner: EventOwner, floorId: string) {
+    return doc(eventDoc(owner), `${Collection.FLOORS}/${floorId}`);
 }
 
-export function guestDoc(eventId: string, guestId: string) {
-    return doc(guestListCollection(eventId), guestId);
+export function guestDoc(owner: EventOwner, guestId: string) {
+    return doc(guestListCollection(owner), guestId);
 }

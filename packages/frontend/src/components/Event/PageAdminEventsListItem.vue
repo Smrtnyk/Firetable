@@ -18,7 +18,16 @@ function emitOnRight({ reset }: { reset: () => void }): void {
         <template #right>
             <q-icon name="trash" />
         </template>
-        <q-item :to="{ name: 'adminEvent', params: { id: props.event.id } }">
+        <q-item
+            :to="{
+                name: 'adminEvent',
+                params: {
+                    eventId: props.event.id,
+                    organisationId: props.event.organisationId,
+                    propertyId: props.event.propertyId,
+                },
+            }"
+        >
             <q-item-section>
                 <q-item-label>{{ props.event.name }}</q-item-label>
             </q-item-section>

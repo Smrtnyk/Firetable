@@ -10,11 +10,17 @@ interface Props {
 const props = defineProps<Props>();
 const { t } = useI18n();
 </script>
-
 <template>
     <router-link
         class="EventCard__link"
-        :to="{ name: 'event', params: { eventId: props.event.id } }"
+        :to="{
+            name: 'event',
+            params: {
+                organisationId: props.event.organisationId,
+                propertyId: props.event.propertyId,
+                eventId: props.event.id,
+            },
+        }"
     >
         <q-card class="EventCard">
             <q-parallax

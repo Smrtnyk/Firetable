@@ -36,8 +36,8 @@ const onUpdateUser = withLoading(async (updatedUser: EditUserPayload) => {
     await fetchUsers();
 });
 
-const onDeleteUser = withLoading(async (id: string) => {
-    await deleteUser(id);
+const onDeleteUser = withLoading(async (user: User) => {
+    await deleteUser(user);
     await fetchUsers();
 });
 
@@ -97,7 +97,7 @@ async function showEditUserDialog(user: User, reset: () => void) {
     }
     const [properties, selectedProperties] = await Promise.all([
         propertiesStore.getPropertiesOfCurrentUser(),
-        propertiesStore.getPropertiesOfUser(user.id),
+        propertiesStore.getPropertiesOfUser(user),
     ]);
     const organisation = await fetchOrganisationById(user.organisationId);
     const dialog = createDialog({
@@ -114,7 +114,11 @@ async function showEditUserDialog(user: User, reset: () => void) {
             },
             listeners: {
                 submit: (user: CreateUserPayload) => {
-                    onUpdateUser({ userId: user.id, updatedUser: user })
+                    onUpdateUser({
+                        userId: user.id,
+                        organisationId: user.organisationId,
+                        updatedUser: user,
+                    })
                         .then(reset)
                         .catch(showErrorMessage);
                     dialog.hide();
@@ -125,9 +129,9 @@ async function showEditUserDialog(user: User, reset: () => void) {
     dialog.onDismiss(reset);
 }
 
-async function onUserSlideRight(id: string, reset: () => void) {
+async function onUserSlideRight(user: User, reset: () => void) {
     if (await showConfirm("Delete user?")) {
-        return onDeleteUser(id);
+        return onDeleteUser(user);
     }
     reset();
 }
@@ -146,7 +150,7 @@ async function onUserSlideRight(id: string, reset: () => void) {
                 v-for="user in users"
                 :key="user.id"
                 right-color="warning"
-                @right="({ reset }) => onUserSlideRight(user.id, reset)"
+                @right="({ reset }) => onUserSlideRight(user, reset)"
                 @left="({ reset }) => showEditUserDialog(user, reset)"
                 class="fa-card"
             >

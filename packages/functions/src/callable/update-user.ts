@@ -41,7 +41,7 @@ export async function updateUserFn(editUserPayload: EditUserPayload): Promise<vo
 
     try {
         // Fetch the properties associated with this user by checking relatedUsers field
-        const existingPropertiesSnapshot = await db.collection(Collection.PROPERTIES)
+        const existingPropertiesSnapshot = await db.collection(`${Collection.ORGANISATIONS}/${editUserPayload.organisationId}/${Collection.PROPERTIES}`)
             .where("relatedUsers", "array-contains", userId)
             .get();
 
@@ -51,7 +51,7 @@ export async function updateUserFn(editUserPayload: EditUserPayload): Promise<vo
         const propertiesToRemove = existingProperties.filter(id => !relatedProperties.includes(id));
 
         await db.runTransaction(async transaction => {
-            const userRef = db.collection(Collection.USERS).doc(userId);
+            const userRef = db.collection(`${Collection.ORGANISATIONS}/${editUserPayload.organisationId}/${Collection.USERS}`).doc(userId);
 
             // Update the user's basic information if provided
             if (updatedUser) {
@@ -60,7 +60,7 @@ export async function updateUserFn(editUserPayload: EditUserPayload): Promise<vo
 
             // Add the user to relatedUsers field of the property document for new associations
             for (const propertyId of propertiesToAdd) {
-                const propertyRef = db.collection(Collection.PROPERTIES).doc(propertyId);
+                const propertyRef = db.collection(`${Collection.ORGANISATIONS}/${editUserPayload.organisationId}/${Collection.PROPERTIES}`).doc(propertyId);
                 transaction.update(propertyRef, {
                     relatedUsers: FieldValue.arrayUnion(userId)
                 });
@@ -68,7 +68,7 @@ export async function updateUserFn(editUserPayload: EditUserPayload): Promise<vo
 
             // Remove the user from relatedUsers field of the property document for removed associations
             for (const propertyId of propertiesToRemove) {
-                const propertyRef = db.collection(Collection.PROPERTIES).doc(propertyId);
+                const propertyRef = db.collection(`${Collection.ORGANISATIONS}/${editUserPayload.organisationId}/${Collection.PROPERTIES}`).doc(propertyId);
                 transaction.update(propertyRef, {
                     relatedUsers: FieldValue.arrayRemove(userId)
                 });

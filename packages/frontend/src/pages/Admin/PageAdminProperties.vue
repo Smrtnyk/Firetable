@@ -10,7 +10,7 @@ import { useProperties } from "src/composables/useProperties";
 import { computed, watchEffect } from "vue";
 import { useOrganisations } from "src/composables/useOrganisations";
 import { useAuthStore } from "stores/auth-store";
-import { ADMIN } from "@firetable/types";
+import { ADMIN, PropertyDoc } from "@firetable/types";
 import { useI18n } from "vue-i18n";
 
 const authStore = useAuthStore();
@@ -46,19 +46,19 @@ const onPropertyCreate = withLoading(async function (payload: CreatePropertyPayl
     return fetchProperties();
 });
 
-const onDeleteProperty = withLoading(async (id: string) => {
-    await deleteProperty(id);
+const onDeleteProperty = withLoading(async (property: PropertyDoc) => {
+    await deleteProperty(property);
     return fetchProperties();
 });
 
-async function deletePropertyAsync(propertyId: string, reset: () => void): Promise<void> {
+async function deletePropertyAsync(property: PropertyDoc, reset: () => void): Promise<void> {
     if (
         await showConfirm(
             t("PageAdminProperties.deletePropertyDialogTitle"),
             t("PageAdminProperties.deletePropertyDialogMessage"),
         )
     ) {
-        return onDeleteProperty(propertyId);
+        return onDeleteProperty(property);
     }
     reset();
 }
@@ -99,7 +99,7 @@ function createProperty(): void {
                 v-for="property in properties"
                 :key="property.id"
                 right-color="warning"
-                @right="({ reset }) => deletePropertyAsync(property.id, reset)"
+                @right="({ reset }) => deletePropertyAsync(property, reset)"
                 class="fa-card"
             >
                 <template #right>

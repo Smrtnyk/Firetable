@@ -60,7 +60,7 @@ export const useAuthStore = defineStore("auth", {
             if (role === ADMIN) {
                 this.assignAdmin(authUser);
             } else {
-                await this.watchAndAssignUser(authUser);
+                await this.watchAndAssignUser(authUser, token?.claims.organisationId as string);
             }
         },
 
@@ -78,13 +78,15 @@ export const useAuthStore = defineStore("auth", {
             this.isReady = true;
         },
 
-        async watchAndAssignUser(authUser: FBUser) {
+        async watchAndAssignUser(authUser: FBUser, organisationId: string) {
             const {
                 promise,
                 data: user,
                 stop,
                 error,
-            } = useFirestoreDocument<User>(`${Collection.USERS}/${authUser.uid}`);
+            } = useFirestoreDocument<User>(
+                `${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}/${authUser.uid}`,
+            );
             await promise.value;
 
             watch(

@@ -6,7 +6,6 @@ import {
     withLoading,
 } from "src/helpers/ui-helpers";
 import { computed } from "vue";
-import { useRoute } from "vue-router";
 import { useEventsStore } from "src/stores/events-store";
 
 import EventGuestListCreateGuestForm from "components/Event/EventGuestListCreateGuestForm.vue";
@@ -18,22 +17,22 @@ import {
     addGuestToGuestList,
     confirmGuestFromGuestList,
     deleteGuestFromGuestList,
+    EventOwner,
 } from "@firetable/backend";
 import { useI18n } from "vue-i18n";
 
 interface Props {
     guestListLimit: number;
     guestList: GuestData[];
+    eventOwner: EventOwner;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     guestList: () => [],
 });
 const quasar = useQuasar();
-const route = useRoute();
 const eventsStore = useEventsStore();
 const { t } = useI18n();
-const eventId = computed(() => route.params.eventId as string);
 const reachedCapacity = computed(() => props.guestList.length / props.guestListLimit);
 const isGuestListFull = computed(() => props.guestList.length >= props.guestListLimit);
 
@@ -44,7 +43,7 @@ function onCreate(newGuestData: GuestData) {
     }
 
     tryCatchLoadingWrapper({
-        hook: () => addGuestToGuestList(eventId.value, newGuestData),
+        hook: () => addGuestToGuestList(props.eventOwner, newGuestData),
     });
 }
 
@@ -52,13 +51,13 @@ async function deleteGuest(id: string, reset: () => void) {
     if (!(await showConfirm(t("EventGuestList.deleteGuestTitle")))) return reset();
 
     await tryCatchLoadingWrapper({
-        hook: () => deleteGuestFromGuestList(eventId.value, id),
+        hook: () => deleteGuestFromGuestList(props.eventOwner, id),
         errorHook: reset,
     });
 }
 
 const confirmGuest = withLoading(function ({ id, confirmed }: GuestData, reset: () => void) {
-    return confirmGuestFromGuestList(eventId.value, id, !confirmed).then(reset);
+    return confirmGuestFromGuestList(props.eventOwner, id, !confirmed).then(reset);
 });
 
 function showAddNewGuestForm(): void {

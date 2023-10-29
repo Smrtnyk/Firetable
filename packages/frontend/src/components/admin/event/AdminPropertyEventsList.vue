@@ -1,21 +1,21 @@
 <script setup lang="ts">
 import PageAdminEventsListItem from "components/Event/PageAdminEventsListItem.vue";
 import { computed } from "vue";
-import { EventDoc } from "@firetable/types";
+import { EventDoc, PropertyDoc } from "@firetable/types";
 
 interface Props {
-    propertyId: string;
+    property: PropertyDoc;
     eventsByProperty: Record<string, Set<EventDoc>>;
     onEventItemSlideRight: (eventDetails: { event: any; reset: () => void }) => void;
-    onLoad: (propertyId: string) => void;
+    onLoad: (property: PropertyDoc) => void;
     done: boolean;
 }
 
 const props = defineProps<Props>();
-const events = computed(() => [...props.eventsByProperty[props.propertyId]]);
+const events = computed(() => [...props.eventsByProperty[props.property.id]]);
 const eventsLength = computed(() => events.value.length);
 const bucketizedEvents = computed(() => {
-    const eventsArr = [...props.eventsByProperty[props.propertyId]];
+    const eventsArr = [...props.eventsByProperty[props.property.id]];
     let bucketized = new Map<string, Map<string, EventDoc[]>>();
 
     for (let event of eventsArr) {
@@ -38,7 +38,7 @@ const bucketizedEvents = computed(() => {
 });
 
 function handleLoad() {
-    props.onLoad(props.propertyId);
+    props.onLoad(props.property);
 }
 </script>
 

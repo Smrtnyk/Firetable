@@ -72,7 +72,8 @@ function onSubmit() {
 
     emit("create", {
         ...state.form,
-        propertyId: selectedFloors[0].propertyId,
+        propertyId: props.property.propertyId,
+        organisationId: props.property.organisationId,
         img: state.form.img,
         floors: selectedFloors,
     });

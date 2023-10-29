@@ -1,4 +1,4 @@
-import { ADMIN, Collection } from "../../types/types.js";
+import { ADMIN } from "../../types/types.js";
 import { default as admin } from "firebase-admin";
 import serviceAccount from "./service-account.json" assert { type: "json" };
 
@@ -12,7 +12,6 @@ export const auth = admin.auth();
 
 const ADMIN_MAIL = "admin@firetable.at";
 const ADMIN_PASSWORD = "admin123";
-const ADMIN_NAME = "Admin";
 
 (async function addAdmin() {
     try {
@@ -22,13 +21,6 @@ const ADMIN_NAME = "Admin";
         });
 
         await auth.setCustomUserClaims(user.uid, { role: ADMIN });
-        await admin.auth().getUser(user.uid);
-
-        await db.collection(Collection.USERS).doc(user.uid).set({
-            email: ADMIN_MAIL,
-            name: ADMIN_NAME,
-            role: ADMIN,
-        });
 
         process.exit();
     } catch (err: any) {

@@ -16,10 +16,11 @@ export async function onPropertyDeletedFn(
     context: functions.EventContext
 ): Promise<void> {
     const propertyId = context.params.propertyId;
+    const organisationid = context.params.organisationid;
 
     try {
         // 1. Cleanup associated user-property mappings
-        const usersSnapshot = await db.collection(Collection.USERS)
+        const usersSnapshot = await db.collection(`${Collection.ORGANISATIONS}/${organisationid}/${Collection.USERS}`)
             .where("relatedProperties", "array-contains", propertyId)
             .get();
 

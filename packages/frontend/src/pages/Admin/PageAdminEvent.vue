@@ -15,13 +15,15 @@ import { Loading, useQuasar } from "quasar";
 import { config } from "src/config";
 import { FloorEditor, FloorMode, getTablesFromFloorDoc } from "@firetable/floor-creator";
 import { FloorDoc, User } from "@firetable/types";
-import { updateEventFloorData, updateEventProperty } from "@firetable/backend";
+import { EventOwner, updateEventFloorData, updateEventProperty } from "@firetable/backend";
 import { tryCatchLoadingWrapper, withLoading } from "src/helpers/ui-helpers";
 import { propIsTruthy } from "@firetable/utils";
 import useAdminEvent from "src/composables/useAdminEvent";
 
 interface Props {
-    id: string;
+    organisationId: string;
+    propertyId: string;
+    eventId: string;
 }
 
 const props = defineProps<Props>();
@@ -29,7 +31,13 @@ const router = useRouter();
 const quasar = useQuasar();
 const tab = ref("info");
 
-const { eventFloors, users, event, isLoading } = useAdminEvent(props.id);
+const eventOwner: EventOwner = {
+    propertyId: props.propertyId,
+    organisationId: props.organisationId,
+    id: props.eventId,
+};
+
+const { eventFloors, users, event, isLoading } = useAdminEvent(eventOwner);
 
 watch(
     isLoading,
@@ -71,20 +79,19 @@ const reservationsStatus = computed(() => {
 });
 
 async function init() {
-    if (!props.id) {
+    if (!props.eventId || !props.organisationId || !props.propertyId) {
         await router.replace("/");
     }
 }
 
 const onFloorUpdate = withLoading(function (floor: FloorEditor) {
-    return updateEventFloorData(floor, props.id);
+    return updateEventFloorData(eventOwner, floor);
 });
 
 function onUpdateActiveStaff(newActiveStaff: User["id"][]) {
     if (!event.value) return;
-    const eventId = event.value.id;
     tryCatchLoadingWrapper({
-        hook: () => updateEventProperty(eventId, "activeStaff", newActiveStaff),
+        hook: () => updateEventProperty(eventOwner, "activeStaff", newActiveStaff),
     });
 }
 
@@ -109,7 +116,7 @@ function showEventInfoEditDialog(): void {
     if (event.value) {
         showDialog(AdminEventEditInfo, "Edit event info", {
             eventInfo: event.value.info || "",
-            eventId: event.value.id,
+            eventOwner,
         });
     }
 }

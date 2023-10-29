@@ -13,14 +13,14 @@ const routes: RouteRecordRaw[] = [
                 component: () => import("pages/PageProperties.vue"),
             },
             {
-                path: "/events/:propertyId",
+                path: "/events/:organisationId/:propertyId",
                 name: "events",
                 props: true,
                 meta: { requiresAuth: true },
                 component: () => import("pages/PageEvents.vue"),
             },
             {
-                path: "/events/:propertyId/event/:eventId",
+                path: "/events/:organisationId/:propertyId/event/:eventId",
                 name: "event",
                 meta: { requiresAuth: true },
                 props: true,
@@ -53,7 +53,7 @@ const routes: RouteRecordRaw[] = [
                 component: () => import("pages/Admin/PageAdminEvents.vue"),
             },
             {
-                path: "/admin/events/:id",
+                path: "/admin/events/:organisationId/:propertyId/:eventId",
                 name: "adminEvent",
                 meta: {
                     requiresAuth: true,
@@ -81,7 +81,7 @@ const routes: RouteRecordRaw[] = [
                 component: () => import("pages/Admin/PageAdminFloors.vue"),
             },
             {
-                path: "/admin/floors/:floorID",
+                path: "/admin/floors/:organisationId/:propertyId/:floorId",
                 name: "adminFloorEdit",
                 meta: {
                     requiresAuth: true,

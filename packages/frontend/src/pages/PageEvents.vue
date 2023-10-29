@@ -6,15 +6,27 @@ import { ONE_HOUR } from "src/constants";
 import { EventDoc } from "@firetable/types";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
 import { useRoute } from "vue-router";
-import { eventsCollection } from "@firetable/backend";
+import { EventOwner, eventsCollection } from "@firetable/backend";
 import { watch } from "vue";
 import { Loading } from "quasar";
 
+interface Props {
+    organisationId: string;
+    propertyId: string;
+}
+
 const route = useRoute();
+const props = defineProps<Props>();
+
+const eventOwner: EventOwner = {
+    propertyId: props.propertyId,
+    organisationId: props.organisationId,
+    id: "",
+};
 
 const { data: events, pending: isLoading } = useFirestoreCollection<EventDoc>(
     createQuery<EventDoc>(
-        eventsCollection(),
+        eventsCollection(eventOwner),
         where("date", ">=", Date.now() - ONE_HOUR * config.eventDuration),
         where("propertyId", "==", route.params.propertyId),
         orderBy("date"),

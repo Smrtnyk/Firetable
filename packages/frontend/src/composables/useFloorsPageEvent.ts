@@ -14,7 +14,7 @@ import {
 import FTDialog from "components/FTDialog.vue";
 import EventShowReservation from "components/Event/EventShowReservation.vue";
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { updateEventFloorData } from "@firetable/backend";
+import { EventOwner, updateEventFloorData } from "@firetable/backend";
 import EventCreateReservation from "components/Event/EventCreateReservation.vue";
 import { takeProp } from "@firetable/utils";
 import { useAuthStore } from "stores/auth-store";
@@ -34,7 +34,7 @@ const HALF_HOUR = 30 * 60 * 1000; // 30 minutes in milliseconds
 export default function useFloorsPageEvent(
     eventFloors: Ref<FloorDoc[]>,
     pageRef: Ref<HTMLDivElement | undefined>,
-    eventId: string,
+    eventOwner: EventOwner,
     event: Ref<VueFirestoreDocumentData<EventDoc> | undefined>,
 ) {
     const { t } = useI18n();
@@ -201,7 +201,7 @@ export default function useFloorsPageEvent(
                 confirmed: val,
             });
             return tryCatchLoadingWrapper({
-                hook: () => updateEventFloorData(floor, eventId),
+                hook: () => updateEventFloorData(eventOwner, floor),
             });
         };
     }
@@ -246,7 +246,7 @@ export default function useFloorsPageEvent(
         element?.setReservation(null);
 
         await tryCatchLoadingWrapper({
-            hook: () => updateEventFloorData(floor, eventId),
+            hook: () => updateEventFloorData(eventOwner, floor),
         });
     }
 
@@ -257,7 +257,7 @@ export default function useFloorsPageEvent(
     ) {
         table?.setReservation(reservationData);
         void tryCatchLoadingWrapper({
-            hook: () => updateEventFloorData(floor, eventId),
+            hook: () => updateEventFloorData(eventOwner, floor),
         });
     }
 
@@ -307,7 +307,7 @@ export default function useFloorsPageEvent(
         table2.setReservation(table1Reservation);
 
         await tryCatchLoadingWrapper({
-            hook: () => updateEventFloorData(floor, eventId),
+            hook: () => updateEventFloorData(eventOwner, floor),
         });
     }
 

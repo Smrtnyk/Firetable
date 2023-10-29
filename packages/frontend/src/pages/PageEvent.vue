@@ -12,16 +12,53 @@ import { useEventsStore } from "src/stores/events-store";
 import { useFirestoreCollection, useFirestoreDocument } from "src/composables/useFirestore";
 import { Collection, EventDoc, FloorDoc, GuestData } from "@firetable/types";
 import useFloorsPageEvent from "src/composables/useFloorsPageEvent";
+import { EventOwner } from "@firetable/backend";
 
 interface State {
     showMapsExpanded: boolean;
 }
 
 interface Props {
+    organisationId: string;
+    propertyId: string;
     eventId: string;
 }
 
 const props = defineProps<Props>();
+
+const eventDocPath = [
+    Collection.ORGANISATIONS,
+    props.organisationId,
+    Collection.PROPERTIES,
+    props.propertyId,
+    Collection.EVENTS,
+    props.eventId,
+].join("/");
+const eventFloorsPath = [
+    Collection.ORGANISATIONS,
+    props.organisationId,
+    Collection.PROPERTIES,
+    props.propertyId,
+    Collection.EVENTS,
+    props.eventId,
+    Collection.FLOORS,
+].join("/");
+const guestListPath = [
+    Collection.ORGANISATIONS,
+    props.organisationId,
+    Collection.PROPERTIES,
+    props.propertyId,
+    Collection.EVENTS,
+    props.eventId,
+    Collection.GUEST_LIST,
+].join("/");
+
+const eventOwner: EventOwner = {
+    propertyId: props.propertyId,
+    organisationId: props.organisationId,
+    id: props.eventId,
+};
+
 const state = reactive<State>({
     showMapsExpanded: false,
 });
@@ -29,15 +66,9 @@ const eventsStore = useEventsStore();
 const router = useRouter();
 const q = useQuasar();
 const pageRef = ref<HTMLDivElement>();
-const guestList = useFirestoreCollection<GuestData>(
-    `${Collection.EVENTS}/${props.eventId}/${Collection.GUEST_LIST}`,
-);
-const { data: event, promise: eventDataPromise } = useFirestoreDocument<EventDoc>(
-    `${Collection.EVENTS}/${props.eventId}`,
-);
-const { data: eventFloors } = useFirestoreCollection<FloorDoc>(
-    `${Collection.EVENTS}/${props.eventId}/${Collection.FLOORS}`,
-);
+const guestList = useFirestoreCollection<GuestData>(guestListPath);
+const { data: event, promise: eventDataPromise } = useFirestoreDocument<EventDoc>(eventDocPath);
+const { data: eventFloors } = useFirestoreCollection<FloorDoc>(eventFloorsPath);
 const {
     onTableFound,
     setActiveFloor,
@@ -46,7 +77,7 @@ const {
     onAutocompleteClear,
     allReservedTables,
     useFloorsPageEventState,
-} = useFloorsPageEvent(eventFloors, pageRef, props.eventId, event);
+} = useFloorsPageEvent(eventFloors, pageRef, eventOwner, event);
 
 function showActiveStaff(): void {
     // todo: implement
@@ -148,6 +179,10 @@ onMounted(init);
             <canvas :id="floor.id" class="shadow-3" :ref="mapFloorToCanvas(floor)"></canvas>
         </div>
 
-        <EventGuestList :guest-list-limit="event.guestListLimit" :guest-list="guestList" />
+        <EventGuestList
+            :guest-list-limit="event.guestListLimit"
+            :guest-list="guestList"
+            :event-owner="eventOwner"
+        />
     </div>
 </template>

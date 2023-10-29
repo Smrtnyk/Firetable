@@ -36,7 +36,9 @@ interface BottomSheetTableClickResult {
 }
 
 interface Props {
-    floorID: string;
+    floorId: string;
+    organisationId: string;
+    propertyId: string;
 }
 const addNewElementsBottomSheetOptions = {
     message: "Choose action",
@@ -64,14 +66,12 @@ const bulkElement = ref<ElementTag | null>(null);
 const bulkLabelCounter = ref(0); // To auto-increment labels
 
 const buttonSize = computed(() => (isMobile ? "xs" : "md"));
-
+const floorPath = `${Collection.ORGANISATIONS}/${props.organisationId}/${Collection.PROPERTIES}/${props.propertyId}/${Collection.FLOORS}/${props.floorId}`;
 const {
     data: floor,
     promise: floorDataPromise,
     pending: isFloorLoading,
-} = useFirestoreDocument<FloorDoc>(`${Collection.FLOORS}/${props.floorID}`, {
-    once: true,
-});
+} = useFirestoreDocument<FloorDoc>(floorPath, { once: true });
 
 onMounted(async () => {
     Loading.show();
@@ -107,7 +107,7 @@ function onFloorSave(): void {
 
     tryCatchLoadingWrapper({
         hook: () =>
-            updateFirestoreDocument(getFirestoreDocument(`${Collection.FLOORS}/${props.floorID}`), {
+            updateFirestoreDocument(getFirestoreDocument(floorPath), {
                 json: floorInstance.value?.json,
                 name: floorInstance.value?.name,
                 width: floorInstance.value?.width,

@@ -10,29 +10,33 @@ export function useUsers() {
     const isLoading = ref<boolean>(true);
 
     async function fetchRelatedProperties() {
-        isLoading.value = true;
-        try {
-            const relatedPropertiesQuery = query(
-                propertiesCollection(),
-                where("relatedUsers", "array-contains", authStore.user?.id),
-            );
+        const relatedPropertiesQuery = query(
+            propertiesCollection(authStore.user!.organisationId),
+            where("relatedUsers", "array-contains", authStore.user?.id),
+        );
 
-            const snapshot = await getDocs(relatedPropertiesQuery);
-            const propertyDocs = snapshot.docs.map((doc) => doc.data());
-            return propertyDocs.flatMap((property) => property.relatedUsers);
-        } finally {
-            isLoading.value = false;
-        }
+        const snapshot = await getDocs(relatedPropertiesQuery);
+        const propertyDocs = snapshot.docs.map((doc) => doc.data());
+        return propertyDocs.flatMap((property) => property.relatedUsers);
     }
 
     async function fetchUsers(): Promise<void> {
         isLoading.value = true;
         try {
-            const relatedUserIds = await fetchRelatedProperties();
-            if (authStore.user!.role === ADMIN || relatedUserIds.length) {
-                users.value = (await fetchUsersByRole([...new Set(relatedUserIds)])).data;
+            if (authStore.user!.role === ADMIN && !authStore.user!.organisationId) {
+                users.value = (await fetchUsersByRole([], "")).data;
             } else {
-                users.value = [];
+                const relatedUserIds = await fetchRelatedProperties();
+                if (relatedUserIds.length) {
+                    users.value = (
+                        await fetchUsersByRole(
+                            [...new Set(relatedUserIds)],
+                            authStore.user!.organisationId,
+                        )
+                    ).data;
+                } else {
+                    users.value = [];
+                }
             }
         } finally {
             isLoading.value = false;

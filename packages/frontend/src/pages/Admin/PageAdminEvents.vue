@@ -4,18 +4,25 @@ import EventCreateForm from "components/admin/event/EventCreateForm.vue";
 import FTTitle from "components/FTTitle.vue";
 import FTDialog from "components/FTDialog.vue";
 
-import { showConfirm, tryCatchLoadingWrapper, withLoading } from "src/helpers/ui-helpers";
+import {
+    showConfirm,
+    showErrorMessage,
+    tryCatchLoadingWrapper,
+    withLoading,
+} from "src/helpers/ui-helpers";
 import { computed, ref, watch } from "vue";
 import { Loading, useQuasar } from "quasar";
 import { CreateEventPayload, EventDoc, PropertyDoc } from "@firetable/types";
-import { createNewEvent, deleteEvent } from "@firetable/backend";
+import { createNewEvent, deleteEvent, EventOwner } from "@firetable/backend";
 import { takeLast } from "@firetable/utils";
 import { useFloors } from "src/composables/useFloors";
 import { useProperties } from "src/composables/useProperties";
 import { useEvents } from "src/composables/useEvents";
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const quasar = useQuasar();
 const { t } = useI18n();
 const { createDialog } = useDialog();
@@ -72,13 +79,29 @@ watch(
 
 function fetchEventsForActiveTab() {
     if (eventsByProperty[activePropertyId.value]?.size === 0) {
-        fetchMoreEvents(activePropertyId.value, null);
+        const activeProperty = properties.value.find((property) => {
+            return property.id === activePropertyId.value;
+        });
+        if (!activeProperty) {
+            showErrorMessage("Something went wrong. Please reload the page!");
+            return;
+        }
+        const eventOwner: EventOwner = {
+            propertyId: activeProperty.id,
+            organisationId: activeProperty.organisationId,
+            id: "",
+        };
+        fetchMoreEvents(eventOwner, null);
     }
 }
 
 const onCreateEvent = withLoading(async function (eventData: CreateEventPayload) {
-    await createNewEvent(eventData);
+    const { id: eventId, organisationId, propertyId } = (await createNewEvent(eventData)).data;
     quasar.notify(t("PageAdminEvents.eventCreatedNotificationMessage"));
+    await router.replace({
+        name: "adminEvent",
+        params: { eventId, propertyId, organisationId },
+    });
 });
 
 async function onEventItemSlideRight({ event, reset }: { event: EventDoc; reset: () => void }) {
@@ -93,15 +116,21 @@ async function onEventItemSlideRight({ event, reset }: { event: EventDoc; reset:
     });
 }
 
-async function onLoad(propertyId: string) {
+async function onLoad(property: PropertyDoc) {
+    const propertyId = property.id;
     if (!hasMoreEventsToFetch[propertyId]) {
         return;
     }
 
     console.log("onLoad called with:", propertyId);
 
+    const eventOwner: EventOwner = {
+        propertyId,
+        organisationId: property.organisationId,
+        id: "",
+    };
     const lastDoc = takeLast([...eventsByProperty[propertyId]])?._doc || null;
-    const eventsDocs = await fetchMoreEvents(propertyId, lastDoc);
+    const eventsDocs = await fetchMoreEvents(eventOwner, lastDoc);
 
     if (!eventsDocs || eventsDocs.length < EVENTS_PER_PAGE) {
         hasMoreEventsToFetch.value = false;
@@ -169,7 +198,7 @@ function showCreateEventForm(property: PropertyDoc): void {
                         </div>
 
                         <AdminPropertyEventsList
-                            :property-id="property.id"
+                            :property="property"
                             :events-by-property="eventsByProperty"
                             :on-event-item-slide-right="onEventItemSlideRight"
                             :on-load="onLoad"

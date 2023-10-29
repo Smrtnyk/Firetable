@@ -11,7 +11,13 @@ const props = defineProps<Props>();
 <template>
     <router-link
         class="PropertyCard__link"
-        :to="{ name: 'events', params: { propertyId: props.property.id } }"
+        :to="{
+            name: 'events',
+            params: {
+                propertyId: props.property.id,
+                organisationId: props.property.organisationId,
+            },
+        }"
     >
         <q-card class="PropertyCard">
             <q-parallax
