@@ -66,6 +66,10 @@ export class RoundTable extends fabric.Group {
 
     setBaseFill(val: string): void {
         this.baseFill = val;
+        this.setFill(val);
+    }
+
+    setFill(val: string): void {
         this.circle.set("fill", val);
         this.canvas?.renderAll();
     }

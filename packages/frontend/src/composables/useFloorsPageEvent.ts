@@ -20,6 +20,7 @@ import { matchesValue, not, takeProp } from "@firetable/utils";
 import { useAuthStore } from "stores/auth-store";
 import { DialogChainObject, useQuasar } from "quasar";
 import { useI18n } from "vue-i18n";
+import { VueFirestoreDocumentData } from "vuefire";
 
 interface State {
     activeTablesAnimationInterval: number | null;
@@ -33,7 +34,7 @@ export default function useFloorsPageEvent(
     eventFloors: Ref<FloorDoc[]>,
     pageRef: Ref<HTMLDivElement | undefined>,
     eventId: string,
-    event: Ref<EventDoc>,
+    event: Ref<VueFirestoreDocumentData<EventDoc> | undefined>,
 ) {
     const { t } = useI18n();
     const q = useQuasar();
@@ -348,7 +349,7 @@ export default function useFloorsPageEvent(
             }
 
             if (currentDate.getTime() - eventDateTime.getTime() >= HALF_HOUR) {
-                table.setBaseFill("red");
+                table.setFill("red");
             }
         }
     }
