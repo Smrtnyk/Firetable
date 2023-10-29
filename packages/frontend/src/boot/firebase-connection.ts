@@ -81,7 +81,7 @@ function handleOnAuthStateChanged(router: Router, authStore: ReturnType<typeof u
                 authStore.setUser(null);
                 router.replace({ path: "/auth" }).catch(showErrorMessage);
             } else {
-                authStore.initUser(currentUser.value.uid);
+                authStore.initUser(currentUser.value);
             }
         },
     );

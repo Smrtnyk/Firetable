@@ -1,10 +1,11 @@
 import { defineStore } from "pinia";
+import { watch } from "vue";
 import { ADMIN, Collection, User } from "@firetable/types";
 import { isDefined, NOOP } from "@firetable/utils";
 import { logoutUser } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useFirestoreDocument } from "src/composables/useFirestore";
-import { watch } from "vue";
+import { User as FBUser } from "firebase/auth";
 
 interface AuthState {
     isAuthenticated: boolean;
@@ -14,13 +15,13 @@ interface AuthState {
 }
 
 export const useAuthStore = defineStore("auth", {
-    state() {
+    state(): AuthState {
         return {
             isAuthenticated: false,
             isReady: false,
             user: null,
             unsubscribeUserWatch: NOOP,
-        } as AuthState;
+        };
     },
     getters: {
         isAdmin(): boolean {
@@ -51,16 +52,41 @@ export const useAuthStore = defineStore("auth", {
                 this.unsubscribeUserWatch = unsubscribeUserWatch;
             }
         },
-        async initUser(uid: string) {
+
+        async initUser(authUser: FBUser) {
+            const token = await authUser?.getIdTokenResult();
+            const role = token?.claims.role as string;
+
+            if (role === ADMIN) {
+                this.assignAdmin(authUser);
+            } else {
+                await this.watchAndAssignUser(authUser);
+            }
+        },
+
+        assignAdmin(authUser: FBUser) {
+            this.user = {
+                name: "Admin",
+                username: "admin",
+                id: authUser.uid,
+                role: ADMIN,
+                email: authUser.email!,
+                relatedProperties: [],
+                organisationId: "",
+            };
+            this.isAuthenticated = true;
+            this.isReady = true;
+        },
+
+        async watchAndAssignUser(authUser: FBUser) {
             const {
                 promise,
                 data: user,
                 stop,
                 error,
-            } = useFirestoreDocument<User>(`${Collection.USERS}/${uid}`);
+            } = useFirestoreDocument<User>(`${Collection.USERS}/${authUser.uid}`);
             await promise.value;
 
-            // Watcher for user data
             watch(
                 () => user.value,
                 (newUser) => {
@@ -77,9 +103,7 @@ export const useAuthStore = defineStore("auth", {
             }
 
             if (!user.value) {
-                this.handleError(stop, {
-                    message: "User is not found in database!",
-                });
+                this.handleError(stop, { message: "User is not found in database!" });
                 return;
             }
 
