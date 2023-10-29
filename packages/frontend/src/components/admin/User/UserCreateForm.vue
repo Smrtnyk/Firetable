@@ -172,7 +172,7 @@ function resetProperties() {
             />
 
             <q-select
-                v-if="form.role === Role.PROPERTY_OWNER && props.organisations.length"
+                v-if="role === ADMIN && props.organisations.length"
                 v-model="chosenOrganisation"
                 :hint="t('UserCreateForm.userOrganisationSelectHint')"
                 standout
@@ -182,7 +182,7 @@ function resetProperties() {
                 option-label="name"
                 option-value="value"
             />
-            <div v-else-if="form.role === Role.PROPERTY_OWNER && !props.organisations.length">
+            <div v-else-if="role === ADMIN && !props.organisations.length">
                 {{ t("UserCreateForm.noOrganisationsMessage") }}
             </div>
 
