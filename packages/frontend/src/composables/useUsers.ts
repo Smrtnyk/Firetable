@@ -4,7 +4,7 @@ import { ADMIN, User } from "@firetable/types";
 import { useAuthStore } from "src/stores/auth-store";
 import { fetchUsersByRole, propertiesCollection } from "@firetable/backend";
 
-export function useAdminUsers() {
+export function useUsers() {
     const authStore = useAuthStore();
     const users = ref<User[]>([]);
     const isLoading = ref<boolean>(true);

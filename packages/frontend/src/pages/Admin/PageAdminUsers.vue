@@ -15,7 +15,7 @@ import {
     updateUser,
 } from "@firetable/backend";
 import { usePropertiesStore } from "stores/usePropertiesStore";
-import { useAdminUsers } from "src/composables/useAdminUsers";
+import { useUsers } from "src/composables/useUsers";
 import { useAuthStore } from "stores/auth-store";
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
@@ -23,7 +23,7 @@ import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 const authStore = useAuthStore();
 const propertiesStore = usePropertiesStore();
-const { users, isLoading, fetchUsers } = useAdminUsers();
+const { users, isLoading, fetchUsers } = useUsers();
 const { createDialog } = useDialog();
 
 const onCreateUser = withLoading(async (newUser: CreateUserPayload) => {
