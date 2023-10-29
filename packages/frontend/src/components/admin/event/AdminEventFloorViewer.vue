@@ -1,5 +1,5 @@
 <template>
-    <div ref="viewerContainerRef">
+    <div ref="viewerContainerRef" v-if="props.floor">
         <q-btn
             class="button-gradient"
             icon="save"
@@ -9,8 +9,10 @@
             rounded
         />
         <ShowSelectedElement
+            v-if="floorInstance"
             :selected-floor-element="selectedFloorElement"
             :delete-allowed="false"
+            :existing-labels="new Set(extractAllTablesLabels(floorInstance as FloorEditor))"
         />
         <canvas id="floor-container" class="eventFloor" ref="floorContainerRef" />
     </div>
@@ -19,7 +21,13 @@
 <script setup lang="ts">
 import { nextTick, ref, shallowRef, watch } from "vue";
 import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
-import { Floor, FloorEditor, FloorEditorElement, FloorMode } from "@firetable/floor-creator";
+import {
+    extractAllTablesLabels,
+    Floor,
+    FloorEditor,
+    FloorEditorElement,
+    FloorMode,
+} from "@firetable/floor-creator";
 import { FloorDoc } from "@firetable/types";
 
 interface Props {
