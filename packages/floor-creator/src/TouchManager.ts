@@ -1,6 +1,5 @@
 import Hammer from "hammerjs";
 import { Floor } from "./Floor";
-import { FloorZoomManager } from "./FloorZoomManager";
 import { fabric } from "fabric";
 
 const DAMPENING_FACTOR = 0.05;
@@ -26,7 +25,6 @@ export class TouchManager {
         this.hammerManager.on("pinch", this.onPinch);
 
         // Pan events
-        this.hammerManager.on("panstart", this.onPanStart);
         this.hammerManager.on("panmove", this.onPanMove);
 
         this.hammerManager.on("doubletap", this.onDoubleTap);
@@ -62,12 +60,6 @@ export class TouchManager {
         const adjustedScale = 1 + (scale - 1) * DAMPENING_FACTOR;
         const center = new fabric.Point(ev.center.x, ev.center.y);
         this.floor.zoomManager.zoomToPoint(center, adjustedScale);
-    };
-
-    private onPanStart = (ev: HammerInput) => {
-        if (ev.pointers.length === 2) {
-            this.floor.zoomManager.initialPinchDistance = FloorZoomManager.getDistance(ev.pointers);
-        }
     };
 
     setViewportTransform(x: number, y: number) {

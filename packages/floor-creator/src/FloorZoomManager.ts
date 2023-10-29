@@ -18,8 +18,6 @@ export class FloorZoomManager {
     private startZoom?: number;
     private targetZoom?: number;
 
-    initialPinchDistance?: number;
-
     constructor(canvas: fabric.Canvas, initialScale: number, initialViewportTransform: number[]) {
         this.canvas = canvas;
         this.initialScale = initialScale;
