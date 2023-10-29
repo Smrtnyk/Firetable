@@ -1,5 +1,5 @@
 import { watch, reactive, computed, Ref, ref, nextTick, onBeforeUnmount } from "vue";
-import { CreateReservationPayload, EventDoc, FloorDoc, Reservation, Role } from "@firetable/types";
+import { EventDoc, FloorDoc, Reservation, Role } from "@firetable/types";
 import {
     BaseTable,
     FloorViewer,
@@ -16,11 +16,12 @@ import EventShowReservation from "components/Event/EventShowReservation.vue";
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { updateEventFloorData } from "@firetable/backend";
 import EventCreateReservation from "components/Event/EventCreateReservation.vue";
-import { matchesValue, not, takeProp } from "@firetable/utils";
+import { takeProp } from "@firetable/utils";
 import { useAuthStore } from "stores/auth-store";
 import { DialogChainObject, useQuasar } from "quasar";
 import { useI18n } from "vue-i18n";
 import { VueFirestoreDocumentData } from "vuefire";
+import { useUsers } from "src/composables/useUsers";
 
 interface State {
     activeTablesAnimationInterval: number | null;
@@ -39,6 +40,7 @@ export default function useFloorsPageEvent(
     const { t } = useI18n();
     const q = useQuasar();
     const authStore = useAuthStore();
+    const { users } = useUsers();
     const currentUser = computed(() => authStore.user);
     const canvases = reactive<Map<string, HTMLCanvasElement>>(new Map());
     const state = ref<State>({
@@ -205,6 +207,7 @@ export default function useFloorsPageEvent(
     }
 
     function showCreateReservationDialog(floor: Floor, element: BaseTable) {
+        console.log(users.value);
         const { label } = element;
         const dialog = q
             .dialog({
@@ -214,13 +217,10 @@ export default function useFloorsPageEvent(
                     title: `${t("EventShowReservation.title")} ${label}`,
                     maximized: false,
                     componentPropsObject: {
-                        freeTables: getFreeTables(floor)
-                            .map(takeProp("label"))
-                            .filter(not(matchesValue(label))),
-                        label,
+                        users: users.value,
                     },
                     listeners: {
-                        create: (reservationData: CreateReservationPayload) => {
+                        create: (reservationData: Reservation) => {
                             resetCurrentOpenCreateReservationDialog();
                             handleReservationCreation(floor, reservationData, element);
                             dialog.hide();
@@ -252,19 +252,10 @@ export default function useFloorsPageEvent(
 
     function handleReservationCreation(
         floor: Floor,
-        reservationData: CreateReservationPayload,
+        reservationData: Reservation,
         table: BaseTable,
     ) {
-        if (!currentUser.value) return;
-
-        const { email, name, role, id } = currentUser.value;
-        const reservedBy = { email, name, role, id };
-
-        table?.setReservation({
-            ...reservationData,
-            confirmed: false,
-            reservedBy,
-        });
+        table?.setReservation(reservationData);
         void tryCatchLoadingWrapper({
             hook: () => updateEventFloorData(floor, eventId),
         });

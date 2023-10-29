@@ -73,6 +73,8 @@ export default {
         reservationCreateBtn: "Absenden",
         reservationConsumption: "Consumption",
         reservationTime: "Time",
+        reservedByLabel: "Reserved by",
+        requireReservedBySelectionError: "You need to select at least one option",
     },
     PageAdminProperties: {
         properties: "Immobilien",

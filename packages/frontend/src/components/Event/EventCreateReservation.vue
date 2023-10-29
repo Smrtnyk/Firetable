@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { computed, reactive, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
 import { greaterThanZero, minLength, noEmptyString, requireNumber } from "src/helpers/form-rules";
-import { CreateReservationPayload } from "@firetable/types";
+import { Reservation, User } from "@firetable/types";
 
+const props = defineProps<{
+    users: User[];
+}>();
 const emit = defineEmits<{
-    (e: "create", payload: CreateReservationPayload): void;
+    (e: "create", payload: Reservation): void;
 }>();
 const { t } = useI18n();
-const state = reactive<CreateReservationPayload>({
+const state = reactive<Reservation>({
     guestName: "",
     numberOfGuests: 2,
     guestContact: "",
@@ -17,8 +20,20 @@ const state = reactive<CreateReservationPayload>({
     consumption: 1,
     confirmed: false,
     time: "00:00",
+    reservedBy: null as unknown as User,
 });
 const reservationForm = ref<QForm | null>(null);
+const formattedUsers = computed(() =>
+    props.users.map((user) => ({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+    })),
+);
+
+function requireReservedBySelection(val: User): boolean | string {
+    return !!val?.id || t(`EventCreateReservation.requireReservedBySelectionError`);
+}
 
 async function onOKClick() {
     if (!(await reservationForm.value?.validate())) return;
@@ -94,6 +109,17 @@ async function onOKClick() {
             />
 
             <q-input v-model="state.reservationNote" rounded standout label="Note" />
+
+            <q-select
+                v-model="state.reservedBy"
+                rounded
+                standout
+                :options="formattedUsers"
+                :rules="[requireReservedBySelection]"
+                option-label="name"
+                option-value="id"
+                :label="t(`EventCreateReservation.reservedByLabel`)"
+            />
 
             <q-btn
                 rounded
