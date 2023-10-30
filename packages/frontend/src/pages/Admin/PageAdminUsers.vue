@@ -4,7 +4,7 @@ import UserEditForm from "components/admin/User/UserEditForm.vue";
 import FTTitle from "components/FTTitle.vue";
 import { showConfirm, showErrorMessage, withLoading } from "src/helpers/ui-helpers";
 import { watch } from "vue";
-import { Loading } from "quasar";
+import { Loading, useQuasar } from "quasar";
 import FTDialog from "components/FTDialog.vue";
 import { ADMIN, CreateUserPayload, EditUserPayload, User } from "@firetable/types";
 import {
@@ -21,6 +21,7 @@ import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
+const quasar = useQuasar();
 const authStore = useAuthStore();
 const propertiesStore = usePropertiesStore();
 const { users, isLoading, fetchUsers } = useUsers();
@@ -113,14 +114,13 @@ async function showEditUserDialog(user: User, reset: () => void) {
                 organisation,
             },
             listeners: {
-                submit: (user: CreateUserPayload) => {
-                    onUpdateUser({
+                submit: async (user: CreateUserPayload) => {
+                    await onUpdateUser({
                         userId: user.id,
                         organisationId: user.organisationId,
                         updatedUser: user,
-                    })
-                        .then(reset)
-                        .catch(showErrorMessage);
+                    });
+                    quasar.notify("User updated successfully!");
                     dialog.hide();
                 },
             },

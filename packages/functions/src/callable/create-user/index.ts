@@ -30,7 +30,7 @@ import { FieldValue } from "firebase-admin/firestore";
  * @throws - Throws appropriate errors for any other exceptions encountered during user creation or data storage.
  */
 export async function createUser(user: CreateUserPayload): Promise<{ uid: string, message: string }> {
-    const { name, password, email, role, relatedProperties, organisationId } = user;
+    const { name, password, email, role, relatedProperties, organisationId, username } = user;
 
     let createdUserUid: string | null = null;
 
@@ -54,6 +54,7 @@ export async function createUser(user: CreateUserPayload): Promise<{ uid: string
             name,
             email,
             role,
+            username,
             relatedProperties,
             organisationId
         };

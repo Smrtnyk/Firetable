@@ -27,7 +27,7 @@ const { logger } = functions;
  *
  * @returns Returns a promise that resolves once the user and their associated properties have been successfully updated in Firestore.
  */
-export async function updateUserFn(editUserPayload: EditUserPayload): Promise<void> {
+export async function updateUserFn(editUserPayload: EditUserPayload): Promise<{ success: boolean, message: string }> {
     const { updatedUser, userId } = editUserPayload;
     const { relatedProperties } = updatedUser;
 
@@ -74,6 +74,8 @@ export async function updateUserFn(editUserPayload: EditUserPayload): Promise<vo
                 });
             }
         });
+
+        return { success: true, message: "User updated successfully." };
     } catch (error: any) {
         logger.error(`Failed to update user ${userId}`, error);
         throw new functions.https.HttpsError("internal", `Failed to update user. Details: ${error.message}`);
