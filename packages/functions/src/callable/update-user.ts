@@ -1,5 +1,5 @@
 import { Collection, EditUserPayload } from "../../types/types.js";
-import { db } from "../init.js";
+import { auth, db } from "../init.js";
 import * as functions from "firebase-functions";
 import { FieldValue } from "firebase-admin/firestore";
 const { logger } = functions;
@@ -37,6 +37,20 @@ export async function updateUserFn(editUserPayload: EditUserPayload): Promise<{ 
 
     if (!updatedUser && (!relatedProperties || relatedProperties.length === 0)) {
         throw new functions.https.HttpsError("invalid-argument", "No data provided to update.");
+    }
+
+    // Check and update password
+    if (updatedUser.password) {
+        try {
+            await auth.updateUser(userId, {
+                password: updatedUser.password
+            });
+        } catch (error: any) {
+            logger.error(`Failed to update password for user ${userId}`, error);
+            throw new functions.https.HttpsError("internal", `Failed to update password. Details: ${error.message}`);
+        }
+        // Remove password from updatedUser so it doesn't get saved in Firestore
+        delete updatedUser.password;
     }
 
     try {

@@ -46,6 +46,7 @@ export interface EditUserPayload {
         relatedProperties: string[];
         role: string;
         name: string;
+        password?: string;
     };
 }
 
