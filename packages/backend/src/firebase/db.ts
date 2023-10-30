@@ -42,10 +42,10 @@ export function usersCollection(organisationId: string) {
  * Call the 'recursiveDelete' callable function with a path to initiate
  * a server-side delete.
  */
-export function deleteCollection(id: string) {
+export function deleteDocAndAllSubCollections(collectionPath: string, docId: string) {
     const { functions } = initializeFirebase();
     const deleteFn = httpsCallable(functions, "deleteCollection");
-    return deleteFn({ col: Collection.EVENTS, id });
+    return deleteFn({ col: collectionPath, id: docId });
 }
 
 // DOCS

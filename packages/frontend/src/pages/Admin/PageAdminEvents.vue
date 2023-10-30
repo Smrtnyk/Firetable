@@ -12,8 +12,8 @@ import {
 } from "src/helpers/ui-helpers";
 import { computed, ref, watch } from "vue";
 import { Loading, useQuasar } from "quasar";
-import { CreateEventPayload, EventDoc, PropertyDoc } from "@firetable/types";
-import { createNewEvent, deleteEvent, EventOwner } from "@firetable/backend";
+import { Collection, CreateEventPayload, EventDoc, PropertyDoc } from "@firetable/types";
+import { createNewEvent, deleteDocAndAllSubCollections, EventOwner } from "@firetable/backend";
 import { takeLast } from "@firetable/utils";
 import { useFloors } from "src/composables/useFloors";
 import { useProperties } from "src/composables/useProperties";
@@ -106,10 +106,18 @@ const onCreateEvent = withLoading(async function (eventData: CreateEventPayload)
 
 async function onEventItemSlideRight({ event, reset }: { event: EventDoc; reset: () => void }) {
     if (!(await showConfirm(t("PageAdminEvents.deleteEventDialogTitle")))) return reset();
-
     await tryCatchLoadingWrapper({
         hook: async () => {
-            await deleteEvent(event.id);
+            await deleteDocAndAllSubCollections(
+                [
+                    Collection.ORGANISATIONS,
+                    event.organisationId,
+                    Collection.PROPERTIES,
+                    event.propertyId,
+                    Collection.EVENTS,
+                ].join("/"),
+                event.id,
+            );
             eventsByProperty[activePropertyId.value].delete(event);
         },
         errorHook: reset,

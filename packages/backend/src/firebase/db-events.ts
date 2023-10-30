@@ -1,7 +1,6 @@
 import {
     eventsCollection,
     guestListCollection,
-    deleteCollection,
     guestDoc,
     eventFloorDoc,
     eventDoc,
@@ -59,8 +58,6 @@ function toEventDoc(doc: DocumentData): EventDoc {
         _doc: doc,
     };
 }
-
-export const deleteEvent = deleteCollection;
 
 export function updateEventProperty<T extends keyof EventDoc>(
     owner: EventOwner,

@@ -4,9 +4,8 @@ import { User } from "./auth.js";
 
 export interface CreateEventForm {
     name: string;
-    date: string;
+    date: number;
     guestListLimit: number;
-    img: string;
     entryPrice: number;
 }
 
@@ -21,7 +20,6 @@ export interface EventDoc {
     creator: string;
     date: number;
     entryPrice: number;
-    img: string | null;
     name: string;
     reservedPercentage: number;
     guestListLimit: number;

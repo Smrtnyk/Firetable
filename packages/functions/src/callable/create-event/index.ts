@@ -66,11 +66,12 @@ export async function createEvent(
         transaction.set(eventRef, {
             name,
             entryPrice,
-            date: getTimestampFromDateString(date),
+            date,
             creator,
             reservedPercentage: 0,
             guestListLimit,
-            propertyId
+            propertyId,
+            organisationId
         });
 
         floors.forEach(floor => {
@@ -84,17 +85,4 @@ export async function createEvent(
 
         return { id, propertyId, organisationId };
     });
-}
-
-/**
- * Converts a date string of the format "DD-MM-YYYY HH:mm" to a Unix timestamp (milliseconds since the Unix Epoch).
- *
- * @param dateString - The date string in the format "DD-MM-YYYY HH:mm".
- * @returns - The Unix timestamp representation of the provided date string.
- */
-function getTimestampFromDateString(dateString: string): number {
-    const [date, time] = dateString.split(" ");
-    const [day, month, year] = date.split("-");
-    const [hours, minutes] = time.split(":");
-    return new Date(+year, +month - 1, +day, +hours, +minutes).getTime();
 }

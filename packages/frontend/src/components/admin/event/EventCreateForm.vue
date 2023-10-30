@@ -1,36 +1,39 @@
 <script setup lang="ts">
-import { reactive, computed, ref } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 
 import { useI18n } from "vue-i18n";
 import { greaterThanZero, noEmptyString, requireNumber } from "src/helpers/form-rules";
 import { useRouter } from "vue-router";
 
-import { date, QForm } from "quasar";
+import { QForm } from "quasar";
 import { CreateEventForm, CreateEventPayload } from "@firetable/types";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { PropertyFloors } from "src/composables/useFloors";
+import { formatEventDate } from "src/helpers/utils";
 
 interface State {
     form: CreateEventForm;
     chosenFloors: string[];
     showDateModal: boolean;
     showTimeModal: boolean;
+    selectedDate: string;
+    selectedTime: string;
 }
 
 interface Props {
     property: PropertyFloors;
 }
 
-const { formatDate } = date;
-const newDate = new Date();
-newDate.setHours(22);
-newDate.setMinutes(0);
+const now = new Date();
+const newDate = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 22, 0),
+);
+const [year, month, day] = newDate.toISOString().split("T")[0].split("-");
 
 const eventObj: CreateEventForm = {
     name: "",
-    date: formatDate(newDate, "DD-MM-YYYY HH:mm"),
+    date: newDate.getTime(),
     guestListLimit: 100,
-    img: "",
     entryPrice: 0,
 };
 const props = defineProps<Props>();
@@ -45,6 +48,26 @@ const state = reactive<State>({
     chosenFloors: [],
     showDateModal: false,
     showTimeModal: false,
+    selectedDate: `${day}-${month}-${year}`,
+    selectedTime: formatEventDate(newDate.getTime()).split(" ")[1], // "HH:mm"
+});
+
+watch([() => state.selectedDate, () => state.selectedTime], () => {
+    const [day, month, year] = state.selectedDate.split("-");
+    const combinedDateTime = `${year}-${month}-${day}T${state.selectedTime}:00Z`;
+    state.form.date = new Date(combinedDateTime).getTime();
+});
+
+function updateDate(newDate: string) {
+    state.selectedDate = newDate;
+}
+
+function updateTime(newTime: any) {
+    state.selectedTime = newTime;
+}
+
+const displayedDate = computed(() => {
+    return `${state.selectedDate} ${state.selectedTime}`;
 });
 
 const totalFloors = computed(() => {
@@ -69,12 +92,10 @@ function onSubmit() {
     if (!form.value?.validate()) {
         return;
     }
-
     emit("create", {
         ...state.form,
         propertyId: props.property.propertyId,
         organisationId: props.property.organisationId,
-        img: state.form.img,
         floors: selectedFloors,
     });
     state.form = eventObj;
@@ -82,13 +103,6 @@ function onSubmit() {
 
 function onReset() {
     state.form = { ...eventObj };
-}
-
-function validDates(calendarDate: string) {
-    return (
-        new Date(calendarDate).toISOString().substring(0, 10) >=
-        new Date().toISOString().substring(0, 10)
-    );
 }
 </script>
 
@@ -109,8 +123,6 @@ function validDates(calendarDate: string) {
     </div>
 
     <template v-else>
-        <q-img v-if="state.form.img" :src="state.form.img" :ratio="1" class="q-mb-md" />
-
         <q-form ref="form" class="q-gutter-xs q-pt-md q-pa-md" @submit="onSubmit" @reset="onReset">
             <q-input
                 v-model="state.form.name"
@@ -141,15 +153,15 @@ function validDates(calendarDate: string) {
                 :rules="[requireNumber()]"
             />
 
-            <q-input v-model="state.form.date" rounded standout readonly class="q-mb-lg">
+            <q-input v-model="displayedDate" rounded standout readonly class="q-mb-lg">
                 <template #prepend>
                     <q-icon name="calendar" class="cursor-pointer" />
                     <q-popup-proxy transition-show="scale" transition-hide="scale">
                         <q-date
-                            v-model="state.form.date"
-                            mask="DD-MM-YYYY HH:mm"
+                            v-model="state.selectedDate"
+                            mask="DD-MM-YYYY"
                             today-btn
-                            :options="validDates"
+                            @update:model-value="updateDate"
                         >
                             <div class="row items-center justify-end">
                                 <q-btn
@@ -165,7 +177,12 @@ function validDates(calendarDate: string) {
                 <template #append>
                     <q-icon name="clock" class="cursor-pointer" />
                     <q-popup-proxy transition-show="scale" transition-hide="scale">
-                        <q-time v-model="state.form.date" mask="DD-MM-YYYY HH:mm" format24h>
+                        <q-time
+                            v-model="state.selectedTime"
+                            mask="HH:mm"
+                            format24h
+                            @update:model-value="updateTime"
+                        >
                             <div class="row items-center justify-end">
                                 <q-btn
                                     :label="t('EventCreateForm.inputDateTimePickerCloseBtnLabel')"

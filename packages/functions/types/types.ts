@@ -18,12 +18,6 @@ export enum Role {
 }
 
 // Cannot import this because functions deploy
-export interface BaseTable {
-    reservation: Record<string, any>;
-    label: string;
-}
-
-// Cannot import this because functions deploy
 export interface CreateUserPayload{
     id: string;
     name: string;
