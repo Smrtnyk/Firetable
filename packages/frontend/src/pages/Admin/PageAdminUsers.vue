@@ -19,6 +19,7 @@ import { useUsers } from "src/composables/useUsers";
 import { useAuthStore } from "stores/auth-store";
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
+import FTCenteredText from "components/FTCenteredText.vue";
 
 const { t } = useI18n();
 const quasar = useQuasar();
@@ -171,13 +172,8 @@ async function onUserSlideRight(user: User, reset: () => void) {
             </q-slide-item>
         </q-list>
 
-        <div
-            v-if="users.length === 0 && !isLoading"
-            class="row justify-center items-center q-mt-md"
-        >
-            <h6 class="q-ma-sm text-weight-bolder underline">
-                {{ t("PageAdminUsers.noUsersCreatedMessage") }}
-            </h6>
-        </div>
+        <FTCenteredText v-if="users.length === 0 && !isLoading">
+            {{ t("PageAdminUsers.noUsersCreatedMessage") }}
+        </FTCenteredText>
     </div>
 </template>

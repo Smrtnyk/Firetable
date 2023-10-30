@@ -13,6 +13,7 @@ import {
 } from "@firetable/backend";
 import { OrganisationDoc } from "@firetable/types";
 import { onMounted, ref } from "vue";
+import FTCenteredText from "components/FTCenteredText.vue";
 
 const quasar = useQuasar();
 const isLoading = ref(false);
@@ -90,13 +91,8 @@ function createOrganisation(): void {
             </q-slide-item>
         </q-list>
 
-        <div
-            v-if="organisations.length === 0 && !isLoading"
-            class="row justify-center items-center q-pa-md"
-        >
-            <h6 class="q-ma-sm text-weight-bolder underline">
-                There are no organisations created.
-            </h6>
-        </div>
+        <FTCenteredText v-if="organisations.length === 0 && !isLoading">
+            There are no organisations created.
+        </FTCenteredText>
     </div>
 </template>

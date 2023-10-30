@@ -12,6 +12,7 @@ import { useOrganisations } from "src/composables/useOrganisations";
 import { useAuthStore } from "stores/auth-store";
 import { ADMIN, PropertyDoc } from "@firetable/types";
 import { useI18n } from "vue-i18n";
+import FTCenteredText from "components/FTCenteredText.vue";
 
 const authStore = useAuthStore();
 const quasar = useQuasar();
@@ -128,13 +129,8 @@ function createProperty(): void {
             </h6>
         </div>
 
-        <div
-            v-else-if="properties.length === 0 && !isLoading"
-            class="row justify-center items-center q-mt-md"
-        >
-            <h6 class="q-ma-sm text-weight-bolder underline">
-                {{ t("PageAdminProperties.noPropertiesCreatedMessage") }}
-            </h6>
-        </div>
+        <FTCenteredText v-else-if="properties.length === 0 && !isLoading">
+            {{ t("PageAdminProperties.noPropertiesCreatedMessage") }}
+        </FTCenteredText>
     </div>
 </template>

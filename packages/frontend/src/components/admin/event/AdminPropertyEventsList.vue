@@ -2,6 +2,7 @@
 import PageAdminEventsListItem from "components/Event/PageAdminEventsListItem.vue";
 import { computed } from "vue";
 import { EventDoc, PropertyDoc } from "@firetable/types";
+import FTCenteredText from "components/FTCenteredText.vue";
 
 interface Props {
     property: PropertyDoc;
@@ -44,13 +45,9 @@ function handleLoad() {
 
 <template>
     <div>
-        <template v-if="!eventsLength">
-            <div class="row justify-center items-center q-mt-md">
-                <h6 class="q-ma-sm text-weight-bolder underline">
-                    There are no events created for this property.
-                </h6>
-            </div>
-        </template>
+        <FTCenteredText v-if="!eventsLength">
+            There are no events created for this property.
+        </FTCenteredText>
         <template v-else>
             <div v-for="[year, yearBuckets] in [...bucketizedEvents.entries()]" :key="year">
                 <p>{{ year }}</p>

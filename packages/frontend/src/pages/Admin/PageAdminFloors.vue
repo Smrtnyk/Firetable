@@ -12,6 +12,7 @@ import { PropertyFloors, useFloors } from "src/composables/useFloors";
 import { onMounted, ref, watch } from "vue";
 import { takeProp } from "@firetable/utils";
 import { useI18n } from "vue-i18n";
+import FTCenteredText from "components/FTCenteredText.vue";
 
 const quasar = useQuasar();
 const { t } = useI18n();
@@ -167,22 +168,15 @@ onMounted(async () => {
                 </q-list>
 
                 <!-- If the property doesn't have floors, display a standout message -->
-                <div v-else class="row justify-center items-center q-mt-md">
-                    <h6 class="q-ma-sm text-weight-bolder underline">
-                        {{ t("PageAdminFloors.noFloorPlansMessage") }}
-                    </h6>
-                </div>
+                <FTCenteredText v-else>
+                    {{ t("PageAdminFloors.noFloorPlansMessage") }}
+                </FTCenteredText>
             </q-tab-panel>
         </q-tab-panels>
 
         <!-- Show "no properties" message when there are no properties and isLoading is false -->
-        <div
-            v-if="!Object.keys(floors).length && !isLoading"
-            class="justify-center items-center q-pa-md text-center"
-        >
-            <h6 class="q-ma-sm text-weight-bolder underline">
-                {{ t("PageAdminFloors.noPropertiesMessage") }}
-            </h6>
-        </div>
+        <FTCenteredText v-if="!Object.keys(floors).length && !isLoading">
+            {{ t("PageAdminFloors.noPropertiesMessage") }}
+        </FTCenteredText>
     </div>
 </template>

@@ -21,6 +21,7 @@ import { useEvents } from "src/composables/useEvents";
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+import FTCenteredText from "components/FTCenteredText.vue";
 
 const router = useRouter();
 const quasar = useQuasar();
@@ -170,14 +171,9 @@ function showCreateEventForm(property: PropertyDoc): void {
     <div class="PageAdminEvents">
         <FTTitle title="Events" />
 
-        <div
-            v-if="properties.length === 0 && !isAnyLoading"
-            class="row justify-center items-center q-mt-md"
-        >
-            <h6 class="q-ma-sm text-weight-bolder underline">
-                {{ t("PageAdminEvents.noPropertiesMessage") }}
-            </h6>
-        </div>
+        <FTCenteredText v-if="properties.length === 0 && !isAnyLoading">
+            {{ t("PageAdminEvents.noPropertiesMessage") }}
+        </FTCenteredText>
 
         <div v-else>
             <q-tabs v-model="activePropertyId" @input="fetchEventsForActiveTab">

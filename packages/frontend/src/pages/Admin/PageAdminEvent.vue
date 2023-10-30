@@ -132,6 +132,7 @@ function showFloorEditDialog(floor: FloorDoc): void {
     }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- unused for now
 function showAssignStaffDialog(): void {
     if (event.value) {
         showDialog(
@@ -207,16 +208,16 @@ onMounted(init);
                         </q-btn>
 
                         <!-- Staff assigned to an event -->
-                        <q-separator class="q-my-md" />
-                        <h2 class="text-subtitle1">Active Staff</h2>
-                        <q-btn
-                            class="button-gradient q-mb-sm"
-                            size="md"
-                            rounded
-                            @click="showAssignStaffDialog"
-                        >
-                            Assign active staff
-                        </q-btn>
+                        <!--                        <q-separator class="q-my-md" />-->
+                        <!--                        <h2 class="text-subtitle1">Active Staff</h2>-->
+                        <!--                        <q-btn-->
+                        <!--                            class="button-gradient q-mb-sm"-->
+                        <!--                            size="md"-->
+                        <!--                            rounded-->
+                        <!--                            @click="showAssignStaffDialog"-->
+                        <!--                        >-->
+                        <!--                            Assign active staff-->
+                        <!--                        </q-btn>-->
                     </div>
                 </q-tab-panel>
             </q-tab-panels>
