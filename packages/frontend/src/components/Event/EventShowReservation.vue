@@ -88,6 +88,7 @@ function onReservationConfirm() {
         <q-item>
             <q-item-section>
                 <q-btn
+                    v-if="!isStaff"
                     :label="t('EventShowReservation.deleteReservationLabel')"
                     outline
                     icon="trash"
