@@ -286,11 +286,11 @@ function deactivateBulkMode() {
             </div>
             <div class="col-6">
                 <q-badge color="secondary">
-                    Height: {{ floorInstance.height }} (300 to 1000)
+                    Height: {{ floorInstance.height }} (300 to 1200)
                 </q-badge>
                 <q-slider
                     :min="300"
-                    :max="1000"
+                    :max="1200"
                     :step="RESOLUTION"
                     label
                     color="deep-orange"
