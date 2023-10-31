@@ -38,7 +38,7 @@ export class RectTable extends fabric.Group {
             ...options.rectOptions,
             fill,
             stroke: "black",
-            strokeWidth: 1,
+            strokeWidth: 0.5,
         });
 
         const textLabel = new fabric.Text(options.textOptions.label, {
