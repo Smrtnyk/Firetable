@@ -8,11 +8,11 @@ export interface FloorDoc {
 }
 
 export const enum ElementTag {
-    RECT = "rect",
-    CIRCLE = "circle",
-    SOFA = "sofa",
+    RECT = "RectTable",
+    CIRCLE = "RoundTable",
+    SOFA = "Sofa",
     SINGLE_SOFA = "SingleSofa",
-    DJ_BOOTH = "dj_booth",
-    WALL = "wall",
+    DJ_BOOTH = "DJBooth",
+    WALL = "Wall",
     STAGE = "Stage",
 }
