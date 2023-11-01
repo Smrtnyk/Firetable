@@ -38,7 +38,6 @@ export class CommandInvoker {
         return this.redoStack.length > 0;
     }
 
-    // Event Emitter
     emit(eventName: string) {
         if (!this.listeners[eventName]) return; // If no listeners for this event, exit
         this.listeners[eventName].forEach((listener) => {
@@ -46,14 +45,12 @@ export class CommandInvoker {
         });
     }
 
-    // Register a new listener
     on(eventName: string, listener: EventListener) {
         if (!this.listeners[eventName]) {
             this.listeners[eventName] = [];
         }
         this.listeners[eventName].push(listener);
         return () => {
-            // Return a function to unregister this listener
             this.listeners[eventName] = this.listeners[eventName].filter((l) => l !== listener);
         };
     }
