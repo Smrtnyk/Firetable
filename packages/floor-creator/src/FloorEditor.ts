@@ -19,7 +19,7 @@ export class FloorEditor extends Floor {
     protected eventManager: EventManager;
     private elementManager: ElementManager;
     private gridDrawer: GridDrawer;
-    private commandInvoker = new CommandInvoker();
+    commandInvoker = new CommandInvoker();
 
     private readonly dblClickHandler?: FloorEditorDoubleClickHandler;
 

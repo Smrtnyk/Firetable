@@ -3,7 +3,7 @@ import AddTableDialog from "components/Floor/AddTableDialog.vue";
 import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
 import FTDialog from "components/FTDialog.vue";
 
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { NumberTuple } from "src/types/generic";
 import { useRouter } from "vue-router";
 import { Loading, useQuasar } from "quasar";
@@ -75,6 +75,15 @@ const {
     pending: isFloorLoading,
 } = useFirestoreDocument<FloorDoc>(floorPath, { once: true });
 
+const undoRedoState = reactive({
+    canUndo: false,
+    canRedo: false,
+});
+let unregisterStateChangeListener: () => void | undefined;
+
+// Remember to unregister the listener when the component unmounts
+onBeforeUnmount(() => {});
+
 onMounted(async () => {
     Loading.show();
     await floorDataPromise.value;
@@ -90,6 +99,7 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(() => {
+    unregisterStateChangeListener?.();
     floorInstance.value?.destroy();
 });
 
@@ -103,6 +113,12 @@ function instantiateFloor(floorDoc: FloorDoc) {
         elementClickHandler,
         mode: FloorMode.EDITOR,
         containerWidth: pageRef.value.clientWidth,
+    });
+
+    // After initializing the floorInstance:
+    floorInstance.value?.commandInvoker.on("change", () => {
+        undoRedoState.canUndo = floorInstance.value?.commandInvoker.canUndo() ?? false;
+        undoRedoState.canRedo = floorInstance.value?.commandInvoker.canRedo() ?? false;
     });
 }
 
@@ -226,6 +242,20 @@ function deactivateBulkMode() {
     bulkElement.value = null;
     bulkLabelCounter.value = 0;
 }
+
+function undoAction() {
+    if (floorInstance.value) {
+        floorInstance.value.commandInvoker.undo();
+        floorInstance.value.canvas.renderAll(); // Refresh the canvas after undo
+    }
+}
+
+function redoAction() {
+    if (floorInstance.value) {
+        floorInstance.value.commandInvoker.redo();
+        floorInstance.value.canvas.renderAll(); // Refresh the canvas after redo
+    }
+}
 </script>
 
 <template>
@@ -258,6 +288,22 @@ function deactivateBulkMode() {
             />
 
             <div class="row q-pa-sm q-col-gutter-md">
+                <div class="col-auto flex q-pl-none justify-end">
+                    <q-btn
+                        :disabled="!undoRedoState.canUndo"
+                        @click="undoAction"
+                        icon="undo"
+                        :size="buttonSize"
+                    />
+                </div>
+                <div class="col-auto flex q-pl-none justify-end">
+                    <q-btn
+                        :disabled="!undoRedoState.canRedo"
+                        @click="redoAction"
+                        icon="redo"
+                        :size="buttonSize"
+                    />
+                </div>
                 <div class="col-auto flex q-pl-none justify-end">
                     <q-btn
                         v-if="floorInstance"

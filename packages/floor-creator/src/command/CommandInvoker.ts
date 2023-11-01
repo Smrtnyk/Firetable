@@ -1,28 +1,60 @@
 import { Command } from "./Command";
 
+type EventListener = () => void;
+
 export class CommandInvoker {
     private undoStack: Command[] = [];
     private redoStack: Command[] = [];
+    private listeners: { [key: string]: EventListener[] } = {};
 
     execute(command: Command) {
         command.execute();
         this.undoStack.push(command);
-        this.redoStack = []; // Clear redo stack when a new command is executed
+        this.redoStack.length = 0;
+        this.emit("change");
     }
 
     undo() {
-        const command = this.undoStack.pop();
-        if (command) {
-            command.undo();
-            this.redoStack.push(command);
-        }
+        if (!this.canUndo()) return;
+        const command = this.undoStack.pop()!;
+        command.undo();
+        this.redoStack.push(command);
+        this.emit("change");
     }
 
     redo() {
-        const command = this.redoStack.pop();
-        if (command) {
-            command.execute();
-            this.undoStack.push(command);
+        if (!this.canRedo()) return;
+        const command = this.redoStack.pop()!;
+        command.execute();
+        this.undoStack.push(command);
+        this.emit("change");
+    }
+
+    canUndo() {
+        return this.undoStack.length > 0;
+    }
+
+    canRedo() {
+        return this.redoStack.length > 0;
+    }
+
+    // Event Emitter
+    emit(eventName: string) {
+        if (!this.listeners[eventName]) return; // If no listeners for this event, exit
+        this.listeners[eventName].forEach((listener) => {
+            listener(); // Call each registered listener
+        });
+    }
+
+    // Register a new listener
+    on(eventName: string, listener: EventListener) {
+        if (!this.listeners[eventName]) {
+            this.listeners[eventName] = [];
         }
+        this.listeners[eventName].push(listener);
+        return () => {
+            // Return a function to unregister this listener
+            this.listeners[eventName] = this.listeners[eventName].filter((l) => l !== listener);
+        };
     }
 }
