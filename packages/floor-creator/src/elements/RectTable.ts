@@ -2,7 +2,13 @@ import { fabric } from "fabric";
 import { FloorElementTypes } from "../types.js";
 import { determineTableColor } from "../utils.js";
 import { Reservation } from "@firetable/types";
-import { FONT_SIZE, TABLE_TEXT_FILL_COLOR, RESOLUTION } from "../constants";
+import {
+    FONT_SIZE,
+    TABLE_TEXT_FILL_COLOR,
+    RESOLUTION,
+    TABLE_WIDTH,
+    TABLE_HEIGHT,
+} from "../constants";
 import { IGroupOptions } from "fabric/fabric-impl";
 import { AnimationStrategy } from "./animation/AnimationStrategy";
 import { SmoothBlinkAnimation } from "./animation/SmoothBlinkAnimation.js";
@@ -116,12 +122,12 @@ export class RectTable extends fabric.Group {
     private enforceMinimumDimensions(): void {
         if (!this.scaleX || !this.scaleY) return;
 
-        if (this.scaleX * this.initialWidth < 50) {
-            this.scaleX = 50 / this.initialWidth;
+        if (this.scaleX * this.initialWidth < TABLE_WIDTH) {
+            this.scaleX = TABLE_WIDTH / this.initialWidth;
         }
 
-        if (this.scaleY * this.initialHeight < 50) {
-            this.scaleY = 50 / this.initialHeight;
+        if (this.scaleY * this.initialHeight < TABLE_HEIGHT) {
+            this.scaleY = TABLE_HEIGHT / this.initialHeight;
         }
     }
 

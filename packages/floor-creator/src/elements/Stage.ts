@@ -1,5 +1,4 @@
 import { fabric } from "fabric";
-import { RESOLUTION } from "../constants";
 
 export class Stage extends fabric.Group {
     constructor(left: number, top: number) {
@@ -9,7 +8,7 @@ export class Stage extends fabric.Group {
             rx: 10,
             ry: 10,
             width: 150,
-            height: RESOLUTION * 4,
+            height: 25 * 4,
             fill: "#222",
             stroke: "#111",
             strokeWidth: 1,
