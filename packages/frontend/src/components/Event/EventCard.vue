@@ -23,11 +23,7 @@ const { t } = useI18n();
         }"
     >
         <q-card class="EventCard">
-            <q-parallax
-                :src="props.event.img || '/images/default-event-img.jpg'"
-                alt=""
-                :ratio="1.5"
-            />
+            <q-parallax :src="'/images/default-event-img.jpg'" alt="" :ratio="1.5" />
 
             <q-card-section class="EventCard__content">
                 <h2 class="text-h3 q-mb-sm q-ml-none q-mt-none">{{ props.event.name }}</h2>
