@@ -12,19 +12,21 @@ import { RectTable } from "./elements/RectTable";
 import { TouchManager } from "./TouchManager";
 import { FloorZoomManager } from "./FloorZoomManager";
 import { EventManager } from "./event-manager/EventManager";
+import { calculateCanvasScale } from "./utils";
 
 Object.assign(fabric, { RectTable, RoundTable });
 
 export abstract class Floor {
     readonly id: string;
     name: string;
-    readonly scale: number;
+    scale: number;
     height: number;
     readonly floorDoc: FloorDoc;
     readonly canvas: fabric.Canvas;
     readonly elementClickHandler: ElementClickHandler;
     readonly tableToTableHandler?: TableToTableHandler;
     width: number;
+    containerWidth: number;
     touchManager: TouchManager;
     zoomManager: FloorZoomManager;
 
@@ -44,6 +46,7 @@ export abstract class Floor {
         this.id = floorDoc.id;
         this.name = floorDoc.name;
         this.width = floorDoc.width;
+        this.containerWidth = containerWidth;
         this.height = floorDoc.height;
         this.floorDoc = floorDoc;
         this.elementClickHandler = elementClickHandler;
@@ -97,8 +100,4 @@ export abstract class Floor {
             this.elementReviver,
         );
     }
-}
-
-function calculateCanvasScale(containerWidth: number, floorWidth: number) {
-    return containerWidth / floorWidth;
 }

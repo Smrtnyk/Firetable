@@ -11,6 +11,7 @@ import { ElementManager } from "./ElementManager";
 import { FloorDoc } from "@firetable/types";
 import { GridDrawer } from "./GridDrawer";
 import { EditorEventManager } from "./event-manager/EditorEventManager";
+import { calculateCanvasScale } from "./utils";
 
 export class FloorEditor extends Floor {
     protected eventManager: EventManager;
@@ -115,6 +116,8 @@ export class FloorEditor extends Floor {
     updateDimensions(newWidth: number, newHeight: number) {
         this.width = newWidth;
         this.height = newHeight;
+        this.scale = calculateCanvasScale(this.containerWidth, this.width);
+        this.setScaling();
         this.renderData(this.floorDoc.json);
         this.renderGrid();
     }
