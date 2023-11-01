@@ -32,9 +32,10 @@ export class EditorEventManager extends EventManager {
 
             // Snapping logic for movement
             const shouldSnapToGrid =
-                Math.round((target.left! / RESOLUTION) * 4) % 4 === 0 &&
-                Math.round((target.top! / RESOLUTION) * 4) % 4 === 0;
-            if (shouldSnapToGrid) {
+                Math.round(target.left! / RESOLUTION) === target.left! / RESOLUTION &&
+                Math.round(target.top! / RESOLUTION) === target.top! / RESOLUTION;
+
+            if (!shouldSnapToGrid) {
                 target
                     .set({
                         left: Math.round(target.left! / RESOLUTION) * RESOLUTION,
