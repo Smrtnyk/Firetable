@@ -41,17 +41,28 @@ export class EditorEventManager extends EventManager {
             const shouldSnapToTop =
                 topRemainder <= snapRange || RESOLUTION - topRemainder <= snapRange;
 
-            if (shouldSnapToLeft || shouldSnapToTop) {
+            let newLeft: number | undefined;
+            let newTop: number | undefined;
+
+            if (shouldSnapToLeft) {
+                newLeft =
+                    leftRemainder <= snapRange
+                        ? target.left! - leftRemainder
+                        : target.left! + (RESOLUTION - leftRemainder);
+            }
+
+            if (shouldSnapToTop) {
+                newTop =
+                    topRemainder <= snapRange
+                        ? target.top! - topRemainder
+                        : target.top! + (RESOLUTION - topRemainder);
+            }
+
+            if (newLeft !== undefined || newTop !== undefined) {
                 target
                     .set({
-                        left:
-                            leftRemainder < RESOLUTION / 2
-                                ? target.left! - leftRemainder
-                                : target.left! + (RESOLUTION - leftRemainder),
-                        top:
-                            topRemainder < RESOLUTION / 2
-                                ? target.top! - topRemainder
-                                : target.top! + (RESOLUTION - topRemainder),
+                        left: newLeft !== undefined ? newLeft : target.left,
+                        top: newTop !== undefined ? newTop : target.top,
                     })
                     .setCoords();
             }
