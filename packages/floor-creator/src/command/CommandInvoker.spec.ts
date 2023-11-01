@@ -1,0 +1,114 @@
+import { CommandInvoker } from "./CommandInvoker";
+import { Command } from "./Command";
+
+class MockCommand {
+    execute = jest.fn();
+    undo = jest.fn();
+}
+
+describe("CommandInvoker", () => {
+    let invoker: CommandInvoker;
+    let mockCommand: Command;
+
+    beforeEach(() => {
+        invoker = new CommandInvoker();
+        mockCommand = new MockCommand();
+    });
+
+    it("executes command and push it to undo stack", () => {
+        invoker.execute(mockCommand);
+        expect(mockCommand.execute).toHaveBeenCalled();
+        expect(invoker.canUndo()).toBeTruthy();
+        expect(invoker.canRedo()).toBeFalsy();
+    });
+
+    it("undos command and push it to redo stack", () => {
+        invoker.execute(mockCommand);
+        invoker.undo();
+        expect(mockCommand.undo).toHaveBeenCalled();
+        expect(invoker.canUndo()).toBeFalsy();
+        expect(invoker.canRedo()).toBeTruthy();
+    });
+
+    it("redos command and push it back to undo stack", () => {
+        invoker.execute(mockCommand);
+        invoker.undo();
+        invoker.redo();
+        expect(mockCommand.execute).toHaveBeenCalledTimes(2); // Once during initial execute, once during redo
+        expect(invoker.canUndo()).toBeTruthy();
+        expect(invoker.canRedo()).toBeFalsy();
+    });
+
+    it("emits events correctly", () => {
+        const listener = jest.fn();
+        invoker.on("change", listener);
+        invoker.execute(mockCommand);
+        invoker.undo();
+        invoker.redo();
+        expect(listener).toHaveBeenCalledTimes(3); // Once for each operation
+    });
+
+    it("unregisters listeners", () => {
+        const listener = jest.fn();
+        const unregister = invoker.on("change", listener);
+        unregister();
+        invoker.execute(mockCommand);
+        expect(listener).not.toHaveBeenCalled();
+    });
+
+    it("handles undo with empty undo stack gracefully", () => {
+        invoker.undo();
+        expect(mockCommand.undo).not.toHaveBeenCalled();
+        expect(invoker.canRedo()).toBeFalsy();
+    });
+
+    it("handles redo with empty redo stack gracefully", () => {
+        invoker.redo();
+        expect(mockCommand.execute).not.toHaveBeenCalled();
+        expect(invoker.canUndo()).toBeFalsy();
+    });
+
+    it("handles multiple commands correctly", () => {
+        const anotherMockCommand = new MockCommand();
+
+        invoker.execute(mockCommand);
+        invoker.execute(anotherMockCommand);
+
+        invoker.undo(); // undo anotherMockCommand
+        expect(anotherMockCommand.undo).toHaveBeenCalled();
+
+        invoker.redo(); // redo anotherMockCommand
+        expect(anotherMockCommand.execute).toHaveBeenCalled();
+
+        invoker.undo(); // undo anotherMockCommand
+        invoker.undo(); // undo mockCommand
+        expect(mockCommand.undo).toHaveBeenCalled();
+    });
+
+    it("calls multiple listeners for the same event", () => {
+        const listener1 = jest.fn();
+        const listener2 = jest.fn();
+
+        invoker.on("change", listener1);
+        invoker.on("change", listener2);
+
+        invoker.execute(mockCommand);
+
+        expect(listener1).toHaveBeenCalled();
+        expect(listener2).toHaveBeenCalled();
+    });
+
+    it("correctly reports canUndo and canRedo after multiple operations", () => {
+        invoker.execute(mockCommand);
+        expect(invoker.canUndo()).toBeTruthy();
+        expect(invoker.canRedo()).toBeFalsy();
+
+        invoker.undo();
+        expect(invoker.canUndo()).toBeFalsy();
+        expect(invoker.canRedo()).toBeTruthy();
+
+        invoker.redo();
+        expect(invoker.canUndo()).toBeTruthy();
+        expect(invoker.canRedo()).toBeFalsy();
+    });
+});
