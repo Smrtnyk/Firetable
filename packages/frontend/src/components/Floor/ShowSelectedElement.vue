@@ -87,7 +87,7 @@
 
 <script setup lang="ts">
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
-import { computed, ref, watch, toRefs } from "vue";
+import { computed, ref, watch, toRefs, onMounted, onBeforeUnmount } from "vue";
 import { BaseTable, FloorEditorElement, isTable } from "@firetable/floor-creator";
 import { QPopupProxy } from "quasar";
 import { isMobile } from "src/global-reactives/is-mobile";
@@ -108,6 +108,20 @@ const { selectedFloorElement, deleteAllowed, existingLabels } = toRefs(props);
 const emit = defineEmits(["delete"]);
 
 const elementColor = ref<string>("");
+
+function onKeyDownListener(event: KeyboardEvent) {
+    if (event.key === "Delete" && selectedFloorElement.value) {
+        deleteElement();
+    }
+}
+
+onMounted(() => {
+    document.addEventListener("keydown", onKeyDownListener);
+});
+
+onBeforeUnmount(() => {
+    document.removeEventListener("keydown", onKeyDownListener);
+});
 
 watch(selectedFloorElement, (newEl) => {
     if (newEl?.getBaseFill) {
