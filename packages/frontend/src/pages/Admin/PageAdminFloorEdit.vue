@@ -15,6 +15,8 @@ import {
     FloorEditorElement,
     FloorMode,
     hasFloorTables,
+    MAX_FLOOR_HEIGHT,
+    MAX_FLOOR_WIDTH,
     RESOLUTION,
 } from "@firetable/floor-creator";
 import { Collection, ElementTag, FloorDoc } from "@firetable/types";
@@ -273,12 +275,12 @@ function deactivateBulkMode() {
         <div class="row q-pa-sm q-col-gutter-md" v-if="floorInstance">
             <div class="col-6">
                 <q-badge color="secondary">
-                    Width: {{ floorInstance.width }} (300 to 1000)
+                    Width: {{ floorInstance.width }} (300 to {{ MAX_FLOOR_WIDTH }})
                 </q-badge>
                 <q-slider
                     :model-value="floorInstance.width"
                     :min="300"
-                    :max="1005"
+                    :max="MAX_FLOOR_WIDTH"
                     :step="RESOLUTION"
                     label
                     color="deep-orange"
@@ -287,11 +289,11 @@ function deactivateBulkMode() {
             </div>
             <div class="col-6">
                 <q-badge color="secondary">
-                    Height: {{ floorInstance.height }} (300 to 1200)
+                    Height: {{ floorInstance.height }} (300 to {{ MAX_FLOOR_HEIGHT }})
                 </q-badge>
                 <q-slider
                     :min="300"
-                    :max="1200"
+                    :max="MAX_FLOOR_HEIGHT"
                     :step="RESOLUTION"
                     label
                     color="deep-orange"
