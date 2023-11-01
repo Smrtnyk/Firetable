@@ -35,4 +35,6 @@ export class FloorViewer extends Floor {
         element.lockMovementY = true;
         element.lockScalingFlip = true;
     }
+
+    destroy() {}
 }

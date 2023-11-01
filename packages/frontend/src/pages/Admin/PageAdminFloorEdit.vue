@@ -3,7 +3,7 @@ import AddTableDialog from "components/Floor/AddTableDialog.vue";
 import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
 import FTDialog from "components/FTDialog.vue";
 
-import { computed, nextTick, onMounted, ref } from "vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
 import { NumberTuple } from "src/types/generic";
 import { useRouter } from "vue-router";
 import { Loading, useQuasar } from "quasar";
@@ -87,6 +87,10 @@ onMounted(async () => {
         return;
     }
     Loading.hide();
+});
+
+onBeforeUnmount(() => {
+    floorInstance.value?.destroy();
 });
 
 function instantiateFloor(floorDoc: FloorDoc) {

@@ -34,6 +34,7 @@ export abstract class Floor {
     abstract onFloorDoubleTap(coordinates: [x: number, y: number]): void;
     protected abstract onElementClick(ev: fabric.IEvent<MouseEvent>): void;
     protected abstract setElementProperties(element: fabric.Object): void;
+    public abstract destroy(): void;
 
     constructor(options: FloorCreationOptions) {
         const { canvas, floorDoc, elementClickHandler, mode, containerWidth, tableToTableHandler } =

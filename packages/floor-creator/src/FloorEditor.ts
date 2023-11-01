@@ -19,6 +19,8 @@ export class FloorEditor extends Floor {
 
     private readonly dblClickHandler?: FloorEditorDoubleClickHandler;
 
+    private ctrlPressedDuringSelection: boolean = false;
+
     constructor(options: FloorEditorCreationOptions) {
         super(options);
 
@@ -27,8 +29,49 @@ export class FloorEditor extends Floor {
         this.eventManager = new EditorEventManager(this);
         this.elementManager = new ElementManager();
         this.initializeCanvasEventHandlers();
+        this.initializeCtrlEventListeners();
+        this.canvas.on("object:moving", (options) => {
+            if (this.ctrlPressedDuringSelection) {
+                const activeObjects = this.canvas.getActiveObjects();
+                const activeGroup = this.canvas.getActiveObject() as fabric.Group;
+
+                if (activeGroup && activeGroup.type === "group") {
+                    activeObjects.forEach((object) => {
+                        if (object !== activeGroup) {
+                            object.set({
+                                left: object.left! + options.e.movementX,
+                                top: object.top! + options.e.movementY,
+                            });
+                        }
+                    });
+                }
+
+                this.ctrlPressedDuringSelection = false;
+            }
+        });
+
         this.renderGrid();
     }
+
+    private initializeCtrlEventListeners() {
+        document.addEventListener("keydown", this.handleKeyDown);
+        document.addEventListener("keyup", this.handleKeyUp);
+    }
+
+    private handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Control" || e.ctrlKey) {
+            this.canvas.selection = true;
+            this.ctrlPressedDuringSelection = true;
+            this.canvas.renderAll();
+        }
+    };
+
+    private handleKeyUp = (e: KeyboardEvent) => {
+        if (e.key === "Control" || e.ctrlKey) {
+            this.canvas.selection = false;
+            this.canvas.renderAll();
+        }
+    };
 
     onFloorDoubleTap(coordinates: [x: number, y: number]) {
         this.dblClickHandler?.(this, coordinates);
@@ -77,5 +120,10 @@ export class FloorEditor extends Floor {
 
     setFloorName(newName: string) {
         this.name = newName;
+    }
+
+    destroy() {
+        document.removeEventListener("keydown", this.handleKeyDown);
+        document.removeEventListener("keyup", this.handleKeyUp);
     }
 }
