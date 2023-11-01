@@ -277,7 +277,7 @@ function deactivateBulkMode() {
                 <q-slider
                     :model-value="floorInstance.width"
                     :min="300"
-                    :max="1000"
+                    :max="1005"
                     :step="RESOLUTION"
                     label
                     color="deep-orange"
