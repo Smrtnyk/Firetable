@@ -7,12 +7,13 @@ import FTDialog from "components/FTDialog.vue";
 import { Loading, useQuasar } from "quasar";
 
 import { useRouter } from "vue-router";
-import { onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { useEventsStore } from "src/stores/events-store";
 import { useFirestoreCollection, useFirestoreDocument } from "src/composables/useFirestore";
 import { Collection, EventDoc, FloorDoc, GuestData } from "@firetable/types";
 import useFloorsPageEvent from "src/composables/useFloorsPageEvent";
 import { EventOwner } from "@firetable/backend";
+import { isMobile } from "src/global-reactives/is-mobile";
 
 interface State {
     showMapsExpanded: boolean;
@@ -79,9 +80,9 @@ const {
     useFloorsPageEventState,
 } = useFloorsPageEvent(eventFloors, pageRef, eventOwner, event);
 
-function showActiveStaff(): void {
-    // todo: implement
-}
+const buttonSize = computed(() => {
+    return isMobile.value ? "sm" : "md";
+});
 
 function showEventInfo(): void {
     q.dialog({
@@ -112,7 +113,7 @@ onMounted(init);
 
 <template>
     <div v-if="event" class="PageEvent" ref="pageRef">
-        <div class="row items-center q-mb-sm">
+        <div class="row items-center q-mb-sm q-gutter-sm">
             <q-fab
                 v-if="useFloorsPageEventState.floorInstances.size"
                 :model-value="state.showMapsExpanded"
@@ -125,7 +126,7 @@ onMounted(init);
                 vertical-actions-align="left"
                 icon="chevron_down"
                 direction="down"
-                class="button-gradient"
+                class="button-gradient q-ma-none"
             >
                 <q-fab-action
                     :key="florInstance.id"
@@ -137,38 +138,28 @@ onMounted(init);
                 />
             </q-fab>
 
-            <q-space />
-            <q-btn
-                class="button-gradient q-mr-sm"
-                rounded
-                size="md"
-                icon="check"
-                @click="showActiveStaff"
-                v-if="event.activeStaff"
+            <FTAutocomplete
+                :all-reserved-tables="allReservedTables"
+                @found="onTableFound"
+                @clear="onAutocompleteClear"
+                class="col q-mb-sm"
             />
             <q-btn
-                class="button-gradient q-mr-sm"
+                class="button-gradient q-ma-none q-ml-sm"
                 rounded
-                size="md"
+                :size="buttonSize"
                 icon="info"
                 @click="showEventInfo"
                 v-if="event.info"
             />
             <q-btn
-                class="button-gradient"
+                class="button-gradient q-ma-none q-ml-sm"
                 @click="eventsStore.toggleEventGuestListDrawerVisibility"
                 icon="users"
                 rounded
-                size="md"
+                :size="buttonSize"
             />
         </div>
-        <q-separator class="q-mx-auto q-my-xs-xs q-my-sm-sm q-my-md-md" inset />
-        <FTAutocomplete
-            :all-reserved-tables="allReservedTables"
-            @found="onTableFound"
-            @clear="onAutocompleteClear"
-            class="q-mb-sm"
-        />
 
         <div
             v-for="floor in eventFloors"
