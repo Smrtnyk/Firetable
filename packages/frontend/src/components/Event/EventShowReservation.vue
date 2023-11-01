@@ -12,6 +12,7 @@ const authStore = useAuthStore();
 const props = defineProps<Props>();
 const emit = defineEmits<{
     (e: "delete"): void;
+    (e: "edit"): void;
     (e: "confirm", confirmed: boolean): void;
 }>();
 const { t } = useI18n();
@@ -86,17 +87,16 @@ function onReservationConfirm() {
             </q-item-section>
         </q-item>
         <q-item>
-            <q-item-section>
+            <div v-if="!isStaff" class="row q-gutter-sm full-width">
                 <q-btn
-                    v-if="!isStaff"
-                    :label="t('EventShowReservation.deleteReservationLabel')"
-                    outline
+                    class="no-wrap"
                     icon="trash"
                     color="negative"
                     @click="() => emit('delete')"
                     v-close-popup
                 />
-            </q-item-section>
+                <q-btn icon="pencil" color="positive" @click="() => emit('edit')" v-close-popup />
+            </div>
         </q-item>
     </q-card-section>
 </template>
