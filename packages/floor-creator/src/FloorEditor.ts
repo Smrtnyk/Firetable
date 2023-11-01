@@ -12,15 +12,20 @@ import { FloorDoc } from "@firetable/types";
 import { GridDrawer } from "./GridDrawer";
 import { EditorEventManager } from "./event-manager/EditorEventManager";
 import { calculateCanvasScale } from "./utils";
+import { CommandInvoker } from "./command/CommandInvoker";
+import { MoveCommand } from "./command/MoveCommand";
 
 export class FloorEditor extends Floor {
     protected eventManager: EventManager;
     private elementManager: ElementManager;
     private gridDrawer: GridDrawer;
+    private commandInvoker = new CommandInvoker();
 
     private readonly dblClickHandler?: FloorEditorDoubleClickHandler;
 
     private ctrlPressedDuringSelection: boolean = false;
+
+    private movingObjectStartPosition: { left: number; top: number } | null = null;
 
     constructor(options: FloorEditorCreationOptions) {
         super(options);
@@ -51,6 +56,29 @@ export class FloorEditor extends Floor {
             }
         });
 
+        this.canvas.on("before:transform", (options) => {
+            if (options.transform && options.transform.target && !this.movingObjectStartPosition) {
+                this.movingObjectStartPosition = {
+                    left: options.transform.target.left!,
+                    top: options.transform.target.top!,
+                };
+            }
+        });
+
+        this.canvas.on("object:modified", (options) => {
+            if (this.movingObjectStartPosition && options.target) {
+                const moveCommand = new MoveCommand(
+                    options.target,
+                    this.movingObjectStartPosition,
+                    { left: options.target.left!, top: options.target.top! },
+                );
+                this.commandInvoker.execute(moveCommand);
+
+                // Reset the starting position for the next move operation
+                this.movingObjectStartPosition = null;
+            }
+        });
+
         this.renderGrid();
     }
 
@@ -64,6 +92,20 @@ export class FloorEditor extends Floor {
             this.canvas.selection = true;
             this.ctrlPressedDuringSelection = true;
             this.canvas.renderAll();
+
+            if (e.key === "z") {
+                if (e.shiftKey) {
+                    this.commandInvoker.redo();
+                } else {
+                    this.commandInvoker.undo();
+                }
+                this.canvas.renderAll();
+                e.preventDefault();
+            } else if (e.key === "y") {
+                this.commandInvoker.redo();
+                this.canvas.renderAll();
+                e.preventDefault();
+            }
         }
     };
 
