@@ -6,7 +6,7 @@
     "exports": "./dist/src/index.js",
     "type": "module",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "test": "jest",
         "build:floor-planner": "tsc"
     },
     "dependencies": {
@@ -17,8 +17,12 @@
     "devDependencies": {
         "@firetable/types": "workspace:*",
         "@firetable/utils": "workspace:*",
+        "@sucrase/jest-plugin": "3.0.0",
         "@types/fabric": "5.3.5",
-        "@types/hammerjs": "2.0.43"
+        "@types/hammerjs": "2.0.43",
+        "@types/jest": "29.5.7",
+        "jest": "29.7.0",
+        "sucrase": "3.34.0"
     },
     "keywords": [],
     "author": "",
