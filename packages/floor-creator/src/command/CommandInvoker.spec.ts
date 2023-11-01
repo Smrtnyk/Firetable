@@ -111,4 +111,62 @@ describe("CommandInvoker", () => {
         expect(invoker.canUndo()).toBeTruthy();
         expect(invoker.canRedo()).toBeFalsy();
     });
+
+    it("clears both undo and redo stacks", () => {
+        invoker.execute(mockCommand);
+        invoker.undo();
+        invoker.clear();
+        expect(invoker.canUndo()).toBeFalsy();
+        expect(invoker.canRedo()).toBeFalsy();
+    });
+
+    it("clears redo stack after executing a new command post undo", () => {
+        invoker.execute(mockCommand);
+        invoker.undo();
+        invoker.execute(new MockCommand());
+        expect(invoker.canRedo()).toBeFalsy();
+    });
+
+    it("maintains the correct order of commands in stacks", () => {
+        const anotherMockCommand = new MockCommand();
+        invoker.execute(mockCommand);
+        invoker.execute(anotherMockCommand);
+        invoker.undo();
+        invoker.undo();
+        expect(mockCommand.undo).toHaveBeenCalled();
+        expect(anotherMockCommand.undo).toHaveBeenCalled();
+        invoker.redo();
+        invoker.redo();
+        expect(mockCommand.execute).toHaveBeenCalledTimes(2);
+        expect(anotherMockCommand.execute).toHaveBeenCalledTimes(2);
+    });
+
+    it("calls the same listener multiple times if registered multiple times", () => {
+        const listener = jest.fn();
+        invoker.on("change", listener);
+        invoker.on("change", listener);
+        invoker.execute(mockCommand);
+        expect(listener).toHaveBeenCalledTimes(2);
+    });
+
+    it("ensures listeners are only unregistered once", () => {
+        const listener = jest.fn();
+        const unregister = invoker.on("change", listener);
+        unregister();
+        unregister(); // Call unregister multiple times
+        invoker.execute(mockCommand);
+        expect(listener).not.toHaveBeenCalled();
+    });
+
+    it("calls listeners in the order they were registered", () => {
+        const order: number[] = [];
+        const listener1 = jest.fn(() => order.push(1));
+        const listener2 = jest.fn(() => order.push(2));
+
+        invoker.on("change", listener1);
+        invoker.on("change", listener2);
+
+        invoker.execute(mockCommand);
+        expect(order).toEqual([1, 2]);
+    });
 });

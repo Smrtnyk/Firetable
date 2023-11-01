@@ -1,20 +1,21 @@
 import { Command } from "./Command";
 
 type EventListener = () => void;
+type CommandInvokerEvent = "change";
 
 export class CommandInvoker {
     private undoStack: Command[] = [];
     private redoStack: Command[] = [];
-    private listeners: { [key: string]: EventListener[] } = {};
+    private listeners = new Map<CommandInvokerEvent, EventListener[]>();
 
-    execute(command: Command) {
+    execute(command: Command): void {
         command.execute();
         this.undoStack.push(command);
-        this.redoStack.length = 0;
+        this.redoStack.splice(0, this.redoStack.length);
         this.emit("change");
     }
 
-    undo() {
+    undo(): void {
         if (!this.canUndo()) return;
         const command = this.undoStack.pop()!;
         command.undo();
@@ -22,7 +23,7 @@ export class CommandInvoker {
         this.emit("change");
     }
 
-    redo() {
+    redo(): void {
         if (!this.canRedo()) return;
         const command = this.redoStack.pop()!;
         command.execute();
@@ -30,28 +31,40 @@ export class CommandInvoker {
         this.emit("change");
     }
 
-    canUndo() {
+    canUndo(): boolean {
         return this.undoStack.length > 0;
     }
 
-    canRedo() {
+    canRedo(): boolean {
         return this.redoStack.length > 0;
     }
 
-    emit(eventName: string) {
-        if (!this.listeners[eventName]) return; // If no listeners for this event, exit
-        this.listeners[eventName].forEach((listener) => {
-            listener(); // Call each registered listener
-        });
+    clear(): void {
+        this.undoStack = [];
+        this.redoStack = [];
     }
 
-    on(eventName: string, listener: EventListener) {
-        if (!this.listeners[eventName]) {
-            this.listeners[eventName] = [];
+    private emit(eventName: CommandInvokerEvent): void {
+        const listenersForEvent = this.listeners.get(eventName);
+        if (!listenersForEvent) return;
+        listenersForEvent.forEach((listener) => listener());
+    }
+
+    on(eventName: CommandInvokerEvent, listener: EventListener): () => void {
+        let listenersForEvent = this.listeners.get(eventName);
+        if (!listenersForEvent) {
+            listenersForEvent = [];
+            this.listeners.set(eventName, listenersForEvent);
         }
-        this.listeners[eventName].push(listener);
+        listenersForEvent.push(listener);
         return () => {
-            this.listeners[eventName] = this.listeners[eventName].filter((l) => l !== listener);
+            if (!listenersForEvent) {
+                return;
+            }
+            this.listeners.set(
+                eventName,
+                listenersForEvent.filter((l) => l !== listener),
+            );
         };
     }
 }
