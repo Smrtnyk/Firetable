@@ -47,10 +47,17 @@ const options = ref(getNamesFromTables(props.allReservedTables));
 const searchTerm = ref("");
 
 function getNamesFromTables(tables: BaseTable[]) {
-    return tables.map((table) => ({
-        label: `${table.reservation!.guestName} (${table.label})`,
-        value: table.reservation!.guestName,
-    }));
+    return tables.map((table) => {
+        return {
+            label: createTableLabel(table),
+            value: table.reservation!.guestName,
+        };
+    });
+}
+
+function createTableLabel(table: BaseTable) {
+    // @ts-expect-error -- floor is custom prop on canvas set by us
+    return `${table.reservation!.guestName} (${table.label} on ${table.canvas?.floor.name})`;
 }
 
 function findSearchedTable(inputVal: string | { value: string }) {
@@ -74,7 +81,7 @@ function filterFn(val: string, update: any) {
         const filteredTables = findSearchedTable(val);
         options.value = filteredTables
             .map((table) => ({
-                label: `${table.reservation!.guestName} (${table.label})`,
+                label: createTableLabel(table),
                 value: table.reservation!.guestName,
             }))
             .filter((option) => option.value.toLowerCase().includes(loweredVal));
