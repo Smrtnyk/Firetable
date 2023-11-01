@@ -116,6 +116,7 @@ export class FloorEditor extends Floor {
         this.width = newWidth;
         this.height = newHeight;
         this.renderData(this.floorDoc.json);
+        this.renderGrid();
     }
 
     setFloorName(newName: string) {
