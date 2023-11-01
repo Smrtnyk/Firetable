@@ -181,6 +181,7 @@ function onDeleteElement(element: FloorEditorElement) {
     const elementToDelete = element.canvas?.getActiveObject();
     if (!elementToDelete) return;
     element.canvas?.remove(elementToDelete);
+    selectedElement.value = undefined;
 }
 
 function toggleBulkMode() {
