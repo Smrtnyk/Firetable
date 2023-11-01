@@ -37,7 +37,7 @@ export class RoundTable extends fabric.Group {
             originY: "center",
             fill,
             stroke: "black",
-            strokeWidth: 2,
+            strokeWidth: 0.5,
         });
         const textLabel = new fabric.Text(options.textOptions.label, {
             ...options.textOptions,

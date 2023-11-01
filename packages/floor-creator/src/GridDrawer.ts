@@ -25,7 +25,7 @@ export class GridDrawer {
         left: number,
         top: number,
     ): fabric.Line[] {
-        const lineOption = { stroke: "rgba(0,0,0,1)", strokeWidth: 1, selectable: false };
+        const lineOption = { stroke: "rgba(0,0,0,1)", strokeWidth: 0.5, selectable: false };
         const lines = [];
 
         for (let i = Math.ceil(width / gridSize); i--; ) {
@@ -65,7 +65,6 @@ export class GridDrawer {
         for (let i = objects.length - 1; i >= 0; i--) {
             // @ts-ignore
             if (objects[i].isGridLine) {
-                // Assuming you've set a flag 'isGridLine' when drawing the grid
                 this.canvas.remove(objects[i]);
             }
         }

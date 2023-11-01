@@ -10,18 +10,20 @@ interface Props {
 const props = defineProps<Props>();
 const { t } = useI18n();
 </script>
-
 <template>
     <router-link
         class="EventCard__link"
-        :to="{ name: 'event', params: { eventId: props.event.id } }"
+        :to="{
+            name: 'event',
+            params: {
+                organisationId: props.event.organisationId,
+                propertyId: props.event.propertyId,
+                eventId: props.event.id,
+            },
+        }"
     >
         <q-card class="EventCard">
-            <q-parallax
-                :src="props.event.img || '/images/default-event-img.jpg'"
-                alt=""
-                :ratio="1.5"
-            />
+            <q-parallax :src="'/images/default-event-img.jpg'" alt="" :ratio="1.5" />
 
             <q-card-section class="EventCard__content">
                 <h2 class="text-h3 q-mb-sm q-ml-none q-mt-none">{{ props.event.name }}</h2>

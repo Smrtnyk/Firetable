@@ -4,7 +4,7 @@ import UserEditForm from "components/admin/User/UserEditForm.vue";
 import FTTitle from "components/FTTitle.vue";
 import { showConfirm, showErrorMessage, withLoading } from "src/helpers/ui-helpers";
 import { watch } from "vue";
-import { Loading } from "quasar";
+import { Loading, useQuasar } from "quasar";
 import FTDialog from "components/FTDialog.vue";
 import { ADMIN, CreateUserPayload, EditUserPayload, User } from "@firetable/types";
 import {
@@ -19,8 +19,10 @@ import { useUsers } from "src/composables/useUsers";
 import { useAuthStore } from "stores/auth-store";
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
+import FTCenteredText from "components/FTCenteredText.vue";
 
 const { t } = useI18n();
+const quasar = useQuasar();
 const authStore = useAuthStore();
 const propertiesStore = usePropertiesStore();
 const { users, isLoading, fetchUsers } = useUsers();
@@ -36,8 +38,8 @@ const onUpdateUser = withLoading(async (updatedUser: EditUserPayload) => {
     await fetchUsers();
 });
 
-const onDeleteUser = withLoading(async (id: string) => {
-    await deleteUser(id);
+const onDeleteUser = withLoading(async (user: User) => {
+    await deleteUser(user);
     await fetchUsers();
 });
 
@@ -97,7 +99,7 @@ async function showEditUserDialog(user: User, reset: () => void) {
     }
     const [properties, selectedProperties] = await Promise.all([
         propertiesStore.getPropertiesOfCurrentUser(),
-        propertiesStore.getPropertiesOfUser(user.id),
+        propertiesStore.getPropertiesOfUser(user),
     ]);
     const organisation = await fetchOrganisationById(user.organisationId);
     const dialog = createDialog({
@@ -113,10 +115,13 @@ async function showEditUserDialog(user: User, reset: () => void) {
                 organisation,
             },
             listeners: {
-                submit: (user: CreateUserPayload) => {
-                    onUpdateUser({ userId: user.id, updatedUser: user })
-                        .then(reset)
-                        .catch(showErrorMessage);
+                submit: async (user: CreateUserPayload) => {
+                    await onUpdateUser({
+                        userId: user.id,
+                        organisationId: user.organisationId,
+                        updatedUser: user,
+                    });
+                    quasar.notify("User updated successfully!");
                     dialog.hide();
                 },
             },
@@ -125,9 +130,9 @@ async function showEditUserDialog(user: User, reset: () => void) {
     dialog.onDismiss(reset);
 }
 
-async function onUserSlideRight(id: string, reset: () => void) {
+async function onUserSlideRight(user: User, reset: () => void) {
     if (await showConfirm("Delete user?")) {
-        return onDeleteUser(id);
+        return onDeleteUser(user);
     }
     reset();
 }
@@ -146,7 +151,7 @@ async function onUserSlideRight(id: string, reset: () => void) {
                 v-for="user in users"
                 :key="user.id"
                 right-color="warning"
-                @right="({ reset }) => onUserSlideRight(user.id, reset)"
+                @right="({ reset }) => onUserSlideRight(user, reset)"
                 @left="({ reset }) => showEditUserDialog(user, reset)"
                 class="fa-card"
             >
@@ -167,13 +172,8 @@ async function onUserSlideRight(id: string, reset: () => void) {
             </q-slide-item>
         </q-list>
 
-        <div
-            v-if="users.length === 0 && !isLoading"
-            class="row justify-center items-center q-mt-md"
-        >
-            <h6 class="q-ma-sm text-weight-bolder underline">
-                {{ t("PageAdminUsers.noUsersCreatedMessage") }}
-            </h6>
-        </div>
+        <FTCenteredText v-if="users.length === 0 && !isLoading">
+            {{ t("PageAdminUsers.noUsersCreatedMessage") }}
+        </FTCenteredText>
     </div>
 </template>

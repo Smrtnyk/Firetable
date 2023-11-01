@@ -16,19 +16,20 @@ export function updateUser(payload: EditUserPayload) {
 }
 
 export function updateUserField<T extends keyof CreateUserPayload>(
+    organisationId: string,
     uid: string,
     field: T,
     value: CreateUserPayload[T],
 ) {
-    return updateDoc(doc(usersCollection(), uid), {
+    return updateDoc(doc(usersCollection(organisationId), uid), {
         [field]: value,
     });
 }
 
-export function deleteUser(id: string) {
+export function deleteUser(user: User) {
     const { functions } = initializeFirebase();
     const deleteFunction = httpsCallable(functions, "deleteUser");
-    return deleteFunction(id);
+    return deleteFunction(user);
 }
 
 export function logoutUser() {
@@ -41,9 +42,15 @@ export function loginWithEmail(email: string, password: string): Promise<UserCre
     return signInWithEmailAndPassword(auth, email, password);
 }
 
-export function fetchUsersByRole(userIdsToFetch: string[]): Promise<HttpsCallableResult<User[]>> {
+export function fetchUsersByRole(
+    userIdsToFetch: string[],
+    organisationId: string,
+): Promise<HttpsCallableResult<User[]>> {
     const { functions } = initializeFirebase();
-    return httpsCallable<string[], User[]>(functions, "fetchUsersByRole")(userIdsToFetch);
+    return httpsCallable<{ userIdsToFetch: string[]; organisationId: string }, User[]>(
+        functions,
+        "fetchUsersByRole",
+    )({ userIdsToFetch, organisationId });
 }
 
 export function submitNewPassword(newPassword: string) {

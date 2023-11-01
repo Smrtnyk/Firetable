@@ -10,8 +10,9 @@ import { useProperties } from "src/composables/useProperties";
 import { computed, watchEffect } from "vue";
 import { useOrganisations } from "src/composables/useOrganisations";
 import { useAuthStore } from "stores/auth-store";
-import { ADMIN } from "@firetable/types";
+import { ADMIN, PropertyDoc } from "@firetable/types";
 import { useI18n } from "vue-i18n";
+import FTCenteredText from "components/FTCenteredText.vue";
 
 const authStore = useAuthStore();
 const quasar = useQuasar();
@@ -46,19 +47,19 @@ const onPropertyCreate = withLoading(async function (payload: CreatePropertyPayl
     return fetchProperties();
 });
 
-const onDeleteProperty = withLoading(async (id: string) => {
-    await deleteProperty(id);
+const onDeleteProperty = withLoading(async (property: PropertyDoc) => {
+    await deleteProperty(property);
     return fetchProperties();
 });
 
-async function deletePropertyAsync(propertyId: string, reset: () => void): Promise<void> {
+async function deletePropertyAsync(property: PropertyDoc, reset: () => void): Promise<void> {
     if (
         await showConfirm(
             t("PageAdminProperties.deletePropertyDialogTitle"),
             t("PageAdminProperties.deletePropertyDialogMessage"),
         )
     ) {
-        return onDeleteProperty(propertyId);
+        return onDeleteProperty(property);
     }
     reset();
 }
@@ -99,7 +100,7 @@ function createProperty(): void {
                 v-for="property in properties"
                 :key="property.id"
                 right-color="warning"
-                @right="({ reset }) => deletePropertyAsync(property.id, reset)"
+                @right="({ reset }) => deletePropertyAsync(property, reset)"
                 class="fa-card"
             >
                 <template #right>
@@ -128,13 +129,8 @@ function createProperty(): void {
             </h6>
         </div>
 
-        <div
-            v-else-if="properties.length === 0 && !isLoading"
-            class="row justify-center items-center q-mt-md"
-        >
-            <h6 class="q-ma-sm text-weight-bolder underline">
-                {{ t("PageAdminProperties.noPropertiesCreatedMessage") }}
-            </h6>
-        </div>
+        <FTCenteredText v-else-if="properties.length === 0 && !isLoading">
+            {{ t("PageAdminProperties.noPropertiesCreatedMessage") }}
+        </FTCenteredText>
     </div>
 </template>

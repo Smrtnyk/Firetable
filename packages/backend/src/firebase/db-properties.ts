@@ -1,6 +1,6 @@
-import { ADMIN, PropertyDoc } from "@firetable/types";
+import { ADMIN, PropertyDoc, User } from "@firetable/types";
 import { deleteDoc, getDocs, query, where } from "firebase/firestore";
-import { propertiesCollection, propertyDoc } from "./db.js";
+import { organisationsCollection, propertiesCollection, propertyDoc } from "./db.js";
 import { initializeFirebase } from "./base.js";
 import { httpsCallable } from "firebase/functions";
 
@@ -17,25 +17,32 @@ export function createNewProperty(propertyPayload: CreatePropertyPayload) {
     )(propertyPayload);
 }
 
-export function deleteProperty(propertyId: string) {
-    return deleteDoc(propertyDoc(propertyId));
+export function deleteProperty(property: PropertyDoc) {
+    return deleteDoc(propertyDoc(property.id, property.organisationId));
 }
 
-export async function fetchPropertiesForUser(
-    userId: string,
-    role?: string,
-): Promise<PropertyDoc[]> {
-    // If the user is an ADMIN, fetch all properties directly
-    if (role === ADMIN) {
-        const propertiesSnapshot = await getDocs(propertiesCollection());
-        return propertiesSnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }) as PropertyDoc);
+export async function fetchPropertiesForUser(user: User, role?: string): Promise<PropertyDoc[]> {
+    // If the user is an ADMIN or organisationId is falsy, fetch all properties across all organisations
+    if (role === ADMIN || !user.organisationId) {
+        const organisationsSnapshot = await getDocs(organisationsCollection());
+        let allProperties: PropertyDoc[] = [];
+
+        for (const organisationDoc of organisationsSnapshot.docs) {
+            const propertiesSnapshot = await getDocs(propertiesCollection(organisationDoc.id));
+            const properties = propertiesSnapshot.docs.map(
+                (doc) => ({ ...doc.data(), id: doc.id }) as PropertyDoc,
+            );
+            allProperties = [...allProperties, ...properties];
+        }
+
+        return allProperties;
     }
 
-    // New logic for non-ADMIN users
-    const propertiesRef = propertiesCollection();
+    // Rest of the logic for non-ADMIN users with a valid organisationId
+    const propertiesRef = propertiesCollection(user.organisationId);
     const userPropertiesQuery = query(
         propertiesRef,
-        where("relatedUsers", "array-contains", userId),
+        where("relatedUsers", "array-contains", user.id),
     );
     const userPropertiesSnapshot = await getDocs(userPropertiesQuery);
 

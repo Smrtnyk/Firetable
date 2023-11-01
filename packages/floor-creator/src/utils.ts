@@ -23,3 +23,7 @@ export function getTableFromTargetElement(ev: fabric.IEvent): BaseTable | null {
     // @ts-ignore -- not typed apparently
     return ev.target?._objects.find(isTable);
 }
+
+export function calculateCanvasScale(containerWidth: number, floorWidth: number) {
+    return containerWidth / floorWidth;
+}

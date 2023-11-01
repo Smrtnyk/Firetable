@@ -1,7 +1,7 @@
 import { reactive, ref } from "vue";
 import { QueryDocumentSnapshot } from "firebase/firestore";
 import { EventDoc } from "@firetable/types";
-import { getEvents } from "@firetable/backend";
+import { EventOwner, getEvents } from "@firetable/backend";
 
 const EVENTS_PER_PAGE = 50;
 
@@ -36,11 +36,12 @@ export function useEvents() {
 
     const isLoading = ref(false);
 
-    async function fetchMoreEvents(propertyId: string, lastDoc: QueryDocumentSnapshot | null) {
+    async function fetchMoreEvents(eventOwner: EventOwner, lastDoc: QueryDocumentSnapshot | null) {
         isLoading.value = true;
+        const { propertyId } = eventOwner;
 
         try {
-            const eventsDocs = await getEvents(lastDoc, EVENTS_PER_PAGE, propertyId);
+            const eventsDocs = await getEvents(lastDoc, EVENTS_PER_PAGE, eventOwner);
             lastFetchedDocForProperty[propertyId] = eventsDocs.length
                 ? eventsDocs[eventsDocs.length - 1]._doc
                 : null;

@@ -31,14 +31,38 @@ export class EditorEventManager extends EventManager {
             }
 
             // Snapping logic for movement
-            const shouldSnapToGrid =
-                Math.round((target.left! / RESOLUTION) * 4) % 4 === 0 &&
-                Math.round((target.top! / RESOLUTION) * 4) % 4 === 0;
-            if (shouldSnapToGrid) {
+            const snapRange = 2; // pixels
+
+            const leftRemainder = target.left! % RESOLUTION;
+            const topRemainder = target.top! % RESOLUTION;
+
+            const shouldSnapToLeft =
+                leftRemainder <= snapRange || RESOLUTION - leftRemainder <= snapRange;
+            const shouldSnapToTop =
+                topRemainder <= snapRange || RESOLUTION - topRemainder <= snapRange;
+
+            let newLeft: number | undefined;
+            let newTop: number | undefined;
+
+            if (shouldSnapToLeft) {
+                newLeft =
+                    leftRemainder <= snapRange
+                        ? target.left! - leftRemainder
+                        : target.left! + (RESOLUTION - leftRemainder);
+            }
+
+            if (shouldSnapToTop) {
+                newTop =
+                    topRemainder <= snapRange
+                        ? target.top! - topRemainder
+                        : target.top! + (RESOLUTION - topRemainder);
+            }
+
+            if (newLeft !== undefined || newTop !== undefined) {
                 target
                     .set({
-                        left: Math.round(target.left! / RESOLUTION) * RESOLUTION,
-                        top: Math.round(target.top! / RESOLUTION) * RESOLUTION,
+                        left: newLeft !== undefined ? newLeft : target.left,
+                        top: newTop !== undefined ? newTop : target.top,
                     })
                     .setCoords();
             }

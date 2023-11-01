@@ -1,5 +1,4 @@
 import * as functions from "firebase-functions";
-import { deleteEventImage } from "./trigger/delete-event-image/index.js";
 import { createEvent as createEventFn } from "./callable/create-event/index.js";
 import { createUser as createUserFn } from "./callable/create-user/index.js";
 import { deleteUser as deleteUserFn } from "./callable/delete-user/index.js";
@@ -22,12 +21,6 @@ export const createEvent = functions
     .region("europe-west3")
     .https
     .onCall(createEventFn);
-
-export const handleEventImageWhenEventDeleted = functions
-    .region("europe-west3")
-    .firestore
-    .document(`${Collection.EVENTS}/{eventId}`)
-    .onDelete(deleteEventImage);
 
 // Everything that has to do with auth
 export const changePassword = functions
@@ -75,7 +68,7 @@ export const deleteUser = functions
 export const onUserDeleted = functions
     .region("europe-west3")
     .firestore
-    .document(`${Collection.USERS}/{userId}`)
+    .document(`${Collection.ORGANISATIONS}/{organisationId}/${Collection.USERS}/{userId}`)
     .onDelete(onUserDeletedFn);
 
 // Properties
@@ -86,12 +79,12 @@ export const createProperty = functions
 export const onPropertyDelete = functions
     .region("europe-west3")
     .firestore
-    .document(`${Collection.PROPERTIES}/{propertyId}`)
+    .document(`${Collection.ORGANISATIONS}/{organisationId}/${Collection.PROPERTIES}/{propertyId}`)
     .onDelete(onPropertyDeletedFn);
 export const onPropertyDeleteCleanupEvents = functions
     .region("europe-west3")
     .firestore
-    .document(`${Collection.PROPERTIES}/{propertyId}`)
+    .document(`${Collection.ORGANISATIONS}/{organisationId}/${Collection.PROPERTIES}/{propertyId}`)
     .onDelete(onPropertyDeletedCleanEvents);
 
 // Generic stuff

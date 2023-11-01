@@ -1,10 +1,10 @@
 import {
     eventsCollection,
     guestListCollection,
-    deleteCollection,
     guestDoc,
     eventFloorDoc,
     eventDoc,
+    EventOwner,
 } from "./db.js";
 import { initializeFirebase } from "./base.js";
 import { httpsCallable } from "firebase/functions";
@@ -26,24 +26,24 @@ import { Floor } from "@firetable/floor-creator";
 export async function getEvents(
     lastDocument: DocumentData | null,
     countPerPage: number,
-    propertyId: string,
+    owner: EventOwner,
 ): Promise<EventDoc[]> {
     const orderByDateQuery = orderBy("date", "desc"); // Newest date first
     const limitQuery = limit(countPerPage);
-    const propertyIdQuery = where("propertyId", "==", propertyId);
+    const propertyIdQuery = where("propertyId", "==", owner.propertyId);
 
     let finalQuery;
     if (lastDocument) {
         const startAfterQuery = startAfter(lastDocument);
         finalQuery = query(
-            eventsCollection(),
+            eventsCollection(owner),
             propertyIdQuery,
             orderByDateQuery,
             limitQuery,
             startAfterQuery,
         );
     } else {
-        finalQuery = query(eventsCollection(), propertyIdQuery, orderByDateQuery, limitQuery);
+        finalQuery = query(eventsCollection(owner), propertyIdQuery, orderByDateQuery, limitQuery);
     }
 
     const eventsDocs = await getDocs(finalQuery);
@@ -59,37 +59,45 @@ function toEventDoc(doc: DocumentData): EventDoc {
     };
 }
 
-export const deleteEvent = deleteCollection;
-
 export function updateEventProperty<T extends keyof EventDoc>(
-    eventId: string,
+    owner: EventOwner,
     key: T,
     value: EventDoc[T],
 ) {
-    return updateDoc(eventDoc(eventId), {
+    return updateDoc(eventDoc(owner), {
         [key]: value,
     });
 }
 
 export function createNewEvent(eventPayload: CreateEventPayload) {
     const { functions } = initializeFirebase();
-    return httpsCallable<CreateEventPayload, string>(functions, "createEvent")(eventPayload);
+    return httpsCallable<
+        CreateEventPayload,
+        {
+            id: string;
+            organisationId: string;
+            propertyId: string;
+        }
+    >(
+        functions,
+        "createEvent",
+    )(eventPayload);
 }
 
-export function updateEventFloorData(floor: Floor, eventId: string) {
-    return updateDoc(eventFloorDoc(eventId, floor.id), {
+export function updateEventFloorData(owner: EventOwner, floor: Floor) {
+    return updateDoc(eventFloorDoc(owner, floor.id), {
         json: floor.json,
     });
 }
 
-export function addGuestToGuestList(eventID: string, payload: GuestData) {
-    return addDoc(guestListCollection(eventID), payload);
+export function addGuestToGuestList(owner: EventOwner, payload: GuestData) {
+    return addDoc(guestListCollection(owner), payload);
 }
 
-export function deleteGuestFromGuestList(eventID: string, guestID: string) {
-    return deleteDoc(guestDoc(eventID, guestID));
+export function deleteGuestFromGuestList(owner: EventOwner, guestID: string) {
+    return deleteDoc(guestDoc(owner, guestID));
 }
 
-export function confirmGuestFromGuestList(eventID: string, guestID: string, confirmed: boolean) {
-    return updateDoc(guestDoc(eventID, guestID), { confirmed });
+export function confirmGuestFromGuestList(owner: EventOwner, guestID: string, confirmed: boolean) {
+    return updateDoc(guestDoc(owner, guestID), { confirmed });
 }

@@ -34,7 +34,6 @@
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { BaseTable } from "@firetable/floor-creator";
-import { isNumber } from "@firetable/utils";
 
 interface Props {
     allReservedTables: BaseTable[];
@@ -48,10 +47,21 @@ const options = ref(getNamesFromTables(props.allReservedTables));
 const searchTerm = ref("");
 
 function getNamesFromTables(tables: BaseTable[]) {
-    return tables.map((table) => table.reservation!.guestName);
+    return tables.map((table) => {
+        return {
+            label: createTableLabel(table),
+            value: table.reservation!.guestName,
+        };
+    });
 }
 
-function findSearchedTable(val: string) {
+function createTableLabel(table: BaseTable) {
+    // @ts-expect-error -- floor is custom prop on canvas set by us
+    return `${table.reservation!.guestName} (${table.label} on ${table.canvas?.floor.name})`;
+}
+
+function findSearchedTable(inputVal: string | { value: string }) {
+    const val = typeof inputVal === "string" ? inputVal : inputVal.value;
     const tokens = val.toLowerCase().split(/\s+/);
 
     return props.allReservedTables.filter((table) => {
@@ -67,10 +77,14 @@ function findSearchedTable(val: string) {
 
 function filterFn(val: string, update: any) {
     update(() => {
-        options.value =
-            !val || isNumber(val)
-                ? getNamesFromTables(props.allReservedTables)
-                : getNamesFromTables(findSearchedTable(val));
+        const loweredVal = val.toLowerCase();
+        const filteredTables = findSearchedTable(val);
+        options.value = filteredTables
+            .map((table) => ({
+                label: createTableLabel(table),
+                value: table.reservation!.guestName,
+            }))
+            .filter((option) => option.value.toLowerCase().includes(loweredVal));
     });
 }
 

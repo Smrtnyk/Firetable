@@ -19,6 +19,7 @@ export interface User {
 
 export interface EditUserPayload {
     userId: string;
+    organisationId: string;
     updatedUser: {
         relatedProperties: string[];
         role: string;

@@ -5,19 +5,19 @@
                 <div class="col-4 q-pa-xs q-pl-none">
                     <q-input
                         :dense="isMobile"
-                        :model-value="getElementWidth"
+                        v-model="localWidth"
                         filled
+                        type="number"
                         label="Width"
-                        readonly
                     />
                 </div>
                 <div class="col-4 q-pa-xs">
                     <q-input
                         :dense="isMobile"
-                        :model-value="getElementHeight"
+                        v-model="localHeight"
                         filled
+                        type="number"
                         label="Height"
-                        readonly
                     />
                 </div>
                 <div class="col-4 q-pa-xs">
@@ -87,7 +87,7 @@
 
 <script setup lang="ts">
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
-import { computed, ref, watch, toRefs } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, toRefs, watch } from "vue";
 import { BaseTable, FloorEditorElement, isTable } from "@firetable/floor-creator";
 import { QPopupProxy } from "quasar";
 import { isMobile } from "src/global-reactives/is-mobile";
@@ -98,16 +98,65 @@ interface Props {
     existingLabels: Set<string>;
 }
 
-const buttonSize = computed(() => (isMobile.value ? "xs" : "md"));
-const colorPickerProxy = ref<QPopupProxy | null>(null);
-
 const props = withDefaults(defineProps<Props>(), {
     deleteAllowed: true,
 });
 const { selectedFloorElement, deleteAllowed, existingLabels } = toRefs(props);
 const emit = defineEmits(["delete"]);
+const buttonSize = computed(() => (isMobile.value ? "xs" : "md"));
+const colorPickerProxy = ref<QPopupProxy | null>(null);
+const getElementWidth = computed(() => {
+    const el = selectedFloorElement.value;
+    return el ? Math.round(el.width! * el.scaleX!) : 0;
+});
 
-const elementColor = ref<string>("");
+const getElementHeight = computed(() => {
+    const el = selectedFloorElement.value;
+    return el ? Math.round(el.height! * el.scaleY!) : 0;
+});
+
+const localWidth = ref(getElementWidth.value);
+const localHeight = ref(getElementHeight.value);
+const elementColor = ref("");
+
+function onKeyDownListener(event: KeyboardEvent) {
+    if (event.key === "Delete" && selectedFloorElement.value) {
+        deleteElement();
+    }
+}
+
+onMounted(() => {
+    document.addEventListener("keydown", onKeyDownListener);
+});
+
+onBeforeUnmount(() => {
+    document.removeEventListener("keydown", onKeyDownListener);
+});
+
+watch(selectedFloorElement, (newEl) => {
+    localWidth.value = newEl ? Math.round(newEl.width! * newEl.scaleX!) : 0;
+    localHeight.value = newEl ? Math.round(newEl.height! * newEl.scaleY!) : 0;
+
+    if (newEl?.getBaseFill) {
+        elementColor.value = newEl.getBaseFill();
+    }
+});
+
+watch(localWidth, (newWidth) => {
+    if (selectedFloorElement.value) {
+        selectedFloorElement.value.scaleX = newWidth / selectedFloorElement.value.width!;
+        selectedFloorElement.value.setCoords();
+        selectedFloorElement.value.canvas?.renderAll();
+    }
+});
+
+watch(localHeight, (newHeight) => {
+    if (selectedFloorElement.value) {
+        selectedFloorElement.value.scaleY = newHeight / selectedFloorElement.value.height!;
+        selectedFloorElement.value.setCoords();
+        selectedFloorElement.value.canvas?.renderAll();
+    }
+});
 
 watch(selectedFloorElement, (newEl) => {
     if (newEl?.getBaseFill) {
@@ -136,16 +185,6 @@ async function deleteElement() {
         emit("delete", selectedFloorElement.value);
     }
 }
-
-const getElementWidth = computed(() => {
-    const el = selectedFloorElement.value;
-    return el ? Math.round(el.width! * el.scaleX!) : 0;
-});
-
-const getElementHeight = computed(() => {
-    const el = selectedFloorElement.value;
-    return el ? Math.round(el.height! * el.scaleY!) : 0;
-});
 
 function setElementColor(newVal: any) {
     elementColor.value = newVal;

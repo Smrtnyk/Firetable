@@ -1,21 +1,22 @@
 <script setup lang="ts">
 import PageAdminEventsListItem from "components/Event/PageAdminEventsListItem.vue";
 import { computed } from "vue";
-import { EventDoc } from "@firetable/types";
+import { EventDoc, PropertyDoc } from "@firetable/types";
+import FTCenteredText from "components/FTCenteredText.vue";
 
 interface Props {
-    propertyId: string;
+    property: PropertyDoc;
     eventsByProperty: Record<string, Set<EventDoc>>;
     onEventItemSlideRight: (eventDetails: { event: any; reset: () => void }) => void;
-    onLoad: (propertyId: string) => void;
+    onLoad: (property: PropertyDoc) => void;
     done: boolean;
 }
 
 const props = defineProps<Props>();
-const events = computed(() => [...props.eventsByProperty[props.propertyId]]);
+const events = computed(() => [...props.eventsByProperty[props.property.id]]);
 const eventsLength = computed(() => events.value.length);
 const bucketizedEvents = computed(() => {
-    const eventsArr = [...props.eventsByProperty[props.propertyId]];
+    const eventsArr = [...props.eventsByProperty[props.property.id]];
     let bucketized = new Map<string, Map<string, EventDoc[]>>();
 
     for (let event of eventsArr) {
@@ -38,19 +39,15 @@ const bucketizedEvents = computed(() => {
 });
 
 function handleLoad() {
-    props.onLoad(props.propertyId);
+    props.onLoad(props.property);
 }
 </script>
 
 <template>
     <div>
-        <template v-if="!eventsLength">
-            <div class="row justify-center items-center q-mt-md">
-                <h6 class="q-ma-sm text-weight-bolder underline">
-                    There are no events created for this property.
-                </h6>
-            </div>
-        </template>
+        <FTCenteredText v-if="!eventsLength">
+            There are no events created for this property.
+        </FTCenteredText>
         <template v-else>
             <div v-for="[year, yearBuckets] in [...bucketizedEvents.entries()]" :key="year">
                 <p>{{ year }}</p>

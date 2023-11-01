@@ -14,7 +14,7 @@ import {
 import FTDialog from "components/FTDialog.vue";
 import EventShowReservation from "components/Event/EventShowReservation.vue";
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { updateEventFloorData } from "@firetable/backend";
+import { EventOwner, updateEventFloorData } from "@firetable/backend";
 import EventCreateReservation from "components/Event/EventCreateReservation.vue";
 import { takeProp } from "@firetable/utils";
 import { useAuthStore } from "stores/auth-store";
@@ -34,7 +34,7 @@ const HALF_HOUR = 30 * 60 * 1000; // 30 minutes in milliseconds
 export default function useFloorsPageEvent(
     eventFloors: Ref<FloorDoc[]>,
     pageRef: Ref<HTMLDivElement | undefined>,
-    eventId: string,
+    eventOwner: EventOwner,
     event: Ref<VueFirestoreDocumentData<EventDoc> | undefined>,
 ) {
     const { t } = useI18n();
@@ -169,7 +169,7 @@ export default function useFloorsPageEvent(
             return;
         }
 
-        showCreateReservationDialog(floor, element);
+        showCreateReservationDialog(floor, element, "create");
     }
 
     function showReservation(floor: Floor, reservation: Reservation, element: BaseTable) {
@@ -186,6 +186,9 @@ export default function useFloorsPageEvent(
                     delete: () => {
                         onDeleteReservation(floor, element).catch(showErrorMessage);
                     },
+                    edit() {
+                        onEditReservation(floor, element);
+                    },
                     confirm: onReservationConfirm(floor, element),
                 },
             },
@@ -201,13 +204,16 @@ export default function useFloorsPageEvent(
                 confirmed: val,
             });
             return tryCatchLoadingWrapper({
-                hook: () => updateEventFloorData(floor, eventId),
+                hook: () => updateEventFloorData(eventOwner, floor),
             });
         };
     }
 
-    function showCreateReservationDialog(floor: Floor, element: BaseTable) {
-        console.log(users.value);
+    function showCreateReservationDialog(
+        floor: Floor,
+        element: BaseTable,
+        mode: "create" | "edit",
+    ) {
         const { label } = element;
         const dialog = q
             .dialog({
@@ -218,10 +224,16 @@ export default function useFloorsPageEvent(
                     maximized: false,
                     componentPropsObject: {
                         users: users.value,
+                        mode,
+                        reservationData: mode === "edit" ? element.reservation : void 0,
                     },
                     listeners: {
                         create: (reservationData: Reservation) => {
                             resetCurrentOpenCreateReservationDialog();
+                            handleReservationCreation(floor, reservationData, element);
+                            dialog.hide();
+                        },
+                        update(reservationData: Reservation) {
                             handleReservationCreation(floor, reservationData, element);
                             dialog.hide();
                         },
@@ -230,11 +242,13 @@ export default function useFloorsPageEvent(
             })
             .onDismiss(resetCurrentOpenCreateReservationDialog);
 
-        currentOpenCreateReservationDialog = {
-            label,
-            dialog,
-            floorId: floor.id,
-        };
+        if (mode === "create") {
+            currentOpenCreateReservationDialog = {
+                label,
+                dialog,
+                floorId: floor.id,
+            };
+        }
     }
 
     function resetCurrentOpenCreateReservationDialog() {
@@ -246,8 +260,13 @@ export default function useFloorsPageEvent(
         element?.setReservation(null);
 
         await tryCatchLoadingWrapper({
-            hook: () => updateEventFloorData(floor, eventId),
+            hook: () => updateEventFloorData(eventOwner, floor),
         });
+    }
+
+    function onEditReservation(floor: Floor, element: BaseTable) {
+        console.log(floor, element);
+        showCreateReservationDialog(floor, element, "edit");
     }
 
     function handleReservationCreation(
@@ -257,7 +276,7 @@ export default function useFloorsPageEvent(
     ) {
         table?.setReservation(reservationData);
         void tryCatchLoadingWrapper({
-            hook: () => updateEventFloorData(floor, eventId),
+            hook: () => updateEventFloorData(eventOwner, floor),
         });
     }
 
@@ -307,7 +326,7 @@ export default function useFloorsPageEvent(
         table2.setReservation(table1Reservation);
 
         await tryCatchLoadingWrapper({
-            hook: () => updateEventFloorData(floor, eventId),
+            hook: () => updateEventFloorData(eventOwner, floor),
         });
     }
 
@@ -334,8 +353,9 @@ export default function useFloorsPageEvent(
             const eventDateTime = new Date(baseEventDate);
             eventDateTime.setHours(parseInt(hours), parseInt(minutes));
 
-            // Check if time is 00:00 and adjust the date to the next day
-            if (hours === "00" && minutes === "00") {
+            // Check if time is starting with "0", for example 01:00, it means it is next day in the morning,
+            // so we need to adjust the date to the next day
+            if (hours.startsWith("0")) {
                 eventDateTime.setDate(eventDateTime.getDate() + 1);
             }
 

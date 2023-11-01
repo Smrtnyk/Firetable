@@ -25,7 +25,9 @@ const userEditForm = ref<QForm>();
 const form = ref<CreateUserPayload>({ ...props.user, password: "" });
 const chosenProperties = ref<string[]>(props.selectedProperties.map((p) => p.id));
 
-const isEditableRole = computed(() => [Role.MANAGER, Role.STAFF].includes(form.value.role as Role));
+const isEditableRole = computed(() =>
+    [Role.MANAGER, Role.STAFF, Role.HOSTESS].includes(form.value.role as Role),
+);
 
 const emailSuffix = computed(() => {
     return `@${props.organisation.name}.at`;
@@ -50,7 +52,10 @@ function prepareAndEmitSubmission() {
         filteredForm.email = `${form.value.username}${emailSuffix.value}`;
     }
 
-    emit("submit", filteredForm);
+    emit("submit", {
+        ...filteredForm,
+        relatedProperties: chosenProperties.value,
+    });
 }
 
 function onReset() {

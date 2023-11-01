@@ -18,12 +18,6 @@ export enum Role {
 }
 
 // Cannot import this because functions deploy
-export interface BaseTable {
-    reservation: Record<string, any>;
-    label: string;
-}
-
-// Cannot import this because functions deploy
 export interface CreateUserPayload{
     id: string;
     name: string;
@@ -42,14 +36,17 @@ export interface User {
     username: string;
     role: Role | typeof ADMIN;
     relatedProperties: string[];
+    organisationId: string;
 }
 
 export interface EditUserPayload {
     userId: string;
+    organisationId: string;
     updatedUser: {
         relatedProperties: string[];
         role: string;
         name: string;
+        password?: string;
     };
 }
 
@@ -72,6 +69,7 @@ export interface FloorDoc {
 
 export type CreateEventPayload = CreateEventForm & {
     propertyId: string;
+    organisationId: string;
     id: string;
     floors: FloorDoc[];
 };

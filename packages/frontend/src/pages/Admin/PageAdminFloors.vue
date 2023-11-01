@@ -8,10 +8,11 @@ import { Loading, useQuasar } from "quasar";
 import { makeRawFloor } from "@firetable/floor-creator";
 import { FloorDoc } from "@firetable/types";
 import { addFloor, deleteFloor } from "@firetable/backend";
-import { useFloors } from "src/composables/useFloors";
+import { PropertyFloors, useFloors } from "src/composables/useFloors";
 import { onMounted, ref, watch } from "vue";
 import { takeProp } from "@firetable/utils";
 import { useI18n } from "vue-i18n";
+import FTCenteredText from "components/FTCenteredText.vue";
 
 const quasar = useQuasar();
 const { t } = useI18n();
@@ -28,7 +29,7 @@ watch(
     { immediate: true, deep: true },
 );
 
-function showAddNewFloorForm(propertyId: string, floors: FloorDoc[]): void {
+function showAddNewFloorForm(propertyData: PropertyFloors, floors: FloorDoc[]): void {
     const dialog = quasar.dialog({
         component: FTDialog,
         componentProps: {
@@ -38,7 +39,14 @@ function showAddNewFloorForm(propertyId: string, floors: FloorDoc[]): void {
             listeners: {
                 create: function onFloorCreate(name: string) {
                     tryCatchLoadingWrapper({
-                        hook: () => addFloor(makeRawFloor(name, propertyId)).then(dialog.hide),
+                        hook: () =>
+                            addFloor(
+                                {
+                                    organisationId: propertyData.organisationId,
+                                    id: propertyData.propertyId,
+                                },
+                                makeRawFloor(name, propertyData.propertyId),
+                            ).then(dialog.hide),
                     });
                 },
             },
@@ -49,7 +57,7 @@ function showAddNewFloorForm(propertyId: string, floors: FloorDoc[]): void {
     });
 }
 
-async function duplicateFloor(floor: FloorDoc, reset: () => void) {
+async function duplicateFloor(propertyData: PropertyFloors, floor: FloorDoc, reset: () => void) {
     if (
         !(await showConfirm(
             t("PageAdminFloors.duplicateFloorPlanMessage", { floorName: floor.name }),
@@ -59,15 +67,29 @@ async function duplicateFloor(floor: FloorDoc, reset: () => void) {
 
     const duplicatedFloor = { ...floor, name: `${floor.name}_copy` };
     return tryCatchLoadingWrapper({
-        hook: () => addFloor(duplicatedFloor),
+        hook: () =>
+            addFloor(
+                {
+                    organisationId: propertyData.organisationId,
+                    id: propertyData.propertyId,
+                },
+                duplicatedFloor,
+            ),
     }).finally(reset);
 }
 
-async function onFloorDelete(id: string, reset: () => void) {
+async function onFloorDelete(propertyData: PropertyFloors, id: string, reset: () => void) {
     if (!(await showConfirm(t("PageAdminFloors.deleteFloorMessage")))) return reset();
 
     await tryCatchLoadingWrapper({
-        hook: () => deleteFloor(id),
+        hook: () =>
+            deleteFloor(
+                {
+                    organisationId: propertyData.organisationId,
+                    id: propertyData.propertyId,
+                },
+                id,
+            ),
         errorHook: reset,
     });
 }
@@ -106,7 +128,7 @@ onMounted(async () => {
                         rounded
                         icon="plus"
                         class="button-gradient"
-                        @click="showAddNewFloorForm(propertyData.propertyId, propertyData.floors)"
+                        @click="showAddNewFloorForm(propertyData, propertyData.floors)"
                     />
                 </div>
                 <!-- If the property has floors, display them -->
@@ -116,8 +138,8 @@ onMounted(async () => {
                         :key="floor.id"
                         right-color="red"
                         left-color="green"
-                        @right="({ reset }) => onFloorDelete(floor.id, reset)"
-                        @left="({ reset }) => duplicateFloor(floor, reset)"
+                        @right="({ reset }) => onFloorDelete(propertyData, floor.id, reset)"
+                        @left="({ reset }) => duplicateFloor(propertyData, floor, reset)"
                         class="fa-card"
                     >
                         <template #right>
@@ -132,7 +154,9 @@ onMounted(async () => {
                             :to="{
                                 name: 'adminFloorEdit',
                                 params: {
-                                    floorID: floor.id,
+                                    floorId: floor.id,
+                                    organisationId: propertyData.organisationId,
+                                    propertyId: propertyData.propertyId,
                                 },
                             }"
                         >
@@ -144,22 +168,15 @@ onMounted(async () => {
                 </q-list>
 
                 <!-- If the property doesn't have floors, display a standout message -->
-                <div v-else class="row justify-center items-center q-mt-md">
-                    <h6 class="q-ma-sm text-weight-bolder underline">
-                        {{ t("PageAdminFloors.noFloorPlansMessage") }}
-                    </h6>
-                </div>
+                <FTCenteredText v-else>
+                    {{ t("PageAdminFloors.noFloorPlansMessage") }}
+                </FTCenteredText>
             </q-tab-panel>
         </q-tab-panels>
 
         <!-- Show "no properties" message when there are no properties and isLoading is false -->
-        <div
-            v-if="!Object.keys(floors).length && !isLoading"
-            class="justify-center items-center q-pa-md text-center"
-        >
-            <h6 class="q-ma-sm text-weight-bolder underline">
-                {{ t("PageAdminFloors.noPropertiesMessage") }}
-            </h6>
-        </div>
+        <FTCenteredText v-if="!Object.keys(floors).length && !isLoading">
+            {{ t("PageAdminFloors.noPropertiesMessage") }}
+        </FTCenteredText>
     </div>
 </template>

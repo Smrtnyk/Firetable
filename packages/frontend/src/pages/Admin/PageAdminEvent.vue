@@ -8,20 +8,22 @@ import AdminEventGeneralInfo from "components/admin/event/AdminEventGeneralInfo.
 import AdminEventReservationsByPerson from "components/admin/event/AdminEventReservationsByPerson.vue";
 import AdminEventEditInfo from "components/admin/event/AdminEventEditInfo.vue";
 import AdminEventFloorViewer from "components/admin/event/AdminEventFloorViewer.vue";
-import AdminEventActiveStaff from "components/admin/event/AdminEventActiveStaff.vue";
 import FTDialog from "components/FTDialog.vue";
 
 import { Loading, useQuasar } from "quasar";
 import { config } from "src/config";
 import { FloorEditor, FloorMode, getTablesFromFloorDoc } from "@firetable/floor-creator";
-import { FloorDoc, User } from "@firetable/types";
-import { updateEventFloorData, updateEventProperty } from "@firetable/backend";
-import { tryCatchLoadingWrapper, withLoading } from "src/helpers/ui-helpers";
+import { FloorDoc } from "@firetable/types";
+import { EventOwner, updateEventFloorData } from "@firetable/backend";
+import { withLoading } from "src/helpers/ui-helpers";
 import { propIsTruthy } from "@firetable/utils";
 import useAdminEvent from "src/composables/useAdminEvent";
+import { isMobile } from "src/global-reactives/is-mobile";
 
 interface Props {
-    id: string;
+    organisationId: string;
+    propertyId: string;
+    eventId: string;
 }
 
 const props = defineProps<Props>();
@@ -29,7 +31,13 @@ const router = useRouter();
 const quasar = useQuasar();
 const tab = ref("info");
 
-const { eventFloors, users, event, isLoading } = useAdminEvent(props.id);
+const eventOwner: EventOwner = {
+    propertyId: props.propertyId,
+    organisationId: props.organisationId,
+    id: props.eventId,
+};
+
+const { eventFloors, event, isLoading } = useAdminEvent(eventOwner);
 
 watch(
     isLoading,
@@ -71,32 +79,26 @@ const reservationsStatus = computed(() => {
 });
 
 async function init() {
-    if (!props.id) {
+    if (!props.eventId || !props.organisationId || !props.propertyId) {
         await router.replace("/");
     }
 }
 
 const onFloorUpdate = withLoading(function (floor: FloorEditor) {
-    return updateEventFloorData(floor, props.id);
+    return updateEventFloorData(eventOwner, floor);
 });
-
-function onUpdateActiveStaff(newActiveStaff: User["id"][]) {
-    if (!event.value) return;
-    const eventId = event.value.id;
-    tryCatchLoadingWrapper({
-        hook: () => updateEventProperty(eventId, "activeStaff", newActiveStaff),
-    });
-}
 
 function showDialog(
     component: Component,
     title: string,
     componentPropsObject: Record<string, unknown> = {},
     listeners: Record<string, unknown> = {},
+    maximized = isMobile.value,
 ) {
     quasar.dialog({
         component: FTDialog,
         componentProps: {
+            maximized,
             component,
             title,
             componentPropsObject,
@@ -109,7 +111,7 @@ function showEventInfoEditDialog(): void {
     if (event.value) {
         showDialog(AdminEventEditInfo, "Edit event info", {
             eventInfo: event.value.info || "",
-            eventId: event.value.id,
+            eventOwner,
         });
     }
 }
@@ -121,21 +123,7 @@ function showFloorEditDialog(floor: FloorDoc): void {
             `Editing Floor: ${floor.name}`,
             { floor, mode: FloorMode.EDITOR, eventId: event.value.id },
             { update: onFloorUpdate },
-        );
-    }
-}
-
-function showAssignStaffDialog(): void {
-    if (event.value) {
-        showDialog(
-            AdminEventActiveStaff,
-            "Active Staff",
-            {
-                eventId: event.value.id,
-                users: users.value,
-                activeStaff: new Set(event.value.activeStaff || []),
-            },
-            { updateActiveStaff: onUpdateActiveStaff },
+            true,
         );
     }
 }
@@ -200,16 +188,16 @@ onMounted(init);
                         </q-btn>
 
                         <!-- Staff assigned to an event -->
-                        <q-separator class="q-my-md" />
-                        <h2 class="text-subtitle1">Active Staff</h2>
-                        <q-btn
-                            class="button-gradient q-mb-sm"
-                            size="md"
-                            rounded
-                            @click="showAssignStaffDialog"
-                        >
-                            Assign active staff
-                        </q-btn>
+                        <!--                        <q-separator class="q-my-md" />-->
+                        <!--                        <h2 class="text-subtitle1">Active Staff</h2>-->
+                        <!--                        <q-btn-->
+                        <!--                            class="button-gradient q-mb-sm"-->
+                        <!--                            size="md"-->
+                        <!--                            rounded-->
+                        <!--                            @click="showAssignStaffDialog"-->
+                        <!--                        >-->
+                        <!--                            Assign active staff-->
+                        <!--                        </q-btn>-->
                     </div>
                 </q-tab-panel>
             </q-tab-panels>

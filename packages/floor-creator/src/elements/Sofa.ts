@@ -1,5 +1,4 @@
 import { fabric } from "fabric";
-import { RESOLUTION } from "../constants";
 import { FloorElementTypes } from "../types";
 import { IGroupOptions } from "fabric/fabric-impl";
 
@@ -16,8 +15,8 @@ export class Sofa extends fabric.Group {
     constructor(sofaGroupOpts: SofaGroupCreationOpts) {
         const sofaBaseOpts = sofaGroupOpts.objects?.[0] ?? {};
         const base = new fabric.Rect({
-            width: RESOLUTION * 4,
-            height: RESOLUTION / 2,
+            width: 25 * 4,
+            height: 25 / 1.5,
             fill: "#444",
             stroke: "#222",
             strokeWidth: 0.5,
@@ -25,13 +24,15 @@ export class Sofa extends fabric.Group {
             // Needs to stay like this all the time, otherwise element gets distorted
             left: 0,
             top: 0,
+            ry: 4,
+            rx: 4,
         });
 
         const backrest = new fabric.Rect({
             left: 0,
-            top: -RESOLUTION / 4,
-            width: RESOLUTION * 4,
-            height: RESOLUTION / 4,
+            top: -25 / 4,
+            width: 25 * 4,
+            height: 25 / 4,
             fill: "#444",
             stroke: "#222",
             strokeWidth: 0.5,

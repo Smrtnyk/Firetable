@@ -25,15 +25,16 @@ export async function createPropertyFn(data: Data, context: functions.https.Call
     };
 
     try {
+        const { organisationId } = data;
         // Adding the property data to Firestore
-        const propertyDocRef = await db.collection(Collection.PROPERTIES).add(propertyData);
+        const propertyDocRef = await db.collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}`).add(propertyData);
         const propertyId = propertyDocRef.id;
 
         const userClaims = context.auth.token;
 
         // If user is not an admin, associate the property with the user
         if (userClaims.role !== ADMIN) {
-            const userRef = db.collection(Collection.USERS).doc(context.auth.uid);
+            const userRef = db.collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`).doc(context.auth.uid);
             await userRef.update({
                 relatedProperties: FieldValue.arrayUnion(propertyId)
             });

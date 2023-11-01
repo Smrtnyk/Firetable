@@ -72,6 +72,10 @@ export class TouchManager {
     }
 
     onPanMove = (e: HammerInput) => {
+        // prevent panning if ctrl is pressed
+        if (e.srcEvent.ctrlKey) {
+            return;
+        }
         const activeObject = this.floor.canvas.getActiveObject();
         // If an object is selected, don't pan the canvas
         if (activeObject) {

@@ -2,7 +2,13 @@ import { fabric } from "fabric";
 import { FloorElementTypes } from "../types.js";
 import { determineTableColor } from "../utils.js";
 import { Reservation } from "@firetable/types";
-import { FONT_SIZE, TABLE_TEXT_FILL_COLOR, RESOLUTION } from "../constants";
+import {
+    FONT_SIZE,
+    TABLE_TEXT_FILL_COLOR,
+    RESOLUTION,
+    TABLE_WIDTH,
+    TABLE_HEIGHT,
+} from "../constants";
 import { IGroupOptions } from "fabric/fabric-impl";
 import { AnimationStrategy } from "./animation/AnimationStrategy";
 import { SmoothBlinkAnimation } from "./animation/SmoothBlinkAnimation.js";
@@ -25,7 +31,6 @@ export class RectTable extends fabric.Group {
     label: string;
     baseFill: string;
     private readonly initialStrokeWidth: number;
-    private readonly initialFontSize: number;
     private readonly initialWidth: number;
     private readonly initialHeight: number;
     private rect: fabric.Rect;
@@ -39,7 +44,7 @@ export class RectTable extends fabric.Group {
             ...options.rectOptions,
             fill,
             stroke: "black",
-            strokeWidth: 2,
+            strokeWidth: 0.5,
         });
 
         const textLabel = new fabric.Text(options.textOptions.label, {
@@ -66,16 +71,33 @@ export class RectTable extends fabric.Group {
         }
 
         this.initialStrokeWidth = tableRect.strokeWidth || 2;
-        this.initialFontSize = textLabel.fontSize || FONT_SIZE;
 
         this.on("scaling", this.handleScaling.bind(this));
     }
 
     private handleScaling(): void {
         this.enforceStrokeWidth();
-        this.resetFontSize();
         this.enforceMinimumDimensions();
         this.snapToGrid();
+        this.adjustTextScaling();
+    }
+
+    private adjustTextScaling(): void {
+        if (!this.scaleX || !this.scaleY) return;
+
+        // Inversely adjust the scaling of the textLabel
+        this.textLabel.set({
+            scaleX: 1 / this.scaleX,
+            scaleY: 1 / this.scaleY,
+        });
+
+        // Adjust the position to keep it centered
+        this.textLabel.set({
+            left: this.rect.left! + this.rect.width! / 2,
+            top: this.rect.top! + this.rect.height! / 2,
+        });
+
+        this.canvas?.renderAll();
     }
 
     private snapToGrid(): void {
@@ -100,12 +122,12 @@ export class RectTable extends fabric.Group {
     private enforceMinimumDimensions(): void {
         if (!this.scaleX || !this.scaleY) return;
 
-        if (this.scaleX * this.initialWidth < 50) {
-            this.scaleX = 50 / this.initialWidth;
+        if (this.scaleX * this.initialWidth < TABLE_WIDTH) {
+            this.scaleX = TABLE_WIDTH / this.initialWidth;
         }
 
-        if (this.scaleY * this.initialHeight < 50) {
-            this.scaleY = 50 / this.initialHeight;
+        if (this.scaleY * this.initialHeight < TABLE_HEIGHT) {
+            this.scaleY = TABLE_HEIGHT / this.initialHeight;
         }
     }
 
@@ -114,15 +136,6 @@ export class RectTable extends fabric.Group {
         if (!this.scaleX || !this.scaleY) return;
         tableRect.set({
             strokeWidth: this.initialStrokeWidth / Math.max(this.scaleX, this.scaleY),
-        });
-    }
-
-    private resetFontSize(): void {
-        const textLabel = this.item(1) as unknown as fabric.Text;
-        textLabel.set({
-            fontSize: this.initialFontSize,
-            left: (this.item(0) as fabric.Rect).left! + (this.item(0) as fabric.Rect).width! / 2, // Adjust position if necessary
-            top: (this.item(0) as fabric.Rect).top! + (this.item(0) as fabric.Rect).height! / 2, // Adjust position if necessary
         });
     }
 

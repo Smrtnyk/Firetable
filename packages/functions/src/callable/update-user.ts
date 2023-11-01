@@ -1,5 +1,5 @@
 import { Collection, EditUserPayload } from "../../types/types.js";
-import { db } from "../init.js";
+import { auth, db } from "../init.js";
 import * as functions from "firebase-functions";
 import { FieldValue } from "firebase-admin/firestore";
 const { logger } = functions;
@@ -27,7 +27,7 @@ const { logger } = functions;
  *
  * @returns Returns a promise that resolves once the user and their associated properties have been successfully updated in Firestore.
  */
-export async function updateUserFn(editUserPayload: EditUserPayload): Promise<void> {
+export async function updateUserFn(editUserPayload: EditUserPayload): Promise<{ success: boolean, message: string }> {
     const { updatedUser, userId } = editUserPayload;
     const { relatedProperties } = updatedUser;
 
@@ -39,9 +39,23 @@ export async function updateUserFn(editUserPayload: EditUserPayload): Promise<vo
         throw new functions.https.HttpsError("invalid-argument", "No data provided to update.");
     }
 
+    // Check and update password
+    if (updatedUser.password) {
+        try {
+            await auth.updateUser(userId, {
+                password: updatedUser.password
+            });
+        } catch (error: any) {
+            logger.error(`Failed to update password for user ${userId}`, error);
+            throw new functions.https.HttpsError("internal", `Failed to update password. Details: ${error.message}`);
+        }
+        // Remove password from updatedUser so it doesn't get saved in Firestore
+        delete updatedUser.password;
+    }
+
     try {
         // Fetch the properties associated with this user by checking relatedUsers field
-        const existingPropertiesSnapshot = await db.collection(Collection.PROPERTIES)
+        const existingPropertiesSnapshot = await db.collection(`${Collection.ORGANISATIONS}/${editUserPayload.organisationId}/${Collection.PROPERTIES}`)
             .where("relatedUsers", "array-contains", userId)
             .get();
 
@@ -51,7 +65,7 @@ export async function updateUserFn(editUserPayload: EditUserPayload): Promise<vo
         const propertiesToRemove = existingProperties.filter(id => !relatedProperties.includes(id));
 
         await db.runTransaction(async transaction => {
-            const userRef = db.collection(Collection.USERS).doc(userId);
+            const userRef = db.collection(`${Collection.ORGANISATIONS}/${editUserPayload.organisationId}/${Collection.USERS}`).doc(userId);
 
             // Update the user's basic information if provided
             if (updatedUser) {
@@ -60,7 +74,7 @@ export async function updateUserFn(editUserPayload: EditUserPayload): Promise<vo
 
             // Add the user to relatedUsers field of the property document for new associations
             for (const propertyId of propertiesToAdd) {
-                const propertyRef = db.collection(Collection.PROPERTIES).doc(propertyId);
+                const propertyRef = db.collection(`${Collection.ORGANISATIONS}/${editUserPayload.organisationId}/${Collection.PROPERTIES}`).doc(propertyId);
                 transaction.update(propertyRef, {
                     relatedUsers: FieldValue.arrayUnion(userId)
                 });
@@ -68,12 +82,14 @@ export async function updateUserFn(editUserPayload: EditUserPayload): Promise<vo
 
             // Remove the user from relatedUsers field of the property document for removed associations
             for (const propertyId of propertiesToRemove) {
-                const propertyRef = db.collection(Collection.PROPERTIES).doc(propertyId);
+                const propertyRef = db.collection(`${Collection.ORGANISATIONS}/${editUserPayload.organisationId}/${Collection.PROPERTIES}`).doc(propertyId);
                 transaction.update(propertyRef, {
                     relatedUsers: FieldValue.arrayRemove(userId)
                 });
             }
         });
+
+        return { success: true, message: "User updated successfully." };
     } catch (error: any) {
         logger.error(`Failed to update user ${userId}`, error);
         throw new functions.https.HttpsError("internal", `Failed to update user. Details: ${error.message}`);

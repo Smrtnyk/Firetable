@@ -4,14 +4,14 @@ import { User } from "./auth.js";
 
 export interface CreateEventForm {
     name: string;
-    date: string;
+    date: number;
     guestListLimit: number;
-    img: string;
     entryPrice: number;
 }
 
 export type CreateEventPayload = CreateEventForm & {
     propertyId: string;
+    organisationId: string;
     floors: FloorDoc[];
 };
 
@@ -20,12 +20,12 @@ export interface EventDoc {
     creator: string;
     date: number;
     entryPrice: number;
-    img: string | null;
     name: string;
     reservedPercentage: number;
     guestListLimit: number;
     activeStaff: User["id"][];
     propertyId: string;
+    organisationId: string;
     info?: string;
     _doc: QueryDocumentSnapshot<EventDoc>;
 }

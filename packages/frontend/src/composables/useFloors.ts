@@ -8,6 +8,7 @@ import { query, where, onSnapshot } from "firebase/firestore";
 export type PropertyFloors = {
     propertyName: string;
     propertyId: string;
+    organisationId: string;
     floors: FloorDoc[];
 };
 export type UsePropertyFloors = Record<string, PropertyFloors>;
@@ -26,7 +27,7 @@ export function useFloors() {
 
             properties.forEach((property) => {
                 const floorQuery = query(
-                    floorsCollection(),
+                    floorsCollection(property.organisationId, property.id),
                     where("propertyId", "==", property.id),
                 );
 
@@ -37,6 +38,7 @@ export function useFloors() {
                             floors.value[property.id] = {
                                 propertyId: property.id,
                                 propertyName: property.name,
+                                organisationId: property.organisationId,
                                 floors: snapshot.docs.map(function (doc) {
                                     console.log("got floor doc ", doc.data());
                                     return {

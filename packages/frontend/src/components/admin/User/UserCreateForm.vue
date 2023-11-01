@@ -178,7 +178,7 @@ function resetProperties() {
                 standout
                 rounded
                 :options="organisationOptions"
-                label="t('UserCreateForm.userOrganisationSelectLabel')"
+                :label="t('UserCreateForm.userOrganisationSelectLabel')"
                 option-label="name"
                 option-value="value"
             />

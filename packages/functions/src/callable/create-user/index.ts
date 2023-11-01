@@ -30,7 +30,7 @@ import { FieldValue } from "firebase-admin/firestore";
  * @throws - Throws appropriate errors for any other exceptions encountered during user creation or data storage.
  */
 export async function createUser(user: CreateUserPayload): Promise<{ uid: string, message: string }> {
-    const { name, password, email, role, relatedProperties, organisationId } = user;
+    const { name, password, email, role, relatedProperties, organisationId, username } = user;
 
     let createdUserUid: string | null = null;
 
@@ -48,22 +48,24 @@ export async function createUser(user: CreateUserPayload): Promise<{ uid: string
     try {
         const createdUser = await auth.createUser({ email, password });
         createdUserUid = createdUser.uid;
-        await auth.setCustomUserClaims(createdUser.uid, { role });
+        await auth.setCustomUserClaims(createdUser.uid, { role, organisationId });
 
         const userDoc = {
             name,
             email,
             role,
+            username,
             relatedProperties,
             organisationId
         };
 
         await db.runTransaction(async (transaction) => {
-            const userRef = db.collection(Collection.USERS).doc(createdUser.uid);
+            // Adjusted the userRef to point to the nested users collection under organisations/{organisationId}
+            const userRef = db.collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`).doc(createdUser.uid);
             transaction.set(userRef, userDoc);
 
             for (const propertyId of relatedProperties) {
-                const propertyRef = db.collection(Collection.PROPERTIES).doc(propertyId);
+                const propertyRef = db.collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}`).doc(propertyId);
                 transaction.update(propertyRef, {
                     relatedUsers: FieldValue.arrayUnion(createdUser.uid)
                 });
@@ -81,3 +83,4 @@ export async function createUser(user: CreateUserPayload): Promise<{ uid: string
         throw new functions.https.HttpsError(errorCode, errorMessage);
     }
 }
+

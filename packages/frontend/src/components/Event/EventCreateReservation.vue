@@ -7,21 +7,30 @@ import { Reservation, User } from "@firetable/types";
 
 const props = defineProps<{
     users: User[];
+    mode: "create" | "edit";
+    reservationData?: Reservation; // Optional data for editing
 }>();
+
 const emit = defineEmits<{
     (e: "create", payload: Reservation): void;
+    (e: "update", payload: Reservation): void;
 }>();
 const { t } = useI18n();
-const state = reactive<Reservation>({
-    guestName: "",
-    numberOfGuests: 2,
-    guestContact: "",
-    reservationNote: "",
-    consumption: 1,
-    confirmed: false,
-    time: "00:00",
-    reservedBy: null as unknown as User,
-});
+
+const initialState =
+    props.mode === "edit" && props.reservationData
+        ? props.reservationData
+        : {
+              guestName: "",
+              numberOfGuests: 2,
+              guestContact: "",
+              reservationNote: "",
+              consumption: 1,
+              confirmed: false,
+              time: "00:00",
+              reservedBy: null as unknown as User,
+          };
+const state = reactive<Reservation>(initialState);
 const reservationForm = ref<QForm | null>(null);
 const formattedUsers = computed(() =>
     props.users.map((user) => ({
@@ -37,7 +46,12 @@ function requireReservedBySelection(val: User): boolean | string {
 
 async function onOKClick() {
     if (!(await reservationForm.value?.validate())) return;
-    emit("create", state);
+
+    if (props.mode === "create") {
+        emit("create", state);
+    } else {
+        emit("update", state);
+    }
 }
 </script>
 
@@ -126,7 +140,13 @@ async function onOKClick() {
                 size="md"
                 class="button-gradient"
                 @click="onOKClick"
-                :label="t(`EventCreateReservation.reservationCreateBtn`)"
+                :label="
+                    t(
+                        `EventCreateReservation.reservation${
+                            props.mode === 'create' ? 'Create' : 'Update'
+                        }Btn`,
+                    )
+                "
             />
         </q-form>
     </q-card-section>

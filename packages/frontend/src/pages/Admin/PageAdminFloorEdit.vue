@@ -3,7 +3,7 @@ import AddTableDialog from "components/Floor/AddTableDialog.vue";
 import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
 import FTDialog from "components/FTDialog.vue";
 
-import { computed, nextTick, onMounted, ref } from "vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { NumberTuple } from "src/types/generic";
 import { useRouter } from "vue-router";
 import { Loading, useQuasar } from "quasar";
@@ -15,6 +15,8 @@ import {
     FloorEditorElement,
     FloorMode,
     hasFloorTables,
+    MAX_FLOOR_HEIGHT,
+    MAX_FLOOR_WIDTH,
     RESOLUTION,
 } from "@firetable/floor-creator";
 import { Collection, ElementTag, FloorDoc } from "@firetable/types";
@@ -36,7 +38,9 @@ interface BottomSheetTableClickResult {
 }
 
 interface Props {
-    floorID: string;
+    floorId: string;
+    organisationId: string;
+    propertyId: string;
 }
 const addNewElementsBottomSheetOptions = {
     message: "Choose action",
@@ -64,14 +68,21 @@ const bulkElement = ref<ElementTag | null>(null);
 const bulkLabelCounter = ref(0); // To auto-increment labels
 
 const buttonSize = computed(() => (isMobile ? "xs" : "md"));
-
+const floorPath = `${Collection.ORGANISATIONS}/${props.organisationId}/${Collection.PROPERTIES}/${props.propertyId}/${Collection.FLOORS}/${props.floorId}`;
 const {
     data: floor,
     promise: floorDataPromise,
     pending: isFloorLoading,
-} = useFirestoreDocument<FloorDoc>(`${Collection.FLOORS}/${props.floorID}`, {
-    once: true,
+} = useFirestoreDocument<FloorDoc>(floorPath, { once: true });
+
+const undoRedoState = reactive({
+    canUndo: false,
+    canRedo: false,
 });
+let unregisterStateChangeListener: () => void | undefined;
+
+// Remember to unregister the listener when the component unmounts
+onBeforeUnmount(() => {});
 
 onMounted(async () => {
     Loading.show();
@@ -87,6 +98,11 @@ onMounted(async () => {
     Loading.hide();
 });
 
+onBeforeUnmount(() => {
+    unregisterStateChangeListener?.();
+    floorInstance.value?.destroy();
+});
+
 function instantiateFloor(floorDoc: FloorDoc) {
     if (!canvasRef.value || !pageRef.value) return;
 
@@ -98,6 +114,12 @@ function instantiateFloor(floorDoc: FloorDoc) {
         mode: FloorMode.EDITOR,
         containerWidth: pageRef.value.clientWidth,
     });
+
+    // After initializing the floorInstance:
+    floorInstance.value?.commandInvoker.on("change", () => {
+        undoRedoState.canUndo = floorInstance.value?.commandInvoker.canUndo() ?? false;
+        undoRedoState.canRedo = floorInstance.value?.commandInvoker.canRedo() ?? false;
+    });
 }
 
 function onFloorSave(): void {
@@ -107,7 +129,7 @@ function onFloorSave(): void {
 
     tryCatchLoadingWrapper({
         hook: () =>
-            updateFirestoreDocument(getFirestoreDocument(`${Collection.FLOORS}/${props.floorID}`), {
+            updateFirestoreDocument(getFirestoreDocument(floorPath), {
                 json: floorInstance.value?.json,
                 name: floorInstance.value?.name,
                 width: floorInstance.value?.width,
@@ -181,6 +203,7 @@ function onDeleteElement(element: FloorEditorElement) {
     const elementToDelete = element.canvas?.getActiveObject();
     if (!elementToDelete) return;
     element.canvas?.remove(elementToDelete);
+    selectedElement.value = undefined;
 }
 
 function toggleBulkMode() {
@@ -219,6 +242,20 @@ function deactivateBulkMode() {
     bulkElement.value = null;
     bulkLabelCounter.value = 0;
 }
+
+function undoAction() {
+    if (floorInstance.value) {
+        floorInstance.value.commandInvoker.undo();
+        floorInstance.value.canvas.renderAll(); // Refresh the canvas after undo
+    }
+}
+
+function redoAction() {
+    if (floorInstance.value) {
+        floorInstance.value.commandInvoker.redo();
+        floorInstance.value.canvas.renderAll(); // Refresh the canvas after redo
+    }
+}
 </script>
 
 <template>
@@ -253,6 +290,22 @@ function deactivateBulkMode() {
             <div class="row q-pa-sm q-col-gutter-md">
                 <div class="col-auto flex q-pl-none justify-end">
                     <q-btn
+                        :disabled="!undoRedoState.canUndo"
+                        @click="undoAction"
+                        icon="undo"
+                        :size="buttonSize"
+                    />
+                </div>
+                <div class="col-auto flex q-pl-none justify-end">
+                    <q-btn
+                        :disabled="!undoRedoState.canRedo"
+                        @click="redoAction"
+                        icon="redo"
+                        :size="buttonSize"
+                    />
+                </div>
+                <div class="col-auto flex q-pl-none justify-end">
+                    <q-btn
                         v-if="floorInstance"
                         @click="floorInstance.toggleGridVisibility"
                         icon="grid"
@@ -272,12 +325,12 @@ function deactivateBulkMode() {
         <div class="row q-pa-sm q-col-gutter-md" v-if="floorInstance">
             <div class="col-6">
                 <q-badge color="secondary">
-                    Width: {{ floorInstance.width }} (300 to 1000)
+                    Width: {{ floorInstance.width }} (300 to {{ MAX_FLOOR_WIDTH }})
                 </q-badge>
                 <q-slider
                     :model-value="floorInstance.width"
                     :min="300"
-                    :max="1000"
+                    :max="MAX_FLOOR_WIDTH"
                     :step="RESOLUTION"
                     label
                     color="deep-orange"
@@ -286,11 +339,11 @@ function deactivateBulkMode() {
             </div>
             <div class="col-6">
                 <q-badge color="secondary">
-                    Height: {{ floorInstance.height }} (300 to 1000)
+                    Height: {{ floorInstance.height }} (300 to {{ MAX_FLOOR_HEIGHT }})
                 </q-badge>
                 <q-slider
                     :min="300"
-                    :max="1000"
+                    :max="MAX_FLOOR_HEIGHT"
                     :step="RESOLUTION"
                     label
                     color="deep-orange"
