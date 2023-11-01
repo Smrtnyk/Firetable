@@ -169,7 +169,7 @@ export default function useFloorsPageEvent(
             return;
         }
 
-        showCreateReservationDialog(floor, element);
+        showCreateReservationDialog(floor, element, "create");
     }
 
     function showReservation(floor: Floor, reservation: Reservation, element: BaseTable) {
@@ -185,6 +185,9 @@ export default function useFloorsPageEvent(
                 listeners: {
                     delete: () => {
                         onDeleteReservation(floor, element).catch(showErrorMessage);
+                    },
+                    edit() {
+                        onEditReservation(floor, element);
                     },
                     confirm: onReservationConfirm(floor, element),
                 },
@@ -206,8 +209,11 @@ export default function useFloorsPageEvent(
         };
     }
 
-    function showCreateReservationDialog(floor: Floor, element: BaseTable) {
-        console.log(users.value);
+    function showCreateReservationDialog(
+        floor: Floor,
+        element: BaseTable,
+        mode: "create" | "edit",
+    ) {
         const { label } = element;
         const dialog = q
             .dialog({
@@ -218,10 +224,16 @@ export default function useFloorsPageEvent(
                     maximized: false,
                     componentPropsObject: {
                         users: users.value,
+                        mode,
+                        reservationData: mode === "edit" ? element.reservation : void 0,
                     },
                     listeners: {
                         create: (reservationData: Reservation) => {
                             resetCurrentOpenCreateReservationDialog();
+                            handleReservationCreation(floor, reservationData, element);
+                            dialog.hide();
+                        },
+                        update(reservationData: Reservation) {
                             handleReservationCreation(floor, reservationData, element);
                             dialog.hide();
                         },
@@ -230,11 +242,13 @@ export default function useFloorsPageEvent(
             })
             .onDismiss(resetCurrentOpenCreateReservationDialog);
 
-        currentOpenCreateReservationDialog = {
-            label,
-            dialog,
-            floorId: floor.id,
-        };
+        if (mode === "create") {
+            currentOpenCreateReservationDialog = {
+                label,
+                dialog,
+                floorId: floor.id,
+            };
+        }
     }
 
     function resetCurrentOpenCreateReservationDialog() {
@@ -248,6 +262,11 @@ export default function useFloorsPageEvent(
         await tryCatchLoadingWrapper({
             hook: () => updateEventFloorData(eventOwner, floor),
         });
+    }
+
+    function onEditReservation(floor: Floor, element: BaseTable) {
+        console.log(floor, element);
+        showCreateReservationDialog(floor, element, "edit");
     }
 
     function handleReservationCreation(
