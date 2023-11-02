@@ -113,10 +113,6 @@ describe("Table Management Functions", () => {
         });
     });
 
-    describe("getReservedTables function", () => {
-        // Similar tests to getFreeTables, but for reserved tables
-    });
-
     describe("extractAllTablesLabels function", () => {
         it("should return an empty array when there are no tables on the floor", () => {
             expect(extractAllTablesLabels(floor)).toEqual([]);

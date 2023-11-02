@@ -71,11 +71,11 @@ export class FloorEditor extends Floor {
     }
 
     onFloorDoubleTap(coordinates: [x: number, y: number]) {
-        this.eventEmitter.emit("doubleClick", this, coordinates);
+        this.emit("doubleClick", this, coordinates);
     }
 
     protected onElementClick = (ev: fabric.IEvent<MouseEvent>) => {
-        this.eventEmitter.emit("elementClicked", this, ev.target as FloorEditorElement);
+        this.emit("elementClicked", this, ev.target as FloorEditorElement);
     };
 
     renderGrid() {
