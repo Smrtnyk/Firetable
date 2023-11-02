@@ -130,17 +130,15 @@ export default function useFloorsPageEvent(
         const canvas = canvases.get(floorDoc.id);
 
         if (!canvas || !pageRef.value) return;
-
-        state.value.floorInstances.add(
-            new FloorViewer({
-                canvas,
-                floorDoc,
-                elementClickHandler: tableClickHandler,
-                mode: FloorMode.LIVE,
-                containerWidth: pageRef.value.clientWidth,
-                tableToTableHandler: swapOrTransferReservations,
-            }),
-        );
+        const floorViewer = new FloorViewer({
+            canvas,
+            floorDoc,
+            mode: FloorMode.LIVE,
+            containerWidth: pageRef.value.clientWidth,
+        });
+        floorViewer.on("elementClicked", tableClickHandler);
+        floorViewer.on("tableToTable", swapOrTransferReservations);
+        state.value.floorInstances.add(floorViewer);
     }
 
     function isActiveFloor(floorId: string): boolean {

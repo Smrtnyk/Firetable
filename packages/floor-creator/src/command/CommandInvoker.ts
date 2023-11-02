@@ -1,18 +1,19 @@
 import { Command } from "./Command";
+import { EventEmitter } from "../event-emitter/EventEmitter";
 
-type EventListener = () => void;
-type CommandInvokerEvent = "change";
+type CommandInvokerEvents = {
+    change: [null];
+};
 
-export class CommandInvoker {
+export class CommandInvoker extends EventEmitter<CommandInvokerEvents> {
     private undoStack: Command[] = [];
     private redoStack: Command[] = [];
-    private listeners = new Map<CommandInvokerEvent, EventListener[]>();
 
     execute(command: Command): void {
         command.execute();
         this.undoStack.push(command);
         this.redoStack.splice(0, this.redoStack.length);
-        this.emit("change");
+        this.emit("change", null);
     }
 
     undo(): void {
@@ -20,7 +21,7 @@ export class CommandInvoker {
         const command = this.undoStack.pop()!;
         command.undo();
         this.redoStack.push(command);
-        this.emit("change");
+        this.emit("change", null);
     }
 
     redo(): void {
@@ -28,7 +29,7 @@ export class CommandInvoker {
         const command = this.redoStack.pop()!;
         command.execute();
         this.undoStack.push(command);
-        this.emit("change");
+        this.emit("change", null);
     }
 
     canUndo(): boolean {
@@ -42,29 +43,5 @@ export class CommandInvoker {
     clear(): void {
         this.undoStack = [];
         this.redoStack = [];
-    }
-
-    private emit(eventName: CommandInvokerEvent): void {
-        const listenersForEvent = this.listeners.get(eventName);
-        if (!listenersForEvent) return;
-        listenersForEvent.forEach((listener) => listener());
-    }
-
-    on(eventName: CommandInvokerEvent, listener: EventListener): () => void {
-        let listenersForEvent = this.listeners.get(eventName);
-        if (!listenersForEvent) {
-            listenersForEvent = [];
-            this.listeners.set(eventName, listenersForEvent);
-        }
-        listenersForEvent.push(listener);
-        return () => {
-            if (!listenersForEvent) {
-                return;
-            }
-            this.listeners.set(
-                eventName,
-                listenersForEvent.filter((l) => l !== listener),
-            );
-        };
     }
 }

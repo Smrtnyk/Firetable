@@ -1,4 +1,3 @@
-import { Floor } from "./Floor.js";
 import { RectTable } from "./elements/RectTable.js";
 import { RoundTable } from "./elements/RoundTable.js";
 import { ElementTag, FloorDoc } from "@firetable/types";
@@ -6,24 +5,14 @@ import { Sofa } from "./elements/Sofa";
 import { DJBooth } from "./elements/DJBooth";
 import { SingleSofa } from "./elements/SingleSofa";
 import { Stage } from "./elements/Stage";
-import type { FloorEditor } from "./FloorEditor";
-
-export interface FloorEditorCreationOptions extends FloorCreationOptions {
-    dblClickHandler?: FloorEditorDoubleClickHandler;
-}
 
 export interface FloorCreationOptions {
     canvas: HTMLCanvasElement;
     floorDoc: FloorDoc;
     mode: FloorMode;
-    elementClickHandler: ElementClickHandler;
-    tableToTableHandler?: TableToTableHandler;
     containerWidth: number;
 }
 
-export type FloorEditorDoubleClickHandler = (floor: FloorEditor, coords: NumberTuple) => void;
-export type ElementClickHandler = (floor: Floor, el: FloorEditorElement | undefined) => void;
-export type TableToTableHandler = (floor: Floor, table1: BaseTable, table2: BaseTable) => void;
 export type BaseTable = RectTable | RoundTable;
 export type FloorEditorElement = RectTable | RoundTable | Sofa | DJBooth | SingleSofa | Stage;
 export type CreateElementOptions = {
@@ -32,11 +21,6 @@ export type CreateElementOptions = {
     y: number;
     tag: ElementTag;
 };
-
-export const enum AnimationDirection {
-    UP = "up",
-    DOWN = "down",
-}
 
 export enum FloorElementTypes {
     ROUND_TABLE = "RoundTable",

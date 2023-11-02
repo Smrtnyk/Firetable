@@ -36,7 +36,7 @@ export class ViewerEventManager extends EventManager {
             );
 
             if (isTable(endElement) && endElement !== this.startElement) {
-                this.floor.tableToTableHandler?.(this.floor, this.startElement, endElement);
+                this.floor.emit("tableToTableHandler", this.floor, this.startElement, endElement);
                 this.dragOccurred = true;
             }
         }

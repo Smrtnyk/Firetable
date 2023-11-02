@@ -62,9 +62,9 @@ watch(floorContainerRef, () => {
     floorInstance.value = new FloorEditor({
         floorDoc: props.floor,
         canvas: floorContainerRef.value,
-        elementClickHandler: onElementClick,
         mode: props.mode,
         containerWidth: viewerContainerRef.value.clientWidth,
     });
+    floorInstance.value.on("elementClicked", onElementClick);
 });
 </script>

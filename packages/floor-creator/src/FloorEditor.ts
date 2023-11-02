@@ -2,9 +2,9 @@ import { Floor } from "./Floor";
 import { fabric } from "fabric";
 import {
     CreateElementOptions,
-    FloorEditorCreationOptions,
-    FloorEditorDoubleClickHandler,
+    FloorCreationOptions,
     FloorEditorElement,
+    NumberTuple,
 } from "./types";
 import { EventManager } from "./event-manager/EventManager";
 import { ElementManager } from "./ElementManager";
@@ -14,28 +14,39 @@ import { EditorEventManager } from "./event-manager/EditorEventManager";
 import { calculateCanvasScale } from "./utils";
 import { CommandInvoker } from "./command/CommandInvoker";
 import { MoveCommand } from "./command/MoveCommand";
+import { EventEmitter } from "./event-emitter/EventEmitter";
+
+type FloorEditorEvents = {
+    elementClicked: [FloorEditor, FloorEditorElement];
+    doubleClick: [FloorEditor, NumberTuple];
+    commandChange: [];
+};
 
 export class FloorEditor extends Floor {
     protected eventManager: EventManager;
     private elementManager: ElementManager;
     private gridDrawer: GridDrawer;
-    commandInvoker = new CommandInvoker();
-
-    private readonly dblClickHandler?: FloorEditorDoubleClickHandler;
+    private eventEmitter: EventEmitter<FloorEditorEvents>;
+    private commandInvoker = new CommandInvoker();
 
     private ctrlPressedDuringSelection: boolean = false;
 
     private movingObjectStartPosition: { left: number; top: number } | null = null;
 
-    constructor(options: FloorEditorCreationOptions) {
+    constructor(options: FloorCreationOptions) {
         super(options);
 
-        this.dblClickHandler = options.dblClickHandler;
+        this.eventEmitter = new EventEmitter<FloorEditorEvents>();
         this.gridDrawer = new GridDrawer(this.canvas);
         this.eventManager = new EditorEventManager(this);
         this.elementManager = new ElementManager();
         this.initializeCanvasEventHandlers();
         this.initializeCtrlEventListeners();
+
+        this.commandInvoker.on("change", () => {
+            this.emit("commandChange");
+        });
+
         this.canvas.on("object:moving", (options) => {
             if (this.ctrlPressedDuringSelection) {
                 const activeObjects = this.canvas.getActiveObjects();
@@ -82,6 +93,33 @@ export class FloorEditor extends Floor {
         this.renderGrid();
     }
 
+    canUndo(): boolean {
+        return this.commandInvoker.canUndo();
+    }
+
+    canRedo(): boolean {
+        return this.commandInvoker.canRedo();
+    }
+
+    undo(): void {
+        return this.commandInvoker.undo();
+    }
+
+    redo(): void {
+        return this.commandInvoker.redo();
+    }
+
+    emit<T extends keyof FloorEditorEvents>(event: T, ...args: FloorEditorEvents[T]) {
+        this.eventEmitter.emit(event, ...args);
+    }
+
+    on<T extends keyof FloorEditorEvents>(
+        event: T,
+        listener: (...args: FloorEditorEvents[T]) => void,
+    ): void {
+        this.eventEmitter.on(event, listener);
+    }
+
     private initializeCtrlEventListeners() {
         document.addEventListener("keydown", this.handleKeyDown);
         document.addEventListener("keyup", this.handleKeyUp);
@@ -117,11 +155,11 @@ export class FloorEditor extends Floor {
     };
 
     onFloorDoubleTap(coordinates: [x: number, y: number]) {
-        this.dblClickHandler?.(this, coordinates);
+        this.eventEmitter.emit("doubleClick", this, coordinates);
     }
 
     protected onElementClick = (ev: fabric.IEvent<MouseEvent>) => {
-        this.elementClickHandler(this, ev.target as FloorEditorElement);
+        this.eventEmitter.emit("elementClicked", this, ev.target as FloorEditorElement);
     };
 
     renderGrid() {

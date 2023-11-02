@@ -1,11 +1,6 @@
 import { fabric } from "fabric";
 import { CANVAS_BG_COLOR } from "./constants.js";
-import {
-    ElementClickHandler,
-    FloorCreationOptions,
-    FloorMode,
-    TableToTableHandler,
-} from "./types.js";
+import { FloorCreationOptions, FloorMode } from "./types.js";
 import { FloorDoc } from "@firetable/types";
 import { RoundTable } from "./elements/RoundTable";
 import { RectTable } from "./elements/RectTable";
@@ -13,6 +8,7 @@ import { TouchManager } from "./TouchManager";
 import { FloorZoomManager } from "./FloorZoomManager";
 import { EventManager } from "./event-manager/EventManager";
 import { calculateCanvasScale } from "./utils";
+import { EventEmitterListener } from "./event-emitter/EventEmitter";
 
 Object.assign(fabric, { RectTable, RoundTable });
 
@@ -23,8 +19,6 @@ export abstract class Floor {
     height: number;
     readonly floorDoc: FloorDoc;
     readonly canvas: fabric.Canvas;
-    readonly elementClickHandler: ElementClickHandler;
-    readonly tableToTableHandler?: TableToTableHandler;
     width: number;
     containerWidth: number;
     touchManager: TouchManager;
@@ -32,15 +26,16 @@ export abstract class Floor {
 
     protected abstract eventManager: EventManager;
 
-    protected abstract initializeCanvasEventHandlers(): void;
     abstract onFloorDoubleTap(coordinates: [x: number, y: number]): void;
+    abstract emit(event: string, ...args: unknown[]): void;
+    abstract on(event: string, listener: EventEmitterListener): void;
+    protected abstract initializeCanvasEventHandlers(): void;
     protected abstract onElementClick(ev: fabric.IEvent<MouseEvent>): void;
     protected abstract setElementProperties(element: fabric.Object): void;
     public abstract destroy(): void;
 
-    constructor(options: FloorCreationOptions) {
-        const { canvas, floorDoc, elementClickHandler, mode, containerWidth, tableToTableHandler } =
-            options;
+    protected constructor(options: FloorCreationOptions) {
+        const { canvas, floorDoc, mode, containerWidth } = options;
 
         this.scale = calculateCanvasScale(containerWidth, floorDoc.width);
         this.id = floorDoc.id;
@@ -49,8 +44,6 @@ export abstract class Floor {
         this.containerWidth = containerWidth;
         this.height = floorDoc.height;
         this.floorDoc = floorDoc;
-        this.elementClickHandler = elementClickHandler;
-        this.tableToTableHandler = tableToTableHandler;
 
         this.canvas = new fabric.Canvas(canvas, {
             width: this.width,

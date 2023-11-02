@@ -21,6 +21,7 @@ describe("EditorEventManager", () => {
         const mockFloor = {
             canvas: mockCanvas,
             elementClickHandler: jest.fn(),
+            emit: jest.fn(),
         } as unknown as Floor;
 
         mockTarget = {
@@ -116,7 +117,12 @@ describe("EditorEventManager", () => {
             manager.onEditorMouseUp();
 
             // @ts-expect-error -- private property
-            expect(manager.floor.elementClickHandler).toHaveBeenCalledWith(manager.floor, void 0);
+            expect(manager.floor.emit).toHaveBeenCalledWith(
+                "elementClicked",
+                // @ts-expect-error -- private property
+                manager.floor,
+                void 0,
+            );
         });
     });
 });

@@ -1,8 +1,13 @@
 import { EventManager } from "./EventManager";
 import { fabric } from "fabric";
 import { RESOLUTION } from "../constants";
+import { Floor } from "../Floor";
 
 export class EditorEventManager extends EventManager {
+    constructor(floor: Floor) {
+        super(floor);
+    }
+
     initializeCanvasEventHandlers() {
         super.initializeCanvasEventHandlers();
 
@@ -13,7 +18,7 @@ export class EditorEventManager extends EventManager {
     private onEditorMouseUp = () => {
         const hasActiveElement = this.floor.canvas.getActiveObject();
         if (!hasActiveElement) {
-            this.floor.elementClickHandler(this.floor, void 0);
+            this.floor.emit("elementClicked", this.floor, void 0);
         }
     };
 

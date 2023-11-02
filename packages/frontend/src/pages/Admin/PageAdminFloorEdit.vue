@@ -109,16 +109,15 @@ function instantiateFloor(floorDoc: FloorDoc) {
     floorInstance.value = new FloorEditor({
         canvas: canvasRef.value,
         floorDoc,
-        dblClickHandler,
-        elementClickHandler,
         mode: FloorMode.EDITOR,
         containerWidth: pageRef.value.clientWidth,
     });
 
-    // After initializing the floorInstance:
-    floorInstance.value?.commandInvoker.on("change", () => {
-        undoRedoState.canUndo = floorInstance.value?.commandInvoker.canUndo() ?? false;
-        undoRedoState.canRedo = floorInstance.value?.commandInvoker.canRedo() ?? false;
+    floorInstance.value.on("elementClicked", elementClickHandler);
+    floorInstance.value.on("doubleClick", dblClickHandler);
+    floorInstance.value.on("commandChange", () => {
+        undoRedoState.canUndo = floorInstance.value!.canUndo();
+        undoRedoState.canRedo = floorInstance.value!.canRedo();
     });
 }
 
@@ -245,14 +244,14 @@ function deactivateBulkMode() {
 
 function undoAction() {
     if (floorInstance.value) {
-        floorInstance.value.commandInvoker.undo();
+        floorInstance.value.undo();
         floorInstance.value.canvas.renderAll(); // Refresh the canvas after undo
     }
 }
 
 function redoAction() {
     if (floorInstance.value) {
-        floorInstance.value.commandInvoker.redo();
+        floorInstance.value.redo();
         floorInstance.value.canvas.renderAll(); // Refresh the canvas after redo
     }
 }
