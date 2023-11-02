@@ -32,16 +32,15 @@ const initialState =
           };
 const state = reactive<Reservation>(initialState);
 const reservationForm = ref<QForm | null>(null);
-const formattedUsers = computed(() =>
+const formattedUsers = computed<Reservation["reservedBy"][]>(() =>
     props.users.map((user) => ({
-        id: user.id,
         name: user.name,
         email: user.email,
     })),
 );
 
-function requireReservedBySelection(val: User): boolean | string {
-    return !!val?.id || t(`EventCreateReservation.requireReservedBySelectionError`);
+function requireReservedBySelection(val: Reservation["reservedBy"]): boolean | string {
+    return !!val?.email || t(`EventCreateReservation.requireReservedBySelectionError`);
 }
 
 async function onOKClick() {
@@ -131,7 +130,7 @@ async function onOKClick() {
                 :options="formattedUsers"
                 :rules="[requireReservedBySelection]"
                 option-label="name"
-                option-value="id"
+                option-value="email"
                 :label="t(`EventCreateReservation.reservedByLabel`)"
             />
 

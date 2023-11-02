@@ -48,10 +48,5 @@ export interface Reservation {
     reservationNote?: string;
     consumption: number;
     time: string;
-    reservedBy: Omit<
-        User,
-        "status" | "floors" | "password" | "username" | "relatedProperties" | "organisationId"
-    >;
+    reservedBy: Pick<User, "name" | "email">;
 }
-
-export type CreateReservationPayload = Omit<Reservation, "reservedBy">;

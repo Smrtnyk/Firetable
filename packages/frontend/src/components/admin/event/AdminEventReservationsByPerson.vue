@@ -72,17 +72,18 @@ const reservedTables = computed(() => props.reservations.filter(propIsTruthy("re
 function reservationsReducer(acc: Res, { reservation }: BaseTable) {
     if (!reservation) return acc;
     const { reservedBy, confirmed } = reservation;
-    const { id, name } = reservedBy;
-    if (acc[id]) {
-        acc[id].reservations++;
+    const { email, name } = reservedBy;
+    const hash = name + email;
+    if (acc[hash]) {
+        acc[hash].reservations++;
     } else {
-        acc[id] = {
+        acc[hash] = {
             name,
             reservations: 1,
             confirmed: 0,
         };
     }
-    if (confirmed) acc[id].confirmed++;
+    if (confirmed) acc[hash].confirmed++;
     return acc;
 }
 
