@@ -1,10 +1,14 @@
-import { configDefaults, defineConfig } from "vitest/config";
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
     test: {
-        exclude: [...configDefaults.exclude, "packages/template/*"],
         clearMocks: true,
         reporters: ["basic"],
         watch: false,
+        browser: {
+            enabled: true,
+            headless: true,
+            name: "chrome",
+        },
     },
 });

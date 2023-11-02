@@ -1,4 +1,4 @@
-import Hammer from "hammerjs";
+import { Manager, Pinch, Pan, Tap, DIRECTION_ALL } from "hammerjs";
 import { Floor } from "./Floor";
 import { fabric } from "fabric";
 
@@ -8,18 +8,25 @@ const PAN_DAMPENING_FACTOR = 0.1;
 export class TouchManager {
     private readonly floor: Floor;
 
-    private hammerManager: HammerManager;
+    private readonly hammerManager: HammerManager;
 
     constructor(floor: Floor) {
         this.floor = floor;
 
         // @ts-ignore -- private prop
         const upperCanvasEl = this.floor.canvas.upperCanvasEl as HTMLElement;
-        this.hammerManager = new Hammer(upperCanvasEl);
+        this.hammerManager = new Manager(upperCanvasEl);
 
-        // Enable pinch and set pan direction
+        // Create recognizers for pinch and pan gestures
+        const doubleTap = new Tap({ event: "doubletap", taps: 2 });
+        const pinch = new Pinch();
+        const pan = new Pan({ direction: DIRECTION_ALL });
+
+        // Add the recognizers to the hammerManager instance
+        this.hammerManager.add([pinch, pan, doubleTap]);
+
         this.hammerManager.get("pinch").set({ enable: true });
-        this.hammerManager.get("pan").set({ direction: Hammer.DIRECTION_ALL });
+        this.hammerManager.get("pan").set({ direction: DIRECTION_ALL });
 
         // Pinch event
         this.hammerManager.on("pinch", this.onPinch);
