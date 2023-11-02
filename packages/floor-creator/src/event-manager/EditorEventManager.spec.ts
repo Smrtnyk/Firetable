@@ -1,40 +1,51 @@
-jest.mock("fabric");
+vi.mock("fabric");
 
 import { Floor } from "../Floor";
 import { EditorEventManager } from "./EditorEventManager";
 import { fabric } from "fabric";
 import { RESOLUTION } from "../constants";
 import { CommandInvoker } from "../command/CommandInvoker";
+import { expect, it, describe, beforeEach, vi } from "vitest";
 
 describe("EditorEventManager", () => {
     let manager: EditorEventManager;
     let mockTarget: fabric.Object;
+    let commandInvoker: CommandInvoker;
 
     beforeEach(() => {
+        commandInvoker = new CommandInvoker();
+        // @ts-expect-error -- stubbing Keyboard event
+        global.KeyboardEvent = vi.fn().mockImplementation((type, config) => {
+            return {
+                ...config,
+                type,
+                preventDefault: vi.fn(),
+            };
+        });
         // @ts-expect-error -- stubbing document object
         globalThis.document = {
-            addEventListener: jest.fn(),
-            removeEventListener: jest.fn(),
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn(),
         };
         // Mocking canvas and other related methods
         const mockCanvas = {
-            on: jest.fn(),
-            getActiveObject: jest.fn(),
-            renderAll: jest.fn(),
+            on: vi.fn(),
+            getActiveObject: vi.fn(),
+            renderAll: vi.fn(),
         } as unknown as fabric.Canvas;
 
         const mockFloor = {
             canvas: mockCanvas,
-            elementClickHandler: jest.fn(),
-            emit: jest.fn(),
+            elementClickHandler: vi.fn(),
+            emit: vi.fn(),
         } as unknown as Floor;
 
         mockTarget = {
-            set: jest.fn().mockReturnThis(),
-            setCoords: jest.fn(),
+            set: vi.fn().mockReturnThis(),
+            setCoords: vi.fn(),
         } as unknown as fabric.Object;
 
-        manager = new EditorEventManager(mockFloor, new CommandInvoker());
+        manager = new EditorEventManager(mockFloor, commandInvoker);
         manager.initializeCanvasEventHandlers();
     });
 
@@ -127,6 +138,98 @@ describe("EditorEventManager", () => {
                 // @ts-expect-error -- private property
                 manager.floor,
                 void 0,
+            );
+        });
+    });
+
+    describe("EditorEventManager - Keyboard Event Handling", () => {
+        it("should enable canvas selection when Control key is pressed", () => {
+            const mockEvent = new KeyboardEvent("keydown", { key: "Control" });
+            // @ts-expect-error -- private method invocation
+            manager.handleKeyDown(mockEvent);
+            // @ts-expect-error -- accessing private property
+            expect(manager.floor.canvas.selection).toBe(true);
+        });
+
+        it("should disable canvas selection when Control key is released", () => {
+            const mockEvent = new KeyboardEvent("keyup", { key: "Control" });
+            // @ts-expect-error -- private method invocation
+            manager.handleKeyUp(mockEvent);
+            // @ts-expect-error -- accessing private property
+            expect(manager.floor.canvas.selection).toBe(false);
+        });
+
+        it("should trigger undo when 'z' is pressed with Control key", () => {
+            const spyUndo = vi.spyOn(commandInvoker, "undo");
+            const mockEvent = new KeyboardEvent("keydown", { key: "z", ctrlKey: true });
+            // @ts-expect-error -- private method invocation
+            manager.handleKeyDown(mockEvent);
+            expect(spyUndo).toHaveBeenCalled();
+        });
+
+        it("should trigger redo when 'y' is pressed with Control key", () => {
+            const spyRedo = vi.spyOn(commandInvoker, "redo");
+            const mockEvent = new KeyboardEvent("keydown", { key: "y", ctrlKey: true });
+            // @ts-expect-error -- private method invocation
+            manager.handleKeyDown(mockEvent);
+            expect(spyRedo).toHaveBeenCalled();
+        });
+
+        it("should trigger redo when 'z' is pressed with Control and Shift keys", () => {
+            const spyRedo = vi.spyOn(commandInvoker, "redo");
+            const mockEvent = new KeyboardEvent("keydown", {
+                key: "z",
+                ctrlKey: true,
+                shiftKey: true,
+            });
+            // @ts-expect-error -- private method invocation
+            manager.handleKeyDown(mockEvent);
+            expect(spyRedo).toHaveBeenCalled();
+        });
+    });
+
+    describe("EditorEventManager - Object Movement with Control Key", () => {
+        it("should move all active objects when Control key is pressed during object movement", () => {
+            // Setup mock for getActiveObjects and getActiveObject
+            const activeObject = new fabric.Object();
+            const mockGroup = new fabric.Group();
+            // @ts-expect-error -- private prop
+            const mockCanvas = manager.floor.canvas;
+            mockCanvas.getActiveObjects = vi.fn().mockReturnValue([activeObject]);
+            mockCanvas.getActiveObject = vi.fn().mockReturnValue(mockGroup);
+
+            const mockEvent = {
+                e: { movementX: 5, movementY: 10 },
+            } as unknown as fabric.IEvent<MouseEvent>;
+            // Simulate Control key being pressed
+            manager.ctrlPressedDuringSelection = true;
+
+            manager.handleObjectMoving(mockEvent);
+
+            // Now we need to test if 'set' was called with the correct arguments
+            expect(activeObject.set).toHaveBeenCalledWith({
+                left: expect.any(Number),
+                top: expect.any(Number),
+            });
+
+            expect(activeObject.left).toBe(5);
+            expect(activeObject.top).toBe(10);
+        });
+    });
+
+    describe("EditorEventManager - Destroy Method", () => {
+        it("should remove all event listeners when destroy is called", () => {
+            // Call the destroy method
+            manager.destroy();
+
+            // Check if removeEventListener has been called for each event
+            expect(globalThis.document.removeEventListener).toHaveBeenCalledWith(
+                "keydown",
+                expect.any(Function),
+            );
+            expect(globalThis.document.removeEventListener).toHaveBeenCalledWith(
+                "keyup",
+                expect.any(Function),
             );
         });
     });

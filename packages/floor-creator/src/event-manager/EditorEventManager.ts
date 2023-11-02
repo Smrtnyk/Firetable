@@ -6,7 +6,7 @@ import { CommandInvoker } from "../command/CommandInvoker";
 import { MoveCommand } from "../command/MoveCommand";
 
 export class EditorEventManager extends EventManager {
-    private ctrlPressedDuringSelection: boolean = false;
+    ctrlPressedDuringSelection: boolean = false;
 
     private movingObjectStartPosition: { left: number; top: number } | null = null;
 
@@ -58,53 +58,56 @@ export class EditorEventManager extends EventManager {
         }
     };
 
+    handleObjectMoving = (options: fabric.IEvent<MouseEvent>): void => {
+        if (this.ctrlPressedDuringSelection) {
+            const activeObjects = this.floor.canvas.getActiveObjects();
+            const activeGroup = this.floor.canvas.getActiveObject() as fabric.Group;
+
+            if (activeGroup && activeGroup.type === "group") {
+                activeObjects.forEach((object) => {
+                    if (object !== activeGroup) {
+                        object.set({
+                            left: object.left! + options.e.movementX,
+                            top: object.top! + options.e.movementY,
+                        });
+                    }
+                });
+            }
+
+            this.ctrlPressedDuringSelection = false;
+        }
+    };
+
+    onBeforeTransform = (options: fabric.IEvent<MouseEvent>) => {
+        if (options.transform && options.transform.target && !this.movingObjectStartPosition) {
+            this.movingObjectStartPosition = {
+                left: options.transform.target.left!,
+                top: options.transform.target.top!,
+            };
+        }
+    };
+
+    onObjectModified = (options: fabric.IEvent<MouseEvent>) => {
+        if (this.movingObjectStartPosition && options.target) {
+            const moveCommand = new MoveCommand(options.target, this.movingObjectStartPosition, {
+                left: options.target.left!,
+                top: options.target.top!,
+            });
+            this.commandInvoker.execute(moveCommand);
+
+            // Reset the starting position for the next move operation
+            this.movingObjectStartPosition = null;
+        }
+    };
+
     initializeCanvasEventHandlers() {
         super.initializeCanvasEventHandlers();
 
         this.floor.canvas.on("object:modified", this.snapToGridOnModify);
         this.floor.canvas.on("mouse:up", this.onEditorMouseUp);
-        this.floor.canvas.on("object:moving", (options) => {
-            if (this.ctrlPressedDuringSelection) {
-                const activeObjects = this.floor.canvas.getActiveObjects();
-                const activeGroup = this.floor.canvas.getActiveObject() as fabric.Group;
-
-                if (activeGroup && activeGroup.type === "group") {
-                    activeObjects.forEach((object) => {
-                        if (object !== activeGroup) {
-                            object.set({
-                                left: object.left! + options.e.movementX,
-                                top: object.top! + options.e.movementY,
-                            });
-                        }
-                    });
-                }
-
-                this.ctrlPressedDuringSelection = false;
-            }
-        });
-
-        this.floor.canvas.on("before:transform", (options) => {
-            if (options.transform && options.transform.target && !this.movingObjectStartPosition) {
-                this.movingObjectStartPosition = {
-                    left: options.transform.target.left!,
-                    top: options.transform.target.top!,
-                };
-            }
-        });
-
-        this.floor.canvas.on("object:modified", (options) => {
-            if (this.movingObjectStartPosition && options.target) {
-                const moveCommand = new MoveCommand(
-                    options.target,
-                    this.movingObjectStartPosition,
-                    { left: options.target.left!, top: options.target.top! },
-                );
-                this.commandInvoker.execute(moveCommand);
-
-                // Reset the starting position for the next move operation
-                this.movingObjectStartPosition = null;
-            }
-        });
+        this.floor.canvas.on("object:moving", this.handleObjectMoving);
+        this.floor.canvas.on("before:transform", this.onBeforeTransform);
+        this.floor.canvas.on("object:modified", this.onObjectModified);
     }
 
     private onEditorMouseUp = () => {

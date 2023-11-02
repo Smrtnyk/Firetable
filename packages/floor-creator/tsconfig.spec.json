@@ -3,11 +3,13 @@
     "compilerOptions": {
         "baseUrl": ".",
         "types": ["jest"],
+        "lib": ["ESNext"],
         "module": "CommonJS",
         "esModuleInterop": true,
         "isolatedModules": true
     },
     "include": [
+        "__mocks__/**/*",
         "./src/**/*.spec.ts"
     ]
 }

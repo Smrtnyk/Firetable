@@ -1,9 +1,10 @@
 import { CommandInvoker } from "./CommandInvoker";
 import { Command } from "./Command";
+import { expect, it, describe, beforeEach, vi } from "vitest";
 
 class MockCommand {
-    execute = jest.fn();
-    undo = jest.fn();
+    execute = vi.fn();
+    undo = vi.fn();
 }
 
 describe("CommandInvoker", () => {
@@ -40,7 +41,7 @@ describe("CommandInvoker", () => {
     });
 
     it("emits events correctly", () => {
-        const listener = jest.fn();
+        const listener = vi.fn();
         invoker.on("change", listener);
         invoker.execute(mockCommand);
         invoker.undo();
@@ -49,7 +50,7 @@ describe("CommandInvoker", () => {
     });
 
     it("unregisters listeners", () => {
-        const listener = jest.fn();
+        const listener = vi.fn();
         const unregister = invoker.on("change", listener);
         unregister();
         invoker.execute(mockCommand);
@@ -86,8 +87,8 @@ describe("CommandInvoker", () => {
     });
 
     it("calls multiple listeners for the same event", () => {
-        const listener1 = jest.fn();
-        const listener2 = jest.fn();
+        const listener1 = vi.fn();
+        const listener2 = vi.fn();
 
         invoker.on("change", listener1);
         invoker.on("change", listener2);
@@ -142,7 +143,7 @@ describe("CommandInvoker", () => {
     });
 
     it("calls the same listener multiple times if registered multiple times", () => {
-        const listener = jest.fn();
+        const listener = vi.fn();
         invoker.on("change", listener);
         invoker.on("change", listener);
         invoker.execute(mockCommand);
@@ -150,7 +151,7 @@ describe("CommandInvoker", () => {
     });
 
     it("ensures listeners are only unregistered once", () => {
-        const listener = jest.fn();
+        const listener = vi.fn();
         const unregister = invoker.on("change", listener);
         unregister();
         unregister(); // Call unregister multiple times
@@ -160,8 +161,8 @@ describe("CommandInvoker", () => {
 
     it("calls listeners in the order they were registered", () => {
         const order: number[] = [];
-        const listener1 = jest.fn(() => order.push(1));
-        const listener2 = jest.fn(() => order.push(2));
+        const listener1 = vi.fn(() => order.push(1));
+        const listener2 = vi.fn(() => order.push(2));
 
         invoker.on("change", listener1);
         invoker.on("change", listener2);
