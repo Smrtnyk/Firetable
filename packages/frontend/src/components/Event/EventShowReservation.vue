@@ -20,6 +20,11 @@ const checked = ref<boolean>(props.reservation.confirmed);
 const isStaff = computed(() => {
     return authStore.user?.role === Role.STAFF;
 });
+function reservedByText(reservedBy: Reservation["reservedBy"]) {
+    const { name, email } = reservedBy;
+    const isSocial = email.startsWith("social");
+    return isSocial ? name : `${name} - ${email}`;
+}
 
 function onReservationConfirm() {
     emit("confirm", !checked.value);
@@ -62,9 +67,7 @@ function onReservationConfirm() {
 
             <div class="col-6">{{ t("EventShowReservation.reservedByLabel") }}</div>
 
-            <div class="col-6 font-black">
-                {{ props.reservation.reservedBy.email }}
-            </div>
+            <div class="col-6 font-black">{{ reservedByText(props.reservation.reservedBy) }}</div>
         </div>
 
         <q-separator class="q-my-md" />

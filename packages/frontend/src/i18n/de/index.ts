@@ -76,6 +76,7 @@ export default {
         reservationTime: "Time",
         reservedByLabel: "Reserved by",
         requireReservedBySelectionError: "You need to select at least one option",
+        reservedBySocialLabel: "Social Networks",
     },
     PageAdminProperties: {
         properties: "Immobilien",

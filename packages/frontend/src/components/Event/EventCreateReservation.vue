@@ -1,9 +1,16 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
 import { greaterThanZero, minLength, noEmptyString, requireNumber } from "src/helpers/form-rules";
 import { Reservation, User } from "@firetable/types";
+
+const socials = ["Whatsapp", "SMS", "Instagram", "Facebook", "Phone"].map((social, index) => {
+    return {
+        name: social,
+        email: `social-${index}`,
+    };
+});
 
 const props = defineProps<{
     users: User[];
@@ -38,10 +45,28 @@ const formattedUsers = computed<Reservation["reservedBy"][]>(() =>
         email: user.email,
     })),
 );
+const selectionType = ref("user");
 
-function requireReservedBySelection(val: Reservation["reservedBy"]): boolean | string {
-    return !!val?.email || t(`EventCreateReservation.requireReservedBySelectionError`);
-}
+const selectableOptions = computed(() => {
+    return selectionType.value === "social" ? socials : formattedUsers.value;
+});
+
+const reservedByLabel = computed(() => {
+    return selectionType.value === "social"
+        ? t(`EventCreateReservation.reservedBySocialLabel`)
+        : t(`EventCreateReservation.reservedByLabel`);
+});
+
+// Watcher that resets state.reservedBy when selectionType changes
+watch(selectionType, (newVal) => {
+    // When selectionType changes to 'social', reset reservedBy to the first social option
+    // When changing to 'user', reset reservedBy to the first user option
+    if (newVal === "social") {
+        state.reservedBy = socials[0];
+    } else {
+        state.reservedBy = formattedUsers.value[0];
+    }
+});
 
 async function onOKClick() {
     if (!(await reservationForm.value?.validate())) return;
@@ -123,15 +148,19 @@ async function onOKClick() {
 
             <q-input v-model="state.reservationNote" rounded standout label="Note" />
 
+            <!-- Selector for choosing between 'User' or 'Social' -->
+            <div class="q-mb-md">
+                <q-radio v-model="selectionType" val="user" label="Staff" />
+                <q-radio v-model="selectionType" val="social" label="Social" />
+            </div>
+
+            <!-- Select input for choosing the user or social -->
             <q-select
                 v-model="state.reservedBy"
-                rounded
-                standout
-                :options="formattedUsers"
-                :rules="[requireReservedBySelection]"
+                :options="selectableOptions"
                 option-label="name"
                 option-value="email"
-                :label="t(`EventCreateReservation.reservedByLabel`)"
+                :label="reservedByLabel"
             />
 
             <q-btn
