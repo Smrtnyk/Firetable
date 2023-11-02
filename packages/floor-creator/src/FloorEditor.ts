@@ -13,7 +13,6 @@ import { GridDrawer } from "./GridDrawer";
 import { EditorEventManager } from "./event-manager/EditorEventManager";
 import { calculateCanvasScale } from "./utils";
 import { CommandInvoker } from "./command/CommandInvoker";
-import { MoveCommand } from "./command/MoveCommand";
 import { EventEmitter } from "./event-emitter/EventEmitter";
 
 type FloorEditorEvents = {
@@ -29,65 +28,16 @@ export class FloorEditor extends Floor {
     private eventEmitter: EventEmitter<FloorEditorEvents>;
     private commandInvoker = new CommandInvoker();
 
-    private ctrlPressedDuringSelection: boolean = false;
-
-    private movingObjectStartPosition: { left: number; top: number } | null = null;
-
     constructor(options: FloorCreationOptions) {
         super(options);
 
         this.eventEmitter = new EventEmitter<FloorEditorEvents>();
         this.gridDrawer = new GridDrawer(this.canvas);
-        this.eventManager = new EditorEventManager(this);
+        this.eventManager = new EditorEventManager(this, this.commandInvoker);
         this.elementManager = new ElementManager();
-        this.initializeCanvasEventHandlers();
-        this.initializeCtrlEventListeners();
 
         this.commandInvoker.on("change", () => {
             this.emit("commandChange");
-        });
-
-        this.canvas.on("object:moving", (options) => {
-            if (this.ctrlPressedDuringSelection) {
-                const activeObjects = this.canvas.getActiveObjects();
-                const activeGroup = this.canvas.getActiveObject() as fabric.Group;
-
-                if (activeGroup && activeGroup.type === "group") {
-                    activeObjects.forEach((object) => {
-                        if (object !== activeGroup) {
-                            object.set({
-                                left: object.left! + options.e.movementX,
-                                top: object.top! + options.e.movementY,
-                            });
-                        }
-                    });
-                }
-
-                this.ctrlPressedDuringSelection = false;
-            }
-        });
-
-        this.canvas.on("before:transform", (options) => {
-            if (options.transform && options.transform.target && !this.movingObjectStartPosition) {
-                this.movingObjectStartPosition = {
-                    left: options.transform.target.left!,
-                    top: options.transform.target.top!,
-                };
-            }
-        });
-
-        this.canvas.on("object:modified", (options) => {
-            if (this.movingObjectStartPosition && options.target) {
-                const moveCommand = new MoveCommand(
-                    options.target,
-                    this.movingObjectStartPosition,
-                    { left: options.target.left!, top: options.target.top! },
-                );
-                this.commandInvoker.execute(moveCommand);
-
-                // Reset the starting position for the next move operation
-                this.movingObjectStartPosition = null;
-            }
         });
 
         this.renderGrid();
@@ -119,40 +69,6 @@ export class FloorEditor extends Floor {
     ): void {
         this.eventEmitter.on(event, listener);
     }
-
-    private initializeCtrlEventListeners() {
-        document.addEventListener("keydown", this.handleKeyDown);
-        document.addEventListener("keyup", this.handleKeyUp);
-    }
-
-    private handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === "Control" || e.ctrlKey) {
-            this.canvas.selection = true;
-            this.ctrlPressedDuringSelection = true;
-            this.canvas.renderAll();
-
-            if (e.key === "z") {
-                if (e.shiftKey) {
-                    this.commandInvoker.redo();
-                } else {
-                    this.commandInvoker.undo();
-                }
-                this.canvas.renderAll();
-                e.preventDefault();
-            } else if (e.key === "y") {
-                this.commandInvoker.redo();
-                this.canvas.renderAll();
-                e.preventDefault();
-            }
-        }
-    };
-
-    private handleKeyUp = (e: KeyboardEvent) => {
-        if (e.key === "Control" || e.ctrlKey) {
-            this.canvas.selection = false;
-            this.canvas.renderAll();
-        }
-    };
 
     onFloorDoubleTap(coordinates: [x: number, y: number]) {
         this.eventEmitter.emit("doubleClick", this, coordinates);
@@ -207,7 +123,6 @@ export class FloorEditor extends Floor {
     }
 
     destroy() {
-        document.removeEventListener("keydown", this.handleKeyDown);
-        document.removeEventListener("keyup", this.handleKeyUp);
+        this.eventManager.destroy();
     }
 }

@@ -18,7 +18,6 @@ export class FloorViewer extends Floor {
         super(options);
         this.eventEmitter = new EventEmitter<FloorViewerEvents>();
         this.eventManager = new ViewerEventManager(this);
-        this.initializeCanvasEventHandlers();
     }
 
     emit<T extends keyof FloorViewerEvents>(event: T, ...args: FloorViewerEvents[T]) {

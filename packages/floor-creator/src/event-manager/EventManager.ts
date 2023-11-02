@@ -4,6 +4,8 @@ import { Floor } from "../Floor";
 export abstract class EventManager {
     protected readonly floor: Floor;
 
+    abstract destroy(): void;
+
     constructor(floor: Floor) {
         this.floor = floor;
     }

@@ -1,16 +1,21 @@
-import { Floor } from "../Floor";
-
 jest.mock("fabric");
 
+import { Floor } from "../Floor";
 import { EditorEventManager } from "./EditorEventManager";
 import { fabric } from "fabric";
 import { RESOLUTION } from "../constants";
+import { CommandInvoker } from "../command/CommandInvoker";
 
 describe("EditorEventManager", () => {
     let manager: EditorEventManager;
     let mockTarget: fabric.Object;
 
     beforeEach(() => {
+        // @ts-expect-error -- stubbing document object
+        globalThis.document = {
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn(),
+        };
         // Mocking canvas and other related methods
         const mockCanvas = {
             on: jest.fn(),
@@ -29,7 +34,7 @@ describe("EditorEventManager", () => {
             setCoords: jest.fn(),
         } as unknown as fabric.Object;
 
-        manager = new EditorEventManager(mockFloor);
+        manager = new EditorEventManager(mockFloor, new CommandInvoker());
         manager.initializeCanvasEventHandlers();
     });
 

@@ -2,12 +2,21 @@ import { EventManager } from "./EventManager";
 import { BaseTable } from "../types";
 import { isTable } from "../type-guards";
 import { fabric } from "fabric";
+import { Floor } from "../Floor";
 
 export class ViewerEventManager extends EventManager {
     private startElement: BaseTable | null = null;
     private isPanning: boolean = false;
 
     dragOccurred: boolean = false;
+
+    constructor(floor: Floor) {
+        super(floor);
+
+        this.initializeCanvasEventHandlers();
+    }
+
+    destroy() {}
 
     initializeCanvasEventHandlers() {
         super.initializeCanvasEventHandlers();
