@@ -89,12 +89,4 @@ export class FloorZoomManager {
         this.canvas.setZoom(this.initialScale);
         this.canvas.renderAll();
     }
-
-    static getDistance(pointers: any[]): number {
-        const [pointer1, pointer2] = pointers;
-        return Math.sqrt(
-            Math.pow(pointer2.clientX - pointer1.clientX, 2) +
-                Math.pow(pointer2.clientY - pointer1.clientY, 2),
-        );
-    }
 }
