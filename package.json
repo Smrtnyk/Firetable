@@ -10,7 +10,8 @@
         "seed:admin-prod": "node packages/functions/lib/src/seed/add-admin-prod.js",
         "dev:frontend": "pnpm --filter frontend dev",
         "build:frontend:spa": "pnpm --filter frontend build:spa",
-        "build:functions": "pnpm --filter functions build"
+        "build:functions": "pnpm --filter functions build",
+        "test": "pnpm -r test"
     },
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "6.9.1",
