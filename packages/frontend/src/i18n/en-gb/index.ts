@@ -71,7 +71,7 @@ export default {
         reservationNumberOfGuests: "Number of persons *",
         reservationGuestContact: "Guest contact",
         reservationNote: "Note",
-        reservationCreateBtn: "Create",
+        reservationCreateBtn: "Submit",
         reservationConsumption: "Consumption",
         reservationTime: "Time",
         reservedByLabel: "Reserved by",

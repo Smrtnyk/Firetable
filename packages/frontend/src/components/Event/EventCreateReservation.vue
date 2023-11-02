@@ -140,13 +140,7 @@ async function onOKClick() {
                 size="md"
                 class="button-gradient"
                 @click="onOKClick"
-                :label="
-                    t(
-                        `EventCreateReservation.reservation${
-                            props.mode === 'create' ? 'Create' : 'Update'
-                        }Btn`,
-                    )
-                "
+                :label="t(`EventCreateReservation.reservationCreateBtn`)"
             />
         </q-form>
     </q-card-section>
