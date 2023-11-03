@@ -6,7 +6,7 @@ import FTDialog from "components/FTDialog.vue";
 import { nextTick, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { NumberTuple } from "src/types/generic";
 import { useRouter } from "vue-router";
-import { Loading, useQuasar } from "quasar";
+import { exportFile, Loading, useQuasar } from "quasar";
 import { BULK_ADD_COLLECTION, ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
 import {
     extractAllTablesLabels,
@@ -255,6 +255,10 @@ function redoAction() {
         floorInstance.value.canvas.renderAll(); // Refresh the canvas after redo
     }
 }
+
+function exportFloor(floor: FloorEditor) {
+    exportFile(`${floor.name}.json`, JSON.stringify(floor.json));
+}
 </script>
 
 <template>
@@ -296,6 +300,8 @@ function redoAction() {
                     icon="stack"
                     :color="bulkMode ? 'positive' : undefined"
                 />
+                <q-btn rounded icon="export" @click="exportFloor(floorInstance as FloorEditor)" />
+                <q-btn rounded icon="import" />
             </template>
         </ShowSelectedElement>
 
