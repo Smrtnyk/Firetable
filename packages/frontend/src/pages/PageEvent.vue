@@ -11,7 +11,7 @@ import { computed, onMounted, reactive, ref } from "vue";
 import { useEventsStore } from "src/stores/events-store";
 import { useFirestoreCollection, useFirestoreDocument } from "src/composables/useFirestore";
 import { EventDoc, FloorDoc, GuestData } from "@firetable/types";
-import useFloorsPageEvent from "src/composables/useFloorsPageEvent";
+import { useFloorsPageEvent } from "src/composables/useFloorsPageEvent";
 import {
     EventOwner,
     getEventFloorsPath,
