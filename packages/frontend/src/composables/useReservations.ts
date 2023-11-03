@@ -3,12 +3,11 @@ import { EventDoc, Reservation, User } from "@firetable/types";
 import {
     BaseTable,
     Floor,
-    FloorViewer,
+    type FloorViewer,
     getFreeTables,
     getReservedTables,
 } from "@firetable/floor-creator";
 import { EventOwner, updateEventFloorData } from "@firetable/backend";
-import { useI18n } from "vue-i18n";
 import { DialogChainObject, useQuasar } from "quasar";
 import { takeProp } from "@firetable/utils";
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
@@ -24,10 +23,10 @@ export function useReservations(
     floorInstances: Set<FloorViewer>,
     eventOwner: EventOwner,
     event: Ref<VueFirestoreDocumentData<EventDoc> | undefined>,
+    t: any,
 ) {
     // check every 1 minute
     const intervalID = setInterval(checkReservationsForTimeAndMarkTableIfNeeded, 60 * 1000);
-    const { t } = useI18n();
     const q = useQuasar();
 
     let currentOpenCreateReservationDialog: {
@@ -239,6 +238,9 @@ export function useReservations(
 
     return {
         allReservedTables,
+        freeTablesPerFloor,
+        onDeleteReservation,
+        handleReservationCreation,
         checkReservationsForTimeAndMarkTableIfNeeded,
         swapOrTransferReservations,
         showReservation,
