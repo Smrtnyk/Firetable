@@ -1,0 +1,15 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "lib": ["ESNext"],
+        "module": "ESNext",
+        "esModuleInterop": true,
+        "isolatedModules": true
+    },
+    "include": [
+        "vitest.config.ts",
+        "__mocks__/**/*",
+        "./src/**/*.spec.ts"
+    ]
+}

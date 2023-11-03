@@ -11,11 +11,16 @@
         "dev:pwa": "quasar dev -m pwa",
         "build:spa": "quasar build",
         "build:pwa": "quasar build -m pwa",
-        "typecheck": "vue-tsc --noEmit -p ./tsconfig.json"
+        "typecheck": "vue-tsc --noEmit -p ./tsconfig.json",
+        "test": "vitest"
     },
     "devDependencies": {
         "@playwright/test": "1.39.0",
         "@quasar/app-vite": "1.6.2",
+        "@vitejs/plugin-vue": "^4.4.0",
+        "@vitest/browser": "1.0.0-beta.3",
+        "vite-tsconfig-paths": "^4.2.1",
+        "vitest": "1.0.0-beta.3",
         "vue-tsc": "1.8.22"
     },
     "dependencies": {
