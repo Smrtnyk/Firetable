@@ -259,6 +259,27 @@ function redoAction() {
 function exportFloor(floor: FloorEditor) {
     exportFile(`${floor.name}.json`, JSON.stringify(floor.json));
 }
+
+const fileInputRef = ref<HTMLInputElement | null>(null);
+function onFileSelected(event: Event) {
+    const fileInput = event.target as HTMLInputElement;
+    const file = fileInput.files?.[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const fileContent = reader.result as string;
+            const jsonData = JSON.parse(fileContent);
+            if (floorInstance.value) {
+                floorInstance.value.renderData(jsonData);
+            }
+        };
+        reader.readAsText(file);
+    }
+}
+
+function triggerFileInput() {
+    fileInputRef.value?.click();
+}
 </script>
 
 <template>
@@ -301,7 +322,14 @@ function exportFloor(floor: FloorEditor) {
                     :color="bulkMode ? 'positive' : undefined"
                 />
                 <q-btn rounded icon="export" @click="exportFloor(floorInstance as FloorEditor)" />
-                <q-btn rounded icon="import" />
+                <q-btn rounded icon="import" @click="triggerFileInput" />
+                <input
+                    ref="fileInputRef"
+                    type="file"
+                    @change="onFileSelected"
+                    style="display: none"
+                    accept=".json"
+                />
             </template>
         </ShowSelectedElement>
 
