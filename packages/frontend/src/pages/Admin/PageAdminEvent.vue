@@ -19,6 +19,7 @@ import { withLoading } from "src/helpers/ui-helpers";
 import { propIsTruthy } from "@firetable/utils";
 import useAdminEvent from "src/composables/useAdminEvent";
 import { isMobile } from "src/global-reactives/is-mobile";
+import { truncateText } from "src/helpers/string-utils";
 
 interface Props {
     organisationId: string;
@@ -164,40 +165,49 @@ onMounted(init);
 
                 <!-- Edit area -->
                 <q-tab-panel name="edit" v-if="!isEventFinished(event.date)">
-                    <div class="column justify-between">
-                        <q-btn
-                            class="button-gradient"
-                            size="md"
-                            rounded
-                            @click="showEventInfoEditDialog"
-                        >
-                            Event info
-                        </q-btn>
+                    <div>
+                        <h2 class="text-subtitle1">Event Info</h2>
+                        <q-item clickable v-ripple>
+                            <q-item-section>
+                                <q-item-label caption lines="2">
+                                    {{ truncateText(event.info || "", 100) }}
+                                </q-item-label>
+                            </q-item-section>
 
-                        <q-separator class="q-my-md" />
+                            <q-item-section side>
+                                <q-btn
+                                    rounded
+                                    icon="pencil"
+                                    class="button-gradient"
+                                    size="md"
+                                    @click="showEventInfoEditDialog"
+                                ></q-btn>
+                            </q-item-section>
+                        </q-item>
+                    </div>
+
+                    <q-separator class="q-my-md" />
+
+                    <div>
                         <h2 class="text-subtitle1">Event Floors</h2>
-                        <q-btn
-                            class="button-gradient q-mb-sm"
-                            size="md"
-                            rounded
-                            v-for="floor in eventFloors"
-                            :key="floor.id"
-                            @click="() => showFloorEditDialog(floor)"
-                        >
-                            {{ floor.name }}
-                        </q-btn>
+                        <q-item :key="floor.id" v-for="floor in eventFloors" clickable v-ripple>
+                            <q-item-section>
+                                <q-item-label>
+                                    {{ floor.name }}
+                                </q-item-label>
+                            </q-item-section>
 
-                        <!-- Staff assigned to an event -->
-                        <!--                        <q-separator class="q-my-md" />-->
-                        <!--                        <h2 class="text-subtitle1">Active Staff</h2>-->
-                        <!--                        <q-btn-->
-                        <!--                            class="button-gradient q-mb-sm"-->
-                        <!--                            size="md"-->
-                        <!--                            rounded-->
-                        <!--                            @click="showAssignStaffDialog"-->
-                        <!--                        >-->
-                        <!--                            Assign active staff-->
-                        <!--                        </q-btn>-->
+                            <q-item-section side>
+                                <q-btn
+                                    class="button-gradient"
+                                    size="md"
+                                    icon="pencil"
+                                    rounded
+                                    @click="() => showFloorEditDialog(floor)"
+                                >
+                                </q-btn>
+                            </q-item-section>
+                        </q-item>
                     </div>
                 </q-tab-panel>
             </q-tab-panels>
