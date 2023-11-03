@@ -68,6 +68,10 @@ watch(selectionType, (newVal) => {
     }
 });
 
+function requireReservedBySelection(val: Reservation["reservedBy"]): boolean | string {
+    return !!val?.email || t(`EventCreateReservation.requireReservedBySelectionError`);
+}
+
 async function onOKClick() {
     if (!(await reservationForm.value?.validate())) return;
 
@@ -161,6 +165,7 @@ async function onOKClick() {
                 option-label="name"
                 option-value="email"
                 :label="reservedByLabel"
+                :rules="[requireReservedBySelection]"
             />
 
             <q-btn
