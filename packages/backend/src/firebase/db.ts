@@ -49,9 +49,6 @@ export function deleteDocAndAllSubCollections(collectionPath: string, docId: str
 }
 
 // DOCS
-export function userDoc(organisationId: string, userId: string) {
-    return doc(usersCollection(organisationId), userId);
-}
 
 export function eventDoc(owner: EventOwner) {
     return doc(eventsCollection(owner), owner.id);

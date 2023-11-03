@@ -15,17 +15,6 @@ export function updateUser(payload: EditUserPayload) {
     return httpsCallable(functions, "updateUser")(payload);
 }
 
-export function updateUserField<T extends keyof CreateUserPayload>(
-    organisationId: string,
-    uid: string,
-    field: T,
-    value: CreateUserPayload[T],
-) {
-    return updateDoc(doc(usersCollection(organisationId), uid), {
-        [field]: value,
-    });
-}
-
 export function deleteUser(user: User) {
     const { functions } = initializeFirebase();
     const deleteFunction = httpsCallable(functions, "deleteUser");
