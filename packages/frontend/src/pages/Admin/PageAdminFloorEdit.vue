@@ -81,8 +81,17 @@ const undoRedoState = reactive({
 });
 let unregisterStateChangeListener: () => void | undefined;
 
-// Remember to unregister the listener when the component unmounts
-onBeforeUnmount(() => {});
+function onKeyDown(event: KeyboardEvent) {
+    if (event.ctrlKey && event.key === "s") {
+        // Prevents browser's save dialog from showing
+        event.preventDefault();
+        onFloorSave();
+    }
+}
+
+onBeforeUnmount(() => {
+    window.removeEventListener("keydown", onKeyDown);
+});
 
 onMounted(async () => {
     Loading.show();
@@ -90,6 +99,7 @@ onMounted(async () => {
     if (floor.value) {
         instantiateFloor(floor.value);
         Loading.hide();
+        window.addEventListener("keydown", onKeyDown);
     } else {
         router.replace("/").catch(showErrorMessage);
         Loading.hide();
