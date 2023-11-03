@@ -1,90 +1,3 @@
-<template>
-    <div class="row q-pa-sm q-col-gutter-md" v-if="selectedFloorElement">
-        <div class="col-8 flex justify-between">
-            <div class="row">
-                <div class="col-4 q-pa-xs q-pl-none">
-                    <q-input
-                        :dense="isMobile"
-                        v-model="localWidth"
-                        filled
-                        type="number"
-                        label="Width"
-                    />
-                </div>
-                <div class="col-4 q-pa-xs">
-                    <q-input
-                        :dense="isMobile"
-                        v-model="localHeight"
-                        filled
-                        type="number"
-                        label="Height"
-                    />
-                </div>
-                <div class="col-4 q-pa-xs">
-                    <q-input
-                        :debounce="500"
-                        v-if="isTable(selectedFloorElement)"
-                        :model-value="selectedFloorElement.label"
-                        @update:model-value="
-                            (newLabel) =>
-                                updateTableLabel(
-                                    selectedFloorElement as BaseTable,
-                                    newLabel as string,
-                                )
-                        "
-                        type="text"
-                        filled
-                        label="Table label"
-                        :dense="isMobile"
-                    />
-                </div>
-            </div>
-        </div>
-        <div class="col-4 flex q-pl-none justify-end">
-            <!-- Color Picker Button -->
-            <q-btn
-                v-if="elementColor"
-                :style="{ 'background-color': elementColor }"
-                @click="openColorPicker"
-                :size="buttonSize"
-                :dense="isMobile"
-            >
-                <q-icon name="color-picker" class="cursor-pointer q-ma-none" />
-                <q-popup-proxy
-                    no-parent-event
-                    ref="colorPickerProxy"
-                    cover
-                    transition-show="scale"
-                    transition-hide="scale"
-                >
-                    <q-color :model-value="elementColor" @update:model-value="setElementColor" />
-                </q-popup-proxy>
-            </q-btn>
-
-            <!-- Delete Button -->
-            <q-btn
-                v-if="selectedFloorElement && deleteAllowed"
-                icon="trash"
-                color="negative"
-                @click="deleteElement"
-                :size="buttonSize"
-            />
-        </div>
-    </div>
-    <div class="row q-pa-sm" v-else>
-        <div class="col q-pa-xs">
-            <q-input
-                :dense="isMobile"
-                model-value="No element selected..."
-                disable
-                readonly
-                filled
-                autogrow
-            />
-        </div>
-    </div>
-</template>
-
 <script setup lang="ts">
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed, onBeforeUnmount, onMounted, ref, toRefs, watch } from "vue";
@@ -103,7 +16,6 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const { selectedFloorElement, deleteAllowed, existingLabels } = toRefs(props);
 const emit = defineEmits(["delete"]);
-const buttonSize = computed(() => (isMobile.value ? "xs" : "md"));
 const colorPickerProxy = ref<QPopupProxy | null>(null);
 const getElementWidth = computed(() => {
     const el = selectedFloorElement.value;
@@ -191,3 +103,92 @@ function setElementColor(newVal: any) {
     selectedFloorElement.value?.setBaseFill?.(newVal);
 }
 </script>
+
+<template>
+    <div v-if="selectedFloorElement" class="row">
+        <div class="col-md-6 col-12 row q-gutter-xs">
+            <div class="col">
+                <q-input
+                    :dense="isMobile"
+                    v-model="localWidth"
+                    standout
+                    rounded
+                    type="number"
+                    label="Width"
+                />
+            </div>
+            <div class="col">
+                <q-input
+                    rounded
+                    :dense="isMobile"
+                    v-model="localHeight"
+                    standout
+                    type="number"
+                    label="Height"
+                />
+            </div>
+            <div class="col" v-if="isTable(selectedFloorElement)">
+                <q-input
+                    :debounce="500"
+                    :model-value="selectedFloorElement.label"
+                    @update:model-value="
+                        (newLabel) =>
+                            updateTableLabel(selectedFloorElement as BaseTable, newLabel as string)
+                    "
+                    type="text"
+                    standout
+                    rounded
+                    label="Table label"
+                    :dense="isMobile"
+                />
+            </div>
+        </div>
+
+        <div class="col-md-6 col-12 row justify-md-end q-mt-sm q-mt-md-none">
+            <!-- Color Picker Button -->
+            <q-btn
+                v-if="elementColor"
+                :style="{ 'background-color': elementColor }"
+                @click="openColorPicker"
+            >
+                <q-icon name="color-picker" class="cursor-pointer q-ma-none" />
+                <q-popup-proxy
+                    no-parent-event
+                    ref="colorPickerProxy"
+                    cover
+                    transition-show="scale"
+                    transition-hide="scale"
+                >
+                    <q-color :model-value="elementColor" @update:model-value="setElementColor" />
+                </q-popup-proxy>
+            </q-btn>
+
+            <!-- Delete Button -->
+            <q-btn v-if="deleteAllowed" icon="trash" color="negative" @click="deleteElement" />
+            <slot name="buttons"></slot>
+        </div>
+    </div>
+
+    <div v-else class="row">
+        <div class="col-md-6 col-12">
+            <q-input
+                :dense="isMobile"
+                model-value="No element selected..."
+                disable
+                readonly
+                standout
+                rounded
+                autogrow
+            />
+        </div>
+        <div class="col-md-6 col-12 row justify-md-end q-mt-sm q-mt-md-none">
+            <slot name="buttons"></slot>
+        </div>
+    </div>
+</template>
+
+<style>
+.col-height-56 {
+    height: 56px !important;
+}
+</style>

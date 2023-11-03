@@ -3,7 +3,7 @@ import AddTableDialog from "components/Floor/AddTableDialog.vue";
 import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
 import FTDialog from "components/FTDialog.vue";
 
-import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from "vue";
+import { nextTick, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { NumberTuple } from "src/types/generic";
 import { useRouter } from "vue-router";
 import { Loading, useQuasar } from "quasar";
@@ -27,7 +27,7 @@ import {
     useFirestoreDocument,
 } from "src/composables/useFirestore";
 import { isNumber } from "@firetable/utils";
-import { isMobile } from "src/global-reactives/is-mobile";
+import { isMobile, buttonSize } from "src/global-reactives/is-mobile";
 
 type ElementDescriptor = {
     tag: ElementTag;
@@ -67,7 +67,6 @@ const bulkMode = ref(false);
 const bulkElement = ref<ElementTag | null>(null);
 const bulkLabelCounter = ref(0); // To auto-increment labels
 
-const buttonSize = computed(() => (isMobile ? "xs" : "md"));
 const floorPath = `${Collection.ORGANISATIONS}/${props.organisationId}/${Collection.PROPERTIES}/${props.propertyId}/${Collection.FLOORS}/${props.floorId}`;
 const {
     data: floor,
@@ -259,68 +258,46 @@ function redoAction() {
 
 <template>
     <div class="PageAdminFloorEdit" ref="pageRef">
-        <div v-if="floorInstance" class="PageAdminFloorEdit__controls justify-between">
+        <div v-if="floorInstance" class="justify-between q-mb-sm">
             <q-input
                 standout
                 rounded
                 label="Floor name"
                 @update:model-value="(event) => onFloorChange('name', event)"
                 :model-value="floorInstance.name"
+                :dense="isMobile"
             >
                 <template #append>
                     <q-btn
                         class="button-gradient"
-                        icon="save"
                         @click="onFloorSave"
                         label="save"
                         rounded
+                        :size="buttonSize"
                     />
                 </template>
             </q-input>
         </div>
-        <div v-if="floorInstance" class="row">
-            <ShowSelectedElement
-                @delete="onDeleteElement"
-                :selected-floor-element="selectedElement"
-                :existing-labels="new Set(extractAllTablesLabels(floorInstance as FloorEditor))"
-                class="col"
-            />
 
-            <div class="row q-pa-sm q-col-gutter-md">
-                <div class="col-auto flex q-pl-none justify-end">
-                    <q-btn
-                        :disabled="!undoRedoState.canUndo"
-                        @click="undoAction"
-                        icon="undo"
-                        :size="buttonSize"
-                    />
-                </div>
-                <div class="col-auto flex q-pl-none justify-end">
-                    <q-btn
-                        :disabled="!undoRedoState.canRedo"
-                        @click="redoAction"
-                        icon="redo"
-                        :size="buttonSize"
-                    />
-                </div>
-                <div class="col-auto flex q-pl-none justify-end">
-                    <q-btn
-                        v-if="floorInstance"
-                        @click="floorInstance.toggleGridVisibility"
-                        icon="grid"
-                        :size="buttonSize"
-                    />
-                </div>
-                <div class="col-auto flex q-pl-none justify-end">
-                    <q-btn
-                        @click="toggleBulkMode"
-                        icon="stack"
-                        :color="bulkMode ? 'positive' : undefined"
-                        :size="buttonSize"
-                    />
-                </div>
-            </div>
-        </div>
+        <ShowSelectedElement
+            v-if="floorInstance"
+            @delete="onDeleteElement"
+            :selected-floor-element="selectedElement"
+            :existing-labels="new Set(extractAllTablesLabels(floorInstance as FloorEditor))"
+        >
+            <template #buttons>
+                <q-btn rounded :disabled="!undoRedoState.canUndo" @click="undoAction" icon="undo" />
+                <q-btn rounded :disabled="!undoRedoState.canRedo" @click="redoAction" icon="redo" />
+                <q-btn rounded @click="floorInstance.toggleGridVisibility" icon="grid" />
+                <q-btn
+                    rounded
+                    @click="toggleBulkMode"
+                    icon="stack"
+                    :color="bulkMode ? 'positive' : undefined"
+                />
+            </template>
+        </ShowSelectedElement>
+
         <div class="row q-pa-sm q-col-gutter-md" v-if="floorInstance">
             <div class="col-6">
                 <q-badge color="secondary">
