@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node_version: ['18']
+        node_version: ['20']
         os: [ubuntu-latest]
 
     steps:
@@ -26,6 +26,8 @@ jobs:
       run: |
         npm install -g pnpm
         pnpm install
+        cd packages
+        pnpm run test -r  # This command will run the test script in all pnpm packages
   sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest
