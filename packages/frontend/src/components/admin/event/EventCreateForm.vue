@@ -9,7 +9,7 @@ import { QForm } from "quasar";
 import { CreateEventForm, CreateEventPayload } from "@firetable/types";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { PropertyFloors } from "src/composables/useFloors";
-import { formatEventDate } from "src/helpers/utils";
+import { formatEventDate } from "src/helpers/date-utils";
 
 interface State {
     form: CreateEventForm;

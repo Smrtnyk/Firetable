@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Component, computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
-import { formatEventDate } from "src/helpers/utils";
+import { formatEventDate } from "src/helpers/date-utils";
 
 import FTTitle from "components/FTTitle.vue";
 import AdminEventGeneralInfo from "components/admin/event/AdminEventGeneralInfo.vue";
