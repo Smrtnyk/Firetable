@@ -49,6 +49,8 @@ export const myIcons: Record<string, string> = {
     "color-picker": "svguse:/svg-icons/ft-icons.svg#color-picker",
     undo: "svguse:/svg-icons/ft-icons.svg#undo",
     redo: "svguse:/svg-icons/ft-icons.svg#redo",
+    export: "svguse:/svg-icons/ft-icons.svg#export",
+    import: "svguse:/svg-icons/ft-icons.svg#import",
 };
 
 export function getDarkMode(): boolean {
