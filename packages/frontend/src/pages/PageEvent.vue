@@ -10,9 +10,14 @@ import { useRouter } from "vue-router";
 import { computed, onMounted, reactive, ref } from "vue";
 import { useEventsStore } from "src/stores/events-store";
 import { useFirestoreCollection, useFirestoreDocument } from "src/composables/useFirestore";
-import { Collection, EventDoc, FloorDoc, GuestData } from "@firetable/types";
+import { EventDoc, FloorDoc, GuestData } from "@firetable/types";
 import useFloorsPageEvent from "src/composables/useFloorsPageEvent";
-import { EventOwner } from "@firetable/backend";
+import {
+    EventOwner,
+    getEventFloorsPath,
+    getEventGuestListPath,
+    getEventPath,
+} from "@firetable/backend";
 import { isMobile } from "src/global-reactives/is-mobile";
 
 interface State {
@@ -27,33 +32,6 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const eventDocPath = [
-    Collection.ORGANISATIONS,
-    props.organisationId,
-    Collection.PROPERTIES,
-    props.propertyId,
-    Collection.EVENTS,
-    props.eventId,
-].join("/");
-const eventFloorsPath = [
-    Collection.ORGANISATIONS,
-    props.organisationId,
-    Collection.PROPERTIES,
-    props.propertyId,
-    Collection.EVENTS,
-    props.eventId,
-    Collection.FLOORS,
-].join("/");
-const guestListPath = [
-    Collection.ORGANISATIONS,
-    props.organisationId,
-    Collection.PROPERTIES,
-    props.propertyId,
-    Collection.EVENTS,
-    props.eventId,
-    Collection.GUEST_LIST,
-].join("/");
-
 const eventOwner: EventOwner = {
     propertyId: props.propertyId,
     organisationId: props.organisationId,
@@ -67,9 +45,11 @@ const eventsStore = useEventsStore();
 const router = useRouter();
 const q = useQuasar();
 const pageRef = ref<HTMLDivElement>();
-const guestList = useFirestoreCollection<GuestData>(guestListPath);
-const { data: event, promise: eventDataPromise } = useFirestoreDocument<EventDoc>(eventDocPath);
-const { data: eventFloors } = useFirestoreCollection<FloorDoc>(eventFloorsPath);
+const guestList = useFirestoreCollection<GuestData>(getEventGuestListPath(eventOwner));
+const { data: event, promise: eventDataPromise } = useFirestoreDocument<EventDoc>(
+    getEventPath(eventOwner),
+);
+const { data: eventFloors } = useFirestoreCollection<FloorDoc>(getEventFloorsPath(eventOwner));
 const {
     onTableFound,
     setActiveFloor,

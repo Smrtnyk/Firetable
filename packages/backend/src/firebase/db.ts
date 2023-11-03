@@ -2,6 +2,7 @@ import { initializeFirebase } from "./base.js";
 import { httpsCallable } from "firebase/functions";
 import { collection, doc } from "firebase/firestore";
 import { Collection, EventDoc, PropertyDoc } from "@firetable/types";
+import { getEventsPath, getFloorsPath, getPropertiesPath } from "./paths.js";
 
 export type EventOwner = Pick<EventDoc, "organisationId" | "propertyId" | "id">;
 
@@ -11,13 +12,11 @@ function getCollection(collectionName: string) {
 }
 
 export function eventsCollection(owner: EventOwner) {
-    return getCollection(
-        `${Collection.ORGANISATIONS}/${owner.organisationId}/${Collection.PROPERTIES}/${owner.propertyId}/${Collection.EVENTS}`,
-    );
+    return getCollection(getEventsPath(owner));
 }
 
 export function propertiesCollection(organisationId: string) {
-    return getCollection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}`);
+    return getCollection(getPropertiesPath(organisationId));
 }
 
 export function organisationsCollection() {
@@ -25,9 +24,7 @@ export function organisationsCollection() {
 }
 
 export function floorsCollection(organisationId: string, propertyId: string) {
-    return getCollection(
-        `${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}/${propertyId}/${Collection.FLOORS}`,
-    );
+    return getCollection(getFloorsPath(organisationId, propertyId));
 }
 
 export function guestListCollection(owner: EventOwner) {

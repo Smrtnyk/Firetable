@@ -19,7 +19,7 @@ import {
     MAX_FLOOR_WIDTH,
     RESOLUTION,
 } from "@firetable/floor-creator";
-import { Collection, ElementTag, FloorDoc } from "@firetable/types";
+import { ElementTag, FloorDoc } from "@firetable/types";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import {
     getFirestoreDocument,
@@ -28,6 +28,7 @@ import {
 } from "src/composables/useFirestore";
 import { isNumber } from "@firetable/utils";
 import { isMobile, buttonSize } from "src/global-reactives/is-mobile";
+import { getFloorPath } from "@firetable/backend";
 
 type ElementDescriptor = {
     tag: ElementTag;
@@ -67,7 +68,7 @@ const bulkMode = ref(false);
 const bulkElement = ref<ElementTag | null>(null);
 const bulkLabelCounter = ref(0); // To auto-increment labels
 
-const floorPath = `${Collection.ORGANISATIONS}/${props.organisationId}/${Collection.PROPERTIES}/${props.propertyId}/${Collection.FLOORS}/${props.floorId}`;
+const floorPath = getFloorPath(props.organisationId, props.propertyId, props.floorId);
 const {
     data: floor,
     promise: floorDataPromise,
