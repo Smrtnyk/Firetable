@@ -3,7 +3,7 @@ name: Build
 on:
     push:
         branches:
-            - master
+            - master # or 'main' if that is your default branch
     pull_request:
         types: [opened, synchronize, reopened]
 
@@ -17,33 +17,36 @@ jobs:
                 os: [ubuntu-latest]
 
         steps:
-            - uses: actions/checkout@v2
-
-            - name: Use Node.js ${{ matrix.node_version }}
-              uses: actions/setup-node@v3 # Updated to v3
+            - uses: actions/checkout@v4
+            - uses: pnpm/action-setup@v2
+            - uses: actions/setup-node@v3
               with:
-                  node-version: ${{ matrix.node_version }}
-                  cache: 'pnpm'
+                node-version: ${{ matrix.node_version }}
+                cache: 'pnpm'
 
             - name: Install dependencies
               run: pnpm install
 
-            - name: Run lint
+            - name: Lint
               run: pnpm run lint
-
-            - name: Build
-              run: pnpm run build
 
             - name: Test
               run: pnpm run test
+
+            - name: Build
+              run: pnpm run build
 
     sonarcloud:
         name: SonarCloud
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
               with:
-                  fetch-depth: 0
+                  fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: ${{ matrix.node_version }}
 
             - name: SonarCloud Scan
               uses: SonarSource/sonarcloud-github-action@master
