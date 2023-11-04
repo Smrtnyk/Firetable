@@ -3,7 +3,7 @@ name: Build
 on:
     push:
         branches:
-            - master # or 'main' if that is your default branch
+            - master
     pull_request:
         types: [opened, synchronize, reopened]
 
