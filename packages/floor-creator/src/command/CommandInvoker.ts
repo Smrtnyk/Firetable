@@ -1,5 +1,5 @@
-import { Command } from "./Command";
 import { EventEmitter } from "../event-emitter/EventEmitter";
+import { Command } from "./Command";
 
 type CommandInvokerEvents = {
     change: [null];
@@ -9,43 +9,56 @@ export class CommandInvoker extends EventEmitter<CommandInvokerEvents> {
     private undoStack: Command[] = [];
     private redoStack: Command[] = [];
 
-    execute(command: Command): void {
-        command.execute();
+    private updateStacksForExecute(command: Command): void {
         this.undoStack.push(command);
-        this.redoStack.splice(0, this.redoStack.length);
-        this.emit("change", null);
+        this.redoStack = []; // Clear the redo stack whenever a new command is executed
     }
 
-    undo(): void {
-        if (!this.canUndo()) {
+    private moveBetweenStacks(
+        sourceStack: Command[],
+        targetStack: Command[],
+        action: "execute" | "undo",
+    ): void {
+        const command = sourceStack.pop();
+        if (!command) {
             return;
         }
-        const command = this.undoStack.pop()!;
-        command.undo();
-        this.redoStack.push(command);
-        this.emit("change", null);
+
+        command[action]();
+        targetStack.push(command);
     }
 
-    redo(): void {
-        if (!this.canRedo()) {
-            return;
-        }
-        const command = this.redoStack.pop()!;
+    public execute(command: Command): void {
         command.execute();
-        this.undoStack.push(command);
+        this.updateStacksForExecute(command);
+        this.emitChange();
+    }
+
+    public undo(): void {
+        this.moveBetweenStacks(this.undoStack, this.redoStack, "undo");
+        this.emitChange();
+    }
+
+    public redo(): void {
+        this.moveBetweenStacks(this.redoStack, this.undoStack, "execute");
+        this.emitChange();
+    }
+
+    private emitChange(): void {
         this.emit("change", null);
     }
 
-    canUndo(): boolean {
+    public canUndo(): boolean {
         return this.undoStack.length > 0;
     }
 
-    canRedo(): boolean {
+    public canRedo(): boolean {
         return this.redoStack.length > 0;
     }
 
-    clear(): void {
+    public clear(): void {
         this.undoStack = [];
         this.redoStack = [];
+        this.emitChange();
     }
 }
