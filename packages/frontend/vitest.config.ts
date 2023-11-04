@@ -1,9 +1,9 @@
 import { defineConfig } from "vitest/config";
 import tsconfigPaths from "vite-tsconfig-paths";
-import Vue from "@vitejs/plugin-vue";
+import vue from "@vitejs/plugin-vue";
 
 export default defineConfig({
-    plugins: [tsconfigPaths(), Vue()],
+    plugins: [tsconfigPaths(), vue()],
     test: {
         alias: {
             "src/": new URL("./src/", import.meta.url).pathname,
