@@ -87,6 +87,7 @@ async function onOKClick() {
     <q-card-section>
         <q-form ref="reservationForm" class="q-gutter-md q-pt-md">
             <q-input
+                data-test="guest-name"
                 v-model="state.guestName"
                 rounded
                 hide-bottom-space
@@ -166,6 +167,7 @@ async function onOKClick() {
                 option-value="email"
                 :label="reservedByLabel"
                 :rules="[requireReservedBySelection]"
+                data-test="reserved-by"
             />
 
             <q-btn
@@ -174,6 +176,7 @@ async function onOKClick() {
                 class="button-gradient"
                 @click="onOKClick"
                 :label="t(`EventCreateReservation.reservationCreateBtn`)"
+                data-test="ok-btn"
             />
         </q-form>
     </q-card-section>

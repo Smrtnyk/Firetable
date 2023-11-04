@@ -3,13 +3,15 @@
     "compilerOptions": {
         "baseUrl": ".",
         "lib": ["ESNext"],
-        "module": "ESNext",
+        "module": "NodeNext",
+        "strict": false,
+        "moduleResolution": "NodeNext",
         "esModuleInterop": true,
-        "isolatedModules": true
     },
     "include": [
         "vitest.config.ts",
-        "__mocks__/**/*",
-        "src"
-    ]
+        "src/**/*.spec.ts",
+        "src/**/*.d.ts"
+    ],
+    "exclude": []
 }
