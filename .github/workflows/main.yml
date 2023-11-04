@@ -26,8 +26,7 @@ jobs:
       run: |
         npm install -g pnpm
         pnpm install
-        cd packages
-        pnpm run test -r  # This command will run the test script in all pnpm packages
+        pnpm run test -r
   sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest
