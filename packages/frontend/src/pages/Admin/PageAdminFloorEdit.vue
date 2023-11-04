@@ -374,6 +374,8 @@ function triggerFileInput() {
             </div>
         </div>
 
-        <canvas v-if="floor && !isFloorLoading" ref="canvasRef" class="shadow-3" />
+        <q-card>
+            <canvas v-if="floor && !isFloorLoading" ref="canvasRef" />
+        </q-card>
     </div>
 </template>

@@ -1,8 +1,7 @@
 <template>
     <div ref="viewerContainerRef" v-if="props.floor">
         <q-btn
-            class="button-gradient"
-            icon="save"
+            class="button-gradient q-mb-sm"
             @click="saveFloorState"
             label="save"
             size="md"
@@ -13,8 +12,11 @@
             :selected-floor-element="selectedFloorElement"
             :delete-allowed="false"
             :existing-labels="new Set(extractAllTablesLabels(floorInstance as FloorEditor))"
+            class="q-mb-sm"
         />
-        <canvas id="floor-container" class="eventFloor" ref="floorContainerRef" />
+        <q-card>
+            <canvas id="floor-container" ref="floorContainerRef" />
+        </q-card>
     </div>
 </template>
 

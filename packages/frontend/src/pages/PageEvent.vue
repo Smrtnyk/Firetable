@@ -147,7 +147,9 @@ onMounted(init);
             class="ft-tab-pane"
             :class="{ 'active show': isActiveFloor(floor.id) }"
         >
-            <canvas :id="floor.id" class="shadow-3" :ref="mapFloorToCanvas(floor)"></canvas>
+            <q-card>
+                <canvas :id="floor.id" :ref="mapFloorToCanvas(floor)"></canvas>
+            </q-card>
         </div>
 
         <EventGuestList
