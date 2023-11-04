@@ -60,13 +60,13 @@ export class FloorZoomManager {
             this.canvas.zoomToPoint(point, zoom);
 
             if (progress < 1) {
-                setTimeout(() => animateStep(performance.now()), 30); // 30ms delay
+                requestAnimationFrame(animateStep);
             } else {
                 this.canvas.renderAll();
             }
         };
 
-        animateStep(performance.now());
+        requestAnimationFrame(animateStep);
     }
 
     zoomToPoint(point: fabric.Point, scaleFactor: number): void {
