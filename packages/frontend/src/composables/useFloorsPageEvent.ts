@@ -14,7 +14,6 @@ import { useAuthStore } from "stores/auth-store";
 import { VueFirestoreDocumentData } from "vuefire";
 import { useUsers } from "src/composables/useUsers";
 import { useReservations } from "src/composables/useReservations";
-import { useI18n } from "vue-i18n";
 
 interface State {
     activeTablesAnimationInterval: number | null;
@@ -28,7 +27,6 @@ export function useFloorsPageEvent(
     eventOwner: EventOwner,
     event: Ref<VueFirestoreDocumentData<EventDoc> | undefined>,
 ) {
-    const { t } = useI18n();
     const authStore = useAuthStore();
     const state = ref<State>({
         activeTablesAnimationInterval: null,
@@ -42,7 +40,7 @@ export function useFloorsPageEvent(
         showCreateReservationDialog,
         swapOrTransferReservations,
         allReservedTables,
-    } = useReservations(users, state.value.floorInstances, eventOwner, event, t);
+    } = useReservations(users, state.value.floorInstances, eventOwner, event);
     const currentUser = computed(() => authStore.user);
     const canvases = reactive<Map<string, HTMLCanvasElement>>(new Map());
 

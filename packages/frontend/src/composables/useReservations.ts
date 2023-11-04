@@ -11,10 +11,12 @@ import { EventOwner, updateEventFloorData } from "@firetable/backend";
 import { DialogChainObject, useQuasar } from "quasar";
 import { takeProp } from "@firetable/utils";
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { VueFirestoreDocumentData } from "vuefire";
+import { useI18n } from "vue-i18n";
+
 import FTDialog from "components/FTDialog.vue";
 import EventCreateReservation from "components/Event/EventCreateReservation.vue";
 import EventShowReservation from "components/Event/EventShowReservation.vue";
-import { VueFirestoreDocumentData } from "vuefire";
 
 const HALF_HOUR = 30 * 60 * 1000; // 30 minutes in milliseconds
 
@@ -23,12 +25,11 @@ export function useReservations(
     floorInstances: Set<FloorViewer>,
     eventOwner: EventOwner,
     event: Ref<VueFirestoreDocumentData<EventDoc> | undefined>,
-    t: any,
 ) {
     // check every 1 minute
     const intervalID = setInterval(checkReservationsForTimeAndMarkTableIfNeeded, 60 * 1000);
     const q = useQuasar();
-
+    const { t } = useI18n();
     let currentOpenCreateReservationDialog: {
         label: string;
         dialog: DialogChainObject;

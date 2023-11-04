@@ -6,6 +6,7 @@ import * as backend from "@firetable/backend";
 import * as uiHelpers from "../helpers/ui-helpers";
 import { FloorElementTypes, FloorMode, FloorViewer, RectTable } from "@firetable/floor-creator";
 import { uid } from "quasar";
+import * as i18n from "vue-i18n";
 import { NOOP } from "@firetable/utils";
 
 function createFloor(floorName: string): FloorViewer {
@@ -72,6 +73,11 @@ describe("useReservations", () => {
     let floor1: FloorViewer;
 
     beforeEach(() => {
+        vi.spyOn(i18n, "useI18n").mockReturnValue(() => {
+            return {
+                t: NOOP,
+            };
+        });
         users = ref([]);
         floor1 = createFloor("test-1");
         const floor2 = createFloor("test-2");
@@ -95,24 +101,12 @@ describe("useReservations", () => {
     });
 
     it("should compute allReservedTables correctly", () => {
-        const { allReservedTables } = useReservations(
-            users,
-            floorInstances,
-            eventOwner,
-            event,
-            NOOP,
-        );
+        const { allReservedTables } = useReservations(users, floorInstances, eventOwner, event);
         expect(allReservedTables.value.length).toBe(2);
     });
 
     it("should compute freeTablesPerFloor correctly", () => {
-        const { freeTablesPerFloor } = useReservations(
-            users,
-            floorInstances,
-            eventOwner,
-            event,
-            NOOP,
-        );
+        const { freeTablesPerFloor } = useReservations(users, floorInstances, eventOwner, event);
         // two floors
         expect(freeTablesPerFloor.value.size).toBe(2);
         // 6 free tables
@@ -131,7 +125,6 @@ describe("useReservations", () => {
             floorInstances,
             eventOwner,
             event,
-            NOOP,
         );
         const [table] = floor1.canvas.getObjects(FloorElementTypes.RECT_TABLE) as RectTable[];
         const setReservationSpy = vi.spyOn(table, "setReservation");
@@ -151,7 +144,6 @@ describe("useReservations", () => {
             floorInstances,
             eventOwner,
             event,
-            NOOP,
         );
         const [table] = allReservedTables.value;
         const setReservationSpy = vi.spyOn(table, "setReservation");
