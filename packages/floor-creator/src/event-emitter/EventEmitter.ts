@@ -1,28 +1,41 @@
-export type EventEmitterListener<Args extends any[] = any[]> = (...args: Args) => void;
+export type EventEmitterListener<EventType extends any[] = any[]> = (...args: EventType) => void;
 
-export class EventEmitter<Events extends Record<string, any[]>> {
-    private listeners: Map<keyof Events, EventEmitterListener<Events[keyof Events]>[]> = new Map();
+type EventMap = {
+    [Event: string]: any[];
+};
+
+export interface TypedEventEmitter<Events extends EventMap> {
+    on<K extends keyof Events>(event: K, listener: EventEmitterListener<Events[K]>): void;
+    off<K extends keyof Events>(event: K, listener: EventEmitterListener<Events[K]>): void;
+    emit<K extends keyof Events>(event: K, ...args: Events[K]): void;
+}
+
+export class EventEmitter<Events extends EventMap> implements TypedEventEmitter<Events> {
+    private listeners: Map<keyof Events, EventEmitterListener[]> = new Map();
 
     public on<K extends keyof Events>(
         event: K,
         listener: EventEmitterListener<Events[K]>,
     ): () => void {
         const currentListeners = this.listeners.get(event) || [];
-        currentListeners.push(listener as any);
+        currentListeners.push(listener as EventEmitterListener<any[]>);
         this.listeners.set(event, currentListeners);
+
+        // Return a function that removes the listener when called.
         return () => this.off(event, listener);
     }
 
     public off<K extends keyof Events>(event: K, listener: EventEmitterListener<Events[K]>): void {
-        const currentListeners = this.listeners.get(event) || [];
-        this.listeners.set(
-            event,
-            currentListeners.filter((l) => l !== listener),
-        );
+        let currentListeners = this.listeners.get(event) || [];
+        currentListeners = currentListeners.filter((l) => l !== listener);
+        this.listeners.set(event, currentListeners);
     }
 
     public emit<K extends keyof Events>(event: K, ...args: Events[K]): void {
         const currentListeners = this.listeners.get(event) || [];
-        currentListeners.forEach((listener) => listener(...args));
+        currentListeners.forEach((listener) => {
+            // Safely call the listener with the correct argument types.
+            listener(...args);
+        });
     }
 }
