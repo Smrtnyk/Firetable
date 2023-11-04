@@ -1,43 +1,52 @@
 name: Build
+
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    types: [opened, synchronize, reopened]
+    push:
+        branches:
+            - master
+    pull_request:
+        types: [opened, synchronize, reopened]
+
 jobs:
-  prepare:
-    name: Test on node ${{ matrix.node_version }} and ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        node_version: ['20']
-        os: [ubuntu-latest]
+    prepare:
+        name: Test on node ${{ matrix.node_version }} and ${{ matrix.os }}
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                node_version: ['20']
+                os: [ubuntu-latest]
 
-    steps:
-    - uses: actions/checkout@v1
-    - name: Use Node.js ${{ matrix.node_version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node_version }}
+        steps:
+            - uses: actions/checkout@v2
 
-    - name: npm install, build and test
-      working-directory: ./
-      run: |
-        npm install -g pnpm
-        pnpm install
-        pnpm run lint
-        pnpm run build
-        pnpm run test
-  sonarcloud:
-    name: SonarCloud
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+            - name: Use Node.js ${{ matrix.node_version }}
+              uses: actions/setup-node@v3 # Updated to v3
+              with:
+                  node-version: ${{ matrix.node_version }}
+                  cache: 'pnpm'
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Run lint
+              run: pnpm run lint
+
+            - name: Build
+              run: pnpm run build
+
+            - name: Test
+              run: pnpm run test
+
+    sonarcloud:
+        name: SonarCloud
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+
+            - name: SonarCloud Scan
+              uses: SonarSource/sonarcloud-github-action@master
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
