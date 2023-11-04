@@ -6,7 +6,7 @@
                 'limited-width': !props.maximized,
             }"
         >
-            <q-banner inline-actions class="shadow-light">
+            <q-banner inline-actions>
                 <template #action>
                     <q-btn round flat icon="close" @click="onDialogOK" />
                 </template>
