@@ -27,7 +27,7 @@ const props = defineProps<Props>();
 const activeStaff = reactive(props.activeStaff);
 const emit = defineEmits(["updateActiveStaff"]);
 
-function setUserAsActiveEventStaff(id: User["id"], active: boolean) {
+function setUserAsActiveEventStaff(id: User["id"], active: boolean): void {
     if (active) {
         activeStaff.add(id);
     } else {

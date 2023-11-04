@@ -8,14 +8,20 @@ interface Data {
     organisationId: string;
 }
 
-export async function createPropertyFn(data: Data, context: functions.https.CallableContext): Promise<string> {
+export async function createPropertyFn(
+    data: Data,
+    context: functions.https.CallableContext,
+): Promise<string> {
     // Check for authenticated user
     if (!context.auth) {
         throw new functions.https.HttpsError("unauthenticated", "User must be authenticated");
     }
 
     if (!data.organisationId) {
-        throw new functions.https.HttpsError("invalid-argument", "organisationId is missing in property payload");
+        throw new functions.https.HttpsError(
+            "invalid-argument",
+            "organisationId is missing in property payload",
+        );
     }
 
     // Create a property with data received from the client
@@ -27,21 +33,25 @@ export async function createPropertyFn(data: Data, context: functions.https.Call
     try {
         const { organisationId } = data;
         // Adding the property data to Firestore
-        const propertyDocRef = await db.collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}`).add(propertyData);
+        const propertyDocRef = await db
+            .collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}`)
+            .add(propertyData);
         const propertyId = propertyDocRef.id;
 
         const userClaims = context.auth.token;
 
         // If user is not an admin, associate the property with the user
         if (userClaims.role !== ADMIN) {
-            const userRef = db.collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`).doc(context.auth.uid);
+            const userRef = db
+                .collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`)
+                .doc(context.auth.uid);
             await userRef.update({
-                relatedProperties: FieldValue.arrayUnion(propertyId)
+                relatedProperties: FieldValue.arrayUnion(propertyId),
             });
 
             // Add the user to relatedUsers of the property
             await propertyDocRef.update({
-                relatedUsers: FieldValue.arrayUnion(context.auth.uid)
+                relatedUsers: FieldValue.arrayUnion(context.auth.uid),
             });
         }
 

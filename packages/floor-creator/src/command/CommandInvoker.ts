@@ -17,7 +17,9 @@ export class CommandInvoker extends EventEmitter<CommandInvokerEvents> {
     }
 
     undo(): void {
-        if (!this.canUndo()) return;
+        if (!this.canUndo()) {
+            return;
+        }
         const command = this.undoStack.pop()!;
         command.undo();
         this.redoStack.push(command);
@@ -25,7 +27,9 @@ export class CommandInvoker extends EventEmitter<CommandInvokerEvents> {
     }
 
     redo(): void {
-        if (!this.canRedo()) return;
+        if (!this.canRedo()) {
+            return;
+        }
         const command = this.redoStack.pop()!;
         command.execute();
         this.undoStack.push(command);

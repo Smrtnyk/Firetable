@@ -59,7 +59,7 @@ export class FloorEditor extends Floor {
         return this.commandInvoker.redo();
     }
 
-    emit<T extends keyof FloorEditorEvents>(event: T, ...args: FloorEditorEvents[T]) {
+    emit<T extends keyof FloorEditorEvents>(event: T, ...args: FloorEditorEvents[T]): void {
         this.eventEmitter.emit(event, ...args);
     }
 
@@ -70,23 +70,23 @@ export class FloorEditor extends Floor {
         this.eventEmitter.on(event, listener);
     }
 
-    onFloorDoubleTap(coordinates: [x: number, y: number]) {
+    onFloorDoubleTap(coordinates: [x: number, y: number]): void {
         this.emit("doubleClick", this, coordinates);
     }
 
-    protected onElementClick = (ev: fabric.IEvent<MouseEvent>) => {
+    protected onElementClick = (ev: fabric.IEvent<MouseEvent>): void => {
         this.emit("elementClicked", this, ev.target as FloorEditorElement);
     };
 
-    renderGrid() {
+    renderGrid(): void {
         this.gridDrawer.drawGrid(this.width, this.height);
     }
 
-    renderData(jsonData?: FloorDoc["json"]) {
+    renderData(jsonData?: FloorDoc["json"]): void {
         super.renderData(jsonData);
     }
 
-    protected setElementProperties(element: fabric.Object) {
+    protected setElementProperties(element: fabric.Object): void {
         element.lockScalingX = false;
         element.lockScalingY = false;
         element.lockMovementX = false;
@@ -94,18 +94,18 @@ export class FloorEditor extends Floor {
         element.lockScalingFlip = true;
     }
 
-    addElement(options: CreateElementOptions) {
+    addElement(options: CreateElementOptions): void {
         const element = this.elementManager.addElement(options);
         element.on("mouseup", this.onElementClick);
         this.setElementProperties(element);
         this.canvas.add(element);
     }
 
-    toggleGridVisibility = () => {
+    toggleGridVisibility = (): void => {
         this.gridDrawer.toggleGridVisibility(this.width, this.height);
     };
 
-    updateDimensions(newWidth: number, newHeight: number) {
+    updateDimensions(newWidth: number, newHeight: number): void {
         this.width = newWidth;
         this.height = newHeight;
         this.scale = calculateCanvasScale(this.containerWidth, this.width);
@@ -114,11 +114,11 @@ export class FloorEditor extends Floor {
         this.renderGrid();
     }
 
-    setFloorName(newName: string) {
+    setFloorName(newName: string): void {
         this.name = newName;
     }
 
-    destroy() {
+    destroy(): void {
         this.eventManager.destroy();
     }
 }

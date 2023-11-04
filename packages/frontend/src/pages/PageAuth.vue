@@ -16,7 +16,7 @@ const passwordRule = [
     minLength("Please enter your password, it has to contain minimum 5 characters."),
 ];
 
-async function onSubmit() {
+async function onSubmit(): Promise<void> {
     if (!(await authForm.value?.validate())) return;
     const validEmail = username.value;
 

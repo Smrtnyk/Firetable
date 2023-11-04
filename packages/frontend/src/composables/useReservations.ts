@@ -55,14 +55,14 @@ export function useReservations(
         floor: Floor,
         reservationData: Reservation,
         table: BaseTable,
-    ) {
+    ): void {
         table?.setReservation(reservationData);
         void tryCatchLoadingWrapper({
             hook: () => updateEventFloorData(eventOwner, floor),
         });
     }
 
-    async function onDeleteReservation(floor: Floor, element: BaseTable) {
+    async function onDeleteReservation(floor: Floor, element: BaseTable): Promise<void> {
         if (!(await showConfirm("Delete reservation?")) || !element.reservation) return;
         element?.setReservation(null);
 
@@ -71,16 +71,16 @@ export function useReservations(
         });
     }
 
-    function onEditReservation(floor: Floor, element: BaseTable) {
+    function onEditReservation(floor: Floor, element: BaseTable): void {
         console.log(floor, element);
         showCreateReservationDialog(floor, element, "edit");
     }
 
-    function resetCurrentOpenCreateReservationDialog() {
+    function resetCurrentOpenCreateReservationDialog(): void {
         currentOpenCreateReservationDialog = null;
     }
 
-    function checkIfReservedTableAndCloseCreateReservationDialog() {
+    function checkIfReservedTableAndCloseCreateReservationDialog(): void {
         if (!currentOpenCreateReservationDialog) return;
 
         const { dialog, label, floorId } = currentOpenCreateReservationDialog;
@@ -98,7 +98,7 @@ export function useReservations(
         floor: Floor,
         element: BaseTable,
         mode: "create" | "edit",
-    ) {
+    ): void {
         const { label } = element;
         const dialog = q
             .dialog({
@@ -136,7 +136,7 @@ export function useReservations(
         }
     }
 
-    function showReservation(floor: Floor, reservation: Reservation, element: BaseTable) {
+    function showReservation(floor: Floor, reservation: Reservation, element: BaseTable): void {
         q.dialog({
             component: FTDialog,
             componentProps: {
@@ -173,7 +173,11 @@ export function useReservations(
         };
     }
 
-    async function swapOrTransferReservations(floor: Floor, table1: BaseTable, table2: BaseTable) {
+    async function swapOrTransferReservations(
+        floor: Floor,
+        table1: BaseTable,
+        table2: BaseTable,
+    ): Promise<void> {
         if (!table1.reservation) {
             return;
         }
@@ -198,28 +202,28 @@ export function useReservations(
         });
     }
 
-    function checkReservationsForTimeAndMarkTableIfNeeded() {
+    function checkReservationsForTimeAndMarkTableIfNeeded(): void {
         if (!event.value?.date) {
             return;
         }
 
         const baseEventDate = new Date(event.value.date);
-        const allReservedTables = Array.from(floorInstances).flatMap(getReservedTables);
+        const allReservedTablesArr = Array.from(floorInstances).flatMap(getReservedTables);
 
-        if (!allReservedTables.length) {
+        if (!allReservedTablesArr.length) {
             return;
         }
 
         const currentDate = new Date();
 
-        for (const table of allReservedTables) {
+        for (const table of allReservedTablesArr) {
             // Only mark non-confirmed reservations
             if (table.reservation?.confirmed) {
                 continue;
             }
             const [hours, minutes] = table.reservation!.time.split(":");
             const eventDateTime = new Date(baseEventDate);
-            eventDateTime.setHours(parseInt(hours), parseInt(minutes));
+            eventDateTime.setHours(parseInt(hours, 10), parseInt(minutes, 10));
 
             // Check if time is starting with "0", for example 01:00, it means it is next day in the morning,
             // so we need to adjust the date to the next day

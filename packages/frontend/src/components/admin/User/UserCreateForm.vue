@@ -46,13 +46,13 @@ const emailSuffix = computed(() => {
     return "";
 });
 
-async function onSubmit() {
+async function onSubmit(): Promise<void> {
     if (await validateForm()) {
         prepareAndEmitSubmission();
     }
 }
 
-function onReset() {
+function onReset(): void {
     form.value = { ...userSkeleton() };
     resetProperties();
 }
@@ -72,14 +72,14 @@ function userSkeleton(user?: User): CreateUserPayload {
     };
 }
 
-function availableRolesBasedOn(role: string) {
-    if (role === ADMIN) {
+function availableRolesBasedOn(roleVal: string): Role[] {
+    if (roleVal === ADMIN) {
         return Object.values(Role);
     }
     return Object.values(Role).filter((r) => r !== Role.PROPERTY_OWNER);
 }
 
-async function validateForm() {
+async function validateForm(): Promise<boolean> {
     if (!(await userCreateForm.value?.validate())) return false;
     const chosenRole = form.value.role;
 
@@ -96,7 +96,7 @@ async function validateForm() {
     return true;
 }
 
-function prepareAndEmitSubmission() {
+function prepareAndEmitSubmission(): void {
     if (!chosenOrganisation.value) {
         throw new Error("chosenOrganisation is required");
     }
@@ -109,7 +109,7 @@ function prepareAndEmitSubmission() {
     emit("submit", submission);
 }
 
-function resetProperties() {
+function resetProperties(): void {
     chosenProperties.value = [];
 }
 </script>

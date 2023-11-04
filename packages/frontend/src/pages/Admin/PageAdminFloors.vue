@@ -29,7 +29,7 @@ watch(
     { immediate: true, deep: true },
 );
 
-function showAddNewFloorForm(propertyData: PropertyFloors, floors: FloorDoc[]): void {
+function showAddNewFloorForm(propertyData: PropertyFloors, floorDocs: FloorDoc[]): void {
     const dialog = quasar.dialog({
         component: FTDialog,
         componentProps: {
@@ -51,13 +51,17 @@ function showAddNewFloorForm(propertyData: PropertyFloors, floors: FloorDoc[]): 
                 },
             },
             componentPropsObject: {
-                allFloorNames: new Set(floors.map(takeProp("name"))),
+                allFloorNames: new Set(floorDocs.map(takeProp("name"))),
             },
         },
     });
 }
 
-async function duplicateFloor(propertyData: PropertyFloors, floor: FloorDoc, reset: () => void) {
+async function duplicateFloor(
+    propertyData: PropertyFloors,
+    floor: FloorDoc,
+    reset: () => void,
+): Promise<void> {
     if (
         !(await showConfirm(
             t("PageAdminFloors.duplicateFloorPlanMessage", { floorName: floor.name }),
@@ -66,7 +70,7 @@ async function duplicateFloor(propertyData: PropertyFloors, floor: FloorDoc, res
         return reset();
 
     const duplicatedFloor = { ...floor, name: `${floor.name}_copy` };
-    return tryCatchLoadingWrapper({
+    await tryCatchLoadingWrapper({
         hook: () =>
             addFloor(
                 {
@@ -78,7 +82,11 @@ async function duplicateFloor(propertyData: PropertyFloors, floor: FloorDoc, res
     }).finally(reset);
 }
 
-async function onFloorDelete(propertyData: PropertyFloors, id: string, reset: () => void) {
+async function onFloorDelete(
+    propertyData: PropertyFloors,
+    id: string,
+    reset: () => void,
+): Promise<void> {
     if (!(await showConfirm(t("PageAdminFloors.deleteFloorMessage")))) return reset();
 
     await tryCatchLoadingWrapper({

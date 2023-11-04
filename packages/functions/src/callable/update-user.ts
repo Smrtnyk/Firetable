@@ -27,7 +27,9 @@ const { logger } = functions;
  *
  * @returns Returns a promise that resolves once the user and their associated properties have been successfully updated in Firestore.
  */
-export async function updateUserFn(editUserPayload: EditUserPayload): Promise<{ success: boolean, message: string }> {
+export async function updateUserFn(
+    editUserPayload: EditUserPayload,
+): Promise<{ success: boolean; message: string }> {
     const { updatedUser, userId } = editUserPayload;
     const { relatedProperties } = updatedUser;
 
@@ -43,11 +45,14 @@ export async function updateUserFn(editUserPayload: EditUserPayload): Promise<{ 
     if (updatedUser.password) {
         try {
             await auth.updateUser(userId, {
-                password: updatedUser.password
+                password: updatedUser.password,
             });
         } catch (error: any) {
             logger.error(`Failed to update password for user ${userId}`, error);
-            throw new functions.https.HttpsError("internal", `Failed to update password. Details: ${error.message}`);
+            throw new functions.https.HttpsError(
+                "internal",
+                `Failed to update password. Details: ${error.message}`,
+            );
         }
         // Remove password from updatedUser so it doesn't get saved in Firestore
         delete updatedUser.password;
@@ -55,17 +60,26 @@ export async function updateUserFn(editUserPayload: EditUserPayload): Promise<{ 
 
     try {
         // Fetch the properties associated with this user by checking relatedUsers field
-        const existingPropertiesSnapshot = await db.collection(`${Collection.ORGANISATIONS}/${editUserPayload.organisationId}/${Collection.PROPERTIES}`)
+        const existingPropertiesSnapshot = await db
+            .collection(
+                `${Collection.ORGANISATIONS}/${editUserPayload.organisationId}/${Collection.PROPERTIES}`,
+            )
             .where("relatedUsers", "array-contains", userId)
             .get();
 
-        const existingProperties = existingPropertiesSnapshot.docs.map(doc => doc.id);
+        const existingProperties = existingPropertiesSnapshot.docs.map((doc) => doc.id);
 
-        const propertiesToAdd = relatedProperties.filter(id => !existingProperties.includes(id));
-        const propertiesToRemove = existingProperties.filter(id => !relatedProperties.includes(id));
+        const propertiesToAdd = relatedProperties.filter((id) => !existingProperties.includes(id));
+        const propertiesToRemove = existingProperties.filter(
+            (id) => !relatedProperties.includes(id),
+        );
 
-        await db.runTransaction(async transaction => {
-            const userRef = db.collection(`${Collection.ORGANISATIONS}/${editUserPayload.organisationId}/${Collection.USERS}`).doc(userId);
+        await db.runTransaction(async (transaction) => {
+            const userRef = db
+                .collection(
+                    `${Collection.ORGANISATIONS}/${editUserPayload.organisationId}/${Collection.USERS}`,
+                )
+                .doc(userId);
 
             // Update the user's basic information if provided
             if (updatedUser) {
@@ -74,17 +88,25 @@ export async function updateUserFn(editUserPayload: EditUserPayload): Promise<{ 
 
             // Add the user to relatedUsers field of the property document for new associations
             for (const propertyId of propertiesToAdd) {
-                const propertyRef = db.collection(`${Collection.ORGANISATIONS}/${editUserPayload.organisationId}/${Collection.PROPERTIES}`).doc(propertyId);
+                const propertyRef = db
+                    .collection(
+                        `${Collection.ORGANISATIONS}/${editUserPayload.organisationId}/${Collection.PROPERTIES}`,
+                    )
+                    .doc(propertyId);
                 transaction.update(propertyRef, {
-                    relatedUsers: FieldValue.arrayUnion(userId)
+                    relatedUsers: FieldValue.arrayUnion(userId),
                 });
             }
 
             // Remove the user from relatedUsers field of the property document for removed associations
             for (const propertyId of propertiesToRemove) {
-                const propertyRef = db.collection(`${Collection.ORGANISATIONS}/${editUserPayload.organisationId}/${Collection.PROPERTIES}`).doc(propertyId);
+                const propertyRef = db
+                    .collection(
+                        `${Collection.ORGANISATIONS}/${editUserPayload.organisationId}/${Collection.PROPERTIES}`,
+                    )
+                    .doc(propertyId);
                 transaction.update(propertyRef, {
-                    relatedUsers: FieldValue.arrayRemove(userId)
+                    relatedUsers: FieldValue.arrayRemove(userId),
                 });
             }
         });
@@ -92,6 +114,9 @@ export async function updateUserFn(editUserPayload: EditUserPayload): Promise<{ 
         return { success: true, message: "User updated successfully." };
     } catch (error: any) {
         logger.error(`Failed to update user ${userId}`, error);
-        throw new functions.https.HttpsError("internal", `Failed to update user. Details: ${error.message}`);
+        throw new functions.https.HttpsError(
+            "internal",
+            `Failed to update user. Details: ${error.message}`,
+        );
     }
 }

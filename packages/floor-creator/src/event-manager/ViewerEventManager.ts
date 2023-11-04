@@ -16,16 +16,18 @@ export class ViewerEventManager extends EventManager {
         this.initializeCanvasEventHandlers();
     }
 
-    destroy() {}
+    destroy(): void {
+        // NOOP here
+    }
 
-    initializeCanvasEventHandlers() {
+    initializeCanvasEventHandlers(): void {
         super.initializeCanvasEventHandlers();
 
         this.floor.canvas.on("mouse:down", this.onTableTouchStart);
         this.floor.canvas.on("mouse:up", this.onTableTouchEnd);
     }
 
-    onTableTouchStart = (options: fabric.IEvent) => {
+    onTableTouchStart = (options: fabric.IEvent): void => {
         const target = options.target;
         if (isTable(target)) {
             this.startElement = target;
@@ -33,7 +35,7 @@ export class ViewerEventManager extends EventManager {
         }
     };
 
-    onTableTouchEnd = (options: fabric.IEvent) => {
+    onTableTouchEnd = (options: fabric.IEvent): void => {
         if (this.isPanning && this.startElement) {
             const pointer = this.floor.canvas.getPointer(options.e);
             const endElement = this.floor.canvas.findTarget(

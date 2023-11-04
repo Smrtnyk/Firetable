@@ -20,7 +20,7 @@ export class FloorViewer extends Floor {
         this.eventManager = new ViewerEventManager(this);
     }
 
-    emit<T extends keyof FloorViewerEvents>(event: T, ...args: FloorViewerEvents[T]) {
+    emit<T extends keyof FloorViewerEvents>(event: T, ...args: FloorViewerEvents[T]): void {
         this.eventEmitter.emit(event, ...args);
     }
 
@@ -31,11 +31,11 @@ export class FloorViewer extends Floor {
         this.eventEmitter.on(event, listener);
     }
 
-    onFloorDoubleTap() {
+    onFloorDoubleTap(): void {
         /* empty for now */
     }
 
-    protected onElementClick = (ev: fabric.IEvent<MouseEvent>) => {
+    protected onElementClick = (ev: fabric.IEvent<MouseEvent>): void => {
         if (this.eventManager.dragOccurred) {
             this.eventManager.dragOccurred = false; // Reset the flag
             return; // Exit early if a drag operation occurred
@@ -43,7 +43,7 @@ export class FloorViewer extends Floor {
         this.eventEmitter.emit("elementClicked", this, ev.target as FloorEditorElement);
     };
 
-    protected setElementProperties(element: fabric.Object) {
+    protected setElementProperties(element: fabric.Object): void {
         element.lockScalingX = true;
         element.lockScalingY = true;
         element.lockMovementX = true;
@@ -51,5 +51,7 @@ export class FloorViewer extends Floor {
         element.lockScalingFlip = true;
     }
 
-    destroy() {}
+    destroy(): void {
+        // NOOP here
+    }
 }

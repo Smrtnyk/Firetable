@@ -79,7 +79,7 @@ function showEventInfo(): void {
     });
 }
 
-async function init() {
+async function init(): Promise<void> {
     if (!props.eventId) {
         await router.replace("/");
     }

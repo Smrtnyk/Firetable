@@ -21,7 +21,9 @@ export async function clearOldEvents(): Promise<void> {
             const orgId = orgDoc.id;
 
             // Step 2: For each organization, retrieve all properties.
-            const propertiesSnapshot = await db.collection(`${Collection.ORGANISATIONS}/${orgId}/${Collection.PROPERTIES}`).get();
+            const propertiesSnapshot = await db
+                .collection(`${Collection.ORGANISATIONS}/${orgId}/${Collection.PROPERTIES}`)
+                .get();
 
             for (const propertyDoc of propertiesSnapshot.docs) {
                 const propertyId = propertyDoc.id;
@@ -30,14 +32,14 @@ export async function clearOldEvents(): Promise<void> {
                 const oldEvents = await getOldEvents(orgId, propertyId);
 
                 if (!oldEvents.empty) {
-                    const deletePromises = oldEvents.docs.map(eventDoc =>
+                    const deletePromises = oldEvents.docs.map((eventDoc) =>
                         deleteDocument({
                             col: `${Collection.ORGANISATIONS}/${orgId}/${Collection.PROPERTIES}/${propertyId}/${Collection.EVENTS}`,
-                            id: eventDoc.id
-                        }).catch(error => {
+                            id: eventDoc.id,
+                        }).catch((error) => {
                             // Individual error handling for each document delete operation
                             logger.error(`Error deleting event with ID ${eventDoc.id}:`, error);
-                        })
+                        }),
                     );
 
                     allDeletePromises.push(...deletePromises);
@@ -47,7 +49,6 @@ export async function clearOldEvents(): Promise<void> {
 
         await Promise.all(allDeletePromises);
         logger.info(`Old events have been cleared.`);
-
     } catch (error) {
         logger.error("Error occurred while clearing old events:", error);
         throw new Error("Failed to clear old events. Check logs for details.");
@@ -57,12 +58,18 @@ export async function clearOldEvents(): Promise<void> {
 /**
  * Fetches events from the Firestore collection that are older than a year.
  */
-async function getOldEvents(organisationId: string, propertyId: string): Promise<firestore.QuerySnapshot<firestore.DocumentData>> {
+async function getOldEvents(
+    organisationId: string,
+    propertyId: string,
+): Promise<firestore.QuerySnapshot<firestore.DocumentData>> {
     const date = new Date();
     date.setFullYear(date.getFullYear() - DELETION_AGE_YEARS);
 
     try {
-        return await db.collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}/${propertyId}/${Collection.EVENTS}`)
+        return await db
+            .collection(
+                `${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}/${propertyId}/${Collection.EVENTS}`,
+            )
             .where("date", "<=", date.getTime())
             .get();
     } catch (error) {

@@ -65,24 +65,24 @@ export abstract class Floor {
         this.touchManager = new TouchManager(this);
     }
 
-    get json() {
+    get json(): ReturnType<typeof fabric.Canvas.toJSON> {
         return this.canvas.toJSON(["label", "reservation", "name", "type"]);
     }
 
-    elementReviver = (_: string, object: fabric.Object) => {
+    elementReviver = (_: string, object: fabric.Object): void => {
         object.on("mouseup", (ev) => {
             this.onElementClick(ev);
         });
         this.setElementProperties(object);
     };
 
-    setScaling() {
+    setScaling(): void {
         this.canvas.setZoom(this.scale);
         this.canvas.setWidth(this.width * this.canvas.getZoom());
         this.canvas.setHeight(this.height * this.canvas.getZoom());
     }
 
-    renderData(jsonData?: FloorDoc["json"]) {
+    renderData(jsonData?: FloorDoc["json"]): void {
         this.setScaling();
         this.canvas.loadFromJSON(
             jsonData,

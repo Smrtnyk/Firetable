@@ -19,8 +19,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: "create", payload: Reservation): void;
-    (e: "update", payload: Reservation): void;
+    (e: "create" | "update", payload: Reservation): void;
 }>();
 const { t } = useI18n();
 
@@ -72,7 +71,7 @@ function requireReservedBySelection(val: Reservation["reservedBy"]): boolean | s
     return !!val?.email || t(`EventCreateReservation.requireReservedBySelectionError`);
 }
 
-async function onOKClick() {
+async function onOKClick(): void {
     if (!(await reservationForm.value?.validate())) return;
 
     if (props.mode === "create") {

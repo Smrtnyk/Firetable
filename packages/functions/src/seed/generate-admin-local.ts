@@ -4,7 +4,7 @@ import { ADMIN } from "../../types/types.js";
 process.env.FIREBASE_AUTH_EMULATOR_HOST = "127.0.0.1:9099";
 process.env.FIRESTORE_EMULATOR_HOST = "127.0.0.1:4000";
 
-const app = admin.initializeApp( { projectId: "firetable-eu" });
+const app = admin.initializeApp({ projectId: "firetable-eu" });
 
 const auth = app.auth();
 

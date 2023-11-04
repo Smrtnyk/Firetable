@@ -52,7 +52,7 @@ export function useFloorsPageEvent(
 
     watch(() => eventFloors.value, handleFloorInstancesData, { deep: true });
 
-    function onTableFound(tables: BaseTable[]) {
+    function onTableFound(tables: BaseTable[]): void {
         onAutocompleteClear();
         for (const table of tables) {
             table.startAnimation();
@@ -60,7 +60,7 @@ export function useFloorsPageEvent(
         state.value.floorInstances.forEach((floor) => floor.canvas.renderAll());
     }
 
-    function updateFloorInstancesData() {
+    function updateFloorInstancesData(): void {
         if (!eventFloors.value.length) return;
 
         for (const floorInstance of state.value.floorInstances) {
@@ -72,14 +72,14 @@ export function useFloorsPageEvent(
         checkReservationsForTimeAndMarkTableIfNeeded();
     }
 
-    async function initFloorInstancesData() {
+    async function initFloorInstancesData(): Promise<void> {
         await nextTick();
         instantiateFloors();
         setActiveFloor([...state.value.floorInstances][0]);
         checkReservationsForTimeAndMarkTableIfNeeded();
     }
 
-    async function handleFloorInstancesData(newVal: FloorDoc[], old: FloorDoc[]) {
+    async function handleFloorInstancesData(newVal: FloorDoc[], old: FloorDoc[]): Promise<void> {
         if (!eventFloors.value) return;
         if ((!old.length && newVal.length) || state.value.floorInstances.size === 0) {
             await initFloorInstancesData();
@@ -94,11 +94,11 @@ export function useFloorsPageEvent(
         };
     }
 
-    function instantiateFloors() {
+    function instantiateFloors(): void {
         eventFloors.value.forEach(instantiateFloor);
     }
 
-    function instantiateFloor(floorDoc: FloorDoc) {
+    function instantiateFloor(floorDoc: FloorDoc): void {
         const canvas = canvases.get(floorDoc.id);
 
         if (!canvas || !pageRef.value) return;
@@ -123,7 +123,7 @@ export function useFloorsPageEvent(
         }
     }
 
-    function tableClickHandler(floor: Floor, element: FloorEditorElement | undefined) {
+    function tableClickHandler(floor: Floor, element: FloorEditorElement | undefined): void {
         if (!isTable(element)) {
             return;
         }

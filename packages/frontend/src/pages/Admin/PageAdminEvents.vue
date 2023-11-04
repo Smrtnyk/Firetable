@@ -78,7 +78,7 @@ watch(
     { immediate: false },
 );
 
-function fetchEventsForActiveTab() {
+function fetchEventsForActiveTab(): void {
     if (eventsByProperty[activePropertyId.value]?.size === 0) {
         const activeProperty = properties.value.find((property) => {
             return property.id === activePropertyId.value;
@@ -105,7 +105,13 @@ const onCreateEvent = withLoading(async function (eventData: CreateEventPayload)
     });
 });
 
-async function onEventItemSlideRight({ event, reset }: { event: EventDoc; reset: () => void }) {
+async function onEventItemSlideRight({
+    event,
+    reset,
+}: {
+    event: EventDoc;
+    reset: () => void;
+}): Promise<void> {
     if (!(await showConfirm(t("PageAdminEvents.deleteEventDialogTitle")))) return reset();
     await tryCatchLoadingWrapper({
         hook: async () => {
@@ -125,7 +131,7 @@ async function onEventItemSlideRight({ event, reset }: { event: EventDoc; reset:
     });
 }
 
-async function onLoad(property: PropertyDoc) {
+async function onLoad(property: PropertyDoc): Promise<void> {
     const propertyId = property.id;
     if (!hasMoreEventsToFetch[propertyId]) {
         return;

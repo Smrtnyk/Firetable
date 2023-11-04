@@ -9,7 +9,7 @@ export function useOrganisations() {
     const error = ref<null | Error>(null);
     const isLoading = ref(true);
 
-    async function fetchOrganisations() {
+    async function fetchOrganisations(): Promise<void> {
         isLoading.value = true;
         try {
             if (auth.user?.role === ADMIN) {

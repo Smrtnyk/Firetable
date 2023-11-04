@@ -9,7 +9,9 @@
         "isolatedModules": true
     },
     "include": [
+        "vitest.config.ts",
         "__mocks__/**/*",
-        "./src/**/*.spec.ts"
-    ]
+        "src/**/*.ts"
+    ],
+    "exclude": []
 }

@@ -10,11 +10,11 @@ export abstract class EventManager {
         this.floor = floor;
     }
 
-    initializeCanvasEventHandlers() {
+    initializeCanvasEventHandlers(): void {
         this.floor.canvas.on("mouse:wheel", this.onMouseWheelHandler);
     }
 
-    private onMouseWheelHandler = (opt: fabric.IEvent<WheelEvent>) => {
+    private onMouseWheelHandler = (opt: fabric.IEvent<WheelEvent>): void => {
         if (!opt.e) {
             return;
         }

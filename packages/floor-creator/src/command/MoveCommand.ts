@@ -1,7 +1,10 @@
 import { Command } from "./Command";
 import { fabric } from "fabric";
 
-type Position = { left: number; top: number };
+type Position = {
+    left: number;
+    top: number;
+};
 
 export class MoveCommand implements Command {
     private object: fabric.Object;

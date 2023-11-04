@@ -25,16 +25,16 @@ export class FloorZoomManager {
         this.minZoom = this.initialScale;
     }
 
-    zoomIn(point: fabric.Point) {
+    zoomIn(point: fabric.Point): void {
         this.adjustZoom(ZOOM_INCREMENT, point);
     }
 
-    zoomOut(point: fabric.Point) {
+    zoomOut(point: fabric.Point): void {
         this.adjustZoom(-ZOOM_INCREMENT, point);
     }
 
     // Adjust the zoom level based on the increment/decrement factor and animate the zoom
-    private adjustZoom(incrementFactor: number, point: fabric.Point) {
+    private adjustZoom(incrementFactor: number, point: fabric.Point): void {
         const newZoom = this.canvas.getZoom() + this.canvas.getZoom() * incrementFactor;
         if (newZoom <= this.maxZoom && newZoom >= this.minZoom) {
             this.animateZoom(newZoom, point);
@@ -43,12 +43,12 @@ export class FloorZoomManager {
         }
     }
 
-    private animateZoom(targetZoom: number, point: fabric.Point) {
+    private animateZoom(targetZoom: number, point: fabric.Point): void {
         this.startTime = undefined;
         this.startZoom = this.canvas.getZoom();
         this.targetZoom = targetZoom;
 
-        const animateStep = (timestamp: number) => {
+        const animateStep = (timestamp: number): void => {
             if (!this.startTime) {
                 this.startTime = timestamp;
             }
@@ -69,7 +69,7 @@ export class FloorZoomManager {
         animateStep(performance.now());
     }
 
-    zoomToPoint(point: fabric.Point, scaleFactor: number) {
+    zoomToPoint(point: fabric.Point, scaleFactor: number): void {
         let newZoom = this.canvas.getZoom() * scaleFactor;
         newZoom = Math.max(this.minZoom, Math.min(newZoom, this.maxZoom));
         this.canvas.zoomToPoint(point, newZoom);
@@ -84,7 +84,7 @@ export class FloorZoomManager {
         return this.canvas.getZoom() > this.minZoom;
     }
 
-    resetZoom() {
+    resetZoom(): void {
         this.canvas.setViewportTransform([...this.initialViewportTransform]);
         this.canvas.setZoom(this.initialScale);
         this.canvas.renderAll();

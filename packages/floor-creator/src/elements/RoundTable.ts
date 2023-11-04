@@ -80,19 +80,19 @@ export class RoundTable extends fabric.Group {
         this.canvas?.renderAll();
     }
 
-    startAnimation() {
+    startAnimation(): void {
         this.animationStrategy.animate();
     }
 
-    stopAnimation() {
+    stopAnimation(): void {
         this.animationStrategy.stop();
     }
 
-    setReservation(reservation: Reservation | null) {
+    setReservation(reservation: Reservation | null): void {
         this.reservation = reservation;
     }
 
-    toObject() {
+    toObject(): Record<string, unknown> {
         return {
             ...super.toObject(),
             baseFill: this.baseFill,
@@ -114,5 +114,5 @@ export class RoundTable extends fabric.Group {
     }
 }
 
-// @ts-ignore: Unreachable code error
+// @ts-expect-error: Unreachable code error
 fabric.RoundTable = fabric.util.createClass(RoundTable);

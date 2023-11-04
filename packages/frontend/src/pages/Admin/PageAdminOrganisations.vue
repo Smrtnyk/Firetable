@@ -22,7 +22,7 @@ const organisations = ref<OrganisationDoc[]>([]);
 
 onMounted(fetchOrganisations);
 
-async function fetchOrganisations() {
+async function fetchOrganisations(): Promise<void> {
     isLoading.value = true;
     organisations.value = await fetchOrganisationsForAdmin();
     isLoading.value = false;

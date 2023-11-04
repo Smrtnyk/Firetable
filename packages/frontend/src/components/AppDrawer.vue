@@ -69,7 +69,7 @@ const avatar = computed(() => {
     return `${first[0]}${last[0]}`;
 });
 
-function setDarkMode(newValue: boolean) {
+function setDarkMode(newValue: boolean): void {
     q.dark.set(newValue);
     q.localStorage.set("FTDarkMode", newValue);
 }
@@ -78,7 +78,7 @@ const onLogoutUser = withLoading(function () {
     return logoutUser().then(authStore.unsubscribeUserWatch);
 });
 
-function setAppLanguage(val: string) {
+function setAppLanguage(val: string): void {
     LocalStorage.set("FTLang", val);
     locale.value = val;
 }

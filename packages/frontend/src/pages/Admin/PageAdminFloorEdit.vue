@@ -81,7 +81,7 @@ const undoRedoState = reactive({
 });
 let unregisterStateChangeListener: () => void | undefined;
 
-function onKeyDown(event: KeyboardEvent) {
+function onKeyDown(event: KeyboardEvent): void {
     if (event.ctrlKey && event.key === "s") {
         // Prevents browser's save dialog from showing
         event.preventDefault();
@@ -113,7 +113,7 @@ onBeforeUnmount(() => {
     floorInstance.value?.destroy();
 });
 
-function instantiateFloor(floorDoc: FloorDoc) {
+function instantiateFloor(floorDoc: FloorDoc): void {
     if (!canvasRef.value || !pageRef.value) return;
 
     floorInstance.value = new FloorEditor({
@@ -147,7 +147,7 @@ function onFloorSave(): void {
     });
 }
 
-function onFloorChange(prop: keyof FloorEditor, event: null | number | string) {
+function onFloorChange(prop: keyof FloorEditor, event: null | number | string): void {
     if (!floorInstance.value) return;
 
     if (prop === "name") floorInstance.value.setFloorName(String(event));
@@ -160,7 +160,7 @@ function onFloorChange(prop: keyof FloorEditor, event: null | number | string) {
     }
 }
 
-function showTableDialog(floor: FloorEditor, [x, y]: NumberTuple, tag: ElementTag) {
+function showTableDialog(floorVal: FloorEditor, [x, y]: NumberTuple, tag: ElementTag): void {
     const dialog = q.dialog({
         component: FTDialog,
         componentProps: {
@@ -168,54 +168,57 @@ function showTableDialog(floor: FloorEditor, [x, y]: NumberTuple, tag: ElementTa
             maximized: false,
             title: "Table ID",
             componentPropsObject: {
-                ids: new Set(extractAllTablesLabels(floor)),
+                ids: new Set(extractAllTablesLabels(floorVal)),
             },
             listeners: {
                 create: function (label: string) {
                     dialog.hide();
-                    floor.addElement({ label, x, y, tag });
+                    floorVal.addElement({ label, x, y, tag });
                 },
             },
         },
     });
 }
 
-function handleAddNewElement(floor: FloorEditor, [x, y]: NumberTuple) {
+function handleAddNewElement(floorVal: FloorEditor, [x, y]: NumberTuple) {
     return function ({ elementDescriptor }: BottomSheetTableClickResult) {
         const { tag } = elementDescriptor;
 
         if (NON_TABLE_EL_TO_ADD.includes(tag)) {
-            floor.addElement({ x, y, tag });
+            floorVal.addElement({ x, y, tag });
             return;
         }
 
-        showTableDialog(floor, [x, y], tag);
+        showTableDialog(floorVal, [x, y], tag);
     };
 }
 
-function dblClickHandler(floor: FloorEditor, coords: NumberTuple) {
+function dblClickHandler(floorVal: FloorEditor, coords: NumberTuple): void {
     if (bulkMode.value && bulkElement.value) {
         const label = String(++bulkLabelCounter.value);
-        floor.addElement({ label, x: coords[0], y: coords[1], tag: bulkElement.value });
+        floorVal.addElement({ label, x: coords[0], y: coords[1], tag: bulkElement.value });
         return;
     }
-    q.bottomSheet(addNewElementsBottomSheetOptions).onOk(handleAddNewElement(floor, coords));
+    q.bottomSheet(addNewElementsBottomSheetOptions).onOk(handleAddNewElement(floorVal, coords));
 }
 
-async function elementClickHandler(_: Floor, element: FloorEditorElement | undefined) {
+async function elementClickHandler(
+    _: Floor,
+    element: FloorEditorElement | undefined,
+): Promise<void> {
     selectedElement.value = undefined;
     await nextTick();
     selectedElement.value = element;
 }
 
-function onDeleteElement(element: FloorEditorElement) {
+function onDeleteElement(element: FloorEditorElement): void {
     const elementToDelete = element.canvas?.getActiveObject();
     if (!elementToDelete) return;
     element.canvas?.remove(elementToDelete);
     selectedElement.value = undefined;
 }
 
-function toggleBulkMode() {
+function toggleBulkMode(): void {
     if (bulkMode.value) {
         // If already in bulk mode, deactivate it
         deactivateBulkMode();
@@ -229,14 +232,14 @@ function toggleBulkMode() {
     }
 }
 
-function activateBulkMode(elementTag: ElementTag) {
+function activateBulkMode(elementTag: ElementTag): void {
     bulkMode.value = true;
     bulkElement.value = elementTag;
 
     // Get all current labels using the helper function
     const labels = extractAllTablesLabels(floorInstance.value as FloorEditor);
     // Convert labels to numbers only if they are numeric and find the maximum
-    const numericLabels = labels.map((label) => parseInt(label)).filter(isNumber);
+    const numericLabels = labels.map((label) => parseInt(label, 10)).filter(isNumber);
 
     if (numericLabels.length === 0) {
         bulkLabelCounter.value = 0;
@@ -246,32 +249,32 @@ function activateBulkMode(elementTag: ElementTag) {
     }
 }
 
-function deactivateBulkMode() {
+function deactivateBulkMode(): void {
     bulkMode.value = false;
     bulkElement.value = null;
     bulkLabelCounter.value = 0;
 }
 
-function undoAction() {
+function undoAction(): void {
     if (floorInstance.value) {
         floorInstance.value.undo();
         floorInstance.value.canvas.renderAll(); // Refresh the canvas after undo
     }
 }
 
-function redoAction() {
+function redoAction(): void {
     if (floorInstance.value) {
         floorInstance.value.redo();
         floorInstance.value.canvas.renderAll(); // Refresh the canvas after redo
     }
 }
 
-function exportFloor(floor: FloorEditor) {
-    exportFile(`${floor.name}.json`, JSON.stringify(floor.json));
+function exportFloor(floorVal: FloorEditor): void {
+    exportFile(`${floorVal.name}.json`, JSON.stringify(floorVal.json));
 }
 
 const fileInputRef = ref<HTMLInputElement | null>(null);
-function onFileSelected(event: Event) {
+function onFileSelected(event: Event): void {
     const fileInput = event.target as HTMLInputElement;
     const file = fileInput.files?.[0];
     if (file) {
@@ -287,7 +290,7 @@ function onFileSelected(event: Event) {
     }
 }
 
-function triggerFileInput() {
+function triggerFileInput(): void {
     fileInputRef.value?.click();
 }
 </script>

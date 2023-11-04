@@ -59,7 +59,7 @@ const mockReservation = {
     },
 };
 
-function createReservedTable(label: string) {
+function createReservedTable(label: string): RectTable {
     const table = createTable(label);
     table.setReservation(mockReservation);
     return table;

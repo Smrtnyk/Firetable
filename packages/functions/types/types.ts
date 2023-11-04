@@ -18,7 +18,7 @@ export enum Role {
 }
 
 // Cannot import this because functions deploy
-export interface CreateUserPayload{
+export interface CreateUserPayload {
     id: string;
     name: string;
     email: string;

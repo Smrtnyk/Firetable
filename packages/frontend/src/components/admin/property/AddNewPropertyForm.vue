@@ -31,7 +31,7 @@ const isSingleOrganisation = computed(() => {
 async function submit(): Promise<void> {
     if (!(await createPropertyForm.value?.validate())) return;
 
-    let organisationId = isSingleOrganisation.value
+    const organisationId = isSingleOrganisation.value
         ? props.organisations[0].id
         : chosenOrganisation.value;
 

@@ -83,7 +83,9 @@ export class RectTable extends fabric.Group {
     }
 
     private adjustTextScaling(): void {
-        if (!this.scaleX || !this.scaleY) return;
+        if (!this.scaleX || !this.scaleY) {
+            return;
+        }
 
         // Inversely adjust the scaling of the textLabel
         this.textLabel.set({
@@ -101,7 +103,9 @@ export class RectTable extends fabric.Group {
     }
 
     private snapToGrid(): void {
-        if (!this.scaleX || !this.scaleY) return;
+        if (!this.scaleX || !this.scaleY) {
+            return;
+        }
 
         const targetWidth = this.initialWidth * this.scaleX;
         const targetHeight = this.initialHeight * this.scaleY;
@@ -112,7 +116,7 @@ export class RectTable extends fabric.Group {
         const correctedScaleX = snappedWidth / this.initialWidth;
         const correctedScaleY = snappedHeight / this.initialHeight;
 
-        // @ts-ignore
+        // @ts-expect-error -- not sure why this is type error
         this.set({
             scaleX: correctedScaleX,
             scaleY: correctedScaleY,
@@ -120,7 +124,9 @@ export class RectTable extends fabric.Group {
     }
 
     private enforceMinimumDimensions(): void {
-        if (!this.scaleX || !this.scaleY) return;
+        if (!this.scaleX || !this.scaleY) {
+            return;
+        }
 
         if (this.scaleX * this.initialWidth < TABLE_WIDTH) {
             this.scaleX = TABLE_WIDTH / this.initialWidth;
@@ -133,17 +139,19 @@ export class RectTable extends fabric.Group {
 
     private enforceStrokeWidth(): void {
         const tableRect = this.item(0) as fabric.Rect;
-        if (!this.scaleX || !this.scaleY) return;
+        if (!this.scaleX || !this.scaleY) {
+            return;
+        }
         tableRect.set({
             strokeWidth: this.initialStrokeWidth / Math.max(this.scaleX, this.scaleY),
         });
     }
 
-    startAnimation() {
+    startAnimation(): void {
         this.animationStrategy.animate();
     }
 
-    stopAnimation() {
+    stopAnimation(): void {
         this.animationStrategy.stop();
     }
 
@@ -167,11 +175,11 @@ export class RectTable extends fabric.Group {
         this.canvas?.renderAll();
     }
 
-    setReservation(reservation: Reservation | null) {
+    setReservation(reservation: Reservation | null): void {
         this.reservation = reservation;
     }
 
-    toObject() {
+    toObject(): Record<string, unknown> {
         return {
             ...super.toObject(),
             baseFill: this.baseFill,
@@ -193,5 +201,5 @@ export class RectTable extends fabric.Group {
     }
 }
 
-// @ts-ignore: Unreachable code error
+// @ts-expect-error: Unreachable code error
 fabric.RectTable = fabric.util.createClass(RectTable);

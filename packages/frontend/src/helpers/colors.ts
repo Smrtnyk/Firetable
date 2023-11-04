@@ -1,8 +1,13 @@
-function generateHSLColor(hue: number, saturation: number, lightness: number, opacity: number) {
+function generateHSLColor(
+    hue: number,
+    saturation: number,
+    lightness: number,
+    opacity: number,
+): string {
     return `hsla(${hue}, ${saturation}%, ${lightness}%, ${opacity})`;
 }
 
-export function getColors(count: number) {
+export function getColors(count: number): { backgroundColors: string[]; borderColors: string[] } {
     const backgroundColors: string[] = [];
     const borderColors: string[] = [];
 

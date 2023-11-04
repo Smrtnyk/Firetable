@@ -2,14 +2,16 @@ import { ADMIN, PropertyDoc, User } from "@firetable/types";
 import { deleteDoc, getDocs, query, where } from "firebase/firestore";
 import { organisationsCollection, propertiesCollection, propertyDoc } from "./db.js";
 import { initializeFirebase } from "./base.js";
-import { httpsCallable } from "firebase/functions";
+import { httpsCallable, HttpsCallableResult } from "firebase/functions";
 
 export type CreatePropertyPayload = {
     name: string;
     organisationId: string;
 };
 
-export function createNewProperty(propertyPayload: CreatePropertyPayload) {
+export function createNewProperty(
+    propertyPayload: CreatePropertyPayload,
+): Promise<HttpsCallableResult<string>> {
     const { functions } = initializeFirebase();
     return httpsCallable<CreatePropertyPayload, string>(
         functions,
@@ -17,7 +19,7 @@ export function createNewProperty(propertyPayload: CreatePropertyPayload) {
     )(propertyPayload);
 }
 
-export function deleteProperty(property: PropertyDoc) {
+export function deleteProperty(property: PropertyDoc): Promise<void> {
     return deleteDoc(propertyDoc(property.id, property.organisationId));
 }
 

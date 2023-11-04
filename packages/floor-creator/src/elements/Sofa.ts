@@ -57,7 +57,7 @@ export class Sofa extends fabric.Group {
     }
 }
 
-// @ts-ignore Register the Sofa class with Fabric
+// @ts-expect-error Register the Sofa class with Fabric
 fabric.Sofa = fabric.util.createClass(Sofa);
-// @ts-ignore Register the Sofa class with Fabric
+// @ts-expect-error Register the Sofa class with Fabric
 fabric.Sofa.fromObject = Sofa.fromObject;

@@ -56,10 +56,10 @@ export class DJBooth extends fabric.Group {
         return "";
     }
 
-    setBaseFill(val: string): void {
+    setBaseFill(): void {
         // imp
     }
 }
 
-// @ts-ignore Register the DJBooth class with Fabric
+// @ts-expect-error Register the DJBooth class with Fabric
 fabric.DJBooth = fabric.util.createClass(DJBooth);

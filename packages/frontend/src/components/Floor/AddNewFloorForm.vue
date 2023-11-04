@@ -10,15 +10,15 @@ const props = defineProps<Props>();
 const emit = defineEmits(["create"]);
 const floorName = ref("");
 
-function noSameFloorName(val: string) {
+function noSameFloorName(val: string): boolean | string {
     return !props.allFloorNames.has(val) || "Floor with the same name already exists!";
 }
 
-function onSubmit() {
+function onSubmit(): void {
     emit("create", floorName.value);
 }
 
-function onReset() {
+function onReset(): void {
     floorName.value = "";
 }
 </script>

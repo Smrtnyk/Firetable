@@ -7,7 +7,7 @@ import {
     EventOwner,
 } from "./db.js";
 import { initializeFirebase } from "./base.js";
-import { httpsCallable } from "firebase/functions";
+import { httpsCallable, HttpsCallableResult } from "firebase/functions";
 import {
     DocumentData,
     getDocs,
@@ -19,6 +19,7 @@ import {
     deleteDoc,
     query,
     where,
+    DocumentReference,
 } from "firebase/firestore";
 import { CreateEventPayload, EventDoc, GuestData } from "@firetable/types";
 import { Floor } from "@firetable/floor-creator";
@@ -63,41 +64,48 @@ export function updateEventProperty<T extends keyof EventDoc>(
     owner: EventOwner,
     key: T,
     value: EventDoc[T],
-) {
+): Promise<void> {
     return updateDoc(eventDoc(owner), {
         [key]: value,
     });
 }
 
-export function createNewEvent(eventPayload: CreateEventPayload) {
+type CreateNewEventReturn = {
+    id: string;
+    organisationId: string;
+    propertyId: string;
+};
+export function createNewEvent(
+    eventPayload: CreateEventPayload,
+): Promise<HttpsCallableResult<CreateNewEventReturn>> {
     const { functions } = initializeFirebase();
-    return httpsCallable<
-        CreateEventPayload,
-        {
-            id: string;
-            organisationId: string;
-            propertyId: string;
-        }
-    >(
+    return httpsCallable<CreateEventPayload, CreateNewEventReturn>(
         functions,
         "createEvent",
     )(eventPayload);
 }
 
-export function updateEventFloorData(owner: EventOwner, floor: Floor) {
+export function updateEventFloorData(owner: EventOwner, floor: Floor): Promise<void> {
     return updateDoc(eventFloorDoc(owner, floor.id), {
         json: floor.json,
     });
 }
 
-export function addGuestToGuestList(owner: EventOwner, payload: GuestData) {
+export function addGuestToGuestList(
+    owner: EventOwner,
+    payload: GuestData,
+): Promise<DocumentReference> {
     return addDoc(guestListCollection(owner), payload);
 }
 
-export function deleteGuestFromGuestList(owner: EventOwner, guestID: string) {
+export function deleteGuestFromGuestList(owner: EventOwner, guestID: string): Promise<void> {
     return deleteDoc(guestDoc(owner, guestID));
 }
 
-export function confirmGuestFromGuestList(owner: EventOwner, guestID: string, confirmed: boolean) {
+export function confirmGuestFromGuestList(
+    owner: EventOwner,
+    guestID: string,
+    confirmed: boolean,
+): Promise<void> {
     return updateDoc(guestDoc(owner, guestID), { confirmed });
 }

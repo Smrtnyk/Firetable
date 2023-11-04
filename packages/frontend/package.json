@@ -6,10 +6,11 @@
     "author": "Milan Keser",
     "private": true,
     "scripts": {
-        "lint": "eslint -c ../../.eslintrc.cjs ./src/** --fix",
+        "lint": "eslint . --ext .ts,.vue",
         "dev": "quasar dev",
         "dev:pwa": "quasar dev -m pwa",
         "build:spa": "quasar build",
+        "build": "quasar build",
         "build:pwa": "quasar build -m pwa",
         "typecheck": "vue-tsc --noEmit -p ./tsconfig.json",
         "test": "vitest"

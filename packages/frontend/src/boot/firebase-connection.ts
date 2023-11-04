@@ -6,7 +6,7 @@ import { showErrorMessage } from "src/helpers/ui-helpers";
 import { getCurrentUser, useCurrentUser, VueFire, VueFireAuth } from "vuefire";
 import { watch } from "vue";
 
-export default boot(({ router, app }) => {
+export default boot(({ router, app }): void => {
     const { firebaseApp } = initializeFirebase();
     app.use(VueFire, {
         firebaseApp,
@@ -24,7 +24,7 @@ export default boot(({ router, app }) => {
  * Firebase is finished with its initialization process,
  * and handle the user accordingly
  */
-function routerBeforeEach(router: Router, store: ReturnType<typeof useAuthStore>) {
+function routerBeforeEach(router: Router, store: ReturnType<typeof useAuthStore>): void {
     router.beforeEach(async (to) => {
         try {
             // Force the app to wait until Firebase has
@@ -64,7 +64,10 @@ function routerBeforeEach(router: Router, store: ReturnType<typeof useAuthStore>
     });
 }
 
-function handleOnAuthStateChanged(router: Router, authStore: ReturnType<typeof useAuthStore>) {
+function handleOnAuthStateChanged(
+    router: Router,
+    authStore: ReturnType<typeof useAuthStore>,
+): void {
     // Tell the application what to do when the
     // authentication state has changed */
     const currentUser = useCurrentUser();

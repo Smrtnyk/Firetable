@@ -52,7 +52,7 @@ const props = defineProps<Props>();
 let chartInstance: Chart | null = null;
 const reservedTables = computed(() => props.reservations.filter(propIsTruthy("reservation")));
 
-function reservationsReducer(acc: Res, { reservation }: BaseTable) {
+function reservationsReducer(acc: Res, { reservation }: BaseTable): Res {
     if (!reservation) return acc;
     const { reservedBy, confirmed } = reservation;
     const { email, name } = reservedBy;
@@ -73,7 +73,7 @@ function reservationsReducer(acc: Res, { reservation }: BaseTable) {
 function generateTablesByWaiterChartOptions(
     chartContainer: HTMLCanvasElement,
     reservations: BaseTable[],
-) {
+): void {
     const data = reservations.reduce(reservationsReducer, {});
 
     const colorData = getColors(Object.keys(data).length);

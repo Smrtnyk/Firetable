@@ -3,8 +3,8 @@ import { default as admin } from "firebase-admin";
 import serviceAccount from "./service-account.json" assert { type: "json" };
 
 const app = admin.initializeApp({
-    // @ts-ignore
-    credential: admin.credential.cert(serviceAccount)
+    // @ts-expect-error -- it has enough fields
+    credential: admin.credential.cert(serviceAccount),
 });
 
 export const db = app.firestore();
