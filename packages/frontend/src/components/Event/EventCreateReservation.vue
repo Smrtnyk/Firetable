@@ -71,7 +71,7 @@ function requireReservedBySelection(val: Reservation["reservedBy"]): boolean | s
     return !!val?.email || t(`EventCreateReservation.requireReservedBySelectionError`);
 }
 
-async function onOKClick(): void {
+async function onOKClick(): Promise<void> {
     if (!(await reservationForm.value?.validate())) return;
 
     if (props.mode === "create") {
