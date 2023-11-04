@@ -19,7 +19,7 @@ export async function createNewOrganisation(
     }
 }
 
-export function deleteOrganisation(organisationId: string) {
+export function deleteOrganisation(organisationId: string): Promise<void> {
     return deleteDoc(organisationDoc(organisationId));
 }
 

@@ -55,7 +55,7 @@ watch(
     { immediate: true },
 );
 
-function onCreateUserFormSubmit(newUser: CreateUserPayload) {
+function onCreateUserFormSubmit(newUser: CreateUserPayload): Promise<void | Promise<void>> | void {
     if (users.value.length > 150) {
         showErrorMessage(t("PageAdminUsers.maxAmountUsersCreationMessage", { limit: 150 }));
         return;
@@ -90,7 +90,7 @@ async function showCreateUserDialog(): Promise<void> {
     });
 }
 
-async function showEditUserDialog(user: User, reset: () => void) {
+async function showEditUserDialog(user: User, reset: () => void): Promise<void> {
     if (
         !(await showConfirm(t("PageAdminUsers.editUserConfirmationMessage", { name: user.name })))
     ) {
@@ -115,11 +115,11 @@ async function showEditUserDialog(user: User, reset: () => void) {
                 organisation,
             },
             listeners: {
-                submit: async (user: CreateUserPayload) => {
+                submit: async (userPayload: CreateUserPayload) => {
                     await onUpdateUser({
-                        userId: user.id,
-                        organisationId: user.organisationId,
-                        updatedUser: user,
+                        userId: userPayload.id,
+                        organisationId: userPayload.organisationId,
+                        updatedUser: userPayload,
                     });
                     quasar.notify("User updated successfully!");
                     dialog.hide();
@@ -130,7 +130,7 @@ async function showEditUserDialog(user: User, reset: () => void) {
     dialog.onDismiss(reset);
 }
 
-async function onUserSlideRight(user: User, reset: () => void) {
+async function onUserSlideRight(user: User, reset: () => void): Promise<void> {
     if (await showConfirm("Delete user?")) {
         return onDeleteUser(user);
     }

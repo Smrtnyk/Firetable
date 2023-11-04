@@ -12,14 +12,21 @@ import { FieldValue } from "firebase-admin/firestore";
  * @param context - Context of the event that triggered the function.
  * @throws Throws error if there's an issue cleaning up the data.
  */
-export async function onUserDeletedFn(snap: functions.firestore.QueryDocumentSnapshot, context: functions.EventContext<{ userId: string, organisationId: string }>): Promise<void> {
+export async function onUserDeletedFn(
+    snap: functions.firestore.QueryDocumentSnapshot,
+    context: functions.EventContext<{
+        userId: string;
+        organisationId: string;
+    }>,
+): Promise<void> {
     const userId = context.params.userId;
     const organisationId = context.params.organisationId;
     logger.info(`Cleaning up data for deleted user with id: ${userId}`);
 
     try {
         // Fetch properties associated with the user
-        const propertiesSnapshot = await db.collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}`)
+        const propertiesSnapshot = await db
+            .collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}`)
             .where("relatedUsers", "array-contains", userId)
             .get();
 
@@ -29,19 +36,25 @@ export async function onUserDeletedFn(snap: functions.firestore.QueryDocumentSna
         }
 
         const batch = db.batch();
-        propertiesSnapshot.docs.forEach(doc => {
+        propertiesSnapshot.docs.forEach((doc) => {
             const propertyRef = doc.ref;
-            logger.debug(`Scheduling update to remove user ID from property document with id: ${doc.id}`);
+            logger.debug(
+                `Scheduling update to remove user ID from property document with id: ${doc.id}`,
+            );
             batch.update(propertyRef, {
-                relatedUsers: FieldValue.arrayRemove(userId)
+                relatedUsers: FieldValue.arrayRemove(userId),
             });
         });
 
         await batch.commit();
-        logger.info(`Successfully removed user ${userId} from associated properties' relatedUsers field.`);
-
+        logger.info(
+            `Successfully removed user ${userId} from associated properties' relatedUsers field.`,
+        );
     } catch (error) {
         logger.error(`Error cleaning up data for user ${userId}:`, error);
-        throw new functions.https.HttpsError("internal", `Error cleaning up data for user ${userId}`);
+        throw new functions.https.HttpsError(
+            "internal",
+            `Error cleaning up data for user ${userId}`,
+        );
     }
 }

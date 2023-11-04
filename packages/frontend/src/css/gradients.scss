@@ -1,10 +1,5 @@
 @import "quasar.variables";
 
-.bg-warning-shadow {
-    box-shadow: 0 0 5px 5px rgba($warning, 0.15);
-    background: rgba($warning, 0.15);
-}
-
 .gradient-warning {
     background: rgba($warning, 0.85);
 }
@@ -27,17 +22,4 @@
         background-position: 10%;
         background-color: unset;
     }
-}
-
-.text-gradient {
-    background: $gradient-primary;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    -webkit-box-decoration-break: clone;
-    box-decoration-break: clone;
-    text-shadow: none;
-}
-
-.bg-gradient {
-    background: $gradient-primary;
 }

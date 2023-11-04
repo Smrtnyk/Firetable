@@ -53,16 +53,16 @@ const state = reactive<State>({
 });
 
 watch([() => state.selectedDate, () => state.selectedTime], () => {
-    const [day, month, year] = state.selectedDate.split("-");
-    const combinedDateTime = `${year}-${month}-${day}T${state.selectedTime}:00Z`;
+    const [dayVal, monthVal, yearVal] = state.selectedDate.split("-");
+    const combinedDateTime = `${yearVal}-${monthVal}-${dayVal}T${state.selectedTime}:00Z`;
     state.form.date = new Date(combinedDateTime).getTime();
 });
 
-function updateDate(newDate: string) {
-    state.selectedDate = newDate;
+function updateDate(newDateVal: any): void {
+    state.selectedDate = newDateVal;
 }
 
-function updateTime(newTime: any) {
+function updateTime(newTime: any): void {
     state.selectedTime = newTime;
 }
 
@@ -74,7 +74,7 @@ const totalFloors = computed(() => {
     return props.property.floors.length;
 });
 
-function onSubmit() {
+async function onSubmit(): Promise<void> {
     if (!state.chosenFloors.length) {
         showErrorMessage(t("EventCreateForm.noChosenFloorsMessage"));
         return;
@@ -89,7 +89,7 @@ function onSubmit() {
         return;
     }
 
-    if (!form.value?.validate()) {
+    if (!(await form.value?.validate())) {
         return;
     }
     emit("create", {
@@ -101,7 +101,7 @@ function onSubmit() {
     state.form = eventObj;
 }
 
-function onReset() {
+function onReset(): void {
     state.form = { ...eventObj };
 }
 </script>

@@ -3,7 +3,7 @@ import { not } from "./not";
 
 describe("not", () => {
     it("returns a function that negates the result of the input function", () => {
-        const isEven = (n: number) => n % 2 === 0;
+        const isEven = (n: number): boolean => n % 2 === 0;
         const isOdd = not(isEven);
 
         expect(isOdd(3)).toBe(true);
@@ -11,7 +11,7 @@ describe("not", () => {
     });
 
     it("works with functions that take multiple arguments", () => {
-        const isGreaterThan = (a: number, b: number) => a > b;
+        const isGreaterThan = (a: number, b: number): boolean => a > b;
         const isNotGreaterThan = not(isGreaterThan);
 
         expect(isNotGreaterThan(3, 2)).toBe(false);
@@ -19,7 +19,7 @@ describe("not", () => {
     });
 
     it("does not modify the input function", () => {
-        const fn = (x: string) => x === "foo";
+        const fn = (x: string): boolean => x === "foo";
         const negatedFn = not(fn);
 
         expect(fn("foo")).toBe(true);

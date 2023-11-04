@@ -7,6 +7,6 @@ export { takeLast } from "./take-last";
 export { takeProp } from "./take-prop";
 export * from "./type-guards";
 
-export function NOOP() {
+export function NOOP(): void {
     /* EMPTY */
 }

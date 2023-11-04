@@ -13,36 +13,40 @@ import { FieldValue } from "firebase-admin/firestore";
  */
 export async function onPropertyDeletedFn(
     snap: functions.firestore.QueryDocumentSnapshot,
-    context: functions.EventContext
+    context: functions.EventContext,
 ): Promise<void> {
     const propertyId = context.params.propertyId;
     const organisationid = context.params.organisationid;
 
     try {
         // 1. Cleanup associated user-property mappings
-        const usersSnapshot = await db.collection(`${Collection.ORGANISATIONS}/${organisationid}/${Collection.USERS}`)
+        const usersSnapshot = await db
+            .collection(`${Collection.ORGANISATIONS}/${organisationid}/${Collection.USERS}`)
             .where("relatedProperties", "array-contains", propertyId)
             .get();
 
         const batch = db.batch();
 
         if (!usersSnapshot.empty) {
-            usersSnapshot.docs.forEach(doc => {
+            usersSnapshot.docs.forEach((doc) => {
                 const userRef = doc.ref;
-                functions.logger.debug(`Scheduling update to remove property ID from user document with id: ${doc.id}`);
+                functions.logger.debug(
+                    `Scheduling update to remove property ID from user document with id: ${doc.id}`,
+                );
                 batch.update(userRef, {
-                    relatedProperties: FieldValue.arrayRemove(propertyId)
+                    relatedProperties: FieldValue.arrayRemove(propertyId),
                 });
             });
         }
 
         // 2. Delete associated floors
-        const floorsSnapshot = await db.collection(Collection.FLOORS)
+        const floorsSnapshot = await db
+            .collection(Collection.FLOORS)
             .where("propertyId", "==", propertyId)
             .get();
 
         if (!floorsSnapshot.empty) {
-            floorsSnapshot.docs.forEach(doc => {
+            floorsSnapshot.docs.forEach((doc) => {
                 functions.logger.debug(`Scheduling deletion of floor document with id: ${doc.id}`);
                 batch.delete(doc.ref);
             });
@@ -52,7 +56,6 @@ export async function onPropertyDeletedFn(
         await batch.commit();
 
         functions.logger.info(`Successfully handled deletion tasks for property ${propertyId}`);
-
     } catch (error) {
         functions.logger.error("Error handling property deletion tasks:", error);
         throw new Error(`Failed to handle deletion tasks for property ${propertyId}`);

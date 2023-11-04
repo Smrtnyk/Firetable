@@ -14,7 +14,7 @@ const isInputEnabled = ref(false);
 const newPassword = ref("");
 const passwordInput = ref<HTMLElement | null>(null);
 
-function toggleInput() {
+function toggleInput(): void {
     isInputEnabled.value = !isInputEnabled.value;
     if (isInputEnabled.value) {
         nextTick(() => {
@@ -32,7 +32,7 @@ const avatar = computed(() => {
     return `${first[0]}${last[0]}`;
 });
 
-async function changePassword() {
+async function changePassword(): Promise<void> {
     if (!newPassword.value) return; // Add more validations if needed
 
     await tryCatchLoadingWrapper({

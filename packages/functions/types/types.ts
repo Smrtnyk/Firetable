@@ -18,7 +18,7 @@ export enum Role {
 }
 
 // Cannot import this because functions deploy
-export interface CreateUserPayload{
+export interface CreateUserPayload {
     id: string;
     name: string;
     email: string;
@@ -50,7 +50,7 @@ export interface EditUserPayload {
     };
 }
 
-export interface CreateEventForm {
+interface CreateEventForm {
     name: string;
     date: string;
     guestListLimit: number;
@@ -58,7 +58,7 @@ export interface CreateEventForm {
     entryPrice: number;
 }
 
-export interface FloorDoc {
+interface FloorDoc {
     id: string;
     name: string;
     width: number;

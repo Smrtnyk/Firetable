@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node_version: ['18']
+        node_version: ['20']
         os: [ubuntu-latest]
 
     steps:
@@ -26,6 +26,9 @@ jobs:
       run: |
         npm install -g pnpm
         pnpm install
+        pnpm run lint
+        pnpm run build
+        pnpm run test
   sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest

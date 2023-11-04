@@ -33,7 +33,7 @@ const appStore = useAppStore();
             />
             <q-space />
             <q-btn flat aria-label="Menu" @click="appStore.toggleAppDrawerVisibility">
-                <q-icon class="text-gradient" size="2rem" name="menu" />
+                <q-icon size="2rem" name="menu" />
             </q-btn>
         </q-tabs>
     </q-header>

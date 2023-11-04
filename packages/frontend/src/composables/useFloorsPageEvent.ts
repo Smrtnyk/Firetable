@@ -1,27 +1,19 @@
-import { watch, reactive, computed, Ref, ref, nextTick, onBeforeUnmount } from "vue";
-import { EventDoc, FloorDoc, Reservation, Role } from "@firetable/types";
+import { watch, reactive, computed, Ref, ref, nextTick } from "vue";
+import { EventDoc, FloorDoc, Role } from "@firetable/types";
 import {
     BaseTable,
     FloorViewer,
     FloorEditorElement,
     FloorMode,
-    getFreeTables,
-    getReservedTables,
     getTables,
     isTable,
     Floor,
 } from "@firetable/floor-creator";
-import FTDialog from "components/FTDialog.vue";
-import EventShowReservation from "components/Event/EventShowReservation.vue";
-import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { EventOwner, updateEventFloorData } from "@firetable/backend";
-import EventCreateReservation from "components/Event/EventCreateReservation.vue";
-import { takeProp } from "@firetable/utils";
+import { EventOwner } from "@firetable/backend";
 import { useAuthStore } from "stores/auth-store";
-import { DialogChainObject, useQuasar } from "quasar";
-import { useI18n } from "vue-i18n";
 import { VueFirestoreDocumentData } from "vuefire";
 import { useUsers } from "src/composables/useUsers";
+import { useReservations } from "src/composables/useReservations";
 
 interface State {
     activeTablesAnimationInterval: number | null;
@@ -29,31 +21,28 @@ interface State {
     floorInstances: Set<FloorViewer>;
 }
 
-const HALF_HOUR = 30 * 60 * 1000; // 30 minutes in milliseconds
-
-export default function useFloorsPageEvent(
+export function useFloorsPageEvent(
     eventFloors: Ref<FloorDoc[]>,
     pageRef: Ref<HTMLDivElement | undefined>,
     eventOwner: EventOwner,
     event: Ref<VueFirestoreDocumentData<EventDoc> | undefined>,
 ) {
-    const { t } = useI18n();
-    const q = useQuasar();
     const authStore = useAuthStore();
-    const { users } = useUsers();
-    const currentUser = computed(() => authStore.user);
-    const canvases = reactive<Map<string, HTMLCanvasElement>>(new Map());
     const state = ref<State>({
         activeTablesAnimationInterval: null,
         floorInstances: new Set(),
         activeFloor: void 0,
     });
-    // check every 1 minute
-    const intervalID = setInterval(checkReservationsForTimeAndMarkTableIfNeeded, 60 * 1000);
-
-    const allReservedTables = computed(() => {
-        return Array.from(state.value.floorInstances).map(getReservedTables).flat();
-    });
+    const { users } = useUsers();
+    const {
+        showReservation,
+        checkReservationsForTimeAndMarkTableIfNeeded,
+        showCreateReservationDialog,
+        swapOrTransferReservations,
+        allReservedTables,
+    } = useReservations(users, state.value.floorInstances, eventOwner, event);
+    const currentUser = computed(() => authStore.user);
+    const canvases = reactive<Map<string, HTMLCanvasElement>>(new Map());
 
     // For now, disable reservation ability for staff,
     // but it should be configurable in the future
@@ -61,26 +50,9 @@ export default function useFloorsPageEvent(
         return currentUser.value?.role !== Role.STAFF;
     });
 
-    let currentOpenCreateReservationDialog: {
-        label: string;
-        dialog: DialogChainObject;
-        floorId: string;
-    } | null = null;
-
-    const freeTablesPerFloor = computed(() => {
-        const freeTablesMap = new Map<string, string[]>();
-
-        for (const floor of state.value.floorInstances) {
-            freeTablesMap.set(floor.id, getFreeTables(floor).map(takeProp("label")));
-        }
-        return freeTablesMap;
-    });
-
-    watch(freeTablesPerFloor, checkIfReservedTableAndCloseCreateReservationDialog);
-
     watch(() => eventFloors.value, handleFloorInstancesData, { deep: true });
 
-    function onTableFound(tables: BaseTable[]) {
+    function onTableFound(tables: BaseTable[]): void {
         onAutocompleteClear();
         for (const table of tables) {
             table.startAnimation();
@@ -88,7 +60,7 @@ export default function useFloorsPageEvent(
         state.value.floorInstances.forEach((floor) => floor.canvas.renderAll());
     }
 
-    function updateFloorInstancesData() {
+    function updateFloorInstancesData(): void {
         if (!eventFloors.value.length) return;
 
         for (const floorInstance of state.value.floorInstances) {
@@ -100,14 +72,14 @@ export default function useFloorsPageEvent(
         checkReservationsForTimeAndMarkTableIfNeeded();
     }
 
-    async function initFloorInstancesData() {
+    async function initFloorInstancesData(): Promise<void> {
         await nextTick();
         instantiateFloors();
         setActiveFloor([...state.value.floorInstances][0]);
         checkReservationsForTimeAndMarkTableIfNeeded();
     }
 
-    async function handleFloorInstancesData(newVal: FloorDoc[], old: FloorDoc[]) {
+    async function handleFloorInstancesData(newVal: FloorDoc[], old: FloorDoc[]): Promise<void> {
         if (!eventFloors.value) return;
         if ((!old.length && newVal.length) || state.value.floorInstances.size === 0) {
             await initFloorInstancesData();
@@ -122,11 +94,11 @@ export default function useFloorsPageEvent(
         };
     }
 
-    function instantiateFloors() {
+    function instantiateFloors(): void {
         eventFloors.value.forEach(instantiateFloor);
     }
 
-    function instantiateFloor(floorDoc: FloorDoc) {
+    function instantiateFloor(floorDoc: FloorDoc): void {
         const canvas = canvases.get(floorDoc.id);
 
         if (!canvas || !pageRef.value) return;
@@ -151,7 +123,7 @@ export default function useFloorsPageEvent(
         }
     }
 
-    function tableClickHandler(floor: Floor, element: FloorEditorElement | undefined) {
+    function tableClickHandler(floor: Floor, element: FloorEditorElement | undefined): void {
         if (!isTable(element)) {
             return;
         }
@@ -170,128 +142,6 @@ export default function useFloorsPageEvent(
         showCreateReservationDialog(floor, element, "create");
     }
 
-    function showReservation(floor: Floor, reservation: Reservation, element: BaseTable) {
-        q.dialog({
-            component: FTDialog,
-            componentProps: {
-                component: EventShowReservation,
-                title: `${t("EventShowReservation.title")} ${element.label}`,
-                maximized: false,
-                componentPropsObject: {
-                    reservation,
-                },
-                listeners: {
-                    delete: () => {
-                        onDeleteReservation(floor, element).catch(showErrorMessage);
-                    },
-                    edit() {
-                        onEditReservation(floor, element);
-                    },
-                    confirm: onReservationConfirm(floor, element),
-                },
-            },
-        });
-    }
-
-    function onReservationConfirm(floor: Floor, element: BaseTable) {
-        return function (val: boolean) {
-            const { reservation } = element;
-            if (!reservation) return;
-            element?.setReservation({
-                ...reservation,
-                confirmed: val,
-            });
-            return tryCatchLoadingWrapper({
-                hook: () => updateEventFloorData(eventOwner, floor),
-            });
-        };
-    }
-
-    function showCreateReservationDialog(
-        floor: Floor,
-        element: BaseTable,
-        mode: "create" | "edit",
-    ) {
-        const { label } = element;
-        const dialog = q
-            .dialog({
-                component: FTDialog,
-                componentProps: {
-                    component: EventCreateReservation,
-                    title: `${t("EventShowReservation.title")} ${label}`,
-                    maximized: false,
-                    componentPropsObject: {
-                        users: users.value,
-                        mode,
-                        reservationData: mode === "edit" ? element.reservation : void 0,
-                    },
-                    listeners: {
-                        create: (reservationData: Reservation) => {
-                            resetCurrentOpenCreateReservationDialog();
-                            handleReservationCreation(floor, reservationData, element);
-                            dialog.hide();
-                        },
-                        update(reservationData: Reservation) {
-                            handleReservationCreation(floor, reservationData, element);
-                            dialog.hide();
-                        },
-                    },
-                },
-            })
-            .onDismiss(resetCurrentOpenCreateReservationDialog);
-
-        if (mode === "create") {
-            currentOpenCreateReservationDialog = {
-                label,
-                dialog,
-                floorId: floor.id,
-            };
-        }
-    }
-
-    function resetCurrentOpenCreateReservationDialog() {
-        currentOpenCreateReservationDialog = null;
-    }
-
-    async function onDeleteReservation(floor: Floor, element: BaseTable) {
-        if (!(await showConfirm("Delete reservation?")) || !element.reservation) return;
-        element?.setReservation(null);
-
-        await tryCatchLoadingWrapper({
-            hook: () => updateEventFloorData(eventOwner, floor),
-        });
-    }
-
-    function onEditReservation(floor: Floor, element: BaseTable) {
-        console.log(floor, element);
-        showCreateReservationDialog(floor, element, "edit");
-    }
-
-    function handleReservationCreation(
-        floor: Floor,
-        reservationData: Reservation,
-        table: BaseTable,
-    ) {
-        table?.setReservation(reservationData);
-        void tryCatchLoadingWrapper({
-            hook: () => updateEventFloorData(eventOwner, floor),
-        });
-    }
-
-    function checkIfReservedTableAndCloseCreateReservationDialog() {
-        if (!currentOpenCreateReservationDialog) return;
-
-        const { dialog, label, floorId } = currentOpenCreateReservationDialog;
-        const freeTables = freeTablesPerFloor.value.get(floorId);
-        const isTableStillFree = freeTables?.includes(label);
-
-        if (isTableStillFree) return;
-
-        dialog.hide();
-        currentOpenCreateReservationDialog = null;
-        showErrorMessage(t("PageEvent.reservationAlreadyReserved"));
-    }
-
     function onAutocompleteClear(): void {
         if (state.value.activeTablesAnimationInterval) {
             clearInterval(state.value.activeTablesAnimationInterval);
@@ -303,77 +153,13 @@ export default function useFloorsPageEvent(
         });
     }
 
-    async function swapOrTransferReservations(floor: Floor, table1: BaseTable, table2: BaseTable) {
-        if (!table1.reservation) {
-            return;
-        }
-        const transferMessage = `This will transfer reservation from table ${table1.label} to table ${table2.label}`;
-        const shouldTransfer = await showConfirm("Transfer reservation", transferMessage);
-
-        console.log(shouldTransfer);
-        console.log(table1.reservation, table2.reservation);
-        if (!shouldTransfer) {
-            return;
-        }
-        const table1Reservation = { ...table1.reservation };
-        if (table2.reservation) {
-            table1.setReservation({ ...table2.reservation });
-        } else {
-            table1.setReservation(null);
-        }
-        table2.setReservation(table1Reservation);
-
-        await tryCatchLoadingWrapper({
-            hook: () => updateEventFloorData(eventOwner, floor),
-        });
-    }
-
-    function checkReservationsForTimeAndMarkTableIfNeeded() {
-        if (!event.value?.date) {
-            return;
-        }
-
-        const baseEventDate = new Date(event.value.date);
-        const allReservedTables = Array.from(state.value.floorInstances).flatMap(getReservedTables);
-
-        if (!allReservedTables.length) {
-            return;
-        }
-
-        const currentDate = new Date();
-
-        for (const table of allReservedTables) {
-            // Only mark non-confirmed reservations
-            if (table.reservation?.confirmed) {
-                continue;
-            }
-            const [hours, minutes] = table.reservation!.time.split(":");
-            const eventDateTime = new Date(baseEventDate);
-            eventDateTime.setHours(parseInt(hours), parseInt(minutes));
-
-            // Check if time is starting with "0", for example 01:00, it means it is next day in the morning,
-            // so we need to adjust the date to the next day
-            if (hours.startsWith("0")) {
-                eventDateTime.setDate(eventDateTime.getDate() + 1);
-            }
-
-            if (currentDate.getTime() - eventDateTime.getTime() >= HALF_HOUR) {
-                table.setFill("red");
-            }
-        }
-    }
-
-    onBeforeUnmount(() => {
-        clearInterval(intervalID);
-    });
-
     return {
-        allReservedTables,
         onTableFound,
         onAutocompleteClear,
         mapFloorToCanvas,
         isActiveFloor,
         setActiveFloor,
         useFloorsPageEventState: state,
+        allReservedTables,
     };
 }

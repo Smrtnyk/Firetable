@@ -29,5 +29,5 @@
         }
     },
     "include": ["src"],
-    "exclude": ["dist", ".quasar", "node_modules"]
+    "exclude": ["dist", ".quasar", "node_modules", "src/**/*.spec.ts", "vitest.config.ts"]
 }

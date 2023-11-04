@@ -17,19 +17,18 @@ import { logger } from "firebase-functions";
 const MIN_PASSWORD_LENGTH = 6;
 
 // Everything that has to do with events
-export const createEvent = functions
-    .region("europe-west3")
-    .https
-    .onCall(createEventFn);
+export const createEvent = functions.region("europe-west3").https.onCall(createEventFn);
 
 // Everything that has to do with auth
 export const changePassword = functions
     .region("europe-west3")
-    .https
-    .onCall(async (data: { newPassword: string }, context) => {
+    .https.onCall(async (data: { newPassword: string }, context) => {
         if (!context.auth) {
             logger.error("Unauthenticated user tried to change password.");
-            throw new functions.https.HttpsError("unauthenticated", "The function must be called while authenticated.");
+            throw new functions.https.HttpsError(
+                "unauthenticated",
+                "The function must be called while authenticated.",
+            );
         }
 
         const uid: string = context.auth.uid;
@@ -37,7 +36,10 @@ export const changePassword = functions
 
         if (!newPassword || newPassword.length < MIN_PASSWORD_LENGTH) {
             logger.error("Invalid password provided by user:", uid);
-            throw new functions.https.HttpsError("invalid-argument", "Password must be at least 6 characters long!");
+            throw new functions.https.HttpsError(
+                "invalid-argument",
+                "Password must be at least 6 characters long!",
+            );
         }
 
         try {
@@ -49,53 +51,35 @@ export const changePassword = functions
             throw new functions.https.HttpsError("internal", "Failed to update the user password.");
         }
     });
-export const fetchUsersByRole = functions
-    .region("europe-west3")
-    .https
-    .onCall(fetchUsersByRoleFn);
-export const createUser = functions
-    .region("europe-west3")
-    .https
-    .onCall(createUserFn);
-export const updateUser = functions
-    .region("europe-west3")
-    .https
-    .onCall(updateUserFn);
-export const deleteUser = functions
-    .region("europe-west3")
-    .https
-    .onCall(deleteUserFn);
+export const fetchUsersByRole = functions.region("europe-west3").https.onCall(fetchUsersByRoleFn);
+export const createUser = functions.region("europe-west3").https.onCall(createUserFn);
+export const updateUser = functions.region("europe-west3").https.onCall(updateUserFn);
+export const deleteUser = functions.region("europe-west3").https.onCall(deleteUserFn);
 export const onUserDeleted = functions
     .region("europe-west3")
-    .firestore
-    .document(`${Collection.ORGANISATIONS}/{organisationId}/${Collection.USERS}/{userId}`)
+    .firestore.document(`${Collection.ORGANISATIONS}/{organisationId}/${Collection.USERS}/{userId}`)
     .onDelete(onUserDeletedFn);
 
 // Properties
-export const createProperty = functions
-    .region("europe-west3")
-    .https
-    .onCall(createPropertyFn);
+export const createProperty = functions.region("europe-west3").https.onCall(createPropertyFn);
 export const onPropertyDelete = functions
     .region("europe-west3")
-    .firestore
-    .document(`${Collection.ORGANISATIONS}/{organisationId}/${Collection.PROPERTIES}/{propertyId}`)
+    .firestore.document(
+        `${Collection.ORGANISATIONS}/{organisationId}/${Collection.PROPERTIES}/{propertyId}`,
+    )
     .onDelete(onPropertyDeletedFn);
 export const onPropertyDeleteCleanupEvents = functions
     .region("europe-west3")
-    .firestore
-    .document(`${Collection.ORGANISATIONS}/{organisationId}/${Collection.PROPERTIES}/{propertyId}`)
+    .firestore.document(
+        `${Collection.ORGANISATIONS}/{organisationId}/${Collection.PROPERTIES}/{propertyId}`,
+    )
     .onDelete(onPropertyDeletedCleanEvents);
 
 // Generic stuff
-export const deleteCollection = functions
-    .region("europe-west3")
-    .https
-    .onCall(deleteDocument);
+export const deleteCollection = functions.region("europe-west3").https.onCall(deleteDocument);
 
 // Crons
 export const clearOldEvents = functions
     .region("europe-west3")
-    .pubsub
-    .schedule("every day 00:00")
+    .pubsub.schedule("every day 00:00")
     .onRun(clearOldEventsFn);

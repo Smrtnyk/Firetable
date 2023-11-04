@@ -11,7 +11,7 @@ import { SingleSofa } from "./elements/SingleSofa";
 import { Stage } from "./elements/Stage";
 
 export class ElementManager {
-    addElement(options: CreateElementOptions) {
+    addElement(options: CreateElementOptions): RectTable | RoundTable | Wall | Sofa | DJBooth {
         return match(options.tag)
             .with(ElementTag.RECT, () => this.addRectTableElement(options))
             .with(ElementTag.CIRCLE, () => this.addRoundTableElement(options))
@@ -23,27 +23,27 @@ export class ElementManager {
             .exhaustive();
     }
 
-    private addWall({ x, y }: CreateElementOptions) {
+    private addWall({ x, y }: CreateElementOptions): Wall {
         return new Wall({ left: x, top: y });
     }
 
-    private addDJBooth({ x, y }: CreateElementOptions) {
+    private addDJBooth({ x, y }: CreateElementOptions): DJBooth {
         return new DJBooth(x, y);
     }
 
-    private addSofaElement({ x, y }: CreateElementOptions) {
+    private addSofaElement({ x, y }: CreateElementOptions): Sofa {
         return new Sofa({ left: x, top: y });
     }
 
-    private addSingleSofaElement({ x, y }: CreateElementOptions) {
+    private addSingleSofaElement({ x, y }: CreateElementOptions): SingleSofa {
         return new SingleSofa({ left: x, top: y });
     }
 
-    private addStageElement({ x, y }: CreateElementOptions) {
+    private addStageElement({ x, y }: CreateElementOptions): Stage {
         return new Stage(x, y);
     }
 
-    private addRoundTableElement({ label, x, y }: CreateElementOptions) {
+    private addRoundTableElement({ label, x, y }: CreateElementOptions): RoundTable {
         this.verifyLabel(label);
         const table = new RoundTable({
             groupOptions: {
@@ -58,7 +58,7 @@ export class ElementManager {
         return table;
     }
 
-    private addRectTableElement({ label, x, y }: CreateElementOptions) {
+    private addRectTableElement({ label, x, y }: CreateElementOptions): RectTable {
         this.verifyLabel(label);
         const table = new RectTable({
             groupOptions: {

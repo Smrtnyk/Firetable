@@ -33,14 +33,14 @@ function formatFromTimestamp(timestamp: number, format: string): string {
     return formattedString;
 }
 
-export function formatEventDate(timestamp: number) {
+export function formatEventDate(timestamp: number): string {
     return formatFromTimestamp(timestamp, "DD-MM-YYYY HH:mm");
 }
 
-export function dateFromTimestamp(timestamp: number) {
+export function dateFromTimestamp(timestamp: number): string {
     return formatFromTimestamp(timestamp, "DD-MM-YYYY");
 }
 
-export function hourFromTimestamp(timestamp: number) {
+export function hourFromTimestamp(timestamp: number): string {
     return formatFromTimestamp(timestamp, "HH:mm");
 }

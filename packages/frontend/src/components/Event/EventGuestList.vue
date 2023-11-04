@@ -36,7 +36,7 @@ const { t } = useI18n();
 const reachedCapacity = computed(() => props.guestList.length / props.guestListLimit);
 const isGuestListFull = computed(() => props.guestList.length >= props.guestListLimit);
 
-function onCreate(newGuestData: GuestData) {
+function onCreate(newGuestData: GuestData): Promise<void> | undefined {
     if (props.guestList.length >= props.guestListLimit) {
         showErrorMessage(t("EventGuestList.guestLimitReached"));
         return;
@@ -47,7 +47,7 @@ function onCreate(newGuestData: GuestData) {
     });
 }
 
-async function deleteGuest(id: string, reset: () => void) {
+async function deleteGuest(id: string, reset: () => void): Promise<void> {
     if (!(await showConfirm(t("EventGuestList.deleteGuestTitle")))) return reset();
 
     await tryCatchLoadingWrapper({

@@ -1,7 +1,7 @@
-import { createRouter, createWebHashHistory, createWebHistory } from "vue-router";
+import { createRouter, createWebHashHistory, createWebHistory, Router } from "vue-router";
 import routes from "./routes";
 
-export default function () {
+export default function (): Router {
     const createHistory =
         process.env.VUE_ROUTER_MODE === "history" ? createWebHistory : createWebHashHistory;
 

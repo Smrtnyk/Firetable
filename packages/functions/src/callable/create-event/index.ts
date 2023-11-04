@@ -34,9 +34,8 @@ const { logger } = functions;
  */
 export async function createEvent(
     eventPayload: CreateEventPayload,
-    context: functions.https.CallableContext
-): Promise<{ id: string, propertyId: string, organisationId: string }> {
-
+    context: functions.https.CallableContext,
+): Promise<{ id: string; propertyId: string; organisationId: string }> {
     // Check for the presence of floors.
     if (!eventPayload.floors || eventPayload.floors.length === 0) {
         throw new functions.https.HttpsError("invalid-argument", "Floors data is required.");
@@ -44,24 +43,31 @@ export async function createEvent(
 
     // Authentication check.
     if (!context.auth) {
-        throw new functions.https.HttpsError("failed-precondition", "The function must be called while authenticated.");
+        throw new functions.https.HttpsError(
+            "failed-precondition",
+            "The function must be called while authenticated.",
+        );
     }
 
-    const { date, floors, entryPrice, guestListLimit, name, propertyId, organisationId } = eventPayload;
+    const { date, floors, entryPrice, guestListLimit, name, propertyId, organisationId } =
+        eventPayload;
     const id = db.collection(Collection.EVENTS).doc().id;
     logger.info(`Creating event with ID: ${id}`);
 
     const creator = context.auth.token.email;
 
-
-    return db.runTransaction(async transaction => {
-        const eventRef = db.collection([
-            Collection.ORGANISATIONS,
-            organisationId,
-            Collection.PROPERTIES,
-            propertyId,
-            Collection.EVENTS
-        ].join("/")).doc(id);
+    return db.runTransaction(async (transaction) => {
+        const eventRef = db
+            .collection(
+                [
+                    Collection.ORGANISATIONS,
+                    organisationId,
+                    Collection.PROPERTIES,
+                    propertyId,
+                    Collection.EVENTS,
+                ].join("/"),
+            )
+            .doc(id);
 
         transaction.set(eventRef, {
             name,
@@ -71,15 +77,18 @@ export async function createEvent(
             reservedPercentage: 0,
             guestListLimit,
             propertyId,
-            organisationId
+            organisationId,
         });
 
-        floors.forEach(floor => {
+        floors.forEach((floor) => {
             if (floor.id) {
                 const floorRef = eventRef.collection(Collection.FLOORS).doc(floor.id);
                 transaction.set(floorRef, floor);
             } else {
-                throw new functions.https.HttpsError("invalid-argument", "Invalid floor data provided.");
+                throw new functions.https.HttpsError(
+                    "invalid-argument",
+                    "Invalid floor data provided.",
+                );
             }
         });
 

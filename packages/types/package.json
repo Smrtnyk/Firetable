@@ -9,7 +9,7 @@
         "./types": "./dist/src/index.d.ts"
     },
     "scripts": {
-        "build:types": "tsc"
+        "build": "tsc"
     },
     "keywords": [],
     "author": "",

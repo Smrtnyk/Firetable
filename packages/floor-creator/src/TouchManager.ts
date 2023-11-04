@@ -13,7 +13,7 @@ export class TouchManager {
     constructor(floor: Floor) {
         this.floor = floor;
 
-        // @ts-ignore -- private prop
+        // @ts-expect-error -- private prop
         const upperCanvasEl = this.floor.canvas.upperCanvasEl as HTMLElement;
         this.hammerManager = new Manager(upperCanvasEl);
 
@@ -37,13 +37,16 @@ export class TouchManager {
         this.hammerManager.on("doubletap", this.onDoubleTap);
     }
 
-    private onDoubleTap = (ev: HammerInput) => {
+    private onDoubleTap = (ev: HammerInput): void => {
         const { x, y } = this.extractEventCoordinates(ev);
         this.floor.onFloorDoubleTap([x, y]);
     };
 
-    private extractEventCoordinates(ev: HammerInput): { x: number; y: number } {
-        // @ts-ignore -- private prop
+    private extractEventCoordinates(ev: HammerInput): {
+        x: number;
+        y: number;
+    } {
+        // @ts-expect-error -- private prop
         // Get the bounding rectangle of the canvas
         const boundingRect = this.floor.canvas.lowerCanvasEl.getBoundingClientRect();
 
@@ -61,7 +64,7 @@ export class TouchManager {
         return { x, y };
     }
 
-    private onPinch = (ev: HammerInput) => {
+    private onPinch = (ev: HammerInput): void => {
         const scale = ev.scale;
         // Adjust the scale based on a dampening factor to control zoom sensitivity
         const adjustedScale = 1 + (scale - 1) * DAMPENING_FACTOR;
@@ -69,16 +72,7 @@ export class TouchManager {
         this.floor.zoomManager.zoomToPoint(center, adjustedScale);
     };
 
-    setViewportTransform(x: number, y: number) {
-        const viewportTransform = this.floor.canvas.viewportTransform?.slice() || [
-            1, 0, 0, 1, 0, 0,
-        ];
-        viewportTransform[4] = x;
-        viewportTransform[5] = y;
-        this.floor.canvas.setViewportTransform(viewportTransform);
-    }
-
-    onPanMove = (e: HammerInput) => {
+    onPanMove = (e: HammerInput): void => {
         // prevent panning if ctrl is pressed
         if (e.srcEvent.ctrlKey) {
             return;

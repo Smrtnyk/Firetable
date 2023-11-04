@@ -9,7 +9,7 @@ export class GridDrawer {
         this.canvas = canvas;
     }
 
-    drawGrid(width: number, height: number) {
+    drawGrid(width: number, height: number): void {
         const gridSize = RESOLUTION;
         const left = (width % gridSize) / 2;
         const top = (height % gridSize) / 2;
@@ -44,14 +44,14 @@ export class GridDrawer {
             top: 0,
             selectable: false,
             excludeFromExport: true,
-            // @ts-ignore
+            // @ts-expect-error -- custom prop
             isGridLine: true,
         });
         this.canvas.add(oGridGroup);
         this.canvas.sendToBack(oGridGroup);
     }
 
-    toggleGridVisibility = (width: number, height: number) => {
+    toggleGridVisibility = (width: number, height: number): void => {
         if (this.isGridVisible) {
             this.clearGrid();
         } else {
@@ -60,10 +60,10 @@ export class GridDrawer {
         this.isGridVisible = !this.isGridVisible;
     };
 
-    clearGrid() {
+    clearGrid(): void {
         const objects = this.canvas.getObjects();
         for (let i = objects.length - 1; i >= 0; i--) {
-            // @ts-ignore
+            // @ts-expect-error -- custom prop
             if (objects[i].isGridLine) {
                 this.canvas.remove(objects[i]);
             }

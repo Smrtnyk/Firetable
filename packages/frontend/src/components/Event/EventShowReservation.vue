@@ -11,8 +11,7 @@ interface Props {
 const authStore = useAuthStore();
 const props = defineProps<Props>();
 const emit = defineEmits<{
-    (e: "delete"): void;
-    (e: "edit"): void;
+    (e: "delete" | "edit"): void;
     (e: "confirm", confirmed: boolean): void;
 }>();
 const { t } = useI18n();
@@ -20,13 +19,13 @@ const checked = ref<boolean>(props.reservation.confirmed);
 const isStaff = computed(() => {
     return authStore.user?.role === Role.STAFF;
 });
-function reservedByText(reservedBy: Reservation["reservedBy"]) {
+function reservedByText(reservedBy: Reservation["reservedBy"]): string {
     const { name, email } = reservedBy;
     const isSocial = email.startsWith("social");
     return isSocial ? name : `${name} - ${email}`;
 }
 
-function onReservationConfirm() {
+function onReservationConfirm(): void {
     emit("confirm", !checked.value);
     checked.value = !checked.value;
 }

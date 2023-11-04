@@ -3,7 +3,10 @@ import { FloorElementTypes } from "../types";
 import { IGroupOptions } from "fabric/fabric-impl";
 
 type WallCreationOptions = Record<string, unknown>;
-type WalLGroupCreationOptions = { left: number; top: number } & IGroupOptions;
+type WalLGroupCreationOptions = {
+    left: number;
+    top: number;
+} & IGroupOptions;
 
 export class Wall extends fabric.Group {
     type = FloorElementTypes.WALL;
@@ -30,7 +33,7 @@ export class Wall extends fabric.Group {
         this.canvas?.renderAll();
     }
 
-    toObject() {
+    toObject(): void {
         return {
             ...super.toObject(),
             objectCaching: false,
@@ -44,7 +47,7 @@ export class Wall extends fabric.Group {
     }
 }
 
-// @ts-ignore Register the Wall class with Fabric
+// @ts-expect-error Register the Wall class with Fabric
 fabric.Wall = fabric.util.createClass(Wall);
-// @ts-ignore Register the Wall class with Fabric
+// @ts-expect-error Register the Wall class with Fabric
 fabric.Wall.fromObject = Wall.fromObject;

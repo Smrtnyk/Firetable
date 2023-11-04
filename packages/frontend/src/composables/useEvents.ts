@@ -36,7 +36,10 @@ export function useEvents() {
 
     const isLoading = ref(false);
 
-    async function fetchMoreEvents(eventOwner: EventOwner, lastDoc: QueryDocumentSnapshot | null) {
+    async function fetchMoreEvents(
+        eventOwner: EventOwner,
+        lastDoc: QueryDocumentSnapshot | null,
+    ): Promise<EventDoc[]> {
         isLoading.value = true;
         const { propertyId } = eventOwner;
 

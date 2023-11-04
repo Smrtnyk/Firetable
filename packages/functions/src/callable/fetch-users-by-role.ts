@@ -34,7 +34,10 @@ const MAX_USERS = 100;
  * The function uses the role of the authenticated user to determine which users it can fetch.
  * It also applies a limit to the number of users that can be fetched to prevent overloading.
  */
-export async function fetchUsersByRoleFn({ userIdsToFetch, organisationId }: { userIdsToFetch: string[], organisationId: string }, context: functions.https.CallableContext): Promise<User[]> {
+export async function fetchUsersByRoleFn(
+    { userIdsToFetch, organisationId }: { userIdsToFetch: string[]; organisationId: string },
+    context: functions.https.CallableContext,
+): Promise<User[]> {
     functions.logger.log("fetchUsersByRoleFn called with userIds:", userIdsToFetch);
 
     // Ensure authentication
@@ -60,11 +63,15 @@ export async function fetchUsersByRoleFn({ userIdsToFetch, organisationId }: { u
 
         for (const orgDoc of organisationsSnapshot.docs) {
             const usersSnapshot = await orgDoc.ref.collection(Collection.USERS).get();
-            const orgUsers = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User));
+            const orgUsers = usersSnapshot.docs.map(
+                (doc) => ({ id: doc.id, ...doc.data() }) as User,
+            );
             users = [...users, ...orgUsers];
         }
     } else {
-        let baseQuery: Query = db.collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`);
+        let baseQuery: Query = db.collection(
+            `${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`,
+        );
 
         if (userIdsToFetch.length > MAX_USERS) {
             functions.logger.warn(`User ${uid} provided too many user IDs.`);
@@ -75,14 +82,16 @@ export async function fetchUsersByRoleFn({ userIdsToFetch, organisationId }: { u
         baseQuery = baseQuery.where(FieldPath.documentId(), "!=", uid).limit(MAX_USERS);
 
         const snapshot = await baseQuery.get();
-        users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User));
+        users = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as User);
 
         const roleFilters: RoleFilter = {
             [ADMIN]: () => true,
             [Role.PROPERTY_OWNER]: (user: User) => user.role !== ADMIN,
-            [Role.MANAGER]: (user: User) => user.role !== ADMIN && user.role !== Role.PROPERTY_OWNER,
+            [Role.MANAGER]: (user: User) =>
+                user.role !== ADMIN && user.role !== Role.PROPERTY_OWNER,
             [Role.STAFF]: (user: User) => user.role === Role.STAFF,
-            [Role.HOSTESS]: (user: User) => [Role.HOSTESS, Role.STAFF, Role.MANAGER].includes(user.role as Role),
+            [Role.HOSTESS]: (user: User) =>
+                [Role.HOSTESS, Role.STAFF, Role.MANAGER].includes(user.role as Role),
             default: (user: User) => user.role === Role.STAFF,
         };
 
@@ -93,4 +102,3 @@ export async function fetchUsersByRoleFn({ userIdsToFetch, organisationId }: { u
 
     return users;
 }
-

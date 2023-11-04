@@ -1,27 +1,27 @@
 import { initializeFirebase } from "./base.js";
-import { usersCollection } from "./db.js";
 import { httpsCallable, HttpsCallableResult } from "firebase/functions";
-import { doc, updateDoc } from "firebase/firestore";
 import { signOut, signInWithEmailAndPassword, UserCredential } from "firebase/auth";
 import { CreateUserPayload, EditUserPayload, User } from "@firetable/types";
 
-export function createUserWithEmail(payload: CreateUserPayload) {
+export function createUserWithEmail(
+    payload: CreateUserPayload,
+): Promise<HttpsCallableResult<unknown>> {
     const { functions } = initializeFirebase();
     return httpsCallable(functions, "createUser")(payload);
 }
 
-export function updateUser(payload: EditUserPayload) {
+export function updateUser(payload: EditUserPayload): Promise<HttpsCallableResult<unknown>> {
     const { functions } = initializeFirebase();
     return httpsCallable(functions, "updateUser")(payload);
 }
 
-export function deleteUser(user: User) {
+export function deleteUser(user: User): Promise<HttpsCallableResult<unknown>> {
     const { functions } = initializeFirebase();
     const deleteFunction = httpsCallable(functions, "deleteUser");
     return deleteFunction(user);
 }
 
-export function logoutUser() {
+export function logoutUser(): Promise<void> {
     const { auth } = initializeFirebase();
     return signOut(auth);
 }
@@ -31,19 +31,27 @@ export function loginWithEmail(email: string, password: string): Promise<UserCre
     return signInWithEmailAndPassword(auth, email, password);
 }
 
+type FetchUsersByRoleRequestData = {
+    userIdsToFetch: string[];
+    organisationId: string;
+};
 export function fetchUsersByRole(
     userIdsToFetch: string[],
     organisationId: string,
 ): Promise<HttpsCallableResult<User[]>> {
     const { functions } = initializeFirebase();
-    return httpsCallable<{ userIdsToFetch: string[]; organisationId: string }, User[]>(
+    return httpsCallable<FetchUsersByRoleRequestData, User[]>(
         functions,
         "fetchUsersByRole",
     )({ userIdsToFetch, organisationId });
 }
 
-export function submitNewPassword(newPassword: string) {
-    if (!newPassword) return; // Add more validations if needed
+export function submitNewPassword(
+    newPassword: string,
+): Promise<HttpsCallableResult<unknown>> | undefined {
+    if (!newPassword) {
+        return;
+    }
     const { functions } = initializeFirebase();
     const changePassword = httpsCallable(functions, "changePassword");
     return changePassword({ newPassword });

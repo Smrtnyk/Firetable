@@ -22,7 +22,7 @@ import { db } from "../init.js";
  * After all subcollections and their contents are deleted, the main document is deleted.
  * If any deletion fails, the function throws an error with details.
  */
-export async function deleteDocument({ col, id }: { col: string, id: string }): Promise<void> {
+export async function deleteDocument({ col, id }: { col: string; id: string }): Promise<void> {
     const document = db.collection(col).doc(id);
 
     try {
@@ -37,7 +37,7 @@ export async function deleteDocument({ col, id }: { col: string, id: string }): 
             const docs = await collection.listDocuments();
 
             // Add deletion promises for each document in the subcollection
-            deletePromises.push(...docs.map(doc => doc.delete()));
+            deletePromises.push(...docs.map((doc) => doc.delete()));
         }
 
         // Delete all documents concurrently
@@ -50,4 +50,3 @@ export async function deleteDocument({ col, id }: { col: string, id: string }): 
         throw new Error(`Failed to delete document with ID ${id}.`);
     }
 }
-

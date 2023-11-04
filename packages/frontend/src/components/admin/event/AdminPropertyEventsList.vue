@@ -17,9 +17,9 @@ const events = computed(() => [...props.eventsByProperty[props.property.id]]);
 const eventsLength = computed(() => events.value.length);
 const bucketizedEvents = computed(() => {
     const eventsArr = [...props.eventsByProperty[props.property.id]];
-    let bucketized = new Map<string, Map<string, EventDoc[]>>();
+    const bucketized = new Map<string, Map<string, EventDoc[]>>();
 
-    for (let event of eventsArr) {
+    for (const event of eventsArr) {
         const date = new Date(event.date);
         const year = date.getFullYear().toString();
         const month = date.toLocaleString("default", { month: "long" }); // Gets full month name.
@@ -38,7 +38,7 @@ const bucketizedEvents = computed(() => {
     return bucketized;
 });
 
-function handleLoad() {
+function handleLoad(): void {
     props.onLoad(props.property);
 }
 </script>

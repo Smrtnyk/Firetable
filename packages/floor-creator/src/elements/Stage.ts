@@ -58,10 +58,10 @@ export class Stage extends fabric.Group {
         return "";
     }
 
-    setBaseFill(val: string): void {
+    setBaseFill(): void {
         // imp
     }
 }
 
-// @ts-ignore Register the PerformanceStage class with Fabric
+// @ts-expect-error Register the PerformanceStage class with Fabric
 fabric.Stage = fabric.util.createClass(Stage);

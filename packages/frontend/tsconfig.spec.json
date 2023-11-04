@@ -2,16 +2,16 @@
     "extends": "./tsconfig.json",
     "compilerOptions": {
         "baseUrl": ".",
-        "types": ["jest"],
         "lib": ["ESNext"],
-        "module": "CommonJS",
+        "module": "NodeNext",
+        "strict": false,
+        "moduleResolution": "NodeNext",
         "esModuleInterop": true,
-        "isolatedModules": true
     },
     "include": [
         "vitest.config.ts",
-        "__mocks__/**/*",
-        "src/**/*.ts"
+        "src/**/*.ts",
+        "src/**/*.d.ts"
     ],
     "exclude": []
 }

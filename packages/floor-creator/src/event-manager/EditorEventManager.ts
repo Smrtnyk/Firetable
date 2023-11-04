@@ -8,7 +8,10 @@ import { MoveCommand } from "../command/MoveCommand";
 export class EditorEventManager extends EventManager {
     ctrlPressedDuringSelection: boolean = false;
 
-    private movingObjectStartPosition: { left: number; top: number } | null = null;
+    private movingObjectStartPosition: {
+        left: number;
+        top: number;
+    } | null = null;
 
     constructor(
         floor: Floor,
@@ -19,17 +22,17 @@ export class EditorEventManager extends EventManager {
         this.initializeCtrlEventListeners();
     }
 
-    destroy() {
+    destroy(): void {
         document.removeEventListener("keydown", this.handleKeyDown);
         document.removeEventListener("keyup", this.handleKeyUp);
     }
 
-    private initializeCtrlEventListeners() {
+    private initializeCtrlEventListeners(): void {
         document.addEventListener("keydown", this.handleKeyDown);
         document.addEventListener("keyup", this.handleKeyUp);
     }
 
-    private handleKeyDown = (e: KeyboardEvent) => {
+    private handleKeyDown = (e: KeyboardEvent): void => {
         if (e.key === "Control" || e.ctrlKey) {
             this.floor.canvas.selection = true;
             this.ctrlPressedDuringSelection = true;
@@ -51,7 +54,7 @@ export class EditorEventManager extends EventManager {
         }
     };
 
-    private handleKeyUp = (e: KeyboardEvent) => {
+    private handleKeyUp = (e: KeyboardEvent): void => {
         if (e.key === "Control" || e.ctrlKey) {
             this.floor.canvas.selection = false;
             this.floor.canvas.renderAll();
@@ -78,7 +81,7 @@ export class EditorEventManager extends EventManager {
         }
     };
 
-    onBeforeTransform = (options: fabric.IEvent<MouseEvent>) => {
+    onBeforeTransform = (options: fabric.IEvent<MouseEvent>): void => {
         if (options.transform && options.transform.target && !this.movingObjectStartPosition) {
             this.movingObjectStartPosition = {
                 left: options.transform.target.left!,
@@ -87,7 +90,7 @@ export class EditorEventManager extends EventManager {
         }
     };
 
-    onObjectModified = (options: fabric.IEvent<MouseEvent>) => {
+    onObjectModified = (options: fabric.IEvent<MouseEvent>): void => {
         if (this.movingObjectStartPosition && options.target) {
             const moveCommand = new MoveCommand(options.target, this.movingObjectStartPosition, {
                 left: options.target.left!,
@@ -100,7 +103,7 @@ export class EditorEventManager extends EventManager {
         }
     };
 
-    initializeCanvasEventHandlers() {
+    initializeCanvasEventHandlers(): void {
         super.initializeCanvasEventHandlers();
 
         this.floor.canvas.on("object:modified", this.snapToGridOnModify);
@@ -110,14 +113,14 @@ export class EditorEventManager extends EventManager {
         this.floor.canvas.on("object:modified", this.onObjectModified);
     }
 
-    private onEditorMouseUp = () => {
+    private onEditorMouseUp = (): void => {
         const hasActiveElement = this.floor.canvas.getActiveObject();
         if (!hasActiveElement) {
             this.floor.emit("elementClicked", this.floor, void 0);
         }
     };
 
-    private snapToGridOnModify = (e: fabric.IEvent) => {
+    private snapToGridOnModify = (e: fabric.IEvent): void => {
         const target = e.target;
 
         if (target) {

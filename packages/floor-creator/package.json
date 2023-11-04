@@ -7,8 +7,8 @@
     "type": "module",
     "scripts": {
         "test": "vitest",
-        "test:clear": "jest --clearCache",
-        "build:floor-planner": "tsc"
+        "build": "tsc",
+        "lint": "eslint . --ext .ts"
     },
     "dependencies": {
         "fabric": "5.3.0",

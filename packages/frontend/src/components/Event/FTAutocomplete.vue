@@ -46,7 +46,7 @@ const { t } = useI18n();
 const options = ref(getNamesFromTables(props.allReservedTables));
 const searchTerm = ref("");
 
-function getNamesFromTables(tables: BaseTable[]) {
+function getNamesFromTables(tables: BaseTable[]): { label: string; value: string }[] {
     return tables.map((table) => {
         return {
             label: createTableLabel(table),
@@ -55,12 +55,12 @@ function getNamesFromTables(tables: BaseTable[]) {
     });
 }
 
-function createTableLabel(table: BaseTable) {
+function createTableLabel(table: BaseTable): string {
     // @ts-expect-error -- floor is custom prop on canvas set by us
     return `${table.reservation!.guestName} (${table.label} on ${table.canvas?.floor.name})`;
 }
 
-function findSearchedTable(inputVal: string | { value: string }) {
+function findSearchedTable(inputVal: string | { value: string }): BaseTable[] {
     const val = typeof inputVal === "string" ? inputVal : inputVal.value;
     const tokens = val.toLowerCase().split(/\s+/);
 
@@ -75,7 +75,7 @@ function findSearchedTable(inputVal: string | { value: string }) {
     });
 }
 
-function filterFn(val: string, update: any) {
+function filterFn(val: string, update: any): void {
     update(() => {
         const loweredVal = val.toLowerCase();
         const filteredTables = findSearchedTable(val);
@@ -95,7 +95,7 @@ watch(searchTerm, (newTerm) => {
     }
 });
 
-function setModel(val: string) {
+function setModel(val: string): void {
     searchTerm.value = val;
 }
 </script>

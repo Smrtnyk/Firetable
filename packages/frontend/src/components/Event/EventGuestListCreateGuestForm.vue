@@ -9,7 +9,7 @@ const emit = defineEmits(["create"]);
 const form = ref<QForm>();
 const guestName = ref("");
 
-function onSubmit() {
+function onSubmit(): void {
     if (!form.value?.validate()) {
         return;
     }
@@ -20,7 +20,7 @@ function onSubmit() {
     });
 }
 
-function onReset() {
+function onReset(): void {
     guestName.value = "";
 }
 </script>

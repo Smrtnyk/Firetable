@@ -11,7 +11,7 @@ import { computed, onMounted, reactive, ref } from "vue";
 import { useEventsStore } from "src/stores/events-store";
 import { useFirestoreCollection, useFirestoreDocument } from "src/composables/useFirestore";
 import { EventDoc, FloorDoc, GuestData } from "@firetable/types";
-import useFloorsPageEvent from "src/composables/useFloorsPageEvent";
+import { useFloorsPageEvent } from "src/composables/useFloorsPageEvent";
 import {
     EventOwner,
     getEventFloorsPath,
@@ -79,7 +79,7 @@ function showEventInfo(): void {
     });
 }
 
-async function init() {
+async function init(): Promise<void> {
     if (!props.eventId) {
         await router.replace("/");
     }
@@ -147,7 +147,9 @@ onMounted(init);
             class="ft-tab-pane"
             :class="{ 'active show': isActiveFloor(floor.id) }"
         >
-            <canvas :id="floor.id" class="shadow-3" :ref="mapFloorToCanvas(floor)"></canvas>
+            <q-card>
+                <canvas :id="floor.id" :ref="mapFloorToCanvas(floor)"></canvas>
+            </q-card>
         </div>
 
         <EventGuestList

@@ -31,7 +31,7 @@ const localWidth = ref(getElementWidth.value);
 const localHeight = ref(getElementHeight.value);
 const elementColor = ref("");
 
-function onKeyDownListener(event: KeyboardEvent) {
+function onKeyDownListener(event: KeyboardEvent): void {
     if (event.key === "Delete" && selectedFloorElement.value) {
         deleteElement();
     }
@@ -76,7 +76,7 @@ watch(selectedFloorElement, (newEl) => {
     }
 });
 
-function openColorPicker() {
+function openColorPicker(): void {
     colorPickerProxy.value?.show();
 }
 
@@ -91,14 +91,14 @@ function updateTableLabel(tableEl: BaseTable, newLabel: string): void {
     tableEl.setLabel(newLabel);
 }
 
-async function deleteElement() {
+async function deleteElement(): Promise<void> {
     if (!selectedFloorElement.value) return;
     if (await showConfirm("Do you really want to delete this element?")) {
         emit("delete", selectedFloorElement.value);
     }
 }
 
-function setElementColor(newVal: any) {
+function setElementColor(newVal: any): void {
     elementColor.value = newVal;
     selectedFloorElement.value?.setBaseFill?.(newVal);
 }
@@ -186,9 +186,3 @@ function setElementColor(newVal: any) {
         </div>
     </div>
 </template>
-
-<style>
-.col-height-56 {
-    height: 56px !important;
-}
-</style>

@@ -29,7 +29,9 @@ import { FieldValue } from "firebase-admin/firestore";
  * @throws - Throws a "unknown" error if there's an unknown issue while checking for user existence.
  * @throws - Throws appropriate errors for any other exceptions encountered during user creation or data storage.
  */
-export async function createUser(user: CreateUserPayload): Promise<{ uid: string, message: string }> {
+export async function createUser(
+    user: CreateUserPayload,
+): Promise<{ uid: string; message: string }> {
     const { name, password, email, role, relatedProperties, organisationId, username } = user;
 
     let createdUserUid: string | null = null;
@@ -37,11 +39,17 @@ export async function createUser(user: CreateUserPayload): Promise<{ uid: string
     try {
         const existingUser = await auth.getUserByEmail(email);
         if (existingUser) {
-            throw new functions.https.HttpsError("already-exists", "A user with this email already exists.");
+            throw new functions.https.HttpsError(
+                "already-exists",
+                "A user with this email already exists.",
+            );
         }
     } catch (error: any) {
         if (error.code !== "auth/user-not-found") {
-            throw new functions.https.HttpsError("unknown", "An error occurred while checking for user existence.");
+            throw new functions.https.HttpsError(
+                "unknown",
+                "An error occurred while checking for user existence.",
+            );
         }
     }
 
@@ -56,24 +64,29 @@ export async function createUser(user: CreateUserPayload): Promise<{ uid: string
             role,
             username,
             relatedProperties,
-            organisationId
+            organisationId,
         };
 
         await db.runTransaction(async (transaction) => {
             // Adjusted the userRef to point to the nested users collection under organisations/{organisationId}
-            const userRef = db.collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`).doc(createdUser.uid);
+            const userRef = db
+                .collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`)
+                .doc(createdUser.uid);
             transaction.set(userRef, userDoc);
 
             for (const propertyId of relatedProperties) {
-                const propertyRef = db.collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}`).doc(propertyId);
+                const propertyRef = db
+                    .collection(
+                        `${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}`,
+                    )
+                    .doc(propertyId);
                 transaction.update(propertyRef, {
-                    relatedUsers: FieldValue.arrayUnion(createdUser.uid)
+                    relatedUsers: FieldValue.arrayUnion(createdUser.uid),
                 });
             }
         });
 
         return { uid: createdUser.uid, message: "User created successfully!" };
-
     } catch (e: any) {
         if (createdUserUid) {
             await auth.deleteUser(createdUserUid);
@@ -83,4 +96,3 @@ export async function createUser(user: CreateUserPayload): Promise<{ uid: string
         throw new functions.https.HttpsError(errorCode, errorMessage);
     }
 }
-

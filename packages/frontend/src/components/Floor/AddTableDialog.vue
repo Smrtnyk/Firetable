@@ -13,11 +13,11 @@ const addTableForm = ref<QForm | null>(null);
 const tableId = ref<string>("");
 const tableIdRules = [noEmptyString(), validateTableNewId];
 
-function validateTableNewId(val: string) {
+function validateTableNewId(val: string): boolean | string {
     return !props.ids.has(val) || "Table with same ID already exists!";
 }
 
-async function onOKClick() {
+async function onOKClick(): Promise<void> {
     if (!(await addTableForm.value?.validate())) return;
     emit("create", tableId.value);
 }

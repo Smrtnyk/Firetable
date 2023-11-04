@@ -21,9 +21,7 @@ export interface EventDoc {
     date: number;
     entryPrice: number;
     name: string;
-    reservedPercentage: number;
     guestListLimit: number;
-    activeStaff: User["id"][];
     propertyId: string;
     organisationId: string;
     info?: string;

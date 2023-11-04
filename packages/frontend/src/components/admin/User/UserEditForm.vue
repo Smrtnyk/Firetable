@@ -33,13 +33,13 @@ const emailSuffix = computed(() => {
     return `@${props.organisation.name}.at`;
 });
 
-async function onSubmit() {
+async function onSubmit(): Promise<void> {
     if (await validateForm()) {
         prepareAndEmitSubmission();
     }
 }
 
-function prepareAndEmitSubmission() {
+function prepareAndEmitSubmission(): void {
     // Filter out empty or null values
     const filteredForm = Object.fromEntries(
         Object.entries(form.value).filter(function ([, value]) {
@@ -58,14 +58,16 @@ function prepareAndEmitSubmission() {
     });
 }
 
-function onReset() {
+function onReset(): void {
     form.value = { ...props.user, password: "" };
     resetProperties();
 }
 
 // Utility functions
-async function validateForm() {
-    if (!(await userEditForm.value?.validate())) return false;
+async function validateForm(): Promise<boolean> {
+    if (!(await userEditForm.value?.validate())) {
+        return false;
+    }
     if (isEditableRole.value && !chosenProperties.value.length) {
         showErrorMessage("You must select at least one property!");
         return false;
@@ -73,7 +75,7 @@ async function validateForm() {
     return true;
 }
 
-function resetProperties() {
+function resetProperties(): void {
     chosenProperties.value = props.selectedProperties.map((p) => p.id);
 }
 </script>

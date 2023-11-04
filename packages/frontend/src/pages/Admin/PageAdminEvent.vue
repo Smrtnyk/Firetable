@@ -79,7 +79,7 @@ const reservationsStatus = computed(() => {
     };
 });
 
-async function init() {
+async function init(): Promise<void> {
     if (!props.eventId || !props.organisationId || !props.propertyId) {
         await router.replace("/");
     }
@@ -95,7 +95,7 @@ function showDialog(
     componentPropsObject: Record<string, unknown> = {},
     listeners: Record<string, unknown> = {},
     maximized = isMobile.value,
-) {
+): void {
     quasar.dialog({
         component: FTDialog,
         componentProps: {
