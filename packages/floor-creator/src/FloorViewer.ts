@@ -43,10 +43,6 @@ export class FloorViewer extends Floor {
         this.eventEmitter.emit("elementClicked", this, ev.target as FloorEditorElement);
     };
 
-    initializeCanvasEventHandlers() {
-        this.eventManager?.initializeCanvasEventHandlers();
-    }
-
     protected setElementProperties(element: fabric.Object) {
         element.lockScalingX = true;
         element.lockScalingY = true;

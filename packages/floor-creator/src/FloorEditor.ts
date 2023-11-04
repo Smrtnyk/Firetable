@@ -86,10 +86,6 @@ export class FloorEditor extends Floor {
         super.renderData(jsonData);
     }
 
-    initializeCanvasEventHandlers() {
-        this.eventManager?.initializeCanvasEventHandlers();
-    }
-
     protected setElementProperties(element: fabric.Object) {
         element.lockScalingX = false;
         element.lockScalingY = false;

@@ -7,7 +7,6 @@
     "type": "module",
     "scripts": {
         "test": "vitest",
-        "test:clear": "jest --clearCache",
         "build:floor-planner": "tsc"
     },
     "dependencies": {

@@ -29,10 +29,9 @@ export abstract class Floor {
     abstract onFloorDoubleTap(coordinates: [x: number, y: number]): void;
     abstract emit(event: string, ...args: unknown[]): void;
     abstract on(event: string, listener: EventEmitterListener): void;
-    protected abstract initializeCanvasEventHandlers(): void;
     protected abstract onElementClick(ev: fabric.IEvent<MouseEvent>): void;
     protected abstract setElementProperties(element: fabric.Object): void;
-    public abstract destroy(): void;
+    abstract destroy(): void;
 
     protected constructor(options: FloorCreationOptions) {
         const { canvas, floorDoc, mode, containerWidth } = options;
