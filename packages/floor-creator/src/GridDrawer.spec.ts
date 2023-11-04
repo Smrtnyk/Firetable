@@ -3,8 +3,8 @@ import { GridDrawer } from "./GridDrawer";
 import { fabric } from "fabric";
 
 describe("GridDrawer", () => {
-    let gridDrawer;
-    let canvas;
+    let gridDrawer: GridDrawer;
+    let canvas: fabric.Canvas;
 
     beforeEach(() => {
         canvas = new fabric.Canvas(document.createElement("canvas"));
@@ -12,6 +12,7 @@ describe("GridDrawer", () => {
     });
 
     it("should be initialized with grid visibility set to true", () => {
+        // @ts-expect-error -- private prop
         expect(gridDrawer.isGridVisible).toBe(true);
     });
 
@@ -25,11 +26,13 @@ describe("GridDrawer", () => {
     describe("Grid Toggling", () => {
         it("should toggle the grid visibility", () => {
             gridDrawer.toggleGridVisibility(1000, 1000);
+            // @ts-expect-error -- private prop
             expect(gridDrawer.isGridVisible).toBe(false);
             // Assuming that drawing the grid adds exactly one object (the grid group)
             expect(canvas.getObjects().length).toBe(0);
 
             gridDrawer.toggleGridVisibility(1000, 1000);
+            // @ts-expect-error -- private prop
             expect(gridDrawer.isGridVisible).toBe(true);
             expect(canvas.getObjects().length).toBe(1);
         });

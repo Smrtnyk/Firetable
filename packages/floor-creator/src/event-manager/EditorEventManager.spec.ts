@@ -2,7 +2,7 @@ import { EditorEventManager } from "./EditorEventManager";
 import { fabric } from "fabric";
 import { RESOLUTION } from "../constants";
 import { CommandInvoker } from "../command/CommandInvoker";
-import { expect, it, describe, beforeEach, vi } from "vitest";
+import { expect, it, describe, beforeEach, vi, SpyInstance } from "vitest";
 import { FloorEditor } from "../FloorEditor";
 import { FloorMode } from "../types";
 
@@ -10,7 +10,7 @@ describe("EditorEventManager", () => {
     let manager: EditorEventManager;
     let commandInvoker: CommandInvoker;
     let floor: FloorEditor;
-    let canvasOnEventSpy;
+    let canvasOnEventSpy: SpyInstance<Parameters<typeof floor.canvas.on>>;
 
     beforeEach(() => {
         commandInvoker = new CommandInvoker();

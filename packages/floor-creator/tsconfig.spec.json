@@ -3,10 +3,9 @@
     "compilerOptions": {
         "baseUrl": ".",
         "types": ["jest"],
-        "lib": ["ESNext"],
+        "lib": ["ESNext", "DOM"],
         "module": "CommonJS",
         "esModuleInterop": true,
-        "isolatedModules": true
     },
     "include": [
         "vitest.config.ts",

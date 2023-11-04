@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, vi, SpyInstance } from "vitest";
 import { FloorEditor } from "./FloorEditor";
 import { FloorMode, FloorCreationOptions } from "./types";
 import { GridDrawer } from "./GridDrawer";
@@ -10,7 +10,7 @@ import { RectTable } from "./elements/RectTable";
 describe("FloorEditor", () => {
     let floorEditor: FloorEditor;
     let canvasElement: HTMLCanvasElement;
-    let gridDrawerSpy;
+    let gridDrawerSpy: SpyInstance<Parameters<typeof GridDrawer.prototype.drawGrid>, void>;
 
     beforeEach(() => {
         canvasElement = document.createElement("canvas");
@@ -35,9 +35,11 @@ describe("FloorEditor", () => {
 
     it("should properly initialize properties and sub-components", () => {
         expect(floorEditor).toBeInstanceOf(FloorEditor);
-        // Assuming we have getters for these properties or they are public
+        // @ts-expect-error -- private prop
         expect(floorEditor.gridDrawer).toBeDefined();
+        // @ts-expect-error -- private prop
         expect(floorEditor.eventManager).toBeDefined();
+        // @ts-expect-error -- private prop
         expect(floorEditor.elementManager).toBeDefined();
         // You could also check if methods have been called in constructor if any
     });
@@ -65,6 +67,7 @@ describe("FloorEditor", () => {
             floorEditor.canvas.add(mockFabricObject);
 
             // Simulate the start of a transform, such as a user starting to drag the object
+            // @ts-expect-error -- private prop
             floorEditor.eventManager.onBeforeTransform({
                 transform: { target: mockFabricObject },
             } as fabric.IEvent<MouseEvent>);
@@ -74,6 +77,7 @@ describe("FloorEditor", () => {
             floorEditor.canvas.setActiveObject(mockFabricObject);
 
             // Simulate the end of the transform, such as the user releasing the mouse button
+            // @ts-expect-error -- private prop
             floorEditor.eventManager.onObjectModified({
                 target: mockFabricObject,
             } as fabric.IEvent<MouseEvent>);
@@ -110,6 +114,7 @@ describe("FloorEditor", () => {
                 target: table,
             };
             // Simulate the element click
+            // @ts-expect-error -- private prop
             floorEditor.onElementClick(mockEvent as unknown as fabric.IEvent<MouseEvent>);
             expect(spy).toHaveBeenCalledWith("elementClicked", floorEditor, table);
         });
@@ -139,8 +144,10 @@ describe("FloorEditor", () => {
 
     describe("Grid Visibility and Rendering", () => {
         it("should toggle grid visibility", () => {
+            // @ts-expect-error -- private prop
             const initialVisibility = floorEditor.gridDrawer.isGridVisible;
             floorEditor.toggleGridVisibility();
+            // @ts-expect-error -- private prop
             expect(floorEditor.gridDrawer.isGridVisible).toBe(!initialVisibility);
         });
 
