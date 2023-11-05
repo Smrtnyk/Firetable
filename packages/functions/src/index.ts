@@ -83,3 +83,21 @@ export const clearOldEvents = functions
     .region("europe-west3")
     .pubsub.schedule("every day 00:00")
     .onRun(clearOldEventsFn);
+
+// HealthCheck
+export const healthCheck = functions.region("europe-west3").https.onRequest((request, response) => {
+    // Set CORS headers for preflight requests
+    // Allows all origins
+    if (request.method === "OPTIONS") {
+        // Send response to OPTIONS requests
+        response.set("Access-Control-Allow-Origin", "*");
+        response.set("Access-Control-Allow-Methods", "GET");
+        response.set("Access-Control-Allow-Headers", "Content-Type");
+        response.set("Access-Control-Max-Age", "3600");
+        response.status(204).send("");
+    } else {
+        // Set CORS headers for the main request
+        response.set("Access-Control-Allow-Origin", "*");
+        response.status(200).send("Service is up and running");
+    }
+});
