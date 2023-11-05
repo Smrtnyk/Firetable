@@ -10,7 +10,7 @@ import {
 } from "@firetable/types";
 import { QForm } from "quasar";
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import { useAuthStore } from "stores/auth-store";
+import { useAuthStore } from "src/stores/auth-store";
 import { noEmptyString, noWhiteSpaces } from "src/helpers/form-rules";
 import { useI18n } from "vue-i18n";
 

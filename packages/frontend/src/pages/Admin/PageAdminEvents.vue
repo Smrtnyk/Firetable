@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import AdminPropertyEventsList from "components/admin/event/AdminPropertyEventsList.vue";
-import EventCreateForm from "components/admin/event/EventCreateForm.vue";
-import FTTitle from "components/FTTitle.vue";
-import FTDialog from "components/FTDialog.vue";
+import AdminPropertyEventsList from "src/components/admin/event/AdminPropertyEventsList.vue";
+import EventCreateForm from "src/components/admin/event/EventCreateForm.vue";
+import FTTitle from "src/components/FTTitle.vue";
+import FTDialog from "src/components/FTDialog.vue";
 
 import {
     showConfirm,
@@ -21,7 +21,7 @@ import { useEvents } from "src/composables/useEvents";
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
-import FTCenteredText from "components/FTCenteredText.vue";
+import FTCenteredText from "src/components/FTCenteredText.vue";
 
 const router = useRouter();
 const quasar = useQuasar();

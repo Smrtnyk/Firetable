@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import PropertyCardList from "components/Property/PropertyCardList.vue";
+import PropertyCardList from "src/components/Property/PropertyCardList.vue";
 import { useProperties } from "src/composables/useProperties";
 import { watch } from "vue";
 import { Loading } from "quasar";

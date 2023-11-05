@@ -10,27 +10,27 @@ const routes: RouteRecordRaw[] = [
                 path: "/",
                 name: "properties",
                 meta: { requiresAuth: true },
-                component: () => import("pages/PageProperties.vue"),
+                component: () => import("src/pages/PageProperties.vue"),
             },
             {
                 path: "/events/:organisationId/:propertyId",
                 name: "events",
                 props: true,
                 meta: { requiresAuth: true },
-                component: () => import("pages/PageEvents.vue"),
+                component: () => import("src/pages/PageEvents.vue"),
             },
             {
                 path: "/events/:organisationId/:propertyId/event/:eventId",
                 name: "event",
                 meta: { requiresAuth: true },
                 props: true,
-                component: () => import("pages/PageEvent.vue"),
+                component: () => import("src/pages/PageEvent.vue"),
             },
             {
                 path: "/profile",
                 name: "userProfile",
                 meta: { requiresAuth: true },
-                component: () => import("pages/PageProfile.vue"),
+                component: () => import("src/pages/PageProfile.vue"),
             },
 
             // Protected routes
@@ -41,7 +41,7 @@ const routes: RouteRecordRaw[] = [
                     requiresAuth: true,
                     allowedRoles: [ADMIN],
                 },
-                component: () => import("pages/Admin/PageAdminOrganisations.vue"),
+                component: () => import("src/pages/Admin/PageAdminOrganisations.vue"),
             },
             {
                 path: "/admin/events",
@@ -50,7 +50,7 @@ const routes: RouteRecordRaw[] = [
                     requiresAuth: true,
                     allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN],
                 },
-                component: () => import("pages/Admin/PageAdminEvents.vue"),
+                component: () => import("src/pages/Admin/PageAdminEvents.vue"),
             },
             {
                 path: "/admin/events/:organisationId/:propertyId/:eventId",
@@ -60,7 +60,7 @@ const routes: RouteRecordRaw[] = [
                     allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN],
                 },
                 props: true,
-                component: () => import("pages/Admin/PageAdminEvent.vue"),
+                component: () => import("src/pages/Admin/PageAdminEvent.vue"),
             },
             {
                 path: "/admin/users",
@@ -69,7 +69,7 @@ const routes: RouteRecordRaw[] = [
                     requiresAuth: true,
                     allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN],
                 },
-                component: () => import("pages/Admin/PageAdminUsers.vue"),
+                component: () => import("src/pages/Admin/PageAdminUsers.vue"),
             },
             {
                 path: "/admin/floors",
@@ -78,7 +78,7 @@ const routes: RouteRecordRaw[] = [
                     requiresAuth: true,
                     allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN],
                 },
-                component: () => import("pages/Admin/PageAdminFloors.vue"),
+                component: () => import("src/pages/Admin/PageAdminFloors.vue"),
             },
             {
                 path: "/admin/floors/:organisationId/:propertyId/:floorId",
@@ -88,13 +88,13 @@ const routes: RouteRecordRaw[] = [
                     allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN],
                 },
                 props: true,
-                component: () => import("pages/Admin/PageAdminFloorEdit.vue"),
+                component: () => import("src/pages/Admin/PageAdminFloorEdit.vue"),
             },
             {
                 path: "/admin/properties",
                 name: "adminProperties",
                 meta: { requiresAuth: true, allowedRoles: [Role.PROPERTY_OWNER, ADMIN] },
-                component: () => import("pages/Admin/PageAdminProperties.vue"),
+                component: () => import("src/pages/Admin/PageAdminProperties.vue"),
             },
         ],
     },
@@ -102,13 +102,13 @@ const routes: RouteRecordRaw[] = [
         path: "/auth",
         name: "auth",
         meta: { requiresAuth: false },
-        component: () => import("pages/PageAuth.vue"),
+        component: () => import("src/pages/PageAuth.vue"),
     },
     // Always leave this as last one
     {
         path: "/:catchAll(.*)*",
         meta: { requiresAuth: false },
-        component: () => import("pages/Error404.vue"),
+        component: () => import("src/pages/Error404.vue"),
     },
 ];
 

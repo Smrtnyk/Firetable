@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import FTTitle from "components/FTTitle.vue";
-import FTDialog from "components/FTDialog.vue";
-import AddNewPropertyForm from "components/admin/property/AddNewPropertyForm.vue";
+import FTTitle from "src/components/FTTitle.vue";
+import FTDialog from "src/components/FTDialog.vue";
+import AddNewPropertyForm from "src/components/admin/property/AddNewPropertyForm.vue";
 
 import { Loading, useQuasar } from "quasar";
 import { showConfirm, withLoading } from "src/helpers/ui-helpers";
@@ -9,10 +9,10 @@ import { createNewProperty, CreatePropertyPayload, deleteProperty } from "@firet
 import { useProperties } from "src/composables/useProperties";
 import { computed, watchEffect } from "vue";
 import { useOrganisations } from "src/composables/useOrganisations";
-import { useAuthStore } from "stores/auth-store";
+import { useAuthStore } from "src/stores/auth-store";
 import { ADMIN, PropertyDoc } from "@firetable/types";
 import { useI18n } from "vue-i18n";
-import FTCenteredText from "components/FTCenteredText.vue";
+import FTCenteredText from "src/components/FTCenteredText.vue";
 
 const authStore = useAuthStore();
 const quasar = useQuasar();

@@ -14,9 +14,9 @@ import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpe
 import { VueFirestoreDocumentData } from "vuefire";
 import { useI18n } from "vue-i18n";
 
-import FTDialog from "components/FTDialog.vue";
-import EventCreateReservation from "components/Event/EventCreateReservation.vue";
-import EventShowReservation from "components/Event/EventShowReservation.vue";
+import FTDialog from "src/components/FTDialog.vue";
+import EventCreateReservation from "src/components/Event/EventCreateReservation.vue";
+import EventShowReservation from "src/components/Event/EventShowReservation.vue";
 
 const HALF_HOUR = 30 * 60 * 1000; // 30 minutes in milliseconds
 

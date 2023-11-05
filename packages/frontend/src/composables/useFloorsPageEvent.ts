@@ -10,7 +10,7 @@ import {
     Floor,
 } from "@firetable/floor-creator";
 import { EventOwner } from "@firetable/backend";
-import { useAuthStore } from "stores/auth-store";
+import { useAuthStore } from "src/stores/auth-store";
 import { VueFirestoreDocumentData } from "vuefire";
 import { useUsers } from "src/composables/useUsers";
 import { useReservations } from "src/composables/useReservations";
@@ -89,7 +89,7 @@ export function useFloorsPageEvent(
     }
 
     function mapFloorToCanvas(floor: FloorDoc) {
-        return function (el: HTMLCanvasElement) {
+        return function (el: any) {
             canvases.set(floor.id, el);
         };
     }

@@ -4,7 +4,7 @@ import { minLength } from "src/helpers/form-rules";
 import { QForm } from "quasar";
 import { ADMIN, OrganisationDoc } from "@firetable/types";
 import { CreatePropertyPayload } from "@firetable/backend";
-import { useAuthStore } from "stores/auth-store";
+import { useAuthStore } from "src/stores/auth-store";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useI18n } from "vue-i18n";
 

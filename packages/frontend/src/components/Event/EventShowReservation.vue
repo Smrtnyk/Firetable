@@ -2,7 +2,7 @@
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { Reservation, Role } from "@firetable/types";
-import { useAuthStore } from "stores/auth-store";
+import { useAuthStore } from "src/stores/auth-store";
 
 interface Props {
     reservation: Reservation;

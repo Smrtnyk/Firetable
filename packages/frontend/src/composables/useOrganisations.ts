@@ -1,6 +1,6 @@
 import { onMounted, ref } from "vue";
 import { ADMIN, OrganisationDoc } from "@firetable/types";
-import { useAuthStore } from "stores/auth-store";
+import { useAuthStore } from "src/stores/auth-store";
 import { fetchOrganisationById, fetchOrganisationsForAdmin } from "@firetable/backend";
 
 export function useOrganisations() {

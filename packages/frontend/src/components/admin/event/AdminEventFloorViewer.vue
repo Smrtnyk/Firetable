@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { nextTick, ref, shallowRef, watch } from "vue";
-import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
+import ShowSelectedElement from "src/components/Floor/ShowSelectedElement.vue";
 import {
     extractAllTablesLabels,
     Floor,

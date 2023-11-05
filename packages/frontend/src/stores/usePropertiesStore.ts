@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { useAuthStore } from "stores/auth-store";
+import { useAuthStore } from "src/stores/auth-store";
 import { fetchPropertiesForUser } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { PropertyDoc, User } from "@firetable/types";

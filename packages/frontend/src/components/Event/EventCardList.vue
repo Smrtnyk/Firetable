@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import EventCard from "components/Event/EventCard.vue";
+import EventCard from "src/components/Event/EventCard.vue";
 import { EventDoc } from "@firetable/types";
 
 interface Props {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from "vue";
 import { useAuthStore } from "src/stores/auth-store";
-import FTTitle from "components/FTTitle.vue";
+import FTTitle from "src/components/FTTitle.vue";
 import { User } from "@firetable/types";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { submitNewPassword } from "@firetable/backend";
@@ -36,7 +36,9 @@ async function changePassword(): Promise<void> {
     if (!newPassword.value) return; // Add more validations if needed
 
     await tryCatchLoadingWrapper({
-        hook: () => submitNewPassword(newPassword.value),
+        hook: async () => {
+            await submitNewPassword(newPassword.value);
+        },
     });
 }
 </script>

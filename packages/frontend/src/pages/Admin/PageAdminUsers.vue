@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import UserCreateForm from "components/admin/User/UserCreateForm.vue";
-import UserEditForm from "components/admin/User/UserEditForm.vue";
-import FTTitle from "components/FTTitle.vue";
+import UserCreateForm from "src/components/admin/User/UserCreateForm.vue";
+import UserEditForm from "src/components/admin/User/UserEditForm.vue";
+import FTTitle from "src/components/FTTitle.vue";
 import { showConfirm, showErrorMessage, withLoading } from "src/helpers/ui-helpers";
 import { watch } from "vue";
 import { Loading, useQuasar } from "quasar";
-import FTDialog from "components/FTDialog.vue";
+import FTDialog from "src/components/FTDialog.vue";
 import { ADMIN, CreateUserPayload, EditUserPayload, User } from "@firetable/types";
 import {
     createUserWithEmail,
@@ -14,12 +14,12 @@ import {
     fetchOrganisationsForAdmin,
     updateUser,
 } from "@firetable/backend";
-import { usePropertiesStore } from "stores/usePropertiesStore";
+import { usePropertiesStore } from "src/stores/usePropertiesStore";
 import { useUsers } from "src/composables/useUsers";
-import { useAuthStore } from "stores/auth-store";
+import { useAuthStore } from "src/stores/auth-store";
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
-import FTCenteredText from "components/FTCenteredText.vue";
+import FTCenteredText from "src/components/FTCenteredText.vue";
 
 const { t } = useI18n();
 const quasar = useQuasar();

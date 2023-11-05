@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-import AppDrawer from "components/AppDrawer.vue";
-import AppTopMenu from "components/AppTopMenu.vue";
+import AppDrawer from "src/components/AppDrawer.vue";
+import AppTopMenu from "src/components/AppTopMenu.vue";
 import { useAuthStore } from "src/stores/auth-store";
 
 const authStore = useAuthStore();

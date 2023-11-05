@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import AddTableDialog from "components/Floor/AddTableDialog.vue";
-import ShowSelectedElement from "components/Floor/ShowSelectedElement.vue";
-import FTDialog from "components/FTDialog.vue";
+import AddTableDialog from "src/components/Floor/AddTableDialog.vue";
+import ShowSelectedElement from "src/components/Floor/ShowSelectedElement.vue";
+import FTDialog from "src/components/FTDialog.vue";
 
 import { nextTick, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { NumberTuple } from "src/types/generic";

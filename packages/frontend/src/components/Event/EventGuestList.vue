@@ -8,9 +8,9 @@ import {
 import { computed } from "vue";
 import { useEventsStore } from "src/stores/events-store";
 
-import EventGuestListCreateGuestForm from "components/Event/EventGuestListCreateGuestForm.vue";
-import FTTitle from "components/FTTitle.vue";
-import FTDialog from "components/FTDialog.vue";
+import EventGuestListCreateGuestForm from "src/components/Event/EventGuestListCreateGuestForm.vue";
+import FTTitle from "src/components/FTTitle.vue";
+import FTDialog from "src/components/FTDialog.vue";
 import { useQuasar } from "quasar";
 import { GuestData } from "@firetable/types";
 import {

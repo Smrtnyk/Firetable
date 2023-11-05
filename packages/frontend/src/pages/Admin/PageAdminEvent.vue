@@ -3,12 +3,12 @@ import { Component, computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { formatEventDate } from "src/helpers/date-utils";
 
-import FTTitle from "components/FTTitle.vue";
-import AdminEventGeneralInfo from "components/admin/event/AdminEventGeneralInfo.vue";
-import AdminEventReservationsByPerson from "components/admin/event/AdminEventReservationsByPerson.vue";
-import AdminEventEditInfo from "components/admin/event/AdminEventEditInfo.vue";
-import AdminEventFloorViewer from "components/admin/event/AdminEventFloorViewer.vue";
-import FTDialog from "components/FTDialog.vue";
+import FTTitle from "src/components/FTTitle.vue";
+import AdminEventGeneralInfo from "src/components/admin/event/AdminEventGeneralInfo.vue";
+import AdminEventReservationsByPerson from "src/components/admin/event/AdminEventReservationsByPerson.vue";
+import AdminEventEditInfo from "src/components/admin/event/AdminEventEditInfo.vue";
+import AdminEventFloorViewer from "src/components/admin/event/AdminEventFloorViewer.vue";
+import FTDialog from "src/components/FTDialog.vue";
 
 import { Loading, useQuasar } from "quasar";
 import { config } from "src/config";

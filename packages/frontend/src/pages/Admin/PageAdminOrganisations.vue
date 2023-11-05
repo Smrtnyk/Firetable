@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import FTTitle from "components/FTTitle.vue";
-import FTDialog from "components/FTDialog.vue";
-import AddNewOrganisationForm from "components/admin/organisation/AddNewOrganisationForm.vue";
+import FTTitle from "src/components/FTTitle.vue";
+import FTDialog from "src/components/FTDialog.vue";
+import AddNewOrganisationForm from "src/components/admin/organisation/AddNewOrganisationForm.vue";
 
 import { useQuasar } from "quasar";
 import { showConfirm, withLoading } from "src/helpers/ui-helpers";
@@ -13,7 +13,7 @@ import {
 } from "@firetable/backend";
 import { OrganisationDoc } from "@firetable/types";
 import { onMounted, ref } from "vue";
-import FTCenteredText from "components/FTCenteredText.vue";
+import FTCenteredText from "src/components/FTCenteredText.vue";
 
 const quasar = useQuasar();
 const isLoading = ref(false);

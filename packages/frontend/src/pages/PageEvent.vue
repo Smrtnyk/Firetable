@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import EventGuestList from "components/Event/EventGuestList.vue";
-import FTAutocomplete from "components/Event/FTAutocomplete.vue";
-import EventInfo from "components/Event/EventInfo.vue";
-import FTDialog from "components/FTDialog.vue";
+import EventGuestList from "src/components/Event/EventGuestList.vue";
+import FTAutocomplete from "src/components/Event/FTAutocomplete.vue";
+import EventInfo from "src/components/Event/EventInfo.vue";
+import FTDialog from "src/components/FTDialog.vue";
 
 import { Loading, useQuasar } from "quasar";
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import AddNewFloorForm from "components/Floor/AddNewFloorForm.vue";
-import FTTitle from "components/FTTitle.vue";
-import FTDialog from "components/FTDialog.vue";
+import AddNewFloorForm from "src/components/Floor/AddNewFloorForm.vue";
+import FTTitle from "src/components/FTTitle.vue";
+import FTDialog from "src/components/FTDialog.vue";
 
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { Loading, useQuasar } from "quasar";
@@ -12,7 +12,7 @@ import { PropertyFloors, useFloors } from "src/composables/useFloors";
 import { onMounted, ref, watch } from "vue";
 import { takeProp } from "@firetable/utils";
 import { useI18n } from "vue-i18n";
-import FTCenteredText from "components/FTCenteredText.vue";
+import FTCenteredText from "src/components/FTCenteredText.vue";
 
 const quasar = useQuasar();
 const { t } = useI18n();

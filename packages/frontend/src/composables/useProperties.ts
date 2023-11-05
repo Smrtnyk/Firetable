@@ -1,5 +1,5 @@
 import { ref, onMounted } from "vue";
-import { usePropertiesStore } from "stores/usePropertiesStore";
+import { usePropertiesStore } from "src/stores/usePropertiesStore";
 import { PropertyDoc } from "@firetable/types";
 
 export function useProperties() {

@@ -2,7 +2,7 @@ import { showErrorMessage } from "src/helpers/ui-helpers";
 import { onUnmounted, ref } from "vue";
 import { floorsCollection } from "@firetable/backend";
 import { FloorDoc } from "@firetable/types";
-import { usePropertiesStore } from "stores/usePropertiesStore";
+import { usePropertiesStore } from "src/stores/usePropertiesStore";
 import { query, where, onSnapshot } from "firebase/firestore";
 
 export type PropertyFloors = {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import EventCardList from "components/Event/EventCardList.vue";
+import EventCardList from "src/components/Event/EventCardList.vue";
 import { where, orderBy, limit } from "firebase/firestore";
 import { config } from "src/config";
 import { ONE_HOUR } from "src/constants";
