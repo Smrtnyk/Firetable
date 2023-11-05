@@ -56,6 +56,6 @@ export class FloorViewer extends Floor {
     }
 
     destroy(): void {
-        // NOOP here
+        this.zoomManager.cancelAnimation();
     }
 }

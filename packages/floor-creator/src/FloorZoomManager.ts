@@ -18,6 +18,8 @@ export class FloorZoomManager {
     private startZoom?: number;
     private targetZoom?: number;
 
+    private animationFrameId?: number;
+
     constructor(canvas: fabric.Canvas, initialScale: number, initialViewportTransform: number[]) {
         this.canvas = canvas;
         this.initialScale = initialScale;
@@ -35,6 +37,12 @@ export class FloorZoomManager {
 
     // Adjust the zoom level based on the increment/decrement factor and animate the zoom
     private adjustZoom(incrementFactor: number, point: fabric.Point): void {
+        // Cancel the previous animation if it's running
+        if (this.animationFrameId !== undefined) {
+            cancelAnimationFrame(this.animationFrameId);
+            this.animationFrameId = undefined;
+        }
+
         const newZoom = this.canvas.getZoom() + this.canvas.getZoom() * incrementFactor;
         if (newZoom <= this.maxZoom && newZoom >= this.minZoom) {
             this.animateZoom(newZoom, point);
@@ -44,6 +52,10 @@ export class FloorZoomManager {
     }
 
     private animateZoom(targetZoom: number, point: fabric.Point): void {
+        if (this.animationFrameId !== undefined) {
+            cancelAnimationFrame(this.animationFrameId);
+        }
+
         this.startTime = undefined;
         this.startZoom = this.canvas.getZoom();
         this.targetZoom = targetZoom;
@@ -60,13 +72,13 @@ export class FloorZoomManager {
             this.canvas.zoomToPoint(point, zoom);
 
             if (progress < 1) {
-                requestAnimationFrame(animateStep);
+                this.animationFrameId = requestAnimationFrame(animateStep);
             } else {
                 this.canvas.requestRenderAll();
             }
         };
 
-        requestAnimationFrame(animateStep);
+        this.animationFrameId = requestAnimationFrame(animateStep);
     }
 
     zoomToPoint(point: fabric.Point, scaleFactor: number): void {
@@ -88,5 +100,12 @@ export class FloorZoomManager {
         this.canvas.setViewportTransform([...this.initialViewportTransform]);
         this.canvas.setZoom(this.initialScale);
         this.canvas.requestRenderAll();
+    }
+
+    public cancelAnimation(): void {
+        if (this.animationFrameId !== undefined) {
+            cancelAnimationFrame(this.animationFrameId);
+            this.animationFrameId = undefined;
+        }
     }
 }
