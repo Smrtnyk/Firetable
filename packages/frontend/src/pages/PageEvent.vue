@@ -99,10 +99,10 @@ onMounted(init);
     <div v-if="event" class="PageEvent" ref="pageRef">
         <div class="row items-center q-mb-sm q-gutter-sm">
             <q-fab
-                v-if="useFloorsPageEventState.floorInstances.size"
+                v-if="useFloorsPageEventState.floorInstances.size > 1"
                 :model-value="state.showMapsExpanded"
                 :label="
-                    useFloorsPageEventState.activeFloor
+                    !isMobile && useFloorsPageEventState.activeFloor
                         ? useFloorsPageEventState.activeFloor.name
                         : ''
                 "
