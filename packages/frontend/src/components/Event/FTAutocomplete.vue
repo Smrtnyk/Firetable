@@ -62,18 +62,29 @@ function createTableLabel(table: BaseTable): string {
 }
 
 function findSearchedTable(inputVal: string | { value: string }): BaseTable[] {
+    // Determine the value to match against
     const val = typeof inputVal === "string" ? inputVal : inputVal.value;
-    const tokens = val.toLowerCase().split(/\s+/);
+    const normalizedVal = val.toLowerCase().trim();
 
-    return props.allReservedTables.filter((table) => {
-        const { guestName } = table.reservation!;
-        const normalizedGuestName = guestName.toLowerCase();
-        const guestNameTokens = normalizedGuestName.split(/\s+/);
+    if (typeof inputVal === "object") {
+        // If inputVal is an object, we assume a specific item was selected
+        // Return only the table that matches the guestName exactly
+        return props.allReservedTables.filter((table) => {
+            return table.reservation!.guestName.toLowerCase() === normalizedVal;
+        });
+    } else {
+        // If inputVal is a string, perform the original filtering logic
+        const tokens = normalizedVal.split(/\s+/);
+        return props.allReservedTables.filter((table) => {
+            const { guestName } = table.reservation!;
+            const normalizedGuestName = guestName.toLowerCase();
+            const guestNameTokens = normalizedGuestName.split(/\s+/);
 
-        return tokens.some((token) =>
-            guestNameTokens.some((nameToken) => nameToken.includes(token)),
-        );
-    });
+            return tokens.some((token) =>
+                guestNameTokens.some((nameToken) => nameToken.includes(token)),
+            );
+        });
+    }
 }
 
 function filterFn(val: string, update: any): void {
