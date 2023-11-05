@@ -54,7 +54,6 @@ export abstract class Floor {
         // @ts-expect-error -- setting this intentionally here, so we have it available if needed
         this.canvas.floor = this;
         this.renderData(this.floorDoc.json);
-        this.canvas.renderAll();
 
         this.zoomManager = new FloorZoomManager(
             this.canvas,
