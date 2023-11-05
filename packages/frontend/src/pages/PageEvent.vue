@@ -106,7 +106,7 @@ onMounted(init);
                 vertical-actions-align="left"
                 icon="chevron_down"
                 direction="down"
-                class="button-gradient q-ma-none"
+                class="button-gradient q-mt-none"
             >
                 <q-fab-action
                     :key="florInstance.id"
