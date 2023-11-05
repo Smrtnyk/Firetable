@@ -23,11 +23,11 @@ export class SmoothBlinkAnimation implements AnimationStrategy {
         }
         this.target.animate("opacity", 0, {
             duration: ANIMATION_DURATION,
-            onChange: this.target.canvas?.renderAll.bind(this.target.canvas),
+            onChange: this.target.canvas?.requestRenderAll.bind(this.target.canvas),
             onComplete: () => {
                 this.target.animate("opacity", 1, {
                     duration: ANIMATION_DURATION,
-                    onChange: this.target.canvas?.renderAll.bind(this.target.canvas),
+                    onChange: this.target.canvas?.requestRenderAll.bind(this.target.canvas),
                     onComplete: () => {
                         this.smoothBlink(); // Loop the animation
                     },
@@ -39,6 +39,6 @@ export class SmoothBlinkAnimation implements AnimationStrategy {
     stop(): void {
         this.isAnimating = false;
         this.target.set({ opacity: 1 });
-        this.target.canvas?.renderAll();
+        this.target.canvas?.requestRenderAll();
     }
 }
