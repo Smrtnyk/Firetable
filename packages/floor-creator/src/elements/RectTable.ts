@@ -99,7 +99,7 @@ export class RectTable extends fabric.Group {
             top: this.rect.top! + this.rect.height! / 2,
         });
 
-        this.canvas?.renderAll();
+        this.canvas?.requestRenderAll();
     }
 
     private snapToGrid(): void {

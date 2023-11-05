@@ -62,7 +62,7 @@ export class FloorZoomManager {
             if (progress < 1) {
                 requestAnimationFrame(animateStep);
             } else {
-                this.canvas.renderAll();
+                this.canvas.requestRenderAll();
             }
         };
 
@@ -73,7 +73,7 @@ export class FloorZoomManager {
         let newZoom = this.canvas.getZoom() * scaleFactor;
         newZoom = Math.max(this.minZoom, Math.min(newZoom, this.maxZoom));
         this.canvas.zoomToPoint(point, newZoom);
-        this.canvas.renderAll();
+        this.canvas.requestRenderAll();
     }
 
     canZoomIn(): boolean {
@@ -87,6 +87,6 @@ export class FloorZoomManager {
     resetZoom(): void {
         this.canvas.setViewportTransform([...this.initialViewportTransform]);
         this.canvas.setZoom(this.initialScale);
-        this.canvas.renderAll();
+        this.canvas.requestRenderAll();
     }
 }
