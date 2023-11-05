@@ -92,6 +92,10 @@ export class FloorEditor extends Floor {
         element.lockMovementX = false;
         element.lockMovementY = false;
         element.lockScalingFlip = true;
+        element.lockRotation = false;
+        element.lockSkewingX = false;
+        element.lockSkewingY = false;
+        element.lockUniScaling = false;
     }
 
     addElement(options: CreateElementOptions): void {
