@@ -92,4 +92,10 @@ export abstract class Floor {
             this.elementReviver,
         );
     }
+
+    resize(pageContainerWidth: number): void {
+        this.containerWidth = pageContainerWidth;
+        this.scale = calculateCanvasScale(this.containerWidth, this.floorDoc.width);
+        this.setScaling();
+    }
 }
