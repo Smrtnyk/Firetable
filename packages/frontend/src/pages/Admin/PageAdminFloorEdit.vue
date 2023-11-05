@@ -27,7 +27,7 @@ import {
     useFirestoreDocument,
 } from "src/composables/useFirestore";
 import { isNumber } from "@firetable/utils";
-import { isMobile, buttonSize } from "src/global-reactives/is-mobile";
+import { isMobile, buttonSize } from "src/global-reactives/screen-detection";
 import { getFloorPath } from "@firetable/backend";
 
 type ElementDescriptor = {

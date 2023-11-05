@@ -21,7 +21,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { BaseTable } from "@firetable/floor-creator";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { propIsTruthy } from "@firetable/utils";
-import { isMobile } from "src/global-reactives/is-mobile";
+import { isMobile } from "src/global-reactives/screen-detection";
 import { getColors } from "src/helpers/colors";
 
 interface Props {

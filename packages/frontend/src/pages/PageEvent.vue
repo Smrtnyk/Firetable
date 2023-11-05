@@ -18,7 +18,7 @@ import {
     getEventGuestListPath,
     getEventPath,
 } from "@firetable/backend";
-import { isMobile } from "src/global-reactives/is-mobile";
+import { isMobile, isTablet } from "src/global-reactives/screen-detection";
 
 interface State {
     showMapsExpanded: boolean;
@@ -129,6 +129,7 @@ onMounted(init);
                 class="col q-mb-sm"
             />
             <q-btn
+                v-if="isTablet"
                 class="button-gradient q-ma-none q-ml-sm"
                 round
                 icon="full-screen"

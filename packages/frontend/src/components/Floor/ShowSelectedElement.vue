@@ -3,7 +3,7 @@ import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed, onBeforeUnmount, onMounted, ref, toRefs, watch } from "vue";
 import { BaseTable, FloorEditorElement, isTable } from "@firetable/floor-creator";
 import { QPopupProxy } from "quasar";
-import { isMobile } from "src/global-reactives/is-mobile";
+import { isMobile } from "src/global-reactives/screen-detection";
 
 interface Props {
     selectedFloorElement: FloorEditorElement | undefined;
