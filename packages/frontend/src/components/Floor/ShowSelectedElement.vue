@@ -147,6 +147,7 @@ function setElementColor(newVal: any): void {
         <div class="col-md-6 col-12 row justify-md-end q-mt-sm q-mt-md-none">
             <!-- Color Picker Button -->
             <q-btn
+                title="Change element fill color"
                 v-if="elementColor"
                 :style="{ 'background-color': elementColor }"
                 @click="openColorPicker"
@@ -164,7 +165,13 @@ function setElementColor(newVal: any): void {
             </q-btn>
 
             <!-- Delete Button -->
-            <q-btn v-if="deleteAllowed" icon="trash" color="negative" @click="deleteElement" />
+            <q-btn
+                title="Delete element"
+                v-if="deleteAllowed"
+                icon="trash"
+                color="negative"
+                @click="deleteElement"
+            />
             <slot name="buttons"></slot>
         </div>
     </div>

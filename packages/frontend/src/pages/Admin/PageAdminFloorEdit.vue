@@ -20,7 +20,7 @@ import {
     RESOLUTION,
 } from "@firetable/floor-creator";
 import { ElementTag, FloorDoc } from "@firetable/types";
-import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import {
     getFirestoreDocument,
     updateFirestoreDocument,
@@ -275,7 +275,10 @@ function redoAction(): void {
     }
 }
 
-function exportFloor(floorVal: FloorEditor): void {
+async function exportFloor(floorVal: FloorEditor): Promise<void> {
+    if (!(await showConfirm("Do you want to export this floor plan?"))) {
+        return;
+    }
     exportFile(`${floorVal.name}.json`, JSON.stringify(floorVal.json));
 }
 
@@ -331,17 +334,40 @@ function triggerFileInput(): void {
             :existing-labels="new Set(extractAllTablesLabels(floorInstance as FloorEditor))"
         >
             <template #buttons>
-                <q-btn rounded :disabled="!undoRedoState.canUndo" @click="undoAction" icon="undo" />
-                <q-btn rounded :disabled="!undoRedoState.canRedo" @click="redoAction" icon="redo" />
-                <q-btn rounded @click="floorInstance.toggleGridVisibility" icon="grid" />
                 <q-btn
+                    title="Undo"
+                    rounded
+                    :disabled="!undoRedoState.canUndo"
+                    @click="undoAction"
+                    icon="undo"
+                />
+                <q-btn
+                    title="Redo"
+                    rounded
+                    :disabled="!undoRedoState.canRedo"
+                    @click="redoAction"
+                    icon="redo"
+                />
+                <q-btn
+                    rounded
+                    title="Toggle grid"
+                    @click="floorInstance.toggleGridVisibility"
+                    icon="grid"
+                />
+                <q-btn
+                    title="Toggle bulk mode"
                     rounded
                     @click="toggleBulkMode"
                     icon="stack"
                     :color="bulkMode ? 'positive' : undefined"
                 />
-                <q-btn rounded icon="export" @click="exportFloor(floorInstance as FloorEditor)" />
-                <q-btn rounded icon="import" @click="triggerFileInput" />
+                <q-btn
+                    rounded
+                    icon="export"
+                    title="Export floor plan"
+                    @click="exportFloor(floorInstance as FloorEditor)"
+                />
+                <q-btn rounded title="Import floor plan" icon="import" @click="triggerFileInput" />
                 <input
                     ref="fileInputRef"
                     type="file"
