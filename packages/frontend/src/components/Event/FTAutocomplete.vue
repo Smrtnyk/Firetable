@@ -93,6 +93,8 @@ watch(searchTerm, (newTerm) => {
     if (newTerm) {
         const found = findSearchedTable(newTerm);
         emit("found", found);
+    } else {
+        emit("clear");
     }
 });
 
