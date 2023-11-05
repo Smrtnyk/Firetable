@@ -36,6 +36,9 @@ export class FloorViewer extends Floor {
     }
 
     protected onElementClick = (ev: fabric.IEvent<MouseEvent>): void => {
+        if (this.touchManager.isInteracting) {
+            return;
+        }
         if (this.eventManager.dragOccurred) {
             this.eventManager.dragOccurred = false; // Reset the flag
             return; // Exit early if a drag operation occurred

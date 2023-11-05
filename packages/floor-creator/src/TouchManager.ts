@@ -10,6 +10,8 @@ export class TouchManager {
 
     private readonly hammerManager: HammerManager;
 
+    isInteracting = false;
+
     constructor(floor: Floor) {
         this.floor = floor;
 
@@ -33,9 +35,16 @@ export class TouchManager {
 
         // Pan events
         this.hammerManager.on("panmove", this.onPanMove);
-
         this.hammerManager.on("doubletap", this.onDoubleTap);
+
+        this.hammerManager.on("pinchend panend", this.onGestureEnd);
     }
+
+    onGestureEnd = (): void => {
+        setTimeout(() => {
+            this.isInteracting = false;
+        }, 30);
+    };
 
     private onDoubleTap = (ev: HammerInput): void => {
         const { x, y } = this.extractEventCoordinates(ev);
@@ -65,6 +74,7 @@ export class TouchManager {
     }
 
     private onPinch = (ev: HammerInput): void => {
+        this.isInteracting = true;
         const scale = ev.scale;
         // Adjust the scale based on a dampening factor to control zoom sensitivity
         const adjustedScale = 1 + (scale - 1) * DAMPENING_FACTOR;
@@ -73,6 +83,7 @@ export class TouchManager {
     };
 
     onPanMove = (e: HammerInput): void => {
+        this.isInteracting = true;
         // prevent panning if ctrl is pressed
         if (e.srcEvent.ctrlKey) {
             return;
