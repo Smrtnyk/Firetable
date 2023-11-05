@@ -33,28 +33,45 @@ describe("FloorEditor", () => {
         floorEditor = new FloorEditor(options);
     });
 
-    it("should properly initialize properties and sub-components", () => {
-        expect(floorEditor).toBeInstanceOf(FloorEditor);
-        // @ts-expect-error -- private prop
-        expect(floorEditor.gridDrawer).toBeDefined();
-        // @ts-expect-error -- private prop
-        expect(floorEditor.eventManager).toBeDefined();
-        // @ts-expect-error -- private prop
-        expect(floorEditor.elementManager).toBeDefined();
-        // You could also check if methods have been called in constructor if any
-    });
-
-    it("should render the initial grid", () => {
-        expect(gridDrawerSpy).toHaveBeenCalled();
-    });
-
-    describe("Undo/Redo Functionality", () => {
-        it("should return false for canUndo and canRedo initially", () => {
-            expect(floorEditor.canUndo()).toBe(false);
-            expect(floorEditor.canRedo()).toBe(false);
+    describe("constructor()", () => {
+        it("properly initializes properties and sub-components", () => {
+            expect(floorEditor).toBeInstanceOf(FloorEditor);
+            // @ts-expect-error -- private prop
+            expect(floorEditor.gridDrawer).toBeDefined();
+            // @ts-expect-error -- private prop
+            expect(floorEditor.eventManager).toBeDefined();
+            // @ts-expect-error -- private prop
+            expect(floorEditor.elementManager).toBeDefined();
         });
 
-        it("should allow undo and redo after moving an object", () => {
+        it("should render the initial grid", () => {
+            expect(gridDrawerSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe("updateDimensions()", () => {
+        it("updates floor dimensions", () => {
+            floorEditor.updateDimensions(800, 800);
+
+            expect(floorEditor.width).toBe(800);
+            expect(floorEditor.height).toBe(800);
+        });
+    });
+
+    describe("canUndo()", () => {
+        it("can't undo in fresh state", () => {
+            expect(floorEditor.canUndo()).toBe(false);
+        });
+    });
+
+    describe("canRedo()", () => {
+        it("can't undo in fresh state", () => {
+            expect(floorEditor.canRedo()).toBe(false);
+        });
+    });
+
+    describe("undo()/redo()", () => {
+        it("allows undo and redo after moving an object", () => {
             // Create a mock fabric object
             const mockFabricObject = new fabric.Rect({
                 left: 100,
@@ -97,8 +114,8 @@ describe("FloorEditor", () => {
         });
     });
 
-    describe("Event Emission", () => {
-        it("should emit elementClicked event on element click", () => {
+    describe("emit()", () => {
+        it("emits elementClicked event on element click", () => {
             const spy = vi.spyOn(floorEditor, "emit");
             const table = new RectTable({
                 rectOptions: {},
@@ -119,7 +136,7 @@ describe("FloorEditor", () => {
             expect(spy).toHaveBeenCalledWith("elementClicked", floorEditor, table);
         });
 
-        it("should emit doubleClick event on canvas double click", () => {
+        it("emits doubleClick event on canvas double click", () => {
             const spy = vi.spyOn(floorEditor, "emit");
             // Simulate double click on the floor
             floorEditor.onFloorDoubleTap([100, 200]);
@@ -127,7 +144,7 @@ describe("FloorEditor", () => {
         });
     });
 
-    describe("Element Manipulation", () => {
+    describe("addElement()", () => {
         it("should add an element to the canvas", () => {
             floorEditor.addElement({
                 tag: ElementTag.RECT,
@@ -142,8 +159,8 @@ describe("FloorEditor", () => {
         });
     });
 
-    describe("Grid Visibility and Rendering", () => {
-        it("should toggle grid visibility", () => {
+    describe("toggleGridVisibility()", () => {
+        it("toggles grid visibility", () => {
             // @ts-expect-error -- private prop
             const initialVisibility = floorEditor.gridDrawer.isGridVisible;
             floorEditor.toggleGridVisibility();
@@ -151,7 +168,7 @@ describe("FloorEditor", () => {
             expect(floorEditor.gridDrawer.isGridVisible).toBe(!initialVisibility);
         });
 
-        it("should re-render grid after updating dimensions", () => {
+        it("re-renders grid after updating dimensions", () => {
             const spy = vi.spyOn(floorEditor, "renderGrid");
             floorEditor.updateDimensions(500, 500);
             expect(spy).toHaveBeenCalled();
