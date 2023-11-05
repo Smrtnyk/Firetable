@@ -88,6 +88,10 @@ async function init(): Promise<void> {
     Loading.hide();
 }
 
+function toggleFullScreen(): void {
+    q.fullscreen.toggle(pageRef.value);
+}
+
 onMounted(init);
 </script>
 
@@ -126,7 +130,13 @@ onMounted(init);
             />
             <q-btn
                 class="button-gradient q-ma-none q-ml-sm"
-                rounded
+                round
+                icon="full-screen"
+                @click="toggleFullScreen"
+            />
+            <q-btn
+                class="button-gradient q-ma-none q-ml-sm"
+                round
                 :size="buttonSize"
                 icon="info"
                 @click="showEventInfo"
