@@ -75,7 +75,6 @@ export function useFloorsPageEvent(
         for (const table of tables) {
             table.startAnimation();
         }
-        state.value.floorInstances.forEach((floor) => floor.canvas.renderAll());
     }
 
     function updateFloorInstancesData(): void {
