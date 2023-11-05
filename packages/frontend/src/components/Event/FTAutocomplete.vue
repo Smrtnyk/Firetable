@@ -5,7 +5,7 @@
             hide-selected
             use-input
             v-model="searchTerm"
-            :label="t(`FTAutocomplete.label`)"
+            :label="isMobile ? '' : t(`FTAutocomplete.label`)"
             clearable
             clear-icon="close"
             dense
@@ -34,6 +34,7 @@
 import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { BaseTable } from "@firetable/floor-creator";
+import { isMobile } from "src/global-reactives/is-mobile";
 
 interface Props {
     allReservedTables: BaseTable[];
