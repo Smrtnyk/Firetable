@@ -1,4 +1,4 @@
-import { watch, reactive, computed, Ref, ref, nextTick } from "vue";
+import { watch, reactive, computed, Ref, ref, nextTick, onMounted, onBeforeUnmount } from "vue";
 import { EventDoc, FloorDoc, Role } from "@firetable/types";
 import {
     BaseTable,
@@ -14,6 +14,7 @@ import { useAuthStore } from "src/stores/auth-store";
 import { VueFirestoreDocumentData } from "vuefire";
 import { useUsers } from "src/composables/useUsers";
 import { useReservations } from "src/composables/useReservations";
+import { debounce } from "quasar";
 
 interface State {
     activeTablesAnimationInterval: number | null;
@@ -50,7 +51,24 @@ export function useFloorsPageEvent(
         return currentUser.value?.role !== Role.STAFF;
     });
 
+    onMounted(() => {
+        window.addEventListener("resize", resizeFloor);
+    });
+
+    onBeforeUnmount(() => {
+        window.removeEventListener("resize", resizeFloor);
+    });
+
     watch(() => eventFloors.value, handleFloorInstancesData, { deep: true });
+
+    const resizeFloor = debounce((): void => {
+        state.value.floorInstances.forEach((floor) => {
+            if (!pageRef.value) {
+                return;
+            }
+            floor.resize(pageRef.value.clientWidth);
+        });
+    }, 100);
 
     function onTableFound(tables: BaseTable[]): void {
         onAutocompleteClear();

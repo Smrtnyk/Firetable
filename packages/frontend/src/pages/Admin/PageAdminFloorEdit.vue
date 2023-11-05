@@ -6,7 +6,7 @@ import FTDialog from "src/components/FTDialog.vue";
 import { nextTick, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { NumberTuple } from "src/types/generic";
 import { useRouter } from "vue-router";
-import { exportFile, Loading, useQuasar } from "quasar";
+import { debounce, exportFile, Loading, useQuasar } from "quasar";
 import { BULK_ADD_COLLECTION, ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
 import {
     extractAllTablesLabels,
@@ -90,7 +90,10 @@ function onKeyDown(event: KeyboardEvent): void {
 }
 
 onBeforeUnmount(() => {
+    unregisterStateChangeListener?.();
+    floorInstance.value?.destroy();
     window.removeEventListener("keydown", onKeyDown);
+    window.removeEventListener("resize", resizeFloor);
 });
 
 onMounted(async () => {
@@ -100,6 +103,7 @@ onMounted(async () => {
         instantiateFloor(floor.value);
         Loading.hide();
         window.addEventListener("keydown", onKeyDown);
+        window.addEventListener("resize", resizeFloor);
     } else {
         router.replace("/").catch(showErrorMessage);
         Loading.hide();
@@ -108,10 +112,12 @@ onMounted(async () => {
     Loading.hide();
 });
 
-onBeforeUnmount(() => {
-    unregisterStateChangeListener?.();
-    floorInstance.value?.destroy();
-});
+const resizeFloor = debounce((): void => {
+    if (!pageRef.value || !floorInstance.value) {
+        return;
+    }
+    floorInstance.value.resize(pageRef.value.clientWidth);
+}, 100);
 
 function instantiateFloor(floorDoc: FloorDoc): void {
     if (!canvasRef.value || !pageRef.value) return;
