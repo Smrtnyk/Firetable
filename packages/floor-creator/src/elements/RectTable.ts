@@ -166,13 +166,13 @@ export class RectTable extends fabric.Group {
 
     setFill(val: string): void {
         this.rect.set("fill", val);
-        this.canvas?.renderAll();
+        this.canvas?.requestRenderAll();
     }
 
     setLabel(newLabel: string): void {
         this.label = newLabel;
         this.textLabel.set("text", newLabel);
-        this.canvas?.renderAll();
+        this.canvas?.requestRenderAll();
     }
 
     setReservation(reservation: Reservation | null): void {
