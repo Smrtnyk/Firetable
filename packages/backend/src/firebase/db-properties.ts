@@ -7,6 +7,7 @@ import { httpsCallable, HttpsCallableResult } from "firebase/functions";
 export type CreatePropertyPayload = {
     name: string;
     organisationId: string;
+    img?: string;
 };
 
 export function createNewProperty(

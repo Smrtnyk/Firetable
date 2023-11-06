@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { minLength } from "src/helpers/form-rules";
+import { minLength, validOptionalURL } from "src/helpers/form-rules";
 import { QForm } from "quasar";
 import { ADMIN, OrganisationDoc } from "@firetable/types";
 import { CreatePropertyPayload } from "@firetable/backend";
@@ -18,10 +18,14 @@ const emit = defineEmits<{
 }>();
 const { t } = useI18n();
 const authStore = useAuthStore();
-const propertyRules = [minLength(t("AddNewPropertyForm.propertyNameLengthValidationMessage"), 3)];
 const propertyName = ref("");
+const propertyImgUrl = ref("");
 const createPropertyForm = ref<null | QForm>(null);
 const chosenOrganisation = ref<string | null>(null);
+
+const propertyRules = [minLength(t("AddNewPropertyForm.propertyNameLengthValidationMessage"), 3)];
+
+const imgUrlRules = [validOptionalURL()];
 
 // If only one organisation is passed in, then it is never an ADMIN
 const isSingleOrganisation = computed(() => {
@@ -42,6 +46,7 @@ async function submit(): Promise<void> {
 
     emit("create", {
         name: propertyName.value,
+        img: propertyImgUrl.value,
         organisationId,
     });
 }
@@ -50,7 +55,22 @@ async function submit(): Promise<void> {
 <template>
     <q-card-section>
         <q-form ref="createPropertyForm" class="q-gutter-md">
-            <q-input v-model="propertyName" rounded standout autofocus :rules="propertyRules" />
+            <q-input
+                label="Property name"
+                v-model="propertyName"
+                rounded
+                standout
+                autofocus
+                :rules="propertyRules"
+            />
+            <q-input
+                label="Optional property image url"
+                v-model="propertyImgUrl"
+                rounded
+                standout
+                autofocus
+                :rules="imgUrlRules"
+            />
 
             <div v-if="!isSingleOrganisation" class="q-gutter-sm q-mb-lg">
                 <div>{{ t("AddNewPropertyForm.organisationsRadioBoxLabel") }}</div>

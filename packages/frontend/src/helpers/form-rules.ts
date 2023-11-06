@@ -29,3 +29,21 @@ export function greaterThanZero(
         return (!isNaN(Number(val)) && Number(val) > 0) || msg;
     };
 }
+
+function isValidUrl(string: string): boolean {
+    try {
+        new URL(string);
+        return true;
+    } catch (_) {
+        return false;
+    }
+}
+
+export function validOptionalURL(msg = "Not a valid url"): (val: string) => boolean | string {
+    return function (val: string): boolean | string {
+        if (val === "") {
+            return true;
+        }
+        return (val && isValidUrl(val)) || msg;
+    };
+}

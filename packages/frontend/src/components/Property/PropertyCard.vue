@@ -20,7 +20,7 @@ const props = defineProps<Props>();
         }"
     >
         <q-card class="PropertyCard">
-            <q-parallax
+            <q-img
                 class="PropertyCard__parallax"
                 :src="props.property.img || 'images/default-event-img.jpg'"
                 alt=""
