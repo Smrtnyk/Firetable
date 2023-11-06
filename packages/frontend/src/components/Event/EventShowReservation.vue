@@ -92,7 +92,7 @@ function onReservationConfirm(): void {
         <q-item>
             <div v-if="!isStaff" class="row q-gutter-sm full-width">
                 <q-btn
-                    title="Delete reservation"
+                    :title="t('Global.delete')"
                     class="no-wrap"
                     icon="trash"
                     color="negative"
@@ -100,7 +100,7 @@ function onReservationConfirm(): void {
                     v-close-popup
                 />
                 <q-btn
-                    title="Edit reservation"
+                    :title="t('Global.edit')"
                     icon="pencil"
                     color="positive"
                     @click="() => emit('edit')"
@@ -108,7 +108,7 @@ function onReservationConfirm(): void {
                 />
             </div>
             <q-btn
-                title="Transfer reservation"
+                :title="t('Global.transfer')"
                 v-if="props.crossFloorReservationTransferEnabled"
                 icon="transfer"
                 color="primary"

@@ -1,4 +1,10 @@
 export default {
+    Global: {
+        fullScreen: "Vollbild",
+        edit: "Bearbeiten",
+        transfer: "Übertragen",
+        delete: "Löschen",
+    },
     AppDrawer: {
         links: {
             logout: "Abmelden",
@@ -14,7 +20,7 @@ export default {
         },
     },
     EventCard: {
-        freeLabel: "Gratis",
+        freeLabel: "Kostenlos",
     },
     PageEvent: {
         showFloorPlansExpanded: "Grundrisse anzeigen",
@@ -60,8 +66,8 @@ export default {
         guestArrivedLabel: "Ist der Gast angekommen?",
         deleteReservationLabel: "Löschen",
         editReservationLabel: "Bearbeiten",
-        reservationConsumption: "Consumption",
-        timeLabel: "Time",
+        reservationConsumption: "Flaschenverzehr",
+        timeLabel: "Ankunftszeit",
     },
     EventCreateReservation: {
         title: "Tisch",
@@ -72,11 +78,11 @@ export default {
         reservationGuestContact: "Kontakt des Gastes",
         reservationNote: "Notiz",
         reservationCreateBtn: "Absenden",
-        reservationConsumption: "Consumption",
-        reservationTime: "Time",
-        reservedByLabel: "Reserved by",
-        requireReservedBySelectionError: "You need to select at least one option",
-        reservedBySocialLabel: "Social Networks",
+        reservationConsumption: "Flaschenverzehr",
+        reservationTime: "Ankunftszeit",
+        reservedByLabel: "Reserviert von",
+        requireReservedBySelectionError: "Sie müssen mindestens eine Option auswählen",
+        reservedBySocialLabel: "Soziale Netzwerke",
     },
     PageAdminProperties: {
         properties: "Immobilien",

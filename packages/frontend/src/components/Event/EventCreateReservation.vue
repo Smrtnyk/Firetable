@@ -150,7 +150,12 @@ async function onOKClick(): Promise<void> {
                 :label="t(`EventCreateReservation.reservationGuestContact`)"
             />
 
-            <q-input v-model="state.reservationNote" rounded standout label="Note" />
+            <q-input
+                v-model="state.reservationNote"
+                rounded
+                standout
+                :label="t('EventCreateReservation.reservationNote')"
+            />
 
             <!-- Selector for choosing between 'User' or 'Social' -->
             <div class="q-mb-md">

@@ -1,4 +1,10 @@
 export default {
+    Global: {
+        fullScreen: "Full Screen",
+        edit: "Edit",
+        transfer: "Transfer",
+        delete: "Delete",
+    },
     AppDrawer: {
         links: {
             logout: "Logout",
@@ -61,7 +67,7 @@ export default {
         deleteReservationLabel: "Delete",
         editReservationLabel: "Edit",
         reservationConsumption: "Consumption",
-        timeLabel: "Time",
+        timeLabel: "Time of arrival",
     },
     EventCreateReservation: {
         title: "Table",
