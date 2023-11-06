@@ -57,8 +57,9 @@ const {
     mapFloorToCanvas,
     onAutocompleteClear,
     allReservedTables,
-    useFloorsPageEventState,
     hasMultipleFloorPlans,
+    activeFloor,
+    floorInstances,
 } = useFloorsPageEvent(eventFloors, pageRef, eventOwner, event);
 
 const buttonSize = computed(() => {
@@ -102,11 +103,7 @@ onMounted(init);
             <q-fab
                 v-if="hasMultipleFloorPlans"
                 :model-value="state.showMapsExpanded"
-                :label="
-                    !isMobile && useFloorsPageEventState.activeFloor
-                        ? useFloorsPageEventState.activeFloor.name
-                        : ''
-                "
+                :label="!isMobile && activeFloor ? activeFloor.name : ''"
                 padding="xs"
                 vertical-actions-align="left"
                 icon="chevron_down"
@@ -115,7 +112,7 @@ onMounted(init);
             >
                 <q-fab-action
                     :key="florInstance.id"
-                    v-for="florInstance of useFloorsPageEventState.floorInstances"
+                    v-for="florInstance of floorInstances"
                     class="text-white"
                     :class="{ 'button-gradient': isActiveFloor(florInstance.id) }"
                     @click.prevent="() => setActiveFloor(florInstance)"

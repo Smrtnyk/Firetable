@@ -7,34 +7,26 @@ import { useUsers } from "src/composables/useUsers";
 import { useReservations } from "src/composables/useReservations";
 import { debounce } from "quasar";
 
-interface State {
-    activeTablesAnimationInterval: number | null;
-    activeFloor: { id: string; name: string } | undefined;
-    floorInstances: Set<FloorViewer>;
-}
-
 export function useFloorsPageEvent(
     eventFloors: Ref<FloorDoc[]>,
     pageRef: Ref<HTMLDivElement | undefined>,
     eventOwner: EventOwner,
     event: Ref<VueFirestoreDocumentData<EventDoc> | undefined>,
 ) {
-    const state = ref<State>({
-        activeTablesAnimationInterval: null,
-        floorInstances: new Set(),
-        activeFloor: void 0,
-    });
+    const activeTablesAnimationInterval = ref<number | undefined>();
+    const activeFloor = ref<{ id: string; name: string } | undefined>();
+    const floorInstances = ref<Set<FloorViewer>>(new Set());
     const { users } = useUsers();
     const {
         tableClickHandler,
         checkReservationsForTimeAndMarkTableIfNeeded,
         swapOrTransferReservations,
         allReservedTables,
-    } = useReservations(users, state.value.floorInstances, eventOwner, event);
+    } = useReservations(users, floorInstances.value, eventOwner, event);
     const canvases = reactive<Map<string, HTMLCanvasElement>>(new Map());
 
     const hasMultipleFloorPlans = computed(() => {
-        return state.value.floorInstances.size > 1;
+        return floorInstances.value.size > 1;
     });
 
     onMounted(() => {
@@ -48,7 +40,7 @@ export function useFloorsPageEvent(
     watch(() => eventFloors.value, handleFloorInstancesData, { deep: true });
 
     const resizeFloor = debounce((): void => {
-        state.value.floorInstances.forEach((floor) => {
+        floorInstances.value.forEach((floor) => {
             if (!pageRef.value) {
                 return;
             }
@@ -66,7 +58,7 @@ export function useFloorsPageEvent(
     function updateFloorInstancesData(): void {
         if (!eventFloors.value.length) return;
 
-        for (const floorInstance of state.value.floorInstances) {
+        for (const floorInstance of floorInstances.value) {
             const findFloor = eventFloors.value.find(({ id }) => id === floorInstance.id);
             if (!findFloor) return;
             floorInstance.renderData(findFloor.json);
@@ -78,13 +70,13 @@ export function useFloorsPageEvent(
     async function initFloorInstancesData(): Promise<void> {
         await nextTick();
         instantiateFloors();
-        setActiveFloor([...state.value.floorInstances][0]);
+        setActiveFloor([...floorInstances.value][0]);
         checkReservationsForTimeAndMarkTableIfNeeded();
     }
 
     async function handleFloorInstancesData(newVal: FloorDoc[], old: FloorDoc[]): Promise<void> {
         if (!eventFloors.value) return;
-        if ((!old.length && newVal.length) || state.value.floorInstances.size === 0) {
+        if ((!old.length && newVal.length) || floorInstances.value.size === 0) {
             await initFloorInstancesData();
             return;
         }
@@ -113,24 +105,24 @@ export function useFloorsPageEvent(
         });
         floorViewer.on("elementClicked", tableClickHandler);
         floorViewer.on("tableToTable", swapOrTransferReservations);
-        state.value.floorInstances.add(floorViewer);
+        floorInstances.value.add(floorViewer);
     }
 
     function isActiveFloor(floorId: string): boolean {
-        return state.value.activeFloor?.id === floorId;
+        return activeFloor.value?.id === floorId;
     }
 
     function setActiveFloor(floor?: FloorViewer): void {
         if (floor) {
-            state.value.activeFloor = { id: floor.id, name: floor.name };
+            activeFloor.value = { id: floor.id, name: floor.name };
         }
     }
 
     function onAutocompleteClear(): void {
-        if (state.value.activeTablesAnimationInterval) {
-            clearInterval(state.value.activeTablesAnimationInterval);
+        if (activeTablesAnimationInterval.value) {
+            clearInterval(activeTablesAnimationInterval.value);
         }
-        state.value.floorInstances.forEach((floor) => {
+        floorInstances.value.forEach((floor) => {
             const tables = getTables(floor);
             tables.forEach((table) => table.stopAnimation());
         });
@@ -142,8 +134,9 @@ export function useFloorsPageEvent(
         mapFloorToCanvas,
         isActiveFloor,
         setActiveFloor,
-        useFloorsPageEventState: state,
         allReservedTables,
         hasMultipleFloorPlans,
+        activeFloor,
+        floorInstances,
     };
 }
