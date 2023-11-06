@@ -60,13 +60,9 @@ function toEventDoc(doc: DocumentData): EventDoc {
     };
 }
 
-export function updateEventProperty<T extends keyof EventDoc>(
-    owner: EventOwner,
-    key: T,
-    value: EventDoc[T],
-): Promise<void> {
+export function updateEvent(owner: EventOwner, data: Partial<EventDoc>): Promise<void> {
     return updateDoc(eventDoc(owner), {
-        [key]: value,
+        ...data,
     });
 }
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from "vue";
+import { computed, reactive, ref, watch, watchEffect } from "vue";
 
 import { useI18n } from "vue-i18n";
 import {
@@ -11,10 +11,10 @@ import {
 import { useRouter } from "vue-router";
 
 import { QForm } from "quasar";
-import { CreateEventForm, CreateEventPayload } from "@firetable/types";
+import { CreateEventForm, CreateEventPayload, EditEventPayload, EventDoc } from "@firetable/types";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { PropertyFloors } from "src/composables/useFloors";
-import { formatEventDate } from "src/helpers/date-utils";
+import { dateFromTimestamp, hourFromTimestamp } from "src/helpers/date-utils";
 
 interface State {
     form: CreateEventForm;
@@ -27,6 +27,7 @@ interface State {
 
 interface Props {
     property: PropertyFloors;
+    event?: EventDoc;
 }
 
 const now = new Date();
@@ -45,7 +46,10 @@ const eventObj: CreateEventForm = {
 const props = defineProps<Props>();
 const emit = defineEmits<{
     (event: "create", payload: CreateEventPayload): void;
+    (event: "update", payload: EditEventPayload): void;
 }>();
+
+const isEditMode = computed(() => !!props.event);
 const { t } = useI18n();
 const router = useRouter();
 const form = ref<QForm>();
@@ -55,7 +59,28 @@ const state = reactive<State>({
     showDateModal: false,
     showTimeModal: false,
     selectedDate: `${day}-${month}-${year}`,
-    selectedTime: formatEventDate(newDate.getTime()).split(" ")[1], // "HH:mm"
+    selectedTime: hourFromTimestamp(newDate.getTime()),
+});
+
+// In your setup or watchEffect where you determine if you're in edit mode
+watchEffect(() => {
+    if (isEditMode.value && props.event) {
+        // Use event data if in edit mode
+        const editDate = new Date(props.event.date);
+        state.form = {
+            name: props.event.name,
+            guestListLimit: props.event.guestListLimit,
+            entryPrice: props.event.entryPrice,
+            img: props.event.img,
+            date: props.event.date,
+        };
+        state.selectedDate = dateFromTimestamp(editDate.getTime());
+        state.selectedTime = hourFromTimestamp(editDate.getTime());
+    } else {
+        state.form = { ...eventObj };
+        state.selectedDate = `${day}-${month}-${year}`;
+        state.selectedTime = hourFromTimestamp(newDate.getTime());
+    }
 });
 
 watch([() => state.selectedDate, () => state.selectedTime], () => {
@@ -80,7 +105,7 @@ const totalFloors = computed(() => {
     return props.property.floors.length;
 });
 
-async function onSubmit(): Promise<void> {
+async function validateAndEmitCreate(): Promise<void> {
     if (!state.chosenFloors.length) {
         showErrorMessage(t("EventCreateForm.noChosenFloorsMessage"));
         return;
@@ -95,16 +120,33 @@ async function onSubmit(): Promise<void> {
         return;
     }
 
-    if (!(await form.value?.validate())) {
-        return;
-    }
     emit("create", {
         ...state.form,
+        guestListLimit: Number(state.form.guestListLimit),
         propertyId: props.property.propertyId,
         organisationId: props.property.organisationId,
         floors: selectedFloors,
     });
     state.form = eventObj;
+}
+
+async function validateAndEmitEdit(): Promise<void> {
+    emit("update", {
+        ...state.form,
+        guestListLimit: Number(state.form.guestListLimit),
+        propertyId: props.property.propertyId,
+        organisationId: props.property.organisationId,
+    });
+}
+
+async function onSubmit(): Promise<void> {
+    if (!(await form.value?.validate())) {
+        return;
+    }
+    if (isEditMode.value) {
+        return validateAndEmitEdit();
+    }
+    return validateAndEmitCreate();
 }
 
 function onReset(): void {
@@ -211,7 +253,7 @@ function onReset(): void {
                 </template>
             </q-input>
 
-            <div class="q-gutter-sm q-mb-lg">
+            <div class="q-gutter-sm q-mb-lg" v-if="!isEditMode">
                 <div class="text-h6">{{ props.property.propertyName }}</div>
                 <div>
                     <q-checkbox
@@ -234,6 +276,7 @@ function onReset(): void {
                     class="button-gradient"
                 />
                 <q-btn
+                    v-if="!isEditMode"
                     rounded
                     size="md"
                     :label="t('EventCreateForm.resetButtonLabel')"

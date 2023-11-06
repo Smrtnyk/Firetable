@@ -6,17 +6,24 @@ interface Props {
     event: EventDoc;
 }
 const props = defineProps<Props>();
-const emit = defineEmits(["right"]);
+const emit = defineEmits(["right", "left"]);
 
 function emitOnRight({ reset }: { reset: () => void }): void {
     emit("right", { event: props.event, reset });
 }
+
+function emitEdit({ reset }: { reset: () => void }): void {
+    emit("left", { event: props.event, reset });
+}
 </script>
 
 <template>
-    <q-slide-item right-color="warning" @right="emitOnRight" class="fa-card">
+    <q-slide-item right-color="warning" @right="emitOnRight" @left="emitEdit" class="fa-card">
         <template #right>
             <q-icon name="trash" />
+        </template>
+        <template #left>
+            <q-icon name="pencil" />
         </template>
         <q-item
             :to="{

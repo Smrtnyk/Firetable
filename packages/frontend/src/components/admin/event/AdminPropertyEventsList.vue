@@ -8,6 +8,7 @@ interface Props {
     property: PropertyDoc;
     eventsByProperty: Record<string, Set<EventDoc>>;
     onEventItemSlideRight: (eventDetails: { event: any; reset: () => void }) => void;
+    onEventEdit: (eventDetails: { event: any; reset: () => void }) => void;
     onLoad: (property: PropertyDoc) => void;
     done: boolean;
 }
@@ -60,6 +61,7 @@ function handleLoad(): void {
                         :key="event.id"
                         :event="event"
                         @right="props.onEventItemSlideRight"
+                        @left="props.onEventEdit"
                     />
                 </div>
             </div>

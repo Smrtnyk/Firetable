@@ -16,6 +16,11 @@ export type CreateEventPayload = CreateEventForm & {
     floors: FloorDoc[];
 };
 
+export type EditEventPayload = CreateEventForm & {
+    propertyId: string;
+    organisationId: string;
+};
+
 export interface EventDoc {
     id: string;
     creator: string;

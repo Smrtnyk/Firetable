@@ -12,12 +12,13 @@ import {
 } from "src/helpers/ui-helpers";
 import { computed, ref, watch } from "vue";
 import { Loading, useQuasar } from "quasar";
-import { CreateEventPayload, EventDoc, PropertyDoc } from "@firetable/types";
+import { CreateEventPayload, EditEventPayload, EventDoc, PropertyDoc } from "@firetable/types";
 import {
     createNewEvent,
     deleteDocAndAllSubCollections,
     EventOwner,
     getEventsPath,
+    updateEvent,
 } from "@firetable/backend";
 import { takeLast } from "@firetable/utils";
 import { useFloors } from "src/composables/useFloors";
@@ -110,6 +111,19 @@ const onCreateEvent = withLoading(async function (eventData: CreateEventPayload)
     });
 });
 
+const onUpdateEvent = withLoading(async function (eventData: EditEventPayload & { id: string }) {
+    await updateEvent(
+        {
+            propertyId: eventData.propertyId,
+            organisationId: eventData.organisationId,
+            id: eventData.id,
+        },
+        eventData,
+    );
+    // An ugly hack to force data reload
+    window.location.reload();
+});
+
 async function onEventItemSlideRight({
     event,
     reset,
@@ -134,6 +148,20 @@ async function onEventItemSlideRight({
     });
 }
 
+async function onEventEdit(
+    property: PropertyDoc,
+    {
+        event,
+        reset,
+    }: {
+        event: EventDoc;
+        reset: () => void;
+    },
+): Promise<void> {
+    showCreateEventForm(property, event);
+    reset();
+}
+
 async function onLoad(property: PropertyDoc): Promise<void> {
     const propertyId = property.id;
     if (!hasMoreEventsToFetch[propertyId]) {
@@ -153,19 +181,30 @@ async function onLoad(property: PropertyDoc): Promise<void> {
     }
 }
 
-function showCreateEventForm(property: PropertyDoc): void {
+function showCreateEventForm(property: PropertyDoc, event?: EventDoc): void {
     const dialog = createDialog({
         component: FTDialog,
         componentProps: {
-            title: t("PageAdminEvents.createNewEventDialogTitle"),
+            title: event ? "Edit event" : t("PageAdminEvents.createNewEventDialogTitle"),
             maximized: false,
             component: EventCreateForm,
             componentPropsObject: {
                 property: floors.value[property.id],
+                event,
             },
             listeners: {
                 create: (eventData: CreateEventPayload) => {
                     onCreateEvent(eventData);
+                    dialog.hide();
+                },
+                update(eventData: EditEventPayload) {
+                    if (!event) {
+                        return;
+                    }
+                    onUpdateEvent({
+                        ...eventData,
+                        id: event.id,
+                    });
                     dialog.hide();
                 },
             },
@@ -212,6 +251,7 @@ function showCreateEventForm(property: PropertyDoc): void {
                             :property="property"
                             :events-by-property="eventsByProperty"
                             :on-event-item-slide-right="onEventItemSlideRight"
+                            :on-event-edit="(eventDetails) => onEventEdit(property, eventDetails)"
                             :on-load="onLoad"
                             :done="!hasMoreEventsToFetch[property.id]"
                         />

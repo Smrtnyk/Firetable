@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { EventOwner, updateEventProperty } from "@firetable/backend";
+import { EventOwner, updateEvent } from "@firetable/backend";
 import { withLoading } from "src/helpers/ui-helpers";
 
 interface Props {
@@ -23,6 +23,8 @@ const props = defineProps<Props>();
 const localEventInfoValue = ref(props.eventInfo);
 
 const saveEventInfo = withLoading(() =>
-    updateEventProperty(props.eventOwner, "info", localEventInfoValue.value),
+    updateEvent(props.eventOwner, {
+        info: localEventInfoValue.value,
+    }),
 );
 </script>
