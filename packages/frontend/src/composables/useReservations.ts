@@ -208,6 +208,7 @@ export function useReservations(
         if (!table1.reservation) {
             return;
         }
+
         const transferMessage = `This will transfer reservation from table ${table1.label} to table ${table2.label}`;
         const shouldTransfer = await showConfirm("Transfer reservation", transferMessage);
 
@@ -301,6 +302,7 @@ export function useReservations(
         if (!isTable(element)) return;
 
         if (await handleCrossFloorReservationTransfer(floor, element)) {
+            crossFloorReservationTransferTable.value = undefined;
             return;
         }
 
@@ -321,6 +323,10 @@ export function useReservations(
         }
 
         if (crossFloorReservationTransferTable.value.floor.id === floor.id) {
+            // If it is the same table, do nothing
+            if (crossFloorReservationTransferTable.value.table.label === element.label) {
+                return true;
+            }
             await swapOrTransferReservations(
                 floor,
                 crossFloorReservationTransferTable.value.table,
@@ -335,7 +341,6 @@ export function useReservations(
             );
         }
 
-        crossFloorReservationTransferTable.value = undefined;
         return true;
     }
 
