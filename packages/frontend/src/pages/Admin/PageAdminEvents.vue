@@ -140,8 +140,6 @@ async function onLoad(property: PropertyDoc): Promise<void> {
         return;
     }
 
-    console.log("onLoad called with:", propertyId);
-
     const eventOwner: EventOwner = {
         propertyId,
         organisationId: property.organisationId,

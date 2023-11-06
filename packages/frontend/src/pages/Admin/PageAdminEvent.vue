@@ -43,7 +43,6 @@ const { eventFloors, event, isLoading } = useAdminEvent(eventOwner);
 watch(
     isLoading,
     (newIsLoading) => {
-        console.log("new loading", newIsLoading);
         if (!newIsLoading) {
             Loading.hide();
         } else {

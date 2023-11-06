@@ -267,7 +267,6 @@ export function useReservations(
     ): Promise<void> {
         const transferMessage = `This will transfer reservation between floor plans "${floor1.name}" table "${table1.label}" to floor plan "${floor2.name}" table "${table2.label}"`;
         const shouldTransfer = await showConfirm("Transfer reservation", transferMessage);
-        console.log(shouldTransfer);
 
         if (!shouldTransfer) {
             return;
