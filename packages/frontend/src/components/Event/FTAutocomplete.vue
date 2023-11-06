@@ -37,6 +37,7 @@ import { BaseTable } from "@firetable/floor-creator";
 
 interface Props {
     allReservedTables: BaseTable[];
+    showFloorNameInOption: boolean;
 }
 
 const props = defineProps<Props>();
@@ -56,8 +57,12 @@ function getNamesFromTables(tables: BaseTable[]): { label: string; value: string
 }
 
 function createTableLabel(table: BaseTable): string {
-    // @ts-expect-error -- floor is custom prop on canvas set by us
-    return `${table.reservation!.guestName} (${table.label} on ${table.canvas?.floor.name})`;
+    const label = `${table.reservation!.guestName} (${table.label})`;
+    if (props.showFloorNameInOption) {
+        // @ts-expect-error -- floor is custom prop on canvas set by us
+        return `${label} on ${table.canvas?.floor.name}`;
+    }
+    return label;
 }
 
 function findSearchedTable(inputVal: string | { value: string }): BaseTable[] {

@@ -60,6 +60,10 @@ const {
     useFloorsPageEventState,
 } = useFloorsPageEvent(eventFloors, pageRef, eventOwner, event);
 
+const hasMultipleFloorPlans = computed(() => {
+    return useFloorsPageEventState.value.floorInstances.size > 1;
+});
+
 const buttonSize = computed(() => {
     return isMobile.value ? "sm" : "md";
 });
@@ -99,7 +103,7 @@ onMounted(init);
     <div v-if="event" class="PageEvent" ref="pageRef">
         <div class="row items-center q-mb-sm q-gutter-sm">
             <q-fab
-                v-if="useFloorsPageEventState.floorInstances.size > 1"
+                v-if="hasMultipleFloorPlans"
                 :model-value="state.showMapsExpanded"
                 :label="
                     !isMobile && useFloorsPageEventState.activeFloor
@@ -123,6 +127,7 @@ onMounted(init);
             </q-fab>
 
             <FTAutocomplete
+                :show-floor-name-in-option="hasMultipleFloorPlans"
                 :all-reserved-tables="allReservedTables"
                 @found="onTableFound"
                 @clear="onAutocompleteClear"
