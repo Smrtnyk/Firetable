@@ -336,38 +336,38 @@ function triggerFileInput(): void {
             <template #buttons>
                 <q-btn
                     title="Undo"
-                    rounded
+                    round
                     :disabled="!undoRedoState.canUndo"
                     @click="undoAction"
                     icon="undo"
                 />
                 <q-btn
                     title="Redo"
-                    rounded
+                    round
                     :disabled="!undoRedoState.canRedo"
                     @click="redoAction"
                     icon="redo"
                 />
                 <q-btn
-                    rounded
+                    round
                     title="Toggle grid"
                     @click="floorInstance.toggleGridVisibility"
                     icon="grid"
                 />
                 <q-btn
                     title="Toggle bulk mode"
-                    rounded
+                    round
                     @click="toggleBulkMode"
                     icon="stack"
                     :color="bulkMode ? 'positive' : undefined"
                 />
                 <q-btn
-                    rounded
+                    round
                     icon="export"
                     title="Export floor plan"
                     @click="exportFloor(floorInstance as FloorEditor)"
                 />
-                <q-btn rounded title="Import floor plan" icon="import" @click="triggerFileInput" />
+                <q-btn round title="Import floor plan" icon="import" @click="triggerFileInput" />
                 <input
                     ref="fileInputRef"
                     type="file"
