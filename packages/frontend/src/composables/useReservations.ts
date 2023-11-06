@@ -227,39 +227,36 @@ export function useReservations(
         });
     }
 
+    function shouldMarkReservationAsExpired(reservationTime: string, eventDate: Date): boolean {
+        const currentDate = new Date();
+        const [hours, minutes] = reservationTime.split(":");
+        const eventDateTime = new Date(eventDate);
+        eventDateTime.setHours(parseInt(hours, 10), parseInt(minutes, 10));
+
+        if (hours.startsWith("0")) {
+            eventDateTime.setDate(eventDateTime.getDate() + 1);
+        }
+
+        return currentDate.getTime() - eventDateTime.getTime() >= HALF_HOUR;
+    }
+
     function checkReservationsForTimeAndMarkTableIfNeeded(): void {
         if (!event.value?.date) {
             return;
         }
 
         const baseEventDate = new Date(event.value.date);
-        const allReservedTablesArr = Array.from(floorInstances).flatMap(getReservedTables);
+        const allReservedTablesArr = allReservedTables.value;
 
-        if (!allReservedTablesArr.length) {
-            return;
-        }
-
-        const currentDate = new Date();
-
-        for (const table of allReservedTablesArr) {
-            // Only mark non-confirmed reservations
-            if (table.reservation?.confirmed) {
-                continue;
-            }
-            const [hours, minutes] = table.reservation!.time.split(":");
-            const eventDateTime = new Date(baseEventDate);
-            eventDateTime.setHours(parseInt(hours, 10), parseInt(minutes, 10));
-
-            // Check if time is starting with "0", for example 01:00, it means it is next day in the morning,
-            // so we need to adjust the date to the next day
-            if (hours.startsWith("0")) {
-                eventDateTime.setDate(eventDateTime.getDate() + 1);
-            }
-
-            if (currentDate.getTime() - eventDateTime.getTime() >= HALF_HOUR) {
+        allReservedTablesArr.forEach((table: BaseTable) => {
+            if (
+                table.reservation &&
+                !table.reservation.confirmed &&
+                shouldMarkReservationAsExpired(table.reservation.time, baseEventDate)
+            ) {
                 table.setFill("red");
             }
-        }
+        });
     }
 
     async function swapOrTransferReservationsBetweenFloorPlans(
