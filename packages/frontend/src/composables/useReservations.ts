@@ -88,7 +88,6 @@ export function useReservations(
     }
 
     function onEditReservation(floor: Floor, element: BaseTable): void {
-        console.log(floor, element);
         showCreateReservationDialog(floor, element, "edit");
     }
 
