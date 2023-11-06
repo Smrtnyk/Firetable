@@ -84,6 +84,7 @@ export function createNewEvent(
 export function updateEventFloorData(owner: EventOwner, floor: Floor): Promise<void> {
     return updateDoc(eventFloorDoc(owner, floor.id), {
         json: floor.json,
+        lastModified: Date.now(),
     });
 }
 

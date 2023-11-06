@@ -86,6 +86,7 @@ function onReservationConfirm(): void {
                     unchecked-icon="close"
                     checked-icon="check"
                     color="green"
+                    v-close-popup
                 />
             </q-item-section>
         </q-item>

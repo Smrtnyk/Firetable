@@ -7,6 +7,10 @@ export interface FloorDoc {
     propertyId: string;
 }
 
+export type EventFloorDoc = FloorDoc & {
+    lastModified?: number;
+};
+
 export const enum ElementTag {
     RECT = "RectTable",
     CIRCLE = "RoundTable",

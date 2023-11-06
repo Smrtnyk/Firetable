@@ -1,5 +1,5 @@
 import { watch, reactive, computed, Ref, ref, nextTick, onMounted, onBeforeUnmount } from "vue";
-import { EventDoc, FloorDoc } from "@firetable/types";
+import { EventDoc, EventFloorDoc } from "@firetable/types";
 import { BaseTable, FloorViewer, FloorMode, getTables } from "@firetable/floor-creator";
 import { EventOwner } from "@firetable/backend";
 import { VueFirestoreDocumentData } from "vuefire";
@@ -8,7 +8,7 @@ import { useReservations } from "src/composables/useReservations";
 import { debounce } from "quasar";
 
 export function useFloorsPageEvent(
-    eventFloors: Ref<FloorDoc[]>,
+    eventFloors: Ref<EventFloorDoc[]>,
     pageRef: Ref<HTMLDivElement | undefined>,
     eventOwner: EventOwner,
     event: Ref<VueFirestoreDocumentData<EventDoc> | undefined>,
@@ -37,7 +37,21 @@ export function useFloorsPageEvent(
         window.removeEventListener("resize", resizeFloor);
     });
 
-    watch(() => eventFloors.value, handleFloorInstancesData, { deep: true });
+    watch(eventFloors, handleFloorInstancesData);
+
+    watch(
+        () => eventFloors.value.map((floor) => floor.lastModified),
+        async (newTimestamps, oldTimestamps) => {
+            if (!oldTimestamps.length) return;
+
+            for (let i = 0; i < newTimestamps.length; i++) {
+                if (newTimestamps[i] !== oldTimestamps[i]) {
+                    updateFloorInstanceData(eventFloors.value[i].id, eventFloors.value[i].json);
+                }
+            }
+        },
+        { deep: true },
+    );
 
     const resizeFloor = debounce((): void => {
         floorInstances.value.forEach((floor) => {
@@ -55,14 +69,12 @@ export function useFloorsPageEvent(
         }
     }
 
-    function updateFloorInstancesData(): void {
-        if (!eventFloors.value.length) return;
-
-        for (const floorInstance of floorInstances.value) {
-            const findFloor = eventFloors.value.find(({ id }) => id === floorInstance.id);
-            if (!findFloor) return;
-            floorInstance.renderData(findFloor.json);
+    function updateFloorInstanceData(floorId: string, json: Record<string, unknown>): void {
+        const maybeFloorViewer = Array.from(floorInstances.value).find(({ id }) => id === floorId);
+        if (!maybeFloorViewer) {
+            return;
         }
+        maybeFloorViewer.renderData(json);
 
         checkReservationsForTimeAndMarkTableIfNeeded();
     }
@@ -74,16 +86,18 @@ export function useFloorsPageEvent(
         checkReservationsForTimeAndMarkTableIfNeeded();
     }
 
-    async function handleFloorInstancesData(newVal: FloorDoc[], old: FloorDoc[]): Promise<void> {
+    async function handleFloorInstancesData(
+        newVal: EventFloorDoc[],
+        old: EventFloorDoc[],
+    ): Promise<void> {
         if (!eventFloors.value) return;
         if ((!old.length && newVal.length) || floorInstances.value.size === 0) {
             await initFloorInstancesData();
             return;
         }
-        updateFloorInstancesData();
     }
 
-    function mapFloorToCanvas(floor: FloorDoc) {
+    function mapFloorToCanvas(floor: EventFloorDoc) {
         return function (el: any) {
             canvases.set(floor.id, el);
         };
@@ -93,7 +107,7 @@ export function useFloorsPageEvent(
         eventFloors.value.forEach(instantiateFloor);
     }
 
-    function instantiateFloor(floorDoc: FloorDoc): void {
+    function instantiateFloor(floorDoc: EventFloorDoc): void {
         const canvas = canvases.get(floorDoc.id);
 
         if (!canvas || !pageRef.value) return;
