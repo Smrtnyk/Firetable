@@ -53,6 +53,7 @@ export abstract class Floor {
         });
         // @ts-expect-error -- setting this intentionally here, so we have it available if needed
         this.canvas.floor = this;
+        this.setScaling();
         this.renderData(this.floorDoc.json);
 
         this.zoomManager = new FloorZoomManager(
@@ -82,7 +83,6 @@ export abstract class Floor {
     }
 
     renderData(jsonData?: FloorDoc["json"]): void {
-        this.setScaling();
         this.canvas.loadFromJSON(
             jsonData,
             () => {
