@@ -72,7 +72,7 @@ export function useReservations(
         reservationData: Reservation,
         table: BaseTable,
     ): void {
-        table?.setReservation(reservationData);
+        table.setReservation(reservationData);
         void tryCatchLoadingWrapper({
             hook: () => updateEventFloorData(eventOwner, floor),
         });
@@ -80,7 +80,7 @@ export function useReservations(
 
     async function onDeleteReservation(floor: Floor, element: BaseTable): Promise<void> {
         if (!(await showConfirm("Delete reservation?")) || !element.reservation) return;
-        element?.setReservation(null);
+        element.setReservation(null);
 
         await tryCatchLoadingWrapper({
             hook: () => updateEventFloorData(eventOwner, floor),
@@ -190,7 +190,7 @@ export function useReservations(
         return function (val: boolean) {
             const { reservation } = element;
             if (!reservation) return;
-            element?.setReservation({
+            element.setReservation({
                 ...reservation,
                 confirmed: val,
             });
