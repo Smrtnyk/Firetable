@@ -26,7 +26,7 @@ const { t } = useI18n();
             <q-img :src="event.img || '/images/default-event-img.jpg'" />
 
             <q-card-section class="EventCard__content">
-                <h2 class="text-h3 q-mb-sm q-ml-none q-mt-none">{{ props.event.name }}</h2>
+                <h4 class="text-h4 q-mb-sm q-ml-none q-mt-none">{{ props.event.name }}</h4>
                 <q-icon
                     name="calendar"
                     color="white"
