@@ -92,18 +92,26 @@ function onReservationConfirm(): void {
         <q-item>
             <div v-if="!isStaff" class="row q-gutter-sm full-width">
                 <q-btn
+                    title="Delete reservation"
                     class="no-wrap"
                     icon="trash"
                     color="negative"
                     @click="() => emit('delete')"
                     v-close-popup
                 />
-                <q-btn icon="pencil" color="positive" @click="() => emit('edit')" v-close-popup />
+                <q-btn
+                    title="Edit reservation"
+                    icon="pencil"
+                    color="positive"
+                    @click="() => emit('edit')"
+                    v-close-popup
+                />
             </div>
             <q-btn
+                title="Transfer reservation"
                 v-if="props.crossFloorReservationTransferEnabled"
                 icon="transfer"
-                color="positive"
+                color="primary"
                 @click="() => emit('transfer')"
                 v-close-popup
             />
