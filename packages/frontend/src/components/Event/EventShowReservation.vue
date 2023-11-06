@@ -102,7 +102,7 @@ function onReservationConfirm(): void {
             </div>
             <q-btn
                 v-if="props.crossFloorReservationTransferEnabled"
-                icon="pencil"
+                icon="transfer"
                 color="positive"
                 @click="() => emit('transfer')"
                 v-close-popup
