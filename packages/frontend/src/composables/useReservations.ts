@@ -301,42 +301,45 @@ export function useReservations(
         floor: FloorViewer,
         element: FloorEditorElement | undefined,
     ): Promise<void> {
-        if (!isTable(element)) {
+        if (!isTable(element)) return;
+
+        if (await handleCrossFloorReservationTransfer(floor, element)) {
             return;
         }
 
-        if (crossFloorReservationTransferTable.value) {
-            if (crossFloorReservationTransferTable.value.floor.id === floor.id) {
-                await swapOrTransferReservations(
-                    floor,
-                    crossFloorReservationTransferTable.value.table,
-                    element,
-                );
-            }
+        const { reservation } = element;
+        if (reservation) {
+            showReservation(floor, reservation, element);
+        } else if (canReserve.value) {
+            showCreateReservationDialog(floor, element, "create");
+        }
+    }
 
+    async function handleCrossFloorReservationTransfer(
+        floor: FloorViewer,
+        element: BaseTable,
+    ): Promise<boolean> {
+        if (!crossFloorReservationTransferTable.value) {
+            return false;
+        }
+
+        if (crossFloorReservationTransferTable.value.floor.id === floor.id) {
+            await swapOrTransferReservations(
+                floor,
+                crossFloorReservationTransferTable.value.table,
+                element,
+            );
+        } else {
             await swapOrTransferReservationsBetweenFloorPlans(
                 crossFloorReservationTransferTable.value.floor,
                 crossFloorReservationTransferTable.value.table,
                 floor,
                 element,
             );
-
-            crossFloorReservationTransferTable.value = undefined;
-            return;
         }
 
-        const { reservation } = element;
-
-        if (reservation) {
-            showReservation(floor, reservation, element);
-            return;
-        }
-
-        if (!canReserve.value) {
-            return;
-        }
-
-        showCreateReservationDialog(floor, element, "create");
+        crossFloorReservationTransferTable.value = undefined;
+        return true;
     }
 
     onBeforeUnmount(() => {
