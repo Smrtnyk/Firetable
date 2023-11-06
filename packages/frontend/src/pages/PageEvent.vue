@@ -58,11 +58,8 @@ const {
     onAutocompleteClear,
     allReservedTables,
     useFloorsPageEventState,
+    hasMultipleFloorPlans,
 } = useFloorsPageEvent(eventFloors, pageRef, eventOwner, event);
-
-const hasMultipleFloorPlans = computed(() => {
-    return useFloorsPageEventState.value.floorInstances.size > 1;
-});
 
 const buttonSize = computed(() => {
     return isMobile.value ? "sm" : "md";

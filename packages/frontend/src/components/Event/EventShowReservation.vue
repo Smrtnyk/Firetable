@@ -6,12 +6,13 @@ import { useAuthStore } from "src/stores/auth-store";
 
 interface Props {
     reservation: Reservation;
+    crossFloorReservationTransferEnabled: boolean;
 }
 
 const authStore = useAuthStore();
 const props = defineProps<Props>();
 const emit = defineEmits<{
-    (e: "delete" | "edit"): void;
+    (e: "delete" | "edit" | "transfer"): void;
     (e: "confirm", confirmed: boolean): void;
 }>();
 const { t } = useI18n();
@@ -99,6 +100,13 @@ function onReservationConfirm(): void {
                 />
                 <q-btn icon="pencil" color="positive" @click="() => emit('edit')" v-close-popup />
             </div>
+            <q-btn
+                v-if="props.crossFloorReservationTransferEnabled"
+                icon="pencil"
+                color="positive"
+                @click="() => emit('transfer')"
+                v-close-popup
+            />
         </q-item>
     </q-card-section>
 </template>

@@ -7,6 +7,7 @@ import * as uiHelpers from "../helpers/ui-helpers";
 import { FloorElementTypes, FloorMode, FloorViewer, RectTable } from "@firetable/floor-creator";
 import { uid } from "quasar";
 import * as i18n from "vue-i18n";
+import * as authStore from "../stores/auth-store";
 import { NOOP } from "@firetable/utils";
 
 function createFloor(floorName: string): FloorViewer {
@@ -78,6 +79,7 @@ describe("useReservations", () => {
                 t: NOOP,
             };
         });
+        vi.spyOn(authStore, "useAuthStore").mockReturnValue({} as any);
         users = ref([]);
         floor1 = createFloor("test-1");
         const floor2 = createFloor("test-2");

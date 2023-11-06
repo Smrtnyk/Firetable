@@ -1,11 +1,13 @@
-import { computed, onBeforeUnmount, Ref, watch } from "vue";
-import { EventDoc, Reservation, User } from "@firetable/types";
+import { computed, onBeforeUnmount, Ref, watch, ref } from "vue";
+import { EventDoc, Reservation, Role, User } from "@firetable/types";
 import {
     BaseTable,
     Floor,
+    FloorEditorElement,
     type FloorViewer,
     getFreeTables,
     getReservedTables,
+    isTable,
 } from "@firetable/floor-creator";
 import { EventOwner, updateEventFloorData } from "@firetable/backend";
 import { DialogChainObject, useQuasar } from "quasar";
@@ -17,6 +19,7 @@ import { useI18n } from "vue-i18n";
 import FTDialog from "src/components/FTDialog.vue";
 import EventCreateReservation from "src/components/Event/EventCreateReservation.vue";
 import EventShowReservation from "src/components/Event/EventShowReservation.vue";
+import { useAuthStore } from "src/stores/auth-store";
 
 const HALF_HOUR = 30 * 60 * 1000; // 30 minutes in milliseconds
 
@@ -26,10 +29,23 @@ export function useReservations(
     eventOwner: EventOwner,
     event: Ref<VueFirestoreDocumentData<EventDoc> | undefined>,
 ) {
+    const authStore = useAuthStore();
     // check every 1 minute
-    const intervalID = setInterval(checkReservationsForTimeAndMarkTableIfNeeded, 60 * 1000);
     const q = useQuasar();
     const { t } = useI18n();
+
+    const intervalID = setInterval(checkReservationsForTimeAndMarkTableIfNeeded, 60 * 1000);
+    const currentUser = computed(() => authStore.user);
+    const crossFloorReservationTransferTable = ref<
+        { table: BaseTable; floor: FloorViewer } | undefined
+    >();
+
+    // For now, disable reservation ability for staff,
+    // but it should be configurable in the future
+    const canReserve = computed(() => {
+        return currentUser.value?.role !== Role.STAFF;
+    });
+
     let currentOpenCreateReservationDialog: {
         label: string;
         dialog: DialogChainObject;
@@ -136,7 +152,11 @@ export function useReservations(
         }
     }
 
-    function showReservation(floor: Floor, reservation: Reservation, element: BaseTable): void {
+    function showReservation(
+        floor: FloorViewer,
+        reservation: Reservation,
+        element: BaseTable,
+    ): void {
         q.dialog({
             component: FTDialog,
             componentProps: {
@@ -145,6 +165,7 @@ export function useReservations(
                 maximized: false,
                 componentPropsObject: {
                     reservation,
+                    crossFloorReservationTransferEnabled: floorInstances.size > 1,
                 },
                 listeners: {
                     delete: () => {
@@ -152,6 +173,12 @@ export function useReservations(
                     },
                     edit() {
                         onEditReservation(floor, element);
+                    },
+                    transfer() {
+                        crossFloorReservationTransferTable.value = {
+                            table: element,
+                            floor,
+                        };
                     },
                     confirm: onReservationConfirm(floor, element),
                 },
@@ -184,8 +211,6 @@ export function useReservations(
         const transferMessage = `This will transfer reservation from table ${table1.label} to table ${table2.label}`;
         const shouldTransfer = await showConfirm("Transfer reservation", transferMessage);
 
-        console.log(shouldTransfer);
-        console.log(table1.reservation, table2.reservation);
         if (!shouldTransfer) {
             return;
         }
@@ -237,6 +262,83 @@ export function useReservations(
         }
     }
 
+    async function swapOrTransferReservationsBetweenFloorPlans(
+        floor1: FloorViewer,
+        table1: BaseTable,
+        floor2: FloorViewer,
+        table2: BaseTable,
+    ): Promise<void> {
+        const transferMessage = `This will transfer reservation between floor plans "${floor1.name}" table "${table1.label}" to floor plan "${floor2.name}" table "${table2.label}"`;
+        const shouldTransfer = await showConfirm("Transfer reservation", transferMessage);
+        console.log(shouldTransfer);
+
+        if (!shouldTransfer) {
+            return;
+        }
+
+        const table1Reservation: Reservation | null = table1.reservation
+            ? { ...table1.reservation }
+            : null;
+
+        if (table2.reservation) {
+            table1.setReservation({ ...table2.reservation });
+        } else {
+            table1.setReservation(null);
+        }
+        table2.setReservation(table1Reservation);
+
+        await tryCatchLoadingWrapper({
+            hook: () => {
+                return Promise.all([
+                    updateEventFloorData(eventOwner, floor1),
+                    updateEventFloorData(eventOwner, floor2),
+                ]);
+            },
+        });
+    }
+
+    async function tableClickHandler(
+        floor: FloorViewer,
+        element: FloorEditorElement | undefined,
+    ): Promise<void> {
+        if (!isTable(element)) {
+            return;
+        }
+
+        if (crossFloorReservationTransferTable.value) {
+            if (crossFloorReservationTransferTable.value.floor.id === floor.id) {
+                await swapOrTransferReservations(
+                    floor,
+                    crossFloorReservationTransferTable.value.table,
+                    element,
+                );
+            }
+
+            await swapOrTransferReservationsBetweenFloorPlans(
+                crossFloorReservationTransferTable.value.floor,
+                crossFloorReservationTransferTable.value.table,
+                floor,
+                element,
+            );
+
+            crossFloorReservationTransferTable.value = undefined;
+            return;
+        }
+
+        const { reservation } = element;
+
+        if (reservation) {
+            showReservation(floor, reservation, element);
+            return;
+        }
+
+        if (!canReserve.value) {
+            return;
+        }
+
+        showCreateReservationDialog(floor, element, "create");
+    }
+
     onBeforeUnmount(() => {
         clearInterval(intervalID);
     });
@@ -248,7 +350,6 @@ export function useReservations(
         handleReservationCreation,
         checkReservationsForTimeAndMarkTableIfNeeded,
         swapOrTransferReservations,
-        showReservation,
-        showCreateReservationDialog,
+        tableClickHandler,
     };
 }

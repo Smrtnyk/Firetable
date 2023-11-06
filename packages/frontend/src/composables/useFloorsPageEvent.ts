@@ -1,16 +1,7 @@
 import { watch, reactive, computed, Ref, ref, nextTick, onMounted, onBeforeUnmount } from "vue";
-import { EventDoc, FloorDoc, Role } from "@firetable/types";
-import {
-    BaseTable,
-    FloorViewer,
-    FloorEditorElement,
-    FloorMode,
-    getTables,
-    isTable,
-    Floor,
-} from "@firetable/floor-creator";
+import { EventDoc, FloorDoc } from "@firetable/types";
+import { BaseTable, FloorViewer, FloorMode, getTables } from "@firetable/floor-creator";
 import { EventOwner } from "@firetable/backend";
-import { useAuthStore } from "src/stores/auth-store";
 import { VueFirestoreDocumentData } from "vuefire";
 import { useUsers } from "src/composables/useUsers";
 import { useReservations } from "src/composables/useReservations";
@@ -28,7 +19,6 @@ export function useFloorsPageEvent(
     eventOwner: EventOwner,
     event: Ref<VueFirestoreDocumentData<EventDoc> | undefined>,
 ) {
-    const authStore = useAuthStore();
     const state = ref<State>({
         activeTablesAnimationInterval: null,
         floorInstances: new Set(),
@@ -36,19 +26,15 @@ export function useFloorsPageEvent(
     });
     const { users } = useUsers();
     const {
-        showReservation,
+        tableClickHandler,
         checkReservationsForTimeAndMarkTableIfNeeded,
-        showCreateReservationDialog,
         swapOrTransferReservations,
         allReservedTables,
     } = useReservations(users, state.value.floorInstances, eventOwner, event);
-    const currentUser = computed(() => authStore.user);
     const canvases = reactive<Map<string, HTMLCanvasElement>>(new Map());
 
-    // For now, disable reservation ability for staff,
-    // but it should be configurable in the future
-    const canReserve = computed(() => {
-        return currentUser.value?.role !== Role.STAFF;
+    const hasMultipleFloorPlans = computed(() => {
+        return state.value.floorInstances.size > 1;
     });
 
     onMounted(() => {
@@ -140,25 +126,6 @@ export function useFloorsPageEvent(
         }
     }
 
-    function tableClickHandler(floor: Floor, element: FloorEditorElement | undefined): void {
-        if (!isTable(element)) {
-            return;
-        }
-
-        const { reservation } = element;
-
-        if (reservation) {
-            showReservation(floor, reservation, element);
-            return;
-        }
-
-        if (!canReserve.value) {
-            return;
-        }
-
-        showCreateReservationDialog(floor, element, "create");
-    }
-
     function onAutocompleteClear(): void {
         if (state.value.activeTablesAnimationInterval) {
             clearInterval(state.value.activeTablesAnimationInterval);
@@ -178,5 +145,6 @@ export function useFloorsPageEvent(
         setActiveFloor,
         useFloorsPageEventState: state,
         allReservedTables,
+        hasMultipleFloorPlans,
     };
 }
