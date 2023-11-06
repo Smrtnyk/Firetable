@@ -133,7 +133,6 @@ export function useFloorsPageEvent(
         state.value.floorInstances.forEach((floor) => {
             const tables = getTables(floor);
             tables.forEach((table) => table.stopAnimation());
-            floor.canvas.renderAll();
         });
     }
 
