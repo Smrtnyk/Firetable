@@ -8,8 +8,8 @@ const { logger } = functions;
  * Creates a new event in the Firestore database, uploads associated event images, and associates the event with specific floor plans.
  *
  * @param eventPayload - The payload containing details for the event creation.
- * @param eventPayload.date - The date and time of the event in the format "DD-MM-YYYY HH:mm".
- * @param eventPayload.img - The base64 encoded image string for the event.
+ * @param eventPayload.date - The date and time of the event in unix timestamp.
+ * @param eventPayload.img - The optional img url.
  * @param eventPayload.floors - An array of floor objects associated with the event. Each floor object must have an ID.
  * @param eventPayload.entryPrice - The entry price for the event.
  * @param eventPayload.guestListLimit - The limit for the guest list for the event.
@@ -49,7 +49,7 @@ export async function createEvent(
         );
     }
 
-    const { date, floors, entryPrice, guestListLimit, name, propertyId, organisationId } =
+    const { date, floors, entryPrice, guestListLimit, name, propertyId, organisationId, img } =
         eventPayload;
     const id = db.collection(Collection.EVENTS).doc().id;
     logger.info(`Creating event with ID: ${id}`);
@@ -74,6 +74,7 @@ export async function createEvent(
             entryPrice,
             date,
             creator,
+            img,
             reservedPercentage: 0,
             guestListLimit,
             propertyId,

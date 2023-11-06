@@ -7,6 +7,7 @@ export interface CreateEventForm {
     date: number;
     guestListLimit: number;
     entryPrice: number;
+    img?: string;
 }
 
 export type CreateEventPayload = CreateEventForm & {
@@ -25,6 +26,7 @@ export interface EventDoc {
     propertyId: string;
     organisationId: string;
     info?: string;
+    img?: string;
     _doc: QueryDocumentSnapshot<EventDoc>;
 }
 

@@ -2,7 +2,12 @@
 import { computed, reactive, ref, watch } from "vue";
 
 import { useI18n } from "vue-i18n";
-import { greaterThanZero, noEmptyString, requireNumber } from "src/helpers/form-rules";
+import {
+    greaterThanZero,
+    noEmptyString,
+    requireNumber,
+    validOptionalURL,
+} from "src/helpers/form-rules";
 import { useRouter } from "vue-router";
 
 import { QForm } from "quasar";
@@ -35,6 +40,7 @@ const eventObj: CreateEventForm = {
     date: newDate.getTime(),
     guestListLimit: 100,
     entryPrice: 0,
+    img: "",
 };
 const props = defineProps<Props>();
 const emit = defineEmits<{
@@ -124,6 +130,15 @@ function onReset(): void {
 
     <template v-else>
         <q-form ref="form" class="q-gutter-xs q-pt-md q-pa-md" @submit="onSubmit" @reset="onReset">
+            <q-input
+                v-model="state.form.img"
+                rounded
+                standout
+                :label="t('EventCreateForm.eventImgInputLabel')"
+                lazy-rules
+                :rules="[validOptionalURL()]"
+            />
+
             <q-input
                 v-model="state.form.name"
                 rounded

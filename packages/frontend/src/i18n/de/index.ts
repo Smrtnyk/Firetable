@@ -48,6 +48,7 @@ export default {
         noChosenFloorsMessage: "Sie müssen mindestens einen Grundriss auswählen",
         selectedFloorNotFoundMessage: "Ausgewählter Grundriss nicht gefunden.",
         goToFloorPlannerMessage: "Zum Grundrissplaner gehen",
+        eventImgInputLabel: "Optionale URL des Veranstaltungsbildes",
         eventNameInputLabel: "Veranstaltungsname*",
         guestListLimitInputLabel: "Limit für Gästeliste",
         entryPriceInputLabel: "Eintrittspreis, bei kostenlosem Eintritt 0 eingeben",

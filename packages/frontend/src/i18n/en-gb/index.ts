@@ -48,6 +48,7 @@ export default {
         noChosenFloorsMessage: "You need to choose at least one floor plan",
         selectedFloorNotFoundMessage: "Selected floor not found.",
         goToFloorPlannerMessage: "Go to floor planner",
+        eventImgInputLabel: "Optional event image url",
         eventNameInputLabel: "Event name*",
         guestListLimitInputLabel: "Guest list limit",
         entryPriceInputLabel: "Entry price, leave 0 if free",
