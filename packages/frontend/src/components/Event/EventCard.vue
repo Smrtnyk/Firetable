@@ -23,7 +23,7 @@ const { t } = useI18n();
         }"
     >
         <q-card class="EventCard">
-            <q-img :src="event.img ?? '/images/default-event-img.jpg'" />
+            <q-img :src="event.img || '/images/default-event-img.jpg'" />
 
             <q-card-section class="EventCard__content">
                 <h2 class="text-h3 q-mb-sm q-ml-none q-mt-none">{{ props.event.name }}</h2>
