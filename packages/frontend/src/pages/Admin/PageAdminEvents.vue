@@ -12,8 +12,13 @@ import {
 } from "src/helpers/ui-helpers";
 import { computed, ref, watch } from "vue";
 import { Loading, useQuasar } from "quasar";
-import { Collection, CreateEventPayload, EventDoc, PropertyDoc } from "@firetable/types";
-import { createNewEvent, deleteDocAndAllSubCollections, EventOwner } from "@firetable/backend";
+import { CreateEventPayload, EventDoc, PropertyDoc } from "@firetable/types";
+import {
+    createNewEvent,
+    deleteDocAndAllSubCollections,
+    EventOwner,
+    getEventsPath,
+} from "@firetable/backend";
 import { takeLast } from "@firetable/utils";
 import { useFloors } from "src/composables/useFloors";
 import { useProperties } from "src/composables/useProperties";
@@ -116,13 +121,11 @@ async function onEventItemSlideRight({
     await tryCatchLoadingWrapper({
         hook: async () => {
             await deleteDocAndAllSubCollections(
-                [
-                    Collection.ORGANISATIONS,
-                    event.organisationId,
-                    Collection.PROPERTIES,
-                    event.propertyId,
-                    Collection.EVENTS,
-                ].join("/"),
+                getEventsPath({
+                    propertyId: event.propertyId,
+                    organisationId: event.organisationId,
+                    id: "",
+                }),
                 event.id,
             );
             eventsByProperty[activePropertyId.value].delete(event);
