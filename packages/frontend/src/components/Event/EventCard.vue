@@ -73,7 +73,7 @@ const { t } = useI18n();
         text-decoration: none !important;
         padding: 1rem;
         width: 100%;
-        background: rgba(0, 0, 0, 0.9);
+        background: inherit;
         position: absolute;
         bottom: 0;
     }
