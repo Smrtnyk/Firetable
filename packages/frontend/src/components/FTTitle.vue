@@ -8,7 +8,11 @@ const props = defineProps<Props>();
 <template>
     <q-card class="ft-card q-pa-sm q-mb-md">
         <div class="FTTitle items-center">
-            <h3 class="ft-title q-ma-none">{{ props.title }}</h3>
+            <div>
+                <h3 class="ft-title q-ma-none">{{ props.title }}</h3>
+                <slot name="subtitle" />
+            </div>
+
             <div class="text-right ft-title__right">
                 <slot name="right" />
             </div>

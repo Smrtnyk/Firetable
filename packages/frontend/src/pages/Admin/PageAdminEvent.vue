@@ -134,9 +134,8 @@ onMounted(init);
 <template>
     <div v-if="event && !isLoading" class="PageAdminEvent">
         <FTTitle :title="event.name">
-            <template #right>
-                <div class="column">
-                    <span class="text-caption">Event date</span>
+            <template #subtitle>
+                <div class="column q-ml-md">
                     <span>
                         {{ formatEventDate(event.date) }}
                     </span>
