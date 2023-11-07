@@ -36,7 +36,7 @@ export class FloorViewer extends Floor {
     }
 
     protected onElementClick = (ev: fabric.IEvent<MouseEvent>): void => {
-        if (this.touchManager.isInteracting) {
+        if (this.touchManager.isInteracting || this.zoomManager.isAnimating) {
             return;
         }
         if (this.eventManager.dragOccurred) {

@@ -2,7 +2,7 @@ import { Manager, Pinch, Pan, Tap, DIRECTION_ALL } from "hammerjs";
 import { Floor } from "./Floor";
 import { fabric } from "fabric";
 
-const DAMPENING_FACTOR = 0.05;
+const DAMPENING_FACTOR = 0.1;
 const PAN_DAMPENING_FACTOR = 0.1;
 
 export class TouchManager {
@@ -79,7 +79,7 @@ export class TouchManager {
         // Adjust the scale based on a dampening factor to control zoom sensitivity
         const adjustedScale = 1 + (scale - 1) * DAMPENING_FACTOR;
         const center = new fabric.Point(ev.center.x, ev.center.y);
-        this.floor.zoomManager.zoomToPoint(center, adjustedScale);
+        this.floor.zoomManager.setPinchZoom(adjustedScale, center);
     };
 
     onPanMove = (e: HammerInput): void => {
