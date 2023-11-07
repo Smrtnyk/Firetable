@@ -19,7 +19,7 @@ export const usePropertiesStore = defineStore("properties", {
         async getPropertiesOfCurrentUser(): Promise<PropertyDoc[]> {
             try {
                 const authStore = useAuthStore();
-                return await fetchPropertiesForUser(authStore.user!, authStore.user!.role);
+                return await fetchPropertiesForUser(authStore.user!);
             } catch (e) {
                 showErrorMessage(e);
             }

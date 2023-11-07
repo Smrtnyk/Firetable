@@ -24,24 +24,23 @@ export function deleteProperty(property: PropertyDoc): Promise<void> {
     return deleteDoc(propertyDoc(property.id, property.organisationId));
 }
 
-export async function fetchPropertiesForUser(user: User, role?: string): Promise<PropertyDoc[]> {
-    // If the user is an ADMIN or organisationId is falsy, fetch all properties across all organisations
-    if (role === ADMIN || !user.organisationId) {
-        const organisationsSnapshot = await getDocs(organisationsCollection());
-        let allProperties: PropertyDoc[] = [];
+// Fetches all properties for Admin users across all organizations
+async function fetchPropertiesForAdmin(): Promise<PropertyDoc[]> {
+    const organisationsSnapshot = await getDocs(organisationsCollection());
+    let allProperties: PropertyDoc[] = [];
 
-        for (const organisationDoc of organisationsSnapshot.docs) {
-            const propertiesSnapshot = await getDocs(propertiesCollection(organisationDoc.id));
-            const properties = propertiesSnapshot.docs.map(
-                (doc) => ({ ...doc.data(), id: doc.id }) as PropertyDoc,
-            );
-            allProperties = [...allProperties, ...properties];
-        }
-
-        return allProperties;
+    for (const organisationDoc of organisationsSnapshot.docs) {
+        const propertiesSnapshot = await getDocs(propertiesCollection(organisationDoc.id));
+        const properties = propertiesSnapshot.docs.map(
+            (doc) => ({ ...doc.data(), id: doc.id }) as PropertyDoc,
+        );
+        allProperties = [...allProperties, ...properties];
     }
 
-    // Rest of the logic for non-ADMIN users with a valid organisationId
+    return allProperties;
+}
+
+async function fetchPropertiesForNonAdmin(user: User): Promise<PropertyDoc[]> {
     const propertiesRef = propertiesCollection(user.organisationId);
     const userPropertiesQuery = query(
         propertiesRef,
@@ -55,4 +54,12 @@ export async function fetchPropertiesForUser(user: User, role?: string): Promise
     }
 
     return userPropertiesSnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }) as PropertyDoc);
+}
+
+export async function fetchPropertiesForUser(user: User): Promise<PropertyDoc[]> {
+    if (user.role === ADMIN) {
+        return fetchPropertiesForAdmin();
+    } else {
+        return fetchPropertiesForNonAdmin(user);
+    }
 }
