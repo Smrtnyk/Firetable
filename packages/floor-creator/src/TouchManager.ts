@@ -79,7 +79,7 @@ export class TouchManager {
         // Adjust the scale based on a dampening factor to control zoom sensitivity
         const adjustedScale = 1 + (scale - 1) * DAMPENING_FACTOR;
         const center = new fabric.Point(ev.center.x, ev.center.y);
-        this.floor.zoomManager.setPinchZoom(adjustedScale, center);
+        this.floor.zoomManager.adjustZoom(adjustedScale, center);
     };
 
     onPanMove = (e: HammerInput): void => {

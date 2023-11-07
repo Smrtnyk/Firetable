@@ -36,11 +36,11 @@ export class FloorZoomManager {
     }
 
     zoomIn(point: fabric.Point): void {
-        this.adjustZoom(ZOOM_INCREMENT, point);
+        this.adjustZoom(1 + ZOOM_INCREMENT, point);
     }
 
     zoomOut(point: fabric.Point): void {
-        this.adjustZoom(-ZOOM_INCREMENT, point);
+        this.adjustZoom(1 - ZOOM_INCREMENT, point);
     }
 
     private update(): void {
@@ -104,14 +104,16 @@ export class FloorZoomManager {
         return new fabric.Point(this.canvas.getWidth() / 2, this.canvas.getHeight() / 2);
     }
 
-    // Adjust the zoom level based on the increment/decrement factor and animate the zoom
-    private adjustZoom(incrementFactor: number, point: fabric.Point): void {
-        const newZoom = this.canvas.getZoom() * (1 + incrementFactor);
+    adjustZoom(scaleFactor: number, point: fabric.Point): void {
+        const newZoom = this.canvas.getZoom() * scaleFactor;
         if (newZoom <= this.maxZoom && newZoom >= this.minZoom) {
-            // Store the desired zoom change and the point, not applying it yet
-            this.zoomDelta += incrementFactor;
-            this.zoomPoint = point;
-            this.isAnimating = true; // Ensure that the update loop knows to continue
+            // Set the animation start properties
+            this.startTime = performance.now();
+            this.startZoom = this.canvas.getZoom();
+            this.targetZoom = newZoom;
+            this.zoomPoint = point; // Use the current point as the zoom focal point
+            this.isAnimating = true; // Start animating
+
             // If we're not already in an animation frame loop, start one
             if (this.animationFrameId === undefined) {
                 this.animationFrameId = requestAnimationFrame(() => this.update());
@@ -121,28 +123,7 @@ export class FloorZoomManager {
         }
     }
 
-    // In FloorZoomManager class
-    setPinchZoom(scale: number, point: fabric.Point): void {
-        // Calculate the new target zoom based on the pinch scale
-        const targetZoom = this.canvas.getZoom() * scale;
-        this.targetZoom = Math.max(this.minZoom, Math.min(targetZoom, this.maxZoom));
-
-        // Check if the target zoom is within the allowed range
-        if (this.targetZoom <= this.maxZoom && this.targetZoom >= this.minZoom) {
-            // Set the animation start properties
-            this.startTime = performance.now();
-            this.startZoom = this.canvas.getZoom();
-            this.zoomPoint = point; // Use the pinch center as the zoom point
-            this.isAnimating = true; // Start animating
-
-            // If we're not already in an animation frame loop, start one
-            if (this.animationFrameId === undefined) {
-                this.animationFrameId = requestAnimationFrame(() => this.update());
-            }
-        }
-    }
-
-    applyPinchZoom(): void {
+    private applyPinchZoom(): void {
         if (this.pinchZoomScale !== null && this.pinchZoomPoint !== null) {
             const newZoom = this.canvas.getZoom() * this.pinchZoomScale;
             this.zoomToPoint(this.pinchZoomPoint, newZoom);
@@ -151,8 +132,7 @@ export class FloorZoomManager {
         }
     }
 
-    // In FloorZoomManager class
-    zoomToPoint(point: fabric.Point, scaleFactor: number): void {
+    private zoomToPoint(point: fabric.Point, scaleFactor: number): void {
         let newZoom = this.canvas.getZoom() * scaleFactor;
         newZoom = Math.max(this.minZoom, Math.min(newZoom, this.maxZoom));
         this.canvas.zoomToPoint(point, newZoom);
