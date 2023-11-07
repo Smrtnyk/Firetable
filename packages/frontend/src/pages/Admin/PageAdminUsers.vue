@@ -97,10 +97,10 @@ async function showEditUserDialog(user: User, reset: () => void): Promise<void> 
         reset();
         return;
     }
-    const [properties, selectedProperties] = await Promise.all([
-        propertiesStore.getPropertiesOfCurrentUser(),
-        propertiesStore.getPropertiesOfUser(user),
-    ]);
+    const properties = await propertiesStore.getPropertiesOfCurrentUser();
+    const selectedProperties = properties.filter((ownProperty) => {
+        return user.relatedProperties.includes(ownProperty.id);
+    });
     const organisation = await fetchOrganisationById(user.organisationId);
     const dialog = createDialog({
         component: FTDialog,
