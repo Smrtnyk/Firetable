@@ -106,7 +106,7 @@ function setElementColor(newVal: any): void {
 
 <template>
     <div v-if="!isTablet" class="ShowSelectedElement">
-        <div
+        <q-card
             v-if="selectedFloorElement"
             class="ShowSelectedElement__floating-controls row q-gutter-xs q-ma-xs q-pa-xs q-pt-md q-pb-md justify-around items-center"
         >
@@ -170,7 +170,7 @@ function setElementColor(newVal: any): void {
                 @click="deleteElement"
             />
             <slot name="buttons"></slot>
-        </div>
+        </q-card>
     </div>
     <div v-else>
         <div v-if="selectedFloorElement && isTablet" class="row">
@@ -272,7 +272,6 @@ function setElementColor(newVal: any): void {
 <style lang="scss">
 .ShowSelectedElement {
     &__floating-controls {
-        background: #222;
         max-width: 140px;
         position: absolute;
         left: 0;
