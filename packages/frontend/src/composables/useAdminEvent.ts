@@ -1,27 +1,26 @@
 import { computed, watch } from "vue";
 import { useRouter } from "vue-router";
-import { Collection, EventDoc, FloorDoc, User } from "@firetable/types";
+import { EventDoc, FloorDoc, User } from "@firetable/types";
 import {
     createQuery,
     useFirestoreCollection,
     useFirestoreDocument,
 } from "src/composables/useFirestore";
-import { EventOwner, usersCollection } from "@firetable/backend";
+import { EventOwner, getEventFloorsPath, getEventPath, usersCollection } from "@firetable/backend";
 
-export default function useAdminEvent({ organisationId, propertyId, id: eventId }: EventOwner) {
+export default function useAdminEvent(eventOwner: EventOwner) {
     const router = useRouter();
 
-    const eventFloorsHook = useFirestoreCollection<FloorDoc>(
-        `${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}/${propertyId}/${Collection.EVENTS}/${eventId}/${Collection.FLOORS}`,
+    const eventFloorsHook = useFirestoreCollection<FloorDoc>(getEventFloorsPath(eventOwner));
+
+    const usersHook = useFirestoreCollection<User>(
+        createQuery(usersCollection(eventOwner.organisationId)),
+        {
+            once: true,
+        },
     );
 
-    const usersHook = useFirestoreCollection<User>(createQuery(usersCollection(organisationId)), {
-        once: true,
-    });
-
-    const eventHook = useFirestoreDocument<EventDoc>(
-        `${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}/${propertyId}/${Collection.EVENTS}/${eventId}`,
-    );
+    const eventHook = useFirestoreDocument<EventDoc>(getEventPath(eventOwner));
 
     watch(eventHook.error, () => {
         if (eventHook.error.value) {
