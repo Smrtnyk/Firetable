@@ -26,13 +26,15 @@ export class FloorZoomManager {
     private animationFrameId?: number;
     public isAnimating: boolean = false;
 
+    private readonly centerPoint: fabric.Point;
+
     constructor(canvas: fabric.Canvas, initialScale: number, initialViewportTransform: number[]) {
         this.canvas = canvas;
         this.initialScale = initialScale;
         this.initialViewportTransform = initialViewportTransform;
         this.minZoom = this.initialScale;
 
-        requestAnimationFrame(() => this.update());
+        this.centerPoint = new fabric.Point(canvas.getWidth() / 2, canvas.getHeight() / 2);
     }
 
     zoomIn(point: fabric.Point): void {
@@ -44,55 +46,49 @@ export class FloorZoomManager {
     }
 
     private update(): void {
-        let needsRender = false;
-
-        // Apply zoom changes if there are any
-        if (this.zoomDelta !== 0 && this.zoomPoint) {
-            const newZoom = this.canvas.getZoom() * (1 + this.zoomDelta);
-            this.canvas.zoomToPoint(this.zoomPoint, newZoom);
-            // Reset the stored state after applying
-            this.zoomDelta = 0;
-            this.zoomPoint = null;
-            needsRender = true; // Mark that the canvas needs re-rendering
-        }
-
-        // Apply pinch zoom changes if there are any
-        if (this.pinchZoomScale !== null && this.pinchZoomPoint !== null) {
-            this.applyPinchZoom();
-            needsRender = true;
-        }
-
-        // Handle ongoing animation for smooth zooming
-        if (
-            this.targetZoom !== undefined &&
-            this.startZoom !== undefined &&
-            this.startTime !== undefined
-        ) {
-            const timestamp = performance.now();
-            const elapsed = timestamp - this.startTime;
-            const progress = easeInOutQuart(Math.min(elapsed / this.animationDuration, 1));
-            const zoom = this.startZoom + (this.targetZoom - this.startZoom) * progress;
-            const point = this.getCenterPoint();
-
-            this.canvas.zoomToPoint(point, zoom);
-            needsRender = true;
-
-            // If the animation duration has elapsed, reset the animation state
-            if (elapsed >= this.animationDuration) {
-                this.startZoom = undefined;
-                this.targetZoom = undefined;
-                this.startTime = undefined;
-                this.isAnimating = false; // Animation is complete, no need to continue the loop
-            }
-        }
-
-        // Only re-render the canvas if needed
-        if (needsRender) {
-            this.canvas.requestRenderAll();
-        }
-
-        // Continue the update loop only if needed
         if (this.isAnimating) {
+            // Apply zoom changes if there are any
+            if (this.zoomDelta !== 0 && this.zoomPoint) {
+                const newZoom = this.canvas.getZoom() * (1 + this.zoomDelta);
+                this.canvas.zoomToPoint(this.zoomPoint, newZoom);
+                // Reset the stored state after applying
+                this.zoomDelta = 0;
+                this.zoomPoint = null;
+            }
+
+            // Apply pinch zoom changes if there are any
+            if (this.pinchZoomScale !== null && this.pinchZoomPoint !== null) {
+                this.applyPinchZoom();
+            }
+
+            // Handle ongoing animation for smooth zooming
+            if (
+                this.targetZoom !== undefined &&
+                this.startZoom !== undefined &&
+                this.startTime !== undefined
+            ) {
+                const timestamp = performance.now();
+                const elapsed = timestamp - this.startTime;
+                const progress = easeInOutQuart(Math.min(elapsed / this.animationDuration, 1));
+                const zoom = this.startZoom + (this.targetZoom - this.startZoom) * progress;
+                const point = this.getCenterPoint();
+
+                this.canvas.zoomToPoint(point, zoom);
+
+                // If the animation duration has elapsed, reset the animation state
+                if (elapsed >= this.animationDuration) {
+                    this.startZoom = undefined;
+                    this.targetZoom = undefined;
+                    this.startTime = undefined;
+                    this.isAnimating = false; // Animation is complete, no need to continue the loop
+                }
+            }
+
+            // Only re-render the canvas if needed
+            if (this.isAnimating) {
+                this.canvas.requestRenderAll();
+            }
+
             requestAnimationFrame(() => this.update());
         } else {
             this.animationFrameId = undefined; // Clear the animation frame id
@@ -101,7 +97,9 @@ export class FloorZoomManager {
     }
 
     private getCenterPoint(): fabric.Point {
-        return new fabric.Point(this.canvas.getWidth() / 2, this.canvas.getHeight() / 2);
+        this.centerPoint.x = this.canvas.getWidth() / 2;
+        this.centerPoint.y = this.canvas.getHeight() / 2;
+        return this.centerPoint;
     }
 
     adjustZoom(scaleFactor: number, point: fabric.Point): void {
@@ -157,7 +155,7 @@ export class FloorZoomManager {
         if (this.animationFrameId !== undefined) {
             cancelAnimationFrame(this.animationFrameId);
             this.animationFrameId = undefined;
-            this.isAnimating = false;
         }
+        this.isAnimating = false;
     }
 }
