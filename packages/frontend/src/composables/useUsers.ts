@@ -23,7 +23,7 @@ export function useUsers() {
     async function fetchUsers(): Promise<void> {
         isLoading.value = true;
         try {
-            if (authStore.user!.role === ADMIN && !authStore.user!.organisationId) {
+            if (authStore.user?.role === ADMIN) {
                 users.value = (await fetchUsersByRole([], "")).data;
             } else {
                 const relatedUserIds = await fetchRelatedProperties();
