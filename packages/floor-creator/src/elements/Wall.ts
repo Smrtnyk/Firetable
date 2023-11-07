@@ -30,7 +30,7 @@ export class Wall extends fabric.Group {
 
     setBaseFill(val: string): void {
         this.wallRect.set("fill", val);
-        this.canvas?.renderAll();
+        this.canvas?.requestRenderAll();
     }
 
     toObject(): void {

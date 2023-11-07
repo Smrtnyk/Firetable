@@ -68,6 +68,6 @@ export class GridDrawer {
                 this.canvas.remove(objects[i]);
             }
         }
-        this.canvas.renderAll();
+        this.canvas.requestRenderAll();
     }
 }

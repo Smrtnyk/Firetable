@@ -36,7 +36,7 @@ export class EditorEventManager extends EventManager {
         if (e.key === "Control" || e.ctrlKey) {
             this.floor.canvas.selection = true;
             this.ctrlPressedDuringSelection = true;
-            this.floor.canvas.renderAll();
+            this.floor.canvas.requestRenderAll();
 
             if (e.key === "z") {
                 if (e.shiftKey) {
@@ -44,11 +44,11 @@ export class EditorEventManager extends EventManager {
                 } else {
                     this.commandInvoker.undo();
                 }
-                this.floor.canvas.renderAll();
+                this.floor.canvas.requestRenderAll();
                 e.preventDefault();
             } else if (e.key === "y") {
                 this.commandInvoker.redo();
-                this.floor.canvas.renderAll();
+                this.floor.canvas.requestRenderAll();
                 e.preventDefault();
             }
         }
@@ -57,7 +57,7 @@ export class EditorEventManager extends EventManager {
     private handleKeyUp = (e: KeyboardEvent): void => {
         if (e.key === "Control" || e.ctrlKey) {
             this.floor.canvas.selection = false;
-            this.floor.canvas.renderAll();
+            this.floor.canvas.requestRenderAll();
         }
     };
 
@@ -170,7 +170,7 @@ export class EditorEventManager extends EventManager {
                     .setCoords();
             }
 
-            this.floor.canvas.renderAll();
+            this.floor.canvas.requestRenderAll();
         }
     };
 }

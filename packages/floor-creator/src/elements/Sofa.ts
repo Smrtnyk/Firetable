@@ -53,7 +53,7 @@ export class Sofa extends fabric.Group {
 
     setBaseFill(val: string): void {
         this.sofaBase.set("fill", val);
-        this.canvas?.renderAll();
+        this.canvas?.requestRenderAll();
     }
 }
 

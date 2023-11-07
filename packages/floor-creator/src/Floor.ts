@@ -86,7 +86,7 @@ export abstract class Floor {
         this.canvas.loadFromJSON(
             jsonData,
             () => {
-                this.canvas.renderAll();
+                this.canvas.requestRenderAll();
             },
             this.elementReviver,
         );
