@@ -158,4 +158,8 @@ export class FloorZoomManager {
         }
         this.isAnimating = false;
     }
+
+    destroy(): void {
+        this.cancelAnimation();
+    }
 }

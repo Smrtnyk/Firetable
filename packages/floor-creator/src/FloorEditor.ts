@@ -124,6 +124,7 @@ export class FloorEditor extends Floor {
 
     destroy(): void {
         this.eventManager.destroy();
-        this.zoomManager.cancelAnimation();
+        this.zoomManager.destroy();
+        this.canvas.dispose();
     }
 }

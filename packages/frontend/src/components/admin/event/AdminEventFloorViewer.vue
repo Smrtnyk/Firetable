@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref, shallowRef, watch } from "vue";
+import { nextTick, onBeforeUnmount, ref, watch } from "vue";
 import ShowSelectedElement from "src/components/Floor/ShowSelectedElement.vue";
 import {
     extractAllTablesLabels,
@@ -43,7 +43,11 @@ const props = defineProps<Props>();
 const emit = defineEmits(["update"]);
 const floorContainerRef = ref<HTMLCanvasElement | null>(null);
 const viewerContainerRef = ref<HTMLDivElement | null>(null);
-const floorInstance = shallowRef<FloorEditor | null>(null);
+const floorInstance = ref<FloorEditor | null>(null);
+
+onBeforeUnmount(() => {
+    floorInstance.value?.destroy();
+});
 
 function saveFloorState(): void {
     if (!floorInstance.value) return;

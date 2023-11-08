@@ -35,6 +35,9 @@ export function useFloorsPageEvent(
 
     onBeforeUnmount(() => {
         window.removeEventListener("resize", resizeFloor);
+        floorInstances.value.forEach((floorInstance) => {
+            floorInstance.destroy();
+        });
     });
 
     watch(eventFloors, handleFloorInstancesData);

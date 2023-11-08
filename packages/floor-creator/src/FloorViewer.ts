@@ -59,6 +59,8 @@ export class FloorViewer extends Floor {
     }
 
     destroy(): void {
-        this.zoomManager.cancelAnimation();
+        this.eventManager.destroy();
+        this.zoomManager.destroy();
+        this.canvas.dispose();
     }
 }
