@@ -43,6 +43,10 @@ const onUpdateUser = withLoading(async (updatedUser: EditUserPayload) => {
 });
 
 const onDeleteUser = withLoading(async (user: User) => {
+    if (user.id === authStore.user?.id) {
+        showErrorMessage("You cannot delete yourself!");
+        return;
+    }
     await deleteUser(user);
     await fetchUsers();
 });
@@ -95,6 +99,11 @@ async function showCreateUserDialog(): Promise<void> {
 }
 
 async function showEditUserDialog(user: User, reset: () => void): Promise<void> {
+    if (user.id === authStore.user?.id) {
+        showErrorMessage("To edit your profile, go to profile page!");
+        reset();
+        return;
+    }
     if (
         !(await showConfirm(t("PageAdminUsers.editUserConfirmationMessage", { name: user.name })))
     ) {
@@ -135,7 +144,7 @@ async function showEditUserDialog(user: User, reset: () => void): Promise<void> 
 
 async function onUserSlideRight(user: User, reset: () => void): Promise<void> {
     if (await showConfirm("Delete user?")) {
-        return onDeleteUser(user);
+        await onDeleteUser(user);
     }
     reset();
 }
