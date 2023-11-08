@@ -155,7 +155,7 @@ function onReset(): void {
 </script>
 
 <template>
-    <div class="column justify-center items-center q-pa-md" v-if="!totalFloors">
+    <div class="column justify-center items-center q-pa-md" v-if="!totalFloors && !props.event">
         <h6 class="q-ma-sm text-weight-bolder underline">
             {{ t("EventCreateForm.noFloorPlansMessage") }}
         </h6>
