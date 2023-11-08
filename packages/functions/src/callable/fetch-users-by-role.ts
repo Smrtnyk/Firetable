@@ -78,8 +78,7 @@ export async function fetchUsersByRoleFn(
             throw new functions.https.HttpsError("invalid-argument", "Too many user IDs provided.");
         }
 
-        baseQuery = baseQuery.where(FieldPath.documentId(), "in", userIdsToFetch);
-        baseQuery = baseQuery.where(FieldPath.documentId(), "!=", uid).limit(MAX_USERS);
+        baseQuery = baseQuery.where(FieldPath.documentId(), "in", userIdsToFetch).limit(MAX_USERS);
 
         const snapshot = await baseQuery.get();
         users = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as User);
