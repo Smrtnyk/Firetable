@@ -3,7 +3,7 @@ import { Floor } from "./Floor";
 import { fabric } from "fabric";
 import { throttle } from "@firetable/utils";
 
-const DAMPENING_FACTOR = 0.2;
+const DAMPENING_FACTOR = 0.1;
 const PAN_DAMPENING_FACTOR = 0.1;
 
 export class TouchManager {
@@ -81,7 +81,7 @@ export class TouchManager {
         const adjustedScale = 1 + (scale - 1) * DAMPENING_FACTOR;
         const center = new fabric.Point(ev.center.x, ev.center.y);
         this.floor.zoomManager.adjustZoom(adjustedScale, center);
-    }, 50);
+    }, 100);
 
     onPanMove = (e: HammerInput): void => {
         this.isInteracting = true;
