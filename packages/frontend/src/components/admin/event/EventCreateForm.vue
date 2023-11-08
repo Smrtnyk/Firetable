@@ -62,6 +62,14 @@ const state = reactive<State>({
     selectedTime: hourFromTimestamp(newDate.getTime()),
 });
 
+function validDates(calendarDate: string): boolean {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dateToCheck = new Date(calendarDate);
+    dateToCheck.setHours(0, 0, 0, 0);
+    return dateToCheck >= today;
+}
+
 // In your setup or watchEffect where you determine if you're in edit mode
 watchEffect(() => {
     if (isEditMode.value && props.event) {
@@ -219,6 +227,7 @@ function onReset(): void {
                             mask="DD-MM-YYYY"
                             today-btn
                             @update:model-value="updateDate"
+                            :options="validDates"
                         >
                             <div class="row items-center justify-end">
                                 <q-btn
