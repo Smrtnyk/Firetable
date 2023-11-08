@@ -5,12 +5,12 @@ export function getPropertiesPath(organisationId: string): string {
     return [Collection.ORGANISATIONS, organisationId, Collection.PROPERTIES].join("/");
 }
 
-export function getPropertyPath(propertyId: string, organisationId: string): string {
+export function getPropertyPath(organisationId: string, propertyId: string): string {
     return [getPropertiesPath(organisationId), propertyId].join("/");
 }
 
 export function getEventsPath({ propertyId, organisationId }: EventOwner): string {
-    return [getPropertyPath(propertyId, organisationId), Collection.EVENTS].join("/");
+    return [getPropertyPath(organisationId, propertyId), Collection.EVENTS].join("/");
 }
 
 export function getEventPath(eventOwner: EventOwner): string {
