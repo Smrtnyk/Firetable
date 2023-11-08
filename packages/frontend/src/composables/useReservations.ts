@@ -109,6 +109,12 @@ export function useReservations(
         showErrorMessage(t("PageEvent.reservationAlreadyReserved"));
     }
 
+    function filterUsersPerProperty(usersArray: User[], propertyId: string): User[] {
+        return usersArray.filter((user) => {
+            return user.relatedProperties.includes(propertyId);
+        });
+    }
+
     function showCreateReservationDialog(
         floor: Floor,
         element: BaseTable,
@@ -123,7 +129,7 @@ export function useReservations(
                     title: `${t("EventShowReservation.title")} ${label}`,
                     maximized: false,
                     componentPropsObject: {
-                        users: users.value,
+                        users: filterUsersPerProperty(users.value, eventOwner.propertyId),
                         mode,
                         reservationData: mode === "edit" ? element.reservation : void 0,
                     },
