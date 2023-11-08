@@ -18,7 +18,7 @@ export class FloorZoomManager {
     private zoomDelta = 0;
     private zoomPoint: fabric.Point | null = null;
     // Define animation properties
-    private animationDuration: number = 20; // Duration of the zoom animation in milliseconds
+    private animationDuration: number = 150; // Duration of the zoom animation in milliseconds
     private startTime?: number;
     private startZoom?: number;
     private targetZoom?: number;
