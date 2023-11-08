@@ -132,6 +132,7 @@ export function useReservations(
                         users: filterUsersPerProperty(users.value, eventOwner.propertyId),
                         mode,
                         reservationData: mode === "edit" ? element.reservation : void 0,
+                        eventStartTimestamp: event.value!.date,
                     },
                     listeners: {
                         create: (reservationData: Reservation) => {
