@@ -9,7 +9,7 @@ export function useUsers() {
     const users = ref<User[]>([]);
     const isLoading = ref<boolean>(true);
 
-    async function fetchRelatedProperties() {
+    async function fetchRelatedProperties(): Promise<string[]> {
         const relatedPropertiesQuery = query(
             propertiesCollection(authStore.user!.organisationId),
             where("relatedUsers", "array-contains", authStore.user?.id),
