@@ -2,8 +2,9 @@
 
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
-/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable */
 const { configure } = require("quasar/wrappers");
+const fs = require("fs");
 
 module.exports = configure(function (/* ctx */) {
     return {
@@ -30,24 +31,13 @@ module.exports = configure(function (/* ctx */) {
         css: ["app.scss"],
 
         // https://github.com/quasarframework/quasar/tree/dev/extras
-        extras: [
-            // 'ionicons-v4',
-            // 'mdi-v5',
-            // 'fontawesome-v6',
-            // 'eva-icons',
-            // 'themify',
-            // 'line-awesome',
-            // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
-
-            "roboto-font", // optional, you are not bound to it
-            // "material-icons", // optional, you are not bound to it
-        ],
+        extras: ["roboto-font"],
 
         // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
         build: {
             target: {
                 browser: ["esnext"],
-                node: "node18",
+                node: "node20",
             },
 
             env: require("dotenv").config().parsed,
@@ -76,13 +66,10 @@ module.exports = configure(function (/* ctx */) {
 
         // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
         devServer: {
-            // server: {
-            //     type: "https",
-            //     options: {
-            //         key: fs.readFileSync("./key.pem"),
-            //         cert: fs.readFileSync("./cert.pem"),
-            //     },
-            // },
+            https:{
+                key: fs.readFileSync("./key.pem"),
+                cert: fs.readFileSync("./cert.pem"),
+            },
             port: 8080,
             open: true,
             host: "0.0.0.0",
