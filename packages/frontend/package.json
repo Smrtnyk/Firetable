@@ -39,7 +39,7 @@
         "vue": "3.4.0-alpha.1",
         "vue-i18n": "9.6.5",
         "vue-router": "4.2.5",
-        "vuefire": "3.1.17",
+        "vuefire": "3.1.18",
         "workbox-build": "^7.0.0",
         "workbox-cacheable-response": "^7.0.0",
         "workbox-core": "^7.0.0",
