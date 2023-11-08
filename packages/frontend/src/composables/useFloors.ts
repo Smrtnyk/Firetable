@@ -1,8 +1,7 @@
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import { onUnmounted, ref } from "vue";
+import { onUnmounted, Ref, ref, watch } from "vue";
 import { floorsCollection } from "@firetable/backend";
 import { FloorDoc, PropertyDoc } from "@firetable/types";
-import { usePropertiesStore } from "src/stores/usePropertiesStore";
 import { query, where, onSnapshot } from "firebase/firestore";
 
 export type PropertyFloors = {
@@ -14,11 +13,22 @@ export type PropertyFloors = {
 
 export type UsePropertyFloors = Record<string, PropertyFloors>;
 
-export function useFloors() {
+export function useFloors(properties: Ref<PropertyDoc[]>) {
     const floors = ref<UsePropertyFloors>({});
-    const isLoading = ref(true);
-    const propertiesStore = usePropertiesStore();
+    const isLoading = ref(false);
     const unsubscribes: (() => void)[] = [];
+
+    const watcher = watch(
+        properties,
+        async (newProperties) => {
+            if (newProperties.length) {
+                await fetchAllFloors();
+            }
+        },
+        { immediate: true, deep: true },
+    );
+
+    unsubscribes.push(watcher);
 
     onUnmounted(() => {
         unsubscribes.forEach((unsubscribe) => unsubscribe());
@@ -59,9 +69,8 @@ export function useFloors() {
 
     async function fetchAllFloors(): Promise<void> {
         try {
-            const properties = await propertiesStore.getPropertiesOfCurrentUser();
-            const fetchPromises = properties.map(fetchFloorsForProperty);
-
+            isLoading.value = true;
+            const fetchPromises = properties.value.map(fetchFloorsForProperty);
             await Promise.all(fetchPromises);
         } catch (error) {
             showErrorMessage(error);
@@ -70,8 +79,5 @@ export function useFloors() {
         }
     }
 
-    // Start fetching floors immediately
-    const loadingPromise = fetchAllFloors();
-
-    return { floors, isLoading, loadingPromise };
+    return { floors, isLoading };
 }

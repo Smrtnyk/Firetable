@@ -6,12 +6,15 @@ import { logoutUser } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useFirestoreDocument } from "src/composables/useFirestore";
 import { User as FBUser } from "firebase/auth";
+import { initAdminProperties, initNonAdminProperties } from "src/stores/usePropertiesStore";
+import { Loading } from "quasar";
 
 interface AuthState {
     isAuthenticated: boolean;
     isReady: boolean;
     user: User | null;
-    unsubscribeUserWatch: typeof NOOP;
+    initInProgress: boolean;
+    unsubscribers: (typeof NOOP)[];
 }
 
 export const useAuthStore = defineStore("auth", {
@@ -20,7 +23,8 @@ export const useAuthStore = defineStore("auth", {
             isAuthenticated: false,
             isReady: false,
             user: null,
-            unsubscribeUserWatch: NOOP,
+            unsubscribers: [],
+            initInProgress: false,
         };
     },
     getters: {
@@ -33,34 +37,51 @@ export const useAuthStore = defineStore("auth", {
         },
     },
     actions: {
-        setUser(user: User | null) {
-            this.user = user;
+        cleanup() {
+            this.unsubscribers.forEach((unsub) => {
+                unsub();
+            });
+            this.isAuthenticated = false;
+            this.isReady = false;
+            this.initInProgress = false;
+            this.user = null;
         },
 
-        setAuthState({
-            isReady,
-            isAuthenticated,
-            unsubscribeUserWatch,
-        }: Partial<Pick<AuthState, "isReady" | "isAuthenticated" | "unsubscribeUserWatch">>) {
+        setAuthState(isAuthenticated: boolean) {
             if (isDefined(isAuthenticated)) {
                 this.isAuthenticated = isAuthenticated;
-            }
-            if (isDefined(isReady)) {
-                this.isReady = isReady;
-            }
-            if (isDefined(unsubscribeUserWatch)) {
-                this.unsubscribeUserWatch = unsubscribeUserWatch;
+            } else {
+                this.isReady = false;
+                this.initInProgress = false;
             }
         },
 
         async initUser(authUser: FBUser) {
-            const token = await authUser?.getIdTokenResult();
-            const role = token?.claims.role as string;
+            if (this.initInProgress) {
+                return;
+            }
+            this.initInProgress = true;
+            try {
+                Loading.show();
+                const token = await authUser?.getIdTokenResult();
+                const role = token?.claims.role as string;
+                const organisationId = token?.claims.organisationId as string;
 
-            if (role === ADMIN) {
-                this.assignAdmin(authUser);
-            } else {
-                await this.watchAndAssignUser(authUser, token?.claims.organisationId as string);
+                if (role === ADMIN) {
+                    this.assignAdmin(authUser);
+                    await initAdminProperties();
+                } else {
+                    await Promise.all([
+                        this.watchAndAssignUser(authUser, organisationId),
+                        initNonAdminProperties({
+                            id: authUser.uid,
+                            organisationId,
+                        }),
+                    ]);
+                }
+                this.isReady = true;
+            } finally {
+                Loading.hide();
             }
         },
 
@@ -112,7 +133,7 @@ export const useAuthStore = defineStore("auth", {
             this.user = user.value;
             this.isAuthenticated = true;
             this.isReady = true;
-            this.unsubscribeUserWatch = stop;
+            this.unsubscribers.push(stop);
         },
 
         handleError(stop: () => void, errorObj: { message: string }) {

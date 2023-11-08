@@ -5,6 +5,7 @@ import { Router } from "vue-router";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { getCurrentUser, useCurrentUser, VueFire, VueFireAuth } from "vuefire";
 import { watch } from "vue";
+import { usePropertiesStore } from "src/stores/usePropertiesStore";
 
 export default boot(({ router, app }): void => {
     const { firebaseApp } = initializeFirebase();
@@ -31,13 +32,20 @@ function routerBeforeEach(router: Router, store: ReturnType<typeof useAuthStore>
             // finished its initialization, and handle the
             // authentication state of the user properly
             if (!store.isReady) {
-                await getCurrentUser();
+                const currUser = await getCurrentUser();
+                if (currUser) {
+                    await store.initUser(currUser);
+                }
             }
             const requiresAuth = to.meta.requiresAuth;
             const allowedRoles = to.meta.allowedRoles as string[] | undefined;
+            if (requiresAuth && !store.isAuthenticated) {
+                return { name: "auth" };
+            }
 
-            if (requiresAuth && !store.isAuthenticated) return { name: "auth" };
-            if (!store.isAuthenticated) return true;
+            if (!store.isAuthenticated) {
+                return true;
+            }
 
             const token = await (await getCurrentUser())?.getIdTokenResult();
             const role = token?.claims.role as string;
@@ -73,18 +81,18 @@ function handleOnAuthStateChanged(
     const currentUser = useCurrentUser();
     watch(
         () => currentUser.value,
-        () => {
+        async () => {
             // Save to the store
-            authStore.setAuthState({
-                isAuthenticated: !!currentUser.value,
-            });
             if (!currentUser.value) {
+                const propertiesStore = usePropertiesStore();
                 // If the user loses authentication route
                 // redirect them to the login page
-                authStore.setUser(null);
+                authStore.cleanup();
+                propertiesStore.cleanup();
                 router.replace({ path: "/auth" }).catch(showErrorMessage);
             } else {
-                authStore.initUser(currentUser.value);
+                authStore.setAuthState(!!currentUser.value);
+                await authStore.initUser(currentUser.value);
             }
         },
     );

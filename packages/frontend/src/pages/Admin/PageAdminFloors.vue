@@ -9,15 +9,29 @@ import { makeRawFloor } from "@firetable/floor-creator";
 import { FloorDoc } from "@firetable/types";
 import { addFloor, deleteFloor } from "@firetable/backend";
 import { PropertyFloors, useFloors } from "src/composables/useFloors";
-import { onMounted, ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 import { takeProp } from "@firetable/utils";
 import { useI18n } from "vue-i18n";
 import FTCenteredText from "src/components/FTCenteredText.vue";
+import { usePropertiesStore } from "src/stores/usePropertiesStore";
 
+const propertiesStore = usePropertiesStore();
 const quasar = useQuasar();
 const { t } = useI18n();
-const { floors, isLoading, loadingPromise } = useFloors();
+
+const properties = computed(() => {
+    return propertiesStore.properties;
+});
+const { floors, isLoading } = useFloors(properties);
 const activeTab = ref("");
+
+watch(isLoading, (loadingVal) => {
+    if (loadingVal) {
+        Loading.show();
+    } else {
+        Loading.hide();
+    }
+});
 
 watch(
     floors,
@@ -101,12 +115,6 @@ async function onFloorDelete(
         errorHook: reset,
     });
 }
-
-onMounted(async () => {
-    Loading.show();
-    await loadingPromise;
-    Loading.hide();
-});
 </script>
 
 <template>

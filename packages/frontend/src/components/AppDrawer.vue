@@ -74,8 +74,8 @@ function setDarkMode(newValue: boolean): void {
     q.localStorage.set("FTDarkMode", newValue);
 }
 
-const onLogoutUser = withLoading(function () {
-    return logoutUser().then(authStore.unsubscribeUserWatch);
+const onLogoutUser = withLoading(async function () {
+    await logoutUser();
 });
 
 function setAppLanguage(val: string): void {

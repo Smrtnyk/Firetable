@@ -6,27 +6,24 @@ import AddNewPropertyForm from "src/components/admin/property/AddNewPropertyForm
 import { Loading, useQuasar } from "quasar";
 import { showConfirm, withLoading } from "src/helpers/ui-helpers";
 import { createNewProperty, CreatePropertyPayload, deleteProperty } from "@firetable/backend";
-import { useProperties } from "src/composables/useProperties";
-import { computed, watchEffect } from "vue";
-import { useOrganisations } from "src/composables/useOrganisations";
+import { computed, onMounted, ref, watchEffect } from "vue";
 import { useAuthStore } from "src/stores/auth-store";
 import { ADMIN, PropertyDoc } from "@firetable/types";
 import { useI18n } from "vue-i18n";
 import FTCenteredText from "src/components/FTCenteredText.vue";
+import { usePropertiesStore } from "src/stores/usePropertiesStore";
 
+const propertiesStore = usePropertiesStore();
 const authStore = useAuthStore();
 const quasar = useQuasar();
 const { t } = useI18n();
-const { properties, fetchProperties, isLoading } = useProperties();
-const { organisations, isLoading: organisationsIsLoading } = useOrganisations();
 
-watchEffect(() => {
-    if (isLoading.value || organisationsIsLoading.value) {
-        Loading.show();
-    } else {
-        Loading.hide();
-    }
+const properties = computed(() => {
+    return propertiesStore.properties;
 });
+const organisations = computed(() => propertiesStore.organisations);
+
+const organisationsIsLoading = ref(false);
 
 const canCreateProperty = computed(() => {
     const isAdmin = authStore.user!.role === ADMIN;
@@ -41,15 +38,32 @@ const canCreateProperty = computed(() => {
     return currentNumOfProperties < maxAllowedProperties;
 });
 
+onMounted(async () => {
+    organisationsIsLoading.value = true;
+    try {
+        await propertiesStore.getOrganisations();
+    } catch (error) {
+        console.error("Failed to load organizations:", error);
+    } finally {
+        organisationsIsLoading.value = false;
+    }
+});
+
+watchEffect(() => {
+    if (organisationsIsLoading.value) {
+        Loading.show();
+    } else {
+        Loading.hide();
+    }
+});
+
 const onPropertyCreate = withLoading(async function (payload: CreatePropertyPayload) {
     await createNewProperty(payload);
     quasar.notify("Property created!");
-    return fetchProperties();
 });
 
 const onDeleteProperty = withLoading(async (property: PropertyDoc) => {
     await deleteProperty(property);
-    return fetchProperties();
 });
 
 async function deletePropertyAsync(property: PropertyDoc, reset: () => void): Promise<void> {
@@ -129,7 +143,7 @@ function createProperty(): void {
             </h6>
         </div>
 
-        <FTCenteredText v-else-if="properties.length === 0 && !isLoading">
+        <FTCenteredText v-else-if="properties.length === 0">
             {{ t("PageAdminProperties.noPropertiesCreatedMessage") }}
         </FTCenteredText>
     </div>

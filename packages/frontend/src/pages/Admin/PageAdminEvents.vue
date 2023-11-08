@@ -22,19 +22,18 @@ import {
 } from "@firetable/backend";
 import { takeLast } from "@firetable/utils";
 import { useFloors } from "src/composables/useFloors";
-import { useProperties } from "src/composables/useProperties";
 import { useEvents } from "src/composables/useEvents";
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import FTCenteredText from "src/components/FTCenteredText.vue";
+import { usePropertiesStore } from "src/stores/usePropertiesStore";
 
 const router = useRouter();
 const quasar = useQuasar();
 const { t } = useI18n();
 const { createDialog } = useDialog();
-const { properties, isLoading: isLoadingProperties } = useProperties();
-const { floors } = useFloors();
+const propertiesStore = usePropertiesStore();
 const {
     eventsByProperty,
     fetchMoreEvents,
@@ -43,8 +42,14 @@ const {
     EVENTS_PER_PAGE,
 } = useEvents();
 const activePropertyId = ref("");
+const properties = computed(() => {
+    return propertiesStore.properties;
+});
 
-const isAnyLoading = computed(() => isLoadingProperties.value || isLoadingEvents.value);
+const { floors, isLoading: isFloorsLoading } = useFloors(properties);
+const isAnyLoading = computed(() => {
+    return isFloorsLoading.value || isLoadingEvents.value;
+});
 
 watch(
     isAnyLoading,
@@ -76,12 +81,10 @@ watch(
 
 watch(
     activePropertyId,
-    (_, oldVal) => {
-        if (oldVal !== undefined) {
-            fetchEventsForActiveTab();
-        }
+    () => {
+        fetchEventsForActiveTab();
     },
-    { immediate: false },
+    { immediate: true },
 );
 
 function fetchEventsForActiveTab(): void {
@@ -105,7 +108,7 @@ function fetchEventsForActiveTab(): void {
 const onCreateEvent = withLoading(async function (eventData: CreateEventPayload) {
     const { id: eventId, organisationId, propertyId } = (await createNewEvent(eventData)).data;
     quasar.notify(t("PageAdminEvents.eventCreatedNotificationMessage"));
-    await router.replace({
+    await router.push({
         name: "adminEvent",
         params: { eventId, propertyId, organisationId },
     });
@@ -217,7 +220,7 @@ function showCreateEventForm(property: PropertyDoc, event?: EventDoc): void {
     <div class="PageAdminEvents">
         <FTTitle title="Events" />
 
-        <FTCenteredText v-if="properties.length === 0 && !isAnyLoading">
+        <FTCenteredText v-if="properties.length === 0 && !isLoadingEvents">
             {{ t("PageAdminEvents.noPropertiesMessage") }}
         </FTCenteredText>
 

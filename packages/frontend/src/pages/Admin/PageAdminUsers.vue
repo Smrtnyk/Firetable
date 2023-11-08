@@ -3,7 +3,7 @@ import UserCreateForm from "src/components/admin/User/UserCreateForm.vue";
 import UserEditForm from "src/components/admin/User/UserEditForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import { showConfirm, showErrorMessage, withLoading } from "src/helpers/ui-helpers";
-import { watch } from "vue";
+import { computed, watch } from "vue";
 import { Loading, useQuasar } from "quasar";
 import FTDialog from "src/components/FTDialog.vue";
 import { ADMIN, CreateUserPayload, EditUserPayload, User } from "@firetable/types";
@@ -27,6 +27,10 @@ const authStore = useAuthStore();
 const propertiesStore = usePropertiesStore();
 const { users, isLoading, fetchUsers } = useUsers();
 const { createDialog } = useDialog();
+
+const properties = computed(() => {
+    return propertiesStore.properties;
+});
 
 const onCreateUser = withLoading(async (newUser: CreateUserPayload) => {
     await createUserWithEmail(newUser);
@@ -69,7 +73,7 @@ async function showCreateUserDialog(): Promise<void> {
         authStore.user!.role === ADMIN
             ? await fetchOrganisationsForAdmin()
             : [await fetchOrganisationById(authStore.user!.organisationId)];
-    const properties = await propertiesStore.getPropertiesOfCurrentUser();
+
     const dialog = createDialog({
         component: FTDialog,
         componentProps: {
@@ -77,7 +81,7 @@ async function showCreateUserDialog(): Promise<void> {
             maximized: false,
             title: t("PageAdminUsers.createNewUserDialogTitle"),
             componentPropsObject: {
-                properties,
+                properties: properties.value,
                 organisations,
             },
             listeners: {
@@ -97,8 +101,7 @@ async function showEditUserDialog(user: User, reset: () => void): Promise<void> 
         reset();
         return;
     }
-    const properties = await propertiesStore.getPropertiesOfCurrentUser();
-    const selectedProperties = properties.filter((ownProperty) => {
+    const selectedProperties = properties.value.filter((ownProperty) => {
         return user.relatedProperties.includes(ownProperty.id);
     });
     const organisation = await fetchOrganisationById(user.organisationId);
@@ -110,7 +113,7 @@ async function showEditUserDialog(user: User, reset: () => void): Promise<void> 
             title: t("PageAdminUsers.editUserDialogTitle", { name: user.name }),
             componentPropsObject: {
                 user: { ...user },
-                properties,
+                properties: properties.value,
                 selectedProperties,
                 organisation,
             },
