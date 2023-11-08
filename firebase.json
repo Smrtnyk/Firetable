@@ -9,7 +9,7 @@
         "runtime": "nodejs18"
     },
     "hosting": {
-        "public": "packages/frontend/dist/spa",
+        "public": "packages/frontend/dist/pwa",
         "ignore": [
             "firebase.json",
             "**/.*",

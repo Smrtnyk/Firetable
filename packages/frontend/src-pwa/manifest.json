@@ -1,7 +1,7 @@
 {
   "name": "Firetable",
   "short_name": "Firetable",
-  "description": "Firetable reservation management system",
+  "description": "Firetable events management system",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#ffffff",

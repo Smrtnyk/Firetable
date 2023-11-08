@@ -122,12 +122,8 @@ module.exports = configure(function (/* ctx */) {
 
         // https://v2.quasar.dev/quasar-cli-vite/developing-pwa/configuring-pwa
         pwa: {
-            workboxMode: "injectManifest",
+            workboxMode: 'injectManifest', // Use your custom Service Worker
             injectPwaMetaTags: true,
-            extendGenerateSWOptions(cfg) {
-                cfg.skipWaiting = false;
-                cfg.clientsClaim = false;
-            },
         },
     };
 });
