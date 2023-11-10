@@ -63,11 +63,14 @@ const eventData = computed(() => eventFloors.value.map(getTablesFromFloorDoc).fl
 
 const reservationsStatus = computed(() => {
     const tables = eventData.value;
-    const reservations = tables.filter(propIsTruthy("reservation"));
-    const unreserved = tables.length - reservations.length;
-    const pending = reservations.filter((table) => !table.reservation?.confirmed).length;
-    const confirmed = reservations.length - pending;
-    const reserved = reservations.length;
+    const reservedTables = tables.filter(propIsTruthy("reservation"));
+    const unreserved = tables.length - reservedTables.length;
+    const pending = reservedTables.filter((table) => !table.reservation?.confirmed).length;
+    const confirmed = reservedTables.length - pending;
+    const reserved = reservedTables.length;
+    const totalGuests = reservedTables.reduce((acc, table) => {
+        return acc + Number(table.reservation!.numberOfGuests || 0);
+    }, 0);
 
     return {
         total: tables.length,
@@ -75,6 +78,7 @@ const reservationsStatus = computed(() => {
         pending,
         confirmed,
         unreserved,
+        totalGuests,
     };
 });
 

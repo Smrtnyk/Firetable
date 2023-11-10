@@ -5,6 +5,9 @@
         <div class="col-4 text-subtitle1">Pending: {{ props.reservationsStatus.pending }}</div>
         <div class="col-4 text-subtitle1">Confirmed: {{ props.reservationsStatus.confirmed }}</div>
         <div class="col-4 text-subtitle1">Free: {{ props.reservationsStatus.unreserved }}</div>
+        <div class="col-4 text-subtitle1">
+            Total Guests: {{ props.reservationsStatus.totalGuests }}
+        </div>
     </div>
 </template>
 
@@ -15,6 +18,7 @@ interface ReservationsStatus {
     pending: number;
     confirmed: number;
     unreserved: number;
+    totalGuests: number;
 }
 
 interface Props {
