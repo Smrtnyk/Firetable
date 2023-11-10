@@ -6,8 +6,10 @@
   "module": "./dist/src/index.js",
   "types": "./dist/src/index.d.ts",
   "exports": {
-    ".": "./dist/src/index.js",
-    "./types": "./dist/src/index.d.ts"
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
+    }
   },
   "scripts": {
     "test": "jest",
