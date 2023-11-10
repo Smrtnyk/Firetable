@@ -10,5 +10,8 @@ export default defineConfig({
             headless: true,
             name: "chrome",
         },
+        deps: {
+            inline: ["@firetable/types", "@firetable/utils"],
+        },
     },
 });
