@@ -52,6 +52,22 @@ const props = defineProps<Props>();
 let chartInstance: Chart | null = null;
 const reservedTables = computed(() => props.reservations.filter(propIsTruthy("reservation")));
 
+function calculateChartHeight(reservations: BaseTable[]): number {
+    const minBarHeight = isMobile.value ? 7 : 12;
+    // Calculate the total height based on the number of bars
+    const totalHeight = reservations.length * minBarHeight;
+
+    const minHeight = 300;
+    return Math.max(totalHeight, minHeight);
+}
+
+function updateChartHeight(reservations: BaseTable[]): void {
+    if (chartRef.value) {
+        const newHeight = calculateChartHeight(reservations);
+        chartRef.value.style.height = `${newHeight}px`;
+    }
+}
+
 function reservationsReducer(acc: Res, { reservation }: BaseTable): Res {
     if (!reservation) return acc;
     const { reservedBy, confirmed } = reservation;
@@ -87,6 +103,8 @@ function generateTablesByWaiterChartOptions(
             borderWidth: 1,
         };
     });
+
+    updateChartHeight(reservations);
 
     try {
         chartInstance = new Chart(chartContainer, {
@@ -164,7 +182,6 @@ onBeforeUnmount(() => {
 
 <style>
 .chart-container {
-    height: 50vh;
-    min-height: 300px;
+    min-height: 50vh;
 }
 </style>
