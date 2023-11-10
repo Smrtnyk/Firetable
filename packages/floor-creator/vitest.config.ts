@@ -11,7 +11,11 @@ export default defineConfig({
             name: "chrome",
         },
         deps: {
-            inline: ["@firetable/types", "@firetable/utils"],
+            optimizer: {
+                web: {
+                    include: ["@firetable/types", "@firetable/utils"],
+                },
+            },
         },
     },
 });
