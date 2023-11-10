@@ -4,7 +4,12 @@
     "description": "",
     "types": "./dist/src/index.d.ts",
     "main": "./dist/src/index.js",
-    "exports": "./dist/src/index.js",
+    "exports": {
+        ".": {
+            "types": "./dist/src/index.d.ts",
+            "import": "./dist/src/index.js"
+        }
+    },
     "type": "module",
     "scripts": {
         "test": "vitest",
