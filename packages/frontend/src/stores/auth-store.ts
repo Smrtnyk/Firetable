@@ -1,6 +1,13 @@
 import { defineStore } from "pinia";
 import { watch } from "vue";
-import { ADMIN, Collection, User } from "@firetable/types";
+import {
+    ADMIN,
+    Collection,
+    DEFAULT_CAPABILITIES_BY_ROLE,
+    User,
+    UserCapabilities,
+    UserCapability,
+} from "@firetable/types";
 import { isDefined, NOOP } from "@firetable/utils";
 import { logoutUser } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";
@@ -32,8 +39,28 @@ export const useAuthStore = defineStore("auth", {
             return this.user?.role === ADMIN;
         },
 
+        capabilities(): UserCapabilities {
+            return this.user!.capabilities ?? DEFAULT_CAPABILITIES_BY_ROLE[this.user!.role];
+        },
+
         isLoggedIn(): boolean {
             return !!this.user?.email;
+        },
+
+        canReserve(): boolean {
+            return this.capabilities[UserCapability.CAN_RESERVE];
+        },
+
+        canSeeGuestContact(): boolean {
+            return this.capabilities[UserCapability.CAN_SEE_GUEST_CONTACT];
+        },
+
+        canDeleteReservation(): boolean {
+            return this.capabilities[UserCapability.CAN_DELETE_RESERVATION];
+        },
+
+        canConfirmReservation(): boolean {
+            return this.capabilities[UserCapability.CAN_CONFIRM_RESERVATION];
         },
     },
     actions: {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { Reservation, Role } from "@firetable/types";
+import { Reservation } from "@firetable/types";
 import { useAuthStore } from "src/stores/auth-store";
 
 interface Props {
@@ -17,9 +17,6 @@ const emit = defineEmits<{
 }>();
 const { t } = useI18n();
 const checked = ref<boolean>(props.reservation.confirmed);
-const isStaff = computed(() => {
-    return authStore.user?.role === Role.STAFF;
-});
 function reservedByText(reservedBy: Reservation["reservedBy"]): string {
     const { name, email } = reservedBy;
     const isSocial = email.startsWith("social");
@@ -50,7 +47,7 @@ function onReservationConfirm(): void {
                 {{ props.reservation.numberOfGuests }}
             </div>
 
-            <template v-if="props.reservation.guestContact && !isStaff">
+            <template v-if="props.reservation.guestContact && authStore.canSeeGuestContact">
                 <div class="col-6">{{ t("EventShowReservation.contactLabel") }}</div>
                 <div class="col-6 font-black">{{ props.reservation.guestContact }}</div>
             </template>
@@ -72,7 +69,7 @@ function onReservationConfirm(): void {
 
         <q-separator class="q-my-md" />
 
-        <q-item v-if="!isStaff" tag="label" class="q-pa-none">
+        <q-item v-if="authStore.canConfirmReservation" tag="label" class="q-pa-none">
             <q-item-section>
                 <q-item-label>
                     {{ t("EventShowReservation.guestArrivedLabel") }}
@@ -91,7 +88,7 @@ function onReservationConfirm(): void {
             </q-item-section>
         </q-item>
         <q-item>
-            <div v-if="!isStaff" class="row q-gutter-sm full-width">
+            <div v-if="authStore.canDeleteReservation" class="row q-gutter-sm full-width">
                 <q-btn
                     :title="t('Global.delete')"
                     class="no-wrap"
@@ -110,7 +107,7 @@ function onReservationConfirm(): void {
             </div>
             <q-btn
                 :title="t('Global.transfer')"
-                v-if="props.crossFloorReservationTransferEnabled"
+                v-if="props.crossFloorReservationTransferEnabled && authStore.canReserve"
                 icon="transfer"
                 color="primary"
                 @click="() => emit('transfer')"

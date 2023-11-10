@@ -1,5 +1,5 @@
 import { computed, onBeforeUnmount, Ref, watch, ref } from "vue";
-import { EventDoc, Reservation, Role, User } from "@firetable/types";
+import { EventDoc, Reservation, User } from "@firetable/types";
 import {
     BaseTable,
     Floor,
@@ -35,15 +35,12 @@ export function useReservations(
     const { t } = useI18n();
 
     const intervalID = setInterval(checkReservationsForTimeAndMarkTableIfNeeded, 60 * 1000);
-    const currentUser = computed(() => authStore.user);
     const crossFloorReservationTransferTable = ref<
         { table: BaseTable; floor: FloorViewer } | undefined
     >();
 
-    // For now, disable reservation ability for staff,
-    // but it should be configurable in the future
     const canReserve = computed(() => {
-        return currentUser.value?.role !== Role.STAFF;
+        return authStore.canReserve;
     });
 
     let currentOpenCreateReservationDialog: {
@@ -211,6 +208,9 @@ export function useReservations(
         table1: BaseTable,
         table2: BaseTable,
     ): Promise<void> {
+        if (!authStore.canReserve) {
+            return;
+        }
         if (!table1.reservation) {
             return;
         }

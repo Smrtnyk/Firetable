@@ -27,6 +27,7 @@ export interface CreateUserPayload {
     password: string;
     relatedProperties: string[];
     organisationId: string;
+    capabilities: UserCapabilities;
 }
 
 export interface User {
@@ -37,17 +38,21 @@ export interface User {
     role: Role | typeof ADMIN;
     relatedProperties: string[];
     organisationId: string;
+    capabilities: UserCapabilities;
 }
 
 export interface EditUserPayload {
     userId: string;
     organisationId: string;
-    updatedUser: {
-        relatedProperties: string[];
-        role: string;
-        name: string;
-        password?: string;
-    };
+    updatedUser: CreateUserPayload;
+}
+
+interface UserCapabilities {
+    [USER_CAPABILITIES.CAN_RESERVE]: boolean;
+}
+
+export const enum USER_CAPABILITIES {
+    CAN_RESERVE = "can-reserve",
 }
 
 interface CreateEventForm {

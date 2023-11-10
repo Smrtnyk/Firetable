@@ -57,8 +57,7 @@ function onReset(): void {
     resetProperties();
 }
 
-// Utility functions
-function userSkeleton(user?: User): CreateUserPayload {
+function userSkeleton(): CreateUserPayload {
     return {
         id: "",
         name: "",
@@ -68,7 +67,6 @@ function userSkeleton(user?: User): CreateUserPayload {
         role: Role.STAFF,
         relatedProperties: [],
         organisationId: "",
-        ...(user || {}),
     };
 }
 

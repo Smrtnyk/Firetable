@@ -37,7 +37,14 @@ export async function updateUserFn(
         throw new functions.https.HttpsError("invalid-argument", "User ID must be provided.");
     }
 
-    if (!updatedUser && (!relatedProperties || relatedProperties.length === 0)) {
+    if (!userId) {
+        throw new functions.https.HttpsError(
+            "invalid-argument",
+            "User data to update must be provided.",
+        );
+    }
+
+    if (!relatedProperties || relatedProperties.length === 0) {
         throw new functions.https.HttpsError("invalid-argument", "No data provided to update.");
     }
 
@@ -54,8 +61,6 @@ export async function updateUserFn(
                 `Failed to update password. Details: ${error.message}`,
             );
         }
-        // Remove password from updatedUser so it doesn't get saved in Firestore
-        delete updatedUser.password;
     }
 
     try {
@@ -81,10 +86,14 @@ export async function updateUserFn(
                 )
                 .doc(userId);
 
-            // Update the user's basic information if provided
-            if (updatedUser) {
-                transaction.update(userRef, updatedUser);
-            }
+            transaction.update(userRef, {
+                name: updatedUser.name,
+                username: updatedUser.username,
+                email: updatedUser.email,
+                role: updatedUser.role,
+                relatedProperties: updatedUser.relatedProperties,
+                capabilities: updatedUser.capabilities,
+            });
 
             // Add the user to relatedUsers field of the property document for new associations
             for (const propertyId of propertiesToAdd) {

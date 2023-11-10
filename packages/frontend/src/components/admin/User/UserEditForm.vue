@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { Role, User, PropertyDoc, CreateUserPayload, OrganisationDoc } from "@firetable/types";
+import {
+    DEFAULT_CAPABILITIES_BY_ROLE,
+    EditUserPayload,
+    OrganisationDoc,
+    PropertyDoc,
+    Role,
+    User,
+    UserCapability,
+} from "@firetable/types";
 import { QForm } from "quasar";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { noEmptyString, noWhiteSpaces } from "src/helpers/form-rules";
@@ -22,8 +30,29 @@ const emit = defineEmits<Emits>();
 const props = defineProps<Props>();
 const userEditForm = ref<QForm>();
 
-const form = ref<CreateUserPayload>({ ...props.user, password: "" });
+const defaultCapabilitiesForRole = DEFAULT_CAPABILITIES_BY_ROLE[Role.STAFF];
+const userCapabilities = {
+    ...defaultCapabilitiesForRole,
+    ...props.user.capabilities,
+};
+
+const isStaff = computed(() => {
+    return props.user.role === Role.STAFF;
+});
+
+const form = ref<EditUserPayload["updatedUser"]>({
+    ...props.user,
+    password: "",
+    capabilities: isStaff.value ? userCapabilities : undefined,
+});
 const chosenProperties = ref<string[]>(props.selectedProperties.map((p) => p.id));
+
+const capabilitiesToDisplay = computed(() => {
+    if (form.value.role !== Role.STAFF) {
+        return [];
+    }
+    return Object.entries(form.value.capabilities ?? DEFAULT_CAPABILITIES_BY_ROLE[form.value.role]);
+});
 
 const isEditableRole = computed(() =>
     [Role.MANAGER, Role.STAFF, Role.HOSTESS].includes(form.value.role as Role),
@@ -59,7 +88,11 @@ function prepareAndEmitSubmission(): void {
 }
 
 function onReset(): void {
-    form.value = { ...props.user, password: "" };
+    form.value = {
+        ...props.user,
+        password: "",
+        capabilities: isStaff.value ? userCapabilities : undefined,
+    };
     resetProperties();
 }
 
@@ -143,6 +176,17 @@ function resetProperties(): void {
                     />
                 </div>
                 <div v-else><p>No properties available. Please create some.</p></div>
+            </div>
+
+            <div v-if="form.capabilities">
+                <div>Capabilities:</div>
+                <div v-for="[capability] in capabilitiesToDisplay" :key="capability">
+                    <q-checkbox
+                        v-model="form.capabilities[capability as UserCapability]"
+                        :label="capability"
+                        color="accent"
+                    />
+                </div>
             </div>
 
             <div>

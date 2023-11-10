@@ -127,7 +127,7 @@ async function showEditUserDialog(user: User, reset: () => void): Promise<void> 
                 organisation,
             },
             listeners: {
-                submit: async (userPayload: CreateUserPayload) => {
+                submit: async (userPayload: EditUserPayload["updatedUser"]) => {
                     await onUpdateUser({
                         userId: userPayload.id,
                         organisationId: userPayload.organisationId,
