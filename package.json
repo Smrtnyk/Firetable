@@ -33,7 +33,7 @@
         "typescript": "5.3.1-rc"
     },
     "dependencies": {
-        "firebase": "10.5.2"
+        "firebase": "10.6.0"
     },
     "private": true,
     "engines": {

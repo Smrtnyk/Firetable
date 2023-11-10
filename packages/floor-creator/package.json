@@ -18,11 +18,11 @@
     "devDependencies": {
         "@firetable/types": "workspace:*",
         "@firetable/utils": "workspace:*",
-        "@types/fabric": "5.3.5",
-        "@types/hammerjs": "2.0.43",
+        "@types/fabric": "5.3.6",
+        "@types/hammerjs": "2.0.44",
         "@vitest/browser": "1.0.0-beta.3",
-        "vitest": "1.0.0-beta.3",
-        "webdriverio": "8.21.0"
+        "vitest": "1.0.0-beta.4",
+        "webdriverio": "8.22.1"
     },
     "keywords": [],
     "author": "",
