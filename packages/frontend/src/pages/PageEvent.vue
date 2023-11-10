@@ -98,7 +98,7 @@ onMounted(init);
 </script>
 
 <template>
-    <div v-if="event" class="PageEvent" ref="pageRef">
+    <div v-if="event" class="PageEvent flex column justify-between" ref="pageRef">
         <div class="row items-center q-mb-sm q-gutter-sm">
             <q-fab
                 v-if="hasMultipleFloorPlans"
