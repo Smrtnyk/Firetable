@@ -49,7 +49,7 @@ Chart.register(
 
 const chartRef = ref<HTMLCanvasElement | null>(null);
 const props = defineProps<Props>();
-let chartInstance: Chart | null = null;
+let chartInstance: Chart | undefined;
 const reservedTables = computed(() => props.reservations.filter(propIsTruthy("reservation")));
 
 function calculateChartHeight(reservations: BaseTable[]): number {
@@ -86,6 +86,13 @@ function reservationsReducer(acc: Res, { reservation }: BaseTable): Res {
     return acc;
 }
 
+function destroyChartIfExists(): void {
+    if (chartInstance) {
+        chartInstance.destroy();
+        chartInstance = undefined;
+    }
+}
+
 function generateTablesByWaiterChartOptions(
     chartContainer: HTMLCanvasElement,
     reservations: BaseTable[],
@@ -105,6 +112,7 @@ function generateTablesByWaiterChartOptions(
     });
 
     updateChartHeight(reservations);
+    destroyChartIfExists();
 
     try {
         chartInstance = new Chart(chartContainer, {
@@ -158,14 +166,18 @@ function generateTablesByWaiterChartOptions(
         showErrorMessage(e);
     }
 }
+
 onMounted(() => {
-    if (!chartRef.value) return;
+    if (!chartRef.value) {
+        return;
+    }
     generateTablesByWaiterChartOptions(chartRef.value, props.reservations);
 });
 
 watch(
     () => props.reservations,
     (newReservations) => {
+        destroyChartIfExists();
         if (chartRef.value) {
             generateTablesByWaiterChartOptions(chartRef.value, newReservations);
         }
@@ -174,9 +186,7 @@ watch(
 );
 
 onBeforeUnmount(() => {
-    if (chartInstance) {
-        chartInstance.destroy();
-    }
+    destroyChartIfExists();
 });
 </script>
 
