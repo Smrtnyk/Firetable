@@ -12,7 +12,7 @@ import EventGuestListCreateGuestForm from "src/components/Event/EventGuestListCr
 import FTTitle from "src/components/FTTitle.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import { useQuasar } from "quasar";
-import { GuestData } from "@firetable/types";
+import { ADMIN, GuestData, Role } from "@firetable/types";
 import {
     addGuestToGuestList,
     confirmGuestFromGuestList,
@@ -20,6 +20,7 @@ import {
     EventOwner,
 } from "@firetable/backend";
 import { useI18n } from "vue-i18n";
+import { useAuthStore } from "src/stores/auth-store";
 
 interface Props {
     guestListLimit: number;
@@ -32,9 +33,14 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const quasar = useQuasar();
 const eventsStore = useEventsStore();
+const authStore = useAuthStore();
 const { t } = useI18n();
 const reachedCapacity = computed(() => props.guestList.length / props.guestListLimit);
 const isGuestListFull = computed(() => props.guestList.length >= props.guestListLimit);
+
+const canInteract = computed(() => {
+    return [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN].includes(authStore.user!.role);
+});
 
 function onCreate(newGuestData: GuestData): Promise<void> | undefined {
     if (props.guestList.length >= props.guestListLimit) {
@@ -93,6 +99,7 @@ function showAddNewGuestForm(): void {
             <FTTitle :title="t('EventGuestList.title')">
                 <template #right>
                     <q-btn
+                        v-if="canInteract"
                         rounded
                         icon="plus"
                         class="button-gradient"
@@ -130,10 +137,10 @@ function showAddNewGuestForm(): void {
                     @right="({ reset }) => deleteGuest(guest.id, reset)"
                     @left="({ reset }) => confirmGuest(guest, reset)"
                 >
-                    <template #right>
+                    <template v-if="canInteract" #right>
                         <q-icon name="trash" />
                     </template>
-                    <template #left>
+                    <template v-if="canInteract" #left>
                         <q-icon color="white" :name="guest.confirmed ? 'close' : 'check'" />
                     </template>
                     <q-item
