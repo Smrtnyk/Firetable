@@ -31,6 +31,7 @@ type TestProps = {
     users: User[];
     mode: "create" | "edit";
     reservationData: Reservation | null;
+    eventStartTimestamp: number;
 };
 
 function createProps(overrides: Partial<TestProps> = {}): TestProps {
@@ -38,6 +39,7 @@ function createProps(overrides: Partial<TestProps> = {}): TestProps {
         users: [],
         mode: "create",
         reservationData: null,
+        eventStartTimestamp: Date.now(),
     };
 
     return { ...defaultProps, ...overrides };
