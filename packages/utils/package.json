@@ -4,6 +4,10 @@
   "description": "",
   "main": "./dist/src/index.js",
   "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": "./dist/src/index.js",
+    "./types": "./dist/src/index.d.ts"
+  },
   "scripts": {
     "test": "jest",
     "build": "tsc",
