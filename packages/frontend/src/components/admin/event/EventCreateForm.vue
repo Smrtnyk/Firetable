@@ -92,6 +92,9 @@ watchEffect(() => {
 });
 
 watch([() => state.selectedDate, () => state.selectedTime], () => {
+    if (!state.selectedDate) {
+        return;
+    }
     const [dayVal, monthVal, yearVal] = state.selectedDate.split("-");
     const combinedDateTime = `${yearVal}-${monthVal}-${dayVal}T${state.selectedTime}:00Z`;
     state.form.date = new Date(combinedDateTime).getTime();
@@ -223,6 +226,7 @@ function onReset(): void {
                     <q-icon name="calendar" class="cursor-pointer" />
                     <q-popup-proxy transition-show="scale" transition-hide="scale">
                         <q-date
+                            :no-unset="true"
                             v-model="state.selectedDate"
                             mask="DD-MM-YYYY"
                             today-btn
