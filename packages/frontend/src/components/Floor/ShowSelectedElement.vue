@@ -107,69 +107,73 @@ function setElementColor(newVal: any): void {
 <template>
     <div v-if="!isTablet" class="ShowSelectedElement">
         <q-card
-            v-if="selectedFloorElement"
             class="ShowSelectedElement__floating-controls row q-gutter-xs q-ma-xs q-pa-xs q-pt-md q-pb-md justify-around items-center"
         >
-            <q-input
-                :dense="isMobile"
-                v-model="localWidth"
-                standout
-                rounded
-                type="number"
-                label="Width"
-                class="q-ma-xs"
-            />
-            <q-input
-                rounded
-                :dense="isMobile"
-                v-model="localHeight"
-                standout
-                type="number"
-                label="Height"
-                class="q-ma-xs"
-            />
-            <q-input
-                v-if="isTable(selectedFloorElement)"
-                class="q-ma-xs"
-                :debounce="500"
-                :model-value="selectedFloorElement.label"
-                @update:model-value="
-                    (newLabel) =>
-                        updateTableLabel(selectedFloorElement as BaseTable, newLabel as string)
-                "
-                type="text"
-                standout
-                rounded
-                label="Table label"
-                :dense="isMobile"
-            />
-            <q-btn
-                title="Change element fill color"
-                v-if="elementColor"
-                :style="{ 'background-color': elementColor }"
-                @click="openColorPicker"
-                round
-            >
-                <q-icon name="color-picker" class="cursor-pointer q-ma-none" />
-                <q-popup-proxy
-                    no-parent-event
-                    ref="colorPickerProxy"
-                    cover
-                    transition-show="scale"
-                    transition-hide="scale"
-                >
-                    <q-color :model-value="elementColor" @update:model-value="setElementColor" />
-                </q-popup-proxy>
-            </q-btn>
-            <q-btn
-                title="Delete element"
-                v-if="deleteAllowed"
-                round
-                icon="trash"
-                color="negative"
-                @click="deleteElement"
-            />
             <slot name="buttons"></slot>
+            <div class="row justify-around q-gutter-xs" v-if="selectedFloorElement">
+                <q-input
+                    :dense="isMobile"
+                    v-model="localWidth"
+                    standout
+                    rounded
+                    type="number"
+                    label="Width"
+                    class="q-ma-xs"
+                />
+                <q-input
+                    rounded
+                    :dense="isMobile"
+                    v-model="localHeight"
+                    standout
+                    type="number"
+                    label="Height"
+                    class="q-ma-xs"
+                />
+                <q-input
+                    v-if="isTable(selectedFloorElement)"
+                    class="q-ma-xs"
+                    :debounce="500"
+                    :model-value="selectedFloorElement.label"
+                    @update:model-value="
+                        (newLabel) =>
+                            updateTableLabel(selectedFloorElement as BaseTable, newLabel as string)
+                    "
+                    type="text"
+                    standout
+                    rounded
+                    label="Table label"
+                    :dense="isMobile"
+                />
+                <q-btn
+                    title="Change element fill color"
+                    v-if="elementColor"
+                    :style="{ 'background-color': elementColor }"
+                    @click="openColorPicker"
+                    round
+                >
+                    <q-icon name="color-picker" class="cursor-pointer q-ma-none" />
+                    <q-popup-proxy
+                        no-parent-event
+                        ref="colorPickerProxy"
+                        cover
+                        transition-show="scale"
+                        transition-hide="scale"
+                    >
+                        <q-color
+                            :model-value="elementColor"
+                            @update:model-value="setElementColor"
+                        />
+                    </q-popup-proxy>
+                </q-btn>
+                <q-btn
+                    title="Delete element"
+                    v-if="deleteAllowed"
+                    round
+                    icon="trash"
+                    color="negative"
+                    @click="deleteElement"
+                />
+            </div>
         </q-card>
     </div>
     <div v-else>
