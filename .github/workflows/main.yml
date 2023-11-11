@@ -29,6 +29,9 @@ jobs:
             - name: Install dependencies
               run: pnpm install
 
+            - name: Prepare Firebase Config
+              run: cp packages/backend/src/firebase/fb-config-template.json packages/backend/src/firebase/fb-config.json
+
             - name: Lint
               run: pnpm run lint
 
