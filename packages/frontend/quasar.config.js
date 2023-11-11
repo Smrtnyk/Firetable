@@ -66,7 +66,7 @@ module.exports = configure(function (/* ctx */) {
 
         // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
         devServer: {
-            https:{
+            https: process.env.CI ? null : {
                 key: fs.readFileSync("./key.pem"),
                 cert: fs.readFileSync("./cert.pem"),
             },
