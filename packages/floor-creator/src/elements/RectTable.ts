@@ -182,6 +182,7 @@ export class RectTable extends fabric.Group {
     toObject(): Record<string, unknown> {
         return {
             ...super.toObject(),
+            opacity: 1,
             baseFill: this.baseFill,
             label: this.label,
             reservation: this.reservation,
