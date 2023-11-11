@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AddTableDialog from "src/components/Floor/AddTableDialog.vue";
-import ShowSelectedElement from "src/components/Floor/ShowSelectedElement.vue";
+import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
 import FTDialog from "src/components/FTDialog.vue";
 
 import { nextTick, onBeforeUnmount, onMounted, reactive, ref } from "vue";
@@ -327,7 +327,7 @@ function triggerFileInput(): void {
             </q-input>
         </div>
 
-        <ShowSelectedElement
+        <FloorEditorControls
             v-if="floorInstance"
             @delete="onDeleteElement"
             :selected-floor-element="selectedElement"
@@ -376,7 +376,7 @@ function triggerFileInput(): void {
                     accept=".json"
                 />
             </template>
-        </ShowSelectedElement>
+        </FloorEditorControls>
 
         <div class="row q-pa-sm q-col-gutter-md" v-if="floorInstance">
             <div class="col-6">

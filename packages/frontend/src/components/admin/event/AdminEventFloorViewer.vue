@@ -13,7 +13,7 @@
                         size="md"
                         rounded
                     />
-                    <ShowSelectedElement
+                    <FloorEditorControls
                         v-if="floorInstance"
                         :selected-floor-element="selectedFloorElement"
                         :delete-allowed="false"
@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, ref, watch } from "vue";
-import ShowSelectedElement from "src/components/Floor/ShowSelectedElement.vue";
+import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
 import {
     extractAllTablesLabels,
     Floor,
