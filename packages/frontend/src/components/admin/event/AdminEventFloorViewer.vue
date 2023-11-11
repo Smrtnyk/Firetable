@@ -1,23 +1,34 @@
 <template>
-    <div ref="viewerContainerRef" v-if="props.floor">
-        <q-btn
-            class="button-gradient q-mb-sm"
-            @click="saveFloorState"
-            label="save"
-            size="md"
-            rounded
-        />
-        <ShowSelectedElement
-            v-if="floorInstance"
-            :selected-floor-element="selectedFloorElement"
-            :delete-allowed="false"
-            :existing-labels="new Set(extractAllTablesLabels(floorInstance as FloorEditor))"
-            class="q-mb-sm"
-        />
-        <q-card>
-            <canvas id="floor-container" ref="floorContainerRef" />
-        </q-card>
-    </div>
+    <q-layout v-if="props.floor">
+        <q-page-container>
+            <q-page class="q-pa-xs-xs q-pa-sm-sm q-pa-md-md row">
+                <div
+                    ref="viewerContainerRef"
+                    class="col-xs-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3"
+                >
+                    <q-btn
+                        class="button-gradient q-mb-sm"
+                        @click="saveFloorState"
+                        label="save"
+                        size="md"
+                        rounded
+                    />
+                    <ShowSelectedElement
+                        v-if="floorInstance"
+                        :selected-floor-element="selectedFloorElement"
+                        :delete-allowed="false"
+                        :existing-labels="
+                            new Set(extractAllTablesLabels(floorInstance as FloorEditor))
+                        "
+                        class="q-mb-sm"
+                    />
+                    <q-card>
+                        <canvas id="floor-container" ref="floorContainerRef" />
+                    </q-card>
+                </div>
+            </q-page>
+        </q-page-container>
+    </q-layout>
 </template>
 
 <script setup lang="ts">
