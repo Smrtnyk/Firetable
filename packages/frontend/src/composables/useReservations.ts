@@ -355,7 +355,7 @@ function shouldMarkReservationAsExpired(reservationTime: string, eventDate: Date
     const currentDate = new Date();
     const [hours, minutes] = reservationTime.split(":");
     const eventDateTime = new Date(eventDate);
-    eventDateTime.setHours(parseInt(hours, 10), parseInt(minutes, 10));
+    eventDateTime.setHours(Number.parseInt(hours, 10), Number.parseInt(minutes, 10));
 
     if (hours.startsWith("0")) {
         eventDateTime.setDate(eventDateTime.getDate() + 1);

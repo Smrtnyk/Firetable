@@ -248,7 +248,7 @@ function activateBulkMode(elementTag: ElementTag): void {
     // Get all current labels using the helper function
     const labels = extractAllTablesLabels(floorInstance.value as FloorEditor);
     // Convert labels to numbers only if they are numeric and find the maximum
-    const numericLabels = labels.map((label) => parseInt(label, 10)).filter(isNumber);
+    const numericLabels = labels.map((label) => Number.parseInt(label, 10)).filter(isNumber);
 
     if (numericLabels.length === 0) {
         bulkLabelCounter.value = 0;

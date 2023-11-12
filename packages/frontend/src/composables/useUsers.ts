@@ -27,16 +27,15 @@ export function useUsers() {
                 users.value = (await fetchUsersByRole([], "")).data;
             } else {
                 const relatedUserIds = await fetchRelatedProperties();
-                if (relatedUserIds.length > 0) {
-                    users.value = (
-                        await fetchUsersByRole(
-                            [...new Set(relatedUserIds)],
-                            authStore.user!.organisationId,
-                        )
-                    ).data;
-                } else {
-                    users.value = [];
-                }
+                users.value =
+                    relatedUserIds.length > 0
+                        ? (
+                              await fetchUsersByRole(
+                                  [...new Set(relatedUserIds)],
+                                  authStore.user!.organisationId,
+                              )
+                          ).data
+                        : [];
             }
         } finally {
             isLoading.value = false;

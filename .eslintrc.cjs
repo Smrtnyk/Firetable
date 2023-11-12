@@ -31,6 +31,7 @@ module.exports = {
             "files": "**/*.spec.ts",
             "rules": {
                 "unicorn/consistent-function-scoping": "off",
+                "unicorn/no-useless-undefined": "off",
             }
         }
     ],
@@ -50,6 +51,18 @@ module.exports = {
         "unicorn/no-this-assignment": "error",
         "unicorn/no-unnecessary-await": "error",
         "unicorn/no-useless-length-check": "error",
+        "unicorn/no-useless-spread": "error",
+        "unicorn/no-useless-switch-case": "error",
+        "unicorn/no-useless-promise-resolve-reject": "error",
+        "unicorn/no-useless-undefined": "error",
+        "unicorn/prefer-default-parameters": "error",
+        "unicorn/prefer-includes": "error",
+        "unicorn/prefer-modern-dom-apis": "error",
+        "unicorn/prefer-modern-math-apis": "error",
+        "unicorn/prefer-node-protocol": "error",
+        "unicorn/prefer-number-properties": "error",
+        "unicorn/prefer-ternary": "error",
+        "unicorn/throw-new-error": "error",
         //
         "@regru/prefer-early-return/prefer-early-return": ["error", {
             "maximumStatements": 2

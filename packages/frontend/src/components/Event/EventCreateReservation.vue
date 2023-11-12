@@ -100,11 +100,7 @@ function options(hr: number, min = 0): boolean {
 watch(selectionType, (newVal) => {
     // When selectionType changes to 'social', reset reservedBy to the first social option
     // When changing to 'user', reset reservedBy to the first user option
-    if (newVal === "social") {
-        state.reservedBy = socials[0];
-    } else {
-        state.reservedBy = formattedUsers.value[0];
-    }
+    state.reservedBy = newVal === "social" ? socials[0] : formattedUsers.value[0];
 });
 
 function requireReservedBySelection(val: Reservation["reservedBy"]): boolean | string {
