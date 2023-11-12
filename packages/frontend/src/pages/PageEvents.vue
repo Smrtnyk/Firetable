@@ -9,6 +9,7 @@ import { useRoute } from "vue-router";
 import { EventOwner, eventsCollection } from "@firetable/backend";
 import { watch } from "vue";
 import { Loading } from "quasar";
+import FTCenteredText from "src/components/FTCenteredText.vue";
 
 interface Props {
     organisationId: string;
@@ -50,9 +51,8 @@ watch(
 <template>
     <div class="PageHome">
         <EventCardList v-if="!!events.length && !isLoading" :events="events" />
-        <div v-if="!isLoading && !events.length" class="row justify-center items-center q-mt-md">
-            <h2 class="text-h4">There are no upcoming events</h2>
-            <q-img src="/no-events.svg" />
-        </div>
+        <FTCenteredText v-if="!isLoading && !events.length">
+            There are no upcoming events
+        </FTCenteredText>
     </div>
 </template>
