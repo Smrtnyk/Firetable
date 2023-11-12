@@ -55,19 +55,21 @@ watch(selectedFloorElement, (newEl) => {
 });
 
 watch(localWidth, (newWidth) => {
-    if (selectedFloorElement.value) {
-        selectedFloorElement.value.scaleX = newWidth / selectedFloorElement.value.width!;
-        selectedFloorElement.value.setCoords();
-        selectedFloorElement.value.canvas?.renderAll();
+    if (!selectedFloorElement.value) {
+        return;
     }
+    selectedFloorElement.value.scaleX = newWidth / selectedFloorElement.value.width!;
+    selectedFloorElement.value.setCoords();
+    selectedFloorElement.value.canvas?.renderAll();
 });
 
 watch(localHeight, (newHeight) => {
-    if (selectedFloorElement.value) {
-        selectedFloorElement.value.scaleY = newHeight / selectedFloorElement.value.height!;
-        selectedFloorElement.value.setCoords();
-        selectedFloorElement.value.canvas?.renderAll();
+    if (!selectedFloorElement.value) {
+        return;
     }
+    selectedFloorElement.value.scaleY = newHeight / selectedFloorElement.value.height!;
+    selectedFloorElement.value.setCoords();
+    selectedFloorElement.value.canvas?.renderAll();
 });
 
 watch(selectedFloorElement, (newEl) => {

@@ -88,21 +88,22 @@ watch(
 );
 
 function fetchEventsForActiveTab(): void {
-    if (eventsByProperty[activePropertyId.value]?.size === 0) {
-        const activeProperty = properties.value.find((property) => {
-            return property.id === activePropertyId.value;
-        });
-        if (!activeProperty) {
-            showErrorMessage("Something went wrong. Please reload the page!");
-            return;
-        }
-        const eventOwner: EventOwner = {
-            propertyId: activeProperty.id,
-            organisationId: activeProperty.organisationId,
-            id: "",
-        };
-        fetchMoreEvents(eventOwner, null);
+    if (eventsByProperty[activePropertyId.value]?.size !== 0) {
+        return;
     }
+    const activeProperty = properties.value.find((property) => {
+        return property.id === activePropertyId.value;
+    });
+    if (!activeProperty) {
+        showErrorMessage("Something went wrong. Please reload the page!");
+        return;
+    }
+    const eventOwner: EventOwner = {
+        propertyId: activeProperty.id,
+        organisationId: activeProperty.organisationId,
+        id: "",
+    };
+    fetchMoreEvents(eventOwner, null);
 }
 
 const onCreateEvent = withLoading(async function (eventData: CreateEventPayload) {

@@ -265,17 +265,19 @@ function deactivateBulkMode(): void {
 }
 
 function undoAction(): void {
-    if (floorInstance.value) {
-        floorInstance.value.undo();
-        floorInstance.value.canvas.renderAll(); // Refresh the canvas after undo
+    if (!floorInstance.value) {
+        return;
     }
+    floorInstance.value.undo();
+    floorInstance.value.canvas.renderAll();
 }
 
 function redoAction(): void {
-    if (floorInstance.value) {
-        floorInstance.value.redo();
-        floorInstance.value.canvas.renderAll(); // Refresh the canvas after redo
+    if (!floorInstance.value) {
+        return;
     }
+    floorInstance.value.redo();
+    floorInstance.value.canvas.renderAll();
 }
 
 async function exportFloor(floorVal: FloorEditor): Promise<void> {

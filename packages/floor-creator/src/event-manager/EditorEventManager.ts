@@ -33,24 +33,25 @@ export class EditorEventManager extends EventManager {
     }
 
     private handleKeyDown = (e: KeyboardEvent): void => {
-        if (e.key === "Control" || e.ctrlKey) {
-            this.floor.canvas.selection = true;
-            this.ctrlPressedDuringSelection = true;
-            this.floor.canvas.requestRenderAll();
+        if (e.key !== "Control" && !e.ctrlKey) {
+            return;
+        }
+        this.floor.canvas.selection = true;
+        this.ctrlPressedDuringSelection = true;
+        this.floor.canvas.requestRenderAll();
 
-            if (e.key === "z") {
-                if (e.shiftKey) {
-                    this.commandInvoker.redo();
-                } else {
-                    this.commandInvoker.undo();
-                }
-                this.floor.canvas.requestRenderAll();
-                e.preventDefault();
-            } else if (e.key === "y") {
+        if (e.key === "z") {
+            if (e.shiftKey) {
                 this.commandInvoker.redo();
-                this.floor.canvas.requestRenderAll();
-                e.preventDefault();
+            } else {
+                this.commandInvoker.undo();
             }
+            this.floor.canvas.requestRenderAll();
+            e.preventDefault();
+        } else if (e.key === "y") {
+            this.commandInvoker.redo();
+            this.floor.canvas.requestRenderAll();
+            e.preventDefault();
         }
     };
 
@@ -62,23 +63,24 @@ export class EditorEventManager extends EventManager {
     };
 
     handleObjectMoving = (options: fabric.IEvent<MouseEvent>): void => {
-        if (this.ctrlPressedDuringSelection) {
-            const activeObjects = this.floor.canvas.getActiveObjects();
-            const activeGroup = this.floor.canvas.getActiveObject() as fabric.Group;
-
-            if (activeGroup && activeGroup.type === "group") {
-                activeObjects.forEach((object) => {
-                    if (object !== activeGroup) {
-                        object.set({
-                            left: object.left! + options.e.movementX,
-                            top: object.top! + options.e.movementY,
-                        });
-                    }
-                });
-            }
-
-            this.ctrlPressedDuringSelection = false;
+        if (!this.ctrlPressedDuringSelection) {
+            return;
         }
+        const activeObjects = this.floor.canvas.getActiveObjects();
+        const activeGroup = this.floor.canvas.getActiveObject() as fabric.Group;
+
+        if (activeGroup && activeGroup.type === "group") {
+            activeObjects.forEach((object) => {
+                if (object !== activeGroup) {
+                    object.set({
+                        left: object.left! + options.e.movementX,
+                        top: object.top! + options.e.movementY,
+                    });
+                }
+            });
+        }
+
+        this.ctrlPressedDuringSelection = false;
     };
 
     onBeforeTransform = (options: fabric.IEvent<MouseEvent>): void => {
@@ -91,16 +93,17 @@ export class EditorEventManager extends EventManager {
     };
 
     onObjectModified = (options: fabric.IEvent<MouseEvent>): void => {
-        if (this.movingObjectStartPosition && options.target) {
-            const moveCommand = new MoveCommand(options.target, this.movingObjectStartPosition, {
-                left: options.target.left!,
-                top: options.target.top!,
-            });
-            this.commandInvoker.execute(moveCommand);
-
-            // Reset the starting position for the next move operation
-            this.movingObjectStartPosition = null;
+        if (!this.movingObjectStartPosition || !options.target) {
+            return;
         }
+        const moveCommand = new MoveCommand(options.target, this.movingObjectStartPosition, {
+            left: options.target.left!,
+            top: options.target.top!,
+        });
+        this.commandInvoker.execute(moveCommand);
+
+        // Reset the starting position for the next move operation
+        this.movingObjectStartPosition = null;
     };
 
     initializeCanvasEventHandlers(): void {

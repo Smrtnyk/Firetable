@@ -12,6 +12,7 @@ module.exports = {
     },
     plugins: [
         "@typescript-eslint",
+        "@regru/prefer-early-return",
         "promise",
         "prettier",
     ],
@@ -25,6 +26,9 @@ module.exports = {
         "prettier",
     ],
     rules: {
+        "@regru/prefer-early-return/prefer-early-return": ["error", {
+            "maximumStatements": 2
+        }],
         "linebreak-style": ["error", "unix"],
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/adjacent-overload-signatures": "error",
