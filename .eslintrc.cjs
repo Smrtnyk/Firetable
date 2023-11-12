@@ -13,6 +13,7 @@ module.exports = {
     plugins: [
         "@typescript-eslint",
         "@regru/prefer-early-return",
+        "unicorn",
         "promise",
         "prettier",
     ],
@@ -25,7 +26,20 @@ module.exports = {
         "plugin:prettier/recommended",
         "prettier",
     ],
+    "overrides": [
+        {
+            "files": "**/*.spec.ts",
+            "rules": {
+                "unicorn/consistent-function-scoping": "off",
+            }
+        }
+    ],
     rules: {
+        // Unicorn
+        "unicorn/consistent-function-scoping": ["error", {
+            "checkArrowFunctions": false
+        }],
+        //
         "@regru/prefer-early-return/prefer-early-return": ["error", {
             "maximumStatements": 2
         }],

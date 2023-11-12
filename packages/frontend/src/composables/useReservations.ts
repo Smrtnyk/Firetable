@@ -234,19 +234,6 @@ export function useReservations(
         });
     }
 
-    function shouldMarkReservationAsExpired(reservationTime: string, eventDate: Date): boolean {
-        const currentDate = new Date();
-        const [hours, minutes] = reservationTime.split(":");
-        const eventDateTime = new Date(eventDate);
-        eventDateTime.setHours(parseInt(hours, 10), parseInt(minutes, 10));
-
-        if (hours.startsWith("0")) {
-            eventDateTime.setDate(eventDateTime.getDate() + 1);
-        }
-
-        return currentDate.getTime() - eventDateTime.getTime() >= HALF_HOUR;
-    }
-
     function checkReservationsForTimeAndMarkTableIfNeeded(): void {
         if (!event.value?.date) {
             return;
@@ -362,4 +349,17 @@ export function useReservations(
         swapOrTransferReservations,
         tableClickHandler,
     };
+}
+
+function shouldMarkReservationAsExpired(reservationTime: string, eventDate: Date): boolean {
+    const currentDate = new Date();
+    const [hours, minutes] = reservationTime.split(":");
+    const eventDateTime = new Date(eventDate);
+    eventDateTime.setHours(parseInt(hours, 10), parseInt(minutes, 10));
+
+    if (hours.startsWith("0")) {
+        eventDateTime.setDate(eventDateTime.getDate() + 1);
+    }
+
+    return currentDate.getTime() - eventDateTime.getTime() >= HALF_HOUR;
 }
