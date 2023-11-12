@@ -123,54 +123,55 @@ export class EditorEventManager extends EventManager {
     private snapToGridOnModify = (e: fabric.IEvent): void => {
         const target = e.target;
 
-        if (target) {
-            // Snapping logic for rotation
-            const snapAngle = 45; // 45 degrees
-            const threshold = 5; // degrees
-            const closestMultipleOfSnap = Math.round(target.angle! / snapAngle) * snapAngle;
-            const differenceFromSnap = Math.abs(target.angle! - closestMultipleOfSnap);
-            if (differenceFromSnap <= threshold) {
-                target.set("angle", closestMultipleOfSnap).setCoords();
-            }
-
-            // Snapping logic for movement
-            const snapRange = 2; // pixels
-
-            const leftRemainder = target.left! % RESOLUTION;
-            const topRemainder = target.top! % RESOLUTION;
-
-            const shouldSnapToLeft =
-                leftRemainder <= snapRange || RESOLUTION - leftRemainder <= snapRange;
-            const shouldSnapToTop =
-                topRemainder <= snapRange || RESOLUTION - topRemainder <= snapRange;
-
-            let newLeft: number | undefined;
-            let newTop: number | undefined;
-
-            if (shouldSnapToLeft) {
-                newLeft =
-                    leftRemainder <= snapRange
-                        ? target.left! - leftRemainder
-                        : target.left! + (RESOLUTION - leftRemainder);
-            }
-
-            if (shouldSnapToTop) {
-                newTop =
-                    topRemainder <= snapRange
-                        ? target.top! - topRemainder
-                        : target.top! + (RESOLUTION - topRemainder);
-            }
-
-            if (newLeft !== undefined || newTop !== undefined) {
-                target
-                    .set({
-                        left: newLeft ?? target.left,
-                        top: newTop ?? target.top,
-                    })
-                    .setCoords();
-            }
-
-            this.floor.canvas.requestRenderAll();
+        if (!target) {
+            return;
         }
+
+        // Snapping logic for rotation
+        const snapAngle = 45; // 45 degrees
+        const threshold = 5; // degrees
+        const closestMultipleOfSnap = Math.round(target.angle! / snapAngle) * snapAngle;
+        const differenceFromSnap = Math.abs(target.angle! - closestMultipleOfSnap);
+        if (differenceFromSnap <= threshold) {
+            target.set("angle", closestMultipleOfSnap).setCoords();
+        }
+
+        // Snapping logic for movement
+        const snapRange = 2; // pixels
+
+        const leftRemainder = target.left! % RESOLUTION;
+        const topRemainder = target.top! % RESOLUTION;
+
+        const shouldSnapToLeft =
+            leftRemainder <= snapRange || RESOLUTION - leftRemainder <= snapRange;
+        const shouldSnapToTop = topRemainder <= snapRange || RESOLUTION - topRemainder <= snapRange;
+
+        let newLeft: number | undefined;
+        let newTop: number | undefined;
+
+        if (shouldSnapToLeft) {
+            newLeft =
+                leftRemainder <= snapRange
+                    ? target.left! - leftRemainder
+                    : target.left! + (RESOLUTION - leftRemainder);
+        }
+
+        if (shouldSnapToTop) {
+            newTop =
+                topRemainder <= snapRange
+                    ? target.top! - topRemainder
+                    : target.top! + (RESOLUTION - topRemainder);
+        }
+
+        if (newLeft !== undefined || newTop !== undefined) {
+            target
+                .set({
+                    left: newLeft ?? target.left,
+                    top: newTop ?? target.top,
+                })
+                .setCoords();
+        }
+
+        this.floor.canvas.requestRenderAll();
     };
 }
