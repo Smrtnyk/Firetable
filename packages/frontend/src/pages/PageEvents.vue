@@ -38,10 +38,10 @@ const { data: events, pending: isLoading } = useFirestoreCollection<EventDoc>(
 watch(
     isLoading,
     (newIsLoading) => {
-        if (!newIsLoading) {
-            Loading.hide();
-        } else {
+        if (newIsLoading) {
             Loading.show();
+        } else {
+            Loading.hide();
         }
     },
     { immediate: true },

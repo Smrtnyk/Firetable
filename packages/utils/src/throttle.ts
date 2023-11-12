@@ -6,11 +6,7 @@ export function throttle<T extends any[]>(
     let lastFunc: number;
     let lastRan: number;
     return function (...args: T) {
-        if (!inThrottle) {
-            func(...args);
-            lastRan = Date.now();
-            inThrottle = true;
-        } else {
+        if (inThrottle) {
             clearTimeout(lastFunc);
             lastFunc = window.setTimeout(
                 function () {
@@ -21,6 +17,10 @@ export function throttle<T extends any[]>(
                 },
                 limit - (Date.now() - lastRan),
             );
+        } else {
+            func(...args);
+            lastRan = Date.now();
+            inThrottle = true;
         }
     };
 }

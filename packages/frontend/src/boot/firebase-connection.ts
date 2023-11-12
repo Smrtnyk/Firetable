@@ -82,17 +82,16 @@ function handleOnAuthStateChanged(
     watch(
         () => currentUser.value,
         async () => {
-            // Save to the store
-            if (!currentUser.value) {
+            if (currentUser.value) {
+                authStore.setAuthState(!!currentUser.value);
+                await authStore.initUser(currentUser.value);
+            } else {
                 const propertiesStore = usePropertiesStore();
                 // If the user loses authentication route
                 // redirect them to the login page
                 authStore.cleanup();
                 propertiesStore.cleanup();
                 router.replace({ path: "/auth" }).catch(showErrorMessage);
-            } else {
-                authStore.setAuthState(!!currentUser.value);
-                await authStore.initUser(currentUser.value);
             }
         },
     );
