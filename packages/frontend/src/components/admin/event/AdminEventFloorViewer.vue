@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, ref, watch } from "vue";
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
 import {
     extractAllTablesLabels,
@@ -42,6 +42,7 @@ import {
     FloorMode,
 } from "@firetable/floor-creator";
 import { FloorDoc } from "@firetable/types";
+import { debounce } from "quasar";
 
 interface Props {
     floor: FloorDoc;
@@ -56,9 +57,21 @@ const floorContainerRef = ref<HTMLCanvasElement | null>(null);
 const viewerContainerRef = ref<HTMLDivElement | null>(null);
 const floorInstance = ref<FloorEditor | null>(null);
 
+onMounted(() => {
+    window.addEventListener("resize", resizeFloor);
+});
+
 onBeforeUnmount(() => {
+    window.removeEventListener("resize", resizeFloor);
     floorInstance.value?.destroy();
 });
+
+const resizeFloor = debounce((): void => {
+    if (!viewerContainerRef.value) {
+        return;
+    }
+    floorInstance.value?.resize(viewerContainerRef.value.clientWidth);
+}, 100);
 
 function saveFloorState(): void {
     if (!floorInstance.value) return;
