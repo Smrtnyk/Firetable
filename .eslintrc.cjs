@@ -42,6 +42,7 @@ module.exports = {
         "unicorn/explicit-length-check": "error",
         "unicorn/new-for-builtins": "error",
         "unicorn/no-instanceof-array": "error",
+        "unicorn/no-lonely-if": "error",
         //
         "@regru/prefer-early-return/prefer-early-return": ["error", {
             "maximumStatements": 2
