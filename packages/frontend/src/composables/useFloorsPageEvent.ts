@@ -96,7 +96,6 @@ export function useFloorsPageEvent(
         if (!eventFloors.value) return;
         if ((!old.length && newVal.length) || floorInstances.value.size === 0) {
             await initFloorInstancesData();
-            return;
         }
     }
 

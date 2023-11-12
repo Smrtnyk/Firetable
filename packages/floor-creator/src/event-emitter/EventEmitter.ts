@@ -1,7 +1,9 @@
-export type EventEmitterListener<EventType extends any[] = any[]> = (...args: EventType) => void;
+export type EventEmitterListener<EventType extends unknown[] = unknown[]> = (
+    ...args: EventType
+) => void;
 
 type EventMap = {
-    [Event: string]: any[];
+    [Event: string]: unknown[];
 };
 
 export interface TypedEventEmitter<Events extends EventMap> {
@@ -17,8 +19,8 @@ export class EventEmitter<Events extends EventMap> implements TypedEventEmitter<
         event: K,
         listener: EventEmitterListener<Events[K]>,
     ): () => void {
-        const currentListeners = this.listeners.get(event) || [];
-        currentListeners.push(listener as EventEmitterListener<any[]>);
+        const currentListeners = this.listeners.get(event) ?? [];
+        currentListeners.push(listener as EventEmitterListener);
         this.listeners.set(event, currentListeners);
 
         // Return a function that removes the listener when called.
@@ -26,15 +28,14 @@ export class EventEmitter<Events extends EventMap> implements TypedEventEmitter<
     }
 
     public off<K extends keyof Events>(event: K, listener: EventEmitterListener<Events[K]>): void {
-        let currentListeners = this.listeners.get(event) || [];
+        let currentListeners = this.listeners.get(event) ?? [];
         currentListeners = currentListeners.filter((l) => l !== listener);
         this.listeners.set(event, currentListeners);
     }
 
     public emit<K extends keyof Events>(event: K, ...args: Events[K]): void {
-        const currentListeners = this.listeners.get(event) || [];
+        const currentListeners = this.listeners.get(event) ?? [];
         currentListeners.forEach((listener) => {
-            // Safely call the listener with the correct argument types.
             listener(...args);
         });
     }

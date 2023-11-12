@@ -82,7 +82,7 @@ export class EditorEventManager extends EventManager {
     };
 
     onBeforeTransform = (options: fabric.IEvent<MouseEvent>): void => {
-        if (options.transform && options.transform.target && !this.movingObjectStartPosition) {
+        if (options.transform?.target && !this.movingObjectStartPosition) {
             this.movingObjectStartPosition = {
                 left: options.transform.target.left!,
                 top: options.transform.target.top!,
@@ -164,8 +164,8 @@ export class EditorEventManager extends EventManager {
             if (newLeft !== undefined || newTop !== undefined) {
                 target
                     .set({
-                        left: newLeft !== undefined ? newLeft : target.left,
-                        top: newTop !== undefined ? newTop : target.top,
+                        left: newLeft ?? target.left,
+                        top: newTop ?? target.top,
                     })
                     .setCoords();
             }
