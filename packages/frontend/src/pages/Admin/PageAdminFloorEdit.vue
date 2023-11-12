@@ -27,7 +27,7 @@ import {
     useFirestoreDocument,
 } from "src/composables/useFirestore";
 import { isNumber } from "@firetable/utils";
-import { isMobile, buttonSize } from "src/global-reactives/screen-detection";
+import { isMobile, buttonSize, isTablet } from "src/global-reactives/screen-detection";
 import { getFloorPath } from "@firetable/backend";
 
 type ElementDescriptor = {
@@ -155,14 +155,17 @@ function onFloorSave(): void {
 
 function onFloorChange(prop: keyof FloorEditor, event: null | number | string): void {
     if (!floorInstance.value) return;
-
-    if (prop === "name") floorInstance.value.setFloorName(String(event));
-
-    if (prop === "width" && isNumber(event)) {
-        floorInstance.value.updateDimensions(event, floorInstance.value.height);
+    if (prop === "name") {
+        floorInstance.value.setFloorName(String(event));
+        return;
     }
-    if (prop === "height" && isNumber(event)) {
-        floorInstance.value.updateDimensions(floorInstance.value.width, event);
+
+    const isValidNumber = event && !Number.isNaN(+event);
+    if (prop === "width" && isValidNumber) {
+        floorInstance.value.updateDimensions(+event, floorInstance.value.height);
+    }
+    if (prop === "height" && isValidNumber) {
+        floorInstance.value.updateDimensions(floorInstance.value.width, +event);
     }
 }
 
@@ -334,6 +337,34 @@ function triggerFileInput(): void {
             :existing-labels="new Set(extractAllTablesLabels(floorInstance as FloorEditor))"
         >
             <template #buttons>
+                <q-input
+                    v-if="!isTablet"
+                    @keydown.prevent
+                    :min="300"
+                    :max="MAX_FLOOR_WIDTH"
+                    :step="RESOLUTION"
+                    :model-value="floorInstance.width"
+                    @update:model-value="(event) => onFloorChange('width', event)"
+                    standout
+                    rounded
+                    type="number"
+                    label="Floor width"
+                    class="q-ma-xs"
+                />
+                <q-input
+                    v-if="!isTablet"
+                    @keydown.prevent
+                    :min="300"
+                    :max="MAX_FLOOR_HEIGHT"
+                    :step="RESOLUTION"
+                    @update:model-value="(event) => onFloorChange('height', event)"
+                    :model-value="floorInstance.height"
+                    standout
+                    rounded
+                    type="number"
+                    label="Floor height"
+                    class="q-ma-xs"
+                />
                 <q-btn
                     title="Undo"
                     round
@@ -379,7 +410,7 @@ function triggerFileInput(): void {
         </FloorEditorControls>
 
         <div class="row q-pa-sm q-col-gutter-md" v-if="floorInstance">
-            <div class="col-6">
+            <div class="col-6" v-if="isTablet">
                 <q-badge color="secondary">
                     Width: {{ floorInstance.width }} (300 to {{ MAX_FLOOR_WIDTH }})
                 </q-badge>
@@ -393,7 +424,7 @@ function triggerFileInput(): void {
                     @update:model-value="(event) => onFloorChange('width', event)"
                 />
             </div>
-            <div class="col-6">
+            <div class="col-6" v-if="isTablet">
                 <q-badge color="secondary">
                     Height: {{ floorInstance.height }} (300 to {{ MAX_FLOOR_HEIGHT }})
                 </q-badge>

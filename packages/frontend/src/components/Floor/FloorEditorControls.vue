@@ -111,8 +111,9 @@ function setElementColor(newVal: any): void {
         >
             <slot name="buttons"></slot>
             <div class="row justify-around q-gutter-xs" v-if="selectedFloorElement">
+                <q-separator inset class="q-ma-md full-width"></q-separator>
+                <p>Element</p>
                 <q-input
-                    :dense="isMobile"
                     v-model="localWidth"
                     standout
                     rounded
@@ -122,7 +123,6 @@ function setElementColor(newVal: any): void {
                 />
                 <q-input
                     rounded
-                    :dense="isMobile"
                     v-model="localHeight"
                     standout
                     type="number"
@@ -142,7 +142,6 @@ function setElementColor(newVal: any): void {
                     standout
                     rounded
                     label="Table label"
-                    :dense="isMobile"
                 />
                 <q-btn
                     title="Change element fill color"
