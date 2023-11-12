@@ -96,5 +96,7 @@ export abstract class Floor {
         this.containerWidth = pageContainerWidth;
         this.scale = calculateCanvasScale(this.containerWidth, this.floorDoc.width);
         this.setScaling();
+        this.zoomManager.setInitialViewportTransform(this.canvas.viewportTransform?.slice() || []);
+        this.zoomManager.setScale(this.scale);
     }
 }

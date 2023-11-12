@@ -3,10 +3,10 @@ import { DEFAULT_ZOOM, ZOOM_INCREMENT } from "./constants.js";
 
 export class FloorZoomManager {
     private canvas: fabric.Canvas;
-    private readonly initialScale: number;
-    private readonly initialViewportTransform: number[];
+    private initialScale: number;
+    private initialViewportTransform: number[];
     readonly maxZoom: number = DEFAULT_ZOOM * 3; // 3 times the default zoom
-    readonly minZoom: number;
+    minZoom: number;
 
     private pinchZoomScale: number | null = null;
     private pinchZoomPoint: fabric.Point | null = null;
@@ -18,7 +18,7 @@ export class FloorZoomManager {
     private startZoom?: number;
     private targetZoom?: number;
 
-    private readonly centerPoint: fabric.Point;
+    private centerPoint: fabric.Point;
 
     constructor(canvas: fabric.Canvas, initialScale: number, initialViewportTransform: number[]) {
         this.canvas = canvas;
@@ -27,6 +27,19 @@ export class FloorZoomManager {
         this.minZoom = this.initialScale;
 
         this.centerPoint = new fabric.Point(canvas.getWidth() / 2, canvas.getHeight() / 2);
+    }
+
+    setScale(newVal: number): void {
+        this.initialScale = newVal;
+        this.minZoom = this.initialScale;
+        this.centerPoint = new fabric.Point(
+            this.canvas.getWidth() / 2,
+            this.canvas.getHeight() / 2,
+        );
+    }
+
+    setInitialViewportTransform(newVal: number[]): void {
+        this.initialViewportTransform = newVal;
     }
 
     zoomIn(point: fabric.Point): void {
