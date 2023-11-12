@@ -44,6 +44,7 @@ module.exports = {
         "unicorn/no-instanceof-array": "error",
         "unicorn/no-lonely-if": "error",
         "unicorn/no-negated-condition": "error",
+        "unicorn/no-nested-ternary": "error",
         //
         "@regru/prefer-early-return/prefer-early-return": ["error", {
             "maximumStatements": 2
