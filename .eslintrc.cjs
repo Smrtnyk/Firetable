@@ -40,6 +40,7 @@ module.exports = {
             "checkArrowFunctions": false
         }],
         "unicorn/explicit-length-check": "error",
+        "unicorn/new-for-builtins": "error",
         //
         "@regru/prefer-early-return/prefer-early-return": ["error", {
             "maximumStatements": 2
