@@ -48,6 +48,7 @@ module.exports = {
         "unicorn/no-new-array": "error",
         "unicorn/no-static-only-class": "error",
         "unicorn/no-this-assignment": "error",
+        "unicorn/no-unnecessary-await": "error",
         //
         "@regru/prefer-early-return/prefer-early-return": ["error", {
             "maximumStatements": 2
