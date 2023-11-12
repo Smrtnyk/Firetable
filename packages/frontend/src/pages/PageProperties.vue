@@ -2,6 +2,7 @@
 import PropertyCardList from "src/components/Property/PropertyCardList.vue";
 import { computed } from "vue";
 import { usePropertiesStore } from "src/stores/usePropertiesStore";
+import FTCenteredText from "src/components/FTCenteredText.vue";
 
 const propertiesStore = usePropertiesStore();
 const properties = computed(() => {
@@ -12,9 +13,8 @@ const properties = computed(() => {
 <template>
     <div class="PageHome">
         <PropertyCardList v-if="properties.length" :properties="properties" />
-        <div v-if="!properties.length" class="row justify-center items-center q-mt-md">
-            <h2 class="text-h4">You have no properties created</h2>
-            <q-img src="/no-events.svg" />
-        </div>
+        <FTCenteredText v-if="!properties.length && !propertiesStore.arePropertiesLoading">
+            You have no properties created
+        </FTCenteredText>
     </div>
 </template>

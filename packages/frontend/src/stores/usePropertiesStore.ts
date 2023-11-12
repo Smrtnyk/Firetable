@@ -14,6 +14,7 @@ import { NOOP } from "@firetable/utils";
 
 interface State {
     properties: PropertyDoc[];
+    arePropertiesLoading: boolean;
     organisations: OrganisationDoc[];
     unsubPropertiesWatch: typeof NOOP;
 }
@@ -22,6 +23,7 @@ export const usePropertiesStore = defineStore("properties", {
     state: () =>
         ({
             properties: [],
+            arePropertiesLoading: false,
             organisations: [],
             unsubPropertiesWatch: NOOP,
         }) as State,
@@ -29,10 +31,6 @@ export const usePropertiesStore = defineStore("properties", {
         cleanup() {
             this.unsubPropertiesWatch();
             this.properties = [];
-        },
-
-        getPropertiesOfCurrentUser(): PropertyDoc[] {
-            return this.properties;
         },
 
         async getOrganisations() {
@@ -53,8 +51,11 @@ export const usePropertiesStore = defineStore("properties", {
             return this.organisations;
         },
 
-        setProperties(properties: PropertyDoc[]) {
+        setProperties(properties: PropertyDoc[]): void {
             this.properties = properties;
+        },
+        setArePropertiesLoading(loading: boolean): void {
+            this.arePropertiesLoading = loading;
         },
     },
 });
@@ -72,7 +73,17 @@ export async function initNonAdminProperties({
     const propertiesStore = usePropertiesStore();
     const propertiesRef = propertiesCollection(organisationId);
     const userPropertiesQuery = query(propertiesRef, where("relatedUsers", "array-contains", id));
-    const { data, stop } = useFirestoreCollection<PropertyDoc[]>(createQuery(userPropertiesQuery));
+    const { data, stop, pending } = useFirestoreCollection<PropertyDoc[]>(
+        createQuery(userPropertiesQuery),
+    );
+
+    const stopWatchPending = watch(
+        pending,
+        (newPending) => {
+            propertiesStore.setArePropertiesLoading(newPending);
+        },
+        { immediate: true },
+    );
 
     const stopWatch = watch(
         () => data.value,
@@ -83,6 +94,7 @@ export async function initNonAdminProperties({
     );
 
     propertiesStore.unsubPropertiesWatch = () => {
+        stopWatchPending();
         stopWatch();
         stop();
     };
