@@ -47,6 +47,7 @@ module.exports = {
         "unicorn/no-nested-ternary": "error",
         "unicorn/no-new-array": "error",
         "unicorn/no-static-only-class": "error",
+        "unicorn/no-this-assignment": "error",
         //
         "@regru/prefer-early-return/prefer-early-return": ["error", {
             "maximumStatements": 2
