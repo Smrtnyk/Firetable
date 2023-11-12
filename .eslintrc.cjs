@@ -49,6 +49,7 @@ module.exports = {
         "unicorn/no-static-only-class": "error",
         "unicorn/no-this-assignment": "error",
         "unicorn/no-unnecessary-await": "error",
+        "unicorn/no-useless-length-check": "error",
         //
         "@regru/prefer-early-return/prefer-early-return": ["error", {
             "maximumStatements": 2
