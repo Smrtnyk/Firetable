@@ -36,7 +36,7 @@ watch(isLoading, (loadingVal) => {
 watch(
     floors,
     (newFloors) => {
-        if (Object.keys(newFloors).length && !activeTab.value) {
+        if (Object.keys(newFloors).length > 0 && !activeTab.value) {
             activeTab.value = Object.keys(newFloors)[0];
         }
     },
@@ -148,7 +148,7 @@ async function onFloorDelete(
                     />
                 </div>
                 <!-- If the property has floors, display them -->
-                <q-list v-if="propertyData.floors.length">
+                <q-list v-if="propertyData.floors.length > 0">
                     <q-slide-item
                         v-for="floor in propertyData.floors"
                         :key="floor.id"
@@ -191,7 +191,7 @@ async function onFloorDelete(
         </q-tab-panels>
 
         <!-- Show "no properties" message when there are no properties and isLoading is false -->
-        <FTCenteredText v-if="!Object.keys(floors).length && !isLoading">
+        <FTCenteredText v-if="Object.keys(floors).length === 0 && !isLoading">
             {{ t("PageAdminFloors.noPropertiesMessage") }}
         </FTCenteredText>
     </div>

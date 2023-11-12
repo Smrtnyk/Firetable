@@ -104,7 +104,7 @@ function setAppLanguage(val: string): void {
                 </div>
             </q-item>
 
-            <q-separator v-if="adminLinks.length" />
+            <q-separator v-if="adminLinks.length > 0" />
 
             <q-item
                 v-for="(link, index) in adminLinks"

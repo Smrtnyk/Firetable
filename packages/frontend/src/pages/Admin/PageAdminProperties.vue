@@ -101,7 +101,7 @@ function createProperty(): void {
         <FTTitle :title="t('PageAdminProperties.properties')">
             <template #right>
                 <q-btn
-                    v-if="organisations.length && !organisationsIsLoading && canCreateProperty"
+                    v-if="organisations.length > 0 && !organisationsIsLoading && canCreateProperty"
                     rounded
                     icon="plus"
                     class="button-gradient"
@@ -109,7 +109,7 @@ function createProperty(): void {
                 />
             </template>
         </FTTitle>
-        <q-list v-if="properties.length && organisations.length">
+        <q-list v-if="properties.length > 0 && organisations.length > 0">
             <q-slide-item
                 v-for="property in properties"
                 :key="property.id"

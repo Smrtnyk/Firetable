@@ -27,7 +27,7 @@ export function useUsers() {
                 users.value = (await fetchUsersByRole([], "")).data;
             } else {
                 const relatedUserIds = await fetchRelatedProperties();
-                if (relatedUserIds.length) {
+                if (relatedUserIds.length > 0) {
                     users.value = (
                         await fetchUsersByRole(
                             [...new Set(relatedUserIds)],

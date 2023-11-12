@@ -39,6 +39,7 @@ module.exports = {
         "unicorn/consistent-function-scoping": ["error", {
             "checkArrowFunctions": false
         }],
+        "unicorn/explicit-length-check": "error",
         //
         "@regru/prefer-early-return/prefer-early-return": ["error", {
             "maximumStatements": 2

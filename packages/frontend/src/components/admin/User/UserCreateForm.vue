@@ -81,7 +81,7 @@ async function validateForm(): Promise<boolean> {
     if (!(await userCreateForm.value?.validate())) return false;
     const chosenRole = form.value.role;
 
-    if (chosenRole !== Role.PROPERTY_OWNER && !chosenProperties.value.length) {
+    if (chosenRole !== Role.PROPERTY_OWNER && chosenProperties.value.length === 0) {
         showErrorMessage("You must select at least one property!");
         return false;
     }
@@ -170,7 +170,7 @@ function resetProperties(): void {
             />
 
             <q-select
-                v-if="role === ADMIN && props.organisations.length"
+                v-if="role === ADMIN && props.organisations.length > 0"
                 v-model="chosenOrganisation"
                 :hint="t('UserCreateForm.userOrganisationSelectHint')"
                 standout
@@ -180,11 +180,11 @@ function resetProperties(): void {
                 option-label="name"
                 option-value="value"
             />
-            <div v-else-if="role === ADMIN && !props.organisations.length">
+            <div v-else-if="role === ADMIN && props.organisations.length === 0">
                 {{ t("UserCreateForm.noOrganisationsMessage") }}
             </div>
 
-            <div v-if="props.properties.length" class="q-gutter-sm q-mb-lg">
+            <div v-if="props.properties.length > 0" class="q-gutter-sm q-mb-lg">
                 <div>{{ t("UserCreateForm.usePropertiesCheckboxesTitle") }}</div>
                 <div>
                     <q-checkbox

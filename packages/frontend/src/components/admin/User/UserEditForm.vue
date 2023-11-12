@@ -101,7 +101,7 @@ async function validateForm(): Promise<boolean> {
     if (!(await userEditForm.value?.validate())) {
         return false;
     }
-    if (isEditableRole.value && !chosenProperties.value.length) {
+    if (isEditableRole.value && chosenProperties.value.length === 0) {
         showErrorMessage("You must select at least one property!");
         return false;
     }
@@ -165,7 +165,7 @@ function resetProperties(): void {
 
             <div v-if="isEditableRole" class="q-gutter-sm q-mb-lg">
                 <div>Properties:</div>
-                <div v-if="properties.length">
+                <div v-if="properties.length > 0">
                     <q-checkbox
                         v-for="property in props.properties"
                         :key="property.id"

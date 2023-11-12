@@ -34,7 +34,7 @@ export const usePropertiesStore = defineStore("properties", {
         },
 
         async getOrganisations() {
-            if (this.organisations.length) {
+            if (this.organisations.length > 0) {
                 return this.organisations;
             }
 

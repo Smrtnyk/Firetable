@@ -50,8 +50,8 @@ watch(
 
 <template>
     <div class="PageHome">
-        <EventCardList v-if="!!events.length && !isLoading" :events="events" />
-        <FTCenteredText v-if="!isLoading && !events.length">
+        <EventCardList v-if="events.length > 0 && !isLoading" :events="events" />
+        <FTCenteredText v-if="!isLoading && events.length === 0">
             There are no upcoming events
         </FTCenteredText>
     </div>

@@ -12,8 +12,8 @@ const properties = computed(() => {
 
 <template>
     <div class="PageHome">
-        <PropertyCardList v-if="properties.length" :properties="properties" />
-        <FTCenteredText v-if="!properties.length && !propertiesStore.arePropertiesLoading">
+        <PropertyCardList v-if="properties.length > 0" :properties="properties" />
+        <FTCenteredText v-if="properties.length === 0 && !propertiesStore.arePropertiesLoading">
             You have no properties created
         </FTCenteredText>
     </div>

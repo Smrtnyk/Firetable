@@ -71,7 +71,7 @@ function createOrganisation(): void {
                 <q-btn rounded icon="plus" class="button-gradient" @click="createOrganisation" />
             </template>
         </FTTitle>
-        <q-list v-if="organisations.length">
+        <q-list v-if="organisations.length > 0">
             <q-slide-item
                 v-for="organisation in organisations"
                 :key="organisation.id"

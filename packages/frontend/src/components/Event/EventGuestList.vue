@@ -119,7 +119,7 @@ function showAddNewGuestForm(): void {
                 </div>
             </q-linear-progress>
 
-            <div class="EventGuestList" v-if="!props.guestList.length">
+            <div class="EventGuestList" v-if="props.guestList.length === 0">
                 <div class="row justify-center items-center q-mt-md">
                     <h6 class="q-ma-sm text-weight-bolder underline">
                         {{ t("EventGuestList.guestListEmptyMessage") }}

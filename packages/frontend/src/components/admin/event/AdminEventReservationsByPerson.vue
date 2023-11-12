@@ -1,6 +1,6 @@
 <template>
     <div>
-        <canvas v-if="reservedTables.length" ref="chartRef" class="chart-container"></canvas>
+        <canvas v-if="reservedTables.length > 0" ref="chartRef" class="chart-container"></canvas>
         <h5 v-else class="text-subtitle2">No reservations to show</h5>
     </div>
 </template>

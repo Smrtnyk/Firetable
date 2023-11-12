@@ -158,7 +158,7 @@ async function onUserSlideRight(user: User, reset: () => void): Promise<void> {
             </template>
         </FTTitle>
 
-        <q-list v-if="users.length && !isLoading">
+        <q-list v-if="users.length > 0 && !isLoading">
             <q-slide-item
                 v-for="user in users"
                 :key="user.id"

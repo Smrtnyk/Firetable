@@ -45,7 +45,7 @@ export function useFloorsPageEvent(
     watch(
         () => eventFloors.value.map((floor) => floor.lastModified),
         async (newTimestamps, oldTimestamps) => {
-            if (!oldTimestamps.length) return;
+            if (oldTimestamps.length === 0) return;
 
             for (let i = 0; i < newTimestamps.length; i++) {
                 if (newTimestamps[i] !== oldTimestamps[i]) {
@@ -94,7 +94,7 @@ export function useFloorsPageEvent(
         old: EventFloorDoc[],
     ): Promise<void> {
         if (!eventFloors.value) return;
-        if ((!old.length && newVal.length) || floorInstances.value.size === 0) {
+        if ((old.length === 0 && newVal.length > 0) || floorInstances.value.size === 0) {
             await initFloorInstancesData();
         }
     }

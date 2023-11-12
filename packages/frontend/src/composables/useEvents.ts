@@ -45,9 +45,8 @@ export function useEvents() {
 
         try {
             const eventsDocs = await getEvents(lastDoc, EVENTS_PER_PAGE, eventOwner);
-            lastFetchedDocForProperty[propertyId] = eventsDocs.length
-                ? eventsDocs[eventsDocs.length - 1]._doc
-                : null;
+            lastFetchedDocForProperty[propertyId] =
+                eventsDocs.length > 0 ? eventsDocs[eventsDocs.length - 1]._doc : null;
 
             eventsByProperty[propertyId] = new Set([
                 ...(eventsByProperty[propertyId] || []),

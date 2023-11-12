@@ -21,7 +21,7 @@ export function useFloors(properties: Ref<PropertyDoc[]>) {
     const watcher = watch(
         properties,
         async (newProperties) => {
-            if (newProperties.length) {
+            if (newProperties.length > 0) {
                 await fetchAllFloors();
             }
         },

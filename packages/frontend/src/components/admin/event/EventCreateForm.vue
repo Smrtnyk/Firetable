@@ -117,7 +117,7 @@ const totalFloors = computed(() => {
 });
 
 async function validateAndEmitCreate(): Promise<void> {
-    if (!state.chosenFloors.length) {
+    if (state.chosenFloors.length === 0) {
         showErrorMessage(t("EventCreateForm.noChosenFloorsMessage"));
         return;
     }
@@ -126,7 +126,7 @@ async function validateAndEmitCreate(): Promise<void> {
         state.chosenFloors.includes(floor.id),
     );
 
-    if (!selectedFloors.length) {
+    if (selectedFloors.length === 0) {
         showErrorMessage(t("EventCreateForm.selectedFloorNotFoundMessage"));
         return;
     }
