@@ -54,4 +54,5 @@ export interface Reservation {
     consumption: number;
     time: string;
     reservedBy: Pick<User, "name" | "email">;
+    creator?: Pick<User, "name" | "email" | "id">;
 }

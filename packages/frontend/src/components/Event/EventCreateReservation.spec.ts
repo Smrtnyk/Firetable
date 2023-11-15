@@ -1,8 +1,9 @@
 import { config, flushPromises, mount, VueWrapper } from "@vue/test-utils";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createI18n } from "vue-i18n";
 import { Quasar } from "quasar";
 import messages from "../../i18n";
+import * as authStore from "../../stores/auth-store";
 
 import EventCreateReservation from "./EventCreateReservation.vue";
 import { Reservation, User } from "@firetable/types";
@@ -45,6 +46,8 @@ function createProps(overrides: Partial<TestProps> = {}): TestProps {
     return { ...defaultProps, ...overrides };
 }
 
+const MOCK_USER = { email: "mail", id: "1", name: "name" };
+
 function mountComponent(overrides?: Partial<TestProps>): VueWrapper<EventCreateReservation, any> {
     return mount(EventCreateReservation, {
         props: createProps(overrides),
@@ -55,6 +58,12 @@ function mountComponent(overrides?: Partial<TestProps>): VueWrapper<EventCreateR
 }
 
 describe("EventCreateReservation", () => {
+    beforeEach(() => {
+        vi.spyOn(authStore, "useAuthStore").mockReturnValue({
+            user: MOCK_USER,
+        } as any);
+    });
+
     it("emits 'create' event with correct payload on OK click in 'create' mode", async () => {
         const wrapper = mountComponent();
 
@@ -83,6 +92,7 @@ describe("EventCreateReservation", () => {
                 confirmed: false,
                 time: "12:00",
                 reservedBy: { name: "Staff", email: "staff@example.com" },
+                creator: MOCK_USER,
             },
         ]);
     });
@@ -168,6 +178,7 @@ describe("EventCreateReservation", () => {
                     name: "Whatsapp",
                 },
                 time: "00:00",
+                creator: MOCK_USER,
             },
         ]);
     });

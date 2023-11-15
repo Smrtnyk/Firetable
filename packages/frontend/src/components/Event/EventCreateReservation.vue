@@ -4,6 +4,7 @@ import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
 import { greaterThanZero, minLength, noEmptyString, requireNumber } from "src/helpers/form-rules";
 import { Reservation, User } from "@firetable/types";
+import { useAuthStore } from "src/stores/auth-store";
 
 const socials = ["Whatsapp", "SMS", "Instagram", "Facebook", "Phone"].map((social, index) => {
     return {
@@ -23,6 +24,7 @@ const emit = defineEmits<{
     (e: "create" | "update", payload: Reservation): void;
 }>();
 const { t } = useI18n();
+const authStore = useAuthStore();
 
 const initialState =
     props.mode === "edit" && props.reservationData
@@ -36,6 +38,11 @@ const initialState =
               confirmed: false,
               time: "00:00",
               reservedBy: null as unknown as User,
+              creator: {
+                  name: authStore.user!.name,
+                  email: authStore.user!.email,
+                  id: authStore.user!.id,
+              },
           };
 const state = reactive<Reservation>(initialState);
 const reservationForm = ref<QForm | null>(null);
