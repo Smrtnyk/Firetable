@@ -10,8 +10,8 @@
         "dev": "quasar dev",
         "dev:pwa": "quasar dev -m pwa",
         "build:spa": "quasar build",
-        "build": "quasar build",
         "build:pwa": "quasar build -m pwa",
+        "build": "quasar build -m pwa",
         "typecheck": "vue-tsc --noEmit -p ./tsconfig.json",
         "test": "vitest"
     },
