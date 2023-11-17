@@ -5,6 +5,8 @@ export class FloorZoomManager {
     private minZoom: number;
     private readonly maxZoom: number = DEFAULT_ZOOM * 3;
 
+    private rafId: number | undefined;
+
     constructor(
         private canvas: fabric.Canvas,
         private initialScale: number,
@@ -35,11 +37,16 @@ export class FloorZoomManager {
     adjustZoom(scaleFactor: number, point: fabric.Point): void {
         const newZoom = this.canvas.getZoom() * scaleFactor;
         if (newZoom <= this.maxZoom && newZoom >= this.minZoom) {
-            this.canvas.zoomToPoint(point, newZoom);
-
-            this.canvas.requestRenderAll();
+            this.cancelCurrentAnimation();
+            this.rafId = requestAnimationFrame(() => {
+                this.canvas.zoomToPoint(point, newZoom);
+                this.canvas.requestRenderAll();
+            });
         } else if (newZoom < this.minZoom) {
-            this.resetZoom();
+            this.cancelCurrentAnimation();
+            this.rafId = requestAnimationFrame(() => {
+                this.resetZoom();
+            });
         }
     }
 
@@ -57,7 +64,13 @@ export class FloorZoomManager {
         this.canvas.requestRenderAll();
     }
 
+    private cancelCurrentAnimation(): void {
+        if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+        }
+    }
+
     destroy(): void {
-        // empty for now
+        this.cancelCurrentAnimation();
     }
 }
