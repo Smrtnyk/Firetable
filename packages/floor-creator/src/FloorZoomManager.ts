@@ -7,6 +7,8 @@ export class FloorZoomManager {
 
     private rafId: number | undefined;
 
+    isZooming = false;
+
     constructor(
         private canvas: fabric.Canvas,
         private initialScale: number,
@@ -38,14 +40,18 @@ export class FloorZoomManager {
         const newZoom = this.canvas.getZoom() * scaleFactor;
         if (newZoom <= this.maxZoom && newZoom >= this.minZoom) {
             this.cancelCurrentAnimation();
+            this.isZooming = true;
             this.rafId = requestAnimationFrame(() => {
                 this.canvas.zoomToPoint(point, newZoom);
                 this.canvas.requestRenderAll();
+                this.isZooming = false;
             });
         } else if (newZoom < this.minZoom) {
             this.cancelCurrentAnimation();
+            this.isZooming = true;
             this.rafId = requestAnimationFrame(() => {
                 this.resetZoom();
+                this.isZooming = false;
             });
         }
     }
@@ -72,5 +78,6 @@ export class FloorZoomManager {
 
     destroy(): void {
         this.cancelCurrentAnimation();
+        this.isZooming = false;
     }
 }

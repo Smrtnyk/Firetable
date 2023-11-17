@@ -3,7 +3,7 @@ import { Floor } from "./Floor";
 import { fabric } from "fabric";
 import { throttle } from "@firetable/utils";
 
-const DAMPENING_FACTOR = 0.3;
+const DAMPENING_FACTOR = 0.1;
 const PAN_DAMPENING_FACTOR = 0.1;
 
 export class TouchManager {
@@ -22,29 +22,22 @@ export class TouchManager {
 
         // Create recognizers for pinch and pan gestures
         const doubleTap = new Tap({ event: "doubletap", taps: 2 });
-        const pinch = new Pinch();
-        const pan = new Pan({ direction: DIRECTION_ALL });
+        const pinch = new Pinch({ enable: true, direction: DIRECTION_ALL });
+        const pan = new Pan({ direction: DIRECTION_ALL, threshold: 50 });
 
         // Add the recognizers to the hammerManager instance
         this.hammerManager.add([pinch, pan, doubleTap]);
 
-        this.hammerManager.get("pinch").set({ enable: true });
-        this.hammerManager.get("pan").set({ direction: DIRECTION_ALL });
-
-        // Pinch event
         this.hammerManager.on("pinch", this.onPinch);
-
-        // Pan events
         this.hammerManager.on("panmove", this.onPanMove);
         this.hammerManager.on("doubletap", this.onDoubleTap);
-
-        this.hammerManager.on("pinchend panend", this.onGestureEnd);
+        this.hammerManager.on("pinchend pinchcancel panend", this.onGestureEnd);
     }
 
     onGestureEnd = (): void => {
         setTimeout(() => {
             this.isInteracting = false;
-        }, 30);
+        }, 100);
     };
 
     private onDoubleTap = (ev: HammerInput): void => {
@@ -81,7 +74,7 @@ export class TouchManager {
         const adjustedScale = 1 + (scale - 1) * DAMPENING_FACTOR;
         const center = new fabric.Point(ev.center.x, ev.center.y);
         this.floor.zoomManager.adjustZoom(adjustedScale, center);
-    }, 200);
+    }, 100);
 
     onPanMove = (e: HammerInput): void => {
         this.isInteracting = true;
@@ -122,4 +115,9 @@ export class TouchManager {
         this.floor.canvas.setViewportTransform([zoom, 0, 0, zoom, newX, newY]);
         this.floor.canvas.requestRenderAll();
     };
+
+    destroy(): void {
+        this.hammerManager.destroy();
+        this.isInteracting = false;
+    }
 }
