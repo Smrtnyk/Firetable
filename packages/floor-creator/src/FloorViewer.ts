@@ -18,6 +18,7 @@ export class FloorViewer extends Floor {
         super(options);
         this.eventEmitter = new EventEmitter<FloorViewerEvents>();
         this.eventManager = new ViewerEventManager(this);
+        this.canvas.defaultCursor = "default";
     }
 
     emit<T extends keyof FloorViewerEvents>(event: T, ...args: FloorViewerEvents[T]): void {
@@ -56,6 +57,9 @@ export class FloorViewer extends Floor {
         element.lockSkewingX = true;
         element.lockSkewingY = true;
         element.lockUniScaling = true;
+
+        // Override the cursor style on hover for all elements in viewer
+        element.hoverCursor = "default";
     }
 
     destroy(): void {
