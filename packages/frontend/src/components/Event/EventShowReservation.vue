@@ -5,6 +5,7 @@ import { Reservation } from "@firetable/types";
 import { useAuthStore } from "src/stores/auth-store";
 
 interface Props {
+    canDeleteReservation: boolean;
     reservation: Reservation;
     crossFloorReservationTransferEnabled: boolean;
 }
@@ -88,7 +89,7 @@ function onReservationConfirm(): void {
             </q-item-section>
         </q-item>
         <q-item>
-            <div v-if="authStore.canDeleteReservation" class="row q-gutter-sm full-width">
+            <div v-if="props.canDeleteReservation" class="row q-gutter-sm full-width">
                 <q-btn
                     :title="t('Global.delete')"
                     class="no-wrap"

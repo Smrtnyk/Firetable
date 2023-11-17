@@ -64,6 +64,17 @@ export function useReservations(
 
     watch(freeTablesPerFloor, checkIfReservedTableAndCloseCreateReservationDialog);
 
+    function isOwnReservation(reservation: Reservation): boolean {
+        return authStore.user?.id === reservation.creator?.id;
+    }
+
+    function canDeleteReservation(reservation: Reservation): boolean {
+        return (
+            authStore.canDeleteReservation ||
+            (isOwnReservation(reservation) && authStore.canDeleteOwnReservation)
+        );
+    }
+
     function handleReservationCreation(
         floor: Floor,
         reservationData: Reservation,
@@ -167,6 +178,7 @@ export function useReservations(
                 title: `${t("EventShowReservation.title")} ${element.label}`,
                 maximized: false,
                 componentPropsObject: {
+                    canDeleteReservation: canDeleteReservation(reservation),
                     reservation,
                     crossFloorReservationTransferEnabled: floorInstances.size > 1,
                 },

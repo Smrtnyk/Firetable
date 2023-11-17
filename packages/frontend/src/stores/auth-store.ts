@@ -48,19 +48,23 @@ export const useAuthStore = defineStore("auth", {
         },
 
         canReserve(): boolean {
-            return this.capabilities[UserCapability.CAN_RESERVE];
+            return !!this.capabilities[UserCapability.CAN_RESERVE];
         },
 
         canSeeGuestContact(): boolean {
-            return this.capabilities[UserCapability.CAN_SEE_GUEST_CONTACT];
+            return !!this.capabilities[UserCapability.CAN_SEE_GUEST_CONTACT];
         },
 
         canDeleteReservation(): boolean {
-            return this.capabilities[UserCapability.CAN_DELETE_RESERVATION];
+            return !!this.capabilities[UserCapability.CAN_DELETE_RESERVATION];
+        },
+
+        canDeleteOwnReservation(): boolean {
+            return !!this.capabilities[UserCapability.CAN_DELETE_OWN_RESERVATION];
         },
 
         canConfirmReservation(): boolean {
-            return this.capabilities[UserCapability.CAN_CONFIRM_RESERVATION];
+            return !!this.capabilities[UserCapability.CAN_CONFIRM_RESERVATION];
         },
     },
     actions: {
