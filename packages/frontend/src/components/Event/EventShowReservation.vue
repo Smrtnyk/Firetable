@@ -37,7 +37,7 @@ function onReservationConfirm(): void {
             <div class="col-6 font-black">{{ props.reservation.guestName }}</div>
 
             <template v-if="props.reservation.time">
-                <div class="col-6 font-black">{{ t("EventShowReservation.timeLabel") }}</div>
+                <div class="col-6">{{ t("EventShowReservation.timeLabel") }}</div>
                 <div class="col-6 font-black">
                     {{ props.reservation.time }}
                 </div>
