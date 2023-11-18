@@ -17,7 +17,7 @@
         "build": "pnpm -r build"
     },
     "devDependencies": {
-        "@regru/eslint-plugin-prefer-early-return": "^1.0.0",
+        "@regru/eslint-plugin-prefer-early-return": "1.0.0",
         "@typescript-eslint/eslint-plugin": "6.11.0",
         "@typescript-eslint/parser": "6.11.0",
         "autoprefixer": "10.4.16",
@@ -28,7 +28,7 @@
         "eslint-plugin-prettier": "5.0.1",
         "eslint-plugin-promise": "6.1.1",
         "eslint-plugin-quasar": "1.1.0",
-        "eslint-plugin-unicorn": "^49.0.0",
+        "eslint-plugin-unicorn": "49.0.0",
         "eslint-plugin-vue": "9.18.1",
         "firebase-tools": "12.9.1",
         "prettier": "3.1.0",
