@@ -145,6 +145,21 @@ onMounted(init);
                     </span>
                 </div>
             </template>
+            <template #right>
+                <q-btn
+                    rounded
+                    :to="{
+                        name: 'event',
+                        params: {
+                            organisationId: eventOwner.organisationId,
+                            propertyId: eventOwner.propertyId,
+                            eventId: eventOwner.id,
+                        },
+                    }"
+                    class="button-gradient"
+                    >View
+                </q-btn>
+            </template>
         </FTTitle>
         <q-tabs
             v-model="tab"
