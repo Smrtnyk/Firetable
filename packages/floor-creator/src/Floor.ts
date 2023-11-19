@@ -63,7 +63,7 @@ export abstract class Floor {
     }
 
     get json(): ReturnType<typeof fabric.Canvas.toJSON> {
-        return this.canvas.toJSON(["label", "reservation", "name", "type"]);
+        return this.canvas.toJSON(["label", "name", "type"]);
     }
 
     elementReviver = (_: string, object: fabric.Object): void => {
