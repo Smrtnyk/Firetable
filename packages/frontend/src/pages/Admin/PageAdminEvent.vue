@@ -175,7 +175,7 @@ onMounted(init);
         <div class="q-gutter-y-md">
             <q-tab-panels v-model="tab" animated transition-next="fade" transition-prev="fade">
                 <!-- General info with charts area -->
-                <q-tab-panel name="info">
+                <q-tab-panel name="info" class="q-pa-xs-sm q-pa-md-md">
                     <AdminEventGeneralInfo :reservations-status="reservationsStatus" />
                     <q-separator class="q-my-sm bg-grey-6" />
                     <AdminEventReservationsByPerson :reservations="eventData" />

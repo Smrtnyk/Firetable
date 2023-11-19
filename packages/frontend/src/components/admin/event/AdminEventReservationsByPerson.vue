@@ -22,7 +22,6 @@ import { BaseTable } from "@firetable/floor-creator";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { propIsTruthy } from "@firetable/utils";
 import { isMobile } from "src/global-reactives/screen-detection";
-import { getColors } from "src/helpers/colors";
 
 interface Props {
     reservations: BaseTable[];
@@ -86,6 +85,44 @@ function reservationsReducer(acc: Res, { reservation }: BaseTable): Res {
     return acc;
 }
 
+function generateStackedChartData(reservations: BaseTable[]): {
+    labels: string[];
+    datasets: any[];
+} {
+    const data = reservations.reduce(reservationsReducer, {});
+    const labels: string[] = [];
+    const reservationCounts: number[] = [];
+    const confirmedCounts: number[] = [];
+
+    Object.values(data).forEach((entry) => {
+        labels.push(entry.name);
+        reservationCounts.push(entry.reservations);
+        confirmedCounts.push(entry.confirmed);
+    });
+
+    const reservationDataset = {
+        label: "Reservations",
+        data: reservationCounts,
+        backgroundColor: "rgba(0, 123, 255, 0.5)",
+        borderColor: "rgba(0, 123, 255, 1)",
+        borderWidth: 1,
+        type: "bar",
+        stack: "bar-stacked",
+    };
+
+    const confirmedDataset = {
+        label: "Confirmed",
+        data: confirmedCounts,
+        backgroundColor: "rgba(40, 167, 69, 0.5)",
+        borderColor: "rgba(40, 167, 69, 1)",
+        borderWidth: 1,
+        type: "bar",
+        stack: "bar-stacked",
+    };
+
+    return { labels, datasets: [reservationDataset, confirmedDataset] };
+}
+
 function destroyChartIfExists(): void {
     if (chartInstance) {
         chartInstance.destroy();
@@ -97,20 +134,7 @@ function generateTablesByWaiterChartOptions(
     chartContainer: HTMLCanvasElement,
     reservations: BaseTable[],
 ): void {
-    const data = reservations.reduce(reservationsReducer, {});
-
-    const colorData = getColors(Object.keys(data).length);
-
-    const reservationData = Object.values(data).map((entry, index) => {
-        return {
-            label: entry.name,
-            data: [entry.reservations, entry.confirmed],
-            backgroundColor: colorData.backgroundColors[index],
-            borderColor: colorData.borderColors[index],
-            borderWidth: 1,
-        };
-    });
-
+    const { labels, datasets } = generateStackedChartData(reservations);
     updateChartHeight(reservations);
     destroyChartIfExists();
 
@@ -118,8 +142,8 @@ function generateTablesByWaiterChartOptions(
         chartInstance = new Chart(chartContainer, {
             type: "bar",
             data: {
-                labels: ["Reservations", "Confirmed"],
-                datasets: reservationData,
+                labels,
+                datasets,
             },
             options: {
                 maintainAspectRatio: false,
@@ -145,18 +169,19 @@ function generateTablesByWaiterChartOptions(
                 responsive: true,
                 scales: {
                     x: {
-                        stacked: false,
+                        stacked: true,
                     },
                     y: {
-                        stacked: false,
+                        stacked: true,
                         ticks: {
-                            maxRotation: 90,
-                            // setting the same value for max and min will enforce that specific angle
-                            minRotation: 90,
+                            autoSkip: false,
+                            autoSkipPadding: 20,
+                            maxRotation: 65,
+                            minRotation: 65,
                             font: {
                                 size: isMobile.value ? 10 : 14,
                             },
-                            padding: isMobile.value ? 2 : 10,
+                            padding: isMobile.value ? 0 : 10,
                         },
                     },
                 },
