@@ -4,7 +4,6 @@ import { RESOLUTION } from "../constants";
 import { CommandInvoker } from "../command/CommandInvoker";
 import { expect, it, describe, beforeEach, vi, SpyInstance } from "vitest";
 import { FloorEditor } from "../FloorEditor";
-import { FloorMode } from "../types";
 
 describe("EditorEventManager", () => {
     let manager: EditorEventManager;
@@ -27,7 +26,6 @@ describe("EditorEventManager", () => {
                 json: {},
                 propertyId: "",
             },
-            mode: FloorMode.EDITOR,
             containerWidth: 1000,
         });
 

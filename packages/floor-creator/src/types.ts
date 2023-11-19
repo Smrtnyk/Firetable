@@ -9,7 +9,6 @@ import { Stage } from "./elements/Stage";
 export interface FloorCreationOptions {
     canvas: HTMLCanvasElement;
     floorDoc: FloorDoc;
-    mode: FloorMode;
     containerWidth: number;
 }
 
@@ -30,16 +29,6 @@ export enum FloorElementTypes {
     SINGLE_SOFA = "SingleSofa",
     STAGE = "Stage",
     WALL = "Wall",
-}
-
-/**
- * EDITOR - When in a map preset editor
- *
- * LIVE   - When in a event page where reservations occur
- */
-export const enum FloorMode {
-    EDITOR = "EDITOR",
-    LIVE = "LIVE",
 }
 
 export type NumberTuple = [number, number];

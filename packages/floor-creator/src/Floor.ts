@@ -1,6 +1,6 @@
 import { fabric } from "fabric";
 import { CANVAS_BG_COLOR } from "./constants.js";
-import { FloorCreationOptions, FloorMode } from "./types.js";
+import { FloorCreationOptions } from "./types.js";
 import { FloorDoc } from "@firetable/types";
 import { RoundTable } from "./elements/RoundTable";
 import { RectTable } from "./elements/RectTable";
@@ -34,7 +34,7 @@ export abstract class Floor {
     abstract destroy(): void;
 
     protected constructor(options: FloorCreationOptions) {
-        const { canvas, floorDoc, mode, containerWidth } = options;
+        const { canvas, floorDoc, containerWidth } = options;
 
         this.scale = calculateCanvasScale(containerWidth, floorDoc.width);
         this.id = floorDoc.id;
@@ -48,7 +48,6 @@ export abstract class Floor {
             width: this.width,
             height: this.height,
             backgroundColor: CANVAS_BG_COLOR,
-            interactive: mode === FloorMode.EDITOR,
             selection: false,
         });
         // @ts-expect-error -- setting this intentionally here, so we have it available if needed

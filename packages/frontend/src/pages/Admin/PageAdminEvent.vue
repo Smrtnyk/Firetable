@@ -12,7 +12,7 @@ import FTDialog from "src/components/FTDialog.vue";
 
 import { Loading, useQuasar } from "quasar";
 import { config } from "src/config";
-import { FloorEditor, FloorMode, getTablesFromFloorDoc } from "@firetable/floor-creator";
+import { FloorEditor, getTablesFromFloorDoc } from "@firetable/floor-creator";
 import { FloorDoc } from "@firetable/types";
 import { EventOwner, updateEventFloorData } from "@firetable/backend";
 import { withLoading } from "src/helpers/ui-helpers";
@@ -125,7 +125,7 @@ function showFloorEditDialog(floor: FloorDoc): void {
         showDialog(
             AdminEventFloorViewer,
             `Editing Floor: ${floor.name}`,
-            { floor, mode: FloorMode.EDITOR, eventId: event.value.id },
+            { floor, eventId: event.value.id },
             { update: onFloorUpdate },
             true,
         );

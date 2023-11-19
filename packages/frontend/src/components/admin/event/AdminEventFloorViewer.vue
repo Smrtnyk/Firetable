@@ -39,14 +39,12 @@ import {
     Floor,
     FloorEditor,
     FloorEditorElement,
-    FloorMode,
 } from "@firetable/floor-creator";
 import { FloorDoc } from "@firetable/types";
 import { debounce } from "quasar";
 
 interface Props {
     floor: FloorDoc;
-    mode: FloorMode;
     eventId: string;
 }
 
@@ -92,7 +90,6 @@ watch(floorContainerRef, () => {
     floorInstance.value = new FloorEditor({
         floorDoc: props.floor,
         canvas: floorContainerRef.value,
-        mode: props.mode,
         containerWidth: viewerContainerRef.value.clientWidth,
     });
     floorInstance.value.on("elementClicked", onElementClick);

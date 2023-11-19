@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi, SpyInstance } from "vitest";
 import { FloorEditor } from "./FloorEditor";
-import { FloorMode, FloorCreationOptions } from "./types";
+import { FloorCreationOptions } from "./types";
 import { GridDrawer } from "./GridDrawer";
 import { ElementTag } from "@firetable/types";
 import { isTable } from "./type-guards";
@@ -24,7 +24,6 @@ describe("FloorEditor", () => {
                 json: {},
                 propertyId: "",
             },
-            mode: FloorMode.EDITOR,
             containerWidth: 1000,
         };
 

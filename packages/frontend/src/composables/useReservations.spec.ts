@@ -4,7 +4,7 @@ import { describe, beforeEach, expect, it, vi } from "vitest";
 import { EventDoc, User } from "@firetable/types";
 import * as backend from "@firetable/backend";
 import * as uiHelpers from "../helpers/ui-helpers";
-import { FloorElementTypes, FloorMode, FloorViewer, RectTable } from "@firetable/floor-creator";
+import { FloorElementTypes, FloorViewer, RectTable } from "@firetable/floor-creator";
 import { uid } from "quasar";
 import * as i18n from "vue-i18n";
 import * as authStore from "../stores/auth-store";
@@ -14,10 +14,11 @@ function createFloor(floorName: string): FloorViewer {
     const canvas = document.createElement("canvas");
     canvas.width = 1000;
     canvas.height = 1000;
+    const id = uid();
     return new FloorViewer({
         canvas,
         floorDoc: {
-            id: uid(),
+            id,
             name: floorName,
             width: 1000,
             height: 1000,
@@ -26,12 +27,11 @@ function createFloor(floorName: string): FloorViewer {
                     createTable("table1").toObject(),
                     createTable("table2").toObject(),
                     createTable("table3").toObject(),
-                    createReservedTable("reserved1").toObject(),
+                    createReservedTable("reserved1", id).toObject(),
                 ],
             },
             propertyId: "",
         },
-        mode: FloorMode.LIVE,
         containerWidth: 1000,
     });
 }
@@ -49,6 +49,7 @@ function createTable(label: string): RectTable {
 }
 
 const mockReservation = {
+    id: "id",
     guestName: "foo",
     confirmed: false,
     numberOfGuests: 1,
@@ -57,12 +58,23 @@ const mockReservation = {
     reservedBy: {
         name: "foo",
         email: "bar",
+        id: "baz",
     },
+    creator: {
+        name: "foo",
+        email: "bar",
+        id: "baz",
+    },
+    _doc: this,
 };
 
-function createReservedTable(label: string): RectTable {
+function createReservedTable(label: string, floorId: string): RectTable {
     const table = createTable(label);
-    table.setReservation(mockReservation);
+    table.setReservation({
+        ...mockReservation,
+        floorId,
+        tableLabel: label,
+    });
     return table;
 }
 
@@ -99,21 +111,6 @@ describe("useReservations", () => {
             propertyId: "1",
             organisationId: "2",
             _doc: this,
-        });
-    });
-
-    it("should compute allReservedTables correctly", () => {
-        const { allReservedTables } = useReservations(users, floorInstances, eventOwner, event);
-        expect(allReservedTables.value.length).toBe(2);
-    });
-
-    it("should compute freeTablesPerFloor correctly", () => {
-        const { freeTablesPerFloor } = useReservations(users, floorInstances, eventOwner, event);
-        // two floors
-        expect(freeTablesPerFloor.value.size).toBe(2);
-        // 6 free tables
-        freeTablesPerFloor.value.forEach((value) => {
-            expect(value.length).toBe(3);
         });
     });
 

@@ -13,7 +13,6 @@ import {
     Floor,
     FloorEditor,
     FloorEditorElement,
-    FloorMode,
     hasFloorTables,
     MAX_FLOOR_HEIGHT,
     MAX_FLOOR_WIDTH,
@@ -125,7 +124,6 @@ function instantiateFloor(floorDoc: FloorDoc): void {
     floorInstance.value = new FloorEditor({
         canvas: canvasRef.value,
         floorDoc,
-        mode: FloorMode.EDITOR,
         containerWidth: pageRef.value.clientWidth,
     });
 

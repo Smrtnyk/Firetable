@@ -1,6 +1,5 @@
 import { expect, it, describe, beforeEach } from "vitest";
 import { FloorEditor } from "./FloorEditor";
-import { FloorMode } from "./types";
 import {
     extractAllTablesLabels,
     getFreeTables,
@@ -28,7 +27,6 @@ describe("Table Management Functions", () => {
                 json: {},
                 propertyId: "",
             },
-            mode: FloorMode.EDITOR,
             containerWidth: 1000,
         });
     });

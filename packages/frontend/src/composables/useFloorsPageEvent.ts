@@ -1,6 +1,6 @@
 import { watch, reactive, computed, Ref, ref, nextTick, onMounted, onBeforeUnmount } from "vue";
 import { EventDoc, EventFloorDoc } from "@firetable/types";
-import { BaseTable, FloorViewer, FloorMode, getTables } from "@firetable/floor-creator";
+import { BaseTable, FloorViewer, getTables } from "@firetable/floor-creator";
 import { EventOwner } from "@firetable/backend";
 import { VueFirestoreDocumentData } from "vuefire";
 import { useUsers } from "src/composables/useUsers";
@@ -116,7 +116,6 @@ export function useFloorsPageEvent(
         const floorViewer = new FloorViewer({
             canvas,
             floorDoc,
-            mode: FloorMode.LIVE,
             containerWidth: pageRef.value.clientWidth,
         });
         floorViewer.on("elementClicked", tableClickHandler);

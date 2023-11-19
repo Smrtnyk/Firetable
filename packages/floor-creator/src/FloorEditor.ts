@@ -30,7 +30,7 @@ export class FloorEditor extends Floor {
 
     constructor(options: FloorCreationOptions) {
         super(options);
-
+        this.canvas.interactive = true;
         this.eventEmitter = new EventEmitter<FloorEditorEvents>();
         this.gridDrawer = new GridDrawer(this.canvas);
         this.eventManager = new EditorEventManager(this, this.commandInvoker);

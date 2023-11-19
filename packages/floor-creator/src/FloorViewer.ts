@@ -16,6 +16,7 @@ export class FloorViewer extends Floor {
 
     constructor(options: FloorCreationOptions) {
         super(options);
+        this.canvas.interactive = false;
         this.eventEmitter = new EventEmitter<FloorViewerEvents>();
         this.eventManager = new ViewerEventManager(this);
         this.canvas.defaultCursor = "default";
