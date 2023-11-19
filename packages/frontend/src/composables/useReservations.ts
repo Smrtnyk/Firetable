@@ -1,17 +1,19 @@
-import { computed, onBeforeUnmount, Ref, watch, ref } from "vue";
-import { EventDoc, Reservation, User } from "@firetable/types";
+import { computed, onBeforeUnmount, Ref, watch, ref, ShallowRef } from "vue";
+import { EventDoc, Reservation, ReservationDoc, User } from "@firetable/types";
 import {
     BaseTable,
     Floor,
     FloorEditorElement,
     type FloorViewer,
-    getFreeTables,
-    getReservedTables,
     isTable,
 } from "@firetable/floor-creator";
-import { EventOwner, updateEventFloorData } from "@firetable/backend";
+import {
+    addReservation,
+    deleteReservation,
+    EventOwner,
+    updateReservationDoc,
+} from "@firetable/backend";
 import { DialogChainObject, useQuasar } from "quasar";
-import { takeProp } from "@firetable/utils";
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { VueFirestoreDocumentData } from "vuefire";
 import { useI18n } from "vue-i18n";
@@ -25,15 +27,16 @@ const HALF_HOUR = 30 * 60 * 1000; // 30 minutes in milliseconds
 
 export function useReservations(
     users: Ref<User[]>,
-    floorInstances: Set<FloorViewer>,
+    reservations: Ref<ReservationDoc[]>,
+    floorInstances: ShallowRef<FloorViewer[]>,
     eventOwner: EventOwner,
     event: Ref<VueFirestoreDocumentData<EventDoc> | undefined>,
 ) {
     const authStore = useAuthStore();
-    // check every 1 minute
     const q = useQuasar();
     const { t } = useI18n();
 
+    // check every 1 minute
     const intervalID = setInterval(checkReservationsForTimeAndMarkTableIfNeeded, 60 * 1000);
     const crossFloorReservationTransferTable = ref<
         { table: BaseTable; floor: FloorViewer } | undefined
@@ -49,20 +52,22 @@ export function useReservations(
         floorId: string;
     } | null = null;
 
-    const allReservedTables = computed(() => {
-        return Array.from(floorInstances).map(getReservedTables).flat();
-    });
-
-    const freeTablesPerFloor = computed(() => {
-        const freeTablesMap = new Map<string, string[]>();
-
-        for (const floor of floorInstances) {
-            freeTablesMap.set(floor.id, getFreeTables(floor).map(takeProp("label")));
-        }
-        return freeTablesMap;
-    });
-
-    watch(freeTablesPerFloor, checkIfReservedTableAndCloseCreateReservationDialog);
+    watch(
+        [reservations, floorInstances],
+        ([newReservations, newFloorInstances]) => {
+            checkIfReservedTableAndCloseCreateReservationDialog();
+            for (const floor of newFloorInstances) {
+                floor.clearAllReservations();
+                for (const reservation of newReservations) {
+                    if (reservation.floorId === floor.id) {
+                        const table = floor.getTableByLabel(reservation.tableLabel);
+                        table?.setReservation(reservation);
+                    }
+                }
+            }
+        },
+        { immediate: true, deep: true },
+    );
 
     function isOwnReservation(reservation: Reservation): boolean {
         return authStore.user?.id === reservation.creator?.id;
@@ -75,23 +80,17 @@ export function useReservations(
         );
     }
 
-    function handleReservationCreation(
-        floor: Floor,
-        reservationData: Reservation,
-        table: BaseTable,
-    ): void {
-        table.setReservation(reservationData);
+    function handleReservationCreation(reservationData: Reservation): void {
         void tryCatchLoadingWrapper({
-            hook: () => updateEventFloorData(eventOwner, floor),
+            hook: () => addReservation(eventOwner, reservationData),
         });
     }
 
-    async function onDeleteReservation(floor: Floor, element: BaseTable): Promise<void> {
-        if (!(await showConfirm("Delete reservation?")) || !element.reservation) return;
-        element.setReservation(null);
+    async function onDeleteReservation(reservation: ReservationDoc): Promise<void> {
+        if (!(await showConfirm("Delete reservation?"))) return;
 
         await tryCatchLoadingWrapper({
-            hook: () => updateEventFloorData(eventOwner, floor),
+            hook: () => deleteReservation(eventOwner, reservation),
         });
     }
 
@@ -105,12 +104,12 @@ export function useReservations(
 
     function checkIfReservedTableAndCloseCreateReservationDialog(): void {
         if (!currentOpenCreateReservationDialog) return;
-
         const { dialog, label, floorId } = currentOpenCreateReservationDialog;
-        const freeTables = freeTablesPerFloor.value.get(floorId);
-        const isTableStillFree = freeTables?.includes(label);
+        const isTableStillFree = reservations.value.find((reservation) => {
+            return reservation.tableLabel === label && reservation.floorId === floorId;
+        });
 
-        if (isTableStillFree) return;
+        if (!isTableStillFree) return;
 
         dialog.hide();
         currentOpenCreateReservationDialog = null;
@@ -141,15 +140,17 @@ export function useReservations(
                         mode,
                         reservationData: mode === "edit" ? element.reservation : void 0,
                         eventStartTimestamp: event.value!.date,
+                        floor: floor,
+                        table: element,
                     },
                     listeners: {
                         create: (reservationData: Reservation) => {
                             resetCurrentOpenCreateReservationDialog();
-                            handleReservationCreation(floor, reservationData, element);
+                            handleReservationCreation(reservationData);
                             dialog.hide();
                         },
                         update(reservationData: Reservation) {
-                            handleReservationCreation(floor, reservationData, element);
+                            handleReservationCreation(reservationData);
                             dialog.hide();
                         },
                     },
@@ -168,7 +169,7 @@ export function useReservations(
 
     function showReservation(
         floor: FloorViewer,
-        reservation: Reservation,
+        reservation: ReservationDoc,
         element: BaseTable,
     ): void {
         q.dialog({
@@ -183,7 +184,7 @@ export function useReservations(
                 },
                 listeners: {
                     delete: () => {
-                        onDeleteReservation(floor, element).catch(showErrorMessage);
+                        onDeleteReservation(reservation).catch(showErrorMessage);
                     },
                     edit() {
                         onEditReservation(floor, element);
@@ -194,22 +195,21 @@ export function useReservations(
                             floor,
                         };
                     },
-                    confirm: onReservationConfirm(floor, element),
+                    confirm: onReservationConfirm(reservation),
                 },
             },
         });
     }
 
-    function onReservationConfirm(floor: Floor, element: BaseTable) {
+    function onReservationConfirm(reservation: ReservationDoc) {
         return function (val: boolean) {
-            const { reservation } = element;
-            if (!reservation) return;
-            element.setReservation({
-                ...reservation,
-                confirmed: val,
-            });
             return tryCatchLoadingWrapper({
-                hook: () => updateEventFloorData(eventOwner, floor),
+                hook: () =>
+                    updateReservationDoc(eventOwner, {
+                        ...reservation,
+                        id: reservation.id,
+                        confirmed: val,
+                    }),
             });
         };
     }
@@ -222,7 +222,12 @@ export function useReservations(
         if (!authStore.canReserve) {
             return;
         }
-        if (!table1.reservation) {
+
+        const reservationTable1 = reservations.value.find((reservation) => {
+            return reservation.floorId === floor.id && reservation.tableLabel === table1.label;
+        });
+
+        if (!reservationTable1) {
             return;
         }
 
@@ -232,16 +237,35 @@ export function useReservations(
         if (!shouldTransfer) {
             return;
         }
-        const table1Reservation = { ...table1.reservation };
-        if (table2.reservation) {
-            table1.setReservation({ ...table2.reservation });
-        } else {
-            table1.setReservation(null);
+
+        const reservationTable2 = reservations.value.find((reservation) => {
+            return reservation.floorId === floor.id && reservation.tableLabel === table2.label;
+        });
+
+        const reservation1 = { ...reservationTable1 };
+
+        reservationTable1.tableLabel = table2.label;
+
+        const promises: Promise<void>[] = [];
+        promises.push(
+            updateReservationDoc(eventOwner, {
+                ...reservationTable1,
+                id: reservationTable1.id,
+            }),
+        );
+
+        if (reservationTable2) {
+            reservationTable2.tableLabel = reservation1.tableLabel;
+            promises.push(
+                updateReservationDoc(eventOwner, {
+                    ...reservationTable2,
+                    id: reservationTable2.id,
+                }),
+            );
         }
-        table2.setReservation(table1Reservation);
 
         await tryCatchLoadingWrapper({
-            hook: () => updateEventFloorData(eventOwner, floor),
+            hook: () => Promise.all(promises),
         });
     }
 
@@ -251,16 +275,17 @@ export function useReservations(
         }
 
         const baseEventDate = new Date(event.value.date);
-        const allReservedTablesArr = allReservedTables.value;
 
-        allReservedTablesArr.forEach((table: BaseTable) => {
+        reservations.value.forEach((reservation) => {
             if (
-                table.reservation &&
-                !table.reservation.confirmed &&
-                shouldMarkReservationAsExpired(table.reservation.time, baseEventDate)
+                reservation.confirmed ||
+                !shouldMarkReservationAsExpired(reservation.time, baseEventDate)
             ) {
-                table.setFill("red");
+                return;
             }
+            const floor = floorInstances.value.find(({ id }) => id === reservation.floorId);
+            const table = floor?.getTableByLabel(reservation.tableLabel);
+            table?.setFill("red");
         });
     }
 
@@ -270,6 +295,18 @@ export function useReservations(
         floor2: FloorViewer,
         table2: BaseTable,
     ): Promise<void> {
+        const reservationTable1 = reservations.value.find((reservation) => {
+            return reservation.floorId === floor1.id && reservation.tableLabel === table1.label;
+        });
+
+        if (!reservationTable1) {
+            return;
+        }
+
+        const reservationTable2 = reservations.value.find((reservation) => {
+            return reservation.floorId === floor2.id && reservation.tableLabel === table2.label;
+        });
+
         const transferMessage = `This will transfer reservation between floor plans "${floor1.name}" table "${table1.label}" to floor plan "${floor2.name}" table "${table2.label}"`;
         const shouldTransfer = await showConfirm("Transfer reservation", transferMessage);
 
@@ -277,24 +314,31 @@ export function useReservations(
             return;
         }
 
-        const table1Reservation: Reservation | null = table1.reservation
-            ? { ...table1.reservation }
-            : null;
+        const reservation1 = { ...reservationTable1 };
 
-        if (table2.reservation) {
-            table1.setReservation({ ...table2.reservation });
-        } else {
-            table1.setReservation(null);
+        reservationTable1.tableLabel = table2.label;
+        reservationTable1.floorId = floor2.id;
+
+        const promises: Promise<void>[] = [];
+        promises.push(
+            updateReservationDoc(eventOwner, {
+                ...reservationTable1,
+                id: reservationTable1.id,
+            }),
+        );
+        if (reservationTable2) {
+            reservationTable2.tableLabel = reservation1.tableLabel;
+            reservationTable2.floorId = reservation1.floorId;
+            promises.push(
+                updateReservationDoc(eventOwner, {
+                    ...reservationTable2,
+                    id: reservationTable2.id,
+                }),
+            );
         }
-        table2.setReservation(table1Reservation);
 
         await tryCatchLoadingWrapper({
-            hook: () => {
-                return Promise.all([
-                    updateEventFloorData(eventOwner, floor1),
-                    updateEventFloorData(eventOwner, floor2),
-                ]);
-            },
+            hook: () => Promise.all(promises),
         });
     }
 
@@ -352,8 +396,6 @@ export function useReservations(
     });
 
     return {
-        allReservedTables,
-        freeTablesPerFloor,
         onDeleteReservation,
         handleReservationCreation,
         checkReservationsForTimeAndMarkTableIfNeeded,

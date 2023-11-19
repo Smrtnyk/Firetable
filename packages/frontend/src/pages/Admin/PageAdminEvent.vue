@@ -16,7 +16,6 @@ import { FloorEditor, getTablesFromFloorDoc } from "@firetable/floor-creator";
 import { FloorDoc } from "@firetable/types";
 import { EventOwner, updateEventFloorData } from "@firetable/backend";
 import { withLoading } from "src/helpers/ui-helpers";
-import { propIsTruthy } from "@firetable/utils";
 import useAdminEvent from "src/composables/useAdminEvent";
 import { buttonSize, isMobile } from "src/global-reactives/screen-detection";
 import { truncateText } from "src/helpers/string-utils";
@@ -38,7 +37,7 @@ const eventOwner: EventOwner = {
     id: props.eventId,
 };
 
-const { eventFloors, event, isLoading } = useAdminEvent(eventOwner);
+const { eventFloors, event, isLoading, reservations } = useAdminEvent(eventOwner);
 
 watch(
     isLoading,
@@ -59,21 +58,19 @@ function isEventFinished(eventTime: number): boolean {
     return currentTime > eventFinishedLimit.getTime();
 }
 
-const eventData = computed(() => eventFloors.value.map(getTablesFromFloorDoc).flat());
+const allTables = computed(() => eventFloors.value.map(getTablesFromFloorDoc).flat());
 
 const reservationsStatus = computed(() => {
-    const tables = eventData.value;
-    const reservedTables = tables.filter(propIsTruthy("reservation"));
-    const unreserved = tables.length - reservedTables.length;
-    const pending = reservedTables.filter((table) => !table.reservation?.confirmed).length;
-    const confirmed = reservedTables.length - pending;
-    const reserved = reservedTables.length;
-    const totalGuests = reservedTables.reduce((acc, table) => {
-        return acc + Number(table.reservation!.numberOfGuests || 0);
+    const unreserved = allTables.value.length - reservations.value.length;
+    const pending = reservations.value.filter((reservation) => !reservation.confirmed).length;
+    const confirmed = reservations.value.length - pending;
+    const reserved = reservations.value.length;
+    const totalGuests = reservations.value.reduce((acc, reservation) => {
+        return acc + Number(reservation.numberOfGuests || 0);
     }, 0);
 
     return {
-        total: tables.length,
+        total: allTables.value.length,
         reserved,
         pending,
         confirmed,
@@ -178,7 +175,7 @@ onMounted(init);
                 <q-tab-panel name="info" class="q-pa-xs-sm q-pa-md-md">
                     <AdminEventGeneralInfo :reservations-status="reservationsStatus" />
                     <q-separator class="q-my-sm bg-grey-6" />
-                    <AdminEventReservationsByPerson :reservations="eventData" />
+                    <AdminEventReservationsByPerson :reservations="reservations" />
                 </q-tab-panel>
 
                 <!-- Edit area -->

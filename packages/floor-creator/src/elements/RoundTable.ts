@@ -1,7 +1,7 @@
 import { fabric } from "fabric";
 import { FloorElementTypes } from "../types.js";
 import { determineTableColor } from "../utils.js";
-import { Reservation } from "@firetable/types";
+import { ReservationDoc } from "@firetable/types";
 import { FONT_SIZE, TABLE_TEXT_FILL_COLOR } from "../constants";
 import { IGroupOptions } from "fabric/fabric-impl";
 import { AnimationStrategy } from "./animation/AnimationStrategy";
@@ -9,7 +9,6 @@ import { SmoothBlinkAnimation } from "./animation/SmoothBlinkAnimation";
 
 interface CircleTableElementOptions {
     groupOptions: {
-        reservation?: Reservation;
         baseFill?: string;
         label: string;
     } & IGroupOptions;
@@ -21,7 +20,7 @@ interface CircleTableElementOptions {
 
 export class RoundTable extends fabric.Group {
     type = FloorElementTypes.ROUND_TABLE;
-    reservation: Reservation | null = null;
+    reservation: ReservationDoc | undefined;
     label: string;
     baseFill: string;
     private circle: fabric.Circle;
@@ -30,12 +29,11 @@ export class RoundTable extends fabric.Group {
 
     constructor(options: CircleTableElementOptions) {
         const baseFillComputed = (options.groupOptions.baseFill as string) || "#444";
-        const fill = determineTableColor(options.groupOptions.reservation, baseFillComputed);
         const tableCircle = new fabric.Circle({
             ...options.circleOptions,
             originX: "center",
             originY: "center",
-            fill,
+            fill: baseFillComputed,
             stroke: "black",
             strokeWidth: 0.5,
         });
@@ -55,9 +53,6 @@ export class RoundTable extends fabric.Group {
         this.textLabel = textLabel;
         this.label = options.groupOptions.label;
         this.baseFill = baseFillComputed;
-        if (options.groupOptions.reservation) {
-            this.reservation = options.groupOptions.reservation;
-        }
     }
 
     getBaseFill(): string {
@@ -88,8 +83,10 @@ export class RoundTable extends fabric.Group {
         this.animationStrategy.stop();
     }
 
-    setReservation(reservation: Reservation | null): void {
+    setReservation(reservation: ReservationDoc | undefined): void {
         this.reservation = reservation;
+        const fill = determineTableColor(reservation, this.baseFill);
+        this.setFill(fill);
     }
 
     toObject(): Record<string, unknown> {
@@ -98,7 +95,6 @@ export class RoundTable extends fabric.Group {
             opacity: 1,
             baseFill: this.baseFill,
             label: this.label,
-            reservation: this.reservation,
         };
     }
 

@@ -5,11 +5,13 @@ import { QForm } from "quasar";
 import { greaterThanZero, minLength, noEmptyString, requireNumber } from "src/helpers/form-rules";
 import { Reservation, User } from "@firetable/types";
 import { useAuthStore } from "src/stores/auth-store";
+import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
 
 const socials = ["Whatsapp", "SMS", "Instagram", "Facebook", "Phone"].map((social, index) => {
     return {
         name: social,
         email: `social-${index}`,
+        id: "",
     };
 });
 
@@ -17,7 +19,12 @@ const props = defineProps<{
     users: User[];
     mode: "create" | "edit";
     eventStartTimestamp: number;
-    reservationData?: Reservation; // Optional data for editing
+    table: BaseTable;
+    floor: FloorViewer;
+    /**
+     *  Optional data for editing
+     */
+    reservationData?: Reservation;
 }>();
 
 const emit = defineEmits<{
@@ -43,6 +50,8 @@ const initialState =
                   email: authStore.user!.email,
                   id: authStore.user!.id,
               },
+              tableLabel: props.table.label,
+              floorId: props.floor.id,
           };
 const state = reactive<Reservation>(initialState);
 const reservationForm = ref<QForm | null>(null);
@@ -50,6 +59,7 @@ const formattedUsers = computed<Reservation["reservedBy"][]>(() =>
     props.users.map((user) => ({
         name: user.name,
         email: user.email,
+        id: user.id,
     })),
 );
 const selectionType = ref("user");

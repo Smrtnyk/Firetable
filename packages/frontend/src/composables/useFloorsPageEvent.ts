@@ -1,6 +1,16 @@
-import { watch, reactive, computed, Ref, ref, nextTick, onMounted, onBeforeUnmount } from "vue";
-import { EventDoc, EventFloorDoc } from "@firetable/types";
-import { BaseTable, FloorViewer, getTables } from "@firetable/floor-creator";
+import {
+    watch,
+    reactive,
+    computed,
+    Ref,
+    ref,
+    nextTick,
+    onMounted,
+    onBeforeUnmount,
+    shallowRef,
+} from "vue";
+import { EventDoc, EventFloorDoc, Reservation, ReservationDoc } from "@firetable/types";
+import { FloorViewer, getTables } from "@firetable/floor-creator";
 import { EventOwner } from "@firetable/backend";
 import { VueFirestoreDocumentData } from "vuefire";
 import { useUsers } from "src/composables/useUsers";
@@ -11,20 +21,23 @@ const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
 
 export function useFloorsPageEvent(
     eventFloors: Ref<EventFloorDoc[]>,
+    reservations: Ref<ReservationDoc[]>,
     pageRef: Ref<HTMLDivElement | undefined>,
     eventOwner: EventOwner,
     event: Ref<VueFirestoreDocumentData<EventDoc> | undefined>,
 ) {
     const activeTablesAnimationInterval = ref<number | undefined>();
     const activeFloor = ref<{ id: string; name: string } | undefined>();
-    const floorInstances = ref<Set<FloorViewer>>(new Set());
+    const floorInstances = shallowRef<FloorViewer[]>([]);
     const { users } = useUsers();
-    const { tableClickHandler, checkReservationsForTimeAndMarkTableIfNeeded, allReservedTables } =
-        useReservations(users, floorInstances.value, eventOwner, event);
+    const {
+        tableClickHandler,
+        checkReservationsForTimeAndMarkTableIfNeeded,
+    } = useReservations(users, reservations, floorInstances, eventOwner, event);
     const canvases = reactive<Map<string, HTMLCanvasElement>>(new Map());
 
     const hasMultipleFloorPlans = computed(() => {
-        return floorInstances.value.size > 1;
+        return eventFloors.value.length > 1;
     });
 
     onMounted(() => {
@@ -43,20 +56,6 @@ export function useFloorsPageEvent(
 
     watch(eventFloors, handleFloorInstancesData);
 
-    watch(
-        () => eventFloors.value.map((floor) => floor.lastModified),
-        async (newTimestamps, oldTimestamps) => {
-            if (oldTimestamps.length === 0) return;
-
-            for (let i = 0; i < newTimestamps.length; i++) {
-                if (newTimestamps[i] !== oldTimestamps[i]) {
-                    updateFloorInstanceData(eventFloors.value[i].id, eventFloors.value[i].json);
-                }
-            }
-        },
-        { deep: true },
-    );
-
     const resizeFloor = debounce((): void => {
         floorInstances.value.forEach((floor) => {
             if (!pageRef.value) {
@@ -66,27 +65,19 @@ export function useFloorsPageEvent(
         });
     }, 100);
 
-    function onTableFound(tables: BaseTable[]): void {
+    function onTableFound(foundReservations: Reservation[]): void {
         onAutocompleteClear();
-        for (const table of tables) {
-            table.startAnimation();
+        for (const reservation of foundReservations) {
+            const floor = floorInstances.value.find(({ id }) => reservation.floorId === id);
+            const table = floor?.getTableByLabel(reservation.tableLabel);
+            table?.startAnimation();
         }
-    }
-
-    function updateFloorInstanceData(floorId: string, json: Record<string, unknown>): void {
-        const maybeFloorViewer = Array.from(floorInstances.value).find(({ id }) => id === floorId);
-        if (!maybeFloorViewer) {
-            return;
-        }
-        maybeFloorViewer.renderData(json);
-
-        checkReservationsForTimeAndMarkTableIfNeeded();
     }
 
     async function initFloorInstancesData(): Promise<void> {
         await nextTick();
         instantiateFloors();
-        setActiveFloor([...floorInstances.value][0]);
+        setActiveFloor(floorInstances.value[0] as FloorViewer);
         checkReservationsForTimeAndMarkTableIfNeeded();
     }
 
@@ -95,7 +86,7 @@ export function useFloorsPageEvent(
         old: EventFloorDoc[],
     ): Promise<void> {
         if (!eventFloors.value) return;
-        if ((old.length === 0 && newVal.length > 0) || floorInstances.value.size === 0) {
+        if ((old.length === 0 && newVal.length > 0) || floorInstances.value.length === 0) {
             await initFloorInstancesData();
         }
     }
@@ -120,7 +111,7 @@ export function useFloorsPageEvent(
             containerWidth: pageRef.value.clientWidth,
         });
         floorViewer.on("elementClicked", tableClickHandler);
-        floorInstances.value.add(floorViewer);
+        floorInstances.value.push(floorViewer);
     }
 
     function isActiveFloor(floorId: string): boolean {
@@ -138,7 +129,7 @@ export function useFloorsPageEvent(
             clearInterval(activeTablesAnimationInterval.value);
         }
         floorInstances.value.forEach((floor) => {
-            const tables = getTables(floor);
+            const tables = getTables(floor as FloorViewer);
             tables.forEach((table) => table.stopAnimation());
         });
     }
@@ -150,7 +141,6 @@ export function useFloorsPageEvent(
         isActiveFloor,
         setActiveFloor,
         resizeFloor,
-        allReservedTables,
         hasMultipleFloorPlans,
         activeFloor,
         floorInstances,

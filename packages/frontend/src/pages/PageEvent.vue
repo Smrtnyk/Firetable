@@ -10,16 +10,17 @@ import { useRouter } from "vue-router";
 import { computed, onMounted, ref } from "vue";
 import { useEventsStore } from "src/stores/events-store";
 import { useFirestoreCollection, useFirestoreDocument } from "src/composables/useFirestore";
-import { EventDoc, FloorDoc, GuestData } from "@firetable/types";
+import { EventDoc, FloorDoc, GuestData, ReservationDoc } from "@firetable/types";
 import { useFloorsPageEvent } from "src/composables/useFloorsPageEvent";
 import {
     EventOwner,
     getEventFloorsPath,
     getEventGuestListPath,
     getEventPath,
+    getReservationsPath,
 } from "@firetable/backend";
 import { isMobile, isTablet } from "src/global-reactives/screen-detection";
-import { noop } from "chart.js/helpers";
+import { NOOP } from "@firetable/utils";
 
 interface Props {
     organisationId: string;
@@ -40,11 +41,15 @@ const eventsStore = useEventsStore();
 const router = useRouter();
 const q = useQuasar();
 const pageRef = ref<HTMLDivElement>();
+
 const guestList = useFirestoreCollection<GuestData>(getEventGuestListPath(eventOwner));
 const { data: event, promise: eventDataPromise } = useFirestoreDocument<EventDoc>(
     getEventPath(eventOwner),
 );
 const { data: eventFloors } = useFirestoreCollection<FloorDoc>(getEventFloorsPath(eventOwner));
+const { data: reservations, promise: reservationsDataPromise } =
+    useFirestoreCollection<ReservationDoc>(getReservationsPath(eventOwner));
+
 const {
     onTableFound,
     setActiveFloor,
@@ -52,11 +57,10 @@ const {
     mapFloorToCanvas,
     onAutocompleteClear,
     resizeFloor,
-    allReservedTables,
     hasMultipleFloorPlans,
     activeFloor,
     floorInstances,
-} = useFloorsPageEvent(eventFloors, pageRef, eventOwner, event);
+} = useFloorsPageEvent(eventFloors, reservations, pageRef, eventOwner, event);
 
 const buttonSize = computed(() => {
     return isMobile.value ? "sm" : "md";
@@ -83,11 +87,12 @@ async function init(): Promise<void> {
     }
     Loading.show();
     await eventDataPromise.value;
+    await reservationsDataPromise.value;
     Loading.hide();
 }
 
 function toggleFullScreen(): void {
-    q.fullscreen.toggle(pageRef.value).then(resizeFloor).catch(noop);
+    q.fullscreen.toggle(pageRef.value).then(resizeFloor).catch(NOOP);
 }
 
 onMounted(init);
@@ -117,8 +122,9 @@ onMounted(init);
             </q-fab>
 
             <FTAutocomplete
+                :floors="eventFloors"
                 :show-floor-name-in-option="hasMultipleFloorPlans"
-                :all-reserved-tables="allReservedTables"
+                :all-reserved-tables="reservations"
                 @found="onTableFound"
                 @clear="onAutocompleteClear"
                 class="col q-mb-sm"

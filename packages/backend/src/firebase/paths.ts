@@ -17,6 +17,10 @@ export function getEventPath(eventOwner: EventOwner): string {
     return [getEventsPath(eventOwner), eventOwner.id].join("/");
 }
 
+export function getReservationsPath(eventOwner: EventOwner): string {
+    return [getEventPath(eventOwner), Collection.RESERVATIONS].join("/");
+}
+
 export function getEventFloorsPath(eventOwner: EventOwner): string {
     return [getEventPath(eventOwner), Collection.FLOORS].join("/");
 }

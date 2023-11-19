@@ -2,7 +2,6 @@ import { expect, it, describe, beforeEach } from "vitest";
 import { FloorEditor } from "./FloorEditor";
 import {
     extractAllTablesLabels,
-    getFreeTables,
     getTables,
     getTablesFromFloorDoc,
     hasFloorTables,
@@ -67,47 +66,6 @@ describe("Table Management Functions", () => {
                 label: "1",
             });
             expect(getTables(floor).length).toEqual(2);
-        });
-    });
-
-    describe("getFreeTables function", () => {
-        it("should return an empty array when there are no free tables on the floor", () => {
-            const reservedTable = new RectTable({
-                rectOptions: {},
-                groupOptions: {
-                    label: "1",
-                },
-                textOptions: {
-                    label: "1",
-                },
-            });
-            reservedTable.setReservation({
-                guestName: "foo",
-                confirmed: false,
-                numberOfGuests: 1,
-                consumption: 1,
-                time: "12:00",
-                reservedBy: {
-                    name: "foo",
-                    email: "bar",
-                },
-            });
-            floor.canvas.add(reservedTable);
-            expect(getFreeTables(floor)).toEqual([]);
-        });
-
-        it("should return an array of free tables on the floor", () => {
-            const freeTable = new RectTable({
-                rectOptions: {},
-                groupOptions: {
-                    label: "1",
-                },
-                textOptions: {
-                    label: "1",
-                },
-            });
-            floor.canvas.add(freeTable);
-            expect(getFreeTables(floor)).toEqual([freeTable]);
         });
     });
 

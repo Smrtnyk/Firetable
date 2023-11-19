@@ -1,6 +1,6 @@
 import { fabric } from "fabric";
 import { CANVAS_BG_COLOR } from "./constants.js";
-import { FloorCreationOptions } from "./types.js";
+import { BaseTable, FloorCreationOptions } from "./types.js";
 import { FloorDoc } from "@firetable/types";
 import { RoundTable } from "./elements/RoundTable";
 import { RectTable } from "./elements/RectTable";
@@ -9,6 +9,8 @@ import { FloorZoomManager } from "./FloorZoomManager";
 import { EventManager } from "./event-manager/EventManager";
 import { calculateCanvasScale } from "./utils";
 import { EventEmitterListener } from "./event-emitter/EventEmitter";
+import { isTable } from "./type-guards";
+import { getReservedTables } from "./filters";
 
 Object.assign(fabric, { RectTable, RoundTable });
 
@@ -52,8 +54,6 @@ export abstract class Floor {
             skipOffscreen: true,
             imageSmoothingEnabled: false,
         });
-        // @ts-expect-error -- setting this intentionally here, so we have it available if needed
-        this.canvas.floor = this;
         this.setScaling();
         this.renderData(this.floorDoc.json);
 
@@ -94,6 +94,22 @@ export abstract class Floor {
             },
             this.elementReviver,
         );
+    }
+
+    getTableByLabel(tableLabel: string): BaseTable | undefined {
+        return this.canvas._objects.find((object): object is BaseTable => {
+            if (!isTable(object)) {
+                return false;
+            }
+            return object.label === tableLabel;
+        });
+    }
+
+    clearAllReservations(): void {
+        getReservedTables(this).forEach((table) => {
+            table.setReservation(void 0);
+        });
+        this.canvas.requestRenderAll();
     }
 
     resize(pageContainerWidth: number): void {

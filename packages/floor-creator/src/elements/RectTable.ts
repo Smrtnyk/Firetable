@@ -1,7 +1,7 @@
 import { fabric } from "fabric";
 import { FloorElementTypes } from "../types.js";
 import { determineTableColor } from "../utils.js";
-import { Reservation } from "@firetable/types";
+import { ReservationDoc } from "@firetable/types";
 import {
     FONT_SIZE,
     TABLE_TEXT_FILL_COLOR,
@@ -15,7 +15,6 @@ import { SmoothBlinkAnimation } from "./animation/SmoothBlinkAnimation.js";
 
 interface RectTableElementOptions {
     groupOptions: {
-        reservation?: Reservation;
         baseFill?: string;
         label: string;
     } & IGroupOptions;
@@ -27,7 +26,7 @@ interface RectTableElementOptions {
 
 export class RectTable extends fabric.Group {
     type = FloorElementTypes.RECT_TABLE;
-    reservation: Reservation | null = null;
+    reservation: ReservationDoc | undefined;
     label: string;
     baseFill: string;
     private readonly initialStrokeWidth: number;
@@ -39,10 +38,9 @@ export class RectTable extends fabric.Group {
 
     constructor(options: RectTableElementOptions) {
         const baseFillComputed = (options.groupOptions.baseFill as string) || "#444";
-        const fill = determineTableColor(options.groupOptions.reservation, baseFillComputed);
         const tableRect = new fabric.Rect({
             ...options.rectOptions,
-            fill,
+            fill: baseFillComputed,
             stroke: "black",
             strokeWidth: 0.5,
         });
@@ -66,9 +64,6 @@ export class RectTable extends fabric.Group {
         this.initialHeight = tableRect.height!;
         this.label = options.groupOptions.label;
         this.baseFill = baseFillComputed;
-        if (options.groupOptions.reservation) {
-            this.reservation = options.groupOptions.reservation;
-        }
 
         this.initialStrokeWidth = tableRect.strokeWidth || 2;
 
@@ -175,8 +170,10 @@ export class RectTable extends fabric.Group {
         this.canvas?.requestRenderAll();
     }
 
-    setReservation(reservation: Reservation | null): void {
+    setReservation(reservation: ReservationDoc | undefined): void {
         this.reservation = reservation;
+        const fill = determineTableColor(reservation, this.baseFill);
+        this.setFill(fill);
     }
 
     toObject(): Record<string, unknown> {
@@ -185,7 +182,6 @@ export class RectTable extends fabric.Group {
             opacity: 1,
             baseFill: this.baseFill,
             label: this.label,
-            reservation: this.reservation,
         };
     }
 

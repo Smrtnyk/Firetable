@@ -31,6 +31,14 @@ export function guestListCollection(owner: EventOwner): CollectionReference {
     return collection(eventsCollection(owner), `${owner.id}/${Collection.GUEST_LIST}`);
 }
 
+export function reservationsCollection(owner: EventOwner): CollectionReference {
+    return collection(eventDoc(owner), Collection.RESERVATIONS);
+}
+
+export function reservationDoc(owner: EventOwner, reservationId: string): DocumentReference {
+    return doc(reservationsCollection(owner), reservationId);
+}
+
 export function usersCollection(organisationId: string): CollectionReference {
     return getCollection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`);
 }

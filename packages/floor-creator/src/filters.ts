@@ -1,7 +1,7 @@
 import { Floor } from "./Floor.js";
 import { BaseTable } from "./types.js";
 import { FloorDoc } from "@firetable/types";
-import { not, propIsTruthy, takeProp } from "@firetable/utils";
+import { propIsTruthy, takeProp } from "@firetable/utils";
 import { isTable } from "./type-guards";
 
 export function hasFloorTables(floor: Floor): boolean {
@@ -20,10 +20,6 @@ export function getTables(floor: Floor): BaseTable[] {
         }
     });
     return tables;
-}
-
-export function getFreeTables(floor: Floor): BaseTable[] {
-    return getTables(floor).filter(not(propIsTruthy("reservation")));
 }
 
 export function getReservedTables(floor: Floor): BaseTable[] {

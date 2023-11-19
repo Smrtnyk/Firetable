@@ -45,7 +45,14 @@ export type GuestData = CreateGuestPayload & {
     id: string;
 };
 
+export type ReservationDoc = Reservation & {
+    id: string;
+    _doc: QueryDocumentSnapshot<Reservation>;
+};
+
 export interface Reservation {
+    floorId: string;
+    tableLabel: string;
     confirmed: boolean;
     guestContact?: string;
     guestName: string;
@@ -53,6 +60,6 @@ export interface Reservation {
     reservationNote?: string;
     consumption: number;
     time: string;
-    reservedBy: Pick<User, "name" | "email">;
+    reservedBy: Pick<User, "name" | "email" | "id">;
     creator?: Pick<User, "name" | "email" | "id">;
 }

@@ -5,6 +5,8 @@ import {
     eventFloorDoc,
     eventDoc,
     EventOwner,
+    reservationsCollection,
+    reservationDoc,
 } from "./db.js";
 import { initializeFirebase } from "./base.js";
 import { httpsCallable, HttpsCallableResult } from "firebase/functions";
@@ -21,7 +23,13 @@ import {
     where,
     DocumentReference,
 } from "firebase/firestore";
-import { CreateEventPayload, EventDoc, GuestData } from "@firetable/types";
+import {
+    CreateEventPayload,
+    EventDoc,
+    GuestData,
+    Reservation,
+    ReservationDoc,
+} from "@firetable/types";
 import { Floor } from "@firetable/floor-creator";
 
 export async function getEvents(
@@ -79,6 +87,26 @@ export function createNewEvent(
         functions,
         "createEvent",
     )(eventPayload);
+}
+
+export function addReservation(
+    owner: EventOwner,
+    reservation: Reservation,
+): Promise<DocumentReference> {
+    return addDoc(reservationsCollection(owner), reservation);
+}
+
+export function deleteReservation(owner: EventOwner, reservation: ReservationDoc): Promise<void> {
+    return deleteDoc(reservationDoc(owner, reservation.id));
+}
+
+export function updateReservationDoc(
+    owner: EventOwner,
+    newReservationData: ReservationDoc,
+): Promise<void> {
+    return updateDoc(reservationDoc(owner, newReservationData.id), {
+        ...newReservationData,
+    });
 }
 
 export function updateEventFloorData(owner: EventOwner, floor: Floor): Promise<void> {
