@@ -91,18 +91,18 @@ function generateStackedChartData(reservations: BaseTable[]): {
 } {
     const data = reservations.reduce(reservationsReducer, {});
     const labels: string[] = [];
-    const reservationCounts: number[] = [];
     const confirmedCounts: number[] = [];
+    const unconfirmedCounts: number[] = [];
 
     Object.values(data).forEach((entry) => {
         labels.push(entry.name);
-        reservationCounts.push(entry.reservations);
         confirmedCounts.push(entry.confirmed);
+        unconfirmedCounts.push(entry.reservations - entry.confirmed); // Calculate unconfirmed
     });
 
-    const reservationDataset = {
-        label: "Reservations",
-        data: reservationCounts,
+    const unconfirmedDataset = {
+        label: "Unconfirmed",
+        data: unconfirmedCounts,
         backgroundColor: "rgba(0, 123, 255, 0.5)",
         borderColor: "rgba(0, 123, 255, 1)",
         borderWidth: 1,
@@ -120,7 +120,7 @@ function generateStackedChartData(reservations: BaseTable[]): {
         stack: "bar-stacked",
     };
 
-    return { labels, datasets: [reservationDataset, confirmedDataset] };
+    return { labels, datasets: [unconfirmedDataset, confirmedDataset] };
 }
 
 function destroyChartIfExists(): void {
