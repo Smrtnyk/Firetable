@@ -7,7 +7,7 @@ import FTDialog from "src/components/FTDialog.vue";
 import { Loading, useQuasar } from "quasar";
 
 import { useRouter } from "vue-router";
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useEventsStore } from "src/stores/events-store";
 import { useFirestoreCollection, useFirestoreDocument } from "src/composables/useFirestore";
 import { EventDoc, FloorDoc, GuestData } from "@firetable/types";
@@ -19,10 +19,6 @@ import {
     getEventPath,
 } from "@firetable/backend";
 import { isMobile, isTablet } from "src/global-reactives/screen-detection";
-
-interface State {
-    showMapsExpanded: boolean;
-}
 
 interface Props {
     organisationId: string;
@@ -38,9 +34,7 @@ const eventOwner: EventOwner = {
     id: props.eventId,
 };
 
-const state = reactive<State>({
-    showMapsExpanded: false,
-});
+const showMapsExpanded = ref(false);
 const eventsStore = useEventsStore();
 const router = useRouter();
 const q = useQuasar();
@@ -102,7 +96,7 @@ onMounted(init);
         <div class="row items-center q-mb-sm q-gutter-sm">
             <q-fab
                 v-if="hasMultipleFloorPlans"
-                :model-value="state.showMapsExpanded"
+                :model-value="showMapsExpanded"
                 :label="!isMobile && activeFloor ? activeFloor.name : ''"
                 padding="xs"
                 vertical-actions-align="left"
