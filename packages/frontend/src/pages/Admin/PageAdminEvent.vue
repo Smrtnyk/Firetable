@@ -18,7 +18,7 @@ import { EventOwner, updateEventFloorData } from "@firetable/backend";
 import { withLoading } from "src/helpers/ui-helpers";
 import { propIsTruthy } from "@firetable/utils";
 import useAdminEvent from "src/composables/useAdminEvent";
-import { isMobile } from "src/global-reactives/screen-detection";
+import { buttonSize, isMobile } from "src/global-reactives/screen-detection";
 import { truncateText } from "src/helpers/string-utils";
 
 interface Props {
@@ -147,6 +147,7 @@ onMounted(init);
             </template>
             <template #right>
                 <q-btn
+                    :size="buttonSize"
                     rounded
                     :to="{
                         name: 'event',
