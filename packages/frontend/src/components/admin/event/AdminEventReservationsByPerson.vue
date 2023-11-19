@@ -88,7 +88,7 @@ function reservationsReducer(acc: Res, reservation: ReservationDoc): Res {
     return acc;
 }
 
-function generateStackedChartData(reservations: BaseTable[]): {
+function generateStackedChartData(reservations: ReservationDoc[]): {
     labels: string[];
     datasets: any[];
 } {
