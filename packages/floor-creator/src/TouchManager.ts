@@ -36,6 +36,7 @@ export class TouchManager {
 
     onGestureEnd = (): void => {
         setTimeout(() => {
+            this.floor.enableObjectInteraction();
             this.isInteracting = false;
         }, 100);
     };
@@ -68,6 +69,7 @@ export class TouchManager {
     }
 
     private onPinch = throttle((ev: HammerInput) => {
+        this.floor.disableObjectInteraction();
         this.isInteracting = true;
         const scale = ev.scale;
         // Adjust the scale based on a dampening factor to control zoom sensitivity
@@ -77,6 +79,7 @@ export class TouchManager {
     }, 100);
 
     onPanMove = (e: HammerInput): void => {
+        this.floor.disableObjectInteraction();
         this.isInteracting = true;
         // prevent panning if ctrl is pressed
         if (e.srcEvent.ctrlKey) {
