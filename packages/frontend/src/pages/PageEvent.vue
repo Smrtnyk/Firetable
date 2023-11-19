@@ -20,6 +20,7 @@ import {
     getReservationsPath,
 } from "@firetable/backend";
 import { isMobile, isTablet } from "src/global-reactives/screen-detection";
+import { showErrorMessage } from "src/helpers/ui-helpers";
 import { NOOP } from "@firetable/utils";
 
 interface Props {
@@ -47,8 +48,11 @@ const { data: event, promise: eventDataPromise } = useFirestoreDocument<EventDoc
     getEventPath(eventOwner),
 );
 const { data: eventFloors } = useFirestoreCollection<FloorDoc>(getEventFloorsPath(eventOwner));
-const { data: reservations, promise: reservationsDataPromise } =
-    useFirestoreCollection<ReservationDoc>(getReservationsPath(eventOwner));
+const {
+    data: reservations,
+    promise: reservationsDataPromise,
+    error: reservationsDataError,
+} = useFirestoreCollection<ReservationDoc>(getReservationsPath(eventOwner));
 
 const {
     onTableFound,
@@ -86,9 +90,13 @@ async function init(): Promise<void> {
         await router.replace("/");
     }
     Loading.show();
-    await eventDataPromise.value;
-    await reservationsDataPromise.value;
+    await Promise.all([eventDataPromise.value, reservationsDataPromise.value]);
     Loading.hide();
+
+    if (reservationsDataError.value) {
+        showErrorMessage(reservationsDataError);
+        await router.replace("/");
+    }
 }
 
 function toggleFullScreen(): void {
