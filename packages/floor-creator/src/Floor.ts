@@ -58,6 +58,7 @@ export abstract class Floor {
         this.renderData(this.floorDoc.json);
 
         this.zoomManager = new FloorZoomManager(
+            this,
             this.canvas,
             this.canvas.getZoom(),
             this.canvas.viewportTransform?.slice() || [],

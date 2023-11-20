@@ -19,11 +19,11 @@ export abstract class EventManager {
             return;
         }
 
-        const delta = opt.e.deltaY;
-
-        if (delta > 0 && this.floor.zoomManager.canZoomIn()) {
+        if (opt.e.deltaY > 0) {
             this.floor.zoomManager.zoomIn(new fabric.Point(opt.e.offsetX, opt.e.offsetY));
-        } else if (delta < 0 && this.floor.zoomManager.canZoomOut()) {
+        }
+
+        if (opt.e.deltaY < 0) {
             this.floor.zoomManager.zoomOut(new fabric.Point(opt.e.offsetX, opt.e.offsetY));
         }
 

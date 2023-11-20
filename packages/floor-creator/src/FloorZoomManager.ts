@@ -1,5 +1,6 @@
 import { fabric } from "fabric";
 import { DEFAULT_ZOOM, ZOOM_INCREMENT } from "./constants.js";
+import type { Floor } from "./Floor";
 
 export class FloorZoomManager {
     private minZoom: number;
@@ -8,6 +9,7 @@ export class FloorZoomManager {
     isZooming = false;
 
     constructor(
+        private floor: Floor,
         private canvas: fabric.Canvas,
         private initialScale: number,
         private initialViewportTransform: number[],
@@ -35,31 +37,34 @@ export class FloorZoomManager {
     }
 
     adjustZoom(scaleFactor: number, point: fabric.Point): void {
-        const newZoom = this.canvas.getZoom() * scaleFactor;
-        if (newZoom <= this.maxZoom && newZoom >= this.minZoom) {
-            this.isZooming = true;
-            this.canvas.zoomToPoint(point, newZoom);
-            this.canvas.requestRenderAll();
-            this.isZooming = false;
-        } else if (newZoom < this.minZoom) {
-            this.isZooming = true;
-            this.resetZoom();
-            this.isZooming = false;
+        let newZoom = this.canvas.getZoom() * scaleFactor;
+        if (newZoom > this.maxZoom) {
+            newZoom = this.maxZoom;
         }
-    }
-
-    canZoomIn(): boolean {
-        return this.canvas.getZoom() < this.maxZoom;
-    }
-
-    canZoomOut(): boolean {
-        return this.canvas.getZoom() > this.minZoom;
-    }
-
-    private resetZoom(): void {
-        this.canvas.setViewportTransform([...this.initialViewportTransform]);
-        this.canvas.setZoom(this.initialScale);
+        if (newZoom < this.minZoom) {
+            newZoom = this.minZoom;
+        }
+        this.isZooming = true;
+        this.canvas.zoomToPoint(point, newZoom);
         this.canvas.requestRenderAll();
+        const canvas = this.canvas;
+        const vpt = this.canvas.viewportTransform!;
+        if (newZoom < 400 / 1000) {
+            vpt[4] = 200 - (1000 * newZoom) / 2;
+            vpt[5] = 200 - (1000 * newZoom) / 2;
+        } else {
+            if (vpt[4] >= 0) {
+                vpt[4] = 0;
+            } else if (vpt[4] < canvas.getWidth() - this.floor.width * newZoom) {
+                vpt[4] = canvas.getWidth() - this.floor.width * newZoom;
+            }
+            if (vpt[5] >= 0) {
+                vpt[5] = 0;
+            } else if (vpt[5] < canvas.getHeight() - this.floor.height * newZoom) {
+                vpt[5] = canvas.getHeight() - this.floor.height * newZoom;
+            }
+        }
+        this.isZooming = false;
     }
 
     destroy(): void {
