@@ -12,6 +12,7 @@ export class Stage extends fabric.Group {
             fill: "#222",
             stroke: "#111",
             strokeWidth: 1,
+            objectCaching: true,
         });
 
         const decor = new fabric.Rect({
@@ -20,6 +21,7 @@ export class Stage extends fabric.Group {
             width: 80,
             height: 20,
             fill: "#6247aa",
+            objectCaching: true,
         });
 
         const stageLabel = new fabric.Text("STAGE", {
@@ -31,6 +33,7 @@ export class Stage extends fabric.Group {
             fontWeight: "bold",
             originX: "center",
             originY: "center",
+            objectCaching: true,
         });
 
         // LEDs for the stage front
@@ -42,13 +45,17 @@ export class Stage extends fabric.Group {
                 top: 2,
                 radius: 2,
                 fill: "#3498DB",
+                objectCaching: true,
             });
         });
 
         super([stageBody, decor, stageLabel, ...ledsFront], {
             left,
             top,
+            objectCaching: true,
         });
+
+        this.objectCaching = true;
 
         // Ensure this is always in the background
         this.moveTo(-1);

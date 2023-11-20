@@ -18,10 +18,12 @@ export class Wall extends fabric.Group {
             height: 100,
             fill: "#444",
             ...wallRectOpts,
+            objectCaching: true,
         });
 
         super([wallRect], groupOpts);
         this.wallRect = wallRect;
+        this.objectCaching = true;
     }
 
     getBaseFill(): string {
@@ -36,13 +38,13 @@ export class Wall extends fabric.Group {
     toObject(): void {
         return {
             ...super.toObject(),
-            objectCaching: false,
+            objectCaching: true,
         };
     }
 
     static fromObject(object: any, callback: (obj: Wall) => void): void {
         const wallRect = object.objects[0];
-        const instance = new Wall(object, wallRect);
+        const instance = new Wall({ ...object, objectCaching: true }, wallRect);
         callback(instance);
     }
 }

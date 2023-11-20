@@ -49,6 +49,8 @@ export abstract class Floor {
             height: this.height,
             backgroundColor: CANVAS_BG_COLOR,
             selection: false,
+            skipOffscreen: true,
+            imageSmoothingEnabled: false,
         });
         // @ts-expect-error -- setting this intentionally here, so we have it available if needed
         this.canvas.floor = this;
