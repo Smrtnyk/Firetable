@@ -134,7 +134,7 @@ export function useReservations(
                 component: FTDialog,
                 componentProps: {
                     component: EventCreateReservation,
-                    title: `${t("EventShowReservation.title")} ${label}`,
+                    title: `${t("EventCreateReservation.title")} ${label}`,
                     maximized: false,
                     componentPropsObject: {
                         users: filterUsersPerProperty(users.value, eventOwner.propertyId),
