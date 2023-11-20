@@ -19,6 +19,7 @@ import {
     getEventPath,
 } from "@firetable/backend";
 import { isMobile, isTablet } from "src/global-reactives/screen-detection";
+import { noop } from "chart.js/helpers";
 
 interface Props {
     organisationId: string;
@@ -50,6 +51,7 @@ const {
     isActiveFloor,
     mapFloorToCanvas,
     onAutocompleteClear,
+    resizeFloor,
     allReservedTables,
     hasMultipleFloorPlans,
     activeFloor,
@@ -85,7 +87,7 @@ async function init(): Promise<void> {
 }
 
 function toggleFullScreen(): void {
-    q.fullscreen.toggle(pageRef.value);
+    q.fullscreen.toggle(pageRef.value).then(resizeFloor).catch(noop);
 }
 
 onMounted(init);

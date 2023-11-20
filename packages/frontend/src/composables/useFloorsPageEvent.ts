@@ -7,6 +7,8 @@ import { useUsers } from "src/composables/useUsers";
 import { useReservations } from "src/composables/useReservations";
 import { debounce } from "quasar";
 
+const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+
 export function useFloorsPageEvent(
     eventFloors: Ref<EventFloorDoc[]>,
     pageRef: Ref<HTMLDivElement | undefined>,
@@ -30,6 +32,9 @@ export function useFloorsPageEvent(
     });
 
     onMounted(() => {
+        if (isTouchDevice) {
+            return;
+        }
         window.addEventListener("resize", resizeFloor);
     });
 
@@ -149,6 +154,7 @@ export function useFloorsPageEvent(
         mapFloorToCanvas,
         isActiveFloor,
         setActiveFloor,
+        resizeFloor,
         allReservedTables,
         hasMultipleFloorPlans,
         activeFloor,
