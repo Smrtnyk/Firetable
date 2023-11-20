@@ -63,6 +63,7 @@ export default {
         contactLabel: "Contact",
         noteLabel: "Note",
         reservedByLabel: "Reserved by",
+        createdByLabel: "Creator",
         groupedWithLabel: "Grouped with",
         guestArrivedLabel: "Guest arrived?",
         deleteReservationLabel: "Delete",

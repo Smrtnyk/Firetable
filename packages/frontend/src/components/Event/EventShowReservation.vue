@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { Reservation } from "@firetable/types";
+import { ADMIN, Reservation } from "@firetable/types";
 import { useAuthStore } from "src/stores/auth-store";
 
 interface Props {
@@ -18,10 +18,18 @@ const emit = defineEmits<{
 }>();
 const { t } = useI18n();
 const checked = ref<boolean>(props.reservation.confirmed);
+const canSeeCreator = computed(() => {
+    return authStore.user?.role === ADMIN;
+});
 function reservedByText(reservedBy: Reservation["reservedBy"]): string {
     const { name, email } = reservedBy;
     const isSocial = email.startsWith("social");
     return isSocial ? name : `${name} - ${email}`;
+}
+
+function createdByText(creator: NonNullable<Reservation["creator"]>): string {
+    const { name, email } = creator;
+    return `${name} - ${email}`;
 }
 
 function onReservationConfirm(): void {
@@ -64,8 +72,14 @@ function onReservationConfirm(): void {
             </template>
 
             <div class="col-6">{{ t("EventShowReservation.reservedByLabel") }}</div>
-
             <div class="col-6 font-black">{{ reservedByText(props.reservation.reservedBy) }}</div>
+
+            <template v-if="props.reservation.creator && canSeeCreator">
+                <div class="col-6">{{ t("EventShowReservation.createdByLabel") }}</div>
+                <div class="col-6 font-black">
+                    {{ createdByText(props.reservation.creator) }}
+                </div>
+            </template>
         </div>
 
         <q-separator class="q-my-md" />
