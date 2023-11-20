@@ -1,7 +1,7 @@
 <template>
     <div>
         <canvas v-if="reservedTables.length > 0" ref="chartRef" class="chart-container"></canvas>
-        <h5 v-else class="text-subtitle2">No reservations to show</h5>
+        <FTCenteredText v-else>No reservations to show</FTCenteredText>
     </div>
 </template>
 
@@ -22,6 +22,7 @@ import { BaseTable } from "@firetable/floor-creator";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { propIsTruthy } from "@firetable/utils";
 import { isMobile } from "src/global-reactives/screen-detection";
+import FTCenteredText from "src/components/FTCenteredText.vue";
 
 interface Props {
     reservations: BaseTable[];
