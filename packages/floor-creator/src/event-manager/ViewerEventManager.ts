@@ -35,18 +35,18 @@ export class ViewerEventManager extends EventManager {
         }
     };
 
-    onTableTouchEnd = (options: fabric.IEvent): void => {
+    onTableTouchEnd = (options: fabric.IEvent<MouseEvent>): void => {
         if (this.isPanning && this.startElement) {
-            const pointer = this.floor.canvas.getPointer(options.e);
-            const endElement = this.floor.canvas.findTarget(
-                new MouseEvent("mousemove", {
-                    clientX: pointer.x,
-                    clientY: pointer.y,
-                }),
-                false,
-            );
+            const { x, y } = this.floor.canvas.getPointer(options.e, true);
 
-            if (isTable(endElement) && endElement !== this.startElement) {
+            let endElement: BaseTable | undefined;
+            this.floor.canvas.forEachObject((obj) => {
+                if (obj.containsPoint(new fabric.Point(x, y)) && isTable(obj)) {
+                    endElement = obj;
+                }
+            });
+
+            if (endElement && endElement !== this.startElement) {
                 this.floor.emit("tableToTable", this.floor, this.startElement, endElement);
                 this.dragOccurred = true;
             }
