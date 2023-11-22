@@ -37,7 +37,7 @@
         "register-service-worker": "^1.7.2",
         "ts-pattern": "5.0.5",
         "vue": "3.4.0-alpha.1",
-        "vue-i18n": "9.7.0",
+        "vue-i18n": "9.7.1",
         "vue-router": "4.2.5",
         "vuefire": "3.1.18",
         "workbox-build": "^7.0.0",
