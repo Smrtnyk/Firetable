@@ -13,7 +13,11 @@ import { logoutUser } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useFirestoreDocument } from "src/composables/useFirestore";
 import { User as FBUser } from "firebase/auth";
-import { initAdminProperties, initNonAdminProperties } from "src/stores/usePropertiesStore";
+import {
+    initAdminProperties,
+    initNonAdminProperties,
+    initOrganisations,
+} from "src/stores/usePropertiesStore";
 import { Loading } from "quasar";
 
 interface AuthState {
@@ -100,6 +104,7 @@ export const useAuthStore = defineStore("auth", {
 
                 if (role === ADMIN) {
                     this.assignAdmin(authUser);
+                    await initOrganisations();
                     await initAdminProperties();
                 } else {
                     await Promise.all([

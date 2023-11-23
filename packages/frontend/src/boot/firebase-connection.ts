@@ -56,12 +56,12 @@ function routerBeforeEach(router: Router, store: ReturnType<typeof useAuthStore>
 
             if (allowedRoles && !allowedRoles.includes(role)) {
                 return {
-                    name: "properties",
+                    name: "home",
                 };
             }
 
             if (to.path === "/auth") {
-                return { name: "properties" };
+                return { name: "home" };
             }
 
             return true;

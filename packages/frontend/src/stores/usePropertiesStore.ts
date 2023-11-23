@@ -55,21 +55,32 @@ export const usePropertiesStore = defineStore("properties", () => {
         arePropertiesLoading.value = loading;
     }
 
+    function setOrganisations(organisationsVal: OrganisationDoc[]): void {
+        organisations.value = organisationsVal;
+    }
+
     return {
         properties,
         organisations,
         arePropertiesLoading,
         setArePropertiesLoading,
         setProperties,
+        setOrganisations,
         getOrganisations,
         cleanup,
         addUnsub,
     };
 });
 
+export async function initOrganisations(): Promise<void> {
+    const propertiesStore = usePropertiesStore();
+    const organisations = await fetchOrganisationsForAdmin();
+    propertiesStore.setOrganisations(organisations);
+}
+
 export async function initAdminProperties(): Promise<void> {
     const propertiesStore = usePropertiesStore();
-    const allProperties = await fetchPropertiesForAdmin();
+    const allProperties = await fetchPropertiesForAdmin(propertiesStore.organisations);
     propertiesStore.setProperties(allProperties);
 }
 
@@ -93,7 +104,7 @@ export async function initNonAdminProperties({
     );
 
     const stopWatch = watch(
-        data,
+        () => data.value,
         (newProperties) => {
             propertiesStore.setProperties(newProperties as unknown as PropertyDoc[]);
         },

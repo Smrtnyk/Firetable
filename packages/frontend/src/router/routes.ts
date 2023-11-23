@@ -8,7 +8,23 @@ const routes: RouteRecordRaw[] = [
         children: [
             {
                 path: "/",
+                name: "home",
+                meta: { requiresAuth: true },
+                component: () => import("src/pages/PageHome.vue"),
+            },
+            {
+                path: "/organisations",
+                name: "organisations",
+                meta: {
+                    requiresAuth: true,
+                    allowedRoles: [ADMIN],
+                },
+                component: () => import("src/pages/PageOrganisations.vue"),
+            },
+            {
+                path: "/:organisationId/properties",
                 name: "properties",
+                props: true,
                 meta: { requiresAuth: true },
                 component: () => import("src/pages/PageProperties.vue"),
             },
