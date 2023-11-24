@@ -5,9 +5,10 @@ import {
     fetchPropertiesForAdmin,
     propertiesCollection,
 } from "@firetable/backend";
-import { ADMIN, OrganisationDoc, PropertyDoc, User } from "@firetable/types";
+import { OrganisationDoc, PropertyDoc, User } from "@firetable/types";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
 import { query, where } from "firebase/firestore";
+import { watch } from "vue";
 import { nextTick, ref, watch } from "vue";
 import { useAuthStore } from "src/stores/auth-store";
 import { NOOP } from "@firetable/utils";
@@ -29,19 +30,14 @@ export const usePropertiesStore = defineStore("properties", () => {
         unsubs.value.push(unsub);
     }
 
-    async function getOrganisations(): Promise<OrganisationDoc[]> {
+    async function getOrganisations(organisationId: string): Promise<OrganisationDoc[]> {
         if (organisations.value.length > 0) {
             return organisations.value;
         }
 
-        const auth = useAuthStore();
-        if (auth.user?.role === ADMIN) {
-            organisations.value = await fetchOrganisationsForAdmin();
-        } else {
-            const organisationsDoc = await fetchOrganisationById(auth.user!.organisationId);
-            if (organisationsDoc) {
-                organisations.value.push(organisationsDoc);
-            }
+        const organisationsDoc = await fetchOrganisationById(organisationId);
+        if (organisationsDoc) {
+            organisations.value = organisationsDoc;
         }
 
         return organisations.value;

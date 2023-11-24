@@ -58,6 +58,9 @@ const adminLinks = computed(() => {
                 icon: "arrow-expand",
                 route: {
                     name: "adminFloors",
+                    params: {
+                        organisationId: user.value.organisationId,
+                    },
                 },
                 text: t("AppDrawer.links.manageFloors"),
             },
@@ -68,6 +71,9 @@ const adminLinks = computed(() => {
             icon: "home",
             route: {
                 name: "adminProperties",
+                params: {
+                    organisationId: user.value.organisationId,
+                },
             },
             text: t("AppDrawer.links.manageProperties"),
         });

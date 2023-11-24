@@ -112,7 +112,11 @@ function createOrganisation(): void {
                     </q-item>
 
                     <!-- Admin Floors -->
-                    <q-item clickable class="ft-card" :to="{ name: 'adminFloors' }">
+                    <q-item
+                        clickable
+                        class="ft-card"
+                        :to="{ name: 'adminFloors', params: { organisationId: organisation.id } }"
+                    >
                         <q-item-section avatar>
                             <q-icon name="arrow-expand" />
                         </q-item-section>
@@ -121,8 +125,15 @@ function createOrganisation(): void {
                         </q-item-section>
                     </q-item>
 
-                    <!-- Admin Floors -->
-                    <q-item clickable class="ft-card" :to="{ name: 'adminProperties' }">
+                    <!-- Admin Properties -->
+                    <q-item
+                        clickable
+                        class="ft-card"
+                        :to="{
+                            name: 'adminProperties',
+                            params: { organisationId: organisation.id },
+                        }"
+                    >
                         <q-item-section avatar>
                             <q-icon name="arrow-expand" />
                         </q-item-section>

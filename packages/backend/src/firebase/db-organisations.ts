@@ -24,7 +24,6 @@ export function deleteOrganisation(organisationId: string): Promise<void> {
 }
 
 export async function fetchOrganisationsForAdmin(): Promise<OrganisationDoc[]> {
-    // If the user is an ADMIN, fetch all properties directly
     const propertiesSnapshot = await getDocs(organisationsCollection());
     return propertiesSnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }) as OrganisationDoc);
 }
@@ -32,11 +31,10 @@ export async function fetchOrganisationsForAdmin(): Promise<OrganisationDoc[]> {
 export async function fetchOrganisationById(
     organisationId: string,
 ): Promise<OrganisationDoc | null> {
-    // New logic for non-ADMIN users
     const organisationDocSnapshot = await getDoc(organisationDoc(organisationId));
 
     if (!organisationDocSnapshot.exists()) {
-        console.log("No organisation found for the given user");
+        console.log("No organisation found for the given organisation id");
         return null;
     }
 

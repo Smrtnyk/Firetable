@@ -5,35 +5,43 @@ import AddNewPropertyForm from "src/components/admin/property/AddNewPropertyForm
 
 import { Loading, useQuasar } from "quasar";
 import { showConfirm, withLoading } from "src/helpers/ui-helpers";
-import { createNewProperty, CreatePropertyPayload, deleteProperty } from "@firetable/backend";
+import {
+    createNewProperty,
+    CreatePropertyPayload,
+    deleteProperty,
+    propertiesCollection,
+} from "@firetable/backend";
 import { computed, onMounted, ref, watchEffect } from "vue";
-import { useAuthStore } from "src/stores/auth-store";
-import { ADMIN, PropertyDoc } from "@firetable/types";
+import { PropertyDoc } from "@firetable/types";
 import { useI18n } from "vue-i18n";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import { usePropertiesStore } from "src/stores/usePropertiesStore";
+import { useRoute } from "vue-router";
+import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
+import { where } from "firebase/firestore";
 
+const route = useRoute();
 const propertiesStore = usePropertiesStore();
-const authStore = useAuthStore();
 const quasar = useQuasar();
 const { t } = useI18n();
 
-const properties = computed(() => {
-    return propertiesStore.properties;
+const organisationId = computed(() => {
+    return route.params.organisationId as string;
 });
-const organisations = computed(() => propertiesStore.organisations);
+const { data: properties, pending: isPropertiesLoading } = useFirestoreCollection<PropertyDoc>(
+    createQuery(
+        propertiesCollection(organisationId.value),
+        where("organisationId", "==", organisationId.value),
+    ),
+);
 
 const organisationsIsLoading = ref(false);
 
 const canCreateProperty = computed(() => {
-    const isAdmin = authStore.user!.role === ADMIN;
-    if (isAdmin) {
-        return true;
-    }
-    if (!organisations.value[0]) {
-        return false;
-    }
-    const maxAllowedProperties = organisations.value[0].maxAllowedProperties;
+    const maxAllowedProperties =
+        propertiesStore.organisations.find((organisation) => {
+            return organisation.id === organisationId.value;
+        })?.maxAllowedProperties || 0;
     const currentNumOfProperties = properties.value.length;
     return currentNumOfProperties < maxAllowedProperties;
 });
@@ -41,7 +49,7 @@ const canCreateProperty = computed(() => {
 onMounted(async () => {
     organisationsIsLoading.value = true;
     try {
-        await propertiesStore.getOrganisations();
+        await propertiesStore.getOrganisations(organisationId.value);
     } catch (error) {
         console.error("Failed to load organizations:", error);
     } finally {
@@ -86,7 +94,7 @@ function createProperty(): void {
             maximized: false,
             component: AddNewPropertyForm,
             componentPropsObject: {
-                organisations: organisations.value,
+                organisationId: organisationId.value,
             },
             listeners: {
                 create: onPropertyCreate,
@@ -101,7 +109,7 @@ function createProperty(): void {
         <FTTitle :title="t('PageAdminProperties.properties')">
             <template #right>
                 <q-btn
-                    v-if="organisations.length > 0 && !organisationsIsLoading && canCreateProperty"
+                    v-if="properties.length > 0 && !isPropertiesLoading && canCreateProperty"
                     rounded
                     icon="plus"
                     class="button-gradient"
@@ -109,7 +117,8 @@ function createProperty(): void {
                 />
             </template>
         </FTTitle>
-        <q-list v-if="properties.length > 0 && organisations.length > 0">
+
+        <q-list v-if="properties.length > 0">
             <q-slide-item
                 v-for="property in properties"
                 :key="property.id"
@@ -128,14 +137,6 @@ function createProperty(): void {
                 </q-item>
             </q-slide-item>
         </q-list>
-        <div
-            v-if="organisations.length === 0 && !organisationsIsLoading"
-            class="row justify-center items-center q-mt-md"
-        >
-            <h6 class="q-ma-sm text-weight-bolder underline">
-                {{ t("PageAdminProperties.noPropertiesWithoutOrganisationMessage") }}
-            </h6>
-        </div>
 
         <div v-else-if="!canCreateProperty && !organisationsIsLoading">
             <h6 class="q-ma-sm text-weight-bolder underline">

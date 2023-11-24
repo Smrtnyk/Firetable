@@ -27,15 +27,13 @@ export function deleteProperty(property: PropertyDoc): Promise<void> {
 export async function fetchPropertiesForAdmin(
     organisations: OrganisationDoc[],
 ): Promise<PropertyDoc[]> {
-    let allProperties: PropertyDoc[] = [];
-
+    const allProperties: PropertyDoc[] = [];
     for (const organisationDoc of organisations) {
         const propertiesSnapshot = await getDocs(propertiesCollection(organisationDoc.id));
         const properties = propertiesSnapshot.docs.map(
             (doc) => ({ ...doc.data(), id: doc.id }) as PropertyDoc,
         );
-        allProperties = [...allProperties, ...properties];
+        allProperties.push(...properties);
     }
-
     return allProperties;
 }

@@ -90,12 +90,13 @@ const routes: RouteRecordRaw[] = [
                 component: () => import("src/pages/Admin/PageAdminUsers.vue"),
             },
             {
-                path: "/admin/floors",
+                path: "/admin/:organisationId/floors",
                 name: "adminFloors",
                 meta: {
                     requiresAuth: true,
                     allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN],
                 },
+                props: true,
                 component: () => import("src/pages/Admin/PageAdminFloors.vue"),
             },
             {
@@ -109,9 +110,13 @@ const routes: RouteRecordRaw[] = [
                 component: () => import("src/pages/Admin/PageAdminFloorEdit.vue"),
             },
             {
-                path: "/admin/properties",
+                path: "/admin/:organisationId/properties",
                 name: "adminProperties",
-                meta: { requiresAuth: true, allowedRoles: [Role.PROPERTY_OWNER, ADMIN] },
+                meta: {
+                    requiresAuth: true,
+                    allowedRoles: [Role.PROPERTY_OWNER, ADMIN],
+                },
+                props: true,
                 component: () => import("src/pages/Admin/PageAdminProperties.vue"),
             },
         ],
