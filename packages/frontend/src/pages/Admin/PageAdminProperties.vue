@@ -9,7 +9,7 @@ import {
     createNewProperty,
     CreatePropertyPayload,
     deleteProperty,
-    propertiesCollection,
+    getPropertiesPath,
 } from "@firetable/backend";
 import { computed, onMounted, ref, watchEffect } from "vue";
 import { PropertyDoc } from "@firetable/types";
@@ -17,8 +17,7 @@ import { useI18n } from "vue-i18n";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import { usePropertiesStore } from "src/stores/usePropertiesStore";
 import { useRoute } from "vue-router";
-import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
-import { where } from "firebase/firestore";
+import { useFirestoreCollection } from "src/composables/useFirestore";
 
 const route = useRoute();
 const propertiesStore = usePropertiesStore();
@@ -29,10 +28,7 @@ const organisationId = computed(() => {
     return route.params.organisationId as string;
 });
 const { data: properties, pending: isPropertiesLoading } = useFirestoreCollection<PropertyDoc>(
-    createQuery(
-        propertiesCollection(organisationId.value),
-        where("organisationId", "==", organisationId.value),
-    ),
+    getPropertiesPath(organisationId.value),
 );
 
 const organisationsIsLoading = ref(false);
