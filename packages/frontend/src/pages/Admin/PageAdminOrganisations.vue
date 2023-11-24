@@ -14,7 +14,9 @@ import {
 import { OrganisationDoc } from "@firetable/types";
 import { onMounted, ref } from "vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const quasar = useQuasar();
 const isLoading = ref(false);
 
@@ -71,24 +73,72 @@ function createOrganisation(): void {
                 <q-btn rounded icon="plus" class="button-gradient" @click="createOrganisation" />
             </template>
         </FTTitle>
-        <q-list v-if="organisations.length > 0">
-            <q-slide-item
+        <q-list bordered class="rounded-borders" v-if="organisations.length > 0">
+            <q-expansion-item
+                expand-separator
                 v-for="organisation in organisations"
                 :key="organisation.id"
-                right-color="warning"
-                @right="({ reset }) => deleteOrganisationAsync(organisation.id, reset)"
-                class="fa-card"
+                expand-icon="arrow_drop_down"
+                :label="organisation.name"
+                class="ft-card"
             >
-                <template #right>
-                    <q-icon name="trash" />
-                </template>
+                <q-list>
+                    <!-- Admin Events -->
+                    <q-item
+                        clickable
+                        class="ft-card"
+                        :to="{ name: 'adminEvents', params: { organisationId: organisation.id } }"
+                    >
+                        <q-item-section avatar>
+                            <q-icon name="calendar" />
+                        </q-item-section>
+                        <q-item-section>
+                            {{ t("AppDrawer.links.manageEvents") }}
+                        </q-item-section>
+                    </q-item>
 
-                <q-item clickable class="ft-card">
-                    <q-item-section>
-                        <q-item-label> {{ organisation.name }}</q-item-label>
-                    </q-item-section>
-                </q-item>
-            </q-slide-item>
+                    <!-- Admin Users -->
+                    <q-item clickable class="ft-card" :to="{ name: 'adminUsers' }">
+                        <q-item-section avatar>
+                            <q-icon name="users" />
+                        </q-item-section>
+                        <q-item-section>
+                            {{ t("AppDrawer.links.manageUsers") }}
+                        </q-item-section>
+                    </q-item>
+
+                    <!-- Admin Floors -->
+                    <q-item clickable class="ft-card" :to="{ name: 'adminFloors' }">
+                        <q-item-section avatar>
+                            <q-icon name="arrow-expand" />
+                        </q-item-section>
+                        <q-item-section>
+                            {{ t("AppDrawer.links.manageFloors") }}
+                        </q-item-section>
+                    </q-item>
+
+                    <!-- Admin Floors -->
+                    <q-item clickable class="ft-card" :to="{ name: 'adminProperties' }">
+                        <q-item-section avatar>
+                            <q-icon name="arrow-expand" />
+                        </q-item-section>
+                        <q-item-section>
+                            {{ t("AppDrawer.links.manageProperties") }}
+                        </q-item-section>
+                    </q-item>
+                </q-list>
+
+                <q-separator />
+
+                <q-slide-item
+                    right-color="warning"
+                    @right="({ reset }) => deleteOrganisationAsync(organisation.id, reset)"
+                >
+                    <template #right>
+                        <q-icon name="trash" />
+                    </template>
+                </q-slide-item>
+            </q-expansion-item>
         </q-list>
 
         <FTCenteredText v-if="organisations.length === 0 && !isLoading">
