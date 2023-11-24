@@ -6,14 +6,8 @@ import { showConfirm, showErrorMessage, withLoading } from "src/helpers/ui-helpe
 import { computed, onBeforeMount, watch } from "vue";
 import { Loading, useQuasar } from "quasar";
 import FTDialog from "src/components/FTDialog.vue";
-import { ADMIN, CreateUserPayload, EditUserPayload, User } from "@firetable/types";
-import {
-    createUserWithEmail,
-    deleteUser,
-    fetchOrganisationById,
-    fetchOrganisationsForAdmin,
-    updateUser,
-} from "@firetable/backend";
+import { CreateUserPayload, EditUserPayload, User } from "@firetable/types";
+import { createUserWithEmail, deleteUser, updateUser } from "@firetable/backend";
 import { usePropertiesStore } from "src/stores/usePropertiesStore";
 import { useUsers } from "src/composables/useUsers";
 import { useAuthStore } from "src/stores/auth-store";
@@ -90,10 +84,11 @@ function onCreateUserFormSubmit(newUser: CreateUserPayload): Promise<void | Prom
 }
 
 async function showCreateUserDialog(): Promise<void> {
-    const organisations =
-        authStore.user!.role === ADMIN
-            ? await fetchOrganisationsForAdmin()
-            : [await fetchOrganisationById(authStore.user!.organisationId)];
+    const [organisation] = (await propertiesStore.getOrganisations(organisationId.value)).filter(
+        (org) => {
+            return org.id === organisationId.value;
+        },
+    );
 
     const dialog = createDialog({
         component: FTDialog,
@@ -103,7 +98,7 @@ async function showCreateUserDialog(): Promise<void> {
             title: t("PageAdminUsers.createNewUserDialogTitle"),
             componentPropsObject: {
                 properties: properties.value,
-                organisations,
+                organisation,
             },
             listeners: {
                 submit: function (userPayload: CreateUserPayload) {
@@ -130,7 +125,11 @@ async function showEditUserDialog(user: User, reset: () => void): Promise<void> 
     const selectedProperties = properties.value.filter((ownProperty) => {
         return user.relatedProperties.includes(ownProperty.id);
     });
-    const organisation = await fetchOrganisationById(user.organisationId);
+    const [organisation] = (await propertiesStore.getOrganisations(organisationId.value)).filter(
+        (org) => {
+            return org.id === organisationId.value;
+        },
+    );
     const dialog = createDialog({
         component: FTDialog,
         componentProps: {
