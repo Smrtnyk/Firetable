@@ -68,7 +68,6 @@ async function submit(): Promise<void> {
             size="md"
             :label="t('AddNewPropertyForm.addPropertyButtonLabel')"
             @click="submit"
-            v-close-popup
         />
     </q-card-actions>
 </template>

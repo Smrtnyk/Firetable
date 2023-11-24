@@ -87,7 +87,7 @@ async function deletePropertyAsync(property: PropertyDoc, reset: () => void): Pr
 }
 
 function createProperty(): void {
-    quasar.dialog({
+    const dialog = quasar.dialog({
         component: FTDialog,
         componentProps: {
             title: t("PageAdminProperties.createPropertyDialogTitle"),
@@ -97,7 +97,10 @@ function createProperty(): void {
                 organisationId: organisationId.value,
             },
             listeners: {
-                create: onPropertyCreate,
+                create: (payload: CreatePropertyPayload) => {
+                    onPropertyCreate(payload);
+                    dialog.hide();
+                },
             },
         },
     });
