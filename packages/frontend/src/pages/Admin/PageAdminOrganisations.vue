@@ -98,7 +98,11 @@ function createOrganisation(): void {
                     </q-item>
 
                     <!-- Admin Users -->
-                    <q-item clickable class="ft-card" :to="{ name: 'adminUsers' }">
+                    <q-item
+                        clickable
+                        class="ft-card"
+                        :to="{ name: 'adminUsers', params: { organisationId: organisation.id } }"
+                    >
                         <q-item-section avatar>
                             <q-icon name="users" />
                         </q-item-section>

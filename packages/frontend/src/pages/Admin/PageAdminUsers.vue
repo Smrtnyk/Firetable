@@ -3,7 +3,7 @@ import UserCreateForm from "src/components/admin/User/UserCreateForm.vue";
 import UserEditForm from "src/components/admin/User/UserEditForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import { showConfirm, showErrorMessage, withLoading } from "src/helpers/ui-helpers";
-import { watch } from "vue";
+import { computed, onBeforeMount, watch } from "vue";
 import { Loading, useQuasar } from "quasar";
 import FTDialog from "src/components/FTDialog.vue";
 import { ADMIN, CreateUserPayload, EditUserPayload, User } from "@firetable/types";
@@ -21,13 +21,27 @@ import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import { storeToRefs } from "pinia";
+import { useRoute, useRouter } from "vue-router";
 
 const { t } = useI18n();
+const route = useRoute();
+const router = useRouter();
 const quasar = useQuasar();
 const authStore = useAuthStore();
 const { properties } = storeToRefs(usePropertiesStore());
-const { users, isLoading, fetchUsers } = useUsers();
+
+const organisationId = computed(() => {
+    return route.params.organisationId as string;
+});
+
+const { users, isLoading, fetchUsers } = useUsers(organisationId.value);
 const { createDialog } = useDialog();
+
+const properties = computed(() => {
+    return propertiesStore.properties.filter((property) => {
+        return property.organisationId === organisationId.value;
+    });
+});
 
 const onCreateUser = withLoading(async (newUser: CreateUserPayload) => {
     await createUserWithEmail(newUser);
@@ -46,6 +60,12 @@ const onDeleteUser = withLoading(async (user: User) => {
     }
     await deleteUser(user);
     await fetchUsers();
+});
+
+onBeforeMount(() => {
+    if (!organisationId.value) {
+        router.replace("/");
+    }
 });
 
 watch(

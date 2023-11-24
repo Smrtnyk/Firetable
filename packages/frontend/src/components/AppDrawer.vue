@@ -32,7 +32,7 @@ const adminLinks = computed(() => {
             text: t("AppDrawer.links.manageOrganisations"),
         });
     }
-    if ([Role.PROPERTY_OWNER, Role.MANAGER].includes(role)) {
+    if (role === Role.PROPERTY_OWNER || role === Role.MANAGER) {
         links.push(
             {
                 icon: "calendar",
@@ -48,6 +48,9 @@ const adminLinks = computed(() => {
                 icon: "users",
                 route: {
                     name: "adminUsers",
+                    params: {
+                        organisationId: user.value.organisationId,
+                    },
                 },
                 text: t("AppDrawer.links.manageUsers"),
             },

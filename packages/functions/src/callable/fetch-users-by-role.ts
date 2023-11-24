@@ -65,16 +65,13 @@ export async function fetchUsersByRoleFn(
 
     let users: User[] = [];
 
+    const baseQuery = db.collection(
+        `${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`,
+    );
     if (userRole === ADMIN) {
-        const organisationsSnapshot = await db.collection(Collection.ORGANISATIONS).get();
-
-        for (const orgDoc of organisationsSnapshot.docs) {
-            const usersSnapshot = await orgDoc.ref.collection(Collection.USERS).get();
-            const orgUsers = usersSnapshot.docs.map(
-                (doc) => ({ id: doc.id, ...doc.data() }) as User,
-            );
-            users = [...users, ...orgUsers];
-        }
+        const usersSnapshot = await baseQuery.get();
+        const orgUsers = usersSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as User);
+        users = [...users, ...orgUsers];
     } else {
         if (userIdsToFetch.length > MAX_USERS) {
             functions.logger.warn(`User ${uid} provided too many user IDs.`);
@@ -85,8 +82,7 @@ export async function fetchUsersByRoleFn(
         const userIdChunks = chunkArray(userIdsToFetch, 30);
 
         for (const chunk of userIdChunks) {
-            const snapshot = await db
-                .collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`)
+            const snapshot = await baseQuery
                 .where(FieldPath.documentId(), "in", chunk)
                 .limit(MAX_USERS)
                 .get();

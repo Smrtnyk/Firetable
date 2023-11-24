@@ -29,7 +29,7 @@ export function useFloorsPageEvent(
     const activeTablesAnimationInterval = ref<number | undefined>();
     const activeFloor = ref<{ id: string; name: string } | undefined>();
     const floorInstances = shallowRef<FloorViewer[]>([]);
-    const { users } = useUsers();
+    const { users } = useUsers(eventOwner.organisationId);
     const {
         tableClickHandler,
         checkReservationsForTimeAndMarkTableIfNeeded,

@@ -80,12 +80,13 @@ const routes: RouteRecordRaw[] = [
                 component: () => import("src/pages/Admin/PageAdminEvent.vue"),
             },
             {
-                path: "/admin/users",
+                path: "/admin/:organisationId/users",
                 name: "adminUsers",
                 meta: {
                     requiresAuth: true,
                     allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN],
                 },
+                props: true,
                 component: () => import("src/pages/Admin/PageAdminUsers.vue"),
             },
             {
