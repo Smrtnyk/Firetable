@@ -1,6 +1,7 @@
 <template>
     <div class="FTAutocomplete">
         <q-select
+            ref="selectEl"
             fill-input
             hide-selected
             use-input
@@ -31,9 +32,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { BaseTable } from "@firetable/floor-creator";
+import { QSelect } from "quasar";
 
 interface Props {
     allReservedTables: BaseTable[];
@@ -44,8 +46,15 @@ const props = defineProps<Props>();
 const emit = defineEmits(["found", "clear"]);
 const { t } = useI18n();
 
+const selectEl = ref<undefined | QSelect>();
 const options = ref(getNamesFromTables(props.allReservedTables));
 const searchTerm = ref("");
+
+function removeFocus(): void {
+    nextTick(() => {
+        selectEl.value?.blur();
+    });
+}
 
 function getNamesFromTables(tables: BaseTable[]): { label: string; value: string }[] {
     return tables.map((table) => {
@@ -72,6 +81,12 @@ function findSearchedTable(inputVal: string | { value: string }): BaseTable[] {
 
     if (typeof inputVal === "object") {
         // If inputVal is an object, we assume a specific item was selected
+
+        // Remove focus when item is selected to not keep virtual keyboard which is annoying on mobile
+        if (normalizedVal.length > 0) {
+            removeFocus();
+        }
+
         // Return only the table that matches the guestName exactly
         return props.allReservedTables.filter((table) => {
             return table.reservation!.guestName.toLowerCase() === normalizedVal;
