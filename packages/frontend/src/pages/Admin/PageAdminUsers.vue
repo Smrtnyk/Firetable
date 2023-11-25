@@ -191,7 +191,11 @@ async function onUserSlideRight(user: User, reset: () => void): Promise<void> {
                     <q-icon name="pencil" />
                 </template>
 
-                <q-item clickable class="ft-card">
+                <q-item
+                    clickable
+                    class="ft-card"
+                    :to="{ name: 'adminUser', params: { userId: user.id } }"
+                >
                     <q-item-section>
                         <q-item-label> {{ user.name }} - {{ user.email }} </q-item-label>
                         <q-item-label caption> Role: {{ user.role }} </q-item-label>

@@ -8,9 +8,7 @@ import {
 import { OrganisationDoc, PropertyDoc, User } from "@firetable/types";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
 import { query, where } from "firebase/firestore";
-import { watch } from "vue";
 import { nextTick, ref, watch } from "vue";
-import { useAuthStore } from "src/stores/auth-store";
 import { NOOP } from "@firetable/utils";
 
 export const usePropertiesStore = defineStore("properties", () => {
@@ -24,6 +22,8 @@ export const usePropertiesStore = defineStore("properties", () => {
             unsub();
         }
         properties.value = [];
+        organisations.value = [];
+        arePropertiesLoading.value = false;
     }
 
     function addUnsub(unsub: typeof NOOP): void {
