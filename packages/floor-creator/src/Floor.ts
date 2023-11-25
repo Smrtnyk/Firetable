@@ -66,20 +66,6 @@ export abstract class Floor {
         return this.canvas.toJSON(["label", "reservation", "name", "type"]);
     }
 
-    enableObjectInteraction(): void {
-        this.canvas.forEachObject((object) => {
-            object.set({ evented: true });
-        });
-        this.canvas.requestRenderAll();
-    }
-
-    disableObjectInteraction(): void {
-        this.canvas.forEachObject((object) => {
-            object.set({ evented: false });
-        });
-        this.canvas.requestRenderAll();
-    }
-
     elementReviver = (_: string, object: fabric.Object): void => {
         object.on("mouseup", (ev) => {
             this.onElementClick(ev);
