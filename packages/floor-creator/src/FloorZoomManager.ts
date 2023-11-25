@@ -12,20 +12,14 @@ export class FloorZoomManager {
         private floor: Floor,
         private canvas: fabric.Canvas,
         private initialScale: number,
-        private initialViewportTransform: number[],
     ) {
         this.initialScale = initialScale;
-        this.initialViewportTransform = initialViewportTransform;
         this.minZoom = this.initialScale;
     }
 
     setScale(newVal: number): void {
         this.initialScale = newVal;
         this.minZoom = this.initialScale;
-    }
-
-    setInitialViewportTransform(newVal: number[]): void {
-        this.initialViewportTransform = newVal;
     }
 
     zoomIn(point: fabric.Point): void {

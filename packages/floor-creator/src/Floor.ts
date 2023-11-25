@@ -57,12 +57,7 @@ export abstract class Floor {
         this.setScaling();
         this.renderData(this.floorDoc.json);
 
-        this.zoomManager = new FloorZoomManager(
-            this,
-            this.canvas,
-            this.canvas.getZoom(),
-            this.canvas.viewportTransform?.slice() || [],
-        );
+        this.zoomManager = new FloorZoomManager(this, this.canvas, this.canvas.getZoom());
 
         this.touchManager = new TouchManager(this);
     }
@@ -119,7 +114,6 @@ export abstract class Floor {
         this.containerWidth = pageContainerWidth;
         this.scale = calculateCanvasScale(this.containerWidth, this.floorDoc.width);
         this.setScaling();
-        this.zoomManager.setInitialViewportTransform(this.canvas.viewportTransform?.slice() || []);
         this.zoomManager.setScale(this.scale);
     }
 }
