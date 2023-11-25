@@ -92,10 +92,17 @@ export abstract class Floor {
         this.setElementProperties(object);
     };
 
+    setObjectCoords(): void {
+        this.canvas.forEachObject((object) => {
+            object.setCoords();
+        });
+    }
+
     setScaling(): void {
         this.canvas.setZoom(this.scale);
         this.canvas.setWidth(this.width * this.canvas.getZoom());
         this.canvas.setHeight(this.height * this.canvas.getZoom());
+        this.setObjectCoords();
     }
 
     renderData(jsonData?: FloorDoc["json"]): void {
