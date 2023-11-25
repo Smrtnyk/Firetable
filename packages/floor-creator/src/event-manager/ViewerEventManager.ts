@@ -5,7 +5,7 @@ import { fabric } from "fabric";
 import { Floor } from "../Floor";
 
 export class ViewerEventManager extends EventManager {
-    private startElement: BaseTable | null = null;
+    private startElement: BaseTable | undefined;
     private isPanning: boolean = false;
 
     dragOccurred: boolean = false;
@@ -28,11 +28,13 @@ export class ViewerEventManager extends EventManager {
     }
 
     onTableTouchStart = (options: fabric.IEvent): void => {
+        this.startElement = undefined;
         const target = options.target;
         if (isTable(target)) {
             this.startElement = target;
             this.isPanning = true;
         }
+        options.e.stopPropagation();
     };
 
     onTableTouchEnd = (options: fabric.IEvent<MouseEvent>): void => {
@@ -51,7 +53,7 @@ export class ViewerEventManager extends EventManager {
                 this.dragOccurred = true;
             }
         }
-        this.startElement = null; // reset after use
+        this.startElement = undefined;
         this.isPanning = false;
     };
 }
