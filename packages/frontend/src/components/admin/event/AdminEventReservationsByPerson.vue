@@ -149,6 +149,7 @@ function generateTablesByWaiterChartOptions(
                 datasets,
             },
             options: {
+                responsive: true,
                 maintainAspectRatio: false,
                 indexAxis: "y",
                 plugins: {
@@ -169,7 +170,6 @@ function generateTablesByWaiterChartOptions(
                         },
                     },
                 },
-                responsive: true,
                 scales: {
                     x: {
                         stacked: true,

@@ -129,6 +129,16 @@ const routes: RouteRecordRaw[] = [
                 props: true,
                 component: () => import("src/pages/Admin/PageAdminProperties.vue"),
             },
+            {
+                path: "/admin/:organisationId/analytics",
+                name: "adminAnalytics",
+                meta: {
+                    requiresAuth: true,
+                    allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN],
+                },
+                props: true,
+                component: () => import("src/pages/Admin/PageAdminAnalytics.vue"),
+            },
         ],
     },
     {

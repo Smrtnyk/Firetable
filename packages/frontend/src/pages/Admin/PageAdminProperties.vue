@@ -27,7 +27,7 @@ const { t } = useI18n();
 const organisationId = computed(() => {
     return route.params.organisationId as string;
 });
-const { data: properties, pending: isPropertiesLoading } = useFirestoreCollection<PropertyDoc>(
+const { data: properties } = useFirestoreCollection<PropertyDoc>(
     getPropertiesPath(organisationId.value),
 );
 
@@ -108,7 +108,7 @@ function createProperty(): void {
         <FTTitle :title="t('PageAdminProperties.properties')">
             <template #right>
                 <q-btn
-                    v-if="properties.length > 0 && !isPropertiesLoading && canCreateProperty"
+                    v-if="!organisationsIsLoading && canCreateProperty"
                     rounded
                     icon="plus"
                     class="button-gradient"

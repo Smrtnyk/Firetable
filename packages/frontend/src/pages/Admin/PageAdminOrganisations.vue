@@ -141,6 +141,21 @@ function createOrganisation(): void {
                             {{ t("AppDrawer.links.manageProperties") }}
                         </q-item-section>
                     </q-item>
+
+                    <!-- Admin Analytics -->
+                    <q-item
+                        clickable
+                        class="ft-card"
+                        :to="{
+                            name: 'adminAnalytics',
+                            params: { organisationId: organisation.id },
+                        }"
+                    >
+                        <q-item-section avatar>
+                            <q-icon name="arrow-expand" />
+                        </q-item-section>
+                        <q-item-section> Manage Analytics </q-item-section>
+                    </q-item>
                 </q-list>
 
                 <q-separator />
