@@ -1,12 +1,11 @@
 import { Floor } from "./Floor";
 import { fabric } from "fabric";
-import { BaseTable, FloorCreationOptions, FloorEditorElement } from "./types";
+import { FloorCreationOptions, FloorEditorElement } from "./types";
 import { ViewerEventManager } from "./event-manager/ViewerEventManager";
 import { EventEmitter } from "./event-emitter/EventEmitter";
 
 type FloorViewerEvents = {
     elementClicked: [FloorViewer, FloorEditorElement];
-    tableToTable: [FloorViewer, BaseTable, BaseTable];
 };
 
 export class FloorViewer extends Floor {
@@ -39,12 +38,7 @@ export class FloorViewer extends Floor {
 
     protected onElementClick = (ev: fabric.IEvent<MouseEvent>): void => {
         if (this.touchManager.isInteracting || this.zoomManager.isZooming) {
-            this.eventManager.dragOccurred = !this.eventManager.dragOccurred;
             return;
-        }
-        if (this.eventManager.dragOccurred) {
-            this.eventManager.dragOccurred = false; // Reset the flag
-            return; // Exit early if a drag operation occurred
         }
         this.eventEmitter.emit("elementClicked", this, ev.target as FloorEditorElement);
     };
