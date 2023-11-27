@@ -7,7 +7,6 @@ import { useAuthStore } from "src/stores/auth-store";
 interface Props {
     canDeleteReservation: boolean;
     reservation: Reservation;
-    crossFloorReservationTransferEnabled: boolean;
 }
 
 const authStore = useAuthStore();
@@ -122,7 +121,7 @@ function onReservationConfirm(): void {
             </div>
             <q-btn
                 :title="t('Global.transfer')"
-                v-if="props.crossFloorReservationTransferEnabled && authStore.canReserve"
+                v-if="authStore.canReserve"
                 icon="transfer"
                 color="primary"
                 @click="() => emit('transfer')"

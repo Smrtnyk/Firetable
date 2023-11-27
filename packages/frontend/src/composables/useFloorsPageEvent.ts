@@ -19,12 +19,8 @@ export function useFloorsPageEvent(
     const activeFloor = ref<{ id: string; name: string } | undefined>();
     const floorInstances = ref<Set<FloorViewer>>(new Set());
     const { users } = useUsers();
-    const {
-        tableClickHandler,
-        checkReservationsForTimeAndMarkTableIfNeeded,
-        swapOrTransferReservations,
-        allReservedTables,
-    } = useReservations(users, floorInstances.value, eventOwner, event);
+    const { tableClickHandler, checkReservationsForTimeAndMarkTableIfNeeded, allReservedTables } =
+        useReservations(users, floorInstances.value, eventOwner, event);
     const canvases = reactive<Map<string, HTMLCanvasElement>>(new Map());
 
     const hasMultipleFloorPlans = computed(() => {
@@ -124,7 +120,6 @@ export function useFloorsPageEvent(
             containerWidth: pageRef.value.clientWidth,
         });
         floorViewer.on("elementClicked", tableClickHandler);
-        floorViewer.on("tableToTable", swapOrTransferReservations);
         floorInstances.value.add(floorViewer);
     }
 

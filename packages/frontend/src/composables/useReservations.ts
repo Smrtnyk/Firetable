@@ -180,7 +180,6 @@ export function useReservations(
                 componentPropsObject: {
                     canDeleteReservation: canDeleteReservation(reservation),
                     reservation,
-                    crossFloorReservationTransferEnabled: floorInstances.size > 1,
                 },
                 listeners: {
                     delete: () => {
@@ -358,7 +357,6 @@ export function useReservations(
         onDeleteReservation,
         handleReservationCreation,
         checkReservationsForTimeAndMarkTableIfNeeded,
-        swapOrTransferReservations,
         tableClickHandler,
     };
 }
