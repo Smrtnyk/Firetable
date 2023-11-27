@@ -1,13 +1,20 @@
 import * as functions from "firebase-functions";
 import { db } from "../init.js";
 import { Role, Collection, User, ADMIN } from "../../types/types.js";
-import { FieldPath, Query } from "firebase-admin/firestore";
+import { FieldPath } from "firebase-admin/firestore";
 
 type RoleFilter = {
     [key in Role | typeof ADMIN | "default"]: (user: User) => boolean;
 };
 
 const MAX_USERS = 100;
+
+// Function to split array into chunks
+function chunkArray(arr: string[], size: number): string[][] {
+    return Array.from({ length: Math.ceil(arr.length / size) }, (v, i) =>
+        arr.slice(i * size, i * size + size),
+    );
+}
 
 /**
  * Fetches users from the Firestore database based on the role of the authenticated user.
@@ -69,19 +76,24 @@ export async function fetchUsersByRoleFn(
             users = [...users, ...orgUsers];
         }
     } else {
-        let baseQuery: Query = db.collection(
-            `${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`,
-        );
-
         if (userIdsToFetch.length > MAX_USERS) {
             functions.logger.warn(`User ${uid} provided too many user IDs.`);
             throw new functions.https.HttpsError("invalid-argument", "Too many user IDs provided.");
         }
 
-        baseQuery = baseQuery.where(FieldPath.documentId(), "in", userIdsToFetch).limit(MAX_USERS);
+        // Split userIdsToFetch into chunks of 30
+        const userIdChunks = chunkArray(userIdsToFetch, 30);
 
-        const snapshot = await baseQuery.get();
-        users = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as User);
+        for (const chunk of userIdChunks) {
+            const snapshot = await db
+                .collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`)
+                .where(FieldPath.documentId(), "in", chunk)
+                .limit(MAX_USERS)
+                .get();
+
+            const chunkUsers = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as User);
+            users = [...users, ...chunkUsers];
+        }
 
         const roleFilters: RoleFilter = {
             [ADMIN]: () => true,

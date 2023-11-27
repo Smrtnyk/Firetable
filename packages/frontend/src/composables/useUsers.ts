@@ -1,48 +1,48 @@
 import { ref, watch } from "vue";
-import { getDocs, query, where } from "firebase/firestore";
 import { ADMIN, User } from "@firetable/types";
 import { useAuthStore } from "src/stores/auth-store";
-import { fetchUsersByRole, propertiesCollection } from "@firetable/backend";
+import { fetchUsersByRole } from "@firetable/backend";
+import { storeToRefs } from "pinia";
+import { usePropertiesStore } from "src/stores/usePropertiesStore";
 
 export function useUsers() {
+    const { properties } = storeToRefs(usePropertiesStore());
     const authStore = useAuthStore();
     const users = ref<User[]>([]);
     const isLoading = ref<boolean>(true);
 
-    async function fetchRelatedProperties(): Promise<string[]> {
-        const relatedPropertiesQuery = query(
-            propertiesCollection(authStore.user!.organisationId),
-            where("relatedUsers", "array-contains", authStore.user?.id),
-        );
-
-        const snapshot = await getDocs(relatedPropertiesQuery);
-        const propertyDocs = snapshot.docs.map((doc) => doc.data());
-        return propertyDocs.flatMap((property) => property.relatedUsers);
-    }
-
     async function fetchUsers(): Promise<void> {
-        isLoading.value = true;
         try {
             if (authStore.user?.role === ADMIN) {
+                isLoading.value = true;
                 users.value = (await fetchUsersByRole([], "")).data;
             } else {
-                const relatedUserIds = await fetchRelatedProperties();
-                users.value =
-                    relatedUserIds.length > 0
-                        ? (
-                              await fetchUsersByRole(
-                                  [...new Set(relatedUserIds)],
-                                  authStore.user!.organisationId,
-                              )
-                          ).data
-                        : [];
+                const relatedIds = properties.value.flatMap((property) => property.relatedUsers);
+                if (relatedIds.length === 0) {
+                    users.value = [];
+                    return;
+                }
+
+                isLoading.value = true;
+                users.value = (
+                    await fetchUsersByRole([...new Set(relatedIds)], authStore.user!.organisationId)
+                ).data;
             }
         } finally {
             isLoading.value = false;
         }
     }
 
-    watch(authStore.user!, fetchUsers, { immediate: true });
+    watch(
+        () => properties.value.length,
+        async (length) => {
+            if (length === 0) {
+                return;
+            }
+            await fetchUsers();
+        },
+        { immediate: true },
+    );
 
     return { users, fetchUsers, isLoading };
 }

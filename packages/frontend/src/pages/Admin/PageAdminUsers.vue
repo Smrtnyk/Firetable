@@ -3,7 +3,7 @@ import UserCreateForm from "src/components/admin/User/UserCreateForm.vue";
 import UserEditForm from "src/components/admin/User/UserEditForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import { showConfirm, showErrorMessage, withLoading } from "src/helpers/ui-helpers";
-import { computed, watch } from "vue";
+import { watch } from "vue";
 import { Loading, useQuasar } from "quasar";
 import FTDialog from "src/components/FTDialog.vue";
 import { ADMIN, CreateUserPayload, EditUserPayload, User } from "@firetable/types";
@@ -20,17 +20,14 @@ import { useAuthStore } from "src/stores/auth-store";
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
 import FTCenteredText from "src/components/FTCenteredText.vue";
+import { storeToRefs } from "pinia";
 
 const { t } = useI18n();
 const quasar = useQuasar();
 const authStore = useAuthStore();
-const propertiesStore = usePropertiesStore();
+const { properties } = storeToRefs(usePropertiesStore());
 const { users, isLoading, fetchUsers } = useUsers();
 const { createDialog } = useDialog();
-
-const properties = computed(() => {
-    return propertiesStore.properties;
-});
 
 const onCreateUser = withLoading(async (newUser: CreateUserPayload) => {
     await createUserWithEmail(newUser);

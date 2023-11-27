@@ -8,56 +8,63 @@ import {
 import { ADMIN, OrganisationDoc, PropertyDoc, User } from "@firetable/types";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
 import { query, where } from "firebase/firestore";
-import { watch } from "vue";
+import { nextTick, ref, watch } from "vue";
 import { useAuthStore } from "src/stores/auth-store";
 import { NOOP } from "@firetable/utils";
 
-interface State {
-    properties: PropertyDoc[];
-    arePropertiesLoading: boolean;
-    organisations: OrganisationDoc[];
-    unsubPropertiesWatch: typeof NOOP;
-}
+export const usePropertiesStore = defineStore("properties", () => {
+    const properties = ref<PropertyDoc[]>([]);
+    const arePropertiesLoading = ref(false);
+    const organisations = ref<OrganisationDoc[]>([]);
+    const unsubs = ref<(typeof NOOP)[]>([]);
 
-export const usePropertiesStore = defineStore("properties", {
-    state: () =>
-        ({
-            properties: [],
-            arePropertiesLoading: false,
-            organisations: [],
-            unsubPropertiesWatch: NOOP,
-        }) as State,
-    actions: {
-        cleanup() {
-            this.unsubPropertiesWatch();
-            this.properties = [];
-        },
+    function cleanup(): void {
+        for (const unsub of unsubs.value) {
+            unsub();
+        }
+        properties.value = [];
+    }
 
-        async getOrganisations() {
-            if (this.organisations.length > 0) {
-                return this.organisations;
+    function addUnsub(unsub: typeof NOOP): void {
+        unsubs.value.push(unsub);
+    }
+
+    async function getOrganisations(): Promise<OrganisationDoc[]> {
+        if (organisations.value.length > 0) {
+            return organisations.value;
+        }
+
+        const auth = useAuthStore();
+        if (auth.user?.role === ADMIN) {
+            organisations.value = await fetchOrganisationsForAdmin();
+        } else {
+            const organisationsDoc = await fetchOrganisationById(auth.user!.organisationId);
+            if (organisationsDoc) {
+                organisations.value.push(organisationsDoc);
             }
+        }
 
-            const auth = useAuthStore();
-            if (auth.user?.role === ADMIN) {
-                this.organisations = await fetchOrganisationsForAdmin();
-            } else {
-                const organisationsDoc = await fetchOrganisationById(auth.user!.organisationId);
-                if (organisationsDoc) {
-                    this.organisations.push(organisationsDoc);
-                }
-            }
+        return organisations.value;
+    }
 
-            return this.organisations;
-        },
+    function setProperties(newProperties: PropertyDoc[]): void {
+        properties.value = newProperties;
+    }
 
-        setProperties(properties: PropertyDoc[]): void {
-            this.properties = properties;
-        },
-        setArePropertiesLoading(loading: boolean): void {
-            this.arePropertiesLoading = loading;
-        },
-    },
+    function setArePropertiesLoading(loading: boolean): void {
+        arePropertiesLoading.value = loading;
+    }
+
+    return {
+        properties,
+        organisations,
+        arePropertiesLoading,
+        setArePropertiesLoading,
+        setProperties,
+        getOrganisations,
+        cleanup,
+        addUnsub,
+    };
 });
 
 export async function initAdminProperties(): Promise<void> {
@@ -73,7 +80,7 @@ export async function initNonAdminProperties({
     const propertiesStore = usePropertiesStore();
     const propertiesRef = propertiesCollection(organisationId);
     const userPropertiesQuery = query(propertiesRef, where("relatedUsers", "array-contains", id));
-    const { data, stop, pending } = useFirestoreCollection<PropertyDoc[]>(
+    const { data, stop, pending, promise } = useFirestoreCollection<PropertyDoc[]>(
         createQuery(userPropertiesQuery),
     );
 
@@ -86,16 +93,19 @@ export async function initNonAdminProperties({
     );
 
     const stopWatch = watch(
-        () => data.value,
+        data,
         (newProperties) => {
             propertiesStore.setProperties(newProperties as unknown as PropertyDoc[]);
         },
         { deep: true },
     );
 
-    propertiesStore.unsubPropertiesWatch = () => {
+    propertiesStore.addUnsub(() => {
         stopWatchPending();
         stopWatch();
         stop();
-    };
+    });
+
+    await promise.value;
+    await nextTick();
 }
