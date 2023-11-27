@@ -14,20 +14,16 @@ import { takeProp } from "@firetable/utils";
 import { useI18n } from "vue-i18n";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import { usePropertiesStore } from "src/stores/usePropertiesStore";
-import { useRoute } from "vue-router";
 
-const route = useRoute();
+const props = defineProps<{ organisationId: string }>();
+
 const propertiesStore = usePropertiesStore();
 const quasar = useQuasar();
 const { t } = useI18n();
 
-const organisationId = computed(() => {
-    return route.params.organisationId as string;
-});
-
 const properties = computed(() => {
     return propertiesStore.properties.filter((property) => {
-        return property.organisationId === organisationId.value;
+        return property.organisationId === props.organisationId;
     });
 });
 const { floors, isLoading } = useFloors(properties);

@@ -16,19 +16,15 @@ import { PropertyDoc } from "@firetable/types";
 import { useI18n } from "vue-i18n";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import { usePropertiesStore } from "src/stores/usePropertiesStore";
-import { useRoute } from "vue-router";
 import { useFirestoreCollection } from "src/composables/useFirestore";
 
-const route = useRoute();
+const props = defineProps<{ organisationId: string }>();
+
 const propertiesStore = usePropertiesStore();
 const quasar = useQuasar();
 const { t } = useI18n();
-
-const organisationId = computed(() => {
-    return route.params.organisationId as string;
-});
 const { data: properties } = useFirestoreCollection<PropertyDoc>(
-    getPropertiesPath(organisationId.value),
+    getPropertiesPath(props.organisationId),
 );
 
 const organisationsIsLoading = ref(false);
@@ -36,7 +32,7 @@ const organisationsIsLoading = ref(false);
 const canCreateProperty = computed(() => {
     const maxAllowedProperties =
         propertiesStore.organisations.find((organisation) => {
-            return organisation.id === organisationId.value;
+            return organisation.id === props.organisationId;
         })?.maxAllowedProperties || 0;
     const currentNumOfProperties = properties.value.length;
     return currentNumOfProperties < maxAllowedProperties;
@@ -45,7 +41,7 @@ const canCreateProperty = computed(() => {
 onMounted(async () => {
     organisationsIsLoading.value = true;
     try {
-        await propertiesStore.getOrganisations(organisationId.value);
+        await propertiesStore.getOrganisations(props.organisationId);
     } catch (error) {
         console.error("Failed to load organizations:", error);
     } finally {
@@ -90,7 +86,7 @@ function createProperty(): void {
             maximized: false,
             component: AddNewPropertyForm,
             componentPropsObject: {
-                organisationId: organisationId.value,
+                organisationId: props.organisationId,
             },
             listeners: {
                 create: (payload: CreatePropertyPayload) => {

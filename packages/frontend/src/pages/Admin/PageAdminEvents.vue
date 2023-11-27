@@ -25,12 +25,13 @@ import { useFloors } from "src/composables/useFloors";
 import { useEvents } from "src/composables/useEvents";
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import { usePropertiesStore } from "src/stores/usePropertiesStore";
 import { useAuthStore } from "src/stores/auth-store";
 
-const route = useRoute();
+const props = defineProps<{ organisationId: string }>();
+
 const router = useRouter();
 const quasar = useQuasar();
 const { t } = useI18n();
@@ -44,13 +45,10 @@ const {
     isLoading: isLoadingEvents,
     EVENTS_PER_PAGE,
 } = useEvents();
-const organisationId = computed(() => {
-    return route.params.organisationId as string;
-});
 const activePropertyId = ref("");
 const properties = computed(() => {
     return propertiesStore.properties.filter((property) => {
-        return property.organisationId === organisationId.value;
+        return property.organisationId === props.organisationId;
     });
 });
 
@@ -60,7 +58,7 @@ const isAnyLoading = computed(() => {
 });
 
 onBeforeMount(() => {
-    if (!organisationId.value) {
+    if (!props.organisationId) {
         router.replace("/");
     }
 });
@@ -114,7 +112,7 @@ function fetchEventsForActiveTab(): void {
     }
     const eventOwner: EventOwner = {
         propertyId: activeProperty.id,
-        organisationId: organisationId.value,
+        organisationId: props.organisationId,
         id: "",
     };
     fetchMoreEvents(eventOwner, null);
@@ -125,7 +123,7 @@ const onCreateEvent = withLoading(async function (eventData: CreateEventPayload)
     quasar.notify(t("PageAdminEvents.eventCreatedNotificationMessage"));
     await router.push({
         name: "adminEvent",
-        params: { eventId, propertyId, organisationId: organisationId.value },
+        params: { eventId, propertyId, organisationId: props.organisationId },
     });
 });
 
@@ -133,7 +131,7 @@ const onUpdateEvent = withLoading(async function (eventData: EditEventPayload & 
     await updateEvent(
         {
             propertyId: eventData.propertyId,
-            organisationId: organisationId.value,
+            organisationId: props.organisationId,
             id: eventData.id,
         },
         eventData,
@@ -155,7 +153,7 @@ async function onEventItemSlideRight({
             await deleteDocAndAllSubCollections(
                 getEventsPath({
                     propertyId: event.propertyId,
-                    organisationId: organisationId.value,
+                    organisationId: props.organisationId,
                     id: "",
                 }),
                 event.id,
@@ -188,7 +186,7 @@ async function onLoad(property: PropertyDoc): Promise<void> {
 
     const eventOwner: EventOwner = {
         propertyId,
-        organisationId: organisationId.value,
+        organisationId: props.organisationId,
         id: "",
     };
     const lastDoc = takeLast([...eventsByProperty[propertyId]])?._doc || null;

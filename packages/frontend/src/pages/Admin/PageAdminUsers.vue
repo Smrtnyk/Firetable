@@ -15,26 +15,23 @@ import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import { storeToRefs } from "pinia";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
+
+const props = defineProps<{ organisationId: string }>();
 
 const { t } = useI18n();
-const route = useRoute();
 const router = useRouter();
 const quasar = useQuasar();
 const authStore = useAuthStore();
 const { properties: allProperties } = storeToRefs(usePropertiesStore());
 const { getOrganisations } = usePropertiesStore();
 
-const organisationId = computed(() => {
-    return route.params.organisationId as string;
-});
-
-const { users, isLoading, fetchUsers } = useUsers(organisationId.value);
+const { users, isLoading, fetchUsers } = useUsers(props.organisationId);
 const { createDialog } = useDialog();
 
 const properties = computed(() => {
     return allProperties.value.filter((property) => {
-        return property.organisationId === organisationId.value;
+        return property.organisationId === props.organisationId;
     });
 });
 
@@ -58,7 +55,7 @@ const onDeleteUser = withLoading(async (user: User) => {
 });
 
 onBeforeMount(() => {
-    if (!organisationId.value) {
+    if (!props.organisationId) {
         router.replace("/");
     }
 });
@@ -85,8 +82,8 @@ function onCreateUserFormSubmit(newUser: CreateUserPayload): Promise<void | Prom
 }
 
 async function showCreateUserDialog(): Promise<void> {
-    const [organisation] = (await getOrganisations(organisationId.value)).filter((org) => {
-        return org.id === organisationId.value;
+    const [organisation] = (await getOrganisations(props.organisationId)).filter((org) => {
+        return org.id === props.organisationId;
     });
 
     const dialog = createDialog({
@@ -124,8 +121,8 @@ async function showEditUserDialog(user: User, reset: () => void): Promise<void> 
     const selectedProperties = properties.value.filter((ownProperty) => {
         return user.relatedProperties.includes(ownProperty.id);
     });
-    const [organisation] = (await getOrganisations(organisationId.value)).filter((org) => {
-        return org.id === organisationId.value;
+    const [organisation] = (await getOrganisations(props.organisationId)).filter((org) => {
+        return org.id === props.organisationId;
     });
     const dialog = createDialog({
         component: FTDialog,
