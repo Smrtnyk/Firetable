@@ -28,11 +28,13 @@ import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import { usePropertiesStore } from "src/stores/usePropertiesStore";
+import { useAuthStore } from "src/stores/auth-store";
 
 const router = useRouter();
 const quasar = useQuasar();
 const { t } = useI18n();
 const { createDialog } = useDialog();
+const authStore = useAuthStore();
 const propertiesStore = usePropertiesStore();
 const {
     eventsByProperty,
@@ -244,6 +246,7 @@ function showCreateEventForm(property: PropertyDoc, event?: EventDoc): void {
                     >
                         <div class="row justify-end">
                             <q-btn
+                                v-if="authStore.isAdmin"
                                 rounded
                                 icon="plus"
                                 class="button-gradient q-mb-md"
