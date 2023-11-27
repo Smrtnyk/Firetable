@@ -30,10 +30,13 @@ export function useFloorsPageEvent(
     const activeFloor = ref<{ id: string; name: string } | undefined>();
     const floorInstances = shallowRef<FloorViewer[]>([]);
     const { users } = useUsers(eventOwner.organisationId);
-    const {
-        tableClickHandler,
-        checkReservationsForTimeAndMarkTableIfNeeded,
-    } = useReservations(users, reservations, floorInstances, eventOwner, event);
+    const { tableClickHandler, checkReservationsForTimeAndMarkTableIfNeeded } = useReservations(
+        users,
+        reservations,
+        floorInstances,
+        eventOwner,
+        event,
+    );
     const canvases = reactive<Map<string, HTMLCanvasElement>>(new Map());
 
     const hasMultipleFloorPlans = computed(() => {

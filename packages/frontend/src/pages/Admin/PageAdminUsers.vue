@@ -22,7 +22,8 @@ const route = useRoute();
 const router = useRouter();
 const quasar = useQuasar();
 const authStore = useAuthStore();
-const { properties } = storeToRefs(usePropertiesStore());
+const { properties: allProperties } = storeToRefs(usePropertiesStore());
+const { getOrganisations } = usePropertiesStore();
 
 const organisationId = computed(() => {
     return route.params.organisationId as string;
@@ -32,7 +33,7 @@ const { users, isLoading, fetchUsers } = useUsers(organisationId.value);
 const { createDialog } = useDialog();
 
 const properties = computed(() => {
-    return propertiesStore.properties.filter((property) => {
+    return allProperties.value.filter((property) => {
         return property.organisationId === organisationId.value;
     });
 });
@@ -84,11 +85,9 @@ function onCreateUserFormSubmit(newUser: CreateUserPayload): Promise<void | Prom
 }
 
 async function showCreateUserDialog(): Promise<void> {
-    const [organisation] = (await propertiesStore.getOrganisations(organisationId.value)).filter(
-        (org) => {
-            return org.id === organisationId.value;
-        },
-    );
+    const [organisation] = (await getOrganisations(organisationId.value)).filter((org) => {
+        return org.id === organisationId.value;
+    });
 
     const dialog = createDialog({
         component: FTDialog,
@@ -125,11 +124,9 @@ async function showEditUserDialog(user: User, reset: () => void): Promise<void> 
     const selectedProperties = properties.value.filter((ownProperty) => {
         return user.relatedProperties.includes(ownProperty.id);
     });
-    const [organisation] = (await propertiesStore.getOrganisations(organisationId.value)).filter(
-        (org) => {
-            return org.id === organisationId.value;
-        },
-    );
+    const [organisation] = (await getOrganisations(organisationId.value)).filter((org) => {
+        return org.id === organisationId.value;
+    });
     const dialog = createDialog({
         component: FTDialog,
         componentProps: {

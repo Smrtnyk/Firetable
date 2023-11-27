@@ -37,7 +37,7 @@ export const usePropertiesStore = defineStore("properties", () => {
 
         const organisationsDoc = await fetchOrganisationById(organisationId);
         if (organisationsDoc) {
-            organisations.value = organisationsDoc;
+            organisations.value = [organisationsDoc];
         }
 
         return organisations.value;
