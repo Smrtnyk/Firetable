@@ -1,6 +1,6 @@
 import { Manager, Pinch, Pan, Tap, DIRECTION_ALL } from "hammerjs";
 import { Floor } from "./Floor";
-import { Canvas, Point } from "fabric";
+import { Point } from "fabric";
 import { throttle } from "@firetable/utils";
 
 const DAMPENING_FACTOR = 0.2;

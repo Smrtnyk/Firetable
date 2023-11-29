@@ -87,7 +87,7 @@ function options(hr: number, min: number | null = 0): boolean {
             currentDate.getUTCMonth(),
             currentDate.getUTCDate(),
             hr,
-            min || 0,
+            min ?? 0,
             0,
             0,
         ),
