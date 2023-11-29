@@ -1,11 +1,11 @@
 import { RESOLUTION } from "./constants";
-import { fabric } from "fabric";
+import { Canvas, Line, Group } from "fabric";
 
 export class GridDrawer {
-    private canvas: fabric.Canvas;
+    private canvas: Canvas;
     private isGridVisible = true;
 
-    constructor(canvas: fabric.Canvas) {
+    constructor(canvas: Canvas) {
         this.canvas = canvas;
     }
 
@@ -24,31 +24,32 @@ export class GridDrawer {
         gridSize: number,
         left: number,
         top: number,
-    ): fabric.Line[] {
+    ): Line[] {
         const lineOption = { stroke: "rgba(0,0,0,1)", strokeWidth: 0.5, selectable: false };
         const lines = [];
 
         for (let i = Math.ceil(width / gridSize); i--; ) {
-            lines.push(new fabric.Line([gridSize * i, -top, gridSize * i, height], lineOption));
+            lines.push(new Line([gridSize * i, -top, gridSize * i, height], lineOption));
         }
         for (let i = Math.ceil(height / gridSize); i--; ) {
-            lines.push(new fabric.Line([-left, gridSize * i, width, gridSize * i], lineOption));
+            lines.push(new Line([-left, gridSize * i, width, gridSize * i], lineOption));
         }
 
         return lines;
     }
 
-    private addGridToCanvas(lines: fabric.Line[]): void {
-        const oGridGroup = new fabric.Group(lines, {
+    private addGridToCanvas(lines: Line[]): void {
+        const oGridGroup = new Group(lines, {
             left: 0,
             top: 0,
             selectable: false,
             excludeFromExport: true,
+            evented: false,
             // @ts-expect-error -- custom prop
             isGridLine: true,
         });
         this.canvas.add(oGridGroup);
-        this.canvas.sendToBack(oGridGroup);
+        this.canvas.sendObjectToBack(oGridGroup);
     }
 
     toggleGridVisibility = (width: number, height: number): void => {

@@ -1,5 +1,5 @@
 import { Command } from "./Command";
-import { fabric } from "fabric";
+import { FabricObject } from "fabric";
 
 type Position = {
     left: number;
@@ -7,11 +7,11 @@ type Position = {
 };
 
 export class MoveCommand implements Command {
-    private object: fabric.Object;
+    private object: FabricObject;
     private oldPosition: Position;
     private newPosition: Position;
 
-    constructor(object: fabric.Object, oldPosition: Position, newPosition: Position) {
+    constructor(object: FabricObject, oldPosition: Position, newPosition: Position) {
         this.object = object;
         this.oldPosition = oldPosition;
         this.newPosition = newPosition;

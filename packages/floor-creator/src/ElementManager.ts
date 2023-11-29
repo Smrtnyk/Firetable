@@ -11,7 +11,9 @@ import { SingleSofa } from "./elements/SingleSofa";
 import { Stage } from "./elements/Stage";
 
 export class ElementManager {
-    addElement(options: CreateElementOptions): RectTable | RoundTable | Wall | Sofa | DJBooth {
+    addElement(
+        options: CreateElementOptions,
+    ): RectTable | RoundTable | Wall | Sofa | DJBooth | SingleSofa {
         return match(options.tag)
             .with(ElementTag.RECT, () => this.addRectTableElement(options))
             .with(ElementTag.CIRCLE, () => this.addRoundTableElement(options))

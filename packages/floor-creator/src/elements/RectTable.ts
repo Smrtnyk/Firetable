@@ -1,5 +1,4 @@
-import { fabric } from "fabric";
-import { FloorElementTypes } from "../types.js";
+import { Group, Rect, FabricText, GroupProps } from "fabric";
 import { determineTableColor } from "../utils.js";
 import { ReservationDoc } from "@firetable/types";
 import {
@@ -9,22 +8,23 @@ import {
     TABLE_WIDTH,
     TABLE_HEIGHT,
 } from "../constants";
-import { IGroupOptions } from "fabric/fabric-impl";
 import { AnimationStrategy } from "./animation/AnimationStrategy";
 import { SmoothBlinkAnimation } from "./animation/SmoothBlinkAnimation.js";
+import { FloorElementTypes } from "../types";
 
 interface RectTableElementOptions {
     groupOptions: {
         baseFill?: string;
         label: string;
-    } & IGroupOptions;
+    } & Partial<GroupProps>;
     textOptions: {
         label: string;
     };
     rectOptions: Record<string, unknown>;
 }
 
-export class RectTable extends fabric.Group {
+export class RectTable extends Group {
+    // @ts-expect-error -- deprecated
     type = FloorElementTypes.RECT_TABLE;
     reservation: ReservationDoc | undefined;
     label: string;
@@ -32,20 +32,20 @@ export class RectTable extends fabric.Group {
     private readonly initialStrokeWidth: number;
     private readonly initialWidth: number;
     private readonly initialHeight: number;
-    private rect: fabric.Rect;
-    private textLabel: fabric.Text;
+    private rect: Rect;
+    private textLabel: FabricText;
     private animationStrategy: AnimationStrategy;
 
     constructor(options: RectTableElementOptions) {
-        const baseFillComputed = (options.groupOptions.baseFill as string) || "#444";
-        const tableRect = new fabric.Rect({
+        const baseFillComputed = options.groupOptions.baseFill || "#444";
+        const tableRect = new Rect({
             ...options.rectOptions,
             fill: baseFillComputed,
             stroke: "black",
             strokeWidth: 0.5,
         });
 
-        const textLabel = new fabric.Text(options.textOptions.label, {
+        const textLabel = new FabricText(options.groupOptions.label, {
             ...options.textOptions,
             fontSize: FONT_SIZE,
             fill: TABLE_TEXT_FILL_COLOR,
@@ -111,7 +111,6 @@ export class RectTable extends fabric.Group {
         const correctedScaleX = snappedWidth / this.initialWidth;
         const correctedScaleY = snappedHeight / this.initialHeight;
 
-        // @ts-expect-error -- not sure why this is type error
         this.set({
             scaleX: correctedScaleX,
             scaleY: correctedScaleY,
@@ -133,7 +132,7 @@ export class RectTable extends fabric.Group {
     }
 
     private enforceStrokeWidth(): void {
-        const tableRect = this.item(0) as fabric.Rect;
+        const tableRect = this.item(0);
         if (!this.scaleX || !this.scaleY) {
             return;
         }
@@ -176,26 +175,24 @@ export class RectTable extends fabric.Group {
         this.setFill(fill);
     }
 
+    // @ts-expect-error -- ok
     toObject(): Record<string, unknown> {
         return {
             ...super.toObject(),
+            type: this.type,
             opacity: 1,
             baseFill: this.baseFill,
             label: this.label,
         };
     }
 
-    static fromObject(object: any, callback: (obj: RectTable) => void): void {
+    static async fromObject(object: any): Promise<RectTable> {
         const rectOpts = object.objects[0];
         const textOpts = object.objects[1];
-        const instance = new RectTable({
+        return new RectTable({
             groupOptions: object,
             rectOptions: rectOpts,
             textOptions: textOpts,
         });
-        callback(instance);
     }
 }
-
-// @ts-expect-error: Unreachable code error
-fabric.RectTable = fabric.util.createClass(RectTable);

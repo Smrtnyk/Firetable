@@ -9,7 +9,7 @@ export function hasFloorTables(floor: Floor): boolean {
 }
 
 export function getTablesFromFloorDoc(floor: FloorDoc): BaseTable[] {
-    return floor.json.objects.filter(isTable);
+    return JSON.parse(floor.json).objects.filter(isTable);
 }
 
 export function getTables(floor: Floor): BaseTable[] {

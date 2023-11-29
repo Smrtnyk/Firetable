@@ -1,5 +1,4 @@
 import { EventManager } from "./EventManager";
-import { fabric } from "fabric";
 import { RESOLUTION } from "../constants";
 import { Floor } from "../Floor";
 import { CommandInvoker } from "../command/CommandInvoker";
@@ -62,12 +61,12 @@ export class EditorEventManager extends EventManager {
         }
     };
 
-    handleObjectMoving = (options: fabric.IEvent<MouseEvent>): void => {
+    handleObjectMoving = (options: any): void => {
         if (!this.ctrlPressedDuringSelection) {
             return;
         }
         const activeObjects = this.floor.canvas.getActiveObjects();
-        const activeGroup = this.floor.canvas.getActiveObject() as fabric.Group;
+        const activeGroup = this.floor.canvas.getActiveObject();
 
         if (activeGroup && activeGroup.type === "group") {
             activeObjects.forEach((object) => {
@@ -83,7 +82,7 @@ export class EditorEventManager extends EventManager {
         this.ctrlPressedDuringSelection = false;
     };
 
-    onBeforeTransform = (options: fabric.IEvent<MouseEvent>): void => {
+    onBeforeTransform = (options: any): void => {
         if (options.transform?.target && !this.movingObjectStartPosition) {
             this.movingObjectStartPosition = {
                 left: options.transform.target.left!,
@@ -92,7 +91,7 @@ export class EditorEventManager extends EventManager {
         }
     };
 
-    onObjectModified = (options: fabric.IEvent<MouseEvent>): void => {
+    onObjectModified = (options: any): void => {
         if (!this.movingObjectStartPosition || !options.target) {
             return;
         }
@@ -123,7 +122,7 @@ export class EditorEventManager extends EventManager {
         }
     };
 
-    private snapToGridOnModify = (e: fabric.IEvent): void => {
+    private snapToGridOnModify = (e: any): void => {
         const target = e.target;
 
         if (!target) {

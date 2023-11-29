@@ -1,6 +1,6 @@
 import { Manager, Pinch, Pan, Tap, DIRECTION_ALL } from "hammerjs";
 import { Floor } from "./Floor";
-import { fabric } from "fabric";
+import { Canvas, Point } from "fabric";
 import { throttle } from "@firetable/utils";
 
 const DAMPENING_FACTOR = 0.2;
@@ -16,8 +16,7 @@ export class TouchManager {
     constructor(floor: Floor) {
         this.floor = floor;
 
-        // @ts-expect-error -- private prop
-        const upperCanvasEl = this.floor.canvas.upperCanvasEl as HTMLElement;
+        const upperCanvasEl = this.floor.canvas.upperCanvasEl;
         this.hammerManager = new Manager(upperCanvasEl);
 
         // Create recognizers for pinch and pan gestures
@@ -49,7 +48,6 @@ export class TouchManager {
         x: number;
         y: number;
     } {
-        // @ts-expect-error -- private prop
         // Get the bounding rectangle of the canvas
         const boundingRect = this.floor.canvas.lowerCanvasEl.getBoundingClientRect();
 
@@ -72,7 +70,7 @@ export class TouchManager {
         const scale = ev.scale;
         // Adjust the scale based on a dampening factor to control zoom sensitivity
         const adjustedScale = 1 + (scale - 1) * DAMPENING_FACTOR;
-        const center = new fabric.Point(ev.center.x, ev.center.y);
+        const center = new Point(ev.center.x, ev.center.y);
         this.floor.zoomManager.adjustZoom(adjustedScale, center);
     }, 100);
 

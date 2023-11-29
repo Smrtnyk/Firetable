@@ -1,5 +1,5 @@
 import { Floor } from "./Floor";
-import { fabric } from "fabric";
+import { FabricObject } from "fabric";
 import { FloorCreationOptions, FloorEditorElement } from "./types";
 import { ViewerEventManager } from "./event-manager/ViewerEventManager";
 import { EventEmitter } from "./event-emitter/EventEmitter";
@@ -16,7 +16,6 @@ export class FloorViewer extends Floor {
 
     constructor(options: FloorCreationOptions) {
         super(options);
-        this.canvas.interactive = false;
         this.eventEmitter = new EventEmitter<FloorViewerEvents>();
         this.eventManager = new ViewerEventManager(this);
         this.canvas.defaultCursor = "default";
@@ -37,14 +36,14 @@ export class FloorViewer extends Floor {
         /* empty for now */
     }
 
-    protected onElementClick = (obj: fabric.Object): void => {
+    protected onElementClick = (obj: FabricObject): void => {
         if (this.touchManager.isInteracting || this.zoomManager.isZooming) {
             return;
         }
         this.eventEmitter.emit("elementClicked", this, obj as FloorEditorElement);
     };
 
-    protected setElementProperties(element: fabric.Object): void {
+    protected setElementProperties(element: FabricObject): void {
         element.lockScalingX = true;
         element.lockScalingY = true;
         element.lockMovementX = true;
@@ -53,7 +52,6 @@ export class FloorViewer extends Floor {
         element.lockRotation = true;
         element.lockSkewingX = true;
         element.lockSkewingY = true;
-        element.lockUniScaling = true;
 
         // Override the cursor style on hover for all elements in viewer
         element.hoverCursor = "default";
@@ -68,6 +66,6 @@ export class FloorViewer extends Floor {
         this.eventManager.destroy();
         this.zoomManager.destroy();
         this.touchManager.destroy();
-        this.canvas.dispose();
+        this.canvas.dispose().catch(console.error);
     }
 }

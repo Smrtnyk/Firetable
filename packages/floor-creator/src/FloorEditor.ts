@@ -1,5 +1,5 @@
 import { Floor } from "./Floor";
-import { fabric } from "fabric";
+import { FabricObject, TPointerEventInfo } from "fabric";
 import {
     CreateElementOptions,
     FloorCreationOptions,
@@ -19,6 +19,7 @@ type FloorEditorEvents = {
     elementClicked: [FloorEditor, FloorEditorElement];
     doubleClick: [FloorEditor, NumberTuple];
     commandChange: [];
+    rendered: [undefined];
 };
 
 export class FloorEditor extends Floor {
@@ -30,7 +31,6 @@ export class FloorEditor extends Floor {
 
     constructor(options: FloorCreationOptions) {
         super(options);
-        this.canvas.interactive = true;
         this.eventEmitter = new EventEmitter<FloorEditorEvents>();
         this.gridDrawer = new GridDrawer(this.canvas);
         this.eventManager = new EditorEventManager(this, this.commandInvoker);
@@ -40,7 +40,10 @@ export class FloorEditor extends Floor {
             this.emit("commandChange");
         });
 
-        this.renderGrid();
+        this.on("rendered", this.renderGrid.bind(this));
+        if (!options.floorDoc.json) {
+            this.renderGrid();
+        }
     }
 
     canUndo(): boolean {
@@ -74,7 +77,7 @@ export class FloorEditor extends Floor {
         this.emit("doubleClick", this, coordinates);
     }
 
-    protected onElementClick = (obj: fabric.Object): void => {
+    protected onElementClick = (obj: FabricObject): void => {
         this.emit("elementClicked", this, obj as FloorEditorElement);
     };
 
@@ -86,7 +89,7 @@ export class FloorEditor extends Floor {
         super.renderData(jsonData);
     }
 
-    protected setElementProperties(element: fabric.Object): void {
+    protected setElementProperties(element: FabricObject): void {
         element.lockScalingX = false;
         element.lockScalingY = false;
         element.lockMovementX = false;
@@ -95,7 +98,6 @@ export class FloorEditor extends Floor {
         element.lockRotation = false;
         element.lockSkewingX = false;
         element.lockSkewingY = false;
-        element.lockUniScaling = false;
     }
 
     addElement(options: CreateElementOptions): void {
@@ -128,6 +130,6 @@ export class FloorEditor extends Floor {
         this.eventManager.destroy();
         this.zoomManager.destroy();
         this.touchManager.destroy();
-        this.canvas.dispose();
+        this.canvas.dispose().catch(console.error);
     }
 }

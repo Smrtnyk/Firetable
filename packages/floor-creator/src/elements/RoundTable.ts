@@ -1,35 +1,35 @@
-import { fabric } from "fabric";
-import { FloorElementTypes } from "../types.js";
+import { Group, Circle, Text, GroupProps } from "fabric";
 import { determineTableColor } from "../utils.js";
 import { ReservationDoc } from "@firetable/types";
 import { FONT_SIZE, TABLE_TEXT_FILL_COLOR } from "../constants";
-import { IGroupOptions } from "fabric/fabric-impl";
 import { AnimationStrategy } from "./animation/AnimationStrategy";
 import { SmoothBlinkAnimation } from "./animation/SmoothBlinkAnimation";
+import { FloorElementTypes } from "../types";
 
 interface CircleTableElementOptions {
     groupOptions: {
         baseFill?: string;
         label: string;
-    } & IGroupOptions;
+    } & Partial<GroupProps>;
     textOptions: {
         label: string;
     };
     circleOptions: Record<string, unknown>;
 }
 
-export class RoundTable extends fabric.Group {
+export class RoundTable extends Group {
+    // @ts-expect-error -- deprecated
     type = FloorElementTypes.ROUND_TABLE;
     reservation: ReservationDoc | undefined;
     label: string;
     baseFill: string;
-    private circle: fabric.Circle;
-    private textLabel: fabric.Text;
+    private circle: Circle;
+    private textLabel: Text;
     private animationStrategy: AnimationStrategy;
 
     constructor(options: CircleTableElementOptions) {
         const baseFillComputed = (options.groupOptions.baseFill as string) || "#444";
-        const tableCircle = new fabric.Circle({
+        const tableCircle = new Circle({
             ...options.circleOptions,
             originX: "center",
             originY: "center",
@@ -37,7 +37,7 @@ export class RoundTable extends fabric.Group {
             stroke: "black",
             strokeWidth: 0.5,
         });
-        const textLabel = new fabric.Text(options.textOptions.label, {
+        const textLabel = new Text(options.groupOptions.label, {
             ...options.textOptions,
             fontSize: FONT_SIZE,
             fill: TABLE_TEXT_FILL_COLOR,
@@ -89,26 +89,24 @@ export class RoundTable extends fabric.Group {
         this.setFill(fill);
     }
 
+    // @ts-expect-error -- ok
     toObject(): Record<string, unknown> {
         return {
             ...super.toObject(),
+            type: this.type,
             opacity: 1,
             baseFill: this.baseFill,
             label: this.label,
         };
     }
 
-    static fromObject(object: any, callback: (obj: RoundTable) => void): void {
+    static async fromObject(object: any): Promise<RoundTable> {
         const circleOptions = object.objects[0];
         const textOptions = object.objects[1];
-        const instance = new RoundTable({
+        return new RoundTable({
             groupOptions: object,
             circleOptions,
             textOptions,
         });
-        callback(instance);
     }
 }
-
-// @ts-expect-error: Unreachable code error
-fabric.RoundTable = fabric.util.createClass(RoundTable);

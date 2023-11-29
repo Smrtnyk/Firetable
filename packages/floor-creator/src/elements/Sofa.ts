@@ -1,20 +1,20 @@
-import { fabric } from "fabric";
+import { Group, Rect, FabricObject, GroupProps } from "fabric";
 import { FloorElementTypes } from "../types";
-import { IGroupOptions } from "fabric/fabric-impl";
 
 type SofaGroupCreationOpts = {
     top: number;
     left: number;
-    objects?: fabric.Object[];
-} & IGroupOptions;
+    objects?: FabricObject[];
+} & Partial<GroupProps>;
 
-export class Sofa extends fabric.Group {
+export class Sofa extends Group {
+    // @ts-expect-error -- deprecated
     type = FloorElementTypes.SOFA;
-    sofaBase: fabric.Rect;
+    sofaBase: Rect;
 
     constructor(sofaGroupOpts: SofaGroupCreationOpts) {
         const sofaBaseOpts = sofaGroupOpts.objects?.[0] ?? {};
-        const base = new fabric.Rect({
+        const base = new Rect({
             width: 25 * 4,
             height: 25 / 1.5,
             fill: "#444",
@@ -28,7 +28,7 @@ export class Sofa extends fabric.Group {
             rx: 4,
         });
 
-        const backrest = new fabric.Rect({
+        const backrest = new Rect({
             left: 0,
             top: -25 / 4,
             width: 25 * 4,
@@ -42,9 +42,8 @@ export class Sofa extends fabric.Group {
         this.sofaBase = base;
     }
 
-    static fromObject(object: any, callback: (obj: Sofa) => void): void {
-        const instance = new Sofa(object);
-        callback(instance);
+    static async fromObject(object: any): Promise<Sofa> {
+        return new Sofa(object);
     }
 
     getBaseFill(): string {
@@ -56,8 +55,3 @@ export class Sofa extends fabric.Group {
         this.canvas?.requestRenderAll();
     }
 }
-
-// @ts-expect-error Register the Sofa class with Fabric
-fabric.Sofa = fabric.util.createClass(Sofa);
-// @ts-expect-error Register the Sofa class with Fabric
-fabric.Sofa.fromObject = Sofa.fromObject;
