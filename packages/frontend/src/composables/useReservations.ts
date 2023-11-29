@@ -52,22 +52,27 @@ export function useReservations(
         floorId: string;
     } | null = null;
 
-    watch(
-        [reservations, floorInstances],
-        ([newReservations, newFloorInstances]) => {
-            checkIfReservedTableAndCloseCreateReservationDialog();
-            for (const floor of newFloorInstances) {
-                floor.clearAllReservations();
-                for (const reservation of newReservations) {
-                    if (reservation.floorId === floor.id) {
-                        const table = floor.getTableByLabel(reservation.tableLabel);
-                        table?.setReservation(reservation);
-                    }
+    watch([reservations, floorInstances], handleFloorUpdates, {
+        immediate: true,
+        deep: true,
+    });
+
+    async function handleFloorUpdates([newReservations, newFloorInstances]: [
+        ReservationDoc[],
+        FloorViewer[],
+    ]): Promise<void> {
+        checkIfReservedTableAndCloseCreateReservationDialog();
+        for (const floor of newFloorInstances) {
+            console.log("updating floor");
+            floor.clearAllReservations();
+            for (const reservation of newReservations) {
+                if (reservation.floorId === floor.id) {
+                    const table = floor.getTableByLabel(reservation.tableLabel);
+                    table?.setReservation(reservation);
                 }
             }
-        },
-        { immediate: true, deep: true },
-    );
+        }
+    }
 
     function isOwnReservation(reservation: Reservation): boolean {
         return authStore.user?.id === reservation.creator?.id;
