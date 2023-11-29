@@ -16,6 +16,12 @@ import { onMounted, ref } from "vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import { useI18n } from "vue-i18n";
 
+type Link = {
+    label: string;
+    icon: string;
+    route: { name: string; params: Record<string, string> };
+};
+
 const { t } = useI18n();
 const quasar = useQuasar();
 const isLoading = ref(false);
@@ -23,6 +29,36 @@ const isLoading = ref(false);
 const organisations = ref<OrganisationDoc[]>([]);
 
 onMounted(fetchOrganisations);
+
+function createLinks(organisationId: string): Link[] {
+    return [
+        {
+            label: t("AppDrawer.links.manageEvents"),
+            icon: "calendar",
+            route: { name: "adminEvents", params: { organisationId } },
+        },
+        {
+            label: t("AppDrawer.links.manageUsers"),
+            icon: "users",
+            route: { name: "adminUsers", params: { organisationId } },
+        },
+        {
+            label: t("AppDrawer.links.manageFloors"),
+            icon: "arrow-expand",
+            route: { name: "adminFloors", params: { organisationId } },
+        },
+        {
+            label: t("AppDrawer.links.manageProperties"),
+            icon: "home",
+            route: { name: "adminProperties", params: { organisationId } },
+        },
+        {
+            label: "Manage Analytics",
+            icon: "line-chart",
+            route: { name: "adminAnalytics", params: { organisationId } },
+        },
+    ];
+}
 
 async function fetchOrganisations(): Promise<void> {
     isLoading.value = true;
@@ -83,78 +119,19 @@ function createOrganisation(): void {
                 class="ft-card"
             >
                 <q-list>
-                    <!-- Admin Events -->
                     <q-item
+                        v-for="item of createLinks(organisation.id)"
+                        :key="item.label"
                         clickable
                         class="ft-card"
-                        :to="{ name: 'adminEvents', params: { organisationId: organisation.id } }"
+                        :to="item.route"
                     >
                         <q-item-section avatar>
-                            <q-icon name="calendar" />
+                            <q-icon :name="item.icon" />
                         </q-item-section>
                         <q-item-section>
-                            {{ t("AppDrawer.links.manageEvents") }}
+                            {{ item.label }}
                         </q-item-section>
-                    </q-item>
-
-                    <!-- Admin Users -->
-                    <q-item
-                        clickable
-                        class="ft-card"
-                        :to="{ name: 'adminUsers', params: { organisationId: organisation.id } }"
-                    >
-                        <q-item-section avatar>
-                            <q-icon name="users" />
-                        </q-item-section>
-                        <q-item-section>
-                            {{ t("AppDrawer.links.manageUsers") }}
-                        </q-item-section>
-                    </q-item>
-
-                    <!-- Admin Floors -->
-                    <q-item
-                        clickable
-                        class="ft-card"
-                        :to="{ name: 'adminFloors', params: { organisationId: organisation.id } }"
-                    >
-                        <q-item-section avatar>
-                            <q-icon name="arrow-expand" />
-                        </q-item-section>
-                        <q-item-section>
-                            {{ t("AppDrawer.links.manageFloors") }}
-                        </q-item-section>
-                    </q-item>
-
-                    <!-- Admin Properties -->
-                    <q-item
-                        clickable
-                        class="ft-card"
-                        :to="{
-                            name: 'adminProperties',
-                            params: { organisationId: organisation.id },
-                        }"
-                    >
-                        <q-item-section avatar>
-                            <q-icon name="home" />
-                        </q-item-section>
-                        <q-item-section>
-                            {{ t("AppDrawer.links.manageProperties") }}
-                        </q-item-section>
-                    </q-item>
-
-                    <!-- Admin Analytics -->
-                    <q-item
-                        clickable
-                        class="ft-card"
-                        :to="{
-                            name: 'adminAnalytics',
-                            params: { organisationId: organisation.id },
-                        }"
-                    >
-                        <q-item-section avatar>
-                            <q-icon name="line-chart" />
-                        </q-item-section>
-                        <q-item-section> Manage Analytics </q-item-section>
                     </q-item>
                 </q-list>
 
