@@ -111,7 +111,6 @@ export class TouchManager {
         newY = Math.min(0, Math.max(minY, newY));
 
         this.floor.canvas.setViewportTransform([zoom, 0, 0, zoom, newX, newY]);
-        this.floor.canvas.requestRenderAll();
     };
 
     destroy(): void {
