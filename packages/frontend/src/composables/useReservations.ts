@@ -63,7 +63,6 @@ export function useReservations(
     ]): Promise<void> {
         checkIfReservedTableAndCloseCreateReservationDialog();
         for (const floor of newFloorInstances) {
-            console.log("updating floor");
             floor.clearAllReservations();
             for (const reservation of newReservations) {
                 if (reservation.floorId === floor.id) {
@@ -161,7 +160,10 @@ export function useReservations(
                     componentPropsObject: {
                         users: filterUsersPerProperty(users.value, eventOwner.propertyId),
                         mode,
-                        reservationData: mode === "edit" ? element.reservation : void 0,
+                        reservationData:
+                            mode === "edit" && element.reservation
+                                ? { ...element.reservation, id: element.reservation.id }
+                                : void 0,
                         eventStartTimestamp: event.value!.date,
                         floor: floor,
                         table: element,
