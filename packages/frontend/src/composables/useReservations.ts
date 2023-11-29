@@ -82,7 +82,25 @@ export function useReservations(
 
     function handleReservationCreation(reservationData: Reservation): void {
         void tryCatchLoadingWrapper({
-            hook: () => addReservation(eventOwner, reservationData),
+            hook: async function () {
+                await addReservation(eventOwner, reservationData);
+                q.notify({
+                    message: "Reservation created",
+                    color: "positive",
+                });
+            },
+        });
+    }
+
+    function handleReservationUpdate(reservationData: ReservationDoc): void {
+        void tryCatchLoadingWrapper({
+            hook: async function () {
+                await updateReservationDoc(eventOwner, reservationData);
+                q.notify({
+                    message: "Reservation updated",
+                    color: "positive",
+                });
+            },
         });
     }
 
@@ -149,8 +167,8 @@ export function useReservations(
                             handleReservationCreation(reservationData);
                             dialog.hide();
                         },
-                        update(reservationData: Reservation) {
-                            handleReservationCreation(reservationData);
+                        update(reservationData: ReservationDoc) {
+                            handleReservationUpdate(reservationData);
                             dialog.hide();
                         },
                     },
