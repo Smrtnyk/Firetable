@@ -74,7 +74,7 @@ const reservedByLabel = computed(() => {
         : t(`EventCreateReservation.reservedByLabel`);
 });
 
-function options(hr: number, min = 0): boolean {
+function options(hr: number, min: number | null = 0): boolean {
     // Calculate the event start and end times based on the eventStartTimestamp in UTC
     const eventStart = new Date(props.eventStartTimestamp);
     const eventEnd = new Date(props.eventStartTimestamp + 8 * 3600 * 1000); // Add 8 hours
@@ -87,7 +87,7 @@ function options(hr: number, min = 0): boolean {
             currentDate.getUTCMonth(),
             currentDate.getUTCDate(),
             hr,
-            min,
+            min || 0,
             0,
             0,
         ),
@@ -159,7 +159,7 @@ async function onOKClick(): Promise<void> {
                 <template #append>
                     <q-icon name="clock" class="cursor-pointer" />
                     <q-popup-proxy transition-show="scale" transition-hide="scale">
-                        <q-time :options="options as any" v-model="state.time" format24h>
+                        <q-time :options="options" v-model="state.time" format24h>
                             <div class="row items-center justify-end">
                                 <q-btn
                                     :label="t('EventCreateForm.inputDateTimePickerCloseBtnLabel')"
@@ -218,6 +218,7 @@ async function onOKClick(): Promise<void> {
 
             <!-- Select input for choosing the user or social -->
             <q-select
+                standout
                 v-model="state.reservedBy"
                 :options="selectableOptions"
                 option-label="name"
