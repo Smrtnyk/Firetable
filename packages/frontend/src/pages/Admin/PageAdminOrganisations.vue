@@ -135,7 +135,7 @@ function createOrganisation(): void {
                         }"
                     >
                         <q-item-section avatar>
-                            <q-icon name="arrow-expand" />
+                            <q-icon name="home" />
                         </q-item-section>
                         <q-item-section>
                             {{ t("AppDrawer.links.manageProperties") }}
@@ -152,7 +152,7 @@ function createOrganisation(): void {
                         }"
                     >
                         <q-item-section avatar>
-                            <q-icon name="arrow-expand" />
+                            <q-icon name="line-chart" />
                         </q-item-section>
                         <q-item-section> Manage Analytics </q-item-section>
                     </q-item>
