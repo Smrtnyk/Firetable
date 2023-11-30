@@ -3,7 +3,7 @@ export interface FloorDoc {
     name: string;
     width: number;
     height: number;
-    json: string;
+    json: string | Record<string, any>;
     propertyId: string;
 }
 

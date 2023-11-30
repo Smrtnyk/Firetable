@@ -1,7 +1,7 @@
 import { Floor } from "./Floor.js";
 import { BaseTable } from "./types.js";
 import { FloorDoc } from "@firetable/types";
-import { propIsTruthy, takeProp } from "@firetable/utils";
+import { isString, propIsTruthy, takeProp } from "@firetable/utils";
 import { isTable } from "./type-guards";
 
 export function hasFloorTables(floor: Floor): boolean {
@@ -9,7 +9,10 @@ export function hasFloorTables(floor: Floor): boolean {
 }
 
 export function getTablesFromFloorDoc(floor: FloorDoc): BaseTable[] {
-    return JSON.parse(floor.json).objects.filter(isTable);
+    if (isString(floor.json)) {
+        return JSON.parse(floor.json).objects.filter(isTable);
+    }
+    return floor.json.objects.filter(isTable);
 }
 
 export function getTables(floor: Floor): BaseTable[] {
