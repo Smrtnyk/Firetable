@@ -58,7 +58,6 @@ export class FloorZoomManager {
             }
         }
         this.floor.setObjectCoords();
-        this.canvas.requestRenderAll();
         this.isZooming = false;
     }
 

@@ -54,7 +54,7 @@ export class ElementManager {
             },
             textOptions: { label },
         });
-        table.set({ left: x, top: y, objectCaching: false });
+        table.set({ left: x, top: y });
         return table;
     }
 
@@ -74,7 +74,6 @@ export class ElementManager {
                 label,
             },
         });
-        table.set({ objectCaching: false });
         return table;
     }
 

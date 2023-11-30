@@ -3,6 +3,7 @@ import { fabric } from "fabric";
 import { FloorCreationOptions, FloorEditorElement } from "./types";
 import { ViewerEventManager } from "./event-manager/ViewerEventManager";
 import { EventEmitter } from "./event-emitter/EventEmitter";
+import { isTable } from "./type-guards";
 
 type FloorViewerEvents = {
     elementClicked: [FloorViewer, FloorEditorElement];
@@ -36,11 +37,11 @@ export class FloorViewer extends Floor {
         /* empty for now */
     }
 
-    protected onElementClick = (ev: fabric.IEvent<MouseEvent>): void => {
+    protected onElementClick = (obj: fabric.Object): void => {
         if (this.touchManager.isInteracting || this.zoomManager.isZooming) {
             return;
         }
-        this.eventEmitter.emit("elementClicked", this, ev.target as FloorEditorElement);
+        this.eventEmitter.emit("elementClicked", this, obj as FloorEditorElement);
     };
 
     protected setElementProperties(element: fabric.Object): void {
@@ -56,6 +57,11 @@ export class FloorViewer extends Floor {
 
         // Override the cursor style on hover for all elements in viewer
         element.hoverCursor = "default";
+        element.selectable = false;
+
+        if (!isTable(element)) {
+            element.evented = false;
+        }
     }
 
     destroy(): void {

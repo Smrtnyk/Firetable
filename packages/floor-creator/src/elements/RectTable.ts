@@ -186,7 +186,6 @@ export class RectTable extends fabric.Group {
             baseFill: this.baseFill,
             label: this.label,
             reservation: this.reservation,
-            objectCaching: false,
         };
     }
 

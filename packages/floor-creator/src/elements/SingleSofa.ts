@@ -26,7 +26,6 @@ export class SingleSofa extends fabric.Group {
             top: 0,
             rx: 4,
             ry: 4,
-            objectCaching: true,
         });
 
         const backrest = new fabric.Rect({
@@ -37,16 +36,14 @@ export class SingleSofa extends fabric.Group {
             fill: "#444",
             stroke: "#222",
             strokeWidth: 0.5,
-            objectCaching: true,
         });
 
         super([base, backrest], sofaGroupOpts);
-        this.objectCaching = true;
         this.sofaBase = base;
     }
 
     static fromObject(object: any, callback: (obj: SingleSofa) => void): void {
-        const instance = new SingleSofa({ ...object, objectCaching: true });
+        const instance = new SingleSofa(object);
         callback(instance);
     }
 

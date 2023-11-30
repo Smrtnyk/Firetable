@@ -74,8 +74,8 @@ export class FloorEditor extends Floor {
         this.emit("doubleClick", this, coordinates);
     }
 
-    protected onElementClick = (ev: fabric.IEvent<MouseEvent>): void => {
-        this.emit("elementClicked", this, ev.target as FloorEditorElement);
+    protected onElementClick = (obj: fabric.Object): void => {
+        this.emit("elementClicked", this, obj as FloorEditorElement);
     };
 
     renderGrid(): void {
@@ -100,7 +100,9 @@ export class FloorEditor extends Floor {
 
     addElement(options: CreateElementOptions): void {
         const element = this.elementManager.addElement(options);
-        element.on("mouseup", this.onElementClick);
+        element.on("mouseup", () => {
+            this.onElementClick(element);
+        });
         this.setElementProperties(element);
         this.canvas.add(element);
     }

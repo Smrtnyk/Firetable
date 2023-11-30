@@ -10,7 +10,6 @@ export class DJBooth extends fabric.Group {
             width: 120,
             height: 60,
             fill: "#1C1C1C",
-            objectCaching: true,
         });
 
         const turntable1 = new fabric.Circle({
@@ -20,7 +19,6 @@ export class DJBooth extends fabric.Group {
             fill: "#1C1C1C",
             stroke: "#2F2F2F", // Dark Grey
             strokeWidth: 2,
-            objectCaching: true,
         });
 
         const turntable2 = new fabric.Circle({
@@ -30,7 +28,6 @@ export class DJBooth extends fabric.Group {
             fill: "#1C1C1C",
             stroke: "#2F2F2F",
             strokeWidth: 2,
-            objectCaching: true,
         });
 
         const djSign = new fabric.Text("DJ", {
@@ -40,7 +37,6 @@ export class DJBooth extends fabric.Group {
             fontSize: 20,
             fill: "#FFFFFF",
             fontWeight: "bold",
-            objectCaching: true,
         });
 
         const ledSpacing = body.width! / 7; // dividing by total LEDs + 1 for even spacing
@@ -50,12 +46,10 @@ export class DJBooth extends fabric.Group {
                 top: 57,
                 radius: 2,
                 fill: "#3498DB",
-                objectCaching: true,
             });
         });
 
-        super([body, turntable1, turntable2, djSign, ...leds], { left, top, objectCaching: true });
-        this.objectCaching = true;
+        super([body, turntable1, turntable2, djSign, ...leds], { left, top });
     }
 
     getBaseFill(): string {

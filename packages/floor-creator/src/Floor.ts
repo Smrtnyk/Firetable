@@ -29,7 +29,7 @@ export abstract class Floor {
     abstract onFloorDoubleTap(coordinates: [x: number, y: number]): void;
     abstract emit(event: string, ...args: unknown[]): void;
     abstract on(event: string, listener: EventEmitterListener): void;
-    protected abstract onElementClick(ev: fabric.IEvent<MouseEvent>): void;
+    protected abstract onElementClick(ev: fabric.Object): void;
     protected abstract setElementProperties(element: fabric.Object): void;
     abstract destroy(): void;
 
@@ -67,8 +67,8 @@ export abstract class Floor {
     }
 
     elementReviver = (_: string, object: fabric.Object): void => {
-        object.on("mouseup", (ev) => {
-            this.onElementClick(ev);
+        object.on("mouseup", () => {
+            this.onElementClick(object);
         });
         this.setElementProperties(object);
     };
