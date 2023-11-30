@@ -33,8 +33,7 @@ export class Wall extends Group {
         this.canvas?.requestRenderAll();
     }
 
-    // @ts-expect-error -- ok
-    toObject(): void {
+    toObject(): any {
         return super.toObject();
     }
 

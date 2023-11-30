@@ -1,4 +1,4 @@
-import { Canvas, FabricObject, TPointerEventInfo, classRegistry } from "fabric";
+import { Canvas, FabricObject, classRegistry } from "fabric";
 import { CANVAS_BG_COLOR } from "./constants.js";
 import { BaseTable, FloorCreationOptions, FloorElementTypes } from "./types.js";
 import { FloorDoc } from "@firetable/types";
@@ -75,7 +75,6 @@ export abstract class Floor {
 
     elementReviver = (_: Record<string, any>, object: FabricObject): void => {
         object.on("mouseup", () => {
-            // @ts-expect-error -- ok
             this.onElementClick(object);
         });
         this.setElementProperties(object);
