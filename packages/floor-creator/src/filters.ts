@@ -1,7 +1,7 @@
 import { Floor } from "./Floor.js";
 import { BaseTable } from "./types.js";
 import { FloorDoc } from "@firetable/types";
-import { isString, propIsTruthy, takeProp } from "@firetable/utils";
+import { isString, takeProp } from "@firetable/utils";
 import { isTable } from "./type-guards";
 
 export function hasFloorTables(floor: Floor): boolean {
@@ -16,17 +16,7 @@ export function getTablesFromFloorDoc(floor: FloorDoc): BaseTable[] {
 }
 
 export function getTables(floor: Floor): BaseTable[] {
-    const tables: BaseTable[] = [];
-    floor.canvas.forEachObject((group) => {
-        if (isTable(group)) {
-            tables.push(group);
-        }
-    });
-    return tables;
-}
-
-export function getReservedTables(floor: Floor): BaseTable[] {
-    return getTables(floor).filter(propIsTruthy("reservation"));
+    return floor.canvas.getObjects().filter(isTable);
 }
 
 export function extractAllTablesLabels(floor: Floor): string[] {

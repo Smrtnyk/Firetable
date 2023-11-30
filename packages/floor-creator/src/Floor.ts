@@ -8,7 +8,7 @@ import { EventManager } from "./event-manager/EventManager";
 import { calculateCanvasScale } from "./utils";
 import { EventEmitterListener } from "./event-emitter/EventEmitter";
 import { isTable } from "./type-guards";
-import { getReservedTables } from "./filters";
+import { getTables } from "./filters";
 import { RectTable } from "./elements/RectTable";
 import { Sofa } from "./elements/Sofa";
 import { Wall } from "./elements/Wall";
@@ -117,7 +117,7 @@ export abstract class Floor {
     }
 
     clearAllReservations(): void {
-        getReservedTables(this).forEach((table) => {
+        getTables(this).forEach((table) => {
             table.setReservation(void 0);
         });
         this.canvas.requestRenderAll();
