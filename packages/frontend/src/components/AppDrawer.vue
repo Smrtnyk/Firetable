@@ -82,10 +82,6 @@ function setAppLanguage(val: string): void {
     LocalStorage.set("FTLang", val);
     locale.value = val;
 }
-
-function refreshApp(): void {
-    window.location.reload();
-}
 </script>
 
 <template>
@@ -156,15 +152,6 @@ function refreshApp(): void {
                     :label="t('AppDrawer.toggles.darkMode')"
                     unchecked-icon="sun"
                     size="lg"
-                />
-            </q-item>
-            <q-item>
-                <q-btn
-                    icon="redo"
-                    @click="refreshApp"
-                    label="Refresh App"
-                    rounded
-                    class="button-gradient"
                 />
             </q-item>
         </q-list>

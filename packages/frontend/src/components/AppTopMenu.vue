@@ -13,6 +13,10 @@ const menuLinks = [
 ];
 
 const appStore = useAppStore();
+
+function refreshApp(): void {
+    window.location.reload();
+}
 </script>
 
 <template>
@@ -24,6 +28,8 @@ const appStore = useAppStore();
             active-color="white"
             :breakpoint="0"
         >
+            <q-btn icon="redo" rounded @click="refreshApp" flat />
+            <q-space />
             <q-route-tab
                 v-for="menu in menuLinks"
                 :key="menu.icon"
