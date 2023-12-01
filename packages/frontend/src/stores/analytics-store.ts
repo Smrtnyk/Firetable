@@ -25,5 +25,8 @@ export const useAnalyticsStore = defineStore("analytics", {
         getDataForMonth(month: string): ReservationBucket[] | undefined {
             return this.dataCache[month];
         },
+        clearData() {
+            this.dataCache = {};
+        },
     },
 });

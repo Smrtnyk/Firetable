@@ -10,7 +10,7 @@ import AdminEventReservationsByPerson from "src/components/admin/event/AdminEven
 import { eventsCollection, reservationsCollection } from "@firetable/backend";
 import { getDocs, query, where } from "firebase/firestore";
 import { EventDoc, PropertyDoc } from "@firetable/types";
-import { computed, ref, watch } from "vue";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { Loading } from "quasar";
 import { usePropertiesStore } from "src/stores/usePropertiesStore";
@@ -256,6 +256,10 @@ const reservationsByDayOfWeek = computed((): TimeSeriesData => {
             },
         ],
     };
+});
+
+onBeforeUnmount(() => {
+    analyticsStore.clearData();
 });
 
 watch(
