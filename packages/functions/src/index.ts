@@ -14,6 +14,11 @@ import { onPropertyDeletedCleanEvents } from "./trigger/on-property-deleted-clea
 import { auth } from "./init.js";
 import { logger } from "firebase-functions";
 
+import { onRequest } from "firebase-functions/v2/https";
+import { setGlobalOptions } from "firebase-functions/v2";
+
+setGlobalOptions({ region: "europe-west3" });
+
 const MIN_PASSWORD_LENGTH = 6;
 
 // Everything that has to do with events
@@ -85,7 +90,7 @@ export const clearOldEvents = functions
     .onRun(clearOldEventsFn);
 
 // HealthCheck
-export const healthCheck = functions.region("europe-west3").https.onRequest((request, response) => {
+export const healthCheck = onRequest({ cors: true }, (request, response) => {
     // Set CORS headers for preflight requests
     // Allows all origins
     if (request.method === "OPTIONS") {
