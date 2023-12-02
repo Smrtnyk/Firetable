@@ -8,19 +8,15 @@ import { FieldValue } from "firebase-admin/firestore";
  * Cleans up associated data for a user when they are deleted.
  * Specifically, removes the user's ID from the relatedUsers field of properties they were associated with.
  *
- * @param snap - The snapshot of the deleted user data.
  * @param context - Context of the event that triggered the function.
  * @throws Throws error if there's an issue cleaning up the data.
  */
-export async function onUserDeletedFn(
-    snap: functions.firestore.QueryDocumentSnapshot,
-    context: functions.EventContext<{
-        userId: string;
-        organisationId: string;
-    }>,
-): Promise<void> {
-    const userId = context.params.userId;
-    const organisationId = context.params.organisationId;
+export async function onUserDeletedFn(context: {
+    userId: string;
+    organisationId: string;
+}): Promise<void> {
+    const userId = context.userId;
+    const organisationId = context.organisationId;
     logger.info(`Cleaning up data for deleted user with id: ${userId}`);
 
     try {

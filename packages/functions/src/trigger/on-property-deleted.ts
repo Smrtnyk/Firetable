@@ -7,21 +7,20 @@ import { FieldValue } from "firebase-admin/firestore";
  * Cleans up associated user-property mappings when a property is deleted.
  * Removes the property's ID from relatedUsers fields of associated users.
  *
- * @param snap - The snapshot of the deleted property data.
- * @param context - Context of the event that triggered the function.
+ * @param params - Context of the event that triggered the function.
  * @throws Throws error if there's an issue cleaning up the user-property mappings.
  */
-export async function onPropertyDeletedFn(
-    snap: functions.firestore.QueryDocumentSnapshot,
-    context: functions.EventContext,
-): Promise<void> {
-    const propertyId = context.params.propertyId;
-    const organisationid = context.params.organisationid;
+export async function onPropertyDeletedFn(params: {
+    propertyId: string;
+    organisationId: string;
+}): Promise<void> {
+    const propertyId = params.propertyId;
+    const organisationId = params.organisationId;
 
     try {
         // 1. Cleanup associated user-property mappings
         const usersSnapshot = await db
-            .collection(`${Collection.ORGANISATIONS}/${organisationid}/${Collection.USERS}`)
+            .collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`)
             .where("relatedProperties", "array-contains", propertyId)
             .get();
 

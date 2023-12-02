@@ -7,15 +7,11 @@ import { deleteDocument } from "../delete-document/index.js";
  * Cleans up associated events and their subcollections when a property is deleted.
  * Removes all events where propertyId matches the ID of the deleted property.
  *
- * @param snap - The snapshot of the deleted property data.
- * @param context - Context of the event that triggered the function.
+ * @param params - Context of the event that triggered the function.
  * @throws Throws error if there's an issue cleaning up the associated events and their subcollections.
  */
-export async function onPropertyDeletedCleanEvents(
-    snap: functions.firestore.QueryDocumentSnapshot,
-    context: functions.EventContext,
-): Promise<void> {
-    const propertyId = context.params.propertyId;
+export async function onPropertyDeletedCleanEvents(params: { propertyId: string }): Promise<void> {
+    const propertyId = params.propertyId;
 
     try {
         // Fetch events associated with the property

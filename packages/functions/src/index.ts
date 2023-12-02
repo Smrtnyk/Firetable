@@ -15,6 +15,7 @@ import { auth } from "./init.js";
 import { logger } from "firebase-functions";
 
 import { onRequest } from "firebase-functions/v2/https";
+import { onDocumentDeleted } from "firebase-functions/v2/firestore";
 import { setGlobalOptions } from "firebase-functions/v2";
 
 setGlobalOptions({ region: "europe-west3" });
@@ -60,25 +61,23 @@ export const fetchUsersByRole = functions.region("europe-west3").https.onCall(fe
 export const createUser = functions.region("europe-west3").https.onCall(createUserFn);
 export const updateUser = functions.region("europe-west3").https.onCall(updateUserFn);
 export const deleteUser = functions.region("europe-west3").https.onCall(deleteUserFn);
-export const onUserDeleted = functions
-    .region("europe-west3")
-    .firestore.document(`${Collection.ORGANISATIONS}/{organisationId}/${Collection.USERS}/{userId}`)
-    .onDelete(onUserDeletedFn);
+export const onUserDeleted = onDocumentDeleted(
+    `${Collection.ORGANISATIONS}/{organisationId}/${Collection.USERS}/{userId}`,
+    (event) => {
+        return onUserDeletedFn(event.params);
+    },
+);
 
 // Properties
 export const createProperty = functions.region("europe-west3").https.onCall(createPropertyFn);
-export const onPropertyDelete = functions
-    .region("europe-west3")
-    .firestore.document(
-        `${Collection.ORGANISATIONS}/{organisationId}/${Collection.PROPERTIES}/{propertyId}`,
-    )
-    .onDelete(onPropertyDeletedFn);
-export const onPropertyDeleteCleanupEvents = functions
-    .region("europe-west3")
-    .firestore.document(
-        `${Collection.ORGANISATIONS}/{organisationId}/${Collection.PROPERTIES}/{propertyId}`,
-    )
-    .onDelete(onPropertyDeletedCleanEvents);
+export const onPropertyDelete = onDocumentDeleted(
+    `${Collection.ORGANISATIONS}/{organisationId}/${Collection.PROPERTIES}/{propertyId}`,
+    (event) => onPropertyDeletedFn(event.params),
+);
+export const onPropertyDeleteCleanupEvents = onDocumentDeleted(
+    `${Collection.ORGANISATIONS}/{organisationId}/${Collection.PROPERTIES}/{propertyId}`,
+    (event) => onPropertyDeletedCleanEvents(event.params),
+);
 
 // Generic stuff
 export const deleteCollection = functions.region("europe-west3").https.onCall(deleteDocument);
@@ -91,18 +90,5 @@ export const clearOldEvents = functions
 
 // HealthCheck
 export const healthCheck = onRequest({ cors: true }, (request, response) => {
-    // Set CORS headers for preflight requests
-    // Allows all origins
-    if (request.method === "OPTIONS") {
-        // Send response to OPTIONS requests
-        response.set("Access-Control-Allow-Origin", "*");
-        response.set("Access-Control-Allow-Methods", "GET");
-        response.set("Access-Control-Allow-Headers", "Content-Type");
-        response.set("Access-Control-Max-Age", "3600");
-        response.status(204).send("");
-    } else {
-        // Set CORS headers for the main request
-        response.set("Access-Control-Allow-Origin", "*");
-        response.status(200).send("Service is up and running");
-    }
+    response.status(200).send("Service is up and running");
 });
