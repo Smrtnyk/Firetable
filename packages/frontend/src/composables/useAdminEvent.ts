@@ -1,4 +1,4 @@
-import { computed, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { EventDoc, FloorDoc, ReservationDoc, User } from "@firetable/types";
 import {
@@ -13,11 +13,16 @@ import {
     getReservationsPath,
     usersCollection,
 } from "@firetable/backend";
+import { decompressFloorDoc } from "src/helpers/compress-floor-doc";
 
 export default function useAdminEvent(eventOwner: EventOwner) {
     const router = useRouter();
+    const eventFloors = ref<FloorDoc[]>([]);
 
-    const eventFloorsHook = useFirestoreCollection<FloorDoc>(getEventFloorsPath(eventOwner));
+    const eventFloorsHook = useFirestoreCollection<FloorDoc>(getEventFloorsPath(eventOwner), {
+        once: true,
+        wait: true,
+    });
     const reservations = useFirestoreCollection<ReservationDoc>(getReservationsPath(eventOwner));
 
     const usersHook = useFirestoreCollection<User>(
@@ -28,6 +33,16 @@ export default function useAdminEvent(eventOwner: EventOwner) {
     );
 
     const eventHook = useFirestoreDocument<EventDoc>(getEventPath(eventOwner));
+
+    watch(eventFloorsHook.data, async (floors) => {
+        if (floors.length === 0) {
+            eventFloors.value = [];
+            return;
+        }
+        for (const floorDoc of floors) {
+            eventFloors.value.push(await decompressFloorDoc(floorDoc));
+        }
+    });
 
     watch(eventHook.error, () => {
         if (eventHook.error.value) {
@@ -41,7 +56,7 @@ export default function useAdminEvent(eventOwner: EventOwner) {
     });
 
     return {
-        eventFloors: eventFloorsHook.data,
+        eventFloors,
         users: usersHook.data,
         event: eventHook.data,
         reservations: reservations.data,

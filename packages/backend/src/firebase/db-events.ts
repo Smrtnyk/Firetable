@@ -26,6 +26,7 @@ import {
 import {
     CreateEventPayload,
     EventDoc,
+    FloorDoc,
     GuestData,
     Reservation,
     ReservationDoc,
@@ -109,10 +110,12 @@ export function updateReservationDoc(
     });
 }
 
-export function updateEventFloorData(owner: EventOwner, floor: Floor): Promise<void> {
-    return updateDoc(eventFloorDoc(owner, floor.id), {
-        json: floor.json,
-        lastModified: Date.now(),
+export function updateEventFloorData(
+    owner: EventOwner,
+    floorData: Pick<FloorDoc, "id" | "json">,
+): Promise<void> {
+    return updateDoc(eventFloorDoc(owner, floorData.id), {
+        json: floorData.json,
     });
 }
 

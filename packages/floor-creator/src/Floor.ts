@@ -68,8 +68,7 @@ export abstract class Floor {
     }
 
     get json(): string {
-        // @ts-expect-error --- not typed properly
-        const json = this.canvas.toJSON(["label", "name", "type"]);
+        const json = this.canvas.toDatalessJSON(["label", "name", "type"]);
         return JSON.stringify(json);
     }
 

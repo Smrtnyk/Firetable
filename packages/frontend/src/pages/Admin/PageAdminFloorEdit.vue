@@ -28,6 +28,7 @@ import {
 import { isNumber } from "@firetable/utils";
 import { isMobile, buttonSize, isTablet } from "src/global-reactives/screen-detection";
 import { getFloorPath } from "@firetable/backend";
+import { compressFloorDoc, decompressFloorDoc } from "src/helpers/compress-floor-doc";
 
 type ElementDescriptor = {
     tag: ElementTag;
@@ -118,12 +119,12 @@ const resizeFloor = debounce((): void => {
     floorInstance.value.resize(pageRef.value.clientWidth);
 }, 100);
 
-function instantiateFloor(floorDoc: FloorDoc): void {
+async function instantiateFloor(floorDoc: FloorDoc): Promise<void> {
     if (!canvasRef.value || !pageRef.value) return;
 
     floorInstance.value = new FloorEditor({
         canvas: canvasRef.value,
-        floorDoc,
+        floorDoc: await decompressFloorDoc(floorDoc),
         containerWidth: pageRef.value.clientWidth,
     });
 
@@ -135,19 +136,23 @@ function instantiateFloor(floorDoc: FloorDoc): void {
     });
 }
 
-function onFloorSave(): void {
+async function onFloorSave(): Promise<void> {
     if (!floorInstance.value || !hasFloorTables(floorInstance.value as FloorEditor)) {
         return showErrorMessage("You need to add at least one table!");
     }
 
-    tryCatchLoadingWrapper({
-        hook: () =>
-            updateFirestoreDocument(getFirestoreDocument(floorPath), {
-                json: floorInstance.value?.json,
-                name: floorInstance.value?.name,
-                width: floorInstance.value?.width,
-                height: floorInstance.value?.height,
-            }),
+    const { name, width, height, json } = floorInstance.value;
+
+    await tryCatchLoadingWrapper({
+        hook: async function () {
+            await updateFirestoreDocument(getFirestoreDocument(floorPath), {
+                json: await compressFloorDoc(json),
+                name,
+                width,
+                height,
+                compressed: true,
+            });
+        },
     });
 }
 

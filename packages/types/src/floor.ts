@@ -5,6 +5,7 @@ export interface FloorDoc {
     height: number;
     json: string | Record<string, any>;
     propertyId: string;
+    compressed?: boolean;
 }
 
 export type EventFloorDoc = FloorDoc & {

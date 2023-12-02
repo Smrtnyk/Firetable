@@ -124,6 +124,9 @@ importers:
       '@quasar/extras':
         specifier: 1.16.9
         version: 1.16.9
+      '@types/pako':
+        specifier: 2.0.3
+        version: 2.0.3
       chart.js:
         specifier: 4.4.0
         version: 4.4.0
@@ -133,6 +136,9 @@ importers:
       date-fns:
         specifier: 2.30.0
         version: 2.30.0
+      pako:
+        specifier: 2.1.0
+        version: 2.1.0
       pinia:
         specifier: 2.1.7
         version: 2.1.7(typescript@5.3.2)(vue@3.4.0-alpha.3)
@@ -3502,6 +3508,10 @@ packages:
 
   /@types/normalize-package-data@2.4.3:
     resolution: {integrity: sha512-ehPtgRgaULsFG8x0NeYJvmyH1hmlfsNLujHe9dQEia/7MAJYdzMSi19JtchUHjmBA6XC/75dK55mzZH+RyieSg==}
+
+  /@types/pako@2.0.3:
+    resolution: {integrity: sha512-bq0hMV9opAcrmE0Byyo0fY3Ew4tgOevJmQ9grUhpXQhYfyLJ1Kqg3P33JT5fdbT2AjeAjR51zqqVjAL/HMkx7Q==}
+    dev: false
 
   /@types/qs@6.9.9:
     resolution: {integrity: sha512-wYLxw35euwqGvTDx6zfY1vokBFnsK0HNrzc6xNHchxfO2hpuRg74GbkEW7e3sSmPvj0TjCDT1VCa6OtHXnubsg==}
@@ -10168,6 +10178,10 @@ packages:
       ip: 1.1.8
       netmask: 2.0.2
     dev: true
+
+  /pako@2.1.0:
+    resolution: {integrity: sha512-w+eufiZ1WuJYgPXbV/PO3NCMEc3xqylkKHzp8bxp1uW4qaSNQUkwmLLEc3kKsfz8lpV1F8Ht3U1Cm+9Srog2ug==}
+    dev: false
 
   /param-case@2.1.1:
     resolution: {integrity: sha512-eQE845L6ot89sk2N8liD8HAuH4ca6Vvr7VWAWwt7+kvvG5aBcPmmphQ68JsEG2qa9n1TykS2DLeMt363AAH8/w==}

@@ -16,6 +16,7 @@ import { VueFirestoreDocumentData } from "vuefire";
 import { useUsers } from "src/composables/useUsers";
 import { useReservations } from "src/composables/useReservations";
 import { debounce } from "quasar";
+import { decompressFloorDoc } from "src/helpers/compress-floor-doc";
 
 const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
 
@@ -79,7 +80,7 @@ export function useFloorsPageEvent(
 
     async function initFloorInstancesData(): Promise<void> {
         await nextTick();
-        instantiateFloors();
+        await instantiateFloors();
         setActiveFloor(floorInstances.value[0] as FloorViewer);
         checkReservationsForTimeAndMarkTableIfNeeded();
     }
@@ -100,17 +101,17 @@ export function useFloorsPageEvent(
         };
     }
 
-    function instantiateFloors(): void {
-        eventFloors.value.forEach(instantiateFloor);
+    async function instantiateFloors(): Promise<void> {
+        await Promise.all(eventFloors.value.map(instantiateFloor));
     }
 
-    function instantiateFloor(floorDoc: EventFloorDoc): void {
+    async function instantiateFloor(floorDoc: EventFloorDoc): Promise<void> {
         const canvas = canvases.get(floorDoc.id);
 
         if (!canvas || !pageRef.value) return;
         const floorViewer = new FloorViewer({
             canvas,
-            floorDoc,
+            floorDoc: await decompressFloorDoc(floorDoc),
             containerWidth: pageRef.value.clientWidth,
         });
         floorViewer.on("elementClicked", tableClickHandler);

@@ -19,6 +19,7 @@ import { withLoading } from "src/helpers/ui-helpers";
 import useAdminEvent from "src/composables/useAdminEvent";
 import { buttonSize, isMobile } from "src/global-reactives/screen-detection";
 import { truncateText } from "src/helpers/string-utils";
+import { compressFloorDoc } from "src/helpers/compress-floor-doc";
 
 interface Props {
     organisationId: string;
@@ -85,8 +86,11 @@ async function init(): Promise<void> {
     }
 }
 
-const onFloorUpdate = withLoading(function (floor: FloorEditor) {
-    return updateEventFloorData(eventOwner, floor);
+const onFloorUpdate = withLoading(async function (floor: FloorEditor) {
+    return updateEventFloorData(eventOwner, {
+        id: floor.id,
+        json: await compressFloorDoc(floor.json),
+    });
 });
 
 function showDialog(

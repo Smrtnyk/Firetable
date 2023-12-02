@@ -1,5 +1,5 @@
 import { Floor } from "./Floor";
-import { FabricObject, TPointerEventInfo } from "fabric";
+import { FabricObject } from "fabric";
 import {
     CreateElementOptions,
     FloorCreationOptions,
