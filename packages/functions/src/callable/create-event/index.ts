@@ -1,22 +1,19 @@
-import * as functions from "firebase-functions";
+import { logger, https } from "firebase-functions";
 import { db } from "../../init.js";
 import { Collection, CreateEventPayload } from "../../../types/types.js";
-
-const { logger } = functions;
+import { CallableRequest } from "firebase-functions/v2/https";
 
 /**
  * Creates a new event in the Firestore database, uploads associated event images, and associates the event with specific floor plans.
  *
- * @param eventPayload - The payload containing details for the event creation.
- * @param eventPayload.date - The date and time of the event in unix timestamp.
- * @param eventPayload.img - The optional img url.
- * @param eventPayload.floors - An array of floor objects associated with the event. Each floor object must have an ID.
- * @param eventPayload.entryPrice - The entry price for the event.
- * @param eventPayload.guestListLimit - The limit for the guest list for the event.
- * @param eventPayload.name - The name of the event.
- * @param eventPayload.propertyId - The ID of the property associated with the event.
- * @param context - The context of the callable function, provided by Firebase Functions.
- *                                                   This includes details about the authenticated user making the request.
+ * @param req - The payload containing details for the event creation.
+ * @param req.date - The date and time of the event in unix timestamp.
+ * @param req.img - The optional img url.
+ * @param req.floors - An array of floor objects associated with the event. Each floor object must have an ID.
+ * @param req.entryPrice - The entry price for the event.
+ * @param req.guestListLimit - The limit for the guest list for the event.
+ * @param req.name - The name of the event.
+ * @param req.propertyId - The ID of the property associated with the event.
  *
  * @throws - Throws an "invalid-argument" error if no floors are provided.
  * @throws - Throws a "failed-precondition" error if the user is not authenticated.
@@ -33,28 +30,28 @@ const { logger } = functions;
  * 5. Associates the event with the provided floors.
  */
 export async function createEvent(
-    eventPayload: CreateEventPayload,
-    context: functions.https.CallableContext,
+    req: CallableRequest<CreateEventPayload>,
 ): Promise<{ id: string; propertyId: string; organisationId: string }> {
-    // Check for the presence of floors.
-    if (!eventPayload.floors || eventPayload.floors.length === 0) {
-        throw new functions.https.HttpsError("invalid-argument", "Floors data is required.");
-    }
-
     // Authentication check.
-    if (!context.auth) {
-        throw new functions.https.HttpsError(
+    if (!req.auth) {
+        throw new https.HttpsError(
             "failed-precondition",
             "The function must be called while authenticated.",
         );
     }
 
     const { date, floors, entryPrice, guestListLimit, name, propertyId, organisationId, img } =
-        eventPayload;
+        req.data;
+
+    // Check for the presence of floors.
+    if (!floors || floors.length === 0) {
+        throw new https.HttpsError("invalid-argument", "Floors data is required.");
+    }
+
     const id = db.collection(Collection.EVENTS).doc().id;
     logger.info(`Creating event with ID: ${id}`);
 
-    const creator = context.auth.token.email;
+    const creator = req.auth.token.email;
 
     return db.runTransaction(async (transaction) => {
         const eventRef = db
@@ -86,10 +83,7 @@ export async function createEvent(
                 const floorRef = eventRef.collection(Collection.FLOORS).doc(floor.id);
                 transaction.set(floorRef, floor);
             } else {
-                throw new functions.https.HttpsError(
-                    "invalid-argument",
-                    "Invalid floor data provided.",
-                );
+                throw new https.HttpsError("invalid-argument", "Invalid floor data provided.");
             }
         });
 

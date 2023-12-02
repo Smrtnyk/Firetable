@@ -1,7 +1,8 @@
-import * as functions from "firebase-functions";
+import { logger, https } from "firebase-functions";
 import { db } from "../init.js";
 import { Role, Collection, User, ADMIN } from "../../types/types.js";
 import { FieldPath } from "firebase-admin/firestore";
+import { CallableRequest } from "firebase-functions/v2/https";
 
 type RoleFilter = {
     [key in Role | typeof ADMIN | "default"]: (user: User) => boolean;
@@ -26,10 +27,9 @@ function chunkArray(arr: string[], size: number): string[][] {
  *
  * This function also supports fetching a specific subset of users by passing their IDs, but Admins can ignore this and fetch all users.
  *
- * @param userIdsToFetch - An array of user IDs to fetch. For Admin users, this can be ignored.
- * @param organisationId - Organisation id the users belong to
- * @param context - The context of the callable function, provided by Firebase Functions.
- *                                                   This includes details about the authenticated user making the request.
+ * @param req - Callable request instance
+ * @param req.data.userIdsToFetch - An array of user IDs to fetch. For Admin users, this can be ignored.
+ * @param req.data.organisationId - Organisation id the users belong to
  *
  * @throws - Throws an "unauthenticated" error if the user is not authenticated.
  * @throws - Throws an "invalid-argument" error if too many user IDs are provided.
@@ -42,26 +42,27 @@ function chunkArray(arr: string[], size: number): string[][] {
  * It also applies a limit to the number of users that can be fetched to prevent overloading.
  */
 export async function fetchUsersByRoleFn(
-    { userIdsToFetch, organisationId }: { userIdsToFetch: string[]; organisationId: string },
-    context: functions.https.CallableContext,
+    req: CallableRequest<{ userIdsToFetch: string[]; organisationId: string }>,
 ): Promise<User[]> {
-    functions.logger.log("fetchUsersByRoleFn called with userIds:", userIdsToFetch);
-
     // Ensure authentication
-    if (!context.auth) {
-        functions.logger.warn("Unauthorized access attempt.");
-        throw new functions.https.HttpsError("unauthenticated", "User must be authenticated.");
+    if (!req.auth) {
+        logger.warn("Unauthorized access attempt.");
+        throw new https.HttpsError("unauthenticated", "User must be authenticated.");
     }
 
-    const uid = context.auth.uid;
-    const userRole = context.auth.token.role as Role | typeof ADMIN;
+    const { userIdsToFetch, organisationId } = req.data;
+
+    logger.log("fetchUsersByRoleFn called with userIds:", userIdsToFetch);
+
+    const uid = req.auth.uid;
+    const userRole = req.auth.token.role as Role | typeof ADMIN;
 
     if (!userRole) {
-        functions.logger.error(`Role not found in custom claims for UID: ${uid}`);
-        throw new functions.https.HttpsError("not-found", "User role not found in custom claims.");
+        logger.error(`Role not found in custom claims for UID: ${uid}`);
+        throw new https.HttpsError("not-found", "User role not found in custom claims.");
     }
 
-    functions.logger.log(`User ${uid} has role: ${userRole}`);
+    logger.log(`User ${uid} has role: ${userRole}`);
 
     let users: User[] = [];
 
@@ -74,8 +75,8 @@ export async function fetchUsersByRoleFn(
         users = [...users, ...orgUsers];
     } else {
         if (userIdsToFetch.length > MAX_USERS) {
-            functions.logger.warn(`User ${uid} provided too many user IDs.`);
-            throw new functions.https.HttpsError("invalid-argument", "Too many user IDs provided.");
+            logger.warn(`User ${uid} provided too many user IDs.`);
+            throw new https.HttpsError("invalid-argument", "Too many user IDs provided.");
         }
 
         // Split userIdsToFetch into chunks of 30
@@ -105,7 +106,7 @@ export async function fetchUsersByRoleFn(
         users = users.filter(roleFilters[userRole] || roleFilters.default);
     }
 
-    functions.logger.log(`Returning ${users.length} users for user ${uid}`);
+    logger.log(`Returning ${users.length} users for user ${uid}`);
 
     return users;
 }

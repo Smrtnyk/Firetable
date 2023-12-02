@@ -1,8 +1,8 @@
 import { Collection, EditUserPayload } from "../../types/types.js";
 import { auth, db } from "../init.js";
-import * as functions from "firebase-functions";
+import { logger, https } from "firebase-functions";
 import { FieldValue } from "firebase-admin/firestore";
-const { logger } = functions;
+import { CallableRequest } from "firebase-functions/v2/https";
 
 /**
  * Updates user details and property associations in Firestore.
@@ -20,7 +20,7 @@ const { logger } = functions;
  * Note: Before updating, the function checks if the user exists and if valid data has been provided.
  * If any of these conditions are not met, the function will throw a specific error.
  *
- * @param editUserPayload - Contains the user data to be updated and the properties to be associated or disassociated.
+ * @param req - Contains the user data to be updated and the properties to be associated or disassociated.
  *
  * @throws Throws an error with code "invalid-argument" if the user ID is not provided or if no data is provided for the update.
  * @throws Throws an error with code "internal" if any part of the update process fails.
@@ -28,24 +28,21 @@ const { logger } = functions;
  * @returns Returns a promise that resolves once the user and their associated properties have been successfully updated in Firestore.
  */
 export async function updateUserFn(
-    editUserPayload: EditUserPayload,
+    req: CallableRequest<EditUserPayload>,
 ): Promise<{ success: boolean; message: string }> {
-    const { updatedUser, userId } = editUserPayload;
+    const { updatedUser, userId, organisationId } = req.data;
     const { relatedProperties } = updatedUser;
 
     if (!userId) {
-        throw new functions.https.HttpsError("invalid-argument", "User ID must be provided.");
+        throw new https.HttpsError("invalid-argument", "User ID must be provided.");
     }
 
     if (!userId) {
-        throw new functions.https.HttpsError(
-            "invalid-argument",
-            "User data to update must be provided.",
-        );
+        throw new https.HttpsError("invalid-argument", "User data to update must be provided.");
     }
 
     if (!relatedProperties || relatedProperties.length === 0) {
-        throw new functions.https.HttpsError("invalid-argument", "No data provided to update.");
+        throw new https.HttpsError("invalid-argument", "No data provided to update.");
     }
 
     // Check and update password
@@ -56,7 +53,7 @@ export async function updateUserFn(
             });
         } catch (error: any) {
             logger.error(`Failed to update password for user ${userId}`, error);
-            throw new functions.https.HttpsError(
+            throw new https.HttpsError(
                 "internal",
                 `Failed to update password. Details: ${error.message}`,
             );
@@ -66,9 +63,7 @@ export async function updateUserFn(
     try {
         // Fetch the properties associated with this user by checking relatedUsers field
         const existingPropertiesSnapshot = await db
-            .collection(
-                `${Collection.ORGANISATIONS}/${editUserPayload.organisationId}/${Collection.PROPERTIES}`,
-            )
+            .collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}`)
             .where("relatedUsers", "array-contains", userId)
             .get();
 
@@ -81,9 +76,7 @@ export async function updateUserFn(
 
         await db.runTransaction(async (transaction) => {
             const userRef = db
-                .collection(
-                    `${Collection.ORGANISATIONS}/${editUserPayload.organisationId}/${Collection.USERS}`,
-                )
+                .collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`)
                 .doc(userId);
 
             transaction.update(userRef, {
@@ -99,7 +92,7 @@ export async function updateUserFn(
             for (const propertyId of propertiesToAdd) {
                 const propertyRef = db
                     .collection(
-                        `${Collection.ORGANISATIONS}/${editUserPayload.organisationId}/${Collection.PROPERTIES}`,
+                        `${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}`,
                     )
                     .doc(propertyId);
                 transaction.update(propertyRef, {
@@ -111,7 +104,7 @@ export async function updateUserFn(
             for (const propertyId of propertiesToRemove) {
                 const propertyRef = db
                     .collection(
-                        `${Collection.ORGANISATIONS}/${editUserPayload.organisationId}/${Collection.PROPERTIES}`,
+                        `${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}`,
                     )
                     .doc(propertyId);
                 transaction.update(propertyRef, {
@@ -123,9 +116,6 @@ export async function updateUserFn(
         return { success: true, message: "User updated successfully." };
     } catch (error: any) {
         logger.error(`Failed to update user ${userId}`, error);
-        throw new functions.https.HttpsError(
-            "internal",
-            `Failed to update user. Details: ${error.message}`,
-        );
+        throw new https.HttpsError("internal", `Failed to update user. Details: ${error.message}`);
     }
 }
