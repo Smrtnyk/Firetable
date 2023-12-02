@@ -31,7 +31,6 @@ import {
     Reservation,
     ReservationDoc,
 } from "@firetable/types";
-import { Floor } from "@firetable/floor-creator";
 
 export async function getEvents(
     lastDocument: DocumentData | null,
