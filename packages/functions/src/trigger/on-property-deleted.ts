@@ -1,7 +1,7 @@
 import { db } from "../init.js";
 import { Collection } from "../../types/types.js";
-import * as functions from "firebase-functions";
 import { FieldValue } from "firebase-admin/firestore";
+import { logger } from "firebase-functions/v2";
 
 /**
  * Cleans up associated user-property mappings when a property is deleted.
@@ -29,7 +29,7 @@ export async function onPropertyDeletedFn(params: {
         if (!usersSnapshot.empty) {
             usersSnapshot.docs.forEach((doc) => {
                 const userRef = doc.ref;
-                functions.logger.debug(
+                logger.debug(
                     `Scheduling update to remove property ID from user document with id: ${doc.id}`,
                 );
                 batch.update(userRef, {
@@ -46,7 +46,7 @@ export async function onPropertyDeletedFn(params: {
 
         if (!floorsSnapshot.empty) {
             floorsSnapshot.docs.forEach((doc) => {
-                functions.logger.debug(`Scheduling deletion of floor document with id: ${doc.id}`);
+                logger.debug(`Scheduling deletion of floor document with id: ${doc.id}`);
                 batch.delete(doc.ref);
             });
         }
@@ -54,9 +54,9 @@ export async function onPropertyDeletedFn(params: {
         // Commit batched operations
         await batch.commit();
 
-        functions.logger.info(`Successfully handled deletion tasks for property ${propertyId}`);
+        logger.info(`Successfully handled deletion tasks for property ${propertyId}`);
     } catch (error) {
-        functions.logger.error("Error handling property deletion tasks:", error);
+        logger.error("Error handling property deletion tasks:", error);
         throw new Error(`Failed to handle deletion tasks for property ${propertyId}`);
     }
 }

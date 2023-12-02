@@ -1,8 +1,7 @@
 import { Collection, CreateUserPayload } from "../../../types/types.js";
 import { auth, db } from "../../init.js";
-import * as functions from "firebase-functions";
 import { FieldValue } from "firebase-admin/firestore";
-import { CallableRequest } from "firebase-functions/v2/https";
+import { CallableRequest, HttpsError } from "firebase-functions/v2/https";
 
 /**
  * Creates a new user in Firebase Authentication and stores associated user information in Firestore.
@@ -40,17 +39,11 @@ export async function createUser(
     try {
         const existingUser = await auth.getUserByEmail(email);
         if (existingUser) {
-            throw new functions.https.HttpsError(
-                "already-exists",
-                "A user with this email already exists.",
-            );
+            throw new HttpsError("already-exists", "A user with this email already exists.");
         }
     } catch (error: any) {
         if (error.code !== "auth/user-not-found") {
-            throw new functions.https.HttpsError(
-                "unknown",
-                "An error occurred while checking for user existence.",
-            );
+            throw new HttpsError("unknown", "An error occurred while checking for user existence.");
         }
     }
 
@@ -94,6 +87,6 @@ export async function createUser(
         }
         const errorCode = e.code || "unknown";
         const errorMessage = e.message || "An unknown error occurred.";
-        throw new functions.https.HttpsError(errorCode, errorMessage);
+        throw new HttpsError(errorCode, errorMessage);
     }
 }

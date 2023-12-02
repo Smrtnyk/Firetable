@@ -13,11 +13,10 @@ import { onPropertyDeletedCleanEvents } from "./trigger/on-property-deleted-clea
 
 import { auth } from "./init.js";
 
-import { logger, https } from "firebase-functions";
 import { onSchedule } from "firebase-functions/v2/scheduler";
-import { onRequest, onCall } from "firebase-functions/v2/https";
+import { onRequest, onCall, HttpsError } from "firebase-functions/v2/https";
 import { onDocumentDeleted } from "firebase-functions/v2/firestore";
-import { setGlobalOptions } from "firebase-functions/v2";
+import { setGlobalOptions, logger } from "firebase-functions/v2";
 
 setGlobalOptions({ region: "europe-west3" });
 
@@ -30,10 +29,7 @@ export const createEvent = onCall(createEventFn);
 export const changePassword = onCall<{ newPassword: string }>(async (req) => {
     if (!req.auth) {
         logger.error("Unauthenticated user tried to change password.");
-        throw new https.HttpsError(
-            "unauthenticated",
-            "The function must be called while authenticated.",
-        );
+        throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
     }
 
     const uid: string = req.auth.uid;
@@ -41,10 +37,7 @@ export const changePassword = onCall<{ newPassword: string }>(async (req) => {
 
     if (!newPassword || newPassword.length < MIN_PASSWORD_LENGTH) {
         logger.error("Invalid password provided by user:", uid);
-        throw new https.HttpsError(
-            "invalid-argument",
-            "Password must be at least 6 characters long!",
-        );
+        throw new HttpsError("invalid-argument", "Password must be at least 6 characters long!");
     }
 
     try {
@@ -53,7 +46,7 @@ export const changePassword = onCall<{ newPassword: string }>(async (req) => {
         return { success: true };
     } catch (error) {
         logger.error("Failed to update the password for user:", uid, error);
-        throw new https.HttpsError("internal", "Failed to update the user password.");
+        throw new HttpsError("internal", "Failed to update the user password.");
     }
 });
 export const fetchUsersByRole = onCall(fetchUsersByRoleFn);

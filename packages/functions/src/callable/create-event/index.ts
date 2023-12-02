@@ -1,7 +1,7 @@
-import { logger, https } from "firebase-functions";
+import { logger } from "firebase-functions/v2";
 import { db } from "../../init.js";
 import { Collection, CreateEventPayload } from "../../../types/types.js";
-import { CallableRequest } from "firebase-functions/v2/https";
+import { CallableRequest, HttpsError } from "firebase-functions/v2/https";
 
 /**
  * Creates a new event in the Firestore database, uploads associated event images, and associates the event with specific floor plans.
@@ -34,7 +34,7 @@ export async function createEvent(
 ): Promise<{ id: string; propertyId: string; organisationId: string }> {
     // Authentication check.
     if (!req.auth) {
-        throw new https.HttpsError(
+        throw new HttpsError(
             "failed-precondition",
             "The function must be called while authenticated.",
         );
@@ -45,7 +45,7 @@ export async function createEvent(
 
     // Check for the presence of floors.
     if (!floors || floors.length === 0) {
-        throw new https.HttpsError("invalid-argument", "Floors data is required.");
+        throw new HttpsError("invalid-argument", "Floors data is required.");
     }
 
     const id = db.collection(Collection.EVENTS).doc().id;
@@ -83,7 +83,7 @@ export async function createEvent(
                 const floorRef = eventRef.collection(Collection.FLOORS).doc(floor.id);
                 transaction.set(floorRef, floor);
             } else {
-                throw new https.HttpsError("invalid-argument", "Invalid floor data provided.");
+                throw new HttpsError("invalid-argument", "Invalid floor data provided.");
             }
         });
 

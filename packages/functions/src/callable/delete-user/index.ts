@@ -1,12 +1,12 @@
 import { auth, db } from "../../init.js";
-import { https, logger } from "firebase-functions";
 import { Collection, User } from "../../../types/types.js";
-import { CallableRequest } from "firebase-functions/v2/https";
+import { CallableRequest, HttpsError } from "firebase-functions/v2/https";
+import { logger } from "firebase-functions/v2";
 
 export async function deleteUser(req: CallableRequest<User>): Promise<void> {
     // Ensure the function is called by an authenticated user
     if (!req.auth) {
-        throw new https.HttpsError(
+        throw new HttpsError(
             "unauthenticated",
             "The function must be called by an authenticated user.",
         );
@@ -30,6 +30,6 @@ export async function deleteUser(req: CallableRequest<User>): Promise<void> {
         await userDoc.delete();
     } catch (error) {
         console.error(`Failed to delete user ${user.id}`, error);
-        throw new https.HttpsError("internal", "Failed to delete user");
+        throw new HttpsError("internal", "Failed to delete user");
     }
 }

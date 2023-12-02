@@ -1,8 +1,7 @@
-import { https } from "firebase-functions";
 import { db } from "../../init.js";
 import { ADMIN, Collection } from "../../../types/types.js";
 import { FieldValue } from "firebase-admin/firestore";
-import { CallableRequest } from "firebase-functions/v2/https";
+import { CallableRequest, HttpsError } from "firebase-functions/v2/https";
 
 interface Data {
     name: string;
@@ -12,16 +11,13 @@ interface Data {
 export async function createPropertyFn(req: CallableRequest<Data>): Promise<string> {
     // Check for authenticated user
     if (!req.auth) {
-        throw new https.HttpsError("unauthenticated", "User must be authenticated");
+        throw new HttpsError("unauthenticated", "User must be authenticated");
     }
 
     const { organisationId } = req.data;
 
     if (!organisationId) {
-        throw new https.HttpsError(
-            "invalid-argument",
-            "organisationId is missing in property payload",
-        );
+        throw new HttpsError("invalid-argument", "organisationId is missing in property payload");
     }
 
     // Create a property with data received from the client
@@ -57,6 +53,6 @@ export async function createPropertyFn(req: CallableRequest<Data>): Promise<stri
         return propertyId;
     } catch (error) {
         console.error("Error adding property:", error);
-        throw new https.HttpsError("internal", "Internal error occurred");
+        throw new HttpsError("internal", "Internal error occurred");
     }
 }

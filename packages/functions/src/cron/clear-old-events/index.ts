@@ -1,10 +1,9 @@
 import { deleteDocument } from "../../delete-document/index.js";
 import { db } from "../../init.js";
-import * as functions from "firebase-functions";
 import { firestore } from "firebase-admin";
 import { Collection } from "../../../types/types.js";
+import { logger } from "firebase-functions/v2";
 
-const { logger } = functions;
 const DELETION_AGE_YEARS = 1; // Number of years after which events are considered old
 
 /**

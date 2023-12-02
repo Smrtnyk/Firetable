@@ -1,8 +1,8 @@
 import { logger } from "firebase-functions";
 import { db } from "../init.js";
 import { Collection } from "../../types/types.js";
-import * as functions from "firebase-functions";
 import { FieldValue } from "firebase-admin/firestore";
+import { HttpsError } from "firebase-functions/v2/https";
 
 /**
  * Cleans up associated data for a user when they are deleted.
@@ -48,9 +48,6 @@ export async function onUserDeletedFn(context: {
         );
     } catch (error) {
         logger.error(`Error cleaning up data for user ${userId}:`, error);
-        throw new functions.https.HttpsError(
-            "internal",
-            `Error cleaning up data for user ${userId}`,
-        );
+        throw new HttpsError("internal", `Error cleaning up data for user ${userId}`);
     }
 }

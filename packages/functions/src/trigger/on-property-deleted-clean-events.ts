@@ -1,7 +1,7 @@
 import { db } from "../init.js";
 import { Collection } from "../../types/types.js";
-import * as functions from "firebase-functions";
 import { deleteDocument } from "../delete-document/index.js";
+import { logger } from "firebase-functions/v2";
 
 /**
  * Cleans up associated events and their subcollections when a property is deleted.
@@ -21,9 +21,7 @@ export async function onPropertyDeletedCleanEvents(params: { propertyId: string 
             .get();
 
         if (eventsSnapshot.empty) {
-            functions.logger.info(
-                `No events associated with property ${propertyId}. Exiting function.`,
-            );
+            logger.info(`No events associated with property ${propertyId}. Exiting function.`);
             return;
         }
 
@@ -34,16 +32,16 @@ export async function onPropertyDeletedCleanEvents(params: { propertyId: string 
                 id: eventDoc.id,
             }).catch((error) => {
                 // Individual error handling for each document delete operation
-                functions.logger.error(`Error deleting event with ID ${eventDoc.id}:`, error);
+                logger.error(`Error deleting event with ID ${eventDoc.id}:`, error);
             }),
         );
 
         await Promise.all(deletePromises);
-        functions.logger.info(
+        logger.info(
             `Successfully deleted all events and their subcollections associated with property ${propertyId}.`,
         );
     } catch (error) {
-        functions.logger.error("Error deleting events associated with property:", error);
+        logger.error("Error deleting events associated with property:", error);
         throw new Error(
             `Failed to delete events and their subcollections associated with property ${propertyId}`,
         );

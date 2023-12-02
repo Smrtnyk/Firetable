@@ -1,8 +1,8 @@
 import { Collection, EditUserPayload } from "../../types/types.js";
 import { auth, db } from "../init.js";
-import { logger, https } from "firebase-functions";
 import { FieldValue } from "firebase-admin/firestore";
-import { CallableRequest } from "firebase-functions/v2/https";
+import { CallableRequest, HttpsError } from "firebase-functions/v2/https";
+import { logger } from "firebase-functions/v2";
 
 /**
  * Updates user details and property associations in Firestore.
@@ -34,15 +34,15 @@ export async function updateUserFn(
     const { relatedProperties } = updatedUser;
 
     if (!userId) {
-        throw new https.HttpsError("invalid-argument", "User ID must be provided.");
+        throw new HttpsError("invalid-argument", "User ID must be provided.");
     }
 
     if (!userId) {
-        throw new https.HttpsError("invalid-argument", "User data to update must be provided.");
+        throw new HttpsError("invalid-argument", "User data to update must be provided.");
     }
 
     if (!relatedProperties || relatedProperties.length === 0) {
-        throw new https.HttpsError("invalid-argument", "No data provided to update.");
+        throw new HttpsError("invalid-argument", "No data provided to update.");
     }
 
     // Check and update password
@@ -53,7 +53,7 @@ export async function updateUserFn(
             });
         } catch (error: any) {
             logger.error(`Failed to update password for user ${userId}`, error);
-            throw new https.HttpsError(
+            throw new HttpsError(
                 "internal",
                 `Failed to update password. Details: ${error.message}`,
             );
@@ -116,6 +116,6 @@ export async function updateUserFn(
         return { success: true, message: "User updated successfully." };
     } catch (error: any) {
         logger.error(`Failed to update user ${userId}`, error);
-        throw new https.HttpsError("internal", `Failed to update user. Details: ${error.message}`);
+        throw new HttpsError("internal", `Failed to update user. Details: ${error.message}`);
     }
 }

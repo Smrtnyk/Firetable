@@ -1,8 +1,8 @@
-import { logger, https } from "firebase-functions";
 import { db } from "../init.js";
 import { Role, Collection, User, ADMIN } from "../../types/types.js";
 import { FieldPath } from "firebase-admin/firestore";
-import { CallableRequest } from "firebase-functions/v2/https";
+import { CallableRequest, HttpsError } from "firebase-functions/v2/https";
+import { logger } from "firebase-functions/v2";
 
 type RoleFilter = {
     [key in Role | typeof ADMIN | "default"]: (user: User) => boolean;
@@ -47,7 +47,7 @@ export async function fetchUsersByRoleFn(
     // Ensure authentication
     if (!req.auth) {
         logger.warn("Unauthorized access attempt.");
-        throw new https.HttpsError("unauthenticated", "User must be authenticated.");
+        throw new HttpsError("unauthenticated", "User must be authenticated.");
     }
 
     const { userIdsToFetch, organisationId } = req.data;
@@ -59,7 +59,7 @@ export async function fetchUsersByRoleFn(
 
     if (!userRole) {
         logger.error(`Role not found in custom claims for UID: ${uid}`);
-        throw new https.HttpsError("not-found", "User role not found in custom claims.");
+        throw new HttpsError("not-found", "User role not found in custom claims.");
     }
 
     logger.log(`User ${uid} has role: ${userRole}`);
@@ -76,7 +76,7 @@ export async function fetchUsersByRoleFn(
     } else {
         if (userIdsToFetch.length > MAX_USERS) {
             logger.warn(`User ${uid} provided too many user IDs.`);
-            throw new https.HttpsError("invalid-argument", "Too many user IDs provided.");
+            throw new HttpsError("invalid-argument", "Too many user IDs provided.");
         }
 
         // Split userIdsToFetch into chunks of 30
