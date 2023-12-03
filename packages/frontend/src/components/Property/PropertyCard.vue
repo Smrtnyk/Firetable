@@ -41,13 +41,6 @@ const props = defineProps<Props>();
         0 0.25rem 0.25rem rgba(0, 0, 0, 0.2),
         0 0 1rem rgba(0, 0, 0, 0.2);
 
-    &__link {
-        text-decoration: none !important;
-        color: currentColor;
-        &:visited {
-            color: currentColor;
-        }
-    }
     &__content {
         overflow: hidden;
         text-decoration: none !important;

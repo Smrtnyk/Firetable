@@ -12,7 +12,11 @@ const organisations = computed(() => {
 <template>
     <div class="PageOrganisations">
         <div class="row q-col-gutter-sm" v-if="organisations.length > 0">
-            <div class="col-6" v-for="organisation of organisations" :key="organisation.id">
+            <div
+                class="col-12 col-sm-6 q-pa-xs"
+                v-for="organisation of organisations"
+                :key="organisation.id"
+            >
                 <router-link
                     :to="{
                         name: 'properties',
