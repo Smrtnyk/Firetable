@@ -23,10 +23,10 @@ setGlobalOptions({ region: "europe-west3" });
 const MIN_PASSWORD_LENGTH = 6;
 
 // Everything that has to do with events
-export const createEvent = onCall(createEventFn);
+export const createEvent = onCall({ cors: true }, createEventFn);
 
 // Everything that has to do with auth
-export const changePassword = onCall<{ newPassword: string }>(async (req) => {
+export const changePassword = onCall<{ newPassword: string }>({ cors: true }, async (req) => {
     if (!req.auth) {
         logger.error("Unauthenticated user tried to change password.");
         throw new HttpsError("unauthenticated", "The function must be called while authenticated.");
@@ -49,10 +49,10 @@ export const changePassword = onCall<{ newPassword: string }>(async (req) => {
         throw new HttpsError("internal", "Failed to update the user password.");
     }
 });
-export const fetchUsersByRole = onCall(fetchUsersByRoleFn);
-export const createUser = onCall(createUserFn);
-export const updateUser = onCall(updateUserFn);
-export const deleteUser = onCall(deleteUserFn);
+export const fetchUsersByRole = onCall({ cors: true }, fetchUsersByRoleFn);
+export const createUser = onCall({ cors: true }, createUserFn);
+export const updateUser = onCall({ cors: true }, updateUserFn);
+export const deleteUser = onCall({ cors: true }, deleteUserFn);
 export const onUserDeleted = onDocumentDeleted(
     `${Collection.ORGANISATIONS}/{organisationId}/${Collection.USERS}/{userId}`,
     (event) => {
@@ -61,7 +61,7 @@ export const onUserDeleted = onDocumentDeleted(
 );
 
 // Properties
-export const createProperty = onCall(createPropertyFn);
+export const createProperty = onCall({ cors: true }, createPropertyFn);
 export const onPropertyDelete = onDocumentDeleted(
     `${Collection.ORGANISATIONS}/{organisationId}/${Collection.PROPERTIES}/{propertyId}`,
     (event) => onPropertyDeletedFn(event.params),
@@ -72,7 +72,7 @@ export const onPropertyDeleteCleanupEvents = onDocumentDeleted(
 );
 
 // Generic stuff
-export const deleteCollection = onCall<{ col: string; id: string }>((request) =>
+export const deleteCollection = onCall<{ col: string; id: string }>({ cors: true }, (request) =>
     deleteDocument(request.data),
 );
 

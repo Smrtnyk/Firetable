@@ -1,9 +1,6 @@
 import { ref, onMounted, onUnmounted, Ref } from "vue";
 
-const projectId = "firetable-eu";
-const region = "europe-west3";
-const functionName = "healthCheck";
-const onlineCheckUrl = `https://${region}-${projectId}.cloudfunctions.net/${functionName}`;
+const onlineCheckUrl = "https://www.google.com/favicon.ico";
 
 export function useNetworkStatus(): {
     isOnline: Ref<boolean>;
@@ -13,11 +10,11 @@ export function useNetworkStatus(): {
     // Helper function to perform an actual network request to verify internet connectivity
     const verifyConnectivity = async (): Promise<void> => {
         try {
-            const response = await fetch(onlineCheckUrl, {
+            await fetch(onlineCheckUrl, {
                 method: "HEAD",
-                cache: "no-cache",
+                mode: "no-cors",
             });
-            isOnline.value = response.ok;
+            isOnline.value = true;
         } catch (error) {
             isOnline.value = false;
         }
