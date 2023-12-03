@@ -101,7 +101,6 @@ export const useAuthStore = defineStore("auth", () => {
                     }),
                 ]);
             }
-            isReady.value = true;
         } finally {
             Loading.hide();
         }
