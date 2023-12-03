@@ -51,7 +51,6 @@ const addNewElementsBottomSheetOptions = {
 
 const NON_TABLE_EL_TO_ADD = [
     ElementTag.SOFA,
-    ElementTag.SINGLE_SOFA,
     ElementTag.DJ_BOOTH,
     ElementTag.WALL,
     ElementTag.STAGE,

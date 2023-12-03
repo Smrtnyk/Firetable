@@ -9,8 +9,7 @@ type WalLGroupCreationOptions = {
 } & Partial<GroupProps>;
 
 export class Wall extends Group {
-    // @ts-expect-error -- deprecated
-    type = FloorElementTypes.WALL;
+    static type = FloorElementTypes.WALL;
     wallRect: Rect;
 
     constructor(groupOpts: WalLGroupCreationOptions, wallRectOpts: WallCreationOptions = {}) {

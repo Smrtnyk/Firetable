@@ -4,7 +4,6 @@ import type { FloorDoc } from "@firetable/types";
 import type { EventManager } from "./event-manager/EventManager";
 import type { EventEmitterListener } from "./event-emitter/EventEmitter";
 import { CANVAS_BG_COLOR } from "./constants.js";
-import { FloorElementTypes } from "./types.js";
 import { TouchManager } from "./TouchManager";
 import { FloorZoomManager } from "./FloorZoomManager";
 import { calculateCanvasScale } from "./utils";
@@ -16,10 +15,10 @@ import { Wall } from "./elements/Wall";
 import { RoundTable } from "./elements/RoundTable";
 import { Canvas, classRegistry } from "fabric";
 
-classRegistry.setClass(RectTable, FloorElementTypes.RECT_TABLE);
-classRegistry.setClass(RoundTable, FloorElementTypes.ROUND_TABLE);
-classRegistry.setClass(Sofa, FloorElementTypes.SOFA);
-classRegistry.setClass(Wall, FloorElementTypes.WALL);
+classRegistry.setClass(RectTable);
+classRegistry.setClass(RoundTable);
+classRegistry.setClass(Sofa);
+classRegistry.setClass(Wall);
 
 export abstract class Floor {
     readonly id: string;

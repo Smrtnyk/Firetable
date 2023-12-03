@@ -9,8 +9,7 @@ type SofaGroupCreationOpts = {
 } & Partial<GroupProps>;
 
 export class Sofa extends Group {
-    // @ts-expect-error -- deprecated
-    type = FloorElementTypes.SOFA;
+    static type = FloorElementTypes.SOFA;
     sofaBase: Rect;
 
     constructor(sofaGroupOpts: SofaGroupCreationOpts) {

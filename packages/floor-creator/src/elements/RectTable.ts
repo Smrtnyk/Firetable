@@ -25,8 +25,7 @@ interface RectTableElementOptions {
 }
 
 export class RectTable extends Group {
-    // @ts-expect-error -- deprecated
-    type = FloorElementTypes.RECT_TABLE;
+    static type = FloorElementTypes.RECT_TABLE;
     reservation: ReservationDoc | undefined;
     label: string;
     baseFill: string;
@@ -180,7 +179,6 @@ export class RectTable extends Group {
     toObject(): Record<string, unknown> {
         return {
             ...super.toObject(),
-            type: this.type,
             opacity: 1,
             baseFill: this.baseFill,
             label: this.label,

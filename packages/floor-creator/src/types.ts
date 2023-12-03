@@ -3,7 +3,6 @@ import type { RoundTable } from "./elements/RoundTable.js";
 import type { ElementTag, FloorDoc } from "@firetable/types";
 import type { Sofa } from "./elements/Sofa";
 import type { DJBooth } from "./elements/DJBooth";
-import type { SingleSofa } from "./elements/SingleSofa";
 import type { Stage } from "./elements/Stage";
 
 export interface FloorCreationOptions {
@@ -13,7 +12,7 @@ export interface FloorCreationOptions {
 }
 
 export type BaseTable = RectTable | RoundTable;
-export type FloorEditorElement = RectTable | RoundTable | Sofa | DJBooth | SingleSofa | Stage;
+export type FloorEditorElement = RectTable | RoundTable | Sofa | DJBooth | Stage;
 export type CreateElementOptions = {
     label?: string;
     x: number;
@@ -26,7 +25,6 @@ export enum FloorElementTypes {
     RECT_TABLE = "RectTable",
     DJ_BOOTH = "DJBooth",
     SOFA = "Sofa",
-    SINGLE_SOFA = "SingleSofa",
     STAGE = "Stage",
     WALL = "Wall",
 }
