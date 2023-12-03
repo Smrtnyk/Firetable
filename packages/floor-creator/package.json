@@ -19,7 +19,7 @@
     "dependencies": {
         "fabric": "6.0.0-beta16",
         "hammerjs": "2.0.8",
-        "ts-pattern": "5.0.5"
+        "ts-pattern": "5.0.6"
     },
     "devDependencies": {
         "@firetable/types": "workspace:*",
