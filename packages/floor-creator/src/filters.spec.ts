@@ -7,7 +7,8 @@ import {
     hasFloorTables,
 } from "./filters";
 import { RectTable } from "./elements/RectTable";
-import { ElementTag, FloorDoc } from "@firetable/types";
+import type { FloorDoc } from "@firetable/types";
+import { ElementTag } from "@firetable/types";
 
 describe("Table Management Functions", () => {
     let floor: FloorEditor;

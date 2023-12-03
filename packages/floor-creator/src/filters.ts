@@ -1,6 +1,6 @@
-import { Floor } from "./Floor.js";
-import { BaseTable } from "./types.js";
-import { FloorDoc } from "@firetable/types";
+import type { Floor } from "./Floor.js";
+import type { BaseTable } from "./types.js";
+import type { FloorDoc } from "@firetable/types";
 import { isString, takeProp } from "@firetable/utils";
 import { isTable } from "./type-guards";
 

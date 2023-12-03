@@ -2,7 +2,7 @@
 import { computed, nextTick, ref } from "vue";
 import { useAuthStore } from "src/stores/auth-store";
 import FTTitle from "src/components/FTTitle.vue";
-import { User } from "@firetable/types";
+import type { User } from "@firetable/types";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { submitNewPassword } from "@firetable/backend";
 import { useI18n } from "vue-i18n";

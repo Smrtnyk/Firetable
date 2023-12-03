@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import { minLength, validOptionalURL } from "src/helpers/form-rules";
 import { QForm } from "quasar";
-import { CreatePropertyPayload } from "@firetable/backend";
+import type { CreatePropertyPayload } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useI18n } from "vue-i18n";
 

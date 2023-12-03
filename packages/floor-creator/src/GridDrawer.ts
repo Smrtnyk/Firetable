@@ -1,5 +1,6 @@
 import { RESOLUTION } from "./constants";
-import { Canvas, Line, Group } from "fabric";
+import type { Canvas } from "fabric";
+import { Line, Group } from "fabric";
 
 export class GridDrawer {
     private canvas: Canvas;

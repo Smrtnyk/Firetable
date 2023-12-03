@@ -1,12 +1,5 @@
-import {
-    collection,
-    doc,
-    query,
-    Query,
-    DocumentData,
-    setDoc,
-    DocumentReference,
-} from "firebase/firestore";
+import type { Query, DocumentData, DocumentReference } from "firebase/firestore";
+import { collection, doc, query, setDoc } from "firebase/firestore";
 import { initializeFirebase } from "@firetable/backend";
 import { useCollection, useDocument } from "vuefire";
 import { isString } from "@firetable/utils";

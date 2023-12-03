@@ -1,4 +1,4 @@
-import { WriteResult } from "firebase-admin/firestore";
+import type { WriteResult } from "firebase-admin/firestore";
 import { db } from "../init.js";
 
 /**

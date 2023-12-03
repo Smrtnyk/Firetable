@@ -1,4 +1,4 @@
-import { FloorDoc } from "@firetable/types";
+import type { FloorDoc } from "@firetable/types";
 import { gzip, ungzip } from "pako";
 
 export async function decompressFloorDoc(floorDoc: FloorDoc): Promise<FloorDoc> {

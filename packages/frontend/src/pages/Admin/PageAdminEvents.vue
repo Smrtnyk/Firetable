@@ -12,11 +12,11 @@ import {
 } from "src/helpers/ui-helpers";
 import { computed, onBeforeMount, ref, watch } from "vue";
 import { Loading, useQuasar } from "quasar";
-import { CreateEventPayload, EditEventPayload, EventDoc, PropertyDoc } from "@firetable/types";
+import type { CreateEventPayload, EditEventPayload, EventDoc, PropertyDoc } from "@firetable/types";
+import type { EventOwner } from "@firetable/backend";
 import {
     createNewEvent,
     deleteDocAndAllSubCollections,
-    EventOwner,
     getEventsPath,
     updateEvent,
 } from "@firetable/backend";

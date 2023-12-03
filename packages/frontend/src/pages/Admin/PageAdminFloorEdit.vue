@@ -4,21 +4,21 @@ import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
 import FTDialog from "src/components/FTDialog.vue";
 
 import { nextTick, onBeforeUnmount, onMounted, reactive, ref } from "vue";
-import { NumberTuple } from "src/types/generic";
+import type { NumberTuple } from "src/types/generic";
 import { useRouter } from "vue-router";
 import { debounce, exportFile, Loading, useQuasar } from "quasar";
 import { BULK_ADD_COLLECTION, ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
+import type { Floor, FloorEditorElement } from "@firetable/floor-creator";
 import {
     extractAllTablesLabels,
-    Floor,
     FloorEditor,
-    FloorEditorElement,
     hasFloorTables,
     MAX_FLOOR_HEIGHT,
     MAX_FLOOR_WIDTH,
     RESOLUTION,
 } from "@firetable/floor-creator";
-import { ElementTag, FloorDoc } from "@firetable/types";
+import type { FloorDoc } from "@firetable/types";
+import { ElementTag } from "@firetable/types";
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import {
     getFirestoreDocument,

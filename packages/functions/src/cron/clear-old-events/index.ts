@@ -1,8 +1,8 @@
 import { deleteDocument } from "../../delete-document/index.js";
 import { db } from "../../init.js";
-import { firestore } from "firebase-admin";
 import { Collection } from "../../../types/types.js";
 import { logger } from "firebase-functions/v2";
+import type { DocumentData, QuerySnapshot } from "firebase-admin/firestore";
 
 const DELETION_AGE_YEARS = 1; // Number of years after which events are considered old
 
@@ -60,7 +60,7 @@ export async function clearOldEvents(): Promise<void> {
 async function getOldEvents(
     organisationId: string,
     propertyId: string,
-): Promise<firestore.QuerySnapshot<firestore.DocumentData>> {
+): Promise<QuerySnapshot<DocumentData>> {
     const date = new Date();
     date.setFullYear(date.getFullYear() - DELETION_AGE_YEARS);
 

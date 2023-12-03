@@ -1,7 +1,8 @@
 import { db } from "../../init.js";
 import { ADMIN, Collection } from "../../../types/types.js";
 import { FieldValue } from "firebase-admin/firestore";
-import { CallableRequest, HttpsError } from "firebase-functions/v2/https";
+import type { CallableRequest } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
 
 interface Data {
     name: string;

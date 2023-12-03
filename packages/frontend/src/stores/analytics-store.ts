@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { ReservationDoc } from "@firetable/types";
+import type { ReservationDoc } from "@firetable/types";
 
 export type AugmentedReservation = ReservationDoc & { date: number };
 

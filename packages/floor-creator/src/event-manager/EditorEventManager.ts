@@ -1,7 +1,7 @@
 import { EventManager } from "./EventManager";
 import { RESOLUTION } from "../constants";
-import { Floor } from "../Floor";
-import { CommandInvoker } from "../command/CommandInvoker";
+import type { Floor } from "../Floor";
+import type { CommandInvoker } from "../command/CommandInvoker";
 import { MoveCommand } from "../command/MoveCommand";
 
 export class EditorEventManager extends EventManager {

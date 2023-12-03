@@ -1,5 +1,5 @@
 import { Manager, Pinch, Pan, Tap, DIRECTION_ALL } from "hammerjs";
-import { Floor } from "./Floor";
+import type { Floor } from "./Floor";
 import { Point } from "fabric";
 import { throttle } from "@firetable/utils";
 

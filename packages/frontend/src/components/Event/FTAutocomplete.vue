@@ -34,7 +34,7 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
-import { FloorDoc, Reservation } from "@firetable/types";
+import type { FloorDoc, Reservation } from "@firetable/types";
 import { QSelect } from "quasar";
 
 interface Props {

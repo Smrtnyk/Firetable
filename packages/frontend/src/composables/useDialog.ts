@@ -1,4 +1,5 @@
-import { DialogChainObject, QDialogOptions, useQuasar } from "quasar";
+import type { DialogChainObject, QDialogOptions } from "quasar";
+import { useQuasar } from "quasar";
 
 export function useDialog(): { createDialog: (options: QDialogOptions) => DialogChainObject } {
     const quasar = useQuasar();

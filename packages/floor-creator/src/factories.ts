@@ -1,5 +1,5 @@
 import { FLOOR_DEFAULT_HEIGHT, FLOOR_DEFAULT_WIDTH } from "./constants.js";
-import { FloorDoc } from "@firetable/types";
+import type { FloorDoc } from "@firetable/types";
 
 export function makeRawFloor(name: string, propertyId: string): Omit<FloorDoc, "id" | "json"> {
     return {

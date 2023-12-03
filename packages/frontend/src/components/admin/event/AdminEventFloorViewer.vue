@@ -34,13 +34,9 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
-import {
-    extractAllTablesLabels,
-    Floor,
-    FloorEditor,
-    FloorEditorElement,
-} from "@firetable/floor-creator";
-import { FloorDoc } from "@firetable/types";
+import type { Floor, FloorEditorElement } from "@firetable/floor-creator";
+import { extractAllTablesLabels, FloorEditor } from "@firetable/floor-creator";
+import type { FloorDoc } from "@firetable/types";
 import { debounce } from "quasar";
 
 interface Props {

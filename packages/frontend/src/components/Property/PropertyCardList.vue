@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import PropertyCard from "src/components/Property/PropertyCard.vue";
-import { PropertyDoc } from "@firetable/types";
+import type { PropertyDoc } from "@firetable/types";
 
 interface Props {
     properties: PropertyDoc[];

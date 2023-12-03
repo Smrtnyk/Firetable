@@ -1,7 +1,10 @@
 import { initializeFirebase } from "./base.js";
-import { httpsCallable, HttpsCallableResult } from "firebase/functions";
-import { DocumentReference, collection, doc, CollectionReference } from "firebase/firestore";
-import { Collection, EventDoc, PropertyDoc } from "@firetable/types";
+import type { HttpsCallableResult } from "firebase/functions";
+import { httpsCallable } from "firebase/functions";
+import type { DocumentReference, CollectionReference } from "firebase/firestore";
+import { collection, doc } from "firebase/firestore";
+import type { EventDoc, PropertyDoc } from "@firetable/types";
+import { Collection } from "@firetable/types";
 import { getEventsPath, getFloorsPath, getPropertiesPath } from "./paths.js";
 
 export type EventOwner = Pick<EventDoc, "organisationId" | "propertyId" | "id">;

@@ -1,5 +1,5 @@
-import { AnimationStrategy } from "./AnimationStrategy";
-import { FabricObject } from "fabric";
+import type { AnimationStrategy } from "./AnimationStrategy";
+import type { FabricObject } from "fabric";
 
 const ANIMATION_DURATION = 500;
 

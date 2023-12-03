@@ -1,17 +1,18 @@
+import type { EventOwner } from "./db.js";
 import {
     eventsCollection,
     guestListCollection,
     guestDoc,
     eventFloorDoc,
     eventDoc,
-    EventOwner,
     reservationsCollection,
     reservationDoc,
 } from "./db.js";
 import { initializeFirebase } from "./base.js";
-import { httpsCallable, HttpsCallableResult } from "firebase/functions";
+import type { HttpsCallableResult } from "firebase/functions";
+import { httpsCallable } from "firebase/functions";
+import type { DocumentData, DocumentReference } from "firebase/firestore";
 import {
-    DocumentData,
     getDocs,
     orderBy,
     limit,
@@ -21,9 +22,8 @@ import {
     deleteDoc,
     query,
     where,
-    DocumentReference,
 } from "firebase/firestore";
-import {
+import type {
     CreateEventPayload,
     EventDoc,
     FloorDoc,

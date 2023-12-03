@@ -1,7 +1,7 @@
 import { boot } from "quasar/wrappers";
 import { useAuthStore } from "src/stores/auth-store";
 import { initializeFirebase } from "@firetable/backend";
-import { Router } from "vue-router";
+import type { Router } from "vue-router";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { getCurrentUser, useCurrentUser, VueFire, VueFireAuth } from "vuefire";
 import { watch } from "vue";

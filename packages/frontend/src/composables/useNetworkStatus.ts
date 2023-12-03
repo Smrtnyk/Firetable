@@ -1,4 +1,5 @@
-import { ref, onMounted, onUnmounted, Ref } from "vue";
+import type { Ref } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 
 const onlineCheckUrl = "https://www.google.com/favicon.ico";
 

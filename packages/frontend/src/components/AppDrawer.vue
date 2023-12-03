@@ -7,7 +7,8 @@ import { useAuthStore } from "src/stores/auth-store";
 import { useAppStore } from "src/stores/app-store";
 import { logoutUser } from "@firetable/backend";
 import { withLoading } from "src/helpers/ui-helpers";
-import { ADMIN, Role, User } from "@firetable/types";
+import type { User } from "@firetable/types";
+import { ADMIN, Role } from "@firetable/types";
 
 const appStore = useAppStore();
 const authStore = useAuthStore();

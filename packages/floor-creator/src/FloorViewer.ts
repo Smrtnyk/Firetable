@@ -1,6 +1,6 @@
 import { Floor } from "./Floor";
-import { FabricObject } from "fabric";
-import { FloorCreationOptions, FloorEditorElement } from "./types";
+import type { FabricObject } from "fabric";
+import type { FloorCreationOptions, FloorEditorElement } from "./types";
 import { ViewerEventManager } from "./event-manager/ViewerEventManager";
 import { EventEmitter } from "./event-emitter/EventEmitter";
 import { isTable } from "./type-guards";

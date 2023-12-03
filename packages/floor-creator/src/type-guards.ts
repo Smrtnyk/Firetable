@@ -1,6 +1,7 @@
-import { RoundTable } from "./elements/RoundTable.js";
-import { BaseTable, FloorElementTypes } from "./types.js";
-import { RectTable } from "./elements/RectTable";
+import type { RoundTable } from "./elements/RoundTable.js";
+import type { BaseTable } from "./types.js";
+import { FloorElementTypes } from "./types.js";
+import type { RectTable } from "./elements/RectTable";
 
 export function isTable(element: unknown): element is BaseTable {
     return isRectTable(element) || isRoundTable(element);

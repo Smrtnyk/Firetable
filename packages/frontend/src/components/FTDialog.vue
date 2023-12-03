@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import { useDialogPluginComponent } from "quasar";
-import { ComponentPublicInstance } from "vue";
+import type { ComponentPublicInstance } from "vue";
 import { isMobile } from "src/global-reactives/screen-detection";
 
 interface Props {

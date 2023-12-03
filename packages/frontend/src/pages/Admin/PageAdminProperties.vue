@@ -5,14 +5,10 @@ import AddNewPropertyForm from "src/components/admin/property/AddNewPropertyForm
 
 import { Loading, useQuasar } from "quasar";
 import { showConfirm, withLoading } from "src/helpers/ui-helpers";
-import {
-    createNewProperty,
-    CreatePropertyPayload,
-    deleteProperty,
-    getPropertiesPath,
-} from "@firetable/backend";
+import type { CreatePropertyPayload } from "@firetable/backend";
+import { createNewProperty, deleteProperty, getPropertiesPath } from "@firetable/backend";
 import { computed, onMounted, ref, watchEffect } from "vue";
-import { PropertyDoc } from "@firetable/types";
+import type { PropertyDoc } from "@firetable/types";
 import { useI18n } from "vue-i18n";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import { usePropertiesStore } from "src/stores/usePropertiesStore";

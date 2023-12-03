@@ -1,4 +1,4 @@
-import { CreateElementOptions } from "./types";
+import type { CreateElementOptions } from "./types";
 import { match } from "ts-pattern";
 import { ElementTag } from "@firetable/types";
 import { Wall } from "./elements/Wall";

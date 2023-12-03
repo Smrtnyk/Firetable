@@ -24,7 +24,7 @@ import {
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { isMobile } from "src/global-reactives/screen-detection";
-import { ReservationDoc } from "@firetable/types";
+import type { ReservationDoc } from "@firetable/types";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 
 interface Props {

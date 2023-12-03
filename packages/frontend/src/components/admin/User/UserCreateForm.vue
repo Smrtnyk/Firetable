@@ -1,13 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import {
-    ADMIN,
-    CreateUserPayload,
-    OrganisationDoc,
-    PropertyDoc,
-    Role,
-    User,
-} from "@firetable/types";
+import type { CreateUserPayload, OrganisationDoc, PropertyDoc, User } from "@firetable/types";
+import { ADMIN, Role } from "@firetable/types";
 import { QForm } from "quasar";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";

@@ -1,7 +1,8 @@
-import { reactive, Ref, ref } from "vue";
+import type { Ref } from "vue";
+import { reactive, ref } from "vue";
 import { useReservations } from "./useReservations";
 import { describe, beforeEach, expect, it, vi } from "vitest";
-import { EventDoc, User } from "@firetable/types";
+import type { EventDoc, User } from "@firetable/types";
 import * as backend from "@firetable/backend";
 import * as uiHelpers from "../helpers/ui-helpers";
 import { FloorElementTypes, FloorViewer, RectTable } from "@firetable/floor-creator";

@@ -1,7 +1,9 @@
 import { initializeFirebase } from "./base.js";
-import { httpsCallable, HttpsCallableResult } from "firebase/functions";
-import { signOut, signInWithEmailAndPassword, UserCredential } from "firebase/auth";
-import { CreateUserPayload, EditUserPayload, User } from "@firetable/types";
+import type { HttpsCallableResult } from "firebase/functions";
+import { httpsCallable } from "firebase/functions";
+import type { UserCredential } from "firebase/auth";
+import { signOut, signInWithEmailAndPassword } from "firebase/auth";
+import type { CreateUserPayload, EditUserPayload, User } from "@firetable/types";
 
 export function createUserWithEmail(
     payload: CreateUserPayload,

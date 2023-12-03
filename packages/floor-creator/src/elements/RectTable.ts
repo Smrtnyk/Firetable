@@ -1,6 +1,7 @@
-import { Group, Rect, FabricText, GroupProps } from "fabric";
+import type { GroupProps } from "fabric";
+import { Group, Rect, FabricText } from "fabric";
 import { determineTableColor } from "../utils.js";
-import { ReservationDoc } from "@firetable/types";
+import type { ReservationDoc } from "@firetable/types";
 import {
     FONT_SIZE,
     TABLE_TEXT_FILL_COLOR,
@@ -8,7 +9,7 @@ import {
     TABLE_WIDTH,
     TABLE_HEIGHT,
 } from "../constants";
-import { AnimationStrategy } from "./animation/AnimationStrategy";
+import type { AnimationStrategy } from "./animation/AnimationStrategy";
 import { SmoothBlinkAnimation } from "./animation/SmoothBlinkAnimation.js";
 import { FloorElementTypes } from "../types";
 

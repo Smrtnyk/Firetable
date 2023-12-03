@@ -1,4 +1,4 @@
-import { RouteRecordRaw } from "vue-router";
+import type { RouteRecordRaw } from "vue-router";
 import { ADMIN, Role } from "@firetable/types";
 
 const routes: RouteRecordRaw[] = [

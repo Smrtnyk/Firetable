@@ -1,8 +1,9 @@
-import { OrganisationDoc, PropertyDoc } from "@firetable/types";
+import type { OrganisationDoc, PropertyDoc } from "@firetable/types";
 import { deleteDoc, getDocs } from "firebase/firestore";
 import { propertiesCollection, propertyDoc } from "./db.js";
 import { initializeFirebase } from "./base.js";
-import { httpsCallable, HttpsCallableResult } from "firebase/functions";
+import type { HttpsCallableResult } from "firebase/functions";
+import { httpsCallable } from "firebase/functions";
 
 export type CreatePropertyPayload = {
     name: string;

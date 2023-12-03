@@ -1,4 +1,5 @@
-import { config, flushPromises, mount, VueWrapper } from "@vue/test-utils";
+import type { VueWrapper } from "@vue/test-utils";
+import { config, flushPromises, mount } from "@vue/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createI18n } from "vue-i18n";
 import { Quasar } from "quasar";
@@ -6,7 +7,7 @@ import messages from "../../i18n";
 import * as authStore from "../../stores/auth-store";
 
 import EventCreateReservation from "./EventCreateReservation.vue";
-import { Reservation, User } from "@firetable/types";
+import type { Reservation, User } from "@firetable/types";
 
 const i18n = createI18n({
     locale: "en-GB",

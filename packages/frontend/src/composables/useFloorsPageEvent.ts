@@ -1,18 +1,18 @@
+import type { Ref } from "vue";
 import {
     watch,
     reactive,
     computed,
-    Ref,
     ref,
     nextTick,
     onMounted,
     onBeforeUnmount,
     shallowRef,
 } from "vue";
-import { EventDoc, EventFloorDoc, Reservation, ReservationDoc } from "@firetable/types";
+import type { EventDoc, EventFloorDoc, Reservation, ReservationDoc } from "@firetable/types";
 import { FloorViewer, getTables } from "@firetable/floor-creator";
-import { EventOwner } from "@firetable/backend";
-import { VueFirestoreDocumentData } from "vuefire";
+import type { EventOwner } from "@firetable/backend";
+import type { VueFirestoreDocumentData } from "vuefire";
 import { useUsers } from "src/composables/useUsers";
 import { useReservations } from "src/composables/useReservations";
 import { debounce } from "quasar";

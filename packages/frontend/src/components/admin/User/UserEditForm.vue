@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import {
-    DEFAULT_CAPABILITIES_BY_ROLE,
+import type {
     EditUserPayload,
     OrganisationDoc,
     PropertyDoc,
-    Role,
     User,
     UserCapability,
 } from "@firetable/types";
+import { DEFAULT_CAPABILITIES_BY_ROLE, Role } from "@firetable/types";
 import { QForm } from "quasar";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { noEmptyString, noWhiteSpaces } from "src/helpers/form-rules";

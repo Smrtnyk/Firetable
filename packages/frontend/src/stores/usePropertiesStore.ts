@@ -5,11 +5,11 @@ import {
     fetchPropertiesForAdmin,
     propertiesCollection,
 } from "@firetable/backend";
-import { OrganisationDoc, PropertyDoc, User } from "@firetable/types";
+import type { OrganisationDoc, PropertyDoc, User } from "@firetable/types";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
 import { query, where } from "firebase/firestore";
 import { nextTick, ref, watch } from "vue";
-import { NOOP } from "@firetable/utils";
+import type { NOOP } from "@firetable/utils";
 
 export const usePropertiesStore = defineStore("properties", () => {
     const properties = ref<PropertyDoc[]>([]);

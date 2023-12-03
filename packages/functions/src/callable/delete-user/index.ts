@@ -1,6 +1,8 @@
 import { auth, db } from "../../init.js";
-import { Collection, User } from "../../../types/types.js";
-import { CallableRequest, HttpsError } from "firebase-functions/v2/https";
+import type { User } from "../../../types/types.js";
+import { Collection } from "../../../types/types.js";
+import type { CallableRequest } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
 
 export async function deleteUser(req: CallableRequest<User>): Promise<void> {

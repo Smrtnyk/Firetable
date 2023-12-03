@@ -1,8 +1,9 @@
 import { EditorEventManager } from "./EditorEventManager";
-import { fabric } from "fabric";
+import { FabricObject, Group } from "fabric";
 import { RESOLUTION } from "../constants";
 import { CommandInvoker } from "../command/CommandInvoker";
-import { expect, it, describe, beforeEach, vi, SpyInstance } from "vitest";
+import type { SpyInstance } from "vitest";
+import { expect, it, describe, beforeEach, vi } from "vitest";
 import { FloorEditor } from "../FloorEditor";
 
 describe("EditorEventManager", () => {
@@ -37,8 +38,8 @@ describe("EditorEventManager", () => {
 
     describe("EditorEventManager - Object Movement Snapping", () => {
         it("should snap object angle to the closest multiple of snap angle", () => {
-            const mockEvent = {} as fabric.IEvent;
-            const target = new fabric.Object();
+            const mockEvent = {} as any;
+            const target = new FabricObject();
             mockEvent.target = target;
             target.angle = 47;
 
@@ -49,8 +50,8 @@ describe("EditorEventManager", () => {
         });
 
         it("should snap object to the left when within snap range on the left", () => {
-            const mockEvent = {} as fabric.IEvent;
-            const target = new fabric.Object();
+            const mockEvent = {} as any;
+            const target = new FabricObject();
             mockEvent.target = target;
             target.left = RESOLUTION - 1;
 
@@ -61,8 +62,8 @@ describe("EditorEventManager", () => {
         });
 
         it("should snap object to the top when within snap range at the top", () => {
-            const mockEvent = {} as fabric.IEvent;
-            const target = new fabric.Object();
+            const mockEvent = {} as any;
+            const target = new FabricObject();
             mockEvent.target = target;
             target.top = RESOLUTION - 1; // 14
 
@@ -73,8 +74,8 @@ describe("EditorEventManager", () => {
         });
 
         it("should snap object to both left and top when within snap range on both axes", () => {
-            const mockEvent = {} as fabric.IEvent;
-            const target = new fabric.Object();
+            const mockEvent = {} as any;
+            const target = new FabricObject();
             mockEvent.target = target;
             target.left = RESOLUTION - 1;
             target.top = RESOLUTION - 1;
@@ -87,8 +88,8 @@ describe("EditorEventManager", () => {
         });
 
         it("should not snap object if it's outside the snap range", () => {
-            const mockEvent = {} as fabric.IEvent;
-            const target = new fabric.Object();
+            const mockEvent = {} as any;
+            const target = new FabricObject();
             mockEvent.target = target;
             target.left = RESOLUTION - 3; // Outside the snap range
 
@@ -118,7 +119,7 @@ describe("EditorEventManager", () => {
 
     describe("EditorEventManager - Mouse Up Event Handling", () => {
         it("should call elementClickHandler when there is no active object on canvas", () => {
-            vi.spyOn(floor.canvas, "getActiveObject").mockReturnValue(null);
+            vi.spyOn(floor.canvas, "getActiveObject").mockReturnValue(void 0);
             const emitSpy = vi.spyOn(floor, "emit");
 
             // @ts-expect-error -- private method
@@ -181,15 +182,15 @@ describe("EditorEventManager", () => {
 
     describe("EditorEventManager - Object Movement with Control Key", () => {
         it("should move all active objects when Control key is pressed during object movement", () => {
-            const activeObject = new fabric.Object();
-            const mockGroup = new fabric.Group();
+            const activeObject = new FabricObject();
+            const mockGroup = new Group();
             vi.spyOn(floor.canvas, "getActiveObjects").mockReturnValue([activeObject]);
             vi.spyOn(floor.canvas, "getActiveObject").mockReturnValue(mockGroup);
             const setSpy = vi.spyOn(activeObject, "set");
 
             const mockEvent = {
                 e: { movementX: 5, movementY: 10 },
-            } as unknown as fabric.IEvent<MouseEvent>;
+            } as any;
             // Simulate Control key being pressed
             manager.ctrlPressedDuringSelection = true;
 

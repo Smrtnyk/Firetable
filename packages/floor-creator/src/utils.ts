@@ -1,4 +1,4 @@
-import { Reservation } from "@firetable/types";
+import type { Reservation } from "@firetable/types";
 import { match } from "ts-pattern";
 
 export function determineTableColor(

@@ -1,5 +1,5 @@
 import { EventEmitter } from "../event-emitter/EventEmitter";
-import { Command } from "./Command";
+import type { Command } from "./Command";
 
 type CommandInvokerEvents = {
     change: [null];

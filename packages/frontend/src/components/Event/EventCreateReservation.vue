@@ -3,7 +3,7 @@ import { computed, reactive, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
 import { greaterThanZero, minLength, noEmptyString, requireNumber } from "src/helpers/form-rules";
-import { Reservation, User } from "@firetable/types";
+import type { Reservation, User } from "@firetable/types";
 import { useAuthStore } from "src/stores/auth-store";
 import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
 

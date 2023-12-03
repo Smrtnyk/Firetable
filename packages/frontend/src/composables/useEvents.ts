@@ -1,7 +1,8 @@
 import { reactive, ref } from "vue";
-import { QueryDocumentSnapshot } from "firebase/firestore";
-import { EventDoc } from "@firetable/types";
-import { EventOwner, getEvents } from "@firetable/backend";
+import type { QueryDocumentSnapshot } from "firebase/firestore";
+import type { EventDoc } from "@firetable/types";
+import type { EventOwner } from "@firetable/backend";
+import { getEvents } from "@firetable/backend";
 
 const EVENTS_PER_PAGE = 50;
 

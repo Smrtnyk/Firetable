@@ -15,7 +15,7 @@ import {
     Tooltip,
     Legend,
 } from "chart.js";
-import { TimeSeriesData } from "src/components/admin/analytics/types";
+import type { TimeSeriesData } from "src/components/admin/analytics/types";
 import { getDarkMode } from "src/config";
 
 Chart.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip, Legend);

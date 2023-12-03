@@ -1,10 +1,10 @@
-import { RectTable } from "./elements/RectTable.js";
-import { RoundTable } from "./elements/RoundTable.js";
-import { ElementTag, FloorDoc } from "@firetable/types";
-import { Sofa } from "./elements/Sofa";
-import { DJBooth } from "./elements/DJBooth";
-import { SingleSofa } from "./elements/SingleSofa";
-import { Stage } from "./elements/Stage";
+import type { RectTable } from "./elements/RectTable.js";
+import type { RoundTable } from "./elements/RoundTable.js";
+import type { ElementTag, FloorDoc } from "@firetable/types";
+import type { Sofa } from "./elements/Sofa";
+import type { DJBooth } from "./elements/DJBooth";
+import type { SingleSofa } from "./elements/SingleSofa";
+import type { Stage } from "./elements/Stage";
 
 export interface FloorCreationOptions {
     canvas: HTMLCanvasElement;

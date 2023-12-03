@@ -1,5 +1,5 @@
-import { Command } from "./Command";
-import { FabricObject } from "fabric";
+import type { Command } from "./Command";
+import type { FabricObject } from "fabric";
 
 type Position = {
     left: number;

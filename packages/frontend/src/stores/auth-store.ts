@@ -1,17 +1,12 @@
 import { defineStore } from "pinia";
 import { computed, ref, watch } from "vue";
-import {
-    ADMIN,
-    Collection,
-    DEFAULT_CAPABILITIES_BY_ROLE,
-    User,
-    UserCapability,
-} from "@firetable/types";
+import type { User } from "@firetable/types";
+import { ADMIN, Collection, DEFAULT_CAPABILITIES_BY_ROLE, UserCapability } from "@firetable/types";
 import { isDefined, NOOP } from "@firetable/utils";
 import { logoutUser } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useFirestoreDocument } from "src/composables/useFirestore";
-import { User as FBUser } from "firebase/auth";
+import type { User as FBUser } from "firebase/auth";
 import {
     initAdminProperties,
     initNonAdminProperties,

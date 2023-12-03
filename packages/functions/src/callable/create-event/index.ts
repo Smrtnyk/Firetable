@@ -1,7 +1,9 @@
 import { logger } from "firebase-functions/v2";
 import { db } from "../../init.js";
-import { Collection, CreateEventPayload } from "../../../types/types.js";
-import { CallableRequest, HttpsError } from "firebase-functions/v2/https";
+import type { CreateEventPayload } from "../../../types/types.js";
+import { Collection } from "../../../types/types.js";
+import type { CallableRequest } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
 
 /**
  * Creates a new event in the Firestore database, uploads associated event images, and associates the event with specific floor plans.

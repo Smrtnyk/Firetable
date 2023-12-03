@@ -1,14 +1,14 @@
 import { Floor } from "./Floor";
-import { FabricObject } from "fabric";
-import {
+import type { FabricObject } from "fabric";
+import type {
     CreateElementOptions,
     FloorCreationOptions,
     FloorEditorElement,
     NumberTuple,
 } from "./types";
-import { EventManager } from "./event-manager/EventManager";
+import type { EventManager } from "./event-manager/EventManager";
 import { ElementManager } from "./ElementManager";
-import { FloorDoc } from "@firetable/types";
+import type { FloorDoc } from "@firetable/types";
 import { GridDrawer } from "./GridDrawer";
 import { EditorEventManager } from "./event-manager/EditorEventManager";
 import { calculateCanvasScale } from "./utils";

@@ -6,7 +6,7 @@ import { showConfirm, showErrorMessage, withLoading } from "src/helpers/ui-helpe
 import { computed, onBeforeMount, watch } from "vue";
 import { Loading, useQuasar } from "quasar";
 import FTDialog from "src/components/FTDialog.vue";
-import { CreateUserPayload, EditUserPayload, User } from "@firetable/types";
+import type { CreateUserPayload, EditUserPayload, User } from "@firetable/types";
 import { createUserWithEmail, deleteUser, updateUser } from "@firetable/backend";
 import { usePropertiesStore } from "src/stores/usePropertiesStore";
 import { useUsers } from "src/composables/useUsers";

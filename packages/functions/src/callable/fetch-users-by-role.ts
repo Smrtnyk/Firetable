@@ -1,7 +1,9 @@
 import { db } from "../init.js";
-import { Role, Collection, User, ADMIN } from "../../types/types.js";
+import type { User } from "../../types/types.js";
+import { Role, Collection, ADMIN } from "../../types/types.js";
 import { FieldPath } from "firebase-admin/firestore";
-import { CallableRequest, HttpsError } from "firebase-functions/v2/https";
+import type { CallableRequest } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
 
 type RoleFilter = {

@@ -10,10 +10,10 @@ import { useRouter } from "vue-router";
 import { computed, onMounted, ref } from "vue";
 import { useEventsStore } from "src/stores/events-store";
 import { useFirestoreCollection, useFirestoreDocument } from "src/composables/useFirestore";
-import { EventDoc, FloorDoc, GuestData, ReservationDoc } from "@firetable/types";
+import type { EventDoc, FloorDoc, GuestData, ReservationDoc } from "@firetable/types";
 import { useFloorsPageEvent } from "src/composables/useFloorsPageEvent";
+import type { EventOwner } from "@firetable/backend";
 import {
-    EventOwner,
     getEventFloorsPath,
     getEventGuestListPath,
     getEventPath,

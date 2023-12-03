@@ -1,7 +1,9 @@
-import { Collection, CreateUserPayload } from "../../../types/types.js";
+import type { CreateUserPayload } from "../../../types/types.js";
+import { Collection } from "../../../types/types.js";
 import { auth, db } from "../../init.js";
 import { FieldValue } from "firebase-admin/firestore";
-import { CallableRequest, HttpsError } from "firebase-functions/v2/https";
+import type { CallableRequest } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
 
 /**
  * Creates a new user in Firebase Authentication and stores associated user information in Firestore.

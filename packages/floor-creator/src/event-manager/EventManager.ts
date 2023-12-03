@@ -1,5 +1,6 @@
-import { TPointerEventInfo, Point } from "fabric";
-import { Floor } from "../Floor";
+import type { TPointerEventInfo } from "fabric";
+import { Point } from "fabric";
+import type { Floor } from "../Floor";
 
 export abstract class EventManager {
     protected readonly floor: Floor;

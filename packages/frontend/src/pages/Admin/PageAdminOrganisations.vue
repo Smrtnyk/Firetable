@@ -5,13 +5,13 @@ import AddNewOrganisationForm from "src/components/admin/organisation/AddNewOrga
 
 import { useQuasar } from "quasar";
 import { showConfirm, withLoading } from "src/helpers/ui-helpers";
+import type { CreateOrganisationPayload } from "@firetable/backend";
 import {
     createNewOrganisation,
-    CreateOrganisationPayload,
     deleteOrganisation,
     fetchOrganisationsForAdmin,
 } from "@firetable/backend";
-import { OrganisationDoc } from "@firetable/types";
+import type { OrganisationDoc } from "@firetable/types";
 import { onMounted, ref } from "vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import { useI18n } from "vue-i18n";

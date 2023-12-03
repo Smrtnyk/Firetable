@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PropertyDoc } from "@firetable/types";
+import type { PropertyDoc } from "@firetable/types";
 
 interface Props {
     property: PropertyDoc;

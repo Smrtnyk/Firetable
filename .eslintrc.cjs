@@ -68,6 +68,7 @@ module.exports = {
             "maximumStatements": 2
         }],
         "linebreak-style": ["error", "unix"],
+        "@typescript-eslint/consistent-type-imports": "error",
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/adjacent-overload-signatures": "error",
         "@typescript-eslint/ban-types": [
@@ -156,6 +157,7 @@ module.exports = {
         "eqeqeq": ["error", "smart"],
         "func-call-spacing": "off", // Off in the favor of @typescript-eslint/func-call-spacing
         "guard-for-in": "error",
+        "import/no-duplicates": "error",
         "import/order": "off",
         "import/no-unresolved": "off",
         "indent": "off", // Off in the favor of @typescript-eslint/indent
@@ -185,7 +187,7 @@ module.exports = {
         "no-debugger": "error",
         "no-dupe-class-members": "off",
         "no-duplicate-case": "error",
-        "no-duplicate-imports": "error",
+        "no-duplicate-imports": "off",
         "no-empty": "off",
         "no-eval": "error",
         "no-extra-bind": "error",
