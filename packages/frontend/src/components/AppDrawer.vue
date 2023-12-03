@@ -64,6 +64,16 @@ const adminLinks = computed(() => {
                 },
                 text: t("AppDrawer.links.manageFloors"),
             },
+            {
+                icon: "line-chart",
+                route: {
+                    name: "adminAnalytics",
+                    params: {
+                        organisationId: user.value.organisationId,
+                    },
+                },
+                text: t("AppDrawer.links.manageAnalytics"),
+            },
         );
     }
     if (role === Role.PROPERTY_OWNER) {

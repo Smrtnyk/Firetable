@@ -13,6 +13,7 @@ export default {
             manageUsers: "Benutzer verwalten",
             manageProperties: "Immobilien verwalten",
             manageOrganisations: "Organisationen verwalten",
+            manageAnalytics: "Analytics verwalten",
         },
         toggles: {
             darkMode: "Dunkelmodus umschalten",
