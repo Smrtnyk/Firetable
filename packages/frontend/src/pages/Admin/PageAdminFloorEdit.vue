@@ -99,15 +99,13 @@ onMounted(async () => {
     Loading.show();
     await floorDataPromise.value;
     if (floor.value) {
-        instantiateFloor(floor.value);
-        Loading.hide();
+        await instantiateFloor(floor.value);
         window.addEventListener("keydown", onKeyDown);
         window.addEventListener("resize", resizeFloor);
     } else {
         router.replace("/").catch(showErrorMessage);
-        Loading.hide();
-        return;
     }
+
     Loading.hide();
 });
 
