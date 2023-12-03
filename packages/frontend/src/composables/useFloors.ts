@@ -1,8 +1,8 @@
-import { showErrorMessage } from "src/helpers/ui-helpers";
 import type { Ref } from "vue";
+import type { FloorDoc, PropertyDoc } from "@firetable/types";
+import { showErrorMessage } from "src/helpers/ui-helpers";
 import { onUnmounted, ref, watch } from "vue";
 import { floorsCollection } from "@firetable/backend";
-import type { FloorDoc, PropertyDoc } from "@firetable/types";
 import { query, where, onSnapshot } from "firebase/firestore";
 
 export type PropertyFloors = {

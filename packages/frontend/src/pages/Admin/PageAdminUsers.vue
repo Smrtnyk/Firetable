@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { CreateUserPayload, EditUserPayload, User } from "@firetable/types";
 import UserCreateForm from "src/components/admin/User/UserCreateForm.vue";
 import UserEditForm from "src/components/admin/User/UserEditForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
@@ -6,7 +7,6 @@ import { showConfirm, showErrorMessage, withLoading } from "src/helpers/ui-helpe
 import { computed, onBeforeMount, watch } from "vue";
 import { Loading, useQuasar } from "quasar";
 import FTDialog from "src/components/FTDialog.vue";
-import type { CreateUserPayload, EditUserPayload, User } from "@firetable/types";
 import { createUserWithEmail, deleteUser, updateUser } from "@firetable/backend";
 import { usePropertiesStore } from "src/stores/usePropertiesStore";
 import { useUsers } from "src/composables/useUsers";

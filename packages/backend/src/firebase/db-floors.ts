@@ -1,7 +1,7 @@
-import { floorDoc, floorsCollection } from "./db.js";
 import type { DocumentReference } from "firebase/firestore";
-import { deleteDoc, addDoc } from "firebase/firestore";
 import type { FloorDoc, PropertyDoc } from "@firetable/types";
+import { floorDoc, floorsCollection } from "./db.js";
+import { deleteDoc, addDoc } from "firebase/firestore";
 
 export function deleteFloor(
     property: Pick<PropertyDoc, "organisationId" | "id">,

@@ -1,6 +1,6 @@
 import type { GroupProps } from "fabric";
-import { Group, Rect } from "fabric";
 import { FloorElementTypes } from "../types";
+import { Group, Rect } from "fabric";
 
 type WallCreationOptions = Record<string, unknown>;
 type WalLGroupCreationOptions = {

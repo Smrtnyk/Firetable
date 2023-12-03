@@ -1,11 +1,11 @@
 import type { SpyInstance } from "vitest";
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { FloorEditor } from "./FloorEditor";
 import type { FloorCreationOptions } from "./types";
+import { FloorEditor } from "./FloorEditor";
 import { GridDrawer } from "./GridDrawer";
-import { ElementTag } from "@firetable/types";
 import { isTable } from "./type-guards";
 import { RectTable } from "./elements/RectTable";
+import { ElementTag } from "@firetable/types";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { Group, Rect } from "fabric";
 
 describe("FloorEditor", () => {

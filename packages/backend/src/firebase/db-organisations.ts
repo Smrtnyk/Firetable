@@ -1,6 +1,6 @@
 import type { OrganisationDoc } from "@firetable/types";
-import { deleteDoc, getDocs, getDoc, addDoc } from "firebase/firestore";
 import { organisationDoc, organisationsCollection } from "./db.js";
+import { deleteDoc, getDocs, getDoc, addDoc } from "firebase/firestore";
 
 export interface CreateOrganisationPayload {
     name: string;

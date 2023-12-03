@@ -1,12 +1,12 @@
+import type { EventDoc, FloorDoc, ReservationDoc, User } from "@firetable/types";
+import type { EventOwner } from "@firetable/backend";
 import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
-import type { EventDoc, FloorDoc, ReservationDoc, User } from "@firetable/types";
 import {
     createQuery,
     useFirestoreCollection,
     useFirestoreDocument,
 } from "src/composables/useFirestore";
-import type { EventOwner } from "@firetable/backend";
 import {
     getEventFloorsPath,
     getEventPath,

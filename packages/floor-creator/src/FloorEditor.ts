@@ -1,4 +1,3 @@
-import { Floor } from "./Floor";
 import type { FabricObject } from "fabric";
 import type {
     CreateElementOptions,
@@ -7,8 +6,9 @@ import type {
     NumberTuple,
 } from "./types";
 import type { EventManager } from "./event-manager/EventManager";
-import { ElementManager } from "./ElementManager";
 import type { FloorDoc } from "@firetable/types";
+import { ElementManager } from "./ElementManager";
+import { Floor } from "./Floor";
 import { GridDrawer } from "./GridDrawer";
 import { EditorEventManager } from "./event-manager/EditorEventManager";
 import { calculateCanvasScale } from "./utils";

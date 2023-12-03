@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import EventCard from "src/components/Event/EventCard.vue";
 import type { EventDoc } from "@firetable/types";
+import EventCard from "src/components/Event/EventCard.vue";
 
 interface Props {
     events: EventDoc[];

@@ -1,11 +1,11 @@
-import { initializeApp } from "firebase/app";
 import type { Auth } from "firebase/auth";
-import { getAuth, connectAuthEmulator } from "firebase/auth";
 import type { Firestore } from "firebase/firestore";
-import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 import type { Functions } from "firebase/functions";
-import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 import fbConfig from "./fb-config.json";
+import { initializeApp } from "firebase/app";
+import { getAuth, connectAuthEmulator } from "firebase/auth";
+import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
+import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 import { memoize } from "@firetable/utils";
 
 const ipAddressPattern =

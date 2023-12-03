@@ -158,7 +158,21 @@ module.exports = {
         "func-call-spacing": "off", // Off in the favor of @typescript-eslint/func-call-spacing
         "guard-for-in": "error",
         "import/no-duplicates": "error",
-        "import/order": "off",
+        "import/order": [
+            "error",
+            {
+                "groups": [
+                    "type",
+                    "object",
+                    "sibling",
+                    "parent",
+                    "index",
+                    "internal",
+                    "external",
+                    "builtin",
+                ]
+            }
+        ],
         "import/no-unresolved": "off",
         "indent": "off", // Off in the favor of @typescript-eslint/indent
         "key-spacing": "error",

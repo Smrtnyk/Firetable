@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import { GridDrawer } from "./GridDrawer";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { fabric } from "fabric";
 
 describe("GridDrawer", () => {

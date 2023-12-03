@@ -1,10 +1,10 @@
+import type { SpyInstance } from "vitest";
 import { EditorEventManager } from "./EditorEventManager";
-import { FabricObject, Group } from "fabric";
 import { RESOLUTION } from "../constants";
 import { CommandInvoker } from "../command/CommandInvoker";
-import type { SpyInstance } from "vitest";
-import { expect, it, describe, beforeEach, vi } from "vitest";
 import { FloorEditor } from "../FloorEditor";
+import { expect, it, describe, beforeEach, vi } from "vitest";
+import { FabricObject, Group } from "fabric";
 
 describe("EditorEventManager", () => {
     let manager: EditorEventManager;

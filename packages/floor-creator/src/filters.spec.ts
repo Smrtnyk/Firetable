@@ -1,4 +1,4 @@
-import { expect, it, describe, beforeEach } from "vitest";
+import type { FloorDoc } from "@firetable/types";
 import { FloorEditor } from "./FloorEditor";
 import {
     extractAllTablesLabels,
@@ -7,7 +7,7 @@ import {
     hasFloorTables,
 } from "./filters";
 import { RectTable } from "./elements/RectTable";
-import type { FloorDoc } from "@firetable/types";
+import { expect, it, describe, beforeEach } from "vitest";
 import { ElementTag } from "@firetable/types";
 
 describe("Table Management Functions", () => {

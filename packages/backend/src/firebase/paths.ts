@@ -1,5 +1,5 @@
-import { Collection } from "@firetable/types";
 import type { EventOwner } from "./db.js";
+import { Collection } from "@firetable/types";
 
 export function getPropertiesPath(organisationId: string): string {
     return [Collection.ORGANISATIONS, organisationId, Collection.PROPERTIES].join("/");

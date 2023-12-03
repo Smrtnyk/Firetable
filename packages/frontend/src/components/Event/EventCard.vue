@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { dateFromTimestamp, hourFromTimestamp } from "src/helpers/date-utils";
 import type { EventDoc } from "@firetable/types";
+import { dateFromTimestamp, hourFromTimestamp } from "src/helpers/date-utils";
 import { useI18n } from "vue-i18n";
 
 interface Props {

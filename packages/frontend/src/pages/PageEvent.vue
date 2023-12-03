@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { EventDoc, FloorDoc, GuestData, ReservationDoc } from "@firetable/types";
+import type { EventOwner } from "@firetable/backend";
 import EventGuestList from "src/components/Event/EventGuestList.vue";
 import FTAutocomplete from "src/components/Event/FTAutocomplete.vue";
 import EventInfo from "src/components/Event/EventInfo.vue";
@@ -10,9 +12,7 @@ import { useRouter } from "vue-router";
 import { computed, onMounted, ref } from "vue";
 import { useEventsStore } from "src/stores/events-store";
 import { useFirestoreCollection, useFirestoreDocument } from "src/composables/useFirestore";
-import type { EventDoc, FloorDoc, GuestData, ReservationDoc } from "@firetable/types";
 import { useFloorsPageEvent } from "src/composables/useFloorsPageEvent";
-import type { EventOwner } from "@firetable/backend";
 import {
     getEventFloorsPath,
     getEventGuestListPath,

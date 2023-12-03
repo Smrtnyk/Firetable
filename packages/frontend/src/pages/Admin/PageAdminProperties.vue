@@ -1,14 +1,14 @@
 <script setup lang="ts">
+import type { CreatePropertyPayload } from "@firetable/backend";
+import type { PropertyDoc } from "@firetable/types";
 import FTTitle from "src/components/FTTitle.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import AddNewPropertyForm from "src/components/admin/property/AddNewPropertyForm.vue";
 
 import { Loading, useQuasar } from "quasar";
 import { showConfirm, withLoading } from "src/helpers/ui-helpers";
-import type { CreatePropertyPayload } from "@firetable/backend";
 import { createNewProperty, deleteProperty, getPropertiesPath } from "@firetable/backend";
 import { computed, onMounted, ref, watchEffect } from "vue";
-import type { PropertyDoc } from "@firetable/types";
 import { useI18n } from "vue-i18n";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import { usePropertiesStore } from "src/stores/usePropertiesStore";

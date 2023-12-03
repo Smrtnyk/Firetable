@@ -1,19 +1,14 @@
 import type { Ref, ShallowRef } from "vue";
-import { computed, onBeforeUnmount, watch, ref } from "vue";
 import type { EventDoc, Reservation, ReservationDoc, User } from "@firetable/types";
-import { isTable } from "@firetable/floor-creator";
-import type {
-    BaseTable,
-    Floor,
-    FloorEditorElement,
-    type FloorViewer,
-} from "@firetable/floor-creator";
+import type { BaseTable, Floor, FloorEditorElement, FloorViewer } from "@firetable/floor-creator";
 import type { EventOwner } from "@firetable/backend";
-import { addReservation, deleteReservation, updateReservationDoc } from "@firetable/backend";
 import type { DialogChainObject } from "quasar";
+import type { VueFirestoreDocumentData } from "vuefire";
+import { computed, onBeforeUnmount, watch, ref } from "vue";
+import { isTable } from "@firetable/floor-creator";
+import { addReservation, deleteReservation, updateReservationDoc } from "@firetable/backend";
 import { useQuasar } from "quasar";
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import type { VueFirestoreDocumentData } from "vuefire";
 import { useI18n } from "vue-i18n";
 
 import FTDialog from "src/components/FTDialog.vue";

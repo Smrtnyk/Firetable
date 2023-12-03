@@ -10,6 +10,7 @@
 </template>
 
 <script setup lang="ts">
+import type { ReservationDoc } from "@firetable/types";
 import {
     Chart,
     BarController,
@@ -24,7 +25,6 @@ import {
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { isMobile } from "src/global-reactives/screen-detection";
-import type { ReservationDoc } from "@firetable/types";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 
 interface Props {

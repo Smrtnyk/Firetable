@@ -1,12 +1,12 @@
 <script setup lang="ts">
+import type { EventDoc } from "@firetable/types";
+import type { EventOwner } from "@firetable/backend";
 import EventCardList from "src/components/Event/EventCardList.vue";
 import { where, orderBy, limit } from "firebase/firestore";
 import { config } from "src/config";
 import { ONE_HOUR } from "src/constants";
-import type { EventDoc } from "@firetable/types";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
 import { useRoute } from "vue-router";
-import type { EventOwner } from "@firetable/backend";
 import { eventsCollection } from "@firetable/backend";
 import { watch } from "vue";
 import { Loading } from "quasar";

@@ -1,4 +1,8 @@
 import type { Ref } from "vue";
+import type { EventDoc, EventFloorDoc, Reservation, ReservationDoc } from "@firetable/types";
+import type { EventOwner } from "@firetable/backend";
+import type { VueFirestoreDocumentData } from "vuefire";
+import { FloorViewer, getTables } from "@firetable/floor-creator";
 import {
     watch,
     reactive,
@@ -9,10 +13,6 @@ import {
     onBeforeUnmount,
     shallowRef,
 } from "vue";
-import type { EventDoc, EventFloorDoc, Reservation, ReservationDoc } from "@firetable/types";
-import { FloorViewer, getTables } from "@firetable/floor-creator";
-import type { EventOwner } from "@firetable/backend";
-import type { VueFirestoreDocumentData } from "vuefire";
 import { useUsers } from "src/composables/useUsers";
 import { useReservations } from "src/composables/useReservations";
 import { debounce } from "quasar";

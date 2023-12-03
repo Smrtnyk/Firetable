@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
 import type {
     EditUserPayload,
     OrganisationDoc,
@@ -7,6 +6,7 @@ import type {
     User,
     UserCapability,
 } from "@firetable/types";
+import { computed, ref } from "vue";
 import { DEFAULT_CAPABILITIES_BY_ROLE, Role } from "@firetable/types";
 import { QForm } from "quasar";
 import { showErrorMessage } from "src/helpers/ui-helpers";

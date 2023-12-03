@@ -1,7 +1,7 @@
 import type { GroupProps } from "fabric";
-import { Group, Rect, FabricText } from "fabric";
-import { determineTableColor } from "../utils.js";
 import type { ReservationDoc } from "@firetable/types";
+import type { AnimationStrategy } from "./animation/AnimationStrategy";
+import { SmoothBlinkAnimation } from "./animation/SmoothBlinkAnimation.js";
 import {
     FONT_SIZE,
     TABLE_TEXT_FILL_COLOR,
@@ -9,9 +9,9 @@ import {
     TABLE_WIDTH,
     TABLE_HEIGHT,
 } from "../constants";
-import type { AnimationStrategy } from "./animation/AnimationStrategy";
-import { SmoothBlinkAnimation } from "./animation/SmoothBlinkAnimation.js";
+import { determineTableColor } from "../utils.js";
 import { FloorElementTypes } from "../types";
+import { Group, Rect, FabricText } from "fabric";
 
 interface RectTableElementOptions {
     groupOptions: {

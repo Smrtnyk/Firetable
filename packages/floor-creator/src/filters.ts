@@ -1,8 +1,8 @@
 import type { Floor } from "./Floor.js";
 import type { BaseTable } from "./types.js";
 import type { FloorDoc } from "@firetable/types";
-import { isString, takeProp } from "@firetable/utils";
 import { isTable } from "./type-guards";
+import { isString, takeProp } from "@firetable/utils";
 
 export function hasFloorTables(floor: Floor): boolean {
     return getTables(floor).length > 0;

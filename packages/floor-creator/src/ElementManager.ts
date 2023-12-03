@@ -1,6 +1,4 @@
 import type { CreateElementOptions } from "./types";
-import { match } from "ts-pattern";
-import { ElementTag } from "@firetable/types";
 import { Wall } from "./elements/Wall";
 import { DJBooth } from "./elements/DJBooth";
 import { Sofa } from "./elements/Sofa";
@@ -9,6 +7,8 @@ import { RESOLUTION, TABLE_HEIGHT, TABLE_WIDTH } from "./constants";
 import { RectTable } from "./elements/RectTable";
 import { SingleSofa } from "./elements/SingleSofa";
 import { Stage } from "./elements/Stage";
+import { ElementTag } from "@firetable/types";
+import { match } from "ts-pattern";
 
 export class ElementManager {
     addElement(

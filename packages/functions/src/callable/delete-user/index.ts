@@ -1,7 +1,7 @@
-import { auth, db } from "../../init.js";
 import type { User } from "../../../types/types.js";
-import { Collection } from "../../../types/types.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
+import { auth, db } from "../../init.js";
+import { Collection } from "../../../types/types.js";
 import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
 

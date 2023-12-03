@@ -1,6 +1,6 @@
-import { logger } from "firebase-functions";
 import { db } from "../init.js";
 import { Collection } from "../../types/types.js";
+import { logger } from "firebase-functions";
 import { FieldValue } from "firebase-admin/firestore";
 import { HttpsError } from "firebase-functions/v2/https";
 

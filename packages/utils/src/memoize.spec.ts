@@ -1,5 +1,5 @@
-import { it, describe, jest, expect } from "@jest/globals";
 import { memoize } from "./memoize";
+import { it, describe, jest, expect } from "@jest/globals";
 
 describe("memoize", () => {
     it("caches function results based on arguments", () => {

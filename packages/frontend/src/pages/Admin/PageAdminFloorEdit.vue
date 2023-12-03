@@ -1,14 +1,15 @@
 <script setup lang="ts">
+import type { NumberTuple } from "src/types/generic";
+import type { Floor, FloorEditorElement } from "@firetable/floor-creator";
+import type { FloorDoc } from "@firetable/types";
 import AddTableDialog from "src/components/Floor/AddTableDialog.vue";
 import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
 import FTDialog from "src/components/FTDialog.vue";
 
 import { nextTick, onBeforeUnmount, onMounted, reactive, ref } from "vue";
-import type { NumberTuple } from "src/types/generic";
 import { useRouter } from "vue-router";
 import { debounce, exportFile, Loading, useQuasar } from "quasar";
 import { BULK_ADD_COLLECTION, ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
-import type { Floor, FloorEditorElement } from "@firetable/floor-creator";
 import {
     extractAllTablesLabels,
     FloorEditor,
@@ -17,7 +18,6 @@ import {
     MAX_FLOOR_WIDTH,
     RESOLUTION,
 } from "@firetable/floor-creator";
-import type { FloorDoc } from "@firetable/types";
 import { ElementTag } from "@firetable/types";
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import {

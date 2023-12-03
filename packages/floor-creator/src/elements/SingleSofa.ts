@@ -1,6 +1,6 @@
 import type { FabricObject, GroupProps } from "fabric";
-import { Rect, Group } from "fabric";
 import { FloorElementTypes } from "../types";
+import { Rect, Group } from "fabric";
 
 type SofaGroupCreationOpts = {
     top: number;

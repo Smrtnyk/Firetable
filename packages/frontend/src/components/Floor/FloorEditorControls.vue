@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import type { BaseTable, FloorEditorElement } from "@firetable/floor-creator";
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed, onBeforeUnmount, onMounted, ref, toRefs, watch } from "vue";
-import type { BaseTable, FloorEditorElement } from "@firetable/floor-creator";
 import { isTable } from "@firetable/floor-creator";
 import { QPopupProxy } from "quasar";
 import { isMobile, isTablet } from "src/global-reactives/screen-detection";

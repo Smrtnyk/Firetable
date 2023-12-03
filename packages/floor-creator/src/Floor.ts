@@ -1,20 +1,20 @@
 import type { FabricObject } from "fabric";
-import { Canvas, classRegistry } from "fabric";
-import { CANVAS_BG_COLOR } from "./constants.js";
 import type { BaseTable, FloorCreationOptions } from "./types.js";
-import { FloorElementTypes } from "./types.js";
 import type { FloorDoc } from "@firetable/types";
+import type { EventManager } from "./event-manager/EventManager";
+import type { EventEmitterListener } from "./event-emitter/EventEmitter";
+import { CANVAS_BG_COLOR } from "./constants.js";
+import { FloorElementTypes } from "./types.js";
 import { TouchManager } from "./TouchManager";
 import { FloorZoomManager } from "./FloorZoomManager";
-import type { EventManager } from "./event-manager/EventManager";
 import { calculateCanvasScale } from "./utils";
-import type { EventEmitterListener } from "./event-emitter/EventEmitter";
 import { isTable } from "./type-guards";
 import { getTables } from "./filters";
 import { RectTable } from "./elements/RectTable";
 import { Sofa } from "./elements/Sofa";
 import { Wall } from "./elements/Wall";
 import { RoundTable } from "./elements/RoundTable";
+import { Canvas, classRegistry } from "fabric";
 
 classRegistry.setClass(RectTable, FloorElementTypes.RECT_TABLE);
 classRegistry.setClass(RoundTable, FloorElementTypes.ROUND_TABLE);

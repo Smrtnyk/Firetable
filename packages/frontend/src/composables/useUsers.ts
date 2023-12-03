@@ -1,5 +1,5 @@
-import { ref, watch } from "vue";
 import type { User } from "@firetable/types";
+import { ref, watch } from "vue";
 import { ADMIN } from "@firetable/types";
 import { useAuthStore } from "src/stores/auth-store";
 import { fetchUsersByRole } from "@firetable/backend";

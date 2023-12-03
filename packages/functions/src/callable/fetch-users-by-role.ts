@@ -1,8 +1,8 @@
-import { db } from "../init.js";
 import type { User } from "../../types/types.js";
+import type { CallableRequest } from "firebase-functions/v2/https";
+import { db } from "../init.js";
 import { Role, Collection, ADMIN } from "../../types/types.js";
 import { FieldPath } from "firebase-admin/firestore";
-import type { CallableRequest } from "firebase-functions/v2/https";
 import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { formatEventDate } from "src/helpers/date-utils";
 import type { EventDoc } from "@firetable/types";
+import { formatEventDate } from "src/helpers/date-utils";
 
 interface Props {
     event: EventDoc;

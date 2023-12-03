@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { User } from "@firetable/types";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -7,7 +8,6 @@ import { useAuthStore } from "src/stores/auth-store";
 import { useAppStore } from "src/stores/app-store";
 import { logoutUser } from "@firetable/backend";
 import { withLoading } from "src/helpers/ui-helpers";
-import type { User } from "@firetable/types";
 import { ADMIN, Role } from "@firetable/types";
 
 const appStore = useAppStore();

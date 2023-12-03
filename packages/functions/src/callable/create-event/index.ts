@@ -1,8 +1,8 @@
-import { logger } from "firebase-functions/v2";
-import { db } from "../../init.js";
 import type { CreateEventPayload } from "../../../types/types.js";
-import { Collection } from "../../../types/types.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
+import { db } from "../../init.js";
+import { Collection } from "../../../types/types.js";
+import { logger } from "firebase-functions/v2";
 import { HttpsError } from "firebase-functions/v2/https";
 
 /**

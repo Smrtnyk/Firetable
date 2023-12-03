@@ -1,14 +1,14 @@
 import type { Ref } from "vue";
-import { reactive, ref } from "vue";
-import { useReservations } from "./useReservations";
-import { describe, beforeEach, expect, it, vi } from "vitest";
 import type { EventDoc, User } from "@firetable/types";
-import * as backend from "@firetable/backend";
+import { useReservations } from "./useReservations";
 import * as uiHelpers from "../helpers/ui-helpers";
+import * as authStore from "../stores/auth-store";
+import { reactive, ref } from "vue";
+import { describe, beforeEach, expect, it, vi } from "vitest";
+import * as backend from "@firetable/backend";
 import { FloorElementTypes, FloorViewer, RectTable } from "@firetable/floor-creator";
 import { uid } from "quasar";
 import * as i18n from "vue-i18n";
-import * as authStore from "../stores/auth-store";
 import { NOOP } from "@firetable/utils";
 
 function createFloor(floorName: string): FloorViewer {

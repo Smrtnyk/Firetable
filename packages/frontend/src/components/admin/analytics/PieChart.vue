@@ -3,9 +3,9 @@
 </template>
 
 <script setup lang="ts">
+import type { PieChartData } from "src/components/admin/analytics/types";
 import { ref, onMounted, watch } from "vue";
 import { Chart, PieController, ArcElement, Tooltip, Legend } from "chart.js";
-import type { PieChartData } from "src/components/admin/analytics/types";
 
 Chart.register(PieController, ArcElement, Tooltip, Legend);
 

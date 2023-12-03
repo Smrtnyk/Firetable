@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { CreateEventPayload, EditEventPayload, EventDoc, PropertyDoc } from "@firetable/types";
+import type { EventOwner } from "@firetable/backend";
 import AdminPropertyEventsList from "src/components/admin/event/AdminPropertyEventsList.vue";
 import EventCreateForm from "src/components/admin/event/EventCreateForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
@@ -12,8 +14,6 @@ import {
 } from "src/helpers/ui-helpers";
 import { computed, onBeforeMount, ref, watch } from "vue";
 import { Loading, useQuasar } from "quasar";
-import type { CreateEventPayload, EditEventPayload, EventDoc, PropertyDoc } from "@firetable/types";
-import type { EventOwner } from "@firetable/backend";
 import {
     createNewEvent,
     deleteDocAndAllSubCollections,

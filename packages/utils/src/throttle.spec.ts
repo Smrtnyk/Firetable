@@ -1,5 +1,5 @@
-import { afterAll, describe, expect, jest, test } from "@jest/globals";
 import { throttle } from "./throttle";
+import { afterAll, describe, expect, jest, test } from "@jest/globals";
 
 describe("throttle", () => {
     jest.useFakeTimers();

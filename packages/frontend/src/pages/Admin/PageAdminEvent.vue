@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import type { Component } from "vue";
+import type { FloorEditor } from "@firetable/floor-creator";
+import type { FloorDoc } from "@firetable/types";
+import type { EventOwner } from "@firetable/backend";
 import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { formatEventDate } from "src/helpers/date-utils";
@@ -13,10 +16,7 @@ import FTDialog from "src/components/FTDialog.vue";
 
 import { Loading, useQuasar } from "quasar";
 import { config } from "src/config";
-import type { FloorEditor } from "@firetable/floor-creator";
 import { getTablesFromFloorDoc } from "@firetable/floor-creator";
-import type { FloorDoc } from "@firetable/types";
-import type { EventOwner } from "@firetable/backend";
 import { updateEventFloorData } from "@firetable/backend";
 import { withLoading } from "src/helpers/ui-helpers";
 import useAdminEvent from "src/composables/useAdminEvent";

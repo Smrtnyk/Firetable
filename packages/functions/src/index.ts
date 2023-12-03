@@ -2,7 +2,6 @@ import { createEvent as createEventFn } from "./callable/create-event/index.js";
 import { createUser as createUserFn } from "./callable/create-user/index.js";
 import { deleteUser as deleteUserFn } from "./callable/delete-user/index.js";
 import { clearOldEvents as clearOldEventsFn } from "./cron/clear-old-events/index.js";
-import { Collection } from "../types/types.js";
 import { createPropertyFn } from "./callable/create-property/create-property.js";
 import { deleteDocument } from "./delete-document/index.js";
 import { updateUserFn } from "./callable/update-user.js";
@@ -12,6 +11,7 @@ import { onPropertyDeletedFn } from "./trigger/on-property-deleted.js";
 import { onPropertyDeletedCleanEvents } from "./trigger/on-property-deleted-clean-events.js";
 
 import { auth } from "./init.js";
+import { Collection } from "../types/types.js";
 
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import { onRequest, onCall, HttpsError } from "firebase-functions/v2/https";

@@ -21,17 +21,20 @@ export function useFirestoreDocument<T>(path: string, options = {}) {
     return useDocument<T>(doc(firestore, path), options);
 }
 
-export function updateFirestoreDocument<T>(documentRef: DocumentReference<T>, updates: Partial<T>) {
+export function updateFirestoreDocument<T>(
+    documentRef: DocumentReference<T>,
+    updates: Partial<T>,
+): Promise<void> {
     return setDoc<T, DocumentData>(documentRef, updates, {
         merge: true,
     });
 }
 
-export function getFirestoreDocument(path: string) {
+export function getFirestoreDocument(path: string): DocumentReference {
     const { firestore } = initializeFirebase();
     return doc(firestore, path);
 }
 
-export function createQuery<T>(collectionRef: any, ...queries: any[]) {
+export function createQuery<T>(collectionRef: any, ...queries: any[]): Query<T> {
     return query<T, DocumentData>(collectionRef, ...queries);
 }

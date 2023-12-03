@@ -1,4 +1,15 @@
+import type { HttpsCallableResult } from "firebase/functions";
+import type { DocumentData, DocumentReference } from "firebase/firestore";
+import type {
+    CreateEventPayload,
+    EventDoc,
+    FloorDoc,
+    GuestData,
+    Reservation,
+    ReservationDoc,
+} from "@firetable/types";
 import type { EventOwner } from "./db.js";
+import { initializeFirebase } from "./base.js";
 import {
     eventsCollection,
     guestListCollection,
@@ -8,10 +19,6 @@ import {
     reservationsCollection,
     reservationDoc,
 } from "./db.js";
-import { initializeFirebase } from "./base.js";
-import type { HttpsCallableResult } from "firebase/functions";
-import { httpsCallable } from "firebase/functions";
-import type { DocumentData, DocumentReference } from "firebase/firestore";
 import {
     getDocs,
     orderBy,
@@ -23,14 +30,7 @@ import {
     query,
     where,
 } from "firebase/firestore";
-import type {
-    CreateEventPayload,
-    EventDoc,
-    FloorDoc,
-    GuestData,
-    Reservation,
-    ReservationDoc,
-} from "@firetable/types";
+import { httpsCallable } from "firebase/functions";
 
 export async function getEvents(
     lastDocument: DocumentData | null,

@@ -1,8 +1,8 @@
 import type { CreateUserPayload } from "../../../types/types.js";
+import type { CallableRequest } from "firebase-functions/v2/https";
 import { Collection } from "../../../types/types.js";
 import { auth, db } from "../../init.js";
 import { FieldValue } from "firebase-admin/firestore";
-import type { CallableRequest } from "firebase-functions/v2/https";
 import { HttpsError } from "firebase-functions/v2/https";
 
 /**

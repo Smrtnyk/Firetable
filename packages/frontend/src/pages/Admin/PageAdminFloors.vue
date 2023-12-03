@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { FloorDoc } from "@firetable/types";
+import type { PropertyFloors } from "src/composables/useFloors";
 import AddNewFloorForm from "src/components/Floor/AddNewFloorForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import FTDialog from "src/components/FTDialog.vue";
@@ -6,9 +8,7 @@ import FTDialog from "src/components/FTDialog.vue";
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { Loading, useQuasar } from "quasar";
 import { makeRawFloor } from "@firetable/floor-creator";
-import type { FloorDoc } from "@firetable/types";
 import { addFloor, deleteFloor } from "@firetable/backend";
-import type { PropertyFloors } from "src/composables/useFloors";
 import { useFloors } from "src/composables/useFloors";
 import { ref, watch, computed } from "vue";
 import { takeProp } from "@firetable/utils";

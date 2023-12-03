@@ -5,6 +5,7 @@
 </template>
 
 <script setup lang="ts">
+import type { TimeSeriesData } from "src/components/admin/analytics/types";
 import { ref, onMounted, watch } from "vue";
 import {
     Chart,
@@ -15,7 +16,6 @@ import {
     Tooltip,
     Legend,
 } from "chart.js";
-import type { TimeSeriesData } from "src/components/admin/analytics/types";
 import { getDarkMode } from "src/config";
 
 Chart.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip, Legend);

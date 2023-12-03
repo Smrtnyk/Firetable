@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { PieChartData, TimeSeriesData } from "src/components/admin/analytics/types";
 
+import type { EventDoc, PropertyDoc } from "@firetable/types";
+import type { AugmentedReservation, ReservationBucket } from "src/stores/analytics-store";
 import FTTitle from "src/components/FTTitle.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import PieChart from "src/components/admin/analytics/PieChart.vue";
@@ -9,14 +11,12 @@ import AdminEventReservationsByPerson from "src/components/admin/event/AdminEven
 
 import { eventsCollection, reservationsCollection } from "@firetable/backend";
 import { getDocs, query, where } from "firebase/firestore";
-import type { EventDoc, PropertyDoc } from "@firetable/types";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { Loading } from "quasar";
 import { usePropertiesStore } from "src/stores/usePropertiesStore";
 import { format, subMonths } from "date-fns";
 import { getColors } from "src/helpers/colors";
-import type { AugmentedReservation, ReservationBucket } from "src/stores/analytics-store";
 import { useAnalyticsStore } from "src/stores/analytics-store";
 
 interface Props {
