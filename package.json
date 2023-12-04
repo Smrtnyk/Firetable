@@ -40,6 +40,9 @@
     },
     "private": true,
     "engines": {
-        "pnpm": ">= 7.11.0"
+        "pnpm": ">= 8.11.0"
+    },
+    "overrides": {
+        "vite": "5.0.5"
     }
 }
