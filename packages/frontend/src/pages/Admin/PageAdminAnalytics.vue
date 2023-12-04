@@ -46,7 +46,7 @@ const monthOptions = computed(() => {
     return options.reverse();
 });
 const reservations = ref<ReservationBucket[]>([]);
-const reservationsByActiveProperty = computed(() => {
+const reservationsByActiveProperty = computed<AugmentedReservation[]>(() => {
     return reservations.value
         .filter((bucket) => bucket.propertyId === selectedTab.value)
         .flatMap((bucket) => bucket.reservations);
@@ -81,7 +81,7 @@ const avgGuestsPerReservation = computed((): AverageGuestsData => {
     let totalGuests = 0;
     let totalReservations = 0;
     reservationsByActiveProperty.value.forEach(({ numberOfGuests }) => {
-        totalGuests += numberOfGuests;
+        totalGuests += Number(numberOfGuests);
         totalReservations++;
     });
 

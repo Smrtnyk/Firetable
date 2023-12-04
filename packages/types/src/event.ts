@@ -1,6 +1,6 @@
 import type { QueryDocumentSnapshot } from "firebase/firestore";
-import { FloorDoc } from "./floor.js";
-import { User } from "./auth.js";
+import type { FloorDoc } from "./floor.js";
+import type { User } from "./auth.js";
 
 export interface CreateEventForm {
     name: string;
@@ -56,7 +56,7 @@ export interface Reservation {
     confirmed: boolean;
     guestContact?: string;
     guestName: string;
-    numberOfGuests: number;
+    numberOfGuests: number | string;
     reservationNote?: string;
     consumption: number;
     time: string;
