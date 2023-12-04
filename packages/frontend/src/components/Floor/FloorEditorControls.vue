@@ -20,12 +20,12 @@ const emit = defineEmits(["delete"]);
 const colorPickerProxy = ref<QPopupProxy | null>(null);
 const getElementWidth = computed(() => {
     const el = selectedFloorElement.value;
-    return el ? Math.round(el.width! * el.scaleX!) : 0;
+    return el ? Math.round(el.width * el.scaleX) : 0;
 });
 
 const getElementHeight = computed(() => {
     const el = selectedFloorElement.value;
-    return el ? Math.round(el.height! * el.scaleY!) : 0;
+    return el ? Math.round(el.height * el.scaleY) : 0;
 });
 
 const localWidth = ref(getElementWidth.value);
@@ -47,8 +47,8 @@ onBeforeUnmount(() => {
 });
 
 watch(selectedFloorElement, (newEl) => {
-    localWidth.value = newEl ? Math.round(newEl.width! * newEl.scaleX!) : 0;
-    localHeight.value = newEl ? Math.round(newEl.height! * newEl.scaleY!) : 0;
+    localWidth.value = newEl ? Math.round(newEl.width * newEl.scaleX) : 0;
+    localHeight.value = newEl ? Math.round(newEl.height * newEl.scaleY) : 0;
 
     if (newEl?.getBaseFill) {
         elementColor.value = newEl.getBaseFill();
@@ -59,7 +59,7 @@ watch(localWidth, (newWidth) => {
     if (!selectedFloorElement.value) {
         return;
     }
-    selectedFloorElement.value.scaleX = newWidth / selectedFloorElement.value.width!;
+    selectedFloorElement.value.scaleX = newWidth / selectedFloorElement.value.width;
     selectedFloorElement.value.setCoords();
     selectedFloorElement.value.canvas?.renderAll();
 });
@@ -68,7 +68,7 @@ watch(localHeight, (newHeight) => {
     if (!selectedFloorElement.value) {
         return;
     }
-    selectedFloorElement.value.scaleY = newHeight / selectedFloorElement.value.height!;
+    selectedFloorElement.value.scaleY = newHeight / selectedFloorElement.value.height;
     selectedFloorElement.value.setCoords();
     selectedFloorElement.value.canvas?.renderAll();
 });
