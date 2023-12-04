@@ -1,4 +1,5 @@
-import type { SpyInstance } from "vitest";
+import type { MockInstance } from "vitest";
+import type { Canvas } from "fabric";
 import { EditorEventManager } from "./EditorEventManager";
 import { RESOLUTION } from "../constants";
 import { CommandInvoker } from "../command/CommandInvoker";
@@ -10,15 +11,16 @@ describe("EditorEventManager", () => {
     let manager: EditorEventManager;
     let commandInvoker: CommandInvoker;
     let floor: FloorEditor;
-    let canvasOnEventSpy: SpyInstance<Parameters<typeof floor.canvas.on>>;
+    let canvasOnEventSpy: MockInstance<Parameters<typeof floor.canvas.on>>;
+    let canvas: Canvas;
 
     beforeEach(() => {
         commandInvoker = new CommandInvoker();
-        const canvas = document.createElement("canvas");
-        canvas.width = 1000;
-        canvas.height = 1000;
+        const canvasEl = document.createElement("canvas");
+        canvasEl.width = 1000;
+        canvasEl.height = 1000;
         floor = new FloorEditor({
-            canvas,
+            canvas: canvasEl,
             floorDoc: {
                 id: "test-id",
                 name: "test floor",
@@ -29,6 +31,7 @@ describe("EditorEventManager", () => {
             },
             containerWidth: 1000,
         });
+        canvas = floor.canvas;
 
         canvasOnEventSpy = vi.spyOn(floor.canvas, "on");
 
@@ -125,30 +128,22 @@ describe("EditorEventManager", () => {
             // @ts-expect-error -- private method
             manager.onEditorMouseUp();
 
-            expect(emitSpy).toHaveBeenCalledWith(
-                "elementClicked",
-                // @ts-expect-error -- private property
-                manager.floor,
-                void 0,
-            );
+            expect(emitSpy).toHaveBeenCalledWith("elementClicked", floor, void 0);
         });
     });
 
     describe("EditorEventManager - Keyboard Event Handling", () => {
         it("should enable canvas selection when Control key is pressed", () => {
-            const mockEvent = new KeyboardEvent("keydown", { key: "Control" });
-            // @ts-expect-error -- private method invocation
-            manager.handleKeyDown(mockEvent);
-            // @ts-expect-error -- accessing private property
-            expect(manager.floor.canvas.selection).toBe(true);
+            const mockEvent = new KeyboardEvent("keydown", { key: "Control", ctrlKey: true });
+            document.dispatchEvent(mockEvent);
+            expect(canvas.selection).toBe(true);
         });
 
         it("should disable canvas selection when Control key is released", () => {
             const mockEvent = new KeyboardEvent("keyup", { key: "Control" });
             // @ts-expect-error -- private method invocation
             manager.handleKeyUp(mockEvent);
-            // @ts-expect-error -- accessing private property
-            expect(manager.floor.canvas.selection).toBe(false);
+            expect(canvas.selection).toBe(false);
         });
 
         it("should trigger undo when 'z' is pressed with Control key", () => {
@@ -162,8 +157,7 @@ describe("EditorEventManager", () => {
         it("should trigger redo when 'y' is pressed with Control key", () => {
             const spyRedo = vi.spyOn(commandInvoker, "redo");
             const mockEvent = new KeyboardEvent("keydown", { key: "y", ctrlKey: true });
-            // @ts-expect-error -- private method invocation
-            manager.handleKeyDown(mockEvent);
+            document.dispatchEvent(mockEvent);
             expect(spyRedo).toHaveBeenCalled();
         });
 
@@ -174,8 +168,7 @@ describe("EditorEventManager", () => {
                 ctrlKey: true,
                 shiftKey: true,
             });
-            // @ts-expect-error -- private method invocation
-            manager.handleKeyDown(mockEvent);
+            document.dispatchEvent(mockEvent);
             expect(spyRedo).toHaveBeenCalled();
         });
     });
@@ -210,10 +203,8 @@ describe("EditorEventManager", () => {
     describe("EditorEventManager - Destroy Method", () => {
         it("should remove all event listeners when destroy is called", () => {
             const relSpy = vi.spyOn(document, "removeEventListener");
-            // Call the destroy method
             manager.destroy();
 
-            // Check if removeEventListener has been called for each event
             expect(relSpy).toHaveBeenCalledWith("keydown", expect.any(Function));
             expect(relSpy).toHaveBeenCalledWith("keyup", expect.any(Function));
         });
