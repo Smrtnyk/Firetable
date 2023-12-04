@@ -40,6 +40,12 @@ function createProps(overrides: Partial<TestProps> = {}): TestProps {
         users: [],
         mode: "create",
         reservationData: null,
+        table: {
+            label: "1",
+        },
+        floor: {
+            id: "1",
+        },
         eventStartTimestamp: Date.now(),
     };
 
@@ -93,6 +99,8 @@ describe("EventCreateReservation", () => {
                 time: "12:00",
                 reservedBy: { name: "Staff", email: "staff@example.com" },
                 creator: MOCK_USER,
+                floorId: "1",
+                tableLabel: "1",
             },
         ]);
     });
@@ -176,9 +184,12 @@ describe("EventCreateReservation", () => {
                 reservedBy: {
                     email: "social-0",
                     name: "Whatsapp",
+                    id: "",
                 },
                 time: "00:00",
                 creator: MOCK_USER,
+                floorId: "1",
+                tableLabel: "1",
             },
         ]);
     });
