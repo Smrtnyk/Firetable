@@ -22,7 +22,7 @@ export class DJBooth extends Group {
         });
 
         const turntable2 = new Circle({
-            left: body.width! - 20 - turntable1.width!,
+            left: body.width - 20 - turntable1.width,
             top: 20,
             radius: 15,
             fill: "#1C1C1C",
@@ -39,7 +39,7 @@ export class DJBooth extends Group {
             fontWeight: "bold",
         });
 
-        const ledSpacing = body.width! / 7; // dividing by total LEDs + 1 for even spacing
+        const ledSpacing = body.width / 7; // dividing by total LEDs + 1 for even spacing
         const leds = Array.from({ length: 6 }).map((_, index) => {
             return new Circle({
                 left: ledSpacing * (index + 1),

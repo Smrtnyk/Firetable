@@ -52,16 +52,16 @@ export class RectTable extends Group {
             textAlign: "center",
             originX: "center",
             originY: "center",
-            left: tableRect.left! + tableRect.width! / 2,
-            top: tableRect.top! + tableRect.height! / 2,
+            left: tableRect.left + tableRect.width / 2,
+            top: tableRect.top + tableRect.height / 2,
         });
 
         super([tableRect, textLabel], options.groupOptions);
         this.animationStrategy = new SmoothBlinkAnimation(this);
         this.rect = tableRect;
         this.textLabel = textLabel;
-        this.initialWidth = tableRect.width!;
-        this.initialHeight = tableRect.height!;
+        this.initialWidth = tableRect.width;
+        this.initialHeight = tableRect.height;
         this.label = options.groupOptions.label;
         this.baseFill = baseFillComputed;
 
@@ -78,10 +78,6 @@ export class RectTable extends Group {
     }
 
     private adjustTextScaling(): void {
-        if (!this.scaleX || !this.scaleY) {
-            return;
-        }
-
         // Inversely adjust the scaling of the textLabel
         this.textLabel.set({
             scaleX: 1 / this.scaleX,
@@ -90,18 +86,14 @@ export class RectTable extends Group {
 
         // Adjust the position to keep it centered
         this.textLabel.set({
-            left: this.rect.left! + this.rect.width! / 2,
-            top: this.rect.top! + this.rect.height! / 2,
+            left: this.rect.left + this.rect.width / 2,
+            top: this.rect.top + this.rect.height / 2,
         });
 
         this.canvas?.requestRenderAll();
     }
 
     private snapToGrid(): void {
-        if (!this.scaleX || !this.scaleY) {
-            return;
-        }
-
         const targetWidth = this.initialWidth * this.scaleX;
         const targetHeight = this.initialHeight * this.scaleY;
 
@@ -118,10 +110,6 @@ export class RectTable extends Group {
     }
 
     private enforceMinimumDimensions(): void {
-        if (!this.scaleX || !this.scaleY) {
-            return;
-        }
-
         if (this.scaleX * this.initialWidth < TABLE_WIDTH) {
             this.scaleX = TABLE_WIDTH / this.initialWidth;
         }
@@ -133,9 +121,6 @@ export class RectTable extends Group {
 
     private enforceStrokeWidth(): void {
         const tableRect = this.item(0);
-        if (!this.scaleX || !this.scaleY) {
-            return;
-        }
         tableRect.set({
             strokeWidth: this.initialStrokeWidth / Math.max(this.scaleX, this.scaleY),
         });

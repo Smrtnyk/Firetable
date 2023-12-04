@@ -72,8 +72,8 @@ export class EditorEventManager extends EventManager {
             activeObjects.forEach((object) => {
                 if (object !== activeGroup) {
                     object.set({
-                        left: object.left! + options.e.movementX,
-                        top: object.top! + options.e.movementY,
+                        left: object.left + options.e.movementX,
+                        top: object.top + options.e.movementY,
                     });
                 }
             });
@@ -85,8 +85,8 @@ export class EditorEventManager extends EventManager {
     onBeforeTransform = (options: any): void => {
         if (options.transform?.target && !this.movingObjectStartPosition) {
             this.movingObjectStartPosition = {
-                left: options.transform.target.left!,
-                top: options.transform.target.top!,
+                left: options.transform.target.left,
+                top: options.transform.target.top,
             };
         }
     };
@@ -96,8 +96,8 @@ export class EditorEventManager extends EventManager {
             return;
         }
         const moveCommand = new MoveCommand(options.target, this.movingObjectStartPosition, {
-            left: options.target.left!,
-            top: options.target.top!,
+            left: options.target.left,
+            top: options.target.top,
         });
         this.commandInvoker.execute(moveCommand);
 
@@ -132,8 +132,8 @@ export class EditorEventManager extends EventManager {
         // Snapping logic for rotation
         const snapAngle = 45; // 45 degrees
         const threshold = 5; // degrees
-        const closestMultipleOfSnap = Math.round(target.angle! / snapAngle) * snapAngle;
-        const differenceFromSnap = Math.abs(target.angle! - closestMultipleOfSnap);
+        const closestMultipleOfSnap = Math.round(target.angle / snapAngle) * snapAngle;
+        const differenceFromSnap = Math.abs(target.angle - closestMultipleOfSnap);
         if (differenceFromSnap <= threshold) {
             target.set("angle", closestMultipleOfSnap).setCoords();
         }
@@ -141,8 +141,8 @@ export class EditorEventManager extends EventManager {
         // Snapping logic for movement
         const snapRange = 2; // pixels
 
-        const leftRemainder = target.left! % RESOLUTION;
-        const topRemainder = target.top! % RESOLUTION;
+        const leftRemainder = target.left % RESOLUTION;
+        const topRemainder = target.top % RESOLUTION;
 
         const shouldSnapToLeft =
             leftRemainder <= snapRange || RESOLUTION - leftRemainder <= snapRange;
@@ -154,15 +154,15 @@ export class EditorEventManager extends EventManager {
         if (shouldSnapToLeft) {
             newLeft =
                 leftRemainder <= snapRange
-                    ? target.left! - leftRemainder
-                    : target.left! + (RESOLUTION - leftRemainder);
+                    ? target.left - leftRemainder
+                    : target.left + (RESOLUTION - leftRemainder);
         }
 
         if (shouldSnapToTop) {
             newTop =
                 topRemainder <= snapRange
-                    ? target.top! - topRemainder
-                    : target.top! + (RESOLUTION - topRemainder);
+                    ? target.top - topRemainder
+                    : target.top + (RESOLUTION - topRemainder);
         }
 
         if (newLeft !== undefined || newTop !== undefined) {

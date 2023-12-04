@@ -41,7 +41,7 @@ export class FloorZoomManager {
         this.isZooming = true;
         this.canvas.zoomToPoint(point, newZoom);
         const canvas = this.canvas;
-        const vpt = this.canvas.viewportTransform!;
+        const vpt = this.canvas.viewportTransform;
         if (newZoom < 400 / 1000) {
             vpt[4] = 200 - (1000 * newZoom) / 2;
             vpt[5] = 200 - (1000 * newZoom) / 2;

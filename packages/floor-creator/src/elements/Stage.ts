@@ -16,15 +16,15 @@ export class Stage extends Group {
 
         const decor = new Rect({
             left: 35,
-            top: stageBody.height! - 25,
+            top: stageBody.height - 25,
             width: 80,
             height: 20,
             fill: "#6247aa",
         });
 
         const stageLabel = new FabricText("STAGE", {
-            left: stageBody.width! / 2,
-            top: stageBody.height! / 2,
+            left: stageBody.width / 2,
+            top: stageBody.height / 2,
             fontFamily: "Arial",
             fontSize: 20,
             fill: "#FFFFFF",
@@ -34,7 +34,7 @@ export class Stage extends Group {
         });
 
         // LEDs for the stage front
-        const ledSpacingWidth = stageBody.width! / 5; // For even spacing
+        const ledSpacingWidth = stageBody.width / 5; // For even spacing
 
         const ledsFront = Array.from({ length: 4 }).map((_, index) => {
             return new Circle({
