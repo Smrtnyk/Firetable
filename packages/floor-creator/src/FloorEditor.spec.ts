@@ -1,4 +1,4 @@
-import type { SpyInstance } from "vitest";
+import type { MockInstance } from "vitest";
 import type { FloorCreationOptions } from "./types";
 import { FloorEditor } from "./FloorEditor";
 import { GridDrawer } from "./GridDrawer";
@@ -11,7 +11,7 @@ import { Group, Rect } from "fabric";
 describe("FloorEditor", () => {
     let floorEditor: FloorEditor;
     let canvasElement: HTMLCanvasElement;
-    let gridDrawerSpy: SpyInstance<Parameters<typeof GridDrawer.prototype.drawGrid>, void>;
+    let gridDrawerSpy: MockInstance<Parameters<typeof GridDrawer.prototype.drawGrid>, void>;
 
     beforeEach(() => {
         canvasElement = document.createElement("canvas");
@@ -126,13 +126,8 @@ describe("FloorEditor", () => {
                     label: "1",
                 },
             });
-            // Create a mock event object
-            const mockEvent = {
-                target: table,
-            };
-            // Simulate the element click
             // @ts-expect-error -- private prop
-            floorEditor.onElementClick(mockEvent as unknown as fabric.IEvent<MouseEvent>);
+            floorEditor.onElementClick(table);
             expect(spy).toHaveBeenCalledWith("elementClicked", floorEditor, table);
         });
 
