@@ -42,7 +42,9 @@
     "engines": {
         "pnpm": ">= 8.11.0"
     },
-    "overrides": {
-        "vite": "5.0.5"
+    "pnpm": {
+        "overrides": {
+            "vite": "5.0.5"
+        }
     }
 }
