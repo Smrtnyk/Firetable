@@ -1,12 +1,15 @@
 import type { Ref } from "vue";
-import type { EventDoc, User } from "@firetable/types";
+import type { EventDoc, ReservationDoc, User } from "@firetable/types";
+import type * as backend from "@firetable/backend";
+import type { MockInstance } from "vitest";
 import { useReservations } from "./useReservations";
 import * as uiHelpers from "../helpers/ui-helpers";
 import * as authStore from "../stores/auth-store";
-import { reactive, ref } from "vue";
+import * as Backend from "@firetable/backend";
+import * as Quasar from "quasar";
+import { toRef, ref } from "vue";
 import { describe, beforeEach, expect, it, vi } from "vitest";
-import * as backend from "@firetable/backend";
-import { FloorElementTypes, FloorViewer, RectTable } from "@firetable/floor-creator";
+import { FloorViewer, getTables, RectTable } from "@firetable/floor-creator";
 import { uid } from "quasar";
 import * as i18n from "vue-i18n";
 import { NOOP } from "@firetable/utils";
@@ -49,30 +52,35 @@ function createTable(label: string): RectTable {
     });
 }
 
-const mockReservation = {
-    id: "id",
-    guestName: "foo",
-    confirmed: false,
-    numberOfGuests: 1,
-    consumption: 1,
-    time: "12:00",
-    reservedBy: {
-        name: "foo",
-        email: "bar",
-        id: "baz",
-    },
-    creator: {
-        name: "foo",
-        email: "bar",
-        id: "baz",
-    },
-    _doc: this,
-};
+function createMockReservation(partial: Partial<ReservationDoc> = {}): ReservationDoc {
+    return {
+        id: "id",
+        guestName: "foo",
+        confirmed: false,
+        numberOfGuests: 1,
+        consumption: 1,
+        time: "12:00",
+        reservedBy: {
+            name: "foo",
+            email: "bar",
+            id: "baz",
+        },
+        creator: {
+            name: "foo",
+            email: "bar",
+            id: "baz",
+        },
+        floorId: "1",
+        tableLabel: "1",
+        _doc: this,
+        ...partial,
+    };
+}
 
 function createReservedTable(label: string, floorId: string): RectTable {
     const table = createTable(label);
     table.setReservation({
-        ...mockReservation,
+        ...createMockReservation(),
         floorId,
         tableLabel: label,
     });
@@ -81,12 +89,22 @@ function createReservedTable(label: string, floorId: string): RectTable {
 
 describe("useReservations", () => {
     let users: Ref<User[]>;
-    let floorInstances: Set<FloorViewer>;
+    const floorInstances = ref<FloorViewer[]>([]);
     let eventOwner: backend.EventOwner;
     let event: Ref<EventDoc>;
     let floor1: FloorViewer;
+    const mockReservations = [];
+    let deleteReservationSpy: MockInstance;
 
     beforeEach(() => {
+        deleteReservationSpy = vi
+            .spyOn(Backend, "deleteReservation")
+            .mockImplementation(vi.fn<any>());
+        mockReservations.length = 0;
+        floorInstances.value.length = 0;
+        vi.spyOn(Quasar, "Dialog", "get").mockReturnValue({
+            create: vi.fn(),
+        });
         vi.spyOn(i18n, "useI18n").mockReturnValue(() => {
             return {
                 t: NOOP,
@@ -96,7 +114,7 @@ describe("useReservations", () => {
         users = ref([]);
         floor1 = createFloor("test-1");
         const floor2 = createFloor("test-2");
-        floorInstances = reactive(new Set([floor1, floor2]));
+        floorInstances.value.push(floor1, floor2);
         eventOwner = {
             propertyId: "1",
             organisationId: "2",
@@ -116,39 +134,44 @@ describe("useReservations", () => {
     });
 
     it("should handle reservation creation correctly", () => {
-        const updateEventFloorDataSpy = vi
-            .spyOn(backend, "updateEventFloorData")
-            .mockReturnValue(undefined);
+        floor1.canvas.add(createReservedTable("table1", floor1.id));
+        const [table] = getTables(floor1);
+        const mockReservation = createMockReservation({
+            floorId: floor1.id,
+            tableLabel: table.label,
+        });
+        mockReservations.push(mockReservation);
+        const setReservationSpy = vi.spyOn(table, "setReservation");
 
         const { handleReservationCreation } = useReservations(
             users,
+            toRef(mockReservations),
             floorInstances,
             eventOwner,
             event,
         );
-        const [table] = floor1.canvas.getObjects(FloorElementTypes.RECT_TABLE) as RectTable[];
-        const setReservationSpy = vi.spyOn(table, "setReservation");
-        handleReservationCreation(floor1, mockReservation, table);
+        handleReservationCreation(mockReservation);
 
         expect(setReservationSpy).toHaveBeenCalledWith(mockReservation);
-        expect(updateEventFloorDataSpy).toHaveBeenCalledWith(eventOwner, floor1);
     });
 
     it("should handle reservation deletion correctly", async () => {
         vi.spyOn(uiHelpers, "showConfirm").mockResolvedValue(true);
-        const updateEventFloorDataSpy = vi
-            .spyOn(backend, "updateEventFloorData")
-            .mockReturnValue(undefined);
-        const { onDeleteReservation, allReservedTables } = useReservations(
+        floor1.canvas.add(createReservedTable("table1", floor1.id));
+        const [table] = getTables(floor1);
+        const mockReservation = createMockReservation({
+            floorId: floor1.id,
+            tableLabel: table.label,
+        });
+        mockReservations.push(mockReservation);
+        const { onDeleteReservation } = useReservations(
             users,
+            toRef(mockReservations),
             floorInstances,
             eventOwner,
             event,
         );
-        const [table] = allReservedTables.value;
-        const setReservationSpy = vi.spyOn(table, "setReservation");
-        await onDeleteReservation(floor1, table);
-        expect(setReservationSpy).toHaveBeenCalledWith(null);
-        expect(updateEventFloorDataSpy).toHaveBeenCalledWith(eventOwner, floor1);
+        await onDeleteReservation(mockReservation);
+        expect(deleteReservationSpy).toHaveBeenCalledWith(eventOwner, mockReservation);
     });
 });
