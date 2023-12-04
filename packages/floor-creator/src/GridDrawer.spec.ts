@@ -1,13 +1,13 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import { GridDrawer } from "./GridDrawer";
-import { fabric } from "fabric";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { Canvas } from "fabric";
 
 describe("GridDrawer", () => {
     let gridDrawer: GridDrawer;
-    let canvas: fabric.Canvas;
+    let canvas: Canvas;
 
     beforeEach(() => {
-        canvas = new fabric.Canvas(document.createElement("canvas"));
+        canvas = new Canvas(document.createElement("canvas"));
         gridDrawer = new GridDrawer(canvas);
     });
 

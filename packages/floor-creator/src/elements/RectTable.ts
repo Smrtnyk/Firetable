@@ -1,7 +1,7 @@
-import { fabric } from "fabric";
-import { FloorElementTypes } from "../types.js";
-import { determineTableColor } from "../utils.js";
-import { Reservation } from "@firetable/types";
+import type { GroupProps } from "fabric";
+import type { ReservationDoc } from "@firetable/types";
+import type { AnimationStrategy } from "./animation/AnimationStrategy";
+import { SmoothBlinkAnimation } from "./animation/SmoothBlinkAnimation.js";
 import {
     FONT_SIZE,
     TABLE_TEXT_FILL_COLOR,
@@ -9,66 +9,61 @@ import {
     TABLE_WIDTH,
     TABLE_HEIGHT,
 } from "../constants";
-import { IGroupOptions } from "fabric/fabric-impl";
-import { AnimationStrategy } from "./animation/AnimationStrategy";
-import { SmoothBlinkAnimation } from "./animation/SmoothBlinkAnimation.js";
+import { determineTableColor } from "../utils.js";
+import { FloorElementTypes } from "../types";
+import { Group, Rect, FabricText } from "fabric";
 
 interface RectTableElementOptions {
     groupOptions: {
-        reservation?: Reservation;
         baseFill?: string;
         label: string;
-    } & IGroupOptions;
+    } & Partial<GroupProps>;
     textOptions: {
         label: string;
     };
     rectOptions: Record<string, unknown>;
 }
 
-export class RectTable extends fabric.Group {
-    type = FloorElementTypes.RECT_TABLE;
-    reservation: Reservation | null = null;
+export class RectTable extends Group {
+    static type = FloorElementTypes.RECT_TABLE;
+    reservation: ReservationDoc | undefined;
     label: string;
     baseFill: string;
     private readonly initialStrokeWidth: number;
     private readonly initialWidth: number;
     private readonly initialHeight: number;
-    private rect: fabric.Rect;
-    private textLabel: fabric.Text;
+    private rect: Rect;
+    private textLabel: FabricText;
     private animationStrategy: AnimationStrategy;
 
     constructor(options: RectTableElementOptions) {
-        const baseFillComputed = (options.groupOptions.baseFill as string) || "#444";
-        const fill = determineTableColor(options.groupOptions.reservation, baseFillComputed);
-        const tableRect = new fabric.Rect({
+        const baseFillComputed = options.groupOptions.baseFill || "#444";
+        const tableRect = new Rect({
             ...options.rectOptions,
-            fill,
+            fill: baseFillComputed,
             stroke: "black",
             strokeWidth: 0.5,
         });
 
-        const textLabel = new fabric.Text(options.textOptions.label, {
+        const textLabel = new FabricText(options.groupOptions.label, {
             ...options.textOptions,
             fontSize: FONT_SIZE,
             fill: TABLE_TEXT_FILL_COLOR,
             textAlign: "center",
             originX: "center",
             originY: "center",
-            left: tableRect.left! + tableRect.width! / 2,
-            top: tableRect.top! + tableRect.height! / 2,
+            left: tableRect.left + tableRect.width / 2,
+            top: tableRect.top + tableRect.height / 2,
         });
 
         super([tableRect, textLabel], options.groupOptions);
         this.animationStrategy = new SmoothBlinkAnimation(this);
         this.rect = tableRect;
         this.textLabel = textLabel;
-        this.initialWidth = tableRect.width!;
-        this.initialHeight = tableRect.height!;
+        this.initialWidth = tableRect.width;
+        this.initialHeight = tableRect.height;
         this.label = options.groupOptions.label;
         this.baseFill = baseFillComputed;
-        if (options.groupOptions.reservation) {
-            this.reservation = options.groupOptions.reservation;
-        }
 
         this.initialStrokeWidth = tableRect.strokeWidth || 2;
 
@@ -83,10 +78,6 @@ export class RectTable extends fabric.Group {
     }
 
     private adjustTextScaling(): void {
-        if (!this.scaleX || !this.scaleY) {
-            return;
-        }
-
         // Inversely adjust the scaling of the textLabel
         this.textLabel.set({
             scaleX: 1 / this.scaleX,
@@ -95,18 +86,14 @@ export class RectTable extends fabric.Group {
 
         // Adjust the position to keep it centered
         this.textLabel.set({
-            left: this.rect.left! + this.rect.width! / 2,
-            top: this.rect.top! + this.rect.height! / 2,
+            left: this.rect.left + this.rect.width / 2,
+            top: this.rect.top + this.rect.height / 2,
         });
 
         this.canvas?.requestRenderAll();
     }
 
     private snapToGrid(): void {
-        if (!this.scaleX || !this.scaleY) {
-            return;
-        }
-
         const targetWidth = this.initialWidth * this.scaleX;
         const targetHeight = this.initialHeight * this.scaleY;
 
@@ -116,7 +103,6 @@ export class RectTable extends fabric.Group {
         const correctedScaleX = snappedWidth / this.initialWidth;
         const correctedScaleY = snappedHeight / this.initialHeight;
 
-        // @ts-expect-error -- not sure why this is type error
         this.set({
             scaleX: correctedScaleX,
             scaleY: correctedScaleY,
@@ -124,10 +110,6 @@ export class RectTable extends fabric.Group {
     }
 
     private enforceMinimumDimensions(): void {
-        if (!this.scaleX || !this.scaleY) {
-            return;
-        }
-
         if (this.scaleX * this.initialWidth < TABLE_WIDTH) {
             this.scaleX = TABLE_WIDTH / this.initialWidth;
         }
@@ -138,10 +120,7 @@ export class RectTable extends fabric.Group {
     }
 
     private enforceStrokeWidth(): void {
-        const tableRect = this.item(0) as fabric.Rect;
-        if (!this.scaleX || !this.scaleY) {
-            return;
-        }
+        const tableRect = this.item(0);
         tableRect.set({
             strokeWidth: this.initialStrokeWidth / Math.max(this.scaleX, this.scaleY),
         });
@@ -175,31 +154,29 @@ export class RectTable extends fabric.Group {
         this.canvas?.requestRenderAll();
     }
 
-    setReservation(reservation: Reservation | null): void {
+    setReservation(reservation: ReservationDoc | undefined): void {
         this.reservation = reservation;
+        const fill = determineTableColor(reservation, this.baseFill);
+        this.setFill(fill);
     }
 
+    // @ts-expect-error -- ok
     toObject(): Record<string, unknown> {
         return {
             ...super.toObject(),
             opacity: 1,
             baseFill: this.baseFill,
             label: this.label,
-            reservation: this.reservation,
         };
     }
 
-    static fromObject(object: any, callback: (obj: RectTable) => void): void {
+    static async fromObject(object: any): Promise<RectTable> {
         const rectOpts = object.objects[0];
         const textOpts = object.objects[1];
-        const instance = new RectTable({
+        return new RectTable({
             groupOptions: object,
             rectOptions: rectOpts,
             textOptions: textOpts,
         });
-        callback(instance);
     }
 }
-
-// @ts-expect-error: Unreachable code error
-fabric.RectTable = fabric.util.createClass(RectTable);

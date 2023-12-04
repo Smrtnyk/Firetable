@@ -1,19 +1,19 @@
-import { fabric } from "fabric";
+import type { GroupProps } from "fabric";
 import { FloorElementTypes } from "../types";
-import { IGroupOptions } from "fabric/fabric-impl";
+import { Group, Rect } from "fabric";
 
 type WallCreationOptions = Record<string, unknown>;
 type WalLGroupCreationOptions = {
     left: number;
     top: number;
-} & IGroupOptions;
+} & Partial<GroupProps>;
 
-export class Wall extends fabric.Group {
-    type = FloorElementTypes.WALL;
-    wallRect: fabric.Rect;
+export class Wall extends Group {
+    static type = FloorElementTypes.WALL;
+    wallRect: Rect;
 
     constructor(groupOpts: WalLGroupCreationOptions, wallRectOpts: WallCreationOptions = {}) {
-        const wallRect = new fabric.Rect({
+        const wallRect = new Rect({
             width: 10,
             height: 100,
             fill: "#444",
@@ -33,18 +33,12 @@ export class Wall extends fabric.Group {
         this.canvas?.requestRenderAll();
     }
 
-    toObject(): void {
+    toObject(): any {
         return super.toObject();
     }
 
-    static fromObject(object: any, callback: (obj: Wall) => void): void {
+    static async fromObject(object: any): Promise<Wall> {
         const wallRect = object.objects[0];
-        const instance = new Wall(object, wallRect);
-        callback(instance);
+        return new Wall(object, wallRect);
     }
 }
-
-// @ts-expect-error Register the Wall class with Fabric
-fabric.Wall = fabric.util.createClass(Wall);
-// @ts-expect-error Register the Wall class with Fabric
-fabric.Wall.fromObject = Wall.fromObject;

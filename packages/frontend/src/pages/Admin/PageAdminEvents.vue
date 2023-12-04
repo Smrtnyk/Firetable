@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { CreateEventPayload, EditEventPayload, EventDoc, PropertyDoc } from "@firetable/types";
+import type { EventOwner } from "@firetable/backend";
 import AdminPropertyEventsList from "src/components/admin/event/AdminPropertyEventsList.vue";
 import EventCreateForm from "src/components/admin/event/EventCreateForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
@@ -10,13 +12,11 @@ import {
     tryCatchLoadingWrapper,
     withLoading,
 } from "src/helpers/ui-helpers";
-import { computed, ref, watch } from "vue";
+import { computed, onBeforeMount, ref, watch } from "vue";
 import { Loading, useQuasar } from "quasar";
-import { CreateEventPayload, EditEventPayload, EventDoc, PropertyDoc } from "@firetable/types";
 import {
     createNewEvent,
     deleteDocAndAllSubCollections,
-    EventOwner,
     getEventsPath,
     updateEvent,
 } from "@firetable/backend";
@@ -28,13 +28,13 @@ import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import { usePropertiesStore } from "src/stores/usePropertiesStore";
-import { useAuthStore } from "src/stores/auth-store";
+
+const props = defineProps<{ organisationId: string }>();
 
 const router = useRouter();
 const quasar = useQuasar();
 const { t } = useI18n();
 const { createDialog } = useDialog();
-const authStore = useAuthStore();
 const propertiesStore = usePropertiesStore();
 const {
     eventsByProperty,
@@ -45,12 +45,20 @@ const {
 } = useEvents();
 const activePropertyId = ref("");
 const properties = computed(() => {
-    return propertiesStore.properties;
+    return propertiesStore.properties.filter((property) => {
+        return property.organisationId === props.organisationId;
+    });
 });
 
 const { floors, isLoading: isFloorsLoading } = useFloors(properties);
 const isAnyLoading = computed(() => {
     return isFloorsLoading.value || isLoadingEvents.value;
+});
+
+onBeforeMount(() => {
+    if (!props.organisationId) {
+        router.replace("/");
+    }
 });
 
 watch(
@@ -102,18 +110,18 @@ function fetchEventsForActiveTab(): void {
     }
     const eventOwner: EventOwner = {
         propertyId: activeProperty.id,
-        organisationId: activeProperty.organisationId,
+        organisationId: props.organisationId,
         id: "",
     };
     fetchMoreEvents(eventOwner, null);
 }
 
 const onCreateEvent = withLoading(async function (eventData: CreateEventPayload) {
-    const { id: eventId, organisationId, propertyId } = (await createNewEvent(eventData)).data;
+    const { id: eventId, propertyId } = (await createNewEvent(eventData)).data;
     quasar.notify(t("PageAdminEvents.eventCreatedNotificationMessage"));
     await router.push({
         name: "adminEvent",
-        params: { eventId, propertyId, organisationId },
+        params: { eventId, propertyId, organisationId: props.organisationId },
     });
 });
 
@@ -121,7 +129,7 @@ const onUpdateEvent = withLoading(async function (eventData: EditEventPayload & 
     await updateEvent(
         {
             propertyId: eventData.propertyId,
-            organisationId: eventData.organisationId,
+            organisationId: props.organisationId,
             id: eventData.id,
         },
         eventData,
@@ -143,7 +151,7 @@ async function onEventItemSlideRight({
             await deleteDocAndAllSubCollections(
                 getEventsPath({
                     propertyId: event.propertyId,
-                    organisationId: event.organisationId,
+                    organisationId: props.organisationId,
                     id: "",
                 }),
                 event.id,
@@ -176,7 +184,7 @@ async function onLoad(property: PropertyDoc): Promise<void> {
 
     const eventOwner: EventOwner = {
         propertyId,
-        organisationId: property.organisationId,
+        organisationId: props.organisationId,
         id: "",
     };
     const lastDoc = takeLast([...eventsByProperty[propertyId]])?._doc || null;
@@ -246,7 +254,6 @@ function showCreateEventForm(property: PropertyDoc, event?: EventDoc): void {
                     >
                         <div class="row justify-end">
                             <q-btn
-                                v-if="authStore.isAdmin"
                                 rounded
                                 icon="plus"
                                 class="button-gradient q-mb-md"

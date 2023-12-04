@@ -1,11 +1,12 @@
+import type { User } from "@firetable/types";
 import { ref, watch } from "vue";
-import { ADMIN, User } from "@firetable/types";
+import { ADMIN } from "@firetable/types";
 import { useAuthStore } from "src/stores/auth-store";
 import { fetchUsersByRole } from "@firetable/backend";
 import { storeToRefs } from "pinia";
 import { usePropertiesStore } from "src/stores/usePropertiesStore";
 
-export function useUsers() {
+export function useUsers(organisationId: string) {
     const { properties } = storeToRefs(usePropertiesStore());
     const authStore = useAuthStore();
     const users = ref<User[]>([]);
@@ -15,7 +16,7 @@ export function useUsers() {
         try {
             if (authStore.user?.role === ADMIN) {
                 isLoading.value = true;
-                users.value = (await fetchUsersByRole([], "")).data;
+                users.value = (await fetchUsersByRole([], organisationId)).data;
             } else {
                 const relatedIds = properties.value.flatMap((property) => property.relatedUsers);
                 if (relatedIds.length === 0) {

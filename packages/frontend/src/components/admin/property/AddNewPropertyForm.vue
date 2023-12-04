@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import type { CreatePropertyPayload } from "@firetable/backend";
+import { ref } from "vue";
 import { minLength, validOptionalURL } from "src/helpers/form-rules";
 import { QForm } from "quasar";
-import { ADMIN, OrganisationDoc } from "@firetable/types";
-import { CreatePropertyPayload } from "@firetable/backend";
-import { useAuthStore } from "src/stores/auth-store";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useI18n } from "vue-i18n";
 
 interface Props {
-    organisations: OrganisationDoc[];
+    organisationId: string;
 }
 
 const props = defineProps<Props>();
@@ -17,29 +15,18 @@ const emit = defineEmits<{
     (eventName: "create", payload: CreatePropertyPayload): void;
 }>();
 const { t } = useI18n();
-const authStore = useAuthStore();
 const propertyName = ref("");
 const propertyImgUrl = ref("");
 const createPropertyForm = ref<null | QForm>(null);
-const chosenOrganisation = ref<string | null>(null);
 
 const propertyRules = [minLength(t("AddNewPropertyForm.propertyNameLengthValidationMessage"), 3)];
 
 const imgUrlRules = [validOptionalURL()];
 
-// If only one organisation is passed in, then it is never an ADMIN
-const isSingleOrganisation = computed(() => {
-    return props.organisations.length === 1 && authStore.user!.role !== ADMIN;
-});
-
 async function submit(): Promise<void> {
     if (!(await createPropertyForm.value?.validate())) return;
 
-    const organisationId = isSingleOrganisation.value
-        ? props.organisations[0].id
-        : chosenOrganisation.value;
-
-    if (!organisationId) {
+    if (!props.organisationId) {
         showErrorMessage("organisationId must be set for this property!");
         return;
     }
@@ -47,7 +34,7 @@ async function submit(): Promise<void> {
     emit("create", {
         name: propertyName.value,
         img: propertyImgUrl.value,
-        organisationId,
+        organisationId: props.organisationId,
     });
 }
 </script>
@@ -71,20 +58,6 @@ async function submit(): Promise<void> {
                 autofocus
                 :rules="imgUrlRules"
             />
-
-            <div v-if="!isSingleOrganisation" class="q-gutter-sm q-mb-lg">
-                <div>{{ t("AddNewPropertyForm.organisationsRadioBoxLabel") }}</div>
-                <div>
-                    <q-radio
-                        v-for="organisation in props.organisations"
-                        :key="organisation.id"
-                        v-model="chosenOrganisation"
-                        :val="organisation.id"
-                        :label="organisation.name"
-                        color="accent"
-                    />
-                </div>
-            </div>
         </q-form>
     </q-card-section>
 
@@ -95,7 +68,6 @@ async function submit(): Promise<void> {
             size="md"
             :label="t('AddNewPropertyForm.addPropertyButtonLabel')"
             @click="submit"
-            v-close-popup
         />
     </q-card-actions>
 </template>

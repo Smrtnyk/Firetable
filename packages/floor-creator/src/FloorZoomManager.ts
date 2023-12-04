@@ -1,6 +1,6 @@
-import { fabric } from "fabric";
-import { DEFAULT_ZOOM, ZOOM_INCREMENT } from "./constants.js";
+import type { Canvas, Point } from "fabric";
 import type { Floor } from "./Floor";
+import { DEFAULT_ZOOM, ZOOM_INCREMENT } from "./constants.js";
 
 export class FloorZoomManager {
     private minZoom: number;
@@ -10,7 +10,7 @@ export class FloorZoomManager {
 
     constructor(
         private floor: Floor,
-        private canvas: fabric.Canvas,
+        private canvas: Canvas,
         private initialScale: number,
     ) {
         this.initialScale = initialScale;
@@ -22,15 +22,15 @@ export class FloorZoomManager {
         this.minZoom = this.initialScale;
     }
 
-    zoomIn(point: fabric.Point): void {
+    zoomIn(point: Point): void {
         this.adjustZoom(1 + ZOOM_INCREMENT, point);
     }
 
-    zoomOut(point: fabric.Point): void {
+    zoomOut(point: Point): void {
         this.adjustZoom(1 - ZOOM_INCREMENT, point);
     }
 
-    adjustZoom(scaleFactor: number, point: fabric.Point): void {
+    adjustZoom(scaleFactor: number, point: Point): void {
         let newZoom = this.canvas.getZoom() * scaleFactor;
         if (newZoom > this.maxZoom) {
             newZoom = this.maxZoom;
@@ -41,7 +41,7 @@ export class FloorZoomManager {
         this.isZooming = true;
         this.canvas.zoomToPoint(point, newZoom);
         const canvas = this.canvas;
-        const vpt = this.canvas.viewportTransform!;
+        const vpt = this.canvas.viewportTransform;
         if (newZoom < 400 / 1000) {
             vpt[4] = 200 - (1000 * newZoom) / 2;
             vpt[5] = 200 - (1000 * newZoom) / 2;

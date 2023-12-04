@@ -32,13 +32,14 @@
 </template>
 
 <script setup lang="ts">
+import type { FloorDoc, Reservation } from "@firetable/types";
 import { nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
-import { BaseTable } from "@firetable/floor-creator";
 import { QSelect } from "quasar";
 
 interface Props {
-    allReservedTables: BaseTable[];
+    floors: FloorDoc[];
+    allReservedTables: Reservation[];
     showFloorNameInOption: boolean;
 }
 
@@ -47,7 +48,7 @@ const emit = defineEmits(["found", "clear"]);
 const { t } = useI18n();
 
 const selectEl = ref<undefined | QSelect>();
-const options = ref(getNamesFromTables(props.allReservedTables));
+const options = ref(getNamesFromReservations(props.allReservedTables));
 const searchTerm = ref("");
 
 function removeFocus(): void {
@@ -56,25 +57,25 @@ function removeFocus(): void {
     });
 }
 
-function getNamesFromTables(tables: BaseTable[]): { label: string; value: string }[] {
-    return tables.map((table) => {
+function getNamesFromReservations(reservations: Reservation[]): { label: string; value: string }[] {
+    return reservations.map((reservation) => {
         return {
-            label: createTableLabel(table),
-            value: table.reservation!.guestName,
+            label: createTableLabel(reservation),
+            value: reservation.guestName,
         };
     });
 }
 
-function createTableLabel(table: BaseTable): string {
-    const label = `${table.reservation!.guestName} (${table.label})`;
+function createTableLabel(reservation: Reservation): string {
+    const label = `${reservation.guestName} (${reservation.tableLabel})`;
     if (props.showFloorNameInOption) {
-        // @ts-expect-error -- floor is custom prop on canvas set by us
-        return `${label} on ${table.canvas?.floor.name}`;
+        const floorName = props.floors.find(({ id }) => id === reservation.floorId);
+        return `${label} on ${floorName?.name}`;
     }
     return label;
 }
 
-function findSearchedTable(inputVal: string | { value: string }): BaseTable[] {
+function findSearchedTable(inputVal: string | { value: string }): Reservation[] {
     // Determine the value to match against
     const val = typeof inputVal === "string" ? inputVal : inputVal.value;
     const normalizedVal = val.toLowerCase().trim();
@@ -88,14 +89,14 @@ function findSearchedTable(inputVal: string | { value: string }): BaseTable[] {
         }
 
         // Return only the table that matches the guestName exactly
-        return props.allReservedTables.filter((table) => {
-            return table.reservation!.guestName.toLowerCase() === normalizedVal;
+        return props.allReservedTables.filter((reservation) => {
+            return reservation.guestName.toLowerCase() === normalizedVal;
         });
     } else {
         // If inputVal is a string, perform the original filtering logic
         const tokens = normalizedVal.split(/\s+/);
-        return props.allReservedTables.filter((table) => {
-            const { guestName } = table.reservation!;
+        return props.allReservedTables.filter((reservation) => {
+            const { guestName } = reservation;
             const normalizedGuestName = guestName.toLowerCase();
             const guestNameTokens = normalizedGuestName.split(/\s+/);
 
@@ -111,9 +112,9 @@ function filterFn(val: string, update: any): void {
         const loweredVal = val.toLowerCase();
         const filteredTables = findSearchedTable(val);
         options.value = filteredTables
-            .map((table) => ({
-                label: createTableLabel(table),
-                value: table.reservation!.guestName,
+            .map((reservation) => ({
+                label: createTableLabel(reservation),
+                value: reservation.guestName,
             }))
             .filter((option) => option.value.toLowerCase().includes(loweredVal));
     });

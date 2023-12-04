@@ -1,23 +1,26 @@
+import type { MockInstance } from "vitest";
+import type { Canvas } from "fabric";
 import { EditorEventManager } from "./EditorEventManager";
-import { fabric } from "fabric";
 import { RESOLUTION } from "../constants";
 import { CommandInvoker } from "../command/CommandInvoker";
-import { expect, it, describe, beforeEach, vi, SpyInstance } from "vitest";
 import { FloorEditor } from "../FloorEditor";
+import { expect, it, describe, beforeEach, vi } from "vitest";
+import { FabricObject, Group } from "fabric";
 
 describe("EditorEventManager", () => {
     let manager: EditorEventManager;
     let commandInvoker: CommandInvoker;
     let floor: FloorEditor;
-    let canvasOnEventSpy: SpyInstance<Parameters<typeof floor.canvas.on>>;
+    let canvasOnEventSpy: MockInstance<Parameters<typeof floor.canvas.on>>;
+    let canvas: Canvas;
 
     beforeEach(() => {
         commandInvoker = new CommandInvoker();
-        const canvas = document.createElement("canvas");
-        canvas.width = 1000;
-        canvas.height = 1000;
+        const canvasEl = document.createElement("canvas");
+        canvasEl.width = 1000;
+        canvasEl.height = 1000;
         floor = new FloorEditor({
-            canvas,
+            canvas: canvasEl,
             floorDoc: {
                 id: "test-id",
                 name: "test floor",
@@ -28,6 +31,7 @@ describe("EditorEventManager", () => {
             },
             containerWidth: 1000,
         });
+        canvas = floor.canvas;
 
         canvasOnEventSpy = vi.spyOn(floor.canvas, "on");
 
@@ -37,8 +41,8 @@ describe("EditorEventManager", () => {
 
     describe("EditorEventManager - Object Movement Snapping", () => {
         it("should snap object angle to the closest multiple of snap angle", () => {
-            const mockEvent = {} as fabric.IEvent;
-            const target = new fabric.Object();
+            const mockEvent = {} as any;
+            const target = new FabricObject();
             mockEvent.target = target;
             target.angle = 47;
 
@@ -49,8 +53,8 @@ describe("EditorEventManager", () => {
         });
 
         it("should snap object to the left when within snap range on the left", () => {
-            const mockEvent = {} as fabric.IEvent;
-            const target = new fabric.Object();
+            const mockEvent = {} as any;
+            const target = new FabricObject();
             mockEvent.target = target;
             target.left = RESOLUTION - 1;
 
@@ -61,8 +65,8 @@ describe("EditorEventManager", () => {
         });
 
         it("should snap object to the top when within snap range at the top", () => {
-            const mockEvent = {} as fabric.IEvent;
-            const target = new fabric.Object();
+            const mockEvent = {} as any;
+            const target = new FabricObject();
             mockEvent.target = target;
             target.top = RESOLUTION - 1; // 14
 
@@ -73,8 +77,8 @@ describe("EditorEventManager", () => {
         });
 
         it("should snap object to both left and top when within snap range on both axes", () => {
-            const mockEvent = {} as fabric.IEvent;
-            const target = new fabric.Object();
+            const mockEvent = {} as any;
+            const target = new FabricObject();
             mockEvent.target = target;
             target.left = RESOLUTION - 1;
             target.top = RESOLUTION - 1;
@@ -87,8 +91,8 @@ describe("EditorEventManager", () => {
         });
 
         it("should not snap object if it's outside the snap range", () => {
-            const mockEvent = {} as fabric.IEvent;
-            const target = new fabric.Object();
+            const mockEvent = {} as any;
+            const target = new FabricObject();
             mockEvent.target = target;
             target.left = RESOLUTION - 3; // Outside the snap range
 
@@ -118,36 +122,28 @@ describe("EditorEventManager", () => {
 
     describe("EditorEventManager - Mouse Up Event Handling", () => {
         it("should call elementClickHandler when there is no active object on canvas", () => {
-            vi.spyOn(floor.canvas, "getActiveObject").mockReturnValue(null);
+            vi.spyOn(floor.canvas, "getActiveObject").mockReturnValue(void 0);
             const emitSpy = vi.spyOn(floor, "emit");
 
             // @ts-expect-error -- private method
             manager.onEditorMouseUp();
 
-            expect(emitSpy).toHaveBeenCalledWith(
-                "elementClicked",
-                // @ts-expect-error -- private property
-                manager.floor,
-                void 0,
-            );
+            expect(emitSpy).toHaveBeenCalledWith("elementClicked", floor, void 0);
         });
     });
 
     describe("EditorEventManager - Keyboard Event Handling", () => {
         it("should enable canvas selection when Control key is pressed", () => {
-            const mockEvent = new KeyboardEvent("keydown", { key: "Control" });
-            // @ts-expect-error -- private method invocation
-            manager.handleKeyDown(mockEvent);
-            // @ts-expect-error -- accessing private property
-            expect(manager.floor.canvas.selection).toBe(true);
+            const mockEvent = new KeyboardEvent("keydown", { key: "Control", ctrlKey: true });
+            document.dispatchEvent(mockEvent);
+            expect(canvas.selection).toBe(true);
         });
 
         it("should disable canvas selection when Control key is released", () => {
             const mockEvent = new KeyboardEvent("keyup", { key: "Control" });
             // @ts-expect-error -- private method invocation
             manager.handleKeyUp(mockEvent);
-            // @ts-expect-error -- accessing private property
-            expect(manager.floor.canvas.selection).toBe(false);
+            expect(canvas.selection).toBe(false);
         });
 
         it("should trigger undo when 'z' is pressed with Control key", () => {
@@ -161,8 +157,7 @@ describe("EditorEventManager", () => {
         it("should trigger redo when 'y' is pressed with Control key", () => {
             const spyRedo = vi.spyOn(commandInvoker, "redo");
             const mockEvent = new KeyboardEvent("keydown", { key: "y", ctrlKey: true });
-            // @ts-expect-error -- private method invocation
-            manager.handleKeyDown(mockEvent);
+            document.dispatchEvent(mockEvent);
             expect(spyRedo).toHaveBeenCalled();
         });
 
@@ -173,23 +168,22 @@ describe("EditorEventManager", () => {
                 ctrlKey: true,
                 shiftKey: true,
             });
-            // @ts-expect-error -- private method invocation
-            manager.handleKeyDown(mockEvent);
+            document.dispatchEvent(mockEvent);
             expect(spyRedo).toHaveBeenCalled();
         });
     });
 
     describe("EditorEventManager - Object Movement with Control Key", () => {
         it("should move all active objects when Control key is pressed during object movement", () => {
-            const activeObject = new fabric.Object();
-            const mockGroup = new fabric.Group();
+            const activeObject = new FabricObject();
+            const mockGroup = new Group();
             vi.spyOn(floor.canvas, "getActiveObjects").mockReturnValue([activeObject]);
             vi.spyOn(floor.canvas, "getActiveObject").mockReturnValue(mockGroup);
             const setSpy = vi.spyOn(activeObject, "set");
 
             const mockEvent = {
                 e: { movementX: 5, movementY: 10 },
-            } as unknown as fabric.IEvent<MouseEvent>;
+            } as any;
             // Simulate Control key being pressed
             manager.ctrlPressedDuringSelection = true;
 
@@ -209,10 +203,8 @@ describe("EditorEventManager", () => {
     describe("EditorEventManager - Destroy Method", () => {
         it("should remove all event listeners when destroy is called", () => {
             const relSpy = vi.spyOn(document, "removeEventListener");
-            // Call the destroy method
             manager.destroy();
 
-            // Check if removeEventListener has been called for each event
             expect(relSpy).toHaveBeenCalledWith("keydown", expect.any(Function));
             expect(relSpy).toHaveBeenCalledWith("keyup", expect.any(Function));
         });

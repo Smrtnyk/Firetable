@@ -1,15 +1,25 @@
+import type { HttpsCallableResult } from "firebase/functions";
+import type { DocumentData, DocumentReference } from "firebase/firestore";
+import type {
+    CreateEventPayload,
+    EventDoc,
+    FloorDoc,
+    GuestData,
+    Reservation,
+    ReservationDoc,
+} from "@firetable/types";
+import type { EventOwner } from "./db.js";
+import { initializeFirebase } from "./base.js";
 import {
     eventsCollection,
     guestListCollection,
     guestDoc,
     eventFloorDoc,
     eventDoc,
-    EventOwner,
+    reservationsCollection,
+    reservationDoc,
 } from "./db.js";
-import { initializeFirebase } from "./base.js";
-import { httpsCallable, HttpsCallableResult } from "firebase/functions";
 import {
-    DocumentData,
     getDocs,
     orderBy,
     limit,
@@ -19,10 +29,8 @@ import {
     deleteDoc,
     query,
     where,
-    DocumentReference,
 } from "firebase/firestore";
-import { CreateEventPayload, EventDoc, GuestData } from "@firetable/types";
-import { Floor } from "@firetable/floor-creator";
+import { httpsCallable } from "firebase/functions";
 
 export async function getEvents(
     lastDocument: DocumentData | null,
@@ -81,10 +89,32 @@ export function createNewEvent(
     )(eventPayload);
 }
 
-export function updateEventFloorData(owner: EventOwner, floor: Floor): Promise<void> {
-    return updateDoc(eventFloorDoc(owner, floor.id), {
-        json: floor.json,
-        lastModified: Date.now(),
+export function addReservation(
+    owner: EventOwner,
+    reservation: Reservation,
+): Promise<DocumentReference> {
+    return addDoc(reservationsCollection(owner), reservation);
+}
+
+export function deleteReservation(owner: EventOwner, reservation: ReservationDoc): Promise<void> {
+    return deleteDoc(reservationDoc(owner, reservation.id));
+}
+
+export function updateReservationDoc(
+    owner: EventOwner,
+    newReservationData: ReservationDoc,
+): Promise<void> {
+    return updateDoc(reservationDoc(owner, newReservationData.id), {
+        ...newReservationData,
+    });
+}
+
+export function updateEventFloorData(
+    owner: EventOwner,
+    floorData: Pick<FloorDoc, "id" | "json">,
+): Promise<void> {
+    return updateDoc(eventFloorDoc(owner, floorData.id), {
+        json: floorData.json,
     });
 }
 

@@ -1,27 +1,26 @@
 import { db } from "../init.js";
 import { Collection } from "../../types/types.js";
-import * as functions from "firebase-functions";
 import { FieldValue } from "firebase-admin/firestore";
+import { logger } from "firebase-functions/v2";
 
 /**
  * Cleans up associated user-property mappings when a property is deleted.
  * Removes the property's ID from relatedUsers fields of associated users.
  *
- * @param snap - The snapshot of the deleted property data.
- * @param context - Context of the event that triggered the function.
+ * @param params - Context of the event that triggered the function.
  * @throws Throws error if there's an issue cleaning up the user-property mappings.
  */
-export async function onPropertyDeletedFn(
-    snap: functions.firestore.QueryDocumentSnapshot,
-    context: functions.EventContext,
-): Promise<void> {
-    const propertyId = context.params.propertyId;
-    const organisationid = context.params.organisationid;
+export async function onPropertyDeletedFn(params: {
+    propertyId: string;
+    organisationId: string;
+}): Promise<void> {
+    const propertyId = params.propertyId;
+    const organisationId = params.organisationId;
 
     try {
         // 1. Cleanup associated user-property mappings
         const usersSnapshot = await db
-            .collection(`${Collection.ORGANISATIONS}/${organisationid}/${Collection.USERS}`)
+            .collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`)
             .where("relatedProperties", "array-contains", propertyId)
             .get();
 
@@ -30,7 +29,7 @@ export async function onPropertyDeletedFn(
         if (!usersSnapshot.empty) {
             usersSnapshot.docs.forEach((doc) => {
                 const userRef = doc.ref;
-                functions.logger.debug(
+                logger.debug(
                     `Scheduling update to remove property ID from user document with id: ${doc.id}`,
                 );
                 batch.update(userRef, {
@@ -47,7 +46,7 @@ export async function onPropertyDeletedFn(
 
         if (!floorsSnapshot.empty) {
             floorsSnapshot.docs.forEach((doc) => {
-                functions.logger.debug(`Scheduling deletion of floor document with id: ${doc.id}`);
+                logger.debug(`Scheduling deletion of floor document with id: ${doc.id}`);
                 batch.delete(doc.ref);
             });
         }
@@ -55,9 +54,9 @@ export async function onPropertyDeletedFn(
         // Commit batched operations
         await batch.commit();
 
-        functions.logger.info(`Successfully handled deletion tasks for property ${propertyId}`);
+        logger.info(`Successfully handled deletion tasks for property ${propertyId}`);
     } catch (error) {
-        functions.logger.error("Error handling property deletion tasks:", error);
+        logger.error("Error handling property deletion tasks:", error);
         throw new Error(`Failed to handle deletion tasks for property ${propertyId}`);
     }
 }

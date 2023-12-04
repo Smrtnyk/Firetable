@@ -1,14 +1,13 @@
-import { CreateElementOptions } from "./types";
-import { match } from "ts-pattern";
-import { ElementTag } from "@firetable/types";
+import type { CreateElementOptions } from "./types";
 import { Wall } from "./elements/Wall";
 import { DJBooth } from "./elements/DJBooth";
 import { Sofa } from "./elements/Sofa";
 import { RoundTable } from "./elements/RoundTable";
 import { RESOLUTION, TABLE_HEIGHT, TABLE_WIDTH } from "./constants";
 import { RectTable } from "./elements/RectTable";
-import { SingleSofa } from "./elements/SingleSofa";
 import { Stage } from "./elements/Stage";
+import { ElementTag } from "@firetable/types";
+import { match } from "ts-pattern";
 
 export class ElementManager {
     addElement(options: CreateElementOptions): RectTable | RoundTable | Wall | Sofa | DJBooth {
@@ -16,7 +15,6 @@ export class ElementManager {
             .with(ElementTag.RECT, () => this.addRectTableElement(options))
             .with(ElementTag.CIRCLE, () => this.addRoundTableElement(options))
             .with(ElementTag.SOFA, () => this.addSofaElement(options))
-            .with(ElementTag.SINGLE_SOFA, () => this.addSingleSofaElement(options))
             .with(ElementTag.DJ_BOOTH, () => this.addDJBooth(options))
             .with(ElementTag.WALL, () => this.addWall(options))
             .with(ElementTag.STAGE, () => this.addStageElement(options))
@@ -33,10 +31,6 @@ export class ElementManager {
 
     private addSofaElement({ x, y }: CreateElementOptions): Sofa {
         return new Sofa({ left: x, top: y });
-    }
-
-    private addSingleSofaElement({ x, y }: CreateElementOptions): SingleSofa {
-        return new SingleSofa({ left: x, top: y });
     }
 
     private addStageElement({ x, y }: CreateElementOptions): Stage {
@@ -60,7 +54,7 @@ export class ElementManager {
 
     private addRectTableElement({ label, x, y }: CreateElementOptions): RectTable {
         this.verifyLabel(label);
-        const table = new RectTable({
+        return new RectTable({
             groupOptions: {
                 label,
                 left: x,
@@ -74,7 +68,6 @@ export class ElementManager {
                 label,
             },
         });
-        return table;
     }
 
     private verifyLabel(label: string | undefined): asserts label {

@@ -1,4 +1,11 @@
 <script setup lang="ts">
+import type {
+    CreateEventForm,
+    CreateEventPayload,
+    EditEventPayload,
+    EventDoc,
+} from "@firetable/types";
+import type { PropertyFloors } from "src/composables/useFloors";
 import { computed, reactive, ref, watch, watchEffect } from "vue";
 
 import { useI18n } from "vue-i18n";
@@ -11,9 +18,7 @@ import {
 import { useRouter } from "vue-router";
 
 import { QForm } from "quasar";
-import { CreateEventForm, CreateEventPayload, EditEventPayload, EventDoc } from "@firetable/types";
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import { PropertyFloors } from "src/composables/useFloors";
 import { dateFromTimestamp, hourFromTimestamp } from "src/helpers/date-utils";
 
 interface State {

@@ -17,12 +17,13 @@
     },
     "devDependencies": {
         "@playwright/test": "1.40.1",
-        "@quasar/app-vite": "1.7.0",
-        "@vitejs/plugin-vue": "4.5.0",
-        "@vitest/browser": "1.0.0-beta.5",
+        "@quasar/app-vite": "1.7.1",
+        "@types/color": "3.0.6",
+        "@vitejs/plugin-vue": "5.0.0-alpha.0",
+        "@vitest/browser": "1.0.0",
         "@vue/test-utils": "2.4.3",
         "vite-tsconfig-paths": "4.2.1",
-        "vitest": "1.0.0-beta.5",
+        "vitest": "1.0.1",
         "vue-tsc": "1.8.24"
     },
     "dependencies": {
@@ -31,25 +32,24 @@
         "@firetable/types": "workspace:*",
         "@firetable/utils": "workspace:*",
         "@quasar/extras": "1.16.9",
+        "@types/pako": "2.0.3",
         "chart.js": "4.4.0",
+        "color": "4.2.3",
+        "date-fns": "2.30.0",
+        "pako": "2.1.0",
         "pinia": "2.1.7",
         "quasar": "2.14.1",
-        "register-service-worker": "^1.7.2",
-        "ts-pattern": "5.0.5",
-        "vue": "3.4.0-alpha.1",
+        "register-service-worker": "1.7.2",
+        "ts-pattern": "5.0.6",
+        "vue": "3.4.0-alpha.4",
         "vue-i18n": "9.8.0",
         "vue-router": "4.2.5",
-        "vuefire": "3.1.18",
-        "workbox-build": "^7.0.0",
-        "workbox-cacheable-response": "^7.0.0",
-        "workbox-core": "^7.0.0",
-        "workbox-expiration": "^7.0.0",
-        "workbox-precaching": "^7.0.0",
-        "workbox-routing": "^7.0.0",
-        "workbox-strategies": "^7.0.0"
+        "vuefire": "3.1.19",
+        "workbox-core": "7.0.0",
+        "workbox-build": "7.0.0"
     },
     "engines": {
-        "node": ">= 18",
-        "pnpm": ">= 7.11.0"
+        "node": ">= 20.10.0",
+        "pnpm": ">= 8.11.0"
     }
 }

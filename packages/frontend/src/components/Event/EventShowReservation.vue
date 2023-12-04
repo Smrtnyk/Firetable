@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import type { Reservation } from "@firetable/types";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { ADMIN, Reservation } from "@firetable/types";
+import { ADMIN } from "@firetable/types";
 import { useAuthStore } from "src/stores/auth-store";
 
 interface Props {

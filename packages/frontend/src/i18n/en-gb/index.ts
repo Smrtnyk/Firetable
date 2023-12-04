@@ -13,6 +13,7 @@ export default {
             manageUsers: "Manage Users",
             manageProperties: "Manage Properties",
             manageOrganisations: "Manage Organisations",
+            manageAnalytics: "Manage Analytics",
         },
         toggles: {
             darkMode: "Toggle dark mode",

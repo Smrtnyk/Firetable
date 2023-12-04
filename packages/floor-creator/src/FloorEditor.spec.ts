@@ -1,16 +1,17 @@
-import { describe, it, expect, beforeEach, vi, SpyInstance } from "vitest";
+import type { MockInstance } from "vitest";
+import type { FloorCreationOptions } from "./types";
 import { FloorEditor } from "./FloorEditor";
-import { FloorCreationOptions } from "./types";
 import { GridDrawer } from "./GridDrawer";
-import { ElementTag } from "@firetable/types";
 import { isTable } from "./type-guards";
-import { fabric } from "fabric";
 import { RectTable } from "./elements/RectTable";
+import { ElementTag } from "@firetable/types";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { Group, Rect } from "fabric";
 
 describe("FloorEditor", () => {
     let floorEditor: FloorEditor;
     let canvasElement: HTMLCanvasElement;
-    let gridDrawerSpy: SpyInstance<Parameters<typeof GridDrawer.prototype.drawGrid>, void>;
+    let gridDrawerSpy: MockInstance<Parameters<typeof GridDrawer.prototype.drawGrid>, void>;
 
     beforeEach(() => {
         canvasElement = document.createElement("canvas");
@@ -72,7 +73,7 @@ describe("FloorEditor", () => {
     describe("undo()/redo()", () => {
         it("allows undo and redo after moving an object", () => {
             // Create a mock fabric object
-            const mockFabricObject = new fabric.Rect({
+            const mockFabricObject = new Rect({
                 left: 100,
                 top: 100,
                 width: 60,
@@ -86,7 +87,7 @@ describe("FloorEditor", () => {
             // @ts-expect-error -- private prop
             floorEditor.eventManager.onBeforeTransform({
                 transform: { target: mockFabricObject },
-            } as fabric.IEvent<MouseEvent>);
+            } as any);
 
             // Simulate the object being moved by the user
             mockFabricObject.set({ left: 200, top: 200 });
@@ -96,7 +97,7 @@ describe("FloorEditor", () => {
             // @ts-expect-error -- private prop
             floorEditor.eventManager.onObjectModified({
                 target: mockFabricObject,
-            } as fabric.IEvent<MouseEvent>);
+            } as any);
 
             // Check if the move was recorded and can be undone
             expect(floorEditor.canUndo()).toBe(true);
@@ -125,13 +126,8 @@ describe("FloorEditor", () => {
                     label: "1",
                 },
             });
-            // Create a mock event object
-            const mockEvent = {
-                target: table,
-            };
-            // Simulate the element click
             // @ts-expect-error -- private prop
-            floorEditor.onElementClick(mockEvent as unknown as fabric.IEvent<MouseEvent>);
+            floorEditor.onElementClick(table);
             expect(spy).toHaveBeenCalledWith("elementClicked", floorEditor, table);
         });
 
@@ -154,7 +150,7 @@ describe("FloorEditor", () => {
             // Check if the element was added to the canvas
             const [table] = floorEditor.canvas.getObjects().filter(isTable);
             // Assume getObjects returns an array of fabric.Object, and we added a fabric.Rect for instance
-            expect(table).toBeInstanceOf(fabric.Group);
+            expect(table).toBeInstanceOf(Group);
         });
     });
 

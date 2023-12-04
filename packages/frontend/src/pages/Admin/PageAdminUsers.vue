@@ -1,19 +1,13 @@
 <script setup lang="ts">
+import type { CreateUserPayload, EditUserPayload, User } from "@firetable/types";
 import UserCreateForm from "src/components/admin/User/UserCreateForm.vue";
 import UserEditForm from "src/components/admin/User/UserEditForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import { showConfirm, showErrorMessage, withLoading } from "src/helpers/ui-helpers";
-import { watch } from "vue";
+import { computed, onBeforeMount, watch } from "vue";
 import { Loading, useQuasar } from "quasar";
 import FTDialog from "src/components/FTDialog.vue";
-import { ADMIN, CreateUserPayload, EditUserPayload, User } from "@firetable/types";
-import {
-    createUserWithEmail,
-    deleteUser,
-    fetchOrganisationById,
-    fetchOrganisationsForAdmin,
-    updateUser,
-} from "@firetable/backend";
+import { createUserWithEmail, deleteUser, updateUser } from "@firetable/backend";
 import { usePropertiesStore } from "src/stores/usePropertiesStore";
 import { useUsers } from "src/composables/useUsers";
 import { useAuthStore } from "src/stores/auth-store";
@@ -21,13 +15,25 @@ import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import { storeToRefs } from "pinia";
+import { useRouter } from "vue-router";
+
+const props = defineProps<{ organisationId: string }>();
 
 const { t } = useI18n();
+const router = useRouter();
 const quasar = useQuasar();
 const authStore = useAuthStore();
-const { properties } = storeToRefs(usePropertiesStore());
-const { users, isLoading, fetchUsers } = useUsers();
+const { properties: allProperties } = storeToRefs(usePropertiesStore());
+const { getOrganisations } = usePropertiesStore();
+
+const { users, isLoading, fetchUsers } = useUsers(props.organisationId);
 const { createDialog } = useDialog();
+
+const properties = computed(() => {
+    return allProperties.value.filter((property) => {
+        return property.organisationId === props.organisationId;
+    });
+});
 
 const onCreateUser = withLoading(async (newUser: CreateUserPayload) => {
     await createUserWithEmail(newUser);
@@ -46,6 +52,12 @@ const onDeleteUser = withLoading(async (user: User) => {
     }
     await deleteUser(user);
     await fetchUsers();
+});
+
+onBeforeMount(() => {
+    if (!props.organisationId) {
+        router.replace("/");
+    }
 });
 
 watch(
@@ -70,10 +82,9 @@ function onCreateUserFormSubmit(newUser: CreateUserPayload): Promise<void | Prom
 }
 
 async function showCreateUserDialog(): Promise<void> {
-    const organisations =
-        authStore.user!.role === ADMIN
-            ? await fetchOrganisationsForAdmin()
-            : [await fetchOrganisationById(authStore.user!.organisationId)];
+    const [organisation] = (await getOrganisations(props.organisationId)).filter((org) => {
+        return org.id === props.organisationId;
+    });
 
     const dialog = createDialog({
         component: FTDialog,
@@ -83,7 +94,7 @@ async function showCreateUserDialog(): Promise<void> {
             title: t("PageAdminUsers.createNewUserDialogTitle"),
             componentPropsObject: {
                 properties: properties.value,
-                organisations,
+                organisation,
             },
             listeners: {
                 submit: function (userPayload: CreateUserPayload) {
@@ -110,7 +121,9 @@ async function showEditUserDialog(user: User, reset: () => void): Promise<void> 
     const selectedProperties = properties.value.filter((ownProperty) => {
         return user.relatedProperties.includes(ownProperty.id);
     });
-    const organisation = await fetchOrganisationById(user.organisationId);
+    const [organisation] = (await getOrganisations(props.organisationId)).filter((org) => {
+        return org.id === props.organisationId;
+    });
     const dialog = createDialog({
         component: FTDialog,
         componentProps: {

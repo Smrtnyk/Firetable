@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import type { EventDoc } from "@firetable/types";
 import { dateFromTimestamp, hourFromTimestamp } from "src/helpers/date-utils";
-import { EventDoc } from "@firetable/types";
 import { useI18n } from "vue-i18n";
 
 interface Props {
@@ -60,14 +60,6 @@ const { t } = useI18n();
     box-shadow:
         0 0.25rem 0.25rem rgba(0, 0, 0, 0.2),
         0 0 1rem rgba(0, 0, 0, 0.2);
-
-    &__link {
-        text-decoration: none !important;
-        color: currentColor;
-        &:visited {
-            color: currentColor;
-        }
-    }
 
     &__content {
         text-decoration: none !important;

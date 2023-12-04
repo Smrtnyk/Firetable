@@ -1,11 +1,16 @@
 <template>
     <div>
-        <canvas v-if="reservedTables.length > 0" ref="chartRef" class="chart-container"></canvas>
+        <canvas
+            v-if="props.reservations.length > 0"
+            ref="chartRef"
+            class="chart-container"
+        ></canvas>
         <FTCenteredText v-else>No reservations to show</FTCenteredText>
     </div>
 </template>
 
 <script setup lang="ts">
+import type { ReservationDoc } from "@firetable/types";
 import {
     Chart,
     BarController,
@@ -17,15 +22,13 @@ import {
     Tooltip,
     SubTitle,
 } from "chart.js";
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { BaseTable } from "@firetable/floor-creator";
+import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import { propIsTruthy } from "@firetable/utils";
 import { isMobile } from "src/global-reactives/screen-detection";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 
 interface Props {
-    reservations: BaseTable[];
+    reservations: ReservationDoc[];
 }
 
 interface ReservationObject {
@@ -50,9 +53,8 @@ Chart.register(
 const chartRef = ref<HTMLCanvasElement | null>(null);
 const props = defineProps<Props>();
 let chartInstance: Chart | undefined;
-const reservedTables = computed(() => props.reservations.filter(propIsTruthy("reservation")));
 
-function calculateChartHeight(reservations: BaseTable[]): number {
+function calculateChartHeight(reservations: ReservationDoc[]): number {
     const minBarHeight = isMobile.value ? 7 : 12;
     // Calculate the total height based on the number of bars
     const totalHeight = reservations.length * minBarHeight;
@@ -61,14 +63,14 @@ function calculateChartHeight(reservations: BaseTable[]): number {
     return Math.max(totalHeight, minHeight);
 }
 
-function updateChartHeight(reservations: BaseTable[]): void {
+function updateChartHeight(reservations: ReservationDoc[]): void {
     if (chartRef.value) {
         const newHeight = calculateChartHeight(reservations);
         chartRef.value.style.height = `${newHeight}px`;
     }
 }
 
-function reservationsReducer(acc: Res, { reservation }: BaseTable): Res {
+function reservationsReducer(acc: Res, reservation: ReservationDoc): Res {
     if (!reservation) return acc;
     const { reservedBy, confirmed } = reservation;
     const { email, name } = reservedBy;
@@ -86,7 +88,7 @@ function reservationsReducer(acc: Res, { reservation }: BaseTable): Res {
     return acc;
 }
 
-function generateStackedChartData(reservations: BaseTable[]): {
+function generateStackedChartData(reservations: ReservationDoc[]): {
     labels: string[];
     datasets: any[];
 } {
@@ -133,7 +135,7 @@ function destroyChartIfExists(): void {
 
 function generateTablesByWaiterChartOptions(
     chartContainer: HTMLCanvasElement,
-    reservations: BaseTable[],
+    reservations: ReservationDoc[],
 ): void {
     const { labels, datasets } = generateStackedChartData(reservations);
     updateChartHeight(reservations);
@@ -147,6 +149,7 @@ function generateTablesByWaiterChartOptions(
                 datasets,
             },
             options: {
+                responsive: true,
                 maintainAspectRatio: false,
                 indexAxis: "y",
                 plugins: {
@@ -167,7 +170,6 @@ function generateTablesByWaiterChartOptions(
                         },
                     },
                 },
-                responsive: true,
                 scales: {
                     x: {
                         stacked: true,

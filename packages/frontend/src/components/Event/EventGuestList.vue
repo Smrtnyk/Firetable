@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { GuestData } from "@firetable/types";
+import type { EventOwner } from "@firetable/backend";
 import {
     showConfirm,
     showErrorMessage,
@@ -12,12 +14,11 @@ import EventGuestListCreateGuestForm from "src/components/Event/EventGuestListCr
 import FTTitle from "src/components/FTTitle.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import { useQuasar } from "quasar";
-import { ADMIN, GuestData, Role } from "@firetable/types";
+import { ADMIN, Role } from "@firetable/types";
 import {
     addGuestToGuestList,
     confirmGuestFromGuestList,
     deleteGuestFromGuestList,
-    EventOwner,
 } from "@firetable/backend";
 import { useI18n } from "vue-i18n";
 import { useAuthStore } from "src/stores/auth-store";

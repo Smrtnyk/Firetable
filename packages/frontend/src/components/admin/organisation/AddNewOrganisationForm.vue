@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import type { CreateOrganisationPayload } from "@firetable/backend";
 import { ref } from "vue";
 import { greaterThanZero, minLength, requireNumber } from "src/helpers/form-rules";
 import { QForm } from "quasar";
-import { CreateOrganisationPayload } from "@firetable/backend";
 
 const emit = defineEmits<{
     (eventName: "create", payload: CreateOrganisationPayload): void;

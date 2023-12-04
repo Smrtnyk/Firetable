@@ -1,4 +1,4 @@
-import { RouteRecordRaw } from "vue-router";
+import type { RouteRecordRaw } from "vue-router";
 import { ADMIN, Role } from "@firetable/types";
 
 const routes: RouteRecordRaw[] = [
@@ -8,7 +8,23 @@ const routes: RouteRecordRaw[] = [
         children: [
             {
                 path: "/",
+                name: "home",
+                meta: { requiresAuth: true },
+                component: () => import("src/pages/PageHome.vue"),
+            },
+            {
+                path: "/organisations",
+                name: "organisations",
+                meta: {
+                    requiresAuth: true,
+                    allowedRoles: [ADMIN],
+                },
+                component: () => import("src/pages/PageOrganisations.vue"),
+            },
+            {
+                path: "/:organisationId/properties",
                 name: "properties",
+                props: true,
                 meta: { requiresAuth: true },
                 component: () => import("src/pages/PageProperties.vue"),
             },
@@ -44,12 +60,13 @@ const routes: RouteRecordRaw[] = [
                 component: () => import("src/pages/Admin/PageAdminOrganisations.vue"),
             },
             {
-                path: "/admin/events",
+                path: "/admin/:organisationId/events",
                 name: "adminEvents",
                 meta: {
                     requiresAuth: true,
                     allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN],
                 },
+                props: true,
                 component: () => import("src/pages/Admin/PageAdminEvents.vue"),
             },
             {
@@ -63,21 +80,23 @@ const routes: RouteRecordRaw[] = [
                 component: () => import("src/pages/Admin/PageAdminEvent.vue"),
             },
             {
-                path: "/admin/users",
+                path: "/admin/:organisationId/users",
                 name: "adminUsers",
                 meta: {
                     requiresAuth: true,
                     allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN],
                 },
+                props: true,
                 component: () => import("src/pages/Admin/PageAdminUsers.vue"),
             },
             {
-                path: "/admin/floors",
+                path: "/admin/:organisationId/floors",
                 name: "adminFloors",
                 meta: {
                     requiresAuth: true,
                     allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN],
                 },
+                props: true,
                 component: () => import("src/pages/Admin/PageAdminFloors.vue"),
             },
             {
@@ -91,10 +110,24 @@ const routes: RouteRecordRaw[] = [
                 component: () => import("src/pages/Admin/PageAdminFloorEdit.vue"),
             },
             {
-                path: "/admin/properties",
+                path: "/admin/:organisationId/properties",
                 name: "adminProperties",
-                meta: { requiresAuth: true, allowedRoles: [Role.PROPERTY_OWNER, ADMIN] },
+                meta: {
+                    requiresAuth: true,
+                    allowedRoles: [Role.PROPERTY_OWNER, ADMIN],
+                },
+                props: true,
                 component: () => import("src/pages/Admin/PageAdminProperties.vue"),
+            },
+            {
+                path: "/admin/:organisationId/analytics",
+                name: "adminAnalytics",
+                meta: {
+                    requiresAuth: true,
+                    allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN],
+                },
+                props: true,
+                component: () => import("src/pages/Admin/PageAdminAnalytics.vue"),
             },
         ],
     },

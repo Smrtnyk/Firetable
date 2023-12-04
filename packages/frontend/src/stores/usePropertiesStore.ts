@@ -1,3 +1,5 @@
+import type { OrganisationDoc, PropertyDoc, User } from "@firetable/types";
+import type { NOOP } from "@firetable/utils";
 import { defineStore } from "pinia";
 import {
     fetchOrganisationById,
@@ -5,12 +7,9 @@ import {
     fetchPropertiesForAdmin,
     propertiesCollection,
 } from "@firetable/backend";
-import { ADMIN, OrganisationDoc, PropertyDoc, User } from "@firetable/types";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
 import { query, where } from "firebase/firestore";
 import { nextTick, ref, watch } from "vue";
-import { useAuthStore } from "src/stores/auth-store";
-import { NOOP } from "@firetable/utils";
 
 export const usePropertiesStore = defineStore("properties", () => {
     const properties = ref<PropertyDoc[]>([]);
@@ -23,25 +22,22 @@ export const usePropertiesStore = defineStore("properties", () => {
             unsub();
         }
         properties.value = [];
+        organisations.value = [];
+        arePropertiesLoading.value = false;
     }
 
     function addUnsub(unsub: typeof NOOP): void {
         unsubs.value.push(unsub);
     }
 
-    async function getOrganisations(): Promise<OrganisationDoc[]> {
+    async function getOrganisations(organisationId: string): Promise<OrganisationDoc[]> {
         if (organisations.value.length > 0) {
             return organisations.value;
         }
 
-        const auth = useAuthStore();
-        if (auth.user?.role === ADMIN) {
-            organisations.value = await fetchOrganisationsForAdmin();
-        } else {
-            const organisationsDoc = await fetchOrganisationById(auth.user!.organisationId);
-            if (organisationsDoc) {
-                organisations.value.push(organisationsDoc);
-            }
+        const organisationsDoc = await fetchOrganisationById(organisationId);
+        if (organisationsDoc) {
+            organisations.value = [organisationsDoc];
         }
 
         return organisations.value;
@@ -55,21 +51,32 @@ export const usePropertiesStore = defineStore("properties", () => {
         arePropertiesLoading.value = loading;
     }
 
+    function setOrganisations(organisationsVal: OrganisationDoc[]): void {
+        organisations.value = organisationsVal;
+    }
+
     return {
         properties,
         organisations,
         arePropertiesLoading,
         setArePropertiesLoading,
         setProperties,
+        setOrganisations,
         getOrganisations,
         cleanup,
         addUnsub,
     };
 });
 
+export async function initOrganisations(): Promise<void> {
+    const propertiesStore = usePropertiesStore();
+    const organisations = await fetchOrganisationsForAdmin();
+    propertiesStore.setOrganisations(organisations);
+}
+
 export async function initAdminProperties(): Promise<void> {
     const propertiesStore = usePropertiesStore();
-    const allProperties = await fetchPropertiesForAdmin();
+    const allProperties = await fetchPropertiesForAdmin(propertiesStore.organisations);
     propertiesStore.setProperties(allProperties);
 }
 
@@ -93,7 +100,7 @@ export async function initNonAdminProperties({
     );
 
     const stopWatch = watch(
-        data,
+        () => data.value,
         (newProperties) => {
             propertiesStore.setProperties(newProperties as unknown as PropertyDoc[]);
         },

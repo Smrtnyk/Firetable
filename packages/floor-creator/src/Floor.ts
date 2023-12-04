@@ -1,16 +1,24 @@
-import { fabric } from "fabric";
+import type { FabricObject } from "fabric";
+import type { BaseTable, FloorCreationOptions } from "./types.js";
+import type { FloorDoc } from "@firetable/types";
+import type { EventManager } from "./event-manager/EventManager";
+import type { EventEmitterListener } from "./event-emitter/EventEmitter";
 import { CANVAS_BG_COLOR } from "./constants.js";
-import { FloorCreationOptions } from "./types.js";
-import { FloorDoc } from "@firetable/types";
-import { RoundTable } from "./elements/RoundTable";
-import { RectTable } from "./elements/RectTable";
 import { TouchManager } from "./TouchManager";
 import { FloorZoomManager } from "./FloorZoomManager";
-import { EventManager } from "./event-manager/EventManager";
 import { calculateCanvasScale } from "./utils";
-import { EventEmitterListener } from "./event-emitter/EventEmitter";
+import { isTable } from "./type-guards";
+import { getTables } from "./filters";
+import { RectTable } from "./elements/RectTable";
+import { Sofa } from "./elements/Sofa";
+import { Wall } from "./elements/Wall";
+import { RoundTable } from "./elements/RoundTable";
+import { Canvas, classRegistry } from "fabric";
 
-Object.assign(fabric, { RectTable, RoundTable });
+classRegistry.setClass(RectTable);
+classRegistry.setClass(RoundTable);
+classRegistry.setClass(Sofa);
+classRegistry.setClass(Wall);
 
 export abstract class Floor {
     readonly id: string;
@@ -18,7 +26,7 @@ export abstract class Floor {
     scale: number;
     height: number;
     readonly floorDoc: FloorDoc;
-    readonly canvas: fabric.Canvas;
+    readonly canvas: Canvas;
     width: number;
     containerWidth: number;
     touchManager: TouchManager;
@@ -29,8 +37,8 @@ export abstract class Floor {
     abstract onFloorDoubleTap(coordinates: [x: number, y: number]): void;
     abstract emit(event: string, ...args: unknown[]): void;
     abstract on(event: string, listener: EventEmitterListener): void;
-    protected abstract onElementClick(ev: fabric.Object): void;
-    protected abstract setElementProperties(element: fabric.Object): void;
+    protected abstract onElementClick(ev: FabricObject): void;
+    protected abstract setElementProperties(element: FabricObject): void;
     abstract destroy(): void;
 
     protected constructor(options: FloorCreationOptions) {
@@ -44,7 +52,7 @@ export abstract class Floor {
         this.height = floorDoc.height;
         this.floorDoc = floorDoc;
 
-        this.canvas = new fabric.Canvas(canvas, {
+        this.canvas = new Canvas(canvas, {
             width: this.width,
             height: this.height,
             backgroundColor: CANVAS_BG_COLOR,
@@ -52,8 +60,6 @@ export abstract class Floor {
             skipOffscreen: true,
             imageSmoothingEnabled: false,
         });
-        // @ts-expect-error -- setting this intentionally here, so we have it available if needed
-        this.canvas.floor = this;
         this.setScaling();
         this.renderData(this.floorDoc.json);
 
@@ -62,11 +68,12 @@ export abstract class Floor {
         this.touchManager = new TouchManager(this);
     }
 
-    get json(): ReturnType<typeof fabric.Canvas.toJSON> {
-        return this.canvas.toJSON(["label", "reservation", "name", "type"]);
+    get json(): string {
+        const json = this.canvas.toDatalessJSON(["label", "name", "type"]);
+        return JSON.stringify(json);
     }
 
-    elementReviver = (_: string, object: fabric.Object): void => {
+    elementReviver = (_: Record<string, any>, object: FabricObject): void => {
         object.on("mouseup", () => {
             this.onElementClick(object);
         });
@@ -87,13 +94,33 @@ export abstract class Floor {
     }
 
     renderData(jsonData?: FloorDoc["json"]): void {
-        this.canvas.loadFromJSON(
-            jsonData,
-            () => {
-                this.canvas.requestRenderAll();
-            },
-            this.elementReviver,
-        );
+        if (!jsonData) {
+            return;
+        }
+        this.canvas
+            // @ts-expect-error -- ok
+            .loadFromJSON(jsonData, this.elementReviver)
+            .then(() => {
+                this.emit("rendered");
+                return this.canvas.requestRenderAll();
+            })
+            .catch(console.error);
+    }
+
+    getTableByLabel(tableLabel: string): BaseTable | undefined {
+        return this.canvas._objects.find((object): object is BaseTable => {
+            if (!isTable(object)) {
+                return false;
+            }
+            return object.label === tableLabel;
+        });
+    }
+
+    clearAllReservations(): void {
+        getTables(this).forEach((table) => {
+            table.setReservation(void 0);
+        });
+        this.canvas.requestRenderAll();
     }
 
     resize(pageContainerWidth: number): void {

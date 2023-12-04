@@ -1,8 +1,8 @@
-import { fabric } from "fabric";
+import { Circle, Group, Rect, FabricText } from "fabric";
 
-export class DJBooth extends fabric.Group {
+export class DJBooth extends Group {
     constructor(left: number, top: number) {
-        const body = new fabric.Rect({
+        const body = new Rect({
             left: 0,
             top: 0,
             rx: 15,
@@ -12,7 +12,7 @@ export class DJBooth extends fabric.Group {
             fill: "#1C1C1C",
         });
 
-        const turntable1 = new fabric.Circle({
+        const turntable1 = new Circle({
             left: 20,
             top: 20,
             radius: 15,
@@ -21,8 +21,8 @@ export class DJBooth extends fabric.Group {
             strokeWidth: 2,
         });
 
-        const turntable2 = new fabric.Circle({
-            left: body.width! - 20 - turntable1.width!,
+        const turntable2 = new Circle({
+            left: body.width - 20 - turntable1.width,
             top: 20,
             radius: 15,
             fill: "#1C1C1C",
@@ -30,7 +30,7 @@ export class DJBooth extends fabric.Group {
             strokeWidth: 2,
         });
 
-        const djSign = new fabric.Text("DJ", {
+        const djSign = new FabricText("DJ", {
             left: 50,
             top: 5,
             fontFamily: "Arial",
@@ -39,9 +39,9 @@ export class DJBooth extends fabric.Group {
             fontWeight: "bold",
         });
 
-        const ledSpacing = body.width! / 7; // dividing by total LEDs + 1 for even spacing
+        const ledSpacing = body.width / 7; // dividing by total LEDs + 1 for even spacing
         const leds = Array.from({ length: 6 }).map((_, index) => {
-            return new fabric.Circle({
+            return new Circle({
                 left: ledSpacing * (index + 1),
                 top: 57,
                 radius: 2,
@@ -60,6 +60,3 @@ export class DJBooth extends fabric.Group {
         // imp
     }
 }
-
-// @ts-expect-error Register the DJBooth class with Fabric
-fabric.DJBooth = fabric.util.createClass(DJBooth);

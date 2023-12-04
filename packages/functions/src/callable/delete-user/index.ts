@@ -1,20 +1,21 @@
+import type { User } from "../../../types/types.js";
+import type { CallableRequest } from "firebase-functions/v2/https";
 import { auth, db } from "../../init.js";
-import * as functions from "firebase-functions";
-import { Collection, User } from "../../../types/types.js";
-import { logger } from "firebase-functions";
+import { Collection } from "../../../types/types.js";
+import { HttpsError } from "firebase-functions/v2/https";
+import { logger } from "firebase-functions/v2";
 
-export async function deleteUser(
-    user: User,
-    context: functions.https.CallableContext,
-): Promise<void> {
-    logger.info(`Deleting user with id of ${user.id}`);
+export async function deleteUser(req: CallableRequest<User>): Promise<void> {
     // Ensure the function is called by an authenticated user
-    if (!context.auth) {
-        throw new functions.https.HttpsError(
+    if (!req.auth) {
+        throw new HttpsError(
             "unauthenticated",
             "The function must be called by an authenticated user.",
         );
     }
+    const user = req.data;
+
+    logger.info(`Deleting user with id of ${user.id}`);
 
     try {
         // Delete from Firebase Auth
@@ -31,6 +32,6 @@ export async function deleteUser(
         await userDoc.delete();
     } catch (error) {
         console.error(`Failed to delete user ${user.id}`, error);
-        throw new functions.https.HttpsError("internal", "Failed to delete user");
+        throw new HttpsError("internal", "Failed to delete user");
     }
 }

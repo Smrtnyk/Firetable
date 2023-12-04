@@ -1,13 +1,7 @@
 <script setup lang="ts">
+import type { CreateUserPayload, OrganisationDoc, PropertyDoc, User } from "@firetable/types";
 import { computed, ref } from "vue";
-import {
-    ADMIN,
-    CreateUserPayload,
-    OrganisationDoc,
-    PropertyDoc,
-    Role,
-    User,
-} from "@firetable/types";
+import { ADMIN, Role } from "@firetable/types";
 import { QForm } from "quasar";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";
@@ -16,7 +10,7 @@ import { useI18n } from "vue-i18n";
 
 interface Props {
     properties: PropertyDoc[];
-    organisations: OrganisationDoc[];
+    organisation: OrganisationDoc;
 }
 
 type Emits = (event: "submit", payload: CreateUserPayload | User) => void;
@@ -35,15 +29,8 @@ const chosenProperties = ref<string[]>([]);
 
 const role = computed(() => authStore.user!.role);
 const availableRoles = computed(() => availableRolesBasedOn(role.value));
-const organisationOptions = computed(() => props.organisations);
-const chosenOrganisation = ref<OrganisationDoc | null>(
-    props.organisations.length === 1 ? props.organisations[0] : null,
-);
 const emailSuffix = computed(() => {
-    if (chosenOrganisation.value) {
-        return `@${chosenOrganisation.value.name}.at`;
-    }
-    return "";
+    return `@${props.organisation.name}.at`;
 });
 
 async function onSubmit(): Promise<void> {
@@ -86,22 +73,14 @@ async function validateForm(): Promise<boolean> {
         return false;
     }
 
-    if (chosenRole === Role.PROPERTY_OWNER && !chosenOrganisation.value) {
-        showErrorMessage("You must select an organisation!");
-        return false;
-    }
-
     return true;
 }
 
 function prepareAndEmitSubmission(): void {
-    if (!chosenOrganisation.value) {
-        throw new Error("chosenOrganisation is required");
-    }
     const submission = {
         ...form.value,
         email: `${form.value.username}${emailSuffix.value}`,
-        organisationId: chosenOrganisation.value.id,
+        organisationId: props.organisation.id,
         relatedProperties: chosenProperties.value,
     };
     emit("submit", submission);
@@ -168,21 +147,6 @@ function resetProperties(): void {
                 :options="availableRoles"
                 :label="t('UserCreateForm.userRoleSelectLabel')"
             />
-
-            <q-select
-                v-if="role === ADMIN && props.organisations.length > 0"
-                v-model="chosenOrganisation"
-                :hint="t('UserCreateForm.userOrganisationSelectHint')"
-                standout
-                rounded
-                :options="organisationOptions"
-                :label="t('UserCreateForm.userOrganisationSelectLabel')"
-                option-label="name"
-                option-value="value"
-            />
-            <div v-else-if="role === ADMIN && props.organisations.length === 0">
-                {{ t("UserCreateForm.noOrganisationsMessage") }}
-            </div>
 
             <div v-if="props.properties.length > 0" class="q-gutter-sm q-mb-lg">
                 <div>{{ t("UserCreateForm.usePropertiesCheckboxesTitle") }}</div>

@@ -23,17 +23,10 @@ export const ELEMENTS_TO_ADD_COLLECTION = [
         },
     },
     {
-        label: "Add a Double Sofa",
+        label: "Add a Sofa",
         img: "/svg-images/double-sofa.svg",
         elementDescriptor: {
             tag: ElementTag.SOFA,
-        },
-    },
-    {
-        label: "Add a Single sofa",
-        img: "/svg-images/single-sofa.svg",
-        elementDescriptor: {
-            tag: ElementTag.SINGLE_SOFA,
         },
     },
     {

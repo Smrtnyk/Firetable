@@ -22,6 +22,14 @@ body {
     -webkit-transition: background-color .3s ease;
 }
 
+a {
+    text-decoration: none !important;
+    color: currentColor;
+    &:visited {
+        color: currentColor;
+    }
+}
+
 .ft-logo {
     max-width: 256px;
 }

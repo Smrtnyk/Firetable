@@ -1,5 +1,5 @@
-import { describe, expect, it } from "@jest/globals";
 import { propIsTruthy } from "./prop-is-truthy";
+import { describe, expect, it } from "@jest/globals";
 
 describe("propIsTruthy", () => {
     const obj = {

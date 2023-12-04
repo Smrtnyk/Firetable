@@ -1,8 +1,11 @@
+import type { HttpsCallableResult } from "firebase/functions";
+import type { DocumentReference, CollectionReference } from "firebase/firestore";
+import type { EventDoc, PropertyDoc } from "@firetable/types";
 import { initializeFirebase } from "./base.js";
-import { httpsCallable, HttpsCallableResult } from "firebase/functions";
-import { DocumentReference, collection, doc, CollectionReference } from "firebase/firestore";
-import { Collection, EventDoc, PropertyDoc } from "@firetable/types";
 import { getEventsPath, getFloorsPath, getPropertiesPath } from "./paths.js";
+import { httpsCallable } from "firebase/functions";
+import { collection, doc } from "firebase/firestore";
+import { Collection } from "@firetable/types";
 
 export type EventOwner = Pick<EventDoc, "organisationId" | "propertyId" | "id">;
 
@@ -29,6 +32,14 @@ export function floorsCollection(organisationId: string, propertyId: string): Co
 
 export function guestListCollection(owner: EventOwner): CollectionReference {
     return collection(eventsCollection(owner), `${owner.id}/${Collection.GUEST_LIST}`);
+}
+
+export function reservationsCollection(owner: EventOwner): CollectionReference {
+    return collection(eventDoc(owner), Collection.RESERVATIONS);
+}
+
+export function reservationDoc(owner: EventOwner, reservationId: string): DocumentReference {
+    return doc(reservationsCollection(owner), reservationId);
 }
 
 export function usersCollection(organisationId: string): CollectionReference {

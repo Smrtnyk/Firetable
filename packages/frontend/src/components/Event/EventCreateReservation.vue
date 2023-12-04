@@ -1,15 +1,17 @@
 <script setup lang="ts">
+import type { Reservation, User } from "@firetable/types";
+import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
 import { computed, reactive, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
 import { greaterThanZero, minLength, noEmptyString, requireNumber } from "src/helpers/form-rules";
-import { Reservation, User } from "@firetable/types";
 import { useAuthStore } from "src/stores/auth-store";
 
 const socials = ["Whatsapp", "SMS", "Instagram", "Facebook", "Phone"].map((social, index) => {
     return {
         name: social,
         email: `social-${index}`,
+        id: "",
     };
 });
 
@@ -17,7 +19,12 @@ const props = defineProps<{
     users: User[];
     mode: "create" | "edit";
     eventStartTimestamp: number;
-    reservationData?: Reservation; // Optional data for editing
+    table: BaseTable;
+    floor: FloorViewer;
+    /**
+     *  Optional data for editing
+     */
+    reservationData?: Reservation;
 }>();
 
 const emit = defineEmits<{
@@ -43,6 +50,8 @@ const initialState =
                   email: authStore.user!.email,
                   id: authStore.user!.id,
               },
+              tableLabel: props.table.label,
+              floorId: props.floor.id,
           };
 const state = reactive<Reservation>(initialState);
 const reservationForm = ref<QForm | null>(null);
@@ -50,6 +59,7 @@ const formattedUsers = computed<Reservation["reservedBy"][]>(() =>
     props.users.map((user) => ({
         name: user.name,
         email: user.email,
+        id: user.id,
     })),
 );
 const selectionType = ref("user");
@@ -64,7 +74,7 @@ const reservedByLabel = computed(() => {
         : t(`EventCreateReservation.reservedByLabel`);
 });
 
-function options(hr: number, min = 0): boolean {
+function options(hr: number, min: number | null = 0): boolean {
     // Calculate the event start and end times based on the eventStartTimestamp in UTC
     const eventStart = new Date(props.eventStartTimestamp);
     const eventEnd = new Date(props.eventStartTimestamp + 8 * 3600 * 1000); // Add 8 hours
@@ -77,7 +87,7 @@ function options(hr: number, min = 0): boolean {
             currentDate.getUTCMonth(),
             currentDate.getUTCDate(),
             hr,
-            min,
+            min ?? 0,
             0,
             0,
         ),
@@ -149,7 +159,7 @@ async function onOKClick(): Promise<void> {
                 <template #append>
                     <q-icon name="clock" class="cursor-pointer" />
                     <q-popup-proxy transition-show="scale" transition-hide="scale">
-                        <q-time :options="options as any" v-model="state.time" format24h>
+                        <q-time :options="options" v-model="state.time" format24h>
                             <div class="row items-center justify-end">
                                 <q-btn
                                     :label="t('EventCreateForm.inputDateTimePickerCloseBtnLabel')"
@@ -208,6 +218,7 @@ async function onOKClick(): Promise<void> {
 
             <!-- Select input for choosing the user or social -->
             <q-select
+                standout
                 v-model="state.reservedBy"
                 :options="selectableOptions"
                 option-label="name"

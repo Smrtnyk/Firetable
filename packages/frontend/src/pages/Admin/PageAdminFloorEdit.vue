@@ -1,24 +1,24 @@
 <script setup lang="ts">
+import type { NumberTuple } from "src/types/generic";
+import type { Floor, FloorEditorElement } from "@firetable/floor-creator";
+import type { FloorDoc } from "@firetable/types";
 import AddTableDialog from "src/components/Floor/AddTableDialog.vue";
 import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
 import FTDialog from "src/components/FTDialog.vue";
 
 import { nextTick, onBeforeUnmount, onMounted, reactive, ref } from "vue";
-import { NumberTuple } from "src/types/generic";
 import { useRouter } from "vue-router";
 import { debounce, exportFile, Loading, useQuasar } from "quasar";
 import { BULK_ADD_COLLECTION, ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
 import {
     extractAllTablesLabels,
-    Floor,
     FloorEditor,
-    FloorEditorElement,
     hasFloorTables,
     MAX_FLOOR_HEIGHT,
     MAX_FLOOR_WIDTH,
     RESOLUTION,
 } from "@firetable/floor-creator";
-import { ElementTag, FloorDoc } from "@firetable/types";
+import { ElementTag } from "@firetable/types";
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import {
     getFirestoreDocument,
@@ -28,6 +28,7 @@ import {
 import { isNumber } from "@firetable/utils";
 import { isMobile, buttonSize, isTablet } from "src/global-reactives/screen-detection";
 import { getFloorPath } from "@firetable/backend";
+import { compressFloorDoc, decompressFloorDoc } from "src/helpers/compress-floor-doc";
 
 type ElementDescriptor = {
     tag: ElementTag;
@@ -50,7 +51,6 @@ const addNewElementsBottomSheetOptions = {
 
 const NON_TABLE_EL_TO_ADD = [
     ElementTag.SOFA,
-    ElementTag.SINGLE_SOFA,
     ElementTag.DJ_BOOTH,
     ElementTag.WALL,
     ElementTag.STAGE,
@@ -99,15 +99,13 @@ onMounted(async () => {
     Loading.show();
     await floorDataPromise.value;
     if (floor.value) {
-        instantiateFloor(floor.value);
-        Loading.hide();
+        await instantiateFloor(floor.value);
         window.addEventListener("keydown", onKeyDown);
         window.addEventListener("resize", resizeFloor);
     } else {
         router.replace("/").catch(showErrorMessage);
-        Loading.hide();
-        return;
     }
+
     Loading.hide();
 });
 
@@ -118,12 +116,12 @@ const resizeFloor = debounce((): void => {
     floorInstance.value.resize(pageRef.value.clientWidth);
 }, 100);
 
-function instantiateFloor(floorDoc: FloorDoc): void {
+async function instantiateFloor(floorDoc: FloorDoc): Promise<void> {
     if (!canvasRef.value || !pageRef.value) return;
 
     floorInstance.value = new FloorEditor({
         canvas: canvasRef.value,
-        floorDoc,
+        floorDoc: await decompressFloorDoc(floorDoc),
         containerWidth: pageRef.value.clientWidth,
     });
 
@@ -135,19 +133,23 @@ function instantiateFloor(floorDoc: FloorDoc): void {
     });
 }
 
-function onFloorSave(): void {
+async function onFloorSave(): Promise<void> {
     if (!floorInstance.value || !hasFloorTables(floorInstance.value as FloorEditor)) {
         return showErrorMessage("You need to add at least one table!");
     }
 
-    tryCatchLoadingWrapper({
-        hook: () =>
-            updateFirestoreDocument(getFirestoreDocument(floorPath), {
-                json: floorInstance.value?.json,
-                name: floorInstance.value?.name,
-                width: floorInstance.value?.width,
-                height: floorInstance.value?.height,
-            }),
+    const { name, width, height, json } = floorInstance.value;
+
+    await tryCatchLoadingWrapper({
+        hook: async function () {
+            await updateFirestoreDocument(getFirestoreDocument(floorPath), {
+                json: await compressFloorDoc(json),
+                name,
+                width,
+                height,
+                compressed: true,
+            });
+        },
     });
 }
 

@@ -10,8 +10,9 @@
 </template>
 
 <script setup lang="ts">
+import type { EventOwner } from "@firetable/backend";
 import { ref } from "vue";
-import { EventOwner, updateEvent } from "@firetable/backend";
+import { updateEvent } from "@firetable/backend";
 import { withLoading } from "src/helpers/ui-helpers";
 
 interface Props {

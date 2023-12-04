@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PropertyDoc } from "@firetable/types";
+import type { PropertyDoc } from "@firetable/types";
 
 interface Props {
     property: PropertyDoc;
@@ -22,7 +22,7 @@ const props = defineProps<Props>();
         <q-card class="PropertyCard">
             <q-img
                 class="PropertyCard__parallax"
-                :src="props.property.img || 'images/default-event-img.jpg'"
+                :src="props.property.img || '/images/default-event-img.jpg'"
                 alt=""
             />
 
@@ -41,13 +41,6 @@ const props = defineProps<Props>();
         0 0.25rem 0.25rem rgba(0, 0, 0, 0.2),
         0 0 1rem rgba(0, 0, 0, 0.2);
 
-    &__link {
-        text-decoration: none !important;
-        color: currentColor;
-        &:visited {
-            color: currentColor;
-        }
-    }
     &__content {
         overflow: hidden;
         text-decoration: none !important;

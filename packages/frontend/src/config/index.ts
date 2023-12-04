@@ -53,6 +53,7 @@ export const myIcons: Record<string, string> = {
     import: "svguse:/svg-icons/ft-icons.svg#import",
     "full-screen": "svguse:/svg-icons/ft-icons.svg#full-screen",
     transfer: "svguse:/svg-icons/ft-icons.svg#transfer",
+    "line-chart": "svguse:/svg-icons/ft-icons.svg#line-chart",
 };
 
 export function getDarkMode(): boolean {

@@ -1,7 +1,9 @@
-import { Collection, CreateUserPayload } from "../../../types/types.js";
+import type { CreateUserPayload } from "../../../types/types.js";
+import type { CallableRequest } from "firebase-functions/v2/https";
+import { Collection } from "../../../types/types.js";
 import { auth, db } from "../../init.js";
-import * as functions from "firebase-functions";
 import { FieldValue } from "firebase-admin/firestore";
+import { HttpsError } from "firebase-functions/v2/https";
 
 /**
  * Creates a new user in Firebase Authentication and stores associated user information in Firestore.
@@ -15,13 +17,13 @@ import { FieldValue } from "firebase-admin/firestore";
  *
  * If any of the steps fail after the user has been created in Firebase Authentication, the function performs a cleanup by deleting the created user.
  *
- * @param user - Payload containing user information and associated properties.
- * @param user.user - Object containing name, password, email, and role of the user.
- * @param user.user.name - Full name of the user.
- * @param user.user.password - Password for the user (to be stored in Firebase Authentication).
- * @param user.user.email - Email address of the user (also serves as the username).
- * @param user.user.role - Role of the user (e.g., ADMIN, PROPERTY_OWNER, etc.).
- * @param user.properties - An array of property IDs to which the user should be mapped.
+ * @param req.data - Payload containing user information and associated properties.
+ * @param req.data.user - Object containing name, password, email, and role of the user.
+ * @param req.data.user.name - Full name of the user.
+ * @param req.data.user.password - Password for the user (to be stored in Firebase Authentication).
+ * @param req.data.user.email - Email address of the user (also serves as the username).
+ * @param req.data.user.role - Role of the user (e.g., ADMIN, PROPERTY_OWNER, etc.).
+ * @param req.data.properties - An array of property IDs to which the user should be mapped.
  *
  * @returns - A Promise resolving to an object containing the UID of the created user and a success message.
  *
@@ -30,26 +32,20 @@ import { FieldValue } from "firebase-admin/firestore";
  * @throws - Throws appropriate errors for any other exceptions encountered during user creation or data storage.
  */
 export async function createUser(
-    user: CreateUserPayload,
+    req: CallableRequest<CreateUserPayload>,
 ): Promise<{ uid: string; message: string }> {
-    const { name, password, email, role, relatedProperties, organisationId, username } = user;
+    const { name, password, email, role, relatedProperties, organisationId, username } = req.data;
 
     let createdUserUid: string | null = null;
 
     try {
         const existingUser = await auth.getUserByEmail(email);
         if (existingUser) {
-            throw new functions.https.HttpsError(
-                "already-exists",
-                "A user with this email already exists.",
-            );
+            throw new HttpsError("already-exists", "A user with this email already exists.");
         }
     } catch (error: any) {
         if (error.code !== "auth/user-not-found") {
-            throw new functions.https.HttpsError(
-                "unknown",
-                "An error occurred while checking for user existence.",
-            );
+            throw new HttpsError("unknown", "An error occurred while checking for user existence.");
         }
     }
 
@@ -93,6 +89,6 @@ export async function createUser(
         }
         const errorCode = e.code || "unknown";
         const errorMessage = e.message || "An unknown error occurred.";
-        throw new functions.https.HttpsError(errorCode, errorMessage);
+        throw new HttpsError(errorCode, errorMessage);
     }
 }

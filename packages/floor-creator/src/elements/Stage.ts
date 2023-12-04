@@ -1,8 +1,8 @@
-import { fabric } from "fabric";
+import { Group, Rect, FabricText, Circle } from "fabric";
 
-export class Stage extends fabric.Group {
+export class Stage extends Group {
     constructor(left: number, top: number) {
-        const stageBody = new fabric.Rect({
+        const stageBody = new Rect({
             left: 0,
             top: 0,
             rx: 10,
@@ -14,17 +14,17 @@ export class Stage extends fabric.Group {
             strokeWidth: 1,
         });
 
-        const decor = new fabric.Rect({
+        const decor = new Rect({
             left: 35,
-            top: stageBody.height! - 25,
+            top: stageBody.height - 25,
             width: 80,
             height: 20,
             fill: "#6247aa",
         });
 
-        const stageLabel = new fabric.Text("STAGE", {
-            left: stageBody.width! / 2,
-            top: stageBody.height! / 2,
+        const stageLabel = new FabricText("STAGE", {
+            left: stageBody.width / 2,
+            top: stageBody.height / 2,
             fontFamily: "Arial",
             fontSize: 20,
             fill: "#FFFFFF",
@@ -34,10 +34,10 @@ export class Stage extends fabric.Group {
         });
 
         // LEDs for the stage front
-        const ledSpacingWidth = stageBody.width! / 5; // For even spacing
+        const ledSpacingWidth = stageBody.width / 5; // For even spacing
 
         const ledsFront = Array.from({ length: 4 }).map((_, index) => {
-            return new fabric.Circle({
+            return new Circle({
                 left: ledSpacingWidth * (index + 1),
                 top: 2,
                 radius: 2,
@@ -51,7 +51,7 @@ export class Stage extends fabric.Group {
         });
 
         // Ensure this is always in the background
-        this.moveTo(-1);
+        // this.moveTo(-1);
     }
 
     getBaseFill(): string {
@@ -62,6 +62,3 @@ export class Stage extends fabric.Group {
         // imp
     }
 }
-
-// @ts-expect-error Register the PerformanceStage class with Fabric
-fabric.Stage = fabric.util.createClass(Stage);

@@ -1,12 +1,12 @@
-import { config, flushPromises, mount, VueWrapper } from "@vue/test-utils";
+import type { VueWrapper } from "@vue/test-utils";
+import type { Reservation, User } from "@firetable/types";
+import EventCreateReservation from "./EventCreateReservation.vue";
+import messages from "../../i18n";
+import * as authStore from "../../stores/auth-store";
+import { config, flushPromises, mount } from "@vue/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createI18n } from "vue-i18n";
 import { Quasar } from "quasar";
-import messages from "../../i18n";
-import * as authStore from "../../stores/auth-store";
-
-import EventCreateReservation from "./EventCreateReservation.vue";
-import { Reservation, User } from "@firetable/types";
 
 const i18n = createI18n({
     locale: "en-GB",
@@ -40,6 +40,12 @@ function createProps(overrides: Partial<TestProps> = {}): TestProps {
         users: [],
         mode: "create",
         reservationData: null,
+        table: {
+            label: "1",
+        },
+        floor: {
+            id: "1",
+        },
         eventStartTimestamp: Date.now(),
     };
 
@@ -93,6 +99,8 @@ describe("EventCreateReservation", () => {
                 time: "12:00",
                 reservedBy: { name: "Staff", email: "staff@example.com" },
                 creator: MOCK_USER,
+                floorId: "1",
+                tableLabel: "1",
             },
         ]);
     });
@@ -176,9 +184,12 @@ describe("EventCreateReservation", () => {
                 reservedBy: {
                     email: "social-0",
                     name: "Whatsapp",
+                    id: "",
                 },
                 time: "00:00",
                 creator: MOCK_USER,
+                floorId: "1",
+                tableLabel: "1",
             },
         ]);
     });

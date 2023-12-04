@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { User } from "@firetable/types";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -7,7 +8,7 @@ import { useAuthStore } from "src/stores/auth-store";
 import { useAppStore } from "src/stores/app-store";
 import { logoutUser } from "@firetable/backend";
 import { withLoading } from "src/helpers/ui-helpers";
-import { ADMIN, Role, User } from "@firetable/types";
+import { ADMIN, Role } from "@firetable/types";
 
 const appStore = useAppStore();
 const authStore = useAuthStore();
@@ -26,33 +27,65 @@ const adminLinks = computed(() => {
     if (role === ADMIN) {
         links.push({
             icon: "home",
-            routeName: "adminOrganisations",
+            route: {
+                name: "adminOrganisations",
+            },
             text: t("AppDrawer.links.manageOrganisations"),
         });
     }
-    if (role === Role.PROPERTY_OWNER || role === Role.MANAGER || role === ADMIN) {
+    if (role === Role.PROPERTY_OWNER || role === Role.MANAGER) {
         links.push(
             {
                 icon: "calendar",
-                routeName: "adminEvents",
+                route: {
+                    name: "adminEvents",
+                    params: {
+                        organisationId: user.value.organisationId,
+                    },
+                },
                 text: t("AppDrawer.links.manageEvents"),
             },
             {
                 icon: "users",
-                routeName: "adminUsers",
+                route: {
+                    name: "adminUsers",
+                    params: {
+                        organisationId: user.value.organisationId,
+                    },
+                },
                 text: t("AppDrawer.links.manageUsers"),
             },
             {
                 icon: "arrow-expand",
-                routeName: "adminFloors",
+                route: {
+                    name: "adminFloors",
+                    params: {
+                        organisationId: user.value.organisationId,
+                    },
+                },
                 text: t("AppDrawer.links.manageFloors"),
+            },
+            {
+                icon: "line-chart",
+                route: {
+                    name: "adminAnalytics",
+                    params: {
+                        organisationId: user.value.organisationId,
+                    },
+                },
+                text: t("AppDrawer.links.manageAnalytics"),
             },
         );
     }
-    if (role === Role.PROPERTY_OWNER || role === ADMIN) {
+    if (role === Role.PROPERTY_OWNER) {
         links.push({
             icon: "home",
-            routeName: "adminProperties",
+            route: {
+                name: "adminProperties",
+                params: {
+                    organisationId: user.value.organisationId,
+                },
+            },
             text: t("AppDrawer.links.manageProperties"),
         });
     }
@@ -106,12 +139,7 @@ function setAppLanguage(val: string): void {
 
             <q-separator v-if="adminLinks.length > 0" />
 
-            <q-item
-                v-for="(link, index) in adminLinks"
-                :key="index"
-                :to="{ name: link.routeName }"
-                clickable
-            >
+            <q-item v-for="(link, index) in adminLinks" :key="index" :to="link.route" clickable>
                 <q-item-section avatar>
                     <q-icon :name="link.icon" />
                 </q-item-section>

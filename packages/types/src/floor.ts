@@ -3,8 +3,9 @@ export interface FloorDoc {
     name: string;
     width: number;
     height: number;
-    json: Record<string, any>;
+    json: string | Record<string, any>;
     propertyId: string;
+    compressed?: boolean;
 }
 
 export type EventFloorDoc = FloorDoc & {
@@ -15,7 +16,6 @@ export const enum ElementTag {
     RECT = "RectTable",
     CIRCLE = "RoundTable",
     SOFA = "Sofa",
-    SINGLE_SOFA = "SingleSofa",
     DJ_BOOTH = "DJBooth",
     WALL = "Wall",
     STAGE = "Stage",

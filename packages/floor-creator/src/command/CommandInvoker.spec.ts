@@ -1,5 +1,5 @@
+import type { Command } from "./Command";
 import { CommandInvoker } from "./CommandInvoker";
-import { Command } from "./Command";
 import { expect, it, describe, beforeEach, vi } from "vitest";
 
 class MockCommand {

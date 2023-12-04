@@ -18,12 +18,12 @@
     },
     "devDependencies": {
         "@regru/eslint-plugin-prefer-early-return": "1.0.0",
-        "@typescript-eslint/eslint-plugin": "6.13.1",
-        "@typescript-eslint/parser": "6.13.1",
+        "@typescript-eslint/eslint-plugin": "6.13.2",
+        "@typescript-eslint/parser": "6.13.2",
         "autoprefixer": "10.4.16",
         "dotenv": "16.3.1",
-        "eslint": "8.54.0",
-        "eslint-config-prettier": "9.0.0",
+        "eslint": "8.55.0",
+        "eslint-config-prettier": "9.1.0",
         "eslint-plugin-import": "2.29.0",
         "eslint-plugin-prettier": "5.0.1",
         "eslint-plugin-promise": "6.1.1",
@@ -40,6 +40,11 @@
     },
     "private": true,
     "engines": {
-        "pnpm": ">= 7.11.0"
+        "pnpm": ">= 8.11.0"
+    },
+    "pnpm": {
+        "overrides": {
+            "vite": "5.0.5"
+        }
     }
 }

@@ -1,5 +1,5 @@
-import { describe, expect, it } from "@jest/globals";
 import { takeLast } from "./take-last";
+import { describe, expect, it } from "@jest/globals";
 
 describe("takeLast", () => {
     it("returns the last element of the array", () => {
