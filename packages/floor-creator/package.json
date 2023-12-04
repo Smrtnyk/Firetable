@@ -14,7 +14,8 @@
     "scripts": {
         "test": "vitest",
         "build": "tsc",
-        "lint": "eslint . --ext .ts"
+        "lint": "eslint . --ext .ts",
+        "find-dead-code": "npx ts-prune -p tsconfig.json --ignore 'src/index.ts|dist'"
     },
     "dependencies": {
         "fabric": "6.0.0-beta16",

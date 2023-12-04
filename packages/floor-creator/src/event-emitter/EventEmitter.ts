@@ -6,7 +6,7 @@ type EventMap = {
     [Event: string]: unknown[];
 };
 
-export interface TypedEventEmitter<Events extends EventMap> {
+interface TypedEventEmitter<Events extends EventMap> {
     on<K extends keyof Events>(event: K, listener: EventEmitterListener<Events[K]>): void;
     off<K extends keyof Events>(event: K, listener: EventEmitterListener<Events[K]>): void;
     emit<K extends keyof Events>(event: K, ...args: Events[K]): void;
