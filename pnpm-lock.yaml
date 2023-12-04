@@ -180,7 +180,7 @@ importers:
         specifier: 1.7.1
         version: 1.7.1(@types/node@20.10.3)(eslint@8.55.0)(pinia@2.1.7)(quasar@2.14.1)(rollup@2.79.1)(vue-router@4.2.5)(vue@3.4.0-alpha.4)(workbox-build@7.0.0)
       '@types/color':
-        specifier: ^3.0.6
+        specifier: 3.0.6
         version: 3.0.6
       '@vitejs/plugin-vue':
         specifier: 5.0.0-alpha.0
