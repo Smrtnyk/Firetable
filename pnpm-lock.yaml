@@ -101,11 +101,11 @@ importers:
         specifier: 2.0.45
         version: 2.0.45
       '@vitest/browser':
-        specifier: 1.0.0
-        version: 1.0.0(vitest@1.0.1)(webdriverio@8.24.6)
+        specifier: 1.0.1
+        version: 1.0.1(vitest@1.0.1)(webdriverio@8.24.6)
       vitest:
         specifier: 1.0.1
-        version: 1.0.1(@types/node@20.10.3)(@vitest/browser@1.0.0)
+        version: 1.0.1(@types/node@20.10.3)(@vitest/browser@1.0.1)
       webdriverio:
         specifier: 8.24.6
         version: 8.24.6(typescript@5.3.2)
@@ -131,8 +131,8 @@ importers:
         specifier: 2.0.3
         version: 2.0.3
       chart.js:
-        specifier: 4.4.0
-        version: 4.4.0
+        specifier: 4.4.1
+        version: 4.4.1
       color:
         specifier: 4.2.3
         version: 4.2.3
@@ -186,8 +186,8 @@ importers:
         specifier: 5.0.0-alpha.0
         version: 5.0.0-alpha.0(vite@5.0.5)(vue@3.4.0-alpha.4)
       '@vitest/browser':
-        specifier: 1.0.0
-        version: 1.0.0(vitest@1.0.1)(webdriverio@8.24.6)
+        specifier: 1.0.1
+        version: 1.0.1(vitest@1.0.1)(webdriverio@8.24.6)
       '@vue/test-utils':
         specifier: 2.4.3
         version: 2.4.3(vue@3.4.0-alpha.4)
@@ -196,7 +196,7 @@ importers:
         version: 4.2.1(typescript@5.3.2)(vite@5.0.5)
       vitest:
         specifier: 1.0.1
-        version: 1.0.1(@types/node@20.10.3)(@vitest/browser@1.0.0)
+        version: 1.0.1(@types/node@20.10.3)(@vitest/browser@1.0.1)
       vue-tsc:
         specifier: 1.8.24
         version: 1.8.24(typescript@5.3.2)
@@ -3735,12 +3735,12 @@ packages:
       vue: 3.4.0-alpha.4(typescript@5.3.2)
     dev: true
 
-  /@vitest/browser@1.0.0(vitest@1.0.1)(webdriverio@8.24.6):
-    resolution: {integrity: sha512-HMBkA531ef2n7knJ9xwiiNIgVwDVynA4Tdzqtbpv72jW3NinEnXRBO9BdVZ3LFtUo5lFtSA6Tyebr8PDcQQp3g==}
+  /@vitest/browser@1.0.1(vitest@1.0.1)(webdriverio@8.24.6):
+    resolution: {integrity: sha512-zKJvgfZMzahaFrIS5fbYnP2We+KRPJQUfog4mjOCOOVpLbk5DWtDD15XPYKaIY2IydD0ir0aCPrlcKlWGrcNww==}
     peerDependencies:
       playwright: '*'
       safaridriver: '*'
-      vitest: ^1.0.0-0
+      vitest: ^1.0.0
       webdriverio: '*'
     peerDependenciesMeta:
       playwright:
@@ -3753,7 +3753,7 @@ packages:
       estree-walker: 3.0.3
       magic-string: 0.30.5
       sirv: 2.0.3
-      vitest: 1.0.1(@types/node@20.10.3)(@vitest/browser@1.0.0)
+      vitest: 1.0.1(@types/node@20.10.3)(@vitest/browser@1.0.1)
       webdriverio: 8.24.6(typescript@5.3.2)
     dev: true
 
@@ -4917,8 +4917,8 @@ packages:
     resolution: {integrity: sha512-mT8iDcrh03qDGRRmoA2hmBJnxpllMR+0/0qlzjqZES6NdiWDcZkCNAk4rPFZ9Q85r27unkiNNg8ZOiwZXBHwcA==}
     dev: true
 
-  /chart.js@4.4.0:
-    resolution: {integrity: sha512-vQEj6d+z0dcsKLlQvbKIMYFHd3t8W/7L2vfJIbYcfyPcRx92CsHqECpueN8qVGNlKyDcr5wBrYAYKnfu/9Q1hQ==}
+  /chart.js@4.4.1:
+    resolution: {integrity: sha512-C74QN1bxwV1v2PEujhmKjOZ7iUM4w6BWs23Md/6aOZZSlwMzeCIDGuZay++rBgChYru7/+QFeoQW0fQoP534Dg==}
     engines: {pnpm: '>=7'}
     dependencies:
       '@kurkle/color': 0.3.2
@@ -12419,7 +12419,7 @@ packages:
       fsevents: 2.3.3
     dev: true
 
-  /vitest@1.0.1(@types/node@20.10.3)(@vitest/browser@1.0.0):
+  /vitest@1.0.1(@types/node@20.10.3)(@vitest/browser@1.0.1):
     resolution: {integrity: sha512-MHsOj079S28hDsvdDvyD1pRj4dcS51EC5Vbe0xvOYX+WryP8soiK2dm8oULi+oA/8Xa/h6GoJEMTmcmBy5YM+Q==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
@@ -12445,7 +12445,7 @@ packages:
         optional: true
     dependencies:
       '@types/node': 20.10.3
-      '@vitest/browser': 1.0.0(vitest@1.0.1)(webdriverio@8.24.6)
+      '@vitest/browser': 1.0.1(vitest@1.0.1)(webdriverio@8.24.6)
       '@vitest/expect': 1.0.1
       '@vitest/runner': 1.0.1
       '@vitest/snapshot': 1.0.1
