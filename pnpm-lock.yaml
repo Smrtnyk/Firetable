@@ -189,8 +189,8 @@ importers:
         specifier: 1.40.1
         version: 1.40.1
       '@quasar/app-vite':
-        specifier: 1.7.0
-        version: 1.7.0(eslint@8.55.0)(pinia@2.1.7)(quasar@2.14.1)(rollup@2.79.1)(vue-router@4.2.5)(vue@3.4.0-alpha.3)(workbox-build@7.0.0)
+        specifier: 1.7.1
+        version: 1.7.1(eslint@8.55.0)(pinia@2.1.7)(quasar@2.14.1)(rollup@2.79.1)(vue-router@4.2.5)(vue@3.4.0-alpha.3)(workbox-build@7.0.0)
       '@types/color':
         specifier: ^3.0.6
         version: 3.0.6
@@ -2837,8 +2837,8 @@ packages:
       - supports-color
     dev: true
 
-  /@quasar/app-vite@1.7.0(eslint@8.55.0)(pinia@2.1.7)(quasar@2.14.1)(rollup@2.79.1)(vue-router@4.2.5)(vue@3.4.0-alpha.3)(workbox-build@7.0.0):
-    resolution: {integrity: sha512-GF8jjjG0WI5ngMjGRwEEKFTbMN0vyQywLcumpoPvPJG87b87enrMBTy1Fr3AKcZS7a4wq3g2+46UUzpo60S8ZA==}
+  /@quasar/app-vite@1.7.1(eslint@8.55.0)(pinia@2.1.7)(quasar@2.14.1)(rollup@2.79.1)(vue-router@4.2.5)(vue@3.4.0-alpha.3)(workbox-build@7.0.0):
+    resolution: {integrity: sha512-cs3ix7w8f7884JiTp3EW6auZ9R+Fg4qoPxEZ7VRGOrSsUg5oQtR/i91jeQk4Z96J/JUOqtcKqdqbzN4fzaFyIg==}
     engines: {node: ^24 || ^22 || ^20 || ^18 || ^16 || ^14.19, npm: '>= 6.14.12', yarn: '>= 1.17.3'}
     hasBin: true
     peerDependencies:
@@ -2865,7 +2865,7 @@ packages:
       workbox-build:
         optional: true
     dependencies:
-      '@quasar/render-ssr-error': 1.0.2
+      '@quasar/render-ssr-error': 1.0.3
       '@quasar/vite-plugin': 1.6.0(@vitejs/plugin-vue@2.3.4)(quasar@2.14.1)(vite@2.9.16)(vue@3.4.0-alpha.3)
       '@rollup/pluginutils': 4.2.1
       '@types/chrome': 0.0.208
@@ -2916,8 +2916,8 @@ packages:
     resolution: {integrity: sha512-SlOhwzXyPQHWgQIS2ncyDdYdksCJvUYNtgsDQqzAKEG3r3d/ejOxvThle79HTK3Q6HB+gQWFG21Ux00Osr5XSw==}
     dev: false
 
-  /@quasar/render-ssr-error@1.0.2:
-    resolution: {integrity: sha512-Y0wyqYHVxc1IOBH6pRiKMSWDqO1mwQu11Zo8rw4cBdclPOQqFb7f65UuRbk5LfbqlXV2hYvklNcy0SBAOiAQnw==}
+  /@quasar/render-ssr-error@1.0.3:
+    resolution: {integrity: sha512-A8RF99q6/sOSe1Ighnh5syEIbliD3qUYEJd2HyfFyBPSMF+WYGXon5dmzg4nUoK662NgOggInevkDyBDJcZugg==}
     engines: {node: '>= 16'}
     dependencies:
       stack-trace: 1.0.0-pre2
