@@ -116,14 +116,12 @@ function createOrganisation(): void {
                 :key="organisation.id"
                 expand-icon="arrow_drop_down"
                 :label="organisation.name"
-                class="ft-card"
             >
                 <q-list>
                     <q-item
                         v-for="item of createLinks(organisation.id)"
                         :key="item.label"
                         clickable
-                        class="ft-card"
                         :to="item.route"
                     >
                         <q-item-section avatar>
