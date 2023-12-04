@@ -32,7 +32,7 @@ export class EditorEventManager extends EventManager {
     }
 
     private handleKeyDown = (e: KeyboardEvent): void => {
-        if (e.key !== "Control" && !e.ctrlKey) {
+        if (!(e.ctrlKey || e.metaKey)) {
             return;
         }
         this.floor.canvas.selection = true;
@@ -55,7 +55,7 @@ export class EditorEventManager extends EventManager {
     };
 
     private handleKeyUp = (e: KeyboardEvent): void => {
-        if (e.key === "Control" || e.ctrlKey) {
+        if (e.key === "Control" || e.key === "Meta") {
             this.floor.canvas.selection = false;
             this.floor.canvas.requestRenderAll();
         }
