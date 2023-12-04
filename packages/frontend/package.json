@@ -18,7 +18,7 @@
     "devDependencies": {
         "@playwright/test": "1.40.1",
         "@quasar/app-vite": "1.7.1",
-        "@types/color": "^3.0.6",
+        "@types/color": "3.0.6",
         "@vitejs/plugin-vue": "5.0.0-alpha.0",
         "@vitest/browser": "1.0.0",
         "@vue/test-utils": "2.4.3",
