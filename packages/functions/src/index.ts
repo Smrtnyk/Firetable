@@ -21,14 +21,14 @@ import { setGlobalOptions } from "firebase-functions/v2";
 setGlobalOptions({ region: "europe-west3" });
 
 // Everything that has to do with events
-export const createEvent = onCall({ cors: true }, createEventFn);
+export const createEvent = onCall(createEventFn);
 
 // Everything that has to do with auth
-export const changePassword = onCall({ cors: true }, changePasswordFn);
-export const fetchUsersByRole = onCall({ cors: true }, fetchUsersByRoleFn);
-export const createUser = onCall({ cors: true }, createUserFn);
-export const updateUser = onCall({ cors: true }, updateUserFn);
-export const deleteUser = onCall({ cors: true }, deleteUserFn);
+export const changePassword = onCall(changePasswordFn);
+export const fetchUsersByRole = onCall(fetchUsersByRoleFn);
+export const createUser = onCall(createUserFn);
+export const updateUser = onCall(updateUserFn);
+export const deleteUser = onCall(deleteUserFn);
 export const onUserDeleted = onDocumentDeleted(
     `${Collection.ORGANISATIONS}/{organisationId}/${Collection.USERS}/{userId}`,
     (event) => {
@@ -37,7 +37,7 @@ export const onUserDeleted = onDocumentDeleted(
 );
 
 // Properties
-export const createProperty = onCall({ cors: true }, createPropertyFn);
+export const createProperty = onCall(createPropertyFn);
 export const onPropertyDelete = onDocumentDeleted(
     `${Collection.ORGANISATIONS}/{organisationId}/${Collection.PROPERTIES}/{propertyId}`,
     (event) => onPropertyDeletedFn(event.params),
@@ -48,7 +48,7 @@ export const onPropertyDeleteCleanupEvents = onDocumentDeleted(
 );
 
 // Generic stuff
-export const deleteCollection = onCall<{ col: string; id: string }>({ cors: true }, (request) =>
+export const deleteCollection = onCall<{ col: string; id: string }>((request) =>
     deleteDocument(request.data),
 );
 
