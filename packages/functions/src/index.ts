@@ -14,7 +14,7 @@ import { changePasswordFn } from "./callable/change-password.js";
 import { Collection } from "../types/types.js";
 
 import { onSchedule } from "firebase-functions/v2/scheduler";
-import { onRequest, onCall } from "firebase-functions/v2/https";
+import { onCall } from "firebase-functions/v2/https";
 import { onDocumentDeleted } from "firebase-functions/v2/firestore";
 import { setGlobalOptions } from "firebase-functions/v2";
 
@@ -54,8 +54,3 @@ export const deleteCollection = onCall<{ col: string; id: string }>({ cors: true
 
 // Crons
 export const clearOldEvents = onSchedule("every day 00:00", clearOldEventsFn);
-
-// HealthCheck
-export const healthCheck = onRequest({ cors: true }, (request, response) => {
-    response.status(200).send("Service is up and running");
-});
