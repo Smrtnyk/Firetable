@@ -28,7 +28,7 @@
         "@types/hammerjs": "2.0.45",
         "@vitest/browser": "1.0.1",
         "vitest": "1.0.1",
-        "webdriverio": "8.24.6"
+        "webdriverio": "8.24.9"
     },
     "keywords": [],
     "author": "",
