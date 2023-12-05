@@ -74,7 +74,6 @@ export async function createEvent(
             date,
             creator,
             img,
-            reservedPercentage: 0,
             guestListLimit,
             propertyId,
             organisationId,
