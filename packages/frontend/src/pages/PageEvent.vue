@@ -143,7 +143,7 @@ onMounted(init);
                 class="button-gradient q-ma-none q-ml-sm"
                 @click="eventsStore.toggleEventGuestListDrawerVisibility"
                 icon="users"
-                round
+                rounded
             />
         </div>
 

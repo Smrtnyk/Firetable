@@ -11,7 +11,6 @@
             clear-icon="close"
             dense
             standout
-            rounded
             :debounce="300"
             @input-value="setModel"
             @filter="filterFn"
