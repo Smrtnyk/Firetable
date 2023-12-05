@@ -100,7 +100,6 @@ module.exports = configure(function (/* ctx */) {
                 "LocalStorage",
                 "Loading",
                 "BottomSheet",
-                "AppFullscreen",
             ],
         },
 

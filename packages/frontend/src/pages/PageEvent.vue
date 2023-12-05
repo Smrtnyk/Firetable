@@ -19,9 +19,8 @@ import {
     getEventPath,
     getReservationsPath,
 } from "@firetable/backend";
-import { isMobile, isTablet } from "src/global-reactives/screen-detection";
+import { isMobile } from "src/global-reactives/screen-detection";
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import { NOOP } from "@firetable/utils";
 
 interface Props {
     organisationId: string;
@@ -60,7 +59,6 @@ const {
     isActiveFloor,
     mapFloorToCanvas,
     onAutocompleteClear,
-    resizeFloor,
     hasMultipleFloorPlans,
     activeFloor,
     floorInstances,
@@ -99,10 +97,6 @@ async function init(): Promise<void> {
     }
 }
 
-function toggleFullScreen(): void {
-    q.fullscreen.toggle(pageRef.value).then(resizeFloor).catch(NOOP);
-}
-
 onMounted(init);
 </script>
 
@@ -136,13 +130,6 @@ onMounted(init);
                 @found="onTableFound"
                 @clear="onAutocompleteClear"
                 class="col q-mb-sm"
-            />
-            <q-btn
-                v-if="isTablet"
-                class="button-gradient q-ma-none q-ml-sm"
-                round
-                icon="full-screen"
-                @click="toggleFullScreen"
             />
             <q-btn
                 class="button-gradient q-ma-none q-ml-sm"
