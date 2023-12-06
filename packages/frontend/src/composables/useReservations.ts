@@ -430,6 +430,9 @@ export function useReservations(
     return {
         checkReservationsForTimeAndMarkTableIfNeeded,
         tableClickHandler,
+        // Used in unit test
+        onDeleteReservation,
+        handleReservationCreation,
     };
 }
 
