@@ -1,6 +1,7 @@
 import type { Floor } from "./Floor.js";
 import type { BaseTable } from "./types.js";
 import type { FloorDoc } from "@firetable/types";
+import { FloorElementTypes } from "./types.js";
 import { isTable } from "./type-guards";
 import { isString, takeProp } from "@firetable/utils";
 
@@ -8,11 +9,19 @@ export function hasFloorTables(floor: Floor): boolean {
     return getTables(floor).length > 0;
 }
 
+function isSerializedTable(element: Record<PropertyKey, unknown>): boolean {
+    return (
+        "type" in element &&
+        (element.type === FloorElementTypes.RECT_TABLE ||
+            element.type === FloorElementTypes.ROUND_TABLE)
+    );
+}
+
 export function getTablesFromFloorDoc(floor: FloorDoc): BaseTable[] {
     if (isString(floor.json)) {
-        return JSON.parse(floor.json).objects.filter(isTable);
+        return JSON.parse(floor.json).objects.filter(isSerializedTable);
     }
-    return floor.json.objects.filter(isTable);
+    return floor.json.objects.filter(isSerializedTable);
 }
 
 export function getTables(floor: Floor): BaseTable[] {
