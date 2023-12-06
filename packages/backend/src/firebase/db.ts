@@ -3,9 +3,9 @@ import type { DocumentReference, CollectionReference } from "firebase/firestore"
 import type { EventDoc, PropertyDoc } from "@firetable/types";
 import { initializeFirebase } from "./base.js";
 import { getEventsPath, getFloorsPath, getPropertiesPath } from "./paths.js";
+import { EVENT_LOGS_DOCUMENT, Collection } from "@firetable/types";
 import { httpsCallable } from "firebase/functions";
 import { collection, doc } from "firebase/firestore";
-import { Collection } from "@firetable/types";
 
 export type EventOwner = Pick<EventDoc, "organisationId" | "propertyId" | "id">;
 
@@ -63,6 +63,10 @@ export function deleteDocAndAllSubCollections(
 
 export function eventDoc(owner: EventOwner): DocumentReference {
     return doc(eventsCollection(owner), owner.id);
+}
+
+export function eventLogsDoc(owner: EventOwner): DocumentReference {
+    return doc(eventsCollection(owner), owner.id, Collection.EVENT_LOGS, EVENT_LOGS_DOCUMENT);
 }
 
 export function floorDoc(

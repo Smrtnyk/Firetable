@@ -1,5 +1,5 @@
 import type { EventOwner } from "./db.js";
-import { Collection } from "@firetable/types";
+import { Collection, EVENT_LOGS_DOCUMENT } from "@firetable/types";
 
 export function getPropertiesPath(organisationId: string): string {
     return [Collection.ORGANISATIONS, organisationId, Collection.PROPERTIES].join("/");
@@ -15,6 +15,10 @@ export function getEventsPath({ propertyId, organisationId }: EventOwner): strin
 
 export function getEventPath(eventOwner: EventOwner): string {
     return [getEventsPath(eventOwner), eventOwner.id].join("/");
+}
+
+export function getEventLogsPath(eventOwner: EventOwner): string {
+    return [getEventPath(eventOwner), Collection.EVENT_LOGS, EVENT_LOGS_DOCUMENT].join("/");
 }
 
 export function getReservationsPath(eventOwner: EventOwner): string {

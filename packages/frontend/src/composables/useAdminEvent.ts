@@ -1,5 +1,12 @@
-import type { EventDoc, FloorDoc, ReservationDoc, User } from "@firetable/types";
+import type { EventDoc, EventLogsDoc, FloorDoc, ReservationDoc, User } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
+import {
+    getEventLogsPath,
+    getEventFloorsPath,
+    getEventPath,
+    getReservationsPath,
+    usersCollection,
+} from "@firetable/backend";
 import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import {
@@ -7,12 +14,6 @@ import {
     useFirestoreCollection,
     useFirestoreDocument,
 } from "src/composables/useFirestore";
-import {
-    getEventFloorsPath,
-    getEventPath,
-    getReservationsPath,
-    usersCollection,
-} from "@firetable/backend";
 import { decompressFloorDoc } from "src/helpers/compress-floor-doc";
 
 export default function useAdminEvent(eventOwner: EventOwner) {
@@ -24,6 +25,7 @@ export default function useAdminEvent(eventOwner: EventOwner) {
         wait: true,
     });
     const reservations = useFirestoreCollection<ReservationDoc>(getReservationsPath(eventOwner));
+    const { data: logs } = useFirestoreDocument<EventLogsDoc>(getEventLogsPath(eventOwner));
 
     const usersHook = useFirestoreCollection<User>(
         createQuery(usersCollection(eventOwner.organisationId)),
@@ -61,5 +63,6 @@ export default function useAdminEvent(eventOwner: EventOwner) {
         event: eventHook.data,
         reservations: reservations.data,
         isLoading,
+        logs,
     };
 }

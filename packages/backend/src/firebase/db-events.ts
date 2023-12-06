@@ -3,14 +3,16 @@ import type { DocumentData, DocumentReference } from "firebase/firestore";
 import type {
     CreateEventPayload,
     EventDoc,
+    EventLog,
     FloorDoc,
     GuestData,
     Reservation,
     ReservationDoc,
+    User,
 } from "@firetable/types";
 import type { EventOwner } from "./db.js";
-import { initializeFirebase } from "./base.js";
 import {
+    eventLogsDoc,
     eventsCollection,
     guestListCollection,
     guestDoc,
@@ -19,6 +21,7 @@ import {
     reservationsCollection,
     reservationDoc,
 } from "./db.js";
+import { initializeFirebase } from "./base.js";
 import {
     getDocs,
     orderBy,
@@ -29,8 +32,43 @@ import {
     deleteDoc,
     query,
     where,
+    Timestamp,
+    arrayUnion,
+    setDoc,
 } from "firebase/firestore";
 import { httpsCallable } from "firebase/functions";
+
+export async function addLogToEvent(
+    eventOwner: EventOwner,
+    logMessage: string,
+    user: User,
+): Promise<void> {
+    const eventLogsRef = eventLogsDoc(eventOwner);
+
+    const logEntry: EventLog = {
+        message: logMessage,
+        timestamp: Timestamp.now(),
+        creator: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+        },
+    };
+
+    try {
+        await setDoc(
+            eventLogsRef,
+            {
+                logs: arrayUnion(logEntry),
+            },
+            { merge: true },
+        );
+        console.log("Log entry added successfully");
+    } catch (error) {
+        console.error("Error adding log entry:", error);
+    }
+}
 
 export async function getEvents(
     lastDocument: DocumentData | null,

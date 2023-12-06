@@ -23,6 +23,7 @@ import useAdminEvent from "src/composables/useAdminEvent";
 import { buttonSize, isMobile } from "src/global-reactives/screen-detection";
 import { truncateText } from "src/helpers/string-utils";
 import { compressFloorDoc } from "src/helpers/compress-floor-doc";
+import AdminEventLogs from "src/components/admin/event/AdminEventLogs.vue";
 
 interface Props {
     organisationId: string;
@@ -41,7 +42,7 @@ const eventOwner: EventOwner = {
     id: props.eventId,
 };
 
-const { eventFloors, event, isLoading, reservations } = useAdminEvent(eventOwner);
+const { eventFloors, event, isLoading, reservations, logs } = useAdminEvent(eventOwner);
 
 watch(
     isLoading,
@@ -175,6 +176,7 @@ onMounted(init);
         >
             <q-tab name="info" label="Info" />
             <q-tab name="edit" label="Edit" v-if="!isEventFinished(event.date)" />
+            <q-tab name="logs" label="Logs" />
         </q-tabs>
         <div class="q-gutter-y-md">
             <q-tab-panels v-model="tab" animated transition-next="fade" transition-prev="fade">
@@ -231,6 +233,11 @@ onMounted(init);
                             </q-item-section>
                         </q-item>
                     </div>
+                </q-tab-panel>
+
+                <!-- Logs -->
+                <q-tab-panel name="logs" v-if="logs">
+                    <AdminEventLogs :logs-doc="logs" />
                 </q-tab-panel>
             </q-tab-panels>
         </div>

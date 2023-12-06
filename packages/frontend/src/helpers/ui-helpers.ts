@@ -1,4 +1,4 @@
-import { Dialog, Loading } from "quasar";
+import { Dialog, Loading, Notify } from "quasar";
 import { isString, NOOP } from "@firetable/utils";
 
 export function showConfirm(title: string, message = ""): Promise<boolean> {
@@ -82,4 +82,11 @@ export async function tryCatchLoadingWrapper<T>({
     } finally {
         Loading.hide();
     }
+}
+
+export function notifyPositive(message: string): void {
+    Notify.create({
+        message,
+        color: "positive",
+    });
 }

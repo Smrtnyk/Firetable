@@ -1,6 +1,6 @@
-import type { QueryDocumentSnapshot } from "firebase/firestore";
+import type { QueryDocumentSnapshot, Timestamp } from "firebase/firestore";
 import type { FloorDoc } from "./floor.js";
-import type { User } from "./auth.js";
+import type { ADMIN, Role, User } from "./auth.js";
 
 export interface CreateEventForm {
     name: string;
@@ -50,6 +50,8 @@ export type ReservationDoc = Reservation & {
     _doc: QueryDocumentSnapshot<Reservation>;
 };
 
+type UserIdentifier = Pick<User, "name" | "email" | "id">;
+
 export interface Reservation {
     floorId: string;
     tableLabel: string;
@@ -60,6 +62,16 @@ export interface Reservation {
     reservationNote?: string;
     consumption: number;
     time: string;
-    reservedBy: Pick<User, "name" | "email" | "id">;
-    creator?: Pick<User, "name" | "email" | "id">;
+    reservedBy: UserIdentifier;
+    creator?: UserIdentifier;
+}
+
+export interface EventLog {
+    message: string;
+    creator: UserIdentifier & { role: Role | typeof ADMIN };
+    timestamp: Timestamp;
+}
+
+export interface EventLogsDoc {
+    logs: EventLog[];
 }

@@ -1,5 +1,6 @@
 export const enum Collection {
     EVENTS = "events",
+    EVENT_LOGS = "eventLogs",
     RESERVATIONS = "reservations",
     GUEST_LIST = "guestList",
     USERS = "users",
@@ -7,3 +8,5 @@ export const enum Collection {
     ORGANISATIONS = "organisations",
     PROPERTIES = "properties",
 }
+
+export const EVENT_LOGS_DOCUMENT = "logsDocument";

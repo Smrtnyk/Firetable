@@ -12,7 +12,7 @@
         "build:spa": "quasar build",
         "build:pwa": "quasar build -m pwa",
         "build": "quasar build -m pwa",
-        "typecheck": "vue-tsc --noEmit -p ./tsconfig.json",
+        "typecheck": "vue-tsc --build --force",
         "test": "vitest"
     },
     "devDependencies": {

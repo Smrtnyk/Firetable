@@ -4,17 +4,28 @@ import type { BaseTable, Floor, FloorEditorElement, FloorViewer } from "@firetab
 import type { EventOwner } from "@firetable/backend";
 import type { DialogChainObject } from "quasar";
 import type { VueFirestoreDocumentData } from "vuefire";
+import {
+    addLogToEvent,
+    addReservation,
+    deleteReservation,
+    updateReservationDoc,
+} from "@firetable/backend";
 import { computed, onBeforeUnmount, watch, ref } from "vue";
 import { isTable } from "@firetable/floor-creator";
-import { addReservation, deleteReservation, updateReservationDoc } from "@firetable/backend";
 import { useQuasar } from "quasar";
-import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import {
+    notifyPositive,
+    showConfirm,
+    showErrorMessage,
+    tryCatchLoadingWrapper,
+} from "src/helpers/ui-helpers";
 import { useI18n } from "vue-i18n";
 
 import FTDialog from "src/components/FTDialog.vue";
 import EventCreateReservation from "src/components/Event/EventCreateReservation.vue";
 import EventShowReservation from "src/components/Event/EventShowReservation.vue";
 import { useAuthStore } from "src/stores/auth-store";
+import { NOOP } from "@firetable/utils";
 
 const HALF_HOUR = 30 * 60 * 1000; // 30 minutes in milliseconds
 
@@ -77,14 +88,16 @@ export function useReservations(
         );
     }
 
+    function createEventLog(message: string): void {
+        addLogToEvent(eventOwner, message, authStore.user!).catch(NOOP);
+    }
+
     function handleReservationCreation(reservationData: Reservation): void {
         void tryCatchLoadingWrapper({
             hook: async function () {
                 await addReservation(eventOwner, reservationData);
-                q.notify({
-                    message: "Reservation created",
-                    color: "positive",
-                });
+                notifyPositive("Reservation created");
+                createEventLog(`Reservation created on table ${reservationData.tableLabel}`);
             },
         });
     }
@@ -93,10 +106,7 @@ export function useReservations(
         void tryCatchLoadingWrapper({
             hook: async function () {
                 await updateReservationDoc(eventOwner, reservationData);
-                q.notify({
-                    message: "Reservation updated",
-                    color: "positive",
-                });
+                notifyPositive("Reservation updated");
             },
         });
     }
@@ -105,12 +115,11 @@ export function useReservations(
         if (!(await showConfirm("Delete reservation?"))) return;
 
         await tryCatchLoadingWrapper({
-            hook: () => deleteReservation(eventOwner, reservation),
+            hook: async function () {
+                await deleteReservation(eventOwner, reservation);
+                createEventLog(`Reservation deleted on table ${reservation.tableLabel}`);
+            },
         });
-    }
-
-    function onEditReservation(floor: Floor, element: BaseTable): void {
-        showCreateReservationDialog(floor, element, "edit");
     }
 
     function resetCurrentOpenCreateReservationDialog(): void {
@@ -205,7 +214,7 @@ export function useReservations(
                         onDeleteReservation(reservation).catch(showErrorMessage);
                     },
                     edit() {
-                        onEditReservation(floor, element);
+                        showCreateReservationDialog(floor, element, "edit");
                     },
                     transfer() {
                         crossFloorReservationTransferTable.value = {
@@ -283,7 +292,12 @@ export function useReservations(
         }
 
         await tryCatchLoadingWrapper({
-            hook: () => Promise.all(promises),
+            hook: async function () {
+                await Promise.all(promises);
+                createEventLog(
+                    `Reservation transferred from table ${table1.label} to table ${table2.label}`,
+                );
+            },
         });
     }
 
@@ -414,8 +428,6 @@ export function useReservations(
     });
 
     return {
-        onDeleteReservation,
-        handleReservationCreation,
         checkReservationsForTimeAndMarkTableIfNeeded,
         tableClickHandler,
     };
