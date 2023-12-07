@@ -90,21 +90,8 @@ module.exports = {
             },
         ],
         "@typescript-eslint/func-call-spacing": ["error", "never"],
-        "@typescript-eslint/indent": [
-            "error",
-            4,
-            {
-                "FunctionExpression": {
-                    "parameters": "first",
-                },
-                "FunctionDeclaration": {
-                    "parameters": "first",
-                },
-                "SwitchCase": 1,
-                "flatTernaryExpressions": true,
-            },
-        ],
         // In favor of prettier
+        "@typescript-eslint/indent": "off",
         "@typescript-eslint/member-delimiter-style": "off",
         "@typescript-eslint/no-empty-function": "warn",
         "@typescript-eslint/no-empty-interface": "error",

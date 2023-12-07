@@ -1,46 +1,53 @@
-import { ElementTag } from "@firetable/types";
+import { FloorElementTypes } from "@firetable/floor-creator";
 
 export const ELEMENTS_TO_ADD_COLLECTION = [
     {
         label: "Add square table",
         img: "/svg-images/square-table.svg",
         elementDescriptor: {
-            tag: ElementTag.RECT,
+            tag: FloorElementTypes.RECT_TABLE,
         },
     },
     {
         label: "Add round table",
         img: "/svg-images/round-table.svg",
         elementDescriptor: {
-            tag: ElementTag.CIRCLE,
+            tag: FloorElementTypes.ROUND_TABLE,
         },
     },
     {
         label: "Add a wall",
         img: "/svg-images/wall.svg",
         elementDescriptor: {
-            tag: ElementTag.WALL,
+            tag: FloorElementTypes.WALL,
         },
     },
     {
         label: "Add a Sofa",
         img: "/svg-images/double-sofa.svg",
         elementDescriptor: {
-            tag: ElementTag.SOFA,
+            tag: FloorElementTypes.SOFA,
         },
     },
     {
         label: "Add DJ Booth",
         img: "/svg-images/dj-booth.svg",
         elementDescriptor: {
-            tag: ElementTag.DJ_BOOTH,
+            tag: FloorElementTypes.DJ_BOOTH,
         },
     },
     {
         label: "Add Stage",
         img: "/svg-images/disco-stage.svg",
         elementDescriptor: {
-            tag: ElementTag.STAGE,
+            tag: FloorElementTypes.STAGE,
+        },
+    },
+    {
+        label: "Add Spiral Staircase",
+        img: "/svg-images/spiral-staircase.png",
+        elementDescriptor: {
+            tag: FloorElementTypes.SPIRAL_STAIRCASE,
         },
     },
 ];
@@ -50,14 +57,14 @@ export const BULK_ADD_COLLECTION = [
         label: "Add square table",
         img: "/svg-images/square-table.svg",
         elementDescriptor: {
-            tag: ElementTag.RECT,
+            tag: FloorElementTypes.RECT_TABLE,
         },
     },
     {
         label: "Add round table",
         img: "/svg-images/round-table.svg",
         elementDescriptor: {
-            tag: ElementTag.CIRCLE,
+            tag: FloorElementTypes.ROUND_TABLE,
         },
     },
 ];

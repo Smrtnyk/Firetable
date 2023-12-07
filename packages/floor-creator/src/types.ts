@@ -1,9 +1,10 @@
 import type { RectTable } from "./elements/RectTable.js";
 import type { RoundTable } from "./elements/RoundTable.js";
-import type { ElementTag, FloorDoc } from "@firetable/types";
+import type { FloorDoc } from "@firetable/types";
 import type { Sofa } from "./elements/Sofa";
 import type { DJBooth } from "./elements/DJBooth";
 import type { Stage } from "./elements/Stage";
+import type { SpiralStaircase } from "./elements/SpiralStaircase";
 
 export interface FloorCreationOptions {
     canvas: HTMLCanvasElement;
@@ -12,12 +13,12 @@ export interface FloorCreationOptions {
 }
 
 export type BaseTable = RectTable | RoundTable;
-export type FloorEditorElement = RectTable | RoundTable | Sofa | DJBooth | Stage;
+export type FloorEditorElement = RectTable | RoundTable | Sofa | DJBooth | Stage | SpiralStaircase;
 export type CreateElementOptions = {
     label?: string;
     x: number;
     y: number;
-    tag: ElementTag;
+    tag: FloorElementTypes;
 };
 
 export enum FloorElementTypes {
@@ -27,6 +28,7 @@ export enum FloorElementTypes {
     SOFA = "Sofa",
     STAGE = "Stage",
     WALL = "Wall",
+    SPIRAL_STAIRCASE = "SpiralStaircase",
 }
 
 export type NumberTuple = [number, number];

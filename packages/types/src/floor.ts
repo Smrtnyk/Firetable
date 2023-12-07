@@ -7,16 +7,3 @@ export interface FloorDoc {
     propertyId: string;
     compressed?: boolean;
 }
-
-export type EventFloorDoc = FloorDoc & {
-    lastModified?: number;
-};
-
-export const enum ElementTag {
-    RECT = "RectTable",
-    CIRCLE = "RoundTable",
-    SOFA = "Sofa",
-    DJ_BOOTH = "DJBooth",
-    WALL = "Wall",
-    STAGE = "Stage",
-}

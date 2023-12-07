@@ -2,7 +2,12 @@ import type { GroupProps } from "fabric";
 import type { ReservationDoc } from "@firetable/types";
 import type { AnimationStrategy } from "./animation/AnimationStrategy";
 import { SmoothBlinkAnimation } from "./animation/SmoothBlinkAnimation";
-import { FONT_SIZE, TABLE_TEXT_FILL_COLOR } from "../constants";
+import {
+    ELEMENT_DEFAULT_FILL_COLOR,
+    ELEMENT_DEFAULT_STROKE_COLOR,
+    FONT_SIZE,
+    TABLE_TEXT_FILL_COLOR,
+} from "../constants";
 import { determineTableColor } from "../utils.js";
 import { FloorElementTypes } from "../types";
 import { Group, Circle, FabricText } from "fabric";
@@ -28,13 +33,14 @@ export class RoundTable extends Group {
     private animationStrategy: AnimationStrategy;
 
     constructor(options: CircleTableElementOptions) {
-        const baseFillComputed = (options.groupOptions.baseFill as string) || "#444";
+        const baseFillComputed =
+            (options.groupOptions.baseFill as string) || ELEMENT_DEFAULT_FILL_COLOR;
         const tableCircle = new Circle({
             ...options.circleOptions,
             originX: "center",
             originY: "center",
             fill: baseFillComputed,
-            stroke: "black",
+            stroke: ELEMENT_DEFAULT_STROKE_COLOR,
             strokeWidth: 0.5,
         });
         const textLabel = new FabricText(options.groupOptions.label, {

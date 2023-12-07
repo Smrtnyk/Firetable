@@ -8,6 +8,8 @@ import {
     RESOLUTION,
     TABLE_WIDTH,
     TABLE_HEIGHT,
+    ELEMENT_DEFAULT_FILL_COLOR,
+    ELEMENT_DEFAULT_STROKE_COLOR,
 } from "../constants";
 import { determineTableColor } from "../utils.js";
 import { FloorElementTypes } from "../types";
@@ -37,11 +39,11 @@ export class RectTable extends Group {
     private animationStrategy: AnimationStrategy;
 
     constructor(options: RectTableElementOptions) {
-        const baseFillComputed = options.groupOptions.baseFill || "#444";
+        const baseFillComputed = options.groupOptions.baseFill || ELEMENT_DEFAULT_FILL_COLOR;
         const tableRect = new Rect({
             ...options.rectOptions,
             fill: baseFillComputed,
-            stroke: "black",
+            stroke: ELEMENT_DEFAULT_STROKE_COLOR,
             strokeWidth: 0.5,
         });
 

@@ -1,4 +1,5 @@
 import type { CreateElementOptions } from "./types";
+import { FloorElementTypes } from "./types";
 import { Wall } from "./elements/Wall";
 import { DJBooth } from "./elements/DJBooth";
 import { Sofa } from "./elements/Sofa";
@@ -6,18 +7,21 @@ import { RoundTable } from "./elements/RoundTable";
 import { RESOLUTION, TABLE_HEIGHT, TABLE_WIDTH } from "./constants";
 import { RectTable } from "./elements/RectTable";
 import { Stage } from "./elements/Stage";
-import { ElementTag } from "@firetable/types";
+import { SpiralStaircase } from "./elements/SpiralStaircase";
 import { match } from "ts-pattern";
 
 export class ElementManager {
-    addElement(options: CreateElementOptions): RectTable | RoundTable | Wall | Sofa | DJBooth {
+    addElement(
+        options: CreateElementOptions,
+    ): RectTable | RoundTable | Wall | Sofa | DJBooth | SpiralStaircase {
         return match(options.tag)
-            .with(ElementTag.RECT, () => this.addRectTableElement(options))
-            .with(ElementTag.CIRCLE, () => this.addRoundTableElement(options))
-            .with(ElementTag.SOFA, () => this.addSofaElement(options))
-            .with(ElementTag.DJ_BOOTH, () => this.addDJBooth(options))
-            .with(ElementTag.WALL, () => this.addWall(options))
-            .with(ElementTag.STAGE, () => this.addStageElement(options))
+            .with(FloorElementTypes.RECT_TABLE, () => this.addRectTableElement(options))
+            .with(FloorElementTypes.ROUND_TABLE, () => this.addRoundTableElement(options))
+            .with(FloorElementTypes.SOFA, () => this.addSofaElement(options))
+            .with(FloorElementTypes.DJ_BOOTH, () => this.addDJBooth(options))
+            .with(FloorElementTypes.WALL, () => this.addWall(options))
+            .with(FloorElementTypes.STAGE, () => this.addStageElement(options))
+            .with(FloorElementTypes.SPIRAL_STAIRCASE, () => this.addSpiralStaircaseElement(options))
             .exhaustive();
     }
 
@@ -35,6 +39,10 @@ export class ElementManager {
 
     private addStageElement({ x, y }: CreateElementOptions): Stage {
         return new Stage(x, y);
+    }
+
+    private addSpiralStaircaseElement({ x, y }: CreateElementOptions): SpiralStaircase {
+        return new SpiralStaircase(x, y);
     }
 
     private addRoundTableElement({ label, x, y }: CreateElementOptions): RoundTable {

@@ -1,5 +1,6 @@
 import type { GroupProps } from "fabric";
 import { FloorElementTypes } from "../types";
+import { ELEMENT_DEFAULT_FILL_COLOR } from "../constants";
 import { Group, Rect } from "fabric";
 
 type WallCreationOptions = Record<string, unknown>;
@@ -16,7 +17,7 @@ export class Wall extends Group {
         const wallRect = new Rect({
             width: 10,
             height: 100,
-            fill: "#444",
+            fill: ELEMENT_DEFAULT_FILL_COLOR,
             ...wallRectOpts,
         });
 

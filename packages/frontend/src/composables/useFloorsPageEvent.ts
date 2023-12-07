@@ -1,5 +1,5 @@
 import type { Ref } from "vue";
-import type { EventDoc, EventFloorDoc, Reservation, ReservationDoc } from "@firetable/types";
+import type { EventDoc, FloorDoc, Reservation, ReservationDoc } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
 import type { VueFirestoreDocumentData } from "vuefire";
 import { FloorViewer, getTables } from "@firetable/floor-creator";
@@ -21,7 +21,7 @@ import { decompressFloorDoc } from "src/helpers/compress-floor-doc";
 const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
 
 export function useFloorsPageEvent(
-    eventFloors: Ref<EventFloorDoc[]>,
+    eventFloors: Ref<FloorDoc[]>,
     reservations: Ref<ReservationDoc[]>,
     pageRef: Ref<HTMLDivElement | undefined>,
     eventOwner: EventOwner,
@@ -85,17 +85,14 @@ export function useFloorsPageEvent(
         checkReservationsForTimeAndMarkTableIfNeeded();
     }
 
-    async function handleFloorInstancesData(
-        newVal: EventFloorDoc[],
-        old: EventFloorDoc[],
-    ): Promise<void> {
+    async function handleFloorInstancesData(newVal: FloorDoc[], old: FloorDoc[]): Promise<void> {
         if (!eventFloors.value) return;
         if ((old.length === 0 && newVal.length > 0) || floorInstances.value.length === 0) {
             await initFloorInstancesData();
         }
     }
 
-    function mapFloorToCanvas(floor: EventFloorDoc) {
+    function mapFloorToCanvas(floor: FloorDoc) {
         return function (el: any) {
             canvases.set(floor.id, el);
         };
@@ -105,7 +102,7 @@ export function useFloorsPageEvent(
         await Promise.all(eventFloors.value.map(instantiateFloor));
     }
 
-    async function instantiateFloor(floorDoc: EventFloorDoc): Promise<void> {
+    async function instantiateFloor(floorDoc: FloorDoc): Promise<void> {
         const canvas = canvases.get(floorDoc.id);
 
         if (!canvas || !pageRef.value) return;

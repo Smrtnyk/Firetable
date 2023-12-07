@@ -8,6 +8,8 @@ export const MAX_FLOOR_HEIGHT = RESOLUTION * 100;
 export const FONT_SIZE = 15;
 export const CANVAS_BG_COLOR = "#333";
 export const TABLE_TEXT_FILL_COLOR = "#fff";
+export const ELEMENT_DEFAULT_FILL_COLOR = "#444";
+export const ELEMENT_DEFAULT_STROKE_COLOR = "#000";
 
 export const DEFAULT_ZOOM = 1;
 export const ZOOM_INCREMENT = 0.3;

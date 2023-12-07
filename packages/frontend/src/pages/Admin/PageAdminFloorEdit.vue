@@ -17,8 +17,8 @@ import {
     MAX_FLOOR_HEIGHT,
     MAX_FLOOR_WIDTH,
     RESOLUTION,
+    FloorElementTypes,
 } from "@firetable/floor-creator";
-import { ElementTag } from "@firetable/types";
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import {
     getFirestoreDocument,
@@ -31,7 +31,7 @@ import { getFloorPath } from "@firetable/backend";
 import { compressFloorDoc, decompressFloorDoc } from "src/helpers/compress-floor-doc";
 
 type ElementDescriptor = {
-    tag: ElementTag;
+    tag: FloorElementTypes;
 };
 
 interface BottomSheetTableClickResult {
@@ -50,10 +50,11 @@ const addNewElementsBottomSheetOptions = {
 };
 
 const NON_TABLE_EL_TO_ADD = [
-    ElementTag.SOFA,
-    ElementTag.DJ_BOOTH,
-    ElementTag.WALL,
-    ElementTag.STAGE,
+    FloorElementTypes.SOFA,
+    FloorElementTypes.DJ_BOOTH,
+    FloorElementTypes.WALL,
+    FloorElementTypes.STAGE,
+    FloorElementTypes.SPIRAL_STAIRCASE,
 ];
 
 const props = defineProps<Props>();
@@ -64,7 +65,7 @@ const canvasRef = ref<HTMLCanvasElement | undefined>();
 const pageRef = ref<HTMLDivElement | undefined>();
 const selectedElement = ref<FloorEditorElement | undefined>();
 const bulkMode = ref(false);
-const bulkElement = ref<ElementTag | undefined>();
+const bulkElement = ref<FloorElementTypes | undefined>();
 const bulkLabelCounter = ref(0); // To auto-increment labels
 
 const floorPath = getFloorPath(props.organisationId, props.propertyId, props.floorId);
@@ -140,6 +141,11 @@ async function onFloorSave(): Promise<void> {
     }
 
     const { name, width, height, json } = floorInstance.value;
+    console.log(
+        floorInstance.value.canvas.getObjects().filter((obj) => {
+            return obj.type === FloorElementTypes.SPIRAL_STAIRCASE;
+        }),
+    );
 
     await tryCatchLoadingWrapper({
         hook: async function () {
@@ -170,7 +176,7 @@ function onFloorChange(prop: keyof FloorEditor, event: null | number | string): 
     }
 }
 
-function showTableDialog(floorVal: FloorEditor, [x, y]: NumberTuple, tag: ElementTag): void {
+function showTableDialog(floorVal: FloorEditor, [x, y]: NumberTuple, tag: FloorElementTypes): void {
     const dialog = q.dialog({
         component: FTDialog,
         componentProps: {
@@ -242,7 +248,7 @@ function toggleBulkMode(): void {
     }
 }
 
-function activateBulkMode(elementTag: ElementTag): void {
+function activateBulkMode(elementTag: FloorElementTypes): void {
     bulkMode.value = true;
     bulkElement.value = elementTag;
 

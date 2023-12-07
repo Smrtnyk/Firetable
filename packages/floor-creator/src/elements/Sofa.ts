@@ -1,5 +1,6 @@
 import type { FabricObject, GroupProps } from "fabric";
 import { FloorElementTypes } from "../types";
+import { ELEMENT_DEFAULT_FILL_COLOR } from "../constants";
 import { Group, Rect } from "fabric";
 
 type SofaGroupCreationOpts = {
@@ -17,7 +18,7 @@ export class Sofa extends Group {
         const base = new Rect({
             width: 25 * 4,
             height: 25 / 1.5,
-            fill: "#444",
+            fill: ELEMENT_DEFAULT_FILL_COLOR,
             stroke: "#222",
             strokeWidth: 0.5,
             ...sofaBaseOpts,
@@ -33,7 +34,7 @@ export class Sofa extends Group {
             top: -25 / 4,
             width: 25 * 4,
             height: 25 / 4,
-            fill: "#444",
+            fill: ELEMENT_DEFAULT_FILL_COLOR,
             stroke: "#222",
             strokeWidth: 0.5,
         });
