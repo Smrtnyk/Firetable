@@ -11,6 +11,7 @@ export class GridDrawer {
     }
 
     drawGrid(width: number, height: number): void {
+        this.clearGrid();
         const gridSize = RESOLUTION;
         const left = (width % gridSize) / 2;
         const top = (height % gridSize) / 2;
