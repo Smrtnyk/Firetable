@@ -89,6 +89,13 @@ export class FloorEditor extends Floor {
         super.renderData(jsonData);
     }
 
+    importFloor(jsonImport: { width: number; height: number; json: string }): void {
+        this.width = jsonImport.width;
+        this.height = jsonImport.height;
+        super.resize(this.containerWidth);
+        this.renderData(JSON.parse(jsonImport.json));
+    }
+
     protected setElementProperties(element: FabricObject): void {
         element.lockScalingX = false;
         element.lockScalingY = false;

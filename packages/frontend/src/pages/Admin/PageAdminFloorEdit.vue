@@ -291,7 +291,14 @@ async function exportFloor(floorVal: FloorEditor): Promise<void> {
     if (!(await showConfirm("Do you want to export this floor plan?"))) {
         return;
     }
-    exportFile(`${floorVal.name}.json`, JSON.stringify(floorVal.json));
+    exportFile(
+        `${floorVal.name}.json`,
+        JSON.stringify({
+            json: floorVal.json,
+            width: floorVal.width,
+            height: floorVal.height,
+        }),
+    );
 }
 
 const fileInputRef = ref<HTMLInputElement | null>(null);
@@ -304,7 +311,7 @@ function onFileSelected(event: Event): void {
             const fileContent = reader.result as string;
             const jsonData = JSON.parse(fileContent);
             if (floorInstance.value) {
-                floorInstance.value.renderData(jsonData);
+                floorInstance.value.importFloor(jsonData);
             }
         };
         reader.readAsText(file);

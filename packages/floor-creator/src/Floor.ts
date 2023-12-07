@@ -58,7 +58,6 @@ export abstract class Floor {
             backgroundColor: CANVAS_BG_COLOR,
             selection: false,
             skipOffscreen: true,
-            imageSmoothingEnabled: false,
         });
         this.setScaling();
         this.renderData(this.floorDoc.json);
