@@ -1,10 +1,10 @@
 import type { MockInstance } from "vitest";
 import type { FloorCreationOptions } from "./types";
+import { FloorElementTypes } from "./types";
 import { FloorEditor } from "./FloorEditor";
 import { GridDrawer } from "./GridDrawer";
 import { isTable } from "./type-guards";
 import { RectTable } from "./elements/RectTable";
-import { ElementTag } from "@firetable/types";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { Group, Rect } from "fabric";
 
@@ -142,7 +142,7 @@ describe("FloorEditor", () => {
     describe("addElement()", () => {
         it("should add an element to the canvas", () => {
             floorEditor.addElement({
-                tag: ElementTag.RECT,
+                tag: FloorElementTypes.RECT_TABLE,
                 x: 1,
                 y: 1,
                 label: "1",

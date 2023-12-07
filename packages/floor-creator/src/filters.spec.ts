@@ -7,8 +7,8 @@ import {
     hasFloorTables,
 } from "./filters";
 import { RectTable } from "./elements/RectTable";
+import { FloorElementTypes } from "./types";
 import { expect, it, describe, beforeEach } from "vitest";
-import { ElementTag } from "@firetable/types";
 
 describe("Table Management Functions", () => {
     let floor: FloorEditor;
@@ -39,7 +39,7 @@ describe("Table Management Functions", () => {
         it("should return true when there are tables on the floor", () => {
             // Assuming floor has a method to add tables, adjust as needed
             floor.addElement({
-                tag: ElementTag.RECT,
+                tag: FloorElementTypes.RECT_TABLE,
                 x: 1,
                 y: 1,
                 label: "1",
@@ -55,13 +55,13 @@ describe("Table Management Functions", () => {
 
         it("should return an array of tables on the floor", () => {
             floor.addElement({
-                tag: ElementTag.RECT,
+                tag: FloorElementTypes.RECT_TABLE,
                 x: 1,
                 y: 1,
                 label: "1",
             });
             floor.addElement({
-                tag: ElementTag.CIRCLE,
+                tag: FloorElementTypes.ROUND_TABLE,
                 x: 1,
                 y: 1,
                 label: "1",
@@ -119,7 +119,7 @@ describe("Table Management Functions", () => {
             const tables = getTablesFromFloorDoc(floorDoc as unknown as FloorDoc);
             expect(tables).toEqual(expect.any(Array));
             tables.forEach((table) => {
-                expect(table.type).toBe(ElementTag.RECT);
+                expect(table.type).toBe(FloorElementTypes.RECT_TABLE);
             });
         });
     });
