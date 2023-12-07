@@ -25,7 +25,7 @@ interface RectTableElementOptions {
 }
 
 export class RectTable extends Group {
-    static type = FloorElementTypes.RECT_TABLE;
+    static override type = FloorElementTypes.RECT_TABLE;
     reservation: ReservationDoc | undefined;
     label: string;
     baseFill: string;
@@ -170,7 +170,7 @@ export class RectTable extends Group {
         };
     }
 
-    static async fromObject(object: any): Promise<RectTable> {
+    static override async fromObject(object: any): Promise<RectTable> {
         const rectOpts = object.objects[0];
         const textOpts = object.objects[1];
         return new RectTable({

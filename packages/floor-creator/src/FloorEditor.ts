@@ -85,7 +85,7 @@ export class FloorEditor extends Floor {
         this.gridDrawer.drawGrid(this.width, this.height);
     }
 
-    renderData(jsonData?: FloorDoc["json"]): void {
+    override renderData(jsonData?: FloorDoc["json"]): void {
         super.renderData(jsonData);
     }
 

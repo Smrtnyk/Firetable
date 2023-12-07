@@ -9,7 +9,7 @@ type WalLGroupCreationOptions = {
 } & Partial<GroupProps>;
 
 export class Wall extends Group {
-    static type = FloorElementTypes.WALL;
+    static override type = FloorElementTypes.WALL;
     wallRect: Rect;
 
     constructor(groupOpts: WalLGroupCreationOptions, wallRectOpts: WallCreationOptions = {}) {
@@ -33,11 +33,11 @@ export class Wall extends Group {
         this.canvas?.requestRenderAll();
     }
 
-    toObject(): any {
+    override toObject(): any {
         return super.toObject();
     }
 
-    static async fromObject(object: any): Promise<Wall> {
+    static override async fromObject(object: any): Promise<Wall> {
         const wallRect = object.objects[0];
         return new Wall(object, wallRect);
     }

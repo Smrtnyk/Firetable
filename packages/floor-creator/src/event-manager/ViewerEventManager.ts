@@ -12,7 +12,7 @@ export class ViewerEventManager extends EventManager {
         // NOOP here
     }
 
-    initializeCanvasEventHandlers(): void {
+    override initializeCanvasEventHandlers(): void {
         super.initializeCanvasEventHandlers();
     }
 }

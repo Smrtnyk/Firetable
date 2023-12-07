@@ -9,7 +9,7 @@ type SofaGroupCreationOpts = {
 } & Partial<GroupProps>;
 
 export class Sofa extends Group {
-    static type = FloorElementTypes.SOFA;
+    static override type = FloorElementTypes.SOFA;
     sofaBase: Rect;
 
     constructor(sofaGroupOpts: SofaGroupCreationOpts) {
@@ -42,7 +42,7 @@ export class Sofa extends Group {
         this.sofaBase = base;
     }
 
-    static async fromObject(object: any): Promise<Sofa> {
+    static override async fromObject(object: any): Promise<Sofa> {
         return new Sofa(object);
     }
 

@@ -19,7 +19,7 @@ interface CircleTableElementOptions {
 }
 
 export class RoundTable extends Group {
-    static type = FloorElementTypes.ROUND_TABLE;
+    static override type = FloorElementTypes.ROUND_TABLE;
     reservation: ReservationDoc | undefined;
     label: string;
     baseFill: string;
@@ -99,7 +99,7 @@ export class RoundTable extends Group {
         };
     }
 
-    static async fromObject(object: any): Promise<RoundTable> {
+    static override async fromObject(object: any): Promise<RoundTable> {
         const circleOptions = object.objects[0];
         const textOptions = object.objects[1];
         return new RoundTable({

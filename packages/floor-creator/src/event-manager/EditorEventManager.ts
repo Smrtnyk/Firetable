@@ -105,7 +105,7 @@ export class EditorEventManager extends EventManager {
         this.movingObjectStartPosition = null;
     };
 
-    initializeCanvasEventHandlers(): void {
+    override initializeCanvasEventHandlers(): void {
         super.initializeCanvasEventHandlers();
 
         this.floor.canvas.on("object:modified", this.snapToGridOnModify);

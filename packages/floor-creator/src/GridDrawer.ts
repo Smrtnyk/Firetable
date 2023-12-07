@@ -63,13 +63,15 @@ export class GridDrawer {
     };
 
     clearGrid(): void {
-        const objects = this.canvas.getObjects();
-        for (let i = objects.length - 1; i >= 0; i--) {
-            // @ts-expect-error -- custom prop
-            if (objects[i].isGridLine) {
-                this.canvas.remove(objects[i]);
-            }
-        }
+        this.canvas
+            .getObjects()
+            .filter((obj) => {
+                // @ts-expect-error -- custom prop
+                return obj.isGridLine;
+            })
+            .forEach((obj) => {
+                this.canvas.remove(obj);
+            });
         this.canvas.requestRenderAll();
     }
 }
