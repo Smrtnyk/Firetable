@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import type { CreateUserPayload, EditUserPayload, User } from "@firetable/types";
+
 import UserCreateForm from "src/components/admin/User/UserCreateForm.vue";
 import UserEditForm from "src/components/admin/User/UserEditForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
+import FTCenteredText from "src/components/FTCenteredText.vue";
+
 import { showConfirm, showErrorMessage, withLoading } from "src/helpers/ui-helpers";
-import { computed, onBeforeMount, watch } from "vue";
+import { computed, onBeforeMount, watch, onUnmounted } from "vue";
 import { Loading, useQuasar } from "quasar";
 import FTDialog from "src/components/FTDialog.vue";
 import { createUserWithEmail, deleteUser, updateUser } from "@firetable/backend";
@@ -13,7 +16,6 @@ import { useUsers } from "src/composables/useUsers";
 import { useAuthStore } from "src/stores/auth-store";
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
-import FTCenteredText from "src/components/FTCenteredText.vue";
 import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 
@@ -57,6 +59,12 @@ const onDeleteUser = withLoading(async (user: User) => {
 onBeforeMount(() => {
     if (!props.organisationId) {
         router.replace("/");
+    }
+});
+
+onUnmounted(() => {
+    if (Loading.isActive) {
+        Loading.hide();
     }
 });
 

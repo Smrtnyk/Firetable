@@ -12,7 +12,7 @@ import {
     tryCatchLoadingWrapper,
     withLoading,
 } from "src/helpers/ui-helpers";
-import { computed, onBeforeMount, ref, watch } from "vue";
+import { computed, onBeforeMount, ref, watch, onUnmounted } from "vue";
 import { Loading, useQuasar } from "quasar";
 import {
     createNewEvent,
@@ -96,6 +96,12 @@ watch(
     },
     { immediate: true },
 );
+
+onUnmounted(() => {
+    if (Loading.isActive) {
+        Loading.hide();
+    }
+});
 
 function fetchEventsForActiveTab(): void {
     if (eventsByProperty[activePropertyId.value]?.size !== 0) {

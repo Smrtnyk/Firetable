@@ -3,7 +3,7 @@ import type { Component } from "vue";
 import type { FloorEditor } from "@firetable/floor-creator";
 import type { FloorDoc } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { formatEventDate } from "src/helpers/date-utils";
 
@@ -13,6 +13,7 @@ import AdminEventReservationsByPerson from "src/components/admin/event/AdminEven
 import AdminEventEditInfo from "src/components/admin/event/AdminEventEditInfo.vue";
 import AdminEventFloorViewer from "src/components/admin/event/AdminEventFloorViewer.vue";
 import FTDialog from "src/components/FTDialog.vue";
+import AdminEventLogs from "src/components/admin/event/AdminEventLogs.vue";
 
 import { Loading, useQuasar } from "quasar";
 import { config } from "src/config";
@@ -23,7 +24,6 @@ import useAdminEvent from "src/composables/useAdminEvent";
 import { buttonSize, isMobile } from "src/global-reactives/screen-detection";
 import { truncateText } from "src/helpers/string-utils";
 import { compressFloorDoc } from "src/helpers/compress-floor-doc";
-import AdminEventLogs from "src/components/admin/event/AdminEventLogs.vue";
 
 interface Props {
     organisationId: string;
@@ -55,6 +55,12 @@ watch(
     },
     { immediate: true },
 );
+
+onUnmounted(() => {
+    if (Loading.isActive) {
+        Loading.hide();
+    }
+});
 
 function isEventFinished(eventTime: number): boolean {
     const eventFinishedLimit = new Date(eventTime);
