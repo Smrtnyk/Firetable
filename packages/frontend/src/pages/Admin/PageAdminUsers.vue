@@ -19,6 +19,13 @@ import { useI18n } from "vue-i18n";
 import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 
+interface BucketizedUsers {
+    [propertyId: string]: {
+        propertyName: string;
+        users: User[];
+    };
+}
+
 const props = defineProps<{ organisationId: string }>();
 
 const { t } = useI18n();
@@ -30,6 +37,22 @@ const { getOrganisations } = usePropertiesStore();
 
 const { users, isLoading, fetchUsers } = useUsers(props.organisationId);
 const { createDialog } = useDialog();
+
+const bucketizedUsers = computed((): BucketizedUsers => {
+    const buckets: BucketizedUsers = {};
+    users.value.forEach((user) => {
+        user.relatedProperties.forEach((propertyId) => {
+            const property = properties.value.find((p) => p.id === propertyId);
+            if (property) {
+                if (!buckets[propertyId]) {
+                    buckets[propertyId] = { propertyName: property.name, users: [] };
+                }
+                buckets[propertyId].users.push(user);
+            }
+        });
+    });
+    return buckets;
+});
 
 const properties = computed(() => {
     return allProperties.value.filter((property) => {
@@ -176,33 +199,42 @@ async function onUserSlideRight(user: User, reset: () => void): Promise<void> {
             </template>
         </FTTitle>
 
-        <q-list v-if="users.length > 0 && !isLoading">
-            <q-slide-item
-                v-for="user in users"
-                :key="user.id"
-                right-color="warning"
-                @right="({ reset }) => onUserSlideRight(user, reset)"
-                @left="({ reset }) => showEditUserDialog(user, reset)"
-                class="fa-card"
-            >
-                <template #right>
-                    <q-icon name="trash" />
-                </template>
+        <div v-if="Object.keys(bucketizedUsers).length > 0 && !isLoading">
+            <template v-for="bucket in Object.values(bucketizedUsers)" :key="bucket.propertyName">
+                <div class="property-section q-mb-md">
+                    <p class="q-ml-sm text-h6">{{ bucket.propertyName }}</p>
+                    <q-list>
+                        <q-slide-item
+                            v-for="user in bucket.users"
+                            :key="user.id"
+                            right-color="warning"
+                            @right="({ reset }) => onUserSlideRight(user, reset)"
+                            @left="({ reset }) => showEditUserDialog(user, reset)"
+                            class="fa-card"
+                        >
+                            <template #right>
+                                <q-icon name="trash" />
+                            </template>
 
-                <template #left>
-                    <q-icon name="pencil" />
-                </template>
+                            <template #left>
+                                <q-icon name="pencil" />
+                            </template>
 
-                <q-item clickable class="ft-card">
-                    <q-item-section>
-                        <q-item-label> {{ user.name }} - {{ user.email }} </q-item-label>
-                        <q-item-label caption> Role: {{ user.role }} </q-item-label>
-                    </q-item-section>
-                </q-item>
-            </q-slide-item>
-        </q-list>
+                            <q-item clickable class="ft-card">
+                                <q-item-section>
+                                    <q-item-label>
+                                        {{ user.name }} - {{ user.email }}
+                                    </q-item-label>
+                                    <q-item-label caption> Role: {{ user.role }} </q-item-label>
+                                </q-item-section>
+                            </q-item>
+                        </q-slide-item>
+                    </q-list>
+                </div>
+            </template>
+        </div>
 
-        <FTCenteredText v-if="users.length === 0 && !isLoading">
+        <FTCenteredText v-if="Object.keys(bucketizedUsers).length === 0 && !isLoading">
             {{ t("PageAdminUsers.noUsersCreatedMessage") }}
         </FTCenteredText>
     </div>
