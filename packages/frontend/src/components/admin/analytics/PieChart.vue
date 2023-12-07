@@ -15,7 +15,7 @@ const props = defineProps<{
 }>();
 
 const chartCanvas = ref<HTMLCanvasElement | null>(null);
-let chartInstance: Chart | null = null;
+let chartInstance: Chart<"pie", number[], unknown>;
 
 function drawChart(chartData: PieChartData): void {
     if (chartInstance) {

@@ -15,7 +15,7 @@ export interface User {
     role: Role | typeof ADMIN;
     relatedProperties: string[];
     organisationId: string;
-    capabilities?: UserCapabilities;
+    capabilities: UserCapabilities | undefined;
 }
 
 export interface EditUserPayload {
@@ -26,7 +26,7 @@ export interface EditUserPayload {
 
 export type CreateUserPayload = User & {
     password: string;
-    capabilities?: UserCapabilities;
+    capabilities: UserCapabilities | undefined;
 };
 
 export interface UserCapabilities {

@@ -6,7 +6,7 @@ import type {
     EventDoc,
 } from "@firetable/types";
 import type { PropertyFloors } from "src/composables/useFloors";
-import { computed, reactive, ref, watch, watchEffect } from "vue";
+import { computed, ref, watch, watchEffect } from "vue";
 
 import { useI18n } from "vue-i18n";
 import {
@@ -58,7 +58,7 @@ const isEditMode = computed(() => !!props.event);
 const { t } = useI18n();
 const router = useRouter();
 const form = ref<QForm>();
-const state = reactive<State>({
+const state = ref<State>({
     form: { ...eventObj },
     chosenFloors: [],
     showDateModal: false,
@@ -80,41 +80,41 @@ watchEffect(() => {
     if (isEditMode.value && props.event) {
         // Use event data if in edit mode
         const editDate = new Date(props.event.date);
-        state.form = {
+        state.value.form = {
             name: props.event.name,
             guestListLimit: props.event.guestListLimit,
             entryPrice: props.event.entryPrice,
-            img: props.event.img,
+            img: props.event.img || "",
             date: props.event.date,
         };
-        state.selectedDate = dateFromTimestamp(editDate.getTime());
-        state.selectedTime = hourFromTimestamp(editDate.getTime());
+        state.value.selectedDate = dateFromTimestamp(editDate.getTime());
+        state.value.selectedTime = hourFromTimestamp(editDate.getTime());
     } else {
-        state.form = { ...eventObj };
-        state.selectedDate = `${day}-${month}-${year}`;
-        state.selectedTime = hourFromTimestamp(newDate.getTime());
+        state.value.form = { ...eventObj };
+        state.value.selectedDate = `${day}-${month}-${year}`;
+        state.value.selectedTime = hourFromTimestamp(newDate.getTime());
     }
 });
 
-watch([() => state.selectedDate, () => state.selectedTime], () => {
-    if (!state.selectedDate) {
+watch([() => state.value.selectedDate, () => state.value.selectedTime], () => {
+    if (!state.value.selectedDate) {
         return;
     }
-    const [dayVal, monthVal, yearVal] = state.selectedDate.split("-");
-    const combinedDateTime = `${yearVal}-${monthVal}-${dayVal}T${state.selectedTime}:00Z`;
-    state.form.date = new Date(combinedDateTime).getTime();
+    const [dayVal, monthVal, yearVal] = state.value.selectedDate.split("-");
+    const combinedDateTime = `${yearVal}-${monthVal}-${dayVal}T${state.value.selectedTime}:00Z`;
+    state.value.form.date = new Date(combinedDateTime).getTime();
 });
 
 function updateDate(newDateVal: any): void {
-    state.selectedDate = newDateVal;
+    state.value.selectedDate = newDateVal;
 }
 
 function updateTime(newTime: any): void {
-    state.selectedTime = newTime;
+    state.value.selectedTime = newTime;
 }
 
 const displayedDate = computed(() => {
-    return `${state.selectedDate} ${state.selectedTime}`;
+    return `${state.value.selectedDate} ${state.value.selectedTime}`;
 });
 
 const totalFloors = computed(() => {
@@ -122,13 +122,13 @@ const totalFloors = computed(() => {
 });
 
 async function validateAndEmitCreate(): Promise<void> {
-    if (state.chosenFloors.length === 0) {
+    if (state.value.chosenFloors.length === 0) {
         showErrorMessage(t("EventCreateForm.noChosenFloorsMessage"));
         return;
     }
 
     const selectedFloors = Object.values(props.property.floors).filter((floor) =>
-        state.chosenFloors.includes(floor.id),
+        state.value.chosenFloors.includes(floor.id),
     );
 
     if (selectedFloors.length === 0) {
@@ -137,19 +137,19 @@ async function validateAndEmitCreate(): Promise<void> {
     }
 
     emit("create", {
-        ...state.form,
-        guestListLimit: Number(state.form.guestListLimit),
+        ...state.value.form,
+        guestListLimit: Number(state.value.form.guestListLimit),
         propertyId: props.property.propertyId,
         organisationId: props.property.organisationId,
         floors: selectedFloors,
     });
-    state.form = eventObj;
+    state.value.form = eventObj;
 }
 
 async function validateAndEmitEdit(): Promise<void> {
     emit("update", {
-        ...state.form,
-        guestListLimit: Number(state.form.guestListLimit),
+        ...state.value.form,
+        guestListLimit: Number(state.value.form.guestListLimit),
         propertyId: props.property.propertyId,
         organisationId: props.property.organisationId,
     });
@@ -166,7 +166,7 @@ async function onSubmit(): Promise<void> {
 }
 
 function onReset(): void {
-    state.form = { ...eventObj };
+    state.value.form = { ...eventObj };
 }
 </script>
 

@@ -36,7 +36,7 @@ const lightModeColors = {
 };
 
 const chartCanvas = ref<HTMLCanvasElement | undefined>();
-let chartInstance: Chart | null = null;
+let chartInstance: Chart | undefined;
 
 function drawChart(chartData: TimeSeriesData): void {
     if (chartInstance) {

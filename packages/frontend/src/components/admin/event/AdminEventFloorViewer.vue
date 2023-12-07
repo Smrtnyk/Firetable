@@ -47,9 +47,9 @@ interface Props {
 const selectedFloorElement = ref<FloorEditorElement | undefined>();
 const props = defineProps<Props>();
 const emit = defineEmits(["update"]);
-const floorContainerRef = ref<HTMLCanvasElement | null>(null);
-const viewerContainerRef = ref<HTMLDivElement | null>(null);
-const floorInstance = ref<FloorEditor | null>(null);
+const floorContainerRef = ref<HTMLCanvasElement | undefined>();
+const viewerContainerRef = ref<HTMLDivElement | undefined>();
+const floorInstance = ref<FloorEditor | undefined>();
 
 onMounted(() => {
     window.addEventListener("resize", resizeFloor);
@@ -73,7 +73,7 @@ function saveFloorState(): void {
 }
 
 async function onElementClick(
-    floor: Floor,
+    _floor: Floor,
     element: FloorEditorElement | undefined,
 ): Promise<void> {
     selectedFloorElement.value = undefined;

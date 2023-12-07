@@ -43,7 +43,7 @@ const canInteract = computed(() => {
     return [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN].includes(authStore.user!.role);
 });
 
-function onCreate(newGuestData: GuestData): Promise<void> | undefined {
+function onCreate(newGuestData: GuestData): Promise<void> | void {
     if (props.guestList.length >= props.guestListLimit) {
         showErrorMessage(t("EventGuestList.guestLimitReached"));
         return;

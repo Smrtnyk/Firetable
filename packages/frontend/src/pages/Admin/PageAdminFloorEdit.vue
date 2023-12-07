@@ -59,12 +59,12 @@ const NON_TABLE_EL_TO_ADD = [
 const props = defineProps<Props>();
 const router = useRouter();
 const q = useQuasar();
-const floorInstance = ref<FloorEditor | null>(null);
-const canvasRef = ref<HTMLCanvasElement | null>(null);
-const pageRef = ref<HTMLDivElement | null>(null);
+const floorInstance = ref<FloorEditor | undefined>();
+const canvasRef = ref<HTMLCanvasElement | undefined>();
+const pageRef = ref<HTMLDivElement | undefined>();
 const selectedElement = ref<FloorEditorElement | undefined>();
 const bulkMode = ref(false);
-const bulkElement = ref<ElementTag | null>(null);
+const bulkElement = ref<ElementTag | undefined>();
 const bulkLabelCounter = ref(0); // To auto-increment labels
 
 const floorPath = getFloorPath(props.organisationId, props.propertyId, props.floorId);
@@ -119,17 +119,18 @@ const resizeFloor = debounce((): void => {
 async function instantiateFloor(floorDoc: FloorDoc): Promise<void> {
     if (!canvasRef.value || !pageRef.value) return;
 
-    floorInstance.value = new FloorEditor({
+    const floorEditor = new FloorEditor({
         canvas: canvasRef.value,
         floorDoc: await decompressFloorDoc(floorDoc),
         containerWidth: pageRef.value.clientWidth,
     });
+    floorInstance.value = floorEditor;
 
-    floorInstance.value.on("elementClicked", elementClickHandler);
-    floorInstance.value.on("doubleClick", dblClickHandler);
-    floorInstance.value.on("commandChange", () => {
-        undoRedoState.canUndo = floorInstance.value!.canUndo();
-        undoRedoState.canRedo = floorInstance.value!.canRedo();
+    floorEditor.on("elementClicked", elementClickHandler);
+    floorEditor.on("doubleClick", dblClickHandler);
+    floorEditor.on("commandChange", () => {
+        undoRedoState.canUndo = floorEditor.canUndo();
+        undoRedoState.canRedo = floorEditor.canRedo();
     });
 }
 
@@ -260,7 +261,7 @@ function activateBulkMode(elementTag: ElementTag): void {
 
 function deactivateBulkMode(): void {
     bulkMode.value = false;
-    bulkElement.value = null;
+    bulkElement.value = undefined;
     bulkLabelCounter.value = 0;
 }
 

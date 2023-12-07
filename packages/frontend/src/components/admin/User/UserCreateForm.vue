@@ -54,6 +54,7 @@ function userSkeleton(): CreateUserPayload {
         role: Role.STAFF,
         relatedProperties: [],
         organisationId: "",
+        capabilities: undefined,
     };
 }
 

@@ -110,6 +110,7 @@ export const useAuthStore = defineStore("auth", () => {
             email: authUser.email!,
             relatedProperties: [],
             organisationId: "",
+            capabilities: undefined,
         };
         isAuthenticated.value = true;
         isReady.value = true;
