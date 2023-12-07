@@ -26,8 +26,8 @@
         "@firetable/types": "workspace:*",
         "@firetable/utils": "workspace:*",
         "@types/hammerjs": "2.0.45",
-        "@vitest/browser": "1.0.1",
-        "vitest": "1.0.1",
+        "@vitest/browser": "1.0.2",
+        "vitest": "1.0.2",
         "webdriverio": "8.24.12"
     },
     "keywords": [],
