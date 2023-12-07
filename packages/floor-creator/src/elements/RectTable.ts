@@ -5,7 +5,6 @@ import { SmoothBlinkAnimation } from "./animation/SmoothBlinkAnimation.js";
 import {
     FONT_SIZE,
     TABLE_TEXT_FILL_COLOR,
-    RESOLUTION,
     TABLE_WIDTH,
     TABLE_HEIGHT,
     ELEMENT_DEFAULT_FILL_COLOR,
@@ -75,40 +74,16 @@ export class RectTable extends Group {
     private handleScaling(): void {
         this.enforceStrokeWidth();
         this.enforceMinimumDimensions();
-        this.snapToGrid();
         this.adjustTextScaling();
     }
 
     private adjustTextScaling(): void {
-        // Inversely adjust the scaling of the textLabel
         this.textLabel.set({
             scaleX: 1 / this.scaleX,
             scaleY: 1 / this.scaleY,
         });
 
-        // Adjust the position to keep it centered
-        this.textLabel.set({
-            left: this.rect.left + this.rect.width / 2,
-            top: this.rect.top + this.rect.height / 2,
-        });
-
         this.canvas?.requestRenderAll();
-    }
-
-    private snapToGrid(): void {
-        const targetWidth = this.initialWidth * this.scaleX;
-        const targetHeight = this.initialHeight * this.scaleY;
-
-        const snappedWidth = Math.round(targetWidth / RESOLUTION) * RESOLUTION;
-        const snappedHeight = Math.round(targetHeight / RESOLUTION) * RESOLUTION;
-
-        const correctedScaleX = snappedWidth / this.initialWidth;
-        const correctedScaleY = snappedHeight / this.initialHeight;
-
-        this.set({
-            scaleX: correctedScaleX,
-            scaleY: correctedScaleY,
-        });
     }
 
     private enforceMinimumDimensions(): void {
