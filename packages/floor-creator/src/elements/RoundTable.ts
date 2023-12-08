@@ -31,7 +31,6 @@ export class RoundTable extends Group {
     private circle: Circle;
     private textLabel: FabricText;
     private animationStrategy: AnimationStrategy;
-    private readonly initialStrokeWidth: number;
 
     constructor(options: CircleTableElementOptions) {
         const baseFillComputed =
@@ -43,6 +42,7 @@ export class RoundTable extends Group {
             fill: baseFillComputed,
             stroke: ELEMENT_DEFAULT_STROKE_COLOR,
             strokeWidth: 0.5,
+            strokeUniform: true,
         });
         const textLabel = new FabricText(options.groupOptions.label, {
             ...options.textOptions,
@@ -60,21 +60,12 @@ export class RoundTable extends Group {
         this.textLabel = textLabel;
         this.label = options.groupOptions.label;
         this.baseFill = baseFillComputed;
-        this.initialStrokeWidth = tableCircle.strokeWidth || 2;
 
         this.on("scaling", this.handleScaling.bind(this));
     }
 
     private handleScaling(): void {
-        this.enforceStrokeWidth();
         this.adjustTextScaling();
-    }
-
-    private enforceStrokeWidth(): void {
-        const circle = this.item(0);
-        circle.set({
-            strokeWidth: this.initialStrokeWidth / Math.max(this.scaleX, this.scaleY),
-        });
     }
 
     private adjustTextScaling(): void {

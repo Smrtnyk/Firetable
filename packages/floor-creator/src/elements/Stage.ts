@@ -12,6 +12,7 @@ export class Stage extends Group {
             fill: "#222",
             stroke: "#111",
             strokeWidth: 1,
+            strokeUniform: true,
         });
 
         const decor = new Rect({

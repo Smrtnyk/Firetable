@@ -19,6 +19,7 @@ export class DJBooth extends Group {
             fill: "#1C1C1C",
             stroke: "#2F2F2F", // Dark Grey
             strokeWidth: 2,
+            strokeUniform: true,
         });
 
         const turntable2 = new Circle({
@@ -28,6 +29,7 @@ export class DJBooth extends Group {
             fill: "#1C1C1C",
             stroke: "#2F2F2F",
             strokeWidth: 2,
+            strokeUniform: true,
         });
 
         const djSign = new FabricText("DJ", {

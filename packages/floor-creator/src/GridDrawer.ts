@@ -27,8 +27,14 @@ export class GridDrawer {
         left: number,
         top: number,
     ): Line[] {
-        const lineOption = { stroke: "rgba(0,0,0,1)", strokeWidth: 0.5, selectable: false };
-        const lines = [];
+        const lineOption = {
+            stroke: "rgba(0,0,0,1)",
+            strokeUniform: true,
+            strokeWidth: 0.5,
+            selectable: false,
+            evented: false,
+        };
+        const lines: Line[] = [];
 
         for (let i = Math.ceil(width / gridSize); i--; ) {
             lines.push(new Line([gridSize * i, -top, gridSize * i, height], lineOption));

@@ -30,7 +30,6 @@ export class RectTable extends Group {
     reservation: ReservationDoc | undefined;
     label: string;
     baseFill: string;
-    private readonly initialStrokeWidth: number;
     private readonly initialWidth: number;
     private readonly initialHeight: number;
     private rect: Rect;
@@ -44,6 +43,7 @@ export class RectTable extends Group {
             fill: baseFillComputed,
             stroke: ELEMENT_DEFAULT_STROKE_COLOR,
             strokeWidth: 0.5,
+            strokeUniform: true,
         });
 
         const textLabel = new FabricText(options.groupOptions.label, {
@@ -66,13 +66,10 @@ export class RectTable extends Group {
         this.label = options.groupOptions.label;
         this.baseFill = baseFillComputed;
 
-        this.initialStrokeWidth = tableRect.strokeWidth || 2;
-
         this.on("scaling", this.handleScaling.bind(this));
     }
 
     private handleScaling(): void {
-        this.enforceStrokeWidth();
         this.enforceMinimumDimensions();
         this.adjustTextScaling();
     }
@@ -94,13 +91,6 @@ export class RectTable extends Group {
         if (this.scaleY * this.initialHeight < TABLE_HEIGHT) {
             this.scaleY = TABLE_HEIGHT / this.initialHeight;
         }
-    }
-
-    private enforceStrokeWidth(): void {
-        const tableRect = this.item(0);
-        tableRect.set({
-            strokeWidth: this.initialStrokeWidth / Math.max(this.scaleX, this.scaleY),
-        });
     }
 
     startAnimation(): void {

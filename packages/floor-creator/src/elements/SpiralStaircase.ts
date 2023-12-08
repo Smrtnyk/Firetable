@@ -39,6 +39,7 @@ export class SpiralStaircase extends Group {
                 {
                     fill: ELEMENT_DEFAULT_FILL_COLOR,
                     stroke: ELEMENT_DEFAULT_STROKE_COLOR,
+                    strokeUniform: true,
                     strokeWidth: 0.5,
                 },
             );

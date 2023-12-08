@@ -20,6 +20,7 @@ export class Sofa extends Group {
             height: 25 / 1.5,
             fill: ELEMENT_DEFAULT_FILL_COLOR,
             stroke: "#222",
+            strokeUniform: true,
             strokeWidth: 0.5,
             ...sofaBaseOpts,
             // Needs to stay like this all the time, otherwise element gets distorted
@@ -36,6 +37,7 @@ export class Sofa extends Group {
             height: 25 / 4,
             fill: ELEMENT_DEFAULT_FILL_COLOR,
             stroke: "#222",
+            strokeUniform: true,
             strokeWidth: 0.5,
         });
 
