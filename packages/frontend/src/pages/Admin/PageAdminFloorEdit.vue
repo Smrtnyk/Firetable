@@ -55,7 +55,7 @@ const NON_TABLE_EL_TO_ADD = [
     FloorElementTypes.WALL,
     FloorElementTypes.STAGE,
     FloorElementTypes.SPIRAL_STAIRCASE,
-    FloorElementTypes.WINDOW,
+    FloorElementTypes.DOOR,
 ];
 
 const props = defineProps<Props>();

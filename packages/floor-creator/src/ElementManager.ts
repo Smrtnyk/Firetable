@@ -8,12 +8,13 @@ import { RESOLUTION, TABLE_HEIGHT, TABLE_WIDTH } from "./constants";
 import { RectTable } from "./elements/RectTable";
 import { Stage } from "./elements/Stage";
 import { SpiralStaircase } from "./elements/SpiralStaircase";
+import { Door } from "./elements/Door";
 import { match } from "ts-pattern";
 
 export class ElementManager {
     addElement(
         options: CreateElementOptions,
-    ): RectTable | RoundTable | Wall | Sofa | DJBooth | SpiralStaircase {
+    ): RectTable | RoundTable | Wall | Sofa | DJBooth | SpiralStaircase | Door {
         return match(options.tag)
             .with(FloorElementTypes.RECT_TABLE, () => this.addRectTableElement(options))
             .with(FloorElementTypes.ROUND_TABLE, () => this.addRoundTableElement(options))
@@ -22,7 +23,12 @@ export class ElementManager {
             .with(FloorElementTypes.WALL, () => this.addWall(options))
             .with(FloorElementTypes.STAGE, () => this.addStageElement(options))
             .with(FloorElementTypes.SPIRAL_STAIRCASE, () => this.addSpiralStaircaseElement(options))
+            .with(FloorElementTypes.DOOR, () => this.addDoor(options))
             .exhaustive();
+    }
+
+    private addDoor({ x, y }: CreateElementOptions): Door {
+        return new Door(x, y);
     }
 
     private addWall({ x, y }: CreateElementOptions): Wall {

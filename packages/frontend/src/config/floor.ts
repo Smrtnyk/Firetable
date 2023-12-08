@@ -44,10 +44,10 @@ export const ELEMENTS_TO_ADD_COLLECTION = [
         },
     },
     {
-        label: "Add Spiral Staircase",
-        img: "/svg-images/spiral-staircase.png",
+        label: "Add Door",
+        img: "/svg-images/door.svg",
         elementDescriptor: {
-            tag: FloorElementTypes.SPIRAL_STAIRCASE,
+            tag: FloorElementTypes.DOOR,
         },
     },
 ];

@@ -29,6 +29,7 @@ export enum FloorElementTypes {
     STAGE = "Stage",
     WALL = "Wall",
     SPIRAL_STAIRCASE = "SpiralStaircase",
+    DOOR = "Door",
 }
 
 export type NumberTuple = [number, number];
