@@ -42,7 +42,9 @@ const router = useRouter();
 const q = useQuasar();
 const pageRef = ref<HTMLDivElement>();
 
-const guestList = useFirestoreCollection<GuestData>(getEventGuestListPath(eventOwner));
+const guestList = useFirestoreCollection<GuestData>(getEventGuestListPath(eventOwner), {
+    wait: true,
+});
 const { data: event, promise: eventDataPromise } = useFirestoreDocument<EventDoc>(
     getEventPath(eventOwner),
 );
@@ -51,7 +53,7 @@ const {
     data: reservations,
     promise: reservationsDataPromise,
     error: reservationsDataError,
-} = useFirestoreCollection<ReservationDoc>(getReservationsPath(eventOwner));
+} = useFirestoreCollection<ReservationDoc>(getReservationsPath(eventOwner), { wait: true });
 
 const {
     onTableFound,

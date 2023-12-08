@@ -1,4 +1,5 @@
 import type { Query, DocumentData, DocumentReference } from "firebase/firestore";
+import type { UseCollectionOptions } from "vuefire/dist/index";
 import { collection, doc, query, setDoc } from "firebase/firestore";
 import { initializeFirebase } from "@firetable/backend";
 import { useCollection, useDocument } from "vuefire";
@@ -6,7 +7,7 @@ import { isString } from "@firetable/utils";
 
 export function useFirestoreCollection<T extends DocumentData>(
     path: string | Query<T>,
-    options = {},
+    options: UseCollectionOptions = {},
 ) {
     const mergedOpts = { ...options, maxRefDepth: 20 };
     const { firestore } = initializeFirebase();
