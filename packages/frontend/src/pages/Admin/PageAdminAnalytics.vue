@@ -150,9 +150,10 @@ const consumptionAnalysisCombined = computed(() => {
     let unconfirmedCount = 0;
 
     reservationsByActiveProperty.value.forEach((reservation) => {
-        totalConsumption += reservation.consumption;
+        const consumption = Number(reservation.consumption);
+        totalConsumption += consumption;
         if (reservation.confirmed) {
-            confirmedConsumption += reservation.consumption;
+            confirmedConsumption += consumption;
             confirmedCount++;
         } else {
             unconfirmedCount++;
