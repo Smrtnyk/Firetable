@@ -91,8 +91,6 @@ module.exports = {
         ],
         "@typescript-eslint/func-call-spacing": ["error", "never"],
         // In favor of prettier
-        "@typescript-eslint/indent": "off",
-        "@typescript-eslint/member-delimiter-style": "off",
         "@typescript-eslint/no-empty-function": "warn",
         "@typescript-eslint/no-empty-interface": "error",
         "@typescript-eslint/no-require-imports": "error",
@@ -132,18 +130,14 @@ module.exports = {
         "@typescript-eslint/type-annotation-spacing": "error",
         "@typescript-eslint/no-shadow": ["error"],
         "@typescript-eslint/unified-signatures": "error",
-        "no-shadow": "off",
-        // "arrow-body-style": ["error", "always"],
         "arrow-spacing": ["error", { "before": true, "after": true }],
         "brace-style": "error",
-        "comma-dangle": "off",
-        "comma-spacing": "off", // Off in the favor of @typescript-eslint/comma-spacing
         "constructor-super": "error",
         "curly": "error",
         "eol-last": "error",
         "eqeqeq": ["error", "smart"],
-        "func-call-spacing": "off", // Off in the favor of @typescript-eslint/func-call-spacing
         "guard-for-in": "error",
+        "import/no-unresolved": "off",
         "import/no-duplicates": "error",
         "import/order": [
             "error",
@@ -160,8 +154,6 @@ module.exports = {
                 ]
             }
         ],
-        "import/no-unresolved": "off",
-        "indent": "off", // Off in the favor of @typescript-eslint/indent
         "key-spacing": "error",
         "keyword-spacing": [
             "error",
@@ -170,7 +162,6 @@ module.exports = {
                 "after": true,
             },
         ],
-        "max-classes-per-file": "off",
         "max-len": [
             "error",
             {
@@ -181,15 +172,9 @@ module.exports = {
         "new-parens": "error",
         "no-bitwise": "error",
         "no-caller": "error",
-        "no-case-declarations": "off",
         "no-cond-assign": "error",
-        "no-console": "off",
-        "no-control-regex": "off",
         "no-debugger": "error",
-        "no-dupe-class-members": "off",
         "no-duplicate-case": "error",
-        "no-duplicate-imports": "off",
-        "no-empty": "off",
         "no-eval": "error",
         "no-extra-bind": "error",
         "no-extra-parens": 0,
@@ -200,7 +185,6 @@ module.exports = {
         "no-multiple-empty-lines": "error",
         "no-new-func": "error",
         "no-new-wrappers": "error",
-        "no-prototype-builtins": "off",
         "no-redeclare": "error",
         "no-return-await": "error",
         "no-sequences": "error",
@@ -209,23 +193,15 @@ module.exports = {
         "no-template-curly-in-string": "error",
         "no-throw-literal": "error",
         "no-trailing-spaces": "error",
-        "no-undef": "off", // Off in favor of typescript compiler
         "no-undef-init": "error",
         "no-unsafe-finally": "error",
-        "no-unused-expressions": "off", // Off in favor of @typescript-eslint/no-unused-expressions
-        "no-unused-vars": "off",
         "no-unused-labels": "error",
-        "no-useless-escape": "off",
         "no-var": "error",
         "object-curly-spacing": ["error", "always"],
         "one-var": ["error", "never"],
         "prefer-const": "error",
-        "quotes": "off",
         "radix": "error",
-        "require-atomic-updates": "off",
-        "semi": "off",
         "space-before-blocks": "error",
-        "space-before-function-paren": "off",
         "space-infix-ops": "error",
         "spaced-comment": ["error", "always", { "markers": ["/"] }],
         "use-isnan": "error",
