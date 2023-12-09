@@ -75,6 +75,7 @@ export function useReservations(
                 }
             }
         }
+        checkReservationsForTimeAndMarkTableIfNeeded();
     }
 
     function isOwnReservation(reservation: Reservation): boolean {
@@ -310,12 +311,14 @@ export function useReservations(
         const baseEventDate = new Date(event.value.date);
 
         reservations.value.forEach((reservation) => {
-            if (
-                reservation.confirmed ||
-                !shouldMarkReservationAsExpired(reservation.time, baseEventDate)
-            ) {
+            if (reservation.confirmed) {
                 return;
             }
+
+            if (!shouldMarkReservationAsExpired(reservation.time, baseEventDate)) {
+                return;
+            }
+
             const floor = floorInstances.value.find(({ id }) => id === reservation.floorId);
             const table = floor?.getTableByLabel(reservation.tableLabel);
             table?.setFill("red");
@@ -429,7 +432,6 @@ export function useReservations(
     });
 
     return {
-        checkReservationsForTimeAndMarkTableIfNeeded,
         tableClickHandler,
         // Used in unit test
         onDeleteReservation,
@@ -441,7 +443,7 @@ function shouldMarkReservationAsExpired(reservationTime: string, eventDate: Date
     const currentDate = new Date();
     const [hours, minutes] = reservationTime.split(":");
     const eventDateTime = new Date(eventDate);
-    eventDateTime.setHours(Number.parseInt(hours, 10), Number.parseInt(minutes, 10));
+    eventDateTime.setHours(Number.parseInt(hours), Number.parseInt(minutes));
 
     if (hours.startsWith("0")) {
         eventDateTime.setDate(eventDateTime.getDate() + 1);

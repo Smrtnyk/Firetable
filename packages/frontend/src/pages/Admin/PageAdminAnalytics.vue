@@ -123,7 +123,7 @@ const peakReservationHours = computed((): TimeSeriesData => {
     });
 
     const sortedHours = Object.keys(hourlyTotals).sort(
-        (a, b) => Number.parseInt(a, 10) - Number.parseInt(b, 10),
+        (a, b) => Number.parseInt(a) - Number.parseInt(b),
     );
     const data = sortedHours.map((hour) => hourlyTotals[hour]);
     const hoursCount = sortedHours.length;

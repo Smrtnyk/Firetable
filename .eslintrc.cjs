@@ -200,7 +200,7 @@ module.exports = {
         "object-curly-spacing": ["error", "always"],
         "one-var": ["error", "never"],
         "prefer-const": "error",
-        "radix": "error",
+        "radix": ["error", "as-needed"],
         "space-before-blocks": "error",
         "space-infix-ops": "error",
         "spaced-comment": ["error", "always", { "markers": ["/"] }],

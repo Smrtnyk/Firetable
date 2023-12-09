@@ -31,7 +31,7 @@ export function useFloorsPageEvent(
     const activeFloor = ref<{ id: string; name: string } | undefined>();
     const floorInstances = shallowRef<FloorViewer[]>([]);
     const { users } = useUsers(eventOwner.organisationId);
-    const { tableClickHandler, checkReservationsForTimeAndMarkTableIfNeeded } = useReservations(
+    const { tableClickHandler } = useReservations(
         users,
         reservations,
         floorInstances,
@@ -82,7 +82,6 @@ export function useFloorsPageEvent(
         await nextTick();
         await instantiateFloors();
         setActiveFloor(floorInstances.value[0] as FloorViewer);
-        checkReservationsForTimeAndMarkTableIfNeeded();
     }
 
     async function handleFloorInstancesData(newVal: FloorDoc[], old: FloorDoc[]): Promise<void> {
