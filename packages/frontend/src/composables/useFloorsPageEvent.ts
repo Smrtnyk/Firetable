@@ -27,7 +27,6 @@ export function useFloorsPageEvent(
     eventOwner: EventOwner,
     event: Ref<VueFirestoreDocumentData<EventDoc> | undefined>,
 ) {
-    const activeTablesAnimationInterval = ref<number | undefined>();
     const activeFloor = ref<{ id: string; name: string } | undefined>();
     const floorInstances = shallowRef<FloorViewer[]>([]);
     const { users } = useUsers(eventOwner.organisationId);
@@ -125,9 +124,6 @@ export function useFloorsPageEvent(
     }
 
     function onAutocompleteClear(): void {
-        if (activeTablesAnimationInterval.value) {
-            clearInterval(activeTablesAnimationInterval.value);
-        }
         floorInstances.value.forEach((floor) => {
             const tables = getTables(floor as FloorViewer);
             tables.forEach((table) => table.stopAnimation());
