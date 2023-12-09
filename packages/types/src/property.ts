@@ -1,4 +1,4 @@
-import { QueryDocumentSnapshot } from "firebase/firestore";
+import type { QueryDocumentSnapshot } from "firebase/firestore";
 
 export interface PropertyDoc {
     id: string;
