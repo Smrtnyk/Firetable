@@ -40,30 +40,9 @@ export class TouchManager {
     };
 
     private onDoubleTap = (ev: HammerInput): void => {
-        const { x, y } = this.extractEventCoordinates(ev);
+        const { x, y } = this.floor.canvas.getScenePoint(ev.srcEvent);
         this.floor.onFloorDoubleTap([x, y]);
     };
-
-    private extractEventCoordinates(ev: HammerInput): {
-        x: number;
-        y: number;
-    } {
-        // Get the bounding rectangle of the canvas
-        const boundingRect = this.floor.canvas.lowerCanvasEl.getBoundingClientRect();
-
-        // Calculate the client-relative coordinates
-        let x = ev.center.x - boundingRect.left;
-        let y = ev.center.y - boundingRect.top;
-
-        // Adjust for zoom and viewport position
-        if (this.floor.canvas.viewportTransform) {
-            const zoom = this.floor.canvas.getZoom();
-            x = (x - this.floor.canvas.viewportTransform[4]) / zoom;
-            y = (y - this.floor.canvas.viewportTransform[5]) / zoom;
-        }
-
-        return { x, y };
-    }
 
     private onPinch = throttle((ev: HammerInput) => {
         this.isInteracting = true;
