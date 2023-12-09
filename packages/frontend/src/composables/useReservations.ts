@@ -107,6 +107,7 @@ export function useReservations(
             hook: async function () {
                 await updateReservationDoc(eventOwner, reservationData);
                 notifyPositive("Reservation updated");
+                createEventLog(`Reservation edited on table ${reservationData.tableLabel}`);
             },
         });
     }

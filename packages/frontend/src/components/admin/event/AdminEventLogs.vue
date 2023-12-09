@@ -36,6 +36,10 @@ function getIconNameForLogEntry(logMessage: string): string {
         return "plus";
     }
 
+    if (logMessage.includes("edited")) {
+        return "pencil";
+    }
+
     return "";
 }
 
