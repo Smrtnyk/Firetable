@@ -328,6 +328,7 @@ function triggerFileInput(): void {
             >
                 <template #append>
                     <q-btn
+                        v-if="isTablet"
                         class="button-gradient"
                         @click="onFloorSave"
                         label="save"
@@ -345,6 +346,16 @@ function triggerFileInput(): void {
             :existing-labels="new Set(extractAllTablesLabels(floorInstance as FloorEditor))"
         >
             <template #buttons>
+                <q-btn
+                    v-if="!isTablet"
+                    class="button-gradient q-mb-md"
+                    icon="save"
+                    @click="onFloorSave"
+                    label="save"
+                    rounded
+                    :size="buttonSize"
+                />
+
                 <q-input
                     v-if="!isTablet"
                     @keydown.prevent
