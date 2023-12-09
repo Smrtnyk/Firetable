@@ -49,14 +49,7 @@ const addNewElementsBottomSheetOptions = {
     actions: ELEMENTS_TO_ADD_COLLECTION,
 };
 
-const NON_TABLE_EL_TO_ADD = [
-    FloorElementTypes.SOFA,
-    FloorElementTypes.DJ_BOOTH,
-    FloorElementTypes.WALL,
-    FloorElementTypes.STAGE,
-    FloorElementTypes.SPIRAL_STAIRCASE,
-    FloorElementTypes.DOOR,
-];
+const TABLE_EL_TO_ADD = [FloorElementTypes.RECT_TABLE, FloorElementTypes.ROUND_TABLE];
 
 const props = defineProps<Props>();
 const router = useRouter();
@@ -200,13 +193,11 @@ function showTableDialog(floorVal: FloorEditor, [x, y]: NumberTuple, tag: FloorE
 function handleAddNewElement(floorVal: FloorEditor, [x, y]: NumberTuple) {
     return function ({ elementDescriptor }: BottomSheetTableClickResult) {
         const { tag } = elementDescriptor;
-
-        if (NON_TABLE_EL_TO_ADD.includes(tag)) {
-            floorVal.addElement({ x, y, tag });
+        if (TABLE_EL_TO_ADD.includes(tag)) {
+            showTableDialog(floorVal, [x, y], tag);
             return;
         }
-
-        showTableDialog(floorVal, [x, y], tag);
+        floorVal.addElement({ x, y, tag });
     };
 }
 
