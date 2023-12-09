@@ -228,10 +228,8 @@ function onDeleteElement(element: FloorEditorElement): void {
 
 function toggleBulkMode(): void {
     if (bulkMode.value) {
-        // If already in bulk mode, deactivate it
         deactivateBulkMode();
     } else {
-        // If not in bulk mode, show the bottom sheet to select an element for bulk addition
         q.bottomSheet({ ...addNewElementsBottomSheetOptions, actions: BULK_ADD_COLLECTION }).onOk(
             ({ elementDescriptor }: BottomSheetTableClickResult) => {
                 activateBulkMode(elementDescriptor.tag);
@@ -244,7 +242,6 @@ function activateBulkMode(elementTag: FloorElementTypes): void {
     bulkMode.value = true;
     bulkElement.value = elementTag;
 
-    // Get all current labels using the helper function
     const labels = extractAllTablesLabels(floorInstance.value as FloorEditor);
     // Convert labels to numbers only if they are numeric and find the maximum
     const numericLabels = labels.map((label) => Number.parseInt(label, 10)).filter(isNumber);
