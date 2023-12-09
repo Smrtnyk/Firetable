@@ -1,6 +1,7 @@
 import type { Canvas } from "fabric";
 import { RESOLUTION } from "./constants";
 import { Line, Group } from "fabric";
+import { propIsTruthy } from "@firetable/utils";
 
 export class GridDrawer {
     private canvas: Canvas;
@@ -72,10 +73,8 @@ export class GridDrawer {
     clearGrid(): void {
         this.canvas
             .getObjects()
-            .filter((obj) => {
-                // @ts-expect-error -- custom prop
-                return obj.isGridLine;
-            })
+            // @ts-expect-error - custom set prop
+            .filter(propIsTruthy("isGridLine"))
             .forEach((obj) => {
                 this.canvas.remove(obj);
             });
