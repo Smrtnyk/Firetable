@@ -13,7 +13,7 @@ interface Props {
 const authStore = useAuthStore();
 const props = defineProps<Props>();
 const emit = defineEmits<{
-    (e: "delete" | "edit" | "transfer"): void;
+    (e: "delete" | "edit" | "transfer" | "copy"): void;
     (e: "confirm", confirmed: boolean): void;
 }>();
 const { t } = useI18n();
@@ -120,14 +120,22 @@ function onReservationConfirm(): void {
                     v-close-popup
                 />
             </div>
-            <q-btn
-                :title="t('Global.transfer')"
-                v-if="authStore.canReserve"
-                icon="transfer"
-                color="primary"
-                @click="() => emit('transfer')"
-                v-close-popup
-            />
+            <div v-if="authStore.canReserve" class="row q-gutter-sm full-width justify-end">
+                <q-btn
+                    :title="t('Global.transfer')"
+                    icon="transfer"
+                    color="primary"
+                    @click="() => emit('transfer')"
+                    v-close-popup
+                />
+                <q-btn
+                    :title="t('Global.copy')"
+                    icon="copy"
+                    color="primary"
+                    @click="() => emit('copy')"
+                    v-close-popup
+                />
+            </div>
         </q-item>
     </q-card-section>
 </template>

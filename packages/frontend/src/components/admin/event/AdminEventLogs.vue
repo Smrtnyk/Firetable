@@ -9,9 +9,9 @@ interface Props {
     logsDoc: EventLogsDoc;
 }
 const props = defineProps<Props>();
-const autStore = useAuthStore();
+const authStore = useAuthStore();
 const logs = computed(() => {
-    if (autStore.user?.role === ADMIN) {
+    if (authStore.user?.role === ADMIN) {
         return props.logsDoc.logs;
     }
     return props.logsDoc.logs.filter((log) => {
@@ -38,6 +38,10 @@ function getIconNameForLogEntry(logMessage: string): string {
 
     if (logMessage.includes("edited")) {
         return "pencil";
+    }
+
+    if (logMessage.includes("copied")) {
+        return "copy";
     }
 
     return "";

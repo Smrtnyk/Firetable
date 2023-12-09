@@ -4,13 +4,13 @@ import type { BaseTable, Floor, FloorEditorElement, FloorViewer } from "@firetab
 import type { EventOwner } from "@firetable/backend";
 import type { DialogChainObject } from "quasar";
 import type { VueFirestoreDocumentData } from "vuefire";
+import { computed, onBeforeUnmount, watch, ref } from "vue";
 import {
     addLogToEvent,
     addReservation,
     deleteReservation,
     updateReservationDoc,
 } from "@firetable/backend";
-import { computed, onBeforeUnmount, watch, ref } from "vue";
 import { isTable } from "@firetable/floor-creator";
 import { useQuasar } from "quasar";
 import {
@@ -43,6 +43,9 @@ export function useReservations(
     // check every 1 minute
     const intervalID = setInterval(checkReservationsForTimeAndMarkTableIfNeeded, 60 * 1000);
     const crossFloorReservationTransferTable = ref<
+        { table: BaseTable; floor: FloorViewer } | undefined
+    >();
+    const crossFloorReservationCopyTable = ref<
         { table: BaseTable; floor: FloorViewer } | undefined
     >();
 
@@ -224,6 +227,12 @@ export function useReservations(
                             floor,
                         };
                     },
+                    copy() {
+                        crossFloorReservationCopyTable.value = {
+                            table: element,
+                            floor,
+                        };
+                    },
                     confirm: onReservationConfirm(reservation),
                 },
             },
@@ -241,6 +250,27 @@ export function useReservations(
                     }),
             });
         };
+    }
+
+    async function copyReservation(
+        sourceReservation: Reservation,
+        targetTable: BaseTable,
+        targetFloor: Floor,
+    ): Promise<void> {
+        const newReservation = {
+            ...sourceReservation,
+            tableLabel: targetTable.label,
+            floorId: targetFloor.id,
+        };
+
+        await tryCatchLoadingWrapper({
+            hook: async function () {
+                await addReservation(eventOwner, newReservation);
+                createEventLog(
+                    `Reservation copied from table ${sourceReservation.tableLabel} to table ${targetTable.label}`,
+                );
+            },
+        });
     }
 
     async function swapOrTransferReservations(
@@ -378,11 +408,55 @@ export function useReservations(
         });
     }
 
+    async function handleCrossFloorReservationCopy(
+        targetFloor: FloorViewer,
+        targetTable: BaseTable,
+    ): Promise<void> {
+        if (!crossFloorReservationCopyTable.value) {
+            return;
+        }
+
+        const { table, floor } = crossFloorReservationCopyTable.value;
+
+        if (table.label === targetTable.label && floor.id === targetFloor.id) {
+            showErrorMessage("Cannot copy reservation to the same table!");
+            return;
+        }
+
+        if (targetTable.reservation) {
+            showErrorMessage("Cannot copy reservation to an already reserved table!");
+            return;
+        }
+
+        const transferMessage = `This will copy reservation from table ${table.label} to table ${targetTable.label}`;
+        const shouldTransfer = await showConfirm("Transfer reservation", transferMessage);
+
+        if (!shouldTransfer) {
+            return;
+        }
+
+        const reservation = reservations.value.find((res) => {
+            return res.tableLabel === table.label && res.floorId === floor.id;
+        });
+
+        if (!reservation) {
+            return;
+        }
+
+        await copyReservation(reservation, targetTable, targetFloor);
+    }
+
     async function tableClickHandler(
         floor: FloorViewer,
         element: FloorEditorElement | undefined,
     ): Promise<void> {
         if (!isTable(element)) return;
+
+        if (crossFloorReservationCopyTable.value) {
+            await handleCrossFloorReservationCopy(floor, element);
+            crossFloorReservationCopyTable.value = undefined;
+            return;
+        }
 
         if (await handleCrossFloorReservationTransfer(floor, element)) {
             crossFloorReservationTransferTable.value = undefined;

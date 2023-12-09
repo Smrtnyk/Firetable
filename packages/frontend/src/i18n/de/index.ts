@@ -3,6 +3,7 @@ export default {
         fullScreen: "Vollbild",
         edit: "Bearbeiten",
         transfer: "Übertragen",
+        copy: "Kopieren",
         delete: "Löschen",
     },
     AppDrawer: {
