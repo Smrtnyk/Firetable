@@ -319,6 +319,7 @@ function triggerFileInput(): void {
     <div class="PageAdminFloorEdit" ref="pageRef">
         <div v-if="floorInstance" class="justify-between q-mb-sm">
             <q-input
+                v-if="isTablet"
                 standout
                 rounded
                 label="Floor name"
@@ -328,7 +329,6 @@ function triggerFileInput(): void {
             >
                 <template #append>
                     <q-btn
-                        v-if="isTablet"
                         class="button-gradient"
                         @click="onFloorSave"
                         label="save"
@@ -354,6 +354,16 @@ function triggerFileInput(): void {
                     label="save"
                     rounded
                     :size="buttonSize"
+                />
+                <q-input
+                    v-if="!isTablet"
+                    standout
+                    rounded
+                    label="Floor name"
+                    @update:model-value="(event) => onFloorChange('name', event)"
+                    :model-value="floorInstance.name"
+                    :dense="isMobile"
+                    class="q-ma-xs"
                 />
 
                 <q-input
