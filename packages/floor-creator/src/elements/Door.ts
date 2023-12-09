@@ -2,7 +2,7 @@ import { ELEMENT_DEFAULT_STROKE_COLOR } from "../constants";
 import { Group, Line, Path } from "fabric";
 
 export class Door extends Group {
-    constructor(top: number, left: number) {
+    constructor(left: number, top: number) {
         const doorLine = new Line([0, 0, 0, 50], {
             stroke: ELEMENT_DEFAULT_STROKE_COLOR,
             strokeWidth: 5,
