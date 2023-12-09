@@ -106,7 +106,7 @@ function onReservationConfirm(): void {
             <div v-if="props.canDeleteReservation" class="row q-gutter-sm full-width">
                 <q-btn
                     :title="t('Global.delete')"
-                    class="no-wrap"
+                    class="no-wrap q-ml-none"
                     icon="trash"
                     color="negative"
                     @click="() => emit('delete')"
