@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { EventDoc, FloorDoc, GuestData, ReservationDoc } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
+import type { TouchPanValue } from "quasar";
 import EventGuestList from "src/components/Event/EventGuestList.vue";
 import FTAutocomplete from "src/components/Event/FTAutocomplete.vue";
 import EventInfo from "src/components/Event/EventInfo.vue";
@@ -21,6 +22,7 @@ import {
 } from "@firetable/backend";
 import { isMobile } from "src/global-reactives/screen-detection";
 import { showErrorMessage } from "src/helpers/ui-helpers";
+import { useAuthStore } from "src/stores/auth-store";
 
 interface Props {
     organisationId: string;
@@ -37,6 +39,7 @@ const eventOwner: EventOwner = {
 };
 
 const showMapsExpanded = ref(false);
+const authStore = useAuthStore();
 const eventsStore = useEventsStore();
 const router = useRouter();
 const q = useQuasar();
@@ -54,6 +57,9 @@ const {
     promise: reservationsDataPromise,
     error: reservationsDataError,
 } = useFirestoreCollection<ReservationDoc>(getReservationsPath(eventOwner), { wait: true });
+
+const fabPos = ref([18, 18]);
+const draggingFab = ref(false);
 
 const {
     onTableFound,
@@ -99,11 +105,48 @@ async function init(): Promise<void> {
     }
 }
 
+const moveFab: TouchPanValue = (ev) => {
+    draggingFab.value = !ev.isFirst && ev.isFinal !== true;
+
+    fabPos.value = [fabPos.value[0] - (ev.delta?.x ?? 0), fabPos.value[1] - (ev.delta?.y ?? 0)];
+};
+
 onMounted(init);
 </script>
 
 <template>
     <div v-if="event" class="PageEvent flex column justify-between" ref="pageRef">
+        <q-page-sticky
+            v-if="authStore.isAdmin"
+            position="bottom-right"
+            :offset="fabPos"
+            style="z-index: 999999"
+        >
+            <q-fab
+                icon="chevron_left"
+                direction="left"
+                vertical-actions-align="center"
+                color="primary"
+                :disable="draggingFab"
+                v-touch-pan.prevent.mouse="moveFab"
+                padding="sm"
+            >
+                <q-fab-action
+                    :to="{
+                        name: 'adminEvent',
+                        params: {
+                            organisationId: eventOwner.organisationId,
+                            propertyId: eventOwner.propertyId,
+                            eventId: eventOwner.id,
+                        },
+                    }"
+                    color="primary"
+                    label="View in manager"
+                    :disable="draggingFab"
+                />
+            </q-fab>
+        </q-page-sticky>
+
         <div class="row items-center q-mb-sm q-gutter-sm">
             <q-fab
                 v-if="hasMultipleFloorPlans"
