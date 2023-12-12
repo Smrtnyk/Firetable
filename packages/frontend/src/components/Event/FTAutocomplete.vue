@@ -56,11 +56,13 @@ function removeFocus(): void {
     });
 }
 
-function getNamesFromReservations(reservations: Reservation[]): { label: string; value: string }[] {
+function getNamesFromReservations(
+    reservations: Reservation[],
+): { label: string; value: Reservation }[] {
     return reservations.map((reservation) => {
         return {
             label: createTableLabel(reservation),
-            value: reservation.guestName,
+            value: reservation,
         };
     });
 }
@@ -74,9 +76,9 @@ function createTableLabel(reservation: Reservation): string {
     return label;
 }
 
-function findSearchedTable(inputVal: string | { value: string }): Reservation[] {
+function findSearchedTable(inputVal: string | { value: Reservation }): Reservation[] {
     // Determine the value to match against
-    const val = typeof inputVal === "string" ? inputVal : inputVal.value;
+    const val = typeof inputVal === "string" ? inputVal : inputVal.value.guestName;
     const normalizedVal = val.toLowerCase().trim();
 
     if (typeof inputVal === "object") {
@@ -86,10 +88,12 @@ function findSearchedTable(inputVal: string | { value: string }): Reservation[] 
         if (normalizedVal.length > 0) {
             removeFocus();
         }
-
         // Return only the table that matches the guestName exactly
         return props.allReservedTables.filter((reservation) => {
-            return reservation.guestName.toLowerCase() === normalizedVal;
+            return (
+                reservation.guestName.toLowerCase() === normalizedVal &&
+                reservation.floorId === inputVal.value.floorId
+            );
         });
     } else {
         // If inputVal is a string, perform the original filtering logic
@@ -113,9 +117,9 @@ function filterFn(val: string, update: any): void {
         options.value = filteredTables
             .map((reservation) => ({
                 label: createTableLabel(reservation),
-                value: reservation.guestName,
+                value: reservation,
             }))
-            .filter((option) => option.value.toLowerCase().includes(loweredVal));
+            .filter((option) => option.value.guestName.toLowerCase().includes(loweredVal));
     });
 }
 
