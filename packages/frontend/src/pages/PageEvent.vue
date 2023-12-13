@@ -10,7 +10,7 @@ import FTDialog from "src/components/FTDialog.vue";
 import { Loading, useQuasar } from "quasar";
 
 import { useRouter } from "vue-router";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, onUnmounted } from "vue";
 import { useEventsStore } from "src/stores/events-store";
 import { useFirestoreCollection, useFirestoreDocument } from "src/composables/useFirestore";
 import { useFloorsPageEvent } from "src/composables/useFloorsPageEvent";
@@ -102,7 +102,9 @@ async function init(): Promise<void> {
     if (reservationsDataError.value) {
         showErrorMessage(reservationsDataError);
         await router.replace("/");
+        return;
     }
+    eventsStore.setCurrentEventName(event.value?.name || "");
 }
 
 const moveFab: TouchPanValue = (ev) => {
@@ -112,6 +114,10 @@ const moveFab: TouchPanValue = (ev) => {
 };
 
 onMounted(init);
+
+onUnmounted(() => {
+    eventsStore.setCurrentEventName("");
+});
 </script>
 
 <template>

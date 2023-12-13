@@ -26,6 +26,22 @@ export const usePropertiesStore = defineStore("properties", () => {
         arePropertiesLoading.value = false;
     }
 
+    function getOrganisationNameById(organisationId: string): string {
+        return (
+            organisations.value.find((organisation) => {
+                return organisation.id === organisationId;
+            })?.name ?? ""
+        );
+    }
+
+    function getPropertyNameById(propertyId: string): string {
+        return (
+            properties.value.find((property) => {
+                return property.id === propertyId;
+            })?.name ?? ""
+        );
+    }
+
     function addUnsub(unsub: typeof NOOP): void {
         unsubs.value.push(unsub);
     }
@@ -59,6 +75,8 @@ export const usePropertiesStore = defineStore("properties", () => {
         properties,
         organisations,
         arePropertiesLoading,
+        getOrganisationNameById,
+        getPropertyNameById,
         setArePropertiesLoading,
         setProperties,
         setOrganisations,

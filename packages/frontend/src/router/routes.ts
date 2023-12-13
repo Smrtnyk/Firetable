@@ -1,7 +1,17 @@
-import type { RouteRecordRaw } from "vue-router";
+import type { RouteLocationNormalized, RouteRecordRaw } from "vue-router";
 import { ADMIN, Role } from "@firetable/types";
+import { usePropertiesStore } from "src/stores/usePropertiesStore";
+import { useEventsStore } from "src/stores/events-store";
 
-const routes: RouteRecordRaw[] = [
+declare module "vue-router" {
+    interface RouteMeta {
+        requiresAuth: boolean;
+        breadcrumb?: string | ((route: RouteLocationNormalized, isAdmin?: boolean) => string);
+        allowedRoles?: (Role | typeof ADMIN)[];
+    }
+}
+
+export const routes: RouteRecordRaw[] = [
     {
         path: "/",
         component: () => import("layouts/MainLayout.vue"),
@@ -9,7 +19,10 @@ const routes: RouteRecordRaw[] = [
             {
                 path: "/",
                 name: "home",
-                meta: { requiresAuth: true },
+                meta: {
+                    requiresAuth: true,
+                    breadcrumb: "Home",
+                },
                 component: () => import("src/pages/PageHome.vue"),
             },
             {
@@ -18,6 +31,7 @@ const routes: RouteRecordRaw[] = [
                 meta: {
                     requiresAuth: true,
                     allowedRoles: [ADMIN],
+                    breadcrumb: "Home",
                 },
                 component: () => import("src/pages/PageOrganisations.vue"),
             },
@@ -25,27 +39,57 @@ const routes: RouteRecordRaw[] = [
                 path: "/:organisationId/properties",
                 name: "properties",
                 props: true,
-                meta: { requiresAuth: true },
+                meta: {
+                    requiresAuth: true,
+                    breadcrumb: (route: RouteLocationNormalized, isAdmin) => {
+                        const propertiesStore = usePropertiesStore();
+                        return isAdmin
+                            ? propertiesStore.getOrganisationNameById(
+                                  route.params.organisationId as string,
+                              )
+                            : "Home";
+                    },
+                    parent: "organisations",
+                },
                 component: () => import("src/pages/PageProperties.vue"),
             },
             {
                 path: "/events/:organisationId/:propertyId",
                 name: "events",
                 props: true,
-                meta: { requiresAuth: true },
+                meta: {
+                    requiresAuth: true,
+                    breadcrumb: (route) => {
+                        const propertiesStore = usePropertiesStore();
+                        return propertiesStore.getPropertyNameById(
+                            route.params.propertyId as string,
+                        );
+                    },
+                    parent: "properties",
+                },
                 component: () => import("src/pages/PageEvents.vue"),
             },
             {
                 path: "/events/:organisationId/:propertyId/event/:eventId",
                 name: "event",
-                meta: { requiresAuth: true },
+                meta: {
+                    requiresAuth: true,
+                    breadcrumb: () => {
+                        const eventsStore = useEventsStore();
+                        return eventsStore.currentEventName;
+                    },
+                    parent: "events",
+                },
                 props: true,
                 component: () => import("src/pages/PageEvent.vue"),
             },
             {
                 path: "/profile",
                 name: "userProfile",
-                meta: { requiresAuth: true },
+                meta: {
+                    requiresAuth: true,
+                    breadcrumb: "Profile",
+                },
                 component: () => import("src/pages/PageProfile.vue"),
             },
 

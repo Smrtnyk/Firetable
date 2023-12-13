@@ -78,11 +78,16 @@ function handleOnAuthStateChanged(
 ): void {
     // Tell the application what to do when the
     // authentication state has changed */
+    let isFirstCall = true;
     const currentUser = useCurrentUser();
     watch(
         () => currentUser.value,
         async () => {
             if (currentUser.value) {
+                if (isFirstCall) {
+                    isFirstCall = false;
+                    return;
+                }
                 authStore.setAuthState(!!currentUser.value);
                 await authStore.initUser(currentUser.value);
             } else {

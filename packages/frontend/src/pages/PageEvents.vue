@@ -2,22 +2,23 @@
 import type { EventDoc } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
 import EventCardList from "src/components/Event/EventCardList.vue";
+import FTCenteredText from "src/components/FTCenteredText.vue";
+
 import { where, orderBy, limit } from "firebase/firestore";
 import { config } from "src/config";
 import { ONE_HOUR } from "src/constants";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
-import { useRoute } from "vue-router";
+import { useRouter } from "vue-router";
 import { eventsCollection } from "@firetable/backend";
-import { watch } from "vue";
+import { watch, onMounted } from "vue";
 import { Loading } from "quasar";
-import FTCenteredText from "src/components/FTCenteredText.vue";
 
 interface Props {
     organisationId: string;
     propertyId: string;
 }
 
-const route = useRoute();
+const router = useRouter();
 const props = defineProps<Props>();
 
 const eventOwner: EventOwner = {
@@ -30,7 +31,7 @@ const { data: events, pending: isLoading } = useFirestoreCollection<EventDoc>(
     createQuery<EventDoc>(
         eventsCollection(eventOwner),
         where("date", ">=", Date.now() - ONE_HOUR * config.eventDuration),
-        where("propertyId", "==", route.params.propertyId),
+        where("propertyId", "==", props.propertyId),
         orderBy("date"),
         limit(10),
     ),
@@ -47,6 +48,13 @@ watch(
     },
     { immediate: true },
 );
+
+onMounted(async () => {
+    if (!props.organisationId || !props.propertyId) {
+        await router.replace("/");
+        return;
+    }
+});
 </script>
 
 <template>
