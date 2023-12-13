@@ -191,6 +191,7 @@ onUnmounted(() => {
                 v-if="event.info"
             />
             <q-btn
+                v-if="!isMobile"
                 class="button-gradient q-ma-none q-ml-sm"
                 @click="eventsStore.toggleEventGuestListDrawerVisibility"
                 icon="users"
