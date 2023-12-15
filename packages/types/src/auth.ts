@@ -31,6 +31,7 @@ export type CreateUserPayload = User & {
 
 export interface UserCapabilities {
     [UserCapability.CAN_RESERVE]?: boolean;
+    [UserCapability.CAN_SEE_RESERVATION_CREATOR]?: boolean;
     [UserCapability.CAN_SEE_GUEST_CONTACT]?: boolean;
     [UserCapability.CAN_DELETE_RESERVATION]?: boolean;
     [UserCapability.CAN_DELETE_OWN_RESERVATION]?: boolean;
@@ -39,6 +40,7 @@ export interface UserCapabilities {
 
 export const enum UserCapability {
     CAN_RESERVE = "Can reserve",
+    CAN_SEE_RESERVATION_CREATOR = "Can see reservation creator",
     CAN_SEE_GUEST_CONTACT = "Can see guest contact",
     CAN_DELETE_RESERVATION = "Can delete reservation",
     CAN_DELETE_OWN_RESERVATION = "Can delete own reservation",
@@ -48,6 +50,7 @@ export const enum UserCapability {
 export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapabilities> = {
     [ADMIN]: {
         [UserCapability.CAN_RESERVE]: true,
+        [UserCapability.CAN_SEE_RESERVATION_CREATOR]: true,
         [UserCapability.CAN_SEE_GUEST_CONTACT]: true,
         [UserCapability.CAN_DELETE_RESERVATION]: true,
         [UserCapability.CAN_DELETE_OWN_RESERVATION]: true,
@@ -55,6 +58,7 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapab
     },
     [Role.PROPERTY_OWNER]: {
         [UserCapability.CAN_RESERVE]: true,
+        [UserCapability.CAN_SEE_RESERVATION_CREATOR]: true,
         [UserCapability.CAN_SEE_GUEST_CONTACT]: true,
         [UserCapability.CAN_DELETE_RESERVATION]: true,
         [UserCapability.CAN_DELETE_OWN_RESERVATION]: true,
@@ -62,6 +66,7 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapab
     },
     [Role.MANAGER]: {
         [UserCapability.CAN_RESERVE]: true,
+        [UserCapability.CAN_SEE_RESERVATION_CREATOR]: true,
         [UserCapability.CAN_SEE_GUEST_CONTACT]: true,
         [UserCapability.CAN_DELETE_RESERVATION]: true,
         [UserCapability.CAN_DELETE_OWN_RESERVATION]: true,
@@ -69,6 +74,7 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapab
     },
     [Role.HOSTESS]: {
         [UserCapability.CAN_RESERVE]: true,
+        [UserCapability.CAN_SEE_RESERVATION_CREATOR]: false,
         [UserCapability.CAN_SEE_GUEST_CONTACT]: true,
         [UserCapability.CAN_DELETE_RESERVATION]: true,
         [UserCapability.CAN_DELETE_OWN_RESERVATION]: true,
@@ -76,6 +82,7 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapab
     },
     [Role.STAFF]: {
         [UserCapability.CAN_RESERVE]: false,
+        [UserCapability.CAN_SEE_RESERVATION_CREATOR]: false,
         [UserCapability.CAN_SEE_GUEST_CONTACT]: false,
         [UserCapability.CAN_DELETE_RESERVATION]: false,
         [UserCapability.CAN_DELETE_OWN_RESERVATION]: true,

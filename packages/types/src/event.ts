@@ -63,7 +63,7 @@ export interface Reservation {
     consumption: number;
     time: string;
     reservedBy: UserIdentifier;
-    creator?: UserIdentifier;
+    creator: UserIdentifier & { createdAt: Timestamp };
 }
 
 export interface EventLog {

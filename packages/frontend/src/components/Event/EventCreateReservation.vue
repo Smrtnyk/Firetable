@@ -6,6 +6,7 @@ import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
 import { greaterThanZero, minLength, noEmptyString, requireNumber } from "src/helpers/form-rules";
 import { useAuthStore } from "src/stores/auth-store";
+import { getFirestoreTimestamp } from "@firetable/backend";
 
 const socials = ["Whatsapp", "SMS", "Instagram", "Facebook", "Phone"].map((social, index) => {
     return {
@@ -49,6 +50,7 @@ const initialState =
                   name: authStore.user!.name,
                   email: authStore.user!.email,
                   id: authStore.user!.id,
+                  createdAt: getFirestoreTimestamp(),
               },
               tableLabel: props.table.label,
               floorId: props.floor.id,

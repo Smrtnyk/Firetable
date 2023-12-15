@@ -37,6 +37,10 @@ export const useAuthStore = defineStore("auth", () => {
         return !!capabilities.value[UserCapability.CAN_RESERVE];
     });
 
+    const canSeeReservationCreator = computed(() => {
+        return !!capabilities.value[UserCapability.CAN_SEE_RESERVATION_CREATOR];
+    });
+
     const canSeeGuestContact = computed(() => {
         return !!capabilities.value[UserCapability.CAN_SEE_GUEST_CONTACT];
     });
@@ -165,6 +169,7 @@ export const useAuthStore = defineStore("auth", () => {
         initUser,
         isLoggedIn,
         isAdmin,
+        canSeeReservationCreator,
         canConfirmReservation,
         canDeleteOwnReservation,
         canReserve,

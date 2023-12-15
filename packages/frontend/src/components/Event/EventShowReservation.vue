@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { Reservation } from "@firetable/types";
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { ADMIN } from "@firetable/types";
 import { useAuthStore } from "src/stores/auth-store";
+import { formatEventDate } from "src/helpers/date-utils";
 
 interface Props {
     canDeleteReservation: boolean;
@@ -18,9 +18,7 @@ const emit = defineEmits<{
 }>();
 const { t } = useI18n();
 const checked = ref<boolean>(props.reservation.confirmed);
-const canSeeCreator = computed(() => {
-    return authStore.user?.role === ADMIN;
-});
+
 function reservedByText(reservedBy: Reservation["reservedBy"]): string {
     const { name, email } = reservedBy;
     const isSocial = email.startsWith("social");
@@ -74,11 +72,18 @@ function onReservationConfirm(): void {
             <div class="col-6">{{ t("EventShowReservation.reservedByLabel") }}</div>
             <div class="col-6 font-black">{{ reservedByText(props.reservation.reservedBy) }}</div>
 
-            <template v-if="props.reservation.creator && canSeeCreator">
+            <template v-if="props.reservation.creator && authStore.canSeeReservationCreator">
                 <div class="col-6">{{ t("EventShowReservation.createdByLabel") }}</div>
                 <div class="col-6 font-black">
                     {{ createdByText(props.reservation.creator) }}
                 </div>
+
+                <template v-if="props.reservation.creator.createdAt">
+                    <div class="col-6">Created at</div>
+                    <div class="col-6 font-black">
+                        {{ formatEventDate(props.reservation.creator.createdAt.toMillis()) }}
+                    </div>
+                </template>
             </template>
         </div>
 
