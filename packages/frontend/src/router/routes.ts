@@ -188,5 +188,3 @@ export const routes: RouteRecordRaw[] = [
         component: () => import("src/pages/Error404.vue"),
     },
 ];
-
-export default routes;

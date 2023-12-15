@@ -1,5 +1,5 @@
 import type { Router } from "vue-router";
-import routes from "./routes";
+import { routes } from "./routes";
 import { createRouter, createWebHashHistory, createWebHistory } from "vue-router";
 
 export default function (): Router {
