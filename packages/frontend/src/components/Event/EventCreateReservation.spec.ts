@@ -1,8 +1,9 @@
 import type { VueWrapper } from "@vue/test-utils";
-import type { Reservation, User } from "@firetable/types";
+import type { Reservation, ReservationDoc, User } from "@firetable/types";
 import EventCreateReservation from "./EventCreateReservation.vue";
 import messages from "../../i18n";
 import * as authStore from "../../stores/auth-store";
+import * as Backend from "@firetable/backend";
 import { config, flushPromises, mount } from "@vue/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createI18n } from "vue-i18n";
@@ -52,7 +53,15 @@ function createProps(overrides: Partial<TestProps> = {}): TestProps {
     return { ...defaultProps, ...overrides };
 }
 
-const MOCK_USER = { email: "mail", id: "1", name: "name" };
+const MOCK_USER: ReservationDoc["creator"] = {
+    email: "mail",
+    id: "1",
+    name: "name",
+    createdAt: {
+        nanoseconds: 1,
+        seconds: 1,
+    } as any,
+};
 
 function mountComponent(overrides?: Partial<TestProps>): VueWrapper<EventCreateReservation, any> {
     return mount(EventCreateReservation, {
@@ -65,6 +74,10 @@ function mountComponent(overrides?: Partial<TestProps>): VueWrapper<EventCreateR
 
 describe("EventCreateReservation", () => {
     beforeEach(() => {
+        vi.spyOn(Backend, "getFirestoreTimestamp").mockReturnValue({
+            seconds: 1,
+            nanoseconds: 1,
+        } as any);
         vi.spyOn(authStore, "useAuthStore").mockReturnValue({
             user: MOCK_USER,
         } as any);
@@ -96,6 +109,7 @@ describe("EventCreateReservation", () => {
                 reservationNote: "",
                 consumption: 1,
                 confirmed: false,
+                reservationConfirmed: false,
                 time: "12:00",
                 reservedBy: { name: "Staff", email: "staff@example.com" },
                 creator: MOCK_USER,
@@ -177,6 +191,7 @@ describe("EventCreateReservation", () => {
             {
                 guestName: "John Doe",
                 confirmed: false,
+                reservationConfirmed: false,
                 consumption: 1,
                 guestContact: "",
                 numberOfGuests: 2,
