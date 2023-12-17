@@ -140,7 +140,7 @@ export function deleteReservation(owner: EventOwner, reservation: ReservationDoc
 
 export function updateReservationDoc(
     owner: EventOwner,
-    newReservationData: ReservationDoc,
+    newReservationData: Partial<ReservationDoc> & Pick<ReservationDoc, "id">,
 ): Promise<void> {
     return updateDoc(reservationDoc(owner, newReservationData.id), {
         ...newReservationData,

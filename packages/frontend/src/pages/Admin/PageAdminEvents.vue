@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { CreateEventPayload, EditEventPayload, EventDoc, PropertyDoc } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
+import type { EventDetails } from "src/components/admin/event/AdminPropertyEventsList.vue";
 import AdminPropertyEventsList from "src/components/admin/event/AdminPropertyEventsList.vue";
 import EventCreateForm from "src/components/admin/event/EventCreateForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
@@ -168,16 +169,7 @@ async function onEventItemSlideRight({
     });
 }
 
-async function onEventEdit(
-    property: PropertyDoc,
-    {
-        event,
-        reset,
-    }: {
-        event: EventDoc;
-        reset: () => void;
-    },
-): Promise<void> {
+async function onEventEdit(property: PropertyDoc, { event, reset }: EventDetails): Promise<void> {
     showCreateEventForm(property, event);
     reset();
 }
@@ -271,7 +263,9 @@ function showCreateEventForm(property: PropertyDoc, event?: EventDoc): void {
                             :property="property"
                             :events-by-property="eventsByProperty"
                             :on-event-item-slide-right="onEventItemSlideRight"
-                            :on-event-edit="(eventDetails) => onEventEdit(property, eventDetails)"
+                            :on-event-edit="
+                                (eventDetails: EventDetails) => onEventEdit(property, eventDetails)
+                            "
                             :on-load="onLoad"
                             :done="!hasMoreEventsToFetch[property.id]"
                         />

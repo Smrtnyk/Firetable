@@ -68,6 +68,7 @@ export default {
         createdByLabel: "Creator",
         groupedWithLabel: "Grouped with",
         guestArrivedLabel: "Guest arrived?",
+        reservationConfirmedLabel: "Reservation confirmed?",
         deleteReservationLabel: "Delete",
         editReservationLabel: "Edit",
         reservationConsumption: "Consumption",

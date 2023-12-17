@@ -4,11 +4,13 @@ import PageAdminEventsListItem from "src/components/Event/PageAdminEventsListIte
 import { computed } from "vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 
+export type EventDetails = { event: EventDoc; reset: () => void };
+
 interface Props {
     property: PropertyDoc;
     eventsByProperty: Record<string, Set<EventDoc>>;
-    onEventItemSlideRight: (eventDetails: { event: any; reset: () => void }) => void;
-    onEventEdit: (eventDetails: { event: any; reset: () => void }) => void;
+    onEventItemSlideRight: (eventDetails: EventDetails) => void;
+    onEventEdit: (eventDetails: EventDetails) => void;
     onLoad: (property: PropertyDoc) => void;
     done: boolean;
 }

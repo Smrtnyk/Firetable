@@ -14,10 +14,11 @@ const authStore = useAuthStore();
 const props = defineProps<Props>();
 const emit = defineEmits<{
     (e: "delete" | "edit" | "transfer" | "copy"): void;
-    (e: "confirm", confirmed: boolean): void;
+    (e: "confirm" | "reservationConfirmed", confirmed: boolean): void;
 }>();
 const { t } = useI18n();
-const checked = ref<boolean>(props.reservation.confirmed);
+const guestArrived = ref<boolean>(props.reservation.confirmed);
+const reservationConfirmed = ref<boolean>(!!props.reservation.reservationConfirmed);
 
 function reservedByText(reservedBy: Reservation["reservedBy"]): string {
     const { name, email } = reservedBy;
@@ -30,9 +31,14 @@ function createdByText(creator: NonNullable<Reservation["creator"]>): string {
     return `${name} - ${email}`;
 }
 
-function onReservationConfirm(): void {
-    emit("confirm", !checked.value);
-    checked.value = !checked.value;
+function onGuestArrived(): void {
+    emit("confirm", !guestArrived.value);
+    guestArrived.value = !guestArrived.value;
+}
+
+function onReservationConfirmed(): void {
+    emit("reservationConfirmed", !reservationConfirmed.value);
+    reservationConfirmed.value = !reservationConfirmed.value;
 }
 </script>
 
@@ -87,8 +93,31 @@ function onReservationConfirm(): void {
             </template>
         </div>
 
-        <q-separator class="q-my-md" />
+        <q-separator class="q-mt-md" />
 
+        <!-- reservation confirmed -->
+        <q-item v-if="authStore.canConfirmReservation" tag="label" class="q-pa-none">
+            <q-item-section>
+                <q-item-label>
+                    {{ t("EventShowReservation.reservationConfirmedLabel") }}
+                </q-item-label>
+            </q-item-section>
+            <q-item-section avatar>
+                <q-toggle
+                    :model-value="reservationConfirmed"
+                    @update:model-value="onReservationConfirmed"
+                    size="lg"
+                    unchecked-icon="close"
+                    checked-icon="check"
+                    color="primary"
+                    v-close-popup
+                />
+            </q-item-section>
+        </q-item>
+
+        <q-separator class="q-ma-none" />
+
+        <!-- guest arrived -->
         <q-item v-if="authStore.canConfirmReservation" tag="label" class="q-pa-none">
             <q-item-section>
                 <q-item-label>
@@ -97,8 +126,8 @@ function onReservationConfirm(): void {
             </q-item-section>
             <q-item-section avatar>
                 <q-toggle
-                    :model-value="checked"
-                    @update:model-value="onReservationConfirm"
+                    :model-value="guestArrived"
+                    @update:model-value="onGuestArrived"
                     size="lg"
                     unchecked-icon="close"
                     checked-icon="check"
@@ -107,6 +136,9 @@ function onReservationConfirm(): void {
                 />
             </q-item-section>
         </q-item>
+
+        <q-separator class="q-mb-md" />
+
         <q-item>
             <div v-if="props.canDeleteReservation" class="row q-gutter-sm full-width">
                 <q-btn

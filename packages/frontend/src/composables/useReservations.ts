@@ -233,20 +233,32 @@ export function useReservations(
                             floor,
                         };
                     },
-                    confirm: onReservationConfirm(reservation),
+                    confirm: onGuestArrived(reservation),
+                    reservationConfirmed: reservationConfirmed(reservation),
                 },
             },
         });
     }
 
-    function onReservationConfirm(reservation: ReservationDoc) {
+    function onGuestArrived(reservation: ReservationDoc) {
         return function (val: boolean) {
             return tryCatchLoadingWrapper({
                 hook: () =>
                     updateReservationDoc(eventOwner, {
-                        ...reservation,
                         id: reservation.id,
                         confirmed: val,
+                    }),
+            });
+        };
+    }
+
+    function reservationConfirmed(reservation: ReservationDoc) {
+        return function (val: boolean) {
+            return tryCatchLoadingWrapper({
+                hook: () =>
+                    updateReservationDoc(eventOwner, {
+                        id: reservation.id,
+                        reservationConfirmed: val,
                     }),
             });
         };

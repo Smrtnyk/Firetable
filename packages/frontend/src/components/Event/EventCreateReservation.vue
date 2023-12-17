@@ -44,6 +44,7 @@ const initialState =
               reservationNote: "",
               consumption: 1,
               confirmed: false,
+              reservationConfirmed: false,
               time: "00:00",
               reservedBy: null as unknown as User,
               creator: {

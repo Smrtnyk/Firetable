@@ -56,6 +56,7 @@ export interface Reservation {
     floorId: string;
     tableLabel: string;
     confirmed: boolean;
+    reservationConfirmed: boolean | undefined;
     guestContact?: string;
     guestName: string;
     numberOfGuests: number | string;
