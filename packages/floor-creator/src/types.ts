@@ -33,3 +33,4 @@ export enum FloorElementTypes {
 }
 
 export type NumberTuple = [number, number];
+export type FloorDropEvent = { x: number; y: number; data: string | undefined };

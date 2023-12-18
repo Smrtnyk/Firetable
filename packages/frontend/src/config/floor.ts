@@ -2,69 +2,52 @@ import { FloorElementTypes } from "@firetable/floor-creator";
 
 export const ELEMENTS_TO_ADD_COLLECTION = [
     {
-        label: "Add square table",
+        label: "Square table",
         img: "/svg-images/square-table.svg",
         elementDescriptor: {
             tag: FloorElementTypes.RECT_TABLE,
         },
     },
     {
-        label: "Add round table",
+        label: "Round table",
         img: "/svg-images/round-table.svg",
         elementDescriptor: {
             tag: FloorElementTypes.ROUND_TABLE,
         },
     },
     {
-        label: "Add a wall",
+        label: "Wall",
         img: "/svg-images/wall.svg",
         elementDescriptor: {
             tag: FloorElementTypes.WALL,
         },
     },
     {
-        label: "Add a Sofa",
+        label: "Sofa",
         img: "/svg-images/double-sofa.svg",
         elementDescriptor: {
             tag: FloorElementTypes.SOFA,
         },
     },
     {
-        label: "Add DJ Booth",
+        label: "DJ Booth",
         img: "/svg-images/dj-booth.svg",
         elementDescriptor: {
             tag: FloorElementTypes.DJ_BOOTH,
         },
     },
     {
-        label: "Add Stage",
+        label: "Stage",
         img: "/svg-images/disco-stage.svg",
         elementDescriptor: {
             tag: FloorElementTypes.STAGE,
         },
     },
     {
-        label: "Add Door",
+        label: "Door",
         img: "/svg-images/door.svg",
         elementDescriptor: {
             tag: FloorElementTypes.DOOR,
-        },
-    },
-];
-
-export const BULK_ADD_COLLECTION = [
-    {
-        label: "Add square table",
-        img: "/svg-images/square-table.svg",
-        elementDescriptor: {
-            tag: FloorElementTypes.RECT_TABLE,
-        },
-    },
-    {
-        label: "Add round table",
-        img: "/svg-images/round-table.svg",
-        elementDescriptor: {
-            tag: FloorElementTypes.ROUND_TABLE,
         },
     },
 ];

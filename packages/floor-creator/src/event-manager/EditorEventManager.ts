@@ -113,6 +113,16 @@ export class EditorEventManager extends EventManager {
         this.floor.canvas.on("object:moving", this.handleObjectMoving);
         this.floor.canvas.on("before:transform", this.onBeforeTransform);
         this.floor.canvas.on("object:modified", this.onObjectModified);
+        this.floor.canvas.wrapperEl.addEventListener("dragover", (e) => e.preventDefault());
+        this.floor.canvas.wrapperEl.addEventListener("drop", (e) => {
+            e.preventDefault();
+            const { x, y } = this.floor.canvas.getScenePoint(e);
+            this.floor.emit("drop", this.floor, {
+                x,
+                y,
+                data: e.dataTransfer?.getData("text/plain"),
+            });
+        });
     }
 
     private onEditorMouseUp = (): void => {

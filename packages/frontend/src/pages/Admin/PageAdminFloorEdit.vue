@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import type { NumberTuple } from "src/types/generic";
-import type { Floor, FloorEditorElement } from "@firetable/floor-creator";
+import type { Floor, FloorDropEvent, FloorEditorElement } from "@firetable/floor-creator";
 import type { FloorDoc } from "@firetable/types";
-import AddTableDialog from "src/components/Floor/AddTableDialog.vue";
 import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
-import FTDialog from "src/components/FTDialog.vue";
 
 import { nextTick, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import { debounce, exportFile, Loading, useQuasar } from "quasar";
-import { BULK_ADD_COLLECTION, ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
+import { ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
 import {
     extractAllTablesLabels,
     FloorEditor,
@@ -58,9 +56,6 @@ const floorInstance = ref<FloorEditor | undefined>();
 const canvasRef = ref<HTMLCanvasElement | undefined>();
 const pageRef = ref<HTMLDivElement | undefined>();
 const selectedElement = ref<FloorEditorElement | undefined>();
-const bulkMode = ref(false);
-const bulkElement = ref<FloorElementTypes | undefined>();
-const bulkLabelCounter = ref(0); // To auto-increment labels
 
 const floorPath = getFloorPath(props.organisationId, props.propertyId, props.floorId);
 const {
@@ -100,7 +95,6 @@ onMounted(async () => {
     } else {
         router.replace("/").catch(showErrorMessage);
     }
-
     Loading.hide();
 });
 
@@ -127,6 +121,27 @@ async function instantiateFloor(floorDoc: FloorDoc): Promise<void> {
         undoRedoState.canUndo = floorEditor.canUndo();
         undoRedoState.canRedo = floorEditor.canRedo();
     });
+    floorEditor.on("drop", onFloorDrop);
+}
+
+function onFloorDrop(floorEditor: FloorEditor, { data, x, y }: FloorDropEvent): void {
+    if (!data) {
+        return;
+    }
+
+    const { item, type } = JSON.parse(data);
+
+    if (type !== "floor-element") {
+        return;
+    }
+
+    if (TABLE_EL_TO_ADD.includes(item)) {
+        const label = getNextTableLabel();
+        floorEditor.addElement({ x, y, tag: item, label });
+        return;
+    }
+
+    floorEditor.addElement({ x, y, tag: item });
 }
 
 async function onFloorSave(): Promise<void> {
@@ -170,31 +185,11 @@ function onFloorChange(prop: keyof FloorEditor, event: null | number | string): 
     }
 }
 
-function showTableDialog(floorVal: FloorEditor, [x, y]: NumberTuple, tag: FloorElementTypes): void {
-    const dialog = q.dialog({
-        component: FTDialog,
-        componentProps: {
-            component: AddTableDialog,
-            maximized: false,
-            title: "Table ID",
-            componentPropsObject: {
-                ids: new Set(extractAllTablesLabels(floorVal)),
-            },
-            listeners: {
-                create: function (label: string) {
-                    dialog.hide();
-                    floorVal.addElement({ label, x, y, tag });
-                },
-            },
-        },
-    });
-}
-
 function handleAddNewElement(floorVal: FloorEditor, [x, y]: NumberTuple) {
     return function ({ elementDescriptor }: BottomSheetTableClickResult) {
         const { tag } = elementDescriptor;
         if (TABLE_EL_TO_ADD.includes(tag)) {
-            showTableDialog(floorVal, [x, y], tag);
+            floorVal.addElement({ x, y, tag, label: getNextTableLabel() });
             return;
         }
         floorVal.addElement({ x, y, tag });
@@ -202,11 +197,6 @@ function handleAddNewElement(floorVal: FloorEditor, [x, y]: NumberTuple) {
 }
 
 function dblClickHandler(floorVal: FloorEditor, coords: NumberTuple): void {
-    if (bulkMode.value && bulkElement.value) {
-        const label = String(++bulkLabelCounter.value);
-        floorVal.addElement({ label, x: coords[0], y: coords[1], tag: bulkElement.value });
-        return;
-    }
     q.bottomSheet(addNewElementsBottomSheetOptions).onOk(handleAddNewElement(floorVal, coords));
 }
 
@@ -226,38 +216,17 @@ function onDeleteElement(element: FloorEditorElement): void {
     selectedElement.value = undefined;
 }
 
-function toggleBulkMode(): void {
-    if (bulkMode.value) {
-        deactivateBulkMode();
-    } else {
-        q.bottomSheet({ ...addNewElementsBottomSheetOptions, actions: BULK_ADD_COLLECTION }).onOk(
-            ({ elementDescriptor }: BottomSheetTableClickResult) => {
-                activateBulkMode(elementDescriptor.tag);
-            },
-        );
-    }
-}
-
-function activateBulkMode(elementTag: FloorElementTypes): void {
-    bulkMode.value = true;
-    bulkElement.value = elementTag;
-
+function getNextTableLabel(): string {
+    let label = -1;
     const labels = extractAllTablesLabels(floorInstance.value as FloorEditor);
-    // Convert labels to numbers only if they are numeric and find the maximum
-    const numericLabels = labels.map((label) => Number.parseInt(label)).filter(isNumber);
-
+    const numericLabels = labels.map((val) => Number.parseInt(val)).filter(isNumber);
     if (numericLabels.length === 0) {
-        bulkLabelCounter.value = 0;
+        label = 0;
     } else {
         const maxLabel = Math.max(...numericLabels);
-        bulkLabelCounter.value = isNumber(maxLabel) ? maxLabel : 0;
+        label = isNumber(maxLabel) ? maxLabel : 0;
     }
-}
-
-function deactivateBulkMode(): void {
-    bulkMode.value = false;
-    bulkElement.value = undefined;
-    bulkLabelCounter.value = 0;
+    return String(++label);
 }
 
 function undoAction(): void {
@@ -309,6 +278,16 @@ function onFileSelected(event: Event): void {
 
 function triggerFileInput(): void {
     fileInputRef.value?.click();
+}
+
+function onDragStart(event: DragEvent, item: FloorElementTypes): void {
+    event.dataTransfer?.setData(
+        "text/plain",
+        JSON.stringify({
+            item,
+            type: "floor-element",
+        }),
+    );
 }
 </script>
 
@@ -405,18 +384,32 @@ function triggerFileInput(): void {
                     @click="redoAction"
                     icon="redo"
                 />
+                <!-- Add Element -->
+                <q-btn round title="Add element" icon="plus">
+                    <q-menu max-width="200px">
+                        <div class="row items-center">
+                            <div
+                                draggable="true"
+                                v-for="element in ELEMENTS_TO_ADD_COLLECTION"
+                                :key="element.elementDescriptor.tag"
+                                class="col-6 justify-center text-center q-my-md"
+                                @dragstart="onDragStart($event, element.elementDescriptor.tag)"
+                            >
+                                <p>{{ element.label }}</p>
+
+                                <q-avatar square size="42px">
+                                    <img :src="element.img" />
+                                </q-avatar>
+                            </div>
+                        </div>
+                    </q-menu>
+                </q-btn>
+
                 <q-btn
                     round
                     title="Toggle grid"
                     @click="floorInstance.toggleGridVisibility"
                     icon="grid"
-                />
-                <q-btn
-                    title="Toggle bulk mode"
-                    round
-                    @click="toggleBulkMode"
-                    icon="stack"
-                    :color="bulkMode ? 'positive' : undefined"
                 />
                 <q-btn
                     round

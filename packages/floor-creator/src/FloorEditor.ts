@@ -1,12 +1,13 @@
 import type { FabricObject } from "fabric";
+import type { EventManager } from "./event-manager/EventManager";
+import type { FloorDoc } from "@firetable/types";
 import type {
     CreateElementOptions,
     FloorCreationOptions,
+    FloorDropEvent,
     FloorEditorElement,
     NumberTuple,
 } from "./types";
-import type { EventManager } from "./event-manager/EventManager";
-import type { FloorDoc } from "@firetable/types";
 import { ElementManager } from "./ElementManager";
 import { Floor } from "./Floor";
 import { GridDrawer } from "./GridDrawer";
@@ -20,6 +21,7 @@ type FloorEditorEvents = {
     doubleClick: [FloorEditor, NumberTuple];
     commandChange: [];
     rendered: [undefined];
+    drop: [FloorEditor, FloorDropEvent];
 };
 
 export class FloorEditor extends Floor {
