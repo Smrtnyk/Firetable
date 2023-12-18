@@ -1,5 +1,7 @@
 {
     "name": "firetable",
+    "description": "Events and reservations management system for gastronomic events",
+    "keywords": ["vue", "typescript", "reservation", "events", "firebase", "firestore"],
     "scripts": {
         "deploy:hosting": "firebase deploy --only hosting",
         "deploy:functions": "firebase deploy --only functions",
