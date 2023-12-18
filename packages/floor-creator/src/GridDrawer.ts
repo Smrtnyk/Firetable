@@ -29,11 +29,12 @@ export class GridDrawer {
         top: number,
     ): Line[] {
         const lineOption = {
-            stroke: "rgba(0,0,0,1)",
+            stroke: "#111",
             strokeUniform: true,
             strokeWidth: 0.5,
             selectable: false,
             evented: false,
+            strokeDashArray: [4, 4],
         };
         const lines: Line[] = [];
 
