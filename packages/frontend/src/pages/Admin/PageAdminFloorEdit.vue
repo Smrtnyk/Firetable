@@ -292,7 +292,7 @@ function onDragStart(event: DragEvent, item: FloorElementTypes): void {
 </script>
 
 <template>
-    <div class="PageAdminFloorEdit" ref="pageRef">
+    <div class="PageAdminFloorEdit flex column justify-center" ref="pageRef">
         <div v-if="floorInstance" class="justify-between q-mb-sm">
             <q-input
                 v-if="isTablet"
