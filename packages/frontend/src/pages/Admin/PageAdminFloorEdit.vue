@@ -217,7 +217,7 @@ function onDeleteElement(element: FloorEditorElement): void {
 }
 
 function getNextTableLabel(): string {
-    let label = -1;
+    let label: number;
     const labels = extractAllTablesLabels(floorInstance.value as FloorEditor);
     const numericLabels = labels.map((val) => Number.parseInt(val)).filter(isNumber);
     if (numericLabels.length === 0) {
