@@ -93,7 +93,7 @@ export class RoundTable extends Group {
 
     setLabel(newLabel: string): void {
         this.label = newLabel;
-        this.textLabel.text = newLabel;
+        this.textLabel.set("text", newLabel);
         this.canvas?.requestRenderAll();
     }
 
