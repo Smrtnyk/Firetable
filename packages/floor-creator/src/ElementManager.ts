@@ -57,7 +57,7 @@ export class ElementManager {
             groupOptions: {
                 label,
             },
-            circleOptions: {
+            shapeOptions: {
                 radius: RESOLUTION,
             },
             textOptions: { label },
@@ -74,7 +74,7 @@ export class ElementManager {
                 left: x,
                 top: y,
             },
-            rectOptions: {
+            shapeOptions: {
                 width: TABLE_WIDTH,
                 height: TABLE_HEIGHT,
             },

@@ -1,16 +1,13 @@
 import type { GroupProps } from "fabric";
-import type { ReservationDoc } from "@firetable/types";
-import type { AnimationStrategy } from "./animation/AnimationStrategy";
-import { SmoothBlinkAnimation } from "./animation/SmoothBlinkAnimation";
+import { Table } from "./Table";
 import {
     ELEMENT_DEFAULT_FILL_COLOR,
     ELEMENT_DEFAULT_STROKE_COLOR,
     FONT_SIZE,
     TABLE_TEXT_FILL_COLOR,
 } from "../constants";
-import { determineTableColor } from "../utils.js";
 import { FloorElementTypes } from "../types";
-import { Group, Circle, FabricText } from "fabric";
+import { Circle, FabricText } from "fabric";
 
 interface CircleTableElementOptions {
     groupOptions: {
@@ -20,26 +17,19 @@ interface CircleTableElementOptions {
     textOptions: {
         label: string;
     };
-    circleOptions: Record<string, unknown>;
+    shapeOptions: Record<string, unknown>;
 }
 
-export class RoundTable extends Group {
+// @ts-expect-error -- not sure why this is an error
+export class RoundTable extends Table {
     static override type = FloorElementTypes.ROUND_TABLE;
-    reservation: ReservationDoc | undefined;
-    label: string;
-    baseFill: string;
-    private circle: Circle;
-    private textLabel: FabricText;
-    private animationStrategy: AnimationStrategy;
 
     constructor(options: CircleTableElementOptions) {
-        const baseFillComputed =
-            (options.groupOptions.baseFill as string) || ELEMENT_DEFAULT_FILL_COLOR;
         const tableCircle = new Circle({
-            ...options.circleOptions,
+            ...options.shapeOptions,
             originX: "center",
             originY: "center",
-            fill: baseFillComputed,
+            fill: options.groupOptions.baseFill || ELEMENT_DEFAULT_FILL_COLOR,
             stroke: ELEMENT_DEFAULT_STROKE_COLOR,
             strokeWidth: 0.5,
             strokeUniform: true,
@@ -54,79 +44,15 @@ export class RoundTable extends Group {
             originX: "center",
             originY: "center",
         });
-        super([tableCircle, textLabel], options.groupOptions);
-        this.animationStrategy = new SmoothBlinkAnimation(this);
-        this.circle = tableCircle;
-        this.textLabel = textLabel;
-        this.label = options.groupOptions.label;
-        this.baseFill = baseFillComputed;
-
-        this.on("scaling", this.handleScaling.bind(this));
-    }
-
-    private handleScaling(): void {
-        this.adjustTextScaling();
-    }
-
-    private adjustTextScaling(): void {
-        this.textLabel.set({
-            scaleX: 1 / this.scaleX,
-            scaleY: 1 / this.scaleY,
-        });
-
-        this.canvas?.requestRenderAll();
-    }
-
-    getBaseFill(): string {
-        return this.circle.get("fill") as string;
-    }
-
-    setBaseFill(val: string): void {
-        this.baseFill = val;
-        this.setFill(val);
-    }
-
-    setFill(val: string): void {
-        this.circle.set("fill", val);
-        this.canvas?.requestRenderAll();
-    }
-
-    setLabel(newLabel: string): void {
-        this.label = newLabel;
-        this.textLabel.set("text", newLabel);
-        this.canvas?.requestRenderAll();
-    }
-
-    startAnimation(): void {
-        this.animationStrategy.animate();
-    }
-
-    stopAnimation(): void {
-        this.animationStrategy.stop();
-    }
-
-    setReservation(reservation: ReservationDoc | undefined): void {
-        this.reservation = reservation;
-        const fill = determineTableColor(reservation, this.baseFill);
-        this.setFill(fill);
-    }
-
-    // @ts-expect-error -- ok
-    toObject(): Record<string, unknown> {
-        return {
-            ...super.toObject(),
-            opacity: 1,
-            baseFill: this.baseFill,
-            label: this.label,
-        };
+        super([tableCircle, textLabel], options);
     }
 
     static override async fromObject(object: any): Promise<RoundTable> {
-        const circleOptions = object.objects[0];
+        const shapeOptions = object.objects[0];
         const textOptions = object.objects[1];
         return new RoundTable({
             groupOptions: object,
-            circleOptions,
+            shapeOptions,
             textOptions,
         });
     }
