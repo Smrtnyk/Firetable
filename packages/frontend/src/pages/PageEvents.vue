@@ -52,7 +52,6 @@ watch(
 onMounted(async () => {
     if (!props.organisationId || !props.propertyId) {
         await router.replace("/");
-        return;
     }
 });
 </script>
