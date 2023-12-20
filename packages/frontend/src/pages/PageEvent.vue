@@ -153,27 +153,36 @@ onUnmounted(() => {
             </q-fab>
         </q-page-sticky>
 
-        <div class="row items-center q-mb-sm q-gutter-sm">
+        <q-page-sticky
+            v-if="hasMultipleFloorPlans"
+            position="bottom-left"
+            :offset="[18, 18]"
+            style="z-index: 999999"
+        >
             <q-fab
-                v-if="hasMultipleFloorPlans"
                 :model-value="showMapsExpanded"
                 :label="!isMobile && activeFloor ? activeFloor.name : ''"
                 padding="xs"
                 vertical-actions-align="left"
-                icon="chevron_down"
-                direction="down"
-                class="button-gradient q-mt-none"
+                icon="chevron_right"
+                direction="up"
+                color="primary"
             >
                 <q-fab-action
                     :key="florInstance.id"
                     v-for="florInstance of floorInstances"
                     class="text-white"
-                    :class="{ 'button-gradient': isActiveFloor(florInstance.id) }"
+                    :class="{
+                        'button-gradient': isActiveFloor(florInstance.id),
+                        'bg-primary': !isActiveFloor(florInstance.id),
+                    }"
                     @click.prevent="() => setActiveFloor(florInstance)"
                     :label="florInstance.name"
                 />
             </q-fab>
+        </q-page-sticky>
 
+        <div class="row items-center q-mb-sm q-gutter-sm">
             <FTAutocomplete
                 :floors="eventFloors"
                 :show-floor-name-in-option="hasMultipleFloorPlans"
