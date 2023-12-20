@@ -35,7 +35,7 @@
         "@types/pako": "2.0.3",
         "chart.js": "4.4.1",
         "color": "4.2.3",
-        "date-fns": "3.0.0",
+        "date-fns": "3.0.1",
         "pako": "2.1.0",
         "pinia": "2.1.7",
         "quasar": "2.14.2",
