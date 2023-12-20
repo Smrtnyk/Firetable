@@ -46,10 +46,39 @@ const monthOptions = computed(() => {
     return options.reverse();
 });
 const reservations = ref<ReservationBucket[]>([]);
+const selectedDay = ref("ALL");
 const reservationsByActiveProperty = computed<AugmentedReservation[]>(() => {
     return reservations.value
         .filter((bucket) => bucket.propertyId === selectedTab.value)
         .flatMap((bucket) => bucket.reservations);
+});
+const reservationsByDay = computed(() => {
+    const daysOfWeek = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+    ];
+    const dayBucket: Record<string, AugmentedReservation[]> = {};
+
+    reservationsByActiveProperty.value.forEach((reservation) => {
+        const date = new Date(reservation.date);
+        const dayIndex = date.getUTCDay();
+        const dayName = daysOfWeek[dayIndex];
+
+        if (!dayBucket[dayName]) {
+            dayBucket[dayName] = [];
+        }
+        dayBucket[dayName].push(reservation);
+    });
+
+    // Filter out days with no reservations
+    return Object.fromEntries(
+        Object.entries(dayBucket).filter(([, reservationsVal]) => reservationsVal.length > 0),
+    );
 });
 
 const confirmedVsUnconfirmed = computed((): PieChartData => {
@@ -291,6 +320,12 @@ async function fetchData(): Promise<void> {
         reservations.value = fetchedData;
 
         analyticsStore.cacheData(cacheKey, fetchedData);
+
+        // Set the active tab to the first day with reservations
+        const firstDayWithReservations = Object.keys(reservationsByDay.value)[0];
+        if (firstDayWithReservations) {
+            selectedDay.value = firstDayWithReservations;
+        }
     } catch (e) {
         showErrorMessage(e);
     } finally {
@@ -424,10 +459,33 @@ async function getReservationFromEventsByUser(events: EventDoc[]): Promise<Reser
                             :chart-data="confirmedVsUnconfirmed"
                             chart-title="Confirmed vs. Unconfirmed"
                         />
-                        <AdminEventReservationsByPerson
-                            class="col-12"
-                            :reservations="reservationsByActiveProperty"
-                        />
+                        <div class="col-12 q-my-sm">
+                            <q-tabs v-model="selectedDay" align="justify">
+                                <q-tab
+                                    v-for="day in [...Object.keys(reservationsByDay), 'ALL']"
+                                    :key="day"
+                                    :name="day"
+                                    :label="day"
+                                />
+                            </q-tabs>
+
+                            <q-tab-panels v-model="selectedDay" animated>
+                                <q-tab-panel
+                                    v-for="(reservations, day) in {
+                                        ...reservationsByDay,
+                                        ALL: reservationsByActiveProperty,
+                                    }"
+                                    :key="day"
+                                    :name="day"
+                                >
+                                    <AdminEventReservationsByPerson
+                                        class="col-12"
+                                        :reservations="reservations"
+                                    />
+                                </q-tab-panel>
+                            </q-tab-panels>
+                        </div>
+
                         <BarChart
                             class="col-sm-12 col-md-6"
                             :chart-data="peakReservationHours"
