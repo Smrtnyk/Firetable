@@ -19,10 +19,11 @@ import { useI18n } from "vue-i18n";
 import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 
+type BucketizedUser = User & { memberOf: string[] };
 interface BucketizedUsers {
     [propertyId: string]: {
         propertyName: string;
-        users: User[];
+        users: BucketizedUser[];
     };
 }
 
@@ -41,13 +42,15 @@ const { createDialog } = useDialog();
 const bucketizedUsers = computed((): BucketizedUsers => {
     const buckets: BucketizedUsers = {};
     users.value.forEach((user) => {
-        user.relatedProperties.forEach((propertyId) => {
+        const bucketizedUser: BucketizedUser = { ...user, memberOf: [] };
+        bucketizedUser.relatedProperties.forEach((propertyId) => {
             const property = properties.value.find((p) => p.id === propertyId);
             if (property) {
+                bucketizedUser.memberOf.push(property.name);
                 if (!buckets[propertyId]) {
                     buckets[propertyId] = { propertyName: property.name, users: [] };
                 }
-                buckets[propertyId].users.push(user);
+                buckets[propertyId].users.push(bucketizedUser);
             }
         });
     });
@@ -226,6 +229,9 @@ async function onUserSlideRight(user: User, reset: () => void): Promise<void> {
                                         {{ user.name }} - {{ user.email }}
                                     </q-item-label>
                                     <q-item-label caption> Role: {{ user.role }} </q-item-label>
+                                    <q-item-label caption>
+                                        Member of: {{ user.memberOf.join(", ") }}
+                                    </q-item-label>
                                 </q-item-section>
                             </q-item>
                         </q-slide-item>
