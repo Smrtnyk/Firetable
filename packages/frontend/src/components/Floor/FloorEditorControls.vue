@@ -117,7 +117,7 @@ function setElementColor(newVal: any): void {
                 <q-separator inset class="q-ma-md full-width"></q-separator>
                 <p>Element</p>
                 <q-input
-                    v-model="localWidth"
+                    v-model.number="localWidth"
                     standout
                     rounded
                     type="number"
@@ -126,7 +126,7 @@ function setElementColor(newVal: any): void {
                 />
                 <q-input
                     rounded
-                    v-model="localHeight"
+                    v-model.number="localHeight"
                     standout
                     type="number"
                     label="Height"
@@ -184,7 +184,7 @@ function setElementColor(newVal: any): void {
                 <div class="col">
                     <q-input
                         :dense="isMobile"
-                        v-model="localWidth"
+                        v-model.number="localWidth"
                         standout
                         rounded
                         type="number"
@@ -195,7 +195,7 @@ function setElementColor(newVal: any): void {
                     <q-input
                         rounded
                         :dense="isMobile"
-                        v-model="localHeight"
+                        v-model.number="localHeight"
                         standout
                         type="number"
                         label="Height"

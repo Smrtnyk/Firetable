@@ -180,7 +180,7 @@ async function onOKClick(): Promise<void> {
             </q-input>
 
             <q-input
-                v-model="state.numberOfGuests"
+                v-model.number="state.numberOfGuests"
                 hide-bottom-space
                 rounded
                 standout
@@ -191,7 +191,7 @@ async function onOKClick(): Promise<void> {
             />
 
             <q-input
-                v-model="state.consumption"
+                v-model.number="state.consumption"
                 hide-bottom-space
                 rounded
                 standout

@@ -207,7 +207,7 @@ function onReset(): void {
             />
 
             <q-input
-                v-model="state.form.guestListLimit"
+                v-model.number="state.form.guestListLimit"
                 rounded
                 standout
                 type="number"
@@ -217,7 +217,7 @@ function onReset(): void {
             />
 
             <q-input
-                v-model="state.form.entryPrice"
+                v-model.number="state.form.entryPrice"
                 rounded
                 standout
                 type="number"

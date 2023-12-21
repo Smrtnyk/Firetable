@@ -37,7 +37,7 @@ async function submit(): Promise<void> {
             />
 
             <q-input
-                v-model="maxAllowedProperties"
+                v-model.number="maxAllowedProperties"
                 label="Add maximum number of allowed properties..."
                 rounded
                 standout
