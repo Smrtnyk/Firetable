@@ -7,7 +7,7 @@ import FTTitle from "src/components/FTTitle.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 
 import { showConfirm, showErrorMessage, withLoading } from "src/helpers/ui-helpers";
-import { computed, onBeforeMount, watch, onUnmounted } from "vue";
+import { computed, onBeforeMount, watch, onUnmounted, ref } from "vue";
 import { Loading, useQuasar } from "quasar";
 import FTDialog from "src/components/FTDialog.vue";
 import { createUserWithEmail, deleteUser, updateUser } from "@firetable/backend";
@@ -38,6 +38,8 @@ const { getOrganisations } = usePropertiesStore();
 
 const { users, isLoading, fetchUsers } = useUsers(props.organisationId);
 const { createDialog } = useDialog();
+
+const activeTab = ref(0);
 
 const bucketizedUsers = computed((): BucketizedUsers => {
     const buckets: BucketizedUsers = {};
@@ -203,9 +205,21 @@ async function onUserSlideRight(user: User, reset: () => void): Promise<void> {
         </FTTitle>
 
         <div v-if="Object.keys(bucketizedUsers).length > 0 && !isLoading">
-            <template v-for="bucket in Object.values(bucketizedUsers)" :key="bucket.propertyName">
-                <div class="property-section q-mb-md">
-                    <p class="q-ml-sm text-h6">{{ bucket.propertyName }}</p>
+            <q-tabs v-model="activeTab">
+                <q-tab
+                    v-for="(bucket, index) in Object.values(bucketizedUsers)"
+                    :key="bucket.propertyName"
+                    :name="index"
+                    :label="bucket.propertyName"
+                />
+            </q-tabs>
+
+            <q-tab-panels v-model="activeTab" animated>
+                <q-tab-panel
+                    v-for="(bucket, index) in Object.values(bucketizedUsers)"
+                    :key="bucket.propertyName"
+                    :name="index"
+                >
                     <q-list>
                         <q-slide-item
                             v-for="user in bucket.users"
@@ -236,8 +250,8 @@ async function onUserSlideRight(user: User, reset: () => void): Promise<void> {
                             </q-item>
                         </q-slide-item>
                     </q-list>
-                </div>
-            </template>
+                </q-tab-panel>
+            </q-tab-panels>
         </div>
 
         <FTCenteredText v-if="Object.keys(bucketizedUsers).length === 0 && !isLoading">
