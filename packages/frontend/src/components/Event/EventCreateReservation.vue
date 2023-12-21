@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Reservation, User } from "@firetable/types";
 import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
+import { ReservationStatus } from "@firetable/types";
 import { computed, reactive, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
@@ -47,6 +48,7 @@ const initialState =
               reservationConfirmed: false,
               time: "00:00",
               reservedBy: null as unknown as User,
+              cancelled: false,
               creator: {
                   name: authStore.user!.name,
                   email: authStore.user!.email,
@@ -55,6 +57,7 @@ const initialState =
               },
               tableLabel: props.table.label,
               floorId: props.floor.id,
+              status: ReservationStatus.ACTIVE,
           };
 const state = reactive<Reservation>(initialState);
 const reservationForm = ref<QForm | null>(null);

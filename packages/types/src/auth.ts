@@ -36,6 +36,9 @@ export interface UserCapabilities {
     [UserCapability.CAN_DELETE_RESERVATION]?: boolean;
     [UserCapability.CAN_DELETE_OWN_RESERVATION]?: boolean;
     [UserCapability.CAN_CONFIRM_RESERVATION]?: boolean;
+    [UserCapability.CAN_CANCEL_RESERVATION]?: boolean;
+    [UserCapability.CAN_EDIT_RESERVATION]?: boolean;
+    [UserCapability.CAN_EDIT_OWN_RESERVATION]?: boolean;
 }
 
 export const enum UserCapability {
@@ -45,6 +48,9 @@ export const enum UserCapability {
     CAN_DELETE_RESERVATION = "Can delete reservation",
     CAN_DELETE_OWN_RESERVATION = "Can delete own reservation",
     CAN_CONFIRM_RESERVATION = "Can confirm reservation",
+    CAN_CANCEL_RESERVATION = "Can cancel reservation",
+    CAN_EDIT_RESERVATION = "Can edit reservation",
+    CAN_EDIT_OWN_RESERVATION = "Can edit own reservation",
 }
 
 export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapabilities> = {
@@ -55,6 +61,9 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapab
         [UserCapability.CAN_DELETE_RESERVATION]: true,
         [UserCapability.CAN_DELETE_OWN_RESERVATION]: true,
         [UserCapability.CAN_CONFIRM_RESERVATION]: true,
+        [UserCapability.CAN_CANCEL_RESERVATION]: true,
+        [UserCapability.CAN_EDIT_RESERVATION]: true,
+        [UserCapability.CAN_EDIT_OWN_RESERVATION]: true,
     },
     [Role.PROPERTY_OWNER]: {
         [UserCapability.CAN_RESERVE]: true,
@@ -63,6 +72,9 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapab
         [UserCapability.CAN_DELETE_RESERVATION]: true,
         [UserCapability.CAN_DELETE_OWN_RESERVATION]: true,
         [UserCapability.CAN_CONFIRM_RESERVATION]: true,
+        [UserCapability.CAN_CANCEL_RESERVATION]: true,
+        [UserCapability.CAN_EDIT_RESERVATION]: true,
+        [UserCapability.CAN_EDIT_OWN_RESERVATION]: true,
     },
     [Role.MANAGER]: {
         [UserCapability.CAN_RESERVE]: true,
@@ -71,6 +83,9 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapab
         [UserCapability.CAN_DELETE_RESERVATION]: true,
         [UserCapability.CAN_DELETE_OWN_RESERVATION]: true,
         [UserCapability.CAN_CONFIRM_RESERVATION]: true,
+        [UserCapability.CAN_CANCEL_RESERVATION]: true,
+        [UserCapability.CAN_EDIT_RESERVATION]: true,
+        [UserCapability.CAN_EDIT_OWN_RESERVATION]: true,
     },
     [Role.HOSTESS]: {
         [UserCapability.CAN_RESERVE]: true,
@@ -79,6 +94,9 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapab
         [UserCapability.CAN_DELETE_RESERVATION]: true,
         [UserCapability.CAN_DELETE_OWN_RESERVATION]: true,
         [UserCapability.CAN_CONFIRM_RESERVATION]: true,
+        [UserCapability.CAN_CANCEL_RESERVATION]: false,
+        [UserCapability.CAN_EDIT_RESERVATION]: true,
+        [UserCapability.CAN_EDIT_OWN_RESERVATION]: true,
     },
     [Role.STAFF]: {
         [UserCapability.CAN_RESERVE]: false,
@@ -87,5 +105,8 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapab
         [UserCapability.CAN_DELETE_RESERVATION]: false,
         [UserCapability.CAN_DELETE_OWN_RESERVATION]: true,
         [UserCapability.CAN_CONFIRM_RESERVATION]: false,
+        [UserCapability.CAN_CANCEL_RESERVATION]: false,
+        [UserCapability.CAN_EDIT_RESERVATION]: false,
+        [UserCapability.CAN_EDIT_OWN_RESERVATION]: true,
     },
 };

@@ -8,6 +8,7 @@ import { config, flushPromises, mount } from "@vue/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createI18n } from "vue-i18n";
 import { Quasar } from "quasar";
+import { ReservationStatus } from "@firetable/types";
 
 const i18n = createI18n({
     locale: "en-GB",
@@ -18,20 +19,36 @@ const i18n = createI18n({
 
 config.global.plugins = [i18n];
 
-const testReservationData = {
+const testReservationData: Reservation = {
     guestName: "John Doe",
     numberOfGuests: 2,
     guestContact: "1234567890",
     reservationNote: "",
     consumption: 1,
     confirmed: false,
+    cancelled: false,
     time: "12:00",
-    reservedBy: { name: "Staff", email: "staff@example.com" },
+    reservedBy: { name: "Staff", email: "staff@example.com", id: "1" },
+    reservationConfirmed: false,
+    floorId: "1",
+    tableLabel: "1",
+    creator: {
+        email: "mail",
+        id: "1",
+        name: "name",
+        createdAt: {
+            nanoseconds: 1,
+            seconds: 1,
+        } as any,
+    },
+    status: ReservationStatus.ACTIVE,
 };
 
 type TestProps = {
     users: User[];
     mode: "create" | "edit";
+    table: { label: string };
+    floor: { id: string };
     reservationData: Reservation | null;
     eventStartTimestamp: number;
 };
@@ -115,6 +132,8 @@ describe("EventCreateReservation", () => {
                 creator: MOCK_USER,
                 floorId: "1",
                 tableLabel: "1",
+                cancelled: false,
+                status: ReservationStatus.ACTIVE,
             },
         ]);
     });
@@ -140,6 +159,8 @@ describe("EventCreateReservation", () => {
                 confirmed: false,
                 time: "12:00",
                 reservedBy: { name: "Staff", email: "staff@example.com" },
+                cancelled: false,
+                status: ReservationStatus.ACTIVE,
             },
         ]);
     });
@@ -205,6 +226,8 @@ describe("EventCreateReservation", () => {
                 creator: MOCK_USER,
                 floorId: "1",
                 tableLabel: "1",
+                cancelled: false,
+                status: ReservationStatus.ACTIVE,
             },
         ]);
     });

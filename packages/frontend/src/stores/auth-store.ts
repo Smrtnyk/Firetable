@@ -57,6 +57,18 @@ export const useAuthStore = defineStore("auth", () => {
         return !!capabilities.value[UserCapability.CAN_CONFIRM_RESERVATION];
     });
 
+    const canCancelReservation = computed(() => {
+        return !!capabilities.value[UserCapability.CAN_CANCEL_RESERVATION];
+    });
+
+    const canEditReservation = computed(() => {
+        return !!capabilities.value[UserCapability.CAN_EDIT_RESERVATION];
+    });
+
+    const canEditOwnReservation = computed(() => {
+        return !!capabilities.value[UserCapability.CAN_EDIT_OWN_RESERVATION];
+    });
+
     function cleanup(): void {
         unsubscribers.forEach((unsub) => {
             unsub();
@@ -169,8 +181,11 @@ export const useAuthStore = defineStore("auth", () => {
         initUser,
         isLoggedIn,
         isAdmin,
+        canEditOwnReservation,
+        canEditReservation,
         canSeeReservationCreator,
         canConfirmReservation,
+        canCancelReservation,
         canDeleteOwnReservation,
         canReserve,
         canSeeGuestContact,

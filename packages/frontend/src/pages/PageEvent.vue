@@ -2,24 +2,24 @@
 import type { EventDoc, FloorDoc, GuestData, ReservationDoc } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
 import type { TouchPanValue } from "quasar";
-import EventGuestList from "src/components/Event/EventGuestList.vue";
-import FTAutocomplete from "src/components/Event/FTAutocomplete.vue";
-import EventInfo from "src/components/Event/EventInfo.vue";
-import FTDialog from "src/components/FTDialog.vue";
-
-import { Loading, useQuasar } from "quasar";
-
-import { useRouter } from "vue-router";
-import { computed, onMounted, ref, onUnmounted } from "vue";
-import { useEventsStore } from "src/stores/events-store";
-import { useFirestoreCollection, useFirestoreDocument } from "src/composables/useFirestore";
-import { useFloorsPageEvent } from "src/composables/useFloorsPageEvent";
+import { ReservationStatus } from "@firetable/types";
 import {
     getEventFloorsPath,
     getEventGuestListPath,
     getEventPath,
     getReservationsPath,
 } from "@firetable/backend";
+import { Loading, useQuasar } from "quasar";
+import EventGuestList from "src/components/Event/EventGuestList.vue";
+import FTAutocomplete from "src/components/Event/FTAutocomplete.vue";
+import EventInfo from "src/components/Event/EventInfo.vue";
+import FTDialog from "src/components/FTDialog.vue";
+
+import { useRouter } from "vue-router";
+import { computed, onMounted, onUnmounted, ref } from "vue";
+import { useEventsStore } from "src/stores/events-store";
+import { useFirestoreCollection, useFirestoreDocument } from "src/composables/useFirestore";
+import { useFloorsPageEvent } from "src/composables/useFloorsPageEvent";
 import { isMobile } from "src/global-reactives/screen-detection";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";
@@ -53,10 +53,16 @@ const { data: event, promise: eventDataPromise } = useFirestoreDocument<EventDoc
 );
 const { data: eventFloors } = useFirestoreCollection<FloorDoc>(getEventFloorsPath(eventOwner));
 const {
-    data: reservations,
+    data: reservationsCollData,
     promise: reservationsDataPromise,
     error: reservationsDataError,
 } = useFirestoreCollection<ReservationDoc>(getReservationsPath(eventOwner), { wait: true });
+const reservations = computed(
+    () =>
+        reservationsCollData.value.filter((res) => {
+            return !res.status || res.status === ReservationStatus.ACTIVE;
+        }) || [],
+);
 
 const fabPos = ref([18, 18]);
 const draggingFab = ref(false);

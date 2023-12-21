@@ -3,7 +3,10 @@ import type { Component } from "vue";
 import type { FloorEditor } from "@firetable/floor-creator";
 import type { FloorDoc } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
-import { computed, onMounted, ref, watch, onUnmounted } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { getTablesFromFloorDoc } from "@firetable/floor-creator";
+import { ReservationStatus } from "@firetable/types";
+import { updateEventFloorData } from "@firetable/backend";
 import { useRouter } from "vue-router";
 import { formatEventDate } from "src/helpers/date-utils";
 
@@ -17,13 +20,12 @@ import AdminEventLogs from "src/components/admin/event/AdminEventLogs.vue";
 
 import { Loading, useQuasar } from "quasar";
 import { config } from "src/config";
-import { getTablesFromFloorDoc } from "@firetable/floor-creator";
-import { updateEventFloorData } from "@firetable/backend";
 import { withLoading } from "src/helpers/ui-helpers";
 import useAdminEvent from "src/composables/useAdminEvent";
 import { buttonSize, isMobile } from "src/global-reactives/screen-detection";
 import { truncateText } from "src/helpers/string-utils";
 import { compressFloorDoc } from "src/helpers/compress-floor-doc";
+import { propIsTruthy } from "@firetable/utils";
 
 interface Props {
     organisationId: string;
@@ -72,16 +74,24 @@ function isEventFinished(eventTime: number): boolean {
 const allTables = computed(() => eventFloors.value.map(getTablesFromFloorDoc).flat());
 
 const reservationsStatus = computed(() => {
+    const activeReservations = reservations.value.filter((reservation) => {
+        return (
+            (!reservation.status || reservation.status === ReservationStatus.ACTIVE) &&
+            !reservation.cancelled
+        );
+    });
+    const cancelledReservations = reservations.value.filter(propIsTruthy("cancelled"));
     const unreserved = allTables.value.length - reservations.value.length;
-    const pending = reservations.value.filter((reservation) => !reservation.confirmed).length;
-    const confirmed = reservations.value.length - pending;
-    const reserved = reservations.value.length;
-    const totalGuests = reservations.value.reduce((acc, reservation) => {
+    const pending = activeReservations.filter((reservation) => !reservation.confirmed).length;
+    const confirmed = activeReservations.length - pending;
+    const reserved = activeReservations.length;
+    const totalGuests = activeReservations.reduce((acc, reservation) => {
         return acc + Number(reservation.numberOfGuests || 0);
     }, 0);
 
     return {
         total: allTables.value.length,
+        cancelled: cancelledReservations.length,
         reserved,
         pending,
         confirmed,

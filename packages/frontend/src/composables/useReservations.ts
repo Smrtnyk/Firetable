@@ -1,17 +1,13 @@
 import type { Ref, ShallowRef } from "vue";
-import type { EventDoc, Reservation, ReservationDoc, User } from "@firetable/types";
 import type { BaseTable, Floor, FloorEditorElement, FloorViewer } from "@firetable/floor-creator";
 import type { EventOwner } from "@firetable/backend";
 import type { DialogChainObject } from "quasar";
 import type { VueFirestoreDocumentData } from "vuefire";
-import { computed, onBeforeUnmount, watch, ref } from "vue";
-import {
-    addLogToEvent,
-    addReservation,
-    deleteReservation,
-    updateReservationDoc,
-} from "@firetable/backend";
+import type { EventDoc, Reservation, ReservationDoc, User } from "@firetable/types";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
+import { ReservationStatus } from "@firetable/types";
 import { isTable } from "@firetable/floor-creator";
+import { addLogToEvent, addReservation, updateReservationDoc } from "@firetable/backend";
 import { useQuasar } from "quasar";
 import {
     notifyPositive,
@@ -20,12 +16,12 @@ import {
     tryCatchLoadingWrapper,
 } from "src/helpers/ui-helpers";
 import { useI18n } from "vue-i18n";
+import { useAuthStore } from "src/stores/auth-store";
+import { NOOP } from "@firetable/utils";
 
 import FTDialog from "src/components/FTDialog.vue";
 import EventCreateReservation from "src/components/Event/EventCreateReservation.vue";
 import EventShowReservation from "src/components/Event/EventShowReservation.vue";
-import { useAuthStore } from "src/stores/auth-store";
-import { NOOP } from "@firetable/utils";
 
 const HALF_HOUR = 30 * 60 * 1000; // 30 minutes in milliseconds
 
@@ -53,11 +49,13 @@ export function useReservations(
         return authStore.canReserve;
     });
 
-    let currentOpenCreateReservationDialog: {
-        label: string;
-        dialog: DialogChainObject;
-        floorId: string;
-    } | null = null;
+    let currentOpenCreateReservationDialog:
+        | {
+              label: string;
+              dialog: DialogChainObject;
+              floorId: string;
+          }
+        | undefined;
 
     watch([reservations, floorInstances], handleFloorUpdates, {
         immediate: true,
@@ -79,17 +77,6 @@ export function useReservations(
             }
         }
         checkReservationsForTimeAndMarkTableIfNeeded();
-    }
-
-    function isOwnReservation(reservation: Reservation): boolean {
-        return authStore.user?.id === reservation.creator?.id;
-    }
-
-    function canDeleteReservation(reservation: Reservation): boolean {
-        return (
-            authStore.canDeleteReservation ||
-            (isOwnReservation(reservation) && authStore.canDeleteOwnReservation)
-        );
     }
 
     function createEventLog(message: string): void {
@@ -121,14 +108,17 @@ export function useReservations(
 
         await tryCatchLoadingWrapper({
             hook: async function () {
-                await deleteReservation(eventOwner, reservation);
+                await updateReservationDoc(eventOwner, {
+                    status: ReservationStatus.DELETED,
+                    id: reservation.id,
+                });
                 createEventLog(`Reservation deleted on table ${reservation.tableLabel}`);
             },
         });
     }
 
     function resetCurrentOpenCreateReservationDialog(): void {
-        currentOpenCreateReservationDialog = null;
+        currentOpenCreateReservationDialog = undefined;
     }
 
     function checkIfReservedTableAndCloseCreateReservationDialog(): void {
@@ -141,7 +131,7 @@ export function useReservations(
         if (!isTableStillFree) return;
 
         dialog.hide();
-        currentOpenCreateReservationDialog = null;
+        currentOpenCreateReservationDialog = undefined;
         showErrorMessage(t("PageEvent.reservationAlreadyReserved"));
     }
 
@@ -211,11 +201,10 @@ export function useReservations(
                 title: `${t("EventShowReservation.title")} ${element.label}`,
                 maximized: false,
                 componentPropsObject: {
-                    canDeleteReservation: canDeleteReservation(reservation),
                     reservation,
                 },
                 listeners: {
-                    delete: () => {
+                    delete() {
                         onDeleteReservation(reservation).catch(showErrorMessage);
                     },
                     edit() {
@@ -235,6 +224,7 @@ export function useReservations(
                     },
                     confirm: onGuestArrived(reservation),
                     reservationConfirmed: reservationConfirmed(reservation),
+                    cancel: onReservationCancelled(reservation),
                 },
             },
         });
@@ -259,6 +249,18 @@ export function useReservations(
                     updateReservationDoc(eventOwner, {
                         id: reservation.id,
                         reservationConfirmed: val,
+                    }),
+            });
+        };
+    }
+
+    function onReservationCancelled(reservation: ReservationDoc) {
+        return function (val: boolean) {
+            return tryCatchLoadingWrapper({
+                hook: () =>
+                    updateReservationDoc(eventOwner, {
+                        id: reservation.id,
+                        cancelled: val,
                     }),
             });
         };

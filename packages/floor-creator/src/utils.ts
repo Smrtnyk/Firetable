@@ -6,6 +6,7 @@ export function determineTableColor(
     fallback: string,
 ): string {
     return match(reservation)
+        .with({ cancelled: true }, () => "#ff9f43")
         .with({ confirmed: true }, () => "#1a7722")
         .with({ reservationConfirmed: true }, () => "#6247aa")
         .with({ confirmed: false }, () => "#2ab7ca")

@@ -52,11 +52,17 @@ export type ReservationDoc = Reservation & {
 
 type UserIdentifier = Pick<User, "name" | "email" | "id">;
 
+export const enum ReservationStatus {
+    DELETED = "Deleted",
+    ACTIVE = "Active",
+}
+
 export interface Reservation {
     floorId: string;
     tableLabel: string;
     confirmed: boolean;
     reservationConfirmed: boolean | undefined;
+    cancelled: boolean | undefined;
     guestContact?: string;
     guestName: string;
     numberOfGuests: number | string;
@@ -65,6 +71,7 @@ export interface Reservation {
     time: string;
     reservedBy: UserIdentifier;
     creator: UserIdentifier & { createdAt: Timestamp };
+    status: ReservationStatus | undefined;
 }
 
 export interface EventLog {

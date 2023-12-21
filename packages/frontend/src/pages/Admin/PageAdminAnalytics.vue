@@ -316,7 +316,7 @@ async function fetchData(): Promise<void> {
 
     try {
         const allEvents = await getEventsForProperties(properties.value, monthKey);
-        const fetchedData = await getReservationFromEventsByUser(allEvents);
+        const fetchedData = await getReservationFromEvents(allEvents);
         reservations.value = fetchedData;
 
         analyticsStore.cacheData(cacheKey, fetchedData);
@@ -377,7 +377,7 @@ async function getEventsForProperties(
         .map((doc) => ({ ...doc.data(), id: doc.id }) as EventDoc);
 }
 
-async function getReservationFromEventsByUser(events: EventDoc[]): Promise<ReservationBucket[]> {
+async function getReservationFromEvents(events: EventDoc[]): Promise<ReservationBucket[]> {
     const buckets: Record<string, ReservationBucket> = {};
 
     await Promise.all(
@@ -398,6 +398,10 @@ async function getReservationFromEventsByUser(events: EventDoc[]): Promise<Reser
                     id: doc.id,
                     date: event.date,
                 } as AugmentedReservation;
+
+                // TODO: include cancelled reservations in analytics
+                if (reservationData.cancelled) return;
+
                 if (!buckets[event.propertyId]) {
                     const property = properties.value.find((p) => p.id === event.propertyId);
                     const propertyName = property ? property.name : "Unknown Property";

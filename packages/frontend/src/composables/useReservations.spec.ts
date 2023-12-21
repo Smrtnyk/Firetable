@@ -5,9 +5,10 @@ import type { MockInstance } from "vitest";
 import { useReservations } from "./useReservations";
 import * as uiHelpers from "../helpers/ui-helpers";
 import * as authStore from "../stores/auth-store";
+import { ReservationStatus } from "@firetable/types";
+import { shallowRef, toRef, ref } from "vue";
 import * as Backend from "@firetable/backend";
 import * as Quasar from "quasar";
-import { toRef, ref } from "vue";
 import { describe, beforeEach, expect, it, vi } from "vitest";
 import { FloorViewer, getTables, RectTable } from "@firetable/floor-creator";
 import { uid } from "quasar";
@@ -42,7 +43,7 @@ function createFloor(floorName: string): FloorViewer {
 
 function createTable(label: string): RectTable {
     return new RectTable({
-        rectOptions: {},
+        shapeOptions: {},
         groupOptions: {
             label,
         },
@@ -57,9 +58,12 @@ function createMockReservation(partial: Partial<ReservationDoc> = {}): Reservati
         id: "id",
         guestName: "foo",
         confirmed: false,
+        reservationConfirmed: false,
         numberOfGuests: 1,
         consumption: 1,
         time: "12:00",
+        cancelled: false,
+        status: ReservationStatus.ACTIVE,
         reservedBy: {
             name: "foo",
             email: "bar",
@@ -69,6 +73,10 @@ function createMockReservation(partial: Partial<ReservationDoc> = {}): Reservati
             name: "foo",
             email: "bar",
             id: "baz",
+            createdAt: {
+                seconds: 1,
+                nanoseconds: 1,
+            } as any,
         },
         floorId: "1",
         tableLabel: "1",
@@ -89,7 +97,7 @@ function createReservedTable(label: string, floorId: string): RectTable {
 
 describe("useReservations", () => {
     let users: Ref<User[]>;
-    const floorInstances = ref<FloorViewer[]>([]);
+    const floorInstances = shallowRef<FloorViewer[]>([]);
     let eventOwner: backend.EventOwner;
     let event: Ref<EventDoc>;
     let floor1: FloorViewer;
@@ -98,14 +106,14 @@ describe("useReservations", () => {
 
     beforeEach(() => {
         deleteReservationSpy = vi
-            .spyOn(Backend, "deleteReservation")
+            .spyOn(Backend, "updateReservationDoc")
             .mockImplementation(vi.fn<any>());
         mockReservations.length = 0;
         floorInstances.value.length = 0;
         vi.spyOn(Quasar, "Dialog", "get").mockReturnValue({
             create: vi.fn(),
         });
-        vi.spyOn(i18n, "useI18n").mockReturnValue(() => {
+        vi.spyOn<any, any>(i18n, "useI18n").mockReturnValue(() => {
             return {
                 t: NOOP,
             };
@@ -172,6 +180,9 @@ describe("useReservations", () => {
             event,
         );
         await onDeleteReservation(mockReservation);
-        expect(deleteReservationSpy).toHaveBeenCalledWith(eventOwner, mockReservation);
+        expect(deleteReservationSpy).toHaveBeenCalledWith(eventOwner, {
+            id: mockReservation.id,
+            status: ReservationStatus.DELETED,
+        });
     });
 });
