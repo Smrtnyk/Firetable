@@ -47,10 +47,10 @@ const testReservationData: Reservation = {
 type TestProps = {
     users: User[];
     mode: "create" | "edit";
+    eventStartTimestamp: number;
     table: { label: string };
     floor: { id: string };
-    reservationData: Reservation | null;
-    eventStartTimestamp: number;
+    reservationData?: Reservation;
 };
 
 function createProps(overrides: Partial<TestProps> = {}): TestProps {
@@ -80,7 +80,9 @@ const MOCK_USER: ReservationDoc["creator"] = {
     } as any,
 };
 
-function mountComponent(overrides?: Partial<TestProps>): VueWrapper<EventCreateReservation, any> {
+function mountComponent(
+    overrides?: Partial<TestProps>,
+): VueWrapper<typeof EventCreateReservation, any> {
     return mount(EventCreateReservation, {
         props: createProps(overrides),
         global: {
