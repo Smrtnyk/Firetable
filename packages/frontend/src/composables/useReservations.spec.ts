@@ -170,6 +170,7 @@ describe("useReservations", () => {
         const mockReservation = createMockReservation({
             floorId: floor1.id,
             tableLabel: table.label,
+            cancelled: true,
         });
         mockReservations.push(mockReservation);
         const { onDeleteReservation } = useReservations(
