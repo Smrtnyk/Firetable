@@ -17,6 +17,7 @@ import AdminEventEditInfo from "src/components/admin/event/AdminEventEditInfo.vu
 import AdminEventFloorViewer from "src/components/admin/event/AdminEventFloorViewer.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import AdminEventLogs from "src/components/admin/event/AdminEventLogs.vue";
+import AdminEventCancelledReservationsList from "src/components/admin/event/AdminEventCancelledReservationsList.vue";
 
 import { Loading, useQuasar } from "quasar";
 import { config } from "src/config";
@@ -64,14 +65,8 @@ onUnmounted(() => {
     }
 });
 
-function isEventFinished(eventTime: number): boolean {
-    const eventFinishedLimit = new Date(eventTime);
-    eventFinishedLimit.setHours(eventFinishedLimit.getHours() + config.eventDuration);
-    const currentTime = new Date().getTime();
-    return currentTime > eventFinishedLimit.getTime();
-}
-
 const allTables = computed(() => eventFloors.value.map(getTablesFromFloorDoc).flat());
+const cancelledReservations = computed(() => reservations.value.filter(propIsTruthy("cancelled")));
 
 const reservationsStatus = computed(() => {
     const activeReservations = reservations.value.filter((reservation) => {
@@ -80,7 +75,6 @@ const reservationsStatus = computed(() => {
             !reservation.cancelled
         );
     });
-    const cancelledReservations = reservations.value.filter(propIsTruthy("cancelled"));
     const unreserved = allTables.value.length - reservations.value.length;
     const pending = activeReservations.filter((reservation) => !reservation.confirmed).length;
     const confirmed = activeReservations.length - pending;
@@ -91,7 +85,7 @@ const reservationsStatus = computed(() => {
 
     return {
         total: allTables.value.length,
-        cancelled: cancelledReservations.length,
+        cancelled: cancelledReservations.value.length,
         reserved,
         pending,
         confirmed,
@@ -112,6 +106,13 @@ const onFloorUpdate = withLoading(async function (floor: FloorEditor) {
         json: await compressFloorDoc(floor.json),
     });
 });
+
+function isEventFinished(eventTime: number): boolean {
+    const eventFinishedLimit = new Date(eventTime);
+    eventFinishedLimit.setHours(eventFinishedLimit.getHours() + config.eventDuration);
+    const currentTime = new Date().getTime();
+    return currentTime > eventFinishedLimit.getTime();
+}
 
 function showDialog(
     component: Component,
@@ -183,13 +184,7 @@ onMounted(init);
                 </q-btn>
             </template>
         </FTTitle>
-        <q-tabs
-            v-model="tab"
-            align="justify"
-            switch-indicator
-            active-class="button-gradient"
-            narrow-indicator
-        >
+        <q-tabs v-model="tab" align="justify">
             <q-tab name="info" label="Info" />
             <q-tab name="edit" label="Edit" v-if="!isEventFinished(event.date)" />
             <q-tab name="logs" label="Logs" />
@@ -201,6 +196,10 @@ onMounted(init);
                     <AdminEventGeneralInfo :reservations-status="reservationsStatus" />
                     <q-separator class="q-my-sm bg-grey-6" />
                     <AdminEventReservationsByPerson :reservations="reservations" />
+                    <q-separator class="q-my-sm bg-grey-6" />
+                    <AdminEventCancelledReservationsList
+                        :cancelled-reservations="cancelledReservations"
+                    />
                 </q-tab-panel>
 
                 <!-- Edit area -->

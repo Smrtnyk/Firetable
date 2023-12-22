@@ -7,7 +7,12 @@ import type { EventDoc, Reservation, ReservationDoc, User } from "@firetable/typ
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import { ReservationStatus } from "@firetable/types";
 import { isTable } from "@firetable/floor-creator";
-import { addLogToEvent, addReservation, updateReservationDoc } from "@firetable/backend";
+import {
+    addLogToEvent,
+    addReservation,
+    deleteReservation,
+    updateReservationDoc,
+} from "@firetable/backend";
 import { useQuasar } from "quasar";
 import {
     notifyPositive,
@@ -108,11 +113,19 @@ export function useReservations(
 
         await tryCatchLoadingWrapper({
             hook: async function () {
-                await updateReservationDoc(eventOwner, {
-                    status: ReservationStatus.DELETED,
-                    id: reservation.id,
-                });
-                createEventLog(`Reservation deleted on table ${reservation.tableLabel}`);
+                // If reservation is cancelled, soft delete it
+                // otherwise just delete it permanently for now
+                // might change in future if use-case for inspecting deleted reservations arises
+                if (reservation.cancelled) {
+                    await updateReservationDoc(eventOwner, {
+                        status: ReservationStatus.DELETED,
+                        id: reservation.id,
+                    });
+                    createEventLog(`Reservation soft deleted on table ${reservation.tableLabel}`);
+                } else {
+                    await deleteReservation(eventOwner, reservation);
+                    createEventLog(`Reservation deleted on table ${reservation.tableLabel}`);
+                }
             },
         });
     }
