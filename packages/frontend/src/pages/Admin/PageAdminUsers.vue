@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CreateUserPayload, EditUserPayload, User } from "@firetable/types";
+import { Role } from "@firetable/types";
 
 import UserCreateForm from "src/components/admin/User/UserCreateForm.vue";
 import UserEditForm from "src/components/admin/User/UserEditForm.vue";
@@ -7,7 +8,7 @@ import FTTitle from "src/components/FTTitle.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 
 import { showConfirm, showErrorMessage, withLoading } from "src/helpers/ui-helpers";
-import { computed, onBeforeMount, watch, onUnmounted, ref } from "vue";
+import { computed, onBeforeMount, onUnmounted, ref, watch } from "vue";
 import { Loading, useQuasar } from "quasar";
 import FTDialog from "src/components/FTDialog.vue";
 import { createUserWithEmail, deleteUser, updateUser } from "@firetable/backend";
@@ -45,6 +46,18 @@ const bucketizedUsers = computed((): BucketizedUsers => {
     const buckets: BucketizedUsers = {};
     users.value.forEach((user) => {
         const bucketizedUser: BucketizedUser = { ...user, memberOf: [] };
+        // if user is property owner, then add it to all buckets
+        // it needs to be added to all buckets because it can be a member of multiple properties
+        if (bucketizedUser.role === Role.PROPERTY_OWNER) {
+            properties.value.forEach((property) => {
+                if (!buckets[property.id]) {
+                    buckets[property.id] = { propertyName: property.name, users: [] };
+                }
+                buckets[property.id].users.push(bucketizedUser);
+            });
+            return;
+        }
+
         bucketizedUser.relatedProperties.forEach((propertyId) => {
             const property = properties.value.find((p) => p.id === propertyId);
             if (property) {
@@ -243,7 +256,7 @@ async function onUserSlideRight(user: User, reset: () => void): Promise<void> {
                                         {{ user.name }} - {{ user.email }}
                                     </q-item-label>
                                     <q-item-label caption> Role: {{ user.role }} </q-item-label>
-                                    <q-item-label caption>
+                                    <q-item-label caption v-if="user.memberOf.length > 0">
                                         Member of: {{ user.memberOf.join(", ") }}
                                     </q-item-label>
                                 </q-item-section>
