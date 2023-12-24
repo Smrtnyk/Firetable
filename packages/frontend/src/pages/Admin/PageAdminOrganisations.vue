@@ -1,20 +1,17 @@
 <script setup lang="ts">
 import type { CreateOrganisationPayload } from "@firetable/backend";
-import type { OrganisationDoc } from "@firetable/types";
 import FTTitle from "src/components/FTTitle.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import AddNewOrganisationForm from "src/components/admin/organisation/AddNewOrganisationForm.vue";
+import FTCenteredText from "src/components/FTCenteredText.vue";
 
 import { useQuasar } from "quasar";
 import { showConfirm, withLoading } from "src/helpers/ui-helpers";
-import {
-    createNewOrganisation,
-    deleteOrganisation,
-    fetchOrganisationsForAdmin,
-} from "@firetable/backend";
-import { onMounted, ref } from "vue";
-import FTCenteredText from "src/components/FTCenteredText.vue";
+import { createNewOrganisation, deleteOrganisation } from "@firetable/backend";
+import { ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { storeToRefs } from "pinia";
+import { initOrganisations, usePropertiesStore } from "src/stores/usePropertiesStore";
 
 type Link = {
     label: string;
@@ -25,10 +22,7 @@ type Link = {
 const { t } = useI18n();
 const quasar = useQuasar();
 const isLoading = ref(false);
-
-const organisations = ref<OrganisationDoc[]>([]);
-
-onMounted(fetchOrganisations);
+const { organisations } = storeToRefs(usePropertiesStore());
 
 function createLinks(organisationId: string): Link[] {
     return [
@@ -60,23 +54,17 @@ function createLinks(organisationId: string): Link[] {
     ];
 }
 
-async function fetchOrganisations(): Promise<void> {
-    isLoading.value = true;
-    organisations.value = await fetchOrganisationsForAdmin();
-    isLoading.value = false;
-}
-
 const onOrganisationCreate = withLoading(async function (
     organisationPayload: CreateOrganisationPayload,
 ) {
     await createNewOrganisation(organisationPayload);
     quasar.notify("organisation created!");
-    return fetchOrganisations();
+    return initOrganisations();
 });
 
 const onDeleteOrganisation = withLoading(async (id: string) => {
     await deleteOrganisation(id);
-    await fetchOrganisations();
+    await initOrganisations();
 });
 
 async function deleteOrganisationAsync(organisationId: string, reset: () => void): Promise<void> {
@@ -87,7 +75,7 @@ async function deleteOrganisationAsync(organisationId: string, reset: () => void
 }
 
 function createOrganisation(): void {
-    quasar.dialog({
+    const dialog = quasar.dialog({
         component: FTDialog,
         componentProps: {
             title: "Add new Organisation",
@@ -95,7 +83,10 @@ function createOrganisation(): void {
             component: AddNewOrganisationForm,
             componentPropsObject: {},
             listeners: {
-                create: onOrganisationCreate,
+                create: (organisationPayload: CreateOrganisationPayload) => {
+                    onOrganisationCreate(organisationPayload);
+                    dialog.hide();
+                },
             },
         },
     });

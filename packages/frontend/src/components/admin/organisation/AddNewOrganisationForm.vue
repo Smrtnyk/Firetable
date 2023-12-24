@@ -48,13 +48,6 @@ async function submit(): Promise<void> {
     </q-card-section>
 
     <q-card-actions align="right">
-        <q-btn
-            rounded
-            class="button-gradient"
-            size="md"
-            label="Create"
-            @click="submit"
-            v-close-popup
-        />
+        <q-btn rounded class="button-gradient" size="md" label="Create" @click="submit" />
     </q-card-actions>
 </template>
