@@ -104,7 +104,7 @@ const breadcrumbLinks = computed<Link[]>(() => {
         height: 30px;
         position: relative;
         line-height: 30px;
-        margin-right: 3px;
+        margin-right: -2px;
         padding: 0 10px;
         border-radius: 0;
         white-space: nowrap;
@@ -134,8 +134,8 @@ const breadcrumbLinks = computed<Link[]>(() => {
             content: "";
             position: absolute;
             top: 0;
-            left: -10px;
-            border-left: 10px solid transparent;
+            left: -5px;
+            border-left: 5px solid transparent;
             border-top: 15px solid $primary;
             border-bottom: 15px solid $primary;
         }
@@ -147,8 +147,8 @@ const breadcrumbLinks = computed<Link[]>(() => {
         &::after {
             position: absolute;
             top: 0;
-            right: -10px;
-            border-left: 10px solid $primary;
+            right: -5px;
+            border-left: 5px solid $primary;
             border-top: 15px solid transparent;
             border-bottom: 15px solid transparent;
             content: "";
