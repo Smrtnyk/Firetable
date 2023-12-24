@@ -113,10 +113,11 @@ export function useReservations(
 
         await tryCatchLoadingWrapper({
             hook: async function () {
-                // If reservation is cancelled, soft delete it
+                // If reservation is cancelled or guest arrived, soft delete it
                 // otherwise just delete it permanently for now
+                // we soft delete these so they can be used in analytics
                 // might change in future if use-case for inspecting deleted reservations arises
-                if (reservation.cancelled) {
+                if (reservation.cancelled || reservation.confirmed) {
                     await updateReservationDoc(eventOwner, {
                         status: ReservationStatus.DELETED,
                         id: reservation.id,

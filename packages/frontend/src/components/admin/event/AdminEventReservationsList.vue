@@ -5,7 +5,8 @@ import FTDialog from "src/components/FTDialog.vue";
 import ReservationGeneralInfo from "src/components/Event/ReservationGeneralInfo.vue";
 
 interface Props {
-    cancelledReservations: ReservationDoc[];
+    title: string;
+    reservations: ReservationDoc[];
 }
 
 const props = defineProps<Props>();
@@ -27,9 +28,9 @@ function showReservation(reservation: ReservationDoc): void {
 </script>
 
 <template>
-    <h2 class="text-subtitle1">Cancelled Reservations</h2>
+    <h2 class="text-subtitle1">{{ props.title }}</h2>
     <q-list>
-        <q-item v-for="reservation in props.cancelledReservations" :key="reservation.id" clickable>
+        <q-item v-for="reservation in props.reservations" :key="reservation.id" clickable>
             <q-item-section @click="showReservation(reservation)">
                 <q-item-label>
                     {{ reservation.guestName }} on {{ reservation.tableLabel }}</q-item-label

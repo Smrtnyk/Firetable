@@ -17,7 +17,7 @@ import AdminEventEditInfo from "src/components/admin/event/AdminEventEditInfo.vu
 import AdminEventFloorViewer from "src/components/admin/event/AdminEventFloorViewer.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import AdminEventLogs from "src/components/admin/event/AdminEventLogs.vue";
-import AdminEventCancelledReservationsList from "src/components/admin/event/AdminEventCancelledReservationsList.vue";
+import AdminEventReservationsList from "src/components/admin/event/AdminEventReservationsList.vue";
 
 import { Loading, useQuasar } from "quasar";
 import { config } from "src/config";
@@ -67,6 +67,9 @@ onUnmounted(() => {
 
 const allTables = computed(() => eventFloors.value.map(getTablesFromFloorDoc).flat());
 const cancelledReservations = computed(() => reservations.value.filter(propIsTruthy("cancelled")));
+const guestArrivedReservations = computed(() =>
+    reservations.value.filter(propIsTruthy("confirmed")),
+);
 
 const reservationsStatus = computed(() => {
     const activeReservations = reservations.value.filter((reservation) => {
@@ -197,8 +200,13 @@ onMounted(init);
                     <q-separator class="q-my-sm bg-grey-6" />
                     <AdminEventReservationsByPerson :reservations="reservations" />
                     <q-separator class="q-my-sm bg-grey-6" />
-                    <AdminEventCancelledReservationsList
-                        :cancelled-reservations="cancelledReservations"
+                    <AdminEventReservationsList
+                        title="Cancelled Reservations"
+                        :reservations="cancelledReservations"
+                    />
+                    <AdminEventReservationsList
+                        title="Arrived Reservations"
+                        :reservations="guestArrivedReservations"
                     />
                 </q-tab-panel>
 
