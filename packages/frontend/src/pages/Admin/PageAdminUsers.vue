@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CreateUserPayload, EditUserPayload, User } from "@firetable/types";
+import type { BucketizedUser, BucketizedUsers } from "src/components/admin/user/AdminUsersList.vue";
 import { Role } from "@firetable/types";
 
 import UserCreateForm from "src/components/admin/user/UserCreateForm.vue";
@@ -19,14 +20,7 @@ import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
 import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
-
-type BucketizedUser = User & { memberOf: string[] };
-interface BucketizedUsers {
-    [propertyId: string]: {
-        propertyName: string;
-        users: BucketizedUser[];
-    };
-}
+import AdminUsersList from "src/components/admin/user/AdminUsersList.vue";
 
 const props = defineProps<{ organisationId: string }>();
 
@@ -155,16 +149,14 @@ async function showCreateUserDialog(): Promise<void> {
     });
 }
 
-async function showEditUserDialog(user: User, reset: () => void): Promise<void> {
+async function showEditUserDialog(user: User): Promise<void> {
     if (user.id === authStore.user?.id) {
         showErrorMessage("To edit your profile, go to profile page!");
-        reset();
         return;
     }
     if (
         !(await showConfirm(t("PageAdminUsers.editUserConfirmationMessage", { name: user.name })))
     ) {
-        reset();
         return;
     }
     const selectedProperties = properties.value.filter((ownProperty) => {
@@ -198,14 +190,12 @@ async function showEditUserDialog(user: User, reset: () => void): Promise<void> 
             },
         },
     });
-    dialog.onDismiss(reset);
 }
 
-async function onUserSlideRight(user: User, reset: () => void): Promise<void> {
+async function onUserSlideRight(user: User): Promise<void> {
     if (await showConfirm("Delete user?")) {
         await onDeleteUser(user);
     }
-    reset();
 }
 </script>
 
@@ -233,36 +223,11 @@ async function onUserSlideRight(user: User, reset: () => void): Promise<void> {
                     :key="bucket.propertyName"
                     :name="index"
                 >
-                    <q-list>
-                        <q-slide-item
-                            v-for="user in bucket.users"
-                            :key="user.id"
-                            right-color="warning"
-                            @right="({ reset }) => onUserSlideRight(user, reset)"
-                            @left="({ reset }) => showEditUserDialog(user, reset)"
-                            class="fa-card"
-                        >
-                            <template #right>
-                                <q-icon name="trash" />
-                            </template>
-
-                            <template #left>
-                                <q-icon name="pencil" />
-                            </template>
-
-                            <q-item clickable class="ft-card">
-                                <q-item-section>
-                                    <q-item-label>
-                                        {{ user.name }} - {{ user.email }}
-                                    </q-item-label>
-                                    <q-item-label caption> Role: {{ user.role }} </q-item-label>
-                                    <q-item-label caption v-if="user.memberOf.length > 0">
-                                        Member of: {{ user.memberOf.join(", ") }}
-                                    </q-item-label>
-                                </q-item-section>
-                            </q-item>
-                        </q-slide-item>
-                    </q-list>
+                    <AdminUsersList
+                        @edit="showEditUserDialog"
+                        @delete="onUserSlideRight"
+                        :users="bucket.users"
+                    />
                 </q-tab-panel>
             </q-tab-panels>
         </div>
