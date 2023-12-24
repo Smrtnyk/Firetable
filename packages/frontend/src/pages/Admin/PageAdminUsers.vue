@@ -267,7 +267,12 @@ async function onUserSlideRight(user: User, reset: () => void): Promise<void> {
             </q-tab-panels>
         </div>
 
-        <FTCenteredText v-if="Object.keys(bucketizedUsers).length === 0 && !isLoading">
+        <!-- Show no properties message if no properties are created -->
+        <FTCenteredText v-if="properties.length === 0">
+            In order to list users, create some properties first
+        </FTCenteredText>
+
+        <FTCenteredText v-else-if="Object.keys(bucketizedUsers).length === 0 && !isLoading">
             {{ t("PageAdminUsers.noUsersCreatedMessage") }}
         </FTCenteredText>
     </div>
