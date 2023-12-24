@@ -9,7 +9,6 @@ import type {
 import { computed, ref } from "vue";
 import { DEFAULT_CAPABILITIES_BY_ROLE, Role } from "@firetable/types";
 import { QForm } from "quasar";
-import { showErrorMessage } from "src/helpers/ui-helpers";
 import { noEmptyString, noWhiteSpaces } from "src/helpers/form-rules";
 
 interface Props {
@@ -98,10 +97,6 @@ function onReset(): void {
 // Utility functions
 async function validateForm(): Promise<boolean> {
     if (!(await userEditForm.value?.validate())) {
-        return false;
-    }
-    if (isEditableRole.value && chosenProperties.value.length === 0) {
-        showErrorMessage("You must select at least one property!");
         return false;
     }
     return true;

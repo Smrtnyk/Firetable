@@ -43,8 +43,8 @@ export async function updateUserFn(
         throw new HttpsError("invalid-argument", "User data to update must be provided.");
     }
 
-    if (!relatedProperties || relatedProperties.length === 0) {
-        throw new HttpsError("invalid-argument", "No data provided to update.");
+    if (!relatedProperties) {
+        throw new HttpsError("invalid-argument", "Related properties field is not set.");
     }
 
     // Check and update password

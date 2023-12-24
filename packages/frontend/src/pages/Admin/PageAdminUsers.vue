@@ -36,6 +36,11 @@ const { createDialog } = useDialog();
 
 const activeTab = ref(0);
 
+const unassignedUsers = computed(() => {
+    return users.value.filter((user) => {
+        return user.relatedProperties.length === 0;
+    });
+});
 const bucketizedUsers = computed((): BucketizedUsers => {
     const buckets: BucketizedUsers = {};
     users.value.forEach((user) => {
@@ -55,7 +60,7 @@ const bucketizedUsers = computed((): BucketizedUsers => {
         bucketizedUser.relatedProperties.forEach((propertyId) => {
             const property = properties.value.find((p) => p.id === propertyId);
             if (property) {
-                bucketizedUser.memberOf.push(property.name);
+                bucketizedUser.memberOf?.push(property.name);
                 if (!buckets[propertyId]) {
                     buckets[propertyId] = { propertyName: property.name, users: [] };
                 }
@@ -207,13 +212,23 @@ async function onUserSlideRight(user: User): Promise<void> {
             </template>
         </FTTitle>
 
+        <template v-if="unassignedUsers.length > 0">
+            <FTCenteredText> Unassigned users ({{ unassignedUsers.length }}) </FTCenteredText>
+            <AdminUsersList
+                @edit="showEditUserDialog"
+                @delete="onUserSlideRight"
+                :users="unassignedUsers"
+                class="q-mb-md"
+            />
+        </template>
+
         <div v-if="Object.keys(bucketizedUsers).length > 0 && !isLoading">
             <q-tabs v-model="activeTab">
                 <q-tab
                     v-for="(bucket, index) in Object.values(bucketizedUsers)"
                     :key="bucket.propertyName"
                     :name="index"
-                    :label="bucket.propertyName"
+                    :label="`${bucket.propertyName} (${bucket.users.length})`"
                 />
             </q-tabs>
 

@@ -5,7 +5,7 @@ interface Props {
     users: BucketizedUser[];
 }
 
-export type BucketizedUser = User & { memberOf: string[] };
+export type BucketizedUser = User & { memberOf?: string[] };
 export interface BucketizedUsers {
     [propertyId: string]: {
         propertyName: string;
@@ -50,7 +50,7 @@ function showEditUserDialog(user: BucketizedUser, reset: () => void): void {
                 <q-item-section>
                     <q-item-label> {{ user.name }} - {{ user.email }} </q-item-label>
                     <q-item-label caption> Role: {{ user.role }} </q-item-label>
-                    <q-item-label caption v-if="user.memberOf.length > 0">
+                    <q-item-label caption v-if="user.memberOf && user.memberOf.length > 0">
                         Member of: {{ user.memberOf.join(", ") }}
                     </q-item-label>
                 </q-item-section>
