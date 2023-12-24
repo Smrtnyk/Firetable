@@ -2,8 +2,8 @@
 import type { CreateUserPayload, EditUserPayload, User } from "@firetable/types";
 import { Role } from "@firetable/types";
 
-import UserCreateForm from "src/components/admin/User/UserCreateForm.vue";
-import UserEditForm from "src/components/admin/User/UserEditForm.vue";
+import UserCreateForm from "src/components/admin/user/UserCreateForm.vue";
+import UserEditForm from "src/components/admin/user/UserEditForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 
