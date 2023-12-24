@@ -1,5 +1,6 @@
-import type { WriteResult } from "firebase-admin/firestore";
 import { db } from "../init.js";
+import { HttpsError } from "firebase-functions/v2/https";
+import { logger } from "firebase-functions/v2";
 
 /**
  * Deletes a specified document and all of its subcollections from Firestore.
@@ -23,30 +24,27 @@ import { db } from "../init.js";
  * If any deletion fails, the function throws an error with details.
  */
 export async function deleteDocument({ col, id }: { col: string; id: string }): Promise<void> {
-    const document = db.collection(col).doc(id);
+    const documentRef = db.collection(col).doc(id);
 
-    try {
-        // Get all subcollections of the document
-        const collections = await document.listCollections();
-
-        // Prepare an array to hold all deletion promises
-        const deletePromises: Promise<WriteResult>[] = [];
-
-        // Iterate over each subcollection
+    // Recursive function to delete a document and its subcollections
+    async function deleteRecursively(ref: typeof documentRef): Promise<void> {
+        // Get subcollections of the document
+        const collections = await ref.listCollections();
         for (const collection of collections) {
             const docs = await collection.listDocuments();
 
-            // Add deletion promises for each document in the subcollection
-            deletePromises.push(...docs.map((doc) => doc.delete()));
+            // Recursive call
+            const promises = docs.map((doc) => deleteRecursively(doc));
+            await Promise.all(promises);
         }
+        // Delete the document itself
+        await ref.delete();
+    }
 
-        // Delete all documents concurrently
-        await Promise.all(deletePromises);
-
-        // Now, delete the main document
-        await document.delete();
+    try {
+        await deleteRecursively(documentRef);
     } catch (error) {
-        console.error(`Error deleting document with ID ${id} in collection ${col}:`, error);
-        throw new Error(`Failed to delete document with ID ${id}.`);
+        logger.error(`Error deleting document with ID ${id} in collection ${col}:`, error);
+        throw new HttpsError("internal", `Failed to delete document with ID ${id}.`);
     }
 }

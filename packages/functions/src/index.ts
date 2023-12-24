@@ -11,6 +11,7 @@ import { onPropertyDeletedFn } from "./trigger/on-property-deleted.js";
 import { onPropertyDeletedCleanEvents } from "./trigger/on-property-deleted-clean-events.js";
 
 import { changePasswordFn } from "./callable/change-password.js";
+import { onOrganisationDeletedFn } from "./trigger/on-organisation-deleted.js";
 import { Collection } from "../types/types.js";
 
 import { onSchedule } from "firebase-functions/v2/scheduler";
@@ -33,6 +34,14 @@ export const onUserDeleted = onDocumentDeleted(
     `${Collection.ORGANISATIONS}/{organisationId}/${Collection.USERS}/{userId}`,
     (event) => {
         return onUserDeletedFn(event.params);
+    },
+);
+
+// Organisations
+export const onOrganisationDeleted = onDocumentDeleted(
+    `${Collection.ORGANISATIONS}/{organisationId}`,
+    (event) => {
+        return onOrganisationDeletedFn(event.params);
     },
 );
 
