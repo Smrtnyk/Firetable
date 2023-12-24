@@ -67,11 +67,10 @@ const onDeleteOrganisation = withLoading(async (id: string) => {
     await initOrganisations();
 });
 
-async function deleteOrganisationAsync(organisationId: string, reset: () => void): Promise<void> {
+async function deleteOrganisationAsync(organisationId: string): Promise<void> {
     if (await showConfirm("Delete organisation?")) {
         return onDeleteOrganisation(organisationId);
     }
-    reset();
 }
 
 function createOrganisation(): void {
@@ -122,18 +121,13 @@ function createOrganisation(): void {
                             {{ item.label }}
                         </q-item-section>
                     </q-item>
+                    <q-item clickable @click="deleteOrganisationAsync(organisation.id)">
+                        <q-item-section avatar>
+                            <q-icon name="trash" color="red" />
+                        </q-item-section>
+                        <q-item-section> Delete Organisation </q-item-section>
+                    </q-item>
                 </q-list>
-
-                <q-separator />
-
-                <q-slide-item
-                    right-color="warning"
-                    @right="({ reset }) => deleteOrganisationAsync(organisation.id, reset)"
-                >
-                    <template #right>
-                        <q-icon name="trash" />
-                    </template>
-                </q-slide-item>
             </q-expansion-item>
         </q-list>
 
