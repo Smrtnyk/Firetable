@@ -8,7 +8,6 @@ import { updateUserFn } from "./callable/update-user.js";
 import { fetchUsersByRoleFn } from "./callable/fetch-users-by-role.js";
 import { onUserDeletedFn } from "./trigger/on-user-deleted.js";
 import { onPropertyDeletedFn } from "./trigger/on-property-deleted.js";
-import { onPropertyDeletedCleanEvents } from "./trigger/on-property-deleted-clean-events.js";
 
 import { changePasswordFn } from "./callable/change-password.js";
 import { onOrganisationDeletedFn } from "./trigger/on-organisation-deleted.js";
@@ -50,10 +49,6 @@ export const createProperty = onCall(createPropertyFn);
 export const onPropertyDelete = onDocumentDeleted(
     `${Collection.ORGANISATIONS}/{organisationId}/${Collection.PROPERTIES}/{propertyId}`,
     (event) => onPropertyDeletedFn(event.params),
-);
-export const onPropertyDeleteCleanupEvents = onDocumentDeleted(
-    `${Collection.ORGANISATIONS}/{organisationId}/${Collection.PROPERTIES}/{propertyId}`,
-    (event) => onPropertyDeletedCleanEvents(event.params),
 );
 
 // Generic stuff
