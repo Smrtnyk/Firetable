@@ -38,6 +38,7 @@ const props = defineProps<Props>();
 const router = useRouter();
 const quasar = useQuasar();
 const tab = ref("info");
+const reservationsTab = ref("arrivedReservations");
 
 const eventOwner: EventOwner = {
     propertyId: props.propertyId,
@@ -200,14 +201,26 @@ onMounted(init);
                     <q-separator class="q-my-sm bg-grey-6" />
                     <AdminEventReservationsByPerson :reservations="reservations" />
                     <q-separator class="q-my-sm bg-grey-6" />
-                    <AdminEventReservationsList
-                        title="Cancelled Reservations"
-                        :reservations="cancelledReservations"
-                    />
-                    <AdminEventReservationsList
-                        title="Arrived Reservations"
-                        :reservations="guestArrivedReservations"
-                    />
+
+                    <!-- Nested Tabs for Arrived and Cancelled Reservations -->
+                    <q-tabs v-model="reservationsTab" align="justify">
+                        <q-tab
+                            name="arrivedReservations"
+                            :label="`Arrived Reservations (${guestArrivedReservations.length})`"
+                        />
+                        <q-tab
+                            name="cancelledReservations"
+                            :label="`Cancelled Reservations (${cancelledReservations.length})`"
+                        />
+                    </q-tabs>
+                    <q-tab-panels v-model="reservationsTab">
+                        <q-tab-panel name="arrivedReservations">
+                            <AdminEventReservationsList :reservations="guestArrivedReservations" />
+                        </q-tab-panel>
+                        <q-tab-panel name="cancelledReservations">
+                            <AdminEventReservationsList :reservations="cancelledReservations" />
+                        </q-tab-panel>
+                    </q-tab-panels>
                 </q-tab-panel>
 
                 <!-- Edit area -->
