@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { CreateEventPayload, EditEventPayload, EventDoc, PropertyDoc } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
-import type { EventDetails } from "src/components/admin/event/AdminPropertyEventsList.vue";
 import AdminPropertyEventsList from "src/components/admin/event/AdminPropertyEventsList.vue";
 import EventCreateForm from "src/components/admin/event/EventCreateForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
@@ -145,14 +144,11 @@ const onUpdateEvent = withLoading(async function (eventData: EditEventPayload & 
     window.location.reload();
 });
 
-async function onEventItemSlideRight({
-    event,
-    reset,
-}: {
-    event: EventDoc;
-    reset: () => void;
-}): Promise<void> {
-    if (!(await showConfirm(t("PageAdminEvents.deleteEventDialogTitle")))) return reset();
+async function onEventItemSlideRight(event: EventDoc): Promise<void> {
+    if (!(await showConfirm(t("PageAdminEvents.deleteEventDialogTitle")))) {
+        return;
+    }
+
     await tryCatchLoadingWrapper({
         hook: async () => {
             await deleteDocAndAllSubCollections(
@@ -165,13 +161,11 @@ async function onEventItemSlideRight({
             );
             eventsByProperty[activePropertyId.value].delete(event);
         },
-        errorHook: reset,
     });
 }
 
-async function onEventEdit(property: PropertyDoc, { event, reset }: EventDetails): Promise<void> {
+async function onEventEdit(property: PropertyDoc, event: EventDoc): Promise<void> {
     showCreateEventForm(property, event);
-    reset();
 }
 
 async function onLoad(property: PropertyDoc): Promise<void> {
@@ -271,10 +265,8 @@ function showCreateEventForm(property: PropertyDoc, event?: EventDoc): void {
                         <AdminPropertyEventsList
                             :property="property"
                             :events-by-property="eventsByProperty"
-                            :on-event-item-slide-right="onEventItemSlideRight"
-                            :on-event-edit="
-                                (eventDetails: EventDetails) => onEventEdit(property, eventDetails)
-                            "
+                            @delete="onEventItemSlideRight"
+                            @edit="(event: EventDoc) => onEventEdit(property, event)"
                             :on-load="onLoad"
                             :done="!hasMoreEventsToFetch[property.id]"
                         />

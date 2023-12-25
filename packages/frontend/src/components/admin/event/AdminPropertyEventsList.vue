@@ -4,16 +4,16 @@ import PageAdminEventsListItem from "src/components/Event/PageAdminEventsListIte
 import { computed } from "vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 
-export type EventDetails = { event: EventDoc; reset: () => void };
-
 interface Props {
     property: PropertyDoc;
     eventsByProperty: Record<string, Set<EventDoc>>;
-    onEventItemSlideRight: (eventDetails: EventDetails) => void;
-    onEventEdit: (eventDetails: EventDetails) => void;
     onLoad: (property: PropertyDoc) => void;
     done: boolean;
 }
+
+const emit = defineEmits<{
+    (e: "delete" | "edit", value: EventDoc): void;
+}>();
 
 const props = defineProps<Props>();
 const events = computed(() => [...props.eventsByProperty[props.property.id]]);
@@ -44,6 +44,16 @@ const bucketizedEvents = computed(() => {
 function handleLoad(): void {
     props.onLoad(props.property);
 }
+
+function emitDelete(event: EventDoc, reset: () => void): void {
+    emit("delete", event);
+    reset();
+}
+
+function emitEdit(event: EventDoc, reset: () => void): void {
+    emit("edit", event);
+    reset();
+}
 </script>
 
 <template>
@@ -62,8 +72,8 @@ function handleLoad(): void {
                         v-for="event in monthEvents"
                         :key="event.id"
                         :event="event"
-                        @right="props.onEventItemSlideRight"
-                        @left="props.onEventEdit"
+                        @right="({ reset }) => emitDelete(event, reset)"
+                        @left="({ reset }) => emitEdit(event, reset)"
                     />
                 </div>
             </div>
