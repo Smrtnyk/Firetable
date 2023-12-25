@@ -15,6 +15,7 @@ import { takeProp } from "@firetable/utils";
 import { useI18n } from "vue-i18n";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import { usePropertiesStore } from "src/stores/usePropertiesStore";
+import FTTabs from "src/components/FTTabs.vue";
 
 const props = defineProps<{ organisationId: string }>();
 
@@ -127,22 +128,14 @@ async function onFloorDelete(
         <FTTitle :title="t('PageAdminFloors.title')" />
 
         <!-- Tabs for each property -->
-        <q-tabs
-            v-model="activeTab"
-            outside-arrows
-            mobile-arrows
-            active-bg-color="primary"
-            indicator-color="transparent"
-            active-class="ft-tabs"
-            align="left"
-        >
+        <FTTabs v-model="activeTab">
             <q-tab
                 v-for="(propertyData, propertyKey) in floors"
                 :key="propertyKey"
                 :name="propertyKey"
                 :label="propertyData.propertyName"
             />
-        </q-tabs>
+        </FTTabs>
 
         <!-- Tab panels for each property's floors -->
         <q-tab-panels v-model="activeTab">

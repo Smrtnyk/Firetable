@@ -21,6 +21,7 @@ import { useI18n } from "vue-i18n";
 import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 import AdminUsersList from "src/components/admin/user/AdminUsersList.vue";
+import FTTabs from "src/components/FTTabs.vue";
 
 const props = defineProps<{ organisationId: string }>();
 
@@ -224,22 +225,14 @@ async function onUserSlideRight(user: User): Promise<void> {
         </template>
 
         <div v-if="Object.keys(bucketizedUsers).length > 0 && !isLoading">
-            <q-tabs
-                v-model="activeTab"
-                outside-arrows
-                mobile-arrows
-                active-bg-color="primary"
-                indicator-color="transparent"
-                active-class="ft-tabs"
-                align="left"
-            >
+            <FTTabs v-model="activeTab">
                 <q-tab
                     v-for="(bucket, index) in Object.values(bucketizedUsers)"
                     :key="bucket.propertyName"
                     :name="index"
                     :label="`${bucket.propertyName} (${bucket.users.length})`"
                 />
-            </q-tabs>
+            </FTTabs>
 
             <q-tab-panels v-model="activeTab" animated>
                 <q-tab-panel

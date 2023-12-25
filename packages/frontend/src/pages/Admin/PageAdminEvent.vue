@@ -27,6 +27,7 @@ import { buttonSize, isMobile } from "src/global-reactives/screen-detection";
 import { truncateText } from "src/helpers/string-utils";
 import { compressFloorDoc } from "src/helpers/compress-floor-doc";
 import { propIsTruthy } from "@firetable/utils";
+import FTTabs from "src/components/FTTabs.vue";
 
 interface Props {
     organisationId: string;
@@ -188,19 +189,11 @@ onMounted(init);
                 </q-btn>
             </template>
         </FTTitle>
-        <q-tabs
-            v-model="tab"
-            outside-arrows
-            mobile-arrows
-            active-bg-color="primary"
-            indicator-color="transparent"
-            active-class="ft-tabs"
-            align="left"
-        >
+        <FTTabs v-model="tab">
             <q-tab name="info" label="Info" />
             <q-tab name="edit" label="Edit" v-if="!isEventFinished(event.date)" />
             <q-tab name="logs" label="Logs" />
-        </q-tabs>
+        </FTTabs>
         <div class="q-gutter-y-md">
             <q-tab-panels v-model="tab" animated transition-next="fade" transition-prev="fade">
                 <!-- General info with charts area -->
@@ -211,15 +204,7 @@ onMounted(init);
                     <q-separator class="q-my-sm bg-grey-6" />
 
                     <!-- Nested Tabs for Arrived and Cancelled Reservations -->
-                    <q-tabs
-                        v-model="reservationsTab"
-                        outside-arrows
-                        mobile-arrows
-                        active-bg-color="primary"
-                        active-class="ft-tabs"
-                        indicator-color="transparent"
-                        align="left"
-                    >
+                    <FTTabs v-model="reservationsTab">
                         <q-tab
                             name="arrivedReservations"
                             :label="`Arrived (${guestArrivedReservations.length})`"
@@ -228,7 +213,7 @@ onMounted(init);
                             name="cancelledReservations"
                             :label="`Cancelled (${cancelledReservations.length})`"
                         />
-                    </q-tabs>
+                    </FTTabs>
                     <q-tab-panels v-model="reservationsTab">
                         <q-tab-panel name="arrivedReservations">
                             <AdminEventReservationsList :reservations="guestArrivedReservations" />

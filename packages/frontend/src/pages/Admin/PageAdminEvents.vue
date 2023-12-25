@@ -28,6 +28,7 @@ import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import { usePropertiesStore } from "src/stores/usePropertiesStore";
+import FTTabs from "src/components/FTTabs.vue";
 
 const props = defineProps<{ organisationId: string }>();
 
@@ -228,23 +229,14 @@ function showCreateEventForm(property: PropertyDoc, event?: EventDoc): void {
         </FTCenteredText>
 
         <div v-else>
-            <q-tabs
-                v-model="activePropertyId"
-                @input="fetchEventsForActiveTab"
-                outside-arrows
-                mobile-arrows
-                active-bg-color="primary"
-                indicator-color="transparent"
-                active-class="ft-tabs"
-                align="left"
-            >
+            <FTTabs v-model="activePropertyId" @input="fetchEventsForActiveTab">
                 <q-tab
                     v-for="property in properties"
                     :key="property.id"
                     :label="property.name"
                     :name="property.id"
                 />
-            </q-tabs>
+            </FTTabs>
 
             <keep-alive>
                 <q-tab-panels v-model="activePropertyId">

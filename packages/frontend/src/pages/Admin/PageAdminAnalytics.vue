@@ -18,6 +18,7 @@ import { usePropertiesStore } from "src/stores/usePropertiesStore";
 import { format, subMonths } from "date-fns";
 import { getColors } from "src/helpers/colors";
 import { useAnalyticsStore } from "src/stores/analytics-store";
+import FTTabs from "src/components/FTTabs.vue";
 
 interface Props {
     organisationId: string;
@@ -437,22 +438,14 @@ async function getReservationFromEvents(events: EventDoc[]): Promise<Reservation
 
         <div v-if="reservations.length > 0">
             <BarChart :chart-data="reservationsByProperty" chart-title="Reservations by Property" />
-            <q-tabs
-                v-model="selectedTab"
-                outside-arrows
-                mobile-arrows
-                active-bg-color="primary"
-                indicator-color="transparent"
-                active-class="ft-tabs"
-                align="left"
-            >
+            <FTTabs v-model="selectedTab">
                 <q-tab
                     v-for="property in properties"
                     :key="property.id"
                     :name="property.id"
                     :label="property.name"
                 />
-            </q-tabs>
+            </FTTabs>
 
             <q-tab-panels v-model="selectedTab" animated>
                 <q-tab-panel
@@ -472,22 +465,14 @@ async function getReservationFromEvents(events: EventDoc[]): Promise<Reservation
                             chart-title="Confirmed vs. Unconfirmed"
                         />
                         <div class="col-12 q-my-sm">
-                            <q-tabs
-                                v-model="selectedDay"
-                                outside-arrows
-                                mobile-arrows
-                                active-bg-color="primary"
-                                indicator-color="transparent"
-                                active-class="ft-tabs"
-                                align="left"
-                            >
+                            <FTTabs v-model="selectedDay">
                                 <q-tab
                                     v-for="day in [...Object.keys(reservationsByDay), 'ALL']"
                                     :key="day"
                                     :name="day"
                                     :label="day"
                                 />
-                            </q-tabs>
+                            </FTTabs>
 
                             <q-tab-panels v-model="selectedDay" animated>
                                 <q-tab-panel
