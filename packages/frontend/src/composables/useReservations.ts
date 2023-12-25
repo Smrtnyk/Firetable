@@ -4,9 +4,9 @@ import type { EventOwner } from "@firetable/backend";
 import type { DialogChainObject } from "quasar";
 import type { VueFirestoreDocumentData } from "vuefire";
 import type { EventDoc, Reservation, ReservationDoc, User } from "@firetable/types";
+import { isTable } from "@firetable/floor-creator";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import { ReservationStatus } from "@firetable/types";
-import { isTable } from "@firetable/floor-creator";
 import {
     addLogToEvent,
     addReservation,
@@ -27,6 +27,7 @@ import { NOOP } from "@firetable/utils";
 import FTDialog from "src/components/FTDialog.vue";
 import EventCreateReservation from "src/components/Event/EventCreateReservation.vue";
 import EventShowReservation from "src/components/Event/EventShowReservation.vue";
+import { determineTableColor } from "src/helpers/floor";
 
 const HALF_HOUR = 30 * 60 * 1000; // 30 minutes in milliseconds
 
@@ -77,11 +78,21 @@ export function useReservations(
             for (const reservation of newReservations) {
                 if (reservation.floorId === floor.id) {
                     const table = floor.getTableByLabel(reservation.tableLabel);
-                    table?.setReservation(reservation);
+                    if (table) {
+                        setReservation(table, reservation);
+                    }
                 }
             }
         }
         checkReservationsForTimeAndMarkTableIfNeeded();
+    }
+
+    function setReservation(table: BaseTable, reservation: ReservationDoc): void {
+        table.setReservation(reservation);
+        const fill = determineTableColor(reservation);
+        if (fill) {
+            table.setFill(fill);
+        }
     }
 
     function createEventLog(message: string): void {

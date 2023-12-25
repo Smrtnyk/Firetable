@@ -3,7 +3,6 @@ import type { ReservationDoc } from "@firetable/types";
 import type { AnimationStrategy } from "./animation/AnimationStrategy";
 import { SmoothBlinkAnimation } from "./animation/SmoothBlinkAnimation.js";
 import { TABLE_WIDTH, TABLE_HEIGHT } from "../constants";
-import { determineTableColor } from "../utils.js";
 import { Group } from "fabric";
 
 interface TableElementOptions {
@@ -95,8 +94,6 @@ export abstract class Table extends Group {
 
     setReservation(reservation: ReservationDoc | undefined): void {
         this.reservation = reservation;
-        const fill = determineTableColor(reservation, this.baseFill);
-        this.setFill(fill);
     }
 
     // @ts-expect-error -- ok
