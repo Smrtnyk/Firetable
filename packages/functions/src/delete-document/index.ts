@@ -2,6 +2,10 @@ import { db } from "../init.js";
 import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
 
+const MAX_DEPTH = 10;
+// Firestore batch limit is 500 operations
+const BATCH_SIZE = 500;
+
 /**
  * Deletes a specified document and all of its subcollections from Firestore.
  *
@@ -26,25 +30,50 @@ import { logger } from "firebase-functions/v2";
 export async function deleteDocument({ col, id }: { col: string; id: string }): Promise<void> {
     const documentRef = db.collection(col).doc(id);
 
-    // Recursive function to delete a document and its subcollections
-    async function deleteRecursively(ref: typeof documentRef): Promise<void> {
-        // Get subcollections of the document
+    async function deleteRecursively(ref: typeof documentRef, depth = 0): Promise<void> {
+        if (depth > MAX_DEPTH) {
+            logger.warn(`Reached max depth limit at ${ref.path}`);
+            return;
+        }
+
+        logger.info(`Deleting document at ${ref.path} with depth ${depth}`);
+
         const collections = await ref.listCollections();
         for (const collection of collections) {
-            const docs = await collection.listDocuments();
+            let batch = db.batch();
+            let operationCount = 0;
 
-            // Recursive call
-            const promises = docs.map((doc) => deleteRecursively(doc));
-            await Promise.all(promises);
+            const docs = await collection.listDocuments();
+            for (const doc of docs) {
+                batch.delete(doc);
+                operationCount++;
+
+                if (operationCount >= BATCH_SIZE) {
+                    await batch.commit();
+                    batch = db.batch();
+                    operationCount = 0;
+                }
+
+                // Recursive call with increased depth
+                await deleteRecursively(doc, depth + 1);
+            }
+
+            if (operationCount > 0) {
+                await batch.commit();
+            }
         }
+
         // Delete the document itself
         await ref.delete();
     }
 
     try {
         await deleteRecursively(documentRef);
-    } catch (error) {
+    } catch (error: any) {
         logger.error(`Error deleting document with ID ${id} in collection ${col}:`, error);
-        throw new HttpsError("internal", `Failed to delete document with ID ${id}.`);
+        throw new HttpsError(
+            "internal",
+            `Failed to delete document with ID ${id}. Error: ${error.message}`,
+        );
     }
 }
