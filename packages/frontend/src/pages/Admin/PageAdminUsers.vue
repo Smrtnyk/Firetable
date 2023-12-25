@@ -38,15 +38,16 @@ const activeTab = ref(0);
 
 const unassignedUsers = computed(() => {
     return users.value.filter((user) => {
-        return user.relatedProperties.length === 0;
+        return user.relatedProperties.length === 0 && user.role !== Role.PROPERTY_OWNER;
     });
 });
+
 const bucketizedUsers = computed((): BucketizedUsers => {
     const buckets: BucketizedUsers = {};
     users.value.forEach((user) => {
         const bucketizedUser: BucketizedUser = { ...user, memberOf: [] };
         // if user is property owner, then add it to all buckets
-        // it needs to be added to all buckets because it can be a member of multiple properties
+        // it needs to be added to all buckets because it must be a member of all properties
         if (bucketizedUser.role === Role.PROPERTY_OWNER) {
             properties.value.forEach((property) => {
                 if (!buckets[property.id]) {
