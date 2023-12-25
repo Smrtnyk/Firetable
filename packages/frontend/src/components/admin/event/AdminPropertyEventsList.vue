@@ -7,12 +7,12 @@ import FTCenteredText from "src/components/FTCenteredText.vue";
 interface Props {
     property: PropertyDoc;
     eventsByProperty: Record<string, Set<EventDoc>>;
-    onLoad: (property: PropertyDoc) => void;
     done: boolean;
 }
 
 const emit = defineEmits<{
     (e: "delete" | "edit", value: EventDoc): void;
+    (e: "load", value: PropertyDoc): void;
 }>();
 
 const props = defineProps<Props>();
@@ -42,7 +42,7 @@ const bucketizedEvents = computed(() => {
 });
 
 function handleLoad(): void {
-    props.onLoad(props.property);
+    emit("load", props.property);
 }
 
 function emitDelete(event: EventDoc, reset: () => void): void {

@@ -267,7 +267,7 @@ function showCreateEventForm(property: PropertyDoc, event?: EventDoc): void {
                             :events-by-property="eventsByProperty"
                             @delete="onEventItemSlideRight"
                             @edit="(event: EventDoc) => onEventEdit(property, event)"
-                            :on-load="onLoad"
+                            @load="onLoad"
                             :done="!hasMoreEventsToFetch[property.id]"
                         />
                     </q-tab-panel>
