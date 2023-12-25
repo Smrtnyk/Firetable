@@ -80,7 +80,7 @@ export default {
         reservationGroupWith: "Group with",
         reservationGroupWithHint: "Group multiple tables under the one reservation.",
         reservationGuestName: "Guest name *",
-        reservationNumberOfGuests: "Number of persons *",
+        reservationNumberOfGuests: "Guest count *",
         reservationGuestContact: "Guest contact",
         reservationNote: "Note",
         reservationCreateBtn: "Submit",
