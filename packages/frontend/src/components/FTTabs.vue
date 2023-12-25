@@ -32,15 +32,37 @@ function handleInput(event: any): void {
 
 <template>
     <q-tabs
+        class="ft-q-tabs"
         v-model="selectedTab"
         outside-arrows
         mobile-arrows
         active-bg-color="primary"
         indicator-color="transparent"
-        active-class="ft-tabs"
+        active-class="ft-active-tab"
         align="left"
         @input="handleInput"
     >
         <slot></slot>
     </q-tabs>
 </template>
+
+<style lang="scss">
+.ft-q-tabs {
+    margin-bottom: 8px;
+    border-radius: $border-radius !important;
+    box-shadow: $box-shadow !important;
+
+    .q-tabs__content {
+        border-radius: $border-radius !important;
+    }
+
+    .q-tab {
+        border-radius: $border-radius !important;
+        margin-right: 4px;
+    }
+
+    .ft-active-tab {
+        color: white !important;
+    }
+}
+</style>

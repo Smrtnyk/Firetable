@@ -194,89 +194,87 @@ onMounted(init);
             <q-tab name="edit" label="Edit" v-if="!isEventFinished(event.date)" />
             <q-tab name="logs" label="Logs" />
         </FTTabs>
-        <div class="q-gutter-y-md">
-            <q-tab-panels v-model="tab" animated transition-next="fade" transition-prev="fade">
-                <!-- General info with charts area -->
-                <q-tab-panel name="info" class="q-pa-xs-sm q-pa-md-md">
-                    <AdminEventGeneralInfo :reservations-status="reservationsStatus" />
-                    <q-separator class="q-my-sm bg-grey-6" />
-                    <AdminEventReservationsByPerson :reservations="reservations" />
-                    <q-separator class="q-my-sm bg-grey-6" />
+        <q-tab-panels v-model="tab" animated transition-next="fade" transition-prev="fade">
+            <!-- General info with charts area -->
+            <q-tab-panel name="info" class="q-pa-xs-sm q-pa-md-md">
+                <AdminEventGeneralInfo :reservations-status="reservationsStatus" />
+                <q-separator class="q-my-sm bg-grey-6" />
+                <AdminEventReservationsByPerson :reservations="reservations" />
+                <q-separator class="q-my-sm bg-grey-6" />
 
-                    <!-- Nested Tabs for Arrived and Cancelled Reservations -->
-                    <FTTabs v-model="reservationsTab">
-                        <q-tab
-                            name="arrivedReservations"
-                            :label="`Arrived (${guestArrivedReservations.length})`"
-                        />
-                        <q-tab
-                            name="cancelledReservations"
-                            :label="`Cancelled (${cancelledReservations.length})`"
-                        />
-                    </FTTabs>
-                    <q-tab-panels v-model="reservationsTab">
-                        <q-tab-panel name="arrivedReservations">
-                            <AdminEventReservationsList :reservations="guestArrivedReservations" />
-                        </q-tab-panel>
-                        <q-tab-panel name="cancelledReservations">
-                            <AdminEventReservationsList :reservations="cancelledReservations" />
-                        </q-tab-panel>
-                    </q-tab-panels>
-                </q-tab-panel>
+                <!-- Nested Tabs for Arrived and Cancelled Reservations -->
+                <FTTabs v-model="reservationsTab">
+                    <q-tab
+                        name="arrivedReservations"
+                        :label="`Arrived (${guestArrivedReservations.length})`"
+                    />
+                    <q-tab
+                        name="cancelledReservations"
+                        :label="`Cancelled (${cancelledReservations.length})`"
+                    />
+                </FTTabs>
+                <q-tab-panels v-model="reservationsTab">
+                    <q-tab-panel name="arrivedReservations">
+                        <AdminEventReservationsList :reservations="guestArrivedReservations" />
+                    </q-tab-panel>
+                    <q-tab-panel name="cancelledReservations">
+                        <AdminEventReservationsList :reservations="cancelledReservations" />
+                    </q-tab-panel>
+                </q-tab-panels>
+            </q-tab-panel>
 
-                <!-- Edit area -->
-                <q-tab-panel name="edit" v-if="!isEventFinished(event.date)">
-                    <div>
-                        <h2 class="text-subtitle1">Event Info</h2>
-                        <q-item clickable v-ripple>
-                            <q-item-section>
-                                <q-item-label caption lines="2">
-                                    {{ truncateText(event.info || "", 100) }}
-                                </q-item-label>
-                            </q-item-section>
+            <!-- Edit area -->
+            <q-tab-panel name="edit" v-if="!isEventFinished(event.date)">
+                <div>
+                    <h2 class="text-subtitle1">Event Info</h2>
+                    <q-item clickable v-ripple>
+                        <q-item-section>
+                            <q-item-label caption lines="2">
+                                {{ truncateText(event.info || "", 100) }}
+                            </q-item-label>
+                        </q-item-section>
 
-                            <q-item-section side>
-                                <q-btn
-                                    rounded
-                                    icon="pencil"
-                                    class="button-gradient"
-                                    size="md"
-                                    @click="showEventInfoEditDialog"
-                                ></q-btn>
-                            </q-item-section>
-                        </q-item>
-                    </div>
+                        <q-item-section side>
+                            <q-btn
+                                rounded
+                                icon="pencil"
+                                class="button-gradient"
+                                size="md"
+                                @click="showEventInfoEditDialog"
+                            ></q-btn>
+                        </q-item-section>
+                    </q-item>
+                </div>
 
-                    <q-separator class="q-my-md" />
+                <q-separator class="q-my-md" />
 
-                    <div>
-                        <h2 class="text-subtitle1">Event Floors</h2>
-                        <q-item :key="floor.id" v-for="floor in eventFloors" clickable v-ripple>
-                            <q-item-section>
-                                <q-item-label>
-                                    {{ floor.name }}
-                                </q-item-label>
-                            </q-item-section>
+                <div>
+                    <h2 class="text-subtitle1">Event Floors</h2>
+                    <q-item :key="floor.id" v-for="floor in eventFloors" clickable v-ripple>
+                        <q-item-section>
+                            <q-item-label>
+                                {{ floor.name }}
+                            </q-item-label>
+                        </q-item-section>
 
-                            <q-item-section side>
-                                <q-btn
-                                    class="button-gradient"
-                                    size="md"
-                                    icon="pencil"
-                                    rounded
-                                    @click="() => showFloorEditDialog(floor)"
-                                >
-                                </q-btn>
-                            </q-item-section>
-                        </q-item>
-                    </div>
-                </q-tab-panel>
+                        <q-item-section side>
+                            <q-btn
+                                class="button-gradient"
+                                size="md"
+                                icon="pencil"
+                                rounded
+                                @click="() => showFloorEditDialog(floor)"
+                            >
+                            </q-btn>
+                        </q-item-section>
+                    </q-item>
+                </div>
+            </q-tab-panel>
 
-                <!-- Logs -->
-                <q-tab-panel name="logs" v-if="logs">
-                    <AdminEventLogs :logs-doc="logs" />
-                </q-tab-panel>
-            </q-tab-panels>
-        </div>
+            <!-- Logs -->
+            <q-tab-panel name="logs" v-if="logs">
+                <AdminEventLogs :logs-doc="logs" />
+            </q-tab-panel>
+        </q-tab-panels>
     </div>
 </template>
