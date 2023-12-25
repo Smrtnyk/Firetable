@@ -36,7 +36,6 @@ function handleInput(event: any): void {
         v-model="selectedTab"
         outside-arrows
         mobile-arrows
-        active-bg-color="primary"
         indicator-color="transparent"
         active-class="ft-active-tab"
         align="left"
@@ -52,17 +51,15 @@ function handleInput(event: any): void {
     border-radius: $border-radius !important;
     box-shadow: $box-shadow !important;
 
-    .q-tabs__content {
-        border-radius: $border-radius !important;
-    }
-
-    .q-tab {
-        border-radius: $border-radius !important;
-        margin-right: 4px;
-    }
-
     .ft-active-tab {
-        color: white !important;
+        position: relative;
+        border: 3px solid;
+        border-image-slice: 1;
+        border-image-source: $gradient-primary !important;
+    }
+
+    .q-tab:not(:last-child) {
+        margin-right: 4px;
     }
 }
 </style>
