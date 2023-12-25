@@ -437,7 +437,15 @@ async function getReservationFromEvents(events: EventDoc[]): Promise<Reservation
 
         <div v-if="reservations.length > 0">
             <BarChart :chart-data="reservationsByProperty" chart-title="Reservations by Property" />
-            <q-tabs v-model="selectedTab" align="justify">
+            <q-tabs
+                v-model="selectedTab"
+                outside-arrows
+                mobile-arrows
+                active-bg-color="primary"
+                indicator-color="transparent"
+                active-class="ft-tabs"
+                align="left"
+            >
                 <q-tab
                     v-for="property in properties"
                     :key="property.id"
@@ -464,7 +472,15 @@ async function getReservationFromEvents(events: EventDoc[]): Promise<Reservation
                             chart-title="Confirmed vs. Unconfirmed"
                         />
                         <div class="col-12 q-my-sm">
-                            <q-tabs v-model="selectedDay" align="justify">
+                            <q-tabs
+                                v-model="selectedDay"
+                                outside-arrows
+                                mobile-arrows
+                                active-bg-color="primary"
+                                indicator-color="transparent"
+                                active-class="ft-tabs"
+                                align="left"
+                            >
                                 <q-tab
                                     v-for="day in [...Object.keys(reservationsByDay), 'ALL']"
                                     :key="day"

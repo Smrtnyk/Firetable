@@ -127,7 +127,15 @@ async function onFloorDelete(
         <FTTitle :title="t('PageAdminFloors.title')" />
 
         <!-- Tabs for each property -->
-        <q-tabs v-model="activeTab">
+        <q-tabs
+            v-model="activeTab"
+            outside-arrows
+            mobile-arrows
+            active-bg-color="primary"
+            indicator-color="transparent"
+            active-class="ft-tabs"
+            align="left"
+        >
             <q-tab
                 v-for="(propertyData, propertyKey) in floors"
                 :key="propertyKey"

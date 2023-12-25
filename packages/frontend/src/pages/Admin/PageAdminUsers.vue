@@ -223,7 +223,15 @@ async function onUserSlideRight(user: User): Promise<void> {
         </template>
 
         <div v-if="Object.keys(bucketizedUsers).length > 0 && !isLoading">
-            <q-tabs v-model="activeTab">
+            <q-tabs
+                v-model="activeTab"
+                outside-arrows
+                mobile-arrows
+                active-bg-color="primary"
+                indicator-color="transparent"
+                active-class="ft-tabs"
+                align="left"
+            >
                 <q-tab
                     v-for="(bucket, index) in Object.values(bucketizedUsers)"
                     :key="bucket.propertyName"

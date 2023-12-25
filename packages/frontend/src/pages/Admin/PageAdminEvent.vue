@@ -188,7 +188,15 @@ onMounted(init);
                 </q-btn>
             </template>
         </FTTitle>
-        <q-tabs v-model="tab" align="justify">
+        <q-tabs
+            v-model="tab"
+            outside-arrows
+            mobile-arrows
+            active-bg-color="primary"
+            indicator-color="transparent"
+            active-class="ft-tabs"
+            align="left"
+        >
             <q-tab name="info" label="Info" />
             <q-tab name="edit" label="Edit" v-if="!isEventFinished(event.date)" />
             <q-tab name="logs" label="Logs" />
@@ -203,14 +211,22 @@ onMounted(init);
                     <q-separator class="q-my-sm bg-grey-6" />
 
                     <!-- Nested Tabs for Arrived and Cancelled Reservations -->
-                    <q-tabs v-model="reservationsTab" align="justify">
+                    <q-tabs
+                        v-model="reservationsTab"
+                        outside-arrows
+                        mobile-arrows
+                        active-bg-color="primary"
+                        active-class="ft-tabs"
+                        indicator-color="transparent"
+                        align="left"
+                    >
                         <q-tab
                             name="arrivedReservations"
-                            :label="`Arrived Reservations (${guestArrivedReservations.length})`"
+                            :label="`Arrived (${guestArrivedReservations.length})`"
                         />
                         <q-tab
                             name="cancelledReservations"
-                            :label="`Cancelled Reservations (${cancelledReservations.length})`"
+                            :label="`Cancelled (${cancelledReservations.length})`"
                         />
                     </q-tabs>
                     <q-tab-panels v-model="reservationsTab">
