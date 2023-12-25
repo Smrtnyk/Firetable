@@ -19,7 +19,7 @@
         "@playwright/test": "1.40.1",
         "@quasar/app-vite": "1.7.1",
         "@types/color": "3.0.6",
-        "@vitejs/plugin-vue": "5.0.0-alpha.0",
+        "@vitejs/plugin-vue": "5.0.0",
         "@vitest/browser": "1.1.0",
         "@vue/test-utils": "2.4.3",
         "vite-tsconfig-paths": "4.2.2",
