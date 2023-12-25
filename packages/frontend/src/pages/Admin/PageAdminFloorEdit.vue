@@ -459,8 +459,8 @@ function onDragStart(event: DragEvent, item: FloorElementTypes): void {
             </div>
         </div>
 
-        <q-card>
+        <div class="ft-card ft-border ft-no-border-radius">
             <canvas v-if="floor && !isFloorLoading" ref="canvasRef" />
-        </q-card>
+        </div>
     </div>
 </template>

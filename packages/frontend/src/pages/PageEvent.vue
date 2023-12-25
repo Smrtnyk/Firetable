@@ -220,9 +220,9 @@ onUnmounted(() => {
             class="ft-tab-pane"
             :class="{ 'active show': isActiveFloor(floor.id) }"
         >
-            <q-card>
+            <div class="ft-card ft-border ft-no-border-radius">
                 <canvas :id="floor.id" :ref="mapFloorToCanvas(floor)"></canvas>
-            </q-card>
+            </div>
         </div>
 
         <EventGuestList
