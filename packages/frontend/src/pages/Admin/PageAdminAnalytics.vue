@@ -32,7 +32,7 @@ const properties = computed(() => {
         return property.organisationId === props.organisationId;
     });
 });
-const selectedTab = ref<string | undefined>();
+const selectedTab = ref("");
 
 const selectedMonth = ref(format(new Date(), "yyyy-MM"));
 const monthOptions = computed(() => {

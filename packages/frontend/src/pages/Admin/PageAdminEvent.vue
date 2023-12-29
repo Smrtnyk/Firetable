@@ -28,6 +28,7 @@ import { truncateText } from "src/helpers/string-utils";
 import { compressFloorDoc } from "src/helpers/compress-floor-doc";
 import { propIsTruthy } from "@firetable/utils";
 import FTTabs from "src/components/FTTabs.vue";
+import { useGuests } from "src/composables/useGuests";
 
 interface Props {
     organisationId: string;
@@ -48,25 +49,7 @@ const eventOwner: EventOwner = {
 };
 
 const { eventFloors, event, isLoading, reservations, logs } = useAdminEvent(eventOwner);
-
-watch(
-    isLoading,
-    (newIsLoading) => {
-        if (newIsLoading) {
-            Loading.show();
-        } else {
-            Loading.hide();
-        }
-    },
-    { immediate: true },
-);
-
-onUnmounted(() => {
-    if (Loading.isActive) {
-        Loading.hide();
-    }
-});
-
+const { returningGuests } = useGuests(eventOwner, reservations);
 const allTables = computed(() => eventFloors.value.map(getTablesFromFloorDoc).flat());
 const cancelledReservations = computed(() => reservations.value.filter(propIsTruthy("cancelled")));
 const guestArrivedReservations = computed(() =>
@@ -97,6 +80,24 @@ const reservationsStatus = computed(() => {
         unreserved,
         totalGuests,
     };
+});
+
+watch(
+    isLoading,
+    (newIsLoading) => {
+        if (newIsLoading) {
+            Loading.show();
+        } else {
+            Loading.hide();
+        }
+    },
+    { immediate: true },
+);
+
+onUnmounted(() => {
+    if (Loading.isActive) {
+        Loading.hide();
+    }
 });
 
 async function init(): Promise<void> {
@@ -212,6 +213,10 @@ onMounted(init);
                         name="cancelledReservations"
                         :label="`Cancelled (${cancelledReservations.length})`"
                     />
+                    <q-tab
+                        name="returningGuests"
+                        :label="`Returning (${returningGuests.length})`"
+                    />
                 </FTTabs>
                 <q-tab-panels v-model="reservationsTab">
                     <q-tab-panel name="arrivedReservations">
@@ -219,6 +224,26 @@ onMounted(init);
                     </q-tab-panel>
                     <q-tab-panel name="cancelledReservations">
                         <AdminEventReservationsList :reservations="cancelledReservations" />
+                    </q-tab-panel>
+                    <q-tab-panel name="returningGuests">
+                        <q-list>
+                            <q-item
+                                v-for="guest in returningGuests"
+                                :key="guest.contact"
+                                clickable
+                                v-ripple
+                            >
+                                <q-item-section>
+                                    <q-item-label overline
+                                        >{{ guest.visits.length }} previous visits</q-item-label
+                                    >
+                                    <q-item-label>
+                                        {{ guest.name }} on
+                                        {{ guest.tableLabels.join(", ") }}</q-item-label
+                                    >
+                                </q-item-section>
+                            </q-item>
+                        </q-list>
                     </q-tab-panel>
                 </q-tab-panels>
             </q-tab-panel>

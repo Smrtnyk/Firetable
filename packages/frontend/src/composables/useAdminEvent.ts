@@ -54,7 +54,12 @@ export default function useAdminEvent(eventOwner: EventOwner) {
     });
 
     const isLoading = computed(() => {
-        return eventFloorsHook.pending.value || usersHook.pending.value || eventHook.pending.value;
+        return (
+            eventFloorsHook.pending.value ||
+            usersHook.pending.value ||
+            eventHook.pending.value ||
+            reservations.pending.value
+        );
     });
 
     return {

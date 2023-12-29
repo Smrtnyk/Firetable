@@ -1,16 +1,17 @@
 import type { HttpsCallableResult } from "firebase/functions";
 import type { DocumentData, DocumentReference } from "firebase/firestore";
+import type { EventOwner } from "./db.js";
 import type {
     CreateEventPayload,
     EventDoc,
     EventLog,
     FloorDoc,
     GuestData,
+    GuestDataPayload,
     Reservation,
     ReservationDoc,
     User,
 } from "@firetable/types";
-import type { EventOwner } from "./db.js";
 import {
     eventLogsDoc,
     eventsCollection,
@@ -125,6 +126,16 @@ export function createNewEvent(
         functions,
         "createEvent",
     )(eventPayload);
+}
+
+export function setGuestData(guestData: GuestDataPayload): Promise<HttpsCallableResult> {
+    const { functions } = initializeFirebase();
+    return httpsCallable(functions, "setGuestData")(guestData);
+}
+
+export function deleteGuestVisit(guestData: GuestDataPayload): Promise<HttpsCallableResult> {
+    const { functions } = initializeFirebase();
+    return httpsCallable(functions, "deleteGuestVisit")(guestData);
 }
 
 export function addReservation(
