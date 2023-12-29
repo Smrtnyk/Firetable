@@ -1,4 +1,4 @@
-import type { DocumentData, QuerySnapshot } from "firebase-admin/firestore";
+import type { QuerySnapshot } from "firebase-admin/firestore";
 import { deleteDocument } from "../../delete-document/index.js";
 import { db } from "../../init.js";
 import { Collection } from "../../../types/types.js";
@@ -30,7 +30,7 @@ export async function clearOldEvents(): Promise<void> {
                 // Step 3: For each property under an organization, retrieve and delete the old events.
                 const oldEvents = await getOldEvents(orgId, propertyId);
 
-                if (!oldEvents.empty) {
+                if (oldEvents && !oldEvents.empty) {
                     const deletePromises = oldEvents.docs.map((eventDoc) =>
                         deleteDocument({
                             col: `${Collection.ORGANISATIONS}/${orgId}/${Collection.PROPERTIES}/${propertyId}/${Collection.EVENTS}`,
@@ -60,7 +60,7 @@ export async function clearOldEvents(): Promise<void> {
 async function getOldEvents(
     organisationId: string,
     propertyId: string,
-): Promise<QuerySnapshot<DocumentData>> {
+): Promise<QuerySnapshot | void> {
     const date = new Date();
     date.setFullYear(date.getFullYear() - DELETION_AGE_YEARS);
 
@@ -73,6 +73,5 @@ async function getOldEvents(
             .get();
     } catch (error) {
         logger.error("Error fetching old events:", error);
-        throw new Error("Failed to fetch old events from Firestore.");
     }
 }
