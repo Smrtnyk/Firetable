@@ -277,6 +277,9 @@ onUnmounted(destroyChartIfExists);
             :rows-per-page-options="[0]"
             card-class="ft-card"
             hide-bottom
+            flat
+            binary-state-sort
+            bordered
         ></q-table>
     </div>
 </template>
