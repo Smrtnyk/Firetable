@@ -58,6 +58,12 @@ function handleInput(event: any): void {
         border-image-source: $gradient-primary !important;
     }
 
+    .q-tab {
+        border: 3px solid transparent;
+        border-image-slice: 1;
+        border-image-source: none;
+    }
+
     .q-tab:not(:last-child) {
         margin-right: 4px;
     }
