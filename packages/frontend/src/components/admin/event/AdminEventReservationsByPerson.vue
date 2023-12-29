@@ -1,14 +1,3 @@
-<template>
-    <div>
-        <canvas
-            v-if="props.reservations.length > 0"
-            ref="chartRef"
-            class="chart-container"
-        ></canvas>
-        <FTCenteredText v-else>No reservations to show</FTCenteredText>
-    </div>
-</template>
-
 <script setup lang="ts">
 import type { ReservationDoc } from "@firetable/types";
 import {
@@ -22,7 +11,7 @@ import {
     Tooltip,
     SubTitle,
 } from "chart.js";
-import { onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { isMobile } from "src/global-reactives/screen-detection";
 import FTCenteredText from "src/components/FTCenteredText.vue";
@@ -38,6 +27,15 @@ interface ReservationObject {
 }
 
 type Res = Record<string, ReservationObject>;
+type ChartData = {
+    labels: string[];
+    datasets: any[];
+};
+
+const enum ViewMode {
+    CHART = "chart",
+    TABLE = "table",
+}
 
 Chart.register(
     CategoryScale,
@@ -50,22 +48,46 @@ Chart.register(
     SubTitle,
 );
 
-const chartRef = ref<HTMLCanvasElement | null>(null);
-const props = defineProps<Props>();
 let chartInstance: Chart | undefined;
+const tableColumns = [
+    { name: "name", required: true, label: "Name", align: "left", field: "name", sortable: true },
+    { name: "confirmed", label: "Arrived", field: "confirmed", sortable: true },
+    { name: "pending", label: "Pending", field: "pending", sortable: true },
+    { name: "total", label: "Total", field: "total", sortable: true },
+];
 
-function calculateChartHeight(reservations: ReservationDoc[]): number {
+const props = defineProps<Props>();
+
+const viewMode = ref(ViewMode.CHART);
+const chartRef = ref<HTMLCanvasElement | null>(null);
+const chartData = computed(() => {
+    return generateStackedChartData(props.reservations);
+});
+const tableData = computed(() => {
+    const { labels, datasets } = chartData.value;
+    const confirmedData = datasets.find((dataset) => dataset.label === "Confirmed").data;
+    const unconfirmedData = datasets.find((dataset) => dataset.label === "Unconfirmed").data;
+
+    return labels.map((label, index) => ({
+        name: label,
+        confirmed: confirmedData[index],
+        pending: unconfirmedData[index],
+        total: confirmedData[index] + unconfirmedData[index],
+    }));
+});
+
+function calculateChartHeight(): number {
     const minBarHeight = isMobile.value ? 7 : 12;
     // Calculate the total height based on the number of bars
-    const totalHeight = reservations.length * minBarHeight;
+    const totalHeight = props.reservations.length * minBarHeight;
 
     const minHeight = 300;
     return Math.max(totalHeight, minHeight);
 }
 
-function updateChartHeight(reservations: ReservationDoc[]): void {
+function updateChartHeight(): void {
     if (chartRef.value) {
-        const newHeight = calculateChartHeight(reservations);
+        const newHeight = calculateChartHeight();
         chartRef.value.style.height = `${newHeight}px`;
     }
 }
@@ -88,10 +110,7 @@ function reservationsReducer(acc: Res, reservation: ReservationDoc): Res {
     return acc;
 }
 
-function generateStackedChartData(reservations: ReservationDoc[]): {
-    labels: string[];
-    datasets: any[];
-} {
+function generateStackedChartData(reservations: ReservationDoc[]): ChartData {
     const data = reservations.reduce(reservationsReducer, {});
     const labels: string[] = [];
     const confirmedCounts: number[] = [];
@@ -133,21 +152,20 @@ function destroyChartIfExists(): void {
     }
 }
 
-function generateTablesByWaiterChartOptions(
-    chartContainer: HTMLCanvasElement,
-    reservations: ReservationDoc[],
-): void {
-    const { labels, datasets } = generateStackedChartData(reservations);
-    updateChartHeight(reservations);
-    destroyChartIfExists();
+function updateChartData(): void {
+    if (!chartInstance) {
+        return;
+    }
 
+    chartInstance.data = chartData.value;
+    chartInstance.update();
+}
+
+function createChart(chartContainer: HTMLCanvasElement): void {
     try {
         chartInstance = new Chart(chartContainer, {
             type: "bar",
-            data: {
-                labels,
-                datasets,
-            },
+            data: chartData.value,
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -195,28 +213,73 @@ function generateTablesByWaiterChartOptions(
     }
 }
 
-onMounted(() => {
-    if (!chartRef.value) {
-        return;
+function initializeChart(chartContainer: HTMLCanvasElement): void {
+    updateChartHeight();
+
+    if (chartInstance) {
+        updateChartData();
+    } else {
+        createChart(chartContainer);
     }
-    generateTablesByWaiterChartOptions(chartRef.value, props.reservations);
+}
+
+onMounted(() => {
+    if (chartRef.value) {
+        initializeChart(chartRef.value);
+    }
 });
 
 watch(
     () => props.reservations,
-    (newReservations) => {
-        destroyChartIfExists();
+    () => {
         if (chartRef.value) {
-            generateTablesByWaiterChartOptions(chartRef.value, newReservations);
+            if (chartInstance) {
+                updateChartData();
+            } else {
+                initializeChart(chartRef.value);
+            }
         }
     },
-    { immediate: true },
+    { deep: true },
 );
 
-onBeforeUnmount(() => {
-    destroyChartIfExists();
-});
+onUnmounted(destroyChartIfExists);
 </script>
+
+<template>
+    <div>
+        <q-btn-toggle
+            v-model="viewMode"
+            no-caps
+            unelevated
+            :options="[
+                { label: 'Chart', value: ViewMode.CHART },
+                { label: 'Table', value: ViewMode.TABLE },
+            ]"
+        ></q-btn-toggle>
+
+        <!-- Chart Container -->
+        <div v-show="viewMode === ViewMode.CHART">
+            <canvas
+                v-if="props.reservations.length > 0"
+                ref="chartRef"
+                class="chart-container"
+            ></canvas>
+            <FTCenteredText v-else>No reservations to show</FTCenteredText>
+        </div>
+
+        <!-- Data Table -->
+        <q-table
+            v-show="viewMode === ViewMode.TABLE"
+            :rows="tableData"
+            :columns="tableColumns"
+            row-key="name"
+            :rows-per-page-options="[0]"
+            card-class="ft-card"
+            hide-bottom
+        ></q-table>
+    </div>
+</template>
 
 <style>
 .chart-container {
