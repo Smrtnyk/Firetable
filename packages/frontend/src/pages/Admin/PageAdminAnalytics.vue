@@ -107,7 +107,7 @@ const confirmedVsUnconfirmed = computed((): PieChartData => {
 
 type AverageGuestsData = { averageGuests: number };
 
-const avgGuestsPerReservation = computed((): AverageGuestsData => {
+const avgGuestsPerReservation = computed<AverageGuestsData>(() => {
     let totalGuests = 0;
     let totalReservations = 0;
     reservationsByActiveProperty.value.forEach(({ numberOfGuests }) => {
@@ -119,7 +119,7 @@ const avgGuestsPerReservation = computed((): AverageGuestsData => {
     return { averageGuests: avg };
 });
 
-const reservationsByProperty = computed((): TimeSeriesData => {
+const reservationsByProperty = computed<TimeSeriesData>(() => {
     const propertyTotals: Record<string, number> = {};
     reservations.value.forEach(({ propertyName, reservations: res }) => {
         propertyTotals[propertyName] = res.length;
@@ -144,7 +144,7 @@ const reservationsByProperty = computed((): TimeSeriesData => {
     };
 });
 
-const peakReservationHours = computed((): TimeSeriesData => {
+const peakReservationHours = computed<TimeSeriesData>(() => {
     const hourlyTotals: Record<string, number> = {};
 
     reservationsByActiveProperty.value.forEach((reservation) => {
@@ -222,7 +222,7 @@ const consumptionAnalysisCombined = computed(() => {
     };
 });
 
-const guestDistributionAnalysis = computed((): TimeSeriesData => {
+const guestDistributionAnalysis = computed<TimeSeriesData>(() => {
     const distribution: Record<string, number> = {};
 
     reservationsByActiveProperty.value.forEach(({ numberOfGuests }) => {
@@ -249,7 +249,7 @@ const guestDistributionAnalysis = computed((): TimeSeriesData => {
     };
 });
 
-const reservationsByDayOfWeek = computed((): TimeSeriesData => {
+const reservationsByDayOfWeek = computed<TimeSeriesData>(() => {
     const dayOfWeekTotals: Record<string, number> = {};
     const daysOfWeek = [
         "Monday",
@@ -464,7 +464,7 @@ async function getReservationFromEvents(events: EventDoc[]): Promise<Reservation
                             :chart-data="confirmedVsUnconfirmed"
                             chart-title="Confirmed vs. Unconfirmed"
                         />
-                        <div class="col-12 q-my-sm">
+                        <div class="col-12 q-my-md">
                             <FTTabs v-model="selectedDay">
                                 <q-tab
                                     v-for="day in [...Object.keys(reservationsByDay), 'ALL']"
@@ -474,8 +474,9 @@ async function getReservationFromEvents(events: EventDoc[]): Promise<Reservation
                                 />
                             </FTTabs>
 
-                            <q-tab-panels v-model="selectedDay" animated>
+                            <q-tab-panels v-model="selectedDay" animated class="q-mt-md">
                                 <q-tab-panel
+                                    class="q-pa-none"
                                     v-for="(reservations, day) in {
                                         ...reservationsByDay,
                                         ALL: reservationsByActiveProperty,
@@ -483,10 +484,7 @@ async function getReservationFromEvents(events: EventDoc[]): Promise<Reservation
                                     :key="day"
                                     :name="day"
                                 >
-                                    <AdminEventReservationsByPerson
-                                        class="col-12"
-                                        :reservations="reservations"
-                                    />
+                                    <AdminEventReservationsByPerson :reservations="reservations" />
                                 </q-tab-panel>
                             </q-tab-panels>
                         </div>
