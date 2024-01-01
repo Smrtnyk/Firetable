@@ -29,6 +29,8 @@ import { useRouter } from "vue-router";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import { usePropertiesStore } from "src/stores/usePropertiesStore";
 import FTTabs from "src/components/FTTabs.vue";
+import { storeToRefs } from "pinia";
+import { useAuthStore } from "src/stores/auth-store";
 
 const props = defineProps<{ organisationId: string }>();
 
@@ -37,6 +39,7 @@ const quasar = useQuasar();
 const { t } = useI18n();
 const { createDialog } = useDialog();
 const propertiesStore = usePropertiesStore();
+const { isAdmin } = storeToRefs(useAuthStore());
 const {
     eventsByProperty,
     fetchMoreEvents,
@@ -247,6 +250,7 @@ function showCreateEventForm(property: PropertyDoc, event?: EventDoc): void {
                     >
                         <div class="row justify-end">
                             <q-btn
+                                v-if="isAdmin"
                                 rounded
                                 icon="plus"
                                 class="button-gradient q-mb-md"
