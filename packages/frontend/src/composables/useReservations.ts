@@ -5,6 +5,7 @@ import type { DialogChainObject } from "quasar";
 import type { VueFirestoreDocumentData } from "vuefire";
 import type { EventDoc, Reservation, ReservationDoc, User } from "@firetable/types";
 import {
+    getFirestoreTimestamp,
     deleteGuestVisit,
     setGuestData,
     addLogToEvent,
@@ -175,6 +176,7 @@ export function useReservations(
                     await updateReservationDoc(eventOwner, {
                         status: ReservationStatus.DELETED,
                         id: reservation.id,
+                        clearedAt: getFirestoreTimestamp(),
                     });
                     createEventLog(`Reservation soft deleted on table ${reservation.tableLabel}`);
                 } else {

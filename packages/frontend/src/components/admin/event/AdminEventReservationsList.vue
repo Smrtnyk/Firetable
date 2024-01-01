@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { ReservationDoc } from "@firetable/types";
 import { useDialog } from "src/composables/useDialog";
+import { formatEventDate } from "src/helpers/date-utils";
+
 import FTDialog from "src/components/FTDialog.vue";
 import ReservationGeneralInfo from "src/components/Event/ReservationGeneralInfo.vue";
 
@@ -32,6 +34,10 @@ function showReservation(reservation: ReservationDoc): void {
             <q-item-section @click="showReservation(reservation)">
                 <q-item-label>
                     {{ reservation.guestName }} on {{ reservation.tableLabel }}</q-item-label
+                >
+                <q-item-label v-if="reservation.clearedAt" caption
+                    >Cleared at:
+                    {{ formatEventDate(reservation.clearedAt.toMillis()) }}</q-item-label
                 >
             </q-item-section>
         </q-item>

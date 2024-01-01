@@ -70,6 +70,7 @@ export interface Reservation {
     consumption: number;
     time: string;
     reservedBy: UserIdentifier;
+    clearedAt?: Timestamp;
     creator: UserIdentifier & { createdAt: Timestamp };
     status: ReservationStatus | undefined;
 }
