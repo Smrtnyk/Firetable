@@ -15,6 +15,7 @@ export default {
             manageProperties: "Immobilien verwalten",
             manageOrganisations: "Organisationen verwalten",
             manageAnalytics: "Analytics verwalten",
+            manageGuests: "Gäste verwalten",
         },
         toggles: {
             darkMode: "Dunkelmodus umschalten",
@@ -89,6 +90,19 @@ export default {
         reservedByLabel: "Reserviert von",
         requireReservedBySelectionError: "Sie müssen mindestens eine Option auswählen",
         reservedBySocialLabel: "Soziale Netzwerke",
+    },
+    PageAdminGuests: {
+        title: "Gäste",
+        noGuestsCreatedMessage: "Es wurden keine Gäste erstellt.",
+        maxAmountGuestsCreationMessage:
+            "Sie haben die maximale Anzahl an Gästen erreicht, welche {limit} beträgt!",
+        createNewGuestDialogTitle: "Neuen Gast erstellen",
+        editGuestDialogTitle: "Gast bearbeiten: {name}",
+        editGuestConfirmationMessage:
+            "Sind Sie sicher, dass Sie den Gast {name} bearbeiten möchten?",
+        deleteGuestDialogTitle: "Gast löschen?",
+        deleteGuestConfirmationMessage:
+            "Sind Sie sicher, dass Sie den Gast {name} löschen möchten?",
     },
     PageAdminProperties: {
         properties: "Immobilien",

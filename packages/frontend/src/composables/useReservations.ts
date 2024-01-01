@@ -4,15 +4,18 @@ import type { EventOwner } from "@firetable/backend";
 import type { DialogChainObject } from "quasar";
 import type { VueFirestoreDocumentData } from "vuefire";
 import type { EventDoc, Reservation, ReservationDoc, User } from "@firetable/types";
-import { isTable } from "@firetable/floor-creator";
-import { computed, onBeforeUnmount, ref, watch } from "vue";
-import { ReservationStatus } from "@firetable/types";
 import {
+    getFirestoreTimestamp,
+    deleteGuestVisit,
+    setGuestData,
     addLogToEvent,
     addReservation,
     deleteReservation,
     updateReservationDoc,
 } from "@firetable/backend";
+import { isTable } from "@firetable/floor-creator";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
+import { ReservationStatus } from "@firetable/types";
 import { useQuasar } from "quasar";
 import {
     notifyPositive,
@@ -28,8 +31,15 @@ import FTDialog from "src/components/FTDialog.vue";
 import EventCreateReservation from "src/components/Event/EventCreateReservation.vue";
 import EventShowReservation from "src/components/Event/EventShowReservation.vue";
 import { determineTableColor } from "src/helpers/floor";
+import { isValidEuropeanPhoneNumber } from "src/helpers/utils";
+import { isEventInProgress } from "src/helpers/events-utils";
 
 const HALF_HOUR = 30 * 60 * 1000; // 30 minutes in milliseconds
+
+const enum GuestDataMode {
+    SET = "set",
+    DELETE = "delete",
+}
 
 export function useReservations(
     users: Ref<User[]>,
@@ -68,6 +78,34 @@ export function useReservations(
         deep: true,
     });
 
+    function handleGuestDataForReservation(
+        reservationData: Reservation,
+        mode: GuestDataMode,
+    ): void {
+        if (!event.value) {
+            return;
+        }
+
+        if (!isValidEuropeanPhoneNumber(reservationData.guestContact)) {
+            return;
+        }
+
+        const data = {
+            reservation: reservationData,
+            propertyId: eventOwner.propertyId,
+            organisationId: eventOwner.organisationId,
+            eventId: eventOwner.id,
+            eventName: event.value.name,
+            eventDate: event.value.date,
+        };
+
+        if (mode === GuestDataMode.SET) {
+            setGuestData(data).catch(console.error);
+        } else {
+            deleteGuestVisit(data).catch(console.error);
+        }
+    }
+
     async function handleFloorUpdates([newReservations, newFloorInstances]: [
         ReservationDoc[],
         FloorViewer[],
@@ -105,6 +143,7 @@ export function useReservations(
                 await addReservation(eventOwner, reservationData);
                 notifyPositive("Reservation created");
                 createEventLog(`Reservation created on table ${reservationData.tableLabel}`);
+                handleGuestDataForReservation(reservationData, GuestDataMode.SET);
             },
         });
     }
@@ -120,23 +159,30 @@ export function useReservations(
     }
 
     async function onDeleteReservation(reservation: ReservationDoc): Promise<void> {
-        if (!(await showConfirm("Delete reservation?"))) return;
+        if (!(await showConfirm("Delete reservation?"))) {
+            return;
+        }
 
         await tryCatchLoadingWrapper({
-            hook: async function () {
-                // If reservation is cancelled or guest arrived, soft delete it
-                // otherwise just delete it permanently for now
-                // we soft delete these so they can be used in analytics
-                // might change in future if use-case for inspecting deleted reservations arises
-                if (reservation.cancelled || reservation.confirmed) {
+            async hook() {
+                if (!event.value) {
+                    return;
+                }
+                // If reservation is cancelled or event is in progress, soft delete it
+                // otherwise just delete it permanently
+                // we soft delete these, so they can be used in analytics
+                // reservations deleted during event are probably deleted to free up the table for the next guest
+                if (isEventInProgress(event.value.date) || reservation.cancelled) {
                     await updateReservationDoc(eventOwner, {
                         status: ReservationStatus.DELETED,
                         id: reservation.id,
+                        clearedAt: getFirestoreTimestamp(),
                     });
                     createEventLog(`Reservation soft deleted on table ${reservation.tableLabel}`);
                 } else {
                     await deleteReservation(eventOwner, reservation);
                     createEventLog(`Reservation deleted on table ${reservation.tableLabel}`);
+                    handleGuestDataForReservation(reservation, GuestDataMode.DELETE);
                 }
             },
         });
@@ -258,11 +304,19 @@ export function useReservations(
     function onGuestArrived(reservation: ReservationDoc) {
         return function (val: boolean) {
             return tryCatchLoadingWrapper({
-                hook: () =>
-                    updateReservationDoc(eventOwner, {
+                async hook() {
+                    await updateReservationDoc(eventOwner, {
                         id: reservation.id,
                         confirmed: val,
-                    }),
+                    });
+                    handleGuestDataForReservation(
+                        {
+                            ...reservation,
+                            confirmed: val,
+                        },
+                        GuestDataMode.SET,
+                    );
+                },
             });
         };
     }
@@ -282,11 +336,19 @@ export function useReservations(
     function onReservationCancelled(reservation: ReservationDoc) {
         return function (val: boolean) {
             return tryCatchLoadingWrapper({
-                hook: () =>
-                    updateReservationDoc(eventOwner, {
+                async hook() {
+                    await updateReservationDoc(eventOwner, {
                         id: reservation.id,
                         cancelled: val,
-                    }),
+                    });
+                    handleGuestDataForReservation(
+                        {
+                            ...reservation,
+                            cancelled: val,
+                        },
+                        GuestDataMode.SET,
+                    );
+                },
             });
         };
     }

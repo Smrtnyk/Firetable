@@ -70,6 +70,7 @@ export interface Reservation {
     consumption: number;
     time: string;
     reservedBy: UserIdentifier;
+    clearedAt?: Timestamp;
     creator: UserIdentifier & { createdAt: Timestamp };
     status: ReservationStatus | undefined;
 }
@@ -82,4 +83,31 @@ export interface EventLog {
 
 export interface EventLogsDoc {
     logs: EventLog[];
+}
+
+export type GuestDataPayload = {
+    reservation: Reservation;
+    propertyId: string;
+    organisationId: string;
+    eventId: string;
+    eventName: string;
+    eventDate: number;
+};
+
+export interface Visit {
+    date: number;
+    eventName: string;
+    arrived: boolean;
+    cancelled: boolean;
+}
+
+export interface GuestDoc {
+    name: string;
+    contact: string;
+    visitedProperties: {
+        [propertyId: string]: {
+            [eventId: string]: Visit | null;
+        };
+    };
+    _doc: QueryDocumentSnapshot<GuestDoc>;
 }

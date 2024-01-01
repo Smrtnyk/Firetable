@@ -15,6 +15,7 @@ export default {
             manageProperties: "Manage Properties",
             manageOrganisations: "Manage Organisations",
             manageAnalytics: "Manage Analytics",
+            manageGuests: "Manage Guests",
         },
         toggles: {
             darkMode: "Toggle dark mode",
@@ -89,6 +90,17 @@ export default {
         reservedByLabel: "Reserved by",
         requireReservedBySelectionError: "You need to select at least one option",
         reservedBySocialLabel: "Social Networks",
+    },
+    PageAdminGuests: {
+        title: "Guests",
+        noGuestsCreatedMessage: "There are no guests created.",
+        maxAmountGuestsCreationMessage:
+            "You have reached the maximum amount of guests which is {limit}!",
+        createNewGuestDialogTitle: "Create new guest",
+        editGuestDialogTitle: "Editing guest: {name}",
+        editGuestConfirmationMessage: "Are you sure you want to edit guest {name}?",
+        deleteGuestDialogTitle: "Delete guest?",
+        deleteGuestConfirmationMessage: "Are you sure you want to delete guest {name}?",
     },
     PageAdminProperties: {
         properties: "Properties",

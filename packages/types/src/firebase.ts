@@ -7,6 +7,7 @@ export const enum Collection {
     FLOORS = "floors",
     ORGANISATIONS = "organisations",
     PROPERTIES = "properties",
+    GUESTS = "guests",
 }
 
 export const EVENT_LOGS_DOCUMENT = "logsDocument";

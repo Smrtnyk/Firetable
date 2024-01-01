@@ -25,11 +25,16 @@
         "noImplicitReturns": true,                        /* Enable error reporting for codepaths that do not explicitly return in a function. */
         "noFallthroughCasesInSwitch": true,               /* Enable error reporting for fallthrough cases in switch statements. */
         "noUncheckedIndexedAccess": true,                 /* Include 'undefined' in index signature results */
-        "noImplicitOverride": true,                       /* Ensure overriding members in derived classes are marked with an override modifier. */
+        "noImplicitOverride": true                       /* Ensure overriding members in derived classes are marked with an override modifier. */
     },
     "compileOnSave": true,
     "include": [
-        "types/diff.d.ts",
         "./src"
+    ],
+    "exclude": [
+        "node_modules",
+        "lib",
+        "dist",
+        "**/*.spec.ts"
     ]
 }

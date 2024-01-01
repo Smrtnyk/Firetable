@@ -1,6 +1,9 @@
 // Copy, cannot be imported from types package
 export const enum Collection {
     EVENTS = "events",
+    EVENT_LOGS = "eventLogs",
+    RESERVATIONS = "reservations",
+    GUESTS = "guests",
     GUEST_LIST = "guestList",
     USERS = "users",
     FLOORS = "floors",
@@ -78,3 +81,33 @@ export type CreateEventPayload = CreateEventForm & {
     id: string;
     floors: FloorDoc[];
 };
+
+export interface SimpleReservation {
+    floorId: string;
+    tableLabel: string;
+    confirmed: boolean;
+    reservationConfirmed: boolean | undefined;
+    cancelled: boolean | undefined;
+    guestContact?: string;
+    guestName: string;
+    numberOfGuests: number | string;
+    consumption: number;
+    time: string;
+}
+
+export interface Visit {
+    date: number;
+    eventName: string;
+    arrived: boolean;
+    cancelled: boolean;
+}
+
+export interface GuestDoc {
+    name: string;
+    contact: string;
+    visitedProperties: {
+        [propertyId: string]: {
+            [eventId: string]: Visit | null;
+        };
+    };
+}

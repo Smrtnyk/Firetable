@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { EventDoc, PropertyDoc } from "@firetable/types";
-import PageAdminEventsListItem from "src/components/Event/PageAdminEventsListItem.vue";
+import PageAdminEventsListItem from "src/components/admin/event/PageAdminEventsListItem.vue";
 import { computed } from "vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 

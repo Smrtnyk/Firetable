@@ -14,7 +14,9 @@
                         rounded
                     />
                     <FloorEditorControls
+                        @floor-save="saveFloorState"
                         v-if="floorInstance"
+                        :floor-instance="floorInstance"
                         :selected-floor-element="selectedFloorElement"
                         :delete-allowed="false"
                         :existing-labels="
@@ -34,10 +36,10 @@
 <script setup lang="ts">
 import type { Floor, FloorEditorElement } from "@firetable/floor-creator";
 import type { FloorDoc } from "@firetable/types";
-import { nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
 import { extractAllTablesLabels, FloorEditor } from "@firetable/floor-creator";
-import { debounce } from "quasar";
+import { nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from "vue";
+import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
+import { useFloorEditor } from "src/composables/useFloorEditor";
 
 interface Props {
     floor: FloorDoc;
@@ -49,7 +51,8 @@ const props = defineProps<Props>();
 const emit = defineEmits(["update"]);
 const floorContainerRef = ref<HTMLCanvasElement | undefined>();
 const viewerContainerRef = ref<HTMLDivElement | undefined>();
-const floorInstance = ref<FloorEditor | undefined>();
+const floorInstance = shallowRef<FloorEditor | undefined>();
+const { onFloorDrop, resizeFloor } = useFloorEditor(floorInstance, viewerContainerRef);
 
 onMounted(() => {
     window.addEventListener("resize", resizeFloor);
@@ -57,15 +60,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
     window.removeEventListener("resize", resizeFloor);
-    floorInstance.value?.destroy();
 });
-
-const resizeFloor = debounce((): void => {
-    if (!viewerContainerRef.value) {
-        return;
-    }
-    floorInstance.value?.resize(viewerContainerRef.value.clientWidth);
-}, 100);
 
 function saveFloorState(): void {
     if (!floorInstance.value) return;
@@ -88,6 +83,7 @@ watch(floorContainerRef, () => {
         canvas: floorContainerRef.value,
         containerWidth: viewerContainerRef.value.clientWidth,
     });
+    floorInstance.value.on("drop", onFloorDrop);
     floorInstance.value.on("elementClicked", onElementClick);
 });
 </script>
