@@ -31,6 +31,7 @@ import EventCreateReservation from "src/components/Event/EventCreateReservation.
 import EventShowReservation from "src/components/Event/EventShowReservation.vue";
 import { determineTableColor } from "src/helpers/floor";
 import { isValidEuropeanPhoneNumber } from "src/helpers/utils";
+import { isEventInProgress } from "src/helpers/events-utils";
 
 const HALF_HOUR = 30 * 60 * 1000; // 30 minutes in milliseconds
 
@@ -157,15 +158,20 @@ export function useReservations(
     }
 
     async function onDeleteReservation(reservation: ReservationDoc): Promise<void> {
-        if (!(await showConfirm("Delete reservation?"))) return;
+        if (!(await showConfirm("Delete reservation?"))) {
+            return;
+        }
 
         await tryCatchLoadingWrapper({
             async hook() {
-                // If reservation is cancelled or guest arrived, soft delete it
-                // otherwise just delete it permanently for now
+                if (!event.value) {
+                    return;
+                }
+                // If reservation is cancelled or event is in progress, soft delete it
+                // otherwise just delete it permanently
                 // we soft delete these, so they can be used in analytics
-                // might change in future if use-case for inspecting deleted reservations arises
-                if (reservation.cancelled || reservation.confirmed) {
+                // reservations deleted during event are probably deleted to free up the table for the next guest
+                if (isEventInProgress(event.value.date) || reservation.cancelled) {
                     await updateReservationDoc(eventOwner, {
                         status: ReservationStatus.DELETED,
                         id: reservation.id,

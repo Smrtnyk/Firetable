@@ -2,13 +2,13 @@
 import type { EventDoc, FloorDoc, GuestData, ReservationDoc } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
 import type { TouchPanValue } from "quasar";
-import { ReservationStatus } from "@firetable/types";
 import {
+    reservationsCollection,
     getEventFloorsPath,
     getEventGuestListPath,
     getEventPath,
-    getReservationsPath,
 } from "@firetable/backend";
+import { ReservationStatus } from "@firetable/types";
 import { Loading, useQuasar } from "quasar";
 import EventGuestList from "src/components/Event/EventGuestList.vue";
 import FTAutocomplete from "src/components/Event/FTAutocomplete.vue";
@@ -18,11 +18,16 @@ import FTDialog from "src/components/FTDialog.vue";
 import { useRouter } from "vue-router";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useEventsStore } from "src/stores/events-store";
-import { useFirestoreCollection, useFirestoreDocument } from "src/composables/useFirestore";
+import {
+    createQuery,
+    useFirestoreCollection,
+    useFirestoreDocument,
+} from "src/composables/useFirestore";
 import { useFloorsPageEvent } from "src/composables/useFloorsPageEvent";
 import { isMobile } from "src/global-reactives/screen-detection";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";
+import { where } from "firebase/firestore";
 
 interface Props {
     organisationId: string;
@@ -52,16 +57,17 @@ const { data: event, promise: eventDataPromise } = useFirestoreDocument<EventDoc
     getEventPath(eventOwner),
 );
 const { data: eventFloors } = useFirestoreCollection<FloorDoc>(getEventFloorsPath(eventOwner));
+// For event view, we only need reservations with status ACTIVE
 const {
-    data: reservationsCollData,
+    data: reservations,
     promise: reservationsDataPromise,
     error: reservationsDataError,
-} = useFirestoreCollection<ReservationDoc>(getReservationsPath(eventOwner), { wait: true });
-const reservations = computed(
-    () =>
-        reservationsCollData.value.filter((res) => {
-            return !res.status || res.status === ReservationStatus.ACTIVE;
-        }) || [],
+} = useFirestoreCollection<ReservationDoc>(
+    createQuery(
+        reservationsCollection(eventOwner),
+        where("status", "==", ReservationStatus.ACTIVE),
+    ),
+    { wait: true },
 );
 
 const fabPos = ref([18, 18]);

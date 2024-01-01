@@ -15,6 +15,7 @@ import {
     useFirestoreDocument,
 } from "src/composables/useFirestore";
 import { decompressFloorDoc } from "src/helpers/compress-floor-doc";
+import { propIsTruthy } from "@firetable/utils";
 
 export default function useAdminEvent(eventOwner: EventOwner) {
     const router = useRouter();
@@ -32,6 +33,12 @@ export default function useAdminEvent(eventOwner: EventOwner) {
         {
             once: true,
         },
+    );
+    const cancelledReservations = computed(() =>
+        reservations.value.filter(propIsTruthy("cancelled")),
+    );
+    const arrivedReservations = computed(() =>
+        reservations.value.filter(propIsTruthy("confirmed")),
     );
 
     const eventHook = useFirestoreDocument<EventDoc>(getEventPath(eventOwner));
@@ -66,7 +73,9 @@ export default function useAdminEvent(eventOwner: EventOwner) {
         eventFloors,
         users: usersHook.data,
         event: eventHook.data,
-        reservations: reservations.data,
+        allReservations: reservations.data,
+        cancelledReservations,
+        arrivedReservations,
         isLoading,
         logs,
     };

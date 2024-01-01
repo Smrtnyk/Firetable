@@ -26,7 +26,6 @@ import useAdminEvent from "src/composables/useAdminEvent";
 import { buttonSize, isMobile } from "src/global-reactives/screen-detection";
 import { truncateText } from "src/helpers/string-utils";
 import { compressFloorDoc } from "src/helpers/compress-floor-doc";
-import { propIsTruthy } from "@firetable/utils";
 import FTTabs from "src/components/FTTabs.vue";
 import { useGuests } from "src/composables/useGuests";
 
@@ -48,22 +47,23 @@ const eventOwner: EventOwner = {
     id: props.eventId,
 };
 
-const { eventFloors, event, isLoading, reservations, logs } = useAdminEvent(eventOwner);
-const { returningGuests } = useGuests(eventOwner, reservations);
+const {
+    eventFloors,
+    event,
+    isLoading,
+    allReservations,
+    cancelledReservations,
+    arrivedReservations,
+    logs,
+} = useAdminEvent(eventOwner);
+const { returningGuests } = useGuests(eventOwner, allReservations);
 const allTables = computed(() => eventFloors.value.map(getTablesFromFloorDoc).flat());
-const cancelledReservations = computed(() => reservations.value.filter(propIsTruthy("cancelled")));
-const guestArrivedReservations = computed(() =>
-    reservations.value.filter(propIsTruthy("confirmed")),
-);
 
 const reservationsStatus = computed(() => {
-    const activeReservations = reservations.value.filter((reservation) => {
-        return (
-            (!reservation.status || reservation.status === ReservationStatus.ACTIVE) &&
-            !reservation.cancelled
-        );
+    const activeReservations = allReservations.value.filter((reservation) => {
+        return reservation.status === ReservationStatus.ACTIVE && !reservation.cancelled;
     });
-    const unreserved = allTables.value.length - reservations.value.length;
+    const unreserved = allTables.value.length - allReservations.value.length;
     const pending = activeReservations.filter((reservation) => !reservation.confirmed).length;
     const confirmed = activeReservations.length - pending;
     const reserved = activeReservations.length;
@@ -200,14 +200,14 @@ onMounted(init);
             <q-tab-panel name="info" class="q-pa-xs-sm q-pa-md-md">
                 <AdminEventGeneralInfo :reservations-status="reservationsStatus" />
                 <q-separator class="q-my-sm bg-grey-6" />
-                <AdminEventReservationsByPerson :reservations="reservations" />
+                <AdminEventReservationsByPerson :reservations="allReservations" />
                 <q-separator class="q-my-sm bg-grey-6" />
 
                 <!-- Nested Tabs for Arrived and Cancelled Reservations -->
                 <FTTabs v-model="reservationsTab">
                     <q-tab
                         name="arrivedReservations"
-                        :label="`Arrived (${guestArrivedReservations.length})`"
+                        :label="`Arrived (${arrivedReservations.length})`"
                     />
                     <q-tab
                         name="cancelledReservations"
@@ -220,7 +220,7 @@ onMounted(init);
                 </FTTabs>
                 <q-tab-panels v-model="reservationsTab">
                     <q-tab-panel name="arrivedReservations">
-                        <AdminEventReservationsList :reservations="guestArrivedReservations" />
+                        <AdminEventReservationsList :reservations="arrivedReservations" />
                     </q-tab-panel>
                     <q-tab-panel name="cancelledReservations">
                         <AdminEventReservationsList :reservations="cancelledReservations" />
