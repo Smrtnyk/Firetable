@@ -37,6 +37,11 @@ function createLinks(organisationId: string): Link[] {
             route: { name: "adminUsers", params: { organisationId } },
         },
         {
+            label: t("AppDrawer.links.manageGuests"),
+            icon: "users",
+            route: { name: "adminGuests", params: { organisationId } },
+        },
+        {
             label: t("AppDrawer.links.manageFloors"),
             icon: "arrow-expand",
             route: { name: "adminFloors", params: { organisationId } },
