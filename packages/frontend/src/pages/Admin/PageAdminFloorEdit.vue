@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { NumberTuple } from "src/types/generic";
-import type { Floor, FloorDropEvent, FloorEditorElement } from "@firetable/floor-creator";
+import type { Floor, FloorEditorElement } from "@firetable/floor-creator";
 import type { FloorDoc } from "@firetable/types";
 import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
 
-import { nextTick, onBeforeUnmount, onMounted, reactive, ref } from "vue";
+import { nextTick, onBeforeUnmount, onMounted, ref, shallowRef } from "vue";
 import { useRouter } from "vue-router";
-import { debounce, exportFile, Loading, useQuasar } from "quasar";
+import { Loading, useQuasar } from "quasar";
 import { ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
 import {
     extractAllTablesLabels,
@@ -17,16 +17,16 @@ import {
     RESOLUTION,
     FloorElementTypes,
 } from "@firetable/floor-creator";
-import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import {
     getFirestoreDocument,
     updateFirestoreDocument,
     useFirestoreDocument,
 } from "src/composables/useFirestore";
-import { isNumber } from "@firetable/utils";
 import { isMobile, buttonSize, isTablet } from "src/global-reactives/screen-detection";
 import { getFloorPath } from "@firetable/backend";
 import { compressFloorDoc, decompressFloorDoc } from "src/helpers/compress-floor-doc";
+import { useFloorEditor, TABLE_EL_TO_ADD } from "src/composables/useFloorEditor";
 
 type ElementDescriptor = {
     tag: FloorElementTypes;
@@ -47,12 +47,10 @@ const addNewElementsBottomSheetOptions = {
     actions: ELEMENTS_TO_ADD_COLLECTION,
 };
 
-const TABLE_EL_TO_ADD = [FloorElementTypes.RECT_TABLE, FloorElementTypes.ROUND_TABLE];
-
 const props = defineProps<Props>();
 const router = useRouter();
 const q = useQuasar();
-const floorInstance = ref<FloorEditor | undefined>();
+const floorInstance = shallowRef<FloorEditor | undefined>();
 const canvasRef = ref<HTMLCanvasElement | undefined>();
 const pageRef = ref<HTMLDivElement | undefined>();
 const selectedElement = ref<FloorEditorElement | undefined>();
@@ -63,12 +61,7 @@ const {
     promise: floorDataPromise,
     pending: isFloorLoading,
 } = useFirestoreDocument<FloorDoc>(floorPath, { once: true });
-
-const undoRedoState = reactive({
-    canUndo: false,
-    canRedo: false,
-});
-let unregisterStateChangeListener: () => void | undefined;
+const { getNextTableLabel, onFloorDrop, resizeFloor } = useFloorEditor(floorInstance, pageRef);
 
 function onKeyDown(event: KeyboardEvent): void {
     if (event.ctrlKey && event.key === "s") {
@@ -79,8 +72,6 @@ function onKeyDown(event: KeyboardEvent): void {
 }
 
 onBeforeUnmount(() => {
-    unregisterStateChangeListener?.();
-    floorInstance.value?.destroy();
     window.removeEventListener("keydown", onKeyDown);
     window.removeEventListener("resize", resizeFloor);
 });
@@ -98,13 +89,6 @@ onMounted(async () => {
     Loading.hide();
 });
 
-const resizeFloor = debounce((): void => {
-    if (!pageRef.value || !floorInstance.value) {
-        return;
-    }
-    floorInstance.value.resize(pageRef.value.clientWidth);
-}, 100);
-
 async function instantiateFloor(floorDoc: FloorDoc): Promise<void> {
     if (!canvasRef.value || !pageRef.value) return;
 
@@ -117,31 +101,7 @@ async function instantiateFloor(floorDoc: FloorDoc): Promise<void> {
 
     floorEditor.on("elementClicked", elementClickHandler);
     floorEditor.on("doubleClick", dblClickHandler);
-    floorEditor.on("commandChange", () => {
-        undoRedoState.canUndo = floorEditor.canUndo();
-        undoRedoState.canRedo = floorEditor.canRedo();
-    });
     floorEditor.on("drop", onFloorDrop);
-}
-
-function onFloorDrop(floorEditor: FloorEditor, { data, x, y }: FloorDropEvent): void {
-    if (!data) {
-        return;
-    }
-
-    const { item, type } = JSON.parse(data);
-
-    if (type !== "floor-element") {
-        return;
-    }
-
-    if (TABLE_EL_TO_ADD.includes(item)) {
-        const label = getNextTableLabel();
-        floorEditor.addElement({ x, y, tag: item, label });
-        return;
-    }
-
-    floorEditor.addElement({ x, y, tag: item });
 }
 
 async function onFloorSave(): Promise<void> {
@@ -169,19 +129,26 @@ async function onFloorSave(): Promise<void> {
     });
 }
 
-function onFloorChange(prop: keyof FloorEditor, event: null | number | string): void {
-    if (!floorInstance.value) return;
-    if (prop === "name") {
-        floorInstance.value.setFloorName(String(event));
+function onFloorChange({
+    name,
+    width,
+    height,
+}: {
+    width?: number;
+    height?: number;
+    name?: string;
+}): void {
+    if (name) {
+        floorInstance.value?.setFloorName(String(name));
         return;
     }
 
-    const isValidNumber = event && !Number.isNaN(+event);
-    if (prop === "width" && isValidNumber) {
-        floorInstance.value.updateDimensions(+event, floorInstance.value.height);
+    if (width && !Number.isNaN(width)) {
+        floorInstance.value?.updateDimensions(width, floorInstance.value.height);
     }
-    if (prop === "height" && isValidNumber) {
-        floorInstance.value.updateDimensions(floorInstance.value.width, +event);
+
+    if (height && !Number.isNaN(height)) {
+        floorInstance.value?.updateDimensions(floorInstance.value.width, +height);
     }
 }
 
@@ -215,80 +182,6 @@ function onDeleteElement(element: FloorEditorElement): void {
     element.canvas?.remove(elementToDelete);
     selectedElement.value = undefined;
 }
-
-function getNextTableLabel(): string {
-    let label: number;
-    const labels = extractAllTablesLabels(floorInstance.value as FloorEditor);
-    const numericLabels = labels.map((val) => Number.parseInt(val)).filter(isNumber);
-    if (numericLabels.length === 0) {
-        label = 0;
-    } else {
-        const maxLabel = Math.max(...numericLabels);
-        label = isNumber(maxLabel) ? maxLabel : 0;
-    }
-    return String(++label);
-}
-
-function undoAction(): void {
-    if (!floorInstance.value) {
-        return;
-    }
-    floorInstance.value.undo();
-    floorInstance.value.canvas.renderAll();
-}
-
-function redoAction(): void {
-    if (!floorInstance.value) {
-        return;
-    }
-    floorInstance.value.redo();
-    floorInstance.value.canvas.renderAll();
-}
-
-async function exportFloor(floorVal: FloorEditor): Promise<void> {
-    if (!(await showConfirm("Do you want to export this floor plan?"))) {
-        return;
-    }
-    exportFile(
-        `${floorVal.name}.json`,
-        JSON.stringify({
-            json: floorVal.json,
-            width: floorVal.width,
-            height: floorVal.height,
-        }),
-    );
-}
-
-const fileInputRef = ref<HTMLInputElement | null>(null);
-function onFileSelected(event: Event): void {
-    const fileInput = event.target as HTMLInputElement;
-    const file = fileInput.files?.[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = () => {
-            const fileContent = reader.result as string;
-            const jsonData = JSON.parse(fileContent);
-            if (floorInstance.value) {
-                floorInstance.value.importFloor(jsonData);
-            }
-        };
-        reader.readAsText(file);
-    }
-}
-
-function triggerFileInput(): void {
-    fileInputRef.value?.click();
-}
-
-function onDragStart(event: DragEvent, item: FloorElementTypes): void {
-    event.dataTransfer?.setData(
-        "text/plain",
-        JSON.stringify({
-            item,
-            type: "floor-element",
-        }),
-    );
-}
 </script>
 
 <template>
@@ -299,7 +192,7 @@ function onDragStart(event: DragEvent, item: FloorElementTypes): void {
                 standout
                 rounded
                 label="Floor name"
-                @update:model-value="(event) => onFloorChange('name', event)"
+                @update:model-value="(event) => onFloorChange({ name: String(event) })"
                 :model-value="floorInstance.name"
                 :dense="isMobile"
             >
@@ -318,114 +211,13 @@ function onDragStart(event: DragEvent, item: FloorElementTypes): void {
         <FloorEditorControls
             v-if="floorInstance"
             @delete="onDeleteElement"
+            :floor-instance="floorInstance"
             :selected-floor-element="selectedElement"
             :existing-labels="new Set(extractAllTablesLabels(floorInstance as FloorEditor))"
+            @floor-save="onFloorSave"
+            @floor-update="onFloorChange"
         >
-            <template #buttons>
-                <q-btn
-                    v-if="!isTablet"
-                    class="button-gradient q-mb-md"
-                    icon="save"
-                    @click="onFloorSave"
-                    label="save"
-                    rounded
-                    :size="buttonSize"
-                />
-                <q-input
-                    v-if="!isTablet"
-                    standout
-                    rounded
-                    label="Floor name"
-                    @update:model-value="(event) => onFloorChange('name', event)"
-                    :model-value="floorInstance.name"
-                    :dense="isMobile"
-                    class="q-ma-xs"
-                />
-
-                <q-input
-                    v-if="!isTablet"
-                    @keydown.prevent
-                    :min="300"
-                    :max="MAX_FLOOR_WIDTH"
-                    :step="RESOLUTION"
-                    :model-value="floorInstance.width"
-                    @update:model-value="(event) => onFloorChange('width', event)"
-                    standout
-                    rounded
-                    type="number"
-                    label="Floor width"
-                    class="q-ma-xs"
-                />
-                <q-input
-                    v-if="!isTablet"
-                    @keydown.prevent
-                    :min="300"
-                    :max="MAX_FLOOR_HEIGHT"
-                    :step="RESOLUTION"
-                    @update:model-value="(event) => onFloorChange('height', event)"
-                    :model-value="floorInstance.height"
-                    standout
-                    rounded
-                    type="number"
-                    label="Floor height"
-                    class="q-ma-xs"
-                />
-                <q-btn
-                    title="Undo"
-                    round
-                    :disabled="!undoRedoState.canUndo"
-                    @click="undoAction"
-                    icon="undo"
-                />
-                <q-btn
-                    title="Redo"
-                    round
-                    :disabled="!undoRedoState.canRedo"
-                    @click="redoAction"
-                    icon="redo"
-                />
-                <!-- Add Element -->
-                <q-btn round title="Add element" icon="plus">
-                    <q-menu max-width="200px">
-                        <div class="row items-center">
-                            <div
-                                draggable="true"
-                                v-for="element in ELEMENTS_TO_ADD_COLLECTION"
-                                :key="element.elementDescriptor.tag"
-                                class="col-6 justify-center text-center q-my-md"
-                                @dragstart="onDragStart($event, element.elementDescriptor.tag)"
-                            >
-                                <p>{{ element.label }}</p>
-
-                                <q-avatar square size="42px">
-                                    <img :src="element.img" />
-                                </q-avatar>
-                            </div>
-                        </div>
-                    </q-menu>
-                </q-btn>
-
-                <q-btn
-                    round
-                    title="Toggle grid"
-                    @click="floorInstance.toggleGridVisibility"
-                    icon="grid"
-                />
-                <q-btn
-                    round
-                    icon="export"
-                    title="Export floor plan"
-                    @click="exportFloor(floorInstance as FloorEditor)"
-                />
-                <q-btn round title="Import floor plan" icon="import" @click="triggerFileInput" />
-                <input
-                    ref="fileInputRef"
-                    type="file"
-                    @change="onFileSelected"
-                    style="display: none"
-                    accept=".json"
-                />
-            </template>
+            <template #buttons> </template>
         </FloorEditorControls>
 
         <div class="row q-pa-sm q-col-gutter-md" v-if="floorInstance">
@@ -440,7 +232,7 @@ function onDragStart(event: DragEvent, item: FloorElementTypes): void {
                     :step="RESOLUTION"
                     label
                     color="deep-orange"
-                    @update:model-value="(event) => onFloorChange('width', event)"
+                    @update:model-value="(event) => onFloorChange({ width: event || 0 })"
                 />
             </div>
             <div class="col-6" v-if="isTablet">
@@ -453,7 +245,7 @@ function onDragStart(event: DragEvent, item: FloorElementTypes): void {
                     :step="RESOLUTION"
                     label
                     color="deep-orange"
-                    @update:model-value="(event) => onFloorChange('height', event)"
+                    @update:model-value="(event) => onFloorChange({ height: event || 0 })"
                     :model-value="floorInstance.height"
                 />
             </div>

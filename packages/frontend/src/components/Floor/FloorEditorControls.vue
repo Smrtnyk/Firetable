@@ -1,28 +1,44 @@
 <script setup lang="ts">
-import type { BaseTable, FloorEditorElement } from "@firetable/floor-creator";
+import type {
+    BaseTable,
+    FloorEditor,
+    FloorEditorElement,
+    FloorElementTypes,
+} from "@firetable/floor-creator";
+import { MAX_FLOOR_HEIGHT, MAX_FLOOR_WIDTH, RESOLUTION, isTable } from "@firetable/floor-creator";
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
-import { computed, onBeforeUnmount, onMounted, ref, toRefs, watch } from "vue";
-import { isTable } from "@firetable/floor-creator";
-import { QPopupProxy } from "quasar";
-import { isMobile, isTablet } from "src/global-reactives/screen-detection";
+import { computed, onBeforeUnmount, onMounted, reactive, ref, toRefs, watch } from "vue";
+import { exportFile, QPopupProxy } from "quasar";
+import { buttonSize, isMobile, isTablet } from "src/global-reactives/screen-detection";
+import { ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
 
 interface Props {
     selectedFloorElement: FloorEditorElement | undefined;
+    floorInstance: FloorEditor;
     deleteAllowed?: boolean;
     existingLabels: Set<string>;
+}
+
+interface EmitEvents {
+    (e: "delete", element: FloorEditorElement): void;
+    (e: "floorUpdate", value: { width?: number; height?: number; name?: string }): void;
+    (e: "floorSave"): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     deleteAllowed: true,
 });
 const { selectedFloorElement, deleteAllowed, existingLabels } = toRefs(props);
-const emit = defineEmits(["delete"]);
+const emit = defineEmits<EmitEvents>();
 const colorPickerProxy = ref<QPopupProxy | null>(null);
 const getElementWidth = computed(() => {
     const el = selectedFloorElement.value;
     return el ? Math.round(el.width * el.scaleX) : 0;
 });
-
+const undoRedoState = reactive({
+    canUndo: false,
+    canRedo: false,
+});
 const getElementHeight = computed(() => {
     const el = selectedFloorElement.value;
     return el ? Math.round(el.height * el.scaleY) : 0;
@@ -39,6 +55,10 @@ function onKeyDownListener(event: KeyboardEvent): void {
 }
 
 onMounted(() => {
+    props.floorInstance.on("commandChange", () => {
+        undoRedoState.canUndo = props.floorInstance.canUndo();
+        undoRedoState.canRedo = props.floorInstance.canRedo();
+    });
     document.addEventListener("keydown", onKeyDownListener);
 });
 
@@ -105,6 +125,75 @@ function setElementColor(newVal: any): void {
     elementColor.value = newVal;
     selectedFloorElement.value?.setBaseFill?.(newVal);
 }
+
+async function exportFloor(floorVal: FloorEditor): Promise<void> {
+    if (!(await showConfirm("Do you want to export this floor plan?"))) {
+        return;
+    }
+    exportFile(
+        `${floorVal.name}.json`,
+        JSON.stringify({
+            json: floorVal.json,
+            width: floorVal.width,
+            height: floorVal.height,
+        }),
+    );
+}
+
+function undoAction(): void {
+    if (!props.floorInstance) {
+        return;
+    }
+    props.floorInstance.undo();
+    props.floorInstance.canvas.renderAll();
+}
+
+function redoAction(): void {
+    if (!props.floorInstance) {
+        return;
+    }
+    props.floorInstance.redo();
+    props.floorInstance.canvas.renderAll();
+}
+const fileInputRef = ref<HTMLInputElement | null>(null);
+
+function onFileSelected(event: Event): void {
+    const fileInput = event.target as HTMLInputElement;
+    const file = fileInput.files?.[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const fileContent = reader.result as string;
+            const jsonData = JSON.parse(fileContent);
+            if (props.floorInstance) {
+                props.floorInstance.importFloor(jsonData);
+            }
+        };
+        reader.readAsText(file);
+    }
+}
+
+function triggerFileInput(): void {
+    fileInputRef.value?.click();
+}
+
+function onDragStart(event: DragEvent, item: FloorElementTypes): void {
+    event.dataTransfer?.setData(
+        "text/plain",
+        JSON.stringify({
+            item,
+            type: "floor-element",
+        }),
+    );
+}
+
+function onFloorChange(prop: keyof FloorEditor, event: null | number | string): void {
+    emit("floorUpdate", { [prop]: event });
+}
+
+function onFloorSave(): void {
+    emit("floorSave");
+}
 </script>
 
 <template>
@@ -112,7 +201,109 @@ function setElementColor(newVal: any): void {
         <q-card
             class="ShowSelectedElement__floating-controls row q-gutter-xs q-ma-xs q-pa-xs q-pt-md q-pb-md justify-around items-center"
         >
-            <slot name="buttons"></slot>
+            <q-btn
+                v-if="!isTablet"
+                class="button-gradient q-mb-md"
+                icon="save"
+                @click="onFloorSave"
+                label="save"
+                rounded
+                :size="buttonSize"
+            />
+            <q-input
+                v-if="!isTablet"
+                standout
+                rounded
+                label="Floor name"
+                @update:model-value="(event) => onFloorChange('name', event)"
+                :model-value="floorInstance.name"
+                :dense="isMobile"
+                class="q-ma-xs"
+            />
+
+            <q-input
+                v-if="!isTablet"
+                @keydown.prevent
+                :min="300"
+                :max="MAX_FLOOR_WIDTH"
+                :step="RESOLUTION"
+                :model-value="floorInstance.width"
+                @update:model-value="(event) => onFloorChange('width', event)"
+                standout
+                rounded
+                type="number"
+                label="Floor width"
+                class="q-ma-xs"
+            />
+            <q-input
+                v-if="!isTablet"
+                @keydown.prevent
+                :min="300"
+                :max="MAX_FLOOR_HEIGHT"
+                :step="RESOLUTION"
+                @update:model-value="(event) => onFloorChange('height', event)"
+                :model-value="floorInstance.height"
+                standout
+                rounded
+                type="number"
+                label="Floor height"
+                class="q-ma-xs"
+            />
+            <q-btn
+                title="Undo"
+                round
+                :disabled="!undoRedoState.canUndo"
+                @click="undoAction"
+                icon="undo"
+            />
+            <q-btn
+                title="Redo"
+                round
+                :disabled="!undoRedoState.canRedo"
+                @click="redoAction"
+                icon="redo"
+            />
+            <!-- Add Element -->
+            <q-btn round title="Add element" icon="plus">
+                <q-menu max-width="200px">
+                    <div class="row items-center">
+                        <div
+                            draggable="true"
+                            v-for="element in ELEMENTS_TO_ADD_COLLECTION"
+                            :key="element.elementDescriptor.tag"
+                            class="col-6 justify-center text-center q-my-md"
+                            @dragstart="onDragStart($event, element.elementDescriptor.tag)"
+                        >
+                            <p>{{ element.label }}</p>
+
+                            <q-avatar square size="42px">
+                                <img :src="element.img" />
+                            </q-avatar>
+                        </div>
+                    </div>
+                </q-menu>
+            </q-btn>
+
+            <q-btn
+                round
+                title="Toggle grid"
+                @click="floorInstance.toggleGridVisibility"
+                icon="grid"
+            />
+            <q-btn
+                round
+                icon="export"
+                title="Export floor plan"
+                @click="exportFloor(floorInstance as FloorEditor)"
+            />
+            <q-btn round title="Import floor plan" icon="import" @click="triggerFileInput" />
+            <input
+                ref="fileInputRef"
+                type="file"
+                @change="onFileSelected"
+                style="display: none"
+                accept=".json"
+            />
             <div class="row justify-around q-gutter-xs" v-if="selectedFloorElement">
                 <q-separator inset class="q-ma-md full-width"></q-separator>
                 <p>Element</p>
