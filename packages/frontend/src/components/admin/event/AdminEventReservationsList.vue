@@ -5,6 +5,8 @@ import { formatEventDate } from "src/helpers/date-utils";
 
 import FTDialog from "src/components/FTDialog.vue";
 import ReservationGeneralInfo from "src/components/Event/ReservationGeneralInfo.vue";
+import { QScrollArea } from "quasar";
+import FTCenteredText from "src/components/FTCenteredText.vue";
 
 interface Props {
     reservations: ReservationDoc[];
@@ -29,17 +31,27 @@ function showReservation(reservation: ReservationDoc): void {
 </script>
 
 <template>
-    <q-list>
-        <q-item v-for="reservation in props.reservations" :key="reservation.id" clickable>
-            <q-item-section @click="showReservation(reservation)">
-                <q-item-label>
-                    {{ reservation.guestName }} on {{ reservation.tableLabel }}</q-item-label
-                >
-                <q-item-label v-if="reservation.clearedAt" caption
-                    >Cleared at:
-                    {{ formatEventDate(reservation.clearedAt.toMillis()) }}</q-item-label
-                >
-            </q-item-section>
-        </q-item>
-    </q-list>
+    <q-scroll-area ref="logsContainer" class="scroll-reservations-container">
+        <q-list v-if="reservations.length > 0">
+            <q-item v-for="reservation in props.reservations" :key="reservation.id" clickable>
+                <q-item-section @click="showReservation(reservation)">
+                    <q-item-label>
+                        {{ reservation.guestName }} on {{ reservation.tableLabel }}</q-item-label
+                    >
+                    <q-item-label v-if="reservation.clearedAt" caption
+                        >Cleared at:
+                        {{ formatEventDate(reservation.clearedAt.toMillis()) }}</q-item-label
+                    >
+                </q-item-section>
+            </q-item>
+        </q-list>
+        <FTCenteredText v-else>No reservations yet</FTCenteredText>
+    </q-scroll-area>
 </template>
+
+<style lang="scss" scoped>
+.scroll-reservations-container {
+    height: 200px;
+    padding: 0 10px;
+}
+</style>
