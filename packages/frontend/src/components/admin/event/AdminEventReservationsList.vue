@@ -12,6 +12,9 @@ interface Props {
     reservations: ReservationDoc[];
 }
 
+const emit = defineEmits<{
+    (e: "delete", value: ReservationDoc): void;
+}>();
 const props = defineProps<Props>();
 const { createDialog } = useDialog();
 
@@ -28,22 +31,37 @@ function showReservation(reservation: ReservationDoc): void {
         },
     });
 }
+
+function emitDelete(reservation: ReservationDoc, reset: () => void): void {
+    reset();
+    emit("delete", reservation);
+}
 </script>
 
 <template>
     <q-scroll-area ref="logsContainer" class="scroll-reservations-container">
         <q-list v-if="reservations.length > 0">
-            <q-item v-for="reservation in props.reservations" :key="reservation.id" clickable>
-                <q-item-section @click="showReservation(reservation)">
-                    <q-item-label>
-                        {{ reservation.guestName }} on {{ reservation.tableLabel }}</q-item-label
-                    >
-                    <q-item-label v-if="reservation.clearedAt" caption
-                        >Cleared at:
-                        {{ formatEventDate(reservation.clearedAt.toMillis()) }}</q-item-label
-                    >
-                </q-item-section>
-            </q-item>
+            <q-slide-item
+                @right="({ reset }) => emitDelete(reservation, reset)"
+                v-for="reservation in props.reservations"
+                :key="reservation.id"
+            >
+                <template #right>
+                    <q-icon name="trash" />
+                </template>
+                <q-item clickable>
+                    <q-item-section @click="showReservation(reservation)">
+                        <q-item-label>
+                            {{ reservation.guestName }} on
+                            {{ reservation.tableLabel }}</q-item-label
+                        >
+                        <q-item-label v-if="reservation.clearedAt" caption
+                            >Cleared at:
+                            {{ formatEventDate(reservation.clearedAt.toMillis()) }}</q-item-label
+                        >
+                    </q-item-section>
+                </q-item>
+            </q-slide-item>
         </q-list>
         <FTCenteredText v-else>No reservations yet</FTCenteredText>
     </q-scroll-area>

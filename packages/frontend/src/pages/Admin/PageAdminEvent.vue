@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { Component } from "vue";
 import type { FloorEditor } from "@firetable/floor-creator";
-import type { FloorDoc } from "@firetable/types";
+import type { FloorDoc, ReservationDoc } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
+import { deleteReservation, updateEventFloorData } from "@firetable/backend";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { getTablesFromFloorDoc } from "@firetable/floor-creator";
 import { ReservationStatus } from "@firetable/types";
-import { updateEventFloorData } from "@firetable/backend";
 import { useRouter } from "vue-router";
 import { formatEventDate } from "src/helpers/date-utils";
 
@@ -21,7 +21,7 @@ import AdminEventReservationsList from "src/components/admin/event/AdminEventRes
 
 import { Loading, useQuasar } from "quasar";
 import { config } from "src/config";
-import { withLoading } from "src/helpers/ui-helpers";
+import { showConfirm, tryCatchLoadingWrapper, withLoading } from "src/helpers/ui-helpers";
 import useAdminEvent from "src/composables/useAdminEvent";
 import { buttonSize, isMobile } from "src/global-reactives/screen-detection";
 import { truncateText } from "src/helpers/string-utils";
@@ -34,6 +34,10 @@ interface Props {
     propertyId: string;
     eventId: string;
 }
+
+const PERMANENTLY_DELETE_RES_TITLE = "Permanently delete reservation?";
+const PERMANENTLY_DELETE_RES_MESSAGE =
+    "This will delete the reservation permanently, excluding it from all analytics. This cannot be undone.";
 
 const props = defineProps<Props>();
 const router = useRouter();
@@ -160,6 +164,15 @@ function showFloorEditDialog(floor: FloorDoc): void {
     }
 }
 
+async function deleteReservationPermanently(reservation: ReservationDoc): Promise<void> {
+    if (!(await showConfirm(PERMANENTLY_DELETE_RES_TITLE, PERMANENTLY_DELETE_RES_MESSAGE))) {
+        return;
+    }
+    await tryCatchLoadingWrapper({
+        hook: () => deleteReservation(eventOwner, reservation),
+    });
+}
+
 onMounted(init);
 </script>
 
@@ -220,10 +233,16 @@ onMounted(init);
                 </FTTabs>
                 <q-tab-panels v-model="reservationsTab">
                     <q-tab-panel name="arrivedReservations">
-                        <AdminEventReservationsList :reservations="arrivedReservations" />
+                        <AdminEventReservationsList
+                            @delete="deleteReservationPermanently"
+                            :reservations="arrivedReservations"
+                        />
                     </q-tab-panel>
                     <q-tab-panel name="cancelledReservations">
-                        <AdminEventReservationsList :reservations="cancelledReservations" />
+                        <AdminEventReservationsList
+                            @delete="deleteReservationPermanently"
+                            :reservations="cancelledReservations"
+                        />
                     </q-tab-panel>
                     <q-tab-panel name="returningGuests">
                         <q-list>
