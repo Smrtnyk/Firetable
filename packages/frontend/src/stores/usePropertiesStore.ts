@@ -35,11 +35,7 @@ export const usePropertiesStore = defineStore("properties", () => {
     }
 
     function getPropertyNameById(propertyId: string): string {
-        return (
-            properties.value.find((property) => {
-                return property.id === propertyId;
-            })?.name ?? ""
-        );
+        return properties.value.find(({ id }) => id === propertyId)?.name ?? "";
     }
 
     function addUnsub(unsub: typeof NOOP): void {

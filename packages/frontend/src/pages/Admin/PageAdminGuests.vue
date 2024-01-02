@@ -86,7 +86,7 @@ function guestVisitsToReadable(guest: GuestDoc): string {
 
                 <q-item clickable class="ft-card">
                     <q-item-section>
-                        <q-item-label>{{ guest.name }}</q-item-label>
+                        <q-item-label>{{ guest.name }} - {{ guest.contact }}</q-item-label>
                         <q-item-label caption>{{ guestVisitsToReadable(guest) }}</q-item-label>
                     </q-item-section>
                 </q-item>

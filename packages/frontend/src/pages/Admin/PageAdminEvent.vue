@@ -251,6 +251,13 @@ onMounted(init);
                                 :key="guest.contact"
                                 clickable
                                 v-ripple
+                                :to="{
+                                    name: 'adminGuest',
+                                    params: {
+                                        organisationId: eventOwner.organisationId,
+                                        guestId: guest.contact,
+                                    },
+                                }"
                             >
                                 <q-item-section>
                                     <q-item-label overline

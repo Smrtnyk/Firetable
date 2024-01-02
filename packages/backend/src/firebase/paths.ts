@@ -39,6 +39,10 @@ export function getGuestsPath(organisationId: string): string {
     return [Collection.ORGANISATIONS, organisationId, Collection.GUESTS].join("/");
 }
 
+export function getGuestPath(organisationId: string, guestId: string): string {
+    return [getGuestsPath(organisationId), guestId].join("/");
+}
+
 // FLOORS
 export function getFloorsPath(organisationId: string, propertyId: string): string {
     return [getPropertyPath(organisationId, propertyId), Collection.FLOORS].join("/");
