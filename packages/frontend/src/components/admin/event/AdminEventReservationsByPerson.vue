@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ReservationDoc } from "@firetable/types";
+import type { PlannedReservationDoc } from "@firetable/types";
 import {
     Chart,
     BarController,
@@ -17,7 +17,7 @@ import { isMobile } from "src/global-reactives/screen-detection";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 
 interface Props {
-    reservations: ReservationDoc[];
+    reservations: PlannedReservationDoc[];
 }
 
 interface ReservationObject {
@@ -92,7 +92,7 @@ function updateChartHeight(): void {
     }
 }
 
-function reservationsReducer(acc: Res, reservation: ReservationDoc): Res {
+function reservationsReducer(acc: Res, reservation: PlannedReservationDoc): Res {
     if (!reservation) return acc;
     const { reservedBy, arrived } = reservation;
     const { email, name } = reservedBy;
@@ -110,7 +110,7 @@ function reservationsReducer(acc: Res, reservation: ReservationDoc): Res {
     return acc;
 }
 
-function generateStackedChartData(reservations: ReservationDoc[]): ChartData {
+function generateStackedChartData(reservations: PlannedReservationDoc[]): ChartData {
     const data = reservations.reduce(reservationsReducer, {});
     const labels: string[] = [];
     const confirmedCounts: number[] = [];

@@ -15,7 +15,7 @@ const authStore = useAuthStore();
 const props = defineProps<Props>();
 const emit = defineEmits<{
     (e: "delete" | "edit" | "transfer" | "copy"): void;
-    (e: "confirm" | "reservationConfirmed" | "cancel", value: boolean): void;
+    (e: "arrived" | "reservationConfirmed" | "cancel", value: boolean): void;
 }>();
 const { t } = useI18n();
 const isGuestArrived = ref<boolean>(props.reservation.arrived);
@@ -43,7 +43,7 @@ function isOwnReservation(reservation: Reservation | AdHocReservation): boolean 
 }
 
 function onGuestArrived(): void {
-    emit("confirm", !isGuestArrived.value);
+    emit("arrived", !isGuestArrived.value);
     isGuestArrived.value = !isGuestArrived.value;
 }
 

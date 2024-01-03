@@ -1,14 +1,20 @@
 <script setup lang="ts">
-import type { EventDoc, FloorDoc, GuestData, ReservationDoc } from "@firetable/types";
+import type {
+    EventDoc,
+    FloorDoc,
+    GuestData,
+    PlannedReservationDoc,
+    ReservationDoc,
+} from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
 import type { TouchPanValue } from "quasar";
+import { isPlannedReservation, ReservationStatus } from "@firetable/types";
 import {
     reservationsCollection,
     getEventFloorsPath,
     getEventGuestListPath,
     getEventPath,
 } from "@firetable/backend";
-import { ReservationStatus } from "@firetable/types";
 import { Loading, useQuasar } from "quasar";
 import EventGuestList from "src/components/Event/EventGuestList.vue";
 import FTAutocomplete from "src/components/Event/FTAutocomplete.vue";
@@ -70,6 +76,11 @@ const {
     { wait: true },
 );
 
+const plannedReservations = computed(() => {
+    return reservations.value.filter(function (reservation): reservation is PlannedReservationDoc {
+        return isPlannedReservation(reservation);
+    });
+});
 const fabPos = ref([18, 18]);
 const draggingFab = ref(false);
 
@@ -198,7 +209,7 @@ onUnmounted(() => {
             <FTAutocomplete
                 :floors="eventFloors"
                 :show-floor-name-in-option="hasMultipleFloorPlans"
-                :all-reserved-tables="reservations"
+                :all-reserved-tables="plannedReservations"
                 @found="onTableFound"
                 @clear="onAutocompleteClear"
                 class="col q-mb-sm"

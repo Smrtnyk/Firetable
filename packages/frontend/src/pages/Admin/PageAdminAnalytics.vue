@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import type { PieChartData, TimeSeriesData } from "src/components/admin/analytics/types";
 
-import type { EventDoc, PropertyDoc } from "@firetable/types";
 import type { AugmentedReservation, ReservationBucket } from "src/stores/analytics-store";
+import type { EventDoc, PropertyDoc, ReservationDoc } from "@firetable/types";
 import FTTitle from "src/components/FTTitle.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import PieChart from "src/components/admin/analytics/PieChart.vue";
 import BarChart from "src/components/admin/analytics/BarChart.vue";
 import AdminEventReservationsByPerson from "src/components/admin/event/AdminEventReservationsByPerson.vue";
 
+import { isPlannedReservation } from "@firetable/types";
 import { eventsCollection, reservationsCollection } from "@firetable/backend";
 import { getDocs, query, where } from "firebase/firestore";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
@@ -394,8 +395,14 @@ async function getReservationFromEvents(events: EventDoc[]): Promise<Reservation
             );
 
             eventReservations.docs.forEach((doc) => {
+                const data = doc.data() as ReservationDoc;
+
+                if (!isPlannedReservation(data)) {
+                    return;
+                }
+
                 const reservationData = {
-                    ...doc.data(),
+                    ...data,
                     id: doc.id,
                     date: event.date,
                 } as AugmentedReservation;

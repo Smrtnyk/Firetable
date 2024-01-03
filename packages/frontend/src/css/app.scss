@@ -68,3 +68,20 @@ a {
 .fade-leave-to {
     opacity: 0;
 }
+
+// Custom Colors
+.text-tertiary {
+    color: $tertiary;
+}
+
+.bg-tertiary {
+    background-color: $tertiary;
+}
+
+.text-quaternary {
+    color: $quaternary;
+}
+
+.bg-quaternary {
+    background-color: $quaternary;
+}

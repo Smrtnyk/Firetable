@@ -3,11 +3,8 @@ import FTCenteredText from "src/components/FTCenteredText.vue";
 
 interface ReservationsStatus {
     total: number;
-    reserved: number;
+    currentlyOccupied: number;
     pending: number;
-    confirmed: number;
-    cancelled: number;
-    unreserved: number;
     totalGuests: number;
 }
 
@@ -20,17 +17,25 @@ const props = defineProps<Props>();
 
 <template>
     <div class="row text-center q-col-gutter-md">
-        <div class="col-12">
-            <FTCenteredText>Real time info</FTCenteredText>
-        </div>
-        <div class="col-4 text-subtitle1">Total tables: {{ props.reservationsStatus.total }}</div>
-        <div class="col-4 text-subtitle1">Reserved: {{ props.reservationsStatus.reserved }}</div>
-        <div class="col-4 text-subtitle1">Pending: {{ props.reservationsStatus.pending }}</div>
-        <div class="col-4 text-subtitle1">Arrived: {{ props.reservationsStatus.confirmed }}</div>
-        <div class="col-4 text-subtitle1">Free: {{ props.reservationsStatus.unreserved }}</div>
-        <div class="col-4 text-subtitle1">Cancelled: {{ props.reservationsStatus.cancelled }}</div>
+        <FTCenteredText class="col-12">Real Time Info</FTCenteredText>
+
         <div class="col-4 text-subtitle1">
-            Total Guests: {{ props.reservationsStatus.totalGuests }}
+            <q-chip color="primary" :label="`Total tables: ${props.reservationsStatus.total}`" />
+        </div>
+        <div class="col-4 text-subtitle1">
+            <q-chip
+                color="secondary"
+                :label="`Currently Occupied: ${props.reservationsStatus.currentlyOccupied}`"
+            />
+        </div>
+        <div class="col-4 text-subtitle1">
+            <q-chip color="tertiary" :label="`Pending: ${props.reservationsStatus.pending}`" />
+        </div>
+        <div class="col-4 text-subtitle1">
+            <q-chip
+                color="quaternary"
+                :label="`Total Guests: ${props.reservationsStatus.totalGuests}`"
+            />
         </div>
     </div>
 </template>

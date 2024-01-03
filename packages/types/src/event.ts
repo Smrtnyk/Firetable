@@ -45,10 +45,17 @@ export type GuestData = CreateGuestPayload & {
     id: string;
 };
 
-export type ReservationDoc = Reservation & {
+export type PlannedReservationDoc = PlannedReservation & {
     id: string;
-    _doc: QueryDocumentSnapshot<Reservation>;
+    _doc: QueryDocumentSnapshot<PlannedReservation>;
 };
+
+export type AdHocReservationDoc = AdHocReservation & {
+    id: string;
+    _doc: QueryDocumentSnapshot<AdHocReservation>;
+};
+
+export type ReservationDoc = PlannedReservationDoc | AdHocReservationDoc;
 
 type UserIdentifier = Pick<User, "name" | "email" | "id">;
 
@@ -81,7 +88,7 @@ export interface AdHocReservation extends BaseReservation {
     arrived: true;
 }
 
-export interface Reservation extends BaseReservation {
+export interface PlannedReservation extends BaseReservation {
     type: ReservationType.PLANNED;
     reservationConfirmed: boolean | undefined;
     cancelled: boolean | undefined;
@@ -90,6 +97,8 @@ export interface Reservation extends BaseReservation {
     guestName: string;
     reservedBy: UserIdentifier;
 }
+
+export type Reservation = AdHocReservation | PlannedReservation;
 
 export interface EventLog {
     message: string;
@@ -135,7 +144,11 @@ export function isAdHocReservation(
 }
 
 export function isPlannedReservation(
-    reservation: Reservation | AdHocReservation,
-): reservation is Reservation {
+    reservation: PlannedReservation | AdHocReservation,
+): reservation is PlannedReservation {
     return reservation.type === ReservationType.PLANNED;
+}
+
+export function isActiveReservation(reservation: Reservation): boolean {
+    return reservation.status === ReservationStatus.ACTIVE;
 }

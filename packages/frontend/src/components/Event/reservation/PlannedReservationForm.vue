@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Reservation, User } from "@firetable/types";
+import type { PlannedReservation, User } from "@firetable/types";
 import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
 import { ReservationStatus, ReservationType } from "@firetable/types";
 import { computed, reactive, ref, watch } from "vue";
@@ -26,11 +26,11 @@ const props = defineProps<{
     /**
      *  Optional data for editing
      */
-    reservationData: Reservation | undefined;
+    reservationData: PlannedReservation | undefined;
 }>();
 
 const emit = defineEmits<{
-    (e: "create" | "update", payload: Reservation): void;
+    (e: "create" | "update", payload: PlannedReservation): void;
 }>();
 const { t } = useI18n();
 const authStore = useAuthStore();
@@ -60,9 +60,9 @@ const initialState =
               floorId: props.floor.id,
               status: ReservationStatus.ACTIVE,
           };
-const state = reactive<Reservation>(initialState);
+const state = reactive<PlannedReservation>(initialState);
 const reservationForm = ref<QForm | null>(null);
-const formattedUsers = computed<Reservation["reservedBy"][]>(() =>
+const formattedUsers = computed<PlannedReservation["reservedBy"][]>(() =>
     props.users.map((user) => ({
         name: user.name,
         email: user.email,
@@ -127,7 +127,7 @@ watch(selectionType, (newVal) => {
     state.reservedBy = newVal === "social" ? socials[0] : formattedUsers.value[0];
 });
 
-function requireReservedBySelection(val: Reservation["reservedBy"]): boolean | string {
+function requireReservedBySelection(val: PlannedReservation["reservedBy"]): boolean | string {
     return !!val?.email || t(`EventCreateReservation.requireReservedBySelectionError`);
 }
 

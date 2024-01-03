@@ -1,7 +1,7 @@
-import type { ReservationDoc } from "@firetable/types";
+import type { PlannedReservationDoc } from "@firetable/types";
 import { defineStore } from "pinia";
 
-export type AugmentedReservation = ReservationDoc & { date: number };
+export type AugmentedReservation = PlannedReservationDoc & { date: number };
 
 export interface ReservationBucket {
     propertyName: string;

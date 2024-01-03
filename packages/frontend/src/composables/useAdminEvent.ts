@@ -1,8 +1,16 @@
-import type { EventDoc, EventLogsDoc, FloorDoc, ReservationDoc, User } from "@firetable/types";
+import type {
+    EventDoc,
+    EventLogsDoc,
+    FloorDoc,
+    PlannedReservationDoc,
+    ReservationDoc,
+    User,
+} from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
+import { isPlannedReservation } from "@firetable/types";
 import {
-    getEventLogsPath,
     getEventFloorsPath,
+    getEventLogsPath,
     getEventPath,
     getReservationsPath,
     usersCollection,
@@ -28,6 +36,12 @@ export default function useAdminEvent(eventOwner: EventOwner) {
     const reservations = useFirestoreCollection<ReservationDoc>(getReservationsPath(eventOwner));
     const { data: logs } = useFirestoreDocument<EventLogsDoc>(getEventLogsPath(eventOwner));
 
+    const allPlannedReservations = computed<PlannedReservationDoc[]>(() => {
+        return reservations.value.filter(function (res): res is PlannedReservationDoc {
+            return isPlannedReservation(res);
+        });
+    });
+
     const usersHook = useFirestoreCollection<User>(
         createQuery(usersCollection(eventOwner.organisationId)),
         {
@@ -35,7 +49,7 @@ export default function useAdminEvent(eventOwner: EventOwner) {
         },
     );
     const cancelledReservations = computed(() =>
-        reservations.value.filter(propIsTruthy("cancelled")),
+        allPlannedReservations.value.filter(propIsTruthy("cancelled")),
     );
     const arrivedReservations = computed(() => reservations.value.filter(propIsTruthy("arrived")));
 
@@ -72,6 +86,7 @@ export default function useAdminEvent(eventOwner: EventOwner) {
         users: usersHook.data,
         event: eventHook.data,
         allReservations: reservations.data,
+        allPlannedReservations,
         cancelledReservations,
         arrivedReservations,
         isLoading,

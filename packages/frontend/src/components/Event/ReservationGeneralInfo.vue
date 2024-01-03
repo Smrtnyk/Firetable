@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import type { AdHocReservation, Reservation } from "@firetable/types";
+import type { AdHocReservation, PlannedReservation, Reservation } from "@firetable/types";
 import { isPlannedReservation } from "@firetable/types";
 import { formatEventDate } from "src/helpers/date-utils";
 import { useI18n } from "vue-i18n";
 import { useAuthStore } from "src/stores/auth-store";
 
 const props = defineProps<{
-    reservation: Reservation | AdHocReservation;
+    reservation: PlannedReservation | AdHocReservation;
 }>();
 const { t } = useI18n();
 const authStore = useAuthStore();
 
-function reservedByText(reservedBy: Reservation["reservedBy"]): string {
+function reservedByText(reservedBy: PlannedReservation["reservedBy"]): string {
     const { name, email } = reservedBy;
     const isSocial = email.startsWith("social");
     return isSocial ? name : `${name} - ${email}`;

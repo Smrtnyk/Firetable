@@ -3,7 +3,13 @@ import type { BaseTable, Floor, FloorEditorElement, FloorViewer } from "@firetab
 import type { EventOwner } from "@firetable/backend";
 import type { DialogChainObject } from "quasar";
 import type { VueFirestoreDocumentData } from "vuefire";
-import type { EventDoc, Reservation, ReservationDoc, User } from "@firetable/types";
+import type {
+    EventDoc,
+    PlannedReservationDoc,
+    Reservation,
+    ReservationDoc,
+    User,
+} from "@firetable/types";
 import {
     getFirestoreTimestamp,
     deleteGuestVisit,
@@ -15,7 +21,7 @@ import {
 } from "@firetable/backend";
 import { isTable } from "@firetable/floor-creator";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
-import { ReservationStatus } from "@firetable/types";
+import { isPlannedReservation, ReservationStatus } from "@firetable/types";
 import { useQuasar } from "quasar";
 import {
     notifyPositive,
@@ -172,7 +178,10 @@ export function useReservations(
                 // otherwise just delete it permanently
                 // we soft delete these, so they can be used in analytics
                 // reservations deleted during event are probably deleted to free up the table for the next guest
-                if (isEventInProgress(event.value.date) || reservation.cancelled) {
+                if (
+                    isEventInProgress(event.value.date) ||
+                    (isPlannedReservation(reservation) && reservation.cancelled)
+                ) {
                     await updateReservationDoc(eventOwner, {
                         status: ReservationStatus.DELETED,
                         id: reservation.id,
@@ -293,32 +302,40 @@ export function useReservations(
                             floor,
                         };
                     },
-                    confirm: onGuestArrived(reservation),
+                    arrived(val: boolean) {
+                        if (!isPlannedReservation(reservation)) {
+                            return;
+                        }
+                        onGuestArrived(reservation, val).catch(showErrorMessage);
+                    },
                     reservationConfirmed: reservationConfirmed(reservation),
-                    cancel: onReservationCancelled(reservation),
+                    cancel(val: boolean) {
+                        if (!isPlannedReservation(reservation)) {
+                            return;
+                        }
+                        onReservationCancelled(reservation, val).catch(showErrorMessage);
+                    },
                 },
             },
         });
     }
 
-    function onGuestArrived(reservation: ReservationDoc) {
-        return function (val: boolean) {
-            return tryCatchLoadingWrapper({
-                async hook() {
-                    await updateReservationDoc(eventOwner, {
-                        id: reservation.id,
+    function onGuestArrived(reservation: PlannedReservationDoc, val: boolean): Promise<void> {
+        return tryCatchLoadingWrapper({
+            async hook() {
+                await updateReservationDoc(eventOwner, {
+                    id: reservation.id,
+                    arrived: val,
+                });
+                handleGuestDataForReservation(
+                    {
+                        ...reservation,
                         arrived: val,
-                    });
-                    handleGuestDataForReservation(
-                        {
-                            ...reservation,
-                            arrived: val,
-                        },
-                        GuestDataMode.SET,
-                    );
-                },
-            });
-        };
+                    },
+                    GuestDataMode.SET,
+                );
+            },
+        });
     }
 
     function reservationConfirmed(reservation: ReservationDoc) {
@@ -333,24 +350,25 @@ export function useReservations(
         };
     }
 
-    function onReservationCancelled(reservation: ReservationDoc) {
-        return function (val: boolean) {
-            return tryCatchLoadingWrapper({
-                async hook() {
-                    await updateReservationDoc(eventOwner, {
-                        id: reservation.id,
+    function onReservationCancelled(
+        reservation: PlannedReservationDoc,
+        val: boolean,
+    ): Promise<void> {
+        return tryCatchLoadingWrapper({
+            async hook() {
+                await updateReservationDoc(eventOwner, {
+                    id: reservation.id,
+                    cancelled: val,
+                });
+                handleGuestDataForReservation(
+                    {
+                        ...reservation,
                         cancelled: val,
-                    });
-                    handleGuestDataForReservation(
-                        {
-                            ...reservation,
-                            cancelled: val,
-                        },
-                        GuestDataMode.SET,
-                    );
-                },
-            });
-        };
+                    },
+                    GuestDataMode.SET,
+                );
+            },
+        });
     }
 
     async function copyReservation(

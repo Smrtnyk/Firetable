@@ -31,14 +31,14 @@
 </template>
 
 <script setup lang="ts">
-import type { FloorDoc, Reservation } from "@firetable/types";
+import type { FloorDoc, PlannedReservation } from "@firetable/types";
 import { nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { QSelect } from "quasar";
 
 interface Props {
     floors: FloorDoc[];
-    allReservedTables: Reservation[];
+    allReservedTables: PlannedReservation[];
     showFloorNameInOption: boolean;
 }
 
@@ -57,8 +57,8 @@ function removeFocus(): void {
 }
 
 function getNamesFromReservations(
-    reservations: Reservation[],
-): { label: string; value: Reservation }[] {
+    reservations: PlannedReservation[],
+): { label: string; value: PlannedReservation }[] {
     return reservations.map((reservation) => {
         return {
             label: createTableLabel(reservation),
@@ -67,7 +67,7 @@ function getNamesFromReservations(
     });
 }
 
-function createTableLabel(reservation: Reservation): string {
+function createTableLabel(reservation: PlannedReservation): string {
     const label = `${reservation.guestName} (${reservation.tableLabel})`;
     if (props.showFloorNameInOption) {
         const floorName = props.floors.find(({ id }) => id === reservation.floorId);
@@ -76,7 +76,7 @@ function createTableLabel(reservation: Reservation): string {
     return label;
 }
 
-function findSearchedTable(inputVal: string | { value: Reservation }): Reservation[] {
+function findSearchedTable(inputVal: string | { value: PlannedReservation }): PlannedReservation[] {
     // Determine the value to match against
     const val = typeof inputVal === "string" ? inputVal : inputVal.value.guestName;
     const normalizedVal = val.toLowerCase().trim();
