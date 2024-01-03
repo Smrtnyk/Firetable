@@ -12,8 +12,7 @@
         "start": "npm run shell",
         "deploy": "firebase deploy --only functions",
         "logs": "firebase functions:log",
-        "find-dead-code": "npx ts-prune",
-        "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+        "find-dead-code": "npx ts-prune"
     },
     "dependencies": {
         "@google-cloud/functions-framework": "3.3.0",
