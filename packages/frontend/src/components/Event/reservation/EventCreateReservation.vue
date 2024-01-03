@@ -36,6 +36,18 @@ const showPlannedReservationForm = computed(() => {
     );
 });
 
+const typedReservationDataForPlanned = computed(() => {
+    return props.reservationData?.type === ReservationType.PLANNED
+        ? props.reservationData
+        : undefined;
+});
+
+const typedReservationDataForAdHoc = computed(() => {
+    return props.reservationData?.type === ReservationType.AD_HOC
+        ? props.reservationData
+        : undefined;
+});
+
 const showAdHocReservationForm = computed(() => {
     return (
         reservationType.value === ReservationType.AD_HOC ||
@@ -81,18 +93,20 @@ function handleReservationUpdate(reservation: Reservation | AdHocReservation): v
             :floor="props.floor"
             :users="props.users"
             :table="props.table"
-            :reservation-data="props.reservationData"
+            :reservation-data="typedReservationDataForPlanned"
             @create="handleReservationCreate"
             @update="handleReservationUpdate"
         />
 
         <AdHocReservationForm
             v-if="showAdHocReservationForm"
-            :reservation-data="props.reservationData"
+            :reservation-data="typedReservationDataForAdHoc"
             :mode="props.mode"
             :event-start-timestamp="props.eventStartTimestamp"
             :floor="props.floor"
             :table="props.table"
+            @create="handleReservationCreate"
+            @update="handleReservationUpdate"
         />
     </div>
 </template>

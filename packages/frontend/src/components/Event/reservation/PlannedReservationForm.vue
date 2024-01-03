@@ -26,7 +26,7 @@ const props = defineProps<{
     /**
      *  Optional data for editing
      */
-    reservationData?: Reservation;
+    reservationData: Reservation | undefined;
 }>();
 
 const emit = defineEmits<{

@@ -5,7 +5,7 @@ import { ReservationStatus, ReservationType } from "@firetable/types";
 import { reactive, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
-import { greaterThanZero, minLength, noEmptyString, requireNumber } from "src/helpers/form-rules";
+import { greaterThanZero, optionalMinLength, requireNumber } from "src/helpers/form-rules";
 import { useAuthStore } from "src/stores/auth-store";
 import { getFirestoreTimestamp } from "@firetable/backend";
 
@@ -17,7 +17,7 @@ const props = defineProps<{
     /**
      *  Optional data for editing
      */
-    reservationData?: AdHocReservation;
+    reservationData: AdHocReservation | undefined;
 }>();
 
 const emit = defineEmits<{
@@ -31,7 +31,7 @@ const initialState =
         ? props.reservationData
         : {
               type: ReservationType.AD_HOC as const,
-              guestName: void 0,
+              guestName: null,
               numberOfGuests: 2,
               guestContact: "",
               reservationNote: "",
@@ -91,7 +91,9 @@ function options(hr: number, min: number | null = 0): boolean {
 }
 
 async function onOKClick(): Promise<void> {
-    if (!(await reservationForm.value?.validate())) return;
+    if (!(await reservationForm.value?.validate())) {
+        return;
+    }
 
     if (props.mode === "create") {
         emit("create", state);
@@ -110,9 +112,9 @@ async function onOKClick(): Promise<void> {
                 rounded
                 hide-bottom-space
                 standout
-                :label="t(`EventCreateReservation.reservationGuestName`)"
+                label="Optional Guest Name"
                 lazy-rules="ondemand"
-                :rules="[noEmptyString(), minLength('Name must be longer!', 2)]"
+                :rules="[optionalMinLength('Name must be longer!', 2)]"
             />
 
             <q-input

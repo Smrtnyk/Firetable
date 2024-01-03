@@ -76,7 +76,7 @@ interface BaseReservation {
 
 export interface AdHocReservation extends BaseReservation {
     type: ReservationType.AD_HOC;
-    guestName: string | undefined;
+    guestName: string | null;
     consumption: number;
     arrived: true;
 }
