@@ -68,7 +68,7 @@ const reservationsStatus = computed(() => {
         return reservation.status === ReservationStatus.ACTIVE && !reservation.cancelled;
     });
     const unreserved = allTables.value.length - allReservations.value.length;
-    const pending = activeReservations.filter((reservation) => !reservation.confirmed).length;
+    const pending = activeReservations.filter((reservation) => !reservation.arrived).length;
     const confirmed = activeReservations.length - pending;
     const reserved = activeReservations.length;
     const totalGuests = activeReservations.reduce((acc, reservation) => {

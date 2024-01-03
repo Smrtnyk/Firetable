@@ -57,22 +57,38 @@ export const enum ReservationStatus {
     ACTIVE = "Active",
 }
 
-export interface Reservation {
+export const enum ReservationType {
+    AD_HOC = 0,
+    PLANNED = 1,
+}
+
+interface BaseReservation {
     floorId: string;
     tableLabel: string;
-    confirmed: boolean;
-    reservationConfirmed: boolean | undefined;
-    cancelled: boolean | undefined;
     guestContact?: string;
-    guestName: string;
-    numberOfGuests: number | string;
+    numberOfGuests: number;
     reservationNote?: string;
-    consumption: number;
     time: string;
-    reservedBy: UserIdentifier;
     clearedAt?: Timestamp;
     creator: UserIdentifier & { createdAt: Timestamp };
-    status: ReservationStatus | undefined;
+    status: ReservationStatus;
+}
+
+export interface AdHocReservation extends BaseReservation {
+    type: ReservationType.AD_HOC;
+    guestName?: string;
+    consumption?: number;
+    arrived: true;
+}
+
+export interface Reservation extends BaseReservation {
+    type: ReservationType.PLANNED;
+    reservationConfirmed: boolean | undefined;
+    cancelled: boolean | undefined;
+    arrived: boolean;
+    consumption: number;
+    guestName: string;
+    reservedBy: UserIdentifier;
 }
 
 export interface EventLog {

@@ -87,7 +87,7 @@ const confirmedVsUnconfirmed = computed((): PieChartData => {
     let unconfirmed = 0;
 
     reservationsByActiveProperty.value.forEach((reservation) => {
-        if (reservation.confirmed) {
+        if (reservation.arrived) {
             confirmed++;
         } else {
             unconfirmed++;
@@ -182,7 +182,7 @@ const consumptionAnalysisCombined = computed(() => {
     reservationsByActiveProperty.value.forEach((reservation) => {
         const consumption = Number(reservation.consumption);
         totalConsumption += consumption;
-        if (reservation.confirmed) {
+        if (reservation.arrived) {
             confirmedConsumption += consumption;
             confirmedCount++;
         } else {

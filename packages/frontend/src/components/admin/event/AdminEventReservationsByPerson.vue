@@ -94,7 +94,7 @@ function updateChartHeight(): void {
 
 function reservationsReducer(acc: Res, reservation: ReservationDoc): Res {
     if (!reservation) return acc;
-    const { reservedBy, confirmed } = reservation;
+    const { reservedBy, arrived } = reservation;
     const { email, name } = reservedBy;
     const hash = name + email;
     if (acc[hash]) {
@@ -106,7 +106,7 @@ function reservationsReducer(acc: Res, reservation: ReservationDoc): Res {
             confirmed: 0,
         };
     }
-    if (confirmed) acc[hash].confirmed++;
+    if (arrived) acc[hash].confirmed++;
     return acc;
 }
 

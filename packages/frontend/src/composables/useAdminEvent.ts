@@ -37,9 +37,7 @@ export default function useAdminEvent(eventOwner: EventOwner) {
     const cancelledReservations = computed(() =>
         reservations.value.filter(propIsTruthy("cancelled")),
     );
-    const arrivedReservations = computed(() =>
-        reservations.value.filter(propIsTruthy("confirmed")),
-    );
+    const arrivedReservations = computed(() => reservations.value.filter(propIsTruthy("arrived")));
 
     const eventHook = useFirestoreDocument<EventDoc>(getEventPath(eventOwner));
 

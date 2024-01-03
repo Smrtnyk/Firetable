@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Reservation, User } from "@firetable/types";
 import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
-import { ReservationStatus } from "@firetable/types";
+import { ReservationStatus, ReservationType } from "@firetable/types";
 import { computed, reactive, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
@@ -39,12 +39,13 @@ const initialState =
     props.mode === "edit" && props.reservationData
         ? props.reservationData
         : {
+              type: ReservationType.PLANNED as const,
               guestName: "",
               numberOfGuests: 2,
               guestContact: "",
               reservationNote: "",
               consumption: 1,
-              confirmed: false,
+              arrived: false,
               reservationConfirmed: false,
               time: "00:00",
               reservedBy: null as unknown as User,

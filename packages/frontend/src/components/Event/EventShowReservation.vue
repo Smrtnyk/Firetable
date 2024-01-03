@@ -17,7 +17,7 @@ const emit = defineEmits<{
     (e: "confirm" | "reservationConfirmed" | "cancel", value: boolean): void;
 }>();
 const { t } = useI18n();
-const isGuestArrived = ref<boolean>(props.reservation.confirmed);
+const isGuestArrived = ref<boolean>(props.reservation.arrived);
 const isCancelled = ref<boolean>(!!props.reservation.cancelled);
 const reservationConfirmed = ref<boolean>(!!props.reservation.reservationConfirmed);
 const canDeleteReservation = computed(() => {

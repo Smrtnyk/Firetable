@@ -307,12 +307,12 @@ export function useReservations(
                 async hook() {
                     await updateReservationDoc(eventOwner, {
                         id: reservation.id,
-                        confirmed: val,
+                        arrived: val,
                     });
                     handleGuestDataForReservation(
                         {
                             ...reservation,
-                            confirmed: val,
+                            arrived: val,
                         },
                         GuestDataMode.SET,
                     );
@@ -442,7 +442,7 @@ export function useReservations(
         const baseEventDate = new Date(event.value.date);
 
         reservations.value.forEach((reservation) => {
-            if (reservation.confirmed) {
+            if (reservation.arrived) {
                 return;
             }
 
