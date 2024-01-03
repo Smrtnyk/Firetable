@@ -3,7 +3,7 @@ import type { AdHocReservation, Reservation, User } from "@firetable/types";
 import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
 import { ReservationType } from "@firetable/types";
 import PlannedReservationForm from "src/components/Event/reservation/PlannedReservationForm.vue";
-import { ref } from "vue";
+import { computed, ref, watch } from "vue";
 import AdHocReservationForm from "src/components/Event/reservation/AdHocReservationForm.vue";
 
 const props = defineProps<{
@@ -15,7 +15,7 @@ const props = defineProps<{
     /**
      *  Optional data for editing
      */
-    reservationData?: Reservation;
+    reservationData?: Reservation | AdHocReservation;
 }>();
 
 const emit = defineEmits<{
@@ -23,6 +23,35 @@ const emit = defineEmits<{
 }>();
 
 const reservationType = ref(ReservationType.PLANNED);
+
+const currentReservationType = computed(() => {
+    // Default to PLANNED type if reservationData is not provided
+    return props.reservationData ? props.reservationData.type : ReservationType.PLANNED;
+});
+
+const showPlannedReservationForm = computed(() => {
+    return (
+        reservationType.value === ReservationType.PLANNED ||
+        (props.mode === "edit" && currentReservationType.value === ReservationType.PLANNED)
+    );
+});
+
+const showAdHocReservationForm = computed(() => {
+    return (
+        reservationType.value === ReservationType.AD_HOC ||
+        (props.mode === "edit" && currentReservationType.value === ReservationType.AD_HOC)
+    );
+});
+
+watch(
+    () => props.reservationData,
+    (newReservationData) => {
+        if (newReservationData) {
+            reservationType.value = newReservationData.type;
+        }
+    },
+    { immediate: true },
+);
 
 function handleReservationCreate(reservation: Reservation | AdHocReservation): void {
     emit("create", reservation);
@@ -36,6 +65,7 @@ function handleReservationUpdate(reservation: Reservation | AdHocReservation): v
 <template>
     <div>
         <q-btn-toggle
+            v-if="props.mode === 'create'"
             v-model="reservationType"
             no-caps
             unelevated
@@ -45,18 +75,20 @@ function handleReservationUpdate(reservation: Reservation | AdHocReservation): v
             ]"
         />
         <PlannedReservationForm
-            v-if="reservationType === ReservationType.PLANNED"
+            v-if="showPlannedReservationForm"
             :mode="props.mode"
             :event-start-timestamp="props.eventStartTimestamp"
             :floor="props.floor"
             :users="props.users"
             :table="props.table"
+            :reservation-data="props.reservationData"
             @create="handleReservationCreate"
             @update="handleReservationUpdate"
         />
 
         <AdHocReservationForm
-            v-if="reservationType === ReservationType.AD_HOC"
+            v-if="showAdHocReservationForm"
+            :reservation-data="props.reservationData"
             :mode="props.mode"
             :event-start-timestamp="props.eventStartTimestamp"
             :floor="props.floor"
