@@ -56,9 +56,21 @@ function onReservationConfirmed(): void {
     emit("reservationConfirmed", !reservationConfirmed.value);
     reservationConfirmed.value = !reservationConfirmed.value;
 }
+
+const reservationChipLabel = computed(() => {
+    return isPlannedReservation(props.reservation) ? "Planned" : "Ad-hoc";
+});
+
+const reservationChipColor = computed(() => {
+    return isPlannedReservation(props.reservation) ? "tertiary" : "quaternary";
+});
 </script>
 
 <template>
+    <div class="row justify-end">
+        <q-chip :color="reservationChipColor" :label="reservationChipLabel" />
+    </div>
+
     <q-card-section>
         <ReservationGeneralInfo :reservation="props.reservation" />
 
