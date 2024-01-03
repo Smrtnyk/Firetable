@@ -77,7 +77,7 @@ function handleOnAuthStateChanged(
     authStore: ReturnType<typeof useAuthStore>,
 ): void {
     // Tell the application what to do when the
-    // authentication state has changed */
+    // authentication state has changed
     let isFirstCall = true;
     const currentUser = useCurrentUser();
     watch(
