@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AdHocReservation, Reservation } from "@firetable/types";
+import type { AdHocReservation } from "@firetable/types";
 import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
 import { ReservationStatus, ReservationType } from "@firetable/types";
 import { reactive, ref } from "vue";
@@ -21,7 +21,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    (e: "create" | "update", payload: Reservation): void;
+    (e: "create" | "update", payload: AdHocReservation): void;
 }>();
 const { t } = useI18n();
 const authStore = useAuthStore();
@@ -35,8 +35,8 @@ const initialState =
               numberOfGuests: 2,
               guestContact: "",
               reservationNote: "",
-              consumption: 1,
-              arrived: true,
+              consumption: 0,
+              arrived: true as const,
               time: "00:00",
               creator: {
                   name: authStore.user!.name,
@@ -48,7 +48,7 @@ const initialState =
               floorId: props.floor.id,
               status: ReservationStatus.ACTIVE,
           };
-const state = reactive<Reservation>(initialState);
+const state = reactive<AdHocReservation>(initialState);
 const reservationForm = ref<QForm | null>(null);
 
 function options(hr: number, min: number | null = 0): boolean {
@@ -158,7 +158,7 @@ async function onOKClick(): Promise<void> {
                 type="number"
                 :label="t(`EventCreateReservation.reservationConsumption`)"
                 lazy-rules="ondemand"
-                :rules="[requireNumber(), greaterThanZero()]"
+                :rules="[requireNumber()]"
             />
 
             <q-input
