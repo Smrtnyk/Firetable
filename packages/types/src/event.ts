@@ -127,3 +127,15 @@ export interface GuestDoc {
     };
     _doc: QueryDocumentSnapshot<GuestDoc>;
 }
+
+export function isAdHocReservation(
+    reservation: Reservation | AdHocReservation,
+): reservation is AdHocReservation {
+    return reservation.type === ReservationType.AD_HOC;
+}
+
+export function isPlannedReservation(
+    reservation: Reservation | AdHocReservation,
+): reservation is Reservation {
+    return reservation.type === ReservationType.PLANNED;
+}

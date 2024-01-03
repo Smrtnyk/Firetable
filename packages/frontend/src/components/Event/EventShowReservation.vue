@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { Reservation } from "@firetable/types";
+import type { AdHocReservation, Reservation } from "@firetable/types";
+import { isPlannedReservation } from "@firetable/types";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useAuthStore } from "src/stores/auth-store";
@@ -7,7 +8,7 @@ import { useAuthStore } from "src/stores/auth-store";
 import ReservationGeneralInfo from "src/components/Event/ReservationGeneralInfo.vue";
 
 interface Props {
-    reservation: Reservation;
+    reservation: Reservation | AdHocReservation;
 }
 
 const authStore = useAuthStore();
@@ -18,8 +19,12 @@ const emit = defineEmits<{
 }>();
 const { t } = useI18n();
 const isGuestArrived = ref<boolean>(props.reservation.arrived);
-const isCancelled = ref<boolean>(!!props.reservation.cancelled);
-const reservationConfirmed = ref<boolean>(!!props.reservation.reservationConfirmed);
+const isCancelled = ref<boolean>(
+    isPlannedReservation(props.reservation) && !!props.reservation.cancelled,
+);
+const reservationConfirmed = ref<boolean>(
+    isPlannedReservation(props.reservation) && !!props.reservation.reservationConfirmed,
+);
 const canDeleteReservation = computed(() => {
     return (
         authStore.canDeleteReservation ||
@@ -33,7 +38,7 @@ const canEditReservation = computed(() => {
     );
 });
 
-function isOwnReservation(reservation: Reservation): boolean {
+function isOwnReservation(reservation: Reservation | AdHocReservation): boolean {
     return authStore.user?.id === reservation.creator?.id;
 }
 
@@ -57,7 +62,7 @@ function onReservationConfirmed(): void {
     <q-card-section>
         <ReservationGeneralInfo :reservation="props.reservation" />
 
-        <template v-if="!isCancelled">
+        <template v-if="!isCancelled && isPlannedReservation(props.reservation)">
             <q-separator />
             <!-- reservation confirmed -->
             <q-item
@@ -149,7 +154,13 @@ function onReservationConfirmed(): void {
             </div>
         </q-item>
 
-        <template v-if="authStore.canCancelReservation && !isGuestArrived">
+        <template
+            v-if="
+                isPlannedReservation(props.reservation) &&
+                authStore.canCancelReservation &&
+                !isGuestArrived
+            "
+        >
             <q-separator class="q-mt-md" />
             <!-- Cancel reservation -->
             <q-item tag="label" class="q-pa-none">
