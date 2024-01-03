@@ -69,7 +69,7 @@ function guestVisitsToReadable(guest: GuestDoc): string {
         <q-list>
             <q-slide-item
                 v-for="guest in guests"
-                :key="guest.id"
+                :key="guest.contact"
                 clickable
                 right-color="warning"
                 @right="({ reset }) => deleteGuest(guest, reset)"

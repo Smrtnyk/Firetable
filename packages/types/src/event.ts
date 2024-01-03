@@ -50,9 +50,9 @@ export type PlannedReservationDoc = PlannedReservation & {
     _doc: QueryDocumentSnapshot<PlannedReservation>;
 };
 
-export type AdHocReservationDoc = AdHocReservation & {
+export type AdHocReservationDoc = WalkInReservation & {
     id: string;
-    _doc: QueryDocumentSnapshot<AdHocReservation>;
+    _doc: QueryDocumentSnapshot<WalkInReservation>;
 };
 
 export type ReservationDoc = PlannedReservationDoc | AdHocReservationDoc;
@@ -65,7 +65,7 @@ export const enum ReservationStatus {
 }
 
 export const enum ReservationType {
-    AD_HOC = 0,
+    WALK_IN = 0,
     PLANNED = 1,
 }
 
@@ -81,8 +81,8 @@ interface BaseReservation {
     status: ReservationStatus;
 }
 
-export interface AdHocReservation extends BaseReservation {
-    type: ReservationType.AD_HOC;
+export interface WalkInReservation extends BaseReservation {
+    type: ReservationType.WALK_IN;
     guestName: string | null;
     consumption: number;
     arrived: true;
@@ -98,7 +98,7 @@ export interface PlannedReservation extends BaseReservation {
     reservedBy: UserIdentifier;
 }
 
-export type Reservation = AdHocReservation | PlannedReservation;
+export type Reservation = WalkInReservation | PlannedReservation;
 
 export interface EventLog {
     message: string;
@@ -127,6 +127,7 @@ export interface Visit {
 }
 
 export interface GuestDoc {
+    id: string;
     name: string;
     contact: string;
     visitedProperties: {
@@ -137,14 +138,14 @@ export interface GuestDoc {
     _doc: QueryDocumentSnapshot<GuestDoc>;
 }
 
-export function isAdHocReservation(
-    reservation: Reservation | AdHocReservation,
-): reservation is AdHocReservation {
-    return reservation.type === ReservationType.AD_HOC;
+export function isAWalkInReservation(
+    reservation: PlannedReservation | WalkInReservation,
+): reservation is WalkInReservation {
+    return reservation.type === ReservationType.WALK_IN;
 }
 
 export function isPlannedReservation(
-    reservation: PlannedReservation | AdHocReservation,
+    reservation: PlannedReservation | WalkInReservation,
 ): reservation is PlannedReservation {
     return reservation.type === ReservationType.PLANNED;
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AdHocReservation } from "@firetable/types";
+import type { WalkInReservation } from "@firetable/types";
 import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
 import { ReservationStatus, ReservationType } from "@firetable/types";
 import { reactive, ref } from "vue";
@@ -17,11 +17,11 @@ const props = defineProps<{
     /**
      *  Optional data for editing
      */
-    reservationData: AdHocReservation | undefined;
+    reservationData: WalkInReservation | undefined;
 }>();
 
 const emit = defineEmits<{
-    (e: "create" | "update", payload: AdHocReservation): void;
+    (e: "create" | "update", payload: WalkInReservation): void;
 }>();
 const { t } = useI18n();
 const authStore = useAuthStore();
@@ -30,7 +30,7 @@ const initialState =
     props.mode === "edit" && props.reservationData
         ? props.reservationData
         : {
-              type: ReservationType.AD_HOC as const,
+              type: ReservationType.WALK_IN as const,
               guestName: null,
               numberOfGuests: 2,
               guestContact: "",
@@ -48,7 +48,7 @@ const initialState =
               floorId: props.floor.id,
               status: ReservationStatus.ACTIVE,
           };
-const state = reactive<AdHocReservation>(initialState);
+const state = reactive<WalkInReservation>(initialState);
 const reservationForm = ref<QForm | null>(null);
 
 function options(hr: number, min: number | null = 0): boolean {

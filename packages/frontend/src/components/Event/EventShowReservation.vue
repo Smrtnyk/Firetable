@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AdHocReservation, Reservation } from "@firetable/types";
+import type { WalkInReservation, Reservation } from "@firetable/types";
 import { isPlannedReservation } from "@firetable/types";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -8,7 +8,7 @@ import { useAuthStore } from "src/stores/auth-store";
 import ReservationGeneralInfo from "src/components/Event/ReservationGeneralInfo.vue";
 
 interface Props {
-    reservation: Reservation | AdHocReservation;
+    reservation: Reservation | WalkInReservation;
 }
 
 const authStore = useAuthStore();
@@ -38,7 +38,7 @@ const canEditReservation = computed(() => {
     );
 });
 
-function isOwnReservation(reservation: Reservation | AdHocReservation): boolean {
+function isOwnReservation(reservation: Reservation | WalkInReservation): boolean {
     return authStore.user?.id === reservation.creator?.id;
 }
 
@@ -58,7 +58,7 @@ function onReservationConfirmed(): void {
 }
 
 const reservationChipLabel = computed(() => {
-    return isPlannedReservation(props.reservation) ? "Planned" : "Ad-hoc";
+    return isPlannedReservation(props.reservation) ? "Planned" : "Walk-In";
 });
 
 const reservationChipColor = computed(() => {

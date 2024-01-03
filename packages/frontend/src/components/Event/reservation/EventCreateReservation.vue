@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { AdHocReservation, Reservation, User } from "@firetable/types";
+import type { WalkInReservation, Reservation, User } from "@firetable/types";
 import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
 import { ReservationType } from "@firetable/types";
 import PlannedReservationForm from "src/components/Event/reservation/PlannedReservationForm.vue";
 import { computed, ref, watch } from "vue";
-import AdHocReservationForm from "src/components/Event/reservation/AdHocReservationForm.vue";
+import WalkInReservationForm from "src/components/Event/reservation/WalkInReservationForm.vue";
 
 const props = defineProps<{
     users: User[];
@@ -15,11 +15,11 @@ const props = defineProps<{
     /**
      *  Optional data for editing
      */
-    reservationData?: Reservation | AdHocReservation;
+    reservationData?: Reservation | WalkInReservation;
 }>();
 
 const emit = defineEmits<{
-    (e: "create" | "update", payload: Reservation | AdHocReservation): void;
+    (e: "create" | "update", payload: Reservation | WalkInReservation): void;
 }>();
 
 const reservationType = ref(ReservationType.PLANNED);
@@ -42,16 +42,16 @@ const typedReservationDataForPlanned = computed(() => {
         : undefined;
 });
 
-const typedReservationDataForAdHoc = computed(() => {
-    return props.reservationData?.type === ReservationType.AD_HOC
+const typedReservationDataForWalkIn = computed(() => {
+    return props.reservationData?.type === ReservationType.WALK_IN
         ? props.reservationData
         : undefined;
 });
 
-const showAdHocReservationForm = computed(() => {
+const showWalkInReservationForm = computed(() => {
     return (
-        reservationType.value === ReservationType.AD_HOC ||
-        (props.mode === "edit" && currentReservationType.value === ReservationType.AD_HOC)
+        reservationType.value === ReservationType.WALK_IN ||
+        (props.mode === "edit" && currentReservationType.value === ReservationType.WALK_IN)
     );
 });
 
@@ -65,11 +65,11 @@ watch(
     { immediate: true },
 );
 
-function handleReservationCreate(reservation: Reservation | AdHocReservation): void {
+function handleReservationCreate(reservation: Reservation | WalkInReservation): void {
     emit("create", reservation);
 }
 
-function handleReservationUpdate(reservation: Reservation | AdHocReservation): void {
+function handleReservationUpdate(reservation: Reservation | WalkInReservation): void {
     emit("update", reservation);
 }
 </script>
@@ -83,7 +83,7 @@ function handleReservationUpdate(reservation: Reservation | AdHocReservation): v
             unelevated
             :options="[
                 { label: 'Planned', value: ReservationType.PLANNED },
-                { label: 'Ad-Hoc', value: ReservationType.AD_HOC },
+                { label: 'Walk-In', value: ReservationType.WALK_IN },
             ]"
         />
         <PlannedReservationForm
@@ -98,9 +98,9 @@ function handleReservationUpdate(reservation: Reservation | AdHocReservation): v
             @update="handleReservationUpdate"
         />
 
-        <AdHocReservationForm
-            v-if="showAdHocReservationForm"
-            :reservation-data="typedReservationDataForAdHoc"
+        <WalkInReservationForm
+            v-if="showWalkInReservationForm"
+            :reservation-data="typedReservationDataForWalkIn"
             :mode="props.mode"
             :event-start-timestamp="props.eventStartTimestamp"
             :floor="props.floor"
