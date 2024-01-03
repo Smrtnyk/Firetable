@@ -1,14 +1,14 @@
 import type { VueWrapper } from "@vue/test-utils";
 import type { Reservation, ReservationDoc, User } from "@firetable/types";
-import EventCreateReservation from "./EventCreateReservation.vue";
+import PlannedReservationForm from "./PlannedReservationForm.vue";
 import messages from "../../../i18n";
 import * as authStore from "../../../stores/auth-store";
-import * as Backend from "@firetable/backend";
+import { ReservationStatus, ReservationType } from "@firetable/types";
 import { config, flushPromises, mount } from "@vue/test-utils";
+import * as Backend from "@firetable/backend";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createI18n } from "vue-i18n";
 import { Quasar } from "quasar";
-import { ReservationStatus } from "@firetable/types";
 
 const i18n = createI18n({
     locale: "en-GB",
@@ -42,6 +42,7 @@ const testReservationData: Reservation = {
         } as any,
     },
     status: ReservationStatus.ACTIVE,
+    type: ReservationType.PLANNED,
 };
 
 type TestProps = {
@@ -82,8 +83,8 @@ const MOCK_USER: ReservationDoc["creator"] = {
 
 function mountComponent(
     overrides?: Partial<TestProps>,
-): VueWrapper<typeof EventCreateReservation, any> {
-    return mount(EventCreateReservation, {
+): VueWrapper<typeof PlannedReservationForm, any> {
+    return mount(PlannedReservationForm, {
         props: createProps(overrides),
         global: {
             plugins: [Quasar],
@@ -91,7 +92,7 @@ function mountComponent(
     });
 }
 
-describe("EventCreateReservation", () => {
+describe("PlannedReservationForm", () => {
     beforeEach(() => {
         vi.spyOn(Backend, "getFirestoreTimestamp").mockReturnValue({
             seconds: 1,
@@ -110,7 +111,7 @@ describe("EventCreateReservation", () => {
         wrapper.vm.state.guestContact = "1234567890";
         wrapper.vm.state.reservationNote = "";
         wrapper.vm.state.consumption = 1;
-        wrapper.vm.state.confirmed = false;
+        wrapper.vm.state.arrived = false;
         wrapper.vm.state.time = "12:00";
         wrapper.vm.state.reservedBy = { name: "Staff", email: "staff@example.com" };
         await wrapper.vm.$nextTick();
@@ -127,7 +128,7 @@ describe("EventCreateReservation", () => {
                 guestContact: "1234567890",
                 reservationNote: "",
                 consumption: 1,
-                confirmed: false,
+                arrived: false,
                 reservationConfirmed: false,
                 time: "12:00",
                 reservedBy: { name: "Staff", email: "staff@example.com" },
@@ -136,6 +137,7 @@ describe("EventCreateReservation", () => {
                 tableLabel: "1",
                 cancelled: false,
                 status: ReservationStatus.ACTIVE,
+                type: ReservationType.PLANNED,
             },
         ]);
     });
@@ -162,11 +164,12 @@ describe("EventCreateReservation", () => {
                 tableLabel: "1",
                 reservationConfirmed: false,
                 consumption: 1,
-                confirmed: false,
+                arrived: false,
                 time: "12:00",
                 reservedBy: { name: "Staff", email: "staff@example.com", id: "1" },
                 cancelled: false,
                 status: ReservationStatus.ACTIVE,
+                type: ReservationType.PLANNED,
             },
         ]);
     });
@@ -217,7 +220,7 @@ describe("EventCreateReservation", () => {
         expect(wrapper.emitted().create[0]).toEqual([
             {
                 guestName: "John Doe",
-                confirmed: false,
+                arrived: false,
                 reservationConfirmed: false,
                 consumption: 1,
                 guestContact: "",
@@ -234,6 +237,7 @@ describe("EventCreateReservation", () => {
                 tableLabel: "1",
                 cancelled: false,
                 status: ReservationStatus.ACTIVE,
+                type: ReservationType.PLANNED,
             },
         ]);
     });

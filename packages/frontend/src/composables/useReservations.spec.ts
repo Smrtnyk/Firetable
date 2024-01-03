@@ -1,17 +1,17 @@
 import type { Ref } from "vue";
-import type { EventDoc, ReservationDoc, User } from "@firetable/types";
+import type { EventDoc, PlannedReservationDoc, ReservationDoc, User } from "@firetable/types";
 import type * as backend from "@firetable/backend";
 import type { MockInstance } from "vitest";
 import { useReservations } from "./useReservations";
 import * as uiHelpers from "../helpers/ui-helpers";
 import * as authStore from "../stores/auth-store";
-import { ReservationStatus } from "@firetable/types";
-import { shallowRef, toRef, ref } from "vue";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ReservationStatus, ReservationType } from "@firetable/types";
 import * as Backend from "@firetable/backend";
+import { ref, shallowRef, toRef } from "vue";
 import * as Quasar from "quasar";
-import { describe, beforeEach, expect, it, vi } from "vitest";
-import { FloorViewer, getTables, RectTable } from "@firetable/floor-creator";
 import { uid } from "quasar";
+import { FloorViewer, getTables, RectTable } from "@firetable/floor-creator";
 import * as i18n from "vue-i18n";
 import { NOOP } from "@firetable/utils";
 
@@ -53,11 +53,11 @@ function createTable(label: string): RectTable {
     });
 }
 
-function createMockReservation(partial: Partial<ReservationDoc> = {}): ReservationDoc {
+function createMockReservation(partial: Partial<ReservationDoc> = {}): PlannedReservationDoc {
     return {
         id: "id",
         guestName: "foo",
-        confirmed: false,
+        arrived: false,
         reservationConfirmed: false,
         numberOfGuests: 1,
         consumption: 1,
@@ -82,6 +82,7 @@ function createMockReservation(partial: Partial<ReservationDoc> = {}): Reservati
         tableLabel: "1",
         _doc: this,
         ...partial,
+        type: ReservationType.PLANNED as const,
     };
 }
 
@@ -182,6 +183,10 @@ describe("useReservations", () => {
         );
         await onDeleteReservation(mockReservation);
         expect(deleteReservationSpy).toHaveBeenCalledWith(eventOwner, {
+            clearedAt: expect.objectContaining({
+                seconds: expect.any(Number),
+                nanoseconds: expect.any(Number),
+            }),
             id: mockReservation.id,
             status: ReservationStatus.DELETED,
         });
