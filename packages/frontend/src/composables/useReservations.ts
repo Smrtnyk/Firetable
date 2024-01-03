@@ -28,7 +28,7 @@ import { useAuthStore } from "src/stores/auth-store";
 import { NOOP } from "@firetable/utils";
 
 import FTDialog from "src/components/FTDialog.vue";
-import EventCreateReservation from "src/components/Event/EventCreateReservation.vue";
+import EventCreateReservation from "src/components/Event/reservation/EventCreateReservation.vue";
 import EventShowReservation from "src/components/Event/EventShowReservation.vue";
 import { determineTableColor } from "src/helpers/floor";
 import { isValidEuropeanPhoneNumber } from "src/helpers/utils";

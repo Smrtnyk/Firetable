@@ -1,8 +1,8 @@
 import type { VueWrapper } from "@vue/test-utils";
 import type { Reservation, ReservationDoc, User } from "@firetable/types";
 import EventCreateReservation from "./EventCreateReservation.vue";
-import messages from "../../i18n";
-import * as authStore from "../../stores/auth-store";
+import messages from "../../../i18n";
+import * as authStore from "../../../stores/auth-store";
 import * as Backend from "@firetable/backend";
 import { config, flushPromises, mount } from "@vue/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -25,7 +25,7 @@ const testReservationData: Reservation = {
     guestContact: "1234567890",
     reservationNote: "",
     consumption: 1,
-    confirmed: false,
+    arrived: false,
     cancelled: false,
     time: "12:00",
     reservedBy: { name: "Staff", email: "staff@example.com", id: "1" },
