@@ -12,6 +12,8 @@ import { config, flushPromises, mount } from "@vue/test-utils";
 import { createI18n } from "vue-i18n";
 import { Quasar } from "quasar";
 
+type PropsType = typeof PlannedReservationForm.props;
+
 const i18n = createI18n({
     locale: "en-GB",
     fallbackLocale: "en-GB",
@@ -48,17 +50,8 @@ const testReservationData: Reservation = {
     isVIP: false,
 };
 
-type TestProps = {
-    users: User[];
-    mode: "create" | "update";
-    eventStartTimestamp: number;
-    table: { label: string };
-    floor: { id: string };
-    reservationData?: Reservation;
-};
-
-function createProps(overrides: Partial<TestProps> = {}): TestProps {
-    const defaultProps: TestProps = {
+function createProps(overrides: Partial<PropsType> = {}): PropsType {
+    const defaultProps: PropsType = {
         users: [],
         mode: "create",
         reservationData: null,
@@ -85,7 +78,7 @@ const MOCK_USER: ReservationDoc["creator"] = {
 };
 
 function mountComponent(
-    overrides?: Partial<TestProps>,
+    overrides?: Partial<PropsType>,
 ): VueWrapper<typeof PlannedReservationForm, any> {
     return mount(PlannedReservationForm, {
         props: createProps(overrides),
