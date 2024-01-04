@@ -2,7 +2,7 @@
 import type { PlannedReservation, User } from "@firetable/types";
 import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
 import { ReservationStatus, ReservationType } from "@firetable/types";
-import { computed, reactive, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
 import { greaterThanZero, minLength, noEmptyString, requireNumber } from "src/helpers/form-rules";
@@ -60,7 +60,7 @@ const initialState =
               status: ReservationStatus.ACTIVE,
               isVIP: false,
           };
-const state = reactive<PlannedReservation>(initialState);
+const state = ref<PlannedReservation>(initialState);
 const reservationForm = ref<QForm | null>(null);
 const formattedUsers = computed<PlannedReservation["reservedBy"][]>(() =>
     props.users.map((user) => ({
@@ -85,7 +85,7 @@ const reservedByLabel = computed(() => {
 watch(selectionType, (newVal) => {
     // When selectionType changes to 'social', reset reservedBy to the first social option
     // When changing to 'user', reset reservedBy to the first user option
-    state.reservedBy = newVal === "social" ? socials[0] : formattedUsers.value[0];
+    state.value.reservedBy = newVal === "social" ? socials[0] : formattedUsers.value[0];
 });
 
 function requireReservedBySelection(val: PlannedReservation["reservedBy"]): boolean | string {

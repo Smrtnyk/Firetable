@@ -2,7 +2,7 @@
 import type { WalkInReservation } from "@firetable/types";
 import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
 import { ReservationStatus, ReservationType } from "@firetable/types";
-import { reactive, ref } from "vue";
+import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
 import { greaterThanZero, optionalMinLength, requireNumber } from "src/helpers/form-rules";
@@ -30,7 +30,7 @@ const initialState =
     props.mode === "update" && props.reservationData
         ? props.reservationData
         : generateInitialState();
-const state = reactive<WalkInReservation>(initialState);
+const state = ref<WalkInReservation>(initialState);
 const reservationForm = ref<QForm | null>(null);
 
 function generateInitialState(): WalkInReservation {
