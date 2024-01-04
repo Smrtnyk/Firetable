@@ -131,8 +131,6 @@ export function useReservations(
     }
 
     function setReservation(table: BaseTable, reservation: ReservationDoc): void {
-        table.setReservation(reservation);
-
         if (reservation.isVIP) {
             table.setVIPStatus(true);
         }
@@ -228,6 +226,7 @@ export function useReservations(
     function showCreateReservationDialog(
         floor: Floor,
         element: BaseTable,
+        reservation: ReservationDoc | undefined,
         mode: "create" | "update",
     ): void {
         const { label } = element;
@@ -242,8 +241,8 @@ export function useReservations(
                         users: filterUsersPerProperty(users.value, eventOwner.propertyId),
                         mode,
                         reservationData:
-                            mode === "update" && element.reservation
-                                ? { ...element.reservation, id: element.reservation.id }
+                            mode === "update" && reservation
+                                ? { ...reservation, id: reservation.id }
                                 : void 0,
                         eventStartTimestamp: event.value!.date,
                         floor: floor,
@@ -292,7 +291,7 @@ export function useReservations(
                         onDeleteReservation(reservation).catch(showErrorMessage);
                     },
                     edit() {
-                        showCreateReservationDialog(floor, element, "update");
+                        showCreateReservationDialog(floor, element, reservation, "update");
                     },
                     transfer() {
                         crossFloorReservationTransferTable.value = {
@@ -534,6 +533,7 @@ export function useReservations(
     async function handleCrossFloorReservationCopy(
         targetFloor: FloorViewer,
         targetTable: BaseTable,
+        targetReservation: ReservationDoc | undefined,
     ): Promise<void> {
         if (!crossFloorReservationCopyTable.value) {
             return;
@@ -546,7 +546,7 @@ export function useReservations(
             return;
         }
 
-        if (targetTable.reservation) {
+        if (targetReservation) {
             showErrorMessage("Cannot copy reservation to an already reserved table!");
             return;
         }
@@ -575,8 +575,13 @@ export function useReservations(
     ): Promise<void> {
         if (!isTable(element)) return;
 
+        // Check if table has reservation
+        const reservation = reservations.value.find((res) => {
+            return res.tableLabel === element.label && res.floorId === floor.id;
+        });
+
         if (crossFloorReservationCopyTable.value) {
-            await handleCrossFloorReservationCopy(floor, element);
+            await handleCrossFloorReservationCopy(floor, element, reservation);
             crossFloorReservationCopyTable.value = undefined;
             return;
         }
@@ -586,11 +591,10 @@ export function useReservations(
             return;
         }
 
-        const { reservation } = element;
         if (reservation) {
             showReservation(floor, reservation, element);
         } else if (canReserve.value) {
-            showCreateReservationDialog(floor, element, "create");
+            showCreateReservationDialog(floor, element, reservation, "create");
         }
     }
 
