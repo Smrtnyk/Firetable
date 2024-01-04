@@ -15,7 +15,7 @@ export function formatEventDate(timestamp: number, timeZone: string | null = "UT
         hour: "2-digit",
         minute: "2-digit",
         second: "2-digit",
-        timeZone: timeZone === null ? void 0 : timeZone,
+        timeZone: timeZone ?? void 0,
         hour12: false,
     });
     return formatter.format(date);
@@ -33,7 +33,7 @@ export function dateFromTimestamp(timestamp: number, timeZone: string | null = "
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
-        timeZone: timeZone === null ? void 0 : timeZone,
+        timeZone: timeZone ?? void 0,
     });
     return formatter.format(date);
 }
@@ -49,7 +49,7 @@ export function hourFromTimestamp(timestamp: number, timeZone: string | null = "
     const formatter = new Intl.DateTimeFormat(LOCALE, {
         hour: "2-digit",
         minute: "2-digit",
-        timeZone: timeZone === null ? void 0 : timeZone,
+        timeZone: timeZone ?? void 0,
         hour12: false,
     });
     return formatter.format(date);
