@@ -9,7 +9,7 @@ import AdminEventReservationsByPerson from "src/components/admin/event/AdminEven
 import FTTabs from "src/components/FTTabs.vue";
 
 import { computed, ref } from "vue";
-import { usePropertiesStore } from "src/stores/usePropertiesStore";
+import { usePropertiesStore } from "src/stores/properties-store";
 import { format, subMonths } from "date-fns";
 import { getColors } from "src/helpers/colors";
 import { useReservationsAnalytics } from "src/composables/useReservationsAnalytics";

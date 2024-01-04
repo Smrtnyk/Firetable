@@ -5,7 +5,7 @@ import { initializeFirebase } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { getCurrentUser, useCurrentUser, VueFire, VueFireAuth } from "vuefire";
 import { watch } from "vue";
-import { usePropertiesStore } from "src/stores/usePropertiesStore";
+import { usePropertiesStore } from "src/stores/properties-store";
 
 export default boot(({ router, app }): void => {
     const { firebaseApp } = initializeFirebase();

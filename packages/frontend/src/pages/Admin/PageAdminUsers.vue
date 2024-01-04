@@ -13,7 +13,7 @@ import { computed, onBeforeMount, onUnmounted, ref, watch } from "vue";
 import { Loading, useQuasar } from "quasar";
 import FTDialog from "src/components/FTDialog.vue";
 import { createUserWithEmail, deleteUser, updateUser } from "@firetable/backend";
-import { usePropertiesStore } from "src/stores/usePropertiesStore";
+import { usePropertiesStore } from "src/stores/properties-store";
 import { useUsers } from "src/composables/useUsers";
 import { useAuthStore } from "src/stores/auth-store";
 import { useDialog } from "src/composables/useDialog";

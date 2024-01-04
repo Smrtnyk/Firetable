@@ -4,7 +4,7 @@ import { ADMIN } from "@firetable/types";
 import { useAuthStore } from "src/stores/auth-store";
 import { fetchUsersByRole } from "@firetable/backend";
 import { storeToRefs } from "pinia";
-import { usePropertiesStore } from "src/stores/usePropertiesStore";
+import { usePropertiesStore } from "src/stores/properties-store";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 
 export function useUsers(organisationId: string) {
