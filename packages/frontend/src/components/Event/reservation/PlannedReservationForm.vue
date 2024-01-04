@@ -182,6 +182,10 @@ defineExpose({
             :label="t('EventCreateReservation.reservationNote')"
         />
 
+        <div class="q-mb-md">
+            <q-checkbox v-model="state.isVIP" :label="t('EventCreateReservation.reservationVIP')" />
+        </div>
+
         <!-- Selector for choosing between 'User' or 'Social' -->
         <div class="q-mb-md">
             <q-radio v-model="selectionType" val="user" label="Staff" />

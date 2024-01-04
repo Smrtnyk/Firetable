@@ -90,6 +90,7 @@ export default {
         reservedByLabel: "Reserved by",
         requireReservedBySelectionError: "You need to select at least one option",
         reservedBySocialLabel: "Social Networks",
+        reservationVIP: "VIP?",
     },
     PageAdminGuests: {
         title: "Guests",

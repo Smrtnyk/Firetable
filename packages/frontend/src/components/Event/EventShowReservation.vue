@@ -69,6 +69,13 @@ const reservationChipColor = computed(() => {
 <template>
     <div class="row justify-end">
         <q-chip :color="reservationChipColor" :label="reservationChipLabel" />
+        <q-chip
+            color="accent"
+            v-if="props.reservation.isVIP"
+            label="VIP"
+            icon="crown"
+            text-color="yellow"
+        />
     </div>
 
     <q-card-section>
