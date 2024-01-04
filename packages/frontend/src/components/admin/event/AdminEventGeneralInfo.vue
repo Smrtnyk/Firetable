@@ -19,19 +19,19 @@ const props = defineProps<Props>();
     <div class="row text-center q-col-gutter-md">
         <FTCenteredText class="col-12">Real Time Info</FTCenteredText>
 
-        <div class="col-4 text-subtitle1">
+        <div class="col-md-4 col-sm-6 text-subtitle1">
             <q-chip color="primary" :label="`Total tables: ${props.reservationsStatus.total}`" />
         </div>
-        <div class="col-4 text-subtitle1">
+        <div class="col-md-4 col-sm-6 text-subtitle1">
             <q-chip
                 color="secondary"
                 :label="`Currently Occupied: ${props.reservationsStatus.currentlyOccupied}`"
             />
         </div>
-        <div class="col-4 text-subtitle1">
+        <div class="col-md-4 col-sm-6 text-subtitle1">
             <q-chip color="tertiary" :label="`Pending: ${props.reservationsStatus.pending}`" />
         </div>
-        <div class="col-4 text-subtitle1">
+        <div class="col-md-4 col-sm-6 text-subtitle1">
             <q-chip
                 color="quaternary"
                 :label="`Total Guests: ${props.reservationsStatus.totalGuests}`"
