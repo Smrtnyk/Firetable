@@ -1,13 +1,12 @@
 import type { Ref } from "vue";
 import type { EventDoc, PlannedReservationDoc, ReservationDoc, User } from "@firetable/types";
-import type * as backend from "@firetable/backend";
 import type { MockInstance } from "vitest";
 import { useReservations } from "./useReservations";
 import * as uiHelpers from "../helpers/ui-helpers";
 import * as authStore from "../stores/auth-store";
+import * as backend from "@firetable/backend";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ReservationStatus, ReservationType } from "@firetable/types";
-import * as Backend from "@firetable/backend";
 import { ref, shallowRef, toRef } from "vue";
 import * as Quasar from "quasar";
 import { uid } from "quasar";
@@ -32,7 +31,7 @@ function createFloor(floorName: string): FloorViewer {
                     createTable("table1").toObject(),
                     createTable("table2").toObject(),
                     createTable("table3").toObject(),
-                    createReservedTable("reserved1", id).toObject(),
+                    createReservedTable("reserved1").toObject(),
                 ],
             },
             propertyId: "",
@@ -83,17 +82,12 @@ function createMockReservation(partial: Partial<ReservationDoc> = {}): PlannedRe
         _doc: this,
         ...partial,
         type: ReservationType.PLANNED as const,
+        isVIP: false,
     };
 }
 
-function createReservedTable(label: string, floorId: string): RectTable {
-    const table = createTable(label);
-    table.setReservation({
-        ...createMockReservation(),
-        floorId,
-        tableLabel: label,
-    });
-    return table;
+function createReservedTable(label: string): RectTable {
+    return createTable(label);
 }
 
 describe("useReservations", () => {
@@ -107,7 +101,7 @@ describe("useReservations", () => {
 
     beforeEach(() => {
         deleteReservationSpy = vi
-            .spyOn(Backend, "updateReservationDoc")
+            .spyOn(backend, "updateReservationDoc")
             .mockImplementation(vi.fn<any>());
         mockReservations.length = 0;
         floorInstances.value.length = 0;
@@ -143,14 +137,14 @@ describe("useReservations", () => {
     });
 
     it("should handle reservation creation correctly", () => {
-        floor1.canvas.add(createReservedTable("table1", floor1.id));
+        floor1.canvas.add(createReservedTable("table1"));
         const [table] = getTables(floor1);
         const mockReservation = createMockReservation({
             floorId: floor1.id,
             tableLabel: table.label,
         });
         mockReservations.push(mockReservation);
-        const setReservationSpy = vi.spyOn(table, "setReservation");
+        const addReservationSpy = vi.spyOn(backend, "addReservation").mockImplementation(vi.fn());
 
         const { handleReservationCreation } = useReservations(
             users,
@@ -161,12 +155,12 @@ describe("useReservations", () => {
         );
         handleReservationCreation(mockReservation);
 
-        expect(setReservationSpy).toHaveBeenCalledWith(mockReservation);
+        expect(addReservationSpy).toHaveBeenCalledWith(eventOwner, mockReservation);
     });
 
     it("should handle reservation deletion correctly", async () => {
         vi.spyOn(uiHelpers, "showConfirm").mockResolvedValue(true);
-        floor1.canvas.add(createReservedTable("table1", floor1.id));
+        floor1.canvas.add(createReservedTable("table1"));
         const [table] = getTables(floor1);
         const mockReservation = createMockReservation({
             floorId: floor1.id,
