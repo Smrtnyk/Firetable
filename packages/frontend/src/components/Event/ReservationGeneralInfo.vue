@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { WalkInReservation, PlannedReservation, Reservation } from "@firetable/types";
+import type { PlannedReservation, Reservation } from "@firetable/types";
 import { isPlannedReservation } from "@firetable/types";
 import { formatEventDate } from "src/helpers/date-utils";
 import { useI18n } from "vue-i18n";
 import { useAuthStore } from "src/stores/auth-store";
 
 const props = defineProps<{
-    reservation: PlannedReservation | WalkInReservation;
+    reservation: Reservation;
 }>();
 const { t } = useI18n();
 const authStore = useAuthStore();

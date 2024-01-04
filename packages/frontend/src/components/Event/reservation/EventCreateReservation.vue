@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { WalkInReservation, Reservation, User } from "@firetable/types";
+import type { Reservation, User } from "@firetable/types";
 import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
 
 import { ReservationType } from "@firetable/types";
@@ -18,11 +18,11 @@ const props = defineProps<{
     /**
      *  Optional data for editing
      */
-    reservationData?: Reservation | WalkInReservation;
+    reservationData?: Reservation;
 }>();
 
 const emit = defineEmits<{
-    (e: "create" | "update", payload: Reservation | WalkInReservation): void;
+    (e: "create" | "update", payload: Reservation): void;
 }>();
 
 const { t } = useI18n();

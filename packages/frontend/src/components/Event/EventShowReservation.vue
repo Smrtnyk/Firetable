@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { WalkInReservation, Reservation } from "@firetable/types";
+import type { Reservation } from "@firetable/types";
 import { isPlannedReservation } from "@firetable/types";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -8,7 +8,7 @@ import { useAuthStore } from "src/stores/auth-store";
 import ReservationGeneralInfo from "src/components/Event/ReservationGeneralInfo.vue";
 
 interface Props {
-    reservation: Reservation | WalkInReservation;
+    reservation: Reservation;
 }
 
 const authStore = useAuthStore();
@@ -38,7 +38,7 @@ const canEditReservation = computed(() => {
     );
 });
 
-function isOwnReservation(reservation: Reservation | WalkInReservation): boolean {
+function isOwnReservation(reservation: Reservation): boolean {
     return authStore.user?.id === reservation.creator?.id;
 }
 
