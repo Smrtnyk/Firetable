@@ -10,6 +10,7 @@ import { useAuthStore } from "src/stores/auth-store";
 import { getFirestoreTimestamp } from "@firetable/backend";
 import { hourFromTimestamp } from "src/helpers/date-utils";
 import { getReservationTimeOptions } from "src/components/Event/reservation/reservation-form-utils";
+import { config } from "src/config";
 
 const props = defineProps<{
     mode: "create" | "update";
@@ -91,7 +92,13 @@ defineExpose({
                 <q-icon name="clock" class="cursor-pointer" />
                 <q-popup-proxy transition-show="scale" transition-hide="scale">
                     <q-time
-                        :options="getReservationTimeOptions.bind(null, props.eventStartTimestamp)"
+                        :options="
+                            getReservationTimeOptions.bind(
+                                null,
+                                props.eventStartTimestamp,
+                                config.eventDuration,
+                            )
+                        "
                         v-model="state.time"
                         format24h
                     >
