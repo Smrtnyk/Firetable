@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import type { WalkInReservation, Reservation, User } from "@firetable/types";
 import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
+
 import { ReservationType } from "@firetable/types";
-import PlannedReservationForm from "src/components/Event/reservation/PlannedReservationForm.vue";
 import { computed, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
+
+import PlannedReservationForm from "src/components/Event/reservation/PlannedReservationForm.vue";
 import WalkInReservationForm from "src/components/Event/reservation/WalkInReservationForm.vue";
 
 const props = defineProps<{
     users: User[];
-    mode: "create" | "edit";
+    mode: "create" | "update";
     eventStartTimestamp: number;
     table: BaseTable;
     floor: FloorViewer;
@@ -22,7 +25,16 @@ const emit = defineEmits<{
     (e: "create" | "update", payload: Reservation | WalkInReservation): void;
 }>();
 
+const { t } = useI18n();
+
 const reservationType = ref(ReservationType.PLANNED);
+
+const plannedRef = ref<typeof PlannedReservationForm | undefined>();
+const walkInRef = ref<typeof WalkInReservationForm | undefined>();
+
+const currentlyActiveRef = computed(() => {
+    return showPlannedReservationForm.value ? plannedRef.value : walkInRef.value;
+});
 
 const currentReservationType = computed(() => {
     // Default to PLANNED type if reservationData is not provided
@@ -32,7 +44,14 @@ const currentReservationType = computed(() => {
 const showPlannedReservationForm = computed(() => {
     return (
         reservationType.value === ReservationType.PLANNED ||
-        (props.mode === "edit" && currentReservationType.value === ReservationType.PLANNED)
+        (props.mode === "update" && currentReservationType.value === ReservationType.PLANNED)
+    );
+});
+
+const showWalkInReservationForm = computed(() => {
+    return (
+        reservationType.value === ReservationType.WALK_IN ||
+        (props.mode === "update" && currentReservationType.value === ReservationType.WALK_IN)
     );
 });
 
@@ -48,13 +67,6 @@ const typedReservationDataForWalkIn = computed(() => {
         : undefined;
 });
 
-const showWalkInReservationForm = computed(() => {
-    return (
-        reservationType.value === ReservationType.WALK_IN ||
-        (props.mode === "edit" && currentReservationType.value === ReservationType.WALK_IN)
-    );
-});
-
 watch(
     () => props.reservationData,
     (newReservationData) => {
@@ -65,17 +77,21 @@ watch(
     { immediate: true },
 );
 
-function handleReservationCreate(reservation: Reservation | WalkInReservation): void {
-    emit("create", reservation);
-}
+async function onOKClick(): Promise<void> {
+    if (!(await currentlyActiveRef.value?.reservationForm.validate())) {
+        return;
+    }
 
-function handleReservationUpdate(reservation: Reservation | WalkInReservation): void {
-    emit("update", reservation);
+    if (!currentlyActiveRef.value?.state) {
+        return;
+    }
+
+    emit(props.mode, currentlyActiveRef.value.state);
 }
 </script>
 
 <template>
-    <div>
+    <q-card-section>
         <q-btn-toggle
             v-if="props.mode === 'create'"
             v-model="reservationType"
@@ -87,6 +103,7 @@ function handleReservationUpdate(reservation: Reservation | WalkInReservation): 
             ]"
         />
         <PlannedReservationForm
+            ref="plannedRef"
             v-if="showPlannedReservationForm"
             :mode="props.mode"
             :event-start-timestamp="props.eventStartTimestamp"
@@ -94,19 +111,25 @@ function handleReservationUpdate(reservation: Reservation | WalkInReservation): 
             :users="props.users"
             :table="props.table"
             :reservation-data="typedReservationDataForPlanned"
-            @create="handleReservationCreate"
-            @update="handleReservationUpdate"
         />
 
         <WalkInReservationForm
+            ref="walkInRef"
             v-if="showWalkInReservationForm"
             :reservation-data="typedReservationDataForWalkIn"
             :mode="props.mode"
             :event-start-timestamp="props.eventStartTimestamp"
             :floor="props.floor"
             :table="props.table"
-            @create="handleReservationCreate"
-            @update="handleReservationUpdate"
         />
-    </div>
+
+        <q-btn
+            rounded
+            size="md"
+            class="button-gradient"
+            @click="onOKClick"
+            :label="t(`EventCreateReservation.reservationCreateBtn`)"
+            data-test="ok-btn"
+        />
+    </q-card-section>
 </template>

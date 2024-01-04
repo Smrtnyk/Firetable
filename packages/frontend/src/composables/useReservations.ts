@@ -224,7 +224,7 @@ export function useReservations(
     function showCreateReservationDialog(
         floor: Floor,
         element: BaseTable,
-        mode: "create" | "edit",
+        mode: "create" | "update",
     ): void {
         const { label } = element;
         const dialog = q
@@ -238,7 +238,7 @@ export function useReservations(
                         users: filterUsersPerProperty(users.value, eventOwner.propertyId),
                         mode,
                         reservationData:
-                            mode === "edit" && element.reservation
+                            mode === "update" && element.reservation
                                 ? { ...element.reservation, id: element.reservation.id }
                                 : void 0,
                         eventStartTimestamp: event.value!.date,
@@ -288,7 +288,7 @@ export function useReservations(
                         onDeleteReservation(reservation).catch(showErrorMessage);
                     },
                     edit() {
-                        showCreateReservationDialog(floor, element, "edit");
+                        showCreateReservationDialog(floor, element, "update");
                     },
                     transfer() {
                         crossFloorReservationTransferTable.value = {

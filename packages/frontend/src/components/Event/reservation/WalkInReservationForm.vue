@@ -11,7 +11,7 @@ import { getFirestoreTimestamp } from "@firetable/backend";
 import { hourFromTimestamp } from "src/helpers/date-utils";
 
 const props = defineProps<{
-    mode: "create" | "edit";
+    mode: "create" | "update";
     eventStartTimestamp: number;
     table: BaseTable;
     floor: FloorViewer;
@@ -21,14 +21,13 @@ const props = defineProps<{
     reservationData: WalkInReservation | undefined;
 }>();
 
-const emit = defineEmits<{
-    (e: "create" | "update", payload: WalkInReservation): void;
-}>();
 const { t } = useI18n();
 const authStore = useAuthStore();
 
 const initialState =
-    props.mode === "edit" && props.reservationData ? props.reservationData : generateInitialState();
+    props.mode === "update" && props.reservationData
+        ? props.reservationData
+        : generateInitialState();
 const state = reactive<WalkInReservation>(initialState);
 const reservationForm = ref<QForm | null>(null);
 
@@ -100,102 +99,84 @@ function options(hr: number, min: number | null = 0): boolean {
     return currentTimeHours >= eventStartHours && currentTimeHours <= eventEndHours;
 }
 
-async function onOKClick(): Promise<void> {
-    if (!(await reservationForm.value?.validate())) {
-        return;
-    }
-
-    if (props.mode === "create") {
-        emit("create", state);
-    } else {
-        emit("update", state);
-    }
-}
+defineExpose({
+    reservationForm,
+    state,
+});
 </script>
 
 <template>
-    <q-card-section>
-        <q-form ref="reservationForm" class="q-gutter-md q-pt-md">
-            <q-input
-                data-test="guest-name"
-                v-model="state.guestName"
-                rounded
-                hide-bottom-space
-                standout
-                label="Optional Guest Name"
-                lazy-rules="ondemand"
-                :rules="[optionalMinLength('Name must be longer!', 2)]"
-            />
+    <q-form ref="reservationForm" class="q-gutter-md q-pt-md">
+        <q-input
+            data-test="guest-name"
+            v-model="state.guestName"
+            rounded
+            hide-bottom-space
+            standout
+            label="Optional Guest Name"
+            lazy-rules="ondemand"
+            :rules="[optionalMinLength('Name must be longer!', 2)]"
+        />
 
-            <q-input
-                :model-value="state.time"
-                rounded
-                standout
-                readonly
-                :label="t(`EventCreateReservation.reservationTime`)"
-            >
-                <template #append>
-                    <q-icon name="clock" class="cursor-pointer" />
-                    <q-popup-proxy transition-show="scale" transition-hide="scale">
-                        <q-time :options="options" v-model="state.time" format24h>
-                            <div class="row items-center justify-end">
-                                <q-btn
-                                    :label="t('EventCreateForm.inputDateTimePickerCloseBtnLabel')"
-                                    color="primary"
-                                    flat
-                                    v-close-popup
-                                />
-                            </div>
-                        </q-time>
-                    </q-popup-proxy>
-                </template>
-            </q-input>
+        <q-input
+            :model-value="state.time"
+            rounded
+            standout
+            readonly
+            :label="t(`EventCreateReservation.reservationTime`)"
+        >
+            <template #append>
+                <q-icon name="clock" class="cursor-pointer" />
+                <q-popup-proxy transition-show="scale" transition-hide="scale">
+                    <q-time :options="options" v-model="state.time" format24h>
+                        <div class="row items-center justify-end">
+                            <q-btn
+                                :label="t('EventCreateForm.inputDateTimePickerCloseBtnLabel')"
+                                color="primary"
+                                flat
+                                v-close-popup
+                            />
+                        </div>
+                    </q-time>
+                </q-popup-proxy>
+            </template>
+        </q-input>
 
-            <q-input
-                v-model.number="state.numberOfGuests"
-                hide-bottom-space
-                rounded
-                standout
-                type="number"
-                :label="t(`EventCreateReservation.reservationNumberOfGuests`)"
-                lazy-rules="ondemand"
-                :rules="[requireNumber(), greaterThanZero()]"
-            />
+        <q-input
+            v-model.number="state.numberOfGuests"
+            hide-bottom-space
+            rounded
+            standout
+            type="number"
+            :label="t(`EventCreateReservation.reservationNumberOfGuests`)"
+            lazy-rules="ondemand"
+            :rules="[requireNumber(), greaterThanZero()]"
+        />
 
-            <q-input
-                v-model.number="state.consumption"
-                hide-bottom-space
-                rounded
-                standout
-                type="number"
-                :label="t(`EventCreateReservation.reservationConsumption`)"
-                lazy-rules="ondemand"
-                :rules="[requireNumber()]"
-            />
+        <q-input
+            v-model.number="state.consumption"
+            hide-bottom-space
+            rounded
+            standout
+            type="number"
+            :label="t(`EventCreateReservation.reservationConsumption`)"
+            lazy-rules="ondemand"
+            :rules="[requireNumber()]"
+        />
 
-            <q-input
-                v-model="state.guestContact"
-                rounded
-                standout
-                class="q-mb-md"
-                :label="t(`EventCreateReservation.reservationGuestContact`)"
-            />
+        <q-input
+            v-model="state.guestContact"
+            rounded
+            standout
+            class="q-mb-md"
+            :label="t(`EventCreateReservation.reservationGuestContact`)"
+        />
 
-            <q-input
-                v-model="state.reservationNote"
-                rounded
-                standout
-                :label="t('EventCreateReservation.reservationNote')"
-            />
-
-            <q-btn
-                rounded
-                size="md"
-                class="button-gradient"
-                @click="onOKClick"
-                :label="t(`EventCreateReservation.reservationCreateBtn`)"
-                data-test="ok-btn"
-            />
-        </q-form>
-    </q-card-section>
+        <q-input
+            v-model="state.reservationNote"
+            rounded
+            standout
+            :label="t('EventCreateReservation.reservationNote')"
+        />
+    </q-form>
 </template>
