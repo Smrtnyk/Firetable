@@ -1,12 +1,14 @@
 import type { VueWrapper } from "@vue/test-utils";
 import type { Reservation, ReservationDoc, User } from "@firetable/types";
+
 import PlannedReservationForm from "./PlannedReservationForm.vue";
-import messages from "../../../i18n";
 import * as authStore from "../../../stores/auth-store";
+import messages from "../../../i18n";
+import * as Backend from "@firetable/backend";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ReservationStatus, ReservationType } from "@firetable/types";
 import { config, flushPromises, mount } from "@vue/test-utils";
-import * as Backend from "@firetable/backend";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createI18n } from "vue-i18n";
 import { Quasar } from "quasar";
 
@@ -47,7 +49,7 @@ const testReservationData: Reservation = {
 
 type TestProps = {
     users: User[];
-    mode: "create" | "edit";
+    mode: "create" | "update";
     eventStartTimestamp: number;
     table: { label: string };
     floor: { id: string };
@@ -103,7 +105,7 @@ describe("PlannedReservationForm", () => {
         } as any);
     });
 
-    it("emits 'create' event with correct payload on OK click in 'create' mode", async () => {
+    it("has correct data in 'create' mode", async () => {
         const wrapper = mountComponent();
 
         wrapper.vm.state.guestName = "John Doe";
@@ -116,69 +118,59 @@ describe("PlannedReservationForm", () => {
         wrapper.vm.state.reservedBy = { name: "Staff", email: "staff@example.com" };
         await wrapper.vm.$nextTick();
 
-        await wrapper.find(`button[data-test="ok-btn"]`).trigger("click");
-
         await flushPromises();
 
-        expect(wrapper.emitted().create).toBeTruthy();
-        expect(wrapper.emitted().create[0]).toEqual([
-            {
-                guestName: "John Doe",
-                numberOfGuests: 2,
-                guestContact: "1234567890",
-                reservationNote: "",
-                consumption: 1,
-                arrived: false,
-                reservationConfirmed: false,
-                time: "12:00",
-                reservedBy: { name: "Staff", email: "staff@example.com" },
-                creator: MOCK_USER,
-                floorId: "1",
-                tableLabel: "1",
-                cancelled: false,
-                status: ReservationStatus.ACTIVE,
-                type: ReservationType.PLANNED,
-            },
-        ]);
+        expect(wrapper.vm.state).toEqual({
+            guestName: "John Doe",
+            numberOfGuests: 2,
+            guestContact: "1234567890",
+            reservationNote: "",
+            consumption: 1,
+            arrived: false,
+            reservationConfirmed: false,
+            time: "12:00",
+            reservedBy: { name: "Staff", email: "staff@example.com" },
+            creator: MOCK_USER,
+            floorId: "1",
+            tableLabel: "1",
+            cancelled: false,
+            status: ReservationStatus.ACTIVE,
+            type: ReservationType.PLANNED,
+        });
     });
 
-    it("emits 'update' event with correct payload on OK click in 'edit' mode", async () => {
+    it("has correct data in 'update' mode", async () => {
         const wrapper = mountComponent({
-            mode: "edit",
+            mode: "update",
             reservationData: testReservationData,
         });
 
-        await wrapper.find(`button[data-test="ok-btn"]`).trigger("click");
-
         await flushPromises();
 
-        expect(wrapper.emitted().update).toBeTruthy();
-        expect(wrapper.emitted().update[0]).toEqual([
-            {
-                guestName: "John Doe",
-                numberOfGuests: 2,
-                guestContact: "1234567890",
-                reservationNote: "",
-                creator: MOCK_USER,
-                floorId: "1",
-                tableLabel: "1",
-                reservationConfirmed: false,
-                consumption: 1,
-                arrived: false,
-                time: "12:00",
-                reservedBy: { name: "Staff", email: "staff@example.com", id: "1" },
-                cancelled: false,
-                status: ReservationStatus.ACTIVE,
-                type: ReservationType.PLANNED,
-            },
-        ]);
+        expect(wrapper.vm.state).toEqual({
+            guestName: "John Doe",
+            numberOfGuests: 2,
+            guestContact: "1234567890",
+            reservationNote: "",
+            creator: MOCK_USER,
+            floorId: "1",
+            tableLabel: "1",
+            reservationConfirmed: false,
+            consumption: 1,
+            arrived: false,
+            time: "12:00",
+            reservedBy: { name: "Staff", email: "staff@example.com", id: "1" },
+            cancelled: false,
+            status: ReservationStatus.ACTIVE,
+            type: ReservationType.PLANNED,
+        });
     });
 
     it("validates minimal needed fields to be set", async () => {
         const wrapper = mountComponent();
 
-        // Trigger validation by clicking the OK button
-        await wrapper.find(`button[data-test="ok-btn"]`).trigger("click");
+        // Trigger validation
+        await wrapper.vm.reservationForm.validate();
         await flushPromises();
 
         {
@@ -190,8 +182,8 @@ describe("PlannedReservationForm", () => {
 
         await wrapper.find(`input[data-test="guest-name"]`).setValue("John Doe");
 
-        // Trigger validation by clicking the OK button
-        await wrapper.find(`button[data-test="ok-btn"]`).trigger("click");
+        // Trigger validation
+        await wrapper.vm.reservationForm.validate();
         await flushPromises();
 
         {
@@ -202,7 +194,7 @@ describe("PlannedReservationForm", () => {
         }
     });
 
-    it("emits correct data when minimal needed fields are set", async () => {
+    it("has correct data when minimal needed fields are set", async () => {
         const wrapper = mountComponent();
 
         // Set guest name and reservedBy fields
@@ -212,39 +204,36 @@ describe("PlannedReservationForm", () => {
         await radioButtons[1].trigger("click");
         await wrapper.vm.$nextTick();
 
-        // Trigger validation by clicking the OK button
-        await wrapper.find(`button[data-test="ok-btn"]`).trigger("click");
+        // Trigger validation
+        await wrapper.vm.reservationForm.validate();
         await flushPromises();
 
-        expect(wrapper.emitted().create).toBeTruthy();
-        expect(wrapper.emitted().create[0]).toEqual([
-            {
-                guestName: "John Doe",
-                arrived: false,
-                reservationConfirmed: false,
-                consumption: 1,
-                guestContact: "",
-                numberOfGuests: 2,
-                reservationNote: "",
-                reservedBy: {
-                    email: "social-0",
-                    name: "Whatsapp",
-                    id: "",
-                },
-                time: "00:00",
-                creator: MOCK_USER,
-                floorId: "1",
-                tableLabel: "1",
-                cancelled: false,
-                status: ReservationStatus.ACTIVE,
-                type: ReservationType.PLANNED,
+        expect(wrapper.vm.state).toEqual({
+            guestName: "John Doe",
+            arrived: false,
+            reservationConfirmed: false,
+            consumption: 1,
+            guestContact: "",
+            numberOfGuests: 2,
+            reservationNote: "",
+            reservedBy: {
+                email: "social-0",
+                name: "Whatsapp",
+                id: "",
             },
-        ]);
+            time: "00:00",
+            creator: MOCK_USER,
+            floorId: "1",
+            tableLabel: "1",
+            cancelled: false,
+            status: ReservationStatus.ACTIVE,
+            type: ReservationType.PLANNED,
+        });
     });
 
     it("initializes with correct state in 'edit' mode", () => {
         const wrapper = mountComponent({
-            mode: "edit",
+            mode: "update",
             reservationData: testReservationData,
         });
         expect(wrapper.vm.state).toEqual(testReservationData);
@@ -253,7 +242,7 @@ describe("PlannedReservationForm", () => {
     it("computes selectableOptions correctly", () => {
         const wrapper = mountComponent({
             users: [{ name: "test user", email: "test@mail.at" } as User],
-            mode: "edit",
+            mode: "update",
             reservationData: testReservationData,
         });
         expect(wrapper.vm.selectableOptions).toEqual([
@@ -261,14 +250,14 @@ describe("PlannedReservationForm", () => {
         ]);
     });
 
-    it("does not emit 'create' event if validation fails", async () => {
+    it("validation returns false if data not set properly", async () => {
         const wrapper = mountComponent({
             users: [{ name: "test user", email: "test@mail.at" } as User],
-            mode: "edit",
-            reservationData: testReservationData,
+            mode: "update",
+            // bad guestName
+            reservationData: { ...testReservationData, guestName: "" },
         });
-        await wrapper.find(`button[data-test="ok-btn"]`).trigger("click");
-        await flushPromises();
-        expect(wrapper.emitted().create).toBeFalsy();
+        const res = await wrapper.vm.reservationForm.validate();
+        expect(res).toBeFalsy();
     });
 });
