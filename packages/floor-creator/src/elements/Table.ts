@@ -96,6 +96,14 @@ export abstract class Table extends Group {
         this.reservation = reservation;
     }
 
+    setVIPStatus(isVIP: boolean): void {
+        this.shape.set({
+            shadow: isVIP ? "2px 2px 5px rgba(255, 215, 0, 0.7)" : "none",
+        });
+
+        this.canvas?.requestRenderAll();
+    }
+
     // @ts-expect-error -- ok
     toObject(): Record<string, unknown> {
         return {

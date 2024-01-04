@@ -80,7 +80,6 @@ export function useReservations(
         | undefined;
 
     watch([reservations, floorInstances], handleFloorUpdates, {
-        immediate: true,
         deep: true,
     });
 
@@ -133,6 +132,7 @@ export function useReservations(
 
     function setReservation(table: BaseTable, reservation: ReservationDoc): void {
         table.setReservation(reservation);
+        table.setVIPStatus(true);
         const fill = determineTableColor(reservation);
         if (fill) {
             table.setFill(fill);
