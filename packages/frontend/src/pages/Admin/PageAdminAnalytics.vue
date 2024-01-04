@@ -8,6 +8,7 @@ import FTCenteredText from "src/components/FTCenteredText.vue";
 import PieChart from "src/components/admin/analytics/PieChart.vue";
 import BarChart from "src/components/admin/analytics/BarChart.vue";
 import AdminEventReservationsByPerson from "src/components/admin/event/AdminEventReservationsByPerson.vue";
+import FTTabs from "src/components/FTTabs.vue";
 
 import { isPlannedReservation } from "@firetable/types";
 import { eventsCollection, reservationsCollection } from "@firetable/backend";
@@ -19,7 +20,6 @@ import { usePropertiesStore } from "src/stores/usePropertiesStore";
 import { format, subMonths } from "date-fns";
 import { getColors } from "src/helpers/colors";
 import { useAnalyticsStore } from "src/stores/analytics-store";
-import FTTabs from "src/components/FTTabs.vue";
 
 interface Props {
     organisationId: string;
