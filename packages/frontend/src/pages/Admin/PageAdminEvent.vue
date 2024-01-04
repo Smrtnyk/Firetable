@@ -11,7 +11,7 @@ import { useRouter } from "vue-router";
 import { formatEventDate } from "src/helpers/date-utils";
 
 import FTTitle from "src/components/FTTitle.vue";
-import AdminEventGeneralInfo from "src/components/admin/event/AdminEventGeneralInfo.vue";
+import AdminEventRTInfo from "src/components/admin/event/AdminEventRTInfo.vue";
 import AdminEventReservationsByPerson from "src/components/admin/event/AdminEventReservationsByPerson.vue";
 import AdminEventEditInfo from "src/components/admin/event/AdminEventEditInfo.vue";
 import AdminEventFloorViewer from "src/components/admin/event/AdminEventFloorViewer.vue";
@@ -206,7 +206,7 @@ onMounted(init);
         <q-tab-panels v-model="tab" animated transition-next="fade" transition-prev="fade">
             <!-- General info with charts area -->
             <q-tab-panel name="info" class="q-pa-xs-sm q-pa-md-md">
-                <AdminEventGeneralInfo :reservations-status="reservationsStatus" />
+                <AdminEventRTInfo :reservations-status="reservationsStatus" />
                 <q-separator class="q-my-sm bg-grey-6" />
                 <AdminEventReservationsByPerson :reservations="allPlannedReservations" />
                 <q-separator class="q-my-sm bg-grey-6" />
