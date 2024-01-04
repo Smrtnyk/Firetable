@@ -8,6 +8,7 @@ import { QForm } from "quasar";
 import { greaterThanZero, optionalMinLength, requireNumber } from "src/helpers/form-rules";
 import { useAuthStore } from "src/stores/auth-store";
 import { getFirestoreTimestamp } from "@firetable/backend";
+import { hourFromTimestamp } from "src/helpers/date-utils";
 
 const props = defineProps<{
     mode: "create" | "edit";
@@ -27,29 +28,38 @@ const { t } = useI18n();
 const authStore = useAuthStore();
 
 const initialState =
-    props.mode === "edit" && props.reservationData
-        ? props.reservationData
-        : {
-              type: ReservationType.WALK_IN as const,
-              guestName: null,
-              numberOfGuests: 2,
-              guestContact: "",
-              reservationNote: "",
-              consumption: 0,
-              arrived: true as const,
-              time: "00:00",
-              creator: {
-                  name: authStore.user!.name,
-                  email: authStore.user!.email,
-                  id: authStore.user!.id,
-                  createdAt: getFirestoreTimestamp(),
-              },
-              tableLabel: props.table.label,
-              floorId: props.floor.id,
-              status: ReservationStatus.ACTIVE,
-          };
+    props.mode === "edit" && props.reservationData ? props.reservationData : generateInitialState();
 const state = reactive<WalkInReservation>(initialState);
 const reservationForm = ref<QForm | null>(null);
+
+function generateInitialState(): WalkInReservation {
+    const eventStart = props.eventStartTimestamp;
+    const now = Date.now();
+    // Set the initial time to either the current hour or the event start hour
+    const initialTime = now > eventStart ? now : eventStart;
+    // Format the time as a string "HH:MM"
+    const formattedTime = hourFromTimestamp(initialTime, null);
+
+    return {
+        type: ReservationType.WALK_IN as const,
+        guestName: null,
+        numberOfGuests: 2,
+        guestContact: "",
+        reservationNote: "",
+        consumption: 0,
+        arrived: true as const,
+        time: formattedTime,
+        creator: {
+            name: authStore.user!.name,
+            email: authStore.user!.email,
+            id: authStore.user!.id,
+            createdAt: getFirestoreTimestamp(),
+        },
+        tableLabel: props.table.label,
+        floorId: props.floor.id,
+        status: ReservationStatus.ACTIVE,
+    };
+}
 
 function options(hr: number, min: number | null = 0): boolean {
     // Calculate the event start and end times based on the eventStartTimestamp in UTC
