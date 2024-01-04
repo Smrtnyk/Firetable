@@ -5,6 +5,7 @@ import { useAuthStore } from "src/stores/auth-store";
 import { fetchUsersByRole } from "@firetable/backend";
 import { storeToRefs } from "pinia";
 import { usePropertiesStore } from "src/stores/usePropertiesStore";
+import { showErrorMessage } from "src/helpers/ui-helpers";
 
 export function useUsers(organisationId: string) {
     const { properties } = storeToRefs(usePropertiesStore());
@@ -29,6 +30,8 @@ export function useUsers(organisationId: string) {
                     await fetchUsersByRole([...new Set(relatedIds)], authStore.user!.organisationId)
                 ).data;
             }
+        } catch (error) {
+            showErrorMessage(error);
         } finally {
             isLoading.value = false;
         }
