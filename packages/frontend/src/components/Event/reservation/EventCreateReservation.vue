@@ -126,7 +126,7 @@ async function onOKClick(): Promise<void> {
         <q-btn
             rounded
             size="md"
-            class="button-gradient"
+            class="button-gradient q-mt-md"
             @click="onOKClick"
             :label="t(`EventCreateReservation.reservationCreateBtn`)"
             data-test="ok-btn"
