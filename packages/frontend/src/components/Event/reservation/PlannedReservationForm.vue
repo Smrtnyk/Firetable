@@ -58,6 +58,7 @@ const initialState =
               tableLabel: props.table.label,
               floorId: props.floor.id,
               status: ReservationStatus.ACTIVE,
+              isVIP: false,
           };
 const state = reactive<PlannedReservation>(initialState);
 const reservationForm = ref<QForm | null>(null);

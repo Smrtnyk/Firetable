@@ -45,6 +45,7 @@ const testReservationData: Reservation = {
     },
     status: ReservationStatus.ACTIVE,
     type: ReservationType.PLANNED,
+    isVIP: false,
 };
 
 type TestProps = {
@@ -136,6 +137,7 @@ describe("PlannedReservationForm", () => {
             cancelled: false,
             status: ReservationStatus.ACTIVE,
             type: ReservationType.PLANNED,
+            isVIP: false,
         });
     });
 
@@ -163,6 +165,7 @@ describe("PlannedReservationForm", () => {
             cancelled: false,
             status: ReservationStatus.ACTIVE,
             type: ReservationType.PLANNED,
+            isVIP: false,
         });
     });
 
@@ -228,6 +231,7 @@ describe("PlannedReservationForm", () => {
             cancelled: false,
             status: ReservationStatus.ACTIVE,
             type: ReservationType.PLANNED,
+            isVIP: false,
         });
     });
 

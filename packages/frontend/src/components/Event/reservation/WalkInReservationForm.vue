@@ -59,6 +59,7 @@ function generateInitialState(): WalkInReservation {
         tableLabel: props.table.label,
         floorId: props.floor.id,
         status: ReservationStatus.ACTIVE,
+        isVIP: false,
     };
 }
 

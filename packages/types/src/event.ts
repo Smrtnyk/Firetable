@@ -79,6 +79,7 @@ interface BaseReservation {
     clearedAt?: Timestamp;
     creator: UserIdentifier & { createdAt: Timestamp };
     status: ReservationStatus;
+    isVIP: boolean;
 }
 
 export interface WalkInReservation extends BaseReservation {
