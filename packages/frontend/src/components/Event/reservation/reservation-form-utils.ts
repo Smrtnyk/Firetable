@@ -1,7 +1,7 @@
 export function getReservationTimeOptions(
+    eventStartTimestamp: number,
     hr: number,
     min: number | null = 0,
-    eventStartTimestamp: number,
 ): boolean {
     // Calculate the event start and end times based on the eventStartTimestamp in UTC
     const eventStart = new Date(eventStartTimestamp);

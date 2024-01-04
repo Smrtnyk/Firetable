@@ -119,7 +119,11 @@ defineExpose({
             <template #append>
                 <q-icon name="clock" class="cursor-pointer" />
                 <q-popup-proxy transition-show="scale" transition-hide="scale">
-                    <q-time :options="getReservationTimeOptions" v-model="state.time" format24h>
+                    <q-time
+                        :options="getReservationTimeOptions.bind(null, props.eventStartTimestamp)"
+                        v-model="state.time"
+                        format24h
+                    >
                         <div class="row items-center justify-end">
                             <q-btn
                                 :label="t('EventCreateForm.inputDateTimePickerCloseBtnLabel')"
