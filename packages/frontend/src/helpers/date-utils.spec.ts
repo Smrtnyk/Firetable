@@ -18,7 +18,7 @@ describe("Date Formatting Functions", () => {
         test("formats correctly with null time zone", () => {
             const formattedDate = formatEventDate(testTimestamp, null);
             // The expected result here should match the local time zone of the test environment
-            // Since this can vary, you might want to check for non-null or valid string output
+            // Since this can vary, we might want to check for non-null or valid string output
             expect(formattedDate).not.toBeNull();
             expect(typeof formattedDate).toBe("string");
         });
@@ -37,7 +37,7 @@ describe("Date Formatting Functions", () => {
 
         test("formats date correctly with null time zone", () => {
             const formattedDate = dateFromTimestamp(testTimestamp, null);
-            // Check for non-null or valid string output
+            // Check for non-null and valid string output
             expect(formattedDate).not.toBeNull();
             expect(typeof formattedDate).toBe("string");
         });
@@ -56,9 +56,15 @@ describe("Date Formatting Functions", () => {
 
         test("formats hour correctly with null time zone", () => {
             const formattedTime = hourFromTimestamp(testTimestamp, null);
-            // Check for non-null or valid string output
+            // Check for non-null and valid string output
             expect(formattedTime).not.toBeNull();
             expect(typeof formattedTime).toBe("string");
+        });
+
+        test("formats boundary time correctly in UTC", () => {
+            const boundaryTimestamp = new Date("2024-01-01T00:00:00Z").getTime();
+            const formattedTime = hourFromTimestamp(boundaryTimestamp, "UTC");
+            expect(formattedTime).toBe("00:00"); // Beginning of the day
         });
     });
 });
