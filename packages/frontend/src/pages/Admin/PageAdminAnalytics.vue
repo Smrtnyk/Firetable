@@ -28,7 +28,7 @@ const properties = computed(() => {
 });
 const selectedTab = ref("");
 const {
-    reservations,
+    reservationBuckets,
     selectedMonth,
     selectedDay,
     reservationsByActiveProperty,
@@ -86,7 +86,7 @@ const avgGuestsPerReservation = computed<AverageGuestsData>(() => {
 
 const reservationsByProperty = computed<TimeSeriesData>(() => {
     const propertyTotals: Record<string, number> = {};
-    reservations.value.forEach(({ propertyName, reservations: res }) => {
+    reservationBuckets.value.forEach(({ propertyName, plannedReservations: res }) => {
         propertyTotals[propertyName] = res.length;
     });
 
@@ -265,7 +265,7 @@ const reservationsByDayOfWeek = computed<TimeSeriesData>(() => {
             standout
         />
 
-        <div v-if="reservations.length > 0">
+        <div v-if="reservationBuckets.length > 0">
             <BarChart :chart-data="reservationsByProperty" chart-title="Reservations by Property" />
             <FTTabs v-model="selectedTab">
                 <q-tab
@@ -278,7 +278,7 @@ const reservationsByDayOfWeek = computed<TimeSeriesData>(() => {
 
             <q-tab-panels v-model="selectedTab" animated>
                 <q-tab-panel
-                    v-for="bucket in reservations"
+                    v-for="bucket in reservationBuckets"
                     :key="bucket.propertyName"
                     :name="bucket.propertyId"
                 >

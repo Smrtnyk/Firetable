@@ -50,12 +50,12 @@ export type PlannedReservationDoc = PlannedReservation & {
     _doc: QueryDocumentSnapshot<PlannedReservation>;
 };
 
-export type AdHocReservationDoc = WalkInReservation & {
+export type WalkInReservationDoc = WalkInReservation & {
     id: string;
     _doc: QueryDocumentSnapshot<WalkInReservation>;
 };
 
-export type ReservationDoc = PlannedReservationDoc | AdHocReservationDoc;
+export type ReservationDoc = PlannedReservationDoc | WalkInReservationDoc;
 
 type UserIdentifier = Pick<User, "name" | "email" | "id">;
 
