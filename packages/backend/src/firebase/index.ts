@@ -5,4 +5,5 @@ export * from "./db-events.js";
 export * from "./db-floors.js";
 export * from "./db-properties.js";
 export * from "./db-organisations.js";
+export * from "./db-analytics.js";
 export * from "./paths.js";

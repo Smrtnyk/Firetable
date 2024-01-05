@@ -1,13 +1,5 @@
-import type { PlannedReservationDoc } from "@firetable/types";
+import type { ReservationBucket } from "@firetable/backend";
 import { defineStore } from "pinia";
-
-export type AugmentedReservation = PlannedReservationDoc & { date: number };
-
-export interface ReservationBucket {
-    propertyName: string;
-    propertyId: string;
-    reservations: AugmentedReservation[];
-}
 
 interface ReservationsState {
     dataCache: Record<string, ReservationBucket[]>;
