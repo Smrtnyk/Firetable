@@ -31,8 +31,8 @@ const {
     reservationBuckets,
     selectedMonth,
     selectedDay,
-    reservationsByActiveProperty,
-    reservationsByDay,
+    plannedReservationsByActiveProperty,
+    plannedReservationsByDay,
 } = useReservationsAnalytics(properties, props.organisationId, selectedTab);
 
 const monthOptions = computed(() => {
@@ -51,7 +51,7 @@ const confirmedVsUnconfirmed = computed((): PieChartData => {
     let confirmed = 0;
     let unconfirmed = 0;
 
-    reservationsByActiveProperty.value.forEach((reservation) => {
+    plannedReservationsByActiveProperty.value.forEach((reservation) => {
         if (reservation.arrived) {
             confirmed++;
         } else {
@@ -75,7 +75,7 @@ type AverageGuestsData = { averageGuests: number };
 const avgGuestsPerReservation = computed<AverageGuestsData>(() => {
     let totalGuests = 0;
     let totalReservations = 0;
-    reservationsByActiveProperty.value.forEach(({ numberOfGuests }) => {
+    plannedReservationsByActiveProperty.value.forEach(({ numberOfGuests }) => {
         totalGuests += Number(numberOfGuests);
         totalReservations++;
     });
@@ -84,7 +84,7 @@ const avgGuestsPerReservation = computed<AverageGuestsData>(() => {
     return { averageGuests: avg };
 });
 
-const reservationsByProperty = computed<TimeSeriesData>(() => {
+const plannedReservationsByProperty = computed<TimeSeriesData>(() => {
     const propertyTotals: Record<string, number> = {};
     reservationBuckets.value.forEach(({ propertyName, plannedReservations: res }) => {
         propertyTotals[propertyName] = res.length;
@@ -112,7 +112,7 @@ const reservationsByProperty = computed<TimeSeriesData>(() => {
 const peakReservationHours = computed<TimeSeriesData>(() => {
     const hourlyTotals: Record<string, number> = {};
 
-    reservationsByActiveProperty.value.forEach((reservation) => {
+    plannedReservationsByActiveProperty.value.forEach((reservation) => {
         const hour = reservation.time.split(":")[0]; // Assuming 'time' is like "14:00"
         hourlyTotals[hour] = (hourlyTotals[hour] || 0) + 1;
     });
@@ -144,7 +144,7 @@ const consumptionAnalysisCombined = computed(() => {
     let confirmedCount = 0;
     let unconfirmedCount = 0;
 
-    reservationsByActiveProperty.value.forEach((reservation) => {
+    plannedReservationsByActiveProperty.value.forEach((reservation) => {
         const consumption = Number(reservation.consumption);
         totalConsumption += consumption;
         if (reservation.arrived) {
@@ -190,7 +190,7 @@ const consumptionAnalysisCombined = computed(() => {
 const guestDistributionAnalysis = computed<TimeSeriesData>(() => {
     const distribution: Record<string, number> = {};
 
-    reservationsByActiveProperty.value.forEach(({ numberOfGuests }) => {
+    plannedReservationsByActiveProperty.value.forEach(({ numberOfGuests }) => {
         const key = numberOfGuests.toString();
         distribution[key] = (distribution[key] || 0) + 1;
     });
@@ -226,7 +226,7 @@ const reservationsByDayOfWeek = computed<TimeSeriesData>(() => {
         "Sunday",
     ];
 
-    reservationsByActiveProperty.value.forEach((reservation) => {
+    plannedReservationsByActiveProperty.value.forEach((reservation) => {
         const utcDate = new Date(reservation.date);
         const localDate = new Date(utcDate.getTime() + utcDate.getTimezoneOffset() * 60000);
         const dayOfWeek = format(localDate, "EEEE");
@@ -266,7 +266,10 @@ const reservationsByDayOfWeek = computed<TimeSeriesData>(() => {
         />
 
         <div v-if="reservationBuckets.length > 0">
-            <BarChart :chart-data="reservationsByProperty" chart-title="Reservations by Property" />
+            <BarChart
+                :chart-data="plannedReservationsByProperty"
+                chart-title="Reservations by Property"
+            />
             <FTTabs v-model="selectedTab">
                 <q-tab
                     v-for="property in properties"
@@ -296,7 +299,7 @@ const reservationsByDayOfWeek = computed<TimeSeriesData>(() => {
                         <div class="col-12 q-my-md">
                             <FTTabs v-model="selectedDay">
                                 <q-tab
-                                    v-for="day in [...Object.keys(reservationsByDay), 'ALL']"
+                                    v-for="day in [...Object.keys(plannedReservationsByDay), 'ALL']"
                                     :key="day"
                                     :name="day"
                                     :label="day"
@@ -307,8 +310,8 @@ const reservationsByDayOfWeek = computed<TimeSeriesData>(() => {
                                 <q-tab-panel
                                     class="q-pa-none"
                                     v-for="(reservations, day) in {
-                                        ...reservationsByDay,
-                                        ALL: reservationsByActiveProperty,
+                                        ...plannedReservationsByDay,
+                                        ALL: plannedReservationsByActiveProperty,
                                     }"
                                     :key="day"
                                     :name="day"

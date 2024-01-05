@@ -28,16 +28,16 @@ export function useReservationsAnalytics(
     const selectedMonth = ref(format(new Date(), SELECTED_MONTH_FORMAT));
     const selectedDay = ref(DEFAULT_SELECTED_DAY);
 
-    const reservationsByActiveProperty = computed<AugmentedPlannedReservation[]>(() => {
+    const plannedReservationsByActiveProperty = computed<AugmentedPlannedReservation[]>(() => {
         return reservationBuckets.value
             .filter((bucket) => bucket.propertyId === selectedTab.value)
             .flatMap((bucket) => bucket.plannedReservations);
     });
 
-    const reservationsByDay = computed(() => {
+    const plannedReservationsByDay = computed(() => {
         const dayBucket: Record<string, AugmentedPlannedReservation[]> = {};
 
-        reservationsByActiveProperty.value.forEach((reservation) => {
+        plannedReservationsByActiveProperty.value.forEach((reservation) => {
             const date = new Date(reservation.date);
             const dayIndex = date.getUTCDay();
             const dayName = daysOfWeek[dayIndex];
@@ -146,7 +146,7 @@ export function useReservationsAnalytics(
             analyticsStore.cacheData(cacheKey, reservationBuckets.value);
 
             // Set the active tab to the first day with reservations
-            const firstDayWithReservations = Object.keys(reservationsByDay.value)[0];
+            const firstDayWithReservations = Object.keys(plannedReservationsByDay.value)[0];
             if (firstDayWithReservations) {
                 selectedDay.value = firstDayWithReservations;
             }
@@ -159,8 +159,8 @@ export function useReservationsAnalytics(
 
     return {
         reservationBuckets,
-        reservationsByActiveProperty,
-        reservationsByDay,
+        plannedReservationsByActiveProperty,
+        plannedReservationsByDay,
         selectedMonth,
         selectedDay,
     };
