@@ -266,55 +266,6 @@ export function useReservationsAnalytics(
         stopWatch();
     });
 
-    function bucketize(
-        events: EventDoc[],
-        fetchedReservations: ReservationDoc[],
-    ): ReservationBucket[] {
-        const buckets: Record<string, ReservationBucket> = {};
-
-        events.forEach((event) => {
-            fetchedReservations.forEach((reservation) => {
-                // TODO: include cancelled reservations in analytics
-                if (isPlannedReservation(reservation) && reservation.cancelled) {
-                    return;
-                }
-
-                if (!buckets[event.propertyId]) {
-                    const propertyName = properties.value.find(function ({ id }) {
-                        return id === event.propertyId;
-                    })?.name;
-
-                    if (!propertyName) {
-                        return;
-                    }
-
-                    buckets[event.propertyId] = {
-                        propertyId: event.propertyId,
-                        propertyName,
-                        plannedReservations: [],
-                        walkInReservations: [],
-                    };
-                }
-
-                const reservationData: AugmentedPlannedReservation | AugmentedWalkInReservation = {
-                    ...reservation,
-                    id: reservation.id,
-                    date: event.date,
-                };
-
-                if (isPlannedReservation(reservationData)) {
-                    buckets[event.propertyId]?.plannedReservations.push(reservationData);
-                }
-
-                if (isAWalkInReservation(reservationData)) {
-                    buckets[event.propertyId]?.walkInReservations.push(reservationData);
-                }
-            });
-        });
-
-        return Object.values(buckets);
-    }
-
     async function fetchData(): Promise<void> {
         const monthKey = selectedMonth.value;
         const cacheKey = monthKey + organisationId;
@@ -337,7 +288,11 @@ export function useReservationsAnalytics(
                 properties.value,
             );
 
-            reservationBuckets.value = bucketize(fetchedData.events, fetchedData.reservations);
+            reservationBuckets.value = bucketize(
+                fetchedData.events,
+                fetchedData.reservations,
+                properties.value,
+            );
             analyticsStore.cacheData(cacheKey, reservationBuckets.value);
 
             // Set the active tab to the first day with reservations
@@ -366,4 +321,54 @@ export function useReservationsAnalytics(
         guestDistributionAnalysis,
         reservationsByDayOfWeek,
     };
+}
+
+function bucketize(
+    events: EventDoc[],
+    fetchedReservations: ReservationDoc[],
+    properties: PropertyDoc[],
+): ReservationBucket[] {
+    const buckets: Record<string, ReservationBucket> = {};
+
+    events.forEach((event) => {
+        fetchedReservations.forEach((reservation) => {
+            // TODO: include cancelled reservations in analytics
+            if (isPlannedReservation(reservation) && reservation.cancelled) {
+                return;
+            }
+
+            if (!buckets[event.propertyId]) {
+                const propertyName = properties.find(function ({ id }) {
+                    return id === event.propertyId;
+                })?.name;
+
+                if (!propertyName) {
+                    return;
+                }
+
+                buckets[event.propertyId] = {
+                    propertyId: event.propertyId,
+                    propertyName,
+                    plannedReservations: [],
+                    walkInReservations: [],
+                };
+            }
+
+            const reservationData: AugmentedPlannedReservation | AugmentedWalkInReservation = {
+                ...reservation,
+                id: reservation.id,
+                date: event.date,
+            };
+
+            if (isPlannedReservation(reservationData)) {
+                buckets[event.propertyId].plannedReservations.push(reservationData);
+            }
+
+            if (isAWalkInReservation(reservationData)) {
+                buckets[event.propertyId].walkInReservations.push(reservationData);
+            }
+        });
+    });
+
+    return Object.values(buckets);
 }
