@@ -23,7 +23,7 @@ interface Props {
 interface ReservationObject {
     name: string;
     reservations: number;
-    confirmed: number;
+    arrived: number;
 }
 
 type Res = Record<string, ReservationObject>;
@@ -51,7 +51,7 @@ Chart.register(
 let chartInstance: Chart | undefined;
 const tableColumns = [
     { name: "name", required: true, label: "Name", align: "left", field: "name", sortable: true },
-    { name: "confirmed", label: "Arrived", field: "confirmed", sortable: true },
+    { name: "arrived", label: "Arrived", field: "arrived", sortable: true },
     { name: "pending", label: "Pending", field: "pending", sortable: true },
     { name: "total", label: "Total", field: "total", sortable: true },
 ];
@@ -65,14 +65,14 @@ const chartData = computed(() => {
 });
 const tableData = computed(() => {
     const { labels, datasets } = chartData.value;
-    const confirmedData = datasets.find((dataset) => dataset.label === "Confirmed").data;
-    const unconfirmedData = datasets.find((dataset) => dataset.label === "Unconfirmed").data;
+    const arrivedData = datasets.find((dataset) => dataset.label === "Arrived").data;
+    const pendingData = datasets.find((dataset) => dataset.label === "Pending").data;
 
     return labels.map((label, index) => ({
         name: label,
-        confirmed: confirmedData[index],
-        pending: unconfirmedData[index],
-        total: confirmedData[index] + unconfirmedData[index],
+        arrived: arrivedData[index],
+        pending: pendingData[index],
+        total: arrivedData[index] + pendingData[index],
     }));
 });
 
@@ -101,28 +101,30 @@ function reservationsReducer(acc: Res, reservation: PlannedReservationDoc): Res 
         acc[hash] = {
             name,
             reservations: 1,
-            confirmed: 0,
+            arrived: 0,
         };
     }
-    if (arrived) acc[hash].confirmed++;
+    if (arrived) {
+        acc[hash].arrived++;
+    }
     return acc;
 }
 
 function generateStackedChartData(reservations: PlannedReservationDoc[]): ChartData {
     const data = reservations.reduce(reservationsReducer, {});
     const labels: string[] = [];
-    const confirmedCounts: number[] = [];
-    const unconfirmedCounts: number[] = [];
+    const arrivedCounts: number[] = [];
+    const pendingCounts: number[] = [];
 
     Object.values(data).forEach((entry) => {
         labels.push(entry.name);
-        confirmedCounts.push(entry.confirmed);
-        unconfirmedCounts.push(entry.reservations - entry.confirmed); // Calculate unconfirmed
+        arrivedCounts.push(entry.arrived);
+        pendingCounts.push(entry.reservations - entry.arrived);
     });
 
-    const unconfirmedDataset = {
-        label: "Unconfirmed",
-        data: unconfirmedCounts,
+    const pendingDataset = {
+        label: "Pending",
+        data: pendingCounts,
         backgroundColor: "rgba(0, 123, 255, 0.5)",
         borderColor: "rgba(0, 123, 255, 1)",
         borderWidth: 1,
@@ -130,9 +132,9 @@ function generateStackedChartData(reservations: PlannedReservationDoc[]): ChartD
         stack: "bar-stacked",
     };
 
-    const confirmedDataset = {
-        label: "Confirmed",
-        data: confirmedCounts,
+    const arrivedDataset = {
+        label: "Arrived",
+        data: arrivedCounts,
         backgroundColor: "rgba(40, 167, 69, 0.5)",
         borderColor: "rgba(40, 167, 69, 1)",
         borderWidth: 1,
@@ -140,7 +142,7 @@ function generateStackedChartData(reservations: PlannedReservationDoc[]): ChartD
         stack: "bar-stacked",
     };
 
-    return { labels, datasets: [unconfirmedDataset, confirmedDataset] };
+    return { labels, datasets: [pendingDataset, arrivedDataset] };
 }
 
 function destroyChartIfExists(): void {
