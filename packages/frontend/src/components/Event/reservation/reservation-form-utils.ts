@@ -4,11 +4,9 @@ export function getReservationTimeOptions(
     hr: number,
     min: number | null = 0,
 ): boolean {
-    // Calculate the event start and end times based on the eventStartTimestamp in UTC
     const eventStart = new Date(eventStartTimestamp);
-    const eventEnd = new Date(eventStartTimestamp + eventDuration * 3600 * 1000); // Add 8 hours
+    const eventEnd = new Date(eventStartTimestamp + eventDuration * 3600 * 1000);
 
-    // Create a date object for the current day in UTC with the hour and minute from the time picker
     const currentDate = new Date(Date.now());
     const currentTime = new Date(
         Date.UTC(
@@ -22,21 +20,23 @@ export function getReservationTimeOptions(
         ),
     );
 
-    // If the current UTC time is before the event start time and the event starts late in the day (e.g., after 16:00 UTC),
-    // assume the time picker is selecting a time for the next day
-    if (currentTime.getUTCHours() < eventStart.getUTCHours() && eventStart.getUTCHours() > 16) {
+    // Check if the event spans across midnight
+    const spansAcrossMidnight =
+        eventEnd.getUTCHours() + eventEnd.getUTCMinutes() / 60 <
+        eventStart.getUTCHours() + eventStart.getUTCMinutes() / 60;
+
+    // Adjust the current time to the next day if needed
+    if (spansAcrossMidnight && currentTime < eventStart) {
         currentTime.setUTCDate(currentTime.getUTCDate() + 1);
     }
 
-    // Convert event start and end times to hours since the start of the day in UTC
+    // Convert times to hours since the start of the day in UTC
     const eventStartHours = eventStart.getUTCHours() + eventStart.getUTCMinutes() / 60;
     const eventEndHours = eventEnd.getUTCHours() + eventEnd.getUTCMinutes() / 60;
-
-    // Convert current time to hours since the start of the day in UTC
     const currentTimeHours = currentTime.getUTCHours() + currentTime.getUTCMinutes() / 60;
 
-    // We need to handle the case where the end time is on the next day
-    if (eventEndHours < eventStartHours) {
+    // Determine if the current time is within the event duration
+    if (spansAcrossMidnight) {
         return currentTimeHours >= eventStartHours || currentTimeHours <= eventEndHours;
     }
     return currentTimeHours >= eventStartHours && currentTimeHours <= eventEndHours;
