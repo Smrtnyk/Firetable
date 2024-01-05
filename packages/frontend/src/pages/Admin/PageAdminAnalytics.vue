@@ -12,7 +12,7 @@ import { computed, ref } from "vue";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { format, subMonths } from "date-fns";
 import { getColors } from "src/helpers/colors";
-import { useReservationsAnalytics } from "src/composables/useReservationsAnalytics";
+import { DAYS_OF_WEEK, useReservationsAnalytics } from "src/composables/useReservationsAnalytics";
 import { storeToRefs } from "pinia";
 
 interface Props {
@@ -216,15 +216,6 @@ const guestDistributionAnalysis = computed<TimeSeriesData>(() => {
 
 const reservationsByDayOfWeek = computed<TimeSeriesData>(() => {
     const dayOfWeekTotals: Record<string, number> = {};
-    const daysOfWeek = [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
-    ];
 
     plannedReservationsByActiveProperty.value.forEach((reservation) => {
         const utcDate = new Date(reservation.date);
@@ -234,11 +225,11 @@ const reservationsByDayOfWeek = computed<TimeSeriesData>(() => {
         dayOfWeekTotals[dayOfWeek] = (dayOfWeekTotals[dayOfWeek] || 0) + 1;
     });
 
-    const { backgroundColors, borderColors } = getColors(daysOfWeek.length);
+    const { backgroundColors, borderColors } = getColors(DAYS_OF_WEEK.length);
 
-    const data = daysOfWeek.map((day) => dayOfWeekTotals[day] || 0);
+    const data = DAYS_OF_WEEK.map((day) => dayOfWeekTotals[day] || 0);
     return {
-        labels: daysOfWeek,
+        labels: DAYS_OF_WEEK,
         datasets: [
             {
                 label: "Reservations by Day of Week",

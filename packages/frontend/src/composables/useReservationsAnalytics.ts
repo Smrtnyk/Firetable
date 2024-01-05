@@ -14,7 +14,15 @@ import { showErrorMessage } from "src/helpers/ui-helpers";
 import { format } from "date-fns";
 import { useAnalyticsStore } from "src/stores/analytics-store";
 
-const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+export const DAYS_OF_WEEK = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+];
 const DEFAULT_SELECTED_DAY = "ALL";
 const SELECTED_MONTH_FORMAT = "yyyy-MM";
 
@@ -40,7 +48,7 @@ export function useReservationsAnalytics(
         plannedReservationsByActiveProperty.value.forEach((reservation) => {
             const date = new Date(reservation.date);
             const dayIndex = date.getUTCDay();
-            const dayName = daysOfWeek[dayIndex];
+            const dayName = DAYS_OF_WEEK[dayIndex];
 
             if (!dayBucket[dayName]) {
                 dayBucket[dayName] = [];
