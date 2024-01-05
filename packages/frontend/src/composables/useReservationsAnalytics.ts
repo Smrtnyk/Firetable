@@ -1,6 +1,7 @@
-import type { PropertyDoc } from "@firetable/types";
+import type { EventDoc, PropertyDoc, ReservationDoc } from "@firetable/types";
 import type { Ref } from "vue";
-import type { AugmentedReservation, ReservationBucket } from "@firetable/backend";
+import type { AugmentedReservation, ReservationBucket } from "src/stores/analytics-store";
+import { isPlannedReservation } from "@firetable/types";
 
 import { fetchAnalyticsData } from "@firetable/backend";
 import { onUnmounted, watch, computed, ref } from "vue";
@@ -9,16 +10,19 @@ import { showErrorMessage } from "src/helpers/ui-helpers";
 import { format } from "date-fns";
 import { useAnalyticsStore } from "src/stores/analytics-store";
 
+const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const DEFAULT_SELECTED_DAY = "ALL";
+const SELECTED_MONTH_FORMAT = "yyyy-MM";
+
 export function useReservationsAnalytics(
     properties: Ref<PropertyDoc[]>,
     organisationId: string,
     selectedTab: Ref<string>,
 ) {
     const analyticsStore = useAnalyticsStore();
-
     const reservations = ref<ReservationBucket[]>([]);
-    const selectedMonth = ref(format(new Date(), "yyyy-MM"));
-    const selectedDay = ref("ALL");
+    const selectedMonth = ref(format(new Date(), SELECTED_MONTH_FORMAT));
+    const selectedDay = ref(DEFAULT_SELECTED_DAY);
 
     const reservationsByActiveProperty = computed<AugmentedReservation[]>(() => {
         return reservations.value
@@ -27,15 +31,6 @@ export function useReservationsAnalytics(
     });
 
     const reservationsByDay = computed(() => {
-        const daysOfWeek = [
-            "Sunday",
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday",
-        ];
         const dayBucket: Record<string, AugmentedReservation[]> = {};
 
         reservationsByActiveProperty.value.forEach((reservation) => {
@@ -72,6 +67,52 @@ export function useReservationsAnalytics(
         stopWatch();
     });
 
+    function bucketize(
+        events: EventDoc[],
+        fetchedReservations: ReservationDoc[],
+    ): ReservationBucket[] {
+        const buckets: Record<string, ReservationBucket> = {};
+
+        events.forEach((event) => {
+            fetchedReservations.forEach((reservation) => {
+                if (!isPlannedReservation(reservation)) {
+                    return;
+                }
+
+                const reservationData = {
+                    ...reservation,
+                    id: reservation.id,
+                    date: event.date,
+                } as AugmentedReservation;
+
+                // TODO: include cancelled reservations in analytics
+                if (reservationData.cancelled) {
+                    return;
+                }
+
+                if (!buckets[event.propertyId]) {
+                    const propertyName = properties.value.find(function ({ id }) {
+                        return id === event.propertyId;
+                    })?.name;
+
+                    if (!propertyName) {
+                        return;
+                    }
+
+                    buckets[event.propertyId] = {
+                        propertyId: event.propertyId,
+                        propertyName,
+                        reservations: [],
+                    };
+                }
+
+                buckets[event.propertyId]?.reservations.push(reservationData);
+            });
+        });
+
+        return Object.values(buckets);
+    }
+
     async function fetchData(): Promise<void> {
         const monthKey = selectedMonth.value;
         const cacheKey = monthKey + organisationId;
@@ -93,9 +134,9 @@ export function useReservationsAnalytics(
                 organisationId,
                 properties.value,
             );
-            reservations.value = fetchedData;
 
-            analyticsStore.cacheData(cacheKey, fetchedData);
+            reservations.value = bucketize(fetchedData.events, fetchedData.reservations);
+            analyticsStore.cacheData(cacheKey, reservations.value);
 
             // Set the active tab to the first day with reservations
             const firstDayWithReservations = Object.keys(reservationsByDay.value)[0];

@@ -1,37 +1,24 @@
-import type {
-    EventDoc,
-    PlannedReservationDoc,
-    PropertyDoc,
-    ReservationDoc,
-} from "@firetable/types";
+import type { EventDoc, PropertyDoc, ReservationDoc } from "@firetable/types";
 import { eventsCollection, reservationsCollection } from "./db.js";
-import { isPlannedReservation } from "@firetable/types";
 import { getDocs, query, where } from "firebase/firestore";
-
-export type AugmentedReservation = PlannedReservationDoc & { date: number };
-
-export interface ReservationBucket {
-    propertyName: string;
-    propertyId: string;
-    reservations: AugmentedReservation[];
-}
 
 export async function fetchAnalyticsData(
     monthKey: string,
     organisationId: string,
     properties: PropertyDoc[],
-): Promise<ReservationBucket[]> {
+): Promise<{ reservations: ReservationDoc[]; events: EventDoc[] }> {
     const allEvents = await getEventsForProperties(properties, monthKey, organisationId);
-    return getReservationFromEvents(allEvents, organisationId, properties);
+    return {
+        events: allEvents,
+        reservations: await getReservationFromEvents(allEvents, organisationId),
+    };
 }
 
 async function getReservationFromEvents(
     events: EventDoc[],
     organisationId: string,
-    properties: PropertyDoc[],
-): Promise<ReservationBucket[]> {
-    const buckets: Record<string, ReservationBucket> = {};
-
+): Promise<ReservationDoc[]> {
+    const reservations: ReservationDoc[] = [];
     await Promise.all(
         events.map(async (event) => {
             const eventReservations = await getDocs(
@@ -46,38 +33,12 @@ async function getReservationFromEvents(
 
             eventReservations.docs.forEach((doc) => {
                 const data = doc.data() as ReservationDoc;
-
-                if (!isPlannedReservation(data)) {
-                    return;
-                }
-
-                const reservationData = {
-                    ...data,
-                    id: doc.id,
-                    date: event.date,
-                } as AugmentedReservation;
-
-                // TODO: include cancelled reservations in analytics
-                if (reservationData.cancelled) {
-                    return;
-                }
-
-                if (!buckets[event.propertyId]) {
-                    const property = properties.find((p) => p.id === event.propertyId);
-                    const propertyName = property ? property.name : "Unknown Property";
-
-                    buckets[event.propertyId] = {
-                        propertyId: event.propertyId,
-                        propertyName: propertyName,
-                        reservations: [],
-                    };
-                }
-                buckets[event.propertyId]?.reservations.push(reservationData);
+                reservations.push(data);
             });
         }),
     );
 
-    return Object.values(buckets);
+    return reservations;
 }
 
 async function getEventsForProperties(
