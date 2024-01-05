@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { NumberTuple } from "src/types/generic";
-import type { Floor, FloorEditorElement } from "@firetable/floor-creator";
+import type { Floor, FloorEditorElement, FloorElementTypes } from "@firetable/floor-creator";
 import type { FloorDoc } from "@firetable/types";
 import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
 
@@ -15,7 +15,6 @@ import {
     MAX_FLOOR_HEIGHT,
     MAX_FLOOR_WIDTH,
     RESOLUTION,
-    FloorElementTypes,
 } from "@firetable/floor-creator";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import {
@@ -110,11 +109,6 @@ async function onFloorSave(): Promise<void> {
     }
 
     const { name, width, height, json } = floorInstance.value;
-    console.log(
-        floorInstance.value.canvas.getObjects().filter((obj) => {
-            return obj.type === FloorElementTypes.SPIRAL_STAIRCASE;
-        }),
-    );
 
     await tryCatchLoadingWrapper({
         hook: async function () {
