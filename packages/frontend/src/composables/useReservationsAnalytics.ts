@@ -7,13 +7,13 @@ import type {
 } from "src/stores/analytics-store";
 import type { PieChartData, TimeSeriesData } from "src/components/admin/analytics/types";
 import { isAWalkInReservation, isPlannedReservation } from "@firetable/types";
+import { computed, onUnmounted, ref, watch } from "vue";
+import { useAnalyticsStore } from "src/stores/analytics-store";
 
 import { fetchAnalyticsData } from "@firetable/backend";
-import { onUnmounted, watch, computed, ref } from "vue";
 import { Loading } from "quasar";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { format } from "date-fns";
-import { useAnalyticsStore } from "src/stores/analytics-store";
 import { getColors } from "src/helpers/colors";
 
 const DAYS_OF_WEEK = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -34,6 +34,26 @@ export function useReservationsAnalytics(
         return reservationBuckets.value
             .filter((bucket) => bucket.propertyId === selectedTab.value)
             .flatMap((bucket) => bucket.plannedReservations);
+    });
+
+    const plannedVsWalkInReservations = computed<PieChartData>(() => {
+        let planned = 0;
+        let walkIn = 0;
+
+        reservationBuckets.value.forEach((bucket) => {
+            planned += bucket.plannedReservations.length;
+            walkIn += bucket.walkInReservations.length;
+        });
+
+        return {
+            labels: ["Planned", "Walk-In"],
+            datasets: [
+                {
+                    data: [planned, walkIn],
+                    backgroundColor: getColors(2).backgroundColors,
+                },
+            ],
+        };
     });
 
     const plannedReservationsByDay = computed(() => {
@@ -79,16 +99,29 @@ export function useReservationsAnalytics(
         };
     });
 
-    const avgGuestsPerPlannedReservation = computed(() => {
-        let totalGuests = 0;
-        let totalReservations = 0;
-        plannedReservationsByActiveProperty.value.forEach(({ numberOfGuests }) => {
-            totalGuests += Number(numberOfGuests);
-            totalReservations++;
+    const avgGuestsPerReservation = computed(() => {
+        let totalPlannedGuests = 0;
+        let totalPlannedReservations = 0;
+        let totalWalkInGuests = 0;
+        let totalWalkInReservations = 0;
+
+        reservationBuckets.value.forEach((bucket) => {
+            bucket.plannedReservations.forEach(({ numberOfGuests }) => {
+                totalPlannedGuests += Number(numberOfGuests);
+                totalPlannedReservations++;
+            });
+            bucket.walkInReservations.forEach(({ numberOfGuests }) => {
+                totalWalkInGuests += Number(numberOfGuests);
+                totalWalkInReservations++;
+            });
         });
 
-        const avg = totalReservations ? totalGuests / totalReservations : 0;
-        return { averageGuests: avg };
+        const averagePlannedGuests =
+            totalPlannedReservations > 0 ? totalPlannedGuests / totalPlannedReservations : 0;
+        const averageWalkInGuests =
+            totalWalkInReservations > 0 ? totalWalkInGuests / totalWalkInReservations : 0;
+
+        return { averagePlannedGuests, averageWalkInGuests };
     });
 
     const plannedReservationsByProperty = computed<TimeSeriesData>(() => {
@@ -314,12 +347,13 @@ export function useReservationsAnalytics(
         selectedMonth,
         selectedDay,
         plannedArrivedVsNoShow,
-        avgGuestsPerPlannedReservation,
+        avgGuestsPerReservation,
         plannedReservationsByProperty,
         consumptionAnalysisCombined,
         peakReservationHours,
         guestDistributionAnalysis,
         reservationsByDayOfWeek,
+        plannedVsWalkInReservations,
     };
 }
 

@@ -32,12 +32,13 @@ const {
     plannedReservationsByActiveProperty,
     plannedReservationsByDay,
     plannedArrivedVsNoShow,
-    avgGuestsPerPlannedReservation,
+    avgGuestsPerReservation,
     plannedReservationsByProperty,
     consumptionAnalysisCombined,
     peakReservationHours,
     guestDistributionAnalysis,
     reservationsByDayOfWeek,
+    plannedVsWalkInReservations,
 } = useReservationsAnalytics(properties, props.organisationId, selectedTab);
 
 const monthOptions = computed(() => {
@@ -110,8 +111,13 @@ const chartInfos = computed(() => [
                     :name="bucket.propertyId"
                 >
                     <q-chip color="primary">
-                        Avg Guests per reservation:
-                        {{ avgGuestsPerPlannedReservation.averageGuests.toFixed(2) }}
+                        Avg Guests per planned reservation:
+                        {{ avgGuestsPerReservation.averagePlannedGuests.toFixed(2) }}
+                    </q-chip>
+
+                    <q-chip color="primary">
+                        Avg Guests per walk-in reservation:
+                        {{ avgGuestsPerReservation.averageWalkInGuests.toFixed(2) }}
                     </q-chip>
 
                     <div class="row">
@@ -119,6 +125,12 @@ const chartInfos = computed(() => [
                             class="col-sm-12 col-md-6"
                             :chart-data="plannedArrivedVsNoShow"
                             chart-title="Arrived vs. No-Show"
+                        />
+
+                        <PieChart
+                            class="col-sm-12 col-md-6"
+                            :chart-data="plannedVsWalkInReservations"
+                            chart-title="Planned vs. Walk-In"
                         />
 
                         <div class="col-12 q-my-md">
