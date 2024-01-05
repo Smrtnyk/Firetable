@@ -1,6 +1,5 @@
 import type { User } from "@firetable/types";
 import { ref, watch } from "vue";
-import { ADMIN } from "@firetable/types";
 import { useAuthStore } from "src/stores/auth-store";
 import { fetchUsersByRole } from "@firetable/backend";
 import { storeToRefs } from "pinia";
@@ -15,7 +14,7 @@ export function useUsers(organisationId: string) {
 
     async function fetchUsers(): Promise<void> {
         try {
-            if (authStore.user?.role === ADMIN) {
+            if (authStore.isAdmin) {
                 isLoading.value = true;
                 users.value = (await fetchUsersByRole([], organisationId)).data;
             } else {
