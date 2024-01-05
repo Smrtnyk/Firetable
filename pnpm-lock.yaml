@@ -137,8 +137,8 @@ importers:
         specifier: 4.2.3
         version: 4.2.3
       date-fns:
-        specifier: 3.0.6
-        version: 3.0.6
+        specifier: 3.1.0
+        version: 3.1.0
       pako:
         specifier: 2.1.0
         version: 2.1.0
@@ -164,8 +164,8 @@ importers:
         specifier: 4.2.5
         version: 4.2.5(vue@3.4.5)
       vuefire:
-        specifier: 3.1.21
-        version: 3.1.21(firebase@10.7.1)(vue@3.4.5)
+        specifier: 3.1.22
+        version: 3.1.22(firebase@10.7.1)(vue@3.4.5)
       workbox-build:
         specifier: 7.0.0
         version: 7.0.0
@@ -5464,8 +5464,8 @@ packages:
     dev: false
     optional: true
 
-  /date-fns@3.0.6:
-    resolution: {integrity: sha512-W+G99rycpKMMF2/YD064b2lE7jJGUe+EjOES7Q8BIGY8sbNdbgcs9XFTZwvzc9Jx1f3k7LB7gZaZa7f8Agzljg==}
+  /date-fns@3.1.0:
+    resolution: {integrity: sha512-ZO7yefXV/wCWzd3I9haCHmfzlfA3i1a2HHO7ZXjtJrRjXt8FULKJ2Vl8wji3XYF4dQ0ZJ/tokXDZeYlFvgms9Q==}
     dev: false
 
   /de-indent@1.0.2:
@@ -12616,8 +12616,8 @@ packages:
       '@vue/shared': 3.4.5
       typescript: 5.3.3
 
-  /vuefire@3.1.21(firebase@10.7.1)(vue@3.4.5):
-    resolution: {integrity: sha512-cVTmfTbOmtCvRzKR6+cwJpqeYHeFpv+61tODxtc7j4o1niwNWyubgTjjxDPvgeOwqrFcSNqt0MqwHQP1MDHGew==}
+  /vuefire@3.1.22(firebase@10.7.1)(vue@3.4.5):
+    resolution: {integrity: sha512-E/n4O9zzhzqSvuAcuYrLLAH90UnNhin1DgDm/NEhwUMTqKhi7OxC6OcxzpTGXgGmD+CSTuO30maLcDQ3KfWpxg==}
     engines: {node: '>=18'}
     peerDependencies:
       '@vue/composition-api': '*'
