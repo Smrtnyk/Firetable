@@ -77,14 +77,14 @@ export function useReservationsAnalytics(
     });
 
     const plannedArrivedVsNoShow = computed((): PieChartData => {
-        let confirmed = 0;
-        let unconfirmed = 0;
+        let arrived = 0;
+        let pending = 0;
 
         plannedReservationsByActiveProperty.value.forEach((reservation) => {
             if (reservation.arrived) {
-                confirmed++;
+                arrived++;
             } else {
-                unconfirmed++;
+                pending++;
             }
         });
 
@@ -92,7 +92,7 @@ export function useReservationsAnalytics(
             labels: ["Arrived", "No-Show"],
             datasets: [
                 {
-                    data: [confirmed, unconfirmed],
+                    data: [arrived, pending],
                     backgroundColor: getColors(2).backgroundColors,
                 },
             ],
@@ -107,11 +107,11 @@ export function useReservationsAnalytics(
 
         reservationBuckets.value.forEach((bucket) => {
             bucket.plannedReservations.forEach(({ numberOfGuests }) => {
-                totalPlannedGuests += Number(numberOfGuests);
+                totalPlannedGuests += numberOfGuests;
                 totalPlannedReservations++;
             });
             bucket.walkInReservations.forEach(({ numberOfGuests }) => {
-                totalWalkInGuests += Number(numberOfGuests);
+                totalWalkInGuests += numberOfGuests;
                 totalWalkInReservations++;
             });
         });
@@ -151,25 +151,25 @@ export function useReservationsAnalytics(
 
     const consumptionAnalysisCombined = computed(() => {
         let totalConsumption = 0;
-        let confirmedConsumption = 0;
-        let confirmedCount = 0;
-        let unconfirmedCount = 0;
+        let arrivedConsumption = 0;
+        let arrivedCount = 0;
+        let pendingCount = 0;
 
         plannedReservationsByActiveProperty.value.forEach((reservation) => {
-            const consumption = Number(reservation.consumption);
+            const consumption = reservation.consumption;
             totalConsumption += consumption;
             if (reservation.arrived) {
-                confirmedConsumption += consumption;
-                confirmedCount++;
+                arrivedConsumption += consumption;
+                arrivedCount++;
             } else {
-                unconfirmedCount++;
+                pendingCount++;
             }
         });
 
-        const averageTotal = totalConsumption / (confirmedCount + unconfirmedCount);
-        const averageConfirmed = confirmedCount > 0 ? confirmedConsumption / confirmedCount : 0;
-        const averageUnconfirmed =
-            unconfirmedCount > 0 ? (totalConsumption - confirmedConsumption) / unconfirmedCount : 0;
+        const averageTotal = totalConsumption / (arrivedCount + pendingCount);
+        const averageArrived = arrivedCount > 0 ? arrivedConsumption / arrivedCount : 0;
+        const averagePending =
+            pendingCount > 0 ? (totalConsumption - arrivedConsumption) / pendingCount : 0;
 
         const { backgroundColors } = getColors(3);
 
@@ -177,14 +177,14 @@ export function useReservationsAnalytics(
             labels: ["Average Consumption"],
             datasets: [
                 {
-                    label: "Confirmed",
-                    data: [averageConfirmed],
+                    label: "Arrived",
+                    data: [averageArrived],
                     backgroundColor: backgroundColors[0],
                     stack: "Stack 0",
                 },
                 {
-                    label: "Unconfirmed",
-                    data: [averageUnconfirmed],
+                    label: "Pending",
+                    data: [averagePending],
                     backgroundColor: backgroundColors[1],
                     stack: "Stack 0",
                 },
