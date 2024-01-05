@@ -76,19 +76,17 @@ const tableData = computed(() => {
     }));
 });
 
-function calculateChartHeight(): number {
+const chartHeight = computed(() => {
     const minBarHeight = isMobile.value ? 7 : 12;
-    // Calculate the total height based on the number of bars
-    const totalHeight = props.reservations.length * minBarHeight;
-
+    const numBars = chartData.value.labels.length;
+    const totalHeight = numBars * minBarHeight;
     const minHeight = 300;
     return Math.max(totalHeight, minHeight);
-}
+});
 
 function updateChartHeight(): void {
     if (chartRef.value) {
-        const newHeight = calculateChartHeight();
-        chartRef.value.style.height = `${newHeight}px`;
+        chartRef.value.style.height = `${chartHeight.value}px`;
     }
 }
 
@@ -256,6 +254,7 @@ onUnmounted(destroyChartIfExists);
                 { label: 'Chart', value: ViewMode.CHART },
                 { label: 'Table', value: ViewMode.TABLE },
             ]"
+            class="q-mb-md"
         ></q-btn-toggle>
 
         <!-- Chart Container -->
@@ -270,6 +269,7 @@ onUnmounted(destroyChartIfExists);
 
         <!-- Data Table -->
         <q-table
+            class="table-container"
             v-show="viewMode === ViewMode.TABLE"
             :rows="tableData"
             :columns="tableColumns"
@@ -285,7 +285,8 @@ onUnmounted(destroyChartIfExists);
 </template>
 
 <style>
-.chart-container {
-    min-height: 50vh;
+.chart-container,
+.table-container {
+    min-height: 25vh;
 }
 </style>
