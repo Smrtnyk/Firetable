@@ -13,7 +13,7 @@ interface Props {
 const props = defineProps<Props>();
 const authStore = useAuthStore();
 const logs = computed(() => {
-    if (authStore.user?.role === ADMIN) {
+    if (authStore.isAdmin) {
         return props.logsDoc.logs;
     }
     return props.logsDoc.logs.filter((log) => {
