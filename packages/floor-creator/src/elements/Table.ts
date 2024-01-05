@@ -92,7 +92,7 @@ export abstract class Table extends Group {
 
     setVIPStatus(isVIP: boolean): void {
         this.shape.set({
-            shadow: isVIP ? "2px 2px 5px rgba(255, 215, 0, 0.7)" : "none",
+            shadow: isVIP ? "0 0 3px rgba(255, 215, 0, 0.7)" : "none",
         });
 
         this.canvas?.requestRenderAll();
