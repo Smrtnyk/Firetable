@@ -6,6 +6,7 @@ import { useI18n } from "vue-i18n";
 import { useAuthStore } from "src/stores/auth-store";
 
 import ReservationGeneralInfo from "src/components/Event/ReservationGeneralInfo.vue";
+import ReservationLabelChips from "src/components/Event/reservation/ReservationLabelChips.vue";
 
 interface Props {
     reservation: Reservation;
@@ -56,27 +57,10 @@ function onReservationConfirmed(): void {
     emit("reservationConfirmed", !reservationConfirmed.value);
     reservationConfirmed.value = !reservationConfirmed.value;
 }
-
-const reservationChipLabel = computed(() => {
-    return isPlannedReservation(props.reservation) ? "Planned" : "Walk-In";
-});
-
-const reservationChipColor = computed(() => {
-    return isPlannedReservation(props.reservation) ? "tertiary" : "quaternary";
-});
 </script>
 
 <template>
-    <div class="row justify-end">
-        <q-chip :color="reservationChipColor" :label="reservationChipLabel" />
-        <q-chip
-            color="accent"
-            v-if="props.reservation.isVIP"
-            label="VIP"
-            icon="crown"
-            text-color="yellow"
-        />
-    </div>
+    <ReservationLabelChips :reservation="props.reservation" />
 
     <q-card-section>
         <ReservationGeneralInfo :reservation="props.reservation" />
