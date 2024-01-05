@@ -47,7 +47,7 @@ const monthOptions = computed(() => {
     return options.reverse();
 });
 
-const confirmedVsUnconfirmed = computed((): PieChartData => {
+const plannedArrivedVsNoShow = computed((): PieChartData => {
     let confirmed = 0;
     let unconfirmed = 0;
 
@@ -60,7 +60,7 @@ const confirmedVsUnconfirmed = computed((): PieChartData => {
     });
 
     return {
-        labels: ["Confirmed", "Unconfirmed"],
+        labels: ["Arrived", "No-Show"],
         datasets: [
             {
                 data: [confirmed, unconfirmed],
@@ -70,9 +70,7 @@ const confirmedVsUnconfirmed = computed((): PieChartData => {
     };
 });
 
-type AverageGuestsData = { averageGuests: number };
-
-const avgGuestsPerReservation = computed<AverageGuestsData>(() => {
+const avgGuestsPerReservation = computed(() => {
     let totalGuests = 0;
     let totalReservations = 0;
     plannedReservationsByActiveProperty.value.forEach(({ numberOfGuests }) => {
@@ -284,8 +282,8 @@ const reservationsByDayOfWeek = computed<TimeSeriesData>(() => {
                     <div class="row">
                         <PieChart
                             class="col-sm-12 col-md-6"
-                            :chart-data="confirmedVsUnconfirmed"
-                            chart-title="Confirmed vs. Unconfirmed"
+                            :chart-data="plannedArrivedVsNoShow"
+                            chart-title="Arrived vs. No-Show"
                         />
                         <div class="col-12 q-my-md">
                             <FTTabs v-model="selectedDay">
