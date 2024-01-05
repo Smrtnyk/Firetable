@@ -6,6 +6,7 @@ import FTCenteredText from "src/components/FTCenteredText.vue";
 import PieChart from "src/components/admin/analytics/PieChart.vue";
 import BarChart from "src/components/admin/analytics/BarChart.vue";
 import AdminEventReservationsByPerson from "src/components/admin/event/AdminEventReservationsByPerson.vue";
+import ReservationAnalyticsCharts from "src/components/admin/analytics/ReservationAnalyticsCharts.vue";
 import FTTabs from "src/components/FTTabs.vue";
 
 import { computed, ref } from "vue";
@@ -239,6 +240,29 @@ const reservationsByDayOfWeek = computed<TimeSeriesData>(() => {
         ],
     };
 });
+
+const chartInfos = computed(() => [
+    {
+        data: peakReservationHours.value,
+        title: "Peak Reservation Hours",
+        type: "bar",
+    },
+    {
+        data: consumptionAnalysisCombined.value,
+        title: "Consumption Data",
+        type: "bar",
+    },
+    {
+        data: guestDistributionAnalysis.value,
+        title: "Guest Distribution",
+        type: "bar",
+    },
+    {
+        data: reservationsByDayOfWeek.value,
+        title: "Reservations by Day of Week",
+        type: "bar",
+    },
+]);
 </script>
 
 <template>
@@ -285,6 +309,7 @@ const reservationsByDayOfWeek = computed<TimeSeriesData>(() => {
                             :chart-data="plannedArrivedVsNoShow"
                             chart-title="Arrived vs. No-Show"
                         />
+
                         <div class="col-12 q-my-md">
                             <FTTabs v-model="selectedDay">
                                 <q-tab
@@ -310,25 +335,13 @@ const reservationsByDayOfWeek = computed<TimeSeriesData>(() => {
                             </q-tab-panels>
                         </div>
 
-                        <BarChart
+                        <ReservationAnalyticsCharts
                             class="col-sm-12 col-md-6"
-                            :chart-data="peakReservationHours"
-                            chart-title="Peak Reservation Hours"
-                        />
-                        <BarChart
-                            class="col-sm-12 col-md-6"
-                            :chart-data="consumptionAnalysisCombined"
-                            chart-title="Consumption Data"
-                        />
-                        <BarChart
-                            class="col-sm-12 col-md-6"
-                            :chart-data="guestDistributionAnalysis"
-                            chart-title="Guest Distribution"
-                        />
-                        <BarChart
-                            class="col-sm-12 col-md-6"
-                            :chart-data="reservationsByDayOfWeek"
-                            chart-title="Reservations by Day of Week"
+                            v-for="chartInfo in chartInfos"
+                            :key="chartInfo.title"
+                            :chart-data="chartInfo.data"
+                            :chart-title="chartInfo.title"
+                            :chart-type="chartInfo.type"
                         />
                     </div>
                 </q-tab-panel>
