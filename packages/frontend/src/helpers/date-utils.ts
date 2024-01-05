@@ -1,13 +1,56 @@
-import { format } from "date-fns";
+const LOCALE = "de-DE";
 
-export function formatEventDate(timestamp: number): string {
-    return format(timestamp, "dd-MM-yyyy HH:mm");
+/**
+ * Pass null as timeZone to show time in current time zone
+ *
+ * @param timestamp Timestamp in milliseconds
+ * @param timeZone Time zone to use
+ */
+export function formatEventDate(timestamp: number, timeZone: string | null = "UTC"): string {
+    const date = new Date(timestamp);
+    const formatter = new Intl.DateTimeFormat(LOCALE, {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        timeZone: timeZone ?? void 0,
+        hour12: false,
+    });
+    return formatter.format(date);
 }
 
-export function dateFromTimestamp(timestamp: number): string {
-    return format(timestamp, "dd-MM-yyyy");
+/**
+ * Pass null as timeZone to show time in current time zone
+ *
+ * @param timestamp Timestamp in milliseconds
+ * @param timeZone Time zone to use
+ */
+export function dateFromTimestamp(timestamp: number, timeZone: string | null = "UTC"): string {
+    const date = new Date(timestamp);
+    const formatter = new Intl.DateTimeFormat(LOCALE, {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        timeZone: timeZone ?? void 0,
+    });
+    return formatter.format(date);
 }
 
-export function hourFromTimestamp(timestamp: number): string {
-    return format(timestamp, "HH:mm");
+/**
+ * Pass null as timeZone to show time in current time zone
+ *
+ * @param timestamp Timestamp in milliseconds
+ * @param timeZone Time zone to use
+ */
+export function hourFromTimestamp(timestamp: number, timeZone: string | null = "UTC"): string {
+    const date = new Date(timestamp);
+    const formatter = new Intl.DateTimeFormat(LOCALE, {
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZone: timeZone ?? void 0,
+        hour12: false,
+    });
+    return formatter.format(date);
 }

@@ -3,7 +3,7 @@ import PropertyCardList from "src/components/Property/PropertyCardList.vue";
 import { computed, onMounted, ref } from "vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import { useRouter } from "vue-router";
-import { usePropertiesStore } from "src/stores/usePropertiesStore";
+import { usePropertiesStore } from "src/stores/properties-store";
 
 interface Props {
     organisationId: string;

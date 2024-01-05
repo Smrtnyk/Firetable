@@ -2,10 +2,10 @@
 import type { EventLog, EventLogsDoc } from "@firetable/types";
 import type { QScrollAreaProps } from "quasar";
 import { ADMIN } from "@firetable/types";
-import { format } from "date-fns";
 import { useAuthStore } from "src/stores/auth-store";
 import { computed, ref } from "vue";
 import { QScrollArea } from "quasar";
+import { formatEventDate } from "src/helpers/date-utils";
 
 interface Props {
     logsDoc: EventLogsDoc;
@@ -13,7 +13,7 @@ interface Props {
 const props = defineProps<Props>();
 const authStore = useAuthStore();
 const logs = computed(() => {
-    if (authStore.user?.role === ADMIN) {
+    if (authStore.isAdmin) {
         return props.logsDoc.logs;
     }
     return props.logsDoc.logs.filter((log) => {
@@ -23,8 +23,8 @@ const logs = computed(() => {
 const showScrollButton = ref(false);
 const logsContainer = ref<QScrollArea | undefined>();
 
-function formatTimestampToReadable(date: Date): string {
-    return format(date, "dd-MM-yyyy HH:mm:ss");
+function formatTimestampToReadable(timestamp: number): string {
+    return formatEventDate(timestamp, null);
 }
 
 function getIconNameForLogEntry(logMessage: string): string {
@@ -52,7 +52,7 @@ function getIconNameForLogEntry(logMessage: string): string {
 }
 
 function formatSubtitleForEventLog({ creator, timestamp }: EventLog): string {
-    const datePart = formatTimestampToReadable(timestamp.toDate());
+    const datePart = formatTimestampToReadable(timestamp.toMillis());
     const userPart = `${creator.name} (${creator.email})`;
     return `${datePart}, by ${userPart}`;
 }

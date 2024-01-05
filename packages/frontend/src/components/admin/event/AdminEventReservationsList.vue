@@ -7,6 +7,7 @@ import FTDialog from "src/components/FTDialog.vue";
 import ReservationGeneralInfo from "src/components/Event/ReservationGeneralInfo.vue";
 import { QScrollArea } from "quasar";
 import FTCenteredText from "src/components/FTCenteredText.vue";
+import ReservationLabelChips from "src/components/Event/reservation/ReservationLabelChips.vue";
 
 interface Props {
     reservations: ReservationDoc[];
@@ -59,6 +60,9 @@ function emitDelete(reservation: ReservationDoc, reset: () => void): void {
                             >Cleared at:
                             {{ formatEventDate(reservation.clearedAt.toMillis()) }}</q-item-label
                         >
+                        <q-item-label caption>
+                            <ReservationLabelChips :reservation="reservation" />
+                        </q-item-label>
                     </q-item-section>
                 </q-item>
             </q-slide-item>

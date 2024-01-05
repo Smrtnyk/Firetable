@@ -11,7 +11,7 @@ import { createNewOrganisation, deleteOrganisation } from "@firetable/backend";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { storeToRefs } from "pinia";
-import { initOrganisations, usePropertiesStore } from "src/stores/usePropertiesStore";
+import { initOrganisations, usePropertiesStore } from "src/stores/properties-store";
 
 type Link = {
     label: string;

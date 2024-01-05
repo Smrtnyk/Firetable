@@ -1,5 +1,4 @@
 import type { GroupProps, Rect, FabricText, Circle } from "fabric";
-import type { ReservationDoc } from "@firetable/types";
 import type { AnimationStrategy } from "./animation/AnimationStrategy";
 import { SmoothBlinkAnimation } from "./animation/SmoothBlinkAnimation.js";
 import { TABLE_WIDTH, TABLE_HEIGHT } from "../constants";
@@ -17,7 +16,6 @@ interface TableElementOptions {
 }
 
 export abstract class Table extends Group {
-    reservation: ReservationDoc | undefined;
     label: string;
     baseFill: string;
     private readonly initialWidth: number;
@@ -92,8 +90,12 @@ export abstract class Table extends Group {
         this.canvas?.requestRenderAll();
     }
 
-    setReservation(reservation: ReservationDoc | undefined): void {
-        this.reservation = reservation;
+    setVIPStatus(isVIP: boolean): void {
+        this.shape.set({
+            shadow: isVIP ? "0 0 3px rgba(255, 215, 0, 0.7)" : "none",
+        });
+
+        this.canvas?.requestRenderAll();
     }
 
     // @ts-expect-error -- ok

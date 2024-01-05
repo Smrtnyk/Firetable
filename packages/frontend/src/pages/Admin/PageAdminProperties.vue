@@ -11,7 +11,7 @@ import { createNewProperty, deleteProperty, getPropertiesPath } from "@firetable
 import { computed, onMounted, ref, watchEffect } from "vue";
 import { useI18n } from "vue-i18n";
 import FTCenteredText from "src/components/FTCenteredText.vue";
-import { usePropertiesStore } from "src/stores/usePropertiesStore";
+import { usePropertiesStore } from "src/stores/properties-store";
 import { useFirestoreCollection } from "src/composables/useFirestore";
 
 const props = defineProps<{ organisationId: string }>();

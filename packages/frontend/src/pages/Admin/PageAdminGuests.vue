@@ -6,7 +6,7 @@ import { useI18n } from "vue-i18n";
 import { showConfirm } from "src/helpers/ui-helpers";
 
 import FTTitle from "src/components/FTTitle.vue";
-import { usePropertiesStore } from "src/stores/usePropertiesStore";
+import { usePropertiesStore } from "src/stores/properties-store";
 import { storeToRefs } from "pinia";
 
 interface Props {
@@ -69,7 +69,7 @@ function guestVisitsToReadable(guest: GuestDoc): string {
         <q-list>
             <q-slide-item
                 v-for="guest in guests"
-                :key="guest.id"
+                :key="guest.contact"
                 clickable
                 right-color="warning"
                 @right="({ reset }) => deleteGuest(guest, reset)"

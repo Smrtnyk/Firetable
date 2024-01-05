@@ -10,7 +10,10 @@ export function useFirestoreCollection<T extends DocumentData>(
     path: string | Query<T> | ComputedRef<Query<T> | null>,
     options: UseCollectionOptions = {},
 ) {
-    const mergedOpts = { ...options, maxRefDepth: 20 };
+    const mergedOpts = {
+        ...options,
+        maxRefDepth: 20,
+    } as UseCollectionOptions<T[]>;
     const { firestore } = initializeFirebase();
     if (isString(path)) {
         return useCollection<T>(collection(firestore, path), mergedOpts);

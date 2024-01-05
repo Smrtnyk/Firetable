@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import type { Reservation } from "@firetable/types";
+import { isPlannedReservation } from "@firetable/types";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useAuthStore } from "src/stores/auth-store";
 
 import ReservationGeneralInfo from "src/components/Event/ReservationGeneralInfo.vue";
+import ReservationLabelChips from "src/components/Event/reservation/ReservationLabelChips.vue";
 
 interface Props {
     reservation: Reservation;
@@ -14,12 +16,16 @@ const authStore = useAuthStore();
 const props = defineProps<Props>();
 const emit = defineEmits<{
     (e: "delete" | "edit" | "transfer" | "copy"): void;
-    (e: "confirm" | "reservationConfirmed" | "cancel", value: boolean): void;
+    (e: "arrived" | "reservationConfirmed" | "cancel", value: boolean): void;
 }>();
 const { t } = useI18n();
-const isGuestArrived = ref<boolean>(props.reservation.confirmed);
-const isCancelled = ref<boolean>(!!props.reservation.cancelled);
-const reservationConfirmed = ref<boolean>(!!props.reservation.reservationConfirmed);
+const isGuestArrived = ref<boolean>(props.reservation.arrived);
+const isCancelled = ref<boolean>(
+    isPlannedReservation(props.reservation) && !!props.reservation.cancelled,
+);
+const reservationConfirmed = ref<boolean>(
+    isPlannedReservation(props.reservation) && !!props.reservation.reservationConfirmed,
+);
 const canDeleteReservation = computed(() => {
     return (
         authStore.canDeleteReservation ||
@@ -38,7 +44,7 @@ function isOwnReservation(reservation: Reservation): boolean {
 }
 
 function onGuestArrived(): void {
-    emit("confirm", !isGuestArrived.value);
+    emit("arrived", !isGuestArrived.value);
     isGuestArrived.value = !isGuestArrived.value;
 }
 
@@ -54,10 +60,12 @@ function onReservationConfirmed(): void {
 </script>
 
 <template>
+    <ReservationLabelChips :reservation="props.reservation" />
+
     <q-card-section>
         <ReservationGeneralInfo :reservation="props.reservation" />
 
-        <template v-if="!isCancelled">
+        <template v-if="!isCancelled && isPlannedReservation(props.reservation)">
             <q-separator />
             <!-- reservation confirmed -->
             <q-item
@@ -149,7 +157,13 @@ function onReservationConfirmed(): void {
             </div>
         </q-item>
 
-        <template v-if="authStore.canCancelReservation && !isGuestArrived">
+        <template
+            v-if="
+                isPlannedReservation(props.reservation) &&
+                authStore.canCancelReservation &&
+                !isGuestArrived
+            "
+        >
             <q-separator class="q-mt-md" />
             <!-- Cancel reservation -->
             <q-item tag="label" class="q-pa-none">

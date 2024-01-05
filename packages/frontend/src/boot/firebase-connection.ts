@@ -5,7 +5,7 @@ import { initializeFirebase } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { getCurrentUser, useCurrentUser, VueFire, VueFireAuth } from "vuefire";
 import { watch } from "vue";
-import { usePropertiesStore } from "src/stores/usePropertiesStore";
+import { usePropertiesStore } from "src/stores/properties-store";
 
 export default boot(({ router, app }): void => {
     const { firebaseApp } = initializeFirebase();
@@ -77,7 +77,7 @@ function handleOnAuthStateChanged(
     authStore: ReturnType<typeof useAuthStore>,
 ): void {
     // Tell the application what to do when the
-    // authentication state has changed */
+    // authentication state has changed
     let isFirstCall = true;
     const currentUser = useCurrentUser();
     watch(

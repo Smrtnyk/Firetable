@@ -117,15 +117,8 @@ export abstract class Floor {
 
     clearAllReservations(): void {
         getTables(this).forEach((table) => {
-            table.setReservation(void 0);
-        });
-        this.resetTablesFill();
-        this.canvas.requestRenderAll();
-    }
-
-    resetTablesFill(): void {
-        getTables(this).forEach((table) => {
             table.setFill(table.baseFill);
+            table.setVIPStatus(false);
         });
         this.canvas.requestRenderAll();
     }

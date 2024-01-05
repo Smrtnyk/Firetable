@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { Reservation } from "@firetable/types";
+import type { PlannedReservation, Reservation } from "@firetable/types";
+import { isPlannedReservation } from "@firetable/types";
 import { formatEventDate } from "src/helpers/date-utils";
 import { useI18n } from "vue-i18n";
 import { useAuthStore } from "src/stores/auth-store";
@@ -10,13 +11,13 @@ const props = defineProps<{
 const { t } = useI18n();
 const authStore = useAuthStore();
 
-function reservedByText(reservedBy: Reservation["reservedBy"]): string {
+function reservedByText(reservedBy: PlannedReservation["reservedBy"]): string {
     const { name, email } = reservedBy;
     const isSocial = email.startsWith("social");
     return isSocial ? name : `${name} - ${email}`;
 }
 
-function createdByText(creator: NonNullable<Reservation["creator"]>): string {
+function createdByText(creator: Reservation["creator"]): string {
     const { name, email } = creator;
     return `${name} - ${email}`;
 }
@@ -24,8 +25,10 @@ function createdByText(creator: NonNullable<Reservation["creator"]>): string {
 
 <template>
     <div class="row q-mb-md">
-        <div class="col-6">{{ t("EventShowReservation.guestNameLabel") }}</div>
-        <div class="col-6 font-black">{{ props.reservation.guestName }}</div>
+        <template v-if="reservation.guestName">
+            <div class="col-6">{{ t("EventShowReservation.guestNameLabel") }}</div>
+            <div class="col-6 font-black">{{ props.reservation.guestName }}</div>
+        </template>
 
         <template v-if="props.reservation.time">
             <div class="col-6">{{ t("EventShowReservation.timeLabel") }}</div>
@@ -54,8 +57,10 @@ function createdByText(creator: NonNullable<Reservation["creator"]>): string {
             <div class="col-6 font-black">{{ props.reservation.reservationNote }}</div>
         </template>
 
-        <div class="col-6">{{ t("EventShowReservation.reservedByLabel") }}</div>
-        <div class="col-6 font-black">{{ reservedByText(props.reservation.reservedBy) }}</div>
+        <template v-if="isPlannedReservation(props.reservation)">
+            <div class="col-6">{{ t("EventShowReservation.reservedByLabel") }}</div>
+            <div class="col-6 font-black">{{ reservedByText(props.reservation.reservedBy) }}</div>
+        </template>
 
         <template v-if="props.reservation.creator && authStore.canSeeReservationCreator">
             <div class="col-6">{{ t("EventShowReservation.createdByLabel") }}</div>

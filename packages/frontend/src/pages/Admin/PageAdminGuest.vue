@@ -4,7 +4,7 @@ import { useFirestoreDocument } from "src/composables/useFirestore";
 import { getGuestPath } from "@firetable/backend";
 import { computed, ref, watch } from "vue";
 import { storeToRefs } from "pinia";
-import { usePropertiesStore } from "src/stores/usePropertiesStore";
+import { usePropertiesStore } from "src/stores/properties-store";
 
 import FTTitle from "src/components/FTTitle.vue";
 import FTTabs from "src/components/FTTabs.vue";

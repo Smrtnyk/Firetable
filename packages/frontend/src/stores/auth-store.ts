@@ -11,7 +11,7 @@ import {
     initAdminProperties,
     initNonAdminProperties,
     initOrganisations,
-} from "src/stores/usePropertiesStore";
+} from "src/stores/properties-store";
 import { Loading } from "quasar";
 
 export const useAuthStore = defineStore("auth", () => {

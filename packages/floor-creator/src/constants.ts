@@ -10,6 +10,7 @@ export const CANVAS_BG_COLOR = "#333";
 export const TABLE_TEXT_FILL_COLOR = "#fff";
 export const ELEMENT_DEFAULT_FILL_COLOR = "#444";
 export const ELEMENT_DEFAULT_STROKE_COLOR = "#000";
+export const ELEMENT_DEFAULT_STROKE_WIDTH = 0.5;
 
 export const DEFAULT_ZOOM = 1;
 export const ZOOM_INCREMENT = 0.3;

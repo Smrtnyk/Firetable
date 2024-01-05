@@ -45,10 +45,17 @@ export type GuestData = CreateGuestPayload & {
     id: string;
 };
 
-export type ReservationDoc = Reservation & {
+export type PlannedReservationDoc = PlannedReservation & {
     id: string;
-    _doc: QueryDocumentSnapshot<Reservation>;
+    _doc: QueryDocumentSnapshot<PlannedReservation>;
 };
+
+export type WalkInReservationDoc = WalkInReservation & {
+    id: string;
+    _doc: QueryDocumentSnapshot<WalkInReservation>;
+};
+
+export type ReservationDoc = PlannedReservationDoc | WalkInReservationDoc;
 
 type UserIdentifier = Pick<User, "name" | "email" | "id">;
 
@@ -57,23 +64,42 @@ export const enum ReservationStatus {
     ACTIVE = "Active",
 }
 
-export interface Reservation {
+export const enum ReservationType {
+    WALK_IN = 0,
+    PLANNED = 1,
+}
+
+interface BaseReservation {
     floorId: string;
     tableLabel: string;
-    confirmed: boolean;
-    reservationConfirmed: boolean | undefined;
-    cancelled: boolean | undefined;
     guestContact?: string;
-    guestName: string;
-    numberOfGuests: number | string;
+    numberOfGuests: number;
     reservationNote?: string;
-    consumption: number;
     time: string;
-    reservedBy: UserIdentifier;
     clearedAt?: Timestamp;
     creator: UserIdentifier & { createdAt: Timestamp };
-    status: ReservationStatus | undefined;
+    status: ReservationStatus;
+    isVIP: boolean;
 }
+
+export interface WalkInReservation extends BaseReservation {
+    type: ReservationType.WALK_IN;
+    guestName: string | null;
+    consumption: number;
+    arrived: true;
+}
+
+export interface PlannedReservation extends BaseReservation {
+    type: ReservationType.PLANNED;
+    reservationConfirmed: boolean | undefined;
+    cancelled: boolean | undefined;
+    arrived: boolean;
+    consumption: number;
+    guestName: string;
+    reservedBy: UserIdentifier;
+}
+
+export type Reservation = WalkInReservation | PlannedReservation;
 
 export interface EventLog {
     message: string;
@@ -102,6 +128,7 @@ export interface Visit {
 }
 
 export interface GuestDoc {
+    id: string;
     name: string;
     contact: string;
     visitedProperties: {
@@ -110,4 +137,20 @@ export interface GuestDoc {
         };
     };
     _doc: QueryDocumentSnapshot<GuestDoc>;
+}
+
+export function isAWalkInReservation(
+    reservation: PlannedReservation | WalkInReservation,
+): reservation is WalkInReservation {
+    return reservation.type === ReservationType.WALK_IN;
+}
+
+export function isPlannedReservation(
+    reservation: PlannedReservation | WalkInReservation,
+): reservation is PlannedReservation {
+    return reservation.type === ReservationType.PLANNED;
+}
+
+export function isActiveReservation(reservation: Reservation): boolean {
+    return reservation.status === ReservationStatus.ACTIVE;
 }

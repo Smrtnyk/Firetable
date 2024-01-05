@@ -5,6 +5,7 @@ import {
     TABLE_TEXT_FILL_COLOR,
     ELEMENT_DEFAULT_FILL_COLOR,
     ELEMENT_DEFAULT_STROKE_COLOR,
+    ELEMENT_DEFAULT_STROKE_WIDTH,
 } from "../constants";
 import { FloorElementTypes } from "../types";
 import { Rect, FabricText } from "fabric";
@@ -29,7 +30,7 @@ export class RectTable extends Table {
             ...options.shapeOptions,
             fill: options.groupOptions.baseFill || ELEMENT_DEFAULT_FILL_COLOR,
             stroke: ELEMENT_DEFAULT_STROKE_COLOR,
-            strokeWidth: 0.5,
+            strokeWidth: ELEMENT_DEFAULT_STROKE_WIDTH,
             strokeUniform: true,
         });
 

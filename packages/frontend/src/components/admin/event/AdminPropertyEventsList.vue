@@ -24,8 +24,8 @@ const bucketizedEvents = computed(() => {
 
     for (const event of eventsArr) {
         const date = new Date(event.date);
-        const year = date.getFullYear().toString();
-        const month = date.toLocaleString("default", { month: "long" }); // Gets full month name.
+        const year = date.getUTCFullYear().toString();
+        const month = date.toLocaleString("default", { month: "long", timeZone: "UTC" });
 
         if (!bucketized.has(year)) {
             bucketized.set(year, new Map());

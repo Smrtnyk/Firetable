@@ -1,5 +1,7 @@
 <template>
-    <canvas ref="chartCanvas"></canvas>
+    <div>
+        <canvas ref="chartCanvas"></canvas>
+    </div>
 </template>
 
 <script setup lang="ts">

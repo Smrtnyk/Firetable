@@ -1,6 +1,6 @@
 import type { RouteLocationNormalized, RouteRecordRaw } from "vue-router";
 import { ADMIN, Role } from "@firetable/types";
-import { usePropertiesStore } from "src/stores/usePropertiesStore";
+import { usePropertiesStore } from "src/stores/properties-store";
 import { useEventsStore } from "src/stores/events-store";
 
 declare module "vue-router" {

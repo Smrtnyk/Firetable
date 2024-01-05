@@ -3,15 +3,15 @@ import type { Component } from "vue";
 import type { FloorEditor } from "@firetable/floor-creator";
 import type { FloorDoc, ReservationDoc } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
+import { isActiveReservation } from "@firetable/types";
 import { deleteReservation, updateEventFloorData } from "@firetable/backend";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { getTablesFromFloorDoc } from "@firetable/floor-creator";
-import { ReservationStatus } from "@firetable/types";
 import { useRouter } from "vue-router";
 import { formatEventDate } from "src/helpers/date-utils";
 
 import FTTitle from "src/components/FTTitle.vue";
-import AdminEventGeneralInfo from "src/components/admin/event/AdminEventGeneralInfo.vue";
+import AdminEventRTInfo from "src/components/admin/event/AdminEventRTInfo.vue";
 import AdminEventReservationsByPerson from "src/components/admin/event/AdminEventReservationsByPerson.vue";
 import AdminEventEditInfo from "src/components/admin/event/AdminEventEditInfo.vue";
 import AdminEventFloorViewer from "src/components/admin/event/AdminEventFloorViewer.vue";
@@ -28,6 +28,7 @@ import { truncateText } from "src/helpers/string-utils";
 import { compressFloorDoc } from "src/helpers/compress-floor-doc";
 import FTTabs from "src/components/FTTabs.vue";
 import { useGuests } from "src/composables/useGuests";
+import { propIsTruthy } from "@firetable/utils";
 
 interface Props {
     organisationId: string;
@@ -55,6 +56,7 @@ const {
     eventFloors,
     event,
     isLoading,
+    allPlannedReservations,
     allReservations,
     cancelledReservations,
     arrivedReservations,
@@ -64,24 +66,17 @@ const { returningGuests } = useGuests(eventOwner, allReservations);
 const allTables = computed(() => eventFloors.value.map(getTablesFromFloorDoc).flat());
 
 const reservationsStatus = computed(() => {
-    const activeReservations = allReservations.value.filter((reservation) => {
-        return reservation.status === ReservationStatus.ACTIVE && !reservation.cancelled;
-    });
-    const unreserved = allTables.value.length - allReservations.value.length;
-    const pending = activeReservations.filter((reservation) => !reservation.confirmed).length;
-    const confirmed = activeReservations.length - pending;
-    const reserved = activeReservations.length;
+    const activeReservations = allReservations.value.filter(isActiveReservation);
+    const currentlyOccupied = activeReservations.filter(propIsTruthy("arrived")).length;
+    const pending = activeReservations.length - currentlyOccupied;
     const totalGuests = activeReservations.reduce((acc, reservation) => {
         return acc + Number(reservation.numberOfGuests || 0);
     }, 0);
 
     return {
         total: allTables.value.length,
-        cancelled: cancelledReservations.value.length,
-        reserved,
+        currentlyOccupied,
         pending,
-        confirmed,
-        unreserved,
         totalGuests,
     };
 });
@@ -211,9 +206,9 @@ onMounted(init);
         <q-tab-panels v-model="tab" animated transition-next="fade" transition-prev="fade">
             <!-- General info with charts area -->
             <q-tab-panel name="info" class="q-pa-xs-sm q-pa-md-md">
-                <AdminEventGeneralInfo :reservations-status="reservationsStatus" />
+                <AdminEventRTInfo :reservations-status="reservationsStatus" />
                 <q-separator class="q-my-sm bg-grey-6" />
-                <AdminEventReservationsByPerson :reservations="allReservations" />
+                <AdminEventReservationsByPerson :reservations="allPlannedReservations" />
                 <q-separator class="q-my-sm bg-grey-6" />
 
                 <!-- Nested Tabs for Arrived and Cancelled Reservations -->

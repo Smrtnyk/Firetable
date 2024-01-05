@@ -1,3 +1,5 @@
+import { isDefined } from "@firetable/utils";
+
 export function noEmptyString(msg = "Please type something"): (val: string) => boolean | string {
     return function (val: string): boolean | string {
         return (val && val.length > 0) || msg;
@@ -7,6 +9,15 @@ export function noEmptyString(msg = "Please type something"): (val: string) => b
 export function minLength(msg: string, minLen = 5): (val: string) => boolean | string {
     return function (val: string): boolean | string {
         return (val && val.length >= minLen) || msg;
+    };
+}
+
+export function optionalMinLength(msg: string, minLen = 5): (val: string) => boolean | string {
+    return function (val: string): boolean | string {
+        if (!isDefined(val) || val === "") {
+            return true;
+        }
+        return minLength(msg, minLen)(val);
     };
 }
 

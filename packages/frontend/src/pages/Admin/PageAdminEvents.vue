@@ -27,7 +27,7 @@ import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import FTCenteredText from "src/components/FTCenteredText.vue";
-import { usePropertiesStore } from "src/stores/usePropertiesStore";
+import { usePropertiesStore } from "src/stores/properties-store";
 import FTTabs from "src/components/FTTabs.vue";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "src/stores/auth-store";

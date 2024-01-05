@@ -1,12 +1,9 @@
 <script setup lang="ts">
 import FTCenteredText from "src/components/FTCenteredText.vue";
-import { usePropertiesStore } from "src/stores/usePropertiesStore";
-import { computed } from "vue";
+import { usePropertiesStore } from "src/stores/properties-store";
+import { storeToRefs } from "pinia";
 
-const propertiesStore = usePropertiesStore();
-const organisations = computed(() => {
-    return propertiesStore.organisations;
-});
+const { organisations } = storeToRefs(usePropertiesStore());
 </script>
 
 <template>
