@@ -2,6 +2,19 @@
 
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=Smrtnyk_Firetable&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=Smrtnyk_Firetable)
 
+### Demo: [https://firetable-eu.web.app](https://firetable-eu.web.app)
+
+To access the demo, use the following credentials:
+- **Owner role**:
+  - Email: `owner@Demo.at`
+  - Password: `Owner@Demo!234,.`
+- **Staff role**:
+  - Email: `staff@Demo.at`
+  - Password: `Staff@Demo!234,.`
+- **Manager role**:
+  - Email: `manager@Demo.at`
+  - Password: `Manager@Demo!234,.`
+
 **Firetable** is an event management system designed with a focus on flexibility and user-friendly interfaces.
 It is built as a mono-repo using [pnpm](https://pnpm.io/), with the following packages:
 
