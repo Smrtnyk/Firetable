@@ -39,6 +39,16 @@ export const usePropertiesStore = defineStore("properties", () => {
         return properties.value.find(({ id }) => id === propertyId)?.name ?? "";
     }
 
+    async function initOrganisations(): Promise<void> {
+        const organisationsData = await fetchOrganisationsForAdmin();
+        setOrganisations(organisationsData);
+    }
+
+    async function initAdminProperties(): Promise<void> {
+        const allProperties = await fetchPropertiesForAdmin(organisations.value);
+        setProperties(allProperties);
+    }
+
     function addUnsub(unsub: typeof NOOP): void {
         unsubs.value.push(unsub);
     }
@@ -108,20 +118,8 @@ export const usePropertiesStore = defineStore("properties", () => {
         initNonAdminProperties,
         getOrganisationNameById,
         getPropertyNameById,
-        setProperties,
-        setOrganisations,
+        initAdminProperties,
+        initOrganisations,
         cleanup,
     };
 });
-
-export async function initOrganisations(): Promise<void> {
-    const propertiesStore = usePropertiesStore();
-    const organisations = await fetchOrganisationsForAdmin();
-    propertiesStore.setOrganisations(organisations);
-}
-
-export async function initAdminProperties(): Promise<void> {
-    const propertiesStore = usePropertiesStore();
-    const allProperties = await fetchPropertiesForAdmin(propertiesStore.organisations);
-    propertiesStore.setProperties(allProperties);
-}

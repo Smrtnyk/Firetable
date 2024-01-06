@@ -11,7 +11,7 @@ import { createNewOrganisation, deleteOrganisation } from "@firetable/backend";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { storeToRefs } from "pinia";
-import { initOrganisations, usePropertiesStore } from "src/stores/properties-store";
+import { usePropertiesStore } from "src/stores/properties-store";
 
 type Link = {
     label: string;
@@ -23,6 +23,7 @@ const { t } = useI18n();
 const quasar = useQuasar();
 const isLoading = ref(false);
 const { organisations } = storeToRefs(usePropertiesStore());
+const propertiesStore = usePropertiesStore();
 
 function createLinks(organisationId: string): Link[] {
     return [
@@ -64,12 +65,12 @@ const onOrganisationCreate = withLoading(async function (
 ) {
     await createNewOrganisation(organisationPayload);
     quasar.notify("organisation created!");
-    return initOrganisations();
+    return propertiesStore.initOrganisations();
 });
 
 const onDeleteOrganisation = withLoading(async (id: string) => {
     await deleteOrganisation(id);
-    await initOrganisations();
+    await propertiesStore.initOrganisations();
 });
 
 async function deleteOrganisationAsync(organisationId: string): Promise<void> {

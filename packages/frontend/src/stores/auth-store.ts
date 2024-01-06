@@ -7,11 +7,7 @@ import { isDefined, NOOP } from "@firetable/utils";
 import { logoutUser } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useFirestoreDocument } from "src/composables/useFirestore";
-import {
-    initAdminProperties,
-    initOrganisations,
-    usePropertiesStore,
-} from "src/stores/properties-store";
+import { usePropertiesStore } from "src/stores/properties-store";
 import { Loading } from "quasar";
 
 export const useAuthStore = defineStore("auth", () => {
@@ -98,13 +94,13 @@ export const useAuthStore = defineStore("auth", () => {
             const token = await authUser?.getIdTokenResult();
             const role = token?.claims.role as User["role"];
             const organisationId = token?.claims.organisationId as string;
+            const propertiesStore = usePropertiesStore();
 
             if (role === ADMIN) {
                 assignAdmin(authUser);
-                await initOrganisations();
-                await initAdminProperties();
+                await propertiesStore.initOrganisations();
+                await propertiesStore.initAdminProperties();
             } else {
-                const propertiesStore = usePropertiesStore();
                 await Promise.all([
                     watchAndAssignUser(authUser, organisationId),
                     propertiesStore.initNonAdminProperties({
