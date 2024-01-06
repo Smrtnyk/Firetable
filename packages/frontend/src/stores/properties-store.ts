@@ -65,17 +65,19 @@ export const usePropertiesStore = defineStore("properties", () => {
         organisations.value = organisationsVal;
     }
 
-    async function initNonAdminProperties({
-        role,
-        id,
-        organisationId,
-    }: Pick<User, "id" | "organisationId" | "role">): Promise<void> {
-        // Initialize organisation for user first
+    async function initUserOrganisation(organisationId: string): Promise<void> {
         const organisationsDoc = await fetchOrganisationById(organisationId);
         if (!organisationsDoc) {
             throw new Error("No organisation found for the given organisation id");
         }
         setOrganisations([organisationsDoc]);
+    }
+
+    async function initNonAdminProperties({
+        role,
+        id,
+        organisationId,
+    }: Pick<User, "id" | "organisationId" | "role">): Promise<void> {
         const propertiesRef = propertiesCollection(organisationId);
         const userPropertiesQuery =
             role === Role.PROPERTY_OWNER
@@ -115,6 +117,7 @@ export const usePropertiesStore = defineStore("properties", () => {
         properties,
         organisations,
         arePropertiesLoading,
+        initUserOrganisation,
         initNonAdminProperties,
         getOrganisationNameById,
         getPropertyNameById,

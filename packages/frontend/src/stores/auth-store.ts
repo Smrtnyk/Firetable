@@ -103,6 +103,7 @@ export const useAuthStore = defineStore("auth", () => {
             } else {
                 await Promise.all([
                     watchAndAssignUser(authUser, organisationId),
+                    propertiesStore.initUserOrganisation(organisationId),
                     propertiesStore.initNonAdminProperties({
                         role,
                         id: authUser.uid,
