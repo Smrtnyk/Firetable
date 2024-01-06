@@ -20,8 +20,8 @@
     },
     "devDependencies": {
         "@regru/eslint-plugin-prefer-early-return": "1.0.0",
-        "@typescript-eslint/eslint-plugin": "6.17.0",
-        "@typescript-eslint/parser": "6.17.0",
+        "@typescript-eslint/eslint-plugin": "6.18.0",
+        "@typescript-eslint/parser": "6.18.0",
         "autoprefixer": "10.4.16",
         "dotenv": "16.3.1",
         "eslint": "8.56.0",
