@@ -91,8 +91,8 @@ export interface WalkInReservation extends BaseReservation {
 
 export interface PlannedReservation extends BaseReservation {
     type: ReservationType.PLANNED;
-    reservationConfirmed: boolean | undefined;
-    cancelled: boolean | undefined;
+    reservationConfirmed: boolean;
+    cancelled: boolean;
     arrived: boolean;
     consumption: number;
     guestName: string;

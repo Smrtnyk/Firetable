@@ -53,28 +53,31 @@ const monthOptions = computed(() => {
     return options.reverse();
 });
 
-const chartInfos = computed(() => [
-    {
-        data: peakReservationHours.value,
-        title: "Peak Reservation Hours",
-        type: "bar",
-    },
-    {
-        data: consumptionAnalysisCombined.value,
-        title: "Consumption Data",
-        type: "bar",
-    },
-    {
-        data: guestDistributionAnalysis.value,
-        title: "Guest Distribution",
-        type: "bar",
-    },
-    {
-        data: reservationsByDayOfWeek.value,
-        title: "Reservations by Day of Week",
-        type: "bar",
-    },
-]);
+const chartInfos = computed(
+    () =>
+        [
+            {
+                data: peakReservationHours.value,
+                title: "Peak Reservation Hours",
+                type: "bar",
+            },
+            {
+                data: consumptionAnalysisCombined.value,
+                title: "Consumption Data",
+                type: "bar",
+            },
+            {
+                data: guestDistributionAnalysis.value,
+                title: "Guest Distribution",
+                type: "bar",
+            },
+            {
+                data: reservationsByDayOfWeek.value,
+                title: "Reservations by Day of Week",
+                type: "bar",
+            },
+        ] as const,
+);
 </script>
 
 <template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Reservation } from "@firetable/types";
+import type { Reservation, ReservationDoc } from "@firetable/types";
 import { isPlannedReservation } from "@firetable/types";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -9,7 +9,7 @@ import ReservationGeneralInfo from "src/components/Event/ReservationGeneralInfo.
 import ReservationLabelChips from "src/components/Event/reservation/ReservationLabelChips.vue";
 
 interface Props {
-    reservation: Reservation;
+    reservation: ReservationDoc;
 }
 
 const authStore = useAuthStore();
@@ -21,10 +21,10 @@ const emit = defineEmits<{
 const { t } = useI18n();
 const isGuestArrived = ref<boolean>(props.reservation.arrived);
 const isCancelled = ref<boolean>(
-    isPlannedReservation(props.reservation) && !!props.reservation.cancelled,
+    isPlannedReservation(props.reservation) && props.reservation.cancelled,
 );
 const reservationConfirmed = ref<boolean>(
-    isPlannedReservation(props.reservation) && !!props.reservation.reservationConfirmed,
+    isPlannedReservation(props.reservation) && props.reservation.reservationConfirmed,
 );
 const canDeleteReservation = computed(() => {
     return (
