@@ -9,8 +9,8 @@ import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useFirestoreDocument } from "src/composables/useFirestore";
 import {
     initAdminProperties,
-    initNonAdminProperties,
     initOrganisations,
+    usePropertiesStore,
 } from "src/stores/properties-store";
 import { Loading } from "quasar";
 
@@ -104,9 +104,10 @@ export const useAuthStore = defineStore("auth", () => {
                 await initOrganisations();
                 await initAdminProperties();
             } else {
+                const propertiesStore = usePropertiesStore();
                 await Promise.all([
                     watchAndAssignUser(authUser, organisationId),
-                    initNonAdminProperties({
+                    propertiesStore.initNonAdminProperties({
                         role,
                         id: authUser.uid,
                         organisationId,

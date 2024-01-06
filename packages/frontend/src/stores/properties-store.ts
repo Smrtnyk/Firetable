@@ -55,17 +55,62 @@ export const usePropertiesStore = defineStore("properties", () => {
         organisations.value = organisationsVal;
     }
 
+    async function initNonAdminProperties({
+        role,
+        id,
+        organisationId,
+    }: Pick<User, "id" | "organisationId" | "role">): Promise<void> {
+        // Initialize organisation for user first
+        const organisationsDoc = await fetchOrganisationById(organisationId);
+        if (!organisationsDoc) {
+            throw new Error("No organisation found for the given organisation id");
+        }
+        setOrganisations([organisationsDoc]);
+        const propertiesRef = propertiesCollection(organisationId);
+        const userPropertiesQuery =
+            role === Role.PROPERTY_OWNER
+                ? query(propertiesRef)
+                : query(propertiesRef, where("relatedUsers", "array-contains", id));
+        const { data, stop, pending, promise } = useFirestoreCollection<PropertyDoc[]>(
+            createQuery(userPropertiesQuery),
+        );
+
+        const stopWatchPending = watch(
+            pending,
+            (newPending) => {
+                setArePropertiesLoading(newPending);
+            },
+            { immediate: true },
+        );
+
+        const stopWatch = watch(
+            () => data.value,
+            (newProperties) => {
+                setProperties(newProperties as unknown as PropertyDoc[]);
+            },
+            { deep: true },
+        );
+
+        addUnsub(() => {
+            stopWatchPending();
+            stopWatch();
+            stop();
+        });
+
+        await promise.value;
+        await nextTick();
+    }
+
     return {
         properties,
         organisations,
         arePropertiesLoading,
+        initNonAdminProperties,
         getOrganisationNameById,
         getPropertyNameById,
-        setArePropertiesLoading,
         setProperties,
         setOrganisations,
         cleanup,
-        addUnsub,
     };
 });
 
@@ -79,51 +124,4 @@ export async function initAdminProperties(): Promise<void> {
     const propertiesStore = usePropertiesStore();
     const allProperties = await fetchPropertiesForAdmin(propertiesStore.organisations);
     propertiesStore.setProperties(allProperties);
-}
-
-export async function initNonAdminProperties({
-    role,
-    id,
-    organisationId,
-}: Pick<User, "id" | "organisationId" | "role">): Promise<void> {
-    const propertiesStore = usePropertiesStore();
-    // Initialize organisation for user first
-    const organisationsDoc = await fetchOrganisationById(organisationId);
-    if (!organisationsDoc) {
-        throw new Error("No organisation found for the given organisation id");
-    }
-    propertiesStore.setOrganisations([organisationsDoc]);
-    const propertiesRef = propertiesCollection(organisationId);
-    const userPropertiesQuery =
-        role === Role.PROPERTY_OWNER
-            ? query(propertiesRef)
-            : query(propertiesRef, where("relatedUsers", "array-contains", id));
-    const { data, stop, pending, promise } = useFirestoreCollection<PropertyDoc[]>(
-        createQuery(userPropertiesQuery),
-    );
-
-    const stopWatchPending = watch(
-        pending,
-        (newPending) => {
-            propertiesStore.setArePropertiesLoading(newPending);
-        },
-        { immediate: true },
-    );
-
-    const stopWatch = watch(
-        () => data.value,
-        (newProperties) => {
-            propertiesStore.setProperties(newProperties as unknown as PropertyDoc[]);
-        },
-        { deep: true },
-    );
-
-    propertiesStore.addUnsub(() => {
-        stopWatchPending();
-        stopWatch();
-        stop();
-    });
-
-    await promise.value;
-    await nextTick();
 }
