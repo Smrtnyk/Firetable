@@ -14,7 +14,7 @@ export function useUsers(organisationId: string) {
 
     async function fetchUsers(): Promise<void> {
         try {
-            if (authStore.isAdmin) {
+            if (authStore.isAdmin || authStore.isPropertyOwner) {
                 isLoading.value = true;
                 users.value = (await fetchUsersByRole([], organisationId)).data;
             } else {

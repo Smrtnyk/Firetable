@@ -71,7 +71,7 @@ export async function fetchUsersByRoleFn(
     const baseQuery = db.collection(
         `${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`,
     );
-    if (userRole === ADMIN) {
+    if (userRole === ADMIN || userRole === Role.PROPERTY_OWNER) {
         const usersSnapshot = await baseQuery.get();
         const orgUsers = usersSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as User);
         users = [...users, ...orgUsers];

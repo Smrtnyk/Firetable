@@ -1,8 +1,14 @@
 import type { User } from "@firetable/types";
 import type { User as FBUser } from "firebase/auth";
+import {
+    Role,
+    ADMIN,
+    Collection,
+    DEFAULT_CAPABILITIES_BY_ROLE,
+    UserCapability,
+} from "@firetable/types";
 import { defineStore } from "pinia";
 import { computed, ref, watch } from "vue";
-import { ADMIN, Collection, DEFAULT_CAPABILITIES_BY_ROLE, UserCapability } from "@firetable/types";
 import { isDefined, NOOP } from "@firetable/utils";
 import { logoutUser } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";
@@ -19,6 +25,10 @@ export const useAuthStore = defineStore("auth", () => {
 
     const isAdmin = computed(() => {
         return user.value?.role === ADMIN;
+    });
+
+    const isPropertyOwner = computed(() => {
+        return user.value?.role === Role.PROPERTY_OWNER;
     });
 
     const capabilities = computed(() => {
@@ -180,6 +190,7 @@ export const useAuthStore = defineStore("auth", () => {
         initUser,
         isLoggedIn,
         isAdmin,
+        isPropertyOwner,
         canEditOwnReservation,
         canEditReservation,
         canSeeReservationCreator,

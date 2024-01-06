@@ -146,7 +146,7 @@ async function showCreateUserDialog(): Promise<void> {
             title: t("PageAdminUsers.createNewUserDialogTitle"),
             componentPropsObject: {
                 properties: properties.value,
-                organisation,
+                organisation: organisation.value,
             },
             listeners: {
                 submit: function (userPayload: CreateUserPayload) {
@@ -181,7 +181,7 @@ async function showEditUserDialog(user: User): Promise<void> {
                 user: { ...user },
                 properties: properties.value,
                 selectedProperties,
-                organisation,
+                organisation: organisation.value,
             },
             listeners: {
                 submit: async (userPayload: EditUserPayload["updatedUser"]) => {

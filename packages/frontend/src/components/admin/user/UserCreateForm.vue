@@ -32,6 +32,9 @@ const availableRoles = computed(() => availableRolesBasedOn(role.value));
 const emailSuffix = computed(() => {
     return `@${props.organisation.name}.at`;
 });
+const shouldShowPropertiesSelection = computed(() => {
+    return props.properties.length > 0 && form.value.role !== Role.PROPERTY_OWNER;
+});
 
 async function onSubmit(): Promise<void> {
     if (await validateForm()) {
@@ -82,7 +85,7 @@ function prepareAndEmitSubmission(): void {
         ...form.value,
         email: `${form.value.username}${emailSuffix.value}`,
         organisationId: props.organisation.id,
-        relatedProperties: chosenProperties.value,
+        relatedProperties: chosenProperties.value || [],
     };
     emit("submit", submission);
 }
@@ -149,7 +152,7 @@ function resetProperties(): void {
                 :label="t('UserCreateForm.userRoleSelectLabel')"
             />
 
-            <div v-if="props.properties.length > 0" class="q-gutter-sm q-mb-lg">
+            <div v-if="shouldShowPropertiesSelection" class="q-gutter-sm q-mb-lg">
                 <div>{{ t("UserCreateForm.usePropertiesCheckboxesTitle") }}</div>
                 <div>
                     <q-checkbox
