@@ -80,7 +80,7 @@ export async function setGuestDataFn(req: CallableRequest<Data>): Promise<void> 
         }
 
         const guestData = guestDoc.data() as GuestDoc;
-        const propertyVisits = guestData.visitedProperties?.[propertyId] || {};
+        const propertyVisits = guestData.visitedProperties?.[propertyId] ?? {};
 
         if (propertyVisits[eventId]) {
             logger.info(

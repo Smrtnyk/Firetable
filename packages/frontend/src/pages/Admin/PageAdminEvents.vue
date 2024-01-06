@@ -183,7 +183,7 @@ async function onLoad(property: PropertyDoc): Promise<void> {
         organisationId: props.organisationId,
         id: "",
     };
-    const lastDoc = takeLast([...eventsByProperty[propertyId]])?._doc || null;
+    const lastDoc = takeLast([...eventsByProperty[propertyId]])?._doc ?? null;
     const eventsDocs = await fetchMoreEvents(eventOwner, lastDoc);
 
     if (!eventsDocs || eventsDocs.length < EVENTS_PER_PAGE) {

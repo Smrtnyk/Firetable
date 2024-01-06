@@ -82,6 +82,7 @@ module.exports = {
             },
         ],
         "@typescript-eslint/comma-spacing": ["error"],
+        "@typescript-eslint/prefer-nullish-coalescing": "error",
         "@typescript-eslint/consistent-type-assertions": "error",
         "@typescript-eslint/explicit-function-return-type": [
             "warn",

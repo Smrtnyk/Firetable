@@ -84,7 +84,7 @@ watchEffect(() => {
             name: props.event.name,
             guestListLimit: props.event.guestListLimit,
             entryPrice: props.event.entryPrice,
-            img: props.event.img || "",
+            img: props.event.img ?? "",
             date: props.event.date,
         };
         state.value.selectedDate = dateFromTimestamp(editDate.getTime());

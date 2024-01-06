@@ -26,14 +26,14 @@ export class SmoothBlinkAnimation implements AnimationStrategy {
             { opacity: 0 },
             {
                 duration: ANIMATION_DURATION,
-                onChange: this.target.canvas?.requestRenderAll.bind(this.target.canvas) || NOOP,
+                onChange: this.target.canvas?.requestRenderAll.bind(this.target.canvas) ?? NOOP,
                 onComplete: () => {
                     this.target.animate(
                         { opacity: 1 },
                         {
                             duration: ANIMATION_DURATION,
                             onChange:
-                                this.target.canvas?.requestRenderAll.bind(this.target.canvas) ||
+                                this.target.canvas?.requestRenderAll.bind(this.target.canvas) ??
                                 NOOP,
                             onComplete: () => {
                                 this.smoothBlink(); // Loop the animation

@@ -29,7 +29,7 @@ export class RoundTable extends Table {
             ...options.shapeOptions,
             originX: "center",
             originY: "center",
-            fill: options.groupOptions.baseFill || ELEMENT_DEFAULT_FILL_COLOR,
+            fill: options.groupOptions.baseFill ?? ELEMENT_DEFAULT_FILL_COLOR,
             stroke: ELEMENT_DEFAULT_STROKE_COLOR,
             strokeWidth: 0.5,
             strokeUniform: true,

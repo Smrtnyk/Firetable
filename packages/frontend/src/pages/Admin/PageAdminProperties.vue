@@ -32,7 +32,7 @@ const canCreateProperty = computed(() => {
     const maxAllowedProperties =
         propertiesStore.organisations.find((organisation) => {
             return organisation.id === props.organisationId;
-        })?.maxAllowedProperties || 0;
+        })?.maxAllowedProperties ?? 0;
     const currentNumOfProperties = properties.value.length;
     return currentNumOfProperties < maxAllowedProperties;
 });

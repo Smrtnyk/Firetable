@@ -107,7 +107,7 @@ function showEventInfo(): void {
             title: "Event Info",
             maximized: false,
             componentPropsObject: {
-                eventInfo: event.value?.info || "",
+                eventInfo: event.value?.info ?? "",
             },
             listeners: {},
         },
@@ -127,7 +127,7 @@ async function init(): Promise<void> {
         await router.replace("/");
         return;
     }
-    eventsStore.setCurrentEventName(event.value?.name || "");
+    eventsStore.setCurrentEventName(event.value?.name ?? "");
 }
 
 const moveFab: TouchPanValue = (ev) => {

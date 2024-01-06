@@ -5,6 +5,7 @@ module.exports = {
     parserOptions: {
         parser: require.resolve("@typescript-eslint/parser"),
         extraFileExtensions: [".vue"],
+        project: "./tsconfig.lint.json",
     },
     reportUnusedDisableDirectives: true,
     env: {

@@ -33,7 +33,7 @@ const { data: guest } = useFirestoreDocument<GuestDoc>(
 const tab = ref("");
 const propertiesVisits = computed(() => {
     const visitsByProperty: VisitsByProperty = {};
-    for (const [propertyId, events] of Object.entries(guest.value?.visitedProperties || {})) {
+    for (const [propertyId, events] of Object.entries(guest.value?.visitedProperties ?? {})) {
         const propertyData = properties.value.find(function ({ id }) {
             return id === propertyId;
         });

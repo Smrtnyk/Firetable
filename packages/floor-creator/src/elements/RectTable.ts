@@ -28,7 +28,7 @@ export class RectTable extends Table {
     constructor(options: RectTableElementOptions) {
         const tableRect = new Rect({
             ...options.shapeOptions,
-            fill: options.groupOptions.baseFill || ELEMENT_DEFAULT_FILL_COLOR,
+            fill: options.groupOptions.baseFill ?? ELEMENT_DEFAULT_FILL_COLOR,
             stroke: ELEMENT_DEFAULT_STROKE_COLOR,
             strokeWidth: ELEMENT_DEFAULT_STROKE_WIDTH,
             strokeUniform: true,

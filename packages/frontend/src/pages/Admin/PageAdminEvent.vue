@@ -141,7 +141,7 @@ function showDialog(
 function showEventInfoEditDialog(): void {
     if (event.value) {
         showDialog(AdminEventEditInfo, "Edit event info", {
-            eventInfo: event.value.info || "",
+            eventInfo: event.value.info ?? "",
             eventOwner,
         });
     }
