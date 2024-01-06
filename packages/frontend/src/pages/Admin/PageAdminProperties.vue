@@ -14,9 +14,11 @@ import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { useFirestoreCollection } from "src/composables/useFirestore";
+import { useAuthStore } from "src/stores/auth-store";
 
 const props = defineProps<{ organisationId: string }>();
 
+const authStore = useAuthStore();
 const propertiesStore = usePropertiesStore();
 const quasar = useQuasar();
 const { t } = useI18n();
@@ -37,11 +39,17 @@ const canCreateProperty = computed(() => {
 
 const onPropertyCreate = withLoading(async function (payload: CreatePropertyPayload) {
     await createNewProperty(payload);
+    if (authStore.isAdmin) {
+        await propertiesStore.initAdminProperties();
+    }
     quasar.notify("Property created!");
 });
 
 const onDeleteProperty = withLoading(async (property: PropertyDoc) => {
     await deleteProperty(property);
+    if (authStore.isAdmin) {
+        await propertiesStore.initAdminProperties();
+    }
 });
 
 async function deletePropertyAsync(property: PropertyDoc, reset: () => void): Promise<void> {
