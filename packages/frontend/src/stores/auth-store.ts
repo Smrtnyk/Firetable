@@ -96,7 +96,7 @@ export const useAuthStore = defineStore("auth", () => {
         try {
             Loading.show();
             const token = await authUser?.getIdTokenResult();
-            const role = token?.claims.role as string;
+            const role = token?.claims.role as User["role"];
             const organisationId = token?.claims.organisationId as string;
 
             if (role === ADMIN) {
@@ -107,6 +107,7 @@ export const useAuthStore = defineStore("auth", () => {
                 await Promise.all([
                     watchAndAssignUser(authUser, organisationId),
                     initNonAdminProperties({
+                        role,
                         id: authUser.uid,
                         organisationId,
                     }),

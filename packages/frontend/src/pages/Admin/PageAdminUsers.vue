@@ -29,13 +29,19 @@ const { t } = useI18n();
 const router = useRouter();
 const quasar = useQuasar();
 const authStore = useAuthStore();
-const { properties: allProperties } = storeToRefs(usePropertiesStore());
-const { getOrganisations } = usePropertiesStore();
+const { properties: allProperties, organisations: allOrganisations } =
+    storeToRefs(usePropertiesStore());
 
 const { users, isLoading, fetchUsers } = useUsers(props.organisationId);
 const { createDialog } = useDialog();
 
 const activeTab = ref(0);
+
+const organisation = computed(() => {
+    return allOrganisations.value.find((org) => {
+        return org.id === props.organisationId;
+    });
+});
 
 const unassignedUsers = computed(() => {
     return users.value.filter((user) => {
@@ -132,10 +138,6 @@ function onCreateUserFormSubmit(newUser: CreateUserPayload): Promise<void | Prom
 }
 
 async function showCreateUserDialog(): Promise<void> {
-    const [organisation] = (await getOrganisations(props.organisationId)).filter((org) => {
-        return org.id === props.organisationId;
-    });
-
     const dialog = createDialog({
         component: FTDialog,
         componentProps: {
@@ -168,9 +170,6 @@ async function showEditUserDialog(user: User): Promise<void> {
     }
     const selectedProperties = properties.value.filter((ownProperty) => {
         return user.relatedProperties.includes(ownProperty.id);
-    });
-    const [organisation] = (await getOrganisations(props.organisationId)).filter((org) => {
-        return org.id === props.organisationId;
     });
     const dialog = createDialog({
         component: FTDialog,

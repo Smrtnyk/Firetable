@@ -1,5 +1,6 @@
 import type { OrganisationDoc, PropertyDoc, User } from "@firetable/types";
 import type { NOOP } from "@firetable/utils";
+import { Role } from "@firetable/types";
 import { defineStore } from "pinia";
 import {
     fetchOrganisationById,
@@ -42,19 +43,6 @@ export const usePropertiesStore = defineStore("properties", () => {
         unsubs.value.push(unsub);
     }
 
-    async function getOrganisations(organisationId: string): Promise<OrganisationDoc[]> {
-        if (organisations.value.length > 0) {
-            return organisations.value;
-        }
-
-        const organisationsDoc = await fetchOrganisationById(organisationId);
-        if (organisationsDoc) {
-            organisations.value = [organisationsDoc];
-        }
-
-        return organisations.value;
-    }
-
     function setProperties(newProperties: PropertyDoc[]): void {
         properties.value = newProperties;
     }
@@ -76,7 +64,6 @@ export const usePropertiesStore = defineStore("properties", () => {
         setArePropertiesLoading,
         setProperties,
         setOrganisations,
-        getOrganisations,
         cleanup,
         addUnsub,
     };
@@ -95,12 +82,22 @@ export async function initAdminProperties(): Promise<void> {
 }
 
 export async function initNonAdminProperties({
+    role,
     id,
     organisationId,
-}: Pick<User, "id" | "organisationId">): Promise<void> {
+}: Pick<User, "id" | "organisationId" | "role">): Promise<void> {
     const propertiesStore = usePropertiesStore();
+    // Initialize organisation for user first
+    const organisationsDoc = await fetchOrganisationById(organisationId);
+    if (!organisationsDoc) {
+        throw new Error("No organisation found for the given organisation id");
+    }
+    propertiesStore.setOrganisations([organisationsDoc]);
     const propertiesRef = propertiesCollection(organisationId);
-    const userPropertiesQuery = query(propertiesRef, where("relatedUsers", "array-contains", id));
+    const userPropertiesQuery =
+        role === Role.PROPERTY_OWNER
+            ? query(propertiesRef)
+            : query(propertiesRef, where("relatedUsers", "array-contains", id));
     const { data, stop, pending, promise } = useFirestoreCollection<PropertyDoc[]>(
         createQuery(userPropertiesQuery),
     );

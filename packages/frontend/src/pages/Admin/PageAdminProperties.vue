@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import type { CreatePropertyPayload } from "@firetable/backend";
 import type { PropertyDoc } from "@firetable/types";
+
 import FTTitle from "src/components/FTTitle.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import AddNewPropertyForm from "src/components/admin/property/AddNewPropertyForm.vue";
+import FTCenteredText from "src/components/FTCenteredText.vue";
 
-import { Loading, useQuasar } from "quasar";
+import { useQuasar } from "quasar";
 import { showConfirm, withLoading } from "src/helpers/ui-helpers";
 import { createNewProperty, deleteProperty, getPropertiesPath } from "@firetable/backend";
-import { computed, onMounted, ref, watchEffect } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import FTCenteredText from "src/components/FTCenteredText.vue";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { useFirestoreCollection } from "src/composables/useFirestore";
 
@@ -32,25 +33,6 @@ const canCreateProperty = computed(() => {
         })?.maxAllowedProperties || 0;
     const currentNumOfProperties = properties.value.length;
     return currentNumOfProperties < maxAllowedProperties;
-});
-
-onMounted(async () => {
-    organisationsIsLoading.value = true;
-    try {
-        await propertiesStore.getOrganisations(props.organisationId);
-    } catch (error) {
-        console.error("Failed to load organizations:", error);
-    } finally {
-        organisationsIsLoading.value = false;
-    }
-});
-
-watchEffect(() => {
-    if (organisationsIsLoading.value) {
-        Loading.show();
-    } else {
-        Loading.hide();
-    }
 });
 
 const onPropertyCreate = withLoading(async function (payload: CreatePropertyPayload) {
