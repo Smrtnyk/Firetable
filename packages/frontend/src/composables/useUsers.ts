@@ -26,7 +26,10 @@ export function useUsers(organisationId: string) {
 
                 isLoading.value = true;
                 users.value = (
-                    await fetchUsersByRole([...new Set(relatedIds)], authStore.user!.organisationId)
+                    await fetchUsersByRole(
+                        [...new Set(relatedIds)],
+                        authStore.nonNullableUser.organisationId,
+                    )
                 ).data;
             }
         } catch (error) {

@@ -50,9 +50,9 @@ const initialState =
               reservedBy: null as unknown as User,
               cancelled: false,
               creator: {
-                  name: authStore.user!.name,
-                  email: authStore.user!.email,
-                  id: authStore.user!.id,
+                  name: authStore.nonNullableUser.name,
+                  email: authStore.nonNullableUser.email,
+                  id: authStore.nonNullableUser.id,
                   createdAt: getFirestoreTimestamp(),
               },
               tableLabel: props.table.label,

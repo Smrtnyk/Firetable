@@ -27,7 +27,7 @@ const userCreateForm = ref<QForm>();
 const form = ref<CreateUserPayload | User>({ ...userSkeleton() });
 const chosenProperties = ref<string[]>([]);
 
-const role = computed(() => authStore.user!.role);
+const role = computed(() => authStore.nonNullableUser.role);
 const availableRoles = computed(() => availableRolesBasedOn(role.value));
 const emailSuffix = computed(() => {
     return `@${props.organisation.name}.at`;

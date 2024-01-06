@@ -42,7 +42,7 @@ export function showErrorMessage(e: unknown): void {
 }
 
 export function withLoading<T extends (...args: any[]) => Promise<any>>(fn: T) {
-    return async function (...args: Parameters<T>): Promise<ReturnType<T> | void> {
+    return async function (...args: Parameters<T>): Promise<ReturnType<T> | undefined> {
         Loading.show();
         try {
             return await fn(...args);
@@ -51,6 +51,8 @@ export function withLoading<T extends (...args: any[]) => Promise<any>>(fn: T) {
         } finally {
             Loading.hide();
         }
+
+        return undefined;
     };
 }
 
@@ -72,7 +74,7 @@ export async function tryCatchLoadingWrapper<T>({
     hook,
     args,
     errorHook,
-}: TryCatchLoadingWrapperOptions<T>): Promise<T | void> {
+}: TryCatchLoadingWrapperOptions<T>): Promise<T | undefined> {
     try {
         Loading.show();
         return await hook(...(args ?? []));
@@ -82,6 +84,8 @@ export async function tryCatchLoadingWrapper<T>({
     } finally {
         Loading.hide();
     }
+
+    return undefined;
 }
 
 export function notifyPositive(message: string): void {

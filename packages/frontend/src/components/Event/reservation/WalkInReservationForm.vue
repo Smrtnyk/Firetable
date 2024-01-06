@@ -40,7 +40,7 @@ function generateInitialState(): WalkInReservation {
     const initialTime = now > eventStart ? now : eventStart;
     // Format the time as a string "HH:MM"
     const formattedTime = hourFromTimestamp(initialTime, null);
-
+    const { id, name, email } = authStore.nonNullableUser;
     return {
         type: ReservationType.WALK_IN as const,
         guestName: null,
@@ -51,9 +51,9 @@ function generateInitialState(): WalkInReservation {
         arrived: true as const,
         time: formattedTime,
         creator: {
-            name: authStore.user!.name,
-            email: authStore.user!.email,
-            id: authStore.user!.id,
+            name,
+            email,
+            id,
             createdAt: getFirestoreTimestamp(),
         },
         tableLabel: props.table.label,

@@ -23,6 +23,13 @@ export const useAuthStore = defineStore("auth", () => {
     const unsubscribers: (typeof NOOP)[] = [];
     const initInProgress = ref(false);
 
+    const nonNullableUser = computed(() => {
+        if (!user.value) {
+            throw new Error("User is not defined!");
+        }
+        return user.value;
+    });
+
     const isAdmin = computed(() => {
         return user.value?.role === ADMIN;
     });
@@ -32,7 +39,10 @@ export const useAuthStore = defineStore("auth", () => {
     });
 
     const capabilities = computed(() => {
-        return user.value?.capabilities ?? DEFAULT_CAPABILITIES_BY_ROLE[user.value!.role];
+        if (!user.value) {
+            throw new Error("User is not defined!");
+        }
+        return user.value?.capabilities ?? DEFAULT_CAPABILITIES_BY_ROLE[user.value.role];
     });
 
     const isLoggedIn = computed(() => {
@@ -127,12 +137,16 @@ export const useAuthStore = defineStore("auth", () => {
     }
 
     function assignAdmin(authUser: FBUser): void {
+        if (!authUser.email) {
+            throw new Error("Admin user must have an email!");
+        }
+
         user.value = {
             name: "Admin",
             username: "admin",
             id: authUser.uid,
             role: ADMIN,
-            email: authUser.email!,
+            email: authUser.email,
             relatedProperties: [],
             organisationId: "",
             capabilities: undefined,
@@ -188,6 +202,7 @@ export const useAuthStore = defineStore("auth", () => {
         cleanup,
         setAuthState,
         initUser,
+        nonNullableUser,
         isLoggedIn,
         isAdmin,
         isPropertyOwner,

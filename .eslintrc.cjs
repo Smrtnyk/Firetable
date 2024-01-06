@@ -22,7 +22,7 @@ module.exports = {
         "plugin:promise/recommended",
         "plugin:import/recommended",
         "plugin:import/typescript",
-        "plugin:@typescript-eslint/recommended",
+        "plugin:@typescript-eslint/strict",
         "plugin:prettier/recommended",
         "prettier",
     ],

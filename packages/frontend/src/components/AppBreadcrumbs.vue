@@ -30,7 +30,9 @@ function isRoot(routeName: string): boolean {
     return routeName === "Home";
 }
 
-function findRouteByName(name: RouteRecordName): RouteRecordRaw | RouteRecordNormalized | void {
+function findRouteByName(
+    name: RouteRecordName,
+): RouteRecordRaw | RouteRecordNormalized | undefined {
     for (const routeItem of router.getRoutes()) {
         if (routeItem.name === name) {
             return routeItem;
@@ -43,6 +45,7 @@ function findRouteByName(name: RouteRecordName): RouteRecordRaw | RouteRecordNor
             }
         }
     }
+    return undefined;
 }
 
 const breadcrumbLinks = computed<Link[]>(() => {
@@ -55,7 +58,9 @@ const breadcrumbLinks = computed<Link[]>(() => {
         if (currentRoute?.meta?.breadcrumb && currentRoute.name) {
             const isAllowed =
                 !currentRoute.meta.allowedRoles ||
-                (currentRoute.meta.allowedRoles as string[]).includes(authStore.user!.role);
+                (currentRoute.meta.allowedRoles as string[]).includes(
+                    authStore.nonNullableUser.role,
+                );
 
             if (isAllowed) {
                 const path = router.resolve({

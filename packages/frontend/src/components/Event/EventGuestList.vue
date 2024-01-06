@@ -40,7 +40,7 @@ const reachedCapacity = computed(() => props.guestList.length / props.guestListL
 const isGuestListFull = computed(() => props.guestList.length >= props.guestListLimit);
 
 const canInteract = computed(() => {
-    return [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN].includes(authStore.user!.role);
+    return [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN].includes(authStore.nonNullableUser.role);
 });
 
 function onCreate(newGuestData: GuestData): Promise<void> | void {

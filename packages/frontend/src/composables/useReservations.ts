@@ -142,7 +142,7 @@ export function useReservations(
     }
 
     function createEventLog(message: string): void {
-        addLogToEvent(eventOwner, message, authStore.user!).catch(NOOP);
+        addLogToEvent(eventOwner, message, authStore.nonNullableUser).catch(NOOP);
     }
 
     function handleReservationCreation(reservationData: Reservation): void {
@@ -230,6 +230,11 @@ export function useReservations(
         mode: "create" | "update",
     ): void {
         const { label } = element;
+        const eventStartTimestamp = event.value?.date;
+        if (!eventStartTimestamp) {
+            showErrorMessage("An error occurred, please refresh the page.");
+            throw new Error("Event start timestamp is not defined");
+        }
         const dialog = q
             .dialog({
                 component: FTDialog,
@@ -244,7 +249,7 @@ export function useReservations(
                             mode === "update" && reservation
                                 ? { ...reservation, id: reservation.id }
                                 : void 0,
-                        eventStartTimestamp: event.value!.date,
+                        eventStartTimestamp,
                         floor: floor,
                         table: element,
                     },

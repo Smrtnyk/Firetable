@@ -60,7 +60,7 @@ export async function clearOldEvents(): Promise<void> {
 async function getOldEvents(
     organisationId: string,
     propertyId: string,
-): Promise<QuerySnapshot | void> {
+): Promise<QuerySnapshot | undefined> {
     const date = new Date();
     date.setFullYear(date.getFullYear() - DELETION_AGE_YEARS);
 
@@ -74,4 +74,5 @@ async function getOldEvents(
     } catch (error) {
         logger.error("Error fetching old events:", error);
     }
+    return undefined;
 }
