@@ -2,72 +2,85 @@
 import type { EventDoc } from "@firetable/types";
 import { dateFromTimestamp, hourFromTimestamp } from "src/helpers/date-utils";
 import { useI18n } from "vue-i18n";
+import { computed } from "vue";
 
 interface Props {
     event: EventDoc;
+    index: number;
 }
 
 const props = defineProps<Props>();
 const { t } = useI18n();
+
+const backgroundImageUrl = computed(() => {
+    const imageIndex = (props.index % 3) + 1;
+    return props.event.img ? props.event.img : `/images/default-event-img-${imageIndex}.jpg`;
+});
 </script>
 <template>
-    <router-link
-        class="EventCard__link"
-        :to="{
-            name: 'event',
-            params: {
-                organisationId: props.event.organisationId,
-                propertyId: props.event.propertyId,
-                eventId: props.event.id,
-            },
+    <div
+        class="EventCard ft-card"
+        :style="{
+            backgroundImage: `url(${backgroundImageUrl})`,
+            backgroundPosition: 'center',
+            backgroundSize: 'cover',
+            backgroundRepeat: 'no-repeat',
         }"
     >
-        <q-card class="EventCard">
-            <q-img :src="event.img || '/images/default-event-img.jpg'" />
+        <router-link
+            class="EventCard__link"
+            :to="{
+                name: 'event',
+                params: {
+                    organisationId: props.event.organisationId,
+                    propertyId: props.event.propertyId,
+                    eventId: props.event.id,
+                },
+            }"
+        >
+            <q-responsive :ratio="16 / 9">
+                <div class="EventCard__content column">
+                    <div class="row items-center">
+                        <q-icon name="calendar" color="white" class="q-mr-xs" size="xs" />
 
-            <q-card-section class="EventCard__content">
-                <h4 class="text-h4 q-mb-sm q-ml-none q-mt-none">{{ props.event.name }}</h4>
-                <q-icon
-                    name="calendar"
-                    color="white"
-                    class="gradient-warning q-pa-xs rounded"
-                    size="xs"
-                />
-                {{ dateFromTimestamp(props.event.date) }}
+                        {{ dateFromTimestamp(props.event.date) }}
 
-                <q-icon
-                    name="clock"
-                    color="white"
-                    class="q-ml-sm gradient-positive q-pa-xs rounded"
-                    size="xs"
-                />
-                {{ hourFromTimestamp(props.event.date) }}
+                        <q-space />
 
-                <q-icon
-                    name="euro"
-                    color="white"
-                    class="q-ml-sm gradient-pink q-pa-xs rounded"
-                    size="xs"
-                />
-                {{ props.event.entryPrice || t("EventCard.freeLabel") }}
-            </q-card-section>
-        </q-card>
-    </router-link>
+                        <q-icon name="clock" color="white" class="q-mr-xs" size="xs" />
+
+                        {{ hourFromTimestamp(props.event.date) }}
+                    </div>
+
+                    <q-space />
+
+                    <div class="row">
+                        <q-icon name="euro" color="white" class="q-mr-xs" size="xs" />
+
+                        {{ props.event.entryPrice || t("EventCard.freeLabel") }}
+                    </div>
+
+                    <h4 class="text-h4 q-mb-sm q-ml-none q-mt-none">{{ props.event.name }}</h4>
+                </div>
+            </q-responsive>
+        </router-link>
+    </div>
 </template>
 
 <style lang="scss">
 .EventCard {
-    box-shadow:
-        0 0.25rem 0.25rem rgba(0, 0, 0, 0.2),
-        0 0 1rem rgba(0, 0, 0, 0.2);
+    border-radius: 0.5rem;
+
+    img {
+        border-radius: 0.5rem;
+    }
 
     &__content {
+        color: white;
         text-decoration: none !important;
         padding: 1rem;
-        width: 100%;
-        background: inherit;
-        position: absolute;
-        bottom: 0;
+        border-radius: 0.5rem;
+        background: rgba(0, 0, 0, 0.5);
     }
 }
 </style>

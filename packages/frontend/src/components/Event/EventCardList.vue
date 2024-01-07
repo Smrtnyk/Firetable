@@ -10,8 +10,8 @@ const props = defineProps<Props>();
 
 <template>
     <div class="EventCardList row">
-        <div v-for="event in props.events" class="col-12 col-sm-6 q-pa-xs" :key="event.id">
-            <EventCard :event="event" />
+        <div v-for="(event, index) in props.events" class="col-12 col-sm-6 q-pa-xs" :key="event.id">
+            <EventCard :index="index" :event="event" />
         </div>
     </div>
 </template>
