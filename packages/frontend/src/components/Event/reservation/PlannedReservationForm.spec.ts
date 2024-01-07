@@ -95,7 +95,7 @@ describe("PlannedReservationForm", () => {
             nanoseconds: 1,
         } as any);
         vi.spyOn(authStore, "useAuthStore").mockReturnValue({
-            user: MOCK_USER,
+            nonNullableUser: MOCK_USER,
         } as any);
     });
 
