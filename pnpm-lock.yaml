@@ -82,8 +82,8 @@ importers:
   packages/floor-creator:
     dependencies:
       fabric:
-        specifier: 6.0.0-beta16
-        version: 6.0.0-beta16
+        specifier: 6.0.0-beta17
+        version: 6.0.0-beta17
       hammerjs:
         specifier: 2.0.8
         version: 2.0.8
@@ -6677,8 +6677,8 @@ packages:
       - supports-color
     dev: true
 
-  /fabric@6.0.0-beta16:
-    resolution: {integrity: sha512-P7f0Z0P6ESxWOdmPSbBARTYj/0Nd5l3igPxxkV9gAIpnHtiVmCovuTc2+tPl4p42u+qHn3rmbd/2IXaplEPxdw==}
+  /fabric@6.0.0-beta17:
+    resolution: {integrity: sha512-Xi4X89oXkysx+rVR76vO+wplx4Qh1aUcfrPdxtlJeAhhZFD8ioH2csIkxo2WDPBfl1rQHl49vuZ1ZFo9uj9GZQ==}
     engines: {node: '>=16.20.0'}
     optionalDependencies:
       canvas: 2.11.2

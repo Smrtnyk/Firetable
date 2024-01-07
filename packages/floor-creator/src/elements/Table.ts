@@ -2,7 +2,7 @@ import type { GroupProps, Rect, FabricText, Circle } from "fabric";
 import type { AnimationStrategy } from "./animation/AnimationStrategy";
 import { SmoothBlinkAnimation } from "./animation/SmoothBlinkAnimation.js";
 import { TABLE_WIDTH, TABLE_HEIGHT } from "../constants";
-import { Group } from "fabric";
+import { Group, LayoutManager } from "fabric";
 
 interface TableElementOptions {
     groupOptions: {
@@ -25,7 +25,10 @@ export abstract class Table extends Group {
     private animationStrategy: AnimationStrategy;
 
     protected constructor(elements: [Rect | Circle, FabricText], options: TableElementOptions) {
-        super(elements, options.groupOptions);
+        super(elements, {
+            ...options.groupOptions,
+            layoutManager: new LayoutManager(),
+        });
         const [shape, textLabel] = elements;
         this.animationStrategy = new SmoothBlinkAnimation(this);
         this.shape = shape;

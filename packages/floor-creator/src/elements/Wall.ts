@@ -1,7 +1,7 @@
 import type { GroupProps } from "fabric";
 import { FloorElementTypes } from "../types";
 import { ELEMENT_DEFAULT_FILL_COLOR } from "../constants";
-import { Group, Rect } from "fabric";
+import { Group, LayoutManager, Rect } from "fabric";
 
 type WallCreationOptions = Record<string, unknown>;
 type WalLGroupCreationOptions = {
@@ -21,7 +21,10 @@ export class Wall extends Group {
             ...wallRectOpts,
         });
 
-        super([wallRect], groupOpts);
+        super([wallRect], {
+            ...groupOpts,
+            layoutManager: new LayoutManager(),
+        });
         this.wallRect = wallRect;
     }
 

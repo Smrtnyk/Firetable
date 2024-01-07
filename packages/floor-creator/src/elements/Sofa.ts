@@ -1,7 +1,7 @@
 import type { FabricObject, GroupProps } from "fabric";
 import { FloorElementTypes } from "../types";
 import { ELEMENT_DEFAULT_FILL_COLOR } from "../constants";
-import { Group, Rect } from "fabric";
+import { Group, LayoutManager, Rect } from "fabric";
 
 type SofaGroupCreationOpts = {
     top: number;
@@ -41,7 +41,10 @@ export class Sofa extends Group {
             strokeWidth: 0.5,
         });
 
-        super([base, backrest], sofaGroupOpts);
+        super([base, backrest], {
+            ...sofaGroupOpts,
+            layoutManager: new LayoutManager(),
+        });
         this.sofaBase = base;
     }
 

@@ -18,7 +18,7 @@
         "find-dead-code": "npx ts-prune -p tsconfig.json --ignore 'src/index.ts|dist'"
     },
     "dependencies": {
-        "fabric": "6.0.0-beta16",
+        "fabric": "6.0.0-beta17",
         "hammerjs": "2.0.8",
         "ts-pattern": "5.0.6"
     },
