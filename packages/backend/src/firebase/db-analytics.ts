@@ -1,4 +1,9 @@
-import type { EventDoc, PropertyDoc, ReservationDoc } from "@firetable/types";
+import type {
+    EventDoc,
+    PropertyDoc,
+    ReservationDoc,
+    ReservationDocWithEventId,
+} from "@firetable/types";
 import { eventsCollection, reservationsCollection } from "./db.js";
 import { getDocs, query, where } from "firebase/firestore";
 
@@ -6,7 +11,7 @@ export async function fetchAnalyticsData(
     monthKey: string,
     organisationId: string,
     properties: PropertyDoc[],
-): Promise<{ reservations: ReservationDoc[]; events: EventDoc[] }> {
+): Promise<{ reservations: ReservationDocWithEventId[]; events: EventDoc[] }> {
     const allEvents = await getEventsForProperties(properties, monthKey, organisationId);
     return {
         events: allEvents,
@@ -17,8 +22,8 @@ export async function fetchAnalyticsData(
 async function getReservationFromEvents(
     events: EventDoc[],
     organisationId: string,
-): Promise<ReservationDoc[]> {
-    const reservations: ReservationDoc[] = [];
+): Promise<ReservationDocWithEventId[]> {
+    const reservations: ReservationDocWithEventId[] = [];
     await Promise.all(
         events.map(async (event) => {
             const eventReservations = await getDocs(
@@ -33,7 +38,7 @@ async function getReservationFromEvents(
 
             eventReservations.docs.forEach((doc) => {
                 const data = doc.data() as ReservationDoc;
-                reservations.push(data);
+                reservations.push({ ...data, eventId: event.id });
             });
         }),
     );

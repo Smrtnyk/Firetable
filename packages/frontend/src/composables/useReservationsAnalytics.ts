@@ -1,4 +1,4 @@
-import type { EventDoc, PropertyDoc, ReservationDoc } from "@firetable/types";
+import type { EventDoc, PropertyDoc, ReservationDocWithEventId } from "@firetable/types";
 import type { Ref } from "vue";
 import type {
     AugmentedPlannedReservation,
@@ -30,20 +30,23 @@ export function useReservationsAnalytics(
     const selectedMonth = ref(format(new Date(), SELECTED_MONTH_FORMAT));
     const selectedDay = ref(DEFAULT_SELECTED_DAY);
 
+    const currentPropertyReservations = computed(() => {
+        // Find the bucket for the selected property
+        return (
+            reservationBuckets.value.find((bucket) => bucket.propertyId === selectedTab.value) ?? {
+                plannedReservations: [],
+                walkInReservations: [],
+            }
+        );
+    });
+
     const plannedReservationsByActiveProperty = computed<AugmentedPlannedReservation[]>(() => {
-        return reservationBuckets.value
-            .filter((bucket) => bucket.propertyId === selectedTab.value)
-            .flatMap((bucket) => bucket.plannedReservations);
+        return currentPropertyReservations.value.plannedReservations;
     });
 
     const plannedVsWalkInReservations = computed<PieChartData>(() => {
-        let planned = 0;
-        let walkIn = 0;
-
-        reservationBuckets.value.forEach((bucket) => {
-            planned += bucket.plannedReservations.length;
-            walkIn += bucket.walkInReservations.length;
-        });
+        const planned = currentPropertyReservations.value.plannedReservations.length;
+        const walkIn = currentPropertyReservations.value.walkInReservations.length;
 
         return {
             labels: ["Planned", "Walk-In"],
@@ -105,15 +108,13 @@ export function useReservationsAnalytics(
         let totalWalkInGuests = 0;
         let totalWalkInReservations = 0;
 
-        reservationBuckets.value.forEach((bucket) => {
-            bucket.plannedReservations.forEach(({ numberOfGuests }) => {
-                totalPlannedGuests += numberOfGuests;
-                totalPlannedReservations++;
-            });
-            bucket.walkInReservations.forEach(({ numberOfGuests }) => {
-                totalWalkInGuests += numberOfGuests;
-                totalWalkInReservations++;
-            });
+        currentPropertyReservations.value.plannedReservations.forEach(({ numberOfGuests }) => {
+            totalPlannedGuests += numberOfGuests;
+            totalPlannedReservations++;
+        });
+        currentPropertyReservations.value.walkInReservations.forEach(({ numberOfGuests }) => {
+            totalWalkInGuests += numberOfGuests;
+            totalWalkInReservations++;
         });
 
         const averagePlannedGuests =
@@ -359,33 +360,37 @@ export function useReservationsAnalytics(
 
 function bucketize(
     events: EventDoc[],
-    fetchedReservations: ReservationDoc[],
+    fetchedReservations: ReservationDocWithEventId[],
     properties: PropertyDoc[],
 ): ReservationBucket[] {
     const buckets: Record<string, ReservationBucket> = {};
 
     events.forEach((event) => {
-        fetchedReservations.forEach((reservation) => {
-            // TODO: include cancelled reservations in analytics
-            if (isPlannedReservation(reservation) && reservation.cancelled) {
+        // Find or create a bucket for each event's property
+        if (!buckets[event.propertyId]) {
+            const propertyName = properties.find(({ id }) => id === event.propertyId)?.name;
+            if (!propertyName) {
                 return;
             }
 
-            if (!buckets[event.propertyId]) {
-                const propertyName = properties.find(function ({ id }) {
-                    return id === event.propertyId;
-                })?.name;
+            buckets[event.propertyId] = {
+                propertyId: event.propertyId,
+                propertyName,
+                plannedReservations: [],
+                walkInReservations: [],
+            };
+        }
 
-                if (!propertyName) {
-                    return;
-                }
+        // Filter reservations for the current event
+        fetchedReservations.forEach((reservation) => {
+            // Ensure the reservation is for the current event
+            if (reservation.eventId !== event.id) {
+                return;
+            }
 
-                buckets[event.propertyId] = {
-                    propertyId: event.propertyId,
-                    propertyName,
-                    plannedReservations: [],
-                    walkInReservations: [],
-                };
+            // Skip cancelled reservations
+            if (isPlannedReservation(reservation) && reservation.cancelled) {
+                return;
             }
 
             const reservationData: AugmentedPlannedReservation | AugmentedWalkInReservation = {
