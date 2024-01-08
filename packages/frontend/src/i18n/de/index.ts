@@ -116,6 +116,7 @@ export default {
         noPropertiesWithoutOrganisationMessage:
             "Um Immobilien zu erstellen, müssen Sie zuerst eine Organisation erstellen.",
         createPropertyDialogTitle: "Neue Immobilie hinzufügen",
+        editPropertyDialogTitle: "Immobilie bearbeiten: {name}",
     },
     AddNewPropertyForm: {
         propertyNameLengthValidationMessage: "Der Immobilienname muss mindestens 3 Zeichen haben!",

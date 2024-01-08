@@ -114,6 +114,7 @@ export default {
         noPropertiesWithoutOrganisationMessage:
             "In order to create properties, you must first create an organisation.",
         createPropertyDialogTitle: "Add new Property",
+        editPropertyDialogTitle: "Editing property: {name}",
     },
     AddNewPropertyForm: {
         propertyNameLengthValidationMessage: "Property name needs to have at least 3 characters!",

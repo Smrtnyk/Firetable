@@ -1,6 +1,12 @@
 <script setup lang="ts">
-import type { CreatePropertyPayload } from "@firetable/backend";
+import type { CreatePropertyPayload, UpdatePropertyPayload } from "@firetable/backend";
 import type { PropertyDoc } from "@firetable/types";
+import {
+    updateProperty,
+    createNewProperty,
+    deleteProperty,
+    getPropertiesPath,
+} from "@firetable/backend";
 
 import FTTitle from "src/components/FTTitle.vue";
 import FTDialog from "src/components/FTDialog.vue";
@@ -9,14 +15,17 @@ import FTCenteredText from "src/components/FTCenteredText.vue";
 
 import { useQuasar } from "quasar";
 import { showConfirm, withLoading } from "src/helpers/ui-helpers";
-import { createNewProperty, deleteProperty, getPropertiesPath } from "@firetable/backend";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { useFirestoreCollection } from "src/composables/useFirestore";
 import { useAuthStore } from "src/stores/auth-store";
 
-const props = defineProps<{ organisationId: string }>();
+interface Props {
+    organisationId: string;
+}
+
+const props = defineProps<Props>();
 
 const authStore = useAuthStore();
 const propertiesStore = usePropertiesStore();
@@ -45,6 +54,14 @@ const onPropertyCreate = withLoading(async function (payload: CreatePropertyPayl
     quasar.notify("Property created!");
 });
 
+const onPropertyUpdate = withLoading(async function (payload: UpdatePropertyPayload) {
+    await updateProperty(payload);
+    if (authStore.isAdmin) {
+        await propertiesStore.initAdminProperties();
+    }
+    quasar.notify("Property updated!");
+});
+
 const onDeleteProperty = withLoading(async (property: PropertyDoc) => {
     await deleteProperty(property);
     if (authStore.isAdmin) {
@@ -53,6 +70,7 @@ const onDeleteProperty = withLoading(async (property: PropertyDoc) => {
 });
 
 async function deletePropertyAsync(property: PropertyDoc, reset: () => void): Promise<void> {
+    reset();
     if (
         await showConfirm(
             t("PageAdminProperties.deletePropertyDialogTitle"),
@@ -61,22 +79,33 @@ async function deletePropertyAsync(property: PropertyDoc, reset: () => void): Pr
     ) {
         return onDeleteProperty(property);
     }
-    reset();
 }
 
-function createProperty(): void {
+async function showUpdatePropertyDialog(property: PropertyDoc, reset: () => void): Promise<void> {
+    reset();
+    createProperty(property);
+}
+
+function createProperty(property?: PropertyDoc): void {
     const dialog = quasar.dialog({
         component: FTDialog,
         componentProps: {
-            title: t("PageAdminProperties.createPropertyDialogTitle"),
+            title: property
+                ? t("PageAdminProperties.editPropertyDialogTitle", { name: property.name })
+                : t("PageAdminProperties.createPropertyDialogTitle"),
             maximized: false,
             component: AddNewPropertyForm,
             componentPropsObject: {
                 organisationId: props.organisationId,
+                propertyDoc: property,
             },
             listeners: {
                 create: (payload: CreatePropertyPayload) => {
                     onPropertyCreate(payload);
+                    dialog.hide();
+                },
+                update(payload: UpdatePropertyPayload) {
+                    onPropertyUpdate(payload);
                     dialog.hide();
                 },
             },
@@ -94,7 +123,7 @@ function createProperty(): void {
                     rounded
                     icon="plus"
                     class="button-gradient"
-                    @click="createProperty"
+                    @click="() => createProperty()"
                 />
             </template>
         </FTTitle>
@@ -105,10 +134,15 @@ function createProperty(): void {
                 :key="property.id"
                 right-color="warning"
                 @right="({ reset }) => deletePropertyAsync(property, reset)"
+                @left="({ reset }) => showUpdatePropertyDialog(property, reset)"
                 class="fa-card"
             >
                 <template #right>
                     <q-icon name="trash" />
+                </template>
+
+                <template #left>
+                    <q-icon name="pencil" />
                 </template>
 
                 <q-item clickable class="ft-card">

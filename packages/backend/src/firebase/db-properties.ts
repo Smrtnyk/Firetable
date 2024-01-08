@@ -2,12 +2,19 @@ import type { OrganisationDoc, PropertyDoc } from "@firetable/types";
 import type { HttpsCallableResult } from "firebase/functions";
 import { propertiesCollection, propertyDoc } from "./db.js";
 import { initializeFirebase } from "./base.js";
-import { deleteDoc, getDocs } from "firebase/firestore";
+import { deleteDoc, getDocs, updateDoc } from "firebase/firestore";
 import { httpsCallable } from "firebase/functions";
 
 export type CreatePropertyPayload = {
     name: string;
     organisationId: string;
+    img?: string;
+};
+
+export type UpdatePropertyPayload = {
+    id: string;
+    organisationId: string;
+    name: string;
     img?: string;
 };
 
@@ -19,6 +26,13 @@ export function createNewProperty(
         functions,
         "createProperty",
     )(propertyPayload);
+}
+
+export function updateProperty(updatedProperty: UpdatePropertyPayload): Promise<void> {
+    return updateDoc(
+        propertyDoc(updatedProperty.id, updatedProperty.organisationId),
+        updatedProperty,
+    );
 }
 
 export function deleteProperty(property: PropertyDoc): Promise<void> {
