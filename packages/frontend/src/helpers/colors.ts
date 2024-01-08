@@ -1,4 +1,6 @@
-import Color from "color";
+import { colors } from "quasar";
+
+const { changeAlpha, rgbToHex, hexToRgb, rgbToHsv, hsvToRgb } = colors;
 
 const baseColors = [
     "#e60049",
@@ -12,8 +14,20 @@ const baseColors = [
     "#00bfa0",
 ];
 
+function rotateHue(hexColor: string, angle: number): string {
+    const rgb = hexToRgb(hexColor);
+
+    const { h, s, v } = rgbToHsv(rgb);
+
+    let newH = (h + angle) % 360;
+    newH = newH < 0 ? 360 + newH : newH;
+
+    const newRgb = hsvToRgb({ h: newH, s, v });
+    return rgbToHex(newRgb);
+}
+
 function adjustColorOpacity(hexColor: string, opacity: number): string {
-    return Color(hexColor).alpha(opacity).string();
+    return changeAlpha(hexColor, opacity);
 }
 
 export function getColors(count: number): { backgroundColors: string[]; borderColors: string[] } {
@@ -28,9 +42,7 @@ export function getColors(count: number): { backgroundColors: string[]; borderCo
         } else {
             // Start modifying the color after using all base colors
             const colorIndex = i % baseColors.length;
-            baseColor = Color(baseColors[colorIndex])
-                .rotate(((i - baseColors.length) * 20) % 360)
-                .hex();
+            baseColor = rotateHue(baseColors[colorIndex], ((i - baseColors.length) * 20) % 360);
         }
 
         backgroundColors.push(adjustColorOpacity(baseColor, 0.7));

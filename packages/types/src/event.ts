@@ -56,6 +56,7 @@ export type WalkInReservationDoc = WalkInReservation & {
 };
 
 export type ReservationDoc = PlannedReservationDoc | WalkInReservationDoc;
+export type ReservationDocWithEventId = ReservationDoc & { eventId: string };
 
 type UserIdentifier = Pick<User, "name" | "email" | "id">;
 
