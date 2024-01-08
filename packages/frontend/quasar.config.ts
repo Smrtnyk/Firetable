@@ -2,11 +2,9 @@
 
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
-/* eslint-disable */
-const { configure } = require("quasar/wrappers");
-const fs = require("fs");
+import { configure } from "quasar/wrappers";
 
-module.exports = configure(function (/* ctx */) {
+export default configure(function (/* ctx */) {
     return {
         eslint: {
             // fix: true,
@@ -40,8 +38,6 @@ module.exports = configure(function (/* ctx */) {
                 node: "node20",
             },
 
-            env: require("dotenv").config().parsed,
-
             vueRouterMode: "history",
             // vueRouterBase,
             // vueDevtools,
@@ -50,7 +46,7 @@ module.exports = configure(function (/* ctx */) {
             // rebuildCache: true, // rebuilds Vite/linter/etc cache on startup
 
             // publicPath: '/',
-            // analyze: true,
+            analyze: true,
             // rawDefine: {}
             // ignorePublicFolder: true,
             // minify: false,
@@ -66,10 +62,10 @@ module.exports = configure(function (/* ctx */) {
 
         // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
         devServer: {
-            https: process.env.CI ? null : {
-                key: fs.readFileSync("./key.pem"),
-                cert: fs.readFileSync("./cert.pem"),
-            },
+            // https: process.env.CI ? null : {
+            //     key: fs.readFileSync("./key.pem"),
+            //     cert: fs.readFileSync("./cert.pem"),
+            // },
             port: 8080,
             open: true,
             host: "0.0.0.0",
@@ -94,13 +90,7 @@ module.exports = configure(function (/* ctx */) {
             // directives: [],
 
             // Quasar plugins
-            plugins: [
-                "Notify",
-                "Dialog",
-                "LocalStorage",
-                "Loading",
-                "BottomSheet",
-            ],
+            plugins: ["Notify", "Dialog", "LocalStorage", "Loading", "BottomSheet"],
         },
 
         // animations: 'all', // --- includes all animations
@@ -112,8 +102,8 @@ module.exports = configure(function (/* ctx */) {
         //   rootComponent: 'src/App.vue',
         //   router: 'src/router/index',
         //   store: 'src/store/index',
-        //   registerServiceWorker: 'src-pwa/register-service-worker',
-        //   serviceWorker: 'src-pwa/custom-service-worker',
+        //   pwaRegisterServiceWorker: 'src-pwa/register-service-worker',
+        //   pwaServiceWorker: 'src-pwa/custom-service-worker',
         //   pwaManifestFile: 'src-pwa/manifest.json',
         //   electronMain: 'src-electron/electron-main',
         //   electronPreload: 'src-electron/electron-preload'
@@ -121,7 +111,7 @@ module.exports = configure(function (/* ctx */) {
 
         // https://v2.quasar.dev/quasar-cli-vite/developing-pwa/configuring-pwa
         pwa: {
-            workboxMode: 'injectManifest', // Use your custom Service Worker
+            workboxMode: "InjectManifest", // Use your custom Service Worker
             injectPwaMetaTags: true,
         },
     };
