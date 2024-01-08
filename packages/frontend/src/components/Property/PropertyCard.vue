@@ -1,54 +1,63 @@
 <script setup lang="ts">
 import type { PropertyDoc } from "@firetable/types";
+import { computed } from "vue";
 
 interface Props {
     property: PropertyDoc;
 }
 
 const props = defineProps<Props>();
+
+const backgroundImageUrl = computed(() => {
+    return props.property.img ? props.property.img : `/images/default-property-img.jpg`;
+});
 </script>
 
 <template>
-    <router-link
-        class="PropertyCard__link"
-        :to="{
-            name: 'events',
-            params: {
-                propertyId: props.property.id,
-                organisationId: props.property.organisationId,
-            },
+    <div
+        class="PropertyCard ft-card"
+        :style="{
+            backgroundImage: `url(${backgroundImageUrl})`,
+            backgroundPosition: 'center',
+            backgroundSize: 'cover',
+            backgroundRepeat: 'no-repeat',
         }"
     >
-        <q-card class="PropertyCard">
-            <q-img
-                class="PropertyCard__parallax"
-                :src="props.property.img || '/images/default-event-img.jpg'"
-                alt=""
-            />
+        <router-link
+            class="PropertyCard__link"
+            :to="{
+                name: 'events',
+                params: {
+                    propertyId: props.property.id,
+                    organisationId: props.property.organisationId,
+                },
+            }"
+        >
+            <q-responsive :ratio="16 / 9">
+                <div class="PropertyCard__content column">
+                    <q-space />
 
-            <q-card-section class="PropertyCard__content">
-                <h2 class="text-h3 q-mb-sm q-ml-none q-mt-none">{{ props.property.name }}</h2>
-            </q-card-section>
-        </q-card>
-    </router-link>
+                    <h2 class="text-h3 q-mb-sm q-ml-none q-mt-none">{{ props.property.name }}</h2>
+                </div>
+            </q-responsive>
+        </router-link>
+    </div>
 </template>
 
 <style lang="scss">
 .PropertyCard {
-    position: relative;
-    overflow: hidden;
-    box-shadow:
-        0 0.25rem 0.25rem rgba(0, 0, 0, 0.2),
-        0 0 1rem rgba(0, 0, 0, 0.2);
+    border-radius: 0.5rem;
+
+    img {
+        border-radius: 0.5rem;
+    }
 
     &__content {
-        overflow: hidden;
+        color: white;
         text-decoration: none !important;
         padding: 1rem;
-        width: 100%;
-        background: inherit;
-        position: absolute;
-        bottom: 0;
+        border-radius: 0.5rem;
+        background: rgba(0, 0, 0, 0.5);
     }
 }
 </style>
