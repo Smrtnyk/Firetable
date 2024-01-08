@@ -62,10 +62,10 @@ export default configure(function (/* ctx */) {
 
         // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
         devServer: {
-            https: process.env.CI ? null : {
-                key: fs.readFileSync("./key.pem"),
-                cert: fs.readFileSync("./cert.pem"),
-            },
+            // https: process.env.CI ? null : {
+            //     key: fs.readFileSync("./key.pem"),
+            //     cert: fs.readFileSync("./cert.pem"),
+            // },
             port: 8080,
             open: true,
             host: "0.0.0.0",
@@ -90,13 +90,7 @@ export default configure(function (/* ctx */) {
             // directives: [],
 
             // Quasar plugins
-            plugins: [
-                "Notify",
-                "Dialog",
-                "LocalStorage",
-                "Loading",
-                "BottomSheet",
-            ],
+            plugins: ["Notify", "Dialog", "LocalStorage", "Loading", "BottomSheet"],
         },
 
         // animations: 'all', // --- includes all animations
@@ -117,7 +111,7 @@ export default configure(function (/* ctx */) {
 
         // https://v2.quasar.dev/quasar-cli-vite/developing-pwa/configuring-pwa
         pwa: {
-            workboxMode: 'InjectManifest', // Use your custom Service Worker
+            workboxMode: "InjectManifest", // Use your custom Service Worker
             injectPwaMetaTags: true,
         },
     };
