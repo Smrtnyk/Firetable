@@ -17,11 +17,13 @@ export class MockFirestore {
         return new MockCollection(path, this);
     }
 
-    runTransaction<T>(updateFunction: (transaction: MockTransaction) => Promise<T>): Promise<T> {
+    async runTransaction<T>(
+        updateFunction: (transaction: MockTransaction) => Promise<T>,
+    ): Promise<T> {
         const transaction = new MockTransaction(this);
-        return updateFunction(transaction).then((result: T) => {
-            return transaction.commit().then(() => result);
-        });
+        const result = await updateFunction(transaction);
+        await transaction.commit();
+        return result;
     }
 
     // Method to get data at a specific path
@@ -49,7 +51,7 @@ class MockCollection {
         const id = generateRandomId();
         const docPath = `${this.path}/${id}`;
         const newDocRef = new MockDocumentReference(docPath, this.db, id);
-        newDocRef.set(data);
+        await newDocRef.set(data);
         return newDocRef;
     }
 }

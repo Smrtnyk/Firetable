@@ -27,4 +27,34 @@ describe("MockFirestore", () => {
         expect(finalSnapshot.exists).toBe(true);
         expect(finalSnapshot.data?.()).toEqual({ key: "value" }); // Data should be visible after the transaction commits
     });
+
+    it("should delete a document correctly", async () => {
+        const db = new MockFirestore();
+        const docRef = db.collection("testCollection").doc("testDoc");
+        await docRef.set({ key: "value" });
+
+        await docRef.delete();
+
+        const snapshot = await docRef.get();
+        expect(snapshot.exists).toBe(false);
+    });
+
+    it("should update a document correctly", async () => {
+        const db = new MockFirestore();
+        const docRef = db.collection("testCollection").doc("testDoc");
+        await docRef.set({ key: "value" });
+
+        await docRef.update({ key: "newValue" });
+
+        const snapshot = await docRef.get();
+        expect(snapshot.data?.()).toEqual({ key: "newValue" });
+    });
+
+    it("should handle non-existent document correctly", async () => {
+        const db = new MockFirestore();
+        const docRef = db.collection("testCollection").doc("nonExistentDoc");
+
+        const snapshot = await docRef.get();
+        expect(snapshot.exists).toBe(false);
+    });
 });
