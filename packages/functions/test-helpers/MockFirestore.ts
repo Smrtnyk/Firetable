@@ -1,5 +1,3 @@
-import { vi } from "vitest";
-
 type FirestoreData = Record<string, any>;
 
 const generateRandomId = (): string => Math.random().toString(36).substring(2, 15);
@@ -46,6 +44,14 @@ class MockCollection {
         const docPath = `${this.path}/${id}`;
         return new MockDocumentReference(docPath, this.db, id);
     }
+
+    async add(data: any): Promise<MockDocumentReference> {
+        const id = generateRandomId();
+        const docPath = `${this.path}/${id}`;
+        const newDocRef = new MockDocumentReference(docPath, this.db, id);
+        newDocRef.set(data);
+        return newDocRef;
+    }
 }
 
 class MockDocumentReference {
@@ -77,6 +83,12 @@ class MockDocumentReference {
     collection(subPath: string): MockCollection {
         const fullPath = `${this.path}/${subPath}`;
         return new MockCollection(fullPath, this.db);
+    }
+
+    update(data: any): Promise<void> {
+        const currentData = this.db.data[this.path] || {};
+        this.db.data[this.path] = { ...currentData, ...data };
+        return Promise.resolve();
     }
 }
 

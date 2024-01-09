@@ -4,7 +4,6 @@ import { MockFirestore } from "../../../test-helpers/MockFirestore.js";
 import { db } from "../../init.js";
 import { getEventPath } from "../../paths.js";
 import { createEvent } from "./index.js";
-import { describe, it, expect, vi } from "vitest";
 
 vi.mock("../../init", () => ({
     db: new MockFirestore(),

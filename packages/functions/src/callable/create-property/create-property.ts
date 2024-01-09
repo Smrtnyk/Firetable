@@ -1,6 +1,7 @@
 import type { CallableRequest } from "firebase-functions/v2/https";
 import { db } from "../../init.js";
-import { ADMIN, Collection } from "../../../types/types.js";
+import { ADMIN } from "../../../types/types.js";
+import { getPropertiesPath, getUsersPath } from "../../paths.js";
 import { FieldValue } from "firebase-admin/firestore";
 import { HttpsError } from "firebase-functions/v2/https";
 
@@ -10,7 +11,6 @@ interface Data {
 }
 
 export async function createPropertyFn(req: CallableRequest<Data>): Promise<string> {
-    // Check for authenticated user
     if (!req.auth) {
         throw new HttpsError("unauthenticated", "User must be authenticated");
     }
@@ -30,7 +30,7 @@ export async function createPropertyFn(req: CallableRequest<Data>): Promise<stri
     try {
         // Adding the property data to Firestore
         const propertyDocRef = await db
-            .collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}`)
+            .collection(getPropertiesPath(organisationId))
             .add(propertyData);
         const propertyId = propertyDocRef.id;
 
@@ -38,9 +38,7 @@ export async function createPropertyFn(req: CallableRequest<Data>): Promise<stri
 
         // If user is not an admin, associate the property with the user
         if (userClaims.role !== ADMIN) {
-            const userRef = db
-                .collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`)
-                .doc(req.auth.uid);
+            const userRef = db.collection(getUsersPath(organisationId)).doc(req.auth.uid);
             await userRef.update({
                 relatedProperties: FieldValue.arrayUnion(propertyId),
             });
