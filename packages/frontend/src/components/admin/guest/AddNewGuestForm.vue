@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { CreateGuestPayload } from "@firetable/types";
 import { ref } from "vue";
-import { minLength, noEmptyString } from "src/helpers/form-rules";
+import { minLength } from "src/helpers/form-rules";
 import { QForm } from "quasar";
+import { isValidEuropeanPhoneNumber } from "src/helpers/utils";
 
 const emit = defineEmits<{
     (eventName: "create", payload: CreateGuestPayload): void;
@@ -12,8 +13,9 @@ const guestContact = ref("");
 const createGuestForm = ref<null | QForm>(null);
 const guestNameRules = [minLength("Guest name must be at least 3 characters long", 3)];
 const guestContactRules = [
-    noEmptyString(),
-    minLength("Guest contact needs to be at least 6 characters long", 6),
+    function (value: string) {
+        return isValidEuropeanPhoneNumber(value) || "Invalid phone number";
+    },
 ];
 
 async function submit(): Promise<void> {
