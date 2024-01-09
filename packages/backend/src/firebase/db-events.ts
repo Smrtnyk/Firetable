@@ -6,7 +6,7 @@ import type {
     EventDoc,
     EventLog,
     FloorDoc,
-    GuestData,
+    GuestInGuestListData,
     Reservation,
     ReservationDoc,
     User,
@@ -158,7 +158,7 @@ export function updateEventFloorData(
 
 export function addGuestToGuestList(
     owner: EventOwner,
-    payload: GuestData,
+    payload: GuestInGuestListData,
 ): Promise<DocumentReference> {
     return addDoc(guestListCollection(owner), payload);
 }
