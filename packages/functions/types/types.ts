@@ -58,14 +58,6 @@ export const enum USER_CAPABILITIES {
     CAN_RESERVE = "can-reserve",
 }
 
-interface CreateEventForm {
-    name: string;
-    date: string;
-    guestListLimit: number;
-    img: string;
-    entryPrice: number;
-}
-
 interface FloorDoc {
     id: string;
     name: string;
@@ -73,6 +65,14 @@ interface FloorDoc {
     height: number;
     json: Record<string, any>;
     propertyId: string;
+}
+
+interface CreateEventForm {
+    name: string;
+    date: number;
+    guestListLimit: number;
+    img: string;
+    entryPrice: number;
 }
 
 export type CreateEventPayload = CreateEventForm & {

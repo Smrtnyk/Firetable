@@ -2,6 +2,7 @@ import type { CreateEventPayload } from "../../../types/types.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
 import { db } from "../../init.js";
 import { Collection } from "../../../types/types.js";
+import { getEventsPath } from "../../paths.js";
 import { logger } from "firebase-functions/v2";
 import { HttpsError } from "firebase-functions/v2/https";
 
@@ -56,17 +57,7 @@ export async function createEvent(
     const creator = req.auth.token.email;
 
     return db.runTransaction(async (transaction) => {
-        const eventRef = db
-            .collection(
-                [
-                    Collection.ORGANISATIONS,
-                    organisationId,
-                    Collection.PROPERTIES,
-                    propertyId,
-                    Collection.EVENTS,
-                ].join("/"),
-            )
-            .doc(id);
+        const eventRef = db.collection(getEventsPath(organisationId, propertyId)).doc(id);
 
         transaction.set(eventRef, {
             name,
