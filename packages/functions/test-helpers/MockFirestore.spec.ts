@@ -20,7 +20,7 @@ describe("MockFirestore", () => {
             transaction.set(docRef, { key: "value" });
             const tempSnapshot = await transaction.get(docRef);
             expect(tempSnapshot.exists).toBe(true);
-            expect(tempSnapshot.data()).toEqual({ key: "value" }); // Data should be visible within the transaction
+            expect(tempSnapshot.data?.()).toEqual({ key: "value" }); // Data should be visible within the transaction
         });
 
         const finalSnapshot = await docRef.get();
