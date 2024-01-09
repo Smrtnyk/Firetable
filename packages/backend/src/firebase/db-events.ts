@@ -7,16 +7,15 @@ import type {
     EventLog,
     FloorDoc,
     GuestData,
-    GuestDataPayload,
     Reservation,
     ReservationDoc,
     User,
 } from "@firetable/types";
 import {
+    guestListDoc,
     eventLogsDoc,
     eventsCollection,
     guestListCollection,
-    guestDoc,
     eventFloorDoc,
     eventDoc,
     reservationsCollection,
@@ -128,16 +127,6 @@ export function createNewEvent(
     )(eventPayload);
 }
 
-export function setGuestData(guestData: GuestDataPayload): Promise<HttpsCallableResult> {
-    const { functions } = initializeFirebase();
-    return httpsCallable(functions, "setGuestData")(guestData);
-}
-
-export function deleteGuestVisit(guestData: GuestDataPayload): Promise<HttpsCallableResult> {
-    const { functions } = initializeFirebase();
-    return httpsCallable(functions, "deleteGuestVisit")(guestData);
-}
-
 export function addReservation(
     owner: EventOwner,
     reservation: Reservation,
@@ -175,7 +164,7 @@ export function addGuestToGuestList(
 }
 
 export function deleteGuestFromGuestList(owner: EventOwner, guestID: string): Promise<void> {
-    return deleteDoc(guestDoc(owner, guestID));
+    return deleteDoc(guestListDoc(owner, guestID));
 }
 
 export function confirmGuestFromGuestList(
@@ -183,5 +172,5 @@ export function confirmGuestFromGuestList(
     guestID: string,
     confirmed: boolean,
 ): Promise<void> {
-    return updateDoc(guestDoc(owner, guestID), { confirmed });
+    return updateDoc(guestListDoc(owner, guestID), { confirmed });
 }

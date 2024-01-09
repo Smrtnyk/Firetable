@@ -6,4 +6,5 @@ export * from "./db-floors.js";
 export * from "./db-properties.js";
 export * from "./db-organisations.js";
 export * from "./db-analytics.js";
+export * from "./db-guests.js";
 export * from "./paths.js";

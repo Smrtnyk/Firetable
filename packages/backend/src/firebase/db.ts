@@ -92,6 +92,10 @@ export function eventFloorDoc(owner: EventOwner, floorId: string): DocumentRefer
     return doc(eventDoc(owner), `${Collection.FLOORS}/${floorId}`);
 }
 
-export function guestDoc(owner: EventOwner, guestId: string): DocumentReference {
+export function guestListDoc(owner: EventOwner, guestId: string): DocumentReference {
     return doc(guestListCollection(owner), guestId);
+}
+
+export function guestDoc(organisationId: string, guestId: string): DocumentReference {
+    return doc(guestsCollection(organisationId), guestId);
 }

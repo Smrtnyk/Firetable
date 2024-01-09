@@ -48,6 +48,13 @@ const propertiesVisits = computed(() => {
     return visitsByProperty;
 });
 
+const guestTitle = computed(() => {
+    if (!guest.value) {
+        return "";
+    }
+    return guest.value.name + " - " + guest.value.contact;
+});
+
 watch(
     propertiesVisits,
     (newVisits) => {
@@ -86,7 +93,7 @@ function formatSubtitleForGuestVisit(visit: Visit): string {
 <template>
     <div class="PageAdminGuest">
         <div v-if="guest?.name">
-            <FTTitle :title="guest.name" />
+            <FTTitle :title="guestTitle" />
             <FTTabs v-model="tab">
                 <q-tab
                     v-for="(item, propertyId) in propertiesVisits"

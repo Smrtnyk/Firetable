@@ -11,8 +11,8 @@ export function deleteFloor(
 }
 
 export function addFloor(
-    property: Pick<PropertyDoc, "organisationId" | "id">,
+    owner: Pick<PropertyDoc, "organisationId" | "id">,
     floor: Partial<FloorDoc> & Pick<FloorDoc, "name">,
 ): Promise<DocumentReference> {
-    return addDoc(floorsCollection(property.organisationId, property.id), floor);
+    return addDoc(floorsCollection(owner.organisationId, owner.id), floor);
 }

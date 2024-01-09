@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { GuestData } from "@firetable/types";
+import type { GuestInGuestListData } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
 import {
     showConfirm,
@@ -25,7 +25,7 @@ import { useAuthStore } from "src/stores/auth-store";
 
 interface Props {
     guestListLimit: number;
-    guestList: GuestData[];
+    guestList: GuestInGuestListData[];
     eventOwner: EventOwner;
 }
 
@@ -43,7 +43,7 @@ const canInteract = computed(() => {
     return [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN].includes(authStore.nonNullableUser.role);
 });
 
-function onCreate(newGuestData: GuestData): Promise<void> | void {
+function onCreate(newGuestData: GuestInGuestListData): Promise<void> | void {
     if (props.guestList.length >= props.guestListLimit) {
         showErrorMessage(t("EventGuestList.guestLimitReached"));
         return;
@@ -63,7 +63,10 @@ async function deleteGuest(id: string, reset: () => void): Promise<void> {
     });
 }
 
-const confirmGuest = withLoading(function ({ id, confirmed }: GuestData, reset: () => void) {
+const confirmGuest = withLoading(function (
+    { id, confirmed }: GuestInGuestListData,
+    reset: () => void,
+) {
     return confirmGuestFromGuestList(props.eventOwner, id, !confirmed).then(reset);
 });
 
@@ -76,7 +79,7 @@ function showAddNewGuestForm(): void {
             maximized: false,
             componentPropsObject: {},
             listeners: {
-                create: (newGuestData: GuestData) => {
+                create: (newGuestData: GuestInGuestListData) => {
                     onCreate(newGuestData);
                     dialog.hide();
                 },

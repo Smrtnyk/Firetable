@@ -1,32 +1,40 @@
 <script setup lang="ts">
-import type { GuestDoc } from "@firetable/types";
+import type { CreateGuestPayload, GuestDoc } from "@firetable/types";
 import { useFirestoreCollection } from "src/composables/useFirestore";
-import { getGuestsPath } from "@firetable/backend";
+import { createGuest, deleteGuest, getGuestsPath } from "@firetable/backend";
 import { useI18n } from "vue-i18n";
-import { showConfirm } from "src/helpers/ui-helpers";
-
-import FTTitle from "src/components/FTTitle.vue";
+import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { storeToRefs } from "pinia";
+import { useQuasar } from "quasar";
+
+import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
+import FTTitle from "src/components/FTTitle.vue";
+import FTCenteredText from "src/components/FTCenteredText.vue";
+import FTDialog from "src/components/FTDialog.vue";
 
 interface Props {
     organisationId: string;
 }
 
+const q = useQuasar();
 const { t } = useI18n();
 const props = defineProps<Props>();
 const { data: guests } = useFirestoreCollection<GuestDoc>(getGuestsPath(props.organisationId), {
-    once: true,
     wait: true,
 });
 const { properties } = storeToRefs(usePropertiesStore());
 
-async function deleteGuest(guest: GuestDoc, reset: () => void): Promise<void> {
+async function onDeleteGuest(guest: GuestDoc, reset: () => void): Promise<void> {
     reset();
     if (!(await showConfirm(t("PageAdminGuests.deleteGuestConfirmationMessage")))) {
         return;
     }
-    console.log(guest);
+    return tryCatchLoadingWrapper({
+        hook() {
+            return deleteGuest(props.organisationId, guest.id);
+        },
+    });
 }
 
 async function editGuest(guest: GuestDoc, reset: () => void): Promise<void> {
@@ -38,11 +46,32 @@ async function editGuest(guest: GuestDoc, reset: () => void): Promise<void> {
 }
 
 function showCreateGuestDialog(): void {
-    // implement
-    console.log("showCreateGuestDialog");
+    const dialog = q.dialog({
+        component: FTDialog,
+        componentProps: {
+            title: "Add new Guest",
+            maximized: false,
+            component: AddNewGuestForm,
+            listeners: {
+                create(payload: CreateGuestPayload) {
+                    dialog.hide();
+
+                    tryCatchLoadingWrapper({
+                        hook() {
+                            return createGuest(props.organisationId, payload);
+                        },
+                    });
+                },
+            },
+        },
+    });
 }
 
 function guestVisitsToReadable(guest: GuestDoc): string {
+    if (!guest.visitedProperties) {
+        return "No visits recorded";
+    }
+
     const res = Object.entries(guest.visitedProperties).map(([propertyId, visits]) => {
         const property = properties.value.find((p) => p.id === propertyId);
         if (!property) {
@@ -66,13 +95,13 @@ function guestVisitsToReadable(guest: GuestDoc): string {
             </template>
         </FTTitle>
 
-        <q-list>
+        <q-list v-if="guests.length > 0">
             <q-slide-item
                 v-for="guest in guests"
                 :key="guest.contact"
                 clickable
                 right-color="warning"
-                @right="({ reset }) => deleteGuest(guest, reset)"
+                @right="({ reset }) => onDeleteGuest(guest, reset)"
                 @left="({ reset }) => editGuest(guest, reset)"
                 class="fa-card"
             >
@@ -84,7 +113,17 @@ function guestVisitsToReadable(guest: GuestDoc): string {
                     <q-icon name="pencil" />
                 </template>
 
-                <q-item clickable class="ft-card">
+                <q-item
+                    clickable
+                    class="ft-card"
+                    :to="{
+                        name: 'adminGuest',
+                        params: {
+                            organisationId: props.organisationId,
+                            guestId: guest.id,
+                        },
+                    }"
+                >
                     <q-item-section>
                         <q-item-label>{{ guest.name }} - {{ guest.contact }}</q-item-label>
                         <q-item-label caption>{{ guestVisitsToReadable(guest) }}</q-item-label>
@@ -92,5 +131,7 @@ function guestVisitsToReadable(guest: GuestDoc): string {
                 </q-item>
             </q-slide-item>
         </q-list>
+
+        <FTCenteredText v-else>No guests data</FTCenteredText>
     </div>
 </template>

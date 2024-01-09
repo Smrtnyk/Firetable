@@ -27,7 +27,7 @@ import { buttonSize, isMobile } from "src/global-reactives/screen-detection";
 import { truncateText } from "src/helpers/string-utils";
 import { compressFloorDoc } from "src/helpers/compress-floor-doc";
 import FTTabs from "src/components/FTTabs.vue";
-import { useGuests } from "src/composables/useGuests";
+import { useGuestsForEvent } from "src/composables/useGuestsForEvent";
 import { propIsTruthy } from "@firetable/utils";
 
 interface Props {
@@ -62,7 +62,7 @@ const {
     arrivedReservations,
     logs,
 } = useAdminEvent(eventOwner);
-const { returningGuests } = useGuests(eventOwner, allReservations);
+const { returningGuests } = useGuestsForEvent(eventOwner, allReservations);
 const allTables = computed(() => eventFloors.value.map(getTablesFromFloorDoc).flat());
 
 const reservationsStatus = computed(() => {

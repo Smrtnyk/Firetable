@@ -13,6 +13,7 @@
         }
     },
     "scripts": {
+        "lint": "eslint . --ext .ts",
         "build": "tsc"
     },
     "keywords": [],

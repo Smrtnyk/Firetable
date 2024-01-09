@@ -35,13 +35,13 @@ export interface EventDoc {
     _doc: QueryDocumentSnapshot<EventDoc>;
 }
 
-export interface CreateGuestPayload {
+export interface CreateGuestInGuestListPayload {
     name: string;
     confirmedTime: number | null;
     confirmed: boolean;
 }
 
-export type GuestData = CreateGuestPayload & {
+export type GuestInGuestListData = CreateGuestInGuestListPayload & {
     id: string;
 };
 
@@ -110,34 +110,6 @@ export interface EventLog {
 
 export interface EventLogsDoc {
     logs: EventLog[];
-}
-
-export type GuestDataPayload = {
-    reservation: Reservation;
-    propertyId: string;
-    organisationId: string;
-    eventId: string;
-    eventName: string;
-    eventDate: number;
-};
-
-export interface Visit {
-    date: number;
-    eventName: string;
-    arrived: boolean;
-    cancelled: boolean;
-}
-
-export interface GuestDoc {
-    id: string;
-    name: string;
-    contact: string;
-    visitedProperties: {
-        [propertyId: string]: {
-            [eventId: string]: Visit | null;
-        };
-    };
-    _doc: QueryDocumentSnapshot<GuestDoc>;
 }
 
 export function isAWalkInReservation(

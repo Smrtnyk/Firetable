@@ -2,7 +2,7 @@
 import type {
     EventDoc,
     FloorDoc,
-    GuestData,
+    GuestInGuestListData,
     PlannedReservationDoc,
     ReservationDoc,
 } from "@firetable/types";
@@ -56,7 +56,7 @@ const router = useRouter();
 const q = useQuasar();
 const pageRef = ref<HTMLDivElement>();
 
-const guestList = useFirestoreCollection<GuestData>(getEventGuestListPath(eventOwner), {
+const guestList = useFirestoreCollection<GuestInGuestListData>(getEventGuestListPath(eventOwner), {
     wait: true,
 });
 const { data: event, promise: eventDataPromise } = useFirestoreDocument<EventDoc>(

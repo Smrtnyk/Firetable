@@ -85,7 +85,7 @@ export type CreateEventPayload = CreateEventForm & {
 export interface SimpleReservation {
     floorId: string;
     tableLabel: string;
-    confirmed: boolean;
+    arrived: boolean;
     reservationConfirmed: boolean | undefined;
     cancelled: boolean | undefined;
     guestContact?: string;

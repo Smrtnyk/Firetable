@@ -9,7 +9,7 @@ import { isValidEuropeanPhoneNumber } from "src/helpers/utils";
 import { where } from "firebase/firestore";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
 
-export function useGuests(eventOwner: EventOwner, reservations: Ref<ReservationDoc[]>) {
+export function useGuestsForEvent(eventOwner: EventOwner, reservations: Ref<ReservationDoc[]>) {
     const guestWithPhoneNumbers = computed(() => {
         const values = reservations.value
             .map(takeProp("guestContact"))

@@ -41,7 +41,7 @@ export async function setGuestDataFn(req: CallableRequest<Data>): Promise<void> 
         throw new HttpsError("invalid-argument", "Reservation is not provided");
     }
 
-    const { guestContact, guestName, confirmed: arrived, cancelled } = reservation;
+    const { guestContact, guestName, arrived, cancelled } = reservation;
 
     if (!guestContact) {
         logger.info("Guest contact is not provided");
@@ -88,7 +88,7 @@ export async function setGuestDataFn(req: CallableRequest<Data>): Promise<void> 
             );
         }
 
-        logger.info("Updating existing guest document with name: ", guestName);
+        logger.info("Updating existing guest document with name:", guestName);
         await guestRef.update({
             [`visitedProperties.${propertyId}.${eventId}`]: visit,
         });
