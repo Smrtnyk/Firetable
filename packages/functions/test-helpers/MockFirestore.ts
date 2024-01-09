@@ -65,15 +65,19 @@ class MockDocumentReference {
         this.id = id;
     }
 
-    set(data: any): void {
+    async set(data: any): Promise<void> {
         if (!data) {
             throw new Error("Data to set cannot be undefined");
         }
         this.db.data[this.path] = data;
     }
 
-    get(): any {
-        return this.db.data[this.path];
+    async get(): Promise<{ exists: boolean; data?: () => any }> {
+        const data = this.db.data[this.path];
+        return {
+            exists: data !== undefined,
+            data: () => data,
+        };
     }
 
     getId(): string {
@@ -90,6 +94,11 @@ class MockDocumentReference {
         this.db.data[this.path] = { ...currentData, ...data };
         return Promise.resolve();
     }
+
+    async delete(): Promise<void> {
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- this is intentional
+        delete this.db.data[this.path];
+    }
 }
 
 class MockTransaction {
@@ -104,10 +113,15 @@ class MockTransaction {
         this.transactionData[docRef.path] = data;
     }
 
-    get(docRef: MockDocumentReference): any {
+    async get(docRef: MockDocumentReference): Promise<{ exists: boolean; data?: () => any }> {
         if (this.transactionData[docRef.path]) {
-            return this.transactionData[docRef.path];
+            return {
+                exists: true,
+                data: () => this.transactionData[docRef.path],
+            };
         }
+
+        // Fallback to get from MockDocumentReference if not in transactionData
         return docRef.get();
     }
 
