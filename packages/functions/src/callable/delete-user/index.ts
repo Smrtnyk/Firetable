@@ -1,7 +1,7 @@
 import type { User } from "../../../types/types.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
 import { auth, db } from "../../init.js";
-import { Collection } from "../../../types/types.js";
+import { getUsersPath } from "../../paths.js";
 import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
 
@@ -22,9 +22,7 @@ export async function deleteUser(req: CallableRequest<User>): Promise<void> {
         await auth.deleteUser(user.id);
 
         // If we've reached this point, it means the Auth deletion was successful, so we proceed to Firestore deletion
-        const userDoc = db
-            .collection(`${Collection.ORGANISATIONS}/${user.organisationId}/${Collection.USERS}`)
-            .doc(user.id);
+        const userDoc = db.collection(getUsersPath(user.organisationId)).doc(user.id);
         if (!(await userDoc.get()).exists) {
             console.warn(`User ${user.id} not found in Firestore.`);
             return;
