@@ -21,6 +21,17 @@
                 <q-icon name="search" />
             </template>
 
+            <template #option="scope">
+                <q-item v-bind="scope.itemProps">
+                    <q-item-section>
+                        <q-item-label>{{ scope.opt.label }}</q-item-label>
+                    </q-item-section>
+                    <q-item-section v-if="scope.opt.isVip" side>
+                        <ReservationVIPChip />
+                    </q-item-section>
+                </q-item>
+            </template>
+
             <template #no-option>
                 <q-item>
                     <q-item-section class="text-grey"> No results </q-item-section>
@@ -32,6 +43,9 @@
 
 <script setup lang="ts">
 import type { FloorDoc, PlannedReservation } from "@firetable/types";
+
+import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPChip.vue";
+
 import { nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { QSelect } from "quasar";
@@ -40,6 +54,12 @@ interface Props {
     floors: FloorDoc[];
     allReservedTables: PlannedReservation[];
     showFloorNameInOption: boolean;
+}
+
+interface Option {
+    label: string;
+    value: PlannedReservation;
+    isVip: boolean;
 }
 
 const props = defineProps<Props>();
@@ -56,15 +76,18 @@ function removeFocus(): void {
     });
 }
 
+function mapReservationToOption(reservation: PlannedReservation): Option {
+    return {
+        label: createTableLabel(reservation),
+        value: reservation,
+        isVip: reservation.isVIP,
+    };
+}
+
 function getNamesFromReservations(
     reservations: PlannedReservation[],
 ): { label: string; value: PlannedReservation }[] {
-    return reservations.map((reservation) => {
-        return {
-            label: createTableLabel(reservation),
-            value: reservation,
-        };
-    });
+    return reservations.map(mapReservationToOption);
 }
 
 function createTableLabel(reservation: PlannedReservation): string {
@@ -115,10 +138,7 @@ function filterFn(val: string, update: any): void {
         const loweredVal = val.toLowerCase();
         const filteredTables = findSearchedTable(val);
         options.value = filteredTables
-            .map((reservation) => ({
-                label: createTableLabel(reservation),
-                value: reservation,
-            }))
+            .map(mapReservationToOption)
             .filter((option) => option.value.guestName.toLowerCase().includes(loweredVal));
     });
 }
