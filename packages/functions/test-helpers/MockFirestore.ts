@@ -7,10 +7,16 @@ export class MockFirestore {
 
     constructor() {
         this.data = {};
-        this.collection = vi.fn(this.collection.bind(this));
     }
 
     collection(path: string): MockCollection {
+        const pathSegments = path.split("/");
+        if (pathSegments.length % 2 === 0) {
+            throw new Error(
+                "Invalid collection path. Collection path must refer to a collection, not a document.",
+            );
+        }
+
         if (!this.data[path]) {
             this.data[path] = {};
         }
