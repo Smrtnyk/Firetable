@@ -1,4 +1,4 @@
-import { MockFieldValue, MockFirestore } from "./MockFirestore.js";
+import { MockFieldPath, MockFieldValue, MockFirestore } from "./MockFirestore.js";
 import { describe, it, expect } from "vitest";
 
 describe("MockFirestore", () => {
@@ -176,6 +176,130 @@ describe("MockFirestore", () => {
 
             const snapshot = await docRef.get();
             expect(snapshot.data?.()?.arrayField).toEqual(["value"]);
+        });
+    });
+
+    describe("Query functionality", () => {
+        it("should filter documents using 'where' with '==' operator", async () => {
+            // Setup
+            const collectionRef = db.collection("testCollection");
+            await collectionRef.doc("doc1").set({ status: "active" });
+            await collectionRef.doc("doc2").set({ status: "inactive" });
+
+            // Test '==' operator
+            const querySnapshot = await collectionRef.where("status", "==", "active").get();
+            const documents = querySnapshot.docs.map((doc) => doc.data());
+
+            // Expect only the active document
+            expect(documents).toHaveLength(1);
+            expect(documents[0].status).toBe("active");
+        });
+
+        it("should filter documents using 'where' with 'array-contains' operator", async () => {
+            // Setup
+            const collectionRef = db.collection("testCollection");
+            await collectionRef.doc("doc1").set({ tags: ["tag1", "tag2"] });
+            await collectionRef.doc("doc2").set({ tags: ["tag2", "tag3"] });
+
+            // Test 'array-contains' operator
+            const querySnapshot = await collectionRef.where("tags", "array-contains", "tag1").get();
+            const documents = querySnapshot.docs.map((doc) => doc.data());
+
+            // Expect only the document with "tag1"
+            expect(documents).toHaveLength(1);
+            expect(documents[0].tags).toContain("tag1");
+        });
+
+        it("should filter documents using 'where' with 'in' operator", async () => {
+            // Setup
+            const collectionRef = db.collection("testCollection");
+            await collectionRef.doc("doc1").set({ status: "active" });
+            await collectionRef.doc("doc2").set({ status: "inactive" });
+            await collectionRef.doc("doc3").set({ status: "pending" });
+
+            // Test 'in' operator
+            const querySnapshot = await collectionRef
+                .where("status", "in", ["active", "pending"])
+                .get();
+            const documents = querySnapshot.docs.map((doc) => doc.data());
+
+            // Expect documents with "active" or "pending" status
+            expect(documents).toHaveLength(2);
+            expect(documents.some((doc) => doc.status === "active")).toBe(true);
+            expect(documents.some((doc) => doc.status === "pending")).toBe(true);
+        });
+
+        it("should limit the number of documents returned", async () => {
+            // Setup
+            const collectionRef = db.collection("testCollection");
+            for (let i = 0; i < 5; i++) {
+                await collectionRef.doc(`doc${i}`).set({ number: i });
+            }
+
+            // Test 'limit'
+            const querySnapshot = await collectionRef.limit(3).get();
+            const documents = querySnapshot.docs.map((doc) => doc.data());
+
+            // Expect only 3 documents
+            expect(documents).toHaveLength(3);
+        });
+
+        it("should handle 'FieldPath.documentId' in 'where' query", async () => {
+            // Setup
+            const collectionRef = db.collection("testCollection");
+            await collectionRef.doc("doc1").set({ status: "active" });
+            await collectionRef.doc("doc2").set({ status: "inactive" });
+
+            // Test MockFieldPath.documentId()
+            const querySnapshot = await collectionRef
+                .where(MockFieldPath.documentId(), "in", ["doc1"])
+                .get();
+            const documents = querySnapshot.docs.map((doc) => doc.data());
+
+            // Expect only the document with ID "doc1"
+            expect(documents).toHaveLength(1);
+            expect(documents[0].status).toBe("active");
+        });
+    });
+
+    describe("Complex queries combining 'where' and 'limit'", () => {
+        it("should apply multiple 'where' constraints correctly", async () => {
+            // Setup
+            const collectionRef = db.collection("testCollection");
+            await collectionRef.doc("doc1").set({ status: "active", priority: 1 });
+            await collectionRef.doc("doc2").set({ status: "active", priority: 2 });
+            await collectionRef.doc("doc3").set({ status: "inactive", priority: 1 });
+
+            // Test multiple 'where' constraints
+            const querySnapshot = await collectionRef
+                .where("status", "==", "active")
+                .where("priority", "==", 1)
+                .get();
+            const documents = querySnapshot.docs.map((doc) => doc.data());
+
+            // Expect only the document with status "active" and priority 1
+            expect(documents).toHaveLength(1);
+            expect(documents[0].status).toBe("active");
+            expect(documents[0].priority).toBe(1);
+        });
+
+        it("should combine 'where' and 'limit' constraints correctly", async () => {
+            // Setup
+            const collectionRef = db.collection("testCollection");
+            for (let i = 0; i < 5; i++) {
+                await collectionRef.doc(`doc${i}`).set({ status: "active", number: i });
+            }
+
+            // Test 'where' combined with 'limit'
+            const querySnapshot = await collectionRef
+                .where("status", "==", "active")
+                .limit(3)
+                .get();
+            const documents = querySnapshot.docs.map((doc) => doc.data());
+
+            // Expect 3 documents with status "active"
+            expect(documents).toHaveLength(3);
+            expect(documents.every((doc) => doc.status === "active")).toBe(true);
         });
     });
 });

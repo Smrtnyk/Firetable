@@ -54,6 +54,11 @@ class MockCollection {
         this.db = db;
     }
 
+    limit(n: number): MockQuery {
+        const query = new MockQuery(this);
+        return query.limit(n);
+    }
+
     async get(): Promise<MockQuerySnapshot> {
         const docs: MockDocumentReference[] = Object.entries(this.db.data)
             .filter(([docPath]) => docPath.startsWith(this.path))
@@ -205,7 +210,7 @@ class MockTransaction {
 }
 
 class MockQuerySnapshot {
-    constructor(private docs: MockDocumentReference[]) {}
+    constructor(public docs: MockDocumentReference[]) {}
 
     async get(): Promise<MockQuerySnapshot> {
         // Simulate fetching documents from Firestore
