@@ -1,7 +1,7 @@
 import type { EditUserPayload } from "../../types/types.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
-import { Collection } from "../../types/types.js";
 import { auth, db } from "../init.js";
+import { getPropertiesPath, getUsersPath } from "../paths.js";
 import { FieldValue } from "firebase-admin/firestore";
 import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
@@ -66,7 +66,7 @@ export async function updateUserFn(
     try {
         // Fetch the properties associated with this user by checking relatedUsers field
         const existingPropertiesSnapshot = await db
-            .collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}`)
+            .collection(getPropertiesPath(organisationId))
             .where("relatedUsers", "array-contains", userId)
             .get();
 
@@ -78,9 +78,7 @@ export async function updateUserFn(
         );
 
         await db.runTransaction(async (transaction) => {
-            const userRef = db
-                .collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`)
-                .doc(userId);
+            const userRef = db.collection(getUsersPath(organisationId)).doc(userId);
 
             transaction.update(userRef, {
                 name: updatedUser.name,
@@ -94,9 +92,7 @@ export async function updateUserFn(
             // Add the user to relatedUsers field of the property document for new associations
             for (const propertyId of propertiesToAdd) {
                 const propertyRef = db
-                    .collection(
-                        `${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}`,
-                    )
+                    .collection(getPropertiesPath(organisationId))
                     .doc(propertyId);
                 transaction.update(propertyRef, {
                     relatedUsers: FieldValue.arrayUnion(userId),
@@ -106,9 +102,7 @@ export async function updateUserFn(
             // Remove the user from relatedUsers field of the property document for removed associations
             for (const propertyId of propertiesToRemove) {
                 const propertyRef = db
-                    .collection(
-                        `${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}`,
-                    )
+                    .collection(getPropertiesPath(organisationId))
                     .doc(propertyId);
                 transaction.update(propertyRef, {
                     relatedUsers: FieldValue.arrayRemove(userId),
