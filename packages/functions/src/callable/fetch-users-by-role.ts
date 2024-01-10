@@ -10,6 +10,11 @@ type RoleFilter = {
     [key in Role | typeof ADMIN | "default"]: (user: User) => boolean;
 };
 
+export type FetchUsersByRoleRequestData = {
+    userIdsToFetch: string[];
+    organisationId: string;
+};
+
 const MAX_USERS = 100;
 
 // Function to split array into chunks
@@ -44,7 +49,7 @@ function chunkArray(arr: string[], size: number): string[][] {
  * It also applies a limit to the number of users that can be fetched to prevent overloading.
  */
 export async function fetchUsersByRoleFn(
-    req: CallableRequest<{ userIdsToFetch: string[]; organisationId: string }>,
+    req: CallableRequest<FetchUsersByRoleRequestData>,
 ): Promise<User[]> {
     // Ensure authentication
     if (!req.auth) {
@@ -73,7 +78,9 @@ export async function fetchUsersByRoleFn(
     );
     if (userRole === ADMIN || userRole === Role.PROPERTY_OWNER) {
         const usersSnapshot = await baseQuery.get();
-        const orgUsers = usersSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as User);
+        const orgUsers = usersSnapshot.docs.map((doc) => {
+            return { id: doc.id, ...doc.data() } as User;
+        });
         users = [...users, ...orgUsers];
     } else {
         if (userIdsToFetch.length > MAX_USERS) {
