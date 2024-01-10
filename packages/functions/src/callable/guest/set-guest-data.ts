@@ -5,7 +5,7 @@ import { db } from "../../init.js";
 import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
 
-type Data = {
+export type GuestData = {
     reservation: SimpleReservation;
     propertyId: string;
     organisationId: string;
@@ -33,7 +33,7 @@ type Data = {
  *
  * @returns {Promise<void>} A promise that resolves when the operation is complete.
  */
-export async function setGuestDataFn(req: CallableRequest<Data>): Promise<void> {
+export async function setGuestDataFn(req: CallableRequest<GuestData>): Promise<void> {
     const { reservation, propertyId, organisationId, eventId, eventDate, eventName } = req.data;
 
     if (!reservation) {

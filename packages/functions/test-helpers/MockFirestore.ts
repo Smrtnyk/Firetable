@@ -17,6 +17,16 @@ export class MockFirestore {
         return new MockCollection(path, this);
     }
 
+    doc(path: string): MockDocumentReference {
+        // Split the path and process it to get the final document path
+        const pathSegments = path.split("/");
+        if (pathSegments.length % 2 !== 0) {
+            throw new Error("Document path must point to a document, not a collection.");
+        }
+
+        return new MockDocumentReference(path, this);
+    }
+
     async runTransaction<T>(
         updateFunction: (transaction: MockTransaction) => Promise<T>,
     ): Promise<T> {
@@ -44,13 +54,13 @@ class MockCollection {
     doc(docId?: string): MockDocumentReference {
         const id = docId ?? generateRandomId();
         const docPath = `${this.path}/${id}`;
-        return new MockDocumentReference(docPath, this.db, id);
+        return new MockDocumentReference(docPath, this.db);
     }
 
     async add(data: any): Promise<MockDocumentReference> {
         const id = generateRandomId();
         const docPath = `${this.path}/${id}`;
-        const newDocRef = new MockDocumentReference(docPath, this.db, id);
+        const newDocRef = new MockDocumentReference(docPath, this.db);
         await newDocRef.set(data);
         return newDocRef;
     }
@@ -61,10 +71,10 @@ class MockDocumentReference {
     public db: MockFirestore;
     public id: string;
 
-    constructor(path: string, db: MockFirestore, id: string) {
+    constructor(path: string, db: MockFirestore) {
         this.path = path;
         this.db = db;
-        this.id = id;
+        this.id = path.split("/").pop() ?? "";
     }
 
     async set(data: any): Promise<void> {
