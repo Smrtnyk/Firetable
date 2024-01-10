@@ -1,6 +1,6 @@
-type FirestoreData = Record<string, any>;
+import { generateRandomId } from "./utils.js";
 
-const generateRandomId = (): string => Math.random().toString(36).substring(2, 15);
+type FirestoreData = Record<string, any>;
 
 export class MockFirestore {
     public data: FirestoreData;
@@ -125,6 +125,12 @@ class MockTransaction {
 
         // Fallback to get from MockDocumentReference if not in transactionData
         return docRef.get();
+    }
+
+    update(docRef: MockDocumentReference, data: any): void {
+        const existingData = this.transactionData[docRef.path] || {};
+
+        this.transactionData[docRef.path] = { ...existingData, ...data };
     }
 
     async commit(): Promise<void> {

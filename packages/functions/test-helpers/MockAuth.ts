@@ -1,13 +1,22 @@
+import { generateRandomId } from "./utils.js";
+
 type MockUser = {
     uid: string;
     email: string;
+    customClaims?: Record<string, any>;
 };
 
 export class MockAuth {
     private readonly users: Record<string, MockUser> = {};
 
-    createUser(user: MockUser): void {
-        this.users[user.uid] = user;
+    async createUser(userDetails: { email: string; password: string }): Promise<MockUser> {
+        const uid = generateRandomId();
+        const newUser: MockUser = {
+            uid,
+            email: userDetails.email,
+        };
+        this.users[uid] = newUser;
+        return newUser;
     }
 
     getUserByEmail(email: string): MockUser | null {
@@ -20,5 +29,13 @@ export class MockAuth {
         }
         // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- this is intentional
         delete this.users[uid];
+    }
+
+    async setCustomUserClaims(uid: string, customClaims: Record<string, any>): Promise<void> {
+        const user = this.users[uid];
+        if (!user) {
+            throw new Error(`No user found for UID: ${uid}`);
+        }
+        user.customClaims = customClaims;
     }
 }
