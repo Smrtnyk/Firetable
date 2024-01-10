@@ -66,7 +66,18 @@ class MockCollection {
     }
 }
 
-class MockDocumentReference {
+// Function to apply the update recursively
+function applyUpdate(current: any, path: string[], value: any): void {
+    const key: any = path[0];
+    if (path.length === 1) {
+        current[key] = value;
+    } else {
+        current[key] = current[key] || {};
+        applyUpdate(current[key], path.slice(1), value);
+    }
+}
+
+export class MockDocumentReference {
     public path: string;
     public db: MockFirestore;
     public id: string;
@@ -103,7 +114,14 @@ class MockDocumentReference {
 
     update(data: any): Promise<void> {
         const currentData = this.db.data[this.path] || {};
-        this.db.data[this.path] = { ...currentData, ...data };
+
+        // Iterate over each key in the update data
+        Object.keys(data).forEach((key) => {
+            const path = key.split(".");
+            applyUpdate(currentData, path, data[key]);
+        });
+
+        this.db.data[this.path] = currentData;
         return Promise.resolve();
     }
 

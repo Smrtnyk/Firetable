@@ -5,14 +5,16 @@ import { Collection } from "../../../types/types.js";
 import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
 
-type Data = {
+export type DeleteGuestVisitData = {
     reservation: SimpleReservation;
     propertyId: string;
     organisationId: string;
     eventId: string;
 };
 
-export async function deleteGuestVisitFn(req: CallableRequest<Data>): Promise<void> {
+export async function deleteGuestVisitFn(
+    req: CallableRequest<DeleteGuestVisitData>,
+): Promise<void> {
     if (!req.data.reservation) {
         logger.info("Reservation is not provided");
         return;
