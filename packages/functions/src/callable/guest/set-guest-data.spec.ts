@@ -2,9 +2,9 @@ import type { GuestData } from "./set-guest-data.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
 import type { GuestDoc } from "../../../types/types.js";
 import { setGuestDataFn } from "./set-guest-data.js";
-import { MockFirestore } from "../../../test-helpers/MockFirestore";
 import * as Init from "../../init.js";
-import { getGuestPath } from "../../paths.js";
+import { getGuestPath, getGuestsPath } from "../../paths.js";
+import { MockFirestore } from "../../../test-helpers/MockFirestore.js";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const organisationId = "orgId";
@@ -32,7 +32,7 @@ describe("setGuestDataFn", () => {
 
     beforeEach(() => {
         mockFirestore = new MockFirestore();
-        vi.spyOn(Init, "db", "get").mockReturnValue(mockFirestore);
+        vi.spyOn(Init, "db", "get").mockReturnValue(mockFirestore as any);
     });
 
     it("should create a new guest if they do not exist", async () => {
@@ -57,7 +57,7 @@ describe("setGuestDataFn", () => {
             visitedProperties: {},
         };
         await mockFirestore
-            .collection(getGuestPath(organisationId))
+            .collection(getGuestsPath(organisationId))
             .doc(guestContact)
             .set(initialGuestData);
 
@@ -97,7 +97,7 @@ describe("setGuestDataFn", () => {
 
         // Expect the function to throw an error due to invalid data
         await expect(
-            setGuestDataFn({ data: requestData } as CallableRequest<Data>),
+            setGuestDataFn({ data: requestData } as CallableRequest<GuestData>),
         ).rejects.toThrow();
     });
 });
