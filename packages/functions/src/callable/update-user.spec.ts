@@ -3,10 +3,10 @@ import type { CallableRequest } from "firebase-functions/v2/https";
 import { updateUserFn } from "./update-user.js";
 import * as Init from "../init";
 import { MockAuth } from "../../test-helpers/MockAuth.js";
-import { MockFirestore } from "../../test-helpers/MockFirestore.js";
+import { MockFieldValue, MockFirestore } from "../../test-helpers/MockFirestore.js";
 import { getPropertyPath, getUserPath } from "../paths.js";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { FieldValue } from "firebase-admin/firestore";
+import * as Firestore from "firebase-admin/firestore";
 
 describe("updateUserFn", () => {
     let mockAuth: MockAuth;
@@ -15,22 +15,10 @@ describe("updateUserFn", () => {
     beforeEach(() => {
         mockAuth = new MockAuth();
         mockFirestore = new MockFirestore();
+
+        vi.spyOn(Firestore, "FieldValue", "get").mockReturnValue(MockFieldValue);
         vi.spyOn(Init, "auth", "get").mockReturnValue(mockAuth);
         vi.spyOn(Init, "db", "get").mockReturnValue(mockFirestore);
-
-        vi.spyOn(FieldValue, "arrayUnion").mockImplementation((...elements: any[]) => {
-            return {
-                arrayUnion: true,
-                elements,
-            };
-        });
-
-        vi.spyOn(FieldValue, "arrayRemove").mockImplementation((...elements: any[]) => {
-            return {
-                arrayRemove: true,
-                elements,
-            };
-        });
     });
 
     describe("Successful updates", () => {

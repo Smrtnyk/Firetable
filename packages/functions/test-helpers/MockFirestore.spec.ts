@@ -1,4 +1,4 @@
-import { MockFirestore } from "./MockFirestore.js";
+import { MockFieldValue, MockFirestore } from "./MockFirestore.js";
 import { describe, it, expect } from "vitest";
 
 describe("MockFirestore", () => {
@@ -124,6 +124,58 @@ describe("MockFirestore", () => {
 
             const snapshot = await docRef.get();
             expect(snapshot.exists).toBe(false);
+        });
+    });
+
+    describe("MockFieldValue functionality", () => {
+        it("should handle arrayUnion operation correctly", async () => {
+            const docRef = db.collection("testCollection").doc("testDoc");
+            await docRef.set({ arrayField: ["initialValue"] });
+
+            await docRef.update({
+                arrayField: MockFieldValue.arrayUnion("newValue"),
+            });
+
+            const snapshot = await docRef.get();
+            expect(snapshot.data?.()?.arrayField).toContain("initialValue");
+            expect(snapshot.data?.()?.arrayField).toContain("newValue");
+        });
+
+        it("should handle arrayRemove operation correctly", async () => {
+            const docRef = db.collection("testCollection").doc("testDoc");
+            await docRef.set({ arrayField: ["valueToRemove", "valueToKeep"] });
+
+            await docRef.update({
+                arrayField: MockFieldValue.arrayRemove("valueToRemove"),
+            });
+
+            const snapshot = await docRef.get();
+            expect(snapshot.data?.()?.arrayField).not.toContain("valueToRemove");
+            expect(snapshot.data?.()?.arrayField).toContain("valueToKeep");
+        });
+
+        it("should not add duplicate values with arrayUnion", async () => {
+            const docRef = db.collection("testCollection").doc("testDoc");
+            await docRef.set({ arrayField: ["value"] });
+
+            await docRef.update({
+                arrayField: MockFieldValue.arrayUnion("value"),
+            });
+
+            const snapshot = await docRef.get();
+            expect(snapshot.data?.()?.arrayField).toEqual(["value"]);
+        });
+
+        it("should not fail on arrayRemove when value not present", async () => {
+            const docRef = db.collection("testCollection").doc("testDoc");
+            await docRef.set({ arrayField: ["value"] });
+
+            await docRef.update({
+                arrayField: MockFieldValue.arrayRemove("nonExistingValue"),
+            });
+
+            const snapshot = await docRef.get();
+            expect(snapshot.data?.()?.arrayField).toEqual(["value"]);
         });
     });
 });

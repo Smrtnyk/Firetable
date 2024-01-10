@@ -150,25 +150,8 @@ export class MockDocumentReference {
         const currentData = this.db.data[this.path] || {};
 
         Object.keys(data).forEach((key) => {
-            const dataValue = data[key];
-            const isObject = typeof dataValue === "object" && dataValue !== null;
-            // Handle arrayUnion and arrayRemove operations
-            if (isObject && data[key].arrayUnion) {
-                currentData[key] = currentData[key] || [];
-                data[key].elements.forEach((element: any) => {
-                    if (!currentData[key].includes(element)) {
-                        currentData[key].push(element);
-                    }
-                });
-            } else if (isObject && data[key].arrayRemove) {
-                if (currentData[key]) {
-                    data[key].elements.forEach((element: any) => {
-                        const index = currentData[key].indexOf(element);
-                        if (index > -1) {
-                            currentData[key].splice(index, 1);
-                        }
-                    });
-                }
+            if (data[key] instanceof MockFieldValue) {
+                currentData[key] = data[key].applyTo(currentData[key]);
             } else {
                 // Handle normal updates
                 const path = key.split(".");
@@ -216,24 +199,9 @@ class MockTransaction {
 
         Object.keys(data).forEach((key) => {
             const dataValue = data[key];
-            const isObject = typeof dataValue === "object" && dataValue !== null;
 
-            if (isObject && dataValue.arrayUnion) {
-                existingData[key] = existingData[key] || [];
-                dataValue.elements.forEach((element: any) => {
-                    if (!existingData[key].includes(element)) {
-                        existingData[key].push(element);
-                    }
-                });
-            } else if (isObject && dataValue.arrayRemove) {
-                if (existingData[key]) {
-                    dataValue.elements.forEach((element: any) => {
-                        const index = existingData[key].indexOf(element);
-                        if (index > -1) {
-                            existingData[key].splice(index, 1);
-                        }
-                    });
-                }
+            if (dataValue instanceof MockFieldValue) {
+                existingData[key] = data[key].applyTo(existingData[key]);
             } else {
                 const path = key.split(".");
                 applyUpdate(existingData, path, data[key]);
@@ -265,5 +233,32 @@ class MockQuerySnapshot {
             }));
 
         return new MockQuerySnapshot(existingDocs as any);
+    }
+}
+
+export class MockFieldValue {
+    private constructor(
+        private operation: "arrayUnion" | "arrayRemove",
+        private elements: any[],
+    ) {}
+
+    static arrayUnion(...elements: any[]): MockFieldValue {
+        return new MockFieldValue("arrayUnion", elements);
+    }
+
+    static arrayRemove(...elements: any[]): MockFieldValue {
+        return new MockFieldValue("arrayRemove", elements);
+    }
+
+    applyTo(currentValue: any): any {
+        if (this.operation === "arrayUnion") {
+            // Combine the current value with new elements, ensuring uniqueness
+            const set = new Set(currentValue || []);
+            this.elements.forEach((element) => set.add(element));
+            return Array.from(set);
+        } else if (this.operation === "arrayRemove") {
+            // Filter out elements to be removed from the current value
+            return (currentValue || []).filter((item: any) => !this.elements.includes(item));
+        }
     }
 }
