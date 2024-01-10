@@ -33,15 +33,16 @@ export async function updateUserFn(
     req: CallableRequest<EditUserPayload>,
 ): Promise<{ success: boolean; message: string }> {
     const { updatedUser, userId, organisationId } = req.data;
-    const { relatedProperties } = updatedUser;
 
     if (!userId) {
         throw new HttpsError("invalid-argument", "User ID must be provided.");
     }
 
-    if (!userId) {
+    if (!userId || !updatedUser) {
         throw new HttpsError("invalid-argument", "User data to update must be provided.");
     }
+
+    const { relatedProperties } = updatedUser;
 
     if (!relatedProperties) {
         throw new HttpsError("invalid-argument", "Related properties field is not set.");

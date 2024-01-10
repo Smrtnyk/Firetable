@@ -1,7 +1,7 @@
 import type { GuestDoc, SimpleReservation, Visit } from "../../../types/types.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
-import { Collection } from "../../../types/types.js";
 import { db } from "../../init.js";
+import { getGuestPath } from "../../paths.js";
 import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
 
@@ -50,9 +50,7 @@ export async function setGuestDataFn(req: CallableRequest<GuestData>): Promise<v
 
     logger.info("Guest contact is eligible for processing ", guestContact);
 
-    const guestRef = db.doc(
-        [Collection.ORGANISATIONS, organisationId, Collection.GUESTS, guestContact].join("/"),
-    );
+    const guestRef = db.doc(getGuestPath(organisationId, guestContact));
 
     const visit: Visit = {
         eventName,

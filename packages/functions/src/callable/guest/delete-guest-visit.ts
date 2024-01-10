@@ -1,7 +1,7 @@
 import type { SimpleReservation } from "../../../types/types.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
 import { db } from "../../init.js";
-import { Collection } from "../../../types/types.js";
+import { getGuestPath } from "../../paths.js";
 import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
 
@@ -22,9 +22,12 @@ export async function deleteGuestVisitFn(
     const { organisationId, propertyId, eventId, reservation } = req.data;
     const { guestContact } = reservation;
 
-    const guestRef = db.doc(
-        `${Collection.ORGANISATIONS}/${organisationId}/${Collection.GUESTS}/${guestContact}`,
-    );
+    if (!guestContact) {
+        logger.info("Guest contact is not provided");
+        throw new HttpsError("invalid-argument", "Guest contact is not provided.");
+    }
+
+    const guestRef = db.doc(getGuestPath(organisationId, guestContact));
 
     try {
         const guestDoc = await guestRef.get();

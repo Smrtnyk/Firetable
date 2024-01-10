@@ -70,6 +70,34 @@ class MockCollection {
         await newDocRef.set(data);
         return newDocRef;
     }
+
+    where(fieldPath: string, opStr: string, value: any): MockQuerySnapshot {
+        const matchingDocs: MockDocumentReference[] = [];
+
+        Object.entries(this.db.data).forEach(([docPath, docData]) => {
+            if (!docPath.startsWith(this.path)) {
+                return;
+            }
+            let match = false;
+
+            switch (opStr) {
+                case "==":
+                    match = docData[fieldPath] === value;
+                    break;
+                case "array-contains":
+                    match = Array.isArray(docData[fieldPath]) && docData[fieldPath].includes(value);
+                    break;
+                default:
+                    throw new Error(`Unsupported operator: ${opStr}`);
+            }
+
+            if (match) {
+                matchingDocs.push(new MockDocumentReference(docPath, this.db));
+            }
+        });
+
+        return new MockQuerySnapshot(matchingDocs);
+    }
 }
 
 // Function to apply the update recursively
@@ -121,10 +149,31 @@ export class MockDocumentReference {
     update(data: any): Promise<void> {
         const currentData = this.db.data[this.path] || {};
 
-        // Iterate over each key in the update data
         Object.keys(data).forEach((key) => {
-            const path = key.split(".");
-            applyUpdate(currentData, path, data[key]);
+            const dataValue = data[key];
+            const isObject = typeof dataValue === "object" && dataValue !== null;
+            // Handle arrayUnion and arrayRemove operations
+            if (isObject && data[key].arrayUnion) {
+                currentData[key] = currentData[key] || [];
+                data[key].elements.forEach((element: any) => {
+                    if (!currentData[key].includes(element)) {
+                        currentData[key].push(element);
+                    }
+                });
+            } else if (isObject && data[key].arrayRemove) {
+                if (currentData[key]) {
+                    data[key].elements.forEach((element: any) => {
+                        const index = currentData[key].indexOf(element);
+                        if (index > -1) {
+                            currentData[key].splice(index, 1);
+                        }
+                    });
+                }
+            } else {
+                // Handle normal updates
+                const path = key.split(".");
+                applyUpdate(currentData, path, data[key]);
+            }
         });
 
         this.db.data[this.path] = currentData;
@@ -161,15 +210,60 @@ class MockTransaction {
         return docRef.get();
     }
 
-    update(docRef: MockDocumentReference, data: any): void {
-        const existingData = this.transactionData[docRef.path] || {};
+    async update(docRef: MockDocumentReference, data: any): Promise<void> {
+        const existingData =
+            this.transactionData[docRef.path] || (await docRef.get()).data?.() || {};
 
-        this.transactionData[docRef.path] = { ...existingData, ...data };
+        Object.keys(data).forEach((key) => {
+            const dataValue = data[key];
+            const isObject = typeof dataValue === "object" && dataValue !== null;
+
+            if (isObject && dataValue.arrayUnion) {
+                existingData[key] = existingData[key] || [];
+                dataValue.elements.forEach((element: any) => {
+                    if (!existingData[key].includes(element)) {
+                        existingData[key].push(element);
+                    }
+                });
+            } else if (isObject && dataValue.arrayRemove) {
+                if (existingData[key]) {
+                    dataValue.elements.forEach((element: any) => {
+                        const index = existingData[key].indexOf(element);
+                        if (index > -1) {
+                            existingData[key].splice(index, 1);
+                        }
+                    });
+                }
+            } else {
+                const path = key.split(".");
+                applyUpdate(existingData, path, data[key]);
+            }
+        });
+
+        this.transactionData[docRef.path] = existingData;
     }
 
     async commit(): Promise<void> {
         Object.entries(this.transactionData).forEach(([key, value]) => {
             this.db.data[key] = value;
         });
+    }
+}
+
+class MockQuerySnapshot {
+    constructor(private docs: MockDocumentReference[]) {}
+
+    async get(): Promise<MockQuerySnapshot> {
+        // Simulate fetching documents from Firestore
+        const docs = await Promise.all(this.docs.map((docRef) => docRef.get()));
+        // Filter out non-existing documents
+        const existingDocs = docs
+            .filter((doc) => doc.exists)
+            .map((doc, idx) => ({
+                id: this.docs[idx]?.getId(),
+                data: () => doc.data,
+            }));
+
+        return new MockQuerySnapshot(existingDocs as any);
     }
 }
