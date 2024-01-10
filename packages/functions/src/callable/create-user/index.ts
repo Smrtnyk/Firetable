@@ -1,7 +1,7 @@
 import type { CreateUserPayload } from "../../../types/types.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
-import { Collection } from "../../../types/types.js";
 import { auth, db } from "../../init.js";
+import { getPropertiesPath, getUsersPath } from "../../paths.js";
 import { FieldValue } from "firebase-admin/firestore";
 import { HttpsError } from "firebase-functions/v2/https";
 
@@ -44,6 +44,9 @@ export async function createUser(
             throw new HttpsError("already-exists", "A user with this email already exists.");
         }
     } catch (error: any) {
+        if (error.code === "already-exists") {
+            throw error;
+        }
         if (error.code !== "auth/user-not-found") {
             throw new HttpsError("unknown", "An error occurred while checking for user existence.");
         }
@@ -65,16 +68,12 @@ export async function createUser(
 
         await db.runTransaction(async (transaction) => {
             // Adjusted the userRef to point to the nested users collection under organisations/{organisationId}
-            const userRef = db
-                .collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`)
-                .doc(createdUser.uid);
+            const userRef = db.collection(getUsersPath(organisationId)).doc(createdUser.uid);
             transaction.set(userRef, userDoc);
 
             for (const propertyId of relatedProperties) {
                 const propertyRef = db
-                    .collection(
-                        `${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}`,
-                    )
+                    .collection(getPropertiesPath(organisationId))
                     .doc(propertyId);
                 transaction.update(propertyRef, {
                     relatedUsers: FieldValue.arrayUnion(createdUser.uid),
