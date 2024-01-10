@@ -1,20 +1,23 @@
 import type { CreateEventPayload } from "../../../types/types.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
 import { MockFirestore } from "../../../test-helpers/MockFirestore.js";
-import { db } from "../../init.js";
+import * as Init from "../../init.js";
 import { getEventPath } from "../../paths.js";
 import { createEvent } from "./index.js";
-
-vi.mock("../../init", () => ({
-    db: new MockFirestore(),
-    auth: vi.fn(),
-}));
+import { beforeEach } from "vitest";
 
 const AUTH_USER_EMAIL = "test@example.com";
 const ORGANISATION_ID = "org456";
 const PROPERTY_ID = "property123";
 
 describe("create-event", () => {
+    let db: MockFirestore;
+
+    beforeEach(() => {
+        db = new MockFirestore();
+        vi.spyOn(Init, "db", "get").mockReturnValue(db as any);
+    });
+
     it("should create an event", async () => {
         // Prepare test data
         const entryPrice = 10;
