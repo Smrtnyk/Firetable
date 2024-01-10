@@ -34,6 +34,34 @@ describe("MockAuth", () => {
         });
     });
 
+    describe("updateUser", () => {
+        it("should update a user's details", async () => {
+            // Create a test user
+            const testUser = { email: "user@example.com", password: "dsad" };
+            const { uid } = await mockAuth.createUser(testUser);
+
+            // Update user details
+            const newPassword = "newPassword";
+            await mockAuth.updateUser(uid, { password: newPassword });
+
+            // Retrieve the updated user
+            const updatedUser = mockAuth.getUserByEmail("user@example.com");
+
+            // Check if the user details have been updated
+            expect(updatedUser).toBeDefined();
+            expect(updatedUser?.password).toBe(newPassword);
+        });
+
+        it("should throw an error if the user does not exist", async () => {
+            const nonExistentUid = "nonExistentUser";
+
+            // Attempt to update a non-existent user
+            await expect(
+                mockAuth.updateUser(nonExistentUid, { password: "newPassword" }),
+            ).rejects.toThrow(`User with UID ${nonExistentUid} not found`);
+        });
+    });
+
     describe("getUserByEmail method", () => {
         it("should return null for a non-existent user", () => {
             const retrievedUser = mockAuth.getUserByEmail("nonexistent@example.com");
