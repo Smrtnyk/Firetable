@@ -17,9 +17,6 @@ export class MockFirestore {
             );
         }
 
-        if (!this.data[path]) {
-            this.data[path] = {};
-        }
         return new MockCollection(path, this);
     }
 
@@ -49,12 +46,20 @@ export class MockFirestore {
 }
 
 class MockCollection {
-    private readonly path: string;
-    private readonly db: MockFirestore;
+    readonly path: string;
+    readonly db: MockFirestore;
 
     constructor(path: string, db: MockFirestore) {
         this.path = path;
         this.db = db;
+    }
+
+    async get(): Promise<MockQuerySnapshot> {
+        const docs: MockDocumentReference[] = Object.entries(this.db.data)
+            .filter(([docPath]) => docPath.startsWith(this.path))
+            .map(([docPath]) => new MockDocumentReference(docPath, this.db));
+
+        return new MockQuerySnapshot(docs);
     }
 
     doc(docId?: string): MockDocumentReference {
@@ -71,32 +76,9 @@ class MockCollection {
         return newDocRef;
     }
 
-    where(fieldPath: string, opStr: string, value: any): MockQuerySnapshot {
-        const matchingDocs: MockDocumentReference[] = [];
-
-        Object.entries(this.db.data).forEach(([docPath, docData]) => {
-            if (!docPath.startsWith(this.path)) {
-                return;
-            }
-            let match = false;
-
-            switch (opStr) {
-                case "==":
-                    match = docData[fieldPath] === value;
-                    break;
-                case "array-contains":
-                    match = Array.isArray(docData[fieldPath]) && docData[fieldPath].includes(value);
-                    break;
-                default:
-                    throw new Error(`Unsupported operator: ${opStr}`);
-            }
-
-            if (match) {
-                matchingDocs.push(new MockDocumentReference(docPath, this.db));
-            }
-        });
-
-        return new MockQuerySnapshot(matchingDocs);
+    where(fieldPath: string | MockFieldPath, opStr: string, value: any): MockQuery {
+        // Initialize a new MockQuery with the collection reference
+        return new MockQuery(this).where(fieldPath, opStr, value);
     }
 }
 
@@ -120,6 +102,10 @@ export class MockDocumentReference {
         this.path = path;
         this.db = db;
         this.id = path.split("/").pop() ?? "";
+    }
+
+    data(): any {
+        return this.db.data[this.path];
     }
 
     async set(data: any): Promise<void> {
@@ -260,5 +246,84 @@ export class MockFieldValue {
             // Filter out elements to be removed from the current value
             return (currentValue || []).filter((item: any) => !this.elements.includes(item));
         }
+    }
+}
+
+export class MockFieldPath {
+    private constructor(private fieldPath: string) {}
+
+    static documentId(): MockFieldPath {
+        return new MockFieldPath("__name__"); // A special identifier for document ID
+    }
+
+    toString(): string {
+        return this.fieldPath;
+    }
+}
+
+class MockQuery {
+    private queryConstraints: any[] = [];
+    private docs: MockDocumentReference[];
+
+    constructor(private collection: MockCollection) {
+        this.docs = this.initializeDocs();
+    }
+
+    private initializeDocs(): MockDocumentReference[] {
+        return Object.entries(this.collection.db.data)
+            .filter(([docPath]) => docPath.startsWith(this.collection.path))
+            .map(([docPath]) => new MockDocumentReference(docPath, this.collection.db));
+    }
+
+    where(fieldPath: string | MockFieldPath, opStr: string, value: any): MockQuery {
+        if (fieldPath instanceof MockFieldPath) {
+            fieldPath = fieldPath.toString();
+        }
+        this.queryConstraints.push({ type: "where", fieldPath, opStr, value });
+        return this;
+    }
+
+    limit(n: number): MockQuery {
+        this.queryConstraints.push({ type: "limit", value: n });
+        return this;
+    }
+
+    async get(): Promise<MockQuerySnapshot> {
+        let filteredDocs = this.docs;
+
+        for (const constraint of this.queryConstraints) {
+            if (constraint.type === "where") {
+                filteredDocs = filteredDocs.filter((docRef) => {
+                    // Special handling for document ID
+                    if (constraint.fieldPath === "__name__") {
+                        return (
+                            constraint.opStr === "in" && constraint.value.includes(docRef.getId())
+                        );
+                    } else {
+                        const docData = docRef.data();
+                        switch (constraint.opStr) {
+                            case "==":
+                                return docData[constraint.fieldPath] === constraint.value;
+                            case "array-contains":
+                                return (
+                                    Array.isArray(docData[constraint.fieldPath]) &&
+                                    docData[constraint.fieldPath].includes(constraint.value)
+                                );
+                            case "in":
+                                return (
+                                    Array.isArray(constraint.value) &&
+                                    constraint.value.includes(docData[constraint.fieldPath])
+                                );
+                            default:
+                                throw new Error(`Unsupported operator: ${constraint.opStr}`);
+                        }
+                    }
+                });
+            } else if (constraint.type === "limit") {
+                filteredDocs = filteredDocs.slice(0, constraint.value);
+            }
+        }
+
+        return new MockQuerySnapshot(filteredDocs);
     }
 }
