@@ -2,40 +2,73 @@ import { MockAuth } from "./MockAuth.js";
 import { describe, it, expect } from "vitest";
 
 describe("MockAuth", () => {
-    it("should allow creating and retrieving a user by email", async () => {
-        const mockAuth = new MockAuth();
-        const testUser = { email: "test@example.com", password: "123" };
+    let mockAuth: MockAuth;
 
-        await mockAuth.createUser(testUser);
+    beforeEach(() => {
+        mockAuth = new MockAuth();
+    });
 
-        const retrievedUser = mockAuth.getUserByEmail("test@example.com");
+    describe("createUser method", () => {
+        it("should allow creating a user and retrieving by email", async () => {
+            const testUser = { email: "test@example.com", password: "123" };
+            const createdUser = await mockAuth.createUser(testUser);
 
-        expect(retrievedUser).toBeDefined();
-        expect(retrievedUser).toEqual({
-            uid: retrievedUser?.uid,
-            email: "test@example.com",
+            expect(createdUser).toBeDefined();
+            expect(createdUser.email).toBe(testUser.email);
+
+            const retrievedUser = mockAuth.getUserByEmail(testUser.email);
+            expect(retrievedUser).toEqual(createdUser);
+        });
+
+        it("should assign a unique UID to each user", async () => {
+            const user1 = await mockAuth.createUser({
+                email: "user1@example.com",
+                password: "123",
+            });
+            const user2 = await mockAuth.createUser({
+                email: "user2@example.com",
+                password: "123",
+            });
+
+            expect(user1.uid).not.toBe(user2.uid);
         });
     });
 
-    it("should return null when retrieving a non-existent user", () => {
-        const mockAuth = new MockAuth();
-
-        const retrievedUser = mockAuth.getUserByEmail("nonexistent@example.com");
-
-        expect(retrievedUser).toBeNull();
+    describe("getUserByEmail method", () => {
+        it("should return null for a non-existent user", () => {
+            const retrievedUser = mockAuth.getUserByEmail("nonexistent@example.com");
+            expect(retrievedUser).toBeNull();
+        });
     });
 
-    it("should set custom user claims", async () => {
-        const mockAuth = new MockAuth();
-        const testUser = { uid: "user123", email: "test@example.com", password: "123" };
+    describe("deleteUser method", () => {
+        it("should delete a user by UID", async () => {
+            const user = await mockAuth.createUser({ email: "test@example.com", password: "123" });
+            await mockAuth.deleteUser(user.uid);
 
-        await mockAuth.createUser(testUser);
+            const deletedUser = mockAuth.getUserByEmail("test@example.com");
+            expect(deletedUser).toBeNull();
+        });
 
-        const user = mockAuth.getUserByEmail("test@example.com");
-        expect(user).toBeDefined();
-        // @ts-expect-error -- user if not defined test will fail anyway
-        await mockAuth.setCustomUserClaims(user.uid, { role: "ADMIN", organisationId: "org1" });
+        it("should throw an error if trying to delete a non-existent user", async () => {
+            await expect(mockAuth.deleteUser("nonexistent")).rejects.toThrow("User not found");
+        });
+    });
 
-        expect(user?.customClaims).toEqual({ role: "ADMIN", organisationId: "org1" });
+    describe("setCustomUserClaims method", () => {
+        it("should set custom user claims", async () => {
+            const user = await mockAuth.createUser({ email: "test@example.com", password: "123" });
+
+            await mockAuth.setCustomUserClaims(user.uid, { role: "ADMIN", organisationId: "org1" });
+
+            const updatedUser = mockAuth.getUserByEmail("test@example.com");
+            expect(updatedUser?.customClaims).toEqual({ role: "ADMIN", organisationId: "org1" });
+        });
+
+        it("should throw an error if user does not exist", async () => {
+            await expect(mockAuth.setCustomUserClaims("nonexistent", {})).rejects.toThrow(
+                "No user found for UID: nonexistent",
+            );
+        });
     });
 });
