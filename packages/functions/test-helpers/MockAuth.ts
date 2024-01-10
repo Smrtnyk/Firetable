@@ -4,6 +4,7 @@ type MockUser = {
     uid: string;
     email: string;
     customClaims?: Record<string, any>;
+    password?: string;
 };
 
 export class MockAuth {
@@ -17,6 +18,15 @@ export class MockAuth {
         };
         this.users[uid] = newUser;
         return newUser;
+    }
+
+    async updateUser(uid: string, updates: { password?: string }): Promise<void> {
+        const user = this.users[uid];
+        if (!user) {
+            throw new Error(`User with UID ${uid} not found`);
+        }
+
+        Object.assign(user, updates);
     }
 
     getUserByEmail(email: string): MockUser | null {
