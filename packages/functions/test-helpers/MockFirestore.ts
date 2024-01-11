@@ -54,6 +54,17 @@ class MockCollection {
         this.db = db;
     }
 
+    // Method to list all document references in the collection
+    async listDocuments(): Promise<MockDocumentReference[]> {
+        return Object.keys(this.db.data)
+            .filter(
+                (path) =>
+                    path.startsWith(this.path) &&
+                    path.split("/").length === this.path.split("/").length + 1,
+            )
+            .map((docPath) => new MockDocumentReference(docPath, this.db));
+    }
+
     limit(n: number): MockQuery {
         const query = new MockQuery(this);
         return query.limit(n);
@@ -107,6 +118,25 @@ export class MockDocumentReference {
         this.path = path;
         this.db = db;
         this.id = path.split("/").pop() ?? "";
+    }
+
+    async listCollections(): Promise<MockCollection[]> {
+        const subCollectionPaths = new Set<string>();
+        const docPathDepth = this.path.split("/").length;
+
+        for (const path in this.db.data) {
+            if (path.startsWith(this.path) && path.split("/").length > docPathDepth) {
+                const subCollectionPath = path
+                    .split("/")
+                    .slice(0, docPathDepth + 1)
+                    .join("/");
+                subCollectionPaths.add(subCollectionPath);
+            }
+        }
+
+        return Array.from(subCollectionPaths).map(
+            (collPath) => new MockCollection(collPath, this.db),
+        );
     }
 
     data(): any {

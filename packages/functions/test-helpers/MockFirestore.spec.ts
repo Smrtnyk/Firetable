@@ -8,6 +8,35 @@ describe("MockFirestore", () => {
         db = new MockFirestore();
     });
 
+    describe("List Collections and Documents", () => {
+        it("should list all documents in a collection", async () => {
+            // Setup
+            const collectionRef = db.collection("testCollection");
+            await collectionRef.doc("doc1").set({ key: "value1" });
+            await collectionRef.doc("doc2").set({ key: "value2" });
+
+            // Test
+            const docs = await collectionRef.listDocuments();
+            expect(docs).toHaveLength(2);
+            expect(docs.map((doc) => doc.getId())).toEqual(["doc1", "doc2"]);
+        });
+
+        it("should list all subcollections of a document", async () => {
+            // Setup
+            const docRef = db.collection("testCollection").doc("doc1");
+            await docRef.collection("subCollection1").doc("subDoc1").set({ key: "value1" });
+            await docRef.collection("subCollection2").doc("subDoc2").set({ key: "value2" });
+
+            // Test
+            const collections = await docRef.listCollections();
+            expect(collections).toHaveLength(2);
+            expect(collections.map((coll) => coll.path)).toEqual([
+                "testCollection/doc1/subCollection1",
+                "testCollection/doc1/subCollection2",
+            ]);
+        });
+    });
+
     describe("collection method", () => {
         it("should return a valid collection reference", () => {
             const collectionRef = db.collection("testCollection");
