@@ -17,21 +17,17 @@ export class MockFirestore {
     collection(path: string): MockCollection {
         const pathSegments = path.split("/");
         if (pathSegments.length % 2 === 0) {
-            throw new Error(
-                "Invalid collection path. Collection path must refer to a collection, not a document.",
-            );
+            throw new Error("Invalid collection path. Must refer to a collection, not a document.");
         }
 
         return new MockCollection(path, this);
     }
 
     doc(path: string): MockDocumentReference {
-        // Split the path and process it to get the final document path
         const pathSegments = path.split("/");
         if (pathSegments.length % 2 !== 0) {
             throw new Error("Document path must point to a document, not a collection.");
         }
-
         return new MockDocumentReference(path, this);
     }
 
@@ -50,7 +46,7 @@ export class MockFirestore {
     }
 }
 
-class MockCollection {
+export class MockCollection {
     readonly path: string;
     readonly db: MockFirestore;
 
@@ -76,8 +72,12 @@ class MockCollection {
     }
 
     async get(): Promise<MockQuerySnapshot> {
+        const expectedDepth = this.path.split("/").length + 1;
         const docs: MockDocumentReference[] = Object.entries(this.db.data)
-            .filter(([docPath]) => docPath.startsWith(this.path))
+            .filter(
+                ([docPath]) =>
+                    docPath.startsWith(this.path) && docPath.split("/").length === expectedDepth,
+            )
             .map(([docPath]) => new MockDocumentReference(docPath, this.db));
 
         return new MockQuerySnapshot(docs);
@@ -348,6 +348,8 @@ class MockQuery {
                         switch (constraint.opStr) {
                             case "==":
                                 return docData[constraint.fieldPath] === constraint.value;
+                            case "<=":
+                                return docData[constraint.fieldPath] <= constraint.value;
                             case "array-contains":
                                 return (
                                     Array.isArray(docData[constraint.fieldPath]) &&
