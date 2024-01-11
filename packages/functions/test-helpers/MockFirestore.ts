@@ -1,3 +1,4 @@
+import { FirestoreOperation } from "./types.js";
 import { generateRandomId } from "./utils.js";
 
 type FirestoreData = Record<string, any>;
@@ -7,6 +8,10 @@ export class MockFirestore {
 
     constructor() {
         this.data = {};
+    }
+
+    batch(): MockWriteBatch {
+        return new MockWriteBatch();
     }
 
     collection(path: string): MockCollection {
@@ -360,5 +365,37 @@ class MockQuery {
         }
 
         return new MockQuerySnapshot(filteredDocs);
+    }
+}
+
+class MockWriteBatch {
+    private operations: { type: FirestoreOperation; docRef: MockDocumentReference; data?: any }[] =
+        [];
+
+    set(docRef: MockDocumentReference, data: any): MockWriteBatch {
+        this.operations.push({ type: FirestoreOperation.SET, docRef, data });
+        return this;
+    }
+
+    update(docRef: MockDocumentReference, data: any): MockWriteBatch {
+        this.operations.push({ type: FirestoreOperation.UPDATE, docRef, data });
+        return this;
+    }
+
+    delete(docRef: MockDocumentReference): MockWriteBatch {
+        this.operations.push({ type: FirestoreOperation.DELETE, docRef });
+        return this;
+    }
+
+    async commit(): Promise<void> {
+        for (const op of this.operations) {
+            if (op.type === FirestoreOperation.SET) {
+                await op.docRef.set(op.data);
+            } else if (op.type === FirestoreOperation.UPDATE) {
+                await op.docRef.update(op.data);
+            } else if (op.type === FirestoreOperation.DELETE) {
+                await op.docRef.delete();
+            }
+        }
     }
 }

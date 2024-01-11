@@ -8,6 +8,32 @@ describe("MockFirestore", () => {
         db = new MockFirestore();
     });
 
+    describe("Batch Operations", () => {
+        it("should commit a batch of write operations", async () => {
+            const docRef1 = db.collection("testCollection").doc("doc1");
+            const docRef2 = db.collection("testCollection").doc("doc2");
+
+            // Start a batch
+            const batch = db.batch();
+
+            // Queue operations
+            batch.set(docRef1, { key: "value1" });
+            batch.update(docRef2, { key: "newValue" });
+            batch.delete(docRef2);
+
+            // Commit batch
+            await batch.commit();
+
+            // Verify operations
+            const snapshot1 = await docRef1.get();
+            expect(snapshot1.exists).toBe(true);
+            expect(snapshot1.data?.()).toEqual({ key: "value1" });
+
+            const snapshot2 = await docRef2.get();
+            expect(snapshot2.exists).toBe(false);
+        });
+    });
+
     describe("List Collections and Documents", () => {
         it("should list all documents in a collection", async () => {
             // Setup
