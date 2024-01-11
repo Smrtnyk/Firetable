@@ -1,5 +1,5 @@
 import { db } from "../init.js";
-import { Collection } from "../../types/types.js";
+import { getPropertiesPath } from "../paths.js";
 import { logger } from "firebase-functions";
 import { FieldValue } from "firebase-admin/firestore";
 import { HttpsError } from "firebase-functions/v2/https";
@@ -22,7 +22,7 @@ export async function onUserDeletedFn(context: {
     try {
         // Fetch properties associated with the user
         const propertiesSnapshot = await db
-            .collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}`)
+            .collection(getPropertiesPath(organisationId))
             .where("relatedUsers", "array-contains", userId)
             .get();
 

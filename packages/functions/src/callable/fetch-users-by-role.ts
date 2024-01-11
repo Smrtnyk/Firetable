@@ -1,7 +1,8 @@
 import type { User } from "../../types/types.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
 import { db } from "../init.js";
-import { Role, Collection, ADMIN } from "../../types/types.js";
+import { Role, ADMIN } from "../../types/types.js";
+import { getUsersPath } from "../paths.js";
 import { FieldPath } from "firebase-admin/firestore";
 import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
@@ -73,9 +74,7 @@ export async function fetchUsersByRoleFn(
 
     let users: User[] = [];
 
-    const baseQuery = db.collection(
-        `${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`,
-    );
+    const baseQuery = db.collection(getUsersPath(organisationId));
     if (userRole === ADMIN || userRole === Role.PROPERTY_OWNER) {
         const usersSnapshot = await baseQuery.get();
         const orgUsers = usersSnapshot.docs.map((doc) => {
