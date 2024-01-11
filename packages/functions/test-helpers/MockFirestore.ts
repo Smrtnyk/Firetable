@@ -125,6 +125,10 @@ export class MockDocumentReference {
         this.id = path.split("/").pop() ?? "";
     }
 
+    get ref(): MockDocumentReference {
+        return this;
+    }
+
     async listCollections(): Promise<MockCollection[]> {
         const subCollectionPaths = new Set<string>();
         const docPathDepth = this.path.split("/").length;
@@ -368,7 +372,7 @@ class MockQuery {
     }
 }
 
-class MockWriteBatch {
+export class MockWriteBatch {
     private operations: { type: FirestoreOperation; docRef: MockDocumentReference; data?: any }[] =
         [];
 
