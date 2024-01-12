@@ -28,8 +28,8 @@ describe("onUserDeletedFn Function", () => {
         // Assert: Check that userId is removed from relatedUsers
         const property1Snapshot = await property1Ref.get();
         const property2Snapshot = await property2Ref.get();
-        expect(property1Snapshot.data()?.relatedUsers).not.toContain(userId);
-        expect(property2Snapshot.data()?.relatedUsers).not.toContain(userId);
+        expect(property1Snapshot.data?.()?.relatedUsers).not.toContain(userId);
+        expect(property2Snapshot.data?.()?.relatedUsers).not.toContain(userId);
     });
 
     it("should not throw an error if no properties are associated with the user", async () => {

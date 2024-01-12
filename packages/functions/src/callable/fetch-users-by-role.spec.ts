@@ -1,7 +1,7 @@
 import type { FetchUsersByRoleRequestData } from "./fetch-users-by-role.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
 import { fetchUsersByRoleFn } from "./fetch-users-by-role.js";
-import * as Init from "../init";
+import * as Init from "../init.js";
 import { ADMIN, Role } from "../../types/types.js";
 import { MockFieldPath, MockFirestore } from "../../test-helpers/MockFirestore.js";
 import * as Firestore from "firebase-admin/firestore";
@@ -26,17 +26,17 @@ describe("fetchUsersByRoleFn", () => {
             .doc("organisations/org1/users/user4")
             .set({ role: Role.PROPERTY_OWNER, name: "user4" });
 
-        vi.spyOn(Firestore, "FieldPath", "get").mockReturnValue(MockFieldPath);
-        vi.spyOn(Init, "db", "get").mockReturnValue(mockFirestore);
+        vi.spyOn(Firestore, "FieldPath", "get").mockReturnValue(MockFieldPath as any);
+        vi.spyOn(Init, "db", "get").mockReturnValue(mockFirestore as any);
     });
 
     describe("Admin User", () => {
         it("should fetch all users ", async () => {
             // Mock req object for an Admin user
             const mockReq = {
-                auth: { uid: "user1", token: { role: ADMIN } },
+                auth: { uid: "user1", token: { role: ADMIN } as any },
                 data: { organisationId: "org1" },
-            };
+            } as CallableRequest<FetchUsersByRoleRequestData>;
 
             const users = await fetchUsersByRoleFn(mockReq);
             expect(users).toStrictEqual([
@@ -67,9 +67,9 @@ describe("fetchUsersByRoleFn", () => {
     describe("Property Owner User", () => {
         it("should fetch all users", async () => {
             const mockReq = {
-                auth: { uid: "user4", token: { role: Role.PROPERTY_OWNER } },
+                auth: { uid: "user4", token: { role: Role.PROPERTY_OWNER } as any },
                 data: { organisationId: "org1" },
-            };
+            } as CallableRequest<FetchUsersByRoleRequestData>;
 
             const users = await fetchUsersByRoleFn(mockReq);
             expect(users).toStrictEqual([
@@ -100,9 +100,10 @@ describe("fetchUsersByRoleFn", () => {
     describe("Staff User", () => {
         it("should fetch users only for related ids", async () => {
             const mockReq: CallableRequest<FetchUsersByRoleRequestData> = {
-                auth: { uid: "user1", token: { role: Role.STAFF } },
+                auth: { uid: "user1", token: { role: Role.STAFF } as any },
                 data: { organisationId: "org1", userIdsToFetch: ["user1", "user2"] },
-            };
+                rawRequest: {} as any,
+            } as CallableRequest<FetchUsersByRoleRequestData>;
 
             const users = await fetchUsersByRoleFn(mockReq);
             expect(users).toStrictEqual([
@@ -119,7 +120,7 @@ describe("fetchUsersByRoleFn", () => {
         it("should throw unauthenticated error if user is not authenticated", async () => {
             const mockReq = {
                 data: { organisationId: "org1" },
-            };
+            } as CallableRequest<FetchUsersByRoleRequestData>;
 
             await expect(fetchUsersByRoleFn(mockReq)).rejects.toThrow(
                 "User must be authenticated.",
@@ -128,14 +129,14 @@ describe("fetchUsersByRoleFn", () => {
 
         it("should throw an error if too many user IDs are provided", async () => {
             const mockReq = {
-                auth: { uid: "user1", token: { role: "ADMIN" } },
+                auth: { uid: "user1", token: { role: "ADMIN" } as any },
                 data: {
                     organisationId: "org1",
                     userIdsToFetch: Array.from({ length: 101 })
                         .fill(0)
                         .map((_, idx) => `user${idx}`),
                 },
-            };
+            } as CallableRequest<FetchUsersByRoleRequestData>;
 
             await expect(fetchUsersByRoleFn(mockReq)).rejects.toThrow(
                 "Too many user IDs provided.",
@@ -146,7 +147,7 @@ describe("fetchUsersByRoleFn", () => {
             const mockReq = {
                 auth: { uid: "user1", token: {} },
                 data: { organisationId: "org1" },
-            };
+            } as CallableRequest<FetchUsersByRoleRequestData>;
 
             await expect(fetchUsersByRoleFn(mockReq)).rejects.toThrow(
                 "User role not found in custom claims.",

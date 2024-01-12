@@ -25,8 +25,8 @@ describe("createUser", () => {
         mockAuth = new MockAuth();
         mockFirestore = new MockFirestore();
 
-        vi.spyOn(Init, "db", "get").mockReturnValue(mockFirestore);
-        vi.spyOn(Init, "auth", "get").mockReturnValue(mockAuth);
+        vi.spyOn(Init, "db", "get").mockReturnValue(mockFirestore as any);
+        vi.spyOn(Init, "auth", "get").mockReturnValue(mockAuth as any);
     });
 
     it("should throw an error if the user already exists", async () => {
@@ -69,8 +69,7 @@ describe("createUser", () => {
         ).rejects.toThrow("Auth creation failed");
 
         // Verify that no data was written to Firestore
-        const userDoc = mockFirestore.getDataAtPath(getUserPath(testUserData.organisationId));
-        expect(userDoc).toBeUndefined();
+        expect(mockFirestore.data.size).toBe(0);
     });
 
     it("should clean up by deleting the user from Auth if there's an exception after user creation", async () => {

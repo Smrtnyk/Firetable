@@ -1,7 +1,7 @@
 import type { EditUserPayload } from "../../types/types.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
 import { updateUserFn } from "./update-user.js";
-import * as Init from "../init";
+import * as Init from "../init.js";
 import { MockAuth } from "../../test-helpers/MockAuth.js";
 import { MockFieldValue, MockFirestore } from "../../test-helpers/MockFirestore.js";
 import { getPropertyPath, getUserPath } from "../paths.js";
@@ -16,9 +16,9 @@ describe("updateUserFn", () => {
         mockAuth = new MockAuth();
         mockFirestore = new MockFirestore();
 
-        vi.spyOn(Firestore, "FieldValue", "get").mockReturnValue(MockFieldValue);
-        vi.spyOn(Init, "auth", "get").mockReturnValue(mockAuth);
-        vi.spyOn(Init, "db", "get").mockReturnValue(mockFirestore);
+        vi.spyOn(Firestore, "FieldValue", "get").mockReturnValue(MockFieldValue as any);
+        vi.spyOn(Init, "auth", "get").mockReturnValue(mockAuth as any);
+        vi.spyOn(Init, "db", "get").mockReturnValue(mockFirestore as any);
     });
 
     describe("Successful updates", () => {
@@ -109,10 +109,11 @@ describe("updateUserFn", () => {
             const request = {
                 auth: { uid },
                 data: {
-                    updatedUser: { password: newPassword, relatedProperties: [] },
+                    updatedUser: { password: newPassword, relatedProperties: [] } as any,
                     userId: uid,
                     organisationId: "org1",
                 },
+                rawRequest: {} as any,
             } as CallableRequest<EditUserPayload>;
 
             await updateUserFn(request);
@@ -133,7 +134,7 @@ describe("updateUserFn", () => {
             const request = {
                 auth: { uid: userId },
                 data: {
-                    updatedUser: { password: "newPassword", relatedProperties: [] },
+                    updatedUser: { password: "newPassword", relatedProperties: [] } as any,
                     userId,
                     organisationId: "org1",
                 },
@@ -196,7 +197,7 @@ describe("updateUserFn", () => {
             // Setup test data with properties to remove
             const request = {
                 data: {
-                    updatedUser: { relatedProperties: [] },
+                    updatedUser: { relatedProperties: [] } as any,
                     userId,
                     organisationId,
                 },
