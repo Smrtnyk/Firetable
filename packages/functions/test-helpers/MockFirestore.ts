@@ -1,3 +1,4 @@
+import type { FieldPath } from "firebase-admin/firestore";
 import { FirestoreOperation } from "./types.js";
 import { generateRandomId } from "./utils.js";
 
@@ -292,7 +293,7 @@ export class MockFieldValue {
     }
 }
 
-export class MockFieldPath {
+export class MockFieldPath implements FieldPath {
     private constructor(private fieldPath: string) {}
 
     static documentId(): MockFieldPath {
@@ -301,6 +302,11 @@ export class MockFieldPath {
 
     toString(): string {
         return this.fieldPath;
+    }
+
+    isEqual(other: FieldPath): boolean {
+        console.log("MockFieldPath.isEqual", other);
+        throw new NotImplementedError("isEqual is not implemented");
     }
 }
 
@@ -404,5 +410,12 @@ export class MockWriteBatch {
                 throw new Error(`Unsupported operation: ${op.type}`);
             }
         }
+    }
+}
+
+class NotImplementedError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.message = message;
     }
 }
