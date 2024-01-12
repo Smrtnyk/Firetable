@@ -8,6 +8,7 @@ declare module "vue-router" {
         requiresAuth: boolean;
         breadcrumb?: string | ((route: RouteLocationNormalized, isAdmin?: boolean) => string);
         allowedRoles?: (Role | typeof ADMIN)[];
+        parent?: string;
     }
 }
 

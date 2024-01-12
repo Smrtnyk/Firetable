@@ -93,9 +93,7 @@ const breadcrumbLinks = computed<Link[]>(() => {
             }
         }
 
-        currentRouteName = currentRoute?.meta?.parent
-            ? (currentRoute.meta.parent as RouteRecordName)
-            : null;
+        currentRouteName = currentRoute?.meta?.parent;
     }
 
     return links;
