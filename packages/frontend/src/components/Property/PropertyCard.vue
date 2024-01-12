@@ -33,7 +33,7 @@ const backgroundImageUrl = computed(() => {
                 },
             }"
         >
-            <q-responsive :ratio="16 / 9">
+            <q-responsive :ratio="1">
                 <div class="PropertyCard__content column">
                     <q-space />
 
