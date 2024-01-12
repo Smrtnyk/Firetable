@@ -168,10 +168,6 @@ export class MockDocumentReference {
         };
     }
 
-    getId(): string {
-        return this.id;
-    }
-
     collection(subPath: string): MockCollection {
         const fullPath = `${this.path}/${subPath}`;
         return new MockCollection(fullPath, this.db);
@@ -258,7 +254,7 @@ class MockQuerySnapshot {
         const existingDocs = docs
             .filter((doc) => doc.exists)
             .map((doc, idx) => ({
-                id: this.docs[idx]?.getId(),
+                id: this.docs[idx]?.id,
                 data: () => doc.data,
             }));
 
@@ -350,9 +346,7 @@ class MockQuery {
                 filteredDocs = filteredDocs.filter((docRef) => {
                     // Special handling for document ID
                     if (constraint.fieldPath === "__name__") {
-                        return (
-                            constraint.opStr === "in" && constraint.value.includes(docRef.getId())
-                        );
+                        return constraint.opStr === "in" && constraint.value.includes(docRef.id);
                     } else {
                         const docData = docRef.data();
                         switch (constraint.opStr) {

@@ -44,7 +44,7 @@ describe("MockFirestore", () => {
             // Test
             const docs = await collectionRef.listDocuments();
             expect(docs).toHaveLength(2);
-            expect(docs.map((doc) => doc.getId())).toEqual(["doc1", "doc2"]);
+            expect(docs.map((doc) => doc.id)).toEqual(["doc1", "doc2"]);
         });
 
         it("should list all subcollections of a document", async () => {
@@ -80,7 +80,7 @@ describe("MockFirestore", () => {
         it("should return a valid document reference", () => {
             const docRef = db.doc("testCollection/testDoc");
             expect(docRef).toBeDefined();
-            expect(docRef.getId()).toBe("testDoc");
+            expect(docRef.id).toBe("testDoc");
         });
 
         it("should throw an error for invalid document path", () => {
