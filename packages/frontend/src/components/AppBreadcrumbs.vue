@@ -80,15 +80,12 @@ const breadcrumbLinks = computed<Link[]>(() => {
             if (isAllowed) {
                 const path = router.resolve({
                     name: currentRoute.name,
-                    params: { ...route.params },
+                    params: route.params,
                 }).href;
                 const name = getBreadcrumbName(currentRoute, authStore.isAdmin);
 
                 if (name) {
-                    links.unshift({
-                        name,
-                        path: path,
-                    });
+                    links.unshift({ name, path });
                 }
             }
         }
