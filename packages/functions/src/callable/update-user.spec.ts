@@ -119,9 +119,9 @@ describe("updateUserFn", () => {
             await updateUserFn(request);
 
             // Verify password update in MockAuth
-            const user = mockAuth.getUserByEmail("test@example.com");
-            expect(user).toBeDefined();
-            // Assuming MockAuth stores the latest password
+            const user = await mockAuth.getUserByEmail("test@example.com");
+
+            // @ts-expect-error -- We shouldn't store the password, but it is a mock auth object
             expect(user?.password).toBe(newPassword);
         });
 

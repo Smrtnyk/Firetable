@@ -16,7 +16,7 @@ describe("MockAuth", () => {
             expect(createdUser).toBeDefined();
             expect(createdUser.email).toBe(testUser.email);
 
-            const retrievedUser = mockAuth.getUserByEmail(testUser.email);
+            const retrievedUser = await mockAuth.getUserByEmail(testUser.email);
             expect(retrievedUser).toEqual(createdUser);
         });
 
@@ -45,10 +45,11 @@ describe("MockAuth", () => {
             await mockAuth.updateUser(uid, { password: newPassword });
 
             // Retrieve the updated user
-            const updatedUser = mockAuth.getUserByEmail("user@example.com");
+            const updatedUser = await mockAuth.getUserByEmail("user@example.com");
 
             // Check if the user details have been updated
             expect(updatedUser).toBeDefined();
+            // @ts-expect-error -- password is not a property of UserRecord but we store it in mock class
             expect(updatedUser?.password).toBe(newPassword);
         });
 
@@ -63,9 +64,10 @@ describe("MockAuth", () => {
     });
 
     describe("getUserByEmail method", () => {
-        it("should return null for a non-existent user", () => {
-            const retrievedUser = mockAuth.getUserByEmail("nonexistent@example.com");
-            expect(retrievedUser).toBeNull();
+        it("should return null for a non-existent user", async () => {
+            expect(() => mockAuth.getUserByEmail("nonexistent@example.com")).toThrow(
+                "User with email nonexistent@example.com not found",
+            );
         });
     });
 
@@ -74,8 +76,7 @@ describe("MockAuth", () => {
             const user = await mockAuth.createUser({ email: "test@example.com", password: "123" });
             await mockAuth.deleteUser(user.uid);
 
-            const deletedUser = mockAuth.getUserByEmail("test@example.com");
-            expect(deletedUser).toBeNull();
+            expect(() => mockAuth.getUserByEmail("test@example.com")).toThrow();
         });
 
         it("should throw an error if trying to delete a non-existent user", async () => {
@@ -89,7 +90,7 @@ describe("MockAuth", () => {
 
             await mockAuth.setCustomUserClaims(user.uid, { role: "ADMIN", organisationId: "org1" });
 
-            const updatedUser = mockAuth.getUserByEmail("test@example.com");
+            const updatedUser = await mockAuth.getUserByEmail("test@example.com");
             expect(updatedUser?.customClaims).toEqual({ role: "ADMIN", organisationId: "org1" });
         });
 

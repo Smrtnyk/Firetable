@@ -82,7 +82,6 @@ describe("createUser", () => {
         ).rejects.toThrow("Some post-creation error");
 
         // Verify user cleanup in Auth
-        const userInAuth = await mockAuth.getUserByEmail(testUserData.email);
-        expect(userInAuth).toBeNull();
+        expect(() => mockAuth.getUserByEmail(testUserData.email)).toThrow();
     });
 });

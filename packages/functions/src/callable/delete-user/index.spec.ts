@@ -44,7 +44,7 @@ describe("deleteUser", () => {
 
         await deleteUser(req);
 
-        expect(mockAuth.getUserByEmail("test@example.com")).toBeNull();
+        expect(() => mockAuth.getUserByEmail("test@example.com")).toThrow();
         expect(mockFirestore.getDataAtPath(getUserPath(testOrgId, testUserId))).toBeUndefined();
     });
 
@@ -66,6 +66,6 @@ describe("deleteUser", () => {
 
         await deleteUser(req);
 
-        expect(mockAuth.getUserByEmail("test@example.com")).toBeNull();
+        expect(() => mockAuth.getUserByEmail("test@example.com")).toThrow();
     });
 });
