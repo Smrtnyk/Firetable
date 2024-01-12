@@ -13,9 +13,11 @@
 
 <script setup lang="ts">
 import type { RouteRecordName, RouteRecordNormalized, RouteRecordRaw } from "vue-router";
+import type { User } from "@firetable/types";
 import { useRoute, useRouter } from "vue-router";
 import { computed } from "vue";
 import { useAuthStore } from "src/stores/auth-store";
+import { isFunction } from "@firetable/utils";
 
 interface Link {
     name: string;
@@ -48,6 +50,23 @@ function findRouteByName(
     return undefined;
 }
 
+function isRouteAllowed(
+    currentRoute: RouteRecordRaw | RouteRecordNormalized,
+    userRole: User["role"],
+): boolean {
+    return !currentRoute.meta?.allowedRoles || currentRoute.meta.allowedRoles.includes(userRole);
+}
+
+function getBreadcrumbName(
+    currentRoute: RouteRecordRaw | RouteRecordNormalized,
+    isAdmin: boolean,
+): string | undefined {
+    if (isFunction(currentRoute.meta?.breadcrumb)) {
+        return currentRoute.meta.breadcrumb(route, isAdmin);
+    }
+    return currentRoute.meta?.breadcrumb;
+}
+
 const breadcrumbLinks = computed<Link[]>(() => {
     const links: Link[] = [];
     let currentRouteName = route.name;
@@ -56,22 +75,14 @@ const breadcrumbLinks = computed<Link[]>(() => {
         const currentRoute = findRouteByName(currentRouteName);
 
         if (currentRoute?.meta?.breadcrumb && currentRoute.name) {
-            const isAllowed =
-                !currentRoute.meta.allowedRoles ||
-                (currentRoute.meta.allowedRoles as string[]).includes(
-                    authStore.nonNullableUser.role,
-                );
+            const isAllowed = isRouteAllowed(currentRoute, authStore.nonNullableUser.role);
 
             if (isAllowed) {
                 const path = router.resolve({
                     name: currentRoute.name,
                     params: { ...route.params },
                 }).href;
-                const breadCrumb = currentRoute.meta.breadcrumb;
-                const name =
-                    typeof breadCrumb === "function"
-                        ? breadCrumb(route, authStore.isAdmin)
-                        : breadCrumb;
+                const name = getBreadcrumbName(currentRoute, authStore.isAdmin);
 
                 if (name) {
                     links.unshift({

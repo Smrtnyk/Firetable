@@ -9,3 +9,7 @@ export function isString(candidate: unknown): candidate is string {
 export function isDefined<T>(candidate: T | undefined | null): candidate is T {
     return candidate !== undefined && candidate !== null;
 }
+
+export function isFunction(candidate: unknown): candidate is Function {
+    return typeof candidate === "function";
+}
