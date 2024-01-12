@@ -1,6 +1,15 @@
-import type { FieldPath, FieldValue } from "firebase-admin/firestore";
+import type {
+    FieldPath,
+    FieldValue,
+    Query,
+    OrderByDirection,
+    WhereFilterOp,
+    DocumentSnapshot,
+} from "firebase-admin/firestore";
 import { FirestoreOperation } from "./types.js";
 import { generateRandomId } from "./utils.js";
+import { Timestamp } from "firebase-admin/firestore";
+import * as console from "node:console";
 
 type FirestoreData = Map<string, any>;
 
@@ -11,8 +20,43 @@ export class MockFirestore {
         this.data = new Map();
     }
 
+    terminate(): Promise<void> {
+        console.log("MockFirestore.terminate");
+        throw new NotImplementedError("terminate is not implemented");
+    }
+
+    settings(settings: any): void {
+        console.log("MockFirestore.settings", settings);
+        throw new NotImplementedError("settings is not implemented");
+    }
+
+    getAll(...args: any[]): any {
+        console.log("MockFirestore.getAll", args);
+        throw new NotImplementedError("getAll is not implemented");
+    }
+
+    recursiveDelete(...args: any[]): any {
+        console.log("MockFirestore.recursiveDelete", args);
+        throw new NotImplementedError("recursiveDelete is not implemented");
+    }
+
+    bulkWriter(...args: any[]): any {
+        console.log("MockFirestore.bulkWriter", args);
+        throw new NotImplementedError("bulkWriter is not implemented");
+    }
+
+    bundle(...args: any[]): any {
+        console.log("MockFirestore.bundle", args);
+        throw new NotImplementedError("bundle is not implemented");
+    }
+
     batch(): MockWriteBatch {
         return new MockWriteBatch();
+    }
+
+    collectionGroup(collectionId: string): any {
+        console.log("MockFirestore.collectionGroup", collectionId);
+        throw new NotImplementedError("collectionGroup is not implemented");
     }
 
     collection(path: string): MockCollection {
@@ -49,22 +93,26 @@ export class MockFirestore {
 
 export class MockCollection {
     readonly path: string;
-    readonly db: MockFirestore;
+    readonly firestore: MockFirestore;
 
-    constructor(path: string, db: MockFirestore) {
+    constructor(path: string, firestore: MockFirestore) {
         this.path = path;
-        this.db = db;
+        this.firestore = firestore;
     }
 
-    // Method to list all document references in the collection
+    isEqual(other: MockCollection): boolean {
+        console.log("MockCollection.isEqual", other);
+        throw new NotImplementedError("isEqual is not implemented");
+    }
+
     async listDocuments(): Promise<MockDocumentReference[]> {
-        return Array.from(this.db.data.keys())
+        return Array.from(this.firestore.data.keys())
             .filter(
                 (path) =>
                     path.startsWith(this.path) &&
                     path.split("/").length === this.path.split("/").length + 1,
             )
-            .map((docPath) => new MockDocumentReference(docPath, this.db));
+            .map((docPath) => new MockDocumentReference(docPath, this.firestore));
     }
 
     limit(n: number): MockQuery {
@@ -74,31 +122,36 @@ export class MockCollection {
 
     async get(): Promise<MockQuerySnapshot> {
         const expectedDepth = this.path.split("/").length + 1;
-        const docs: MockDocumentReference[] = Array.from(this.db.data.entries())
+        const docs = Array.from(this.firestore.data.entries())
             .filter(
                 ([docPath]) =>
                     docPath.startsWith(this.path) && docPath.split("/").length === expectedDepth,
             )
-            .map(([docPath]) => new MockDocumentReference(docPath, this.db));
+            .map(async ([docPath]) => {
+                const ref = new MockDocumentReference(docPath, this.firestore);
+                const data = await ref.get();
+                return new MockQueryDocumentSnapshot(ref, data.exists, data.data());
+            });
+        const snapshots = await Promise.all(docs);
 
-        return new MockQuerySnapshot(docs);
+        return new MockQuerySnapshot(snapshots);
     }
 
     doc(docId?: string): MockDocumentReference {
         const id = docId ?? generateRandomId();
         const docPath = `${this.path}/${id}`;
-        return new MockDocumentReference(docPath, this.db);
+        return new MockDocumentReference(docPath, this.firestore);
     }
 
     async add(data: any): Promise<MockDocumentReference> {
         const id = generateRandomId();
         const docPath = `${this.path}/${id}`;
-        const newDocRef = new MockDocumentReference(docPath, this.db);
+        const newDocRef = new MockDocumentReference(docPath, this.firestore);
         await newDocRef.set(data);
         return newDocRef;
     }
 
-    where(fieldPath: string | MockFieldPath, opStr: string, value: any): MockQuery {
+    where(fieldPath: string | MockFieldPath, opStr: WhereFilterOp, value: any): MockQuery {
         // Initialize a new MockQuery with the collection reference
         return new MockQuery(this).where(fieldPath, opStr, value);
     }
@@ -117,24 +170,20 @@ function applyUpdate(current: any, path: string[], value: any): void {
 
 export class MockDocumentReference {
     public path: string;
-    public db: MockFirestore;
+    public firestore: MockFirestore;
     public id: string;
 
-    constructor(path: string, db: MockFirestore) {
+    constructor(path: string, firestore: MockFirestore) {
         this.path = path;
-        this.db = db;
+        this.firestore = firestore;
         this.id = path.split("/").pop() ?? "";
-    }
-
-    get ref(): MockDocumentReference {
-        return this;
     }
 
     async listCollections(): Promise<MockCollection[]> {
         const subCollectionPaths = new Set<string>();
         const docPathDepth = this.path.split("/").length;
 
-        for (const path of this.db.data.keys()) {
+        for (const path of this.firestore.data.keys()) {
             if (path.startsWith(this.path) && path.split("/").length > docPathDepth) {
                 const subCollectionPath = path
                     .split("/")
@@ -145,36 +194,30 @@ export class MockDocumentReference {
         }
 
         return Array.from(subCollectionPaths).map(
-            (collPath) => new MockCollection(collPath, this.db),
+            (collPath) => new MockCollection(collPath, this.firestore),
         );
     }
 
-    data(): any {
-        return this.db.data.get(this.path);
-    }
-
-    async set(data: any): Promise<void> {
+    async set(data: any): Promise<MockWriteResult> {
         if (!data) {
             throw new Error("Data to set cannot be undefined");
         }
-        this.db.data.set(this.path, data);
+        this.firestore.data.set(this.path, data);
+        return new MockWriteResult();
     }
 
-    async get(): Promise<{ exists: boolean; data?: () => any }> {
-        const data = this.db.data.get(this.path);
-        return {
-            exists: data !== undefined,
-            data: () => data,
-        };
+    async get(): Promise<MockDocumentSnapshot> {
+        const data = this.firestore.data.get(this.path);
+        return new MockDocumentSnapshot(this, data !== undefined, data);
     }
 
     collection(subPath: string): MockCollection {
         const fullPath = `${this.path}/${subPath}`;
-        return new MockCollection(fullPath, this.db);
+        return new MockCollection(fullPath, this.firestore);
     }
 
-    update(data: any): Promise<void> {
-        const currentData = this.db.data.get(this.path) || {};
+    update(data: any): Promise<MockWriteResult> {
+        const currentData = this.firestore.data.get(this.path) || {};
 
         Object.keys(data).forEach((key) => {
             if (data[key] instanceof MockFieldValue) {
@@ -186,12 +229,13 @@ export class MockDocumentReference {
             }
         });
 
-        this.db.data.set(this.path, currentData);
-        return Promise.resolve();
+        this.firestore.data.set(this.path, currentData);
+        return Promise.resolve(new MockWriteResult());
     }
 
-    async delete(): Promise<void> {
-        this.db.data.delete(this.path);
+    async delete(): Promise<MockWriteResult> {
+        this.firestore.data.delete(this.path);
+        return new MockWriteResult();
     }
 }
 
@@ -244,21 +288,81 @@ class MockTransaction {
     }
 }
 
+export class MockDocumentSnapshot {
+    createTime?: Timestamp;
+    updateTime?: Timestamp;
+    readTime = Timestamp.now();
+
+    /**
+     * @private
+     */
+    readonly #data: any;
+
+    constructor(
+        public readonly ref: any,
+        public readonly exists: boolean,
+        data: any,
+    ) {
+        this.#data = data;
+    }
+
+    get id(): string {
+        return this.ref.id;
+    }
+
+    data(): any | undefined {
+        return this.exists ? this.#data : undefined;
+    }
+
+    get(fieldPath: string | FieldPath): any {
+        if (!this.exists) {
+            return undefined;
+        }
+
+        const pathString = typeof fieldPath === "string" ? fieldPath : fieldPath.toString();
+
+        const fields = pathString.split(".");
+        let currentObject = this.#data;
+        for (const field of fields) {
+            if (!(field in currentObject)) {
+                return undefined;
+            }
+            currentObject = currentObject[field];
+        }
+        return currentObject;
+    }
+
+    isEqual(other: DocumentSnapshot): boolean {
+        console.log("MockDocumentSnapshot.isEqual", other);
+        throw new NotImplementedError("isEqual is not implemented");
+    }
+}
+
+export class MockQueryDocumentSnapshot extends MockDocumentSnapshot {
+    override createTime = Timestamp.now();
+    override updateTime = Timestamp.now();
+}
+
 class MockQuerySnapshot {
-    constructor(public docs: MockDocumentReference[]) {}
+    size = 0;
+    query: any;
+    empty = false;
+    readTime = Timestamp.now();
 
-    async get(): Promise<MockQuerySnapshot> {
-        // Simulate fetching documents from Firestore
-        const docs = await Promise.all(this.docs.map((docRef) => docRef.get()));
-        // Filter out non-existing documents
-        const existingDocs = docs
-            .filter((doc) => doc.exists)
-            .map((doc, idx) => ({
-                id: this.docs[idx]?.id,
-                data: () => doc.data,
-            }));
+    constructor(public docs: MockQueryDocumentSnapshot[]) {}
 
-        return new MockQuerySnapshot(existingDocs as any);
+    docChanges(): any {
+        console.log("MockQuerySnapshot.docChanges");
+        throw new NotImplementedError("docChanges is not implemented");
+    }
+
+    isEqual(other: any): boolean {
+        console.log("MockQuerySnapshot.isEqual", other);
+        throw new NotImplementedError("isEqual is not implemented");
+    }
+
+    forEach(callback: (doc: any) => void): void {
+        this.docs.forEach((doc) => callback(doc));
     }
 }
 
@@ -311,25 +415,106 @@ export class MockFieldPath implements FieldPath {
     }
 }
 
-class MockQuery {
+class MockQuery implements Query {
+    private readonly _initPromise: Promise<void>;
     private queryConstraints: any[] = [];
-    private readonly docs: MockDocumentReference[];
+    private docs: MockQueryDocumentSnapshot[] = [];
+    firestore: any;
 
     constructor(private collection: MockCollection) {
-        this.docs = this.initializeDocs();
+        this._initPromise = this.init();
     }
 
-    private initializeDocs(): MockDocumentReference[] {
-        return Array.from(this.collection.db.data.entries())
+    async init(): Promise<void> {
+        const docsPromise = Array.from(this.collection.firestore.data.entries())
             .filter(([docPath]) => docPath.startsWith(this.collection.path))
-            .map(([docPath]) => new MockDocumentReference(docPath, this.collection.db));
+            .map(([docPath]) => new MockDocumentReference(docPath, this.collection.firestore))
+            .map((docRef) => {
+                return docRef.get();
+            });
+        const docsSnaps = await Promise.all(docsPromise);
+        this.docs = docsSnaps.map((snap) => {
+            return new MockQueryDocumentSnapshot(snap.ref, snap.exists, snap.data());
+        });
     }
 
-    where(fieldPath: string | MockFieldPath, opStr: string, value: any): MockQuery {
-        if (fieldPath instanceof MockFieldPath) {
-            fieldPath = fieldPath.toString();
+    withConverter(): any {
+        console.log("MockQuery.withConverter");
+        throw new NotImplementedError("withConverter is not implemented");
+    }
+
+    stream(): any {
+        console.log("MockQuery.stream");
+        throw new NotImplementedError("stream is not implemented");
+    }
+
+    count(): any {
+        console.log("MockQuery.count");
+        throw new NotImplementedError("count is not implemented");
+    }
+
+    onSnapshot(...args: any[]): any {
+        console.log("MockQuery.onSnapshot", args);
+        throw new NotImplementedError("onSnapshot is not implemented");
+    }
+
+    aggregate(...args: any[]): any {
+        console.log("MockQuery.aggregate", args);
+        throw new NotImplementedError("aggregate is not implemented");
+    }
+
+    endBefore(...args: any[]): any {
+        console.log("MockQuery.endBefore", args);
+        throw new NotImplementedError("endBefore is not implemented");
+    }
+
+    endAt(...args: any[]): any {
+        console.log("MockQuery.endAt", args);
+        throw new NotImplementedError("endAt is not implemented");
+    }
+
+    select(...field: (string | MockFieldPath)[]): any {
+        console.log("MockQuery.select", field);
+        throw new NotImplementedError("select is not implemented");
+    }
+
+    startAfter(...args: any[]): any {
+        console.log("MockQuery.startAfter", args);
+        throw new NotImplementedError("startAfter is not implemented");
+    }
+
+    startAt(...args: any[]): any {
+        console.log("MockQuery.startAt", args);
+        throw new NotImplementedError("startAt is not implemented");
+    }
+
+    offset(offset: number): any {
+        console.log("MockQuery.offset", offset);
+        throw new NotImplementedError("offset is not implemented");
+    }
+
+    limitToLast(limit: number): any {
+        console.log("MockQuery.limitToLast", limit);
+        throw new NotImplementedError("limitToLast is not implemented");
+    }
+
+    orderBy(fieldPath: string | MockFieldPath, directionStr?: OrderByDirection): any {
+        console.log("MockQuery.orderBy", fieldPath, directionStr);
+        throw new NotImplementedError("orderBy is not implemented");
+    }
+
+    where(
+        filterOrFieldPath: any | string | MockFieldPath,
+        opStr?: WhereFilterOp,
+        value?: any,
+    ): MockQuery {
+        if (!opStr && !value) {
+            throw new NotImplementedError("where for filter is not implemented");
         }
-        this.queryConstraints.push({ type: "where", fieldPath, opStr, value });
+        if (filterOrFieldPath instanceof MockFieldPath) {
+            filterOrFieldPath = filterOrFieldPath.toString();
+        }
+        this.queryConstraints.push({ type: "where", fieldPath: filterOrFieldPath, opStr, value });
         return this;
     }
 
@@ -338,7 +523,13 @@ class MockQuery {
         return this;
     }
 
+    isEqual(other: any): boolean {
+        console.log("MockQuery.isEqual", other);
+        throw new NotImplementedError("isEqual is not implemented");
+    }
+
     async get(): Promise<MockQuerySnapshot> {
+        await this._initPromise;
         let filteredDocs = this.docs;
 
         for (const constraint of this.queryConstraints) {
@@ -397,7 +588,7 @@ export class MockWriteBatch {
         return this;
     }
 
-    async commit(): Promise<void> {
+    async commit(): Promise<MockWriteResult[]> {
         for (const op of this.operations) {
             if (op.type === FirestoreOperation.SET) {
                 await op.docRef.set(op.data);
@@ -409,6 +600,17 @@ export class MockWriteBatch {
                 throw new Error(`Unsupported operation: ${op.type}`);
             }
         }
+
+        return [new MockWriteResult()];
+    }
+}
+
+export class MockWriteResult {
+    readonly writeTime = Timestamp.now();
+
+    isEqual(other: MockWriteResult): boolean {
+        console.log("MockWriteResult.isEqual", other);
+        throw new NotImplementedError("isEqual is not implemented");
     }
 }
 
