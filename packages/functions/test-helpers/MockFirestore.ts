@@ -5,34 +5,42 @@ import type {
     OrderByDirection,
     WhereFilterOp,
     DocumentSnapshot,
+    Settings,
+    ReadOptions,
 } from "firebase-admin/firestore";
 import { FirestoreOperation } from "./types.js";
 import { generateRandomId } from "./utils.js";
 import { Timestamp } from "firebase-admin/firestore";
-import * as console from "node:console";
 
 type FirestoreData = Map<string, any>;
 
 export class MockFirestore {
     public data: FirestoreData;
+    private _settings: Settings;
 
-    constructor() {
+    constructor(settings: Settings = {}) {
         this.data = new Map();
+        this._settings = settings;
     }
 
     terminate(): Promise<void> {
-        console.log("MockFirestore.terminate");
-        throw new NotImplementedError("terminate is not implemented");
+        this.data.clear();
+        return Promise.resolve();
     }
 
-    settings(settings: any): void {
-        console.log("MockFirestore.settings", settings);
-        throw new NotImplementedError("settings is not implemented");
+    settings(settings: Settings): void {
+        this._settings = settings;
+        console.log(this._settings);
     }
 
-    getAll(...args: any[]): any {
-        console.log("MockFirestore.getAll", args);
-        throw new NotImplementedError("getAll is not implemented");
+    async getAll(
+        ...documentRefsOrReadOptions: Array<MockDocumentReference | ReadOptions>
+    ): Promise<MockDocumentSnapshot[]> {
+        // collect all document references
+        const documentRefs = documentRefsOrReadOptions.filter(
+            (ref): ref is MockDocumentReference => ref instanceof MockDocumentReference,
+        );
+        return Promise.all(documentRefs.map((ref) => ref.get()));
     }
 
     recursiveDelete(...args: any[]): any {
@@ -247,20 +255,14 @@ class MockTransaction {
         this.db = db;
     }
 
-    set(docRef: MockDocumentReference, data: any): void {
+    set(docRef: MockDocumentReference, data: any): MockTransaction {
         this.transactionData.set(docRef.path, data);
+        return this;
     }
 
-    async get(docRef: MockDocumentReference): Promise<{ exists: boolean; data?: () => any }> {
-        if (this.transactionData.has(docRef.path)) {
-            return {
-                exists: true,
-                data: () => this.transactionData.get(docRef.path),
-            };
-        }
-
-        // Fallback to get from MockDocumentReference if not in transactionData
-        return docRef.get();
+    async get(docRef: MockDocumentReference): Promise<MockDocumentSnapshot> {
+        const data = this.transactionData.get(docRef.path);
+        return new MockDocumentSnapshot(docRef, !!data, data);
     }
 
     async update(docRef: MockDocumentReference, data: any): Promise<void> {
