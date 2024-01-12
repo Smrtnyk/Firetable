@@ -1,4 +1,4 @@
-import type { FieldPath } from "firebase-admin/firestore";
+import type { FieldPath, FieldValue } from "firebase-admin/firestore";
 import { FirestoreOperation } from "./types.js";
 import { generateRandomId } from "./utils.js";
 
@@ -266,7 +266,7 @@ class MockQuerySnapshot {
     }
 }
 
-export class MockFieldValue {
+export class MockFieldValue implements FieldValue {
     private constructor(
         private operation: "arrayUnion" | "arrayRemove",
         private elements: any[],
@@ -290,6 +290,11 @@ export class MockFieldValue {
             // Filter out elements to be removed from the current value
             return (currentValue || []).filter((item: any) => !this.elements.includes(item));
         }
+    }
+
+    isEqual(other: FieldValue): boolean {
+        console.log("MockFieldValue.isEqual", other);
+        throw new NotImplementedError("isEqual is not implemented");
     }
 }
 
