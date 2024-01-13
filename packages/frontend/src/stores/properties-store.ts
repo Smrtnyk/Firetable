@@ -24,6 +24,10 @@ export const DEFAULT_ORGANISATION_SETTINGS: DeepRequired<OrganisationSettings> =
         eventStartTime24HFormat: "22:00",
         eventDurationInHours: 10,
         eventCardAspectRatio: "16:9",
+        reservationArrivedColor: "#1a7722",
+        reservationConfirmedColor: "#6247aa",
+        reservationCancelledColor: "#ff9f43",
+        reservationPendingColor: "#2ab7ca",
     },
     property: {
         propertyCardAspectRatio: "1",

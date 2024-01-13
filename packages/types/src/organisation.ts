@@ -15,5 +15,9 @@ export interface OrganisationSettings {
         eventCardAspectRatio: AspectRatio;
         eventStartTime24HFormat: string;
         eventDurationInHours: number;
+        reservationArrivedColor: string;
+        reservationConfirmedColor: string;
+        reservationCancelledColor: string;
+        reservationPendingColor: string;
     };
 }
