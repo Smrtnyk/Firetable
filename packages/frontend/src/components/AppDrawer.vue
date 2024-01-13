@@ -75,6 +75,16 @@ const adminLinks = computed(() => {
                 },
                 text: t("AppDrawer.links.manageAnalytics"),
             },
+            {
+                icon: "cog-wheel",
+                route: {
+                    name: "adminOrganisationSettings",
+                    params: {
+                        organisationId: user.value.organisationId,
+                    },
+                },
+                text: t("AppDrawer.links.settings"),
+            },
         );
     }
     if (role === Role.PROPERTY_OWNER) {
