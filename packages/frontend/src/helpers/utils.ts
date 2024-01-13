@@ -12,3 +12,11 @@ export function isValidEuropeanPhoneNumber(number: unknown): boolean {
 
     return regex.test(numberString) && digitCount >= 6;
 }
+
+export function parseAspectRatio(aspectRatio: string): number {
+    const parts = aspectRatio.split(":");
+    if (parts.length === 2) {
+        return Number.parseFloat(parts[0]) / Number.parseFloat(parts[1]);
+    }
+    return Number.parseFloat(aspectRatio);
+}

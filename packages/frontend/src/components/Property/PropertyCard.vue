@@ -4,6 +4,7 @@ import { computed } from "vue";
 
 interface Props {
     property: PropertyDoc;
+    aspectRatio: number;
 }
 
 const props = defineProps<Props>();
@@ -33,7 +34,7 @@ const backgroundImageUrl = computed(() => {
                 },
             }"
         >
-            <q-responsive :ratio="1">
+            <q-responsive :ratio="props.aspectRatio">
                 <div class="PropertyCard__content column">
                     <q-space />
 

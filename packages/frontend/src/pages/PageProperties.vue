@@ -4,6 +4,7 @@ import { computed, onMounted, ref } from "vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import { useRouter } from "vue-router";
 import { usePropertiesStore } from "src/stores/properties-store";
+import { parseAspectRatio } from "src/helpers/utils";
 
 interface Props {
     organisationId: string;
@@ -15,10 +16,18 @@ const propertiesStore = usePropertiesStore();
 
 const pending = ref(false);
 
+const settings = computed(() => {
+    return propertiesStore.getOrganisationSettingsById(props.organisationId);
+});
+
 const properties = computed(() => {
     return propertiesStore.properties.filter((property) => {
         return property.organisationId === props.organisationId;
     });
+});
+
+const cardsAspectRatio = computed(() => {
+    return parseAspectRatio(settings.value.property.propertyCardAspectRatio);
 });
 
 onMounted(() => {
@@ -30,7 +39,11 @@ onMounted(() => {
 
 <template>
     <div class="PageHome">
-        <PropertyCardList v-if="properties.length > 0" :properties="properties" />
+        <PropertyCardList
+            v-if="properties.length > 0"
+            :properties="properties"
+            :aspect-ratio="cardsAspectRatio"
+        />
         <FTCenteredText v-if="properties.length === 0 && !pending">
             You have no properties created
         </FTCenteredText>
