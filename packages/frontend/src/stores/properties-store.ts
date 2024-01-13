@@ -65,6 +65,10 @@ export const usePropertiesStore = defineStore("properties", () => {
         return deepMerge(DEFAULT_ORGANISATION_SETTINGS, settings);
     }
 
+    function getPropertiesByOrganisationId(organisationId: string): PropertyDoc[] {
+        return properties.value.filter(({ organisationId: orgId }) => orgId === organisationId);
+    }
+
     async function initOrganisations(): Promise<void> {
         const organisationsData = await fetchOrganisationsForAdmin();
         setOrganisations(organisationsData);
@@ -143,6 +147,7 @@ export const usePropertiesStore = defineStore("properties", () => {
         properties,
         organisations,
         arePropertiesLoading,
+        getPropertiesByOrganisationId,
         getOrganisationSettingsById,
         initUserOrganisation,
         initNonAdminProperties,

@@ -16,14 +16,12 @@ const propertiesStore = usePropertiesStore();
 
 const pending = ref(false);
 
+const properties = computed(() =>
+    propertiesStore.getPropertiesByOrganisationId(props.organisationId),
+);
+
 const settings = computed(() => {
     return propertiesStore.getOrganisationSettingsById(props.organisationId);
-});
-
-const properties = computed(() => {
-    return propertiesStore.properties.filter((property) => {
-        return property.organisationId === props.organisationId;
-    });
 });
 
 const cardsAspectRatio = computed(() => {
