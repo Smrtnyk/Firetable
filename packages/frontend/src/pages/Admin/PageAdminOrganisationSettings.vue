@@ -48,6 +48,10 @@ const colorsSettings = [
         key: "reservationCancelledColor",
     },
 ];
+
+function reset(): void {
+    editableSettings.value = JSON.parse(JSON.stringify(settings.value));
+}
 </script>
 
 <template>
@@ -56,18 +60,26 @@ const colorsSettings = [
             <template #right>
                 <q-btn
                     rounded
-                    class="button-gradient"
+                    class="button-gradient q-mr-sm"
                     :disable="!hasSettingsChanged"
-                    :loading="false"
                     @click="saveSettings"
                 >
                     Save
                 </q-btn>
+                <q-btn
+                    rounded
+                    class="button-gradient"
+                    :disable="!hasSettingsChanged"
+                    @click="reset"
+                >
+                    Reset
+                </q-btn>
             </template>
         </FTTitle>
 
-        <q-card class="ft-card q-pa-md q-mb-md">
+        <q-card class="ft-card q-mb-md q-pt-none q-px-md q-pb-md">
             <FTCenteredText>Property</FTCenteredText>
+            <q-separator class="q-mb-md" />
 
             <SettingsSection title="Property card aspect ratio">
                 <q-select
@@ -79,11 +91,12 @@ const colorsSettings = [
             </SettingsSection>
         </q-card>
 
-        <q-card class="ft-card q-pa-md q-mb-md">
+        <q-card class="ft-card q-mb-md q-pt-none q-px-md q-pb-md">
             <FTCenteredText>Event</FTCenteredText>
+            <q-separator class="q-mb-md" />
 
             <div class="column q-col-gutter-md">
-                <SettingsSection title="Event start date">
+                <SettingsSection title="Default event start time">
                     <q-input
                         :model-value="editableSettings.event.eventStartTime24HFormat"
                         rounded
