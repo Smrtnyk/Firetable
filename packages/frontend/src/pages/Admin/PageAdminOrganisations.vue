@@ -26,41 +26,42 @@ const { organisations } = storeToRefs(usePropertiesStore());
 const propertiesStore = usePropertiesStore();
 
 function createLinks(organisationId: string): Link[] {
+    const params = { organisationId };
     return [
         {
             label: t("AppDrawer.links.manageEvents"),
             icon: "calendar",
-            route: { name: "adminEvents", params: { organisationId } },
+            route: { name: "adminEvents", params },
         },
         {
             label: t("AppDrawer.links.manageUsers"),
             icon: "users",
-            route: { name: "adminUsers", params: { organisationId } },
+            route: { name: "adminUsers", params },
         },
         {
             label: t("AppDrawer.links.manageGuests"),
             icon: "users",
-            route: { name: "adminGuests", params: { organisationId } },
+            route: { name: "adminGuests", params },
         },
         {
             label: t("AppDrawer.links.manageFloors"),
             icon: "arrow-expand",
-            route: { name: "adminFloors", params: { organisationId } },
+            route: { name: "adminFloors", params },
         },
         {
             label: t("AppDrawer.links.manageProperties"),
             icon: "home",
-            route: { name: "adminProperties", params: { organisationId } },
+            route: { name: "adminProperties", params },
         },
         {
             label: t("AppDrawer.links.settings"),
-            icon: "settings",
-            route: { name: "adminOrganisationSettings", params: { organisationId } },
+            icon: "cog-wheel",
+            route: { name: "adminOrganisationSettings", params },
         },
         {
             label: "Manage Analytics",
             icon: "line-chart",
-            route: { name: "adminAnalytics", params: { organisationId } },
+            route: { name: "adminAnalytics", params },
         },
     ];
 }
