@@ -15,8 +15,10 @@ To access the demo, use the following credentials:
   - Email: `manager@Demo.at`
   - Password: `Manager@Demo!234,.`
 
-**Firetable** is an event management system designed with a focus on flexibility and user-friendly interfaces.
-It is built as a mono-repo using [pnpm](https://pnpm.io/), with the following packages:
+**Firetable** is an event management system, built as a mono-repo using [pnpm](https://pnpm.io/), designed with a focus on flexibility and user-friendly interfaces.
+It functions as a Progressive Web App (PWA), providing a desktop-like experience when installed on your device.
+This approach ensures Firetable is not just a web application but also a robust tool that offers an app-like experience directly from your browser.
+For optimal use and to take full advantage of its features, including its full-screen functionality, we recommend installing Firetable on your desktop.
 
 - **frontend**: The main frontend application.
 - **backend**: The backend application, which is a [Firebase](https://firebase.google.com/) project.
