@@ -4,6 +4,7 @@ import type { MockInstance } from "vitest";
 import { useReservations } from "./useReservations";
 import * as uiHelpers from "../helpers/ui-helpers";
 import * as authStore from "../stores/auth-store";
+import * as propertiesStore from "../stores/properties-store";
 import * as backend from "@firetable/backend";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ReservationStatus, ReservationType } from "@firetable/types";
@@ -34,7 +35,6 @@ function createFloor(floorName: string): FloorViewer {
                     createReservedTable("reserved1").toObject(),
                 ],
             },
-            propertyId: "",
         },
         containerWidth: 1000,
     });
@@ -114,6 +114,7 @@ describe("useReservations", () => {
             };
         });
         vi.spyOn(authStore, "useAuthStore").mockReturnValue({} as any);
+        vi.spyOn(propertiesStore, "usePropertiesStore").mockReturnValue({} as any);
         users = ref([]);
         floor1 = createFloor("test-1");
         const floor2 = createFloor("test-2");
