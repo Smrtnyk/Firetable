@@ -91,9 +91,6 @@ importers:
         specifier: 5.0.6
         version: 5.0.6
     devDependencies:
-      '@firetable/types':
-        specifier: workspace:*
-        version: link:../types
       '@firetable/utils':
         specifier: workspace:*
         version: link:../utils

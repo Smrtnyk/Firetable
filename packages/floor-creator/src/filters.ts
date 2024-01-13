@@ -1,6 +1,5 @@
 import type { Floor } from "./Floor.js";
-import type { BaseTable } from "./types.js";
-import type { FloorDoc } from "@firetable/types";
+import type { BaseTable, FloorData } from "./types.js";
 import { FloorElementTypes } from "./types.js";
 import { isTable } from "./type-guards";
 import { isString, takeProp } from "@firetable/utils";
@@ -17,7 +16,7 @@ function isSerializedTable(element: Record<PropertyKey, unknown>): boolean {
     );
 }
 
-export function getTablesFromFloorDoc(floor: FloorDoc): BaseTable[] {
+export function getTablesFromFloorDoc(floor: FloorData): BaseTable[] {
     if (isString(floor.json)) {
         return JSON.parse(floor.json).objects.filter(isSerializedTable);
     }

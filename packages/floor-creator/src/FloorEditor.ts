@@ -1,9 +1,9 @@
 import type { FabricObject } from "fabric";
 import type { EventManager } from "./event-manager/EventManager";
-import type { FloorDoc } from "@firetable/types";
 import type {
     CreateElementOptions,
     FloorCreationOptions,
+    FloorData,
     FloorDropEvent,
     FloorEditorElement,
     NumberTuple,
@@ -87,7 +87,7 @@ export class FloorEditor extends Floor {
         this.gridDrawer.drawGrid(this.width, this.height);
     }
 
-    override renderData(jsonData?: FloorDoc["json"]): void {
+    override renderData(jsonData?: FloorData["json"]): void {
         super.renderData(jsonData);
     }
 

@@ -59,14 +59,20 @@ function showAddNewFloorForm(propertyData: PropertyFloors, floorDocs: FloorDoc[]
             listeners: {
                 create: function onFloorCreate(name: string) {
                     tryCatchLoadingWrapper({
-                        hook: () =>
-                            addFloor(
+                        hook() {
+                            const rawFloor = {
+                                ...makeRawFloor(name),
+                                propertyId: propertyData.propertyId,
+                            };
+
+                            return addFloor(
                                 {
                                     organisationId: propertyData.organisationId,
                                     id: propertyData.propertyId,
                                 },
-                                makeRawFloor(name, propertyData.propertyId),
-                            ).then(dialog.hide),
+                                rawFloor,
+                            ).then(dialog.hide);
+                        },
                     });
                 },
             },

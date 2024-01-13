@@ -1,6 +1,5 @@
 import type { RectTable } from "./elements/RectTable.js";
 import type { RoundTable } from "./elements/RoundTable.js";
-import type { FloorDoc } from "@firetable/types";
 import type { Sofa } from "./elements/Sofa";
 import type { DJBooth } from "./elements/DJBooth";
 import type { Stage } from "./elements/Stage";
@@ -8,8 +7,16 @@ import type { SpiralStaircase } from "./elements/SpiralStaircase";
 
 export interface FloorCreationOptions {
     canvas: HTMLCanvasElement;
-    floorDoc: FloorDoc;
+    floorDoc: FloorData;
     containerWidth: number;
+}
+
+export interface FloorData {
+    id: string;
+    name: string;
+    width: number;
+    height: number;
+    json: string | Record<string, any>;
 }
 
 export type BaseTable = RectTable | RoundTable;

@@ -1,6 +1,5 @@
 import type { FabricObject } from "fabric";
-import type { BaseTable, FloorCreationOptions } from "./types.js";
-import type { FloorDoc } from "@firetable/types";
+import type { BaseTable, FloorCreationOptions, FloorData } from "./types.js";
 import type { EventManager } from "./event-manager/EventManager";
 import type { EventEmitterListener } from "./event-emitter/EventEmitter";
 import { CANVAS_BG_COLOR } from "./constants.js";
@@ -25,7 +24,7 @@ export abstract class Floor {
     name: string;
     scale: number;
     height: number;
-    readonly floorDoc: FloorDoc;
+    readonly floorDoc: FloorData;
     readonly canvas: Canvas;
     width: number;
     containerWidth: number;
@@ -92,7 +91,7 @@ export abstract class Floor {
         this.setObjectCoords();
     }
 
-    renderData(jsonData?: FloorDoc["json"]): void {
+    renderData(jsonData?: FloorData["json"]): void {
         if (!jsonData) {
             return;
         }

@@ -23,7 +23,6 @@
         "ts-pattern": "5.0.6"
     },
     "devDependencies": {
-        "@firetable/types": "workspace:*",
         "@firetable/utils": "workspace:*",
         "@types/hammerjs": "2.0.45",
         "@vitest/browser": "1.2.0",

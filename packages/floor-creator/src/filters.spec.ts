@@ -1,4 +1,4 @@
-import type { FloorDoc } from "@firetable/types";
+import type { FloorData } from "./types";
 import { FloorEditor } from "./FloorEditor";
 import {
     extractAllTablesLabels,
@@ -25,7 +25,6 @@ describe("Table Management Functions", () => {
                 width: 1000,
                 height: 1000,
                 json: {},
-                propertyId: "",
             },
             containerWidth: 1000,
         });
@@ -77,7 +76,7 @@ describe("Table Management Functions", () => {
 
         it("should return an array of labels of all tables on the floor", () => {
             const table1 = new RectTable({
-                rectOptions: {},
+                shapeOptions: {},
                 groupOptions: {
                     label: "1",
                 },
@@ -86,7 +85,7 @@ describe("Table Management Functions", () => {
                 },
             });
             const table2 = new RectTable({
-                rectOptions: {},
+                shapeOptions: {},
                 groupOptions: {
                     label: "2",
                 },
@@ -103,7 +102,7 @@ describe("Table Management Functions", () => {
     describe("getTablesFromFloorDoc function", () => {
         it("should return an array of BaseTable objects from a FloorDoc", () => {
             const table1 = new RectTable({
-                rectOptions: {},
+                shapeOptions: {},
                 groupOptions: {
                     label: "1",
                 },
@@ -116,7 +115,7 @@ describe("Table Management Functions", () => {
                     objects: [table1.toObject()],
                 },
             };
-            const tables = getTablesFromFloorDoc(floorDoc as unknown as FloorDoc);
+            const tables = getTablesFromFloorDoc(floorDoc as unknown as FloorData);
             expect(tables).toEqual(expect.any(Array));
             tables.forEach((table) => {
                 expect(table.type).toBe(FloorElementTypes.RECT_TABLE);

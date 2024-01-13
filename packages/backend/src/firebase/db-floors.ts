@@ -12,7 +12,7 @@ export function deleteFloor(
 
 export function addFloor(
     owner: Pick<PropertyDoc, "organisationId" | "id">,
-    floor: Partial<FloorDoc> & Pick<FloorDoc, "name">,
+    floor: Partial<FloorDoc> & Pick<FloorDoc, "name" | "propertyId">,
 ): Promise<DocumentReference> {
     return addDoc(floorsCollection(owner.organisationId, owner.id), floor);
 }
