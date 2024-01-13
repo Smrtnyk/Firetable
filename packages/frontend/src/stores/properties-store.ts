@@ -23,10 +23,10 @@ export const DEFAULT_ORGANISATION_SETTINGS: DeepRequired<OrganisationSettings> =
     event: {
         eventStartTime24HFormat: "22:00",
         eventDurationInHours: 10,
-        eventCardAspectRatio: 16 / 9,
+        eventCardAspectRatio: "1",
     },
     property: {
-        propertyCardAspectRatio: 1,
+        propertyCardAspectRatio: "1",
     },
 };
 

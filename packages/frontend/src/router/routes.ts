@@ -105,6 +105,15 @@ export const routes: RouteRecordRaw[] = [
                 component: () => import("src/pages/Admin/PageAdminOrganisations.vue"),
             },
             {
+                path: "/admin/organisations/:organisationId/settings",
+                name: "adminOrganisationSettings",
+                meta: {
+                    requiresAuth: true,
+                    allowedRoles: [ADMIN, Role.PROPERTY_OWNER, Role.MANAGER],
+                },
+                component: () => import("src/pages/Admin/PageAdminOrganisationSettings.vue"),
+            },
+            {
                 path: "/admin/:organisationId/guests",
                 name: "adminGuests",
                 meta: {
