@@ -39,6 +39,7 @@ import EventShowReservation from "src/components/Event/EventShowReservation.vue"
 import { determineTableColor } from "src/helpers/floor";
 import { isValidEuropeanPhoneNumber } from "src/helpers/utils";
 import { isEventInProgress } from "src/helpers/events-utils";
+import { usePropertiesStore } from "src/stores/properties-store";
 
 const HALF_HOUR = 30 * 60 * 1000; // 30 minutes in milliseconds
 
@@ -57,6 +58,11 @@ export function useReservations(
     const authStore = useAuthStore();
     const q = useQuasar();
     const { t } = useI18n();
+    const propertiesStore = usePropertiesStore();
+
+    const settings = computed(() => {
+        return propertiesStore.getOrganisationSettingsById(eventOwner.organisationId);
+    });
 
     // check every 1 minute
     const intervalID = setInterval(checkReservationsForTimeAndMarkTableIfNeeded, 60 * 1000);
@@ -252,6 +258,7 @@ export function useReservations(
                         eventStartTimestamp,
                         floor: floor,
                         table: element,
+                        eventDurationInHours: settings.value.event.eventDurationInHours,
                     },
                     listeners: {
                         create: (reservationData: Reservation) => {

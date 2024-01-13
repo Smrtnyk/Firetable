@@ -16,6 +16,7 @@ export default {
             manageOrganisations: "Manage Organisations",
             manageAnalytics: "Manage Analytics",
             manageGuests: "Manage Guests",
+            settings: "Settings",
         },
         toggles: {
             darkMode: "Toggle dark mode",

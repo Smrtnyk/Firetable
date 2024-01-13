@@ -10,7 +10,6 @@ import { useAuthStore } from "src/stores/auth-store";
 import { getFirestoreTimestamp } from "@firetable/backend";
 import { hourFromTimestamp } from "src/helpers/date-utils";
 import { getReservationTimeOptions } from "src/components/Event/reservation/reservation-form-utils";
-import { config } from "src/config";
 
 const props = defineProps<{
     mode: "create" | "update";
@@ -21,6 +20,7 @@ const props = defineProps<{
      *  Optional data for editing
      */
     reservationData: WalkInReservation | undefined;
+    eventDurationInHours: number;
 }>();
 
 const { t } = useI18n();
@@ -97,7 +97,7 @@ defineExpose({
                             getReservationTimeOptions.bind(
                                 null,
                                 props.eventStartTimestamp,
-                                config.eventDuration,
+                                props.eventDurationInHours,
                             )
                         "
                         v-model="state.time"

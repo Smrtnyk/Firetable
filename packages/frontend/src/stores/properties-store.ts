@@ -1,4 +1,10 @@
-import type { OrganisationDoc, PropertyDoc, User } from "@firetable/types";
+import type {
+    OrganisationDoc,
+    OrganisationSettings,
+    PropertyDoc,
+    User,
+    DeepRequired,
+} from "@firetable/types";
 import type { NOOP } from "@firetable/utils";
 import { Role } from "@firetable/types";
 import { defineStore } from "pinia";
@@ -11,6 +17,18 @@ import {
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
 import { query, where } from "firebase/firestore";
 import { nextTick, ref, watch } from "vue";
+import { deepMerge } from "@firetable/utils";
+
+export const DEFAULT_ORGANISATION_SETTINGS: DeepRequired<OrganisationSettings> = {
+    event: {
+        eventStartTime24HFormat: "22:00",
+        eventDurationInHours: 10,
+        eventCardAspectRatio: 16 / 9,
+    },
+    property: {
+        propertyCardAspectRatio: 1,
+    },
+};
 
 export const usePropertiesStore = defineStore("properties", () => {
     const properties = ref<PropertyDoc[]>([]);
@@ -37,6 +55,14 @@ export const usePropertiesStore = defineStore("properties", () => {
 
     function getPropertyNameById(propertyId: string): string {
         return properties.value.find(({ id }) => id === propertyId)?.name ?? "";
+    }
+
+    function getOrganisationSettingsById(organisationId: string): OrganisationSettings {
+        const settings =
+            organisations.value.find((organisation) => {
+                return organisation.id === organisationId;
+            })?.settings ?? {};
+        return deepMerge(DEFAULT_ORGANISATION_SETTINGS, settings);
     }
 
     async function initOrganisations(): Promise<void> {
@@ -117,6 +143,7 @@ export const usePropertiesStore = defineStore("properties", () => {
         properties,
         organisations,
         arePropertiesLoading,
+        getOrganisationSettingsById,
         initUserOrganisation,
         initNonAdminProperties,
         getOrganisationNameById,

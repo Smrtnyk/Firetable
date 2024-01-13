@@ -16,6 +16,7 @@ export default {
             manageOrganisations: "Organisationen verwalten",
             manageAnalytics: "Analytics verwalten",
             manageGuests: "Gäste verwalten",
+            settings: "Einstellungen",
         },
         toggles: {
             darkMode: "Dunkelmodus umschalten",

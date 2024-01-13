@@ -5,13 +5,13 @@ import EventCardList from "src/components/Event/EventCardList.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 
 import { where, orderBy, limit } from "firebase/firestore";
-import { config } from "src/config";
 import { ONE_HOUR } from "src/constants";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
 import { useRouter } from "vue-router";
 import { eventsCollection } from "@firetable/backend";
-import { watch, onMounted } from "vue";
+import { watch, onMounted, computed } from "vue";
 import { Loading } from "quasar";
+import { usePropertiesStore } from "src/stores/properties-store";
 
 interface Props {
     organisationId: string;
@@ -20,6 +20,7 @@ interface Props {
 
 const router = useRouter();
 const props = defineProps<Props>();
+const propertiesStore = usePropertiesStore();
 
 const eventOwner: EventOwner = {
     propertyId: props.propertyId,
@@ -27,10 +28,14 @@ const eventOwner: EventOwner = {
     id: "",
 };
 
+const settings = computed(() => {
+    return propertiesStore.getOrganisationSettingsById(props.organisationId);
+});
+
 const { data: events, pending: isLoading } = useFirestoreCollection<EventDoc>(
     createQuery<EventDoc>(
         eventsCollection(eventOwner),
-        where("date", ">=", Date.now() - ONE_HOUR * config.eventDuration),
+        where("date", ">=", Date.now() - ONE_HOUR * settings.value.event.eventDurationInHours),
         where("propertyId", "==", props.propertyId),
         orderBy("date"),
         limit(10),

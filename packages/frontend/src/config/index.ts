@@ -1,13 +1,5 @@
 import { LocalStorage } from "quasar";
 
-interface Config {
-    eventDuration: number;
-}
-
-export const config: Config = {
-    eventDuration: 10,
-};
-
 export const myIcons: Record<string, string> = {
     chevron_left: "svguse:/svg-icons/ft-icons.svg#chevron-left",
     chevron_right: "svguse:/svg-icons/ft-icons.svg#chevron-right",

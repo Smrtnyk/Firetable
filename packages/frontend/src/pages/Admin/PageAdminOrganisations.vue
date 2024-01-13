@@ -53,6 +53,11 @@ function createLinks(organisationId: string): Link[] {
             route: { name: "adminProperties", params: { organisationId } },
         },
         {
+            label: t("AppDrawer.links.settings"),
+            icon: "settings",
+            route: { name: "adminOrganisationSettings", params: { organisationId } },
+        },
+        {
             label: "Manage Analytics",
             icon: "line-chart",
             route: { name: "adminAnalytics", params: { organisationId } },

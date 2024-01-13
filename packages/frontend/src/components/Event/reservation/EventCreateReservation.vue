@@ -19,6 +19,7 @@ const props = defineProps<{
      *  Optional data for editing
      */
     reservationData?: Reservation;
+    eventDurationInHours: number;
 }>();
 
 const emit = defineEmits<{
@@ -111,6 +112,7 @@ async function onOKClick(): Promise<void> {
             :users="props.users"
             :table="props.table"
             :reservation-data="typedReservationDataForPlanned"
+            :event-duration-in-hours="props.eventDurationInHours"
         />
 
         <WalkInReservationForm
@@ -121,6 +123,7 @@ async function onOKClick(): Promise<void> {
             :event-start-timestamp="props.eventStartTimestamp"
             :floor="props.floor"
             :table="props.table"
+            :event-duration-in-hours="props.eventDurationInHours"
         />
 
         <q-btn

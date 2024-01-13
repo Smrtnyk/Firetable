@@ -9,7 +9,6 @@ import { greaterThanZero, minLength, noEmptyString, requireNumber } from "src/he
 import { useAuthStore } from "src/stores/auth-store";
 import { getFirestoreTimestamp } from "@firetable/backend";
 import { getReservationTimeOptions } from "src/components/Event/reservation/reservation-form-utils";
-import { config } from "src/config";
 
 const socials = ["Whatsapp", "SMS", "Instagram", "Facebook", "Phone"].map((social, index) => {
     return {
@@ -29,6 +28,7 @@ const props = defineProps<{
      *  Optional data for editing
      */
     reservationData: PlannedReservation | undefined;
+    eventDurationInHours: number;
 }>();
 
 const { t } = useI18n();
@@ -126,7 +126,7 @@ defineExpose({
                             getReservationTimeOptions.bind(
                                 null,
                                 props.eventStartTimestamp,
-                                config.eventDuration,
+                                props.eventDurationInHours,
                             )
                         "
                         v-model="state.time"

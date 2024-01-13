@@ -20,7 +20,6 @@ import AdminEventLogs from "src/components/admin/event/AdminEventLogs.vue";
 import AdminEventReservationsList from "src/components/admin/event/AdminEventReservationsList.vue";
 
 import { Loading, useQuasar } from "quasar";
-import { config } from "src/config";
 import { showConfirm, tryCatchLoadingWrapper, withLoading } from "src/helpers/ui-helpers";
 import useAdminEvent from "src/composables/useAdminEvent";
 import { buttonSize, isMobile } from "src/global-reactives/screen-detection";
@@ -29,6 +28,7 @@ import { compressFloorDoc } from "src/helpers/compress-floor-doc";
 import FTTabs from "src/components/FTTabs.vue";
 import { useGuestsForEvent } from "src/composables/useGuestsForEvent";
 import { propIsTruthy } from "@firetable/utils";
+import { usePropertiesStore } from "src/stores/properties-store";
 
 interface Props {
     organisationId: string;
@@ -43,8 +43,13 @@ const PERMANENTLY_DELETE_RES_MESSAGE =
 const props = defineProps<Props>();
 const router = useRouter();
 const quasar = useQuasar();
+const propertiesStore = usePropertiesStore();
+
 const tab = ref("info");
 const reservationsTab = ref("arrivedReservations");
+const settings = computed(() => {
+    return propertiesStore.getOrganisationSettingsById(props.organisationId);
+});
 
 const eventOwner: EventOwner = {
     propertyId: props.propertyId,
@@ -114,7 +119,9 @@ const onFloorUpdate = withLoading(async function (floor: FloorEditor) {
 
 function isEventFinished(eventTime: number): boolean {
     const eventFinishedLimit = new Date(eventTime);
-    eventFinishedLimit.setHours(eventFinishedLimit.getHours() + config.eventDuration);
+    eventFinishedLimit.setHours(
+        eventFinishedLimit.getHours() + settings.value.event.eventDurationInHours,
+    );
     const currentTime = new Date().getTime();
     return currentTime > eventFinishedLimit.getTime();
 }

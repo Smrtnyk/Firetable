@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import type { NumberTuple } from "src/types/generic";
 import type { Floor, FloorEditorElement, FloorElementTypes } from "@firetable/floor-creator";
-import type { FloorDoc } from "@firetable/types";
+import type { FloorDoc, NumberTuple } from "@firetable/types";
 import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
 
 import { nextTick, onBeforeUnmount, onMounted, ref, shallowRef } from "vue";
