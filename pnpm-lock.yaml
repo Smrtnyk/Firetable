@@ -221,6 +221,9 @@ importers:
 
   packages/utils:
     devDependencies:
+      '@firetable/types':
+        specifier: workspace:*
+        version: link:../types
       '@jest/globals':
         specifier: 30.0.0-alpha.2
         version: 30.0.0-alpha.2

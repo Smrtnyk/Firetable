@@ -4,6 +4,7 @@ export * from "./prop-is-truthy";
 export * from "./take-last";
 export * from "./take-prop";
 export * from "./throttle";
+export * from "./deep-merge";
 export * from "./type-guards";
 
 export function NOOP(): void {
