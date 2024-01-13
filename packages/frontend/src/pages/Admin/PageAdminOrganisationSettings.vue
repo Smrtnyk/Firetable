@@ -4,6 +4,8 @@ import { computed, ref } from "vue";
 
 import FTTitle from "src/components/FTTitle.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
+import { withLoading } from "src/helpers/ui-helpers";
+import { updateOrganisationSettings } from "@firetable/backend";
 
 interface Props {
     organisationId: string;
@@ -23,13 +25,9 @@ const hasSettingsChanged = computed(() => {
     return JSON.stringify(editableSettings.value) !== JSON.stringify(settings.value);
 });
 
-function saveSettings(): void {
-    try {
-        console.log(hasSettingsChanged.value);
-    } catch (error) {
-        // Handle error
-    }
-}
+const saveSettings = withLoading(() => {
+    return updateOrganisationSettings(props.organisationId, editableSettings.value);
+});
 </script>
 
 <template>
