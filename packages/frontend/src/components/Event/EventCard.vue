@@ -7,6 +7,7 @@ import { computed } from "vue";
 interface Props {
     event: EventDoc;
     index: number;
+    aspectRatio: number;
 }
 
 const props = defineProps<Props>();
@@ -38,7 +39,7 @@ const backgroundImageUrl = computed(() => {
                 },
             }"
         >
-            <q-responsive :ratio="16 / 9">
+            <q-responsive :ratio="props.aspectRatio">
                 <div class="EventCard__content column">
                     <div class="row items-center">
                         <q-icon name="calendar" color="white" class="q-mr-xs" size="xs" />

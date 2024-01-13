@@ -12,6 +12,7 @@ import { eventsCollection } from "@firetable/backend";
 import { watch, onMounted, computed } from "vue";
 import { Loading } from "quasar";
 import { usePropertiesStore } from "src/stores/properties-store";
+import { parseAspectRatio } from "src/helpers/utils";
 
 interface Props {
     organisationId: string;
@@ -30,6 +31,10 @@ const eventOwner: EventOwner = {
 
 const settings = computed(() => {
     return propertiesStore.getOrganisationSettingsById(props.organisationId);
+});
+
+const cardsAspectRatio = computed(() => {
+    return parseAspectRatio(settings.value.event.eventCardAspectRatio);
 });
 
 const { data: events, pending: isLoading } = useFirestoreCollection<EventDoc>(
@@ -63,7 +68,11 @@ onMounted(async () => {
 
 <template>
     <div class="PageHome">
-        <EventCardList v-if="events.length > 0 && !isLoading" :events="events" />
+        <EventCardList
+            v-if="events.length > 0 && !isLoading"
+            :events="events"
+            :aspect-ratio="cardsAspectRatio"
+        />
         <FTCenteredText v-if="!isLoading && events.length === 0">
             There are no upcoming events
         </FTCenteredText>
