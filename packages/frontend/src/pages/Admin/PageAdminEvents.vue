@@ -56,6 +56,10 @@ const isAnyLoading = computed(() => {
     return isFloorsLoading.value || isLoadingEvents.value;
 });
 
+const settings = computed(() => {
+    return propertiesStore.getOrganisationSettingsById(props.organisationId);
+});
+
 onBeforeMount(() => {
     if (!props.organisationId) {
         router.replace("/");
@@ -198,6 +202,7 @@ function showCreateEventForm(property: PropertyDoc, event?: EventDoc): void {
             componentPropsObject: {
                 property: floors.value[property.id],
                 event,
+                eventStartHours: settings.value.event.eventStartTime24HFormat,
             },
             listeners: {
                 create: (eventData: CreateEventPayload) => {

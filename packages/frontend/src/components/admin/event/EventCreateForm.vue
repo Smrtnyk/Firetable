@@ -33,13 +33,13 @@ interface State {
 interface Props {
     property: PropertyFloors;
     event?: EventDoc;
+    eventStartHours: string;
 }
 
 const now = new Date();
 const newDate = new Date(
     Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 22, 0),
 );
-const [year, month, day] = newDate.toISOString().split("T")[0].split("-");
 
 const eventObj: CreateEventForm = {
     name: "",
@@ -63,8 +63,8 @@ const state = ref<State>({
     chosenFloors: [],
     showDateModal: false,
     showTimeModal: false,
-    selectedDate: `${day}-${month}-${year}`,
-    selectedTime: hourFromTimestamp(newDate.getTime()),
+    selectedDate: dateFromTimestamp(Date.now()),
+    selectedTime: props.eventStartHours,
 });
 
 function validDates(calendarDate: string): boolean {
@@ -91,8 +91,8 @@ watchEffect(() => {
         state.value.selectedTime = hourFromTimestamp(editDate.getTime());
     } else {
         state.value.form = { ...eventObj };
-        state.value.selectedDate = `${day}-${month}-${year}`;
-        state.value.selectedTime = hourFromTimestamp(newDate.getTime());
+        state.value.selectedDate = dateFromTimestamp(Date.now());
+        state.value.selectedTime = props.eventStartHours;
     }
 });
 
@@ -100,7 +100,7 @@ watch([() => state.value.selectedDate, () => state.value.selectedTime], () => {
     if (!state.value.selectedDate) {
         return;
     }
-    const [dayVal, monthVal, yearVal] = state.value.selectedDate.split("-");
+    const [dayVal, monthVal, yearVal] = state.value.selectedDate.split(".");
     const combinedDateTime = `${yearVal}-${monthVal}-${dayVal}T${state.value.selectedTime}:00Z`;
     state.value.form.date = new Date(combinedDateTime).getTime();
 });
@@ -233,7 +233,7 @@ function onReset(): void {
                         <q-date
                             :no-unset="true"
                             v-model="state.selectedDate"
-                            mask="DD-MM-YYYY"
+                            mask="DD.MM.YYYY"
                             today-btn
                             @update:model-value="updateDate"
                             :options="validDates"
