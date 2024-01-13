@@ -1,6 +1,6 @@
-import type { OrganisationDoc } from "@firetable/types";
+import type { OrganisationDoc, OrganisationSettings } from "@firetable/types";
 import { organisationDoc, organisationsCollection } from "./db.js";
-import { deleteDoc, getDocs, getDoc, addDoc } from "firebase/firestore";
+import { deleteDoc, getDocs, getDoc, addDoc, updateDoc } from "firebase/firestore";
 
 export interface CreateOrganisationPayload {
     name: string;
@@ -42,4 +42,12 @@ export async function fetchOrganisationById(
         id: organisationDocSnapshot.id,
         ...organisationDocSnapshot.data(),
     } as OrganisationDoc;
+}
+
+export function updateOrganisationSettings(
+    organisationId: string,
+    newSettings: OrganisationSettings,
+): Promise<void> {
+    const updatePayload: Partial<OrganisationDoc> = { settings: newSettings };
+    return updateDoc(organisationDoc(organisationId), updatePayload);
 }
