@@ -6,7 +6,7 @@ import { updateOrganisationSettings } from "@firetable/backend";
 
 import SettingsSection from "src/components/admin/organisation-settings/SettingsSection.vue";
 import FTTitle from "src/components/FTTitle.vue";
-import FTCenteredText from "src/components/FTCenteredText.vue";
+import SettingsCard from "src/components/admin/organisation-settings/SettingsCard.vue";
 
 interface Props {
     organisationId: string;
@@ -77,10 +77,7 @@ function reset(): void {
             </template>
         </FTTitle>
 
-        <q-card class="ft-card q-mb-md q-pt-none q-px-md q-pb-md">
-            <FTCenteredText>Property</FTCenteredText>
-            <q-separator class="q-mb-md" />
-
+        <SettingsCard title="Property">
             <SettingsSection title="Property card aspect ratio">
                 <q-select
                     rounded
@@ -89,70 +86,65 @@ function reset(): void {
                     :options="aspectRatioOptions"
                 />
             </SettingsSection>
-        </q-card>
+        </SettingsCard>
 
-        <q-card class="ft-card q-mb-md q-pt-none q-px-md q-pb-md">
-            <FTCenteredText>Event</FTCenteredText>
-            <q-separator class="q-mb-md" />
-
-            <div class="column q-col-gutter-md">
-                <SettingsSection title="Default event start time">
-                    <q-input
-                        :model-value="editableSettings.event.eventStartTime24HFormat"
-                        rounded
-                        standout
-                        readonly
-                    >
-                        <template #append>
-                            <q-icon name="clock" class="cursor-pointer" />
-                            <q-popup-proxy transition-show="scale" transition-hide="scale">
-                                <q-time
-                                    v-model="editableSettings.event.eventStartTime24HFormat"
-                                    format="24h"
-                                />
-                            </q-popup-proxy>
-                        </template>
-                    </q-input>
-                </SettingsSection>
-
-                <SettingsSection title="Event duration in hours">
-                    <q-input
-                        rounded
-                        standout
-                        v-model.number="editableSettings.event.eventDurationInHours"
-                    />
-                </SettingsSection>
-
-                <SettingsSection title="Event card aspect ratio">
-                    <q-select
-                        rounded
-                        standout
-                        v-model="editableSettings.event.eventCardAspectRatio"
-                        :options="aspectRatioOptions"
-                    />
-                </SettingsSection>
-
-                <SettingsSection
-                    v-for="colorSetting in colorsSettings"
-                    :key="colorSetting.key"
-                    :title="colorSetting.title"
+        <SettingsCard title="Event">
+            <SettingsSection title="Default event start time">
+                <q-input
+                    :model-value="editableSettings.event.eventStartTime24HFormat"
+                    rounded
+                    standout
+                    readonly
                 >
-                    <q-btn
-                        stretch
-                        :title="colorSetting.title"
-                        :style="{
-                            'background-color': editableSettings.event[colorSetting.key],
-                        }"
-                        icon="color-picker"
-                        push
-                        :label="editableSettings.event[colorSetting.key]"
-                    >
-                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                            <q-color v-model="editableSettings.event[colorSetting.key]" />
+                    <template #append>
+                        <q-icon name="clock" class="cursor-pointer" />
+                        <q-popup-proxy transition-show="scale" transition-hide="scale">
+                            <q-time
+                                v-model="editableSettings.event.eventStartTime24HFormat"
+                                format="24h"
+                            />
                         </q-popup-proxy>
-                    </q-btn>
-                </SettingsSection>
-            </div>
-        </q-card>
+                    </template>
+                </q-input>
+            </SettingsSection>
+
+            <SettingsSection title="Event duration in hours">
+                <q-input
+                    rounded
+                    standout
+                    v-model.number="editableSettings.event.eventDurationInHours"
+                />
+            </SettingsSection>
+
+            <SettingsSection title="Event card aspect ratio">
+                <q-select
+                    rounded
+                    standout
+                    v-model="editableSettings.event.eventCardAspectRatio"
+                    :options="aspectRatioOptions"
+                />
+            </SettingsSection>
+
+            <SettingsSection
+                v-for="colorSetting in colorsSettings"
+                :key="colorSetting.key"
+                :title="colorSetting.title"
+            >
+                <q-btn
+                    stretch
+                    :title="colorSetting.title"
+                    :style="{
+                        'background-color': editableSettings.event[colorSetting.key],
+                    }"
+                    icon="color-picker"
+                    push
+                    :label="editableSettings.event[colorSetting.key]"
+                >
+                    <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                        <q-color v-model="editableSettings.event[colorSetting.key]" />
+                    </q-popup-proxy>
+                </q-btn>
+            </SettingsSection>
+        </SettingsCard>
     </div>
 </template>
