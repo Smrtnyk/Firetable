@@ -138,13 +138,15 @@ function reset(): void {
                     :title="colorSetting.title"
                 >
                     <q-btn
-                        class="full-width"
+                        stretch
                         :title="colorSetting.title"
                         :style="{
                             'background-color': editableSettings.event[colorSetting.key],
                         }"
+                        icon="color-picker"
+                        push
+                        :label="editableSettings.event[colorSetting.key]"
                     >
-                        <q-icon name="color-picker" class="cursor-pointer q-ma-none" />
                         <q-popup-proxy cover transition-show="scale" transition-hide="scale">
                             <q-color v-model="editableSettings.event[colorSetting.key]" />
                         </q-popup-proxy>
