@@ -32,6 +32,9 @@ export const DEFAULT_ORGANISATION_SETTINGS: DeepRequired<OrganisationSettings> =
     property: {
         propertyCardAspectRatio: "1",
     },
+    guest: {
+        collectGuestData: false,
+    },
 };
 
 export const usePropertiesStore = defineStore("properties", () => {

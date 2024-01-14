@@ -97,6 +97,10 @@ export function useReservations(
             return;
         }
 
+        if (!settings.value.guest.collectGuestData) {
+            return;
+        }
+
         if (!isValidEuropeanPhoneNumber(reservationData.guestContact)) {
             return;
         }
