@@ -10,25 +10,24 @@ function isObject(value: unknown): value is Record<string, unknown> {
     );
 }
 
-export function deepMerge<T>(defaultObject: T, partialObject: DeepPartial<T>): T {
+export function deepMerge<T extends Record<string, unknown>>(
+    defaultObject: T,
+    partialObject: DeepPartial<T>,
+): T {
     const result: any = {};
 
     // Merge properties from the default object
-    for (const key in defaultObject) {
-        if (!Object.prototype.hasOwnProperty.call(defaultObject, key)) {
-            continue;
-        }
-
+    for (const key of Object.keys(defaultObject)) {
+        const value = defaultObject[key];
+        const partialValue = partialObject[key];
         result[key] =
-            isObject(defaultObject[key]) &&
-            partialObject[key] !== undefined &&
-            isObject(partialObject[key])
-                ? deepMerge(defaultObject[key], partialObject[key] ?? {})
-                : partialObject[key] ?? defaultObject[key];
+            isObject(value) && isObject(partialValue)
+                ? deepMerge(value, partialValue)
+                : partialValue ?? value;
     }
 
     // Add new properties from the partial object that are not in the default object
-    for (const key in partialObject) {
+    for (const key of Object.keys(partialObject)) {
         if (!isDefined(defaultObject[key])) {
             result[key] = partialObject[key];
         }
