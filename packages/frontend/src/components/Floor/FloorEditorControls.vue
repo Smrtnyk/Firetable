@@ -276,9 +276,9 @@ function onFloorSave(): void {
                         <div
                             draggable="true"
                             v-for="element in ELEMENTS_TO_ADD_COLLECTION"
-                            :key="element.elementDescriptor.tag"
+                            :key="element.tag"
                             class="col-6 justify-center text-center q-my-md"
-                            @dragstart="onDragStart($event, element.elementDescriptor.tag)"
+                            @dragstart="onDragStart($event, element.tag)"
                         >
                             <p>{{ element.label }}</p>
 

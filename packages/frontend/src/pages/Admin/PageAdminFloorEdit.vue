@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Floor, FloorEditorElement, FloorElementTypes } from "@firetable/floor-creator";
+import type { Floor, FloorEditorElement } from "@firetable/floor-creator";
 import type { FloorDoc, NumberTuple } from "@firetable/types";
 import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
 
@@ -26,14 +26,6 @@ import { getFloorPath } from "@firetable/backend";
 import { compressFloorDoc, decompressFloorDoc } from "src/helpers/compress-floor-doc";
 import { useFloorEditor, TABLE_EL_TO_ADD } from "src/composables/useFloorEditor";
 import { isTouchDevice } from "src/helpers/is-touch-device";
-
-type ElementDescriptor = {
-    tag: FloorElementTypes;
-};
-
-interface BottomSheetTableClickResult {
-    elementDescriptor: ElementDescriptor;
-}
 
 interface Props {
     floorId: string;
@@ -147,8 +139,7 @@ function onFloorChange({
 }
 
 function handleAddNewElement(floorVal: FloorEditor, [x, y]: NumberTuple) {
-    return function ({ elementDescriptor }: BottomSheetTableClickResult) {
-        const { tag } = elementDescriptor;
+    return function ({ tag }: (typeof ELEMENTS_TO_ADD_COLLECTION)[0]) {
         if (TABLE_EL_TO_ADD.includes(tag)) {
             floorVal.addElement({ x, y, tag, label: getNextTableLabel() });
             return;
