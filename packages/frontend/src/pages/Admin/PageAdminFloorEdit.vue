@@ -25,6 +25,7 @@ import { isMobile, buttonSize, isTablet } from "src/global-reactives/screen-dete
 import { getFloorPath } from "@firetable/backend";
 import { compressFloorDoc, decompressFloorDoc } from "src/helpers/compress-floor-doc";
 import { useFloorEditor, TABLE_EL_TO_ADD } from "src/composables/useFloorEditor";
+import { isTouchDevice } from "src/helpers/is-touch-device";
 
 type ElementDescriptor = {
     tag: FloorElementTypes;
@@ -157,6 +158,9 @@ function handleAddNewElement(floorVal: FloorEditor, [x, y]: NumberTuple) {
 }
 
 function dblClickHandler(floorVal: FloorEditor, coords: NumberTuple): void {
+    if (!isTouchDevice) {
+        return;
+    }
     q.bottomSheet(addNewElementsBottomSheetOptions).onOk(handleAddNewElement(floorVal, coords));
 }
 

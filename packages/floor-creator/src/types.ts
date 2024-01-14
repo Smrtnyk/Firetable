@@ -37,6 +37,8 @@ export enum FloorElementTypes {
     WALL = "Wall",
     SPIRAL_STAIRCASE = "SpiralStaircase",
     DOOR = "Door",
+    EDITABLE_RECT = "EditableRect",
+    EDITABLE_CIRCLE = "EditableCircle",
 }
 
 export type NumberTuple = [number, number];

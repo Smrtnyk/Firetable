@@ -2,6 +2,20 @@ import { FloorElementTypes } from "@firetable/floor-creator";
 
 export const ELEMENTS_TO_ADD_COLLECTION = [
     {
+        label: "Rectangle",
+        img: "/svg-images/rectangle.svg",
+        elementDescriptor: {
+            tag: FloorElementTypes.EDITABLE_RECT,
+        },
+    },
+    {
+        label: "Circle",
+        img: "/svg-images/circle.svg",
+        elementDescriptor: {
+            tag: FloorElementTypes.EDITABLE_CIRCLE,
+        },
+    },
+    {
         label: "Square table",
         img: "/svg-images/square-table.svg",
         elementDescriptor: {

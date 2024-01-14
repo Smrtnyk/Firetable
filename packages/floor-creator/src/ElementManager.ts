@@ -1,10 +1,12 @@
 import type { CreateElementOptions } from "./types.js";
+import type { FabricObject } from "fabric";
+import { EditableShape } from "./elements/EditableShape.js";
 import { FloorElementTypes } from "./types.js";
 import { Wall } from "./elements/Wall.js";
 import { DJBooth } from "./elements/DJBooth.js";
 import { Sofa } from "./elements/Sofa.js";
 import { RoundTable } from "./elements/RoundTable.js";
-import { RESOLUTION, TABLE_HEIGHT, TABLE_WIDTH } from "./constants.js";
+import { ELEMENT_DEFAULT_FILL_COLOR, RESOLUTION, TABLE_HEIGHT, TABLE_WIDTH } from "./constants.js";
 import { RectTable } from "./elements/RectTable.js";
 import { Stage } from "./elements/Stage.js";
 import { SpiralStaircase } from "./elements/SpiralStaircase.js";
@@ -12,9 +14,7 @@ import { Door } from "./elements/Door.js";
 import { match } from "ts-pattern";
 
 export class ElementManager {
-    addElement(
-        options: CreateElementOptions,
-    ): RectTable | RoundTable | Wall | Sofa | DJBooth | SpiralStaircase | Door {
+    addElement(options: CreateElementOptions): FabricObject {
         return match(options.tag)
             .with(FloorElementTypes.RECT_TABLE, () => this.addRectTableElement(options))
             .with(FloorElementTypes.ROUND_TABLE, () => this.addRoundTableElement(options))
@@ -24,7 +24,42 @@ export class ElementManager {
             .with(FloorElementTypes.STAGE, () => this.addStageElement(options))
             .with(FloorElementTypes.SPIRAL_STAIRCASE, () => this.addSpiralStaircaseElement(options))
             .with(FloorElementTypes.DOOR, () => this.addDoor(options))
+            .with(FloorElementTypes.EDITABLE_RECT, () => this.addEditableRect(options))
+            .with(FloorElementTypes.EDITABLE_CIRCLE, () => this.addEditableCircle(options))
             .exhaustive();
+    }
+
+    private addEditableCircle({ x, y }: CreateElementOptions): EditableShape {
+        return EditableShape.create({
+            shape: "circle",
+            shapeOptions: {
+                radius: 50,
+                stroke: "black",
+                strokeWidth: 1,
+                strokeUniform: true,
+                fill: ELEMENT_DEFAULT_FILL_COLOR,
+                top: y,
+                left: x,
+            },
+            text: "Editable Text",
+        });
+    }
+
+    private addEditableRect({ x, y }: CreateElementOptions): EditableShape {
+        return EditableShape.create({
+            shape: "rect",
+            shapeOptions: {
+                width: 100,
+                height: 100,
+                stroke: "black",
+                strokeWidth: 1,
+                strokeUniform: true,
+                fill: ELEMENT_DEFAULT_FILL_COLOR,
+                top: y,
+                left: x,
+            },
+            text: "Editable Text",
+        });
     }
 
     private addDoor({ x, y }: CreateElementOptions): Door {

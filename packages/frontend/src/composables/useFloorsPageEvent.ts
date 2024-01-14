@@ -17,8 +17,7 @@ import { useUsers } from "src/composables/useUsers";
 import { useReservations } from "src/composables/useReservations";
 import { debounce } from "quasar";
 import { decompressFloorDoc } from "src/helpers/compress-floor-doc";
-
-const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+import { isTouchDevice } from "src/helpers/is-touch-device";
 
 export function useFloorsPageEvent(
     eventFloors: Ref<FloorDoc[]>,
