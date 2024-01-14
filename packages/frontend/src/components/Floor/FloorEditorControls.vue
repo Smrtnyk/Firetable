@@ -205,7 +205,7 @@ function onFloorSave(): void {
 <template>
     <div v-if="!isTablet" class="ShowSelectedElement">
         <q-card
-            class="ShowSelectedElement__floating-controls row q-gutter-xs q-ma-xs q-pa-xs q-pt-md q-pb-md justify-around items-center"
+            class="ShowSelectedElement__floating-controls row q-gutter-xs q-ma-xs q-pa-xs q-pt-md q-pb-md justify-around items-center ft-card"
         >
             <q-btn
                 v-if="!isTablet"
