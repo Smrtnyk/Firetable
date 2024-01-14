@@ -41,7 +41,7 @@ export class ElementManager {
                 top: y,
                 left: x,
             },
-            text: "Editable Text",
+            text: "Editable on dbl click",
         });
     }
 
@@ -58,7 +58,7 @@ export class ElementManager {
                 top: y,
                 left: x,
             },
-            text: "Editable Text",
+            text: "Editable on dbl click",
         });
     }
 

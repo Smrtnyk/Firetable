@@ -1,6 +1,6 @@
 import type { CircleProps, FabricObject, GroupProps, RectProps } from "fabric";
 import { FONT_SIZE, TABLE_TEXT_FILL_COLOR } from "../constants.js";
-import { classRegistry, Group, FabricText, Rect, Circle } from "fabric";
+import { classRegistry, Group, Rect, Circle, IText } from "fabric";
 
 type Editable = "rect" | "circle";
 
@@ -11,7 +11,7 @@ interface EditableShapeOptions<S extends Editable> {
 }
 
 export class EditableShape extends Group {
-    private readonly textObj: FabricText;
+    private readonly textObj: IText;
     private readonly shape: FabricObject;
     label = "";
 
@@ -28,7 +28,7 @@ export class EditableShape extends Group {
                 throw new Error("Unsupported shape type");
         }
 
-        const textObj = new FabricText(options.text, {
+        const textObj = new IText(options.text, {
             originX: "center",
             originY: "center",
             fontSize: FONT_SIZE,
@@ -41,21 +41,17 @@ export class EditableShape extends Group {
         return new EditableShape([shape, textObj], {});
     }
 
-    constructor(objects: [FabricObject, FabricText], options?: Partial<GroupProps>) {
-        super(objects, options);
+    constructor(objects: [FabricObject, IText], options?: Partial<GroupProps>) {
+        super(objects, {
+            ...options,
+            interactive: true,
+            subTargetCheck: true,
+        });
 
         this.textObj = objects[1];
         this.shape = objects[0];
+        this.shape.evented = false;
         this.label = this.textObj.get("text");
-    }
-
-    /**
-     * Updates the text of the shape.
-     * @param newText The new text to set.
-     */
-    setLabel(newText: string): void {
-        this.textObj.set("text", newText);
-        this.canvas?.requestRenderAll();
     }
 
     setBaseFill(val: string): void {

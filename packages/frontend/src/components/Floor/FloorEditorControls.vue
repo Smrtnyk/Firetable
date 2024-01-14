@@ -5,13 +5,7 @@ import type {
     FloorEditorElement,
     FloorElementTypes,
 } from "@firetable/floor-creator";
-import {
-    isLabelable,
-    MAX_FLOOR_HEIGHT,
-    MAX_FLOOR_WIDTH,
-    RESOLUTION,
-    isTable,
-} from "@firetable/floor-creator";
+import { MAX_FLOOR_HEIGHT, MAX_FLOOR_WIDTH, RESOLUTION, isTable } from "@firetable/floor-creator";
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed, onBeforeUnmount, onMounted, reactive, ref, toRefs, watch } from "vue";
 import { exportFile, QPopupProxy } from "quasar";
@@ -330,7 +324,7 @@ function onFloorSave(): void {
                     class="q-ma-xs"
                 />
                 <q-input
-                    v-if="isLabelable(selectedFloorElement)"
+                    v-if="isTable(selectedFloorElement)"
                     class="q-ma-xs"
                     :debounce="500"
                     :model-value="selectedFloorElement.label"
