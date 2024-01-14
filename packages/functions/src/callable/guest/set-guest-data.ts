@@ -41,7 +41,7 @@ export async function setGuestDataFn(req: CallableRequest<GuestData>): Promise<v
         throw new HttpsError("invalid-argument", "Reservation is not provided");
     }
 
-    const { guestContact, guestName, arrived, cancelled } = reservation;
+    const { guestContact, guestName, arrived, cancelled, isVIP } = reservation;
 
     if (!guestContact) {
         logger.info("Guest contact is not provided");
@@ -57,6 +57,7 @@ export async function setGuestDataFn(req: CallableRequest<GuestData>): Promise<v
         date: eventDate,
         arrived,
         cancelled: !!cancelled,
+        isVIPVisit: isVIP,
     };
 
     try {

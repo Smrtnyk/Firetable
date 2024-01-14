@@ -15,6 +15,7 @@ export interface Visit {
     eventName: string;
     arrived: boolean;
     cancelled: boolean;
+    isVIPVisit?: boolean;
 }
 
 interface VisitedProperties {

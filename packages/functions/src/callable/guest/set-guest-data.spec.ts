@@ -1,6 +1,6 @@
 import type { GuestData } from "./set-guest-data.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
-import type { GuestDoc } from "../../../types/types.js";
+import type { GuestDoc, SimpleReservation } from "../../../types/types.js";
 import { setGuestDataFn } from "./set-guest-data.js";
 import * as Init from "../../init.js";
 import { getGuestPath, getGuestsPath } from "../../paths.js";
@@ -10,10 +10,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 const organisationId = "orgId";
 const guestContact = "guestContact";
 
-const testSimpleReservation = {
+const testSimpleReservation: Partial<SimpleReservation> = {
     guestContact,
     guestName: "guestName",
     arrived: false,
+    isVIP: true,
 };
 
 const date = Date.now();
@@ -47,6 +48,7 @@ describe("setGuestDataFn", () => {
             cancelled: false,
             date,
             eventName: "eventName",
+            isVIPVisit: true,
         });
     });
 
@@ -81,6 +83,7 @@ describe("setGuestDataFn", () => {
                 cancelled: false,
                 date,
                 eventName: "eventName",
+                isVIPVisit: true,
             },
         });
     });

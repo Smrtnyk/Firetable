@@ -5,6 +5,7 @@ import type { DialogChainObject } from "quasar";
 import type { VueFirestoreDocumentData } from "vuefire";
 import type {
     EventDoc,
+    GuestDataPayload,
     PlannedReservationDoc,
     Reservation,
     ReservationDoc,
@@ -105,7 +106,7 @@ export function useReservations(
             return;
         }
 
-        const data = {
+        const data: GuestDataPayload = {
             reservation: reservationData,
             propertyId: eventOwner.propertyId,
             organisationId: eventOwner.organisationId,

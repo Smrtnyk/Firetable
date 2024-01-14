@@ -1,4 +1,5 @@
 // Copy, cannot be imported from types package
+
 export const enum Collection {
     EVENTS = "events",
     EVENT_LOGS = "eventLogs",
@@ -92,6 +93,7 @@ export interface SimpleReservation {
     guestName: string;
     numberOfGuests: number | string;
     consumption: number;
+    isVIP: boolean;
     time: string;
 }
 
@@ -100,6 +102,7 @@ export interface Visit {
     eventName: string;
     arrived: boolean;
     cancelled: boolean;
+    isVIPVisit?: boolean;
 }
 
 export interface GuestDoc {
