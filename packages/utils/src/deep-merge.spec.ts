@@ -1,6 +1,6 @@
 import type { DeepPartial } from "@firetable/types";
-import { deepMerge } from "./deep-merge";
-import { describe, expect, it } from "@jest/globals";
+import { deepMerge } from "./deep-merge.js";
+import { describe, expect, it } from "vitest";
 
 describe("deepMerge", () => {
     const DEFAULT_SETTINGS = {

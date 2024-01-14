@@ -1,10 +1,10 @@
 import type { MockInstance } from "vitest";
-import type { FloorCreationOptions } from "./types";
-import { FloorElementTypes } from "./types";
-import { FloorEditor } from "./FloorEditor";
-import { GridDrawer } from "./GridDrawer";
-import { isTable } from "./type-guards";
-import { RectTable } from "./elements/RectTable";
+import type { FloorCreationOptions } from "./types.js";
+import { FloorElementTypes } from "./types.js";
+import { FloorEditor } from "./FloorEditor.js";
+import { GridDrawer } from "./GridDrawer.js";
+import { isTable } from "./type-guards.js";
+import { RectTable } from "./elements/RectTable.js";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { Group, Rect } from "fabric";
 
@@ -23,7 +23,6 @@ describe("FloorEditor", () => {
                 width: 1000,
                 height: 1000,
                 json: {},
-                propertyId: "",
             },
             containerWidth: 1000,
         };
@@ -118,7 +117,7 @@ describe("FloorEditor", () => {
         it("emits elementClicked event on element click", () => {
             const spy = vi.spyOn(floorEditor, "emit");
             const table = new RectTable({
-                rectOptions: {},
+                shapeOptions: {},
                 groupOptions: {
                     label: "1",
                 },

@@ -1,9 +1,9 @@
 import type { MockInstance } from "vitest";
 import type { Canvas } from "fabric";
-import { EditorEventManager } from "./EditorEventManager";
-import { RESOLUTION } from "../constants";
-import { CommandInvoker } from "../command/CommandInvoker";
-import { FloorEditor } from "../FloorEditor";
+import { EditorEventManager } from "./EditorEventManager.js";
+import { RESOLUTION } from "../constants.js";
+import { CommandInvoker } from "../command/CommandInvoker.js";
+import { FloorEditor } from "../FloorEditor.js";
 import { expect, it, describe, beforeEach, vi } from "vitest";
 import { FabricObject, Group } from "fabric";
 
@@ -27,7 +27,6 @@ describe("EditorEventManager", () => {
                 width: 1000,
                 height: 1000,
                 json: {},
-                propertyId: "",
             },
             containerWidth: 1000,
         });

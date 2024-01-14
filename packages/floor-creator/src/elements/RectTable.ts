@@ -1,13 +1,13 @@
 import type { GroupProps } from "fabric";
-import { Table } from "./Table";
+import { Table } from "./Table.js";
 import {
     FONT_SIZE,
     TABLE_TEXT_FILL_COLOR,
     ELEMENT_DEFAULT_FILL_COLOR,
     ELEMENT_DEFAULT_STROKE_COLOR,
     ELEMENT_DEFAULT_STROKE_WIDTH,
-} from "../constants";
-import { FloorElementTypes } from "../types";
+} from "../constants.js";
+import { FloorElementTypes } from "../types.js";
 import { Rect, FabricText } from "fabric";
 
 interface RectTableElementOptions {

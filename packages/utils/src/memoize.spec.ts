@@ -1,9 +1,9 @@
-import { memoize } from "./memoize";
-import { it, describe, jest, expect } from "@jest/globals";
+import { memoize } from "./memoize.js";
+import { it, describe, vi, expect } from "vitest";
 
 describe("memoize", () => {
     it("caches function results based on arguments", () => {
-        const mockFn = jest.fn((a: number, b: number) => a + b);
+        const mockFn = vi.fn((a: number, b: number) => a + b);
         const memoizedFn = memoize(mockFn);
         expect(memoizedFn(1, 2)).toBe(3);
         expect(mockFn).toHaveBeenCalledTimes(1);
@@ -18,7 +18,7 @@ describe("memoize", () => {
     });
 
     it("does not cache results when arguments are different", () => {
-        const mockFn = jest.fn((a: number, b: number) => a + b);
+        const mockFn = vi.fn((a: number, b: number) => a + b);
         const memoizedFn = memoize(mockFn);
         expect(memoizedFn(1, 2)).toBe(3);
         expect(mockFn).toHaveBeenCalledTimes(1);
@@ -31,7 +31,7 @@ describe("memoize", () => {
     });
 
     it("returns cached result when called with no arguments", () => {
-        const mockFn = jest.fn(() => Math.random());
+        const mockFn = vi.fn(() => Math.random());
         const memoizedFn = memoize(mockFn);
         const result1 = memoizedFn();
         const result2 = memoizedFn();

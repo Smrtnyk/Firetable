@@ -1,4 +1,4 @@
-import type { AnimationStrategy } from "./AnimationStrategy";
+import type { AnimationStrategy } from "./AnimationStrategy.js";
 import type { FabricObject } from "fabric";
 import { NOOP } from "@firetable/utils";
 

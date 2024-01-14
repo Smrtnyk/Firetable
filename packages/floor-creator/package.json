@@ -2,15 +2,13 @@
     "name": "@firetable/floor-creator",
     "version": "1.0.0",
     "description": "Floor planner tool built using typescript and fabric.js",
-    "types": "./dist/src/index.d.ts",
-    "main": "./dist/src/index.js",
+    "type": "module",
     "exports": {
         ".": {
             "types": "./dist/src/index.d.ts",
             "import": "./dist/src/index.js"
         }
     },
-    "type": "module",
     "scripts": {
         "test": "vitest",
         "build": "tsc",

@@ -3,7 +3,6 @@
     "version": "1.0.0",
     "description": "",
     "type": "module",
-    "types": "./dist/src/firebase/index.d.ts",
     "exports": {
         ".": "./dist/src/firebase/index.js",
         "./types": "./dist/src/firebase/index.d.ts"

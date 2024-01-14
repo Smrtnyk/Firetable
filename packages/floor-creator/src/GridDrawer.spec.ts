@@ -1,4 +1,4 @@
-import { GridDrawer } from "./GridDrawer";
+import { GridDrawer } from "./GridDrawer.js";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { Canvas } from "fabric";
 

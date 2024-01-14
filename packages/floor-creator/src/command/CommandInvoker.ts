@@ -1,5 +1,5 @@
-import type { Command } from "./Command";
-import { EventEmitter } from "../event-emitter/EventEmitter";
+import type { Command } from "./Command.js";
+import { EventEmitter } from "../event-emitter/EventEmitter.js";
 
 type CommandInvokerEvents = {
     change: [null];

@@ -1,5 +1,5 @@
 import type { Canvas, Point } from "fabric";
-import type { Floor } from "./Floor";
+import type { Floor } from "./Floor.js";
 import { DEFAULT_ZOOM, ZOOM_INCREMENT } from "./constants.js";
 
 export class FloorZoomManager {

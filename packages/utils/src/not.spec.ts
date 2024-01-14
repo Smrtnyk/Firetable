@@ -1,5 +1,5 @@
-import { not } from "./not";
-import { describe, expect, it } from "@jest/globals";
+import { not } from "./not.js";
+import { describe, expect, it } from "vitest";
 
 describe("not", () => {
     it("returns a function that negates the result of the input function", () => {

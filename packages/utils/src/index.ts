@@ -1,11 +1,11 @@
-export * from "./memoize";
-export * from "./not";
-export * from "./prop-is-truthy";
-export * from "./take-last";
-export * from "./take-prop";
-export * from "./throttle";
-export * from "./deep-merge";
-export * from "./type-guards";
+export { memoize } from "./memoize.js";
+export { not } from "./not.js";
+export { propIsTruthy } from "./prop-is-truthy.js";
+export { takeLast } from "./take-last.js";
+export { takeProp } from "./take-prop.js";
+export { throttle } from "./throttle.js";
+export { deepMerge } from "./deep-merge.js";
+export * from "./type-guards.js";
 
 export function NOOP(): void {
     /* EMPTY */

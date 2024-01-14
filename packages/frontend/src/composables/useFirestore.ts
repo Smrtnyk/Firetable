@@ -1,5 +1,5 @@
 import type { Query, DocumentData, DocumentReference } from "firebase/firestore";
-import type { UseCollectionOptions } from "vuefire/dist/index";
+import type { UseCollectionOptions } from "vuefire";
 import type { ComputedRef } from "vue";
 import { collection, doc, query, setDoc } from "firebase/firestore";
 import { initializeFirebase } from "@firetable/backend";

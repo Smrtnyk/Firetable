@@ -154,8 +154,6 @@ function reset(): void {
                 <q-toggle
                     v-model="editableSettings.guest.collectGuestData"
                     :label="editableSettings.guest.collectGuestData ? 'On' : 'Off'"
-                    :left-label="editableSettings.guest.collectGuestData ? 'On' : 'Off'"
-                    :right-label="editableSettings.guest.collectGuestData ? 'On' : 'Off'"
                 />
             </SettingsSection>
         </SettingsCard>

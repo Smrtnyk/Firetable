@@ -1,5 +1,5 @@
 import type { TPointerEventInfo } from "fabric";
-import type { Floor } from "../Floor";
+import type { Floor } from "../Floor.js";
 import { Point } from "fabric";
 
 export abstract class EventManager {

@@ -1,5 +1,5 @@
 import type { DeepPartial } from "@firetable/types";
-import { isDefined } from "./type-guards";
+import { isDefined } from "./type-guards.js";
 
 function isObject(value: unknown): value is Record<string, unknown> {
     return (

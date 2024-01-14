@@ -1,8 +1,8 @@
-import type { Floor } from "../Floor";
-import type { CommandInvoker } from "../command/CommandInvoker";
-import { EventManager } from "./EventManager";
-import { RESOLUTION } from "../constants";
-import { MoveCommand } from "../command/MoveCommand";
+import type { Floor } from "../Floor.js";
+import type { CommandInvoker } from "../command/CommandInvoker.js";
+import { EventManager } from "./EventManager.js";
+import { RESOLUTION } from "../constants.js";
+import { MoveCommand } from "../command/MoveCommand.js";
 
 export class EditorEventManager extends EventManager {
     ctrlPressedDuringSelection: boolean = false;

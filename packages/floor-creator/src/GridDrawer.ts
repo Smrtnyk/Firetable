@@ -1,5 +1,5 @@
 import type { Canvas } from "fabric";
-import { RESOLUTION } from "./constants";
+import { RESOLUTION } from "./constants.js";
 import { Line, Group } from "fabric";
 import { propIsTruthy } from "@firetable/utils";
 

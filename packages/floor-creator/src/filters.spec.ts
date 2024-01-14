@@ -1,13 +1,13 @@
-import type { FloorData } from "./types";
-import { FloorEditor } from "./FloorEditor";
+import type { FloorData } from "./types.js";
+import { FloorEditor } from "./FloorEditor.js";
 import {
     extractAllTablesLabels,
     getTables,
     getTablesFromFloorDoc,
     hasFloorTables,
-} from "./filters";
-import { RectTable } from "./elements/RectTable";
-import { FloorElementTypes } from "./types";
+} from "./filters.js";
+import { RectTable } from "./elements/RectTable.js";
+import { FloorElementTypes } from "./types.js";
 import { expect, it, describe, beforeEach } from "vitest";
 
 describe("Table Management Functions", () => {

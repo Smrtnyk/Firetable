@@ -1,14 +1,14 @@
-import type { CreateElementOptions } from "./types";
-import { FloorElementTypes } from "./types";
-import { Wall } from "./elements/Wall";
-import { DJBooth } from "./elements/DJBooth";
-import { Sofa } from "./elements/Sofa";
-import { RoundTable } from "./elements/RoundTable";
-import { RESOLUTION, TABLE_HEIGHT, TABLE_WIDTH } from "./constants";
-import { RectTable } from "./elements/RectTable";
-import { Stage } from "./elements/Stage";
-import { SpiralStaircase } from "./elements/SpiralStaircase";
-import { Door } from "./elements/Door";
+import type { CreateElementOptions } from "./types.js";
+import { FloorElementTypes } from "./types.js";
+import { Wall } from "./elements/Wall.js";
+import { DJBooth } from "./elements/DJBooth.js";
+import { Sofa } from "./elements/Sofa.js";
+import { RoundTable } from "./elements/RoundTable.js";
+import { RESOLUTION, TABLE_HEIGHT, TABLE_WIDTH } from "./constants.js";
+import { RectTable } from "./elements/RectTable.js";
+import { Stage } from "./elements/Stage.js";
+import { SpiralStaircase } from "./elements/SpiralStaircase.js";
+import { Door } from "./elements/Door.js";
 import { match } from "ts-pattern";
 
 export class ElementManager {

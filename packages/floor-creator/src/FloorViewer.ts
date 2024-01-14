@@ -1,9 +1,9 @@
 import type { FabricObject } from "fabric";
-import type { FloorCreationOptions, FloorEditorElement } from "./types";
-import { Floor } from "./Floor";
-import { ViewerEventManager } from "./event-manager/ViewerEventManager";
-import { EventEmitter } from "./event-emitter/EventEmitter";
-import { isTable } from "./type-guards";
+import type { FloorCreationOptions, FloorEditorElement } from "./types.js";
+import { Floor } from "./Floor.js";
+import { ViewerEventManager } from "./event-manager/ViewerEventManager.js";
+import { EventEmitter } from "./event-emitter/EventEmitter.js";
+import { isTable } from "./type-guards.js";
 
 type FloorViewerEvents = {
     elementClicked: [FloorViewer, FloorEditorElement];

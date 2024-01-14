@@ -2,9 +2,7 @@
     "name": "@firetable/utils",
     "version": "1.0.0",
     "description": "",
-    "main": "./dist/src/index.js",
-    "module": "./dist/src/index.js",
-    "types": "./dist/src/index.d.ts",
+    "type": "module",
     "exports": {
         ".": {
             "types": "./dist/src/index.d.ts",
@@ -12,7 +10,7 @@
         }
     },
     "scripts": {
-        "test": "jest",
+        "test": "vitest",
         "build": "tsc",
         "lint": "eslint ./src --ext .ts"
     },
@@ -21,9 +19,6 @@
     "license": "ISC",
     "devDependencies": {
         "@firetable/types": "workspace:*",
-        "@jest/globals": "30.0.0-alpha.2",
-        "@swc/core": "1.3.102",
-        "@swc/jest": "0.2.29",
-        "jest": "30.0.0-alpha.2"
+        "vitest": "1.2.0"
     }
 }

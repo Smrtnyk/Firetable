@@ -1,4 +1,4 @@
-import type { Command } from "./Command";
+import type { Command } from "./Command.js";
 import type { FabricObject } from "fabric";
 
 type Position = {

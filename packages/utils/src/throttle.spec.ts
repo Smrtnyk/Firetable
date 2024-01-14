@@ -1,36 +1,36 @@
-import { throttle } from "./throttle";
-import { afterAll, describe, expect, jest, test } from "@jest/globals";
+import { throttle } from "./throttle.js";
+import { afterAll, describe, expect, vi, it } from "vitest";
 
 describe("throttle", () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
-    test("calls the function immediately on first invocation", () => {
-        const mockFn = jest.fn();
+    it("calls the function immediately on first invocation", () => {
+        const mockFn = vi.fn();
         const throttledFunc = throttle(mockFn, 1000);
 
         throttledFunc();
         expect(mockFn).toHaveBeenCalledTimes(1);
     });
 
-    test("ignores calls during the throttle period", () => {
-        const mockFn = jest.fn();
+    it("ignores calls during the throttle period", () => {
+        const mockFn = vi.fn();
         const throttledFunc = throttle(mockFn, 1000);
 
         throttledFunc();
-        jest.advanceTimersByTime(500); // half-way through the throttle period
+        vi.advanceTimersByTime(500); // half-way through the throttle period
         throttledFunc();
-        jest.advanceTimersByTime(499); // just before the throttle period ends
+        vi.advanceTimersByTime(499); // just before the throttle period ends
         throttledFunc();
 
         expect(mockFn).toHaveBeenCalledTimes(1); // Still should only have been called once
     });
 
-    test("calls the function again after the throttle period", () => {
-        const mockFn = jest.fn();
+    it("calls the function again after the throttle period", () => {
+        const mockFn = vi.fn();
         const throttledFunc = throttle(mockFn, 1000);
 
         throttledFunc();
-        jest.advanceTimersByTime(1000); // Move past the throttle period
+        vi.advanceTimersByTime(1000); // Move past the throttle period
         throttledFunc(); // Should be able to call it again
 
         expect(mockFn).toHaveBeenCalledTimes(2);
@@ -38,6 +38,6 @@ describe("throttle", () => {
 
     // Clean up
     afterAll(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 });

@@ -1,8 +1,8 @@
 {
     "compilerOptions": {
         "esModuleInterop": true,
-        "module": "esnext",
-        "moduleResolution": "node",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
         "isolatedModules": false,
         "noEmit": true,
         "baseUrl": ".",

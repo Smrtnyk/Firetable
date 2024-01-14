@@ -1,5 +1,5 @@
 import type { FabricObject } from "fabric";
-import type { EventManager } from "./event-manager/EventManager";
+import type { EventManager } from "./event-manager/EventManager.js";
 import type {
     CreateElementOptions,
     FloorCreationOptions,
@@ -7,14 +7,14 @@ import type {
     FloorDropEvent,
     FloorEditorElement,
     NumberTuple,
-} from "./types";
-import { ElementManager } from "./ElementManager";
-import { Floor } from "./Floor";
-import { GridDrawer } from "./GridDrawer";
-import { EditorEventManager } from "./event-manager/EditorEventManager";
-import { calculateCanvasScale } from "./utils";
-import { CommandInvoker } from "./command/CommandInvoker";
-import { EventEmitter } from "./event-emitter/EventEmitter";
+} from "./types.js";
+import { ElementManager } from "./ElementManager.js";
+import { Floor } from "./Floor.js";
+import { GridDrawer } from "./GridDrawer.js";
+import { EditorEventManager } from "./event-manager/EditorEventManager.js";
+import { calculateCanvasScale } from "./utils.js";
+import { CommandInvoker } from "./command/CommandInvoker.js";
+import { EventEmitter } from "./event-emitter/EventEmitter.js";
 
 type FloorEditorEvents = {
     elementClicked: [FloorEditor, FloorEditorElement];

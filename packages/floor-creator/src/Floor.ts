@@ -1,17 +1,17 @@
 import type { FabricObject } from "fabric";
 import type { BaseTable, FloorCreationOptions, FloorData } from "./types.js";
-import type { EventManager } from "./event-manager/EventManager";
-import type { EventEmitterListener } from "./event-emitter/EventEmitter";
+import type { EventManager } from "./event-manager/EventManager.js";
+import type { EventEmitterListener } from "./event-emitter/EventEmitter.js";
 import { CANVAS_BG_COLOR } from "./constants.js";
-import { TouchManager } from "./TouchManager";
-import { FloorZoomManager } from "./FloorZoomManager";
-import { calculateCanvasScale } from "./utils";
-import { isTable } from "./type-guards";
-import { getTables } from "./filters";
-import { RectTable } from "./elements/RectTable";
-import { Sofa } from "./elements/Sofa";
-import { Wall } from "./elements/Wall";
-import { RoundTable } from "./elements/RoundTable";
+import { TouchManager } from "./TouchManager.js";
+import { FloorZoomManager } from "./FloorZoomManager.js";
+import { calculateCanvasScale } from "./utils.js";
+import { isTable } from "./type-guards.js";
+import { getTables } from "./filters.js";
+import { RectTable } from "./elements/RectTable.js";
+import { Sofa } from "./elements/Sofa.js";
+import { Wall } from "./elements/Wall.js";
+import { RoundTable } from "./elements/RoundTable.js";
 import { Canvas, classRegistry } from "fabric";
 
 classRegistry.setClass(RectTable);

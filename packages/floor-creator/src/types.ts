@@ -1,9 +1,9 @@
 import type { RectTable } from "./elements/RectTable.js";
 import type { RoundTable } from "./elements/RoundTable.js";
-import type { Sofa } from "./elements/Sofa";
-import type { DJBooth } from "./elements/DJBooth";
-import type { Stage } from "./elements/Stage";
-import type { SpiralStaircase } from "./elements/SpiralStaircase";
+import type { Sofa } from "./elements/Sofa.js";
+import type { DJBooth } from "./elements/DJBooth.js";
+import type { Stage } from "./elements/Stage.js";
+import type { SpiralStaircase } from "./elements/SpiralStaircase.js";
 
 export interface FloorCreationOptions {
     canvas: HTMLCanvasElement;
