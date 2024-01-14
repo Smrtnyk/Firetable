@@ -5,10 +5,12 @@ import { getGuestPath } from "@firetable/backend";
 import { computed, ref, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { usePropertiesStore } from "src/stores/properties-store";
+import { formatEventDate } from "src/helpers/date-utils";
 
 import FTTitle from "src/components/FTTitle.vue";
 import FTTabs from "src/components/FTTabs.vue";
-import { formatEventDate } from "src/helpers/date-utils";
+import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPChip.vue";
+import FTCenteredText from "src/components/FTCenteredText.vue";
 
 interface Props {
     organisationId: string;
@@ -46,13 +48,6 @@ const propertiesVisits = computed(() => {
         };
     }
     return visitsByProperty;
-});
-
-const guestTitle = computed(() => {
-    if (!guest.value) {
-        return "";
-    }
-    return guest.value.name + " - " + guest.value.contact;
 });
 
 watch(
@@ -93,7 +88,10 @@ function formatSubtitleForGuestVisit(visit: Visit): string {
 <template>
     <div class="PageAdminGuest">
         <div v-if="guest?.name">
-            <FTTitle :title="guestTitle" />
+            <FTTitle :title="guest.name" />
+
+            <FTCenteredText> Contact: {{ guest.contact }} </FTCenteredText>
+
             <FTTabs v-model="tab">
                 <q-tab
                     v-for="(item, propertyId) in propertiesVisits"
@@ -116,8 +114,12 @@ function formatSubtitleForGuestVisit(visit: Visit): string {
                             :icon="getVisitIcon(visit)"
                             :subtitle="formatSubtitleForGuestVisit(visit)"
                         >
-                            <div>
-                                {{ visit.eventName }}
+                            <div class="row">
+                                <span>
+                                    {{ visit.eventName }}
+                                </span>
+                                <q-space />
+                                <ReservationVIPChip v-if="visit.isVIPVisit" />
                             </div>
                         </q-timeline-entry>
                     </q-timeline>
