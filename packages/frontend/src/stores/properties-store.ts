@@ -52,6 +52,12 @@ export const usePropertiesStore = defineStore("properties", () => {
         arePropertiesLoading.value = false;
     }
 
+    function getOrganisationById(organisationId: string): OrganisationDoc | undefined {
+        return organisations.value.find((organisation) => {
+            return organisation.id === organisationId;
+        });
+    }
+
     function getOrganisationNameById(organisationId: string): string {
         return (
             organisations.value.find((organisation) => {
@@ -154,6 +160,7 @@ export const usePropertiesStore = defineStore("properties", () => {
         properties,
         organisations,
         arePropertiesLoading,
+        getOrganisationById,
         getPropertiesByOrganisationId,
         getOrganisationSettingsById,
         initUserOrganisation,

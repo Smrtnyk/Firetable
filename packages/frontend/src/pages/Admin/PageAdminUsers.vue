@@ -18,7 +18,6 @@ import { useUsers } from "src/composables/useUsers";
 import { useAuthStore } from "src/stores/auth-store";
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
-import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 import AdminUsersList from "src/components/admin/user/AdminUsersList.vue";
 import FTTabs from "src/components/FTTabs.vue";
@@ -29,8 +28,7 @@ const { t } = useI18n();
 const router = useRouter();
 const quasar = useQuasar();
 const authStore = useAuthStore();
-const { properties: allProperties, organisations: allOrganisations } =
-    storeToRefs(usePropertiesStore());
+const propertiesStore = usePropertiesStore();
 
 const { users, isLoading, fetchUsers } = useUsers(props.organisationId);
 const { createDialog } = useDialog();
@@ -38,9 +36,7 @@ const { createDialog } = useDialog();
 const activeTab = ref(0);
 
 const organisation = computed(() => {
-    return allOrganisations.value.find((org) => {
-        return org.id === props.organisationId;
-    });
+    return propertiesStore.getOrganisationById(props.organisationId);
 });
 
 const unassignedUsers = computed(() => {
@@ -80,9 +76,7 @@ const bucketizedUsers = computed((): BucketizedUsers => {
 });
 
 const properties = computed(() => {
-    return allProperties.value.filter((property) => {
-        return property.organisationId === props.organisationId;
-    });
+    return propertiesStore.getPropertiesByOrganisationId(props.organisationId);
 });
 
 const onCreateUser = withLoading(async (newUser: CreateUserPayload) => {

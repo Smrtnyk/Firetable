@@ -11,18 +11,15 @@ import { computed, ref } from "vue";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { format, subMonths } from "date-fns";
 import { useReservationsAnalytics } from "src/composables/useReservationsAnalytics";
-import { storeToRefs } from "pinia";
 
 interface Props {
     organisationId: string;
 }
 
 const props = defineProps<Props>();
-const { properties: allProperties } = storeToRefs(usePropertiesStore());
+const propertiesStore = usePropertiesStore();
 const properties = computed(() => {
-    return allProperties.value.filter((property) => {
-        return property.organisationId === props.organisationId;
-    });
+    return propertiesStore.getPropertiesByOrganisationId(props.organisationId);
 });
 const selectedTab = ref("");
 const {

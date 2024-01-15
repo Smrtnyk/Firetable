@@ -46,9 +46,7 @@ const {
 } = useEvents();
 const activePropertyId = ref("");
 const properties = computed(() => {
-    return propertiesStore.properties.filter((property) => {
-        return property.organisationId === props.organisationId;
-    });
+    return propertiesStore.getPropertiesByOrganisationId(props.organisationId);
 });
 
 const { floors, isLoading: isFloorsLoading } = useFloors(properties);

@@ -24,9 +24,7 @@ const quasar = useQuasar();
 const { t } = useI18n();
 
 const properties = computed(() => {
-    return propertiesStore.properties.filter((property) => {
-        return property.organisationId === props.organisationId;
-    });
+    return propertiesStore.getPropertiesByOrganisationId(props.organisationId);
 });
 const { floors, isLoading } = useFloors(properties);
 const activeTab = ref("");
