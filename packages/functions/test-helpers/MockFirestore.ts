@@ -171,7 +171,7 @@ function applyUpdate(current: any, path: string[], value: any): void {
     if (path.length === 1) {
         current[key] = value;
     } else {
-        current[key] = current[key] || {};
+        current[key] = current[key] ?? {};
         applyUpdate(current[key], path.slice(1), value);
     }
 }
@@ -225,7 +225,7 @@ export class MockDocumentReference {
     }
 
     update(data: any): Promise<MockWriteResult> {
-        const currentData = this.firestore.data.get(this.path) || {};
+        const currentData = this.firestore.data.get(this.path) ?? {};
 
         Object.keys(data).forEach((key) => {
             if (data[key] instanceof MockFieldValue) {
@@ -267,7 +267,7 @@ class MockTransaction {
 
     async update(docRef: MockDocumentReference, data: any): Promise<void> {
         const existingData =
-            this.transactionData.get(docRef.path) || (await docRef.get()).data?.() || {};
+            this.transactionData.get(docRef.path) ?? (await docRef.get()).data?.() ?? {};
 
         Object.keys(data).forEach((key) => {
             const dataValue = data[key];
@@ -385,12 +385,12 @@ export class MockFieldValue implements FieldValue {
     applyTo(currentValue: any): any {
         if (this.operation === "arrayUnion") {
             // Combine the current value with new elements, ensuring uniqueness
-            const set = new Set(currentValue || []);
+            const set = new Set(currentValue ?? []);
             this.elements.forEach((element) => set.add(element));
             return Array.from(set);
         } else if (this.operation === "arrayRemove") {
             // Filter out elements to be removed from the current value
-            return (currentValue || []).filter((item: any) => !this.elements.includes(item));
+            return (currentValue ?? []).filter((item: any) => !this.elements.includes(item));
         }
     }
 

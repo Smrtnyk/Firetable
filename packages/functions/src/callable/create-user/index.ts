@@ -86,8 +86,8 @@ export async function createUser(
         if (createdUserUid) {
             await auth.deleteUser(createdUserUid);
         }
-        const errorCode = e.code || "unknown";
-        const errorMessage = e.message || "An unknown error occurred.";
+        const errorCode = e.code ?? "unknown";
+        const errorMessage = e.message ?? "An unknown error occurred.";
         throw new HttpsError(errorCode, errorMessage);
     }
 }
