@@ -6,6 +6,7 @@ import BarChart from "src/components/admin/analytics/BarChart.vue";
 import AdminEventReservationsByPerson from "src/components/admin/event/AdminEventReservationsByPerson.vue";
 import ReservationAnalyticsCharts from "src/components/admin/analytics/ReservationAnalyticsCharts.vue";
 import FTTabs from "src/components/FTTabs.vue";
+import FTCard from "src/components/FTCard.vue";
 
 import { computed, ref } from "vue";
 import { usePropertiesStore } from "src/stores/properties-store";
@@ -80,6 +81,7 @@ const chartInfos = computed(
 <template>
     <div class="PageAdminAnalytics">
         <FTTitle title="Analytics" />
+
         <q-select
             v-model="selectedMonth"
             :options="monthOptions"
@@ -88,13 +90,17 @@ const chartInfos = computed(
             map-options
             rounded
             standout
+            class="q-mb-md"
         />
 
         <div v-if="reservationBuckets.length > 0">
-            <BarChart
-                :chart-data="plannedReservationsByProperty"
-                chart-title="Reservations by Property"
-            />
+            <FTCard class="q-mb-md">
+                <BarChart
+                    :chart-data="plannedReservationsByProperty"
+                    chart-title="Reservations by Property"
+                />
+            </FTCard>
+
             <FTTabs v-model="selectedTab">
                 <q-tab
                     v-for="property in properties"
@@ -104,34 +110,46 @@ const chartInfos = computed(
                 />
             </FTTabs>
 
-            <q-tab-panels v-model="selectedTab" animated>
+            <q-tab-panels
+                v-model="selectedTab"
+                animated
+                class="bg-transparent"
+                transition-next="fade"
+                transition-prev="fade"
+                transition-duration="1000"
+            >
                 <q-tab-panel
                     v-for="bucket in reservationBuckets"
                     :key="bucket.propertyName"
                     :name="bucket.propertyId"
+                    class="q-pa-none"
                 >
-                    <q-chip color="primary">
-                        Avg Guests per planned reservation:
-                        {{ avgGuestsPerReservation.averagePlannedGuests.toFixed(2) }}
-                    </q-chip>
+                    <div class="row q-col-gutter-sm q-col-gutter-md-md">
+                        <div class="col-12">
+                            <q-chip color="primary">
+                                Avg Guests per planned reservation:
+                                {{ avgGuestsPerReservation.averagePlannedGuests.toFixed(2) }}
+                            </q-chip>
 
-                    <q-chip color="primary">
-                        Avg Guests per walk-in reservation:
-                        {{ avgGuestsPerReservation.averageWalkInGuests.toFixed(2) }}
-                    </q-chip>
+                            <q-chip color="primary">
+                                Avg Guests per walk-in reservation:
+                                {{ avgGuestsPerReservation.averageWalkInGuests.toFixed(2) }}
+                            </q-chip>
+                        </div>
 
-                    <div class="row">
-                        <PieChart
-                            class="col-sm-12 col-md-6"
-                            :chart-data="plannedArrivedVsNoShow"
-                            chart-title="Arrived vs. No-Show"
-                        />
+                        <FTCard class="col-sm-12 col-md-6">
+                            <PieChart
+                                :chart-data="plannedArrivedVsNoShow"
+                                chart-title="Arrived vs. No-Show"
+                            />
+                        </FTCard>
 
-                        <PieChart
-                            class="col-sm-12 col-md-6"
-                            :chart-data="plannedVsWalkInReservations"
-                            chart-title="Planned vs. Walk-In"
-                        />
+                        <FTCard class="col-sm-12 col-md-6">
+                            <PieChart
+                                :chart-data="plannedVsWalkInReservations"
+                                chart-title="Planned vs. Walk-In"
+                            />
+                        </FTCard>
 
                         <div class="col-12 q-my-md">
                             <FTTabs v-model="selectedDay">
@@ -143,7 +161,14 @@ const chartInfos = computed(
                                 />
                             </FTTabs>
 
-                            <q-tab-panels v-model="selectedDay" animated class="q-mt-md">
+                            <q-tab-panels
+                                v-model="selectedDay"
+                                animated
+                                class="q-mt-md"
+                                transition-next="fade"
+                                transition-prev="fade"
+                                transition-duration="1000"
+                            >
                                 <q-tab-panel
                                     class="q-pa-none"
                                     v-for="(reservations, day) in {
@@ -158,18 +183,22 @@ const chartInfos = computed(
                             </q-tab-panels>
                         </div>
 
-                        <ReservationAnalyticsCharts
+                        <FTCard
                             class="col-sm-12 col-md-6"
                             v-for="chartInfo in chartInfos"
                             :key="chartInfo.title"
-                            :chart-data="chartInfo.data"
-                            :chart-title="chartInfo.title"
-                            :chart-type="chartInfo.type"
-                        />
+                        >
+                            <ReservationAnalyticsCharts
+                                :chart-data="chartInfo.data"
+                                :chart-title="chartInfo.title"
+                                :chart-type="chartInfo.type"
+                            />
+                        </FTCard>
                     </div>
                 </q-tab-panel>
             </q-tab-panels>
         </div>
+
         <FTCenteredText v-else> No Data For this month </FTCenteredText>
     </div>
 </template>
