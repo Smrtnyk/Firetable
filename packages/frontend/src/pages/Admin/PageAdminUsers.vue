@@ -7,11 +7,14 @@ import UserCreateForm from "src/components/admin/user/UserCreateForm.vue";
 import UserEditForm from "src/components/admin/user/UserEditForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
+import FTDialog from "src/components/FTDialog.vue";
+import AdminUsersList from "src/components/admin/user/AdminUsersList.vue";
+import FTTabs from "src/components/FTTabs.vue";
+import FTTabPanels from "src/components/FTTabPanels.vue";
 
 import { showConfirm, showErrorMessage, withLoading } from "src/helpers/ui-helpers";
 import { computed, onBeforeMount, onUnmounted, ref, watch } from "vue";
 import { Loading, useQuasar } from "quasar";
-import FTDialog from "src/components/FTDialog.vue";
 import { createUserWithEmail, deleteUser, updateUser } from "@firetable/backend";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { useUsers } from "src/composables/useUsers";
@@ -19,8 +22,6 @@ import { useAuthStore } from "src/stores/auth-store";
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
-import AdminUsersList from "src/components/admin/user/AdminUsersList.vue";
-import FTTabs from "src/components/FTTabs.vue";
 
 const props = defineProps<{ organisationId: string }>();
 
@@ -229,7 +230,7 @@ async function onUserSlideRight(user: User): Promise<void> {
                 />
             </FTTabs>
 
-            <q-tab-panels v-model="activeTab" animated>
+            <FTTabPanels v-model="activeTab">
                 <q-tab-panel
                     v-for="(bucket, index) in Object.values(bucketizedUsers)"
                     :key="bucket.propertyName"
@@ -241,7 +242,7 @@ async function onUserSlideRight(user: User): Promise<void> {
                         :users="bucket.users"
                     />
                 </q-tab-panel>
-            </q-tab-panels>
+            </FTTabPanels>
         </div>
 
         <!-- Show no properties message if no properties are created -->

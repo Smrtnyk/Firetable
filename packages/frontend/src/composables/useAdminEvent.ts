@@ -25,7 +25,7 @@ import {
 import { decompressFloorDoc } from "src/helpers/compress-floor-doc";
 import { propIsTruthy } from "@firetable/utils";
 
-export default function useAdminEvent(eventOwner: EventOwner) {
+export function useAdminEvent(eventOwner: EventOwner) {
     const router = useRouter();
     const eventFloors = ref<FloorDoc[]>([]);
 

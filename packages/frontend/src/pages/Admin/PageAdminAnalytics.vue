@@ -7,6 +7,7 @@ import AdminEventReservationsByPerson from "src/components/admin/event/AdminEven
 import ReservationAnalyticsCharts from "src/components/admin/analytics/ReservationAnalyticsCharts.vue";
 import FTTabs from "src/components/FTTabs.vue";
 import FTCard from "src/components/FTCard.vue";
+import FTTabPanels from "src/components/FTTabPanels.vue";
 
 import { computed, ref } from "vue";
 import { usePropertiesStore } from "src/stores/properties-store";
@@ -110,14 +111,7 @@ const chartInfos = computed(
                 />
             </FTTabs>
 
-            <q-tab-panels
-                v-model="selectedTab"
-                animated
-                class="bg-transparent"
-                transition-next="fade"
-                transition-prev="fade"
-                transition-duration="1000"
-            >
+            <FTTabPanels v-model="selectedTab" class="bg-transparent">
                 <q-tab-panel
                     v-for="bucket in reservationBuckets"
                     :key="bucket.propertyName"
@@ -161,14 +155,7 @@ const chartInfos = computed(
                                 />
                             </FTTabs>
 
-                            <q-tab-panels
-                                v-model="selectedDay"
-                                animated
-                                class="q-mt-md"
-                                transition-next="fade"
-                                transition-prev="fade"
-                                transition-duration="1000"
-                            >
+                            <FTTabPanels v-model="selectedDay" class="q-mt-md">
                                 <q-tab-panel
                                     class="q-pa-none"
                                     v-for="(reservations, day) in {
@@ -180,7 +167,7 @@ const chartInfos = computed(
                                 >
                                     <AdminEventReservationsByPerson :reservations="reservations" />
                                 </q-tab-panel>
-                            </q-tab-panels>
+                            </FTTabPanels>
                         </div>
 
                         <FTCard
@@ -196,7 +183,7 @@ const chartInfos = computed(
                         </FTCard>
                     </div>
                 </q-tab-panel>
-            </q-tab-panels>
+            </FTTabPanels>
         </div>
 
         <FTCenteredText v-else> No Data For this month </FTCenteredText>

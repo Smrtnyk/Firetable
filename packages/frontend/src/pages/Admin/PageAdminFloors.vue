@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import type { FloorDoc } from "@firetable/types";
 import type { PropertyFloors } from "src/composables/useFloors";
+
 import AddNewFloorForm from "src/components/Floor/AddNewFloorForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import FTDialog from "src/components/FTDialog.vue";
+import FTCenteredText from "src/components/FTCenteredText.vue";
+import FTTabs from "src/components/FTTabs.vue";
+import FTTabPanels from "src/components/FTTabPanels.vue";
 
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { Loading, useQuasar } from "quasar";
@@ -13,9 +17,7 @@ import { useFloors } from "src/composables/useFloors";
 import { ref, watch, computed } from "vue";
 import { takeProp } from "@firetable/utils";
 import { useI18n } from "vue-i18n";
-import FTCenteredText from "src/components/FTCenteredText.vue";
 import { usePropertiesStore } from "src/stores/properties-store";
-import FTTabs from "src/components/FTTabs.vue";
 
 const props = defineProps<{ organisationId: string }>();
 
@@ -142,7 +144,7 @@ async function onFloorDelete(
         </FTTabs>
 
         <!-- Tab panels for each property's floors -->
-        <q-tab-panels v-model="activeTab">
+        <FTTabPanels v-model="activeTab">
             <q-tab-panel
                 v-for="(propertyData, propertyKey) in floors"
                 :key="propertyKey"
@@ -198,7 +200,7 @@ async function onFloorDelete(
                     {{ t("PageAdminFloors.noFloorPlansMessage") }}
                 </FTCenteredText>
             </q-tab-panel>
-        </q-tab-panels>
+        </FTTabPanels>
 
         <!-- Show "no properties" message when there are no properties and isLoading is false -->
         <FTCenteredText v-if="Object.keys(floors).length === 0 && !isLoading">

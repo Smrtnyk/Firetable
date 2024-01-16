@@ -11,6 +11,7 @@ import FTTitle from "src/components/FTTitle.vue";
 import FTTabs from "src/components/FTTabs.vue";
 import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPChip.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
+import FTTabPanels from "src/components/FTTabPanels.vue";
 
 interface Props {
     organisationId: string;
@@ -100,7 +101,7 @@ function formatSubtitleForGuestVisit(visit: Visit): string {
                     :label="item.name"
                 />
             </FTTabs>
-            <q-tab-panels v-model="tab">
+            <FTTabPanels v-model="tab">
                 <q-tab-panel
                     v-for="(item, propertyId) in propertiesVisits"
                     :key="propertyId"
@@ -124,7 +125,7 @@ function formatSubtitleForGuestVisit(visit: Visit): string {
                         </q-timeline-entry>
                     </q-timeline>
                 </q-tab-panel>
-            </q-tab-panels>
+            </FTTabPanels>
         </div>
     </div>
 </template>

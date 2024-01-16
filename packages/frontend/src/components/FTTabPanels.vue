@@ -1,0 +1,11 @@
+<template>
+    <q-tab-panels
+        v-bind="$attrs"
+        animated
+        transition-next="fade"
+        transition-prev="fade"
+        transition-duration="900"
+    >
+        <slot></slot>
+    </q-tab-panels>
+</template>

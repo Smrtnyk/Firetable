@@ -18,14 +18,15 @@ import AdminEventFloorViewer from "src/components/admin/event/AdminEventFloorVie
 import FTDialog from "src/components/FTDialog.vue";
 import AdminEventLogs from "src/components/admin/event/AdminEventLogs.vue";
 import AdminEventReservationsList from "src/components/admin/event/AdminEventReservationsList.vue";
+import FTTabs from "src/components/FTTabs.vue";
+import FTTabPanels from "src/components/FTTabPanels.vue";
 
 import { Loading, useQuasar } from "quasar";
 import { showConfirm, tryCatchLoadingWrapper, withLoading } from "src/helpers/ui-helpers";
-import useAdminEvent from "src/composables/useAdminEvent";
+import { useAdminEvent } from "src/composables/useAdminEvent";
 import { buttonSize, isMobile } from "src/global-reactives/screen-detection";
 import { truncateText } from "src/helpers/string-utils";
 import { compressFloorDoc } from "src/helpers/compress-floor-doc";
-import FTTabs from "src/components/FTTabs.vue";
 import { useGuestsForEvent } from "src/composables/useGuestsForEvent";
 import { propIsTruthy } from "@firetable/utils";
 import { usePropertiesStore } from "src/stores/properties-store";
@@ -210,7 +211,7 @@ onMounted(init);
             <q-tab name="edit" label="Edit" v-if="!isEventFinished(event.date)" />
             <q-tab name="logs" label="Logs" />
         </FTTabs>
-        <q-tab-panels v-model="tab" animated transition-next="fade" transition-prev="fade">
+        <FTTabPanels v-model="tab">
             <!-- General info with charts area -->
             <q-tab-panel name="info" class="q-pa-xs-sm q-pa-md-md">
                 <AdminEventRTInfo :reservations-status="reservationsStatus" />
@@ -233,7 +234,7 @@ onMounted(init);
                         :label="`Returning (${returningGuests.length})`"
                     />
                 </FTTabs>
-                <q-tab-panels v-model="reservationsTab">
+                <FTTabPanels v-model="reservationsTab">
                     <q-tab-panel name="arrivedReservations">
                         <AdminEventReservationsList
                             @delete="deleteReservationPermanently"
@@ -273,7 +274,7 @@ onMounted(init);
                             </q-item>
                         </q-list>
                     </q-tab-panel>
-                </q-tab-panels>
+                </FTTabPanels>
             </q-tab-panel>
 
             <!-- Edit area -->
@@ -328,6 +329,6 @@ onMounted(init);
             <q-tab-panel name="logs" v-if="logs">
                 <AdminEventLogs :logs-doc="logs" />
             </q-tab-panel>
-        </q-tab-panels>
+        </FTTabPanels>
     </div>
 </template>

@@ -5,6 +5,9 @@ import AdminPropertyEventsList from "src/components/admin/event/AdminPropertyEve
 import EventCreateForm from "src/components/admin/event/EventCreateForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import FTDialog from "src/components/FTDialog.vue";
+import FTTabs from "src/components/FTTabs.vue";
+import FTTabPanels from "src/components/FTTabPanels.vue";
+import FTCenteredText from "src/components/FTCenteredText.vue";
 
 import {
     showConfirm,
@@ -26,9 +29,7 @@ import { useEvents } from "src/composables/useEvents";
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
-import FTCenteredText from "src/components/FTCenteredText.vue";
 import { usePropertiesStore } from "src/stores/properties-store";
-import FTTabs from "src/components/FTTabs.vue";
 
 const props = defineProps<{ organisationId: string }>();
 
@@ -241,33 +242,27 @@ function showCreateEventForm(property: PropertyDoc, event?: EventDoc): void {
                 />
             </FTTabs>
 
-            <keep-alive>
-                <q-tab-panels v-model="activePropertyId">
-                    <q-tab-panel
-                        v-for="property in properties"
-                        :key="property.id"
-                        :name="property.id"
-                    >
-                        <div class="row justify-end">
-                            <q-btn
-                                rounded
-                                icon="plus"
-                                class="button-gradient q-mb-md"
-                                @click="showCreateEventForm(property)"
-                            />
-                        </div>
-
-                        <AdminPropertyEventsList
-                            :property="property"
-                            :events-by-property="eventsByProperty"
-                            @delete="onEventItemSlideRight"
-                            @edit="(event: EventDoc) => onEventEdit(property, event)"
-                            @load="onLoad"
-                            :done="!hasMoreEventsToFetch[property.id]"
+            <FTTabPanels v-model="activePropertyId">
+                <q-tab-panel v-for="property in properties" :key="property.id" :name="property.id">
+                    <div class="row justify-end">
+                        <q-btn
+                            rounded
+                            icon="plus"
+                            class="button-gradient q-mb-md"
+                            @click="showCreateEventForm(property)"
                         />
-                    </q-tab-panel>
-                </q-tab-panels>
-            </keep-alive>
+                    </div>
+
+                    <AdminPropertyEventsList
+                        :property="property"
+                        :events-by-property="eventsByProperty"
+                        @delete="onEventItemSlideRight"
+                        @edit="(event: EventDoc) => onEventEdit(property, event)"
+                        @load="onLoad"
+                        :done="!hasMoreEventsToFetch[property.id]"
+                    />
+                </q-tab-panel>
+            </FTTabPanels>
         </div>
     </div>
 </template>
