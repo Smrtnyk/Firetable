@@ -4,6 +4,14 @@ import { generateRandomId } from "./utils.js";
 export class MockAuth implements Partial<Auth> {
     private readonly users: Record<string, UserRecord> = {};
 
+    async getUser(uid: string): Promise<UserRecord> {
+        const user = this.users[uid];
+        if (!user) {
+            throw new UserNotFoundError(`User with UID ${uid} not found`);
+        }
+        return user;
+    }
+
     async createUser(userDetails: { email: string; password: string }): Promise<UserRecord> {
         const uid = generateRandomId();
         const newUser: UserRecord = {
@@ -63,12 +71,8 @@ export class MockAuth implements Partial<Auth> {
             throw new UserNotFoundError(`No user found for UID: ${uid}`);
         }
 
-        Object.assign(user, {
-            customClaims: {
-                ...user.customClaims,
-                ...customClaims,
-            },
-        });
+        // @ts-expect-error -- this is intentional
+        user.customClaims = customClaims;
     }
 }
 

@@ -63,6 +63,21 @@ export async function updateUserFn(
         }
     }
 
+    const currentUser = await auth.getUser(userId);
+    const currentCustomClaims = currentUser.customClaims ?? {};
+    if (updatedUser.role && currentCustomClaims.role !== updatedUser.role) {
+        try {
+            const updatedCustomClaims = { ...currentCustomClaims, role: updatedUser.role };
+            await auth.setCustomUserClaims(userId, updatedCustomClaims);
+        } catch (error: any) {
+            logger.error(`Failed to update custom claims for user ${userId}`, error);
+            throw new HttpsError(
+                "internal",
+                `Failed to update custom claims. Details: ${error.message}`,
+            );
+        }
+    }
+
     try {
         // Fetch the properties associated with this user by checking relatedUsers field
         const existingPropertiesSnapshot = await db
