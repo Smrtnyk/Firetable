@@ -4,7 +4,7 @@
         animated
         transition-next="fade"
         transition-prev="fade"
-        transition-duration="900"
+        transition-duration="600"
     >
         <slot></slot>
     </q-tab-panels>
