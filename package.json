@@ -33,7 +33,7 @@
         "eslint-plugin-unicorn": "50.0.1",
         "eslint-plugin-vue": "9.20.1",
         "firebase-tools": "13.0.3",
-        "prettier": "3.2.2",
+        "prettier": "3.2.4",
         "ts-node": "10.9.2",
         "typescript": "5.3.3"
     },
