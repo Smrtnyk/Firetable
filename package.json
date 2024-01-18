@@ -22,7 +22,7 @@
         "@regru/eslint-plugin-prefer-early-return": "1.0.0",
         "@typescript-eslint/eslint-plugin": "6.19.0",
         "@typescript-eslint/parser": "6.19.0",
-        "autoprefixer": "10.4.16",
+        "autoprefixer": "10.4.17",
         "dotenv": "16.3.1",
         "eslint": "8.56.0",
         "eslint-config-prettier": "9.1.0",
@@ -38,7 +38,7 @@
         "typescript": "5.3.3"
     },
     "dependencies": {
-        "firebase": "10.7.1"
+        "firebase": "10.7.2"
     },
     "private": true,
     "engines": {
@@ -46,7 +46,7 @@
     },
     "pnpm": {
         "overrides": {
-            "vite": "5.0.11"
+            "vite": "5.1.0-beta.1"
         }
     }
 }
