@@ -19,6 +19,7 @@ export interface OrganisationSettings {
         reservationConfirmedColor: string;
         reservationCancelledColor: string;
         reservationPendingColor: string;
+        reservationWaitingForResponseColor: string;
     };
     guest: {
         collectGuestData: boolean;

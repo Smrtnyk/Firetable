@@ -16,15 +16,18 @@ const authStore = useAuthStore();
 const props = defineProps<Props>();
 const emit = defineEmits<{
     (e: "delete" | "edit" | "transfer" | "copy"): void;
-    (e: "arrived" | "reservationConfirmed" | "cancel", value: boolean): void;
+    (e: "arrived" | "reservationConfirmed" | "cancel" | "waitingForResponse", value: boolean): void;
 }>();
 const { t } = useI18n();
 const isGuestArrived = ref<boolean>(props.reservation.arrived);
 const isCancelled = ref<boolean>(
     isPlannedReservation(props.reservation) && props.reservation.cancelled,
 );
-const reservationConfirmed = ref<boolean>(
+const reservationConfirmed = ref(
     isPlannedReservation(props.reservation) && props.reservation.reservationConfirmed,
+);
+const waitingForResponse = ref(
+    isPlannedReservation(props.reservation) && !!props.reservation.waitingForResponse,
 );
 const canDeleteReservation = computed(() => {
     return (
@@ -57,6 +60,11 @@ function onReservationConfirmed(): void {
     emit("reservationConfirmed", !reservationConfirmed.value);
     reservationConfirmed.value = !reservationConfirmed.value;
 }
+
+function onWaitingForResponse(): void {
+    emit("waitingForResponse", !waitingForResponse.value);
+    waitingForResponse.value = !waitingForResponse.value;
+}
 </script>
 
 <template>
@@ -65,36 +73,62 @@ function onReservationConfirmed(): void {
     <q-card-section>
         <ReservationGeneralInfo :reservation="props.reservation" />
 
-        <template v-if="!isCancelled && isPlannedReservation(props.reservation)">
-            <q-separator />
-            <!-- reservation confirmed -->
-            <q-item
-                v-if="authStore.canConfirmReservation && !isGuestArrived"
-                tag="label"
-                class="q-pa-none"
-            >
-                <q-item-section>
-                    <q-item-label>
-                        {{ t("EventShowReservation.reservationConfirmedLabel") }}
-                    </q-item-label>
-                </q-item-section>
-                <q-item-section avatar>
-                    <q-toggle
-                        :model-value="reservationConfirmed"
-                        @update:model-value="onReservationConfirmed"
-                        size="lg"
-                        unchecked-icon="close"
-                        checked-icon="check"
-                        color="primary"
-                        v-close-popup
-                    />
-                </q-item-section>
-            </q-item>
+        <template
+            v-if="
+                !isCancelled &&
+                isPlannedReservation(props.reservation) &&
+                authStore.canConfirmReservation
+            "
+        >
+            <template v-if="!isGuestArrived && !reservationConfirmed">
+                <q-separator />
+                <!-- waiting for response -->
+                <q-item tag="label" class="q-pa-none">
+                    <q-item-section>
+                        <q-item-label>
+                            {{ t("EventShowReservation.waitingForResponse") }}
+                        </q-item-label>
+                    </q-item-section>
+                    <q-item-section avatar>
+                        <q-toggle
+                            :model-value="waitingForResponse"
+                            @update:model-value="onWaitingForResponse"
+                            size="lg"
+                            unchecked-icon="close"
+                            checked-icon="check"
+                            color="yellow"
+                            v-close-popup
+                        />
+                    </q-item-section>
+                </q-item>
+            </template>
 
-            <q-separator class="q-ma-none" />
+            <!-- reservation confirmed -->
+            <template v-if="!isGuestArrived">
+                <q-separator />
+                <q-item tag="label" class="q-pa-none">
+                    <q-item-section>
+                        <q-item-label>
+                            {{ t("EventShowReservation.reservationConfirmedLabel") }}
+                        </q-item-label>
+                    </q-item-section>
+                    <q-item-section avatar>
+                        <q-toggle
+                            :model-value="reservationConfirmed"
+                            @update:model-value="onReservationConfirmed"
+                            size="lg"
+                            unchecked-icon="close"
+                            checked-icon="check"
+                            color="primary"
+                            v-close-popup
+                        />
+                    </q-item-section>
+                </q-item>
+            </template>
 
             <!-- guest arrived -->
-            <q-item v-if="authStore.canConfirmReservation" tag="label" class="q-pa-none">
+            <q-separator class="q-ma-none" />
+            <q-item tag="label" class="q-pa-none">
                 <q-item-section>
                     <q-item-label>
                         {{ t("EventShowReservation.guestArrivedLabel") }}

@@ -76,6 +76,7 @@ export default {
         reservationConsumption: "Consumption",
         timeLabel: "Time of arrival",
         cancel: "Cancel",
+        waitingForResponse: "Waiting for response",
     },
     EventCreateReservation: {
         title: "Table",

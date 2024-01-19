@@ -28,6 +28,7 @@ export const DEFAULT_ORGANISATION_SETTINGS: DeepRequired<OrganisationSettings> =
         reservationConfirmedColor: "#6247aa",
         reservationCancelledColor: "#ff9f43",
         reservationPendingColor: "#2ab7ca",
+        reservationWaitingForResponseColor: "#b5a22c",
     },
     property: {
         propertyCardAspectRatio: "1",

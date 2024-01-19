@@ -47,6 +47,10 @@ const colorsSettings = [
         title: "Reservation cancelled color",
         key: "reservationCancelledColor",
     },
+    {
+        title: "Reservation waiting for response color",
+        key: "reservationWaitingForResponseColor",
+    },
 ];
 
 function reset(): void {

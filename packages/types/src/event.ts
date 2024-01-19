@@ -95,6 +95,7 @@ export interface PlannedReservation extends BaseReservation {
     reservationConfirmed: boolean;
     cancelled: boolean;
     arrived: boolean;
+    waitingForResponse?: boolean;
     consumption: number;
     guestName: string;
     reservedBy: UserIdentifier;

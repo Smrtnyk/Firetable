@@ -151,12 +151,14 @@ export function useReservations(
             reservationCancelledColor,
             reservationPendingColor,
             reservationConfirmedColor,
+            reservationWaitingForResponseColor,
         } = settings.value.event;
         const fill = determineTableColor(reservation, {
             reservationArrivedColor,
             reservationCancelledColor,
             reservationConfirmedColor,
             reservationPendingColor,
+            reservationWaitingForResponseColor,
         });
         if (fill) {
             table.setFill(fill);
@@ -339,7 +341,19 @@ export function useReservations(
                         }
                         onGuestArrived(reservation, val).catch(showErrorMessage);
                     },
-                    reservationConfirmed: reservationConfirmed(reservation),
+                    waitingForResponse(val: boolean) {
+                        if (!isPlannedReservation(reservation)) {
+                            return;
+                        }
+
+                        reservationWaitingForResponse(val, reservation).catch(showErrorMessage);
+                    },
+                    reservationConfirmed(val: boolean) {
+                        if (!isPlannedReservation(reservation)) {
+                            return;
+                        }
+                        reservationConfirmed(val, reservation).catch(showErrorMessage);
+                    },
                     cancel(val: boolean) {
                         if (!isPlannedReservation(reservation)) {
                             return;
@@ -369,16 +383,29 @@ export function useReservations(
         });
     }
 
-    function reservationConfirmed(reservation: ReservationDoc) {
-        return function (val: boolean) {
-            return tryCatchLoadingWrapper({
-                hook: () =>
-                    updateReservationDoc(eventOwner, {
-                        id: reservation.id,
-                        reservationConfirmed: val,
-                    }),
-            });
-        };
+    function reservationConfirmed(val: boolean, reservation: PlannedReservationDoc): Promise<void> {
+        return tryCatchLoadingWrapper({
+            hook: () =>
+                updateReservationDoc(eventOwner, {
+                    id: reservation.id,
+                    reservationConfirmed: val,
+                    waitingForResponse: false,
+                }),
+        });
+    }
+
+    function reservationWaitingForResponse(
+        val: boolean,
+        reservation: ReservationDoc,
+    ): Promise<void> {
+        return tryCatchLoadingWrapper({
+            hook: () =>
+                updateReservationDoc(eventOwner, {
+                    id: reservation.id,
+                    waitingForResponse: val,
+                    reservationConfirmed: false,
+                }),
+        });
     }
 
     function onReservationCancelled(
