@@ -131,10 +131,9 @@ function setAppLanguage(val: string): void {
     <q-drawer
         :model-value="appStore.showAppDrawer"
         @update:model-value="appStore.toggleAppDrawerVisibility"
-        elevated
         side="right"
-        overlay
         behavior="mobile"
+        bordered
     >
         <q-list>
             <q-item header class="column items-center q-pt-xl q-pb-lg" v-if="user">
