@@ -46,7 +46,7 @@
     },
     "pnpm": {
         "overrides": {
-            "vite": "5.1.0-beta.1"
+            "vite": "5.1.0-beta.2"
         }
     }
 }
