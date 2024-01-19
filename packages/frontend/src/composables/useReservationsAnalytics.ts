@@ -203,7 +203,7 @@ export function useReservationsAnalytics(
         const hourlyTotals: Record<string, number> = {};
 
         plannedReservationsByActiveProperty.value.forEach((reservation) => {
-            const hour = reservation.time.split(":")[0]; // Assuming 'time' is like "14:00"
+            const hour = reservation.time.split(":")[0];
             hourlyTotals[hour] = (hourlyTotals[hour] || 0) + 1;
         });
 

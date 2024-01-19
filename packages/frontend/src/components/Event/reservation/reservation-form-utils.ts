@@ -25,7 +25,6 @@ export function getReservationTimeOptions(
         eventEnd.getUTCHours() + eventEnd.getUTCMinutes() / 60 <
         eventStart.getUTCHours() + eventStart.getUTCMinutes() / 60;
 
-    // Adjust the current time to the next day if needed
     if (spansAcrossMidnight && currentTime < eventStart) {
         currentTime.setUTCDate(currentTime.getUTCDate() + 1);
     }

@@ -28,7 +28,6 @@ describe("GridDrawer", () => {
             gridDrawer.toggleGridVisibility(1000, 1000);
             // @ts-expect-error -- private prop
             expect(gridDrawer.isGridVisible).toBe(false);
-            // Assuming that drawing the grid adds exactly one object (the grid group)
             expect(canvas.getObjects().length).toBe(0);
 
             gridDrawer.toggleGridVisibility(1000, 1000);

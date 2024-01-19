@@ -36,7 +36,6 @@ describe("Table Management Functions", () => {
         });
 
         it("should return true when there are tables on the floor", () => {
-            // Assuming floor has a method to add tables, adjust as needed
             floor.addElement({
                 tag: FloorElementTypes.RECT_TABLE,
                 x: 1,
