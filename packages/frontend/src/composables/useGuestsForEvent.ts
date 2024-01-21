@@ -34,7 +34,7 @@ export function useGuestsForEvent(eventOwner: EventOwner, reservations: Ref<Rese
     const returningGuests = computed(() => {
         return data.value
             .map((guest) => {
-                const currentPropertyVisits = guest.visitedProperties[eventOwner.propertyId] || {};
+                const currentPropertyVisits = guest.visitedProperties[eventOwner.propertyId] ?? {};
 
                 // Filter out the visits for the current event and create a new visits array
                 // and filter out the visits where the guest has not arrived
