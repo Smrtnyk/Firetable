@@ -371,6 +371,7 @@ export function useReservations(
                 await updateReservationDoc(eventOwner, {
                     id: reservation.id,
                     arrived: val,
+                    waitingForResponse: false,
                 });
                 handleGuestDataForReservation(
                     {
@@ -417,6 +418,7 @@ export function useReservations(
                 await updateReservationDoc(eventOwner, {
                     id: reservation.id,
                     cancelled: val,
+                    waitingForResponse: false,
                 });
                 handleGuestDataForReservation(
                     {
