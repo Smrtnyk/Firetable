@@ -20,8 +20,8 @@
     },
     "devDependencies": {
         "@regru/eslint-plugin-prefer-early-return": "1.0.0",
-        "@typescript-eslint/eslint-plugin": "6.19.0",
-        "@typescript-eslint/parser": "6.19.0",
+        "@typescript-eslint/eslint-plugin": "6.20.0",
+        "@typescript-eslint/parser": "6.20.0",
         "eslint": "8.56.0",
         "eslint-config-prettier": "9.1.0",
         "eslint-plugin-import": "2.29.1",
@@ -30,10 +30,10 @@
         "eslint-plugin-quasar": "1.1.0",
         "eslint-plugin-unicorn": "50.0.1",
         "eslint-plugin-vue": "9.20.1",
-        "firebase-tools": "13.0.3",
+        "firebase-tools": "13.1.0",
         "prettier": "3.2.4",
         "ts-node": "10.9.2",
-        "typescript": "5.4.0-dev.20240120"
+        "typescript": "5.4.0-beta"
     },
     "dependencies": {
         "firebase": "10.7.2"
