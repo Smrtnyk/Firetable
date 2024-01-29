@@ -22,7 +22,7 @@ interface CircleTableElementOptions {
 
 // @ts-expect-error -- not sure why this is an error
 export class RoundTable extends Table {
-    static override type = FloorElementTypes.ROUND_TABLE;
+    static override readonly type = FloorElementTypes.ROUND_TABLE;
 
     constructor(options: CircleTableElementOptions) {
         const tableCircle = new Circle({

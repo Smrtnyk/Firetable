@@ -10,7 +10,7 @@ type WalLGroupCreationOptions = {
 } & Partial<GroupProps>;
 
 export class Wall extends Group {
-    static override type = FloorElementTypes.WALL;
+    static override readonly type = FloorElementTypes.WALL;
     wallRect: Rect;
 
     constructor(groupOpts: WalLGroupCreationOptions, wallRectOpts: WallCreationOptions = {}) {

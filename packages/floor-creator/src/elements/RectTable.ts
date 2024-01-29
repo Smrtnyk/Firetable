@@ -23,7 +23,7 @@ interface RectTableElementOptions {
 
 // @ts-expect-error -- not sure why this is an error
 export class RectTable extends Table {
-    static override type = FloorElementTypes.RECT_TABLE;
+    static override readonly type = FloorElementTypes.RECT_TABLE;
 
     constructor(options: RectTableElementOptions) {
         const tableRect = new Rect({

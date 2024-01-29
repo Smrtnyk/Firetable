@@ -10,7 +10,7 @@ type SofaGroupCreationOpts = {
 } & Partial<GroupProps>;
 
 export class Sofa extends Group {
-    static override type = FloorElementTypes.SOFA;
+    static override readonly type = FloorElementTypes.SOFA;
     sofaBase: Rect;
 
     constructor(sofaGroupOpts: SofaGroupCreationOpts) {
