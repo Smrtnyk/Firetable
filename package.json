@@ -29,14 +29,14 @@
         "eslint-plugin-promise": "6.1.1",
         "eslint-plugin-quasar": "1.1.0",
         "eslint-plugin-unicorn": "50.0.1",
-        "eslint-plugin-vue": "9.20.1",
+        "eslint-plugin-vue": "9.21.1",
         "firebase-tools": "13.1.0",
         "prettier": "3.2.4",
         "ts-node": "10.9.2",
         "typescript": "5.4.0-beta"
     },
     "dependencies": {
-        "firebase": "10.7.2"
+        "firebase": "10.8.0"
     },
     "private": true,
     "engines": {
