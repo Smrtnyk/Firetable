@@ -1,4 +1,4 @@
-import { Group, Rect, FabricText, Circle } from "fabric";
+import { Group, Rect, FabricText, Circle } from "fabric/es";
 
 export class Stage extends Group {
     constructor(left: number, top: number) {

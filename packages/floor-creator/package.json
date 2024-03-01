@@ -16,16 +16,16 @@
         "find-dead-code": "npx ts-prune -p tsconfig.json --ignore 'src/index.ts|dist'"
     },
     "dependencies": {
-        "fabric": "6.0.0-beta18",
+        "fabric": "6.0.0-beta19",
         "hammerjs": "2.0.8",
-        "ts-pattern": "5.0.6"
+        "ts-pattern": "5.0.8"
     },
     "devDependencies": {
         "@firetable/utils": "workspace:*",
         "@types/hammerjs": "2.0.45",
-        "@vitest/browser": "1.2.2",
-        "vitest": "1.2.2",
-        "webdriverio": "8.29.7"
+        "@vitest/browser": "1.3.1",
+        "vitest": "1.3.1",
+        "webdriverio": "8.32.3"
     },
     "keywords": ["floor", "planner", "fabric", "typescript"],
     "author": "",

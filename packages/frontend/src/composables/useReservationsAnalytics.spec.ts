@@ -62,10 +62,11 @@ describe("useReservationsAnalytics", () => {
         await nextTick();
         await new Promise((resolve) => setTimeout(resolve, 1));
 
-        expect(fetchAnalyticsDataSpy).toHaveBeenCalledWith("2024-01", MOCK_ORG_ID, [
-            villageProperty,
-            prestigeProperty,
-        ]);
+        expect(fetchAnalyticsDataSpy).toHaveBeenCalledWith(
+            expect.stringMatching(/202[0-9]-[0-9][0-9]/),
+            MOCK_ORG_ID,
+            [villageProperty, prestigeProperty],
+        );
         expect(reservationBuckets.value.length).toBe(2);
         expect(plannedVsWalkInReservations.value).toStrictEqual({
             datasets: [

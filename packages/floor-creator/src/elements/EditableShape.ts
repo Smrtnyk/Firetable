@@ -1,6 +1,6 @@
-import type { CircleProps, FabricObject, GroupProps, RectProps } from "fabric";
+import type { CircleProps, FabricObject, GroupProps, RectProps } from "fabric/es";
 import { FONT_SIZE, TABLE_TEXT_FILL_COLOR } from "../constants.js";
-import { classRegistry, Group, Rect, Circle, IText } from "fabric";
+import { classRegistry, Group, Rect, Circle, IText } from "fabric/es";
 
 type Editable = "rect" | "circle";
 

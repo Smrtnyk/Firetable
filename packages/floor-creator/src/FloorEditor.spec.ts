@@ -6,7 +6,7 @@ import { GridDrawer } from "./GridDrawer.js";
 import { isTable } from "./type-guards.js";
 import { RectTable } from "./elements/RectTable.js";
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { Group, Rect } from "fabric";
+import { Group, Rect } from "fabric/es";
 
 describe("FloorEditor", () => {
     let floorEditor: FloorEditor;

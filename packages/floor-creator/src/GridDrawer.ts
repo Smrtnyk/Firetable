@@ -1,6 +1,6 @@
-import type { Canvas } from "fabric";
+import type { Canvas } from "fabric/es";
 import { RESOLUTION } from "./constants.js";
-import { Line, Group } from "fabric";
+import { Line, Group } from "fabric/es";
 import { propIsTruthy } from "@firetable/utils";
 
 export class GridDrawer {

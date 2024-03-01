@@ -1,4 +1,4 @@
-import type { FabricObject } from "fabric";
+import type { FabricObject } from "fabric/es";
 import type { BaseTable, FloorCreationOptions, FloorData } from "./types.js";
 import type { EventManager } from "./event-manager/EventManager.js";
 import type { EventEmitterListener } from "./event-emitter/EventEmitter.js";
@@ -12,7 +12,7 @@ import { RectTable } from "./elements/RectTable.js";
 import { Sofa } from "./elements/Sofa.js";
 import { Wall } from "./elements/Wall.js";
 import { RoundTable } from "./elements/RoundTable.js";
-import { Canvas, classRegistry } from "fabric";
+import { Canvas, classRegistry } from "fabric/es";
 
 classRegistry.setClass(RectTable);
 classRegistry.setClass(RoundTable);

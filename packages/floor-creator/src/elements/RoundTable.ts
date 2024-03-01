@@ -1,4 +1,4 @@
-import type { GroupProps } from "fabric";
+import type { GroupProps } from "fabric/es";
 import { Table } from "./Table.js";
 import {
     ELEMENT_DEFAULT_FILL_COLOR,
@@ -7,7 +7,7 @@ import {
     TABLE_TEXT_FILL_COLOR,
 } from "../constants.js";
 import { FloorElementTypes } from "../types.js";
-import { Circle, FabricText } from "fabric";
+import { Circle, FabricText } from "fabric/es";
 
 interface CircleTableElementOptions {
     groupOptions: {

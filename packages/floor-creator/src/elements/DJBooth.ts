@@ -1,4 +1,4 @@
-import { Circle, Group, Rect, FabricText } from "fabric";
+import { Circle, Group, Rect, FabricText } from "fabric/es";
 
 export class DJBooth extends Group {
     constructor(left: number, top: number) {

@@ -1,5 +1,5 @@
 import type { AnimationStrategy } from "./AnimationStrategy.js";
-import type { FabricObject } from "fabric";
+import type { FabricObject } from "fabric/es";
 import { NOOP } from "@firetable/utils";
 
 const ANIMATION_DURATION = 500;

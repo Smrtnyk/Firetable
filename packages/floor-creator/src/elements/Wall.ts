@@ -1,7 +1,7 @@
-import type { GroupProps } from "fabric";
+import type { GroupProps } from "fabric/es";
 import { FloorElementTypes } from "../types.js";
 import { ELEMENT_DEFAULT_FILL_COLOR } from "../constants.js";
-import { Group, LayoutManager, Rect } from "fabric";
+import { Group, LayoutManager, Rect } from "fabric/es";
 
 type WallCreationOptions = Record<string, unknown>;
 type WalLGroupCreationOptions = {

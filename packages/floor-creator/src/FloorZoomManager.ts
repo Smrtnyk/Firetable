@@ -1,4 +1,4 @@
-import type { Canvas, Point } from "fabric";
+import type { Canvas, Point } from "fabric/es";
 import type { Floor } from "./Floor.js";
 import { DEFAULT_ZOOM, ZOOM_INCREMENT } from "./constants.js";
 

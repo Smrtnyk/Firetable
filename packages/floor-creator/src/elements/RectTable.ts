@@ -1,4 +1,4 @@
-import type { GroupProps } from "fabric";
+import type { GroupProps } from "fabric/es";
 import { Table } from "./Table.js";
 import {
     FONT_SIZE,
@@ -8,7 +8,7 @@ import {
     ELEMENT_DEFAULT_STROKE_WIDTH,
 } from "../constants.js";
 import { FloorElementTypes } from "../types.js";
-import { Rect, FabricText } from "fabric";
+import { Rect, FabricText } from "fabric/es";
 
 interface RectTableElementOptions {
     groupOptions: {
