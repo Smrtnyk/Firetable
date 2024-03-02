@@ -54,7 +54,7 @@ const tableColumns = [
     { name: "arrived", label: "Arrived", field: "arrived", sortable: true },
     { name: "pending", label: "Pending", field: "pending", sortable: true },
     { name: "total", label: "Total", field: "total", sortable: true },
-];
+] as any;
 
 const props = defineProps<Props>();
 
