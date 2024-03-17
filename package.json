@@ -20,8 +20,8 @@
     },
     "devDependencies": {
         "@regru/eslint-plugin-prefer-early-return": "1.0.0",
-        "@typescript-eslint/eslint-plugin": "7.1.0",
-        "@typescript-eslint/parser": "7.1.0",
+        "@typescript-eslint/eslint-plugin": "7.2.0",
+        "@typescript-eslint/parser": "7.2.0",
         "eslint": "8.57.0",
         "eslint-config-prettier": "9.1.0",
         "eslint-plugin-import": "2.29.1",
@@ -29,14 +29,14 @@
         "eslint-plugin-promise": "6.1.1",
         "eslint-plugin-quasar": "1.1.0",
         "eslint-plugin-unicorn": "51.0.1",
-        "eslint-plugin-vue": "9.22.0",
-        "firebase-tools": "13.4.0",
+        "eslint-plugin-vue": "9.23.0",
+        "firebase-tools": "13.5.1",
         "prettier": "3.2.5",
         "ts-node": "10.9.2",
-        "typescript": "5.4.0-beta"
+        "typescript": "5.4.2"
     },
     "dependencies": {
-        "firebase": "10.8.1"
+        "firebase": "10.9.0"
     },
     "private": true,
     "engines": {
@@ -44,7 +44,7 @@
     },
     "pnpm": {
         "overrides": {
-            "vite": "5.1.0-beta.5"
+            "vite": "5.2.0-beta.1"
         }
     }
 }
