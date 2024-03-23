@@ -9,13 +9,7 @@ export default defineConfig({
             enabled: true,
             headless: true,
             name: "chrome",
-        },
-        deps: {
-            optimizer: {
-                web: {
-                    include: ["@firetable/types", "@firetable/utils"],
-                },
-            },
+            provider: "webdriverio",
         },
     },
 });

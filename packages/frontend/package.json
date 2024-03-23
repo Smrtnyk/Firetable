@@ -17,38 +17,34 @@
         "test": "vitest"
     },
     "devDependencies": {
-        "@playwright/test": "1.42.1",
-        "@quasar/app-vite": "2.0.0-beta.5",
-        "@vitejs/plugin-vue": "5.0.4",
-        "@vitest/browser": "1.4.0",
-        "@vue/test-utils": "2.4.5",
+        "@playwright/test": "1.45.1",
+        "@quasar/app-vite": "2.0.0-beta.15",
+        "@vitejs/plugin-vue": "5.0.5",
+        "@vitest/browser": "catalog:",
+        "@vue/test-utils": "2.4.6",
         "vite-tsconfig-paths": "4.3.2",
-        "vitest": "1.4.0",
-        "vue-tsc": "2.0.6"
+        "vitest": "catalog:",
+        "vue-tsc": "2.0.26"
     },
     "dependencies": {
         "@firetable/backend": "workspace:*",
         "@firetable/floor-creator": "workspace:*",
         "@firetable/types": "workspace:*",
         "@firetable/utils": "workspace:*",
-        "@quasar/extras": "1.16.9",
+        "@quasar/extras": "1.16.12",
         "@types/pako": "2.0.3",
-        "chart.js": "4.4.2",
-        "date-fns": "3.5.0",
+        "chart.js": "4.4.3",
+        "date-fns": "3.6.0",
         "pako": "2.1.0",
         "pinia": "2.1.7",
-        "quasar": "2.15.1",
+        "quasar": "2.16.6",
         "register-service-worker": "1.7.2",
-        "ts-pattern": "5.0.8",
-        "vue": "3.4.21",
-        "vue-i18n": "9.10.2",
-        "vue-router": "4.3.0",
+        "ts-pattern": "catalog:",
+        "vue": "3.4.31",
+        "vue-i18n": "9.13.1",
+        "vue-router": "4.4.0",
         "vuefire": "3.1.23",
-        "workbox-core": "7.0.0",
-        "workbox-build": "7.0.0"
-    },
-    "engines": {
-        "node": ">= 20.10.0",
-        "pnpm": ">= 8.11.0"
+        "workbox-core": "7.1.0",
+        "workbox-build": "7.1.1"
     }
 }

@@ -101,7 +101,7 @@ export abstract class Table extends Group {
         this.canvas?.requestRenderAll();
     }
 
-    // @ts-expect-error -- ok
+    // @ts-expect-error -- seems like having proper return type here is a bit tricky
     toObject(): Record<string, unknown> {
         return {
             ...super.toObject(),

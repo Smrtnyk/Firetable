@@ -96,7 +96,7 @@ export abstract class Floor {
             return;
         }
         this.canvas
-            // @ts-expect-error -- ok
+            // @ts-expect-error -- figure this out, our type might not be accurate
             .loadFromJSON(jsonData, this.elementReviver)
             .then(() => {
                 this.emit("rendered");

@@ -16,7 +16,7 @@ export default defineConfig({
             enabled: true,
             headless: true,
             name: "chrome",
-            slowHijackESM: true,
+            provider: "webdriverio",
         },
     },
 });

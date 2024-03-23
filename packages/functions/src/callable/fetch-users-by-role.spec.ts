@@ -7,6 +7,8 @@ import { MockFieldPath, MockFirestore } from "../../test-helpers/MockFirestore.j
 import * as Firestore from "firebase-admin/firestore";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+vi.mock("firebase-admin/firestore");
+
 describe("fetchUsersByRoleFn", () => {
     let mockFirestore: MockFirestore;
 

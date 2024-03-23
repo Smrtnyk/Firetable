@@ -9,6 +9,8 @@ import { getPropertyPath, getUserPath } from "../paths.js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as Firestore from "firebase-admin/firestore";
 
+vi.mock("firebase-admin/firestore");
+
 let mockAuth: MockAuth;
 let mockFirestore: MockFirestore;
 

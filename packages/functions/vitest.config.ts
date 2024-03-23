@@ -8,8 +8,5 @@ export default defineConfig({
         clearMocks: true,
         reporters: ["basic"],
         watch: false,
-        deps: {
-            interopDefault: true,
-        },
     },
 });

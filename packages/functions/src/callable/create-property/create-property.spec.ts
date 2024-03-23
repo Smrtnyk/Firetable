@@ -4,7 +4,9 @@ import { MockFieldValue, MockFirestore } from "../../../test-helpers/MockFiresto
 import * as Init from "../../init.js";
 import { getPropertyPath, getUserPath } from "../../paths.js";
 import * as Firestore from "firebase-admin/firestore";
-import { beforeEach, vi } from "vitest";
+import { beforeEach, vi, describe, expect, it } from "vitest";
+
+vi.mock("firebase-admin/firestore");
 
 describe("createPropertyFn", () => {
     let mockFirestore: MockFirestore;
@@ -19,6 +21,7 @@ describe("createPropertyFn", () => {
 
     beforeEach(() => {
         mockFirestore = new MockFirestore();
+
         vi.spyOn(Init, "db", "get").mockReturnValue(mockFirestore as any);
         vi.spyOn(Firestore, "FieldValue", "get").mockReturnValue(MockFieldValue as any);
     });
