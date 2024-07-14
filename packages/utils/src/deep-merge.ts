@@ -23,7 +23,7 @@ export function deepMerge<T extends Record<string, unknown>>(
         result[key] =
             isObject(value) && isObject(partialValue)
                 ? deepMerge(value, partialValue)
-                : partialValue ?? value;
+                : (partialValue ?? value);
     }
 
     // Add new properties from the partial object that are not in the default object

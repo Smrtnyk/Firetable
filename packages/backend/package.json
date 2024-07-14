@@ -16,6 +16,9 @@
         "@firetable/floor-creator": "workspace:*",
         "@firetable/utils": "workspace:*"
     },
+    "dependencies": {
+        "firebase": "catalog:"
+    },
     "keywords": [],
     "author": "",
     "license": "ISC"

@@ -4,3 +4,4 @@ catalog:
     vitest: 2.0.2
     '@vitest/browser': 2.0.2
     'ts-pattern': 5.2.0
+    firebase: "10.12.3"

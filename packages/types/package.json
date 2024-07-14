@@ -13,6 +13,9 @@
         "lint": "eslint . --ext .ts",
         "build": "tsc"
     },
+    "dependencies": {
+        "firebase": "catalog:"
+    },
     "keywords": [],
     "author": "",
     "license": "ISC"
