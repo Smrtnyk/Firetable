@@ -37,7 +37,7 @@
         "eslint-plugin-quasar": "1.1.0",
         "eslint-plugin-unicorn": "54.0.0",
         "eslint-plugin-vue": "9.27.0",
-        "firebase-tools": "13.13.2",
+        "firebase-tools": "13.13.3",
         "prettier": "3.3.3",
         "typescript": "5.5.3"
     },
