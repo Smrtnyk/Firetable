@@ -8,8 +8,7 @@
         "./types": "./dist/src/firebase/index.d.ts"
     },
     "scripts": {
-        "build": "tsc",
-        "lint": "eslint . --ext .ts"
+        "build": "tsc"
     },
     "devDependencies": {
         "@firetable/types": "workspace:*",

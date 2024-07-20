@@ -11,8 +11,7 @@
     },
     "scripts": {
         "test": "vitest",
-        "build": "tsc",
-        "lint": "eslint ./src --ext .ts"
+        "build": "tsc"
     },
     "keywords": [],
     "author": "",

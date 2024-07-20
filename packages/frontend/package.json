@@ -7,7 +7,6 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "lint": "eslint . --ext .ts,.vue",
         "dev": "quasar dev",
         "dev:pwa": "quasar dev -m pwa",
         "build:spa": "quasar build",

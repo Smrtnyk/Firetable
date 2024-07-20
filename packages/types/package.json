@@ -10,7 +10,6 @@
         }
     },
     "scripts": {
-        "lint": "eslint --cache .",
         "build": "tsc"
     },
     "dependencies": {
