@@ -1,0 +1,40 @@
+{
+    "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "NodeNext",
+        "noEmit": true,
+        "target": "ESNext",
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
+        "allowSyntheticDefaultImports": true,
+        "lib": ["ESNext"],
+        "strict": true,
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "strictFunctionTypes": true,
+        "strictBindCallApply": true,
+        "strictPropertyInitialization": true,
+        "noImplicitThis": true,
+        "useUnknownInCatchVariables": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "exactOptionalPropertyTypes": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUncheckedIndexedAccess": true,
+        "noImplicitOverride": true
+    },
+    "include": [
+        "eslint.config.js",
+        "packages/*/src",
+        "packages/*/test-helpers",
+        "packages/frontend/src-pwa",
+        "packages/frontend/quasar.config.ts",
+    ],
+    "exclude": [
+        "node_modules",
+        "lib",
+        "dist",
+    ]
+}

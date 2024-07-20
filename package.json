@@ -1,6 +1,7 @@
 {
     "name": "firetable",
     "description": "Events and reservations management system for gastronomic events",
+    "type": "module",
     "keywords": [
         "vue",
         "typescript",
@@ -22,14 +23,12 @@
         "build:frontend:pwa": "pnpm --filter frontend build:pwa",
         "build:functions": "pnpm --filter functions build",
         "test": "pnpm -r test",
-        "lint": "pnpm -r lint",
+        "lint": "eslint .",
         "build": "pnpm -r build"
     },
     "devDependencies": {
         "@regru/eslint-plugin-prefer-early-return": "1.0.0",
-        "@typescript-eslint/eslint-plugin": "7.16.1",
-        "@typescript-eslint/parser": "7.16.1",
-        "eslint": "8.57.0",
+        "eslint": "9.7.0",
         "eslint-config-prettier": "9.1.0",
         "eslint-plugin-import-x": "3.0.1",
         "eslint-plugin-prettier": "5.2.1",
@@ -38,12 +37,25 @@
         "eslint-plugin-unicorn": "54.0.0",
         "eslint-plugin-vue": "9.27.0",
         "firebase-tools": "13.13.3",
+        "globals": "15.8.0",
         "prettier": "3.3.3",
-        "typescript": "5.5.3"
+        "typescript": "5.5.3",
+        "typescript-eslint": "7.16.1"
     },
     "private": true,
     "engines": {
         "node": ">= 20.10.0",
         "pnpm": ">= 9.5.0"
+    },
+    "pnpm": {
+        "peerDependencyRules": {
+            "allowedVersions": {
+                "typescript-eslint>eslint": "^9.0.0",
+                "@typescript-eslint/eslint-plugin>eslint": "^9.0.0",
+                "@typescript-eslint/parser>eslint": "^9.0.0",
+                "@typescript-eslint/type-utils>eslint": "^9.0.0",
+                "@typescript-eslint/utils>eslint": "^9.0.0"
+            }
+        }
     }
 }

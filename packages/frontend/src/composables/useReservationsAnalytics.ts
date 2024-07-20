@@ -204,7 +204,7 @@ export function useReservationsAnalytics(
 
         plannedReservationsByActiveProperty.value.forEach((reservation) => {
             const hour = reservation.time.split(":")[0];
-            hourlyTotals[hour] = (hourlyTotals[hour] || 0) + 1;
+            hourlyTotals[hour] = (hourlyTotals[hour] ?? 0) + 1;
         });
 
         const sortedHours = Object.keys(hourlyTotals).sort(
@@ -233,7 +233,7 @@ export function useReservationsAnalytics(
 
         plannedReservationsByActiveProperty.value.forEach(({ numberOfGuests }) => {
             const key = numberOfGuests.toString();
-            distribution[key] = (distribution[key] || 0) + 1;
+            distribution[key] = (distribution[key] ?? 0) + 1;
         });
 
         const labels = Object.keys(distribution).sort();
@@ -263,12 +263,12 @@ export function useReservationsAnalytics(
             const localDate = new Date(utcDate.getTime() + utcDate.getTimezoneOffset() * 60000);
             const dayOfWeek = format(localDate, "EEEE");
 
-            dayOfWeekTotals[dayOfWeek] = (dayOfWeekTotals[dayOfWeek] || 0) + 1;
+            dayOfWeekTotals[dayOfWeek] = (dayOfWeekTotals[dayOfWeek] ?? 0) + 1;
         });
 
         const { backgroundColors, borderColors } = getColors(DAYS_OF_WEEK.length);
 
-        const data = DAYS_OF_WEEK.map((day) => dayOfWeekTotals[day] || 0);
+        const data = DAYS_OF_WEEK.map((day) => dayOfWeekTotals[day] ?? 0);
         return {
             labels: DAYS_OF_WEEK,
             datasets: [

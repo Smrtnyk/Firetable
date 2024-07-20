@@ -4,8 +4,9 @@
         "types": ["vitest/globals"]
     },
     "include": [
-        "src/**/*.ts",
-        "test-helpers/**/*.ts",
+        "**/*.spec.ts",
+        "./src/**/*.ts",
+        "./test-helpers/**/*.ts",
         "vitest.config.ts"
     ],
     "exclude": [

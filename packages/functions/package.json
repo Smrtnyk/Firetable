@@ -4,7 +4,7 @@
     "main": "lib/src/index.js",
     "type": "module",
     "scripts": {
-        "lint": "eslint . --ext .ts",
+        "lint": "eslint --cache .",
         "build": "tsc",
         "test": "vitest",
         "dev": "tsc --watch",
