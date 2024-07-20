@@ -20,8 +20,8 @@ module.exports = {
     extends: [
         "eslint:recommended",
         "plugin:promise/recommended",
-        "plugin:import/recommended",
-        "plugin:import/typescript",
+        "plugin:import-x/recommended",
+        "plugin:import-x/typescript",
         "plugin:@typescript-eslint/strict",
         "plugin:prettier/recommended",
         "prettier",
@@ -138,9 +138,9 @@ module.exports = {
         "eol-last": "error",
         "eqeqeq": ["error", "smart"],
         "guard-for-in": "error",
-        "import/no-unresolved": "off",
-        "import/no-duplicates": "error",
-        "import/order": [
+        "import-x/no-unresolved": "off",
+        "import-x/no-duplicates": "error",
+        "import-x/order": [
             "error",
             {
                 "groups": [
