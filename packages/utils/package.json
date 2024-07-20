@@ -14,8 +14,6 @@
         "build": "tsc"
     },
     "keywords": [],
-    "author": "",
-    "license": "ISC",
     "devDependencies": {
         "@firetable/types": "workspace:*",
         "vitest": "catalog:"

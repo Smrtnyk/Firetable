@@ -26,7 +26,5 @@
         "vitest": "catalog:",
         "webdriverio": "8.39.1"
     },
-    "keywords": ["floor", "planner", "fabric", "typescript"],
-    "author": "",
-    "license": "ISC"
+    "keywords": ["floor", "planner", "fabric", "typescript"]
 }

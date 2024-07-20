@@ -18,7 +18,5 @@
     "dependencies": {
         "firebase": "catalog:"
     },
-    "keywords": [],
-    "author": "",
-    "license": "ISC"
+    "keywords": []
 }
