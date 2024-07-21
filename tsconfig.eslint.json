@@ -26,6 +26,7 @@
         "noImplicitOverride": true
     },
     "include": [
+        "packages/*/vitest.config.ts",
         "eslint.config.js",
         "packages/*/src",
         "packages/*/test-helpers",

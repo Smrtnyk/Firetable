@@ -9,10 +9,8 @@
         "esModuleInterop": true,
     },
     "include": [
-        "quasar.config.ts",
-        "src-pwa/**/*",
-        "vitest.config.ts",
-        "src"
+        "src/**/*.spec.ts",
+        "src/**/*.ts"
     ],
     "exclude": []
 }
