@@ -17,11 +17,11 @@ const compat = new FlatCompat({
 export default tseslint.config(
     eslint.configs.recommended,
     ...tseslint.configs.strict,
-    promise.configs["flat/recommended"],
     ...compat.plugins("@regru/eslint-plugin-prefer-early-return"),
     {
         plugins: {
             "import-x": importX,
+            promise,
             unicorn,
             vue,
         },
@@ -31,6 +31,7 @@ export default tseslint.config(
         rules: {
             ...importX.configs.recommended.rules,
             ...importX.configs.typescript.rules,
+            ...promise.configs["flat/recommended"].rules,
         },
     },
     {
@@ -93,16 +94,9 @@ export default tseslint.config(
             "@typescript-eslint/consistent-type-imports": "error",
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/adjacent-overload-signatures": "error",
-            "@typescript-eslint/ban-types": [
-                "error",
-                {
-                    types: {
-                        "{}": false,
-                        Function: false,
-                        object: false,
-                    },
-                },
-            ],
+            "@typescript-eslint/no-unsafe-function-type": "error",
+            "@typescript-eslint/no-wrapper-object-types": "error",
+            "@typescript-eslint/no-empty-object-type": "error",
             "@typescript-eslint/comma-spacing": ["error"],
             "@typescript-eslint/prefer-nullish-coalescing": "error",
             "@typescript-eslint/consistent-type-assertions": "error",

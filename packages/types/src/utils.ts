@@ -1,14 +1,13 @@
 export type NumberTuple = [number, number];
+export type AnyFunction = (...args: any[]) => any;
 
 export type DeepRequired<T> = {
     [P in keyof T]-?: T[P] extends object
-        ? T[P] extends Function
+        ? T[P] extends AnyFunction
             ? T[P]
             : DeepRequired<T[P]>
         : T[P];
 };
-
-export type AnyFunction = (...args: any[]) => any;
 
 export type DeepPartial<T> = {
     [P in keyof T]?: T[P] extends Record<string, unknown>

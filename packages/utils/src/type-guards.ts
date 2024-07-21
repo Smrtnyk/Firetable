@@ -1,3 +1,5 @@
+import type { AnyFunction } from "@firetable/types";
+
 export function isNumber(candidate: unknown): candidate is number {
     return !Number.isNaN(candidate) && typeof candidate === "number" && Number.isFinite(candidate);
 }
@@ -10,6 +12,6 @@ export function isDefined<T>(candidate: T | undefined | null): candidate is T {
     return candidate !== undefined && candidate !== null;
 }
 
-export function isFunction(candidate: unknown): candidate is Function {
+export function isFunction(candidate: unknown): candidate is AnyFunction {
     return typeof candidate === "function";
 }
