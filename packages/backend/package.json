@@ -8,11 +8,10 @@
         "./types": "./dist/src/firebase/index.d.ts"
     },
     "scripts": {
-        "build": "tsc"
+        "build": "tsc -b"
     },
     "devDependencies": {
         "@firetable/types": "workspace:*",
-        "@firetable/floor-creator": "workspace:*",
         "@firetable/utils": "workspace:*"
     },
     "dependencies": {
