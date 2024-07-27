@@ -15,14 +15,14 @@
         "test": "vitest"
     },
     "devDependencies": {
-        "@playwright/test": "1.45.2",
+        "@playwright/test": "1.45.3",
         "@quasar/app-vite": "2.0.0-beta.15",
-        "@vitejs/plugin-vue": "5.0.5",
+        "@vitejs/plugin-vue": "5.1.0",
         "@vitest/browser": "catalog:",
         "@vue/test-utils": "2.4.6",
         "vite-tsconfig-paths": "4.3.2",
         "vitest": "catalog:",
-        "vue-tsc": "2.0.26"
+        "vue-tsc": "2.0.29"
     },
     "dependencies": {
         "@firetable/backend": "workspace:*",
@@ -35,7 +35,7 @@
         "date-fns": "3.6.0",
         "firebase": "catalog:",
         "pako": "2.1.0",
-        "pinia": "2.1.7",
+        "pinia": "2.2.0",
         "quasar": "2.16.6",
         "register-service-worker": "1.7.2",
         "ts-pattern": "catalog:",
