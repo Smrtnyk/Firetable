@@ -10,8 +10,8 @@ type CollectLineProps = {
 };
 
 type Line = {
-    vLines: { x: number; y1: number; y2: number }[];
-    hLines: { y: number; x1: number; x2: number }[];
+    vLines: VerticalLine[];
+    hLines: HorizontalLine[];
 };
 
 export function collectLine(props: CollectLineProps): Line {
@@ -20,8 +20,8 @@ export function collectLine(props: CollectLineProps): Line {
     const aList = makeLineByRect(activeObjectRect);
     const margin = aligningLineMargin / (activeObject.canvas?.getZoom() ?? 1);
     const opts = { target: activeObject, list, aList, margin };
-    const vLines = collectVerticalLine(opts);
-    const hLines = collectHorizontalLine(opts);
+    const vLines = collectLines(opts, "x", createVerticalLine, setVerticalPos);
+    const hLines = collectLines(opts, "y", createHorizontalLine, setHorizontalPos);
 
     return { vLines, hLines };
 }
@@ -32,19 +32,24 @@ type CollectItemLineProps = {
     aList: LineProps[];
     margin: number;
 };
-type VerticalLine = { x: number; y1: number; y2: number };
 
-function collectVerticalLine(props: CollectItemLineProps): VerticalLine[] {
+type VerticalLine = { x: number; y1: number; y2: number };
+type HorizontalLine = { y: number; x1: number; x2: number };
+
+function collectLines<A extends "x" | "y", R = A extends "y" ? HorizontalLine : VerticalLine>(
+    props: CollectItemLineProps,
+    axis: A,
+    createLineFn: (line: LineProps, aLine: LineProps) => R,
+    setPosFn: (props: SnapToPixelProps) => void,
+): R[] {
     const { target, list, aList, margin } = props;
 
-    const arr = aList.map((x) => {
-        return getDistanceLine(x, list, "x");
-    });
+    const arr = aList.map((x) => getDistanceLine(x, list, axis));
     const min = getMinDistance(arr);
     if (min > margin) {
         return [];
     }
-    const lines = [];
+    const lines: R[] = [];
     const width = aList[0].x2 - aList[0].x;
     const height = aList[0].y2 - aList[0].y;
     let b = false;
@@ -53,83 +58,45 @@ function collectVerticalLine(props: CollectItemLineProps): VerticalLine[] {
         if (min === item.dis) {
             const line = list[item.index];
             const aLine = aList[item.index];
-            const x = line.x;
-            const y = aLine.y;
-
-            const y1 = Math.min(line.y, line.y2, y, aLine.y2);
-            const y2 = Math.max(line.y, line.y2, y, aLine.y2);
-
-            lines.push({ x, y1, y2 });
+            lines.push(createLineFn(line, aLine));
             if (b) {
                 continue;
             }
             b = true;
 
-            setPos({
+            setPosFn({
                 target,
-                x,
-                y,
-                centerX: i - 1,
-                centerY: item.index - 1,
+                x: axis === "x" ? line.x : aLine.x,
+                y: axis === "y" ? line.y : aLine.y,
+                centerX: axis === "x" ? i - 1 : item.index - 1,
+                centerY: axis === "y" ? i - 1 : item.index - 1,
                 width,
                 height,
-                dir: "x",
+                dir: axis,
             });
             const dis = min * item.dir;
             aList.forEach(function (lineProp) {
-                lineProp.x -= dis;
+                lineProp[axis] -= dis;
             });
         }
     }
     return lines;
 }
 
-type HorizontalLine = { y: number; x1: number; x2: number };
+function createVerticalLine(line: LineProps, aLine: LineProps): VerticalLine {
+    const x = line.x;
+    const y = aLine.y;
+    const y1 = Math.min(line.y, line.y2, y, aLine.y2);
+    const y2 = Math.max(line.y, line.y2, y, aLine.y2);
+    return { x, y1, y2 };
+}
 
-function collectHorizontalLine(props: CollectItemLineProps): HorizontalLine[] {
-    const { target, list, aList, margin } = props;
-
-    const arr = aList.map((x) => getDistanceLine(x, list, "y"));
-    const min = getMinDistance(arr);
-    if (min > margin) {
-        return [];
-    }
-    const lines = [];
-    const width = aList[0].x2 - aList[0].x;
-    const height = aList[0].y2 - aList[0].y;
-    let b = false;
-    for (let i = 0; i < arr.length; i++) {
-        const item = arr[i];
-        if (min === item.dis) {
-            const line = list[item.index];
-            const aLine = aList[item.index];
-            const y = line.y;
-            const x = aLine.x;
-
-            const x1 = Math.min(line.x, line.x2, x, aLine.x2);
-            const x2 = Math.max(line.x, line.x2, x, aLine.x2);
-            lines.push({ y, x1, x2 });
-            if (b) {
-                continue;
-            }
-            b = true;
-            setPos({
-                target,
-                x,
-                y,
-                centerX: item.index - 1,
-                centerY: i - 1,
-                width,
-                height,
-                dir: "y",
-            });
-            const dis = min * item.dir;
-            aList.forEach(function (lineProp) {
-                lineProp.y -= dis;
-            });
-        }
-    }
-    return lines;
+function createHorizontalLine(line: LineProps, aLine: LineProps): HorizontalLine {
+    const y = line.y;
+    const x = aLine.x;
+    const x1 = Math.min(line.x, line.x2, x, aLine.x2);
+    const x2 = Math.max(line.x, line.x2, x, aLine.x2);
+    return { y, x1, x2 };
 }
 
 type LineProps = {
@@ -148,7 +115,6 @@ type DistanceLine = {
 function getDistanceLine(target: LineProps, list: LineProps[], type: "x" | "y"): DistanceLine {
     let dis = Infinity;
     let index = -1;
-    /** 1正值 -1负值 */
     let dir = 1;
     for (let i = 0; i < list.length; i++) {
         const v = getDistance(target[type], list[i][type]);
@@ -187,12 +153,19 @@ type SnapToPixelProps = {
     dir: "x" | "y";
 };
 
-function setPos(props: SnapToPixelProps): void {
-    const { target, centerX, centerY, width, height, dir } = props;
-    let { x, y } = props;
+function setVerticalPos(props: SnapToPixelProps): void {
+    const { target, centerX, width } = props;
+    let { x } = props;
     x -= (centerX * width) / 2;
+    setPositionDir(target, new Point(x, props.y), "x");
+    target.setCoords();
+}
+
+function setHorizontalPos(props: SnapToPixelProps): void {
+    const { target, centerY, height } = props;
+    let { y } = props;
     y -= (centerY * height) / 2;
-    setPositionDir(target, new Point(x, y), dir);
+    setPositionDir(target, new Point(props.x, y), "y");
     target.setCoords();
 }
 
