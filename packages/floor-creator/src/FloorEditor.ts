@@ -15,6 +15,7 @@ import { EditorEventManager } from "./event-manager/EditorEventManager.js";
 import { calculateCanvasScale } from "./utils.js";
 import { CommandInvoker } from "./command/CommandInvoker.js";
 import { EventEmitter } from "./event-emitter/EventEmitter.js";
+import { initAligningGuidelines } from "./aligning-guidelines/index.js";
 
 type FloorEditorEvents = {
     elementClicked: [FloorEditor, FloorEditorElement];
@@ -46,6 +47,8 @@ export class FloorEditor extends Floor {
         if (!options.floorDoc.json) {
             this.renderGrid();
         }
+
+        initAligningGuidelines(this.canvas);
     }
 
     canUndo(): boolean {

@@ -8,6 +8,9 @@ import vue from "eslint-plugin-vue";
 import vueParser from "vue-eslint-parser";
 import tsParser from "@typescript-eslint/parser";
 import globals from "globals";
+import { join } from "node:path";
+
+const tsconfig = join(import.meta.dirname, "tsconfig.eslint.json");
 
 const compat = new FlatCompat({
     baseDirectory: import.meta.filename,
@@ -46,7 +49,7 @@ export default tseslint.config(
             parser: vueParser,
             parserOptions: {
                 parser: tsParser,
-                project: "tsconfig.eslint.json",
+                project: tsconfig,
                 tsconfigDirName: import.meta.dirname,
                 extraFileExtensions: [".vue"],
             },
