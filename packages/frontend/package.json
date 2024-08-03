@@ -17,7 +17,7 @@
     "devDependencies": {
         "@playwright/test": "1.45.3",
         "@quasar/app-vite": "2.0.0-beta.15",
-        "@vitejs/plugin-vue": "5.1.0",
+        "@vitejs/plugin-vue": "5.1.2",
         "@vitest/browser": "catalog:",
         "@vue/test-utils": "2.4.6",
         "vite-tsconfig-paths": "4.3.2",
@@ -39,9 +39,9 @@
         "quasar": "2.16.6",
         "register-service-worker": "1.7.2",
         "ts-pattern": "catalog:",
-        "vue": "3.5.0-alpha.3",
+        "vue": "3.5.0-alpha.4",
         "vue-i18n": "9.13.1",
-        "vue-router": "4.4.0",
+        "vue-router": "4.4.2",
         "vuefire": "3.1.24",
         "workbox-core": "7.1.0",
         "workbox-build": "7.1.1"
