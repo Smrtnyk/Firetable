@@ -1,5 +1,10 @@
+<script setup lang="ts">
+const model = defineModel();
+</script>
+
 <template>
     <q-tab-panels
+        v-model="model"
         v-bind="$attrs"
         animated
         transition-next="fade"
