@@ -46,16 +46,5 @@
         "node": ">= 20.10.0",
         "pnpm": ">= 9.5.0"
     },
-    "packageManager": "pnpm@9.5.0",
-    "pnpm": {
-        "peerDependencyRules": {
-            "allowedVersions": {
-                "typescript-eslint>eslint": "^9.0.0",
-                "@typescript-eslint/eslint-plugin>eslint": "^9.0.0",
-                "@typescript-eslint/parser>eslint": "^9.0.0",
-                "@typescript-eslint/type-utils>eslint": "^9.0.0",
-                "@typescript-eslint/utils>eslint": "^9.0.0"
-            }
-        }
-    }
+    "packageManager": "pnpm@9.5.0"
 }

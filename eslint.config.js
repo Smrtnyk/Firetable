@@ -148,7 +148,7 @@ export default tseslint.config(
             "arrow-spacing": ["error", { before: true, after: true }],
             "brace-style": "error",
             "constructor-super": "error",
-            curly: "error",
+            curly: ["error", "all"],
             "eol-last": "error",
             eqeqeq: ["error", "smart"],
             "guard-for-in": "error",
