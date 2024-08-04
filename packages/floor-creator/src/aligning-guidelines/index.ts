@@ -12,7 +12,7 @@ export function initAligningGuidelines(canvas: Canvas): () => void {
     const verticalLines = new Set<string>();
     let onlyDrawPoint = false;
     const cacheMap = new Map<string, [TBBox, Point[]]>();
-    function getCaCheMapValue(object: FabricObject): [TBBox, Point[]] {
+    function getCacheMapValue(object: FabricObject): [TBBox, Point[]] {
         const cacheKey = [
             object.calcTransformMatrix().toString(),
             object.width,
@@ -38,7 +38,7 @@ export function initAligningGuidelines(canvas: Canvas): () => void {
         const activeObjectRect = activeObject.getBoundingRect();
 
         for (const object of objects) {
-            const objectRect = getCaCheMapValue(object)[0];
+            const objectRect = getCacheMapValue(object)[0];
             const { vLines, hLines } = collectLine({ activeObject, activeObjectRect, objectRect });
             vLines.forEach((o) => {
                 verticalLines.add(JSON.stringify(o));
@@ -84,7 +84,7 @@ export function initAligningGuidelines(canvas: Canvas): () => void {
         let point = activeObject.getCoords()[index];
 
         for (const object of objects) {
-            const [rect, coords] = getCaCheMapValue(object);
+            const [rect, coords] = getCacheMapValue(object);
             const center = new Point(rect.left + rect.width / 2, rect.top + rect.height / 2);
             const list = [...coords, center];
             const props = { activeObject, point, list, isScale, index };
