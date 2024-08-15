@@ -50,7 +50,7 @@ export function useEvents() {
                 eventsDocs.length > 0 ? eventsDocs[eventsDocs.length - 1]._doc : null;
 
             eventsByProperty[propertyId] = new Set([
-                ...(eventsByProperty[propertyId] || []),
+                ...eventsByProperty[propertyId],
                 ...eventsDocs,
             ]);
 

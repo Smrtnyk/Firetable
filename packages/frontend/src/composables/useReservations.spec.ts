@@ -81,7 +81,7 @@ function createMockReservation(partial: Partial<ReservationDoc> = {}): PlannedRe
         tableLabel: "1",
         _doc: this,
         ...partial,
-        type: ReservationType.PLANNED as const,
+        type: ReservationType.PLANNED,
         isVIP: false,
     };
 }

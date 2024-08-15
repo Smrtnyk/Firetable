@@ -1,6 +1,6 @@
 import type { DeepPartial } from "@firetable/types";
 import { deepMerge } from "./deep-merge.js";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 describe("deepMerge", () => {
     const DEFAULT_SETTINGS = {
@@ -55,7 +55,7 @@ describe("deepMerge", () => {
     });
 
     it("should not merge arrays and functions", () => {
-        const myFunction = () => {};
+        const myFunction = vi.fn();
         const partial = {
             event: {
                 details: {

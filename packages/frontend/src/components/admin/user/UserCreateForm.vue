@@ -24,7 +24,7 @@ const emit = defineEmits<Emits>();
 const props = defineProps<Props>();
 const userCreateForm = ref<QForm>();
 
-const form = ref<CreateUserPayload | User>({ ...userSkeleton() });
+const form = ref<CreateUserPayload | User>(userSkeleton());
 const chosenProperties = ref<string[]>([]);
 
 const role = computed(() => authStore.nonNullableUser.role);
