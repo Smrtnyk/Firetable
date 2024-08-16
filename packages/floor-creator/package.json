@@ -16,7 +16,7 @@
         "lint": "eslint ./src"
     },
     "dependencies": {
-        "fabric": "6.2.0",
+        "fabric": "6.3.0",
         "hammerjs": "2.0.8",
         "ts-pattern": "catalog:"
     },
