@@ -161,8 +161,8 @@ importers:
         specifier: 4.4.3
         version: 4.4.3(vue@3.5.0-beta.2(typescript@5.6.0-dev.20240816))
       vuefire:
-        specifier: 3.1.24
-        version: 3.1.24(firebase@10.13.0)(vue@3.5.0-beta.2(typescript@5.6.0-dev.20240816))
+        specifier: 3.2.0
+        version: 3.2.0(firebase@10.13.0)(vue@3.5.0-beta.2(typescript@5.6.0-dev.20240816))
       workbox-build:
         specifier: 7.1.1
         version: 7.1.1
@@ -6207,8 +6207,8 @@ packages:
       typescript:
         optional: true
 
-  vuefire@3.1.24:
-    resolution: {integrity: sha512-tG7eKGXIjOL2ybQSWQ8ntEoeTuxzMCUK3zFdHge+FqyeYjLmTnoEiBfXJvLcsOZlUEz3gUYfDDc/sMbXAS9wZA==}
+  vuefire@3.2.0:
+    resolution: {integrity: sha512-fcJqNwPeGgL5vx++c0bVjMvYvZUzPHoYLPmlQpB0AS7722P+staJViG3RlcjNGMu7fgA1+HmGm5uwngFwVqnRw==}
     engines: {node: '>=18'}
     peerDependencies:
       '@vue/composition-api': '*'
@@ -13451,7 +13451,7 @@ snapshots:
     optionalDependencies:
       typescript: 5.6.0-dev.20240816
 
-  vuefire@3.1.24(firebase@10.13.0)(vue@3.5.0-beta.2(typescript@5.6.0-dev.20240816)):
+  vuefire@3.2.0(firebase@10.13.0)(vue@3.5.0-beta.2(typescript@5.6.0-dev.20240816)):
     dependencies:
       vue: 3.5.0-beta.2(typescript@5.6.0-dev.20240816)
       vue-demi: 0.14.10(vue@3.5.0-beta.2(typescript@5.6.0-dev.20240816))
