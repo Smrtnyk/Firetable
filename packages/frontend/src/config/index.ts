@@ -49,6 +49,7 @@ export const myIcons: Record<string, string> = {
     dash: "svguse:/svg-icons/ft-icons.svg#dash",
     crown: "svguse:/svg-icons/ft-icons.svg#crown",
     "cog-wheel": "svguse:/svg-icons/ft-icons.svg#cog-wheel",
+    "send-backward": "svguse:/svg-icons/ft-icons.svg#send-backward",
 };
 
 export function getDarkMode(): boolean {
