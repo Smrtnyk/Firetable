@@ -71,7 +71,7 @@ export abstract class Floor {
         return JSON.stringify(json);
     }
 
-    elementReviver = (_: Record<string, any>, object: FabricObject): void => {
+    elementReviver = (_: Record<string, unknown>, object: FabricObject): void => {
         object.on("mouseup", () => {
             this.onElementClick(object);
         });

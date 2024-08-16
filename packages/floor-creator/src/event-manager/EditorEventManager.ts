@@ -1,5 +1,6 @@
 import type { Floor } from "../Floor.js";
 import type { CommandInvoker } from "../command/CommandInvoker.js";
+import type { Transform, TEvent, ModifiedEvent } from "fabric";
 import { EventManager } from "./EventManager.js";
 import { RESOLUTION } from "../constants.js";
 import { MoveCommand } from "../command/MoveCommand.js";
@@ -82,7 +83,7 @@ export class EditorEventManager extends EventManager {
         this.ctrlPressedDuringSelection = false;
     };
 
-    onBeforeTransform = (options: any): void => {
+    onBeforeTransform = (options: TEvent & { transform: Transform }): void => {
         if (options.transform?.target && !this.movingObjectStartPosition) {
             this.movingObjectStartPosition = {
                 left: options.transform.target.left,
@@ -91,7 +92,7 @@ export class EditorEventManager extends EventManager {
         }
     };
 
-    onObjectModified = (options: any): void => {
+    onObjectModified = (options: ModifiedEvent): void => {
         if (!this.movingObjectStartPosition || !options.target) {
             return;
         }
@@ -132,7 +133,7 @@ export class EditorEventManager extends EventManager {
         }
     };
 
-    private snapToGridOnModify = (e: any): void => {
+    private snapToGridOnModify = (e: ModifiedEvent): void => {
         const target = e.target;
 
         if (!target) {
