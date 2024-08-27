@@ -20,10 +20,11 @@ const compat = new FlatCompat({
 export default tseslint.config(
     eslint.configs.recommended,
     ...tseslint.configs.strict,
+    importX.flatConfigs.recommended,
+    importX.flatConfigs.typescript,
     ...compat.plugins("@regru/eslint-plugin-prefer-early-return"),
     {
         plugins: {
-            "import-x": importX,
             promise,
             unicorn,
             vue,
@@ -32,8 +33,6 @@ export default tseslint.config(
     {
         files: ["**/*.vue", "**/*.ts"],
         rules: {
-            ...importX.configs.recommended.rules,
-            ...importX.configs.typescript.rules,
             ...promise.configs["flat/recommended"].rules,
         },
     },
