@@ -174,8 +174,8 @@ importers:
         specifier: 1.46.1
         version: 1.46.1
       '@quasar/app-vite':
-        specifier: 2.0.0-beta.19
-        version: 2.0.0-beta.19(@types/node@22.2.0)(eslint@9.9.1)(pinia@2.2.2(typescript@5.6.1-rc)(vue@3.5.0-beta.2(typescript@5.6.1-rc)))(quasar@2.16.9)(rollup@2.79.1)(terser@5.31.0)(typescript@5.6.1-rc)(vue-router@4.4.3(vue@3.5.0-beta.2(typescript@5.6.1-rc)))(vue@3.5.0-beta.2(typescript@5.6.1-rc))(workbox-build@7.1.1)
+        specifier: 2.0.0-beta.20
+        version: 2.0.0-beta.20(@types/node@22.2.0)(eslint@9.9.1)(pinia@2.2.2(typescript@5.6.1-rc)(vue@3.5.0-beta.2(typescript@5.6.1-rc)))(quasar@2.16.9)(rollup@2.79.1)(terser@5.31.0)(typescript@5.6.1-rc)(vue-router@4.4.3(vue@3.5.0-beta.2(typescript@5.6.1-rc)))(vue@3.5.0-beta.2(typescript@5.6.1-rc))(workbox-build@7.1.1)
       '@vitejs/plugin-vue':
         specifier: 5.1.2
         version: 5.1.2(vite@5.3.5(@types/node@22.2.0)(sass@1.77.8)(terser@5.31.0))(vue@3.5.0-beta.2(typescript@5.6.1-rc))
@@ -1614,8 +1614,8 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  '@quasar/app-vite@2.0.0-beta.19':
-    resolution: {integrity: sha512-6hVhSN6vUJgayv4Nj07OnifSgjJUMO4ImAFnw7Atg1g1boih7ye+hzDJNLLzm8dQbSApLAOhQI5/7LzSHHld8Q==}
+  '@quasar/app-vite@2.0.0-beta.20':
+    resolution: {integrity: sha512-LhpEhiT400neyByjsSxo4+jZ2Hl1FtfoCPaz+LZ3pkBJ+WuGHVQh2GBaBPgqaW+lYVo8LkuK2i+XfqPdIVqmjw==}
     engines: {node: ^30 || ^28 || ^26 || ^24 || ^22 || ^20 || ^18, npm: '>= 6.14.12', yarn: '>= 1.17.3'}
     hasBin: true
     peerDependencies:
@@ -8044,7 +8044,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@quasar/app-vite@2.0.0-beta.19(@types/node@22.2.0)(eslint@9.9.1)(pinia@2.2.2(typescript@5.6.1-rc)(vue@3.5.0-beta.2(typescript@5.6.1-rc)))(quasar@2.16.9)(rollup@2.79.1)(terser@5.31.0)(typescript@5.6.1-rc)(vue-router@4.4.3(vue@3.5.0-beta.2(typescript@5.6.1-rc)))(vue@3.5.0-beta.2(typescript@5.6.1-rc))(workbox-build@7.1.1)':
+  '@quasar/app-vite@2.0.0-beta.20(@types/node@22.2.0)(eslint@9.9.1)(pinia@2.2.2(typescript@5.6.1-rc)(vue@3.5.0-beta.2(typescript@5.6.1-rc)))(quasar@2.16.9)(rollup@2.79.1)(terser@5.31.0)(typescript@5.6.1-rc)(vue-router@4.4.3(vue@3.5.0-beta.2(typescript@5.6.1-rc)))(vue@3.5.0-beta.2(typescript@5.6.1-rc))(workbox-build@7.1.1)':
     dependencies:
       '@quasar/render-ssr-error': 1.0.3
       '@quasar/ssl-certificate': 1.0.0
@@ -9086,7 +9086,7 @@ snapshots:
   camel-case@4.1.2:
     dependencies:
       pascal-case: 3.1.2
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   camelcase@6.3.0: {}
 
@@ -9599,7 +9599,7 @@ snapshots:
   dot-case@3.0.4:
     dependencies:
       no-case: 3.0.4
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   dot-prop@5.3.0:
     dependencies:
@@ -11370,7 +11370,7 @@ snapshots:
 
   lower-case@2.0.2:
     dependencies:
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   lru-cache@10.2.2: {}
 
@@ -11644,7 +11644,7 @@ snapshots:
   no-case@3.0.4:
     dependencies:
       lower-case: 2.0.2
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   node-domexception@1.0.0: {}
 
@@ -11865,7 +11865,7 @@ snapshots:
   param-case@3.0.4:
     dependencies:
       dot-case: 3.0.4
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   parent-module@1.0.1:
     dependencies:
@@ -11904,7 +11904,7 @@ snapshots:
   pascal-case@3.1.2:
     dependencies:
       no-case: 3.0.4
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   path-browserify@1.0.1: {}
 

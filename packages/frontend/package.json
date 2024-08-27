@@ -16,7 +16,7 @@
     },
     "devDependencies": {
         "@playwright/test": "1.46.1",
-        "@quasar/app-vite": "2.0.0-beta.19",
+        "@quasar/app-vite": "2.0.0-beta.20",
         "@vitejs/plugin-vue": "5.1.2",
         "@vitest/browser": "catalog:",
         "@vue/test-utils": "2.4.6",
