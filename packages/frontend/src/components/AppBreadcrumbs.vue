@@ -101,10 +101,11 @@ const breadcrumbLinks = computed<Link[]>(() => {
 .AppBreadcrumbs {
     max-width: 100%;
     overflow: hidden;
+    margin-top: 1px;
+
     .q-breadcrumbs__separator {
         display: none;
     }
-    margin-top: 1px;
 
     div {
         flex-wrap: nowrap;
