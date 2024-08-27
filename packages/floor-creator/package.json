@@ -25,7 +25,7 @@
         "@types/hammerjs": "2.0.45",
         "@vitest/browser": "catalog:",
         "vitest": "catalog:",
-        "webdriverio": "9.0.1"
+        "webdriverio": "9.0.7"
     },
     "keywords": ["floor", "planner", "fabric", "typescript"]
 }
