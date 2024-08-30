@@ -2,9 +2,7 @@
     "extends": "./tsconfig.json",
     "compilerOptions": {
         "baseUrl": ".",
-        "types": ["jest"],
         "lib": ["ESNext", "DOM"],
-        "module": "CommonJS",
         "esModuleInterop": true,
     },
     "include": [
