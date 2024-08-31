@@ -28,7 +28,6 @@
         "@firetable/backend": "workspace:*",
         "@firetable/floor-creator": "workspace:*",
         "@firetable/types": "workspace:*",
-        "@firetable/utils": "workspace:*",
         "@quasar/extras": "1.16.12",
         "@types/pako": "2.0.3",
         "chart.js": "4.4.4",

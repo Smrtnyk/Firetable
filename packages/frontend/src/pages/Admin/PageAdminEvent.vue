@@ -28,8 +28,8 @@ import { buttonSize, isMobile } from "src/global-reactives/screen-detection";
 import { truncateText } from "src/helpers/string-utils";
 import { compressFloorDoc } from "src/helpers/compress-floor-doc";
 import { useGuestsForEvent } from "src/composables/useGuestsForEvent";
-import { propIsTruthy } from "@firetable/utils";
 import { usePropertiesStore } from "src/stores/properties-store";
+import { property } from "es-toolkit/compat";
 
 interface Props {
     organisationId: string;
@@ -73,7 +73,7 @@ const allTables = computed(() => eventFloors.value.map(getTablesFromFloorDoc).fl
 
 const reservationsStatus = computed(() => {
     const activeReservations = allReservations.value.filter(isActiveReservation);
-    const currentlyOccupied = activeReservations.filter(propIsTruthy("arrived")).length;
+    const currentlyOccupied = activeReservations.filter(property("arrived")).length;
     const pending = activeReservations.length - currentlyOccupied;
     const totalGuests = activeReservations.reduce((acc, reservation) => {
         return acc + Number(reservation.numberOfGuests || 0);

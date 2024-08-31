@@ -11,8 +11,7 @@
         "build": "tsc -b"
     },
     "devDependencies": {
-        "@firetable/types": "workspace:*",
-        "@firetable/utils": "workspace:*"
+        "@firetable/types": "workspace:*"
     },
     "dependencies": {
         "es-toolkit": "catalog:",

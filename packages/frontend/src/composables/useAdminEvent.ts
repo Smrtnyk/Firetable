@@ -23,7 +23,7 @@ import {
     useFirestoreDocument,
 } from "src/composables/useFirestore";
 import { decompressFloorDoc } from "src/helpers/compress-floor-doc";
-import { propIsTruthy } from "@firetable/utils";
+import { property } from "es-toolkit/compat";
 
 export function useAdminEvent(eventOwner: EventOwner) {
     const router = useRouter();
@@ -49,9 +49,9 @@ export function useAdminEvent(eventOwner: EventOwner) {
         },
     );
     const cancelledReservations = computed(() =>
-        allPlannedReservations.value.filter(propIsTruthy("cancelled")),
+        allPlannedReservations.value.filter(property("cancelled")),
     );
-    const arrivedReservations = computed(() => reservations.value.filter(propIsTruthy("arrived")));
+    const arrivedReservations = computed(() => reservations.value.filter(property("arrived")));
 
     const eventHook = useFirestoreDocument<EventDoc>(getEventPath(eventOwner));
 

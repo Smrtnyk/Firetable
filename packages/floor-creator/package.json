@@ -22,7 +22,6 @@
         "ts-pattern": "catalog:"
     },
     "devDependencies": {
-        "@firetable/utils": "workspace:*",
         "@types/hammerjs": "2.0.45",
         "@vitest/browser": "catalog:",
         "vitest": "catalog:",
