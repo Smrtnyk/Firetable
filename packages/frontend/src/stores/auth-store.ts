@@ -9,19 +9,19 @@ import {
 } from "@firetable/types";
 import { defineStore } from "pinia";
 import { computed, ref, watch } from "vue";
-import { NOOP } from "@firetable/utils";
 import { logoutUser } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useFirestoreDocument } from "src/composables/useFirestore";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { Loading } from "quasar";
 import { isNotNil } from "es-toolkit/predicate";
+import { noop } from "es-toolkit/function";
 
 export const useAuthStore = defineStore("auth", () => {
     const isAuthenticated = ref(false);
     const isReady = ref(false);
     const user = ref<User | null>(null);
-    const unsubscribers: (typeof NOOP)[] = [];
+    const unsubscribers: (typeof noop)[] = [];
     const initInProgress = ref(false);
 
     const nonNullableUser = computed(() => {
@@ -196,7 +196,7 @@ export const useAuthStore = defineStore("auth", () => {
     function handleError(stop: () => void, errorObj: { message: string }): void {
         stop();
         showErrorMessage(errorObj.message);
-        logoutUser().catch(NOOP);
+        logoutUser().catch(noop);
     }
 
     return {

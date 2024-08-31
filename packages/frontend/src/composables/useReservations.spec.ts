@@ -13,7 +13,7 @@ import * as Quasar from "quasar";
 import { uid } from "quasar";
 import { FloorViewer, getTables, RectTable } from "@firetable/floor-creator";
 import * as i18n from "vue-i18n";
-import { NOOP } from "@firetable/utils";
+import { noop } from "es-toolkit/function";
 
 function createFloor(floorName: string): FloorViewer {
     const canvas = document.createElement("canvas");
@@ -111,7 +111,7 @@ describe.skip("useReservations", () => {
         });
         vi.spyOn<any, any>(i18n, "useI18n").mockReturnValue(() => {
             return {
-                t: NOOP,
+                t: noop,
             };
         });
         vi.spyOn(authStore, "useAuthStore").mockReturnValue({} as any);

@@ -1,6 +1,6 @@
 import type { AnimationStrategy } from "./AnimationStrategy.js";
 import type { FabricObject } from "fabric/es";
-import { NOOP } from "@firetable/utils";
+import { noop } from "es-toolkit";
 
 const ANIMATION_DURATION = 500;
 
@@ -26,7 +26,7 @@ export class SmoothBlinkAnimation implements AnimationStrategy {
             { opacity: 0 },
             {
                 duration: ANIMATION_DURATION,
-                onChange: this.target.canvas?.requestRenderAll.bind(this.target.canvas) ?? NOOP,
+                onChange: this.target.canvas?.requestRenderAll.bind(this.target.canvas) ?? noop,
                 onComplete: () => {
                     this.target.animate(
                         { opacity: 1 },
@@ -34,7 +34,7 @@ export class SmoothBlinkAnimation implements AnimationStrategy {
                             duration: ANIMATION_DURATION,
                             onChange:
                                 this.target.canvas?.requestRenderAll.bind(this.target.canvas) ??
-                                NOOP,
+                                noop,
                             onComplete: () => {
                                 this.smoothBlink(); // Loop the animation
                             },

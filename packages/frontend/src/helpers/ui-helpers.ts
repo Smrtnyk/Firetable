@@ -1,6 +1,5 @@
 import { Dialog, Loading, Notify } from "quasar";
-import { NOOP } from "@firetable/utils";
-import { isString } from "es-toolkit";
+import { isString, noop } from "es-toolkit/function";
 
 export function showConfirm(title: string, message = ""): Promise<boolean> {
     const options = {
@@ -81,7 +80,7 @@ export async function tryCatchLoadingWrapper<T>({
         return await hook(...(args ?? []));
     } catch (e) {
         showErrorMessage(e);
-        (errorHook ?? NOOP)(...(args ?? []));
+        (errorHook ?? noop)(...(args ?? []));
     } finally {
         Loading.hide();
     }

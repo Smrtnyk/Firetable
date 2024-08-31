@@ -5,7 +5,7 @@ import type {
     User,
     DeepRequired,
 } from "@firetable/types";
-import type { NOOP } from "@firetable/utils";
+import type { noop } from "es-toolkit";
 import { Role } from "@firetable/types";
 import { defineStore } from "pinia";
 import {
@@ -42,7 +42,7 @@ export const usePropertiesStore = defineStore("properties", () => {
     const properties = ref<PropertyDoc[]>([]);
     const arePropertiesLoading = ref(false);
     const organisations = ref<OrganisationDoc[]>([]);
-    const unsubs = ref<(typeof NOOP)[]>([]);
+    const unsubs = ref<(typeof noop)[]>([]);
 
     function cleanup(): void {
         for (const unsub of unsubs.value) {
@@ -93,7 +93,7 @@ export const usePropertiesStore = defineStore("properties", () => {
         setProperties(allProperties);
     }
 
-    function addUnsub(unsub: typeof NOOP): void {
+    function addUnsub(unsub: typeof noop): void {
         unsubs.value.push(unsub);
     }
 

@@ -32,7 +32,6 @@ import {
 } from "src/helpers/ui-helpers";
 import { useI18n } from "vue-i18n";
 import { useAuthStore } from "src/stores/auth-store";
-import { NOOP } from "@firetable/utils";
 
 import FTDialog from "src/components/FTDialog.vue";
 import EventCreateReservation from "src/components/Event/reservation/EventCreateReservation.vue";
@@ -41,6 +40,7 @@ import { determineTableColor } from "src/helpers/floor";
 import { isValidEuropeanPhoneNumber } from "src/helpers/utils";
 import { isEventInProgress } from "src/helpers/events-utils";
 import { usePropertiesStore } from "src/stores/properties-store";
+import { noop } from "es-toolkit/function";
 
 const HALF_HOUR = 30 * 60 * 1000; // 30 minutes in milliseconds
 
@@ -166,7 +166,7 @@ export function useReservations(
     }
 
     function createEventLog(message: string): void {
-        addLogToEvent(eventOwner, message, authStore.nonNullableUser).catch(NOOP);
+        addLogToEvent(eventOwner, message, authStore.nonNullableUser).catch(noop);
     }
 
     function handleReservationCreation(reservationData: Reservation): void {
