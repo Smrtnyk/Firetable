@@ -4,15 +4,15 @@ import type { GuestDoc, ReservationDoc } from "@firetable/types";
 import type { Ref, ComputedRef } from "vue";
 import { computed } from "vue";
 import { guestsCollection } from "@firetable/backend";
-import { takeProp } from "@firetable/utils";
 import { isValidEuropeanPhoneNumber } from "src/helpers/utils";
 import { where } from "firebase/firestore";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
+import { property } from "es-toolkit/compat";
 
 export function useGuestsForEvent(eventOwner: EventOwner, reservations: Ref<ReservationDoc[]>) {
     const guestWithPhoneNumbers = computed(() => {
         const values = reservations.value
-            .map(takeProp("guestContact"))
+            .map(property("guestContact"))
             .filter(isValidEuropeanPhoneNumber)
             .slice(0, 30); // Limit to 30 contacts due to Firestore 'in' query constraint
         return Array.from(new Set(values));

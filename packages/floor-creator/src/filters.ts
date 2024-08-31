@@ -2,7 +2,8 @@ import type { Floor } from "./Floor.js";
 import type { BaseTable, FloorData } from "./types.js";
 import { FloorElementTypes } from "./types.js";
 import { isTable } from "./type-guards.js";
-import { isString, takeProp } from "@firetable/utils";
+import { isString } from "@firetable/utils";
+import { property } from "es-toolkit/compat";
 
 export function hasFloorTables(floor: Floor): boolean {
     return getTables(floor).length > 0;
@@ -28,5 +29,5 @@ export function getTables(floor: Floor): BaseTable[] {
 }
 
 export function extractAllTablesLabels(floor: Floor): string[] {
-    return getTables(floor).map(takeProp("label"));
+    return getTables(floor).map(property("label"));
 }

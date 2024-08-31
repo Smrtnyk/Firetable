@@ -15,9 +15,9 @@ import { makeRawFloor } from "@firetable/floor-creator";
 import { addFloor, deleteFloor } from "@firetable/backend";
 import { useFloors } from "src/composables/useFloors";
 import { ref, watch, computed } from "vue";
-import { takeProp } from "@firetable/utils";
 import { useI18n } from "vue-i18n";
 import { usePropertiesStore } from "src/stores/properties-store";
+import { property } from "es-toolkit/compat";
 
 const props = defineProps<{ organisationId: string }>();
 
@@ -77,7 +77,7 @@ function showAddNewFloorForm(propertyData: PropertyFloors, floorDocs: FloorDoc[]
                 },
             },
             componentPropsObject: {
-                allFloorNames: new Set(floorDocs.map(takeProp("name"))),
+                allFloorNames: new Set(floorDocs.map(property("name"))),
             },
         },
     });
