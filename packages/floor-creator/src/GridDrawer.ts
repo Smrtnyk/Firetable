@@ -74,8 +74,7 @@ export class GridDrawer {
     clearGrid(): void {
         this.canvas
             .getObjects()
-            // @ts-expect-error - custom set prop
-            .filter(has("isGridLine"))
+            .filter((obj) => has(obj, "isGridLine"))
             .forEach((obj) => {
                 this.canvas.remove(obj);
             });
