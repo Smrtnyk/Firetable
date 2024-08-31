@@ -16,6 +16,7 @@
         "lint": "eslint ./src"
     },
     "dependencies": {
+        "es-toolkit": "catalog:",
         "fabric": "6.4.0",
         "hammerjs": "2.0.8",
         "ts-pattern": "catalog:"
@@ -27,5 +28,10 @@
         "vitest": "catalog:",
         "webdriverio": "9.0.7"
     },
-    "keywords": ["floor", "planner", "fabric", "typescript"]
+    "keywords": [
+        "floor",
+        "planner",
+        "fabric",
+        "typescript"
+    ]
 }

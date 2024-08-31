@@ -33,7 +33,7 @@
         "@types/pako": "2.0.3",
         "chart.js": "4.4.4",
         "date-fns": "3.6.0",
-        "es-toolkit": "1.17.0",
+        "es-toolkit": "catalog:",
         "firebase": "catalog:",
         "pako": "2.1.0",
         "pinia": "2.2.2",
