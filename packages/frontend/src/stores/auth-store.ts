@@ -9,12 +9,13 @@ import {
 } from "@firetable/types";
 import { defineStore } from "pinia";
 import { computed, ref, watch } from "vue";
-import { isDefined, NOOP } from "@firetable/utils";
+import { NOOP } from "@firetable/utils";
 import { logoutUser } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useFirestoreDocument } from "src/composables/useFirestore";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { Loading } from "quasar";
+import { isNotNil } from "es-toolkit/predicate";
 
 export const useAuthStore = defineStore("auth", () => {
     const isAuthenticated = ref(false);
@@ -96,7 +97,7 @@ export const useAuthStore = defineStore("auth", () => {
     }
 
     function setAuthState(isAuthenticatedVal: boolean): void {
-        if (isDefined(isAuthenticated)) {
+        if (isNotNil(isAuthenticated)) {
             isAuthenticated.value = isAuthenticatedVal;
         } else {
             isReady.value = false;

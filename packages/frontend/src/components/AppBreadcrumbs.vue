@@ -17,7 +17,7 @@ import type { User } from "@firetable/types";
 import { useRoute, useRouter } from "vue-router";
 import { computed } from "vue";
 import { useAuthStore } from "src/stores/auth-store";
-import { isFunction } from "@firetable/utils";
+import { isFunction } from "es-toolkit";
 
 interface Link {
     name: string;

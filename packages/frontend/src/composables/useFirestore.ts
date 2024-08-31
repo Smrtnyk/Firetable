@@ -4,7 +4,7 @@ import type { ComputedRef } from "vue";
 import { collection, doc, query, setDoc } from "firebase/firestore";
 import { initializeFirebase } from "@firetable/backend";
 import { useCollection, useDocument } from "vuefire";
-import { isString } from "@firetable/utils";
+import { isString } from "es-toolkit";
 
 export function useFirestoreCollection<T extends DocumentData>(
     path: string | Query<T> | ComputedRef<Query<T> | null>,

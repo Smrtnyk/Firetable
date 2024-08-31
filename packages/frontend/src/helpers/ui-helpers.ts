@@ -1,5 +1,6 @@
 import { Dialog, Loading, Notify } from "quasar";
-import { isString, NOOP } from "@firetable/utils";
+import { NOOP } from "@firetable/utils";
+import { isString } from "es-toolkit";
 
 export function showConfirm(title: string, message = ""): Promise<boolean> {
     const options = {

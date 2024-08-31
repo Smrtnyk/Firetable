@@ -1,4 +1,4 @@
-import { isDefined } from "@firetable/utils";
+import { isNil } from "es-toolkit/predicate";
 
 export function noEmptyString(msg = "Please type something"): (val: string) => boolean | string {
     return function (val: string): boolean | string {
@@ -14,7 +14,7 @@ export function minLength(msg: string, minLen = 5): (val: string) => boolean | s
 
 export function optionalMinLength(msg: string, minLen = 5): (val: string) => boolean | string {
     return function (val: string): boolean | string {
-        if (!isDefined(val) || val === "") {
+        if (isNil(val) || val === "") {
             return true;
         }
         return minLength(msg, minLen)(val);
