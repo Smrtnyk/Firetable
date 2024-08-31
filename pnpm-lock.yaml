@@ -71,6 +71,9 @@ importers:
 
   packages/backend:
     dependencies:
+      es-toolkit:
+        specifier: 'catalog:'
+        version: 1.17.0
       firebase:
         specifier: 'catalog:'
         version: 10.13.1

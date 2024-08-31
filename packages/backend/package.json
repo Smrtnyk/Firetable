@@ -15,6 +15,7 @@
         "@firetable/utils": "workspace:*"
     },
     "dependencies": {
+        "es-toolkit": "catalog:",
         "firebase": "catalog:"
     },
     "keywords": []
