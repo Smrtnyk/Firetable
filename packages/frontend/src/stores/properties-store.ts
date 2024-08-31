@@ -17,7 +17,7 @@ import {
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
 import { query, where } from "firebase/firestore";
 import { nextTick, ref, watch } from "vue";
-import { deepMerge } from "@firetable/utils";
+import { merge } from "es-toolkit";
 
 export const DEFAULT_ORGANISATION_SETTINGS: DeepRequired<OrganisationSettings> = {
     event: {
@@ -76,7 +76,7 @@ export const usePropertiesStore = defineStore("properties", () => {
             organisations.value.find((organisation) => {
                 return organisation.id === organisationId;
             })?.settings ?? {};
-        return deepMerge(DEFAULT_ORGANISATION_SETTINGS, settings);
+        return merge(DEFAULT_ORGANISATION_SETTINGS, settings);
     }
 
     function getPropertiesByOrganisationId(organisationId: string): PropertyDoc[] {
