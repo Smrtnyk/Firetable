@@ -23,13 +23,13 @@ import {
     getEventsPath,
     updateEvent,
 } from "@firetable/backend";
-import { takeLast } from "@firetable/utils";
 import { useFloors } from "src/composables/useFloors";
 import { useEvents } from "src/composables/useEvents";
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { usePropertiesStore } from "src/stores/properties-store";
+import { last } from "es-toolkit";
 
 const props = defineProps<{ organisationId: string }>();
 
@@ -183,7 +183,7 @@ async function onLoad(property: PropertyDoc): Promise<void> {
         organisationId: props.organisationId,
         id: "",
     };
-    const lastDoc = takeLast([...eventsByProperty[propertyId]])?._doc ?? null;
+    const lastDoc = last([...eventsByProperty[propertyId]])?._doc ?? null;
     const eventsDocs = await fetchMoreEvents(eventOwner, lastDoc);
 
     if (!eventsDocs || eventsDocs.length < EVENTS_PER_PAGE) {
