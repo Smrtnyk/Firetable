@@ -207,8 +207,8 @@ importers:
         specifier: 12.4.0
         version: 12.4.0(encoding@0.1.13)
       firebase-functions:
-        specifier: 5.1.0
-        version: 5.1.0(firebase-admin@12.4.0(encoding@0.1.13))
+        specifier: 5.1.1
+        version: 5.1.1(firebase-admin@12.4.0(encoding@0.1.13))
     devDependencies:
       '@faker-js/faker':
         specifier: 8.4.1
@@ -3396,8 +3396,8 @@ packages:
     resolution: {integrity: sha512-3HOHqJxNmFv0JgK3voyMQgmcibhJN4LQfZfhnZGb6pcONnZxejki4nQ1twsoJlGaIvgQWBtO7rc5mh/cqlOJNA==}
     engines: {node: '>=14'}
 
-  firebase-functions@5.1.0:
-    resolution: {integrity: sha512-VO46n9lqljrNiqOv4BbnFHYxY+yYCdZcOeUIF1t9DbFxBbVPztHdMM9MvpfCDp0nzXP2PugdmghSgM0hORrNvw==}
+  firebase-functions@5.1.1:
+    resolution: {integrity: sha512-KkyKZE98Leg/C73oRyuUYox04PQeeBThdygMfeX+7t1cmKWYKa/ZieYa89U8GHgED+0mF7m7wfNZOfbURYxIKg==}
     engines: {node: '>=14.10.0'}
     hasBin: true
     peerDependencies:
@@ -10229,7 +10229,7 @@ snapshots:
       - encoding
       - supports-color
 
-  firebase-functions@5.1.0(firebase-admin@12.4.0(encoding@0.1.13)):
+  firebase-functions@5.1.1(firebase-admin@12.4.0(encoding@0.1.13)):
     dependencies:
       '@types/cors': 2.8.17
       '@types/express': 4.17.3
