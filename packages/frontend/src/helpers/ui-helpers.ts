@@ -1,5 +1,5 @@
 import { Dialog, Loading, Notify } from "quasar";
-import { isString, noop } from "es-toolkit/function";
+import { isString, noop } from "es-toolkit";
 
 export function showConfirm(title: string, message = ""): Promise<boolean> {
     const options = {

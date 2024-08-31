@@ -126,9 +126,5 @@
         "node_modules",
         "./src/**/*.spec.ts"
     ],
-    "references": [
-        {
-            "path": "../utils"
-        }
-    ]
+    "references": []
 }
