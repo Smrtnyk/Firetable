@@ -2,9 +2,12 @@ import type { FloorDropEvent, FloorEditor } from "@firetable/floor-creator";
 import type { Ref, ShallowRef } from "vue";
 import { onBeforeUnmount } from "vue";
 import { FloorElementTypes, extractAllTablesLabels } from "@firetable/floor-creator";
-import { isNumber } from "@firetable/utils";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { debounce } from "quasar";
+
+export function isNumber(candidate: unknown): candidate is number {
+    return !Number.isNaN(candidate) && typeof candidate === "number" && Number.isFinite(candidate);
+}
 
 export const TABLE_EL_TO_ADD = [FloorElementTypes.RECT_TABLE, FloorElementTypes.ROUND_TABLE];
 
