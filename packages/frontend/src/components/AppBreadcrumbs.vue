@@ -13,15 +13,18 @@
 
 <script setup lang="ts">
 import type { RouteRecordName, RouteRecordNormalized, RouteRecordRaw } from "vue-router";
-import type { User } from "@firetable/types";
+import type { AnyFunction, User } from "@firetable/types";
 import { useRoute, useRouter } from "vue-router";
 import { computed } from "vue";
 import { useAuthStore } from "src/stores/auth-store";
-import { isFunction } from "es-toolkit";
 
 interface Link {
     name: string;
     path: string;
+}
+
+function isAnyFunction(value: unknown): value is AnyFunction {
+    return typeof value === "function";
 }
 
 const route = useRoute();
@@ -61,7 +64,7 @@ function getBreadcrumbName(
     currentRoute: RouteRecordRaw | RouteRecordNormalized,
     isAdmin: boolean,
 ): string | undefined {
-    if (isFunction(currentRoute.meta?.breadcrumb)) {
+    if (isAnyFunction(currentRoute.meta?.breadcrumb)) {
         return currentRoute.meta.breadcrumb(route, isAdmin);
     }
     return currentRoute.meta?.breadcrumb;
