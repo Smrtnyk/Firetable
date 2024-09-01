@@ -19,6 +19,8 @@ import { debounce } from "quasar";
 import { decompressFloorDoc } from "src/helpers/compress-floor-doc";
 import { isTouchDevice } from "src/helpers/is-touch-device";
 
+type ActiveFloor = { id: string; name: string };
+
 export function useFloorsPageEvent(
     eventFloors: Ref<FloorDoc[]>,
     reservations: Ref<ReservationDoc[]>,
@@ -26,7 +28,7 @@ export function useFloorsPageEvent(
     eventOwner: EventOwner,
     event: Ref<VueFirestoreDocumentData<EventDoc> | undefined>,
 ) {
-    const activeFloor = ref<{ id: string; name: string } | undefined>();
+    const activeFloor = ref<ActiveFloor | undefined>();
     const floorInstances = shallowRef<FloorViewer[]>([]);
     const { users } = useUsers(eventOwner.organisationId);
     const { tableClickHandler } = useReservations(
@@ -38,11 +40,11 @@ export function useFloorsPageEvent(
     );
     const canvases = reactive<Map<string, HTMLCanvasElement>>(new Map());
 
-    const hasMultipleFloorPlans = computed(() => {
+    const hasMultipleFloorPlans = computed(function () {
         return eventFloors.value.length > 1;
     });
 
-    onMounted(() => {
+    onMounted(function () {
         if (isTouchDevice) {
             return;
         }
@@ -51,15 +53,15 @@ export function useFloorsPageEvent(
 
     onBeforeUnmount(() => {
         window.removeEventListener("resize", resizeFloor);
-        floorInstances.value.forEach((floorInstance) => {
+        floorInstances.value.forEach(function (floorInstance) {
             floorInstance.destroy();
         });
     });
 
     watch(eventFloors, handleFloorInstancesData);
 
-    const resizeFloor = debounce((): void => {
-        floorInstances.value.forEach((floor) => {
+    const resizeFloor = debounce(function () {
+        floorInstances.value.forEach(function (floor) {
             if (!pageRef.value) {
                 return;
             }
@@ -75,13 +77,15 @@ export function useFloorsPageEvent(
             foundReservations.length === 1 &&
             activeFloor.value?.id !== foundReservations[0].floorId
         ) {
-            const floor = floorInstances.value.find(
-                ({ id }) => foundReservations[0].floorId === id,
-            );
+            const floor = floorInstances.value.find(function ({ id }) {
+                return foundReservations[0].floorId === id;
+            });
             setActiveFloor(floor);
         }
         for (const reservation of foundReservations) {
-            const floor = floorInstances.value.find(({ id }) => reservation.floorId === id);
+            const floor = floorInstances.value.find(function ({ id }) {
+                return reservation.floorId === id;
+            });
             const table = floor?.getTableByLabel(reservation.tableLabel);
             table?.startAnimation();
         }
@@ -90,11 +94,13 @@ export function useFloorsPageEvent(
     async function initFloorInstancesData(): Promise<void> {
         await nextTick();
         await instantiateFloors();
-        setActiveFloor(floorInstances.value[0] as FloorViewer);
+        setActiveFloor(floorInstances.value[0]);
     }
 
     async function handleFloorInstancesData(newVal: FloorDoc[], old: FloorDoc[]): Promise<void> {
-        if (!eventFloors.value) return;
+        if (!eventFloors.value) {
+            return;
+        }
         if ((old.length === 0 && newVal.length > 0) || floorInstances.value.length === 0) {
             await initFloorInstancesData();
         }
@@ -113,7 +119,9 @@ export function useFloorsPageEvent(
     async function instantiateFloor(floorDoc: FloorDoc): Promise<void> {
         const canvas = canvases.get(floorDoc.id);
 
-        if (!canvas || !pageRef.value) return;
+        if (!canvas || !pageRef.value) {
+            return;
+        }
         const floorViewer = new FloorViewer({
             canvas,
             floorDoc: await decompressFloorDoc(floorDoc),
@@ -134,7 +142,7 @@ export function useFloorsPageEvent(
     }
 
     function onAutocompleteClear(): void {
-        floorInstances.value.forEach((floor) => {
+        floorInstances.value.forEach(function (floor) {
             const tables = getTables(floor as FloorViewer);
             tables.forEach((table) => table.stopAnimation());
         });

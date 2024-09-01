@@ -42,6 +42,17 @@ import { isEventInProgress } from "src/helpers/events-utils";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { noop } from "es-toolkit/function";
 
+type OpenDialog = {
+    label: string;
+    dialog: DialogChainObject;
+    floorId: string;
+};
+
+type CrossFloorTable = {
+    table: BaseTable;
+    floor: FloorViewer;
+};
+
 const HALF_HOUR = 30 * 60 * 1000; // 30 minutes in milliseconds
 
 const enum GuestDataMode {
@@ -67,24 +78,14 @@ export function useReservations(
 
     // check every 1 minute
     const intervalID = setInterval(checkReservationsForTimeAndMarkTableIfNeeded, 60 * 1000);
-    const crossFloorReservationTransferTable = ref<
-        { table: BaseTable; floor: FloorViewer } | undefined
-    >();
-    const crossFloorReservationCopyTable = ref<
-        { table: BaseTable; floor: FloorViewer } | undefined
-    >();
+    const crossFloorReservationTransferTable = ref<CrossFloorTable | undefined>();
+    const crossFloorReservationCopyTable = ref<CrossFloorTable | undefined>();
 
     const canReserve = computed(() => {
         return authStore.canReserve;
     });
 
-    let currentOpenCreateReservationDialog:
-        | {
-              label: string;
-              dialog: DialogChainObject;
-              floorId: string;
-          }
-        | undefined;
+    let currentOpenCreateReservationDialog: OpenDialog | undefined;
 
     watch([reservations, floorInstances], handleFloorUpdates, {
         deep: true,
@@ -171,7 +172,7 @@ export function useReservations(
 
     function handleReservationCreation(reservationData: Reservation): void {
         void tryCatchLoadingWrapper({
-            hook: async function () {
+            async hook() {
                 await addReservation(eventOwner, reservationData);
                 notifyPositive("Reservation created");
                 createEventLog(`Reservation created on table ${reservationData.tableLabel}`);
@@ -182,7 +183,7 @@ export function useReservations(
 
     function handleReservationUpdate(reservationData: ReservationDoc): void {
         void tryCatchLoadingWrapper({
-            hook: async function () {
+            async hook() {
                 await updateReservationDoc(eventOwner, reservationData);
                 notifyPositive("Reservation updated");
                 createEventLog(`Reservation edited on table ${reservationData.tableLabel}`);
@@ -228,13 +229,18 @@ export function useReservations(
     }
 
     function checkIfReservedTableAndCloseCreateReservationDialog(): void {
-        if (!currentOpenCreateReservationDialog) return;
+        if (!currentOpenCreateReservationDialog) {
+            return;
+        }
+
         const { dialog, label, floorId } = currentOpenCreateReservationDialog;
         const isTableStillFree = reservations.value.find((reservation) => {
             return reservation.tableLabel === label && reservation.floorId === floorId;
         });
 
-        if (!isTableStillFree) return;
+        if (!isTableStillFree) {
+            return;
+        }
 
         dialog.hide();
         currentOpenCreateReservationDialog = undefined;
@@ -242,7 +248,7 @@ export function useReservations(
     }
 
     function filterUsersPerProperty(usersArray: User[], propertyId: string): User[] {
-        return usersArray.filter((user) => {
+        return usersArray.filter(function (user) {
             return user.relatedProperties.includes(propertyId);
         });
     }
@@ -279,7 +285,7 @@ export function useReservations(
                         eventDurationInHours: settings.value.event.eventDurationInHours,
                     },
                     listeners: {
-                        create: (reservationData: Reservation) => {
+                        create(reservationData: Reservation) {
                             resetCurrentOpenCreateReservationDialog();
                             handleReservationCreation(reservationData);
                             dialog.hide();
@@ -386,12 +392,13 @@ export function useReservations(
 
     function reservationConfirmed(val: boolean, reservation: PlannedReservationDoc): Promise<void> {
         return tryCatchLoadingWrapper({
-            hook: () =>
-                updateReservationDoc(eventOwner, {
+            hook() {
+                return updateReservationDoc(eventOwner, {
                     id: reservation.id,
                     reservationConfirmed: val,
                     waitingForResponse: false,
-                }),
+                });
+            },
         });
     }
 
@@ -400,12 +407,13 @@ export function useReservations(
         reservation: ReservationDoc,
     ): Promise<void> {
         return tryCatchLoadingWrapper({
-            hook: () =>
-                updateReservationDoc(eventOwner, {
+            hook() {
+                return updateReservationDoc(eventOwner, {
                     id: reservation.id,
                     waitingForResponse: val,
                     reservationConfirmed: false,
-                }),
+                });
+            },
         });
     }
 
@@ -443,7 +451,7 @@ export function useReservations(
         };
 
         await tryCatchLoadingWrapper({
-            hook: async function () {
+            async hook() {
                 await addReservation(eventOwner, newReservation);
                 createEventLog(
                     `Reservation copied from table ${sourceReservation.tableLabel} to table ${targetTable.label}`,
@@ -503,13 +511,18 @@ export function useReservations(
         }
 
         await tryCatchLoadingWrapper({
-            hook: async function () {
+            async hook() {
                 await Promise.all(promises);
                 createEventLog(
                     `Reservation transferred from table ${table1.label} to table ${table2.label}`,
                 );
             },
         });
+    }
+
+    function markReservationAsExpired(reservation: ReservationDoc): void {
+        const floor = floorInstances.value.find(({ id }) => id === reservation.floorId);
+        floor?.getTableByLabel(reservation.tableLabel)?.setFill("red");
     }
 
     function checkReservationsForTimeAndMarkTableIfNeeded(): void {
@@ -519,19 +532,14 @@ export function useReservations(
 
         const baseEventDate = new Date(event.value.date);
 
-        reservations.value.forEach((reservation) => {
-            if (reservation.arrived) {
-                return;
-            }
-
-            if (!shouldMarkReservationAsExpired(reservation.time, baseEventDate)) {
-                return;
-            }
-
-            const floor = floorInstances.value.find(({ id }) => id === reservation.floorId);
-            const table = floor?.getTableByLabel(reservation.tableLabel);
-            table?.setFill("red");
-        });
+        reservations.value
+            .filter(function (reservation) {
+                return (
+                    !reservation.arrived &&
+                    shouldMarkReservationAsExpired(reservation.time, baseEventDate)
+                );
+            })
+            .forEach(markReservationAsExpired);
     }
 
     async function swapOrTransferReservationsBetweenFloorPlans(
@@ -540,7 +548,7 @@ export function useReservations(
         floor2: FloorViewer,
         table2: BaseTable,
     ): Promise<void> {
-        const reservationTable1 = reservations.value.find((reservation) => {
+        const reservationTable1 = reservations.value.find(function (reservation) {
             return reservation.floorId === floor1.id && reservation.tableLabel === table1.label;
         });
 
@@ -548,7 +556,7 @@ export function useReservations(
             return;
         }
 
-        const reservationTable2 = reservations.value.find((reservation) => {
+        const reservationTable2 = reservations.value.find(function (reservation) {
             return reservation.floorId === floor2.id && reservation.tableLabel === table2.label;
         });
 
@@ -583,7 +591,9 @@ export function useReservations(
         }
 
         await tryCatchLoadingWrapper({
-            hook: () => Promise.all(promises),
+            hook() {
+                return Promise.all(promises);
+            },
         });
     }
 
@@ -615,7 +625,7 @@ export function useReservations(
             return;
         }
 
-        const reservation = reservations.value.find((res) => {
+        const reservation = reservations.value.find(function (res) {
             return res.tableLabel === table.label && res.floorId === floor.id;
         });
 
@@ -630,10 +640,12 @@ export function useReservations(
         floor: FloorViewer,
         element: FloorEditorElement | undefined,
     ): Promise<void> {
-        if (!isTable(element)) return;
+        if (!isTable(element)) {
+            return;
+        }
 
         // Check if table has reservation
-        const reservation = reservations.value.find((res) => {
+        const reservation = reservations.value.find(function (res) {
             return res.tableLabel === element.label && res.floorId === floor.id;
         });
 
