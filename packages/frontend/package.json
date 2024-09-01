@@ -22,7 +22,7 @@
         "@vue/test-utils": "2.4.6",
         "vite-tsconfig-paths": "5.0.1",
         "vitest": "catalog:",
-        "vue-tsc": "2.1.2"
+        "vue-tsc": "2.1.4"
     },
     "dependencies": {
         "@firetable/backend": "workspace:*",

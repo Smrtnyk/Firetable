@@ -15,7 +15,6 @@ import { EditorEventManager } from "./event-manager/EditorEventManager.js";
 import { calculateCanvasScale } from "./utils.js";
 import { CommandInvoker } from "./command/CommandInvoker.js";
 import { EventEmitter } from "./event-emitter/EventEmitter.js";
-// @ts-expect-error -- fabric screwed up the exports
 import { initAligningGuidelines } from "fabric/extensions";
 
 type FloorEditorEvents = {
