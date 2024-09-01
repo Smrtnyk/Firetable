@@ -51,7 +51,7 @@ export function useFloorsPageEvent(
         window.addEventListener("resize", resizeFloor);
     });
 
-    onBeforeUnmount(() => {
+    onBeforeUnmount(function () {
         window.removeEventListener("resize", resizeFloor);
         floorInstances.value.forEach(function (floorInstance) {
             floorInstance.destroy();
