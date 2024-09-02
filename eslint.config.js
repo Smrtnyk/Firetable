@@ -65,6 +65,7 @@ export default tseslint.config(
             "unicorn/explicit-length-check": "error",
             "unicorn/no-await-in-promise-methods": "error",
             "unicorn/no-console-spaces": "error",
+            "unicorn/no-for-loop": "error",
             "unicorn/better-regex": "error",
             "unicorn/consistent-destructuring": "error",
             "unicorn/consistent-empty-array-spread": "error",
