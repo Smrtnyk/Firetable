@@ -51,15 +51,15 @@ const properties = computed(() => {
 });
 
 const { floors, isLoading: isFloorsLoading } = useFloors(properties);
-const isAnyLoading = computed(() => {
+const isAnyLoading = computed(function () {
     return isFloorsLoading.value || isLoadingEvents.value;
 });
 
-const settings = computed(() => {
+const settings = computed(function () {
     return propertiesStore.getOrganisationSettingsById(props.organisationId);
 });
 
-onBeforeMount(() => {
+onBeforeMount(function () {
     if (!props.organisationId) {
         router.replace("/");
     }
@@ -67,7 +67,7 @@ onBeforeMount(() => {
 
 watch(
     isAnyLoading,
-    (loading) => {
+    function (loading) {
         if (loading) {
             Loading.show();
         } else {
@@ -79,13 +79,13 @@ watch(
 
 watch(
     properties,
-    (newProperties) => {
+    function (newProperties) {
         // Check if activePropertyId hasn't been set and properties are available
         if (!activePropertyId.value && newProperties.length > 0) {
             activePropertyId.value = newProperties[0].id;
         }
 
-        newProperties.forEach((property) => {
+        newProperties.forEach(function (property) {
             eventsByProperty[property.id] = new Set();
             hasMoreEventsToFetch[property.id] = true;
         });
@@ -95,13 +95,13 @@ watch(
 
 watch(
     activePropertyId,
-    () => {
+    function () {
         fetchEventsForActiveTab();
     },
     { immediate: true },
 );
 
-onUnmounted(() => {
+onUnmounted(function () {
     if (Loading.isActive) {
         Loading.hide();
     }
@@ -154,7 +154,7 @@ async function onEventItemSlideRight(event: EventDoc): Promise<void> {
     }
 
     await tryCatchLoadingWrapper({
-        hook: async () => {
+        async hook() {
             await deleteDocAndAllSubCollections(
                 getEventsPath({
                     propertyId: event.propertyId,
@@ -204,7 +204,7 @@ function showCreateEventForm(property: PropertyDoc, event?: EventDoc): void {
                 eventStartHours: settings.value.event.eventStartTime24HFormat,
             },
             listeners: {
-                create: (eventData: CreateEventPayload) => {
+                create(eventData: CreateEventPayload) {
                     onCreateEvent(eventData);
                     dialog.hide();
                 },

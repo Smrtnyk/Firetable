@@ -36,8 +36,8 @@ export function useAdminEvent(eventOwner: EventOwner) {
     const reservations = useFirestoreCollection<ReservationDoc>(getReservationsPath(eventOwner));
     const { data: logs } = useFirestoreDocument<EventLogsDoc>(getEventLogsPath(eventOwner));
 
-    const allPlannedReservations = computed<PlannedReservationDoc[]>(() => {
-        return reservations.value.filter(function (res): res is PlannedReservationDoc {
+    const allPlannedReservations = computed<PlannedReservationDoc[]>(function () {
+        return reservations.value.filter(function (res) {
             return isPlannedReservation(res);
         });
     });
@@ -48,31 +48,34 @@ export function useAdminEvent(eventOwner: EventOwner) {
             once: true,
         },
     );
-    const cancelledReservations = computed(() =>
-        allPlannedReservations.value.filter(property("cancelled")),
-    );
-    const arrivedReservations = computed(() => reservations.value.filter(property("arrived")));
+    const cancelledReservations = computed(function () {
+        return allPlannedReservations.value.filter(property("cancelled"));
+    });
+    const arrivedReservations = computed(function () {
+        return reservations.value.filter(property("arrived"));
+    });
 
     const eventHook = useFirestoreDocument<EventDoc>(getEventPath(eventOwner));
 
-    watch(eventFloorsHook.data, async (floors) => {
+    watch(eventFloorsHook.data, async function (floors) {
         if (floors.length === 0) {
             eventFloors.value = [];
             return;
         }
+
         for (const floorDoc of floors) {
             eventFloors.value.push(await decompressFloorDoc(floorDoc));
         }
     });
 
-    watch(eventHook.error, () => {
+    watch(eventHook.error, function () {
         if (eventHook.error.value) {
-            router.replace("/").catch((err) => console.error(err));
+            router.replace("/").catch(console.error);
             eventHook.stop();
         }
     });
 
-    const isLoading = computed(() => {
+    const isLoading = computed(function () {
         return (
             eventFloorsHook.pending.value ||
             usersHook.pending.value ||
