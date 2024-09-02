@@ -10,7 +10,7 @@ import { createQuery, useFirestoreCollection } from "src/composables/useFirestor
 import { property } from "es-toolkit/compat";
 
 export function useGuestsForEvent(eventOwner: EventOwner, reservations: Ref<ReservationDoc[]>) {
-    const guestWithPhoneNumbers = computed(() => {
+    const guestWithPhoneNumbers = computed(function () {
         const values = reservations.value
             .map(property("guestContact"))
             .filter(isValidEuropeanPhoneNumber)
@@ -18,7 +18,7 @@ export function useGuestsForEvent(eventOwner: EventOwner, reservations: Ref<Rese
         return Array.from(new Set(values));
     });
 
-    const guestsQuery: ComputedRef<Query<GuestDoc> | null> = computed(() => {
+    const guestsQuery: ComputedRef<Query<GuestDoc> | null> = computed(function () {
         if (guestWithPhoneNumbers.value.length > 0) {
             return createQuery(
                 guestsCollection(eventOwner.organisationId),
@@ -31,28 +31,27 @@ export function useGuestsForEvent(eventOwner: EventOwner, reservations: Ref<Rese
     const { data } = useFirestoreCollection<GuestDoc>(guestsQuery, { wait: true, once: true });
 
     // Compute recurring guests without current eventId from eventOwner
-    const returningGuests = computed(() => {
+    const returningGuests = computed(function () {
         return data.value
-            .map((guest) => {
+            .map(function (guest) {
                 const currentPropertyVisits = guest.visitedProperties[eventOwner.propertyId] ?? {};
 
                 // Filter out the visits for the current event and create a new visits array
                 // and filter out the visits where the guest has not arrived
                 const visitsWithoutCurrentEvent = Object.entries(currentPropertyVisits)
-                    .filter(
-                        ([eventId, visitDetails]) =>
-                            visitDetails && eventId !== eventOwner.id && visitDetails.arrived,
-                    )
+                    .filter(function ([eventId, visitDetails]) {
+                        return visitDetails && eventId !== eventOwner.id && visitDetails.arrived;
+                    })
                     .map(([, visitDetails]) => visitDetails);
 
                 // Find matching reservations for each visit based on contact
-                const matchingReservations = reservations.value.filter(
-                    (reservation) => reservation.guestContact === guest.contact,
-                );
+                const matchingReservations = reservations.value.filter(function (reservation) {
+                    return reservation.guestContact === guest.contact;
+                });
                 // Map table labels from matching reservations
-                const tableLabels = matchingReservations.map(
-                    (reservation) => reservation.tableLabel,
-                );
+                const tableLabels = matchingReservations.map(function (reservation) {
+                    return reservation.tableLabel;
+                });
 
                 return {
                     name: guest.name,
@@ -61,7 +60,9 @@ export function useGuestsForEvent(eventOwner: EventOwner, reservations: Ref<Rese
                     tableLabels,
                 };
             })
-            .filter((guest) => guest.visits.length > 0);
+            .filter(function (guest) {
+                return guest.visits.length > 0;
+            });
     });
 
     return {
