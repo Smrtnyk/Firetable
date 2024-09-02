@@ -14,7 +14,7 @@ export async function createNewOrganisation(
         const docRef = await addDoc(organisationsCollection(), organisationPayload);
         return docRef.id;
     } catch (e) {
-        console.error("Error adding document: ", e);
+        console.error("Error adding document:", e);
         throw e;
     }
 }
