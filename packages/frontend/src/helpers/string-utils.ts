@@ -2,5 +2,5 @@ export function truncateText(input: string, limit: number): string {
     if (input.length <= limit) {
         return input;
     }
-    return `${input.substring(0, limit)}...`;
+    return `${input.slice(0, Math.max(0, limit))}...`;
 }

@@ -276,7 +276,7 @@ export function useReservationsAnalytics(
 
         plannedReservationsByActiveProperty.value.forEach(function (reservation) {
             const utcDate = new Date(reservation.date);
-            const localDate = new Date(utcDate.getTime() + utcDate.getTimezoneOffset() * 60000);
+            const localDate = new Date(utcDate.getTime() + utcDate.getTimezoneOffset() * 60_000);
             const dayOfWeek = format(localDate, "EEEE");
 
             dayOfWeekTotals[dayOfWeek] = (dayOfWeekTotals[dayOfWeek] ?? 0) + 1;

@@ -148,7 +148,7 @@ describe("FloorEditor", () => {
                 label: "1",
             });
             // Check if the element was added to the canvas
-            const [table] = floorEditor.canvas.getObjects().filter(isTable);
+            const table = floorEditor.canvas.getObjects().find(isTable);
             // Assume getObjects returns an array of fabric.Object, and we added a fabric.Rect for instance
             expect(table).toBeInstanceOf(Group);
         });

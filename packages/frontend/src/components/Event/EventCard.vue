@@ -13,9 +13,9 @@ interface Props {
 const props = defineProps<Props>();
 const { t } = useI18n();
 
-const backgroundImageUrl = computed(() => {
+const backgroundImageUrl = computed(function () {
     const imageIndex = (props.index % 3) + 1;
-    return props.event.img ? props.event.img : `/images/default-event-img-${imageIndex}.jpg`;
+    return props.event.img ?? `/images/default-event-img-${imageIndex}.jpg`;
 });
 </script>
 <template>

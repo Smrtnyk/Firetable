@@ -69,7 +69,9 @@ const {
     logs,
 } = useAdminEvent(eventOwner);
 const { returningGuests } = useGuestsForEvent(eventOwner, allReservations);
-const allTables = computed(() => eventFloors.value.map(getTablesFromFloorDoc).flat());
+const allTables = computed(function () {
+    return eventFloors.value.flatMap(getTablesFromFloorDoc);
+});
 
 const reservationsStatus = computed(() => {
     const activeReservations = allReservations.value.filter(isActiveReservation);

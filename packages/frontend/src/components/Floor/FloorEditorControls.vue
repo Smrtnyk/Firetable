@@ -165,13 +165,13 @@ function onFileSelected(event: Event): void {
     const file = fileInput.files?.[0];
     if (file) {
         const reader = new FileReader();
-        reader.onload = () => {
+        reader.addEventListener("load", function () {
             const fileContent = reader.result as string;
             const jsonData = JSON.parse(fileContent);
             if (props.floorInstance) {
                 props.floorInstance.importFloor(jsonData);
             }
-        };
+        });
         reader.readAsText(file);
     }
 }
