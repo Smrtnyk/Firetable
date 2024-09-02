@@ -64,7 +64,7 @@ describe.skip("useReservationsAnalytics", () => {
         await new Promise((resolve) => setTimeout(resolve, 1));
 
         expect(fetchAnalyticsDataSpy).toHaveBeenCalledWith(
-            expect.stringMatching(/202[0-9]-[0-9][0-9]/),
+            expect.stringMatching(/202\d-\d\d/),
             MOCK_ORG_ID,
             [villageProperty, prestigeProperty],
         );

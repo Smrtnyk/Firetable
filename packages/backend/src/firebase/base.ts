@@ -9,7 +9,7 @@ import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 import { memoize } from "es-toolkit";
 
 const ipAddressPattern =
-    /^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$/;
+    /^((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)$/;
 
 export const initializeFirebase = memoize(() => {
     const firebaseApp = initializeApp(fbConfig);
