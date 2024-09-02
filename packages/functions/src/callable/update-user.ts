@@ -42,9 +42,7 @@ export async function updateUserFn(
         throw new HttpsError("invalid-argument", "User data to update must be provided.");
     }
 
-    const { relatedProperties } = updatedUser;
-
-    if (!relatedProperties) {
+    if (!updatedUser.relatedProperties) {
         throw new HttpsError("invalid-argument", "Related properties field is not set.");
     }
 
@@ -87,12 +85,14 @@ export async function updateUserFn(
 
         const existingProperties = existingPropertiesSnapshot.docs.map((doc) => doc.id);
 
-        const propertiesToAdd = relatedProperties.filter((id) => !existingProperties.includes(id));
-        const propertiesToRemove = existingProperties.filter(
-            (id) => !relatedProperties.includes(id),
-        );
+        const propertiesToAdd = updatedUser.relatedProperties.filter(function (id) {
+            return !existingProperties.includes(id);
+        });
+        const propertiesToRemove = existingProperties.filter(function (id) {
+            return !updatedUser.relatedProperties.includes(id);
+        });
 
-        await db.runTransaction(async (transaction) => {
+        await db.runTransaction(async function (transaction) {
             const userRef = db.collection(getUsersPath(organisationId)).doc(userId);
 
             transaction.update(userRef, {
