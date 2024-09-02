@@ -63,6 +63,7 @@ export default tseslint.config(
                 },
             ],
             "unicorn/explicit-length-check": "error",
+            "unicorn/no-await-in-promise-methods": "error",
             "unicorn/better-regex": "error",
             "unicorn/consistent-destructuring": "error",
             "unicorn/consistent-empty-array-spread": "error",
