@@ -30,21 +30,25 @@ export function useReservationsAnalytics(
     const selectedMonth = ref(format(new Date(), SELECTED_MONTH_FORMAT));
     const selectedDay = ref(DEFAULT_SELECTED_DAY);
 
-    const currentPropertyReservations = computed(() => {
+    const currentPropertyReservations = computed(function () {
         // Find the bucket for the selected property
         return (
-            reservationBuckets.value.find((bucket) => bucket.propertyId === selectedTab.value) ?? {
+            reservationBuckets.value.find(function (bucket) {
+                return bucket.propertyId === selectedTab.value;
+            }) ?? {
                 plannedReservations: [],
                 walkInReservations: [],
             }
         );
     });
 
-    const plannedReservationsByActiveProperty = computed<AugmentedPlannedReservation[]>(() => {
-        return currentPropertyReservations.value.plannedReservations;
-    });
+    const plannedReservationsByActiveProperty = computed<AugmentedPlannedReservation[]>(
+        function () {
+            return currentPropertyReservations.value.plannedReservations;
+        },
+    );
 
-    const plannedVsWalkInReservations = computed<PieChartData>(() => {
+    const plannedVsWalkInReservations = computed<PieChartData>(function () {
         const planned = currentPropertyReservations.value.plannedReservations.length;
         const walkIn = currentPropertyReservations.value.walkInReservations.length;
 
@@ -59,10 +63,10 @@ export function useReservationsAnalytics(
         };
     });
 
-    const plannedReservationsByDay = computed(() => {
+    const plannedReservationsByDay = computed(function () {
         const dayBucket: Record<string, AugmentedPlannedReservation[]> = {};
 
-        plannedReservationsByActiveProperty.value.forEach((reservation) => {
+        plannedReservationsByActiveProperty.value.forEach(function (reservation) {
             const date = new Date(reservation.date);
             const dayIndex = date.getUTCDay();
             const dayName = DAYS_OF_WEEK[dayIndex];
@@ -75,20 +79,23 @@ export function useReservationsAnalytics(
 
         // Filter out days with no reservations
         return Object.fromEntries(
-            Object.entries(dayBucket).filter(([, reservationsVal]) => reservationsVal.length > 0),
+            Object.entries(dayBucket).filter(function ([, reservationsVal]) {
+                return reservationsVal.length > 0;
+            }),
         );
     });
 
-    const plannedArrivedVsNoShow = computed((): PieChartData => {
+    const plannedArrivedVsNoShow = computed<PieChartData>(function () {
         let arrived = 0;
         let pending = 0;
 
-        plannedReservationsByActiveProperty.value.forEach((reservation) => {
+        plannedReservationsByActiveProperty.value.forEach(function (reservation) {
             if (reservation.arrived) {
                 arrived++;
-            } else {
-                pending++;
+                return;
             }
+
+            pending++;
         });
 
         return {
@@ -102,17 +109,20 @@ export function useReservationsAnalytics(
         };
     });
 
-    const avgGuestsPerReservation = computed(() => {
+    const avgGuestsPerReservation = computed(function () {
         let totalPlannedGuests = 0;
         let totalPlannedReservations = 0;
         let totalWalkInGuests = 0;
         let totalWalkInReservations = 0;
 
-        currentPropertyReservations.value.plannedReservations.forEach(({ numberOfGuests }) => {
+        currentPropertyReservations.value.plannedReservations.forEach(function ({
+            numberOfGuests,
+        }) {
             totalPlannedGuests += numberOfGuests;
             totalPlannedReservations++;
         });
-        currentPropertyReservations.value.walkInReservations.forEach(({ numberOfGuests }) => {
+
+        currentPropertyReservations.value.walkInReservations.forEach(function ({ numberOfGuests }) {
             totalWalkInGuests += numberOfGuests;
             totalWalkInReservations++;
         });
@@ -127,12 +137,14 @@ export function useReservationsAnalytics(
 
     const plannedReservationsByProperty = computed<TimeSeriesData>(() => {
         const propertyTotals: Record<string, number> = {};
-        reservationBuckets.value.forEach(({ propertyName, plannedReservations: res }) => {
+        reservationBuckets.value.forEach(function ({ propertyName, plannedReservations: res }) {
             propertyTotals[propertyName] = res.length;
         });
 
         const labels = Object.keys(propertyTotals);
-        const data = labels.map((name) => propertyTotals[name]);
+        const data = labels.map(function (name) {
+            return propertyTotals[name];
+        });
 
         const { backgroundColors, borderColors } = getColors(labels.length);
 
@@ -150,13 +162,13 @@ export function useReservationsAnalytics(
         };
     });
 
-    const consumptionAnalysisCombined = computed(() => {
+    const consumptionAnalysisCombined = computed(function () {
         let totalConsumption = 0;
         let arrivedConsumption = 0;
         let arrivedCount = 0;
         let pendingCount = 0;
 
-        plannedReservationsByActiveProperty.value.forEach((reservation) => {
+        plannedReservationsByActiveProperty.value.forEach(function (reservation) {
             const consumption = reservation.consumption;
             totalConsumption += consumption;
             if (reservation.arrived) {
@@ -199,18 +211,20 @@ export function useReservationsAnalytics(
         };
     });
 
-    const peakReservationHours = computed<TimeSeriesData>(() => {
+    const peakReservationHours = computed<TimeSeriesData>(function () {
         const hourlyTotals: Record<string, number> = {};
 
-        plannedReservationsByActiveProperty.value.forEach((reservation) => {
+        plannedReservationsByActiveProperty.value.forEach(function (reservation) {
             const hour = reservation.time.split(":")[0];
             hourlyTotals[hour] = (hourlyTotals[hour] ?? 0) + 1;
         });
 
-        const sortedHours = Object.keys(hourlyTotals).sort(
-            (a, b) => Number.parseInt(a) - Number.parseInt(b),
-        );
-        const data = sortedHours.map((hour) => hourlyTotals[hour]);
+        const sortedHours = Object.keys(hourlyTotals).sort(function (a, b) {
+            return Number.parseInt(a) - Number.parseInt(b);
+        });
+        const data = sortedHours.map(function (hour) {
+            return hourlyTotals[hour];
+        });
         const hoursCount = sortedHours.length;
         const { backgroundColors, borderColors } = getColors(hoursCount);
 
@@ -228,16 +242,18 @@ export function useReservationsAnalytics(
         };
     });
 
-    const guestDistributionAnalysis = computed<TimeSeriesData>(() => {
+    const guestDistributionAnalysis = computed<TimeSeriesData>(function () {
         const distribution: Record<string, number> = {};
 
-        plannedReservationsByActiveProperty.value.forEach(({ numberOfGuests }) => {
+        plannedReservationsByActiveProperty.value.forEach(function ({ numberOfGuests }) {
             const key = numberOfGuests.toString();
             distribution[key] = (distribution[key] ?? 0) + 1;
         });
 
         const labels = Object.keys(distribution).sort();
-        const data = labels.map((key) => distribution[key]);
+        const data = labels.map(function (key) {
+            return distribution[key];
+        });
 
         const { backgroundColors, borderColors } = getColors(labels.length);
 
@@ -255,10 +271,10 @@ export function useReservationsAnalytics(
         };
     });
 
-    const reservationsByDayOfWeek = computed<TimeSeriesData>(() => {
+    const reservationsByDayOfWeek = computed<TimeSeriesData>(function () {
         const dayOfWeekTotals: Record<string, number> = {};
 
-        plannedReservationsByActiveProperty.value.forEach((reservation) => {
+        plannedReservationsByActiveProperty.value.forEach(function (reservation) {
             const utcDate = new Date(reservation.date);
             const localDate = new Date(utcDate.getTime() + utcDate.getTimezoneOffset() * 60000);
             const dayOfWeek = format(localDate, "EEEE");
@@ -268,7 +284,9 @@ export function useReservationsAnalytics(
 
         const { backgroundColors, borderColors } = getColors(DAYS_OF_WEEK.length);
 
-        const data = DAYS_OF_WEEK.map((day) => dayOfWeekTotals[day] ?? 0);
+        const data = DAYS_OF_WEEK.map(function (day) {
+            return dayOfWeekTotals[day] ?? 0;
+        });
         return {
             labels: DAYS_OF_WEEK,
             datasets: [
@@ -285,7 +303,7 @@ export function useReservationsAnalytics(
 
     const stopWatch = watch(
         [properties, selectedMonth],
-        async () => {
+        async function () {
             if (properties.value.length === 0) {
                 return;
             }
@@ -295,7 +313,7 @@ export function useReservationsAnalytics(
         { immediate: true },
     );
 
-    onUnmounted(() => {
+    onUnmounted(function () {
         analyticsStore.clearData();
         stopWatch();
     });
@@ -365,10 +383,13 @@ function bucketize(
 ): ReservationBucket[] {
     const buckets: Record<string, ReservationBucket> = {};
 
-    events.forEach((event) => {
+    events.forEach(function (event) {
         // Find or create a bucket for each event's property
         if (!buckets[event.propertyId]) {
-            const propertyName = properties.find(({ id }) => id === event.propertyId)?.name;
+            const propertyName = properties.find(function ({ id }) {
+                return id === event.propertyId;
+            })?.name;
+
             if (!propertyName) {
                 return;
             }
@@ -382,7 +403,7 @@ function bucketize(
         }
 
         // Filter reservations for the current event
-        fetchedReservations.forEach((reservation) => {
+        fetchedReservations.forEach(function (reservation) {
             // Ensure the reservation is for the current event
             if (reservation.eventId !== event.id) {
                 return;

@@ -21,7 +21,7 @@ export function useFloors(properties: Ref<PropertyDoc[]>) {
 
     const watcher = watch(
         properties,
-        async (newProperties) => {
+        async function (newProperties) {
             if (newProperties.length > 0) {
                 await fetchAllFloors();
             }
@@ -31,8 +31,10 @@ export function useFloors(properties: Ref<PropertyDoc[]>) {
 
     unsubscribes.push(watcher);
 
-    onUnmounted(() => {
-        unsubscribes.forEach((unsubscribe) => unsubscribe());
+    onUnmounted(function () {
+        unsubscribes.forEach(function (unsubscribe) {
+            unsubscribe();
+        });
     });
 
     async function fetchFloorsForProperty(property: PropertyDoc): Promise<void> {
@@ -41,25 +43,24 @@ export function useFloors(properties: Ref<PropertyDoc[]>) {
             where("propertyId", "==", property.id),
         );
 
-        return new Promise<void>((resolve, reject) => {
+        return new Promise<void>(function (resolve, reject) {
             const unsubscribe = onSnapshot(
                 floorQuery,
-                (snapshot) => {
+                function (snapshot) {
                     floors.value[property.id] = {
                         propertyId: property.id,
                         propertyName: property.name,
                         organisationId: property.organisationId,
-                        floors: snapshot.docs.map(
-                            (doc) =>
-                                ({
-                                    ...doc.data(),
-                                    id: doc.id,
-                                }) as FloorDoc,
-                        ),
+                        floors: snapshot.docs.map(function (doc) {
+                            return {
+                                ...doc.data(),
+                                id: doc.id,
+                            } as FloorDoc;
+                        }),
                     };
                     resolve();
                 },
-                (error) => {
+                function (error) {
                     console.error("Error fetching floors:", error);
                     reject(error);
                 },

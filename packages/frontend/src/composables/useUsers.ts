@@ -18,7 +18,9 @@ export function useUsers(organisationId: string) {
                 isLoading.value = true;
                 users.value = (await fetchUsersByRole([], organisationId)).data;
             } else {
-                const relatedIds = properties.value.flatMap((property) => property.relatedUsers);
+                const relatedIds = properties.value.flatMap(function (property) {
+                    return property.relatedUsers;
+                });
                 if (relatedIds.length === 0) {
                     users.value = [];
                     return;
@@ -27,7 +29,7 @@ export function useUsers(organisationId: string) {
                 isLoading.value = true;
                 users.value = (
                     await fetchUsersByRole(
-                        [...new Set(relatedIds)],
+                        Array.from(new Set(relatedIds)),
                         authStore.nonNullableUser.organisationId,
                     )
                 ).data;
@@ -40,8 +42,10 @@ export function useUsers(organisationId: string) {
     }
 
     watch(
-        () => properties.value.length,
-        async (length) => {
+        function () {
+            return properties.value.length;
+        },
+        async function (length) {
             if (length === 0) {
                 return;
             }

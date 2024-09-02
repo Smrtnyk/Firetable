@@ -52,14 +52,14 @@ export function useFloorEditor(
         floorEditor.addElement({ x, y, tag: item });
     }
 
-    const resizeFloor = debounce((): void => {
+    const resizeFloor = debounce(function () {
         if (!containerRef.value) {
             return;
         }
         floorInstance.value?.resize(containerRef.value.clientWidth);
     }, 100);
 
-    onBeforeUnmount(() => {
+    onBeforeUnmount(function () {
         floorInstance.value?.destroy();
     });
 

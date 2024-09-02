@@ -21,22 +21,22 @@ export function useNetworkStatus(): {
         }
     };
 
-    const updateOnlineStatus = (): void => {
+    function updateOnlineStatus(): void {
         isOnline.value = navigator.onLine;
         if (navigator.onLine) {
             // Perform an additional check to verify true connectivity
             void verifyConnectivity();
         }
-    };
+    }
 
-    onMounted(() => {
+    onMounted(function () {
         window.addEventListener("online", updateOnlineStatus);
         window.addEventListener("offline", updateOnlineStatus);
         // Perform an initial connectivity check when the component is mounted
         void verifyConnectivity();
     });
 
-    onUnmounted(() => {
+    onUnmounted(function () {
         window.removeEventListener("online", updateOnlineStatus);
         window.removeEventListener("offline", updateOnlineStatus);
     });
