@@ -64,6 +64,7 @@ export default tseslint.config(
             ],
             "unicorn/explicit-length-check": "error",
             "unicorn/consistent-destructuring": "error",
+            "unicorn/consistent-empty-array-spread": "error",
             "unicorn/new-for-builtins": "error",
             "unicorn/no-instanceof-array": "error",
             "unicorn/no-lonely-if": "error",
