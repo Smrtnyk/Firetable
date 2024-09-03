@@ -76,7 +76,7 @@ const {
     { wait: true },
 );
 
-const plannedReservations = computed(() => {
+const plannedReservations = computed(function () {
     return reservations.value.filter(function (reservation): reservation is PlannedReservationDoc {
         return isPlannedReservation(reservation);
     });
@@ -95,7 +95,7 @@ const {
     floorInstances,
 } = useFloorsPageEvent(eventFloors, reservations, pageRef, eventOwner, event);
 
-const buttonSize = computed(() => {
+const buttonSize = computed(function () {
     return isMobile.value ? "sm" : "md";
 });
 
@@ -117,6 +117,7 @@ function showEventInfo(): void {
 async function init(): Promise<void> {
     if (!props.eventId) {
         await router.replace("/");
+        // TODO: why no return here?
     }
     Loading.show();
     await Promise.all([eventDataPromise.value, reservationsDataPromise.value]);
@@ -130,15 +131,15 @@ async function init(): Promise<void> {
     eventsStore.setCurrentEventName(event.value?.name ?? "");
 }
 
-const moveFab: TouchPanValue = (ev) => {
+function moveFab(ev: Parameters<NonNullable<TouchPanValue>>[0]): void {
     draggingFab.value = !ev.isFirst && ev.isFinal !== true;
 
     fabPos.value = [fabPos.value[0] - (ev.delta?.x ?? 0), fabPos.value[1] - (ev.delta?.y ?? 0)];
-};
+}
 
 onMounted(init);
 
-onUnmounted(() => {
+onUnmounted(function () {
     eventsStore.setCurrentEventName("");
 });
 </script>

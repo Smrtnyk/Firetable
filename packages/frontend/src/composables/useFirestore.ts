@@ -1,4 +1,4 @@
-import type { Query, DocumentData, DocumentReference } from "firebase/firestore";
+import type { Query, DocumentData, DocumentReference, QueryConstraint } from "firebase/firestore";
 import type { UseCollectionOptions, UseDocumentOptions } from "vuefire";
 import type { ComputedRef } from "vue";
 import { collection, doc, query, setDoc } from "firebase/firestore";
@@ -40,6 +40,9 @@ export function getFirestoreDocument(path: string): DocumentReference {
     return doc(firestore, path);
 }
 
-export function createQuery<T>(collectionRef: any, ...queries: any[]): Query<T> {
-    return query<T, DocumentData>(collectionRef, ...queries);
+export function createQuery<T>(
+    collectionRef: any,
+    ...queryConstraints: QueryConstraint[]
+): Query<T> {
+    return query<T, DocumentData>(collectionRef, ...queryConstraints);
 }

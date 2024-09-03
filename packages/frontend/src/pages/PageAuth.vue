@@ -17,11 +17,13 @@ const passwordRule = [
 ];
 
 async function onSubmit(): Promise<void> {
-    if (!(await authForm.value?.validate())) return;
-    const validEmail = username.value;
+    if (!(await authForm.value?.validate())) {
+        return;
+    }
 
+    const validEmail = username.value;
     await tryCatchLoadingWrapper({
-        hook: async () => {
+        async hook() {
             await loginWithEmail(validEmail, password.value);
             return router.replace("/");
         },

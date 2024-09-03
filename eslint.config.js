@@ -191,6 +191,7 @@ export default tseslint.config(
             "brace-style": "error",
             "constructor-super": "error",
             curly: ["error", "all"],
+            "arrow-body-style": ["error", "always"],
             "eol-last": "error",
             eqeqeq: ["error", "smart"],
             "guard-for-in": "error",

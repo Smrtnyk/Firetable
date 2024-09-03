@@ -29,11 +29,11 @@ const eventOwner: EventOwner = {
     id: "",
 };
 
-const settings = computed(() => {
+const settings = computed(function () {
     return propertiesStore.getOrganisationSettingsById(props.organisationId);
 });
 
-const cardsAspectRatio = computed(() => {
+const cardsAspectRatio = computed(function () {
     return parseAspectRatio(settings.value.event.eventCardAspectRatio);
 });
 
@@ -49,7 +49,7 @@ const { data: events, pending: isLoading } = useFirestoreCollection<EventDoc>(
 
 watch(
     isLoading,
-    (newIsLoading) => {
+    function (newIsLoading) {
         if (newIsLoading) {
             Loading.show();
         } else {
@@ -59,7 +59,7 @@ watch(
     { immediate: true },
 );
 
-onMounted(async () => {
+onMounted(async function () {
     if (!props.organisationId || !props.propertyId) {
         await router.replace("/");
     }
