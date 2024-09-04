@@ -16,11 +16,11 @@ type FirestoreData = Map<string, any>;
 
 export class MockFirestore {
     public data: FirestoreData;
-    private _settings: Settings;
+    #settings: Settings;
 
     constructor(settings: Settings = {}) {
         this.data = new Map();
-        this._settings = settings;
+        this.#settings = settings;
     }
 
     terminate(): Promise<void> {
@@ -29,11 +29,11 @@ export class MockFirestore {
     }
 
     settings(settings: Settings): void {
-        this._settings = settings;
-        console.log(this._settings);
+        this.#settings = settings;
+        console.log(this.#settings);
     }
 
-    async getAll(
+    getAll(
         ...documentRefsOrReadOptions: Array<MockDocumentReference | ReadOptions>
     ): Promise<MockDocumentSnapshot[]> {
         // collect all document references
@@ -113,14 +113,16 @@ export class MockCollection {
         throw new NotImplementedError("isEqual is not implemented");
     }
 
-    async listDocuments(): Promise<MockDocumentReference[]> {
-        return Array.from(this.firestore.data.keys())
-            .filter(
-                (path) =>
+    listDocuments(): Promise<MockDocumentReference[]> {
+        const docs = Array.from(this.firestore.data.keys())
+            .filter((path) => {
+                return (
                     path.startsWith(this.path) &&
-                    path.split("/").length === this.path.split("/").length + 1,
-            )
+                    path.split("/").length === this.path.split("/").length + 1
+                );
+            })
             .map((docPath) => new MockDocumentReference(docPath, this.firestore));
+        return Promise.resolve(docs);
     }
 
     limit(n: number): MockQuery {
@@ -187,7 +189,7 @@ export class MockDocumentReference {
         this.id = path.split("/").pop() ?? "";
     }
 
-    async listCollections(): Promise<MockCollection[]> {
+    listCollections(): Promise<MockCollection[]> {
         const subCollectionPaths = new Set<string>();
         const docPathDepth = this.path.split("/").length;
 
@@ -201,22 +203,23 @@ export class MockDocumentReference {
             }
         }
 
-        return Array.from(subCollectionPaths).map(
+        const cols = Array.from(subCollectionPaths).map(
             (collPath) => new MockCollection(collPath, this.firestore),
         );
+        return Promise.resolve(cols);
     }
 
-    async set(data: any): Promise<MockWriteResult> {
+    set(data: any): Promise<MockWriteResult> {
         if (!data) {
             throw new Error("Data to set cannot be undefined");
         }
         this.firestore.data.set(this.path, data);
-        return new MockWriteResult();
+        return Promise.resolve(new MockWriteResult());
     }
 
-    async get(): Promise<MockDocumentSnapshot> {
+    get(): Promise<MockDocumentSnapshot> {
         const data = this.firestore.data.get(this.path);
-        return new MockDocumentSnapshot(this, data !== undefined, data);
+        return Promise.resolve(new MockDocumentSnapshot(this, data !== undefined, data));
     }
 
     collection(subPath: string): MockCollection {
@@ -241,9 +244,9 @@ export class MockDocumentReference {
         return Promise.resolve(new MockWriteResult());
     }
 
-    async delete(): Promise<MockWriteResult> {
+    delete(): Promise<MockWriteResult> {
         this.firestore.data.delete(this.path);
-        return new MockWriteResult();
+        return Promise.resolve(new MockWriteResult());
     }
 }
 
@@ -260,9 +263,9 @@ class MockTransaction {
         return this;
     }
 
-    async get(docRef: MockDocumentReference): Promise<MockDocumentSnapshot> {
+    get(docRef: MockDocumentReference): Promise<MockDocumentSnapshot> {
         const data = this.transactionData.get(docRef.path);
-        return new MockDocumentSnapshot(docRef, Boolean(data), data);
+        return Promise.resolve(new MockDocumentSnapshot(docRef, Boolean(data), data));
     }
 
     async update(docRef: MockDocumentReference, data: any): Promise<void> {
@@ -287,6 +290,7 @@ class MockTransaction {
         Array.from(this.transactionData.entries()).forEach(([key, value]) => {
             this.db.data.set(key, value);
         });
+        await Promise.resolve();
     }
 }
 
@@ -350,8 +354,11 @@ class MockQuerySnapshot {
     query: any;
     empty = false;
     readTime = Timestamp.now();
+    docs: MockQueryDocumentSnapshot[];
 
-    constructor(public docs: MockQueryDocumentSnapshot[]) {}
+    constructor(docs: MockQueryDocumentSnapshot[]) {
+        this.docs = docs;
+    }
 
     docChanges(): any {
         console.log("MockQuerySnapshot.docChanges");
@@ -369,10 +376,13 @@ class MockQuerySnapshot {
 }
 
 export class MockFieldValue implements FieldValue {
-    private constructor(
-        private operation: "arrayUnion" | "arrayRemove",
-        private elements: any[],
-    ) {}
+    private readonly operation: "arrayUnion" | "arrayRemove";
+    private elements: any[];
+
+    private constructor(operation: "arrayUnion" | "arrayRemove", elements: any[]) {
+        this.operation = operation;
+        this.elements = elements;
+    }
 
     static arrayUnion(...elements: any[]): MockFieldValue {
         return new MockFieldValue("arrayUnion", elements);
@@ -401,7 +411,10 @@ export class MockFieldValue implements FieldValue {
 }
 
 export class MockFieldPath implements FieldPath {
-    private constructor(private fieldPath: string) {}
+    private readonly fieldPath: string;
+    private constructor(fieldPath: string) {
+        this.fieldPath = fieldPath;
+    }
 
     static documentId(): MockFieldPath {
         // A special identifier for document ID
@@ -419,20 +432,20 @@ export class MockFieldPath implements FieldPath {
 }
 
 class MockQuery implements Query {
-    private readonly _initPromise: Promise<void>;
+    readonly #initPromise: Promise<void>;
     private queryConstraints: any[] = [];
     private docs: MockQueryDocumentSnapshot[] = [];
     firestore: any;
 
     constructor(private collection: MockCollection) {
-        this._initPromise = this.init();
+        this.#initPromise = this.init();
     }
 
     async init(): Promise<void> {
         const docsPromise = Array.from(this.collection.firestore.data.entries())
             .filter(([docPath]) => docPath.startsWith(this.collection.path))
             .map(([docPath]) => new MockDocumentReference(docPath, this.collection.firestore))
-            .map((docRef) => {
+            .map(function (docRef) {
                 return docRef.get();
             });
         const docsSnaps = await Promise.all(docsPromise);
@@ -538,7 +551,7 @@ class MockQuery implements Query {
     }
 
     async get(): Promise<MockQuerySnapshot> {
-        await this._initPromise;
+        await this.#initPromise;
         let filteredDocs = this.docs;
 
         for (const constraint of this.queryConstraints) {

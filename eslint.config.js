@@ -344,11 +344,26 @@ export default tseslint.config(
             "no-param-reassign": "error",
             "no-plusplus": "error",
             "no-return-assign": "error",
+            "no-underscore-dangle": [
+                "error",
+                {
+                    allow: ["_doc", "_objects"],
+                },
+            ],
+            "no-unneeded-ternary": "error",
+            "no-useless-computed-key": "error",
+            "no-useless-concat": "error",
+            "no-useless-rename": "error",
+            "no-useless-return": "error",
+            "object-shorthand": "error",
+            "prefer-template": "error",
+            "require-await": "error",
 
             // Classes
             "accessor-pairs": "error",
             "no-constructor-return": "error",
             "no-this-before-super": "error",
+            "no-useless-constructor": "error",
             // "new-cap": "error",
             // "class-methods-use-this": "error",
 

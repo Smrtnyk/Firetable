@@ -66,7 +66,8 @@ export async function createUser(
             organisationId,
         };
 
-        await db.runTransaction(async (transaction) => {
+        // eslint-disable-next-line require-await -- Firestore transaction requires an async function
+        await db.runTransaction(async function (transaction) {
             // Adjusted the userRef to point to the nested users collection under organisations/{organisationId}
             const userRef = db.collection(getUsersPath(organisationId)).doc(createdUser.uid);
             transaction.set(userRef, userDoc);

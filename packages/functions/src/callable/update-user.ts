@@ -92,6 +92,7 @@ export async function updateUserFn(
             return !updatedUser.relatedProperties.includes(id);
         });
 
+        // eslint-disable-next-line require-await -- Firestore transaction requires an async function
         await db.runTransaction(async function (transaction) {
             const userRef = db.collection(getUsersPath(organisationId)).doc(userId);
 

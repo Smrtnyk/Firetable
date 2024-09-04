@@ -124,10 +124,10 @@ export function useReservations(
         }
     }
 
-    async function handleFloorUpdates([newReservations, newFloorInstances]: [
+    function handleFloorUpdates([newReservations, newFloorInstances]: [
         ReservationDoc[],
         FloorViewer[],
-    ]): Promise<void> {
+    ]): void {
         checkIfReservedTableAndCloseCreateReservationDialog();
         for (const floor of newFloorInstances) {
             floor.clearAllReservations();
@@ -283,7 +283,7 @@ export function useReservations(
                                 ? { ...reservation, id: reservation.id }
                                 : void 0,
                         eventStartTimestamp,
-                        floor: floor,
+                        floor,
                         table: element,
                         eventDurationInHours: settings.value.event.eventDurationInHours,
                     },

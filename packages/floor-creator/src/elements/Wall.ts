@@ -41,8 +41,8 @@ export class Wall extends Group {
         return super.toObject();
     }
 
-    static override async fromObject(object: any): Promise<Wall> {
+    static override fromObject(object: any): Promise<Wall> {
         const wallRect = object.objects[0];
-        return new Wall(object, wallRect);
+        return Promise.resolve(new Wall(object, wallRect));
     }
 }

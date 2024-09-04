@@ -148,7 +148,7 @@ function onCreateUserFormSubmit(
     return onCreateUser(newUser);
 }
 
-async function showCreateUserDialog(): Promise<void> {
+function showCreateUserDialog(): void {
     const dialog = createDialog({
         component: FTDialog,
         componentProps: {
@@ -160,7 +160,7 @@ async function showCreateUserDialog(): Promise<void> {
                 organisation: organisation.value,
             },
             listeners: {
-                submit: function (userPayload: CreateUserPayload) {
+                submit(userPayload: CreateUserPayload) {
                     onCreateUserFormSubmit(userPayload);
                     dialog.hide();
                 },

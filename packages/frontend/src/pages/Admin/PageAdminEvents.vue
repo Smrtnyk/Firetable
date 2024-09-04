@@ -168,7 +168,7 @@ async function onEventItemSlideRight(event: EventDoc): Promise<void> {
     });
 }
 
-async function onEventEdit(property: PropertyDoc, event: EventDoc): Promise<void> {
+function onEventEdit(property: PropertyDoc, event: EventDoc): void {
     showCreateEventForm(property, event);
 }
 

@@ -107,7 +107,7 @@ export abstract class Floor {
     }
 
     getTableByLabel(tableLabel: string): BaseTable | undefined {
-        return this.canvas._objects.find((object): object is BaseTable => {
+        return this.canvas._objects.find(function (object): object is BaseTable {
             if (!isTable(object)) {
                 return false;
             }

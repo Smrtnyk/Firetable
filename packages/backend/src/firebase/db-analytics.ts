@@ -75,7 +75,7 @@ async function getEventsForProperties(
             return getDocs(
                 query(
                     eventsCollection({
-                        organisationId: organisationId,
+                        organisationId,
                         propertyId: property.id,
                         id: "",
                     }),

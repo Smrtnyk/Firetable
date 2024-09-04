@@ -64,7 +64,7 @@ describe("MockAuth", () => {
     });
 
     describe("getUserByEmail method", () => {
-        it("should return null for a non-existent user", async () => {
+        it("should return null for a non-existent user", () => {
             expect(() => mockAuth.getUserByEmail("nonexistent@example.com")).toThrow(
                 "User with email nonexistent@example.com not found",
             );

@@ -47,13 +47,15 @@ export class RoundTable extends Table {
         super([tableCircle, textLabel], options);
     }
 
-    static override async fromObject(object: any): Promise<RoundTable> {
+    static override fromObject(object: any): Promise<RoundTable> {
         const shapeOptions = object.objects[0];
         const textOptions = object.objects[1];
-        return new RoundTable({
-            groupOptions: object,
-            shapeOptions,
-            textOptions,
-        });
+        return Promise.resolve(
+            new RoundTable({
+                groupOptions: object,
+                shapeOptions,
+                textOptions,
+            }),
+        );
     }
 }

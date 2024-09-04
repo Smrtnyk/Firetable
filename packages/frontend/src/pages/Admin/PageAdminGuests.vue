@@ -40,6 +40,7 @@ async function onDeleteGuest(guest: GuestDoc, reset: () => void): Promise<void> 
 async function editGuest(_: GuestDoc, reset: () => void): Promise<void> {
     reset();
     if (!(await showConfirm(t("PageAdminGuests.editGuestConfirmationMessage")))) {
+        // eslint-disable-next-line no-useless-return -- needed when todo will be resolved
         return;
     }
     // TODO: implement edit guest

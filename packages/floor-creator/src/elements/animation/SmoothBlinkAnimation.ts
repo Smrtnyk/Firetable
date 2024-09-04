@@ -6,8 +6,11 @@ const ANIMATION_DURATION = 500;
 
 export class SmoothBlinkAnimation implements AnimationStrategy {
     private isAnimating: boolean = false;
+    private target: FabricObject;
 
-    constructor(private target: FabricObject) {}
+    constructor(target: FabricObject) {
+        this.target = target;
+    }
 
     animate(): void {
         if (this.isAnimating) {

@@ -81,7 +81,7 @@ async function deletePropertyAsync(property: PropertyDoc, reset: () => void): Pr
     }
 }
 
-async function showUpdatePropertyDialog(property: PropertyDoc, reset: () => void): Promise<void> {
+function showUpdatePropertyDialog(property: PropertyDoc, reset: () => void): void {
     reset();
     createProperty(property);
 }

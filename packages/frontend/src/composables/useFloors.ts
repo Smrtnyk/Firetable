@@ -38,7 +38,7 @@ export function useFloors(properties: Ref<PropertyDoc[]>) {
         });
     });
 
-    async function fetchFloorsForProperty(property: PropertyDoc): Promise<void> {
+    function fetchFloorsForProperty(property: PropertyDoc): Promise<void> {
         const floorQuery = query(
             floorsCollection(property.organisationId, property.id),
             where("propertyId", "==", property.id),

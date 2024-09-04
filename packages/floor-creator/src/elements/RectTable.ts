@@ -49,13 +49,15 @@ export class RectTable extends Table {
         this.label = options.groupOptions.label;
     }
 
-    static override async fromObject(object: any): Promise<RectTable> {
+    static override fromObject(object: any): Promise<RectTable> {
         const rectOpts = object.objects[0];
         const textOpts = object.objects[1];
-        return new RectTable({
-            groupOptions: object,
-            shapeOptions: rectOpts,
-            textOptions: textOpts,
-        });
+        return Promise.resolve(
+            new RectTable({
+                groupOptions: object,
+                shapeOptions: rectOpts,
+                textOptions: textOpts,
+            }),
+        );
     }
 }

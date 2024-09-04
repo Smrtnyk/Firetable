@@ -32,7 +32,7 @@ import { HttpsError } from "firebase-functions/v2/https";
  * 4. In a transaction, creates a new event document with the provided data.
  * 5. Associates the event with the provided floors.
  */
-export async function createEvent(
+export function createEvent(
     req: CallableRequest<CreateEventPayload>,
 ): Promise<{ id: string; propertyId: string; organisationId: string }> {
     // Authentication check.
@@ -56,7 +56,8 @@ export async function createEvent(
 
     const creator = req.auth.token.email;
 
-    return db.runTransaction(async (transaction) => {
+    // eslint-disable-next-line require-await -- Firestore transaction requires an async function
+    return db.runTransaction(async function (transaction) {
         const eventRef = db.collection(getEventsPath(organisationId, propertyId)).doc(id);
 
         transaction.set(eventRef, {

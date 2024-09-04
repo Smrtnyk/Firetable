@@ -121,7 +121,7 @@ const totalFloors = computed(() => {
     return props.property.floors.length;
 });
 
-async function validateAndEmitCreate(): Promise<void> {
+function validateAndEmitCreate(): void {
     if (state.value.chosenFloors.length === 0) {
         showErrorMessage(t("EventCreateForm.noChosenFloorsMessage"));
         return;
@@ -146,7 +146,7 @@ async function validateAndEmitCreate(): Promise<void> {
     state.value.form = eventObj;
 }
 
-async function validateAndEmitEdit(): Promise<void> {
+function validateAndEmitEdit(): void {
     emit("update", {
         ...state.value.form,
         guestListLimit: Number(state.value.form.guestListLimit),

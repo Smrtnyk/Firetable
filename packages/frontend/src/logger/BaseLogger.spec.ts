@@ -28,7 +28,7 @@ describe("DevLogger", () => {
         DevLogger.error(error);
 
         expect(console.error).toHaveBeenCalledWith(
-            "[FT-DEV] [ERROR]: This is an error\nStack: " + error.stack,
+            `[FT-DEV] [ERROR]: This is an error\nStack: ${error.stack}`,
         );
     });
 
@@ -66,7 +66,7 @@ describe("AppLogger", () => {
         AppLogger.error(error);
 
         expect(console.error).toHaveBeenCalledWith(
-            "[FT-APP] [ERROR]: This is an error\nStack: " + error.stack,
+            `[FT-APP] [ERROR]: This is an error\nStack: ${error.stack}`,
         );
     });
 

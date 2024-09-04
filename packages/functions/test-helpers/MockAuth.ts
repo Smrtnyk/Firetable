@@ -4,15 +4,15 @@ import { generateRandomId } from "./utils.js";
 export class MockAuth implements Partial<Auth> {
     private readonly users: Record<string, UserRecord> = {};
 
-    async getUser(uid: string): Promise<UserRecord> {
+    getUser(uid: string): Promise<UserRecord> {
         const user = this.users[uid];
         if (!user) {
             throw new UserNotFoundError(`User with UID ${uid} not found`);
         }
-        return user;
+        return Promise.resolve(user);
     }
 
-    async createUser(userDetails: { email: string; password: string }): Promise<UserRecord> {
+    createUser(userDetails: { email: string; password: string }): Promise<UserRecord> {
         const uid = generateRandomId();
         const newUser: UserRecord = {
             disabled: false,
@@ -35,10 +35,10 @@ export class MockAuth implements Partial<Auth> {
         };
         this.users[uid] = newUser;
 
-        return newUser;
+        return Promise.resolve(newUser);
     }
 
-    async updateUser(uid: string, updates: { password?: string }): Promise<UserRecord> {
+    updateUser(uid: string, updates: { password?: string }): Promise<UserRecord> {
         const user = this.users[uid];
         if (!user) {
             throw new UserNotFoundError(`User with UID ${uid} not found`);
@@ -46,7 +46,7 @@ export class MockAuth implements Partial<Auth> {
 
         Object.assign(user, updates);
 
-        return user;
+        return Promise.resolve(user);
     }
 
     getUserByEmail(email: string): Promise<UserRecord> {
@@ -57,15 +57,16 @@ export class MockAuth implements Partial<Auth> {
         return Promise.resolve(userRecord);
     }
 
-    async deleteUser(uid: string): Promise<void> {
+    deleteUser(uid: string): Promise<void> {
         if (!this.users[uid]) {
             throw new UserNotFoundError("User not found");
         }
         // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- this is intentional
         delete this.users[uid];
+        return Promise.resolve();
     }
 
-    async setCustomUserClaims(uid: string, customClaims: Record<string, any>): Promise<void> {
+    setCustomUserClaims(uid: string, customClaims: Record<string, any>): Promise<void> {
         const user = this.users[uid];
         if (!user) {
             throw new UserNotFoundError(`No user found for UID: ${uid}`);
@@ -73,6 +74,8 @@ export class MockAuth implements Partial<Auth> {
 
         // @ts-expect-error -- this is intentional
         user.customClaims = customClaims;
+
+        return Promise.resolve();
     }
 }
 

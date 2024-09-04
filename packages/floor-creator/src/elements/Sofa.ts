@@ -48,8 +48,8 @@ export class Sofa extends Group {
         this.sofaBase = base;
     }
 
-    static override async fromObject(object: any): Promise<Sofa> {
-        return new Sofa(object);
+    static override fromObject(object: any): Promise<Sofa> {
+        return Promise.resolve(new Sofa(object));
     }
 
     getBaseFill(): string {

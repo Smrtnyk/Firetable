@@ -103,7 +103,7 @@ async function onFloorSave(): Promise<void> {
     const { name, width, height, json } = floorInstance.value;
 
     await tryCatchLoadingWrapper({
-        hook: async function () {
+        async hook() {
             await updateFirestoreDocument(getFirestoreDocument(floorPath), {
                 json: await compressFloorDoc(json),
                 name,
