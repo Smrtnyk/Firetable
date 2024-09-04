@@ -91,11 +91,11 @@ export function useReservationsAnalytics(
 
         plannedReservationsByActiveProperty.value.forEach(function (reservation) {
             if (reservation.arrived) {
-                arrived++;
+                arrived += 1;
                 return;
             }
 
-            pending++;
+            pending += 1;
         });
 
         return {
@@ -119,12 +119,12 @@ export function useReservationsAnalytics(
             numberOfGuests,
         }) {
             totalPlannedGuests += numberOfGuests;
-            totalPlannedReservations++;
+            totalPlannedReservations += 1;
         });
 
         currentPropertyReservations.value.walkInReservations.forEach(function ({ numberOfGuests }) {
             totalWalkInGuests += numberOfGuests;
-            totalWalkInReservations++;
+            totalWalkInReservations += 1;
         });
 
         const averagePlannedGuests =
@@ -173,9 +173,9 @@ export function useReservationsAnalytics(
             totalConsumption += consumption;
             if (reservation.arrived) {
                 arrivedConsumption += consumption;
-                arrivedCount++;
+                arrivedCount += 1;
             } else {
-                pendingCount++;
+                pendingCount += 1;
             }
         });
 

@@ -12,7 +12,7 @@ export class SpiralStaircase extends Group {
 
         const staircaseComponents: Path[] = [];
 
-        for (let i = 0; i < steps; i++) {
+        for (let i = 0; i < steps; i += 1) {
             const startAngleRad = (Math.PI / 180) * (i * anglePerStep);
             const endAngleRad = (Math.PI / 180) * ((i + 1) * anglePerStep);
 

@@ -38,10 +38,10 @@ export class GridDrawer {
         };
         const lines: Line[] = [];
 
-        for (let i = Math.ceil(width / gridSize); i--; ) {
+        for (let i = Math.ceil(width / gridSize); (i -= 1); ) {
             lines.push(new Line([gridSize * i, -top, gridSize * i, height], lineOption));
         }
-        for (let i = Math.ceil(height / gridSize); i--; ) {
+        for (let i = Math.ceil(height / gridSize); (i -= 1); ) {
             lines.push(new Line([-left, gridSize * i, width, gridSize * i], lineOption));
         }
 

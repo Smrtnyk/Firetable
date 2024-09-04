@@ -46,7 +46,7 @@ export async function deleteDocument({ col, id }: { col: string; id: string }): 
             const docs = await collection.listDocuments();
             for (const doc of docs) {
                 batch.delete(doc);
-                operationCount++;
+                operationCount += 1;
 
                 if (operationCount >= BATCH_SIZE) {
                     await batch.commit();

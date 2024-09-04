@@ -514,10 +514,16 @@ class MockQuery implements Query {
         if (!opStr && !value) {
             throw new NotImplementedError("where for filter is not implemented");
         }
-        if (filterOrFieldPath instanceof MockFieldPath) {
-            filterOrFieldPath = filterOrFieldPath.toString();
-        }
-        this.queryConstraints.push({ type: "where", fieldPath: filterOrFieldPath, opStr, value });
+        const computedFilterOrFieldPath =
+            filterOrFieldPath instanceof MockFieldPath
+                ? filterOrFieldPath.toString()
+                : filterOrFieldPath;
+        this.queryConstraints.push({
+            type: "where",
+            fieldPath: computedFilterOrFieldPath,
+            opStr,
+            value,
+        });
         return this;
     }
 

@@ -30,7 +30,8 @@ export function useFloorEditor(
             const maxLabel = Math.max(...numericLabels);
             label = isNumber(maxLabel) ? maxLabel : 0;
         }
-        return String(++label);
+        label += 1;
+        return String(label);
     }
 
     function onFloorDrop(floorEditor: FloorEditor, { data, x, y }: FloorDropEvent): void {

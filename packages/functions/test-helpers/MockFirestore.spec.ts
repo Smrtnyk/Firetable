@@ -287,7 +287,7 @@ describe("MockFirestore", () => {
         it("should limit the number of documents returned", async () => {
             // Setup
             const collectionRef = db.collection("testCollection");
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < 5; i += 1) {
                 await collectionRef.doc(`doc${i}`).set({ number: i });
             }
 
@@ -341,7 +341,7 @@ describe("MockFirestore", () => {
         it("should combine 'where' and 'limit' constraints correctly", async () => {
             // Setup
             const collectionRef = db.collection("testCollection");
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < 5; i += 1) {
                 await collectionRef.doc(`doc${i}`).set({ status: "active", number: i });
             }
 

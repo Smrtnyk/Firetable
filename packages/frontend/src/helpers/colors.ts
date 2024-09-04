@@ -36,7 +36,7 @@ export function getColors(count: number): { backgroundColors: string[]; borderCo
     const backgroundColors: string[] = [];
     const borderColors: string[] = [];
 
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < count; i += 1) {
         let baseColor;
 
         if (i < baseColors.length) {

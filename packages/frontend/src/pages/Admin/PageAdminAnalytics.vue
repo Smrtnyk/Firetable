@@ -42,7 +42,7 @@ const {
 
 const monthOptions = computed(() => {
     const options = [];
-    for (let i = 11; i >= 0; i--) {
+    for (let i = 11; i >= 0; i -= 1) {
         const date = subMonths(new Date(), i);
         options.push({
             label: format(date, "MMMM yyyy"),

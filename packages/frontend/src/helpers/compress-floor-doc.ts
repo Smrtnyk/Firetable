@@ -10,7 +10,7 @@ export async function decompressFloorDoc(floorDoc: FloorDoc): Promise<FloorDoc> 
 
     const byteCharacters = atob(floorDoc.json);
     const byteNumbers = new Uint8Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
+    for (let i = 0; i < byteCharacters.length; i += 1) {
         byteNumbers[i] = byteCharacters.charCodeAt(i);
     }
 

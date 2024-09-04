@@ -49,7 +49,7 @@ describe("deleteDocument Function", () => {
         // Setup: Create a deeply nested document structure
         let currentRef: any = db.collection(collectionName);
         let deepDocPath = `${collectionName}`;
-        for (let i = 0; i <= MAX_DEPTH + 2; i++) {
+        for (let i = 0; i <= MAX_DEPTH + 2; i += 1) {
             deepDocPath += `/doc${i}/subCol${i}`;
             currentRef = currentRef.doc(`doc${i}`).collection(`subCol${i}`);
         }

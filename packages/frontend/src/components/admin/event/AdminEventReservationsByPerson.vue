@@ -96,7 +96,7 @@ function reservationsReducer(acc: Res, reservation: PlannedReservationDoc): Res 
     const { email, name } = reservedBy;
     const hash = name + email;
     if (acc[hash]) {
-        acc[hash].reservations++;
+        acc[hash].reservations += 1;
     } else {
         acc[hash] = {
             name,
@@ -105,7 +105,7 @@ function reservationsReducer(acc: Res, reservation: PlannedReservationDoc): Res 
         };
     }
     if (arrived) {
-        acc[hash].arrived++;
+        acc[hash].arrived += 1;
     }
     return acc;
 }

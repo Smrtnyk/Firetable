@@ -338,6 +338,12 @@ export default tseslint.config(
             "spaced-comment": ["error", "always", { markers: ["/"] }],
             "use-isnan": "error",
             "valid-typeof": "error",
+            "no-lone-blocks": "error",
+            "no-loop-func": "error",
+            "no-lonely-if": "error",
+            "no-param-reassign": "error",
+            "no-plusplus": "error",
+            "no-return-assign": "error",
 
             // Classes
             "accessor-pairs": "error",
