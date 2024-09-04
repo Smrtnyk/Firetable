@@ -41,7 +41,7 @@ export class MockAuth implements Partial<Auth> {
     updateUser(uid: string, updates: { password?: string }): Promise<UserRecord> {
         const user = this.users[uid];
         if (!user) {
-            throw new UserNotFoundError(`User with UID ${uid} not found`);
+            return Promise.reject(new UserNotFoundError(`User with UID ${uid} not found`));
         }
 
         Object.assign(user, updates);
@@ -59,7 +59,7 @@ export class MockAuth implements Partial<Auth> {
 
     deleteUser(uid: string): Promise<void> {
         if (!this.users[uid]) {
-            throw new UserNotFoundError("User not found");
+            return Promise.reject(new UserNotFoundError("User not found"));
         }
         // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- this is intentional
         delete this.users[uid];
@@ -69,7 +69,7 @@ export class MockAuth implements Partial<Auth> {
     setCustomUserClaims(uid: string, customClaims: Record<string, any>): Promise<void> {
         const user = this.users[uid];
         if (!user) {
-            throw new UserNotFoundError(`No user found for UID: ${uid}`);
+            return Promise.reject(new UserNotFoundError(`No user found for UID: ${uid}`));
         }
 
         // @ts-expect-error -- this is intentional
