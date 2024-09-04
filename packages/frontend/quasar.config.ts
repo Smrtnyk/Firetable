@@ -4,6 +4,7 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 import { configure } from "quasar/wrappers";
 
+// eslint-disable-next-line no-inline-comments -- for api
 export default configure(function (/* ctx */) {
     return {
         eslint: {
@@ -111,7 +112,8 @@ export default configure(function (/* ctx */) {
 
         // https://v2.quasar.dev/quasar-cli-vite/developing-pwa/configuring-pwa
         pwa: {
-            workboxMode: "InjectManifest", // Use your custom Service Worker
+            // Use your custom Service Worker
+            workboxMode: "InjectManifest",
             injectPwaMetaTags: true,
         },
     };

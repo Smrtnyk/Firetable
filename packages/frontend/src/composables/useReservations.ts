@@ -53,7 +53,8 @@ type CrossFloorTable = {
     floor: FloorViewer;
 };
 
-const HALF_HOUR = 30 * 60 * 1000; // 30 minutes in milliseconds
+// 30 minutes in milliseconds
+const HALF_HOUR = 30 * 60 * 1000;
 
 const enum GuestDataMode {
     SET = "set",

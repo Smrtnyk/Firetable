@@ -262,7 +262,7 @@ class MockTransaction {
 
     async get(docRef: MockDocumentReference): Promise<MockDocumentSnapshot> {
         const data = this.transactionData.get(docRef.path);
-        return new MockDocumentSnapshot(docRef, !!data, data);
+        return new MockDocumentSnapshot(docRef, Boolean(data), data);
     }
 
     async update(docRef: MockDocumentReference, data: any): Promise<void> {
@@ -404,7 +404,8 @@ export class MockFieldPath implements FieldPath {
     private constructor(private fieldPath: string) {}
 
     static documentId(): MockFieldPath {
-        return new MockFieldPath("__name__"); // A special identifier for document ID
+        // A special identifier for document ID
+        return new MockFieldPath("__name__");
     }
 
     toString(): string {
@@ -540,26 +541,25 @@ class MockQuery implements Query {
                     // Special handling for document ID
                     if (constraint.fieldPath === "__name__") {
                         return constraint.opStr === "in" && constraint.value.includes(docRef.id);
-                    } else {
-                        const docData = docRef.data();
-                        switch (constraint.opStr) {
-                            case "==":
-                                return docData[constraint.fieldPath] === constraint.value;
-                            case "<=":
-                                return docData[constraint.fieldPath] <= constraint.value;
-                            case "array-contains":
-                                return (
-                                    Array.isArray(docData[constraint.fieldPath]) &&
-                                    docData[constraint.fieldPath].includes(constraint.value)
-                                );
-                            case "in":
-                                return (
-                                    Array.isArray(constraint.value) &&
-                                    constraint.value.includes(docData[constraint.fieldPath])
-                                );
-                            default:
-                                throw new Error(`Unsupported operator: ${constraint.opStr}`);
-                        }
+                    }
+                    const docData = docRef.data();
+                    switch (constraint.opStr) {
+                        case "==":
+                            return docData[constraint.fieldPath] === constraint.value;
+                        case "<=":
+                            return docData[constraint.fieldPath] <= constraint.value;
+                        case "array-contains":
+                            return (
+                                Array.isArray(docData[constraint.fieldPath]) &&
+                                docData[constraint.fieldPath].includes(constraint.value)
+                            );
+                        case "in":
+                            return (
+                                Array.isArray(constraint.value) &&
+                                constraint.value.includes(docData[constraint.fieldPath])
+                            );
+                        default:
+                            throw new Error(`Unsupported operator: ${constraint.opStr}`);
                     }
                 });
             } else if (constraint.type === "limit") {

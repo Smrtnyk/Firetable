@@ -67,7 +67,8 @@ describe("EditorEventManager", () => {
             const mockEvent = {} as any;
             const target = new FabricObject();
             mockEvent.target = target;
-            target.top = RESOLUTION - 1; // 14
+            // 14
+            target.top = RESOLUTION - 1;
 
             // @ts-expect-error -- private method
             manager.snapToGridOnModify(mockEvent);
@@ -93,7 +94,8 @@ describe("EditorEventManager", () => {
             const mockEvent = {} as any;
             const target = new FabricObject();
             mockEvent.target = target;
-            target.left = RESOLUTION - 3; // Outside the snap range
+            // Outside the snap range
+            target.left = RESOLUTION - 3;
 
             // @ts-expect-error -- private method
             manager.snapToGridOnModify(mockEvent);

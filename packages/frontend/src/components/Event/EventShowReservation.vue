@@ -27,7 +27,7 @@ const reservationConfirmed = ref(
     isPlannedReservation(props.reservation) && props.reservation.reservationConfirmed,
 );
 const waitingForResponse = ref(
-    isPlannedReservation(props.reservation) && !!props.reservation.waitingForResponse,
+    isPlannedReservation(props.reservation) && Boolean(props.reservation.waitingForResponse),
 );
 const canDeleteReservation = computed(() => {
     return (

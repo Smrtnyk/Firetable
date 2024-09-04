@@ -16,8 +16,9 @@ async function deleteAuthUsersOfOrganisation(organisationId: string): Promise<vo
     const snapshot = await usersRef.get();
 
     const deletePromises: Promise<void>[] = [];
-    snapshot.forEach((doc) => {
-        const userId = doc.id; // Document ID is the user's UID
+    snapshot.forEach(function (doc) {
+        // Document ID is the user's UID
+        const userId = doc.id;
         deletePromises.push(auth.deleteUser(userId));
     });
 

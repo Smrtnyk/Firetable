@@ -51,39 +51,39 @@ export const useAuthStore = defineStore("auth", () => {
     });
 
     const canReserve = computed(() => {
-        return !!capabilities.value[UserCapability.CAN_RESERVE];
+        return Boolean(capabilities.value[UserCapability.CAN_RESERVE]);
     });
 
     const canSeeReservationCreator = computed(() => {
-        return !!capabilities.value[UserCapability.CAN_SEE_RESERVATION_CREATOR];
+        return Boolean(capabilities.value[UserCapability.CAN_SEE_RESERVATION_CREATOR]);
     });
 
     const canSeeGuestContact = computed(() => {
-        return !!capabilities.value[UserCapability.CAN_SEE_GUEST_CONTACT];
+        return Boolean(capabilities.value[UserCapability.CAN_SEE_GUEST_CONTACT]);
     });
 
     const canDeleteReservation = computed(() => {
-        return !!capabilities.value[UserCapability.CAN_DELETE_RESERVATION];
+        return Boolean(capabilities.value[UserCapability.CAN_DELETE_RESERVATION]);
     });
 
     const canDeleteOwnReservation = computed(() => {
-        return !!capabilities.value[UserCapability.CAN_DELETE_OWN_RESERVATION];
+        return Boolean(capabilities.value[UserCapability.CAN_DELETE_OWN_RESERVATION]);
     });
 
     const canConfirmReservation = computed(() => {
-        return !!capabilities.value[UserCapability.CAN_CONFIRM_RESERVATION];
+        return Boolean(capabilities.value[UserCapability.CAN_CONFIRM_RESERVATION]);
     });
 
     const canCancelReservation = computed(() => {
-        return !!capabilities.value[UserCapability.CAN_CANCEL_RESERVATION];
+        return Boolean(capabilities.value[UserCapability.CAN_CANCEL_RESERVATION]);
     });
 
     const canEditReservation = computed(() => {
-        return !!capabilities.value[UserCapability.CAN_EDIT_RESERVATION];
+        return Boolean(capabilities.value[UserCapability.CAN_EDIT_RESERVATION]);
     });
 
     const canEditOwnReservation = computed(() => {
-        return !!capabilities.value[UserCapability.CAN_EDIT_OWN_RESERVATION];
+        return Boolean(capabilities.value[UserCapability.CAN_EDIT_OWN_RESERVATION]);
     });
 
     function cleanup(): void {

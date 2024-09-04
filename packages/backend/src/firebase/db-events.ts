@@ -76,7 +76,8 @@ export async function getEvents(
     countPerPage: number,
     owner: EventOwner,
 ): Promise<EventDoc[]> {
-    const orderByDateQuery = orderBy("date", "desc"); // Newest date first
+    // Newest date first
+    const orderByDateQuery = orderBy("date", "desc");
     const limitQuery = limit(countPerPage);
     const propertyIdQuery = where("propertyId", "==", owner.propertyId);
 

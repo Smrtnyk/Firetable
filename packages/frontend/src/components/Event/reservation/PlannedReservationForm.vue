@@ -89,7 +89,7 @@ watch(selectionType, (newVal) => {
 });
 
 function requireReservedBySelection(val: PlannedReservation["reservedBy"]): boolean | string {
-    return !!val?.email || t(`EventCreateReservation.requireReservedBySelectionError`);
+    return Boolean(val?.email) || t(`EventCreateReservation.requireReservedBySelectionError`);
 }
 
 defineExpose({

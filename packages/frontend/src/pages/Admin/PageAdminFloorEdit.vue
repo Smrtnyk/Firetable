@@ -134,7 +134,7 @@ function onFloorChange({
     }
 
     if (height && !Number.isNaN(height)) {
-        floorInstance.value?.updateDimensions(floorInstance.value.width, +height);
+        floorInstance.value?.updateDimensions(floorInstance.value.width, Number(height));
     }
 }
 

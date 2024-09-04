@@ -2,7 +2,7 @@ import { dateFromTimestamp, formatEventDate, hourFromTimestamp } from "./date-ut
 import { test, describe, expect } from "vitest";
 
 describe("Date Formatting Functions", () => {
-    const testTimestamp = new Date("2024-01-15T12:30:45Z").getTime(); // Example UTC timestamp
+    const testTimestamp = new Date("2024-01-15T12:30:45Z").getTime();
 
     describe("formatEventDate", () => {
         test("formats correctly in UTC", () => {
@@ -12,7 +12,8 @@ describe("Date Formatting Functions", () => {
 
         test("formats correctly in America/New_York time zone", () => {
             const formattedDate = formatEventDate(testTimestamp, "America/New_York");
-            expect(formattedDate).toBe("15.01.2024, 07:30:45"); // Adjusting for -5 hours
+            // Adjusting for -5 hours
+            expect(formattedDate).toBe("15.01.2024, 07:30:45");
         });
 
         test("formats correctly with null time zone", () => {
@@ -27,12 +28,14 @@ describe("Date Formatting Functions", () => {
     describe("dateFromTimestamp", () => {
         test("formats date correctly in UTC", () => {
             const formattedDate = dateFromTimestamp(testTimestamp, "UTC");
-            expect(formattedDate).toBe("15.01.2024"); // Expected format in de-DE locale
+            // Expected format in de-DE locale
+            expect(formattedDate).toBe("15.01.2024");
         });
 
         test("formats date correctly in America/New_York time zone", () => {
             const formattedDate = dateFromTimestamp(testTimestamp, "America/New_York");
-            expect(formattedDate).toBe("15.01.2024"); // The date remains the same as the time change doesn't affect the date
+            // The date remains the same as the time change doesn't affect the date
+            expect(formattedDate).toBe("15.01.2024");
         });
 
         test("formats date correctly with null time zone", () => {
@@ -46,12 +49,14 @@ describe("Date Formatting Functions", () => {
     describe("hourFromTimestamp", () => {
         test("formats hour correctly in UTC", () => {
             const formattedTime = hourFromTimestamp(testTimestamp, "UTC");
-            expect(formattedTime).toBe("12:30"); // Time in UTC
+            // Time in UTC
+            expect(formattedTime).toBe("12:30");
         });
 
         test("formats hour correctly in America/New_York time zone", () => {
             const formattedTime = hourFromTimestamp(testTimestamp, "America/New_York");
-            expect(formattedTime).toBe("07:30"); // Adjusting for -5 hours
+            // Adjusting for -5 hours
+            expect(formattedTime).toBe("07:30");
         });
 
         test("formats hour correctly with null time zone", () => {
@@ -64,7 +69,8 @@ describe("Date Formatting Functions", () => {
         test("formats boundary time correctly in UTC", () => {
             const boundaryTimestamp = new Date("2024-01-01T00:00:00Z").getTime();
             const formattedTime = hourFromTimestamp(boundaryTimestamp, "UTC");
-            expect(formattedTime).toBe("00:00"); // Beginning of the day
+            // Beginning of the day
+            expect(formattedTime).toBe("00:00");
         });
     });
 });

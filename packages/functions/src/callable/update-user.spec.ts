@@ -218,7 +218,8 @@ describe("updateUserFn", () => {
                 const propertyPath = getPropertyPath(organisationId, propertyId);
                 const propertyDocRef = mockFirestore.doc(propertyPath);
                 await propertyDocRef.set({
-                    relatedUsers: [], // initially empty
+                    // initially empty
+                    relatedUsers: [],
                 });
             }
 

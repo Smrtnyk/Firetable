@@ -88,7 +88,7 @@ function handleOnAuthStateChanged(
                     isFirstCall = false;
                     return;
                 }
-                authStore.setAuthState(!!currentUser.value);
+                authStore.setAuthState(Boolean(currentUser.value));
                 await authStore.initUser(currentUser.value);
             } else {
                 const propertiesStore = usePropertiesStore();

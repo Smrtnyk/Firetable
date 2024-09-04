@@ -243,6 +243,8 @@ export default tseslint.config(
             "no-useless-backreference": "error",
             "consistent-this": "error",
             "func-name-matching": "error",
+            "no-else-return": "error",
+            "no-implicit-coercion": "error",
             // "require-atomic-updates": "error",
             "key-spacing": "error",
             "func-style": ["error", "declaration"],
@@ -343,6 +345,9 @@ export default tseslint.config(
             "no-this-before-super": "error",
             // "new-cap": "error",
             // "class-methods-use-this": "error",
+
+            // Comments
+            "no-inline-comments": "error",
 
             ...vue.configs["vue3-strongly-recommended"].rules,
             "vue/multi-word-component-names": "off",

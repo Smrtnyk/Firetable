@@ -71,7 +71,7 @@ const options = ref(getNamesFromReservations(props.allReservedTables));
 const searchTerm = ref("");
 
 function removeFocus(): void {
-    nextTick(() => {
+    nextTick(function () {
         selectEl.value?.blur();
     });
 }
@@ -104,9 +104,8 @@ function findSearchedTable(inputVal: string | { value: PlannedReservation }): Pl
     const val = typeof inputVal === "string" ? inputVal : inputVal.value.guestName;
     const normalizedVal = val.toLowerCase().trim();
 
+    // If inputVal is an object, we assume a specific item was selected
     if (typeof inputVal === "object") {
-        // If inputVal is an object, we assume a specific item was selected
-
         // Remove focus when item is selected to not keep virtual keyboard which is annoying on mobile
         if (normalizedVal.length > 0) {
             removeFocus();
@@ -118,32 +117,34 @@ function findSearchedTable(inputVal: string | { value: PlannedReservation }): Pl
                 reservation.floorId === inputVal.value.floorId
             );
         });
-    } else {
-        // If inputVal is a string, perform the original filtering logic
-        const tokens = normalizedVal.split(/\s+/);
-        return props.allReservedTables.filter((reservation) => {
-            const { guestName } = reservation;
-            const normalizedGuestName = guestName.toLowerCase();
-            const guestNameTokens = normalizedGuestName.split(/\s+/);
-
-            return tokens.some((token) =>
-                guestNameTokens.some((nameToken) => nameToken.includes(token)),
-            );
-        });
     }
-}
 
-function filterFn(val: string, update: any): void {
-    update(() => {
-        const loweredVal = val.toLowerCase();
-        const filteredTables = findSearchedTable(val);
-        options.value = filteredTables
-            .map(mapReservationToOption)
-            .filter((option) => option.value.guestName.toLowerCase().includes(loweredVal));
+    // If inputVal is a string, perform the original filtering logic
+    const tokens = normalizedVal.split(/\s+/);
+    return props.allReservedTables.filter((reservation) => {
+        const { guestName } = reservation;
+        const normalizedGuestName = guestName.toLowerCase();
+        const guestNameTokens = normalizedGuestName.split(/\s+/);
+
+        return tokens.some(function (token) {
+            return guestNameTokens.some(function (nameToken) {
+                return nameToken.includes(token);
+            });
+        });
     });
 }
 
-watch(searchTerm, (newTerm) => {
+function filterFn(val: string, update: any): void {
+    update(function () {
+        const loweredVal = val.toLowerCase();
+        const filteredTables = findSearchedTable(val);
+        options.value = filteredTables.map(mapReservationToOption).filter(function (option) {
+            return option.value.guestName.toLowerCase().includes(loweredVal);
+        });
+    });
+}
+
+watch(searchTerm, function (newTerm) {
     if (newTerm) {
         const found = findSearchedTable(newTerm);
         emit("found", found);

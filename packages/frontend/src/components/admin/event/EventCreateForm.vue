@@ -54,7 +54,7 @@ const emit = defineEmits<{
     (event: "update", payload: EditEventPayload): void;
 }>();
 
-const isEditMode = computed(() => !!props.event);
+const isEditMode = computed(() => Boolean(props.event));
 const { t } = useI18n();
 const router = useRouter();
 const form = ref<QForm>();

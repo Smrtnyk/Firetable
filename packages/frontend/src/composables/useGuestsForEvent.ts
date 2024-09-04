@@ -14,7 +14,8 @@ export function useGuestsForEvent(eventOwner: EventOwner, reservations: Ref<Rese
         const values = reservations.value
             .map(property("guestContact"))
             .filter(isValidEuropeanPhoneNumber)
-            .slice(0, 30); // Limit to 30 contacts due to Firestore 'in' query constraint
+            // Limit to 30 contacts due to Firestore 'in' query constraint
+            .slice(0, 30);
         return Array.from(new Set(values));
     });
 

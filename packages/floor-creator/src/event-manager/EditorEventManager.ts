@@ -141,16 +141,18 @@ export class EditorEventManager extends EventManager {
         }
 
         // Snapping logic for rotation
-        const snapAngle = 45; // 45 degrees
-        const threshold = 5; // degrees
+        // In degrees
+        const snapAngle = 45;
+        // In degrees
+        const threshold = 5;
         const closestMultipleOfSnap = Math.round(target.angle / snapAngle) * snapAngle;
         const differenceFromSnap = Math.abs(target.angle - closestMultipleOfSnap);
         if (differenceFromSnap <= threshold) {
             target.set("angle", closestMultipleOfSnap).setCoords();
         }
 
-        // Snapping logic for movement
-        const snapRange = 2; // pixels
+        // Snapping logic for movement in pixels
+        const snapRange = 2;
 
         const leftRemainder = target.left % RESOLUTION;
         const topRemainder = target.top % RESOLUTION;

@@ -37,7 +37,9 @@ describe("getReservationTimeOptions", () => {
 
     test("handles invalid time inputs", () => {
         const eventStartTimestamp = new Date("2024-01-01T12:00:00Z").getTime();
-        expect(getReservationTimeOptions(eventStartTimestamp, 10, -1, 0)).toBeFalsy(); // Negative hour
-        expect(getReservationTimeOptions(eventStartTimestamp, 10, 24, 0)).toBeFalsy(); // Hour greater than 23
+        // Negative hour
+        expect(getReservationTimeOptions(eventStartTimestamp, 10, -1, 0)).toBeFalsy();
+        // Hour greater than 23
+        expect(getReservationTimeOptions(eventStartTimestamp, 10, 24, 0)).toBeFalsy();
     });
 });

@@ -5,7 +5,8 @@ import { Collection } from "../../../types/types.js";
 import { getEventsPath } from "../../paths.js";
 import { logger } from "firebase-functions/v2";
 
-const DELETION_AGE_YEARS = 1; // Number of years after which events are considered old
+// Number of years after which events are considered old
+const DELETION_AGE_YEARS = 1;
 
 /**
  * Clears events that are a year old from the Firestore collection.

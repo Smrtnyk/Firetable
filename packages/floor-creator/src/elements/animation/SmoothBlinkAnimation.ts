@@ -35,9 +35,7 @@ export class SmoothBlinkAnimation implements AnimationStrategy {
                             onChange:
                                 this.target.canvas?.requestRenderAll.bind(this.target.canvas) ??
                                 noop,
-                            onComplete: () => {
-                                this.smoothBlink(); // Loop the animation
-                            },
+                            onComplete: this.smoothBlink.bind(this),
                         },
                     );
                 },

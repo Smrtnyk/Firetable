@@ -35,7 +35,8 @@ describe("CommandInvoker", () => {
         invoker.execute(mockCommand);
         invoker.undo();
         invoker.redo();
-        expect(mockCommand.execute).toHaveBeenCalledTimes(2); // Once during initial execute, once during redo
+        // Once during initial execute, once during redo
+        expect(mockCommand.execute).toHaveBeenCalledTimes(2);
         expect(invoker.canUndo()).toBeTruthy();
         expect(invoker.canRedo()).toBeFalsy();
     });
@@ -46,7 +47,8 @@ describe("CommandInvoker", () => {
         invoker.execute(mockCommand);
         invoker.undo();
         invoker.redo();
-        expect(listener).toHaveBeenCalledTimes(3); // Once for each operation
+        // Once for each operation
+        expect(listener).toHaveBeenCalledTimes(3);
     });
 
     it("unregisters listeners", () => {
@@ -74,15 +76,16 @@ describe("CommandInvoker", () => {
 
         invoker.execute(mockCommand);
         invoker.execute(anotherMockCommand);
-
-        invoker.undo(); // undo anotherMockCommand
+        // undo anotherMockCommand
+        invoker.undo();
         expect(anotherMockCommand.undo).toHaveBeenCalled();
-
-        invoker.redo(); // redo anotherMockCommand
+        // redo anotherMockCommand
+        invoker.redo();
         expect(anotherMockCommand.execute).toHaveBeenCalled();
-
-        invoker.undo(); // undo anotherMockCommand
-        invoker.undo(); // undo mockCommand
+        // undo anotherMockCommand
+        invoker.undo();
+        // undo mockCommand
+        invoker.undo();
         expect(mockCommand.undo).toHaveBeenCalled();
     });
 
@@ -154,7 +157,8 @@ describe("CommandInvoker", () => {
         const listener = vi.fn();
         const unregister = invoker.on("change", listener);
         unregister();
-        unregister(); // Call unregister multiple times
+        // Call unregister multiple times
+        unregister();
         invoker.execute(mockCommand);
         expect(listener).not.toHaveBeenCalled();
     });

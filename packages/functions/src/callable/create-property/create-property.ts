@@ -25,7 +25,8 @@ export async function createPropertyFn(req: CallableRequest<Data>): Promise<stri
     // Create a property with data received from the client
     const propertyData = {
         ...req.data,
-        creatorId: req.auth.uid, // Adding the UID from the authenticated request
+        // Adding the UID from the authenticated request
+        creatorId: req.auth.uid,
     };
 
     try {

@@ -11,7 +11,8 @@ export class CommandInvoker extends EventEmitter<CommandInvokerEvents> {
 
     private updateStacksForExecute(command: Command): void {
         this.undoStack.push(command);
-        this.redoStack = []; // Clear the redo stack whenever a new command is executed
+        // Clear the redo stack whenever a new command is executed
+        this.redoStack = [];
     }
 
     private moveBetweenStacks(

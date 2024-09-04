@@ -35,9 +35,10 @@ export class Stage extends Group {
         });
 
         // LEDs for the stage front
-        const ledSpacingWidth = stageBody.width / 5; // For even spacing
+        // For even spacing
+        const ledSpacingWidth = stageBody.width / 5;
 
-        const ledsFront = Array.from({ length: 4 }).map((_, index) => {
+        const ledsFront = Array.from({ length: 4 }).map(function (_, index) {
             return new Circle({
                 left: ledSpacingWidth * (index + 1),
                 top: 2,

@@ -56,7 +56,7 @@ export async function setGuestDataFn(req: CallableRequest<GuestData>): Promise<v
         eventName,
         date: eventDate,
         arrived,
-        cancelled: !!cancelled,
+        cancelled: Boolean(cancelled),
         isVIPVisit: isVIP,
     };
 

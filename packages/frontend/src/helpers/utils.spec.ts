@@ -33,16 +33,19 @@ describe("helpers/utils", () => {
         });
 
         it("returns true for valid European phone numbers with country code", () => {
-            expect(isValidEuropeanPhoneNumber("+441234567890")).toBe(true); // UK number
-            expect(isValidEuropeanPhoneNumber("+33123456789")).toBe(true); // France number
-            expect(isValidEuropeanPhoneNumber("00341234567890")).toBe(true); // Spain number with 00 prefix
+            // UK number
+            expect(isValidEuropeanPhoneNumber("+441234567890")).toBe(true);
+            // France number
+            expect(isValidEuropeanPhoneNumber("+33123456789")).toBe(true);
+            // Spain number with 00 prefix
+            expect(isValidEuropeanPhoneNumber("00341234567890")).toBe(true);
         });
 
         it("returns true for valid European phone numbers without country code", () => {
-            expect(isValidEuropeanPhoneNumber("0123456789")).toBe(true); // Local number
-            expect(isValidEuropeanPhoneNumber("123 456 7890")).toBe(true); // Local number with spaces
-            expect(isValidEuropeanPhoneNumber("123-456-7890")).toBe(true); // Local number with dashes
-            expect(isValidEuropeanPhoneNumber("123.456.7890")).toBe(true); // Local number with dots
+            expect(isValidEuropeanPhoneNumber("0123456789")).toBe(true);
+            expect(isValidEuropeanPhoneNumber("123 456 7890")).toBe(true);
+            expect(isValidEuropeanPhoneNumber("123-456-7890")).toBe(true);
+            expect(isValidEuropeanPhoneNumber("123.456.7890")).toBe(true);
         });
 
         it("returns false for phone numbers with less than 6 digits", () => {
@@ -58,9 +61,9 @@ describe("helpers/utils", () => {
         });
 
         it("handles numbers with various formats and separators", () => {
-            expect(isValidEuropeanPhoneNumber("+44 1234 567890")).toBe(true); // With spaces
-            expect(isValidEuropeanPhoneNumber("0044-1234-567890")).toBe(true); // With dashes
-            expect(isValidEuropeanPhoneNumber("+44.1234.567890")).toBe(true); // With dots
+            expect(isValidEuropeanPhoneNumber("+44 1234 567890")).toBe(true);
+            expect(isValidEuropeanPhoneNumber("0044-1234-567890")).toBe(true);
+            expect(isValidEuropeanPhoneNumber("+44.1234.567890")).toBe(true);
         });
     });
 

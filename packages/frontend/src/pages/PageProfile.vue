@@ -17,14 +17,17 @@ const passwordInput = ref<HTMLElement | null>(null);
 function toggleInput(): void {
     isInputEnabled.value = !isInputEnabled.value;
     if (isInputEnabled.value) {
-        nextTick(() => {
+        nextTick(function () {
             passwordInput.value?.focus();
         });
     }
 }
 
-const avatar = computed(() => {
-    if (!user.value) return "";
+const avatar = computed(function () {
+    if (!user.value) {
+        return "";
+    }
+
     const [first, last] = user.value.name.split(" ");
     if (!last) {
         return first[0];
@@ -33,10 +36,12 @@ const avatar = computed(() => {
 });
 
 async function changePassword(): Promise<void> {
-    if (!newPassword.value) return; // Add more validations if needed
+    if (!newPassword.value) {
+        return;
+    }
 
     await tryCatchLoadingWrapper({
-        hook: async () => {
+        async hook() {
             await submitNewPassword(newPassword.value);
         },
     });

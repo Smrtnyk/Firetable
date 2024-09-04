@@ -17,7 +17,7 @@ export class DJBooth extends Group {
             top: 20,
             radius: 15,
             fill: "#1C1C1C",
-            stroke: "#2F2F2F", // Dark Grey
+            stroke: "#2F2F2F",
             strokeWidth: 2,
             strokeUniform: true,
         });
@@ -41,8 +41,9 @@ export class DJBooth extends Group {
             fontWeight: "bold",
         });
 
-        const ledSpacing = body.width / 7; // dividing by total LEDs + 1 for even spacing
-        const leds = Array.from({ length: 6 }).map((_, index) => {
+        // dividing by total LEDs + 1 for even spacing
+        const ledSpacing = body.width / 7;
+        const leds = Array.from({ length: 6 }).map(function (_, index) {
             return new Circle({
                 left: ledSpacing * (index + 1),
                 top: 57,
