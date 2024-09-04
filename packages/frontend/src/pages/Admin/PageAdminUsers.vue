@@ -53,7 +53,7 @@ const bucketizedUsers = computed((): BucketizedUsers => {
         // if user is property owner, then add it to all buckets
         // it needs to be added to all buckets because it must be a member of all properties
         if (bucketizedUser.role === Role.PROPERTY_OWNER) {
-            properties.value.forEach((property) => {
+            properties.value.forEach(function (property) {
                 if (!buckets[property.id]) {
                     buckets[property.id] = { propertyName: property.name, users: [] };
                 }
@@ -62,8 +62,10 @@ const bucketizedUsers = computed((): BucketizedUsers => {
             return;
         }
 
-        bucketizedUser.relatedProperties.forEach((propertyId) => {
-            const property = properties.value.find((p) => p.id === propertyId);
+        bucketizedUser.relatedProperties.forEach(function (propertyId) {
+            const property = properties.value.find(function ({ id }) {
+                return id === propertyId;
+            });
             if (property) {
                 bucketizedUser.memberOf?.push(property.name);
                 if (!buckets[propertyId]) {

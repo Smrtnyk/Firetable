@@ -10,6 +10,7 @@ import { computed, ref } from "vue";
 import { DEFAULT_CAPABILITIES_BY_ROLE, Role } from "@firetable/types";
 import { QForm } from "quasar";
 import { noEmptyString, noWhiteSpaces } from "src/helpers/form-rules";
+import { property } from "es-toolkit/compat";
 
 interface Props {
     user: User;
@@ -43,7 +44,7 @@ const form = ref<EditUserPayload["updatedUser"]>({
     password: "",
     capabilities: isStaff.value ? userCapabilities : undefined,
 });
-const chosenProperties = ref<string[]>(props.selectedProperties.map((p) => p.id));
+const chosenProperties = ref<string[]>(props.selectedProperties.map(property("id")));
 
 const capabilitiesToDisplay = computed(() => {
     if (form.value.role !== Role.STAFF) {
@@ -103,7 +104,7 @@ async function validateForm(): Promise<boolean> {
 }
 
 function resetProperties(): void {
-    chosenProperties.value = props.selectedProperties.map((p) => p.id);
+    chosenProperties.value = props.selectedProperties.map(property("id"));
 }
 </script>
 

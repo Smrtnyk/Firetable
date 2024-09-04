@@ -19,11 +19,11 @@ export function showConfirm(title: string, message = ""): Promise<boolean> {
         },
     };
 
-    return new Promise((resolve) =>
+    return new Promise(function (resolve) {
         Dialog.create(options)
             .onOk(() => resolve(true))
-            .onCancel(() => resolve(false)),
-    );
+            .onCancel(() => resolve(false));
+    });
 }
 
 export function showErrorMessage(e: unknown): void {

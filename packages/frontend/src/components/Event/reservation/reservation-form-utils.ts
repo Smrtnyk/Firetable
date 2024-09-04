@@ -1,7 +1,7 @@
 export function getReservationTimeOptions(
     eventStartTimestamp: number,
     eventDuration: number,
-    hr: number,
+    hours: number,
     min: number | null = 0,
 ): boolean {
     const eventStart = new Date(eventStartTimestamp);
@@ -13,7 +13,7 @@ export function getReservationTimeOptions(
             currentDate.getUTCFullYear(),
             currentDate.getUTCMonth(),
             currentDate.getUTCDate(),
-            hr,
+            hours,
             min ?? 0,
             0,
             0,

@@ -20,7 +20,7 @@ const MAX_USERS = 100;
 
 // Function to split array into chunks
 function chunkArray(arr: string[], size: number): string[][] {
-    return Array.from({ length: Math.ceil(arr.length / size) }, (_v, i) =>
+    return Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
         arr.slice(i * size, i * size + size),
     );
 }

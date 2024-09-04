@@ -31,17 +31,17 @@ const props = withDefaults(defineProps<Props>(), {
 const { selectedFloorElement, deleteAllowed, existingLabels } = toRefs(props);
 const emit = defineEmits<EmitEvents>();
 const colorPickerProxy = ref<QPopupProxy | null>(null);
-const getElementWidth = computed(() => {
-    const el = selectedFloorElement.value;
-    return el ? Math.round(el.width * el.scaleX) : 0;
+const getElementWidth = computed(function () {
+    const element = selectedFloorElement.value;
+    return element ? Math.round(element.width * element.scaleX) : 0;
+});
+const getElementHeight = computed(function () {
+    const element = selectedFloorElement.value;
+    return element ? Math.round(element.height * element.scaleY) : 0;
 });
 const undoRedoState = reactive({
     canUndo: false,
     canRedo: false,
-});
-const getElementHeight = computed(() => {
-    const el = selectedFloorElement.value;
-    return el ? Math.round(el.height * el.scaleY) : 0;
 });
 
 const localWidth = ref(getElementWidth.value);

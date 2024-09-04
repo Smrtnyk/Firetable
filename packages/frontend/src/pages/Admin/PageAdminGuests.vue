@@ -72,8 +72,10 @@ function guestVisitsToReadable(guest: GuestDoc): string {
         return "No visits recorded";
     }
 
-    const res = Object.entries(guest.visitedProperties).map(([propertyId, visits]) => {
-        const property = properties.value.find((p) => p.id === propertyId);
+    const res = Object.entries(guest.visitedProperties).map(function ([propertyId, visits]) {
+        const property = properties.value.find(function ({ id }) {
+            return id === propertyId;
+        });
         if (!property) {
             return "";
         }

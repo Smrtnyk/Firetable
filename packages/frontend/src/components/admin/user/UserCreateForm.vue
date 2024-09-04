@@ -27,8 +27,8 @@ const userCreateForm = ref<QForm>();
 const form = ref<CreateUserPayload | User>(userSkeleton());
 const chosenProperties = ref<string[]>([]);
 
-const role = computed(() => authStore.nonNullableUser.role);
-const availableRoles = computed(() => availableRolesBasedOn(role.value));
+const currUserRole = computed(() => authStore.nonNullableUser.role);
+const availableRoles = computed(() => availableRolesBasedOn(currUserRole.value));
 const emailSuffix = computed(() => {
     return `@${props.organisation.name}.at`;
 });
@@ -65,7 +65,9 @@ function availableRolesBasedOn(roleVal: string): Role[] {
     if (roleVal === ADMIN) {
         return Object.values(Role);
     }
-    return Object.values(Role).filter((r) => r !== Role.PROPERTY_OWNER);
+    return Object.values(Role).filter(function (role) {
+        return role !== Role.PROPERTY_OWNER;
+    });
 }
 
 async function validateForm(): Promise<boolean> {

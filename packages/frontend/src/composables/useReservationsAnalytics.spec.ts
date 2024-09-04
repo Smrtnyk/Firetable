@@ -61,7 +61,9 @@ describe.skip("useReservationsAnalytics", () => {
         );
 
         await nextTick();
-        await new Promise((resolve) => setTimeout(resolve, 1));
+        await new Promise(function (resolve) {
+            setTimeout(resolve, 1);
+        });
 
         expect(fetchAnalyticsDataSpy).toHaveBeenCalledWith(
             expect.stringMatching(/202\d-\d\d/),

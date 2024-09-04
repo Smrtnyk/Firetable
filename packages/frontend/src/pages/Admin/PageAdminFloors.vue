@@ -57,7 +57,7 @@ function showAddNewFloorForm(propertyData: PropertyFloors, floorDocs: FloorDoc[]
             component: AddNewFloorForm,
             maximized: false,
             listeners: {
-                create: function onFloorCreate(name: string) {
+                create(name: string) {
                     tryCatchLoadingWrapper({
                         hook() {
                             const rawFloor = {

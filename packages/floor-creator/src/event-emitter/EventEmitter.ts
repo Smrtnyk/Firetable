@@ -1,3 +1,6 @@
+import { negate } from "es-toolkit";
+import { matches } from "es-toolkit/compat";
+
 export type EventEmitterListener<EventType extends unknown[] = unknown[]> = (
     ...args: EventType
 ) => void;
@@ -29,13 +32,13 @@ export class EventEmitter<Events extends EventMap> implements TypedEventEmitter<
 
     public off<K extends keyof Events>(event: K, listener: EventEmitterListener<Events[K]>): void {
         let currentListeners = this.listeners.get(event) ?? [];
-        currentListeners = currentListeners.filter((l) => l !== listener);
+        currentListeners = currentListeners.filter(negate(matches(listener)));
         this.listeners.set(event, currentListeners);
     }
 
     public emit<K extends keyof Events>(event: K, ...args: Events[K]): void {
         const currentListeners = this.listeners.get(event) ?? [];
-        currentListeners.forEach((listener) => {
+        currentListeners.forEach(function (listener) {
             listener(...args);
         });
     }

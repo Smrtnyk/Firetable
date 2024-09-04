@@ -591,15 +591,15 @@ export class MockWriteBatch {
     }
 
     async commit(): Promise<MockWriteResult[]> {
-        for (const op of this.operations) {
-            if (op.type === FirestoreOperation.SET) {
-                await op.docRef.set(op.data);
-            } else if (op.type === FirestoreOperation.UPDATE) {
-                await op.docRef.update(op.data);
-            } else if (op.type === FirestoreOperation.DELETE) {
-                await op.docRef.delete();
+        for (const operation of this.operations) {
+            if (operation.type === FirestoreOperation.SET) {
+                await operation.docRef.set(operation.data);
+            } else if (operation.type === FirestoreOperation.UPDATE) {
+                await operation.docRef.update(operation.data);
+            } else if (operation.type === FirestoreOperation.DELETE) {
+                await operation.docRef.delete();
             } else {
-                throw new Error(`Unsupported operation: ${op.type}`);
+                throw new Error(`Unsupported operation: ${operation.type}`);
             }
         }
 

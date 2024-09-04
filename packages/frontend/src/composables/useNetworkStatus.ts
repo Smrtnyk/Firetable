@@ -9,7 +9,7 @@ export function useNetworkStatus(): {
     const isOnline = ref(window.navigator.onLine);
 
     // Helper function to perform an actual network request to verify internet connectivity
-    const verifyConnectivity = async (): Promise<void> => {
+    async function verifyConnectivity(): Promise<void> {
         try {
             await fetch(onlineCheckUrl, {
                 method: "HEAD",
@@ -19,7 +19,7 @@ export function useNetworkStatus(): {
         } catch (error) {
             isOnline.value = false;
         }
-    };
+    }
 
     function updateOnlineStatus(): void {
         isOnline.value = navigator.onLine;

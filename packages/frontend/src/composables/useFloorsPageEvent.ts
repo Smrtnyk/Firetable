@@ -107,8 +107,8 @@ export function useFloorsPageEvent(
     }
 
     function mapFloorToCanvas(floor: FloorDoc) {
-        return function (el: any) {
-            canvases.set(floor.id, el);
+        return function (element: any) {
+            canvases.set(floor.id, element);
         };
     }
 
