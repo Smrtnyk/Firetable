@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CreateUserPayload, EditUserPayload, User } from "@firetable/types";
+import type { CreateUserPayload, EditUserPayload, PropertyDoc, User } from "@firetable/types";
 import type { BucketizedUser, BucketizedUsers } from "src/components/admin/user/AdminUsersList.vue";
 import { Role } from "@firetable/types";
 
@@ -46,12 +46,22 @@ const unassignedUsers = computed(() => {
     });
 });
 
-const bucketizedUsers = computed((): BucketizedUsers => {
+const bucketizedUsers = computed<BucketizedUsers>(function () {
     const buckets: BucketizedUsers = {};
-    users.value.forEach((user) => {
+
+    // Helper function to add users to buckets
+    function addUserToBucket(bucketizedUser: BucketizedUser, property: PropertyDoc): void {
+        bucketizedUser.memberOf?.push(property.name);
+        if (!buckets[property.id]) {
+            buckets[property.id] = { propertyName: property.name, users: [] };
+        }
+        buckets[property.id].users.push(bucketizedUser);
+    }
+
+    users.value.forEach(function (user) {
         const bucketizedUser: BucketizedUser = { ...user, memberOf: [] };
-        // if user is property owner, then add it to all buckets
-        // it needs to be added to all buckets because it must be a member of all properties
+
+        // If user is property owner, add them to all buckets
         if (bucketizedUser.role === Role.PROPERTY_OWNER) {
             properties.value.forEach(function (property) {
                 if (!buckets[property.id]) {
@@ -62,37 +72,33 @@ const bucketizedUsers = computed((): BucketizedUsers => {
             return;
         }
 
+        // Process user-related properties
         bucketizedUser.relatedProperties.forEach(function (propertyId) {
-            const property = properties.value.find(function ({ id }) {
-                return id === propertyId;
-            });
+            const property = findPropertyById(propertyId);
             if (property) {
-                bucketizedUser.memberOf?.push(property.name);
-                if (!buckets[propertyId]) {
-                    buckets[propertyId] = { propertyName: property.name, users: [] };
-                }
-                buckets[propertyId].users.push(bucketizedUser);
+                addUserToBucket(bucketizedUser, property);
             }
         });
     });
+
     return buckets;
 });
 
-const properties = computed(() => {
+const properties = computed(function () {
     return propertiesStore.getPropertiesByOrganisationId(props.organisationId);
 });
 
-const onCreateUser = withLoading(async (newUser: CreateUserPayload) => {
+const onCreateUser = withLoading(async function (newUser: CreateUserPayload) {
     await createUserWithEmail(newUser);
     await fetchUsers();
 });
 
-const onUpdateUser = withLoading(async (updatedUser: EditUserPayload) => {
+const onUpdateUser = withLoading(async function (updatedUser: EditUserPayload) {
     await updateUser(updatedUser);
     await fetchUsers();
 });
 
-const onDeleteUser = withLoading(async (user: User) => {
+const onDeleteUser = withLoading(async function (user: User) {
     if (user.id === authStore.user?.id) {
         showErrorMessage("You cannot delete yourself!");
         return;
@@ -101,13 +107,19 @@ const onDeleteUser = withLoading(async (user: User) => {
     await fetchUsers();
 });
 
-onBeforeMount(() => {
+function findPropertyById(propertyId: string): PropertyDoc | undefined {
+    return properties.value.find(function ({ id }) {
+        return id === propertyId;
+    });
+}
+
+onBeforeMount(function () {
     if (!props.organisationId) {
         router.replace("/");
     }
 });
 
-onUnmounted(() => {
+onUnmounted(function () {
     if (Loading.isActive) {
         Loading.hide();
     }
@@ -115,7 +127,7 @@ onUnmounted(() => {
 
 watch(
     isLoading,
-    (loading) => {
+    function (loading) {
         if (loading) {
             Loading.show();
         } else {
@@ -183,7 +195,7 @@ async function showEditUserDialog(user: User): Promise<void> {
                 organisation: organisation.value,
             },
             listeners: {
-                submit: async (userPayload: EditUserPayload["updatedUser"]) => {
+                async submit(userPayload: EditUserPayload["updatedUser"]) {
                     await onUpdateUser({
                         userId: userPayload.id,
                         organisationId: userPayload.organisationId,

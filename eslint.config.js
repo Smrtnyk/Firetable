@@ -277,8 +277,12 @@ export default tseslint.config(
                 },
             ],
             "max-depth": ["error", 4],
+            "max-nested-callbacks": ["error", 3],
+            // Kinda overkill
+            // "max-lines-per-function": ["error", 40],
             complexity: "error",
             "block-scoped-var": "error",
+            "no-array-constructor": "error",
             "keyword-spacing": [
                 "error",
                 {
@@ -335,6 +339,7 @@ export default tseslint.config(
             "accessor-pairs": "error",
             "no-constructor-return": "error",
             "no-this-before-super": "error",
+            // "new-cap": "error",
             // "class-methods-use-this": "error",
 
             ...vue.configs["vue3-strongly-recommended"].rules,
@@ -349,6 +354,7 @@ export default tseslint.config(
         rules: {
             "unicorn/consistent-function-scoping": "off",
             "unicorn/no-useless-undefined": "off",
+            "max-nested-callbacks": "off",
         },
     },
     {
