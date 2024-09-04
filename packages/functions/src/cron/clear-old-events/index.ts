@@ -2,6 +2,7 @@ import type { QuerySnapshot } from "firebase-admin/firestore";
 import { deleteDocument } from "../../delete-document/index.js";
 import { db } from "../../init.js";
 import { Collection } from "../../../types/types.js";
+import { getEventsPath } from "../../paths.js";
 import { logger } from "firebase-functions/v2";
 
 const DELETION_AGE_YEARS = 1; // Number of years after which events are considered old
@@ -66,9 +67,7 @@ async function getOldEvents(
 
     try {
         return await db
-            .collection(
-                `${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}/${propertyId}/${Collection.EVENTS}`,
-            )
+            .collection(getEventsPath(organisationId, propertyId))
             .where("date", "<=", date.getTime())
             .get();
     } catch (error) {

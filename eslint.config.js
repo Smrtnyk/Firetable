@@ -212,6 +212,11 @@ export default tseslint.config(
                     ],
                 },
             ],
+            "no-confusing-arrow": "error",
+            "array-callback-return": "error",
+            "for-direction": "error",
+            "no-async-promise-executor": "error",
+            "no-await-in-loop": "error",
             "key-spacing": "error",
             "keyword-spacing": [
                 "error",
@@ -277,6 +282,12 @@ export default tseslint.config(
         rules: {
             "unicorn/consistent-function-scoping": "off",
             "unicorn/no-useless-undefined": "off",
+        },
+    },
+    {
+        files: ["**/functions/src/**/*.ts", "**/functions/test-helpers/**/*.ts"],
+        rules: {
+            "no-await-in-loop": "off",
         },
     },
     ...compat.extends("plugin:prettier/recommended"),

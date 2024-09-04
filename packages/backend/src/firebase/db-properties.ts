@@ -42,13 +42,15 @@ export function deleteProperty(property: PropertyDoc): Promise<void> {
 export async function fetchPropertiesForAdmin(
     organisations: OrganisationDoc[],
 ): Promise<PropertyDoc[]> {
-    const allProperties: PropertyDoc[] = [];
-    for (const organisationDoc of organisations) {
-        const propertiesSnapshot = await getDocs(propertiesCollection(organisationDoc.id));
-        const properties = propertiesSnapshot.docs.map(
-            (doc) => ({ ...doc.data(), id: doc.id }) as PropertyDoc,
-        );
-        allProperties.push(...properties);
-    }
-    return allProperties;
+    const propertiesSnapshots = await Promise.all(
+        organisations.map(function (org) {
+            return getDocs(propertiesCollection(org.id));
+        }),
+    );
+
+    return propertiesSnapshots.flatMap(function (snapshot) {
+        return snapshot.docs.map(function (doc) {
+            return { ...doc.data(), id: doc.id } as PropertyDoc;
+        });
+    });
 }

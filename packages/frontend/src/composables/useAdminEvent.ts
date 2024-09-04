@@ -63,9 +63,11 @@ export function useAdminEvent(eventOwner: EventOwner) {
             return;
         }
 
-        for (const floorDoc of floors) {
-            eventFloors.value.push(await decompressFloorDoc(floorDoc));
-        }
+        eventFloors.value = await Promise.all(
+            floors.map(function (floorDoc) {
+                return decompressFloorDoc(floorDoc);
+            }),
+        );
     });
 
     watch(eventHook.error, function () {
