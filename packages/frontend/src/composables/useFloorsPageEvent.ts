@@ -18,6 +18,7 @@ import { useReservations } from "src/composables/useReservations";
 import { debounce } from "quasar";
 import { decompressFloorDoc } from "src/helpers/compress-floor-doc";
 import { isTouchDevice } from "src/helpers/is-touch-device";
+import { AppLogger } from "src/logger/FTLogger.js";
 
 type ActiveFloor = { id: string; name: string };
 
@@ -54,7 +55,7 @@ export function useFloorsPageEvent(
     onBeforeUnmount(function () {
         window.removeEventListener("resize", resizeFloor);
         floorInstances.value.forEach(function (floorInstance) {
-            floorInstance.destroy();
+            floorInstance.destroy().catch(AppLogger.error.bind(AppLogger));
         });
     });
 

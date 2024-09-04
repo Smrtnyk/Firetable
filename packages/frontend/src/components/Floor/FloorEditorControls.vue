@@ -11,6 +11,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref, toRefs, watch } fr
 import { exportFile, QPopupProxy } from "quasar";
 import { buttonSize, isMobile, isTablet } from "src/global-reactives/screen-detection";
 import { ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
+import { AppLogger } from "src/logger/FTLogger.js";
 
 interface Props {
     selectedFloorElement: FloorEditorElement | undefined;
@@ -169,7 +170,7 @@ function onFileSelected(event: Event): void {
             const fileContent = reader.result as string;
             const jsonData = JSON.parse(fileContent);
             if (props.floorInstance) {
-                props.floorInstance.importFloor(jsonData);
+                props.floorInstance.importFloor(jsonData).catch(AppLogger.error.bind(AppLogger));
             }
         });
         reader.readAsText(file);

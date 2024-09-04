@@ -37,12 +37,12 @@ async function onDeleteGuest(guest: GuestDoc, reset: () => void): Promise<void> 
     });
 }
 
-async function editGuest(guest: GuestDoc, reset: () => void): Promise<void> {
+async function editGuest(_: GuestDoc, reset: () => void): Promise<void> {
     reset();
     if (!(await showConfirm(t("PageAdminGuests.editGuestConfirmationMessage")))) {
         return;
     }
-    console.log(guest);
+    // TODO: implement edit guest
 }
 
 function showCreateGuestDialog(): void {

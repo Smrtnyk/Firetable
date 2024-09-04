@@ -24,12 +24,12 @@ export async function deleteUser(req: CallableRequest<User>): Promise<void> {
         // If we've reached this point, it means the Auth deletion was successful, so we proceed to Firestore deletion
         const userDoc = db.collection(getUsersPath(user.organisationId)).doc(user.id);
         if (!(await userDoc.get()).exists) {
-            console.warn(`User ${user.id} not found in Firestore.`);
+            logger.warn(`User ${user.id} not found in Firestore.`);
             return;
         }
         await userDoc.delete();
     } catch (error) {
-        console.error(`Failed to delete user ${user.id}`, error);
+        logger.error(`Failed to delete user ${user.id}`, error);
         throw new HttpsError("internal", "Failed to delete user");
     }
 }

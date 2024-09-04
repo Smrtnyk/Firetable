@@ -1,3 +1,4 @@
+/* eslint-disable no-console -- cannot import frontend logger here */
 import { register } from "register-service-worker";
 
 declare const process: {

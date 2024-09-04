@@ -90,15 +90,15 @@ export class FloorEditor extends Floor {
         this.gridDrawer.drawGrid(this.width, this.height);
     }
 
-    override renderData(jsonData?: FloorData["json"]): void {
-        super.renderData(jsonData);
+    override async renderData(jsonData?: FloorData["json"]): Promise<void> {
+        await super.renderData(jsonData);
     }
 
-    importFloor(jsonImport: { width: number; height: number; json: string }): void {
+    async importFloor(jsonImport: { width: number; height: number; json: string }): Promise<void> {
         this.width = jsonImport.width;
         this.height = jsonImport.height;
         super.resize(this.containerWidth);
-        this.renderData(JSON.parse(jsonImport.json));
+        await this.renderData(JSON.parse(jsonImport.json));
     }
 
     protected setElementProperties(element: FabricObject): void {
@@ -125,12 +125,12 @@ export class FloorEditor extends Floor {
         this.gridDrawer.toggleGridVisibility(this.width, this.height);
     };
 
-    updateDimensions(newWidth: number, newHeight: number): void {
+    async updateDimensions(newWidth: number, newHeight: number): Promise<void> {
         this.width = newWidth;
         this.height = newHeight;
         this.scale = calculateCanvasScale(this.containerWidth, this.width);
         this.setScaling();
-        this.renderData(this.floorDoc.json);
+        await this.renderData(this.floorDoc.json);
         this.renderGrid();
     }
 
@@ -138,10 +138,13 @@ export class FloorEditor extends Floor {
         this.name = newName;
     }
 
-    destroy(): void {
+    /**
+     * This can throw an error so it should be called in a try-catch block
+     */
+    async destroy(): Promise<void> {
         this.eventManager.destroy();
         this.zoomManager.destroy();
         this.touchManager.destroy();
-        this.canvas.dispose().catch(console.error);
+        await this.canvas.dispose();
     }
 }

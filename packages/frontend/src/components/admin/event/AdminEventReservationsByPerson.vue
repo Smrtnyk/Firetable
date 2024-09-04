@@ -80,7 +80,6 @@ const chartHeight = computed(() => {
     const minBarHeight = isMobile.value ? 27 : 52;
     const numBars = chartData.value.labels.length;
     const totalHeight = numBars * minBarHeight;
-    console.log(totalHeight);
     const minHeight = 300;
     return Math.max(totalHeight, minHeight);
 });
@@ -88,7 +87,6 @@ const chartHeight = computed(() => {
 function updateChartHeight(): void {
     if (chartRef.value) {
         chartRef.value.style.height = `${chartHeight.value}px`;
-        console.log("Chart height updated to", chartHeight.value);
     }
 }
 

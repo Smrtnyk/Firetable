@@ -4,6 +4,7 @@ import { onBeforeUnmount } from "vue";
 import { FloorElementTypes, extractAllTablesLabels } from "@firetable/floor-creator";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { debounce } from "quasar";
+import { AppLogger } from "src/logger/FTLogger.js";
 
 export function isNumber(candidate: unknown): candidate is number {
     return !Number.isNaN(candidate) && typeof candidate === "number" && Number.isFinite(candidate);
@@ -60,7 +61,7 @@ export function useFloorEditor(
     }, 100);
 
     onBeforeUnmount(function () {
-        floorInstance.value?.destroy();
+        floorInstance.value?.destroy().catch(AppLogger.error.bind(AppLogger));
     });
 
     return { getNextTableLabel, onFloorDrop, resizeFloor };

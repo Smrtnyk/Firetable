@@ -4,6 +4,7 @@ import { ADMIN } from "../../../types/types.js";
 import { getPropertiesPath, getUsersPath } from "../../paths.js";
 import { FieldValue } from "firebase-admin/firestore";
 import { HttpsError } from "firebase-functions/v2/https";
+import { logger } from "firebase-functions/v2";
 
 interface Data {
     name: string;
@@ -51,7 +52,7 @@ export async function createPropertyFn(req: CallableRequest<Data>): Promise<stri
 
         return propertyId;
     } catch (error) {
-        console.error("Error adding property:", error);
+        logger.error("Error adding property:", error);
         throw new HttpsError("internal", "Internal error occurred");
     }
 }

@@ -44,18 +44,13 @@ function drawChart(chartData: PieChartData): void {
     }
 }
 
-watch(
-    () => props.chartData,
-    (newData) => {
-        drawChart(newData);
-    },
-);
+watch(() => props.chartData, drawChart);
 
-onMounted(() => {
+onMounted(function () {
     drawChart(props.chartData);
 });
 
-onUnmounted(() => {
+onUnmounted(function () {
     chartInstance?.destroy();
 });
 </script>

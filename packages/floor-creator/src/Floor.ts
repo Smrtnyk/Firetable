@@ -91,18 +91,19 @@ export abstract class Floor {
         this.setObjectCoords();
     }
 
-    renderData(jsonData?: FloorData["json"]): void {
+    renderData(jsonData?: FloorData["json"]): Promise<void> {
         if (!jsonData) {
-            return;
+            return Promise.resolve();
         }
-        this.canvas
-            // @ts-expect-error -- figure this out, our type might not be accurate
-            .loadFromJSON(jsonData, this.elementReviver)
-            .then(() => {
-                this.emit("rendered");
-                return this.canvas.requestRenderAll();
-            })
-            .catch(console.error);
+        return (
+            this.canvas
+                // @ts-expect-error -- figure this out, our type might not be accurate
+                .loadFromJSON(jsonData, this.elementReviver)
+                .then(() => {
+                    this.emit("rendered");
+                    return this.canvas.requestRenderAll();
+                })
+        );
     }
 
     getTableByLabel(tableLabel: string): BaseTable | undefined {

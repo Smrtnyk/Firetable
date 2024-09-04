@@ -40,6 +40,7 @@ import { extractAllTablesLabels, FloorEditor } from "@firetable/floor-creator";
 import { nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from "vue";
 import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
 import { useFloorEditor } from "src/composables/useFloorEditor";
+import { AppLogger } from "src/logger/FTLogger.js";
 
 interface Props {
     floor: FloorDoc;
@@ -60,10 +61,13 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
     window.removeEventListener("resize", resizeFloor);
+    floorInstance.value?.destroy().catch(AppLogger.error.bind(AppLogger));
 });
 
 function saveFloorState(): void {
-    if (!floorInstance.value) return;
+    if (!floorInstance.value) {
+        return;
+    }
     emit("update", floorInstance.value);
 }
 
@@ -76,8 +80,11 @@ async function onElementClick(
     selectedFloorElement.value = element;
 }
 
-watch(floorContainerRef, () => {
-    if (!floorContainerRef.value || !viewerContainerRef.value) return;
+watch(floorContainerRef, function () {
+    if (!floorContainerRef.value || !viewerContainerRef.value) {
+        return;
+    }
+
     floorInstance.value = new FloorEditor({
         floorDoc: props.floor,
         canvas: floorContainerRef.value,

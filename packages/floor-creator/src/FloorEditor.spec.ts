@@ -50,8 +50,8 @@ describe("FloorEditor", () => {
     });
 
     describe("updateDimensions()", () => {
-        it("updates floor dimensions", () => {
-            floorEditor.updateDimensions(800, 800);
+        it("updates floor dimensions", async () => {
+            await floorEditor.updateDimensions(800, 800);
 
             expect(floorEditor.width).toBe(800);
             expect(floorEditor.height).toBe(800);
@@ -163,9 +163,9 @@ describe("FloorEditor", () => {
             expect(floorEditor.gridDrawer.isGridVisible).toBe(!initialVisibility);
         });
 
-        it("re-renders grid after updating dimensions", () => {
+        it("re-renders grid after updating dimensions", async () => {
             const spy = vi.spyOn(floorEditor, "renderGrid");
-            floorEditor.updateDimensions(500, 500);
+            await floorEditor.updateDimensions(500, 500);
             expect(spy).toHaveBeenCalled();
         });
     });

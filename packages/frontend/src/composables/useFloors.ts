@@ -4,6 +4,7 @@ import { showErrorMessage } from "src/helpers/ui-helpers";
 import { onUnmounted, ref, watch } from "vue";
 import { floorsCollection } from "@firetable/backend";
 import { query, where, onSnapshot } from "firebase/firestore";
+import { AppLogger } from "src/logger/FTLogger.js";
 
 export type PropertyFloors = {
     propertyName: string;
@@ -61,7 +62,7 @@ export function useFloors(properties: Ref<PropertyDoc[]>) {
                     resolve();
                 },
                 function (error) {
-                    console.error("Error fetching floors:", error);
+                    AppLogger.error("Error fetching floors:", error);
                     reject(error);
                 },
             );

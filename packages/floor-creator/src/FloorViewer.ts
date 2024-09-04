@@ -62,10 +62,13 @@ export class FloorViewer extends Floor {
         }
     }
 
-    destroy(): void {
+    /**
+     * This can throw so it should be called in a try/catch block
+     */
+    async destroy(): Promise<void> {
         this.eventManager.destroy();
         this.zoomManager.destroy();
         this.touchManager.destroy();
-        this.canvas.dispose().catch(console.error);
+        await this.canvas.dispose();
     }
 }

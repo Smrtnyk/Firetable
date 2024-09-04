@@ -24,6 +24,7 @@ import {
 } from "src/composables/useFirestore";
 import { decompressFloorDoc } from "src/helpers/compress-floor-doc";
 import { property } from "es-toolkit/compat";
+import { AppLogger } from "src/logger/FTLogger.js";
 
 export function useAdminEvent(eventOwner: EventOwner) {
     const router = useRouter();
@@ -72,7 +73,7 @@ export function useAdminEvent(eventOwner: EventOwner) {
 
     watch(eventHook.error, function () {
         if (eventHook.error.value) {
-            router.replace("/").catch(console.error);
+            router.replace("/").catch(AppLogger.error.bind(AppLogger));
             eventHook.stop();
         }
     });

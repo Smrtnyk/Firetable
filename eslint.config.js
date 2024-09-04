@@ -282,6 +282,8 @@ export default tseslint.config(
             // "max-lines-per-function": ["error", 40],
             complexity: "error",
             "block-scoped-var": "error",
+            "no-case-declarations": "error",
+            "no-console": "error",
             "no-array-constructor": "error",
             "keyword-spacing": [
                 "error",
@@ -355,12 +357,19 @@ export default tseslint.config(
             "unicorn/consistent-function-scoping": "off",
             "unicorn/no-useless-undefined": "off",
             "max-nested-callbacks": "off",
+            "no-console": "off",
         },
     },
     {
         files: ["**/functions/src/**/*.ts", "**/functions/test-helpers/**/*.ts"],
         rules: {
             "no-await-in-loop": "off",
+        },
+    },
+    {
+        files: ["**/functions/test-helpers/**/*.ts"],
+        rules: {
+            "no-console": "off",
         },
     },
     ...compat.extends("plugin:prettier/recommended"),

@@ -40,7 +40,7 @@ import { determineTableColor } from "src/helpers/floor";
 import { isValidEuropeanPhoneNumber } from "src/helpers/utils";
 import { isEventInProgress } from "src/helpers/events-utils";
 import { usePropertiesStore } from "src/stores/properties-store";
-import { noop } from "es-toolkit/function";
+import { AppLogger } from "src/logger/FTLogger.js";
 
 type OpenDialog = {
     label: string;
@@ -117,9 +117,9 @@ export function useReservations(
         };
 
         if (mode === GuestDataMode.SET) {
-            setGuestData(data).catch(console.error);
+            setGuestData(data).catch(AppLogger.error.bind(AppLogger));
         } else {
-            deleteGuestVisit(data).catch(console.error);
+            deleteGuestVisit(data).catch(AppLogger.error.bind(AppLogger));
         }
     }
 
@@ -167,7 +167,9 @@ export function useReservations(
     }
 
     function createEventLog(message: string): void {
-        addLogToEvent(eventOwner, message, authStore.nonNullableUser).catch(noop);
+        addLogToEvent(eventOwner, message, authStore.nonNullableUser).catch(
+            AppLogger.error.bind(AppLogger),
+        );
     }
 
     function handleReservationCreation(reservationData: Reservation): void {

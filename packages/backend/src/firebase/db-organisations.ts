@@ -10,13 +10,8 @@ export interface CreateOrganisationPayload {
 export async function createNewOrganisation(
     organisationPayload: CreateOrganisationPayload,
 ): Promise<string> {
-    try {
-        const docRef = await addDoc(organisationsCollection(), organisationPayload);
-        return docRef.id;
-    } catch (e) {
-        console.error("Error adding document:", e);
-        throw e;
-    }
+    const docRef = await addDoc(organisationsCollection(), organisationPayload);
+    return docRef.id;
 }
 
 export function deleteOrganisation(organisationId: string): Promise<void> {
@@ -34,7 +29,6 @@ export async function fetchOrganisationById(
     const organisationDocSnapshot = await getDoc(organisationDoc(organisationId));
 
     if (!organisationDocSnapshot.exists()) {
-        console.log("No organisation found for the given organisation id");
         return null;
     }
 

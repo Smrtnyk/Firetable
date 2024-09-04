@@ -38,6 +38,12 @@ import {
 } from "firebase/firestore";
 import { httpsCallable } from "firebase/functions";
 
+/**
+ * It can throw so should be called inside a try-catch block
+ * @param eventOwner The owner of the event
+ * @param logMessage The message to be logged
+ * @param user The user who created the log
+ */
 export async function addLogToEvent(
     eventOwner: EventOwner,
     logMessage: string,
@@ -56,18 +62,13 @@ export async function addLogToEvent(
         },
     };
 
-    try {
-        await setDoc(
-            eventLogsRef,
-            {
-                logs: arrayUnion(logEntry),
-            },
-            { merge: true },
-        );
-        console.log("Log entry added successfully");
-    } catch (error) {
-        console.error("Error adding log entry:", error);
-    }
+    await setDoc(
+        eventLogsRef,
+        {
+            logs: arrayUnion(logEntry),
+        },
+        { merge: true },
+    );
 }
 
 export async function getEvents(

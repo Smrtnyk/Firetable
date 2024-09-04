@@ -1,5 +1,6 @@
 import type { FloorDoc } from "@firetable/types";
 import { gzip, ungzip } from "pako";
+import { DevLogger } from "src/logger/DevFTLogger.js";
 
 export async function decompressFloorDoc(floorDoc: FloorDoc): Promise<FloorDoc> {
     const start = performance.now();
@@ -15,14 +16,14 @@ export async function decompressFloorDoc(floorDoc: FloorDoc): Promise<FloorDoc> 
 
     floorDoc.json = new TextDecoder().decode(ungzip(byteNumbers));
 
-    console.log(performance.now() - start);
+    DevLogger.logPerformance("floor decompression", performance.now() - start);
     return floorDoc;
 }
 
 export async function compressFloorDoc(json: string): Promise<string> {
     const start = performance.now();
     const res = btoa(String.fromCharCode(...gzip(json)));
-    console.log(performance.now() - start);
+    DevLogger.logPerformance("floor compression", performance.now() - start);
 
     return res;
 }
