@@ -113,7 +113,7 @@ async function init(): Promise<void> {
     }
 }
 
-const onFloorUpdate = withLoading(async function (floor: FloorEditor) {
+const onFloorUpdate = withLoading(function (floor: FloorEditor) {
     return updateEventFloorData(eventOwner, {
         id: floor.id,
         json: compressFloorDoc(floor.json),

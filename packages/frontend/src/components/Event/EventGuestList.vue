@@ -29,28 +29,30 @@ interface Props {
     eventOwner: EventOwner;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-    guestList: () => [],
-});
+const { guestListLimit, eventOwner, guestList = [] } = defineProps<Props>();
 const quasar = useQuasar();
 const eventsStore = useEventsStore();
 const authStore = useAuthStore();
 const { t } = useI18n();
-const reachedCapacity = computed(() => props.guestList.length / props.guestListLimit);
-const isGuestListFull = computed(() => props.guestList.length >= props.guestListLimit);
+const reachedCapacity = computed(function () {
+    return guestList.length / guestListLimit;
+});
+const isGuestListFull = computed(function () {
+    return guestList.length >= guestListLimit;
+});
 
-const canInteract = computed(() => {
+const canInteract = computed(function () {
     return [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN].includes(authStore.nonNullableUser.role);
 });
 
 function onCreate(newGuestData: GuestInGuestListData): Promise<void> | void {
-    if (props.guestList.length >= props.guestListLimit) {
+    if (guestList.length >= guestListLimit) {
         showErrorMessage(t("EventGuestList.guestLimitReached"));
         return;
     }
 
     tryCatchLoadingWrapper({
-        hook: () => addGuestToGuestList(props.eventOwner, newGuestData),
+        hook: () => addGuestToGuestList(eventOwner, newGuestData),
     });
 }
 
@@ -58,7 +60,7 @@ async function deleteGuest(id: string, reset: () => void): Promise<void> {
     if (!(await showConfirm(t("EventGuestList.deleteGuestTitle")))) return reset();
 
     await tryCatchLoadingWrapper({
-        hook: () => deleteGuestFromGuestList(props.eventOwner, id),
+        hook: () => deleteGuestFromGuestList(eventOwner, id),
         errorHook: reset,
     });
 }
@@ -67,7 +69,7 @@ const confirmGuest = withLoading(function (
     { id, confirmed }: GuestInGuestListData,
     reset: () => void,
 ) {
-    return confirmGuestFromGuestList(props.eventOwner, id, !confirmed).then(reset);
+    return confirmGuestFromGuestList(eventOwner, id, !confirmed).then(reset);
 });
 
 function showAddNewGuestForm(): void {
@@ -118,12 +120,12 @@ function showAddNewGuestForm(): void {
                     <q-badge
                         color="white"
                         text-color="accent"
-                        :label="`${props.guestList.length} / ${props.guestListLimit}`"
+                        :label="`${guestList.length} / ${guestListLimit}`"
                     />
                 </div>
             </q-linear-progress>
 
-            <div class="EventGuestList" v-if="props.guestList.length === 0">
+            <div class="EventGuestList" v-if="guestList.length === 0">
                 <div class="row justify-center items-center q-mt-md">
                     <h6 class="q-ma-sm text-weight-bolder underline">
                         {{ t("EventGuestList.guestListEmptyMessage") }}

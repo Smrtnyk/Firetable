@@ -117,7 +117,7 @@ export function useFloorsPageEvent(
         await Promise.all(eventFloors.value.map(instantiateFloor));
     }
 
-    async function instantiateFloor(floorDoc: FloorDoc): Promise<void> {
+    function instantiateFloor(floorDoc: FloorDoc): void {
         const canvas = canvases.get(floorDoc.id);
 
         if (!canvas || !pageRef.value) {
