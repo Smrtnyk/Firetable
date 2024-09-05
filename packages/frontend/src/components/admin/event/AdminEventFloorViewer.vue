@@ -37,7 +37,7 @@
 import type { Floor, FloorEditorElement } from "@firetable/floor-creator";
 import type { FloorDoc } from "@firetable/types";
 import { extractAllTablesLabels, FloorEditor } from "@firetable/floor-creator";
-import { nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from "vue";
+import { nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch, useTemplateRef } from "vue";
 import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
 import { useFloorEditor } from "src/composables/useFloorEditor";
 import { AppLogger } from "src/logger/FTLogger.js";
@@ -50,16 +50,16 @@ interface Props {
 const selectedFloorElement = ref<FloorEditorElement | undefined>();
 const props = defineProps<Props>();
 const emit = defineEmits(["update"]);
-const floorContainerRef = ref<HTMLCanvasElement | undefined>();
-const viewerContainerRef = ref<HTMLDivElement | undefined>();
+const floorContainerRef = useTemplateRef<HTMLCanvasElement>("floorContainerRef");
+const viewerContainerRef = useTemplateRef<HTMLDivElement>("viewerContainerRef");
 const floorInstance = shallowRef<FloorEditor | undefined>();
 const { onFloorDrop, resizeFloor } = useFloorEditor(floorInstance, viewerContainerRef);
 
-onMounted(() => {
+onMounted(function () {
     window.addEventListener("resize", resizeFloor);
 });
 
-onBeforeUnmount(() => {
+onBeforeUnmount(function () {
     window.removeEventListener("resize", resizeFloor);
     floorInstance.value?.destroy().catch(AppLogger.error.bind(AppLogger));
 });

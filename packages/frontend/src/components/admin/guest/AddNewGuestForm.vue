@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CreateGuestPayload } from "@firetable/types";
-import { ref } from "vue";
+import { ref, useTemplateRef } from "vue";
 import { minLength } from "src/helpers/form-rules";
 import { QForm } from "quasar";
 import { isValidEuropeanPhoneNumber } from "src/helpers/utils";
@@ -10,7 +10,7 @@ const emit = defineEmits<{
 }>();
 const guestName = ref("");
 const guestContact = ref("");
-const createGuestForm = ref<null | QForm>(null);
+const createGuestForm = useTemplateRef<QForm>("createGuestForm");
 const guestNameRules = [minLength("Guest name must be at least 3 characters long", 3)];
 const guestContactRules = [
     function (value: string) {
@@ -19,7 +19,9 @@ const guestContactRules = [
 ];
 
 async function submit(): Promise<void> {
-    if (!(await createGuestForm.value?.validate())) return;
+    if (!(await createGuestForm.value?.validate())) {
+        return;
+    }
 
     emit("create", {
         name: guestName.value,

@@ -3,7 +3,7 @@ import type { Floor, FloorEditorElement } from "@firetable/floor-creator";
 import type { FloorDoc, NumberTuple } from "@firetable/types";
 import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
 
-import { nextTick, onBeforeUnmount, onMounted, ref, shallowRef } from "vue";
+import { nextTick, onBeforeUnmount, onMounted, ref, shallowRef, useTemplateRef } from "vue";
 import { useRouter } from "vue-router";
 import { Loading, useQuasar } from "quasar";
 import { ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
@@ -42,8 +42,8 @@ const props = defineProps<Props>();
 const router = useRouter();
 const q = useQuasar();
 const floorInstance = shallowRef<FloorEditor | undefined>();
-const canvasRef = ref<HTMLCanvasElement | undefined>();
-const pageRef = ref<HTMLDivElement | undefined>();
+const canvasRef = useTemplateRef<HTMLCanvasElement | undefined>("canvasRef");
+const pageRef = useTemplateRef<HTMLDivElement>("pageRef");
 const selectedElement = ref<FloorEditorElement | undefined>();
 
 const floorPath = getFloorPath(props.organisationId, props.propertyId, props.floorId);
@@ -80,12 +80,14 @@ onMounted(async () => {
     Loading.hide();
 });
 
-async function instantiateFloor(floorDoc: FloorDoc): Promise<void> {
-    if (!canvasRef.value || !pageRef.value) return;
+function instantiateFloor(floorDoc: FloorDoc): void {
+    if (!canvasRef.value || !pageRef.value) {
+        return;
+    }
 
     const floorEditor = new FloorEditor({
         canvas: canvasRef.value,
-        floorDoc: await decompressFloorDoc(floorDoc),
+        floorDoc: decompressFloorDoc(floorDoc),
         containerWidth: pageRef.value.clientWidth,
     });
     floorInstance.value = floorEditor;
@@ -105,7 +107,7 @@ async function onFloorSave(): Promise<void> {
     await tryCatchLoadingWrapper({
         async hook() {
             await updateFirestoreDocument(getFirestoreDocument(floorPath), {
-                json: await compressFloorDoc(json),
+                json: compressFloorDoc(json),
                 name,
                 width,
                 height,
@@ -166,7 +168,9 @@ async function elementClickHandler(
 
 function onDeleteElement(element: FloorEditorElement): void {
     const elementToDelete = element.canvas?.getActiveObject();
-    if (!elementToDelete) return;
+    if (!elementToDelete) {
+        return;
+    }
     element.canvas?.remove(elementToDelete);
     selectedElement.value = undefined;
 }

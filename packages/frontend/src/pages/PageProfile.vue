@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { User } from "@firetable/types";
-import { computed, nextTick, ref } from "vue";
+import { computed, nextTick, ref, useTemplateRef } from "vue";
 import { useAuthStore } from "src/stores/auth-store";
 import FTTitle from "src/components/FTTitle.vue";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
@@ -12,7 +12,7 @@ const authStore = useAuthStore();
 const user = computed<User | null>(() => authStore.user);
 const isInputEnabled = ref(false);
 const newPassword = ref("");
-const passwordInput = ref<HTMLElement | null>(null);
+const passwordInput = useTemplateRef<HTMLElement>("passwordInput");
 
 function toggleInput(): void {
     isInputEnabled.value = !isInputEnabled.value;

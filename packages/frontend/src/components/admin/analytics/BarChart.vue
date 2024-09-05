@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import type { TimeSeriesData } from "src/components/admin/analytics/types";
-import { ref, onMounted, watch, onUnmounted } from "vue";
+import { useTemplateRef, onMounted, watch, onUnmounted } from "vue";
 import {
     Chart,
     BarController,
@@ -24,7 +24,7 @@ const props = defineProps<{
     chartTitle: string;
 }>();
 
-const chartCanvas = ref<HTMLCanvasElement | undefined>();
+const chartCanvas = useTemplateRef<HTMLCanvasElement>("chartCanvas");
 let chartInstance: Chart | undefined;
 
 function drawChart(chartData: TimeSeriesData): void {

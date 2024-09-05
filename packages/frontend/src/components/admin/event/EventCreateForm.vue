@@ -6,7 +6,7 @@ import type {
     EventDoc,
 } from "@firetable/types";
 import type { PropertyFloors } from "src/composables/useFloors";
-import { computed, ref, watch, watchEffect } from "vue";
+import { computed, ref, watch, watchEffect, useTemplateRef } from "vue";
 
 import { useI18n } from "vue-i18n";
 import {
@@ -57,7 +57,7 @@ const emit = defineEmits<{
 const isEditMode = computed(() => Boolean(props.event));
 const { t } = useI18n();
 const router = useRouter();
-const form = ref<QForm>();
+const form = useTemplateRef<QForm>("form");
 const state = ref<State>({
     form: { ...eventObj },
     chosenFloors: [],
@@ -76,7 +76,7 @@ function validDates(calendarDate: string): boolean {
 }
 
 // In your setup or watchEffect where you determine if you're in edit mode
-watchEffect(() => {
+watchEffect(function () {
     if (isEditMode.value && props.event) {
         // Use event data if in edit mode
         const editDate = new Date(props.event.date);
@@ -96,7 +96,7 @@ watchEffect(() => {
     }
 });
 
-watch([() => state.value.selectedDate, () => state.value.selectedTime], () => {
+watch([() => state.value.selectedDate, () => state.value.selectedTime], function () {
     if (!state.value.selectedDate) {
         return;
     }

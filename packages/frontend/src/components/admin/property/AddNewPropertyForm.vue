@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CreatePropertyPayload, UpdatePropertyPayload } from "@firetable/backend";
 import type { PropertyDoc } from "@firetable/types";
-import { ref, watch } from "vue";
+import { ref, watch, useTemplateRef } from "vue";
 import { minLength, validOptionalURL } from "src/helpers/form-rules";
 import { QForm } from "quasar";
 import { showErrorMessage } from "src/helpers/ui-helpers";
@@ -20,13 +20,13 @@ const emit = defineEmits<{
 const { t } = useI18n();
 const propertyName = ref("");
 const propertyImgUrl = ref("");
-const createPropertyForm = ref<null | QForm>(null);
+const createPropertyForm = useTemplateRef<QForm>("createPropertyForm");
 const propertyRules = [minLength(t("AddNewPropertyForm.propertyNameLengthValidationMessage"), 3)];
 const imgUrlRules = [validOptionalURL()];
 
 watch(
     () => props.propertyDoc,
-    (newVal) => {
+    function (newVal) {
         if (newVal) {
             propertyName.value = newVal.name;
             propertyImgUrl.value = newVal.img ?? "";
@@ -36,7 +36,9 @@ watch(
 );
 
 async function submit(): Promise<void> {
-    if (!(await createPropertyForm.value?.validate())) return;
+    if (!(await createPropertyForm.value?.validate())) {
+        return;
+    }
 
     if (!props.organisationId) {
         showErrorMessage("organisationId must be set for this property!");

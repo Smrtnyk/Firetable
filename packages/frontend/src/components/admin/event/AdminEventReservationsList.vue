@@ -40,7 +40,7 @@ function emitDelete(reservation: ReservationDoc, reset: () => void): void {
 </script>
 
 <template>
-    <q-scroll-area ref="logsContainer" class="scroll-reservations-container">
+    <q-scroll-area class="scroll-reservations-container">
         <q-list v-if="reservations.length > 0">
             <q-slide-item
                 @right="({ reset }) => emitDelete(reservation, reset)"

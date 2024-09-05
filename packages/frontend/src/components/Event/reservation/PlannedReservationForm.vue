@@ -2,7 +2,7 @@
 import type { PlannedReservation, User } from "@firetable/types";
 import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
 import { ReservationStatus, ReservationType } from "@firetable/types";
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
 import { greaterThanZero, minLength, noEmptyString, requireNumber } from "src/helpers/form-rules";
@@ -10,15 +10,7 @@ import { useAuthStore } from "src/stores/auth-store";
 import { getFirestoreTimestamp } from "@firetable/backend";
 import { getReservationTimeOptions } from "src/components/Event/reservation/reservation-form-utils";
 
-const socials = ["Whatsapp", "SMS", "Instagram", "Facebook", "Phone"].map((social, index) => {
-    return {
-        name: social,
-        email: `social-${index}`,
-        id: "",
-    };
-});
-
-const props = defineProps<{
+interface Props {
     users: User[];
     mode: "create" | "update";
     eventStartTimestamp: number;
@@ -29,8 +21,16 @@ const props = defineProps<{
      */
     reservationData: PlannedReservation | undefined;
     eventDurationInHours: number;
-}>();
+}
 
+const socials = ["Whatsapp", "SMS", "Instagram", "Facebook", "Phone"].map((social, index) => {
+    return {
+        name: social,
+        email: `social-${index}`,
+        id: "",
+    };
+});
+const props = defineProps<Props>();
 const { t } = useI18n();
 const authStore = useAuthStore();
 
@@ -61,28 +61,30 @@ const initialState =
               isVIP: false,
           };
 const state = ref<PlannedReservation>(initialState);
-const reservationForm = ref<QForm | null>(null);
-const formattedUsers = computed<PlannedReservation["reservedBy"][]>(() =>
-    props.users.map((user) => ({
-        name: user.name,
-        email: user.email,
-        id: user.id,
-    })),
-);
+const reservationForm = useTemplateRef<QForm>("reservationForm");
+const formattedUsers = computed<PlannedReservation["reservedBy"][]>(function () {
+    return props.users.map(function (user) {
+        return {
+            name: user.name,
+            email: user.email,
+            id: user.id,
+        };
+    });
+});
 const selectionType = ref("user");
 
-const selectableOptions = computed(() => {
+const selectableOptions = computed(function () {
     return selectionType.value === "social" ? socials : formattedUsers.value;
 });
 
-const reservedByLabel = computed(() => {
+const reservedByLabel = computed(function () {
     return selectionType.value === "social"
         ? t(`EventCreateReservation.reservedBySocialLabel`)
         : t(`EventCreateReservation.reservedByLabel`);
 });
 
 // Watcher that resets state.reservedBy when selectionType changes
-watch(selectionType, (newVal) => {
+watch(selectionType, function (newVal) {
     // When selectionType changes to 'social', reset reservedBy to the first social option
     // When changing to 'user', reset reservedBy to the first user option
     state.value.reservedBy = newVal === "social" ? socials[0] : formattedUsers.value[0];

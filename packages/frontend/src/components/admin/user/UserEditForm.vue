@@ -6,7 +6,7 @@ import type {
     User,
     UserCapability,
 } from "@firetable/types";
-import { computed, ref } from "vue";
+import { computed, ref, useTemplateRef } from "vue";
 import { DEFAULT_CAPABILITIES_BY_ROLE, Role } from "@firetable/types";
 import { QForm } from "quasar";
 import { noEmptyString, noWhiteSpaces } from "src/helpers/form-rules";
@@ -27,7 +27,7 @@ const userNameRules = [noWhiteSpaces];
 
 const emit = defineEmits<Emits>();
 const props = defineProps<Props>();
-const userEditForm = ref<QForm>();
+const userEditForm = useTemplateRef<QForm>("userEditForm");
 
 const defaultCapabilitiesForRole = DEFAULT_CAPABILITIES_BY_ROLE[Role.STAFF];
 const userCapabilities = {
@@ -35,7 +35,7 @@ const userCapabilities = {
     ...props.user.capabilities,
 };
 
-const isStaff = computed(() => {
+const isStaff = computed(function () {
     return props.user.role === Role.STAFF;
 });
 
@@ -46,23 +46,23 @@ const form = ref<EditUserPayload["updatedUser"]>({
 });
 const chosenProperties = ref<string[]>(props.selectedProperties.map(property("id")));
 
-const capabilitiesToDisplay = computed(() => {
+const capabilitiesToDisplay = computed(function () {
     if (form.value.role !== Role.STAFF) {
         return [];
     }
     return Object.entries(form.value.capabilities ?? DEFAULT_CAPABILITIES_BY_ROLE[form.value.role]);
 });
 
-const isEditableRole = computed(() =>
-    [Role.MANAGER, Role.STAFF, Role.HOSTESS].includes(form.value.role as Role),
-);
+const isEditableRole = computed(function () {
+    return [Role.MANAGER, Role.STAFF, Role.HOSTESS].includes(form.value.role as Role);
+});
 
-const emailSuffix = computed(() => {
+const emailSuffix = computed(function () {
     return `@${props.organisation.name}.at`;
 });
 
 async function onSubmit(): Promise<void> {
-    if (await validateForm()) {
+    if (await userEditForm.value?.validate()) {
         prepareAndEmitSubmission();
     }
 }
@@ -93,14 +93,6 @@ function onReset(): void {
         capabilities: isStaff.value ? userCapabilities : undefined,
     };
     resetProperties();
-}
-
-// Utility functions
-async function validateForm(): Promise<boolean> {
-    if (!(await userEditForm.value?.validate())) {
-        return false;
-    }
-    return true;
 }
 
 function resetProperties(): void {

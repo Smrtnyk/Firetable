@@ -1,5 +1,5 @@
 import type { FloorDropEvent, FloorEditor } from "@firetable/floor-creator";
-import type { Ref, ShallowRef } from "vue";
+import type { ShallowRef } from "vue";
 import { onBeforeUnmount } from "vue";
 import { FloorElementTypes, extractAllTablesLabels } from "@firetable/floor-creator";
 import { showErrorMessage } from "src/helpers/ui-helpers";
@@ -14,7 +14,7 @@ export const TABLE_EL_TO_ADD = [FloorElementTypes.RECT_TABLE, FloorElementTypes.
 
 export function useFloorEditor(
     floorInstance: ShallowRef<FloorEditor | undefined>,
-    containerRef: Ref<HTMLElement | undefined>,
+    containerRef: ShallowRef<HTMLElement | null>,
 ) {
     function getNextTableLabel(): string {
         if (!floorInstance.value) {

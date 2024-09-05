@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, useTemplateRef } from "vue";
 import { useRouter } from "vue-router";
 import { minLength, noEmptyString } from "src/helpers/form-rules";
 import { QForm } from "quasar";
@@ -10,7 +10,7 @@ const router = useRouter();
 const username = ref("");
 const password = ref("");
 const isPwd = ref(true);
-const authForm = ref<QForm | null>(null);
+const authForm = useTemplateRef<QForm>("authForm");
 const usernameRule = [noEmptyString()];
 const passwordRule = [
     minLength("Please enter your password, it has to contain minimum 5 characters."),

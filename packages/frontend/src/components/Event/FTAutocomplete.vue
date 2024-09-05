@@ -46,7 +46,7 @@ import type { FloorDoc, PlannedReservation } from "@firetable/types";
 
 import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPChip.vue";
 
-import { nextTick, ref, watch } from "vue";
+import { nextTick, ref, watch, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { QSelect } from "quasar";
 
@@ -66,7 +66,7 @@ const props = defineProps<Props>();
 const emit = defineEmits(["found", "clear"]);
 const { t } = useI18n();
 
-const selectEl = ref<undefined | QSelect>();
+const selectEl = useTemplateRef<undefined | QSelect>("selectEl");
 const options = ref(getNamesFromReservations(props.allReservedTables));
 const searchTerm = ref("");
 

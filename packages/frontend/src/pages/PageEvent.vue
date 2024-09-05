@@ -22,7 +22,7 @@ import EventInfo from "src/components/Event/EventInfo.vue";
 import FTDialog from "src/components/FTDialog.vue";
 
 import { useRouter } from "vue-router";
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref, useTemplateRef } from "vue";
 import { useEventsStore } from "src/stores/events-store";
 import {
     createQuery,
@@ -54,7 +54,7 @@ const authStore = useAuthStore();
 const eventsStore = useEventsStore();
 const router = useRouter();
 const q = useQuasar();
-const pageRef = ref<HTMLDivElement>();
+const pageRef = useTemplateRef<HTMLDivElement>("pageRef");
 
 const guestList = useFirestoreCollection<GuestInGuestListData>(getEventGuestListPath(eventOwner), {
     wait: true,

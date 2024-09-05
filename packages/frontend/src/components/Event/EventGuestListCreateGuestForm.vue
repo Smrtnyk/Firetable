@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, useTemplateRef } from "vue";
 import { minLength } from "src/helpers/form-rules";
 import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
 
 const { t } = useI18n();
 const emit = defineEmits(["create"]);
-const form = ref<QForm>();
+const form = useTemplateRef<QForm>("form");
 const guestName = ref("");
 
 function onSubmit(): void {

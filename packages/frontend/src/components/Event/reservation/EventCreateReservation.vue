@@ -3,13 +3,13 @@ import type { Reservation, User } from "@firetable/types";
 import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
 
 import { ReservationType } from "@firetable/types";
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 
 import PlannedReservationForm from "src/components/Event/reservation/PlannedReservationForm.vue";
 import WalkInReservationForm from "src/components/Event/reservation/WalkInReservationForm.vue";
 
-const props = defineProps<{
+interface Props {
     users: User[];
     mode: "create" | "update";
     eventStartTimestamp: number;
@@ -20,7 +20,9 @@ const props = defineProps<{
      */
     reservationData?: Reservation;
     eventDurationInHours: number;
-}>();
+}
+
+const props = defineProps<Props>();
 
 const emit = defineEmits<{
     (e: "create" | "update", payload: Reservation): void;
@@ -30,39 +32,39 @@ const { t } = useI18n();
 
 const reservationType = ref(ReservationType.PLANNED);
 
-const plannedRef = ref<typeof PlannedReservationForm | undefined>();
-const walkInRef = ref<typeof WalkInReservationForm | undefined>();
+const plannedRef = useTemplateRef<typeof PlannedReservationForm>("plannedRef");
+const walkInRef = useTemplateRef<typeof WalkInReservationForm>("walkInRef");
 
-const currentlyActiveRef = computed(() => {
+const currentlyActiveRef = computed(function () {
     return showPlannedReservationForm.value ? plannedRef.value : walkInRef.value;
 });
 
-const currentReservationType = computed(() => {
+const currentReservationType = computed(function () {
     // Default to PLANNED type if reservationData is not provided
     return props.reservationData ? props.reservationData.type : ReservationType.PLANNED;
 });
 
-const showPlannedReservationForm = computed(() => {
+const showPlannedReservationForm = computed(function () {
     return (
         reservationType.value === ReservationType.PLANNED ||
         (props.mode === "update" && currentReservationType.value === ReservationType.PLANNED)
     );
 });
 
-const showWalkInReservationForm = computed(() => {
+const showWalkInReservationForm = computed(function () {
     return (
         reservationType.value === ReservationType.WALK_IN ||
         (props.mode === "update" && currentReservationType.value === ReservationType.WALK_IN)
     );
 });
 
-const typedReservationDataForPlanned = computed(() => {
+const typedReservationDataForPlanned = computed(function () {
     return props.reservationData?.type === ReservationType.PLANNED
         ? props.reservationData
         : undefined;
 });
 
-const typedReservationDataForWalkIn = computed(() => {
+const typedReservationDataForWalkIn = computed(function () {
     return props.reservationData?.type === ReservationType.WALK_IN
         ? props.reservationData
         : undefined;
@@ -70,7 +72,7 @@ const typedReservationDataForWalkIn = computed(() => {
 
 watch(
     () => props.reservationData,
-    (newReservationData) => {
+    function (newReservationData) {
         if (newReservationData) {
             reservationType.value = newReservationData.type;
         }

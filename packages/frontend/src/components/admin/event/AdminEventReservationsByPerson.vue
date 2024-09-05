@@ -11,7 +11,7 @@ import {
     Tooltip,
     SubTitle,
 } from "chart.js";
-import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch, useTemplateRef } from "vue";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { isMobile } from "src/global-reactives/screen-detection";
 import FTCenteredText from "src/components/FTCenteredText.vue";
@@ -59,24 +59,26 @@ const tableColumns = [
 const props = defineProps<Props>();
 
 const viewMode = ref(ViewMode.CHART);
-const chartRef = ref<HTMLCanvasElement | null>(null);
-const chartData = computed(() => {
+const chartRef = useTemplateRef<HTMLCanvasElement>("chartRef");
+const chartData = computed(function () {
     return generateStackedChartData(props.reservations);
 });
-const tableData = computed(() => {
+const tableData = computed(function () {
     const { labels, datasets } = chartData.value;
     const arrivedData = datasets.find((dataset) => dataset.label === "Arrived").data;
     const pendingData = datasets.find((dataset) => dataset.label === "Pending").data;
 
-    return labels.map((label, index) => ({
-        name: label,
-        arrived: arrivedData[index],
-        pending: pendingData[index],
-        total: arrivedData[index] + pendingData[index],
-    }));
+    return labels.map(function (label, index) {
+        return {
+            name: label,
+            arrived: arrivedData[index],
+            pending: pendingData[index],
+            total: arrivedData[index] + pendingData[index],
+        };
+    });
 });
 
-const chartHeight = computed(() => {
+const chartHeight = computed(function () {
     const minBarHeight = isMobile.value ? 27 : 52;
     const numBars = chartData.value.labels.length;
     const totalHeight = numBars * minBarHeight;
@@ -91,7 +93,9 @@ function updateChartHeight(): void {
 }
 
 function reservationsReducer(acc: Res, reservation: PlannedReservationDoc): Res {
-    if (!reservation) return acc;
+    if (!reservation) {
+        return acc;
+    }
     const { reservedBy, arrived } = reservation;
     const { email, name } = reservedBy;
     const hash = name + email;
@@ -116,7 +120,7 @@ function generateStackedChartData(reservations: PlannedReservationDoc[]): ChartD
     const arrivedCounts: number[] = [];
     const pendingCounts: number[] = [];
 
-    Object.values(data).forEach((entry) => {
+    Object.values(data).forEach(function (entry) {
         labels.push(entry.name);
         arrivedCounts.push(entry.arrived);
         pendingCounts.push(entry.reservations - entry.arrived);
@@ -223,7 +227,7 @@ function initializeChart(chartContainer: HTMLCanvasElement): void {
     }
 }
 
-onMounted(() => {
+onMounted(function () {
     if (chartRef.value) {
         initializeChart(chartRef.value);
     }
@@ -231,14 +235,17 @@ onMounted(() => {
 
 watch(
     () => props.reservations,
-    () => {
-        if (chartRef.value) {
-            if (chartInstance) {
-                updateChartData();
-            } else {
-                initializeChart(chartRef.value);
-            }
+    function () {
+        if (!chartRef.value) {
+            return;
         }
+
+        if (chartInstance) {
+            updateChartData();
+            return;
+        }
+
+        initializeChart(chartRef.value);
     },
     { deep: true },
 );

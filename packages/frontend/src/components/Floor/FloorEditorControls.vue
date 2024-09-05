@@ -7,7 +7,7 @@ import type {
 } from "@firetable/floor-creator";
 import { MAX_FLOOR_HEIGHT, MAX_FLOOR_WIDTH, RESOLUTION, isTable } from "@firetable/floor-creator";
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
-import { computed, onBeforeUnmount, onMounted, reactive, ref, toRefs, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch, useTemplateRef } from "vue";
 import { exportFile, QPopupProxy } from "quasar";
 import { buttonSize, isMobile, isTablet } from "src/global-reactives/screen-detection";
 import { ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
@@ -26,19 +26,23 @@ interface EmitEvents {
     (e: "floorSave"): void;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-    deleteAllowed: true,
-});
-const { selectedFloorElement, deleteAllowed, existingLabels } = toRefs(props);
+const {
+    deleteAllowed = true,
+    existingLabels,
+    selectedFloorElement,
+    floorInstance,
+} = defineProps<Props>();
 const emit = defineEmits<EmitEvents>();
-const colorPickerProxy = ref<QPopupProxy | null>(null);
+const colorPickerProxy = useTemplateRef<QPopupProxy>("colorPickerProxy");
 const getElementWidth = computed(function () {
-    const element = selectedFloorElement.value;
-    return element ? Math.round(element.width * element.scaleX) : 0;
+    return selectedFloorElement
+        ? Math.round(selectedFloorElement.width * selectedFloorElement.scaleX)
+        : 0;
 });
 const getElementHeight = computed(function () {
-    const element = selectedFloorElement.value;
-    return element ? Math.round(element.height * element.scaleY) : 0;
+    return selectedFloorElement
+        ? Math.round(selectedFloorElement.height * selectedFloorElement.scaleY)
+        : 0;
 });
 const undoRedoState = reactive({
     canUndo: false,
@@ -50,55 +54,61 @@ const localHeight = ref(getElementHeight.value);
 const elementColor = ref("");
 
 function onKeyDownListener(event: KeyboardEvent): void {
-    if (event.key === "Delete" && selectedFloorElement.value) {
+    if (event.key === "Delete" && selectedFloorElement) {
         deleteElement();
     }
 }
 
-onMounted(() => {
-    props.floorInstance.on("commandChange", () => {
-        undoRedoState.canUndo = props.floorInstance.canUndo();
-        undoRedoState.canRedo = props.floorInstance.canRedo();
+onMounted(function () {
+    floorInstance.on("commandChange", () => {
+        undoRedoState.canUndo = floorInstance.canUndo();
+        undoRedoState.canRedo = floorInstance.canRedo();
     });
     document.addEventListener("keydown", onKeyDownListener);
 });
 
-onBeforeUnmount(() => {
+onBeforeUnmount(function () {
     document.removeEventListener("keydown", onKeyDownListener);
 });
 
-watch(selectedFloorElement, (newEl) => {
-    localWidth.value = newEl ? Math.round(newEl.width * newEl.scaleX) : 0;
-    localHeight.value = newEl ? Math.round(newEl.height * newEl.scaleY) : 0;
+watch(
+    () => selectedFloorElement,
+    function (newEl) {
+        localWidth.value = newEl ? Math.round(newEl.width * newEl.scaleX) : 0;
+        localHeight.value = newEl ? Math.round(newEl.height * newEl.scaleY) : 0;
 
-    if (newEl?.getBaseFill) {
-        elementColor.value = newEl.getBaseFill();
-    }
-});
+        if (newEl?.getBaseFill) {
+            elementColor.value = newEl.getBaseFill();
+        }
+    },
+);
 
-watch(localWidth, (newWidth) => {
-    if (!selectedFloorElement.value) {
+watch(localWidth, function (newWidth) {
+    if (!selectedFloorElement) {
         return;
     }
-    selectedFloorElement.value.scaleX = newWidth / selectedFloorElement.value.width;
-    selectedFloorElement.value.setCoords();
-    selectedFloorElement.value.canvas?.renderAll();
+    selectedFloorElement.scaleX = newWidth / selectedFloorElement.width;
+    selectedFloorElement.setCoords();
+    selectedFloorElement.canvas?.renderAll();
 });
 
-watch(localHeight, (newHeight) => {
-    if (!selectedFloorElement.value) {
+watch(localHeight, function (newHeight) {
+    if (!selectedFloorElement) {
         return;
     }
-    selectedFloorElement.value.scaleY = newHeight / selectedFloorElement.value.height;
-    selectedFloorElement.value.setCoords();
-    selectedFloorElement.value.canvas?.renderAll();
+    selectedFloorElement.scaleY = newHeight / selectedFloorElement.height;
+    selectedFloorElement.setCoords();
+    selectedFloorElement.canvas?.renderAll();
 });
 
-watch(selectedFloorElement, (newEl) => {
-    if (newEl?.getBaseFill) {
-        elementColor.value = newEl.getBaseFill();
-    }
-});
+watch(
+    () => selectedFloorElement,
+    function (newEl) {
+        if (newEl?.getBaseFill) {
+            elementColor.value = newEl.getBaseFill();
+        }
+    },
+);
 
 function openColorPicker(): void {
     colorPickerProxy.value?.show();
@@ -111,7 +121,7 @@ function updateTableLabel(
     if (typeof newLabel !== "string" || !isTable(tableEl)) {
         return;
     }
-    if (existingLabels.value.has(newLabel)) {
+    if (existingLabels.has(newLabel)) {
         showErrorMessage("Table Id already taken");
         return;
     }
@@ -119,15 +129,17 @@ function updateTableLabel(
 }
 
 async function deleteElement(): Promise<void> {
-    if (!selectedFloorElement.value) return;
+    if (!selectedFloorElement) {
+        return;
+    }
     if (await showConfirm("Do you really want to delete this element?")) {
-        emit("delete", selectedFloorElement.value);
+        emit("delete", selectedFloorElement);
     }
 }
 
 function setElementColor(newVal: any): void {
     elementColor.value = newVal;
-    selectedFloorElement.value?.setBaseFill?.(newVal);
+    selectedFloorElement?.setBaseFill?.(newVal);
 }
 
 async function exportFloor(floorVal: FloorEditor): Promise<void> {
@@ -145,21 +157,21 @@ async function exportFloor(floorVal: FloorEditor): Promise<void> {
 }
 
 function undoAction(): void {
-    if (!props.floorInstance) {
+    if (!floorInstance) {
         return;
     }
-    props.floorInstance.undo();
-    props.floorInstance.canvas.renderAll();
+    floorInstance.undo();
+    floorInstance.canvas.renderAll();
 }
 
 function redoAction(): void {
-    if (!props.floorInstance) {
+    if (!floorInstance) {
         return;
     }
-    props.floorInstance.redo();
-    props.floorInstance.canvas.renderAll();
+    floorInstance.redo();
+    floorInstance.canvas.renderAll();
 }
-const fileInputRef = ref<HTMLInputElement | null>(null);
+const fileInputRef = useTemplateRef<HTMLInputElement>("fileInputRef");
 
 function onFileSelected(event: Event): void {
     const fileInput = event.target as HTMLInputElement;
@@ -169,8 +181,8 @@ function onFileSelected(event: Event): void {
         reader.addEventListener("load", function () {
             const fileContent = reader.result as string;
             const jsonData = JSON.parse(fileContent);
-            if (props.floorInstance) {
-                props.floorInstance.importFloor(jsonData).catch(AppLogger.error.bind(AppLogger));
+            if (floorInstance) {
+                floorInstance.importFloor(jsonData).catch(AppLogger.error.bind(AppLogger));
             }
         });
         reader.readAsText(file);
@@ -200,7 +212,7 @@ function onFloorSave(): void {
 }
 
 function sendBack(): void {
-    selectedFloorElement.value?.canvas?.sendObjectBackwards(selectedFloorElement.value);
+    selectedFloorElement?.canvas?.sendObjectBackwards(selectedFloorElement);
 }
 </script>
 

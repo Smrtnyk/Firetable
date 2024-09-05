@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import type { PieChartData } from "src/components/admin/analytics/types";
-import { ref, onMounted, watch, onUnmounted } from "vue";
+import { useTemplateRef, onMounted, watch, onUnmounted } from "vue";
 import { Chart, PieController, ArcElement, Tooltip, Legend } from "chart.js";
 
 Chart.register(PieController, ArcElement, Tooltip, Legend);
@@ -16,7 +16,7 @@ const props = defineProps<{
     chartTitle: string;
 }>();
 
-const chartCanvas = ref<HTMLCanvasElement | null>(null);
+const chartCanvas = useTemplateRef<HTMLCanvasElement>("chartCanvas");
 let chartInstance: Chart<"pie", number[], unknown> | undefined;
 
 function drawChart(chartData: PieChartData): void {

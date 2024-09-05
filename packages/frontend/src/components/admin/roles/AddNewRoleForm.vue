@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, useTemplateRef } from "vue";
 import { minLength } from "src/helpers/form-rules";
 import { QForm } from "quasar";
 
 const emit = defineEmits(["create"]);
 const roleRules = [minLength("Role needs to have at least 3 characters!", 3)];
 const roleName = ref("");
-const createRoleForm = ref<null | QForm>(null);
+const createRoleForm = useTemplateRef<QForm>("createRoleForm");
 
 async function submit(): Promise<void> {
-    if (!(await createRoleForm.value?.validate())) return;
+    if (!(await createRoleForm.value?.validate())) {
+        return;
+    }
     emit("create", roleName.value);
 }
 </script>

@@ -1,24 +1,20 @@
 <template>
-    <q-dialog ref="dialogRef" :maximized="props.maximized || isMobile" persistent>
+    <q-dialog ref="dialogRef" :maximized="maximized || isMobile" persistent>
         <q-card
             class="q-pt-none"
             :class="{
-                'limited-width': !props.maximized,
+                'limited-width': !maximized,
             }"
         >
             <q-banner inline-actions>
                 <template #action>
                     <q-btn round flat icon="close" @click="onDialogOK" />
                 </template>
-                <h6 class="text-h6 q-ma-none q-ml-sm" v-if="props.title">{{ props.title }}</h6>
+                <h6 class="text-h6 q-ma-none q-ml-sm" v-if="title">{{ title }}</h6>
             </q-banner>
             <q-separator dark inset />
             <div class="q-pa-sm">
-                <component
-                    v-bind="props.componentPropsObject"
-                    v-on="props.listeners"
-                    :is="props.component"
-                />
+                <component v-bind="componentPropsObject" v-on="listeners" :is="component" />
             </div>
         </q-card>
     </q-dialog>
@@ -37,10 +33,13 @@ interface Props {
     title?: string;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-    maximized: true,
-    title: "",
-});
+const {
+    maximized = true,
+    title = "",
+    component,
+    listeners,
+    componentPropsObject,
+} = defineProps<Props>();
 const { dialogRef, onDialogOK } = useDialogPluginComponent();
 
 defineEmits(useDialogPluginComponent.emits);

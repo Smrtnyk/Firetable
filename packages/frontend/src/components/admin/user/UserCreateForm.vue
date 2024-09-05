@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CreateUserPayload, OrganisationDoc, PropertyDoc, User } from "@firetable/types";
-import { computed, ref } from "vue";
+import { computed, ref, useTemplateRef } from "vue";
 import { ADMIN, Role } from "@firetable/types";
 import { QForm } from "quasar";
 import { showErrorMessage } from "src/helpers/ui-helpers";
@@ -22,17 +22,21 @@ const { t } = useI18n();
 const authStore = useAuthStore();
 const emit = defineEmits<Emits>();
 const props = defineProps<Props>();
-const userCreateForm = ref<QForm>();
+const userCreateForm = useTemplateRef<QForm>("userCreateForm");
 
 const form = ref<CreateUserPayload | User>(userSkeleton());
 const chosenProperties = ref<string[]>([]);
 
-const currUserRole = computed(() => authStore.nonNullableUser.role);
-const availableRoles = computed(() => availableRolesBasedOn(currUserRole.value));
-const emailSuffix = computed(() => {
+const currUserRole = computed(function () {
+    return authStore.nonNullableUser.role;
+});
+const availableRoles = computed(function () {
+    return availableRolesBasedOn(currUserRole.value);
+});
+const emailSuffix = computed(function () {
     return `@${props.organisation.name}.at`;
 });
-const shouldShowPropertiesSelection = computed(() => {
+const shouldShowPropertiesSelection = computed(function () {
     return props.properties.length > 0 && form.value.role !== Role.PROPERTY_OWNER;
 });
 
@@ -71,7 +75,9 @@ function availableRolesBasedOn(roleVal: string): Role[] {
 }
 
 async function validateForm(): Promise<boolean> {
-    if (!(await userCreateForm.value?.validate())) return false;
+    if (!(await userCreateForm.value?.validate())) {
+        return false;
+    }
     const chosenRole = form.value.role;
 
     if (chosenRole !== Role.PROPERTY_OWNER && chosenProperties.value.length === 0) {
@@ -132,7 +138,7 @@ function resetProperties(): void {
 
             <q-input
                 v-if="'password' in form"
-                v-model="form.password"
+                v-model="form.password as string"
                 standout
                 rounded
                 :label="t('UserCreateForm.userPasswordInputLabel')"

@@ -1,4 +1,4 @@
-import type { Ref } from "vue";
+import type { Ref, ShallowRef } from "vue";
 import type { EventDoc, FloorDoc, Reservation, ReservationDoc } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
 import type { VueFirestoreDocumentData } from "vuefire";
@@ -25,7 +25,7 @@ type ActiveFloor = { id: string; name: string };
 export function useFloorsPageEvent(
     eventFloors: Ref<FloorDoc[]>,
     reservations: Ref<ReservationDoc[]>,
-    pageRef: Ref<HTMLDivElement | undefined>,
+    pageRef: ShallowRef<HTMLDivElement | null>,
     eventOwner: EventOwner,
     event: Ref<VueFirestoreDocumentData<EventDoc> | undefined>,
 ) {
@@ -125,7 +125,7 @@ export function useFloorsPageEvent(
         }
         const floorViewer = new FloorViewer({
             canvas,
-            floorDoc: await decompressFloorDoc(floorDoc),
+            floorDoc: decompressFloorDoc(floorDoc),
             containerWidth: pageRef.value.clientWidth,
         });
         floorViewer.on("elementClicked", tableClickHandler);

@@ -2,7 +2,7 @@
 import type { WalkInReservation } from "@firetable/types";
 import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
 import { ReservationStatus, ReservationType } from "@firetable/types";
-import { ref } from "vue";
+import { ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
 import { greaterThanZero, optionalMinLength, requireNumber } from "src/helpers/form-rules";
@@ -11,7 +11,7 @@ import { getFirestoreTimestamp } from "@firetable/backend";
 import { hourFromTimestamp } from "src/helpers/date-utils";
 import { getReservationTimeOptions } from "src/components/Event/reservation/reservation-form-utils";
 
-const props = defineProps<{
+interface Props {
     mode: "create" | "update";
     eventStartTimestamp: number;
     table: BaseTable;
@@ -21,7 +21,9 @@ const props = defineProps<{
      */
     reservationData: WalkInReservation | undefined;
     eventDurationInHours: number;
-}>();
+}
+
+const props = defineProps<Props>();
 
 const { t } = useI18n();
 const authStore = useAuthStore();
@@ -31,7 +33,7 @@ const initialState =
         ? props.reservationData
         : generateInitialState();
 const state = ref<WalkInReservation>(initialState);
-const reservationForm = ref<QForm | null>(null);
+const reservationForm = useTemplateRef<QForm>("reservationForm");
 
 function generateInitialState(): WalkInReservation {
     const eventStart = props.eventStartTimestamp;
