@@ -41,30 +41,6 @@ export abstract class Table extends Group {
         this.on("scaling", this.handleScaling.bind(this));
     }
 
-    private handleScaling(): void {
-        this.enforceMinimumDimensions();
-        this.adjustTextScaling();
-    }
-
-    private adjustTextScaling(): void {
-        this.textLabel.set({
-            scaleX: 1 / this.scaleX,
-            scaleY: 1 / this.scaleY,
-        });
-
-        this.canvas?.requestRenderAll();
-    }
-
-    private enforceMinimumDimensions(): void {
-        if (this.scaleX * this.initialWidth < TABLE_WIDTH) {
-            this.scaleX = TABLE_WIDTH / this.initialWidth;
-        }
-
-        if (this.scaleY * this.initialHeight < TABLE_HEIGHT) {
-            this.scaleY = TABLE_HEIGHT / this.initialHeight;
-        }
-    }
-
     startAnimation(): void {
         this.animationStrategy.animate();
     }
@@ -109,5 +85,29 @@ export abstract class Table extends Group {
             baseFill: this.baseFill,
             label: this.label,
         };
+    }
+
+    private handleScaling(): void {
+        this.enforceMinimumDimensions();
+        this.adjustTextScaling();
+    }
+
+    private adjustTextScaling(): void {
+        this.textLabel.set({
+            scaleX: 1 / this.scaleX,
+            scaleY: 1 / this.scaleY,
+        });
+
+        this.canvas?.requestRenderAll();
+    }
+
+    private enforceMinimumDimensions(): void {
+        if (this.scaleX * this.initialWidth < TABLE_WIDTH) {
+            this.scaleX = TABLE_WIDTH / this.initialWidth;
+        }
+
+        if (this.scaleY * this.initialHeight < TABLE_HEIGHT) {
+            this.scaleY = TABLE_HEIGHT / this.initialHeight;
+        }
     }
 }

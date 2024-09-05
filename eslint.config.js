@@ -136,6 +136,17 @@ export default tseslint.config(
                 },
             ],
             "linebreak-style": ["error", "unix"],
+            // TypeScript
+            // "@typescript-eslint/explicit-module-boundary-types": "error",
+            "@typescript-eslint/member-ordering": "error",
+            "@typescript-eslint/max-params": [
+                "error",
+                {
+                    maximum: 5,
+                },
+            ],
+            "@typescript-eslint/default-param-last": "error",
+            "@typescript-eslint/consistent-type-exports": "error",
             "@typescript-eslint/consistent-type-imports": "error",
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/adjacent-overload-signatures": "error",

@@ -21,6 +21,25 @@ export class GridDrawer {
         this.addGridToCanvas(lines);
     }
 
+    toggleGridVisibility = (width: number, height: number): void => {
+        if (this.isGridVisible) {
+            this.clearGrid();
+        } else {
+            this.drawGrid(width, height);
+        }
+        this.isGridVisible = !this.isGridVisible;
+    };
+
+    clearGrid(): void {
+        this.canvas
+            .getObjects()
+            .filter((obj) => has(obj, "isGridLine"))
+            .forEach((obj) => {
+                this.canvas.remove(obj);
+            });
+        this.canvas.requestRenderAll();
+    }
+
     private createGridLines(
         width: number,
         height: number,
@@ -60,24 +79,5 @@ export class GridDrawer {
         });
         this.canvas.add(oGridGroup);
         this.canvas.sendObjectToBack(oGridGroup);
-    }
-
-    toggleGridVisibility = (width: number, height: number): void => {
-        if (this.isGridVisible) {
-            this.clearGrid();
-        } else {
-            this.drawGrid(width, height);
-        }
-        this.isGridVisible = !this.isGridVisible;
-    };
-
-    clearGrid(): void {
-        this.canvas
-            .getObjects()
-            .filter((obj) => has(obj, "isGridLine"))
-            .forEach((obj) => {
-                this.canvas.remove(obj);
-            });
-        this.canvas.requestRenderAll();
     }
 }

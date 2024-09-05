@@ -28,6 +28,15 @@ export class Wall extends Group {
         this.wallRect = wallRect;
     }
 
+    static override fromObject(object: any): Promise<Wall> {
+        const wallRect = object.objects[0];
+        return Promise.resolve(new Wall(object, wallRect));
+    }
+
+    override toObject(): any {
+        return super.toObject();
+    }
+
     getBaseFill(): string {
         return this.wallRect.get("fill") as string;
     }
@@ -35,14 +44,5 @@ export class Wall extends Group {
     setBaseFill(val: string): void {
         this.wallRect.set("fill", val);
         this.canvas?.requestRenderAll();
-    }
-
-    override toObject(): any {
-        return super.toObject();
-    }
-
-    static override fromObject(object: any): Promise<Wall> {
-        const wallRect = object.objects[0];
-        return Promise.resolve(new Wall(object, wallRect));
     }
 }

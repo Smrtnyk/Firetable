@@ -22,46 +22,6 @@ export class EditorEventManager extends EventManager {
         this.initializeCtrlEventListeners();
     }
 
-    destroy(): void {
-        document.removeEventListener("keydown", this.handleKeyDown);
-        document.removeEventListener("keyup", this.handleKeyUp);
-    }
-
-    private initializeCtrlEventListeners(): void {
-        document.addEventListener("keydown", this.handleKeyDown);
-        document.addEventListener("keyup", this.handleKeyUp);
-    }
-
-    private handleKeyDown = (e: KeyboardEvent): void => {
-        if (!(e.ctrlKey || e.metaKey)) {
-            return;
-        }
-        this.floor.canvas.selection = true;
-        this.ctrlPressedDuringSelection = true;
-        this.floor.canvas.requestRenderAll();
-
-        if (e.key === "z") {
-            if (e.shiftKey) {
-                this.commandInvoker.redo();
-            } else {
-                this.commandInvoker.undo();
-            }
-            this.floor.canvas.requestRenderAll();
-            e.preventDefault();
-        } else if (e.key === "y") {
-            this.commandInvoker.redo();
-            this.floor.canvas.requestRenderAll();
-            e.preventDefault();
-        }
-    };
-
-    private handleKeyUp = (e: KeyboardEvent): void => {
-        if (e.key === "Control" || e.key === "Meta") {
-            this.floor.canvas.selection = false;
-            this.floor.canvas.requestRenderAll();
-        }
-    };
-
     handleObjectMoving = (options: any): void => {
         if (!this.ctrlPressedDuringSelection) {
             return;
@@ -106,6 +66,11 @@ export class EditorEventManager extends EventManager {
         this.movingObjectStartPosition = null;
     };
 
+    destroy(): void {
+        document.removeEventListener("keydown", this.handleKeyDown);
+        document.removeEventListener("keyup", this.handleKeyUp);
+    }
+
     override initializeCanvasEventHandlers(): void {
         super.initializeCanvasEventHandlers();
 
@@ -125,6 +90,41 @@ export class EditorEventManager extends EventManager {
             });
         });
     }
+
+    private initializeCtrlEventListeners(): void {
+        document.addEventListener("keydown", this.handleKeyDown);
+        document.addEventListener("keyup", this.handleKeyUp);
+    }
+
+    private handleKeyDown = (e: KeyboardEvent): void => {
+        if (!(e.ctrlKey || e.metaKey)) {
+            return;
+        }
+        this.floor.canvas.selection = true;
+        this.ctrlPressedDuringSelection = true;
+        this.floor.canvas.requestRenderAll();
+
+        if (e.key === "z") {
+            if (e.shiftKey) {
+                this.commandInvoker.redo();
+            } else {
+                this.commandInvoker.undo();
+            }
+            this.floor.canvas.requestRenderAll();
+            e.preventDefault();
+        } else if (e.key === "y") {
+            this.commandInvoker.redo();
+            this.floor.canvas.requestRenderAll();
+            e.preventDefault();
+        }
+    };
+
+    private handleKeyUp = (e: KeyboardEvent): void => {
+        if (e.key === "Control" || e.key === "Meta") {
+            this.floor.canvas.selection = false;
+            this.floor.canvas.requestRenderAll();
+        }
+    };
 
     private onEditorMouseUp = (): void => {
         const hasActiveElement = this.floor.canvas.getActiveObject();

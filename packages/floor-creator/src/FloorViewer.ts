@@ -36,6 +36,16 @@ export class FloorViewer extends Floor {
         /* empty for now */
     }
 
+    /**
+     * This can throw so it should be called in a try/catch block
+     */
+    async destroy(): Promise<void> {
+        this.eventManager.destroy();
+        this.zoomManager.destroy();
+        this.touchManager.destroy();
+        await this.canvas.dispose();
+    }
+
     protected onElementClick = (obj: FabricObject): void => {
         if (this.touchManager.isInteracting || this.zoomManager.isZooming) {
             return;
@@ -60,15 +70,5 @@ export class FloorViewer extends Floor {
         if (!isTable(element)) {
             element.evented = false;
         }
-    }
-
-    /**
-     * This can throw so it should be called in a try/catch block
-     */
-    async destroy(): Promise<void> {
-        this.eventManager.destroy();
-        this.zoomManager.destroy();
-        this.touchManager.destroy();
-        await this.canvas.dispose();
     }
 }

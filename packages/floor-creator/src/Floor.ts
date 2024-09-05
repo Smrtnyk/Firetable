@@ -33,13 +33,6 @@ export abstract class Floor {
 
     protected abstract eventManager: EventManager;
 
-    abstract onFloorDoubleTap(coordinates: [x: number, y: number]): void;
-    abstract emit(event: string, ...args: unknown[]): void;
-    abstract on(event: string, listener: EventEmitterListener): void;
-    protected abstract onElementClick(ev: FabricObject): void;
-    protected abstract setElementProperties(element: FabricObject): void;
-    abstract destroy(): void;
-
     protected constructor(options: FloorCreationOptions) {
         const { canvas, floorDoc, containerWidth } = options;
 
@@ -129,4 +122,11 @@ export abstract class Floor {
         this.setScaling();
         this.zoomManager.setScale(this.scale);
     }
+
+    abstract onFloorDoubleTap(coordinates: [x: number, y: number]): void;
+    abstract emit(event: string, ...args: unknown[]): void;
+    abstract on(event: string, listener: EventEmitterListener): void;
+    abstract destroy(): void;
+    protected abstract onElementClick(ev: FabricObject): void;
+    protected abstract setElementProperties(element: FabricObject): void;
 }

@@ -3,10 +3,10 @@ import type { Floor } from "./Floor.js";
 import { DEFAULT_ZOOM, ZOOM_INCREMENT } from "./constants.js";
 
 export class FloorZoomManager {
+    isZooming = false;
+
     private minZoom: number;
     private readonly maxZoom: number = DEFAULT_ZOOM * 3;
-
-    isZooming = false;
 
     constructor(
         private floor: Floor,

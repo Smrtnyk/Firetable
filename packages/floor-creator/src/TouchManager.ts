@@ -7,11 +7,18 @@ const DAMPENING_FACTOR = 0.2;
 const PAN_DAMPENING_FACTOR = 0.1;
 
 export class TouchManager {
-    private readonly floor: Floor;
-
-    private readonly hammerManager: HammerManager;
-
     isInteracting = false;
+
+    private readonly floor: Floor;
+    private readonly hammerManager: HammerManager;
+    private onPinch = throttle((ev: HammerInput) => {
+        this.isInteracting = true;
+        const scale = ev.scale;
+        // Adjust the scale based on a dampening factor to control zoom sensitivity
+        const adjustedScale = 1 + (scale - 1) * DAMPENING_FACTOR;
+        const center = new Point(ev.center.x, ev.center.y);
+        this.floor.zoomManager.adjustZoom(adjustedScale, center);
+    }, 100);
 
     constructor(floor: Floor) {
         this.floor = floor;
@@ -32,26 +39,6 @@ export class TouchManager {
         this.hammerManager.on("doubletap", this.onDoubleTap);
         this.hammerManager.on("pinchend pinchcancel panend", this.onGestureEnd);
     }
-
-    onGestureEnd = (): void => {
-        setTimeout(() => {
-            this.isInteracting = false;
-        }, 100);
-    };
-
-    private onDoubleTap = (ev: HammerInput): void => {
-        const { x, y } = this.floor.canvas.getScenePoint(ev.srcEvent);
-        this.floor.onFloorDoubleTap([x, y]);
-    };
-
-    private onPinch = throttle((ev: HammerInput) => {
-        this.isInteracting = true;
-        const scale = ev.scale;
-        // Adjust the scale based on a dampening factor to control zoom sensitivity
-        const adjustedScale = 1 + (scale - 1) * DAMPENING_FACTOR;
-        const center = new Point(ev.center.x, ev.center.y);
-        this.floor.zoomManager.adjustZoom(adjustedScale, center);
-    }, 100);
 
     onPanMove = (e: HammerInput): void => {
         this.isInteracting = true;
@@ -96,4 +83,15 @@ export class TouchManager {
         this.hammerManager.destroy();
         this.isInteracting = false;
     }
+
+    onGestureEnd = (): void => {
+        setTimeout(() => {
+            this.isInteracting = false;
+        }, 100);
+    };
+
+    private onDoubleTap = (ev: HammerInput): void => {
+        const { x, y } = this.floor.canvas.getScenePoint(ev.srcEvent);
+        this.floor.onFloorDoubleTap([x, y]);
+    };
 }

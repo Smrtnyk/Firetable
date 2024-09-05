@@ -12,6 +12,12 @@ export class SmoothBlinkAnimation implements AnimationStrategy {
         this.target = target;
     }
 
+    stop(): void {
+        this.isAnimating = false;
+        this.target.set({ opacity: 1 });
+        this.target.canvas?.requestRenderAll();
+    }
+
     animate(): void {
         if (this.isAnimating) {
             return;
@@ -44,11 +50,5 @@ export class SmoothBlinkAnimation implements AnimationStrategy {
                 },
             },
         );
-    }
-
-    stop(): void {
-        this.isAnimating = false;
-        this.target.set({ opacity: 1 });
-        this.target.canvas?.requestRenderAll();
     }
 }

@@ -11,9 +11,22 @@ interface EditableShapeOptions<S extends Editable> {
 }
 
 export class EditableShape extends Group {
+    label = "";
     private readonly textObj: IText;
     private readonly shape: FabricObject;
-    label = "";
+
+    constructor(objects: [FabricObject, IText], options?: Partial<GroupProps>) {
+        super(objects, {
+            ...options,
+            interactive: true,
+            subTargetCheck: true,
+        });
+
+        this.textObj = objects[1];
+        this.shape = objects[0];
+        this.shape.evented = false;
+        this.label = this.textObj.get("text");
+    }
 
     static create<S extends Editable>(options: EditableShapeOptions<S>): EditableShape {
         let shape: FabricObject;
@@ -39,19 +52,6 @@ export class EditableShape extends Group {
         });
 
         return new EditableShape([shape, textObj], {});
-    }
-
-    constructor(objects: [FabricObject, IText], options?: Partial<GroupProps>) {
-        super(objects, {
-            ...options,
-            interactive: true,
-            subTargetCheck: true,
-        });
-
-        this.textObj = objects[1];
-        this.shape = objects[0];
-        this.shape.evented = false;
-        this.label = this.textObj.get("text");
     }
 
     setBaseFill(val: string): void {

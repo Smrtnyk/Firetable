@@ -82,36 +82,6 @@ export class FloorEditor extends Floor {
         this.emit("doubleClick", this, coordinates);
     }
 
-    protected onElementClick = (obj: FabricObject): void => {
-        this.emit("elementClicked", this, obj as FloorEditorElement);
-    };
-
-    renderGrid(): void {
-        this.gridDrawer.drawGrid(this.width, this.height);
-    }
-
-    override async renderData(jsonData?: FloorData["json"]): Promise<void> {
-        await super.renderData(jsonData);
-    }
-
-    async importFloor(jsonImport: { width: number; height: number; json: string }): Promise<void> {
-        this.width = jsonImport.width;
-        this.height = jsonImport.height;
-        super.resize(this.containerWidth);
-        await this.renderData(JSON.parse(jsonImport.json));
-    }
-
-    protected setElementProperties(element: FabricObject): void {
-        element.lockScalingX = false;
-        element.lockScalingY = false;
-        element.lockMovementX = false;
-        element.lockMovementY = false;
-        element.lockScalingFlip = true;
-        element.lockRotation = false;
-        element.lockSkewingX = false;
-        element.lockSkewingY = false;
-    }
-
     addElement(options: CreateElementOptions): void {
         const element = this.elementManager.addElement(options);
         element.on("mouseup", () => {
@@ -146,5 +116,35 @@ export class FloorEditor extends Floor {
         this.zoomManager.destroy();
         this.touchManager.destroy();
         await this.canvas.dispose();
+    }
+
+    renderGrid(): void {
+        this.gridDrawer.drawGrid(this.width, this.height);
+    }
+
+    override async renderData(jsonData?: FloorData["json"]): Promise<void> {
+        await super.renderData(jsonData);
+    }
+
+    async importFloor(jsonImport: { width: number; height: number; json: string }): Promise<void> {
+        this.width = jsonImport.width;
+        this.height = jsonImport.height;
+        super.resize(this.containerWidth);
+        await this.renderData(JSON.parse(jsonImport.json));
+    }
+
+    protected onElementClick = (obj: FabricObject): void => {
+        this.emit("elementClicked", this, obj as FloorEditorElement);
+    };
+
+    protected setElementProperties(element: FabricObject): void {
+        element.lockScalingX = false;
+        element.lockScalingY = false;
+        element.lockMovementX = false;
+        element.lockMovementY = false;
+        element.lockScalingFlip = true;
+        element.lockRotation = false;
+        element.lockSkewingX = false;
+        element.lockSkewingY = false;
     }
 }

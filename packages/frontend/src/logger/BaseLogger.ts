@@ -12,19 +12,6 @@ export abstract class BaseLogger {
         this.prefix = options?.prefix ? `[${options.prefix}]` : "";
     }
 
-    private log(level: LogLevel, message: string, ...args: unknown[]): void {
-        const formattedMessage = `${this.prefix} [${level.toUpperCase()}]: ${message}`;
-        if (level === "error") {
-            console.error(formattedMessage, ...args);
-        } else if (level === "warn") {
-            console.warn(formattedMessage, ...args);
-        } else if (level === "debug") {
-            console.debug(formattedMessage, ...args);
-        } else {
-            console.info(formattedMessage, ...args);
-        }
-    }
-
     public info(message: string, ...args: unknown[]): void {
         this.log("info", message, ...args);
     }
@@ -46,6 +33,19 @@ export abstract class BaseLogger {
 
     public debug(message: string, ...args: unknown[]): void {
         this.log("debug", message, ...args);
+    }
+
+    private log(level: LogLevel, message: string, ...args: unknown[]): void {
+        const formattedMessage = `${this.prefix} [${level.toUpperCase()}]: ${message}`;
+        if (level === "error") {
+            console.error(formattedMessage, ...args);
+        } else if (level === "warn") {
+            console.warn(formattedMessage, ...args);
+        } else if (level === "debug") {
+            console.debug(formattedMessage, ...args);
+        } else {
+            console.info(formattedMessage, ...args);
+        }
     }
 
     private isError(value: unknown): value is Error {

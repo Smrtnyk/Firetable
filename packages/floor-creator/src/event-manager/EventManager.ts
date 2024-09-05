@@ -5,9 +5,7 @@ import { Point } from "fabric/es";
 export abstract class EventManager {
     protected readonly floor: Floor;
 
-    abstract destroy(): void;
-
-    constructor(floor: Floor) {
+    protected constructor(floor: Floor) {
         this.floor = floor;
     }
 
@@ -31,4 +29,6 @@ export abstract class EventManager {
         opt.e.preventDefault();
         opt.e.stopPropagation();
     };
+
+    abstract destroy(): void;
 }

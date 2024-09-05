@@ -432,10 +432,10 @@ export class MockFieldPath implements FieldPath {
 }
 
 class MockQuery implements Query {
-    readonly #initPromise: Promise<void>;
+    firestore: any;
     private queryConstraints: any[] = [];
     private docs: MockQueryDocumentSnapshot[] = [];
-    firestore: any;
+    readonly #initPromise: Promise<void>;
 
     constructor(private collection: MockCollection) {
         this.#initPromise = this.init();
@@ -594,12 +594,12 @@ export class MockWriteBatch {
     private operations: { type: FirestoreOperation; docRef: MockDocumentReference; data?: any }[] =
         [];
 
-    set(docRef: MockDocumentReference, data: any): MockWriteBatch {
+    set(docRef: MockDocumentReference, data: unknown): MockWriteBatch {
         this.operations.push({ type: FirestoreOperation.SET, docRef, data });
         return this;
     }
 
-    update(docRef: MockDocumentReference, data: any): MockWriteBatch {
+    update(docRef: MockDocumentReference, data: unknown): MockWriteBatch {
         this.operations.push({ type: FirestoreOperation.UPDATE, docRef, data });
         return this;
     }
