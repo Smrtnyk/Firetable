@@ -12,6 +12,8 @@ import { getDarkMode, myIcons } from "src/config";
 
 const q = useQuasar();
 
-q.iconMapFn = (iconName) => ({ icon: myIcons[iconName] });
+q.iconMapFn = function (iconName) {
+    return { icon: myIcons[iconName] };
+};
 q.dark.set(getDarkMode());
 </script>

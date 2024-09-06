@@ -12,6 +12,6 @@ const i18n = createI18n({
     legacy: false,
 });
 
-export default boot(({ app }) => {
+export default boot(function ({ app }) {
     app.use(i18n);
 });

@@ -46,7 +46,7 @@ const {
     EVENTS_PER_PAGE,
 } = useEvents();
 const activePropertyId = ref("");
-const properties = computed(() => {
+const properties = computed(function () {
     return propertiesStore.getPropertiesByOrganisationId(props.organisationId);
 });
 
@@ -111,7 +111,7 @@ function fetchEventsForActiveTab(): void {
     if (eventsByProperty[activePropertyId.value]?.size !== 0) {
         return;
     }
-    const activeProperty = properties.value.find((property) => {
+    const activeProperty = properties.value.find(function (property) {
         return property.id === activePropertyId.value;
     });
     if (!activeProperty) {

@@ -93,7 +93,9 @@ function getNamesFromReservations(
 function createTableLabel(reservation: PlannedReservation): string {
     const label = `${reservation.guestName} (${reservation.tableLabel})`;
     if (props.showFloorNameInOption) {
-        const floorName = props.floors.find(({ id }) => id === reservation.floorId);
+        const floorName = props.floors.find(function ({ id }) {
+            return id === reservation.floorId;
+        });
         return `${label} on ${floorName?.name}`;
     }
     return label;
@@ -111,7 +113,7 @@ function findSearchedTable(inputVal: string | { value: PlannedReservation }): Pl
             removeFocus();
         }
         // Return only the table that matches the guestName exactly
-        return props.allReservedTables.filter((reservation) => {
+        return props.allReservedTables.filter(function (reservation) {
             return (
                 reservation.guestName.toLowerCase() === normalizedVal &&
                 reservation.floorId === inputVal.value.floorId
@@ -121,7 +123,7 @@ function findSearchedTable(inputVal: string | { value: PlannedReservation }): Pl
 
     // If inputVal is a string, perform the original filtering logic
     const tokens = normalizedVal.split(/\s+/);
-    return props.allReservedTables.filter((reservation) => {
+    return props.allReservedTables.filter(function (reservation) {
         const { guestName } = reservation;
         const normalizedGuestName = guestName.toLowerCase();
         const guestNameTokens = normalizedGuestName.split(/\s+/);

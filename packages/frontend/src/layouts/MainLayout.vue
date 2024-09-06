@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import { computed } from "vue";
-
 import AppDrawer from "src/components/AppDrawer.vue";
 import AppTopMenu from "src/components/AppTopMenu.vue";
 import NetworkOverlay from "src/components/NetworkOverlay.vue";
 
 import { useAuthStore } from "src/stores/auth-store";
+import { storeToRefs } from "pinia";
 
-const authStore = useAuthStore();
-const isLoggedIn = computed(() => authStore.isLoggedIn);
+const { isLoggedIn } = storeToRefs(useAuthStore());
 </script>
 
 <template>

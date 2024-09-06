@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { User } from "@firetable/types";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -9,9 +8,10 @@ import { useAppStore } from "src/stores/app-store";
 import { logoutUser } from "@firetable/backend";
 import { withLoading } from "src/helpers/ui-helpers";
 import { ADMIN, Role } from "@firetable/types";
+import { storeToRefs } from "pinia";
 
 const appStore = useAppStore();
-const authStore = useAuthStore();
+const { nonNullableUser } = storeToRefs(useAuthStore());
 const q = useQuasar();
 const { t, locale } = useI18n();
 
@@ -21,9 +21,9 @@ const langOptions = [
     { value: "de", label: "German" },
 ];
 
-const adminLinks = computed(() => {
+const adminLinks = computed(function () {
     const links = [];
-    const role = user.value.role;
+    const role = nonNullableUser.value.role;
     if (role === ADMIN) {
         links.push({
             icon: "home",
@@ -40,7 +40,7 @@ const adminLinks = computed(() => {
                 route: {
                     name: "adminEvents",
                     params: {
-                        organisationId: user.value.organisationId,
+                        organisationId: nonNullableUser.value.organisationId,
                     },
                 },
                 text: t("AppDrawer.links.manageEvents"),
@@ -50,7 +50,7 @@ const adminLinks = computed(() => {
                 route: {
                     name: "adminUsers",
                     params: {
-                        organisationId: user.value.organisationId,
+                        organisationId: nonNullableUser.value.organisationId,
                     },
                 },
                 text: t("AppDrawer.links.manageUsers"),
@@ -60,7 +60,7 @@ const adminLinks = computed(() => {
                 route: {
                     name: "adminFloors",
                     params: {
-                        organisationId: user.value.organisationId,
+                        organisationId: nonNullableUser.value.organisationId,
                     },
                 },
                 text: t("AppDrawer.links.manageFloors"),
@@ -70,7 +70,7 @@ const adminLinks = computed(() => {
                 route: {
                     name: "adminAnalytics",
                     params: {
-                        organisationId: user.value.organisationId,
+                        organisationId: nonNullableUser.value.organisationId,
                     },
                 },
                 text: t("AppDrawer.links.manageAnalytics"),
@@ -80,7 +80,7 @@ const adminLinks = computed(() => {
                 route: {
                     name: "adminOrganisationSettings",
                     params: {
-                        organisationId: user.value.organisationId,
+                        organisationId: nonNullableUser.value.organisationId,
                     },
                 },
                 text: t("AppDrawer.links.settings"),
@@ -93,7 +93,7 @@ const adminLinks = computed(() => {
             route: {
                 name: "adminProperties",
                 params: {
-                    organisationId: user.value.organisationId,
+                    organisationId: nonNullableUser.value.organisationId,
                 },
             },
             text: t("AppDrawer.links.manageProperties"),
@@ -102,10 +102,8 @@ const adminLinks = computed(() => {
 
     return links;
 });
-const user = computed(() => authStore.user as unknown as NonNullable<User>);
-const avatar = computed(() => {
-    if (!user.value) return "";
-    const [first, last] = user.value.name.split(" ");
+const avatar = computed(function () {
+    const [first, last] = nonNullableUser.value.name.split(" ");
     if (!last) {
         return first[0];
     }
@@ -136,13 +134,13 @@ function setAppLanguage(val: string): void {
         bordered
     >
         <q-list>
-            <q-item header class="column items-center q-pt-xl q-pb-lg" v-if="user">
+            <q-item header class="column items-center q-pt-xl q-pb-lg" v-if="nonNullableUser">
                 <q-avatar size="6rem" class="ft-avatar">
                     {{ avatar }}
                 </q-avatar>
                 <div class="q-mt-md text-center">
-                    <div class="text-subtitle1">{{ user.name }}</div>
-                    <div class="text-caption text-grey">{{ user.email }}</div>
+                    <div class="text-subtitle1">{{ nonNullableUser.name }}</div>
+                    <div class="text-caption text-grey">{{ nonNullableUser.email }}</div>
                 </div>
             </q-item>
 

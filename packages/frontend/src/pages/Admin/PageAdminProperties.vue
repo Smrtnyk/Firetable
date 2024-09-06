@@ -37,9 +37,9 @@ const { data: properties } = useFirestoreCollection<PropertyDoc>(
 
 const organisationsIsLoading = ref(false);
 
-const canCreateProperty = computed(() => {
+const canCreateProperty = computed(function () {
     const maxAllowedProperties =
-        propertiesStore.organisations.find((organisation) => {
+        propertiesStore.organisations.find(function (organisation) {
             return organisation.id === props.organisationId;
         })?.maxAllowedProperties ?? 0;
     const currentNumOfProperties = properties.value.length;
@@ -62,7 +62,7 @@ const onPropertyUpdate = withLoading(async function (payload: UpdatePropertyPayl
     quasar.notify("Property updated!");
 });
 
-const onDeleteProperty = withLoading(async (property: PropertyDoc) => {
+const onDeleteProperty = withLoading(async function (property: PropertyDoc) {
     await deleteProperty(property);
     if (authStore.isAdmin) {
         await propertiesStore.initAdminProperties();
@@ -100,7 +100,7 @@ function createProperty(property?: PropertyDoc): void {
                 propertyDoc: property,
             },
             listeners: {
-                create: (payload: CreatePropertyPayload) => {
+                create(payload: CreatePropertyPayload) {
                     onPropertyCreate(payload);
                     dialog.hide();
                 },

@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 
-export const useEventsStore = defineStore("events", () => {
+export const useEventsStore = defineStore("events", function () {
     const showEventGuestListDrawer = ref(false);
     const currentEventName = ref("");
 

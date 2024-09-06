@@ -25,13 +25,13 @@ const propertiesStore = usePropertiesStore();
 const quasar = useQuasar();
 const { t } = useI18n();
 
-const properties = computed(() => {
+const properties = computed(function () {
     return propertiesStore.getPropertiesByOrganisationId(props.organisationId);
 });
 const { floors, isLoading } = useFloors(properties);
 const activeTab = ref("");
 
-watch(isLoading, (loadingVal) => {
+watch(isLoading, function (loadingVal) {
     if (loadingVal) {
         Loading.show();
     } else {
@@ -41,7 +41,7 @@ watch(isLoading, (loadingVal) => {
 
 watch(
     floors,
-    (newFloors) => {
+    function (newFloors) {
         if (Object.keys(newFloors).length > 0 && !activeTab.value) {
             activeTab.value = Object.keys(newFloors)[0];
         }
@@ -97,14 +97,15 @@ async function duplicateFloor(
 
     const duplicatedFloor = { ...floor, name: `${floor.name}_copy` };
     await tryCatchLoadingWrapper({
-        hook: () =>
-            addFloor(
+        hook() {
+            return addFloor(
                 {
                     organisationId: propertyData.organisationId,
                     id: propertyData.propertyId,
                 },
                 duplicatedFloor,
-            ),
+            );
+        },
     }).finally(reset);
 }
 
@@ -116,14 +117,15 @@ async function onFloorDelete(
     if (!(await showConfirm(t("PageAdminFloors.deleteFloorMessage")))) return reset();
 
     await tryCatchLoadingWrapper({
-        hook: () =>
-            deleteFloor(
+        hook() {
+            return deleteFloor(
                 {
                     organisationId: propertyData.organisationId,
                     id: propertyData.propertyId,
                 },
                 id,
-            ),
+            );
+        },
         errorHook: reset,
     });
 }

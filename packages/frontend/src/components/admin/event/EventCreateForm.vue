@@ -54,7 +54,9 @@ const emit = defineEmits<{
     (event: "update", payload: EditEventPayload): void;
 }>();
 
-const isEditMode = computed(() => Boolean(props.event));
+const isEditMode = computed(function () {
+    return Boolean(props.event);
+});
 const { t } = useI18n();
 const router = useRouter();
 const form = useTemplateRef<QForm>("form");
@@ -113,11 +115,11 @@ function updateTime(newTime: any): void {
     state.value.selectedTime = newTime;
 }
 
-const displayedDate = computed(() => {
+const displayedDate = computed(function () {
     return `${state.value.selectedDate} ${state.value.selectedTime}`;
 });
 
-const totalFloors = computed(() => {
+const totalFloors = computed(function () {
     return props.property.floors.length;
 });
 
@@ -127,9 +129,9 @@ function validateAndEmitCreate(): void {
         return;
     }
 
-    const selectedFloors = Object.values(props.property.floors).filter((floor) =>
-        state.value.chosenFloors.includes(floor.id),
-    );
+    const selectedFloors = Object.values(props.property.floors).filter(function (floor) {
+        return state.value.chosenFloors.includes(floor.id);
+    });
 
     if (selectedFloors.length === 0) {
         showErrorMessage(t("EventCreateForm.selectedFloorNotFoundMessage"));

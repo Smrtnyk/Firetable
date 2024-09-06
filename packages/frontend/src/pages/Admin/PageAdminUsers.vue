@@ -36,12 +36,12 @@ const { createDialog } = useDialog();
 
 const activeTab = ref(0);
 
-const organisation = computed(() => {
+const organisation = computed(function () {
     return propertiesStore.getOrganisationById(props.organisationId);
 });
 
-const unassignedUsers = computed(() => {
-    return users.value.filter((user) => {
+const unassignedUsers = computed(function () {
+    return users.value.filter(function (user) {
         return user.relatedProperties.length === 0 && user.role !== Role.PROPERTY_OWNER;
     });
 });
@@ -179,7 +179,7 @@ async function showEditUserDialog(user: User): Promise<void> {
     ) {
         return;
     }
-    const selectedProperties = properties.value.filter((ownProperty) => {
+    const selectedProperties = properties.value.filter(function (ownProperty) {
         return user.relatedProperties.includes(ownProperty.id);
     });
     const dialog = createDialog({

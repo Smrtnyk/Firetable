@@ -1,6 +1,6 @@
 import { boot } from "quasar/wrappers";
 import { createPinia } from "pinia";
 
-export default boot(({ app }) => {
+export default boot(function ({ app }) {
     app.use(createPinia());
 });

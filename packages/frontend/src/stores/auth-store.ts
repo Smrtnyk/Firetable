@@ -17,77 +17,77 @@ import { Loading } from "quasar";
 import { isNotNil } from "es-toolkit/predicate";
 import { noop } from "es-toolkit/function";
 
-export const useAuthStore = defineStore("auth", () => {
+export const useAuthStore = defineStore("auth", function () {
     const isAuthenticated = ref(false);
     const isReady = ref(false);
     const user = ref<User | null>(null);
     const unsubscribers: (typeof noop)[] = [];
     const initInProgress = ref(false);
 
-    const nonNullableUser = computed(() => {
+    const nonNullableUser = computed(function () {
         if (!user.value) {
             throw new Error("User is not defined!");
         }
         return user.value;
     });
 
-    const isAdmin = computed(() => {
+    const isAdmin = computed(function () {
         return user.value?.role === ADMIN;
     });
 
-    const isPropertyOwner = computed(() => {
+    const isPropertyOwner = computed(function () {
         return user.value?.role === Role.PROPERTY_OWNER;
     });
 
-    const capabilities = computed(() => {
+    const capabilities = computed(function () {
         if (!user.value) {
             throw new Error("User is not defined!");
         }
         return user.value?.capabilities ?? DEFAULT_CAPABILITIES_BY_ROLE[user.value.role];
     });
 
-    const isLoggedIn = computed(() => {
+    const isLoggedIn = computed(function () {
         return user.value?.email;
     });
 
-    const canReserve = computed(() => {
+    const canReserve = computed(function () {
         return Boolean(capabilities.value[UserCapability.CAN_RESERVE]);
     });
 
-    const canSeeReservationCreator = computed(() => {
+    const canSeeReservationCreator = computed(function () {
         return Boolean(capabilities.value[UserCapability.CAN_SEE_RESERVATION_CREATOR]);
     });
 
-    const canSeeGuestContact = computed(() => {
+    const canSeeGuestContact = computed(function () {
         return Boolean(capabilities.value[UserCapability.CAN_SEE_GUEST_CONTACT]);
     });
 
-    const canDeleteReservation = computed(() => {
+    const canDeleteReservation = computed(function () {
         return Boolean(capabilities.value[UserCapability.CAN_DELETE_RESERVATION]);
     });
 
-    const canDeleteOwnReservation = computed(() => {
+    const canDeleteOwnReservation = computed(function () {
         return Boolean(capabilities.value[UserCapability.CAN_DELETE_OWN_RESERVATION]);
     });
 
-    const canConfirmReservation = computed(() => {
+    const canConfirmReservation = computed(function () {
         return Boolean(capabilities.value[UserCapability.CAN_CONFIRM_RESERVATION]);
     });
 
-    const canCancelReservation = computed(() => {
+    const canCancelReservation = computed(function () {
         return Boolean(capabilities.value[UserCapability.CAN_CANCEL_RESERVATION]);
     });
 
-    const canEditReservation = computed(() => {
+    const canEditReservation = computed(function () {
         return Boolean(capabilities.value[UserCapability.CAN_EDIT_RESERVATION]);
     });
 
-    const canEditOwnReservation = computed(() => {
+    const canEditOwnReservation = computed(function () {
         return Boolean(capabilities.value[UserCapability.CAN_EDIT_OWN_RESERVATION]);
     });
 
     function cleanup(): void {
-        unsubscribers.forEach((unsub) => {
+        unsubscribers.forEach(function (unsub) {
             unsub();
         });
         isAuthenticated.value = false;
@@ -169,7 +169,7 @@ export const useAuthStore = defineStore("auth", () => {
 
         watch(
             () => userRef.value,
-            (newUser) => {
+            function (newUser) {
                 if (newUser) {
                     user.value = newUser;
                 }

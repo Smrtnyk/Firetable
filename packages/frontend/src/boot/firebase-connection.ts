@@ -7,7 +7,7 @@ import { getCurrentUser, useCurrentUser, VueFire, VueFireAuth } from "vuefire";
 import { watch } from "vue";
 import { usePropertiesStore } from "src/stores/properties-store";
 
-export default boot(({ router, app }): void => {
+export default boot(function ({ router, app }) {
     const { firebaseApp } = initializeFirebase();
     app.use(VueFire, {
         firebaseApp,
@@ -26,7 +26,7 @@ export default boot(({ router, app }): void => {
  * and handle the user accordingly
  */
 function routerBeforeEach(router: Router, store: ReturnType<typeof useAuthStore>): void {
-    router.beforeEach(async (to) => {
+    router.beforeEach(async function (to) {
         try {
             // Force the app to wait until Firebase has
             // finished its initialization, and handle the
@@ -82,7 +82,7 @@ function handleOnAuthStateChanged(
     const currentUser = useCurrentUser();
     watch(
         () => currentUser.value,
-        async () => {
+        async function () {
             if (currentUser.value) {
                 if (isFirstCall) {
                     isFirstCall = false;

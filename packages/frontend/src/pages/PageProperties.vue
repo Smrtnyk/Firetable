@@ -16,19 +16,19 @@ const propertiesStore = usePropertiesStore();
 
 const pending = ref(false);
 
-const properties = computed(() =>
-    propertiesStore.getPropertiesByOrganisationId(props.organisationId),
-);
+const properties = computed(function () {
+    return propertiesStore.getPropertiesByOrganisationId(props.organisationId);
+});
 
-const settings = computed(() => {
+const settings = computed(function () {
     return propertiesStore.getOrganisationSettingsById(props.organisationId);
 });
 
-const cardsAspectRatio = computed(() => {
+const cardsAspectRatio = computed(function () {
     return parseAspectRatio(settings.value.property.propertyCardAspectRatio);
 });
 
-onMounted(() => {
+onMounted(function () {
     if (!props.organisationId) {
         router.replace("/");
     }

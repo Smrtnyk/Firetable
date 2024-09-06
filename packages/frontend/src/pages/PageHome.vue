@@ -6,7 +6,7 @@ import { useRouter } from "vue-router";
 const authStore = useAuthStore();
 const router = useRouter();
 
-const redirectLink = computed(() => {
+const redirectLink = computed(function () {
     return authStore.isAdmin
         ? {
               name: "organisations",
@@ -19,7 +19,7 @@ const redirectLink = computed(() => {
           };
 });
 
-onMounted(() => {
+onMounted(function () {
     router.replace(redirectLink.value);
 });
 </script>

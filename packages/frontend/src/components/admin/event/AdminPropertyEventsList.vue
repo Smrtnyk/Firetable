@@ -16,10 +16,14 @@ const emit = defineEmits<{
 }>();
 
 const props = defineProps<Props>();
-const events = computed(() => [...props.eventsByProperty[props.property.id]]);
-const eventsLength = computed(() => events.value.length);
-const bucketizedEvents = computed(() => {
-    const eventsArr = [...props.eventsByProperty[props.property.id]];
+const events = computed(function () {
+    return Array.from(props.eventsByProperty[props.property.id]);
+});
+const eventsLength = computed(function () {
+    return events.value.length;
+});
+const bucketizedEvents = computed(function () {
+    const eventsArr = Array.from(props.eventsByProperty[props.property.id]);
     const bucketized = new Map<string, Map<string, EventDoc[]>>();
 
     for (const event of eventsArr) {

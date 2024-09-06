@@ -23,7 +23,7 @@ interface Props {
     eventDurationInHours: number;
 }
 
-const socials = ["Whatsapp", "SMS", "Instagram", "Facebook", "Phone"].map((social, index) => {
+const socials = ["Whatsapp", "SMS", "Instagram", "Facebook", "Phone"].map(function (social, index) {
     return {
         name: social,
         email: `social-${index}`,

@@ -41,6 +41,7 @@ import { isValidEuropeanPhoneNumber } from "src/helpers/utils";
 import { isEventInProgress } from "src/helpers/events-utils";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { AppLogger } from "src/logger/FTLogger.js";
+import { storeToRefs } from "pinia";
 
 type OpenDialog = {
     label: string;
@@ -68,12 +69,12 @@ export function useReservations(
     eventOwner: EventOwner,
     event: Ref<VueFirestoreDocumentData<EventDoc> | undefined>,
 ) {
-    const authStore = useAuthStore();
+    const { canReserve, nonNullableUser } = storeToRefs(useAuthStore());
     const q = useQuasar();
     const { t } = useI18n();
     const propertiesStore = usePropertiesStore();
 
-    const settings = computed(() => {
+    const settings = computed(function () {
         return propertiesStore.getOrganisationSettingsById(eventOwner.organisationId);
     });
 
@@ -81,10 +82,6 @@ export function useReservations(
     const intervalID = setInterval(checkReservationsForTimeAndMarkTableIfNeeded, 60 * 1000);
     const crossFloorReservationTransferTable = ref<CrossFloorTable | undefined>();
     const crossFloorReservationCopyTable = ref<CrossFloorTable | undefined>();
-
-    const canReserve = computed(() => {
-        return authStore.canReserve;
-    });
 
     let currentOpenCreateReservationDialog: OpenDialog | undefined;
 
@@ -168,7 +165,7 @@ export function useReservations(
     }
 
     function createEventLog(message: string): void {
-        addLogToEvent(eventOwner, message, authStore.nonNullableUser).catch(
+        addLogToEvent(eventOwner, message, nonNullableUser.value).catch(
             AppLogger.error.bind(AppLogger),
         );
     }
@@ -468,7 +465,7 @@ export function useReservations(
         table1: BaseTable,
         table2: BaseTable,
     ): Promise<void> {
-        if (!authStore.canReserve) {
+        if (!canReserve.value) {
             return;
         }
 
@@ -700,7 +697,7 @@ export function useReservations(
         return true;
     }
 
-    onBeforeUnmount(() => {
+    onBeforeUnmount(function () {
         clearInterval(intervalID);
     });
 

@@ -14,13 +14,13 @@ const selectedTab = ref(props.modelValue);
 // Watch for external changes to modelValue and update selectedTab
 watch(
     () => props.modelValue,
-    (newValue) => {
+    function (newValue) {
         selectedTab.value = newValue;
     },
 );
 
 // Emit update event when selectedTab changes
-watch(selectedTab, (newValue) => {
+watch(selectedTab, function (newValue) {
     emit("update:modelValue", newValue);
 });
 

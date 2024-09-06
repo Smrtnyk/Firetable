@@ -62,12 +62,12 @@ function onKeyDown(event: KeyboardEvent): void {
     }
 }
 
-onBeforeUnmount(() => {
+onBeforeUnmount(function () {
     window.removeEventListener("keydown", onKeyDown);
     window.removeEventListener("resize", resizeFloor);
 });
 
-onMounted(async () => {
+onMounted(async function () {
     Loading.show();
     await floorDataPromise.value;
     if (floor.value) {

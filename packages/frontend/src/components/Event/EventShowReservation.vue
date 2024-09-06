@@ -29,13 +29,13 @@ const reservationConfirmed = ref(
 const waitingForResponse = ref(
     isPlannedReservation(props.reservation) && Boolean(props.reservation.waitingForResponse),
 );
-const canDeleteReservation = computed(() => {
+const canDeleteReservation = computed(function () {
     return (
         authStore.canDeleteReservation ||
         (isOwnReservation(props.reservation) && authStore.canDeleteOwnReservation)
     );
 });
-const canEditReservation = computed(() => {
+const canEditReservation = computed(function () {
     return (
         authStore.canEditReservation ||
         (isOwnReservation(props.reservation) && authStore.canEditOwnReservation)

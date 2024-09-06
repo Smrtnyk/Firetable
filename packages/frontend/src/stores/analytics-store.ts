@@ -16,9 +16,11 @@ interface ReservationsState {
 }
 
 export const useAnalyticsStore = defineStore("analytics", {
-    state: (): ReservationsState => ({
-        dataCache: {},
-    }),
+    state(): ReservationsState {
+        return {
+            dataCache: {},
+        };
+    },
     actions: {
         cacheData(month: string, data: ReservationBucket[]) {
             this.dataCache[month] = data;

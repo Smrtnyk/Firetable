@@ -38,7 +38,7 @@ export const DEFAULT_ORGANISATION_SETTINGS: DeepRequired<OrganisationSettings> =
     },
 };
 
-export const usePropertiesStore = defineStore("properties", () => {
+export const usePropertiesStore = defineStore("properties", function () {
     const properties = ref<PropertyDoc[]>([]);
     const arePropertiesLoading = ref(false);
     const organisations = ref<OrganisationDoc[]>([]);
@@ -54,33 +54,39 @@ export const usePropertiesStore = defineStore("properties", () => {
     }
 
     function getOrganisationById(organisationId: string): OrganisationDoc | undefined {
-        return organisations.value.find((organisation) => {
+        return organisations.value.find(function (organisation) {
             return organisation.id === organisationId;
         });
     }
 
     function getOrganisationNameById(organisationId: string): string {
         return (
-            organisations.value.find((organisation) => {
+            organisations.value.find(function (organisation) {
                 return organisation.id === organisationId;
             })?.name ?? ""
         );
     }
 
     function getPropertyNameById(propertyId: string): string {
-        return properties.value.find(({ id }) => id === propertyId)?.name ?? "";
+        return (
+            properties.value.find(function ({ id }) {
+                return id === propertyId;
+            })?.name ?? ""
+        );
     }
 
     function getOrganisationSettingsById(organisationId: string): OrganisationSettings {
         const settings =
-            organisations.value.find((organisation) => {
+            organisations.value.find(function (organisation) {
                 return organisation.id === organisationId;
             })?.settings ?? {};
         return merge(DEFAULT_ORGANISATION_SETTINGS, settings);
     }
 
     function getPropertiesByOrganisationId(organisationId: string): PropertyDoc[] {
-        return properties.value.filter(({ organisationId: orgId }) => orgId === organisationId);
+        return properties.value.filter(function (property) {
+            return property.organisationId === organisationId;
+        });
     }
 
     async function initOrganisations(): Promise<void> {
@@ -133,7 +139,7 @@ export const usePropertiesStore = defineStore("properties", () => {
 
         const stopWatchPending = watch(
             pending,
-            (newPending) => {
+            function (newPending) {
                 setArePropertiesLoading(newPending);
             },
             { immediate: true },
@@ -141,13 +147,13 @@ export const usePropertiesStore = defineStore("properties", () => {
 
         const stopWatch = watch(
             () => data.value,
-            (newProperties) => {
+            function (newProperties) {
                 setProperties(newProperties as unknown as PropertyDoc[]);
             },
             { deep: true },
         );
 
-        addUnsub(() => {
+        addUnsub(function () {
             stopWatchPending();
             stopWatch();
             stop();

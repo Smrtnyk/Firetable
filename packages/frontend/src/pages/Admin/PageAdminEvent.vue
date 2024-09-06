@@ -48,7 +48,7 @@ const propertiesStore = usePropertiesStore();
 
 const tab = ref("info");
 const reservationsTab = ref("arrivedReservations");
-const settings = computed(() => {
+const settings = computed(function () {
     return propertiesStore.getOrganisationSettingsById(props.organisationId);
 });
 
@@ -73,11 +73,11 @@ const allTables = computed(function () {
     return eventFloors.value.flatMap(getTablesFromFloorDoc);
 });
 
-const reservationsStatus = computed(() => {
+const reservationsStatus = computed(function () {
     const activeReservations = allReservations.value.filter(isActiveReservation);
     const currentlyOccupied = activeReservations.filter(property("arrived")).length;
     const pending = activeReservations.length - currentlyOccupied;
-    const totalGuests = activeReservations.reduce((acc, reservation) => {
+    const totalGuests = activeReservations.reduce(function (acc, reservation) {
         return acc + Number(reservation.numberOfGuests || 0);
     }, 0);
 
@@ -91,7 +91,7 @@ const reservationsStatus = computed(() => {
 
 watch(
     isLoading,
-    (newIsLoading) => {
+    function (newIsLoading) {
         if (newIsLoading) {
             Loading.show();
         } else {
@@ -101,7 +101,7 @@ watch(
     { immediate: true },
 );
 
-onUnmounted(() => {
+onUnmounted(function () {
     if (Loading.isActive) {
         Loading.hide();
     }
@@ -174,7 +174,9 @@ async function deleteReservationPermanently(reservation: ReservationDoc): Promis
         return;
     }
     await tryCatchLoadingWrapper({
-        hook: () => deleteReservation(eventOwner, reservation),
+        hook() {
+            return deleteReservation(eventOwner, reservation);
+        },
     });
 }
 

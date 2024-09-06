@@ -42,7 +42,7 @@ export const routes: RouteRecordRaw[] = [
                 props: true,
                 meta: {
                     requiresAuth: true,
-                    breadcrumb: (route: RouteLocationNormalized, isAdmin) => {
+                    breadcrumb(route: RouteLocationNormalized, isAdmin) {
                         const propertiesStore = usePropertiesStore();
                         return isAdmin
                             ? propertiesStore.getOrganisationNameById(
@@ -60,7 +60,7 @@ export const routes: RouteRecordRaw[] = [
                 props: true,
                 meta: {
                     requiresAuth: true,
-                    breadcrumb: (route) => {
+                    breadcrumb(route) {
                         const propertiesStore = usePropertiesStore();
                         return propertiesStore.getPropertyNameById(
                             route.params.propertyId as string,
@@ -75,7 +75,7 @@ export const routes: RouteRecordRaw[] = [
                 name: "event",
                 meta: {
                     requiresAuth: true,
-                    breadcrumb: () => {
+                    breadcrumb() {
                         const eventsStore = useEventsStore();
                         return eventsStore.currentEventName;
                     },

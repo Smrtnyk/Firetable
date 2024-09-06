@@ -34,7 +34,7 @@ const { data: guest } = useFirestoreDocument<GuestDoc>(
     },
 );
 const tab = ref("");
-const propertiesVisits = computed(() => {
+const propertiesVisits = computed(function () {
     const visitsByProperty: VisitsByProperty = {};
     for (const [propertyId, events] of Object.entries(guest.value?.visitedProperties ?? {})) {
         const propertyData = properties.value.find(function ({ id }) {
@@ -53,7 +53,7 @@ const propertiesVisits = computed(() => {
 
 watch(
     propertiesVisits,
-    (newVisits) => {
+    function (newVisits) {
         if (Object.keys(newVisits).length > 0) {
             tab.value = Object.keys(newVisits)[0];
         }

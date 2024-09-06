@@ -60,7 +60,7 @@ function onKeyDownListener(event: KeyboardEvent): void {
 }
 
 onMounted(function () {
-    floorInstance.on("commandChange", () => {
+    floorInstance.on("commandChange", function () {
         undoRedoState.canUndo = floorInstance.canUndo();
         undoRedoState.canRedo = floorInstance.canRedo();
     });

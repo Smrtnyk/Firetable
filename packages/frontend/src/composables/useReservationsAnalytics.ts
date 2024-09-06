@@ -135,7 +135,7 @@ export function useReservationsAnalytics(
         return { averagePlannedGuests, averageWalkInGuests };
     });
 
-    const plannedReservationsByProperty = computed<TimeSeriesData>(() => {
+    const plannedReservationsByProperty = computed<TimeSeriesData>(function () {
         const propertyTotals: Record<string, number> = {};
         reservationBuckets.value.forEach(function ({ propertyName, plannedReservations: res }) {
             propertyTotals[propertyName] = res.length;

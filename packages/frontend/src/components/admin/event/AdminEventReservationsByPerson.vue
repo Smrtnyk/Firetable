@@ -65,8 +65,12 @@ const chartData = computed(function () {
 });
 const tableData = computed(function () {
     const { labels, datasets } = chartData.value;
-    const arrivedData = datasets.find((dataset) => dataset.label === "Arrived").data;
-    const pendingData = datasets.find((dataset) => dataset.label === "Pending").data;
+    const arrivedData = datasets.find(function (dataset) {
+        return dataset.label === "Arrived";
+    }).data;
+    const pendingData = datasets.find(function (dataset) {
+        return dataset.label === "Pending";
+    }).data;
 
     return labels.map(function (label, index) {
         return {

@@ -23,9 +23,9 @@ interface Props {
 const props = defineProps<Props>();
 const localEventInfoValue = ref(props.eventInfo);
 
-const saveEventInfo = withLoading(() =>
-    updateEvent(props.eventOwner, {
+const saveEventInfo = withLoading(function () {
+    return updateEvent(props.eventOwner, {
         info: localEventInfoValue.value,
-    }),
-);
+    });
+});
 </script>

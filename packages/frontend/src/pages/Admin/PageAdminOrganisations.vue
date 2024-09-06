@@ -74,7 +74,7 @@ const onOrganisationCreate = withLoading(async function (
     return propertiesStore.initOrganisations();
 });
 
-const onDeleteOrganisation = withLoading(async (id: string) => {
+const onDeleteOrganisation = withLoading(async function (id: string) {
     await deleteOrganisation(id);
     await propertiesStore.initOrganisations();
 });
@@ -94,7 +94,7 @@ function createOrganisation(): void {
             component: AddNewOrganisationForm,
             componentPropsObject: {},
             listeners: {
-                create: (organisationPayload: CreateOrganisationPayload) => {
+                create(organisationPayload: CreateOrganisationPayload) {
                     onOrganisationCreate(organisationPayload);
                     dialog.hide();
                 },

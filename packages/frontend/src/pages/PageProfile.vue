@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import type { User } from "@firetable/types";
 import { computed, nextTick, ref, useTemplateRef } from "vue";
 import { useAuthStore } from "src/stores/auth-store";
 import FTTitle from "src/components/FTTitle.vue";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { submitNewPassword } from "@firetable/backend";
 import { useI18n } from "vue-i18n";
+import { storeToRefs } from "pinia";
 
 const { t } = useI18n();
-const authStore = useAuthStore();
-const user = computed<User | null>(() => authStore.user);
+const { user } = storeToRefs(useAuthStore());
 const isInputEnabled = ref(false);
 const newPassword = ref("");
 const passwordInput = useTemplateRef<HTMLElement>("passwordInput");

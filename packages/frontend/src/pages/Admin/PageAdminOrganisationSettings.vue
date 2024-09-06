@@ -14,7 +14,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const propertiesStore = usePropertiesStore();
-const settings = computed(() => {
+const settings = computed(function () {
     return propertiesStore.getOrganisationSettingsById(props.organisationId);
 });
 
@@ -22,11 +22,11 @@ const editableSettings = ref(JSON.parse(JSON.stringify(settings.value)));
 
 const aspectRatioOptions = ["1", "16:9"];
 
-const hasSettingsChanged = computed(() => {
+const hasSettingsChanged = computed(function () {
     return JSON.stringify(editableSettings.value) !== JSON.stringify(settings.value);
 });
 
-const saveSettings = withLoading(() => {
+const saveSettings = withLoading(function () {
     return updateOrganisationSettings(props.organisationId, editableSettings.value);
 });
 

@@ -52,15 +52,21 @@ function onCreate(newGuestData: GuestInGuestListData): Promise<void> | void {
     }
 
     tryCatchLoadingWrapper({
-        hook: () => addGuestToGuestList(eventOwner, newGuestData),
+        hook() {
+            return addGuestToGuestList(eventOwner, newGuestData);
+        },
     });
 }
 
 async function deleteGuest(id: string, reset: () => void): Promise<void> {
-    if (!(await showConfirm(t("EventGuestList.deleteGuestTitle")))) return reset();
+    if (!(await showConfirm(t("EventGuestList.deleteGuestTitle")))) {
+        return reset();
+    }
 
     await tryCatchLoadingWrapper({
-        hook: () => deleteGuestFromGuestList(eventOwner, id),
+        hook() {
+            return deleteGuestFromGuestList(eventOwner, id);
+        },
         errorHook: reset,
     });
 }
@@ -81,7 +87,7 @@ function showAddNewGuestForm(): void {
             maximized: false,
             componentPropsObject: {},
             listeners: {
-                create: (newGuestData: GuestInGuestListData) => {
+                create(newGuestData: GuestInGuestListData) {
                     onCreate(newGuestData);
                     dialog.hide();
                 },

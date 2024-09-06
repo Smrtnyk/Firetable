@@ -20,7 +20,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const propertiesStore = usePropertiesStore();
-const properties = computed(() => {
+const properties = computed(function () {
     return propertiesStore.getPropertiesByOrganisationId(props.organisationId);
 });
 const selectedTab = ref("");
@@ -40,7 +40,7 @@ const {
     plannedVsWalkInReservations,
 } = useReservationsAnalytics(properties, props.organisationId, selectedTab);
 
-const monthOptions = computed(() => {
+const monthOptions = computed(function () {
     const options = [];
     for (let i = 11; i >= 0; i -= 1) {
         const date = subMonths(new Date(), i);
@@ -52,31 +52,30 @@ const monthOptions = computed(() => {
     return options.reverse();
 });
 
-const chartInfos = computed(
-    () =>
-        [
-            {
-                data: peakReservationHours.value,
-                title: "Peak Reservation Hours",
-                type: "bar",
-            },
-            {
-                data: consumptionAnalysisCombined.value,
-                title: "Consumption Data",
-                type: "bar",
-            },
-            {
-                data: guestDistributionAnalysis.value,
-                title: "Guest Distribution",
-                type: "bar",
-            },
-            {
-                data: reservationsByDayOfWeek.value,
-                title: "Reservations by Day of Week",
-                type: "bar",
-            },
-        ] as const,
-);
+const chartInfos = computed(function () {
+    return [
+        {
+            data: peakReservationHours.value,
+            title: "Peak Reservation Hours",
+            type: "bar",
+        },
+        {
+            data: consumptionAnalysisCombined.value,
+            title: "Consumption Data",
+            type: "bar",
+        },
+        {
+            data: guestDistributionAnalysis.value,
+            title: "Guest Distribution",
+            type: "bar",
+        },
+        {
+            data: reservationsByDayOfWeek.value,
+            title: "Reservations by Day of Week",
+            type: "bar",
+        },
+    ] as const;
+});
 </script>
 
 <template>

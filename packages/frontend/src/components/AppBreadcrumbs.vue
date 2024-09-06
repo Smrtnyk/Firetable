@@ -70,7 +70,7 @@ function getBreadcrumbName(
     return currentRoute.meta?.breadcrumb;
 }
 
-const breadcrumbLinks = computed<Link[]>(() => {
+const breadcrumbLinks = computed<Link[]>(function () {
     const links: Link[] = [];
     let currentRouteName = route.name;
 
