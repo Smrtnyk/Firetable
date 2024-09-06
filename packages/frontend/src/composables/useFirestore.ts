@@ -7,7 +7,7 @@ import { useCollection, useDocument } from "vuefire";
 import { isString } from "es-toolkit";
 
 export function useFirestoreCollection<T extends DocumentData>(
-    path: string | Query<T> | ComputedRef<Query<T> | null>,
+    path: ComputedRef<Query<T> | null> | Query<T> | string,
     options: UseCollectionOptions<T[]> = {},
 ) {
     const mergedOpts = {

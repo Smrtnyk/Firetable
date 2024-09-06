@@ -5,9 +5,7 @@ import { minLength } from "src/helpers/form-rules";
 import { QForm } from "quasar";
 import { isValidEuropeanPhoneNumber } from "src/helpers/utils";
 
-const emit = defineEmits<{
-    (eventName: "create", payload: CreateGuestPayload): void;
-}>();
+const emit = defineEmits<(eventName: "create", payload: CreateGuestPayload) => void>();
 const guestName = ref("");
 const guestContact = ref("");
 const createGuestForm = useTemplateRef<QForm>("createGuestForm");

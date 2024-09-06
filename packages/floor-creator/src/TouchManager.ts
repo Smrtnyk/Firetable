@@ -11,7 +11,7 @@ export class TouchManager {
 
     private readonly floor: Floor;
     private readonly hammerManager: HammerManager;
-    private onPinch = throttle((ev: HammerInput) => {
+    private readonly onPinch = throttle((ev: HammerInput) => {
         this.isInteracting = true;
         const scale = ev.scale;
         // Adjust the scale based on a dampening factor to control zoom sensitivity
@@ -90,7 +90,7 @@ export class TouchManager {
         }, 100);
     };
 
-    private onDoubleTap = (ev: HammerInput): void => {
+    private readonly onDoubleTap = (ev: HammerInput): void => {
         const { x, y } = this.floor.canvas.getScenePoint(ev.srcEvent);
         this.floor.onFloorDoubleTap([x, y]);
     };

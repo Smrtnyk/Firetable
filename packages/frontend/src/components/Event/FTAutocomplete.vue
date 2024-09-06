@@ -66,7 +66,7 @@ const props = defineProps<Props>();
 const emit = defineEmits(["found", "clear"]);
 const { t } = useI18n();
 
-const selectEl = useTemplateRef<undefined | QSelect>("selectEl");
+const selectEl = useTemplateRef<QSelect | undefined>("selectEl");
 const options = ref(getNamesFromReservations(props.allReservedTables));
 const searchTerm = ref("");
 

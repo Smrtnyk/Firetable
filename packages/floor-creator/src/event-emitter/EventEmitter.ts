@@ -16,7 +16,7 @@ interface TypedEventEmitter<Events extends EventMap> {
 }
 
 export class EventEmitter<Events extends EventMap> implements TypedEventEmitter<Events> {
-    private listeners: Map<keyof Events, EventEmitterListener[]> = new Map();
+    private readonly listeners: Map<keyof Events, EventEmitterListener[]> = new Map();
 
     public on<K extends keyof Events>(
         event: K,

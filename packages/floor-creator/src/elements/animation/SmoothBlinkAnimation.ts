@@ -5,8 +5,8 @@ import { noop } from "es-toolkit";
 const ANIMATION_DURATION = 500;
 
 export class SmoothBlinkAnimation implements AnimationStrategy {
-    private isAnimating: boolean = false;
-    private target: FabricObject;
+    private isAnimating = false;
+    private readonly target: FabricObject;
 
     constructor(target: FabricObject) {
         this.target = target;

@@ -7,9 +7,9 @@ type Position = {
 };
 
 export class MoveCommand implements Command {
-    private object: FabricObject;
-    private oldPosition: Position;
-    private newPosition: Position;
+    private readonly object: FabricObject;
+    private readonly oldPosition: Position;
+    private readonly newPosition: Position;
 
     constructor(object: FabricObject, oldPosition: Position, newPosition: Position) {
         this.object = object;

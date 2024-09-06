@@ -53,8 +53,7 @@ function createTable(label: string): RectTable {
 }
 
 function createMockReservation(partial: Partial<ReservationDoc> = {}): PlannedReservationDoc {
-    return {
-        id: "id",
+    const doc = {
         guestName: "foo",
         arrived: false,
         reservationConfirmed: false,
@@ -79,10 +78,14 @@ function createMockReservation(partial: Partial<ReservationDoc> = {}): PlannedRe
         },
         floorId: "1",
         tableLabel: "1",
-        _doc: this,
-        ...partial,
         type: ReservationType.PLANNED,
         isVIP: false,
+    };
+    return {
+        id: "id",
+        ...doc,
+        _doc: doc,
+        ...partial,
     };
 }
 
@@ -125,8 +128,7 @@ describe.skip("useReservations", () => {
             organisationId: "2",
             id: "3",
         };
-        event = ref<EventDoc>({
-            id: "3",
+        const doc = {
             name: "test event",
             creator: "test creator",
             date: Date.now(),
@@ -134,7 +136,11 @@ describe.skip("useReservations", () => {
             guestListLimit: 100,
             propertyId: "1",
             organisationId: "2",
-            _doc: this,
+        };
+        event = ref<EventDoc>({
+            id: "3",
+            ...doc,
+            _doc: doc,
         });
     });
 

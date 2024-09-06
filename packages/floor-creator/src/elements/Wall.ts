@@ -4,10 +4,10 @@ import { ELEMENT_DEFAULT_FILL_COLOR } from "../constants.js";
 import { Group, LayoutManager, Rect } from "fabric/es";
 
 type WallCreationOptions = Record<string, unknown>;
-type WalLGroupCreationOptions = {
+type WalLGroupCreationOptions = Partial<GroupProps> & {
     left: number;
     top: number;
-} & Partial<GroupProps>;
+};
 
 export class Wall extends Group {
     static override readonly type = FloorElementTypes.WALL;

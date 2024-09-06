@@ -4,14 +4,14 @@ import { floorDoc, floorsCollection } from "./db.js";
 import { deleteDoc, addDoc } from "firebase/firestore";
 
 export function deleteFloor(
-    property: Pick<PropertyDoc, "organisationId" | "id">,
+    property: Pick<PropertyDoc, "id" | "organisationId">,
     floorID: string,
 ): Promise<void> {
     return deleteDoc(floorDoc(property, floorID));
 }
 
 export function addFloor(
-    owner: Pick<PropertyDoc, "organisationId" | "id">,
+    owner: Pick<PropertyDoc, "id" | "organisationId">,
     floor: Partial<FloorDoc> & Pick<FloorDoc, "name" | "propertyId">,
 ): Promise<DocumentReference> {
     return addDoc(floorsCollection(owner.organisationId, owner.id), floor);

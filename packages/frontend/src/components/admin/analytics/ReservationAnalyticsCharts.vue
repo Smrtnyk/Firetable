@@ -4,7 +4,7 @@ import PieChart from "./PieChart.vue";
 import BarChart from "./BarChart.vue";
 
 interface Props {
-    chartData: TimeSeriesData | PieChartData;
+    chartData: PieChartData | TimeSeriesData;
     chartTitle: string;
     chartType: "bar" | "pie";
 }

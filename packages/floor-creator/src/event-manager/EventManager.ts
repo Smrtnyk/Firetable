@@ -13,7 +13,7 @@ export abstract class EventManager {
         this.floor.canvas.on("mouse:wheel", this.onMouseWheelHandler);
     }
 
-    private onMouseWheelHandler = (opt: TPointerEventInfo<WheelEvent>): void => {
+    private readonly onMouseWheelHandler = (opt: TPointerEventInfo<WheelEvent>): void => {
         if (!opt.e) {
             return;
         }

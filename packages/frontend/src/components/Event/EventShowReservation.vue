@@ -15,8 +15,8 @@ interface Props {
 const authStore = useAuthStore();
 const props = defineProps<Props>();
 const emit = defineEmits<{
-    (e: "delete" | "edit" | "transfer" | "copy"): void;
-    (e: "arrived" | "reservationConfirmed" | "cancel" | "waitingForResponse", value: boolean): void;
+    (e: "copy" | "delete" | "edit" | "transfer"): void;
+    (e: "arrived" | "cancel" | "reservationConfirmed" | "waitingForResponse", value: boolean): void;
 }>();
 const { t } = useI18n();
 const isGuestArrived = ref<boolean>(props.reservation.arrived);

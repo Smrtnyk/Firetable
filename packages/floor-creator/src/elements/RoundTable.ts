@@ -10,10 +10,10 @@ import { FloorElementTypes } from "../types.js";
 import { Circle, FabricText } from "fabric/es";
 
 interface CircleTableElementOptions {
-    groupOptions: {
+    groupOptions: Partial<GroupProps> & {
         baseFill?: string;
         label: string;
-    } & Partial<GroupProps>;
+    };
     textOptions: {
         label: string;
     };

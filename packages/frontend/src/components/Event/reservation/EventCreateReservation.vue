@@ -24,9 +24,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const emit = defineEmits<{
-    (e: "create" | "update", payload: Reservation): void;
-}>();
+const emit = defineEmits<(e: "create" | "update", payload: Reservation) => void>();
 
 const { t } = useI18n();
 

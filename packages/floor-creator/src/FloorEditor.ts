@@ -27,10 +27,10 @@ type FloorEditorEvents = {
 
 export class FloorEditor extends Floor {
     protected eventManager: EventManager;
-    private elementManager: ElementManager;
-    private gridDrawer: GridDrawer;
-    private eventEmitter: EventEmitter<FloorEditorEvents>;
-    private commandInvoker = new CommandInvoker();
+    private readonly elementManager: ElementManager;
+    private readonly gridDrawer: GridDrawer;
+    private readonly eventEmitter: EventEmitter<FloorEditorEvents>;
+    private readonly commandInvoker = new CommandInvoker();
 
     constructor(options: FloorCreationOptions) {
         super(options);

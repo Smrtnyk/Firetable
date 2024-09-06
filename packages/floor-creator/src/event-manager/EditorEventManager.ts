@@ -6,7 +6,7 @@ import { RESOLUTION } from "../constants.js";
 import { MoveCommand } from "../command/MoveCommand.js";
 
 export class EditorEventManager extends EventManager {
-    ctrlPressedDuringSelection: boolean = false;
+    ctrlPressedDuringSelection = false;
 
     private movingObjectStartPosition: {
         left: number;
@@ -15,7 +15,7 @@ export class EditorEventManager extends EventManager {
 
     constructor(
         floor: Floor,
-        private commandInvoker: CommandInvoker,
+        private readonly commandInvoker: CommandInvoker,
     ) {
         super(floor);
         this.initializeCanvasEventHandlers();
@@ -96,7 +96,7 @@ export class EditorEventManager extends EventManager {
         document.addEventListener("keyup", this.handleKeyUp);
     }
 
-    private handleKeyDown = (e: KeyboardEvent): void => {
+    private readonly handleKeyDown = (e: KeyboardEvent): void => {
         if (!(e.ctrlKey || e.metaKey)) {
             return;
         }
@@ -119,21 +119,21 @@ export class EditorEventManager extends EventManager {
         }
     };
 
-    private handleKeyUp = (e: KeyboardEvent): void => {
+    private readonly handleKeyUp = (e: KeyboardEvent): void => {
         if (e.key === "Control" || e.key === "Meta") {
             this.floor.canvas.selection = false;
             this.floor.canvas.requestRenderAll();
         }
     };
 
-    private onEditorMouseUp = (): void => {
+    private readonly onEditorMouseUp = (): void => {
         const hasActiveElement = this.floor.canvas.getActiveObject();
         if (!hasActiveElement) {
             this.floor.emit("elementClicked", this.floor, void 0);
         }
     };
 
-    private snapToGridOnModify = (e: ModifiedEvent): void => {
+    private readonly snapToGridOnModify = (e: ModifiedEvent): void => {
         const target = e.target;
 
         if (!target) {

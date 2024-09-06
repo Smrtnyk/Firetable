@@ -16,11 +16,11 @@ export interface FloorData {
     name: string;
     width: number;
     height: number;
-    json: string | Record<string, any>;
+    json: Record<string, any> | string;
 }
 
 export type BaseTable = RectTable | RoundTable;
-export type FloorEditorElement = RectTable | RoundTable | Sofa | DJBooth | Stage | SpiralStaircase;
+export type FloorEditorElement = DJBooth | RectTable | RoundTable | Sofa | SpiralStaircase | Stage;
 export type CreateElementOptions = {
     label?: string;
     x: number;

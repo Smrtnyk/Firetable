@@ -6,9 +6,9 @@ export function determineTableColor(
     colorPalette: Pick<
         OrganisationSettings["event"],
         | "reservationArrivedColor"
+        | "reservationCancelledColor"
         | "reservationConfirmedColor"
         | "reservationPendingColor"
-        | "reservationCancelledColor"
         | "reservationWaitingForResponseColor"
     >,
 ): string | undefined {

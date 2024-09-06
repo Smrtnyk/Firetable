@@ -12,7 +12,7 @@ type FloorViewerEvents = {
 export class FloorViewer extends Floor {
     protected eventManager: ViewerEventManager;
 
-    private eventEmitter: EventEmitter<FloorViewerEvents>;
+    private readonly eventEmitter: EventEmitter<FloorViewerEvents>;
 
     constructor(options: FloorCreationOptions) {
         super(options);

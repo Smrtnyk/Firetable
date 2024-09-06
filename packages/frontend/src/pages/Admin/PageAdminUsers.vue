@@ -139,7 +139,7 @@ watch(
 
 function onCreateUserFormSubmit(
     newUser: CreateUserPayload,
-): Promise<void | Promise<void>> | undefined {
+): Promise<Promise<void> | void> | undefined {
     if (users.value.length > 150) {
         showErrorMessage(t("PageAdminUsers.maxAmountUsersCreationMessage", { limit: 150 }));
         return undefined;

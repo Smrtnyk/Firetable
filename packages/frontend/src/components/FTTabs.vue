@@ -2,10 +2,10 @@
 import { ref, watch } from "vue";
 
 const props = defineProps<{
-    modelValue: string | number;
+    modelValue: number | string;
 }>();
 const emit = defineEmits<{
-    (e: "update:modelValue", value: string | number): void;
+    (e: "update:modelValue", value: number | string): void;
     (e: "input", value: any): void;
 }>();
 

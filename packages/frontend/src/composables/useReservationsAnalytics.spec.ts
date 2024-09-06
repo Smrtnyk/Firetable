@@ -85,19 +85,21 @@ describe.skip("useReservationsAnalytics", () => {
 
 // Factory functions
 function createPropertyDoc(overrides: Partial<PropertyDoc> = {}): PropertyDoc {
-    return {
-        id: "defaultPropertyId",
+    const doc = {
         name: "Default Property",
         organisationId: MOCK_ORG_ID,
-        _doc: this,
         relatedUsers: [],
+    };
+    return {
+        id: "defaultPropertyId",
+        ...doc,
+        _doc: doc,
         ...overrides,
     };
 }
 
 function createEventDoc(overrides: Partial<EventDoc> = {}): EventDoc {
-    return {
-        id: "defaultEventId",
+    const doc = {
         name: "Default Event",
         date: Date.now(),
         organisationId: MOCK_ORG_ID,
@@ -105,7 +107,11 @@ function createEventDoc(overrides: Partial<EventDoc> = {}): EventDoc {
         entryPrice: 1,
         guestListLimit: 100,
         propertyId: "defaultPropertyId",
-        _doc: this,
+    };
+    return {
+        id: "defaultEventId",
+        ...doc,
+        _doc: doc,
         ...overrides,
     };
 }
@@ -113,8 +119,7 @@ function createEventDoc(overrides: Partial<EventDoc> = {}): EventDoc {
 function createReservationDocWithEventId(
     overrides: Partial<ReservationDocWithEventId> = {},
 ): ReservationDocWithEventId {
-    return {
-        id: "defaultReservationId",
+    const doc = {
         eventId: "defaultEventId",
         tableLabel: "1",
         consumption: 1,
@@ -130,7 +135,11 @@ function createReservationDocWithEventId(
             name: "Default User",
             email: "",
         },
-        _doc: this,
+    };
+    return {
+        id: "defaultReservationId",
+        ...doc,
+        _doc: doc,
         ...overrides,
     };
 }

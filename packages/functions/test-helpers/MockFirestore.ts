@@ -161,7 +161,7 @@ export class MockCollection {
         return newDocRef;
     }
 
-    where(fieldPath: string | MockFieldPath, opStr: WhereFilterOp, value: any): MockQuery {
+    where(fieldPath: MockFieldPath | string, opStr: WhereFilterOp, value: any): MockQuery {
         // Initialize a new MockQuery with the collection reference
         return new MockQuery(this).where(fieldPath, opStr, value);
     }
@@ -251,14 +251,14 @@ export class MockDocumentReference {
 }
 
 class MockTransaction {
-    private transactionData: FirestoreData = new Map<string, any>();
-    private db: MockFirestore;
+    private readonly transactionData: FirestoreData = new Map<string, any>();
+    private readonly db: MockFirestore;
 
     constructor(db: MockFirestore) {
         this.db = db;
     }
 
-    set(docRef: MockDocumentReference, data: any): MockTransaction {
+    set(docRef: MockDocumentReference, data: any): this {
         this.transactionData.set(docRef.path, data);
         return this;
     }
@@ -320,7 +320,7 @@ export class MockDocumentSnapshot {
         return this.exists ? this.#data : undefined;
     }
 
-    get(fieldPath: string | FieldPath): any {
+    get(fieldPath: FieldPath | string): any {
         if (!this.exists) {
             return undefined;
         }
@@ -376,10 +376,10 @@ class MockQuerySnapshot {
 }
 
 export class MockFieldValue implements FieldValue {
-    private readonly operation: "arrayUnion" | "arrayRemove";
-    private elements: any[];
+    private readonly operation: "arrayRemove" | "arrayUnion";
+    private readonly elements: any[];
 
-    private constructor(operation: "arrayUnion" | "arrayRemove", elements: any[]) {
+    private constructor(operation: "arrayRemove" | "arrayUnion", elements: any[]) {
         this.operation = operation;
         this.elements = elements;
     }
@@ -433,11 +433,11 @@ export class MockFieldPath implements FieldPath {
 
 class MockQuery implements Query {
     firestore: any;
-    private queryConstraints: any[] = [];
+    private readonly queryConstraints: any[] = [];
     private docs: MockQueryDocumentSnapshot[] = [];
     readonly #initPromise: Promise<void>;
 
-    constructor(private collection: MockCollection) {
+    constructor(private readonly collection: MockCollection) {
         this.#initPromise = this.init();
     }
 
@@ -489,7 +489,7 @@ class MockQuery implements Query {
         throw new NotImplementedError("endAt is not implemented");
     }
 
-    select(...field: (string | MockFieldPath)[]): any {
+    select(...field: (MockFieldPath | string)[]): any {
         console.log("MockQuery.select", field);
         throw new NotImplementedError("select is not implemented");
     }
@@ -514,16 +514,16 @@ class MockQuery implements Query {
         throw new NotImplementedError("limitToLast is not implemented");
     }
 
-    orderBy(fieldPath: string | MockFieldPath, directionStr?: OrderByDirection): any {
+    orderBy(fieldPath: MockFieldPath | string, directionStr?: OrderByDirection): any {
         console.log("MockQuery.orderBy", fieldPath, directionStr);
         throw new NotImplementedError("orderBy is not implemented");
     }
 
     where(
-        filterOrFieldPath: any | string | MockFieldPath,
+        filterOrFieldPath: MockFieldPath | any | string,
         opStr?: WhereFilterOp,
         value?: any,
-    ): MockQuery {
+    ): this {
         if (!opStr && !value) {
             throw new NotImplementedError("where for filter is not implemented");
         }
@@ -540,7 +540,7 @@ class MockQuery implements Query {
         return this;
     }
 
-    limit(n: number): MockQuery {
+    limit(n: number): this {
         this.queryConstraints.push({ type: "limit", value: n });
         return this;
     }
@@ -591,20 +591,23 @@ class MockQuery implements Query {
 }
 
 export class MockWriteBatch {
-    private operations: { type: FirestoreOperation; docRef: MockDocumentReference; data?: any }[] =
-        [];
+    private readonly operations: {
+        type: FirestoreOperation;
+        docRef: MockDocumentReference;
+        data?: any;
+    }[] = [];
 
-    set(docRef: MockDocumentReference, data: unknown): MockWriteBatch {
+    set(docRef: MockDocumentReference, data: unknown): this {
         this.operations.push({ type: FirestoreOperation.SET, docRef, data });
         return this;
     }
 
-    update(docRef: MockDocumentReference, data: unknown): MockWriteBatch {
+    update(docRef: MockDocumentReference, data: unknown): this {
         this.operations.push({ type: FirestoreOperation.UPDATE, docRef, data });
         return this;
     }
 
-    delete(docRef: MockDocumentReference): MockWriteBatch {
+    delete(docRef: MockDocumentReference): this {
         this.operations.push({ type: FirestoreOperation.DELETE, docRef });
         return this;
     }

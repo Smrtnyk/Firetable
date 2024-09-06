@@ -4,14 +4,12 @@ import { ref, useTemplateRef } from "vue";
 import { greaterThanZero, minLength, requireNumber } from "src/helpers/form-rules";
 import { QForm } from "quasar";
 
-const emit = defineEmits<{
-    (eventName: "create", payload: CreateOrganisationPayload): void;
-}>();
+const emit = defineEmits<(eventName: "create", payload: CreateOrganisationPayload) => void>();
 const organisationRules = [minLength("organisation name needs to have at least 3 characters!", 3)];
 const maxAllowedPropertiesRules = [requireNumber(), greaterThanZero()];
 
 const organisationName = ref("");
-const maxAllowedProperties = ref<null | number>(null);
+const maxAllowedProperties = ref<number | null>(null);
 const createOrganisationForm = useTemplateRef<QForm>("createOrganisationForm");
 
 async function submit(): Promise<void> {

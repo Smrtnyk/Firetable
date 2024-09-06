@@ -32,4 +32,4 @@ export interface GuestDoc {
     _doc: QueryDocumentSnapshot<GuestDoc>;
 }
 
-export type CreateGuestPayload = Pick<GuestDoc, "name" | "contact" | "visitedProperties">;
+export type CreateGuestPayload = Pick<GuestDoc, "contact" | "name" | "visitedProperties">;

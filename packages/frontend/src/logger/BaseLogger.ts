@@ -1,5 +1,5 @@
 /* eslint-disable no-console -- this file is fine to use this */
-type LogLevel = "info" | "warn" | "error" | "debug";
+type LogLevel = "debug" | "error" | "info" | "warn";
 
 interface LoggerOptions {
     prefix?: string;

@@ -7,7 +7,7 @@ import { EVENT_LOGS_DOCUMENT, Collection } from "@firetable/types";
 import { httpsCallable } from "firebase/functions";
 import { collection, doc } from "firebase/firestore";
 
-export type EventOwner = Pick<EventDoc, "organisationId" | "propertyId" | "id">;
+export type EventOwner = Pick<EventDoc, "id" | "organisationId" | "propertyId">;
 
 function getCollection(collectionName: string): CollectionReference {
     const { firestore } = initializeFirebase();
@@ -74,7 +74,7 @@ export function eventLogsDoc(owner: EventOwner): DocumentReference {
 }
 
 export function floorDoc(
-    property: Pick<PropertyDoc, "organisationId" | "id">,
+    property: Pick<PropertyDoc, "id" | "organisationId">,
     id: string,
 ): DocumentReference {
     return doc(floorsCollection(property.organisationId, property.id), id);

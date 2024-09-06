@@ -58,7 +58,7 @@ export type WalkInReservationDoc = WalkInReservation & {
 export type ReservationDoc = PlannedReservationDoc | WalkInReservationDoc;
 export type ReservationDocWithEventId = ReservationDoc & { eventId: string };
 
-type UserIdentifier = Pick<User, "name" | "email" | "id">;
+type UserIdentifier = Pick<User, "email" | "id" | "name">;
 
 export const enum ReservationStatus {
     DELETED = "Deleted",
@@ -101,7 +101,7 @@ export interface PlannedReservation extends BaseReservation {
     reservedBy: UserIdentifier;
 }
 
-export type Reservation = WalkInReservation | PlannedReservation;
+export type Reservation = PlannedReservation | WalkInReservation;
 
 export interface EventLog {
     message: string;

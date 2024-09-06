@@ -116,7 +116,7 @@ function openColorPicker(): void {
 
 function updateTableLabel(
     tableEl: FloorEditorElement | undefined,
-    newLabel: string | number | null,
+    newLabel: number | string | null,
 ): void {
     if (typeof newLabel !== "string" || !isTable(tableEl)) {
         return;
@@ -203,7 +203,7 @@ function onDragStart(event: DragEvent, item: FloorElementTypes): void {
     );
 }
 
-function onFloorChange(prop: keyof FloorEditor, event: null | number | string): void {
+function onFloorChange(prop: keyof FloorEditor, event: number | string | null): void {
     emit("floorUpdate", { [prop]: event });
 }
 

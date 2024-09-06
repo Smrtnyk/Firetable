@@ -14,9 +14,7 @@ export interface BucketizedUsers {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits<{
-    (e: "delete" | "edit", value: User): void;
-}>();
+const emit = defineEmits<(e: "delete" | "edit", value: User) => void>();
 
 function onUserSlideRight(user: BucketizedUser, reset: () => void): void {
     emit("delete", user);

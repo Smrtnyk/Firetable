@@ -11,10 +11,10 @@ import { FloorElementTypes } from "../types.js";
 import { Rect, FabricText } from "fabric/es";
 
 interface RectTableElementOptions {
-    groupOptions: {
+    groupOptions: Partial<GroupProps> & {
         baseFill?: string;
         label: string;
-    } & Partial<GroupProps>;
+    };
     textOptions: {
         label: string;
     };

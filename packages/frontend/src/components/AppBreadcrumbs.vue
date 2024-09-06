@@ -37,7 +37,7 @@ function isRoot(routeName: string): boolean {
 
 function findRouteByName(
     name: RouteRecordName,
-): RouteRecordRaw | RouteRecordNormalized | undefined {
+): RouteRecordNormalized | RouteRecordRaw | undefined {
     for (const routeItem of router.getRoutes()) {
         if (routeItem.name === name) {
             return routeItem;
@@ -54,14 +54,14 @@ function findRouteByName(
 }
 
 function isRouteAllowed(
-    currentRoute: RouteRecordRaw | RouteRecordNormalized,
+    currentRoute: RouteRecordNormalized | RouteRecordRaw,
     userRole: User["role"],
 ): boolean {
     return !currentRoute.meta?.allowedRoles || currentRoute.meta.allowedRoles.includes(userRole);
 }
 
 function getBreadcrumbName(
-    currentRoute: RouteRecordRaw | RouteRecordNormalized,
+    currentRoute: RouteRecordNormalized | RouteRecordRaw,
     isAdmin: boolean,
 ): string | undefined {
     if (isAnyFunction(currentRoute.meta?.breadcrumb)) {

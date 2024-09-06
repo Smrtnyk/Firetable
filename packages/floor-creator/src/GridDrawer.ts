@@ -4,7 +4,7 @@ import { Line, Group } from "fabric/es";
 import { has } from "es-toolkit/compat";
 
 export class GridDrawer {
-    private canvas: Canvas;
+    private readonly canvas: Canvas;
     private isGridVisible = true;
 
     constructor(canvas: Canvas) {

@@ -5,10 +5,10 @@ import { TABLE_WIDTH, TABLE_HEIGHT } from "../constants.js";
 import { Group, LayoutManager } from "fabric/es";
 
 interface TableElementOptions {
-    groupOptions: {
+    groupOptions: Partial<GroupProps> & {
         baseFill?: string;
         label: string;
-    } & Partial<GroupProps>;
+    };
     textOptions: {
         label: string;
     };
@@ -20,11 +20,11 @@ export abstract class Table extends Group {
     baseFill: string;
     private readonly initialWidth: number;
     private readonly initialHeight: number;
-    private shape: Rect | Circle;
-    private textLabel: FabricText;
-    private animationStrategy: AnimationStrategy;
+    private readonly shape: Circle | Rect;
+    private readonly textLabel: FabricText;
+    private readonly animationStrategy: AnimationStrategy;
 
-    protected constructor(elements: [Rect | Circle, FabricText], options: TableElementOptions) {
+    protected constructor(elements: [Circle | Rect, FabricText], options: TableElementOptions) {
         super(elements, {
             ...options.groupOptions,
             layoutManager: new LayoutManager(),

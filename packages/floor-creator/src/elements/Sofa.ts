@@ -3,11 +3,11 @@ import { FloorElementTypes } from "../types.js";
 import { ELEMENT_DEFAULT_FILL_COLOR } from "../constants.js";
 import { Group, LayoutManager, Rect } from "fabric/es";
 
-type SofaGroupCreationOpts = {
+type SofaGroupCreationOpts = Partial<GroupProps> & {
     top: number;
     left: number;
     objects?: FabricObject[];
-} & Partial<GroupProps>;
+};
 
 export class Sofa extends Group {
     static override readonly type = FloorElementTypes.SOFA;

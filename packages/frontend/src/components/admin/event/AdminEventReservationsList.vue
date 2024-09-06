@@ -13,9 +13,7 @@ interface Props {
     reservations: ReservationDoc[];
 }
 
-const emit = defineEmits<{
-    (e: "delete", value: ReservationDoc): void;
-}>();
+const emit = defineEmits<(e: "delete", value: ReservationDoc) => void>();
 const props = defineProps<Props>();
 const { createDialog } = useDialog();
 
