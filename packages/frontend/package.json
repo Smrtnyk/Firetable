@@ -38,7 +38,6 @@
         "pinia": "2.2.2",
         "quasar": "2.16.10",
         "register-service-worker": "1.7.2",
-        "ts-pattern": "catalog:",
         "vue": "3.5.3",
         "vue-i18n": "9.14.0",
         "vue-router": "4.4.3",

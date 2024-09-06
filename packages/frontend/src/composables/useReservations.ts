@@ -145,20 +145,7 @@ export function useReservations(
             table.setVIPStatus(true);
         }
 
-        const {
-            reservationArrivedColor,
-            reservationCancelledColor,
-            reservationPendingColor,
-            reservationConfirmedColor,
-            reservationWaitingForResponseColor,
-        } = settings.value.event;
-        const fill = determineTableColor(reservation, {
-            reservationArrivedColor,
-            reservationCancelledColor,
-            reservationConfirmedColor,
-            reservationPendingColor,
-            reservationWaitingForResponseColor,
-        });
+        const fill = determineTableColor(reservation, settings.value.event);
         if (fill) {
             table.setFill(fill);
         }

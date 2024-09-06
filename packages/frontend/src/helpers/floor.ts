@@ -1,22 +1,42 @@
 import type { OrganisationSettings, Reservation } from "@firetable/types";
-import { match } from "ts-pattern";
+import { isPlannedReservation } from "@firetable/types";
+
+type ColorPalette = Pick<
+    OrganisationSettings["event"],
+    | "reservationArrivedColor"
+    | "reservationCancelledColor"
+    | "reservationConfirmedColor"
+    | "reservationPendingColor"
+    | "reservationWaitingForResponseColor"
+>;
 
 export function determineTableColor(
     reservation: Reservation | undefined,
-    colorPalette: Pick<
-        OrganisationSettings["event"],
-        | "reservationArrivedColor"
-        | "reservationCancelledColor"
-        | "reservationConfirmedColor"
-        | "reservationPendingColor"
-        | "reservationWaitingForResponseColor"
-    >,
-): string | undefined {
-    return match(reservation)
-        .with({ waitingForResponse: true }, () => colorPalette.reservationWaitingForResponseColor)
-        .with({ cancelled: true }, () => colorPalette.reservationCancelledColor)
-        .with({ arrived: true }, () => colorPalette.reservationArrivedColor)
-        .with({ reservationConfirmed: true }, () => colorPalette.reservationConfirmedColor)
-        .with({ arrived: false }, () => colorPalette.reservationPendingColor)
-        .otherwise(() => void 0);
+    colorPalette: ColorPalette,
+): string {
+    if (!reservation) {
+        return "";
+    }
+
+    if (isPlannedReservation(reservation) && reservation.waitingForResponse) {
+        return colorPalette.reservationWaitingForResponseColor;
+    }
+
+    if (isPlannedReservation(reservation) && reservation.cancelled) {
+        return colorPalette.reservationCancelledColor;
+    }
+
+    if (reservation.arrived) {
+        return colorPalette.reservationArrivedColor;
+    }
+
+    if (reservation.reservationConfirmed) {
+        return colorPalette.reservationConfirmedColor;
+    }
+
+    if (reservation.arrived === false) {
+        return colorPalette.reservationPendingColor;
+    }
+
+    return "";
 }
