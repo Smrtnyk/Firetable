@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { EventDoc } from "@firetable/types";
+import type { EventDoc, VoidFunction } from "@firetable/types";
 import { formatEventDate } from "src/helpers/date-utils";
 
 interface Props {
@@ -8,11 +8,11 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits(["right", "left"]);
 
-function emitOnRight({ reset }: { reset: () => void }): void {
+function emitOnRight({ reset }: { reset: VoidFunction }): void {
     emit("right", { event: props.event, reset });
 }
 
-function emitEdit({ reset }: { reset: () => void }): void {
+function emitEdit({ reset }: { reset: VoidFunction }): void {
     emit("left", { event: props.event, reset });
 }
 </script>

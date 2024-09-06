@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FloorDoc } from "@firetable/types";
+import type { FloorDoc, VoidFunction } from "@firetable/types";
 import type { PropertyFloors } from "src/composables/useFloors";
 
 import AddNewFloorForm from "src/components/Floor/AddNewFloorForm.vue";
@@ -86,7 +86,7 @@ function showAddNewFloorForm(propertyData: PropertyFloors, floorDocs: FloorDoc[]
 async function duplicateFloor(
     propertyData: PropertyFloors,
     floor: FloorDoc,
-    reset: () => void,
+    reset: VoidFunction,
 ): Promise<void> {
     if (
         !(await showConfirm(
@@ -112,7 +112,7 @@ async function duplicateFloor(
 async function onFloorDelete(
     propertyData: PropertyFloors,
     id: string,
-    reset: () => void,
+    reset: VoidFunction,
 ): Promise<void> {
     if (!(await showConfirm(t("PageAdminFloors.deleteFloorMessage")))) return reset();
 

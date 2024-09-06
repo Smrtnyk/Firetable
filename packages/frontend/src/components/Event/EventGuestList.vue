@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { GuestInGuestListData } from "@firetable/types";
+import type { GuestInGuestListData, VoidFunction } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
 import {
     showConfirm,
@@ -58,7 +58,7 @@ function onCreate(newGuestData: GuestInGuestListData): Promise<void> | void {
     });
 }
 
-async function deleteGuest(id: string, reset: () => void): Promise<void> {
+async function deleteGuest(id: string, reset: VoidFunction): Promise<void> {
     if (!(await showConfirm(t("EventGuestList.deleteGuestTitle")))) {
         return reset();
     }
@@ -73,7 +73,7 @@ async function deleteGuest(id: string, reset: () => void): Promise<void> {
 
 const confirmGuest = withLoading(function (
     { id, confirmed }: GuestInGuestListData,
-    reset: () => void,
+    reset: VoidFunction,
 ) {
     return confirmGuestFromGuestList(eventOwner, id, !confirmed).then(reset);
 });

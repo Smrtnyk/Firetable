@@ -1,5 +1,5 @@
 import type { Ref } from "vue";
-import type { FloorDoc, PropertyDoc } from "@firetable/types";
+import type { FloorDoc, PropertyDoc, VoidFunction } from "@firetable/types";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { onUnmounted, ref, watch } from "vue";
 import { floorsCollection } from "@firetable/backend";
@@ -18,7 +18,7 @@ export type UsePropertyFloors = Record<string, PropertyFloors>;
 export function useFloors(properties: Ref<PropertyDoc[]>) {
     const floors = ref<UsePropertyFloors>({});
     const isLoading = ref(false);
-    const unsubscribes: (() => void)[] = [];
+    const unsubscribes: VoidFunction[] = [];
 
     const watcher = watch(
         properties,

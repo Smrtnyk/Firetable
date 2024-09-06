@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CreatePropertyPayload, UpdatePropertyPayload } from "@firetable/backend";
-import type { PropertyDoc } from "@firetable/types";
+import type { PropertyDoc, VoidFunction } from "@firetable/types";
 import {
     updateProperty,
     createNewProperty,
@@ -69,7 +69,7 @@ const onDeleteProperty = withLoading(async function (property: PropertyDoc) {
     }
 });
 
-async function deletePropertyAsync(property: PropertyDoc, reset: () => void): Promise<void> {
+async function deletePropertyAsync(property: PropertyDoc, reset: VoidFunction): Promise<void> {
     reset();
     if (
         await showConfirm(
@@ -81,7 +81,7 @@ async function deletePropertyAsync(property: PropertyDoc, reset: () => void): Pr
     }
 }
 
-function showUpdatePropertyDialog(property: PropertyDoc, reset: () => void): void {
+function showUpdatePropertyDialog(property: PropertyDoc, reset: VoidFunction): void {
     reset();
     createProperty(property);
 }

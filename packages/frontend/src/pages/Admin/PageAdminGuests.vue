@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CreateGuestPayload, GuestDoc } from "@firetable/types";
+import type { CreateGuestPayload, GuestDoc, VoidFunction } from "@firetable/types";
 import { useFirestoreCollection } from "src/composables/useFirestore";
 import { createGuest, deleteGuest, getGuestsPath } from "@firetable/backend";
 import { useI18n } from "vue-i18n";
@@ -25,7 +25,7 @@ const { data: guests } = useFirestoreCollection<GuestDoc>(getGuestsPath(props.or
 });
 const { properties } = storeToRefs(usePropertiesStore());
 
-async function onDeleteGuest(guest: GuestDoc, reset: () => void): Promise<void> {
+async function onDeleteGuest(guest: GuestDoc, reset: VoidFunction): Promise<void> {
     reset();
     if (!(await showConfirm(t("PageAdminGuests.deleteGuestConfirmationMessage")))) {
         return;
@@ -37,7 +37,7 @@ async function onDeleteGuest(guest: GuestDoc, reset: () => void): Promise<void> 
     });
 }
 
-async function editGuest(_: GuestDoc, reset: () => void): Promise<void> {
+async function editGuest(_: GuestDoc, reset: VoidFunction): Promise<void> {
     reset();
     if (!(await showConfirm(t("PageAdminGuests.editGuestConfirmationMessage")))) {
         // eslint-disable-next-line no-useless-return -- needed when todo will be resolved

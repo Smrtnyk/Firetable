@@ -1,4 +1,4 @@
-import type { User } from "@firetable/types";
+import type { User, VoidFunction } from "@firetable/types";
 import type { User as FBUser } from "firebase/auth";
 import {
     Role,
@@ -193,7 +193,7 @@ export const useAuthStore = defineStore("auth", function () {
         unsubscribers.push(stop);
     }
 
-    function handleError(stop: () => void, errorObj: { message: string }): void {
+    function handleError(stop: VoidFunction, errorObj: { message: string }): void {
         stop();
         showErrorMessage(errorObj.message);
         logoutUser().catch(noop);

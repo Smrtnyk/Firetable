@@ -1,5 +1,6 @@
 export type NumberTuple = [number, number];
 export type AnyFunction = (...args: any[]) => any;
+export type VoidFunction = (...args: any[]) => void;
 
 export type DeepRequired<T> = {
     [P in keyof T]-?: T[P] extends object

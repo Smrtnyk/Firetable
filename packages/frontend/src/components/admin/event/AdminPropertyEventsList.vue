@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { EventDoc, PropertyDoc } from "@firetable/types";
+import type { EventDoc, PropertyDoc, VoidFunction } from "@firetable/types";
 import PageAdminEventsListItem from "src/components/admin/event/PageAdminEventsListItem.vue";
 import { computed } from "vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
@@ -53,12 +53,12 @@ function handleLoad(): void {
     emit("load", props.property);
 }
 
-function emitDelete(event: EventDoc, reset: () => void): void {
+function emitDelete(event: EventDoc, reset: VoidFunction): void {
     emit("delete", event);
     reset();
 }
 
-function emitEdit(event: EventDoc, reset: () => void): void {
+function emitEdit(event: EventDoc, reset: VoidFunction): void {
     emit("edit", event);
     reset();
 }

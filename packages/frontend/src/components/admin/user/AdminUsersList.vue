@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { User } from "@firetable/types";
+import type { User, VoidFunction } from "@firetable/types";
 
 interface Props {
     users: BucketizedUser[];
@@ -16,11 +16,11 @@ export interface BucketizedUsers {
 const props = defineProps<Props>();
 const emit = defineEmits<(e: "delete" | "edit", value: User) => void>();
 
-function onUserSlideRight(user: BucketizedUser, reset: () => void): void {
+function onUserSlideRight(user: BucketizedUser, reset: VoidFunction): void {
     emit("delete", user);
     reset();
 }
-function showEditUserDialog(user: BucketizedUser, reset: () => void): void {
+function showEditUserDialog(user: BucketizedUser, reset: VoidFunction): void {
     emit("edit", user);
     reset();
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ReservationDoc } from "@firetable/types";
+import type { ReservationDoc, VoidFunction } from "@firetable/types";
 import { useDialog } from "src/composables/useDialog";
 import { formatEventDate } from "src/helpers/date-utils";
 
@@ -31,7 +31,7 @@ function showReservation(reservation: ReservationDoc): void {
     });
 }
 
-function emitDelete(reservation: ReservationDoc, reset: () => void): void {
+function emitDelete(reservation: ReservationDoc, reset: VoidFunction): void {
     reset();
     emit("delete", reservation);
 }
