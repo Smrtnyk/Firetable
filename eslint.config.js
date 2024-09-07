@@ -309,6 +309,8 @@ export default tseslint.config(
                         "on",
                         "rx",
                         "ry",
+                        "fs",
+                        "$",
                     ],
                 },
             ],

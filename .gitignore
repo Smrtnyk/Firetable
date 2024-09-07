@@ -25,6 +25,8 @@ cypress.env.json
 cypress.json
 **/jest/coverage/
 **/coverage/
+**/test-results
+**/playwright-report
 
 # Editor directories and files
 .fleet
@@ -44,4 +46,5 @@ firebase-export-*
 *.log
 local-db
 dist
+dist-esbuild
 lib

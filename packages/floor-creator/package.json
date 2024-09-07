@@ -13,7 +13,8 @@
         "test": "vitest",
         "build": "tsc -b",
         "find-dead-code": "npx ts-prune -p tsconfig.json --ignore 'src/index.ts|dist'",
-        "lint": "eslint ./src"
+        "lint": "eslint ./src",
+        "bundle": "node esbuild-bundle.js"
     },
     "dependencies": {
         "es-toolkit": "catalog:",
@@ -22,8 +23,12 @@
         "ts-pattern": "catalog:"
     },
     "devDependencies": {
+        "@types/node": "22.5.4",
         "@types/hammerjs": "2.0.45",
+        "@playwright/test": "1.47.0",
         "@vitest/browser": "catalog:",
+        "cheerio": "1.0.0",
+        "esbuild": "0.23.1",
         "vitest": "catalog:",
         "webdriverio": "9.0.9"
     },

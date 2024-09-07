@@ -1,0 +1,14 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "lib": ["ESNext", "DOM"],
+        "esModuleInterop": true,
+        "exactOptionalPropertyTypes": false,
+        "types": ["node"]
+    },
+    "include": [
+        "e2e/**/*.ts"
+    ],
+    "exclude": []
+}

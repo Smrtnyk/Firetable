@@ -28,7 +28,9 @@
     "include": [
         "packages/*/vitest.config.ts",
         "eslint.config.js",
+        "**/esbuild-bundle.js",
         "packages/*/src",
+        "packages/*/e2e",
         "packages/*/test-helpers",
         "packages/frontend/src-pwa",
         "packages/frontend/quasar.config.ts",
