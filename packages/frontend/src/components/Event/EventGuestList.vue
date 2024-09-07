@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import type { GuestInGuestListData, VoidFunction } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
-import {
-    showConfirm,
-    showErrorMessage,
-    tryCatchLoadingWrapper,
-    withLoading,
-} from "src/helpers/ui-helpers";
+import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { computed } from "vue";
 import { useEventsStore } from "src/stores/events-store";
 
@@ -58,26 +53,6 @@ function onCreate(newGuestData: GuestInGuestListData): Promise<void> | void {
     });
 }
 
-async function deleteGuest(id: string, reset: VoidFunction): Promise<void> {
-    if (!(await showConfirm(t("EventGuestList.deleteGuestTitle")))) {
-        return reset();
-    }
-
-    await tryCatchLoadingWrapper({
-        hook() {
-            return deleteGuestFromGuestList(eventOwner, id);
-        },
-        errorHook: reset,
-    });
-}
-
-const confirmGuest = withLoading(function (
-    { id, confirmed }: GuestInGuestListData,
-    reset: VoidFunction,
-) {
-    return confirmGuestFromGuestList(eventOwner, id, !confirmed).then(reset);
-});
-
 function showAddNewGuestForm(): void {
     const dialog = quasar.dialog({
         component: FTDialog,
@@ -94,6 +69,34 @@ function showAddNewGuestForm(): void {
             },
         },
     });
+}
+
+async function onSwipeRightDeleteGuest(
+    { reset }: { reset: VoidFunction },
+    id: string,
+): Promise<void> {
+    if (!(await showConfirm(t("EventGuestList.deleteGuestTitle")))) {
+        return reset();
+    }
+
+    await tryCatchLoadingWrapper({
+        hook() {
+            return deleteGuestFromGuestList(eventOwner, id);
+        },
+        // Reset only on error hook, since deleting the guest causes the rerender of the list anyway
+        errorHook: reset,
+    });
+}
+
+async function onSwipeLeftConfirmGuest(
+    { reset }: { reset: VoidFunction },
+    guest: GuestInGuestListData,
+): Promise<void> {
+    await tryCatchLoadingWrapper({
+        hook() {
+            return confirmGuestFromGuestList(eventOwner, guest.id, !guest.confirmed);
+        },
+    }).finally(reset);
 }
 </script>
 
@@ -146,8 +149,8 @@ function showAddNewGuestForm(): void {
                     :key="guest.id"
                     right-color="warning"
                     :left-color="guest.confirmed ? 'red-5' : 'green-5'"
-                    @right="({ reset }) => deleteGuest(guest.id, reset)"
-                    @left="({ reset }) => confirmGuest(guest, reset)"
+                    @right="onSwipeRightDeleteGuest($event, guest.id)"
+                    @left="onSwipeLeftConfirmGuest($event, guest)"
                 >
                     <template v-if="canInteract" #right>
                         <q-icon name="trash" />
