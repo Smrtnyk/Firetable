@@ -21,7 +21,8 @@ esbuild
         outfile: path.join(outputDir, "bundle.js"),
         platform: "browser",
         target: ["esnext"],
-        format: "esm",
+        format: "iife",
+        globalName: "FT",
         splitting: false,
     })
     .then(() => {

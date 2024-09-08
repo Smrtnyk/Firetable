@@ -8,6 +8,7 @@
         "types": ["node"]
     },
     "include": [
+        "src/**/*.ts",
         "e2e/**/*.ts"
     ],
     "exclude": []
