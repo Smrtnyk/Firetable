@@ -444,6 +444,7 @@ export default tseslint.config(
             "**/coverage/",
             ".idea/",
             "**/vitest.config.ts",
+            "**/dist-esbuild/**",
         ],
     },
 );

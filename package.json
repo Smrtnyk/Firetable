@@ -38,12 +38,12 @@
         "firebase-tools": "13.16.0",
         "globals": "15.9.0",
         "prettier": "3.3.3",
-        "typescript": "5.6.1-rc",
-        "typescript-eslint": "8.4.0"
+        "typescript": "5.6.2",
+        "typescript-eslint": "8.5.0"
     },
     "private": true,
     "engines": {
         "node": ">= 20.10.0"
     },
-    "packageManager": "pnpm@9.9.0"
+    "packageManager": "pnpm@9.10.0"
 }
