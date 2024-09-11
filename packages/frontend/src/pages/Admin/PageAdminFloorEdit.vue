@@ -71,7 +71,7 @@ onMounted(async function () {
     Loading.show();
     await floorDataPromise.value;
     if (floor.value) {
-        await instantiateFloor(floor.value);
+        instantiateFloor(floor.value);
         window.addEventListener("keydown", onKeyDown);
         window.addEventListener("resize", resizeFloor);
     } else {

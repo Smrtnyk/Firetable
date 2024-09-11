@@ -18,6 +18,7 @@ import { createQuery, useFirestoreCollection } from "src/composables/useFirestor
 import { query, where } from "firebase/firestore";
 import { nextTick, ref, watch } from "vue";
 import { merge } from "es-toolkit";
+import { matchesProperty } from "es-toolkit/compat";
 
 export const DEFAULT_ORGANISATION_SETTINGS: DeepRequired<OrganisationSettings> = {
     event: {
@@ -54,39 +55,24 @@ export const usePropertiesStore = defineStore("properties", function () {
     }
 
     function getOrganisationById(organisationId: string): OrganisationDoc | undefined {
-        return organisations.value.find(function (organisation) {
-            return organisation.id === organisationId;
-        });
+        return organisations.value.find(matchesProperty("id", organisationId));
     }
 
     function getOrganisationNameById(organisationId: string): string {
-        return (
-            organisations.value.find(function (organisation) {
-                return organisation.id === organisationId;
-            })?.name ?? ""
-        );
+        return getOrganisationById(organisationId)?.name ?? "";
     }
 
     function getPropertyNameById(propertyId: string): string {
-        return (
-            properties.value.find(function ({ id }) {
-                return id === propertyId;
-            })?.name ?? ""
-        );
+        return properties.value.find(matchesProperty("id", propertyId))?.name ?? "";
     }
 
     function getOrganisationSettingsById(organisationId: string): OrganisationSettings {
-        const settings =
-            organisations.value.find(function (organisation) {
-                return organisation.id === organisationId;
-            })?.settings ?? {};
+        const settings = getOrganisationById(organisationId)?.settings ?? {};
         return merge(DEFAULT_ORGANISATION_SETTINGS, settings);
     }
 
     function getPropertiesByOrganisationId(organisationId: string): PropertyDoc[] {
-        return properties.value.filter(function (property) {
-            return property.organisationId === organisationId;
-        });
+        return properties.value.filter(matchesProperty("organisationId", organisationId));
     }
 
     async function initOrganisations(): Promise<void> {

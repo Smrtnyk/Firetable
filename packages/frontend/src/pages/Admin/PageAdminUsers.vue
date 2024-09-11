@@ -22,6 +22,7 @@ import { useAuthStore } from "src/stores/auth-store";
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+import { matchesProperty } from "es-toolkit/compat";
 
 const props = defineProps<{ organisationId: string }>();
 
@@ -108,9 +109,7 @@ const onDeleteUser = withLoading(async function (user: User) {
 });
 
 function findPropertyById(propertyId: string): PropertyDoc | undefined {
-    return properties.value.find(function ({ id }) {
-        return id === propertyId;
-    });
+    return properties.value.find(matchesProperty("id", propertyId));
 }
 
 onBeforeMount(function () {

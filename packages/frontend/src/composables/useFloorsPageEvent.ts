@@ -19,6 +19,7 @@ import { debounce } from "quasar";
 import { decompressFloorDoc } from "src/helpers/compress-floor-doc";
 import { isTouchDevice } from "src/helpers/is-touch-device";
 import { AppLogger } from "src/logger/FTLogger.js";
+import { matchesProperty } from "es-toolkit/compat";
 
 type ActiveFloor = { id: string; name: string };
 
@@ -78,15 +79,13 @@ export function useFloorsPageEvent(
             foundReservations.length === 1 &&
             activeFloor.value?.id !== foundReservations[0].floorId
         ) {
-            const floor = floorInstances.value.find(function ({ id }) {
-                return foundReservations[0].floorId === id;
-            });
+            const floor = floorInstances.value.find(
+                matchesProperty("id", foundReservations[0].floorId),
+            );
             setActiveFloor(floor);
         }
         for (const reservation of foundReservations) {
-            const floor = floorInstances.value.find(function ({ id }) {
-                return reservation.floorId === id;
-            });
+            const floor = floorInstances.value.find(matchesProperty("id", reservation.floorId));
             const table = floor?.getTableByLabel(reservation.tableLabel);
             table?.startAnimation();
         }

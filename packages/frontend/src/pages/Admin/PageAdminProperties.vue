@@ -20,6 +20,7 @@ import { useI18n } from "vue-i18n";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { useFirestoreCollection } from "src/composables/useFirestore";
 import { useAuthStore } from "src/stores/auth-store";
+import { matchesProperty } from "es-toolkit/compat";
 
 interface Props {
     organisationId: string;
@@ -39,9 +40,8 @@ const organisationsIsLoading = ref(false);
 
 const canCreateProperty = computed(function () {
     const maxAllowedProperties =
-        propertiesStore.organisations.find(function (organisation) {
-            return organisation.id === props.organisationId;
-        })?.maxAllowedProperties ?? 0;
+        propertiesStore.organisations.find(matchesProperty("id", props.organisationId))
+            ?.maxAllowedProperties ?? 0;
     const currentNumOfProperties = properties.value.length;
     return currentNumOfProperties < maxAllowedProperties;
 });

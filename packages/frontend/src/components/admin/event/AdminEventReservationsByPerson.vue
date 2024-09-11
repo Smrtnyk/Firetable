@@ -15,6 +15,7 @@ import { computed, onMounted, onUnmounted, ref, watch, useTemplateRef } from "vu
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { isMobile } from "src/global-reactives/screen-detection";
 import FTCenteredText from "src/components/FTCenteredText.vue";
+import { matchesProperty } from "es-toolkit/compat";
 
 interface Props {
     reservations: PlannedReservationDoc[];
@@ -65,12 +66,8 @@ const chartData = computed(function () {
 });
 const tableData = computed(function () {
     const { labels, datasets } = chartData.value;
-    const arrivedData = datasets.find(function (dataset) {
-        return dataset.label === "Arrived";
-    }).data;
-    const pendingData = datasets.find(function (dataset) {
-        return dataset.label === "Pending";
-    }).data;
+    const arrivedData = datasets.find(matchesProperty("label", "Arrived")).data;
+    const pendingData = datasets.find(matchesProperty("label", "Pending")).data;
 
     return labels.map(function (label, index) {
         return {

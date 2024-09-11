@@ -12,6 +12,7 @@ import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import FTDialog from "src/components/FTDialog.vue";
+import { matchesProperty } from "es-toolkit/compat";
 
 interface Props {
     organisationId: string;
@@ -74,9 +75,7 @@ function guestVisitsToReadable(guest: GuestDoc): string {
     }
 
     const res = Object.entries(guest.visitedProperties).map(function ([propertyId, visits]) {
-        const property = properties.value.find(function ({ id }) {
-            return id === propertyId;
-        });
+        const property = properties.value.find(matchesProperty("id", propertyId));
         if (!property) {
             return "";
         }

@@ -49,6 +49,7 @@ import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPC
 import { nextTick, ref, watch, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { QSelect } from "quasar";
+import { matchesProperty } from "es-toolkit/compat";
 
 interface Props {
     floors: FloorDoc[];
@@ -93,9 +94,7 @@ function getNamesFromReservations(
 function createTableLabel(reservation: PlannedReservation): string {
     const label = `${reservation.guestName} (${reservation.tableLabel})`;
     if (props.showFloorNameInOption) {
-        const floorName = props.floors.find(function ({ id }) {
-            return id === reservation.floorId;
-        });
+        const floorName = props.floors.find(matchesProperty("id", reservation.floorId));
         return `${label} on ${floorName?.name}`;
     }
     return label;

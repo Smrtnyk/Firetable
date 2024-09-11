@@ -30,6 +30,7 @@ import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { last } from "es-toolkit";
+import { matchesProperty } from "es-toolkit/compat";
 
 const props = defineProps<{ organisationId: string }>();
 
@@ -111,9 +112,7 @@ function fetchEventsForActiveTab(): void {
     if (eventsByProperty[activePropertyId.value]?.size !== 0) {
         return;
     }
-    const activeProperty = properties.value.find(function (property) {
-        return property.id === activePropertyId.value;
-    });
+    const activeProperty = properties.value.find(matchesProperty("id", activePropertyId.value));
     if (!activeProperty) {
         showErrorMessage("Something went wrong. Please reload the page!");
         return;

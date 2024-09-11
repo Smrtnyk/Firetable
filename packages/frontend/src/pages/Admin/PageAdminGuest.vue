@@ -12,6 +12,7 @@ import FTTabs from "src/components/FTTabs.vue";
 import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPChip.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import FTTabPanels from "src/components/FTTabPanels.vue";
+import { matchesProperty } from "es-toolkit/compat";
 
 interface Props {
     organisationId: string;
@@ -37,9 +38,7 @@ const tab = ref("");
 const propertiesVisits = computed(function () {
     const visitsByProperty: VisitsByProperty = {};
     for (const [propertyId, events] of Object.entries(guest.value?.visitedProperties ?? {})) {
-        const propertyData = properties.value.find(function ({ id }) {
-            return id === propertyId;
-        });
+        const propertyData = properties.value.find(matchesProperty("id", propertyId));
         if (!propertyData) {
             continue;
         }

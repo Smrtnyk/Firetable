@@ -42,6 +42,7 @@ import { isEventInProgress } from "src/helpers/events-utils";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { AppLogger } from "src/logger/FTLogger.js";
 import { storeToRefs } from "pinia";
+import { matchesProperty } from "es-toolkit/compat";
 
 type OpenDialog = {
     label: string;
@@ -508,7 +509,7 @@ export function useReservations(
     }
 
     function markReservationAsExpired(reservation: ReservationDoc): void {
-        const floor = floorInstances.value.find(({ id }) => id === reservation.floorId);
+        const floor = floorInstances.value.find(matchesProperty("id", reservation.floorId));
         floor?.getTableByLabel(reservation.tableLabel)?.setFill("red");
     }
 
