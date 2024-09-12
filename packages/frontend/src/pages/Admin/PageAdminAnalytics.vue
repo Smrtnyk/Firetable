@@ -12,7 +12,7 @@ import FTTabPanels from "src/components/FTTabPanels.vue";
 import { computed, ref } from "vue";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { format, subMonths } from "date-fns";
-import { useReservationsAnalytics } from "src/composables/useReservationsAnalytics";
+import { useReservationsAnalytics } from "src/composables/analytics/useReservationsAnalytics.js";
 
 interface Props {
     organisationId: string;

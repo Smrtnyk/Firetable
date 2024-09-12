@@ -1,7 +1,7 @@
 import type { MockInstance } from "vitest";
 import type { EventDoc, PropertyDoc, ReservationDocWithEventId } from "@firetable/types";
-import { useReservationsAnalytics } from "./useReservationsAnalytics";
-import * as analyticsStore from "../stores/analytics-store";
+import { useReservationsAnalytics } from "./useReservationsAnalytics.js";
+import * as analyticsStore from "../../stores/analytics-store.js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ReservationStatus, ReservationType } from "@firetable/types";
 import * as backend from "@firetable/backend";

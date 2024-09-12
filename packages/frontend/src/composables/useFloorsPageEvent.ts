@@ -144,7 +144,9 @@ export function useFloorsPageEvent(
     function onAutocompleteClear(): void {
         floorInstances.value.forEach(function (floor) {
             const tables = getTables(floor as FloorViewer);
-            tables.forEach((table) => table.stopAnimation());
+            tables.forEach(function (table) {
+                table.stopAnimation();
+            });
         });
     }
 

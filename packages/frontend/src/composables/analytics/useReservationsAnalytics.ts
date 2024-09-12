@@ -1,21 +1,17 @@
-import type { EventDoc, PropertyDoc, ReservationDocWithEventId } from "@firetable/types";
+import type { PropertyDoc } from "@firetable/types";
 import type { Ref } from "vue";
-import type {
-    AugmentedPlannedReservation,
-    AugmentedWalkInReservation,
-    ReservationBucket,
-} from "src/stores/analytics-store";
-import type { PieChartData, TimeSeriesData } from "src/components/admin/analytics/types";
-import { isAWalkInReservation, isPlannedReservation } from "@firetable/types";
+import type { AugmentedPlannedReservation, ReservationBucket } from "src/stores/analytics-store.js";
+import type { PieChartData, TimeSeriesData } from "src/components/admin/analytics/types.js";
 import { computed, onUnmounted, ref, watch } from "vue";
-import { useAnalyticsStore } from "src/stores/analytics-store";
+import { useAnalyticsStore } from "src/stores/analytics-store.js";
 
 import { fetchAnalyticsData } from "@firetable/backend";
 import { Loading } from "quasar";
-import { showErrorMessage } from "src/helpers/ui-helpers";
+import { showErrorMessage } from "src/helpers/ui-helpers.js";
 import { format } from "date-fns";
-import { getColors } from "src/helpers/colors";
+import { getColors } from "src/helpers/colors.js";
 import { matchesProperty } from "es-toolkit/compat";
+import { bucketizeReservations } from "src/composables/analytics/bucketize-reservations.js";
 
 const DAYS_OF_WEEK = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const DEFAULT_SELECTED_DAY = "ALL";
@@ -357,7 +353,7 @@ export function useReservationsAnalytics(
                 properties.value,
             );
 
-            reservationBuckets.value = bucketize(
+            reservationBuckets.value = bucketizeReservations(
                 fetchedData.events,
                 fetchedData.reservations,
                 properties.value,
@@ -391,59 +387,4 @@ export function useReservationsAnalytics(
         reservationsByDayOfWeek,
         plannedVsWalkInReservations,
     };
-}
-
-function bucketize(
-    events: EventDoc[],
-    fetchedReservations: ReservationDocWithEventId[],
-    properties: PropertyDoc[],
-): ReservationBucket[] {
-    const buckets: Record<string, ReservationBucket> = {};
-
-    events.forEach(function (event) {
-        // Find or create a bucket for each event's property
-        if (!buckets[event.propertyId]) {
-            const propertyName = properties.find(matchesProperty("id", event.propertyId))?.name;
-
-            if (!propertyName) {
-                return;
-            }
-
-            buckets[event.propertyId] = {
-                propertyId: event.propertyId,
-                propertyName,
-                plannedReservations: [],
-                walkInReservations: [],
-            };
-        }
-
-        // Filter reservations for the current event
-        fetchedReservations.forEach(function (reservation) {
-            // Ensure the reservation is for the current event
-            if (reservation.eventId !== event.id) {
-                return;
-            }
-
-            // Skip cancelled reservations
-            if (isPlannedReservation(reservation) && reservation.cancelled) {
-                return;
-            }
-
-            const reservationData: AugmentedPlannedReservation | AugmentedWalkInReservation = {
-                ...reservation,
-                id: reservation.id,
-                date: event.date,
-            };
-
-            if (isPlannedReservation(reservationData)) {
-                buckets[event.propertyId].plannedReservations.push(reservationData);
-            }
-
-            if (isAWalkInReservation(reservationData)) {
-                buckets[event.propertyId].walkInReservations.push(reservationData);
-            }
-        });
-    });
-
-    return Object.values(buckets);
 }
