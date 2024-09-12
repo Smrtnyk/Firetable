@@ -22,7 +22,8 @@
     "devDependencies": {
         "@faker-js/faker": "9.0.0",
         "@firebase/app-types": "0.9.2",
-        "vitest": "catalog:"
+        "vitest": "catalog:",
+        "@vitest/spy": "2.1.0"
     },
     "private": true
 }

@@ -29,6 +29,7 @@
         "@types/hammerjs": "2.0.45",
         "@playwright/test": "1.47.0",
         "@vitest/browser": "catalog:",
+        "@vitest/spy": "2.1.0",
         "cheerio": "1.0.0",
         "esbuild": "0.23.1",
         "vitest": "catalog:",

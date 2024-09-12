@@ -445,6 +445,8 @@ export default tseslint.config(
             ".idea/",
             "**/vitest.config.ts",
             "**/dist-esbuild/**",
+            "**/node_modules/**",
+            "node_modules",
         ],
     },
 );
