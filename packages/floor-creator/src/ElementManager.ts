@@ -11,22 +11,33 @@ import { RectTable } from "./elements/RectTable.js";
 import { Stage } from "./elements/Stage.js";
 import { SpiralStaircase } from "./elements/SpiralStaircase.js";
 import { Door } from "./elements/Door.js";
-import { match } from "ts-pattern";
 
 export class ElementManager {
     addElement(options: CreateElementOptions): FabricObject {
-        return match(options.tag)
-            .with(FloorElementTypes.RECT_TABLE, () => this.addRectTableElement(options))
-            .with(FloorElementTypes.ROUND_TABLE, () => this.addRoundTableElement(options))
-            .with(FloorElementTypes.SOFA, () => this.addSofaElement(options))
-            .with(FloorElementTypes.DJ_BOOTH, () => this.addDJBooth(options))
-            .with(FloorElementTypes.WALL, () => this.addWall(options))
-            .with(FloorElementTypes.STAGE, () => this.addStageElement(options))
-            .with(FloorElementTypes.SPIRAL_STAIRCASE, () => this.addSpiralStaircaseElement(options))
-            .with(FloorElementTypes.DOOR, () => this.addDoor(options))
-            .with(FloorElementTypes.EDITABLE_RECT, () => this.addEditableRect(options))
-            .with(FloorElementTypes.EDITABLE_CIRCLE, () => this.addEditableCircle(options))
-            .exhaustive();
+        switch (options.tag) {
+            case FloorElementTypes.RECT_TABLE:
+                return this.addRectTableElement(options);
+            case FloorElementTypes.ROUND_TABLE:
+                return this.addRoundTableElement(options);
+            case FloorElementTypes.SOFA:
+                return this.addSofaElement(options);
+            case FloorElementTypes.DJ_BOOTH:
+                return this.addDJBooth(options);
+            case FloorElementTypes.WALL:
+                return this.addWall(options);
+            case FloorElementTypes.STAGE:
+                return this.addStageElement(options);
+            case FloorElementTypes.SPIRAL_STAIRCASE:
+                return this.addSpiralStaircaseElement(options);
+            case FloorElementTypes.DOOR:
+                return this.addDoor(options);
+            case FloorElementTypes.EDITABLE_RECT:
+                return this.addEditableRect(options);
+            case FloorElementTypes.EDITABLE_CIRCLE:
+                return this.addEditableCircle(options);
+            default:
+                throw new Error(`Unknown floor element type: ${options.tag}`);
+        }
     }
 
     private addEditableCircle({ x, y }: CreateElementOptions): EditableShape {
