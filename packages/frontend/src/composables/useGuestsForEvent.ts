@@ -7,7 +7,7 @@ import { guestsCollection } from "@firetable/backend";
 import { isValidEuropeanPhoneNumber } from "src/helpers/utils";
 import { where } from "firebase/firestore";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
-import { property } from "es-toolkit/compat";
+import { matchesProperty, property } from "es-toolkit/compat";
 
 export function useGuestsForEvent(eventOwner: EventOwner, reservations: Ref<ReservationDoc[]>) {
     const guestWithPhoneNumbers = computed(function () {
@@ -46,13 +46,11 @@ export function useGuestsForEvent(eventOwner: EventOwner, reservations: Ref<Rese
                     .map(([, visitDetails]) => visitDetails);
 
                 // Find matching reservations for each visit based on contact
-                const matchingReservations = reservations.value.filter(function (reservation) {
-                    return reservation.guestContact === guest.contact;
-                });
+                const matchingReservations = reservations.value.filter(
+                    matchesProperty("guestContact", guest.contact),
+                );
                 // Map table labels from matching reservations
-                const tableLabels = matchingReservations.map(function (reservation) {
-                    return reservation.tableLabel;
-                });
+                const tableLabels = matchingReservations.map(property("tableLabel"));
 
                 return {
                     name: guest.name,

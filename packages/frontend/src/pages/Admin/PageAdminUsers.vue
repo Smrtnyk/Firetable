@@ -12,7 +12,12 @@ import AdminUsersList from "src/components/admin/user/AdminUsersList.vue";
 import FTTabs from "src/components/FTTabs.vue";
 import FTTabPanels from "src/components/FTTabPanels.vue";
 
-import { showConfirm, showErrorMessage, withLoading } from "src/helpers/ui-helpers";
+import {
+    showConfirm,
+    showErrorMessage,
+    tryCatchLoadingWrapper,
+    withLoading,
+} from "src/helpers/ui-helpers";
 import { computed, onBeforeMount, onUnmounted, ref, watch } from "vue";
 import { Loading, useQuasar } from "quasar";
 import { createUserWithEmail, deleteUser, updateUser } from "@firetable/backend";
@@ -89,11 +94,6 @@ const properties = computed(function () {
     return propertiesStore.getPropertiesByOrganisationId(props.organisationId);
 });
 
-const onCreateUser = withLoading(async function (newUser: CreateUserPayload) {
-    await createUserWithEmail(newUser);
-    await fetchUsers();
-});
-
 const onUpdateUser = withLoading(async function (updatedUser: EditUserPayload) {
     await updateUser(updatedUser);
     await fetchUsers();
@@ -136,15 +136,18 @@ watch(
     { immediate: true },
 );
 
-function onCreateUserFormSubmit(
-    newUser: CreateUserPayload,
-): Promise<Promise<void> | void> | undefined {
+async function onCreateUserFormSubmit(newUser: CreateUserPayload): Promise<void> {
     if (users.value.length > 150) {
         showErrorMessage(t("PageAdminUsers.maxAmountUsersCreationMessage", { limit: 150 }));
-        return undefined;
+        return;
     }
 
-    return onCreateUser(newUser);
+    await tryCatchLoadingWrapper({
+        async hook() {
+            await createUserWithEmail(newUser);
+            await fetchUsers();
+        },
+    });
 }
 
 function showCreateUserDialog(): void {
