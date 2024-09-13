@@ -23,7 +23,8 @@
         "build:functions": "pnpm --filter functions build",
         "test": "pnpm -r test",
         "lint": "eslint .",
-        "build": "pnpm -r build"
+        "build": "pnpm -r build",
+        "build:clean": "rm -rf ./packages/*/dist && pnpm -r build"
     },
     "devDependencies": {
         "@regru/eslint-plugin-prefer-early-return": "1.0.0",
