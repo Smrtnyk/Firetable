@@ -41,12 +41,12 @@ interface Props {
     eventId: string;
 }
 
-const props = defineProps<Props>();
+const { propertyId, eventId, organisationId } = defineProps<Props>();
 
 const eventOwner: EventOwner = {
-    propertyId: props.propertyId,
-    organisationId: props.organisationId,
-    id: props.eventId,
+    propertyId,
+    organisationId,
+    id: eventId,
 };
 
 const showMapsExpanded = ref(false);
@@ -115,19 +115,24 @@ function showEventInfo(): void {
 }
 
 async function init(): Promise<void> {
-    if (!props.eventId) {
-        await router.replace("/");
-        // TODO: why no return here?
-    }
     Loading.show();
     await Promise.all([eventDataPromise.value, reservationsDataPromise.value]);
     Loading.hide();
 
-    if (reservationsDataError.value) {
-        showErrorMessage(reservationsDataError);
-        await router.replace("/");
+    if (!event.value) {
+        showErrorMessage("Event not found", function () {
+            router.replace("/");
+        });
         return;
     }
+
+    if (reservationsDataError.value) {
+        showErrorMessage(reservationsDataError, function () {
+            router.replace("/");
+        });
+        return;
+    }
+
     eventsStore.setCurrentEventName(event.value?.name ?? "");
 }
 

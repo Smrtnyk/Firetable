@@ -1,3 +1,4 @@
+import type { VoidFunction } from "@firetable/types";
 import { Dialog, Loading, Notify } from "quasar";
 import { isString, noop } from "es-toolkit";
 
@@ -26,7 +27,7 @@ export function showConfirm(title: string, message = ""): Promise<boolean> {
     });
 }
 
-export function showErrorMessage(e: unknown): void {
+export function showErrorMessage(e: unknown, onCloseCallback?: VoidFunction): void {
     let message = "An unexpected error occurred.";
     if (isString(e)) {
         message = e;
@@ -34,11 +35,15 @@ export function showErrorMessage(e: unknown): void {
         message = e.message;
     }
 
-    Dialog.create({
+    const dialog = Dialog.create({
         title: "Error",
         message,
         class: "error-dialog",
     });
+
+    if (onCloseCallback) {
+        dialog.onOk(onCloseCallback);
+    }
 }
 
 type TryCatchLoadingWrapperOptions<T> = {
