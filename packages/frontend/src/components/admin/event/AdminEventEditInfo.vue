@@ -13,7 +13,7 @@
 import type { EventOwner } from "@firetable/backend";
 import { ref } from "vue";
 import { updateEvent } from "@firetable/backend";
-import { withLoading } from "src/helpers/ui-helpers";
+import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 
 interface Props {
     eventOwner: EventOwner;
@@ -23,9 +23,13 @@ interface Props {
 const props = defineProps<Props>();
 const localEventInfoValue = ref(props.eventInfo);
 
-const saveEventInfo = withLoading(function () {
-    return updateEvent(props.eventOwner, {
-        info: localEventInfoValue.value,
+async function saveEventInfo(): Promise<void> {
+    await tryCatchLoadingWrapper({
+        hook() {
+            return updateEvent(props.eventOwner, {
+                info: localEventInfoValue.value,
+            });
+        },
     });
-});
+}
 </script>

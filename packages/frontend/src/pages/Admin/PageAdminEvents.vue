@@ -9,12 +9,7 @@ import FTTabs from "src/components/FTTabs.vue";
 import FTTabPanels from "src/components/FTTabPanels.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 
-import {
-    showConfirm,
-    showErrorMessage,
-    tryCatchLoadingWrapper,
-    withLoading,
-} from "src/helpers/ui-helpers";
+import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { computed, onBeforeMount, ref, watch, onUnmounted } from "vue";
 import { Loading, useQuasar } from "quasar";
 import {
@@ -125,27 +120,35 @@ function fetchEventsForActiveTab(): void {
     fetchMoreEvents(eventOwner, null);
 }
 
-const onCreateEvent = withLoading(async function (eventData: CreateEventPayload) {
-    const { id: eventId, propertyId } = (await createNewEvent(eventData)).data;
-    quasar.notify(t("PageAdminEvents.eventCreatedNotificationMessage"));
-    await router.push({
-        name: "adminEvent",
-        params: { eventId, propertyId, organisationId: props.organisationId },
-    });
-});
-
-const onUpdateEvent = withLoading(async function (eventData: EditEventPayload & { id: string }) {
-    await updateEvent(
-        {
-            propertyId: eventData.propertyId,
-            organisationId: props.organisationId,
-            id: eventData.id,
+async function onCreateEvent(eventData: CreateEventPayload): Promise<void> {
+    await tryCatchLoadingWrapper({
+        async hook() {
+            const { id: eventId, propertyId } = (await createNewEvent(eventData)).data;
+            quasar.notify(t("PageAdminEvents.eventCreatedNotificationMessage"));
+            await router.push({
+                name: "adminEvent",
+                params: { eventId, propertyId, organisationId: props.organisationId },
+            });
         },
-        eventData,
-    );
-    // An ugly hack to force data reload
-    window.location.reload();
-});
+    });
+}
+
+async function onUpdateEvent(eventData: EditEventPayload & { id: string }): Promise<void> {
+    await tryCatchLoadingWrapper({
+        async hook() {
+            await updateEvent(
+                {
+                    propertyId: eventData.propertyId,
+                    organisationId: props.organisationId,
+                    id: eventData.id,
+                },
+                eventData,
+            );
+            // An ugly hack to force data reload
+            window.location.reload();
+        },
+    });
+}
 
 async function onEventItemSlideRight(event: EventDoc): Promise<void> {
     if (!(await showConfirm(t("PageAdminEvents.deleteEventDialogTitle")))) {

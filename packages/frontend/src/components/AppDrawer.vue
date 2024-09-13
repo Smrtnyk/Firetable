@@ -6,7 +6,7 @@ import { LocalStorage, useQuasar } from "quasar";
 import { useAuthStore } from "src/stores/auth-store";
 import { useAppStore } from "src/stores/app-store";
 import { logoutUser } from "@firetable/backend";
-import { withLoading } from "src/helpers/ui-helpers";
+import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { ADMIN, Role } from "@firetable/types";
 import { storeToRefs } from "pinia";
 
@@ -115,9 +115,13 @@ function setDarkMode(newValue: boolean): void {
     q.localStorage.set("FTDarkMode", newValue);
 }
 
-const onLogoutUser = withLoading(async function () {
-    await logoutUser();
-});
+async function onLogoutUser(): Promise<void> {
+    await tryCatchLoadingWrapper({
+        hook() {
+            return logoutUser();
+        },
+    });
+}
 
 function setAppLanguage(val: string): void {
     LocalStorage.set("FTLang", val);

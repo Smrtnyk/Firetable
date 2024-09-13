@@ -14,7 +14,7 @@ import AddNewPropertyForm from "src/components/admin/property/AddNewPropertyForm
 import FTCenteredText from "src/components/FTCenteredText.vue";
 
 import { useQuasar } from "quasar";
-import { showConfirm, withLoading } from "src/helpers/ui-helpers";
+import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { usePropertiesStore } from "src/stores/properties-store";
@@ -46,28 +46,40 @@ const canCreateProperty = computed(function () {
     return currentNumOfProperties < maxAllowedProperties;
 });
 
-const onPropertyCreate = withLoading(async function (payload: CreatePropertyPayload) {
-    await createNewProperty(payload);
-    if (authStore.isAdmin) {
-        await propertiesStore.initAdminProperties();
-    }
-    quasar.notify("Property created!");
-});
+async function onPropertyCreate(payload: CreatePropertyPayload): Promise<void> {
+    await tryCatchLoadingWrapper({
+        async hook() {
+            await createNewProperty(payload);
+            if (authStore.isAdmin) {
+                await propertiesStore.initAdminProperties();
+            }
+            quasar.notify("Property created!");
+        },
+    });
+}
 
-const onPropertyUpdate = withLoading(async function (payload: UpdatePropertyPayload) {
-    await updateProperty(payload);
-    if (authStore.isAdmin) {
-        await propertiesStore.initAdminProperties();
-    }
-    quasar.notify("Property updated!");
-});
+async function onPropertyUpdate(payload: UpdatePropertyPayload): Promise<void> {
+    await tryCatchLoadingWrapper({
+        async hook() {
+            await updateProperty(payload);
+            if (authStore.isAdmin) {
+                await propertiesStore.initAdminProperties();
+            }
+            quasar.notify("Property updated!");
+        },
+    });
+}
 
-const onDeleteProperty = withLoading(async function (property: PropertyDoc) {
-    await deleteProperty(property);
-    if (authStore.isAdmin) {
-        await propertiesStore.initAdminProperties();
-    }
-});
+async function onDeleteProperty(property: PropertyDoc): Promise<void> {
+    await tryCatchLoadingWrapper({
+        async hook() {
+            await deleteProperty(property);
+            if (authStore.isAdmin) {
+                await propertiesStore.initAdminProperties();
+            }
+        },
+    });
+}
 
 async function deletePropertyAsync(property: PropertyDoc, reset: VoidFunction): Promise<void> {
     reset();

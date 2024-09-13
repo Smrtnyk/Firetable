@@ -6,7 +6,7 @@ import AddNewOrganisationForm from "src/components/admin/organisation/AddNewOrga
 import FTCenteredText from "src/components/FTCenteredText.vue";
 
 import { useQuasar } from "quasar";
-import { showConfirm, withLoading } from "src/helpers/ui-helpers";
+import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { createNewOrganisation, deleteOrganisation } from "@firetable/backend";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -66,18 +66,24 @@ function createLinks(organisationId: string): Link[] {
     ];
 }
 
-const onOrganisationCreate = withLoading(async function (
-    organisationPayload: CreateOrganisationPayload,
-) {
-    await createNewOrganisation(organisationPayload);
-    quasar.notify("organisation created!");
-    return propertiesStore.initOrganisations();
-});
+async function onOrganisationCreate(organisationPayload: CreateOrganisationPayload): Promise<void> {
+    await tryCatchLoadingWrapper({
+        async hook() {
+            await createNewOrganisation(organisationPayload);
+            quasar.notify("organisation created!");
+            return propertiesStore.initOrganisations();
+        },
+    });
+}
 
-const onDeleteOrganisation = withLoading(async function (id: string) {
-    await deleteOrganisation(id);
-    await propertiesStore.initOrganisations();
-});
+async function onDeleteOrganisation(id: string): Promise<void> {
+    await tryCatchLoadingWrapper({
+        async hook() {
+            await deleteOrganisation(id);
+            await propertiesStore.initOrganisations();
+        },
+    });
+}
 
 async function deleteOrganisationAsync(organisationId: string): Promise<void> {
     if (await showConfirm("Delete organisation?")) {

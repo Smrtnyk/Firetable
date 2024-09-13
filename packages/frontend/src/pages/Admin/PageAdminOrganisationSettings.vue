@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { usePropertiesStore } from "src/stores/properties-store";
 import { computed, ref } from "vue";
-import { withLoading } from "src/helpers/ui-helpers";
+import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { updateOrganisationSettings } from "@firetable/backend";
 
 import SettingsSection from "src/components/admin/organisation-settings/SettingsSection.vue";
@@ -26,9 +26,13 @@ const hasSettingsChanged = computed(function () {
     return JSON.stringify(editableSettings.value) !== JSON.stringify(settings.value);
 });
 
-const saveSettings = withLoading(function () {
-    return updateOrganisationSettings(props.organisationId, editableSettings.value);
-});
+async function saveSettings(): Promise<void> {
+    await tryCatchLoadingWrapper({
+        hook() {
+            return updateOrganisationSettings(props.organisationId, editableSettings.value);
+        },
+    });
+}
 
 const colorsSettings = [
     {

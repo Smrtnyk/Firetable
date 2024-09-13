@@ -22,7 +22,7 @@ import FTTabs from "src/components/FTTabs.vue";
 import FTTabPanels from "src/components/FTTabPanels.vue";
 
 import { Loading, useQuasar } from "quasar";
-import { showConfirm, tryCatchLoadingWrapper, withLoading } from "src/helpers/ui-helpers";
+import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useAdminEvent } from "src/composables/useAdminEvent";
 import { buttonSize, isMobile } from "src/global-reactives/screen-detection";
 import { truncateText } from "src/helpers/string-utils";
@@ -113,12 +113,16 @@ async function init(): Promise<void> {
     }
 }
 
-const onFloorUpdate = withLoading(function (floor: FloorEditor) {
-    return updateEventFloorData(eventOwner, {
-        id: floor.id,
-        json: compressFloorDoc(floor.json),
+async function onFloorUpdate(floor: FloorEditor): Promise<void> {
+    await tryCatchLoadingWrapper({
+        hook() {
+            return updateEventFloorData(eventOwner, {
+                id: floor.id,
+                json: compressFloorDoc(floor.json),
+            });
+        },
     });
-});
+}
 
 function isEventFinished(eventTime: number): boolean {
     const eventFinishedLimit = new Date(eventTime);

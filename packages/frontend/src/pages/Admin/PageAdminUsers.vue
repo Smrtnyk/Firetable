@@ -12,12 +12,7 @@ import AdminUsersList from "src/components/admin/user/AdminUsersList.vue";
 import FTTabs from "src/components/FTTabs.vue";
 import FTTabPanels from "src/components/FTTabPanels.vue";
 
-import {
-    showConfirm,
-    showErrorMessage,
-    tryCatchLoadingWrapper,
-    withLoading,
-} from "src/helpers/ui-helpers";
+import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { computed, onBeforeMount, onUnmounted, ref, watch } from "vue";
 import { Loading, useQuasar } from "quasar";
 import { createUserWithEmail, deleteUser, updateUser } from "@firetable/backend";
@@ -94,19 +89,28 @@ const properties = computed(function () {
     return propertiesStore.getPropertiesByOrganisationId(props.organisationId);
 });
 
-const onUpdateUser = withLoading(async function (updatedUser: EditUserPayload) {
-    await updateUser(updatedUser);
-    await fetchUsers();
-});
+async function onUpdateUser(updatedUser: EditUserPayload): Promise<void> {
+    await tryCatchLoadingWrapper({
+        async hook() {
+            await updateUser(updatedUser);
+            await fetchUsers();
+        },
+    });
+}
 
-const onDeleteUser = withLoading(async function (user: User) {
+async function onDeleteUser(user: User): Promise<void> {
     if (user.id === authStore.user?.id) {
         showErrorMessage("You cannot delete yourself!");
         return;
     }
-    await deleteUser(user);
-    await fetchUsers();
-});
+
+    await tryCatchLoadingWrapper({
+        async hook() {
+            await deleteUser(user);
+            await fetchUsers();
+        },
+    });
+}
 
 function findPropertyById(propertyId: string): PropertyDoc | undefined {
     return properties.value.find(matchesProperty("id", propertyId));
