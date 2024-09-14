@@ -1,8 +1,8 @@
 packages:
     - 'packages/*'
 catalog:
-    vitest: 2.1.0
-    '@vitest/browser': 2.1.0
-    '@vitest/spy': 2.1.0
+    vitest: 2.1.1
+    '@vitest/browser': 2.1.1
+    '@vitest/spy': 2.1.1
     firebase: 10.13.1
-    es-toolkit: 1.17.0
+    es-toolkit: 1.18.0
