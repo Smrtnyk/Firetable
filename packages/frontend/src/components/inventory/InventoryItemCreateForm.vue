@@ -1,0 +1,184 @@
+<script setup lang="ts">
+import type { CreateInventoryItemPayload } from "@firetable/types";
+import { DrinkCategory, InventoryItemType } from "@firetable/types";
+import { computed, defineEmits, ref, useTemplateRef } from "vue";
+import { QForm } from "quasar";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
+const formRef = useTemplateRef<QForm>("formRef");
+
+function getInitialForm(): CreateInventoryItemPayload {
+    return {
+        name: "",
+        type: InventoryItemType.DRINK,
+        category: DrinkCategory.SPIRIT,
+        price: 0,
+        quantity: 0,
+        unit: "",
+        supplier: "",
+    };
+}
+
+const form = ref<CreateInventoryItemPayload>(getInitialForm());
+
+const typeOptions = [InventoryItemType.DRINK, InventoryItemType.FOOD, InventoryItemType.OTHER];
+
+const emit = defineEmits<(e: "submit", item: CreateInventoryItemPayload) => void>();
+const isDrinkType = computed(() => form.value.type === InventoryItemType.DRINK);
+
+async function onSubmit(): Promise<void> {
+    if (!(await formRef.value?.validate())) {
+        return;
+    }
+
+    emit("submit", form.value);
+
+    onReset();
+}
+
+function onReset(): void {
+    form.value = { ...getInitialForm() };
+}
+</script>
+
+<template>
+    <div class="InventoryItemCreateForm">
+        <q-form greedy class="q-gutter-md q-pt-md q-pa-md" ref="formRef">
+            <!-- Name -->
+            <q-input
+                v-model="form.name"
+                label="Name"
+                standout
+                rounded
+                required
+                :rules="[(val) => !!val || 'Name is required']"
+                aria-label="Name"
+                role="textbox"
+            />
+
+            <!-- Type -->
+            <q-select
+                v-model="form.type"
+                :options="typeOptions"
+                emit-value
+                label="Type"
+                standout
+                rounded
+                required
+                :rules="[(val) => !!val || 'Type is required']"
+                aria-label="Type"
+                role="combobox"
+            />
+
+            <!-- Category -->
+            <q-input
+                v-model="form.category"
+                label="Category"
+                standout
+                rounded
+                aria-label="Category"
+                role="textbox"
+            />
+
+            <!-- Price -->
+            <q-input
+                v-model.number="form.price"
+                label="Price"
+                type="number"
+                standout
+                rounded
+                required
+                :rules="[(val) => val > 0 || 'Price must be positive']"
+                aria-label="Price"
+                role="spinbutton"
+            />
+
+            <!-- Quantity -->
+            <q-input
+                v-model.number="form.quantity"
+                label="Quantity"
+                type="number"
+                standout
+                rounded
+                required
+                :rules="[(val) => val > 0 || 'Quantity must be positive']"
+                aria-label="Quantity"
+                role="spinbutton"
+            />
+
+            <!-- Unit -->
+            <q-input
+                v-model="form.unit"
+                label="Unit"
+                standout
+                rounded
+                required
+                :rules="[(val) => !!val || 'Unit is required']"
+                aria-label="Unit"
+                role="textbox"
+            />
+
+            <!-- Alcohol Content (only for drinks) -->
+            <q-input
+                v-if="isDrinkType"
+                v-model.number="form.alcoholContent"
+                label="Alcohol Content (%)"
+                type="number"
+                standout
+                rounded
+                :rules="[
+                    (val) =>
+                        val === undefined ||
+                        (val >= 0 && val <= 100) ||
+                        'Must be between 0 and 100',
+                ]"
+                aria-label="Alcohol Content"
+                role="spinbutton"
+            />
+
+            <!-- Volume (only for drinks) -->
+            <q-input
+                v-if="isDrinkType"
+                v-model.number="form.volume"
+                label="Volume (ml)"
+                type="number"
+                standout
+                rounded
+                :rules="[(val) => val === undefined || val >= 0 || 'Volume must be positive']"
+                aria-label="Volume"
+                role="spinbutton"
+            />
+
+            <q-input
+                v-model="form.supplier"
+                label="Supplier"
+                standout
+                rounded
+                aria-label="Supplier"
+                role="textbox"
+            />
+
+            <!-- Buttons -->
+            <div class="row q-gutter-md">
+                <q-btn
+                    rounded
+                    class="button-gradient"
+                    size="md"
+                    :label="t('InventoryItemCreateForm.submitButtonLabel')"
+                    @click="onSubmit"
+                />
+                <q-btn
+                    rounded
+                    size="md"
+                    outline
+                    :label="t('UserCreateForm.buttonResetLabel')"
+                    type="reset"
+                    color="primary"
+                    class="q-ml-sm"
+                    @click="onReset"
+                />
+            </div>
+        </q-form>
+    </div>
+</template>

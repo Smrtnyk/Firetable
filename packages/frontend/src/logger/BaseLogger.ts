@@ -13,29 +13,29 @@ export abstract class BaseLogger {
     }
 
     public info(message: string, ...args: unknown[]): void {
-        this.log("info", message, ...args);
+        this.#log("info", message, ...args);
     }
 
     public warn(message: string, ...args: unknown[]): void {
-        this.log("warn", message, ...args);
+        this.#log("warn", message, ...args);
     }
 
     public error(message: unknown, ...args: unknown[]): void {
-        if (this.isError(message)) {
+        if (this.#isError(message)) {
             const errorMessage = `${this.prefix} [ERROR]: ${message.message}\nStack: ${message.stack}`;
             console.error(errorMessage, ...args);
         } else if (typeof message === "string") {
-            this.log("error", message, ...args);
+            this.#log("error", message, ...args);
         } else {
-            this.log("error", "An unknown error occurred", ...args);
+            this.#log("error", "An unknown error occurred", ...args);
         }
     }
 
     public debug(message: string, ...args: unknown[]): void {
-        this.log("debug", message, ...args);
+        this.#log("debug", message, ...args);
     }
 
-    private log(level: LogLevel, message: string, ...args: unknown[]): void {
+    #log(level: LogLevel, message: string, ...args: unknown[]): void {
         const formattedMessage = `${this.prefix} [${level.toUpperCase()}]: ${message}`;
         if (level === "error") {
             console.error(formattedMessage, ...args);
@@ -48,7 +48,7 @@ export abstract class BaseLogger {
         }
     }
 
-    private isError(value: unknown): value is Error {
+    #isError(value: unknown): value is Error {
         return value instanceof Error;
     }
 }

@@ -8,3 +8,4 @@ export * from "./db-organisations.js";
 export * from "./db-analytics.js";
 export * from "./db-guests.js";
 export * from "./paths.js";
+export * from "./db-inventory.js";

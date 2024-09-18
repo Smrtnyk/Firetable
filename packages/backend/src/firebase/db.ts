@@ -2,7 +2,13 @@ import type { HttpsCallableResult } from "firebase/functions";
 import type { DocumentReference, CollectionReference } from "firebase/firestore";
 import type { EventDoc, PropertyDoc } from "@firetable/types";
 import { initializeFirebase } from "./base.js";
-import { getEventsPath, getFloorsPath, getGuestsPath, getPropertiesPath } from "./paths.js";
+import {
+    getEventsPath,
+    getFloorsPath,
+    getGuestsPath,
+    getInventoryPath,
+    getPropertiesPath,
+} from "./paths.js";
 import { EVENT_LOGS_DOCUMENT, Collection } from "@firetable/types";
 import { httpsCallable } from "firebase/functions";
 import { collection, doc } from "firebase/firestore";
@@ -12,6 +18,13 @@ export type EventOwner = Pick<EventDoc, "id" | "organisationId" | "propertyId">;
 function getCollection(collectionName: string): CollectionReference {
     const { firestore } = initializeFirebase();
     return collection(firestore, collectionName);
+}
+
+export function getInventoryCollection(
+    organisationId: string,
+    propertyId: string,
+): CollectionReference {
+    return getCollection(getInventoryPath(organisationId, propertyId));
 }
 
 export function guestsCollection(organisationId: string): CollectionReference {
