@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { PlannedReservation, User } from "@firetable/types";
 import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
+import { isTimeWithinEventDuration } from "./reservation-form-utils";
 import { ReservationStatus, ReservationType } from "@firetable/types";
 import { computed, ref, watch, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
@@ -8,7 +9,6 @@ import { QForm } from "quasar";
 import { greaterThanZero, minLength, noEmptyString, requireNumber } from "src/helpers/form-rules";
 import { useAuthStore } from "src/stores/auth-store";
 import { getFirestoreTimestamp } from "@firetable/backend";
-import { getReservationTimeOptions } from "src/components/Event/reservation/reservation-form-utils";
 
 interface Props {
     users: User[];
@@ -125,7 +125,7 @@ defineExpose({
                 <q-popup-proxy transition-show="scale" transition-hide="scale">
                     <q-time
                         :options="
-                            getReservationTimeOptions.bind(
+                            isTimeWithinEventDuration.bind(
                                 null,
                                 props.eventStartTimestamp,
                                 props.eventDurationInHours,

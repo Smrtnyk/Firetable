@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { WalkInReservation } from "@firetable/types";
 import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
+import { isTimeWithinEventDuration } from "./reservation-form-utils";
 import { ReservationStatus, ReservationType } from "@firetable/types";
 import { ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
@@ -9,7 +10,6 @@ import { greaterThanZero, optionalMinLength, requireNumber } from "src/helpers/f
 import { useAuthStore } from "src/stores/auth-store";
 import { getFirestoreTimestamp } from "@firetable/backend";
 import { hourFromTimestamp } from "src/helpers/date-utils";
-import { getReservationTimeOptions } from "src/components/Event/reservation/reservation-form-utils";
 
 interface Props {
     mode: "create" | "update";
@@ -96,7 +96,7 @@ defineExpose({
                 <q-popup-proxy transition-show="scale" transition-hide="scale">
                     <q-time
                         :options="
-                            getReservationTimeOptions.bind(
+                            isTimeWithinEventDuration.bind(
                                 null,
                                 props.eventStartTimestamp,
                                 props.eventDurationInHours,
