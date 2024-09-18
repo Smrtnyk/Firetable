@@ -43,8 +43,10 @@ describe("FloorEditor", () => {
             expect(floorEditor.elementManager).toBeDefined();
         });
 
-        // FIXME: not working in browser mode for some raeson
-        it.skip("should render the initial grid", () => {
+        it("should render the initial grid", async () => {
+            await new Promise((resolve) => {
+                floorEditor.on("rendered", resolve);
+            });
             expect(gridDrawerSpy).toHaveBeenCalled();
         });
     });
