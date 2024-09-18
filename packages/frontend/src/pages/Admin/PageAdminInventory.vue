@@ -4,7 +4,12 @@ import { InventoryItemType } from "@firetable/types";
 import FTTitle from "src/components/FTTitle.vue";
 import { useI18n } from "vue-i18n";
 import { useFirestoreCollection } from "src/composables/useFirestore.js";
-import { addInventoryItem, deleteInventoryItem, getInventoryPath } from "@firetable/backend";
+import {
+    addInventoryItem,
+    deleteInventoryItem,
+    getInventoryPath,
+    updateInventoryItem,
+} from "@firetable/backend";
 import { Loading } from "quasar";
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers.js";
 import { onMounted } from "vue";
@@ -13,6 +18,7 @@ import FTDialog from "src/components/FTDialog.vue";
 import InventoryItemCreateForm from "src/components/inventory/InventoryItemCreateForm.vue";
 import { useDialog } from "src/composables/useDialog.js";
 import { AppLogger } from "src/logger/FTLogger.js";
+import { omit } from "es-toolkit";
 
 interface Props {
     organisationId: string;
@@ -42,6 +48,26 @@ async function onInventoryItemCreateSubmit(
     }).catch(AppLogger.error.bind(AppLogger));
 }
 
+function showEditInventoryItemForm(item: InventoryItemDoc): void {
+    const dialog = createDialog({
+        component: FTDialog,
+        componentProps: {
+            component: InventoryItemCreateForm,
+            componentPropsObject: {
+                itemToEdit: omit(item, ["id", "_doc"]),
+            },
+            maximized: false,
+            title: t("PageAdminInventory.editInventoryItemDialogTitle"),
+            listeners: {
+                submit(updatedItem: CreateInventoryItemPayload) {
+                    onInventoryItemEditSubmit(item.id, updatedItem);
+                    dialog.hide();
+                },
+            },
+        },
+    });
+}
+
 function showCreateInventoryItemDialog(): void {
     const dialog = createDialog({
         component: FTDialog,
@@ -59,8 +85,15 @@ function showCreateInventoryItemDialog(): void {
     });
 }
 
-function editItem(item: InventoryItemDoc): void {
-    // Implement edit functionality
+async function onInventoryItemEditSubmit(
+    itemId: string,
+    updatedItem: CreateInventoryItemPayload,
+): Promise<void> {
+    await tryCatchLoadingWrapper({
+        async hook() {
+            await updateInventoryItem(organisationId, propertyId, itemId, updatedItem);
+        },
+    }).catch(AppLogger.error.bind(AppLogger));
 }
 
 async function deleteItem(item: InventoryItemDoc): Promise<void> {
@@ -143,7 +176,7 @@ onMounted(init);
                             <div>Unit: {{ item.unit }}</div>
                         </q-card-section>
                         <q-card-actions align="right">
-                            <q-btn flat icon="pencil" @click="editItem(item)" />
+                            <q-btn flat icon="pencil" @click="showEditInventoryItemForm(item)" />
                             <q-btn flat icon="trash" color="negative" @click="deleteItem(item)" />
                         </q-card-actions>
                     </q-card>

@@ -1,14 +1,22 @@
 <script setup lang="ts">
 import type { CreateInventoryItemPayload } from "@firetable/types";
 import { DrinkCategory, InventoryItemType } from "@firetable/types";
-import { computed, defineEmits, ref, useTemplateRef } from "vue";
+import { computed, defineEmits, ref, useTemplateRef, watch } from "vue";
 import { QForm } from "quasar";
 import { useI18n } from "vue-i18n";
 
+interface Props {
+    itemToEdit?: CreateInventoryItemPayload;
+}
+
 const { t } = useI18n();
+const props = defineProps<Props>();
 const formRef = useTemplateRef<QForm>("formRef");
 
 function getInitialForm(): CreateInventoryItemPayload {
+    if (props.itemToEdit) {
+        return { ...props.itemToEdit };
+    }
     return {
         name: "",
         type: InventoryItemType.DRINK,
@@ -40,6 +48,13 @@ async function onSubmit(): Promise<void> {
 function onReset(): void {
     form.value = { ...getInitialForm() };
 }
+
+watch(
+    () => props.itemToEdit,
+    function () {
+        form.value = { ...getInitialForm() };
+    },
+);
 </script>
 
 <template>
