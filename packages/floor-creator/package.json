@@ -31,8 +31,7 @@
         "@vitest/spy": "catalog:",
         "cheerio": "1.0.0",
         "esbuild": "0.23.1",
-        "vitest": "catalog:",
-        "webdriverio": "9.0.9"
+        "vitest": "catalog:"
     },
     "keywords": [
         "floor",

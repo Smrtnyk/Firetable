@@ -110,6 +110,7 @@ function resetProperties(): void {
             @submit="onSubmit"
             @reset="onReset"
             ref="userCreateForm"
+            greedy
         >
             <q-input
                 v-model="form.name"

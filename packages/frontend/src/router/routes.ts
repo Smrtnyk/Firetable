@@ -155,6 +155,16 @@ export const routes: RouteRecordRaw[] = [
                 component: () => import("src/pages/Admin/PageAdminEvent.vue"),
             },
             {
+                path: "/admin/:organisationId/:propertyId/inventory",
+                name: "adminInventory",
+                meta: {
+                    requiresAuth: true,
+                    allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN],
+                },
+                props: true,
+                component: () => import("src/pages/Admin/PageAdminInventory.vue"),
+            },
+            {
                 path: "/admin/:organisationId/users",
                 name: "adminUsers",
                 meta: {

@@ -6,3 +6,4 @@ export * from "./property.js";
 export * from "./organisation.js";
 export * from "./guest.js";
 export * from "./utils.js";
+export * from "./inventory.js";

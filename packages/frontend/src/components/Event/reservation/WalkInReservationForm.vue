@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import type { WalkInReservation } from "@firetable/types";
 import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
+import { isTimeWithinEventDuration } from "./reservation-form-utils";
 import { ReservationStatus, ReservationType } from "@firetable/types";
 import { ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
 import { greaterThanZero, optionalMinLength, requireNumber } from "src/helpers/form-rules";
-import { useAuthStore } from "src/stores/auth-store";
-import { getFirestoreTimestamp } from "@firetable/backend";
 import { hourFromTimestamp } from "src/helpers/date-utils";
-import { getReservationTimeOptions } from "src/components/Event/reservation/reservation-form-utils";
 
 interface Props {
     mode: "create" | "update";
@@ -26,23 +24,21 @@ interface Props {
 const props = defineProps<Props>();
 
 const { t } = useI18n();
-const authStore = useAuthStore();
 
 const initialState =
     props.mode === "update" && props.reservationData
         ? props.reservationData
         : generateInitialState();
-const state = ref<WalkInReservation>(initialState);
+const state = ref<Omit<WalkInReservation, "creator">>(initialState);
 const reservationForm = useTemplateRef<QForm>("reservationForm");
 
-function generateInitialState(): WalkInReservation {
+function generateInitialState(): Omit<WalkInReservation, "creator"> {
     const eventStart = props.eventStartTimestamp;
     const now = Date.now();
     // Set the initial time to either the current hour or the event start hour
     const initialTime = now > eventStart ? now : eventStart;
     // Format the time as a string "HH:MM"
     const formattedTime = hourFromTimestamp(initialTime, null);
-    const { id, name, email } = authStore.nonNullableUser;
     return {
         type: ReservationType.WALK_IN as const,
         guestName: null,
@@ -52,12 +48,6 @@ function generateInitialState(): WalkInReservation {
         consumption: 0,
         arrived: true as const,
         time: formattedTime,
-        creator: {
-            name,
-            email,
-            id,
-            createdAt: getFirestoreTimestamp(),
-        },
         tableLabel: props.table.label,
         floorId: props.floor.id,
         status: ReservationStatus.ACTIVE,
@@ -96,7 +86,7 @@ defineExpose({
                 <q-popup-proxy transition-show="scale" transition-hide="scale">
                     <q-time
                         :options="
-                            getReservationTimeOptions.bind(
+                            isTimeWithinEventDuration.bind(
                                 null,
                                 props.eventStartTimestamp,
                                 props.eventDurationInHours,

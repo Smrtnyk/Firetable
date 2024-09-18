@@ -10,6 +10,11 @@ export function getPropertyPath(organisationId: string, propertyId: string): str
     return [getPropertiesPath(organisationId), propertyId].join("/");
 }
 
+// INVENTORY
+export function getInventoryPath(organisationId: string, propertyId: string): string {
+    return [getPropertyPath(organisationId, propertyId), Collection.INVENTORY].join("/");
+}
+
 // EVENTS
 export function getEventsPath({ propertyId, organisationId }: EventOwner): string {
     return [getPropertyPath(organisationId, propertyId), Collection.EVENTS].join("/");

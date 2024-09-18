@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import type { PlannedReservation, User } from "@firetable/types";
 import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
+import { isTimeWithinEventDuration } from "./reservation-form-utils";
 import { ReservationStatus, ReservationType } from "@firetable/types";
 import { computed, ref, watch, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
 import { greaterThanZero, minLength, noEmptyString, requireNumber } from "src/helpers/form-rules";
-import { useAuthStore } from "src/stores/auth-store";
-import { getFirestoreTimestamp } from "@firetable/backend";
-import { getReservationTimeOptions } from "src/components/Event/reservation/reservation-form-utils";
 
 interface Props {
+    currentUser: User;
     users: User[];
     mode: "create" | "update";
     eventStartTimestamp: number;
@@ -32,7 +31,6 @@ const socials = ["Whatsapp", "SMS", "Instagram", "Facebook", "Phone"].map(functi
 });
 const props = defineProps<Props>();
 const { t } = useI18n();
-const authStore = useAuthStore();
 
 const initialState =
     props.mode === "update" && props.reservationData
@@ -49,18 +47,12 @@ const initialState =
               time: "00:00",
               reservedBy: null as unknown as User,
               cancelled: false,
-              creator: {
-                  name: authStore.nonNullableUser.name,
-                  email: authStore.nonNullableUser.email,
-                  id: authStore.nonNullableUser.id,
-                  createdAt: getFirestoreTimestamp(),
-              },
               tableLabel: props.table.label,
               floorId: props.floor.id,
               status: ReservationStatus.ACTIVE,
               isVIP: false,
           };
-const state = ref<PlannedReservation>(initialState);
+const state = ref<Omit<PlannedReservation, "creator">>(initialState);
 const reservationForm = useTemplateRef<QForm>("reservationForm");
 const formattedUsers = computed<PlannedReservation["reservedBy"][]>(function () {
     return props.users.map(function (user) {
@@ -125,7 +117,7 @@ defineExpose({
                 <q-popup-proxy transition-show="scale" transition-hide="scale">
                     <q-time
                         :options="
-                            getReservationTimeOptions.bind(
+                            isTimeWithinEventDuration.bind(
                                 null,
                                 props.eventStartTimestamp,
                                 props.eventDurationInHours,

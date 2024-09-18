@@ -5,6 +5,7 @@ import vue from "@vitejs/plugin-vue";
 export default defineConfig({
     plugins: [tsconfigPaths(), vue()],
     test: {
+        setupFiles: ['vitest-browser-vue'],
         alias: {
             "src/": new URL("./src/", import.meta.url).pathname,
             "stores/": new URL("./src/stores/", import.meta.url).pathname,
@@ -12,11 +13,12 @@ export default defineConfig({
         clearMocks: true,
         reporters: ["basic"],
         watch: false,
+        includeTaskLocation: true,
         browser: {
             enabled: true,
             headless: true,
-            name: "chrome",
-            provider: "webdriverio",
+            name: "chromium",
+            provider: "playwright",
         },
     },
 });

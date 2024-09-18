@@ -261,6 +261,7 @@ export function useReservations(
                     title: `${t("EventCreateReservation.title")} ${label}`,
                     maximized: false,
                     componentPropsObject: {
+                        currentUser: nonNullableUser.value,
                         users: filterUsersPerProperty(users.value, eventOwner.propertyId),
                         mode,
                         reservationData:
