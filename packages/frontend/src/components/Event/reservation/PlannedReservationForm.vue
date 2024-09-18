@@ -7,7 +7,6 @@ import { computed, ref, watch, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
 import { greaterThanZero, minLength, noEmptyString, requireNumber } from "src/helpers/form-rules";
-import { getFirestoreTimestamp } from "@firetable/backend";
 
 interface Props {
     currentUser: User;
@@ -48,18 +47,12 @@ const initialState =
               time: "00:00",
               reservedBy: null as unknown as User,
               cancelled: false,
-              creator: {
-                  name: props.currentUser.name,
-                  email: props.currentUser.email,
-                  id: props.currentUser.id,
-                  createdAt: getFirestoreTimestamp(),
-              },
               tableLabel: props.table.label,
               floorId: props.floor.id,
               status: ReservationStatus.ACTIVE,
               isVIP: false,
           };
-const state = ref<PlannedReservation>(initialState);
+const state = ref<Omit<PlannedReservation, "creator">>(initialState);
 const reservationForm = useTemplateRef<QForm>("reservationForm");
 const formattedUsers = computed<PlannedReservation["reservedBy"][]>(function () {
     return props.users.map(function (user) {

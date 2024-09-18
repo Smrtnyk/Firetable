@@ -2,15 +2,24 @@ import type { VueWrapper } from "@vue/test-utils";
 import type { Reservation, ReservationDoc, User } from "@firetable/types";
 
 import PlannedReservationForm from "./PlannedReservationForm.vue";
-import * as authStore from "../../../stores/auth-store";
 import messages from "../../../i18n";
-import * as Backend from "@firetable/backend";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { ReservationStatus, ReservationType } from "@firetable/types";
 import { config, flushPromises, mount } from "@vue/test-utils";
 import { createI18n } from "vue-i18n";
-import { Quasar } from "quasar";
+import {
+    Quasar,
+    QInput,
+    QSelect,
+    QIcon,
+    QBtn,
+    QTime,
+    QPopupProxy,
+    QCheckbox,
+    QRadio,
+    ClosePopup,
+} from "quasar";
 
 type PropsType = typeof PlannedReservationForm.props;
 
@@ -52,6 +61,7 @@ const testReservationData: Reservation = {
 
 function createProps(overrides: Partial<PropsType> = {}): PropsType {
     const defaultProps: PropsType = {
+        currentUser: MOCK_USER,
         users: [],
         mode: "create",
         reservationData: null,
@@ -62,6 +72,7 @@ function createProps(overrides: Partial<PropsType> = {}): PropsType {
             id: "1",
         },
         eventStartTimestamp: Date.now(),
+        eventDurationInHours: 8,
     };
 
     return { ...defaultProps, ...overrides };
@@ -84,22 +95,24 @@ function mountComponent(
         props: createProps(overrides),
         global: {
             plugins: [Quasar],
+            components: {
+                QInput,
+                QSelect,
+                QIcon,
+                QBtn,
+                QTime,
+                QPopupProxy,
+                QCheckbox,
+                QRadio,
+            },
+            directives: {
+                ClosePopup,
+            },
         },
     });
 }
 
-// FIXME: stopped working with latest browser mode
-describe.skip("PlannedReservationForm", () => {
-    beforeEach(() => {
-        vi.spyOn(Backend, "getFirestoreTimestamp").mockReturnValue({
-            seconds: 1,
-            nanoseconds: 1,
-        } as any);
-        vi.spyOn(authStore, "useAuthStore").mockReturnValue({
-            nonNullableUser: MOCK_USER,
-        } as any);
-    });
-
+describe("PlannedReservationForm", () => {
     it("has correct data in 'create' mode", async () => {
         const wrapper = mountComponent();
 
@@ -125,7 +138,6 @@ describe.skip("PlannedReservationForm", () => {
             reservationConfirmed: false,
             time: "12:00",
             reservedBy: { name: "Staff", email: "staff@example.com" },
-            creator: MOCK_USER,
             floorId: "1",
             tableLabel: "1",
             cancelled: false,
@@ -219,7 +231,6 @@ describe.skip("PlannedReservationForm", () => {
                 id: "",
             },
             time: "00:00",
-            creator: MOCK_USER,
             floorId: "1",
             tableLabel: "1",
             cancelled: false,
