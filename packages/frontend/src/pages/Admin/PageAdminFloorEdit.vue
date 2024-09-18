@@ -40,7 +40,7 @@ const addNewElementsBottomSheetOptions = {
 
 const props = defineProps<Props>();
 const router = useRouter();
-const q = useQuasar();
+const quasar = useQuasar();
 const floorInstance = shallowRef<FloorEditor | undefined>();
 const canvasRef = useTemplateRef<HTMLCanvasElement | undefined>("canvasRef");
 const pageRef = useTemplateRef<HTMLDivElement>("pageRef");
@@ -154,7 +154,9 @@ function dblClickHandler(floorVal: FloorEditor, coords: NumberTuple): void {
     if (!isTouchDevice) {
         return;
     }
-    q.bottomSheet(addNewElementsBottomSheetOptions).onOk(handleAddNewElement(floorVal, coords));
+    quasar
+        .bottomSheet(addNewElementsBottomSheetOptions)
+        .onOk(handleAddNewElement(floorVal, coords));
 }
 
 async function elementClickHandler(

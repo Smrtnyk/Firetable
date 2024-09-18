@@ -53,7 +53,7 @@ const showMapsExpanded = ref(false);
 const authStore = useAuthStore();
 const eventsStore = useEventsStore();
 const router = useRouter();
-const q = useQuasar();
+const quasar = useQuasar();
 const pageRef = useTemplateRef<HTMLDivElement>("pageRef");
 
 const guestList = useFirestoreCollection<GuestInGuestListData>(getEventGuestListPath(eventOwner), {
@@ -100,7 +100,7 @@ const buttonSize = computed(function () {
 });
 
 function showEventInfo(): void {
-    q.dialog({
+    quasar.dialog({
         component: FTDialog,
         componentProps: {
             component: EventInfo,

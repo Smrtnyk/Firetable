@@ -292,7 +292,6 @@ export default tseslint.config(
                         "i",
                         "a",
                         "b",
-                        "q",
                         "t",
                         "_",
                         "x",

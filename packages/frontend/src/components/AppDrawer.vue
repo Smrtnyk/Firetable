@@ -12,7 +12,7 @@ import { storeToRefs } from "pinia";
 
 const appStore = useAppStore();
 const { nonNullableUser } = storeToRefs(useAuthStore());
-const q = useQuasar();
+const quasar = useQuasar();
 const { t, locale } = useI18n();
 
 const lang = ref(locale);
@@ -111,8 +111,8 @@ const avatar = computed(function () {
 });
 
 function setDarkMode(newValue: boolean): void {
-    q.dark.set(newValue);
-    q.localStorage.set("FTDarkMode", newValue);
+    quasar.dark.set(newValue);
+    quasar.localStorage.set("FTDarkMode", newValue);
 }
 
 async function onLogoutUser(): Promise<void> {

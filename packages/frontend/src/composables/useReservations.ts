@@ -71,7 +71,7 @@ export function useReservations(
     event: Ref<VueFirestoreDocumentData<EventDoc> | undefined>,
 ) {
     const { canReserve, nonNullableUser } = storeToRefs(useAuthStore());
-    const q = useQuasar();
+    const quasar = useQuasar();
     const { t } = useI18n();
     const propertiesStore = usePropertiesStore();
 
@@ -253,7 +253,7 @@ export function useReservations(
             showErrorMessage("An error occurred, please refresh the page.");
             throw new Error("Event start timestamp is not defined");
         }
-        const dialog = q
+        const dialog = quasar
             .dialog({
                 component: FTDialog,
                 componentProps: {
@@ -302,7 +302,7 @@ export function useReservations(
         reservation: ReservationDoc,
         element: BaseTable,
     ): void {
-        q.dialog({
+        quasar.dialog({
             component: FTDialog,
             componentProps: {
                 component: EventShowReservation,

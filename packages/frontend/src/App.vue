@@ -10,10 +10,10 @@
 import { useQuasar } from "quasar";
 import { getDarkMode, myIcons } from "src/config";
 
-const q = useQuasar();
+const quasar = useQuasar();
 
-q.iconMapFn = function (iconName) {
+quasar.iconMapFn = function (iconName) {
     return { icon: myIcons[iconName] };
 };
-q.dark.set(getDarkMode());
+quasar.dark.set(getDarkMode());
 </script>

@@ -18,7 +18,7 @@ interface Props {
     organisationId: string;
 }
 
-const q = useQuasar();
+const quasar = useQuasar();
 const { t } = useI18n();
 const props = defineProps<Props>();
 const { data: guests } = useFirestoreCollection<GuestDoc>(getGuestsPath(props.organisationId), {
@@ -48,7 +48,7 @@ async function editGuest(_: GuestDoc, reset: VoidFunction): Promise<void> {
 }
 
 function showCreateGuestDialog(): void {
-    const dialog = q.dialog({
+    const dialog = quasar.dialog({
         component: FTDialog,
         componentProps: {
             title: "Add new Guest",
