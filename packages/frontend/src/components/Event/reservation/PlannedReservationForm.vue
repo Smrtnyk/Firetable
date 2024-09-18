@@ -7,10 +7,10 @@ import { computed, ref, watch, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
 import { greaterThanZero, minLength, noEmptyString, requireNumber } from "src/helpers/form-rules";
-import { useAuthStore } from "src/stores/auth-store";
 import { getFirestoreTimestamp } from "@firetable/backend";
 
 interface Props {
+    currentUser: User;
     users: User[];
     mode: "create" | "update";
     eventStartTimestamp: number;
@@ -32,7 +32,6 @@ const socials = ["Whatsapp", "SMS", "Instagram", "Facebook", "Phone"].map(functi
 });
 const props = defineProps<Props>();
 const { t } = useI18n();
-const authStore = useAuthStore();
 
 const initialState =
     props.mode === "update" && props.reservationData
@@ -50,9 +49,9 @@ const initialState =
               reservedBy: null as unknown as User,
               cancelled: false,
               creator: {
-                  name: authStore.nonNullableUser.name,
-                  email: authStore.nonNullableUser.email,
-                  id: authStore.nonNullableUser.id,
+                  name: props.currentUser.name,
+                  email: props.currentUser.email,
+                  id: props.currentUser.id,
                   createdAt: getFirestoreTimestamp(),
               },
               tableLabel: props.table.label,

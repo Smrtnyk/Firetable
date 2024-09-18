@@ -10,6 +10,7 @@ import PlannedReservationForm from "src/components/Event/reservation/PlannedRese
 import WalkInReservationForm from "src/components/Event/reservation/WalkInReservationForm.vue";
 
 interface Props {
+    currentUser: User;
     users: User[];
     mode: "create" | "update";
     eventStartTimestamp: number;
@@ -106,6 +107,7 @@ async function onOKClick(): Promise<void> {
         <PlannedReservationForm
             ref="plannedRef"
             v-if="showPlannedReservationForm"
+            :current-user="props.currentUser"
             :mode="props.mode"
             :event-start-timestamp="props.eventStartTimestamp"
             :floor="props.floor"
