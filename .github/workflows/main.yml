@@ -29,8 +29,9 @@ jobs:
             - name: Install dependencies
               run: pnpm install
 
+            # Install Playwright Browsers in all packages that use Playwright
             - name: Install Playwright Browsers
-              run: pnpm exec playwright install
+              run: pnpm recursive exec playwright install
 
             - name: Prepare Firebase Config
               run: cp packages/backend/src/firebase/fb-config-template.json packages/backend/src/firebase/fb-config.json
