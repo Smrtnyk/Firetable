@@ -184,7 +184,7 @@ function setAppLanguage(val: string): void {
             <q-separator spaced />
             <q-item>
                 <q-toggle
-                    :model-value="q.dark.isActive"
+                    :model-value="quasar.dark.isActive"
                     @update:model-value="setDarkMode"
                     checked-icon="moon"
                     color="red"
