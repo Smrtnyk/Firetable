@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CreateInventoryItemPayload } from "@firetable/types";
 import { DrinkCategory, InventoryItemType } from "@firetable/types";
-import { computed, defineEmits, ref, useTemplateRef, watch } from "vue";
+import { computed, ref, useTemplateRef, watch } from "vue";
 import { QForm } from "quasar";
 import { useI18n } from "vue-i18n";
 
@@ -12,6 +12,10 @@ interface Props {
 const { t } = useI18n();
 const props = defineProps<Props>();
 const formRef = useTemplateRef<QForm>("formRef");
+const form = ref<CreateInventoryItemPayload>(getInitialForm());
+const typeOptions = [InventoryItemType.DRINK, InventoryItemType.FOOD, InventoryItemType.OTHER];
+const emit = defineEmits<(e: "submit", item: CreateInventoryItemPayload) => void>();
+const isDrinkType = computed(() => form.value.type === InventoryItemType.DRINK);
 
 function getInitialForm(): CreateInventoryItemPayload {
     if (props.itemToEdit) {
@@ -27,13 +31,6 @@ function getInitialForm(): CreateInventoryItemPayload {
         supplier: "",
     };
 }
-
-const form = ref<CreateInventoryItemPayload>(getInitialForm());
-
-const typeOptions = [InventoryItemType.DRINK, InventoryItemType.FOOD, InventoryItemType.OTHER];
-
-const emit = defineEmits<(e: "submit", item: CreateInventoryItemPayload) => void>();
-const isDrinkType = computed(() => form.value.type === InventoryItemType.DRINK);
 
 async function onSubmit(): Promise<void> {
     if (!(await formRef.value?.validate())) {

@@ -15,7 +15,7 @@ import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpe
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 import FTDialog from "src/components/FTDialog.vue";
-import InventoryItemCreateForm from "src/components/inventory/InventoryItemCreateForm.vue";
+import InventoryItemCreateForm from "src/components/admin/inventory/InventoryItemCreateForm.vue";
 import { useDialog } from "src/composables/useDialog.js";
 import { AppLogger } from "src/logger/FTLogger.js";
 import { omit } from "es-toolkit";

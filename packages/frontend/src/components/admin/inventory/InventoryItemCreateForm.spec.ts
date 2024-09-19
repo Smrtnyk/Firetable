@@ -1,6 +1,6 @@
 import type { RenderResult } from "vitest-browser-vue";
 import InventoryItemCreateForm from "./InventoryItemCreateForm.vue";
-import messages from "../../i18n";
+import messages from "../../../i18n";
 import { describe, it, expect, beforeEach } from "vitest";
 import { InventoryItemType, DrinkCategory } from "@firetable/types";
 import { QInput, Quasar, QSelect, QBtn } from "quasar";
@@ -8,7 +8,7 @@ import { render } from "vitest-browser-vue";
 import { page, userEvent } from "@vitest/browser/context";
 import { createI18n } from "vue-i18n";
 import "quasar/dist/quasar.css";
-import "../../css/app.scss";
+import "../../../css/app.scss";
 
 const i18n = createI18n({
     locale: "en-GB",
