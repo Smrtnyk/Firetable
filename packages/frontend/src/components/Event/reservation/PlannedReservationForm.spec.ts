@@ -6,7 +6,7 @@ import messages from "../../../i18n";
 
 import { describe, expect, it } from "vitest";
 import { ReservationStatus, ReservationType } from "@firetable/types";
-import { config, flushPromises, mount } from "@vue/test-utils";
+import { flushPromises, mount } from "@vue/test-utils";
 import { createI18n } from "vue-i18n";
 import {
     Quasar,
@@ -29,8 +29,6 @@ const i18n = createI18n({
     messages,
     legacy: false,
 });
-
-config.global.plugins = [i18n];
 
 const testReservationData: Reservation = {
     guestName: "John Doe",
@@ -94,7 +92,7 @@ function mountComponent(
     return mount(PlannedReservationForm, {
         props: createProps(overrides),
         global: {
-            plugins: [Quasar],
+            plugins: [Quasar, i18n],
             components: {
                 QInput,
                 QSelect,
