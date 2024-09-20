@@ -26,7 +26,7 @@
     "devDependencies": {
         "@types/node": "22.5.5",
         "@types/hammerjs": "2.0.45",
-        "@playwright/test": "1.47.1",
+        "@playwright/test": "1.47.2",
         "@vitest/browser": "catalog:",
         "@vitest/spy": "catalog:",
         "cheerio": "1.0.0",
