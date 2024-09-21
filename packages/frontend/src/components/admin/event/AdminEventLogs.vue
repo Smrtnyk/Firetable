@@ -2,18 +2,17 @@
 import type { EventLog, EventLogsDoc } from "@firetable/types";
 import type { QScrollAreaProps } from "quasar";
 import { ADMIN } from "@firetable/types";
-import { useAuthStore } from "src/stores/auth-store";
 import { computed, ref, useTemplateRef } from "vue";
 import { QScrollArea } from "quasar";
 import { formatEventDate } from "src/helpers/date-utils";
 
 interface Props {
     logsDoc: EventLogsDoc;
+    isAdmin: boolean;
 }
 const props = defineProps<Props>();
-const authStore = useAuthStore();
 const logs = computed(function () {
-    if (authStore.isAdmin) {
+    if (props.isAdmin) {
         return props.logsDoc.logs;
     }
     return props.logsDoc.logs.filter(function (log) {

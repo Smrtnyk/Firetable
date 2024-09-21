@@ -4,7 +4,6 @@ import type { PropertyDoc } from "@firetable/types";
 import { ref, watch, useTemplateRef } from "vue";
 import { minLength, validOptionalURL } from "src/helpers/form-rules";
 import { QForm } from "quasar";
-import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useI18n } from "vue-i18n";
 
 interface Props {
@@ -40,11 +39,6 @@ async function submit(): Promise<void> {
         return;
     }
 
-    if (!props.organisationId) {
-        showErrorMessage("organisationId must be set for this property!");
-        return;
-    }
-
     const payload = {
         name: propertyName.value,
         img: propertyImgUrl.value,
@@ -64,7 +58,7 @@ async function submit(): Promise<void> {
 
 <template>
     <q-card-section>
-        <q-form ref="createPropertyForm" class="q-gutter-md">
+        <q-form ref="createPropertyForm" greedy class="q-gutter-md">
             <q-input
                 label="Property name"
                 v-model="propertyName"
@@ -89,7 +83,7 @@ async function submit(): Promise<void> {
             rounded
             class="button-gradient"
             size="md"
-            :label="t('AddNewPropertyForm.addPropertyButtonLabel')"
+            :label="t('Global.submit')"
             @click="submit"
         />
     </q-card-actions>

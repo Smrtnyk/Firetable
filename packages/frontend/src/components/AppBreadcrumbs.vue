@@ -17,6 +17,7 @@ import type { AnyFunction, User } from "@firetable/types";
 import { useRoute, useRouter } from "vue-router";
 import { computed } from "vue";
 import { useAuthStore } from "src/stores/auth-store";
+import { isFunction } from "es-toolkit";
 
 interface Link {
     name: string;
@@ -57,7 +58,13 @@ function isRouteAllowed(
     currentRoute: RouteRecordNormalized | RouteRecordRaw,
     userRole: User["role"],
 ): boolean {
-    return !currentRoute.meta?.allowedRoles || currentRoute.meta.allowedRoles.includes(userRole);
+    if (!currentRoute.meta?.allowedRoles) {
+        return true;
+    }
+
+    return isFunction(currentRoute.meta.allowedRoles)
+        ? (currentRoute.meta.allowedRoles(authStore) as boolean)
+        : ((currentRoute.meta.allowedRoles as string[]) ?? ([] as string[])).includes(userRole);
 }
 
 function getBreadcrumbName(

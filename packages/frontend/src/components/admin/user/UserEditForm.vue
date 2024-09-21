@@ -75,7 +75,6 @@ function prepareAndEmitSubmission(): void {
         }),
     );
 
-    // Check if username is present
     if (form.value.username) {
         filteredForm.email = `${form.value.username}${emailSuffix.value}`;
     }

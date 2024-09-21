@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CreateOrganisationPayload } from "@firetable/backend";
+import type { Link } from "src/types";
 import FTTitle from "src/components/FTTitle.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import AddNewOrganisationForm from "src/components/admin/organisation/AddNewOrganisationForm.vue";
@@ -12,12 +13,6 @@ import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { storeToRefs } from "pinia";
 import { usePropertiesStore } from "src/stores/properties-store";
-
-type Link = {
-    label: string;
-    icon: string;
-    route: { name: string; params: Record<string, string> };
-};
 
 const { t } = useI18n();
 const quasar = useQuasar();

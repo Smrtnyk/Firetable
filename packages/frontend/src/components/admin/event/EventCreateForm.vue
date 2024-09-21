@@ -291,7 +291,7 @@ function onReset(): void {
                 <q-btn
                     rounded
                     size="md"
-                    :label="t('EventCreateForm.submitButtonLabel')"
+                    :label="t('Global.submit')"
                     type="submit"
                     class="button-gradient"
                 />
@@ -299,7 +299,7 @@ function onReset(): void {
                     v-if="!isEditMode"
                     rounded
                     size="md"
-                    :label="t('EventCreateForm.resetButtonLabel')"
+                    :label="t('Global.reset')"
                     type="reset"
                     class="q-ml-sm"
                     outline

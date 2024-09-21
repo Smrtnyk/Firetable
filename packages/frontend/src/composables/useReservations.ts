@@ -23,7 +23,6 @@ import {
 import { isTable } from "@firetable/floor-creator";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import { isPlannedReservation, ReservationStatus } from "@firetable/types";
-import { useQuasar } from "quasar";
 import {
     notifyPositive,
     showConfirm,
@@ -43,6 +42,8 @@ import { usePropertiesStore } from "src/stores/properties-store";
 import { AppLogger } from "src/logger/FTLogger.js";
 import { storeToRefs } from "pinia";
 import { matchesProperty } from "es-toolkit/compat";
+import { HALF_HOUR, ONE_MINUTE } from "src/constants";
+import { useDialog } from "src/composables/useDialog";
 
 type OpenDialog = {
     label: string;
@@ -55,13 +56,19 @@ type CrossFloorTable = {
     floor: FloorViewer;
 };
 
-// 30 minutes in milliseconds
-const HALF_HOUR = 30 * 60 * 1000;
-
 const enum GuestDataMode {
     SET = "set",
     DELETE = "delete",
 }
+
+type UseReservations = {
+    tableClickHandler: (
+        floor: FloorViewer,
+        element: FloorEditorElement | undefined,
+    ) => Promise<void>;
+    onDeleteReservation: (reservation: ReservationDoc) => Promise<void>;
+    handleReservationCreation: (reservationData: Reservation) => void;
+};
 
 export function useReservations(
     users: Ref<User[]>,
@@ -69,9 +76,9 @@ export function useReservations(
     floorInstances: ShallowRef<FloorViewer[]>,
     eventOwner: EventOwner,
     event: Ref<VueFirestoreDocumentData<EventDoc> | undefined>,
-) {
+): UseReservations {
     const { canReserve, nonNullableUser } = storeToRefs(useAuthStore());
-    const quasar = useQuasar();
+    const { createDialog } = useDialog();
     const { t } = useI18n();
     const propertiesStore = usePropertiesStore();
 
@@ -79,8 +86,7 @@ export function useReservations(
         return propertiesStore.getOrganisationSettingsById(eventOwner.organisationId);
     });
 
-    // check every 1 minute
-    const intervalID = setInterval(checkReservationsForTimeAndMarkTableIfNeeded, 60 * 1000);
+    const intervalID = setInterval(checkReservationsForTimeAndMarkTableIfNeeded, ONE_MINUTE);
     const crossFloorReservationTransferTable = ref<CrossFloorTable | undefined>();
     const crossFloorReservationCopyTable = ref<CrossFloorTable | undefined>();
 
@@ -253,40 +259,38 @@ export function useReservations(
             showErrorMessage("An error occurred, please refresh the page.");
             throw new Error("Event start timestamp is not defined");
         }
-        const dialog = quasar
-            .dialog({
-                component: FTDialog,
-                componentProps: {
-                    component: EventCreateReservation,
-                    title: `${t("EventCreateReservation.title")} ${label}`,
-                    maximized: false,
-                    componentPropsObject: {
-                        currentUser: nonNullableUser.value,
-                        users: filterUsersPerProperty(users.value, eventOwner.propertyId),
-                        mode,
-                        reservationData:
-                            mode === "update" && reservation
-                                ? { ...reservation, id: reservation.id }
-                                : void 0,
-                        eventStartTimestamp,
-                        floor,
-                        table: element,
-                        eventDurationInHours: settings.value.event.eventDurationInHours,
+        const dialog = createDialog({
+            component: FTDialog,
+            componentProps: {
+                component: EventCreateReservation,
+                title: `${t("EventCreateReservation.title")} ${label}`,
+                maximized: false,
+                componentPropsObject: {
+                    currentUser: nonNullableUser.value,
+                    users: filterUsersPerProperty(users.value, eventOwner.propertyId),
+                    mode,
+                    reservationData:
+                        mode === "update" && reservation
+                            ? { ...reservation, id: reservation.id }
+                            : void 0,
+                    eventStartTimestamp,
+                    floor,
+                    table: element,
+                    eventDurationInHours: settings.value.event.eventDurationInHours,
+                },
+                listeners: {
+                    create(reservationData: Reservation) {
+                        resetCurrentOpenCreateReservationDialog();
+                        handleReservationCreation(reservationData);
+                        dialog.hide();
                     },
-                    listeners: {
-                        create(reservationData: Reservation) {
-                            resetCurrentOpenCreateReservationDialog();
-                            handleReservationCreation(reservationData);
-                            dialog.hide();
-                        },
-                        update(reservationData: ReservationDoc) {
-                            handleReservationUpdate(reservationData);
-                            dialog.hide();
-                        },
+                    update(reservationData: ReservationDoc) {
+                        handleReservationUpdate(reservationData);
+                        dialog.hide();
                     },
                 },
-            })
-            .onDismiss(resetCurrentOpenCreateReservationDialog);
+            },
+        }).onDismiss(resetCurrentOpenCreateReservationDialog);
 
         if (mode === "create") {
             currentOpenCreateReservationDialog = {
@@ -302,7 +306,7 @@ export function useReservations(
         reservation: ReservationDoc,
         element: BaseTable,
     ): void {
-        quasar.dialog({
+        createDialog({
             component: FTDialog,
             componentProps: {
                 component: EventShowReservation,

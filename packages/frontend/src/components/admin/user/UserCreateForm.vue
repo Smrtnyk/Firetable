@@ -179,7 +179,7 @@ function resetProperties(): void {
                 <q-btn
                     rounded
                     size="md"
-                    :label="t('UserCreateForm.buttonSubmitLabel')"
+                    :label="t('Global.submit')"
                     type="submit"
                     class="button-gradient"
                 />
@@ -187,7 +187,7 @@ function resetProperties(): void {
                     rounded
                     size="md"
                     outline
-                    :label="t('UserCreateForm.buttonResetLabel')"
+                    :label="t('Global.reset')"
                     type="reset"
                     color="primary"
                     class="q-ml-sm"

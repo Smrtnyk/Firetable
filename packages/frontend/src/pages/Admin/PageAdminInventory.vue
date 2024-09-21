@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import type { CreateInventoryItemPayload, InventoryItemDoc } from "@firetable/types";
-import { InventoryItemType } from "@firetable/types";
-import FTTitle from "src/components/FTTitle.vue";
 import { useI18n } from "vue-i18n";
 import { useFirestoreCollection } from "src/composables/useFirestore.js";
 import {
@@ -14,11 +12,17 @@ import { Loading } from "quasar";
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers.js";
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
-import FTDialog from "src/components/FTDialog.vue";
-import InventoryItemCreateForm from "src/components/admin/inventory/InventoryItemCreateForm.vue";
 import { useDialog } from "src/composables/useDialog.js";
 import { AppLogger } from "src/logger/FTLogger.js";
 import { omit } from "es-toolkit";
+import { parseProductData } from "src/helpers/inventory/parse-product-data";
+
+import FTTitle from "src/components/FTTitle.vue";
+import BarcodeScanner from "src/components/admin/inventory/BarcodeScanner.vue";
+import FTCenteredText from "src/components/FTCenteredText.vue";
+import InventoryTable from "src/components/admin/inventory/InventoryTable.vue";
+import FTDialog from "src/components/FTDialog.vue";
+import InventoryItemCreateForm from "src/components/admin/inventory/InventoryItemCreateForm.vue";
 
 interface Props {
     organisationId: string;
@@ -34,6 +38,7 @@ const {
     data: inventoryData,
     promise: inventoryDataPromise,
     error: inventoryDataError,
+    pending: isLoadingItems,
 } = useFirestoreCollection<InventoryItemDoc>(getInventoryPath(organisationId, propertyId), {
     wait: true,
 });
@@ -57,7 +62,9 @@ function showEditInventoryItemForm(item: InventoryItemDoc): void {
                 itemToEdit: omit(item, ["id", "_doc"]),
             },
             maximized: false,
-            title: t("PageAdminInventory.editInventoryItemDialogTitle"),
+            title: t("PageAdminInventory.editInventoryItemDialogTitle", {
+                name: item.name,
+            }),
             listeners: {
                 submit(updatedItem: CreateInventoryItemPayload) {
                     onInventoryItemEditSubmit(item.id, updatedItem);
@@ -68,11 +75,14 @@ function showEditInventoryItemForm(item: InventoryItemDoc): void {
     });
 }
 
-function showCreateInventoryItemDialog(): void {
+function showCreateInventoryItemDialog(initialData = {}): void {
     const dialog = createDialog({
         component: FTDialog,
         componentProps: {
             component: InventoryItemCreateForm,
+            componentPropsObject: {
+                initialData,
+            },
             maximized: false,
             title: t("PageAdminInventory.createNewInventoryItemDialogTitle"),
             listeners: {
@@ -97,7 +107,9 @@ async function onInventoryItemEditSubmit(
 }
 
 async function deleteItem(item: InventoryItemDoc): Promise<void> {
-    if (!(await showConfirm(t("PageAdminInventory.deleteItemConfirmMessage")))) {
+    if (
+        !(await showConfirm(t("PageAdminInventory.deleteItemConfirmMessage", { name: item.name })))
+    ) {
         return;
     }
 
@@ -106,19 +118,6 @@ async function deleteItem(item: InventoryItemDoc): Promise<void> {
             await deleteInventoryItem(organisationId, propertyId, item.id);
         },
     }).catch(AppLogger.error.bind(AppLogger));
-}
-
-function getTypeLabel(type: InventoryItemType): string {
-    switch (type) {
-        case InventoryItemType.DRINK:
-            return "Drink";
-        case InventoryItemType.FOOD:
-            return "Food";
-        case InventoryItemType.OTHER:
-            return "Other";
-        default:
-            return type;
-    }
 }
 
 async function init(): Promise<void> {
@@ -140,6 +139,56 @@ async function init(): Promise<void> {
     }
 }
 
+function scanBarcode(): void {
+    const dialog = createDialog({
+        component: FTDialog,
+        componentProps: {
+            component: BarcodeScanner,
+            maximized: false,
+            title: t("PageAdminInventory.scanBarcodeDialogTitle"),
+            listeners: {
+                barcodeScanned(barcode: string) {
+                    dialog.hide();
+                    fetchProductDetails(barcode);
+                },
+            },
+        },
+    });
+}
+
+async function fetchProductDetails(barcode: string): Promise<void> {
+    await tryCatchLoadingWrapper({
+        async hook() {
+            const url = `https://world.openfoodfacts.net/api/v2/product/${barcode}.json`;
+            const response = await fetch(url, {
+                mode: "cors",
+            });
+
+            if (!response.ok) {
+                throw new Error(
+                    "There was an error fetching the product, please enter the details manually.",
+                );
+            }
+
+            const { product, status } = await response.json();
+
+            if (status !== 1) {
+                throw new Error("Product not found, please enter the details manually.");
+            }
+
+            populateProductForm(product);
+            AppLogger.info(product);
+        },
+        errorHook() {
+            showCreateInventoryItemDialog();
+        },
+    });
+}
+
+function populateProductForm(product: Record<string, any>): void {
+    showCreateInventoryItemDialog(parseProductData(product));
+}
+
 onMounted(init);
 </script>
 
@@ -153,35 +202,20 @@ onMounted(init);
                     class="button-gradient"
                     @click="showCreateInventoryItemDialog"
                 />
+                <q-btn rounded icon="camera" @click="scanBarcode" />
             </template>
         </FTTitle>
 
-        <!-- Inventory Table -->
+        <FTCenteredText v-if="inventoryData.length === 0 && !isLoadingItems">
+            {{ t("PageAdminInventory.noItemsMessage") }}
+        </FTCenteredText>
+
         <div v-if="inventoryData.length > 0" class="q-mt-md">
-            <div class="row q-col-gutter-md q-mt-md">
-                <div
-                    class="col-xs-12 col-sm-6 col-md-4"
-                    v-for="item in inventoryData"
-                    :key="item.id"
-                >
-                    <q-card>
-                        <q-card-section>
-                            <div class="text-h6">{{ item.name }}</div>
-                            <div>{{ getTypeLabel(item.type) }}</div>
-                            <div>{{ item.category }}</div>
-                        </q-card-section>
-                        <q-card-section>
-                            <div>Price: ${{ item.price.toFixed(2) }}</div>
-                            <div>Quantity: {{ item.quantity }}</div>
-                            <div>Unit: {{ item.unit }}</div>
-                        </q-card-section>
-                        <q-card-actions align="right">
-                            <q-btn flat icon="pencil" @click="showEditInventoryItemForm(item)" />
-                            <q-btn flat icon="trash" color="negative" @click="deleteItem(item)" />
-                        </q-card-actions>
-                    </q-card>
-                </div>
-            </div>
+            <InventoryTable
+                :rows="inventoryData"
+                @edit-item="showEditInventoryItemForm"
+                @delete-item="deleteItem"
+            />
         </div>
     </div>
 </template>

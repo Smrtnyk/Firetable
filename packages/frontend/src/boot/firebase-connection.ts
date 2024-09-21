@@ -6,6 +6,7 @@ import { showErrorMessage } from "src/helpers/ui-helpers";
 import { getCurrentUser, useCurrentUser, VueFire, VueFireAuth } from "vuefire";
 import { watch } from "vue";
 import { usePropertiesStore } from "src/stores/properties-store";
+import { isFunction } from "es-toolkit";
 
 export default boot(function ({ router, app }) {
     const { firebaseApp } = initializeFirebase();
@@ -25,36 +26,45 @@ export default boot(function ({ router, app }) {
  * Firebase is finished with its initialization process,
  * and handle the user accordingly
  */
-function routerBeforeEach(router: Router, store: ReturnType<typeof useAuthStore>): void {
+function routerBeforeEach(router: Router, authStore: ReturnType<typeof useAuthStore>): void {
     router.beforeEach(async function (to) {
         try {
             // Force the app to wait until Firebase has
             // finished its initialization, and handle the
             // authentication state of the user properly
-            if (!store.isReady) {
+            if (!authStore.isReady) {
                 const currUser = await getCurrentUser();
                 if (currUser) {
-                    await store.initUser(currUser);
+                    await authStore.initUser(currUser);
                 }
             }
             const requiresAuth = to.meta.requiresAuth;
-            const allowedRoles = to.meta.allowedRoles as string[] | undefined;
-            if (requiresAuth && !store.isAuthenticated) {
+
+            if (requiresAuth && !authStore.isAuthenticated) {
                 return { name: "auth" };
             }
 
-            if (!store.isAuthenticated) {
+            if (!authStore.isAuthenticated) {
                 return true;
             }
 
             const token = await (await getCurrentUser())?.getIdTokenResult();
             const role = token?.claims.role as string;
 
-            if (allowedRoles?.includes(role)) {
+            const allowedRoles = to.meta.allowedRoles;
+
+            if (!allowedRoles) {
                 return true;
             }
 
-            if (allowedRoles && !allowedRoles.includes(role)) {
+            const isAllowed = isFunction(allowedRoles)
+                ? allowedRoles(authStore)
+                : (allowedRoles as string[]).includes(role);
+            if (isAllowed) {
+                return true;
+            }
+
+            if (allowedRoles && !isAllowed) {
                 return {
                     name: "home",
                 };

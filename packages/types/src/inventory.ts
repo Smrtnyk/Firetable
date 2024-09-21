@@ -14,15 +14,7 @@ export const enum DrinkCategory {
 
 export type CreateInventoryItemPayload = Pick<
     InventoryItemDoc,
-    | "alcoholContent"
-    | "category"
-    | "name"
-    | "price"
-    | "quantity"
-    | "supplier"
-    | "type"
-    | "unit"
-    | "volume"
+    "alcoholContent" | "category" | "name" | "price" | "quantity" | "supplier" | "type" | "volume"
 >;
 
 export interface InventoryItemDoc {
@@ -38,8 +30,6 @@ export interface InventoryItemDoc {
     price: number;
     // Quantity in stock
     quantity: number;
-    // Unit of measurement, e.g., 'bottle', 'can', 'plate'
-    unit: string;
     // Alcohol percentage (if applicable)
     alcoholContent?: number;
     // Volume in ml or l (if applicable)
