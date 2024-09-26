@@ -5,15 +5,18 @@ import NetworkOverlay from "src/components/NetworkOverlay.vue";
 
 import { useAuthStore } from "src/stores/auth-store";
 import { storeToRefs } from "pinia";
+import { ref } from "vue";
 
-const { isLoggedIn } = storeToRefs(useAuthStore());
+const { isLoggedIn, user } = storeToRefs(useAuthStore());
+
+const isDrawerVisible = ref(false);
 </script>
 
 <template>
     <q-layout v-if="isLoggedIn" view="hHh lpR fFf">
         <NetworkOverlay />
-        <AppDrawer />
-        <AppTopMenu />
+        <AppDrawer v-model="isDrawerVisible" :user="user!" />
+        <AppTopMenu @toggle-drawer="isDrawerVisible = !isDrawerVisible" />
         <q-page-container>
             <q-page class="q-pa-xs-xs q-pa-sm-sm q-pa-md-md row">
                 <router-view

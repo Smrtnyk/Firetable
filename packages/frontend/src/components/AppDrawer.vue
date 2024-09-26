@@ -1,17 +1,19 @@
 <script setup lang="ts">
+import type { User } from "@firetable/types";
+import { ADMIN, Role } from "@firetable/types";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 import { LocalStorage, useQuasar } from "quasar";
-import { useAuthStore } from "src/stores/auth-store";
-import { useAppStore } from "src/stores/app-store";
 import { logoutUser } from "@firetable/backend";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { ADMIN, Role } from "@firetable/types";
-import { storeToRefs } from "pinia";
 
-const appStore = useAppStore();
-const { nonNullableUser } = storeToRefs(useAuthStore());
+interface Props {
+    user: User;
+    modelValue: boolean;
+}
+const props = defineProps<Props>();
+const emit = defineEmits<(e: "update:modelValue", value: boolean) => void>();
 const quasar = useQuasar();
 const { t, locale } = useI18n();
 
@@ -21,89 +23,59 @@ const langOptions = [
     { value: "de", label: "German" },
 ];
 
-const adminLinks = computed(function () {
-    const links = [];
-    const role = nonNullableUser.value.role;
-    if (role === ADMIN) {
-        links.push({
-            icon: "home",
-            route: {
-                name: "adminOrganisations",
-            },
-            text: t("AppDrawer.links.manageOrganisations"),
-        });
-    }
-    if (role === Role.PROPERTY_OWNER || role === Role.MANAGER) {
-        links.push(
-            {
-                icon: "calendar",
-                route: {
-                    name: "adminEvents",
-                    params: {
-                        organisationId: nonNullableUser.value.organisationId,
-                    },
-                },
-                text: t("AppDrawer.links.manageEvents"),
-            },
-            {
-                icon: "users",
-                route: {
-                    name: "adminUsers",
-                    params: {
-                        organisationId: nonNullableUser.value.organisationId,
-                    },
-                },
-                text: t("AppDrawer.links.manageUsers"),
-            },
-            {
-                icon: "arrow-expand",
-                route: {
-                    name: "adminFloors",
-                    params: {
-                        organisationId: nonNullableUser.value.organisationId,
-                    },
-                },
-                text: t("AppDrawer.links.manageFloors"),
-            },
-            {
-                icon: "line-chart",
-                route: {
-                    name: "adminAnalytics",
-                    params: {
-                        organisationId: nonNullableUser.value.organisationId,
-                    },
-                },
-                text: t("AppDrawer.links.manageAnalytics"),
-            },
-            {
-                icon: "cog-wheel",
-                route: {
-                    name: "adminOrganisationSettings",
-                    params: {
-                        organisationId: nonNullableUser.value.organisationId,
-                    },
-                },
-                text: t("AppDrawer.links.settings"),
-            },
-        );
-    }
-    if (role === Role.PROPERTY_OWNER) {
-        links.push({
-            icon: "home",
-            route: {
-                name: "adminProperties",
-                params: {
-                    organisationId: nonNullableUser.value.organisationId,
-                },
-            },
-            text: t("AppDrawer.links.manageProperties"),
-        });
-    }
+const links = computed(() => {
+    const role = props.user.role;
+    const organisationId = props.user.organisationId;
+    const isAdmin = props.user.role === ADMIN;
 
-    return links;
+    return [
+        {
+            icon: "home",
+            route: { name: "adminOrganisations" },
+            text: t("AppDrawer.links.manageOrganisations"),
+            isVisible: isAdmin,
+        },
+        {
+            icon: "calendar",
+            route: { name: "adminEvents", params: { organisationId } },
+            text: t("AppDrawer.links.manageEvents"),
+            isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
+        },
+        {
+            icon: "users",
+            route: { name: "adminUsers", params: { organisationId } },
+            text: t("AppDrawer.links.manageUsers"),
+            isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
+        },
+        {
+            icon: "arrow-expand",
+            route: { name: "adminFloors", params: { organisationId } },
+            text: t("AppDrawer.links.manageFloors"),
+            isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
+        },
+        {
+            icon: "line-chart",
+            route: { name: "adminAnalytics", params: { organisationId } },
+            text: t("AppDrawer.links.manageAnalytics"),
+            isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
+        },
+        {
+            icon: "cog-wheel",
+            route: { name: "adminOrganisationSettings", params: { organisationId } },
+            text: t("AppDrawer.links.settings"),
+            isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
+        },
+        {
+            icon: "home",
+            route: { name: "adminProperties", params: { organisationId } },
+            text: t("AppDrawer.links.manageProperties"),
+            isVisible: role === Role.PROPERTY_OWNER,
+        },
+    ].filter((link) => link.isVisible);
 });
+
 const avatar = computed(function () {
-    const [first, last] = nonNullableUser.value.name.split(" ");
+    const [first, last] = props.user.name.split(" ");
     if (!last) {
         return first[0];
     }
@@ -131,26 +103,26 @@ function setAppLanguage(val: string): void {
 
 <template>
     <q-drawer
-        :model-value="appStore.showAppDrawer"
-        @update:model-value="appStore.toggleAppDrawerVisibility"
+        :model-value="props.modelValue"
+        @update:model-value="emit('update:modelValue', $event)"
         side="right"
         behavior="mobile"
         bordered
     >
         <q-list>
-            <q-item header class="column items-center q-pt-xl q-pb-lg" v-if="nonNullableUser">
+            <q-item header class="column items-center q-pt-xl q-pb-lg">
                 <q-avatar size="6rem" class="ft-avatar">
                     {{ avatar }}
                 </q-avatar>
                 <div class="q-mt-md text-center">
-                    <div class="text-subtitle1">{{ nonNullableUser.name }}</div>
-                    <div class="text-caption text-grey">{{ nonNullableUser.email }}</div>
+                    <div class="text-subtitle1">{{ props.user.name }}</div>
+                    <div class="text-caption text-grey">{{ props.user.email }}</div>
                 </div>
             </q-item>
 
-            <q-separator v-if="adminLinks.length > 0" />
+            <q-separator v-if="links.length > 0" />
 
-            <q-item v-for="(link, index) in adminLinks" :key="index" :to="link.route" clickable>
+            <q-item v-for="(link, index) in links" :key="index" :to="link.route" clickable>
                 <q-item-section avatar>
                     <q-icon :name="link.icon" />
                 </q-item-section>

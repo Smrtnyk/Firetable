@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { useAppStore } from "src/stores/app-store";
 import { useAuthStore } from "src/stores/auth-store";
 
 import AppBreadcrumbs from "src/components/AppBreadcrumbs.vue";
 
+const emit = defineEmits<(e: "toggle-drawer") => void>();
 const authStore = useAuthStore();
 const menuLinks = [
     {
@@ -15,8 +15,6 @@ const menuLinks = [
         routeName: "userProfile",
     },
 ];
-
-const appStore = useAppStore();
 
 function refreshApp(): void {
     window.location.reload();
@@ -42,7 +40,7 @@ function refreshApp(): void {
                 :icon="menu.icon"
             />
             <q-space />
-            <q-btn flat aria-label="Menu" @click="appStore.toggleAppDrawerVisibility">
+            <q-btn flat aria-label="Menu" @click="emit('toggle-drawer')">
                 <q-icon size="2rem" name="menu" />
             </q-btn>
         </q-tabs>

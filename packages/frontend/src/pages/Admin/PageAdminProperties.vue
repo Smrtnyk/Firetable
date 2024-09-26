@@ -134,6 +134,12 @@ function createLinks(propertyId: string): Link[] {
             route: { name: "adminInventory", params },
             visible: authStore.canSeeInventory,
         },
+        {
+            label: t("AppDrawer.links.manageFloors"),
+            icon: "arrow-expand",
+            route: { name: "adminFloors", params },
+            visible: true,
+        },
     ].filter(function (link) {
         return link.visible;
     });
