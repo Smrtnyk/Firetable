@@ -108,7 +108,7 @@ importers:
         version: 22.7.2
       '@vitest/browser':
         specifier: 'catalog:'
-        version: 2.1.1(@vitest/spy@2.1.1)(playwright@1.47.2)(typescript@5.6.2)(vite@5.4.6(@types/node@22.7.2)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vitest@2.1.1)(webdriverio@9.0.9)
+        version: 2.1.1(@vitest/spy@2.1.1)(playwright@1.47.2)(typescript@5.6.2)(vite@5.3.5(@types/node@22.7.2)(sass@1.77.8)(terser@5.31.0))(vitest@2.1.1)(webdriverio@9.0.9)
       '@vitest/spy':
         specifier: 'catalog:'
         version: 2.1.1
@@ -185,6 +185,9 @@ importers:
         specifier: 7.1.0
         version: 7.1.0
     devDependencies:
+      '@pinia/testing':
+        specifier: 0.1.5
+        version: 0.1.5(pinia@2.2.2(typescript@5.6.2)(vue@3.5.9(typescript@5.6.2)))(vue@3.5.9(typescript@5.6.2))
       '@playwright/test':
         specifier: 1.47.2
         version: 1.47.2
@@ -192,14 +195,14 @@ importers:
         specifier: 2.0.0-beta.21
         version: 2.0.0-beta.21(@types/node@22.7.2)(eslint@9.11.1)(pinia@2.2.2(typescript@5.6.2)(vue@3.5.9(typescript@5.6.2)))(quasar@2.17.0)(rollup@2.79.1)(sass-embedded@1.79.2)(terser@5.31.0)(typescript@5.6.2)(vue-router@4.4.5(vue@3.5.9(typescript@5.6.2)))(vue@3.5.9(typescript@5.6.2))(workbox-build@7.1.1)
       '@quasar/vite-plugin':
-        specifier: ^1.7.0
-        version: 1.7.0(@vitejs/plugin-vue@5.1.4(vite@5.3.5(@types/node@22.7.2)(sass@1.77.8)(terser@5.31.0))(vue@3.5.9(typescript@5.6.2)))(quasar@2.17.0)(vite@5.3.5(@types/node@22.7.2)(sass@1.77.8)(terser@5.31.0))(vue@3.5.9(typescript@5.6.2))
+        specifier: 1.7.0
+        version: 1.7.0(@vitejs/plugin-vue@5.1.4(vite@5.4.6(@types/node@22.7.2)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vue@3.5.9(typescript@5.6.2)))(quasar@2.17.0)(vite@5.4.6(@types/node@22.7.2)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vue@3.5.9(typescript@5.6.2))
       '@vitejs/plugin-vue':
         specifier: 5.1.4
-        version: 5.1.4(vite@5.3.5(@types/node@22.7.2)(sass@1.77.8)(terser@5.31.0))(vue@3.5.9(typescript@5.6.2))
+        version: 5.1.4(vite@5.4.6(@types/node@22.7.2)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vue@3.5.9(typescript@5.6.2))
       '@vitest/browser':
         specifier: 'catalog:'
-        version: 2.1.1(@vitest/spy@2.1.1)(playwright@1.47.2)(typescript@5.6.2)(vite@5.3.5(@types/node@22.7.2)(sass@1.77.8)(terser@5.31.0))(vitest@2.1.1)(webdriverio@9.0.9)
+        version: 2.1.1(@vitest/spy@2.1.1)(playwright@1.47.2)(typescript@5.6.2)(vite@5.4.6(@types/node@22.7.2)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vitest@2.1.1)(webdriverio@9.0.9)
       '@vitest/spy':
         specifier: 'catalog:'
         version: 2.1.1
@@ -211,13 +214,13 @@ importers:
         version: 2.4.6
       vite-tsconfig-paths:
         specifier: 5.0.1
-        version: 5.0.1(typescript@5.6.2)(vite@5.3.5(@types/node@22.7.2)(sass@1.77.8)(terser@5.31.0))
+        version: 5.0.1(typescript@5.6.2)(vite@5.4.6(@types/node@22.7.2)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))
       vitest:
         specifier: 'catalog:'
         version: 2.1.1(@types/node@22.7.2)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass@1.77.8)(terser@5.31.0)
       vitest-browser-vue:
         specifier: 0.0.1
-        version: 0.0.1(@vitest/browser@2.1.1(@vitest/spy@2.1.1)(playwright@1.47.2)(typescript@5.6.2)(vite@5.3.5(@types/node@22.7.2)(sass@1.77.8)(terser@5.31.0))(vitest@2.1.1)(webdriverio@9.0.9))(vitest@2.1.1(@types/node@22.7.2)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass@1.77.8)(terser@5.31.0))(vue@3.5.9(typescript@5.6.2))
+        version: 0.0.1(@vitest/browser@2.1.1(@vitest/spy@2.1.1)(playwright@1.47.2)(typescript@5.6.2)(vite@5.4.6(@types/node@22.7.2)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vitest@2.1.1)(webdriverio@9.0.9))(vitest@2.1.1(@types/node@22.7.2)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass@1.77.8)(terser@5.31.0))(vue@3.5.9(typescript@5.6.2))
       vue-tsc:
         specifier: 2.1.6
         version: 2.1.6(typescript@5.6.2)
@@ -1729,6 +1732,11 @@ packages:
   '@opentelemetry/semantic-conventions@1.21.0':
     resolution: {integrity: sha512-lkC8kZYntxVKr7b8xmjCVUgE0a8xgDakPyDo9uSWavXPyYqLgYYGdEd2j8NxihRyb6UwpX3G/hFUF4/9q2V+/g==}
     engines: {node: '>=14'}
+
+  '@pinia/testing@0.1.5':
+    resolution: {integrity: sha512-AcGzuotkzhRoF00htuxLfIPBBHVE6HjjB3YC5Y3os8vRgKu6ipknK5GBQq9+pduwYQhZ+BcCZDC9TyLAUlUpoQ==}
+    peerDependencies:
+      pinia: '>=2.2.1'
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -8610,6 +8618,14 @@ snapshots:
 
   '@opentelemetry/semantic-conventions@1.21.0': {}
 
+  '@pinia/testing@0.1.5(pinia@2.2.2(typescript@5.6.2)(vue@3.5.9(typescript@5.6.2)))(vue@3.5.9(typescript@5.6.2))':
+    dependencies:
+      pinia: 2.2.2(typescript@5.6.2)(vue@3.5.9(typescript@5.6.2))
+      vue-demi: 0.14.10(vue@3.5.9(typescript@5.6.2))
+    transitivePeerDependencies:
+      - '@vue/composition-api'
+      - vue
+
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
@@ -8681,7 +8697,7 @@ snapshots:
     dependencies:
       '@quasar/render-ssr-error': 1.0.3
       '@quasar/ssl-certificate': 1.0.0
-      '@quasar/vite-plugin': 1.7.0(@vitejs/plugin-vue@5.1.4(vite@5.3.5(@types/node@22.7.2)(sass@1.77.8)(terser@5.31.0))(vue@3.5.9(typescript@5.6.2)))(quasar@2.17.0)(vite@5.4.6(@types/node@22.7.2)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vue@3.5.9(typescript@5.6.2))
+      '@quasar/vite-plugin': 1.7.0(@vitejs/plugin-vue@5.1.4(vite@5.4.6(@types/node@22.7.2)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vue@3.5.9(typescript@5.6.2)))(quasar@2.17.0)(vite@5.4.6(@types/node@22.7.2)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vue@3.5.9(typescript@5.6.2))
       '@types/chrome': 0.0.262
       '@types/compression': 1.7.5
       '@types/cordova': 11.0.3
@@ -8745,16 +8761,9 @@ snapshots:
       fs-extra: 11.2.0
       selfsigned: 2.4.1
 
-  '@quasar/vite-plugin@1.7.0(@vitejs/plugin-vue@5.1.4(vite@5.3.5(@types/node@22.7.2)(sass@1.77.8)(terser@5.31.0))(vue@3.5.9(typescript@5.6.2)))(quasar@2.17.0)(vite@5.3.5(@types/node@22.7.2)(sass@1.77.8)(terser@5.31.0))(vue@3.5.9(typescript@5.6.2))':
+  '@quasar/vite-plugin@1.7.0(@vitejs/plugin-vue@5.1.4(vite@5.4.6(@types/node@22.7.2)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vue@3.5.9(typescript@5.6.2)))(quasar@2.17.0)(vite@5.4.6(@types/node@22.7.2)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vue@3.5.9(typescript@5.6.2))':
     dependencies:
-      '@vitejs/plugin-vue': 5.1.4(vite@5.3.5(@types/node@22.7.2)(sass@1.77.8)(terser@5.31.0))(vue@3.5.9(typescript@5.6.2))
-      quasar: 2.17.0
-      vite: 5.3.5(@types/node@22.7.2)(sass@1.77.8)(terser@5.31.0)
-      vue: 3.5.9(typescript@5.6.2)
-
-  '@quasar/vite-plugin@1.7.0(@vitejs/plugin-vue@5.1.4(vite@5.3.5(@types/node@22.7.2)(sass@1.77.8)(terser@5.31.0))(vue@3.5.9(typescript@5.6.2)))(quasar@2.17.0)(vite@5.4.6(@types/node@22.7.2)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vue@3.5.9(typescript@5.6.2))':
-    dependencies:
-      '@vitejs/plugin-vue': 5.1.4(vite@5.3.5(@types/node@22.7.2)(sass@1.77.8)(terser@5.31.0))(vue@3.5.9(typescript@5.6.2))
+      '@vitejs/plugin-vue': 5.1.4(vite@5.4.6(@types/node@22.7.2)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vue@3.5.9(typescript@5.6.2))
       quasar: 2.17.0
       vite: 5.4.6(@types/node@22.7.2)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0)
       vue: 3.5.9(typescript@5.6.2)
@@ -9198,11 +9207,6 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 8.7.0
       eslint-visitor-keys: 3.4.3
-
-  '@vitejs/plugin-vue@5.1.4(vite@5.3.5(@types/node@22.7.2)(sass@1.77.8)(terser@5.31.0))(vue@3.5.9(typescript@5.6.2))':
-    dependencies:
-      vite: 5.3.5(@types/node@22.7.2)(sass@1.77.8)(terser@5.31.0)
-      vue: 3.5.9(typescript@5.6.2)
 
   '@vitejs/plugin-vue@5.1.4(vite@5.4.6(@types/node@22.7.2)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vue@3.5.9(typescript@5.6.2))':
     dependencies:
@@ -14262,13 +14266,13 @@ snapshots:
       - supports-color
       - terser
 
-  vite-tsconfig-paths@5.0.1(typescript@5.6.2)(vite@5.3.5(@types/node@22.7.2)(sass@1.77.8)(terser@5.31.0)):
+  vite-tsconfig-paths@5.0.1(typescript@5.6.2)(vite@5.4.6(@types/node@22.7.2)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0)):
     dependencies:
       debug: 4.3.6
       globrex: 0.1.2
       tsconfck: 3.0.3(typescript@5.6.2)
     optionalDependencies:
-      vite: 5.3.5(@types/node@22.7.2)(sass@1.77.8)(terser@5.31.0)
+      vite: 5.4.6(@types/node@22.7.2)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0)
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -14296,9 +14300,9 @@ snapshots:
       sass-embedded: 1.79.2
       terser: 5.31.0
 
-  vitest-browser-vue@0.0.1(@vitest/browser@2.1.1(@vitest/spy@2.1.1)(playwright@1.47.2)(typescript@5.6.2)(vite@5.3.5(@types/node@22.7.2)(sass@1.77.8)(terser@5.31.0))(vitest@2.1.1)(webdriverio@9.0.9))(vitest@2.1.1(@types/node@22.7.2)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass@1.77.8)(terser@5.31.0))(vue@3.5.9(typescript@5.6.2)):
+  vitest-browser-vue@0.0.1(@vitest/browser@2.1.1(@vitest/spy@2.1.1)(playwright@1.47.2)(typescript@5.6.2)(vite@5.4.6(@types/node@22.7.2)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vitest@2.1.1)(webdriverio@9.0.9))(vitest@2.1.1(@types/node@22.7.2)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass@1.77.8)(terser@5.31.0))(vue@3.5.9(typescript@5.6.2)):
     dependencies:
-      '@vitest/browser': 2.1.1(@vitest/spy@2.1.1)(playwright@1.47.2)(typescript@5.6.2)(vite@5.3.5(@types/node@22.7.2)(sass@1.77.8)(terser@5.31.0))(vitest@2.1.1)(webdriverio@9.0.9)
+      '@vitest/browser': 2.1.1(@vitest/spy@2.1.1)(playwright@1.47.2)(typescript@5.6.2)(vite@5.4.6(@types/node@22.7.2)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vitest@2.1.1)(webdriverio@9.0.9)
       '@vue/test-utils': 2.4.6
       vitest: 2.1.1(@types/node@22.7.2)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass@1.77.8)(terser@5.31.0)
       vue: 3.5.9(typescript@5.6.2)

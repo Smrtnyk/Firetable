@@ -1,5 +1,6 @@
 import type { DefineComponent, ExtractPropTypes, WritableComputedRef } from "vue";
 import type { QuasarPluginOptions } from "quasar";
+import type { RenderResult } from "vitest-browser-vue";
 import messages from "../src/i18n";
 import { ref, h, defineComponent } from "vue";
 import { render } from "vitest-browser-vue";
@@ -64,7 +65,7 @@ export function installQuasarPlugin(options?: Partial<QuasarPluginOptions>): voi
 /**
  * Injections for Components with a QPage root Element
  */
-export function qLayoutInjections() {
+export function qLayoutInjections(): Record<string, any> {
     return {
         // pageContainerKey
         _q_pc_: true,
@@ -95,7 +96,11 @@ export function qLayoutInjections() {
 export function renderComponent<
     TComponent extends DefineComponent<Record<string, unknown>, Record<string, unknown>, any>,
     TProps = Readonly<ExtractPropTypes<TComponent["__props"]>>,
->(component: TComponent, props?: Partial<TProps>, options?: { wrapInLayout?: boolean }) {
+>(
+    component: TComponent,
+    props?: Partial<TProps>,
+    options?: { wrapInLayout?: boolean },
+): RenderResult<any> {
     const wrapInLayout = options?.wrapInLayout ?? false;
 
     const componentToRender = wrapInLayout

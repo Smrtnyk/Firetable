@@ -18,6 +18,7 @@ export default defineConfig({
     ],
     test: {
         setupFiles: ['vitest-browser-vue'],
+        cache: false,
         alias: {
             "src/": new URL("./src/", import.meta.url).pathname,
             "stores/": new URL("./src/stores/", import.meta.url).pathname,
@@ -26,7 +27,7 @@ export default defineConfig({
             optimizer: {
                 web: {
                     enabled: true,
-                    include: ["@vue/test-utils", "quasar", "vue-i18n", "pinia", "@firetable/backend"],
+                    include: ["@vue/test-utils", "quasar", "vue-i18n", "pinia", "@firetable/backend", "@pinia/testing", "vue"],
                 }
             }
         },

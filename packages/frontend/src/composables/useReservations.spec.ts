@@ -1,25 +1,17 @@
 import type { Ref } from "vue";
 import type { EventDoc, PlannedReservationDoc, ReservationDoc, User } from "@firetable/types";
-import type { MockInstance } from "vitest";
-import { useReservations } from "./useReservations";
-import * as uiHelpers from "../helpers/ui-helpers";
-import * as authStore from "../stores/auth-store";
-import * as propertiesStore from "../stores/properties-store";
-import * as backend from "@firetable/backend";
+import type { EventOwner } from "@firetable/backend";
+import { installPinia } from "../../test-helpers/install-pinia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ReservationStatus, ReservationType } from "@firetable/types";
 import { ref, shallowRef, toRef } from "vue";
-import * as Quasar from "quasar";
-import { uid } from "quasar";
 import { FloorViewer, getTables, RectTable } from "@firetable/floor-creator";
-import * as i18n from "vue-i18n";
-import { noop } from "es-toolkit/function";
 
 function createFloor(floorName: string): FloorViewer {
     const canvas = document.createElement("canvas");
     canvas.width = 1000;
     canvas.height = 1000;
-    const id = uid();
+    const id = Math.random().toString();
     return new FloorViewer({
         canvas,
         floorDoc: {
@@ -93,32 +85,53 @@ function createReservedTable(label: string): RectTable {
     return createTable(label);
 }
 
-// FIXME: stopped working with latest browser mode
+const { addReservationSpy, deleteReservationSpy } = vi.hoisted(() => {
+    return {
+        addReservationSpy: vi.fn(),
+        deleteReservationSpy: vi.fn(),
+    };
+});
+
+vi.mock("vue-i18n", () => {
+    return {
+        default: {
+            useI18n: () => ({
+                t: vi.fn().mockReturnValue("test"),
+            }),
+        },
+        useI18n: () => ({
+            t: vi.fn().mockReturnValue("test"),
+        }),
+    };
+});
+vi.mock("../helpers/ui-helpers.js", () => {
+    return {
+        showErrorMessage: vi.fn(),
+        tryCatchLoadingWrapper: vi.fn().mockResolvedValue(undefined),
+        showConfirm: vi.fn().mockResolvedValue(true),
+    };
+});
+vi.mock("@firetable/backend", () => {
+    return {
+        addReservation: addReservationSpy,
+        updateReservationDoc: deleteReservationSpy,
+    };
+});
+
+installPinia({ stubActions: false });
+
+// FIXME: fix these tests, seems like there is a bug with vitest.mock
 describe.skip("useReservations", () => {
     let users: Ref<User[]>;
     const floorInstances = shallowRef<FloorViewer[]>([]);
-    let eventOwner: backend.EventOwner;
+    let eventOwner: EventOwner;
     let event: Ref<EventDoc>;
     let floor1: FloorViewer;
     const mockReservations = [];
-    let deleteReservationSpy: MockInstance;
 
     beforeEach(() => {
-        deleteReservationSpy = vi
-            .spyOn(backend, "updateReservationDoc")
-            .mockImplementation(vi.fn<any>());
         mockReservations.length = 0;
         floorInstances.value.length = 0;
-        vi.spyOn(Quasar, "Dialog", "get").mockReturnValue({
-            create: vi.fn(),
-        });
-        vi.spyOn<any, any>(i18n, "useI18n").mockReturnValue(() => {
-            return {
-                t: noop,
-            };
-        });
-        vi.spyOn(authStore, "useAuthStore").mockReturnValue({} as any);
-        vi.spyOn(propertiesStore, "usePropertiesStore").mockReturnValue({} as any);
         users = ref([]);
         floor1 = createFloor("test-1");
         const floor2 = createFloor("test-2");
@@ -144,7 +157,7 @@ describe.skip("useReservations", () => {
         });
     });
 
-    it("should handle reservation creation correctly", () => {
+    it("should handle reservation creation correctly", async () => {
         floor1.canvas.add(createReservedTable("table1"));
         const [table] = getTables(floor1);
         const mockReservation = createMockReservation({
@@ -152,8 +165,8 @@ describe.skip("useReservations", () => {
             tableLabel: table.label,
         });
         mockReservations.push(mockReservation);
-        const addReservationSpy = vi.spyOn(backend, "addReservation").mockImplementation(vi.fn());
 
+        const { useReservations } = await import("./useReservations");
         const { handleReservationCreation } = useReservations(
             users,
             toRef(mockReservations),
@@ -167,9 +180,9 @@ describe.skip("useReservations", () => {
     });
 
     it("should handle reservation deletion correctly", async () => {
-        vi.spyOn(uiHelpers, "showConfirm").mockResolvedValue(true);
         floor1.canvas.add(createReservedTable("table1"));
         const [table] = getTables(floor1);
+        const { useReservations } = await import("./useReservations");
         const mockReservation = createMockReservation({
             floorId: floor1.id,
             tableLabel: table.label,

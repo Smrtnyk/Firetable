@@ -15,9 +15,10 @@
         "test": "vitest"
     },
     "devDependencies": {
+        "@pinia/testing": "0.1.5",
         "@playwright/test": "1.47.2",
         "@quasar/app-vite": "2.0.0-beta.21",
-        "@quasar/vite-plugin": "^1.7.0",
+        "@quasar/vite-plugin": "1.7.0",
         "@vitejs/plugin-vue": "5.1.4",
         "@vitest/browser": "catalog:",
         "@vitest/spy": "catalog:",
