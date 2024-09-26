@@ -40,6 +40,8 @@ For optimal use and to take full advantage of its features, including its full-s
 - **Analytics**: Track key metrics and gain valuable insights into guest behavior and operational aspects.
 - **Dark Mode**: Switch to an eye-friendly dark theme.
 - **Language Picker**: Multi-language support to cater to a global audience.
+- **Inventory Management**: Keep track of inventory items, manage stock levels, and streamline supply chain operations across all properties.
+- **Barcode Scanning**: Quickly add or update inventory items using barcode scanning technology for faster data entry and reduced errors.
 
 ## Reservation System
 
@@ -71,6 +73,18 @@ By leveraging visual and data-driven analytics, it offers a detailed understandi
 ### Data Utilization:
 The analytical data helps in making informed decisions for improving service quality, optimizing operations, and enhancing the overall guest experience.
 By understanding patterns and trends in reservations and guest behavior, Firetable empowers venue managers to adapt strategies that align with guest needs and business objectives.
+
+### Inventory Management
+
+Firetable's inventory management system enables efficient tracking and management of inventory across all properties. With real-time updates and detailed tracking.
+
+### Barcode Scanning
+Enhance your inventory management with integrated barcode scanning:
+
+ * Efficient Data Entry: Use your phone camera as a barcode scanner to add new items.
+ * Error Reduction: Minimize manual entry errors by scanning barcodes for item identification.
+ * Compatibility: Works with standard barcode scanners, requiring no specialized equipment, just your phone.
+ * Real-Time Synchronization: Instantly update inventory records as items are scanned, ensuring data accuracy.
 
 ---
 
