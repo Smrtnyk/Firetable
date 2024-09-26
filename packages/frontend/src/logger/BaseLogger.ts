@@ -31,8 +31,65 @@ export abstract class BaseLogger {
         }
     }
 
+    /**
+     * Logs the error and appends it to the body of the HTML document.
+     * Useful when debugging on mobile devices or when the console is not visible.
+     * @param message - The error message or error object to log and display in the DOM.
+     * @param args - Additional arguments for logging.
+     */
+    public errorAndAddToBody(message: unknown, ...args: unknown[]): void {
+        // First, log the error using the existing error method
+        this.error(message, ...args);
+
+        // Create a new DOM element for the error message
+        const errorElement = document.createElement("div");
+
+        // Style the error element (optional)
+        errorElement.style.color = "red";
+        errorElement.style.fontWeight = "bold";
+        errorElement.style.margin = "10px 0";
+
+        // Determine if the message is an Error object or a string, and include args
+        let errorText = `${this.prefix} [ERROR]: `;
+
+        if (this.#isError(message)) {
+            errorText += `${message.message}`;
+        } else if (typeof message === "string") {
+            errorText += `${message}`;
+        } else {
+            errorText += `An unknown error occurred`;
+        }
+
+        // Append all additional arguments
+        if (args.length > 0) {
+            const formattedArgs = args.map((arg) => this.#formatArg(arg)).join(" ");
+            errorText += ` | Additional Info: ${formattedArgs}`;
+        }
+
+        // Set the content of the error element
+        errorElement.textContent = errorText;
+
+        // Append the error element to the body of the HTML document
+        document.body.appendChild(errorElement);
+    }
+
     public debug(message: string, ...args: unknown[]): void {
         this.#log("debug", message, ...args);
+    }
+
+    /**
+     * Helper method to format additional arguments for appending to the DOM.
+     * Converts objects, arrays, etc., into a string.
+     */
+    #formatArg(arg: unknown): string {
+        if (typeof arg === "object") {
+            try {
+                return JSON.stringify(arg);
+            } catch {
+                return String(arg);
+            }
+        }
+        return String(arg);
     }
 
     #log(level: LogLevel, message: string, ...args: unknown[]): void {

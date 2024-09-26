@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { CreatePropertyPayload, UpdatePropertyPayload } from "@firetable/backend";
-import type { PropertyDoc, VoidFunction } from "@firetable/types";
+import type { PropertyDoc } from "@firetable/types";
+import type { Link } from "src/types";
 import {
     updateProperty,
     createNewProperty,
@@ -27,7 +28,6 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-
 const authStore = useAuthStore();
 const propertiesStore = usePropertiesStore();
 const quasar = useQuasar();
@@ -81,8 +81,7 @@ async function onDeleteProperty(property: PropertyDoc): Promise<void> {
     });
 }
 
-async function deletePropertyAsync(property: PropertyDoc, reset: VoidFunction): Promise<void> {
-    reset();
+async function deletePropertyAsync(property: PropertyDoc): Promise<void> {
     if (
         await showConfirm(
             t("PageAdminProperties.deletePropertyDialogTitle"),
@@ -93,9 +92,10 @@ async function deletePropertyAsync(property: PropertyDoc, reset: VoidFunction): 
     }
 }
 
-function showUpdatePropertyDialog(property: PropertyDoc, reset: VoidFunction): void {
-    reset();
-    createProperty(property);
+async function showUpdatePropertyDialog(property: PropertyDoc): Promise<void> {
+    if (await showConfirm("Edit property?")) {
+        createProperty(property);
+    }
 }
 
 function createProperty(property?: PropertyDoc): void {
@@ -124,6 +124,20 @@ function createProperty(property?: PropertyDoc): void {
         },
     });
 }
+
+function createLinks(propertyId: string): Link[] {
+    const params = { propertyId, organisationId: props.organisationId };
+    return [
+        {
+            label: t("PageAdminProperties.manageInventoryLink"),
+            icon: "grid",
+            route: { name: "adminInventory", params },
+            visible: authStore.canSeeInventory,
+        },
+    ].filter(function (link) {
+        return link.visible;
+    });
+}
 </script>
 
 <template>
@@ -135,34 +149,57 @@ function createProperty(property?: PropertyDoc): void {
                     rounded
                     icon="plus"
                     class="button-gradient"
-                    @click="() => createProperty()"
+                    @click="createProperty()"
                 />
             </template>
         </FTTitle>
 
-        <q-list v-if="properties.length > 0">
-            <q-slide-item
+        <q-list bordered v-if="properties.length > 0" class="rounded-borders">
+            <q-expansion-item
                 v-for="property in properties"
                 :key="property.id"
-                right-color="warning"
-                @right="({ reset }) => deletePropertyAsync(property, reset)"
-                @left="({ reset }) => showUpdatePropertyDialog(property, reset)"
-                class="fa-card"
+                expand-icon="arrow_drop_down"
+                expand-separator
             >
-                <template #right>
-                    <q-icon name="trash" />
-                </template>
-
-                <template #left>
-                    <q-icon name="pencil" />
-                </template>
-
-                <q-item clickable class="ft-card">
+                <template #header>
                     <q-item-section>
-                        <q-item-label> {{ property.name }}</q-item-label>
+                        <q-item-label>{{ property.name }}</q-item-label>
                     </q-item-section>
-                </q-item>
-            </q-slide-item>
+                    <q-space />
+                    <q-item-section side>
+                        <div class="row items-center">
+                            <q-btn
+                                flat
+                                icon="pencil"
+                                @click.stop="showUpdatePropertyDialog(property)"
+                            />
+                            <q-btn
+                                flat
+                                icon="trash"
+                                color="negative"
+                                @click.stop="deletePropertyAsync(property)"
+                            />
+                        </div>
+                    </q-item-section>
+                </template>
+
+                <!-- Expanded Content -->
+                <q-list>
+                    <q-item
+                        v-for="item in createLinks(property.id)"
+                        :key="item.label"
+                        clickable
+                        :to="item.route"
+                    >
+                        <q-item-section avatar>
+                            <q-icon :name="item.icon" />
+                        </q-item-section>
+                        <q-item-section>
+                            {{ item.label }}
+                        </q-item-section>
+                    </q-item>
+                </q-list>
+            </q-expansion-item>
         </q-list>
 
         <div v-else-if="!canCreateProperty && !organisationsIsLoading">

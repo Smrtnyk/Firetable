@@ -39,6 +39,7 @@ export interface UserCapabilities {
     [UserCapability.CAN_CANCEL_RESERVATION]?: boolean;
     [UserCapability.CAN_EDIT_RESERVATION]?: boolean;
     [UserCapability.CAN_EDIT_OWN_RESERVATION]?: boolean;
+    [UserCapability.CAN_SEE_INVENTORY]?: boolean;
 }
 
 export const enum UserCapability {
@@ -51,6 +52,7 @@ export const enum UserCapability {
     CAN_CANCEL_RESERVATION = "Can cancel reservation",
     CAN_EDIT_RESERVATION = "Can edit reservation",
     CAN_EDIT_OWN_RESERVATION = "Can edit own reservation",
+    CAN_SEE_INVENTORY = "Can see inventory",
 }
 
 export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapabilities> = {
@@ -64,6 +66,7 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapab
         [UserCapability.CAN_CANCEL_RESERVATION]: true,
         [UserCapability.CAN_EDIT_RESERVATION]: true,
         [UserCapability.CAN_EDIT_OWN_RESERVATION]: true,
+        [UserCapability.CAN_SEE_INVENTORY]: true,
     },
     [Role.PROPERTY_OWNER]: {
         [UserCapability.CAN_RESERVE]: true,
@@ -75,6 +78,7 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapab
         [UserCapability.CAN_CANCEL_RESERVATION]: true,
         [UserCapability.CAN_EDIT_RESERVATION]: true,
         [UserCapability.CAN_EDIT_OWN_RESERVATION]: true,
+        [UserCapability.CAN_SEE_INVENTORY]: true,
     },
     [Role.MANAGER]: {
         [UserCapability.CAN_RESERVE]: true,
@@ -86,6 +90,7 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapab
         [UserCapability.CAN_CANCEL_RESERVATION]: true,
         [UserCapability.CAN_EDIT_RESERVATION]: true,
         [UserCapability.CAN_EDIT_OWN_RESERVATION]: true,
+        [UserCapability.CAN_SEE_INVENTORY]: true,
     },
     [Role.HOSTESS]: {
         [UserCapability.CAN_RESERVE]: true,
@@ -97,6 +102,7 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapab
         [UserCapability.CAN_CANCEL_RESERVATION]: false,
         [UserCapability.CAN_EDIT_RESERVATION]: true,
         [UserCapability.CAN_EDIT_OWN_RESERVATION]: true,
+        [UserCapability.CAN_SEE_INVENTORY]: false,
     },
     [Role.STAFF]: {
         [UserCapability.CAN_RESERVE]: false,
@@ -108,5 +114,6 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapab
         [UserCapability.CAN_CANCEL_RESERVATION]: false,
         [UserCapability.CAN_EDIT_RESERVATION]: false,
         [UserCapability.CAN_EDIT_OWN_RESERVATION]: true,
+        [UserCapability.CAN_SEE_INVENTORY]: false,
     },
 };

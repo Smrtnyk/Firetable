@@ -5,6 +5,13 @@ export default {
         transfer: "Übertragen",
         copy: "Kopieren",
         delete: "Löschen",
+        name: "Name",
+        type: "Typ",
+        category: "Kategorie",
+        actions: "Aktionen",
+        price: "Preis",
+        submit: "Absenden",
+        reset: "Zurücksetzen",
     },
     AppDrawer: {
         links: {
@@ -119,6 +126,7 @@ export default {
             "Um Immobilien zu erstellen, müssen Sie zuerst eine Organisation erstellen.",
         createPropertyDialogTitle: "Neue Immobilie hinzufügen",
         editPropertyDialogTitle: "Immobilie bearbeiten: {name}",
+        manageInventoryLink: "Inventar verwalten",
     },
     AddNewPropertyForm: {
         propertyNameLengthValidationMessage: "Der Immobilienname muss mindestens 3 Zeichen haben!",
@@ -177,5 +185,12 @@ export default {
         passwordInputEnabledTitle: "Eingabe deaktivieren",
         passwordInputDisabledTitle: "Eingabe aktivieren",
         updatePasswordButtonLabel: "Passwort aktualisieren",
+    },
+    PageAdminInventory: {
+        title: "Inventar",
+        createNewInventoryItemDialogTitle: "Neues Inventar hinzufügen",
+        noItemsMessage: "Es gibt keine Artikel im Inventar.",
+        editInventoryItemDialogTitle: "Inventar bearbeiten: {name}",
+        deleteItemConfirmMessage: "Inventarartikel löschen: {name}?",
     },
 };

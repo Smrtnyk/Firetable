@@ -7,6 +7,7 @@ import { useI18n } from "vue-i18n";
 
 interface Props {
     itemToEdit?: CreateInventoryItemPayload;
+    initialData?: CreateInventoryItemPayload;
 }
 
 const { t } = useI18n();
@@ -15,7 +16,9 @@ const formRef = useTemplateRef<QForm>("formRef");
 const form = ref<CreateInventoryItemPayload>(getInitialForm());
 const typeOptions = [InventoryItemType.DRINK, InventoryItemType.FOOD, InventoryItemType.OTHER];
 const emit = defineEmits<(e: "submit", item: CreateInventoryItemPayload) => void>();
-const isDrinkType = computed(() => form.value.type === InventoryItemType.DRINK);
+const isDrinkType = computed(function () {
+    return form.value.type === InventoryItemType.DRINK;
+});
 
 function getInitialForm(): CreateInventoryItemPayload {
     if (props.itemToEdit) {
@@ -27,8 +30,8 @@ function getInitialForm(): CreateInventoryItemPayload {
         category: DrinkCategory.SPIRIT,
         price: 0,
         quantity: 0,
-        unit: "",
         supplier: "",
+        ...props.initialData,
     };
 }
 
@@ -119,18 +122,6 @@ watch(
                 role="spinbutton"
             />
 
-            <!-- Unit -->
-            <q-input
-                v-model="form.unit"
-                label="Unit"
-                standout
-                rounded
-                required
-                :rules="[(val) => !!val || 'Unit is required']"
-                aria-label="Unit"
-                role="textbox"
-            />
-
             <!-- Alcohol Content (only for drinks) -->
             <q-input
                 v-if="isDrinkType"
@@ -177,14 +168,14 @@ watch(
                     rounded
                     class="button-gradient"
                     size="md"
-                    :label="t('InventoryItemCreateForm.submitButtonLabel')"
+                    :label="t('Global.submit')"
                     @click="onSubmit"
                 />
                 <q-btn
                     rounded
                     size="md"
                     outline
-                    :label="t('UserCreateForm.buttonResetLabel')"
+                    :label="t('Global.reset')"
                     type="reset"
                     color="primary"
                     class="q-ml-sm"

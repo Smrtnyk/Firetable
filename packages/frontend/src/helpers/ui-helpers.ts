@@ -69,8 +69,8 @@ export async function tryCatchLoadingWrapper<T>({
         Loading.show();
         return await hook(...(args ?? []));
     } catch (e) {
-        showErrorMessage(e);
-        (errorHook ?? noop)(...(args ?? []));
+        const errorHookVal = (errorHook ?? noop).bind(null, ...(args ?? []));
+        showErrorMessage(e, errorHookVal);
     } finally {
         Loading.hide();
     }

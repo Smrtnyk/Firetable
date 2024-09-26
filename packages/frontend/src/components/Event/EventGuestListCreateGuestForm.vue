@@ -41,7 +41,7 @@ function onReset(): void {
             <q-btn
                 rounded
                 size="md"
-                :label="t('EventGuestListCreateGuestForm.guestNameAddSubmit')"
+                :label="t('Global.submit')"
                 type="submit"
                 class="button-gradient"
             />
@@ -49,7 +49,7 @@ function onReset(): void {
                 rounded
                 size="md"
                 outline
-                :label="t('EventGuestListCreateGuestForm.guestNameReset')"
+                :label="t('Global.reset')"
                 type="reset"
                 color="primary"
                 class="q-ml-sm"

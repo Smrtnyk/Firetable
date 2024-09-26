@@ -1,38 +1,17 @@
 import type { RenderResult } from "vitest-browser-vue";
+import type { CreateInventoryItemPayload } from "@firetable/types";
 import InventoryItemCreateForm from "./InventoryItemCreateForm.vue";
-import messages from "../../../i18n";
+import { renderComponent, t } from "../../../../test-helpers/render-component";
 import { describe, it, expect, beforeEach } from "vitest";
 import { InventoryItemType, DrinkCategory } from "@firetable/types";
-import { QInput, Quasar, QSelect, QBtn } from "quasar";
-import { render } from "vitest-browser-vue";
 import { page, userEvent } from "@vitest/browser/context";
-import { createI18n } from "vue-i18n";
-import "quasar/dist/quasar.css";
-import "../../../css/app.scss";
-
-const i18n = createI18n({
-    locale: "en-GB",
-    fallbackLocale: "en-GB",
-    messages,
-    legacy: false,
-});
 
 describe("InventoryItemCreateForm.vue", () => {
     let screen: RenderResult<any>;
-    const t = i18n.global.t;
 
     describe("create", () => {
         beforeEach(() => {
-            screen = render(InventoryItemCreateForm, {
-                global: {
-                    plugins: [Quasar, i18n],
-                    components: {
-                        QInput,
-                        QSelect,
-                        QBtn,
-                    },
-                },
-            });
+            screen = renderComponent(InventoryItemCreateForm);
         });
 
         it("renders correctly", () => {
@@ -48,9 +27,6 @@ describe("InventoryItemCreateForm.vue", () => {
 
             const quantityInput = page.getByLabelText("Quantity");
             await expect.element(quantityInput).toHaveValue(0);
-
-            const unitInput = page.getByLabelText("Unit");
-            await expect.element(unitInput).toHaveValue("");
 
             const supplierInput = page.getByLabelText("Supplier");
             await expect.element(supplierInput).toHaveValue("");
@@ -82,9 +58,6 @@ describe("InventoryItemCreateForm.vue", () => {
 
             const quantityError = page.getByText("Quantity must be positive");
             expect(quantityError.elements().length).toBeTruthy();
-
-            const unitError = page.getByText("Unit is required");
-            expect(unitError.elements().length).toBeTruthy();
         });
 
         it("emits submit event with correct data when form is valid", async () => {
@@ -115,10 +88,6 @@ describe("InventoryItemCreateForm.vue", () => {
             await userEvent.type(quantityInput, "50");
             await expect.element(quantityInput).toHaveValue(50);
 
-            const unitInput = page.getByLabelText("Unit");
-            await userEvent.type(unitInput, "plate");
-            await expect.element(unitInput).toHaveValue("plate");
-
             const submitButton = page.getByText("Submit");
             await userEvent.click(submitButton);
         });
@@ -128,17 +97,12 @@ describe("InventoryItemCreateForm.vue", () => {
             await userEvent.type(nameInput, "Test Drink");
             await expect.element(nameInput).toHaveValue("Test Drink");
 
-            const unitInput = page.getByLabelText("Unit");
-            await userEvent.type(unitInput, "bottle");
-            await expect.element(unitInput).toHaveValue("bottle");
-
             // Click the reset button
             const resetButton = page.getByText("Reset");
             await userEvent.click(resetButton);
 
             // Check that form values have been reset
             await expect.element(nameInput).toHaveValue("");
-            await expect.element(unitInput).toHaveValue("");
         });
 
         it("conditionally shows alcohol content and volume fields when type is drink", async () => {
@@ -201,21 +165,10 @@ describe("InventoryItemCreateForm.vue", () => {
                 category: "Snacks",
                 price: 5.99,
                 quantity: 10,
-                unit: "pack",
                 supplier: "Supplier A",
             };
 
-            screen = render(InventoryItemCreateForm, {
-                props: { itemToEdit },
-                global: {
-                    plugins: [Quasar, i18n],
-                    components: {
-                        QInput,
-                        QSelect,
-                        QBtn,
-                    },
-                },
-            });
+            screen = renderComponent(InventoryItemCreateForm, { itemToEdit });
 
             const nameInput = page.getByLabelText("Name");
             await expect.element(nameInput).toHaveValue("Existing Item");
@@ -225,9 +178,6 @@ describe("InventoryItemCreateForm.vue", () => {
 
             const quantityInput = page.getByLabelText("Quantity");
             await expect.element(quantityInput).toHaveValue(10);
-
-            const unitInput = page.getByLabelText("Unit");
-            await expect.element(unitInput).toHaveValue("pack");
 
             const supplierInput = page.getByLabelText("Supplier");
             await expect.element(supplierInput).toHaveValue("Supplier A");
@@ -246,21 +196,10 @@ describe("InventoryItemCreateForm.vue", () => {
                 category: "Snacks",
                 price: 5.99,
                 quantity: 10,
-                unit: "pack",
                 supplier: "Supplier A",
             };
 
-            screen = render(InventoryItemCreateForm, {
-                props: { itemToEdit },
-                global: {
-                    plugins: [Quasar, i18n],
-                    components: {
-                        QInput,
-                        QSelect,
-                        QBtn,
-                    },
-                },
-            });
+            screen = renderComponent(InventoryItemCreateForm, { itemToEdit });
 
             const nameInput = page.getByLabelText("Name");
             await userEvent.clear(nameInput);
@@ -268,7 +207,7 @@ describe("InventoryItemCreateForm.vue", () => {
             await expect.element(nameInput).toHaveValue("Updated Item");
 
             // Simulate form submission
-            const submitButton = page.getByText(t("InventoryItemCreateForm.submitButtonLabel"));
+            const submitButton = page.getByText(t("Global.submit"));
             await userEvent.click(submitButton);
 
             // Verify that the component emitted the 'submit' event with the updated item
@@ -289,21 +228,10 @@ describe("InventoryItemCreateForm.vue", () => {
                 category: "Snacks",
                 price: 5.99,
                 quantity: 10,
-                unit: "pack",
                 supplier: "Supplier A",
             };
 
-            screen = render(InventoryItemCreateForm, {
-                props: { itemToEdit },
-                global: {
-                    plugins: [Quasar, i18n],
-                    components: {
-                        QInput,
-                        QSelect,
-                        QBtn,
-                    },
-                },
-            });
+            screen = renderComponent(InventoryItemCreateForm, { itemToEdit });
 
             const nameInput = page.getByLabelText("Name");
             await userEvent.clear(nameInput);
@@ -311,11 +239,95 @@ describe("InventoryItemCreateForm.vue", () => {
             await expect.element(nameInput).toHaveValue("Modified Name");
 
             // Click the reset button
-            const resetButton = page.getByText(t("UserCreateForm.buttonResetLabel"));
+            const resetButton = page.getByText(t("Global.reset"));
             await userEvent.click(resetButton);
 
             // Verify that the form is reset to the initial item values
             await expect.element(nameInput).toHaveValue("Existing Item");
+        });
+    });
+
+    describe("initialData", () => {
+        const initialData: CreateInventoryItemPayload = {
+            name: "Red Bull 250ml",
+            type: InventoryItemType.DRINK,
+            category: "Energy drinks",
+            price: 0,
+            quantity: 0,
+            unit: "ml",
+            supplier: "Red Bull,Orginal",
+            alcoholContent: 0,
+            volume: 250,
+        };
+
+        beforeEach(() => {
+            screen = renderComponent(InventoryItemCreateForm, { initialData });
+        });
+
+        it("prefills form when initialData prop is provided", async () => {
+            const nameInput = page.getByLabelText("Name");
+            await expect.element(nameInput).toHaveValue("Red Bull 250ml");
+
+            const typeSelect = page.getByLabelText("Type").getByLabelText("Type");
+            await expect.element(typeSelect).toHaveValue(InventoryItemType.DRINK);
+
+            const categoryInput = page.getByLabelText("Category");
+            await expect.element(categoryInput).toHaveValue("Energy drinks");
+
+            const priceInput = page.getByLabelText("Price");
+            await expect.element(priceInput).toHaveValue(0);
+
+            const quantityInput = page.getByLabelText("Quantity");
+            await expect.element(quantityInput).toHaveValue(0);
+
+            const supplierInput = page.getByLabelText("Supplier");
+            await expect.element(supplierInput).toHaveValue("Red Bull,Orginal");
+
+            const alcoholContentInput = page.getByLabelText("Alcohol Content");
+            await expect.element(alcoholContentInput).toHaveValue(0);
+
+            const volumeInput = page.getByLabelText("Volume");
+            await expect.element(volumeInput).toHaveValue(250);
+        });
+
+        it("emits submit event with correct data when initialData is provided and form is submitted", async () => {
+            const nameInput = page.getByLabelText("Name");
+            await userEvent.clear(nameInput);
+            await userEvent.type(nameInput, "Red Bull Sugarfree 250ml");
+
+            await expect.element(nameInput).toHaveValue("Red Bull Sugarfree 250ml");
+
+            const priceInput = page.getByLabelText("Price");
+            await userEvent.type(priceInput, "2.5");
+
+            const quantityInput = page.getByLabelText("Quantity");
+            await userEvent.type(quantityInput, "10");
+
+            const submitButton = page.getByText(t("Global.submit"));
+            await userEvent.click(submitButton);
+
+            const emittedEvents = screen.emitted("submit");
+            expect(emittedEvents).toBeTruthy();
+            expect(emittedEvents.length).toBe(1);
+            const submittedItem = emittedEvents[0][0];
+            expect(submittedItem).toStrictEqual({
+                ...initialData,
+                price: 2.5,
+                quantity: 10,
+                name: "Red Bull Sugarfree 250ml",
+            });
+        });
+
+        it("resets form to initial data when reset button is clicked", async () => {
+            const nameInput = page.getByLabelText("Name");
+            await userEvent.clear(nameInput);
+            await userEvent.type(nameInput, "Modified Name");
+            await expect.element(nameInput).toHaveValue("Modified Name");
+
+            const resetButton = page.getByText(t("Global.reset") || "Reset");
+            await userEvent.click(resetButton);
+
+            await expect.element(nameInput).toHaveValue("Red Bull 250ml");
         });
     });
 });

@@ -50,6 +50,10 @@ export const useAuthStore = defineStore("auth", function () {
         return user.value?.email;
     });
 
+    const canSeeInventory = computed(function () {
+        return Boolean(capabilities.value[UserCapability.CAN_SEE_INVENTORY]);
+    });
+
     const canReserve = computed(function () {
         return Boolean(capabilities.value[UserCapability.CAN_RESERVE]);
     });
@@ -209,6 +213,7 @@ export const useAuthStore = defineStore("auth", function () {
         isPropertyOwner,
         canEditOwnReservation,
         canEditReservation,
+        canSeeInventory,
         canSeeReservationCreator,
         canConfirmReservation,
         canCancelReservation,

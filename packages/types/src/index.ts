@@ -1,9 +1,9 @@
 export * from "./firebase.js";
 export * from "./event.js";
-export * from "./floor.js";
+export type * from "./floor.js";
 export * from "./auth.js";
-export * from "./property.js";
-export * from "./organisation.js";
-export * from "./guest.js";
-export * from "./utils.js";
+export type * from "./property.js";
+export type * from "./organisation.js";
+export type * from "./guest.js";
+export type * from "./utils.js";
 export * from "./inventory.js";

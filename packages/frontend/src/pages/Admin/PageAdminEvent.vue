@@ -30,6 +30,7 @@ import { compressFloorDoc } from "src/helpers/compress-floor-doc";
 import { useGuestsForEvent } from "src/composables/useGuestsForEvent";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { property } from "es-toolkit/compat";
+import { useAuthStore } from "src/stores/auth-store";
 
 interface Props {
     organisationId: string;
@@ -58,6 +59,7 @@ const eventOwner: EventOwner = {
     id: props.eventId,
 };
 
+const authStore = useAuthStore();
 const {
     eventFloors,
     event,
@@ -335,7 +337,7 @@ onMounted(init);
 
             <!-- Logs -->
             <q-tab-panel name="logs" v-if="logs">
-                <AdminEventLogs :logs-doc="logs" />
+                <AdminEventLogs :logs-doc="logs" :is-admin="authStore.isAdmin" />
             </q-tab-panel>
         </FTTabPanels>
     </div>
