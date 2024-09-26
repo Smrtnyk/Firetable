@@ -10,6 +10,14 @@ export default defineConfig({
             "src/": new URL("./src/", import.meta.url).pathname,
             "stores/": new URL("./src/stores/", import.meta.url).pathname,
         },
+        deps: {
+            optimizer: {
+                web: {
+                    enabled: true,
+                    include: ["@vue/test-utils", "quasar", "vue-i18n", "pinia", "@firetable/backend"],
+                }
+            }
+        },
         clearMocks: true,
         reporters: ["basic"],
         watch: false,
