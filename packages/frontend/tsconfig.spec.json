@@ -5,7 +5,7 @@
         "lib": ["ESNext"],
         "module": "NodeNext",
         "strict": false,
-        "moduleResolution": "NodeNext",
+        "moduleResolution": "Bundler",
         "esModuleInterop": true,
         "types": ["vitest-browser-vue", "@vitest/browser/providers/playwright"],
     },

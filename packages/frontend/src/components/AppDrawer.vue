@@ -4,7 +4,7 @@ import { ADMIN, Role } from "@firetable/types";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
-import { LocalStorage, useQuasar } from "quasar";
+import { LocalStorage, Dark } from "quasar";
 import { logoutUser } from "@firetable/backend";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 
@@ -14,7 +14,6 @@ interface Props {
 }
 const props = defineProps<Props>();
 const emit = defineEmits<(e: "update:modelValue", value: boolean) => void>();
-const quasar = useQuasar();
 const { t, locale } = useI18n();
 
 const lang = ref(locale);
@@ -83,8 +82,8 @@ const avatar = computed(function () {
 });
 
 function setDarkMode(newValue: boolean): void {
-    quasar.dark.set(newValue);
-    quasar.localStorage.set("FTDarkMode", newValue);
+    Dark.set(newValue);
+    LocalStorage.set("FTDarkMode", newValue);
 }
 
 async function onLogoutUser(): Promise<void> {
@@ -156,7 +155,7 @@ function setAppLanguage(val: string): void {
             <q-separator spaced />
             <q-item>
                 <q-toggle
-                    :model-value="quasar.dark.isActive"
+                    :model-value="Dark.isActive"
                     @update:model-value="setDarkMode"
                     checked-icon="moon"
                     color="red"

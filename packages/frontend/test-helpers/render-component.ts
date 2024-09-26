@@ -1,26 +1,34 @@
-import type { DefineComponent, ExtractPropTypes } from "vue";
+import type { DefineComponent, ExtractPropTypes, WritableComputedRef } from "vue";
+import type { QuasarPluginOptions } from "quasar";
 import messages from "../src/i18n";
-import { h, defineComponent } from "vue";
+import { ref, h, defineComponent } from "vue";
 import { render } from "vitest-browser-vue";
 import {
+    QAvatar,
     QBtn,
+    QDrawer,
     QIcon,
     QInput,
     QItem,
     QItemLabel,
     QItemSection,
     QLayout,
+    QList,
     QPageSticky,
     QScrollArea,
     QSelect,
+    QSeparator,
     QSlideItem,
     QTable,
     QTd,
     QTimeline,
     QTimelineEntry,
+    QToggle,
     Quasar,
 } from "quasar";
 import { createI18n } from "vue-i18n";
+import { config } from "@vue/test-utils";
+import { beforeAll, afterAll, vi } from "vitest";
 
 import "quasar/dist/quasar.css";
 import "../src/css/app.scss";
@@ -33,6 +41,52 @@ const i18n = createI18n({
 });
 
 export const t = i18n.global.t;
+export function getLocaleForTest(): WritableComputedRef<"de" | "en-GB", "de" | "en-GB"> {
+    return i18n.global.locale;
+}
+
+export function installQuasarPlugin(options?: Partial<QuasarPluginOptions>): void {
+    const globalConfigBackup = structuredClone(config.global);
+
+    beforeAll(() => {
+        config.global.plugins.unshift([Quasar, options]);
+        config.global.provide = {
+            ...config.global.provide,
+            ...qLayoutInjections(),
+        };
+    });
+
+    afterAll(() => {
+        config.global = globalConfigBackup;
+    });
+}
+
+/**
+ * Injections for Components with a QPage root Element
+ */
+export function qLayoutInjections() {
+    return {
+        // pageContainerKey
+        _q_pc_: true,
+        // layoutKey
+        _q_l_: {
+            header: { size: 0, offset: 0, space: false },
+            right: { size: 300, offset: 0, space: false },
+            footer: { size: 0, offset: 0, space: false },
+            left: { size: 300, offset: 0, space: false },
+            isContainer: ref(false),
+            view: ref("lHh Lpr lff"),
+            rows: ref({ top: "lHh", middle: "Lpr", bottom: "lff" }),
+            height: ref(900),
+            instances: {},
+            update: vi.fn(),
+            animate: vi.fn(),
+            totalWidth: ref(1200),
+            scroll: ref({ position: 0, direction: "up" }),
+            scrollbarWidth: ref(125),
+        },
+    };
+}
 
 /**
  * Function to render a component with Quasar plugins and components.
@@ -79,6 +133,11 @@ export function renderComponent<
                 QItemSection,
                 QSlideItem,
                 QItemLabel,
+                QAvatar,
+                QSeparator,
+                QDrawer,
+                QToggle,
+                QList,
             },
         },
     };

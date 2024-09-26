@@ -17,10 +17,11 @@
     "devDependencies": {
         "@playwright/test": "1.47.2",
         "@quasar/app-vite": "2.0.0-beta.21",
+        "@quasar/vite-plugin": "^1.7.0",
         "@vitejs/plugin-vue": "5.1.4",
         "@vitest/browser": "catalog:",
         "@vitest/spy": "catalog:",
-        "@vitest/ui": "2.1.1",
+        "@vitest/ui": "catalog:",
         "@vue/test-utils": "2.4.6",
         "vite-tsconfig-paths": "5.0.1",
         "vitest": "catalog:",
