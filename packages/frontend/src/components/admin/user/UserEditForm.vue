@@ -7,7 +7,7 @@ import type {
     UserCapabilities,
     UserCapability,
 } from "@firetable/types";
-import { computed, ref, useTemplateRef } from "vue";
+import { computed, ref, useTemplateRef, watch } from "vue";
 import { DEFAULT_CAPABILITIES_BY_ROLE, Role } from "@firetable/types";
 import { QForm } from "quasar";
 import { noEmptyString, noWhiteSpaces } from "src/helpers/form-rules";
@@ -30,13 +30,9 @@ const emit = defineEmits<Emits>();
 const props = defineProps<Props>();
 const userEditForm = useTemplateRef<QForm>("userEditForm");
 
-const defaultCapabilitiesForRole = computed(function () {
-    return DEFAULT_CAPABILITIES_BY_ROLE[props.user.role];
-});
-
 function getUserCapabilities(): UserCapabilities {
     return {
-        ...defaultCapabilitiesForRole.value,
+        ...DEFAULT_CAPABILITIES_BY_ROLE[Role.STAFF],
         ...props.user.capabilities,
     };
 }
@@ -66,6 +62,23 @@ const isEditableRole = computed(function () {
 const emailSuffix = computed(function () {
     return `@${props.organisation.name}.at`;
 });
+
+// Temporary variable to store capabilities when role changes
+let previousCapabilities: UserCapabilities | undefined = form.value.capabilities;
+
+watch(
+    () => form.value.role,
+    function (newRole, oldRole) {
+        if (oldRole === Role.STAFF) {
+            // Store the current capabilities
+            previousCapabilities = form.value.capabilities;
+        }
+
+        // Restore the previous capabilities if they exist
+        form.value.capabilities =
+            newRole === Role.STAFF ? (previousCapabilities ?? getUserCapabilities()) : undefined;
+    },
+);
 
 async function onSubmit(): Promise<void> {
     if (await userEditForm.value?.validate()) {

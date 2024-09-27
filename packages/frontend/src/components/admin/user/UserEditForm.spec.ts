@@ -1,6 +1,6 @@
 import UserEditForm from "./UserEditForm.vue";
 import { renderComponent } from "../../../../test-helpers/render-component";
-import { Role, DEFAULT_CAPABILITIES_BY_ROLE } from "@firetable/types";
+import { Role, DEFAULT_CAPABILITIES_BY_ROLE, UserCapability } from "@firetable/types";
 import { describe, it, beforeEach, expect } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 
@@ -202,5 +202,85 @@ describe("UserEditForm", () => {
         screen = renderComponent(UserEditForm, props);
 
         expect(screen.getByText("Capabilities:").query()).toBeNull();
+    });
+
+    it("shows capabilities checkboxes when role changes from Manager to Staff", async () => {
+        props.user.role = Role.MANAGER;
+        const screen = renderComponent(UserEditForm, props);
+
+        // Initially, capabilities should not be visible
+        expect(screen.getByText("Capabilities:").query()).toBeNull();
+
+        // Change role to Staff
+        const roleSelect = screen.getByLabelText("Role");
+        await userEvent.click(roleSelect);
+        const staffOption = screen.getByRole("option", { name: Role.STAFF });
+        await userEvent.click(staffOption);
+
+        // Capabilities should now be visible
+        expect(screen.getByText("Capabilities:").query()).toBeTruthy();
+
+        // Check that capabilities checkboxes are rendered
+        for (const [capability, defaultValue] of Object.entries(
+            DEFAULT_CAPABILITIES_BY_ROLE[Role.STAFF],
+        )) {
+            const checkbox = screen.getByRole("checkbox", { name: capability });
+            expect(checkbox.query()).toBeTruthy();
+            expect(checkbox.query().getAttribute("aria-checked")).toBe(
+                defaultValue ? "true" : "false",
+            );
+        }
+    });
+
+    it("preserves capabilities when changing role from Staff to Manager and back to Staff", async () => {
+        props.user.role = Role.STAFF;
+        props.user.capabilities = {
+            [UserCapability.CAN_RESERVE]: true,
+            [UserCapability.CAN_SEE_GUEST_CONTACT]: true,
+            [UserCapability.CAN_DELETE_RESERVATION]: false,
+        };
+        const screen = renderComponent(UserEditForm, props);
+
+        // Capabilities should be initially displayed with the user's capabilities
+        expect(screen.getByText("Capabilities:").query()).toBeTruthy();
+        let capabilityCheckbox = screen
+            .getByRole("checkbox", { name: UserCapability.CAN_RESERVE })
+            .query();
+        expect(capabilityCheckbox.getAttribute("aria-checked")).toBe("true");
+        capabilityCheckbox = screen
+            .getByRole("checkbox", {
+                name: UserCapability.CAN_DELETE_RESERVATION,
+            })
+            .query();
+        expect(capabilityCheckbox.getAttribute("aria-checked")).toBe("false");
+
+        // Change role to Manager
+        const roleSelect = screen.getByLabelText("Role");
+        await userEvent.click(roleSelect);
+        const managerOption = screen.getByRole("option", { name: Role.MANAGER });
+        await userEvent.click(managerOption);
+
+        // Capabilities should not be displayed
+        expect(screen.getByText("Capabilities:").query()).toBeNull();
+
+        // Change role back to Staff
+        await userEvent.click(roleSelect);
+        const staffOption = screen.getByRole("option", { name: Role.STAFF });
+        await userEvent.click(staffOption);
+
+        // Capabilities should now be displayed again
+        expect(screen.getByText("Capabilities:").query()).toBeTruthy();
+
+        // Verify that the capabilities are preserved
+        capabilityCheckbox = screen
+            .getByRole("checkbox", { name: UserCapability.CAN_RESERVE })
+            .query();
+        expect(capabilityCheckbox.getAttribute("aria-checked")).toBe("true");
+        capabilityCheckbox = screen
+            .getByRole("checkbox", {
+                name: UserCapability.CAN_DELETE_RESERVATION,
+            })
+            .query();
+        expect(capabilityCheckbox.getAttribute("aria-checked")).toBe("false");
     });
 });
