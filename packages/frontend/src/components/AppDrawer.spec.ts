@@ -53,7 +53,7 @@ describe("AppDrawer", () => {
         expect(screen.getByText(avatarText)).toBeTruthy();
     });
 
-    it("displays correct links for MANAGER role", () => {
+    it("displays correct links for MANAGER role with no properties assigned", () => {
         user.role = Role.MANAGER;
 
         screen = renderComponent(
@@ -71,13 +71,7 @@ describe("AppDrawer", () => {
             },
         );
 
-        const expectedLinks = [
-            "Manage Events",
-            "Manage Users",
-            "Manage Floors",
-            "Manage Analytics",
-            "Settings",
-        ];
+        const expectedLinks = ["Manage Events", "Manage Users", "Manage Analytics", "Settings"];
 
         const allLinks = document.querySelectorAll(".q-item__section--main");
         const visibleLinks = Array.from(allLinks).map((link) => link.textContent);

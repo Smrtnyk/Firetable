@@ -40,6 +40,7 @@ export interface UserCapabilities {
     [UserCapability.CAN_EDIT_RESERVATION]?: boolean;
     [UserCapability.CAN_EDIT_OWN_RESERVATION]?: boolean;
     [UserCapability.CAN_SEE_INVENTORY]?: boolean;
+    [UserCapability.CAN_EDIT_FLOOR_PLANS]?: boolean;
 }
 
 export const enum UserCapability {
@@ -53,6 +54,7 @@ export const enum UserCapability {
     CAN_EDIT_RESERVATION = "Can edit reservation",
     CAN_EDIT_OWN_RESERVATION = "Can edit own reservation",
     CAN_SEE_INVENTORY = "Can see inventory",
+    CAN_EDIT_FLOOR_PLANS = "Can edit floor plans",
 }
 
 export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapabilities> = {
@@ -67,6 +69,7 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapab
         [UserCapability.CAN_EDIT_RESERVATION]: true,
         [UserCapability.CAN_EDIT_OWN_RESERVATION]: true,
         [UserCapability.CAN_SEE_INVENTORY]: true,
+        [UserCapability.CAN_EDIT_FLOOR_PLANS]: true,
     },
     [Role.PROPERTY_OWNER]: {
         [UserCapability.CAN_RESERVE]: true,
@@ -79,6 +82,7 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapab
         [UserCapability.CAN_EDIT_RESERVATION]: true,
         [UserCapability.CAN_EDIT_OWN_RESERVATION]: true,
         [UserCapability.CAN_SEE_INVENTORY]: true,
+        [UserCapability.CAN_EDIT_FLOOR_PLANS]: true,
     },
     [Role.MANAGER]: {
         [UserCapability.CAN_RESERVE]: true,
@@ -91,6 +95,7 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapab
         [UserCapability.CAN_EDIT_RESERVATION]: true,
         [UserCapability.CAN_EDIT_OWN_RESERVATION]: true,
         [UserCapability.CAN_SEE_INVENTORY]: true,
+        [UserCapability.CAN_EDIT_FLOOR_PLANS]: true,
     },
     [Role.HOSTESS]: {
         [UserCapability.CAN_RESERVE]: true,
@@ -103,6 +108,7 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapab
         [UserCapability.CAN_EDIT_RESERVATION]: true,
         [UserCapability.CAN_EDIT_OWN_RESERVATION]: true,
         [UserCapability.CAN_SEE_INVENTORY]: false,
+        [UserCapability.CAN_EDIT_FLOOR_PLANS]: false,
     },
     [Role.STAFF]: {
         [UserCapability.CAN_RESERVE]: false,
@@ -115,5 +121,6 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapab
         [UserCapability.CAN_EDIT_RESERVATION]: false,
         [UserCapability.CAN_EDIT_OWN_RESERVATION]: true,
         [UserCapability.CAN_SEE_INVENTORY]: false,
+        [UserCapability.CAN_EDIT_FLOOR_PLANS]: false,
     },
 };

@@ -14,7 +14,8 @@ import { usePropertiesStore } from "src/stores/properties-store";
 interface Props {
     modelValue: boolean;
 }
-const { nonNullableUser, isAdmin, canSeeInventory } = storeToRefs(useAuthStore());
+const { nonNullableUser, isAdmin, canSeeInventory, canEditFloorPlans } =
+    storeToRefs(useAuthStore());
 const propertiesStore = usePropertiesStore();
 const props = defineProps<Props>();
 const emit = defineEmits<(e: "update:modelValue", value: boolean) => void>();
@@ -26,63 +27,39 @@ const langOptions = [
     { value: "de", label: "German" },
 ];
 
-const inventoryLink = computed<GuardedLink | LinkWithChildren | undefined>(function () {
-    const shouldShowInventoryLinks = !isAdmin.value && canSeeInventory.value;
-    if (!shouldShowInventoryLinks) {
+const inventoryLink = computed(() => {
+    if (isAdmin.value || !canSeeInventory.value) {
         return;
     }
 
-    const properties = propertiesStore.getPropertiesByOrganisationId(
-        nonNullableUser.value.organisationId,
-    );
-
-    if (properties.length === 0) {
-        return;
-    }
-
-    if (properties.length === 1) {
-        const property = properties[0];
-        return {
-            icon: "grid",
-            route: {
-                name: "adminInventory",
-                params: {
-                    organisationId: nonNullableUser.value.organisationId,
-                    propertyId: property.id,
-                },
-            },
-            label: t("Global.manageInventoryLink"),
-            isVisible: true,
-        };
-    }
-    // For multiple properties, return an expandable item
-    const children = properties.map(function (property) {
-        return {
-            icon: "home",
-            route: {
-                name: "adminInventory",
-                params: {
-                    organisationId: nonNullableUser.value.organisationId,
-                    propertyId: property.id,
-                },
-            },
-            label: property.name,
-            isVisible: true,
-        };
-    });
-    return {
-        icon: "grid",
+    return buildExpandableLink({
         label: t("Global.manageInventoryLink"),
+        icon: "grid",
+        routeName: "adminInventory",
         isVisible: true,
-        children,
-    };
+        childIcon: "home",
+    });
 });
 
-const links = computed(function () {
+const manageFloorsLink = computed<GuardedLink | LinkWithChildren | undefined>(() => {
+    if (isAdmin.value || !canEditFloorPlans.value) {
+        return;
+    }
+
+    return buildExpandableLink({
+        label: t("AppDrawer.links.manageFloors"),
+        icon: "arrow-expand",
+        routeName: "adminFloors",
+        isVisible: true,
+        childIcon: "home",
+    });
+});
+
+const links = computed<(GuardedLink | LinkWithChildren)[]>(function () {
     const role = nonNullableUser.value.role;
     const organisationId = nonNullableUser.value.organisationId;
 
-    const allLinks: (GuardedLink | LinkWithChildren)[] = [
+    const allLinks: (GuardedLink | LinkWithChildren | undefined)[] = [
         {
             icon: "home",
             route: { name: "adminOrganisations" },
@@ -99,12 +76,6 @@ const links = computed(function () {
             icon: "users",
             route: { name: "adminUsers", params: { organisationId } },
             label: t("AppDrawer.links.manageUsers"),
-            isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
-        },
-        {
-            icon: "arrow-expand",
-            route: { name: "adminFloors", params: { organisationId } },
-            label: t("AppDrawer.links.manageFloors"),
             isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
         },
         {
@@ -125,14 +96,14 @@ const links = computed(function () {
             label: t("AppDrawer.links.manageProperties"),
             isVisible: role === Role.PROPERTY_OWNER,
         },
+
+        manageFloorsLink.value,
+        inventoryLink.value,
     ];
 
-    const inventory = inventoryLink.value;
-    if (inventory) {
-        allLinks.push(inventory);
-    }
-
-    return allLinks.filter((link) => link.isVisible);
+    return allLinks.filter(function (link): link is NonNullable<GuardedLink | LinkWithChildren> {
+        return link !== undefined && link.isVisible;
+    });
 });
 
 const avatar = computed(function () {
@@ -142,6 +113,65 @@ const avatar = computed(function () {
     }
     return `${first[0]}${last[0]}`;
 });
+
+function buildExpandableLink(options: {
+    label: string;
+    icon: string;
+    routeName: string;
+    isVisible: boolean;
+    childIcon?: string;
+}): GuardedLink | LinkWithChildren | undefined {
+    const { label, icon, routeName, isVisible, childIcon } = options;
+
+    if (!isVisible) {
+        return;
+    }
+
+    const properties = propertiesStore.getPropertiesByOrganisationId(
+        nonNullableUser.value.organisationId,
+    );
+
+    if (properties.length === 0) {
+        return;
+    }
+
+    function toRoute(propertyId: string): GuardedLink["route"] {
+        return {
+            name: routeName,
+            params: {
+                organisationId: nonNullableUser.value.organisationId,
+                propertyId,
+            },
+        };
+    }
+
+    if (properties.length === 1) {
+        const property = properties[0];
+        return {
+            icon,
+            route: toRoute(property.id),
+            label,
+            isVisible,
+        };
+    }
+
+    // For multiple properties, return an expandable item
+    const children = properties.map(function (property) {
+        return {
+            icon: childIcon ?? "home",
+            route: toRoute(property.id),
+            label: property.name,
+            isVisible: true,
+        };
+    });
+
+    return {
+        icon,
+        label,
+        isVisible,
+        children,
+    };
+}
 
 function setDarkMode(newValue: boolean): void {
     Dark.set(newValue);

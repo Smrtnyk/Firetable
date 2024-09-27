@@ -184,7 +184,9 @@ export const routes: RouteRecordRaw[] = [
                 name: "adminFloors",
                 meta: {
                     requiresAuth: true,
-                    allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN],
+                    allowedRoles(authStore) {
+                        return authStore.canEditFloorPlans;
+                    },
                 },
                 props: true,
                 component: () => import("src/pages/Admin/PageAdminFloors.vue"),
