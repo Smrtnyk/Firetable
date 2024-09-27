@@ -1,0 +1,254 @@
+import UserCreateForm from "./UserCreateForm.vue";
+import { renderComponent, t } from "../../../../test-helpers/render-component";
+import { vi, describe, it, beforeEach, expect } from "vitest";
+import { ADMIN, Role } from "@firetable/types";
+import { userEvent } from "@vitest/browser/context";
+
+const { showErrorMessageSpy } = vi.hoisted(() => {
+    return { showErrorMessageSpy: vi.fn() };
+});
+
+vi.mock("src/helpers/ui-helpers", () => ({
+    showErrorMessage: showErrorMessageSpy,
+}));
+
+describe("UserCreateForm", () => {
+    let props;
+    const user = {
+        role: Role.MANAGER,
+    };
+
+    beforeEach(() => {
+        props = {
+            properties: [
+                { id: "property1", name: "Property 1" },
+                { id: "property2", name: "Property 2" },
+            ],
+            organisation: {
+                id: "org1",
+                name: "TestOrg",
+            },
+        };
+        showErrorMessageSpy.mockClear();
+    });
+
+    it("renders the form with initial values", () => {
+        const screen = renderComponent(UserCreateForm, props, {
+            piniaStoreOptions: {
+                initialState: {
+                    auth: { user },
+                },
+            },
+        });
+
+        expect(
+            screen
+                .getByLabelText(t("UserCreateForm.userNameInputLabel"))
+                .query()
+                .getAttribute("value"),
+        ).toBe("");
+
+        expect(
+            screen
+                .getByLabelText(t("UserCreateForm.userMailInputLabel"))
+                .query()
+                .getAttribute("value"),
+        ).toBe("");
+
+        expect(
+            screen
+                .getByLabelText(t("UserCreateForm.userPasswordInputLabel"))
+                .query()
+                .getAttribute("value"),
+        ).toBe("");
+
+        // Role select should be rendered and default to Role.STAFF
+        const roleSelect = screen.getByLabelText(t("UserCreateForm.userRoleSelectLabel"));
+        expect(roleSelect.query()).toBeTruthy();
+        expect(roleSelect.query().getAttribute("aria-label")).toBe(
+            t("UserCreateForm.userRoleSelectLabel"),
+        );
+
+        // Properties checkboxes should be rendered (since we have properties and role is not PROPERTY_OWNER)
+        const propertyCheckboxes = screen.getByRole("checkbox");
+        expect(propertyCheckboxes.elements().length).toBe(2);
+
+        // Ensure checkboxes are unchecked
+        for (const checkbox of propertyCheckboxes.elements()) {
+            expect(checkbox.getAttribute("aria-checked")).toBe("false");
+        }
+    });
+
+    it("validates required fields", async () => {
+        const screen = renderComponent(UserCreateForm, props, {
+            piniaStoreOptions: {
+                initialState: {
+                    auth: { user },
+                },
+            },
+        });
+
+        const submitButton = screen.getByRole("button", { name: t("Global.submit") });
+        await userEvent.click(submitButton);
+
+        expect(screen.getByText("Please type something").elements().length).toBeGreaterThanOrEqual(
+            2,
+        );
+    });
+
+    it("shows error when no properties are selected", async () => {
+        const screen = renderComponent(UserCreateForm, props, {
+            piniaStoreOptions: {
+                initialState: {
+                    auth: { user },
+                },
+            },
+        });
+
+        // Fill out required fields
+        await userEvent.fill(
+            screen.getByLabelText(t("UserCreateForm.userNameInputLabel")),
+            "Test User",
+        );
+        await userEvent.fill(
+            screen.getByLabelText(t("UserCreateForm.userMailInputLabel")),
+            "testuser",
+        );
+        await userEvent.fill(
+            screen.getByLabelText(t("UserCreateForm.userPasswordInputLabel")),
+            "password123",
+        );
+
+        const submitButton = screen.getByRole("button", { name: t("Global.submit") });
+        await userEvent.click(submitButton);
+
+        // Check that showErrorMessage is called for properties selection
+        expect(showErrorMessageSpy).toHaveBeenCalledWith("You must select at least one property!");
+    });
+
+    it("emits submit event with correct payload", async () => {
+        const screen = renderComponent(UserCreateForm, props, {
+            piniaStoreOptions: {
+                initialState: {
+                    auth: { user },
+                },
+            },
+        });
+
+        // Fill out the form fields
+        await userEvent.fill(
+            screen.getByLabelText(t("UserCreateForm.userNameInputLabel")),
+            "Test User",
+        );
+        await userEvent.fill(
+            screen.getByLabelText(t("UserCreateForm.userMailInputLabel")),
+            "testuser",
+        );
+        await userEvent.fill(
+            screen.getByLabelText(t("UserCreateForm.userPasswordInputLabel")),
+            "password123",
+        );
+
+        // Select role
+        const roleSelect = screen.getByLabelText(t("UserCreateForm.userRoleSelectLabel"));
+        await userEvent.click(roleSelect);
+        const managerOption = screen.getByRole("option", { name: Role.MANAGER });
+        await userEvent.click(managerOption);
+
+        // Select properties
+        const propertyCheckboxes = screen.getByRole("checkbox");
+        // Select first property
+        await userEvent.click(propertyCheckboxes.elements()[0]);
+
+        const submitButton = screen.getByRole("button", { name: t("Global.submit") });
+        await userEvent.click(submitButton);
+
+        // Check that the 'submit' event was emitted with correct payload
+        expect(screen.emitted().submit).toBeTruthy();
+        const emittedPayload = screen.emitted().submit[0][0];
+        expect(emittedPayload).toMatchObject({
+            name: "Test User",
+            username: "testuser",
+            password: "password123",
+            role: Role.MANAGER,
+            // emailSuffix is '@TestOrg.at'
+            email: "testuser@TestOrg.at",
+            organisationId: "org1",
+            relatedProperties: ["property1"],
+        });
+    });
+
+    it("resets the form when reset button is clicked", async () => {
+        const screen = renderComponent(UserCreateForm, props, {
+            piniaStoreOptions: {
+                initialState: {
+                    auth: { user },
+                },
+            },
+        });
+
+        // Fill out the form fields
+        await userEvent.fill(
+            screen.getByLabelText(t("UserCreateForm.userNameInputLabel")),
+            "Test User",
+        );
+        await userEvent.fill(
+            screen.getByLabelText(t("UserCreateForm.userMailInputLabel")),
+            "testuser",
+        );
+        await userEvent.fill(
+            screen.getByLabelText(t("UserCreateForm.userPasswordInputLabel")),
+            "password123",
+        );
+
+        const propertyCheckboxes = screen.getByRole("checkbox");
+        await userEvent.click(propertyCheckboxes.elements()[0]);
+
+        const resetButton = screen.getByRole("button", { name: t("Global.reset") });
+        await userEvent.click(resetButton);
+
+        expect(
+            screen
+                .getByLabelText(t("UserCreateForm.userNameInputLabel"))
+                .query()
+                .getAttribute("value"),
+        ).toBe("");
+        expect(
+            screen
+                .getByLabelText(t("UserCreateForm.userMailInputLabel"))
+                .query()
+                .getAttribute("value"),
+        ).toBe("");
+        expect(
+            screen
+                .getByLabelText(t("UserCreateForm.userPasswordInputLabel"))
+                .query()
+                .getAttribute("value"),
+        ).toBe("");
+
+        // Check that properties are reset
+        for (const checkbox of propertyCheckboxes.elements()) {
+            expect(checkbox.getAttribute("aria-checked")).toBe("false");
+        }
+    });
+
+    it("does not show properties selection when role is PROPERTY_OWNER", async () => {
+        const screen = renderComponent(UserCreateForm, props, {
+            piniaStoreOptions: {
+                initialState: {
+                    auth: { user: { ...user, role: ADMIN } },
+                },
+            },
+        });
+
+        // Select role PROPERTY_OWNER
+        const roleSelect = screen.getByLabelText(t("UserCreateForm.userRoleSelectLabel"));
+        await userEvent.click(roleSelect);
+        const propertyOwnerOption = screen.getByRole("option", { name: Role.PROPERTY_OWNER });
+        await userEvent.click(propertyOwnerOption);
+
+        // Check that properties selection is not displayed
+        const propertyCheckboxes = screen.getByRole("checkbox");
+        expect(propertyCheckboxes.elements().length).toBe(0);
+    });
+});
