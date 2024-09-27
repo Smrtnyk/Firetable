@@ -1,0 +1,206 @@
+import UserEditForm from "./UserEditForm.vue";
+import { renderComponent } from "../../../../test-helpers/render-component";
+import { Role, DEFAULT_CAPABILITIES_BY_ROLE } from "@firetable/types";
+import { describe, it, beforeEach, expect } from "vitest";
+import { userEvent } from "@vitest/browser/context";
+
+describe("UserEditForm", () => {
+    let props;
+
+    beforeEach(() => {
+        props = {
+            user: {
+                id: "user1",
+                name: "John Doe",
+                email: "johndoe@TestOrg.at",
+                username: "johndoe",
+                role: Role.STAFF,
+                relatedProperties: ["property1"],
+                organisationId: "org1",
+            },
+            properties: [
+                { id: "property1", name: "Property 1" },
+                { id: "property2", name: "Property 2" },
+            ],
+            selectedProperties: [{ id: "property1", name: "Property 1" }],
+            organisation: {
+                id: "org1",
+                name: "TestOrg",
+            },
+        };
+    });
+
+    it("renders the form with initial values", () => {
+        const screen = renderComponent(UserEditForm, props);
+
+        // Check that the name input has the user's name
+        expect(
+            screen
+                .getByLabelText(/Name */)
+                .query()
+                .getAttribute("value"),
+        ).toBe(props.user.name);
+
+        // Check that the username input has the user's username
+        expect(screen.getByLabelText("Username *").query().getAttribute("value")).toBe(
+            props.user.username,
+        );
+
+        // Password field should be empty
+        expect(screen.getByLabelText("User password *").query().getAttribute("value")).toBe("");
+
+        // Role select should be present for editable roles
+        if ([Role.MANAGER, Role.STAFF, Role.HOSTESS].includes(props.user.role)) {
+            const roleSelect = screen.getByLabelText("Role");
+            expect(roleSelect.query()).toBeTruthy();
+        }
+
+        // Properties checkboxes should be rendered
+        const propertyCheckboxes = screen.getByRole("checkbox", {
+            name: /Property/,
+        });
+        expect(propertyCheckboxes.elements().length).toBe(props.properties.length);
+
+        // Check that selected properties are checked
+        for (const checkbox of propertyCheckboxes.elements()) {
+            const label = checkbox.getAttribute("aria-label");
+            const isChecked = props.selectedProperties.some(function (property) {
+                return property.name === label;
+            });
+            expect(checkbox.getAttribute("aria-checked")).toBe(isChecked ? "true" : "false");
+        }
+
+        for (const [capability, defaultValue] of Object.entries(
+            DEFAULT_CAPABILITIES_BY_ROLE[Role.STAFF],
+        )) {
+            const checkbox = screen.getByRole("checkbox", { name: capability });
+            expect(checkbox.query()).toBeTruthy();
+            expect(checkbox.query().getAttribute("aria-checked")).toBe(
+                defaultValue ? "true" : "false",
+            );
+        }
+    });
+
+    it("validates required fields", async () => {
+        const screen = renderComponent(UserEditForm, props);
+
+        // Clear the name field
+        const nameInput = screen.getByLabelText(/Name */).query();
+        await userEvent.clear(nameInput);
+
+        const submitButton = screen.getByRole("button", { name: "Update" });
+        await userEvent.click(submitButton);
+
+        // Expect validation error for name field
+        expect(screen.getByText("Please type something").query()).toBeTruthy();
+    });
+
+    it("emits submit event with correct payload", async () => {
+        const screen = renderComponent(UserEditForm, {
+            ...props,
+            user: {
+                ...props.user,
+            },
+        });
+
+        // Update fields
+        await userEvent.clear(screen.getByLabelText(/Name */));
+        await userEvent.type(screen.getByLabelText(/Name */), "Jane Doe");
+
+        await userEvent.clear(screen.getByLabelText("Username *"));
+        await userEvent.type(screen.getByLabelText("Username *"), "janedoe");
+
+        await userEvent.type(screen.getByLabelText("User password *"), "newpassword123");
+
+        // Change role to MANAGER
+        const roleSelect = screen.getByLabelText("Role");
+        await userEvent.click(roleSelect);
+        const managerOption = screen.getByRole("option", { name: Role.MANAGER });
+        await userEvent.click(managerOption);
+
+        // Select additional property
+        const propertyCheckbox = screen.getByRole("checkbox", { name: "Property 2" });
+        await userEvent.click(propertyCheckbox);
+
+        const submitButton = screen.getByRole("button", { name: "Update" });
+        await userEvent.click(submitButton);
+
+        // Check emitted payload
+        expect(screen.emitted().submit).toBeTruthy();
+        const emittedPayload = screen.emitted().submit[0][0];
+        expect(emittedPayload).toMatchObject({
+            name: "Jane Doe",
+            username: "janedoe",
+            password: "newpassword123",
+            role: Role.MANAGER,
+            email: "janedoe@TestOrg.at",
+            relatedProperties: ["property1", "property2"],
+        });
+    });
+
+    it("resets the form when reset button is clicked", async () => {
+        const screen = renderComponent(UserEditForm, props);
+
+        // Modify fields
+        await userEvent.clear(screen.getByLabelText(/Name */));
+        await userEvent.type(screen.getByLabelText(/Name */), "Jane Doe");
+
+        await userEvent.type(screen.getByLabelText("User password *"), "newpassword123");
+
+        // Deselect a property
+        const propertyCheckbox = screen.getByRole("checkbox", { name: "Property 1" });
+        await userEvent.click(propertyCheckbox);
+
+        // Reset the form
+        const resetButton = screen.getByRole("button", { name: "Reset" });
+        await userEvent.click(resetButton);
+
+        // Check that fields are reset
+        expect(
+            screen
+                .getByLabelText(/Name */)
+                .query()
+                .getAttribute("value"),
+        ).toBe(props.user.name);
+        expect(screen.getByLabelText("User password *").query().getAttribute("value")).toBe("");
+
+        // Check that properties are reset
+        const propertyCheckboxes = screen.getByRole("checkbox", {
+            name: /Property/,
+        });
+        for (const checkbox of propertyCheckboxes.elements()) {
+            const label = checkbox.getAttribute("aria-label");
+            const isChecked = props.selectedProperties.some(function (property) {
+                return property.name === label;
+            });
+            expect(checkbox.getAttribute("aria-checked")).toBe(isChecked ? "true" : "false");
+        }
+    });
+
+    it("does not show role and properties selection when role is not editable", () => {
+        props.user.role = Role.PROPERTY_OWNER;
+        const screen = renderComponent(UserEditForm, props);
+
+        // Role select should not be present
+        expect(screen.getByLabelText("Role").query()).toBeNull();
+
+        // Properties selection should not be present
+        const propertyCheckboxes = screen.getByRole("checkbox", {
+            name: /Property/,
+        });
+        expect(propertyCheckboxes.elements().length).toBe(0);
+    });
+
+    it("shows capabilities checkboxes only for STAFF role", () => {
+        props.user.role = Role.STAFF;
+        let screen = renderComponent(UserEditForm, props);
+        expect(screen.getByText("Capabilities:").query()).toBeTruthy();
+
+        screen.unmount();
+
+        props.user.role = Role.MANAGER;
+        screen = renderComponent(UserEditForm, props);
+
+        expect(screen.getByText("Capabilities:").query()).toBeNull();
+    });
+});

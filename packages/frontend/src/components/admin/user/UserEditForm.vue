@@ -4,6 +4,7 @@ import type {
     OrganisationDoc,
     PropertyDoc,
     User,
+    UserCapabilities,
     UserCapability,
 } from "@firetable/types";
 import { computed, ref, useTemplateRef } from "vue";
@@ -29,11 +30,16 @@ const emit = defineEmits<Emits>();
 const props = defineProps<Props>();
 const userEditForm = useTemplateRef<QForm>("userEditForm");
 
-const defaultCapabilitiesForRole = DEFAULT_CAPABILITIES_BY_ROLE[Role.STAFF];
-const userCapabilities = {
-    ...defaultCapabilitiesForRole,
-    ...props.user.capabilities,
-};
+const defaultCapabilitiesForRole = computed(function () {
+    return DEFAULT_CAPABILITIES_BY_ROLE[props.user.role];
+});
+
+function getUserCapabilities(): UserCapabilities {
+    return {
+        ...defaultCapabilitiesForRole.value,
+        ...props.user.capabilities,
+    };
+}
 
 const isStaff = computed(function () {
     return props.user.role === Role.STAFF;
@@ -42,7 +48,7 @@ const isStaff = computed(function () {
 const form = ref<EditUserPayload["updatedUser"]>({
     ...props.user,
     password: "",
-    capabilities: isStaff.value ? userCapabilities : undefined,
+    capabilities: isStaff.value ? getUserCapabilities() : undefined,
 });
 const chosenProperties = ref<string[]>(props.selectedProperties.map(property("id")));
 
@@ -68,14 +74,19 @@ async function onSubmit(): Promise<void> {
 }
 
 function prepareAndEmitSubmission(): void {
+    const valuesToEmit = {
+        ...form.value,
+        capabilities: form.value.role === Role.STAFF ? form.value.capabilities : undefined,
+        relatedProperties: chosenProperties.value,
+    };
     // Filter out empty or null values
     const filteredForm = Object.fromEntries(
-        Object.entries(form.value).filter(function ([, value]) {
-            return value !== "" && value !== null;
+        Object.entries(valuesToEmit).filter(function ([, value]) {
+            return value !== "" && value != null;
         }),
     );
 
-    if (form.value.username) {
+    if (filteredForm.username) {
         filteredForm.email = `${form.value.username}${emailSuffix.value}`;
     }
 
@@ -89,7 +100,7 @@ function onReset(): void {
     form.value = {
         ...props.user,
         password: "",
-        capabilities: isStaff.value ? userCapabilities : undefined,
+        capabilities: isStaff.value ? getUserCapabilities() : undefined,
     };
     resetProperties();
 }
