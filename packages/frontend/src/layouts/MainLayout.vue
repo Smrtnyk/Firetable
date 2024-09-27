@@ -6,9 +6,11 @@ import NetworkOverlay from "src/components/NetworkOverlay.vue";
 import { useAuthStore } from "src/stores/auth-store";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
+import { useRoute } from "vue-router";
+
+const route = useRoute();
 
 const { isLoggedIn } = storeToRefs(useAuthStore());
-
 const isDrawerVisible = ref(false);
 </script>
 
@@ -20,6 +22,7 @@ const isDrawerVisible = ref(false);
         <q-page-container>
             <q-page class="q-pa-xs-xs q-pa-sm-sm q-pa-md-md row">
                 <router-view
+                    :key="route.fullPath"
                     v-slot="{ Component }"
                     class="col-xs-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3"
                 >
