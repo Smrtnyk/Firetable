@@ -118,7 +118,7 @@ vi.mock("@firetable/backend", () => {
     };
 });
 
-installPinia({ stubActions: false });
+installPinia();
 
 // FIXME: fix these tests, seems like there is a bug with vitest.mock
 describe.skip("useReservations", () => {
