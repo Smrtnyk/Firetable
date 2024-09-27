@@ -235,12 +235,7 @@ function showEventForm(event?: EventDoc): void {
     <div class="PageAdminEvents">
         <FTTitle title="Events">
             <template #right>
-                <q-btn
-                    rounded
-                    icon="plus"
-                    class="button-gradient q-mb-md"
-                    @click="showEventForm()"
-                />
+                <q-btn rounded icon="plus" class="button-gradient" @click="showEventForm()" />
             </template>
         </FTTitle>
 
