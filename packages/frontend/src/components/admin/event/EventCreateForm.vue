@@ -15,7 +15,6 @@ import {
     requireNumber,
     validOptionalURL,
 } from "src/helpers/form-rules";
-import { useRouter } from "vue-router";
 
 import { QForm } from "quasar";
 import { showErrorMessage } from "src/helpers/ui-helpers";
@@ -61,7 +60,6 @@ const isEditMode = computed(function () {
     return Boolean(props.event);
 });
 const { t } = useI18n();
-const router = useRouter();
 const form = useTemplateRef<QForm>("form");
 const state = ref<State>({
     form: { ...eventObj },
@@ -122,10 +120,6 @@ const displayedDate = computed(function () {
     return `${state.value.selectedDate} ${state.value.selectedTime}`;
 });
 
-const totalFloors = computed(function () {
-    return props.floors.length;
-});
-
 function validateAndEmitCreate(): void {
     if (state.value.chosenFloors.length === 0) {
         showErrorMessage(t("EventCreateForm.noChosenFloorsMessage"));
@@ -176,139 +170,122 @@ function onReset(): void {
 </script>
 
 <template>
-    <div class="column justify-center items-center q-pa-md" v-if="!totalFloors && !props.event">
-        <h6 class="q-ma-sm text-weight-bolder underline">
-            {{ t("EventCreateForm.noFloorPlansMessage") }}
-        </h6>
-        <q-btn
+    <q-form ref="form" class="q-gutter-xs q-pt-md q-pa-md" @submit="onSubmit" @reset="onReset">
+        <q-input
+            v-model="state.form.img"
             rounded
-            class="button-gradient q-mx-auto"
-            @click="() => router.replace('/admin/floors')"
-            v-close-popup
-            size="lg"
-        >
-            {{ t("EventCreateForm.goToFloorPlannerMessage") }}
-        </q-btn>
-    </div>
+            standout
+            :label="t('EventCreateForm.eventImgInputLabel')"
+            lazy-rules
+            :rules="[validOptionalURL()]"
+        />
 
-    <template v-else>
-        <q-form ref="form" class="q-gutter-xs q-pt-md q-pa-md" @submit="onSubmit" @reset="onReset">
-            <q-input
-                v-model="state.form.img"
-                rounded
-                standout
-                :label="t('EventCreateForm.eventImgInputLabel')"
-                lazy-rules
-                :rules="[validOptionalURL()]"
-            />
+        <q-input
+            v-model="state.form.name"
+            rounded
+            standout
+            :label="t('EventCreateForm.eventNameInputLabel')"
+            lazy-rules
+            :rules="[noEmptyString()]"
+        />
 
-            <q-input
-                v-model="state.form.name"
-                rounded
-                standout
-                :label="t('EventCreateForm.eventNameInputLabel')"
-                lazy-rules
-                :rules="[noEmptyString()]"
-            />
+        <q-input
+            v-model.number="state.form.guestListLimit"
+            rounded
+            standout
+            type="number"
+            :label="t('EventCreateForm.guestListLimitInputLabel')"
+            lazy-rules
+            :rules="[requireNumber(), greaterThanZero()]"
+        />
 
-            <q-input
-                v-model.number="state.form.guestListLimit"
-                rounded
-                standout
-                type="number"
-                :label="t('EventCreateForm.guestListLimitInputLabel')"
-                lazy-rules
-                :rules="[requireNumber(), greaterThanZero()]"
-            />
+        <q-input
+            v-model.number="state.form.entryPrice"
+            rounded
+            standout
+            type="number"
+            :label="t('EventCreateForm.entryPriceInputLabel')"
+            lazy-rules
+            :rules="[requireNumber()]"
+        />
 
-            <q-input
-                v-model.number="state.form.entryPrice"
-                rounded
-                standout
-                type="number"
-                :label="t('EventCreateForm.entryPriceInputLabel')"
-                lazy-rules
-                :rules="[requireNumber()]"
-            />
+        <q-input v-model="displayedDate" rounded standout readonly class="q-mb-lg">
+            <template #prepend>
+                <q-icon name="calendar" class="cursor-pointer" />
+                <q-popup-proxy transition-show="scale" transition-hide="scale">
+                    <q-date
+                        :no-unset="true"
+                        v-model="state.selectedDate"
+                        mask="DD.MM.YYYY"
+                        today-btn
+                        @update:model-value="updateDate"
+                        :options="validDates"
+                    >
+                        <div class="row items-center justify-end">
+                            <q-btn
+                                :label="t('EventCreateForm.inputDateTimePickerCloseBtnLabel')"
+                                color="primary"
+                                flat
+                                v-close-popup
+                            />
+                        </div>
+                    </q-date>
+                </q-popup-proxy>
+            </template>
+            <template #append>
+                <q-icon name="clock" class="cursor-pointer" />
+                <q-popup-proxy transition-show="scale" transition-hide="scale">
+                    <q-time
+                        v-model="state.selectedTime"
+                        mask="HH:mm"
+                        format24h
+                        @update:model-value="updateTime"
+                    >
+                        <div class="row items-center justify-end">
+                            <q-btn
+                                :label="t('EventCreateForm.inputDateTimePickerCloseBtnLabel')"
+                                color="primary"
+                                flat
+                                v-close-popup
+                            />
+                        </div>
+                    </q-time>
+                </q-popup-proxy>
+            </template>
+        </q-input>
 
-            <q-input v-model="displayedDate" rounded standout readonly class="q-mb-lg">
-                <template #prepend>
-                    <q-icon name="calendar" class="cursor-pointer" />
-                    <q-popup-proxy transition-show="scale" transition-hide="scale">
-                        <q-date
-                            :no-unset="true"
-                            v-model="state.selectedDate"
-                            mask="DD.MM.YYYY"
-                            today-btn
-                            @update:model-value="updateDate"
-                            :options="validDates"
-                        >
-                            <div class="row items-center justify-end">
-                                <q-btn
-                                    :label="t('EventCreateForm.inputDateTimePickerCloseBtnLabel')"
-                                    color="primary"
-                                    flat
-                                    v-close-popup
-                                />
-                            </div>
-                        </q-date>
-                    </q-popup-proxy>
-                </template>
-                <template #append>
-                    <q-icon name="clock" class="cursor-pointer" />
-                    <q-popup-proxy transition-show="scale" transition-hide="scale">
-                        <q-time
-                            v-model="state.selectedTime"
-                            mask="HH:mm"
-                            format24h
-                            @update:model-value="updateTime"
-                        >
-                            <div class="row items-center justify-end">
-                                <q-btn
-                                    :label="t('EventCreateForm.inputDateTimePickerCloseBtnLabel')"
-                                    color="primary"
-                                    flat
-                                    v-close-popup
-                                />
-                            </div>
-                        </q-time>
-                    </q-popup-proxy>
-                </template>
-            </q-input>
-
-            <div class="q-gutter-sm q-mb-lg" v-if="!isEditMode">
-                <div class="text-h6">{{ props.propertyName }}</div>
-                <div>
-                    <q-checkbox
-                        v-for="floor in props.floors"
-                        :key="floor.id"
-                        v-model="state.chosenFloors"
-                        :val="floor.id"
-                        :label="floor.name"
-                        color="accent"
-                    />
-                </div>
-            </div>
-
+        <div class="q-gutter-sm q-mb-lg" v-if="!isEditMode">
+            <div class="text-h6">{{ props.propertyName }}</div>
             <div>
-                <q-btn
-                    rounded
-                    size="md"
-                    :label="t('Global.submit')"
-                    type="submit"
-                    class="button-gradient"
-                />
-                <q-btn
-                    v-if="!isEditMode"
-                    rounded
-                    size="md"
-                    :label="t('Global.reset')"
-                    type="reset"
-                    class="q-ml-sm"
-                    outline
-                    color="primary"
+                <q-checkbox
+                    v-for="floor in props.floors"
+                    :key="floor.id"
+                    v-model="state.chosenFloors"
+                    :val="floor.id"
+                    :label="floor.name"
+                    color="accent"
                 />
             </div>
-        </q-form>
-    </template>
+        </div>
+
+        <div>
+            <q-btn
+                rounded
+                size="md"
+                :label="t('Global.submit')"
+                type="submit"
+                class="button-gradient"
+            />
+            <q-btn
+                v-if="!isEditMode"
+                rounded
+                size="md"
+                :label="t('Global.reset')"
+                type="reset"
+                class="q-ml-sm"
+                outline
+                color="primary"
+            />
+        </div>
+    </q-form>
 </template>
