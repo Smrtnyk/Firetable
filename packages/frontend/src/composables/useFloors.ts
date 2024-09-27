@@ -6,13 +6,6 @@ import { floorsCollection } from "@firetable/backend";
 import { query, where, onSnapshot } from "firebase/firestore";
 import { AppLogger } from "src/logger/FTLogger.js";
 
-export type PropertyFloors = {
-    propertyName: string;
-    propertyId: string;
-    organisationId: string;
-    floors: FloorDoc[];
-};
-
 export function useFloors(
     propertyId: string,
     organisationId: string,

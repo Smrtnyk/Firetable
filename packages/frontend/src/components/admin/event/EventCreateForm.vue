@@ -4,8 +4,8 @@ import type {
     CreateEventPayload,
     EditEventPayload,
     EventDoc,
+    FloorDoc,
 } from "@firetable/types";
-import type { PropertyFloors } from "src/composables/useFloors";
 import { computed, ref, watch, watchEffect, useTemplateRef } from "vue";
 
 import { useI18n } from "vue-i18n";
@@ -31,7 +31,10 @@ interface State {
 }
 
 interface Props {
-    property: PropertyFloors;
+    propertyId: string;
+    organisationId: string;
+    propertyName: string;
+    floors: FloorDoc[];
     event?: EventDoc;
     eventStartHours: string;
 }
@@ -120,7 +123,7 @@ const displayedDate = computed(function () {
 });
 
 const totalFloors = computed(function () {
-    return props.property.floors.length;
+    return props.floors.length;
 });
 
 function validateAndEmitCreate(): void {
@@ -129,7 +132,7 @@ function validateAndEmitCreate(): void {
         return;
     }
 
-    const selectedFloors = Object.values(props.property.floors).filter(function (floor) {
+    const selectedFloors = Object.values(props.floors).filter(function (floor) {
         return state.value.chosenFloors.includes(floor.id);
     });
 
@@ -141,8 +144,8 @@ function validateAndEmitCreate(): void {
     emit("create", {
         ...state.value.form,
         guestListLimit: Number(state.value.form.guestListLimit),
-        propertyId: props.property.propertyId,
-        organisationId: props.property.organisationId,
+        propertyId: props.propertyId,
+        organisationId: props.organisationId,
         floors: selectedFloors,
     });
     state.value.form = eventObj;
@@ -152,8 +155,8 @@ function validateAndEmitEdit(): void {
     emit("update", {
         ...state.value.form,
         guestListLimit: Number(state.value.form.guestListLimit),
-        propertyId: props.property.propertyId,
-        organisationId: props.property.organisationId,
+        propertyId: props.propertyId,
+        organisationId: props.organisationId,
     });
 }
 
@@ -274,10 +277,10 @@ function onReset(): void {
             </q-input>
 
             <div class="q-gutter-sm q-mb-lg" v-if="!isEditMode">
-                <div class="text-h6">{{ props.property.propertyName }}</div>
+                <div class="text-h6">{{ props.propertyName }}</div>
                 <div>
                     <q-checkbox
-                        v-for="floor in props.property.floors"
+                        v-for="floor in props.floors"
                         :key="floor.id"
                         v-model="state.chosenFloors"
                         :val="floor.id"

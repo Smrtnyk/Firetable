@@ -72,7 +72,7 @@ export async function addLogToEvent(
 }
 
 export async function getEvents(
-    lastDocument: DocumentData | null,
+    lastDocument: DocumentData | undefined,
     countPerPage: number,
     owner: EventOwner,
 ): Promise<EventDoc[]> {

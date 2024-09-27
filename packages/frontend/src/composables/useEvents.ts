@@ -1,8 +1,9 @@
 import type { QueryDocumentSnapshot } from "firebase/firestore";
 import type { EventDoc } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
-import { reactive, ref } from "vue";
+import { ref } from "vue";
 import { getEvents } from "@firetable/backend";
+import { last } from "es-toolkit";
 
 const EVENTS_PER_PAGE = 50;
 
@@ -11,14 +12,9 @@ const EVENTS_PER_PAGE = 50;
  *
  * This composable provides functionality to fetch and manage events from a backend service.
  *
- * @property eventsByProperty - A reactive object that holds events
- * grouped by their respective property IDs. Each property ID maps to a Set of EventDoc objects.
+ * @property events - A reactive array that holds events
  *
- * @property lastFetchedDocForProperty - A reactive object that
- * tracks the last fetched document (event) for each property ID. This is used for pagination purposes,
- * ensuring that subsequent fetches start after this document.
- *
- * @property hasMoreEventsToFetch - A ref that indicates whether there are more events to
+ * @property done - A ref that indicates whether there are more events to
  * fetch. It's set to `false` when the fetched events are less than the expected EVENTS_PER_PAGE, signaling
  * that there might be no more events to fetch.
  *
@@ -30,45 +26,37 @@ const EVENTS_PER_PAGE = 50;
  * @property isLoading - A ref that indicates the loading state. It's initially set to `true`
  * and becomes `false` after the first fetch completes. It remains unchanged for subsequent fetches.
  */
-export function useEvents() {
-    const eventsByProperty = reactive<Record<string, Set<EventDoc>>>({});
-    const lastFetchedDocForProperty = reactive<Record<string, QueryDocumentSnapshot | null>>({});
-    const hasMoreEventsToFetch = reactive<Record<string, boolean>>({});
+export function useEvents(eventOwner: EventOwner) {
+    const events = ref<EventDoc[]>([]);
+    const lastFetchedDoc = ref<QueryDocumentSnapshot | undefined>();
+    const done = ref(false);
 
     const isLoading = ref(false);
 
-    async function fetchMoreEvents(
-        eventOwner: EventOwner,
-        lastDoc: QueryDocumentSnapshot | null,
-    ): Promise<EventDoc[]> {
+    async function fetchMoreEvents(): Promise<void> {
+        if (done.value) {
+            return;
+        }
+
         isLoading.value = true;
-        const { propertyId } = eventOwner;
 
         try {
-            const eventsDocs = await getEvents(lastDoc, EVENTS_PER_PAGE, eventOwner);
-            lastFetchedDocForProperty[propertyId] =
-                eventsDocs.length > 0 ? eventsDocs[eventsDocs.length - 1]._doc : null;
+            const eventsDocs = await getEvents(lastFetchedDoc.value, EVENTS_PER_PAGE, eventOwner);
+            lastFetchedDoc.value = last(eventsDocs)?._doc;
 
-            eventsByProperty[propertyId] = new Set([
-                ...eventsByProperty[propertyId],
-                ...eventsDocs,
-            ]);
+            events.value.push(...eventsDocs);
 
             if (!eventsDocs || eventsDocs.length < EVENTS_PER_PAGE) {
-                hasMoreEventsToFetch[propertyId] = false;
+                done.value = true;
             }
-
-            return eventsDocs;
         } finally {
             isLoading.value = false;
         }
     }
 
     return {
-        EVENTS_PER_PAGE,
-        eventsByProperty,
-        lastFetchedDocForProperty,
-        hasMoreEventsToFetch,
+        events,
+        done,
         fetchMoreEvents,
         isLoading,
     };
