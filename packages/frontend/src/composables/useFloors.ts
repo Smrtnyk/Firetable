@@ -1,7 +1,7 @@
+import type { FloorDoc, VoidFunction } from "@firetable/types";
 import type { Ref } from "vue";
-import type { FloorDoc, PropertyDoc, VoidFunction } from "@firetable/types";
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import { onUnmounted, ref, watch } from "vue";
+import { ref, onUnmounted } from "vue";
 import { floorsCollection } from "@firetable/backend";
 import { query, where, onSnapshot } from "firebase/firestore";
 import { AppLogger } from "src/logger/FTLogger.js";
@@ -13,24 +13,16 @@ export type PropertyFloors = {
     floors: FloorDoc[];
 };
 
-export type UsePropertyFloors = Record<string, PropertyFloors>;
-
-export function useFloors(properties: Ref<PropertyDoc[]>) {
-    const floors = ref<UsePropertyFloors>({});
+export function useFloors(
+    propertyId: string,
+    organisationId: string,
+): {
+    floors: Ref<FloorDoc[]>;
+    isLoading: Ref<boolean>;
+} {
+    const floors = ref<FloorDoc[]>([]);
     const isLoading = ref(false);
     const unsubscribes: VoidFunction[] = [];
-
-    const watcher = watch(
-        properties,
-        async function (newProperties) {
-            if (newProperties.length > 0) {
-                await fetchAllFloors();
-            }
-        },
-        { immediate: true, deep: true },
-    );
-
-    unsubscribes.push(watcher);
 
     onUnmounted(function () {
         unsubscribes.forEach(function (unsubscribe) {
@@ -38,28 +30,23 @@ export function useFloors(properties: Ref<PropertyDoc[]>) {
         });
     });
 
-    function fetchFloorsForProperty(property: PropertyDoc): Promise<void> {
+    async function fetchFloorsForProperty(): Promise<void> {
         const floorQuery = query(
-            floorsCollection(property.organisationId, property.id),
-            where("propertyId", "==", property.id),
+            floorsCollection(organisationId, propertyId),
+            where("propertyId", "==", propertyId),
         );
 
-        return new Promise<void>(function (resolve, reject) {
+        floors.value = await new Promise<FloorDoc[]>(function (resolve, reject) {
             const unsubscribe = onSnapshot(
                 floorQuery,
                 function (snapshot) {
-                    floors.value[property.id] = {
-                        propertyId: property.id,
-                        propertyName: property.name,
-                        organisationId: property.organisationId,
-                        floors: snapshot.docs.map(function (doc) {
-                            return {
-                                ...doc.data(),
-                                id: doc.id,
-                            } as FloorDoc;
-                        }),
-                    };
-                    resolve();
+                    const res = snapshot.docs.map(function (doc) {
+                        return {
+                            ...doc.data(),
+                            id: doc.id,
+                        } as FloorDoc;
+                    });
+                    resolve(res);
                 },
                 function (error) {
                     AppLogger.error("Error fetching floors:", error);
@@ -70,17 +57,18 @@ export function useFloors(properties: Ref<PropertyDoc[]>) {
         });
     }
 
-    async function fetchAllFloors(): Promise<void> {
+    async function fetchFloors(): Promise<void> {
         try {
             isLoading.value = true;
-            const fetchPromises = properties.value.map(fetchFloorsForProperty);
-            await Promise.all(fetchPromises);
+            await fetchFloorsForProperty();
         } catch (error) {
             showErrorMessage(error);
         } finally {
             isLoading.value = false;
         }
     }
+
+    fetchFloors();
 
     return { floors, isLoading };
 }

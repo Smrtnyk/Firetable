@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import type { CreateEventPayload, EditEventPayload, EventDoc, PropertyDoc } from "@firetable/types";
+import type { CreateEventPayload, EditEventPayload, EventDoc } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
+import type { PropertyFloors } from "src/composables/useFloors";
 import AdminPropertyEventsList from "src/components/admin/event/AdminPropertyEventsList.vue";
 import EventCreateForm from "src/components/admin/event/EventCreateForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import FTDialog from "src/components/FTDialog.vue";
-import FTTabs from "src/components/FTTabs.vue";
-import FTTabPanels from "src/components/FTTabPanels.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
@@ -27,7 +26,12 @@ import { usePropertiesStore } from "src/stores/properties-store";
 import { last } from "es-toolkit";
 import { matchesProperty } from "es-toolkit/compat";
 
-const props = defineProps<{ organisationId: string }>();
+interface Props {
+    organisationId: string;
+    propertyId: string;
+}
+
+const { organisationId, propertyId } = defineProps<Props>();
 
 const router = useRouter();
 const quasar = useQuasar();
@@ -43,20 +47,20 @@ const {
 } = useEvents();
 const activePropertyId = ref("");
 const properties = computed(function () {
-    return propertiesStore.getPropertiesByOrganisationId(props.organisationId);
+    return propertiesStore.getPropertiesByOrganisationId(organisationId);
 });
 
-const { floors, isLoading: isFloorsLoading } = useFloors(properties);
+const { floors, isLoading: isFloorsLoading } = useFloors(propertyId, organisationId);
 const isAnyLoading = computed(function () {
     return isFloorsLoading.value || isLoadingEvents.value;
 });
 
 const settings = computed(function () {
-    return propertiesStore.getOrganisationSettingsById(props.organisationId);
+    return propertiesStore.getOrganisationSettingsById(organisationId);
 });
 
 onBeforeMount(function () {
-    if (!props.organisationId) {
+    if (!organisationId || !propertyId) {
         router.replace("/");
     }
 });
@@ -113,8 +117,8 @@ function fetchEventsForActiveTab(): void {
         return;
     }
     const eventOwner: EventOwner = {
-        propertyId: activeProperty.id,
-        organisationId: props.organisationId,
+        propertyId,
+        organisationId,
         id: "",
     };
     fetchMoreEvents(eventOwner, null);
@@ -123,11 +127,11 @@ function fetchEventsForActiveTab(): void {
 async function onCreateEvent(eventData: CreateEventPayload): Promise<void> {
     await tryCatchLoadingWrapper({
         async hook() {
-            const { id: eventId, propertyId } = (await createNewEvent(eventData)).data;
+            const { id: eventId } = (await createNewEvent(eventData)).data;
             quasar.notify(t("PageAdminEvents.eventCreatedNotificationMessage"));
             await router.push({
                 name: "adminEvent",
-                params: { eventId, propertyId, organisationId: props.organisationId },
+                params: { eventId, propertyId, organisationId },
             });
         },
     });
@@ -139,7 +143,7 @@ async function onUpdateEvent(eventData: EditEventPayload & { id: string }): Prom
             await updateEvent(
                 {
                     propertyId: eventData.propertyId,
-                    organisationId: props.organisationId,
+                    organisationId,
                     id: eventData.id,
                 },
                 eventData,
@@ -160,7 +164,7 @@ async function onEventItemSlideRight(event: EventDoc): Promise<void> {
             await deleteDocAndAllSubCollections(
                 getEventsPath({
                     propertyId: event.propertyId,
-                    organisationId: props.organisationId,
+                    organisationId,
                     id: "",
                 }),
                 event.id,
@@ -170,19 +174,14 @@ async function onEventItemSlideRight(event: EventDoc): Promise<void> {
     });
 }
 
-function onEventEdit(property: PropertyDoc, event: EventDoc): void {
-    showCreateEventForm(property, event);
-}
-
-async function onLoad(property: PropertyDoc): Promise<void> {
-    const propertyId = property.id;
+async function onLoad(): Promise<void> {
     if (!hasMoreEventsToFetch[propertyId]) {
         return;
     }
 
     const eventOwner: EventOwner = {
         propertyId,
-        organisationId: props.organisationId,
+        organisationId,
         id: "",
     };
     const lastDoc = last([...eventsByProperty[propertyId]])?._doc ?? null;
@@ -193,7 +192,13 @@ async function onLoad(property: PropertyDoc): Promise<void> {
     }
 }
 
-function showCreateEventForm(property: PropertyDoc, event?: EventDoc): void {
+function showEventForm(event?: EventDoc): void {
+    const propertyFloors: PropertyFloors = {
+        propertyId,
+        floors: floors.value,
+        organisationId,
+        propertyName: propertiesStore.getPropertyNameById(propertyId),
+    };
     const dialog = createDialog({
         component: FTDialog,
         componentProps: {
@@ -201,7 +206,7 @@ function showCreateEventForm(property: PropertyDoc, event?: EventDoc): void {
             maximized: false,
             component: EventCreateForm,
             componentPropsObject: {
-                property: floors.value[property.id],
+                propertyFloors,
                 event,
                 eventStartHours: settings.value.event.eventStartTime24HFormat,
             },
@@ -228,43 +233,30 @@ function showCreateEventForm(property: PropertyDoc, event?: EventDoc): void {
 
 <template>
     <div class="PageAdminEvents">
-        <FTTitle title="Events" />
+        <FTTitle title="Events">
+            <template #right>
+                <q-btn
+                    rounded
+                    icon="plus"
+                    class="button-gradient q-mb-md"
+                    @click="showEventForm()"
+                />
+            </template>
+        </FTTitle>
 
         <FTCenteredText v-if="properties.length === 0 && !isLoadingEvents">
             {{ t("PageAdminEvents.noPropertiesMessage") }}
         </FTCenteredText>
 
         <div v-else>
-            <FTTabs v-model="activePropertyId" @input="fetchEventsForActiveTab">
-                <q-tab
-                    v-for="property in properties"
-                    :key="property.id"
-                    :label="property.name"
-                    :name="property.id"
-                />
-            </FTTabs>
-
-            <FTTabPanels v-model="activePropertyId">
-                <q-tab-panel v-for="property in properties" :key="property.id" :name="property.id">
-                    <div class="row justify-end">
-                        <q-btn
-                            rounded
-                            icon="plus"
-                            class="button-gradient q-mb-md"
-                            @click="showCreateEventForm(property)"
-                        />
-                    </div>
-
-                    <AdminPropertyEventsList
-                        :property="property"
-                        :events-by-property="eventsByProperty"
-                        @delete="onEventItemSlideRight"
-                        @edit="(event: EventDoc) => onEventEdit(property, event)"
-                        @load="onLoad"
-                        :done="!hasMoreEventsToFetch[property.id]"
-                    />
-                </q-tab-panel>
-            </FTTabPanels>
+            <AdminPropertyEventsList
+                :property-id="propertyId"
+                :events="Array.from(eventsByProperty[propertyId])"
+                @delete="onEventItemSlideRight"
+                @edit="(event: EventDoc) => showEventForm(event)"
+                @load="onLoad"
+                :done="!hasMoreEventsToFetch[propertyId]"
+            />
         </div>
     </div>
 </template>

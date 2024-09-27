@@ -71,7 +71,7 @@ describe("AppDrawer", () => {
             },
         );
 
-        const expectedLinks = ["Manage Events", "Manage Users", "Manage Analytics", "Settings"];
+        const expectedLinks = ["Manage Users", "Manage Analytics", "Settings"];
 
         const allLinks = document.querySelectorAll(".q-item__section--main");
         const visibleLinks = Array.from(allLinks).map((link) => link.textContent);

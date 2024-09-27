@@ -1,35 +1,31 @@
 <script setup lang="ts">
 import type { FloorDoc, VoidFunction } from "@firetable/types";
-import type { PropertyFloors } from "src/composables/useFloors";
 
 import AddNewFloorForm from "src/components/Floor/AddNewFloorForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
-import FTTabs from "src/components/FTTabs.vue";
-import FTTabPanels from "src/components/FTTabPanels.vue";
 
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { Loading, useQuasar } from "quasar";
 import { makeRawFloor } from "@firetable/floor-creator";
 import { addFloor, deleteFloor } from "@firetable/backend";
 import { useFloors } from "src/composables/useFloors";
-import { ref, watch, computed } from "vue";
+import { watch } from "vue";
 import { useI18n } from "vue-i18n";
-import { usePropertiesStore } from "src/stores/properties-store";
 import { property } from "es-toolkit/compat";
 
-const props = defineProps<{ organisationId: string }>();
+interface Props {
+    organisationId: string;
+    propertyId: string;
+}
 
-const propertiesStore = usePropertiesStore();
+const { organisationId, propertyId } = defineProps<Props>();
+
 const quasar = useQuasar();
 const { t } = useI18n();
 
-const properties = computed(function () {
-    return propertiesStore.getPropertiesByOrganisationId(props.organisationId);
-});
-const { floors, isLoading } = useFloors(properties);
-const activeTab = ref("");
+const { floors, isLoading } = useFloors(propertyId, organisationId);
 
 watch(isLoading, function (loadingVal) {
     if (loadingVal) {
@@ -39,17 +35,7 @@ watch(isLoading, function (loadingVal) {
     }
 });
 
-watch(
-    floors,
-    function (newFloors) {
-        if (Object.keys(newFloors).length > 0 && !activeTab.value) {
-            activeTab.value = Object.keys(newFloors)[0];
-        }
-    },
-    { immediate: true, deep: true },
-);
-
-function showAddNewFloorForm(propertyData: PropertyFloors, floorDocs: FloorDoc[]): void {
+function showAddNewFloorForm(floorDocs: FloorDoc[]): void {
     const dialog = quasar.dialog({
         component: FTDialog,
         componentProps: {
@@ -62,13 +48,13 @@ function showAddNewFloorForm(propertyData: PropertyFloors, floorDocs: FloorDoc[]
                         hook() {
                             const rawFloor = {
                                 ...makeRawFloor(name),
-                                propertyId: propertyData.propertyId,
+                                propertyId,
                             };
 
                             return addFloor(
                                 {
-                                    organisationId: propertyData.organisationId,
-                                    id: propertyData.propertyId,
+                                    organisationId,
+                                    id: propertyId,
                                 },
                                 rawFloor,
                             ).then(dialog.hide);
@@ -83,25 +69,22 @@ function showAddNewFloorForm(propertyData: PropertyFloors, floorDocs: FloorDoc[]
     });
 }
 
-async function duplicateFloor(
-    propertyData: PropertyFloors,
-    floor: FloorDoc,
-    reset: VoidFunction,
-): Promise<void> {
-    if (
-        !(await showConfirm(
-            t("PageAdminFloors.duplicateFloorPlanMessage", { floorName: floor.name }),
-        ))
-    )
+async function duplicateFloor(floor: FloorDoc, reset: VoidFunction): Promise<void> {
+    const isConfirmed = await showConfirm(
+        t("PageAdminFloors.duplicateFloorPlanMessage", { floorName: floor.name }),
+    );
+
+    if (!isConfirmed) {
         return reset();
+    }
 
     const duplicatedFloor = { ...floor, name: `${floor.name}_copy` };
     await tryCatchLoadingWrapper({
         hook() {
             return addFloor(
                 {
-                    organisationId: propertyData.organisationId,
-                    id: propertyData.propertyId,
+                    organisationId,
+                    id: propertyId,
                 },
                 duplicatedFloor,
             );
@@ -109,19 +92,17 @@ async function duplicateFloor(
     }).finally(reset);
 }
 
-async function onFloorDelete(
-    propertyData: PropertyFloors,
-    id: string,
-    reset: VoidFunction,
-): Promise<void> {
-    if (!(await showConfirm(t("PageAdminFloors.deleteFloorMessage")))) return reset();
+async function onFloorDelete(id: string, reset: VoidFunction): Promise<void> {
+    if (!(await showConfirm(t("PageAdminFloors.deleteFloorMessage")))) {
+        return reset();
+    }
 
     await tryCatchLoadingWrapper({
         hook() {
             return deleteFloor(
                 {
-                    organisationId: propertyData.organisationId,
-                    id: propertyData.propertyId,
+                    organisationId,
+                    id: propertyId,
                 },
                 id,
             );
@@ -133,76 +114,57 @@ async function onFloorDelete(
 
 <template>
     <div class="PageAdminFloors">
-        <FTTitle :title="t('PageAdminFloors.title')" />
+        <FTTitle :title="t('PageAdminFloors.title')">
+            <template #right>
+                <q-btn
+                    rounded
+                    icon="plus"
+                    class="button-gradient"
+                    @click="showAddNewFloorForm(floors)"
+                />
+            </template>
+        </FTTitle>
 
-        <!-- Tabs for each property -->
-        <FTTabs v-model="activeTab">
-            <q-tab
-                v-for="(propertyData, propertyKey) in floors"
-                :key="propertyKey"
-                :name="propertyKey"
-                :label="propertyData.propertyName"
-            />
-        </FTTabs>
-
-        <!-- Tab panels for each property's floors -->
-        <FTTabPanels v-model="activeTab">
-            <q-tab-panel
-                v-for="(propertyData, propertyKey) in floors"
-                :key="propertyKey"
-                :name="propertyKey"
+        <!-- If the property has floors, display them -->
+        <q-list v-if="floors.length > 0">
+            <q-slide-item
+                v-for="floor in floors"
+                :key="floor.id"
+                right-color="red"
+                left-color="green"
+                @right="({ reset }) => onFloorDelete(floor.id, reset)"
+                @left="({ reset }) => duplicateFloor(floor, reset)"
+                class="fa-card"
             >
-                <!-- Button to add a new floor for the property in the active tab -->
-                <div class="add-floor-btn row justify-end">
-                    <q-btn
-                        rounded
-                        icon="plus"
-                        class="button-gradient"
-                        @click="showAddNewFloorForm(propertyData, propertyData.floors)"
-                    />
-                </div>
-                <!-- If the property has floors, display them -->
-                <q-list v-if="propertyData.floors.length > 0">
-                    <q-slide-item
-                        v-for="floor in propertyData.floors"
-                        :key="floor.id"
-                        right-color="red"
-                        left-color="green"
-                        @right="({ reset }) => onFloorDelete(propertyData, floor.id, reset)"
-                        @left="({ reset }) => duplicateFloor(propertyData, floor, reset)"
-                        class="fa-card"
-                    >
-                        <template #right>
-                            <q-icon name="trash" />
-                        </template>
-                        <template #left>
-                            <q-icon name="copy" />
-                        </template>
-                        <q-item
-                            v-ripple
-                            clickable
-                            :to="{
-                                name: 'adminFloorEdit',
-                                params: {
-                                    floorId: floor.id,
-                                    organisationId: propertyData.organisationId,
-                                    propertyId: propertyData.propertyId,
-                                },
-                            }"
-                        >
-                            <q-item-section>
-                                <q-item-label>{{ floor.name }}</q-item-label>
-                            </q-item-section>
-                        </q-item>
-                    </q-slide-item>
-                </q-list>
+                <template #right>
+                    <q-icon name="trash" />
+                </template>
+                <template #left>
+                    <q-icon name="copy" />
+                </template>
+                <q-item
+                    v-ripple
+                    clickable
+                    :to="{
+                        name: 'adminFloorEdit',
+                        params: {
+                            floorId: floor.id,
+                            organisationId,
+                            propertyId,
+                        },
+                    }"
+                >
+                    <q-item-section>
+                        <q-item-label>{{ floor.name }}</q-item-label>
+                    </q-item-section>
+                </q-item>
+            </q-slide-item>
+        </q-list>
 
-                <!-- If the property doesn't have floors, display a standout message -->
-                <FTCenteredText v-else>
-                    {{ t("PageAdminFloors.noFloorPlansMessage") }}
-                </FTCenteredText>
-            </q-tab-panel>
-        </FTTabPanels>
+        <!-- If the property doesn't have floors, display a standout message -->
+        <FTCenteredText v-else>
+            {{ t("PageAdminFloors.noFloorPlansMessage") }}
+        </FTCenteredText>
 
         <!-- Show "no properties" message when there are no properties and isLoading is false -->
         <FTCenteredText v-if="Object.keys(floors).length === 0 && !isLoading">

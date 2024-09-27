@@ -1,4 +1,4 @@
-import type { EventDoc, PropertyDoc } from "@firetable/types";
+import type { EventDoc } from "@firetable/types";
 import AdminPropertyEventsList from "./AdminPropertyEventsList.vue";
 import { renderComponent } from "../../../../test-helpers/render-component";
 import { describe, it, expect, beforeEach, vi } from "vitest";
@@ -18,57 +18,51 @@ vi.mock("src/components/admin/event/PageAdminEventsListItem.vue", () => ({
     },
 }));
 
+const event1: EventDoc = {
+    id: "event1",
+    name: "Event 1",
+    date: new Date("2021-05-15").getTime(),
+} as EventDoc;
+
+const event2: EventDoc = {
+    id: "event2",
+    name: "Event 2",
+    date: new Date("2021-05-20").getTime(),
+} as EventDoc;
+
+const event3: EventDoc = {
+    id: "event3",
+    name: "Event 3",
+    date: new Date("2021-06-10").getTime(),
+} as EventDoc;
+
+const event4: EventDoc = {
+    id: "event4",
+    name: "Event 4",
+    date: new Date("2022-01-05").getTime(),
+} as EventDoc;
+
+const events = [event1, event2, event3, event4];
+
 describe("PageAdminEventsList", () => {
-    let screen: ReturnType<typeof renderComponent>;
+    const propertyId = "prop1";
 
-    const property = { id: "prop1", name: "Property 1" } as PropertyDoc;
-    const eventsByProperty: Record<string, Set<EventDoc>> = {
-        [property.id]: new Set<EventDoc>(),
-    };
-
-    beforeEach(() => {
-        screen = renderComponent(AdminPropertyEventsList, {
-            property,
-            eventsByProperty,
-            done: false,
-        });
-    });
+    beforeEach(() => {});
 
     it("displays a message when there are no events", () => {
+        renderComponent(AdminPropertyEventsList, {
+            propertyId,
+            events: [],
+            done: false,
+        });
         const message = page.getByText("There are no events created for this property.");
         expect(message).toBeTruthy();
     });
 
     it("displays events grouped by year and month", () => {
-        const event1: EventDoc = {
-            id: "event1",
-            name: "Event 1",
-            date: new Date("2021-05-15").getTime(),
-        } as EventDoc;
-
-        const event2: EventDoc = {
-            id: "event2",
-            name: "Event 2",
-            date: new Date("2021-05-20").getTime(),
-        } as EventDoc;
-
-        const event3: EventDoc = {
-            id: "event3",
-            name: "Event 3",
-            date: new Date("2021-06-10").getTime(),
-        } as EventDoc;
-
-        const event4: EventDoc = {
-            id: "event4",
-            name: "Event 4",
-            date: new Date("2022-01-05").getTime(),
-        } as EventDoc;
-
-        eventsByProperty[property.id] = new Set([event1, event2, event3, event4]);
-
-        screen.rerender({
-            property,
-            eventsByProperty,
+        renderComponent(AdminPropertyEventsList, {
+            propertyId,
+            events,
             done: false,
         });
 
@@ -89,9 +83,9 @@ describe("PageAdminEventsList", () => {
     });
 
     it('emits "load" event when "Load More" button is clicked', async () => {
-        screen.rerender({
-            property,
-            eventsByProperty,
+        const screen = renderComponent(AdminPropertyEventsList, {
+            propertyId,
+            events,
             done: false,
         });
 
@@ -102,20 +96,18 @@ describe("PageAdminEventsList", () => {
         await userEvent.click(loadMoreButton);
         // Check that the "load" event was emitted
         expect(emitted.load).toBeTruthy();
-        expect(emitted.load[0]).toEqual([property]);
+        expect(emitted.load[0]).toEqual([]);
     });
 
     it('emits "edit" and "delete" events when actions are triggered', async () => {
-        const event1 = {
+        const mockEvent = {
             id: "event1",
             name: "Event 1",
             date: new Date("2021-05-15").getTime(),
         };
-        screen.rerender({
-            property,
-            eventsByProperty: {
-                [property.id]: new Set([event1]),
-            },
+        const screen = renderComponent(AdminPropertyEventsList, {
+            propertyId,
+            events: [mockEvent],
             done: false,
         });
 
@@ -133,10 +125,10 @@ describe("PageAdminEventsList", () => {
 
         await userEvent.click(editButton);
         expect(emitted.edit).toBeTruthy();
-        expect(emitted.edit[0]).toEqual([event1]);
+        expect(emitted.edit[0]).toEqual([mockEvent]);
 
         await userEvent.click(deleteButton);
         expect(emitted.delete).toBeTruthy();
-        expect(emitted.delete[0]).toEqual([event1]);
+        expect(emitted.delete[0]).toEqual([mockEvent]);
     });
 });

@@ -14,7 +14,7 @@ import { usePropertiesStore } from "src/stores/properties-store";
 interface Props {
     modelValue: boolean;
 }
-const { nonNullableUser, isAdmin, canSeeInventory, canEditFloorPlans } =
+const { nonNullableUser, isAdmin, canSeeInventory, canEditFloorPlans, canCreateEvents } =
     storeToRefs(useAuthStore());
 const propertiesStore = usePropertiesStore();
 const props = defineProps<Props>();
@@ -27,7 +27,7 @@ const langOptions = [
     { value: "de", label: "German" },
 ];
 
-const inventoryLink = computed(() => {
+const inventoryLink = computed(function () {
     if (isAdmin.value || !canSeeInventory.value) {
         return;
     }
@@ -41,7 +41,7 @@ const inventoryLink = computed(() => {
     });
 });
 
-const manageFloorsLink = computed<GuardedLink | LinkWithChildren | undefined>(() => {
+const manageFloorsLink = computed(function () {
     if (isAdmin.value || !canEditFloorPlans.value) {
         return;
     }
@@ -50,6 +50,20 @@ const manageFloorsLink = computed<GuardedLink | LinkWithChildren | undefined>(()
         label: t("AppDrawer.links.manageFloors"),
         icon: "arrow-expand",
         routeName: "adminFloors",
+        isVisible: true,
+        childIcon: "home",
+    });
+});
+
+const manageEventsLink = computed(function () {
+    if (isAdmin.value || !canCreateEvents.value) {
+        return;
+    }
+
+    return buildExpandableLink({
+        label: t("AppDrawer.links.manageEvents"),
+        icon: "calendar",
+        routeName: "adminEvents",
         isVisible: true,
         childIcon: "home",
     });
@@ -66,12 +80,7 @@ const links = computed<(GuardedLink | LinkWithChildren)[]>(function () {
             label: t("AppDrawer.links.manageOrganisations"),
             isVisible: isAdmin.value,
         },
-        {
-            icon: "calendar",
-            route: { name: "adminEvents", params: { organisationId } },
-            label: t("AppDrawer.links.manageEvents"),
-            isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
-        },
+        manageEventsLink.value,
         {
             icon: "users",
             route: { name: "adminUsers", params: { organisationId } },
@@ -225,6 +234,7 @@ function isLinkWithChildren(link: GuardedLink | LinkWithChildren): link is LinkW
                     :label="link.label"
                     :icon="link.icon"
                     expand-separator
+                    expand-icon="arrow_drop_down"
                 >
                     <q-item
                         v-for="(childLink, childIndex) in link.children"

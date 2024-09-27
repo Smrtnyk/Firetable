@@ -1,32 +1,28 @@
 <script setup lang="ts">
-import type { EventDoc, PropertyDoc, VoidFunction } from "@firetable/types";
+import type { EventDoc, VoidFunction } from "@firetable/types";
 import PageAdminEventsListItem from "src/components/admin/event/PageAdminEventsListItem.vue";
 import { computed } from "vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 
 interface Props {
-    property: PropertyDoc;
-    eventsByProperty: Record<string, Set<EventDoc>>;
+    propertyId: string;
+    events: EventDoc[];
     done: boolean;
 }
 
 const emit = defineEmits<{
     (e: "delete" | "edit", value: EventDoc): void;
-    (e: "load", value: PropertyDoc): void;
+    (e: "load"): void;
 }>();
 
 const props = defineProps<Props>();
-const events = computed(function () {
-    return Array.from(props.eventsByProperty[props.property.id]);
-});
 const eventsLength = computed(function () {
-    return events.value.length;
+    return props.events.length;
 });
 const bucketizedEvents = computed(function () {
-    const eventsArr = Array.from(props.eventsByProperty[props.property.id]);
     const bucketized = new Map<string, Map<string, EventDoc[]>>();
 
-    for (const event of eventsArr) {
+    for (const event of props.events) {
         const date = new Date(event.date);
         const year = date.getUTCFullYear().toString();
         const month = date.toLocaleString("default", { month: "long", timeZone: "UTC" });
@@ -50,7 +46,7 @@ const bucketizedEvents = computed(function () {
 });
 
 function handleLoad(): void {
-    emit("load", props.property);
+    emit("load");
 }
 
 function emitDelete(event: EventDoc, reset: VoidFunction): void {
@@ -65,15 +61,21 @@ function emitEdit(event: EventDoc, reset: VoidFunction): void {
 </script>
 
 <template>
-    <div>
+    <div class="q-pa-sm">
         <FTCenteredText v-if="!eventsLength">
             There are no events created for this property.
         </FTCenteredText>
         <template v-else>
             <div v-for="[year, yearBuckets] in [...bucketizedEvents.entries()]" :key="year">
-                <p>{{ year }}</p>
+                <p>
+                    <b>{{ year }}</b>
+                </p>
 
-                <div v-for="[month, monthEvents] in [...yearBuckets.entries()]" :key="month">
+                <div
+                    class="q-mb-sm"
+                    v-for="[month, monthEvents] in [...yearBuckets.entries()]"
+                    :key="month"
+                >
                     <p>{{ month }}</p>
 
                     <PageAdminEventsListItem

@@ -24,11 +24,6 @@ function createLinks(organisationId: string): Link[] {
     const params = { organisationId };
     return [
         {
-            label: t("AppDrawer.links.manageEvents"),
-            icon: "calendar",
-            route: { name: "adminEvents", params },
-        },
-        {
             label: t("AppDrawer.links.manageUsers"),
             icon: "users",
             route: { name: "adminUsers", params },

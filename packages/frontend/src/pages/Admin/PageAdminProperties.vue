@@ -129,6 +129,12 @@ function createLinks(propertyId: string): Link[] {
     const params = { propertyId, organisationId: props.organisationId };
     return [
         {
+            label: t("AppDrawer.links.manageEvents"),
+            icon: "calendar",
+            route: { name: "adminEvents", params },
+            visible: authStore.canCreateEvents,
+        },
+        {
             label: t("Global.manageInventoryLink"),
             icon: "grid",
             route: { name: "adminInventory", params },

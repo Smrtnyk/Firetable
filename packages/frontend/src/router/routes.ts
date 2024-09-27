@@ -138,7 +138,7 @@ export const routes: RouteRecordRaw[] = [
                 component: () => import("src/pages/Admin/PageAdminGuest.vue"),
             },
             {
-                path: "/admin/:organisationId/events",
+                path: "/admin/:organisationId/:propertyId/events",
                 name: "adminEvents",
                 meta: {
                     requiresAuth: true,
@@ -180,7 +180,7 @@ export const routes: RouteRecordRaw[] = [
                 component: () => import("src/pages/Admin/PageAdminUsers.vue"),
             },
             {
-                path: "/admin/:organisationId/floors",
+                path: "/admin/:organisationId/:propertyId/floors",
                 name: "adminFloors",
                 meta: {
                     requiresAuth: true,
