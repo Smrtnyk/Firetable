@@ -12,6 +12,7 @@ export default {
         price: "Preis",
         submit: "Absenden",
         reset: "Zurücksetzen",
+        manageInventoryLink: "Inventar verwalten",
     },
     AppDrawer: {
         links: {
@@ -126,7 +127,6 @@ export default {
             "Um Immobilien zu erstellen, müssen Sie zuerst eine Organisation erstellen.",
         createPropertyDialogTitle: "Neue Immobilie hinzufügen",
         editPropertyDialogTitle: "Immobilie bearbeiten: {name}",
-        manageInventoryLink: "Inventar verwalten",
     },
     AddNewPropertyForm: {
         propertyNameLengthValidationMessage: "Der Immobilienname muss mindestens 3 Zeichen haben!",

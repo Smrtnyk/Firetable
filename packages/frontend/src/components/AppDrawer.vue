@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { GuardedLink, LinkWithChildren } from "src/types";
 import { Role } from "@firetable/types";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -8,11 +9,13 @@ import { logoutUser } from "@firetable/backend";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "src/stores/auth-store";
+import { usePropertiesStore } from "src/stores/properties-store";
 
 interface Props {
     modelValue: boolean;
 }
-const { nonNullableUser, isAdmin } = storeToRefs(useAuthStore());
+const { nonNullableUser, isAdmin, canSeeInventory } = storeToRefs(useAuthStore());
+const propertiesStore = usePropertiesStore();
 const props = defineProps<Props>();
 const emit = defineEmits<(e: "update:modelValue", value: boolean) => void>();
 const { t, locale } = useI18n();
@@ -23,54 +26,113 @@ const langOptions = [
     { value: "de", label: "German" },
 ];
 
-const links = computed(() => {
+const inventoryLink = computed<GuardedLink | LinkWithChildren | undefined>(function () {
+    const shouldShowInventoryLinks = !isAdmin.value && canSeeInventory.value;
+    if (!shouldShowInventoryLinks) {
+        return;
+    }
+
+    const properties = propertiesStore.getPropertiesByOrganisationId(
+        nonNullableUser.value.organisationId,
+    );
+
+    if (properties.length === 0) {
+        return;
+    }
+
+    if (properties.length === 1) {
+        const property = properties[0];
+        return {
+            icon: "grid",
+            route: {
+                name: "adminInventory",
+                params: {
+                    organisationId: nonNullableUser.value.organisationId,
+                    propertyId: property.id,
+                },
+            },
+            label: t("Global.manageInventoryLink"),
+            isVisible: true,
+        };
+    }
+    // For multiple properties, return an expandable item
+    const children = properties.map(function (property) {
+        return {
+            icon: "home",
+            route: {
+                name: "adminInventory",
+                params: {
+                    organisationId: nonNullableUser.value.organisationId,
+                    propertyId: property.id,
+                },
+            },
+            label: property.name,
+            isVisible: true,
+        };
+    });
+    return {
+        icon: "grid",
+        label: t("Global.manageInventoryLink"),
+        isVisible: true,
+        children,
+    };
+});
+
+const links = computed(function () {
     const role = nonNullableUser.value.role;
     const organisationId = nonNullableUser.value.organisationId;
 
-    return [
+    const allLinks: (GuardedLink | LinkWithChildren)[] = [
         {
             icon: "home",
             route: { name: "adminOrganisations" },
-            text: t("AppDrawer.links.manageOrganisations"),
-            isVisible: isAdmin,
+            label: t("AppDrawer.links.manageOrganisations"),
+            isVisible: isAdmin.value,
         },
         {
             icon: "calendar",
             route: { name: "adminEvents", params: { organisationId } },
-            text: t("AppDrawer.links.manageEvents"),
+            label: t("AppDrawer.links.manageEvents"),
             isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
         },
         {
             icon: "users",
             route: { name: "adminUsers", params: { organisationId } },
-            text: t("AppDrawer.links.manageUsers"),
+            label: t("AppDrawer.links.manageUsers"),
             isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
         },
         {
             icon: "arrow-expand",
             route: { name: "adminFloors", params: { organisationId } },
-            text: t("AppDrawer.links.manageFloors"),
+            label: t("AppDrawer.links.manageFloors"),
             isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
         },
         {
             icon: "line-chart",
             route: { name: "adminAnalytics", params: { organisationId } },
-            text: t("AppDrawer.links.manageAnalytics"),
+            label: t("AppDrawer.links.manageAnalytics"),
             isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
         },
         {
             icon: "cog-wheel",
             route: { name: "adminOrganisationSettings", params: { organisationId } },
-            text: t("AppDrawer.links.settings"),
+            label: t("AppDrawer.links.settings"),
             isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
         },
         {
             icon: "home",
             route: { name: "adminProperties", params: { organisationId } },
-            text: t("AppDrawer.links.manageProperties"),
+            label: t("AppDrawer.links.manageProperties"),
             isVisible: role === Role.PROPERTY_OWNER,
         },
-    ].filter((link) => link.isVisible);
+    ];
+
+    const inventory = inventoryLink.value;
+    if (inventory) {
+        allLinks.push(inventory);
+    }
+
+    return allLinks.filter((link) => link.isVisible);
 });
 
 const avatar = computed(function () {
@@ -98,6 +160,10 @@ function setAppLanguage(val: string): void {
     LocalStorage.set("FTLang", val);
     locale.value = val;
 }
+
+function isLinkWithChildren(link: GuardedLink | LinkWithChildren): link is LinkWithChildren {
+    return "children" in link;
+}
 </script>
 
 <template>
@@ -121,12 +187,36 @@ function setAppLanguage(val: string): void {
 
             <q-separator v-if="links.length > 0" />
 
-            <q-item v-for="(link, index) in links" :key="index" :to="link.route" clickable>
-                <q-item-section avatar>
-                    <q-icon :name="link.icon" />
-                </q-item-section>
-                <q-item-section>{{ link.text }}</q-item-section>
-            </q-item>
+            <!-- Navigation Links -->
+            <template v-for="(link, index) in links" :key="index">
+                <!-- Expandable Item -->
+                <q-expansion-item
+                    v-if="isLinkWithChildren(link)"
+                    :label="link.label"
+                    :icon="link.icon"
+                    expand-separator
+                >
+                    <q-item
+                        v-for="(childLink, childIndex) in link.children"
+                        :key="childIndex"
+                        :to="childLink.route"
+                        clickable
+                    >
+                        <q-item-section avatar>
+                            <q-icon :name="childLink.icon" />
+                        </q-item-section>
+                        <q-item-section>{{ childLink.label }}</q-item-section>
+                    </q-item>
+                </q-expansion-item>
+
+                <!-- Regular Item -->
+                <q-item v-else :to="link.route" clickable>
+                    <q-item-section avatar>
+                        <q-icon :name="link.icon" />
+                    </q-item-section>
+                    <q-item-section>{{ link.label }}</q-item-section>
+                </q-item>
+            </template>
 
             <q-separator spaced />
 

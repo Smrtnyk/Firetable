@@ -129,7 +129,7 @@ function createLinks(propertyId: string): Link[] {
     const params = { propertyId, organisationId: props.organisationId };
     return [
         {
-            label: t("PageAdminProperties.manageInventoryLink"),
+            label: t("Global.manageInventoryLink"),
             icon: "grid",
             route: { name: "adminInventory", params },
             visible: authStore.canSeeInventory,

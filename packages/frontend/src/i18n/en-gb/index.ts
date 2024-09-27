@@ -12,6 +12,7 @@ export default {
         price: "Price",
         submit: "Submit",
         reset: "Reset",
+        manageInventoryLink: "Manage Inventory",
     },
     InventoryTable: {
         quantity: "Quantity",
@@ -125,7 +126,6 @@ export default {
             "In order to create properties, you must first create an organisation.",
         createPropertyDialogTitle: "Add new Property",
         editPropertyDialogTitle: "Editing property: {name}",
-        manageInventoryLink: "Manage Inventory",
     },
     AddNewPropertyForm: {
         propertyNameLengthValidationMessage: "Property name needs to have at least 3 characters!",
