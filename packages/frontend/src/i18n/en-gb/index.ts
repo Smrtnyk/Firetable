@@ -69,6 +69,7 @@ export default {
         guestListLimitInputLabel: "Guest list limit",
         entryPriceInputLabel: "Entry price, leave 0 if free",
         inputDateTimePickerCloseBtnLabel: "Close",
+        inputDateTimeLabel: "Event date and time",
     },
     EventShowReservation: {
         title: "Table",

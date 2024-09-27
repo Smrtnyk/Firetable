@@ -78,7 +78,6 @@ function validDates(calendarDate: string): boolean {
     return dateToCheck >= today;
 }
 
-// In your setup or watchEffect where you determine if you're in edit mode
 watchEffect(function () {
     if (isEditMode.value && props.event) {
         // Use event data if in edit mode
@@ -166,11 +165,18 @@ async function onSubmit(): Promise<void> {
 
 function onReset(): void {
     state.value.form = { ...eventObj };
+    state.value.chosenFloors.length = 0;
 }
 </script>
 
 <template>
-    <q-form ref="form" class="q-gutter-xs q-pt-md q-pa-md" @submit="onSubmit" @reset="onReset">
+    <q-form
+        ref="form"
+        class="q-gutter-xs q-pt-md q-pa-md"
+        @submit="onSubmit"
+        @reset="onReset"
+        greedy
+    >
         <q-input
             v-model="state.form.img"
             rounded
@@ -209,7 +215,14 @@ function onReset(): void {
             :rules="[requireNumber()]"
         />
 
-        <q-input v-model="displayedDate" rounded standout readonly class="q-mb-lg">
+        <q-input
+            :label="t('EventCreateForm.inputDateTimeLabel')"
+            v-model="displayedDate"
+            rounded
+            standout
+            readonly
+            class="q-mb-lg"
+        >
             <template #prepend>
                 <q-icon name="calendar" class="cursor-pointer" />
                 <q-popup-proxy transition-show="scale" transition-hide="scale">

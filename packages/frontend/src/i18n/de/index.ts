@@ -67,6 +67,7 @@ export default {
         inputDateTimePickerCloseBtnLabel: "Schließen",
         submitButtonLabel: "Absenden",
         resetButtonLabel: "Zurücksetzen",
+        inputDateTimeLabel: "Datum und Uhrzeit der Veranstaltung",
     },
     EventShowReservation: {
         title: "Tisch",
