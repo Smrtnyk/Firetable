@@ -10,6 +10,7 @@ import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "src/stores/auth-store";
 import { usePropertiesStore } from "src/stores/properties-store";
+import AppDrawerLink from "src/components/AppDrawerLink.vue";
 
 interface Props {
     modelValue: boolean;
@@ -226,9 +227,7 @@ function isLinkWithChildren(link: GuardedLink | LinkWithChildren): link is LinkW
 
             <q-separator v-if="links.length > 0" />
 
-            <!-- Navigation Links -->
             <template v-for="(link, index) in links" :key="index">
-                <!-- Expandable Item -->
                 <q-expansion-item
                     v-if="isLinkWithChildren(link)"
                     :label="link.label"
@@ -236,26 +235,14 @@ function isLinkWithChildren(link: GuardedLink | LinkWithChildren): link is LinkW
                     expand-separator
                     expand-icon="arrow_drop_down"
                 >
-                    <q-item
+                    <AppDrawerLink
                         v-for="(childLink, childIndex) in link.children"
+                        :link="childLink"
                         :key="childIndex"
-                        :to="childLink.route"
-                        clickable
-                    >
-                        <q-item-section avatar>
-                            <q-icon :name="childLink.icon" />
-                        </q-item-section>
-                        <q-item-section>{{ childLink.label }}</q-item-section>
-                    </q-item>
+                    />
                 </q-expansion-item>
 
-                <!-- Regular Item -->
-                <q-item v-else :to="link.route" clickable>
-                    <q-item-section avatar>
-                        <q-icon :name="link.icon" />
-                    </q-item-section>
-                    <q-item-section>{{ link.label }}</q-item-section>
-                </q-item>
+                <AppDrawerLink :link="link" v-else />
             </template>
 
             <q-separator spaced />
