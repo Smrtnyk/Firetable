@@ -125,6 +125,7 @@ export function renderComponent<
         global: {
             plugins: [
                 createTestingPinia({
+                    stubActions: false,
                     ...options?.piniaStoreOptions,
                     createSpy: vi.fn,
                 }),

@@ -2,8 +2,8 @@ import type { RenderResult } from "vitest-browser-vue";
 import type { User } from "@firetable/types";
 import AppDrawer from "./AppDrawer.vue";
 import { getLocaleForTest, renderComponent } from "../../test-helpers/render-component";
+import { UserCapability, Role } from "@firetable/types";
 import { describe, it, expect, beforeEach } from "vitest";
-import { Role } from "@firetable/types";
 import { userEvent } from "@vitest/browser/context";
 import { Dark } from "quasar";
 
@@ -155,6 +155,142 @@ describe("AppDrawer", () => {
 
         expect(emitted["update:modelValue"]).toBeTruthy();
         expect(emitted["update:modelValue"][0]).toEqual([false]);
+    });
+
+    it("does not display inventory links when user lacks CAN_SEE_INVENTORY capability", () => {
+        user.capabilities = {
+            [UserCapability.CAN_SEE_INVENTORY]: false,
+        };
+
+        screen = renderComponent(
+            AppDrawer,
+            { modelValue },
+            {
+                wrapInLayout: true,
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: { user },
+                    },
+                },
+            },
+        );
+
+        const inventoryLink = screen.getByText("Manage Inventory");
+        expect(inventoryLink.query()).toBeNull();
+    });
+
+    it("displays single Manage Inventory link when user has CAN_SEE_INVENTORY and one property", () => {
+        user.capabilities = {
+            [UserCapability.CAN_SEE_INVENTORY]: true,
+        };
+
+        screen = renderComponent(
+            AppDrawer,
+            { modelValue },
+            {
+                wrapInLayout: true,
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: { user },
+                        properties: {
+                            properties: [
+                                {
+                                    id: "property1",
+                                    name: "Property 1",
+                                    organisationId: user.organisationId,
+                                },
+                            ],
+                        },
+                    },
+                },
+            },
+        );
+
+        const inventoryLink = screen.getByText("Manage Inventory");
+        expect(inventoryLink.query()).toBeTruthy();
+
+        // Ensure it's a single link, not an expandable item
+        const expansionItem = screen.getByText("Property 1");
+        expect(expansionItem.query()).toBeNull();
+    });
+
+    it("displays expandable Manage Inventory link when user has CAN_SEE_INVENTORY and multiple properties", async () => {
+        user.capabilities = {
+            [UserCapability.CAN_SEE_INVENTORY]: true,
+        };
+
+        screen = renderComponent(
+            AppDrawer,
+            { modelValue },
+            {
+                wrapInLayout: true,
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: { user },
+                        properties: {
+                            properties: [
+                                {
+                                    id: "property1",
+                                    name: "Property 1",
+                                    organisationId: user.organisationId,
+                                },
+                                {
+                                    id: "property2",
+                                    name: "Property 2",
+                                    organisationId: user.organisationId,
+                                },
+                            ],
+                        },
+                    },
+                },
+            },
+        );
+
+        const inventoryLink = screen.getByText("Manage Inventory");
+        expect(inventoryLink.query()).toBeTruthy();
+
+        // Simulate expanding the expandable item
+        await userEvent.click(inventoryLink);
+
+        // Check that property links are displayed
+        const propertyLink1 = screen.getByText("Property 1");
+        const propertyLink2 = screen.getByText("Property 2");
+        expect(propertyLink1.query()).toBeTruthy();
+        expect(propertyLink2.query()).toBeTruthy();
+    });
+
+    it("uses custom capabilities over default capabilities", () => {
+        user.role = Role.MANAGER;
+        user.capabilities = {
+            [UserCapability.CAN_SEE_INVENTORY]: false,
+        };
+
+        screen = renderComponent(
+            AppDrawer,
+            { modelValue },
+            {
+                wrapInLayout: true,
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: { user },
+                        properties: {
+                            properties: [
+                                {
+                                    id: "property1",
+                                    name: "Property 1",
+                                    organisationId: user.organisationId,
+                                },
+                            ],
+                        },
+                    },
+                },
+            },
+        );
+
+        // Even though MANAGER role has CAN_SEE_INVENTORY by default,
+        // the custom capabilities should override it
+        const inventoryLink = screen.getByText("Manage Inventory");
+        expect(inventoryLink.query()).toBeNull();
     });
 
     it("changes language when a new language is selected", async () => {
