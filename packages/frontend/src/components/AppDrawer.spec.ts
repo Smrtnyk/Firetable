@@ -1,19 +1,11 @@
-import type { User } from "@firetable/types";
 import type { RenderResult } from "vitest-browser-vue";
+import type { User } from "@firetable/types";
 import AppDrawer from "./AppDrawer.vue";
-import {
-    getLocaleForTest,
-    installQuasarPlugin,
-    renderComponent,
-} from "../../test-helpers/render-component";
+import { getLocaleForTest, renderComponent } from "../../test-helpers/render-component";
 import { describe, it, expect, beforeEach } from "vitest";
 import { Role } from "@firetable/types";
 import { userEvent } from "@vitest/browser/context";
-import { LocalStorage, Dark } from "quasar";
-
-installQuasarPlugin({
-    plugins: { LocalStorage, Dark },
-});
+import { Dark } from "quasar";
 
 describe("AppDrawer", () => {
     let user: User;
@@ -39,10 +31,16 @@ describe("AppDrawer", () => {
         screen = renderComponent(
             AppDrawer,
             {
-                user,
                 modelValue,
             },
-            { wrapInLayout: true },
+            {
+                wrapInLayout: true,
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: { user },
+                    },
+                },
+            },
         );
 
         expect(screen.getByText(user.name)).toBeTruthy();
@@ -61,10 +59,16 @@ describe("AppDrawer", () => {
         screen = renderComponent(
             AppDrawer,
             {
-                user,
                 modelValue,
             },
-            { wrapInLayout: true },
+            {
+                wrapInLayout: true,
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: { user },
+                    },
+                },
+            },
         );
 
         const expectedLinks = [
@@ -85,10 +89,16 @@ describe("AppDrawer", () => {
         screen = renderComponent(
             AppDrawer,
             {
-                user,
                 modelValue,
             },
-            { wrapInLayout: true },
+            {
+                wrapInLayout: true,
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: { user },
+                    },
+                },
+            },
         );
 
         const logoutButton = screen.getByText("Logout").elements()[1];
@@ -99,10 +109,16 @@ describe("AppDrawer", () => {
         screen = renderComponent(
             AppDrawer,
             {
-                user,
                 modelValue,
             },
-            { wrapInLayout: true },
+            {
+                wrapInLayout: true,
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: { user },
+                    },
+                },
+            },
         );
 
         expect(Dark.isActive).toBe(false);
@@ -122,10 +138,16 @@ describe("AppDrawer", () => {
         screen = renderComponent(
             AppDrawer,
             {
-                user,
                 modelValue: true,
             },
-            { wrapInLayout: true },
+            {
+                wrapInLayout: true,
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: { user },
+                    },
+                },
+            },
         );
 
         const emitted = screen.emitted();
@@ -139,10 +161,16 @@ describe("AppDrawer", () => {
         screen = renderComponent(
             AppDrawer,
             {
-                user,
                 modelValue,
             },
-            { wrapInLayout: true },
+            {
+                wrapInLayout: true,
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: { user },
+                    },
+                },
+            },
         );
 
         expect(getLocaleForTest().value).toBe("en-GB");

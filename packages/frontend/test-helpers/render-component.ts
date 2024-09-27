@@ -1,6 +1,7 @@
 import type { DefineComponent, ExtractPropTypes, WritableComputedRef } from "vue";
 import type { QuasarPluginOptions } from "quasar";
 import type { RenderResult } from "vitest-browser-vue";
+import type { TestingOptions } from "@pinia/testing";
 import messages from "../src/i18n";
 import { ref, h, defineComponent } from "vue";
 import { render } from "vitest-browser-vue";
@@ -33,6 +34,7 @@ import { beforeAll, afterAll, vi } from "vitest";
 
 import "quasar/dist/quasar.css";
 import "../src/css/app.scss";
+import { createTestingPinia } from "@pinia/testing";
 
 const i18n = createI18n({
     locale: "en-GB",
@@ -99,7 +101,7 @@ export function renderComponent<
 >(
     component: TComponent,
     props?: Partial<TProps>,
-    options?: { wrapInLayout?: boolean },
+    options?: { wrapInLayout?: boolean; piniaStoreOptions?: Partial<TestingOptions> },
 ): RenderResult<any> {
     const wrapInLayout = options?.wrapInLayout ?? false;
 
@@ -121,7 +123,14 @@ export function renderComponent<
 
     const renderOptions: any = {
         global: {
-            plugins: [Quasar, i18n],
+            plugins: [
+                createTestingPinia({
+                    ...options?.piniaStoreOptions,
+                    createSpy: vi.fn,
+                }),
+                Quasar,
+                i18n,
+            ],
             components: {
                 QInput,
                 QSelect,

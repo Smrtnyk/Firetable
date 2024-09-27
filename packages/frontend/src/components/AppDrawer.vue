@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import type { User } from "@firetable/types";
-import { ADMIN, Role } from "@firetable/types";
+import { Role } from "@firetable/types";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 import { LocalStorage, Dark } from "quasar";
 import { logoutUser } from "@firetable/backend";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { storeToRefs } from "pinia";
+import { useAuthStore } from "src/stores/auth-store";
 
 interface Props {
-    user: User;
     modelValue: boolean;
 }
+const { nonNullableUser, isAdmin } = storeToRefs(useAuthStore());
 const props = defineProps<Props>();
 const emit = defineEmits<(e: "update:modelValue", value: boolean) => void>();
 const { t, locale } = useI18n();
@@ -23,9 +24,8 @@ const langOptions = [
 ];
 
 const links = computed(() => {
-    const role = props.user.role;
-    const organisationId = props.user.organisationId;
-    const isAdmin = props.user.role === ADMIN;
+    const role = nonNullableUser.value.role;
+    const organisationId = nonNullableUser.value.organisationId;
 
     return [
         {
@@ -74,7 +74,7 @@ const links = computed(() => {
 });
 
 const avatar = computed(function () {
-    const [first, last] = props.user.name.split(" ");
+    const [first, last] = nonNullableUser.value.name.split(" ");
     if (!last) {
         return first[0];
     }
@@ -114,8 +114,8 @@ function setAppLanguage(val: string): void {
                     {{ avatar }}
                 </q-avatar>
                 <div class="q-mt-md text-center">
-                    <div class="text-subtitle1">{{ props.user.name }}</div>
-                    <div class="text-caption text-grey">{{ props.user.email }}</div>
+                    <div class="text-subtitle1">{{ nonNullableUser.name }}</div>
+                    <div class="text-caption text-grey">{{ nonNullableUser.email }}</div>
                 </div>
             </q-item>
 

@@ -7,7 +7,7 @@ import { useAuthStore } from "src/stores/auth-store";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
 
-const { isLoggedIn, user } = storeToRefs(useAuthStore());
+const { isLoggedIn } = storeToRefs(useAuthStore());
 
 const isDrawerVisible = ref(false);
 </script>
@@ -15,7 +15,7 @@ const isDrawerVisible = ref(false);
 <template>
     <q-layout v-if="isLoggedIn" view="hHh lpR fFf">
         <NetworkOverlay />
-        <AppDrawer v-model="isDrawerVisible" :user="user!" />
+        <AppDrawer v-model="isDrawerVisible" />
         <AppTopMenu @toggle-drawer="isDrawerVisible = !isDrawerVisible" />
         <q-page-container>
             <q-page class="q-pa-xs-xs q-pa-sm-sm q-pa-md-md row">

@@ -1,7 +1,6 @@
 import type { Ref } from "vue";
 import type { EventDoc, PlannedReservationDoc, ReservationDoc, User } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
-import { installPinia } from "../../test-helpers/install-pinia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ReservationStatus, ReservationType } from "@firetable/types";
 import { ref, shallowRef, toRef } from "vue";
@@ -117,8 +116,6 @@ vi.mock("@firetable/backend", () => {
         updateReservationDoc: deleteReservationSpy,
     };
 });
-
-installPinia();
 
 // FIXME: fix these tests, seems like there is a bug with vitest.mock
 describe.skip("useReservations", () => {
