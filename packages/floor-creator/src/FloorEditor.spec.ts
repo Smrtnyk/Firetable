@@ -194,7 +194,7 @@ describe("FloorEditor", () => {
             expect(floorEditor.gridDrawer.isGridVisible).toBe(!initialVisibility);
         });
 
-        it("re-renders grid after updating dimensions", async () => {
+        it("re-renders grid after updating dimensions", () => {
             const spy = vi.spyOn(floorEditor, "renderGrid");
             floorEditor.updateDimensions(500, 500);
             expect(spy).toHaveBeenCalled();
