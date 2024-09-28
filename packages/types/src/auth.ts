@@ -7,12 +7,14 @@ export enum Role {
     HOSTESS = "Hostess",
 }
 
+export type AdminUser = Omit<User, "role"> & { role: typeof ADMIN };
+
 export interface User {
     id: string;
     name: string;
     email: string;
     username: string;
-    role: Role | typeof ADMIN;
+    role: Role;
     relatedProperties: string[];
     organisationId: string;
     capabilities: UserCapabilities | undefined;

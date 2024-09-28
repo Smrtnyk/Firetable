@@ -2,6 +2,7 @@ import type { HttpsCallableResult } from "firebase/functions";
 import type { DocumentData, DocumentReference } from "firebase/firestore";
 import type { EventOwner } from "./db.js";
 import type {
+    AdminUser,
     CreateEventPayload,
     EventDoc,
     EventLog,
@@ -47,7 +48,7 @@ import { httpsCallable } from "firebase/functions";
 export async function addLogToEvent(
     eventOwner: EventOwner,
     logMessage: string,
-    user: User,
+    user: AdminUser | User,
 ): Promise<void> {
     const eventLogsRef = eventLogsDoc(eventOwner);
 

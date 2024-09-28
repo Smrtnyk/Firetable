@@ -102,7 +102,7 @@ export async function updateUserFn(
                 email: updatedUser.email,
                 role: updatedUser.role,
                 relatedProperties: updatedUser.relatedProperties,
-                capabilities: updatedUser.capabilities ?? null,
+                capabilities: updatedUser.capabilities,
             });
 
             // Add the user to relatedUsers field of the property document for new associations

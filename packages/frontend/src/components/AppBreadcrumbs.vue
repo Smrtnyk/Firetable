@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 import type { RouteRecordName, RouteRecordNormalized, RouteRecordRaw } from "vue-router";
-import type { AnyFunction, User } from "@firetable/types";
+import type { AdminUser, AnyFunction, User } from "@firetable/types";
 import { useRoute, useRouter } from "vue-router";
 import { computed } from "vue";
 import { useAuthStore } from "src/stores/auth-store";
@@ -56,7 +56,7 @@ function findRouteByName(
 
 function isRouteAllowed(
     currentRoute: RouteRecordNormalized | RouteRecordRaw,
-    userRole: User["role"],
+    userRole: (AdminUser | User)["role"],
 ): boolean {
     if (!currentRoute.meta?.allowedRoles) {
         return true;

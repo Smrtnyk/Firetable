@@ -235,6 +235,7 @@ describe("UserEditForm", () => {
     it("preserves capabilities when changing role from Staff to Manager and back to Staff", async () => {
         props.user.role = Role.STAFF;
         props.user.capabilities = {
+            ...props.user.capabilities,
             [UserCapability.CAN_RESERVE]: true,
             [UserCapability.CAN_SEE_GUEST_CONTACT]: true,
             [UserCapability.CAN_DELETE_RESERVATION]: false,
@@ -282,5 +283,26 @@ describe("UserEditForm", () => {
             })
             .query();
         expect(capabilityCheckbox.getAttribute("aria-checked")).toBe("false");
+    });
+
+    it("emits default capabilities when role is updated to a new role", async () => {
+        props.user.role = Role.STAFF;
+        const screen = renderComponent(UserEditForm, props);
+
+        // Change role to Manager
+        const roleSelect = screen.getByLabelText("Role");
+        await userEvent.click(roleSelect);
+        const managerOption = screen.getByRole("option", { name: Role.MANAGER });
+        await userEvent.click(managerOption);
+
+        const submitButton = screen.getByRole("button", { name: "Update" });
+        await userEvent.click(submitButton);
+
+        expect(screen.emitted().submit).toBeTruthy();
+        const emittedPayload = screen.emitted().submit[0][0];
+        expect(emittedPayload).toMatchObject({
+            role: Role.MANAGER,
+            capabilities: DEFAULT_CAPABILITIES_BY_ROLE[Role.MANAGER],
+        });
     });
 });

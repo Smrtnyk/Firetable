@@ -94,6 +94,7 @@ async function onUpdateUser(updatedUser: EditUserPayload): Promise<void> {
         async hook() {
             await updateUser(updatedUser);
             await fetchUsers();
+            quasar.notify("User updated successfully!");
         },
     });
 }
@@ -207,7 +208,7 @@ async function showEditUserDialog(user: User): Promise<void> {
                         organisationId: userPayload.organisationId,
                         updatedUser: userPayload,
                     });
-                    quasar.notify("User updated successfully!");
+
                     dialog.hide();
                 },
             },

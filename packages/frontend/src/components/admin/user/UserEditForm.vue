@@ -48,11 +48,11 @@ const form = ref<EditUserPayload["updatedUser"]>({
 });
 const chosenProperties = ref<string[]>(props.selectedProperties.map(property("id")));
 
-const capabilitiesToDisplay = computed(function () {
-    if (form.value.role !== Role.STAFF) {
-        return [];
+const capabilitiesToDisplay = computed(() => {
+    if (form.value.role === Role.STAFF) {
+        return Object.entries(form.value.capabilities ?? {}) as [UserCapability, boolean][];
     }
-    return Object.entries(form.value.capabilities ?? DEFAULT_CAPABILITIES_BY_ROLE[form.value.role]);
+    return [];
 });
 
 const editableRoles = [Role.MANAGER, Role.STAFF, Role.HOSTESS];
@@ -64,20 +64,22 @@ const emailSuffix = computed(function () {
     return `@${props.organisation.name}.at`;
 });
 
-// Temporary variable to store capabilities when role changes
-let previousCapabilities: UserCapabilities | undefined = form.value.capabilities;
+// Store custom capabilities per role
+const previousCapabilities: Partial<Record<Role, UserCapabilities>> = {
+    [props.user.role]: { ...form.value.capabilities },
+};
 
 watch(
     () => form.value.role,
-    function (newRole, oldRole) {
-        if (oldRole === Role.STAFF) {
-            // Store the current capabilities
-            previousCapabilities = form.value.capabilities;
-        }
+    (newRole, oldRole) => {
+        // Store the current capabilities for the old role
+        previousCapabilities[oldRole] = { ...form.value.capabilities };
 
-        // Restore the previous capabilities if they exist
-        form.value.capabilities =
-            newRole === Role.STAFF ? (previousCapabilities ?? getUserCapabilities()) : undefined;
+        // Set capabilities to the stored capabilities for the new role if they exist,
+        // otherwise, use the default capabilities for the new role
+        form.value.capabilities = previousCapabilities[newRole]
+            ? { ...previousCapabilities[newRole] }
+            : { ...DEFAULT_CAPABILITIES_BY_ROLE[newRole] };
     },
 );
 
@@ -90,7 +92,6 @@ async function onSubmit(): Promise<void> {
 function prepareAndEmitSubmission(): void {
     const valuesToEmit = {
         ...form.value,
-        capabilities: form.value.role === Role.STAFF ? form.value.capabilities : undefined,
         relatedProperties: chosenProperties.value,
     };
     // Filter out empty or null values
@@ -104,10 +105,7 @@ function prepareAndEmitSubmission(): void {
         filteredForm.email = `${form.value.username}${emailSuffix.value}`;
     }
 
-    emit("submit", {
-        ...filteredForm,
-        relatedProperties: chosenProperties.value,
-    });
+    emit("submit", filteredForm);
 }
 
 function onReset(): void {
@@ -189,11 +187,11 @@ function resetProperties(): void {
                 <div v-else><p>No properties available. Please create some.</p></div>
             </div>
 
-            <div v-if="form.capabilities">
+            <div v-if="capabilitiesToDisplay.length > 0 && form.capabilities">
                 <div>Capabilities:</div>
                 <div v-for="[capability] in capabilitiesToDisplay" :key="capability">
                     <q-checkbox
-                        v-model="form.capabilities[capability as UserCapability]"
+                        v-model="form.capabilities[capability]"
                         :label="capability"
                         color="accent"
                     />
