@@ -55,8 +55,9 @@ const capabilitiesToDisplay = computed(function () {
     return Object.entries(form.value.capabilities ?? DEFAULT_CAPABILITIES_BY_ROLE[form.value.role]);
 });
 
+const editableRoles = [Role.MANAGER, Role.STAFF, Role.HOSTESS];
 const isEditableRole = computed(function () {
-    return [Role.MANAGER, Role.STAFF, Role.HOSTESS].includes(form.value.role as Role);
+    return editableRoles.includes(form.value.role as Role);
 });
 
 const emailSuffix = computed(function () {
@@ -169,7 +170,7 @@ function resetProperties(): void {
                 hint="Assign role to user, default is Staff."
                 standout
                 rounded
-                :options="[Role.MANAGER, Role.STAFF]"
+                :options="editableRoles"
                 label="Role"
             />
 
