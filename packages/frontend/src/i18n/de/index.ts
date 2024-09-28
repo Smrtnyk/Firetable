@@ -147,6 +147,7 @@ export default {
         title: "Veranstaltungen",
         noPropertiesMessage:
             "Es wurden keine Immobilien erstellt, Veranstaltungen können nicht erstellt werden.",
+        noEventsMessage: "Es wurden keine Veranstaltungen erstellt.",
         deleteEventDialogTitle: "Veranstaltung löschen?",
         eventCreatedNotificationMessage: "Veranstaltung erstellt!",
         createNewEventDialogTitle: "Neue Veranstaltung erstellen",

@@ -20,6 +20,7 @@ import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { usePropertiesStore } from "src/stores/properties-store";
+import FTCenteredText from "src/components/FTCenteredText.vue";
 
 interface Props {
     organisationId: string;
@@ -178,5 +179,7 @@ onMounted(fetchMoreEvents);
                 :done="done"
             />
         </div>
+
+        <FTCenteredText v-else> {{ t("PageAdminEvents.noEventsMessage") }} </FTCenteredText>
     </div>
 </template>
