@@ -24,7 +24,7 @@
         "hammerjs": "2.0.8"
     },
     "devDependencies": {
-        "@types/node": "22.7.3",
+        "@types/node": "22.7.4",
         "@types/hammerjs": "2.0.45",
         "@playwright/test": "1.47.2",
         "@vitest/browser": "catalog:",
