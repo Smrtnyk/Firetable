@@ -15,7 +15,8 @@ const { t } = useI18n();
 
 const backgroundImageUrl = computed(function () {
     const imageIndex = (props.index % 3) + 1;
-    return props.event.img ?? `/images/default-event-img-${imageIndex}.jpg`;
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- it can be empty string
+    return props.event.img || `/images/default-event-img-${imageIndex}.jpg`;
 });
 </script>
 <template>
