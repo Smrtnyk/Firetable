@@ -95,12 +95,12 @@ export class FloorEditor extends Floor {
         this.gridDrawer.toggleGridVisibility(this.width, this.height);
     };
 
-    async updateDimensions(newWidth: number, newHeight: number): Promise<void> {
+    updateDimensions(newWidth: number, newHeight: number): void {
         this.width = newWidth;
         this.height = newHeight;
         this.scale = calculateCanvasScale(this.containerWidth, this.width);
         this.setScaling();
-        await this.renderData(this.floorDoc.json);
+        this.canvas.requestRenderAll();
         this.renderGrid();
     }
 

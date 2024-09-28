@@ -13,7 +13,7 @@ describe("FloorEditor", () => {
     let canvasElement: HTMLCanvasElement;
     let gridDrawerSpy: MockInstance<typeof GridDrawer.prototype.drawGrid>;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         canvasElement = document.createElement("canvas");
         const options: FloorCreationOptions = {
             canvas: canvasElement,
@@ -30,33 +30,63 @@ describe("FloorEditor", () => {
         gridDrawerSpy = vi.spyOn(GridDrawer.prototype, "drawGrid");
 
         floorEditor = new FloorEditor(options);
+
+        await new Promise((resolve) => {
+            floorEditor.on("rendered", resolve);
+        });
     });
 
     describe("constructor()", () => {
-        it("properly initializes properties and sub-components", () => {
-            expect(floorEditor).toBeInstanceOf(FloorEditor);
-            // @ts-expect-error -- private prop
-            expect(floorEditor.gridDrawer).toBeDefined();
-            // @ts-expect-error -- private prop
-            expect(floorEditor.eventManager).toBeDefined();
-            // @ts-expect-error -- private prop
-            expect(floorEditor.elementManager).toBeDefined();
-        });
-
-        it("should render the initial grid", async () => {
-            await new Promise((resolve) => {
-                floorEditor.on("rendered", resolve);
-            });
+        it("should render the initial grid", () => {
             expect(gridDrawerSpy).toHaveBeenCalled();
         });
     });
 
     describe("updateDimensions()", () => {
-        it("updates floor dimensions", async () => {
-            await floorEditor.updateDimensions(800, 800);
+        it("updates floor dimensions", () => {
+            floorEditor.updateDimensions(800, 800);
 
             expect(floorEditor.width).toBe(800);
             expect(floorEditor.height).toBe(800);
+        });
+
+        it("updates floor dimensions without resetting the floor state", () => {
+            // Add an element to the floor
+            floorEditor.addElement({
+                tag: FloorElementTypes.RECT_TABLE,
+                x: 100,
+                y: 100,
+                label: "Test Table",
+            });
+
+            // Modify the element (optional)
+            const table = floorEditor.canvas.getObjects().find(isTable);
+            if (table) {
+                table.set("angle", 45);
+            }
+
+            // Get the initial state of the canvas
+            const initialObjects = floorEditor.canvas.getObjects().map((obj) => obj.toObject());
+
+            // Update dimensions
+            floorEditor.updateDimensions(800, 800);
+
+            // Get the state of the canvas after updating dimensions
+            const updatedObjects = floorEditor.canvas.getObjects().map((obj) => obj.toObject());
+
+            // The number of objects should be the same
+            expect(updatedObjects.length).toBe(initialObjects.length);
+
+            // make sure added table element is unchanged
+            expect(updatedObjects[1]).toEqual(initialObjects[1]);
+        });
+
+        it("does not call renderData when updating dimensions", () => {
+            const renderDataSpy = vi.spyOn(floorEditor, "renderData");
+
+            floorEditor.updateDimensions(800, 800);
+
+            expect(renderDataSpy).not.toHaveBeenCalled();
         });
     });
 
@@ -74,7 +104,6 @@ describe("FloorEditor", () => {
 
     describe("undo()/redo()", () => {
         it("allows undo and redo after moving an object", () => {
-            // Create a mock fabric object
             const mockFabricObject = new Rect({
                 left: 100,
                 top: 100,
@@ -167,7 +196,7 @@ describe("FloorEditor", () => {
 
         it("re-renders grid after updating dimensions", async () => {
             const spy = vi.spyOn(floorEditor, "renderGrid");
-            await floorEditor.updateDimensions(500, 500);
+            floorEditor.updateDimensions(500, 500);
             expect(spy).toHaveBeenCalled();
         });
     });
