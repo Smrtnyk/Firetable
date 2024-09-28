@@ -305,4 +305,211 @@ describe("UserEditForm", () => {
             capabilities: DEFAULT_CAPABILITIES_BY_ROLE[Role.MANAGER],
         });
     });
+
+    it("emits updated capabilities when capabilities are modified", async () => {
+        // Start with default props (user role is STAFF)
+        const screen = renderComponent(UserEditForm, props);
+
+        // Modify capabilities
+        const canReserveCheckbox = screen.getByRole("checkbox", {
+            name: UserCapability.CAN_RESERVE,
+        });
+        await userEvent.click(canReserveCheckbox);
+
+        const canEditOwnReservationCheckbox = screen.getByRole("checkbox", {
+            name: UserCapability.CAN_EDIT_OWN_RESERVATION,
+        });
+        await userEvent.click(canEditOwnReservationCheckbox);
+
+        const submitButton = screen.getByRole("button", { name: "Update" });
+        await userEvent.click(submitButton);
+
+        // Check that the emitted payload includes the updated capabilities
+        expect(screen.emitted().submit).toBeTruthy();
+        const emittedPayload = screen.emitted().submit[0][0];
+
+        // Create expected capabilities by toggling the modified ones
+        const expectedCapabilities = {
+            ...DEFAULT_CAPABILITIES_BY_ROLE[Role.STAFF],
+            [UserCapability.CAN_RESERVE]:
+                !DEFAULT_CAPABILITIES_BY_ROLE[Role.STAFF][UserCapability.CAN_RESERVE],
+            [UserCapability.CAN_EDIT_OWN_RESERVATION]:
+                !DEFAULT_CAPABILITIES_BY_ROLE[Role.STAFF][UserCapability.CAN_EDIT_OWN_RESERVATION],
+        };
+
+        expect(emittedPayload.capabilities).toMatchObject(expectedCapabilities);
+    });
+
+    it("updates the email in the emitted payload when the username is changed", async () => {
+        const screen = renderComponent(UserEditForm, props);
+
+        await userEvent.clear(screen.getByLabelText("Username *"));
+        await userEvent.type(screen.getByLabelText("Username *"), "newusername");
+
+        const submitButton = screen.getByRole("button", { name: "Update" });
+        await userEvent.click(submitButton);
+
+        expect(screen.emitted().submit).toBeTruthy();
+        const emittedPayload = screen.emitted().submit[0][0];
+        expect(emittedPayload.email).toBe("newusername@TestOrg.at");
+    });
+
+    it("updates the email suffix based on the organisation name in the emitted payload", async () => {
+        props.organisation.name = "DifferentOrg";
+        const screen = renderComponent(UserEditForm, props);
+
+        await userEvent.clear(screen.getByLabelText("Username *"));
+        await userEvent.type(screen.getByLabelText("Username *"), "newusername");
+
+        const submitButton = screen.getByRole("button", { name: "Update" });
+        await userEvent.click(submitButton);
+
+        expect(screen.emitted().submit).toBeTruthy();
+        const emittedPayload = screen.emitted().submit[0][0];
+        expect(emittedPayload.email).toBe("newusername@DifferentOrg.at");
+    });
+
+    it("emits updated relatedProperties when properties selection is modified", async () => {
+        const screen = renderComponent(UserEditForm, props);
+
+        const property1Checkbox = screen.getByRole("checkbox", { name: "Property 1" });
+        // Deselect Property 1
+        await userEvent.click(property1Checkbox);
+
+        const property2Checkbox = screen.getByRole("checkbox", { name: "Property 2" });
+        // Select Property 2
+        await userEvent.click(property2Checkbox);
+
+        const submitButton = screen.getByRole("button", { name: "Update" });
+        await userEvent.click(submitButton);
+
+        // Check that the emitted payload includes the updated relatedProperties
+        expect(screen.emitted().submit).toBeTruthy();
+        const emittedPayload = screen.emitted().submit[0][0];
+        expect(emittedPayload.relatedProperties).toEqual(["property2"]);
+    });
+
+    it("resets all fields to initial values after changing multiple fields and clicking reset", async () => {
+        const screen = renderComponent(UserEditForm, props);
+
+        // Modify multiple fields
+        await userEvent.clear(screen.getByLabelText(/Name */));
+        await userEvent.type(screen.getByLabelText(/Name */), "Jane Doe");
+
+        await userEvent.type(screen.getByLabelText("User password *"), "newpassword123");
+
+        // Change role to MANAGER
+        const roleSelect = screen.getByLabelText("Role");
+        await userEvent.click(roleSelect);
+        const managerOption = screen.getByRole("option", { name: Role.MANAGER });
+        await userEvent.click(managerOption);
+
+        // Deselect a property
+        const propertyCheckbox = screen.getByRole("checkbox", { name: "Property 1" });
+        await userEvent.click(propertyCheckbox);
+
+        // Reset the form
+        const resetButton = screen.getByRole("button", { name: "Reset" });
+        await userEvent.click(resetButton);
+
+        // Check that fields are reset
+        expect(
+            screen
+                .getByLabelText(/Name */)
+                .query()
+                .getAttribute("value"),
+        ).toBe(props.user.name);
+        expect(screen.getByLabelText("User password *").query().getAttribute("value")).toBe("");
+
+        // Check that role is reset
+        const roleSelectAfterReset = screen.getByLabelText("Role");
+        // Need to simulate opening the select to check selected value
+        await userEvent.click(roleSelectAfterReset);
+        const selectedOption = screen.getByRole("option", { selected: true });
+        expect(selectedOption.query().textContent).toBe(props.user.role);
+
+        // Check that properties are reset
+        const propertyCheckboxes = screen.getByRole("checkbox", {
+            name: /Property/,
+        });
+        for (const checkbox of propertyCheckboxes.elements()) {
+            const label = checkbox.getAttribute("aria-label");
+            const isChecked = props.selectedProperties.some(function (property) {
+                return property.name === label;
+            });
+            expect(checkbox.getAttribute("aria-checked")).toBe(isChecked ? "true" : "false");
+        }
+    });
+
+    it("preserves capabilities for each role when switching between roles multiple times", async () => {
+        props.user.role = Role.STAFF;
+        props.user.capabilities = {
+            ...props.user.capabilities,
+            [UserCapability.CAN_RESERVE]: true,
+            [UserCapability.CAN_SEE_GUEST_CONTACT]: false,
+        };
+        const screen = renderComponent(UserEditForm, props);
+
+        // Change capabilities for Staff role
+        const canReserveCheckbox = screen.getByRole("checkbox", {
+            name: UserCapability.CAN_RESERVE,
+        });
+        // Toggle to false
+        await userEvent.click(canReserveCheckbox);
+
+        // Change role to Manager
+        const roleSelect = screen.getByLabelText("Role");
+        await userEvent.click(roleSelect);
+        const managerOption = screen.getByRole("option", { name: Role.MANAGER });
+        await userEvent.click(managerOption);
+
+        // Change role to Hostess
+        await userEvent.click(roleSelect);
+        const hostessOption = screen.getByRole("option", { name: Role.HOSTESS });
+        await userEvent.click(hostessOption);
+
+        // Change back to Staff
+        await userEvent.click(roleSelect);
+        const staffOption = screen.getByRole("option", { name: Role.STAFF });
+        await userEvent.click(staffOption);
+
+        // Verify that the capabilities are preserved for Staff role
+        expect(screen.getByText("Capabilities:").query()).toBeTruthy();
+        const canReserveCheckboxAfter = screen
+            .getByRole("checkbox", {
+                name: UserCapability.CAN_RESERVE,
+            })
+            .query();
+        // Should be false as toggled earlier
+        expect(canReserveCheckboxAfter.getAttribute("aria-checked")).toBe("false");
+
+        const canSeeGuestContactCheckbox = screen
+            .getByRole("checkbox", {
+                name: UserCapability.CAN_SEE_GUEST_CONTACT,
+            })
+            .query();
+        expect(canSeeGuestContactCheckbox.getAttribute("aria-checked")).toBe("false");
+    });
+
+    it("emits capabilities for non-staff roles when the role is changed", async () => {
+        props.user.role = Role.STAFF;
+        const screen = renderComponent(UserEditForm, props);
+
+        // Change role to Hostess
+        const roleSelect = screen.getByLabelText("Role");
+        await userEvent.click(roleSelect);
+        const hostessOption = screen.getByRole("option", { name: Role.HOSTESS });
+        await userEvent.click(hostessOption);
+
+        const submitButton = screen.getByRole("button", { name: "Update" });
+        await userEvent.click(submitButton);
+
+        // Check that the emitted payload includes capabilities for Hostess role
+        expect(screen.emitted().submit).toBeTruthy();
+        const emittedPayload = screen.emitted().submit[0][0];
+        expect(emittedPayload).toMatchObject({
+            role: Role.HOSTESS,
+            capabilities: DEFAULT_CAPABILITIES_BY_ROLE[Role.HOSTESS],
+        });
+    });
 });
