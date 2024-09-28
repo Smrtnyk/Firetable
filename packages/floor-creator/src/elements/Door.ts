@@ -1,5 +1,5 @@
 import { ELEMENT_DEFAULT_STROKE_COLOR } from "../constants.js";
-import { Group, Line, Path } from "fabric/es";
+import { Group, Line, Path } from "fabric";
 
 export class Door extends Group {
     constructor(left: number, top: number) {

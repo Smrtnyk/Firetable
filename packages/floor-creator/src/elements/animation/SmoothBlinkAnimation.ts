@@ -1,5 +1,5 @@
 import type { AnimationStrategy } from "./AnimationStrategy.js";
-import type { FabricObject } from "fabric/es";
+import type { FabricObject } from "fabric";
 import { noop } from "es-toolkit";
 
 const ANIMATION_DURATION = 500;

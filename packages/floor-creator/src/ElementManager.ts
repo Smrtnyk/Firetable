@@ -1,5 +1,5 @@
 import type { CreateElementOptions } from "./types.js";
-import type { FabricObject } from "fabric/es";
+import type { FabricObject } from "fabric";
 import { EditableShape } from "./elements/EditableShape.js";
 import { FloorElementTypes } from "./types.js";
 import { Wall } from "./elements/Wall.js";

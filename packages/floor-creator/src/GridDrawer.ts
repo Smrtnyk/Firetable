@@ -1,6 +1,6 @@
-import type { Canvas } from "fabric/es";
+import type { Canvas } from "fabric";
 import { RESOLUTION } from "./constants.js";
-import { Line, Group } from "fabric/es";
+import { Line, Group } from "fabric";
 import { has } from "es-toolkit/compat";
 
 export class GridDrawer {

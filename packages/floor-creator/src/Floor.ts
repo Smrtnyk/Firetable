@@ -1,4 +1,4 @@
-import type { FabricObject } from "fabric/es";
+import type { FabricObject } from "fabric";
 import type { BaseTable, FloorCreationOptions, FloorData } from "./types.js";
 import type { EventManager } from "./event-manager/EventManager.js";
 import type { EventEmitterListener } from "./event-emitter/EventEmitter.js";
@@ -12,12 +12,14 @@ import { RectTable } from "./elements/RectTable.js";
 import { Sofa } from "./elements/Sofa.js";
 import { Wall } from "./elements/Wall.js";
 import { RoundTable } from "./elements/RoundTable.js";
-import { Canvas, classRegistry } from "fabric/es";
+import { EditableShape } from "./elements/EditableShape.js";
+import { Canvas, classRegistry } from "fabric";
 
 classRegistry.setClass(RectTable);
 classRegistry.setClass(RoundTable);
 classRegistry.setClass(Sofa);
 classRegistry.setClass(Wall);
+classRegistry.setClass(EditableShape);
 
 export abstract class Floor {
     readonly id: string;

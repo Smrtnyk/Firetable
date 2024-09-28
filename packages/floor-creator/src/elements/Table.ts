@@ -1,8 +1,8 @@
-import type { GroupProps, Rect, FabricText, Circle } from "fabric/es";
+import type { GroupProps, Rect, FabricText, Circle } from "fabric";
 import type { AnimationStrategy } from "./animation/AnimationStrategy.js";
 import { SmoothBlinkAnimation } from "./animation/SmoothBlinkAnimation.js";
 import { TABLE_WIDTH, TABLE_HEIGHT } from "../constants.js";
-import { Group, LayoutManager } from "fabric/es";
+import { Group, LayoutManager } from "fabric";
 
 interface TableElementOptions {
     groupOptions: Partial<GroupProps> & {

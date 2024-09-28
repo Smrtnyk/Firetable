@@ -1,7 +1,7 @@
-import type { FabricObject, GroupProps } from "fabric/es";
+import type { FabricObject, GroupProps } from "fabric";
 import { FloorElementTypes } from "../types.js";
 import { ELEMENT_DEFAULT_FILL_COLOR } from "../constants.js";
-import { Group, LayoutManager, Rect } from "fabric/es";
+import { Group, LayoutManager, Rect } from "fabric";
 
 type SofaGroupCreationOpts = Partial<GroupProps> & {
     top: number;

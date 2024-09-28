@@ -1,4 +1,4 @@
-import type { FabricObject } from "fabric/es";
+import type { FabricObject } from "fabric";
 import type { EventManager } from "./event-manager/EventManager.js";
 import type {
     CreateElementOptions,

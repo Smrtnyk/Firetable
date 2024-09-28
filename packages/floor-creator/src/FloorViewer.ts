@@ -1,4 +1,4 @@
-import type { FabricObject } from "fabric/es";
+import type { FabricObject } from "fabric";
 import type { FloorCreationOptions, FloorEditorElement } from "./types.js";
 import { Floor } from "./Floor.js";
 import { ViewerEventManager } from "./event-manager/ViewerEventManager.js";

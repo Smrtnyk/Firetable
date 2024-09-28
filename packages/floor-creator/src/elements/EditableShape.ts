@@ -1,6 +1,6 @@
-import type { CircleProps, FabricObject, GroupProps, RectProps } from "fabric/es";
+import type { CircleProps, FabricObject, GroupProps, RectProps } from "fabric";
 import { FONT_SIZE, TABLE_TEXT_FILL_COLOR } from "../constants.js";
-import { classRegistry, Group, Rect, Circle, IText } from "fabric/es";
+import { Group, Rect, Circle, IText } from "fabric";
 
 type Editable = "circle" | "rect";
 
@@ -63,5 +63,3 @@ export class EditableShape extends Group {
         return this.shape.get("fill");
     }
 }
-
-classRegistry.setClass(EditableShape);

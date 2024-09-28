@@ -1,5 +1,5 @@
 import type { Command } from "./Command.js";
-import type { FabricObject } from "fabric/es";
+import type { FabricObject } from "fabric";
 
 type Position = {
     left: number;
