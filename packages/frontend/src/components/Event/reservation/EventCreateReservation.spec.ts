@@ -122,7 +122,7 @@ describe("EventCreateReservation", () => {
             expect(isVIPCheckbox.getAttribute("aria-checked")).toBe("false");
         });
 
-        it("renders the form with initial values in 'update' mode", async () => {
+        it("renders the form with initial values in 'update' mode", () => {
             props.mode = "update";
             props.reservationData = generateUpdateState();
 
