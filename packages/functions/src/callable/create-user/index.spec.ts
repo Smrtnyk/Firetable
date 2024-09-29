@@ -5,6 +5,7 @@ import { MockFirestore } from "../../../test-helpers/MockFirestore.js";
 import * as Init from "../../init.js";
 import { getUserPath } from "../../paths.js";
 import { createUser } from "./index.js";
+import { HttpsError } from "firebase-functions/v2/https";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const testUserData = {
@@ -83,5 +84,34 @@ describe("createUser", () => {
 
         // Verify user cleanup in Auth
         expect(() => mockAuth.getUserByEmail(testUserData.email)).toThrow();
+    });
+
+    it("should throw an 'invalid-argument' error if the password is invalid", async () => {
+        // Arrange: Modify testUserData to have an invalid password (e.g., less than 6 characters)
+        const invalidPasswordData = { ...testUserData, password: "123" };
+
+        // Mock createUser to throw an 'auth/invalid-password' error
+        const authError = new Error("Password should be at least 6 characters");
+        // Assign the Firebase error code
+        (authError as any).code = "auth/invalid-password";
+        vi.spyOn(mockAuth, "createUser").mockRejectedValue(authError);
+
+        // Act & Assert: Expect the function to throw an HttpsError with code 'invalid-argument' and appropriate message
+        await expect(
+            createUser({ data: invalidPasswordData } as CallableRequest<CreateUserPayload>),
+        ).rejects.toThrow(
+            "The provided password is invalid. It must be at least 6 characters long and contain a mix of characters.",
+        );
+
+        // Optionally, you can check the error type and code more precisely
+        try {
+            await createUser({ data: invalidPasswordData } as CallableRequest<CreateUserPayload>);
+        } catch (error: any) {
+            expect(error).toBeInstanceOf(HttpsError);
+            expect(error.code).toBe("invalid-argument");
+            expect(error.message).toBe(
+                "The provided password is invalid. It must be at least 6 characters long and contain a mix of characters.",
+            );
+        }
     });
 });

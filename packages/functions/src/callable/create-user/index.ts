@@ -87,8 +87,31 @@ export async function createUser(
         if (createdUserUid) {
             await auth.deleteUser(createdUserUid);
         }
-        const errorCode = e.code ?? "unknown";
-        const errorMessage = e.message ?? "An unknown error occurred.";
+
+        // Map Firebase Auth error codes to HttpsError codes
+        let errorCode: HttpsError["code"] = "unknown";
+        let errorMessage = "An unknown error occurred.";
+
+        switch (e.code) {
+            case "auth/invalid-password":
+                errorCode = "invalid-argument";
+                errorMessage =
+                    "The provided password is invalid. It must be at least 6 characters long and contain a mix of characters.";
+                break;
+            case "auth/email-already-exists":
+                errorCode = "already-exists";
+                errorMessage = "A user with this email already exists.";
+                break;
+            case "auth/invalid-email":
+                errorCode = "invalid-argument";
+                errorMessage = "The provided email is invalid.";
+                break;
+            // Add more cases as needed based on Firebase Auth error codes
+            default:
+                errorCode = "internal";
+                errorMessage = e.message || "An internal error occurred.";
+        }
+
         throw new HttpsError(errorCode, errorMessage);
     }
 }
