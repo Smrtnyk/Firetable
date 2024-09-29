@@ -5,7 +5,14 @@ import { ADMIN, Role } from "@firetable/types";
 import { QForm } from "quasar";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";
-import { noEmptyString, noWhiteSpaces } from "src/helpers/form-rules";
+import {
+    hasNumbers,
+    hasSymbols,
+    hasUpperCase,
+    minLength,
+    noEmptyString,
+    noWhiteSpaces,
+} from "src/helpers/form-rules";
 import { useI18n } from "vue-i18n";
 
 interface Props {
@@ -15,9 +22,6 @@ interface Props {
 
 type Emits = (event: "submit", payload: CreateUserPayload | User) => void;
 
-const stringRules = [noEmptyString()];
-const userNameRules = [noEmptyString(), noWhiteSpaces];
-
 const { t } = useI18n();
 const authStore = useAuthStore();
 const emit = defineEmits<Emits>();
@@ -26,6 +30,16 @@ const userCreateForm = useTemplateRef<QForm>("userCreateForm");
 
 const form = ref<CreateUserPayload | User>(userSkeleton());
 const chosenProperties = ref<string[]>([]);
+
+const stringRules = [noEmptyString()];
+const userNameRules = [noEmptyString(), noWhiteSpaces];
+const passwordRules = [
+    noEmptyString(t("validation.passwordRequired")),
+    minLength(t("validation.passwordMinLength"), 6),
+    hasUpperCase(t("validation.passwordHasUpperCase")),
+    hasNumbers(t("validation.passwordHasNumbers")),
+    hasSymbols(t("validation.passwordHasSymbols")),
+];
 
 const currUserRole = computed(function () {
     return authStore.nonNullableUser.role;
@@ -145,7 +159,7 @@ function resetProperties(): void {
                 :label="t('UserCreateForm.userPasswordInputLabel')"
                 :hint="t('UserCreateForm.userPasswordInputHint')"
                 lazy-rules
-                :rules="stringRules"
+                :rules="passwordRules"
             >
                 <template #prepend>
                     <q-icon name="key" />

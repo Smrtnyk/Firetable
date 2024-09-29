@@ -14,6 +14,17 @@ export default {
         reset: "Reset",
         manageInventoryLink: "Manage Inventory",
     },
+    validation: {
+        required: "Please type something.",
+        noWhiteSpaces: "No whitespaces are allowed!",
+        passwordRequired: "Password is required.",
+        passwordMinLength: "Password must be at least 6 characters long.",
+        passwordHasUpperCase: "Password must include at least one uppercase letter.",
+        passwordHasNumbers: "Password must include at least one number.",
+        passwordHasSymbols:
+            "Password must include at least one special character (e.g., !, #, etc...)",
+        selectAtLeastOneProperty: "You must select at least one property!",
+    },
     InventoryTable: {
         quantity: "Quantity",
         drink: "Drink",

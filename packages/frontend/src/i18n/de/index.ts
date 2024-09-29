@@ -14,6 +14,17 @@ export default {
         reset: "Zurücksetzen",
         manageInventoryLink: "Inventar verwalten",
     },
+    validation: {
+        required: "Bitte geben Sie etwas ein.",
+        noWhiteSpaces: "Keine Leerzeichen erlaubt!",
+        passwordRequired: "Passwort ist erforderlich.",
+        passwordMinLength: "Das Passwort muss mindestens 6 Zeichen lang sein.",
+        passwordHasUpperCase: "Das Passwort muss mindestens einen Großbuchstaben enthalten.",
+        passwordHasNumbers: "Das Passwort muss mindestens eine Zahl enthalten.",
+        passwordHasSymbols:
+            "Das Passwort muss mindestens ein Sonderzeichen enthalten (e.g., !, #, etc...)",
+        selectAtLeastOneProperty: "Sie müssen mindestens eine Immobilie auswählen!",
+    },
     AppDrawer: {
         links: {
             logout: "Abmelden",

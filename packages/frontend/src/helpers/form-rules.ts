@@ -25,6 +25,24 @@ export function noWhiteSpaces(val: string): boolean | string {
     return !/\s/g.test(val) || "No whitespaces are allowed!";
 }
 
+export function hasUpperCase(msg: string): (val: string) => boolean | string {
+    return function (val: string): boolean | string {
+        return /[A-Z]/.test(val) || msg;
+    };
+}
+
+export function hasNumbers(msg: string): (val: string) => boolean | string {
+    return function (val: string): boolean | string {
+        return /\d/.test(val) || msg;
+    };
+}
+
+export function hasSymbols(msg: string): (val: string) => boolean | string {
+    return function (val: string): boolean | string {
+        return /[!"#$%&()*,.:<>?@^{|}]/.test(val) || msg;
+    };
+}
+
 export function requireNumber(
     msg = "You must type in a number!",
 ): (val: unknown) => boolean | string {

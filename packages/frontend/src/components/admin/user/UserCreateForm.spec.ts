@@ -116,7 +116,7 @@ describe("UserCreateForm", () => {
         );
         await userEvent.fill(
             screen.getByLabelText(t("UserCreateForm.userPasswordInputLabel")),
-            "password123",
+            "Passwor!d123",
         );
 
         const submitButton = screen.getByRole("button", { name: t("Global.submit") });
@@ -146,7 +146,7 @@ describe("UserCreateForm", () => {
         );
         await userEvent.fill(
             screen.getByLabelText(t("UserCreateForm.userPasswordInputLabel")),
-            "password123",
+            "Passwor!d123",
         );
 
         // Select role
@@ -169,7 +169,7 @@ describe("UserCreateForm", () => {
         expect(emittedPayload).toMatchObject({
             name: "Test User",
             username: "testuser",
-            password: "password123",
+            password: "Passwor!d123",
             role: Role.MANAGER,
             // emailSuffix is '@TestOrg.at'
             email: "testuser@TestOrg.at",
@@ -250,5 +250,167 @@ describe("UserCreateForm", () => {
         // Check that properties selection is not displayed
         const propertyCheckboxes = screen.getByRole("checkbox");
         expect(propertyCheckboxes.elements().length).toBe(0);
+    });
+
+    it("validates that password is not empty", async () => {
+        const screen = renderComponent(UserCreateForm, props, {
+            piniaStoreOptions: {
+                initialState: {
+                    auth: { user },
+                },
+            },
+        });
+
+        await userEvent.fill(
+            screen.getByLabelText(t("UserCreateForm.userNameInputLabel")),
+            "Test User",
+        );
+        await userEvent.fill(
+            screen.getByLabelText(t("UserCreateForm.userMailInputLabel")),
+            "testuser",
+        );
+
+        const submitButton = screen.getByRole("button", { name: t("Global.submit") });
+        await userEvent.click(submitButton);
+
+        expect(screen.getByText("Password is required.")).toBeTruthy();
+    });
+
+    it("validates that password meets minimum length", async () => {
+        const screen = renderComponent(UserCreateForm, props, {
+            piniaStoreOptions: {
+                initialState: {
+                    auth: { user },
+                },
+            },
+        });
+
+        await userEvent.fill(
+            screen.getByLabelText(t("UserCreateForm.userNameInputLabel")),
+            "Test User",
+        );
+        await userEvent.fill(
+            screen.getByLabelText(t("UserCreateForm.userMailInputLabel")),
+            "testuser",
+        );
+        await userEvent.fill(
+            screen.getByLabelText(t("UserCreateForm.userPasswordInputLabel")),
+            // Short password
+            "123",
+        );
+
+        const submitButton = screen.getByRole("button", { name: t("Global.submit") });
+        await userEvent.click(submitButton);
+
+        expect(screen.getByText("Password must be at least 6 characters long.")).toBeTruthy();
+    });
+
+    it("validates that password includes at least one uppercase letter, one number, and one symbol", async () => {
+        const screen = renderComponent(UserCreateForm, props, {
+            piniaStoreOptions: {
+                initialState: {
+                    auth: { user },
+                },
+            },
+        });
+
+        await userEvent.fill(
+            screen.getByLabelText(t("UserCreateForm.userNameInputLabel")),
+            "Test User",
+        );
+        await userEvent.fill(
+            screen.getByLabelText(t("UserCreateForm.userMailInputLabel")),
+            "testuser",
+        );
+        await userEvent.fill(
+            screen.getByLabelText(t("UserCreateForm.userPasswordInputLabel")),
+            // No uppercase, number, or symbol
+            "password",
+        );
+
+        const submitButton = screen.getByRole("button", { name: t("Global.submit") });
+        await userEvent.click(submitButton);
+
+        expect(
+            screen.getByText("Password must include at least one uppercase letter.").query(),
+        ).toBeTruthy();
+
+        await userEvent.fill(
+            screen.getByLabelText(t("UserCreateForm.userPasswordInputLabel")),
+            // No number, or symbol
+            "Password",
+        );
+
+        await userEvent.click(submitButton);
+
+        expect(screen.getByText("Password must include at least one number.").query()).toBeTruthy();
+
+        await userEvent.fill(
+            screen.getByLabelText(t("UserCreateForm.userPasswordInputLabel")),
+            // No symbol
+            "Password1",
+        );
+
+        await userEvent.click(submitButton);
+
+        expect(
+            screen
+                .getByText(
+                    "Password must include at least one special character (e.g., !, #, etc...)",
+                )
+                .query(),
+        ).toBeTruthy();
+    });
+
+    it("emits submit event when password meets all validation rules", async () => {
+        const screen = renderComponent(UserCreateForm, props, {
+            piniaStoreOptions: {
+                initialState: {
+                    auth: { user },
+                },
+            },
+        });
+
+        await userEvent.fill(
+            screen.getByLabelText(t("UserCreateForm.userNameInputLabel")),
+            "Test User",
+        );
+        await userEvent.fill(
+            screen.getByLabelText(t("UserCreateForm.userMailInputLabel")),
+            "testuser",
+        );
+        await userEvent.fill(
+            screen.getByLabelText(t("UserCreateForm.userPasswordInputLabel")),
+            // Valid password
+            "Password123!",
+        );
+
+        // Select role
+        const roleSelect = screen.getByLabelText(t("UserCreateForm.userRoleSelectLabel"));
+        await userEvent.click(roleSelect);
+        const managerOption = screen.getByRole("option", { name: Role.MANAGER });
+        await userEvent.click(managerOption);
+
+        // Select properties
+        const propertyCheckboxes = screen.getByRole("checkbox");
+        // Select first property
+        await userEvent.click(propertyCheckboxes.elements()[0]);
+
+        const submitButton = screen.getByRole("button", { name: t("Global.submit") });
+        await userEvent.click(submitButton);
+
+        // Check that the 'submit' event was emitted with correct payload
+        expect(screen.emitted().submit).toBeTruthy();
+        const emittedPayload = screen.emitted().submit[0][0];
+        expect(emittedPayload).toMatchObject({
+            name: "Test User",
+            username: "testuser",
+            password: "Password123!",
+            role: Role.MANAGER,
+            // emailSuffix is '@TestOrg.at'
+            email: "testuser@TestOrg.at",
+            organisationId: "org1",
+            relatedProperties: ["property1"],
+        });
     });
 });
