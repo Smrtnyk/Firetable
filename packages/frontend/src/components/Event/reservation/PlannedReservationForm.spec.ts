@@ -1,6 +1,7 @@
 import type { VueWrapper } from "@vue/test-utils";
 import type { Reservation, ReservationDoc, User } from "@firetable/types";
 
+import type { PlannedReservationFormProps } from "./PlannedReservationForm.vue";
 import PlannedReservationForm from "./PlannedReservationForm.vue";
 import messages from "../../../i18n";
 
@@ -20,8 +21,6 @@ import {
     QRadio,
     ClosePopup,
 } from "quasar";
-
-type PropsType = typeof PlannedReservationForm.props;
 
 const i18n = createI18n({
     locale: "en-GB",
@@ -57,8 +56,10 @@ const testReservationData: Reservation = {
     isVIP: false,
 };
 
-function createProps(overrides: Partial<PropsType> = {}): PropsType {
-    const defaultProps: PropsType = {
+function createProps(
+    overrides: Partial<PlannedReservationFormProps> = {},
+): PlannedReservationFormProps {
+    const defaultProps: PlannedReservationFormProps = {
         currentUser: MOCK_USER,
         users: [],
         mode: "create",
@@ -85,7 +86,7 @@ const MOCK_USER: ReservationDoc["creator"] = {
 };
 
 function mountComponent(
-    overrides?: Partial<PropsType>,
+    overrides?: Partial<PlannedReservationFormProps>,
 ): VueWrapper<typeof PlannedReservationForm, any> {
     return mount(PlannedReservationForm, {
         props: createProps(overrides),
