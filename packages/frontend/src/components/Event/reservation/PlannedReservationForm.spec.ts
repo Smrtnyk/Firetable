@@ -66,9 +66,7 @@ function createProps(overrides: Partial<PropsType> = {}): PropsType {
         table: {
             label: "1",
         },
-        floor: {
-            id: "1",
-        },
+        floorId: "1",
         eventStartTimestamp: Date.now(),
         eventDurationInHours: 8,
     };
