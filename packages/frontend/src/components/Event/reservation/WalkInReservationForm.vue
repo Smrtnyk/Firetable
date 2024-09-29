@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { WalkInReservation } from "@firetable/types";
-import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
+import type { BaseTable } from "@firetable/floor-creator";
 import { isTimeWithinEventDuration } from "./reservation-form-utils";
 import { ReservationStatus, ReservationType } from "@firetable/types";
 import { ref, useTemplateRef } from "vue";
@@ -13,7 +13,7 @@ interface Props {
     mode: "create" | "update";
     eventStartTimestamp: number;
     table: BaseTable;
-    floor: FloorViewer;
+    floorId: string;
     /**
      *  Optional data for editing
      */
@@ -41,7 +41,7 @@ function generateInitialState(): Omit<WalkInReservation, "creator"> {
     const formattedTime = hourFromTimestamp(initialTime, null);
     return {
         type: ReservationType.WALK_IN as const,
-        guestName: null,
+        guestName: "",
         numberOfGuests: 2,
         guestContact: "",
         reservationNote: "",
@@ -49,7 +49,7 @@ function generateInitialState(): Omit<WalkInReservation, "creator"> {
         arrived: true as const,
         time: formattedTime,
         tableLabel: props.table.label,
-        floorId: props.floor.id,
+        floorId: props.floorId,
         status: ReservationStatus.ACTIVE,
         isVIP: false,
     };

@@ -85,7 +85,7 @@ interface BaseReservation {
 
 export interface WalkInReservation extends BaseReservation {
     type: ReservationType.WALK_IN;
-    guestName: string | null;
+    guestName: string;
     consumption: number;
     arrived: true;
 }

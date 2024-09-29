@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PlannedReservation, User } from "@firetable/types";
-import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
+import type { BaseTable } from "@firetable/floor-creator";
 import { isTimeWithinEventDuration } from "./reservation-form-utils";
 import { ReservationStatus, ReservationType } from "@firetable/types";
 import { computed, ref, watch, useTemplateRef } from "vue";
@@ -14,7 +14,7 @@ interface Props {
     mode: "create" | "update";
     eventStartTimestamp: number;
     table: BaseTable;
-    floor: FloorViewer;
+    floorId: string;
     /**
      *  Optional data for editing
      */
@@ -48,7 +48,7 @@ const initialState =
               reservedBy: null as unknown as User,
               cancelled: false,
               tableLabel: props.table.label,
-              floorId: props.floor.id,
+              floorId: props.floorId,
               status: ReservationStatus.ACTIVE,
               isVIP: false,
           };

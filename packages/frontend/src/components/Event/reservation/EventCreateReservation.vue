@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Reservation, User } from "@firetable/types";
-import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
+import type { BaseTable } from "@firetable/floor-creator";
 
 import { ReservationType } from "@firetable/types";
 import { computed, ref, watch, useTemplateRef } from "vue";
@@ -10,13 +10,13 @@ import PlannedReservationForm from "src/components/Event/reservation/PlannedRese
 import WalkInReservationForm from "src/components/Event/reservation/WalkInReservationForm.vue";
 import { getFirestoreTimestamp } from "@firetable/backend";
 
-interface Props {
+export interface EventCreateReservationProps {
     currentUser: User;
     users: User[];
     mode: "create" | "update";
     eventStartTimestamp: number;
     table: BaseTable;
-    floor: FloorViewer;
+    floorId: string;
     /**
      *  Optional data for editing
      */
@@ -24,7 +24,7 @@ interface Props {
     eventDurationInHours: number;
 }
 
-const props = defineProps<Props>();
+const props = defineProps<EventCreateReservationProps>();
 
 const emit = defineEmits<(e: "create" | "update", payload: Reservation) => void>();
 
@@ -41,7 +41,7 @@ const currentlyActiveRef = computed(function () {
 
 const currentReservationType = computed(function () {
     // Default to PLANNED type if reservationData is not provided
-    return props.reservationData ? props.reservationData.type : ReservationType.PLANNED;
+    return props.reservationData?.type ?? ReservationType.PLANNED;
 });
 
 const showPlannedReservationForm = computed(function () {
@@ -121,7 +121,7 @@ async function onOKClick(): Promise<void> {
             :current-user="props.currentUser"
             :mode="props.mode"
             :event-start-timestamp="props.eventStartTimestamp"
-            :floor="props.floor"
+            :floor-id="props.floorId"
             :users="props.users"
             :table="props.table"
             :reservation-data="typedReservationDataForPlanned"
@@ -134,7 +134,7 @@ async function onOKClick(): Promise<void> {
             :reservation-data="typedReservationDataForWalkIn"
             :mode="props.mode"
             :event-start-timestamp="props.eventStartTimestamp"
-            :floor="props.floor"
+            :floor-id="props.floorId"
             :table="props.table"
             :event-duration-in-hours="props.eventDurationInHours"
         />

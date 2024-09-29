@@ -274,7 +274,7 @@ export function useReservations(
                             ? { ...reservation, id: reservation.id }
                             : void 0,
                     eventStartTimestamp,
-                    floor,
+                    floorId: floor.id,
                     table: element,
                     eventDurationInHours: settings.value.event.eventDurationInHours,
                 },
