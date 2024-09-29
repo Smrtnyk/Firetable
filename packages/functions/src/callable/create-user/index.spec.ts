@@ -30,7 +30,7 @@ describe("createUser", () => {
         vi.spyOn(Init, "auth", "get").mockReturnValue(mockAuth as any);
     });
 
-    it("should throw an error if the user already exists", async () => {
+    it("throws an error if the user already exists", async () => {
         // Setup to simulate existing user
         await mockAuth.createUser({ email: "test@example.com", password: "testpassword" });
 
@@ -40,7 +40,7 @@ describe("createUser", () => {
         ).rejects.toThrow("A user with this email already exists.");
     });
 
-    it("should create a new user and store their data in Firestore", async () => {
+    it("creates a new user and store their data in Firestore", async () => {
         const result = await createUser({
             data: testUserData,
         } as CallableRequest<CreateUserPayload>);
@@ -60,7 +60,7 @@ describe("createUser", () => {
         );
     });
 
-    it("should handle failure in creating a user in Firebase Auth", async () => {
+    it("handles failure in creating a user in Firebase Auth", async () => {
         // Mock createUser to throw an error
         vi.spyOn(mockAuth, "createUser").mockRejectedValue(new Error("Auth creation failed"));
 
@@ -73,7 +73,7 @@ describe("createUser", () => {
         expect(mockFirestore.data.size).toBe(0);
     });
 
-    it("should clean up by deleting the user from Auth if there's an exception after user creation", async () => {
+    it("cleans up by deleting the user from Auth if there's an exception after user creation", async () => {
         vi.spyOn(mockFirestore, "runTransaction").mockRejectedValue(
             new Error("Some post-creation error"),
         );
@@ -86,24 +86,19 @@ describe("createUser", () => {
         expect(() => mockAuth.getUserByEmail(testUserData.email)).toThrow();
     });
 
-    it("should throw an 'invalid-argument' error if the password is invalid", async () => {
-        // Arrange: Modify testUserData to have an invalid password (e.g., less than 6 characters)
+    it("throws an 'invalid-argument' error if the password is invalid", async () => {
         const invalidPasswordData = { ...testUserData, password: "123" };
 
-        // Mock createUser to throw an 'auth/invalid-password' error
         const authError = new Error("Password should be at least 6 characters");
-        // Assign the Firebase error code
         (authError as any).code = "auth/invalid-password";
         vi.spyOn(mockAuth, "createUser").mockRejectedValue(authError);
 
-        // Act & Assert: Expect the function to throw an HttpsError with code 'invalid-argument' and appropriate message
         await expect(
             createUser({ data: invalidPasswordData } as CallableRequest<CreateUserPayload>),
         ).rejects.toThrow(
             "The provided password is invalid. It must be at least 6 characters long and contain a mix of characters.",
         );
 
-        // Optionally, you can check the error type and code more precisely
         try {
             await createUser({ data: invalidPasswordData } as CallableRequest<CreateUserPayload>);
         } catch (error: any) {
@@ -112,6 +107,43 @@ describe("createUser", () => {
             expect(error.message).toBe(
                 "The provided password is invalid. It must be at least 6 characters long and contain a mix of characters.",
             );
+        }
+    });
+
+    it("throws an 'invalid-argument' error if the email is invalid", async () => {
+        const invalidEmailData = { ...testUserData, email: "invalid-email" };
+
+        const authError = new Error("The email address is badly formatted.");
+        (authError as any).code = "auth/invalid-email";
+        vi.spyOn(mockAuth, "createUser").mockRejectedValue(authError);
+
+        await expect(
+            createUser({ data: invalidEmailData } as CallableRequest<CreateUserPayload>),
+        ).rejects.toThrow("The provided email is invalid.");
+
+        try {
+            await createUser({ data: invalidEmailData } as CallableRequest<CreateUserPayload>);
+        } catch (error: any) {
+            expect(error).toBeInstanceOf(HttpsError);
+            expect(error.code).toBe("invalid-argument");
+            expect(error.message).toBe("The provided email is invalid.");
+        }
+    });
+
+    it("throws an 'internal' error for unexpected errors", async () => {
+        const unexpectedError = new Error("Unexpected server error.");
+        vi.spyOn(mockAuth, "createUser").mockRejectedValue(unexpectedError);
+
+        await expect(
+            createUser({ data: testUserData } as CallableRequest<CreateUserPayload>),
+        ).rejects.toThrow("Unexpected server error.");
+
+        try {
+            await createUser({ data: testUserData } as CallableRequest<CreateUserPayload>);
+        } catch (error: any) {
+            expect(error).toBeInstanceOf(HttpsError);
+            expect(error.code).toBe("internal");
+            expect(error.message).toBe("Unexpected server error.");
         }
     });
 });
