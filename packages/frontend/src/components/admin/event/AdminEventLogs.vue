@@ -6,11 +6,11 @@ import { computed, ref, useTemplateRef } from "vue";
 import { QScrollArea } from "quasar";
 import { formatEventDate } from "src/helpers/date-utils";
 
-interface Props {
+export interface AdminEventLogsProps {
     logsDoc: EventLogsDoc;
     isAdmin: boolean;
 }
-const props = defineProps<Props>();
+const props = defineProps<AdminEventLogsProps>();
 const logs = computed(function () {
     if (props.isAdmin) {
         return props.logsDoc.logs;

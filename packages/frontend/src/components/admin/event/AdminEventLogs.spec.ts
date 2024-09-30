@@ -1,5 +1,6 @@
 import type { EventLog, EventLogsDoc } from "@firetable/types";
 import type { RenderResult } from "vitest-browser-vue";
+import type { AdminEventLogsProps } from "./AdminEventLogs.vue";
 import AdminEventLogs from "./AdminEventLogs.vue";
 import { renderComponent } from "../../../../test-helpers/render-component";
 import { formatEventDate } from "../../../helpers/date-utils";
@@ -67,7 +68,7 @@ function getIconNameForLogEntry(logMessage: string): string {
 }
 
 describe("AdminEventLogs", () => {
-    let screen: RenderResult<any>;
+    let screen: RenderResult<AdminEventLogsProps>;
 
     describe("when user is admin", () => {
         beforeEach(() => {
@@ -169,13 +170,11 @@ describe("AdminEventLogs", () => {
         );
 
         // Get the QScrollArea element
-        const scrollAreaElement = screen.container.querySelector(".logs-container") as HTMLElement;
+        const scrollAreaElement = screen.container.querySelector(".logs-container");
         expect(scrollAreaElement).toBeTruthy();
 
         // Get the scrolling element inside QScrollArea
-        const scrollContentElement = scrollAreaElement.querySelector(
-            ".q-scrollarea__container",
-        ) as HTMLElement;
+        const scrollContentElement = scrollAreaElement.querySelector(".q-scrollarea__container");
         expect(scrollContentElement).toBeTruthy();
 
         // Calculate the scrollable height
