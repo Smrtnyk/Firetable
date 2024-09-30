@@ -37,7 +37,6 @@ import EventCreateReservation from "src/components/Event/reservation/EventCreate
 import EventShowReservation from "src/components/Event/EventShowReservation.vue";
 import { determineTableColor } from "src/helpers/floor";
 import { isValidEuropeanPhoneNumber } from "src/helpers/utils";
-import { isEventInProgress } from "src/helpers/events-utils";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { AppLogger } from "src/logger/FTLogger.js";
 import { storeToRefs } from "pinia";
@@ -713,4 +712,10 @@ function shouldMarkReservationAsExpired(reservationTime: string, eventDate: Date
     }
 
     return currentDate.getTime() - eventDateTime.getTime() >= HALF_HOUR;
+}
+
+function isEventInProgress(eventDate: number): boolean {
+    const currentDateInUTC = Date.now();
+
+    return currentDateInUTC >= eventDate;
 }
