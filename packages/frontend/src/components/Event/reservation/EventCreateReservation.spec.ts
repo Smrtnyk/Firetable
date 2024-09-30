@@ -1,5 +1,6 @@
-import type { WalkInReservation } from "@firetable/types";
+import type { PlannedReservation, User, WalkInReservation } from "@firetable/types";
 import type { EventCreateReservationProps } from "./EventCreateReservation.vue";
+import type { PlannedReservationFormProps } from "./PlannedReservationForm.vue";
 import EventCreateReservation from "./EventCreateReservation.vue";
 import { hourFromTimestamp } from "../../../helpers/date-utils";
 import { renderComponent, t } from "../../../../test-helpers/render-component";
@@ -223,6 +224,338 @@ describe("EventCreateReservation", () => {
             await userEvent.click(closeBtn);
 
             expect(timeInput.getAttribute("value")).toBe(format(newTime, "HH:mm"));
+        });
+    });
+
+    describe("PlannedReservationForm", () => {
+        let plannedProps: PlannedReservationFormProps;
+
+        beforeEach(() => {
+            plannedProps = {
+                currentUser: {
+                    id: "user1",
+                    name: "Alice",
+                    email: "alice@example.com",
+                },
+                users: [
+                    { id: "user1", name: "Alice", email: "alice@example.com" },
+                    { id: "user2", name: "Bob", email: "bob@example.com" },
+                ],
+                mode: "create",
+                eventStartTimestamp,
+                table: {
+                    id: "table1",
+                    label: "Table 1",
+                },
+                floorId: "floor1",
+                reservationData: undefined,
+                eventDurationInHours: 8,
+            };
+        });
+
+        // Helper function to generate initial state for "create" mode
+        function generateInitialPlannedState(): Omit<PlannedReservation, "creator"> {
+            return {
+                type: ReservationType.PLANNED,
+                guestName: "",
+                numberOfGuests: 2,
+                guestContact: "",
+                reservationNote: "",
+                consumption: 1,
+                arrived: false,
+                reservationConfirmed: false,
+                time: "00:00",
+                reservedBy: null as unknown as User,
+                cancelled: false,
+                tableLabel: plannedProps.table.label,
+                floorId: plannedProps.floorId,
+                status: ReservationStatus.ACTIVE,
+                isVIP: false,
+            };
+        }
+
+        // Helper function to generate initial state for "update" mode
+        function generateUpdatePlannedState(): Omit<PlannedReservation, "creator"> {
+            return {
+                type: ReservationType.PLANNED,
+                guestName: "Charlie",
+                numberOfGuests: 5,
+                guestContact: "charlie@example.com",
+                reservationNote: "Anniversary party",
+                consumption: 100,
+                arrived: false,
+                reservationConfirmed: true,
+                time: "20:00",
+                reservedBy: {
+                    name: "Bob",
+                    email: "bob@example.com",
+                    id: "user2",
+                },
+                cancelled: false,
+                tableLabel: plannedProps.table.label,
+                floorId: plannedProps.floorId,
+                status: ReservationStatus.ACTIVE,
+                isVIP: true,
+            };
+        }
+
+        it("renders the form with initial values in 'create' mode", () => {
+            const screen = renderComponent(EventCreateReservation, plannedProps);
+
+            // Check that guest name input is empty
+            const guestNameInput = screen
+                .getByLabelText(t("EventCreateReservation.reservationGuestName"))
+                .query();
+            expect(guestNameInput.getAttribute("value")).toBe("");
+
+            // Check that time input has the correct initial value
+            const timeInput = screen
+                .getByLabelText(t("EventCreateReservation.reservationTime"))
+                .query();
+            expect(timeInput.getAttribute("value")).toBe(generateInitialPlannedState().time);
+
+            // Check that number of guests input has default value
+            const numberOfGuestsInput = screen
+                .getByLabelText(t("EventCreateReservation.reservationNumberOfGuests"))
+                .query();
+            expect(Number(numberOfGuestsInput.getAttribute("value"))).toBe(
+                generateInitialPlannedState().numberOfGuests,
+            );
+
+            // Check that consumption input has default value
+            const consumptionInput = screen
+                .getByLabelText(t("EventCreateReservation.reservationConsumption"))
+                .query();
+            expect(Number(consumptionInput.getAttribute("value"))).toBe(
+                generateInitialPlannedState().consumption,
+            );
+
+            // Check that guest contact input is empty
+            const guestContactInput = screen
+                .getByLabelText(t("EventCreateReservation.reservationGuestContact"))
+                .query();
+            expect(guestContactInput.getAttribute("value")).toBe("");
+
+            // Check that reservation note input is empty
+            const reservationNoteInput = screen
+                .getByLabelText(t("EventCreateReservation.reservationNote"))
+                .query();
+            expect(reservationNoteInput.getAttribute("value")).toBe("");
+
+            // Check that isVIP checkbox is unchecked
+            const isVIPCheckbox = screen
+                .getByLabelText(t("EventCreateReservation.reservationVIP"))
+                .query();
+            expect(isVIPCheckbox.getAttribute("aria-checked")).toBe("false");
+
+            // Check that selectionType is defaulted to "user"
+            const userRadio = screen.getByRole("radio", { name: "Staff" }).query();
+            const socialRadio = screen.getByRole("radio", { name: "Social" }).query();
+            expect(userRadio.getAttribute("aria-checked")).toBe("true");
+            expect(socialRadio.getAttribute("aria-checked")).toBe("false");
+
+            // Check that reservedBy select has the first user selected
+            const reservedBySelect = screen
+                .getByRole("combobox", { name: t("EventCreateReservation.reservedByLabel") })
+                .query();
+            expect(reservedBySelect.getAttribute("value")).toBe("");
+        });
+
+        it("renders the form with initial values in 'update' mode", () => {
+            plannedProps.mode = "update";
+            plannedProps.reservationData = generateUpdatePlannedState();
+
+            const screen = renderComponent(EventCreateReservation, plannedProps);
+
+            // Check that guest name input has the correct value
+            const guestNameInput = screen
+                .getByLabelText(t("EventCreateReservation.reservationGuestName"))
+                .query();
+            expect(guestNameInput.getAttribute("value")).toBe(
+                plannedProps.reservationData?.guestName,
+            );
+
+            // Check that time input has the correct value
+            const timeInput = screen
+                .getByLabelText(t("EventCreateReservation.reservationTime"))
+                .query();
+            expect(timeInput.getAttribute("value")).toBe(plannedProps.reservationData?.time);
+
+            // Check that number of guests input has the correct value
+            const numberOfGuestsInput = screen
+                .getByLabelText(t("EventCreateReservation.reservationNumberOfGuests"))
+                .query();
+            expect(Number(numberOfGuestsInput.getAttribute("value"))).toBe(
+                plannedProps.reservationData?.numberOfGuests,
+            );
+
+            // Check that consumption input has the correct value
+            const consumptionInput = screen
+                .getByLabelText(t("EventCreateReservation.reservationConsumption"))
+                .query();
+            expect(Number(consumptionInput.getAttribute("value"))).toBe(
+                plannedProps.reservationData?.consumption,
+            );
+
+            // Check that guest contact input has the correct value
+            const guestContactInput = screen
+                .getByLabelText(t("EventCreateReservation.reservationGuestContact"))
+                .query();
+            expect(guestContactInput.getAttribute("value")).toBe(
+                plannedProps.reservationData?.guestContact,
+            );
+
+            // Check that reservation note input has the correct value
+            const reservationNoteInput = screen
+                .getByLabelText(t("EventCreateReservation.reservationNote"))
+                .query();
+            expect(reservationNoteInput.getAttribute("value")).toBe(
+                plannedProps.reservationData?.reservationNote,
+            );
+
+            // Check that isVIP checkbox is checked
+            const isVIPCheckbox = screen
+                .getByLabelText(t("EventCreateReservation.reservationVIP"))
+                .query();
+            expect(isVIPCheckbox.getAttribute("aria-checked")).toBe("true");
+
+            // Check that selectionType is set based on reservationData
+            const userRadio = screen.getByRole("radio", { name: "Staff" }).query();
+            const socialRadio = screen.getByRole("radio", { name: "Social" }).query();
+            expect(userRadio.getAttribute("aria-checked")).toBe("true");
+            expect(socialRadio.getAttribute("aria-checked")).toBe("false");
+
+            // Check that reservedBy select has the correct user selected
+            const reservedBySelect = screen
+                .getByRole("combobox", { name: t("EventCreateReservation.reservedByLabel") })
+                .query();
+            expect(reservedBySelect.getAttribute("value")).toBe(
+                plannedProps.reservationData?.reservedBy?.name,
+            );
+        });
+
+        it("validates guest name and reservedBy selection", async () => {
+            const screen = renderComponent(EventCreateReservation, plannedProps);
+
+            // Fill in guest name with insufficient length
+            const guestNameInput = screen
+                .getByLabelText(t("EventCreateReservation.reservationGuestName"))
+                .query();
+            await userEvent.type(guestNameInput, "A");
+
+            // Attempt to submit the form
+            const okBtn = screen.getByRole("button", { name: t("Global.submit") });
+            await userEvent.click(okBtn);
+
+            // Check for validation error
+            const errorMessage = screen.getByText("Name must be longer!");
+            expect(errorMessage.query()).toBeTruthy();
+
+            // Check for reservedBy validation error
+            const reservedByError = screen.getByText(
+                t("EventCreateReservation.requireReservedBySelectionError"),
+            );
+            expect(reservedByError.query()).toBeTruthy();
+        });
+
+        it("allows user to select reservedBy as 'User' and emits the correct payload", async () => {
+            const screen = renderComponent(EventCreateReservation, plannedProps);
+
+            // Fill in guest name
+            const guestNameInput = screen
+                .getByLabelText(t("EventCreateReservation.reservationGuestName"))
+                .query();
+            await userEvent.type(guestNameInput, "David");
+
+            // Select reservedBy as 'User' (Staff)
+            const userRadio = screen.getByRole("radio", { name: "Staff" }).query();
+            await userEvent.click(userRadio);
+
+            const reservedBySelect = screen
+                .getByRole("combobox", { name: t("EventCreateReservation.reservedByLabel") })
+                .query();
+            await userEvent.click(reservedBySelect);
+            const firstUserOption = screen.getByText(plannedProps.users[1].name);
+            await userEvent.click(firstUserOption);
+
+            // Submit the form
+            const okBtn = screen.getByRole("button", { name: t("Global.submit") });
+            await userEvent.click(okBtn);
+
+            // Check that the 'create' event is emitted with correct payload
+            expect(screen.emitted().create).toBeTruthy();
+            const emittedPayload = screen.emitted().create[0][0] as PlannedReservation;
+
+            expect(emittedPayload.guestName).toBe("David");
+            expect(emittedPayload.reservedBy.email).toBe(plannedProps.users[1].email);
+            expect(emittedPayload.reservedBy.name).toBe(plannedProps.users[1].name);
+            expect(emittedPayload.reservedBy.id).toBe(plannedProps.users[1].id);
+        });
+
+        it("allows user to select reservedBy as 'Social' and emits the correct payload", async () => {
+            const screen = renderComponent(EventCreateReservation, plannedProps);
+
+            // Fill in guest name
+            const guestNameInput = screen
+                .getByLabelText(t("EventCreateReservation.reservationGuestName"))
+                .query();
+            await userEvent.type(guestNameInput, "Eve");
+
+            // Select reservedBy as 'Social'
+            const socialRadio = screen.getByRole("radio", { name: "Social" }).query();
+            await userEvent.click(socialRadio);
+
+            // Submit the form
+            const okBtn = screen.getByRole("button", { name: t("Global.submit") });
+            await userEvent.click(okBtn);
+
+            // Check that the 'create' event is emitted with correct payload
+            expect(screen.emitted().create).toBeTruthy();
+            const emittedPayload = screen.emitted().create[0][0] as PlannedReservation;
+
+            expect(emittedPayload.guestName).toBe("Eve");
+            expect(emittedPayload.reservedBy.email).toBe("social-0");
+            expect(emittedPayload.reservedBy.name).toBe("Whatsapp");
+            expect(emittedPayload.reservedBy.id).toBe("");
+        });
+
+        it("emits 'update' event with correct payload in 'update' mode", async () => {
+            plannedProps.mode = "update";
+            plannedProps.reservationData = generateUpdatePlannedState();
+
+            const screen = renderComponent(EventCreateReservation, plannedProps);
+
+            // Modify guest name
+            const guestNameInput = screen
+                .getByLabelText(t("EventCreateReservation.reservationGuestName"))
+                .query();
+            await userEvent.clear(guestNameInput);
+            await userEvent.type(guestNameInput, "Charlie Updated");
+
+            const socialRadioBtn = screen.getByRole("radio", { name: "Social" });
+            await userEvent.click(socialRadioBtn);
+
+            // Change reservedBy to another user
+            const reservedBySelect = screen
+                .getByRole("combobox", { name: t("EventCreateReservation.reservedBySocialLabel") })
+                .query();
+            await userEvent.click(reservedBySelect);
+            // Selecting 'SMS'
+            const smsOption = screen.getByText("SMS");
+            await userEvent.click(smsOption);
+
+            // Submit the form
+            const okBtn = screen.getByRole("button", { name: t("Global.submit") });
+            await userEvent.click(okBtn);
+
+            // Check that the 'update' event is emitted with correct payload
+            expect(screen.emitted().update).toBeTruthy();
+            const emittedPayload = screen.emitted().update[0][0] as PlannedReservation;
+
+            expect(emittedPayload.guestName).toBe("Charlie Updated");
+            expect(emittedPayload.reservedBy.email).toBe("social-1");
+            expect(emittedPayload.reservedBy.name).toBe("SMS");
+            expect(emittedPayload.reservedBy.id).toBe("");
         });
     });
 });

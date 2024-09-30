@@ -93,7 +93,7 @@ defineExpose({
 </script>
 
 <template>
-    <q-form ref="reservationForm" class="q-gutter-md q-pt-md">
+    <q-form ref="reservationForm" class="q-gutter-md q-pt-md" greedy>
         <q-input
             data-test="guest-name"
             v-model="state.guestName"
