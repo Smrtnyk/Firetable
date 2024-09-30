@@ -53,5 +53,8 @@ export const myIcons: Record<string, string> = {
 };
 
 export function getDarkMode(): boolean {
-    return LocalStorage.getItem("FTDarkMode") ?? false;
+    return (
+        LocalStorage.getItem("FTDarkMode") ??
+        window.matchMedia("(prefers-color-scheme: dark)").matches
+    );
 }
