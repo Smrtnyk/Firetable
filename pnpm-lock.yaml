@@ -7,13 +7,13 @@ settings:
 catalogs:
   default:
     '@vitest/browser':
-      specifier: 2.1.1
+      specifier: https://pkg.pr.new/@vitest/browser@9edfa19
       version: 2.1.1
     '@vitest/spy':
-      specifier: 2.1.1
+      specifier: https://pkg.pr.new/@vitest/spy@9edfa19
       version: 2.1.1
     '@vitest/ui':
-      specifier: 2.1.1
+      specifier: https://pkg.pr.new/@vitest/ui@9edfa19
       version: 2.1.1
     es-toolkit:
       specifier: 1.23.0
@@ -22,7 +22,7 @@ catalogs:
       specifier: 10.14.0
       version: 10.14.0
     vitest:
-      specifier: 2.1.1
+      specifier: https://pkg.pr.new/vitest@9edfa19
       version: 2.1.1
 
 importers:
@@ -108,10 +108,10 @@ importers:
         version: 22.7.4
       '@vitest/browser':
         specifier: 'catalog:'
-        version: 2.1.1(@vitest/spy@2.1.1)(playwright@1.47.2)(typescript@5.6.2)(vite@5.3.5(@types/node@22.7.4)(sass@1.77.8)(terser@5.31.0))(vitest@2.1.1)(webdriverio@9.0.9)
+        version: https://pkg.pr.new/@vitest/browser@9edfa19(@vitest/spy@https://pkg.pr.new/@vitest/spy@9edfa19)(playwright@1.47.2)(typescript@5.6.2)(vite@5.4.6(@types/node@22.7.4)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vitest@2.1.1)(webdriverio@9.0.9)
       '@vitest/spy':
         specifier: 'catalog:'
-        version: 2.1.1
+        version: https://pkg.pr.new/@vitest/spy@9edfa19
       cheerio:
         specifier: 1.0.0
         version: 1.0.0
@@ -120,7 +120,7 @@ importers:
         version: 0.24.0
       vitest:
         specifier: 'catalog:'
-        version: 2.1.1(@types/node@22.7.4)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass@1.77.8)(terser@5.31.0)
+        version: https://pkg.pr.new/vitest@9edfa19(@types/node@22.7.4)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0)
 
   packages/frontend:
     dependencies:
@@ -205,13 +205,13 @@ importers:
         version: 5.1.4(vite@5.4.6(@types/node@22.7.4)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vue@3.5.10(typescript@5.6.2))
       '@vitest/browser':
         specifier: 'catalog:'
-        version: 2.1.1(@vitest/spy@2.1.1)(playwright@1.47.2)(typescript@5.6.2)(vite@5.4.6(@types/node@22.7.4)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vitest@2.1.1)(webdriverio@9.0.9)
+        version: https://pkg.pr.new/@vitest/browser@9edfa19(@vitest/spy@https://pkg.pr.new/@vitest/spy@9edfa19)(playwright@1.47.2)(typescript@5.6.2)(vite@5.4.6(@types/node@22.7.4)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vitest@2.1.1)(webdriverio@9.0.9)
       '@vitest/spy':
         specifier: 'catalog:'
-        version: 2.1.1
+        version: https://pkg.pr.new/@vitest/spy@9edfa19
       '@vitest/ui':
         specifier: 'catalog:'
-        version: 2.1.1(vitest@2.1.1)
+        version: https://pkg.pr.new/@vitest/ui@9edfa19(vitest@2.1.1)
       '@vue/test-utils':
         specifier: 2.4.6
         version: 2.4.6
@@ -220,10 +220,10 @@ importers:
         version: 5.0.1(typescript@5.6.2)(vite@5.4.6(@types/node@22.7.4)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))
       vitest:
         specifier: 'catalog:'
-        version: 2.1.1(@types/node@22.7.4)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass@1.77.8)(terser@5.31.0)
+        version: https://pkg.pr.new/vitest@9edfa19(@types/node@22.7.4)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0)
       vitest-browser-vue:
         specifier: 0.0.1
-        version: 0.0.1(@vitest/browser@2.1.1(@vitest/spy@2.1.1)(playwright@1.47.2)(typescript@5.6.2)(vite@5.4.6(@types/node@22.7.4)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vitest@2.1.1)(webdriverio@9.0.9))(vitest@2.1.1(@types/node@22.7.4)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass@1.77.8)(terser@5.31.0))(vue@3.5.10(typescript@5.6.2))
+        version: 0.0.1(@vitest/browser@https://pkg.pr.new/@vitest/browser@9edfa19(@vitest/spy@https://pkg.pr.new/@vitest/spy@9edfa19)(playwright@1.47.2)(typescript@5.6.2)(vite@5.4.6(@types/node@22.7.4)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vitest@2.1.1)(webdriverio@9.0.9))(vitest@https://pkg.pr.new/vitest@9edfa19(@types/node@22.7.4)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vue@3.5.10(typescript@5.6.2))
       vue-tsc:
         specifier: 2.1.6
         version: 2.1.6(typescript@5.6.2)
@@ -248,10 +248,10 @@ importers:
         version: 0.9.2
       '@vitest/spy':
         specifier: 'catalog:'
-        version: 2.1.1
+        version: https://pkg.pr.new/@vitest/spy@9edfa19
       vitest:
         specifier: 'catalog:'
-        version: 2.1.1(@types/node@22.7.4)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass@1.77.8)(terser@5.31.0)
+        version: https://pkg.pr.new/vitest@9edfa19(@types/node@22.7.4)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0)
 
   packages/types:
     dependencies:
@@ -1900,19 +1900,9 @@ packages:
       rollup:
         optional: true
 
-  '@rollup/rollup-android-arm-eabi@4.17.2':
-    resolution: {integrity: sha512-NM0jFxY8bB8QLkoKxIQeObCaDlJKewVlIEkuyYKm5An1tdVZ966w2+MPQ2l8LBZLjR+SgyV+nRkTIunzOYBMLQ==}
-    cpu: [arm]
-    os: [android]
-
   '@rollup/rollup-android-arm-eabi@4.22.2':
     resolution: {integrity: sha512-8Ao+EDmTPjZ1ZBABc1ohN7Ylx7UIYcjReZinigedTOnGFhIctyGPxY2II+hJ6gD2/vkDKZTyQ0e7++kwv6wDrw==}
     cpu: [arm]
-    os: [android]
-
-  '@rollup/rollup-android-arm64@4.17.2':
-    resolution: {integrity: sha512-yeX/Usk7daNIVwkq2uGoq2BYJKZY1JfyLTaHO/jaiSwi/lsf8fTFoQW/n6IdAsx5tx+iotu2zCJwz8MxI6D/Bw==}
-    cpu: [arm64]
     os: [android]
 
   '@rollup/rollup-android-arm64@4.22.2':
@@ -1920,19 +1910,9 @@ packages:
     cpu: [arm64]
     os: [android]
 
-  '@rollup/rollup-darwin-arm64@4.17.2':
-    resolution: {integrity: sha512-kcMLpE6uCwls023+kknm71ug7MZOrtXo+y5p/tsg6jltpDtgQY1Eq5sGfHcQfb+lfuKwhBmEURDga9N0ol4YPw==}
-    cpu: [arm64]
-    os: [darwin]
-
   '@rollup/rollup-darwin-arm64@4.22.2':
     resolution: {integrity: sha512-BTHO7rR+LC67OP7I8N8GvdvnQqzFujJYWo7qCQ8fGdQcb8Gn6EQY+K1P+daQLnDCuWKbZ+gHAQZuKiQkXkqIYg==}
     cpu: [arm64]
-    os: [darwin]
-
-  '@rollup/rollup-darwin-x64@4.17.2':
-    resolution: {integrity: sha512-AtKwD0VEx0zWkL0ZjixEkp5tbNLzX+FCqGG1SvOu993HnSz4qDI6S4kGzubrEJAljpVkhRSlg5bzpV//E6ysTQ==}
-    cpu: [x64]
     os: [darwin]
 
   '@rollup/rollup-darwin-x64@4.22.2':
@@ -1940,18 +1920,8 @@ packages:
     cpu: [x64]
     os: [darwin]
 
-  '@rollup/rollup-linux-arm-gnueabihf@4.17.2':
-    resolution: {integrity: sha512-3reX2fUHqN7sffBNqmEyMQVj/CKhIHZd4y631duy0hZqI8Qoqf6lTtmAKvJFYa6bhU95B1D0WgzHkmTg33In0A==}
-    cpu: [arm]
-    os: [linux]
-
   '@rollup/rollup-linux-arm-gnueabihf@4.22.2':
     resolution: {integrity: sha512-GBHuY07x96OTEM3OQLNaUSUwrOhdMea/LDmlFHi/HMonrgF6jcFrrFFwJhhe84XtA1oK/Qh4yFS+VMREf6dobg==}
-    cpu: [arm]
-    os: [linux]
-
-  '@rollup/rollup-linux-arm-musleabihf@4.17.2':
-    resolution: {integrity: sha512-uSqpsp91mheRgw96xtyAGP9FW5ChctTFEoXP0r5FAzj/3ZRv3Uxjtc7taRQSaQM/q85KEKjKsZuiZM3GyUivRg==}
     cpu: [arm]
     os: [linux]
 
@@ -1960,18 +1930,8 @@ packages:
     cpu: [arm]
     os: [linux]
 
-  '@rollup/rollup-linux-arm64-gnu@4.17.2':
-    resolution: {integrity: sha512-EMMPHkiCRtE8Wdk3Qhtciq6BndLtstqZIroHiiGzB3C5LDJmIZcSzVtLRbwuXuUft1Cnv+9fxuDtDxz3k3EW2A==}
-    cpu: [arm64]
-    os: [linux]
-
   '@rollup/rollup-linux-arm64-gnu@4.22.2':
     resolution: {integrity: sha512-Z1YpgBvFYhZIyBW5BoopwSg+t7yqEhs5HCei4JbsaXnhz/eZehT18DaXl957aaE9QK7TRGFryCAtStZywcQe1A==}
-    cpu: [arm64]
-    os: [linux]
-
-  '@rollup/rollup-linux-arm64-musl@4.17.2':
-    resolution: {integrity: sha512-NMPylUUZ1i0z/xJUIx6VUhISZDRT+uTWpBcjdv0/zkp7b/bQDF+NfnfdzuTiB1G6HTodgoFa93hp0O1xl+/UbA==}
     cpu: [arm64]
     os: [linux]
 
@@ -1980,19 +1940,9 @@ packages:
     cpu: [arm64]
     os: [linux]
 
-  '@rollup/rollup-linux-powerpc64le-gnu@4.17.2':
-    resolution: {integrity: sha512-T19My13y8uYXPw/L/k0JYaX1fJKFT/PWdXiHr8mTbXWxjVF1t+8Xl31DgBBvEKclw+1b00Chg0hxE2O7bTG7GQ==}
-    cpu: [ppc64]
-    os: [linux]
-
   '@rollup/rollup-linux-powerpc64le-gnu@4.22.2':
     resolution: {integrity: sha512-HpJCMnlMTfEhwo19bajvdraQMcAq3FX08QDx3OfQgb+414xZhKNf3jNvLFYKbbDSGBBrQh5yNwWZrdK0g0pokg==}
     cpu: [ppc64]
-    os: [linux]
-
-  '@rollup/rollup-linux-riscv64-gnu@4.17.2':
-    resolution: {integrity: sha512-BOaNfthf3X3fOWAB+IJ9kxTgPmMqPPH5f5k2DcCsRrBIbWnaJCgX2ll77dV1TdSy9SaXTR5iDXRL8n7AnoP5cg==}
-    cpu: [riscv64]
     os: [linux]
 
   '@rollup/rollup-linux-riscv64-gnu@4.22.2':
@@ -2000,28 +1950,13 @@ packages:
     cpu: [riscv64]
     os: [linux]
 
-  '@rollup/rollup-linux-s390x-gnu@4.17.2':
-    resolution: {integrity: sha512-W0UP/x7bnn3xN2eYMql2T/+wpASLE5SjObXILTMPUBDB/Fg/FxC+gX4nvCfPBCbNhz51C+HcqQp2qQ4u25ok6g==}
-    cpu: [s390x]
-    os: [linux]
-
   '@rollup/rollup-linux-s390x-gnu@4.22.2':
     resolution: {integrity: sha512-qgYbOEbrPfEkH/OnUJd1/q4s89FvNJQIUldx8X2F/UM5sEbtkqZpf2s0yly2jSCKr1zUUOY1hnTP2J1WOzMAdA==}
     cpu: [s390x]
     os: [linux]
 
-  '@rollup/rollup-linux-x64-gnu@4.17.2':
-    resolution: {integrity: sha512-Hy7pLwByUOuyaFC6mAr7m+oMC+V7qyifzs/nW2OJfC8H4hbCzOX07Ov0VFk/zP3kBsELWNFi7rJtgbKYsav9QQ==}
-    cpu: [x64]
-    os: [linux]
-
   '@rollup/rollup-linux-x64-gnu@4.22.2':
     resolution: {integrity: sha512-a0lkvNhFLhf+w7A95XeBqGQaG0KfS3hPFJnz1uraSdUe/XImkp/Psq0Ca0/UdD5IEAGoENVmnYrzSC9Y2a2uKQ==}
-    cpu: [x64]
-    os: [linux]
-
-  '@rollup/rollup-linux-x64-musl@4.17.2':
-    resolution: {integrity: sha512-h1+yTWeYbRdAyJ/jMiVw0l6fOOm/0D1vNLui9iPuqgRGnXA0u21gAqOyB5iHjlM9MMfNOm9RHCQ7zLIzT0x11Q==}
     cpu: [x64]
     os: [linux]
 
@@ -2030,29 +1965,14 @@ packages:
     cpu: [x64]
     os: [linux]
 
-  '@rollup/rollup-win32-arm64-msvc@4.17.2':
-    resolution: {integrity: sha512-tmdtXMfKAjy5+IQsVtDiCfqbynAQE/TQRpWdVataHmhMb9DCoJxp9vLcCBjEQWMiUYxO1QprH/HbY9ragCEFLA==}
-    cpu: [arm64]
-    os: [win32]
-
   '@rollup/rollup-win32-arm64-msvc@4.22.2':
     resolution: {integrity: sha512-t/YgCbZ638R/r7IKb9yCM6nAek1RUvyNdfU0SHMDLOf6GFe/VG1wdiUAsxTWHKqjyzkRGg897ZfCpdo1bsCSsA==}
     cpu: [arm64]
     os: [win32]
 
-  '@rollup/rollup-win32-ia32-msvc@4.17.2':
-    resolution: {integrity: sha512-7II/QCSTAHuE5vdZaQEwJq2ZACkBpQDOmQsE6D6XUbnBHW8IAhm4eTufL6msLJorzrHDFv3CF8oCA/hSIRuZeQ==}
-    cpu: [ia32]
-    os: [win32]
-
   '@rollup/rollup-win32-ia32-msvc@4.22.2':
     resolution: {integrity: sha512-kTmX5uGs3WYOA+gYDgI6ITkZng9SP71FEMoHNkn+cnmb9Zuyyay8pf0oO5twtTwSjNGy1jlaWooTIr+Dw4tIbw==}
     cpu: [ia32]
-    os: [win32]
-
-  '@rollup/rollup-win32-x64-msvc@4.17.2':
-    resolution: {integrity: sha512-TGGO7v7qOq4CYmSBVEYpI1Y5xDuCEnbVC5Vth8mOsW0gDSzxNrVERPc790IGHsrT2dQSimgMr9Ub3Y1Jci5/8w==}
-    cpu: [x64]
     os: [win32]
 
   '@rollup/rollup-win32-x64-msvc@4.22.2':
@@ -2310,8 +2230,9 @@ packages:
       vite: ^5.0.0
       vue: ^3.2.25
 
-  '@vitest/browser@2.1.1':
-    resolution: {integrity: sha512-wLKqohwlZI24xMIEZAPwv9SVliv1avaIBeE0ou471D++BRPhiw2mubKBczFFIDHXuSL7UXb8/JQK9Ui6ttW9bQ==}
+  '@vitest/browser@https://pkg.pr.new/@vitest/browser@9edfa19':
+    resolution: {tarball: https://pkg.pr.new/@vitest/browser@9edfa19}
+    version: 2.1.1
     peerDependencies:
       playwright: '*'
       safaridriver: '*'
@@ -2325,11 +2246,13 @@ packages:
       webdriverio:
         optional: true
 
-  '@vitest/expect@2.1.1':
-    resolution: {integrity: sha512-YeueunS0HiHiQxk+KEOnq/QMzlUuOzbU1Go+PgAsHvvv3tUkJPm9xWt+6ITNTlzsMXUjmgm5T+U7KBPK2qQV6w==}
+  '@vitest/expect@https://pkg.pr.new/vitest-dev/vitest/@vitest/expect@9edfa19':
+    resolution: {tarball: https://pkg.pr.new/vitest-dev/vitest/@vitest/expect@9edfa19}
+    version: 2.1.1
 
-  '@vitest/mocker@2.1.1':
-    resolution: {integrity: sha512-LNN5VwOEdJqCmJ/2XJBywB11DLlkbY0ooDJW3uRX5cZyYCrc4PI/ePX0iQhE3BiEGiQmK4GE7Q/PqCkkaiPnrA==}
+  '@vitest/mocker@https://pkg.pr.new/vitest-dev/vitest/@vitest/mocker@9edfa19':
+    resolution: {tarball: https://pkg.pr.new/vitest-dev/vitest/@vitest/mocker@9edfa19}
+    version: 2.1.1
     peerDependencies:
       '@vitest/spy': 2.1.1
       msw: ^2.3.5
@@ -2343,22 +2266,43 @@ packages:
   '@vitest/pretty-format@2.1.1':
     resolution: {integrity: sha512-SjxPFOtuINDUW8/UkElJYQSFtnWX7tMksSGW0vfjxMneFqxVr8YJ979QpMbDW7g+BIiq88RAGDjf7en6rvLPPQ==}
 
-  '@vitest/runner@2.1.1':
-    resolution: {integrity: sha512-uTPuY6PWOYitIkLPidaY5L3t0JJITdGTSwBtwMjKzo5O6RCOEncz9PUN+0pDidX8kTHYjO0EwUIvhlGpnGpxmA==}
+  '@vitest/pretty-format@https://pkg.pr.new/vitest-dev/vitest/@vitest/pretty-format@9edfa19':
+    resolution: {tarball: https://pkg.pr.new/vitest-dev/vitest/@vitest/pretty-format@9edfa19}
+    version: 2.1.1
 
-  '@vitest/snapshot@2.1.1':
-    resolution: {integrity: sha512-BnSku1WFy7r4mm96ha2FzN99AZJgpZOWrAhtQfoxjUU5YMRpq1zmHRq7a5K9/NjqonebO7iVDla+VvZS8BOWMw==}
+  '@vitest/runner@https://pkg.pr.new/vitest-dev/vitest/@vitest/runner@9edfa19':
+    resolution: {tarball: https://pkg.pr.new/vitest-dev/vitest/@vitest/runner@9edfa19}
+    version: 2.1.1
 
-  '@vitest/spy@2.1.1':
-    resolution: {integrity: sha512-ZM39BnZ9t/xZ/nF4UwRH5il0Sw93QnZXd9NAZGRpIgj0yvVwPpLd702s/Cx955rGaMlyBQkZJ2Ir7qyY48VZ+g==}
+  '@vitest/snapshot@https://pkg.pr.new/vitest-dev/vitest/@vitest/snapshot@9edfa19':
+    resolution: {tarball: https://pkg.pr.new/vitest-dev/vitest/@vitest/snapshot@9edfa19}
+    version: 2.1.1
+
+  '@vitest/spy@https://pkg.pr.new/@vitest/spy@9edfa19':
+    resolution: {tarball: https://pkg.pr.new/@vitest/spy@9edfa19}
+    version: 2.1.1
+
+  '@vitest/spy@https://pkg.pr.new/vitest-dev/vitest/@vitest/spy@9edfa19':
+    resolution: {tarball: https://pkg.pr.new/vitest-dev/vitest/@vitest/spy@9edfa19}
+    version: 2.1.1
 
   '@vitest/ui@2.1.1':
     resolution: {integrity: sha512-IIxo2LkQDA+1TZdPLYPclzsXukBWd5dX2CKpGqH8CCt8Wh0ZuDn4+vuQ9qlppEju6/igDGzjWF/zyorfsf+nHg==}
     peerDependencies:
       vitest: 2.1.1
 
+  '@vitest/ui@https://pkg.pr.new/@vitest/ui@9edfa19':
+    resolution: {tarball: https://pkg.pr.new/@vitest/ui@9edfa19}
+    version: 2.1.1
+    peerDependencies:
+      vitest: 2.1.1
+
   '@vitest/utils@2.1.1':
     resolution: {integrity: sha512-Y6Q9TsI+qJ2CC0ZKj6VBb+T8UPz593N113nnUykqwANqhgf3QkZeHFlusgKLTqrnVHbj/XDKZcDHol+dxVT+rQ==}
+
+  '@vitest/utils@https://pkg.pr.new/vitest-dev/vitest/@vitest/utils@9edfa19':
+    resolution: {tarball: https://pkg.pr.new/vitest-dev/vitest/@vitest/utils@9edfa19}
+    version: 2.1.1
 
   '@volar/language-core@2.4.1':
     resolution: {integrity: sha512-9AKhC7Qn2mQYxj7Dz3bVxeOk7gGJladhWixUYKef/o0o7Bm4an+A3XvmcTHVqZ8stE6lBVH++g050tBtJ4TZPQ==}
@@ -5274,9 +5218,6 @@ packages:
   picocolors@1.0.0:
     resolution: {integrity: sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==}
 
-  picocolors@1.0.1:
-    resolution: {integrity: sha512-anP1Z8qwhkbmu7MFP5iTt+wQKXgwzf7zTyGlcdzabySa9vd0Xt392U0rVmz9poOaBj0uHJKyyo9/upk0HrEQew==}
-
   picocolors@1.1.0:
     resolution: {integrity: sha512-TQ92mBOW0l3LeMeyLV6mzy/kWr8lkd/hp3mTg7wYK7zJhuBStmGMBG0BdeDZS/dZx1IukaX6Bk11zcln25o1Aw==}
 
@@ -5325,10 +5266,6 @@ packages:
   postcss-selector-parser@6.0.16:
     resolution: {integrity: sha512-A0RVJrX+IUkVZbW3ClroRWurercFhieevHB38sr2+l9eUClMqome3LmEmnhlNy+5Mr2EYN6B2Kaw9wYdd+VHiw==}
     engines: {node: '>=4'}
-
-  postcss@8.4.39:
-    resolution: {integrity: sha512-0vzE+lAiG7hZl1/9I8yzKLx3aR9Xbof3fBHKunvMfOCYAtMhrsnccJY2iTURb9EZd5+pLuiNV9/c/GZJOHsgIw==}
-    engines: {node: ^10 || ^12 || >=14}
 
   postcss@8.4.47:
     resolution: {integrity: sha512-56rxCq7G/XfB4EkXq9Egn5GCqugWvDFjafDOThIdMBsI15iqPqR5r15TfSr1YPYeEI19YeaXMCbY6u88Y76GLQ==}
@@ -5654,11 +5591,6 @@ packages:
   rollup@2.79.1:
     resolution: {integrity: sha512-uKxbd0IhMZOhjAiD5oAFp7BqvkA4Dv47qpOCtaNvng4HBwdbWtdOh8f5nZNuk2rp51PMGk3bzfWu5oayNEuYnw==}
     engines: {node: '>=10.0.0'}
-    hasBin: true
-
-  rollup@4.17.2:
-    resolution: {integrity: sha512-/9ClTJPByC0U4zNLowV1tMBe8yMEAxewtR3cUNX5BoEpGH3dQEWpJLr6CLp0fPdYRF/fzVOgvDb1zXuakwF5kQ==}
-    engines: {node: '>=18.0.0', npm: '>=8.0.0'}
     hasBin: true
 
   rollup@4.22.2:
@@ -6547,8 +6479,9 @@ packages:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
 
-  vite-node@2.1.1:
-    resolution: {integrity: sha512-N/mGckI1suG/5wQI35XeR9rsMsPqKXzq1CdUndzVstBj/HvyxxGctwnK6WX43NGt5L3Z5tcRf83g4TITKJhPrA==}
+  vite-node@https://pkg.pr.new/vitest-dev/vitest/vite-node@9edfa19:
+    resolution: {tarball: https://pkg.pr.new/vitest-dev/vitest/vite-node@9edfa19}
+    version: 2.1.1
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
 
@@ -6558,34 +6491,6 @@ packages:
       vite: '*'
     peerDependenciesMeta:
       vite:
-        optional: true
-
-  vite@5.3.5:
-    resolution: {integrity: sha512-MdjglKR6AQXQb9JGiS7Rc2wC6uMjcm7Go/NHNO63EwiJXfuk9PgqiP/n5IDJCziMkfw9n4Ubp7lttNwz+8ZVKA==}
-    engines: {node: ^18.0.0 || >=20.0.0}
-    hasBin: true
-    peerDependencies:
-      '@types/node': ^18.0.0 || >=20.0.0
-      less: '*'
-      lightningcss: ^1.21.0
-      sass: '*'
-      stylus: '*'
-      sugarss: '*'
-      terser: ^5.4.0
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-      less:
-        optional: true
-      lightningcss:
-        optional: true
-      sass:
-        optional: true
-      stylus:
-        optional: true
-      sugarss:
-        optional: true
-      terser:
         optional: true
 
   vite@5.4.6:
@@ -6621,14 +6526,16 @@ packages:
 
   vitest-browser-vue@0.0.1:
     resolution: {integrity: sha512-r4UoOR2zFg0p5FFmYhcdIp6gFVXcQrVr5+zpm4h+1uAD1V+x7WUWrVzkFAFzeXVU2DfjhHMGxIvEBQT2HOw4Ew==}
+    version: 0.0.1
     engines: {node: ^18.0.0 || >=20.0.0}
     peerDependencies:
       '@vitest/browser': ^2.1.0-beta.4
       vitest: ^2.1.0-beta.4
       vue: ^3.0.0
 
-  vitest@2.1.1:
-    resolution: {integrity: sha512-97We7/VC0e9X5zBVkvt7SGQMGrRtn3KtySFQG5fpaMlS+l62eeXRQO633AYhSTC3z7IMebnPPNjGXVGNRFlxBA==}
+  vitest@https://pkg.pr.new/vitest@9edfa19:
+    resolution: {tarball: https://pkg.pr.new/vitest@9edfa19}
+    version: 2.1.1
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
     peerDependencies:
@@ -8808,97 +8715,49 @@ snapshots:
     optionalDependencies:
       rollup: 2.79.1
 
-  '@rollup/rollup-android-arm-eabi@4.17.2':
-    optional: true
-
   '@rollup/rollup-android-arm-eabi@4.22.2':
-    optional: true
-
-  '@rollup/rollup-android-arm64@4.17.2':
     optional: true
 
   '@rollup/rollup-android-arm64@4.22.2':
     optional: true
 
-  '@rollup/rollup-darwin-arm64@4.17.2':
-    optional: true
-
   '@rollup/rollup-darwin-arm64@4.22.2':
-    optional: true
-
-  '@rollup/rollup-darwin-x64@4.17.2':
     optional: true
 
   '@rollup/rollup-darwin-x64@4.22.2':
     optional: true
 
-  '@rollup/rollup-linux-arm-gnueabihf@4.17.2':
-    optional: true
-
   '@rollup/rollup-linux-arm-gnueabihf@4.22.2':
-    optional: true
-
-  '@rollup/rollup-linux-arm-musleabihf@4.17.2':
     optional: true
 
   '@rollup/rollup-linux-arm-musleabihf@4.22.2':
     optional: true
 
-  '@rollup/rollup-linux-arm64-gnu@4.17.2':
-    optional: true
-
   '@rollup/rollup-linux-arm64-gnu@4.22.2':
-    optional: true
-
-  '@rollup/rollup-linux-arm64-musl@4.17.2':
     optional: true
 
   '@rollup/rollup-linux-arm64-musl@4.22.2':
     optional: true
 
-  '@rollup/rollup-linux-powerpc64le-gnu@4.17.2':
-    optional: true
-
   '@rollup/rollup-linux-powerpc64le-gnu@4.22.2':
-    optional: true
-
-  '@rollup/rollup-linux-riscv64-gnu@4.17.2':
     optional: true
 
   '@rollup/rollup-linux-riscv64-gnu@4.22.2':
     optional: true
 
-  '@rollup/rollup-linux-s390x-gnu@4.17.2':
-    optional: true
-
   '@rollup/rollup-linux-s390x-gnu@4.22.2':
-    optional: true
-
-  '@rollup/rollup-linux-x64-gnu@4.17.2':
     optional: true
 
   '@rollup/rollup-linux-x64-gnu@4.22.2':
     optional: true
 
-  '@rollup/rollup-linux-x64-musl@4.17.2':
-    optional: true
-
   '@rollup/rollup-linux-x64-musl@4.22.2':
-    optional: true
-
-  '@rollup/rollup-win32-arm64-msvc@4.17.2':
     optional: true
 
   '@rollup/rollup-win32-arm64-msvc@4.22.2':
     optional: true
 
-  '@rollup/rollup-win32-ia32-msvc@4.17.2':
-    optional: true
-
   '@rollup/rollup-win32-ia32-msvc@4.22.2':
-    optional: true
-
-  '@rollup/rollup-win32-x64-msvc@4.17.2':
     optional: true
 
   '@rollup/rollup-win32-x64-msvc@4.22.2':
@@ -9204,17 +9063,17 @@ snapshots:
       vite: 5.4.6(@types/node@22.7.4)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0)
       vue: 3.5.10(typescript@5.6.2)
 
-  '@vitest/browser@2.1.1(@vitest/spy@2.1.1)(playwright@1.47.2)(typescript@5.6.2)(vite@5.3.5(@types/node@22.7.4)(sass@1.77.8)(terser@5.31.0))(vitest@2.1.1)(webdriverio@9.0.9)':
+  '@vitest/browser@https://pkg.pr.new/@vitest/browser@9edfa19(@vitest/spy@https://pkg.pr.new/@vitest/spy@9edfa19)(playwright@1.47.2)(typescript@5.6.2)(vite@5.4.6(@types/node@22.7.4)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vitest@2.1.1)(webdriverio@9.0.9)':
     dependencies:
       '@testing-library/dom': 10.4.0
       '@testing-library/user-event': 14.5.2(@testing-library/dom@10.4.0)
-      '@vitest/mocker': 2.1.1(@vitest/spy@2.1.1)(msw@2.3.5(typescript@5.6.2))(vite@5.3.5(@types/node@22.7.4)(sass@1.77.8)(terser@5.31.0))
-      '@vitest/utils': 2.1.1
+      '@vitest/mocker': https://pkg.pr.new/vitest-dev/vitest/@vitest/mocker@9edfa19(@vitest/spy@https://pkg.pr.new/@vitest/spy@9edfa19)(msw@2.3.5(typescript@5.6.2))(vite@5.4.6(@types/node@22.7.4)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))
+      '@vitest/utils': https://pkg.pr.new/vitest-dev/vitest/@vitest/utils@9edfa19
       magic-string: 0.30.11
       msw: 2.3.5(typescript@5.6.2)
       sirv: 2.0.4
       tinyrainbow: 1.2.0
-      vitest: 2.1.1(@types/node@22.7.4)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass@1.77.8)(terser@5.31.0)
+      vitest: https://pkg.pr.new/vitest@9edfa19(@types/node@22.7.4)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0)
       ws: 8.18.0
     optionalDependencies:
       playwright: 1.47.2
@@ -9226,47 +9085,16 @@ snapshots:
       - utf-8-validate
       - vite
 
-  '@vitest/browser@2.1.1(@vitest/spy@2.1.1)(playwright@1.47.2)(typescript@5.6.2)(vite@5.4.6(@types/node@22.7.4)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vitest@2.1.1)(webdriverio@9.0.9)':
+  '@vitest/expect@https://pkg.pr.new/vitest-dev/vitest/@vitest/expect@9edfa19':
     dependencies:
-      '@testing-library/dom': 10.4.0
-      '@testing-library/user-event': 14.5.2(@testing-library/dom@10.4.0)
-      '@vitest/mocker': 2.1.1(@vitest/spy@2.1.1)(msw@2.3.5(typescript@5.6.2))(vite@5.4.6(@types/node@22.7.4)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))
-      '@vitest/utils': 2.1.1
-      magic-string: 0.30.11
-      msw: 2.3.5(typescript@5.6.2)
-      sirv: 2.0.4
-      tinyrainbow: 1.2.0
-      vitest: 2.1.1(@types/node@22.7.4)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass@1.77.8)(terser@5.31.0)
-      ws: 8.18.0
-    optionalDependencies:
-      playwright: 1.47.2
-      webdriverio: 9.0.9
-    transitivePeerDependencies:
-      - '@vitest/spy'
-      - bufferutil
-      - typescript
-      - utf-8-validate
-      - vite
-
-  '@vitest/expect@2.1.1':
-    dependencies:
-      '@vitest/spy': 2.1.1
-      '@vitest/utils': 2.1.1
+      '@vitest/spy': https://pkg.pr.new/vitest-dev/vitest/@vitest/spy@9edfa19
+      '@vitest/utils': https://pkg.pr.new/vitest-dev/vitest/@vitest/utils@9edfa19
       chai: 5.1.1
       tinyrainbow: 1.2.0
 
-  '@vitest/mocker@2.1.1(@vitest/spy@2.1.1)(msw@2.3.5(typescript@5.6.2))(vite@5.3.5(@types/node@22.7.4)(sass@1.77.8)(terser@5.31.0))':
+  '@vitest/mocker@https://pkg.pr.new/vitest-dev/vitest/@vitest/mocker@9edfa19(@vitest/spy@https://pkg.pr.new/@vitest/spy@9edfa19)(msw@2.3.5(typescript@5.6.2))(vite@5.4.6(@types/node@22.7.4)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))':
     dependencies:
-      '@vitest/spy': 2.1.1
-      estree-walker: 3.0.3
-      magic-string: 0.30.11
-    optionalDependencies:
-      msw: 2.3.5(typescript@5.6.2)
-      vite: 5.3.5(@types/node@22.7.4)(sass@1.77.8)(terser@5.31.0)
-
-  '@vitest/mocker@2.1.1(@vitest/spy@2.1.1)(msw@2.3.5(typescript@5.6.2))(vite@5.4.6(@types/node@22.7.4)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))':
-    dependencies:
-      '@vitest/spy': 2.1.1
+      '@vitest/spy': https://pkg.pr.new/@vitest/spy@9edfa19
       estree-walker: 3.0.3
       magic-string: 0.30.11
     optionalDependencies:
@@ -9276,19 +9104,28 @@ snapshots:
   '@vitest/pretty-format@2.1.1':
     dependencies:
       tinyrainbow: 1.2.0
+    optional: true
 
-  '@vitest/runner@2.1.1':
+  '@vitest/pretty-format@https://pkg.pr.new/vitest-dev/vitest/@vitest/pretty-format@9edfa19':
     dependencies:
-      '@vitest/utils': 2.1.1
+      tinyrainbow: 1.2.0
+
+  '@vitest/runner@https://pkg.pr.new/vitest-dev/vitest/@vitest/runner@9edfa19':
+    dependencies:
+      '@vitest/utils': https://pkg.pr.new/vitest-dev/vitest/@vitest/utils@9edfa19
       pathe: 1.1.2
 
-  '@vitest/snapshot@2.1.1':
+  '@vitest/snapshot@https://pkg.pr.new/vitest-dev/vitest/@vitest/snapshot@9edfa19':
     dependencies:
-      '@vitest/pretty-format': 2.1.1
+      '@vitest/pretty-format': https://pkg.pr.new/vitest-dev/vitest/@vitest/pretty-format@9edfa19
       magic-string: 0.30.11
       pathe: 1.1.2
 
-  '@vitest/spy@2.1.1':
+  '@vitest/spy@https://pkg.pr.new/@vitest/spy@9edfa19':
+    dependencies:
+      tinyspy: 3.0.0
+
+  '@vitest/spy@https://pkg.pr.new/vitest-dev/vitest/@vitest/spy@9edfa19':
     dependencies:
       tinyspy: 3.0.0
 
@@ -9301,11 +9138,30 @@ snapshots:
       sirv: 2.0.4
       tinyglobby: 0.2.6
       tinyrainbow: 1.2.0
-      vitest: 2.1.1(@types/node@22.7.4)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass@1.77.8)(terser@5.31.0)
+      vitest: https://pkg.pr.new/vitest@9edfa19(@types/node@22.7.4)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0)
+    optional: true
+
+  '@vitest/ui@https://pkg.pr.new/@vitest/ui@9edfa19(vitest@2.1.1)':
+    dependencies:
+      '@vitest/utils': https://pkg.pr.new/vitest-dev/vitest/@vitest/utils@9edfa19
+      fflate: 0.8.2
+      flatted: 3.3.1
+      pathe: 1.1.2
+      sirv: 2.0.4
+      tinyglobby: 0.2.6
+      tinyrainbow: 1.2.0
+      vitest: https://pkg.pr.new/vitest@9edfa19(@types/node@22.7.4)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0)
 
   '@vitest/utils@2.1.1':
     dependencies:
       '@vitest/pretty-format': 2.1.1
+      loupe: 3.1.1
+      tinyrainbow: 1.2.0
+    optional: true
+
+  '@vitest/utils@https://pkg.pr.new/vitest-dev/vitest/@vitest/utils@9edfa19':
+    dependencies:
+      '@vitest/pretty-format': https://pkg.pr.new/vitest-dev/vitest/@vitest/pretty-format@9edfa19
       loupe: 3.1.1
       tinyrainbow: 1.2.0
 
@@ -10867,7 +10723,7 @@ snapshots:
 
   estree-walker@3.0.3:
     dependencies:
-      '@types/estree': 1.0.5
+      '@types/estree': 1.0.6
 
   esutils@2.0.3: {}
 
@@ -12888,8 +12744,6 @@ snapshots:
 
   picocolors@1.0.0: {}
 
-  picocolors@1.0.1: {}
-
   picocolors@1.1.0: {}
 
   picomatch@2.3.1: {}
@@ -12928,12 +12782,6 @@ snapshots:
     dependencies:
       cssesc: 3.0.0
       util-deprecate: 1.0.2
-
-  postcss@8.4.39:
-    dependencies:
-      nanoid: 3.3.7
-      picocolors: 1.0.1
-      source-map-js: 1.2.0
 
   postcss@8.4.47:
     dependencies:
@@ -13274,28 +13122,6 @@ snapshots:
 
   rollup@2.79.1:
     optionalDependencies:
-      fsevents: 2.3.3
-
-  rollup@4.17.2:
-    dependencies:
-      '@types/estree': 1.0.5
-    optionalDependencies:
-      '@rollup/rollup-android-arm-eabi': 4.17.2
-      '@rollup/rollup-android-arm64': 4.17.2
-      '@rollup/rollup-darwin-arm64': 4.17.2
-      '@rollup/rollup-darwin-x64': 4.17.2
-      '@rollup/rollup-linux-arm-gnueabihf': 4.17.2
-      '@rollup/rollup-linux-arm-musleabihf': 4.17.2
-      '@rollup/rollup-linux-arm64-gnu': 4.17.2
-      '@rollup/rollup-linux-arm64-musl': 4.17.2
-      '@rollup/rollup-linux-powerpc64le-gnu': 4.17.2
-      '@rollup/rollup-linux-riscv64-gnu': 4.17.2
-      '@rollup/rollup-linux-s390x-gnu': 4.17.2
-      '@rollup/rollup-linux-x64-gnu': 4.17.2
-      '@rollup/rollup-linux-x64-musl': 4.17.2
-      '@rollup/rollup-win32-arm64-msvc': 4.17.2
-      '@rollup/rollup-win32-ia32-msvc': 4.17.2
-      '@rollup/rollup-win32-x64-msvc': 4.17.2
       fsevents: 2.3.3
 
   rollup@4.22.2:
@@ -14264,17 +14090,18 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vite-node@2.1.1(@types/node@22.7.4)(sass@1.77.8)(terser@5.31.0):
+  vite-node@https://pkg.pr.new/vitest-dev/vitest/vite-node@9edfa19(@types/node@22.7.4)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0):
     dependencies:
       cac: 6.7.14
       debug: 4.3.6
       pathe: 1.1.2
-      vite: 5.3.5(@types/node@22.7.4)(sass@1.77.8)(terser@5.31.0)
+      vite: 5.4.6(@types/node@22.7.4)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0)
     transitivePeerDependencies:
       - '@types/node'
       - less
       - lightningcss
       - sass
+      - sass-embedded
       - stylus
       - sugarss
       - supports-color
@@ -14291,17 +14118,6 @@ snapshots:
       - supports-color
       - typescript
 
-  vite@5.3.5(@types/node@22.7.4)(sass@1.77.8)(terser@5.31.0):
-    dependencies:
-      esbuild: 0.21.5
-      postcss: 8.4.39
-      rollup: 4.17.2
-    optionalDependencies:
-      '@types/node': 22.7.4
-      fsevents: 2.3.3
-      sass: 1.77.8
-      terser: 5.31.0
-
   vite@5.4.6(@types/node@22.7.4)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0):
     dependencies:
       esbuild: 0.21.5
@@ -14314,22 +14130,22 @@ snapshots:
       sass-embedded: 1.79.2
       terser: 5.31.0
 
-  vitest-browser-vue@0.0.1(@vitest/browser@2.1.1(@vitest/spy@2.1.1)(playwright@1.47.2)(typescript@5.6.2)(vite@5.4.6(@types/node@22.7.4)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vitest@2.1.1)(webdriverio@9.0.9))(vitest@2.1.1(@types/node@22.7.4)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass@1.77.8)(terser@5.31.0))(vue@3.5.10(typescript@5.6.2)):
+  vitest-browser-vue@0.0.1(@vitest/browser@https://pkg.pr.new/@vitest/browser@9edfa19(@vitest/spy@https://pkg.pr.new/@vitest/spy@9edfa19)(playwright@1.47.2)(typescript@5.6.2)(vite@5.4.6(@types/node@22.7.4)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vitest@2.1.1)(webdriverio@9.0.9))(vitest@https://pkg.pr.new/vitest@9edfa19(@types/node@22.7.4)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vue@3.5.10(typescript@5.6.2)):
     dependencies:
-      '@vitest/browser': 2.1.1(@vitest/spy@2.1.1)(playwright@1.47.2)(typescript@5.6.2)(vite@5.4.6(@types/node@22.7.4)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vitest@2.1.1)(webdriverio@9.0.9)
+      '@vitest/browser': https://pkg.pr.new/@vitest/browser@9edfa19(@vitest/spy@https://pkg.pr.new/@vitest/spy@9edfa19)(playwright@1.47.2)(typescript@5.6.2)(vite@5.4.6(@types/node@22.7.4)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vitest@2.1.1)(webdriverio@9.0.9)
       '@vue/test-utils': 2.4.6
-      vitest: 2.1.1(@types/node@22.7.4)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass@1.77.8)(terser@5.31.0)
+      vitest: https://pkg.pr.new/vitest@9edfa19(@types/node@22.7.4)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0)
       vue: 3.5.10(typescript@5.6.2)
 
-  vitest@2.1.1(@types/node@22.7.4)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass@1.77.8)(terser@5.31.0):
+  vitest@https://pkg.pr.new/vitest@9edfa19(@types/node@22.7.4)(@vitest/browser@2.1.1)(@vitest/ui@2.1.1)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.3.5(typescript@5.6.2))(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0):
     dependencies:
-      '@vitest/expect': 2.1.1
-      '@vitest/mocker': 2.1.1(@vitest/spy@2.1.1)(msw@2.3.5(typescript@5.6.2))(vite@5.3.5(@types/node@22.7.4)(sass@1.77.8)(terser@5.31.0))
-      '@vitest/pretty-format': 2.1.1
-      '@vitest/runner': 2.1.1
-      '@vitest/snapshot': 2.1.1
-      '@vitest/spy': 2.1.1
-      '@vitest/utils': 2.1.1
+      '@vitest/expect': https://pkg.pr.new/vitest-dev/vitest/@vitest/expect@9edfa19
+      '@vitest/mocker': https://pkg.pr.new/vitest-dev/vitest/@vitest/mocker@9edfa19(@vitest/spy@https://pkg.pr.new/@vitest/spy@9edfa19)(msw@2.3.5(typescript@5.6.2))(vite@5.4.6(@types/node@22.7.4)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))
+      '@vitest/pretty-format': https://pkg.pr.new/vitest-dev/vitest/@vitest/pretty-format@9edfa19
+      '@vitest/runner': https://pkg.pr.new/vitest-dev/vitest/@vitest/runner@9edfa19
+      '@vitest/snapshot': https://pkg.pr.new/vitest-dev/vitest/@vitest/snapshot@9edfa19
+      '@vitest/spy': https://pkg.pr.new/vitest-dev/vitest/@vitest/spy@9edfa19
+      '@vitest/utils': https://pkg.pr.new/vitest-dev/vitest/@vitest/utils@9edfa19
       chai: 5.1.1
       debug: 4.3.6
       magic-string: 0.30.11
@@ -14339,12 +14155,12 @@ snapshots:
       tinyexec: 0.3.0
       tinypool: 1.0.0
       tinyrainbow: 1.2.0
-      vite: 5.3.5(@types/node@22.7.4)(sass@1.77.8)(terser@5.31.0)
-      vite-node: 2.1.1(@types/node@22.7.4)(sass@1.77.8)(terser@5.31.0)
+      vite: 5.4.6(@types/node@22.7.4)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0)
+      vite-node: https://pkg.pr.new/vitest-dev/vitest/vite-node@9edfa19(@types/node@22.7.4)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 22.7.4
-      '@vitest/browser': 2.1.1(@vitest/spy@2.1.1)(playwright@1.47.2)(typescript@5.6.2)(vite@5.3.5(@types/node@22.7.4)(sass@1.77.8)(terser@5.31.0))(vitest@2.1.1)(webdriverio@9.0.9)
+      '@vitest/browser': https://pkg.pr.new/@vitest/browser@9edfa19(@vitest/spy@https://pkg.pr.new/@vitest/spy@9edfa19)(playwright@1.47.2)(typescript@5.6.2)(vite@5.4.6(@types/node@22.7.4)(sass-embedded@1.79.2)(sass@1.77.8)(terser@5.31.0))(vitest@2.1.1)(webdriverio@9.0.9)
       '@vitest/ui': 2.1.1(vitest@2.1.1)
       jsdom: 20.0.3(canvas@2.11.2(encoding@0.1.13))
     transitivePeerDependencies:
@@ -14352,6 +14168,7 @@ snapshots:
       - lightningcss
       - msw
       - sass
+      - sass-embedded
       - stylus
       - sugarss
       - supports-color
