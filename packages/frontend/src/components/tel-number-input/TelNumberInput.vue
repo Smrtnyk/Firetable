@@ -68,7 +68,7 @@ import { parsePhoneNumberFromString, AsYouType } from "libphonenumber-js";
 import { QSelect, QInput } from "quasar";
 
 interface TelNumberInputProps {
-    modelValue: string;
+    modelValue: string | undefined;
 }
 
 const props = defineProps<TelNumberInputProps>();

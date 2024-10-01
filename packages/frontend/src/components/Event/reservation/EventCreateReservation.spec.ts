@@ -216,7 +216,7 @@ describe("EventCreateReservation", () => {
 
             const newTime = addHours(eventStartTimestamp, 1);
 
-            const timeOption = screen.getByText(newTime.getHours().toString());
+            const timeOption = screen.getByText(format(newTime, "HH"));
             expect(timeOption.query()).toBeTruthy();
 
             await userEvent.click(timeOption);
@@ -280,7 +280,7 @@ describe("EventCreateReservation", () => {
                 type: ReservationType.PLANNED,
                 guestName: "Charlie",
                 numberOfGuests: 5,
-                guestContact: "charlie@example.com",
+                guestContact: "+432313213",
                 reservationNote: "Anniversary party",
                 consumption: 100,
                 arrived: false,
@@ -331,9 +331,7 @@ describe("EventCreateReservation", () => {
             );
 
             // Check that guest contact input is empty
-            const guestContactInput = screen
-                .getByLabelText(t("EventCreateReservation.reservationGuestContact"))
-                .query();
+            const guestContactInput = screen.getByLabelText("Phone Number").query();
             expect(guestContactInput.getAttribute("value")).toBe("");
 
             // Check that reservation note input is empty
@@ -398,12 +396,8 @@ describe("EventCreateReservation", () => {
             );
 
             // Check that guest contact input has the correct value
-            const guestContactInput = screen
-                .getByLabelText(t("EventCreateReservation.reservationGuestContact"))
-                .query();
-            expect(guestContactInput.getAttribute("value")).toBe(
-                plannedProps.reservationData?.guestContact,
-            );
+            const guestContactInput = screen.getByLabelText("Phone Number").query();
+            expect(guestContactInput.getAttribute("value")).toBe("2313213");
 
             // Check that reservation note input has the correct value
             const reservationNoteInput = screen
@@ -461,7 +455,6 @@ describe("EventCreateReservation", () => {
         it("allows user to select reservedBy as 'User' and emits the correct payload", async () => {
             const screen = renderComponent(EventCreateReservation, plannedProps);
 
-            // Fill in guest name
             const guestNameInput = screen
                 .getByLabelText(t("EventCreateReservation.reservationGuestName"))
                 .query();
@@ -475,21 +468,20 @@ describe("EventCreateReservation", () => {
                 .getByRole("combobox", { name: t("EventCreateReservation.reservedByLabel") })
                 .query();
             await userEvent.click(reservedBySelect);
-            const firstUserOption = screen.getByText(plannedProps.users[1].name);
+            const firstUserOption = screen.getByText(plannedProps.users[0].name);
             await userEvent.click(firstUserOption);
 
             // Submit the form
             const okBtn = screen.getByRole("button", { name: t("Global.submit") });
             await userEvent.click(okBtn);
 
-            // Check that the 'create' event is emitted with correct payload
             expect(screen.emitted().create).toBeTruthy();
             const emittedPayload = screen.emitted().create[0][0] as PlannedReservation;
 
             expect(emittedPayload.guestName).toBe("David");
-            expect(emittedPayload.reservedBy.email).toBe(plannedProps.users[1].email);
-            expect(emittedPayload.reservedBy.name).toBe(plannedProps.users[1].name);
-            expect(emittedPayload.reservedBy.id).toBe(plannedProps.users[1].id);
+            expect(emittedPayload.reservedBy.email).toBe(plannedProps.users[0].email);
+            expect(emittedPayload.reservedBy.name).toBe(plannedProps.users[0].name);
+            expect(emittedPayload.reservedBy.id).toBe(plannedProps.users[0].id);
         });
 
         it("allows user to select reservedBy as 'Social' and emits the correct payload", async () => {

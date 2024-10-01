@@ -8,6 +8,8 @@ import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
 import { greaterThanZero, minLength, noEmptyString, requireNumber } from "src/helpers/form-rules";
 
+import TelNumberInput from "src/components/tel-number-input/TelNumberInput.vue";
+
 export interface PlannedReservationFormProps {
     currentUser: User;
     users: User[];
@@ -161,13 +163,11 @@ defineExpose({
             :rules="[requireNumber(), greaterThanZero()]"
         />
 
-        <q-input
+        <tel-number-input
             v-model="state.guestContact"
-            rounded
-            standout
+            :label="t('EventCreateReservation.reservationGuestContact')"
             class="q-mb-md"
-            :label="t(`EventCreateReservation.reservationGuestContact`)"
-        />
+        ></tel-number-input>
 
         <q-input
             v-model="state.reservationNote"
