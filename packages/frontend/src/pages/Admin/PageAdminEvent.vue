@@ -31,6 +31,7 @@ import { useGuestsForEvent } from "src/composables/useGuestsForEvent";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { property } from "es-toolkit/compat";
 import { useAuthStore } from "src/stores/auth-store";
+import FTCenteredText from "src/components/FTCenteredText.vue";
 
 interface Props {
     organisationId: string;
@@ -282,6 +283,13 @@ onMounted(init);
                                     >
                                 </q-item-section>
                             </q-item>
+                            <FTCenteredText v-if="returningGuests.length === 0">
+                                <q-item>
+                                    <q-item-section>
+                                        <q-item-label>No returning guests</q-item-label>
+                                    </q-item-section>
+                                </q-item>
+                            </FTCenteredText>
                         </q-list>
                     </q-tab-panel>
                 </FTTabPanels>
