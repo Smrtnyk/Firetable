@@ -36,11 +36,11 @@
         "eslint-plugin-quasar": "1.1.0",
         "eslint-plugin-unicorn": "55.0.0",
         "eslint-plugin-vue": "9.28.0",
-        "firebase-tools": "13.20.1",
+        "firebase-tools": "13.20.2",
         "globals": "15.9.0",
         "prettier": "3.3.3",
         "typescript": "5.6.2",
-        "typescript-eslint": "8.7.0"
+        "typescript-eslint": "8.8.0"
     },
     "private": true,
     "engines": {

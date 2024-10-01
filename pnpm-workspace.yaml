@@ -5,5 +5,5 @@ catalog:
     '@vitest/browser': 2.1.1
     '@vitest/spy': 2.1.1
     '@vitest/ui': 2.1.1
-    firebase: 10.13.2
-    es-toolkit: 1.22.0
+    firebase: 10.14.0
+    es-toolkit: 1.23.0
