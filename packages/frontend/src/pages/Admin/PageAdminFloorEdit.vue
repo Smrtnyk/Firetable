@@ -111,7 +111,6 @@ async function onFloorSave(): Promise<void> {
                 name,
                 width,
                 height,
-                compressed: true,
             });
         },
     });

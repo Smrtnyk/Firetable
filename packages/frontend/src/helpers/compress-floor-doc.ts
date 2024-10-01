@@ -4,10 +4,6 @@ import { DevLogger } from "src/logger/DevFTLogger.js";
 
 export function decompressFloorDoc(floorDoc: FloorDoc): FloorDoc {
     const start = performance.now();
-    if (!floorDoc.compressed || typeof floorDoc.json === "object") {
-        return floorDoc;
-    }
-
     const byteCharacters = atob(floorDoc.json);
     const byteNumbers = new Uint8Array(byteCharacters.length);
     for (let i = 0; i < byteCharacters.length; i += 1) {

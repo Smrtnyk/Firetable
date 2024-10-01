@@ -3,7 +3,6 @@ export interface FloorDoc {
     name: string;
     width: number;
     height: number;
-    json: Record<string, any> | string;
+    json: string;
     propertyId: string;
-    compressed?: boolean;
 }
