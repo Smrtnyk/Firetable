@@ -248,12 +248,14 @@ onMounted(init);
                 <FTTabPanels v-model="reservationsTab">
                     <q-tab-panel name="arrivedReservations">
                         <AdminEventReservationsList
+                            :empty-message="`No arrived reservations`"
                             @delete="deleteReservationPermanently"
                             :reservations="arrivedReservations"
                         />
                     </q-tab-panel>
                     <q-tab-panel name="cancelledReservations">
                         <AdminEventReservationsList
+                            :empty-message="`No cancelled reservations`"
                             @delete="deleteReservationPermanently"
                             :reservations="cancelledReservations"
                         />

@@ -11,6 +11,7 @@ import ReservationLabelChips from "src/components/Event/reservation/ReservationL
 
 interface Props {
     reservations: ReservationDoc[];
+    emptyMessage: string;
 }
 
 const emit = defineEmits<(e: "delete", value: ReservationDoc) => void>();
@@ -65,7 +66,7 @@ function emitDelete(reservation: ReservationDoc, reset: VoidFunction): void {
                 </q-item>
             </q-slide-item>
         </q-list>
-        <FTCenteredText v-else>No reservations yet</FTCenteredText>
+        <FTCenteredText v-else>{{ props.emptyMessage }}</FTCenteredText>
     </q-scroll-area>
 </template>
 
