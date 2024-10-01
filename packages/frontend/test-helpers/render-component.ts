@@ -36,6 +36,9 @@ import "quasar/dist/quasar.css";
 import "../src/css/app.scss";
 import { createTestingPinia } from "@pinia/testing";
 
+document.body.style.height = "100vh";
+document.body.style.width = "100vw";
+
 const i18n = createI18n({
     locale: "en-GB",
     fallbackLocale: "en-GB",

@@ -154,6 +154,9 @@ importers:
       firebase:
         specifier: 'catalog:'
         version: 10.14.0
+      libphonenumber-js:
+        specifier: 1.11.9
+        version: 1.11.9
       pako:
         specifier: 2.1.0
         version: 2.1.0
@@ -4603,6 +4606,9 @@ packages:
   levn@0.4.1:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
+
+  libphonenumber-js@1.11.9:
+    resolution: {integrity: sha512-Zs5wf5HaWzW2/inlupe2tstl0I/Tbqo7lH20ZLr6Is58u7Dz2n+gRFGNlj9/gWxFvNfp9+YyDsiegjNhdixB9A==}
 
   libsodium-wrappers@0.7.13:
     resolution: {integrity: sha512-kasvDsEi/r1fMzKouIDv7B8I6vNmknXwGiYodErGuESoFTohGSKZplFtVxZqHaoQ217AynyIFgnOVRitpHs0Qw==}
@@ -12191,6 +12197,8 @@ snapshots:
     dependencies:
       prelude-ls: 1.2.1
       type-check: 0.4.0
+
+  libphonenumber-js@1.11.9: {}
 
   libsodium-wrappers@0.7.13:
     dependencies:
