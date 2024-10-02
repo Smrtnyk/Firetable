@@ -20,6 +20,7 @@ import AdminEventLogs from "src/components/admin/event/AdminEventLogs.vue";
 import AdminEventReservationsList from "src/components/admin/event/AdminEventReservationsList.vue";
 import FTTabs from "src/components/FTTabs.vue";
 import FTTabPanels from "src/components/FTTabPanels.vue";
+import AdminEventReturningGuestsList from "src/components/admin/event/AdminEventReturningGuestsList.vue";
 
 import { Loading, useQuasar } from "quasar";
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
@@ -31,7 +32,6 @@ import { useGuestsForEvent } from "src/composables/useGuestsForEvent";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { property } from "es-toolkit/compat";
 import { useAuthStore } from "src/stores/auth-store";
-import FTCenteredText from "src/components/FTCenteredText.vue";
 
 interface Props {
     organisationId: string;
@@ -261,38 +261,10 @@ onMounted(init);
                         />
                     </q-tab-panel>
                     <q-tab-panel name="returningGuests">
-                        <q-list>
-                            <q-item
-                                v-for="guest in returningGuests"
-                                :key="guest.contact"
-                                clickable
-                                v-ripple
-                                :to="{
-                                    name: 'adminGuest',
-                                    params: {
-                                        organisationId: eventOwner.organisationId,
-                                        guestId: guest.contact,
-                                    },
-                                }"
-                            >
-                                <q-item-section>
-                                    <q-item-label overline
-                                        >{{ guest.visits.length }} previous visits</q-item-label
-                                    >
-                                    <q-item-label>
-                                        {{ guest.name }} on
-                                        {{ guest.tableLabels.join(", ") }}</q-item-label
-                                    >
-                                </q-item-section>
-                            </q-item>
-                            <FTCenteredText v-if="returningGuests.length === 0">
-                                <q-item>
-                                    <q-item-section>
-                                        <q-item-label>No returning guests</q-item-label>
-                                    </q-item-section>
-                                </q-item>
-                            </FTCenteredText>
-                        </q-list>
+                        <AdminEventReturningGuestsList
+                            :organisation-id="organisationId"
+                            :returning-guests="returningGuests"
+                        />
                     </q-tab-panel>
                 </FTTabPanels>
             </q-tab-panel>
