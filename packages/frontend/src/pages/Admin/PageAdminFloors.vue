@@ -165,10 +165,5 @@ async function onFloorDelete(id: string, reset: VoidFunction): Promise<void> {
         <FTCenteredText v-else>
             {{ t("PageAdminFloors.noFloorPlansMessage") }}
         </FTCenteredText>
-
-        <!-- Show "no properties" message when there are no properties and isLoading is false -->
-        <FTCenteredText v-if="Object.keys(floors).length === 0 && !isLoading">
-            {{ t("PageAdminFloors.noPropertiesMessage") }}
-        </FTCenteredText>
     </div>
 </template>
