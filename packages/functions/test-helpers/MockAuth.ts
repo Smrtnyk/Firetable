@@ -7,19 +7,32 @@ export class MockAuth implements Partial<Auth> {
     getUser(uid: string): Promise<UserRecord> {
         const user = this.users[uid];
         if (!user) {
-            throw new UserNotFoundError(`User with UID ${uid} not found`);
+            return Promise.reject(new UserNotFoundError(`User with UID ${uid} not found`));
         }
         return Promise.resolve(user);
     }
 
-    createUser(userDetails: { email: string; password: string }): Promise<UserRecord> {
+    createUser(userDetails: {
+        email?: string;
+        password?: string;
+        displayName?: string;
+        photoURL?: string;
+        phoneNumber?: string;
+        emailVerified?: boolean;
+        disabled?: boolean;
+    }): Promise<UserRecord> {
         const uid = generateRandomId();
         const newUser: UserRecord = {
-            disabled: false,
-            emailVerified: false,
+            uid,
+            email: userDetails.email ?? null,
+            displayName: userDetails.displayName ?? null,
+            photoURL: userDetails.photoURL ?? null,
+            phoneNumber: userDetails.phoneNumber ?? null,
+            emailVerified: userDetails.emailVerified ?? false,
+            disabled: userDetails.disabled ?? false,
             metadata: {
                 creationTime: new Date().toISOString(),
-                lastSignInTime: new Date().toISOString(),
+                lastSignInTime: null,
                 toJSON() {
                     return this;
                 },
@@ -28,13 +41,12 @@ export class MockAuth implements Partial<Auth> {
             toJSON() {
                 return this;
             },
-            uid,
-            email: userDetails.email,
-            // @ts-expect-error -- this is intentional
-            password: userDetails.password,
         };
+        if (userDetails.password) {
+            // Simulate password hashing
+            (newUser as any).passwordHash = Buffer.from(userDetails.password).toString("base64");
+        }
         this.users[uid] = newUser;
-
         return Promise.resolve(newUser);
     }
 
@@ -77,13 +89,58 @@ export class MockAuth implements Partial<Auth> {
 
         return Promise.resolve();
     }
+
+    listUsers(
+        maxResults = 1000,
+        pageToken?: string,
+    ): Promise<{ users: UserRecord[]; pageToken?: string }> {
+        const allUsers = Object.values(this.users);
+        let startIndex = 0;
+        if (pageToken) {
+            startIndex = Number.parseInt(pageToken);
+            if (Number.isNaN(startIndex)) startIndex = 0;
+        }
+        const users = allUsers.slice(startIndex, startIndex + maxResults);
+        const newPageToken =
+            startIndex + maxResults < allUsers.length ? String(startIndex + maxResults) : undefined;
+        return Promise.resolve({ users, pageToken: newPageToken });
+    }
+
+    createCustomToken(uid: string, developerClaims?: object): Promise<string> {
+        const user = this.users[uid];
+        if (!user) {
+            return Promise.reject(new UserNotFoundError(`User with UID ${uid} not found`));
+        }
+        const tokenPayload = {
+            uid,
+            claims: developerClaims ?? {},
+        };
+        const token = Buffer.from(JSON.stringify(tokenPayload)).toString("base64");
+        return Promise.resolve(token);
+    }
+
+    revokeRefreshTokens(uid: string): Promise<void> {
+        const user = this.users[uid];
+        if (!user) {
+            return Promise.reject(new UserNotFoundError(`User with UID ${uid} not found`));
+        }
+        (user as any).tokensValidAfterTime = new Date().toISOString();
+        return Promise.resolve();
+    }
 }
 
-class UserNotFoundError extends Error {
-    code = "auth/user-not-found";
-
-    constructor(message: string) {
+class AuthError extends Error {
+    constructor(
+        public code: string,
+        message: string,
+    ) {
         super(message);
-        this.name = "UserNotFoundError";
+        this.name = "FirebaseAuthError";
+    }
+}
+
+class UserNotFoundError extends AuthError {
+    constructor(message: string) {
+        super("auth/user-not-found", message);
     }
 }
