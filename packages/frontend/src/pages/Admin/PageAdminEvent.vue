@@ -192,14 +192,7 @@ onMounted(init);
 
 <template>
     <div v-if="event && !isLoading" class="PageAdminEvent">
-        <FTTitle :title="event.name">
-            <template #subtitle>
-                <div class="column q-ml-md">
-                    <span>
-                        {{ formatEventDate(event.date) }}
-                    </span>
-                </div>
-            </template>
+        <FTTitle :title="event.name" :subtitle="formatEventDate(event.date)">
             <template #right>
                 <q-btn
                     :size="buttonSize"

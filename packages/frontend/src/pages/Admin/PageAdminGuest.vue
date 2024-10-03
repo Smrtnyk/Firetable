@@ -133,48 +133,50 @@ async function onDeleteGuest(guestId: string): Promise<void> {
 <template>
     <div class="PageAdminGuest">
         <div v-if="guest">
-            <FTTitle :title="guest.name">
+            <FTTitle :title="guest.name" :subtitle="guest.contact">
                 <template #right>
                     <q-btn rounded icon="pencil" color="secondary" @click="editGuest" />
                     <q-btn rounded icon="trash" color="negative" @click="onDeleteGuest(guest.id)" />
                 </template>
             </FTTitle>
 
-            <FTCenteredText> Contact: {{ guest.contact }} </FTCenteredText>
+            <div v-if="Object.keys(propertiesVisits).length > 0">
+                <FTTabs v-model="tab">
+                    <q-tab
+                        v-for="(item, propertyId) in propertiesVisits"
+                        :key="propertyId"
+                        :name="propertyId"
+                        :label="item.name"
+                    />
+                </FTTabs>
+                <FTTabPanels v-model="tab">
+                    <q-tab-panel
+                        v-for="(item, propertyId) in propertiesVisits"
+                        :key="propertyId"
+                        :name="propertyId"
+                    >
+                        <q-timeline color="primary">
+                            <q-timeline-entry
+                                v-for="visit in item.visits"
+                                :key="visit.date"
+                                :color="getVisitColor(visit)"
+                                :icon="getVisitIcon(visit)"
+                                :subtitle="formatSubtitleForGuestVisit(visit)"
+                            >
+                                <div class="row">
+                                    <span>
+                                        {{ visit.eventName }}
+                                    </span>
+                                    <q-space />
+                                    <ReservationVIPChip v-if="visit.isVIPVisit" />
+                                </div>
+                            </q-timeline-entry>
+                        </q-timeline>
+                    </q-tab-panel>
+                </FTTabPanels>
+            </div>
 
-            <FTTabs v-model="tab">
-                <q-tab
-                    v-for="(item, propertyId) in propertiesVisits"
-                    :key="propertyId"
-                    :name="propertyId"
-                    :label="item.name"
-                />
-            </FTTabs>
-            <FTTabPanels v-model="tab">
-                <q-tab-panel
-                    v-for="(item, propertyId) in propertiesVisits"
-                    :key="propertyId"
-                    :name="propertyId"
-                >
-                    <q-timeline color="primary">
-                        <q-timeline-entry
-                            v-for="visit in item.visits"
-                            :key="visit.date"
-                            :color="getVisitColor(visit)"
-                            :icon="getVisitIcon(visit)"
-                            :subtitle="formatSubtitleForGuestVisit(visit)"
-                        >
-                            <div class="row">
-                                <span>
-                                    {{ visit.eventName }}
-                                </span>
-                                <q-space />
-                                <ReservationVIPChip v-if="visit.isVIPVisit" />
-                            </div>
-                        </q-timeline-entry>
-                    </q-timeline>
-                </q-tab-panel>
-            </FTTabPanels>
+            <FTCenteredText v-else> There are no visits recorded for this guest.</FTCenteredText>
         </div>
     </div>
 </template>
