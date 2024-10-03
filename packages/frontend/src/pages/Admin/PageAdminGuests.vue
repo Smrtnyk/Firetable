@@ -1,24 +1,24 @@
 <script setup lang="ts">
-import type { CreateGuestPayload, GuestDoc, VoidFunction } from "@firetable/types";
+import type { CreateGuestPayload, GuestDoc } from "@firetable/types";
 import { useFirestoreCollection } from "src/composables/useFirestore";
-import { createGuest, deleteGuest, getGuestsPath } from "@firetable/backend";
+import { createGuest, getGuestsPath } from "@firetable/backend";
 import { useI18n } from "vue-i18n";
-import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { storeToRefs } from "pinia";
-import { useQuasar } from "quasar";
 
 import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import { matchesProperty } from "es-toolkit/compat";
+import { useDialog } from "src/composables/useDialog";
 
 interface Props {
     organisationId: string;
 }
 
-const quasar = useQuasar();
+const { createDialog } = useDialog();
 const { t } = useI18n();
 const props = defineProps<Props>();
 const { data: guests } = useFirestoreCollection<GuestDoc>(getGuestsPath(props.organisationId), {
@@ -26,29 +26,8 @@ const { data: guests } = useFirestoreCollection<GuestDoc>(getGuestsPath(props.or
 });
 const { properties } = storeToRefs(usePropertiesStore());
 
-async function onDeleteGuest(guest: GuestDoc, reset: VoidFunction): Promise<void> {
-    reset();
-    if (!(await showConfirm(t("PageAdminGuests.deleteGuestConfirmationMessage")))) {
-        return;
-    }
-    return tryCatchLoadingWrapper({
-        hook() {
-            return deleteGuest(props.organisationId, guest.id);
-        },
-    });
-}
-
-async function editGuest(_: GuestDoc, reset: VoidFunction): Promise<void> {
-    reset();
-    if (!(await showConfirm(t("PageAdminGuests.editGuestConfirmationMessage")))) {
-        // eslint-disable-next-line no-useless-return -- needed when todo will be resolved
-        return;
-    }
-    // TODO: implement edit guest
-}
-
 function showCreateGuestDialog(): void {
-    const dialog = quasar.dialog({
+    const dialog = createDialog({
         component: FTDialog,
         componentProps: {
             title: "Add new Guest",
@@ -70,7 +49,7 @@ function showCreateGuestDialog(): void {
 }
 
 function guestVisitsToReadable(guest: GuestDoc): string {
-    if (!guest.visitedProperties) {
+    if (Object.keys(guest.visitedProperties).length === 0) {
         return "No visits recorded";
     }
 
@@ -98,40 +77,24 @@ function guestVisitsToReadable(guest: GuestDoc): string {
         </FTTitle>
 
         <q-list v-if="guests.length > 0">
-            <q-slide-item
+            <q-item
                 v-for="guest in guests"
                 :key="guest.contact"
                 clickable
-                right-color="warning"
-                @right="({ reset }) => onDeleteGuest(guest, reset)"
-                @left="({ reset }) => editGuest(guest, reset)"
-                class="fa-card"
+                class="bg-dark"
+                :to="{
+                    name: 'adminGuest',
+                    params: {
+                        organisationId: props.organisationId,
+                        guestId: guest.id,
+                    },
+                }"
             >
-                <template #right>
-                    <q-icon name="trash" />
-                </template>
-
-                <template #left>
-                    <q-icon name="pencil" />
-                </template>
-
-                <q-item
-                    clickable
-                    class="ft-card"
-                    :to="{
-                        name: 'adminGuest',
-                        params: {
-                            organisationId: props.organisationId,
-                            guestId: guest.id,
-                        },
-                    }"
-                >
-                    <q-item-section>
-                        <q-item-label>{{ guest.name }} - {{ guest.contact }}</q-item-label>
-                        <q-item-label caption>{{ guestVisitsToReadable(guest) }}</q-item-label>
-                    </q-item-section>
-                </q-item>
-            </q-slide-item>
+                <q-item-section>
+                    <q-item-label>{{ guest.name }} - {{ guest.contact }}</q-item-label>
+                    <q-item-label caption>{{ guestVisitsToReadable(guest) }}</q-item-label>
+                </q-item-section>
+            </q-item>
         </q-list>
 
         <FTCenteredText v-else>No guests data</FTCenteredText>

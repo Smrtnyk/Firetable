@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { GuestDoc, Visit } from "@firetable/types";
 import { useFirestoreDocument } from "src/composables/useFirestore";
-import { getGuestPath } from "@firetable/backend";
+import { deleteGuest, getGuestPath } from "@firetable/backend";
 import { computed, ref, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { usePropertiesStore } from "src/stores/properties-store";
@@ -13,6 +13,12 @@ import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPC
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import FTTabPanels from "src/components/FTTabPanels.vue";
 import { matchesProperty } from "es-toolkit/compat";
+import { useDialog } from "src/composables/useDialog";
+import FTDialog from "src/components/FTDialog.vue";
+import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
+import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { useI18n } from "vue-i18n";
+import { useRouter } from "vue-router";
 
 interface Props {
     organisationId: string;
@@ -25,8 +31,10 @@ interface VisitsByProperty {
         visits: Visit[];
     };
 }
-
+const router = useRouter();
+const { createDialog } = useDialog();
 const { properties } = storeToRefs(usePropertiesStore());
+const { t } = useI18n();
 const props = defineProps<Props>();
 const { data: guest } = useFirestoreDocument<GuestDoc>(
     getGuestPath(props.organisationId, props.guestId),
@@ -83,12 +91,54 @@ function getVisitIcon(visit: Visit): string {
 function formatSubtitleForGuestVisit(visit: Visit): string {
     return formatEventDate(visit.date);
 }
+
+async function editGuest(): Promise<void> {
+    if (!(await showConfirm("Are you sure you want to edit this guest?"))) {
+        return;
+    }
+
+    const dialog = createDialog({
+        component: FTDialog,
+        componentProps: {
+            component: AddNewGuestForm,
+            componentPropsObject: {
+                mode: "edit",
+                initialData: { ...guest.value },
+            },
+            maximized: false,
+            title: "Edit guest",
+            listeners: {
+                update() {
+                    dialog.hide();
+                },
+            },
+        },
+    });
+}
+
+async function onDeleteGuest(guestId: string): Promise<void> {
+    if (!(await showConfirm(t("PageAdminGuests.deleteGuestConfirmationMessage")))) {
+        return;
+    }
+
+    return tryCatchLoadingWrapper({
+        async hook() {
+            await deleteGuest(props.organisationId, guestId);
+            router.back();
+        },
+    });
+}
 </script>
 
 <template>
     <div class="PageAdminGuest">
-        <div v-if="guest?.name">
-            <FTTitle :title="guest.name" />
+        <div v-if="guest">
+            <FTTitle :title="guest.name">
+                <template #right>
+                    <q-btn rounded icon="pencil" color="secondary" @click="editGuest" />
+                    <q-btn rounded icon="trash" color="negative" @click="onDeleteGuest(guest.id)" />
+                </template>
+            </FTTitle>
 
             <FTCenteredText> Contact: {{ guest.contact }} </FTCenteredText>
 

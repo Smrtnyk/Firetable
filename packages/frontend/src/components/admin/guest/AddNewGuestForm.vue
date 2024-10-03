@@ -48,7 +48,7 @@ async function submit(): Promise<void> {
 
 <template>
     <q-card-section>
-        <q-form ref="createGuestForm" class="q-gutter-md">
+        <q-form ref="createGuestForm" class="q-gutter-md" greedy>
             <q-input
                 label="Guest name"
                 v-model="guestName"
