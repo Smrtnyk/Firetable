@@ -6,22 +6,43 @@ import { QForm } from "quasar";
 
 import TelNumberInput from "src/components/tel-number-input/TelNumberInput.vue";
 
-const emit = defineEmits<(eventName: "create", payload: CreateGuestPayload) => void>();
+export interface AddNewGuestFormProps {
+    mode: "create" | "edit";
+    initialData?: {
+        name: string;
+        contact: string;
+    };
+}
+
+const { mode = "create", initialData } = defineProps<AddNewGuestFormProps>();
+const emit = defineEmits<(eventName: "create" | "update", payload: CreateGuestPayload) => void>();
+
 const guestName = ref("");
 const guestContact = ref("");
 const createGuestForm = useTemplateRef<QForm>("createGuestForm");
 const guestNameRules = [minLength("Guest name must be at least 3 characters long", 3)];
+
+if (mode === "edit" && initialData) {
+    guestName.value = initialData.name;
+    guestContact.value = initialData.contact;
+}
 
 async function submit(): Promise<void> {
     if (!(await createGuestForm.value?.validate())) {
         return;
     }
 
-    emit("create", {
+    const payload: CreateGuestPayload = {
         name: guestName.value,
         contact: guestContact.value,
         visitedProperties: {},
-    });
+    };
+
+    if (mode === "create") {
+        emit("create", payload);
+    } else if (mode === "edit") {
+        emit("update", payload);
+    }
 }
 </script>
 
@@ -36,7 +57,7 @@ async function submit(): Promise<void> {
                 autofocus
                 :rules="guestNameRules"
             />
-            <TelNumberInput v-model="guestContact" label="Guest Contact" />
+            <TelNumberInput required v-model="guestContact" label="Guest Contact" />
         </q-form>
     </q-card-section>
 
