@@ -3,18 +3,14 @@ import type { CreateGuestPayload } from "@firetable/types";
 import { ref, useTemplateRef } from "vue";
 import { minLength } from "src/helpers/form-rules";
 import { QForm } from "quasar";
-import { isValidEuropeanPhoneNumber } from "src/helpers/utils";
+
+import TelNumberInput from "src/components/tel-number-input/TelNumberInput.vue";
 
 const emit = defineEmits<(eventName: "create", payload: CreateGuestPayload) => void>();
 const guestName = ref("");
 const guestContact = ref("");
 const createGuestForm = useTemplateRef<QForm>("createGuestForm");
 const guestNameRules = [minLength("Guest name must be at least 3 characters long", 3)];
-const guestContactRules = [
-    function (value: string) {
-        return isValidEuropeanPhoneNumber(value) || "Invalid phone number";
-    },
-];
 
 async function submit(): Promise<void> {
     if (!(await createGuestForm.value?.validate())) {
@@ -40,14 +36,7 @@ async function submit(): Promise<void> {
                 autofocus
                 :rules="guestNameRules"
             />
-            <q-input
-                label="Guest contact"
-                v-model="guestContact"
-                rounded
-                standout
-                autofocus
-                :rules="guestContactRules"
-            />
+            <TelNumberInput v-model="guestContact" label="Guest Contact" />
         </q-form>
     </q-card-section>
 
