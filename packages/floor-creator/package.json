@@ -20,7 +20,7 @@
     },
     "dependencies": {
         "es-toolkit": "catalog:",
-        "fabric": "6.4.2",
+        "fabric": "6.4.3",
         "hammerjs": "2.0.8"
     },
     "devDependencies": {
