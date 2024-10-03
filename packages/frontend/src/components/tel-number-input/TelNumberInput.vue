@@ -67,11 +67,12 @@ import { computed, ref, watch } from "vue";
 import { parsePhoneNumberFromString, AsYouType } from "libphonenumber-js";
 import { QSelect, QInput } from "quasar";
 
-interface TelNumberInputProps {
+export interface TelNumberInputProps {
     modelValue: string | undefined;
+    required?: boolean;
 }
 
-const props = defineProps<TelNumberInputProps>();
+const { modelValue, required = false } = defineProps<TelNumberInputProps>();
 const emit = defineEmits(["update:modelValue"]);
 const fullNumber = computed(function () {
     if (selectedCountry.value && phoneNumber.value) {
@@ -84,7 +85,7 @@ const phoneNumber = ref("");
 const countryOptions = ref<Country[]>(europeanCountries);
 
 watch(
-    () => props.modelValue,
+    () => modelValue,
     function (newVal) {
         // Only update inputs if modelValue has changed and is different from current inputs
         if (newVal && newVal !== fullNumber.value) {
@@ -125,8 +126,14 @@ function onFilterCountries(val: string, update: AnyFunction): void {
 }
 
 function validateCountrySelection(): boolean | string {
-    // If phone number is provided but country code is missing
-    if (phoneNumber.value && !selectedCountry.value) {
+    const country = selectedCountry.value;
+    const number = phoneNumber.value;
+
+    if (required) {
+        if (!country) {
+            return "Please select a country code";
+        }
+    } else if (number && !country) {
         return "Please select a country code";
     }
     return true;
@@ -134,14 +141,20 @@ function validateCountrySelection(): boolean | string {
 
 function validatePhoneNumber(): boolean | string {
     const country = selectedCountry.value;
-    // If both country code and phone number are empty, return true (field is optional)
-    if (!country && !phoneNumber.value) {
-        return true;
-    }
+    const number = phoneNumber.value;
 
-    // If one is provided without the other, return an error
-    if ((country && !phoneNumber.value) || (!country && phoneNumber.value)) {
-        return "Please provide both country code and phone number";
+    if (required) {
+        if (!country || !number) {
+            return "Please provide both country code and phone number";
+        }
+    } else {
+        if (!country && !number) {
+            // Field is optional
+            return true;
+        }
+        if ((country && !number) || (!country && number)) {
+            return "Please provide both country code and phone number";
+        }
     }
 
     if (!country) {
