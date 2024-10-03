@@ -3,9 +3,8 @@ import type { QuasarPluginOptions } from "quasar";
 import type { RenderResult } from "vitest-browser-vue";
 import type { TestingOptions } from "@pinia/testing";
 import messages from "../src/i18n";
-import { ref, h, defineComponent } from "vue";
-import { render } from "vitest-browser-vue";
 import {
+    QDialog,
     QAvatar,
     QBtn,
     QDrawer,
@@ -28,6 +27,8 @@ import {
     QToggle,
     Quasar,
 } from "quasar";
+import { ref, h, defineComponent } from "vue";
+import { render } from "vitest-browser-vue";
 import { createI18n } from "vue-i18n";
 import { config } from "@vue/test-utils";
 import { beforeAll, afterAll, vi } from "vitest";
@@ -156,6 +157,7 @@ export function renderComponent<
                 QDrawer,
                 QToggle,
                 QList,
+                QDialog,
             },
         },
     };

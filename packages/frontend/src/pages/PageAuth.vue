@@ -36,7 +36,7 @@ async function onSubmit(): Promise<void> {
         <div class="row window-height items-center q-pa-md justify-center text-center">
             <div class="col">
                 <q-img class="ft-logo" src="/icons/icon-256x256.png" />
-                <q-form ref="authForm" class="PageAuth__auth-form limited-width q-mx-auto">
+                <q-form ref="authForm" class="PageAuth__auth-form limited-width q-mx-auto" greedy>
                     <h1 class="text-h5 text-center">Welcome to Firetable</h1>
                     <q-input
                         v-model="username"
