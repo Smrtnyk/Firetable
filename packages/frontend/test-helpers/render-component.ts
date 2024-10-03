@@ -1,5 +1,4 @@
-import type { DefineComponent, ExtractPropTypes, WritableComputedRef } from "vue";
-import type { QuasarPluginOptions } from "quasar";
+import type { WritableComputedRef } from "vue";
 import type { RenderResult } from "vitest-browser-vue";
 import type { TestingOptions } from "@pinia/testing";
 import messages from "../src/i18n";
@@ -27,11 +26,10 @@ import {
     QToggle,
     Quasar,
 } from "quasar";
-import { ref, h, defineComponent } from "vue";
+import { h, defineComponent } from "vue";
 import { render } from "vitest-browser-vue";
 import { createI18n } from "vue-i18n";
-import { config } from "@vue/test-utils";
-import { beforeAll, afterAll, vi } from "vitest";
+import { vi } from "vitest";
 
 import "quasar/dist/quasar.css";
 import "../src/css/app.scss";
@@ -52,59 +50,13 @@ export function getLocaleForTest(): WritableComputedRef<"de" | "en-GB", "de" | "
     return i18n.global.locale;
 }
 
-export function installQuasarPlugin(options?: Partial<QuasarPluginOptions>): void {
-    const globalConfigBackup = structuredClone(config.global);
-
-    beforeAll(() => {
-        config.global.plugins.unshift([Quasar, options]);
-        config.global.provide = {
-            ...config.global.provide,
-            ...qLayoutInjections(),
-        };
-    });
-
-    afterAll(() => {
-        config.global = globalConfigBackup;
-    });
-}
-
-/**
- * Injections for Components with a QPage root Element
- */
-export function qLayoutInjections(): Record<string, any> {
-    return {
-        // pageContainerKey
-        _q_pc_: true,
-        // layoutKey
-        _q_l_: {
-            header: { size: 0, offset: 0, space: false },
-            right: { size: 300, offset: 0, space: false },
-            footer: { size: 0, offset: 0, space: false },
-            left: { size: 300, offset: 0, space: false },
-            isContainer: ref(false),
-            view: ref("lHh Lpr lff"),
-            rows: ref({ top: "lHh", middle: "Lpr", bottom: "lff" }),
-            height: ref(900),
-            instances: {},
-            update: vi.fn(),
-            animate: vi.fn(),
-            totalWidth: ref(1200),
-            scroll: ref({ position: 0, direction: "up" }),
-            scrollbarWidth: ref(125),
-        },
-    };
-}
-
 /**
  * Function to render a component with Quasar plugins and components.
  * Also registers the i18n plugin with messages.
  */
-export function renderComponent<
-    TComponent extends DefineComponent<Record<string, unknown>, Record<string, unknown>, any>,
-    TProps = Readonly<ExtractPropTypes<TComponent["__props"]>>,
->(
-    component: TComponent,
-    props?: Partial<TProps>,
+export function renderComponent(
+    component: Parameters<typeof render>[0],
+    props?: any,
     options?: { wrapInLayout?: boolean; piniaStoreOptions?: Partial<TestingOptions> },
 ): RenderResult<any> {
     const wrapInLayout = options?.wrapInLayout ?? false;

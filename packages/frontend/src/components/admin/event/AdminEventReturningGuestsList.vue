@@ -1,31 +1,29 @@
 <template>
-    <q-list>
-        <q-item
-            v-for="guest in returningGuests"
-            :key="guest.contact"
-            clickable
-            v-ripple
-            :to="{
-                name: 'adminGuest',
-                params: {
-                    organisationId,
-                    guestId: guest.contact,
-                },
-            }"
-        >
-            <q-item-section>
-                <q-item-label overline>{{ guest.visits.length }} previous visits</q-item-label>
-                <q-item-label> {{ guest.name }} on {{ guest.tableLabels.join(", ") }}</q-item-label>
-            </q-item-section>
-        </q-item>
-        <FTCenteredText v-if="returningGuests.length === 0">
-            <q-item>
+    <div>
+        <q-list v-if="returningGuests.length > 0">
+            <q-item
+                v-for="guest in returningGuests"
+                :key="guest.contact"
+                clickable
+                v-ripple
+                :to="{
+                    name: 'adminGuest',
+                    params: {
+                        organisationId,
+                        guestId: guest.contact,
+                    },
+                }"
+            >
                 <q-item-section>
-                    <q-item-label>No returning guests</q-item-label>
+                    <q-item-label overline>{{ guest.visits.length }} previous visits</q-item-label>
+                    <q-item-label>
+                        {{ guest.name }} on {{ guest.tableLabels.join(", ") }}</q-item-label
+                    >
                 </q-item-section>
             </q-item>
-        </FTCenteredText>
-    </q-list>
+        </q-list>
+        <FTCenteredText v-else> No returning guests </FTCenteredText>
+    </div>
 </template>
 
 <script setup lang="ts">
