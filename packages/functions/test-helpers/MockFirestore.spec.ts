@@ -1,5 +1,6 @@
 import { MockFieldPath, MockFieldValue, MockFirestore } from "./MockFirestore.js";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { Timestamp } from "firebase-admin/firestore";
 
 describe("MockFirestore", () => {
     let db: MockFirestore;
@@ -111,6 +112,33 @@ describe("MockFirestore", () => {
             expect(snapshot.exists).toBe(true);
             expect(snapshot.data?.()).toEqual({ key: "value" });
         });
+
+        it("should merge data when merge option is true", async () => {
+            const docRef = db.collection("testCollection").doc("testDoc");
+            await docRef.set({ key1: "value1", key2: "value2" });
+
+            await docRef.set({ key2: "newValue2", key3: "value3" }, { merge: true });
+
+            const snapshot = await docRef.get();
+            expect(snapshot.data()).toEqual({
+                key1: "value1",
+                key2: "newValue2",
+                key3: "value3",
+            });
+        });
+
+        it("should overwrite data when merge option is false", async () => {
+            const docRef = db.collection("testCollection").doc("testDoc");
+            await docRef.set({ key1: "value1", key2: "value2" });
+
+            await docRef.set({ key2: "newValue2", key3: "value3" });
+
+            const snapshot = await docRef.get();
+            expect(snapshot.data()).toEqual({
+                key2: "newValue2",
+                key3: "value3",
+            });
+        });
     });
 
     describe("transaction method", () => {
@@ -127,6 +155,58 @@ describe("MockFirestore", () => {
             const finalSnapshot = await docRef.get();
             expect(finalSnapshot.exists).toBe(true);
             expect(finalSnapshot.data?.()).toEqual({ key: "value" });
+        });
+
+        it("should create a new document in a transaction", async () => {
+            const docRef = db.collection("testCollection").doc("testDoc");
+
+            await db.runTransaction(async (transaction) => {
+                transaction.create(docRef, { key: "value" });
+            });
+
+            const snapshot = await docRef.get();
+            expect(snapshot.exists).toBe(true);
+            expect(snapshot.data()).toEqual({ key: "value" });
+        });
+
+        it("should fail to create a document that already exists", async () => {
+            const docRef = db.collection("testCollection").doc("testDoc");
+            await docRef.set({ key: "value" });
+
+            await expect(
+                db.runTransaction(async (transaction) => {
+                    transaction.create(docRef, { key: "newValue" });
+                }),
+            ).rejects.toThrow("Document already exists");
+
+            const snapshot = await docRef.get();
+            expect(snapshot.data()).toEqual({ key: "value" });
+        });
+
+        it("should delete a document in a transaction", async () => {
+            const docRef = db.collection("testCollection").doc("testDoc");
+            await docRef.set({ key: "value" });
+
+            await db.runTransaction(async (transaction) => {
+                transaction.delete(docRef);
+            });
+
+            const snapshot = await docRef.get();
+            expect(snapshot.exists).toBe(false);
+        });
+
+        it("should handle MockFieldValue operations in transactions", async () => {
+            const docRef = db.collection("testCollection").doc("testDoc");
+            await docRef.set({ counter: 1 });
+
+            await db.runTransaction(async (transaction) => {
+                transaction.update(docRef, {
+                    counter: MockFieldValue.increment(5),
+                });
+            });
+
+            const snapshot = await docRef.get();
+            expect(snapshot.data()?.counter).toBe(6);
         });
     });
 
@@ -170,6 +250,19 @@ describe("MockFirestore", () => {
             const snapshot = await docRef.get();
             expect(snapshot.exists).toBe(true);
             expect(snapshot.data?.()).toEqual({ key: "newValue" });
+        });
+
+        it("should update nested fields using field paths", async () => {
+            const docRef = db.collection("testCollection").doc("testDoc");
+            await docRef.set({ nested: { field1: "value1", field2: "value2" } });
+
+            const fieldPath = MockFieldPath.fromSegments("nested", "field2");
+            await docRef.update({ [fieldPath.toString()]: "newValue2" });
+
+            const snapshot = await docRef.get();
+            expect(snapshot.data()).toEqual({
+                nested: { field1: "value1", field2: "newValue2" },
+            });
         });
     });
 
@@ -231,6 +324,51 @@ describe("MockFirestore", () => {
 
             const snapshot = await docRef.get();
             expect(snapshot.data?.()?.arrayField).toEqual(["value"]);
+        });
+
+        it("should handle increment operation correctly", async () => {
+            const docRef = db.collection("testCollection").doc("testDoc");
+            await docRef.set({ counter: 1 });
+
+            await docRef.update({
+                counter: MockFieldValue.increment(2),
+            });
+
+            const snapshot = await docRef.get();
+            expect(snapshot.data()?.counter).toBe(3);
+        });
+
+        it("should handle serverTimestamp operation correctly", async () => {
+            const docRef = db.collection("testCollection").doc("testDoc");
+            await docRef.set({ updatedAt: null });
+
+            await docRef.update({
+                updatedAt: MockFieldValue.serverTimestamp(),
+            });
+
+            const snapshot = await docRef.get();
+            expect(snapshot.data()?.updatedAt).toBeInstanceOf(Timestamp);
+        });
+    });
+
+    describe("MockFieldPath functionality", () => {
+        it("should create a field path from segments", () => {
+            const fieldPath = MockFieldPath.fromSegments("nested", "field");
+            expect(fieldPath.toString()).toBe("nested.field");
+        });
+
+        it("should use field path in queries", async () => {
+            const docRef = db.collection("testCollection").doc("testDoc");
+            await docRef.set({ nested: { field: "value" } });
+
+            const fieldPath = MockFieldPath.fromSegments("nested", "field");
+            const querySnapshot = await db
+                .collection("testCollection")
+                .where(fieldPath, "==", "value")
+                .get();
+
+            expect(querySnapshot.docs).toHaveLength(1);
+            expect(querySnapshot.docs[0].data()).toEqual({ nested: { field: "value" } });
         });
     });
 
@@ -315,6 +453,125 @@ describe("MockFirestore", () => {
             expect(documents).toHaveLength(1);
             expect(documents[0].status).toBe("active");
         });
+
+        it("should filter documents using 'where' with '<' operator", async () => {
+            // Setup
+            const collectionRef = db.collection("testCollection");
+            await collectionRef.doc("doc1").set({ number: 1 });
+            await collectionRef.doc("doc2").set({ number: 2 });
+            await collectionRef.doc("doc3").set({ number: 3 });
+
+            // Test '<' operator
+            const querySnapshot = await collectionRef.where("number", "<", 3).get();
+            const documents = querySnapshot.docs.map((doc) => doc.data());
+
+            // Expect documents with number less than 3
+            expect(documents).toHaveLength(2);
+            expect(documents.some((doc) => doc.number === 1)).toBe(true);
+            expect(documents.some((doc) => doc.number === 2)).toBe(true);
+        });
+
+        it("should filter documents using 'where' with '!=' operator", async () => {
+            // Setup
+            const collectionRef = db.collection("testCollection");
+            await collectionRef.doc("doc1").set({ status: "active" });
+            await collectionRef.doc("doc2").set({ status: "inactive" });
+
+            // Test '!=' operator
+            const querySnapshot = await collectionRef.where("status", "!=", "active").get();
+            const documents = querySnapshot.docs.map((doc) => doc.data());
+
+            // Expect documents where status is not 'active'
+            expect(documents).toHaveLength(1);
+            expect(documents[0].status).toBe("inactive");
+        });
+
+        it("should filter documents using 'where' with 'array-contains-any' operator", async () => {
+            // Setup
+            const collectionRef = db.collection("testCollection");
+            await collectionRef.doc("doc1").set({ tags: ["tag1", "tag2"] });
+            await collectionRef.doc("doc2").set({ tags: ["tag2", "tag3"] });
+            await collectionRef.doc("doc3").set({ tags: ["tag4"] });
+
+            // Test 'array-contains-any' operator
+            const querySnapshot = await collectionRef
+                .where("tags", "array-contains-any", ["tag1", "tag4"])
+                .get();
+            const documents = querySnapshot.docs.map((doc) => doc.data());
+
+            // Expect documents that have either 'tag1' or 'tag4'
+            expect(documents).toHaveLength(2);
+            expect(documents.some((doc) => doc.tags.includes("tag1"))).toBe(true);
+            expect(documents.some((doc) => doc.tags.includes("tag4"))).toBe(true);
+        });
+
+        it("should filter documents using 'where' with 'not-in' operator", async () => {
+            // Setup
+            const collectionRef = db.collection("testCollection");
+            await collectionRef.doc("doc1").set({ status: "active" });
+            await collectionRef.doc("doc2").set({ status: "inactive" });
+            await collectionRef.doc("doc3").set({ status: "pending" });
+
+            // Test 'not-in' operator
+            const querySnapshot = await collectionRef.where("status", "not-in", ["inactive"]).get();
+            const documents = querySnapshot.docs.map((doc) => doc.data());
+
+            // Expect documents where status is not 'inactive'
+            expect(documents).toHaveLength(2);
+            expect(documents.some((doc) => doc.status === "active")).toBe(true);
+            expect(documents.some((doc) => doc.status === "pending")).toBe(true);
+        });
+
+        it("should paginate documents using 'startAt' and 'endAt'", async () => {
+            // Setup
+            const collectionRef = db.collection("testCollection");
+            for (let i = 1; i <= 5; i++) {
+                await collectionRef.doc(`doc${i}`).set({ number: i });
+            }
+
+            // Order documents by 'number'
+            const query = collectionRef.orderBy("number");
+
+            // Start at number 2, end at number 4
+            const querySnapshot = await query.startAt(2).endAt(4).get();
+            const documents = querySnapshot.docs.map((doc) => doc.data());
+
+            // Expect documents with number 2, 3, 4
+            expect(documents).toHaveLength(3);
+            expect(documents.map((doc) => doc.number)).toEqual([2, 3, 4]);
+        });
+
+        it("should paginate documents using 'startAfter' and 'limitToLast'", async () => {
+            // Setup
+            const collectionRef = db.collection("testCollection");
+            for (let i = 1; i <= 5; i++) {
+                await collectionRef.doc(`doc${i}`).set({ number: i });
+            }
+
+            // Order documents by 'number'
+            const query = collectionRef.orderBy("number");
+
+            // Get last 2 documents after number 2
+            const querySnapshot = await query.startAfter(2).limitToLast(2).get();
+            const documents = querySnapshot.docs.map((doc) => doc.data());
+
+            // Expect documents with number 4, 5
+            expect(documents).toHaveLength(2);
+            expect(documents.map((doc) => doc.number)).toEqual([4, 5]);
+        });
+
+        it("should query documents with nested fields", async () => {
+            const collectionRef = db.collection("testCollection");
+            await collectionRef.doc("doc1").set({ nested: { status: "active" } });
+            await collectionRef.doc("doc2").set({ nested: { status: "inactive" } });
+
+            const querySnapshot = await collectionRef.where("nested.status", "==", "active").get();
+
+            const documents = querySnapshot.docs.map((doc) => doc.data());
+
+            expect(documents).toHaveLength(1);
+            expect(documents[0]).toEqual({ nested: { status: "active" } });
+        });
     });
 
     describe("Complex queries combining 'where' and 'limit'", () => {
@@ -355,6 +612,68 @@ describe("MockFirestore", () => {
             // Expect 3 documents with status "active"
             expect(documents).toHaveLength(3);
             expect(documents.every((doc) => doc.status === "active")).toBe(true);
+        });
+    });
+
+    describe("onSnapshot method", () => {
+        it("should call onNext immediately with current data", async () => {
+            const docRef = db.collection("testCollection").doc("testDoc");
+            await docRef.set({ key: "value" });
+
+            const onNext = vi.fn();
+            const unsubscribe = docRef.onSnapshot(onNext);
+
+            // Wait for any asynchronous operations
+            await new Promise(process.nextTick);
+
+            expect(onNext).toHaveBeenCalled();
+            const snapshot = onNext.mock.calls[0][0];
+            expect(snapshot.exists).toBe(true);
+            expect(snapshot.data()).toEqual({ key: "value" });
+
+            unsubscribe();
+        });
+
+        it("should receive updates when data changes", async () => {
+            const docRef = db.collection("testCollection").doc("testDoc");
+
+            const onNext = vi.fn();
+            const unsubscribe = docRef.onSnapshot(onNext);
+
+            // Wait for any asynchronous operations
+            await new Promise(process.nextTick);
+
+            // Initially, the document does not exist
+            let snapshot = onNext.mock.calls[0][0];
+            expect(snapshot.exists).toBe(false);
+
+            // Set data
+            await docRef.set({ key: "value" });
+            await new Promise(process.nextTick);
+
+            // Should have been called again
+            expect(onNext).toHaveBeenCalledTimes(2);
+            snapshot = onNext.mock.calls[1][0];
+            expect(snapshot.exists).toBe(true);
+            expect(snapshot.data()).toEqual({ key: "value" });
+
+            // Update data
+            await docRef.update({ key: "newValue" });
+            await new Promise(process.nextTick);
+
+            expect(onNext).toHaveBeenCalledTimes(3);
+            snapshot = onNext.mock.calls[2][0];
+            expect(snapshot.data()).toEqual({ key: "newValue" });
+
+            // Delete document
+            await docRef.delete();
+            await new Promise(process.nextTick);
+
+            expect(onNext).toHaveBeenCalledTimes(4);
+            snapshot = onNext.mock.calls[3][0];
+            expect(snapshot.exists).toBe(false);
+
+            unsubscribe();
         });
     });
 });

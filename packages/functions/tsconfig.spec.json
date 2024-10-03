@@ -1,12 +1,13 @@
 {
     "extends": "./tsconfig.json",
     "compilerOptions": {
-        "types": ["vitest/globals"]
+        "types": ["vitest/globals"],
+        "target": "ESNext"
     },
     "include": [
         "**/*.spec.ts",
         "./src/**/*.ts",
-        "./test-helpers/**/*.ts",
+        "test-helpers",
         "vitest.config.ts"
     ],
     "exclude": [
