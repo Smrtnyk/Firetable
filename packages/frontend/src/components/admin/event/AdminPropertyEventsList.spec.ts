@@ -1,7 +1,7 @@
 import type { EventDoc } from "@firetable/types";
 import AdminPropertyEventsList from "./AdminPropertyEventsList.vue";
 import { renderComponent } from "../../../../test-helpers/render-component";
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { userEvent, page } from "@vitest/browser/context";
 
 vi.mock("src/components/admin/event/PageAdminEventsListItem.vue", () => ({
@@ -46,8 +46,6 @@ const events = [event1, event2, event3, event4];
 
 describe("PageAdminEventsList", () => {
     const propertyId = "prop1";
-
-    beforeEach(() => {});
 
     it("displays a message when there are no events", () => {
         renderComponent(AdminPropertyEventsList, {
