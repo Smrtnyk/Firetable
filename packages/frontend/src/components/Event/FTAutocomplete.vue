@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FloorDoc, PlannedReservation } from "@firetable/types";
+import type { AnyFunction, FloorDoc, PlannedReservation } from "@firetable/types";
 
 import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPChip.vue";
 
@@ -28,6 +28,7 @@ const { t } = useI18n();
 const selectEl = useTemplateRef<QSelect | undefined>("selectEl");
 const options = ref(getNamesFromReservations(props.allReservedTables));
 const searchTerm = ref("");
+const hideArrived = ref(false);
 
 function removeFocus(): void {
     nextTick(function () {
@@ -97,12 +98,19 @@ function findSearchedTable(inputVal: string | { value: PlannedReservation }): Pl
 function filterFn(val: string, update: any): void {
     update(function () {
         const loweredVal = val.toLowerCase();
-        const filteredTables = findSearchedTable(val);
+        const filteredTables = findSearchedTable(val).filter(function (reservation) {
+            // Exclude arrived reservations if hideArrived is true
+            return !(hideArrived.value && reservation.arrived);
+        });
         options.value = filteredTables.map(mapReservationToOption).filter(function (option) {
             return option.value.guestName.toLowerCase().includes(loweredVal);
         });
     });
 }
+
+watch(hideArrived, function () {
+    filterFn(searchTerm.value, (fn: AnyFunction) => fn());
+});
 
 watch(searchTerm, function (newTerm) {
     if (newTerm) {
@@ -139,6 +147,14 @@ function setModel(val: string): void {
         >
             <template #prepend>
                 <q-icon name="search" />
+            </template>
+
+            <template #before-options>
+                <q-item>
+                    <q-item-section>
+                        <q-checkbox v-model="hideArrived" label="Hide arrived" dense @click.stop />
+                    </q-item-section>
+                </q-item>
             </template>
 
             <template #option="scope">

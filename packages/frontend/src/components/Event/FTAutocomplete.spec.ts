@@ -99,4 +99,26 @@ describe("FTAutocomplete.vue", () => {
         const vipChip = screen.getByText("VIP");
         expect(vipChip.query()).toBeNull();
     });
+
+    it("does not display arrived guests when 'Hide arrived' is checked", async () => {
+        const screen = createComponent();
+
+        const input = screen.getByRole("combobox");
+        await userEvent.fill(input, "John");
+        await userEvent.click(input);
+
+        // Find the 'Hide arrived' checkbox inside the dropdown
+        const hideArrivedCheckbox = screen.getByRole("checkbox", { name: "Hide arrived" });
+        expect.element(hideArrivedCheckbox).toBeVisible();
+
+        // Click the checkbox to hide arrived guests
+        await userEvent.click(hideArrivedCheckbox);
+
+        // Verify that John Doe is not in the options
+        const johnOption = screen.getByText("John Doe (Table 1) on First Floor");
+        expect(johnOption.query()).toBeNull();
+
+        const janeOption = screen.getByText("Jane Smith (Table 2) on Second Floor");
+        await expect.element(janeOption).toBeVisible();
+    });
 });
