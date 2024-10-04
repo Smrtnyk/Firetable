@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { GuestDoc, Visit } from "@firetable/types";
 import { useFirestoreDocument } from "src/composables/useFirestore";
-import { deleteGuest, getGuestPath } from "@firetable/backend";
+import { deleteGuest, getGuestPath, updateGuestInfo } from "@firetable/backend";
 import { computed, ref, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { usePropertiesStore } from "src/stores/properties-store";
@@ -35,13 +35,10 @@ const router = useRouter();
 const { createDialog } = useDialog();
 const { properties } = storeToRefs(usePropertiesStore());
 const { t } = useI18n();
-const props = defineProps<Props>();
-const { data: guest } = useFirestoreDocument<GuestDoc>(
-    getGuestPath(props.organisationId, props.guestId),
-    {
-        once: true,
-    },
-);
+const { organisationId, guestId } = defineProps<Props>();
+const { data: guest } = useFirestoreDocument<GuestDoc>(getGuestPath(organisationId, guestId), {
+    once: true,
+});
 const tab = ref("");
 const propertiesVisits = computed(function () {
     const visitsByProperty: VisitsByProperty = {};
@@ -108,22 +105,27 @@ async function editGuest(): Promise<void> {
             maximized: false,
             title: "Edit guest",
             listeners: {
-                update() {
+                update(updatedData) {
                     dialog.hide();
+                    return tryCatchLoadingWrapper({
+                        hook() {
+                            return updateGuestInfo(organisationId, guestId, updatedData);
+                        },
+                    });
                 },
             },
         },
     });
 }
 
-async function onDeleteGuest(guestId: string): Promise<void> {
+async function onDeleteGuest(): Promise<void> {
     if (!(await showConfirm(t("PageAdminGuests.deleteGuestConfirmationMessage")))) {
         return;
     }
 
     return tryCatchLoadingWrapper({
         async hook() {
-            await deleteGuest(props.organisationId, guestId);
+            await deleteGuest(organisationId, guestId);
             router.back();
         },
     });

@@ -25,3 +25,26 @@ export function createGuest(organisationId: string, guestData: CreateGuestPayloa
     const newDoc = doc(firestore, getGuestsPath(organisationId), guestData.contact);
     return setDoc(newDoc, guestData);
 }
+
+/**
+ * Updates a guest's contact and/or name via Cloud Function.
+ *
+ * @param organisationId - The ID of the organisation.
+ * @param guestId - The current guest ID (current contact information).
+ * @param updatedData - The updated guest data (name and contact).
+ * @returns A promise that resolves when the update is complete.
+ */
+export async function updateGuestInfo(
+    organisationId: string,
+    guestId: string,
+    updatedData: CreateGuestPayload,
+): Promise<void> {
+    const { functions } = initializeFirebase();
+    const updateGuestInfoFn = httpsCallable(functions, "updateGuestData");
+
+    await updateGuestInfoFn({
+        organisationId,
+        guestId,
+        updatedData,
+    });
+}
