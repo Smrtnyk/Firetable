@@ -5,13 +5,17 @@ import { ADMIN } from "@firetable/types";
 import { computed, ref, useTemplateRef } from "vue";
 import { QScrollArea } from "quasar";
 import { formatEventDate } from "src/helpers/date-utils";
+import FTCenteredText from "src/components/FTCenteredText.vue";
 
 export interface AdminEventLogsProps {
-    logsDoc: EventLogsDoc;
+    logsDoc: EventLogsDoc | null;
     isAdmin: boolean;
 }
 const props = defineProps<AdminEventLogsProps>();
 const logs = computed(function () {
+    if (!props.logsDoc) {
+        return [];
+    }
     if (props.isAdmin) {
         return props.logsDoc.logs;
     }
@@ -70,29 +74,34 @@ function scrollToBottom(): void {
 </script>
 
 <template>
-    <q-scroll-area ref="logsContainer" class="logs-container" @scroll="handleScroll">
-        <q-timeline color="primary">
-            <q-timeline-entry
-                v-for="log of logs"
-                :key="log.timestamp.nanoseconds"
-                :subtitle="formatSubtitleForEventLog(log)"
-                :icon="getIconNameForLogEntry(log.message)"
-            >
-                <div>
-                    {{ log.message }}
-                </div>
-            </q-timeline-entry>
-        </q-timeline>
-    </q-scroll-area>
+    <div class="AdminEventLogs">
+        <div v-if="logs.length > 0">
+            <q-scroll-area ref="logsContainer" class="logs-container" @scroll="handleScroll">
+                <q-timeline color="primary">
+                    <q-timeline-entry
+                        v-for="log of logs"
+                        :key="log.timestamp.nanoseconds"
+                        :subtitle="formatSubtitleForEventLog(log)"
+                        :icon="getIconNameForLogEntry(log.message)"
+                    >
+                        <div>
+                            {{ log.message }}
+                        </div>
+                    </q-timeline-entry>
+                </q-timeline>
+            </q-scroll-area>
 
-    <q-page-sticky
-        v-if="showScrollButton"
-        position="bottom"
-        :offset="[18, 18]"
-        class="scroll-to-bottom"
-    >
-        <q-btn @click="scrollToBottom" fab icon="chevron_down" color="secondary" />
-    </q-page-sticky>
+            <q-page-sticky
+                v-if="showScrollButton"
+                position="bottom"
+                :offset="[18, 18]"
+                class="scroll-to-bottom"
+            >
+                <q-btn @click="scrollToBottom" fab icon="chevron_down" color="secondary" />
+            </q-page-sticky>
+        </div>
+        <FTCenteredText v-else>No logs recorded for this event.</FTCenteredText>
+    </div>
 </template>
 
 <style lang="scss">

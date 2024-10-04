@@ -311,7 +311,7 @@ onMounted(init);
             </q-tab-panel>
 
             <!-- Logs -->
-            <q-tab-panel name="logs" v-if="logs">
+            <q-tab-panel name="logs">
                 <AdminEventLogs :logs-doc="logs" :is-admin="authStore.isAdmin" />
             </q-tab-panel>
         </FTTabPanels>
