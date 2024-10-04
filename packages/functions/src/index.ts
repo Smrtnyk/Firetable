@@ -13,6 +13,7 @@ import { changePasswordFn } from "./callable/change-password.js";
 import { onOrganisationDeletedFn } from "./trigger/on-organisation-deleted.js";
 import { setGuestDataFn } from "./callable/guest/set-guest-data.js";
 import { deleteGuestVisitFn } from "./callable/guest/delete-guest-visit.js";
+import { updateGuestDataFn } from "./callable/guest/update-guest-info.js";
 import { Collection } from "../types/types.js";
 
 import { onSchedule } from "firebase-functions/v2/scheduler";
@@ -52,9 +53,10 @@ export const onPropertyDelete = onDocumentDeleted(
     `${Collection.ORGANISATIONS}/{organisationId}/${Collection.PROPERTIES}/{propertyId}`,
     (event) => onPropertyDeletedFn(event.params),
 );
-// Reservations
+// Reservations and guests
 export const setGuestData = onCall(setGuestDataFn);
 export const deleteGuestVisit = onCall(deleteGuestVisitFn);
+export const updateGuestData = onCall(updateGuestDataFn);
 
 // Generic stuff
 export const deleteCollection = onCall<{ col: string; id: string }>((request) =>
