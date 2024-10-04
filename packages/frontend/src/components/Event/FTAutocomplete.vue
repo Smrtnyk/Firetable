@@ -8,7 +8,7 @@ import { useI18n } from "vue-i18n";
 import { QSelect } from "quasar";
 import { matchesProperty } from "es-toolkit/compat";
 
-interface Props {
+export interface FTAutocompleteProps {
     floors: FloorDoc[];
     allReservedTables: PlannedReservation[];
     showFloorNameInOption: boolean;
@@ -21,7 +21,7 @@ interface Option {
     arrived: boolean;
 }
 
-const props = defineProps<Props>();
+const props = defineProps<FTAutocompleteProps>();
 const emit = defineEmits(["found", "clear"]);
 const { t } = useI18n();
 
