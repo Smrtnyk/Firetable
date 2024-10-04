@@ -36,7 +36,7 @@ describe("EventCreateReservation", () => {
         function generateInitialState(): Omit<WalkInReservation, "creator"> {
             const eventStart = props.eventStartTimestamp;
             const now = Date.now();
-            const initialTime = now > eventStart ? now : eventStart;
+            const initialTime = Math.max(now, eventStart);
             const formattedTime = hourFromTimestamp(initialTime, null);
             return {
                 type: ReservationType.WALK_IN,

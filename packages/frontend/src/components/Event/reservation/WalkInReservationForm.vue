@@ -36,7 +36,7 @@ function generateInitialState(): Omit<WalkInReservation, "creator"> {
     const eventStart = props.eventStartTimestamp;
     const now = Date.now();
     // Set the initial time to either the current hour or the event start hour
-    const initialTime = now > eventStart ? now : eventStart;
+    const initialTime = Math.max(now, eventStart);
     // Format the time as a string "HH:MM"
     const formattedTime = hourFromTimestamp(initialTime, null);
     return {
