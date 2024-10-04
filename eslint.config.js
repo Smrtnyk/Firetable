@@ -62,6 +62,7 @@ export default tseslint.config(
                     checkArrowFunctions: false,
                 },
             ],
+            "unicorn/consistent-existence-index-check": "error",
             "unicorn/prefer-math-min-max": "error",
             "unicorn/prefer-global-this": "error",
             "unicorn/explicit-length-check": "error",
