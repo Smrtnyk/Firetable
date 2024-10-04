@@ -62,6 +62,7 @@ export default tseslint.config(
                     checkArrowFunctions: false,
                 },
             ],
+            "unicorn/prefer-global-this": "error",
             "unicorn/explicit-length-check": "error",
             "unicorn/no-await-in-promise-methods": "error",
             "unicorn/no-console-spaces": "error",

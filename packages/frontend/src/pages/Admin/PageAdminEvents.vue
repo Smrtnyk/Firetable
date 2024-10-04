@@ -99,12 +99,12 @@ async function onUpdateEvent(eventData: EditEventPayload & { id: string }): Prom
                 eventData,
             );
             // An ugly hack to force data reload
-            window.location.reload();
+            globalThis.location.reload();
         },
     });
 }
 
-async function onEventItemSlideRight(event: EventDoc): Promise<void> {
+async function deleteEvent(event: EventDoc): Promise<void> {
     if (!(await showConfirm(t("PageAdminEvents.deleteEventDialogTitle")))) {
         return;
     }
@@ -119,6 +119,8 @@ async function onEventItemSlideRight(event: EventDoc): Promise<void> {
                 }),
                 event.id,
             );
+            // An ugly hack to force data reload
+            globalThis.location.reload();
         },
     });
 }
@@ -173,8 +175,8 @@ onMounted(fetchMoreEvents);
             <AdminPropertyEventsList
                 :property-id="propertyId"
                 :events="events"
-                @delete="onEventItemSlideRight"
-                @edit="(event: EventDoc) => showEventForm(event)"
+                @delete="deleteEvent"
+                @edit="showEventForm"
                 @load="fetchMoreEvents"
                 :done="done"
             />

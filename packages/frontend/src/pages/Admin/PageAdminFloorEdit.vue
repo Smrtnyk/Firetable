@@ -63,7 +63,7 @@ function onKeyDown(event: KeyboardEvent): void {
 }
 
 onBeforeUnmount(function () {
-    window.removeEventListener("keydown", onKeyDown);
+    globalThis.removeEventListener("keydown", onKeyDown);
     window.removeEventListener("resize", resizeFloor);
 });
 
@@ -72,7 +72,7 @@ onMounted(async function () {
     await floorDataPromise.value;
     if (floor.value) {
         instantiateFloor(floor.value);
-        window.addEventListener("keydown", onKeyDown);
+        globalThis.addEventListener("keydown", onKeyDown);
         window.addEventListener("resize", resizeFloor);
     } else {
         router.replace("/").catch(showErrorMessage);

@@ -17,7 +17,7 @@ const menuLinks = [
 ];
 
 function refreshApp(): void {
-    window.location.reload();
+    globalThis.location.reload();
 }
 </script>
 

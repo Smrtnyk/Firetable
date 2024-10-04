@@ -6,7 +6,7 @@ const onlineCheckUrl = "https://www.google.com/favicon.ico";
 export function useNetworkStatus(): {
     isOnline: Ref<boolean>;
 } {
-    const isOnline = ref(window.navigator.onLine);
+    const isOnline = ref(globalThis.navigator.onLine);
 
     // Helper function to perform an actual network request to verify internet connectivity
     async function verifyConnectivity(): Promise<void> {
@@ -30,15 +30,15 @@ export function useNetworkStatus(): {
     }
 
     onMounted(function () {
-        window.addEventListener("online", updateOnlineStatus);
-        window.addEventListener("offline", updateOnlineStatus);
+        globalThis.addEventListener("online", updateOnlineStatus);
+        globalThis.addEventListener("offline", updateOnlineStatus);
         // Perform an initial connectivity check when the component is mounted
         void verifyConnectivity();
     });
 
     onUnmounted(function () {
-        window.removeEventListener("online", updateOnlineStatus);
-        window.removeEventListener("offline", updateOnlineStatus);
+        globalThis.removeEventListener("online", updateOnlineStatus);
+        globalThis.removeEventListener("offline", updateOnlineStatus);
     });
 
     return { isOnline };

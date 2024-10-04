@@ -21,6 +21,6 @@ import FTCenteredText from "src/components/FTCenteredText.vue";
 const { isOnline } = useNetworkStatus();
 
 function reloadPage(): void {
-    window.location.reload();
+    globalThis.location.reload();
 }
 </script>
