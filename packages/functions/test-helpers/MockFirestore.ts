@@ -280,7 +280,14 @@ export class MockDocumentReference implements DocumentReference {
     }
 
     async update(data: any): Promise<MockWriteResult> {
-        const currentData = this.firestore.data.get(this.path) ?? {};
+        const currentData = this.firestore.data.get(this.path);
+
+        if (!currentData) {
+            throw new FirestoreError(
+                "not-found",
+                `No document to update: Document at path '${this.path}' does not exist.`,
+            );
+        }
 
         Object.keys(data).forEach((key) => {
             const value = data[key];
@@ -867,6 +874,29 @@ export class MockWriteBatch {
     }
 
     async commit(): Promise<MockWriteResult[]> {
+        // First, validate all operations without applying them
+        for (const operation of this.operations) {
+            if (operation.type === FirestoreOperation.SET) {
+                // No validation needed for set operations
+                continue;
+            } else if (operation.type === FirestoreOperation.UPDATE) {
+                // Check if document exists
+                const docSnapshot = await operation.docRef.get();
+                if (!docSnapshot.exists) {
+                    throw new FirestoreError(
+                        "not-found",
+                        `No document to update: Document at path '${operation.docRef.path}' does not exist.`,
+                    );
+                }
+            } else if (operation.type === FirestoreOperation.DELETE) {
+                // No validation needed for delete operations
+                continue;
+            } else {
+                throw new Error(`Unsupported operation: ${operation.type}`);
+            }
+        }
+
+        // If validation passes, perform all operations
         for (const operation of this.operations) {
             if (operation.type === FirestoreOperation.SET) {
                 await operation.docRef.set(operation.data);

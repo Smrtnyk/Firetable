@@ -10,9 +10,39 @@ describe("MockFirestore", () => {
     });
 
     describe("Batch Operations", () => {
+        it("should fail to commit a batch with an update on a non-existent document", async () => {
+            const docRef1 = db.collection("testCollection").doc("doc1");
+            const docRef2 = db.collection("testCollection").doc("doc2");
+
+            // Start a batch
+            const batch = db.batch();
+
+            // Queue operations
+            batch.set(docRef1, { key: "value1" });
+            // doc2 doesn't exist
+            batch.update(docRef2, { key: "newValue" });
+            batch.delete(docRef2);
+
+            // Commit batch and expect it to fail
+            await expect(batch.commit()).rejects.toThrowError(
+                /No document to update: Document at path 'testCollection\/doc2' does not exist/,
+            );
+
+            // Verify that no operations were applied
+            const snapshot1 = await docRef1.get();
+            // Since batch failed, doc1 should not exist
+            expect(snapshot1.exists).toBe(false);
+
+            const snapshot2 = await docRef2.get();
+            expect(snapshot2.exists).toBe(false);
+        });
+
         it("should commit a batch of write operations", async () => {
             const docRef1 = db.collection("testCollection").doc("doc1");
             const docRef2 = db.collection("testCollection").doc("doc2");
+
+            // Ensure doc2 exists before the batch
+            await docRef2.set({ key: "initialValue" });
 
             // Start a batch
             const batch = db.batch();
@@ -31,7 +61,7 @@ describe("MockFirestore", () => {
             expect(snapshot1.data?.()).toEqual({ key: "value1" });
 
             const snapshot2 = await docRef2.get();
-            expect(snapshot2.exists).toBe(false);
+            expect(snapshot2.exists).toBe(false); // doc2 was deleted in the batch
         });
     });
 
@@ -245,13 +275,14 @@ describe("MockFirestore", () => {
             expect(snapshot.data?.()).toEqual({ nested: { key: "newValue" } });
         });
 
-        it("should handle updating non-existent documents", async () => {
+        it("should throw an error when updating a non-existent document", async () => {
             const docRef = db.collection("testCollection").doc("nonExistentDoc");
-            await docRef.update({ key: "newValue" });
+            await expect(docRef.update({ key: "newValue" })).rejects.toThrowError(
+                /No document to update/,
+            );
 
             const snapshot = await docRef.get();
-            expect(snapshot.exists).toBe(true);
-            expect(snapshot.data?.()).toEqual({ key: "newValue" });
+            expect(snapshot.exists).toBe(false);
         });
 
         it("should update nested fields using field paths", async () => {

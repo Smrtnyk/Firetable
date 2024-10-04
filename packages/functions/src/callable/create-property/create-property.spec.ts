@@ -2,7 +2,7 @@ import type { CallableRequest } from "firebase-functions/v2/https";
 import { createPropertyFn } from "./create-property.js";
 import { MockFieldValue, MockFirestore } from "../../../test-helpers/MockFirestore.js";
 import * as Init from "../../init.js";
-import { getPropertyPath, getUserPath } from "../../paths.js";
+import { getPropertyPath, getUserPath, getUsersPath } from "../../paths.js";
 import * as Firestore from "firebase-admin/firestore";
 import { beforeEach, vi, describe, expect, it } from "vitest";
 
@@ -47,6 +47,14 @@ describe("createPropertyFn", () => {
         const roleName = "user";
         const propertyName = "Test Property";
 
+        // Create the user document in Firestore
+        const userData = {
+            name: "Test User",
+            role: roleName,
+            relatedProperties: [],
+        };
+        await mockFirestore.collection(getUsersPath(organisationId)).doc(userId).set(userData);
+
         const request = mockRequest(
             { name: propertyName, organisationId },
             { uid: userId, token: { role: roleName } },
@@ -67,7 +75,7 @@ describe("createPropertyFn", () => {
         });
 
         // Check if the user's related properties are updated
-        const userData = mockFirestore.getDataAtPath(getUserPath(organisationId, userId));
-        expect(userData.relatedProperties).toContain(propertyId);
+        const updatedUserData = mockFirestore.getDataAtPath(getUserPath(organisationId, userId));
+        expect(updatedUserData.relatedProperties).toContain(propertyId);
     });
 });
