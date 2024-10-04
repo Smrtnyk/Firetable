@@ -3,7 +3,7 @@ import type { HttpsCallableResult } from "firebase/functions";
 import { initializeFirebase } from "./base.js";
 import { guestDoc } from "./db.js";
 import { getGuestsPath } from "./paths.js";
-import { setDoc, deleteDoc, doc } from "firebase/firestore";
+import { deleteDoc, addDoc, collection } from "firebase/firestore";
 import { httpsCallable } from "firebase/functions";
 
 export function setGuestData(guestData: GuestDataPayload): Promise<HttpsCallableResult> {
@@ -20,10 +20,13 @@ export function deleteGuest(organisationId: string, guestId: string): Promise<vo
     return deleteDoc(guestDoc(organisationId, guestId));
 }
 
-export function createGuest(organisationId: string, guestData: CreateGuestPayload): Promise<void> {
+export async function createGuest(
+    organisationId: string,
+    guestData: CreateGuestPayload,
+): Promise<void> {
     const { firestore } = initializeFirebase();
-    const newDoc = doc(firestore, getGuestsPath(organisationId), guestData.contact);
-    return setDoc(newDoc, guestData);
+    const guestsCollectionRef = collection(firestore, getGuestsPath(organisationId));
+    await addDoc(guestsCollectionRef, guestData);
 }
 
 /**
