@@ -8,7 +8,7 @@ import { formatEventDate } from "src/helpers/date-utils";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 
 export interface AdminEventLogsProps {
-    logsDoc: EventLogsDoc | null;
+    logsDoc: EventLogsDoc | null | undefined;
     isAdmin: boolean;
 }
 const props = defineProps<AdminEventLogsProps>();

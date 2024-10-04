@@ -1,7 +1,7 @@
 import type { EventOwner } from "@firetable/backend";
 import type { Query } from "firebase/firestore";
 import type { GuestDoc, ReservationDoc } from "@firetable/types";
-import type { Ref, ComputedRef } from "vue";
+import type { Ref } from "vue";
 import { computed } from "vue";
 import { guestsCollection } from "@firetable/backend";
 import { isValidEuropeanPhoneNumber } from "src/helpers/utils";
@@ -10,7 +10,7 @@ import { createQuery, useFirestoreCollection } from "src/composables/useFirestor
 import { matchesProperty, property } from "es-toolkit/compat";
 
 export function useGuestsForEvent(eventOwner: EventOwner, reservations: Ref<ReservationDoc[]>) {
-    const guestWithPhoneNumbers = computed(function () {
+    const guestWithPhoneNumbers = computed<string[]>(function () {
         const values = reservations.value
             .map(property("guestContact"))
             .filter(isValidEuropeanPhoneNumber)
@@ -19,7 +19,7 @@ export function useGuestsForEvent(eventOwner: EventOwner, reservations: Ref<Rese
         return Array.from(new Set(values));
     });
 
-    const guestsQuery: ComputedRef<Query<GuestDoc> | null> = computed(function () {
+    const guestsQuery = computed<Query<GuestDoc> | null>(function () {
         if (guestWithPhoneNumbers.value.length > 0) {
             return createQuery(
                 guestsCollection(eventOwner.organisationId),

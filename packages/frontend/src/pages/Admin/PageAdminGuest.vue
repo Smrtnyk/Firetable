@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { GuestDoc, Visit } from "@firetable/types";
+import type { CreateGuestPayload, GuestDoc, Visit } from "@firetable/types";
 import { useFirestoreDocument } from "src/composables/useFirestore";
 import { deleteGuest, getGuestPath, updateGuestInfo } from "@firetable/backend";
 import { computed, ref, watch } from "vue";
@@ -105,7 +105,7 @@ async function editGuest(): Promise<void> {
             maximized: false,
             title: "Edit guest",
             listeners: {
-                update(updatedData) {
+                update(updatedData: CreateGuestPayload) {
                     dialog.hide();
                     return tryCatchLoadingWrapper({
                         hook() {
@@ -138,7 +138,7 @@ async function onDeleteGuest(): Promise<void> {
             <FTTitle :title="guest.name" :subtitle="guest.contact">
                 <template #right>
                     <q-btn rounded icon="pencil" color="secondary" @click="editGuest" />
-                    <q-btn rounded icon="trash" color="negative" @click="onDeleteGuest(guest.id)" />
+                    <q-btn rounded icon="trash" color="negative" @click="onDeleteGuest()" />
                 </template>
             </FTTitle>
 
