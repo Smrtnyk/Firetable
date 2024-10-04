@@ -7,6 +7,8 @@ import type {
     DocumentSnapshot,
     Settings,
     ReadOptions,
+    CollectionReference,
+    DocumentReference,
 } from "firebase-admin/firestore";
 import { FirestoreOperation } from "./types.js";
 import { generateRandomId } from "./utils.js";
@@ -114,7 +116,7 @@ export class MockFirestore {
     }
 }
 
-export class MockCollection {
+export class MockCollection implements CollectionReference {
     readonly path: string;
     readonly firestore: MockFirestore;
 
@@ -195,7 +197,7 @@ function applyUpdate(current: any, path: string[], value: any): void {
     }
 }
 
-export class MockDocumentReference {
+export class MockDocumentReference implements DocumentReference {
     public path: string;
     public firestore: MockFirestore;
     public id: string;
@@ -210,7 +212,6 @@ export class MockDocumentReference {
     onSnapshot(
         onNext: (snapshot: MockDocumentSnapshot) => void,
         onError?: (error: Error) => void,
-        // onCompletion?: () => void,
     ): () => void {
         this.listeners.push(onNext);
         (async function (instance) {
@@ -406,14 +407,11 @@ class MockTransaction {
     }
 }
 
-export class MockDocumentSnapshot {
+export class MockDocumentSnapshot implements DocumentSnapshot {
     createTime?: Timestamp;
     updateTime?: Timestamp;
     readTime = Timestamp.now();
 
-    /**
-     * @private
-     */
     readonly #data: any;
 
     constructor(
@@ -450,7 +448,7 @@ export class MockDocumentSnapshot {
         return currentObject;
     }
 
-    isEqual(other: DocumentSnapshot): boolean {
+    isEqual(other: MockDocumentSnapshot): boolean {
         console.log("MockDocumentSnapshot.isEqual", other);
         throw new NotImplementedError("isEqual is not implemented");
     }
