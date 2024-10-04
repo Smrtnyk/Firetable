@@ -60,7 +60,7 @@ describe("EventCreateReservation", () => {
                 type: ReservationType.WALK_IN,
                 guestName: "John Doe",
                 numberOfGuests: 4,
-                guestContact: "john.doe@example.com",
+                guestContact: "+43666666666",
                 reservationNote: "Birthday celebration",
                 consumption: 50,
                 arrived: true,
@@ -105,9 +105,7 @@ describe("EventCreateReservation", () => {
             );
 
             // Check that guest contact input is empty
-            const guestContactInput = screen
-                .getByLabelText(t("EventCreateReservation.reservationGuestContact"))
-                .query();
+            const guestContactInput = screen.getByLabelText("Phone Number").query();
             expect(guestContactInput.getAttribute("value")).toBe("");
 
             // Check that reservation note input is empty
@@ -160,12 +158,9 @@ describe("EventCreateReservation", () => {
             );
 
             // Check that guest contact input has the correct value
-            const guestContactInput = screen
-                .getByLabelText(t("EventCreateReservation.reservationGuestContact"))
-                .query();
-            expect(guestContactInput.getAttribute("value")).toBe(
-                props.reservationData?.guestContact,
-            );
+            // Check that guest contact input is empty
+            const guestContactInput = screen.getByLabelText("Phone Number").query();
+            expect(guestContactInput.getAttribute("value")).toBe("666666666");
 
             // Check that reservation note input has the correct value
             const reservationNoteInput = screen
