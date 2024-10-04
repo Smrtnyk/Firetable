@@ -57,7 +57,9 @@ function emitDelete(reservation: ReservationDoc, reset: VoidFunction): void {
                         >
                         <q-item-label v-if="reservation.clearedAt" caption
                             >Cleared at:
-                            {{ formatEventDate(reservation.clearedAt.toMillis()) }}</q-item-label
+                            {{
+                                formatEventDate(reservation.clearedAt.toMillis(), null)
+                            }}</q-item-label
                         >
                         <q-item-label caption>
                             <ReservationLabelChips :reservation="reservation" />

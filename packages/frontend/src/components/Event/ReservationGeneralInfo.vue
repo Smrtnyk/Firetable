@@ -71,7 +71,7 @@ function createdByText(creator: Reservation["creator"]): string {
             <template v-if="props.reservation.creator.createdAt">
                 <div class="col-6">Created at</div>
                 <div class="col-6 font-black">
-                    {{ formatEventDate(props.reservation.creator.createdAt.toMillis()) }}
+                    {{ formatEventDate(props.reservation.creator.createdAt.toMillis(), null) }}
                 </div>
             </template>
         </template>
