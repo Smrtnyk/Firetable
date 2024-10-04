@@ -160,6 +160,7 @@ describe("MockFirestore", () => {
         it("should create a new document in a transaction", async () => {
             const docRef = db.collection("testCollection").doc("testDoc");
 
+            // eslint-disable-next-line require-await -- transaction wants async function
             await db.runTransaction(async (transaction) => {
                 transaction.create(docRef, { key: "value" });
             });
@@ -174,6 +175,7 @@ describe("MockFirestore", () => {
             await docRef.set({ key: "value" });
 
             await expect(
+                // eslint-disable-next-line require-await -- transaction wants async function
                 db.runTransaction(async (transaction) => {
                     transaction.create(docRef, { key: "newValue" });
                 }),
@@ -186,7 +188,7 @@ describe("MockFirestore", () => {
         it("should delete a document in a transaction", async () => {
             const docRef = db.collection("testCollection").doc("testDoc");
             await docRef.set({ key: "value" });
-
+            // eslint-disable-next-line require-await -- transaction wants async function
             await db.runTransaction(async (transaction) => {
                 transaction.delete(docRef);
             });
@@ -198,7 +200,7 @@ describe("MockFirestore", () => {
         it("should handle MockFieldValue operations in transactions", async () => {
             const docRef = db.collection("testCollection").doc("testDoc");
             await docRef.set({ counter: 1 });
-
+            // eslint-disable-next-line require-await -- transaction wants async function
             await db.runTransaction(async (transaction) => {
                 transaction.update(docRef, {
                     counter: MockFieldValue.increment(5),

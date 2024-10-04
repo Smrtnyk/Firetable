@@ -210,19 +210,18 @@ export class MockDocumentReference {
     onSnapshot(
         onNext: (snapshot: MockDocumentSnapshot) => void,
         onError?: (error: Error) => void,
-        onCompletion?: () => void,
+        // onCompletion?: () => void,
     ): () => void {
         this.listeners.push(onNext);
-        // Immediately call the listener with the current data
-        this.get()
-            .then((snapshot) => {
+        (async function (instance) {
+            try {
+                const snapshot = await instance.get();
                 onNext(snapshot);
-            })
-            .catch((error) => {
+            } catch (error) {
                 if (onError) onError(error);
-            });
+            }
+        })(this);
 
-        // Return unsubscribe function
         return () => {
             this.listeners = this.listeners.filter((listener) => listener !== onNext);
         };
@@ -294,6 +293,7 @@ export class MockDocumentReference {
                 const lastKey = path[path.length - 1];
 
                 if (value.operation === "delete") {
+                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- keep like this for now
                     delete parent[lastKey];
                 } else {
                     const currentValue = parent[lastKey];
@@ -329,13 +329,16 @@ export class MockDocumentReference {
 class MockTransaction {
     private readonly readVersions: Map<string, number> = new Map();
     private readonly writes: Map<string, any> = new Map();
+    private readonly firestore: MockFirestore;
 
-    constructor(private readonly firestore: MockFirestore) {}
+    constructor(firestore: MockFirestore) {
+        this.firestore = firestore;
+    }
 
-    async get(docRef: MockDocumentReference): Promise<MockDocumentSnapshot> {
+    get(docRef: MockDocumentReference): Promise<MockDocumentSnapshot> {
         const data = this.writes.get(docRef.path) ?? this.firestore.getDataAtPath(docRef.path);
         this.readVersions.set(docRef.path, this.firestore.getVersion(docRef.path));
-        return new MockDocumentSnapshot(docRef, data !== undefined, data);
+        return Promise.resolve(new MockDocumentSnapshot(docRef, data !== undefined, data));
     }
 
     set(docRef: MockDocumentReference, data: any): this {
@@ -359,6 +362,7 @@ class MockTransaction {
                 const lastKey = path[path.length - 1];
 
                 if (value.operation === "delete") {
+                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- keep like this for now
                     delete parent[lastKey];
                 } else {
                     const currentValue = parent[lastKey];
@@ -374,7 +378,7 @@ class MockTransaction {
         return this;
     }
 
-    async commit(): Promise<void> {
+    commit(): void {
         // Check for conflicts
         for (const [path, version] of this.readVersions.entries()) {
             if (this.firestore.getVersion(path) !== version) {
@@ -572,8 +576,8 @@ export class MockFieldPath implements FieldPath {
 class MockQuery implements Query {
     private readonly queryConstraints: any[] = [];
     private docs: MockQueryDocumentSnapshot[] = [];
-    readonly #initPromise: Promise<void>;
     private orderByField: string | null = null;
+    readonly #initPromise: Promise<void>;
 
     constructor(
         private readonly collection: MockCollection | null,
@@ -586,7 +590,7 @@ class MockQuery implements Query {
     async init(): Promise<void> {
         if (this.collectionGroupId) {
             // For collectionGroup queries
-            this.docs = await this.#getCollectionGroupDocs();
+            this.docs = this.#getCollectionGroupDocs();
         } else if (this.collection) {
             // For collection queries
             const docsPromise = Array.from(this.firestore.data.entries())
@@ -635,6 +639,11 @@ class MockQuery implements Query {
     offset(offset: number): any {
         console.log("MockQuery.offset", offset);
         throw new NotImplementedError("offset is not implemented");
+    }
+
+    explain(options?: any): any {
+        console.log("MockQuery.explain", options);
+        throw new NotImplementedError("explain is not implemented");
     }
 
     limitToLast(limit: number): this {
@@ -724,7 +733,7 @@ class MockQuery implements Query {
         await this.#initPromise;
 
         if (this.collectionGroupId) {
-            return new MockQuerySnapshot(await this.#getCollectionGroupDocs());
+            return new MockQuerySnapshot(this.#getCollectionGroupDocs());
         }
 
         let filteredDocs = this.docs;
@@ -766,7 +775,7 @@ class MockQuery implements Query {
                         case "array-contains-any":
                             return (
                                 Array.isArray(docValue) &&
-                                constraint.value.some((v: any) => docValue.includes(v))
+                                constraint.value.some((value) => docValue.includes(value))
                             );
                         case "in":
                             return (
@@ -821,11 +830,14 @@ class MockQuery implements Query {
         return new MockQuerySnapshot(filteredDocs);
     }
 
-    async #getCollectionGroupDocs(): Promise<MockQueryDocumentSnapshot[]> {
+    #getCollectionGroupDocs(): MockQueryDocumentSnapshot[] {
         const docs = [];
+        if (!this.collectionGroupId) {
+            return docs;
+        }
         for (const [path, data] of this.firestore.data.entries()) {
             const pathSegments = path.split("/");
-            if (pathSegments.includes(this.collectionGroupId!)) {
+            if (pathSegments.includes(this.collectionGroupId)) {
                 const docRef = new MockDocumentReference(path, this.firestore);
                 docs.push(new MockQueryDocumentSnapshot(docRef, true, data));
             }

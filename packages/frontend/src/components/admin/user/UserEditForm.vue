@@ -176,11 +176,11 @@ function resetProperties(): void {
                 <div>Properties:</div>
                 <div v-if="properties.length > 0">
                     <q-checkbox
-                        v-for="property in props.properties"
-                        :key="property.id"
+                        v-for="{ id, name } in props.properties"
+                        :key="id"
                         v-model="chosenProperties"
-                        :val="property.id"
-                        :label="property.name"
+                        :val="id"
+                        :label="name"
                         color="accent"
                     />
                 </div>
