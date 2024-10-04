@@ -3,7 +3,7 @@ import type { CallableRequest } from "firebase-functions/v2/https";
 import type { GuestDoc, SimpleReservation } from "../../../types/types.js";
 import { setGuestDataFn } from "./set-guest-data.js";
 import * as Init from "../../init.js";
-import { getGuestPath, getGuestsPath } from "../../paths.js";
+import { getGuestsPath } from "../../paths.js";
 import { MockFirestore } from "../../../test-helpers/MockFirestore.js";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
@@ -39,10 +39,17 @@ describe("setGuestDataFn", () => {
     it("should create a new guest if they do not exist", async () => {
         await setGuestDataFn({ data: testRequestData } as CallableRequest<GuestData>);
 
-        const guestDoc = mockFirestore.getDataAtPath(getGuestPath(organisationId, guestContact));
-        expect(guestDoc).toBeDefined();
+        // Query the guests collection for the guest with contact == guestContact
+        const guestsCollectionRef = mockFirestore.collection(getGuestsPath(organisationId));
+        const querySnapshot = await guestsCollectionRef.where("contact", "==", guestContact).get();
+
+        expect(querySnapshot.empty).toBe(false);
+        const guestDoc = querySnapshot.docs[0];
+        const guestData = guestDoc.data();
+
+        expect(guestData).toBeDefined();
         const guestVisits =
-            guestDoc.visitedProperties[testRequestData.propertyId][testRequestData.eventId];
+            guestData.visitedProperties[testRequestData.propertyId][testRequestData.eventId];
         expect(guestVisits).toStrictEqual({
             arrived: false,
             cancelled: false,
@@ -58,10 +65,10 @@ describe("setGuestDataFn", () => {
             contact: guestContact,
             visitedProperties: {},
         };
-        await mockFirestore
-            .collection(getGuestsPath(organisationId))
-            .doc(guestContact)
-            .set(initialGuestData);
+
+        // Add a guest document to the guests collection
+        const guestsCollectionRef = mockFirestore.collection(getGuestsPath(organisationId));
+        await guestsCollectionRef.add(initialGuestData);
 
         const requestData = {
             reservation: { ...testSimpleReservation, arrived: true },
@@ -74,11 +81,16 @@ describe("setGuestDataFn", () => {
 
         await setGuestDataFn({ data: requestData } as CallableRequest<GuestData>);
 
-        const guestDoc = mockFirestore.getDataAtPath(getGuestPath(organisationId, guestContact));
+        // Query the guests collection for the guest with contact == guestContact
+        const querySnapshot = await guestsCollectionRef.where("contact", "==", guestContact).get();
 
-        const guestVisits = guestDoc.visitedProperties[requestData.propertyId];
+        expect(querySnapshot.empty).toBe(false);
+        const guestDoc = querySnapshot.docs[0];
+        const guestData = guestDoc.data();
+
+        const guestVisits = guestData.visitedProperties[requestData.propertyId];
         expect(guestVisits).toStrictEqual({
-            eventId: {
+            [requestData.eventId]: {
                 arrived: true,
                 cancelled: false,
                 date,
@@ -91,11 +103,13 @@ describe("setGuestDataFn", () => {
     it("should handle errors gracefully", async () => {
         const requestData = {
             reservation: {
-                /* ... invalid or incomplete reservation data ... */
+                // Invalid reservation data
             },
             propertyId: "propertyId",
             organisationId: "orgId",
             eventId: "eventId",
+            eventName: "eventName",
+            eventDate: date,
         };
 
         // Expect the function to throw an error due to invalid data

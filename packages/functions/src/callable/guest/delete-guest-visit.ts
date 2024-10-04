@@ -1,7 +1,7 @@
 import type { SimpleReservation } from "../../../types/types.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
 import { db } from "../../init.js";
-import { getGuestPath } from "../../paths.js";
+import { getGuestsPath } from "../../paths.js";
 import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
 
@@ -27,15 +27,22 @@ export async function deleteGuestVisitFn(
         throw new HttpsError("invalid-argument", "Guest contact is not provided.");
     }
 
-    const guestRef = db.doc(getGuestPath(organisationId, guestContact));
+    const guestsCollectionRef = db.collection(getGuestsPath(organisationId));
 
     try {
-        const guestDoc = await guestRef.get();
+        const querySnapshot = await guestsCollectionRef.where("contact", "==", guestContact).get();
 
-        if (!guestDoc.exists) {
+        if (querySnapshot.empty) {
             logger.info(`Guest document for contact ${guestContact} does not exist.`);
             return;
         }
+
+        const guestDoc = querySnapshot.docs[0];
+        if (!guestDoc) {
+            logger.error(`Guest document is undefined even though querySnapshot is not empty.`);
+            throw new HttpsError("internal", "Unexpected error occurred.");
+        }
+        const guestRef = guestDoc.ref;
 
         const updateData = {
             [`visitedProperties.${propertyId}.${eventId}`]: null,

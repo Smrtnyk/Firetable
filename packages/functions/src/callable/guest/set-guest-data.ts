@@ -1,7 +1,7 @@
 import type { GuestDoc, SimpleReservation, Visit } from "../../../types/types.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
 import { db } from "../../init.js";
-import { getGuestPath } from "../../paths.js";
+import { getGuestsPath } from "../../paths.js";
 import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
 
@@ -50,8 +50,7 @@ export async function setGuestDataFn(req: CallableRequest<GuestData>): Promise<v
 
     logger.info("Guest contact is eligible for processing ", guestContact);
 
-    const guestRef = db.doc(getGuestPath(organisationId, guestContact));
-
+    const guestsCollectionRef = db.collection(getGuestsPath(organisationId));
     const visit: Visit = {
         eventName,
         date: eventDate,
@@ -61,10 +60,10 @@ export async function setGuestDataFn(req: CallableRequest<GuestData>): Promise<v
     };
 
     try {
-        const guestDoc = await guestRef.get();
+        const querySnapshot = await guestsCollectionRef.where("contact", "==", guestContact).get();
 
-        if (!guestDoc.exists) {
-            logger.info("Creating new guest document with name: ", guestName);
+        if (querySnapshot.empty) {
+            logger.info("Creating new guest document with name:", guestName);
             const guestData: GuestDoc = {
                 contact: guestContact,
                 name: guestName,
@@ -74,23 +73,26 @@ export async function setGuestDataFn(req: CallableRequest<GuestData>): Promise<v
                     },
                 },
             };
-            await guestRef.set(guestData);
-            return;
+            await guestsCollectionRef.add(guestData);
+        } else {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Guest exists, update the document, snapshot not empty
+            const guestDoc = querySnapshot.docs[0]!;
+            const guestRef = guestDoc.ref;
+            const guestData = guestDoc.data() as GuestDoc;
+
+            const propertyVisits = guestData.visitedProperties?.[propertyId] ?? {};
+
+            if (propertyVisits[eventId]) {
+                logger.info(
+                    "Visit with this eventId already exists for this propertyId, updating existing visit",
+                );
+            }
+
+            logger.info("Updating existing guest document with name:", guestName);
+            await guestRef.update({
+                [`visitedProperties.${propertyId}.${eventId}`]: visit,
+            });
         }
-
-        const guestData = guestDoc.data() as GuestDoc;
-        const propertyVisits = guestData.visitedProperties?.[propertyId] ?? {};
-
-        if (propertyVisits[eventId]) {
-            logger.info(
-                "Visit with this eventId already exists for this propertyId, will update existing visit",
-            );
-        }
-
-        logger.info("Updating existing guest document with name:", guestName);
-        await guestRef.update({
-            [`visitedProperties.${propertyId}.${eventId}`]: visit,
-        });
     } catch (error) {
         logger.error("Error processing reservation: ", error);
     }
