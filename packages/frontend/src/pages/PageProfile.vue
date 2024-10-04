@@ -76,7 +76,7 @@ async function changePassword(): Promise<void> {
                     <q-input
                         ref="passwordInput"
                         v-model="newPassword"
-                        :disable="isInputEnabled === false"
+                        :disable="!isInputEnabled"
                         :placeholder="t('PageProfile.passwordInputPlaceholder')"
                         clearable
                     ></q-input>
