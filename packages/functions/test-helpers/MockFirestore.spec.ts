@@ -61,7 +61,8 @@ describe("MockFirestore", () => {
             expect(snapshot1.data?.()).toEqual({ key: "value1" });
 
             const snapshot2 = await docRef2.get();
-            expect(snapshot2.exists).toBe(false); // doc2 was deleted in the batch
+            // doc2 was deleted in the batch
+            expect(snapshot2.exists).toBe(false);
         });
     });
 
@@ -406,6 +407,55 @@ describe("MockFirestore", () => {
     });
 
     describe("Query functionality", () => {
+        it("should correctly set 'empty' and 'size' properties based on the docs array", async () => {
+            const collectionRef = db.collection("testCollection");
+
+            // Test when the collection has no documents
+            let querySnapshot = await collectionRef.get();
+            expect(querySnapshot.empty).toBe(true);
+            expect(querySnapshot.size).toBe(0);
+            expect(querySnapshot.docs).toHaveLength(0);
+
+            // Add a document to the collection
+            await collectionRef.doc("doc1").set({ key: "value1" });
+
+            // Test after adding one document
+            querySnapshot = await collectionRef.get();
+            expect(querySnapshot.empty).toBe(false);
+            expect(querySnapshot.size).toBe(1);
+            expect(querySnapshot.docs).toHaveLength(1);
+
+            // Add another document
+            await collectionRef.doc("doc2").set({ key: "value2" });
+
+            // Test after adding a second document
+            querySnapshot = await collectionRef.get();
+            expect(querySnapshot.empty).toBe(false);
+            expect(querySnapshot.size).toBe(2);
+            expect(querySnapshot.docs).toHaveLength(2);
+        });
+
+        it("should correctly reflect 'empty' and 'size' after applying query filters", async () => {
+            const collectionRef = db.collection("testCollection");
+
+            // Add documents with different statuses
+            await collectionRef.doc("doc1").set({ status: "active" });
+            await collectionRef.doc("doc2").set({ status: "inactive" });
+            await collectionRef.doc("doc3").set({ status: "pending" });
+
+            // Query documents with status 'archived' (no documents should match)
+            let querySnapshot = await collectionRef.where("status", "==", "archived").get();
+            expect(querySnapshot.empty).toBe(true);
+            expect(querySnapshot.size).toBe(0);
+            expect(querySnapshot.docs).toHaveLength(0);
+
+            // Query documents with status 'active' (one document should match)
+            querySnapshot = await collectionRef.where("status", "==", "active").get();
+            expect(querySnapshot.empty).toBe(false);
+            expect(querySnapshot.size).toBe(1);
+            expect(querySnapshot.docs).toHaveLength(1);
+        });
+
         it("should filter documents using 'where' with '==' operator", async () => {
             // Setup
             const collectionRef = db.collection("testCollection");

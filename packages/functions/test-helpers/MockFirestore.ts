@@ -467,14 +467,16 @@ export class MockQueryDocumentSnapshot extends MockDocumentSnapshot {
 }
 
 class MockQuerySnapshot {
-    size = 0;
+    size: number;
     query: any;
-    empty = false;
+    empty: boolean;
     readTime = Timestamp.now();
     docs: MockQueryDocumentSnapshot[];
 
     constructor(docs: MockQueryDocumentSnapshot[]) {
         this.docs = docs;
+        this.size = docs.length;
+        this.empty = docs.length === 0;
     }
 
     docChanges(): any {

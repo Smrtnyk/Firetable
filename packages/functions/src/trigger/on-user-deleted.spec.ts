@@ -43,12 +43,14 @@ describe("onUserDeletedFn Function", () => {
     });
 
     it("should handle errors correctly", async () => {
-        // Setup: Create properties and simulate a database operation failure
+        // Create properties and simulate a database operation failure
         vi.spyOn(MockWriteBatch.prototype, "commit").mockRejectedValue(
             new Error("Simulated database error"),
         );
+        const propertiesRef = db.collection(getPropertiesPath(organisationId));
+        const propertyRef = propertiesRef.doc("property1");
+        await propertyRef.set({ relatedUsers: ["user1", "user2"] });
 
-        // Test & Assert: Expect the function to throw an error
         await expect(onUserDeletedFn({ userId, organisationId })).rejects.toThrow(
             "Error cleaning up data for user user1",
         );
