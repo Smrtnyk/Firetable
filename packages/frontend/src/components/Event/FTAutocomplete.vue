@@ -1,46 +1,3 @@
-<template>
-    <div class="FTAutocomplete">
-        <q-select
-            ref="selectEl"
-            fill-input
-            hide-selected
-            use-input
-            v-model="searchTerm"
-            :label="t(`FTAutocomplete.label`)"
-            clearable
-            clear-icon="close"
-            dense
-            standout
-            :debounce="300"
-            @input-value="setModel"
-            @filter="filterFn"
-            @clear="() => emit('clear')"
-            :options="options"
-        >
-            <template #prepend>
-                <q-icon name="search" />
-            </template>
-
-            <template #option="scope">
-                <q-item v-bind="scope.itemProps">
-                    <q-item-section>
-                        <q-item-label>{{ scope.opt.label }}</q-item-label>
-                    </q-item-section>
-                    <q-item-section v-if="scope.opt.isVip" side>
-                        <ReservationVIPChip />
-                    </q-item-section>
-                </q-item>
-            </template>
-
-            <template #no-option>
-                <q-item>
-                    <q-item-section class="text-grey"> No results </q-item-section>
-                </q-item>
-            </template>
-        </q-select>
-    </div>
-</template>
-
 <script setup lang="ts">
 import type { FloorDoc, PlannedReservation } from "@firetable/types";
 
@@ -61,6 +18,7 @@ interface Option {
     label: string;
     value: PlannedReservation;
     isVip: boolean;
+    arrived: boolean;
 }
 
 const props = defineProps<Props>();
@@ -82,6 +40,7 @@ function mapReservationToOption(reservation: PlannedReservation): Option {
         label: createTableLabel(reservation),
         value: reservation,
         isVip: reservation.isVIP,
+        arrived: reservation.arrived,
     };
 }
 
@@ -158,3 +117,52 @@ function setModel(val: string): void {
     searchTerm.value = val;
 }
 </script>
+
+<template>
+    <div class="FTAutocomplete">
+        <q-select
+            ref="selectEl"
+            fill-input
+            hide-selected
+            use-input
+            v-model="searchTerm"
+            :label="t(`FTAutocomplete.label`)"
+            clearable
+            clear-icon="close"
+            dense
+            standout
+            :debounce="300"
+            @input-value="setModel"
+            @filter="filterFn"
+            @clear="() => emit('clear')"
+            :options="options"
+        >
+            <template #prepend>
+                <q-icon name="search" />
+            </template>
+
+            <template #option="scope">
+                <q-item v-bind="scope.itemProps">
+                    <q-item-section>
+                        <q-item-label>
+                            {{ scope.opt.label }}
+                        </q-item-label>
+                    </q-item-section>
+
+                    <q-item-section v-if="scope.opt.arrived" side>
+                        <q-icon name="check" color="green" />
+                    </q-item-section>
+                    <q-item-section v-if="scope.opt.isVip" side>
+                        <ReservationVIPChip />
+                    </q-item-section>
+                </q-item>
+            </template>
+
+            <template #no-option>
+                <q-item>
+                    <q-item-section class="text-grey"> No results </q-item-section>
+                </q-item>
+            </template>
+        </q-select>
+    </div>
+</template>
