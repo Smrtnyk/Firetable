@@ -422,6 +422,7 @@ export default tseslint.config(
             "unicorn/no-useless-undefined": "off",
             "max-nested-callbacks": "off",
             "no-console": "off",
+            "no-await-in-loop": "off",
         },
     },
     {
