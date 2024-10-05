@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { Reservation, User } from "@firetable/types";
-import type { BaseTable } from "@firetable/floor-creator";
 
 import { ReservationType } from "@firetable/types";
 import { computed, ref, watch, useTemplateRef } from "vue";
@@ -15,13 +14,15 @@ export interface EventCreateReservationProps {
     users: User[];
     mode: "create" | "update";
     eventStartTimestamp: number;
-    table: BaseTable;
-    floorId: string;
     /**
      *  Optional data for editing
      */
     reservationData?: Reservation;
     eventDurationInHours: number;
+    /**
+     *  If true, only the Planned Reservation Form is shown
+     */
+    onlyPlanned?: boolean;
 }
 
 const props = defineProps<EventCreateReservationProps>();
@@ -44,17 +45,20 @@ const currentReservationType = computed(function () {
     return props.reservationData?.type ?? ReservationType.PLANNED;
 });
 
-const showPlannedReservationForm = computed(function () {
+const showPlannedReservationForm = computed(() => {
     return (
+        props.onlyPlanned ||
         reservationType.value === ReservationType.PLANNED ||
         (props.mode === "update" && currentReservationType.value === ReservationType.PLANNED)
     );
 });
 
-const showWalkInReservationForm = computed(function () {
+const showWalkInReservationForm = computed(() => {
+    // Only show Walk-In form if not in 'onlyPlanned' mode
     return (
-        reservationType.value === ReservationType.WALK_IN ||
-        (props.mode === "update" && currentReservationType.value === ReservationType.WALK_IN)
+        !props.onlyPlanned &&
+        (reservationType.value === ReservationType.WALK_IN ||
+            (props.mode === "update" && currentReservationType.value === ReservationType.WALK_IN))
     );
 });
 
@@ -70,15 +74,17 @@ const typedReservationDataForWalkIn = computed(function () {
         : undefined;
 });
 
-watch(
-    () => props.reservationData,
-    function (newReservationData) {
-        if (newReservationData) {
-            reservationType.value = newReservationData.type;
-        }
-    },
-    { immediate: true },
-);
+if (!props.onlyPlanned) {
+    watch(
+        () => props.reservationData,
+        function (newReservationData) {
+            if (newReservationData) {
+                reservationType.value = newReservationData.type;
+            }
+        },
+        { immediate: true },
+    );
+}
 
 async function onOKClick(): Promise<void> {
     if (!(await currentlyActiveRef.value?.reservationForm.validate())) {
@@ -106,7 +112,7 @@ async function onOKClick(): Promise<void> {
 <template>
     <q-card-section>
         <q-btn-toggle
-            v-if="props.mode === 'create'"
+            v-if="!props.onlyPlanned && props.mode === 'create'"
             v-model="reservationType"
             no-caps
             unelevated
@@ -121,9 +127,7 @@ async function onOKClick(): Promise<void> {
             :current-user="props.currentUser"
             :mode="props.mode"
             :event-start-timestamp="props.eventStartTimestamp"
-            :floor-id="props.floorId"
             :users="props.users"
-            :table="props.table"
             :reservation-data="typedReservationDataForPlanned"
             :event-duration-in-hours="props.eventDurationInHours"
         />
@@ -134,8 +138,6 @@ async function onOKClick(): Promise<void> {
             :reservation-data="typedReservationDataForWalkIn"
             :mode="props.mode"
             :event-start-timestamp="props.eventStartTimestamp"
-            :floor-id="props.floorId"
-            :table="props.table"
             :event-duration-in-hours="props.eventDurationInHours"
         />
 

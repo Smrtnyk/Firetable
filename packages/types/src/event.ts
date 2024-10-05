@@ -1,6 +1,7 @@
 import type { QueryDocumentSnapshot, Timestamp } from "firebase/firestore";
 import type { FloorDoc } from "./floor.js";
-import type { ADMIN, Role, User } from "./auth.js";
+import type { ADMIN, Role } from "./auth.js";
+import type { UserIdentifier } from "./base-reservation.js";
 
 export interface CreateEventForm {
     name: string;
@@ -45,64 +46,6 @@ export type GuestInGuestListData = CreateGuestInGuestListPayload & {
     id: string;
 };
 
-export type PlannedReservationDoc = PlannedReservation & {
-    id: string;
-    _doc: QueryDocumentSnapshot<PlannedReservation>;
-};
-
-export type WalkInReservationDoc = WalkInReservation & {
-    id: string;
-    _doc: QueryDocumentSnapshot<WalkInReservation>;
-};
-
-export type ReservationDoc = PlannedReservationDoc | WalkInReservationDoc;
-export type ReservationDocWithEventId = ReservationDoc & { eventId: string };
-
-type UserIdentifier = Pick<User, "email" | "id" | "name">;
-
-export const enum ReservationStatus {
-    DELETED = "Deleted",
-    ACTIVE = "Active",
-}
-
-export const enum ReservationType {
-    WALK_IN = 0,
-    PLANNED = 1,
-}
-
-interface BaseReservation {
-    floorId: string;
-    tableLabel: string;
-    guestContact?: string;
-    numberOfGuests: number;
-    reservationNote?: string;
-    time: string;
-    clearedAt?: Timestamp;
-    creator: UserIdentifier & { createdAt: Timestamp };
-    status: ReservationStatus;
-    isVIP: boolean;
-}
-
-export interface WalkInReservation extends BaseReservation {
-    type: ReservationType.WALK_IN;
-    guestName: string;
-    consumption: number;
-    arrived: true;
-}
-
-export interface PlannedReservation extends BaseReservation {
-    type: ReservationType.PLANNED;
-    reservationConfirmed: boolean;
-    cancelled: boolean;
-    arrived: boolean;
-    waitingForResponse?: boolean;
-    consumption: number;
-    guestName: string;
-    reservedBy: UserIdentifier;
-}
-
-export type Reservation = PlannedReservation | WalkInReservation;
-
 export interface EventLog {
     message: string;
     creator: UserIdentifier & { role: Role | typeof ADMIN };
@@ -111,20 +54,4 @@ export interface EventLog {
 
 export interface EventLogsDoc {
     logs: EventLog[];
-}
-
-export function isAWalkInReservation(
-    reservation: PlannedReservation | WalkInReservation,
-): reservation is WalkInReservation {
-    return reservation.type === ReservationType.WALK_IN;
-}
-
-export function isPlannedReservation(
-    reservation: PlannedReservation | WalkInReservation,
-): reservation is PlannedReservation {
-    return reservation.type === ReservationType.PLANNED;
-}
-
-export function isActiveReservation(reservation: Reservation): boolean {
-    return reservation.status === ReservationStatus.ACTIVE;
 }

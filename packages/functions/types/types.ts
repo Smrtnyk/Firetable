@@ -4,6 +4,7 @@ export const enum Collection {
     EVENTS = "events",
     EVENT_LOGS = "eventLogs",
     RESERVATIONS = "reservations",
+    QUEUED_RESERVATIONS = "queuedReservations",
     GUESTS = "guests",
     GUEST_LIST = "guestList",
     USERS = "users",

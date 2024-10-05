@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { PlannedReservation, User } from "@firetable/types";
-import type { BaseTable } from "@firetable/floor-creator";
 import { isTimeWithinEventDuration } from "./reservation-form-utils";
 import { ReservationStatus, ReservationType } from "@firetable/types";
 import { computed, ref, watch, useTemplateRef } from "vue";
@@ -15,8 +14,6 @@ export interface PlannedReservationFormProps {
     users: User[];
     mode: "create" | "update";
     eventStartTimestamp: number;
-    table: BaseTable;
-    floorId: string;
     /**
      *  Optional data for editing
      */
@@ -49,12 +46,10 @@ const initialState =
               time: "00:00",
               reservedBy: null as unknown as User,
               cancelled: false,
-              tableLabel: props.table.label,
-              floorId: props.floorId,
               status: ReservationStatus.ACTIVE,
               isVIP: false,
           };
-const state = ref<Omit<PlannedReservation, "creator">>(initialState);
+const state = ref<Omit<PlannedReservation, "creator" | "floorId" | "tableLabel">>(initialState);
 const reservationForm = useTemplateRef<QForm>("reservationForm");
 const formattedUsers = computed<PlannedReservation["reservedBy"][]>(function () {
     return props.users.map(function (user) {

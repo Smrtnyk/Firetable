@@ -15,7 +15,7 @@ interface Props {
 const authStore = useAuthStore();
 const props = defineProps<Props>();
 const emit = defineEmits<{
-    (e: "copy" | "delete" | "edit" | "transfer"): void;
+    (e: "copy" | "delete" | "edit" | "queue" | "transfer"): void;
     (e: "arrived" | "cancel" | "reservationConfirmed" | "waitingForResponse", value: boolean): void;
 }>();
 const { t } = useI18n();
@@ -39,6 +39,14 @@ const canEditReservation = computed(function () {
     return (
         authStore.canEditReservation ||
         (isOwnReservation(props.reservation) && authStore.canEditOwnReservation)
+    );
+});
+
+const canMoveToQueue = computed(function () {
+    return (
+        (authStore.canReserve || isOwnReservation(props.reservation)) &&
+        !isCancelled.value &&
+        !isGuestArrived.value
     );
 });
 
@@ -167,6 +175,14 @@ function onWaitingForResponse(): void {
                     icon="pencil"
                     color="positive"
                     @click="() => emit('edit')"
+                    v-close-popup
+                />
+                <q-btn
+                    v-if="canMoveToQueue"
+                    title="Move to queue"
+                    icon="bookmark"
+                    color="secondary"
+                    @click="() => emit('queue')"
                     v-close-popup
                 />
             </div>

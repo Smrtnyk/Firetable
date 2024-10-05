@@ -5,16 +5,18 @@ import type {
     GuestInGuestListData,
     PlannedReservationDoc,
     ReservationDoc,
+    QueuedReservationDoc,
 } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
 import type { TouchPanValue } from "quasar";
-import { isPlannedReservation, ReservationStatus } from "@firetable/types";
 import {
+    queuedReservationsCollection,
     reservationsCollection,
     getEventFloorsPath,
     getEventGuestListPath,
     getEventPath,
 } from "@firetable/backend";
+import { isPlannedReservation, ReservationStatus } from "@firetable/types";
 import { Loading, useQuasar } from "quasar";
 import EventGuestList from "src/components/Event/EventGuestList.vue";
 import FTAutocomplete from "src/components/Event/FTAutocomplete.vue";
@@ -22,7 +24,7 @@ import EventInfo from "src/components/Event/EventInfo.vue";
 import FTDialog from "src/components/FTDialog.vue";
 
 import { useRouter } from "vue-router";
-import { computed, onMounted, onUnmounted, ref, useTemplateRef } from "vue";
+import { computed, onMounted, onUnmounted, ref, useTemplateRef, provide } from "vue";
 import { useEventsStore } from "src/stores/events-store";
 import {
     createQuery,
@@ -34,6 +36,8 @@ import { isMobile } from "src/global-reactives/screen-detection";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";
 import { where } from "firebase/firestore";
+import EventQueuedReservations from "src/components/Event/EventQueuedReservations.vue";
+import { useUsers } from "src/composables/useUsers";
 
 interface Props {
     organisationId: string;
@@ -56,6 +60,7 @@ const router = useRouter();
 const quasar = useQuasar();
 const pageRef = useTemplateRef<HTMLDivElement>("pageRef");
 
+const { users } = useUsers(eventOwner.organisationId);
 const guestList = useFirestoreCollection<GuestInGuestListData>(getEventGuestListPath(eventOwner), {
     wait: true,
 });
@@ -63,7 +68,7 @@ const { data: event, promise: eventDataPromise } = useFirestoreDocument<EventDoc
     getEventPath(eventOwner),
 );
 const { data: eventFloors } = useFirestoreCollection<FloorDoc>(getEventFloorsPath(eventOwner));
-// For event view, we only need reservations with status ACTIVE
+
 const {
     data: reservations,
     promise: reservationsDataPromise,
@@ -71,6 +76,19 @@ const {
 } = useFirestoreCollection<ReservationDoc>(
     createQuery(
         reservationsCollection(eventOwner),
+        // For event view, we only need reservations with status ACTIVE
+        where("status", "==", ReservationStatus.ACTIVE),
+    ),
+    { wait: true },
+);
+
+const {
+    data: queuedResData,
+    error: queuedResListenerError,
+    promise: queuedResPromise,
+} = useFirestoreCollection<QueuedReservationDoc>(
+    createQuery(
+        queuedReservationsCollection(eventOwner),
         where("status", "==", ReservationStatus.ACTIVE),
     ),
     { wait: true },
@@ -83,6 +101,7 @@ const plannedReservations = computed(function () {
 });
 const fabPos = ref([18, 18]);
 const draggingFab = ref(false);
+provide("eventData", event);
 
 const {
     onTableFound,
@@ -93,7 +112,7 @@ const {
     hasMultipleFloorPlans,
     activeFloor,
     floorInstances,
-} = useFloorsPageEvent(eventFloors, reservations, pageRef, eventOwner, event);
+} = useFloorsPageEvent(eventFloors, reservations, pageRef, eventOwner, event, users);
 
 const buttonSize = computed(function () {
     return isMobile.value ? "sm" : "md";
@@ -116,7 +135,11 @@ function showEventInfo(): void {
 
 async function init(): Promise<void> {
     Loading.show();
-    await Promise.all([eventDataPromise.value, reservationsDataPromise.value]);
+    await Promise.all([
+        eventDataPromise.value,
+        reservationsDataPromise.value,
+        queuedResPromise.value,
+    ]);
     Loading.hide();
 
     if (!event.value) {
@@ -137,7 +160,7 @@ async function init(): Promise<void> {
 }
 
 function moveFab(ev: Parameters<NonNullable<TouchPanValue>>[0]): void {
-    draggingFab.value = !ev.isFirst && ev.isFinal !== true;
+    draggingFab.value = !ev.isFirst && !ev.isFinal;
 
     fabPos.value = [fabPos.value[0] - (ev.delta?.x ?? 0), fabPos.value[1] - (ev.delta?.y ?? 0)];
 }
@@ -248,6 +271,12 @@ onUnmounted(function () {
             </div>
         </div>
 
+        <EventQueuedReservations
+            :data="queuedResData"
+            :error="queuedResListenerError"
+            :event-owner="eventOwner"
+            :users="users"
+        />
         <EventGuestList
             :guest-list-limit="event.guestListLimit"
             :guest-list="guestList"

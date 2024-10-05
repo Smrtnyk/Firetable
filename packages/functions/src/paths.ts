@@ -39,3 +39,22 @@ export function getGuestsPath(organisationId: string): string {
 export function getGuestPath(organisationId: string, guestId: string): string {
     return [getGuestsPath(organisationId), guestId].join("/");
 }
+
+// Reservation
+export function getReservationsPath(
+    organisationId: string,
+    propertyId: string,
+    eventId: string,
+): string {
+    return [getEventPath(organisationId, propertyId, eventId), Collection.RESERVATIONS].join("/");
+}
+
+export function getQueuedReservationsPath(
+    organisationId: string,
+    propertyId: string,
+    eventId: string,
+): string {
+    return [getEventPath(organisationId, propertyId, eventId), Collection.QUEUED_RESERVATIONS].join(
+        "/",
+    );
+}

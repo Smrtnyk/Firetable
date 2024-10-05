@@ -55,6 +55,10 @@ export function reservationsCollection(owner: EventOwner): CollectionReference {
     return collection(eventDoc(owner), Collection.RESERVATIONS);
 }
 
+export function queuedReservationsCollection(owner: EventOwner): CollectionReference {
+    return collection(eventDoc(owner), Collection.QUEUED_RESERVATIONS);
+}
+
 export function reservationDoc(owner: EventOwner, reservationId: string): DocumentReference {
     return doc(reservationsCollection(owner), reservationId);
 }

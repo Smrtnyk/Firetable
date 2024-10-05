@@ -9,7 +9,6 @@ import type {
     FloorDoc,
     GuestInGuestListData,
     Reservation,
-    ReservationDoc,
     User,
 } from "@firetable/types";
 import {
@@ -20,7 +19,6 @@ import {
     eventFloorDoc,
     eventDoc,
     reservationsCollection,
-    reservationDoc,
 } from "./db.js";
 import { initializeFirebase } from "./base.js";
 import {
@@ -135,19 +133,6 @@ export function addReservation(
     reservation: Reservation,
 ): Promise<DocumentReference> {
     return addDoc(reservationsCollection(owner), reservation);
-}
-
-export function deleteReservation(owner: EventOwner, reservation: ReservationDoc): Promise<void> {
-    return deleteDoc(reservationDoc(owner, reservation.id));
-}
-
-export function updateReservationDoc(
-    owner: EventOwner,
-    newReservationData: Partial<ReservationDoc> & Pick<ReservationDoc, "id">,
-): Promise<void> {
-    return updateDoc(reservationDoc(owner, newReservationData.id), {
-        ...newReservationData,
-    });
 }
 
 export function updateEventFloorData(

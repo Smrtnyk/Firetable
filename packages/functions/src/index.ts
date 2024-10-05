@@ -14,6 +14,7 @@ import { onOrganisationDeletedFn } from "./trigger/on-organisation-deleted.js";
 import { setGuestDataFn } from "./callable/guest/set-guest-data.js";
 import { deleteGuestVisitFn } from "./callable/guest/delete-guest-visit.js";
 import { updateGuestDataFn } from "./callable/guest/update-guest-info.js";
+import { moveReservationToQueueFn } from "./callable/reservation/move-reservation-to-queue.js";
 import { Collection } from "../types/types.js";
 
 import { onSchedule } from "firebase-functions/v2/scheduler";
@@ -53,10 +54,12 @@ export const onPropertyDelete = onDocumentDeleted(
     `${Collection.ORGANISATIONS}/{organisationId}/${Collection.PROPERTIES}/{propertyId}`,
     (event) => onPropertyDeletedFn(event.params),
 );
-// Reservations and guests
+// Guests
 export const setGuestData = onCall(setGuestDataFn);
 export const deleteGuestVisit = onCall(deleteGuestVisitFn);
 export const updateGuestData = onCall(updateGuestDataFn);
+// Reservations
+export const moveReservationToQueue = onCall(moveReservationToQueueFn);
 
 // Generic stuff
 export const deleteCollection = onCall<{ col: string; id: string }>((request) =>

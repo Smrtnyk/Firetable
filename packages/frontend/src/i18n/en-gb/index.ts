@@ -25,6 +25,12 @@ export default {
             "Password must include at least one special character (e.g., !, #, etc...)",
         selectAtLeastOneProperty: "You must select at least one property!",
     },
+    EventQueuedReservations: {
+        title: "Queued Reservations",
+        emptyMessage: "There are no reservations in the queue.",
+        errorMessage: "Error fetching reservations.",
+        addNewReservation: "Add new reservation",
+    },
     InventoryTable: {
         quantity: "Quantity",
         drink: "Drink",
@@ -102,8 +108,6 @@ export default {
     },
     EventCreateReservation: {
         title: "Table",
-        reservationGroupWith: "Group with",
-        reservationGroupWithHint: "Group multiple tables under the one reservation.",
         reservationGuestName: "Guest name *",
         reservationNumberOfGuests: "Guest count *",
         reservationGuestContact: "Guest contact",

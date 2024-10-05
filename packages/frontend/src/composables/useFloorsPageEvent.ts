@@ -1,5 +1,5 @@
 import type { Ref, ShallowRef } from "vue";
-import type { EventDoc, FloorDoc, Reservation, ReservationDoc } from "@firetable/types";
+import type { EventDoc, FloorDoc, Reservation, ReservationDoc, User } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
 import type { VueFirestoreDocumentData } from "vuefire";
 import { FloorViewer, getTables } from "@firetable/floor-creator";
@@ -13,7 +13,6 @@ import {
     onBeforeUnmount,
     shallowRef,
 } from "vue";
-import { useUsers } from "src/composables/useUsers";
 import { useReservations } from "src/composables/useReservations";
 import { debounce } from "quasar";
 import { decompressFloorDoc } from "src/helpers/compress-floor-doc";
@@ -23,16 +22,17 @@ import { matchesProperty } from "es-toolkit/compat";
 
 type ActiveFloor = { id: string; name: string };
 
+// eslint-disable-next-line @typescript-eslint/max-params -- FIXME fix this
 export function useFloorsPageEvent(
     eventFloors: Ref<FloorDoc[]>,
     reservations: Ref<ReservationDoc[]>,
     pageRef: ShallowRef<HTMLDivElement | null>,
     eventOwner: EventOwner,
     event: Ref<VueFirestoreDocumentData<EventDoc> | undefined>,
+    users: Ref<User[]>,
 ) {
     const activeFloor = ref<ActiveFloor | undefined>();
     const floorInstances = shallowRef<FloorViewer[]>([]);
-    const { users } = useUsers(eventOwner.organisationId);
     const { tableClickHandler } = useReservations(
         users,
         reservations,

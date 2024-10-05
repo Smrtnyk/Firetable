@@ -25,6 +25,18 @@ export default {
             "Das Passwort muss mindestens ein Sonderzeichen enthalten (e.g., !, #, etc...)",
         selectAtLeastOneProperty: "Sie müssen mindestens eine Immobilie auswählen!",
     },
+    EventQueuedReservations: {
+        title: "Warteschlange",
+        emptyMessage: "Es gibt keine Reservierungen in der Warteschlange.",
+        errorMessage: "Fehler beim Abrufen von Reservierungen.",
+        addNewReservation: "Neue Reservierung",
+    },
+    InventoryTable: {
+        quantity: "Menge",
+        drink: "Getränk",
+        food: "Essen",
+        other: "Andere",
+    },
     AppDrawer: {
         links: {
             logout: "Abmelden",
@@ -100,8 +112,6 @@ export default {
     },
     EventCreateReservation: {
         title: "Tisch",
-        reservationGroupWith: "Gruppieren mit",
-        reservationGroupWithHint: "Mehrere Tische unter einer Reservierung gruppieren.",
         reservationGuestName: "Name des Gastes *",
         reservationNumberOfGuests: "Anzahl der Gäste *",
         reservationGuestContact: "Kontakt des Gastes",

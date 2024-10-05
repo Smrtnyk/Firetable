@@ -217,7 +217,7 @@ function isLinkWithChildren(link: GuardedLink | LinkWithChildren): link is LinkW
         bordered
     >
         <q-list>
-            <q-item header class="column items-center q-pt-xl q-pb-lg">
+            <q-item class="column items-center q-pt-xl q-pb-lg">
                 <q-avatar size="6rem" class="ft-avatar">
                     {{ avatar }}
                 </q-avatar>

@@ -371,4 +371,144 @@ describe("EventShowReservation", () => {
         const label = screen.getByText(t("EventShowReservation.cancel"));
         expect(label.query()).toBeNull();
     });
+
+    describe("move to queue", () => {
+        it('renders the "Move to Queue" button when user can reserve and reservation is not cancelled or arrived and it is not own reservation', async () => {
+            props.reservation.creator.id = "user2";
+
+            const screen = renderComponent(EventShowReservation, props, {
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: {
+                            user: {
+                                id: "user1",
+                                role: Role.PROPERTY_OWNER,
+                                capabilities: {
+                                    [UserCapability.CAN_RESERVE]: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+
+            const queueButton = screen.getByRole("button", { name: "Move to queue" });
+            await expect.element(queueButton).toBeVisible();
+        });
+
+        it('renders the "Move to Queue" button when user is the owner and but cannot can reserve', async () => {
+            const screen = renderComponent(EventShowReservation, props, {
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: {
+                            user: {
+                                // Same as reservation.creator.id
+                                id: "user1",
+                                role: Role.PROPERTY_OWNER,
+                                capabilities: {
+                                    // Global reserve not allowed
+                                    [UserCapability.CAN_RESERVE]: false,
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+
+            const queueButton = screen.getByRole("button", { name: "Move to queue" });
+            await expect.element(queueButton).toBeVisible();
+        });
+
+        it('does not render the "Move to Queue" button when reservation is cancelled', () => {
+            props.reservation.cancelled = true;
+
+            const screen = renderComponent(EventShowReservation, props, {
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: {
+                            user: {
+                                id: "user1",
+                                role: Role.PROPERTY_OWNER,
+                                capabilities: {
+                                    [UserCapability.CAN_RESERVE]: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+
+            const queueButton = screen.getByRole("button", { name: "Move to queue" });
+            expect(queueButton.query()).toBeNull();
+        });
+
+        it('does not render the "Move to Queue" button when guest has arrived', () => {
+            props.reservation.arrived = true;
+
+            const screen = renderComponent(EventShowReservation, props, {
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: {
+                            user: {
+                                id: "user1",
+                                role: Role.PROPERTY_OWNER,
+                                capabilities: {
+                                    [UserCapability.CAN_RESERVE]: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+
+            const queueButton = screen.getByRole("button", { name: "Move to queue" });
+            expect(queueButton.query()).toBeNull();
+        });
+
+        it('does not render the "Move to Queue" button when user cannot reserve', () => {
+            const screen = renderComponent(EventShowReservation, props, {
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: {
+                            user: {
+                                // Different user
+                                id: "user2",
+                                role: Role.STAFF,
+                                capabilities: {
+                                    [UserCapability.CAN_RESERVE]: false,
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+
+            const queueButton = screen.getByRole("button", { name: "Move to queue" });
+            expect(queueButton.query()).toBeNull();
+        });
+
+        it('emits "queue" event when "Move to Queue" button is clicked', async () => {
+            const screen = renderComponent(EventShowReservation, props, {
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: {
+                            user: {
+                                id: "user1",
+                                role: Role.PROPERTY_OWNER,
+                                capabilities: {
+                                    [UserCapability.CAN_RESERVE]: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+
+            const queueButton = screen.getByRole("button", { name: "Move to queue" });
+            await userEvent.click(queueButton);
+
+            expect(screen.emitted().queue).toBeTruthy();
+            expect(screen.emitted().queue[0]).toEqual([]);
+        });
+    });
 });

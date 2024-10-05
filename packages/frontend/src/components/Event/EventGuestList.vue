@@ -4,6 +4,7 @@ import type { EventOwner } from "@firetable/backend";
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { computed } from "vue";
 import { useEventsStore } from "src/stores/events-store";
+import { storeToRefs } from "pinia";
 
 import EventGuestListCreateGuestForm from "src/components/Event/EventGuestListCreateGuestForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
@@ -27,7 +28,7 @@ interface Props {
 const { guestListLimit, eventOwner, guestList = [] } = defineProps<Props>();
 const quasar = useQuasar();
 const eventsStore = useEventsStore();
-const authStore = useAuthStore();
+const { nonNullableUser } = storeToRefs(useAuthStore());
 const { t } = useI18n();
 const reachedCapacity = computed(function () {
     return guestList.length / guestListLimit;
@@ -37,7 +38,9 @@ const isGuestListFull = computed(function () {
 });
 
 const canInteract = computed(function () {
-    return [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN].includes(authStore.nonNullableUser.role);
+    return [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN, Role.HOSTESS].includes(
+        nonNullableUser.value.role,
+    );
 });
 
 function onCreate(newGuestData: GuestInGuestListData): Promise<void> | void {

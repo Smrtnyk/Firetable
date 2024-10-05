@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { WalkInReservation } from "@firetable/types";
-import type { BaseTable } from "@firetable/floor-creator";
 import { isTimeWithinEventDuration } from "./reservation-form-utils";
 import { ReservationStatus, ReservationType } from "@firetable/types";
 import { ref, useTemplateRef } from "vue";
@@ -13,8 +12,6 @@ import TelNumberInput from "src/components/tel-number-input/TelNumberInput.vue";
 interface Props {
     mode: "create" | "update";
     eventStartTimestamp: number;
-    table: BaseTable;
-    floorId: string;
     /**
      *  Optional data for editing
      */
@@ -26,14 +23,16 @@ const props = defineProps<Props>();
 
 const { t } = useI18n();
 
+type State = Omit<WalkInReservation, "creator" | "floorId" | "tableLabel">;
+
 const initialState =
     props.mode === "update" && props.reservationData
         ? props.reservationData
         : generateInitialState();
-const state = ref<Omit<WalkInReservation, "creator">>(initialState);
+const state = ref<State>(initialState);
 const reservationForm = useTemplateRef<QForm>("reservationForm");
 
-function generateInitialState(): Omit<WalkInReservation, "creator"> {
+function generateInitialState(): State {
     const eventStart = props.eventStartTimestamp;
     const now = Date.now();
     // Set the initial time to either the current hour or the event start hour
@@ -49,8 +48,6 @@ function generateInitialState(): Omit<WalkInReservation, "creator"> {
         consumption: 0,
         arrived: true as const,
         time: formattedTime,
-        tableLabel: props.table.label,
-        floorId: props.floorId,
         status: ReservationStatus.ACTIVE,
         isVIP: false,
     };
