@@ -206,7 +206,7 @@ describe("EventCreateReservation", () => {
             expect(timeInput.getAttribute("value")).toBe(generateInitialState().time);
 
             // Simulate clicking the clock icon to open the time picker
-            const clockIcon = screen.getByText("clock");
+            const clockIcon = document.querySelector(".q-icon");
             await userEvent.click(clockIcon);
 
             const newTime = addHours(eventStartTimestamp, 1);

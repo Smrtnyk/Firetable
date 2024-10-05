@@ -247,7 +247,7 @@ function isLinkWithChildren(link: GuardedLink | LinkWithChildren): link is LinkW
 
             <q-separator spaced />
 
-            <q-item clickable @click="onLogoutUser">
+            <q-item clickable @click="onLogoutUser" aria-label="Logout">
                 <q-item-section avatar>
                     <q-icon name="logout" />
                 </q-item-section>

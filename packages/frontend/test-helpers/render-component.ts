@@ -2,6 +2,7 @@ import type { WritableComputedRef } from "vue";
 import type { RenderResult } from "vitest-browser-vue";
 import type { TestingOptions } from "@pinia/testing";
 import messages from "../src/i18n";
+import { myIcons } from "../src/config";
 import {
     QDialog,
     QAvatar,
@@ -25,6 +26,7 @@ import {
     QTimelineEntry,
     QToggle,
     Quasar,
+    IconSet,
 } from "quasar";
 import { h, defineComponent } from "vue";
 import { render } from "vitest-browser-vue";
@@ -117,5 +119,13 @@ export function renderComponent(
         renderOptions.props = props;
     }
 
-    return render(componentToRender, renderOptions);
+    Quasar.iconSet.iconMapFn = function (iconName) {
+        return { icon: myIcons[iconName] };
+    };
+
+    const result = render(componentToRender, renderOptions);
+
+    IconSet.props.name = "line-awesome";
+
+    return result;
 }

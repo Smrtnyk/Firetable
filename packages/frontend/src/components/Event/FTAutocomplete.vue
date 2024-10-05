@@ -166,7 +166,11 @@ function setModel(val: string): void {
                     </q-item-section>
 
                     <q-item-section v-if="scope.opt.arrived" side>
-                        <q-icon name="check" color="green" />
+                        <q-icon
+                            name="check"
+                            color="green"
+                            aria-label="Guest arrived checkmark icon"
+                        />
                     </q-item-section>
                     <q-item-section v-if="scope.opt.isVip" side>
                         <ReservationVIPChip />

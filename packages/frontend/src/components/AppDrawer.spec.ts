@@ -95,8 +95,8 @@ describe("AppDrawer", () => {
             },
         );
 
-        const logoutButton = screen.getByText("Logout").elements()[1];
-        expect(logoutButton).toBeTruthy();
+        const logoutButton = screen.getByLabelText("Logout");
+        expect(logoutButton.query().innerHTML).toContain("Logout");
     });
 
     it("toggles dark mode when the toggle is clicked", async () => {

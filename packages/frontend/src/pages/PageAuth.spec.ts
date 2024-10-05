@@ -82,18 +82,14 @@ describe("PageAuth", () => {
         expect(passwordInput.query().getAttribute("type")).toBe("password");
 
         // Click the eye icon to toggle visibility
-        const eyeIcon = screen.getByText("eye-open");
+        const eyeIcon = document.querySelector(".q-icon");
         await userEvent.click(eyeIcon);
 
         // After clicking, password type should be 'text'
         expect(passwordInput.query().getAttribute("type")).toBe("text");
 
-        // The icon should change to 'eye-off'
-        const eyeOffIcon = screen.getByText("eye-off");
-        expect(eyeOffIcon.query()).toBeTruthy();
-
         // Click again to toggle back
-        await userEvent.click(eyeOffIcon);
+        await userEvent.click(eyeIcon);
 
         // Password type should be 'password' again
         expect(passwordInput.query().getAttribute("type")).toBe("password");

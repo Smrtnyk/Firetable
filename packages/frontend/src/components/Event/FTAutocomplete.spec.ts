@@ -50,7 +50,7 @@ describe("FTAutocomplete.vue", () => {
         const johnOption = screen.getByText("John Doe (Table 1) on First Floor");
         await expect.element(johnOption).toBeVisible();
 
-        const checkIcon = screen.getByText("check");
+        const checkIcon = screen.getByLabelText("Guest arrived checkmark icon");
         await expect.element(checkIcon).toBeVisible();
     });
 

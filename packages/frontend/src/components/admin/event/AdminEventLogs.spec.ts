@@ -96,8 +96,8 @@ describe("AdminEventLogs", () => {
                 const iconHandle = timelineEntryHandle.querySelector(".q-icon");
 
                 if (expectedIconName) {
-                    const iconName = iconHandle.textContent;
-                    expect(iconName).toBe(expectedIconName);
+                    const iconName = iconHandle.innerHTML;
+                    expect(iconName).toContain(expectedIconName);
                 } else {
                     expect(iconHandle).toBeNull();
                 }
