@@ -11,6 +11,7 @@ import { storeToRefs } from "pinia";
 import { useAuthStore } from "src/stores/auth-store";
 import { usePropertiesStore } from "src/stores/properties-store";
 import AppDrawerLink from "src/components/AppDrawerLink.vue";
+import { dynamicallySwitchLang } from "src/config";
 
 interface Props {
     modelValue: boolean;
@@ -199,6 +200,7 @@ async function onLogoutUser(): Promise<void> {
 function setAppLanguage(val: string): void {
     LocalStorage.set("FTLang", val);
     locale.value = val;
+    dynamicallySwitchLang(val);
 }
 
 function isLinkWithChildren(link: GuardedLink | LinkWithChildren): link is LinkWithChildren {
