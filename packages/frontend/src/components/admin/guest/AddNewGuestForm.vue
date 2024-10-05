@@ -5,6 +5,8 @@ import { minLength } from "src/helpers/form-rules";
 import { QForm } from "quasar";
 
 import TelNumberInput from "src/components/tel-number-input/TelNumberInput.vue";
+import { hashString } from "src/helpers/hash-string";
+import { maskPhoneNumber } from "src/helpers/mask-phone-number";
 
 export interface AddNewGuestFormProps {
     mode: "create" | "edit";
@@ -35,6 +37,8 @@ async function submit(): Promise<void> {
     const payload: CreateGuestPayload = {
         name: guestName.value,
         contact: guestContact.value,
+        hashedContact: await hashString(guestContact.value),
+        maskedContact: maskPhoneNumber(guestContact.value),
         visitedProperties: {},
     };
 

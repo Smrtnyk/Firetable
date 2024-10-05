@@ -1,6 +1,6 @@
 import type { GuestData } from "./set-guest-data.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
-import type { GuestDoc, SimpleReservation } from "../../../types/types.js";
+import type { GuestDoc, PreparedGuestData } from "../../../types/types.js";
 import { setGuestDataFn } from "./set-guest-data.js";
 import * as Init from "../../init.js";
 import { getGuestsPath } from "../../paths.js";
@@ -8,11 +8,16 @@ import { MockFirestore } from "../../../test-helpers/MockFirestore.js";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const organisationId = "orgId";
-const guestContact = "guestContact";
+const contact = "guestContact";
+const maskedContact = "maskedContact";
+const hashedContact = "hashedContact";
 
-const testSimpleReservation: Partial<SimpleReservation> = {
-    guestContact,
+const preparedGuestData: PreparedGuestData = {
+    contact,
+    maskedContact,
+    hashedContact,
     guestName: "guestName",
+    cancelled: false,
     arrived: false,
     isVIP: true,
 };
@@ -20,7 +25,7 @@ const testSimpleReservation: Partial<SimpleReservation> = {
 const date = Date.now();
 
 const testRequestData = {
-    reservation: testSimpleReservation,
+    preparedGuestData,
     propertyId: "propertyId",
     organisationId,
     eventId: "eventId",
@@ -33,7 +38,7 @@ describe("setGuestDataFn", () => {
 
     beforeEach(() => {
         mockFirestore = new MockFirestore();
-        vi.spyOn(Init, "db", "get").mockReturnValue(mockFirestore as any);
+        vi.spyOn(Init, "db", "get").mockReturnValue(mockFirestore);
     });
 
     it("should create a new guest if they do not exist", async () => {
@@ -41,7 +46,7 @@ describe("setGuestDataFn", () => {
 
         // Query the guests collection for the guest with contact == guestContact
         const guestsCollectionRef = mockFirestore.collection(getGuestsPath(organisationId));
-        const querySnapshot = await guestsCollectionRef.where("contact", "==", guestContact).get();
+        const querySnapshot = await guestsCollectionRef.where("contact", "==", contact).get();
 
         expect(querySnapshot.empty).toBe(false);
         const guestDoc = querySnapshot.docs[0];
@@ -62,7 +67,9 @@ describe("setGuestDataFn", () => {
     it("should update an existing guest with new visit information", async () => {
         const initialGuestData: GuestDoc = {
             name: "guestName",
-            contact: guestContact,
+            contact,
+            hashedContact,
+            maskedContact,
             visitedProperties: {},
         };
 
@@ -71,7 +78,7 @@ describe("setGuestDataFn", () => {
         await guestsCollectionRef.add(initialGuestData);
 
         const requestData = {
-            reservation: { ...testSimpleReservation, arrived: true },
+            preparedGuestData: { ...preparedGuestData, arrived: true },
             propertyId: "propertyId",
             organisationId,
             eventId: "eventId",
@@ -82,7 +89,7 @@ describe("setGuestDataFn", () => {
         await setGuestDataFn({ data: requestData } as CallableRequest<GuestData>);
 
         // Query the guests collection for the guest with contact == guestContact
-        const querySnapshot = await guestsCollectionRef.where("contact", "==", guestContact).get();
+        const querySnapshot = await guestsCollectionRef.where("contact", "==", contact).get();
 
         expect(querySnapshot.empty).toBe(false);
         const guestDoc = querySnapshot.docs[0];
@@ -102,7 +109,7 @@ describe("setGuestDataFn", () => {
 
     it("should handle errors gracefully", async () => {
         const requestData = {
-            reservation: {
+            preparedGuestData: {
                 // Invalid reservation data
             },
             propertyId: "propertyId",

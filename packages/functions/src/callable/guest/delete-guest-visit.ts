@@ -1,4 +1,4 @@
-import type { SimpleReservation } from "../../../types/types.js";
+import type { PreparedGuestData } from "../../../types/types.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
 import { db } from "../../init.js";
 import { getGuestsPath } from "../../paths.js";
@@ -6,7 +6,7 @@ import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
 
 export type DeleteGuestVisitData = {
-    reservation: SimpleReservation;
+    preparedGuestData: PreparedGuestData;
     propertyId: string;
     organisationId: string;
     eventId: string;
@@ -15,14 +15,14 @@ export type DeleteGuestVisitData = {
 export async function deleteGuestVisitFn(
     req: CallableRequest<DeleteGuestVisitData>,
 ): Promise<void> {
-    if (!req.data.reservation) {
-        logger.info("Reservation is not provided");
+    if (!req.data.preparedGuestData) {
+        logger.info("Prepared guest data is not provided");
         return;
     }
-    const { organisationId, propertyId, eventId, reservation } = req.data;
-    const { guestContact } = reservation;
+    const { organisationId, propertyId, eventId, preparedGuestData } = req.data;
+    const { contact } = preparedGuestData;
 
-    if (!guestContact) {
+    if (!contact) {
         logger.info("Guest contact is not provided");
         throw new HttpsError("invalid-argument", "Guest contact is not provided.");
     }
@@ -30,10 +30,10 @@ export async function deleteGuestVisitFn(
     const guestsCollectionRef = db.collection(getGuestsPath(organisationId));
 
     try {
-        const querySnapshot = await guestsCollectionRef.where("contact", "==", guestContact).get();
+        const querySnapshot = await guestsCollectionRef.where("contact", "==", contact).get();
 
         if (querySnapshot.empty) {
-            logger.info(`Guest document for contact ${guestContact} does not exist.`);
+            logger.info(`Guest document for contact ${contact} does not exist.`);
             return;
         }
 
@@ -49,7 +49,7 @@ export async function deleteGuestVisitFn(
         };
 
         await guestRef.update(updateData);
-        logger.info(`Visit for eventId ${eventId} set to null for guest ${guestContact}.`);
+        logger.info(`Visit for eventId ${eventId} set to null for guest ${contact}.`);
     } catch (error) {
         logger.error(`Error processing the request: ${error}`);
         throw new HttpsError("internal", "Error processing the request.", error);

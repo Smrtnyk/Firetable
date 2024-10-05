@@ -1,8 +1,17 @@
 import type { QueryDocumentSnapshot } from "firebase/firestore";
-import type { Reservation } from "./event.js";
+
+interface PreparedGuestData {
+    arrived: boolean;
+    cancelled: boolean | undefined;
+    contact: string;
+    maskedContact: string;
+    hashedContact: string;
+    guestName: string;
+    isVIP: boolean;
+}
 
 export type GuestDataPayload = {
-    reservation: Reservation;
+    preparedGuestData: PreparedGuestData;
     propertyId: string;
     organisationId: string;
     eventId: string;
@@ -28,8 +37,10 @@ export interface GuestDoc {
     id: string;
     name: string;
     contact: string;
+    hashedContact: string;
+    maskedContact: string;
     visitedProperties: VisitedProperties;
     _doc: QueryDocumentSnapshot<GuestDoc>;
 }
 
-export type CreateGuestPayload = Pick<GuestDoc, "contact" | "name" | "visitedProperties">;
+export type CreateGuestPayload = Omit<GuestDoc, "_doc" | "id">;

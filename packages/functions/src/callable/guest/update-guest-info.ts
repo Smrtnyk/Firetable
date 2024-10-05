@@ -5,7 +5,7 @@ import { getGuestsPath } from "../../paths.js";
 import { HttpsError } from "firebase-functions/v2/https";
 
 export interface UpdateGuestInfo {
-    updatedData: Pick<GuestDoc, "contact" | "name">;
+    updatedData: Pick<GuestDoc, "contact" | "hashedContact" | "maskedContact" | "name">;
     guestId: string;
     organisationId: string;
 }
@@ -44,6 +44,8 @@ export async function updateGuestDataFn(
 
         await oldDocRef.update({
             contact: updatedData.contact,
+            hashedContact: updatedData.hashedContact,
+            maskedContact: updatedData.maskedContact,
             name: updatedData.name,
         });
 

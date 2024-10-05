@@ -1,12 +1,12 @@
-import type { GuestDoc, SimpleReservation, Visit } from "../../../types/types.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
+import type { GuestDoc, PreparedGuestData, Visit } from "../../../types/types.js";
 import { db } from "../../init.js";
 import { getGuestsPath } from "../../paths.js";
 import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
 
 export type GuestData = {
-    reservation: SimpleReservation;
+    preparedGuestData: PreparedGuestData;
     propertyId: string;
     organisationId: string;
     eventId: string;
@@ -34,21 +34,23 @@ export type GuestData = {
  * @returns {Promise<void>} A promise that resolves when the operation is complete.
  */
 export async function setGuestDataFn(req: CallableRequest<GuestData>): Promise<void> {
-    const { reservation, propertyId, organisationId, eventId, eventDate, eventName } = req.data;
+    const { preparedGuestData, propertyId, organisationId, eventId, eventDate, eventName } =
+        req.data;
 
-    if (!reservation) {
+    if (!preparedGuestData) {
         logger.info("Reservation is not provided");
-        throw new HttpsError("invalid-argument", "Reservation is not provided");
+        throw new HttpsError("invalid-argument", "Guest data is not provided");
     }
 
-    const { guestContact, guestName, arrived, cancelled, isVIP } = reservation;
+    const { contact, maskedContact, hashedContact, guestName, arrived, cancelled, isVIP } =
+        preparedGuestData;
 
-    if (!guestContact) {
+    if (!contact) {
         logger.info("Guest contact is not provided");
         throw new HttpsError("invalid-argument", "Guest contact is not provided");
     }
 
-    logger.info("Guest contact is eligible for processing ", guestContact);
+    logger.info("Guest contact is eligible for processing ", contact);
 
     const guestsCollectionRef = db.collection(getGuestsPath(organisationId));
     const visit: Visit = {
@@ -60,12 +62,14 @@ export async function setGuestDataFn(req: CallableRequest<GuestData>): Promise<v
     };
 
     try {
-        const querySnapshot = await guestsCollectionRef.where("contact", "==", guestContact).get();
+        const querySnapshot = await guestsCollectionRef.where("contact", "==", contact).get();
 
         if (querySnapshot.empty) {
             logger.info("Creating new guest document with name:", guestName);
             const guestData: GuestDoc = {
-                contact: guestContact,
+                contact,
+                hashedContact,
+                maskedContact,
                 name: guestName,
                 visitedProperties: {
                     [propertyId]: {

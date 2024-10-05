@@ -1,12 +1,21 @@
 import type { DeleteGuestVisitData } from "./delete-guest-visit.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
+import type { PreparedGuestData } from "../../../types/types";
 import { deleteGuestVisitFn } from "./delete-guest-visit.js";
 import * as Init from "../../init.js";
 import { MockDocumentReference, MockFirestore } from "../../../test-helpers/MockFirestore.js";
 import { getGuestsPath } from "../../paths.js";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const testReservation = { guestContact: "guest1", arrived: false };
+const preparedGuestData: PreparedGuestData = {
+    contact: "guest1",
+    maskedContact: "maskedContact",
+    hashedContact: "hashedContact",
+    guestName: "guestName",
+    arrived: false,
+    cancelled: false,
+    isVIP: true,
+};
 const propertyId = "propertyId";
 const organisationId = "orgId";
 const eventId = "event1";
@@ -24,7 +33,7 @@ describe("deleteGuestVisitFn", () => {
     it("should handle errors", async () => {
         const guestsCollectionRef = mockFirestore.collection(getGuestsPath(organisationId));
         const guestData = {
-            contact: testReservation.guestContact,
+            contact: preparedGuestData.contact,
             visitedProperties: {
                 [propertyId]: {
                     [eventId]: {
@@ -46,7 +55,7 @@ describe("deleteGuestVisitFn", () => {
         await expect(
             deleteGuestVisitFn({
                 data: {
-                    reservation: testReservation,
+                    preparedGuestData,
                     propertyId,
                     organisationId,
                     eventId,
@@ -59,7 +68,7 @@ describe("deleteGuestVisitFn", () => {
         await expect(
             deleteGuestVisitFn({
                 data: {
-                    reservation: { guestContact: "nonexistentGuest", arrived: false },
+                    preparedGuestData: { contact: "nonexistentGuest", arrived: false },
                     propertyId,
                     organisationId,
                     eventId,
@@ -78,7 +87,7 @@ describe("deleteGuestVisitFn", () => {
     it("should delete a guest visit", async () => {
         const guestsCollectionRef = mockFirestore.collection(getGuestsPath(organisationId));
         const guestData = {
-            contact: testReservation.guestContact,
+            contact: preparedGuestData.contact,
             visitedProperties: {
                 [propertyId]: {
                     [eventId]: {
@@ -94,7 +103,7 @@ describe("deleteGuestVisitFn", () => {
 
         await deleteGuestVisitFn({
             data: {
-                reservation: testReservation,
+                preparedGuestData,
                 propertyId,
                 organisationId,
                 eventId,

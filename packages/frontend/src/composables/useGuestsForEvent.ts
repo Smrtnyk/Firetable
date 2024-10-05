@@ -4,7 +4,6 @@ import type { GuestDoc, ReservationDoc } from "@firetable/types";
 import type { Ref } from "vue";
 import { computed } from "vue";
 import { guestsCollection } from "@firetable/backend";
-import { isValidEuropeanPhoneNumber } from "src/helpers/utils";
 import { where } from "firebase/firestore";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
 import { matchesProperty, property } from "es-toolkit/compat";
@@ -13,7 +12,7 @@ export function useGuestsForEvent(eventOwner: EventOwner, reservations: Ref<Rese
     const guestWithPhoneNumbers = computed<string[]>(function () {
         const values = reservations.value
             .map(property("guestContact"))
-            .filter(isValidEuropeanPhoneNumber)
+            .filter(Boolean)
             // Limit to 30 contacts due to Firestore 'in' query constraint
             .slice(0, 30);
         return Array.from(new Set(values));

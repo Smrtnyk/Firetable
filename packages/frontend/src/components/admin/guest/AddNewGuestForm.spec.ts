@@ -4,7 +4,7 @@ import { renderComponent } from "../../../../test-helpers/render-component";
 import { describe, it, expect, beforeEach } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 
-describe("CreateGuestForm", () => {
+describe("AddNewGuestForm", () => {
     describe("create", () => {
         let props: AddNewGuestFormProps;
 
@@ -92,6 +92,8 @@ describe("CreateGuestForm", () => {
             expect(screen.emitted().create[0][0]).toEqual({
                 name: "John Doe",
                 contact: "+4325550123",
+                maskedContact: "+43XXXX0123",
+                hashedContact: "75bde53b8d20a110ce8d51d94345d18744e77e72ce3f8ad1d8bcd8fe60092ffc",
                 visitedProperties: {},
             });
         });
@@ -137,6 +139,8 @@ describe("CreateGuestForm", () => {
             expect(screen.emitted().create[0][0]).toEqual({
                 name: "Invalid Contact",
                 contact: "+432025550123",
+                maskedContact: "+43XXXXXX0123",
+                hashedContact: "06f34ecfe0bd145206f748116d5de65d72ffbd58ac7461d46bfb40b8053e9ec5",
                 visitedProperties: {},
             });
         });
@@ -221,6 +225,8 @@ describe("CreateGuestForm", () => {
             expect(screen.emitted().update[0][0]).toEqual({
                 name: "Updated Guest",
                 contact: "+432025550123",
+                maskedContact: "+43XXXXXX0123",
+                hashedContact: "06f34ecfe0bd145206f748116d5de65d72ffbd58ac7461d46bfb40b8053e9ec5",
                 visitedProperties: {},
             });
         });

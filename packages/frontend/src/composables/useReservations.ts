@@ -36,13 +36,14 @@ import FTDialog from "src/components/FTDialog.vue";
 import EventCreateReservation from "src/components/Event/reservation/EventCreateReservation.vue";
 import EventShowReservation from "src/components/Event/EventShowReservation.vue";
 import { determineTableColor } from "src/helpers/floor";
-import { isValidEuropeanPhoneNumber } from "src/helpers/utils";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { AppLogger } from "src/logger/FTLogger.js";
 import { storeToRefs } from "pinia";
 import { matchesProperty } from "es-toolkit/compat";
 import { HALF_HOUR, ONE_MINUTE } from "src/constants";
 import { useDialog } from "src/composables/useDialog";
+import { hashString } from "src/helpers/hash-string";
+import { maskPhoneNumber } from "src/helpers/mask-phone-number";
 
 type OpenDialog = {
     label: string;
@@ -95,10 +96,10 @@ export function useReservations(
         deep: true,
     });
 
-    function handleGuestDataForReservation(
+    async function handleGuestDataForReservation(
         reservationData: Reservation,
         mode: GuestDataMode,
-    ): void {
+    ): Promise<void> {
         if (!event.value) {
             return;
         }
@@ -107,12 +108,22 @@ export function useReservations(
             return;
         }
 
-        if (!isValidEuropeanPhoneNumber(reservationData.guestContact)) {
+        if (!reservationData.guestContact || !reservationData.guestName) {
             return;
         }
 
         const data: GuestDataPayload = {
-            reservation: reservationData,
+            preparedGuestData: {
+                contact: reservationData.guestContact,
+                hashedContact: await hashString(reservationData.guestContact),
+                maskedContact: maskPhoneNumber(reservationData.guestContact),
+                guestName: reservationData.guestName,
+                arrived: reservationData.arrived,
+                cancelled: isPlannedReservation(reservationData)
+                    ? reservationData.cancelled
+                    : false,
+                isVIP: reservationData.isVIP,
+            },
             propertyId: eventOwner.propertyId,
             organisationId: eventOwner.organisationId,
             eventId: eventOwner.id,

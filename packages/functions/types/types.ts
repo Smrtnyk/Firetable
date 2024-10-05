@@ -83,18 +83,14 @@ export type CreateEventPayload = CreateEventForm & {
     floors: FloorDoc[];
 };
 
-export interface SimpleReservation {
-    floorId: string;
-    tableLabel: string;
+export interface PreparedGuestData {
     arrived: boolean;
-    reservationConfirmed: boolean | undefined;
     cancelled: boolean | undefined;
-    guestContact?: string;
+    contact: string;
+    maskedContact: string;
+    hashedContact: string;
     guestName: string;
-    numberOfGuests: number | string;
-    consumption: number;
     isVIP: boolean;
-    time: string;
 }
 
 export interface Visit {
@@ -108,6 +104,8 @@ export interface Visit {
 export interface GuestDoc {
     name: string;
     contact: string;
+    hashedContact: string;
+    maskedContact: string;
     visitedProperties: {
         [propertyId: string]: {
             [eventId: string]: Visit | null;
