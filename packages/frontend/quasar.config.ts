@@ -7,17 +7,6 @@ import { configure } from "quasar/wrappers";
 // eslint-disable-next-line no-inline-comments -- for api
 export default configure(function (/* ctx */) {
     return {
-        eslint: {
-            // fix: true,
-            // include: [],
-            // exclude: [],
-            rawOptions: {
-                cache: false,
-            },
-            warnings: true,
-            errors: true,
-        },
-
         // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
         // preFetch: true,
 
@@ -47,7 +36,7 @@ export default configure(function (/* ctx */) {
             // rebuildCache: true, // rebuilds Vite/linter/etc cache on startup
 
             // publicPath: '/',
-            analyze: true,
+            // analyze: true,
             // rawDefine: {}
             // ignorePublicFolder: true,
             // minify: false,
