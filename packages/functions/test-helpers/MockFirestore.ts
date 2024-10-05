@@ -334,7 +334,7 @@ export class MockDocumentReference implements DocumentReference {
     }
 }
 
-class MockTransaction {
+export class MockTransaction {
     private readonly readVersions: Map<string, number> = new Map();
     private readonly writes: Map<string, any> = new Map();
     private readonly firestore: MockFirestore;
