@@ -37,7 +37,7 @@ export interface BaseReservation {
     reservationNote?: string;
     /**
      * The time the reservation was created
-     * In string format
+     * In string format of HH:mm
      */
     time: string;
     /**

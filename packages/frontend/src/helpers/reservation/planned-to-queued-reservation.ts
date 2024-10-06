@@ -13,6 +13,5 @@ export function plannedToQueuedReservation(planned: PlannedReservation): QueuedR
             "waitingForResponse",
         ]),
         type: ReservationType.QUEUED,
-        savedAt: Date.now(),
     };
 }

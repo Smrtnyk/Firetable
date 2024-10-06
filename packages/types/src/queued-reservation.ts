@@ -29,10 +29,6 @@ export type QueuedReservation = Omit<
      * The type of the reservation
      */
     type: ReservationType.QUEUED;
-    /**
-     * Timestamp when the reservation was moved to the queue or created
-     */
-    savedAt: number;
 };
 
 export function isQueuedReservation(

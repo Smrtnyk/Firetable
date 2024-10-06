@@ -1,24 +1,11 @@
 import type { PlannedReservation, QueuedReservation } from "@firetable/types";
 import { plannedToQueuedReservation } from "./planned-to-queued-reservation";
 import { ReservationType } from "@firetable/types";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { omit } from "es-toolkit";
 
 describe("plannedToQueuedReservation", () => {
-    beforeEach(() => {
-        vi.useFakeTimers();
-    });
-
-    afterEach(() => {
-        vi.useRealTimers();
-        vi.resetAllMocks();
-    });
-
     it("should correctly transform a full PlannedReservation to QueuedReservation", () => {
-        // Fixed timestamp for testing
-        const fixedTimestamp = 1_680_000_000_000;
-        vi.setSystemTime(new Date(fixedTimestamp));
-
         const planned: PlannedReservation = {
             arrived: false,
             cancelled: false,
@@ -58,7 +45,6 @@ describe("plannedToQueuedReservation", () => {
                 "tableLabel",
                 "waitingForResponse",
             ]),
-            savedAt: fixedTimestamp,
         };
 
         expect(queued).toEqual(expectedQueued);
@@ -106,7 +92,7 @@ describe("plannedToQueuedReservation", () => {
         expect(queued).not.toHaveProperty("waitingForResponse");
     });
 
-    it("should add savedAt timestamp correctly", () => {
+    it("should add createdAt timestamp correctly", () => {
         const fixedTimestamp = 1_680_000_000_000;
         vi.setSystemTime(new Date(fixedTimestamp));
 
@@ -126,7 +112,7 @@ describe("plannedToQueuedReservation", () => {
                 id: "creator3",
                 email: "creator3@example.com",
                 name: "Creator Three",
-                createdAt: 1_670_000_000_000,
+                createdAt: fixedTimestamp,
             },
             guestName: "Alice Johnson",
             consumption: 10,
@@ -139,7 +125,7 @@ describe("plannedToQueuedReservation", () => {
 
         const queued = plannedToQueuedReservation(planned);
 
-        expect(queued.savedAt).toBe(fixedTimestamp);
+        expect(queued.creator.createdAt).toBe(fixedTimestamp);
     });
 
     it("should handle missing optional fields in PlannedReservation", () => {
@@ -184,7 +170,6 @@ describe("plannedToQueuedReservation", () => {
                 "tableLabel",
                 "waitingForResponse",
             ]),
-            savedAt: fixedTimestamp,
         };
 
         expect(queued).toEqual(expectedQueued);
@@ -270,7 +255,6 @@ describe("plannedToQueuedReservation", () => {
                 "tableLabel",
                 "waitingForResponse",
             ]),
-            savedAt: fixedTimestamp,
         };
 
         expect(queued).toEqual(expectedQueued);
