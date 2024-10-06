@@ -4,6 +4,7 @@ import type { User } from "./auth.js";
 export const enum ReservationType {
     WALK_IN = 0,
     PLANNED = 1,
+    QUEUED = 2,
 }
 
 export const enum ReservationStatus {

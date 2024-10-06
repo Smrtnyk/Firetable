@@ -1,6 +1,7 @@
 import type { BaseReservation, UserIdentifier } from "./base-reservation.js";
 import type { QueryDocumentSnapshot } from "firebase/firestore";
 import type { WalkInReservation } from "./walk-in-reservation.js";
+import type { QueuedReservation } from "./queued-reservation.js";
 import { ReservationType } from "./base-reservation.js";
 
 export interface PlannedReservation extends BaseReservation {
@@ -20,7 +21,7 @@ export type PlannedReservationDoc = PlannedReservation & {
 };
 
 export function isPlannedReservation(
-    reservation: PlannedReservation | WalkInReservation,
+    reservation: PlannedReservation | QueuedReservation | WalkInReservation,
 ): reservation is PlannedReservation {
     return reservation.type === ReservationType.PLANNED;
 }

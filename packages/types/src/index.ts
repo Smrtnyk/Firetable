@@ -6,7 +6,7 @@ export type * from "./property.js";
 export type * from "./organisation.js";
 export type * from "./guest.js";
 export type * from "./utils.js";
-export type * from "./queued-reservation.js";
+export * from "./queued-reservation.js";
 export * from "./base-reservation.js";
 export * from "./reservation.js";
 export * from "./walk-in-reservation.js";
