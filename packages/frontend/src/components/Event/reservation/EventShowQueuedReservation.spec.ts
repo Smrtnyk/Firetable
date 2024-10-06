@@ -1,8 +1,8 @@
 import type { QueuedReservationDoc } from "@firetable/types";
 import type { RenderResult } from "vitest-browser-vue";
 import EventShowQueuedReservation from "./EventShowQueuedReservation.vue";
-import { renderComponent } from "../../../test-helpers/render-component";
-import { useAuthStore } from "../../stores/auth-store";
+import { renderComponent } from "../../../../test-helpers/render-component";
+import { useAuthStore } from "../../../stores/auth-store";
 import { Role } from "@firetable/types";
 import { describe, it, expect } from "vitest";
 import { userEvent } from "@vitest/browser/context";

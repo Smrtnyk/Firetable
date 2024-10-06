@@ -12,7 +12,7 @@ import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPC
 import FTDialog from "src/components/FTDialog.vue";
 import EventCreateReservation from "src/components/Event/reservation/EventCreateReservation.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
-import EventShowQueuedReservation from "src/components/Event/EventShowQueuedReservation.vue";
+import EventShowQueuedReservation from "src/components/Event/reservation/EventShowQueuedReservation.vue";
 
 import { useDialog } from "src/composables/useDialog";
 import { useAuthStore } from "src/stores/auth-store";
