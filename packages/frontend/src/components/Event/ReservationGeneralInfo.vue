@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { PlannedReservation, Reservation } from "@firetable/types";
-import { isPlannedReservation } from "@firetable/types";
+import type { PlannedReservation, QueuedReservation, Reservation } from "@firetable/types";
+import { isAWalkInReservation } from "@firetable/types";
 import { formatEventDate } from "src/helpers/date-utils";
 import { useI18n } from "vue-i18n";
 import { useAuthStore } from "src/stores/auth-store";
 
 const props = defineProps<{
-    reservation: Reservation;
+    reservation: QueuedReservation | Reservation;
 }>();
 const { t } = useI18n();
 const authStore = useAuthStore();
@@ -57,7 +57,7 @@ function createdByText(creator: Reservation["creator"]): string {
             <div class="col-6 font-black">{{ props.reservation.reservationNote }}</div>
         </template>
 
-        <template v-if="isPlannedReservation(props.reservation)">
+        <template v-if="!isAWalkInReservation(props.reservation)">
             <div class="col-6">{{ t("EventShowReservation.reservedByLabel") }}</div>
             <div class="col-6 font-black">{{ reservedByText(props.reservation.reservedBy) }}</div>
         </template>
