@@ -10,7 +10,6 @@ import type {
     Reservation,
     ReservationDoc,
     User,
-    QueuedReservation,
 } from "@firetable/types";
 import {
     moveReservationToQueue,
@@ -46,7 +45,7 @@ import { HALF_HOUR, ONE_MINUTE } from "src/constants";
 import { useDialog } from "src/composables/useDialog";
 import { hashString } from "src/helpers/hash-string";
 import { maskPhoneNumber } from "src/helpers/mask-phone-number";
-import { omit } from "es-toolkit";
+import { plannedToQueuedReservation } from "src/helpers/reservation/planned-to-queued-reservation";
 
 type OpenDialog = {
     label: string;
@@ -462,17 +461,7 @@ export function useReservations(
             return;
         }
 
-        const toQueuedReservation: QueuedReservation = {
-            ...omit(reservation, [
-                "arrived",
-                "cancelled",
-                "floorId",
-                "reservationConfirmed",
-                "tableLabel",
-                "waitingForResponse",
-            ]),
-            savedAt: Date.now(),
-        };
+        const toQueuedReservation = plannedToQueuedReservation(reservation);
         await tryCatchLoadingWrapper({
             hook() {
                 return moveReservationToQueue(eventOwner, reservation.id, toQueuedReservation);
