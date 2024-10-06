@@ -3,7 +3,7 @@ import type { QueuedReservation, QueuedReservationDoc } from "@firetable/types";
 
 import { computed } from "vue";
 
-import ReservationGeneralInfo from "src/components/Event/ReservationGeneralInfo.vue";
+import ReservationGeneralInfo from "src/components/Event/reservation/ReservationGeneralInfo.vue";
 import ReservationLabelChips from "src/components/Event/reservation/ReservationLabelChips.vue";
 
 import { useAuthStore } from "src/stores/auth-store";

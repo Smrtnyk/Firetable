@@ -5,7 +5,7 @@ import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useAuthStore } from "src/stores/auth-store";
 
-import ReservationGeneralInfo from "src/components/Event/ReservationGeneralInfo.vue";
+import ReservationGeneralInfo from "src/components/Event/reservation/ReservationGeneralInfo.vue";
 import ReservationLabelChips from "src/components/Event/reservation/ReservationLabelChips.vue";
 
 interface Props {

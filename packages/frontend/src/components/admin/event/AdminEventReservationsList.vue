@@ -4,7 +4,7 @@ import { useDialog } from "src/composables/useDialog";
 import { formatEventDate } from "src/helpers/date-utils";
 
 import FTDialog from "src/components/FTDialog.vue";
-import ReservationGeneralInfo from "src/components/Event/ReservationGeneralInfo.vue";
+import ReservationGeneralInfo from "src/components/Event/reservation/ReservationGeneralInfo.vue";
 import { QScrollArea } from "quasar";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import ReservationLabelChips from "src/components/Event/reservation/ReservationLabelChips.vue";
