@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type { EventDoc, QueuedReservationDoc, Reservation, User } from "@firetable/types";
+import type { EventDoc, PlannedReservation, QueuedReservationDoc, User } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
 import type { Ref } from "vue";
+import { saveQueuedReservation } from "@firetable/backend";
 import { useEventsStore } from "src/stores/events-store";
 import { useI18n } from "vue-i18n";
 import { computed, inject } from "vue";
@@ -10,11 +11,14 @@ import FTTitle from "src/components/FTTitle.vue";
 import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPChip.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import EventCreateReservation from "src/components/Event/reservation/EventCreateReservation.vue";
+import FTCenteredText from "src/components/FTCenteredText.vue";
+
 import { useDialog } from "src/composables/useDialog";
 import { useAuthStore } from "src/stores/auth-store";
 import { storeToRefs } from "pinia";
 import { usePropertiesStore } from "src/stores/properties-store";
-import { showErrorMessage } from "src/helpers/ui-helpers";
+import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { plannedToQueuedReservation } from "src/helpers/reservation/planned-to-queued-reservation";
 
 interface EventQueuedReservationsProps {
     data: QueuedReservationDoc[];
@@ -48,15 +52,25 @@ function addNewQueuedReservation(): void {
             title: `${t("EventQueuedReservations.addNewReservation")}`,
             maximized: false,
             componentPropsObject: {
+                mode: "create",
                 currentUser: nonNullableUser.value,
                 users,
                 eventStartTimestamp: eventData.value.date,
                 eventDurationInHours: settings.value.event.eventDurationInHours,
+                onlyPlanned: true,
             },
             listeners: {
-                create(reservationData: Reservation) {
-                    // FIXME: implement
+                async create(reservationData: PlannedReservation) {
                     dialog.hide();
+
+                    await tryCatchLoadingWrapper({
+                        hook() {
+                            return saveQueuedReservation(
+                                eventOwner,
+                                plannedToQueuedReservation(reservationData),
+                            );
+                        },
+                    });
                 },
             },
         },
@@ -85,19 +99,13 @@ function showReservation(reservation: QueuedReservationDoc): void {
 
         <div v-if="data.length === 0">
             <div class="row justify-center items-center q-mt-md">
-                <h6 class="q-ma-sm text-weight-bolder underline">
-                    {{ t("EventQueuedReservations.emptyMessage") }}
-                </h6>
+                <FTCenteredText>{{ t("EventQueuedReservations.emptyMessage") }}</FTCenteredText>
                 <q-img src="/people-confirmation.svg" />
             </div>
         </div>
 
         <div v-if="data.length === 0 && error">
-            <div class="row justify-center items-center q-mt-md">
-                <h6 class="q-ma-sm text-weight-bolder underline">
-                    {{ t("EventQueuedReservations.errorMessage") }}
-                </h6>
-            </div>
+            <FTCenteredText> {{ t("EventQueuedReservations.errorMessage") }}</FTCenteredText>
         </div>
 
         <div v-if="data.length > 0">
