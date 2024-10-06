@@ -1,10 +1,17 @@
 import type { EventOwner } from "../db.js";
-import type { QueuedReservation, ReservationDoc } from "@firetable/types";
+import type { QueuedReservation, Reservation, ReservationDoc } from "@firetable/types";
 import type { HttpsCallableResult } from "firebase/functions";
-import { reservationDoc } from "../db.js";
+import { reservationsCollection, reservationDoc } from "../db.js";
 import { initializeFirebase } from "../base.js";
 import { httpsCallable } from "firebase/functions";
-import { deleteDoc, updateDoc } from "firebase/firestore";
+import { addDoc, deleteDoc, type DocumentReference, updateDoc } from "firebase/firestore";
+
+export function addReservation(
+    owner: EventOwner,
+    reservation: Reservation,
+): Promise<DocumentReference> {
+    return addDoc(reservationsCollection(owner), reservation);
+}
 
 export function moveReservationToQueue(
     eventOwner: EventOwner,
