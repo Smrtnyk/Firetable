@@ -6,6 +6,7 @@ import { computed } from "vue";
 import { useEventsStore } from "src/stores/events-store";
 import { storeToRefs } from "pinia";
 
+import FTCenteredText from "src/components/FTCenteredText.vue";
 import EventGuestListCreateGuestForm from "src/components/Event/EventGuestListCreateGuestForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import FTDialog from "src/components/FTDialog.vue";
@@ -138,12 +139,8 @@ async function onSwipeLeftConfirmGuest(
             </q-linear-progress>
 
             <div class="EventGuestList" v-if="guestList.length === 0">
-                <div class="row justify-center items-center q-mt-md">
-                    <h6 class="q-ma-sm text-weight-bolder underline">
-                        {{ t("EventGuestList.guestListEmptyMessage") }}
-                    </h6>
-                    <q-img src="/people-confirmation.svg" />
-                </div>
+                <FTCenteredText>{{ t("EventGuestList.guestListEmptyMessage") }}</FTCenteredText>
+                <q-img src="/people-confirmation.svg" />
             </div>
 
             <q-list v-else bordered separator>
