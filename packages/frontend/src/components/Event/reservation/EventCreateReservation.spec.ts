@@ -20,11 +20,6 @@ describe("EventCreateReservation", () => {
             props = {
                 mode: "create",
                 eventStartTimestamp,
-                table: {
-                    id: "table1",
-                    label: "Table 1",
-                },
-                floorId: "floor1",
                 reservationData: undefined,
                 eventDurationInHours: 8,
                 users: [],
@@ -47,8 +42,6 @@ describe("EventCreateReservation", () => {
                 consumption: 0,
                 arrived: true,
                 time: formattedTime,
-                tableLabel: props.table.label,
-                floorId: props.floorId,
                 status: ReservationStatus.ACTIVE,
                 isVIP: false,
             };
@@ -65,8 +58,6 @@ describe("EventCreateReservation", () => {
                 consumption: 50,
                 arrived: true,
                 time: "19:00",
-                tableLabel: props.table.label,
-                floorId: props.floorId,
                 status: ReservationStatus.ACTIVE,
                 isVIP: true,
             };
@@ -238,11 +229,6 @@ describe("EventCreateReservation", () => {
                 ],
                 mode: "create",
                 eventStartTimestamp,
-                table: {
-                    id: "table1",
-                    label: "Table 1",
-                },
-                floorId: "floor1",
                 reservationData: undefined,
                 eventDurationInHours: 8,
             };
@@ -262,8 +248,6 @@ describe("EventCreateReservation", () => {
                 time: "00:00",
                 reservedBy: null as unknown as User,
                 cancelled: false,
-                tableLabel: plannedProps.table.label,
-                floorId: plannedProps.floorId,
                 status: ReservationStatus.ACTIVE,
                 isVIP: false,
             };
@@ -287,8 +271,6 @@ describe("EventCreateReservation", () => {
                     id: "user2",
                 },
                 cancelled: false,
-                tableLabel: plannedProps.table.label,
-                floorId: plannedProps.floorId,
                 status: ReservationStatus.ACTIVE,
                 isVIP: true,
             };
