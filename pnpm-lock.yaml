@@ -155,8 +155,8 @@ importers:
         specifier: 'catalog:'
         version: 10.14.0
       libphonenumber-js:
-        specifier: 1.11.10
-        version: 1.11.10
+        specifier: 1.11.11
+        version: 1.11.11
       pako:
         specifier: 2.1.0
         version: 2.1.0
@@ -173,8 +173,8 @@ importers:
         specifier: 3.5.11
         version: 3.5.11(typescript@5.6.2)
       vue-i18n:
-        specifier: 10.0.3
-        version: 10.0.3(vue@3.5.11(typescript@5.6.2))
+        specifier: 10.0.4
+        version: 10.0.4(vue@3.5.11(typescript@5.6.2))
       vue-router:
         specifier: 4.4.5
         version: 4.4.5(vue@3.5.11(typescript@5.6.2))
@@ -1640,16 +1640,16 @@ packages:
     resolution: {integrity: sha512-xTUt0NulylX27/zMx04ZYar/kr1raaiFTVvQ5feljQsiAgdm0WPj4S73/ye0fbslh+15QrIuDvfCXTek7pMY5A==}
     engines: {node: '>=18'}
 
-  '@intlify/core-base@10.0.3':
-    resolution: {integrity: sha512-ysJnTGDtuXPa6R2Ii4JIvfMVvDahUUny3aY8+P4r6/0TYHkblgzIMjV6cAn60em67AB0M7OWNAdcAVfWWeN8Qg==}
+  '@intlify/core-base@10.0.4':
+    resolution: {integrity: sha512-GG428DkrrWCMhxRMRQZjuS7zmSUzarYcaHJqG9VB8dXAxw4iQDoKVQ7ChJRB6ZtsCsX3Jse1PEUlHrJiyQrOTg==}
     engines: {node: '>= 16'}
 
-  '@intlify/message-compiler@10.0.3':
-    resolution: {integrity: sha512-KC2fG8nCzSYmXjHptEt6i/xM3k6S2szsPaHDCRgWKEYAbeHe6JFm6X4KRw3Csy112A8CxpavMi1dh3h7khwV5w==}
+  '@intlify/message-compiler@10.0.4':
+    resolution: {integrity: sha512-AFbhEo10DP095/45EauinQJ5hJ3rJUmuuqltGguvc3WsvezZN+g8qNHLGWKu60FHQVizMrQY7VJ+zVlBXlQQkQ==}
     engines: {node: '>= 16'}
 
-  '@intlify/shared@10.0.3':
-    resolution: {integrity: sha512-PWxrCb6fDlnoGLnXLlWu6d7o/HdWACB9TjRnpLro+9uyfqgWA9hvqg5vekcPRyraTieV5srCbTk/ldYw9V3LHw==}
+  '@intlify/shared@10.0.4':
+    resolution: {integrity: sha512-ukFn0I01HsSgr3VYhYcvkTCLS7rGa0gw4A4AMpcy/A9xx/zRJy7PS2BElMXLwUazVFMAr5zuiTk3MQeoeGXaJg==}
     engines: {node: '>= 16'}
 
   '@isaacs/cliui@8.0.2':
@@ -4581,8 +4581,8 @@ packages:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
 
-  libphonenumber-js@1.11.10:
-    resolution: {integrity: sha512-yHEtzDlG2VbhuxMIo/sAUY+lyL5YThqD+gHT3YyelaRWRQv1VeyEk94jDvviRT4PYmLJR9cHxvtrx9h2f4OAIQ==}
+  libphonenumber-js@1.11.11:
+    resolution: {integrity: sha512-mF3KaORjJQR6JBNcOkluDcJKhtoQT4VTLRMrX1v/wlBayL4M8ybwEDeryyPcrSEJmD0rVwHUbBarpZwN5NfPFQ==}
 
   libsodium-wrappers@0.7.13:
     resolution: {integrity: sha512-kasvDsEi/r1fMzKouIDv7B8I6vNmknXwGiYodErGuESoFTohGSKZplFtVxZqHaoQ217AynyIFgnOVRitpHs0Qw==}
@@ -6620,8 +6620,8 @@ packages:
     peerDependencies:
       eslint: '>=6.0.0'
 
-  vue-i18n@10.0.3:
-    resolution: {integrity: sha512-8ul2S4Hy9orKs7eOlkw/zqnVu98GttUdyIMRyjoMpv6hFPxnybgBLdep/UCmdan5kUHyxqMnr2cGHTBuPBYJaw==}
+  vue-i18n@10.0.4:
+    resolution: {integrity: sha512-1xkzVxqBLk2ZFOmeI+B5r1J7aD/WtNJ4j9k2mcFcQo5BnOmHBmD7z4/oZohh96AAaRZ4Q7mNQvxc9h+aT+Md3w==}
     engines: {node: '>= 16'}
     peerDependencies:
       vue: ^3.0.0
@@ -8442,17 +8442,17 @@ snapshots:
 
   '@inquirer/type@1.3.3': {}
 
-  '@intlify/core-base@10.0.3':
+  '@intlify/core-base@10.0.4':
     dependencies:
-      '@intlify/message-compiler': 10.0.3
-      '@intlify/shared': 10.0.3
+      '@intlify/message-compiler': 10.0.4
+      '@intlify/shared': 10.0.4
 
-  '@intlify/message-compiler@10.0.3':
+  '@intlify/message-compiler@10.0.4':
     dependencies:
-      '@intlify/shared': 10.0.3
+      '@intlify/shared': 10.0.4
       source-map-js: 1.2.1
 
-  '@intlify/shared@10.0.3': {}
+  '@intlify/shared@10.0.4': {}
 
   '@isaacs/cliui@8.0.2':
     dependencies:
@@ -12118,7 +12118,7 @@ snapshots:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
-  libphonenumber-js@1.11.10: {}
+  libphonenumber-js@1.11.11: {}
 
   libsodium-wrappers@0.7.13:
     dependencies:
@@ -14267,10 +14267,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vue-i18n@10.0.3(vue@3.5.11(typescript@5.6.2)):
+  vue-i18n@10.0.4(vue@3.5.11(typescript@5.6.2)):
     dependencies:
-      '@intlify/core-base': 10.0.3
-      '@intlify/shared': 10.0.3
+      '@intlify/core-base': 10.0.4
+      '@intlify/shared': 10.0.4
       '@vue/devtools-api': 6.6.4
       vue: 3.5.11(typescript@5.6.2)
 
