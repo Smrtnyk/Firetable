@@ -104,14 +104,14 @@ describe("AdminEventLogs", () => {
             }
         });
 
-        it("formats subtitles correctly", () => {
+        it("formats subtitles correctly", async () => {
             for (const log of sampleLogs) {
                 const datePart = formatEventDate(log.timestamp.toMillis(), null);
                 const userPart = `${log.creator.name} (${log.creator.email})`;
                 const expectedSubtitle = `${datePart}, by ${userPart}`;
 
                 const subtitleElement = page.getByText(expectedSubtitle);
-                expect.element(subtitleElement).toBeVisible();
+                await expect.element(subtitleElement).toBeVisible();
             }
         });
     });
@@ -124,13 +124,13 @@ describe("AdminEventLogs", () => {
             });
         });
 
-        it("filters out logs created by admins", () => {
+        it("filters out logs created by admins", async () => {
             const nonAdminLogs = sampleLogs.filter((log) => log.creator.role !== ADMIN);
 
             // Verify that non-admin logs are displayed
             for (const log of nonAdminLogs) {
                 const messageElement = page.getByText(log.message);
-                expect.element(messageElement).toBeVisible();
+                await expect.element(messageElement).toBeVisible();
             }
 
             // Verify that admin logs are not displayed

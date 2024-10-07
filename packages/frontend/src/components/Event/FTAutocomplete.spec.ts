@@ -109,7 +109,7 @@ describe("FTAutocomplete.vue", () => {
 
         // Find the 'Hide arrived' checkbox inside the dropdown
         const hideArrivedCheckbox = screen.getByRole("checkbox", { name: "Hide arrived" });
-        expect.element(hideArrivedCheckbox).toBeVisible();
+        await expect.element(hideArrivedCheckbox).toBeVisible();
 
         // Click the checkbox to hide arrived guests
         await userEvent.click(hideArrivedCheckbox);

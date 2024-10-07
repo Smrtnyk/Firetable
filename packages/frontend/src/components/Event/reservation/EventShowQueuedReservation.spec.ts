@@ -63,27 +63,27 @@ describe("EventShowQueuedReservation", () => {
         );
     }
 
-    it("renders ReservationLabelChips and ReservationGeneralInfo components with correct props", () => {
+    it("renders ReservationLabelChips and ReservationGeneralInfo components with correct props", async () => {
         const screen = renderComponentWithStore(true, "user123");
 
-        expect.element(screen.getByText("VIP")).toBeVisible();
-        expect.element(screen.getByText("John Doe")).toBeVisible();
-        expect.element(screen.getByText("18:00")).toBeVisible();
+        await expect.element(screen.getByText("VIP")).toBeVisible();
+        await expect.element(screen.getByText("John Doe", { exact: true })).toBeVisible();
+        await expect.element(screen.getByText("18:00")).toBeVisible();
     });
 
-    it('renders "Move to Floor Plan" button when canUnqueue is true (canReserve)', () => {
+    it('renders "Move to Floor Plan" button when canUnqueue is true (canReserve)', async () => {
         const screen = renderComponentWithStore(true, "user123");
 
         const moveButton = screen.getByRole("button", { name: /move to floor plan/i });
-        expect.element(moveButton).toBeVisible();
+        await expect.element(moveButton).toBeVisible();
     });
 
-    it('renders "Move to Floor Plan" button when canUnqueue is true (own reservation)', () => {
+    it('renders "Move to Floor Plan" button when canUnqueue is true (own reservation)', async () => {
         //  User is the owner but cannot reserve globally
         const screen = renderComponentWithStore(false, "creator456");
 
         const moveButton = screen.getByRole("button", { name: /move to floor plan/i });
-        expect.element(moveButton).toBeVisible();
+        await expect.element(moveButton).toBeVisible();
     });
 
     it('does not render "Move to Floor Plan" button when canUnqueue is false', () => {
@@ -113,7 +113,7 @@ describe("EventShowQueuedReservation", () => {
         expect(screen.emitted().unqueue.length).toBe(1);
     });
 
-    it('updates "canUnqueue" when authStore changes (canReserve becomes true)', () => {
+    it('updates "canUnqueue" when authStore changes (canReserve becomes true)', async () => {
         //  User initially cannot reserve and is not the owner
         const screen = renderComponent(
             EventShowQueuedReservation,
@@ -143,10 +143,12 @@ describe("EventShowQueuedReservation", () => {
         screen.rerender({});
 
         // Now, the button should be present
-        expect.element(screen.getByRole("button", { name: /move to floor plan/i })).toBeVisible();
+        await expect
+            .element(screen.getByRole("button", { name: /move to floor plan/i }))
+            .toBeVisible();
     });
 
-    it('updates "canUnqueue" when authStore changes (own reservation)', () => {
+    it('updates "canUnqueue" when authStore changes (own reservation)', async () => {
         //  User initially cannot reserve and is not the owner
         const screen = renderComponent(
             EventShowQueuedReservation,
@@ -176,6 +178,8 @@ describe("EventShowQueuedReservation", () => {
         screen.rerender({});
 
         // Now, the button should be present
-        expect.element(screen.getByRole("button", { name: /move to floor plan/i })).toBeVisible();
+        await expect
+            .element(screen.getByRole("button", { name: /move to floor plan/i }))
+            .toBeVisible();
     });
 });
