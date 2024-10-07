@@ -13,7 +13,6 @@ import type {
 } from "@firetable/types";
 import {
     moveReservationToQueue,
-    getFirestoreTimestamp,
     deleteGuestVisit,
     setGuestData,
     addLogToEvent,
@@ -220,7 +219,7 @@ export function useReservations(
                     await updateReservationDoc(eventOwner, {
                         status: ReservationStatus.DELETED,
                         id: reservation.id,
-                        clearedAt: getFirestoreTimestamp(),
+                        clearedAt: Date.now(),
                     });
                     createEventLog(`Reservation soft deleted on table ${reservation.tableLabel}`);
                 } else {

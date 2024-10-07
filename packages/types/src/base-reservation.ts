@@ -42,12 +42,14 @@ export interface BaseReservation {
     time: string;
     /**
      * The time the reservation was last cleared
+     * Remove Timestamp after some time has passed
+     * due to compat support for old reservations
      */
-    clearedAt?: Timestamp;
+    clearedAt?: Timestamp | number;
     /**
      * Identifier of the user who created the reservation
      */
-    creator: UserIdentifier & { createdAt: Timestamp };
+    creator: UserIdentifier & { createdAt: Timestamp | number };
     /**
      * The status of the reservation
      * Either active or deleted

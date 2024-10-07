@@ -4,7 +4,7 @@ import type { QScrollAreaProps } from "quasar";
 import { ADMIN } from "@firetable/types";
 import { computed, ref, useTemplateRef } from "vue";
 import { QScrollArea } from "quasar";
-import { formatEventDate } from "src/helpers/date-utils";
+import { getFormatedDateFromTimestamp } from "src/helpers/date-utils";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 
 export interface AdminEventLogsProps {
@@ -25,10 +25,6 @@ const logs = computed(function () {
 });
 const showScrollButton = ref(false);
 const logsContainer = useTemplateRef<QScrollArea>("logsContainer");
-
-function formatTimestampToReadable(timestamp: number): string {
-    return formatEventDate(timestamp, null);
-}
 
 function getIconNameForLogEntry(logMessage: string): string {
     if (logMessage.includes("deleted")) {
@@ -55,7 +51,7 @@ function getIconNameForLogEntry(logMessage: string): string {
 }
 
 function formatSubtitleForEventLog({ creator, timestamp }: EventLog): string {
-    const datePart = formatTimestampToReadable(timestamp.toMillis());
+    const datePart = getFormatedDateFromTimestamp(timestamp);
     const userPart = `${creator.name} (${creator.email})`;
     return `${datePart}, by ${userPart}`;
 }
@@ -80,7 +76,7 @@ function scrollToBottom(): void {
                 <q-timeline color="primary">
                     <q-timeline-entry
                         v-for="log of logs"
-                        :key="log.timestamp.nanoseconds"
+                        :key="log.timestamp.toString()"
                         :subtitle="formatSubtitleForEventLog(log)"
                         :icon="getIconNameForLogEntry(log.message)"
                     >

@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { PlannedReservation, QueuedReservation, Reservation } from "@firetable/types";
 import { isAWalkInReservation } from "@firetable/types";
-import { formatEventDate } from "src/helpers/date-utils";
+import { getFormatedDateFromTimestamp } from "src/helpers/date-utils";
 import { useI18n } from "vue-i18n";
+import { computed } from "vue";
 import { useAuthStore } from "src/stores/auth-store";
 
 const props = defineProps<{
@@ -10,6 +11,11 @@ const props = defineProps<{
 }>();
 const { t } = useI18n();
 const authStore = useAuthStore();
+
+const createdAt = computed(() => {
+    const createdAtValue = props.reservation.creator.createdAt;
+    return getFormatedDateFromTimestamp(createdAtValue);
+});
 
 function reservedByText(reservedBy: PlannedReservation["reservedBy"]): string {
     const { name, email } = reservedBy;
@@ -62,7 +68,7 @@ function createdByText(creator: Reservation["creator"]): string {
 
             <div class="col-6">Created at</div>
             <div class="col-6 font-black">
-                {{ formatEventDate(props.reservation.creator.createdAt.toMillis(), null) }}
+                {{ createdAt }}
             </div>
         </template>
     </div>

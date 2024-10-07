@@ -2,7 +2,7 @@ import type { Auth } from "firebase/auth";
 import type { Firestore } from "firebase/firestore";
 import type { Functions } from "firebase/functions";
 import fbConfig from "./fb-config.json";
-import { Timestamp, getFirestore, connectFirestoreEmulator } from "firebase/firestore";
+import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { getAuth, connectAuthEmulator } from "firebase/auth";
 import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
@@ -26,8 +26,4 @@ function initEmulators(firestore: Firestore, auth: Auth, functions: Functions): 
     connectAuthEmulator(auth, `http://${location.hostname}:9099/`, { disableWarnings: true });
     connectFirestoreEmulator(firestore, location.hostname, 4000);
     connectFunctionsEmulator(functions, location.hostname, 5001);
-}
-
-export function getFirestoreTimestamp(): Timestamp {
-    return Timestamp.now();
 }

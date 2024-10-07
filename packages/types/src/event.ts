@@ -49,7 +49,11 @@ export type GuestInGuestListData = CreateGuestInGuestListPayload & {
 export interface EventLog {
     message: string;
     creator: UserIdentifier & { role: Role | typeof ADMIN };
-    timestamp: Timestamp;
+    /**
+     * Remove Timestamp after some time has passed
+     * due to compat support for old logs
+     */
+    timestamp: Timestamp | number;
 }
 
 export interface EventLogsDoc {

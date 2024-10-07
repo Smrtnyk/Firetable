@@ -1,3 +1,6 @@
+import type { FirestoreTimestamp } from "@firetable/types";
+import { isNumber } from "es-toolkit/compat";
+
 const LOCALE = "de-DE";
 
 /**
@@ -53,4 +56,11 @@ export function hourFromTimestamp(timestamp: number, timeZone: string | null = "
         hour12: false,
     });
     return formatter.format(date);
+}
+
+export function getFormatedDateFromTimestamp(timestamp: FirestoreTimestamp | number): string {
+    if (isNumber(timestamp)) {
+        return formatEventDate(timestamp, null);
+    }
+    return formatEventDate(timestamp.toMillis(), null);
 }

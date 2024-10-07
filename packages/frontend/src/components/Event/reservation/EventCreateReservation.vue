@@ -7,7 +7,6 @@ import { useI18n } from "vue-i18n";
 
 import PlannedReservationForm from "src/components/Event/reservation/PlannedReservationForm.vue";
 import WalkInReservationForm from "src/components/Event/reservation/WalkInReservationForm.vue";
-import { getFirestoreTimestamp } from "@firetable/backend";
 
 export interface EventCreateReservationProps {
     currentUser: User;
@@ -101,7 +100,7 @@ async function onOKClick(): Promise<void> {
             name: props.currentUser.name,
             email: props.currentUser.email,
             id: props.currentUser.id,
-            createdAt: getFirestoreTimestamp(),
+            createdAt: Date.now(),
         },
     };
 

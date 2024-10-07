@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ReservationDoc, VoidFunction } from "@firetable/types";
 import { useDialog } from "src/composables/useDialog";
-import { formatEventDate } from "src/helpers/date-utils";
+import { getFormatedDateFromTimestamp } from "src/helpers/date-utils";
 
 import FTDialog from "src/components/FTDialog.vue";
 import ReservationGeneralInfo from "src/components/Event/reservation/ReservationGeneralInfo.vue";
@@ -57,9 +57,7 @@ function emitDelete(reservation: ReservationDoc, reset: VoidFunction): void {
                         >
                         <q-item-label v-if="reservation.clearedAt" caption
                             >Cleared at:
-                            {{
-                                formatEventDate(reservation.clearedAt.toMillis(), null)
-                            }}</q-item-label
+                            {{ getFormatedDateFromTimestamp(reservation.clearedAt) }}</q-item-label
                         >
                         <q-item-label caption>
                             <ReservationLabelChips :reservation="reservation" />
