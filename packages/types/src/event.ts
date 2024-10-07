@@ -3,13 +3,10 @@ import type { FloorDoc } from "./floor.js";
 import type { ADMIN, Role } from "./auth.js";
 import type { UserIdentifier } from "./base-reservation.js";
 
-export interface CreateEventForm {
-    name: string;
-    date: number;
-    guestListLimit: number;
-    entryPrice: number;
-    img?: string;
-}
+export type CreateEventForm = Pick<
+    EventDoc,
+    "date" | "entryPrice" | "guestListLimit" | "img" | "name"
+>;
 
 export type CreateEventPayload = CreateEventForm & {
     propertyId: string;
@@ -23,22 +20,66 @@ export type EditEventPayload = CreateEventForm & {
 };
 
 export interface EventDoc {
+    /**
+     * id is the same as the document id in firestore
+     */
     id: string;
+    /**
+     * user mail of the event creator
+     */
     creator: string;
+    /**
+     * date as a timestamp of the event
+     */
     date: number;
+    /**
+     * entry price for the event
+     * if 0, then the event is free
+     */
     entryPrice: number;
+    /**
+     * name of the event
+     */
     name: string;
+    /**
+     * limit of guests that can be on the guest list
+     */
     guestListLimit: number;
+    /**
+     * id of the property where the event is hosted
+     */
     propertyId: string;
+    /**
+     * id of the organisation where the event is hosted
+     */
     organisationId: string;
+    /**
+     * if provided, any kind of info regarding the event
+     * visible to the user
+     */
     info?: string;
+    /**
+     * image url of the event if provided
+     */
     img?: string;
+    /**
+     * document snapshot of the event document
+     */
     _doc: QueryDocumentSnapshot<EventDoc>;
 }
 
 export interface CreateGuestInGuestListPayload {
+    /**
+     * name of the guest
+     */
     name: string;
+    /**
+     * timestamp of the confirmed time
+     */
     confirmedTime: number | null;
+    /**
+     * whether the guest came and was confirmed
+     */
     confirmed: boolean;
 }
 
@@ -47,7 +88,14 @@ export type GuestInGuestListData = CreateGuestInGuestListPayload & {
 };
 
 export interface EventLog {
+    /**
+     * message of the log
+     */
     message: string;
+    /**
+     * creator of the log
+     *
+     */
     creator: UserIdentifier & { role: Role | typeof ADMIN };
     /**
      * Remove Timestamp after some time has passed
