@@ -30,17 +30,11 @@ function createdByText(creator: Reservation["creator"]): string {
             <div class="col-6 font-black">{{ props.reservation.guestName }}</div>
         </template>
 
-        <template v-if="props.reservation.time">
-            <div class="col-6">{{ t("EventShowReservation.timeLabel") }}</div>
-            <div class="col-6 font-black">
-                {{ props.reservation.time }}
-            </div>
-        </template>
+        <div class="col-6">{{ t("EventShowReservation.timeLabel") }}</div>
+        <div class="col-6 font-black">{{ props.reservation.time }}</div>
 
         <div class="col-6">{{ t("EventShowReservation.numberOfPeopleLabel") }}</div>
-        <div class="col-6 font-black">
-            {{ props.reservation.numberOfGuests }}
-        </div>
+        <div class="col-6 font-black">{{ props.reservation.numberOfGuests }}</div>
 
         <template v-if="props.reservation.guestContact && authStore.canSeeGuestContact">
             <div class="col-6">{{ t("EventShowReservation.contactLabel") }}</div>
@@ -62,18 +56,14 @@ function createdByText(creator: Reservation["creator"]): string {
             <div class="col-6 font-black">{{ reservedByText(props.reservation.reservedBy) }}</div>
         </template>
 
-        <template v-if="props.reservation.creator && authStore.canSeeReservationCreator">
+        <template v-if="authStore.canSeeReservationCreator">
             <div class="col-6">{{ t("EventShowReservation.createdByLabel") }}</div>
-            <div class="col-6 font-black">
-                {{ createdByText(props.reservation.creator) }}
-            </div>
+            <div class="col-6 font-black">{{ createdByText(props.reservation.creator) }}</div>
 
-            <template v-if="props.reservation.creator.createdAt">
-                <div class="col-6">Created at</div>
-                <div class="col-6 font-black">
-                    {{ formatEventDate(props.reservation.creator.createdAt.toMillis(), null) }}
-                </div>
-            </template>
+            <div class="col-6">Created at</div>
+            <div class="col-6 font-black">
+                {{ formatEventDate(props.reservation.creator.createdAt.toMillis(), null) }}
+            </div>
         </template>
     </div>
 </template>

@@ -24,6 +24,9 @@ describe("EventShowReservation", () => {
                 id: "user1",
                 email: "foo",
                 name: "bar",
+                createdAt: {
+                    toMillis: () => 123_455,
+                },
             },
         };
         props = { reservation };
