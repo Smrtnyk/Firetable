@@ -53,11 +53,13 @@ describe("PageAdminEventsList", () => {
             events: [],
             done: false,
         });
-        const message = page.getByText("There are no events created for this property.");
-        expect(message).toBeTruthy();
+
+        expect
+            .element(page.getByText("There are no events created for this property."))
+            .toBeVisible();
     });
 
-    it("displays events grouped by year and month", () => {
+    it("displays events grouped by year and month", async () => {
         renderComponent(AdminPropertyEventsList, {
             propertyId,
             events,
@@ -65,19 +67,19 @@ describe("PageAdminEventsList", () => {
         });
 
         // Check for year headings
-        expect(page.getByText("2021")).toBeTruthy();
-        expect(page.getByText("2022")).toBeTruthy();
+        await expect.element(page.getByText("2021")).toBeVisible();
+        await expect.element(page.getByText("2022")).toBeVisible();
 
         // Check for month headings
-        expect(page.getByText("May")).toBeTruthy();
-        expect(page.getByText("June")).toBeTruthy();
-        expect(page.getByText("January")).toBeTruthy();
+        await expect.element(page.getByText("May")).toBeVisible();
+        await expect.element(page.getByText("June")).toBeVisible();
+        await expect.element(page.getByText("January")).toBeVisible();
 
         // Check for event names
-        expect(page.getByText("Event 1")).toBeTruthy();
-        expect(page.getByText("Event 2")).toBeTruthy();
-        expect(page.getByText("Event 3")).toBeTruthy();
-        expect(page.getByText("Event 4")).toBeTruthy();
+        await expect.element(page.getByText("Event 1")).toBeVisible();
+        await expect.element(page.getByText("Event 2")).toBeVisible();
+        await expect.element(page.getByText("Event 3")).toBeVisible();
+        await expect.element(page.getByText("Event 4")).toBeVisible();
     });
 
     it('emits "load" event when "Load More" button is clicked', async () => {
@@ -87,12 +89,9 @@ describe("PageAdminEventsList", () => {
             done: false,
         });
 
-        const loadMoreButton = page.getByRole("button", { name: "Load More" });
-        expect(loadMoreButton).toBeTruthy();
-
-        const emitted = screen.emitted();
-        await userEvent.click(loadMoreButton);
+        await userEvent.click(page.getByRole("button", { name: "Load More" }));
         // Check that the "load" event was emitted
+        const emitted = screen.emitted();
         expect(emitted.load).toBeTruthy();
         expect(emitted.load[0]).toEqual([]);
     });
@@ -109,23 +108,13 @@ describe("PageAdminEventsList", () => {
             done: false,
         });
 
-        await new Promise((resolve) => {
-            setTimeout(resolve, 0);
-        });
-
-        const editButton = screen.getByText("Edit");
-        const deleteButton = screen.getByText("Delete");
-
-        expect(editButton.query()).toBeTruthy();
-        expect(deleteButton.query()).toBeTruthy();
+        await userEvent.click(screen.getByText("Edit"));
 
         const emitted = screen.emitted();
-
-        await userEvent.click(editButton);
         expect(emitted.edit).toBeTruthy();
         expect(emitted.edit[0]).toEqual([mockEvent]);
 
-        await userEvent.click(deleteButton);
+        await userEvent.click(screen.getByText("Delete"));
         expect(emitted.delete).toBeTruthy();
         expect(emitted.delete[0]).toEqual([mockEvent]);
     });

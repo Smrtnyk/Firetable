@@ -27,7 +27,7 @@ describe("AppDrawer", () => {
         modelValue = true;
     });
 
-    it("displays user avatar, name, and email", () => {
+    it("displays user avatar, name, and email", async () => {
         screen = renderComponent(
             AppDrawer,
             {
@@ -43,14 +43,14 @@ describe("AppDrawer", () => {
             },
         );
 
-        expect(screen.getByText(user.name)).toBeTruthy();
-        expect(screen.getByText(user.email)).toBeTruthy();
+        await expect.element(screen.getByText(user.name)).toBeVisible();
+        await expect.element(screen.getByText(user.email)).toBeVisible();
 
         const avatarText = user.name
             .split(" ")
             .map((n) => n[0])
             .join("");
-        expect(screen.getByText(avatarText)).toBeTruthy();
+        await expect.element(screen.getByText(avatarText)).toBeVisible();
     });
 
     it("displays correct links for MANAGER role with no properties assigned", () => {
@@ -79,7 +79,7 @@ describe("AppDrawer", () => {
         expect(visibleLinks).toEqual(expect.arrayContaining(expectedLinks));
     });
 
-    it("renders logout button", () => {
+    it("renders logout button", async () => {
         screen = renderComponent(
             AppDrawer,
             {
@@ -95,8 +95,7 @@ describe("AppDrawer", () => {
             },
         );
 
-        const logoutButton = screen.getByLabelText("Logout");
-        expect(logoutButton.query().innerHTML).toContain("Logout");
+        await expect.element(screen.getByText("Logout")).toBeVisible();
     });
 
     it("toggles dark mode when the toggle is clicked", async () => {
@@ -118,10 +117,7 @@ describe("AppDrawer", () => {
         expect(Dark.isActive).toBe(false);
 
         const initialDarkModeInStorage = localStorage.getItem("FTDarkMode");
-        const darkModeToggle = screen.getByText("Toggle dark mode");
-        expect(darkModeToggle).toBeTruthy();
-
-        await userEvent.click(darkModeToggle);
+        await userEvent.click(screen.getByText("Toggle dark mode"));
 
         expect(Dark.isActive).toBe(true);
         expect(localStorage.getItem("FTDarkMode")).not.toBe(initialDarkModeInStorage);
@@ -169,11 +165,10 @@ describe("AppDrawer", () => {
             },
         );
 
-        const inventoryLink = screen.getByText("Manage Inventory");
-        expect(inventoryLink.query()).toBeNull();
+        expect(screen.getByText("Manage Inventory").query()).toBeNull();
     });
 
-    it("displays single Manage Inventory link when user has CAN_SEE_INVENTORY and one property", () => {
+    it("displays single Manage Inventory link when user has CAN_SEE_INVENTORY and one property", async () => {
         user.capabilities = {
             [UserCapability.CAN_SEE_INVENTORY]: true,
         };
@@ -200,12 +195,10 @@ describe("AppDrawer", () => {
             },
         );
 
-        const inventoryLink = screen.getByText("Manage Inventory");
-        expect(inventoryLink.query()).toBeTruthy();
+        await expect.element(screen.getByText("Manage Inventory")).toBeVisible();
 
         // Ensure it's a single link, not an expandable item
-        const expansionItem = screen.getByText("Property 1");
-        expect(expansionItem.query()).toBeNull();
+        expect(screen.getByText("Property 1").query()).toBeNull();
     });
 
     it("displays expandable Manage Inventory link when user has CAN_SEE_INVENTORY and multiple properties", async () => {
@@ -240,17 +233,12 @@ describe("AppDrawer", () => {
             },
         );
 
-        const inventoryLink = screen.getByText("Manage Inventory");
-        expect(inventoryLink.query()).toBeTruthy();
-
         // Simulate expanding the expandable item
-        await userEvent.click(inventoryLink);
+        await userEvent.click(screen.getByText("Manage Inventory"));
 
         // Check that property links are displayed
-        const propertyLink1 = screen.getByText("Property 1");
-        const propertyLink2 = screen.getByText("Property 2");
-        expect(propertyLink1.query()).toBeTruthy();
-        expect(propertyLink2.query()).toBeTruthy();
+        await expect.element(screen.getByText("Property 1")).toBeVisible();
+        await expect.element(screen.getByText("Property 2")).toBeVisible();
     });
 
     it("uses custom capabilities over default capabilities", () => {
@@ -283,8 +271,7 @@ describe("AppDrawer", () => {
 
         // Even though MANAGER role has CAN_SEE_INVENTORY by default,
         // the custom capabilities should override it
-        const inventoryLink = screen.getByText("Manage Inventory");
-        expect(inventoryLink.query()).toBeNull();
+        expect(screen.getByText("Manage Inventory").query()).toBeNull();
     });
 
     it("changes language when a new language is selected", async () => {
@@ -304,13 +291,9 @@ describe("AppDrawer", () => {
         );
 
         expect(getLocaleForTest().value).toBe("en-GB");
-        const languageSelect = screen.getByLabelText("Language");
-        expect(languageSelect.query()).toBeTruthy();
 
-        await userEvent.click(languageSelect);
-
-        const germanOption = screen.getByRole("option", { name: "German" });
-        await userEvent.click(germanOption);
+        await userEvent.click(screen.getByLabelText("Language"));
+        await userEvent.click(screen.getByRole("option", { name: "German" }));
 
         expect(getLocaleForTest().value).toBe("de");
     });

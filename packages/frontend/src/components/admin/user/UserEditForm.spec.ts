@@ -30,7 +30,7 @@ describe("UserEditForm", () => {
         };
     });
 
-    it("renders the form with initial values", () => {
+    it("renders the form with initial values", async () => {
         const screen = renderComponent(UserEditForm, props);
 
         // Check that the name input has the user's name
@@ -51,8 +51,7 @@ describe("UserEditForm", () => {
 
         // Role select should be present for editable roles
         if ([Role.MANAGER, Role.STAFF, Role.HOSTESS].includes(props.user.role)) {
-            const roleSelect = screen.getByLabelText("Role");
-            expect(roleSelect.query()).toBeTruthy();
+            await expect.element(screen.getByLabelText("Role")).toBeInTheDocument();
         }
 
         // Properties checkboxes should be rendered
@@ -92,7 +91,7 @@ describe("UserEditForm", () => {
         await userEvent.click(submitButton);
 
         // Expect validation error for name field
-        expect(screen.getByText("Please type something").query()).toBeTruthy();
+        await expect.element(screen.getByText("Please type something")).toBeVisible();
     });
 
     it("emits submit event with correct payload", async () => {

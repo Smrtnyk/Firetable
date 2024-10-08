@@ -12,12 +12,11 @@ describe("ReturningGuestsList", () => {
         };
     });
 
-    it("renders 'No returning guests' message when list is empty", () => {
+    it("renders 'No returning guests' message when list is empty", async () => {
         const screen = renderComponent(AdminEventReturningGuestsList, props);
 
         // Check that the 'No returning guests' message is displayed
-        const noGuestsMessage = screen.getByText("No returning guests").query();
-        expect(noGuestsMessage).toBeTruthy();
+        await expect.element(screen.getByText("No returning guests")).toBeVisible();
 
         // Ensure that no guest items are rendered
         const guestItems = screen.getByRole("listitem").elements();

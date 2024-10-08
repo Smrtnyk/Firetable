@@ -273,7 +273,7 @@ describe("UserCreateForm", () => {
         const submitButton = screen.getByRole("button", { name: t("Global.submit") });
         await userEvent.click(submitButton);
 
-        expect(screen.getByText("Password is required.")).toBeTruthy();
+        await expect.element(screen.getByText("Password is required.")).toBeVisible();
     });
 
     it("validates that password meets minimum length", async () => {
@@ -302,7 +302,9 @@ describe("UserCreateForm", () => {
         const submitButton = screen.getByRole("button", { name: t("Global.submit") });
         await userEvent.click(submitButton);
 
-        expect(screen.getByText("Password must be at least 6 characters long.")).toBeTruthy();
+        expect
+            .element(screen.getByText("Password must be at least 6 characters long."))
+            .toBeVisible();
     });
 
     it("validates that password includes at least one uppercase letter, one number, and one symbol", async () => {

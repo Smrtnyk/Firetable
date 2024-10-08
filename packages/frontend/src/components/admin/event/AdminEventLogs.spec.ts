@@ -85,12 +85,12 @@ describe("AdminEventLogs", () => {
             });
         });
 
-        it("displays correct icons for log messages", () => {
+        it("displays correct icons for log messages", async () => {
             for (const log of sampleLogs) {
                 const expectedIconName = getIconNameForLogEntry(log.message);
 
                 const messageElement = page.getByText(log.message);
-                expect(messageElement).toBeTruthy();
+                await expect.element(messageElement).toBeVisible();
 
                 const timelineEntryHandle = messageElement.element().closest(".q-timeline__entry");
                 const iconHandle = timelineEntryHandle.querySelector(".q-icon");

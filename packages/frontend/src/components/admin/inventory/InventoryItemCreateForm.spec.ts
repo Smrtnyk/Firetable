@@ -14,10 +14,6 @@ describe("InventoryItemCreateForm.vue", () => {
             screen = renderComponent(InventoryItemCreateForm);
         });
 
-        it("renders correctly", () => {
-            expect(screen.container).toBeTruthy();
-        });
-
         it("has the correct initial form data", async () => {
             const nameInput = page.getByLabelText("Name");
             await expect.element(nameInput).toHaveValue("");
@@ -50,14 +46,9 @@ describe("InventoryItemCreateForm.vue", () => {
             await userEvent.click(submitButton);
 
             // Check for validation error messages
-            const nameError = page.getByText("Name is required");
-            expect(nameError.elements().length).toBeTruthy();
-
-            const priceError = page.getByText("Price must be positive");
-            expect(priceError.elements().length).toBeTruthy();
-
-            const quantityError = page.getByText("Quantity must be positive");
-            expect(quantityError.elements().length).toBeTruthy();
+            await expect.element(page.getByText("Name is required")).toBeVisible();
+            await expect.element(page.getByText("Price must be positive")).toBeVisible();
+            await expect.element(page.getByText("Quantity must be positive")).toBeVisible();
         });
 
         it("emits submit event with correct data when form is valid", async () => {
