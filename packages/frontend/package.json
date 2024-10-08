@@ -16,7 +16,7 @@
     },
     "devDependencies": {
         "@pinia/testing": "0.1.6",
-        "@playwright/test": "1.47.2",
+        "@playwright/test": "1.48.0",
         "@quasar/app-vite": "2.0.0-beta.21",
         "@quasar/vite-plugin": "1.7.0",
         "@vitejs/plugin-vue": "5.1.4",
