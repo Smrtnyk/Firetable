@@ -67,7 +67,7 @@ describe("createPropertyFn", () => {
         const propertyData = mockFirestore.getDataAtPath(
             getPropertyPath(organisationId, propertyId),
         );
-        expect(propertyData).toStrictEqual({
+        expect(propertyData.data).toStrictEqual({
             name: propertyName,
             organisationId,
             creatorId: userId,
@@ -76,6 +76,6 @@ describe("createPropertyFn", () => {
 
         // Check if the user's related properties are updated
         const updatedUserData = mockFirestore.getDataAtPath(getUserPath(organisationId, userId));
-        expect(updatedUserData.relatedProperties).toContain(propertyId);
+        expect(updatedUserData.data.relatedProperties).toContain(propertyId);
     });
 });

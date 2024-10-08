@@ -4,7 +4,7 @@ import { MockFirestore } from "../../../test-helpers/MockFirestore.js";
 import * as Init from "../../init.js";
 import { getEventPath } from "../../paths.js";
 import { createEvent } from "./index.js";
-import { beforeEach } from "vitest";
+import { beforeEach, describe, vi, it, expect } from "vitest";
 
 const AUTH_USER_EMAIL = "test@example.com";
 const ORGANISATION_ID = "org456";
@@ -49,7 +49,7 @@ describe("create-event", () => {
         const pathToEvent = getEventPath(ORGANISATION_ID, PROPERTY_ID, result.id);
 
         // Check if the data is correctly stored in the mock Firestore
-        const eventData = db.getDataAtPath(pathToEvent);
+        const eventData = db.getDataAtPath(pathToEvent).data;
 
         expect(eventData).toStrictEqual({
             creator: AUTH_USER_EMAIL,

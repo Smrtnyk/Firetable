@@ -24,15 +24,15 @@ export class MockAuth implements Partial<Auth> {
         const uid = generateRandomId();
         const newUser: UserRecord = {
             uid,
-            email: userDetails.email ?? null,
-            displayName: userDetails.displayName ?? null,
-            photoURL: userDetails.photoURL ?? null,
-            phoneNumber: userDetails.phoneNumber ?? null,
+            email: userDetails.email,
+            displayName: userDetails.displayName,
+            photoURL: userDetails.photoURL,
+            phoneNumber: userDetails.phoneNumber,
             emailVerified: userDetails.emailVerified ?? false,
             disabled: userDetails.disabled ?? false,
             metadata: {
                 creationTime: new Date().toISOString(),
-                lastSignInTime: null,
+                lastSignInTime: "",
                 toJSON() {
                     return this;
                 },

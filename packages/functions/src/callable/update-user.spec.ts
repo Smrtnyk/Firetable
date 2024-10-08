@@ -67,6 +67,12 @@ describe("updateUserFn", () => {
                     email,
                     relatedProperties: ["property1"],
                 });
+            await mockFirestore.doc(getPropertyPath(organisationId, "property1")).set({
+                relatedUsers: [uid],
+            });
+            await mockFirestore.doc(getPropertyPath(organisationId, "property2")).set({
+                relatedUsers: [],
+            });
 
             // Simulate the callable request
             const request = {
@@ -78,7 +84,7 @@ describe("updateUserFn", () => {
             expect(result).toEqual({ success: true, message: "User updated successfully." });
 
             // Verify user details updated in Firestore
-            const userDoc = mockFirestore.getDataAtPath(getUserPath(organisationId, uid));
+            const userDoc = mockFirestore.getDataAtPath(getUserPath(organisationId, uid)).data;
 
             expect(userDoc.name).toBe(updatedUser.name);
             expect(userDoc.email).toBe(updatedUser.email);
@@ -135,6 +141,12 @@ describe("updateUserFn", () => {
                 password: "oldPassword",
             });
 
+            // Create user doc
+            await mockFirestore.doc(getUserPath("org1", uid)).set({
+                name: "Test User",
+                email: "",
+            });
+
             const request = {
                 auth: { uid },
                 data: {
@@ -182,6 +194,11 @@ describe("updateUserFn", () => {
                 email: "test@example.com",
                 password: "password",
             });
+            // Create user doc
+            await mockFirestore.doc(getUserPath(organisationId, uid)).set({
+                name: "Test User",
+                email: "",
+            });
 
             await mockAuth.setCustomUserClaims(uid, { role: "user", organisationId });
 
@@ -212,6 +229,11 @@ describe("updateUserFn", () => {
                 role: Role.STAFF,
                 password: "password",
             });
+            // Add user doc
+            await mockFirestore.doc(getUserPath(organisationId, uid)).set({
+                name: "Test User",
+                email: "",
+            });
 
             // Setup initial mock properties without the user associated
             for (const propertyId of propertiesToAdd) {
@@ -240,7 +262,7 @@ describe("updateUserFn", () => {
                 const propertyDoc = mockFirestore.getDataAtPath(
                     getPropertyPath(organisationId, propertyId),
                 );
-                expect(propertyDoc.relatedUsers).toContain(uid);
+                expect(propertyDoc.data.relatedUsers).toContain(uid);
             }
         });
 
@@ -253,6 +275,11 @@ describe("updateUserFn", () => {
                 organisationId,
                 role: Role.STAFF,
                 password: "password",
+            });
+            // Add user doc
+            await mockFirestore.doc(getUserPath(organisationId, uid)).set({
+                name: "Test User",
+                email: "",
             });
 
             // Setup initial mock properties with the user associated
@@ -281,7 +308,7 @@ describe("updateUserFn", () => {
                 const propertyDoc = mockFirestore.getDataAtPath(
                     getPropertyPath(organisationId, propertyId),
                 );
-                expect(propertyDoc.relatedUsers).not.toContain(uid);
+                expect(propertyDoc.data.relatedUsers).not.toContain(uid);
             }
         });
     });

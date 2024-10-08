@@ -41,6 +41,14 @@ describe("createUser", () => {
     });
 
     it("creates a new user and store their data in Firestore", async () => {
+        // create related properties
+        for (const propertyId of testUserData.relatedProperties) {
+            await mockFirestore
+                .collection(`organisations/${testUserData.organisationId}/properties`)
+                .doc(propertyId)
+                .set({ id: propertyId });
+        }
+
         const result = await createUser({
             data: testUserData,
         } as CallableRequest<CreateUserPayload>);
@@ -52,7 +60,7 @@ describe("createUser", () => {
         const userDoc = mockFirestore.getDataAtPath(
             getUserPath(testUserData.organisationId, result.uid),
         );
-        expect(userDoc).toEqual(
+        expect(userDoc.data).toEqual(
             expect.objectContaining({
                 name: "Test User",
                 email: "test@example.com",
