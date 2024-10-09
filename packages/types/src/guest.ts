@@ -1,5 +1,3 @@
-import type { QueryDocumentSnapshot } from "firebase/firestore";
-
 interface PreparedGuestData {
     arrived: boolean;
     cancelled: boolean | undefined;
@@ -40,7 +38,6 @@ export interface GuestDoc {
     hashedContact: string;
     maskedContact: string;
     visitedProperties: VisitedProperties;
-    _doc: QueryDocumentSnapshot<GuestDoc>;
 }
 
-export type CreateGuestPayload = Omit<GuestDoc, "_doc" | "id">;
+export type CreateGuestPayload = Omit<GuestDoc, "id">;
