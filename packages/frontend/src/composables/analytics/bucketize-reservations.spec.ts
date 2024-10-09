@@ -9,8 +9,8 @@ import {
 import { describe, it, expect } from "vitest";
 
 const mockProperties: PropertyDoc[] = [
-    { id: "prop1", name: "Property One", _doc: {} as any, organisationId: "123", relatedUsers: [] },
-    { id: "prop2", name: "Property Two", _doc: {} as any, organisationId: "123", relatedUsers: [] },
+    { id: "prop1", name: "Property One", organisationId: "123", relatedUsers: [] },
+    { id: "prop2", name: "Property Two", organisationId: "123", relatedUsers: [] },
 ];
 
 const mockEvents: EventDoc[] = [

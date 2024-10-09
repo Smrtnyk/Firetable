@@ -24,8 +24,8 @@ describe("UserCreateForm", () => {
     beforeEach(() => {
         props = {
             properties: [
-                { id: "property1", name: "Property 1", _doc: {} as any } as PropertyDoc,
-                { id: "property2", name: "Property 2", _doc: {} as any } as PropertyDoc,
+                { id: "property1", name: "Property 1" } as PropertyDoc,
+                { id: "property2", name: "Property 2" } as PropertyDoc,
             ],
             organisation: {
                 id: "org1",

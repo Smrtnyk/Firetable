@@ -26,9 +26,7 @@ describe("UserEditForm", () => {
                 { id: "property1", name: "Property 1" } as PropertyDoc,
                 { id: "property2", name: "Property 2" } as PropertyDoc,
             ],
-            selectedProperties: [
-                { id: "property1", name: "Property 1", _doc: {} as any } as PropertyDoc,
-            ],
+            selectedProperties: [{ id: "property1", name: "Property 1" } as PropertyDoc],
             organisation: {
                 id: "org1",
                 name: "TestOrg",
