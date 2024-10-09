@@ -1,13 +1,7 @@
 import type {
-    CollectionReference,
-    DocumentReference,
-    DocumentSnapshot,
     FieldPath,
-    FieldValue,
-    Firestore,
     FirestoreDataConverter,
     OrderByDirection,
-    Query,
     ReadOptions,
     Settings,
     WhereFilterOp,
@@ -31,7 +25,7 @@ const validOperators: WhereFilterOp[] = [
     "array-contains-any",
 ];
 
-export class MockFirestore implements Firestore {
+export class MockFirestore {
     simulateNetworkError = false;
     simulateTimeoutError = false;
     data: FirestoreData = new Map();
@@ -107,7 +101,7 @@ export class MockFirestore implements Firestore {
     }
 
     bulkWriter(): MockBulkWriter {
-        return new MockBulkWriter(this);
+        return new MockBulkWriter();
     }
 
     bundle(name?: string): MockBundleBuilder {
@@ -190,14 +184,13 @@ export class MockFirestore implements Firestore {
     }
 }
 
-class MockQuery implements Query {
+class MockQuery {
     docs: MockQueryDocumentSnapshot[] = [];
     protected path: string;
     protected firestore: MockFirestore;
     protected converter: FirestoreDataConverter<any> | null;
     private readonly collectionGroupId: string | undefined;
     private queryConstraints: any[] = [];
-    private readonly orderByField: string | null = null;
     private listeners: Array<(snapshot: MockQuerySnapshot) => void> = [];
     private lastSnapshot: MockQuerySnapshot | null = null;
     private offsetValue = 0;
@@ -805,13 +798,10 @@ class MockQuery implements Query {
     }
 }
 
-export class MockCollection extends MockQuery implements CollectionReference {
+export class MockCollection extends MockQuery {
     override readonly path: string;
     override readonly firestore: MockFirestore;
-    readonly id: string;
-    parent: MockDocumentReference | null;
-
-    private override readonly converter: FirestoreDataConverter<any> | null;
+    override readonly converter: FirestoreDataConverter<any> | null;
 
     constructor(
         path: string,
@@ -822,14 +812,6 @@ export class MockCollection extends MockQuery implements CollectionReference {
         this.path = path;
         this.firestore = firestore;
         this.converter = converter;
-    }
-
-    findNearest() {
-        throw new NotImplementedError("findNearest is not implemented");
-    }
-
-    override explainStream(...args: any[]): NodeJS.ReadableStream {
-        throw new NotImplementedError("explainStream is not implemented");
     }
 
     override withConverter<U>(converter: FirestoreDataConverter<U>): MockCollection {
@@ -871,7 +853,7 @@ function applyUpdate(current: any, path: string[], value: any): void {
     }
 }
 
-export class MockDocumentReference implements DocumentReference {
+export class MockDocumentReference {
     public path: string;
     public firestore: MockFirestore;
     public id: string;
@@ -904,7 +886,7 @@ export class MockDocumentReference implements DocumentReference {
             try {
                 const snapshot = await instance.get();
                 onNext(snapshot);
-            } catch (error) {
+            } catch (error: any) {
                 if (onError) onError(error);
             }
         })(this);
@@ -1248,7 +1230,7 @@ export class MockTransaction {
     }
 }
 
-export class MockDocumentSnapshot implements DocumentSnapshot {
+export class MockDocumentSnapshot {
     createTime: Timestamp | undefined;
     updateTime: Timestamp | undefined;
     readTime = Timestamp.now();
@@ -1309,7 +1291,7 @@ export class MockDocumentSnapshot implements DocumentSnapshot {
 }
 
 export class MockQueryDocumentSnapshot extends MockDocumentSnapshot {
-    data(): any | undefined {
+    override data(): any | undefined {
         const data = super.data();
         return this.ref.converter ? this.ref.converter.fromFirestore(data) : data;
     }
@@ -1326,7 +1308,6 @@ class MockQuerySnapshot {
     size: number;
     query: any;
     empty: boolean;
-    readTime = Timestamp.now();
     docs: MockQueryDocumentSnapshot[];
 
     private readonly previousDocs: MockQueryDocumentSnapshot[] | null;
@@ -1414,7 +1395,7 @@ type MockFieldValueOptions =
     | "delete"
     | "increment"
     | "serverTimestamp";
-export class MockFieldValue implements FieldValue {
+export class MockFieldValue {
     readonly operation: MockFieldValueOptions;
     private readonly elements: any[];
 
@@ -1472,7 +1453,7 @@ export class MockFieldValue implements FieldValue {
     }
 }
 
-export class MockFieldPath implements FieldPath {
+export class MockFieldPath {
     private readonly fieldPath: string;
     private constructor(fieldPath: string) {
         this.fieldPath = fieldPath;
@@ -1602,11 +1583,6 @@ type BulkWriterOperation = {
 class MockBulkWriter {
     private operations: BulkWriterOperation[] = [];
     private isClosed = false;
-    private readonly firestore: MockFirestore;
-
-    constructor(firestore: MockFirestore) {
-        this.firestore = firestore;
-    }
 
     set(docRef: MockDocumentReference, data: any): Promise<MockWriteResult> {
         return this.enqueueOperation(FirestoreOperation.SET, docRef, data);
@@ -1654,7 +1630,7 @@ class MockBulkWriter {
                         );
                 }
                 operation.resolve(new MockWriteResult());
-            } catch (error) {
+            } catch (error: any) {
                 operation.reject(error);
             }
         }

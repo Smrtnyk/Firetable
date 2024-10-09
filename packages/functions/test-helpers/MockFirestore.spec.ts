@@ -919,7 +919,7 @@ describe("MockFirestore", () => {
             const unsubscribe = docRef.onSnapshot(onNext);
 
             // Wait for any asynchronous operations
-            await new Promise(process.nextTick);
+            await setTimeout(1);
 
             // Initially, the document does not exist
             let snapshot = onNext.mock.calls[0][0];
@@ -927,7 +927,7 @@ describe("MockFirestore", () => {
 
             // Set data
             await docRef.set({ key: "value" });
-            await new Promise(process.nextTick);
+            await setTimeout(1);
 
             // Should have been called again
             expect(onNext).toHaveBeenCalledTimes(2);
@@ -937,7 +937,7 @@ describe("MockFirestore", () => {
 
             // Update data
             await docRef.update({ key: "newValue" });
-            await new Promise(process.nextTick);
+            await setTimeout(1);
 
             expect(onNext).toHaveBeenCalledTimes(3);
             snapshot = onNext.mock.calls[2][0];
@@ -945,7 +945,7 @@ describe("MockFirestore", () => {
 
             // Delete document
             await docRef.delete();
-            await new Promise(process.nextTick);
+            await setTimeout(1);
 
             expect(onNext).toHaveBeenCalledTimes(4);
             snapshot = onNext.mock.calls[3][0];
@@ -1013,7 +1013,7 @@ describe("MockFirestore", () => {
             const unsubscribe = collectionRef.onSnapshot(onNext);
 
             // Wait for any asynchronous operations
-            await new Promise(process.nextTick);
+            await setTimeout(1);
 
             expect(onNext).toHaveBeenCalled();
             const snapshot = onNext.mock.calls[0][0];
@@ -1030,7 +1030,7 @@ describe("MockFirestore", () => {
             const unsubscribe = collectionRef.onSnapshot(onNext);
 
             // Wait for any asynchronous operations
-            await new Promise(process.nextTick);
+            await setTimeout(1);
 
             // Initially, the collection is empty
             let snapshot = onNext.mock.calls[0][0];
@@ -1038,7 +1038,7 @@ describe("MockFirestore", () => {
 
             // Add a document
             await collectionRef.doc("doc1").set({ key: "value1" });
-            await new Promise(process.nextTick);
+            await setTimeout(1);
 
             // Should have been called again
             expect(onNext).toHaveBeenCalledTimes(2);
@@ -1091,11 +1091,11 @@ describe("MockFirestore", () => {
             const unsubscribe = collectionRef.onSnapshot(onNext);
 
             // Wait for any asynchronous operations
-            await new Promise(process.nextTick);
+            await setTimeout(1);
 
             // Delete the document
             await collectionRef.doc("doc1").delete();
-            await new Promise(process.nextTick);
+            await setTimeout(1);
 
             expect(onNext).toHaveBeenCalledTimes(2);
             const snapshot = onNext.mock.calls[1][0];
