@@ -61,7 +61,6 @@ const mockReservations: ReservationDocWithEventId[] = [
         arrived: true,
         consumption: 100,
         reservedBy: { email: "reserver@example.com", id: "reserver", name: "Reserver One" },
-        _doc: {} as any,
     },
     {
         id: "res2",
@@ -106,7 +105,6 @@ const mockReservations: ReservationDocWithEventId[] = [
         arrived: false,
         consumption: 70,
         reservedBy: { email: "reserver@example.com", id: "reserver", name: "Reserver One" },
-        _doc: {} as any,
     },
 ];
 

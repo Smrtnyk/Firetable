@@ -35,7 +35,6 @@ describe("EventShowReservation", () => {
                 name: "bar",
                 createdAt: 123_455,
             },
-            _doc: {} as any,
         };
         props = { reservation };
     });
