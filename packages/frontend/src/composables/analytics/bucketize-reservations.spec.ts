@@ -81,7 +81,6 @@ const mockReservations: ReservationDocWithEventId[] = [
         isVIP: false,
         arrived: true,
         consumption: 50,
-        _doc: {} as any,
     },
     {
         id: "res3",

@@ -1,4 +1,3 @@
-import type { QueryDocumentSnapshot } from "firebase/firestore";
 import type { BaseReservation } from "./base-reservation.js";
 import type { PlannedReservation } from "./planned-reservation.js";
 import type { QueuedReservation } from "./queued-reservation.js";
@@ -13,7 +12,6 @@ export interface WalkInReservation extends BaseReservation {
 
 export type WalkInReservationDoc = WalkInReservation & {
     id: string;
-    _doc: QueryDocumentSnapshot<WalkInReservation>;
 };
 
 export function isAWalkInReservation(
