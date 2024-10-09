@@ -2,9 +2,9 @@ import type { QueuedReservationDoc } from "@firetable/types";
 import type { RenderResult } from "vitest-browser-vue";
 import EventShowQueuedReservation from "./EventShowQueuedReservation.vue";
 import { renderComponent } from "../../../../test-helpers/render-component";
-import { useAuthStore } from "../../../stores/auth-store";
-import { Role } from "@firetable/types";
-import { describe, it, expect } from "vitest";
+import { ReservationStatus, ReservationType, Role } from "@firetable/types";
+import { useAuthStore } from "src/stores/auth-store";
+import { describe, expect, it } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 
 describe("EventShowQueuedReservation", () => {
@@ -24,12 +24,10 @@ describe("EventShowQueuedReservation", () => {
             id: "creator456",
             email: "creator@example.com",
             name: "Creator Name",
-            createdAt: {
-                toMillis: () => 1_600_000_000_000,
-            },
+            createdAt: 1_600_000_000_000,
         },
-        date: 1_680_000_000_000,
-        status: 1,
+        status: ReservationStatus.ACTIVE,
+        type: ReservationType.QUEUED,
     };
 
     /**
@@ -139,7 +137,7 @@ describe("EventShowQueuedReservation", () => {
 
         // Rerender the component to reflect the store change
         const authStore = useAuthStore();
-        authStore.user.role = Role.MANAGER;
+        authStore.user!.role = Role.MANAGER;
         screen.rerender({});
 
         // Now, the button should be present
@@ -174,7 +172,7 @@ describe("EventShowQueuedReservation", () => {
 
         // Update authStore to make the user the owner
         const authStore = useAuthStore();
-        authStore.user.id = "creator456";
+        authStore.user!.id = "creator456";
         screen.rerender({});
 
         // Now, the button should be present

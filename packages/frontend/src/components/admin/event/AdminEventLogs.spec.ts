@@ -3,39 +3,41 @@ import type { RenderResult } from "vitest-browser-vue";
 import type { AdminEventLogsProps } from "./AdminEventLogs.vue";
 import AdminEventLogs from "./AdminEventLogs.vue";
 import { renderComponent } from "../../../../test-helpers/render-component";
-import { formatEventDate } from "../../../helpers/date-utils";
-import { ADMIN } from "@firetable/types";
+import { ADMIN, Role } from "@firetable/types";
+import { formatEventDate } from "src/helpers/date-utils";
 import { beforeEach, describe, expect, it } from "vitest";
 import { page } from "@vitest/browser/context";
-import { Timestamp } from "firebase/firestore";
 
 const sampleLogs: EventLog[] = [
     {
         message: "User John Doe created a reservation.",
         creator: {
+            id: "foo",
             name: "John Doe",
             email: "john@example.com",
-            role: "Manager",
+            role: Role.MANAGER,
         },
-        timestamp: Timestamp.fromMillis(1_633_017_600_000),
+        timestamp: 1_633_017_600_000,
     },
     {
         message: "Admin deleted a reservation.",
         creator: {
+            id: "bar",
             name: "Admin",
             email: "admin@example.com",
             role: ADMIN,
         },
-        timestamp: Timestamp.fromMillis(1_633_104_000_000),
+        timestamp: 1_633_104_000_000,
     },
     {
         message: "User Jane Smith edited a reservation.",
         creator: {
+            id: "baz",
             name: "Jane Smith",
             email: "jane@example.com",
-            role: "Staff",
+            role: Role.STAFF,
         },
-        timestamp: Timestamp.fromMillis(1_633_190_400_000),
+        timestamp: 1_633_190_400_000,
     },
 ];
 
@@ -93,10 +95,10 @@ describe("AdminEventLogs", () => {
                 await expect.element(messageElement).toBeVisible();
 
                 const timelineEntryHandle = messageElement.element().closest(".q-timeline__entry");
-                const iconHandle = timelineEntryHandle.querySelector(".q-icon");
+                const iconHandle = timelineEntryHandle!.querySelector(".q-icon");
 
                 if (expectedIconName) {
-                    const iconName = iconHandle.innerHTML;
+                    const iconName = iconHandle!.innerHTML;
                     expect(iconName).toContain(expectedIconName);
                 } else {
                     expect(iconHandle).toBeNull();
@@ -106,7 +108,7 @@ describe("AdminEventLogs", () => {
 
         it("formats subtitles correctly", async () => {
             for (const log of sampleLogs) {
-                const datePart = formatEventDate(log.timestamp.toMillis(), null);
+                const datePart = formatEventDate(log.timestamp as number, null);
                 const userPart = `${log.creator.name} (${log.creator.email})`;
                 const expectedSubtitle = `${datePart}, by ${userPart}`;
 
@@ -137,7 +139,7 @@ describe("AdminEventLogs", () => {
             const adminLog = sampleLogs.find(function (log) {
                 return log.creator.role === ADMIN;
             });
-            const adminMessage = adminLog.message;
+            const adminMessage = adminLog!.message;
 
             const elements = Array.from(document.querySelectorAll("*"));
             const adminElementExists = elements.some(function (element) {
@@ -150,15 +152,20 @@ describe("AdminEventLogs", () => {
 
     it('shows "Scroll to Bottom" button when scrolled away from top and bottom, and scrolls to bottom when button is clicked', async () => {
         const numberOfLogs = 50;
-        const logs: EventLog[] = Array.from({ length: numberOfLogs }, (_, i) => ({
-            message: `Log message ${i}`,
-            creator: {
-                name: `User ${i}`,
-                email: `user${i}@example.com`,
-                role: "User",
-            },
-            timestamp: Timestamp.fromMillis(Date.now() - i * 1000),
-        }));
+        const logs = Array.from(
+            { length: numberOfLogs },
+            (_, i) =>
+                ({
+                    message: `Log message ${i}`,
+                    creator: {
+                        id: Math.random().toString(),
+                        name: `User ${i}`,
+                        email: `user${i}@example.com`,
+                        role: Role.STAFF,
+                    },
+                    timestamp: Date.now() - i * 1000,
+                }) as EventLog,
+        );
 
         screen = renderComponent(
             AdminEventLogs,
@@ -174,18 +181,18 @@ describe("AdminEventLogs", () => {
         expect(scrollAreaElement).toBeTruthy();
 
         // Get the scrolling element inside QScrollArea
-        const scrollContentElement = scrollAreaElement.querySelector(".q-scrollarea__container");
+        const scrollContentElement = scrollAreaElement!.querySelector(".q-scrollarea__container");
         expect(scrollContentElement).toBeTruthy();
 
         // Calculate the scrollable height
         const scrollableHeight =
-            scrollContentElement.scrollHeight - scrollContentElement.clientHeight;
+            scrollContentElement!.scrollHeight - scrollContentElement!.clientHeight;
 
         // Set scrollTop to 30% of the scrollable height
-        scrollContentElement.scrollTop = scrollableHeight * 0.3;
+        scrollContentElement!.scrollTop = scrollableHeight * 0.3;
 
         // Dispatch a scroll event to trigger handleScroll
-        scrollContentElement.dispatchEvent(new Event("scroll"));
+        scrollContentElement!.dispatchEvent(new Event("scroll"));
 
         await new Promise((resolve) => {
             setTimeout(resolve, 222);
@@ -194,7 +201,7 @@ describe("AdminEventLogs", () => {
         // Assert that the "Scroll to Bottom" button appears
         const scrollButton = document.querySelector<HTMLButtonElement>(".q-btn--fab");
         expect(scrollButton).toBeTruthy();
-        scrollButton.click();
+        scrollButton!.click();
 
         // Wait for the scroll animation to complete (animation duration is 1000ms)
         await new Promise((resolve) => {
@@ -202,12 +209,12 @@ describe("AdminEventLogs", () => {
         });
 
         // Dispatch a scroll event to update the component's state
-        scrollContentElement.dispatchEvent(new Event("scroll"));
+        scrollContentElement!.dispatchEvent(new Event("scroll"));
 
         // Verify that scrollTop is at the bottom
         const isAtBottom =
-            scrollContentElement.scrollTop + scrollContentElement.clientHeight >=
-            scrollContentElement.scrollHeight;
+            scrollContentElement!.scrollTop + scrollContentElement!.clientHeight >=
+            scrollContentElement!.scrollHeight;
         expect(isAtBottom).toBe(true);
 
         // Assert that the "Scroll to Bottom" button disappears

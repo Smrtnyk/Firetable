@@ -1,8 +1,8 @@
 import type { PlannedReservationDoc } from "@firetable/types";
 import EventShowReservation from "./EventShowReservation.vue";
 import { renderComponent, t } from "../../../test-helpers/render-component";
-import { UserCapability, ReservationType, Role } from "@firetable/types";
-import { describe, it, expect, beforeEach } from "vitest";
+import { ReservationStatus, ReservationType, Role, UserCapability } from "@firetable/types";
+import { beforeEach, describe, expect, it } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 
 describe("EventShowReservation", () => {
@@ -12,11 +12,20 @@ describe("EventShowReservation", () => {
         const reservation: PlannedReservationDoc = {
             id: "reservation1",
             arrived: false,
+            isVIP: false,
+            numberOfGuests: 2,
             cancelled: false,
             reservationConfirmed: false,
             waitingForResponse: false,
             type: ReservationType.PLANNED,
+            consumption: 0,
+            time: "22:00",
+            status: ReservationStatus.ACTIVE,
+            floorId: "floor1",
+            tableLabel: "table1",
+            guestName: "John Doe",
             reservedBy: {
+                id: "user1",
                 email: "foo",
                 name: "bar",
             },
@@ -24,10 +33,9 @@ describe("EventShowReservation", () => {
                 id: "user1",
                 email: "foo",
                 name: "bar",
-                createdAt: {
-                    toMillis: () => 123_455,
-                },
+                createdAt: 123_455,
             },
+            _doc: {} as any,
         };
         props = { reservation };
     });

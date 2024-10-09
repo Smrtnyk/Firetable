@@ -1,9 +1,10 @@
+import type { AdminEventReturningGuestsListProps } from "./AdminEventReturningGuestsList.vue";
 import AdminEventReturningGuestsList from "./AdminEventReturningGuestsList.vue";
 import { renderComponent } from "../../../../test-helpers/render-component";
 import { describe, it, expect, beforeEach } from "vitest";
 
 describe("ReturningGuestsList", () => {
-    let props;
+    let props: AdminEventReturningGuestsListProps;
 
     beforeEach(() => {
         props = {
@@ -24,17 +25,23 @@ describe("ReturningGuestsList", () => {
     });
 
     it("renders a list of returning guests", () => {
+        const sampleVisit = {
+            date: Date.now(),
+            arrived: true,
+            eventName: "Event 1",
+            cancelled: false,
+        };
         props.returningGuests = [
             {
                 name: "John Doe",
                 contact: "john@example.com",
-                visits: [{ date: Date.now() }],
+                visits: [sampleVisit],
                 tableLabels: ["Table 1", "Table 2"],
             },
             {
                 name: "Jane Smith",
                 contact: "jane@example.com",
-                visits: [{ date: Date.now() }, { date: Date.now() }],
+                visits: [sampleVisit, sampleVisit],
                 tableLabels: ["Table 3"],
             },
         ];

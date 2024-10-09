@@ -13,7 +13,7 @@ import { QForm } from "quasar";
 import { noEmptyString, noWhiteSpaces } from "src/helpers/form-rules";
 import { property } from "es-toolkit/compat";
 
-interface Props {
+export interface UserEditFormProps {
     user: User;
     properties: PropertyDoc[];
     selectedProperties: PropertyDoc[];
@@ -27,7 +27,7 @@ const stringRules = [noWhiteSpaces];
 const userNameRules = [noWhiteSpaces];
 
 const emit = defineEmits<Emits>();
-const props = defineProps<Props>();
+const props = defineProps<UserEditFormProps>();
 const userEditForm = useTemplateRef<QForm>("userEditForm");
 
 function getUserCapabilities(): UserCapabilities {

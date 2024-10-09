@@ -110,7 +110,7 @@ defineExpose({
             :label="t(`EventCreateReservation.reservationTime`)"
         >
             <template #append>
-                <q-icon name="clock" class="cursor-pointer" />
+                <q-icon name="clock" class="cursor-pointer" aria-label="Open time picker" />
                 <q-popup-proxy transition-show="scale" transition-hide="scale">
                     <q-time
                         :options="

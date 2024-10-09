@@ -59,7 +59,7 @@ function showEditInventoryItemForm(item: InventoryItemDoc): void {
         componentProps: {
             component: InventoryItemCreateForm,
             componentPropsObject: {
-                itemToEdit: omit(item, ["id", "_doc"]),
+                itemToEdit: omit(item, ["id"]),
             },
             maximized: false,
             title: t("PageAdminInventory.editInventoryItemDialogTitle", {

@@ -64,6 +64,7 @@ async function onSubmit(): Promise<void> {
                                 :name="isPwd ? 'eye-open' : 'eye-off'"
                                 class-name="cursor-pointer"
                                 @click="() => (isPwd = !isPwd)"
+                                aria-label="Toggle password visibility"
                             />
                         </template>
                     </q-input>

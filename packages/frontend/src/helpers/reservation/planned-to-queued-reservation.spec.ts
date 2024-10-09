@@ -1,7 +1,7 @@
 import type { PlannedReservation, QueuedReservation } from "@firetable/types";
 import { plannedToQueuedReservation } from "./planned-to-queued-reservation";
-import { ReservationType } from "@firetable/types";
-import { describe, it, expect, vi } from "vitest";
+import { ReservationStatus, ReservationType } from "@firetable/types";
+import { describe, expect, it, vi } from "vitest";
 import { omit } from "es-toolkit";
 
 describe("plannedToQueuedReservation", () => {
@@ -30,8 +30,8 @@ describe("plannedToQueuedReservation", () => {
             isVIP: false,
             numberOfGuests: 2,
             time: "18:00",
-            type: ReservationType.QUEUED,
-            status: "ACTIVE",
+            type: ReservationType.PLANNED,
+            status: ReservationStatus.ACTIVE,
         };
 
         const queued = plannedToQueuedReservation(planned);
@@ -45,6 +45,7 @@ describe("plannedToQueuedReservation", () => {
                 "tableLabel",
                 "waitingForResponse",
             ]),
+            type: ReservationType.QUEUED,
         };
 
         expect(queued).toEqual(expectedQueued);
@@ -77,8 +78,8 @@ describe("plannedToQueuedReservation", () => {
             isVIP: true,
             numberOfGuests: 4,
             time: "20:00",
-            type: "PLANNED",
-            status: "ACTIVE",
+            type: ReservationType.PLANNED,
+            status: ReservationStatus.ACTIVE,
         };
 
         const queued = plannedToQueuedReservation(planned);
@@ -119,8 +120,8 @@ describe("plannedToQueuedReservation", () => {
             isVIP: true,
             numberOfGuests: 5,
             time: "19:00",
-            type: "PLANNED",
-            status: "ACTIVE",
+            type: ReservationType.PLANNED,
+            status: ReservationStatus.ACTIVE,
         };
 
         const queued = plannedToQueuedReservation(planned);
@@ -155,8 +156,8 @@ describe("plannedToQueuedReservation", () => {
             isVIP: false,
             numberOfGuests: 1,
             time: "17:00",
-            type: ReservationType.QUEUED,
-            status: "ACTIVE",
+            type: ReservationType.PLANNED,
+            status: ReservationStatus.ACTIVE,
         };
 
         const queued = plannedToQueuedReservation(planned);
@@ -170,6 +171,7 @@ describe("plannedToQueuedReservation", () => {
                 "tableLabel",
                 "waitingForResponse",
             ]),
+            type: ReservationType.QUEUED,
         };
 
         expect(queued).toEqual(expectedQueued);
@@ -202,8 +204,8 @@ describe("plannedToQueuedReservation", () => {
             isVIP: false,
             numberOfGuests: 3,
             time: "18:00",
-            type: ReservationType.QUEUED,
-            status: "ACTIVE",
+            type: ReservationType.PLANNED,
+            status: ReservationStatus.ACTIVE,
         };
 
         const plannedCopy = { ...planned };
@@ -240,8 +242,8 @@ describe("plannedToQueuedReservation", () => {
             isVIP: false,
             numberOfGuests: 0,
             time: "",
-            type: ReservationType.QUEUED,
-            status: "ACTIVE",
+            type: ReservationType.PLANNED,
+            status: ReservationStatus.ACTIVE,
         };
 
         const queued = plannedToQueuedReservation(planned);
@@ -255,6 +257,7 @@ describe("plannedToQueuedReservation", () => {
                 "tableLabel",
                 "waitingForResponse",
             ]),
+            type: ReservationType.QUEUED,
         };
 
         expect(queued).toEqual(expectedQueued);
@@ -287,8 +290,8 @@ describe("plannedToQueuedReservation", () => {
             isVIP: true,
             numberOfGuests: 4,
             time: "16:00",
-            type: "PLANNED",
-            status: "ACTIVE",
+            type: ReservationType.PLANNED,
+            status: ReservationStatus.ACTIVE,
             // Additional field not in omit list
             extraField: "extraValue",
         };

@@ -1,3 +1,5 @@
+import type { EventCreateFormProps } from "./EventCreateForm.vue";
+import type { FloorDoc } from "@firetable/types";
 import EventCreateForm from "./EventCreateForm.vue";
 import { renderComponent } from "../../../../test-helpers/render-component";
 import { describe, it, expect, beforeEach, vi } from "vitest";
@@ -14,7 +16,7 @@ vi.mock("src/helpers/ui-helpers", () => ({
 
 describe("EventCreateForm", () => {
     describe("create", () => {
-        let props;
+        let props: EventCreateFormProps;
 
         beforeEach(() => {
             props = {
@@ -22,8 +24,8 @@ describe("EventCreateForm", () => {
                 organisationId: "org1",
                 propertyName: "Test Property",
                 floors: [
-                    { id: "floor1", name: "Floor 1" },
-                    { id: "floor2", name: "Floor 2" },
+                    { id: "floor1", name: "Floor 1" } as FloorDoc,
+                    { id: "floor2", name: "Floor 2" } as FloorDoc,
                 ],
                 eventStartHours: "22:00",
             };
@@ -34,17 +36,17 @@ describe("EventCreateForm", () => {
 
             // Check that the form fields are empty or have default values
             expect(
-                screen.getByLabelText("Optional event image url").query().getAttribute("value"),
+                screen.getByLabelText("Optional event image url").query()?.getAttribute("value"),
             ).toBe("");
-            expect(screen.getByLabelText("Event name*").query().getAttribute("value")).toBe("");
-            expect(screen.getByLabelText("Guest List Limit").query().getAttribute("value")).toBe(
+            expect(screen.getByLabelText("Event name*").query()?.getAttribute("value")).toBe("");
+            expect(screen.getByLabelText("Guest List Limit").query()?.getAttribute("value")).toBe(
                 "100",
             );
-            expect(screen.getByLabelText("Entry Price").query().getAttribute("value")).toBe("0");
+            expect(screen.getByLabelText("Entry Price").query()?.getAttribute("value")).toBe("0");
             const floorCheckboxes = screen.getByRole("checkbox");
 
             expect(
-                screen.getByLabelText("Event date and time").query().getAttribute("value"),
+                screen.getByLabelText("Event date and time").query()?.getAttribute("value"),
             ).toContain("22:00");
 
             for (const element of floorCheckboxes.elements()) {
@@ -96,8 +98,9 @@ describe("EventCreateForm", () => {
             await nextTick();
 
             // Check that the 'create' event was emitted with correct payload
-            expect(screen.emitted().create).toBeTruthy();
-            expect(screen.emitted().create[0][0]).toMatchObject({
+            const emitted = screen.emitted().create as any[];
+            expect(emitted).toBeTruthy();
+            expect(emitted[0][0]).toMatchObject({
                 name: "Test Event",
                 guestListLimit: 100,
                 entryPrice: 50,
@@ -129,16 +132,16 @@ describe("EventCreateForm", () => {
             await userEvent.click(resetButton);
 
             // Check that the form fields are reset
-            expect(screen.getByLabelText("Event Name").query().textContent).toBe("");
-            expect(screen.getByLabelText("Guest List Limit").query().textContent).toBe("");
-            expect(screen.getByLabelText("Entry Price").query().textContent).toBe("");
-            expect(screen.getByLabelText("Event Image URL").query().textContent).toBe("");
+            expect(screen.getByLabelText("Event Name").query()?.textContent).toBe("");
+            expect(screen.getByLabelText("Guest List Limit").query()?.textContent).toBe("");
+            expect(screen.getByLabelText("Entry Price").query()?.textContent).toBe("");
+            expect(screen.getByLabelText("Event Image URL").query()?.textContent).toBe("");
             expect(firstCheckbox.getAttribute("aria-checked")).toBe("false");
         });
     });
 
     describe("edit", () => {
-        let props;
+        let props: EventCreateFormProps;
 
         beforeEach(() => {
             props = {
@@ -146,8 +149,8 @@ describe("EventCreateForm", () => {
                 organisationId: "org1",
                 propertyName: "Test Property",
                 floors: [
-                    { id: "floor1", name: "Floor 1" },
-                    { id: "floor2", name: "Floor 2" },
+                    { id: "floor1", name: "Floor 1" } as FloorDoc,
+                    { id: "floor2", name: "Floor 2" } as FloorDoc,
                 ],
                 eventStartHours: "22:00",
                 event: {
@@ -160,6 +163,7 @@ describe("EventCreateForm", () => {
                     propertyId: "property1",
                     organisationId: "org1",
                     creator: "user1",
+                    _doc: {} as any,
                 },
             };
         });
@@ -171,20 +175,20 @@ describe("EventCreateForm", () => {
 
             // Check that the form fields are populated with event data
             expect(
-                screen.getByLabelText("Optional event image url").query().getAttribute("value"),
-            ).toBe(props.event.img);
-            expect(screen.getByLabelText("Event Name").query().getAttribute("value")).toBe(
-                props.event.name,
+                screen.getByLabelText("Optional event image url").query()?.getAttribute("value"),
+            ).toBe(props.event!.img);
+            expect(screen.getByLabelText("Event Name").query()?.getAttribute("value")).toBe(
+                props.event!.name,
             );
-            expect(screen.getByLabelText("Guest List Limit").query().getAttribute("value")).toBe(
-                String(props.event.guestListLimit),
+            expect(screen.getByLabelText("Guest List Limit").query()?.getAttribute("value")).toBe(
+                String(props.event!.guestListLimit),
             );
-            expect(screen.getByLabelText("Entry Price").query().getAttribute("value")).toBe(
-                String(props.event.entryPrice),
+            expect(screen.getByLabelText("Entry Price").query()?.getAttribute("value")).toBe(
+                String(props.event!.entryPrice),
             );
 
             expect(
-                screen.getByLabelText("Event date and time").query().getAttribute("value"),
+                screen.getByLabelText("Event date and time").query()?.getAttribute("value"),
             ).toContain("22:00");
         });
 
@@ -210,14 +214,15 @@ describe("EventCreateForm", () => {
             await nextTick();
 
             // Check that the 'update' event was emitted with correct payload
-            expect(screen.emitted().update).toBeTruthy();
-            expect(screen.emitted().update[0][0]).toMatchObject({
+            const emitted = screen.emitted().update as any[];
+            expect(emitted).toBeTruthy();
+            expect(emitted[0][0]).toMatchObject({
                 name: "Updated Event",
                 // Should remain unchanged
-                guestListLimit: props.event.guestListLimit,
+                guestListLimit: props.event!.guestListLimit,
                 entryPrice: 80,
                 // Should remain unchanged unless updated
-                img: props.event.img,
+                img: props.event!.img,
                 propertyId: props.propertyId,
                 organisationId: props.organisationId,
             });

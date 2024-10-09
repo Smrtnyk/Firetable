@@ -21,7 +21,6 @@ export default defineConfig({
         cache: false,
         alias: {
             "src/": new URL("./src/", import.meta.url).pathname,
-            "stores/": new URL("./src/stores/", import.meta.url).pathname,
         },
         deps: {
             optimizer: {

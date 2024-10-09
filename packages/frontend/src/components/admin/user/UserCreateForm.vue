@@ -15,7 +15,7 @@ import {
 } from "src/helpers/form-rules";
 import { useI18n } from "vue-i18n";
 
-interface Props {
+export interface UserCreateFormProps {
     properties: PropertyDoc[];
     organisation: OrganisationDoc;
 }
@@ -25,7 +25,7 @@ type Emits = (event: "submit", payload: CreateUserPayload | User) => void;
 const { t } = useI18n();
 const authStore = useAuthStore();
 const emit = defineEmits<Emits>();
-const props = defineProps<Props>();
+const props = defineProps<UserCreateFormProps>();
 const userCreateForm = useTemplateRef<QForm>("userCreateForm");
 
 const form = ref<CreateUserPayload | User>(userSkeleton());

@@ -2,16 +2,16 @@ import type { InventoryItemDoc } from "@firetable/types";
 import type { RenderResult } from "vitest-browser-vue";
 import InventoryTable from "./InventoryTable.vue";
 import { renderComponent } from "../../../../test-helpers/render-component";
-import { describe, it, expect, beforeEach } from "vitest";
-import { InventoryItemType } from "@firetable/types";
-import { userEvent, page } from "@vitest/browser/context";
+import { DrinkCategory, InventoryItemType } from "@firetable/types";
+import { beforeEach, describe, expect, it } from "vitest";
+import { page, userEvent } from "@vitest/browser/context";
 
 const sampleItems: InventoryItemDoc[] = [
     {
         id: "1",
         name: "Red Bull 250ml",
         type: InventoryItemType.DRINK,
-        category: "Energy drinks",
+        category: DrinkCategory.SPIRIT,
         price: 2.99,
         quantity: 50,
     },
@@ -19,7 +19,7 @@ const sampleItems: InventoryItemDoc[] = [
         id: "2",
         name: "Chocolate Bar",
         type: InventoryItemType.FOOD,
-        category: "Snacks",
+        category: DrinkCategory.BEER,
         price: 1.49,
         quantity: 100,
     },
@@ -46,7 +46,7 @@ describe("InventoryTable.vue", () => {
             const typeCell = page.getByText(typeLabel);
             expect(typeCell.elements().length).toBeGreaterThan(0);
 
-            const categoryCell = page.getByText(item.category);
+            const categoryCell = page.getByText(item.category as string);
             expect(categoryCell.elements().length).toBeGreaterThan(0);
 
             const priceText = `$${item.price.toFixed(2)}`;
@@ -76,7 +76,7 @@ describe("InventoryTable.vue", () => {
 
         await userEvent.click(editButton);
 
-        const emittedEvents = screen.emitted("edit-item");
+        const emittedEvents = screen.emitted("edit-item") as any[];
         expect(emittedEvents).toBeTruthy();
         expect(emittedEvents.length).toBe(1);
         expect(emittedEvents[0][0]).toStrictEqual(sampleItems[0]);
@@ -88,7 +88,7 @@ describe("InventoryTable.vue", () => {
 
         await userEvent.click(deleteButton);
 
-        const emittedEvents = screen.emitted("delete-item");
+        const emittedEvents = screen.emitted("delete-item") as any[];
         expect(emittedEvents).toBeTruthy();
         expect(emittedEvents.length).toBe(1);
         expect(emittedEvents[0][0]).toStrictEqual(sampleItems[1]);

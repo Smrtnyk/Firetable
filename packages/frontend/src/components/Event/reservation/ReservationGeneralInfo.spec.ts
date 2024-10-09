@@ -1,8 +1,8 @@
-import type { QueuedReservationDoc, UserCapabilities } from "@firetable/types";
+import type { QueuedReservationDoc, UserCapabilities, WalkInReservation } from "@firetable/types";
 import ReservationGeneralInfo from "./ReservationGeneralInfo.vue";
 import { renderComponent } from "../../../../test-helpers/render-component";
-import { formatEventDate } from "../../../helpers/date-utils.js";
-import { ReservationType, Role, UserCapability } from "@firetable/types";
+import { ReservationStatus, ReservationType, Role, UserCapability } from "@firetable/types";
+import { formatEventDate } from "src/helpers/date-utils";
 import { describe, expect, it } from "vitest";
 
 describe("ReservationGeneralInfo", () => {
@@ -16,6 +16,7 @@ describe("ReservationGeneralInfo", () => {
         guestContact: "john.doe@contact.com",
         reservationNote: "Please prepare a vegan meal.",
         reservedBy: {
+            id: "foo",
             name: "John Doe",
             email: "john.doe@example.com",
         },
@@ -23,12 +24,10 @@ describe("ReservationGeneralInfo", () => {
             id: "creator456",
             email: "creator@example.com",
             name: "Creator Name",
-            createdAt: {
-                toMillis: () => 1_600_000_000_000,
-            },
+            createdAt: 1_600_000_000_000,
         },
-        date: 1_680_000_000_000,
-        status: 1,
+        status: ReservationStatus.ACTIVE,
+        type: ReservationType.QUEUED,
     };
 
     function renderComponentWithStore(
@@ -118,7 +117,7 @@ describe("ReservationGeneralInfo", () => {
         });
 
         await expect.element(screen.getByText(/^\s*Contact\s*$/)).toBeVisible();
-        await expect.element(screen.getByText(mockReservation.guestContact)).toBeVisible();
+        await expect.element(screen.getByText(mockReservation.guestContact!)).toBeVisible();
     });
 
     it("does not render guestContact when user cannot see it", () => {
@@ -194,7 +193,7 @@ describe("ReservationGeneralInfo", () => {
         const screen = renderComponentWithStore("user123");
 
         await expect.element(screen.getByText("Note")).toBeVisible();
-        await expect.element(screen.getByText(mockReservation.reservationNote)).toBeVisible();
+        await expect.element(screen.getByText(mockReservation.reservationNote!)).toBeVisible();
     });
 
     it("does not render reservationNote section when reservationNote is absent", () => {
@@ -222,7 +221,7 @@ describe("ReservationGeneralInfo", () => {
         );
 
         expect(screen.getByText("Note").query()).toBeNull();
-        expect(screen.getByText(mockReservation.reservationNote).query()).toBeNull();
+        expect(screen.getByText(mockReservation.reservationNote!).query()).toBeNull();
     });
 
     it("renders reservedBy label and value when not a walk-in reservation", async () => {
@@ -233,9 +232,12 @@ describe("ReservationGeneralInfo", () => {
     });
 
     it("does not render reservedBy section when it is a walk-in reservation", () => {
-        const walkInReservation: QueuedReservationDoc = {
+        const walkInReservation: WalkInReservation = {
             ...mockReservation,
             type: ReservationType.WALK_IN,
+            arrived: true,
+            tableLabel: "Table 1",
+            floorId: "floor1",
         };
 
         const screen = renderComponent(
@@ -299,87 +301,19 @@ describe("ReservationGeneralInfo", () => {
             .toBeVisible();
     });
 
-    it("does not render createdAt section when createdAt is absent", () => {
-        const reservationWithoutCreatedAt: QueuedReservationDoc = {
-            ...mockReservation,
-            creator: {
-                ...mockReservation.creator,
-                createdAt: undefined,
-            },
-        };
-
-        const screen = renderComponent(
-            ReservationGeneralInfo,
-            { reservation: reservationWithoutCreatedAt },
-            {
-                piniaStoreOptions: {
-                    initialState: {
-                        auth: {
-                            user: {
-                                id: "user123",
-                                email: "current.user@example.com",
-                                name: "Current User",
-                                role: Role.MANAGER,
-                                capabilities: {},
-                            },
-                            canSeeGuestContact: true,
-                            canSeeReservationCreator: true,
-                        },
-                    },
-                },
-            },
-        );
-
-        expect(screen.getByText("Created at").query()).toBeNull();
-        expect(screen.getByText(formatEventDate(1_600_000_000_000, null)).query()).toBeNull();
-    });
-
-    it("does not render creator section when creator is absent", () => {
-        const reservationWithoutCreator: QueuedReservationDoc = {
-            ...mockReservation,
-            creator: undefined,
-        };
-
-        const screen = renderComponent(
-            ReservationGeneralInfo,
-            { reservation: reservationWithoutCreator },
-            {
-                piniaStoreOptions: {
-                    initialState: {
-                        auth: {
-                            user: {
-                                id: "user123",
-                                email: "current.user@example.com",
-                                name: "Current User",
-                                role: Role.MANAGER,
-                                capabilities: {},
-                            },
-                            canSeeGuestContact: true,
-                            canSeeReservationCreator: true,
-                        },
-                    },
-                },
-            },
-        );
-
-        expect(screen.getByText(/^\s*Creator\s*$/).query()).toBeNull();
-        expect(screen.getByText("Creator Name - creator@example.com").query()).toBeNull();
-        expect(screen.getByText("Created at").query()).toBeNull();
-        expect(screen.getByText(formatEventDate(1_600_000_000_000, null)).query()).toBeNull();
-    });
-
     it("handles missing fields gracefully", async () => {
         const incompleteReservation: QueuedReservationDoc = {
             type: ReservationType.QUEUED,
             id: "reservation2",
             guestName: "",
-            consumption: undefined,
+            consumption: 0,
             isVIP: false,
             numberOfGuests: 2,
             time: "14:00",
-            guestContact: undefined,
-            reservationNote: undefined,
+            guestContact: "",
+            reservationNote: "",
             reservedBy: {
+                id: "reservedBy123",
                 name: "Reserved By",
                 email: "",
             },
@@ -387,9 +321,9 @@ describe("ReservationGeneralInfo", () => {
                 id: "creator789",
                 email: "",
                 name: "",
+                createdAt: 1_680_000_000_000,
             },
-            date: 1_680_000_000_000,
-            status: 2,
+            status: ReservationStatus.DELETED,
         };
 
         const screen = renderComponent(

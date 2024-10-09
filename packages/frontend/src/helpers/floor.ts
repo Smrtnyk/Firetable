@@ -34,7 +34,7 @@ export function determineTableColor(
         return colorPalette.reservationConfirmedColor;
     }
 
-    if (reservation.arrived === false) {
+    if (!reservation.arrived) {
         return colorPalette.reservationPendingColor;
     }
 

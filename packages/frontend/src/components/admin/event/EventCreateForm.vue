@@ -29,7 +29,7 @@ interface State {
     selectedTime: string;
 }
 
-interface Props {
+export interface EventCreateFormProps {
     propertyId: string;
     organisationId: string;
     propertyName: string;
@@ -50,7 +50,7 @@ const eventObj: CreateEventForm = {
     entryPrice: 0,
     img: "",
 };
-const props = defineProps<Props>();
+const props = defineProps<EventCreateFormProps>();
 const emit = defineEmits<{
     (event: "create", payload: CreateEventPayload): void;
     (event: "update", payload: EditEventPayload): void;

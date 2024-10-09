@@ -418,6 +418,7 @@ export default tseslint.config(
     {
         files: ["**/*.spec.ts"],
         rules: {
+            "@typescript-eslint/no-non-null-assertion": "off",
             "unicorn/consistent-function-scoping": "off",
             "unicorn/no-useless-undefined": "off",
             "max-nested-callbacks": "off",

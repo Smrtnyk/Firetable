@@ -45,15 +45,15 @@ describe("PageAuth", () => {
         const screen = renderComponent(PageAuth);
 
         // Check that the username input is empty
-        const usernameInput = screen.getByLabelText("Username *").query();
-        expect(usernameInput.getAttribute("value")).toBe("");
+        const usernameInput = screen.getByLabelText("Username *");
+        expect(usernameInput.query()?.getAttribute("value")).toBe("");
 
         // Check that the password input is empty
-        const passwordInput = screen.getByLabelText("Password *").query();
-        expect(passwordInput.getAttribute("value")).toBe("");
+        const passwordInput = screen.getByLabelText("Password *");
+        expect(passwordInput.query()?.getAttribute("value")).toBe("");
 
         // Check that the password is of type 'password'
-        expect(passwordInput.getAttribute("type")).toBe("password");
+        expect(passwordInput.query()?.getAttribute("type")).toBe("password");
     });
 
     it("validates required fields", async () => {
@@ -79,31 +79,28 @@ describe("PageAuth", () => {
         const screen = renderComponent(PageAuth);
         const passwordInput = screen.getByLabelText("Password *");
         // Initially, password type should be 'password'
-        expect(passwordInput.query().getAttribute("type")).toBe("password");
+        expect(passwordInput.query()?.getAttribute("type")).toBe("password");
 
         // Click the eye icon to toggle visibility
-        const eyeIcon = document.querySelector(".q-icon");
+        const eyeIcon = screen.getByLabelText("Toggle password visibility");
         await userEvent.click(eyeIcon);
 
         // After clicking, password type should be 'text'
-        expect(passwordInput.query().getAttribute("type")).toBe("text");
+        expect(passwordInput.query()?.getAttribute("type")).toBe("text");
 
         // Click again to toggle back
         await userEvent.click(eyeIcon);
 
         // Password type should be 'password' again
-        expect(passwordInput.query().getAttribute("type")).toBe("password");
+        expect(passwordInput.query()?.getAttribute("type")).toBe("password");
     });
 
     // Cannot mock @firetable/backend for some reason
     it.skip("submits the form with valid inputs", async () => {
         const screen = renderComponent(PageAuth);
 
-        const usernameInput = screen.getByLabelText("Username *").query();
-        const passwordInput = screen.getByLabelText("Password *").query();
-
-        await userEvent.type(usernameInput, "testuser");
-        await userEvent.type(passwordInput, "password123");
+        await userEvent.type(screen.getByLabelText("Username *"), "testuser");
+        await userEvent.type(screen.getByLabelText("Password *"), "password123");
 
         const loginButton = screen.getByRole("button", { name: "Login" });
         await userEvent.click(loginButton);
@@ -127,11 +124,8 @@ describe("PageAuth", () => {
 
         const screen = renderComponent(PageAuth);
 
-        const usernameInput = screen.getByLabelText("Username *").query();
-        const passwordInput = screen.getByLabelText("Password *").query();
-
-        await userEvent.type(usernameInput, "testuser");
-        await userEvent.type(passwordInput, "wrongpassword");
+        await userEvent.type(screen.getByLabelText("Username *"), "testuser");
+        await userEvent.type(screen.getByLabelText("Password *"), "wrongpassword");
 
         const loginButton = screen.getByRole("button", { name: "Login" });
         await userEvent.click(loginButton);
@@ -153,12 +147,9 @@ describe("PageAuth", () => {
     it("validates password length", async () => {
         const screen = renderComponent(PageAuth);
 
-        const usernameInput = screen.getByLabelText("Username *").query();
-        const passwordInput = screen.getByLabelText("Password *").query();
-
-        await userEvent.type(usernameInput, "testuser");
+        await userEvent.type(screen.getByLabelText("Username *"), "testuser");
         // Password too short
-        await userEvent.type(passwordInput, "1234");
+        await userEvent.type(screen.getByLabelText("Password *"), "1234");
 
         const loginButton = screen.getByRole("button", { name: "Login" });
         await userEvent.click(loginButton);

@@ -72,6 +72,7 @@ export function renderComponent(
                           QLayout,
                           {},
                           {
+                              // @ts-expect-error -- not sure why this is not working
                               default: () => h(component, props),
                           },
                       );

@@ -1,5 +1,3 @@
-import type { QueryDocumentSnapshot } from "firebase/firestore";
-
 export const enum InventoryItemType {
     DRINK = "drink",
     FOOD = "food",
@@ -10,6 +8,7 @@ export const enum DrinkCategory {
     BEER = "beer",
     WINE = "wine",
     SPIRIT = "spirit",
+    SOFT_DRINK = "soft_drink",
 }
 
 export type CreateInventoryItemPayload = Pick<
@@ -36,5 +35,4 @@ export interface InventoryItemDoc {
     volume?: number;
     // Supplier name or ID (optional)
     supplier?: string;
-    _doc: QueryDocumentSnapshot<InventoryItemDoc>;
 }

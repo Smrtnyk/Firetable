@@ -141,7 +141,7 @@ describe("AppDrawer", () => {
         );
 
         const emitted = screen.emitted();
-        await userEvent.click(document.querySelector("body"));
+        await userEvent.click(document.querySelector("body")!);
 
         expect(emitted["update:modelValue"]).toBeTruthy();
         expect(emitted["update:modelValue"][0]).toEqual([false]);

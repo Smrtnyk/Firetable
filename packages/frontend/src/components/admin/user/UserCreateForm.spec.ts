@@ -1,8 +1,11 @@
+import type { UserCreateFormProps } from "./UserCreateForm.vue";
+import type { PropertyDoc } from "@firetable/types";
 import UserCreateForm from "./UserCreateForm.vue";
 import { renderComponent, t } from "../../../../test-helpers/render-component";
 import { vi, describe, it, beforeEach, expect } from "vitest";
 import { ADMIN, Role } from "@firetable/types";
 import { userEvent } from "@vitest/browser/context";
+import { first } from "es-toolkit/compat";
 
 const { showErrorMessageSpy } = vi.hoisted(() => {
     return { showErrorMessageSpy: vi.fn() };
@@ -13,7 +16,7 @@ vi.mock("src/helpers/ui-helpers", () => ({
 }));
 
 describe("UserCreateForm", () => {
-    let props;
+    let props: UserCreateFormProps;
     const user = {
         role: Role.MANAGER,
     };
@@ -21,12 +24,13 @@ describe("UserCreateForm", () => {
     beforeEach(() => {
         props = {
             properties: [
-                { id: "property1", name: "Property 1" },
-                { id: "property2", name: "Property 2" },
+                { id: "property1", name: "Property 1", _doc: {} as any } as PropertyDoc,
+                { id: "property2", name: "Property 2", _doc: {} as any } as PropertyDoc,
             ],
             organisation: {
                 id: "org1",
                 name: "TestOrg",
+                maxAllowedProperties: 2,
             },
         };
         showErrorMessageSpy.mockClear();
@@ -45,27 +49,27 @@ describe("UserCreateForm", () => {
             screen
                 .getByLabelText(t("UserCreateForm.userNameInputLabel"))
                 .query()
-                .getAttribute("value"),
+                ?.getAttribute("value"),
         ).toBe("");
 
         expect(
             screen
                 .getByLabelText(t("UserCreateForm.userMailInputLabel"))
                 .query()
-                .getAttribute("value"),
+                ?.getAttribute("value"),
         ).toBe("");
 
         expect(
             screen
                 .getByLabelText(t("UserCreateForm.userPasswordInputLabel"))
                 .query()
-                .getAttribute("value"),
+                ?.getAttribute("value"),
         ).toBe("");
 
         // Role select should be rendered and default to Role.STAFF
         const roleSelect = screen.getByLabelText(t("UserCreateForm.userRoleSelectLabel"));
         expect(roleSelect.query()).toBeTruthy();
-        expect(roleSelect.query().getAttribute("aria-label")).toBe(
+        expect(roleSelect.query()?.getAttribute("aria-label")).toBe(
             t("UserCreateForm.userRoleSelectLabel"),
         );
 
@@ -165,7 +169,7 @@ describe("UserCreateForm", () => {
 
         // Check that the 'submit' event was emitted with correct payload
         expect(screen.emitted().submit).toBeTruthy();
-        const emittedPayload = screen.emitted().submit[0][0];
+        const [emittedPayload] = first(screen.emitted().submit as any[]);
         expect(emittedPayload).toMatchObject({
             name: "Test User",
             username: "testuser",
@@ -211,19 +215,19 @@ describe("UserCreateForm", () => {
             screen
                 .getByLabelText(t("UserCreateForm.userNameInputLabel"))
                 .query()
-                .getAttribute("value"),
+                ?.getAttribute("value"),
         ).toBe("");
         expect(
             screen
                 .getByLabelText(t("UserCreateForm.userMailInputLabel"))
                 .query()
-                .getAttribute("value"),
+                ?.getAttribute("value"),
         ).toBe("");
         expect(
             screen
                 .getByLabelText(t("UserCreateForm.userPasswordInputLabel"))
                 .query()
-                .getAttribute("value"),
+                ?.getAttribute("value"),
         ).toBe("");
 
         // Check that properties are reset
@@ -403,7 +407,7 @@ describe("UserCreateForm", () => {
 
         // Check that the 'submit' event was emitted with correct payload
         expect(screen.emitted().submit).toBeTruthy();
-        const emittedPayload = screen.emitted().submit[0][0];
+        const [emittedPayload] = first(screen.emitted().submit as any[]);
         expect(emittedPayload).toMatchObject({
             name: "Test User",
             username: "testuser",

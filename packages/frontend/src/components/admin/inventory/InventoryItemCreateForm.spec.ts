@@ -2,8 +2,8 @@ import type { RenderResult } from "vitest-browser-vue";
 import type { CreateInventoryItemPayload } from "@firetable/types";
 import InventoryItemCreateForm from "./InventoryItemCreateForm.vue";
 import { renderComponent, t } from "../../../../test-helpers/render-component";
-import { describe, it, expect, beforeEach } from "vitest";
-import { InventoryItemType, DrinkCategory } from "@firetable/types";
+import { DrinkCategory, InventoryItemType } from "@firetable/types";
+import { beforeEach, describe, expect, it } from "vitest";
 import { page, userEvent } from "@vitest/browser/context";
 
 describe("InventoryItemCreateForm.vue", () => {
@@ -68,7 +68,7 @@ describe("InventoryItemCreateForm.vue", () => {
             );
 
             expect(foodOption).toBeTruthy();
-            await userEvent.click(foodOption);
+            await userEvent.click(foodOption!);
             await expect.element(typeSelect).toHaveValue(InventoryItemType.FOOD);
 
             const priceInput = page.getByLabelText("Price");
@@ -118,7 +118,7 @@ describe("InventoryItemCreateForm.vue", () => {
                 );
 
                 expect(foodOption).toBeTruthy();
-                await userEvent.click(foodOption);
+                await userEvent.click(foodOption!);
 
                 // Check that 'Alcohol Content' and 'Volume' inputs are no longer present
                 const alcoholContentInputAfter = page.getByLabelText("Alcohol Content");
@@ -137,7 +137,7 @@ describe("InventoryItemCreateForm.vue", () => {
                 );
 
                 expect(drinkOption).toBeTruthy();
-                await userEvent.click(drinkOption);
+                await userEvent.click(drinkOption!);
                 // Check that 'Alcohol Content' and 'Volume' inputs are present again
                 const alcoholContentInputAgain = page.getByLabelText("Alcohol Content");
                 const volumeInputAgain = page.getByLabelText("Volume");
@@ -202,7 +202,7 @@ describe("InventoryItemCreateForm.vue", () => {
             await userEvent.click(submitButton);
 
             // Verify that the component emitted the 'submit' event with the updated item
-            const emittedEvents = screen.emitted("submit");
+            const emittedEvents = screen.emitted("submit") as any[];
             expect(emittedEvents).toBeTruthy();
             expect(emittedEvents.length).toBe(1);
             const submittedItem = emittedEvents[0][0];
@@ -242,10 +242,9 @@ describe("InventoryItemCreateForm.vue", () => {
         const initialData: CreateInventoryItemPayload = {
             name: "Red Bull 250ml",
             type: InventoryItemType.DRINK,
-            category: "Energy drinks",
+            category: DrinkCategory.SOFT_DRINK,
             price: 0,
             quantity: 0,
-            unit: "ml",
             supplier: "Red Bull,Orginal",
             alcoholContent: 0,
             volume: 250,
@@ -263,7 +262,7 @@ describe("InventoryItemCreateForm.vue", () => {
             await expect.element(typeSelect).toHaveValue(InventoryItemType.DRINK);
 
             const categoryInput = page.getByLabelText("Category");
-            await expect.element(categoryInput).toHaveValue("Energy drinks");
+            await expect.element(categoryInput).toHaveValue(DrinkCategory.SOFT_DRINK);
 
             const priceInput = page.getByLabelText("Price");
             await expect.element(priceInput).toHaveValue(0);
@@ -297,7 +296,7 @@ describe("InventoryItemCreateForm.vue", () => {
             const submitButton = page.getByText(t("Global.submit"));
             await userEvent.click(submitButton);
 
-            const emittedEvents = screen.emitted("submit");
+            const emittedEvents = screen.emitted("submit") as any[];
             expect(emittedEvents).toBeTruthy();
             expect(emittedEvents.length).toBe(1);
             const submittedItem = emittedEvents[0][0];

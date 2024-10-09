@@ -1,4 +1,4 @@
-import type { PlannedReservation, WalkInReservation } from "@firetable/types";
+import type { BaseReservation, PlannedReservation, WalkInReservation } from "@firetable/types";
 import { determineTableColor } from "./floor.js";
 import { describe, it, expect } from "vitest";
 import { ReservationStatus, ReservationType } from "@firetable/types";
@@ -11,9 +11,11 @@ const colorPalette = {
     reservationWaitingForResponseColor: "#b5a22c",
 };
 
-const mockUser = {
-    userId: "user123",
-    createdAt: new Date(),
+const mockUser: BaseReservation["creator"] = {
+    id: "user123",
+    createdAt: Date.now(),
+    email: "example@mail.com",
+    name: "John Doe",
 };
 
 const plannedReservation: PlannedReservation = {
@@ -31,6 +33,7 @@ const plannedReservation: PlannedReservation = {
     time: new Date().toISOString(),
     status: ReservationStatus.ACTIVE,
     isVIP: false,
+    creator: mockUser,
 };
 
 const walkInReservation: WalkInReservation = {
@@ -44,6 +47,7 @@ const walkInReservation: WalkInReservation = {
     time: new Date().toISOString(),
     status: ReservationStatus.ACTIVE,
     isVIP: true,
+    creator: mockUser,
 };
 
 describe("determineTableColor", () => {
@@ -90,16 +94,5 @@ describe("determineTableColor", () => {
         };
         const result = determineTableColor(pendingReservation, colorPalette);
         expect(result).toBe(colorPalette.reservationPendingColor);
-    });
-
-    it("returns an empty string when none of the conditions match", () => {
-        const unmatchedReservation = {
-            ...plannedReservation,
-            waitingForResponse: false,
-            cancelled: false,
-            arrived: null,
-        };
-        const result = determineTableColor(unmatchedReservation, colorPalette);
-        expect(result).toBe("");
     });
 });

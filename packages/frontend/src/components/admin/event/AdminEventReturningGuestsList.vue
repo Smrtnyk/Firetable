@@ -30,7 +30,7 @@
 import type { Visit } from "@firetable/types";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 
-interface Props {
+export interface AdminEventReturningGuestsListProps {
     organisationId: string;
     returningGuests: {
         name: string;
@@ -40,5 +40,5 @@ interface Props {
     }[];
 }
 
-const { organisationId, returningGuests } = defineProps<Props>();
+const { organisationId, returningGuests } = defineProps<AdminEventReturningGuestsListProps>();
 </script>

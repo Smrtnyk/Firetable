@@ -1,11 +1,14 @@
+import type { UserEditFormProps } from "./UserEditForm.vue";
+import type { PropertyDoc } from "@firetable/types";
 import UserEditForm from "./UserEditForm.vue";
 import { renderComponent } from "../../../../test-helpers/render-component";
 import { Role, DEFAULT_CAPABILITIES_BY_ROLE, UserCapability } from "@firetable/types";
 import { describe, it, beforeEach, expect } from "vitest";
 import { userEvent } from "@vitest/browser/context";
+import { first } from "es-toolkit/compat";
 
 describe("UserEditForm", () => {
-    let props;
+    let props: UserEditFormProps;
 
     beforeEach(() => {
         props = {
@@ -17,15 +20,19 @@ describe("UserEditForm", () => {
                 role: Role.STAFF,
                 relatedProperties: ["property1"],
                 organisationId: "org1",
+                capabilities: DEFAULT_CAPABILITIES_BY_ROLE[Role.STAFF],
             },
             properties: [
-                { id: "property1", name: "Property 1" },
-                { id: "property2", name: "Property 2" },
+                { id: "property1", name: "Property 1" } as PropertyDoc,
+                { id: "property2", name: "Property 2" } as PropertyDoc,
             ],
-            selectedProperties: [{ id: "property1", name: "Property 1" }],
+            selectedProperties: [
+                { id: "property1", name: "Property 1", _doc: {} as any } as PropertyDoc,
+            ],
             organisation: {
                 id: "org1",
                 name: "TestOrg",
+                maxAllowedProperties: 2,
             },
         };
     });
@@ -38,16 +45,16 @@ describe("UserEditForm", () => {
             screen
                 .getByLabelText(/Name */)
                 .query()
-                .getAttribute("value"),
+                ?.getAttribute("value"),
         ).toBe(props.user.name);
 
         // Check that the username input has the user's username
-        expect(screen.getByLabelText("Username *").query().getAttribute("value")).toBe(
+        expect(screen.getByLabelText("Username *").query()?.getAttribute("value")).toBe(
             props.user.username,
         );
 
         // Password field should be empty
-        expect(screen.getByLabelText("User password *").query().getAttribute("value")).toBe("");
+        expect(screen.getByLabelText("User password *").query()?.getAttribute("value")).toBe("");
 
         // Role select should be present for editable roles
         if ([Role.MANAGER, Role.STAFF, Role.HOSTESS].includes(props.user.role)) {
@@ -74,7 +81,7 @@ describe("UserEditForm", () => {
         )) {
             const checkbox = screen.getByRole("checkbox", { name: capability });
             expect(checkbox.query()).toBeTruthy();
-            expect(checkbox.query().getAttribute("aria-checked")).toBe(
+            expect(checkbox.query()?.getAttribute("aria-checked")).toBe(
                 defaultValue ? "true" : "false",
             );
         }
@@ -84,7 +91,7 @@ describe("UserEditForm", () => {
         const screen = renderComponent(UserEditForm, props);
 
         // Clear the name field
-        const nameInput = screen.getByLabelText(/Name */).query();
+        const nameInput = screen.getByLabelText(/Name */);
         await userEvent.clear(nameInput);
 
         const submitButton = screen.getByRole("button", { name: "Update" });
@@ -126,7 +133,7 @@ describe("UserEditForm", () => {
 
         // Check emitted payload
         expect(screen.emitted().submit).toBeTruthy();
-        const emittedPayload = screen.emitted().submit[0][0];
+        const [emittedPayload] = first(screen.emitted().submit as any[]);
         expect(emittedPayload).toMatchObject({
             name: "Jane Doe",
             username: "janedoe",
@@ -159,9 +166,9 @@ describe("UserEditForm", () => {
             screen
                 .getByLabelText(/Name */)
                 .query()
-                .getAttribute("value"),
+                ?.getAttribute("value"),
         ).toBe(props.user.name);
-        expect(screen.getByLabelText("User password *").query().getAttribute("value")).toBe("");
+        expect(screen.getByLabelText("User password *").query()?.getAttribute("value")).toBe("");
 
         // Check that properties are reset
         const propertyCheckboxes = screen.getByRole("checkbox", {
@@ -225,7 +232,7 @@ describe("UserEditForm", () => {
         )) {
             const checkbox = screen.getByRole("checkbox", { name: capability });
             expect(checkbox.query()).toBeTruthy();
-            expect(checkbox.query().getAttribute("aria-checked")).toBe(
+            expect(checkbox.query()?.getAttribute("aria-checked")).toBe(
                 defaultValue ? "true" : "false",
             );
         }
@@ -243,16 +250,12 @@ describe("UserEditForm", () => {
 
         // Capabilities should be initially displayed with the user's capabilities
         expect(screen.getByText("Capabilities:").query()).toBeTruthy();
-        let capabilityCheckbox = screen
-            .getByRole("checkbox", { name: UserCapability.CAN_RESERVE })
-            .query();
-        expect(capabilityCheckbox.getAttribute("aria-checked")).toBe("true");
-        capabilityCheckbox = screen
-            .getByRole("checkbox", {
-                name: UserCapability.CAN_DELETE_RESERVATION,
-            })
-            .query();
-        expect(capabilityCheckbox.getAttribute("aria-checked")).toBe("false");
+        let capabilityCheckbox = screen.getByRole("checkbox", { name: UserCapability.CAN_RESERVE });
+        expect(capabilityCheckbox.query()?.getAttribute("aria-checked")).toBe("true");
+        capabilityCheckbox = screen.getByRole("checkbox", {
+            name: UserCapability.CAN_DELETE_RESERVATION,
+        });
+        expect(capabilityCheckbox.query()?.getAttribute("aria-checked")).toBe("false");
 
         // Change role to Manager
         const roleSelect = screen.getByLabelText("Role");
@@ -272,16 +275,14 @@ describe("UserEditForm", () => {
         expect(screen.getByText("Capabilities:").query()).toBeTruthy();
 
         // Verify that the capabilities are preserved
-        capabilityCheckbox = screen
-            .getByRole("checkbox", { name: UserCapability.CAN_RESERVE })
-            .query();
-        expect(capabilityCheckbox.getAttribute("aria-checked")).toBe("true");
-        capabilityCheckbox = screen
-            .getByRole("checkbox", {
-                name: UserCapability.CAN_DELETE_RESERVATION,
-            })
-            .query();
-        expect(capabilityCheckbox.getAttribute("aria-checked")).toBe("false");
+        capabilityCheckbox = screen.getByRole("checkbox", { name: UserCapability.CAN_RESERVE });
+
+        expect(capabilityCheckbox.query()?.getAttribute("aria-checked")).toBe("true");
+        capabilityCheckbox = screen.getByRole("checkbox", {
+            name: UserCapability.CAN_DELETE_RESERVATION,
+        });
+
+        expect(capabilityCheckbox.query()?.getAttribute("aria-checked")).toBe("false");
     });
 
     it("emits default capabilities when role is updated to a new role", async () => {
@@ -298,7 +299,7 @@ describe("UserEditForm", () => {
         await userEvent.click(submitButton);
 
         expect(screen.emitted().submit).toBeTruthy();
-        const emittedPayload = screen.emitted().submit[0][0];
+        const [emittedPayload] = first(screen.emitted().submit as any[]);
         expect(emittedPayload).toMatchObject({
             role: Role.MANAGER,
             capabilities: DEFAULT_CAPABILITIES_BY_ROLE[Role.MANAGER],
@@ -325,7 +326,7 @@ describe("UserEditForm", () => {
 
         // Check that the emitted payload includes the updated capabilities
         expect(screen.emitted().submit).toBeTruthy();
-        const emittedPayload = screen.emitted().submit[0][0];
+        const [emittedPayload] = first(screen.emitted().submit as any[]);
 
         // Create expected capabilities by toggling the modified ones
         const expectedCapabilities = {
@@ -349,7 +350,7 @@ describe("UserEditForm", () => {
         await userEvent.click(submitButton);
 
         expect(screen.emitted().submit).toBeTruthy();
-        const emittedPayload = screen.emitted().submit[0][0];
+        const [emittedPayload] = first(screen.emitted().submit as any[]);
         expect(emittedPayload.email).toBe("newusername@TestOrg.at");
     });
 
@@ -364,7 +365,7 @@ describe("UserEditForm", () => {
         await userEvent.click(submitButton);
 
         expect(screen.emitted().submit).toBeTruthy();
-        const emittedPayload = screen.emitted().submit[0][0];
+        const [emittedPayload] = first(screen.emitted().submit as any[]);
         expect(emittedPayload.email).toBe("newusername@DifferentOrg.at");
     });
 
@@ -384,7 +385,7 @@ describe("UserEditForm", () => {
 
         // Check that the emitted payload includes the updated relatedProperties
         expect(screen.emitted().submit).toBeTruthy();
-        const emittedPayload = screen.emitted().submit[0][0];
+        const [emittedPayload] = first(screen.emitted().submit as any[]);
         expect(emittedPayload.relatedProperties).toEqual(["property2"]);
     });
 
@@ -416,16 +417,16 @@ describe("UserEditForm", () => {
             screen
                 .getByLabelText(/Name */)
                 .query()
-                .getAttribute("value"),
+                ?.getAttribute("value"),
         ).toBe(props.user.name);
-        expect(screen.getByLabelText("User password *").query().getAttribute("value")).toBe("");
+        expect(screen.getByLabelText("User password *").query()?.getAttribute("value")).toBe("");
 
         // Check that role is reset
         const roleSelectAfterReset = screen.getByLabelText("Role");
         // Need to simulate opening the select to check selected value
         await userEvent.click(roleSelectAfterReset);
         const selectedOption = screen.getByRole("option", { selected: true });
-        expect(selectedOption.query().textContent).toBe(props.user.role);
+        expect(selectedOption.query()?.textContent).toBe(props.user.role);
 
         // Check that properties are reset
         const propertyCheckboxes = screen.getByRole("checkbox", {
@@ -474,20 +475,17 @@ describe("UserEditForm", () => {
 
         // Verify that the capabilities are preserved for Staff role
         expect(screen.getByText("Capabilities:").query()).toBeTruthy();
-        const canReserveCheckboxAfter = screen
-            .getByRole("checkbox", {
-                name: UserCapability.CAN_RESERVE,
-            })
-            .query();
-        // Should be false as toggled earlier
-        expect(canReserveCheckboxAfter.getAttribute("aria-checked")).toBe("false");
+        const canReserveCheckboxAfter = screen.getByRole("checkbox", {
+            name: UserCapability.CAN_RESERVE,
+        });
 
-        const canSeeGuestContactCheckbox = screen
-            .getByRole("checkbox", {
-                name: UserCapability.CAN_SEE_GUEST_CONTACT,
-            })
-            .query();
-        expect(canSeeGuestContactCheckbox.getAttribute("aria-checked")).toBe("false");
+        // Should be false as toggled earlier
+        expect(canReserveCheckboxAfter.query()?.getAttribute("aria-checked")).toBe("false");
+
+        const canSeeGuestContactCheckbox = screen.getByRole("checkbox", {
+            name: UserCapability.CAN_SEE_GUEST_CONTACT,
+        });
+        expect(canSeeGuestContactCheckbox.query()?.getAttribute("aria-checked")).toBe("false");
     });
 
     it("emits capabilities for non-staff roles when the role is changed", async () => {
@@ -505,7 +503,7 @@ describe("UserEditForm", () => {
 
         // Check that the emitted payload includes capabilities for Hostess role
         expect(screen.emitted().submit).toBeTruthy();
-        const emittedPayload = screen.emitted().submit[0][0];
+        const [emittedPayload] = first(screen.emitted().submit as any[]);
         expect(emittedPayload).toMatchObject({
             role: Role.HOSTESS,
             capabilities: DEFAULT_CAPABILITIES_BY_ROLE[Role.HOSTESS],

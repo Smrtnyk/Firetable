@@ -13,6 +13,7 @@
                 @filter="onFilterCountries"
                 clearable
                 clear-icon="close"
+                clear-icon-label="Clear"
                 :rules="[validateCountrySelection]"
             >
                 <template #option="scope">

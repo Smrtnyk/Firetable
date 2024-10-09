@@ -3,6 +3,8 @@ import TelNumberInput from "./TelNumberInput.vue";
 import { renderComponent } from "../../../test-helpers/render-component";
 import { describe, it, expect, beforeEach } from "vitest";
 import { userEvent } from "@vitest/browser/context";
+import { last } from "es-toolkit";
+import { first } from "es-toolkit/compat";
 
 const AUSTRIA_OPTION = "Austria";
 
@@ -20,15 +22,14 @@ describe("TelNumberInput", () => {
         it("renders the form with initial values", () => {
             const screen = renderComponent(TelNumberInput, props);
 
-            const countryCodeSelect = screen
-                .getByRole("combobox", { name: "Country Code" })
-                .query();
-            expect(countryCodeSelect).toBeTruthy();
-            expect(countryCodeSelect.getAttribute("value")).toBe("");
+            const countryCodeSelect = screen.getByRole("combobox", { name: "Country Code" });
 
-            const phoneNumberInput = screen.getByLabelText("Phone Number").query();
-            expect(phoneNumberInput).toBeTruthy();
-            expect(phoneNumberInput.getAttribute("value")).toBe("");
+            expect.element(countryCodeSelect).toBeVisible();
+            expect(countryCodeSelect.query()?.getAttribute("value")).toBe("");
+
+            const phoneNumberInput = screen.getByLabelText("Phone Number");
+            expect.element(phoneNumberInput).toBeVisible();
+            expect(phoneNumberInput.query()?.getAttribute("value")).toBe("");
         });
 
         it("allows selecting a country code", async () => {
@@ -39,48 +40,46 @@ describe("TelNumberInput", () => {
             const countryOption = screen.getByText(AUSTRIA_OPTION);
             await userEvent.click(countryOption);
 
-            expect(countryCodeSelect.query().getAttribute("value")).toBe("Austria");
+            expect(countryCodeSelect.query()?.getAttribute("value")).toBe("Austria");
         });
 
         it("allows entering a phone number", async () => {
             const screen = renderComponent(TelNumberInput, props);
 
-            const phoneNumberInput = screen.getByLabelText("Phone Number").query();
+            const phoneNumberInput = screen.getByLabelText("Phone Number");
             await userEvent.type(phoneNumberInput, "123456789");
 
-            expect(phoneNumberInput.getAttribute("value")).toBe("123456789");
+            expect(phoneNumberInput.query()?.getAttribute("value")).toBe("123456789");
         });
 
         it("emits the correct modelValue when a valid phone number is provided", async () => {
             const screen = renderComponent(TelNumberInput, props);
 
-            const countryCodeSelect = screen
-                .getByRole("combobox", { name: "Country Code" })
-                .query();
+            const countryCodeSelect = screen.getByRole("combobox", { name: "Country Code" });
             await userEvent.click(countryCodeSelect);
             const countryOption = screen.getByText(AUSTRIA_OPTION);
             await userEvent.click(countryOption);
 
-            const phoneNumberInput = screen.getByLabelText("Phone Number").query();
+            const phoneNumberInput = screen.getByLabelText("Phone Number");
             await userEvent.type(phoneNumberInput, "2025550123");
 
             await userEvent.tab();
 
             expect(screen.emitted()["update:modelValue"]).toBeTruthy();
-            expect(screen.emitted()["update:modelValue"].at(-1)[0]).toBe("+432025550123");
+            expect(last<string[]>(screen.emitted()["update:modelValue"] as any)[0]).toBe(
+                "+432025550123",
+            );
         });
 
         it("shows validation error for an invalid phone number", async () => {
             const screen = renderComponent(TelNumberInput, props);
 
-            const countryCodeSelect = screen
-                .getByRole("combobox", { name: "Country Code" })
-                .query();
+            const countryCodeSelect = screen.getByRole("combobox", { name: "Country Code" });
             await userEvent.click(countryCodeSelect);
             const countryOption = screen.getByText(AUSTRIA_OPTION);
             await userEvent.click(countryOption);
 
-            const phoneNumberInput = screen.getByLabelText("Phone Number").query();
+            const phoneNumberInput = screen.getByLabelText("Phone Number");
             await userEvent.type(phoneNumberInput, "123");
 
             await userEvent.tab();
@@ -89,7 +88,7 @@ describe("TelNumberInput", () => {
             expect(errorMessage.query()).toBeTruthy();
 
             expect(screen.emitted()["update:modelValue"]).toBeTruthy();
-            expect(screen.emitted()["update:modelValue"].at(-1)[0]).toBe("");
+            expect(last<string[]>(screen.emitted()["update:modelValue"] as any)[0]).toBe("");
         });
 
         it("allows leaving both fields empty (optional field)", async () => {
@@ -108,7 +107,7 @@ describe("TelNumberInput", () => {
             expect(phoneError.query()).toBeNull();
 
             expect(screen.emitted()["update:modelValue"]).toBeTruthy();
-            expect(screen.emitted()["update:modelValue"][0][0]).toBe("");
+            expect(first<string[]>(screen.emitted()["update:modelValue"] as any)[0]).toBe("");
         });
 
         // flaky test
@@ -147,50 +146,44 @@ describe("TelNumberInput", () => {
                 modelValue: "+441234567890",
             });
 
-            const countryCodeSelect = screen
-                .getByRole("combobox", { name: "Country Code" })
-                .query();
-            expect(countryCodeSelect.getAttribute("value")).toContain("United Kingdom");
+            const countryCodeSelect = screen.getByRole("combobox", { name: "Country Code" });
+            expect(countryCodeSelect.query()?.getAttribute("value")).toContain("United Kingdom");
 
-            const phoneNumberInput = screen.getByLabelText("Phone Number").query();
-            expect(phoneNumberInput.getAttribute("value")).toBe("1234567890");
+            const phoneNumberInput = screen.getByLabelText("Phone Number");
+            expect(phoneNumberInput.query()?.getAttribute("value")).toBe("1234567890");
         });
 
         it("does not emit modelValue when inputs are invalid", async () => {
             const screen = renderComponent(TelNumberInput, props);
 
-            const countryCodeSelect = screen
-                .getByRole("combobox", { name: "Country Code" })
-                .query();
+            const countryCodeSelect = screen.getByRole("combobox", { name: "Country Code" });
             await userEvent.click(countryCodeSelect);
             const countryOption = screen.getByText(AUSTRIA_OPTION);
             await userEvent.click(countryOption);
 
-            const phoneNumberInput = screen.getByLabelText("Phone Number").query();
+            const phoneNumberInput = screen.getByLabelText("Phone Number");
             await userEvent.type(phoneNumberInput, "abc");
 
             await userEvent.tab();
 
             expect(screen.emitted()["update:modelValue"]).toBeTruthy();
-            expect(screen.emitted()["update:modelValue"].at(-1)[0]).toBe("");
+            expect(last<string[]>(screen.emitted()["update:modelValue"] as any)[0]).toBe("");
         });
 
         it("formats the phone number correctly on blur", async () => {
             const screen = renderComponent(TelNumberInput, props);
 
-            const countryCodeSelect = screen
-                .getByRole("combobox", { name: "Country Code" })
-                .query();
+            const countryCodeSelect = screen.getByRole("combobox", { name: "Country Code" });
             await userEvent.click(countryCodeSelect);
             const countryOption = screen.getByText(AUSTRIA_OPTION);
             await userEvent.click(countryOption);
 
-            const phoneNumberInput = screen.getByLabelText("Phone Number").query();
+            const phoneNumberInput = screen.getByLabelText("Phone Number");
             await userEvent.type(phoneNumberInput, "7123456789");
 
             await userEvent.tab();
 
-            expect(phoneNumberInput.getAttribute("value")).toBe("7123456789");
+            expect(phoneNumberInput.query()?.getAttribute("value")).toBe("7123456789");
         });
 
         // flaky test
@@ -207,7 +200,7 @@ describe("TelNumberInput", () => {
 
             // Now clear the country code
             const clearButton = document.querySelector("i.q-icon[role='button']");
-            await userEvent.click(clearButton);
+            await userEvent.click(clearButton!);
             // Blur to trigger validation
             await userEvent.tab();
 
@@ -217,7 +210,7 @@ describe("TelNumberInput", () => {
             expect(errorMessage.query()).toBeTruthy();
 
             expect(screen.emitted()["update:modelValue"]).toBeTruthy();
-            expect(screen.emitted()["update:modelValue"].at(-1)[0]).toBe("");
+            expect(last<string[]>(screen.emitted()["update:modelValue"] as any)[0]).toBe("");
         });
 
         // flaky test
@@ -236,7 +229,7 @@ describe("TelNumberInput", () => {
             // Now clear both fields
             const clearButton = document.querySelector("i.q-icon[role='button']");
             await userEvent.fill(phoneNumberInput, "");
-            await userEvent.click(clearButton);
+            await userEvent.click(clearButton!);
 
             // Blur to trigger validation
             await userEvent.tab();
@@ -251,7 +244,7 @@ describe("TelNumberInput", () => {
             expect(phoneError.query()).toBeNull();
 
             expect(screen.emitted()["update:modelValue"]).toBeTruthy();
-            expect(screen.emitted()["update:modelValue"].at(-1)[0]).toBe("");
+            expect(last<string[]>(screen.emitted()["update:modelValue"] as any)[0]).toBe("");
         });
     });
 
@@ -290,7 +283,9 @@ describe("TelNumberInput", () => {
 
             // Ensure that the modelValue was emitted correctly
             expect(screen.emitted()["update:modelValue"]).toBeTruthy();
-            expect(screen.emitted()["update:modelValue"].at(-1)[0]).toBe("+432025550123");
+            expect(last<string[]>(screen.emitted()["update:modelValue"] as any)[0]).toBe(
+                "+432025550123",
+            );
         });
 
         it("shows error when only one field is provided", async () => {

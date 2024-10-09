@@ -1,4 +1,3 @@
-import type { QueryDocumentSnapshot } from "firebase/firestore";
 import type { PlannedReservation } from "./planned-reservation.js";
 import type { WalkInReservation } from "./walk-in-reservation.js";
 import { ReservationType } from "./base-reservation.js";
@@ -7,12 +6,7 @@ export type QueuedReservationDoc = QueuedReservation & {
     /**
      * The id of the document
      */
-    id: number;
-
-    /**
-     * document snapshot provided by the vuefire
-     */
-    _doc: QueryDocumentSnapshot<QueuedReservationDoc>;
+    id: string;
 };
 
 export type QueuedReservation = Omit<

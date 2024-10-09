@@ -1,5 +1,4 @@
 import { bucketizeReservations } from "./bucketize-reservations.js";
-import { describe, it, expect } from "vitest";
 import {
     ReservationStatus,
     ReservationType,
@@ -7,11 +6,11 @@ import {
     type ReservationDocWithEventId,
     type PropertyDoc,
 } from "@firetable/types";
+import { describe, it, expect } from "vitest";
 
-// Mock data for testing
 const mockProperties: PropertyDoc[] = [
-    { id: "prop1", name: "Property One" },
-    { id: "prop2", name: "Property Two" },
+    { id: "prop1", name: "Property One", _doc: {} as any, organisationId: "123", relatedUsers: [] },
+    { id: "prop2", name: "Property Two", _doc: {} as any, organisationId: "123", relatedUsers: [] },
 ];
 
 const mockEvents: EventDoc[] = [
@@ -24,6 +23,7 @@ const mockEvents: EventDoc[] = [
         entryPrice: 50,
         creator: "user1",
         organisationId: "org1",
+        _doc: {} as any,
     },
     {
         id: "event2",
@@ -34,6 +34,7 @@ const mockEvents: EventDoc[] = [
         entryPrice: 100,
         creator: "user2",
         organisationId: "org2",
+        _doc: {} as any,
     },
 ];
 
@@ -52,7 +53,7 @@ const mockReservations: ReservationDocWithEventId[] = [
             email: "creator1@example.com",
             id: "creator1",
             name: "Creator One",
-            createdAt: new Date(),
+            createdAt: Date.now(),
         },
         isVIP: true,
         reservationConfirmed: true,
@@ -60,6 +61,7 @@ const mockReservations: ReservationDocWithEventId[] = [
         arrived: true,
         consumption: 100,
         reservedBy: { email: "reserver@example.com", id: "reserver", name: "Reserver One" },
+        _doc: {} as any,
     },
     {
         id: "res2",
@@ -75,11 +77,12 @@ const mockReservations: ReservationDocWithEventId[] = [
             email: "creator2@example.com",
             id: "creator2",
             name: "Creator Two",
-            createdAt: new Date(),
+            createdAt: Date.now(),
         },
         isVIP: false,
         arrived: true,
         consumption: 50,
+        _doc: {} as any,
     },
     {
         id: "res3",
@@ -95,7 +98,7 @@ const mockReservations: ReservationDocWithEventId[] = [
             email: "creator3@example.com",
             id: "creator3",
             name: "Creator Three",
-            createdAt: new Date(),
+            createdAt: Date.now(),
         },
         isVIP: false,
         reservationConfirmed: true,
@@ -103,6 +106,7 @@ const mockReservations: ReservationDocWithEventId[] = [
         arrived: false,
         consumption: 70,
         reservedBy: { email: "reserver@example.com", id: "reserver", name: "Reserver One" },
+        _doc: {} as any,
     },
 ];
 
@@ -152,6 +156,7 @@ describe("bucketizeReservations", () => {
                     entryPrice: 75,
                     creator: "user3",
                     organisationId: "org3",
+                    _doc: {} as any,
                 },
             ],
             mockReservations,
@@ -191,6 +196,7 @@ describe("bucketizeReservations", () => {
                     entryPrice: 75,
                     creator: "user3",
                     organisationId: "org3",
+                    _doc: {} as any,
                 },
             ],
             mockReservations,
@@ -220,7 +226,7 @@ describe("bucketizeReservations", () => {
     });
 
     it("handles multiple events for the same property", () => {
-        const multipleEventsSameProperty = [
+        const multipleEventsSameProperty: EventDoc[] = [
             {
                 id: "event1",
                 propertyId: "prop1",
@@ -230,6 +236,7 @@ describe("bucketizeReservations", () => {
                 entryPrice: 50,
                 creator: "user1",
                 organisationId: "org1",
+                _doc: {} as any,
             },
             {
                 id: "event3",
@@ -240,6 +247,7 @@ describe("bucketizeReservations", () => {
                 entryPrice: 75,
                 creator: "user3",
                 organisationId: "org3",
+                _doc: {} as any,
             },
         ];
 
@@ -256,15 +264,9 @@ describe("bucketizeReservations", () => {
     });
 
     it("correctly adds mixed planned and walk-in reservations", () => {
-        const mixedReservations = [
-            {
-                ...mockReservations[0],
-                type: ReservationType.PLANNED,
-            },
-            {
-                ...mockReservations[1],
-                type: ReservationType.WALK_IN,
-            },
+        const mixedReservations: ReservationDocWithEventId[] = [
+            mockReservations[0],
+            mockReservations[1],
         ];
 
         const result = bucketizeReservations(mockEvents, mixedReservations, mockProperties);
