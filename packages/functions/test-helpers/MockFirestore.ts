@@ -828,7 +828,7 @@ export class MockCollection extends MockQuery implements CollectionReference {
         throw new NotImplementedError("findNearest is not implemented");
     }
 
-    override explainStream(options?: FirebaseFirestore.ExplainOptions): NodeJS.ReadableStream {
+    override explainStream(...args: any[]): NodeJS.ReadableStream {
         throw new NotImplementedError("explainStream is not implemented");
     }
 
@@ -1715,10 +1715,12 @@ class MockBundleBuilder {
 }
 
 export class MockGeoPoint {
-    constructor(
-        public latitude: number,
-        public longitude: number,
-    ) {}
+    readonly longitude: number;
+    readonly latitude: number;
+    constructor(latitude: number, longitude: number) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 
     isEqual(other: MockGeoPoint): boolean {
         return this.latitude === other.latitude && this.longitude === other.longitude;

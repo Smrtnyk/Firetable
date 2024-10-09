@@ -1,4 +1,5 @@
 import type { QueuedReservationDoc, UserCapabilities, WalkInReservation } from "@firetable/types";
+import type { RenderResult } from "vitest-browser-vue";
 import ReservationGeneralInfo from "./ReservationGeneralInfo.vue";
 import { renderComponent } from "../../../../test-helpers/render-component";
 import { ReservationStatus, ReservationType, Role, UserCapability } from "@firetable/types";
@@ -33,7 +34,7 @@ describe("ReservationGeneralInfo", () => {
     function renderComponentWithStore(
         currentUserId: string,
         capabilitiesPartial: Partial<UserCapabilities> = {},
-    ) {
+    ): RenderResult<any> {
         return renderComponent(
             ReservationGeneralInfo,
             { reservation: mockReservation },

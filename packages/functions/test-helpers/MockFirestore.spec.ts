@@ -1330,7 +1330,7 @@ describe("MockFirestore", () => {
             );
         });
 
-        it("should throw 'invalid-argument' error for unsupported query operators", async () => {
+        it("should throw 'invalid-argument' error for unsupported query operators", () => {
             expect(() => {
                 db.collection("testCollection").where(
                     "status",
