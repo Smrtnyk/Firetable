@@ -1,15 +1,9 @@
 import type { AdminUser, User, VoidFunction } from "@firetable/types";
 import type { User as FBUser } from "firebase/auth";
-import {
-    Role,
-    ADMIN,
-    Collection,
-    DEFAULT_CAPABILITIES_BY_ROLE,
-    UserCapability,
-} from "@firetable/types";
+import { Role, ADMIN, DEFAULT_CAPABILITIES_BY_ROLE, UserCapability } from "@firetable/types";
 import { defineStore } from "pinia";
 import { computed, ref, watch } from "vue";
-import { logoutUser } from "@firetable/backend";
+import { getUserPath, logoutUser } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useFirestoreDocument } from "src/composables/useFirestore";
 import { usePropertiesStore } from "src/stores/properties-store";
@@ -174,9 +168,7 @@ export const useAuthStore = defineStore("auth", function () {
             data: userRef,
             stop,
             error,
-        } = useFirestoreDocument<User>(
-            `${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}/${authUser.uid}`,
-        );
+        } = useFirestoreDocument<User>(getUserPath(organisationId, authUser.uid));
         await promise.value;
 
         watch(
