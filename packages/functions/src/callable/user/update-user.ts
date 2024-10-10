@@ -1,8 +1,7 @@
 import type { EditUserPayload } from "../../../types/types.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
 import { auth, db } from "../../init.js";
-import { getPropertiesPath, getUsersPath } from "../../paths.js";
-import { FieldValue } from "firebase-admin/firestore";
+import { getUserPath } from "../../paths.js";
 import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
 
@@ -77,53 +76,13 @@ export async function updateUserFn(
     }
 
     try {
-        // Fetch the properties associated with this user by checking relatedUsers field
-        const existingPropertiesSnapshot = await db
-            .collection(getPropertiesPath(organisationId))
-            .where("relatedUsers", "array-contains", userId)
-            .get();
-
-        const existingProperties = existingPropertiesSnapshot.docs.map((doc) => doc.id);
-
-        const propertiesToAdd = updatedUser.relatedProperties.filter(function (id) {
-            return !existingProperties.includes(id);
-        });
-        const propertiesToRemove = existingProperties.filter(function (id) {
-            return !updatedUser.relatedProperties.includes(id);
-        });
-
-        // eslint-disable-next-line require-await -- Firestore transaction requires an async function
-        await db.runTransaction(async function (transaction) {
-            const userRef = db.collection(getUsersPath(organisationId)).doc(userId);
-
-            transaction.update(userRef, {
-                name: updatedUser.name,
-                username: updatedUser.username,
-                email: updatedUser.email,
-                role: updatedUser.role,
-                relatedProperties: updatedUser.relatedProperties,
-                capabilities: updatedUser.capabilities,
-            });
-
-            // Add the user to relatedUsers field of the property document for new associations
-            for (const propertyId of propertiesToAdd) {
-                const propertyRef = db
-                    .collection(getPropertiesPath(organisationId))
-                    .doc(propertyId);
-                transaction.update(propertyRef, {
-                    relatedUsers: FieldValue.arrayUnion(userId),
-                });
-            }
-
-            // Remove the user from relatedUsers field of the property document for removed associations
-            for (const propertyId of propertiesToRemove) {
-                const propertyRef = db
-                    .collection(getPropertiesPath(organisationId))
-                    .doc(propertyId);
-                transaction.update(propertyRef, {
-                    relatedUsers: FieldValue.arrayRemove(userId),
-                });
-            }
+        await db.doc(getUserPath(organisationId, userId)).update({
+            name: updatedUser.name,
+            username: updatedUser.username,
+            email: updatedUser.email,
+            role: updatedUser.role,
+            relatedProperties: updatedUser.relatedProperties,
+            capabilities: updatedUser.capabilities,
         });
 
         return { success: true, message: "User updated successfully." };

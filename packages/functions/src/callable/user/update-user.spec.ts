@@ -4,8 +4,12 @@ import { updateUserFn } from "./update-user";
 import { Role } from "../../../types/types";
 import * as Init from "../../init";
 import { MockAuth } from "../../../test-helpers/MockAuth";
-import { MockFieldValue, MockFirestore } from "../../../test-helpers/MockFirestore";
-import { getPropertyPath, getUserPath } from "../../paths";
+import {
+    MockDocumentReference,
+    MockFieldValue,
+    MockFirestore,
+} from "../../../test-helpers/MockFirestore";
+import { getUserPath } from "../../paths";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as Firestore from "firebase-admin/firestore";
 
@@ -67,12 +71,6 @@ describe("updateUserFn", () => {
                     email,
                     relatedProperties: ["property1"],
                 });
-            await mockFirestore.doc(getPropertyPath(organisationId, "property1")).set({
-                relatedUsers: [uid],
-            });
-            await mockFirestore.doc(getPropertyPath(organisationId, "property2")).set({
-                relatedUsers: [],
-            });
 
             // Simulate the callable request
             const request = {
@@ -111,7 +109,7 @@ describe("updateUserFn", () => {
             );
         });
 
-        it("should handle errors during Firestore transaction", async () => {
+        it("should handle errors during update", async () => {
             const request = {
                 data: {
                     updatedUser: { name: "New Name", relatedProperties: ["property1"] },
@@ -123,11 +121,13 @@ describe("updateUserFn", () => {
             vi.spyOn(MockAuth.prototype, "getUser").mockResolvedValue({} as any);
 
             // Mock Firestore transaction to throw an error
-            vi.spyOn(mockFirestore, "runTransaction").mockRejectedValue(
-                new Error("Transaction failed"),
+            vi.spyOn(MockDocumentReference.prototype, "update").mockRejectedValue(
+                new Error("Failed"),
             );
 
-            await expect(updateUserFn(request)).rejects.toThrow("Transaction failed");
+            await expect(updateUserFn(request)).rejects.toThrow(
+                "Failed to update user. Details: Failed",
+            );
         });
     });
 
@@ -215,101 +215,6 @@ describe("updateUserFn", () => {
             // Verify custom claim update in MockAuth
             const user = await mockAuth.getUserByEmail("test@example.com");
             expect(user.customClaims).toStrictEqual({ role: newRole, organisationId });
-        });
-    });
-
-    describe("Property associations", () => {
-        it("should add new property associations", async () => {
-            const organisationId = "org1";
-            const propertiesToAdd = ["property2", "property3"];
-
-            const uid = await createUser({
-                email: "example@mail.at",
-                organisationId,
-                role: Role.STAFF,
-                password: "password",
-            });
-            // Add user doc
-            await mockFirestore.doc(getUserPath(organisationId, uid)).set({
-                name: "Test User",
-                email: "",
-            });
-
-            // Setup initial mock properties without the user associated
-            for (const propertyId of propertiesToAdd) {
-                const propertyPath = getPropertyPath(organisationId, propertyId);
-                const propertyDocRef = mockFirestore.doc(propertyPath);
-                await propertyDocRef.set({
-                    // initially empty
-                    relatedUsers: [],
-                });
-            }
-
-            // Setup test data with new properties to add
-            const request = {
-                data: {
-                    updatedUser: { relatedProperties: propertiesToAdd },
-                    userId: uid,
-                    organisationId,
-                },
-            } as CallableRequest<EditUserPayload>;
-
-            // Call the function to add property associations
-            await updateUserFn(request);
-
-            // Verify new associations in Firestore
-            for (const propertyId of propertiesToAdd) {
-                const propertyDoc = mockFirestore.getDataAtPath(
-                    getPropertyPath(organisationId, propertyId),
-                );
-                expect(propertyDoc.data.relatedUsers).toContain(uid);
-            }
-        });
-
-        it("should remove existing property associations", async () => {
-            const organisationId = "org1";
-            const propertiesToRemove = ["property1"];
-
-            const uid = await createUser({
-                email: "example@mail.at",
-                organisationId,
-                role: Role.STAFF,
-                password: "password",
-            });
-            // Add user doc
-            await mockFirestore.doc(getUserPath(organisationId, uid)).set({
-                name: "Test User",
-                email: "",
-            });
-
-            // Setup initial mock properties with the user associated
-            for (const propertyId of propertiesToRemove) {
-                const propertyPath = getPropertyPath(organisationId, propertyId);
-                const propertyDocRef = mockFirestore.doc(propertyPath);
-                await propertyDocRef.set({
-                    relatedUsers: [uid],
-                });
-            }
-
-            // Setup test data with properties to remove
-            const request = {
-                data: {
-                    updatedUser: { relatedProperties: [] } as any,
-                    userId: uid,
-                    organisationId,
-                },
-            } as CallableRequest<EditUserPayload>;
-
-            // Call the function to remove property associations
-            await updateUserFn(request);
-
-            // Verify removal of associations in Firestore
-            for (const propertyId of propertiesToRemove) {
-                const propertyDoc = mockFirestore.getDataAtPath(
-                    getPropertyPath(organisationId, propertyId),
-                );
-                expect(propertyDoc.data.relatedUsers).not.toContain(uid);
-            }
         });
     });
 });

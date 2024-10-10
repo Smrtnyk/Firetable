@@ -6,7 +6,6 @@ import { createPropertyFn } from "./callable/create-property/create-property.js"
 import { deleteDocument } from "./delete-document/index.js";
 import { updateUserFn } from "./callable/user/update-user.js";
 import { fetchUsersByRoleFn } from "./callable/user/fetch-users-by-role.js";
-import { onUserDeletedFn } from "./trigger/on-user-deleted.js";
 import { onPropertyDeletedFn } from "./trigger/on-property-deleted.js";
 
 import { changePasswordFn } from "./callable/user/change-password.js";
@@ -33,12 +32,6 @@ export const fetchUsersByRole = onCall(fetchUsersByRoleFn);
 export const createUser = onCall(createUserFn);
 export const updateUser = onCall(updateUserFn);
 export const deleteUser = onCall(deleteUserFn);
-export const onUserDeleted = onDocumentDeleted(
-    `${Collection.ORGANISATIONS}/{organisationId}/${Collection.USERS}/{userId}`,
-    (event) => {
-        return onUserDeletedFn(event.params);
-    },
-);
 
 // Organisations
 export const onOrganisationDeleted = onDocumentDeleted(

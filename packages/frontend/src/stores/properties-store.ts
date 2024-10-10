@@ -15,7 +15,7 @@ import {
     propertiesCollection,
 } from "@firetable/backend";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
-import { query, where } from "firebase/firestore";
+import { query, where, documentId } from "firebase/firestore";
 import { nextTick, ref, watch } from "vue";
 import { merge } from "es-toolkit";
 import { matchesProperty } from "es-toolkit/compat";
@@ -111,14 +111,20 @@ export const usePropertiesStore = defineStore("properties", function () {
 
     async function initNonAdminProperties({
         role,
-        id,
         organisationId,
-    }: Pick<User, "id" | "organisationId" | "role">): Promise<void> {
+        relatedProperties,
+    }: Pick<User, "organisationId" | "relatedProperties" | "role">): Promise<void> {
+        if (relatedProperties.length === 0) {
+            setProperties([]);
+            return;
+        }
+
         const propertiesRef = propertiesCollection(organisationId);
         const userPropertiesQuery =
             role === Role.PROPERTY_OWNER
                 ? query(propertiesRef)
-                : query(propertiesRef, where("relatedUsers", "array-contains", id));
+                : query(propertiesRef, where(documentId(), "in", relatedProperties));
+
         const { data, stop, pending, promise } = useFirestoreCollection<PropertyDoc[]>(
             createQuery(userPropertiesQuery),
         );

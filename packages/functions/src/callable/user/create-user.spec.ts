@@ -2,7 +2,7 @@ import type { CallableRequest } from "firebase-functions/v2/https";
 import type { CreateUserPayload } from "../../../types/types";
 import { createUser } from "./create-user";
 import { MockAuth } from "../../../test-helpers/MockAuth";
-import { MockFirestore } from "../../../test-helpers/MockFirestore";
+import { MockDocumentReference, MockFirestore } from "../../../test-helpers/MockFirestore";
 import * as Init from "../../init";
 import { getUserPath } from "../../paths";
 import { HttpsError } from "firebase-functions/v2/https";
@@ -82,7 +82,7 @@ describe("createUser", () => {
     });
 
     it("cleans up by deleting the user from Auth if there's an exception after user creation", async () => {
-        vi.spyOn(mockFirestore, "runTransaction").mockRejectedValue(
+        vi.spyOn(MockDocumentReference.prototype, "set").mockRejectedValue(
             new Error("Some post-creation error"),
         );
 

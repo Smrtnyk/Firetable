@@ -34,18 +34,14 @@ export function loginWithEmail(email: string, password: string): Promise<UserCre
 }
 
 type FetchUsersByRoleRequestData = {
-    userIdsToFetch: string[];
     organisationId: string;
 };
-export function fetchUsersByRole(
-    userIdsToFetch: string[],
-    organisationId: string,
-): Promise<HttpsCallableResult<User[]>> {
+export function fetchUsersByRole(organisationId: string): Promise<HttpsCallableResult<User[]>> {
     const { functions } = initializeFirebase();
     return httpsCallable<FetchUsersByRoleRequestData, User[]>(
         functions,
         "fetchUsersByRole",
-    )({ userIdsToFetch, organisationId });
+    )({ organisationId });
 }
 
 export function submitNewPassword(

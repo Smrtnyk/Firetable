@@ -1,8 +1,7 @@
 import type { CreateUserPayload } from "../../../types/types.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
 import { auth, db } from "../../init.js";
-import { getPropertiesPath, getUsersPath } from "../../paths.js";
-import { FieldValue } from "firebase-admin/firestore";
+import { getUsersPath } from "../../paths.js";
 import { HttpsError } from "firebase-functions/v2/https";
 
 /**
@@ -13,7 +12,6 @@ import { HttpsError } from "firebase-functions/v2/https";
  * 2. Creates a new user in Firebase Authentication with the provided email and password.
  * 3. Assigns a custom claim (role) to the created user in Firebase Authentication.
  * 4. Stores user metadata (name, email, role, status) in the Firestore USERS collection.
- * 5. Maps the user to one or more properties by storing entries in the USER_PROPERTY_MAP collection.
  *
  * If any of the steps fail after the user has been created in Firebase Authentication, the function performs a cleanup by deleting the created user.
  *
@@ -66,21 +64,7 @@ export async function createUser(
             organisationId,
         };
 
-        // eslint-disable-next-line require-await -- Firestore transaction requires an async function
-        await db.runTransaction(async function (transaction) {
-            // Adjusted the userRef to point to the nested users collection under organisations/{organisationId}
-            const userRef = db.collection(getUsersPath(organisationId)).doc(createdUser.uid);
-            transaction.set(userRef, userDoc);
-
-            for (const propertyId of relatedProperties) {
-                const propertyRef = db
-                    .collection(getPropertiesPath(organisationId))
-                    .doc(propertyId);
-                transaction.update(propertyRef, {
-                    relatedUsers: FieldValue.arrayUnion(createdUser.uid),
-                });
-            }
-        });
+        await db.collection(getUsersPath(organisationId)).doc(createdUser.uid).set(userDoc);
 
         return { uid: createdUser.uid, message: "User created successfully!" };
     } catch (e: any) {
@@ -106,7 +90,6 @@ export async function createUser(
                 errorCode = "invalid-argument";
                 errorMessage = "The provided email is invalid.";
                 break;
-            // Add more cases as needed based on Firebase Auth error codes
             default:
                 errorCode = "internal";
                 errorMessage = e.message || "An internal error occurred.";

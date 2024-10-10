@@ -71,7 +71,6 @@ describe("createPropertyFn", () => {
             name: propertyName,
             organisationId,
             creatorId: userId,
-            relatedUsers: [userId],
         });
 
         // Check if the user's related properties are updated

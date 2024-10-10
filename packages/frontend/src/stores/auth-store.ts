@@ -128,12 +128,15 @@ export const useAuthStore = defineStore("auth", function () {
                 await propertiesStore.initOrganisations();
                 await propertiesStore.initAdminProperties();
             } else {
+                const userDocument = await watchAndAssignUser(authUser, organisationId);
+                if (!userDocument) {
+                    return;
+                }
                 await Promise.all([
-                    watchAndAssignUser(authUser, organisationId),
                     propertiesStore.initUserOrganisation(organisationId),
                     propertiesStore.initNonAdminProperties({
                         role,
-                        id: authUser.uid,
+                        relatedProperties: userDocument.relatedProperties,
                         organisationId,
                     }),
                 ]);
@@ -162,7 +165,10 @@ export const useAuthStore = defineStore("auth", function () {
         isReady.value = true;
     }
 
-    async function watchAndAssignUser(authUser: FBUser, organisationId: string): Promise<void> {
+    async function watchAndAssignUser(
+        authUser: FBUser,
+        organisationId: string,
+    ): Promise<User | undefined> {
         const {
             promise,
             data: userRef,
@@ -195,6 +201,8 @@ export const useAuthStore = defineStore("auth", function () {
         isAuthenticated.value = true;
         isReady.value = true;
         unsubscribers.push(stop);
+
+        return user.value;
     }
 
     function handleError(stop: VoidFunction, errorObj: { message: string }): void {

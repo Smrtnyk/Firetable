@@ -44,11 +44,6 @@ export async function createPropertyFn(req: CallableRequest<Data>): Promise<stri
             await userRef.update({
                 relatedProperties: FieldValue.arrayUnion(propertyId),
             });
-
-            // Add the user to relatedUsers of the property
-            await propertyDocRef.update({
-                relatedUsers: FieldValue.arrayUnion(req.auth.uid),
-            });
         }
 
         return propertyId;
