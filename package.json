@@ -39,7 +39,7 @@
         "firebase-tools": "13.22.0",
         "globals": "15.11.0",
         "prettier": "3.3.3",
-        "typescript": "5.6.3",
+        "typescript": "5.7.0-dev.20241010",
         "typescript-eslint": "8.8.1"
     },
     "private": true,

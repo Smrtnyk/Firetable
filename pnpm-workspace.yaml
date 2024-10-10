@@ -5,5 +5,5 @@ catalog:
     '@vitest/browser': https://pkg.pr.new/@vitest/browser@9ece395
     '@vitest/spy': https://pkg.pr.new/@vitest/spy@9ece395
     '@vitest/ui': https://pkg.pr.new/@vitest/ui@9ece395
-    firebase: 10.14.0
+    firebase: 10.14.1
     es-toolkit: 1.24.0
