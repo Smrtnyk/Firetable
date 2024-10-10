@@ -32,7 +32,6 @@ function onReset(): void {
             standout
             rounded
             :label="t('EventGuestListCreateGuestForm.guestNameLabel')"
-            :hint="t('EventGuestListCreateGuestForm.guestNameHint')"
             lazy-rules
             :rules="[minLength(t('EventGuestListCreateGuestForm.guestNameValidationLength'), 3)]"
         />

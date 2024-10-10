@@ -73,7 +73,6 @@ export default {
     },
     EventGuestListCreateGuestForm: {
         guestNameLabel: "Guest name *",
-        guestNameHint: "Name of the guest",
         guestNameValidationLength: "Name must have at least 3 characters!",
     },
     EventCreateForm: {
@@ -99,8 +98,6 @@ export default {
         groupedWithLabel: "Grouped with",
         guestArrivedLabel: "Arrived",
         reservationConfirmedLabel: "Confirmed",
-        deleteReservationLabel: "Delete",
-        editReservationLabel: "Edit",
         reservationConsumption: "Consumption",
         timeLabel: "Time of arrival",
         cancel: "Cancel",

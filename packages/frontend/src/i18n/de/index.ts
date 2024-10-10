@@ -72,10 +72,7 @@ export default {
     },
     EventGuestListCreateGuestForm: {
         guestNameLabel: "Gastname *",
-        guestNameHint: "Name des Gastes",
         guestNameValidationLength: "Der Name muss mindestens 3 Zeichen haben!",
-        guestNameAddSubmit: "Absenden",
-        guestNameReset: "Zurücksetzen",
     },
     EventCreateForm: {
         noFloorPlansMessage:
@@ -88,8 +85,6 @@ export default {
         guestListLimitInputLabel: "Limit für Gästeliste",
         entryPriceInputLabel: "Eintrittspreis, bei kostenlosem Eintritt 0 eingeben",
         inputDateTimePickerCloseBtnLabel: "Schließen",
-        submitButtonLabel: "Absenden",
-        resetButtonLabel: "Zurücksetzen",
         inputDateTimeLabel: "Datum und Uhrzeit der Veranstaltung",
     },
     EventShowReservation: {
@@ -103,8 +98,6 @@ export default {
         groupedWithLabel: "Gruppiert mit",
         guestArrivedLabel: "Angekommen",
         reservationConfirmedLabel: "Bestätigen",
-        deleteReservationLabel: "Löschen",
-        editReservationLabel: "Bearbeiten",
         reservationConsumption: "Flaschenkonsum",
         timeLabel: "Ankunftszeit",
         cancel: "Absagen",
@@ -116,7 +109,6 @@ export default {
         reservationNumberOfGuests: "Anzahl der Gäste *",
         reservationGuestContact: "Kontakt des Gastes",
         reservationNote: "Notiz",
-        reservationCreateBtn: "Absenden",
         reservationConsumption: "Flaschenverzehr",
         reservationTime: "Ankunftszeit",
         reservedByLabel: "Reserviert von",
@@ -153,7 +145,6 @@ export default {
     AddNewPropertyForm: {
         propertyNameLengthValidationMessage: "Der Immobilienname muss mindestens 3 Zeichen haben!",
         organisationsRadioBoxLabel: "Organisationen:",
-        addPropertyButtonLabel: "Absenden",
     },
     PageAdminFloors: {
         title: "Grundrisse",
@@ -197,8 +188,6 @@ export default {
         userOrganisationSelectLabel: "Organisation",
         userOrganisationSelectHint: "Wählen Sie eine Organisation für diesen Benutzer.",
         usePropertiesCheckboxesTitle: "Immobilien:",
-        buttonSubmitLabel: "Absenden",
-        buttonResetLabel: "Zurücksetzen",
     },
     PageProfile: {
         title: "Profil von {name}",
