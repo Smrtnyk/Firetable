@@ -1,10 +1,10 @@
 import type { CallableRequest } from "firebase-functions/v2/https";
-import { getUserPath, getUsersPath } from "../../paths.js";
-import * as Init from "../../init.js";
-import { ADMIN } from "../../../types/types.js";
-import { MockAuth } from "../../../test-helpers/MockAuth.js";
-import { MockFirestore } from "../../../test-helpers/MockFirestore.js";
-import { deleteUser } from "./index.js";
+import { deleteUser } from "./delete-user";
+import { getUserPath, getUsersPath } from "../../paths";
+import * as Init from "../../init";
+import { ADMIN } from "../../../types/types";
+import { MockAuth } from "../../../test-helpers/MockAuth";
+import { MockFirestore } from "../../../test-helpers/MockFirestore";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 describe("deleteUser", () => {

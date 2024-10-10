@@ -1,5 +1,5 @@
 import type { CallableRequest } from "firebase-functions/v2/https";
-import { auth } from "../init.js";
+import { auth } from "../../init.js";
 import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
 

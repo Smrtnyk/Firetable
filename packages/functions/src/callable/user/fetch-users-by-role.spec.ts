@@ -1,9 +1,9 @@
-import type { FetchUsersByRoleRequestData } from "./fetch-users-by-role.js";
+import type { FetchUsersByRoleRequestData } from "./fetch-users-by-role";
 import type { CallableRequest } from "firebase-functions/v2/https";
-import { fetchUsersByRoleFn } from "./fetch-users-by-role.js";
-import * as Init from "../init.js";
-import { ADMIN, Role } from "../../types/types.js";
-import { MockFieldPath, MockFirestore } from "../../test-helpers/MockFirestore.js";
+import { fetchUsersByRoleFn } from "./fetch-users-by-role";
+import * as Init from "../../init";
+import { ADMIN, Role } from "../../../types/types";
+import { MockFieldPath, MockFirestore } from "../../../test-helpers/MockFirestore";
 import * as Firestore from "firebase-admin/firestore";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 

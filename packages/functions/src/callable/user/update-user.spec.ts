@@ -1,11 +1,11 @@
-import type { EditUserPayload, User } from "../../types/types.js";
+import type { EditUserPayload, User } from "../../../types/types";
 import type { CallableRequest } from "firebase-functions/v2/https";
-import { updateUserFn } from "./update-user.js";
-import { Role } from "../../types/types.js";
-import * as Init from "../init.js";
-import { MockAuth } from "../../test-helpers/MockAuth.js";
-import { MockFieldValue, MockFirestore } from "../../test-helpers/MockFirestore.js";
-import { getPropertyPath, getUserPath } from "../paths.js";
+import { updateUserFn } from "./update-user";
+import { Role } from "../../../types/types";
+import * as Init from "../../init";
+import { MockAuth } from "../../../test-helpers/MockAuth";
+import { MockFieldValue, MockFirestore } from "../../../test-helpers/MockFirestore";
+import { getPropertyPath, getUserPath } from "../../paths";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as Firestore from "firebase-admin/firestore";
 

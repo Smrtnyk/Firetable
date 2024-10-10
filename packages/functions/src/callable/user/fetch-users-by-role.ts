@@ -1,8 +1,8 @@
-import type { User } from "../../types/types.js";
+import type { User } from "../../../types/types.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
-import { db } from "../init.js";
-import { Role, ADMIN } from "../../types/types.js";
-import { getUsersPath } from "../paths.js";
+import { db } from "../../init.js";
+import { Role, ADMIN } from "../../../types/types.js";
+import { getUsersPath } from "../../paths.js";
 import { FieldPath } from "firebase-admin/firestore";
 import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";

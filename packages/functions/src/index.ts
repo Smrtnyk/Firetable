@@ -1,15 +1,15 @@
 import { createEvent as createEventFn } from "./callable/create-event/index.js";
-import { createUser as createUserFn } from "./callable/create-user/index.js";
-import { deleteUser as deleteUserFn } from "./callable/delete-user/index.js";
+import { createUser as createUserFn } from "./callable/user/create-user.js";
+import { deleteUser as deleteUserFn } from "./callable/user/delete-user.js";
 import { clearOldEvents as clearOldEventsFn } from "./cron/clear-old-events/index.js";
 import { createPropertyFn } from "./callable/create-property/create-property.js";
 import { deleteDocument } from "./delete-document/index.js";
-import { updateUserFn } from "./callable/update-user.js";
-import { fetchUsersByRoleFn } from "./callable/fetch-users-by-role.js";
+import { updateUserFn } from "./callable/user/update-user.js";
+import { fetchUsersByRoleFn } from "./callable/user/fetch-users-by-role.js";
 import { onUserDeletedFn } from "./trigger/on-user-deleted.js";
 import { onPropertyDeletedFn } from "./trigger/on-property-deleted.js";
 
-import { changePasswordFn } from "./callable/change-password.js";
+import { changePasswordFn } from "./callable/user/change-password.js";
 import { onOrganisationDeletedFn } from "./trigger/on-organisation-deleted.js";
 import { setGuestDataFn } from "./callable/guest/set-guest-data.js";
 import { deleteGuestVisitFn } from "./callable/guest/delete-guest-visit.js";

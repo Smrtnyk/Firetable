@@ -1,10 +1,10 @@
 import type { CallableRequest } from "firebase-functions/v2/https";
-import type { CreateUserPayload } from "../../../types/types.js";
-import { MockAuth } from "../../../test-helpers/MockAuth.js";
-import { MockFirestore } from "../../../test-helpers/MockFirestore.js";
-import * as Init from "../../init.js";
-import { getUserPath } from "../../paths.js";
-import { createUser } from "./index.js";
+import type { CreateUserPayload } from "../../../types/types";
+import { createUser } from "./create-user";
+import { MockAuth } from "../../../test-helpers/MockAuth";
+import { MockFirestore } from "../../../test-helpers/MockFirestore";
+import * as Init from "../../init";
+import { getUserPath } from "../../paths";
 import { HttpsError } from "firebase-functions/v2/https";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 

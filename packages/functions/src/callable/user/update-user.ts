@@ -1,7 +1,7 @@
-import type { EditUserPayload } from "../../types/types.js";
+import type { EditUserPayload } from "../../../types/types.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
-import { auth, db } from "../init.js";
-import { getPropertiesPath, getUsersPath } from "../paths.js";
+import { auth, db } from "../../init.js";
+import { getPropertiesPath, getUsersPath } from "../../paths.js";
 import { FieldValue } from "firebase-admin/firestore";
 import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
