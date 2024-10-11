@@ -89,7 +89,7 @@ function formatSubtitleForGuestVisit(visit: Visit): string {
     return formatEventDate(visit.date);
 }
 
-async function editGuest(): Promise<void> {
+async function editGuest(guestVal: GuestDoc): Promise<void> {
     if (!(await showConfirm("Are you sure you want to edit this guest?"))) {
         return;
     }
@@ -100,7 +100,7 @@ async function editGuest(): Promise<void> {
             component: AddNewGuestForm,
             componentPropsObject: {
                 mode: "edit",
-                initialData: { ...guest.value },
+                initialData: guestVal,
             },
             maximized: false,
             title: "Edit guest",
@@ -137,7 +137,7 @@ async function onDeleteGuest(): Promise<void> {
         <div v-if="guest">
             <FTTitle :title="guest.name" :subtitle="guest.contact">
                 <template #right>
-                    <q-btn rounded icon="pencil" color="secondary" @click="editGuest" />
+                    <q-btn rounded icon="pencil" color="secondary" @click="editGuest(guest)" />
                     <q-btn rounded icon="trash" color="negative" @click="onDeleteGuest()" />
                 </template>
             </FTTitle>

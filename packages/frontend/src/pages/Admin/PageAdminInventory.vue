@@ -75,7 +75,7 @@ function showEditInventoryItemForm(item: InventoryItemDoc): void {
     });
 }
 
-function showCreateInventoryItemDialog(initialData = {}): void {
+function showCreateInventoryItemDialog(initialData?: CreateInventoryItemPayload): void {
     const dialog = createDialog({
         component: FTDialog,
         componentProps: {
@@ -200,7 +200,7 @@ onMounted(init);
                     rounded
                     icon="plus"
                     class="button-gradient"
-                    @click="showCreateInventoryItemDialog"
+                    @click="showCreateInventoryItemDialog()"
                 />
                 <q-btn rounded icon="camera" @click="scanBarcode" />
             </template>

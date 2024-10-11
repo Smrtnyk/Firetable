@@ -224,6 +224,9 @@ importers:
       vitest-browser-vue:
         specifier: 0.0.1
         version: 0.0.1(@vitest/browser@2.1.2)(vitest@2.1.2)(vue@3.5.12(typescript@5.6.3))
+      vue-component-type-helpers:
+        specifier: 2.1.6
+        version: 2.1.6
       vue-tsc:
         specifier: 2.1.6
         version: 2.1.6(typescript@5.6.3)
@@ -2120,9 +2123,6 @@ packages:
       vite:
         optional: true
 
-  '@vitest/pretty-format@2.1.2':
-    resolution: {integrity: sha512-FIoglbHrSUlOJPDGIrh2bjX1sNars5HbxlcsFKCtKzu4+5lpsRhOCVcuzp0fEhAGHkPZRIXVNzPcpSlkoZ3LuA==}
-
   '@vitest/pretty-format@https://pkg.pr.new/vitest-dev/vitest/@vitest/pretty-format@47dde76':
     resolution: {tarball: https://pkg.pr.new/vitest-dev/vitest/@vitest/pretty-format@47dde76}
     version: 2.1.2
@@ -2143,19 +2143,11 @@ packages:
     resolution: {tarball: https://pkg.pr.new/vitest-dev/vitest/@vitest/spy@47dde76}
     version: 2.1.2
 
-  '@vitest/ui@2.1.2':
-    resolution: {integrity: sha512-92gcNzkDnmxOxyHzQrQYRsoV9Q0Aay0r4QMLnV+B+lbqlUWa8nDg9ivyLV5mMVTtGirHsYUGGh/zbIA55gBZqA==}
-    peerDependencies:
-      vitest: 2.1.2
-
   '@vitest/ui@https://pkg.pr.new/@vitest/ui@47dde76':
     resolution: {tarball: https://pkg.pr.new/@vitest/ui@47dde76}
     version: 2.1.2
     peerDependencies:
       vitest: 2.1.2
-
-  '@vitest/utils@2.1.2':
-    resolution: {integrity: sha512-zMO2KdYy6mx56btx9JvAqAZ6EyS3g49krMPPrgOp1yxGZiA93HumGk+bZ5jIZtOg5/VBYl5eBmGRQHqq4FG6uQ==}
 
   '@vitest/utils@https://pkg.pr.new/vitest-dev/vitest/@vitest/utils@47dde76':
     resolution: {tarball: https://pkg.pr.new/vitest-dev/vitest/@vitest/utils@47dde76}
@@ -8356,11 +8348,6 @@ snapshots:
       msw: 2.4.9(typescript@5.6.3)
       vite: 5.4.8(@types/node@22.7.5)(sass@1.79.4)(terser@5.34.1)
 
-  '@vitest/pretty-format@2.1.2':
-    dependencies:
-      tinyrainbow: 1.2.0
-    optional: true
-
   '@vitest/pretty-format@https://pkg.pr.new/vitest-dev/vitest/@vitest/pretty-format@47dde76':
     dependencies:
       tinyrainbow: 1.2.0
@@ -8384,18 +8371,6 @@ snapshots:
     dependencies:
       tinyspy: 3.0.2
 
-  '@vitest/ui@2.1.2(vitest@2.1.2)':
-    dependencies:
-      '@vitest/utils': 2.1.2
-      fflate: 0.8.2
-      flatted: 3.3.1
-      pathe: 1.1.2
-      sirv: 2.0.4
-      tinyglobby: 0.2.9
-      tinyrainbow: 1.2.0
-      vitest: https://pkg.pr.new/vitest@47dde76(@types/node@22.7.5)(@vitest/browser@2.1.2)(@vitest/ui@2.1.2)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.4.9(typescript@5.6.3))(sass@1.79.4)(terser@5.34.1)
-    optional: true
-
   '@vitest/ui@https://pkg.pr.new/@vitest/ui@47dde76(vitest@2.1.2)':
     dependencies:
       '@vitest/utils': https://pkg.pr.new/vitest-dev/vitest/@vitest/utils@47dde76
@@ -8406,13 +8381,6 @@ snapshots:
       tinyglobby: 0.2.9
       tinyrainbow: 1.2.0
       vitest: https://pkg.pr.new/vitest@47dde76(@types/node@22.7.5)(@vitest/browser@2.1.2)(@vitest/ui@2.1.2)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.4.9(typescript@5.6.3))(sass@1.79.4)(terser@5.34.1)
-
-  '@vitest/utils@2.1.2':
-    dependencies:
-      '@vitest/pretty-format': 2.1.2
-      loupe: 3.1.2
-      tinyrainbow: 1.2.0
-    optional: true
 
   '@vitest/utils@https://pkg.pr.new/vitest-dev/vitest/@vitest/utils@47dde76':
     dependencies:
@@ -12857,7 +12825,7 @@ snapshots:
     optionalDependencies:
       '@types/node': 22.7.5
       '@vitest/browser': https://pkg.pr.new/@vitest/browser@47dde76(@vitest/spy@https://pkg.pr.new/@vitest/spy@47dde76)(playwright@1.48.0)(typescript@5.6.3)(vite@5.4.8(@types/node@22.7.5)(sass@1.79.4)(terser@5.34.1))(vitest@2.1.2)
-      '@vitest/ui': 2.1.2(vitest@2.1.2)
+      '@vitest/ui': https://pkg.pr.new/@vitest/ui@47dde76(vitest@2.1.2)
       jsdom: 20.0.3(canvas@2.11.2(encoding@0.1.13))
     transitivePeerDependencies:
       - less

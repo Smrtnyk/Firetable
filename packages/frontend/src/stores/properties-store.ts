@@ -54,8 +54,12 @@ export const usePropertiesStore = defineStore("properties", function () {
         arePropertiesLoading.value = false;
     }
 
-    function getOrganisationById(organisationId: string): OrganisationDoc | undefined {
-        return organisations.value.find(matchesProperty("id", organisationId));
+    function getOrganisationById(organisationId: string): OrganisationDoc {
+        const organisation = organisations.value.find(matchesProperty("id", organisationId));
+        if (!organisation) {
+            throw new Error("No organisation found for the given organisation id");
+        }
+        return organisation;
     }
 
     function getOrganisationNameById(organisationId: string): string {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Reservation, User } from "@firetable/types";
+import type { AdminUser, Reservation, ReservationDoc, User } from "@firetable/types";
 
 import { ReservationType } from "@firetable/types";
 import { computed, ref, watch, useTemplateRef } from "vue";
@@ -9,14 +9,14 @@ import PlannedReservationForm from "src/components/Event/reservation/PlannedRese
 import WalkInReservationForm from "src/components/Event/reservation/WalkInReservationForm.vue";
 
 export interface EventCreateReservationProps {
-    currentUser: User;
+    currentUser: AdminUser | User;
     users: User[];
     mode: "create" | "update";
     eventStartTimestamp: number;
     /**
      *  Optional data for editing
      */
-    reservationData?: Reservation;
+    reservationData?: ReservationDoc | undefined;
     eventDurationInHours: number;
     /**
      *  If true, only the Planned Reservation Form is shown

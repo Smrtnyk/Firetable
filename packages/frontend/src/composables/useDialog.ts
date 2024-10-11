@@ -1,10 +1,23 @@
-import type { DialogChainObject, QDialogOptions } from "quasar";
+import type { DialogChainObject } from "quasar";
+import type { Component } from "vue";
+import type { ComponentProps } from "vue-component-type-helpers";
 import { useQuasar } from "quasar";
 
-export function useDialog(): { createDialog: (options: QDialogOptions) => DialogChainObject } {
+type CreateOptions<C> = {
+    component: Component;
+    componentProps: {
+        component: C;
+        maximized?: boolean;
+        componentPropsObject?: ComponentProps<C>;
+        listeners?: Record<string, (...args: any[]) => any>;
+        title?: string;
+    };
+};
+
+export function useDialog() {
     const quasar = useQuasar();
 
-    function createDialog(options: QDialogOptions): DialogChainObject {
+    function createDialog<C>(options: CreateOptions<C>): DialogChainObject {
         return quasar.dialog(options);
     }
 

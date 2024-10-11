@@ -118,6 +118,7 @@ describe("EventCreateReservation", () => {
         it("renders the form with initial values in 'update' mode", () => {
             props.mode = "update";
             props.reservationData = {
+                id: "foo",
                 ...generateUpdateState(),
                 creator: {
                     id: "user1",

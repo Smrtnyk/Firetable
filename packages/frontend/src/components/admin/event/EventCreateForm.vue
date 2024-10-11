@@ -34,7 +34,7 @@ export interface EventCreateFormProps {
     organisationId: string;
     propertyName: string;
     floors: FloorDoc[];
-    event?: EventDoc;
+    event?: EventDoc | undefined;
     eventStartHours: string;
 }
 

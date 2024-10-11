@@ -7,7 +7,7 @@ import { useI18n } from "vue-i18n";
 
 interface Props {
     itemToEdit?: CreateInventoryItemPayload;
-    initialData?: CreateInventoryItemPayload;
+    initialData?: CreateInventoryItemPayload | undefined;
 }
 
 const { t } = useI18n();
