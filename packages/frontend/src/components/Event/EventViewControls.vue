@@ -22,7 +22,7 @@ const props = defineProps<EventViewControlsProps>();
 
 <template>
     <q-btn-dropdown dense round outline aria-label="Toggle event controls menu">
-        <q-list style="min-width: 50vw">
+        <q-list>
             <q-item v-if="hasMultipleFloorPlans" clickable>
                 <q-item-section>
                     <q-item-label>{{ activeFloor?.name }}</q-item-label>
@@ -32,7 +32,7 @@ const props = defineProps<EventViewControlsProps>();
                     <q-icon name="chevron_right" />
                 </q-item-section>
 
-                <q-menu anchor="top end" self="top start">
+                <q-menu>
                     <q-list>
                         <q-item
                             v-for="florInstance of floorInstances"
