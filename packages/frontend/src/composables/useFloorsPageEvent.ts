@@ -135,7 +135,7 @@ export function useFloorsPageEvent(
         return activeFloor.value?.id === floorId;
     }
 
-    function setActiveFloor(floor?: FloorViewer): void {
+    function setActiveFloor(floor?: ActiveFloor): void {
         if (floor) {
             activeFloor.value = { id: floor.id, name: floor.name };
         }

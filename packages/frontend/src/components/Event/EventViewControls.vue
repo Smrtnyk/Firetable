@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import type { FloorViewer } from "@firetable/floor-creator";
-
-interface EventViewControlsProps {
+export interface EventViewControlsProps {
     activeFloor: { id: string; name: string } | undefined;
-    floorInstances: FloorViewer[];
+    floorInstances: { id: string; name: string }[];
     hasMultipleFloorPlans: boolean;
     isAdmin: boolean;
 }
@@ -16,14 +14,14 @@ const emit = defineEmits<{
             | "toggle-event-guest-list-drawer-visibility"
             | "toggle-queued-reservations-drawer-visibility",
     ): void;
-    (e: "set-active-floor", value: FloorViewer): void;
+    (e: "set-active-floor", value: { id: string; name: string }): void;
 }>();
 
 const props = defineProps<EventViewControlsProps>();
 </script>
 
 <template>
-    <q-btn-dropdown dense round outline>
+    <q-btn-dropdown dense round outline aria-label="Toggle event controls menu">
         <q-list style="min-width: 50vw">
             <q-item v-if="hasMultipleFloorPlans" clickable>
                 <q-item-section>
