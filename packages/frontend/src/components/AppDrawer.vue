@@ -210,6 +210,7 @@ function isLinkWithChildren(link: GuardedLink | LinkWithChildren): link is LinkW
 
 <template>
     <q-drawer
+        no-swipe-open
         :model-value="props.modelValue"
         @update:model-value="emit('update:modelValue', $event)"
         side="right"
