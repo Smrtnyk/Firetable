@@ -2,6 +2,7 @@
 import type { PlannedReservationDoc } from "@firetable/types";
 import { computed } from "vue";
 import { matchesProperty } from "es-toolkit/compat";
+import FTCenteredText from "src/components/FTCenteredText.vue";
 
 interface Props {
     reservations: PlannedReservationDoc[];
@@ -94,6 +95,7 @@ function generateTableData(reservations: PlannedReservationDoc[]): TableData {
 <template>
     <div>
         <q-table
+            dense
             v-if="tableData.length > 0"
             class="table-container"
             :rows="tableData"
@@ -110,9 +112,3 @@ function generateTableData(reservations: PlannedReservationDoc[]): TableData {
         <FTCenteredText v-else>No reservations yet</FTCenteredText>
     </div>
 </template>
-
-<style>
-.table-container {
-    min-height: 25vh;
-}
-</style>

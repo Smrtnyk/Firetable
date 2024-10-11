@@ -32,6 +32,7 @@ import { useGuestsForEvent } from "src/composables/useGuestsForEvent";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { property } from "es-toolkit/compat";
 import { useAuthStore } from "src/stores/auth-store";
+import SettingsCard from "src/components/admin/organisation-settings/SettingsCard.vue";
 
 interface Props {
     organisationId: string;
@@ -215,57 +216,64 @@ onMounted(init);
             <q-tab name="edit" label="Edit" v-if="!isEventFinished(event.date)" />
             <q-tab name="logs" label="Logs" />
         </FTTabs>
-        <FTTabPanels v-model="tab">
-            <!-- General info with charts area -->
-            <q-tab-panel name="info" class="q-pa-xs-sm q-pa-md-md">
-                <AdminEventRTInfo :reservations-status="reservationsStatus" />
-                <q-separator class="q-my-sm bg-grey-6" />
-                <AdminEventReservationsByPerson :reservations="allPlannedReservations" />
-                <q-separator class="q-my-sm bg-grey-6" />
+        <FTTabPanels v-model="tab" class="bg-transparent">
+            <!-- General info area -->
+            <q-tab-panel name="info" class="q-px-xs-xs q-px-md-md q-py-none">
+                <SettingsCard title="Tables status">
+                    <AdminEventRTInfo :reservations-status="reservationsStatus" />
+                </SettingsCard>
 
-                <!-- Nested Tabs for Arrived and Cancelled Reservations -->
-                <FTTabs v-model="reservationsTab">
-                    <q-tab
-                        name="arrivedReservations"
-                        :label="`Arrived (${arrivedReservations.length})`"
-                    />
-                    <q-tab
-                        name="cancelledReservations"
-                        :label="`Cancelled (${cancelledReservations.length})`"
-                    />
-                    <q-tab
-                        name="returningGuests"
-                        :label="`Returning (${returningGuests.length})`"
-                    />
-                </FTTabs>
-                <FTTabPanels v-model="reservationsTab">
-                    <q-tab-panel name="arrivedReservations">
-                        <AdminEventReservationsList
-                            :empty-message="`No arrived reservations`"
-                            @delete="deleteReservationPermanently"
-                            :reservations="arrivedReservations"
+                <SettingsCard title="Reserved by status">
+                    <AdminEventReservationsByPerson :reservations="allPlannedReservations" />
+                </SettingsCard>
+
+                <SettingsCard title="Guests">
+                    <FTTabs v-model="reservationsTab">
+                        <q-tab
+                            name="arrivedReservations"
+                            :label="`Arrived (${arrivedReservations.length})`"
                         />
-                    </q-tab-panel>
-                    <q-tab-panel name="cancelledReservations">
-                        <AdminEventReservationsList
-                            :empty-message="`No cancelled reservations`"
-                            @delete="deleteReservationPermanently"
-                            :reservations="cancelledReservations"
+                        <q-tab
+                            name="cancelledReservations"
+                            :label="`Cancelled (${cancelledReservations.length})`"
                         />
-                    </q-tab-panel>
-                    <q-tab-panel name="returningGuests">
-                        <AdminEventReturningGuestsList
-                            :organisation-id="organisationId"
-                            :returning-guests="returningGuests"
+                        <q-tab
+                            name="returningGuests"
+                            :label="`Returning (${returningGuests.length})`"
                         />
-                    </q-tab-panel>
-                </FTTabPanels>
+                    </FTTabs>
+                    <FTTabPanels v-model="reservationsTab">
+                        <q-tab-panel name="arrivedReservations" class="q-pa-none">
+                            <AdminEventReservationsList
+                                :empty-message="`No arrived reservations`"
+                                @delete="deleteReservationPermanently"
+                                :reservations="arrivedReservations"
+                            />
+                        </q-tab-panel>
+                        <q-tab-panel name="cancelledReservations">
+                            <AdminEventReservationsList
+                                :empty-message="`No cancelled reservations`"
+                                @delete="deleteReservationPermanently"
+                                :reservations="cancelledReservations"
+                            />
+                        </q-tab-panel>
+                        <q-tab-panel name="returningGuests">
+                            <AdminEventReturningGuestsList
+                                :organisation-id="organisationId"
+                                :returning-guests="returningGuests"
+                            />
+                        </q-tab-panel>
+                    </FTTabPanels>
+                </SettingsCard>
             </q-tab-panel>
 
             <!-- Edit area -->
-            <q-tab-panel name="edit" v-if="!isEventFinished(event.date)">
-                <div>
-                    <h2 class="text-subtitle1">Event Info</h2>
+            <q-tab-panel
+                name="edit"
+                v-if="!isEventFinished(event.date)"
+                class="q-px-xs-sm q-px-md-md q-py-none"
+            >
+                <SettingsCard title="Event Info">
                     <q-item clickable v-ripple>
                         <q-item-section>
                             <q-item-label caption lines="2">
@@ -283,12 +291,9 @@ onMounted(init);
                             ></q-btn>
                         </q-item-section>
                     </q-item>
-                </div>
+                </SettingsCard>
 
-                <q-separator class="q-my-md" />
-
-                <div>
-                    <h2 class="text-subtitle1">Event Floors</h2>
+                <SettingsCard title="Event Floors">
                     <q-item :key="floor.id" v-for="floor in eventFloors" clickable v-ripple>
                         <q-item-section>
                             <q-item-label>
@@ -307,12 +312,14 @@ onMounted(init);
                             </q-btn>
                         </q-item-section>
                     </q-item>
-                </div>
+                </SettingsCard>
             </q-tab-panel>
 
             <!-- Logs -->
-            <q-tab-panel name="logs">
-                <AdminEventLogs :logs-doc="logs" :is-admin="authStore.isAdmin" />
+            <q-tab-panel name="logs" class="q-px-xs-sm q-px-md-md q-py-none">
+                <SettingsCard title="">
+                    <AdminEventLogs :logs-doc="logs" :is-admin="authStore.isAdmin" />
+                </SettingsCard>
             </q-tab-panel>
         </FTTabPanels>
     </div>

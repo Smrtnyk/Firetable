@@ -10,6 +10,7 @@ const model = defineModel<number | string>();
         transition-next="fade"
         transition-prev="fade"
         transition-duration="600"
+        class="q-pa-none"
     >
         <slot></slot>
     </q-tab-panels>

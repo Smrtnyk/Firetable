@@ -5,7 +5,6 @@ import { getFormatedDateFromTimestamp } from "src/helpers/date-utils";
 
 import FTDialog from "src/components/FTDialog.vue";
 import ReservationGeneralInfo from "src/components/Event/reservation/ReservationGeneralInfo.vue";
-import { QScrollArea } from "quasar";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import ReservationLabelChips from "src/components/Event/reservation/ReservationLabelChips.vue";
 
@@ -39,7 +38,7 @@ function emitDelete(reservation: ReservationDoc, reset: VoidFunction): void {
 </script>
 
 <template>
-    <q-scroll-area class="scroll-reservations-container">
+    <div class="AdminEventReservationsList">
         <q-list v-if="reservations.length > 0">
             <q-slide-item
                 @right="({ reset }) => emitDelete(reservation, reset)"
@@ -67,12 +66,5 @@ function emitDelete(reservation: ReservationDoc, reset: VoidFunction): void {
             </q-slide-item>
         </q-list>
         <FTCenteredText v-else>{{ props.emptyMessage }}</FTCenteredText>
-    </q-scroll-area>
+    </div>
 </template>
-
-<style lang="scss" scoped>
-.scroll-reservations-container {
-    height: 200px;
-    padding: 0 10px;
-}
-</style>

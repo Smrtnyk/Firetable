@@ -31,18 +31,20 @@ function handleInput(event: any): void {
 </script>
 
 <template>
-    <q-tabs
-        class="ft-q-tabs"
-        v-model="selectedTab"
-        outside-arrows
-        mobile-arrows
-        indicator-color="transparent"
-        active-class="ft-active-tab"
-        align="left"
-        @input="handleInput"
-    >
-        <slot></slot>
-    </q-tabs>
+    <div class="full-width">
+        <q-tabs
+            class="ft-q-tabs q-pa-none"
+            v-model="selectedTab"
+            outside-arrows
+            mobile-arrows
+            indicator-color="transparent"
+            active-class="ft-active-tab"
+            align="left"
+            @input="handleInput"
+        >
+            <slot></slot>
+        </q-tabs>
+    </div>
 </template>
 
 <style lang="scss">

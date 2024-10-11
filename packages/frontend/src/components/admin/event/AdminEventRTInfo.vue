@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import FTCenteredText from "src/components/FTCenteredText.vue";
-
 interface ReservationsStatus {
     total: number;
     currentlyOccupied: number;
@@ -12,30 +10,20 @@ interface Props {
     reservationsStatus: ReservationsStatus;
 }
 
-const props = defineProps<Props>();
+const { reservationsStatus } = defineProps<Props>();
 </script>
 
 <template>
-    <div class="row text-center q-col-gutter-md">
-        <FTCenteredText class="col-12">Real Time Info</FTCenteredText>
+    <div class="row text-center justify-between">
+        <q-chip color="primary" :label="`Total tables: ${reservationsStatus.total}`" />
 
-        <div class="col-md-4 col-sm-6 text-subtitle1">
-            <q-chip color="primary" :label="`Total tables: ${props.reservationsStatus.total}`" />
-        </div>
-        <div class="col-md-4 col-sm-6 text-subtitle1">
-            <q-chip
-                color="secondary"
-                :label="`Currently Occupied: ${props.reservationsStatus.currentlyOccupied}`"
-            />
-        </div>
-        <div class="col-md-4 col-sm-6 text-subtitle1">
-            <q-chip color="tertiary" :label="`Pending: ${props.reservationsStatus.pending}`" />
-        </div>
-        <div class="col-md-4 col-sm-6 text-subtitle1">
-            <q-chip
-                color="quaternary"
-                :label="`Total Guests: ${props.reservationsStatus.totalGuests}`"
-            />
-        </div>
+        <q-chip
+            color="secondary"
+            :label="`Currently Occupied: ${reservationsStatus.currentlyOccupied}`"
+        />
+
+        <q-chip color="tertiary" :label="`Pending: ${reservationsStatus.pending}`" />
+
+        <q-chip color="quaternary" :label="`Total Guests: ${reservationsStatus.totalGuests}`" />
     </div>
 </template>
