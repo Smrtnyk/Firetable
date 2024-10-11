@@ -60,7 +60,7 @@ const props = defineProps<EventViewControlsProps>();
                 <q-item-section avatar>
                     <q-icon name="list" color="secondary" />
                 </q-item-section>
-                <q-item-section>Table Waiting list</q-item-section>
+                <q-item-section>On-hold reservations</q-item-section>
             </q-item>
 
             <q-item

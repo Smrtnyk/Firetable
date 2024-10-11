@@ -99,7 +99,7 @@ describe("EventViewControls.vue", () => {
         });
         await showMenu();
 
-        const waitingListItem = screen.getByText("Table Waiting list");
+        const waitingListItem = screen.getByText("On-hold reservations");
         await userEvent.click(waitingListItem);
 
         expect(screen.emitted()["toggle-queued-reservations-drawer-visibility"]).toHaveLength(1);
