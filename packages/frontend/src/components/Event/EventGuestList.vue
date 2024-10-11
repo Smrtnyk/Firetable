@@ -106,6 +106,7 @@ async function onSwipeLeftConfirmGuest(
 
 <template>
     <q-drawer
+        no-swipe-open
         :model-value="eventsStore.showEventGuestListDrawer"
         @update:model-value="eventsStore.toggleEventGuestListDrawerVisibility"
         class-name="PageEvent__guest-list-drawer"

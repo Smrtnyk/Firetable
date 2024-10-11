@@ -99,7 +99,7 @@ function showReservation(reservation: QueuedReservationDoc): void {
 </script>
 
 <template>
-    <q-drawer v-model="eventsStore.showQueuedReservationsDrawer">
+    <q-drawer no-swipe-open v-model="eventsStore.showQueuedReservationsDrawer">
         <div class="EventQueuedReservations">
             <FTTitle :title="t('EventQueuedReservations.title')">
                 <template #right>
