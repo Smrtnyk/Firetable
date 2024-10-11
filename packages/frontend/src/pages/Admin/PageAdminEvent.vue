@@ -21,6 +21,7 @@ import AdminEventReservationsList from "src/components/admin/event/AdminEventRes
 import FTTabs from "src/components/FTTabs.vue";
 import FTTabPanels from "src/components/FTTabPanels.vue";
 import AdminEventReturningGuestsList from "src/components/admin/event/AdminEventReturningGuestsList.vue";
+import AppCardSection from "src/components/AppCardSection.vue";
 
 import { Loading, useQuasar } from "quasar";
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
@@ -32,7 +33,6 @@ import { useGuestsForEvent } from "src/composables/useGuestsForEvent";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { property } from "es-toolkit/compat";
 import { useAuthStore } from "src/stores/auth-store";
-import SettingsCard from "src/components/admin/organisation-settings/SettingsCard.vue";
 
 interface Props {
     organisationId: string;
@@ -219,15 +219,15 @@ onMounted(init);
         <FTTabPanels v-model="tab" class="bg-transparent">
             <!-- General info area -->
             <q-tab-panel name="info" class="q-px-xs-xs q-px-md-md q-py-none">
-                <SettingsCard title="Tables status">
+                <AppCardSection title="Tables status">
                     <AdminEventRTInfo :reservations-status="reservationsStatus" />
-                </SettingsCard>
+                </AppCardSection>
 
-                <SettingsCard title="Reserved by status">
+                <AppCardSection title="Reserved by status">
                     <AdminEventReservationsByPerson :reservations="allPlannedReservations" />
-                </SettingsCard>
+                </AppCardSection>
 
-                <SettingsCard title="Guests">
+                <AppCardSection title="Guests">
                     <FTTabs v-model="reservationsTab">
                         <q-tab
                             name="arrivedReservations"
@@ -264,7 +264,7 @@ onMounted(init);
                             />
                         </q-tab-panel>
                     </FTTabPanels>
-                </SettingsCard>
+                </AppCardSection>
             </q-tab-panel>
 
             <!-- Edit area -->
@@ -273,7 +273,7 @@ onMounted(init);
                 v-if="!isEventFinished(event.date)"
                 class="q-px-xs-sm q-px-md-md q-py-none"
             >
-                <SettingsCard title="Event Info">
+                <AppCardSection title="Event Info">
                     <q-item clickable v-ripple>
                         <q-item-section>
                             <q-item-label caption lines="2">
@@ -291,7 +291,7 @@ onMounted(init);
                             ></q-btn>
                         </q-item-section>
                     </q-item>
-                </SettingsCard>
+                </AppCardSection>
 
                 <SettingsCard title="Event Floors">
                     <q-item :key="floor.id" v-for="floor in eventFloors" clickable v-ripple>
@@ -317,9 +317,9 @@ onMounted(init);
 
             <!-- Logs -->
             <q-tab-panel name="logs" class="q-px-xs-sm q-px-md-md q-py-none">
-                <SettingsCard title="">
+                <AppCardSection title="">
                     <AdminEventLogs :logs-doc="logs" :is-admin="authStore.isAdmin" />
-                </SettingsCard>
+                </AppCardSection>
             </q-tab-panel>
         </FTTabPanels>
     </div>

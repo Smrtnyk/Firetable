@@ -6,7 +6,7 @@ import { updateOrganisationSettings } from "@firetable/backend";
 
 import SettingsSection from "src/components/admin/organisation-settings/SettingsSection.vue";
 import FTTitle from "src/components/FTTitle.vue";
-import SettingsCard from "src/components/admin/organisation-settings/SettingsCard.vue";
+import AppCardSection from "src/components/AppCardSection.vue";
 
 interface Props {
     organisationId: string;
@@ -85,7 +85,7 @@ function reset(): void {
             </template>
         </FTTitle>
 
-        <SettingsCard title="Property">
+        <AppCardSection title="Property">
             <SettingsSection title="Property card aspect ratio">
                 <q-select
                     rounded
@@ -94,9 +94,9 @@ function reset(): void {
                     :options="aspectRatioOptions"
                 />
             </SettingsSection>
-        </SettingsCard>
+        </AppCardSection>
 
-        <SettingsCard title="Event">
+        <AppCardSection title="Event">
             <SettingsSection title="Default event start time">
                 <q-input
                     :model-value="editableSettings.event.eventStartTime24HFormat"
@@ -155,15 +155,15 @@ function reset(): void {
                     </q-popup-proxy>
                 </q-btn>
             </SettingsSection>
-        </SettingsCard>
+        </AppCardSection>
 
-        <SettingsCard title="Guest">
+        <AppCardSection title="Guest">
             <SettingsSection title="Collect guest data">
                 <q-toggle
                     v-model="editableSettings.guest.collectGuestData"
                     :label="editableSettings.guest.collectGuestData ? 'On' : 'Off'"
                 />
             </SettingsSection>
-        </SettingsCard>
+        </AppCardSection>
     </div>
 </template>
