@@ -53,6 +53,7 @@ export const myIcons: Record<string, string> = {
     "send-backward": "svguse:/svg-icons/ft-icons.svg#send-backward",
     bookmark: "svguse:/svg-icons/ft-icons.svg#bookmark",
     "users-list": "svguse:/svg-icons/ft-icons.svg#users-list",
+    list: "svguse:/svg-icons/ft-icons.svg#list",
 };
 
 export function getDarkMode(): boolean {
