@@ -210,7 +210,7 @@ describe("EventCreateReservation", () => {
 
             const newTime = addHours(eventStartTimestamp, 1);
 
-            const timeOption = screen.getByText(format(newTime, "HH"));
+            const timeOption = screen.getByText(format(newTime, "HH"), { exact: true });
             expect(timeOption.query()).toBeTruthy();
 
             await userEvent.click(timeOption);
