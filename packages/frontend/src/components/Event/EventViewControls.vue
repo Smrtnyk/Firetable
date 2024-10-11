@@ -87,6 +87,7 @@ const props = defineProps<EventViewControlsProps>();
                 v-close-popup
                 @click="() => emit('navigate-to-admin-event')"
             >
+                <q-item-section avatar> </q-item-section>
                 <q-item-section>Show Details</q-item-section>
             </q-item>
         </q-list>
