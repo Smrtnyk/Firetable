@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CreateUserPayload, OrganisationDoc, PropertyDoc, User } from "@firetable/types";
+import type { CreateUserPayload, OrganisationDoc, PropertyDoc } from "@firetable/types";
 import { computed, ref, useTemplateRef } from "vue";
 import { ADMIN, Role } from "@firetable/types";
 import { QForm } from "quasar";
@@ -20,7 +20,7 @@ export interface UserCreateFormProps {
     organisation: OrganisationDoc;
 }
 
-type Emits = (event: "submit", payload: CreateUserPayload | User) => void;
+type Emits = (event: "submit", payload: CreateUserPayload) => void;
 
 const { t } = useI18n();
 const authStore = useAuthStore();
@@ -28,7 +28,7 @@ const emit = defineEmits<Emits>();
 const props = defineProps<UserCreateFormProps>();
 const userCreateForm = useTemplateRef<QForm>("userCreateForm");
 
-const form = ref<CreateUserPayload | User>(userSkeleton());
+const form = ref<CreateUserPayload>(userSkeleton());
 const chosenProperties = ref<string[]>([]);
 
 const stringRules = [noEmptyString()];
