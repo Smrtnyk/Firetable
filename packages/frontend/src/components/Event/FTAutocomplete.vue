@@ -145,6 +145,9 @@ function setModel(val: string): void {
             @clear="() => emit('clear')"
             :options="options"
         >
+            <template #before>
+                <slot name="before" />
+            </template>
             <template #prepend>
                 <q-icon name="search" />
             </template>

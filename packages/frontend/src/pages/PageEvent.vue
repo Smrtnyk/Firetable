@@ -8,7 +8,6 @@ import type {
     QueuedReservationDoc,
 } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
-import type { TouchPanValue } from "quasar";
 import {
     queuedReservationsCollection,
     reservationsCollection,
@@ -18,13 +17,8 @@ import {
 } from "@firetable/backend";
 import { isPlannedReservation, ReservationStatus } from "@firetable/types";
 import { Loading, useQuasar } from "quasar";
-import EventGuestList from "src/components/Event/EventGuestList.vue";
-import FTAutocomplete from "src/components/Event/FTAutocomplete.vue";
-import EventInfo from "src/components/Event/EventInfo.vue";
-import FTDialog from "src/components/FTDialog.vue";
-
 import { useRouter } from "vue-router";
-import { computed, onMounted, onUnmounted, ref, useTemplateRef, provide } from "vue";
+import { computed, onMounted, onUnmounted, useTemplateRef, provide } from "vue";
 import { useEventsStore } from "src/stores/events-store";
 import {
     createQuery,
@@ -32,12 +26,17 @@ import {
     useFirestoreDocument,
 } from "src/composables/useFirestore";
 import { useFloorsPageEvent } from "src/composables/useFloorsPageEvent";
-import { isMobile } from "src/global-reactives/screen-detection";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";
 import { where } from "firebase/firestore";
-import EventQueuedReservations from "src/components/Event/EventQueuedReservations.vue";
 import { useUsers } from "src/composables/useUsers";
+
+import EventGuestList from "src/components/Event/EventGuestList.vue";
+import FTAutocomplete from "src/components/Event/FTAutocomplete.vue";
+import EventInfo from "src/components/Event/EventInfo.vue";
+import FTDialog from "src/components/FTDialog.vue";
+import EventQueuedReservations from "src/components/Event/EventQueuedReservations.vue";
+import EventViewControls from "src/components/Event/EventViewControls.vue";
 
 interface Props {
     organisationId: string;
@@ -53,7 +52,6 @@ const eventOwner: EventOwner = {
     id: eventId,
 };
 
-const showMapsExpanded = ref(false);
 const authStore = useAuthStore();
 const eventsStore = useEventsStore();
 const router = useRouter();
@@ -99,8 +97,6 @@ const plannedReservations = computed(function () {
         return isPlannedReservation(reservation);
     });
 });
-const fabPos = ref([18, 18]);
-const draggingFab = ref(false);
 provide("eventData", event);
 
 const {
@@ -113,10 +109,6 @@ const {
     activeFloor,
     floorInstances,
 } = useFloorsPageEvent(eventFloors, reservations, pageRef, eventOwner, event, users);
-
-const buttonSize = computed(function () {
-    return isMobile.value ? "sm" : "md";
-});
 
 function showEventInfo(): void {
     quasar.dialog({
@@ -159,10 +151,14 @@ async function init(): Promise<void> {
     eventsStore.setCurrentEventName(event.value?.name ?? "");
 }
 
-function moveFab(ev: Parameters<NonNullable<TouchPanValue>>[0]): void {
-    draggingFab.value = !ev.isFirst && !ev.isFinal;
-
-    fabPos.value = [fabPos.value[0] - (ev.delta?.x ?? 0), fabPos.value[1] - (ev.delta?.y ?? 0)];
+function navigateToAdminEvent(): void {
+    router.push({
+        name: "adminEvent",
+        params: {
+            organisationId: eventOwner.organisationId,
+            propertyId: eventOwner.propertyId,
+        },
+    });
 }
 
 onMounted(init);
@@ -174,90 +170,33 @@ onUnmounted(function () {
 
 <template>
     <div v-if="event" class="PageEvent flex column justify-between" ref="pageRef">
-        <q-page-sticky
-            v-if="authStore.isAdmin"
-            position="bottom-right"
-            :offset="fabPos"
-            style="z-index: 999999"
-        >
-            <q-fab
-                icon="chevron_left"
-                direction="left"
-                vertical-actions-align="center"
-                color="primary"
-                :disable="draggingFab"
-                v-touch-pan.prevent.mouse="moveFab"
-                padding="sm"
-            >
-                <q-fab-action
-                    :to="{
-                        name: 'adminEvent',
-                        params: {
-                            organisationId: eventOwner.organisationId,
-                            propertyId: eventOwner.propertyId,
-                            eventId: eventOwner.id,
-                        },
-                    }"
-                    color="primary"
-                    label="View in manager"
-                    :disable="draggingFab"
-                />
-            </q-fab>
-        </q-page-sticky>
-
-        <q-page-sticky
-            v-if="hasMultipleFloorPlans"
-            position="bottom-left"
-            :offset="[18, 18]"
-            style="z-index: 999999"
-        >
-            <q-fab
-                :model-value="showMapsExpanded"
-                :label="!isMobile && activeFloor ? activeFloor.name : ''"
-                padding="xs"
-                vertical-actions-align="left"
-                icon="chevron_right"
-                direction="up"
-                color="primary"
-            >
-                <q-fab-action
-                    :key="florInstance.id"
-                    v-for="florInstance of floorInstances"
-                    class="text-white"
-                    :class="{
-                        'button-gradient': isActiveFloor(florInstance.id),
-                        'bg-primary': !isActiveFloor(florInstance.id),
-                    }"
-                    @click.prevent="() => setActiveFloor(florInstance)"
-                    :label="florInstance.name"
-                />
-            </q-fab>
-        </q-page-sticky>
-
-        <div class="row items-center q-mb-sm q-gutter-sm">
+        <div>
             <FTAutocomplete
                 :floors="eventFloors"
                 :show-floor-name-in-option="hasMultipleFloorPlans"
                 :all-reserved-tables="plannedReservations"
                 @found="onTableFound"
                 @clear="onAutocompleteClear"
-                class="col q-mb-sm"
-            />
-            <q-btn
-                class="button-gradient q-ma-none q-ml-sm"
-                round
-                :size="buttonSize"
-                icon="info"
-                @click="showEventInfo"
-                v-if="event.info"
-            />
-            <q-btn
-                v-if="!isMobile"
-                class="button-gradient q-ma-none q-ml-sm"
-                @click="eventsStore.toggleEventGuestListDrawerVisibility"
-                icon="users"
-                rounded
-            />
+                class="q-mb-sm"
+            >
+                <template #before>
+                    <EventViewControls
+                        :active-floor="activeFloor"
+                        :floor-instances="floorInstances"
+                        :has-multiple-floor-plans="hasMultipleFloorPlans"
+                        :is-admin="authStore.isAdmin"
+                        @navigate-to-admin-event="navigateToAdminEvent"
+                        @toggle-event-guest-list-drawer-visibility="
+                            eventsStore.toggleEventGuestListDrawerVisibility
+                        "
+                        @toggle-queued-reservations-drawer-visibility="
+                            eventsStore.toggleQueuedReservationsDrawerVisibility
+                        "
+                        @show-event-info="showEventInfo"
+                        @set-active-floor="setActiveFloor"
+                    />
+                </template>
+            </FTAutocomplete>
         </div>
 
         <div
