@@ -4,6 +4,7 @@ import type { EventOwner } from "@firetable/backend";
 import type { DialogChainObject } from "quasar";
 import type { VueFirestoreDocumentData } from "vuefire";
 import type {
+    AnyFunction,
     EventDoc,
     GuestDataPayload,
     PlannedReservationDoc,
@@ -22,6 +23,7 @@ import {
 } from "@firetable/backend";
 import { isTable } from "@firetable/floor-creator";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
+import { Notify } from "quasar";
 import { isPlannedReservation, ReservationStatus } from "@firetable/types";
 import {
     notifyPositive,
@@ -90,6 +92,7 @@ export function useReservations(
     const propertiesStore = usePropertiesStore();
 
     const currentTableOperation = ref<TableOperation | undefined>();
+    let operationNotification: AnyFunction | undefined;
 
     const settings = computed(function () {
         return propertiesStore.getOrganisationSettingsById(eventOwner.organisationId);
@@ -99,9 +102,58 @@ export function useReservations(
 
     let currentOpenCreateReservationDialog: OpenDialog | undefined;
 
+    watch(currentTableOperation, (newOperation) => {
+        if (newOperation) {
+            showOperationNotification(newOperation);
+        } else if (operationNotification) {
+            // Dismiss the notification if the operation is cleared
+            operationNotification();
+            operationNotification = undefined;
+        }
+    });
+
     watch([reservations, floorInstances], handleFloorUpdates, {
         deep: true,
     });
+
+    function showOperationNotification(operation: TableOperation): void {
+        let message = "";
+        switch (operation.type) {
+            case TableOperationType.RESERVATION_COPY:
+                message = `Copying reservation from table ${operation.sourceTable.label}`;
+                break;
+            case TableOperationType.RESERVATION_TRANSFER:
+                message = `Transferring reservation from table ${operation.sourceTable.label}`;
+                break;
+        }
+
+        operationNotification = Notify.create({
+            message,
+            type: "ongoing",
+            timeout: 0,
+            position: "top",
+            actions: [
+                {
+                    label: t("Global.cancel"),
+                    color: "white",
+                    noDismiss: true,
+                    handler: onCancelOperation,
+                },
+            ],
+        });
+    }
+
+    async function onCancelOperation(): Promise<void> {
+        const confirm = await showConfirm(
+            "Cancel Operation",
+            "Are you sure you want to cancel the current operation?",
+        );
+
+        if (confirm) {
+            // This will also dismiss the notification
+            currentTableOperation.value = undefined;
+        }
+    }
 
     async function handleGuestDataForReservation(
         reservationData: Reservation,

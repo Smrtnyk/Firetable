@@ -5,6 +5,7 @@ export default {
         transfer: "Transfer",
         copy: "Copy",
         delete: "Delete",
+        cancel: "Cancel",
         name: "Name",
         type: "Type",
         category: "Category",
@@ -100,7 +101,6 @@ export default {
         reservationConfirmedLabel: "Confirmed",
         reservationConsumption: "Consumption",
         timeLabel: "Time of arrival",
-        cancel: "Cancel",
         waitingForResponse: "Waiting for response",
     },
     EventCreateReservation: {

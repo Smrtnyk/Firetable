@@ -378,7 +378,7 @@ describe("EventShowReservation", () => {
             },
         });
 
-        const label = screen.getByText(t("EventShowReservation.cancel"));
+        const label = screen.getByText(t("Global.cancel"));
         expect(label.query()).toBeNull();
     });
 

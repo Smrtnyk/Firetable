@@ -219,7 +219,7 @@ function onWaitingForResponse(): void {
             <q-item tag="label" class="q-pa-none">
                 <q-item-section>
                     <q-item-label>
-                        {{ t("EventShowReservation.cancel") }}
+                        {{ t("Global.cancel") }}
                     </q-item-label>
                 </q-item-section>
                 <q-item-section avatar>
