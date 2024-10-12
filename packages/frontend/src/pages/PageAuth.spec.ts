@@ -10,7 +10,14 @@ const { loginWithEmailSpy, routerReplaceSpy, showErrorMessageSpy, tryCatchLoadin
             loginWithEmailSpy: vi.fn(),
             routerReplaceSpy: vi.fn(),
             showErrorMessageSpy: vi.fn(),
-            tryCatchLoadingWrapperSpy: vi.fn(),
+            tryCatchLoadingWrapperSpy: vi.fn(async ({ hook, onError }) => {
+                try {
+                    await hook();
+                } catch (error) {
+                    console.log("in error", error);
+                    if (onError) onError(error);
+                }
+            }),
         };
     });
 
@@ -26,16 +33,7 @@ vi.mock("vue-router", () => ({
 
 vi.mock("src/helpers/ui-helpers", () => {
     return {
-        tryCatchLoadingWrapper: tryCatchLoadingWrapperSpy.mockImplementation(
-            async ({ hook, onError }) => {
-                try {
-                    await hook();
-                } catch (error) {
-                    console.log("in error", error);
-                    if (onError) onError(error);
-                }
-            },
-        ),
+        tryCatchLoadingWrapper: tryCatchLoadingWrapperSpy,
         showErrorMessage: showErrorMessageSpy,
     };
 });
