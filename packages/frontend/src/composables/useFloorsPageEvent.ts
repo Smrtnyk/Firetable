@@ -75,10 +75,8 @@ export function useFloorsPageEvent(
         onAutocompleteClear();
         // If it is only 1 table, we can set the active floor to that floor
         // but first check if current active floor is already the same floor
-        if (
-            foundReservations.length === 1 &&
-            activeFloor.value?.id !== foundReservations[0].floorId
-        ) {
+        const isSingleReservation = foundReservations.length === 1;
+        if (isSingleReservation && isActiveFloor(foundReservations[0].floorId)) {
             const floor = floorInstances.value.find(
                 matchesProperty("id", foundReservations[0].floorId),
             );
