@@ -28,6 +28,9 @@ interface EventQueuedReservationsProps {
     users: User[];
 }
 
+type Emits = (e: "unqueue", reservation: QueuedReservationDoc) => void;
+
+const emit = defineEmits<Emits>();
 const { data, error, eventOwner, users } = defineProps<EventQueuedReservationsProps>();
 
 const { nonNullableUser } = storeToRefs(useAuthStore());
@@ -90,6 +93,7 @@ function showReservation(reservation: QueuedReservationDoc): void {
             },
             listeners: {
                 unqueue() {
+                    emit("unqueue", reservation);
                     dialog.hide();
                 },
             },

@@ -52,11 +52,6 @@ type OpenDialog = {
     floorId: string;
 };
 
-type CrossFloorTable = {
-    table: BaseTable;
-    floor: FloorViewer;
-};
-
 const enum GuestDataMode {
     SET = "set",
     DELETE = "delete",
@@ -71,6 +66,17 @@ type UseReservations = {
     handleReservationCreation: (reservationData: Reservation) => void;
 };
 
+const enum TableOperationType {
+    RESERVATION_COPY = 1,
+    RESERVATION_TRANSFER = 2,
+}
+
+interface TableOperation {
+    type: TableOperationType;
+    sourceFloor: FloorViewer;
+    sourceTable: BaseTable;
+}
+
 export function useReservations(
     users: Ref<User[]>,
     reservations: Ref<ReservationDoc[]>,
@@ -83,13 +89,13 @@ export function useReservations(
     const { t } = useI18n();
     const propertiesStore = usePropertiesStore();
 
+    const currentTableOperation = ref<TableOperation | undefined>();
+
     const settings = computed(function () {
         return propertiesStore.getOrganisationSettingsById(eventOwner.organisationId);
     });
 
     const intervalID = setInterval(checkReservationsForTimeAndMarkTableIfNeeded, ONE_MINUTE);
-    const crossFloorReservationTransferTable = ref<CrossFloorTable | undefined>();
-    const crossFloorReservationCopyTable = ref<CrossFloorTable | undefined>();
 
     let currentOpenCreateReservationDialog: OpenDialog | undefined;
 
@@ -340,16 +346,10 @@ export function useReservations(
                         showCreateReservationDialog(floor, element, reservation, "update");
                     },
                     transfer() {
-                        crossFloorReservationTransferTable.value = {
-                            table: element,
-                            floor,
-                        };
+                        initiateReservationTransfer(floor, element);
                     },
                     copy() {
-                        crossFloorReservationCopyTable.value = {
-                            table: element,
-                            floor,
-                        };
+                        initiateReservationCopy(floor, element);
                     },
                     arrived(val: boolean) {
                         if (!isPlannedReservation(reservation)) {
@@ -626,18 +626,35 @@ export function useReservations(
         });
     }
 
-    async function handleCrossFloorReservationCopy(
+    async function handleTableOperation(
         targetFloor: FloorViewer,
         targetTable: BaseTable,
         targetReservation: ReservationDoc | undefined,
     ): Promise<void> {
-        if (!crossFloorReservationCopyTable.value) {
+        const operation = currentTableOperation.value;
+        if (!operation) {
             return;
         }
 
-        const { table, floor } = crossFloorReservationCopyTable.value;
+        switch (operation.type) {
+            case TableOperationType.RESERVATION_COPY:
+                await handleReservationCopy(operation, targetFloor, targetTable, targetReservation);
+                break;
+            case TableOperationType.RESERVATION_TRANSFER:
+                await handleReservationTransfer(operation, targetFloor, targetTable);
+                break;
+        }
+    }
 
-        if (table.label === targetTable.label && floor.id === targetFloor.id) {
+    async function handleReservationCopy(
+        operation: TableOperation,
+        targetFloor: FloorViewer,
+        targetTable: BaseTable,
+        targetReservation: ReservationDoc | undefined,
+    ): Promise<void> {
+        const { sourceFloor, sourceTable } = operation;
+
+        if (sourceFloor.id === targetFloor.id && sourceTable.label === targetTable.label) {
             showErrorMessage("Cannot copy reservation to the same table!");
             return;
         }
@@ -647,22 +664,69 @@ export function useReservations(
             return;
         }
 
-        const transferMessage = `This will copy reservation from table ${table.label} to table ${targetTable.label}`;
-        const shouldTransfer = await showConfirm("Transfer reservation", transferMessage);
+        const confirm = await showConfirm(
+            "Confirm Copy",
+            `Copy reservation from table ${sourceTable.label} to table ${targetTable.label}?`,
+        );
+        if (!confirm) return;
 
-        if (!shouldTransfer) {
-            return;
-        }
-
-        const reservation = reservations.value.find(function (res) {
-            return res.tableLabel === table.label && res.floorId === floor.id;
-        });
-
+        const reservation = reservations.value.find(
+            (res) => res.tableLabel === sourceTable.label && res.floorId === sourceFloor.id,
+        );
         if (!reservation) {
+            showErrorMessage("Source reservation not found.");
             return;
         }
 
         await copyReservation(reservation, targetTable, targetFloor);
+    }
+
+    async function handleReservationTransfer(
+        operation: TableOperation,
+        targetFloor: FloorViewer,
+        targetTable: BaseTable,
+    ): Promise<void> {
+        const { sourceFloor, sourceTable } = operation;
+
+        if (sourceFloor.id === targetFloor.id && sourceTable.label === targetTable.label) {
+            showErrorMessage("Cannot transfer reservation to the same table!");
+            return;
+        }
+
+        const confirm = await showConfirm(
+            "Confirm Transfer",
+            `Transfer reservation from table ${sourceTable.label} to table ${targetTable.label}?`,
+        );
+
+        if (!confirm) {
+            return;
+        }
+
+        const isSameFloor = sourceFloor.id === targetFloor.id;
+        await (isSameFloor
+            ? swapOrTransferReservations(sourceFloor, sourceTable, targetTable)
+            : swapOrTransferReservationsBetweenFloorPlans(
+                  sourceFloor,
+                  sourceTable,
+                  targetFloor,
+                  targetTable,
+              ));
+    }
+
+    function initiateReservationCopy(floor: FloorViewer, table: BaseTable): void {
+        currentTableOperation.value = {
+            type: TableOperationType.RESERVATION_COPY,
+            sourceFloor: floor,
+            sourceTable: table,
+        };
+    }
+
+    function initiateReservationTransfer(floor: FloorViewer, table: BaseTable): void {
+        currentTableOperation.value = {
+            type: TableOperationType.RESERVATION_TRANSFER,
+            sourceFloor: floor,
+            sourceTable: table,
+        };
     }
 
     async function tableClickHandler(
@@ -673,19 +737,13 @@ export function useReservations(
             return;
         }
 
-        // Check if table has reservation
-        const reservation = reservations.value.find(function (res) {
-            return res.tableLabel === element.label && res.floorId === floor.id;
-        });
+        const reservation = reservations.value.find(
+            (res) => res.tableLabel === element.label && res.floorId === floor.id,
+        );
 
-        if (crossFloorReservationCopyTable.value) {
-            await handleCrossFloorReservationCopy(floor, element, reservation);
-            crossFloorReservationCopyTable.value = undefined;
-            return;
-        }
-
-        if (await handleCrossFloorReservationTransfer(floor, element)) {
-            crossFloorReservationTransferTable.value = undefined;
+        if (currentTableOperation.value) {
+            await handleTableOperation(floor, element, reservation);
+            currentTableOperation.value = undefined;
             return;
         }
 
@@ -694,36 +752,6 @@ export function useReservations(
         } else if (canReserve.value) {
             showCreateReservationDialog(floor, element, reservation, "create");
         }
-    }
-
-    async function handleCrossFloorReservationTransfer(
-        floor: FloorViewer,
-        element: BaseTable,
-    ): Promise<boolean> {
-        if (!crossFloorReservationTransferTable.value) {
-            return false;
-        }
-
-        if (crossFloorReservationTransferTable.value.floor.id === floor.id) {
-            // If it is the same table, do nothing
-            if (crossFloorReservationTransferTable.value.table.label === element.label) {
-                return true;
-            }
-            await swapOrTransferReservations(
-                floor,
-                crossFloorReservationTransferTable.value.table,
-                element,
-            );
-        } else {
-            await swapOrTransferReservationsBetweenFloorPlans(
-                crossFloorReservationTransferTable.value.floor,
-                crossFloorReservationTransferTable.value.table,
-                floor,
-                element,
-            );
-        }
-
-        return true;
     }
 
     onBeforeUnmount(function () {

@@ -66,7 +66,6 @@ const { data: event, promise: eventDataPromise } = useFirestoreDocument<EventDoc
     getEventPath(eventOwner),
 );
 const { data: eventFloors } = useFirestoreCollection<FloorDoc>(getEventFloorsPath(eventOwner));
-
 const {
     data: reservations,
     promise: reservationsDataPromise,
@@ -79,7 +78,6 @@ const {
     ),
     { wait: true },
 );
-
 const {
     data: queuedResData,
     error: queuedResListenerError,
@@ -215,6 +213,7 @@ onUnmounted(function () {
             :error="queuedResListenerError"
             :event-owner="eventOwner"
             :users="users"
+            @unqueue="console.log"
         />
         <EventGuestList
             :guest-list-limit="event.guestListLimit"
