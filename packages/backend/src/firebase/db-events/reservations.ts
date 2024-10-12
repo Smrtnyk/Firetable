@@ -1,5 +1,10 @@
 import type { EventOwner } from "../db.js";
-import type { QueuedReservation, Reservation, ReservationDoc } from "@firetable/types";
+import type {
+    PlannedReservation,
+    QueuedReservation,
+    Reservation,
+    ReservationDoc,
+} from "@firetable/types";
 import type { HttpsCallableResult } from "firebase/functions";
 import { queuedReservationsCollection, reservationsCollection, reservationDoc } from "../db.js";
 import { initializeFirebase } from "../base.js";
@@ -28,6 +33,16 @@ export function moveReservationToQueue(
     const { functions } = initializeFirebase();
     const moveReservationToQueueFn = httpsCallable(functions, "moveReservationToQueue");
     return moveReservationToQueueFn({ eventOwner, reservationId, preparedQueuedReservation });
+}
+
+export function moveReservationFromQueue(
+    eventOwner: EventOwner,
+    reservationId: string,
+    preparedPlannedReservation: PlannedReservation,
+): Promise<HttpsCallableResult> {
+    const { functions } = initializeFirebase();
+    const moveReservationFromQueueFn = httpsCallable(functions, "moveReservationFromQueue");
+    return moveReservationFromQueueFn({ eventOwner, reservationId, preparedPlannedReservation });
 }
 
 export function addReservation(

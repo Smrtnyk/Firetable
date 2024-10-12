@@ -4,21 +4,21 @@ import type {
     FloorDoc,
     GuestInGuestListData,
     PlannedReservationDoc,
-    ReservationDoc,
     QueuedReservationDoc,
+    ReservationDoc,
 } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
+import { isPlannedReservation, ReservationStatus } from "@firetable/types";
 import {
-    queuedReservationsCollection,
-    reservationsCollection,
     getEventFloorsPath,
     getEventGuestListPath,
     getEventPath,
+    queuedReservationsCollection,
+    reservationsCollection,
 } from "@firetable/backend";
-import { isPlannedReservation, ReservationStatus } from "@firetable/types";
 import { Loading, useQuasar } from "quasar";
 import { useRouter } from "vue-router";
-import { computed, onMounted, onUnmounted, useTemplateRef, provide } from "vue";
+import { computed, onMounted, onUnmounted, provide, useTemplateRef } from "vue";
 import { useEventsStore } from "src/stores/events-store";
 import {
     createQuery,
@@ -37,6 +37,7 @@ import EventInfo from "src/components/Event/EventInfo.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import EventQueuedReservations from "src/components/Event/EventQueuedReservations.vue";
 import EventViewControls from "src/components/Event/EventViewControls.vue";
+import { TableOperationType } from "src/composables/useReservations";
 
 interface Props {
     organisationId: string;
@@ -98,6 +99,7 @@ const plannedReservations = computed(function () {
 provide("eventData", event);
 
 const {
+    initiateTableOperation,
     onTableFound,
     setActiveFloor,
     isActiveFloor,
@@ -159,6 +161,13 @@ function navigateToAdminEvent(): void {
     });
 }
 
+function onReservationUnqueue(reservation: QueuedReservationDoc): void {
+    initiateTableOperation({
+        type: TableOperationType.RESERVATION_DEQUEUE,
+        reservation,
+    });
+}
+
 onMounted(init);
 
 onUnmounted(function () {
@@ -213,7 +222,7 @@ onUnmounted(function () {
             :error="queuedResListenerError"
             :event-owner="eventOwner"
             :users="users"
-            @unqueue="console.log"
+            @unqueue="onReservationUnqueue"
         />
         <EventGuestList
             :guest-list-limit="event.guestListLimit"

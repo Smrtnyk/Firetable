@@ -33,7 +33,7 @@ export function useFloorsPageEvent(
 ) {
     const activeFloor = ref<ActiveFloor | undefined>();
     const floorInstances = shallowRef<FloorViewer[]>([]);
-    const { tableClickHandler } = useReservations(
+    const { tableClickHandler, initiateTableOperation } = useReservations(
         users,
         reservations,
         floorInstances,
@@ -149,6 +149,7 @@ export function useFloorsPageEvent(
     }
 
     return {
+        initiateTableOperation,
         onTableFound,
         onAutocompleteClear,
         mapFloorToCanvas,

@@ -95,6 +95,7 @@ function showReservation(reservation: QueuedReservationDoc): void {
                 unqueue() {
                     emit("unqueue", reservation);
                     dialog.hide();
+                    eventsStore.toggleQueuedReservationsDrawerVisibility();
                 },
             },
         },

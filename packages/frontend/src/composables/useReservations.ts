@@ -8,11 +8,13 @@ import type {
     EventDoc,
     GuestDataPayload,
     PlannedReservationDoc,
+    QueuedReservationDoc,
     Reservation,
     ReservationDoc,
     User,
 } from "@firetable/types";
 import {
+    moveReservationFromQueue,
     moveReservationToQueue,
     deleteGuestVisit,
     setGuestData,
@@ -47,6 +49,7 @@ import { useDialog } from "src/composables/useDialog";
 import { hashString } from "src/helpers/hash-string";
 import { maskPhoneNumber } from "src/helpers/mask-phone-number";
 import { plannedToQueuedReservation } from "src/helpers/reservation/planned-to-queued-reservation";
+import { queuedToPlannedReservation } from "src/helpers/reservation/queued-to-planned-reservation";
 
 type OpenDialog = {
     label: string;
@@ -60,6 +63,7 @@ const enum GuestDataMode {
 }
 
 type UseReservations = {
+    initiateTableOperation: (operation: TableOperation) => void;
     tableClickHandler: (
         floor: FloorViewer,
         element: FloorEditorElement | undefined,
@@ -68,16 +72,33 @@ type UseReservations = {
     handleReservationCreation: (reservationData: Reservation) => void;
 };
 
-const enum TableOperationType {
+export const enum TableOperationType {
     RESERVATION_COPY = 1,
     RESERVATION_TRANSFER = 2,
+    RESERVATION_DEQUEUE = 3,
 }
 
-interface TableOperation {
-    type: TableOperationType;
+interface ReservationCopyOperation {
+    type: TableOperationType.RESERVATION_COPY;
     sourceFloor: FloorViewer;
     sourceTable: BaseTable;
 }
+
+interface ReservationTransferOperation {
+    type: TableOperationType.RESERVATION_TRANSFER;
+    sourceFloor: FloorViewer;
+    sourceTable: BaseTable;
+}
+
+interface ReservationDequeueOperation {
+    type: TableOperationType.RESERVATION_DEQUEUE;
+    reservation: QueuedReservationDoc;
+}
+
+type TableOperation =
+    | ReservationCopyOperation
+    | ReservationDequeueOperation
+    | ReservationTransferOperation;
 
 export function useReservations(
     users: Ref<User[]>,
@@ -116,9 +137,16 @@ export function useReservations(
         deep: true,
     });
 
+    function initiateTableOperation(operation: TableOperation): void {
+        currentTableOperation.value = operation;
+    }
+
     function showOperationNotification(operation: TableOperation): void {
         let message = "";
         switch (operation.type) {
+            case TableOperationType.RESERVATION_DEQUEUE:
+                message = `Moving reservation from on-hold`;
+                break;
             case TableOperationType.RESERVATION_COPY:
                 message = `Copying reservation from table ${operation.sourceTable.label}`;
                 break;
@@ -695,11 +723,30 @@ export function useReservations(
             case TableOperationType.RESERVATION_TRANSFER:
                 await handleReservationTransfer(operation, targetFloor, targetTable);
                 break;
+            case TableOperationType.RESERVATION_DEQUEUE:
+                await handleReservationDequeue(operation, targetFloor.id, targetTable.label);
+                break;
         }
     }
 
+    async function handleReservationDequeue(
+        operation: ReservationDequeueOperation,
+        floorId: string,
+        tableLabel: string,
+    ): Promise<void> {
+        await tryCatchLoadingWrapper({
+            hook() {
+                return moveReservationFromQueue(
+                    eventOwner,
+                    operation.reservation.id,
+                    queuedToPlannedReservation(operation.reservation, floorId, tableLabel),
+                );
+            },
+        });
+    }
+
     async function handleReservationCopy(
-        operation: TableOperation,
+        operation: ReservationCopyOperation,
         targetFloor: FloorViewer,
         targetTable: BaseTable,
         targetReservation: ReservationDoc | undefined,
@@ -734,7 +781,7 @@ export function useReservations(
     }
 
     async function handleReservationTransfer(
-        operation: TableOperation,
+        operation: ReservationTransferOperation,
         targetFloor: FloorViewer,
         targetTable: BaseTable,
     ): Promise<void> {
@@ -811,6 +858,7 @@ export function useReservations(
     });
 
     return {
+        initiateTableOperation,
         tableClickHandler,
         // Used in unit test
         onDeleteReservation,
