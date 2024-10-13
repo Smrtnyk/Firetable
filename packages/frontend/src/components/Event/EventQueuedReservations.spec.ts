@@ -212,12 +212,12 @@ describe("EventQueuedReservations.vue", () => {
         expect(mockHide).toHaveBeenCalled();
     });
 
-    it("does not render the drawer when showQueuedReservationsDrawer is false", () => {
+    it("does not render the drawer when showQueuedReservationsDrawer is false", async () => {
         eventsStoreState.showQueuedReservationsDrawer = false;
 
         render();
 
-        const drawer = document.querySelector(".q-drawer");
+        const drawer = document.querySelector(".q-drawer__backdrop");
         expect(drawer).not.toBeVisible();
     });
 
