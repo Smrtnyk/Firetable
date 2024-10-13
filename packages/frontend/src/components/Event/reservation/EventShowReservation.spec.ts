@@ -1,6 +1,6 @@
 import type { PlannedReservationDoc } from "@firetable/types";
 import EventShowReservation from "./EventShowReservation.vue";
-import { renderComponent, t } from "../../../test-helpers/render-component";
+import { renderComponent, t } from "../../../../test-helpers/render-component";
 import { ReservationStatus, ReservationType, Role, UserCapability } from "@firetable/types";
 import { beforeEach, describe, expect, it } from "vitest";
 import { userEvent } from "@vitest/browser/context";

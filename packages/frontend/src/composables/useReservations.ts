@@ -38,7 +38,8 @@ import { useAuthStore } from "src/stores/auth-store";
 
 import FTDialog from "src/components/FTDialog.vue";
 import EventCreateReservation from "src/components/Event/reservation/EventCreateReservation.vue";
-import EventShowReservation from "src/components/Event/EventShowReservation.vue";
+import EventShowReservation from "src/components/Event/reservation/EventShowReservation.vue";
+
 import { determineTableColor } from "src/helpers/floor";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { AppLogger } from "src/logger/FTLogger.js";
