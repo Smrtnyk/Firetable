@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import type { EventDoc, PlannedReservation, QueuedReservationDoc, User } from "@firetable/types";
+import type {
+    EventDoc,
+    PlannedReservation,
+    QueuedReservation,
+    QueuedReservationDoc,
+    User,
+} from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
-import type { Ref } from "vue";
-import { saveQueuedReservation } from "@firetable/backend";
 import { useEventsStore } from "src/stores/events-store";
 import { useI18n } from "vue-i18n";
-import { computed, inject } from "vue";
+import { computed } from "vue";
 
 import FTTitle from "src/components/FTTitle.vue";
 import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPChip.vue";
@@ -18,37 +22,34 @@ import { useDialog } from "src/composables/useDialog";
 import { useAuthStore } from "src/stores/auth-store";
 import { storeToRefs } from "pinia";
 import { usePropertiesStore } from "src/stores/properties-store";
-import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { plannedToQueuedReservation } from "src/helpers/reservation/planned-to-queued-reservation";
 
-interface EventQueuedReservationsProps {
+export interface EventQueuedReservationsProps {
     data: QueuedReservationDoc[];
     error: unknown | undefined;
     eventOwner: EventOwner;
+    eventData: EventDoc;
     users: User[];
 }
 
-type Emits = (e: "unqueue", reservation: QueuedReservationDoc) => void;
+interface Emits {
+    (e: "create", reservation: QueuedReservation): void;
+    (e: "unqueue", reservation: QueuedReservationDoc): void;
+}
 
 const emit = defineEmits<Emits>();
-const { data, error, eventOwner, users } = defineProps<EventQueuedReservationsProps>();
+const { data, error, eventOwner, users, eventData } = defineProps<EventQueuedReservationsProps>();
 
 const { nonNullableUser } = storeToRefs(useAuthStore());
 const { t } = useI18n();
 const { createDialog } = useDialog();
 const eventsStore = useEventsStore();
 const propertiesStore = usePropertiesStore();
-const eventData = inject<Ref<EventDoc>>("eventData");
 const settings = computed(function () {
     return propertiesStore.getOrganisationSettingsById(eventOwner.organisationId);
 });
 
 function addNewQueuedReservation(): void {
-    if (!eventData) {
-        showErrorMessage("Event data not found");
-        return;
-    }
-
     const dialog = createDialog({
         component: FTDialog,
         componentProps: {
@@ -59,22 +60,14 @@ function addNewQueuedReservation(): void {
                 mode: "create",
                 currentUser: nonNullableUser.value,
                 users,
-                eventStartTimestamp: eventData.value.date,
+                eventStartTimestamp: eventData.date,
                 eventDurationInHours: settings.value.event.eventDurationInHours,
                 onlyPlanned: true,
             },
             listeners: {
-                async create(reservationData: PlannedReservation) {
+                create(reservationData: PlannedReservation) {
+                    emit("create", plannedToQueuedReservation(reservationData));
                     dialog.hide();
-
-                    await tryCatchLoadingWrapper({
-                        hook() {
-                            return saveQueuedReservation(
-                                eventOwner,
-                                plannedToQueuedReservation(reservationData),
-                            );
-                        },
-                    });
                 },
             },
         },
@@ -109,6 +102,7 @@ function showReservation(reservation: QueuedReservationDoc): void {
             <FTTitle :title="t('EventQueuedReservations.title')">
                 <template #right>
                     <q-btn
+                        aria-label="Add new reservation"
                         rounded
                         icon="plus"
                         class="button-gradient"
@@ -121,7 +115,7 @@ function showReservation(reservation: QueuedReservationDoc): void {
         <div v-if="data.length === 0">
             <div class="row justify-center items-center q-mt-md">
                 <FTCenteredText>{{ t("EventQueuedReservations.emptyMessage") }}</FTCenteredText>
-                <q-img src="/people-confirmation.svg" />
+                <q-img src="/people-confirmation.svg" alt="Empty reservations image" />
             </div>
         </div>
 

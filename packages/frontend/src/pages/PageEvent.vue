@@ -4,21 +4,23 @@ import type {
     FloorDoc,
     GuestInGuestListData,
     PlannedReservationDoc,
+    QueuedReservation,
     QueuedReservationDoc,
     ReservationDoc,
 } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
-import { isPlannedReservation, ReservationStatus } from "@firetable/types";
 import {
+    saveQueuedReservation,
     getEventFloorsPath,
     getEventGuestListPath,
     getEventPath,
     queuedReservationsCollection,
     reservationsCollection,
 } from "@firetable/backend";
+import { isPlannedReservation, ReservationStatus } from "@firetable/types";
 import { Loading, useQuasar } from "quasar";
 import { useRouter } from "vue-router";
-import { computed, onMounted, onUnmounted, provide, useTemplateRef } from "vue";
+import { computed, onMounted, onUnmounted, useTemplateRef } from "vue";
 import { useEventsStore } from "src/stores/events-store";
 import {
     createQuery,
@@ -26,7 +28,7 @@ import {
     useFirestoreDocument,
 } from "src/composables/useFirestore";
 import { useFloorsPageEvent } from "src/composables/useFloorsPageEvent";
-import { showErrorMessage } from "src/helpers/ui-helpers";
+import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";
 import { where } from "firebase/firestore";
 import { useUsers } from "src/composables/useUsers";
@@ -96,7 +98,6 @@ const plannedReservations = computed(function () {
         return isPlannedReservation(reservation);
     });
 });
-provide("eventData", event);
 
 const {
     initiateTableOperation,
@@ -168,6 +169,14 @@ function onReservationUnqueue(reservation: QueuedReservationDoc): void {
     });
 }
 
+async function onCreateQueuedReservation(reservation: QueuedReservation): Promise<void> {
+    await tryCatchLoadingWrapper({
+        hook() {
+            return saveQueuedReservation(eventOwner, reservation);
+        },
+    });
+}
+
 onMounted(init);
 
 onUnmounted(function () {
@@ -218,11 +227,14 @@ onUnmounted(function () {
         </div>
 
         <EventQueuedReservations
+            v-if="event"
             :data="queuedResData"
             :error="queuedResListenerError"
             :event-owner="eventOwner"
             :users="users"
+            :event-data="event"
             @unqueue="onReservationUnqueue"
+            @create="onCreateQueuedReservation"
         />
         <EventGuestList
             :guest-list-limit="event.guestListLimit"
