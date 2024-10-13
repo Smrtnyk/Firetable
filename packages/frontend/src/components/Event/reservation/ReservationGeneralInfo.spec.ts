@@ -68,7 +68,7 @@ describe("ReservationGeneralInfo", () => {
         await expect.element(screen.getByText(/^\s*John\s+Doe\s*$/)).toBeVisible();
     });
 
-    it("does not render guestName section when guestName is absent", () => {
+    it("does not render guestName section when guestName is absent", async () => {
         const reservationWithoutGuestName = { ...mockReservation, guestName: undefined };
 
         const screen = renderComponent(
@@ -93,7 +93,7 @@ describe("ReservationGeneralInfo", () => {
             },
         );
 
-        expect(screen.getByText("Name").query()).toBeNull();
+        await expect.element(screen.getByText("Name")).not.toBeInTheDocument();
     });
 
     it("renders time label and value when present", async () => {
@@ -121,13 +121,13 @@ describe("ReservationGeneralInfo", () => {
         await expect.element(screen.getByText(mockReservation.guestContact!)).toBeVisible();
     });
 
-    it("does not render guestContact when user cannot see it", () => {
+    it("does not render guestContact when user cannot see it", async () => {
         const screen = renderComponentWithStore("user123");
 
-        expect(screen.getByText(/^\s*Contact\s*$/).query()).toBeNull();
+        await expect.element(screen.getByText(/^\s*Contact\s*$/)).not.toBeInTheDocument();
     });
 
-    it("does not render guestContact when guestContact is absent", () => {
+    it("does not render guestContact when guestContact is absent", async () => {
         const reservationWithoutGuestContact = { ...mockReservation, guestContact: undefined };
         const screen = renderComponent(
             ReservationGeneralInfo,
@@ -151,7 +151,7 @@ describe("ReservationGeneralInfo", () => {
             },
         );
 
-        expect(screen.getByText(/^\s*Contact\s*$/).query()).toBeNull();
+        await expect.element(screen.getByText(/^\s*Contact\s*$/)).not.toBeInTheDocument();
     });
 
     it("renders consumption label and value when present", async () => {
@@ -163,7 +163,7 @@ describe("ReservationGeneralInfo", () => {
             .toBeVisible();
     });
 
-    it("does not render consumption section when consumption is absent", () => {
+    it("does not render consumption section when consumption is absent", async () => {
         const reservationWithoutConsumption = { ...mockReservation, consumption: undefined };
         const screen = renderComponent(
             ReservationGeneralInfo,
@@ -187,7 +187,7 @@ describe("ReservationGeneralInfo", () => {
             },
         );
 
-        expect(screen.getByText("Consumption").query()).toBeNull();
+        await expect.element(screen.getByText("Consumption")).not.toBeInTheDocument();
     });
 
     it("renders reservationNote label and value when present", async () => {
@@ -197,7 +197,7 @@ describe("ReservationGeneralInfo", () => {
         await expect.element(screen.getByText(mockReservation.reservationNote!)).toBeVisible();
     });
 
-    it("does not render reservationNote section when reservationNote is absent", () => {
+    it("does not render reservationNote section when reservationNote is absent", async () => {
         const reservationWithoutNote = { ...mockReservation, reservationNote: undefined };
         const screen = renderComponent(
             ReservationGeneralInfo,
@@ -221,8 +221,10 @@ describe("ReservationGeneralInfo", () => {
             },
         );
 
-        expect(screen.getByText("Note").query()).toBeNull();
-        expect(screen.getByText(mockReservation.reservationNote!).query()).toBeNull();
+        await expect.element(screen.getByText("Note")).not.toBeInTheDocument();
+        await expect
+            .element(screen.getByText(mockReservation.reservationNote!))
+            .not.toBeInTheDocument();
     });
 
     it("renders reservedBy label and value when not a walk-in reservation", async () => {
@@ -232,7 +234,7 @@ describe("ReservationGeneralInfo", () => {
         await expect.element(screen.getByText("John Doe - john.doe@example.com")).toBeVisible();
     });
 
-    it("does not render reservedBy section when it is a walk-in reservation", () => {
+    it("does not render reservedBy section when it is a walk-in reservation", async () => {
         const walkInReservation: WalkInReservation = {
             ...mockReservation,
             type: ReservationType.WALK_IN,
@@ -263,8 +265,10 @@ describe("ReservationGeneralInfo", () => {
             },
         );
 
-        expect(screen.getByText("Reserved by").query()).toBeNull();
-        expect(screen.getByText("John Doe - john.doe@example.com").query()).toBeNull();
+        await expect.element(screen.getByText("Reserved by")).not.toBeInTheDocument();
+        await expect
+            .element(screen.getByText("John Doe - john.doe@example.com"))
+            .not.toBeInTheDocument();
     });
 
     it("renders reservedBy with correct format when email does not start with 'social'", async () => {
@@ -284,11 +288,13 @@ describe("ReservationGeneralInfo", () => {
             .toBeVisible();
     });
 
-    it("does not render creator section when user cannot see reservation creator", () => {
+    it("does not render creator section when user cannot see reservation creator", async () => {
         const screen = renderComponentWithStore("user123");
 
-        expect(screen.getByText(/^\s*Creator\s*$/).query()).toBeNull();
-        expect(screen.getByText("Creator Name - creator@example.com").query()).toBeNull();
+        await expect.element(screen.getByText(/^\s*Creator\s*$/)).not.toBeInTheDocument();
+        await expect
+            .element(screen.getByText("Creator Name - creator@example.com"))
+            .not.toBeInTheDocument();
     });
 
     it("renders createdAt label and formatted date when present", async () => {
@@ -349,14 +355,14 @@ describe("ReservationGeneralInfo", () => {
             },
         );
 
-        expect(screen.getByText("Name").query()).toBeNull();
+        await expect.element(screen.getByText("Name")).not.toBeInTheDocument();
         await expect.element(screen.getByText("Number of people")).toBeVisible();
         await expect
             .element(screen.getByText(incompleteReservation.numberOfGuests.toString()))
             .toBeVisible();
 
-        expect(screen.getByText(/^\s*Contact\s*$/).query()).toBeNull();
-        expect(screen.getByText("Consumption").query()).toBeNull();
-        expect(screen.getByText("Note").query()).toBeNull();
+        await expect.element(screen.getByText(/^\s*Contact\s*$/)).not.toBeInTheDocument();
+        await expect.element(screen.getByText("Consumption")).not.toBeInTheDocument();
+        await expect.element(screen.getByText("Note")).not.toBeInTheDocument();
     });
 });

@@ -54,7 +54,7 @@ describe("EventShowReservation", () => {
         });
 
         const toggle = screen.getByText(t("EventShowReservation.waitingForResponse"));
-        expect(toggle.query()).toBeTruthy();
+        await expect.element(toggle).toBeVisible();
 
         await userEvent.click(toggle);
 
@@ -62,7 +62,7 @@ describe("EventShowReservation", () => {
         expect(screen.emitted().waitingForResponse[0]).toEqual([true]);
     });
 
-    it('does not render the "Waiting for Response" toggle when reservation is confirmed', () => {
+    it('does not render the "Waiting for Response" toggle when reservation is confirmed', async () => {
         props.reservation.reservationConfirmed = true;
 
         const screen = renderComponent(EventShowReservation, props, {
@@ -79,7 +79,7 @@ describe("EventShowReservation", () => {
         });
 
         const label = screen.getByText(t("EventShowReservation.waitingForResponse"));
-        expect(label.query()).toBeNull();
+        await expect.element(label).not.toBeInTheDocument();
     });
 
     it('renders the "Reservation Confirmed" toggle when conditions are met', async () => {
@@ -97,7 +97,7 @@ describe("EventShowReservation", () => {
         });
 
         const toggle = screen.getByText(t("EventShowReservation.reservationConfirmedLabel"));
-        expect(toggle.query()).toBeTruthy();
+        await expect.element(toggle).toBeVisible();
 
         await userEvent.click(toggle);
 
@@ -120,7 +120,7 @@ describe("EventShowReservation", () => {
         });
 
         const toggle = screen.getByText(t("EventShowReservation.guestArrivedLabel"));
-        expect(toggle.query()).toBeTruthy();
+        await expect.element(toggle).toBeVisible();
 
         await userEvent.click(toggle);
 
@@ -143,7 +143,7 @@ describe("EventShowReservation", () => {
         });
 
         const deleteButton = screen.getByRole("button", { name: t("Global.delete") });
-        expect(deleteButton.query()).toBeTruthy();
+        await expect.element(deleteButton).toBeVisible();
 
         await userEvent.click(deleteButton);
 
@@ -165,14 +165,14 @@ describe("EventShowReservation", () => {
         });
 
         const editButton = screen.getByRole("button", { name: t("Global.edit") });
-        expect(editButton.query()).toBeTruthy();
+        await expect.element(editButton).toBeVisible();
 
         await userEvent.click(editButton);
 
         expect(screen.emitted().edit).toBeTruthy();
     });
 
-    it("does not render the edit button when reservation is cancelled", () => {
+    it("does not render the edit button when reservation is cancelled", async () => {
         props.reservation.cancelled = true;
 
         const screen = renderComponent(EventShowReservation, props, {
@@ -189,7 +189,7 @@ describe("EventShowReservation", () => {
         });
 
         const editButton = screen.getByRole("button", { name: t("Global.edit") });
-        expect(editButton.query()).toBeNull();
+        await expect.element(editButton).not.toBeInTheDocument();
     });
 
     it("renders transfer and copy buttons when user can reserve and reservation is not cancelled", async () => {
@@ -209,8 +209,8 @@ describe("EventShowReservation", () => {
         const transferButton = screen.getByRole("button", { name: t("Global.transfer") });
         const copyButton = screen.getByRole("button", { name: t("Global.copy") });
 
-        expect(transferButton.query()).toBeTruthy();
-        expect(copyButton.query()).toBeTruthy();
+        await expect.element(transferButton).toBeVisible();
+        await expect.element(copyButton).toBeVisible();
 
         await userEvent.click(transferButton);
         expect(screen.emitted().transfer).toBeTruthy();
@@ -219,7 +219,7 @@ describe("EventShowReservation", () => {
         expect(screen.emitted().copy).toBeTruthy();
     });
 
-    it("does not render transfer and copy buttons when reservation is cancelled", () => {
+    it("does not render transfer and copy buttons when reservation is cancelled", async () => {
         props.reservation.cancelled = true;
 
         const screen = renderComponent(EventShowReservation, props, {
@@ -238,11 +238,11 @@ describe("EventShowReservation", () => {
         const transferButton = screen.getByRole("button", { name: t("Global.transfer") });
         const copyButton = screen.getByRole("button", { name: t("Global.copy") });
 
-        expect(transferButton.query()).toBeNull();
-        expect(copyButton.query()).toBeNull();
+        await expect.element(transferButton).not.toBeInTheDocument();
+        await expect.element(copyButton).not.toBeInTheDocument();
     });
 
-    it("renders delete button when user can delete any reservation", () => {
+    it("renders delete button when user can delete any reservation", async () => {
         const screen = renderComponent(EventShowReservation, props, {
             piniaStoreOptions: {
                 initialState: {
@@ -259,10 +259,10 @@ describe("EventShowReservation", () => {
         });
 
         const deleteButton = screen.getByRole("button", { name: t("Global.delete") });
-        expect(deleteButton.query()).toBeTruthy();
+        await expect.element(deleteButton).toBeVisible();
     });
 
-    it("renders delete button when user can delete own reservation", () => {
+    it("renders delete button when user can delete own reservation", async () => {
         const screen = renderComponent(EventShowReservation, props, {
             piniaStoreOptions: {
                 initialState: {
@@ -279,10 +279,10 @@ describe("EventShowReservation", () => {
         });
 
         const deleteButton = screen.getByRole("button", { name: t("Global.delete") });
-        expect(deleteButton.query()).toBeTruthy();
+        await expect.element(deleteButton).toBeVisible();
     });
 
-    it("does not render delete button when user cannot delete reservation", () => {
+    it("does not render delete button when user cannot delete reservation", async () => {
         const screen = renderComponent(EventShowReservation, props, {
             piniaStoreOptions: {
                 initialState: {
@@ -299,7 +299,7 @@ describe("EventShowReservation", () => {
         });
 
         const deleteButton = screen.getByRole("button", { name: t("Global.delete") });
-        expect(deleteButton.query()).toBeNull();
+        await expect.element(deleteButton).not.toBeInTheDocument();
     });
 
     it("renders edit button when user can edit any reservation", () => {
@@ -322,7 +322,7 @@ describe("EventShowReservation", () => {
         expect(editButton).toBeTruthy();
     });
 
-    it("renders edit button when user can edit own reservation", () => {
+    it("renders edit button when user can edit own reservation", async () => {
         const screen = renderComponent(EventShowReservation, props, {
             piniaStoreOptions: {
                 initialState: {
@@ -339,10 +339,10 @@ describe("EventShowReservation", () => {
         });
 
         const editButton = screen.getByRole("button", { name: t("Global.edit") });
-        expect(editButton.query()).toBeTruthy();
+        await expect.element(editButton).toBeVisible();
     });
 
-    it("does not render edit button when user cannot edit reservation", () => {
+    it("does not render edit button when user cannot edit reservation", async () => {
         const screen = renderComponent(EventShowReservation, props, {
             piniaStoreOptions: {
                 initialState: {
@@ -359,10 +359,10 @@ describe("EventShowReservation", () => {
         });
 
         const editButton = screen.getByRole("button", { name: t("Global.edit") });
-        expect(editButton.query()).toBeNull();
+        await expect.element(editButton).not.toBeInTheDocument();
     });
 
-    it('does not render the "Cancel Reservation" toggle when guest has arrived', () => {
+    it('does not render the "Cancel Reservation" toggle when guest has arrived', async () => {
         props.reservation.arrived = true;
 
         const screen = renderComponent(EventShowReservation, props, {
@@ -379,7 +379,7 @@ describe("EventShowReservation", () => {
         });
 
         const label = screen.getByText(t("Global.cancel"));
-        expect(label.query()).toBeNull();
+        await expect.element(label).not.toBeInTheDocument();
     });
 
     describe("move to queue", () => {
@@ -429,7 +429,7 @@ describe("EventShowReservation", () => {
             await expect.element(queueButton).toBeVisible();
         });
 
-        it('does not render the "Move to Queue" button when reservation is cancelled', () => {
+        it('does not render the "Move to Queue" button when reservation is cancelled', async () => {
             props.reservation.cancelled = true;
 
             const screen = renderComponent(EventShowReservation, props, {
@@ -449,10 +449,10 @@ describe("EventShowReservation", () => {
             });
 
             const queueButton = screen.getByRole("button", { name: "Move to queue" });
-            expect(queueButton.query()).toBeNull();
+            await expect.element(queueButton).not.toBeInTheDocument();
         });
 
-        it('does not render the "Move to Queue" button when guest has arrived', () => {
+        it('does not render the "Move to Queue" button when guest has arrived', async () => {
             props.reservation.arrived = true;
 
             const screen = renderComponent(EventShowReservation, props, {
@@ -472,10 +472,10 @@ describe("EventShowReservation", () => {
             });
 
             const queueButton = screen.getByRole("button", { name: "Move to queue" });
-            expect(queueButton.query()).toBeNull();
+            await expect.element(queueButton).not.toBeInTheDocument();
         });
 
-        it('does not render the "Move to Queue" button when user cannot reserve', () => {
+        it('does not render the "Move to Queue" button when user cannot reserve', async () => {
             const screen = renderComponent(EventShowReservation, props, {
                 piniaStoreOptions: {
                     initialState: {
@@ -494,7 +494,7 @@ describe("EventShowReservation", () => {
             });
 
             const queueButton = screen.getByRole("button", { name: "Move to queue" });
-            expect(queueButton.query()).toBeNull();
+            await expect.element(queueButton).not.toBeInTheDocument();
         });
 
         it('emits "queue" event when "Move to Queue" button is clicked', async () => {

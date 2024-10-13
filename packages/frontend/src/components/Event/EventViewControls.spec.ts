@@ -50,7 +50,7 @@ describe("EventViewControls.vue", () => {
         const screen = render({ hasMultipleFloorPlans: false });
         await showMenu();
 
-        expect(screen.getByText("First Floor").query()).toBeNull();
+        await expect.element(screen.getByText("First Floor")).not.toBeInTheDocument();
     });
 
     it("renders 'Show Details' option when isAdmin is true", async () => {
@@ -64,7 +64,7 @@ describe("EventViewControls.vue", () => {
         const screen = render({ isAdmin: false });
         await showMenu();
 
-        expect(screen.getByText("Show Details").query()).toBeNull();
+        await expect.element(screen.getByText("Show Details")).not.toBeInTheDocument();
     });
 
     it("emits 'set-active-floor' with correct floor data when a floor is selected", async () => {

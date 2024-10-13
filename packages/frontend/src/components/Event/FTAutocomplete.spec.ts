@@ -66,7 +66,7 @@ describe("FTAutocomplete.vue", () => {
         await expect.element(janeOption).toBeVisible();
         // Check that the checkmark icon is not present
         const checkIcon = screen.getByText("check");
-        expect(checkIcon.query()).toBeNull();
+        await expect.element(checkIcon).not.toBeInTheDocument();
     });
 
     it("displays VIP chip for VIP guests", async () => {
@@ -97,7 +97,7 @@ describe("FTAutocomplete.vue", () => {
 
         // Check that the VIP chip is not present
         const vipChip = screen.getByText("VIP");
-        expect(vipChip.query()).toBeNull();
+        await expect.element(vipChip).not.toBeInTheDocument();
     });
 
     it("does not display arrived guests when 'Hide arrived' is checked", async () => {
@@ -116,7 +116,7 @@ describe("FTAutocomplete.vue", () => {
 
         // Verify that John Doe is not in the options
         const johnOption = screen.getByText("John Doe (Table 1) on First Floor");
-        expect(johnOption.query()).toBeNull();
+        await expect.element(johnOption).not.toBeInTheDocument();
 
         const janeOption = screen.getByText("Jane Smith (Table 2) on Second Floor");
         await expect.element(janeOption).toBeVisible();
