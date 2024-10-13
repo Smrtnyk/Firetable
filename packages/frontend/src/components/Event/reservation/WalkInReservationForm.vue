@@ -7,7 +7,7 @@ import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
 import { greaterThanZero, optionalMinLength, requireNumber } from "src/helpers/form-rules";
 import { hourFromTimestamp } from "src/helpers/date-utils";
-import TelNumberInput from "src/components/tel-number-input/TelNumberInput.vue";
+import TelNumberInput from "src/components/TelNumberInput/TelNumberInput.vue";
 
 interface Props {
     mode: "create" | "update";

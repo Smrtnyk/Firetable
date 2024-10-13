@@ -4,7 +4,7 @@ import { ref, useTemplateRef } from "vue";
 import { minLength } from "src/helpers/form-rules";
 import { QForm } from "quasar";
 
-import TelNumberInput from "src/components/tel-number-input/TelNumberInput.vue";
+import TelNumberInput from "src/components/TelNumberInput/TelNumberInput.vue";
 import { hashString } from "src/helpers/hash-string";
 import { maskPhoneNumber } from "src/helpers/mask-phone-number";
 
