@@ -1063,11 +1063,11 @@ describe("MockFirestore", () => {
             const unsubscribe = collectionRef.onSnapshot(onNext);
 
             // Wait for any asynchronous operations
-            await setTimeout(1);
+            await setTimeout(4);
 
             // Modify the document
             await collectionRef.doc("doc1").update({ key: "newValue" });
-            await setTimeout(1);
+            await setTimeout(4);
 
             expect(onNext).toHaveBeenCalledTimes(2);
             const snapshot = onNext.mock.calls[1][0];
