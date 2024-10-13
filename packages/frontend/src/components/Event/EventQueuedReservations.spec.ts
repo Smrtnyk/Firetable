@@ -212,7 +212,7 @@ describe("EventQueuedReservations.vue", () => {
         expect(mockHide).toHaveBeenCalled();
     });
 
-    it("does not render the drawer when showQueuedReservationsDrawer is false", async () => {
+    it("does not render the drawer when showQueuedReservationsDrawer is false", () => {
         eventsStoreState.showQueuedReservationsDrawer = false;
 
         render();
