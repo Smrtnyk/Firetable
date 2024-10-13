@@ -36,7 +36,7 @@ describe("UserCreateForm", () => {
         showErrorMessageSpy.mockClear();
     });
 
-    it("renders the form with initial values", () => {
+    it("renders the form with initial values", async () => {
         const screen = renderComponent(UserCreateForm, props, {
             piniaStoreOptions: {
                 initialState: {
@@ -45,33 +45,21 @@ describe("UserCreateForm", () => {
             },
         });
 
-        expect(
-            screen
-                .getByLabelText(t("UserCreateForm.userNameInputLabel"))
-                .query()
-                ?.getAttribute("value"),
-        ).toBe("");
+        await expect
+            .element(screen.getByLabelText(t("UserCreateForm.userNameInputLabel")))
+            .toHaveValue("");
 
-        expect(
-            screen
-                .getByLabelText(t("UserCreateForm.userMailInputLabel"))
-                .query()
-                ?.getAttribute("value"),
-        ).toBe("");
+        await expect
+            .element(screen.getByLabelText(t("UserCreateForm.userMailInputLabel")))
+            .toHaveValue("");
 
-        expect(
-            screen
-                .getByLabelText(t("UserCreateForm.userPasswordInputLabel"))
-                .query()
-                ?.getAttribute("value"),
-        ).toBe("");
+        await expect
+            .element(screen.getByLabelText(t("UserCreateForm.userPasswordInputLabel")))
+            .toHaveValue("");
 
         // Role select should be rendered and default to Role.STAFF
         const roleSelect = screen.getByLabelText(t("UserCreateForm.userRoleSelectLabel"));
-        expect(roleSelect.query()).toBeTruthy();
-        expect(roleSelect.query()?.getAttribute("aria-label")).toBe(
-            t("UserCreateForm.userRoleSelectLabel"),
-        );
+        await expect.element(roleSelect).toHaveValue(Role.STAFF);
 
         // Properties checkboxes should be rendered (since we have properties and role is not PROPERTY_OWNER)
         const propertyCheckboxes = screen.getByRole("checkbox");
@@ -79,7 +67,7 @@ describe("UserCreateForm", () => {
 
         // Ensure checkboxes are unchecked
         for (const checkbox of propertyCheckboxes.elements()) {
-            expect(checkbox.getAttribute("aria-checked")).toBe("false");
+            await expect.element(checkbox).toHaveAttribute("aria-checked", "false");
         }
     });
 
@@ -211,28 +199,19 @@ describe("UserCreateForm", () => {
         const resetButton = screen.getByRole("button", { name: t("Global.reset") });
         await userEvent.click(resetButton);
 
-        expect(
-            screen
-                .getByLabelText(t("UserCreateForm.userNameInputLabel"))
-                .query()
-                ?.getAttribute("value"),
-        ).toBe("");
-        expect(
-            screen
-                .getByLabelText(t("UserCreateForm.userMailInputLabel"))
-                .query()
-                ?.getAttribute("value"),
-        ).toBe("");
-        expect(
-            screen
-                .getByLabelText(t("UserCreateForm.userPasswordInputLabel"))
-                .query()
-                ?.getAttribute("value"),
-        ).toBe("");
+        await expect
+            .element(screen.getByLabelText(t("UserCreateForm.userNameInputLabel")))
+            .toHaveValue("");
+        await expect
+            .element(screen.getByLabelText(t("UserCreateForm.userMailInputLabel")))
+            .toHaveValue("");
+        await expect
+            .element(screen.getByLabelText(t("UserCreateForm.userPasswordInputLabel")))
+            .toHaveValue("");
 
         // Check that properties are reset
         for (const checkbox of propertyCheckboxes.elements()) {
-            expect(checkbox.getAttribute("aria-checked")).toBe("false");
+            await expect.element(checkbox).toHaveAttribute("aria-checked", "false");
         }
     });
 
@@ -337,9 +316,9 @@ describe("UserCreateForm", () => {
         const submitButton = screen.getByRole("button", { name: t("Global.submit") });
         await userEvent.click(submitButton);
 
-        expect(
-            screen.getByText("Password must include at least one uppercase letter.").query(),
-        ).toBeTruthy();
+        await expect
+            .element(screen.getByText("Password must include at least one uppercase letter."))
+            .toBeVisible();
 
         await userEvent.fill(
             screen.getByLabelText(t("UserCreateForm.userPasswordInputLabel")),
@@ -349,7 +328,9 @@ describe("UserCreateForm", () => {
 
         await userEvent.click(submitButton);
 
-        expect(screen.getByText("Password must include at least one number.").query()).toBeTruthy();
+        await expect
+            .element(screen.getByText("Password must include at least one number."))
+            .toBeVisible();
 
         await userEvent.fill(
             screen.getByLabelText(t("UserCreateForm.userPasswordInputLabel")),
@@ -359,13 +340,13 @@ describe("UserCreateForm", () => {
 
         await userEvent.click(submitButton);
 
-        expect(
-            screen
-                .getByText(
+        await expect
+            .element(
+                screen.getByText(
                     "Password must include at least one special character (e.g., !, #, etc...)",
-                )
-                .query(),
-        ).toBeTruthy();
+                ),
+            )
+            .toBeVisible();
     });
 
     it("emits submit event when password meets all validation rules", async () => {
