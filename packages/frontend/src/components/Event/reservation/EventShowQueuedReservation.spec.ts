@@ -69,7 +69,7 @@ describe("EventShowQueuedReservation", () => {
         await expect.element(screen.getByText("18:00")).toBeVisible();
     });
 
-    it('renders "Move to Floor Plan" button when canUnqueue is true (canReserve)', async () => {
+    it('renders "Move to Floor Plan" button when canModify is true)', async () => {
         const screen = renderComponentWithStore(true, "user123");
 
         const moveButton = screen.getByRole("button", { name: /move to floor plan/i });
@@ -84,15 +84,15 @@ describe("EventShowQueuedReservation", () => {
         await expect.element(moveButton).toBeVisible();
     });
 
-    it('does not render "Move to Floor Plan" button when canUnqueue is false', () => {
+    it('does not render "Move to Floor Plan" button when canUnqueue is false', async () => {
         // User cannot reserve and is not the owner
         const screen = renderComponentWithStore(false, "user789");
 
         const moveButton = screen.getByRole("button", { name: /move to floor plan/i });
-        expect(moveButton.query()).toBeNull();
+        await expect.element(moveButton).not.toBeInTheDocument();
     });
 
-    it('emits "unqueue" event when "Move to Floor Plan" button is clicked (canReserve)', async () => {
+    it('emits "unqueue" event when "Move to Floor Plan" button is clicked (canModify)', async () => {
         // User can reserve
         const screen = renderComponentWithStore(true, "user123");
         await userEvent.click(screen.getByRole("button", { name: /move to floor plan/i }));
@@ -111,7 +111,7 @@ describe("EventShowQueuedReservation", () => {
         expect(screen.emitted().unqueue.length).toBe(1);
     });
 
-    it('updates "canUnqueue" when authStore changes (canReserve becomes true)', async () => {
+    it('updates "canUnqueue" when authStore changes (canModify becomes true)', async () => {
         //  User initially cannot reserve and is not the owner
         const screen = renderComponent(
             EventShowQueuedReservation,
@@ -133,7 +133,9 @@ describe("EventShowQueuedReservation", () => {
         );
 
         // Initially, "Move to Floor Plan" button should not be present
-        expect(screen.getByRole("button", { name: /move to floor plan/i }).query()).toBeNull();
+        await expect
+            .element(screen.getByRole("button", { name: /move to floor plan/i }))
+            .not.toBeInTheDocument();
 
         // Rerender the component to reflect the store change
         const authStore = useAuthStore();
@@ -168,7 +170,9 @@ describe("EventShowQueuedReservation", () => {
         );
 
         // Initially, "Move to Floor Plan" button should not be present
-        expect(screen.getByRole("button", { name: /move to floor plan/i }).query()).toBeNull();
+        await expect
+            .element(screen.getByRole("button", { name: /move to floor plan/i }))
+            .not.toBeInTheDocument();
 
         // Update authStore to make the user the owner
         const authStore = useAuthStore();
@@ -179,5 +183,47 @@ describe("EventShowQueuedReservation", () => {
         await expect
             .element(screen.getByRole("button", { name: /move to floor plan/i }))
             .toBeVisible();
+    });
+
+    it('renders "Delete" button when canModify is true (canModify)', async () => {
+        const screen = renderComponentWithStore(true, "user123");
+
+        const deleteButton = screen.getByRole("button", { name: /delete/i });
+        await expect.element(deleteButton).toBeVisible();
+    });
+
+    it('renders "Delete" button when canModify is true (own reservation)', async () => {
+        // User is the owner but cannot reserve globally
+        const screen = renderComponentWithStore(false, "creator456");
+
+        const deleteButton = screen.getByRole("button", { name: /delete/i });
+        await expect.element(deleteButton).toBeVisible();
+    });
+
+    it('does not render "Delete" button when canModify is false', async () => {
+        // User cannot reserve and is not the owner
+        const screen = renderComponentWithStore(false, "user789");
+
+        const deleteButton = screen.getByRole("button", { name: /delete/i });
+        await expect.element(deleteButton).not.toBeInTheDocument();
+    });
+
+    it('emits "delete" event when "Delete" button is clicked (canReserve)', async () => {
+        // User can reserve
+        const screen = renderComponentWithStore(true, "user123");
+        await userEvent.click(screen.getByRole("button", { name: /delete/i }));
+
+        expect(screen.emitted().delete).toBeTruthy();
+        expect(screen.emitted().delete.length).toBe(1);
+    });
+
+    it('emits "delete" event when "Delete" button is clicked (own reservation)', async () => {
+        // User is the owner but cannot reserve globally
+        const screen = renderComponentWithStore(false, "creator456");
+
+        await userEvent.click(screen.getByRole("button", { name: /delete/i }));
+
+        expect(screen.emitted().delete).toBeTruthy();
+        expect(screen.emitted().delete.length).toBe(1);
     });
 });

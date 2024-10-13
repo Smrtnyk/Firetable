@@ -6,7 +6,12 @@ import type {
     ReservationDoc,
 } from "@firetable/types";
 import type { HttpsCallableResult } from "firebase/functions";
-import { queuedReservationsCollection, reservationsCollection, reservationDoc } from "../db.js";
+import {
+    queuedReservationDoc,
+    queuedReservationsCollection,
+    reservationsCollection,
+    reservationDoc,
+} from "../db.js";
 import { initializeFirebase } from "../base.js";
 import { httpsCallable } from "firebase/functions";
 import { addDoc, deleteDoc, type DocumentReference, updateDoc } from "firebase/firestore";
@@ -43,6 +48,13 @@ export function moveReservationFromQueue(
     const { functions } = initializeFirebase();
     const moveReservationFromQueueFn = httpsCallable(functions, "moveReservationFromQueue");
     return moveReservationFromQueueFn({ eventOwner, reservationId, preparedPlannedReservation });
+}
+
+export function deleteQueuedReservation(
+    eventOwner: EventOwner,
+    queuedReservationId: string,
+): Promise<void> {
+    return deleteDoc(queuedReservationDoc(eventOwner, queuedReservationId));
 }
 
 export function addReservation(

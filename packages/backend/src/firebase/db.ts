@@ -63,6 +63,10 @@ export function reservationDoc(owner: EventOwner, reservationId: string): Docume
     return doc(reservationsCollection(owner), reservationId);
 }
 
+export function queuedReservationDoc(owner: EventOwner, reservationId: string): DocumentReference {
+    return doc(queuedReservationsCollection(owner), reservationId);
+}
+
 export function usersCollection(organisationId: string): CollectionReference {
     return getCollection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`);
 }

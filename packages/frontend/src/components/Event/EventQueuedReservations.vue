@@ -34,7 +34,7 @@ export interface EventQueuedReservationsProps {
 
 interface Emits {
     (e: "create", reservation: QueuedReservation): void;
-    (e: "unqueue", reservation: QueuedReservationDoc): void;
+    (e: "delete" | "unqueue", reservation: QueuedReservationDoc): void;
 }
 
 const emit = defineEmits<Emits>();
@@ -89,6 +89,10 @@ function showReservation(reservation: QueuedReservationDoc): void {
                     emit("unqueue", reservation);
                     dialog.hide();
                     eventsStore.toggleQueuedReservationsDrawerVisibility();
+                },
+                delete() {
+                    emit("delete", reservation);
+                    dialog.hide();
                 },
             },
         },

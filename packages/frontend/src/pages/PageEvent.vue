@@ -10,6 +10,7 @@ import type {
 } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
 import {
+    deleteQueuedReservation,
     saveQueuedReservation,
     getEventFloorsPath,
     getEventGuestListPath,
@@ -28,7 +29,7 @@ import {
     useFirestoreDocument,
 } from "src/composables/useFirestore";
 import { useFloorsPageEvent } from "src/composables/useFloorsPageEvent";
-import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";
 import { where } from "firebase/firestore";
 import { useUsers } from "src/composables/useUsers";
@@ -177,6 +178,20 @@ async function onCreateQueuedReservation(reservation: QueuedReservation): Promis
     });
 }
 
+async function onDeleteQueuedReservation(reservation: QueuedReservationDoc): Promise<void> {
+    const shouldDelete = await showConfirm("Are you sure you want to delete this reservation?");
+
+    if (!shouldDelete) {
+        return;
+    }
+
+    await tryCatchLoadingWrapper({
+        hook() {
+            return deleteQueuedReservation(eventOwner, reservation.id);
+        },
+    });
+}
+
 onMounted(init);
 
 onUnmounted(function () {
@@ -235,6 +250,7 @@ onUnmounted(function () {
             :event-data="event"
             @unqueue="onReservationUnqueue"
             @create="onCreateQueuedReservation"
+            @delete="onDeleteQueuedReservation"
         />
         <EventGuestList
             :guest-list-limit="event.guestListLimit"

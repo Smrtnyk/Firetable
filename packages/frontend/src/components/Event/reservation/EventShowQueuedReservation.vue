@@ -13,11 +13,11 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits<(e: "unqueue") => void>();
+const emit = defineEmits<(e: "delete" | "unqueue") => void>();
 
 const authStore = useAuthStore();
 
-const canUnqueue = computed(function () {
+const canModify = computed(function () {
     return authStore.canReserve || isOwnReservation(props.reservation);
 });
 
@@ -34,7 +34,7 @@ function isOwnReservation(reservation: QueuedReservation): boolean {
 
         <q-separator class="q-mb-md" />
 
-        <q-item v-if="canUnqueue">
+        <q-item v-if="canModify">
             <div class="row q-gutter-sm full-width">
                 <q-btn
                     title="Move to Floor Plan"
@@ -42,6 +42,14 @@ function isOwnReservation(reservation: QueuedReservation): boolean {
                     color="secondary"
                     @click="() => emit('unqueue')"
                     v-close-popup
+                />
+
+                <q-btn
+                    title="Delete"
+                    icon="trash"
+                    color="negative"
+                    v-close-popup
+                    @click="() => emit('delete')"
                 />
             </div>
         </q-item>
