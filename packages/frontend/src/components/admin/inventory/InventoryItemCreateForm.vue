@@ -5,13 +5,13 @@ import { computed, ref, useTemplateRef, watch } from "vue";
 import { QForm } from "quasar";
 import { useI18n } from "vue-i18n";
 
-interface Props {
+export interface InventoryItemCreateFormProps {
     itemToEdit?: CreateInventoryItemPayload;
     initialData?: CreateInventoryItemPayload | undefined;
 }
 
 const { t } = useI18n();
-const props = defineProps<Props>();
+const props = defineProps<InventoryItemCreateFormProps>();
 const formRef = useTemplateRef<QForm>("formRef");
 const form = ref<CreateInventoryItemPayload>(getInitialForm());
 const typeOptions = [InventoryItemType.DRINK, InventoryItemType.FOOD, InventoryItemType.OTHER];
@@ -69,7 +69,6 @@ watch(
                 required
                 :rules="[(val) => !!val || 'Name is required']"
                 aria-label="Name"
-                role="textbox"
             />
 
             <!-- Type -->
@@ -83,7 +82,6 @@ watch(
                 required
                 :rules="[(val) => !!val || 'Type is required']"
                 aria-label="Type"
-                role="combobox"
             />
 
             <!-- Category -->
@@ -93,7 +91,6 @@ watch(
                 standout
                 rounded
                 aria-label="Category"
-                role="textbox"
             />
 
             <!-- Price -->
@@ -106,7 +103,6 @@ watch(
                 required
                 :rules="[(val) => val > 0 || 'Price must be positive']"
                 aria-label="Price"
-                role="spinbutton"
             />
 
             <!-- Quantity -->
@@ -119,7 +115,6 @@ watch(
                 required
                 :rules="[(val) => val > 0 || 'Quantity must be positive']"
                 aria-label="Quantity"
-                role="spinbutton"
             />
 
             <!-- Alcohol Content (only for drinks) -->
@@ -137,7 +132,6 @@ watch(
                         'Must be between 0 and 100',
                 ]"
                 aria-label="Alcohol Content"
-                role="spinbutton"
             />
 
             <!-- Volume (only for drinks) -->
@@ -150,7 +144,6 @@ watch(
                 rounded
                 :rules="[(val) => val === undefined || val >= 0 || 'Volume must be positive']"
                 aria-label="Volume"
-                role="spinbutton"
             />
 
             <q-input
@@ -159,7 +152,6 @@ watch(
                 standout
                 rounded
                 aria-label="Supplier"
-                role="textbox"
             />
 
             <!-- Buttons -->

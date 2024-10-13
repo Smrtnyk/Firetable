@@ -1,5 +1,6 @@
 import type { RenderResult } from "vitest-browser-vue";
 import type { CreateInventoryItemPayload } from "@firetable/types";
+import type { InventoryItemCreateFormProps } from "./InventoryItemCreateForm.vue";
 import InventoryItemCreateForm from "./InventoryItemCreateForm.vue";
 import { renderComponent, t } from "../../../../test-helpers/render-component";
 import { DrinkCategory, InventoryItemType } from "@firetable/types";
@@ -7,7 +8,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 
 describe("InventoryItemCreateForm.vue", () => {
-    let screen: RenderResult<any>;
+    let screen: RenderResult<InventoryItemCreateFormProps>;
 
     describe("create", () => {
         beforeEach(() => {
@@ -32,9 +33,12 @@ describe("InventoryItemCreateForm.vue", () => {
 
             const volumeInput = screen.getByLabelText("Volume");
             await expect.element(volumeInput).toHaveValue(null);
-            // It is the nested one
-            const typeSelect = screen.getByLabelText("Type").getByLabelText("Type");
-            await expect.element(typeSelect).toHaveValue(InventoryItemType.DRINK);
+
+            const options = screen.getByRole("combobox", {
+                includeHidden: false,
+                expanded: false,
+            });
+            await expect.element(options).toHaveValue(InventoryItemType.DRINK);
 
             const categorySelect = screen.getByLabelText("Category");
             await expect.element(categorySelect).toHaveValue(DrinkCategory.SPIRIT);
@@ -163,8 +167,11 @@ describe("InventoryItemCreateForm.vue", () => {
             const supplierInput = screen.getByLabelText("Supplier");
             await expect.element(supplierInput).toHaveValue("Supplier A");
 
-            const typeSelect = screen.getByLabelText("Type").getByLabelText("Type");
-            await expect.element(typeSelect).toHaveValue(InventoryItemType.FOOD);
+            const options = screen.getByRole("combobox", {
+                includeHidden: false,
+                expanded: false,
+            });
+            await expect.element(options).toHaveValue(InventoryItemType.FOOD);
 
             const categoryInput = screen.getByLabelText("Category");
             await expect.element(categoryInput).toHaveValue("Snacks");
@@ -248,8 +255,11 @@ describe("InventoryItemCreateForm.vue", () => {
             const nameInput = screen.getByLabelText("Name");
             await expect.element(nameInput).toHaveValue("Red Bull 250ml");
 
-            const typeSelect = screen.getByLabelText("Type").getByLabelText("Type");
-            await expect.element(typeSelect).toHaveValue(InventoryItemType.DRINK);
+            const options = screen.getByRole("combobox", {
+                includeHidden: false,
+                expanded: false,
+            });
+            await expect.element(options).toHaveValue(InventoryItemType.DRINK);
 
             const categoryInput = screen.getByLabelText("Category");
             await expect.element(categoryInput).toHaveValue(DrinkCategory.SOFT_DRINK);
