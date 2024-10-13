@@ -19,17 +19,16 @@ describe("TelNumberInput", () => {
     });
 
     describe("when optional", () => {
-        it("renders the form with initial values", () => {
+        it("renders the form with initial values", async () => {
             const screen = renderComponent(TelNumberInput, props);
 
             const countryCodeSelect = screen.getByRole("combobox", { name: "Country Code" });
-
-            expect.element(countryCodeSelect).toBeVisible();
-            expect(countryCodeSelect.query()?.getAttribute("value")).toBe("");
+            await expect.element(countryCodeSelect).toBeVisible();
+            await expect.element(countryCodeSelect).toHaveValue("");
 
             const phoneNumberInput = screen.getByLabelText("Phone Number");
-            expect.element(phoneNumberInput).toBeVisible();
-            expect(phoneNumberInput.query()?.getAttribute("value")).toBe("");
+            await expect.element(phoneNumberInput).toBeVisible();
+            await expect.element(phoneNumberInput).toHaveValue("");
         });
 
         it("allows selecting a country code", async () => {
@@ -40,7 +39,7 @@ describe("TelNumberInput", () => {
             const countryOption = screen.getByText(AUSTRIA_OPTION);
             await userEvent.click(countryOption);
 
-            expect(countryCodeSelect.query()?.getAttribute("value")).toBe("Austria");
+            await expect.element(countryCodeSelect).toHaveValue(AUSTRIA_OPTION);
         });
 
         it("allows entering a phone number", async () => {
@@ -49,7 +48,7 @@ describe("TelNumberInput", () => {
             const phoneNumberInput = screen.getByLabelText("Phone Number");
             await userEvent.type(phoneNumberInput, "123456789");
 
-            expect(phoneNumberInput.query()?.getAttribute("value")).toBe("123456789");
+            await expect.element(phoneNumberInput).toHaveValue("123456789");
         });
 
         it("emits the correct modelValue when a valid phone number is provided", async () => {
@@ -85,7 +84,7 @@ describe("TelNumberInput", () => {
             await userEvent.tab();
 
             const errorMessage = screen.getByText("Invalid phone number");
-            expect(errorMessage.query()).toBeTruthy();
+            await expect.element(errorMessage).toBeVisible();
 
             expect(screen.emitted()["update:modelValue"]).toBeTruthy();
             expect(last<string[]>(screen.emitted()["update:modelValue"] as any)[0]).toBe("");
@@ -103,15 +102,14 @@ describe("TelNumberInput", () => {
                 "Please provide both country code and phone number",
             );
             const countryError = screen.getByText("Please select a country code");
-            expect(countryError.query()).toBeNull();
-            expect(phoneError.query()).toBeNull();
+            await expect.element(countryError).not.toBeInTheDocument();
+            await expect.element(phoneError).not.toBeInTheDocument();
 
             expect(screen.emitted()["update:modelValue"]).toBeTruthy();
             expect(first<string[]>(screen.emitted()["update:modelValue"] as any)[0]).toBe("");
         });
 
-        // flaky test
-        it.skip("shows error when only one field is provided", async () => {
+        it("shows error when only one field is provided", async () => {
             const screen = renderComponent(TelNumberInput, props);
             const phoneNumberInput = screen.getByLabelText("Phone Number");
             const countryCodeSelect = screen.getByRole("combobox", { name: "Country Code" });
@@ -128,7 +126,7 @@ describe("TelNumberInput", () => {
             const errorMessage = screen.getByText(
                 "Please provide both country code and phone number",
             );
-            expect(errorMessage.query()).toBeTruthy();
+            await expect.element(errorMessage).toBeVisible();
 
             // Now clear the country code and provide only the phone number
             const clearButton = screen.getByRole("button", { name: "clear" });
@@ -138,19 +136,19 @@ describe("TelNumberInput", () => {
 
             await userEvent.tab();
 
-            expect(errorMessage.query()).toBeTruthy();
+            await expect.element(errorMessage).toBeVisible();
         });
 
-        it("updates inputs when modelValue prop changes externally", () => {
+        it("updates inputs when modelValue prop changes externally", async () => {
             const screen = renderComponent(TelNumberInput, {
                 modelValue: "+441234567890",
             });
 
             const countryCodeSelect = screen.getByRole("combobox", { name: "Country Code" });
-            expect(countryCodeSelect.query()?.getAttribute("value")).toContain("United Kingdom");
+            await expect.element(countryCodeSelect).toHaveValue("United Kingdom");
 
             const phoneNumberInput = screen.getByLabelText("Phone Number");
-            expect(phoneNumberInput.query()?.getAttribute("value")).toBe("1234567890");
+            await expect.element(phoneNumberInput).toHaveValue("1234567890");
         });
 
         it("does not emit modelValue when inputs are invalid", async () => {
@@ -183,11 +181,10 @@ describe("TelNumberInput", () => {
 
             await userEvent.tab();
 
-            expect(phoneNumberInput.query()?.getAttribute("value")).toBe("7123456789");
+            await expect.element(phoneNumberInput).toHaveValue("7123456789");
         });
 
-        // flaky test
-        it.skip("handles optional phone number correctly when only country code is cleared", async () => {
+        it("handles optional phone number correctly when only country code is cleared", async () => {
             const screen = renderComponent(TelNumberInput, props);
 
             // Provide both country code and phone number
@@ -198,23 +195,22 @@ describe("TelNumberInput", () => {
             const phoneNumberInput = screen.getByLabelText("Phone Number");
             await userEvent.type(phoneNumberInput, "2025550123");
 
-            // Now clear the country code
-            const clearButton = document.querySelector("i.q-icon[role='button']");
-            await userEvent.click(clearButton!);
+            const clearButton = screen.getByRole("button", { name: "clear" });
+            await userEvent.click(clearButton);
             // Blur to trigger validation
             await userEvent.tab();
 
             const errorMessage = screen.getByText(
                 "Please provide both country code and phone number",
             );
-            expect(errorMessage.query()).toBeTruthy();
+            await expect.element(errorMessage).toBeVisible();
 
             expect(screen.emitted()["update:modelValue"]).toBeTruthy();
             expect(last<string[]>(screen.emitted()["update:modelValue"] as any)[0]).toBe("");
         });
 
         // flaky test
-        it.skip("allows clearing both fields and emits empty modelValue", async () => {
+        it("allows clearing both fields and emits empty modelValue", async () => {
             const screen = renderComponent(TelNumberInput, props);
 
             // Provide both country code and phone number
@@ -227,21 +223,21 @@ describe("TelNumberInput", () => {
             await userEvent.type(phoneNumberInput, "2025550123");
 
             // Now clear both fields
-            const clearButton = document.querySelector("i.q-icon[role='button']");
+            const clearButton = screen.getByRole("button", { name: "clear" });
             await userEvent.fill(phoneNumberInput, "");
-            await userEvent.click(clearButton!);
+            await userEvent.click(clearButton);
 
             // Blur to trigger validation
             await userEvent.tab();
 
             // Check that no validation errors are shown
             const countryError = screen.getByText("Please select a country code");
-            expect(countryError.query()).toBeNull();
+            await expect.element(countryError).not.toBeInTheDocument();
 
             const phoneError = screen.getByText(
                 "Please provide both country code and phone number",
             );
-            expect(phoneError.query()).toBeNull();
+            await expect.element(phoneError).not.toBeInTheDocument();
 
             expect(screen.emitted()["update:modelValue"]).toBeTruthy();
             expect(last<string[]>(screen.emitted()["update:modelValue"] as any)[0]).toBe("");
@@ -261,9 +257,9 @@ describe("TelNumberInput", () => {
             await userEvent.click(phoneNumberInput);
             await userEvent.tab();
 
-            expect(
-                screen.getByText("Please provide both country code and phone number").query(),
-            ).toBeTruthy();
+            await expect
+                .element(screen.getByText("Please provide both country code and phone number"))
+                .toBeVisible();
 
             expect(screen.emitted()["update:modelValue"]).toBeFalsy();
         });
@@ -302,26 +298,21 @@ describe("TelNumberInput", () => {
             await userEvent.click(phoneNumberInput);
             await userEvent.tab();
 
-            expect(
-                screen.getByText("Please provide both country code and phone number").query(),
-            ).toBeTruthy();
+            await expect
+                .element(screen.getByText("Please provide both country code and phone number"))
+                .toBeVisible();
 
             // Now clear the country code and provide only the phone number
             const clearButton = screen.getByRole("button", { name: "clear" });
             await userEvent.click(clearButton);
-            try {
-                await userEvent.click(clearButton);
-            } catch (e) {
-                /* empty */
-            }
 
             await userEvent.type(phoneNumberInput, "2025550123");
 
             await userEvent.tab();
 
-            expect(
-                screen.getByText("Please provide both country code and phone number").query(),
-            ).toBeTruthy();
+            await expect
+                .element(screen.getByText("Please provide both country code and phone number"))
+                .toBeVisible();
         });
     });
 });
