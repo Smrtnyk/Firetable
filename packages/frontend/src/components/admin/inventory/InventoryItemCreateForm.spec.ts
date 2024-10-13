@@ -4,7 +4,7 @@ import InventoryItemCreateForm from "./InventoryItemCreateForm.vue";
 import { renderComponent, t } from "../../../../test-helpers/render-component";
 import { DrinkCategory, InventoryItemType } from "@firetable/types";
 import { beforeEach, describe, expect, it } from "vitest";
-import { page, userEvent } from "@vitest/browser/context";
+import { userEvent } from "@vitest/browser/context";
 
 describe("InventoryItemCreateForm.vue", () => {
     let screen: RenderResult<any>;
@@ -15,81 +15,78 @@ describe("InventoryItemCreateForm.vue", () => {
         });
 
         it("has the correct initial form data", async () => {
-            const nameInput = page.getByLabelText("Name");
+            const nameInput = screen.getByLabelText("Name");
             await expect.element(nameInput).toHaveValue("");
 
-            const priceInput = page.getByLabelText("Price");
+            const priceInput = screen.getByLabelText("Price");
             await expect.element(priceInput).toHaveValue(0);
 
-            const quantityInput = page.getByLabelText("Quantity");
+            const quantityInput = screen.getByLabelText("Quantity");
             await expect.element(quantityInput).toHaveValue(0);
 
-            const supplierInput = page.getByLabelText("Supplier");
+            const supplierInput = screen.getByLabelText("Supplier");
             await expect.element(supplierInput).toHaveValue("");
 
-            const alcoholContentInput = page.getByLabelText("Alcohol Content");
+            const alcoholContentInput = screen.getByLabelText("Alcohol Content");
             await expect.element(alcoholContentInput).toHaveValue(null);
 
-            const volumeInput = page.getByLabelText("Volume");
+            const volumeInput = screen.getByLabelText("Volume");
             await expect.element(volumeInput).toHaveValue(null);
             // It is the nested one
-            const typeSelect = page.getByLabelText("Type").getByLabelText("Type");
+            const typeSelect = screen.getByLabelText("Type").getByLabelText("Type");
             await expect.element(typeSelect).toHaveValue(InventoryItemType.DRINK);
 
-            const categorySelect = page.getByLabelText("Category");
+            const categorySelect = screen.getByLabelText("Category");
             await expect.element(categorySelect).toHaveValue(DrinkCategory.SPIRIT);
         });
 
         it("shows validation errors when required fields are empty", async () => {
             // Try to submit the form without filling required fields
-            const submitButton = page.getByText("Submit");
+            const submitButton = screen.getByText("Submit");
             await userEvent.click(submitButton);
 
             // Check for validation error messages
-            await expect.element(page.getByText("Name is required")).toBeVisible();
-            await expect.element(page.getByText("Price must be positive")).toBeVisible();
-            await expect.element(page.getByText("Quantity must be positive")).toBeVisible();
+            await expect.element(screen.getByText("Name is required")).toBeVisible();
+            await expect.element(screen.getByText("Price must be positive")).toBeVisible();
+            await expect.element(screen.getByText("Quantity must be positive")).toBeVisible();
         });
 
         it("emits submit event with correct data when form is valid", async () => {
-            const nameInput = page.getByLabelText("Name");
+            const nameInput = screen.getByLabelText("Name");
             await userEvent.type(nameInput, "Test Drink");
             await expect.element(nameInput).toHaveValue("Test Drink");
 
-            const typeSelect = page.getByLabelText("Type").getByLabelText("Type");
-            await userEvent.click(typeSelect);
-            // sleep for 100ms
-            await new Promise((resolve) => {
-                setTimeout(resolve, 100);
+            const options = screen.getByRole("combobox", {
+                includeHidden: false,
+                expanded: false,
             });
-            const options = document.querySelectorAll(".q-menu .q-item");
-            const foodOption = Array.from(options).find(
-                (option) => option.textContent?.trim() === InventoryItemType.FOOD,
-            );
 
-            expect(foodOption).toBeTruthy();
+            await userEvent.click(options);
+
+            const foodOption = screen.getByText(InventoryItemType.FOOD);
+
             await userEvent.click(foodOption!);
-            await expect.element(typeSelect).toHaveValue(InventoryItemType.FOOD);
+            await expect.element(options).toHaveValue(InventoryItemType.FOOD);
 
-            const priceInput = page.getByLabelText("Price");
+            const priceInput = screen.getByLabelText("Price");
             await userEvent.type(priceInput, "10");
             await expect.element(priceInput).toHaveValue(10);
 
-            const quantityInput = page.getByLabelText("Quantity");
+            const quantityInput = screen.getByLabelText("Quantity");
             await userEvent.type(quantityInput, "50");
             await expect.element(quantityInput).toHaveValue(50);
 
-            const submitButton = page.getByText("Submit");
+            const submitButton = screen.getByText("Submit");
             await userEvent.click(submitButton);
         });
 
         it("resets the form when reset button is clicked", async () => {
-            const nameInput = page.getByLabelText("Name");
+            const nameInput = screen.getByLabelText("Name");
             await userEvent.type(nameInput, "Test Drink");
             await expect.element(nameInput).toHaveValue("Test Drink");
 
             // Click the reset button
-            const resetButton = page.getByText("Reset");
+            const resetButton = screen.getByText("Reset");
             await userEvent.click(resetButton);
 
             // Check that form values have been reset
@@ -97,53 +94,46 @@ describe("InventoryItemCreateForm.vue", () => {
         });
 
         it("conditionally shows alcohol content and volume fields when type is drink", async () => {
-            const alcoholContentInput = page.getByLabelText("Alcohol Content");
-            const volumeInput = page.getByLabelText("Volume");
+            const alcoholContentInput = screen.getByLabelText("Alcohol Content");
+            const volumeInput = screen.getByLabelText("Volume");
 
             await expect.element(alcoholContentInput).toBeVisible();
             await expect.element(volumeInput).toBeVisible();
 
-            const typeSelect = page.getByLabelText("Type").getByLabelText("Type");
+            const options = screen.getByRole("combobox", {
+                includeHidden: false,
+                expanded: false,
+            });
+
             {
                 // Change type to 'food'
-                await userEvent.click(typeSelect);
-                // sleep for 100ms
-                await new Promise((resolve) => {
-                    setTimeout(resolve, 100);
-                });
-                // Select 'Food' from the dropdown options
-                const options = document.querySelectorAll(".q-menu .q-item");
-                const foodOption = Array.from(options).find(
-                    (option) => option.textContent?.trim() === InventoryItemType.FOOD,
-                );
+                await userEvent.click(options);
 
-                expect(foodOption).toBeTruthy();
-                await userEvent.click(foodOption!);
+                const foodOption = screen.getByText(InventoryItemType.FOOD);
+
+                // Select 'Food' from the dropdown options
+                await userEvent.click(foodOption);
 
                 // Check that 'Alcohol Content' and 'Volume' inputs are no longer present
-                const alcoholContentInputAfter = page.getByLabelText("Alcohol Content");
-                const volumeInputAfter = page.getByLabelText("Volume");
+                const alcoholContentInputAfter = screen.getByLabelText("Alcohol Content");
+                const volumeInputAfter = screen.getByLabelText("Volume");
 
-                expect(alcoholContentInputAfter.elements().length).toBe(0);
-                expect(volumeInputAfter.elements().length).toBe(0);
+                await expect.element(alcoholContentInputAfter).not.toBeInTheDocument();
+                await expect.element(volumeInputAfter).not.toBeInTheDocument();
             }
 
             {
                 // Change type back to 'drink'
-                await userEvent.click(typeSelect);
-                const options = document.querySelectorAll(".q-menu .q-item");
-                const drinkOption = Array.from(options).find(
-                    (option) => option.textContent?.trim() === InventoryItemType.DRINK,
-                );
+                await userEvent.click(options);
+                const drinkOption = screen.getByText(InventoryItemType.DRINK);
 
-                expect(drinkOption).toBeTruthy();
-                await userEvent.click(drinkOption!);
+                await userEvent.click(drinkOption);
                 // Check that 'Alcohol Content' and 'Volume' inputs are present again
-                const alcoholContentInputAgain = page.getByLabelText("Alcohol Content");
-                const volumeInputAgain = page.getByLabelText("Volume");
+                const alcoholContentInputAgain = screen.getByLabelText("Alcohol Content");
+                const volumeInputAgain = screen.getByLabelText("Volume");
 
-                expect(alcoholContentInputAgain.elements().length).toBeGreaterThan(0);
-                expect(volumeInputAgain.elements().length).toBeGreaterThan(0);
+                await expect.element(alcoholContentInputAgain).toBeVisible();
+                await expect.element(volumeInputAgain).toBeVisible();
             }
         });
     });
@@ -161,22 +151,22 @@ describe("InventoryItemCreateForm.vue", () => {
 
             screen = renderComponent(InventoryItemCreateForm, { itemToEdit });
 
-            const nameInput = page.getByLabelText("Name");
+            const nameInput = screen.getByLabelText("Name");
             await expect.element(nameInput).toHaveValue("Existing Item");
 
-            const priceInput = page.getByLabelText("Price");
+            const priceInput = screen.getByLabelText("Price");
             await expect.element(priceInput).toHaveValue(5.99);
 
-            const quantityInput = page.getByLabelText("Quantity");
+            const quantityInput = screen.getByLabelText("Quantity");
             await expect.element(quantityInput).toHaveValue(10);
 
-            const supplierInput = page.getByLabelText("Supplier");
+            const supplierInput = screen.getByLabelText("Supplier");
             await expect.element(supplierInput).toHaveValue("Supplier A");
 
-            const typeSelect = page.getByLabelText("Type").getByLabelText("Type");
+            const typeSelect = screen.getByLabelText("Type").getByLabelText("Type");
             await expect.element(typeSelect).toHaveValue(InventoryItemType.FOOD);
 
-            const categoryInput = page.getByLabelText("Category");
+            const categoryInput = screen.getByLabelText("Category");
             await expect.element(categoryInput).toHaveValue("Snacks");
         });
 
@@ -192,13 +182,13 @@ describe("InventoryItemCreateForm.vue", () => {
 
             screen = renderComponent(InventoryItemCreateForm, { itemToEdit });
 
-            const nameInput = page.getByLabelText("Name");
+            const nameInput = screen.getByLabelText("Name");
             await userEvent.clear(nameInput);
             await userEvent.type(nameInput, "Updated Item");
             await expect.element(nameInput).toHaveValue("Updated Item");
 
             // Simulate form submission
-            const submitButton = page.getByText(t("Global.submit"));
+            const submitButton = screen.getByText(t("Global.submit"));
             await userEvent.click(submitButton);
 
             // Verify that the component emitted the 'submit' event with the updated item
@@ -224,13 +214,13 @@ describe("InventoryItemCreateForm.vue", () => {
 
             screen = renderComponent(InventoryItemCreateForm, { itemToEdit });
 
-            const nameInput = page.getByLabelText("Name");
+            const nameInput = screen.getByLabelText("Name");
             await userEvent.clear(nameInput);
             await userEvent.type(nameInput, "Modified Name");
             await expect.element(nameInput).toHaveValue("Modified Name");
 
             // Click the reset button
-            const resetButton = page.getByText(t("Global.reset"));
+            const resetButton = screen.getByText(t("Global.reset"));
             await userEvent.click(resetButton);
 
             // Verify that the form is reset to the initial item values
@@ -255,45 +245,45 @@ describe("InventoryItemCreateForm.vue", () => {
         });
 
         it("prefills form when initialData prop is provided", async () => {
-            const nameInput = page.getByLabelText("Name");
+            const nameInput = screen.getByLabelText("Name");
             await expect.element(nameInput).toHaveValue("Red Bull 250ml");
 
-            const typeSelect = page.getByLabelText("Type").getByLabelText("Type");
+            const typeSelect = screen.getByLabelText("Type").getByLabelText("Type");
             await expect.element(typeSelect).toHaveValue(InventoryItemType.DRINK);
 
-            const categoryInput = page.getByLabelText("Category");
+            const categoryInput = screen.getByLabelText("Category");
             await expect.element(categoryInput).toHaveValue(DrinkCategory.SOFT_DRINK);
 
-            const priceInput = page.getByLabelText("Price");
+            const priceInput = screen.getByLabelText("Price");
             await expect.element(priceInput).toHaveValue(0);
 
-            const quantityInput = page.getByLabelText("Quantity");
+            const quantityInput = screen.getByLabelText("Quantity");
             await expect.element(quantityInput).toHaveValue(0);
 
-            const supplierInput = page.getByLabelText("Supplier");
+            const supplierInput = screen.getByLabelText("Supplier");
             await expect.element(supplierInput).toHaveValue("Red Bull,Orginal");
 
-            const alcoholContentInput = page.getByLabelText("Alcohol Content");
+            const alcoholContentInput = screen.getByLabelText("Alcohol Content");
             await expect.element(alcoholContentInput).toHaveValue(0);
 
-            const volumeInput = page.getByLabelText("Volume");
+            const volumeInput = screen.getByLabelText("Volume");
             await expect.element(volumeInput).toHaveValue(250);
         });
 
         it("emits submit event with correct data when initialData is provided and form is submitted", async () => {
-            const nameInput = page.getByLabelText("Name");
+            const nameInput = screen.getByLabelText("Name");
             await userEvent.clear(nameInput);
             await userEvent.type(nameInput, "Red Bull Sugarfree 250ml");
 
             await expect.element(nameInput).toHaveValue("Red Bull Sugarfree 250ml");
 
-            const priceInput = page.getByLabelText("Price");
+            const priceInput = screen.getByLabelText("Price");
             await userEvent.type(priceInput, "2.5");
 
-            const quantityInput = page.getByLabelText("Quantity");
+            const quantityInput = screen.getByLabelText("Quantity");
             await userEvent.type(quantityInput, "10");
 
-            const submitButton = page.getByText(t("Global.submit"));
+            const submitButton = screen.getByText(t("Global.submit"));
             await userEvent.click(submitButton);
 
             const emittedEvents = screen.emitted("submit") as any[];
@@ -309,12 +299,12 @@ describe("InventoryItemCreateForm.vue", () => {
         });
 
         it("resets form to initial data when reset button is clicked", async () => {
-            const nameInput = page.getByLabelText("Name");
+            const nameInput = screen.getByLabelText("Name");
             await userEvent.clear(nameInput);
             await userEvent.type(nameInput, "Modified Name");
             await expect.element(nameInput).toHaveValue("Modified Name");
 
-            const resetButton = page.getByText(t("Global.reset") || "Reset");
+            const resetButton = screen.getByText(t("Global.reset") || "Reset");
             await userEvent.click(resetButton);
 
             await expect.element(nameInput).toHaveValue("Red Bull 250ml");
