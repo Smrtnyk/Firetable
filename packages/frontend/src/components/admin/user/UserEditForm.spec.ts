@@ -39,20 +39,13 @@ describe("UserEditForm", () => {
         const screen = renderComponent(UserEditForm, props);
 
         // Check that the name input has the user's name
-        expect(
-            screen
-                .getByLabelText(/Name */)
-                .query()
-                ?.getAttribute("value"),
-        ).toBe(props.user.name);
+        await expect.element(screen.getByLabelText(/Name */)).toHaveValue(props.user.name);
 
         // Check that the username input has the user's username
-        expect(screen.getByLabelText("Username *").query()?.getAttribute("value")).toBe(
-            props.user.username,
-        );
+        await expect.element(screen.getByLabelText("Username *")).toHaveValue(props.user.username);
 
         // Password field should be empty
-        expect(screen.getByLabelText("User password *").query()?.getAttribute("value")).toBe("");
+        await expect.element(screen.getByLabelText("User password *")).toHaveValue("");
 
         // Role select should be present for editable roles
         if ([Role.MANAGER, Role.STAFF, Role.HOSTESS].includes(props.user.role)) {
@@ -71,17 +64,19 @@ describe("UserEditForm", () => {
             const isChecked = props.selectedProperties.some(function (property) {
                 return property.name === label;
             });
-            expect(checkbox.getAttribute("aria-checked")).toBe(isChecked ? "true" : "false");
+            await expect
+                .element(checkbox)
+                .toHaveAttribute("aria-checked", isChecked ? "true" : "false");
         }
 
         for (const [capability, defaultValue] of Object.entries(
             DEFAULT_CAPABILITIES_BY_ROLE[Role.STAFF],
         )) {
             const checkbox = screen.getByRole("checkbox", { name: capability });
-            expect(checkbox.query()).toBeTruthy();
-            expect(checkbox.query()?.getAttribute("aria-checked")).toBe(
-                defaultValue ? "true" : "false",
-            );
+            await expect.element(checkbox).toBeVisible();
+            await expect
+                .element(checkbox)
+                .toHaveAttribute("aria-checked", defaultValue ? "true" : "false");
         }
     });
 
@@ -160,13 +155,8 @@ describe("UserEditForm", () => {
         await userEvent.click(resetButton);
 
         // Check that fields are reset
-        expect(
-            screen
-                .getByLabelText(/Name */)
-                .query()
-                ?.getAttribute("value"),
-        ).toBe(props.user.name);
-        expect(screen.getByLabelText("User password *").query()?.getAttribute("value")).toBe("");
+        await expect.element(screen.getByLabelText(/Name */)).toHaveValue(props.user.name);
+        await expect.element(screen.getByLabelText("User password *")).toHaveValue("");
 
         // Check that properties are reset
         const propertyCheckboxes = screen.getByRole("checkbox", {
@@ -177,16 +167,18 @@ describe("UserEditForm", () => {
             const isChecked = props.selectedProperties.some(function (property) {
                 return property.name === label;
             });
-            expect(checkbox.getAttribute("aria-checked")).toBe(isChecked ? "true" : "false");
+            await expect
+                .element(checkbox)
+                .toHaveAttribute("aria-checked", isChecked ? "true" : "false");
         }
     });
 
-    it("does not show role and properties selection when role is not editable", () => {
+    it("does not show role and properties selection when role is not editable", async () => {
         props.user.role = Role.PROPERTY_OWNER;
         const screen = renderComponent(UserEditForm, props);
 
         // Role select should not be present
-        expect(screen.getByLabelText("Role").query()).toBeNull();
+        await expect.element(screen.getByLabelText("Role")).not.toBeInTheDocument();
 
         // Properties selection should not be present
         const propertyCheckboxes = screen.getByRole("checkbox", {
@@ -195,17 +187,17 @@ describe("UserEditForm", () => {
         expect(propertyCheckboxes.elements().length).toBe(0);
     });
 
-    it("shows capabilities checkboxes only for STAFF role", () => {
+    it("shows capabilities checkboxes only for STAFF role", async () => {
         props.user.role = Role.STAFF;
-        let screen = renderComponent(UserEditForm, props);
-        expect(screen.getByText("Capabilities:").query()).toBeTruthy();
+        const screen = renderComponent(UserEditForm, props);
+        await expect.element(screen.getByText("Capabilities:")).toBeVisible();
 
         screen.unmount();
 
         props.user.role = Role.MANAGER;
-        screen = renderComponent(UserEditForm, props);
+        screen.rerender(props);
 
-        expect(screen.getByText("Capabilities:").query()).toBeNull();
+        await expect.element(screen.getByText("Capabilities:")).not.toBeInTheDocument();
     });
 
     it("shows capabilities checkboxes when role changes from Manager to Staff", async () => {
@@ -213,7 +205,7 @@ describe("UserEditForm", () => {
         const screen = renderComponent(UserEditForm, props);
 
         // Initially, capabilities should not be visible
-        expect(screen.getByText("Capabilities:").query()).toBeNull();
+        await expect.element(screen.getByText("Capabilities:")).not.toBeInTheDocument();
 
         // Change role to Staff
         const roleSelect = screen.getByLabelText("Role");
@@ -222,17 +214,17 @@ describe("UserEditForm", () => {
         await userEvent.click(staffOption);
 
         // Capabilities should now be visible
-        expect(screen.getByText("Capabilities:").query()).toBeTruthy();
+        await expect.element(screen.getByText("Capabilities:")).toBeVisible();
 
         // Check that capabilities checkboxes are rendered
         for (const [capability, defaultValue] of Object.entries(
             DEFAULT_CAPABILITIES_BY_ROLE[Role.STAFF],
         )) {
             const checkbox = screen.getByRole("checkbox", { name: capability });
-            expect(checkbox.query()).toBeTruthy();
-            expect(checkbox.query()?.getAttribute("aria-checked")).toBe(
-                defaultValue ? "true" : "false",
-            );
+            await expect.element(checkbox).toBeVisible();
+            await expect
+                .element(checkbox)
+                .toHaveAttribute("aria-checked", defaultValue ? "true" : "false");
         }
     });
 
@@ -247,13 +239,13 @@ describe("UserEditForm", () => {
         const screen = renderComponent(UserEditForm, props);
 
         // Capabilities should be initially displayed with the user's capabilities
-        expect(screen.getByText("Capabilities:").query()).toBeTruthy();
+        await expect.element(screen.getByText("Capabilities:")).toBeVisible();
         let capabilityCheckbox = screen.getByRole("checkbox", { name: UserCapability.CAN_RESERVE });
-        expect(capabilityCheckbox.query()?.getAttribute("aria-checked")).toBe("true");
+        await expect.element(capabilityCheckbox).toHaveAttribute("aria-checked", "true");
         capabilityCheckbox = screen.getByRole("checkbox", {
             name: UserCapability.CAN_DELETE_RESERVATION,
         });
-        expect(capabilityCheckbox.query()?.getAttribute("aria-checked")).toBe("false");
+        await expect.element(capabilityCheckbox).toHaveAttribute("aria-checked", "false");
 
         // Change role to Manager
         const roleSelect = screen.getByLabelText("Role");
@@ -262,7 +254,7 @@ describe("UserEditForm", () => {
         await userEvent.click(managerOption);
 
         // Capabilities should not be displayed
-        expect(screen.getByText("Capabilities:").query()).toBeNull();
+        await expect.element(screen.getByText("Capabilities:")).not.toBeInTheDocument();
 
         // Change role back to Staff
         await userEvent.click(roleSelect);
@@ -270,17 +262,17 @@ describe("UserEditForm", () => {
         await userEvent.click(staffOption);
 
         // Capabilities should now be displayed again
-        expect(screen.getByText("Capabilities:").query()).toBeTruthy();
+        await expect.element(screen.getByText("Capabilities:")).toBeVisible();
 
         // Verify that the capabilities are preserved
         capabilityCheckbox = screen.getByRole("checkbox", { name: UserCapability.CAN_RESERVE });
 
-        expect(capabilityCheckbox.query()?.getAttribute("aria-checked")).toBe("true");
+        await expect.element(capabilityCheckbox).toHaveAttribute("aria-checked", "true");
         capabilityCheckbox = screen.getByRole("checkbox", {
             name: UserCapability.CAN_DELETE_RESERVATION,
         });
 
-        expect(capabilityCheckbox.query()?.getAttribute("aria-checked")).toBe("false");
+        await expect.element(capabilityCheckbox).toHaveAttribute("aria-checked", "false");
     });
 
     it("emits default capabilities when role is updated to a new role", async () => {
@@ -411,20 +403,15 @@ describe("UserEditForm", () => {
         await userEvent.click(resetButton);
 
         // Check that fields are reset
-        expect(
-            screen
-                .getByLabelText(/Name */)
-                .query()
-                ?.getAttribute("value"),
-        ).toBe(props.user.name);
-        expect(screen.getByLabelText("User password *").query()?.getAttribute("value")).toBe("");
+        await expect.element(screen.getByLabelText(/Name */)).toHaveValue(props.user.name);
+        await expect.element(screen.getByLabelText("User password *")).toHaveValue("");
 
         // Check that role is reset
         const roleSelectAfterReset = screen.getByLabelText("Role");
         // Need to simulate opening the select to check selected value
         await userEvent.click(roleSelectAfterReset);
         const selectedOption = screen.getByRole("option", { selected: true });
-        expect(selectedOption.query()?.textContent).toBe(props.user.role);
+        await expect.element(selectedOption).toHaveTextContent(props.user.role);
 
         // Check that properties are reset
         const propertyCheckboxes = screen.getByRole("checkbox", {
@@ -435,7 +422,9 @@ describe("UserEditForm", () => {
             const isChecked = props.selectedProperties.some(function (property) {
                 return property.name === label;
             });
-            expect(checkbox.getAttribute("aria-checked")).toBe(isChecked ? "true" : "false");
+            await expect
+                .element(checkbox)
+                .toHaveAttribute("aria-checked", isChecked ? "true" : "false");
         }
     });
 
@@ -472,18 +461,18 @@ describe("UserEditForm", () => {
         await userEvent.click(staffOption);
 
         // Verify that the capabilities are preserved for Staff role
-        expect(screen.getByText("Capabilities:").query()).toBeTruthy();
+        await expect.element(screen.getByText("Capabilities:")).toBeVisible();
         const canReserveCheckboxAfter = screen.getByRole("checkbox", {
             name: UserCapability.CAN_RESERVE,
         });
 
         // Should be false as toggled earlier
-        expect(canReserveCheckboxAfter.query()?.getAttribute("aria-checked")).toBe("false");
+        await expect.element(canReserveCheckboxAfter).toHaveAttribute("aria-checked", "false");
 
         const canSeeGuestContactCheckbox = screen.getByRole("checkbox", {
             name: UserCapability.CAN_SEE_GUEST_CONTACT,
         });
-        expect(canSeeGuestContactCheckbox.query()?.getAttribute("aria-checked")).toBe("false");
+        await expect.element(canSeeGuestContactCheckbox).toHaveAttribute("aria-checked", "false");
     });
 
     it("emits capabilities for non-staff roles when the role is changed", async () => {
