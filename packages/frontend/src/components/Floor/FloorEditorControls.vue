@@ -431,7 +431,6 @@ function sendBack(): void {
             </div>
 
             <div class="col-md-6 col-12 row justify-md-end q-mt-sm q-mt-md-none">
-                <!-- Color Picker Button -->
                 <q-btn
                     title="Change element fill color"
                     v-if="elementColor"
@@ -453,7 +452,6 @@ function sendBack(): void {
                     </q-popup-proxy>
                 </q-btn>
 
-                <!-- Delete Button -->
                 <q-btn
                     title="Delete element"
                     v-if="deleteAllowed"
@@ -517,9 +515,6 @@ function sendBack(): void {
 
     .buttons {
         grid-area: buttons;
-    }
-
-    .buttons {
         justify-self: center;
         align-self: center;
         text-align: center;

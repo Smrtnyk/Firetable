@@ -34,7 +34,7 @@ export async function createUser(
 ): Promise<{ uid: string; message: string }> {
     const { name, password, email, role, relatedProperties, organisationId, username } = req.data;
 
-    let createdUserUid: string | null = null;
+    let createdUserUid: string | undefined;
 
     try {
         const existingUser = await auth.getUserByEmail(email);
@@ -73,8 +73,8 @@ export async function createUser(
         }
 
         // Map Firebase Auth error codes to HttpsError codes
-        let errorCode: HttpsError["code"] = "unknown";
-        let errorMessage = "An unknown error occurred.";
+        let errorCode: HttpsError["code"];
+        let errorMessage: string;
 
         switch (e.code) {
             case "auth/invalid-password":

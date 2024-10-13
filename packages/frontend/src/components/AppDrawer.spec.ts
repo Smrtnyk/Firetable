@@ -1,5 +1,6 @@
 import type { RenderResult } from "vitest-browser-vue";
 import type { User } from "@firetable/types";
+import type { AppDrawerProps } from "./AppDrawer.vue";
 import AppDrawer from "./AppDrawer.vue";
 import { getLocaleForTest, renderComponent } from "../../test-helpers/render-component";
 import { UserCapability, Role } from "@firetable/types";
@@ -10,7 +11,7 @@ import { Dark } from "quasar";
 describe("AppDrawer", () => {
     let user: User;
     let modelValue: boolean;
-    let screen: RenderResult<any>;
+    let screen: RenderResult<AppDrawerProps>;
 
     beforeEach(() => {
         user = {

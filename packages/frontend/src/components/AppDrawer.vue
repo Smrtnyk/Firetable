@@ -13,13 +13,13 @@ import { usePropertiesStore } from "src/stores/properties-store";
 import AppDrawerLink from "src/components/AppDrawerLink.vue";
 import { dynamicallySwitchLang } from "src/config";
 
-interface Props {
+export interface AppDrawerProps {
     modelValue: boolean;
 }
 const { nonNullableUser, isAdmin, canSeeInventory, canEditFloorPlans, canCreateEvents } =
     storeToRefs(useAuthStore());
 const propertiesStore = usePropertiesStore();
-const props = defineProps<Props>();
+const props = defineProps<AppDrawerProps>();
 const emit = defineEmits<(e: "update:modelValue", value: boolean) => void>();
 const { t, locale } = useI18n();
 
