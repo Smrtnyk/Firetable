@@ -3,6 +3,10 @@ import { gzip, ungzip } from "pako";
 import { DevLogger } from "src/logger/DevFTLogger.js";
 
 export function decompressFloorDoc(floorDoc: FloorDoc): FloorDoc {
+    if (!floorDoc.json) {
+        return floorDoc;
+    }
+
     const start = performance.now();
     const byteCharacters = atob(floorDoc.json);
     const byteNumbers = new Uint8Array(byteCharacters.length);
