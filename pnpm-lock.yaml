@@ -253,8 +253,8 @@ importers:
         specifier: 'catalog:'
         version: https://pkg.pr.new/@vitest/spy@d260cef
       es-toolkit:
-        specifier: 1.24.0
-        version: 1.24.0
+        specifier: 1.25.0
+        version: 1.25.0
       vitest:
         specifier: 'catalog:'
         version: https://pkg.pr.new/vitest@d260cef(@types/node@22.7.5)(@vitest/browser@2.1.3)(@vitest/ui@2.1.3)(jsdom@20.0.3(canvas@2.11.2(encoding@0.1.13)))(msw@2.4.9(typescript@5.6.3))(sass@1.79.4)(terser@5.34.1)
@@ -3144,9 +3144,6 @@ packages:
   es-to-primitive@1.2.1:
     resolution: {integrity: sha512-QCOllgZJtaUo9miYBcLChTUaHNjJF3PYs1VidD7AwiEj1kYxKeQTctLAezAOH5ZKRH0g2IgPn6KwB4IT8iRpvA==}
     engines: {node: '>= 0.4'}
-
-  es-toolkit@1.24.0:
-    resolution: {integrity: sha512-nZM+MRSGhKjCdjvqWEFr5Jns6vxoXtBcsl4/cEsGMgsMx8Z2ato4vBTGMUSIQBZJgEdKyNcgGh42yu9xiuNYtQ==}
 
   es-toolkit@1.25.0:
     resolution: {integrity: sha512-lFjz98f6ownLM2qBk0+FY10cSGqYX1vEkfwc+vuKhybQVTuUL9JmjZs73A7+GhOaq5afwHUCERHcP9Bl/AgCXw==}
@@ -9561,8 +9558,6 @@ snapshots:
       is-callable: 1.2.7
       is-date-object: 1.0.5
       is-symbol: 1.0.4
-
-  es-toolkit@1.24.0: {}
 
   es-toolkit@1.25.0: {}
 
