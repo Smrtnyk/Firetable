@@ -49,6 +49,13 @@ export default {
         passwordHasSymbols:
             "Das Passwort muss mindestens ein Sonderzeichen enthalten (e.g., !, #, etc...)",
         selectAtLeastOneProperty: "Sie müssen mindestens eine Immobilie auswählen!",
+        nameMustBeLongerErrorMsg: "Der Name muss mindestens 2 Zeichen lang sein!",
+        negativeReservationConsumptionErrorMsg: "Der Verbrauch kann nicht negativ sein!",
+        greaterThanZeroErrorMsg: "Der Wert muss größer als 0 sein!",
+    },
+    TelNumberInput: {
+        countryCodeLabel: "Ländervorwahl",
+        phoneNumberLabel: "Telefonnummer",
     },
     EventQueuedReservations: {
         title: "Warteschlange",
@@ -131,6 +138,9 @@ export default {
         reservationConsumption: "Flaschenkonsum",
         timeLabel: "Ankunftszeit",
         waitingForResponse: "Warten auf Antwort",
+    },
+    WalkInReservationForm: {
+        optionalGuestNameLabel: "Name des Gastes (optional)",
     },
     EventCreateReservation: {
         title: "Tisch",

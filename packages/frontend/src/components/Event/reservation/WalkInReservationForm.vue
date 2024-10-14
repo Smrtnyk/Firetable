@@ -5,7 +5,12 @@ import { ReservationStatus, ReservationType } from "@firetable/types";
 import { ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
-import { greaterThanZero, optionalMinLength, requireNumber } from "src/helpers/form-rules";
+import {
+    greaterThanZero,
+    noNegativeNumber,
+    optionalMinLength,
+    requireNumber,
+} from "src/helpers/form-rules";
 import { hourFromTimestamp } from "src/helpers/date-utils";
 import TelNumberInput from "src/components/TelNumberInput/TelNumberInput.vue";
 
@@ -60,15 +65,14 @@ defineExpose({
 </script>
 
 <template>
-    <q-form ref="reservationForm" class="q-gutter-md q-pt-md">
+    <q-form ref="reservationForm" class="q-gutter-md q-pt-md" greedy>
         <q-input
             v-model="state.guestName"
             rounded
             hide-bottom-space
             standout
-            label="Optional Guest Name"
-            lazy-rules="ondemand"
-            :rules="[optionalMinLength('Name must be longer!', 2)]"
+            :label="t('WalkInReservationForm.optionalGuestNameLabel')"
+            :rules="[optionalMinLength(t('validation.nameMustBeLongerErrorMsg'), 2)]"
         />
 
         <q-input
@@ -112,8 +116,7 @@ defineExpose({
             standout
             type="number"
             :label="t(`EventCreateReservation.reservationNumberOfGuests`)"
-            lazy-rules="ondemand"
-            :rules="[requireNumber(), greaterThanZero()]"
+            :rules="[requireNumber(), greaterThanZero(t('validation.greaterThanZeroErrorMsg'))]"
         />
 
         <q-input
@@ -123,8 +126,10 @@ defineExpose({
             standout
             type="number"
             :label="t(`EventCreateReservation.reservationConsumption`)"
-            lazy-rules="ondemand"
-            :rules="[requireNumber()]"
+            :rules="[
+                requireNumber(),
+                noNegativeNumber(t('validation.negativeReservationConsumptionErrorMsg')),
+            ]"
         />
 
         <TelNumberInput

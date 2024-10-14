@@ -47,6 +47,13 @@ export default {
         passwordHasSymbols:
             "Password must include at least one special character (e.g., !, #, etc...)",
         selectAtLeastOneProperty: "You must select at least one property!",
+        nameMustBeLongerErrorMsg: "Name must be at least 2 characters long!",
+        negativeReservationConsumptionErrorMsg: "Consumption cannot be negative",
+        greaterThanZeroErrorMsg: "Value must be greater than 0",
+    },
+    TelNumberInput: {
+        countryCodeLabel: "Country Code",
+        phoneNumberLabel: "Phone Number",
     },
     EventQueuedReservations: {
         title: "Queued Reservations",
@@ -128,6 +135,9 @@ export default {
         reservationConsumption: "Consumption",
         timeLabel: "Time of arrival",
         waitingForResponse: "Waiting for response",
+    },
+    WalkInReservationForm: {
+        optionalGuestNameLabel: "Optional Guest Name",
     },
     EventCreateReservation: {
         title: "Table",

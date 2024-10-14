@@ -4,6 +4,7 @@ import {
     hasUpperCase,
     minLength,
     noEmptyString,
+    noNegativeNumber,
     noWhiteSpaces,
 } from "./form-rules";
 import { describe, it, expect } from "vitest";
@@ -82,6 +83,61 @@ describe("form-rules.ts", () => {
             const message = "At least one special character required.";
             const validator = hasSymbols(message);
             expect(validator("Password")).toBe(message);
+        });
+    });
+
+    describe("noNegativeNumber", () => {
+        it("returns true for numbers greater than or equal to 0", () => {
+            const validator = noNegativeNumber("Number must be greater than or equal to 0!");
+            expect(validator(0)).toBe(true);
+            expect(validator(10)).toBe(true);
+            expect(validator(0.5)).toBe(true);
+        });
+
+        it("returns true for numeric strings greater than or equal to 0", () => {
+            const validator = noNegativeNumber("Number must be greater than or equal to 0!");
+            expect(validator("5")).toBe(true);
+            expect(validator("0")).toBe(true);
+            expect(validator("123.45")).toBe(true);
+            expect(validator("  7  ")).toBe(true);
+        });
+
+        it("returns default error message for negative numbers", () => {
+            const validator = noNegativeNumber("Number must be greater than or equal to 0!");
+            const defaultMessage = "Number must be greater than or equal to 0!";
+            expect(validator(-1)).toBe(defaultMessage);
+            expect(validator(-0.01)).toBe(defaultMessage);
+            expect(validator("-5")).toBe(defaultMessage);
+        });
+
+        it("returns custom error message for negative numbers", () => {
+            const customMessage = "Please enter a positive number.";
+            const validator = noNegativeNumber(customMessage);
+            expect(validator(-3)).toBe(customMessage);
+            expect(validator("-10")).toBe(customMessage);
+        });
+
+        it("returns default error message for non-numeric values", () => {
+            const validator = noNegativeNumber("Number must be greater than or equal to 0!");
+            const defaultMessage = "Number must be greater than or equal to 0!";
+            expect(validator("abc")).toBe(defaultMessage);
+            expect(validator(undefined)).toBe(defaultMessage);
+            expect(validator({})).toBe(defaultMessage);
+            expect(validator([])).toBe(defaultMessage);
+            expect(validator(null)).toBe(defaultMessage);
+            expect(validator("")).toBe(defaultMessage);
+            expect(validator("   ")).toBe(defaultMessage);
+        });
+
+        it("returns custom error message for non-numeric invalid values", () => {
+            const customMessage = "Invalid number provided.";
+            const validator = noNegativeNumber(customMessage);
+            expect(validator("abc")).toBe(customMessage);
+            expect(validator(undefined)).toBe(customMessage);
+            expect(validator({})).toBe(customMessage);
+            expect(validator([])).toBe(customMessage);
+            expect(validator(null)).toBe(customMessage);
+            expect(validator("   ")).toBe(customMessage);
         });
     });
 });

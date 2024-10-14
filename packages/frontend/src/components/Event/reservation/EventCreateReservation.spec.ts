@@ -185,7 +185,7 @@ describe("EventCreateReservation", () => {
             const submitBtn = screen.getByRole("button", { name: t(`Global.submit`) });
             await userEvent.click(submitBtn);
 
-            const errorMessage = screen.getByText("Name must be longer!");
+            const errorMessage = screen.getByText(t("validation.nameMustBeLongerErrorMsg"));
             await expect.element(errorMessage).toBeVisible();
         });
 
@@ -431,7 +431,7 @@ describe("EventCreateReservation", () => {
             await userEvent.click(okBtn);
 
             // Check for validation error
-            const errorMessage = screen.getByText("Name must be longer!");
+            const errorMessage = screen.getByText(t("validation.nameMustBeLongerErrorMsg"));
             await expect.element(errorMessage).toBeVisible();
 
             // Check for reservedBy validation error

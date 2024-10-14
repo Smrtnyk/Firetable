@@ -97,8 +97,10 @@ defineExpose({
             hide-bottom-space
             standout
             :label="t(`EventCreateReservation.reservationGuestName`)"
-            lazy-rules="ondemand"
-            :rules="[noEmptyString(), minLength('Name must be longer!', 2)]"
+            :rules="[
+                noEmptyString(t('validation.required')),
+                minLength(t('validation.nameMustBeLongerErrorMsg'), 2),
+            ]"
         />
 
         <q-input
@@ -142,8 +144,7 @@ defineExpose({
             standout
             type="number"
             :label="t(`EventCreateReservation.reservationNumberOfGuests`)"
-            lazy-rules="ondemand"
-            :rules="[requireNumber(), greaterThanZero()]"
+            :rules="[requireNumber(), greaterThanZero(t('validation.greaterThanZeroErrorMsg'))]"
         />
 
         <q-input

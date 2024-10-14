@@ -1,4 +1,5 @@
 import { isNil } from "es-toolkit/predicate";
+import { isString } from "es-toolkit";
 
 export function noEmptyString(msg = "Please type something"): (val: string) => boolean | string {
     return function (val: string): boolean | string {
@@ -56,6 +57,23 @@ export function greaterThanZero(
 ): (val: unknown) => boolean | string {
     return function (val: unknown): boolean | string {
         return (!Number.isNaN(Number(val)) && Number(val) > 0) || msg;
+    };
+}
+
+export function noNegativeNumber(msg: string): (val: unknown) => boolean | string {
+    return function (val: unknown): boolean | string {
+        // Check if val is a number or a string that can be converted to a number
+        const isNumberType = typeof val === "number";
+        const isStringWithNumber = isString(val) && val.trim() !== "" && !Number.isNaN(Number(val));
+
+        if (isNumberType || isStringWithNumber) {
+            const num = Number(val);
+            if (num >= 0) {
+                return true;
+            }
+        }
+
+        return msg;
     };
 }
 

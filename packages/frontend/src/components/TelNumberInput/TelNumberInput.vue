@@ -8,7 +8,7 @@
                 v-model="selectedCountry"
                 :options="countryOptions"
                 option-label="name"
-                label="Country Code"
+                :label="t('TelNumberInput.countryCodeLabel')"
                 :use-input="!selectedCountry"
                 @filter="onFilterCountries"
                 clearable
@@ -48,7 +48,7 @@
             <q-input
                 class="col"
                 v-model="phoneNumber"
-                label="Phone Number"
+                :label="t('TelNumberInput.phoneNumberLabel')"
                 type="tel"
                 rounded
                 standout
@@ -67,6 +67,7 @@ import europeanCountries from "./european-countries";
 import { computed, ref, watch } from "vue";
 import { parsePhoneNumberFromString, AsYouType } from "libphonenumber-js";
 import { QSelect, QInput } from "quasar";
+import { useI18n } from "vue-i18n";
 
 export interface TelNumberInputProps {
     modelValue: string | undefined;
@@ -75,6 +76,8 @@ export interface TelNumberInputProps {
 
 const { modelValue, required = false } = defineProps<TelNumberInputProps>();
 const emit = defineEmits(["update:modelValue"]);
+const { t } = useI18n();
+
 const fullNumber = computed(function () {
     if (selectedCountry.value && phoneNumber.value) {
         return `+${selectedCountry.value.dialCode}${phoneNumber.value}`;
