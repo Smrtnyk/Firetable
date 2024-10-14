@@ -40,6 +40,8 @@ import EventInfo from "src/components/Event/EventInfo.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import EventQueuedReservations from "src/components/Event/EventQueuedReservations.vue";
 import EventViewControls from "src/components/Event/EventViewControls.vue";
+import EventFloorCanvasList from "src/components/Event/EventFloorCanvasList.vue";
+
 import { TableOperationType, useReservations } from "src/composables/useReservations";
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
@@ -237,16 +239,12 @@ onUnmounted(function () {
             </FTAutocomplete>
         </div>
 
-        <div
-            v-for="floor in eventFloors"
-            :key="floor.id"
-            class="ft-tab-pane"
-            :class="{ 'active show': isActiveFloor(floor.id) }"
-        >
-            <div class="ft-card ft-border ft-no-border-radius">
-                <canvas :id="floor.id" :ref="mapFloorToCanvas(floor)"></canvas>
-            </div>
-        </div>
+        <EventFloorCanvasList
+            v-if="eventFloors.length > 0"
+            :event-floors="eventFloors"
+            :map-floor-to-canvas="mapFloorToCanvas"
+            :is-active-floor="isActiveFloor"
+        />
 
         <EventQueuedReservations
             v-if="event"
