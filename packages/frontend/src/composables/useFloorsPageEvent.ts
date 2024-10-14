@@ -73,7 +73,7 @@ export function useFloorsPageEvent(
         // If it is only 1 table, we can set the active floor to that floor
         // but first check if current active floor is already the same floor
         const isSingleReservation = foundReservations.length === 1;
-        if (isSingleReservation && isActiveFloor(foundReservations[0].floorId)) {
+        if (isSingleReservation && !isActiveFloor(foundReservations[0].floorId)) {
             const floor = floorInstances.value.find(
                 matchesProperty("id", foundReservations[0].floorId),
             );

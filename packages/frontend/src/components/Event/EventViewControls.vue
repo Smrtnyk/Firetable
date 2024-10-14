@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { computed } from "vue";
+import { buttonSize } from "src/global-reactives/screen-detection";
+
 export interface EventViewControlsProps {
     activeFloor: { id: string; name: string } | undefined;
-    floorInstances: { id: string; name: string }[];
-    hasMultipleFloorPlans: boolean;
+    floors: { id: string; name: string }[];
     isAdmin: boolean;
+    isActiveFloor: (floorId: string) => boolean;
 }
 
 const emit = defineEmits<{
@@ -17,79 +20,117 @@ const emit = defineEmits<{
     (e: "set-active-floor", value: { id: string; name: string }): void;
 }>();
 
-const props = defineProps<EventViewControlsProps>();
+const { floors, isAdmin, isActiveFloor } = defineProps<EventViewControlsProps>();
+
+const currentActiveIndex = computed(() => {
+    return floors.findIndex(function (floor) {
+        return isActiveFloor(floor.id);
+    });
+});
+
+const previousFloor = computed(function () {
+    const index = currentActiveIndex.value;
+    if (index > 0) {
+        return floors[index - 1];
+    }
+    return void 0;
+});
+const nextFloor = computed(function () {
+    const index = currentActiveIndex.value;
+    if (index < floors.length - 1 && index !== -1) {
+        return floors[index + 1];
+    }
+    return void 0;
+});
+
+const shouldShowButtons = computed(function () {
+    return floors.length > 1;
+});
+
+function showPrevFloor(): void {
+    if (previousFloor.value) {
+        emit("set-active-floor", previousFloor.value);
+    }
+}
+
+// Handle "Show Next Floor" button click
+function showNextFloor(): void {
+    if (nextFloor.value) {
+        emit("set-active-floor", nextFloor.value);
+    }
+}
 </script>
 
 <template>
-    <q-btn-dropdown dense round outline aria-label="Toggle event controls menu">
-        <q-list>
-            <q-item v-if="hasMultipleFloorPlans" clickable>
-                <q-item-section>
-                    <q-item-label>{{ activeFloor?.name }}</q-item-label>
-                    <q-item-label caption>Current floor</q-item-label>
-                </q-item-section>
-                <q-item-section side>
-                    <q-icon name="chevron_right" />
-                </q-item-section>
+    <div class="row q-mb-sm q-gutter-sm" aria-label="Toggle event controls menu">
+        <q-btn
+            :size="buttonSize"
+            dense
+            outline
+            color="grey"
+            icon="list"
+            v-close-popup
+            @click="emit('toggle-queued-reservations-drawer-visibility')"
+            aria-label="Toggle queued reservations drawer visibility"
+        />
+        <q-btn
+            :size="buttonSize"
+            dense
+            outline
+            color="grey"
+            icon="users-list"
+            v-close-popup
+            @click="emit('toggle-event-guest-list-drawer-visibility')"
+            aria-label="Toggle event guest list drawer visibility"
+        />
+        <q-btn
+            :size="buttonSize"
+            dense
+            outline
+            color="grey"
+            icon="info"
+            v-close-popup
+            @click="() => emit('show-event-info')"
+            aria-label="Show event info"
+        />
 
-                <q-menu>
-                    <q-list>
-                        <q-item
-                            v-for="florInstance of floorInstances"
-                            :key="florInstance.id"
-                            clickable
-                            @click.prevent="() => emit('set-active-floor', florInstance)"
-                            :class="{
-                                'button-gradient': activeFloor?.id === florInstance.id,
-                            }"
-                        >
-                            <q-item-section>
-                                {{ florInstance.name }}
-                            </q-item-section>
-                        </q-item>
-                    </q-list>
-                </q-menu>
-            </q-item>
-            <q-separator />
+        <q-btn
+            v-if="isAdmin"
+            clickable
+            v-close-popup
+            @click="() => emit('navigate-to-admin-event')"
+            :size="buttonSize"
+            dense
+            outline
+            color="grey"
+            icon="eye-open"
+            aria-label="Navigate to admin event"
+        />
 
-            <q-item
-                clickable
-                v-close-popup
-                @click="emit('toggle-queued-reservations-drawer-visibility')"
-            >
-                <q-item-section avatar>
-                    <q-icon name="list" color="secondary" />
-                </q-item-section>
-                <q-item-section>On-hold reservations</q-item-section>
-            </q-item>
-
-            <q-item
-                clickable
-                v-close-popup
-                @click="emit('toggle-event-guest-list-drawer-visibility')"
-            >
-                <q-item-section avatar>
-                    <q-icon name="users-list" color="tertiary" />
-                </q-item-section>
-                <q-item-section>Guestlist</q-item-section>
-            </q-item>
-
-            <q-item clickable v-close-popup @click="() => emit('show-event-info')">
-                <q-item-section avatar>
-                    <q-icon name="info" color="quaternary" />
-                </q-item-section>
-                <q-item-section>Event Info</q-item-section>
-            </q-item>
-
-            <q-item
-                v-if="props.isAdmin"
-                clickable
-                v-close-popup
-                @click="() => emit('navigate-to-admin-event')"
-            >
-                <q-item-section avatar> </q-item-section>
-                <q-item-section>Show Details</q-item-section>
-            </q-item>
-        </q-list>
-    </q-btn-dropdown>
+        <q-space />
+        <template v-if="shouldShowButtons">
+            <q-btn
+                unelevated
+                outline
+                color="grey"
+                dense
+                icon="chevron_left"
+                :size="buttonSize"
+                @click="showPrevFloor"
+                :disabled="!previousFloor"
+                aria-label="Show previous floor"
+            />
+            <q-btn
+                unelevated
+                outline
+                color="grey"
+                dense
+                icon="chevron_right"
+                :size="buttonSize"
+                @click="showNextFloor"
+                :disabled="!nextFloor"
+                aria-label="Show next floor"
+            />
+        </template>
+    </div>
 </template>

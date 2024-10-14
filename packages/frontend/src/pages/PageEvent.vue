@@ -218,25 +218,24 @@ onUnmounted(function () {
                 @found="animateTables"
                 @clear="stopAllTableAnimations"
                 class="q-mb-sm"
-            >
-                <template #before>
-                    <EventViewControls
-                        :active-floor="activeFloor"
-                        :floor-instances="floorInstances"
-                        :has-multiple-floor-plans="hasMultipleFloorPlans"
-                        :is-admin="authStore.isAdmin"
-                        @navigate-to-admin-event="navigateToAdminEvent"
-                        @toggle-event-guest-list-drawer-visibility="
-                            eventsStore.toggleEventGuestListDrawerVisibility
-                        "
-                        @toggle-queued-reservations-drawer-visibility="
-                            eventsStore.toggleQueuedReservationsDrawerVisibility
-                        "
-                        @show-event-info="showEventInfo"
-                        @set-active-floor="setActiveFloor"
-                    />
-                </template>
-            </FTAutocomplete>
+            />
+
+            <EventViewControls
+                :active-floor="activeFloor"
+                :floors="floorInstances"
+                :has-multiple-floor-plans="hasMultipleFloorPlans"
+                :is-admin="authStore.isAdmin"
+                :is-active-floor="isActiveFloor"
+                @navigate-to-admin-event="navigateToAdminEvent"
+                @toggle-event-guest-list-drawer-visibility="
+                    eventsStore.toggleEventGuestListDrawerVisibility
+                "
+                @toggle-queued-reservations-drawer-visibility="
+                    eventsStore.toggleQueuedReservationsDrawerVisibility
+                "
+                @show-event-info="showEventInfo"
+                @set-active-floor="setActiveFloor"
+            />
         </div>
 
         <EventFloorCanvasList
@@ -244,6 +243,7 @@ onUnmounted(function () {
             :event-floors="eventFloors"
             :map-floor-to-canvas="mapFloorToCanvas"
             :is-active-floor="isActiveFloor"
+            @set-active-floor="setActiveFloor"
         />
 
         <EventQueuedReservations

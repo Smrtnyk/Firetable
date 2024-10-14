@@ -2,24 +2,29 @@ import type { RenderResult } from "vitest-browser-vue";
 import type { EventViewControlsProps } from "./EventViewControls.vue";
 import EventViewControls from "./EventViewControls.vue";
 import { renderComponent } from "../../../test-helpers/render-component";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { userEvent, page } from "@vitest/browser/context";
 import { last } from "es-toolkit";
 
 describe("EventViewControls.vue", () => {
-    const floorInstances: EventViewControlsProps["floorInstances"] = [
+    const floors: EventViewControlsProps["floors"] = [
         { id: "floor1", name: "First Floor" },
         { id: "floor2", name: "Second Floor" },
     ];
 
-    const activeFloor = { id: "floor1", name: "First Floor" };
+    let activeFloor: EventViewControlsProps["activeFloor"];
+
+    function isActiveFloor(floorId: string): boolean {
+        return floorId === activeFloor!.id;
+    }
 
     function render(
         props: Partial<EventViewControlsProps> = {},
     ): RenderResult<EventViewControlsProps> {
         return renderComponent(EventViewControls, {
-            activeFloor,
-            floorInstances,
+            activeFloor: floors[0],
+            floors,
+            isActiveFloor,
             hasMultipleFloorPlans: true,
             isAdmin: true,
             ...props,
@@ -31,33 +36,63 @@ describe("EventViewControls.vue", () => {
         await userEvent.click(btnDropdown);
     }
 
-    it("renders the active floor name", async () => {
+    beforeEach(() => {
+        activeFloor = floors[0];
+    });
+
+    it("renders prev and next floor btns", async () => {
         const screen = render();
         await showMenu();
 
-        await expect.element(screen.getByText("First Floor")).toBeVisible();
-        await expect.element(screen.getByText("Current floor")).toBeVisible();
+        const prevFloorBtn = screen.getByLabelText("Show previous floor");
+        const nextFloorBtn = screen.getByLabelText("Show next floor");
+
+        await expect.element(prevFloorBtn).toBeVisible();
+        await expect.element(nextFloorBtn).toBeVisible();
     });
 
-    it("renders floor plans dropdown when hasMultipleFloorPlans is true", async () => {
+    it("sets prev floor btn as disabled when multi floors", async () => {
         const screen = render();
         await showMenu();
 
-        await expect.element(screen.getByText("First Floor")).toBeVisible();
+        const prevFloorBtn = screen.getByLabelText("Show previous floor");
+        await expect.element(prevFloorBtn).toBeDisabled();
+
+        const nextFloorBtn = screen.getByLabelText("Show next floor");
+        await expect.element(nextFloorBtn).not.toBeDisabled();
     });
 
-    it("does not render floor plans dropdown when hasMultipleFloorPlans is false", async () => {
-        const screen = render({ hasMultipleFloorPlans: false });
+    it("sets next floor btn as disabled when multi floors", async () => {
+        activeFloor = floors[1];
+        const screen = render();
         await showMenu();
 
-        await expect.element(screen.getByText("First Floor")).not.toBeInTheDocument();
+        const prevFloorBtn = screen.getByLabelText("Show previous floor");
+        await expect.element(prevFloorBtn).not.toBeDisabled();
+
+        const nextFloorBtn = screen.getByLabelText("Show next floor");
+        await expect.element(nextFloorBtn).toBeDisabled();
     });
 
-    it("renders 'Show Details' option when isAdmin is true", async () => {
+    it("does not render switch floor plans when floors are of length 1", async () => {
+        const screen = render({
+            floors: [floors[0]],
+        });
+        await showMenu();
+
+        const prevFloorBtn = screen.getByLabelText("Show previous floor");
+        const nextFloorBtn = screen.getByLabelText("Show next floor");
+
+        await expect.element(prevFloorBtn).not.toBeInTheDocument();
+        await expect.element(nextFloorBtn).not.toBeInTheDocument();
+    });
+
+    it("renders 'Show Details' btn when 'isAdmin' is true", async () => {
         const screen = render({ isAdmin: true });
         await showMenu();
 
-        await expect.element(screen.getByText("Show Details")).toBeVisible();
+        const navigateToAdminBtn = screen.getByLabelText("Navigate to admin event");
+        await expect.element(navigateToAdminBtn).toBeVisible();
     });
 
     it("does not render 'Show Details' option when isAdmin is false", async () => {
@@ -67,54 +102,38 @@ describe("EventViewControls.vue", () => {
         await expect.element(screen.getByText("Show Details")).not.toBeInTheDocument();
     });
 
-    it("emits 'set-active-floor' with correct floor data when a floor is selected", async () => {
-        const screen = render({
-            activeFloor,
-            floorInstances,
-            hasMultipleFloorPlans: true,
-            isAdmin: false,
-        });
+    it("emits 'set-active-floor' with correct floor data when next floor is selected", async () => {
+        const screen = render();
         await showMenu();
 
-        // Open the floor plans dropdown
-        const floorItem = screen.getByText("First Floor");
-        await userEvent.click(floorItem);
-
-        // Select the second floor
-        const secondFloorOption = screen.getByText("Second Floor");
-        await userEvent.click(secondFloorOption);
+        const nextFloorBtn = screen.getByLabelText("Show next floor");
+        await userEvent.click(nextFloorBtn);
 
         const emitted = last(
-            screen.emitted()["set-active-floor"],
-        ) as EventViewControlsProps["activeFloor"][];
-        expect(emitted[0]).toStrictEqual(floorInstances[1]);
+            screen.emitted<EventViewControlsProps["activeFloor"][]>()["set-active-floor"],
+        );
+        expect(emitted![0]).toStrictEqual(floors[1]);
     });
 
     it("emits 'toggle-queued-reservations-drawer-visibility' when 'Table Waiting list' is clicked", async () => {
         const screen = render({
-            activeFloor,
-            floorInstances,
-            hasMultipleFloorPlans: true,
             isAdmin: false,
         });
         await showMenu();
 
-        const waitingListItem = screen.getByText("On-hold reservations");
+        const waitingListItem = screen.getByLabelText(
+            "Toggle queued reservations drawer visibility",
+        );
         await userEvent.click(waitingListItem);
 
         expect(screen.emitted()["toggle-queued-reservations-drawer-visibility"]).toHaveLength(1);
     });
 
     it("emits 'toggle-event-guest-list-drawer-visibility' when 'Guestlist' is clicked", async () => {
-        const screen = render({
-            activeFloor,
-            floorInstances,
-            hasMultipleFloorPlans: true,
-            isAdmin: false,
-        });
+        const screen = render();
         await showMenu();
 
-        const guestListItem = screen.getByText("Guestlist");
+        const guestListItem = screen.getByLabelText("Toggle event guest list drawer visibility");
         await userEvent.click(guestListItem);
 
         expect(screen.emitted()["toggle-event-guest-list-drawer-visibility"]).toHaveLength(1);
@@ -122,14 +141,11 @@ describe("EventViewControls.vue", () => {
 
     it("emits 'show-event-info' when 'Event Info' is clicked", async () => {
         const screen = render({
-            activeFloor,
-            floorInstances,
-            hasMultipleFloorPlans: true,
             isAdmin: false,
         });
         await showMenu();
 
-        const eventInfoItem = screen.getByText("Event Info");
+        const eventInfoItem = screen.getByLabelText("Show event info");
         await userEvent.click(eventInfoItem);
 
         expect(screen.emitted()["show-event-info"]).toHaveLength(1);
@@ -137,15 +153,12 @@ describe("EventViewControls.vue", () => {
 
     it("emits 'navigate-to-admin-event' when 'Show Details' is clicked", async () => {
         const screen = render({
-            activeFloor,
-            floorInstances,
-            hasMultipleFloorPlans: true,
             isAdmin: true,
         });
         await showMenu();
 
-        const showDetailsItem = screen.getByText("Show Details");
-        await userEvent.click(showDetailsItem);
+        const navigateToAdminBtn = screen.getByLabelText("Navigate to admin event");
+        await userEvent.click(navigateToAdminBtn);
 
         expect(screen.emitted()["navigate-to-admin-event"]).toHaveLength(1);
     });
