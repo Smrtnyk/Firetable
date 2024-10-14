@@ -14,18 +14,18 @@ describe("AddNewGuestForm", () => {
             };
         });
 
-        it("renders the form with initial values", () => {
+        it("renders the form with initial values", async () => {
             const screen = renderComponent(AddNewGuestForm, props);
 
             // Check that the guest name input is rendered and empty
             const guestNameInput = screen.getByLabelText("Guest name");
-            expect(guestNameInput.query()?.getAttribute("value")).toBe("");
+            await expect.element(guestNameInput).toHaveValue("");
 
             const countryCodeSelect = screen.getByRole("combobox", { name: "Country Code" });
-            expect(countryCodeSelect.query()?.getAttribute("value")).toBe("");
+            await expect.element(countryCodeSelect).toHaveValue("");
 
             const phoneNumberInput = screen.getByLabelText("Phone Number");
-            expect(phoneNumberInput.query()?.getAttribute("value")).toBe("");
+            await expect.element(phoneNumberInput).toHaveValue("");
         });
 
         it("validates guest name input", async () => {
@@ -37,7 +37,7 @@ describe("AddNewGuestForm", () => {
 
             // Check for validation error
             const errorMessage = screen.getByText("Guest name must be at least 3 characters long");
-            expect(errorMessage.query()).toBeTruthy();
+            await expect.element(errorMessage).toBeVisible();
 
             // Enter an invalid guest name
             const guestNameInput = screen.getByLabelText("Guest name");
@@ -47,7 +47,7 @@ describe("AddNewGuestForm", () => {
             await userEvent.click(submitButton);
 
             // Error should still be present
-            expect(errorMessage.query()).toBeTruthy();
+            await expect.element(errorMessage).toBeVisible();
 
             // Enter a valid guest name
             await userEvent.clear(guestNameInput);
@@ -57,7 +57,7 @@ describe("AddNewGuestForm", () => {
             await userEvent.click(submitButton);
 
             // Error message should no longer be present
-            expect(errorMessage.query()).toBeNull();
+            await expect.element(errorMessage).not.toBeInTheDocument();
         });
 
         it("emits 'create' event with correct payload when form is valid", async () => {
@@ -109,7 +109,7 @@ describe("AddNewGuestForm", () => {
             const phoneError = screen.getByText(
                 "Please provide both country code and phone number",
             );
-            expect(phoneError.query()).toBeTruthy();
+            await expect.element(phoneError).toBeVisible();
 
             // The form should not emit 'create' because of validation error
             expect(screen.emitted().create).toBeFalsy();
@@ -150,7 +150,7 @@ describe("AddNewGuestForm", () => {
             const submitButton = screen.getByRole("button", { name: "Submit" });
             await userEvent.click(submitButton);
 
-            expect(screen.getByText("Please select a country code").query()).toBeTruthy();
+            await expect.element(screen.getByText("Please select a country code")).toBeVisible();
 
             expect(screen.emitted().create).toBeFalsy();
         });
@@ -169,19 +169,19 @@ describe("AddNewGuestForm", () => {
             };
         });
 
-        it("renders the form with initial values", () => {
+        it("renders the form with initial values", async () => {
             const screen = renderComponent(AddNewGuestForm, props);
 
             // Check that the guest name input is rendered and has initial value
             const guestNameInput = screen.getByLabelText("Guest name");
-            expect(guestNameInput.query()?.getAttribute("value")).toBe("Existing Guest");
+            await expect.element(guestNameInput).toHaveValue("Existing Guest");
 
             // Check that the TelNumberInput component is rendered with initial values
             const countryCodeSelect = screen.getByRole("combobox", { name: "Country Code" });
-            expect(countryCodeSelect.query()?.getAttribute("value")).toContain("Austria");
+            await expect.element(countryCodeSelect).toHaveValue("Austria");
 
             const phoneNumberInput = screen.getByLabelText("Phone Number");
-            expect(phoneNumberInput.query()?.getAttribute("value")).toBe("1234567890");
+            await expect.element(phoneNumberInput).toHaveValue("1234567890");
         });
 
         it("emits 'update' event with correct payload when form is valid", async () => {
@@ -231,7 +231,7 @@ describe("AddNewGuestForm", () => {
 
             // Check for validation error
             const errorMessage = screen.getByText("Guest name must be at least 3 characters long");
-            expect(errorMessage.query()).toBeTruthy();
+            await expect.element(errorMessage).toBeVisible();
 
             // Enter a valid guest name
             await userEvent.type(guestNameInput, "Valid Name");
@@ -239,7 +239,7 @@ describe("AddNewGuestForm", () => {
             await userEvent.click(submitButton);
 
             // Error message should no longer be present
-            expect(errorMessage.query()).toBeNull();
+            await expect.element(errorMessage).not.toBeInTheDocument();
         });
     });
 });

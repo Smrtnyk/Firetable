@@ -78,44 +78,42 @@ describe("EventCreateReservation", () => {
 
             // Check that guest name input is empty
             const guestNameInput = screen.getByLabelText("Optional Guest Name");
-            expect(guestNameInput.query()?.getAttribute("value")).toBe("");
+            await expect.element(guestNameInput).toHaveValue("");
 
             // Check that time input has the correct initial value
             const timeInput = screen.getByLabelText(t("EventCreateReservation.reservationTime"));
-            expect(timeInput.query()?.getAttribute("value")).toBe(generateInitialState().time);
+            await expect.element(timeInput).toHaveValue(generateInitialState().time);
 
             // Check that number of guests input has default value
             const numberOfGuestsInput = screen.getByLabelText(
                 t("EventCreateReservation.reservationNumberOfGuests"),
             );
-            expect(Number(numberOfGuestsInput.query()?.getAttribute("value"))).toBe(
-                generateInitialState().numberOfGuests,
-            );
+            await expect
+                .element(numberOfGuestsInput)
+                .toHaveValue(generateInitialState().numberOfGuests);
 
             // Check that consumption input has default value
             const consumptionInput = screen.getByLabelText(
                 t("EventCreateReservation.reservationConsumption"),
             );
-            expect(Number(consumptionInput.query()?.getAttribute("value"))).toBe(
-                generateInitialState().consumption,
-            );
+            await expect.element(consumptionInput).toHaveValue(generateInitialState().consumption);
 
             // Check that guest contact input is empty
             const guestContactInput = screen.getByLabelText("Phone Number");
-            expect(guestContactInput.query()?.getAttribute("value")).toBe("");
+            await expect.element(guestContactInput).toHaveValue("");
 
             // Check that reservation note input is empty
             const reservationNoteInput = screen.getByLabelText(
                 t("EventCreateReservation.reservationNote"),
             );
-            expect(reservationNoteInput.query()?.getAttribute("value")).toBe("");
+            await expect.element(reservationNoteInput).toHaveValue("");
 
             // Check that isVIP checkbox is unchecked
             const isVIPCheckbox = screen.getByLabelText(t("EventCreateReservation.reservationVIP"));
-            expect(isVIPCheckbox.query()?.getAttribute("aria-checked")).toBe("false");
+            await expect.element(isVIPCheckbox).not.toBeChecked();
         });
 
-        it("renders the form with initial values in 'update' mode", () => {
+        it("renders the form with initial values in 'update' mode", async () => {
             props.mode = "update";
             props.reservationData = {
                 id: "foo",
@@ -132,50 +130,46 @@ describe("EventCreateReservation", () => {
 
             // No button to switch the mode
             const walkInBtn = screen.getByRole("button", { name: "Walk-In" });
-            expect(walkInBtn.query()).toBeFalsy();
+            await expect.element(walkInBtn).not.toBeInTheDocument();
 
             // Check that guest name input has the correct value
             const guestNameInput = screen.getByLabelText("Optional Guest Name");
-            expect(guestNameInput.query()?.getAttribute("value")).toBe(
-                props.reservationData?.guestName,
-            );
+            await expect.element(guestNameInput).toHaveValue(props.reservationData?.guestName);
 
             // Check that time input has the correct value
             const timeInput = screen.getByLabelText(t("EventCreateReservation.reservationTime"));
-            expect(timeInput.query()?.getAttribute("value")).toBe(props.reservationData?.time);
+            await expect.element(timeInput).toHaveValue(props.reservationData?.time);
 
             // Check that number of guests input has the correct value
             const numberOfGuestsInput = screen.getByLabelText(
                 t("EventCreateReservation.reservationNumberOfGuests"),
             );
-            expect(Number(numberOfGuestsInput.query()?.getAttribute("value"))).toBe(
-                props.reservationData?.numberOfGuests,
-            );
+            await expect
+                .element(numberOfGuestsInput)
+                .toHaveValue(props.reservationData?.numberOfGuests);
 
             // Check that consumption input has the correct value
             const consumptionInput = screen.getByLabelText(
                 t("EventCreateReservation.reservationConsumption"),
             );
-            expect(Number(consumptionInput.query()?.getAttribute("value"))).toBe(
-                props.reservationData?.consumption,
-            );
+            await expect.element(consumptionInput).toHaveValue(props.reservationData?.consumption);
 
             // Check that guest contact input has the correct value
             // Check that guest contact input is empty
             const guestContactInput = screen.getByLabelText("Phone Number");
-            expect(guestContactInput.query()?.getAttribute("value")).toBe("666666666");
+            await expect.element(guestContactInput).toHaveValue("666666666");
 
             // Check that reservation note input has the correct value
             const reservationNoteInput = screen.getByLabelText(
                 t("EventCreateReservation.reservationNote"),
             );
-            expect(reservationNoteInput.query()?.getAttribute("value")).toBe(
-                props.reservationData?.reservationNote,
-            );
+            await expect
+                .element(reservationNoteInput)
+                .toHaveValue(props.reservationData?.reservationNote);
 
             // Check that isVIP checkbox is checked
             const isVIPCheckbox = screen.getByLabelText(t("EventCreateReservation.reservationVIP"));
-            expect(isVIPCheckbox.query()?.getAttribute("aria-checked")).toBe("true");
+            await expect.element(isVIPCheckbox).toBeChecked();
         });
 
         it("validates guest name length", async () => {
@@ -192,7 +186,7 @@ describe("EventCreateReservation", () => {
             await userEvent.click(submitBtn);
 
             const errorMessage = screen.getByText("Name must be longer!");
-            expect(errorMessage.query()).toBeTruthy();
+            await expect.element(errorMessage).toBeVisible();
         });
 
         it("opens the time picker and selects a time correctly", async () => {
@@ -202,7 +196,7 @@ describe("EventCreateReservation", () => {
             await userEvent.click(walkInBtn);
 
             const timeInput = screen.getByLabelText(t("EventCreateReservation.reservationTime"));
-            expect(timeInput.query()?.getAttribute("value")).toBe(generateInitialState().time);
+            await expect.element(timeInput).toHaveValue(generateInitialState().time);
 
             // Simulate clicking the clock icon to open the time picker
             const clockIcon = document.querySelector(".q-icon");
@@ -211,13 +205,13 @@ describe("EventCreateReservation", () => {
             const newTime = addHours(eventStartTimestamp, 1);
 
             const timeOption = screen.getByText(format(newTime, "HH"), { exact: true });
-            expect(timeOption.query()).toBeTruthy();
+            await expect.element(timeOption).toBeVisible();
 
             await userEvent.click(timeOption);
             const closeBtn = screen.getByRole("button", { name: "Close" });
             await userEvent.click(closeBtn);
 
-            expect(timeInput.query()?.getAttribute("value")).toBe(format(newTime, "HH:mm"));
+            await expect.element(timeInput).toHaveValue(format(newTime, "HH:mm"));
         });
     });
 
@@ -288,67 +282,65 @@ describe("EventCreateReservation", () => {
             };
         }
 
-        it("renders the form with initial values in 'create' mode", () => {
+        it("renders the form with initial values in 'create' mode", async () => {
             const screen = renderComponent(EventCreateReservation, plannedProps);
 
             // Check that guest name input is empty
             const guestNameInput = screen.getByLabelText(
                 t("EventCreateReservation.reservationGuestName"),
             );
-            expect(guestNameInput.query()?.getAttribute("value")).toBe("");
+            await expect.element(guestNameInput).toHaveValue("");
 
             // Check that time input has the correct initial value
             const timeInput = screen.getByLabelText(t("EventCreateReservation.reservationTime"), {
                 exact: true,
             });
-            expect(timeInput.query()?.getAttribute("value")).toBe(
-                generateInitialPlannedState().time,
-            );
+            await expect.element(timeInput).toHaveValue(generateInitialPlannedState().time);
 
             // Check that number of guests input has default value
             const numberOfGuestsInput = screen.getByLabelText(
                 t("EventCreateReservation.reservationNumberOfGuests"),
             );
-            expect(Number(numberOfGuestsInput.query()?.getAttribute("value"))).toBe(
-                generateInitialPlannedState().numberOfGuests,
-            );
+            await expect
+                .element(numberOfGuestsInput)
+                .toHaveValue(generateInitialPlannedState().numberOfGuests);
 
             // Check that consumption input has default value
             const consumptionInput = screen.getByLabelText(
                 t("EventCreateReservation.reservationConsumption"),
             );
-            expect(Number(consumptionInput.query()?.getAttribute("value"))).toBe(
-                generateInitialPlannedState().consumption,
-            );
+            await expect
+                .element(consumptionInput)
+                .toHaveValue(generateInitialPlannedState().consumption);
 
             // Check that guest contact input is empty
             const guestContactInput = screen.getByLabelText("Phone Number");
-            expect(guestContactInput.query()?.getAttribute("value")).toBe("");
+            await expect.element(guestContactInput).toHaveValue("");
 
             // Check that reservation note input is empty
             const reservationNoteInput = screen.getByLabelText(
                 t("EventCreateReservation.reservationNote"),
             );
-            expect(reservationNoteInput.query()?.getAttribute("value")).toBe("");
+            await expect.element(reservationNoteInput).toHaveValue("");
 
             // Check that isVIP checkbox is unchecked
             const isVIPCheckbox = screen.getByLabelText(t("EventCreateReservation.reservationVIP"));
-            expect(isVIPCheckbox.query()?.getAttribute("aria-checked")).toBe("false");
+            await expect.element(isVIPCheckbox).not.toBeChecked();
 
             // Check that selectionType is defaulted to "user"
             const userRadio = screen.getByRole("radio", { name: "Staff" });
             const socialRadio = screen.getByRole("radio", { name: "Social" });
-            expect(userRadio.query()?.getAttribute("aria-checked")).toBe("true");
-            expect(socialRadio.query()?.getAttribute("aria-checked")).toBe("false");
+            await expect.element(userRadio).toBeChecked();
+            await expect.element(socialRadio).not.toBeChecked();
 
             // Check that reservedBy select has the first user selected
             const reservedBySelect = screen.getByRole("combobox", {
                 name: t("EventCreateReservation.reservedByLabel"),
             });
-            expect(reservedBySelect.query()?.getAttribute("value")).toBe("");
+            await expect.element(reservedBySelect).toHaveValue("");
         });
 
-        it("renders the form with initial values in 'update' mode", () => {
+        it("renders the form with initial values in 'update' mode", async () => {
             plannedProps.mode = "update";
             plannedProps.reservationData = {
                 ...generateUpdatePlannedState(),
@@ -366,64 +358,62 @@ describe("EventCreateReservation", () => {
             const guestNameInput = screen.getByLabelText(
                 t("EventCreateReservation.reservationGuestName"),
             );
-            expect(guestNameInput.query()?.getAttribute("value")).toBe(
-                plannedProps.reservationData?.guestName,
-            );
+            await expect
+                .element(guestNameInput)
+                .toHaveValue(plannedProps.reservationData?.guestName);
 
             // Check that time input has the correct value
             const timeInput = screen.getByLabelText(t("EventCreateReservation.reservationTime"), {
                 exact: true,
             });
-            expect(timeInput.query()?.getAttribute("value")).toBe(
-                plannedProps.reservationData?.time,
-            );
+            await expect.element(timeInput).toHaveValue(plannedProps.reservationData?.time);
 
             // Check that number of guests input has the correct value
             const numberOfGuestsInput = screen.getByLabelText(
                 t("EventCreateReservation.reservationNumberOfGuests"),
             );
-            expect(Number(numberOfGuestsInput.query()?.getAttribute("value"))).toBe(
-                plannedProps.reservationData?.numberOfGuests,
-            );
+            await expect
+                .element(numberOfGuestsInput)
+                .toHaveValue(plannedProps.reservationData?.numberOfGuests);
 
             // Check that consumption input has the correct value
             const consumptionInput = screen.getByLabelText(
                 t("EventCreateReservation.reservationConsumption"),
             );
 
-            expect(Number(consumptionInput.query()?.getAttribute("value"))).toBe(
-                plannedProps.reservationData?.consumption,
-            );
+            await expect
+                .element(consumptionInput)
+                .toHaveValue(plannedProps.reservationData?.consumption);
 
             // Check that guest contact input has the correct value
             const guestContactInput = screen.getByLabelText("Phone Number");
-            expect(guestContactInput.query()?.getAttribute("value")).toBe("2313213");
+            await expect.element(guestContactInput).toHaveValue("2313213");
 
             // Check that reservation note input has the correct value
             const reservationNoteInput = screen.getByLabelText(
                 t("EventCreateReservation.reservationNote"),
             );
-            expect(reservationNoteInput.query()?.getAttribute("value")).toBe(
-                plannedProps.reservationData?.reservationNote,
-            );
+            await expect
+                .element(reservationNoteInput)
+                .toHaveValue(plannedProps.reservationData?.reservationNote);
 
             // Check that isVIP checkbox is checked
             const isVIPCheckbox = screen.getByLabelText(t("EventCreateReservation.reservationVIP"));
-            expect(isVIPCheckbox.query()?.getAttribute("aria-checked")).toBe("true");
+            await expect.element(isVIPCheckbox).toBeChecked();
 
             // Check that selectionType is set based on reservationData
             const userRadio = screen.getByRole("radio", { name: "Staff" });
             const socialRadio = screen.getByRole("radio", { name: "Social" });
-            expect(userRadio.query()?.getAttribute("aria-checked")).toBe("true");
-            expect(socialRadio.query()?.getAttribute("aria-checked")).toBe("false");
+            await expect.element(userRadio).toBeChecked();
+            await expect.element(socialRadio).not.toBeChecked();
 
             // Check that reservedBy select has the correct user selected
             const reservedBySelect = screen.getByRole("combobox", {
                 name: t("EventCreateReservation.reservedByLabel"),
             });
-            expect(reservedBySelect.query()?.getAttribute("value")).toBe(
-                plannedProps.reservationData?.reservedBy?.name,
-            );
+            await expect
+                .element(reservedBySelect)
+                .toHaveValue(plannedProps.reservationData?.reservedBy?.name);
         });
 
         it("validates guest name and reservedBy selection", async () => {
@@ -442,13 +432,13 @@ describe("EventCreateReservation", () => {
 
             // Check for validation error
             const errorMessage = screen.getByText("Name must be longer!");
-            expect(errorMessage.query()).toBeTruthy();
+            await expect.element(errorMessage).toBeVisible();
 
             // Check for reservedBy validation error
             const reservedByError = screen.getByText(
                 t("EventCreateReservation.requireReservedBySelectionError"),
             );
-            expect(reservedByError.query()).toBeTruthy();
+            await expect.element(reservedByError).toBeVisible();
         });
 
         it("allows user to select reservedBy as 'User' and emits the correct payload", async () => {

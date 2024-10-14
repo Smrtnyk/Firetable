@@ -124,31 +124,7 @@ describe("AppDrawer", () => {
         expect(localStorage.getItem("FTDarkMode")).not.toBe(initialDarkModeInStorage);
     });
 
-    // TODO: figure out how to simulate click on overlay to close the drawer
-    it.skip('emits "update:modelValue" when the drawer visibility changes', async () => {
-        screen = renderComponent(
-            AppDrawer,
-            {
-                modelValue: true,
-            },
-            {
-                wrapInLayout: true,
-                piniaStoreOptions: {
-                    initialState: {
-                        auth: { user },
-                    },
-                },
-            },
-        );
-
-        const emitted = screen.emitted();
-        await userEvent.click(document.querySelector("body")!);
-
-        expect(emitted["update:modelValue"]).toBeTruthy();
-        expect(emitted["update:modelValue"][0]).toEqual([false]);
-    });
-
-    it("does not display inventory links when user lacks CAN_SEE_INVENTORY capability", () => {
+    it("does not display inventory links when user lacks CAN_SEE_INVENTORY capability", async () => {
         user.capabilities = {
             [UserCapability.CAN_SEE_INVENTORY]: false,
         };
@@ -166,7 +142,7 @@ describe("AppDrawer", () => {
             },
         );
 
-        expect(screen.getByText("Manage Inventory").query()).toBeNull();
+        await expect.element(screen.getByText("Manage Inventory")).not.toBeInTheDocument();
     });
 
     it("displays single Manage Inventory link when user has CAN_SEE_INVENTORY and one property", async () => {
@@ -199,7 +175,7 @@ describe("AppDrawer", () => {
         await expect.element(screen.getByText("Manage Inventory")).toBeVisible();
 
         // Ensure it's a single link, not an expandable item
-        expect(screen.getByText("Property 1").query()).toBeNull();
+        await expect.element(screen.getByText("Property 1")).not.toBeInTheDocument();
     });
 
     it("displays expandable Manage Inventory link when user has CAN_SEE_INVENTORY and multiple properties", async () => {
@@ -242,7 +218,7 @@ describe("AppDrawer", () => {
         await expect.element(screen.getByText("Property 2")).toBeVisible();
     });
 
-    it("uses custom capabilities over default capabilities", () => {
+    it("uses custom capabilities over default capabilities", async () => {
         user.role = Role.MANAGER;
         user.capabilities = {
             [UserCapability.CAN_SEE_INVENTORY]: false,
@@ -272,7 +248,7 @@ describe("AppDrawer", () => {
 
         // Even though MANAGER role has CAN_SEE_INVENTORY by default,
         // the custom capabilities should override it
-        expect(screen.getByText("Manage Inventory").query()).toBeNull();
+        await expect.element(screen.getByText("Manage Inventory")).not.toBeInTheDocument();
     });
 
     it("changes language when a new language is selected", async () => {

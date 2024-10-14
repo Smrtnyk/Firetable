@@ -67,7 +67,7 @@ describe("UserCreateForm", () => {
 
         // Ensure checkboxes are unchecked
         for (const checkbox of propertyCheckboxes.elements()) {
-            await expect.element(checkbox).toHaveAttribute("aria-checked", "false");
+            await expect.element(checkbox).not.toBeChecked();
         }
     });
 
@@ -211,7 +211,7 @@ describe("UserCreateForm", () => {
 
         // Check that properties are reset
         for (const checkbox of propertyCheckboxes.elements()) {
-            await expect.element(checkbox).toHaveAttribute("aria-checked", "false");
+            await expect.element(checkbox).not.toBeChecked();
         }
     });
 

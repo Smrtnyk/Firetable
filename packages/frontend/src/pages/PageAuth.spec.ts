@@ -39,19 +39,19 @@ vi.mock("src/helpers/ui-helpers", () => {
 });
 
 describe("PageAuth", () => {
-    it("renders the form with initial values", () => {
+    it("renders the form with initial values", async () => {
         const screen = renderComponent(PageAuth);
 
         // Check that the username input is empty
         const usernameInput = screen.getByLabelText("Username *");
-        expect(usernameInput.query()?.getAttribute("value")).toBe("");
+        await expect.element(usernameInput).toHaveValue("");
 
         // Check that the password input is empty
         const passwordInput = screen.getByLabelText("Password *");
-        expect(passwordInput.query()?.getAttribute("value")).toBe("");
+        await expect.element(passwordInput).toHaveValue("");
 
         // Check that the password is of type 'password'
-        expect(passwordInput.query()?.getAttribute("type")).toBe("password");
+        await expect.element(passwordInput).toHaveAttribute("type", "password");
     });
 
     it("validates required fields", async () => {
@@ -62,12 +62,12 @@ describe("PageAuth", () => {
 
         // Check for validation errors
         const usernameError = screen.getByText("Please type something");
-        expect(usernameError.query()).toBeTruthy();
+        await expect.element(usernameError).toBeVisible();
 
         const passwordError = screen.getByText(
             "Please enter your password, it has to contain minimum 5 characters.",
         );
-        expect(passwordError.query()).toBeTruthy();
+        await expect.element(passwordError).toBeVisible();
 
         // Ensure that loginWithEmail was not called
         expect(loginWithEmailSpy).not.toHaveBeenCalled();
@@ -77,20 +77,20 @@ describe("PageAuth", () => {
         const screen = renderComponent(PageAuth);
         const passwordInput = screen.getByLabelText("Password *");
         // Initially, password type should be 'password'
-        expect(passwordInput.query()?.getAttribute("type")).toBe("password");
+        await expect.element(passwordInput).toHaveAttribute("type", "password");
 
         // Click the eye icon to toggle visibility
         const eyeIcon = screen.getByLabelText("Toggle password visibility");
         await userEvent.click(eyeIcon);
 
         // After clicking, password type should be 'text'
-        expect(passwordInput.query()?.getAttribute("type")).toBe("text");
+        await expect.element(passwordInput).toHaveAttribute("type", "text");
 
         // Click again to toggle back
         await userEvent.click(eyeIcon);
 
         // Password type should be 'password' again
-        expect(passwordInput.query()?.getAttribute("type")).toBe("password");
+        await expect.element(passwordInput).toHaveAttribute("type", "password");
     });
 
     // Cannot mock @firetable/backend for some reason
@@ -139,7 +139,7 @@ describe("PageAuth", () => {
         // Optionally, check that an error message is displayed
         // Assuming that your component displays an error message when login fails
         const errorMessage = screen.getByText("Invalid credentials");
-        expect(errorMessage.query()).toBeTruthy();
+        await expect.element(errorMessage).toBeVisible();
     });
 
     it("validates password length", async () => {
@@ -156,7 +156,7 @@ describe("PageAuth", () => {
         const passwordError = screen.getByText(
             "Please enter your password, it has to contain minimum 5 characters.",
         );
-        expect(passwordError.query()).toBeTruthy();
+        await expect.element(passwordError).toBeVisible();
 
         // Ensure that loginWithEmail was not called
         expect(loginWithEmailSpy).not.toHaveBeenCalled();

@@ -241,11 +241,11 @@ describe("UserEditForm", () => {
         // Capabilities should be initially displayed with the user's capabilities
         await expect.element(screen.getByText("Capabilities:")).toBeVisible();
         let capabilityCheckbox = screen.getByRole("checkbox", { name: UserCapability.CAN_RESERVE });
-        await expect.element(capabilityCheckbox).toHaveAttribute("aria-checked", "true");
+        await expect.element(capabilityCheckbox).toBeChecked();
         capabilityCheckbox = screen.getByRole("checkbox", {
             name: UserCapability.CAN_DELETE_RESERVATION,
         });
-        await expect.element(capabilityCheckbox).toHaveAttribute("aria-checked", "false");
+        await expect.element(capabilityCheckbox).not.toBeChecked();
 
         // Change role to Manager
         const roleSelect = screen.getByLabelText("Role");
@@ -267,12 +267,12 @@ describe("UserEditForm", () => {
         // Verify that the capabilities are preserved
         capabilityCheckbox = screen.getByRole("checkbox", { name: UserCapability.CAN_RESERVE });
 
-        await expect.element(capabilityCheckbox).toHaveAttribute("aria-checked", "true");
+        await expect.element(capabilityCheckbox).toBeChecked();
         capabilityCheckbox = screen.getByRole("checkbox", {
             name: UserCapability.CAN_DELETE_RESERVATION,
         });
 
-        await expect.element(capabilityCheckbox).toHaveAttribute("aria-checked", "false");
+        await expect.element(capabilityCheckbox).not.toBeChecked();
     });
 
     it("emits default capabilities when role is updated to a new role", async () => {
@@ -467,12 +467,12 @@ describe("UserEditForm", () => {
         });
 
         // Should be false as toggled earlier
-        await expect.element(canReserveCheckboxAfter).toHaveAttribute("aria-checked", "false");
+        await expect.element(canReserveCheckboxAfter).not.toBeChecked();
 
         const canSeeGuestContactCheckbox = screen.getByRole("checkbox", {
             name: UserCapability.CAN_SEE_GUEST_CONTACT,
         });
-        await expect.element(canSeeGuestContactCheckbox).toHaveAttribute("aria-checked", "false");
+        await expect.element(canSeeGuestContactCheckbox).not.toBeChecked();
     });
 
     it("emits capabilities for non-staff roles when the role is changed", async () => {

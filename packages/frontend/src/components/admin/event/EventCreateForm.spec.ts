@@ -31,18 +31,14 @@ describe("EventCreateForm", () => {
             };
         });
 
-        it("renders the form with initial values", () => {
+        it("renders the form with initial values", async () => {
             const screen = renderComponent(EventCreateForm, props);
 
             // Check that the form fields are empty or have default values
-            expect(
-                screen.getByLabelText("Optional event image url").query()?.getAttribute("value"),
-            ).toBe("");
-            expect(screen.getByLabelText("Event name*").query()?.getAttribute("value")).toBe("");
-            expect(screen.getByLabelText("Guest List Limit").query()?.getAttribute("value")).toBe(
-                "100",
-            );
-            expect(screen.getByLabelText("Entry Price").query()?.getAttribute("value")).toBe("0");
+            await expect.element(screen.getByLabelText("Optional event image url")).toHaveValue("");
+            await expect.element(screen.getByLabelText("Event name*")).toHaveValue("");
+            await expect.element(screen.getByLabelText("Guest List Limit")).toHaveValue(100);
+            await expect.element(screen.getByLabelText("Entry Price")).toHaveValue(0);
             const floorCheckboxes = screen.getByRole("checkbox");
 
             expect(
@@ -50,7 +46,7 @@ describe("EventCreateForm", () => {
             ).toContain("22:00");
 
             for (const element of floorCheckboxes.elements()) {
-                expect(element.getAttribute("aria-checked")).toBe("false");
+                await expect.element(element).not.toBeChecked();
             }
         });
 
@@ -59,7 +55,7 @@ describe("EventCreateForm", () => {
             const submitButton = screen.getByRole("button", { name: "Submit" });
             await userEvent.click(submitButton);
 
-            expect(screen.getByText("Please type something").query()).toBeTruthy();
+            await expect.element(screen.getByText("Please type something")).toBeVisible();
         });
 
         it("shows error when no floors are selected", async () => {
@@ -132,11 +128,11 @@ describe("EventCreateForm", () => {
             await userEvent.click(resetButton);
 
             // Check that the form fields are reset
-            expect(screen.getByLabelText("Event Name").query()?.textContent).toBe("");
-            expect(screen.getByLabelText("Guest List Limit").query()?.textContent).toBe("");
-            expect(screen.getByLabelText("Entry Price").query()?.textContent).toBe("");
-            expect(screen.getByLabelText("Event Image URL").query()?.textContent).toBe("");
-            expect(firstCheckbox.getAttribute("aria-checked")).toBe("false");
+            await expect.element(screen.getByLabelText("Event Name")).toHaveValue("");
+            await expect.element(screen.getByLabelText("Guest List Limit")).toHaveValue(100);
+            await expect.element(screen.getByLabelText("Entry Price")).toHaveValue(0);
+            await expect.element(screen.getByLabelText("Event Image URL")).toHaveValue("");
+            await expect.element(firstCheckbox).not.toBeChecked();
         });
     });
 
@@ -170,22 +166,19 @@ describe("EventCreateForm", () => {
 
         it("renders the form with event data", async () => {
             const screen = renderComponent(EventCreateForm, props);
-
-            await nextTick();
-
             // Check that the form fields are populated with event data
-            expect(
-                screen.getByLabelText("Optional event image url").query()?.getAttribute("value"),
-            ).toBe(props.event!.img);
-            expect(screen.getByLabelText("Event Name").query()?.getAttribute("value")).toBe(
-                props.event!.name,
-            );
-            expect(screen.getByLabelText("Guest List Limit").query()?.getAttribute("value")).toBe(
-                String(props.event!.guestListLimit),
-            );
-            expect(screen.getByLabelText("Entry Price").query()?.getAttribute("value")).toBe(
-                String(props.event!.entryPrice),
-            );
+            await expect
+                .element(screen.getByLabelText("Optional event image url"))
+                .toHaveValue(props.event!.img);
+            await expect
+                .element(screen.getByLabelText("Event Name"))
+                .toHaveValue(props.event!.name);
+            await expect
+                .element(screen.getByLabelText("Guest List Limit"))
+                .toHaveValue(props.event!.guestListLimit);
+            await expect
+                .element(screen.getByLabelText("Entry Price"))
+                .toHaveValue(props.event!.entryPrice);
 
             expect(
                 screen.getByLabelText("Event date and time").query()?.getAttribute("value"),
@@ -210,8 +203,6 @@ describe("EventCreateForm", () => {
             const submitButton = screen.getByRole("button", { name: "Submit" });
 
             await userEvent.click(submitButton);
-
-            await nextTick();
 
             // Check that the 'update' event was emitted with correct payload
             const emitted = screen.emitted().update as any[];
