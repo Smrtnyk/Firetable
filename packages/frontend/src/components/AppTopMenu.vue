@@ -2,6 +2,7 @@
 import { useAuthStore } from "src/stores/auth-store";
 
 import AppBreadcrumbs from "src/components/AppBreadcrumbs.vue";
+import { refreshApp } from "src/helpers/utils";
 
 const emit = defineEmits<(e: "toggle-drawer") => void>();
 const authStore = useAuthStore();
@@ -15,10 +16,6 @@ const menuLinks = [
         routeName: "userProfile",
     },
 ];
-
-function refreshApp(): void {
-    globalThis.location.reload();
-}
 </script>
 
 <template>

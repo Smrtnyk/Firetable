@@ -5,3 +5,7 @@ export function parseAspectRatio(aspectRatio: string): number {
     }
     return Number.parseFloat(aspectRatio);
 }
+
+export function refreshApp(): void {
+    globalThis.location.reload();
+}

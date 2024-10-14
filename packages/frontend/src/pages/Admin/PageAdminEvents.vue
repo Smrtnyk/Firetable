@@ -21,6 +21,7 @@ import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { usePropertiesStore } from "src/stores/properties-store";
 import FTCenteredText from "src/components/FTCenteredText.vue";
+import { refreshApp } from "src/helpers/utils";
 
 interface Props {
     organisationId: string;
@@ -98,8 +99,8 @@ async function onUpdateEvent(eventData: EditEventPayload & { id: string }): Prom
                 },
                 eventData,
             );
-            // An ugly hack to force data reload
-            globalThis.location.reload();
+            // FIXME: An ugly hack to force data reload
+            refreshApp();
         },
     });
 }
@@ -119,8 +120,8 @@ async function deleteEvent(event: EventDoc): Promise<void> {
                 }),
                 event.id,
             );
-            // An ugly hack to force data reload
-            globalThis.location.reload();
+            // FIXME: An ugly hack to force data reload
+            refreshApp();
         },
     });
 }

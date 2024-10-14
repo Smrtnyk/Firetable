@@ -8,7 +8,7 @@
             </div>
             <p class="text-subtitle1">Wait or try to reload the page</p>
             <p>
-                <q-btn rounded class="button-gradient" @click="reloadPage">Reload</q-btn>
+                <q-btn rounded class="button-gradient" @click="refreshApp">Reload</q-btn>
             </p>
         </q-card>
     </q-dialog>
@@ -17,10 +17,7 @@
 <script setup lang="ts">
 import { useNetworkStatus } from "src/composables/useNetworkStatus";
 import FTCenteredText from "src/components/FTCenteredText.vue";
+import { refreshApp } from "src/helpers/utils";
 
 const { isOnline } = useNetworkStatus();
-
-function reloadPage(): void {
-    globalThis.location.reload();
-}
 </script>
