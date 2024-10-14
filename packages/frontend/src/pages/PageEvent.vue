@@ -19,7 +19,7 @@ import {
     reservationsCollection,
 } from "@firetable/backend";
 import { isPlannedReservation, ReservationStatus } from "@firetable/types";
-import { Loading, useQuasar } from "quasar";
+import { Loading } from "quasar";
 import { useRouter } from "vue-router";
 import { computed, onMounted, onUnmounted, useTemplateRef } from "vue";
 import { useEventsStore } from "src/stores/events-store";
@@ -41,6 +41,7 @@ import FTDialog from "src/components/FTDialog.vue";
 import EventQueuedReservations from "src/components/Event/EventQueuedReservations.vue";
 import EventViewControls from "src/components/Event/EventViewControls.vue";
 import { TableOperationType, useReservations } from "src/composables/useReservations";
+import { useDialog } from "src/composables/useDialog";
 
 interface Props {
     organisationId: string;
@@ -59,7 +60,7 @@ const eventOwner: EventOwner = {
 const authStore = useAuthStore();
 const eventsStore = useEventsStore();
 const router = useRouter();
-const quasar = useQuasar();
+const { createDialog } = useDialog();
 const pageRef = useTemplateRef<HTMLDivElement>("pageRef");
 
 const { users } = useUsers(eventOwner.organisationId);
@@ -117,7 +118,7 @@ const { initiateTableOperation } = useReservations(
 );
 
 function showEventInfo(): void {
-    quasar.dialog({
+    createDialog({
         component: FTDialog,
         componentProps: {
             component: EventInfo,
