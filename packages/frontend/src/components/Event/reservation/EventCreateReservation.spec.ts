@@ -204,7 +204,13 @@ describe("EventCreateReservation", () => {
 
             const newTime = addHours(eventStartTimestamp, 1);
 
-            const timeOption = screen.getByText(format(newTime, "H"), { exact: true });
+            let formattedNewTime = format(newTime, "H");
+            // Quasar shows 00 and then goes 1, 2, 3, ..., 9, 10, 11, 12
+            if (formattedNewTime === "0") {
+                formattedNewTime = "00";
+            }
+
+            const timeOption = screen.getByText(formattedNewTime, { exact: true });
             await userEvent.click(timeOption);
 
             const closeBtn = screen.getByRole("button", { name: "Close" });
