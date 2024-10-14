@@ -1,9 +1,9 @@
 packages:
     - 'packages/*'
 catalog:
-    vitest: https://pkg.pr.new/vitest@4ec301b
-    '@vitest/browser': https://pkg.pr.new/@vitest/browser@4ec301b
-    '@vitest/spy': https://pkg.pr.new/@vitest/spy@4ec301b
-    '@vitest/ui': https://pkg.pr.new/@vitest/ui@4ec301b
+    vitest: https://pkg.pr.new/vitest@d260cef
+    '@vitest/browser': https://pkg.pr.new/@vitest/browser@d260cef
+    '@vitest/spy': https://pkg.pr.new/@vitest/spy@d260cef
+    '@vitest/ui': https://pkg.pr.new/@vitest/ui@d260cef
     firebase: 10.14.1
     es-toolkit: 1.25.0
