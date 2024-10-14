@@ -87,10 +87,7 @@ const {
     error: queuedResListenerError,
     promise: queuedResPromise,
 } = useFirestoreCollection<QueuedReservationDoc>(
-    createQuery(
-        queuedReservationsCollection(eventOwner),
-        where("status", "==", ReservationStatus.ACTIVE),
-    ),
+    createQuery(queuedReservationsCollection(eventOwner)),
     { wait: true },
 );
 
