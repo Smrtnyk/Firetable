@@ -84,6 +84,7 @@ export default {
     },
     PageEvent: {
         showFloorPlansExpanded: "Grundrisse anzeigen",
+        deleteQueuedReservationConfirmMsg: "Reservierung aus der Warteschlange löschen?",
     },
     FTAutocomplete: {
         label: "Tische nach Gastnamen suchen...",

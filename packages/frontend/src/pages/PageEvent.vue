@@ -42,6 +42,7 @@ import EventQueuedReservations from "src/components/Event/EventQueuedReservation
 import EventViewControls from "src/components/Event/EventViewControls.vue";
 import { TableOperationType, useReservations } from "src/composables/useReservations";
 import { useDialog } from "src/composables/useDialog";
+import { useI18n } from "vue-i18n";
 
 interface Props {
     organisationId: string;
@@ -60,6 +61,7 @@ const eventOwner: EventOwner = {
 const authStore = useAuthStore();
 const eventsStore = useEventsStore();
 const router = useRouter();
+const { t } = useI18n();
 const { createDialog } = useDialog();
 const pageRef = useTemplateRef<HTMLDivElement>("pageRef");
 
@@ -184,7 +186,7 @@ async function onCreateQueuedReservation(reservation: QueuedReservation): Promis
 }
 
 async function onDeleteQueuedReservation(reservation: QueuedReservationDoc): Promise<void> {
-    const shouldDelete = await showConfirm("Are you sure you want to delete this reservation?");
+    const shouldDelete = await showConfirm(t("PageEvent.deleteQueuedReservationConfirmMsg"));
 
     if (!shouldDelete) {
         return;
