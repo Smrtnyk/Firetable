@@ -7,13 +7,14 @@ import FTDialog from "src/components/FTDialog.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { Loading, useQuasar } from "quasar";
+import { Loading } from "quasar";
 import { makeRawFloor } from "@firetable/floor-creator";
 import { addFloor, deleteFloor } from "@firetable/backend";
 import { useFloors } from "src/composables/useFloors";
 import { watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { property } from "es-toolkit/compat";
+import { useDialog } from "src/composables/useDialog";
 
 interface Props {
     organisationId: string;
@@ -22,7 +23,7 @@ interface Props {
 
 const { organisationId, propertyId } = defineProps<Props>();
 
-const quasar = useQuasar();
+const { createDialog } = useDialog();
 const { t } = useI18n();
 
 const { floors, isLoading } = useFloors(propertyId, organisationId);
@@ -36,7 +37,7 @@ watch(isLoading, function (loadingVal) {
 });
 
 function showAddNewFloorForm(floorDocs: FloorDoc[]): void {
-    const dialog = quasar.dialog({
+    const dialog = createDialog({
         component: FTDialog,
         componentProps: {
             title: "Add New Floor",

@@ -139,7 +139,9 @@ function validateAndEmitCreate(): void {
         guestListLimit: Number(state.value.form.guestListLimit),
         propertyId: props.propertyId,
         organisationId: props.organisationId,
-        floors: selectedFloors,
+        floors: selectedFloors.map(function (floor) {
+            return { ...floor, id: floor.id };
+        }),
     });
     state.value.form = eventObj;
 }
