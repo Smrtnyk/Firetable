@@ -105,8 +105,9 @@ describe("TelNumberInput", () => {
             await expect.element(countryError).not.toBeInTheDocument();
             await expect.element(phoneError).not.toBeInTheDocument();
 
+            const emitted = screen.emitted<string>()["update:modelValue"];
             expect(screen.emitted()["update:modelValue"]).toBeTruthy();
-            expect(first<string[]>(screen.emitted()["update:modelValue"] as any)[0]).toBe("");
+            expect(first(emitted)![0]).toBe("");
         });
 
         it("shows error when only one field is provided", async () => {
