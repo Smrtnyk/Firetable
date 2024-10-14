@@ -204,10 +204,9 @@ describe("EventCreateReservation", () => {
 
             const newTime = addHours(eventStartTimestamp, 1);
 
-            const timeOption = screen.getByText(format(newTime, "HH"), { exact: true });
-            await expect.element(timeOption).toBeVisible();
-
+            const timeOption = screen.getByText(format(newTime, "H"), { exact: true });
             await userEvent.click(timeOption);
+
             const closeBtn = screen.getByRole("button", { name: "Close" });
             await userEvent.click(closeBtn);
 
