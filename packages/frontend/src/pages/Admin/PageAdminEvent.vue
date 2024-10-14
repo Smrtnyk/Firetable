@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Component } from "vue";
 import type { FloorEditor } from "@firetable/floor-creator";
-import type { FloorDoc, ReservationDoc } from "@firetable/types";
+import type { AnyFunction, FloorDoc, ReservationDoc } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
 import { isActiveReservation } from "@firetable/types";
 import { deleteReservation, updateEventFloorData } from "@firetable/backend";
@@ -23,7 +23,7 @@ import FTTabPanels from "src/components/FTTabPanels.vue";
 import AdminEventReturningGuestsList from "src/components/admin/event/AdminEventReturningGuestsList.vue";
 import AppCardSection from "src/components/AppCardSection.vue";
 
-import { Loading, useQuasar } from "quasar";
+import { Loading } from "quasar";
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useAdminEvent } from "src/composables/useAdminEvent";
 import { buttonSize, isMobile } from "src/global-reactives/screen-detection";
@@ -33,6 +33,7 @@ import { useGuestsForEvent } from "src/composables/useGuestsForEvent";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { property } from "es-toolkit/compat";
 import { useAuthStore } from "src/stores/auth-store";
+import { useDialog } from "src/composables/useDialog";
 
 interface Props {
     organisationId: string;
@@ -46,7 +47,7 @@ const PERMANENTLY_DELETE_RES_MESSAGE =
 
 const props = defineProps<Props>();
 const router = useRouter();
-const quasar = useQuasar();
+const { createDialog } = useDialog();
 const propertiesStore = usePropertiesStore();
 
 const tab = ref("info");
@@ -141,10 +142,10 @@ function showDialog(
     component: Component,
     title: string,
     componentPropsObject: Record<string, unknown> = {},
-    listeners: Record<string, unknown> = {},
+    listeners: Record<string, AnyFunction> = {},
     maximized = isMobile.value,
 ): void {
-    quasar.dialog({
+    createDialog({
         component: FTDialog,
         componentProps: {
             maximized,
@@ -178,7 +179,11 @@ function showFloorEditDialog(floor: FloorDoc): void {
 }
 
 async function deleteReservationPermanently(reservation: ReservationDoc): Promise<void> {
-    if (!(await showConfirm(PERMANENTLY_DELETE_RES_TITLE, PERMANENTLY_DELETE_RES_MESSAGE))) {
+    const shouldDeletePermanently = await showConfirm(
+        PERMANENTLY_DELETE_RES_TITLE,
+        PERMANENTLY_DELETE_RES_MESSAGE,
+    );
+    if (!shouldDeletePermanently) {
         return;
     }
     await tryCatchLoadingWrapper({
@@ -293,7 +298,7 @@ onMounted(init);
                     </q-item>
                 </AppCardSection>
 
-                <SettingsCard title="Event Floors">
+                <AppCardSection title="Event Floors">
                     <q-item :key="floor.id" v-for="floor in eventFloors" clickable v-ripple>
                         <q-item-section>
                             <q-item-label>
@@ -312,7 +317,7 @@ onMounted(init);
                             </q-btn>
                         </q-item-section>
                     </q-item>
-                </SettingsCard>
+                </AppCardSection>
             </q-tab-panel>
 
             <!-- Logs -->
