@@ -15,6 +15,30 @@ export default {
         reset: "Zurücksetzen",
         manageInventoryLink: "Inventar verwalten",
     },
+    useReservations: {
+        cancelTableOperationTitle: "Operation abbrechen",
+        cancelTableOperationMsg: "Möchten Sie die aktuelle Operation wirklich abbrechen?",
+        movingReservationOperationMsg: "Reservierung von Warteliste verschieben",
+        copyingReservationOperationMsg: "Reservierung von Tisch {tableLabel} kopieren",
+        transferringReservationOperationMsg: "Reservierung von Tisch {tableLabel} übertragen",
+        reservationUpdatedMsg: "Reservierung aktualisiert!",
+        deleteReservationTitle: "Reservierung löschen?",
+        reservationAlreadyReserved: "Jemand anderes hat diesen Tisch bereits reserviert.",
+        moveReservationToQueueConfirmTitle:
+            "Möchten Sie diese Reservierung wirklich in die Warteliste verschieben?",
+        transferReservationConfirmTitle: "Möchten Sie diese Reservierung wirklich übertragen?",
+        transferReservationConfirmMessage:
+            "Dies überträgt die Reservierung von Tisch {table1Label} zu Tisch {table2Label}",
+        crossFloorTransferReservationConfirmMessage: `Dies überträgt die Reservierung zwischen Grundrissen "{floor1Name}" Tisch "{table1Label}" zu Grundriss "{floor2Name}" Tisch "{table2Label}"`,
+        transferToSameTableErrorMsg: "Kann Reservierung nicht auf denselben Tisch übertragen!",
+        copyToSameTableErrorMsg: "Kann Reservierung nicht auf denselben Tisch kopieren!",
+        copyToReservedTableErrorMsg:
+            "Kann Reservierung nicht auf einen bereits reservierten Tisch kopieren!",
+        copyReservationConfirmMsg:
+            "Reservierung von Tisch {sourceTableLabel} zu Tisch {targetTableLabel} kopieren?",
+        reservationCopyErrorMsg:
+            "Fehler beim Kopieren der Reservierung! Bitte versuchen Sie es erneut.",
+    },
     validation: {
         required: "Bitte geben Sie etwas ein.",
         noWhiteSpaces: "Keine Leerzeichen erlaubt!",

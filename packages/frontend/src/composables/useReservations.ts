@@ -132,22 +132,32 @@ export function useReservations(
         deep: true,
     });
 
+    function cancelCurrentOperation(): void {
+        currentTableOperation.value = undefined;
+    }
+
     function initiateTableOperation(operation: TableOperation): void {
         currentTableOperation.value = operation;
     }
 
     function showOperationNotification(operation: TableOperation): void {
-        let message = "";
+        let message;
         switch (operation.type) {
             case TableOperationType.RESERVATION_DEQUEUE:
-                message = `Moving reservation from on-hold`;
+                message = t("useReservations.movingReservationOperationMsg");
                 break;
             case TableOperationType.RESERVATION_COPY:
-                message = `Copying reservation from table ${operation.sourceTable.label}`;
+                message = t("useReservations.copyingReservationOperationMsg", {
+                    tableLabel: operation.sourceTable.label,
+                });
                 break;
             case TableOperationType.RESERVATION_TRANSFER:
-                message = `Transferring reservation from table ${operation.sourceTable.label}`;
+                message = t("useReservations.transferringReservationOperationMsg", {
+                    tableLabel: operation.sourceTable.label,
+                });
                 break;
+            default:
+                throw new Error("Invalid table operation type!");
         }
 
         operationNotification = Notify.create({
@@ -168,13 +178,13 @@ export function useReservations(
 
     async function onCancelOperation(): Promise<void> {
         const confirm = await showConfirm(
-            "Cancel Operation",
-            "Are you sure you want to cancel the current operation?",
+            t("useReservations.cancelTableOperationTitle"),
+            t("useReservations.cancelTableOperationMsg"),
         );
 
         if (confirm) {
             // This will also dismiss the notification
-            currentTableOperation.value = undefined;
+            cancelCurrentOperation();
         }
     }
 
@@ -282,14 +292,15 @@ export function useReservations(
         void tryCatchLoadingWrapper({
             async hook() {
                 await updateReservationDoc(eventOwner, reservationData);
-                notifyPositive("Reservation updated");
+                notifyPositive(t("useReservations.reservationUpdatedMsg"));
                 createEventLog(`Reservation edited on table ${reservationData.tableLabel}`);
             },
         });
     }
 
     async function onDeleteReservation(reservation: ReservationDoc): Promise<void> {
-        if (!(await showConfirm("Delete reservation?"))) {
+        const shouldDelete = await showConfirm(t("useReservations.deleteReservationTitle"));
+        if (!shouldDelete) {
             return;
         }
 
@@ -343,7 +354,7 @@ export function useReservations(
 
         dialog.hide();
         currentOpenCreateReservationDialog = undefined;
-        showErrorMessage(t("PageEvent.reservationAlreadyReserved"));
+        showErrorMessage(t("useReservations.reservationAlreadyReserved"));
     }
 
     function filterUsersPerProperty(usersArray: User[], propertyId: string): User[] {
@@ -359,11 +370,10 @@ export function useReservations(
         mode: "create" | "update",
     ): void {
         const { label } = element;
-        const eventStartTimestamp = event.value?.date;
-        if (!eventStartTimestamp) {
-            showErrorMessage("An error occurred, please refresh the page.");
-            throw new Error("Event start timestamp is not defined");
-        }
+
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
+        const eventStartTimestamp = event.value!.date;
+
         const dialog = createDialog({
             component: FTDialog,
             componentProps: {
@@ -540,7 +550,10 @@ export function useReservations(
     }
 
     async function onMoveReservationToQueue(reservation: PlannedReservationDoc): Promise<void> {
-        if (!(await showConfirm("Are you sure you want to move this reservation to queue?"))) {
+        const shouldMove = await showConfirm(
+            t("useReservations.moveReservationToQueueConfirmTitle"),
+        );
+        if (!shouldMove) {
             return;
         }
 
@@ -590,8 +603,14 @@ export function useReservations(
             return;
         }
 
-        const transferMessage = `This will transfer reservation from table ${table1.label} to table ${table2.label}`;
-        const shouldTransfer = await showConfirm("Transfer reservation", transferMessage);
+        const transferMessage = t("useReservations.transferReservationConfirmMessage", {
+            table1Label: table1.label,
+            table2Label: table2.label,
+        });
+        const shouldTransfer = await showConfirm(
+            t("useReservations.transferReservationConfirmTitle"),
+            transferMessage,
+        );
 
         if (!shouldTransfer) {
             return;
@@ -673,8 +692,16 @@ export function useReservations(
             return reservation.floorId === floor2.id && reservation.tableLabel === table2.label;
         });
 
-        const transferMessage = `This will transfer reservation between floor plans "${floor1.name}" table "${table1.label}" to floor plan "${floor2.name}" table "${table2.label}"`;
-        const shouldTransfer = await showConfirm("Transfer reservation", transferMessage);
+        const transferMessage = t("useReservations.crossFloorTransferReservationConfirmMessage", {
+            floor1Name: floor1.name,
+            floor2Name: floor2.name,
+            table1Label: table1.label,
+            table2Label: table2.label,
+        });
+        const shouldTransfer = await showConfirm(
+            t("useReservations.transferReservationConfirmTitle"),
+            transferMessage,
+        );
 
         if (!shouldTransfer) {
             return;
@@ -758,18 +785,21 @@ export function useReservations(
         const { sourceFloor, sourceTable } = operation;
 
         if (sourceFloor.id === targetFloor.id && sourceTable.label === targetTable.label) {
-            showErrorMessage("Cannot copy reservation to the same table!");
+            showErrorMessage(t("useReservations.copyToSameTableErrorMsg"));
             return;
         }
 
         if (targetReservation) {
-            showErrorMessage("Cannot copy reservation to an already reserved table!");
+            showErrorMessage(t("useReservations.copyToReservedTableErrorMsg"));
             return;
         }
 
         const confirm = await showConfirm(
-            "Confirm Copy",
-            `Copy reservation from table ${sourceTable.label} to table ${targetTable.label}?`,
+            "",
+            t("useReservations.copyReservationConfirmMsg", {
+                sourceTableLabel: sourceTable.label,
+                targetTableLabel: targetTable.label,
+            }),
         );
         if (!confirm) return;
 
@@ -777,7 +807,9 @@ export function useReservations(
             (res) => res.tableLabel === sourceTable.label && res.floorId === sourceFloor.id,
         );
         if (!reservation) {
-            showErrorMessage("Source reservation not found.");
+            showErrorMessage(t("useReservations.reservationCopyErrorMsg"));
+            AppLogger.error("Source reservation not found.");
+            cancelCurrentOperation();
             return;
         }
 
@@ -792,16 +824,7 @@ export function useReservations(
         const { sourceFloor, sourceTable } = operation;
 
         if (sourceFloor.id === targetFloor.id && sourceTable.label === targetTable.label) {
-            showErrorMessage("Cannot transfer reservation to the same table!");
-            return;
-        }
-
-        const confirm = await showConfirm(
-            "Confirm Transfer",
-            `Transfer reservation from table ${sourceTable.label} to table ${targetTable.label}?`,
-        );
-
-        if (!confirm) {
+            showErrorMessage(t("useReservations.transferToSameTableErrorMsg"));
             return;
         }
 
@@ -846,7 +869,7 @@ export function useReservations(
 
         if (currentTableOperation.value) {
             await handleTableOperation(floor, element, reservation);
-            currentTableOperation.value = undefined;
+            cancelCurrentOperation();
             return;
         }
 

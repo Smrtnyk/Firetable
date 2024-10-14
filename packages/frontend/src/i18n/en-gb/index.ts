@@ -15,6 +15,28 @@ export default {
         reset: "Reset",
         manageInventoryLink: "Manage Inventory",
     },
+    useReservations: {
+        cancelTableOperationTitle: "Cancel Operation",
+        cancelTableOperationMsg: "Are you sure you want to cancel the current operation?",
+        movingReservationOperationMsg: "Moving reservation from on-hold",
+        copyingReservationOperationMsg: "Copying reservation from table {tableLabel}",
+        transferringReservationOperationMsg: "Transferring reservation from table {tableLabel}",
+        reservationUpdatedMsg: "Reservation updated!",
+        deleteReservationTitle: "Delete reservation?",
+        reservationAlreadyReserved: "Someone else already reserved this table.",
+        moveReservationToQueueConfirmTitle:
+            "Are you sure you want to move this reservation to on-hold?",
+        transferReservationConfirmTitle: "Are you sure you want to transfer this reservation?",
+        transferReservationConfirmMessage:
+            "This will transfer reservation from table {table1Label} to table {table2Label}",
+        crossFloorTransferReservationConfirmMessage: `This will transfer reservation between floor plans "{floor1Name}" table "{table1Label}" to floor plan "{floor2Name}" table "{table2Label}"`,
+        transferToSameTableErrorMsg: "Cannot transfer reservation to the same table!",
+        copyToSameTableErrorMsg: "Cannot copy reservation to the same table!",
+        copyToReservedTableErrorMsg: "Cannot copy reservation to an already reserved table!",
+        copyReservationConfirmMsg:
+            "Copy reservation from table {sourceTableLabel} to table {targetTableLabel}?",
+        reservationCopyErrorMsg: "Error copying reservation! Please try again.",
+    },
     validation: {
         required: "Please type something.",
         noWhiteSpaces: "No whitespaces are allowed!",
@@ -60,7 +82,6 @@ export default {
     },
     PageEvent: {
         showFloorPlansExpanded: "Floor plans",
-        reservationAlreadyReserved: "Someone else already reserved this table.",
     },
     FTAutocomplete: {
         label: "Search tables by guest name...",
