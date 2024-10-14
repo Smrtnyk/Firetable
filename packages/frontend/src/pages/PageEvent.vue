@@ -126,7 +126,7 @@ function showEventInfo(): void {
         component: FTDialog,
         componentProps: {
             component: EventInfo,
-            title: "Event Info",
+            title: t("PageEvent.eventInfoTitle"),
             maximized: false,
             componentPropsObject: {
                 eventInfo: event.value?.info ?? "",

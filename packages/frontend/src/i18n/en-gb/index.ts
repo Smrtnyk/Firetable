@@ -81,11 +81,15 @@ export default {
         freeLabel: "Free",
     },
     PageEvent: {
+        eventInfoTitle: "Event info",
         showFloorPlansExpanded: "Floor plans",
         deleteQueuedReservationConfirmMsg: "Are you sure you want to delete this reservation?",
     },
     FTAutocomplete: {
         label: "Search tables by guest name...",
+    },
+    EventInfo: {
+        eventInfoEmptyMsg: "There is no event description set for this event!",
     },
     EventGuestList: {
         deleteGuestTitle: "Do you really want to remove this guest from the guest list?",

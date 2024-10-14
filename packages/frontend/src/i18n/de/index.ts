@@ -83,11 +83,15 @@ export default {
         freeLabel: "Kostenlos",
     },
     PageEvent: {
+        eventInfoTitle: "Veranstaltungsinformationen",
         showFloorPlansExpanded: "Grundrisse anzeigen",
         deleteQueuedReservationConfirmMsg: "Reservierung aus der Warteschlange löschen?",
     },
     FTAutocomplete: {
         label: "Tische nach Gastnamen suchen...",
+    },
+    EventInfo: {
+        eventInfoEmptyMsg: "Es gibt keine Informationen zu dieser Veranstaltung.",
     },
     EventGuestList: {
         deleteGuestTitle: "Möchten Sie diesen Gast wirklich von der Gästeliste entfernen?",
