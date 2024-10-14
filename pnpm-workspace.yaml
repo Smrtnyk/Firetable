@@ -6,4 +6,4 @@ catalog:
     '@vitest/spy': https://pkg.pr.new/@vitest/spy@4ec301b
     '@vitest/ui': https://pkg.pr.new/@vitest/ui@4ec301b
     firebase: 10.14.1
-    es-toolkit: 1.24.0
+    es-toolkit: 1.25.0

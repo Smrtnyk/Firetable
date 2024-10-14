@@ -16,8 +16,8 @@ catalogs:
       specifier: https://pkg.pr.new/@vitest/ui@4ec301b
       version: 2.1.2
     es-toolkit:
-      specifier: 1.24.0
-      version: 1.24.0
+      specifier: 1.25.0
+      version: 1.25.0
     firebase:
       specifier: 10.14.1
       version: 10.14.1
@@ -76,7 +76,7 @@ importers:
     dependencies:
       es-toolkit:
         specifier: 'catalog:'
-        version: 1.24.0
+        version: 1.25.0
       firebase:
         specifier: 'catalog:'
         version: 10.14.1
@@ -89,7 +89,7 @@ importers:
     dependencies:
       es-toolkit:
         specifier: 'catalog:'
-        version: 1.24.0
+        version: 1.25.0
       fabric:
         specifier: 6.4.3
         version: 6.4.3(encoding@0.1.13)
@@ -150,7 +150,7 @@ importers:
         version: 4.1.0
       es-toolkit:
         specifier: 'catalog:'
-        version: 1.24.0
+        version: 1.25.0
       firebase:
         specifier: 'catalog:'
         version: 10.14.1
@@ -3147,6 +3147,9 @@ packages:
 
   es-toolkit@1.24.0:
     resolution: {integrity: sha512-nZM+MRSGhKjCdjvqWEFr5Jns6vxoXtBcsl4/cEsGMgsMx8Z2ato4vBTGMUSIQBZJgEdKyNcgGh42yu9xiuNYtQ==}
+
+  es-toolkit@1.25.0:
+    resolution: {integrity: sha512-lFjz98f6ownLM2qBk0+FY10cSGqYX1vEkfwc+vuKhybQVTuUL9JmjZs73A7+GhOaq5afwHUCERHcP9Bl/AgCXw==}
 
   esbuild@0.21.5:
     resolution: {integrity: sha512-mg3OPMV4hXywwpoDxu3Qda5xCKQi+vCTZq8S9J/EpkhB2HzKXq4SNFZE3+NK93JYxc8VMSep+lOUSC/RVKaBqw==}
@@ -9556,6 +9559,8 @@ snapshots:
       is-symbol: 1.0.4
 
   es-toolkit@1.24.0: {}
+
+  es-toolkit@1.25.0: {}
 
   esbuild@0.21.5:
     optionalDependencies:
