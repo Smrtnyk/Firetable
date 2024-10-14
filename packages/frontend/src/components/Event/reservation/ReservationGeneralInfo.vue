@@ -66,7 +66,7 @@ function createdByText(creator: Reservation["creator"]): string {
             <div class="col-6">{{ t("EventShowReservation.createdByLabel") }}</div>
             <div class="col-6 font-black">{{ createdByText(props.reservation.creator) }}</div>
 
-            <div class="col-6">Created at</div>
+            <div class="col-6">{{ t("EventShowReservation.createdAtLabel") }}</div>
             <div class="col-6 font-black">
                 {{ createdAt }}
             </div>

@@ -83,6 +83,7 @@ export default {
             darkMode: "Toggle dark mode",
             onlineStatus: "Toggle online status",
         },
+        languageSelectorLabel: "Language",
     },
     EventCard: {
         freeLabel: "Free",
@@ -129,12 +130,16 @@ export default {
         noteLabel: "Note",
         reservedByLabel: "Reserved by",
         createdByLabel: "Creator",
+        createdAtLabel: "Created at",
         groupedWithLabel: "Grouped with",
         guestArrivedLabel: "Arrived",
         reservationConfirmedLabel: "Confirmed",
         reservationConsumption: "Consumption",
         timeLabel: "Time of arrival",
         waitingForResponse: "Waiting for response",
+    },
+    PlannedReservationForm: {
+        reservedByStaffRadioBtnLabel: "Staff",
     },
     WalkInReservationForm: {
         optionalGuestNameLabel: "Optional Guest Name",
@@ -152,16 +157,22 @@ export default {
         reservedBySocialLabel: "Social Networks",
         reservationVIP: "VIP?",
     },
+    AddNewGuestForm: {
+        guestNameInputLabel: "Guest name *",
+    },
+    PageAdminGuest: {
+        editGuestConfirmMsg: "Are you sure you want to edit guest {name}?",
+        editGuestDialogTitle: "Editing guest: {name}",
+        deleteGuestConfirmTitle: "Delete guest?",
+        deleteGuestConfirmMessage: "Are you sure you want to delete guest {name}?",
+        noVisitsMessage: "There are no visits recorded for this guest.",
+    },
     PageAdminGuests: {
         title: "Guests",
         noGuestsCreatedMessage: "There are no guests created.",
         maxAmountGuestsCreationMessage:
             "You have reached the maximum amount of guests which is {limit}!",
         createNewGuestDialogTitle: "Create new guest",
-        editGuestDialogTitle: "Editing guest: {name}",
-        editGuestConfirmationMessage: "Are you sure you want to edit guest {name}?",
-        deleteGuestDialogTitle: "Delete guest?",
-        deleteGuestConfirmationMessage: "Are you sure you want to delete guest {name}?",
     },
     PageAdminProperties: {
         properties: "Properties",
@@ -196,6 +207,7 @@ export default {
         deleteEventDialogTitle: "Delete Event?",
         eventCreatedNotificationMessage: "Event created!",
         createNewEventDialogTitle: "Create new event",
+        editEventDialogTitle: "Editing event: {eventName}",
     },
     PageAdminUsers: {
         title: "Users",

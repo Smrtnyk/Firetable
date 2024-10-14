@@ -30,7 +30,7 @@ function showCreateGuestDialog(): void {
     const dialog = createDialog({
         component: FTDialog,
         componentProps: {
-            title: "Add new Guest",
+            title: t("PageAdminGuests.createNewGuestDialogTitle"),
             maximized: false,
             component: AddNewGuestForm,
             listeners: {

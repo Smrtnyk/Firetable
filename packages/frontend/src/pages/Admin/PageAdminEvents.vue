@@ -20,7 +20,6 @@ import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { usePropertiesStore } from "src/stores/properties-store";
-import FTCenteredText from "src/components/FTCenteredText.vue";
 import { refreshApp } from "src/helpers/utils";
 
 interface Props {
@@ -130,7 +129,11 @@ function showEventForm(event?: EventDoc): void {
     const dialog = createDialog({
         component: FTDialog,
         componentProps: {
-            title: event ? "Edit event" : t("PageAdminEvents.createNewEventDialogTitle"),
+            title: event
+                ? t("PageAdminEvents.editEventDialogTitle", {
+                      eventName: event.name,
+                  })
+                : t("PageAdminEvents.createNewEventDialogTitle"),
             maximized: false,
             component: EventCreateForm,
             componentPropsObject: {
@@ -166,13 +169,13 @@ onMounted(fetchMoreEvents);
 
 <template>
     <div class="PageAdminEvents">
-        <FTTitle title="Events">
+        <FTTitle :title="t('PageAdminEvents.title')">
             <template #right>
                 <q-btn rounded icon="plus" class="button-gradient" @click="showEventForm()" />
             </template>
         </FTTitle>
 
-        <div v-if="events.length > 0 && !isLoadingEvents">
+        <div v-if="!isLoadingEvents">
             <AdminPropertyEventsList
                 :property-id="propertyId"
                 :events="events"
@@ -182,7 +185,5 @@ onMounted(fetchMoreEvents);
                 :done="done"
             />
         </div>
-
-        <FTCenteredText v-else> {{ t("PageAdminEvents.noEventsMessage") }} </FTCenteredText>
     </div>
 </template>

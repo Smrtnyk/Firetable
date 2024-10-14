@@ -263,7 +263,7 @@ function isLinkWithChildren(link: GuardedLink | LinkWithChildren): link is LinkW
                 <q-select
                     :model-value="lang"
                     :options="langOptions"
-                    label="Language"
+                    :label="t('AppDrawer.languageSelectorLabel')"
                     dense
                     borderless
                     emit-value

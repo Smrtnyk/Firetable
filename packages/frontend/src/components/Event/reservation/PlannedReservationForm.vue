@@ -177,8 +177,16 @@ defineExpose({
 
         <!-- Selector for choosing between 'User' or 'Social' -->
         <div class="q-mb-md">
-            <q-radio v-model="selectionType" val="user" label="Staff" />
-            <q-radio v-model="selectionType" val="social" label="Social" />
+            <q-radio
+                v-model="selectionType"
+                val="user"
+                :label="t(`PlannedReservationForm.reservedByStaffRadioBtnLabel`)"
+            />
+            <q-radio
+                v-model="selectionType"
+                val="social"
+                :label="t(`EventCreateReservation.reservedBySocialLabel`)"
+            />
         </div>
 
         <!-- Select input for choosing the user or social -->

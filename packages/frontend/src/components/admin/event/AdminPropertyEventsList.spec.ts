@@ -1,6 +1,6 @@
 import type { EventDoc } from "@firetable/types";
 import AdminPropertyEventsList from "./AdminPropertyEventsList.vue";
-import { renderComponent } from "../../../../test-helpers/render-component";
+import { renderComponent, t } from "../../../../test-helpers/render-component";
 import { describe, it, expect, vi } from "vitest";
 import { userEvent, page } from "@vitest/browser/context";
 
@@ -54,9 +54,7 @@ describe("PageAdminEventsList", () => {
             done: false,
         });
 
-        expect
-            .element(page.getByText("There are no events created for this property."))
-            .toBeVisible();
+        expect.element(page.getByText(t("PageAdminEvents.noEventsMessage"))).toBeVisible();
     });
 
     it("displays events grouped by year and month", async () => {

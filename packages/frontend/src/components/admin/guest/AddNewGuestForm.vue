@@ -7,6 +7,7 @@ import { QForm } from "quasar";
 import TelNumberInput from "src/components/TelNumberInput/TelNumberInput.vue";
 import { hashString } from "src/helpers/hash-string";
 import { maskPhoneNumber } from "src/helpers/mask-phone-number";
+import { useI18n } from "vue-i18n";
 
 export interface AddNewGuestFormProps {
     mode: "create" | "edit";
@@ -18,6 +19,8 @@ export interface AddNewGuestFormProps {
 
 const { mode = "create", initialData } = defineProps<AddNewGuestFormProps>();
 const emit = defineEmits<(eventName: "create" | "update", payload: CreateGuestPayload) => void>();
+
+const { t } = useI18n();
 
 const guestName = ref("");
 const guestContact = ref("");
@@ -54,18 +57,24 @@ async function submit(): Promise<void> {
     <q-card-section>
         <q-form ref="createGuestForm" class="q-gutter-md" greedy>
             <q-input
-                label="Guest name"
+                :label="t('AddNewGuestForm.guestNameInputLabel')"
                 v-model="guestName"
                 rounded
                 standout
                 autofocus
                 :rules="guestNameRules"
             />
-            <TelNumberInput required v-model="guestContact" label="Guest Contact" />
+            <TelNumberInput required v-model="guestContact" />
         </q-form>
     </q-card-section>
 
     <q-card-actions align="right">
-        <q-btn rounded class="button-gradient" size="md" label="Submit" @click="submit" />
+        <q-btn
+            rounded
+            class="button-gradient"
+            size="md"
+            :label="t('Global.submit')"
+            @click="submit"
+        />
     </q-card-actions>
 </template>

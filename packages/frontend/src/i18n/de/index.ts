@@ -85,6 +85,7 @@ export default {
             darkMode: "Dunkelmodus umschalten",
             onlineStatus: "Online-Status umschalten",
         },
+        languageSelectorLabel: "Sprache",
     },
     EventCard: {
         freeLabel: "Kostenlos",
@@ -132,12 +133,16 @@ export default {
         noteLabel: "Notiz",
         reservedByLabel: "Reserviert von",
         createdByLabel: "Ersteller",
+        createdAtLabel: "Erstellt am",
         groupedWithLabel: "Gruppiert mit",
         guestArrivedLabel: "Angekommen",
         reservationConfirmedLabel: "Bestätigen",
         reservationConsumption: "Flaschenkonsum",
         timeLabel: "Ankunftszeit",
         waitingForResponse: "Warten auf Antwort",
+    },
+    PlannedReservationForm: {
+        reservedByStaffRadioBtnLabel: "Personal",
     },
     WalkInReservationForm: {
         optionalGuestNameLabel: "Name des Gastes (optional)",
@@ -155,18 +160,22 @@ export default {
         reservedBySocialLabel: "Soziale Netzwerke",
         reservationVIP: "VIP?",
     },
+    AddNewGuestForm: {
+        guestNameInputLabel: "Gastname *",
+    },
+    PageAdminGuest: {
+        editGuestConfirmMsg: "Sind Sie sicher, dass Sie den Gast {name} bearbeiten möchten?",
+        editGuestDialogTitle: "Gast bearbeiten: {name}",
+        deleteGuestConfirmTitle: "Gast löschen?",
+        deleteGuestConfirmMessage: "Sind Sie sicher, dass Sie den Gast {name} löschen möchten?",
+        noVisitsMessage: "Es gibt keine Besuche für diesen Gast.",
+    },
     PageAdminGuests: {
         title: "Gäste",
         noGuestsCreatedMessage: "Es wurden keine Gäste erstellt.",
         maxAmountGuestsCreationMessage:
             "Sie haben die maximale Anzahl an Gästen erreicht, welche {limit} beträgt!",
         createNewGuestDialogTitle: "Neuen Gast erstellen",
-        editGuestDialogTitle: "Gast bearbeiten: {name}",
-        editGuestConfirmationMessage:
-            "Sind Sie sicher, dass Sie den Gast {name} bearbeiten möchten?",
-        deleteGuestDialogTitle: "Gast löschen?",
-        deleteGuestConfirmationMessage:
-            "Sind Sie sicher, dass Sie den Gast {name} löschen möchten?",
     },
     PageAdminProperties: {
         properties: "Immobilien",
@@ -202,6 +211,7 @@ export default {
         deleteEventDialogTitle: "Veranstaltung löschen?",
         eventCreatedNotificationMessage: "Veranstaltung erstellt!",
         createNewEventDialogTitle: "Neue Veranstaltung erstellen",
+        editEventDialogTitle: "Veranstaltung bearbeiten: {eventName}",
     },
     PageAdminUsers: {
         title: "Benutzer",

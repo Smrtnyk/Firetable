@@ -90,7 +90,12 @@ function formatSubtitleForGuestVisit(visit: Visit): string {
 }
 
 async function editGuest(guestVal: GuestDoc): Promise<void> {
-    if (!(await showConfirm("Are you sure you want to edit this guest?"))) {
+    const shouldEdit = await showConfirm(
+        t("PageAdminGuest.editGuestConfirmMsg", {
+            name: guestVal.name,
+        }),
+    );
+    if (!shouldEdit) {
         return;
     }
 
@@ -103,7 +108,9 @@ async function editGuest(guestVal: GuestDoc): Promise<void> {
                 initialData: guestVal,
             },
             maximized: false,
-            title: "Edit guest",
+            title: t("PageAdminGuest.editGuestDialogTitle", {
+                name: guestVal.name,
+            }),
             listeners: {
                 update(updatedData: CreateGuestPayload) {
                     dialog.hide();
@@ -119,7 +126,11 @@ async function editGuest(guestVal: GuestDoc): Promise<void> {
 }
 
 async function onDeleteGuest(): Promise<void> {
-    if (!(await showConfirm(t("PageAdminGuests.deleteGuestConfirmationMessage")))) {
+    const shouldDelete = await showConfirm(
+        t("PageAdminGuest.deleteGuestConfirmTitle"),
+        t("PageAdminGuest.deleteGuestConfirmMessage"),
+    );
+    if (!shouldDelete) {
         return;
     }
 
@@ -137,7 +148,13 @@ async function onDeleteGuest(): Promise<void> {
         <div v-if="guest">
             <FTTitle :title="guest.name" :subtitle="guest.contact">
                 <template #right>
-                    <q-btn rounded icon="pencil" color="secondary" @click="editGuest(guest)" />
+                    <q-btn
+                        class="q-mr-sm"
+                        rounded
+                        icon="pencil"
+                        color="secondary"
+                        @click="editGuest(guest)"
+                    />
                     <q-btn rounded icon="trash" color="negative" @click="onDeleteGuest()" />
                 </template>
             </FTTitle>
@@ -178,7 +195,7 @@ async function onDeleteGuest(): Promise<void> {
                 </FTTabPanels>
             </div>
 
-            <FTCenteredText v-else> There are no visits recorded for this guest.</FTCenteredText>
+            <FTCenteredText v-else>{{ t("PageAdminGuest.noVisitsMessage") }}</FTCenteredText>
         </div>
     </div>
 </template>
