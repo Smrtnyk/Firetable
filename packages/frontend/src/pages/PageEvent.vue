@@ -40,7 +40,7 @@ import EventInfo from "src/components/Event/EventInfo.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import EventQueuedReservations from "src/components/Event/EventQueuedReservations.vue";
 import EventViewControls from "src/components/Event/EventViewControls.vue";
-import { TableOperationType } from "src/composables/useReservations";
+import { TableOperationType, useReservations } from "src/composables/useReservations";
 
 interface Props {
     organisationId: string;
@@ -101,16 +101,23 @@ const plannedReservations = computed(function () {
 });
 
 const {
-    initiateTableOperation,
-    onTableFound,
+    animateTables,
     setActiveFloor,
     isActiveFloor,
     mapFloorToCanvas,
-    onAutocompleteClear,
+    stopAllTableAnimations,
     hasMultipleFloorPlans,
     activeFloor,
     floorInstances,
-} = useFloorsPageEvent(eventFloors, reservations, pageRef, eventOwner, event, users);
+} = useFloorsPageEvent(eventFloors, pageRef);
+
+const { initiateTableOperation } = useReservations(
+    users,
+    reservations,
+    floorInstances,
+    eventOwner,
+    event,
+);
 
 function showEventInfo(): void {
     quasar.dialog({
@@ -206,8 +213,8 @@ onUnmounted(function () {
                 :floors="eventFloors"
                 :show-floor-name-in-option="hasMultipleFloorPlans"
                 :all-reserved-tables="plannedReservations"
-                @found="onTableFound"
-                @clear="onAutocompleteClear"
+                @found="animateTables"
+                @clear="stopAllTableAnimations"
                 class="q-mb-sm"
             >
                 <template #before>

@@ -1,19 +1,16 @@
 import type { Ref, ShallowRef } from "vue";
-import type { EventDoc, FloorDoc, Reservation, ReservationDoc, User } from "@firetable/types";
-import type { EventOwner } from "@firetable/backend";
-import type { VueFirestoreDocumentData } from "vuefire";
-import { FloorViewer, getTables } from "@firetable/floor-creator";
+import type { FloorDoc, Reservation } from "@firetable/types";
 import {
-    watch,
-    reactive,
     computed,
-    ref,
     nextTick,
-    onMounted,
     onBeforeUnmount,
+    onMounted,
+    reactive,
+    ref,
     shallowRef,
+    watch,
 } from "vue";
-import { useReservations } from "src/composables/useReservations";
+import { FloorViewer, getTables } from "@firetable/floor-creator";
 import { debounce } from "quasar";
 import { decompressFloorDoc } from "src/helpers/compress-floor-doc";
 import { isTouchDevice } from "src/helpers/is-touch-device";
@@ -21,25 +18,25 @@ import { AppLogger } from "src/logger/FTLogger.js";
 import { matchesProperty } from "es-toolkit/compat";
 
 type ActiveFloor = { id: string; name: string };
+type UseFloorsPageEvent = {
+    animateTables: (foundReservations: Reservation[]) => void;
+    stopAllTableAnimations: () => void;
+    mapFloorToCanvas: (floor: FloorDoc) => (element: any) => void;
+    isActiveFloor: (floorId: string) => boolean;
+    setActiveFloor: (floor?: ActiveFloor) => void;
+    resizeFloor: () => void;
+    hasMultipleFloorPlans: Ref<boolean>;
+    activeFloor: Ref<ActiveFloor | undefined>;
+    floorInstances: ShallowRef<FloorViewer[]>;
+};
 
-// eslint-disable-next-line @typescript-eslint/max-params -- FIXME fix this
 export function useFloorsPageEvent(
     eventFloors: Ref<FloorDoc[]>,
-    reservations: Ref<ReservationDoc[]>,
     pageRef: ShallowRef<HTMLDivElement | null>,
-    eventOwner: EventOwner,
-    event: Ref<VueFirestoreDocumentData<EventDoc> | undefined>,
-    users: Ref<User[]>,
-) {
+): UseFloorsPageEvent {
     const activeFloor = ref<ActiveFloor | undefined>();
     const floorInstances = shallowRef<FloorViewer[]>([]);
-    const { tableClickHandler, initiateTableOperation } = useReservations(
-        users,
-        reservations,
-        floorInstances,
-        eventOwner,
-        event,
-    );
+
     const canvases = reactive<Map<string, HTMLCanvasElement>>(new Map());
 
     const hasMultipleFloorPlans = computed(function () {
@@ -71,8 +68,8 @@ export function useFloorsPageEvent(
         });
     }, 100);
 
-    function onTableFound(foundReservations: Reservation[]): void {
-        onAutocompleteClear();
+    function animateTables(foundReservations: Reservation[]): void {
+        stopAllTableAnimations();
         // If it is only 1 table, we can set the active floor to that floor
         // but first check if current active floor is already the same floor
         const isSingleReservation = foundReservations.length === 1;
@@ -111,22 +108,21 @@ export function useFloorsPageEvent(
     }
 
     async function instantiateFloors(): Promise<void> {
-        await Promise.all(eventFloors.value.map(instantiateFloor));
+        const floors = await Promise.all(eventFloors.value.map(instantiateFloor));
+        floorInstances.value = floors.filter(Boolean) as FloorViewer[];
     }
 
-    function instantiateFloor(floorDoc: FloorDoc): void {
+    function instantiateFloor(floorDoc: FloorDoc): FloorViewer | undefined {
         const canvas = canvases.get(floorDoc.id);
 
         if (!canvas || !pageRef.value) {
             return;
         }
-        const floorViewer = new FloorViewer({
+        return new FloorViewer({
             canvas,
             floorDoc: decompressFloorDoc(floorDoc),
             containerWidth: pageRef.value.clientWidth,
         });
-        floorViewer.on("elementClicked", tableClickHandler);
-        floorInstances.value.push(floorViewer);
     }
 
     function isActiveFloor(floorId: string): boolean {
@@ -139,7 +135,7 @@ export function useFloorsPageEvent(
         }
     }
 
-    function onAutocompleteClear(): void {
+    function stopAllTableAnimations(): void {
         floorInstances.value.forEach(function (floor) {
             const tables = getTables(floor as FloorViewer);
             tables.forEach(function (table) {
@@ -149,9 +145,8 @@ export function useFloorsPageEvent(
     }
 
     return {
-        initiateTableOperation,
-        onTableFound,
-        onAutocompleteClear,
+        animateTables,
+        stopAllTableAnimations,
         mapFloorToCanvas,
         isActiveFloor,
         setActiveFloor,

@@ -32,6 +32,13 @@ export class FloorViewer extends Floor {
         this.eventEmitter.on(event, listener);
     }
 
+    off<T extends keyof FloorViewerEvents>(
+        event: T,
+        listener: (...args: FloorViewerEvents[T]) => void,
+    ): void {
+        this.eventEmitter.off(event, listener);
+    }
+
     onFloorDoubleTap(): void {
         /* empty for now */
     }

@@ -65,12 +65,6 @@ const enum GuestDataMode {
 
 type UseReservations = {
     initiateTableOperation: (operation: TableOperation) => void;
-    tableClickHandler: (
-        floor: FloorViewer,
-        element: FloorEditorElement | undefined,
-    ) => Promise<void>;
-    onDeleteReservation: (reservation: ReservationDoc) => Promise<void>;
-    handleReservationCreation: (reservationData: Reservation) => void;
 };
 
 export const enum TableOperationType {
@@ -231,6 +225,7 @@ export function useReservations(
         FloorViewer[],
     ]): void {
         checkIfReservedTableAndCloseCreateReservationDialog();
+        registerTableClickHandlers(newFloorInstances);
         for (const floor of newFloorInstances) {
             floor.clearAllReservations();
             for (const reservation of newReservations) {
@@ -243,6 +238,14 @@ export function useReservations(
             }
         }
         checkReservationsForTimeAndMarkTableIfNeeded();
+    }
+
+    function registerTableClickHandlers(floorInstancesArray: FloorViewer[]): void {
+        for (const floorViewer of floorInstancesArray) {
+            // De-register the old handler first
+            floorViewer.off("elementClicked", tableClickHandler);
+            floorViewer.on("elementClicked", tableClickHandler);
+        }
     }
 
     function setReservation(table: BaseTable, reservation: ReservationDoc): void {
@@ -860,10 +863,6 @@ export function useReservations(
 
     return {
         initiateTableOperation,
-        tableClickHandler,
-        // Used in unit test
-        onDeleteReservation,
-        handleReservationCreation,
     };
 }
 
