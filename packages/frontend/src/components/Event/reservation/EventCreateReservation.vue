@@ -146,7 +146,6 @@ async function onOKClick(): Promise<void> {
             class="button-gradient q-mt-md"
             @click="onOKClick"
             :label="t(`Global.submit`)"
-            data-test="ok-btn"
         />
     </q-card-section>
 </template>

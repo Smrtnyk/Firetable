@@ -92,7 +92,6 @@ defineExpose({
 <template>
     <q-form ref="reservationForm" class="q-gutter-md q-pt-md" greedy>
         <q-input
-            data-test="guest-name"
             v-model="state.guestName"
             rounded
             hide-bottom-space
@@ -190,7 +189,6 @@ defineExpose({
             option-value="email"
             :label="reservedByLabel"
             :rules="[requireReservedBySelection]"
-            data-test="reserved-by"
         />
     </q-form>
 </template>

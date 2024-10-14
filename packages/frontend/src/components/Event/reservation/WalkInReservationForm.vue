@@ -62,7 +62,6 @@ defineExpose({
 <template>
     <q-form ref="reservationForm" class="q-gutter-md q-pt-md">
         <q-input
-            data-test="guest-name"
             v-model="state.guestName"
             rounded
             hide-bottom-space
