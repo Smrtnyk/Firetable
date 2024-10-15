@@ -45,12 +45,14 @@ import { usePropertiesStore } from "src/stores/properties-store";
 import { AppLogger } from "src/logger/FTLogger.js";
 import { storeToRefs } from "pinia";
 import { matchesProperty } from "es-toolkit/compat";
-import { HALF_HOUR, ONE_MINUTE } from "src/constants";
+import { ONE_MINUTE } from "src/constants";
 import { useDialog } from "src/composables/useDialog";
 import { hashString } from "src/helpers/hash-string";
 import { maskPhoneNumber } from "src/helpers/mask-phone-number";
 import { plannedToQueuedReservation } from "src/helpers/reservation/planned-to-queued-reservation";
 import { queuedToPlannedReservation } from "src/helpers/reservation/queued-to-planned-reservation";
+import { shouldMarkReservationAsExpired } from "src/helpers/reservation/should-mark-reservation-as-expired";
+import { isEventInProgress } from "src/helpers/event/is-event-in-progress";
 
 type OpenDialog = {
     label: string;
@@ -887,23 +889,4 @@ export function useReservations(
     return {
         initiateTableOperation,
     };
-}
-
-function shouldMarkReservationAsExpired(reservationTime: string, eventDate: Date): boolean {
-    const currentDate = new Date();
-    const [hours, minutes] = reservationTime.split(":");
-    const eventDateTime = new Date(eventDate);
-    eventDateTime.setHours(Number.parseInt(hours), Number.parseInt(minutes));
-
-    if (hours.startsWith("0")) {
-        eventDateTime.setDate(eventDateTime.getDate() + 1);
-    }
-
-    return currentDate.getTime() - eventDateTime.getTime() >= HALF_HOUR;
-}
-
-function isEventInProgress(eventDate: number): boolean {
-    const currentDateInUTC = Date.now();
-
-    return currentDateInUTC >= eventDate;
 }
