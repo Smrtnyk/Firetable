@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import type { EventDoc, VoidFunction } from "@firetable/types";
+
 import PageAdminEventsListItem from "src/components/admin/event/PageAdminEventsListItem.vue";
-import { computed } from "vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
+
 import { useI18n } from "vue-i18n";
+import { computed } from "vue";
 
 interface Props {
     propertyId: string;
@@ -20,18 +22,28 @@ const props = defineProps<Props>();
 const eventsLength = computed(function () {
     return props.events.length;
 });
-const bucketizedEvents = computed(function () {
-    const bucketized = new Map<string, Map<string, EventDoc[]>>();
+const bucketizedEvents = computed(() => {
+    const upcomingEvents = new Map<string, Map<string, EventDoc[]>>();
+    const pastEvents = new Map<string, Map<string, EventDoc[]>>();
+    const now = new Date();
 
     for (const event of props.events) {
-        const date = new Date(event.date);
-        const year = date.getUTCFullYear().toString();
-        const month = date.toLocaleString(locale.value, { month: "long", timeZone: "UTC" });
+        const eventDate = new Date(event.date);
+        const isPastEvent = eventDate < now;
 
-        let yearMap = bucketized.get(year);
+        // Decide which bucket to put the event in
+        const targetBucket = isPastEvent ? pastEvents : upcomingEvents;
+
+        const year = eventDate.getUTCFullYear().toString();
+        const month = eventDate.toLocaleString(locale.value, {
+            month: "long",
+            timeZone: "UTC",
+        });
+
+        let yearMap = targetBucket.get(year);
         if (!yearMap) {
             yearMap = new Map();
-            bucketized.set(year, yearMap);
+            targetBucket.set(year, yearMap);
         }
 
         let monthEvents = yearMap.get(month);
@@ -43,7 +55,18 @@ const bucketizedEvents = computed(function () {
         monthEvents.push(event);
     }
 
-    return bucketized;
+    return {
+        upcomingEvents,
+        pastEvents,
+    };
+});
+
+const hasUpcomingEvents = computed(() => {
+    return bucketizedEvents.value.upcomingEvents.size > 0;
+});
+
+const hasPastEvents = computed(() => {
+    return bucketizedEvents.value.pastEvents.size > 0;
 });
 
 function handleLoad(): void {
@@ -67,25 +90,66 @@ function emitEdit(event: EventDoc, reset: VoidFunction): void {
             {{ t("PageAdminEvents.noEventsMessage") }}
         </FTCenteredText>
         <template v-else>
-            <div v-for="[year, yearBuckets] in [...bucketizedEvents.entries()]" :key="year">
-                <p>
-                    <b>{{ year }}</b>
-                </p>
-
+            <!-- Upcoming Events -->
+            <div v-if="hasUpcomingEvents">
                 <div
-                    class="q-mb-sm"
-                    v-for="[month, monthEvents] in [...yearBuckets.entries()]"
-                    :key="month"
+                    v-for="[year, yearBuckets] in [...bucketizedEvents.upcomingEvents.entries()]"
+                    :key="'upcoming-' + year"
                 >
-                    <p>{{ month }}</p>
+                    <p>
+                        <b>{{ year }}</b>
+                    </p>
 
-                    <PageAdminEventsListItem
-                        v-for="event in monthEvents"
-                        :key="event.id"
-                        :event="event"
-                        @right="({ reset }) => emitDelete(event, reset)"
-                        @left="({ reset }) => emitEdit(event, reset)"
-                    />
+                    <div
+                        class="q-mb-sm"
+                        v-for="[month, monthEvents] in [...yearBuckets.entries()]"
+                        :key="month"
+                    >
+                        <p>{{ month }}</p>
+
+                        <PageAdminEventsListItem
+                            v-for="event in monthEvents"
+                            :key="event.id"
+                            :event="event"
+                            @right="({ reset }) => emitDelete(event, reset)"
+                            @left="({ reset }) => emitEdit(event, reset)"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Past Events Marker -->
+            <div v-if="hasPastEvents">
+                <p>
+                    <b>{{ t("PageAdminEvents.pastEventsLabel") }}</b>
+                </p>
+            </div>
+
+            <!-- Past Events -->
+            <div v-if="hasPastEvents">
+                <div
+                    v-for="[year, yearBuckets] in [...bucketizedEvents.pastEvents.entries()]"
+                    :key="'past-' + year"
+                >
+                    <p>
+                        <b>{{ year }}</b>
+                    </p>
+
+                    <div
+                        class="q-mb-sm"
+                        v-for="[month, monthEvents] in [...yearBuckets.entries()]"
+                        :key="month"
+                    >
+                        <p>{{ month }}</p>
+
+                        <PageAdminEventsListItem
+                            v-for="event in monthEvents"
+                            :key="event.id"
+                            :event="event"
+                            @right="({ reset }) => emitDelete(event, reset)"
+                            @left="({ reset }) => emitEdit(event, reset)"
+                        />
+                    </div>
                 </div>
             </div>
 

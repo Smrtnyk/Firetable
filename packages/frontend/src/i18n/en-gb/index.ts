@@ -203,6 +203,7 @@ export default {
     PageAdminEvents: {
         title: "Events",
         noPropertiesMessage: "There are no properties created, cannot create events.",
+        pastEventsLabel: "Past Events",
         noEventsMessage: "There are no events created.",
         deleteEventDialogTitle: "Delete Event?",
         eventCreatedNotificationMessage: "Event created!",
