@@ -101,7 +101,13 @@ function showReservation(reservation: QueuedReservationDoc): void {
 </script>
 
 <template>
-    <q-drawer no-swipe-open v-model="eventsStore.showQueuedReservationsDrawer">
+    <q-drawer
+        no-swipe-open
+        v-model="eventsStore.showQueuedReservationsDrawer"
+        overlay
+        behavior="mobile"
+        side="left"
+    >
         <div class="EventQueuedReservations">
             <FTTitle :title="t('EventQueuedReservations.title')">
                 <template #right>
