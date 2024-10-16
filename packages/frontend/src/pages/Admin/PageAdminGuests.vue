@@ -13,6 +13,7 @@ import FTCenteredText from "src/components/FTCenteredText.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import { matchesProperty } from "es-toolkit/compat";
 import { useDialog } from "src/composables/useDialog";
+import { computed } from "vue";
 
 interface Props {
     organisationId: string;
@@ -25,6 +26,18 @@ const { data: guests } = useFirestoreCollection<GuestDoc>(getGuestsPath(props.or
     wait: true,
 });
 const { properties } = storeToRefs(usePropertiesStore());
+
+const sortedGuests = computed(() => {
+    if (!guests.value) {
+        return [];
+    }
+    return [...guests.value].sort(function (a, b) {
+        const aVisits = getGuestVisitsCount(a);
+        const bVisits = getGuestVisitsCount(b);
+        // Sort in descending order
+        return bVisits - aVisits;
+    });
+});
 
 function showCreateGuestDialog(): void {
     const dialog = createDialog({
@@ -66,6 +79,15 @@ function guestVisitsToReadable(guest: GuestDoc): string {
     });
     return res.join(", ");
 }
+
+function getGuestVisitsCount(guest: GuestDoc): number {
+    if (!guest.visitedProperties) {
+        return 0;
+    }
+    return Object.values(guest.visitedProperties).reduce((sum, visits) => {
+        return sum + Object.values(visits).filter(Boolean).length;
+    }, 0);
+}
 </script>
 
 <template>
@@ -76,9 +98,9 @@ function guestVisitsToReadable(guest: GuestDoc): string {
             </template>
         </FTTitle>
 
-        <q-list v-if="guests.length > 0">
+        <q-list v-if="sortedGuests.length > 0">
             <q-item
-                v-for="guest in guests"
+                v-for="guest in sortedGuests"
                 :key="guest.contact"
                 clickable
                 class="bg-dark"
