@@ -36,6 +36,8 @@ const europeanCountries: Country[] = [
     { name: "United Kingdom", iso2: "gb", dialCode: "44", flag: "https://flagcdn.com/gb.svg" },
     { name: "Serbia", iso2: "rs", dialCode: "381", flag: "https://flagcdn.com/rs.svg" },
     { name: "Bosnia", iso2: "ba", dialCode: "387", flag: "https://flagcdn.com/ba.svg" },
+    { name: "North Macedonia", iso2: "mk", dialCode: "389", flag: "https://flagcdn.com/mk.svg" },
+    { name: "United Kingdom", iso2: "uk", dialCode: "44", flag: "https://flagcdn.com/gb.svg" },
 ];
 
 export default europeanCountries;
