@@ -90,11 +90,11 @@ describe("PageAdminGuests.vue", () => {
         const screen = render();
 
         await expect.element(screen.getByText(t("PageAdminGuests.title"))).toBeInTheDocument();
-        await expect.element(screen.getByText("John Doe - john@example.com")).toBeInTheDocument();
+        await expect.element(screen.getByText("John Doe")).toBeInTheDocument();
         await expect
             .element(screen.getByText("Property One visits: 2, Property Two visits: 1"))
             .toBeInTheDocument();
-        await expect.element(screen.getByText("Jane Smith - jane@example.com")).toBeInTheDocument();
+        await expect.element(screen.getByText("Jane Smith")).toBeInTheDocument();
         await expect.element(screen.getByText("Property One visits: 1")).toBeInTheDocument();
     });
 
@@ -105,9 +105,9 @@ describe("PageAdminGuests.vue", () => {
         expect(guestItems.elements()).toHaveLength(2);
 
         // First guest should be John Doe (3 visits)
-        expect(guestItems.elements()[0]).toHaveTextContent("John Doe - john@example.com");
+        expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
         // Second guest should be Jane Smith (1 visit)
-        expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith - jane@example.com");
+        expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
     });
 
     it("shows 'No guests data' when there are no guests", async () => {

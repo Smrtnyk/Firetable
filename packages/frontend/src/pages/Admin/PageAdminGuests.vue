@@ -109,7 +109,6 @@ function getGuestVisitsCount(guest: GuestDoc): number {
                 v-for="guest in sortedGuests"
                 :key="guest.contact"
                 clickable
-                class="bg-dark"
                 :to="{
                     name: 'adminGuest',
                     params: {
@@ -119,8 +118,15 @@ function getGuestVisitsCount(guest: GuestDoc): number {
                 }"
             >
                 <q-item-section>
-                    <q-item-label>{{ guest.name }} - {{ guest.contact }}</q-item-label>
-                    <q-item-label caption>{{ guestVisitsToReadable(guest) }}</q-item-label>
+                    <q-item-label>
+                        {{ guest.name }}
+                    </q-item-label>
+                    <q-item-label caption>
+                        <div class="row">
+                            <span v-if="guest.maskedContact">{{ guest.maskedContact }}</span
+                            ><q-space /> {{ guestVisitsToReadable(guest) }}
+                        </div>
+                    </q-item-label>
                 </q-item-section>
             </q-item>
         </q-list>
