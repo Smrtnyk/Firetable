@@ -15,13 +15,13 @@ import { matchesProperty } from "es-toolkit/compat";
 import { useDialog } from "src/composables/useDialog";
 import { computed } from "vue";
 
-interface Props {
+export interface PageAdminGuestsProps {
     organisationId: string;
 }
 
 const { createDialog } = useDialog();
 const { t } = useI18n();
-const props = defineProps<Props>();
+const props = defineProps<PageAdminGuestsProps>();
 const { data: guests } = useFirestoreCollection<GuestDoc>(getGuestsPath(props.organisationId), {
     wait: true,
 });
@@ -94,7 +94,13 @@ function getGuestVisitsCount(guest: GuestDoc): number {
     <div class="PageAdminUsers">
         <FTTitle :title="t('PageAdminGuests.title')">
             <template #right>
-                <q-btn rounded icon="plus" class="button-gradient" @click="showCreateGuestDialog" />
+                <q-btn
+                    rounded
+                    icon="plus"
+                    class="button-gradient"
+                    @click="showCreateGuestDialog"
+                    aria-label="Add new guest"
+                />
             </template>
         </FTTitle>
 
