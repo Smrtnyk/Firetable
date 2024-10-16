@@ -48,7 +48,7 @@ const availableRoles = computed(function () {
     return availableRolesBasedOn(currUserRole.value);
 });
 const emailSuffix = computed(function () {
-    return `@${props.organisation.name}.at`;
+    return `@${props.organisation.name}.org`;
 });
 const shouldShowPropertiesSelection = computed(function () {
     return props.properties.length > 0 && form.value.role !== Role.PROPERTY_OWNER;

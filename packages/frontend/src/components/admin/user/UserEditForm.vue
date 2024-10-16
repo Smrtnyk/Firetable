@@ -61,7 +61,7 @@ const isEditableRole = computed(function () {
 });
 
 const emailSuffix = computed(function () {
-    return `@${props.organisation.name}.at`;
+    return `@${props.organisation.name}.org`;
 });
 
 // Store custom capabilities per role

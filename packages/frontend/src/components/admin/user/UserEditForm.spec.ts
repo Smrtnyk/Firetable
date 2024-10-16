@@ -15,7 +15,7 @@ describe("UserEditForm", () => {
             user: {
                 id: "user1",
                 name: "John Doe",
-                email: "johndoe@TestOrg.at",
+                email: "johndoe@TestOrg.org",
                 username: "johndoe",
                 role: Role.STAFF,
                 relatedProperties: ["property1"],
@@ -132,7 +132,7 @@ describe("UserEditForm", () => {
             username: "janedoe",
             password: "newpassword123",
             role: Role.MANAGER,
-            email: "janedoe@TestOrg.at",
+            email: "janedoe@TestOrg.org",
             relatedProperties: ["property1", "property2"],
         });
     });
@@ -341,7 +341,7 @@ describe("UserEditForm", () => {
 
         expect(screen.emitted().submit).toBeTruthy();
         const [emittedPayload] = first(screen.emitted().submit as any[]);
-        expect(emittedPayload.email).toBe("newusername@TestOrg.at");
+        expect(emittedPayload.email).toBe("newusername@TestOrg.org");
     });
 
     it("updates the email suffix based on the organisation name in the emitted payload", async () => {
@@ -356,7 +356,7 @@ describe("UserEditForm", () => {
 
         expect(screen.emitted().submit).toBeTruthy();
         const [emittedPayload] = first(screen.emitted().submit as any[]);
-        expect(emittedPayload.email).toBe("newusername@DifferentOrg.at");
+        expect(emittedPayload.email).toBe("newusername@DifferentOrg.org");
     });
 
     it("emits updated relatedProperties when properties selection is modified", async () => {

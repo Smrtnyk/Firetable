@@ -163,8 +163,8 @@ describe("UserCreateForm", () => {
             username: "testuser",
             password: "Passwor!d123",
             role: Role.MANAGER,
-            // emailSuffix is '@TestOrg.at'
-            email: "testuser@TestOrg.at",
+            // emailSuffix is '@TestOrg.org'
+            email: "testuser@TestOrg.org",
             organisationId: "org1",
             relatedProperties: ["property1"],
         });
@@ -394,8 +394,8 @@ describe("UserCreateForm", () => {
             username: "testuser",
             password: "Password123!",
             role: Role.MANAGER,
-            // emailSuffix is '@TestOrg.at'
-            email: "testuser@TestOrg.at",
+            // emailSuffix is '@TestOrg.org'
+            email: "testuser@TestOrg.org",
             organisationId: "org1",
             relatedProperties: ["property1"],
         });
