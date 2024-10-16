@@ -20,7 +20,7 @@ import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 
-interface Props {
+export interface PageAdminGuestProps {
     organisationId: string;
     guestId: string;
 }
@@ -35,10 +35,11 @@ const router = useRouter();
 const { createDialog } = useDialog();
 const { properties } = storeToRefs(usePropertiesStore());
 const { t } = useI18n();
-const { organisationId, guestId } = defineProps<Props>();
+const { organisationId, guestId } = defineProps<PageAdminGuestProps>();
 const { data: guest } = useFirestoreDocument<GuestDoc>(getGuestPath(organisationId, guestId), {
     once: true,
 });
+
 const tab = ref("");
 const propertiesVisits = computed(function () {
     const visitsByProperty: VisitsByProperty = {};
@@ -159,8 +160,15 @@ async function onDeleteGuest(): Promise<void> {
                         icon="pencil"
                         color="secondary"
                         @click="editGuest(guest)"
+                        aria-label="Edit guest"
                     />
-                    <q-btn rounded icon="trash" color="negative" @click="onDeleteGuest()" />
+                    <q-btn
+                        rounded
+                        icon="trash"
+                        color="negative"
+                        @click="onDeleteGuest()"
+                        aria-label="Delete guest"
+                    />
                 </template>
             </FTTitle>
 
@@ -188,7 +196,7 @@ async function onDeleteGuest(): Promise<void> {
                                 :subtitle="formatSubtitleForGuestVisit(visit)"
                             >
                                 <div class="row">
-                                    <span>
+                                    <span id="visit-event-name">
                                         {{ visit.eventName }}
                                     </span>
                                     <q-space />

@@ -1,0 +1,232 @@
+import type { RenderResult } from "vitest-browser-vue";
+import type { GuestDoc, PropertyDoc } from "@firetable/types";
+import type { PageAdminGuestProps } from "./PageAdminGuest.vue";
+import PageAdminGuest from "./PageAdminGuest.vue";
+import { renderComponent, t } from "../../../test-helpers/render-component";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { userEvent } from "@vitest/browser/context";
+import FTDialog from "src/components/FTDialog.vue";
+import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
+import { ref } from "vue";
+
+const { createDialogSpy, showConfirmMock, useFirestoreDocumentMock, tryCatchLoadingWrapperSpy } =
+    vi.hoisted(() => ({
+        createDialogSpy: vi.fn(),
+        showConfirmMock: vi.fn(),
+        useFirestoreDocumentMock: vi.fn(),
+        tryCatchLoadingWrapperSpy: vi.fn(),
+    }));
+
+vi.mock("src/composables/useDialog", () => ({
+    useDialog: () => ({
+        createDialog: createDialogSpy,
+    }),
+}));
+
+vi.mock("src/composables/useFirestore", () => ({
+    useFirestoreDocument: useFirestoreDocumentMock,
+    useFirestoreCollection: vi.fn(),
+    createQuery: vi.fn(),
+}));
+
+vi.mock("src/helpers/ui-helpers", async function (importOriginal) {
+    return {
+        ...(await importOriginal()),
+        showConfirm: showConfirmMock,
+        tryCatchLoadingWrapper: tryCatchLoadingWrapperSpy,
+    };
+});
+
+describe("PageAdminGuest.vue", () => {
+    let guestData: GuestDoc;
+    let propertiesData: PropertyDoc[];
+
+    beforeEach(() => {
+        guestData = {
+            id: "guest1",
+            name: "John Doe",
+            contact: "john@example.com",
+            hashedContact: "hashedContact",
+            maskedContact: "maskedContact",
+            visitedProperties: {
+                property1: {
+                    visit1: {
+                        date: new Date("2023-10-05T10:00:00Z").getTime(),
+                        eventName: "Event A",
+                        arrived: true,
+                        cancelled: false,
+                        isVIPVisit: true,
+                    },
+                    visit2: {
+                        date: new Date("2023-10-03T15:30:00Z").getTime(),
+                        eventName: "Event B",
+                        arrived: false,
+                        cancelled: false,
+                        isVIPVisit: false,
+                    },
+                },
+                property2: {
+                    visit3: {
+                        date: new Date("2023-09-15T20:00:00Z").getTime(),
+                        eventName: "Event C",
+                        arrived: false,
+                        cancelled: true,
+                        isVIPVisit: false,
+                    },
+                },
+            },
+        } as GuestDoc;
+
+        propertiesData = [
+            { id: "property1", name: "Property One" } as PropertyDoc,
+            { id: "property2", name: "Property Two" } as PropertyDoc,
+        ];
+
+        useFirestoreDocumentMock.mockReturnValue({
+            data: ref(guestData),
+        });
+    });
+
+    function render(
+        props = { organisationId: "org1", guestId: "guest1" },
+    ): RenderResult<PageAdminGuestProps> {
+        return renderComponent(PageAdminGuest, props, {
+            piniaStoreOptions: {
+                initialState: {
+                    properties: {
+                        properties: propertiesData,
+                    },
+                },
+                stubActions: true,
+            },
+        });
+    }
+
+    it("renders guest information correctly", async () => {
+        const screen = render();
+
+        await expect.element(screen.getByText("John Doe")).toBeInTheDocument();
+        await expect.element(screen.getByText("john@example.com")).toBeInTheDocument();
+    });
+
+    it("renders visits sorted by date in descending order", () => {
+        render();
+
+        // Get the list of visit event names
+        const visitEventNames = Array.from(document.querySelectorAll("#visit-event-name")).map(
+            (element) => element.textContent,
+        );
+
+        // Expected order: Most recent visit first and on first property tab
+        expect(visitEventNames).toStrictEqual(["Event A", "Event B"]);
+    });
+
+    it("renders VIP chip for VIP visits", async () => {
+        const screen = render();
+
+        const vipChip = screen.getByText("VIP");
+        await expect.element(vipChip).toBeVisible();
+
+        // Verify that the VIP chip is associated with the correct visit
+        const vipVisitEventName = screen.getByText("Event A");
+        await expect
+            .element(vipVisitEventName.element()!.closest(".q-timeline__content")!)
+            .toContainElement(vipChip.element() as HTMLElement);
+    });
+
+    it("shows 'No visits' message when guest has no visits", async () => {
+        guestData.visitedProperties = {};
+        useFirestoreDocumentMock.mockReturnValue({
+            data: {
+                value: guestData,
+            },
+        });
+
+        const screen = render();
+
+        await expect
+            .element(screen.getByText(t("PageAdminGuest.noVisitsMessage")))
+            .toBeInTheDocument();
+    });
+
+    it("opens edit guest dialog when edit button is clicked", async () => {
+        showConfirmMock.mockResolvedValue(true);
+        const screen = render();
+        const editButton = screen.getByLabelText("Edit guest");
+        await userEvent.click(editButton);
+
+        expect(createDialogSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                component: FTDialog,
+                componentProps: expect.objectContaining({
+                    component: AddNewGuestForm,
+                    componentPropsObject: expect.objectContaining({
+                        mode: "edit",
+                        initialData: guestData,
+                    }),
+                    maximized: false,
+                    title: t("PageAdminGuest.editGuestDialogTitle", {
+                        name: guestData.name,
+                    }),
+                    listeners: expect.any(Object),
+                }),
+            }),
+        );
+    });
+
+    it("asks for confirmation before deleting guest", async () => {
+        const screen = render();
+
+        showConfirmMock.mockResolvedValue(true);
+
+        const deleteButton = screen.getByLabelText("Delete guest");
+        await userEvent.click(deleteButton);
+
+        expect(showConfirmMock).toHaveBeenCalledWith(
+            t("PageAdminGuest.deleteGuestConfirmTitle"),
+            t("PageAdminGuest.deleteGuestConfirmMessage"),
+        );
+        expect(tryCatchLoadingWrapperSpy).toHaveBeenCalled();
+    });
+
+    it("does not delete guest if confirmation is cancelled", async () => {
+        const screen = render();
+
+        showConfirmMock.mockResolvedValue(false);
+
+        const deleteButton = screen.getByLabelText("Delete guest");
+        await userEvent.click(deleteButton);
+
+        expect(showConfirmMock).toHaveBeenCalled();
+        expect(tryCatchLoadingWrapperSpy).not.toHaveBeenCalled();
+    });
+
+    it("switches tabs when a different property is selected", async () => {
+        const screen = render();
+
+        // By default, the first property tab should be selected
+        const activeTab = screen.getByRole("tab", { selected: true });
+        await expect.element(activeTab).toHaveTextContent("Property One");
+
+        // Click on the second property tab
+        const propertyTwoTab = screen.getByText("Property Two");
+        await userEvent.click(propertyTwoTab);
+
+        // Now the active tab should be "Property Two"
+        const newActiveTab = screen.getByRole("tab", { selected: true });
+        await expect.element(newActiveTab).toHaveTextContent("Property Two");
+
+        // Verify that the visits for Property Two are displayed
+        await expect.element(screen.getByText("Event C")).toBeInTheDocument();
+    });
+
+    it("shows formatted visit dates", () => {
+        render();
+
+        const formattedDates = Array.from(document.querySelectorAll(".q-timeline__subtitle")).map(
+            (element) => element.textContent,
+        );
+
+        expect(formattedDates).toEqual(["05.10.2023, 10:00:00", "03.10.2023, 15:30:00"]);
+    });
+});
