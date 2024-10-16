@@ -159,7 +159,7 @@ function onWaitingForResponse(): void {
         <q-separator class="q-mb-md" />
 
         <q-item class="q-pa-sm-none q-pa-xs-none">
-            <div class="row q-gutter-sm full-width">
+            <div class="row q-gutter-sm">
                 <q-btn
                     v-if="canDeleteReservation"
                     :title="t('Global.delete')"
@@ -186,10 +186,8 @@ function onWaitingForResponse(): void {
                     v-close-popup
                 />
             </div>
-            <div
-                v-if="authStore.canReserve && !isCancelled"
-                class="row q-gutter-sm full-width justify-end"
-            >
+            <q-space />
+            <div v-if="authStore.canReserve && !isCancelled" class="row q-gutter-sm justify-end">
                 <q-btn
                     :title="t('Global.transfer')"
                     icon="transfer"
