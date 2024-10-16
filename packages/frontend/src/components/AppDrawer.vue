@@ -90,6 +90,12 @@ const links = computed<(GuardedLink | LinkWithChildren)[]>(function () {
             isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
         },
         {
+            icon: "users-list",
+            route: { name: "adminGuests", params: { organisationId } },
+            label: t("AppDrawer.links.manageGuests"),
+            isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
+        },
+        {
             icon: "line-chart",
             route: { name: "adminAnalytics", params: { organisationId } },
             label: t("AppDrawer.links.manageAnalytics"),

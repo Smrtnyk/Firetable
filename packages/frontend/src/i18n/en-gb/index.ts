@@ -73,10 +73,10 @@ export default {
             manageEvents: "Manage Events",
             manageFloors: "Manage Floors",
             manageUsers: "Manage Users",
+            manageGuests: "Guestbook",
             manageProperties: "Manage Properties",
             manageOrganisations: "Manage Organisations",
             manageAnalytics: "Manage Analytics",
-            manageGuests: "Manage Guests",
             settings: "Settings",
         },
         toggles: {

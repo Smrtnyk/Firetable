@@ -75,10 +75,10 @@ export default {
             manageEvents: "Veranstaltungen verwalten",
             manageFloors: "Grundrisse verwalten",
             manageUsers: "Benutzer verwalten",
+            manageGuests: "Gäste verwalten",
             manageProperties: "Immobilien verwalten",
             manageOrganisations: "Organisationen verwalten",
             manageAnalytics: "Analytics verwalten",
-            manageGuests: "Gäste verwalten",
             settings: "Einstellungen",
         },
         toggles: {
