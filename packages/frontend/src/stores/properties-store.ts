@@ -1,12 +1,13 @@
 import type {
+    DeepRequired,
     OrganisationDoc,
     OrganisationSettings,
     PropertyDoc,
     User,
-    DeepRequired,
 } from "@firetable/types";
 import type { noop } from "es-toolkit";
 import { Role } from "@firetable/types";
+import { merge } from "es-toolkit";
 import { defineStore } from "pinia";
 import {
     fetchOrganisationById,
@@ -15,9 +16,8 @@ import {
     propertiesCollection,
 } from "@firetable/backend";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
-import { query, where, documentId } from "firebase/firestore";
+import { documentId, query, where } from "firebase/firestore";
 import { nextTick, ref, watch } from "vue";
-import { merge } from "es-toolkit";
 import { matchesProperty } from "es-toolkit/compat";
 
 export const DEFAULT_ORGANISATION_SETTINGS: DeepRequired<OrganisationSettings> = {
@@ -118,7 +118,7 @@ export const usePropertiesStore = defineStore("properties", function () {
         organisationId,
         relatedProperties,
     }: Pick<User, "organisationId" | "relatedProperties" | "role">): Promise<void> {
-        if (relatedProperties.length === 0) {
+        if (role !== Role.PROPERTY_OWNER && relatedProperties.length === 0) {
             setProperties([]);
             return;
         }
