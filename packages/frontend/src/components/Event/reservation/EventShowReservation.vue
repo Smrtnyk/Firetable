@@ -158,7 +158,7 @@ function onWaitingForResponse(): void {
 
         <q-separator class="q-mb-md" />
 
-        <q-item>
+        <q-item class="q-pa-sm-none q-pa-xs-none">
             <div class="row q-gutter-sm full-width">
                 <q-btn
                     v-if="canDeleteReservation"
