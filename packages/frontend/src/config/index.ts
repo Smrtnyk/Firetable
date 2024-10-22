@@ -54,6 +54,8 @@ export const myIcons: Record<string, string> = {
     bookmark: "svguse:/svg-icons/ft-icons.svg#bookmark",
     "users-list": "svguse:/svg-icons/ft-icons.svg#users-list",
     list: "svguse:/svg-icons/ft-icons.svg#list",
+    "dashed-outline": "svguse:/svg-icons/ft-icons.svg#dashed-outline",
+    fill: "svguse:/svg-icons/ft-icons.svg#fill",
 };
 
 export function getDarkMode(): boolean {
