@@ -1,5 +1,5 @@
 import type { FabricObject, GroupProps } from "fabric";
-import { FloorElementTypes } from "../types.js";
+import { type FloorEditorElement, FloorElementTypes } from "../types.js";
 import { ELEMENT_DEFAULT_FILL_COLOR } from "../constants.js";
 import { Group, LayoutManager, Rect } from "fabric";
 
@@ -9,7 +9,7 @@ type SofaGroupCreationOpts = Partial<GroupProps> & {
     objects?: FabricObject[];
 };
 
-export class Sofa extends Group {
+export class Sofa extends Group implements FloorEditorElement {
     static override readonly type = FloorElementTypes.SOFA;
     sofaBase: Rect;
 

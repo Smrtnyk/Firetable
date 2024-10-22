@@ -1,4 +1,5 @@
 import type { CircleProps, FabricObject, GroupProps, RectProps } from "fabric";
+import type { FloorEditorElement } from "../types.js";
 import { FONT_SIZE, TABLE_TEXT_FILL_COLOR } from "../constants.js";
 import { Group, Rect, Circle, IText } from "fabric";
 
@@ -10,7 +11,7 @@ interface EditableShapeOptions<S extends Editable> {
     text: string;
 }
 
-export class EditableShape extends Group {
+export class EditableShape extends Group implements FloorEditorElement {
     label = "";
     private readonly textObj: IText;
     private readonly shape: FabricObject;

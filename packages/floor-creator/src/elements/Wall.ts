@@ -1,5 +1,5 @@
 import type { GroupProps } from "fabric";
-import { FloorElementTypes } from "../types.js";
+import { type FloorEditorElement, FloorElementTypes } from "../types.js";
 import { ELEMENT_DEFAULT_FILL_COLOR } from "../constants.js";
 import { Group, LayoutManager, Rect } from "fabric";
 
@@ -9,7 +9,7 @@ type WalLGroupCreationOptions = Partial<GroupProps> & {
     top: number;
 };
 
-export class Wall extends Group {
+export class Wall extends Group implements FloorEditorElement {
     static override readonly type = FloorElementTypes.WALL;
     wallRect: Rect;
 

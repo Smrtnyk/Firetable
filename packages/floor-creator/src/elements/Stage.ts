@@ -1,6 +1,7 @@
+import type { FloorEditorElement } from "../types.js";
 import { Group, Rect, FabricText, Circle } from "fabric";
 
-export class Stage extends Group {
+export class Stage extends Group implements FloorEditorElement {
     constructor(left: number, top: number) {
         const stageBody = new Rect({
             left: 0,
@@ -51,9 +52,6 @@ export class Stage extends Group {
             left,
             top,
         });
-
-        // Ensure this is always in the background
-        // this.moveTo(-1);
     }
 
     getBaseFill(): string {

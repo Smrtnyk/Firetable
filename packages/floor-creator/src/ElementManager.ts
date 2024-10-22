@@ -74,7 +74,7 @@ export class ElementManager {
     }
 
     private addDoor({ x, y }: CreateElementOptions): Door {
-        return new Door(x, y);
+        return new Door({ left: x, top: y });
     }
 
     private addWall({ x, y }: CreateElementOptions): Wall {

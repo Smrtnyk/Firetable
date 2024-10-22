@@ -1,9 +1,6 @@
 import type { RectTable } from "./elements/RectTable.js";
 import type { RoundTable } from "./elements/RoundTable.js";
-import type { Sofa } from "./elements/Sofa.js";
-import type { DJBooth } from "./elements/DJBooth.js";
-import type { Stage } from "./elements/Stage.js";
-import type { SpiralStaircase } from "./elements/SpiralStaircase.js";
+import type { FabricObject } from "fabric";
 
 export interface FloorCreationOptions {
     canvas: HTMLCanvasElement;
@@ -20,7 +17,14 @@ export interface FloorData {
 }
 
 export type BaseTable = RectTable | RoundTable;
-export type FloorEditorElement = DJBooth | RectTable | RoundTable | Sofa | SpiralStaircase | Stage;
+
+export interface FloorEditorElement extends FabricObject {
+    flip?(): void;
+
+    getBaseFill(): string;
+    setBaseFill(fill: string): void;
+}
+
 export type CreateElementOptions = {
     label?: string;
     x: number;

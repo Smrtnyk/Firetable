@@ -1,5 +1,6 @@
 import type { GroupProps, Rect, FabricText, Circle } from "fabric";
 import type { AnimationStrategy } from "./animation/AnimationStrategy.js";
+import type { FloorEditorElement } from "../types.js";
 import { SmoothBlinkAnimation } from "./animation/SmoothBlinkAnimation.js";
 import { TABLE_WIDTH, TABLE_HEIGHT } from "../constants.js";
 import { Group, LayoutManager } from "fabric";
@@ -15,7 +16,7 @@ interface TableElementOptions {
     shapeOptions: Record<string, unknown>;
 }
 
-export abstract class Table extends Group {
+export abstract class Table extends Group implements FloorEditorElement {
     label: string;
     baseFill: string;
     private readonly initialWidth: number;

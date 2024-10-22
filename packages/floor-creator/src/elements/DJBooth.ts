@@ -1,6 +1,7 @@
+import type { FloorEditorElement } from "../types.js";
 import { Circle, Group, Rect, FabricText } from "fabric";
 
-export class DJBooth extends Group {
+export class DJBooth extends Group implements FloorEditorElement {
     constructor(left: number, top: number) {
         const body = new Rect({
             left: 0,
