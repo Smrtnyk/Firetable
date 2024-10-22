@@ -1,10 +1,5 @@
 <script setup lang="ts">
-import type {
-    BaseTable,
-    FloorEditor,
-    FloorEditorElement,
-    FloorElementTypes,
-} from "@firetable/floor-creator";
+import type { FloorEditor, FloorEditorElement, FloorElementTypes } from "@firetable/floor-creator";
 import { MAX_FLOOR_HEIGHT, MAX_FLOOR_WIDTH, RESOLUTION, isTable } from "@firetable/floor-creator";
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch, useTemplateRef } from "vue";
@@ -137,7 +132,10 @@ async function deleteElement(): Promise<void> {
     }
 }
 
-function setElementColor(newVal: any): void {
+function setElementColor(newVal: string | null): void {
+    if (!newVal) {
+        return;
+    }
     elementColor.value = newVal;
     selectedFloorElement?.setBaseFill?.(newVal);
 }
@@ -213,6 +211,10 @@ function onFloorSave(): void {
 
 function sendBack(): void {
     selectedFloorElement?.canvas?.sendObjectBackwards(selectedFloorElement);
+}
+
+function flipElement(): void {
+    selectedFloorElement?.flip?.();
 }
 </script>
 
@@ -384,6 +386,22 @@ function sendBack(): void {
                 icon="send-backward"
                 @click="sendBack"
             />
+
+            <q-btn title="Flip element" round icon="transfer" @click="flipElement" />
+            <q-btn
+                v-if="'changeToOutlinedMode' in selectedFloorElement"
+                title="Switch to outline element"
+                round
+                icon="dashed-outline"
+                @click="selectedFloorElement.changeToOutlinedMode()"
+            />
+            <q-btn
+                v-if="'changeToFilledMode' in selectedFloorElement"
+                title="Switch to fill element"
+                round
+                icon="fill"
+                @click="selectedFloorElement.changeToFilledMode()"
+            />
         </div>
     </q-card>
 
@@ -415,11 +433,7 @@ function sendBack(): void {
                         :debounce="500"
                         :model-value="selectedFloorElement.label"
                         @update:model-value="
-                            (newLabel) =>
-                                updateTableLabel(
-                                    selectedFloorElement as BaseTable,
-                                    newLabel as string,
-                                )
+                            (newLabel) => updateTableLabel(selectedFloorElement, newLabel as string)
                         "
                         type="text"
                         standout
@@ -487,7 +501,7 @@ function sendBack(): void {
     max-width: 15%;
     position: absolute;
     left: 0.5%;
-    top: 10%;
+    top: 0.5%;
 
     .element-container {
         display: grid;
