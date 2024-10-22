@@ -28,25 +28,25 @@
     },
     "devDependencies": {
         "@regru/eslint-plugin-prefer-early-return": "1.0.0",
-        "eslint": "9.12.0",
+        "eslint": "9.13.0",
         "eslint-config-prettier": "9.1.0",
         "eslint-plugin-import-x": "4.1.1",
         "eslint-plugin-prettier": "5.2.1",
         "eslint-plugin-promise": "7.1.0",
         "eslint-plugin-quasar": "1.1.0",
         "eslint-plugin-unicorn": "56.0.0",
-        "eslint-plugin-vue": "9.29.0",
-        "firebase-tools": "13.22.0",
+        "eslint-plugin-vue": "9.29.1",
+        "firebase-tools": "13.22.1",
         "globals": "15.11.0",
         "prettier": "3.3.3",
         "typescript": "5.6.3",
-        "typescript-eslint": "8.9.0"
+        "typescript-eslint": "8.11.0"
     },
     "private": true,
     "engines": {
         "node": ">= 22.9.0"
     },
-    "packageManager": "pnpm@9.12.1",
+    "packageManager": "pnpm@9.12.2",
     "pnpm": {
         "overrides": {
             "esbuild": "0.24.0"
