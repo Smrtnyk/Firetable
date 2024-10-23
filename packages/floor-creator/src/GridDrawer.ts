@@ -3,6 +3,15 @@ import { RESOLUTION } from "./constants.js";
 import { Line, Group } from "fabric";
 import { has } from "es-toolkit/compat";
 
+declare module "fabric" {
+    interface GroupProps {
+        isGridLine?: boolean;
+    }
+    interface Group {
+        isGridLine?: boolean;
+    }
+}
+
 export class GridDrawer {
     private readonly canvas: Canvas;
     private isGridVisible = true;
@@ -74,7 +83,6 @@ export class GridDrawer {
             selectable: false,
             excludeFromExport: true,
             evented: false,
-            // @ts-expect-error -- custom prop
             isGridLine: true,
         });
         this.canvas.add(oGridGroup);
