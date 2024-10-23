@@ -52,6 +52,7 @@ export function useGuestsForEvent(eventOwner: EventOwner, reservations: Ref<Rese
                 const tableLabels = matchingReservations.map(property("tableLabel"));
 
                 return {
+                    id: guest.id,
                     name: guest.name,
                     contact: guest.contact,
                     visits: visitsWithoutCurrentEvent,

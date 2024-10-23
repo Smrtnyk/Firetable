@@ -10,7 +10,7 @@
                     name: 'adminGuest',
                     params: {
                         organisationId,
-                        guestId: guest.contact,
+                        guestId: guest.id,
                     },
                 }"
             >
@@ -33,6 +33,7 @@ import FTCenteredText from "src/components/FTCenteredText.vue";
 export interface AdminEventReturningGuestsListProps {
     organisationId: string;
     returningGuests: {
+        id: string;
         name: string;
         contact: string;
         visits: (Visit | null)[];

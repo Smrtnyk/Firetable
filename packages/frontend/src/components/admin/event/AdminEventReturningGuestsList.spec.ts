@@ -33,12 +33,14 @@ describe("ReturningGuestsList", () => {
         };
         props.returningGuests = [
             {
+                id: "guest1",
                 name: "John Doe",
                 contact: "john@example.com",
                 visits: [sampleVisit],
                 tableLabels: ["Table 1", "Table 2"],
             },
             {
+                id: "guest2",
                 name: "Jane Smith",
                 contact: "jane@example.com",
                 visits: [sampleVisit, sampleVisit],
@@ -73,6 +75,7 @@ describe("ReturningGuestsList", () => {
     it("handles guests with no visits gracefully", async () => {
         props.returningGuests = [
             {
+                id: "guest1",
                 name: "Guest With No Visits",
                 contact: "guest@example.com",
                 visits: [],
@@ -94,6 +97,7 @@ describe("ReturningGuestsList", () => {
     it("handles guests with null visits", async () => {
         props.returningGuests = [
             {
+                id: "guest1",
                 name: "Guest With Null Visits",
                 contact: "nullguest@example.com",
                 visits: [null, null],
