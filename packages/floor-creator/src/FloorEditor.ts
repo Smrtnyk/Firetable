@@ -15,6 +15,7 @@ import { EditorEventManager } from "./event-manager/EditorEventManager.js";
 import { calculateCanvasScale } from "./utils.js";
 import { CommandInvoker } from "./command/CommandInvoker.js";
 import { EventEmitter } from "./event-emitter/EventEmitter.js";
+import { ActiveSelection } from "fabric";
 import { initAligningGuidelines } from "fabric/extensions";
 
 type FloorEditorEvents = {
@@ -89,6 +90,32 @@ export class FloorEditor extends Floor {
         });
         this.setElementProperties(element);
         this.canvas.add(element);
+    }
+
+    async copySelectedElement(): Promise<void> {
+        const activeObject = this.canvas.getActiveObject();
+        if (activeObject) {
+            const cloned = await activeObject.clone();
+            this.canvas.discardActiveObject();
+            cloned.set({
+                left: cloned.left + 10,
+                top: cloned.top + 10,
+            });
+            cloned.on("mouseup", () => {
+                this.onElementClick(cloned);
+            });
+            if (cloned instanceof ActiveSelection) {
+                cloned.canvas = this.canvas;
+                cloned.forEachObject((obj) => {
+                    this.canvas.add(obj);
+                });
+                cloned.setCoords();
+            } else {
+                this.canvas.add(cloned);
+            }
+            this.canvas.setActiveObject(cloned);
+            this.canvas.requestRenderAll();
+        }
     }
 
     toggleGridVisibility = (): void => {

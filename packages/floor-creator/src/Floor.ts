@@ -9,7 +9,6 @@ import { calculateCanvasScale } from "./utils.js";
 import { isTable } from "./type-guards.js";
 import { getTables } from "./filters.js";
 import { RectTable } from "./elements/RectTable.js";
-import { Sofa } from "./elements/Sofa.js";
 import { Wall } from "./elements/Wall.js";
 import { RoundTable } from "./elements/RoundTable.js";
 import { EditableShape } from "./elements/EditableShape.js";
@@ -17,7 +16,6 @@ import { Canvas, classRegistry } from "fabric";
 
 classRegistry.setClass(RectTable);
 classRegistry.setClass(RoundTable);
-classRegistry.setClass(Sofa);
 classRegistry.setClass(Wall);
 classRegistry.setClass(EditableShape);
 

@@ -1,7 +1,7 @@
 import type { FabricObject, GroupProps } from "fabric";
 import { type FloorEditorElement, FloorElementTypes } from "../types.js";
 import { ELEMENT_DEFAULT_FILL_COLOR } from "../constants.js";
-import { Group, LayoutManager, Rect } from "fabric";
+import { classRegistry, Group, LayoutManager, Rect } from "fabric";
 
 type SofaGroupCreationOpts = Partial<GroupProps> & {
     top: number;
@@ -61,3 +61,5 @@ export class Sofa extends Group implements FloorEditorElement {
         this.canvas?.requestRenderAll();
     }
 }
+
+classRegistry.setClass(Sofa);

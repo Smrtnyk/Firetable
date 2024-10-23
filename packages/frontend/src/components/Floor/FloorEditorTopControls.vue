@@ -1,19 +1,25 @@
 <script setup lang="ts">
-import type { FloorEditorElement } from "@firetable/floor-creator";
 import type { QPopupProxy } from "quasar";
+import type { FloorEditor, FloorEditorElement } from "@firetable/floor-creator";
 import { isTable } from "@firetable/floor-creator";
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from "vue";
 
 interface Props {
     selectedFloorElement: FloorEditorElement;
+    floorInstance: FloorEditor;
     deleteAllowed?: boolean;
     existingLabels: Set<string>;
 }
 
 type EmitEvents = (e: "delete", element: FloorEditorElement) => void;
 const emit = defineEmits<EmitEvents>();
-const { deleteAllowed = true, existingLabels, selectedFloorElement } = defineProps<Props>();
+const {
+    deleteAllowed = true,
+    existingLabels,
+    selectedFloorElement,
+    floorInstance,
+} = defineProps<Props>();
 const colorPickerProxy = useTemplateRef<QPopupProxy>("colorPickerProxy");
 const getElementWidth = computed(function () {
     return selectedFloorElement
@@ -168,6 +174,12 @@ onBeforeUnmount(function () {
                 @click="sendBack"
             />
 
+            <q-btn
+                title="Copy element"
+                round
+                icon="copy"
+                @click="floorInstance.copySelectedElement()"
+            />
             <q-btn
                 v-if="'flip' in selectedFloorElement"
                 title="Flip element"

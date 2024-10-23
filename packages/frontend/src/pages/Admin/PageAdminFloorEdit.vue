@@ -174,8 +174,9 @@ function onDeleteElement(element: FloorEditorElement): void {
 <template>
     <div class="PageAdminFloorEdit flex column justify-center" ref="pageRef">
         <FloorEditorTopControls
-            v-if="selectedElement && !isTablet"
+            v-if="selectedElement && !isTablet && floorInstance"
             :selected-floor-element="selectedElement"
+            :floor-instance="floorInstance"
             :existing-labels="new Set(extractAllTablesLabels(floorInstance as FloorEditor))"
             @delete="onDeleteElement"
         />
