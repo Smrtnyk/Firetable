@@ -36,9 +36,7 @@ const { createDialog } = useDialog();
 const { properties } = storeToRefs(usePropertiesStore());
 const { t } = useI18n();
 const { organisationId, guestId } = defineProps<PageAdminGuestProps>();
-const { data: guest } = useFirestoreDocument<GuestDoc>(getGuestPath(organisationId, guestId), {
-    once: true,
-});
+const { data: guest } = useFirestoreDocument<GuestDoc>(getGuestPath(organisationId, guestId));
 
 const tab = ref("");
 const propertiesVisits = computed(function () {
