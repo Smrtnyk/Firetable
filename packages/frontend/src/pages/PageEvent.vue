@@ -205,6 +205,8 @@ onMounted(init);
 
 onUnmounted(function () {
     eventsStore.setCurrentEventName("");
+    eventsStore.toggleEventGuestListDrawerVisibility(false);
+    eventsStore.toggleQueuedReservationsDrawerVisibility(false);
 });
 </script>
 
