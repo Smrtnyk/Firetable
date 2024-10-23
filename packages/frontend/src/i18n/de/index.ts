@@ -164,6 +164,7 @@ export default {
         guestNameInputLabel: "Gastname *",
     },
     PageAdminGuest: {
+        upcomingChipLabel: "Bevorstehend",
         editGuestConfirmMsg: "Sind Sie sicher, dass Sie den Gast {name} bearbeiten möchten?",
         editGuestDialogTitle: "Gast bearbeiten: {name}",
         deleteGuestConfirmTitle: "Gast löschen?",

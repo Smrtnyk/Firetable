@@ -73,6 +73,13 @@ watch(
     { immediate: true },
 );
 
+function isUpcomingVisit(visit: Visit): boolean {
+    const now = Date.now();
+    const visitDate = new Date(visit.date).getTime();
+    // Consider the visit upcoming if it's today or in the future and not cancelled
+    return visitDate >= now && !visit.cancelled;
+}
+
 function getVisitColor(visit: Visit): string {
     if (visit.cancelled) {
         return "warning";
@@ -203,6 +210,9 @@ async function onDeleteGuest(): Promise<void> {
                                     </span>
                                     <q-space />
                                     <ReservationVIPChip v-if="visit.isVIPVisit" />
+                                    <q-chip v-if="isUpcomingVisit(visit)" color="orange">
+                                        {{ t("PageAdminGuest.upcomingChipLabel") }}
+                                    </q-chip>
                                 </div>
                             </q-timeline-entry>
                         </q-timeline>

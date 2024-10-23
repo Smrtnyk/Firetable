@@ -237,14 +237,61 @@ describe("PageAdminGuest.vue", () => {
             property2: {},
         };
 
-        useFirestoreDocumentMock.mockReturnValue({
-            data: ref(guestData),
-        });
-
         const screen = render();
 
         await expect
             .element(screen.getByText(t("PageAdminGuest.noVisitsMessage")))
             .toBeInTheDocument();
+    });
+
+    it("shows 'Upcoming' chip for future visits", async () => {
+        const futureDate = new Date();
+        // Tomorrow
+        futureDate.setDate(futureDate.getDate() + 1);
+        const pastDate = new Date();
+        // Yesterday
+        pastDate.setDate(pastDate.getDate() - 1);
+
+        guestData.visitedProperties = {
+            property1: {
+                futureVisit: {
+                    date: futureDate.getTime(),
+                    eventName: "Future Event",
+                    arrived: false,
+                    cancelled: false,
+                    isVIPVisit: false,
+                },
+                pastVisit: {
+                    date: pastDate.getTime(),
+                    eventName: "Past Event",
+                    arrived: true,
+                    cancelled: false,
+                    isVIPVisit: false,
+                },
+            },
+        };
+
+        const screen = render();
+
+        // Check for the future visit
+        const futureEventNameElement = screen.getByText("Future Event");
+        await expect.element(futureEventNameElement).toBeInTheDocument();
+
+        const futureTimelineEntry = futureEventNameElement
+            .element()!
+            .closest(".q-timeline__entry")!;
+        const upcomingChip = futureTimelineEntry.querySelector(".q-chip");
+        await expect.element(upcomingChip!).toHaveTextContent("Upcoming");
+
+        // Check for the past visit
+        const pastEventNameElement = screen.getByText("Past Event");
+        await expect.element(pastEventNameElement).toBeInTheDocument();
+
+        const pastTimelineEntry = pastEventNameElement.element()!.closest(".q-timeline__entry")!;
+        const chipsInPastEvent = pastTimelineEntry.querySelectorAll(".q-chip");
+        const hasUpcomingChip = Array.from(chipsInPastEvent).some(
+            (chip) => chip.textContent === "Upcoming",
+        );
+        expect(hasUpcomingChip).toBe(false);
     });
 });
