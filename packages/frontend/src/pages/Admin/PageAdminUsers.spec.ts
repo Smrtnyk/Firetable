@@ -223,4 +223,16 @@ describe("PageAdminUsers.vue", () => {
 
         expect(Loading.hide).toHaveBeenCalled();
     });
+
+    it("does not render tabs when there is only one property", async () => {
+        propertiesData = [{ id: "property1", name: "Property One", organisationId }];
+
+        const screen = render();
+
+        const tabs = screen.getByRole("tab");
+        await expect.element(tabs).not.toBeInTheDocument();
+
+        const userItem = screen.getByText("John Doe");
+        await expect.element(userItem).toBeVisible();
+    });
 });

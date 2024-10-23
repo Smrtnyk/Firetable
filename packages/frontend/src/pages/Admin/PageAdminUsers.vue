@@ -245,29 +245,41 @@ async function onUserSlideRight(user: User): Promise<void> {
             />
         </template>
 
+        <!-- Users Assigned to Properties -->
         <div v-if="Object.keys(bucketizedUsers).length > 0 && !isLoading">
-            <FTTabs v-model="activeTab">
-                <q-tab
-                    v-for="(bucket, index) in Object.values(bucketizedUsers)"
-                    :key="bucket.propertyName"
-                    :name="index"
-                    :label="`${bucket.propertyName} (${bucket.users.length})`"
-                />
-            </FTTabs>
-
-            <FTTabPanels v-model="activeTab">
-                <q-tab-panel
-                    v-for="(bucket, index) in Object.values(bucketizedUsers)"
-                    :key="bucket.propertyName"
-                    :name="index"
-                >
-                    <AdminUsersList
-                        @edit="showEditUserDialog"
-                        @delete="onUserSlideRight"
-                        :users="bucket.users"
+            <template v-if="Object.keys(bucketizedUsers).length > 1">
+                <!-- Multiple properties: Show tabs -->
+                <FTTabs v-model="activeTab">
+                    <q-tab
+                        v-for="(bucket, index) in Object.values(bucketizedUsers)"
+                        :key="bucket.propertyName"
+                        :name="index"
+                        :label="`${bucket.propertyName} (${bucket.users.length})`"
                     />
-                </q-tab-panel>
-            </FTTabPanels>
+                </FTTabs>
+
+                <FTTabPanels v-model="activeTab">
+                    <q-tab-panel
+                        v-for="(bucket, index) in Object.values(bucketizedUsers)"
+                        :key="bucket.propertyName"
+                        :name="index"
+                    >
+                        <AdminUsersList
+                            @edit="showEditUserDialog"
+                            @delete="onUserSlideRight"
+                            :users="bucket.users"
+                        />
+                    </q-tab-panel>
+                </FTTabPanels>
+            </template>
+            <template v-else>
+                <!-- Single property: Show users without tabs -->
+                <AdminUsersList
+                    @edit="showEditUserDialog"
+                    @delete="onUserSlideRight"
+                    :users="Object.values(bucketizedUsers)[0].users"
+                />
+            </template>
         </div>
 
         <!-- Show no properties message if no properties are created -->
