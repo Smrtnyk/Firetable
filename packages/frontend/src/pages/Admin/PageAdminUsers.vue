@@ -24,7 +24,11 @@ import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { matchesProperty } from "es-toolkit/compat";
 
-const props = defineProps<{ organisationId: string }>();
+export interface PageAdminUsersProps {
+    organisationId: string;
+}
+
+const props = defineProps<PageAdminUsersProps>();
 
 const { t } = useI18n();
 const router = useRouter();

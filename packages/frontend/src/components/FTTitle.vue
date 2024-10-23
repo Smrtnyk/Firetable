@@ -10,7 +10,7 @@ const { title, subtitle } = defineProps<Props>();
     <q-card class="ft-card q-pa-sm q-mb-md">
         <div class="FTTitle items-center">
             <div>
-                <h3 class="ft-title q-ma-none">{{ title }}</h3>
+                <h3 role="heading" aria-level="3" class="ft-title q-ma-none">{{ title }}</h3>
                 <h6 v-if="subtitle" class="ft-subtitle q-ma-none">
                     {{ subtitle }}
                 </h6>
