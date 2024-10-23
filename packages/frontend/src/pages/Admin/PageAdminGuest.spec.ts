@@ -229,4 +229,22 @@ describe("PageAdminGuest.vue", () => {
 
         expect(formattedDates).toEqual(["05.10.2023, 10:00:00", "03.10.2023, 15:30:00"]);
     });
+
+    it("shows 'No visits' message when guest has properties with no visits", async () => {
+        // Guest has properties, but no visits
+        guestData.visitedProperties = {
+            property1: {},
+            property2: {},
+        };
+
+        useFirestoreDocumentMock.mockReturnValue({
+            data: ref(guestData),
+        });
+
+        const screen = render();
+
+        await expect
+            .element(screen.getByText(t("PageAdminGuest.noVisitsMessage")))
+            .toBeInTheDocument();
+    });
 });

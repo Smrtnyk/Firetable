@@ -48,15 +48,19 @@ const propertiesVisits = computed(function () {
         if (!propertyData) {
             continue;
         }
-        const sortedVisits = (Object.values(events).filter(Boolean) as Visit[]).sort(
+
+        const sortedVisits = (Object.values(events || {}).filter(Boolean) as Visit[]).sort(
             function (a, b) {
                 return new Date(b.date).getTime() - new Date(a.date).getTime();
             },
         );
-        visitsByProperty[propertyId] = {
-            name: propertyData.name,
-            visits: sortedVisits,
-        };
+
+        if (sortedVisits.length > 0) {
+            visitsByProperty[propertyId] = {
+                name: propertyData.name,
+                visits: sortedVisits,
+            };
+        }
     }
     return visitsByProperty;
 });
