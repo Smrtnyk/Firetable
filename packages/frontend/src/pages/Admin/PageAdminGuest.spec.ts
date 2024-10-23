@@ -37,6 +37,12 @@ vi.mock("src/helpers/ui-helpers", async function (importOriginal) {
     };
 });
 
+vi.mock("vue-router", () => ({
+    useRouter: () => ({
+        push: vi.fn(),
+    }),
+}));
+
 describe("PageAdminGuest.vue", () => {
     let guestData: GuestDoc;
     let propertiesData: PropertyDoc[];
@@ -137,9 +143,7 @@ describe("PageAdminGuest.vue", () => {
     it("shows 'No visits' message when guest has no visits", async () => {
         guestData.visitedProperties = {};
         useFirestoreDocumentMock.mockReturnValue({
-            data: {
-                value: guestData,
-            },
+            data: ref(guestData),
         });
 
         const screen = render();
