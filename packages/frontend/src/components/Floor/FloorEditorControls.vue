@@ -1,18 +1,14 @@
 <script setup lang="ts">
 import type { FloorEditor, FloorEditorElement, FloorElementTypes } from "@firetable/floor-creator";
-import { MAX_FLOOR_HEIGHT, MAX_FLOOR_WIDTH, RESOLUTION, isTable } from "@firetable/floor-creator";
-import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
-import { computed, onBeforeUnmount, onMounted, reactive, ref, watch, useTemplateRef } from "vue";
-import { exportFile, QPopupProxy } from "quasar";
-import { buttonSize, isMobile, isTablet } from "src/global-reactives/screen-detection";
+import { MAX_FLOOR_HEIGHT, MAX_FLOOR_WIDTH, RESOLUTION } from "@firetable/floor-creator";
+import { showConfirm } from "src/helpers/ui-helpers";
+import { onMounted, reactive, useTemplateRef } from "vue";
+import { exportFile } from "quasar";
 import { ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
 import { AppLogger } from "src/logger/FTLogger.js";
 
 interface Props {
-    selectedFloorElement: FloorEditorElement | undefined;
     floorInstance: FloorEditor;
-    deleteAllowed?: boolean;
-    existingLabels: Set<string>;
 }
 
 interface EmitEvents {
@@ -21,124 +17,20 @@ interface EmitEvents {
     (e: "floorSave"): void;
 }
 
-const {
-    deleteAllowed = true,
-    existingLabels,
-    selectedFloorElement,
-    floorInstance,
-} = defineProps<Props>();
+const { floorInstance } = defineProps<Props>();
 const emit = defineEmits<EmitEvents>();
-const colorPickerProxy = useTemplateRef<QPopupProxy>("colorPickerProxy");
-const getElementWidth = computed(function () {
-    return selectedFloorElement
-        ? Math.round(selectedFloorElement.width * selectedFloorElement.scaleX)
-        : 0;
-});
-const getElementHeight = computed(function () {
-    return selectedFloorElement
-        ? Math.round(selectedFloorElement.height * selectedFloorElement.scaleY)
-        : 0;
-});
+
 const undoRedoState = reactive({
     canUndo: false,
     canRedo: false,
 });
-
-const localWidth = ref(getElementWidth.value);
-const localHeight = ref(getElementHeight.value);
-const elementColor = ref("");
-
-function onKeyDownListener(event: KeyboardEvent): void {
-    if (event.key === "Delete" && selectedFloorElement) {
-        deleteElement();
-    }
-}
 
 onMounted(function () {
     floorInstance.on("commandChange", function () {
         undoRedoState.canUndo = floorInstance.canUndo();
         undoRedoState.canRedo = floorInstance.canRedo();
     });
-    document.addEventListener("keydown", onKeyDownListener);
 });
-
-onBeforeUnmount(function () {
-    document.removeEventListener("keydown", onKeyDownListener);
-});
-
-watch(
-    () => selectedFloorElement,
-    function (newEl) {
-        localWidth.value = newEl ? Math.round(newEl.width * newEl.scaleX) : 0;
-        localHeight.value = newEl ? Math.round(newEl.height * newEl.scaleY) : 0;
-
-        if (newEl?.getBaseFill) {
-            elementColor.value = newEl.getBaseFill();
-        }
-    },
-);
-
-watch(localWidth, function (newWidth) {
-    if (!selectedFloorElement) {
-        return;
-    }
-    selectedFloorElement.scaleX = newWidth / selectedFloorElement.width;
-    selectedFloorElement.setCoords();
-    selectedFloorElement.canvas?.renderAll();
-});
-
-watch(localHeight, function (newHeight) {
-    if (!selectedFloorElement) {
-        return;
-    }
-    selectedFloorElement.scaleY = newHeight / selectedFloorElement.height;
-    selectedFloorElement.setCoords();
-    selectedFloorElement.canvas?.renderAll();
-});
-
-watch(
-    () => selectedFloorElement,
-    function (newEl) {
-        if (newEl?.getBaseFill) {
-            elementColor.value = newEl.getBaseFill();
-        }
-    },
-);
-
-function openColorPicker(): void {
-    colorPickerProxy.value?.show();
-}
-
-function updateTableLabel(
-    tableEl: FloorEditorElement | undefined,
-    newLabel: number | string | null,
-): void {
-    if (typeof newLabel !== "string" || !isTable(tableEl)) {
-        return;
-    }
-    if (existingLabels.has(newLabel)) {
-        showErrorMessage("Table Id already taken");
-        return;
-    }
-    tableEl.setLabel(newLabel);
-}
-
-async function deleteElement(): Promise<void> {
-    if (!selectedFloorElement) {
-        return;
-    }
-    if (await showConfirm("Do you really want to delete this element?")) {
-        emit("delete", selectedFloorElement);
-    }
-}
-
-function setElementColor(newVal: string | null): void {
-    if (!newVal) {
-        return;
-    }
-    elementColor.value = newVal;
-    selectedFloorElement?.setBaseFill?.(newVal);
-}
 
 async function exportFloor(floorVal: FloorEditor): Promise<void> {
     if (!(await showConfirm("Do you want to export this floor plan?"))) {
@@ -208,292 +100,111 @@ function onFloorChange(prop: keyof FloorEditor, event: number | string | null): 
 function onFloorSave(): void {
     emit("floorSave");
 }
-
-function sendBack(): void {
-    selectedFloorElement?.canvas?.sendObjectBackwards(selectedFloorElement);
-}
-
-function flipElement(): void {
-    selectedFloorElement?.flip?.();
-}
 </script>
 
 <template>
     <q-card
-        v-if="!isTablet"
-        class="FloorEditorControls row q-gutter-xs q-pa-xs q-pt-md q-pb-md justify-around items-center ft-card"
+        class="FloorEditorControls row q-gutter-xs q-pa-xs q-pt-md q-pb-md justify-around ft-card"
     >
-        <q-btn
-            v-if="!isTablet"
-            class="button-gradient q-mb-md"
-            icon="save"
-            @click="onFloorSave"
-            label="save"
-            rounded
-            :size="buttonSize"
-        />
-        <q-input
-            v-if="!isTablet"
-            standout
-            rounded
-            label="Floor name"
-            @update:model-value="(event) => onFloorChange('name', event)"
-            :model-value="floorInstance.name"
-            :dense="isMobile"
-            class="q-ma-xs full-width"
-        />
+        <div class="row items-center justify-around">
+            <q-btn
+                class="button-gradient q-mb-md"
+                icon="save"
+                @click="onFloorSave"
+                label="save"
+                rounded
+            />
+            <input
+                ref="fileInputRef"
+                type="file"
+                @change="onFileSelected"
+                style="display: none"
+                accept=".json"
+            />
 
-        <q-input
-            v-if="!isTablet"
-            @keydown.prevent
-            :min="300"
-            :max="MAX_FLOOR_WIDTH"
-            :step="RESOLUTION"
-            :model-value="floorInstance.width"
-            @update:model-value="(event) => onFloorChange('width', event)"
-            standout
-            rounded
-            type="number"
-            label="Floor width"
-            class="q-ma-xs full-width"
-        />
-        <q-input
-            v-if="!isTablet"
-            @keydown.prevent
-            :min="300"
-            :max="MAX_FLOOR_HEIGHT"
-            :step="RESOLUTION"
-            @update:model-value="(event) => onFloorChange('height', event)"
-            :model-value="floorInstance.height"
-            standout
-            rounded
-            type="number"
-            label="Floor height"
-            class="q-ma-xs full-width"
-        />
-        <q-btn
-            title="Undo"
-            round
-            :disabled="!undoRedoState.canUndo"
-            @click="undoAction"
-            icon="undo"
-        />
-        <q-btn
-            title="Redo"
-            round
-            :disabled="!undoRedoState.canRedo"
-            @click="redoAction"
-            icon="redo"
-        />
+            <q-input
+                standout
+                rounded
+                label="Floor name"
+                @update:model-value="(event) => onFloorChange('name', event)"
+                :model-value="floorInstance.name"
+                class="q-ma-xs full-width"
+            />
+
+            <q-input
+                @keydown.prevent
+                :min="300"
+                :max="MAX_FLOOR_WIDTH"
+                :step="RESOLUTION"
+                :model-value="floorInstance.width"
+                @update:model-value="(event) => onFloorChange('width', event)"
+                standout
+                rounded
+                type="number"
+                label="Floor width"
+                class="q-ma-xs full-width"
+            />
+            <q-input
+                @keydown.prevent
+                :min="300"
+                :max="MAX_FLOOR_HEIGHT"
+                :step="RESOLUTION"
+                @update:model-value="(event) => onFloorChange('height', event)"
+                :model-value="floorInstance.height"
+                standout
+                rounded
+                type="number"
+                label="Floor height"
+                class="q-ma-xs full-width"
+            />
+            <q-btn
+                title="Undo"
+                round
+                :disabled="!undoRedoState.canUndo"
+                @click="undoAction"
+                icon="undo"
+            />
+            <q-btn
+                title="Redo"
+                round
+                :disabled="!undoRedoState.canRedo"
+                @click="redoAction"
+                icon="redo"
+            />
+
+            <q-btn
+                round
+                title="Toggle grid"
+                @click="floorInstance.toggleGridVisibility"
+                icon="grid"
+            />
+            <q-btn
+                round
+                icon="export"
+                title="Export floor plan"
+                @click="exportFloor(floorInstance as FloorEditor)"
+            />
+            <q-btn round title="Import floor plan" icon="import" @click="triggerFileInput" />
+        </div>
         <!-- Add Element -->
-        <q-btn round title="Add element" icon="plus">
-            <q-menu max-width="200px">
-                <div class="row items-center">
-                    <div
-                        draggable="true"
-                        v-for="element in ELEMENTS_TO_ADD_COLLECTION"
-                        :key="element.tag"
-                        class="col-6 justify-center text-center q-my-md"
-                        @dragstart="onDragStart($event, element.tag)"
-                    >
-                        <p>{{ element.label }}</p>
+        <q-separator inset />
 
-                        <q-avatar square size="42px">
-                            <img :src="element.img ?? ''" alt="Floor element" />
-                        </q-avatar>
-                    </div>
-                </div>
-            </q-menu>
-        </q-btn>
-
-        <q-btn round title="Toggle grid" @click="floorInstance.toggleGridVisibility" icon="grid" />
-        <q-btn
-            round
-            icon="export"
-            title="Export floor plan"
-            @click="exportFloor(floorInstance as FloorEditor)"
-        />
-        <q-btn round title="Import floor plan" icon="import" @click="triggerFileInput" />
-        <input
-            ref="fileInputRef"
-            type="file"
-            @change="onFileSelected"
-            style="display: none"
-            accept=".json"
-        />
-
-        <div class="row justify-evenly" v-if="selectedFloorElement">
-            <q-separator inset class="q-ma-md full-width"></q-separator>
-            <p>Element</p>
-
-            <q-input
-                v-model.number="localWidth"
-                standout
-                rounded
-                type="number"
-                label="Width"
-                class="q-ma-xs full-width"
-            />
-            <q-input
-                rounded
-                v-model.number="localHeight"
-                standout
-                type="number"
-                label="Height"
-                class="q-ma-xs full-width"
-            />
-            <q-input
-                v-if="isTable(selectedFloorElement)"
-                class="q-ma-xs full-width q-mb-md"
-                :debounce="500"
-                :model-value="selectedFloorElement.label"
-                @update:model-value="(newLabel) => updateTableLabel(selectedFloorElement, newLabel)"
-                type="text"
-                standout
-                rounded
-                label="Table label"
-            />
-            <q-btn
-                title="Change element fill color"
-                v-if="elementColor"
-                :style="{ 'background-color': elementColor }"
-                @click="openColorPicker"
-                round
+        <div class="row items-center">
+            <div
+                draggable="true"
+                v-for="element in ELEMENTS_TO_ADD_COLLECTION"
+                :key="element.tag"
+                class="col-6 justify-center text-center q-my-md"
+                @dragstart="onDragStart($event, element.tag)"
             >
-                <q-icon name="color-picker" class="cursor-pointer q-ma-none" />
-                <q-popup-proxy
-                    no-parent-event
-                    ref="colorPickerProxy"
-                    cover
-                    transition-show="scale"
-                    transition-hide="scale"
-                >
-                    <q-color :model-value="elementColor" @update:model-value="setElementColor" />
-                </q-popup-proxy>
-            </q-btn>
-            <q-btn
-                title="Delete element"
-                v-if="deleteAllowed"
-                round
-                icon="trash"
-                color="negative"
-                @click="deleteElement"
-            />
-            <q-btn
-                title="Send back"
-                v-if="deleteAllowed"
-                round
-                icon="send-backward"
-                @click="sendBack"
-            />
+                <p>{{ element.label }}</p>
 
-            <q-btn title="Flip element" round icon="transfer" @click="flipElement" />
-            <q-btn
-                v-if="'changeToOutlinedMode' in selectedFloorElement"
-                title="Switch to outline element"
-                round
-                icon="dashed-outline"
-                @click="selectedFloorElement.changeToOutlinedMode()"
-            />
-            <q-btn
-                v-if="'changeToFilledMode' in selectedFloorElement"
-                title="Switch to fill element"
-                round
-                icon="fill"
-                @click="selectedFloorElement.changeToFilledMode()"
-            />
+                <q-avatar square size="42px">
+                    <img :src="element.img ?? ''" alt="Floor element" />
+                </q-avatar>
+            </div>
         </div>
     </q-card>
-
-    <div v-else>
-        <div v-if="selectedFloorElement && isTablet" class="row">
-            <div class="col-md-6 col-12 row q-gutter-xs">
-                <div class="col">
-                    <q-input
-                        :dense="isMobile"
-                        v-model.number="localWidth"
-                        standout
-                        rounded
-                        type="number"
-                        label="Width"
-                    />
-                </div>
-                <div class="col">
-                    <q-input
-                        rounded
-                        :dense="isMobile"
-                        v-model.number="localHeight"
-                        standout
-                        type="number"
-                        label="Height"
-                    />
-                </div>
-                <div class="col" v-if="isTable(selectedFloorElement)">
-                    <q-input
-                        :debounce="500"
-                        :model-value="selectedFloorElement.label"
-                        @update:model-value="
-                            (newLabel) => updateTableLabel(selectedFloorElement, newLabel as string)
-                        "
-                        type="text"
-                        standout
-                        rounded
-                        label="Table label"
-                        :dense="isMobile"
-                    />
-                </div>
-            </div>
-
-            <div class="col-md-6 col-12 row justify-md-end q-mt-sm q-mt-md-none">
-                <q-btn
-                    title="Change element fill color"
-                    v-if="elementColor"
-                    :style="{ 'background-color': elementColor }"
-                    @click="openColorPicker"
-                >
-                    <q-icon name="color-picker" class="cursor-pointer q-ma-none" />
-                    <q-popup-proxy
-                        no-parent-event
-                        ref="colorPickerProxy"
-                        cover
-                        transition-show="scale"
-                        transition-hide="scale"
-                    >
-                        <q-color
-                            :model-value="elementColor"
-                            @update:model-value="setElementColor"
-                        />
-                    </q-popup-proxy>
-                </q-btn>
-
-                <q-btn
-                    title="Delete element"
-                    v-if="deleteAllowed"
-                    icon="trash"
-                    color="negative"
-                    @click="deleteElement"
-                />
-                <slot name="buttons"></slot>
-            </div>
-        </div>
-
-        <div v-else class="row">
-            <div class="col-md-6 col-12">
-                <q-input
-                    :dense="isMobile"
-                    model-value="No element selected..."
-                    disable
-                    readonly
-                    standout
-                    rounded
-                    autogrow
-                />
-            </div>
-            <div class="col-md-6 col-12 row justify-md-end q-mt-sm q-mt-md-none">
-                <slot name="buttons"></slot>
-            </div>
-        </div>
-    </div>
 </template>
 
 <style lang="scss">
