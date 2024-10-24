@@ -155,32 +155,36 @@ function getGuestVisitsCount(guest: GuestDoc): number {
         </div>
 
         <!-- Guest List -->
-        <q-list v-if="filteredGuests.length > 0 && !isLoading">
+        <q-virtual-scroll
+            style="max-height: 75vh"
+            :items="filteredGuests"
+            v-if="filteredGuests.length > 0 && !isLoading"
+            v-slot="{ item, index }"
+        >
             <q-item
-                v-for="guest in filteredGuests"
-                :key="guest.contact"
+                :key="index"
                 clickable
                 :to="{
                     name: 'adminGuest',
                     params: {
                         organisationId: props.organisationId,
-                        guestId: guest.id,
+                        guestId: item.id,
                     },
                 }"
             >
                 <q-item-section>
                     <q-item-label>
-                        {{ guest.name }}
+                        {{ item.name }}
                     </q-item-label>
                     <q-item-label caption>
                         <div class="row">
-                            <span v-if="guest.maskedContact">{{ guest.maskedContact }}</span
-                            ><q-space /> {{ guestVisitsToReadable(guest) }}
+                            <span v-if="item.maskedContact">{{ item.maskedContact }}</span
+                            ><q-space /> {{ guestVisitsToReadable(item) }}
                         </div>
                     </q-item-label>
                 </q-item-section>
             </q-item>
-        </q-list>
+        </q-virtual-scroll>
 
         <FTCenteredText v-if="!isLoading && filteredGuests.length === 0">{{
             t("PageAdminGuests.noGuestsData")

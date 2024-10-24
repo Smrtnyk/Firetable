@@ -5,12 +5,12 @@ import type { PageAdminGuestsProps } from "./PageAdminGuests.vue";
 import type { Ref } from "vue";
 import PageAdminGuests from "./PageAdminGuests.vue";
 import { renderComponent, t } from "../../../test-helpers/render-component";
+import { ref } from "vue";
 import FTDialog from "src/components/FTDialog.vue";
 import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
 
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { userEvent } from "@vitest/browser/context";
-import { ref } from "vue";
 
 const { createDialogSpy, useFirestoreCollectionMock } = vi.hoisted(() => ({
     createDialogSpy: vi.fn(),
@@ -83,8 +83,10 @@ describe("PageAdminGuests.vue", () => {
         });
     });
 
-    function render(props = { organisationId: "org1" }): RenderResult<PageAdminGuestsProps> {
-        return renderComponent(PageAdminGuests, props, {
+    async function render(
+        props = { organisationId: "org1" },
+    ): Promise<RenderResult<PageAdminGuestsProps>> {
+        const renderResult = renderComponent(PageAdminGuests, props, {
             piniaStoreOptions: {
                 initialState: {
                     properties: {
@@ -93,10 +95,18 @@ describe("PageAdminGuests.vue", () => {
                 },
             },
         });
+
+        try {
+            await vi.waitUntil(() => document.querySelector(".q-virtual-scroll .q-item"));
+        } catch (e) {
+            // Empty catch block to prevent test failure
+        }
+
+        return renderResult;
     }
 
     it("renders correctly when there are guests", async () => {
-        const screen = render();
+        const screen = await render();
 
         await expect.element(screen.getByRole("heading", { name: "Guests" })).toBeInTheDocument();
         await expect.element(screen.getByText("John Doe")).toBeInTheDocument();
@@ -109,8 +119,9 @@ describe("PageAdminGuests.vue", () => {
         await expect.element(screen.getByText("No visits recorded")).toBeInTheDocument();
     });
 
-    it("renders guests sorted by number of visits", () => {
-        const screen = render();
+    it("renders guests sorted by number of visits", async () => {
+        const screen = await render();
+
         const guestItems = screen.getByRole("listitem");
 
         expect(guestItems.elements()).toHaveLength(3);
@@ -130,13 +141,13 @@ describe("PageAdminGuests.vue", () => {
             pending: ref(false),
         });
 
-        const screen = render();
+        const screen = await render();
 
         await expect.element(screen.getByText("No guests data")).toBeInTheDocument();
     });
 
     it("opens the add new guest dialog when plus button is clicked", async () => {
-        const screen = render();
+        const screen = await render();
 
         const addButton = screen.getByLabelText("Add new guest");
         await userEvent.click(addButton);
@@ -164,7 +175,7 @@ describe("PageAdminGuests.vue", () => {
         });
 
         it("filters guests by name based on search input", async () => {
-            const screen = render();
+            const screen = await render();
 
             const searchInput = screen.getByLabelText("Search guests");
             await userEvent.type(searchInput, "Jane");
@@ -178,7 +189,7 @@ describe("PageAdminGuests.vue", () => {
         });
 
         it("filters guests by contact based on search input", async () => {
-            const screen = render();
+            const screen = await render();
 
             const searchInput = screen.getByLabelText("Search guests");
             await userEvent.type(searchInput, "alice@example.com");
@@ -191,7 +202,7 @@ describe("PageAdminGuests.vue", () => {
         });
 
         it("is case-insensitive when filtering guests", async () => {
-            const screen = render();
+            const screen = await render();
 
             const searchInput = screen.getByLabelText("Search guests");
             await userEvent.type(searchInput, "jOhN d");
@@ -204,7 +215,7 @@ describe("PageAdminGuests.vue", () => {
         });
 
         it("shows multiple guests when search matches multiple entries", async () => {
-            const screen = render();
+            const screen = await render();
 
             const searchInput = screen.getByLabelText("Search guests");
             await userEvent.type(searchInput, "example.com");
@@ -219,7 +230,7 @@ describe("PageAdminGuests.vue", () => {
         });
 
         it("shows 'No guests data' when search yields no results", async () => {
-            const screen = render();
+            const screen = await render();
 
             const searchInput = screen.getByLabelText("Search guests");
             await userEvent.type(searchInput, "NonExistentGuest");
@@ -232,7 +243,7 @@ describe("PageAdminGuests.vue", () => {
         });
 
         it("clears search input and shows all guests", async () => {
-            const screen = render();
+            const screen = await render();
 
             const searchInput = screen.getByLabelText("Search guests");
             await userEvent.type(searchInput, "Jane");
@@ -255,7 +266,7 @@ describe("PageAdminGuests.vue", () => {
     });
 
     it.todo("navigates to guest detail when a guest item is clicked", async () => {
-        const screen = render();
+        const screen = await render();
 
         const guestItem = screen.getByText("John Doe - john@example.com");
         await userEvent.click(guestItem);
