@@ -46,29 +46,54 @@ watch(
 
 const searchQuery = ref<string>("");
 
-const sortedGuests = computed(() => {
+const guestsWithSummaries = computed(function () {
     if (!guests.value) {
         return [];
     }
-    return [...guests.value].sort(function (a, b) {
-        const aVisits = getGuestVisitsCount(a);
-        const bVisits = getGuestVisitsCount(b);
+
+    return guests.value.map((guest) => ({
+        ...guest,
+        id: guest.id,
+        summary: guestReservationsSummary(guest),
+    }));
+});
+
+const sortedGuests = computed(() => {
+    if (!guestsWithSummaries.value) {
+        return [];
+    }
+    return [...guestsWithSummaries.value].sort((a, b) => {
+        const aReservations = getGuestVisitsCount(a);
+        const bReservations = getGuestVisitsCount(b);
         // Sort in descending order
-        return bVisits - aVisits;
+        return bReservations - aReservations;
     });
 });
 
-const filteredGuests = computed(function () {
+const filteredGuests = computed(() => {
     if (!searchQuery.value?.trim()) {
         return sortedGuests.value;
     }
     const query = searchQuery.value.trim().toLowerCase();
-    return sortedGuests.value.filter(function (guest) {
+    return sortedGuests.value.filter((guest) => {
         return (
             guest.name.toLowerCase().includes(query) || guest.contact.toLowerCase().includes(query)
         );
     });
 });
+
+function getReservationColor(summary: Summary): string {
+    const percentage = Number.parseFloat(summary.visitPercentage);
+    if (percentage >= 75) {
+        return "green";
+    }
+
+    if (percentage >= 50) {
+        return "orange";
+    }
+
+    return "red";
+}
 
 function showCreateGuestDialog(): void {
     const dialog = createDialog({
@@ -209,15 +234,18 @@ function getGuestVisitsCount(guest: GuestDoc): number {
                         </div>
                     </q-item-label>
                     <q-item-label caption>
-                        <div v-for="summary in guestReservationsSummary(item)" class="full-width">
+                        <div v-if="item.summary" v-for="summary in item.summary" class="full-width">
                             <span>{{ summary.propertyName }}</span
                             >:
                             <q-chip text-color="white" color="tertiary" size="sm"
                                 >Bookings: {{ summary.totalReservations }}</q-chip
                             >
                             <q-chip size="sm"> Arrived: {{ summary.fulfilledVisits }} </q-chip>
-                            <q-chip size="sm">{{ summary.visitPercentage }}%</q-chip>
+                            <q-chip :color="getReservationColor(summary)" size="sm"
+                                >{{ summary.visitPercentage }}%</q-chip
+                            >
                         </div>
+                        <span v-else>No bookings</span>
                     </q-item-label>
                 </q-item-section>
             </q-item>
