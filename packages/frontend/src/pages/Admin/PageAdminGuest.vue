@@ -19,6 +19,7 @@ import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+import FTBtn from "src/components/FTBtn.vue";
 
 export interface PageAdminGuestProps {
     organisationId: string;
@@ -163,7 +164,7 @@ async function onDeleteGuest(): Promise<void> {
         <div v-if="guest">
             <FTTitle :title="guest.name" :subtitle="guest.contact">
                 <template #right>
-                    <q-btn
+                    <FTBtn
                         class="q-mr-sm"
                         rounded
                         icon="pencil"
@@ -171,7 +172,7 @@ async function onDeleteGuest(): Promise<void> {
                         @click="editGuest(guest)"
                         aria-label="Edit guest"
                     />
-                    <q-btn
+                    <FTBtn
                         rounded
                         icon="trash"
                         color="negative"
