@@ -170,7 +170,7 @@ export default {
     },
     PageAdminGuests: {
         title: "Guests",
-        noGuestsCreatedMessage: "There are no guests created.",
+        noGuestsData: "No guests data.",
         maxAmountGuestsCreationMessage:
             "You have reached the maximum amount of guests which is {limit}!",
         createNewGuestDialogTitle: "Create new guest",

@@ -7,7 +7,7 @@ import { renderComponent, t } from "../../../test-helpers/render-component";
 import FTDialog from "src/components/FTDialog.vue";
 import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 
 const { createDialogSpy, useFirestoreCollectionMock } = vi.hoisted(() => ({
@@ -60,6 +60,14 @@ describe("PageAdminGuests.vue", () => {
                     },
                 },
             } as GuestDoc,
+            {
+                id: "guest3",
+                name: "Alice Johnson",
+                contact: "alice@example.com",
+                hashedContact: "hashedContact",
+                maskedContact: "maskedContact",
+                visitedProperties: {},
+            } as GuestDoc,
         ];
 
         propertiesData = [
@@ -89,25 +97,29 @@ describe("PageAdminGuests.vue", () => {
     it("renders correctly when there are guests", async () => {
         const screen = render();
 
-        await expect.element(screen.getByText(t("PageAdminGuests.title"))).toBeInTheDocument();
+        await expect.element(screen.getByRole("heading", { name: "Guests" })).toBeInTheDocument();
         await expect.element(screen.getByText("John Doe")).toBeInTheDocument();
         await expect
             .element(screen.getByText("Property One visits: 2, Property Two visits: 1"))
             .toBeInTheDocument();
         await expect.element(screen.getByText("Jane Smith")).toBeInTheDocument();
         await expect.element(screen.getByText("Property One visits: 1")).toBeInTheDocument();
+        await expect.element(screen.getByText("Alice Johnson")).toBeInTheDocument();
+        await expect.element(screen.getByText("No visits recorded")).toBeInTheDocument();
     });
 
     it("renders guests sorted by number of visits", () => {
         const screen = render();
         const guestItems = screen.getByRole("listitem");
 
-        expect(guestItems.elements()).toHaveLength(2);
+        expect(guestItems.elements()).toHaveLength(3);
 
         // First guest should be John Doe (3 visits)
         expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
         // Second guest should be Jane Smith (1 visit)
         expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
+        // Third guest should be Alice Johnson (0 visits)
+        expect(guestItems.elements()[2]).toHaveTextContent("Alice Johnson");
     });
 
     it("shows 'No guests data' when there are no guests", async () => {
@@ -140,6 +152,106 @@ describe("PageAdminGuests.vue", () => {
                 }),
             }),
         );
+    });
+
+    describe("search", () => {
+        beforeEach(() => {
+            vi.useFakeTimers();
+        });
+
+        afterEach(() => {
+            vi.useRealTimers();
+        });
+
+        it("filters guests by name based on search input", async () => {
+            const screen = render();
+
+            const searchInput = screen.getByLabelText("Search guests");
+            await userEvent.type(searchInput, "Jane");
+            // Debounced search
+            await vi.advanceTimersByTimeAsync(301);
+
+            // Only Jane Smith should be visible
+            const guestItems = screen.getByRole("listitem");
+            expect(guestItems.elements()).toHaveLength(1);
+            expect(guestItems.elements()[0]).toHaveTextContent("Jane Smith");
+        });
+
+        it("filters guests by contact based on search input", async () => {
+            const screen = render();
+
+            const searchInput = screen.getByLabelText("Search guests");
+            await userEvent.type(searchInput, "alice@example.com");
+            await vi.advanceTimersByTimeAsync(301);
+
+            // Only Alice Johnson should be visible
+            const guestItems = screen.getByRole("listitem");
+            expect(guestItems.elements()).toHaveLength(1);
+            expect(guestItems.elements()[0]).toHaveTextContent("Alice Johnson");
+        });
+
+        it("is case-insensitive when filtering guests", async () => {
+            const screen = render();
+
+            const searchInput = screen.getByLabelText("Search guests");
+            await userEvent.type(searchInput, "jOhN d");
+            await vi.advanceTimersByTimeAsync(301);
+
+            // Only John Doe should be visible
+            const guestItems = screen.getByRole("listitem");
+            expect(guestItems.elements()).toHaveLength(1);
+            expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
+        });
+
+        it("shows multiple guests when search matches multiple entries", async () => {
+            const screen = render();
+
+            const searchInput = screen.getByLabelText("Search guests");
+            await userEvent.type(searchInput, "example.com");
+            await vi.advanceTimersByTimeAsync(301);
+
+            // All guests should be visible since all have contacts ending with example.com
+            const guestItems = screen.getByRole("listitem");
+            expect(guestItems.elements()).toHaveLength(3);
+            expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
+            expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
+            expect(guestItems.elements()[2]).toHaveTextContent("Alice Johnson");
+        });
+
+        it("shows 'No guests data' when search yields no results", async () => {
+            const screen = render();
+
+            const searchInput = screen.getByLabelText("Search guests");
+            await userEvent.type(searchInput, "NonExistentGuest");
+            await vi.advanceTimersByTimeAsync(301);
+
+            // No guests should be visible, show 'No guests data' message
+            await expect
+                .element(screen.getByText(t("PageAdminGuests.noGuestsData")))
+                .toBeInTheDocument();
+        });
+
+        it("clears search input and shows all guests", async () => {
+            const screen = render();
+
+            const searchInput = screen.getByLabelText("Search guests");
+            await userEvent.type(searchInput, "Jane");
+            await vi.advanceTimersByTimeAsync(301);
+
+            // Only Jane Smith should be visible
+            let guestItems = screen.getByRole("listitem");
+            expect(guestItems.elements()).toHaveLength(1);
+            expect(guestItems.elements()[0]).toHaveTextContent("Jane Smith");
+
+            // Clear the search input
+            const clearButton = screen.getByLabelText("Clear");
+            await userEvent.click(clearButton);
+            await vi.advanceTimersByTimeAsync(301);
+
+            // All guests should be visible again
+            guestItems = screen.getByRole("listitem");
+            expect(guestItems.elements()).toHaveLength(3);
+        });
     });
 
     it.todo("navigates to guest detail when a guest item is clicked", async () => {

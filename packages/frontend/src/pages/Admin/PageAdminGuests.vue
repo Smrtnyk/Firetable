@@ -8,13 +8,14 @@ import { usePropertiesStore } from "src/stores/properties-store";
 import { storeToRefs } from "pinia";
 import { matchesProperty } from "es-toolkit/compat";
 import { useDialog } from "src/composables/useDialog";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 
 import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import FTBtn from "src/components/FTBtn.vue";
+import { isMobile } from "src/global-reactives/screen-detection";
 
 export interface PageAdminGuestsProps {
     organisationId: string;
@@ -28,6 +29,8 @@ const { data: guests } = useFirestoreCollection<GuestDoc>(getGuestsPath(props.or
 });
 const { properties } = storeToRefs(usePropertiesStore());
 
+const searchQuery = ref<string>("");
+
 const sortedGuests = computed(() => {
     if (!guests.value) {
         return [];
@@ -37,6 +40,18 @@ const sortedGuests = computed(() => {
         const bVisits = getGuestVisitsCount(b);
         // Sort in descending order
         return bVisits - aVisits;
+    });
+});
+
+const filteredGuests = computed(function () {
+    if (!searchQuery.value?.trim()) {
+        return sortedGuests.value;
+    }
+    const query = searchQuery.value.trim().toLowerCase();
+    return sortedGuests.value.filter(function (guest) {
+        return (
+            guest.name.toLowerCase().includes(query) || guest.contact.toLowerCase().includes(query)
+        );
     });
 });
 
@@ -105,9 +120,29 @@ function getGuestVisitsCount(guest: GuestDoc): number {
             </template>
         </FTTitle>
 
-        <q-list v-if="sortedGuests.length > 0">
+        <!-- Search Input -->
+        <div class="q-mb-md">
+            <q-input
+                :dense="isMobile"
+                standout
+                rounded
+                v-model="searchQuery"
+                debounce="300"
+                placeholder="Search by name or contact"
+                clearable
+                clear-icon="close"
+                label="Search guests"
+            >
+                <template #prepend>
+                    <q-icon name="search" />
+                </template>
+            </q-input>
+        </div>
+
+        <!-- Guest List -->
+        <q-list v-if="filteredGuests.length > 0">
             <q-item
-                v-for="guest in sortedGuests"
+                v-for="guest in filteredGuests"
                 :key="guest.contact"
                 clickable
                 :to="{
@@ -132,6 +167,6 @@ function getGuestVisitsCount(guest: GuestDoc): number {
             </q-item>
         </q-list>
 
-        <FTCenteredText v-else>No guests data</FTCenteredText>
+        <FTCenteredText v-else>{{ t("PageAdminGuests.noGuestsData") }}</FTCenteredText>
     </div>
 </template>
