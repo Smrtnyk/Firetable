@@ -2,6 +2,7 @@ import type { RenderResult } from "vitest-browser-vue";
 import type { GuestDoc, PropertyDoc, Visit } from "@firetable/types";
 import type { PageAdminGuestsProps } from "./PageAdminGuests.vue";
 
+import type { Ref } from "vue";
 import PageAdminGuests from "./PageAdminGuests.vue";
 import { renderComponent, t } from "../../../test-helpers/render-component";
 import FTDialog from "src/components/FTDialog.vue";
@@ -9,6 +10,7 @@ import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
 
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { userEvent } from "@vitest/browser/context";
+import { ref } from "vue";
 
 const { createDialogSpy, useFirestoreCollectionMock } = vi.hoisted(() => ({
     createDialogSpy: vi.fn(),
@@ -27,11 +29,11 @@ vi.mock("src/composables/useFirestore", () => ({
 }));
 
 describe("PageAdminGuests.vue", () => {
-    let guestsData: GuestDoc[];
+    let guestsData: Ref<GuestDoc[]>;
     let propertiesData: PropertyDoc[];
 
     beforeEach(() => {
-        guestsData = [
+        guestsData = ref([
             {
                 id: "guest1",
                 name: "John Doe",
@@ -68,7 +70,7 @@ describe("PageAdminGuests.vue", () => {
                 maskedContact: "maskedContact",
                 visitedProperties: {},
             } as GuestDoc,
-        ];
+        ]);
 
         propertiesData = [
             { id: "property1", name: "Property One" } as PropertyDoc,
@@ -76,9 +78,8 @@ describe("PageAdminGuests.vue", () => {
         ];
 
         useFirestoreCollectionMock.mockReturnValue({
-            data: {
-                value: guestsData,
-            },
+            data: guestsData,
+            pending: ref(false),
         });
     });
 
@@ -123,11 +124,10 @@ describe("PageAdminGuests.vue", () => {
     });
 
     it("shows 'No guests data' when there are no guests", async () => {
-        guestsData = [];
+        guestsData = ref<GuestDoc[]>([]);
         useFirestoreCollectionMock.mockReturnValue({
-            data: {
-                value: guestsData,
-            },
+            data: guestsData,
+            pending: ref(false),
         });
 
         const screen = render();

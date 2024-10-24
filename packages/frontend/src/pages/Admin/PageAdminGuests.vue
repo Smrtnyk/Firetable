@@ -8,14 +8,15 @@ import { usePropertiesStore } from "src/stores/properties-store";
 import { storeToRefs } from "pinia";
 import { matchesProperty } from "es-toolkit/compat";
 import { useDialog } from "src/composables/useDialog";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
+import { isMobile } from "src/global-reactives/screen-detection";
+import { Loading } from "quasar";
 
 import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import FTBtn from "src/components/FTBtn.vue";
-import { isMobile } from "src/global-reactives/screen-detection";
 
 export interface PageAdminGuestsProps {
     organisationId: string;
@@ -24,10 +25,24 @@ export interface PageAdminGuestsProps {
 const { createDialog } = useDialog();
 const { t } = useI18n();
 const props = defineProps<PageAdminGuestsProps>();
-const { data: guests } = useFirestoreCollection<GuestDoc>(getGuestsPath(props.organisationId), {
-    wait: true,
-});
+const { data: guests, pending: isLoading } = useFirestoreCollection<GuestDoc>(
+    getGuestsPath(props.organisationId),
+    {
+        wait: true,
+    },
+);
 const { properties } = storeToRefs(usePropertiesStore());
+
+watch(
+    () => isLoading.value,
+    function () {
+        if (isLoading.value) {
+            Loading.show();
+        } else {
+            Loading.hide();
+        }
+    },
+);
 
 const searchQuery = ref<string>("");
 
@@ -140,7 +155,7 @@ function getGuestVisitsCount(guest: GuestDoc): number {
         </div>
 
         <!-- Guest List -->
-        <q-list v-if="filteredGuests.length > 0">
+        <q-list v-if="filteredGuests.length > 0 && !isLoading">
             <q-item
                 v-for="guest in filteredGuests"
                 :key="guest.contact"
@@ -167,6 +182,8 @@ function getGuestVisitsCount(guest: GuestDoc): number {
             </q-item>
         </q-list>
 
-        <FTCenteredText v-else>{{ t("PageAdminGuests.noGuestsData") }}</FTCenteredText>
+        <FTCenteredText v-if="!isLoading && filteredGuests.length === 0">{{
+            t("PageAdminGuests.noGuestsData")
+        }}</FTCenteredText>
     </div>
 </template>
