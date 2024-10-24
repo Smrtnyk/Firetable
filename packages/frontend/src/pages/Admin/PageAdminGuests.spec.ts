@@ -108,15 +108,16 @@ describe("PageAdminGuests.vue", () => {
     it("renders correctly when there are guests", async () => {
         const screen = await render();
 
-        await expect.element(screen.getByRole("heading", { name: "Guests" })).toBeInTheDocument();
-        await expect.element(screen.getByText("John Doe")).toBeInTheDocument();
-        await expect
-            .element(screen.getByText("Property One visits: 2, Property Two visits: 1"))
-            .toBeInTheDocument();
-        await expect.element(screen.getByText("Jane Smith")).toBeInTheDocument();
-        await expect.element(screen.getByText("Property One visits: 1")).toBeInTheDocument();
-        await expect.element(screen.getByText("Alice Johnson")).toBeInTheDocument();
-        await expect.element(screen.getByText("No visits recorded")).toBeInTheDocument();
+        await expect.element(screen.getByRole("heading", { name: "Guests" })).toBeVisible();
+        await expect.element(screen.getByText("John Doe")).toBeVisible();
+        await expect.element(screen.getByText("Jane Smith")).toBeVisible();
+        await expect.element(screen.getByText("Alice Johnson")).toBeVisible();
+
+        const percentage = screen.getByText("0.00%");
+        expect(percentage.elements()).toHaveLength(3);
+
+        const arrived = screen.getByText("Arrived: 0");
+        expect(arrived.elements()).toHaveLength(3);
     });
 
     it("renders guests sorted by number of visits", async () => {

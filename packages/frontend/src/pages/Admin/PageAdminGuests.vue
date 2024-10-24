@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CreateGuestPayload, GuestDoc } from "@firetable/types";
+import type { CreateGuestPayload, GuestDoc, Visit } from "@firetable/types";
 import { useFirestoreCollection } from "src/composables/useFirestore";
 import { createGuest, getGuestsPath } from "@firetable/backend";
 import { useI18n } from "vue-i18n";
@@ -92,23 +92,49 @@ function showCreateGuestDialog(): void {
     });
 }
 
-function guestVisitsToReadable(guest: GuestDoc): string {
+type Summary = {
+    propertyName: string;
+    totalReservations: number;
+    fulfilledVisits: number;
+    visitPercentage: string;
+};
+
+function guestReservationsSummary(guest: GuestDoc): Summary[] | undefined {
     if (Object.keys(guest.visitedProperties).length === 0) {
-        return "No visits recorded";
+        return undefined;
     }
 
-    const res = Object.entries(guest.visitedProperties).map(function ([propertyId, visits]) {
+    const summaries = Object.entries(guest.visitedProperties).map(([propertyId, events]) => {
         const property = properties.value.find(matchesProperty("id", propertyId));
         if (!property) {
             return "";
         }
-        const visitsCount = Object.values(visits).filter(Boolean).length;
-        if (!visitsCount) {
-            return "";
-        }
-        return `${property.name} visits: ${visitsCount}`;
+
+        // Total reservations: count of non-null events
+        const totalReservations = Object.values(events).filter(
+            (event): event is Visit => event !== null,
+        ).length;
+
+        // Fulfilled visits: arrived and not canceled
+        const fulfilledVisits = Object.values(events).filter(
+            (event): event is Visit => event !== null && event.arrived && !event.cancelled,
+        ).length;
+
+        // Calculate visit percentage
+        const visitPercentage =
+            totalReservations > 0
+                ? ((fulfilledVisits / totalReservations) * 100).toFixed(2)
+                : "0.00";
+
+        return {
+            propertyName: property.name,
+            totalReservations,
+            fulfilledVisits,
+            visitPercentage,
+        };
     });
-    return res.join(", ");
+
+    return summaries.filter(Boolean) as Summary[];
 }
 
 function getGuestVisitsCount(guest: GuestDoc): number {
@@ -174,12 +200,23 @@ function getGuestVisitsCount(guest: GuestDoc): number {
             >
                 <q-item-section>
                     <q-item-label>
-                        {{ item.name }}
+                        <div class="row">
+                            <span>{{ item.name }}</span>
+                            <q-space />
+                            <span class="text-grey-6" v-if="item.maskedContact">{{
+                                item.maskedContact
+                            }}</span>
+                        </div>
                     </q-item-label>
                     <q-item-label caption>
-                        <div class="row">
-                            <span v-if="item.maskedContact">{{ item.maskedContact }}</span
-                            ><q-space /> {{ guestVisitsToReadable(item) }}
+                        <div v-for="summary in guestReservationsSummary(item)" class="full-width">
+                            <span>{{ summary.propertyName }}</span
+                            >:
+                            <q-chip text-color="white" color="tertiary" size="sm"
+                                >Bookings: {{ summary.totalReservations }}</q-chip
+                            >
+                            <q-chip size="sm"> Arrived: {{ summary.fulfilledVisits }} </q-chip>
+                            <q-chip size="sm">{{ summary.visitPercentage }}%</q-chip>
                         </div>
                     </q-item-label>
                 </q-item-section>
