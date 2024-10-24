@@ -119,7 +119,7 @@ describe("PageAdminGuest.vue", () => {
         render();
 
         // Get the list of visit event names
-        const visitEventNames = Array.from(document.querySelectorAll("#visit-event-name")).map(
+        const visitEventNames = Array.from(document.querySelectorAll(".q-timeline__title")).map(
             (element) => element.textContent,
         );
 
@@ -297,5 +297,38 @@ describe("PageAdminGuest.vue", () => {
             (chip) => chip.textContent === "Upcoming",
         );
         expect(hasUpcomingChip).toBe(false);
+    });
+
+    it("does not render tabs when there is only one property", async () => {
+        // Modify guestData to have only one property
+        guestData.visitedProperties = {
+            property1: {
+                visit1: {
+                    date: new Date("2023-10-05T10:00:00Z").getTime(),
+                    eventName: "Event A",
+                    arrived: true,
+                    cancelled: false,
+                    isVIPVisit: true,
+                },
+                visit2: {
+                    date: new Date("2023-10-03T15:30:00Z").getTime(),
+                    eventName: "Event B",
+                    arrived: false,
+                    cancelled: false,
+                    isVIPVisit: false,
+                },
+            },
+        };
+
+        useFirestoreDocumentMock.mockReturnValue({
+            data: ref(guestData),
+        });
+
+        const screen = render();
+
+        await expect.element(screen.getByRole("tab")).not.toBeInTheDocument();
+
+        await expect.element(screen.getByText("Event A")).toBeInTheDocument();
+        await expect.element(screen.getByText("Event B")).toBeInTheDocument();
     });
 });

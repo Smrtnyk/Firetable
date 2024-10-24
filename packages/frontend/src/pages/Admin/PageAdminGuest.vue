@@ -5,21 +5,20 @@ import { deleteGuest, getGuestPath, updateGuestInfo } from "@firetable/backend";
 import { computed, ref, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { usePropertiesStore } from "src/stores/properties-store";
-import { formatEventDate } from "src/helpers/date-utils";
-
-import FTTitle from "src/components/FTTitle.vue";
-import FTTabs from "src/components/FTTabs.vue";
-import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPChip.vue";
-import FTCenteredText from "src/components/FTCenteredText.vue";
-import FTTabPanels from "src/components/FTTabPanels.vue";
-import { matchesProperty } from "es-toolkit/compat";
-import { useDialog } from "src/composables/useDialog";
-import FTDialog from "src/components/FTDialog.vue";
-import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+import { matchesProperty } from "es-toolkit/compat";
+import { useDialog } from "src/composables/useDialog";
+
+import FTTitle from "src/components/FTTitle.vue";
+import FTTabs from "src/components/FTTabs.vue";
+import FTCenteredText from "src/components/FTCenteredText.vue";
+import FTTabPanels from "src/components/FTTabPanels.vue";
+import FTDialog from "src/components/FTDialog.vue";
+import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
 import FTBtn from "src/components/FTBtn.vue";
+import AdminGuestVisitsTimeline from "src/components/admin/guest/AdminGuestVisitsTimeline.vue";
 
 export interface PageAdminGuestProps {
     organisationId: string;
@@ -64,6 +63,15 @@ const propertiesVisits = computed(function () {
     return visitsByProperty;
 });
 
+const singlePropertyVisits = computed(() => {
+    const propertiesKeys = Object.keys(propertiesVisits.value);
+    if (propertiesKeys.length === 1) {
+        const singleProperty = propertiesVisits.value[propertiesKeys[0]];
+        return singleProperty.visits;
+    }
+    return [];
+});
+
 watch(
     propertiesVisits,
     function (newVisits) {
@@ -73,37 +81,6 @@ watch(
     },
     { immediate: true },
 );
-
-function isUpcomingVisit(visit: Visit): boolean {
-    const now = Date.now();
-    const visitDate = new Date(visit.date).getTime();
-    // Consider the visit upcoming if it's today or in the future and not cancelled
-    return visitDate >= now && !visit.cancelled;
-}
-
-function getVisitColor(visit: Visit): string {
-    if (visit.cancelled) {
-        return "warning";
-    }
-    if (visit.arrived) {
-        return "green";
-    }
-    return "blue";
-}
-
-function getVisitIcon(visit: Visit): string {
-    if (visit.cancelled) {
-        return "close";
-    }
-    if (visit.arrived) {
-        return "check";
-    }
-    return "dash";
-}
-
-function formatSubtitleForGuestVisit(visit: Visit): string {
-    return formatEventDate(visit.date);
-}
 
 async function editGuest(guestVal: GuestDoc): Promise<void> {
     const shouldEdit = await showConfirm(
@@ -183,42 +160,31 @@ async function onDeleteGuest(): Promise<void> {
             </FTTitle>
 
             <div v-if="Object.keys(propertiesVisits).length > 0">
-                <FTTabs v-model="tab">
-                    <q-tab
-                        v-for="(item, propertyId) in propertiesVisits"
-                        :key="propertyId"
-                        :name="propertyId"
-                        :label="item.name"
-                    />
-                </FTTabs>
-                <FTTabPanels v-model="tab">
-                    <q-tab-panel
-                        v-for="(item, propertyId) in propertiesVisits"
-                        :key="propertyId"
-                        :name="propertyId"
-                    >
-                        <q-timeline color="primary">
-                            <q-timeline-entry
-                                v-for="visit in item.visits"
-                                :key="visit.date"
-                                :color="getVisitColor(visit)"
-                                :icon="getVisitIcon(visit)"
-                                :subtitle="formatSubtitleForGuestVisit(visit)"
-                            >
-                                <div class="row">
-                                    <span id="visit-event-name">
-                                        {{ visit.eventName }}
-                                    </span>
-                                    <q-space />
-                                    <ReservationVIPChip v-if="visit.isVIPVisit" />
-                                    <q-chip v-if="isUpcomingVisit(visit)" color="orange">
-                                        {{ t("PageAdminGuest.upcomingChipLabel") }}
-                                    </q-chip>
-                                </div>
-                            </q-timeline-entry>
-                        </q-timeline>
-                    </q-tab-panel>
-                </FTTabPanels>
+                <!-- Check if there are multiple properties -->
+                <template v-if="Object.keys(propertiesVisits).length > 1">
+                    <FTTabs v-model="tab">
+                        <q-tab
+                            v-for="(item, propertyId) in propertiesVisits"
+                            :key="propertyId"
+                            :name="propertyId"
+                            :label="item.name"
+                        />
+                    </FTTabs>
+                    <FTTabPanels v-model="tab">
+                        <q-tab-panel
+                            v-for="(item, propertyId) in propertiesVisits"
+                            :key="propertyId"
+                            :name="propertyId"
+                        >
+                            <AdminGuestVisitsTimeline :visits="item.visits" />
+                        </q-tab-panel>
+                    </FTTabPanels>
+                </template>
+
+                <!-- Single Property: Directly show the visits without tabs -->
+                <template v-else>
+                    <AdminGuestVisitsTimeline :visits="singlePropertyVisits" />
+                </template>
             </div>
 
             <FTCenteredText v-else>{{ t("PageAdminGuest.noVisitsMessage") }}</FTCenteredText>
