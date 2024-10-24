@@ -5,6 +5,7 @@ import FTTitle from "src/components/FTTitle.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import AddNewOrganisationForm from "src/components/admin/organisation/AddNewOrganisationForm.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
+import FTBtn from "src/components/FTBtn.vue";
 
 import { useQuasar } from "quasar";
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
@@ -99,7 +100,7 @@ function createOrganisation(): void {
     <div>
         <FTTitle title="Organisations">
             <template #right>
-                <q-btn rounded icon="plus" class="button-gradient" @click="createOrganisation" />
+                <FTBtn rounded icon="plus" class="button-gradient" @click="createOrganisation" />
             </template>
         </FTTitle>
         <q-list bordered class="rounded-borders" v-if="organisations.length > 0">

@@ -5,6 +5,7 @@ import { computed } from "vue";
 
 import ReservationGeneralInfo from "src/components/Event/reservation/ReservationGeneralInfo.vue";
 import ReservationLabelChips from "src/components/Event/reservation/ReservationLabelChips.vue";
+import FTBtn from "src/components/FTBtn.vue";
 
 import { useAuthStore } from "src/stores/auth-store";
 
@@ -36,7 +37,7 @@ function isOwnReservation(reservation: QueuedReservation): boolean {
 
         <q-item v-if="canModify">
             <div class="row q-gutter-sm full-width">
-                <q-btn
+                <FTBtn
                     title="Move to Floor Plan"
                     icon="transfer"
                     color="secondary"
@@ -44,7 +45,7 @@ function isOwnReservation(reservation: QueuedReservation): boolean {
                     v-close-popup
                 />
 
-                <q-btn
+                <FTBtn
                     title="Delete"
                     icon="trash"
                     color="negative"

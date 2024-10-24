@@ -10,6 +10,8 @@ import FTCenteredText from "src/components/FTCenteredText.vue";
 import EventGuestListCreateGuestForm from "src/components/Event/EventGuestListCreateGuestForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import FTDialog from "src/components/FTDialog.vue";
+import FTBtn from "src/components/FTBtn.vue";
+
 import { useQuasar } from "quasar";
 import { ADMIN, Role } from "@firetable/types";
 import {
@@ -118,7 +120,7 @@ async function onSwipeLeftConfirmGuest(
         <div class="EventGuestList">
             <FTTitle :title="t('EventGuestList.title')">
                 <template #right>
-                    <q-btn
+                    <FTBtn
                         v-if="canInteract"
                         rounded
                         icon="plus"

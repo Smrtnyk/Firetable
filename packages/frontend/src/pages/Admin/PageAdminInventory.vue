@@ -23,6 +23,7 @@ import FTCenteredText from "src/components/FTCenteredText.vue";
 import InventoryTable from "src/components/admin/inventory/InventoryTable.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import InventoryItemCreateForm from "src/components/admin/inventory/InventoryItemCreateForm.vue";
+import FTBtn from "src/components/FTBtn.vue";
 
 interface Props {
     organisationId: string;
@@ -196,13 +197,13 @@ onMounted(init);
     <div class="PageAdminInventory">
         <FTTitle :title="t('PageAdminInventory.title')">
             <template #right>
-                <q-btn
+                <FTBtn
                     rounded
                     icon="plus"
                     class="button-gradient"
                     @click="showCreateInventoryItemDialog()"
                 />
-                <q-btn rounded icon="camera" @click="scanBarcode" />
+                <FTBtn rounded icon="camera" @click="scanBarcode" />
             </template>
         </FTTitle>
 

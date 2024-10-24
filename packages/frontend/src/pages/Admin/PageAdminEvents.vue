@@ -4,6 +4,7 @@ import AdminPropertyEventsList from "src/components/admin/event/AdminPropertyEve
 import EventCreateForm from "src/components/admin/event/EventCreateForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import FTDialog from "src/components/FTDialog.vue";
+import FTBtn from "src/components/FTBtn.vue";
 
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { computed, onBeforeMount, watch, onUnmounted, onMounted } from "vue";
@@ -171,7 +172,7 @@ onMounted(fetchMoreEvents);
     <div class="PageAdminEvents">
         <FTTitle :title="t('PageAdminEvents.title')">
             <template #right>
-                <q-btn rounded icon="plus" class="button-gradient" @click="showEventForm()" />
+                <FTBtn rounded icon="plus" class="button-gradient" @click="showEventForm()" />
             </template>
         </FTTitle>
 

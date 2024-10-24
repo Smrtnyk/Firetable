@@ -23,6 +23,7 @@ import { useAuthStore } from "src/stores/auth-store";
 import { storeToRefs } from "pinia";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { plannedToQueuedReservation } from "src/helpers/reservation/planned-to-queued-reservation";
+import FTBtn from "src/components/FTBtn.vue";
 
 export interface EventQueuedReservationsProps {
     data: QueuedReservationDoc[];
@@ -111,7 +112,7 @@ function showReservation(reservation: QueuedReservationDoc): void {
         <div class="EventQueuedReservations">
             <FTTitle :title="t('EventQueuedReservations.title')">
                 <template #right>
-                    <q-btn
+                    <FTBtn
                         aria-label="Add new reservation"
                         rounded
                         icon="plus"

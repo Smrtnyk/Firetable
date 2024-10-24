@@ -6,14 +6,15 @@ import { useI18n } from "vue-i18n";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { storeToRefs } from "pinia";
+import { matchesProperty } from "es-toolkit/compat";
+import { useDialog } from "src/composables/useDialog";
+import { computed } from "vue";
 
 import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import FTDialog from "src/components/FTDialog.vue";
-import { matchesProperty } from "es-toolkit/compat";
-import { useDialog } from "src/composables/useDialog";
-import { computed } from "vue";
+import FTBtn from "src/components/FTBtn.vue";
 
 export interface PageAdminGuestsProps {
     organisationId: string;
@@ -94,7 +95,7 @@ function getGuestVisitsCount(guest: GuestDoc): number {
     <div class="PageAdminUsers">
         <FTTitle :title="t('PageAdminGuests.title')">
             <template #right>
-                <q-btn
+                <FTBtn
                     rounded
                     icon="plus"
                     class="button-gradient"

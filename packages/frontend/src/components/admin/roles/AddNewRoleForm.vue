@@ -2,7 +2,9 @@
 import { ref, useTemplateRef } from "vue";
 import { minLength } from "src/helpers/form-rules";
 import { QForm } from "quasar";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const emit = defineEmits(["create"]);
 const roleRules = [minLength("Role needs to have at least 3 characters!", 3)];
 const roleName = ref("");
@@ -28,7 +30,7 @@ async function submit(): Promise<void> {
             rounded
             class="button-gradient"
             size="md"
-            label="Create"
+            :label="t('Global.submit')"
             @click="submit"
             v-close-popup
         />

@@ -6,22 +6,18 @@
                     ref="viewerContainerRef"
                     class="col-xs-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3"
                 >
-                    <q-btn
-                        class="button-gradient q-mb-sm"
-                        @click="saveFloorState"
-                        label="save"
-                        size="md"
-                        rounded
+                    <FloorEditorTopControls
+                        v-if="floorInstance && selectedFloorElement"
+                        :selected-floor-element="selectedFloorElement"
+                        :floor-instance="floorInstance"
+                        :existing-labels="
+                            new Set(extractAllTablesLabels(floorInstance as FloorEditor))
+                        "
                     />
                     <FloorEditorControls
                         @floor-save="saveFloorState"
                         v-if="floorInstance"
                         :floor-instance="floorInstance"
-                        :selected-floor-element="selectedFloorElement"
-                        :delete-allowed="false"
-                        :existing-labels="
-                            new Set(extractAllTablesLabels(floorInstance as FloorEditor))
-                        "
                         class="q-mb-sm"
                     />
                     <q-card>
@@ -38,9 +34,11 @@ import type { Floor, FloorEditorElement } from "@firetable/floor-creator";
 import type { FloorDoc } from "@firetable/types";
 import { extractAllTablesLabels, FloorEditor } from "@firetable/floor-creator";
 import { nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch, useTemplateRef } from "vue";
-import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
 import { useFloorEditor } from "src/composables/useFloorEditor";
 import { AppLogger } from "src/logger/FTLogger.js";
+
+import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
+import FloorEditorTopControls from "src/components/Floor/FloorEditorTopControls.vue";
 
 interface Props {
     floor: FloorDoc;

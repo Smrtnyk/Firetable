@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { noEmptyString } from "src/helpers/form-rules";
+import { useI18n } from "vue-i18n";
 
 interface Props {
     allFloorNames: Set<string>;
 }
 
+const { t } = useI18n();
 const props = defineProps<Props>();
 const emit = defineEmits(["create"]);
 const floorName = ref("");
@@ -35,12 +37,18 @@ function onReset(): void {
         />
 
         <div>
-            <q-btn rounded size="md" label="Submit" type="submit" class="button-gradient" />
+            <q-btn
+                rounded
+                size="md"
+                :label="t('Global.submit')"
+                type="submit"
+                class="button-gradient"
+            />
             <q-btn
                 rounded
                 size="md"
                 outline
-                label="Reset"
+                :label="t('Global.reset')"
                 type="reset"
                 color="primary"
                 class="q-ml-sm"

@@ -15,6 +15,7 @@ import { watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { property } from "es-toolkit/compat";
 import { useDialog } from "src/composables/useDialog";
+import FTBtn from "src/components/FTBtn.vue";
 
 interface Props {
     organisationId: string;
@@ -117,7 +118,7 @@ async function onFloorDelete(id: string, reset: VoidFunction): Promise<void> {
     <div class="PageAdminFloors">
         <FTTitle :title="t('PageAdminFloors.title')">
             <template #right>
-                <q-btn
+                <FTBtn
                     rounded
                     icon="plus"
                     class="button-gradient"

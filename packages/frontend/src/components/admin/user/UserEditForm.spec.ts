@@ -87,7 +87,7 @@ describe("UserEditForm", () => {
         const nameInput = screen.getByLabelText(/Name */);
         await userEvent.clear(nameInput);
 
-        const submitButton = screen.getByRole("button", { name: "Update" });
+        const submitButton = screen.getByRole("button", { name: "Submit" });
         await userEvent.click(submitButton);
 
         // Expect validation error for name field
@@ -121,7 +121,7 @@ describe("UserEditForm", () => {
         const propertyCheckbox = screen.getByRole("checkbox", { name: "Property 2" });
         await userEvent.click(propertyCheckbox);
 
-        const submitButton = screen.getByRole("button", { name: "Update" });
+        const submitButton = screen.getByRole("button", { name: "Submit" });
         await userEvent.click(submitButton);
 
         // Check emitted payload
@@ -285,7 +285,7 @@ describe("UserEditForm", () => {
         const managerOption = screen.getByRole("option", { name: Role.MANAGER });
         await userEvent.click(managerOption);
 
-        const submitButton = screen.getByRole("button", { name: "Update" });
+        const submitButton = screen.getByRole("button", { name: "Submit" });
         await userEvent.click(submitButton);
 
         expect(screen.emitted().submit).toBeTruthy();
@@ -311,7 +311,7 @@ describe("UserEditForm", () => {
         });
         await userEvent.click(canEditOwnReservationCheckbox);
 
-        const submitButton = screen.getByRole("button", { name: "Update" });
+        const submitButton = screen.getByRole("button", { name: "Submit" });
         await userEvent.click(submitButton);
 
         // Check that the emitted payload includes the updated capabilities
@@ -336,7 +336,7 @@ describe("UserEditForm", () => {
         await userEvent.clear(screen.getByLabelText("Username *"));
         await userEvent.type(screen.getByLabelText("Username *"), "newusername");
 
-        const submitButton = screen.getByRole("button", { name: "Update" });
+        const submitButton = screen.getByRole("button", { name: "Submit" });
         await userEvent.click(submitButton);
 
         expect(screen.emitted().submit).toBeTruthy();
@@ -351,7 +351,7 @@ describe("UserEditForm", () => {
         await userEvent.clear(screen.getByLabelText("Username *"));
         await userEvent.type(screen.getByLabelText("Username *"), "newusername");
 
-        const submitButton = screen.getByRole("button", { name: "Update" });
+        const submitButton = screen.getByRole("button", { name: "Submit" });
         await userEvent.click(submitButton);
 
         expect(screen.emitted().submit).toBeTruthy();
@@ -370,7 +370,7 @@ describe("UserEditForm", () => {
         // Select Property 2
         await userEvent.click(property2Checkbox);
 
-        const submitButton = screen.getByRole("button", { name: "Update" });
+        const submitButton = screen.getByRole("button", { name: "Submit" });
         await userEvent.click(submitButton);
 
         // Check that the emitted payload includes the updated relatedProperties
@@ -485,7 +485,7 @@ describe("UserEditForm", () => {
         const hostessOption = screen.getByRole("option", { name: Role.HOSTESS });
         await userEvent.click(hostessOption);
 
-        const submitButton = screen.getByRole("button", { name: "Update" });
+        const submitButton = screen.getByRole("button", { name: "Submit" });
         await userEvent.click(submitButton);
 
         // Check that the emitted payload includes capabilities for Hostess role

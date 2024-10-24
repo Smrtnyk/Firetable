@@ -13,6 +13,7 @@ import FTTitle from "src/components/FTTitle.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import AddNewPropertyForm from "src/components/admin/property/AddNewPropertyForm.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
+import FTBtn from "src/components/FTBtn.vue";
 
 import { useQuasar } from "quasar";
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
@@ -156,7 +157,7 @@ function createLinks(propertyId: string): Link[] {
     <div>
         <FTTitle :title="t('PageAdminProperties.properties')">
             <template #right>
-                <q-btn
+                <FTBtn
                     v-if="!organisationsIsLoading && canCreateProperty"
                     rounded
                     icon="plus"
@@ -179,14 +180,15 @@ function createLinks(propertyId: string): Link[] {
                     </q-item-section>
                     <q-space />
                     <q-item-section side>
-                        <div class="row items-center">
-                            <q-btn
-                                flat
+                        <div class="row q-gutter-sm items-center">
+                            <FTBtn
+                                unelevated
                                 icon="pencil"
+                                color="positive"
                                 @click.stop="showUpdatePropertyDialog(property)"
                             />
-                            <q-btn
-                                flat
+                            <FTBtn
+                                unelevated
                                 icon="trash"
                                 color="negative"
                                 @click.stop="deletePropertyAsync(property)"

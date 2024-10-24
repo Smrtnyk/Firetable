@@ -7,6 +7,7 @@ import { updateOrganisationSettings } from "@firetable/backend";
 import SettingsSection from "src/components/admin/organisation-settings/SettingsSection.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import AppCardSection from "src/components/AppCardSection.vue";
+import FTBtn from "src/components/FTBtn.vue";
 
 interface Props {
     organisationId: string;
@@ -66,22 +67,22 @@ function reset(): void {
     <div class="PageAdminOrganisationSettings">
         <FTTitle title="Settings">
             <template #right>
-                <q-btn
+                <FTBtn
                     rounded
                     class="button-gradient q-mr-sm"
                     :disable="!hasSettingsChanged"
                     @click="saveSettings"
                 >
                     Save
-                </q-btn>
-                <q-btn
+                </FTBtn>
+                <FTBtn
                     rounded
                     class="button-gradient"
                     :disable="!hasSettingsChanged"
                     @click="reset"
                 >
                     Reset
-                </q-btn>
+                </FTBtn>
             </template>
         </FTTitle>
 

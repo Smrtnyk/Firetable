@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { buttonSize } from "src/global-reactives/screen-detection";
+
+import FTBtn from "src/components/FTBtn.vue";
 
 export interface EventViewControlsProps {
     activeFloor: { id: string; name: string } | undefined;
@@ -63,8 +64,7 @@ function showNextFloor(): void {
 
 <template>
     <div class="row q-mb-sm q-gutter-sm" aria-label="Toggle event controls menu">
-        <q-btn
-            :size="buttonSize"
+        <FTBtn
             dense
             outline
             color="grey"
@@ -73,8 +73,7 @@ function showNextFloor(): void {
             @click="emit('toggle-queued-reservations-drawer-visibility')"
             aria-label="Toggle queued reservations drawer visibility"
         />
-        <q-btn
-            :size="buttonSize"
+        <FTBtn
             dense
             outline
             color="grey"
@@ -83,8 +82,7 @@ function showNextFloor(): void {
             @click="emit('toggle-event-guest-list-drawer-visibility')"
             aria-label="Toggle event guest list drawer visibility"
         />
-        <q-btn
-            :size="buttonSize"
+        <FTBtn
             dense
             outline
             color="grey"
@@ -94,12 +92,11 @@ function showNextFloor(): void {
             aria-label="Show event info"
         />
 
-        <q-btn
+        <FTBtn
             v-if="isAdmin"
             clickable
             v-close-popup
             @click="() => emit('navigate-to-admin-event')"
-            :size="buttonSize"
             dense
             outline
             color="grey"
@@ -109,24 +106,22 @@ function showNextFloor(): void {
 
         <q-space />
         <template v-if="shouldShowButtons">
-            <q-btn
+            <FTBtn
                 unelevated
                 outline
                 color="grey"
                 dense
                 icon="chevron_left"
-                :size="buttonSize"
                 @click="showPrevFloor"
                 :disabled="!previousFloor"
                 aria-label="Show previous floor"
             />
-            <q-btn
+            <FTBtn
                 unelevated
                 outline
                 color="grey"
                 dense
                 icon="chevron_right"
-                :size="buttonSize"
                 @click="showNextFloor"
                 :disabled="!nextFloor"
                 aria-label="Show next floor"

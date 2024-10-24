@@ -11,6 +11,7 @@ import FTDialog from "src/components/FTDialog.vue";
 import AdminUsersList from "src/components/admin/user/AdminUsersList.vue";
 import FTTabs from "src/components/FTTabs.vue";
 import FTTabPanels from "src/components/FTTabPanels.vue";
+import FTBtn from "src/components/FTBtn.vue";
 
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { computed, onBeforeMount, onUnmounted, ref, watch } from "vue";
@@ -231,7 +232,7 @@ async function onUserSlideRight(user: User): Promise<void> {
     <div class="PageAdminUsers">
         <FTTitle :title="t('PageAdminUsers.title')">
             <template #right>
-                <q-btn rounded icon="plus" class="button-gradient" @click="showCreateUserDialog" />
+                <FTBtn rounded icon="plus" class="button-gradient" @click="showCreateUserDialog" />
             </template>
         </FTTitle>
 

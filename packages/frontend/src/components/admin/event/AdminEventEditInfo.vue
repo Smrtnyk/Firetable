@@ -1,6 +1,6 @@
 <template>
     <q-input v-model="localEventInfoValue" filled autogrow />
-    <q-btn
+    <FTBtn
         rounded
         class="button-gradient q-mt-sm"
         icon="save"
@@ -14,6 +14,7 @@ import type { EventOwner } from "@firetable/backend";
 import { ref } from "vue";
 import { updateEvent } from "@firetable/backend";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import FTBtn from "src/components/FTBtn.vue";
 
 interface Props {
     eventOwner: EventOwner;

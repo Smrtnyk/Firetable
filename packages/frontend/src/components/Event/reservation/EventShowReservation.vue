@@ -7,6 +7,7 @@ import { useAuthStore } from "src/stores/auth-store";
 
 import ReservationGeneralInfo from "src/components/Event/reservation/ReservationGeneralInfo.vue";
 import ReservationLabelChips from "src/components/Event/reservation/ReservationLabelChips.vue";
+import FTBtn from "src/components/FTBtn.vue";
 
 interface Props {
     reservation: ReservationDoc;
@@ -160,7 +161,7 @@ function onWaitingForResponse(): void {
 
         <q-item class="q-pa-sm-none q-pa-xs-none">
             <div class="row q-gutter-sm">
-                <q-btn
+                <FTBtn
                     v-if="canDeleteReservation"
                     :title="t('Global.delete')"
                     class="no-wrap q-ml-none"
@@ -169,7 +170,7 @@ function onWaitingForResponse(): void {
                     @click="() => emit('delete')"
                     v-close-popup
                 />
-                <q-btn
+                <FTBtn
                     v-if="canEditReservation && !isCancelled"
                     :title="t('Global.edit')"
                     icon="pencil"
@@ -177,7 +178,7 @@ function onWaitingForResponse(): void {
                     @click="() => emit('edit')"
                     v-close-popup
                 />
-                <q-btn
+                <FTBtn
                     v-if="canMoveToQueue"
                     title="Move to queue"
                     icon="bookmark"
@@ -188,14 +189,14 @@ function onWaitingForResponse(): void {
             </div>
             <q-space />
             <div v-if="authStore.canReserve && !isCancelled" class="row q-gutter-sm justify-end">
-                <q-btn
+                <FTBtn
                     :title="t('Global.transfer')"
                     icon="transfer"
                     color="primary"
                     @click="() => emit('transfer')"
                     v-close-popup
                 />
-                <q-btn
+                <FTBtn
                     :title="t('Global.copy')"
                     icon="copy"
                     color="primary"

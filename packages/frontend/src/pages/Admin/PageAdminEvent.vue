@@ -26,7 +26,7 @@ import AppCardSection from "src/components/AppCardSection.vue";
 import { Loading } from "quasar";
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useAdminEvent } from "src/composables/useAdminEvent";
-import { buttonSize, isMobile } from "src/global-reactives/screen-detection";
+import { isMobile } from "src/global-reactives/screen-detection";
 import { truncateText } from "src/helpers/string-utils";
 import { compressFloorDoc } from "src/helpers/compress-floor-doc";
 import { useGuestsForEvent } from "src/composables/useGuestsForEvent";
@@ -34,6 +34,7 @@ import { usePropertiesStore } from "src/stores/properties-store";
 import { property } from "es-toolkit/compat";
 import { useAuthStore } from "src/stores/auth-store";
 import { useDialog } from "src/composables/useDialog";
+import FTBtn from "src/components/FTBtn.vue";
 
 interface Props {
     organisationId: string;
@@ -200,8 +201,7 @@ onMounted(init);
     <div v-if="event && !isLoading" class="PageAdminEvent">
         <FTTitle :title="event.name" :subtitle="formatEventDate(event.date)">
             <template #right>
-                <q-btn
-                    :size="buttonSize"
+                <FTBtn
                     rounded
                     :to="{
                         name: 'event',
@@ -213,7 +213,7 @@ onMounted(init);
                     }"
                     class="button-gradient"
                     >View
-                </q-btn>
+                </FTBtn>
             </template>
         </FTTitle>
         <FTTabs v-model="tab">
@@ -287,13 +287,12 @@ onMounted(init);
                         </q-item-section>
 
                         <q-item-section side>
-                            <q-btn
+                            <FTBtn
                                 rounded
                                 icon="pencil"
                                 class="button-gradient"
-                                size="md"
                                 @click="showEventInfoEditDialog"
-                            ></q-btn>
+                            />
                         </q-item-section>
                     </q-item>
                 </AppCardSection>
@@ -307,14 +306,13 @@ onMounted(init);
                         </q-item-section>
 
                         <q-item-section side>
-                            <q-btn
+                            <FTBtn
                                 class="button-gradient"
-                                size="md"
                                 icon="pencil"
                                 rounded
                                 @click="() => showFloorEditDialog(floor)"
                             >
-                            </q-btn>
+                            </FTBtn>
                         </q-item-section>
                     </q-item>
                 </AppCardSection>

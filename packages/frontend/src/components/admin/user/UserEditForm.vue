@@ -12,6 +12,7 @@ import { DEFAULT_CAPABILITIES_BY_ROLE, Role } from "@firetable/types";
 import { QForm } from "quasar";
 import { noEmptyString, noWhiteSpaces } from "src/helpers/form-rules";
 import { property } from "es-toolkit/compat";
+import { useI18n } from "vue-i18n";
 
 export interface UserEditFormProps {
     user: User;
@@ -26,6 +27,7 @@ const nameRules = [noEmptyString()];
 const stringRules = [noWhiteSpaces];
 const userNameRules = [noWhiteSpaces];
 
+const { t } = useI18n();
 const emit = defineEmits<Emits>();
 const props = defineProps<UserEditFormProps>();
 const userEditForm = useTemplateRef<QForm>("userEditForm");
@@ -199,12 +201,18 @@ function resetProperties(): void {
             </div>
 
             <div>
-                <q-btn rounded size="md" label="Update" type="submit" class="button-gradient" />
+                <q-btn
+                    rounded
+                    size="md"
+                    :label="t('Global.submit')"
+                    type="submit"
+                    class="button-gradient"
+                />
                 <q-btn
                     rounded
                     size="md"
                     outline
-                    label="Reset"
+                    :label="t('Global.reset')"
                     type="reset"
                     color="primary"
                     class="q-ml-sm"
