@@ -1,13 +1,14 @@
 import type { RenderResult } from "vitest-browser-vue";
-import type { GuestDoc, PropertyDoc, Visit } from "@firetable/types";
+import type { AppUser, GuestDoc, PropertyDoc, Visit } from "@firetable/types";
 import type { PageAdminGuestsProps } from "./PageAdminGuests.vue";
-
 import type { Ref } from "vue";
+
 import PageAdminGuests from "./PageAdminGuests.vue";
 import { renderComponent, t } from "../../../test-helpers/render-component";
-import { ref } from "vue";
 import FTDialog from "src/components/FTDialog.vue";
 import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
+import { ADMIN, Role } from "@firetable/types";
+import { ref } from "vue";
 
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { userEvent } from "@vitest/browser/context";
@@ -25,14 +26,29 @@ vi.mock("src/composables/useDialog", () => ({
 
 vi.mock("src/composables/useFirestore", () => ({
     useFirestoreCollection: useFirestoreCollectionMock,
+    useFirestoreDocument: vi.fn(),
     createQuery: vi.fn(),
 }));
 
 describe("PageAdminGuests.vue", () => {
     let guestsData: Ref<GuestDoc[]>;
     let propertiesData: PropertyDoc[];
+    let authState: { user: AppUser };
 
     beforeEach(() => {
+        authState = {
+            user: {
+                id: "admin1",
+                name: "Admin User",
+                email: "admin@example.com",
+                username: "adminuser",
+                role: ADMIN,
+                // Irrelevant for admin
+                relatedProperties: [],
+                organisationId: "org1",
+                capabilities: undefined,
+            },
+        };
         guestsData = ref([
             {
                 id: "guest1",
@@ -92,6 +108,7 @@ describe("PageAdminGuests.vue", () => {
                     properties: {
                         properties: propertiesData,
                     },
+                    auth: authState,
                 },
             },
         });
@@ -287,5 +304,188 @@ describe("PageAdminGuests.vue", () => {
         await userEvent.click(guestItem);
 
         // Assert navigation
+    });
+
+    describe("user role-based guest filtering", () => {
+        it("renders all guests for admin users", async () => {
+            // Admin is default in the test setup
+            guestsData = ref([
+                {
+                    id: "guest1",
+                    name: "John Doe",
+                    contact: "john@example.com",
+                    hashedContact: "hashedContact",
+                    maskedContact: "maskedContact",
+                    visitedProperties: {
+                        property1: {
+                            visit1: { date: new Date("2023-10-01").getTime() } as Visit,
+                            visit2: { date: new Date("2023-10-05").getTime() } as Visit,
+                        },
+                        property2: {
+                            visit3: { date: new Date("2023-09-15").getTime() } as Visit,
+                        },
+                    },
+                } as GuestDoc,
+                {
+                    id: "guest2",
+                    name: "Jane Smith",
+                    contact: "jane@example.com",
+                    hashedContact: "hashedContact",
+                    maskedContact: "maskedContact",
+                    visitedProperties: {
+                        property1: {
+                            visit4: { date: new Date("2023-08-20").getTime() } as Visit,
+                        },
+                    },
+                } as GuestDoc,
+                {
+                    id: "guest3",
+                    name: "Alice Johnson",
+                    contact: "alice@example.com",
+                    hashedContact: "hashedContact",
+                    maskedContact: "maskedContact",
+                    visitedProperties: {},
+                } as GuestDoc,
+            ]);
+
+            useFirestoreCollectionMock.mockReturnValue({
+                data: guestsData,
+                pending: ref(false),
+            });
+
+            const screen = await render();
+
+            await expect.element(screen.getByText("John Doe")).toBeVisible();
+            await expect.element(screen.getByText("Jane Smith")).toBeVisible();
+            await expect.element(screen.getByText("Alice Johnson")).toBeVisible();
+        });
+
+        it("renders only related guests for non-admin users", async () => {
+            authState = {
+                user: {
+                    id: "user1",
+                    name: "Test User",
+                    email: "user@example.com",
+                    username: "testuser",
+                    role: Role.HOSTESS,
+                    relatedProperties: ["property1"],
+                    organisationId: "org1",
+                    capabilities: undefined,
+                },
+            };
+
+            guestsData = ref([
+                {
+                    id: "guest1",
+                    name: "John Doe",
+                    contact: "john@example.com",
+                    hashedContact: "hashedContact",
+                    maskedContact: "maskedContact",
+                    visitedProperties: {
+                        property1: {
+                            visit1: { date: new Date("2023-10-01").getTime() } as Visit,
+                            visit2: { date: new Date("2023-10-05").getTime() } as Visit,
+                        },
+                        property2: {
+                            visit3: { date: new Date("2023-09-15").getTime() } as Visit,
+                        },
+                    },
+                } as GuestDoc,
+                {
+                    id: "guest2",
+                    name: "Jane Smith",
+                    contact: "jane@example.com",
+                    hashedContact: "hashedContact",
+                    maskedContact: "maskedContact",
+                    visitedProperties: {
+                        property1: {
+                            visit4: { date: new Date("2023-08-20").getTime() } as Visit,
+                        },
+                    },
+                } as GuestDoc,
+                {
+                    id: "guest3",
+                    name: "Alice Johnson",
+                    contact: "alice@example.com",
+                    hashedContact: "hashedContact",
+                    maskedContact: "maskedContact",
+                    visitedProperties: {},
+                } as GuestDoc,
+            ]);
+
+            useFirestoreCollectionMock.mockReturnValue({
+                data: guestsData,
+                pending: ref(false),
+            });
+
+            const screen = await render();
+
+            await expect.element(screen.getByText("John Doe")).toBeVisible();
+            await expect.element(screen.getByText("Jane Smith")).toBeVisible();
+            await expect.element(screen.getByText("Alice Johnson")).not.toBeInTheDocument();
+        });
+
+        it("renders no guests for non-admin users with no related properties", async () => {
+            authState = {
+                user: {
+                    id: "user2",
+                    name: "No Property User",
+                    email: "noproperty@example.com",
+                    username: "nopropertyuser",
+                    role: Role.HOSTESS,
+                    relatedProperties: [],
+                    organisationId: "org1",
+                    capabilities: undefined,
+                },
+            };
+
+            guestsData = ref([
+                {
+                    id: "guest1",
+                    name: "John Doe",
+                    contact: "john@example.com",
+                    hashedContact: "hashedContact",
+                    maskedContact: "maskedContact",
+                    visitedProperties: {
+                        property1: {
+                            visit1: { date: new Date("2023-10-01").getTime() } as Visit,
+                        },
+                    },
+                } as GuestDoc,
+                {
+                    id: "guest2",
+                    name: "Jane Smith",
+                    contact: "jane@example.com",
+                    hashedContact: "hashedContact",
+                    maskedContact: "maskedContact",
+                    visitedProperties: {
+                        property2: {
+                            visit2: { date: new Date("2023-10-05").getTime() } as Visit,
+                        },
+                    },
+                } as GuestDoc,
+                {
+                    id: "guest3",
+                    name: "Alice Johnson",
+                    contact: "alice@example.com",
+                    hashedContact: "hashedContact",
+                    maskedContact: "maskedContact",
+                    visitedProperties: {},
+                } as GuestDoc,
+            ]);
+
+            useFirestoreCollectionMock.mockReturnValue({
+                data: guestsData,
+                pending: ref(false),
+            });
+
+            const screen = await render();
+
+            await expect.element(screen.getByText("John Doe")).not.toBeInTheDocument();
+            await expect.element(screen.getByText("Jane Smith")).not.toBeInTheDocument();
+            await expect.element(screen.getByText("Alice Johnson")).not.toBeInTheDocument();
+
+            await expect.element(screen.getByText("No guests data")).toBeInTheDocument();
+        });
     });
 });

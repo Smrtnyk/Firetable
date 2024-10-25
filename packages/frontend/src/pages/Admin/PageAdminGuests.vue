@@ -11,6 +11,7 @@ import { useDialog } from "src/composables/useDialog";
 import { computed, ref, watch } from "vue";
 import { isMobile } from "src/global-reactives/screen-detection";
 import { Loading } from "quasar";
+import { useAuthStore } from "src/stores/auth-store";
 
 import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
@@ -25,6 +26,7 @@ export interface PageAdminGuestsProps {
 type SortOption = "bookings" | "percentage";
 
 type Summary = {
+    propertyId: string;
     propertyName: string;
     totalReservations: number;
     fulfilledVisits: number;
@@ -47,6 +49,7 @@ const { data: guests, pending: isLoading } = useFirestoreCollection<GuestDoc>(
     },
 );
 const { properties } = storeToRefs(usePropertiesStore());
+const { nonNullableUser, isAdmin } = storeToRefs(useAuthStore());
 
 watch(
     () => isLoading.value,
@@ -66,32 +69,44 @@ const guestsWithSummaries = computed(function () {
         return [];
     }
 
-    return guests.value.map(function (guest) {
-        const summaries = guestReservationsSummary(guest);
-        let totalReservations = 0;
-        let fulfilledVisits = 0;
+    return guests.value
+        .map(function (guest) {
+            const summaries = guestReservationsSummary(guest);
+            let totalReservations = 0;
+            let fulfilledVisits = 0;
 
-        if (summaries) {
-            summaries.forEach(function (summary) {
-                totalReservations += summary.totalReservations;
-                fulfilledVisits += summary.fulfilledVisits;
+            if (summaries) {
+                summaries.forEach(function (summary) {
+                    totalReservations += summary.totalReservations;
+                    fulfilledVisits += summary.fulfilledVisits;
+                });
+            }
+
+            const overallPercentage =
+                totalReservations > 0
+                    ? ((fulfilledVisits / totalReservations) * 100).toFixed(2)
+                    : "0.00";
+
+            return {
+                ...guest,
+                id: guest.id,
+                summary: summaries,
+                totalReservations,
+                fulfilledVisits,
+                overallPercentage,
+            };
+        })
+        .filter(function (guest) {
+            // Admin sees all guests
+            if (isAdmin.value) {
+                return true;
+            }
+
+            // Check if any of the guest's visited properties are in the user's relatedProperties
+            return guest.summary?.some(function (summary) {
+                return nonNullableUser.value.relatedProperties.includes(summary.propertyId);
             });
-        }
-
-        const overallPercentage =
-            totalReservations > 0
-                ? ((fulfilledVisits / totalReservations) * 100).toFixed(2)
-                : "0.00";
-
-        return {
-            ...guest,
-            id: guest.id,
-            summary: summaries,
-            totalReservations,
-            fulfilledVisits,
-            overallPercentage,
-        };
-    });
+        });
 });
 
 const sortedGuests = computed(function () {
@@ -201,6 +216,7 @@ function guestReservationsSummary(guest: GuestDoc): Summary[] | undefined {
                 : "0.00";
 
         return {
+            propertyId: property.id,
             propertyName: property.name,
             totalReservations,
             fulfilledVisits,
@@ -301,7 +317,11 @@ function guestReservationsSummary(guest: GuestDoc): Summary[] | undefined {
                     </q-item-label>
                     <q-item-label caption>
                         <template v-if="item.summary">
-                            <div v-for="summary in item.summary" class="full-width">
+                            <div
+                                v-for="summary in item.summary"
+                                :key="summary.propertyName"
+                                class="full-width"
+                            >
                                 <span>{{ summary.propertyName }}</span
                                 >:
                                 <q-chip text-color="white" color="tertiary" size="sm"
