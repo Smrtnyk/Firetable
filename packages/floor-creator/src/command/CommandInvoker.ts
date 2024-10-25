@@ -1,5 +1,5 @@
 import type { Command } from "./Command.js";
-import { EventEmitter } from "../event-emitter/EventEmitter.js";
+import { EventEmitter } from "@posva/event-emitter";
 
 type CommandInvokerEvents = {
     change: [null];

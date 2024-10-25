@@ -1,9 +1,9 @@
 import type { FabricObject } from "fabric";
-import type { FloorCreationOptions, FloorEditorElement } from "./types.js";
+import type { FloorCreationOptions, FloorEditorElement, ToTuple } from "./types.js";
 import { Floor } from "./Floor.js";
 import { ViewerEventManager } from "./event-manager/ViewerEventManager.js";
-import { EventEmitter } from "./event-emitter/EventEmitter.js";
 import { isTable } from "./type-guards.js";
+import { EventEmitter } from "@posva/event-emitter";
 
 type FloorViewerEvents = {
     elementClicked: [FloorViewer, FloorEditorElement];
@@ -21,7 +21,10 @@ export class FloorViewer extends Floor {
         this.canvas.defaultCursor = "default";
     }
 
-    emit<T extends keyof FloorViewerEvents>(event: T, ...args: FloorViewerEvents[T]): void {
+    emit<T extends keyof FloorViewerEvents>(
+        event: T,
+        ...args: ToTuple<FloorViewerEvents[T]>
+    ): void {
         this.eventEmitter.emit(event, ...args);
     }
 

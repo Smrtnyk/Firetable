@@ -19,14 +19,15 @@
         "bundle": "node esbuild-bundle.js"
     },
     "dependencies": {
+        "@posva/event-emitter": "1.0.2",
         "es-toolkit": "catalog:",
         "fabric": "6.4.3",
         "hammerjs": "2.0.8"
     },
     "devDependencies": {
-        "@types/node": "22.7.9",
-        "@types/hammerjs": "2.0.46",
         "@playwright/test": "1.48.1",
+        "@types/hammerjs": "2.0.46",
+        "@types/node": "22.7.9",
         "@vitest/browser": "catalog:",
         "cheerio": "1.0.0",
         "esbuild": "0.24.0",

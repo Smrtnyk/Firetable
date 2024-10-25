@@ -1,7 +1,6 @@
 import type { FabricObject } from "fabric";
 import type { BaseTable, FloorCreationOptions, FloorData } from "./types.js";
 import type { EventManager } from "./event-manager/EventManager.js";
-import type { EventEmitterListener } from "./event-emitter/EventEmitter.js";
 import { CANVAS_BG_COLOR } from "./constants.js";
 import { TouchManager } from "./TouchManager.js";
 import { FloorZoomManager } from "./FloorZoomManager.js";
@@ -125,7 +124,7 @@ export abstract class Floor {
 
     abstract onFloorDoubleTap(coordinates: [x: number, y: number]): void;
     abstract emit(event: string, ...args: unknown[]): void;
-    abstract on(event: string, listener: EventEmitterListener): void;
+    abstract on(event: string, listener: any): void;
     abstract destroy(): void;
     protected abstract onElementClick(ev: FabricObject): void;
     protected abstract setElementProperties(element: FabricObject): void;

@@ -7,6 +7,7 @@ import type {
     FloorDropEvent,
     FloorEditorElement,
     NumberTuple,
+    ToTuple,
 } from "./types.js";
 import { ElementManager } from "./ElementManager.js";
 import { Floor } from "./Floor.js";
@@ -14,9 +15,9 @@ import { GridDrawer } from "./GridDrawer.js";
 import { EditorEventManager } from "./event-manager/EditorEventManager.js";
 import { calculateCanvasScale } from "./utils.js";
 import { CommandInvoker } from "./command/CommandInvoker.js";
-import { EventEmitter } from "./event-emitter/EventEmitter.js";
 import { ActiveSelection } from "fabric";
 import { initAligningGuidelines } from "fabric/extensions";
+import { EventEmitter } from "@posva/event-emitter";
 
 type FloorEditorEvents = {
     elementClicked: [FloorEditor, FloorEditorElement];
@@ -68,13 +69,16 @@ export class FloorEditor extends Floor {
         return this.commandInvoker.redo();
     }
 
-    emit<T extends keyof FloorEditorEvents>(event: T, ...args: FloorEditorEvents[T]): void {
+    emit<T extends keyof FloorEditorEvents>(
+        event: T,
+        ...args: ToTuple<FloorEditorEvents[T]>
+    ): void {
         this.eventEmitter.emit(event, ...args);
     }
 
     on<T extends keyof FloorEditorEvents>(
         event: T,
-        listener: (...args: FloorEditorEvents[T]) => void,
+        listener: (...args: ToTuple<FloorEditorEvents[T]>) => void,
     ): void {
         this.eventEmitter.on(event, listener);
     }
