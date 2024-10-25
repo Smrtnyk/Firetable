@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { CreateGuestPayload, GuestDoc, Visit } from "@firetable/types";
-import { useFirestoreCollection } from "src/composables/useFirestore";
-import { createGuest, getGuestsPath } from "@firetable/backend";
+import { createGuest } from "@firetable/backend";
 import { useI18n } from "vue-i18n";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { usePropertiesStore } from "src/stores/properties-store";
@@ -18,6 +17,7 @@ import FTTitle from "src/components/FTTitle.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import FTBtn from "src/components/FTBtn.vue";
+import { useGuestsStore } from "src/stores/guests-store";
 
 export interface PageAdminGuestsProps {
     organisationId: string;
@@ -42,12 +42,8 @@ const sortOptions = [
 const { createDialog } = useDialog();
 const { t } = useI18n();
 const props = defineProps<PageAdminGuestsProps>();
-const { data: guests, pending: isLoading } = useFirestoreCollection<GuestDoc>(
-    getGuestsPath(props.organisationId),
-    {
-        wait: true,
-    },
-);
+const guestsStore = useGuestsStore();
+const { data: guests, pending: isLoading } = guestsStore.getGuests(props.organisationId);
 const { properties } = storeToRefs(usePropertiesStore());
 const { nonNullableUser, isAdmin } = storeToRefs(useAuthStore());
 

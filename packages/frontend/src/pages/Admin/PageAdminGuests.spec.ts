@@ -297,15 +297,6 @@ describe("PageAdminGuests.vue", () => {
         await expect.element(screen.getByLabelText("Sort Guests")).not.toBeInTheDocument();
     });
 
-    it.todo("navigates to guest detail when a guest item is clicked", async () => {
-        const screen = await render();
-
-        const guestItem = screen.getByText("John Doe - john@example.com");
-        await userEvent.click(guestItem);
-
-        // Assert navigation
-    });
-
     describe("user role-based guest filtering", () => {
         it("renders all guests for admin users", async () => {
             // Admin is default in the test setup
