@@ -49,20 +49,23 @@ describe("updateUserFn", () => {
         it("should successfully update user details and property associations", async () => {
             const organisationId = "org1";
             const email = "original@example.com";
+            const role = Role.STAFF;
             const updatedUser = {
                 name: "Updated Name",
                 email: "updated@example.com",
                 relatedProperties: ["property1", "property2"],
+                username: "updateduser",
+                role,
             };
 
             const uid = await createUser({
                 email,
                 password: "password",
                 organisationId,
-                role: Role.STAFF,
+                role,
             });
 
-            // Setting up existing user and properties in Mock Firestore
+            // Setting up existing user in Mock Firestore
             await mockFirestore
                 .collection(`organisations/${organisationId}/users`)
                 .doc(uid)
@@ -72,12 +75,9 @@ describe("updateUserFn", () => {
                     relatedProperties: ["property1"],
                 });
 
-            // Simulate the callable request
-            const request = {
+            const result = await updateUserFn({
                 data: { updatedUser, userId: uid, organisationId },
-            } as CallableRequest<EditUserPayload>;
-
-            const result = await updateUserFn(request);
+            } as CallableRequest<EditUserPayload>);
 
             expect(result).toEqual({ success: true, message: "User updated successfully." });
 
@@ -88,6 +88,53 @@ describe("updateUserFn", () => {
             expect(userDoc.email).toBe(updatedUser.email);
             expect(userDoc.relatedProperties).toEqual(updatedUser.relatedProperties);
         });
+    });
+
+    it("does not throw an error if capabilities is undefined", async () => {
+        const organisationId = "org1";
+        const email = "user2@example.com";
+        const updatedUser = {
+            name: "Updated Name",
+            email: "updated2@example.com",
+            relatedProperties: ["property3", "property4"],
+            username: "updateduser2",
+            role: Role.STAFF,
+            // capabilities is intentionally omitted
+        };
+
+        const uid = await createUser({
+            email,
+            password: "password456",
+            organisationId,
+            role: Role.STAFF,
+        });
+
+        // Set up existing user in Mock Firestore with capabilities
+        await mockFirestore
+            .collection(`organisations/${organisationId}/users`)
+            .doc(uid)
+            .set({
+                name: "Original Name",
+                email,
+                relatedProperties: ["property3"],
+                capabilities: ["cap2"],
+            });
+
+        const request = {
+            data: { updatedUser, userId: uid, organisationId },
+        } as CallableRequest<EditUserPayload>;
+
+        const result = await updateUserFn(request);
+
+        expect(result).toEqual({ success: true, message: "User updated successfully." });
+
+        // Verify user details updated in Firestore
+        const userDoc = mockFirestore.getDataAtPath(getUserPath(organisationId, uid)).data;
+
+        expect(userDoc.name).toBe(updatedUser.name);
+        expect(userDoc.email).toBe(updatedUser.email);
+        expect(userDoc.relatedProperties).toEqual(updatedUser.relatedProperties);
+        expect(userDoc.capabilities).toEqual(["cap2"]);
     });
 
     describe("Handling errors", () => {
@@ -150,7 +197,15 @@ describe("updateUserFn", () => {
             const request = {
                 auth: { uid },
                 data: {
-                    updatedUser: { password: newPassword, relatedProperties: [] } as any,
+                    updatedUser: {
+                        password: newPassword,
+                        relatedProperties: [],
+                        name: "Test User",
+                        username: "TestUser",
+                        email: "test@example.com",
+                        role: "Staff",
+                        capabilities: {},
+                    } as any,
                     userId: uid,
                     organisationId: "org1",
                 },
@@ -188,7 +243,7 @@ describe("updateUserFn", () => {
     describe("Role updates", () => {
         it("should update custom claim when role is updated", async () => {
             const organisationId = "org1";
-            const newRole = "admin";
+            const newRole = Role.PROPERTY_OWNER;
 
             const { uid } = await mockAuth.createUser({
                 email: "test@example.com",
@@ -200,14 +255,25 @@ describe("updateUserFn", () => {
                 email: "",
             });
 
-            await mockAuth.setCustomUserClaims(uid, { role: "user", organisationId });
+            await mockAuth.setCustomUserClaims(uid, { role: Role.MANAGER, organisationId });
 
             const request = {
                 data: {
-                    updatedUser: { role: newRole, relatedProperties: [] } as any,
+                    updatedUser: {
+                        role: newRole,
+                        relatedProperties: [],
+                        name: "Test User",
+                        username: "TestUser",
+                        email: "test@example.com",
+                        capabilities: {},
+                        organisationId,
+                        password: "password",
+                        id: uid,
+                    },
                     userId: uid,
                     organisationId,
                 },
+                rawRequest: {} as any,
             } as CallableRequest<EditUserPayload>;
 
             await updateUserFn(request);

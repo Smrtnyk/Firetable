@@ -6,27 +6,20 @@ import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
 
 /**
- * Updates user details and property associations in Firestore.
+ * Updates user details in Firestore and in firebase auth.
  *
- * This function is responsible for making the necessary changes to user data and their associated properties
- * in Firestore based on the provided payload. It will perform the following operations atomically:
+ * It will perform the following operations atomically:
  *
  * 1. Update the user's basic information, if provided.
  * 2. Add new associations between the user and properties.
  * 3. Remove any associations that are no longer needed.
  *
- * The function uses transactions to ensure that all database operations are atomic. If any part of the update process
- * fails, none of the changes will be committed to the database. This helps in maintaining data integrity.
- *
  * Note: Before updating, the function checks if the user exists and if valid data has been provided.
  * If any of these conditions are not met, the function will throw a specific error.
  *
- * @param req - Contains the user data to be updated and the properties to be associated or disassociated.
+ * @param req - Contains the user data to be updated and the properties to be as
  *
- * @throws Throws an error with code "invalid-argument" if the user ID is not provided or if no data is provided for the update.
- * @throws Throws an error with code "internal" if any part of the update process fails.
- *
- * @returns Returns a promise that resolves once the user and their associated properties have been successfully updated in Firestore.
+ * @returns Returns a promise that resolves once the user has been successfully updated in Firestore.
  */
 export async function updateUserFn(
     req: CallableRequest<EditUserPayload>,
@@ -75,15 +68,22 @@ export async function updateUserFn(
         }
     }
 
+    // Prepare the data to update
+    const updateData: Record<string, any> = {
+        name: updatedUser.name,
+        username: updatedUser.username,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        relatedProperties: updatedUser.relatedProperties,
+    };
+
+    // Conditionally include 'capabilities' if it's provided and not undefined
+    if (updatedUser.capabilities !== undefined) {
+        updateData.capabilities = updatedUser.capabilities;
+    }
+
     try {
-        await db.doc(getUserPath(organisationId, userId)).update({
-            name: updatedUser.name,
-            username: updatedUser.username,
-            email: updatedUser.email,
-            role: updatedUser.role,
-            relatedProperties: updatedUser.relatedProperties,
-            capabilities: updatedUser.capabilities,
-        });
+        await db.doc(getUserPath(organisationId, userId)).update(updateData);
 
         return { success: true, message: "User updated successfully." };
     } catch (error: any) {

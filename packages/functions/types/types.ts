@@ -32,7 +32,7 @@ export interface CreateUserPayload {
     password: string;
     relatedProperties: string[];
     organisationId: string;
-    capabilities: UserCapabilities;
+    capabilities?: UserCapabilities;
 }
 
 export interface User {
@@ -43,7 +43,7 @@ export interface User {
     role: Role | typeof ADMIN;
     relatedProperties: string[];
     organisationId: string;
-    capabilities: UserCapabilities;
+    capabilities?: UserCapabilities;
 }
 
 export interface EditUserPayload {
