@@ -228,6 +228,7 @@ function guestReservationsSummary(guest: GuestDoc): Summary[] | undefined {
 
         <!-- Search Input and Sort Options Container -->
         <q-input
+            v-if="guestsWithSummaries.length > 0 && !isLoading"
             :dense="isMobile"
             standout
             rounded

@@ -268,6 +268,18 @@ describe("PageAdminGuests.vue", () => {
         });
     });
 
+    it("does not render search and filter controls when there are no guests", async () => {
+        useFirestoreCollectionMock.mockReturnValue({
+            data: ref([]),
+            pending: ref(false),
+        });
+
+        const screen = await render();
+
+        await expect.element(screen.getByLabelText("Search guests")).not.toBeInTheDocument();
+        await expect.element(screen.getByLabelText("Sort Guests")).not.toBeInTheDocument();
+    });
+
     it.todo("navigates to guest detail when a guest item is clicked", async () => {
         const screen = await render();
 
