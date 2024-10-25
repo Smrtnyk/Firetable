@@ -44,6 +44,7 @@ export interface UserCapabilities {
     [UserCapability.CAN_SEE_INVENTORY]?: boolean;
     [UserCapability.CAN_EDIT_FLOOR_PLANS]?: boolean;
     [UserCapability.CAN_CREATE_EVENTS]?: boolean;
+    [UserCapability.CAN_SEE_GUESTBOOK]?: boolean;
 }
 
 export const enum UserCapability {
@@ -59,6 +60,7 @@ export const enum UserCapability {
     CAN_SEE_INVENTORY = "Can see inventory",
     CAN_EDIT_FLOOR_PLANS = "Can edit floor plans",
     CAN_CREATE_EVENTS = "Can create events",
+    CAN_SEE_GUESTBOOK = "Can see guestbook",
 }
 
 export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapabilities> = {
@@ -75,6 +77,7 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapab
         [UserCapability.CAN_SEE_INVENTORY]: true,
         [UserCapability.CAN_EDIT_FLOOR_PLANS]: true,
         [UserCapability.CAN_CREATE_EVENTS]: true,
+        [UserCapability.CAN_SEE_GUESTBOOK]: true,
     },
     [Role.PROPERTY_OWNER]: {
         [UserCapability.CAN_RESERVE]: true,
@@ -89,6 +92,7 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapab
         [UserCapability.CAN_SEE_INVENTORY]: true,
         [UserCapability.CAN_EDIT_FLOOR_PLANS]: true,
         [UserCapability.CAN_CREATE_EVENTS]: true,
+        [UserCapability.CAN_SEE_GUESTBOOK]: true,
     },
     [Role.MANAGER]: {
         [UserCapability.CAN_RESERVE]: true,
@@ -103,6 +107,7 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapab
         [UserCapability.CAN_SEE_INVENTORY]: true,
         [UserCapability.CAN_EDIT_FLOOR_PLANS]: true,
         [UserCapability.CAN_CREATE_EVENTS]: true,
+        [UserCapability.CAN_SEE_GUESTBOOK]: true,
     },
     [Role.HOSTESS]: {
         [UserCapability.CAN_RESERVE]: true,
@@ -117,6 +122,7 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapab
         [UserCapability.CAN_SEE_INVENTORY]: false,
         [UserCapability.CAN_EDIT_FLOOR_PLANS]: false,
         [UserCapability.CAN_CREATE_EVENTS]: false,
+        [UserCapability.CAN_SEE_GUESTBOOK]: true,
     },
     [Role.STAFF]: {
         [UserCapability.CAN_RESERVE]: false,
@@ -131,5 +137,6 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapab
         [UserCapability.CAN_SEE_INVENTORY]: false,
         [UserCapability.CAN_EDIT_FLOOR_PLANS]: false,
         [UserCapability.CAN_CREATE_EVENTS]: false,
+        [UserCapability.CAN_SEE_GUESTBOOK]: false,
     },
 };

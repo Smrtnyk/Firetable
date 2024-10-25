@@ -122,7 +122,9 @@ export const routes: RouteRecordRaw[] = [
                 name: "adminGuests",
                 meta: {
                     requiresAuth: true,
-                    allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN],
+                    allowedRoles(authStore) {
+                        return authStore.canSeeGuestbook;
+                    },
                 },
                 props: true,
                 component: () => import("src/pages/Admin/PageAdminGuests.vue"),
@@ -132,7 +134,9 @@ export const routes: RouteRecordRaw[] = [
                 name: "adminGuest",
                 meta: {
                     requiresAuth: true,
-                    allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN],
+                    allowedRoles(authStore) {
+                        return authStore.canSeeGuestbook;
+                    },
                 },
                 props: true,
                 component: () => import("src/pages/Admin/PageAdminGuest.vue"),

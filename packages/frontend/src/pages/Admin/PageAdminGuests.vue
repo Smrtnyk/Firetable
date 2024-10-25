@@ -209,7 +209,7 @@ function guestReservationsSummary(guest: GuestDoc): Summary[] | undefined {
 </script>
 
 <template>
-    <div class="PageAdminUsers">
+    <div class="PageAdminGuests">
         <FTTitle :title="t('PageAdminGuests.title')">
             <template #right>
                 <FTBtn

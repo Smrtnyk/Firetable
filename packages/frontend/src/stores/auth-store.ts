@@ -92,6 +92,10 @@ export const useAuthStore = defineStore("auth", function () {
         return Boolean(capabilities.value[UserCapability.CAN_EDIT_OWN_RESERVATION]);
     });
 
+    const canSeeGuestbook = computed(function () {
+        return Boolean(capabilities.value[UserCapability.CAN_SEE_GUESTBOOK]);
+    });
+
     function cleanup(): void {
         unsubscribers.forEach(function (unsub) {
             unsub();
@@ -231,6 +235,7 @@ export const useAuthStore = defineStore("auth", function () {
         canReserve,
         canSeeGuestContact,
         canDeleteReservation,
+        canSeeGuestbook,
         user,
         isAuthenticated,
         isReady,

@@ -16,8 +16,14 @@ import { dynamicallySwitchLang } from "src/config";
 export interface AppDrawerProps {
     modelValue: boolean;
 }
-const { nonNullableUser, isAdmin, canSeeInventory, canEditFloorPlans, canCreateEvents } =
-    storeToRefs(useAuthStore());
+const {
+    nonNullableUser,
+    isAdmin,
+    canSeeInventory,
+    canEditFloorPlans,
+    canCreateEvents,
+    canSeeGuestbook,
+} = storeToRefs(useAuthStore());
 const propertiesStore = usePropertiesStore();
 const props = defineProps<AppDrawerProps>();
 const emit = defineEmits<(e: "update:modelValue", value: boolean) => void>();
@@ -93,7 +99,7 @@ const links = computed<(GuardedLink | LinkWithChildren)[]>(function () {
             icon: "users-list",
             route: { name: "adminGuests", params: { organisationId } },
             label: t("AppDrawer.links.manageGuests"),
-            isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
+            isVisible: canSeeGuestbook.value && !isAdmin.value,
         },
         {
             icon: "line-chart",
