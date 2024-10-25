@@ -420,8 +420,16 @@ describe("PageAdminGuests.vue", () => {
 
             const screen = await render();
 
+            // Check that John Doe is visible
             await expect.element(screen.getByText("John Doe")).toBeVisible();
+            // Ensure that only property1 summary is displayed for John Doe
+            expect(screen.getByText("Property One").elements()).toHaveLength(2);
+            await expect.element(screen.getByText("Property Two:")).not.toBeInTheDocument();
+
+            // Check that Jane Smith is visible
             await expect.element(screen.getByText("Jane Smith")).toBeVisible();
+
+            // Ensure that Alice Johnson is not displayed
             await expect.element(screen.getByText("Alice Johnson")).not.toBeInTheDocument();
         });
 

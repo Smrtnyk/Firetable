@@ -75,7 +75,7 @@ const guestsWithSummaries = computed(function () {
             let totalReservations = 0;
             let fulfilledVisits = 0;
 
-            if (summaries) {
+            if (summaries && summaries.length > 0) {
                 summaries.forEach(function (summary) {
                     totalReservations += summary.totalReservations;
                     fulfilledVisits += summary.fulfilledVisits;
@@ -101,11 +101,8 @@ const guestsWithSummaries = computed(function () {
             if (isAdmin.value) {
                 return true;
             }
-
-            // Check if any of the guest's visited properties are in the user's relatedProperties
-            return guest.summary?.some(function (summary) {
-                return nonNullableUser.value.relatedProperties.includes(summary.propertyId);
-            });
+            // Non-admins: only include guests with summaries (i.e., visits to accessible properties)
+            return guest.summary && guest.summary.length > 0;
         });
 });
 
@@ -193,36 +190,47 @@ function guestReservationsSummary(guest: GuestDoc): Summary[] | undefined {
         return undefined;
     }
 
-    const summaries = Object.entries(guest.visitedProperties).map(([propertyId, events]) => {
-        const property = properties.value.find(matchesProperty("id", propertyId));
-        if (!property) {
-            return null;
-        }
+    const summaries = Object.entries(guest.visitedProperties)
+        .filter(function ([propertyId]) {
+            // Admins see all properties
+            if (isAdmin.value) {
+                return true;
+            }
+            // Non-admins only see properties in their relatedProperties
+            return nonNullableUser.value.relatedProperties.includes(propertyId);
+        })
+        .map(function ([propertyId, events]) {
+            const property = properties.value.find(matchesProperty("id", propertyId));
+            if (!property) {
+                return null;
+            }
 
-        // Total reservations: count of non-null events
-        const totalReservations = Object.values(events).filter(function (event): event is Visit {
-            return event !== null;
-        }).length;
+            // Total reservations: count of non-null events
+            const totalReservations = Object.values(events).filter(
+                function (event): event is Visit {
+                    return event !== null;
+                },
+            ).length;
 
-        // Fulfilled visits: arrived and not canceled
-        const fulfilledVisits = Object.values(events).filter(function (event): event is Visit {
-            return event !== null && event.arrived && !event.cancelled;
-        }).length;
+            // Fulfilled visits: arrived and not canceled
+            const fulfilledVisits = Object.values(events).filter(function (event): event is Visit {
+                return event !== null && event.arrived && !event.cancelled;
+            }).length;
 
-        // Calculate visit percentage
-        const visitPercentage =
-            totalReservations > 0
-                ? ((fulfilledVisits / totalReservations) * 100).toFixed(2)
-                : "0.00";
+            // Calculate visit percentage
+            const visitPercentage =
+                totalReservations > 0
+                    ? ((fulfilledVisits / totalReservations) * 100).toFixed(2)
+                    : "0.00";
 
-        return {
-            propertyId: property.id,
-            propertyName: property.name,
-            totalReservations,
-            fulfilledVisits,
-            visitPercentage,
-        };
-    });
+            return {
+                propertyId: property.id,
+                propertyName: property.name,
+                totalReservations,
+                fulfilledVisits,
+                visitPercentage,
+            };
+        });
 
     return summaries.filter(Boolean) as Summary[];
 }
