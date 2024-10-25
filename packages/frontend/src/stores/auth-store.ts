@@ -1,4 +1,4 @@
-import type { AdminUser, User, VoidFunction } from "@firetable/types";
+import type { AppUser, User, VoidFunction } from "@firetable/types";
 import type { User as FBUser } from "firebase/auth";
 import { Role, ADMIN, DEFAULT_CAPABILITIES_BY_ROLE, UserCapability } from "@firetable/types";
 import { defineStore } from "pinia";
@@ -14,7 +14,7 @@ import { noop } from "es-toolkit/function";
 export const useAuthStore = defineStore("auth", function () {
     const isAuthenticated = ref(false);
     const isReady = ref(false);
-    const user = ref<AdminUser | User | null>(null);
+    const user = ref<AppUser | null>(null);
     const unsubscribers: (typeof noop)[] = [];
     const initInProgress = ref(false);
 
@@ -123,7 +123,7 @@ export const useAuthStore = defineStore("auth", function () {
         try {
             Loading.show();
             const token = await authUser?.getIdTokenResult();
-            const role = token?.claims.role as (AdminUser | User)["role"];
+            const role = token?.claims.role as AppUser["role"];
             const organisationId = token?.claims.organisationId as string;
             const propertiesStore = usePropertiesStore();
 

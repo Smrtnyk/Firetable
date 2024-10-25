@@ -1,5 +1,5 @@
 import type { EventOwner } from "../db.js";
-import type { AdminUser, EventLog, User } from "@firetable/types";
+import type { AppUser, EventLog } from "@firetable/types";
 import { eventLogsDoc } from "../db.js";
 import { arrayUnion, setDoc, Timestamp } from "firebase/firestore";
 
@@ -12,7 +12,7 @@ import { arrayUnion, setDoc, Timestamp } from "firebase/firestore";
 export async function addLogToEvent(
     eventOwner: EventOwner,
     logMessage: string,
-    user: AdminUser | User,
+    user: AppUser,
 ): Promise<void> {
     const eventLogsRef = eventLogsDoc(eventOwner);
 

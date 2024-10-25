@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AdminUser, PlannedReservation, User } from "@firetable/types";
+import type { AppUser, PlannedReservation, User } from "@firetable/types";
 import { isTimeWithinEventDuration } from "./reservation-form-utils";
 import { ReservationStatus, ReservationType } from "@firetable/types";
 import { computed, ref, watch, useTemplateRef } from "vue";
@@ -10,7 +10,7 @@ import { greaterThanZero, minLength, noEmptyString, requireNumber } from "src/he
 import TelNumberInput from "src/components/TelNumberInput/TelNumberInput.vue";
 
 export interface PlannedReservationFormProps {
-    currentUser: AdminUser | User;
+    currentUser: AppUser;
     users: User[];
     mode: "create" | "update";
     eventStartTimestamp: number;
