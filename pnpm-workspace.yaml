@@ -6,3 +6,4 @@ catalog:
     '@vitest/ui': https://pkg.pr.new/@vitest/ui@5df7414
     firebase: 11.0.1
     es-toolkit: 1.26.0
+    '@posva/event-emitter': 1.0.2

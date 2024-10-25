@@ -33,7 +33,7 @@
         "@firetable/backend": "workspace:*",
         "@firetable/floor-creator": "workspace:*",
         "@firetable/types": "workspace:*",
-        "@posva/event-emitter": "1.0.2",
+        "@posva/event-emitter": "catalog:",
         "@quasar/extras": "1.16.12",
         "@types/pako": "2.0.3",
         "@zxing/browser": "0.1.5",
