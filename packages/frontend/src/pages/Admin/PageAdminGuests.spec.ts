@@ -108,7 +108,9 @@ describe("PageAdminGuests.vue", () => {
     it("renders correctly when there are guests", async () => {
         const screen = await render();
 
-        await expect.element(screen.getByRole("heading", { name: "Guests" })).toBeVisible();
+        await expect
+            .element(screen.getByRole("heading", { name: "Guests (3)", exact: true }))
+            .toBeVisible();
         await expect.element(screen.getByText("John Doe")).toBeVisible();
         await expect.element(screen.getByText("Jane Smith")).toBeVisible();
         await expect.element(screen.getByText("Alice Johnson")).toBeVisible();

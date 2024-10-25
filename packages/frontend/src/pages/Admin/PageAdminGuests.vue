@@ -130,6 +130,10 @@ const filteredGuests = computed(function () {
     });
 });
 
+const pageTitle = computed(function () {
+    return `${t("PageAdminGuests.title")} (${guestsWithSummaries.value.length})`;
+});
+
 function setSortOption(option: SortOption): void {
     sortOption.value = option;
 }
@@ -210,7 +214,7 @@ function guestReservationsSummary(guest: GuestDoc): Summary[] | undefined {
 
 <template>
     <div class="PageAdminGuests">
-        <FTTitle :title="t('PageAdminGuests.title')">
+        <FTTitle :title="pageTitle">
             <template #right>
                 <FTBtn
                     rounded
