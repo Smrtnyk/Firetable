@@ -19,6 +19,38 @@ describe("MockFirestore", () => {
     });
 
     describe("Batch Operations", () => {
+        it("should fail to commit a batch if any operation contains undefined values", async () => {
+            const docRef1 = db.collection("testCollection").doc("doc1");
+            const docRef2 = db.collection("testCollection").doc("doc2");
+
+            // **Ensure docRef2 exists before the batch**
+            await docRef2.set({ keyExisting: "existingValue" });
+
+            // Start a batch
+            const batch = db.batch();
+
+            // Queue operations
+            batch.set(docRef1, { key1: "value1" });
+            batch.update(docRef2, { key2: undefined });
+            batch.delete(docRef2);
+
+            // Commit batch and expect it to fail with 'invalid-argument' error
+            await expect(batch.commit()).rejects.toThrowError(
+                new FirestoreError(
+                    "invalid-argument",
+                    `Cannot use "undefined" as a Firestore value (found in field "key2"). If you want to ignore undefined properties, enable \`ignoreUndefinedProperties\`.`,
+                ),
+            );
+
+            // **Verify that no operations were applied due to batch failure**
+            const snapshot1 = await docRef1.get();
+            expect(snapshot1.exists).toBe(false);
+
+            const snapshot2 = await docRef2.get();
+            expect(snapshot2.exists).toBe(true);
+            expect(snapshot2.data?.()).toEqual({ keyExisting: "existingValue" });
+        });
+
         it("should fail to commit a batch with an update on a non-existent document", async () => {
             const docRef1 = db.collection("testCollection").doc("doc1");
             const docRef2 = db.collection("testCollection").doc("doc2");
@@ -144,6 +176,53 @@ describe("MockFirestore", () => {
     });
 
     describe("set method", () => {
+        it("should throw 'invalid-argument' error when setting undefined data", async () => {
+            const docRef = db.collection("testCollection").doc("testDoc");
+            await expect(docRef.set(undefined)).rejects.toThrowError(
+                new FirestoreError("invalid-argument", "Data to set cannot be undefined or null"),
+            );
+
+            // Ensure the document does not exist
+            const snapshot = await docRef.get();
+            expect(snapshot.exists).toBe(false);
+        });
+
+        it("should throw an error when setting a field to undefined with merge", async () => {
+            const docRef = db.collection("testCollection").doc("testDoc");
+            await docRef.set({ key1: "value1", key2: "value2" });
+
+            // Attempt to set 'key2' to undefined with merge
+            await expect(docRef.set({ key2: undefined }, { merge: true })).rejects.toThrowError(
+                new FirestoreError(
+                    "invalid-argument",
+                    `Cannot use "undefined" as a Firestore value (found in field "key2"). If you want to ignore undefined properties, enable \`ignoreUndefinedProperties\`.`,
+                ),
+            );
+
+            // Ensure the original value remains unchanged
+            const snapshot = await docRef.get();
+            expect(snapshot.data?.()).toEqual({ key1: "value1", key2: "value2" });
+        });
+
+        it("should throw an error when a nested field is set to undefined with merge", async () => {
+            const docRef = db.collection("testCollection").doc("testDoc");
+            await docRef.set({ nested: { key1: "value1", key2: "value2" } });
+
+            // Attempt to set 'nested.key2' to undefined with merge
+            await expect(
+                docRef.set({ "nested.key2": undefined }, { merge: true }),
+            ).rejects.toThrowError(
+                new FirestoreError(
+                    "invalid-argument",
+                    `Cannot use "undefined" as a Firestore value (found in field "nested.key2"). If you want to ignore undefined properties, enable \`ignoreUndefinedProperties\`.`,
+                ),
+            );
+
+            // Ensure the original nested value remains unchanged
+            const snapshot = await docRef.get();
+            expect(snapshot.data?.()).toEqual({ nested: { key1: "value1", key2: "value2" } });
+        });
+
         it("should set and get document data correctly", async () => {
             const docRef = db.collection("testCollection").doc("testDoc");
             await docRef.set({ key: "value" });
@@ -179,9 +258,41 @@ describe("MockFirestore", () => {
                 key3: "value3",
             });
         });
+
+        it("should allow setting a field to null", async () => {
+            const docRef = db.collection("testCollection").doc("testDoc");
+            await expect(docRef.set({ key1: null })).resolves.toBeInstanceOf(MockWriteResult);
+
+            const snapshot = await docRef.get();
+            expect(snapshot.exists).toBe(true);
+            expect(snapshot.data?.()).toEqual({ key1: null });
+        });
     });
 
     describe("transaction method", () => {
+        it("should throw an error when a transaction attempts to update a field to undefined", async () => {
+            const docRef = db.collection("testCollection").doc("testDoc");
+            await docRef.set({ key1: "value1", key2: "value2" });
+
+            await expect(
+                db.runTransaction(async (transaction) => {
+                    const snapshot = await transaction.get(docRef);
+                    expect(snapshot.exists).toBe(true);
+                    // Attempt to update 'key2' to undefined
+                    transaction.update(docRef, { key2: undefined });
+                }),
+            ).rejects.toThrowError(
+                new FirestoreError(
+                    "invalid-argument",
+                    `Cannot use "undefined" as a Firestore value (found in field "key2"). If you want to ignore undefined properties, enable \`ignoreUndefinedProperties\`.`,
+                ),
+            );
+
+            // Ensure no changes were applied
+            const snapshot = await docRef.get();
+            expect(snapshot.data?.()).toEqual({ key1: "value1", key2: "value2" });
+        });
+
         it("should fail the transaction after maximum retries due to conflicts", async () => {
             const docRef = db.doc("testCollection/doc1");
             await docRef.set({ counter: 1 });
@@ -306,6 +417,40 @@ describe("MockFirestore", () => {
     });
 
     describe("update method", () => {
+        it("should throw an error when updating a field to undefined", async () => {
+            const docRef = db.collection("testCollection").doc("testDoc");
+            await docRef.set({ key1: "value1", key2: "value2" });
+
+            // Attempt to update 'key2' to undefined
+            await expect(docRef.update({ key2: undefined })).rejects.toThrowError(
+                new FirestoreError(
+                    "invalid-argument",
+                    `Cannot use "undefined" as a Firestore value (found in field "key2"). If you want to ignore undefined properties, enable \`ignoreUndefinedProperties\`.`,
+                ),
+            );
+
+            // Ensure the original value remains unchanged
+            const snapshot = await docRef.get();
+            expect(snapshot.data?.()).toEqual({ key1: "value1", key2: "value2" });
+        });
+
+        it("should throw an error when updating a nested field to undefined", async () => {
+            const docRef = db.collection("testCollection").doc("testDoc");
+            await docRef.set({ nested: { key1: "value1", key2: "value2" } });
+
+            // Attempt to update 'nested.key2' to undefined
+            await expect(docRef.update({ "nested.key2": undefined })).rejects.toThrowError(
+                new FirestoreError(
+                    "invalid-argument",
+                    `Cannot use "undefined" as a Firestore value (found in field "nested.key2"). If you want to ignore undefined properties, enable \`ignoreUndefinedProperties\`.`,
+                ),
+            );
+
+            // Ensure the original nested value remains unchanged
+            const snapshot = await docRef.get();
+            expect(snapshot.data?.()).toEqual({ nested: { key1: "value1", key2: "value2" } });
+        });
+
         it("should update a document correctly", async () => {
             const docRef = db.collection("testCollection").doc("testDoc");
             await docRef.set({ key: "value" });

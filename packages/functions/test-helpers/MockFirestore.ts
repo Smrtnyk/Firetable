@@ -854,13 +854,13 @@ function applyUpdate(current: any, path: string[], value: any): void {
 }
 
 export class MockDocumentReference {
-    public path: string;
-    public firestore: MockFirestore;
-    public id: string;
-    public parent: MockCollection;
-    private listeners: Array<(snapshot: MockDocumentSnapshot) => void> = [];
+    readonly converter: FirestoreDataConverter<any> | null;
+    path: string;
+    firestore: MockFirestore;
+    id: string;
+    parent: MockCollection;
 
-    private readonly converter: FirestoreDataConverter<any> | null;
+    private listeners: Array<(snapshot: MockDocumentSnapshot) => void> = [];
 
     constructor(
         path: string,
@@ -954,6 +954,8 @@ export class MockDocumentReference {
             );
         }
 
+        validateNoUndefined(data, "data");
+
         // Use converter if available
         const dataToStore = this.converter ? this.converter.toFirestore(data) : data;
 
@@ -1036,6 +1038,11 @@ export class MockDocumentReference {
             );
         }
 
+        for (const key of Object.keys(data)) {
+            const value = data[key];
+            validateNoUndefined(value, key);
+        }
+
         // Create a deep copy of the current data to avoid in-place mutations
         const currentData = customClone(documentData.data);
 
@@ -1090,6 +1097,7 @@ export class MockTransaction {
     private readonly readVersions: Map<string, number> = new Map();
     private readonly writes: Map<string, { type: string; data?: any }> = new Map();
     private readonly firestore: MockFirestore;
+    private isClosed = false;
 
     constructor(firestore: MockFirestore) {
         this.firestore = firestore;
@@ -1121,9 +1129,12 @@ export class MockTransaction {
             updateTime = documentData?.updateTime;
         }
 
-        const exists = data !== undefined;
+        // **Correctly set convertedData based on the document reference's converter**
+        const convertedData = docRef.converter ? docRef.converter.fromFirestore(data) : data;
+
+        const exists = convertedData !== undefined;
         return Promise.resolve(
-            new MockDocumentSnapshot(docRef, exists, data, createTime, updateTime),
+            new MockDocumentSnapshot(docRef, exists, convertedData, createTime, updateTime),
         );
     }
 
@@ -1147,8 +1158,14 @@ export class MockTransaction {
         return this;
     }
 
-    // eslint-disable-next-line require-await -- to match real firestore interface
     async commit(): Promise<void> {
+        if (this.isClosed) {
+            throw new FirestoreError(
+                "failed-precondition",
+                "Transaction has already been committed.",
+            );
+        }
+
         // Check for conflicts
         for (const [path, version] of this.readVersions.entries()) {
             if (this.firestore.getVersion(path) !== version) {
@@ -1156,11 +1173,36 @@ export class MockTransaction {
             }
         }
 
-        // Apply writes
+        // **Validation Phase**
+        for (const [path, operation] of this.writes.entries()) {
+            if (operation.type === FirestoreOperation.SET) {
+                if (operation.data === undefined || operation.data === null) {
+                    throw new FirestoreError(
+                        "invalid-argument",
+                        "Data to set cannot be undefined or null",
+                    );
+                }
+                validateNoUndefined(operation.data, "data");
+            } else if (operation.type === FirestoreOperation.UPDATE) {
+                // **Derive docRef from path**
+                const docRef = this.firestore.doc(path);
+                const docSnapshot = await docRef.get();
+                if (!docSnapshot.exists) {
+                    throw new FirestoreError(
+                        "not-found",
+                        `No document to update: Document at path '${path}' does not exist.`,
+                    );
+                }
+
+                validateNoUndefined(operation.data, "data");
+            }
+        }
+
+        // **Execution Phase**
         for (const [path, operation] of this.writes.entries()) {
             const existingDocumentData = this.firestore.data.get(path);
             switch (operation.type) {
-                case "set":
+                case FirestoreOperation.SET:
                     if (existingDocumentData) {
                         // Overwrite existing document but keep createTime
                         existingDocumentData.updateData(operation.data);
@@ -1171,15 +1213,15 @@ export class MockTransaction {
                     }
                     break;
 
-                case "update":
+                case FirestoreOperation.UPDATE: {
                     if (!existingDocumentData) {
                         throw new FirestoreError(
                             "not-found",
                             `No document to update: Document at path '${path}' does not exist.`,
                         );
                     }
-                    // eslint-disable-next-line no-case-declarations -- keep like this for now
-                    const currentData = existingDocumentData.data;
+                    // Create a deep copy to avoid in-place mutations
+                    const currentData = customClone(existingDocumentData.data);
 
                     // Apply updates
                     Object.keys(operation.data).forEach((key) => {
@@ -1207,25 +1249,29 @@ export class MockTransaction {
 
                     existingDocumentData.updateData(currentData);
                     break;
+                }
 
-                case "delete":
+                case FirestoreOperation.DELETE:
                     this.firestore.data.delete(path);
                     break;
 
-                case "create":
+                case FirestoreOperation.CREATE:
                     if (existingDocumentData) {
                         throw new FirestoreError("already-exists", "Document already exists");
                     }
-                    // eslint-disable-next-line no-case-declarations -- keep like this for now
-                    const newDocData = new MockDocumentData(operation.data);
-                    this.firestore.data.set(path, newDocData);
+                    this.firestore.data.set(path, new MockDocumentData(operation.data));
                     break;
 
                 default:
-                    throw new Error(`Unsupported operation type: ${operation.type}`);
+                    throw new FirestoreError(
+                        "invalid-argument",
+                        `Unsupported operation type: ${operation.type}`,
+                    );
             }
 
             this.firestore.incrementVersion(path);
+
+            this.isClosed = true;
         }
     }
 }
@@ -1488,6 +1534,8 @@ export class MockWriteBatch {
         data?: any;
     }[] = [];
 
+    private isClosed = false;
+
     set(docRef: MockDocumentReference, data: unknown): this {
         this.operations.push({ type: FirestoreOperation.SET, docRef, data });
         return this;
@@ -1504,12 +1552,21 @@ export class MockWriteBatch {
     }
 
     async commit(): Promise<MockWriteResult[]> {
-        // First, validate all operations without applying them
+        if (this.isClosed) {
+            throw new FirestoreError("failed-precondition", "Batch has already been committed.");
+        }
+
+        // **Validation Phase**
         for (const operation of this.operations) {
             if (operation.type === FirestoreOperation.SET) {
-                // No validation needed for set operations
+                if (operation.data === undefined || operation.data === null) {
+                    throw new FirestoreError(
+                        "invalid-argument",
+                        "Data to set cannot be undefined or null",
+                    );
+                }
+                validateNoUndefined(operation.data, "data");
             } else if (operation.type === FirestoreOperation.UPDATE) {
-                // Check if document exists
                 const docSnapshot = await operation.docRef.get();
                 if (!docSnapshot.exists) {
                     throw new FirestoreError(
@@ -1517,14 +1574,19 @@ export class MockWriteBatch {
                         `No document to update: Document at path '${operation.docRef.path}' does not exist.`,
                     );
                 }
+
+                validateNoUndefined(operation.data, "data");
             } else if (operation.type === FirestoreOperation.DELETE) {
                 // No validation needed for delete operations
             } else {
-                throw new Error(`Unsupported operation: ${operation.type}`);
+                throw new FirestoreError(
+                    "invalid-argument",
+                    `Unsupported operation type: ${operation.type}`,
+                );
             }
         }
 
-        // If validation passes, perform all operations
+        // **Execution Phase**
         for (const operation of this.operations) {
             if (operation.type === FirestoreOperation.SET) {
                 await operation.docRef.set(operation.data);
@@ -1532,11 +1594,10 @@ export class MockWriteBatch {
                 await operation.docRef.update(operation.data);
             } else if (operation.type === FirestoreOperation.DELETE) {
                 await operation.docRef.delete();
-            } else {
-                throw new Error(`Unsupported operation: ${operation.type}`);
             }
         }
 
+        this.isClosed = true;
         return [new MockWriteResult()];
     }
 }
@@ -1809,4 +1870,20 @@ function customClone(value: any): any {
         return result;
     }
     return value;
+}
+
+function validateNoUndefined(value: any, fieldPath: string): void {
+    if (value === undefined) {
+        throw new FirestoreError(
+            "invalid-argument",
+            `Cannot use "undefined" as a Firestore value (found in field "${fieldPath}"). If you want to ignore undefined properties, enable \`ignoreUndefinedProperties\`.`,
+        );
+    }
+
+    if (typeof value === "object" && value !== null) {
+        for (const [key, val] of Object.entries(value)) {
+            const nestedFieldPath = fieldPath === "data" ? key : `${fieldPath}.${key}`;
+            validateNoUndefined(val, nestedFieldPath);
+        }
+    }
 }

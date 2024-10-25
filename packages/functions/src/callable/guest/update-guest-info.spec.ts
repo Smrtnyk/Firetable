@@ -40,6 +40,8 @@ describe("updateGuestDataFn", () => {
             data: {
                 updatedData: {
                     contact: initialContact,
+                    hashedContact: "hashedContact",
+                    maskedContact: "maskedContact",
                     name: updatedName,
                 },
                 guestId,
@@ -72,6 +74,8 @@ describe("updateGuestDataFn", () => {
             data: {
                 updatedData: {
                     // New contact
+                    hashedContact: "hashedContact",
+                    maskedContact: "maskedContact",
                     contact: updatedContact,
                     name: updatedName,
                 },
