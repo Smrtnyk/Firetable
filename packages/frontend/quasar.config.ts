@@ -13,7 +13,7 @@ export default configure(function (/* ctx */) {
         // app boot file (/src/boot)
         // --> boot files are part of "main.js"
         // https://v2.quasar.dev/quasar-cli-vite/boot-files
-        boot: ["register-pinia", "i18n", "firebase-connection"],
+        boot: ["event-emitter", "event-handlers", "register-pinia", "i18n", "firebase-connection"],
 
         // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
         css: ["app.scss"],

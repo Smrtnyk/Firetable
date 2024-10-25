@@ -20,6 +20,8 @@ export interface User {
     capabilities: UserCapabilities | undefined;
 }
 
+export type AppUser = AdminUser | User;
+
 export interface EditUserPayload {
     userId: string;
     organisationId: string;

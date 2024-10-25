@@ -6,7 +6,6 @@ import type { VueFirestoreDocumentData } from "vuefire";
 import type {
     AnyFunction,
     EventDoc,
-    GuestDataPayload,
     PlannedReservationDoc,
     QueuedReservationDoc,
     Reservation,
@@ -16,9 +15,6 @@ import type {
 import {
     moveReservationFromQueue,
     moveReservationToQueue,
-    deleteGuestVisit,
-    setGuestData,
-    addLogToEvent,
     addReservation,
     deleteReservation,
     updateReservationDoc,
@@ -47,23 +43,17 @@ import { storeToRefs } from "pinia";
 import { matchesProperty } from "es-toolkit/compat";
 import { ONE_MINUTE } from "src/constants";
 import { useDialog } from "src/composables/useDialog";
-import { hashString } from "src/helpers/hash-string";
-import { maskPhoneNumber } from "src/helpers/mask-phone-number";
 import { plannedToQueuedReservation } from "src/helpers/reservation/planned-to-queued-reservation";
 import { queuedToPlannedReservation } from "src/helpers/reservation/queued-to-planned-reservation";
 import { shouldMarkReservationAsExpired } from "src/helpers/reservation/should-mark-reservation-as-expired";
 import { isEventInProgress } from "src/helpers/event/is-event-in-progress";
+import { eventEmitter } from "src/boot/event-emitter";
 
 type OpenDialog = {
     label: string;
     dialog: DialogChainObject;
     floorId: string;
 };
-
-const enum GuestDataMode {
-    SET = "set",
-    DELETE = "delete",
-}
 
 type UseReservations = {
     initiateTableOperation: (operation: TableOperation) => void;
@@ -190,48 +180,6 @@ export function useReservations(
         }
     }
 
-    async function handleGuestDataForReservation(
-        reservationData: Reservation,
-        mode: GuestDataMode,
-    ): Promise<void> {
-        if (!event.value) {
-            return;
-        }
-
-        if (!settings.value.guest.collectGuestData) {
-            return;
-        }
-
-        if (!reservationData.guestContact || !reservationData.guestName) {
-            return;
-        }
-
-        const data: GuestDataPayload = {
-            preparedGuestData: {
-                contact: reservationData.guestContact,
-                hashedContact: await hashString(reservationData.guestContact),
-                maskedContact: maskPhoneNumber(reservationData.guestContact),
-                guestName: reservationData.guestName,
-                arrived: reservationData.arrived,
-                cancelled: isPlannedReservation(reservationData)
-                    ? reservationData.cancelled
-                    : false,
-                isVIP: reservationData.isVIP,
-            },
-            propertyId: eventOwner.propertyId,
-            organisationId: eventOwner.organisationId,
-            eventId: eventOwner.id,
-            eventName: event.value.name,
-            eventDate: event.value.date,
-        };
-
-        if (mode === GuestDataMode.SET) {
-            setGuestData(data).catch(AppLogger.error.bind(AppLogger));
-        } else {
-            deleteGuestVisit(data).catch(AppLogger.error.bind(AppLogger));
-        }
-    }
-
     function handleFloorUpdates([newReservations, newFloorInstances]: [
         ReservationDoc[],
         FloorViewer[],
@@ -271,21 +219,18 @@ export function useReservations(
         }
     }
 
-    function createEventLog(message: string): void {
-        addLogToEvent(eventOwner, message, nonNullableUser.value).catch(
-            AppLogger.error.bind(AppLogger),
-        );
-    }
-
     function handleReservationCreation(reservationData: Reservation): void {
         void tryCatchLoadingWrapper({
             async hook() {
                 await addReservation(eventOwner, reservationData);
                 notifyPositive("Reservation created");
-                createEventLog(`Reservation created on table ${reservationData.tableLabel}`);
-                handleGuestDataForReservation(reservationData, GuestDataMode.SET).catch(
-                    AppLogger.error.bind(AppLogger),
-                );
+
+                eventEmitter.emit("reservation:created", {
+                    reservation: reservationData,
+                    eventOwner,
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
+                    event: event.value!,
+                });
             },
         });
     }
@@ -295,7 +240,12 @@ export function useReservations(
             async hook() {
                 await updateReservationDoc(eventOwner, reservationData);
                 notifyPositive(t("useReservations.reservationUpdatedMsg"));
-                createEventLog(`Reservation edited on table ${reservationData.tableLabel}`);
+                eventEmitter.emit("reservation:updated", {
+                    reservation: reservationData,
+                    eventOwner,
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
+                    event: event.value!,
+                });
             },
         });
     }
@@ -324,13 +274,20 @@ export function useReservations(
                         id: reservation.id,
                         clearedAt: Date.now(),
                     });
-                    createEventLog(`Reservation soft deleted on table ${reservation.tableLabel}`);
+                    eventEmitter.emit("reservation:deleted:soft", {
+                        reservation,
+                        eventOwner,
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
+                        event: event.value!,
+                    });
                 } else {
                     await deleteReservation(eventOwner, reservation);
-                    createEventLog(`Reservation deleted on table ${reservation.tableLabel}`);
-                    handleGuestDataForReservation(reservation, GuestDataMode.DELETE).catch(
-                        AppLogger.error.bind(AppLogger),
-                    );
+                    eventEmitter.emit("reservation:deleted", {
+                        reservation,
+                        eventOwner,
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
+                        event: event.value!,
+                    });
                 }
             },
         });
@@ -491,13 +448,16 @@ export function useReservations(
                     arrived: val,
                     waitingForResponse: false,
                 });
-                handleGuestDataForReservation(
-                    {
+
+                eventEmitter.emit("reservation:arrived", {
+                    reservation: {
                         ...reservation,
                         arrived: val,
                     },
-                    GuestDataMode.SET,
-                ).catch(AppLogger.error.bind(AppLogger));
+                    eventOwner,
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
+                    event: event.value!,
+                });
             },
         });
     }
@@ -540,13 +500,16 @@ export function useReservations(
                     cancelled: val,
                     waitingForResponse: false,
                 });
-                handleGuestDataForReservation(
-                    {
+
+                eventEmitter.emit("reservation:cancelled", {
+                    reservation: {
                         ...reservation,
                         cancelled: val,
                     },
-                    GuestDataMode.SET,
-                ).catch(AppLogger.error.bind(AppLogger));
+                    eventOwner,
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
+                    event: event.value!,
+                });
             },
         });
     }
@@ -581,9 +544,11 @@ export function useReservations(
         await tryCatchLoadingWrapper({
             async hook() {
                 await addReservation(eventOwner, newReservation);
-                createEventLog(
-                    `Reservation copied from table ${sourceReservation.tableLabel} to table ${targetTable.label}`,
-                );
+                eventEmitter.emit("reservation:copied", {
+                    sourceReservation,
+                    targetTable,
+                    eventOwner,
+                });
             },
         });
     }
@@ -647,9 +612,11 @@ export function useReservations(
         await tryCatchLoadingWrapper({
             async hook() {
                 await Promise.all(promises);
-                createEventLog(
-                    `Reservation transferred from table ${table1.label} to table ${table2.label}`,
-                );
+                eventEmitter.emit("reservation:transferred", {
+                    fromTable: table1,
+                    toTable: table2,
+                    eventOwner,
+                });
             },
         });
     }
