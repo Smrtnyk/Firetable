@@ -226,7 +226,7 @@ onUnmounted(function () {
                 :active-floor="activeFloor"
                 :floors="floorInstances"
                 :has-multiple-floor-plans="hasMultipleFloorPlans"
-                :is-admin="authStore.isAdmin"
+                :can-see-admin-event="authStore.canCreateEvents"
                 :is-active-floor="isActiveFloor"
                 @navigate-to-admin-event="navigateToAdminEvent"
                 @toggle-event-guest-list-drawer-visibility="

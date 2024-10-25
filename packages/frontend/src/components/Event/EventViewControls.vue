@@ -6,7 +6,7 @@ import FTBtn from "src/components/FTBtn.vue";
 export interface EventViewControlsProps {
     activeFloor: { id: string; name: string } | undefined;
     floors: { id: string; name: string }[];
-    isAdmin: boolean;
+    canSeeAdminEvent: boolean;
     isActiveFloor: (floorId: string) => boolean;
 }
 
@@ -21,7 +21,7 @@ const emit = defineEmits<{
     (e: "set-active-floor", value: { id: string; name: string }): void;
 }>();
 
-const { floors, isAdmin, isActiveFloor } = defineProps<EventViewControlsProps>();
+const { floors, isActiveFloor, canSeeAdminEvent } = defineProps<EventViewControlsProps>();
 
 const currentActiveIndex = computed(() => {
     return floors.findIndex(function (floor) {
@@ -93,7 +93,7 @@ function showNextFloor(): void {
         />
 
         <FTBtn
-            v-if="isAdmin"
+            v-if="canSeeAdminEvent"
             clickable
             v-close-popup
             @click="() => emit('navigate-to-admin-event')"

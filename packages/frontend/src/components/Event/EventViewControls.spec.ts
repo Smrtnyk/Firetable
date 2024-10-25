@@ -26,7 +26,7 @@ describe("EventViewControls.vue", () => {
             floors,
             isActiveFloor,
             hasMultipleFloorPlans: true,
-            isAdmin: true,
+            canSeeAdminEvent: true,
             ...props,
         });
     }
@@ -87,16 +87,16 @@ describe("EventViewControls.vue", () => {
         await expect.element(nextFloorBtn).not.toBeInTheDocument();
     });
 
-    it("renders 'Show Details' btn when 'isAdmin' is true", async () => {
-        const screen = render({ isAdmin: true });
+    it("renders 'Show Details' btn when 'canSeeAdminEvent' is true", async () => {
+        const screen = render({ canSeeAdminEvent: true });
         await showMenu();
 
         const navigateToAdminBtn = screen.getByLabelText("Navigate to admin event");
         await expect.element(navigateToAdminBtn).toBeVisible();
     });
 
-    it("does not render 'Show Details' option when isAdmin is false", async () => {
-        const screen = render({ isAdmin: false });
+    it("does not render 'Show Details' option when 'canSeeAdminEvent' is false", async () => {
+        const screen = render({ canSeeAdminEvent: false });
         await showMenu();
 
         await expect.element(screen.getByText("Show Details")).not.toBeInTheDocument();
@@ -117,7 +117,7 @@ describe("EventViewControls.vue", () => {
 
     it("emits 'toggle-queued-reservations-drawer-visibility' when 'Table Waiting list' is clicked", async () => {
         const screen = render({
-            isAdmin: false,
+            canSeeAdminEvent: false,
         });
         await showMenu();
 
@@ -141,7 +141,7 @@ describe("EventViewControls.vue", () => {
 
     it("emits 'show-event-info' when 'Event Info' is clicked", async () => {
         const screen = render({
-            isAdmin: false,
+            canSeeAdminEvent: false,
         });
         await showMenu();
 
@@ -153,7 +153,7 @@ describe("EventViewControls.vue", () => {
 
     it("emits 'navigate-to-admin-event' when 'Show Details' is clicked", async () => {
         const screen = render({
-            isAdmin: true,
+            canSeeAdminEvent: true,
         });
         await showMenu();
 
