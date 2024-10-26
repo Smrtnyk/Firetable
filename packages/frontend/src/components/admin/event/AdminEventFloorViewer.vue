@@ -4,10 +4,10 @@
             <q-page class="q-pa-xs-xs q-pa-sm-sm q-pa-md-md row">
                 <div
                     ref="viewerContainerRef"
-                    class="col-xs-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3"
+                    class="col-xs-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3 justify-center column"
                 >
                     <FloorEditorTopControls
-                        v-if="floorInstance && selectedFloorElement"
+                        v-if="floorInstance && selectedFloorElement && !isTablet"
                         :selected-floor-element="selectedFloorElement"
                         :floor-instance="floorInstance"
                         :existing-labels="
@@ -16,13 +16,13 @@
                     />
                     <FloorEditorControls
                         @floor-save="saveFloorState"
-                        v-if="floorInstance"
+                        v-if="floorInstance && !isTablet"
                         :floor-instance="floorInstance"
                         class="q-mb-sm"
                     />
-                    <q-card>
+                    <div class="ft-card ft-border ft-no-border-radius">
                         <canvas id="floor-container" ref="floorContainerRef" />
-                    </q-card>
+                    </div>
                 </div>
             </q-page>
         </q-page-container>
@@ -36,6 +36,7 @@ import { extractAllTablesLabels, FloorEditor } from "@firetable/floor-creator";
 import { nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch, useTemplateRef } from "vue";
 import { useFloorEditor } from "src/composables/useFloorEditor";
 import { AppLogger } from "src/logger/FTLogger.js";
+import { isTablet } from "src/global-reactives/screen-detection";
 
 import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
 import FloorEditorTopControls from "src/components/Floor/FloorEditorTopControls.vue";
