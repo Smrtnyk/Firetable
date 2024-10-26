@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import type { Floor, FloorEditorElement } from "@firetable/floor-creator";
-import type { FloorDoc, NumberTuple } from "@firetable/types";
+import type { FloorDoc } from "@firetable/types";
 import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
 import FloorEditorTopControls from "src/components/Floor/FloorEditorTopControls.vue";
 
 import { nextTick, onBeforeUnmount, onMounted, ref, shallowRef, useTemplateRef } from "vue";
 import { useRouter } from "vue-router";
-import { Loading, useQuasar } from "quasar";
-import { ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
+import { Loading } from "quasar";
 import { extractAllTablesLabels, FloorEditor, hasFloorTables } from "@firetable/floor-creator";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import {
@@ -18,23 +17,16 @@ import {
 import { isTablet } from "src/global-reactives/screen-detection";
 import { getFloorPath } from "@firetable/backend";
 import { compressFloorDoc, decompressFloorDoc } from "src/helpers/compress-floor-doc";
-import { useFloorEditor, TABLE_EL_TO_ADD } from "src/composables/useFloorEditor";
-import { isTouchDevice } from "src/helpers/is-touch-device";
+import { useFloorEditor } from "src/composables/useFloorEditor";
 
 interface Props {
     floorId: string;
     organisationId: string;
     propertyId: string;
 }
-const addNewElementsBottomSheetOptions = {
-    message: "Choose action",
-    grid: true,
-    actions: ELEMENTS_TO_ADD_COLLECTION,
-};
 
 const props = defineProps<Props>();
 const router = useRouter();
-const quasar = useQuasar();
 const floorInstance = shallowRef<FloorEditor | undefined>();
 const canvasRef = useTemplateRef<HTMLCanvasElement | undefined>("canvasRef");
 const pageRef = useTemplateRef<HTMLDivElement>("pageRef");
@@ -46,7 +38,7 @@ const {
     promise: floorDataPromise,
     pending: isFloorLoading,
 } = useFirestoreDocument<FloorDoc>(floorPath, { once: true });
-const { getNextTableLabel, onFloorDrop, resizeFloor } = useFloorEditor(floorInstance, pageRef);
+const { onFloorDrop, resizeFloor } = useFloorEditor(floorInstance, pageRef);
 
 function onKeyDown(event: KeyboardEvent): void {
     if (event.ctrlKey && event.key === "s") {
@@ -87,7 +79,6 @@ function instantiateFloor(floorDoc: FloorDoc): void {
     floorInstance.value = floorEditor;
 
     floorEditor.on("elementClicked", elementClickHandler);
-    floorEditor.on("doubleClick", dblClickHandler);
     floorEditor.on("drop", onFloorDrop);
 }
 
@@ -131,25 +122,6 @@ function onFloorChange({
     if (height && !Number.isNaN(height)) {
         floorInstance.value?.updateDimensions(floorInstance.value.width, Number(height));
     }
-}
-
-function handleAddNewElement(floorVal: FloorEditor, [x, y]: NumberTuple) {
-    return function ({ tag }: (typeof ELEMENTS_TO_ADD_COLLECTION)[0]) {
-        if (TABLE_EL_TO_ADD.includes(tag)) {
-            floorVal.addElement({ x, y, tag, label: getNextTableLabel() });
-            return;
-        }
-        floorVal.addElement({ x, y, tag });
-    };
-}
-
-function dblClickHandler(floorVal: FloorEditor, coords: NumberTuple): void {
-    if (!isTouchDevice) {
-        return;
-    }
-    quasar
-        .bottomSheet(addNewElementsBottomSheetOptions)
-        .onOk(handleAddNewElement(floorVal, coords));
 }
 
 async function elementClickHandler(
