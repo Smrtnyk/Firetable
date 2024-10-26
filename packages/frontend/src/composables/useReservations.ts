@@ -265,6 +265,7 @@ export function useReservations(
                 // otherwise just delete it permanently
                 // we soft delete these, so they can be used in analytics
                 // reservations deleted during event are probably deleted to free up the table for the next guest
+                // FIXME: We should probably add a button to end the visit though and not delete the reservation
                 if (
                     isEventInProgress(event.value.date) ||
                     (isPlannedReservation(reservation) && reservation.cancelled)
