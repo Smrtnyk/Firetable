@@ -8,6 +8,7 @@ import TelNumberInput from "src/components/TelNumberInput/TelNumberInput.vue";
 import { hashString } from "src/helpers/hash-string";
 import { maskPhoneNumber } from "src/helpers/mask-phone-number";
 import { useI18n } from "vue-i18n";
+import { capitalizeName } from "src/helpers/capitalize-name";
 
 export interface AddNewGuestFormProps {
     mode: "create" | "edit";
@@ -30,6 +31,10 @@ const guestNameRules = [minLength("Guest name must be at least 3 characters long
 if (mode === "edit" && initialData) {
     guestName.value = initialData.name;
     guestContact.value = initialData.contact;
+}
+
+function capitalizeGuestName(): void {
+    guestName.value = capitalizeName(guestName.value);
 }
 
 async function submit(): Promise<void> {
@@ -62,6 +67,7 @@ async function submit(): Promise<void> {
                 rounded
                 standout
                 autofocus
+                @blur="capitalizeGuestName"
                 :rules="guestNameRules"
             />
             <TelNumberInput required v-model="guestContact" />
