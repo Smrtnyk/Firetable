@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import type { CreateGuestPayload, GuestDoc, Visit } from "@firetable/types";
+import type { CreateGuestPayload } from "@firetable/types";
+import type { Summary } from "src/stores/guests-store";
 import { createGuest } from "@firetable/backend";
 import { useI18n } from "vue-i18n";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { usePropertiesStore } from "src/stores/properties-store";
 import { storeToRefs } from "pinia";
-import { matchesProperty } from "es-toolkit/compat";
 import { useDialog } from "src/composables/useDialog";
 import { computed, ref, watch } from "vue";
 import { isMobile } from "src/global-reactives/screen-detection";
@@ -25,14 +24,6 @@ export interface PageAdminGuestsProps {
 
 type SortOption = "bookings" | "percentage";
 
-type Summary = {
-    propertyId: string;
-    propertyName: string;
-    totalReservations: number;
-    fulfilledVisits: number;
-    visitPercentage: string;
-};
-
 const sortOption = ref<SortOption>("bookings");
 const sortOptions = [
     { label: "Sort by Bookings", value: "bookings" },
@@ -44,8 +35,7 @@ const { t } = useI18n();
 const props = defineProps<PageAdminGuestsProps>();
 const guestsStore = useGuestsStore();
 const { data: guests, pending: isLoading } = guestsStore.getGuests(props.organisationId);
-const { properties } = storeToRefs(usePropertiesStore());
-const { nonNullableUser, isAdmin } = storeToRefs(useAuthStore());
+const { isAdmin } = storeToRefs(useAuthStore());
 
 watch(
     () => isLoading.value,
@@ -67,7 +57,7 @@ const guestsWithSummaries = computed(function () {
 
     return guests.value
         .map(function (guest) {
-            const summaries = guestReservationsSummary(guest);
+            const summaries = guestsStore.guestReservationsSummary(guest);
             let totalReservations = 0;
             let fulfilledVisits = 0;
 
@@ -179,56 +169,6 @@ function showCreateGuestDialog(): void {
             },
         },
     });
-}
-
-function guestReservationsSummary(guest: GuestDoc): Summary[] | undefined {
-    if (Object.keys(guest.visitedProperties).length === 0) {
-        return undefined;
-    }
-
-    const summaries = Object.entries(guest.visitedProperties)
-        .filter(function ([propertyId]) {
-            // Admins see all properties
-            if (isAdmin.value) {
-                return true;
-            }
-            // Non-admins only see properties in their relatedProperties
-            return nonNullableUser.value.relatedProperties.includes(propertyId);
-        })
-        .map(function ([propertyId, events]) {
-            const property = properties.value.find(matchesProperty("id", propertyId));
-            if (!property) {
-                return null;
-            }
-
-            // Total reservations: count of non-null events
-            const totalReservations = Object.values(events).filter(
-                function (event): event is Visit {
-                    return event !== null;
-                },
-            ).length;
-
-            // Fulfilled visits: arrived and not canceled
-            const fulfilledVisits = Object.values(events).filter(function (event): event is Visit {
-                return event !== null && event.arrived && !event.cancelled;
-            }).length;
-
-            // Calculate visit percentage
-            const visitPercentage =
-                totalReservations > 0
-                    ? ((fulfilledVisits / totalReservations) * 100).toFixed(2)
-                    : "0.00";
-
-            return {
-                propertyId: property.id,
-                propertyName: property.name,
-                totalReservations,
-                fulfilledVisits,
-                visitPercentage,
-            };
-        });
-
-    return summaries.filter(Boolean) as Summary[];
 }
 </script>
 
