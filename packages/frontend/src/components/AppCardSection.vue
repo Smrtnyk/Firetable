@@ -15,7 +15,7 @@ const props = defineProps<Props>();
             <q-separator class="q-mb-md" />
         </template>
 
-        <div class="column q-col-gutter-md">
+        <div class="column q-col-gutter-md overflow-auto">
             <slot />
         </div>
     </q-card>
