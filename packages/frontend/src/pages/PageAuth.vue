@@ -2,9 +2,15 @@
 import { ref, useTemplateRef } from "vue";
 import { useRouter } from "vue-router";
 import { minLength, noEmptyString } from "src/helpers/form-rules";
-import { QForm } from "quasar";
+import { Loading, QForm } from "quasar";
 import { loginWithEmail } from "@firetable/backend";
-import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { showErrorMessage } from "src/helpers/ui-helpers";
+
+const firebaseErrorMessages: Record<string, string> = {
+    "auth/invalid-email": "The email address you entered is invalid.",
+    "auth/user-not-found": "No account found with this email.",
+    "auth/wrong-password": "Incorrect password. Please try again.",
+};
 
 const router = useRouter();
 const username = ref("");
@@ -21,13 +27,18 @@ async function onSubmit(): Promise<void> {
         return;
     }
 
-    const validEmail = username.value;
-    await tryCatchLoadingWrapper({
-        async hook() {
-            await loginWithEmail(validEmail, password.value);
-            return router.replace("/");
-        },
-    });
+    try {
+        Loading.show();
+        await loginWithEmail(username.value, password.value);
+        await router.replace("/");
+    } catch (e: any) {
+        const errorCode = e.code;
+        const userFriendlyMessage =
+            firebaseErrorMessages[errorCode] ?? "An unexpected error occurred. Please try again.";
+        showErrorMessage(userFriendlyMessage);
+    } finally {
+        Loading.hide();
+    }
 }
 </script>
 
