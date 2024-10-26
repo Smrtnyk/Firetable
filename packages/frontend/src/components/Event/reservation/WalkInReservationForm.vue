@@ -13,6 +13,7 @@ import {
 } from "src/helpers/form-rules";
 import { hourFromTimestamp } from "src/helpers/date-utils";
 import TelNumberInput from "src/components/TelNumberInput/TelNumberInput.vue";
+import { capitalizeName } from "src/helpers/capitalize-name";
 
 interface Props {
     mode: "create" | "update";
@@ -58,6 +59,10 @@ function generateInitialState(): State {
     };
 }
 
+function capitalizeGuestName(): void {
+    state.value.guestName = capitalizeName(state.value.guestName);
+}
+
 defineExpose({
     reservationForm,
     state,
@@ -71,6 +76,7 @@ defineExpose({
             rounded
             hide-bottom-space
             standout
+            @blur="capitalizeGuestName"
             :label="t('WalkInReservationForm.optionalGuestNameLabel')"
             :rules="[optionalMinLength(t('validation.nameMustBeLongerErrorMsg'), 2)]"
         />

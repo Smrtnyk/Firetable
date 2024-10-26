@@ -8,6 +8,7 @@ import { QForm } from "quasar";
 import { greaterThanZero, minLength, noEmptyString, requireNumber } from "src/helpers/form-rules";
 
 import TelNumberInput from "src/components/TelNumberInput/TelNumberInput.vue";
+import { capitalizeName } from "src/helpers/capitalize-name";
 
 export interface PlannedReservationFormProps {
     currentUser: AppUser;
@@ -83,6 +84,10 @@ function requireReservedBySelection(val: PlannedReservation["reservedBy"]): bool
     return Boolean(val?.email) || t(`EventCreateReservation.requireReservedBySelectionError`);
 }
 
+function capitalizeGuestName(): void {
+    state.value.guestName = capitalizeName(state.value.guestName);
+}
+
 defineExpose({
     reservationForm,
     state,
@@ -96,6 +101,7 @@ defineExpose({
             rounded
             hide-bottom-space
             standout
+            @blur="capitalizeGuestName"
             :label="t(`EventCreateReservation.reservationGuestName`)"
             :rules="[
                 noEmptyString(t('validation.required')),
