@@ -21,6 +21,7 @@ const authStore = useAuthStore();
 const props = defineProps<EventShowReservationProps>();
 const emit = defineEmits<{
     (e: "copy" | "delete" | "edit" | "queue" | "transfer"): void;
+    (e: "goToGuestProfile", guestId: string): void;
     (e: "arrived" | "cancel" | "reservationConfirmed" | "waitingForResponse", value: boolean): void;
 }>();
 const { t } = useI18n();
@@ -87,13 +88,19 @@ function onWaitingForResponse(): void {
     <q-card-section>
         <ReservationGeneralInfo :reservation="props.reservation" />
 
-        <template v-if="guestSummaryData && guestSummaryData.totalReservations > 0">
+        <q-item
+            clickable
+            @click="emit('goToGuestProfile', guestSummaryData.guestId)"
+            class="column q-pa-none"
+            v-if="guestSummaryData && guestSummaryData.totalReservations > 0"
+            v-close-popup
+        >
             <q-separator />
             <div>{{ t("EventShowReservation.guestHistoryLabel") }}:</div>
             <div>
                 <GuestSummaryChips :summary="guestSummaryData" />
             </div>
-        </template>
+        </q-item>
 
         <template
             v-if="

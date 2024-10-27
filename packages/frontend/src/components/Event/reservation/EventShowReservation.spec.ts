@@ -553,6 +553,7 @@ describe("EventShowReservation", () => {
     describe("guest history", () => {
         it("displays guest summary when promise resolves with data", async () => {
             const guestSummaryData: GuestSummary = {
+                guestId: "guest1",
                 propertyId: "prop1",
                 propertyName: "Property 1",
                 totalReservations: 5,
@@ -604,6 +605,7 @@ describe("EventShowReservation", () => {
 
         it("does not display guest summary when totalReservations is zero", async () => {
             const guestSummaryData: GuestSummary = {
+                guestId: "guest1",
                 propertyId: "prop1",
                 propertyName: "Property 1",
                 totalReservations: 0,

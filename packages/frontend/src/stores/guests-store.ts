@@ -10,6 +10,7 @@ import { useAuthStore } from "src/stores/auth-store";
 import { usePropertiesStore } from "src/stores/properties-store";
 
 export type GuestSummary = {
+    guestId: string;
     propertyId: string;
     propertyName: string;
     totalReservations: number;
@@ -136,6 +137,7 @@ export const useGuestsStore = defineStore("guests", function () {
                 : "0.00";
 
         return {
+            guestId: guestDoc.id,
             propertyId: property.id,
             propertyName: property.name,
             totalReservations,

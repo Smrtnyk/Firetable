@@ -93,6 +93,7 @@ describe("Guests Store", () => {
             );
 
             expect(result).toEqual({
+                guestId: "guest1",
                 propertyId: "property1",
                 propertyName: "Property 1",
                 // event1 and event3
@@ -252,6 +253,7 @@ describe("Guests Store", () => {
             );
 
             expect(result).toEqual({
+                guestId: "guest1",
                 propertyId: "property1",
                 propertyName: "Property 1",
                 totalReservations: 0,

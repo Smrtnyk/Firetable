@@ -51,6 +51,7 @@ import { isEventInProgress } from "src/helpers/event/is-event-in-progress";
 import { eventEmitter } from "src/boot/event-emitter";
 import { hashString } from "src/helpers/hash-string";
 import { useGuestsStore } from "src/stores/guests-store";
+import { useRouter } from "vue-router";
 
 type OpenDialog = {
     label: string;
@@ -99,8 +100,8 @@ export function useReservations(
 ): UseReservations {
     const { createDialog } = useDialog();
     const { t } = useI18n();
-
     const { canReserve, nonNullableUser, canSeeGuestbook } = storeToRefs(useAuthStore());
+    const router = useRouter();
     const propertiesStore = usePropertiesStore();
     const guestsStore = useGuestsStore();
 
@@ -422,6 +423,15 @@ export function useReservations(
                     guestSummaryPromise: getGuestSummary(reservation),
                 },
                 listeners: {
+                    goToGuestProfile(guestId: string) {
+                        router.push({
+                            name: "adminGuest",
+                            params: {
+                                organisationId: eventOwner.organisationId,
+                                guestId,
+                            },
+                        });
+                    },
                     delete() {
                         onDeleteReservation(reservation).catch(showErrorMessage);
                     },
