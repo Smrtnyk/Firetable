@@ -35,6 +35,75 @@ describe("Guests Store", () => {
         mockReturnGuestData([]);
     });
 
+    describe("getGuestByHashedContact", () => {
+        it("returns guest from refsMap if available", async () => {
+            const guestsStore = mockedStore(useGuestsStore);
+            const guestDoc = {
+                id: "guest1",
+                hashedContact: "hashedContact1",
+                name: "Guest 1",
+                visitedProperties: {},
+            } as GuestDoc;
+
+            // Set up refsMap with guest data
+            useFirestoreCollectionSpy.mockReturnValue({
+                data: ref([guestDoc]),
+                promise: Promise.resolve(),
+            });
+
+            guestsStore.getGuests("org1");
+
+            const result = await guestsStore.getGuestByHashedContact("org1", "hashedContact1");
+            expect(result).toEqual(guestDoc);
+            // Should not make additional Firestore query
+            expect(useFirestoreCollectionSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("returns undefined when guest not found in any cache or Firestore", async () => {
+            const guestsStore = mockedStore(useGuestsStore);
+
+            // Empty response from Firestore
+            useFirestoreCollectionSpy.mockReturnValue({
+                data: ref([]),
+                promise: Promise.resolve(),
+            });
+
+            const result = await guestsStore.getGuestByHashedContact("org1", "nonexistent");
+            expect(result).toBeUndefined();
+        });
+
+        it("caches guest after fetching from Firestore", async () => {
+            const guestsStore = mockedStore(useGuestsStore);
+            const guestDoc = {
+                id: "guest1",
+                hashedContact: "hashedContact1",
+                name: "Guest 1",
+                visitedProperties: {},
+            } as GuestDoc;
+
+            // First call returns from Firestore
+            useFirestoreCollectionSpy.mockReturnValue({
+                data: ref([guestDoc]),
+                promise: Promise.resolve(),
+            });
+
+            // First fetch should query Firestore
+            await guestsStore.getGuestByHashedContact("org1", "hashedContact1");
+            expect(useFirestoreCollectionSpy).toHaveBeenCalledTimes(1);
+
+            // Clear spy to verify second call
+            useFirestoreCollectionSpy.mockClear();
+
+            // Second fetch should use cache
+            const cachedResult = await guestsStore.getGuestByHashedContact(
+                "org1",
+                "hashedContact1",
+            );
+            expect(cachedResult).toEqual(guestDoc);
+            expect(useFirestoreCollectionSpy).not.toHaveBeenCalled();
+        });
+    });
+
     describe("invalidateGuestCache", () => {
         it("removes guest from cache when found", async () => {
             const guestsStore = mockedStore(useGuestsStore);
@@ -342,6 +411,94 @@ describe("Guests Store", () => {
                 visitPercentage: "0.00",
             });
         });
+
+        it("handles null events correctly when excluding events", async () => {
+            const guestsStore = mockedStore(useGuestsStore);
+            const propertiesStore = mockedStore(usePropertiesStore);
+            const authStore = mockedStore(useAuthStore);
+
+            const guestDoc: GuestDoc = {
+                id: "guest1",
+                contact: "+4323524323",
+                hashedContact: "hashedContact1",
+                maskedContact: "maskedContact1",
+                name: "Guest 1",
+                visitedProperties: {
+                    property1: {
+                        event1: null,
+                        event2: { arrived: true, cancelled: false } as Visit,
+                    },
+                },
+            };
+
+            mockReturnGuestData([guestDoc]);
+            propertiesStore.properties = [{ id: "property1", name: "Property 1" }] as PropertyDoc[];
+
+            authStore.user = {
+                relatedProperties: ["property1"],
+                role: Role.STAFF,
+            } as AppUser;
+
+            const result = await guestsStore.getGuestSummaryForPropertyExcludingEvent(
+                "org1",
+                "hashedContact1",
+                "property1",
+                "event2",
+            );
+
+            // Should not count null events in totals
+            expect(result).toEqual({
+                guestId: "guest1",
+                propertyId: "property1",
+                propertyName: "Property 1",
+                totalReservations: 0,
+                fulfilledVisits: 0,
+                visitPercentage: "0.00",
+            });
+        });
+
+        it("handles case when all events are excluded", async () => {
+            const guestsStore = mockedStore(useGuestsStore);
+            const propertiesStore = mockedStore(usePropertiesStore);
+            const authStore = mockedStore(useAuthStore);
+
+            const guestDoc: GuestDoc = {
+                id: "guest1",
+                contact: "+4323524323",
+                hashedContact: "hashedContact1",
+                maskedContact: "maskedContact1",
+                name: "Guest 1",
+                visitedProperties: {
+                    property1: {
+                        event1: { arrived: true, cancelled: false } as Visit,
+                    },
+                },
+            };
+
+            mockReturnGuestData([guestDoc]);
+            propertiesStore.properties = [{ id: "property1", name: "Property 1" }] as PropertyDoc[];
+
+            authStore.user = {
+                relatedProperties: ["property1"],
+                role: Role.STAFF,
+            } as AppUser;
+
+            const result = await guestsStore.getGuestSummaryForPropertyExcludingEvent(
+                "org1",
+                "hashedContact1",
+                "property1",
+                "event1",
+            );
+
+            expect(result).toEqual({
+                guestId: "guest1",
+                propertyId: "property1",
+                propertyName: "Property 1",
+                totalReservations: 0,
+                fulfilledVisits: 0,
+                visitPercentage: "0.00",
+            });
+        });
     });
 
     describe("guestReservationsSummary", () => {
@@ -472,6 +629,81 @@ describe("Guests Store", () => {
                     visitPercentage: "0.00",
                 },
             ]);
+        });
+
+        it("filters out properties that are not found in propertiesStore", () => {
+            const guestsStore = mockedStore(useGuestsStore);
+            const propertiesStore = mockedStore(usePropertiesStore);
+            const authStore = mockedStore(useAuthStore);
+
+            const guestDoc: GuestDoc = {
+                id: "guest1",
+                name: "Guest 1",
+                contact: "+4323524323",
+                maskedContact: "maskedContact1",
+                hashedContact: "hashedContact1",
+                visitedProperties: {
+                    property1: {
+                        event1: { arrived: true, cancelled: false } as Visit,
+                    },
+                    property2: {
+                        event2: { arrived: true, cancelled: false } as Visit,
+                    },
+                },
+            };
+
+            // Only set up one property in the store
+            propertiesStore.properties = [{ id: "property1", name: "Property 1" }] as PropertyDoc[];
+
+            authStore.user = {
+                relatedProperties: ["property1", "property2"],
+                role: Role.STAFF,
+            } as AppUser;
+
+            const result = guestsStore.guestReservationsSummary(guestDoc);
+            expect(result).toHaveLength(1);
+            expect(result?.[0].propertyId).toBe("property1");
+        });
+
+        it("correctly calculates visit percentage with mixed event statuses", () => {
+            const guestsStore = mockedStore(useGuestsStore);
+            const propertiesStore = mockedStore(usePropertiesStore);
+            const authStore = mockedStore(useAuthStore);
+
+            const guestDoc = {
+                id: "guest1",
+                name: "Guest 1",
+                contact: "+4323524323",
+                maskedContact: "maskedContact1",
+                hashedContact: "hashedContact1",
+                visitedProperties: {
+                    property1: {
+                        event1: { arrived: true, cancelled: false } as Visit,
+                        event2: { arrived: false, cancelled: false } as Visit,
+                        event3: { arrived: true, cancelled: true } as Visit,
+                        // Represents a deleted/invalid event
+                        event4: null,
+                    },
+                },
+            } as GuestDoc;
+
+            propertiesStore.properties = [{ id: "property1", name: "Property 1" }] as PropertyDoc[];
+
+            authStore.user = {
+                relatedProperties: ["property1"],
+                role: Role.STAFF,
+            } as AppUser;
+
+            const result = guestsStore.guestReservationsSummary(guestDoc);
+            expect(result?.[0]).toEqual({
+                propertyId: "property1",
+                propertyName: "Property 1",
+                // Should count 3 events (excluding null)
+                totalReservations: 3,
+                // Should only count event1 (arrived true, cancelled false)
+                fulfilledVisits: 1,
+                visitPercentage: "33.33",
+            });
         });
     });
 });
