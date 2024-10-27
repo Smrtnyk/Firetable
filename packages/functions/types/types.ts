@@ -103,6 +103,7 @@ export interface Visit {
 }
 
 export interface GuestDoc {
+    lastModified: number;
     name: string;
     contact: string;
     hashedContact: string;

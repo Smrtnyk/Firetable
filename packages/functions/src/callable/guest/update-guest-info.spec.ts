@@ -11,7 +11,6 @@ describe("updateGuestDataFn", () => {
     let mockFirestore: MockFirestore;
 
     const organisationId = "orgId";
-    // Firestore-generated ID
     const guestId = "guestDocId";
     const initialContact = "oldContact";
     const updatedContact = "newContact";
@@ -22,7 +21,6 @@ describe("updateGuestDataFn", () => {
         vi.restoreAllMocks();
         mockFirestore = new MockFirestore();
 
-        // Mock the Firestore instance in Init
         vi.spyOn(Init, "db", "get").mockReturnValue(mockFirestore as any);
     });
 
@@ -56,8 +54,9 @@ describe("updateGuestDataFn", () => {
         const updatedDocSnapshot = await oldDocRef.get();
         const updatedData = updatedDocSnapshot.data();
 
-        expect(updatedData?.name).toBe(updatedName);
-        expect(updatedData?.contact).toBe(initialContact);
+        expect(updatedData.name).toBe(updatedName);
+        expect(updatedData.contact).toBe(initialContact);
+        expect(updatedData.lastModified).toBeGreaterThan(0);
     });
 
     it("should update guest contact and name when contact changes", async () => {
@@ -91,8 +90,9 @@ describe("updateGuestDataFn", () => {
         const updatedDocSnapshot = await oldDocRef.get();
         const updatedData = updatedDocSnapshot.data();
 
-        expect(updatedData?.name).toBe(updatedName);
-        expect(updatedData?.contact).toBe(updatedContact);
+        expect(updatedData.name).toBe(updatedName);
+        expect(updatedData.contact).toBe(updatedContact);
+        expect(updatedData.lastModified).toBeGreaterThan(0);
     });
 
     it("should throw an error if guest does not exist", async () => {

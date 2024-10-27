@@ -37,6 +37,7 @@ export interface GuestDoc {
     contact: string;
     hashedContact: string;
     maskedContact: string;
+    lastModified?: number;
     visitedProperties: VisitedProperties;
 }
 

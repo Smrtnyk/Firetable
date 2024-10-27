@@ -67,6 +67,7 @@ export async function setGuestDataFn(req: CallableRequest<GuestData>): Promise<v
         if (querySnapshot.empty) {
             logger.info("Creating new guest document with name:", guestName);
             const guestData: GuestDoc = {
+                lastModified: Date.now(),
                 contact,
                 hashedContact,
                 maskedContact,
@@ -94,6 +95,7 @@ export async function setGuestDataFn(req: CallableRequest<GuestData>): Promise<v
 
             logger.info("Updating existing guest document with name:", guestName);
             await guestRef.update({
+                lastModified: Date.now(),
                 [`visitedProperties.${propertyId}.${eventId}`]: visit,
             });
         }

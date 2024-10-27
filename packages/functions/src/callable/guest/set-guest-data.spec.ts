@@ -22,6 +22,8 @@ const preparedGuestData: PreparedGuestData = {
     isVIP: true,
 };
 
+const mockTimestamp = 1_699_999_999_999;
+
 const date = Date.now();
 
 const testRequestData = {
@@ -39,6 +41,7 @@ describe("setGuestDataFn", () => {
     beforeEach(() => {
         mockFirestore = new MockFirestore();
         vi.spyOn(Init, "db", "get").mockReturnValue(mockFirestore);
+        vi.setSystemTime(mockTimestamp);
     });
 
     it("should create a new guest if they do not exist", async () => {
@@ -62,10 +65,14 @@ describe("setGuestDataFn", () => {
             eventName: "eventName",
             isVIPVisit: true,
         });
+
+        // Verify lastModified is set correctly
+        expect(guestData.lastModified).toBe(mockTimestamp);
     });
 
     it("should update an existing guest with new visit information", async () => {
         const initialGuestData: GuestDoc = {
+            lastModified: 1,
             name: "guestName",
             contact,
             hashedContact,
@@ -105,6 +112,65 @@ describe("setGuestDataFn", () => {
                 isVIPVisit: true,
             },
         });
+
+        // Verify lastModified is updated correctly
+        expect(guestData.lastModified).toBe(mockTimestamp);
+    });
+
+    it("should update lastModified when adding a new visit to an existing guest", async () => {
+        const initialGuestData: GuestDoc = {
+            name: "guestName",
+            contact,
+            hashedContact,
+            maskedContact,
+            visitedProperties: {
+                propertyId: {
+                    existingEventId: {
+                        arrived: true,
+                        cancelled: false,
+                        date: date - 100_000,
+                        eventName: "existingEvent",
+                        isVIPVisit: false,
+                    },
+                },
+            },
+            lastModified: 1,
+        };
+
+        // Add a guest document to the guests collection
+        const guestsCollectionRef = mockFirestore.collection(getGuestsPath(organisationId));
+        await guestsCollectionRef.add(initialGuestData);
+
+        const requestData = {
+            preparedGuestData: { ...preparedGuestData, arrived: true },
+            propertyId: "propertyId",
+            organisationId,
+            eventId: "newEventId",
+            eventName: "newEventName",
+            eventDate: date,
+        };
+
+        await setGuestDataFn({ data: requestData } as CallableRequest<GuestData>);
+
+        const querySnapshot = await guestsCollectionRef.where("contact", "==", contact).get();
+
+        expect(querySnapshot.empty).toBe(false);
+        const guestDoc = querySnapshot.docs[0];
+        const guestData = guestDoc.data();
+
+        const guestVisits = guestData.visitedProperties[requestData.propertyId];
+        expect(guestVisits).toHaveProperty("existingEventId");
+        expect(guestVisits).toHaveProperty("newEventId");
+        expect(guestVisits.newEventId).toStrictEqual({
+            arrived: true,
+            cancelled: false,
+            date,
+            eventName: "newEventName",
+            isVIPVisit: true,
+        });
+
+        // Verify lastModified is updated correctly
+        expect(guestData.lastModified).toBe(mockTimestamp);
     });
 
     it("should handle errors gracefully", async () => {

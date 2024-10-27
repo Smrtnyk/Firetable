@@ -43,6 +43,7 @@ export async function updateGuestDataFn(
         }
 
         await oldDocRef.update({
+            lastModified: Date.now(),
             contact: updatedData.contact,
             hashedContact: updatedData.hashedContact,
             maskedContact: updatedData.maskedContact,
