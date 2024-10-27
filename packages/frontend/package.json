@@ -36,6 +36,7 @@
         "@posva/event-emitter": "catalog:",
         "@quasar/extras": "1.16.12",
         "@types/pako": "2.0.3",
+        "@vueuse/core": "11.1.0",
         "@zxing/browser": "0.1.5",
         "chart.js": "4.4.5",
         "date-fns": "4.1.0",

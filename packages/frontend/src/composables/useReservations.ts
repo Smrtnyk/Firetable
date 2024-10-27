@@ -12,6 +12,7 @@ import type {
     ReservationDoc,
     User,
 } from "@firetable/types";
+import type { GuestSummary } from "src/stores/guests-store";
 import {
     moveReservationFromQueue,
     moveReservationToQueue,
@@ -48,6 +49,8 @@ import { queuedToPlannedReservation } from "src/helpers/reservation/queued-to-pl
 import { shouldMarkReservationAsExpired } from "src/helpers/reservation/should-mark-reservation-as-expired";
 import { isEventInProgress } from "src/helpers/event/is-event-in-progress";
 import { eventEmitter } from "src/boot/event-emitter";
+import { hashString } from "src/helpers/hash-string";
+import { useGuestsStore } from "src/stores/guests-store";
 
 type OpenDialog = {
     label: string;
@@ -94,10 +97,12 @@ export function useReservations(
     eventOwner: EventOwner,
     event: Ref<VueFirestoreDocumentData<EventDoc> | undefined>,
 ): UseReservations {
-    const { canReserve, nonNullableUser } = storeToRefs(useAuthStore());
     const { createDialog } = useDialog();
     const { t } = useI18n();
+
+    const { canReserve, nonNullableUser, canSeeGuestbook } = storeToRefs(useAuthStore());
     const propertiesStore = usePropertiesStore();
+    const guestsStore = useGuestsStore();
 
     const currentTableOperation = ref<TableOperation | undefined>();
     let operationNotification: AnyFunction | undefined;
@@ -378,6 +383,29 @@ export function useReservations(
         }
     }
 
+    async function getGuestSummary(reservation: ReservationDoc): Promise<GuestSummary | undefined> {
+        if (!reservation.guestContact) {
+            return undefined;
+        }
+
+        if (!canSeeGuestbook.value) {
+            return;
+        }
+
+        try {
+            return await guestsStore.getGuestSummaryForPropertyExcludingEvent(
+                eventOwner.organisationId,
+                await hashString(reservation.guestContact),
+                eventOwner.propertyId,
+                eventOwner.id,
+            );
+        } catch (error) {
+            AppLogger.error("Error fetching guest data", error);
+        }
+
+        return undefined;
+    }
+
     function showReservation(
         floor: FloorViewer,
         reservation: ReservationDoc,
@@ -391,6 +419,7 @@ export function useReservations(
                 maximized: false,
                 componentPropsObject: {
                     reservation,
+                    guestSummaryPromise: getGuestSummary(reservation),
                 },
                 listeners: {
                     delete() {

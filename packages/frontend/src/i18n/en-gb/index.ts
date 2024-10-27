@@ -137,6 +137,7 @@ export default {
         reservationConsumption: "Consumption",
         timeLabel: "Time of arrival",
         waitingForResponse: "Waiting for response",
+        guestHistoryLabel: "Guest history",
     },
     PlannedReservationForm: {
         reservedByStaffRadioBtnLabel: "Staff",
@@ -250,5 +251,9 @@ export default {
         noItemsMessage: "There are no items in the inventory.",
         editInventoryItemDialogTitle: "Editing inventory item: {name}",
         deleteItemConfirmMessage: "Delete inventory item: {name}?",
+    },
+    GuestSummaryChips: {
+        reservations: "Reservations",
+        arrived: "Arrived",
     },
 };

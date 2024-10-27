@@ -140,6 +140,7 @@ export default {
         reservationConsumption: "Flaschenkonsum",
         timeLabel: "Ankunftszeit",
         waitingForResponse: "Warten auf Antwort",
+        guestHistoryLabel: "Gastverlauf",
     },
     PlannedReservationForm: {
         reservedByStaffRadioBtnLabel: "Personal",
@@ -255,5 +256,9 @@ export default {
         noItemsMessage: "Es gibt keine Artikel im Inventar.",
         editInventoryItemDialogTitle: "Inventar bearbeiten: {name}",
         deleteItemConfirmMessage: "Inventarartikel löschen: {name}?",
+    },
+    GuestSummaryChips: {
+        reservations: "Reservierungen",
+        arrived: "Angekommen",
     },
 };

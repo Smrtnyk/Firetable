@@ -1,20 +1,24 @@
 <script setup lang="ts">
 import type { Reservation, ReservationDoc } from "@firetable/types";
+import type { GuestSummary } from "src/stores/guests-store";
 import { isPlannedReservation } from "@firetable/types";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useAuthStore } from "src/stores/auth-store";
+import { useAsyncState } from "@vueuse/core";
 
 import ReservationGeneralInfo from "src/components/Event/reservation/ReservationGeneralInfo.vue";
 import ReservationLabelChips from "src/components/Event/reservation/ReservationLabelChips.vue";
 import FTBtn from "src/components/FTBtn.vue";
+import GuestSummaryChips from "src/components/guest/GuestSummaryChips.vue";
 
-interface Props {
+export interface EventShowReservationProps {
     reservation: ReservationDoc;
+    guestSummaryPromise: Promise<GuestSummary | undefined>;
 }
 
 const authStore = useAuthStore();
-const props = defineProps<Props>();
+const props = defineProps<EventShowReservationProps>();
 const emit = defineEmits<{
     (e: "copy" | "delete" | "edit" | "queue" | "transfer"): void;
     (e: "arrived" | "cancel" | "reservationConfirmed" | "waitingForResponse", value: boolean): void;
@@ -30,6 +34,7 @@ const reservationConfirmed = ref(
 const waitingForResponse = ref(
     isPlannedReservation(props.reservation) && Boolean(props.reservation.waitingForResponse),
 );
+const { state: guestSummaryData } = useAsyncState(props.guestSummaryPromise, void 0);
 const canDeleteReservation = computed(function () {
     return (
         authStore.canDeleteReservation ||
@@ -81,6 +86,14 @@ function onWaitingForResponse(): void {
 
     <q-card-section>
         <ReservationGeneralInfo :reservation="props.reservation" />
+
+        <template v-if="guestSummaryData && guestSummaryData.totalReservations > 0">
+            <q-separator />
+            <div>{{ t("EventShowReservation.guestHistoryLabel") }}:</div>
+            <div>
+                <GuestSummaryChips :summary="guestSummaryData" />
+            </div>
+        </template>
 
         <template
             v-if="
