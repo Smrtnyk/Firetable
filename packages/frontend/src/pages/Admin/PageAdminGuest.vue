@@ -19,6 +19,7 @@ import FTDialog from "src/components/FTDialog.vue";
 import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
 import FTBtn from "src/components/FTBtn.vue";
 import AdminGuestVisitsTimeline from "src/components/admin/guest/AdminGuestVisitsTimeline.vue";
+import { useGuestsStore } from "src/stores/guests-store";
 
 export interface PageAdminGuestProps {
     organisationId: string;
@@ -33,6 +34,7 @@ interface VisitsByProperty {
 }
 const router = useRouter();
 const { createDialog } = useDialog();
+const guestsStore = useGuestsStore();
 const { properties } = storeToRefs(usePropertiesStore());
 const { t } = useI18n();
 const { organisationId, guestId } = defineProps<PageAdminGuestProps>();
@@ -108,8 +110,9 @@ async function editGuest(guestVal: GuestDoc): Promise<void> {
                 update(updatedData: CreateGuestPayload) {
                     dialog.hide();
                     return tryCatchLoadingWrapper({
-                        hook() {
-                            return updateGuestInfo(organisationId, guestId, updatedData);
+                        async hook() {
+                            await updateGuestInfo(organisationId, guestId, updatedData);
+                            guestsStore.invalidateGuestCache(guestId);
                         },
                     });
                 },
@@ -130,6 +133,7 @@ async function onDeleteGuest(): Promise<void> {
     return tryCatchLoadingWrapper({
         async hook() {
             await deleteGuest(organisationId, guestId);
+            guestsStore.invalidateGuestCache(guestId);
             router.back();
         },
     });
