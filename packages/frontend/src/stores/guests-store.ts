@@ -9,7 +9,7 @@ import { AppLogger } from "src/logger/FTLogger";
 import { useAuthStore } from "src/stores/auth-store";
 import { usePropertiesStore } from "src/stores/properties-store";
 
-export type Summary = {
+export type GuestSummary = {
     propertyId: string;
     propertyName: string;
     totalReservations: number;

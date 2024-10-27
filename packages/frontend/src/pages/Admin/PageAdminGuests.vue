@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { CreateGuestPayload } from "@firetable/types";
-import type { Summary } from "src/stores/guests-store";
 import { createGuest } from "@firetable/backend";
 import { useI18n } from "vue-i18n";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
@@ -10,13 +9,14 @@ import { computed, ref, watch } from "vue";
 import { isMobile } from "src/global-reactives/screen-detection";
 import { Loading } from "quasar";
 import { useAuthStore } from "src/stores/auth-store";
+import { useGuestsStore } from "src/stores/guests-store";
 
 import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import FTBtn from "src/components/FTBtn.vue";
-import { useGuestsStore } from "src/stores/guests-store";
+import GuestSummaryChips from "src/components/guest/GuestSummaryChips.vue";
 
 export interface PageAdminGuestsProps {
     organisationId: string;
@@ -134,19 +134,6 @@ const pageTitle = computed(function () {
 
 function setSortOption(option: SortOption): void {
     sortOption.value = option;
-}
-
-function getReservationColor(summary: Summary): string {
-    const percentage = Number.parseFloat(summary.visitPercentage);
-    if (percentage >= 75) {
-        return "green";
-    }
-
-    if (percentage >= 50) {
-        return "orange";
-    }
-
-    return "red";
 }
 
 function showCreateGuestDialog(): void {
@@ -268,13 +255,7 @@ function showCreateGuestDialog(): void {
                             >
                                 <span>{{ summary.propertyName }}</span
                                 >:
-                                <q-chip text-color="white" color="tertiary" size="sm"
-                                    >Bookings: {{ summary.totalReservations }}</q-chip
-                                >
-                                <q-chip size="sm"> Arrived: {{ summary.fulfilledVisits }} </q-chip>
-                                <q-chip :color="getReservationColor(summary)" size="sm"
-                                    >{{ summary.visitPercentage }}%</q-chip
-                                >
+                                <GuestSummaryChips :summary="summary" />
                             </div>
                         </template>
                         <span v-else>No bookings</span>
