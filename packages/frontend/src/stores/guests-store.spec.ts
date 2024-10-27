@@ -35,6 +35,87 @@ describe("Guests Store", () => {
         mockReturnGuestData([]);
     });
 
+    describe("invalidateGuestCache", () => {
+        it("removes guest from cache when found", async () => {
+            const guestsStore = mockedStore(useGuestsStore);
+            const guestDoc = {
+                id: "guest1",
+                hashedContact: "hashedContact1",
+                name: "Guest 1",
+                contact: "+4323524323",
+                maskedContact: "maskedContact1",
+                visitedProperties: {},
+            } as GuestDoc;
+
+            // First, get the guest to populate the cache
+            mockReturnGuestData([guestDoc]);
+            await guestsStore.getGuestByHashedContact("org1", "hashedContact1");
+
+            // Verify guest is in cache by getting it again (should use cache)
+            useFirestoreCollectionSpy.mockClear();
+            await guestsStore.getGuestByHashedContact("org1", "hashedContact1");
+            expect(useFirestoreCollectionSpy).not.toHaveBeenCalled();
+
+            // Invalidate the cache
+            guestsStore.invalidateGuestCache("guest1");
+
+            // Verify guest is removed from cache by getting it again (should query Firestore)
+            useFirestoreCollectionSpy.mockClear();
+            await guestsStore.getGuestByHashedContact("org1", "hashedContact1");
+            expect(useFirestoreCollectionSpy).toHaveBeenCalled();
+        });
+
+        it("does nothing when guest is not found in cache", () => {
+            const guestsStore = mockedStore(useGuestsStore);
+
+            // Try to invalidate a non-existent guest
+            guestsStore.invalidateGuestCache("nonexistent");
+
+            // Verify the cache remains unchanged
+            expect(useFirestoreCollectionSpy).not.toHaveBeenCalled();
+        });
+
+        it("only removes the specified guest from cache", async () => {
+            const guestsStore = mockedStore(useGuestsStore);
+            const guest1 = {
+                id: "guest1",
+                hashedContact: "hashedContact1",
+                name: "Guest 1",
+                contact: "+4323524323",
+                maskedContact: "maskedContact1",
+                visitedProperties: {},
+            } as GuestDoc;
+            const guest2 = {
+                id: "guest2",
+                hashedContact: "hashedContact2",
+                name: "Guest 2",
+                contact: "+4323524324",
+                maskedContact: "maskedContact2",
+                visitedProperties: {},
+            } as GuestDoc;
+
+            // Populate cache with both guests
+            mockReturnGuestData([guest1]);
+            await guestsStore.getGuestByHashedContact("org1", "hashedContact1");
+            mockReturnGuestData([guest2]);
+            await guestsStore.getGuestByHashedContact("org1", "hashedContact2");
+
+            // Clear spy to start fresh
+            useFirestoreCollectionSpy.mockClear();
+
+            // Invalidate only guest1
+            guestsStore.invalidateGuestCache("guest1");
+
+            // Verify guest1 is removed (requires Firestore query)
+            await guestsStore.getGuestByHashedContact("org1", "hashedContact1");
+            expect(useFirestoreCollectionSpy).toHaveBeenCalledTimes(1);
+
+            // Verify guest2 is still in cache (no Firestore query)
+            await guestsStore.getGuestByHashedContact("org1", "hashedContact2");
+            expect(useFirestoreCollectionSpy).toHaveBeenCalledTimes(1);
+        });
+    });
+
     describe("getGuests", () => {
         it("returns guests ref for organisationId", () => {
             const guestsStore = mockedStore(useGuestsStore);

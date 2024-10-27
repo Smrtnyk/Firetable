@@ -7,6 +7,7 @@ import { hashString } from "src/helpers/hash-string";
 import { maskPhoneNumber } from "src/helpers/mask-phone-number";
 import { deleteGuestVisit, setGuestData } from "@firetable/backend";
 import { usePropertiesStore } from "src/stores/properties-store";
+import { useGuestsStore } from "src/stores/guests-store";
 
 const enum GuestDataMode {
     SET = "set",
@@ -44,6 +45,7 @@ async function handleGuestDataForReservation(
     mode: GuestDataMode,
 ): Promise<void> {
     const propertiesStore = usePropertiesStore();
+    const guestsStore = useGuestsStore();
     const settings = propertiesStore.getOrganisationSettingsById(eventOwner.organisationId);
 
     if (!settings.guest.collectGuestData) {
@@ -71,9 +73,13 @@ async function handleGuestDataForReservation(
         eventDate: event.date,
     };
 
+    function invalidateCache(): void {
+        guestsStore.invalidateGuestCache(data.preparedGuestData.hashedContact);
+    }
+
     if (mode === GuestDataMode.SET) {
-        setGuestData(data).catch(AppLogger.error.bind(AppLogger));
+        setGuestData(data).then(invalidateCache).catch(AppLogger.error.bind(AppLogger));
     } else {
-        deleteGuestVisit(data).catch(AppLogger.error.bind(AppLogger));
+        deleteGuestVisit(data).then(invalidateCache).catch(AppLogger.error.bind(AppLogger));
     }
 }

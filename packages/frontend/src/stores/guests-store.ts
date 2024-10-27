@@ -39,6 +39,17 @@ export const useGuestsStore = defineStore("guests", function () {
         return refsMap.get(organisationId)!;
     }
 
+    function invalidateGuestCache(guestId: string): void {
+        for (const [hashedContact, guest] of guestsCache.entries()) {
+            if (guest.id === guestId) {
+                guestsCache.delete(hashedContact);
+                AppLogger.info(`Cache invalidated for guest ${guestId}`);
+                return;
+            }
+        }
+        AppLogger.info(`No cached guest found with id ${guestId}`);
+    }
+
     async function getGuestByHashedContact(
         organisationId: string,
         hashedContact: string,
@@ -203,6 +214,8 @@ export const useGuestsStore = defineStore("guests", function () {
     }
 
     return {
+        getGuestByHashedContact,
+        invalidateGuestCache,
         getGuestSummaryForPropertyExcludingEvent,
         getGuests,
         guestReservationsSummary,
