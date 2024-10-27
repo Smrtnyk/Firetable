@@ -3,7 +3,8 @@ import type { QPopupProxy } from "quasar";
 import type { FloorEditor, FloorEditorElement } from "@firetable/floor-creator";
 import { isTable } from "@firetable/floor-creator";
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
-import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from "vue";
+import { computed, onMounted, ref, useTemplateRef, watch } from "vue";
+import { useEventListener } from "@vueuse/core";
 
 interface Props {
     selectedFloorElement: FloorEditorElement;
@@ -111,11 +112,7 @@ async function deleteElement(): Promise<void> {
 }
 
 onMounted(function () {
-    document.addEventListener("keydown", onKeyDownListener);
-});
-
-onBeforeUnmount(function () {
-    document.removeEventListener("keydown", onKeyDownListener);
+    useEventListener("keydown", onKeyDownListener);
 });
 </script>
 

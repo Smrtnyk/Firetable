@@ -40,6 +40,7 @@ import { isTablet } from "src/global-reactives/screen-detection";
 
 import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
 import FloorEditorTopControls from "src/components/Floor/FloorEditorTopControls.vue";
+import { useEventListener } from "@vueuse/core";
 
 interface Props {
     floor: FloorDoc;
@@ -55,11 +56,10 @@ const floorInstance = shallowRef<FloorEditor | undefined>();
 const { onFloorDrop, resizeFloor } = useFloorEditor(floorInstance, viewerContainerRef);
 
 onMounted(function () {
-    window.addEventListener("resize", resizeFloor);
+    useEventListener("resize", resizeFloor);
 });
 
 onBeforeUnmount(function () {
-    window.removeEventListener("resize", resizeFloor);
     floorInstance.value?.destroy().catch(AppLogger.error.bind(AppLogger));
 });
 

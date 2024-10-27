@@ -4,7 +4,7 @@ import type { FloorDoc } from "@firetable/types";
 import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
 import FloorEditorTopControls from "src/components/Floor/FloorEditorTopControls.vue";
 
-import { nextTick, onBeforeUnmount, onMounted, ref, shallowRef, useTemplateRef } from "vue";
+import { nextTick, onMounted, ref, shallowRef, useTemplateRef } from "vue";
 import { useRouter } from "vue-router";
 import { Loading } from "quasar";
 import { extractAllTablesLabels, FloorEditor, hasFloorTables } from "@firetable/floor-creator";
@@ -18,6 +18,7 @@ import { isTablet } from "src/global-reactives/screen-detection";
 import { getFloorPath } from "@firetable/backend";
 import { compressFloorDoc, decompressFloorDoc } from "src/helpers/compress-floor-doc";
 import { useFloorEditor } from "src/composables/useFloorEditor";
+import { useEventListener } from "@vueuse/core";
 
 interface Props {
     floorId: string;
@@ -48,18 +49,13 @@ function onKeyDown(event: KeyboardEvent): void {
     }
 }
 
-onBeforeUnmount(function () {
-    globalThis.removeEventListener("keydown", onKeyDown);
-    window.removeEventListener("resize", resizeFloor);
-});
-
 onMounted(async function () {
     Loading.show();
     await floorDataPromise.value;
     if (floor.value) {
         instantiateFloor(floor.value);
-        globalThis.addEventListener("keydown", onKeyDown);
-        window.addEventListener("resize", resizeFloor);
+        useEventListener("resize", resizeFloor);
+        useEventListener("keydown", onKeyDown);
     } else {
         router.replace("/").catch(showErrorMessage);
     }

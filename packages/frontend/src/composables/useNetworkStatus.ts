@@ -1,5 +1,6 @@
 import type { Ref } from "vue";
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted } from "vue";
+import { useEventListener } from "@vueuse/core";
 
 const onlineCheckUrl = "https://www.google.com/favicon.ico";
 
@@ -30,15 +31,10 @@ export function useNetworkStatus(): {
     }
 
     onMounted(function () {
-        globalThis.addEventListener("online", updateOnlineStatus);
-        globalThis.addEventListener("offline", updateOnlineStatus);
+        useEventListener("online", updateOnlineStatus);
+        useEventListener("offline", updateOnlineStatus);
         // Perform an initial connectivity check when the component is mounted
         void verifyConnectivity();
-    });
-
-    onUnmounted(function () {
-        globalThis.removeEventListener("online", updateOnlineStatus);
-        globalThis.removeEventListener("offline", updateOnlineStatus);
     });
 
     return { isOnline };

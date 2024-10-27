@@ -16,6 +16,7 @@ import { decompressFloorDoc } from "src/helpers/compress-floor-doc";
 import { isTouchDevice } from "src/helpers/is-touch-device";
 import { AppLogger } from "src/logger/FTLogger.js";
 import { matchesProperty } from "es-toolkit/compat";
+import { useEventListener } from "@vueuse/core";
 
 type ActiveFloor = { id: string; name: string };
 type UseFloorsPageEvent = {
@@ -47,11 +48,10 @@ export function useFloorsPageEvent(
         if (isTouchDevice) {
             return;
         }
-        window.addEventListener("resize", resizeFloor);
+        useEventListener("resize", resizeFloor);
     });
 
     onBeforeUnmount(function () {
-        window.removeEventListener("resize", resizeFloor);
         floorInstances.value.forEach(function (floorInstance) {
             floorInstance.destroy().catch(AppLogger.error.bind(AppLogger));
         });
