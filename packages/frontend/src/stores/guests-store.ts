@@ -1,4 +1,4 @@
-import type { GuestDoc, Visit } from "@firetable/types";
+import type { GuestDoc, PropertyDoc, Visit } from "@firetable/types";
 import type { _RefFirestore, VueFirestoreDocumentData, VueFirestoreQueryData } from "vuefire";
 import { defineStore } from "pinia";
 import { getGuestsPath, guestsCollection } from "@firetable/backend";
@@ -18,12 +18,43 @@ export type GuestSummary = {
     visitPercentage: string;
 };
 
+type PropertyEvents = Record<string, Visit | null>;
+
 export const useGuestsStore = defineStore("guests", function () {
     const refsMap = new Map<string, _RefFirestore<VueFirestoreQueryData<GuestDoc>>>();
     const authStore = useAuthStore();
     const propertiesStore = usePropertiesStore();
-
     const guestsCache = new Map<string, GuestDoc>();
+
+    function hasPropertyAccess(propertyId: string): boolean {
+        return (
+            authStore.isAdmin || authStore.nonNullableUser.relatedProperties.includes(propertyId)
+        );
+    }
+
+    function findProperty(propertyId: string): PropertyDoc | undefined {
+        return propertiesStore.properties.find(matchesProperty("id", propertyId));
+    }
+
+    function createPropertySummary(
+        propertyId: string,
+        events: PropertyEvents,
+    ): Omit<GuestSummary, "guestId"> | undefined {
+        const property = findProperty(propertyId);
+        if (!property) {
+            return undefined;
+        }
+
+        const { totalReservations, fulfilledVisits, visitPercentage } = calculateVisitStats(events);
+
+        return {
+            propertyId: property.id,
+            propertyName: property.name,
+            totalReservations,
+            fulfilledVisits,
+            visitPercentage,
+        };
+    }
 
     function getGuests(organisationId: string): _RefFirestore<VueFirestoreQueryData<GuestDoc>> {
         if (!refsMap.get(organisationId)) {
@@ -56,10 +87,9 @@ export const useGuestsStore = defineStore("guests", function () {
     ): Promise<VueFirestoreDocumentData<GuestDoc> | undefined> {
         const guests = refsMap.get(organisationId);
         if (guests?.data.value) {
-            const foundGuest = guests.data.value.find(function (guest) {
-                return guest.hashedContact === hashedContact;
-            });
-
+            const foundGuest = guests.data.value.find(
+                (guest) => guest.hashedContact === hashedContact,
+            );
             if (foundGuest) {
                 AppLogger.info("Guest found in all guests cache");
                 return foundGuest;
@@ -67,7 +97,6 @@ export const useGuestsStore = defineStore("guests", function () {
         }
 
         const cachedGuest = guestsCache.get(hashedContact);
-
         if (cachedGuest) {
             AppLogger.info("Guest found in guests cache");
             return cachedGuest;
@@ -85,13 +114,11 @@ export const useGuestsStore = defineStore("guests", function () {
         await promise.value;
 
         const foundGuest = first(data.value);
-
         if (foundGuest) {
             guestsCache.set(hashedContact, foundGuest);
-            return foundGuest;
         }
 
-        return void 0;
+        return foundGuest;
     }
 
     async function getGuestSummaryForPropertyExcludingEvent(
@@ -106,54 +133,30 @@ export const useGuestsStore = defineStore("guests", function () {
             return undefined;
         }
 
-        // Check if the user has access to the property
-        const isAdmin = authStore.isAdmin;
-        const relatedProperties = authStore.nonNullableUser.relatedProperties;
-        if (!isAdmin && !relatedProperties.includes(propertyId)) {
+        if (!hasPropertyAccess(propertyId)) {
             AppLogger.info("Access denied to the property");
             return undefined;
         }
 
-        // Find the property details
-        const properties = propertiesStore.properties;
-        const property = properties.find(matchesProperty("id", propertyId));
-        if (!property) {
-            AppLogger.info("Property not found");
-            return undefined;
-        }
-
-        // Get the events related to the property
         const events = guestDoc.visitedProperties[propertyId];
         if (!events) {
             AppLogger.info("No events found for the property");
             return undefined;
         }
 
-        // Exclude the specified event
         const eventsExcludingSpecified = { ...events };
         // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- just for now
         delete eventsExcludingSpecified[eventIdToExclude];
 
-        const totalReservations = Object.values(eventsExcludingSpecified).filter(
-            (event): event is Visit => event !== null,
-        ).length;
-
-        const fulfilledVisits = Object.values(eventsExcludingSpecified).filter(
-            (event): event is Visit => event !== null && event.arrived && !event.cancelled,
-        ).length;
-
-        const visitPercentage =
-            totalReservations > 0
-                ? ((fulfilledVisits / totalReservations) * 100).toFixed(2)
-                : "0.00";
+        const summary = createPropertySummary(propertyId, eventsExcludingSpecified);
+        if (!summary) {
+            AppLogger.info("No events found for the property after excluding the specified event");
+            return undefined;
+        }
 
         return {
+            ...summary,
             guestId: guestDoc.id,
-            propertyId: property.id,
-            propertyName: property.name,
-            totalReservations,
-            fulfilledVisits,
-            visitPercentage,
         };
     }
 
@@ -162,55 +165,14 @@ export const useGuestsStore = defineStore("guests", function () {
             return undefined;
         }
 
-        const isAdmin = authStore.isAdmin;
-        const relatedProperties = authStore.nonNullableUser.relatedProperties;
-        const properties = propertiesStore.properties;
-
         const summaries = Object.entries(guest.visitedProperties)
-            .filter(function ([propertyId]) {
-                // Admins see all properties
-                if (isAdmin) {
-                    return true;
-                }
-                // Non-admins only see properties in their relatedProperties
-                return relatedProperties.includes(propertyId);
-            })
+            .filter(([propertyId]) => hasPropertyAccess(propertyId))
             .map(function ([propertyId, events]) {
-                const property = properties.find(matchesProperty("id", propertyId));
-                if (!property) {
-                    return null;
-                }
-
-                // Total reservations: count of non-null events
-                const totalReservations = Object.values(events).filter(
-                    function (event): event is Visit {
-                        return event !== null;
-                    },
-                ).length;
-
-                // Fulfilled visits: arrived and not canceled
-                const fulfilledVisits = Object.values(events).filter(
-                    function (event): event is Visit {
-                        return event !== null && event.arrived && !event.cancelled;
-                    },
-                ).length;
-
-                // Calculate visit percentage
-                const visitPercentage =
-                    totalReservations > 0
-                        ? ((fulfilledVisits / totalReservations) * 100).toFixed(2)
-                        : "0.00";
-
-                return {
-                    propertyId: property.id,
-                    propertyName: property.name,
-                    totalReservations,
-                    fulfilledVisits,
-                    visitPercentage,
-                };
+                return createPropertySummary(propertyId, events);
             });
 
-        return summaries.filter(Boolean) as GuestSummary[];
+        const validSummaries = summaries.filter(Boolean) as GuestSummary[];
+        return validSummaries.length > 0 ? validSummaries : undefined;
     }
 
     return {
@@ -221,3 +183,22 @@ export const useGuestsStore = defineStore("guests", function () {
         guestReservationsSummary,
     };
 });
+
+function calculateVisitStats(events: PropertyEvents): {
+    totalReservations: number;
+    fulfilledVisits: number;
+    visitPercentage: string;
+} {
+    const nonNullEvents = Object.values(events).filter((event): event is Visit => event !== null);
+
+    const totalReservations = nonNullEvents.length;
+
+    const fulfilledVisits = nonNullEvents.filter(
+        (event) => event.arrived && !event.cancelled,
+    ).length;
+
+    const visitPercentage =
+        totalReservations > 0 ? ((fulfilledVisits / totalReservations) * 100).toFixed(2) : "0.00";
+
+    return { totalReservations, fulfilledVisits, visitPercentage };
+}
