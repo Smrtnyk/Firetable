@@ -17,14 +17,12 @@ export type GuestSummary = {
     visitPercentage: string;
 };
 
-type GuestDocWithSummary = GuestDoc & { summary: Summary[] | undefined };
-
 export const useGuestsStore = defineStore("guests", function () {
     const refsMap = new Map<string, _RefFirestore<VueFirestoreQueryData<GuestDoc>>>();
     const authStore = useAuthStore();
     const propertiesStore = usePropertiesStore();
 
-    const guestsCache = new Map<string, GuestDocWithSummary>();
+    const guestsCache = new Map<string, GuestDoc>();
 
     function getGuests(organisationId: string): _RefFirestore<VueFirestoreQueryData<GuestDoc>> {
         if (!refsMap.get(organisationId)) {
@@ -43,7 +41,7 @@ export const useGuestsStore = defineStore("guests", function () {
     async function getGuestByHashedContact(
         organisationId: string,
         hashedContact: string,
-    ): Promise<VueFirestoreDocumentData<GuestDocWithSummary> | undefined> {
+    ): Promise<VueFirestoreDocumentData<GuestDoc> | undefined> {
         const guests = refsMap.get(organisationId);
         if (guests?.data.value) {
             const foundGuest = guests.data.value.find(function (guest) {
@@ -52,10 +50,7 @@ export const useGuestsStore = defineStore("guests", function () {
 
             if (foundGuest) {
                 AppLogger.info("Guest found in all guests cache");
-                return {
-                    ...foundGuest,
-                    summary: guestReservationsSummary(foundGuest),
-                };
+                return foundGuest;
             }
         }
 
@@ -80,18 +75,76 @@ export const useGuestsStore = defineStore("guests", function () {
         const foundGuest = first(data.value);
 
         if (foundGuest) {
-            const summarizedGuestData = {
-                ...foundGuest,
-                summary: guestReservationsSummary(foundGuest),
-            };
-            guestsCache.set(hashedContact, summarizedGuestData);
-            return summarizedGuestData;
+            guestsCache.set(hashedContact, foundGuest);
+            return foundGuest;
         }
 
         return void 0;
     }
 
-    function guestReservationsSummary(guest: GuestDoc): Summary[] | undefined {
+    async function getGuestSummaryForPropertyExcludingEvent(
+        organisationId: string,
+        hashedContact: string,
+        propertyId: string,
+        eventIdToExclude: string,
+    ): Promise<GuestSummary | undefined> {
+        const guestDoc = await getGuestByHashedContact(organisationId, hashedContact);
+        if (!guestDoc) {
+            AppLogger.info("Guest not found");
+            return undefined;
+        }
+
+        // Check if the user has access to the property
+        const isAdmin = authStore.isAdmin;
+        const relatedProperties = authStore.nonNullableUser.relatedProperties;
+        if (!isAdmin && !relatedProperties.includes(propertyId)) {
+            AppLogger.info("Access denied to the property");
+            return undefined;
+        }
+
+        // Find the property details
+        const properties = propertiesStore.properties;
+        const property = properties.find(matchesProperty("id", propertyId));
+        if (!property) {
+            AppLogger.info("Property not found");
+            return undefined;
+        }
+
+        // Get the events related to the property
+        const events = guestDoc.visitedProperties[propertyId];
+        if (!events) {
+            AppLogger.info("No events found for the property");
+            return undefined;
+        }
+
+        // Exclude the specified event
+        const eventsExcludingSpecified = { ...events };
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- just for now
+        delete eventsExcludingSpecified[eventIdToExclude];
+
+        const totalReservations = Object.values(eventsExcludingSpecified).filter(
+            (event): event is Visit => event !== null,
+        ).length;
+
+        const fulfilledVisits = Object.values(eventsExcludingSpecified).filter(
+            (event): event is Visit => event !== null && event.arrived && !event.cancelled,
+        ).length;
+
+        const visitPercentage =
+            totalReservations > 0
+                ? ((fulfilledVisits / totalReservations) * 100).toFixed(2)
+                : "0.00";
+
+        return {
+            propertyId: property.id,
+            propertyName: property.name,
+            totalReservations,
+            fulfilledVisits,
+            visitPercentage,
+        };
+    }
+
+    function guestReservationsSummary(guest: GuestDoc): GuestSummary[] | undefined {
         if (Object.keys(guest.visitedProperties).length === 0) {
             return undefined;
         }
@@ -144,12 +197,12 @@ export const useGuestsStore = defineStore("guests", function () {
                 };
             });
 
-        return summaries.filter(Boolean) as Summary[];
+        return summaries.filter(Boolean) as GuestSummary[];
     }
 
     return {
+        getGuestSummaryForPropertyExcludingEvent,
         getGuests,
-        getGuestByHashedContact,
         guestReservationsSummary,
     };
 });
