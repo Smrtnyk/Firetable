@@ -78,6 +78,10 @@ const { returningGuests } = useGuestsForEvent(eventOwner, allReservations);
 const allTables = computed(function () {
     return eventFloors.value.flatMap(getTablesFromFloorDoc);
 });
+const logsLabelWithCount = computed(function () {
+    const logsLength = logs.value?.logs.length ?? 0;
+    return logsLength > 0 ? `Logs (${logsLength})` : "Logs";
+});
 
 const reservationsStatus = computed(function () {
     const activeReservations = allReservations.value.filter(isActiveReservation);
@@ -222,7 +226,7 @@ onMounted(init);
         <FTTabs v-model="tab">
             <q-tab name="info" label="Info" />
             <q-tab name="edit" label="Edit" v-if="!isEventFinished(event.date)" />
-            <q-tab name="logs" label="Logs" />
+            <q-tab name="logs" :label="logsLabelWithCount" />
         </FTTabs>
         <FTTabPanels v-model="tab" class="bg-transparent">
             <!-- General info area -->
