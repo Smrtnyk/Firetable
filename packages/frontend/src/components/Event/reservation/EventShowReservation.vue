@@ -179,36 +179,35 @@ function onWaitingForResponse(): void {
 
         <q-separator class="q-mb-md" />
 
-        <q-item class="q-pa-sm-none q-pa-xs-none">
-            <div class="row q-gutter-sm">
-                <FTBtn
-                    v-if="canDeleteReservation"
-                    :title="t('Global.delete')"
-                    class="no-wrap q-ml-none"
-                    icon="trash"
-                    color="negative"
-                    @click="() => emit('delete')"
-                    v-close-popup
-                />
-                <FTBtn
-                    v-if="canEditReservation && !isCancelled"
-                    :title="t('Global.edit')"
-                    icon="pencil"
-                    color="positive"
-                    @click="() => emit('edit')"
-                    v-close-popup
-                />
-                <FTBtn
-                    v-if="canMoveToQueue"
-                    title="Move to queue"
-                    icon="bookmark"
-                    color="secondary"
-                    @click="() => emit('queue')"
-                    v-close-popup
-                />
-            </div>
+        <q-item class="q-pa-sm-none q-pa-xs-none q-gutter-xs q-ml-none">
+            <FTBtn
+                v-if="canDeleteReservation"
+                :title="t('Global.delete')"
+                class="no-wrap q-ml-none"
+                icon="trash"
+                color="negative"
+                @click="() => emit('delete')"
+                v-close-popup
+            />
+            <FTBtn
+                v-if="canEditReservation && !isCancelled"
+                :title="t('Global.edit')"
+                icon="pencil"
+                color="positive"
+                @click="() => emit('edit')"
+                v-close-popup
+            />
+
             <q-space />
-            <div v-if="authStore.canReserve && !isCancelled" class="row q-gutter-sm justify-end">
+            <FTBtn
+                v-if="canMoveToQueue"
+                title="Move to queue"
+                icon="bookmark"
+                color="secondary"
+                @click="() => emit('queue')"
+                v-close-popup
+            />
+            <template v-if="authStore.canReserve && !isCancelled">
                 <FTBtn
                     :title="t('Global.transfer')"
                     icon="transfer"
@@ -223,7 +222,7 @@ function onWaitingForResponse(): void {
                     @click="() => emit('copy')"
                     v-close-popup
                 />
-            </div>
+            </template>
         </q-item>
 
         <template
