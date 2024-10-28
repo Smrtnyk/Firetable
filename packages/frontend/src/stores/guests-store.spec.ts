@@ -18,6 +18,48 @@ vi.mock("src/composables/useFirestore", () => ({
     createQuery: vi.fn(),
 }));
 
+// Test helpers and fixtures
+type TestStores = {
+    guestsStore: ReturnType<typeof useGuestsStore>;
+    propertiesStore: ReturnType<typeof usePropertiesStore>;
+    authStore: ReturnType<typeof useAuthStore>;
+};
+
+function setupTestStores(): TestStores {
+    const guestsStore = mockedStore(useGuestsStore);
+    const propertiesStore = mockedStore(usePropertiesStore);
+    const authStore = mockedStore(useAuthStore) as any;
+    return { guestsStore, propertiesStore, authStore };
+}
+
+function createTestVisit(options: Partial<Visit> = {}): Visit {
+    return {
+        arrived: false,
+        cancelled: false,
+        date: new Date("2023-12-25").getTime(),
+        ...options,
+    } as Visit;
+}
+
+function createTestGuest(options: Partial<GuestDoc> = {}): GuestDoc {
+    return {
+        id: "guest1",
+        name: "Guest 1",
+        contact: "+4323524323",
+        hashedContact: "hashedContact1",
+        maskedContact: "maskedContact1",
+        visitedProperties: {},
+        ...options,
+    } as GuestDoc;
+}
+
+function createTestProperty(id: string): PropertyDoc {
+    return {
+        id,
+        name: `Property ${id}`,
+    } as PropertyDoc;
+}
+
 function mockReturnGuestData(guestData: GuestDoc[]): void {
     useFirestoreCollectionSpy.mockReturnValue({
         data: ref(guestData),
@@ -25,76 +67,58 @@ function mockReturnGuestData(guestData: GuestDoc[]): void {
     });
 }
 
+function setupAuthUser(
+    authStore: ReturnType<typeof useAuthStore>,
+    role: AppUser["role"] = Role.STAFF,
+    properties: string[] = [],
+): void {
+    authStore.user = {
+        relatedProperties: properties,
+        role,
+    } as AdminUser | AppUser;
+}
+
 describe("Guests Store", () => {
     beforeEach(() => {
-        const pinia = createPinia();
         const app = createApp({});
+        const pinia = createPinia();
         app.use(pinia);
         setActivePinia(pinia);
-
         mockReturnGuestData([]);
     });
 
     describe("getGuestByHashedContact", () => {
         it("returns guest from refsMap if available", async () => {
-            const guestsStore = mockedStore(useGuestsStore);
-            const guestDoc = {
-                id: "guest1",
-                hashedContact: "hashedContact1",
-                name: "Guest 1",
-                visitedProperties: {},
-            } as GuestDoc;
+            const { guestsStore } = setupTestStores();
+            const guestDoc = createTestGuest();
 
-            // Set up refsMap with guest data
-            useFirestoreCollectionSpy.mockReturnValue({
-                data: ref([guestDoc]),
-                promise: Promise.resolve(),
-            });
-
+            mockReturnGuestData([guestDoc]);
             guestsStore.getGuests("org1");
 
             const result = await guestsStore.getGuestByHashedContact("org1", "hashedContact1");
             expect(result).toEqual(guestDoc);
-            // Should not make additional Firestore query
             expect(useFirestoreCollectionSpy).toHaveBeenCalledTimes(1);
         });
 
         it("returns undefined when guest not found in any cache or Firestore", async () => {
-            const guestsStore = mockedStore(useGuestsStore);
-
-            // Empty response from Firestore
-            useFirestoreCollectionSpy.mockReturnValue({
-                data: ref([]),
-                promise: Promise.resolve(),
-            });
+            const { guestsStore } = setupTestStores();
+            mockReturnGuestData([]);
 
             const result = await guestsStore.getGuestByHashedContact("org1", "nonexistent");
             expect(result).toBeUndefined();
         });
 
         it("caches guest after fetching from Firestore", async () => {
-            const guestsStore = mockedStore(useGuestsStore);
-            const guestDoc = {
-                id: "guest1",
-                hashedContact: "hashedContact1",
-                name: "Guest 1",
-                visitedProperties: {},
-            } as GuestDoc;
+            const { guestsStore } = setupTestStores();
+            const guestDoc = createTestGuest();
 
-            // First call returns from Firestore
-            useFirestoreCollectionSpy.mockReturnValue({
-                data: ref([guestDoc]),
-                promise: Promise.resolve(),
-            });
+            mockReturnGuestData([guestDoc]);
 
-            // First fetch should query Firestore
             await guestsStore.getGuestByHashedContact("org1", "hashedContact1");
             expect(useFirestoreCollectionSpy).toHaveBeenCalledTimes(1);
 
-            // Clear spy to verify second call
             useFirestoreCollectionSpy.mockClear();
 
-            // Second fetch should use cache
             const cachedResult = await guestsStore.getGuestByHashedContact(
                 "org1",
                 "hashedContact1",
@@ -106,80 +130,48 @@ describe("Guests Store", () => {
 
     describe("invalidateGuestCache", () => {
         it("removes guest from cache when found", async () => {
-            const guestsStore = mockedStore(useGuestsStore);
-            const guestDoc = {
-                id: "guest1",
-                hashedContact: "hashedContact1",
-                name: "Guest 1",
-                contact: "+4323524323",
-                maskedContact: "maskedContact1",
-                visitedProperties: {},
-            } as GuestDoc;
+            const { guestsStore } = setupTestStores();
+            const guestDoc = createTestGuest();
 
-            // First, get the guest to populate the cache
             mockReturnGuestData([guestDoc]);
             await guestsStore.getGuestByHashedContact("org1", "hashedContact1");
 
-            // Verify guest is in cache by getting it again (should use cache)
             useFirestoreCollectionSpy.mockClear();
             await guestsStore.getGuestByHashedContact("org1", "hashedContact1");
             expect(useFirestoreCollectionSpy).not.toHaveBeenCalled();
 
-            // Invalidate the cache
             guestsStore.invalidateGuestCache("guest1");
 
-            // Verify guest is removed from cache by getting it again (should query Firestore)
             useFirestoreCollectionSpy.mockClear();
             await guestsStore.getGuestByHashedContact("org1", "hashedContact1");
             expect(useFirestoreCollectionSpy).toHaveBeenCalled();
         });
 
         it("does nothing when guest is not found in cache", () => {
-            const guestsStore = mockedStore(useGuestsStore);
-
-            // Try to invalidate a non-existent guest
+            const { guestsStore } = setupTestStores();
             guestsStore.invalidateGuestCache("nonexistent");
-
-            // Verify the cache remains unchanged
             expect(useFirestoreCollectionSpy).not.toHaveBeenCalled();
         });
 
         it("only removes the specified guest from cache", async () => {
-            const guestsStore = mockedStore(useGuestsStore);
-            const guest1 = {
-                id: "guest1",
-                hashedContact: "hashedContact1",
-                name: "Guest 1",
-                contact: "+4323524323",
-                maskedContact: "maskedContact1",
-                visitedProperties: {},
-            } as GuestDoc;
-            const guest2 = {
+            const { guestsStore } = setupTestStores();
+            const guest1 = createTestGuest();
+            const guest2 = createTestGuest({
                 id: "guest2",
                 hashedContact: "hashedContact2",
-                name: "Guest 2",
-                contact: "+4323524324",
-                maskedContact: "maskedContact2",
-                visitedProperties: {},
-            } as GuestDoc;
+            });
 
-            // Populate cache with both guests
             mockReturnGuestData([guest1]);
             await guestsStore.getGuestByHashedContact("org1", "hashedContact1");
             mockReturnGuestData([guest2]);
             await guestsStore.getGuestByHashedContact("org1", "hashedContact2");
 
-            // Clear spy to start fresh
             useFirestoreCollectionSpy.mockClear();
-
-            // Invalidate only guest1
             guestsStore.invalidateGuestCache("guest1");
 
-            // Verify guest1 is removed (requires Firestore query)
             await guestsStore.getGuestByHashedContact("org1", "hashedContact1");
             expect(useFirestoreCollectionSpy).toHaveBeenCalledTimes(1);
 
-            // Verify guest2 is still in cache (no Firestore query)
             await guestsStore.getGuestByHashedContact("org1", "hashedContact2");
             expect(useFirestoreCollectionSpy).toHaveBeenCalledTimes(1);
         });
@@ -187,7 +179,7 @@ describe("Guests Store", () => {
 
     describe("getGuests", () => {
         it("returns guests ref for organisationId", () => {
-            const guestsStore = mockedStore(useGuestsStore);
+            const { guestsStore } = setupTestStores();
             const result = guestsStore.getGuests("org1");
 
             expect(result).toBeDefined();
@@ -197,7 +189,7 @@ describe("Guests Store", () => {
         });
 
         it("caches the refs for the organisationId", () => {
-            const guestsStore = mockedStore(useGuestsStore);
+            const { guestsStore } = setupTestStores();
 
             const result1 = guestsStore.getGuests("org1");
             const result2 = guestsStore.getGuests("org1");
@@ -214,46 +206,26 @@ describe("Guests Store", () => {
         });
 
         it("excludes future visits from the summary", async () => {
-            const guestDoc = {
-                name: "Guest 1",
-                contact: "+4323524323",
-                hashedContact: "hashedContact1",
-                maskedContact: "maskedContact1",
-                id: "guest1",
+            const { guestsStore, propertiesStore, authStore } = setupTestStores();
+            const guestDoc = createTestGuest({
                 visitedProperties: {
                     property1: {
-                        // Past visit
-                        event1: {
+                        event1: createTestVisit({
                             arrived: true,
-                            cancelled: false,
                             date: new Date("2023-12-25").getTime(),
-                        } as Visit,
-                        // Future visit
-                        event2: {
-                            arrived: false,
-                            cancelled: false,
-                            date: new Date("2024-01-15").getTime(),
-                        } as Visit,
-                        // Past visit
-                        event3: {
+                        }),
+                        event2: createTestVisit({ date: new Date("2024-01-15").getTime() }),
+                        event3: createTestVisit({
                             arrived: true,
-                            cancelled: false,
                             date: new Date("2023-12-30").getTime(),
-                        } as Visit,
+                        }),
                     },
                 },
-            } as GuestDoc;
-
-            const authStore = mockedStore(useAuthStore);
-            const propertiesStore = mockedStore(usePropertiesStore);
-            const guestsStore = mockedStore(useGuestsStore);
+            });
 
             mockReturnGuestData([guestDoc]);
-            propertiesStore.properties = [{ id: "property1", name: "Property 1" } as PropertyDoc];
-            authStore.user = {
-                relatedProperties: ["property1"],
-                role: ADMIN,
-            } as AdminUser;
+            propertiesStore.properties = [createTestProperty("property1")];
+            setupAuthUser(authStore, ADMIN, ["property1"]);
 
             const result = await guestsStore.getGuestSummaryForPropertyExcludingEvent(
                 "org1",
@@ -265,8 +237,7 @@ describe("Guests Store", () => {
             expect(result).toEqual({
                 guestId: "guest1",
                 propertyId: "property1",
-                propertyName: "Property 1",
-                // Only event3 should be counted (event1 is excluded, event2 is in future)
+                propertyName: "Property property1",
                 totalReservations: 1,
                 fulfilledVisits: 1,
                 visitPercentage: "100.00",
@@ -274,51 +245,34 @@ describe("Guests Store", () => {
         });
 
         it("returns zeroes when all past visits are excluded and remaining visits are in future", async () => {
-            const guestDoc = {
-                name: "Guest 1",
-                contact: "+4323524323",
-                hashedContact: "hashedContact1",
-                maskedContact: "maskedContact1",
-                id: "guest1",
+            const { guestsStore, propertiesStore, authStore } = setupTestStores();
+            const guestDoc = createTestGuest({
                 visitedProperties: {
                     property1: {
-                        event1: {
+                        event1: createTestVisit({
                             arrived: true,
-                            cancelled: false,
                             date: new Date("2023-12-25").getTime(),
-                        } as Visit,
-                        event2: {
-                            arrived: false,
-                            cancelled: false,
-                            date: new Date("2024-01-15").getTime(),
-                        } as Visit,
+                        }),
+                        event2: createTestVisit({ date: new Date("2024-01-15").getTime() }),
                     },
                 },
-            } as GuestDoc;
-
-            const authStore = mockedStore(useAuthStore);
-            const propertiesStore = mockedStore(usePropertiesStore);
-            const guestsStore = mockedStore(useGuestsStore);
+            });
 
             mockReturnGuestData([guestDoc]);
-            propertiesStore.properties = [{ id: "property1", name: "Property 1" } as PropertyDoc];
-            authStore.user = {
-                relatedProperties: ["property1"],
-                role: ADMIN,
-            } as AdminUser;
+            propertiesStore.properties = [createTestProperty("property1")];
+            setupAuthUser(authStore, ADMIN, ["property1"]);
 
             const result = await guestsStore.getGuestSummaryForPropertyExcludingEvent(
                 "org1",
                 "hashedContact1",
                 "property1",
-                // Exclude the only past visit
                 "event1",
             );
 
             expect(result).toEqual({
                 guestId: "guest1",
                 propertyId: "property1",
-                propertyName: "Property 1",
+                propertyName: "Property property1",
                 totalReservations: 0,
                 fulfilledVisits: 0,
                 visitPercentage: "0.00",
@@ -326,47 +280,31 @@ describe("Guests Store", () => {
         });
 
         it("handles visits on current day correctly", async () => {
+            const { guestsStore, propertiesStore, authStore } = setupTestStores();
             const currentTimestamp = new Date("2024-01-01").getTime();
-            const guestDoc = {
-                name: "Guest 1",
-                contact: "+4323524323",
-                hashedContact: "hashedContact1",
-                maskedContact: "maskedContact1",
-                id: "guest1",
+            const guestDoc = createTestGuest({
                 visitedProperties: {
                     property1: {
-                        event1: {
-                            arrived: true,
-                            cancelled: false,
-                            date: currentTimestamp,
-                        } as Visit,
+                        event1: createTestVisit({ arrived: true, date: currentTimestamp }),
                     },
                 },
-            } as GuestDoc;
-
-            const authStore = mockedStore(useAuthStore);
-            const propertiesStore = mockedStore(usePropertiesStore);
-            const guestsStore = mockedStore(useGuestsStore);
+            });
 
             mockReturnGuestData([guestDoc]);
-            propertiesStore.properties = [{ id: "property1", name: "Property 1" } as PropertyDoc];
-            authStore.user = {
-                relatedProperties: ["property1"],
-                role: ADMIN,
-            } as AdminUser;
+            propertiesStore.properties = [createTestProperty("property1")];
+            setupAuthUser(authStore, ADMIN, ["property1"]);
 
             const result = await guestsStore.getGuestSummaryForPropertyExcludingEvent(
                 "org1",
                 "hashedContact1",
                 "property1",
-                // Exclude non-existent event
                 "event2",
             );
 
             expect(result).toEqual({
                 guestId: "guest1",
                 propertyId: "property1",
-                propertyName: "Property 1",
+                propertyName: "Property property1",
                 totalReservations: 1,
                 fulfilledVisits: 1,
                 visitPercentage: "100.00",
@@ -374,31 +312,20 @@ describe("Guests Store", () => {
         });
 
         it("returns guest summary excluding the specified event", async () => {
-            const guestDoc = {
-                name: "Guest 1",
-                contact: "+4323524323",
-                hashedContact: "hashedContact1",
-                maskedContact: "maskedContact1",
-                id: "guest1",
+            const { guestsStore, propertiesStore, authStore } = setupTestStores();
+            const guestDoc = createTestGuest({
                 visitedProperties: {
                     property1: {
-                        event1: { arrived: true, cancelled: false } as Visit,
-                        event2: { arrived: false, cancelled: false } as Visit,
-                        event3: { arrived: true, cancelled: true } as Visit,
+                        event1: createTestVisit({ arrived: true }),
+                        event2: createTestVisit(),
+                        event3: createTestVisit({ arrived: true, cancelled: true }),
                     },
                 },
-            } as GuestDoc;
-
-            const authStore = mockedStore(useAuthStore);
-            const propertiesStore = mockedStore(usePropertiesStore);
-            const guestsStore = mockedStore(useGuestsStore);
+            });
 
             mockReturnGuestData([guestDoc]);
-            propertiesStore.properties = [{ id: "property1", name: "Property 1" } as PropertyDoc];
-            authStore.user = {
-                relatedProperties: ["property1"],
-                role: ADMIN,
-            } as AdminUser;
+            propertiesStore.properties = [createTestProperty("property1")];
+            setupAuthUser(authStore, ADMIN, ["property1"]);
 
             const result = await guestsStore.getGuestSummaryForPropertyExcludingEvent(
                 "org1",
@@ -410,18 +337,15 @@ describe("Guests Store", () => {
             expect(result).toEqual({
                 guestId: "guest1",
                 propertyId: "property1",
-                propertyName: "Property 1",
-                // event1 and event3
+                propertyName: "Property property1",
                 totalReservations: 2,
-                // event1 (arrived and not cancelled)
                 fulfilledVisits: 1,
                 visitPercentage: "50.00",
             });
         });
 
         it("returns undefined if guest not found", async () => {
-            const guestsStore = mockedStore(useGuestsStore);
-
+            const { guestsStore } = setupTestStores();
             mockReturnGuestData([]);
 
             const result = await guestsStore.getGuestSummaryForPropertyExcludingEvent(
@@ -435,28 +359,17 @@ describe("Guests Store", () => {
         });
 
         it("returns undefined if user does not have access to the property", async () => {
-            const guestDoc: GuestDoc = {
-                name: "Guest 1",
-                contact: "+4323524323",
-                hashedContact: "hashedContact1",
-                maskedContact: "maskedContact1",
-                id: "guest1",
+            const { guestsStore, authStore } = setupTestStores();
+            const guestDoc = createTestGuest({
                 visitedProperties: {
                     property2: {
-                        event1: { arrived: true, cancelled: false } as Visit,
+                        event1: createTestVisit({ arrived: true }),
                     },
                 },
-            };
+            });
 
             mockReturnGuestData([guestDoc]);
-            const authStore = mockedStore(useAuthStore);
-            const guestsStore = mockedStore(useGuestsStore);
-
-            // User does not have access to property2
-            authStore.user = {
-                relatedProperties: ["property1"],
-                role: Role.STAFF,
-            } as AppUser;
+            setupAuthUser(authStore, Role.STAFF, ["property1"]);
 
             const result = await guestsStore.getGuestSummaryForPropertyExcludingEvent(
                 "org1",
@@ -469,28 +382,17 @@ describe("Guests Store", () => {
         });
 
         it("returns undefined if property not found", async () => {
-            const guestDoc: GuestDoc = {
-                id: "guest1",
-                name: "Guest 1",
-                contact: "+4323524323",
-                maskedContact: "maskedContact1",
-                hashedContact: "hashedContact1",
+            const { guestsStore, propertiesStore, authStore } = setupTestStores();
+            const guestDoc = createTestGuest({
                 visitedProperties: {
                     property1: {
-                        event1: { arrived: true, cancelled: false } as Visit,
+                        event1: createTestVisit({ arrived: true }),
                     },
                 },
-            };
+            });
 
             mockReturnGuestData([guestDoc]);
-            const authStore = mockedStore(useAuthStore);
-            const propertiesStore = mockedStore(usePropertiesStore);
-            const guestsStore = mockedStore(useGuestsStore);
-
-            authStore.user = {
-                relatedProperties: ["property1"],
-                role: Role.MANAGER,
-            } as AppUser;
+            setupAuthUser(authStore, Role.MANAGER, ["property1"]);
             propertiesStore.properties = [];
 
             const result = await guestsStore.getGuestSummaryForPropertyExcludingEvent(
@@ -504,25 +406,12 @@ describe("Guests Store", () => {
         });
 
         it("returns undefined if no events for the property", async () => {
-            const guestsStore = mockedStore(useGuestsStore);
-            const propertiesStore = mockedStore(usePropertiesStore);
-            const authStore = mockedStore(useAuthStore);
-
-            const guestDoc: GuestDoc = {
-                id: "guest1",
-                name: "Guest 1",
-                contact: "+4323524323",
-                maskedContact: "maskedContact1",
-                hashedContact: "hashedContact1",
-                visitedProperties: {},
-            };
+            const { guestsStore, propertiesStore, authStore } = setupTestStores();
+            const guestDoc = createTestGuest();
 
             mockReturnGuestData([guestDoc]);
-            propertiesStore.properties = [{ id: "property1", name: "Property 1" } as PropertyDoc];
-            authStore.user = {
-                relatedProperties: ["property1"],
-                role: Role.STAFF,
-            } as AppUser;
+            propertiesStore.properties = [createTestProperty("property1")];
+            setupAuthUser(authStore, Role.STAFF, ["property1"]);
 
             const result = await guestsStore.getGuestSummaryForPropertyExcludingEvent(
                 "org1",
@@ -535,42 +424,30 @@ describe("Guests Store", () => {
         });
 
         it("returns 0 reservations summary if no events after excluding the specified event", async () => {
-            const guestsStore = mockedStore(useGuestsStore);
-            const propertiesStore = mockedStore(usePropertiesStore);
-            const authStore = mockedStore(useAuthStore);
-
-            const guestDoc: GuestDoc = {
-                id: "guest1",
-                name: "Guest 1",
-                contact: "+4323524323",
-                maskedContact: "maskedContact1",
-                hashedContact: "hashedContact1",
+            const { guestsStore, propertiesStore, authStore } = setupTestStores();
+            const guestDoc = createTestGuest({
                 visitedProperties: {
                     property1: {
-                        event1: { arrived: true, cancelled: false } as Visit,
+                        event1: createTestVisit({ arrived: true }),
                     },
                 },
-            };
+            });
 
             mockReturnGuestData([guestDoc]);
-            propertiesStore.properties = [{ id: "property1", name: "Property 1" } as PropertyDoc];
-            authStore.user = {
-                relatedProperties: ["property1"],
-                role: Role.STAFF,
-            } as AppUser;
+            propertiesStore.properties = [createTestProperty("property1")];
+            setupAuthUser(authStore, Role.STAFF, ["property1"]);
 
             const result = await guestsStore.getGuestSummaryForPropertyExcludingEvent(
                 "org1",
                 "hashedContact1",
                 "property1",
-                // Exclude the only event
                 "event1",
             );
 
             expect(result).toEqual({
                 guestId: "guest1",
                 propertyId: "property1",
-                propertyName: "Property 1",
+                propertyName: "Property property1",
                 totalReservations: 0,
                 fulfilledVisits: 0,
                 visitPercentage: "0.00",
@@ -578,31 +455,19 @@ describe("Guests Store", () => {
         });
 
         it("handles null events correctly when excluding events", async () => {
-            const guestsStore = mockedStore(useGuestsStore);
-            const propertiesStore = mockedStore(usePropertiesStore);
-            const authStore = mockedStore(useAuthStore);
-
-            const guestDoc: GuestDoc = {
-                id: "guest1",
-                contact: "+4323524323",
-                hashedContact: "hashedContact1",
-                maskedContact: "maskedContact1",
-                name: "Guest 1",
+            const { guestsStore, propertiesStore, authStore } = setupTestStores();
+            const guestDoc = createTestGuest({
                 visitedProperties: {
                     property1: {
                         event1: null,
-                        event2: { arrived: true, cancelled: false } as Visit,
+                        event2: createTestVisit({ arrived: true }),
                     },
                 },
-            };
+            });
 
             mockReturnGuestData([guestDoc]);
-            propertiesStore.properties = [{ id: "property1", name: "Property 1" }] as PropertyDoc[];
-
-            authStore.user = {
-                relatedProperties: ["property1"],
-                role: Role.STAFF,
-            } as AppUser;
+            propertiesStore.properties = [createTestProperty("property1")];
+            setupAuthUser(authStore, Role.STAFF, ["property1"]);
 
             const result = await guestsStore.getGuestSummaryForPropertyExcludingEvent(
                 "org1",
@@ -610,12 +475,11 @@ describe("Guests Store", () => {
                 "property1",
                 "event2",
             );
-
             // Should not count null events in totals
             expect(result).toEqual({
                 guestId: "guest1",
                 propertyId: "property1",
-                propertyName: "Property 1",
+                propertyName: "Property property1",
                 totalReservations: 0,
                 fulfilledVisits: 0,
                 visitPercentage: "0.00",
@@ -623,30 +487,18 @@ describe("Guests Store", () => {
         });
 
         it("handles case when all events are excluded", async () => {
-            const guestsStore = mockedStore(useGuestsStore);
-            const propertiesStore = mockedStore(usePropertiesStore);
-            const authStore = mockedStore(useAuthStore);
-
-            const guestDoc: GuestDoc = {
-                id: "guest1",
-                contact: "+4323524323",
-                hashedContact: "hashedContact1",
-                maskedContact: "maskedContact1",
-                name: "Guest 1",
+            const { guestsStore, propertiesStore, authStore } = setupTestStores();
+            const guestDoc = createTestGuest({
                 visitedProperties: {
                     property1: {
-                        event1: { arrived: true, cancelled: false } as Visit,
+                        event1: createTestVisit({ arrived: true }),
                     },
                 },
-            };
+            });
 
             mockReturnGuestData([guestDoc]);
-            propertiesStore.properties = [{ id: "property1", name: "Property 1" }] as PropertyDoc[];
-
-            authStore.user = {
-                relatedProperties: ["property1"],
-                role: Role.STAFF,
-            } as AppUser;
+            propertiesStore.properties = [createTestProperty("property1")];
+            setupAuthUser(authStore, Role.STAFF, ["property1"]);
 
             const result = await guestsStore.getGuestSummaryForPropertyExcludingEvent(
                 "org1",
@@ -658,7 +510,7 @@ describe("Guests Store", () => {
             expect(result).toEqual({
                 guestId: "guest1",
                 propertyId: "property1",
-                propertyName: "Property 1",
+                propertyName: "Property property1",
                 totalReservations: 0,
                 fulfilledVisits: 0,
                 visitPercentage: "0.00",
@@ -680,53 +532,42 @@ describe("Guests Store", () => {
         });
 
         it("returns summaries for properties the user has access to", () => {
-            const guestsStore = mockedStore(useGuestsStore);
-            const propertiesStore = mockedStore(usePropertiesStore);
-            const authStore = mockedStore(useAuthStore);
-
-            const guestDoc = {
-                id: "guest1",
-                name: "Guest 1",
-                contact: "+4323524323",
-                maskedContact: "maskedContact1",
-                hashedContact: "hashedContact1",
+            const { guestsStore, propertiesStore, authStore } = setupTestStores();
+            const guestDoc = createTestGuest({
                 visitedProperties: {
                     property1: {
-                        event1: { arrived: true, cancelled: false } as Visit,
+                        event1: createTestVisit({ arrived: true }),
                     },
                     property2: {
-                        event2: { arrived: false, cancelled: false } as Visit,
+                        event2: createTestVisit(),
                     },
                     property3: {
-                        event3: { arrived: true, cancelled: true } as Visit,
+                        event3: createTestVisit({ arrived: true, cancelled: true }),
                     },
                 },
-            } as GuestDoc;
+            });
 
             propertiesStore.properties = [
-                { id: "property1", name: "Property 1" },
-                { id: "property2", name: "Property 2" },
-                { id: "property3", name: "Property 3" },
-            ] as unknown as PropertyDoc[];
+                createTestProperty("property1"),
+                createTestProperty("property2"),
+                createTestProperty("property3"),
+            ];
 
-            authStore.user = {
-                relatedProperties: ["property1", "property2"],
-                role: Role.STAFF,
-            } as AppUser;
+            setupAuthUser(authStore, Role.STAFF, ["property1", "property2"]);
 
             const result = guestsStore.guestReservationsSummary(guestDoc);
 
             expect(result).toEqual([
                 {
                     propertyId: "property1",
-                    propertyName: "Property 1",
+                    propertyName: "Property property1",
                     totalReservations: 1,
                     fulfilledVisits: 1,
                     visitPercentage: "100.00",
                 },
                 {
                     propertyId: "property2",
-                    propertyName: "Property 2",
+                    propertyName: "Property property2",
                     totalReservations: 1,
                     fulfilledVisits: 0,
                     visitPercentage: "0.00",
@@ -735,61 +576,50 @@ describe("Guests Store", () => {
         });
 
         it("includes all properties when user is admin", () => {
-            const guestsStore = mockedStore(useGuestsStore);
-            const propertiesStore = mockedStore(usePropertiesStore);
-            const authStore = mockedStore(useAuthStore);
-
-            const guestDoc: GuestDoc = {
-                id: "guest1",
-                name: "Guest 1",
-                contact: "+4323524323",
-                maskedContact: "maskedContact1",
-                hashedContact: "hashedContact1",
+            const { guestsStore, propertiesStore, authStore } = setupTestStores();
+            const guestDoc = createTestGuest({
                 visitedProperties: {
                     property1: {
-                        event1: { arrived: true, cancelled: false } as Visit,
+                        event1: createTestVisit({ arrived: true }),
                     },
                     property2: {
-                        event2: { arrived: false, cancelled: false } as Visit,
+                        event2: createTestVisit(),
                     },
                     property3: {
-                        event3: { arrived: true, cancelled: true } as Visit,
+                        event3: createTestVisit({ arrived: true, cancelled: true }),
                     },
                 },
-            };
+            });
 
             propertiesStore.properties = [
-                { id: "property1", name: "Property 1" },
-                { id: "property2", name: "Property 2" },
-                { id: "property3", name: "Property 3" },
-            ] as PropertyDoc[];
-            authStore.user = {
-                relatedProperties: [],
-                role: ADMIN,
-            } as unknown as AdminUser;
+                createTestProperty("property1"),
+                createTestProperty("property2"),
+                createTestProperty("property3"),
+            ];
+
+            setupAuthUser(authStore, ADMIN, []);
 
             const result = guestsStore.guestReservationsSummary(guestDoc);
 
             expect(result).toEqual([
                 {
                     propertyId: "property1",
-                    propertyName: "Property 1",
+                    propertyName: "Property property1",
                     totalReservations: 1,
                     fulfilledVisits: 1,
                     visitPercentage: "100.00",
                 },
                 {
                     propertyId: "property2",
-                    propertyName: "Property 2",
+                    propertyName: "Property property2",
                     totalReservations: 1,
                     fulfilledVisits: 0,
                     visitPercentage: "0.00",
                 },
                 {
                     propertyId: "property3",
-                    propertyName: "Property 3",
+                    propertyName: "Property property3",
                     totalReservations: 1,
-                    // Cancelled visit doesn't count as fulfilled
                     fulfilledVisits: 0,
                     visitPercentage: "0.00",
                 },
@@ -797,72 +627,53 @@ describe("Guests Store", () => {
         });
 
         it("filters out properties that are not found in propertiesStore", () => {
-            const guestsStore = mockedStore(useGuestsStore);
-            const propertiesStore = mockedStore(usePropertiesStore);
-            const authStore = mockedStore(useAuthStore);
-
-            const guestDoc: GuestDoc = {
-                id: "guest1",
-                name: "Guest 1",
-                contact: "+4323524323",
-                maskedContact: "maskedContact1",
-                hashedContact: "hashedContact1",
+            const { guestsStore, propertiesStore, authStore } = setupTestStores();
+            const guestDoc = createTestGuest({
                 visitedProperties: {
                     property1: {
-                        event1: { arrived: true, cancelled: false } as Visit,
+                        event1: createTestVisit({ arrived: true }),
                     },
                     property2: {
-                        event2: { arrived: true, cancelled: false } as Visit,
+                        event2: createTestVisit({ arrived: true }),
                     },
                 },
-            };
+            });
 
             // Only set up one property in the store
-            propertiesStore.properties = [{ id: "property1", name: "Property 1" }] as PropertyDoc[];
-
-            authStore.user = {
-                relatedProperties: ["property1", "property2"],
-                role: Role.STAFF,
-            } as AppUser;
+            propertiesStore.properties = [createTestProperty("property1")];
+            setupAuthUser(authStore, Role.STAFF, ["property1", "property2"]);
 
             const result = guestsStore.guestReservationsSummary(guestDoc);
             expect(result).toHaveLength(1);
-            expect(result?.[0].propertyId).toBe("property1");
+            expect(result?.[0]).toEqual({
+                propertyId: "property1",
+                propertyName: "Property property1",
+                totalReservations: 1,
+                fulfilledVisits: 1,
+                visitPercentage: "100.00",
+            });
         });
 
         it("correctly calculates visit percentage with mixed event statuses", () => {
-            const guestsStore = mockedStore(useGuestsStore);
-            const propertiesStore = mockedStore(usePropertiesStore);
-            const authStore = mockedStore(useAuthStore);
-
-            const guestDoc = {
-                id: "guest1",
-                name: "Guest 1",
-                contact: "+4323524323",
-                maskedContact: "maskedContact1",
-                hashedContact: "hashedContact1",
+            const { guestsStore, propertiesStore, authStore } = setupTestStores();
+            const guestDoc = createTestGuest({
                 visitedProperties: {
                     property1: {
-                        event1: { arrived: true, cancelled: false } as Visit,
-                        event2: { arrived: false, cancelled: false } as Visit,
-                        event3: { arrived: true, cancelled: true } as Visit,
-                        // Represents a deleted/invalid event
+                        event1: createTestVisit({ arrived: true }),
+                        event2: createTestVisit(),
+                        event3: createTestVisit({ arrived: true, cancelled: true }),
                         event4: null,
                     },
                 },
-            } as GuestDoc;
+            });
 
-            propertiesStore.properties = [{ id: "property1", name: "Property 1" }] as PropertyDoc[];
-
-            authStore.user = {
-                relatedProperties: ["property1"],
-                role: Role.STAFF,
-            } as AppUser;
+            propertiesStore.properties = [createTestProperty("property1")];
+            setupAuthUser(authStore, Role.STAFF, ["property1"]);
 
             const result = guestsStore.guestReservationsSummary(guestDoc);
             expect(result?.[0]).toEqual({
                 propertyId: "property1",
-                propertyName: "Property 1",
+                propertyName: "Property property1",
                 // Should count 3 events (excluding null)
                 totalReservations: 3,
                 // Should only count event1 (arrived true, cancelled false)
