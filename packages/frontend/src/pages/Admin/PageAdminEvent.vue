@@ -230,7 +230,7 @@ onMounted(init);
         </FTTabs>
         <FTTabPanels v-model="tab" class="bg-transparent">
             <!-- General info area -->
-            <q-tab-panel name="info" class="q-px-xs-xs q-px-md-md q-py-none">
+            <q-tab-panel name="info" class="q-px-none q-py-none">
                 <AppCardSection title="Tables status">
                     <AdminEventRTInfo :reservations-status="reservationsStatus" />
                 </AppCardSection>
@@ -283,7 +283,7 @@ onMounted(init);
             <q-tab-panel
                 name="edit"
                 v-if="!isEventFinished(event.date)"
-                class="q-px-xs-sm q-px-md-md q-py-none"
+                class="q-px-none q-py-none"
             >
                 <AppCardSection title="Event Info">
                     <q-item clickable v-ripple>
@@ -326,7 +326,7 @@ onMounted(init);
             </q-tab-panel>
 
             <!-- Logs -->
-            <q-tab-panel name="logs" class="q-px-xs-sm q-px-md-md q-py-none">
+            <q-tab-panel name="logs" class="q-px-none q-py-none">
                 <AppCardSection title="">
                     <AdminEventLogs :logs-doc="logs" :is-admin="authStore.isAdmin" />
                 </AppCardSection>

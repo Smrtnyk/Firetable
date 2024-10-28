@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
+import { isMobile } from "src/global-reactives/screen-detection";
 
 const props = defineProps<{
     modelValue: number | string;
@@ -37,10 +38,11 @@ function handleInput(event: any): void {
             v-model="selectedTab"
             outside-arrows
             mobile-arrows
-            indicator-color="transparent"
             active-class="ft-active-tab"
             align="left"
             @input="handleInput"
+            :dense="isMobile"
+            narrow-indicator
         >
             <slot></slot>
         </q-tabs>
@@ -51,19 +53,9 @@ function handleInput(event: any): void {
 .ft-q-tabs {
     margin-bottom: 8px;
     border-radius: $border-radius !important;
-    box-shadow: $box-shadow !important;
 
-    .ft-active-tab {
-        position: relative;
-        border: 3px solid;
-        border-image-slice: 1;
-        border-image-source: $gradient-primary !important;
-    }
-
-    .q-tab {
-        border: 3px solid transparent;
-        border-image-slice: 1;
-        border-image-source: none;
+    .q-tab__indicator {
+        background: $gradient-primary;
     }
 
     .q-tab:not(:last-child) {
