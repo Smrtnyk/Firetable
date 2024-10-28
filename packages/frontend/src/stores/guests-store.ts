@@ -148,9 +148,20 @@ export const useGuestsStore = defineStore("guests", function () {
         // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- just for now
         delete eventsExcludingSpecified[eventIdToExclude];
 
+        // Filter out future visits
+        const currentTimestamp = Date.now();
+        for (const [eventId, visit] of Object.entries(eventsExcludingSpecified)) {
+            if (visit && visit.date > currentTimestamp) {
+                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- just for now
+                delete eventsExcludingSpecified[eventId];
+            }
+        }
+
         const summary = createPropertySummary(propertyId, eventsExcludingSpecified);
         if (!summary) {
-            AppLogger.info("No events found for the property after excluding the specified event");
+            AppLogger.info(
+                "No valid events found after excluding specified event and future visits",
+            );
             return undefined;
         }
 

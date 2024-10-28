@@ -208,6 +208,171 @@ describe("Guests Store", () => {
     });
 
     describe("getGuestSummaryForPropertyExcludingEvent", () => {
+        beforeEach(() => {
+            // Mock current date to be fixed for consistent testing
+            vi.setSystemTime(new Date("2024-01-01"));
+        });
+
+        it("excludes future visits from the summary", async () => {
+            const guestDoc = {
+                name: "Guest 1",
+                contact: "+4323524323",
+                hashedContact: "hashedContact1",
+                maskedContact: "maskedContact1",
+                id: "guest1",
+                visitedProperties: {
+                    property1: {
+                        // Past visit
+                        event1: {
+                            arrived: true,
+                            cancelled: false,
+                            date: new Date("2023-12-25").getTime(),
+                        } as Visit,
+                        // Future visit
+                        event2: {
+                            arrived: false,
+                            cancelled: false,
+                            date: new Date("2024-01-15").getTime(),
+                        } as Visit,
+                        // Past visit
+                        event3: {
+                            arrived: true,
+                            cancelled: false,
+                            date: new Date("2023-12-30").getTime(),
+                        } as Visit,
+                    },
+                },
+            } as GuestDoc;
+
+            const authStore = mockedStore(useAuthStore);
+            const propertiesStore = mockedStore(usePropertiesStore);
+            const guestsStore = mockedStore(useGuestsStore);
+
+            mockReturnGuestData([guestDoc]);
+            propertiesStore.properties = [{ id: "property1", name: "Property 1" } as PropertyDoc];
+            authStore.user = {
+                relatedProperties: ["property1"],
+                role: ADMIN,
+            } as AdminUser;
+
+            const result = await guestsStore.getGuestSummaryForPropertyExcludingEvent(
+                "org1",
+                "hashedContact1",
+                "property1",
+                "event1",
+            );
+
+            expect(result).toEqual({
+                guestId: "guest1",
+                propertyId: "property1",
+                propertyName: "Property 1",
+                // Only event3 should be counted (event1 is excluded, event2 is in future)
+                totalReservations: 1,
+                fulfilledVisits: 1,
+                visitPercentage: "100.00",
+            });
+        });
+
+        it("returns zeroes when all past visits are excluded and remaining visits are in future", async () => {
+            const guestDoc = {
+                name: "Guest 1",
+                contact: "+4323524323",
+                hashedContact: "hashedContact1",
+                maskedContact: "maskedContact1",
+                id: "guest1",
+                visitedProperties: {
+                    property1: {
+                        event1: {
+                            arrived: true,
+                            cancelled: false,
+                            date: new Date("2023-12-25").getTime(),
+                        } as Visit,
+                        event2: {
+                            arrived: false,
+                            cancelled: false,
+                            date: new Date("2024-01-15").getTime(),
+                        } as Visit,
+                    },
+                },
+            } as GuestDoc;
+
+            const authStore = mockedStore(useAuthStore);
+            const propertiesStore = mockedStore(usePropertiesStore);
+            const guestsStore = mockedStore(useGuestsStore);
+
+            mockReturnGuestData([guestDoc]);
+            propertiesStore.properties = [{ id: "property1", name: "Property 1" } as PropertyDoc];
+            authStore.user = {
+                relatedProperties: ["property1"],
+                role: ADMIN,
+            } as AdminUser;
+
+            const result = await guestsStore.getGuestSummaryForPropertyExcludingEvent(
+                "org1",
+                "hashedContact1",
+                "property1",
+                // Exclude the only past visit
+                "event1",
+            );
+
+            expect(result).toEqual({
+                guestId: "guest1",
+                propertyId: "property1",
+                propertyName: "Property 1",
+                totalReservations: 0,
+                fulfilledVisits: 0,
+                visitPercentage: "0.00",
+            });
+        });
+
+        it("handles visits on current day correctly", async () => {
+            const currentTimestamp = new Date("2024-01-01").getTime();
+            const guestDoc = {
+                name: "Guest 1",
+                contact: "+4323524323",
+                hashedContact: "hashedContact1",
+                maskedContact: "maskedContact1",
+                id: "guest1",
+                visitedProperties: {
+                    property1: {
+                        event1: {
+                            arrived: true,
+                            cancelled: false,
+                            date: currentTimestamp,
+                        } as Visit,
+                    },
+                },
+            } as GuestDoc;
+
+            const authStore = mockedStore(useAuthStore);
+            const propertiesStore = mockedStore(usePropertiesStore);
+            const guestsStore = mockedStore(useGuestsStore);
+
+            mockReturnGuestData([guestDoc]);
+            propertiesStore.properties = [{ id: "property1", name: "Property 1" } as PropertyDoc];
+            authStore.user = {
+                relatedProperties: ["property1"],
+                role: ADMIN,
+            } as AdminUser;
+
+            const result = await guestsStore.getGuestSummaryForPropertyExcludingEvent(
+                "org1",
+                "hashedContact1",
+                "property1",
+                // Exclude non-existent event
+                "event2",
+            );
+
+            expect(result).toEqual({
+                guestId: "guest1",
+                propertyId: "property1",
+                propertyName: "Property 1",
+                totalReservations: 1,
+                fulfilledVisits: 1,
+                visitPercentage: "100.00",
+            });
+        });
+
         it("returns guest summary excluding the specified event", async () => {
             const guestDoc = {
                 name: "Guest 1",
