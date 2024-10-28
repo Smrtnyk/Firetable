@@ -9,10 +9,12 @@ import { httpsCallable } from "firebase/functions";
 
 export function updateEventFloorData(
     owner: EventOwner,
-    floorData: Pick<FloorDoc, "id" | "json">,
+    floorData: Pick<FloorDoc, "height" | "id" | "json" | "width">,
 ): Promise<void> {
     return updateDoc(eventFloorDoc(owner, floorData.id), {
         json: floorData.json,
+        width: floorData.width,
+        height: floorData.height,
     });
 }
 

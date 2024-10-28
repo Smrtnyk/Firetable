@@ -122,9 +122,12 @@ async function init(): Promise<void> {
 async function onFloorUpdate(floor: FloorEditor): Promise<void> {
     await tryCatchLoadingWrapper({
         hook() {
+            const { width, height, json, id } = floor;
             return updateEventFloorData(eventOwner, {
-                id: floor.id,
-                json: compressFloorDoc(floor.json),
+                id,
+                json: compressFloorDoc(json),
+                width,
+                height,
             });
         },
     });

@@ -16,6 +16,7 @@
                     />
                     <FloorEditorControls
                         @floor-save="saveFloorState"
+                        @floor-update="onFloorChange"
                         v-if="floorInstance && !isTablet"
                         :floor-instance="floorInstance"
                         class="q-mb-sm"
@@ -62,6 +63,29 @@ onMounted(function () {
 onBeforeUnmount(function () {
     floorInstance.value?.destroy().catch(AppLogger.error.bind(AppLogger));
 });
+
+function onFloorChange({
+    name,
+    width,
+    height,
+}: {
+    width?: number;
+    height?: number;
+    name?: string;
+}): void {
+    if (name) {
+        floorInstance.value?.setFloorName(String(name));
+        return;
+    }
+
+    if (width && !Number.isNaN(width)) {
+        floorInstance.value?.updateDimensions(width, floorInstance.value.height);
+    }
+
+    if (height && !Number.isNaN(height)) {
+        floorInstance.value?.updateDimensions(floorInstance.value.width, Number(height));
+    }
+}
 
 function saveFloorState(): void {
     if (!floorInstance.value) {
