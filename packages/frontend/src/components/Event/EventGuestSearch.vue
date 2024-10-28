@@ -8,7 +8,7 @@ import { useI18n } from "vue-i18n";
 import { QSelect } from "quasar";
 import { matchesProperty } from "es-toolkit/compat";
 
-export interface FTAutocompleteProps {
+export interface EventGuestSearchProps {
     floors: FloorDoc[];
     allReservedTables: PlannedReservation[];
     showFloorNameInOption: boolean;
@@ -21,7 +21,7 @@ interface Option {
     arrived: boolean;
 }
 
-const props = defineProps<FTAutocompleteProps>();
+const props = defineProps<EventGuestSearchProps>();
 const emit = defineEmits(["found", "clear"]);
 const { t } = useI18n();
 
@@ -127,14 +127,14 @@ function setModel(val: string): void {
 </script>
 
 <template>
-    <div class="FTAutocomplete">
+    <div class="EventGuestSearch">
         <q-select
             ref="selectEl"
             fill-input
             hide-selected
             use-input
             v-model="searchTerm"
-            :label="t(`FTAutocomplete.label`)"
+            :label="t(`EventGuestSearch.label`)"
             clearable
             clear-icon="close"
             dense

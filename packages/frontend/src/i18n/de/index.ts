@@ -95,7 +95,7 @@ export default {
         showFloorPlansExpanded: "Grundrisse anzeigen",
         deleteQueuedReservationConfirmMsg: "Reservierung aus der Warteschlange löschen?",
     },
-    FTAutocomplete: {
+    EventGuestSearch: {
         label: "Tische nach Gastnamen suchen...",
     },
     EventInfo: {

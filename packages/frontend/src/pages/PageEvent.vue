@@ -35,7 +35,7 @@ import { where } from "firebase/firestore";
 import { useUsers } from "src/composables/useUsers";
 
 import EventGuestList from "src/components/Event/EventGuestList.vue";
-import FTAutocomplete from "src/components/Event/FTAutocomplete.vue";
+import EventGuestSearch from "src/components/Event/EventGuestSearch.vue";
 import EventInfo from "src/components/Event/EventInfo.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import EventQueuedReservations from "src/components/Event/EventQueuedReservations.vue";
@@ -213,7 +213,7 @@ onUnmounted(function () {
 <template>
     <div v-if="event" class="PageEvent flex column justify-between" ref="pageRef">
         <div>
-            <FTAutocomplete
+            <EventGuestSearch
                 :floors="eventFloors"
                 :show-floor-name-in-option="hasMultipleFloorPlans"
                 :all-reserved-tables="plannedReservations"

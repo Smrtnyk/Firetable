@@ -1,11 +1,11 @@
-import type { FTAutocompleteProps } from "./FTAutocomplete.vue";
+import type { EventGuestSearchProps } from "./EventGuestSearch.vue";
 import type { RenderResult } from "vitest-browser-vue";
-import FTAutocomplete from "./FTAutocomplete.vue";
+import EventGuestSearch from "./EventGuestSearch.vue";
 import { renderComponent } from "../../../test-helpers/render-component";
 import { describe, it, expect } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 
-describe("FTAutocomplete.vue", () => {
+describe("EventGuestSearch.vue", () => {
     const floors = [
         { id: "floor1", name: "First Floor" },
         { id: "floor2", name: "Second Floor" },
@@ -32,8 +32,8 @@ describe("FTAutocomplete.vue", () => {
 
     const showFloorNameInOption = true;
 
-    function createComponent(): RenderResult<FTAutocompleteProps> {
-        return renderComponent(FTAutocomplete, {
+    function createComponent(): RenderResult<EventGuestSearchProps> {
+        return renderComponent(EventGuestSearch, {
             floors,
             allReservedTables: reservations,
             showFloorNameInOption,

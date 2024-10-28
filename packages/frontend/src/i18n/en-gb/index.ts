@@ -93,7 +93,7 @@ export default {
         showFloorPlansExpanded: "Floor plans",
         deleteQueuedReservationConfirmMsg: "Are you sure you want to delete this reservation?",
     },
-    FTAutocomplete: {
+    EventGuestSearch: {
         label: "Search tables by guest name...",
     },
     EventInfo: {
