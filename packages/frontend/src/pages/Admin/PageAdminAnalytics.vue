@@ -12,7 +12,10 @@ import FTTabPanels from "src/components/FTTabPanels.vue";
 import { computed, ref } from "vue";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { format, subMonths } from "date-fns";
-import { useReservationsAnalytics } from "src/composables/analytics/useReservationsAnalytics.js";
+import {
+    DAYS_OF_WEEK,
+    useReservationsAnalytics,
+} from "src/composables/analytics/useReservationsAnalytics.js";
 
 interface Props {
     organisationId: string;
@@ -25,6 +28,8 @@ const properties = computed(function () {
 });
 const selectedTab = ref("");
 const {
+    guestDistributionLabels,
+    peakHoursLabels,
     reservationBuckets,
     selectedMonth,
     selectedDay,
@@ -57,22 +62,26 @@ const chartInfos = computed(function () {
         {
             data: peakReservationHours.value,
             title: "Peak Reservation Hours",
+            labels: peakHoursLabels.value,
             type: "bar",
         },
         {
             data: consumptionAnalysisCombined.value,
             title: "Consumption Data",
             type: "bar",
+            labels: ["Consumption"] as string[],
         },
         {
             data: guestDistributionAnalysis.value,
             title: "Guest Distribution",
             type: "bar",
+            labels: guestDistributionLabels.value,
         },
         {
             data: reservationsByDayOfWeek.value,
             title: "Reservations by Day of Week",
             type: "bar",
+            labels: DAYS_OF_WEEK,
         },
     ] as const;
 });
@@ -178,6 +187,7 @@ const chartInfos = computed(function () {
                                 :chart-data="chartInfo.data"
                                 :chart-title="chartInfo.title"
                                 :chart-type="chartInfo.type"
+                                :labels="chartInfo.labels"
                             />
                         </FTCard>
                     </div>

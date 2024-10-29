@@ -13,7 +13,15 @@ import { getColors } from "src/helpers/colors.js";
 import { matchesProperty } from "es-toolkit/compat";
 import { bucketizeReservations } from "src/composables/analytics/bucketize-reservations.js";
 
-const DAYS_OF_WEEK = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+export const DAYS_OF_WEEK = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+];
 const DEFAULT_SELECTED_DAY = "ALL";
 const SELECTED_MONTH_FORMAT = "yyyy-MM";
 
@@ -46,16 +54,20 @@ export function useReservationsAnalytics(
     const plannedVsWalkInReservations = computed<PieChartData>(function () {
         const planned = currentPropertyReservations.value.plannedReservations.length;
         const walkIn = currentPropertyReservations.value.walkInReservations.length;
+        const { backgroundColors } = getColors(2);
 
-        return {
-            labels: ["Planned", "Walk-In"],
-            datasets: [
-                {
-                    data: [planned, walkIn],
-                    backgroundColor: getColors(2).backgroundColors,
-                },
-            ],
-        };
+        return [
+            {
+                name: "Planned",
+                value: planned,
+                itemStyle: { color: backgroundColors[0] },
+            },
+            {
+                name: "Walk-In",
+                value: walkIn,
+                itemStyle: { color: backgroundColors[1] },
+            },
+        ];
     });
 
     const plannedReservationsByDay = computed(function () {
@@ -95,15 +107,20 @@ export function useReservationsAnalytics(
             { arrived: 0, pending: 0 },
         );
 
-        return {
-            labels: ["Arrived", "No-Show"],
-            datasets: [
-                {
-                    data: [arrived, pending],
-                    backgroundColor: getColors(2).backgroundColors,
-                },
-            ],
-        };
+        const { backgroundColors } = getColors(2);
+
+        return [
+            {
+                name: "Arrived",
+                value: arrived,
+                itemStyle: { color: backgroundColors[0] },
+            },
+            {
+                name: "No-Show",
+                value: pending,
+                itemStyle: { color: backgroundColors[1] },
+            },
+        ];
     });
 
     const avgGuestsPerReservation = computed(function () {
@@ -144,28 +161,18 @@ export function useReservationsAnalytics(
             return acc;
         }, {});
 
-        const labels = Object.keys(propertyTotals);
-        const data = labels.map(function (name) {
-            return propertyTotals[name];
-        });
+        const { backgroundColors } = getColors(1);
 
-        const { backgroundColors, borderColors } = getColors(labels.length);
-
-        return {
-            labels,
-            datasets: [
-                {
-                    label: "Reservations by Property",
-                    data,
-                    backgroundColor: backgroundColors,
-                    borderColor: borderColors,
-                    borderWidth: 1,
-                },
-            ],
-        };
+        return [
+            {
+                name: "Reservations by Property",
+                data: Object.values(propertyTotals),
+                itemStyle: { color: backgroundColors[0] },
+            },
+        ];
     });
 
-    const consumptionAnalysisCombined = computed(function () {
+    const consumptionAnalysisCombined = computed<TimeSeriesData>(function () {
         const { totalConsumption, arrivedConsumption, arrivedCount, pendingCount } =
             plannedReservationsByActiveProperty.value.reduce(
                 function (acc, reservation) {
@@ -196,31 +203,43 @@ export function useReservationsAnalytics(
 
         const { backgroundColors } = getColors(3);
 
-        return {
-            labels: ["Average Consumption"],
-            datasets: [
-                {
-                    label: "Arrived",
-                    data: [averageArrived],
-                    backgroundColor: backgroundColors[0],
-                    stack: "Stack 0",
-                },
-                {
-                    label: "Pending",
-                    data: [averagePending],
-                    backgroundColor: backgroundColors[1],
-                    stack: "Stack 0",
-                },
-                {
-                    label: "Total",
-                    data: [averageTotal],
-                    backgroundColor: backgroundColors[2],
-                    stack: "Stack 0",
-                },
-            ],
-        };
+        return [
+            {
+                name: "Total",
+                data: [toTwoDecimals(averageTotal)],
+                itemStyle: { color: backgroundColors[0] },
+                stack: "consumption",
+            },
+            {
+                name: "Arrived",
+                data: [toTwoDecimals(averageArrived)],
+                itemStyle: { color: backgroundColors[1] },
+                stack: "consumption",
+            },
+            {
+                name: "Pending",
+                data: [toTwoDecimals(averagePending)],
+                itemStyle: { color: backgroundColors[2] },
+                stack: "consumption",
+            },
+        ];
     });
 
+    const peakHoursLabels = computed(() => {
+        const hourlyTotals = Object.keys(
+            plannedReservationsByActiveProperty.value.reduce<Record<string, number>>(
+                (acc, reservation) => {
+                    const hour = reservation.time.split(":")[0];
+                    acc[hour] = (acc[hour] ?? 0) + 1;
+                    return acc;
+                },
+                {},
+            ),
+        ).sort((a, b) => Number.parseInt(a) - Number.parseInt(b));
+
+        // Format hours to be more readable (e.g., "08:00", "14:00")
+        return hourlyTotals.map((hour) => `${hour.padStart(2, "0")}:00`);
+    });
     const peakReservationHours = computed<TimeSeriesData>(function () {
         const hourlyTotals = plannedReservationsByActiveProperty.value.reduce<
             Record<string, number>
@@ -230,29 +249,36 @@ export function useReservationsAnalytics(
             return acc;
         }, {});
 
-        const sortedHours = Object.keys(hourlyTotals).sort(function (a, b) {
-            return Number.parseInt(a) - Number.parseInt(b);
-        });
-        const data = sortedHours.map(function (hour) {
-            return hourlyTotals[hour];
-        });
-        const hoursCount = sortedHours.length;
-        const { backgroundColors, borderColors } = getColors(hoursCount);
+        const sortedHours = Object.keys(hourlyTotals).sort(
+            (a, b) => Number.parseInt(a) - Number.parseInt(b),
+        );
+        const { backgroundColors } = getColors(1);
 
-        return {
-            labels: sortedHours,
-            datasets: [
-                {
-                    label: "Reservations per Hour",
-                    data,
-                    backgroundColor: backgroundColors,
-                    borderColor: borderColors,
-                    borderWidth: 1,
-                },
-            ],
-        };
+        return [
+            {
+                name: "Reservations per Hour",
+                data: sortedHours.map((hour) => hourlyTotals[hour]),
+                itemStyle: { color: backgroundColors[0] },
+            },
+        ];
     });
 
+    const guestDistributionLabels = computed(() => {
+        return Object.keys(
+            plannedReservationsByActiveProperty.value.reduce<Record<string, number>>(
+                (acc, { numberOfGuests }) => {
+                    const key = numberOfGuests.toString();
+                    acc[key] = (acc[key] ?? 0) + 1;
+                    return acc;
+                },
+                {},
+            ),
+        ).sort();
+    });
+
+    const propertyLabels = computed(() => {
+        return reservationBuckets.value.map((bucket) => bucket.propertyName);
+    });
     const guestDistributionAnalysis = computed<TimeSeriesData>(function () {
         const distribution = plannedReservationsByActiveProperty.value.reduce<
             Record<string, number>
@@ -263,24 +289,15 @@ export function useReservationsAnalytics(
         }, {});
 
         const labels = Object.keys(distribution).sort();
-        const data = labels.map(function (key) {
-            return distribution[key];
-        });
+        const { backgroundColors } = getColors(1);
 
-        const { backgroundColors, borderColors } = getColors(labels.length);
-
-        return {
-            labels,
-            datasets: [
-                {
-                    label: "Guest Distribution",
-                    data,
-                    backgroundColor: backgroundColors,
-                    borderColor: borderColors,
-                    borderWidth: 1,
-                },
-            ],
-        };
+        return [
+            {
+                name: "Guest Distribution",
+                data: labels.map((key) => distribution[key]),
+                itemStyle: { color: backgroundColors[0] },
+            },
+        ];
     });
 
     const reservationsByDayOfWeek = computed<TimeSeriesData>(function () {
@@ -295,23 +312,15 @@ export function useReservationsAnalytics(
             return acc;
         }, {});
 
-        const { backgroundColors, borderColors } = getColors(DAYS_OF_WEEK.length);
+        const { backgroundColors } = getColors(1);
 
-        const data = DAYS_OF_WEEK.map(function (day) {
-            return dayOfWeekTotals[day] ?? 0;
-        });
-        return {
-            labels: DAYS_OF_WEEK,
-            datasets: [
-                {
-                    label: "Reservations by Day of Week",
-                    data,
-                    backgroundColor: backgroundColors,
-                    borderColor: borderColors,
-                    borderWidth: 1,
-                },
-            ],
-        };
+        return [
+            {
+                name: "Reservations by Day",
+                data: DAYS_OF_WEEK.map((day) => dayOfWeekTotals[day] ?? 0),
+                itemStyle: { color: backgroundColors[0] },
+            },
+        ];
     });
 
     const stopWatch = watch(
@@ -373,6 +382,9 @@ export function useReservationsAnalytics(
     }
 
     return {
+        propertyLabels,
+        peakHoursLabels,
+        guestDistributionLabels,
         reservationBuckets,
         plannedReservationsByActiveProperty,
         plannedReservationsByDay,
@@ -387,4 +399,8 @@ export function useReservationsAnalytics(
         reservationsByDayOfWeek,
         plannedVsWalkInReservations,
     };
+}
+
+function toTwoDecimals(num: number): number {
+    return Number.parseFloat(num.toFixed(2));
 }

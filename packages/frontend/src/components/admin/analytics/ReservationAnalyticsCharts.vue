@@ -7,6 +7,7 @@ interface Props {
     chartData: PieChartData | TimeSeriesData;
     chartTitle: string;
     chartType: "bar" | "pie";
+    labels?: string[];
 }
 
 const props = defineProps<Props>();
@@ -14,9 +15,17 @@ const props = defineProps<Props>();
 
 <template>
     <div v-if="props.chartType === 'bar'">
-        <BarChart :chart-data="props.chartData as TimeSeriesData" :chart-title="props.chartTitle" />
+        <BarChart
+            :labels="props.labels"
+            :chart-data="props.chartData as TimeSeriesData"
+            :chart-title="props.chartTitle"
+        />
     </div>
     <div v-else-if="props.chartType === 'pie'">
-        <PieChart :chart-data="props.chartData as PieChartData" :chart-title="props.chartTitle" />
+        <PieChart
+            :labels="props.labels"
+            :chart-data="props.chartData as PieChartData"
+            :chart-title="props.chartTitle"
+        />
     </div>
 </template>
