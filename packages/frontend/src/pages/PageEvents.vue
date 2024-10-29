@@ -33,6 +33,10 @@ const settings = computed(function () {
     return propertiesStore.getOrganisationSettingsById(props.organisationId);
 });
 
+const propertySettings = computed(function () {
+    return propertiesStore.getPropertySettingsById(props.propertyId);
+});
+
 const cardsAspectRatio = computed(function () {
     return parseAspectRatio(settings.value.event.eventCardAspectRatio);
 });
@@ -72,6 +76,7 @@ onMounted(async function () {
             v-if="events.length > 0 && !isLoading"
             :events="events"
             :aspect-ratio="cardsAspectRatio"
+            :property-time-zone="propertySettings.timezone"
         />
         <FTCenteredText v-if="!isLoading && events.length === 0">
             There are no upcoming events

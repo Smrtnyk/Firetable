@@ -3,6 +3,7 @@ import AdminPropertyEventsList from "./AdminPropertyEventsList.vue";
 import { renderComponent, t } from "../../../../test-helpers/render-component";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { userEvent, page } from "@vitest/browser/context";
+import { getDefaultTimezone } from "src/helpers/date-utils";
 
 vi.mock("src/components/admin/event/PageAdminEventsListItem.vue", () => ({
     default: {
@@ -61,6 +62,7 @@ describe("PageAdminEventsList", () => {
             propertyId,
             events: [],
             done: false,
+            timezone: getDefaultTimezone(),
         });
 
         expect.element(page.getByText(t("PageAdminEvents.noEventsMessage"))).toBeVisible();
@@ -71,6 +73,7 @@ describe("PageAdminEventsList", () => {
             propertyId,
             events,
             done: false,
+            timezone: getDefaultTimezone(),
         });
 
         // Check that upcoming events are displayed
@@ -104,6 +107,7 @@ describe("PageAdminEventsList", () => {
             propertyId,
             events,
             done: false,
+            timezone: getDefaultTimezone(),
         });
 
         // Check for year headings
@@ -127,6 +131,7 @@ describe("PageAdminEventsList", () => {
             propertyId,
             events,
             done: false,
+            timezone: getDefaultTimezone(),
         });
 
         await userEvent.click(page.getByRole("button", { name: "Load More" }));
@@ -146,6 +151,7 @@ describe("PageAdminEventsList", () => {
             propertyId,
             events: [mockEvent],
             done: false,
+            timezone: getDefaultTimezone(),
         });
 
         await userEvent.click(screen.getByText("Edit"));

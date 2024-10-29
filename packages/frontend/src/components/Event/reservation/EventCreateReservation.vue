@@ -22,6 +22,7 @@ export interface EventCreateReservationProps {
      *  If true, only the Planned Reservation Form is shown
      */
     onlyPlanned?: boolean;
+    timezone: string;
 }
 
 const props = defineProps<EventCreateReservationProps>();
@@ -134,6 +135,7 @@ async function onOKClick(): Promise<void> {
         <WalkInReservationForm
             ref="walkInRef"
             v-if="showWalkInReservationForm"
+            :timezone="props.timezone"
             :reservation-data="typedReservationDataForWalkIn"
             :mode="props.mode"
             :event-start-timestamp="props.eventStartTimestamp"

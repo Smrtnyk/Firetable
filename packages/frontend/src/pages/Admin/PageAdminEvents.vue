@@ -51,6 +51,11 @@ const settings = computed(function () {
     return propertiesStore.getOrganisationSettingsById(organisationId);
 });
 
+const propertySettings = computed(function () {
+    return propertiesStore.getPropertySettingsById(propertyId);
+});
+
+console.log(propertySettings);
 onBeforeMount(function () {
     if (!organisationId || !propertyId) {
         router.replace("/");
@@ -144,6 +149,7 @@ function showEventForm(event?: EventDoc): void {
                 propertyName: propertiesStore.getPropertyNameById(propertyId),
                 event,
                 eventStartHours: settings.value.event.eventStartTime24HFormat,
+                propertyTimezone: propertySettings.value.timezone,
             },
             listeners: {
                 create(eventData: CreateEventPayload) {
@@ -178,8 +184,8 @@ onMounted(fetchMoreEvents);
 
         <div v-if="!isLoadingEvents">
             <AdminPropertyEventsList
-                :property-id="propertyId"
                 :events="events"
+                :timezone="propertySettings.timezone"
                 @delete="deleteEvent"
                 @edit="showEventForm"
                 @load="fetchMoreEvents"

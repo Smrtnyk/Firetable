@@ -20,6 +20,7 @@ describe("EventCreateForm", () => {
 
         beforeEach(() => {
             props = {
+                propertyTimezone: "Europe/Vienna",
                 propertyId: "property1",
                 organisationId: "org1",
                 propertyName: "Test Property",
@@ -144,6 +145,7 @@ describe("EventCreateForm", () => {
                 propertyId: "property1",
                 organisationId: "org1",
                 propertyName: "Test Property",
+                propertyTimezone: "Europe/London",
                 floors: [
                     { id: "floor1", name: "Floor 1" } as FloorDoc,
                     { id: "floor2", name: "Floor 2" } as FloorDoc,

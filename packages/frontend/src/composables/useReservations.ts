@@ -111,6 +111,9 @@ export function useReservations(
     const settings = computed(function () {
         return propertiesStore.getOrganisationSettingsById(eventOwner.organisationId);
     });
+    const propertySettings = computed(function () {
+        return propertiesStore.getPropertySettingsById(eventOwner.propertyId);
+    });
 
     const intervalID = setInterval(checkReservationsForTimeAndMarkTableIfNeeded, ONE_MINUTE);
 
@@ -347,6 +350,7 @@ export function useReservations(
                 title: `${t("EventCreateReservation.title")} ${label}`,
                 maximized: false,
                 componentPropsObject: {
+                    timezone: propertySettings.value.timezone,
                     currentUser: nonNullableUser.value,
                     users: filterUsersPerProperty(users.value, eventOwner.propertyId),
                     mode,
@@ -420,6 +424,7 @@ export function useReservations(
                 maximized: false,
                 componentPropsObject: {
                     reservation,
+                    timezone: propertySettings.value.timezone,
                     guestSummaryPromise: getGuestSummary(reservation),
                 },
                 listeners: {

@@ -2,6 +2,7 @@ import type { FirestoreTimestamp } from "@firetable/types";
 import { isNumber } from "es-toolkit/compat";
 
 export const timezones = Intl.supportedValuesOf("timeZone").sort();
+export const UTC = "UTC";
 
 /**
  * Pass null as timeZone to show time in current time zone
@@ -10,11 +11,7 @@ export const timezones = Intl.supportedValuesOf("timeZone").sort();
  * @param locale
  * @param timeZone Time zone to use
  */
-export function formatEventDate(
-    timestamp: number,
-    locale: string,
-    timeZone: string | null = "UTC",
-): string {
+export function formatEventDate(timestamp: number, locale: string, timeZone: string): string {
     const date = new Date(timestamp);
     const formatter = new Intl.DateTimeFormat(locale, {
         year: "numeric",
@@ -36,11 +33,7 @@ export function formatEventDate(
  * @param locale
  * @param timeZone Time zone to use
  */
-export function dateFromTimestamp(
-    timestamp: number,
-    locale: string,
-    timeZone: string | null = "UTC",
-): string {
+export function dateFromTimestamp(timestamp: number, locale: string, timeZone: string): string {
     const date = new Date(timestamp);
     const formatter = new Intl.DateTimeFormat(locale, {
         year: "numeric",
@@ -58,11 +51,7 @@ export function dateFromTimestamp(
  * @param locale
  * @param timeZone Time zone to use
  */
-export function hourFromTimestamp(
-    timestamp: number,
-    locale: string,
-    timeZone: string | null = "UTC",
-): string {
+export function hourFromTimestamp(timestamp: number, locale: string, timeZone: string): string {
     const date = new Date(timestamp);
     const formatter = new Intl.DateTimeFormat(locale, {
         hour: "2-digit",
@@ -76,11 +65,12 @@ export function hourFromTimestamp(
 export function getFormatedDateFromTimestamp(
     timestamp: FirestoreTimestamp | number,
     locale: string,
+    timezone: string,
 ): string {
     if (isNumber(timestamp)) {
-        return formatEventDate(timestamp, locale, null);
+        return formatEventDate(timestamp, locale, timezone);
     }
-    return formatEventDate(timestamp.toMillis(), locale, null);
+    return formatEventDate(timestamp.toMillis(), locale, timezone);
 }
 
 export function getDefaultTimezone(): string {

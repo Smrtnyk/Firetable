@@ -3,7 +3,7 @@ import type { EventCreateReservationProps } from "./EventCreateReservation.vue";
 import type { PlannedReservationFormProps } from "./PlannedReservationForm.vue";
 import EventCreateReservation from "./EventCreateReservation.vue";
 import { renderComponent, t, locale } from "../../../../test-helpers/render-component";
-import { hourFromTimestamp } from "src/helpers/date-utils";
+import { getDefaultTimezone, hourFromTimestamp } from "src/helpers/date-utils";
 import { ONE_HOUR } from "src/constants";
 import { ReservationStatus, ReservationType } from "@firetable/types";
 import { describe, expect, it, beforeEach } from "vitest";
@@ -18,6 +18,7 @@ describe("EventCreateReservation", () => {
     describe("WalkIn", () => {
         beforeEach(() => {
             props = {
+                timezone: getDefaultTimezone(),
                 mode: "create",
                 eventStartTimestamp,
                 eventDurationInHours: 8,
@@ -35,7 +36,11 @@ describe("EventCreateReservation", () => {
             const eventStart = props.eventStartTimestamp;
             const now = Date.now();
             const initialTime = Math.max(now, eventStart);
-            const formattedTime = hourFromTimestamp(initialTime, locale.value, null);
+            const formattedTime = hourFromTimestamp(
+                initialTime,
+                locale.value,
+                getDefaultTimezone(),
+            );
             return {
                 type: ReservationType.WALK_IN,
                 guestName: "",
@@ -225,6 +230,7 @@ describe("EventCreateReservation", () => {
 
         beforeEach(() => {
             plannedProps = {
+                timezone: getDefaultTimezone(),
                 currentUser: {
                     id: "user1",
                     name: "Alice",

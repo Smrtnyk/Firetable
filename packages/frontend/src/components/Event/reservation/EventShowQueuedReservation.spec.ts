@@ -6,6 +6,7 @@ import { ReservationStatus, ReservationType, Role } from "@firetable/types";
 import { useAuthStore } from "src/stores/auth-store";
 import { describe, expect, it } from "vitest";
 import { userEvent } from "@vitest/browser/context";
+import { getDefaultTimezone } from "src/helpers/date-utils";
 
 describe("EventShowQueuedReservation", () => {
     const mockReservation: QueuedReservationDoc = {
@@ -43,7 +44,7 @@ describe("EventShowQueuedReservation", () => {
     ): RenderResult<any> {
         return renderComponent(
             EventShowQueuedReservation,
-            { reservation: mockReservation },
+            { reservation: mockReservation, timezone: getDefaultTimezone() },
             {
                 piniaStoreOptions: {
                     initialState: {
@@ -115,7 +116,7 @@ describe("EventShowQueuedReservation", () => {
         //  User initially cannot reserve and is not the owner
         const screen = renderComponent(
             EventShowQueuedReservation,
-            { reservation: mockReservation },
+            { reservation: mockReservation, timezone: getDefaultTimezone() },
             {
                 piniaStoreOptions: {
                     initialState: {
@@ -152,7 +153,7 @@ describe("EventShowQueuedReservation", () => {
         //  User initially cannot reserve and is not the owner
         const screen = renderComponent(
             EventShowQueuedReservation,
-            { reservation: mockReservation },
+            { reservation: mockReservation, timezone: getDefaultTimezone() },
             {
                 piniaStoreOptions: {
                     initialState: {

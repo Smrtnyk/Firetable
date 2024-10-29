@@ -35,7 +35,8 @@ interface VisitsByProperty {
 const router = useRouter();
 const { createDialog } = useDialog();
 const guestsStore = useGuestsStore();
-const { properties } = storeToRefs(usePropertiesStore());
+const propertiesStore = usePropertiesStore();
+const { properties } = storeToRefs(propertiesStore);
 const { t } = useI18n();
 const { organisationId, guestId } = defineProps<PageAdminGuestProps>();
 const { data: guest } = useFirestoreDocument<GuestDoc>(getGuestPath(organisationId, guestId));
@@ -180,14 +181,27 @@ async function onDeleteGuest(): Promise<void> {
                             :key="propertyId"
                             :name="propertyId"
                         >
-                            <AdminGuestVisitsTimeline :visits="item.visits" />
+                            <AdminGuestVisitsTimeline
+                                :timezone="
+                                    propertiesStore.getPropertySettingsById(String(propertyId))
+                                        .timezone
+                                "
+                                :visits="item.visits"
+                            />
                         </q-tab-panel>
                     </FTTabPanels>
                 </template>
 
                 <!-- Single Property: Directly show the visits without tabs -->
                 <template v-else>
-                    <AdminGuestVisitsTimeline :visits="singlePropertyVisits" />
+                    <AdminGuestVisitsTimeline
+                        :timezone="
+                            propertiesStore.getPropertySettingsById(
+                                Object.keys(guest.visitedProperties)[0],
+                            ).timezone
+                        "
+                        :visits="singlePropertyVisits"
+                    />
                 </template>
             </div>
 

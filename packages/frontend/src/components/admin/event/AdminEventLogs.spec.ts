@@ -4,7 +4,7 @@ import type { AdminEventLogsProps } from "./AdminEventLogs.vue";
 import AdminEventLogs from "./AdminEventLogs.vue";
 import { renderComponent, locale } from "../../../../test-helpers/render-component";
 import { ADMIN, Role } from "@firetable/types";
-import { formatEventDate } from "src/helpers/date-utils";
+import { formatEventDate, getDefaultTimezone } from "src/helpers/date-utils";
 import { beforeEach, describe, expect, it } from "vitest";
 import { page } from "@vitest/browser/context";
 
@@ -77,6 +77,7 @@ describe("AdminEventLogs", () => {
             screen = renderComponent(AdminEventLogs, {
                 logsDoc,
                 isAdmin: true,
+                timezone: getDefaultTimezone(),
             });
         });
 
@@ -108,7 +109,11 @@ describe("AdminEventLogs", () => {
 
         it("formats subtitles correctly", async () => {
             for (const log of sampleLogs) {
-                const datePart = formatEventDate(log.timestamp as number, locale.value, null);
+                const datePart = formatEventDate(
+                    log.timestamp as number,
+                    locale.value,
+                    getDefaultTimezone(),
+                );
                 const userPart = `${log.creator.name} (${log.creator.email})`;
                 const expectedSubtitle = `${datePart}, by ${userPart}`;
 
@@ -123,6 +128,7 @@ describe("AdminEventLogs", () => {
             screen = renderComponent(AdminEventLogs, {
                 logsDoc,
                 isAdmin: false,
+                timezone: getDefaultTimezone(),
             });
         });
 
@@ -170,6 +176,7 @@ describe("AdminEventLogs", () => {
         screen = renderComponent(
             AdminEventLogs,
             {
+                timezone: getDefaultTimezone(),
                 logsDoc: { logs },
                 isAdmin: true,
             },

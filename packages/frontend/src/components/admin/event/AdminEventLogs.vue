@@ -11,6 +11,7 @@ import FTCenteredText from "src/components/FTCenteredText.vue";
 export interface AdminEventLogsProps {
     logsDoc: EventLogsDoc | null | undefined;
     isAdmin: boolean;
+    timezone: string;
 }
 const props = defineProps<AdminEventLogsProps>();
 const { locale } = useI18n();
@@ -53,7 +54,7 @@ function getIconNameForLogEntry(logMessage: string): string {
 }
 
 function formatSubtitleForEventLog({ creator, timestamp }: EventLog): string {
-    const datePart = getFormatedDateFromTimestamp(timestamp, locale.value);
+    const datePart = getFormatedDateFromTimestamp(timestamp, locale.value, props.timezone);
     const userPart = `${creator.name} (${creator.email})`;
     return `${datePart}, by ${userPart}`;
 }

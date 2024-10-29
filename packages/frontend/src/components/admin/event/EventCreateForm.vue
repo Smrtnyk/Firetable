@@ -36,12 +36,20 @@ export interface EventCreateFormProps {
     floors: FloorDoc[];
     event?: EventDoc | undefined;
     eventStartHours: string;
+    propertyTimezone: string;
 }
 
-const now = new Date();
-const newDate = new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 22, 0),
-);
+const props = defineProps<EventCreateFormProps>();
+const emit = defineEmits<{
+    (event: "create", payload: CreateEventPayload): void;
+    (event: "update", payload: EditEventPayload): void;
+}>();
+
+// Default date creation should use property timezone
+const newDate = new Date();
+// Set to eventStartHours in property timezone
+const [hours, minutes] = props.eventStartHours.split(":");
+newDate.setHours(Number.parseInt(hours), Number.parseInt(minutes), 0, 0);
 
 const eventObj: CreateEventForm = {
     name: "",
@@ -50,11 +58,6 @@ const eventObj: CreateEventForm = {
     entryPrice: 0,
     img: "",
 };
-const props = defineProps<EventCreateFormProps>();
-const emit = defineEmits<{
-    (event: "create", payload: CreateEventPayload): void;
-    (event: "update", payload: EditEventPayload): void;
-}>();
 
 const isEditMode = computed(function () {
     return Boolean(props.event);
@@ -66,16 +69,21 @@ const state = ref<State>({
     chosenFloors: [],
     showDateModal: false,
     showTimeModal: false,
-    selectedDate: dateFromTimestamp(Date.now(), locale.value),
+    selectedDate: dateFromTimestamp(Date.now(), locale.value, props.propertyTimezone),
     selectedTime: props.eventStartHours,
 });
 
 function validDates(calendarDate: string): boolean {
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const formatter = new Intl.DateTimeFormat("en-US", {
+        timeZone: props.propertyTimezone,
+    });
+    const propertyToday = new Date(formatter.format(today));
+    propertyToday.setHours(0, 0, 0, 0);
+
     const dateToCheck = new Date(calendarDate);
     dateToCheck.setHours(0, 0, 0, 0);
-    return dateToCheck >= today;
+    return dateToCheck >= propertyToday;
 }
 
 watchEffect(function () {
@@ -89,11 +97,23 @@ watchEffect(function () {
             img: props.event.img ?? "",
             date: props.event.date,
         };
-        state.value.selectedDate = dateFromTimestamp(editDate.getTime(), locale.value);
-        state.value.selectedTime = hourFromTimestamp(editDate.getTime(), locale.value);
+        state.value.selectedDate = dateFromTimestamp(
+            editDate.getTime(),
+            locale.value,
+            props.propertyTimezone,
+        );
+        state.value.selectedTime = hourFromTimestamp(
+            editDate.getTime(),
+            locale.value,
+            props.propertyTimezone,
+        );
     } else {
         state.value.form = { ...eventObj };
-        state.value.selectedDate = dateFromTimestamp(Date.now(), locale.value);
+        state.value.selectedDate = dateFromTimestamp(
+            Date.now(),
+            locale.value,
+            props.propertyTimezone,
+        );
         state.value.selectedTime = props.eventStartHours;
     }
 });
@@ -103,8 +123,36 @@ watch([() => state.value.selectedDate, () => state.value.selectedTime], function
         return;
     }
     const [dayVal, monthVal, yearVal] = state.value.selectedDate.split(".");
-    const combinedDateTime = `${yearVal}-${monthVal}-${dayVal}T${state.value.selectedTime}:00Z`;
-    state.value.form.date = new Date(combinedDateTime).getTime();
+    // Create date in property timezone
+    const dateStr = `${yearVal}-${monthVal}-${dayVal}T${state.value.selectedTime}`;
+    const date = new Date(dateStr);
+
+    // Convert the local date to UTC while preserving the intended time
+    const formatter = new Intl.DateTimeFormat("en-US", {
+        timeZone: props.propertyTimezone,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+    });
+
+    const parts = formatter.formatToParts(date);
+    const dateParts = parts.reduce<Record<string, string>>((acc, part) => {
+        acc[part.type] = part.value;
+        return acc;
+    }, {});
+
+    // Create UTC timestamp
+    state.value.form.date = Date.UTC(
+        Number(dateParts.year),
+        Number(dateParts.month) - 1,
+        Number(dateParts.day),
+        Number(dateParts.hour),
+        Number(dateParts.minute),
+    );
 });
 
 function updateDate(newDateVal: any): void {
@@ -116,7 +164,8 @@ function updateTime(newTime: any): void {
 }
 
 const displayedDate = computed(function () {
-    return `${state.value.selectedDate} ${state.value.selectedTime}`;
+    if (!state.value.form.date) return "";
+    return `${dateFromTimestamp(state.value.form.date, locale.value, props.propertyTimezone)} ${hourFromTimestamp(state.value.form.date, locale.value, props.propertyTimezone)}`;
 });
 
 function validateAndEmitCreate(): void {

@@ -11,6 +11,7 @@ import { useAuthStore } from "src/stores/auth-store";
 
 interface Props {
     reservation: QueuedReservationDoc;
+    timezone: string;
 }
 
 const props = defineProps<Props>();
@@ -31,7 +32,7 @@ function isOwnReservation(reservation: QueuedReservation): boolean {
     <ReservationLabelChips :reservation="props.reservation" />
 
     <q-card-section>
-        <ReservationGeneralInfo :reservation="props.reservation" />
+        <ReservationGeneralInfo :timezone="props.timezone" :reservation="props.reservation" />
 
         <q-separator class="q-mb-md" />
 

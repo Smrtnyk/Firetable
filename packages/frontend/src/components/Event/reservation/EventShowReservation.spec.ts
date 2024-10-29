@@ -7,6 +7,7 @@ import { ReservationStatus, ReservationType, Role, UserCapability } from "@firet
 import { beforeEach, describe, expect, it } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 import { nextTick } from "vue";
+import { getDefaultTimezone } from "src/helpers/date-utils";
 
 describe("EventShowReservation", () => {
     let props: EventShowReservationProps;
@@ -55,6 +56,7 @@ describe("EventShowReservation", () => {
         };
         props = {
             reservation,
+            timezone: getDefaultTimezone(),
             guestSummaryPromise: Promise.resolve(void 0),
         };
     });

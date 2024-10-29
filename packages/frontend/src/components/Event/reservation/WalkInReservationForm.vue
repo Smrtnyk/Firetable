@@ -23,6 +23,7 @@ interface Props {
      */
     reservationData: WalkInReservation | undefined;
     eventDurationInHours: number;
+    timezone: string;
 }
 
 const props = defineProps<Props>();
@@ -44,7 +45,7 @@ function generateInitialState(): State {
     // Set the initial time to either the current hour or the event start hour
     const initialTime = Math.max(now, eventStart);
     // Format the time as a string "HH:MM"
-    const formattedTime = hourFromTimestamp(initialTime, locale.value, null);
+    const formattedTime = hourFromTimestamp(initialTime, locale.value, props.timezone);
     return {
         type: ReservationType.WALK_IN as const,
         guestName: "",

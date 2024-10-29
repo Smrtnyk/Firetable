@@ -8,13 +8,14 @@ import { useAuthStore } from "src/stores/auth-store";
 
 const props = defineProps<{
     reservation: QueuedReservation | Reservation;
+    timezone: string;
 }>();
 const { t, locale } = useI18n();
 const authStore = useAuthStore();
 
 const createdAt = computed(() => {
     const createdAtValue = props.reservation.creator.createdAt;
-    return getFormatedDateFromTimestamp(createdAtValue, locale.value);
+    return getFormatedDateFromTimestamp(createdAtValue, locale.value, props.timezone);
 });
 
 function reservedByText(reservedBy: PlannedReservation["reservedBy"]): string {

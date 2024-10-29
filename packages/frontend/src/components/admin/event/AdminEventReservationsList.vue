@@ -12,6 +12,7 @@ import ReservationLabelChips from "src/components/Event/reservation/ReservationL
 interface Props {
     reservations: ReservationDoc[];
     emptyMessage: string;
+    timezone: string;
 }
 
 const emit = defineEmits<(e: "delete", value: ReservationDoc) => void>();
@@ -28,6 +29,7 @@ function showReservation(reservation: ReservationDoc): void {
             component: ReservationGeneralInfo,
             componentPropsObject: {
                 reservation,
+                timezone: props.timezone,
             },
         },
     });
@@ -59,7 +61,11 @@ function emitDelete(reservation: ReservationDoc, reset: VoidFunction): void {
                         <q-item-label v-if="reservation.clearedAt" caption
                             >Cleared at:
                             {{
-                                getFormatedDateFromTimestamp(reservation.clearedAt, locale)
+                                getFormatedDateFromTimestamp(
+                                    reservation.clearedAt,
+                                    locale,
+                                    props.timezone,
+                                )
                             }}</q-item-label
                         >
                         <q-item-label caption>

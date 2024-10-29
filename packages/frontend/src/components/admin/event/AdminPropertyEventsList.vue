@@ -8,8 +8,8 @@ import { useI18n } from "vue-i18n";
 import { computed } from "vue";
 
 interface Props {
-    propertyId: string;
     events: EventDoc[];
+    timezone: string;
     done: boolean;
 }
 
@@ -18,16 +18,16 @@ const emit = defineEmits<{
     (e: "load"): void;
 }>();
 const { locale, t } = useI18n();
-const props = defineProps<Props>();
+const { events, timezone, done } = defineProps<Props>();
 const eventsLength = computed(function () {
-    return props.events.length;
+    return events.length;
 });
 const bucketizedEvents = computed(() => {
     const upcomingEvents = new Map<string, Map<string, EventDoc[]>>();
     const pastEvents = new Map<string, Map<string, EventDoc[]>>();
     const now = new Date();
 
-    for (const event of props.events) {
+    for (const event of events) {
         const eventDate = new Date(event.date);
         const isPastEvent = eventDate < now;
 
@@ -111,6 +111,7 @@ function emitEdit(event: EventDoc, reset: VoidFunction): void {
                             v-for="event in monthEvents"
                             :key="event.id"
                             :event="event"
+                            :timezone="timezone"
                             @right="({ reset }) => emitDelete(event, reset)"
                             @left="({ reset }) => emitEdit(event, reset)"
                         />
@@ -146,6 +147,7 @@ function emitEdit(event: EventDoc, reset: VoidFunction): void {
                             v-for="event in monthEvents"
                             :key="event.id"
                             :event="event"
+                            :timezone="timezone"
                             @right="({ reset }) => emitDelete(event, reset)"
                             @left="({ reset }) => emitEdit(event, reset)"
                         />
@@ -155,7 +157,7 @@ function emitEdit(event: EventDoc, reset: VoidFunction): void {
 
             <!-- Load More Button -->
             <div class="row justify-center q-my-md">
-                <q-btn v-if="!props.done" label="Load More" @click="handleLoad" />
+                <q-btn v-if="!done" label="Load More" @click="handleLoad" />
             </div>
         </template>
     </div>

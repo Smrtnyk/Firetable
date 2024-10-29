@@ -18,10 +18,25 @@ export type GuestDataPayload = {
 };
 
 export interface Visit {
+    /**
+     * Timestamp of the visit, which is event date
+     */
     date: number;
+    /**
+     * Name of the event
+     */
     eventName: string;
+    /**
+     * If the guest arrived at the event
+     */
     arrived: boolean;
+    /**
+     * If the guest cancelled the visit
+     */
     cancelled: boolean;
+    /**
+     * If the guest visit was a VIP
+     */
     isVIPVisit?: boolean;
 }
 

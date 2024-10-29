@@ -4,9 +4,12 @@ import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPC
 import { formatEventDate } from "src/helpers/date-utils";
 import { useI18n } from "vue-i18n";
 
-const { visits } = defineProps<{
+interface Props {
     visits: Visit[];
-}>();
+    timezone: string;
+}
+
+const { visits, timezone } = defineProps<Props>();
 
 const { t, locale } = useI18n();
 
@@ -38,7 +41,7 @@ function getVisitIcon(visit: Visit): string {
 }
 
 function formatSubtitleForGuestVisit(visit: Visit): string {
-    return formatEventDate(visit.date, locale.value);
+    return formatEventDate(visit.date, locale.value, timezone);
 }
 </script>
 

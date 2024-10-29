@@ -8,15 +8,16 @@ interface Props {
     event: EventDoc;
     index: number;
     aspectRatio: number;
+    propertyTimezone: string;
 }
 
-const props = defineProps<Props>();
+const { event, index, aspectRatio, propertyTimezone } = defineProps<Props>();
 const { t, locale } = useI18n();
 
 const backgroundImageUrl = computed(function () {
-    const imageIndex = (props.index % 3) + 1;
+    const imageIndex = (index % 3) + 1;
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- it can be empty string
-    return props.event.img || `/images/default-event-img-${imageIndex}.jpg`;
+    return event.img || `/images/default-event-img-${imageIndex}.jpg`;
 });
 </script>
 <template>
@@ -34,24 +35,24 @@ const backgroundImageUrl = computed(function () {
             :to="{
                 name: 'event',
                 params: {
-                    organisationId: props.event.organisationId,
-                    propertyId: props.event.propertyId,
-                    eventId: props.event.id,
+                    organisationId: event.organisationId,
+                    propertyId: event.propertyId,
+                    eventId: event.id,
                 },
             }"
         >
-            <q-responsive :ratio="props.aspectRatio">
+            <q-responsive :ratio="aspectRatio">
                 <div class="EventCard__content column">
                     <div class="row items-center">
                         <q-icon name="calendar" color="white" class="q-mr-xs" size="xs" />
 
-                        {{ dateFromTimestamp(props.event.date, locale) }}
+                        {{ dateFromTimestamp(event.date, locale, propertyTimezone) }}
 
                         <q-space />
 
                         <q-icon name="clock" color="white" class="q-mr-xs" size="xs" />
 
-                        {{ hourFromTimestamp(props.event.date, locale) }}
+                        {{ hourFromTimestamp(event.date, locale, propertyTimezone) }}
                     </div>
 
                     <q-space />
@@ -59,10 +60,10 @@ const backgroundImageUrl = computed(function () {
                     <div class="row">
                         <q-icon name="euro" color="white" class="q-mr-xs" size="xs" />
 
-                        {{ props.event.entryPrice || t("EventCard.freeLabel") }}
+                        {{ event.entryPrice || t("EventCard.freeLabel") }}
                     </div>
 
-                    <h4 class="text-h4 q-mb-sm q-ml-none q-mt-none">{{ props.event.name }}</h4>
+                    <h4 class="text-h4 q-mb-sm q-ml-none q-mt-none">{{ event.name }}</h4>
                 </div>
             </q-responsive>
         </router-link>

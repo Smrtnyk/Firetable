@@ -5,17 +5,18 @@ import { useI18n } from "vue-i18n";
 
 interface Props {
     event: EventDoc;
+    timezone: string;
 }
-const props = defineProps<Props>();
+const { event, timezone } = defineProps<Props>();
 const emit = defineEmits(["right", "left"]);
 const { locale } = useI18n();
 
 function emitOnRight({ reset }: { reset: VoidFunction }): void {
-    emit("right", { event: props.event, reset });
+    emit("right", { event, reset });
 }
 
 function emitEdit({ reset }: { reset: VoidFunction }): void {
-    emit("left", { event: props.event, reset });
+    emit("left", { event, reset });
 }
 </script>
 
@@ -31,19 +32,19 @@ function emitEdit({ reset }: { reset: VoidFunction }): void {
             :to="{
                 name: 'adminEvent',
                 params: {
-                    eventId: props.event.id,
-                    organisationId: props.event.organisationId,
-                    propertyId: props.event.propertyId,
+                    eventId: event.id,
+                    organisationId: event.organisationId,
+                    propertyId: event.propertyId,
                 },
             }"
         >
             <q-item-section>
-                <q-item-label>{{ props.event.name }}</q-item-label>
+                <q-item-label>{{ event.name }}</q-item-label>
             </q-item-section>
 
             <q-item-section side top>
                 <q-item-label caption>
-                    {{ formatEventDate(props.event.date, locale) }}
+                    {{ formatEventDate(event.date, locale, timezone) }}
                 </q-item-label>
             </q-item-section>
         </q-item>

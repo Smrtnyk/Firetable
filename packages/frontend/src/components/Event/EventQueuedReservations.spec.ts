@@ -12,6 +12,7 @@ import EventShowQueuedReservation from "src/components/Event/reservation/EventSh
 import { useEventsStore } from "src/stores/events-store";
 import { noop } from "es-toolkit";
 import { ADMIN } from "@firetable/types";
+import { UTC } from "src/helpers/date-utils";
 
 const { createDialogSpy } = vi.hoisted(() => {
     return {
@@ -49,7 +50,18 @@ describe("EventQueuedReservations.vue", () => {
         eventsStoreState = {
             showQueuedReservationsDrawer: true,
         };
-        propertiesStoreState = {};
+        propertiesStoreState = {
+            properties: [
+                {
+                    id: "prop1",
+                    name: "Property One",
+                    organisationId: "org1",
+                    settings: {
+                        timezone: UTC,
+                    },
+                },
+            ],
+        };
         props = {
             data: [],
             error: undefined,

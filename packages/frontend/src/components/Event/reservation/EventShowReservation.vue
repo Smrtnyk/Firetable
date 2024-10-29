@@ -15,6 +15,7 @@ import GuestSummaryChips from "src/components/guest/GuestSummaryChips.vue";
 export interface EventShowReservationProps {
     reservation: ReservationDoc;
     guestSummaryPromise: Promise<GuestSummary | undefined>;
+    timezone: string;
 }
 
 const authStore = useAuthStore();
@@ -86,7 +87,7 @@ function onWaitingForResponse(): void {
     <ReservationLabelChips :reservation="props.reservation" />
 
     <q-card-section>
-        <ReservationGeneralInfo :reservation="props.reservation" />
+        <ReservationGeneralInfo :timezone="props.timezone" :reservation="props.reservation" />
 
         <q-item
             clickable

@@ -8,6 +8,7 @@ import { userEvent } from "@vitest/browser/context";
 import FTDialog from "src/components/FTDialog.vue";
 import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
 import { ref } from "vue";
+import { UTC } from "src/helpers/date-utils";
 
 const { createDialogSpy, showConfirmMock, useFirestoreDocumentMock, tryCatchLoadingWrapperSpy } =
     vi.hoisted(() => ({
@@ -84,8 +85,20 @@ describe("PageAdminGuest.vue", () => {
         } as GuestDoc;
 
         propertiesData = [
-            { id: "property1", name: "Property One" } as PropertyDoc,
-            { id: "property2", name: "Property Two" } as PropertyDoc,
+            {
+                id: "property1",
+                name: "Property One",
+                settings: {
+                    timezone: UTC,
+                },
+            } as PropertyDoc,
+            {
+                id: "property2",
+                name: "Property Two",
+                settings: {
+                    timezone: UTC,
+                },
+            } as PropertyDoc,
         ];
 
         useFirestoreDocumentMock.mockReturnValue({
@@ -103,7 +116,6 @@ describe("PageAdminGuest.vue", () => {
                         properties: propertiesData,
                     },
                 },
-                stubActions: true,
             },
         });
     }

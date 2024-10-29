@@ -49,6 +49,9 @@ const propertiesStore = usePropertiesStore();
 const settings = computed(function () {
     return propertiesStore.getOrganisationSettingsById(eventOwner.organisationId);
 });
+const propertiesSettings = computed(function () {
+    return propertiesStore.getPropertySettingsById(eventOwner.propertyId);
+});
 
 function addNewQueuedReservation(): void {
     const dialog = createDialog({
@@ -58,6 +61,7 @@ function addNewQueuedReservation(): void {
             title: `${t("EventQueuedReservations.addNewReservation")}`,
             maximized: false,
             componentPropsObject: {
+                timezone: propertiesSettings.value.timezone,
                 mode: "create",
                 currentUser: nonNullableUser.value,
                 users,
@@ -83,6 +87,7 @@ function showReservation(reservation: QueuedReservationDoc): void {
             title: "",
             maximized: false,
             componentPropsObject: {
+                timezone: propertiesSettings.value.timezone,
                 reservation,
             },
             listeners: {

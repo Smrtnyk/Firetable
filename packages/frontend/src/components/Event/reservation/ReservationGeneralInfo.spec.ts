@@ -3,7 +3,7 @@ import type { RenderResult } from "vitest-browser-vue";
 import ReservationGeneralInfo from "./ReservationGeneralInfo.vue";
 import { renderComponent, locale } from "../../../../test-helpers/render-component";
 import { ReservationStatus, ReservationType, Role, UserCapability } from "@firetable/types";
-import { formatEventDate } from "src/helpers/date-utils";
+import { formatEventDate, getDefaultTimezone } from "src/helpers/date-utils";
 import { describe, expect, it } from "vitest";
 
 describe("ReservationGeneralInfo", () => {
@@ -37,7 +37,7 @@ describe("ReservationGeneralInfo", () => {
     ): RenderResult<any> {
         return renderComponent(
             ReservationGeneralInfo,
-            { reservation: mockReservation },
+            { reservation: mockReservation, timezone: getDefaultTimezone() },
             {
                 piniaStoreOptions: {
                     initialState: {
@@ -73,7 +73,7 @@ describe("ReservationGeneralInfo", () => {
 
         const screen = renderComponent(
             ReservationGeneralInfo,
-            { reservation: reservationWithoutGuestName },
+            { reservation: reservationWithoutGuestName, timezone: getDefaultTimezone() },
             {
                 piniaStoreOptions: {
                     initialState: {
@@ -131,7 +131,7 @@ describe("ReservationGeneralInfo", () => {
         const reservationWithoutGuestContact = { ...mockReservation, guestContact: undefined };
         const screen = renderComponent(
             ReservationGeneralInfo,
-            { reservation: reservationWithoutGuestContact },
+            { reservation: reservationWithoutGuestContact, timezone: getDefaultTimezone() },
             {
                 piniaStoreOptions: {
                     initialState: {
@@ -167,7 +167,7 @@ describe("ReservationGeneralInfo", () => {
         const reservationWithoutConsumption = { ...mockReservation, consumption: undefined };
         const screen = renderComponent(
             ReservationGeneralInfo,
-            { reservation: reservationWithoutConsumption },
+            { reservation: reservationWithoutConsumption, timezone: getDefaultTimezone() },
             {
                 piniaStoreOptions: {
                     initialState: {
@@ -201,7 +201,7 @@ describe("ReservationGeneralInfo", () => {
         const reservationWithoutNote = { ...mockReservation, reservationNote: undefined };
         const screen = renderComponent(
             ReservationGeneralInfo,
-            { reservation: reservationWithoutNote },
+            { reservation: reservationWithoutNote, timezone: getDefaultTimezone() },
             {
                 piniaStoreOptions: {
                     initialState: {
@@ -245,7 +245,7 @@ describe("ReservationGeneralInfo", () => {
 
         const screen = renderComponent(
             ReservationGeneralInfo,
-            { reservation: walkInReservation },
+            { reservation: walkInReservation, timezone: getDefaultTimezone() },
             {
                 piniaStoreOptions: {
                     initialState: {
@@ -304,7 +304,11 @@ describe("ReservationGeneralInfo", () => {
 
         await expect.element(screen.getByText("Created at")).toBeVisible();
         await expect
-            .element(screen.getByText(formatEventDate(1_600_000_000_000, locale.value, null)))
+            .element(
+                screen.getByText(
+                    formatEventDate(1_600_000_000_000, locale.value, getDefaultTimezone()),
+                ),
+            )
             .toBeVisible();
     });
 
@@ -335,7 +339,7 @@ describe("ReservationGeneralInfo", () => {
 
         const screen = renderComponent(
             ReservationGeneralInfo,
-            { reservation: incompleteReservation },
+            { reservation: incompleteReservation, timezone: getDefaultTimezone() },
             {
                 piniaStoreOptions: {
                     initialState: {

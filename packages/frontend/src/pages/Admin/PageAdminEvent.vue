@@ -58,6 +58,9 @@ const reservationsTab = ref("arrivedReservations");
 const settings = computed(function () {
     return propertiesStore.getOrganisationSettingsById(props.organisationId);
 });
+const propertySettings = computed(function () {
+    return propertiesStore.getPropertySettingsById(props.propertyId);
+});
 
 const eventOwner: EventOwner = {
     propertyId: props.propertyId,
@@ -208,7 +211,10 @@ onMounted(init);
 
 <template>
     <div v-if="event && !isLoading" class="PageAdminEvent">
-        <FTTitle :title="event.name" :subtitle="formatEventDate(event.date, locale)">
+        <FTTitle
+            :title="event.name"
+            :subtitle="formatEventDate(event.date, locale, propertySettings.timezone)"
+        >
             <template #right>
                 <FTBtn
                     rounded
@@ -259,6 +265,7 @@ onMounted(init);
                     <FTTabPanels v-model="reservationsTab">
                         <q-tab-panel name="arrivedReservations" class="q-pa-none">
                             <AdminEventReservationsList
+                                :timezone="propertySettings.timezone"
                                 :empty-message="`No arrived reservations`"
                                 @delete="deleteReservationPermanently"
                                 :reservations="arrivedReservations"
@@ -266,6 +273,7 @@ onMounted(init);
                         </q-tab-panel>
                         <q-tab-panel name="cancelledReservations">
                             <AdminEventReservationsList
+                                :timezone="propertySettings.timezone"
                                 :empty-message="`No cancelled reservations`"
                                 @delete="deleteReservationPermanently"
                                 :reservations="cancelledReservations"
@@ -330,7 +338,11 @@ onMounted(init);
             <!-- Logs -->
             <q-tab-panel name="logs" class="q-px-none q-py-none">
                 <AppCardSection title="">
-                    <AdminEventLogs :logs-doc="logs" :is-admin="authStore.isAdmin" />
+                    <AdminEventLogs
+                        :timezone="propertySettings.timezone"
+                        :logs-doc="logs"
+                        :is-admin="authStore.isAdmin"
+                    />
                 </AppCardSection>
             </q-tab-panel>
         </FTTabPanels>
