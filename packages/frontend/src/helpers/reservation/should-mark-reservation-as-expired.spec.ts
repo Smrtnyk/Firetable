@@ -10,16 +10,53 @@ describe("shouldMarkReservationAsExpired", () => {
         vi.useRealTimers();
     });
 
-    it("returns true when current time is at least 30 minutes after eventDateTime", () => {
+    const viennaTimezone = "Europe/Vienna";
+
+    it("returns true when current time is at least 30 minutes after eventDateTime in property timezone", () => {
         const reservationTime = "23:00";
-        const eventDate = new Date("2023-10-14");
-        // 1 hour and 31 minutes later
-        const currentDate = new Date("2023-10-15T00:31:00");
+        // 23:00 Vienna time
+        const eventDate = new Date("2023-10-14T21:00:00Z");
+        // 00:31 next day Vienna time
+        const currentDate = new Date("2023-10-14T22:31:00Z");
         vi.setSystemTime(currentDate);
 
-        const result = shouldMarkReservationAsExpired(reservationTime, eventDate);
+        const result = shouldMarkReservationAsExpired(reservationTime, eventDate, viennaTimezone);
 
         expect(result).toBe(true);
+    });
+
+    it("handles different timezones correctly", () => {
+        const testCases = [
+            {
+                timezone: "Europe/Vienna",
+                reservationTime: "16:00",
+                // 16:31 Vienna time
+                currentTime: new Date("2023-10-14T14:31:00Z"),
+                expected: true,
+                description: "Vienna - 16:31 is 31 minutes after 16:00",
+            },
+            {
+                timezone: "America/New_York",
+                reservationTime: "16:00",
+                // 16:31 NY time
+                currentTime: new Date("2023-10-14T20:31:00Z"),
+                expected: true,
+                description: "NY - 16:31 is 31 minutes after 16:00",
+            },
+        ];
+
+        for (const { timezone, reservationTime, currentTime, expected, description } of testCases) {
+            console.log(`\nTesting ${description}`);
+            vi.setSystemTime(currentTime);
+
+            const result = shouldMarkReservationAsExpired(
+                reservationTime,
+                // Using current time as event date for simplicity
+                currentTime,
+                timezone,
+            );
+            expect(result, `Failed for ${timezone}: ${description}`).toBe(expected);
+        }
     });
 
     it("returns false when current time is less than 30 minutes after eventDateTime", () => {
@@ -29,9 +66,24 @@ describe("shouldMarkReservationAsExpired", () => {
         const currentDate = new Date("2023-10-14T23:50:00");
         vi.setSystemTime(currentDate);
 
-        const result = shouldMarkReservationAsExpired(reservationTime, eventDate);
+        const result = shouldMarkReservationAsExpired(reservationTime, eventDate, viennaTimezone);
 
         expect(result).toBe(false);
+    });
+
+    it("handles midnight crossing correctly", () => {
+        // Event starts at 22:00 Vienna time
+        const eventDate = new Date("2023-10-14T20:00:00Z");
+        // Reservation at 00:30 Vienna time (next day)
+        const reservationTime = "00:30";
+        // Current time is 01:01 Vienna time (31 minutes after reservation)
+        const currentTime = new Date("2023-10-14T23:01:00Z");
+
+        vi.setSystemTime(currentTime);
+
+        const result = shouldMarkReservationAsExpired(reservationTime, eventDate, viennaTimezone);
+
+        expect(result).toBe(true);
     });
 
     it('handles times after midnight correctly (hour starts with "0")', () => {
@@ -41,7 +93,7 @@ describe("shouldMarkReservationAsExpired", () => {
         const currentDate = new Date("2023-10-15T00:46:00");
         vi.setSystemTime(currentDate);
 
-        const result = shouldMarkReservationAsExpired(reservationTime, eventDate);
+        const result = shouldMarkReservationAsExpired(reservationTime, eventDate, viennaTimezone);
 
         expect(result).toBe(true);
     });
@@ -53,7 +105,7 @@ describe("shouldMarkReservationAsExpired", () => {
         const currentDate = new Date("2023-10-15T00:40:00");
         vi.setSystemTime(currentDate);
 
-        const result = shouldMarkReservationAsExpired(reservationTime, eventDate);
+        const result = shouldMarkReservationAsExpired(reservationTime, eventDate, viennaTimezone);
 
         expect(result).toBe(false);
     });
@@ -65,7 +117,7 @@ describe("shouldMarkReservationAsExpired", () => {
         const currentDate = new Date("2023-10-14T12:30:00");
         vi.setSystemTime(currentDate);
 
-        const result = shouldMarkReservationAsExpired(reservationTime, eventDate);
+        const result = shouldMarkReservationAsExpired(reservationTime, eventDate, viennaTimezone);
 
         expect(result).toBe(true);
     });

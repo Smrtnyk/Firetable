@@ -682,7 +682,11 @@ export function useReservations(
             .filter(function (reservation) {
                 return (
                     !reservation.arrived &&
-                    shouldMarkReservationAsExpired(reservation.time, baseEventDate)
+                    shouldMarkReservationAsExpired(
+                        reservation.time,
+                        baseEventDate,
+                        propertySettings.value.timezone,
+                    )
                 );
             })
             .forEach(markReservationAsExpired);
