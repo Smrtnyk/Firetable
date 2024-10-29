@@ -1,9 +1,9 @@
 packages:
     - 'packages/*'
 catalog:
-    vitest: https://pkg.pr.new/vitest@5df7414
-    '@vitest/browser': https://pkg.pr.new/@vitest/browser@5df7414
-    '@vitest/ui': https://pkg.pr.new/@vitest/ui@5df7414
+    vitest: https://pkg.pr.new/vitest@8878b04
+    '@vitest/browser': https://pkg.pr.new/@vitest/browser@8878b04
+    '@vitest/ui': https://pkg.pr.new/@vitest/ui@8878b04
     firebase: 11.0.1
     es-toolkit: 1.26.1
     '@posva/event-emitter': 1.0.2

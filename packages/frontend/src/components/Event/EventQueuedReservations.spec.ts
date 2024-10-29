@@ -11,6 +11,7 @@ import EventCreateReservation from "src/components/Event/reservation/EventCreate
 import EventShowQueuedReservation from "src/components/Event/reservation/EventShowQueuedReservation.vue";
 import { useEventsStore } from "src/stores/events-store";
 import { noop } from "es-toolkit";
+import { ADMIN } from "@firetable/types";
 
 const { createDialogSpy } = vi.hoisted(() => {
     return {
@@ -42,6 +43,7 @@ describe("EventQueuedReservations.vue", () => {
             user: {
                 id: "user1",
                 email: "",
+                role: ADMIN,
             },
         };
         eventsStoreState = {
