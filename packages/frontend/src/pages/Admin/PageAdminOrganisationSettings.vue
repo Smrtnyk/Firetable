@@ -11,7 +11,7 @@ import AppCardSection from "src/components/AppCardSection.vue";
 import FTBtn from "src/components/FTBtn.vue";
 import { timezones } from "src/helpers/date-utils";
 
-interface Props {
+export interface PageAdminOrganisationSettingsProps {
     organisationId: string;
 }
 
@@ -38,7 +38,7 @@ const colorsSettings = [
     },
 ] as const;
 
-const props = defineProps<Props>();
+const props = defineProps<PageAdminOrganisationSettingsProps>();
 const propertiesStore = usePropertiesStore();
 const properties = computed(() =>
     propertiesStore.getPropertiesByOrganisationId(props.organisationId),
@@ -190,6 +190,7 @@ onMounted(initPropertySettings);
                 <q-input
                     rounded
                     standout
+                    label="Event duration in hours"
                     v-model.number="editableSettings.organisation.event.eventDurationInHours"
                 />
             </SettingsSection>
