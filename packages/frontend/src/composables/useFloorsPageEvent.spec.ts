@@ -3,6 +3,7 @@ import type { FloorDoc } from "@firetable/types";
 import { useFloorsPageEvent } from "./useFloorsPageEvent";
 import { nextTick, ref, shallowRef, createApp } from "vue";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { noop } from "es-toolkit";
 
 vi.mock("src/helpers/compress-floor-doc", () => ({
     decompressFloorDoc: vi.fn().mockImplementation((doc) => doc),
@@ -16,7 +17,7 @@ export function withSetup(composable: () => ReturnType<typeof useFloorsPageEvent
     const app = createApp({
         setup() {
             result = composable();
-            return () => {};
+            return noop;
         },
     });
     app.mount(document.createElement("div"));

@@ -1,6 +1,10 @@
-import type { PlannedReservation, User, WalkInReservation } from "@firetable/types";
+import type {
+    PlannedReservation,
+    PlannedReservationDoc,
+    User,
+    WalkInReservation,
+} from "@firetable/types";
 import type { EventCreateReservationProps } from "./EventCreateReservation.vue";
-import type { PlannedReservationFormProps } from "./PlannedReservationForm.vue";
 import EventCreateReservation from "./EventCreateReservation.vue";
 import { renderComponent, t, locale } from "../../../../test-helpers/render-component";
 import { getDefaultTimezone, hourFromTimestamp } from "src/helpers/date-utils";
@@ -226,7 +230,7 @@ describe("EventCreateReservation", () => {
     });
 
     describe("PlannedReservationForm", () => {
-        let plannedProps: PlannedReservationFormProps;
+        let plannedProps: EventCreateReservationProps;
 
         beforeEach(() => {
             plannedProps = {
@@ -361,7 +365,7 @@ describe("EventCreateReservation", () => {
                     email: "",
                     createdAt: Date.now(),
                 },
-            };
+            } as unknown as PlannedReservationDoc;
 
             const screen = renderComponent(EventCreateReservation, plannedProps);
 
@@ -523,7 +527,7 @@ describe("EventCreateReservation", () => {
                     email: "",
                     createdAt: Date.now(),
                 },
-            };
+            } as unknown as PlannedReservationDoc;
 
             const screen = renderComponent(EventCreateReservation, plannedProps);
 

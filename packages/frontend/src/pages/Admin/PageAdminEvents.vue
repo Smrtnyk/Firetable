@@ -55,7 +55,6 @@ const propertySettings = computed(function () {
     return propertiesStore.getPropertySettingsById(propertyId);
 });
 
-console.log(propertySettings);
 onBeforeMount(function () {
     if (!organisationId || !propertyId) {
         router.replace("/");
