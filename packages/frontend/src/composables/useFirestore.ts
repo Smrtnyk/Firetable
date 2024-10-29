@@ -1,10 +1,4 @@
-import type {
-    Query,
-    DocumentData,
-    DocumentReference,
-    QueryConstraint,
-    CollectionReference,
-} from "firebase/firestore";
+import type { Query, DocumentData, DocumentReference, QueryConstraint } from "firebase/firestore";
 import type {
     _RefFirestore,
     UseCollectionOptions,
@@ -56,7 +50,7 @@ export function getFirestoreDocument(path: string): DocumentReference {
 }
 
 export function createQuery<T>(
-    collectionRefOrPath: CollectionReference | string,
+    collectionRefOrPath: any | string,
     ...queryConstraints: QueryConstraint[]
 ): Query<T> {
     if (isString(collectionRefOrPath)) {
@@ -65,6 +59,6 @@ export function createQuery<T>(
         // @ts-expect-error -- not sure why it complains, but it works like this
         return query<T, DocumentData>(collectionRef, ...queryConstraints);
     }
-    // @ts-expect-error -- not sure why it complains, but it works like this
+
     return query<T, DocumentData>(collectionRefOrPath, ...queryConstraints);
 }
