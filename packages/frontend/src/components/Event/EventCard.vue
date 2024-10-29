@@ -11,7 +11,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const backgroundImageUrl = computed(function () {
     const imageIndex = (props.index % 3) + 1;
@@ -45,13 +45,13 @@ const backgroundImageUrl = computed(function () {
                     <div class="row items-center">
                         <q-icon name="calendar" color="white" class="q-mr-xs" size="xs" />
 
-                        {{ dateFromTimestamp(props.event.date) }}
+                        {{ dateFromTimestamp(props.event.date, locale) }}
 
                         <q-space />
 
                         <q-icon name="clock" color="white" class="q-mr-xs" size="xs" />
 
-                        {{ hourFromTimestamp(props.event.date) }}
+                        {{ hourFromTimestamp(props.event.date, locale) }}
                     </div>
 
                     <q-space />

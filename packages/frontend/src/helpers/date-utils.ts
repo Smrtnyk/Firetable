@@ -1,19 +1,22 @@
 import type { FirestoreTimestamp } from "@firetable/types";
 import { isNumber } from "es-toolkit/compat";
 
-const LOCALE = "de-DE";
-
 export const timezones = Intl.supportedValuesOf("timeZone").sort();
 
 /**
  * Pass null as timeZone to show time in current time zone
  *
  * @param timestamp Timestamp in milliseconds
+ * @param locale
  * @param timeZone Time zone to use
  */
-export function formatEventDate(timestamp: number, timeZone: string | null = "UTC"): string {
+export function formatEventDate(
+    timestamp: number,
+    locale: string,
+    timeZone: string | null = "UTC",
+): string {
     const date = new Date(timestamp);
-    const formatter = new Intl.DateTimeFormat(LOCALE, {
+    const formatter = new Intl.DateTimeFormat(locale, {
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
@@ -30,11 +33,16 @@ export function formatEventDate(timestamp: number, timeZone: string | null = "UT
  * Pass null as timeZone to show time in current time zone
  *
  * @param timestamp Timestamp in milliseconds
+ * @param locale
  * @param timeZone Time zone to use
  */
-export function dateFromTimestamp(timestamp: number, timeZone: string | null = "UTC"): string {
+export function dateFromTimestamp(
+    timestamp: number,
+    locale: string,
+    timeZone: string | null = "UTC",
+): string {
     const date = new Date(timestamp);
-    const formatter = new Intl.DateTimeFormat(LOCALE, {
+    const formatter = new Intl.DateTimeFormat(locale, {
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
@@ -47,11 +55,16 @@ export function dateFromTimestamp(timestamp: number, timeZone: string | null = "
  * Pass null as timeZone to show time in current time zone
  *
  * @param timestamp Timestamp in milliseconds
+ * @param locale
  * @param timeZone Time zone to use
  */
-export function hourFromTimestamp(timestamp: number, timeZone: string | null = "UTC"): string {
+export function hourFromTimestamp(
+    timestamp: number,
+    locale: string,
+    timeZone: string | null = "UTC",
+): string {
     const date = new Date(timestamp);
-    const formatter = new Intl.DateTimeFormat(LOCALE, {
+    const formatter = new Intl.DateTimeFormat(locale, {
         hour: "2-digit",
         minute: "2-digit",
         timeZone: timeZone ?? void 0,
@@ -60,11 +73,14 @@ export function hourFromTimestamp(timestamp: number, timeZone: string | null = "
     return formatter.format(date);
 }
 
-export function getFormatedDateFromTimestamp(timestamp: FirestoreTimestamp | number): string {
+export function getFormatedDateFromTimestamp(
+    timestamp: FirestoreTimestamp | number,
+    locale: string,
+): string {
     if (isNumber(timestamp)) {
-        return formatEventDate(timestamp, null);
+        return formatEventDate(timestamp, locale, null);
     }
-    return formatEventDate(timestamp.toMillis(), null);
+    return formatEventDate(timestamp.toMillis(), locale, null);
 }
 
 export function getDefaultTimezone(): string {

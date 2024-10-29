@@ -5,6 +5,7 @@ import { ADMIN } from "@firetable/types";
 import { computed, ref, useTemplateRef } from "vue";
 import { QScrollArea } from "quasar";
 import { getFormatedDateFromTimestamp } from "src/helpers/date-utils";
+import { useI18n } from "vue-i18n";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 
 export interface AdminEventLogsProps {
@@ -12,6 +13,7 @@ export interface AdminEventLogsProps {
     isAdmin: boolean;
 }
 const props = defineProps<AdminEventLogsProps>();
+const { locale } = useI18n();
 const logs = computed(function () {
     if (!props.logsDoc) {
         return [];
@@ -51,7 +53,7 @@ function getIconNameForLogEntry(logMessage: string): string {
 }
 
 function formatSubtitleForEventLog({ creator, timestamp }: EventLog): string {
-    const datePart = getFormatedDateFromTimestamp(timestamp);
+    const datePart = getFormatedDateFromTimestamp(timestamp, locale.value);
     const userPart = `${creator.name} (${creator.email})`;
     return `${datePart}, by ${userPart}`;
 }

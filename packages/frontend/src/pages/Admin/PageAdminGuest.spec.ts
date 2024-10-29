@@ -231,7 +231,7 @@ describe("PageAdminGuest.vue", () => {
             (element) => element.textContent,
         );
 
-        expect(formattedDates).toEqual(["05.10.2023, 10:00:00", "03.10.2023, 15:30:00"]);
+        expect(formattedDates).toEqual(["05/10/2023, 10:00:00", "03/10/2023, 15:30:00"]);
     });
 
     it("shows 'No visits' message when guest has properties with no visits", async () => {

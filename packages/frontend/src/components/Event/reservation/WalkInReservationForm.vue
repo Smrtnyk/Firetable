@@ -27,7 +27,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 type State = Omit<WalkInReservation, "creator" | "floorId" | "tableLabel">;
 
@@ -44,7 +44,7 @@ function generateInitialState(): State {
     // Set the initial time to either the current hour or the event start hour
     const initialTime = Math.max(now, eventStart);
     // Format the time as a string "HH:MM"
-    const formattedTime = hourFromTimestamp(initialTime, null);
+    const formattedTime = hourFromTimestamp(initialTime, locale.value, null);
     return {
         type: ReservationType.WALK_IN as const,
         guestName: "",

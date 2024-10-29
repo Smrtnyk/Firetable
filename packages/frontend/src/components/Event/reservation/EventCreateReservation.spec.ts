@@ -2,7 +2,7 @@ import type { PlannedReservation, User, WalkInReservation } from "@firetable/typ
 import type { EventCreateReservationProps } from "./EventCreateReservation.vue";
 import type { PlannedReservationFormProps } from "./PlannedReservationForm.vue";
 import EventCreateReservation from "./EventCreateReservation.vue";
-import { renderComponent, t } from "../../../../test-helpers/render-component";
+import { renderComponent, t, locale } from "../../../../test-helpers/render-component";
 import { hourFromTimestamp } from "src/helpers/date-utils";
 import { ONE_HOUR } from "src/constants";
 import { ReservationStatus, ReservationType } from "@firetable/types";
@@ -35,7 +35,7 @@ describe("EventCreateReservation", () => {
             const eventStart = props.eventStartTimestamp;
             const now = Date.now();
             const initialTime = Math.max(now, eventStart);
-            const formattedTime = hourFromTimestamp(initialTime, null);
+            const formattedTime = hourFromTimestamp(initialTime, locale.value, null);
             return {
                 type: ReservationType.WALK_IN,
                 guestName: "",

@@ -59,14 +59,14 @@ const emit = defineEmits<{
 const isEditMode = computed(function () {
     return Boolean(props.event);
 });
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const form = useTemplateRef<QForm>("form");
 const state = ref<State>({
     form: { ...eventObj },
     chosenFloors: [],
     showDateModal: false,
     showTimeModal: false,
-    selectedDate: dateFromTimestamp(Date.now()),
+    selectedDate: dateFromTimestamp(Date.now(), locale.value),
     selectedTime: props.eventStartHours,
 });
 
@@ -89,11 +89,11 @@ watchEffect(function () {
             img: props.event.img ?? "",
             date: props.event.date,
         };
-        state.value.selectedDate = dateFromTimestamp(editDate.getTime());
-        state.value.selectedTime = hourFromTimestamp(editDate.getTime());
+        state.value.selectedDate = dateFromTimestamp(editDate.getTime(), locale.value);
+        state.value.selectedTime = hourFromTimestamp(editDate.getTime(), locale.value);
     } else {
         state.value.form = { ...eventObj };
-        state.value.selectedDate = dateFromTimestamp(Date.now());
+        state.value.selectedDate = dateFromTimestamp(Date.now(), locale.value);
         state.value.selectedTime = props.eventStartHours;
     }
 });

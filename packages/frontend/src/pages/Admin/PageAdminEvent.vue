@@ -34,6 +34,7 @@ import { usePropertiesStore } from "src/stores/properties-store";
 import { property } from "es-toolkit/compat";
 import { useAuthStore } from "src/stores/auth-store";
 import { useDialog } from "src/composables/useDialog";
+import { useI18n } from "vue-i18n";
 import FTBtn from "src/components/FTBtn.vue";
 
 interface Props {
@@ -48,6 +49,7 @@ const PERMANENTLY_DELETE_RES_MESSAGE =
 
 const props = defineProps<Props>();
 const router = useRouter();
+const { locale } = useI18n();
 const { createDialog } = useDialog();
 const propertiesStore = usePropertiesStore();
 
@@ -206,7 +208,7 @@ onMounted(init);
 
 <template>
     <div v-if="event && !isLoading" class="PageAdminEvent">
-        <FTTitle :title="event.name" :subtitle="formatEventDate(event.date)">
+        <FTTitle :title="event.name" :subtitle="formatEventDate(event.date, locale)">
             <template #right>
                 <FTBtn
                     rounded

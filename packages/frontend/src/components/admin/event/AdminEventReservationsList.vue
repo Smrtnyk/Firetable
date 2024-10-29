@@ -2,6 +2,7 @@
 import type { ReservationDoc, VoidFunction } from "@firetable/types";
 import { useDialog } from "src/composables/useDialog";
 import { getFormatedDateFromTimestamp } from "src/helpers/date-utils";
+import { useI18n } from "vue-i18n";
 
 import FTDialog from "src/components/FTDialog.vue";
 import ReservationGeneralInfo from "src/components/Event/reservation/ReservationGeneralInfo.vue";
@@ -15,6 +16,7 @@ interface Props {
 
 const emit = defineEmits<(e: "delete", value: ReservationDoc) => void>();
 const props = defineProps<Props>();
+const { locale } = useI18n();
 const { createDialog } = useDialog();
 
 function showReservation(reservation: ReservationDoc): void {
@@ -56,7 +58,9 @@ function emitDelete(reservation: ReservationDoc, reset: VoidFunction): void {
                         >
                         <q-item-label v-if="reservation.clearedAt" caption
                             >Cleared at:
-                            {{ getFormatedDateFromTimestamp(reservation.clearedAt) }}</q-item-label
+                            {{
+                                getFormatedDateFromTimestamp(reservation.clearedAt, locale)
+                            }}</q-item-label
                         >
                         <q-item-label caption>
                             <ReservationLabelChips :reservation="reservation" />

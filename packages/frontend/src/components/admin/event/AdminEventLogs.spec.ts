@@ -2,7 +2,7 @@ import type { EventLog, EventLogsDoc } from "@firetable/types";
 import type { RenderResult } from "vitest-browser-vue";
 import type { AdminEventLogsProps } from "./AdminEventLogs.vue";
 import AdminEventLogs from "./AdminEventLogs.vue";
-import { renderComponent } from "../../../../test-helpers/render-component";
+import { renderComponent, locale } from "../../../../test-helpers/render-component";
 import { ADMIN, Role } from "@firetable/types";
 import { formatEventDate } from "src/helpers/date-utils";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -108,7 +108,7 @@ describe("AdminEventLogs", () => {
 
         it("formats subtitles correctly", async () => {
             for (const log of sampleLogs) {
-                const datePart = formatEventDate(log.timestamp as number, null);
+                const datePart = formatEventDate(log.timestamp as number, locale.value, null);
                 const userPart = `${log.creator.name} (${log.creator.email})`;
                 const expectedSubtitle = `${datePart}, by ${userPart}`;
 

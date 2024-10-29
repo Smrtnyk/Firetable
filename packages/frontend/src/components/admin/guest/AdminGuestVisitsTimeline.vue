@@ -8,7 +8,7 @@ const { visits } = defineProps<{
     visits: Visit[];
 }>();
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 function isUpcomingVisit(visit: Visit): boolean {
     const now = Date.now();
@@ -38,7 +38,7 @@ function getVisitIcon(visit: Visit): string {
 }
 
 function formatSubtitleForGuestVisit(visit: Visit): string {
-    return formatEventDate(visit.date);
+    return formatEventDate(visit.date, locale.value);
 }
 </script>
 

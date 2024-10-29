@@ -9,12 +9,12 @@ import { useAuthStore } from "src/stores/auth-store";
 const props = defineProps<{
     reservation: QueuedReservation | Reservation;
 }>();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const authStore = useAuthStore();
 
 const createdAt = computed(() => {
     const createdAtValue = props.reservation.creator.createdAt;
-    return getFormatedDateFromTimestamp(createdAtValue);
+    return getFormatedDateFromTimestamp(createdAtValue, locale.value);
 });
 
 function reservedByText(reservedBy: PlannedReservation["reservedBy"]): string {

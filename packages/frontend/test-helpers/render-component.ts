@@ -50,6 +50,7 @@ const i18n = createI18n({
 });
 
 export const t = i18n.global.t;
+export const locale = i18n.global.locale;
 export function getLocaleForTest(): WritableComputedRef<"de" | "en-GB", "de" | "en-GB"> {
     return i18n.global.locale;
 }
