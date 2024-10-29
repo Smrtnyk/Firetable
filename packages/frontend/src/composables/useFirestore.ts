@@ -1,5 +1,17 @@
-import type { Query, DocumentData, DocumentReference, QueryConstraint } from "firebase/firestore";
-import type { UseCollectionOptions, UseDocumentOptions } from "vuefire";
+import type {
+    Query,
+    DocumentData,
+    DocumentReference,
+    QueryConstraint,
+    CollectionReference,
+} from "firebase/firestore";
+import type {
+    _RefFirestore,
+    UseCollectionOptions,
+    UseDocumentOptions,
+    VueFirestoreDocumentData,
+    VueFirestoreQueryData,
+} from "vuefire";
 import type { ComputedRef } from "vue";
 import { collection, doc, query, setDoc } from "firebase/firestore";
 import { initializeFirebase } from "@firetable/backend";
@@ -9,7 +21,7 @@ import { isString } from "es-toolkit";
 export function useFirestoreCollection<T extends DocumentData>(
     path: ComputedRef<Query<T> | null> | Query<T> | string,
     options: UseCollectionOptions<T[]> = {},
-) {
+): _RefFirestore<VueFirestoreQueryData<T>> {
     const mergedOpts = {
         ...options,
         maxRefDepth: 20,
@@ -21,7 +33,10 @@ export function useFirestoreCollection<T extends DocumentData>(
     return useCollection<T>(path, mergedOpts);
 }
 
-export function useFirestoreDocument<T>(path: string, options: UseDocumentOptions<T> = {}) {
+export function useFirestoreDocument<T>(
+    path: string,
+    options: UseDocumentOptions<T> = {},
+): _RefFirestore<VueFirestoreDocumentData<T> | undefined> {
     const { firestore } = initializeFirebase();
     return useDocument<T>(doc(firestore, path), options);
 }
@@ -41,8 +56,15 @@ export function getFirestoreDocument(path: string): DocumentReference {
 }
 
 export function createQuery<T>(
-    collectionRef: any,
+    collectionRefOrPath: CollectionReference | string,
     ...queryConstraints: QueryConstraint[]
 ): Query<T> {
-    return query<T, DocumentData>(collectionRef, ...queryConstraints);
+    if (isString(collectionRefOrPath)) {
+        const { firestore } = initializeFirebase();
+        const collectionRef = collection(firestore, collectionRefOrPath);
+        // @ts-expect-error -- not sure why it complains, but it works like this
+        return query<T, DocumentData>(collectionRef, ...queryConstraints);
+    }
+    // @ts-expect-error -- not sure why it complains, but it works like this
+    return query<T, DocumentData>(collectionRefOrPath, ...queryConstraints);
 }

@@ -1,7 +1,7 @@
 import type { GuestDoc, PropertyDoc, Visit } from "@firetable/types";
 import type { _RefFirestore, VueFirestoreDocumentData, VueFirestoreQueryData } from "vuefire";
 import { defineStore } from "pinia";
-import { getGuestsPath, guestsCollection } from "@firetable/backend";
+import { getGuestsPath } from "@firetable/backend";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
 import { where } from "firebase/firestore";
 import { first, matchesProperty } from "es-toolkit/compat";
@@ -104,10 +104,7 @@ export const useGuestsStore = defineStore("guests", function () {
 
         AppLogger.info("Guest not found in cache, fetching from Firestore");
         const { data, promise } = useFirestoreCollection<GuestDoc>(
-            createQuery(
-                guestsCollection(organisationId),
-                where("hashedContact", "==", hashedContact),
-            ),
+            createQuery(getGuestsPath(organisationId), where("hashedContact", "==", hashedContact)),
             { once: true, wait: true },
         );
 
