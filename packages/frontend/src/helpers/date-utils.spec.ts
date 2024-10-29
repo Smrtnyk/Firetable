@@ -1,4 +1,9 @@
-import { dateFromTimestamp, formatEventDate, hourFromTimestamp } from "./date-utils";
+import {
+    createUTCTimestamp,
+    dateFromTimestamp,
+    formatEventDate,
+    hourFromTimestamp,
+} from "./date-utils";
 import { test, describe, expect } from "vitest";
 
 const DEFAULT_LOCALE = "en-GB";
@@ -6,6 +11,118 @@ const DEFAULT_TIMEZONE = "UTC";
 
 describe("Date Formatting Functions", () => {
     const testTimestamp = new Date("2024-01-15T12:30:45Z").getTime();
+
+    describe("createUTCTimestamp", () => {
+        test("converts Vienna time to correct UTC timestamp", () => {
+            const dateStr = "15.01.2024";
+            const timeStr = "22:00";
+            const timezone = "Europe/Vienna";
+
+            const timestamp = createUTCTimestamp(dateStr, timeStr, timezone);
+
+            // Convert back to check if we get the same time in Vienna
+            const formattedTime = hourFromTimestamp(timestamp, DEFAULT_LOCALE, timezone);
+            const formattedDate = dateFromTimestamp(timestamp, DEFAULT_LOCALE, timezone);
+
+            expect(formattedTime).toBe("22:00");
+            expect(formattedDate).toBe("15/01/2024");
+
+            // Check UTC time (Vienna is UTC+1 in winter)
+            const utcTime = hourFromTimestamp(timestamp, DEFAULT_LOCALE, "UTC");
+            expect(utcTime).toBe("21:00");
+        });
+
+        test("handles daylight saving time correctly", () => {
+            // Summer time
+            const dateStr = "15.07.2024";
+            const timeStr = "22:00";
+            const timezone = "Europe/Vienna";
+
+            const timestamp = createUTCTimestamp(dateStr, timeStr, timezone);
+
+            // Check local time is preserved
+            const formattedTime = hourFromTimestamp(timestamp, DEFAULT_LOCALE, timezone);
+            expect(formattedTime).toBe("22:00");
+
+            // Check UTC time (Vienna is UTC+2 in summer)
+            const utcTime = hourFromTimestamp(timestamp, DEFAULT_LOCALE, "UTC");
+            expect(utcTime).toBe("20:00");
+        });
+
+        test("handles different timezones correctly", () => {
+            const dateStr = "15.01.2024";
+            const timeStr = "22:00";
+            const timezones = {
+                // Next day in UTC
+                "America/New_York": "03:00",
+                "Asia/Tokyo": "13:00",
+                "Australia/Sydney": "11:00",
+            };
+
+            for (const [timezone, expectedUTCTime] of Object.entries(timezones)) {
+                const timestamp = createUTCTimestamp(dateStr, timeStr, timezone);
+
+                // Check if local time is preserved
+                const localTime = hourFromTimestamp(timestamp, DEFAULT_LOCALE, timezone);
+                expect(localTime).toBe("22:00");
+
+                // Check UTC conversion
+                const utcTime = hourFromTimestamp(timestamp, DEFAULT_LOCALE, "UTC");
+                expect(utcTime).toBe(expectedUTCTime);
+            }
+        });
+
+        test("handles date change across timezone boundaries", () => {
+            const dateStr = "31.12.2024";
+            const timeStr = "22:00";
+            const timezone = "America/New_York";
+
+            const timestamp = createUTCTimestamp(dateStr, timeStr, timezone);
+
+            // Check local date/time is preserved
+            const nyDate = dateFromTimestamp(timestamp, DEFAULT_LOCALE, timezone);
+            const nyTime = hourFromTimestamp(timestamp, DEFAULT_LOCALE, timezone);
+            expect(nyDate).toBe("31/12/2024");
+            expect(nyTime).toBe("22:00");
+
+            // Check UTC date (should be next year)
+            const utcDate = dateFromTimestamp(timestamp, DEFAULT_LOCALE, "UTC");
+            const utcTime = hourFromTimestamp(timestamp, DEFAULT_LOCALE, "UTC");
+            expect(utcDate).toBe("01/01/2025");
+            expect(utcTime).toBe("03:00");
+        });
+    });
+
+    describe("locale handling", () => {
+        const testCases = [
+            {
+                locale: "de-DE",
+                expectedDate: "15.01.2024",
+                expectedDateTime: "15.01.2024, 12:30:45",
+            },
+            {
+                locale: "en-GB",
+                expectedDate: "15/01/2024",
+                expectedDateTime: "15/01/2024, 12:30:45",
+            },
+            {
+                locale: "en-US",
+                expectedDate: "01/15/2024",
+                expectedDateTime: "01/15/2024, 12:30:45",
+            },
+        ];
+
+        testCases.forEach(({ locale, expectedDate, expectedDateTime }) => {
+            test(`formats dates correctly for ${locale}`, () => {
+                expect(dateFromTimestamp(testTimestamp, locale, DEFAULT_TIMEZONE)).toBe(
+                    expectedDate,
+                );
+                expect(formatEventDate(testTimestamp, locale, DEFAULT_TIMEZONE)).toBe(
+                    expectedDateTime,
+                );
+            });
+        });
+    });
 
     describe("formatEventDate", () => {
         test("formats correctly in UTC", () => {

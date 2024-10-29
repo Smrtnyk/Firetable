@@ -18,7 +18,7 @@ import {
 
 import { QForm } from "quasar";
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import { dateFromTimestamp, hourFromTimestamp } from "src/helpers/date-utils";
+import { createUTCTimestamp, dateFromTimestamp, hourFromTimestamp } from "src/helpers/date-utils";
 
 interface State {
     form: CreateEventForm;
@@ -122,36 +122,10 @@ watch([() => state.value.selectedDate, () => state.value.selectedTime], function
     if (!state.value.selectedDate) {
         return;
     }
-    const [dayVal, monthVal, yearVal] = state.value.selectedDate.split(".");
-    // Create date in property timezone
-    const dateStr = `${yearVal}-${monthVal}-${dayVal}T${state.value.selectedTime}`;
-    const date = new Date(dateStr);
-
-    // Convert the local date to UTC while preserving the intended time
-    const formatter = new Intl.DateTimeFormat("en-US", {
-        timeZone: props.propertyTimezone,
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false,
-    });
-
-    const parts = formatter.formatToParts(date);
-    const dateParts = parts.reduce<Record<string, string>>((acc, part) => {
-        acc[part.type] = part.value;
-        return acc;
-    }, {});
-
-    // Create UTC timestamp
-    state.value.form.date = Date.UTC(
-        Number(dateParts.year),
-        Number(dateParts.month) - 1,
-        Number(dateParts.day),
-        Number(dateParts.hour),
-        Number(dateParts.minute),
+    state.value.form.date = createUTCTimestamp(
+        state.value.selectedDate,
+        state.value.selectedTime,
+        props.propertyTimezone,
     );
 });
 

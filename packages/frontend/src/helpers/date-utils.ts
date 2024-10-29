@@ -5,6 +5,57 @@ export const timezones = Intl.supportedValuesOf("timeZone").sort();
 export const UTC = "UTC";
 
 /**
+ * Converts a date string and time string to UTC timestamp considering the timezone
+ *
+ * @param dateStr Date in DD.MM.YYYY format
+ * @param timeStr Time in HH:mm format
+ * @param timezone Timezone to use
+ * @returns UTC timestamp in milliseconds
+ */
+export function createUTCTimestamp(dateStr: string, timeStr: string, timezone: string): number {
+    const [dayVal, monthVal, yearVal] = dateStr.split(".");
+
+    // First create date in UTC
+    const utcDate = Date.UTC(
+        Number(yearVal),
+        Number(monthVal) - 1,
+        Number(dayVal),
+        Number(timeStr.split(":")[0]),
+        Number(timeStr.split(":")[1]),
+    );
+
+    // Create formatters for both UTC and target timezone
+    const targetFormatter = new Intl.DateTimeFormat("en-US", {
+        timeZone: timezone,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+    });
+
+    const parts = targetFormatter.formatToParts(utcDate);
+    const targetObj = parts.reduce<Record<string, string>>((acc, part) => {
+        if (["year", "month", "day", "hour", "minute"].includes(part.type)) {
+            acc[part.type] = part.value;
+        }
+        return acc;
+    }, {});
+
+    // Calculate the offset needed to make target time match desired time
+    const targetHour = Number(targetObj.hour);
+    const desiredHour = Number(timeStr.split(":")[0]);
+    const hourOffset = desiredHour - targetHour;
+
+    // Adjust UTC time by the offset
+    const adjustedUtc = new Date(utcDate);
+    adjustedUtc.setUTCHours(adjustedUtc.getUTCHours() + hourOffset);
+
+    return adjustedUtc.getTime();
+}
+
+/**
  * Pass null as timeZone to show time in current time zone
  *
  * @param timestamp Timestamp in milliseconds
