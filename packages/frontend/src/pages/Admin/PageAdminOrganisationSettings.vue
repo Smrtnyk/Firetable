@@ -1,38 +1,18 @@
 <script setup lang="ts">
+import type { OrganisationSettings, PropertySettings } from "@firetable/types";
 import { usePropertiesStore } from "src/stores/properties-store";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { updateOrganisationSettings } from "@firetable/backend";
+import { updateOrganisationSettings, updatePropertySettings } from "@firetable/backend";
 
 import SettingsSection from "src/components/admin/organisation-settings/SettingsSection.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import AppCardSection from "src/components/AppCardSection.vue";
 import FTBtn from "src/components/FTBtn.vue";
+import { timezones } from "src/helpers/date-utils";
 
 interface Props {
     organisationId: string;
-}
-
-const props = defineProps<Props>();
-const propertiesStore = usePropertiesStore();
-const settings = computed(function () {
-    return propertiesStore.getOrganisationSettingsById(props.organisationId);
-});
-
-const editableSettings = ref(JSON.parse(JSON.stringify(settings.value)));
-
-const aspectRatioOptions = ["1", "16:9"];
-
-const hasSettingsChanged = computed(function () {
-    return JSON.stringify(editableSettings.value) !== JSON.stringify(settings.value);
-});
-
-async function saveSettings(): Promise<void> {
-    await tryCatchLoadingWrapper({
-        hook() {
-            return updateOrganisationSettings(props.organisationId, editableSettings.value);
-        },
-    });
 }
 
 const colorsSettings = [
@@ -56,11 +36,98 @@ const colorsSettings = [
         title: "Reservation waiting for response color",
         key: "reservationWaitingForResponseColor",
     },
-];
+] as const;
+
+const props = defineProps<Props>();
+const propertiesStore = usePropertiesStore();
+const properties = computed(() =>
+    propertiesStore.getPropertiesByOrganisationId(props.organisationId),
+);
+
+const organisationSettings = computed(function () {
+    return propertiesStore.getOrganisationSettingsById(props.organisationId);
+});
+
+type EditableSettings = {
+    organisation: OrganisationSettings;
+    properties: Record<string, PropertySettings>;
+};
+const editableSettings = ref<EditableSettings>({
+    organisation: JSON.parse(JSON.stringify(organisationSettings.value)),
+    properties: {},
+});
+
+const aspectRatioOptions = ["1", "16:9"];
+
+const hasSettingsChanged = computed(() => {
+    // Check if organisation settings changed
+    const organisationChanged =
+        JSON.stringify(editableSettings.value.organisation) !==
+        JSON.stringify(organisationSettings.value);
+
+    // Check if any property settings changed
+    const propertiesChanged = properties.value.some((property) => {
+        const currentSettings = propertiesStore.getPropertySettingsById(property.id);
+        const editedSettings = editableSettings.value.properties[property.id];
+        return JSON.stringify(currentSettings) !== JSON.stringify(editedSettings);
+    });
+
+    return organisationChanged || propertiesChanged;
+});
 
 function reset(): void {
-    editableSettings.value = JSON.parse(JSON.stringify(settings.value));
+    editableSettings.value.organisation = JSON.parse(JSON.stringify(organisationSettings.value));
+    initPropertySettings();
 }
+
+function initPropertySettings(): void {
+    properties.value.forEach((property) => {
+        const propertySettings = propertiesStore.getPropertySettingsById(property.id);
+
+        editableSettings.value.properties[property.id] = {
+            timezone: propertySettings.timezone,
+        };
+    });
+}
+
+async function saveSettings(): Promise<void> {
+    await tryCatchLoadingWrapper({
+        async hook() {
+            const savePromises: Promise<void>[] = [];
+
+            // Check if organisation settings changed and need to be saved
+            const organisationChanged =
+                JSON.stringify(editableSettings.value.organisation) !==
+                JSON.stringify(organisationSettings.value);
+
+            if (organisationChanged) {
+                savePromises.push(
+                    updateOrganisationSettings(
+                        props.organisationId,
+                        editableSettings.value.organisation,
+                    ),
+                );
+            }
+
+            // Check which properties had their settings changed
+            properties.value.forEach(function (property) {
+                const currentSettings = propertiesStore.getPropertySettingsById(property.id);
+                const editedSettings = editableSettings.value.properties[property.id];
+
+                if (JSON.stringify(currentSettings) !== JSON.stringify(editedSettings)) {
+                    savePromises.push(
+                        updatePropertySettings(props.organisationId, property.id, editedSettings),
+                    );
+                }
+            });
+
+            // Wait for all updates to complete
+            await Promise.all(savePromises);
+        },
+    });
+}
+
+onMounted(initPropertySettings);
 </script>
 
 <template>
@@ -91,7 +158,7 @@ function reset(): void {
                 <q-select
                     rounded
                     standout
-                    v-model="editableSettings.property.propertyCardAspectRatio"
+                    v-model="editableSettings.organisation.property.propertyCardAspectRatio"
                     :options="aspectRatioOptions"
                 />
             </SettingsSection>
@@ -100,7 +167,7 @@ function reset(): void {
         <AppCardSection title="Event">
             <SettingsSection title="Default event start time">
                 <q-input
-                    :model-value="editableSettings.event.eventStartTime24HFormat"
+                    :model-value="editableSettings.organisation.event.eventStartTime24HFormat"
                     rounded
                     standout
                     readonly
@@ -109,7 +176,9 @@ function reset(): void {
                         <q-icon name="clock" class="cursor-pointer" />
                         <q-popup-proxy transition-show="scale" transition-hide="scale">
                             <q-time
-                                v-model="editableSettings.event.eventStartTime24HFormat"
+                                v-model="
+                                    editableSettings.organisation.event.eventStartTime24HFormat
+                                "
                                 format="24h"
                             />
                         </q-popup-proxy>
@@ -121,7 +190,7 @@ function reset(): void {
                 <q-input
                     rounded
                     standout
-                    v-model.number="editableSettings.event.eventDurationInHours"
+                    v-model.number="editableSettings.organisation.event.eventDurationInHours"
                 />
             </SettingsSection>
 
@@ -129,7 +198,7 @@ function reset(): void {
                 <q-select
                     rounded
                     standout
-                    v-model="editableSettings.event.eventCardAspectRatio"
+                    v-model="editableSettings.organisation.event.eventCardAspectRatio"
                     :options="aspectRatioOptions"
                 />
             </SettingsSection>
@@ -144,15 +213,15 @@ function reset(): void {
                     stretch
                     :title="colorSetting.title"
                     :style="{
-                        'background-color': editableSettings.event[colorSetting.key],
+                        'background-color': editableSettings.organisation.event[colorSetting.key],
                     }"
                     icon="color-picker"
                     push
-                    :label="editableSettings.event[colorSetting.key]"
+                    :label="editableSettings.organisation.event[colorSetting.key]"
                     stack
                 >
                     <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                        <q-color v-model="editableSettings.event[colorSetting.key]" />
+                        <q-color v-model="editableSettings.organisation.event[colorSetting.key]" />
                     </q-popup-proxy>
                 </q-btn>
             </SettingsSection>
@@ -161,10 +230,27 @@ function reset(): void {
         <AppCardSection title="Guest">
             <SettingsSection title="Collect guest data">
                 <q-toggle
-                    v-model="editableSettings.guest.collectGuestData"
-                    :label="editableSettings.guest.collectGuestData ? 'On' : 'Off'"
+                    v-model="editableSettings.organisation.guest.collectGuestData"
+                    :label="editableSettings.organisation.guest.collectGuestData ? 'On' : 'Off'"
                 />
             </SettingsSection>
+        </AppCardSection>
+
+        <AppCardSection title="Properties">
+            <div v-for="property in properties" :key="property.id">
+                <SettingsSection
+                    :title="property.name"
+                    v-if="editableSettings.properties[property.id]"
+                >
+                    <q-select
+                        rounded
+                        standout
+                        v-model="editableSettings.properties[property.id].timezone"
+                        :options="timezones"
+                        label="Timezone"
+                    />
+                </SettingsSection>
+            </div>
         </AppCardSection>
     </div>
 </template>

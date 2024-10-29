@@ -1,4 +1,4 @@
-import type { OrganisationDoc, PropertyDoc } from "@firetable/types";
+import type { OrganisationDoc, PropertyDoc, PropertySettings } from "@firetable/types";
 import type { HttpsCallableResult } from "firebase/functions";
 import { propertiesCollection, propertyDoc } from "./db.js";
 import { initializeFirebase } from "./base.js";
@@ -33,6 +33,14 @@ export function updateProperty(updatedProperty: UpdatePropertyPayload): Promise<
         propertyDoc(updatedProperty.id, updatedProperty.organisationId),
         updatedProperty,
     );
+}
+
+export async function updatePropertySettings(
+    organisationId: string,
+    propertyId: string,
+    settings: PropertySettings,
+): Promise<void> {
+    await updateDoc(propertyDoc(propertyId, organisationId), { settings });
 }
 
 export function deleteProperty(property: PropertyDoc): Promise<void> {

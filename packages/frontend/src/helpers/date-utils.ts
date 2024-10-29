@@ -3,6 +3,8 @@ import { isNumber } from "es-toolkit/compat";
 
 const LOCALE = "de-DE";
 
+export const timezones = Intl.supportedValuesOf("timeZone").sort();
+
 /**
  * Pass null as timeZone to show time in current time zone
  *
@@ -63,4 +65,8 @@ export function getFormatedDateFromTimestamp(timestamp: FirestoreTimestamp | num
         return formatEventDate(timestamp, null);
     }
     return formatEventDate(timestamp.toMillis(), null);
+}
+
+export function getDefaultTimezone(): string {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
 }

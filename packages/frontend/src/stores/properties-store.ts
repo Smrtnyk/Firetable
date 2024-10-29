@@ -3,6 +3,7 @@ import type {
     OrganisationDoc,
     OrganisationSettings,
     PropertyDoc,
+    PropertySettings,
     User,
 } from "@firetable/types";
 import type { noop } from "es-toolkit";
@@ -19,6 +20,11 @@ import { createQuery, useFirestoreCollection } from "src/composables/useFirestor
 import { documentId, query, where } from "firebase/firestore";
 import { nextTick, ref, watch } from "vue";
 import { matchesProperty } from "es-toolkit/compat";
+import { getDefaultTimezone } from "src/helpers/date-utils";
+
+const DEFAULT_PROPERTY_SETTINGS = {
+    timezone: getDefaultTimezone(),
+};
 
 export const DEFAULT_ORGANISATION_SETTINGS: DeepRequired<OrganisationSettings> = {
     event: {
@@ -73,6 +79,14 @@ export const usePropertiesStore = defineStore("properties", function () {
     function getOrganisationSettingsById(organisationId: string): OrganisationSettings {
         const settings = getOrganisationById(organisationId)?.settings ?? {};
         return merge(DEFAULT_ORGANISATION_SETTINGS, settings);
+    }
+
+    function getPropertySettingsById(propertyId: string): PropertySettings {
+        const property = properties.value.find(matchesProperty("id", propertyId));
+        if (!property) {
+            throw new Error("No property found for the given property id");
+        }
+        return merge(DEFAULT_PROPERTY_SETTINGS, property.settings ?? {});
     }
 
     function getPropertiesByOrganisationId(organisationId: string): PropertyDoc[] {
@@ -163,6 +177,7 @@ export const usePropertiesStore = defineStore("properties", function () {
         properties,
         organisations,
         arePropertiesLoading,
+        getPropertySettingsById,
         getOrganisationById,
         getPropertiesByOrganisationId,
         getOrganisationSettingsById,
