@@ -18,7 +18,12 @@ import {
 
 import { QForm } from "quasar";
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import { createUTCTimestamp, dateFromTimestamp, hourFromTimestamp } from "src/helpers/date-utils";
+import {
+    createTodayUTCTimestamp,
+    createUTCTimestamp,
+    dateFromTimestamp,
+    hourFromTimestamp,
+} from "src/helpers/date-utils";
 
 interface State {
     form: CreateEventForm;
@@ -45,15 +50,14 @@ const emit = defineEmits<{
     (event: "update", payload: EditEventPayload): void;
 }>();
 
-// Default date creation should use property timezone
-const newDate = new Date();
+const { t, locale } = useI18n();
+
 // Set to eventStartHours in property timezone
-const [hours, minutes] = props.eventStartHours.split(":");
-newDate.setHours(Number.parseInt(hours), Number.parseInt(minutes), 0, 0);
+const initialDate = createTodayUTCTimestamp(props.eventStartHours, props.propertyTimezone);
 
 const eventObj: CreateEventForm = {
     name: "",
-    date: newDate.getTime(),
+    date: initialDate,
     guestListLimit: 100,
     entryPrice: 0,
     img: "",
@@ -62,7 +66,6 @@ const eventObj: CreateEventForm = {
 const isEditMode = computed(function () {
     return Boolean(props.event);
 });
-const { t, locale } = useI18n();
 const form = useTemplateRef<QForm>("form");
 const state = ref<State>({
     form: { ...eventObj },

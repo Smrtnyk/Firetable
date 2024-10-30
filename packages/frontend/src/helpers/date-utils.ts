@@ -5,6 +5,43 @@ export const timezones = Intl.supportedValuesOf("timeZone").sort();
 export const UTC = "UTC";
 
 /**
+ * Gets today's date in specified timezone formatted as DD.MM.YYYY
+ *
+ * @param timezone - Timezone to use for the date
+ * @returns Date string in DD.MM.YYYY format
+ */
+export function getTodayInTimezone(timezone: string): string {
+    const formatter = new Intl.DateTimeFormat("en-US", {
+        timeZone: timezone,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+    });
+
+    const dateParts = formatter.formatToParts(new Date());
+    const dateObj = dateParts.reduce<Record<string, string>>((acc, part) => {
+        if (["year", "month", "day"].includes(part.type)) {
+            acc[part.type] = part.value;
+        }
+        return acc;
+    }, {});
+
+    return `${dateObj.day}.${dateObj.month}.${dateObj.year}`;
+}
+
+/**
+ * Creates a UTC timestamp for today with specified time in given timezone
+ *
+ * @param time - Time in HH:mm format
+ * @param timezone - Timezone to use
+ * @returns UTC timestamp in milliseconds
+ */
+export function createTodayUTCTimestamp(time: string, timezone: string): number {
+    const todayFormatted = getTodayInTimezone(timezone);
+    return createUTCTimestamp(todayFormatted, time, timezone);
+}
+
+/**
  * Converts a date string and time string to UTC timestamp considering the timezone
  *
  * @param dateStr Date in DD.MM.YYYY format
