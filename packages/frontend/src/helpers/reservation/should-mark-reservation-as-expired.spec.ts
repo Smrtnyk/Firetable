@@ -61,9 +61,10 @@ describe("shouldMarkReservationAsExpired", () => {
 
     it("returns false when current time is less than 30 minutes after eventDateTime", () => {
         const reservationTime = "23:30";
-        const eventDate = new Date("2023-10-14");
-        // 20 minutes later
-        const currentDate = new Date("2023-10-14T23:50:00");
+        // Event starts at 22:00 UTC (midnight Vienna time)
+        const eventDate = new Date("2023-10-14T22:00:00.000Z");
+        // Set current time to 23:50 Vienna time (21:50 UTC)
+        const currentDate = new Date("2023-10-14T21:50:00.000Z");
         vi.setSystemTime(currentDate);
 
         const result = shouldMarkReservationAsExpired(reservationTime, eventDate, viennaTimezone);
