@@ -21,7 +21,7 @@ const subtitleClass = computed(() => {
     <q-card class="ft-card q-pa-sm q-mb-md">
         <div class="FTTitle items-center">
             <div>
-                <h3 role="heading" aria-level="3" :class="['ft-title', 'q-ma-none', titleClass]">
+                <h3 aria-level="3" :class="['ft-title', 'q-ma-none', titleClass]">
                     {{ title }}
                 </h3>
                 <h6 v-if="subtitle" :class="['ft-subtitle', 'q-ma-none', subtitleClass]">

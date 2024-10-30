@@ -50,7 +50,7 @@ export function getFirestoreDocument(path: string): DocumentReference {
 }
 
 export function createQuery<T>(
-    collectionRefOrPath: any | string,
+    collectionRefOrPath: any,
     ...queryConstraints: QueryConstraint[]
 ): Query<T> {
     if (isString(collectionRefOrPath)) {

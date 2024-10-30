@@ -1,7 +1,9 @@
 import type { FirestoreTimestamp } from "@firetable/types";
 import { isNumber } from "es-toolkit/compat";
 
-export const timezones = Intl.supportedValuesOf("timeZone").sort();
+export const timezones = Intl.supportedValuesOf("timeZone").sort(function (a, b) {
+    return a.localeCompare(b, undefined, { sensitivity: "base" });
+});
 export const UTC = "UTC";
 
 /**

@@ -273,7 +273,7 @@ export function useReservationsAnalytics(
                 },
                 {},
             ),
-        ).sort();
+        ).sort((a, b) => Number(a) - Number(b));
     });
 
     const propertyLabels = computed(() => {
@@ -288,7 +288,7 @@ export function useReservationsAnalytics(
             return acc;
         }, {});
 
-        const labels = Object.keys(distribution).sort();
+        const labels = sortNumericStrings(Object.keys(distribution));
         const { backgroundColors } = getColors(1);
 
         return [
@@ -403,4 +403,8 @@ export function useReservationsAnalytics(
 
 function toTwoDecimals(num: number): number {
     return Number.parseFloat(num.toFixed(2));
+}
+
+function sortNumericStrings(strings: string[]): string[] {
+    return strings.sort((a, b) => Number(a) - Number(b));
 }

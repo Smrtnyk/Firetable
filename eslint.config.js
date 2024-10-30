@@ -380,7 +380,6 @@ export default tseslint.config(
             "no-loop-func": "error",
             "no-lonely-if": "error",
             "no-param-reassign": "error",
-            "no-plusplus": ["error", { allowForLoopAfterthoughts: true }],
             "no-return-assign": "error",
             "no-underscore-dangle": [
                 "error",
