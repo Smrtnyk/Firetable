@@ -26,8 +26,8 @@
         "vite-tsconfig-paths": "5.0.1",
         "vitest": "catalog:",
         "vitest-browser-vue": "0.0.1",
-        "vue-component-type-helpers": "2.1.8",
-        "vue-tsc": "2.1.8"
+        "vue-component-type-helpers": "2.1.10",
+        "vue-tsc": "2.1.10"
     },
     "dependencies": {
         "@firetable/backend": "workspace:*",
@@ -36,7 +36,7 @@
         "@posva/event-emitter": "catalog:",
         "@quasar/extras": "1.16.12",
         "@types/pako": "2.0.3",
-        "@vueuse/core": "11.1.0",
+        "@vueuse/core": "11.2.0",
         "@zxing/browser": "0.1.5",
         "date-fns": "4.1.0",
         "echarts": "5.5.1",
