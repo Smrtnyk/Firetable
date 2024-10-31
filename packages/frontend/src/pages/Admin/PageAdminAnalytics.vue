@@ -85,6 +85,22 @@ const chartInfos = computed(function () {
         },
     ] as const;
 });
+
+const hasPropertyData = computed(function (): boolean {
+    if (!selectedTab.value) {
+        return false;
+    }
+
+    const bucket = reservationBuckets.value.find(function (b) {
+        return b.propertyId === selectedTab.value;
+    });
+    return (
+        bucket !== undefined &&
+        Object.values(bucket).some((value) =>
+            Array.isArray(value) ? value.length > 0 : value !== null && value !== undefined,
+        )
+    );
+});
 </script>
 
 <template>
@@ -121,12 +137,16 @@ const chartInfos = computed(function () {
 
             <FTTabPanels v-model="selectedTab" class="bg-transparent">
                 <q-tab-panel
-                    v-for="bucket in reservationBuckets"
-                    :key="bucket.propertyName"
-                    :name="bucket.propertyId"
+                    v-for="property in properties"
+                    :key="property.id"
+                    :name="property.id"
                     class="q-pa-none"
                 >
-                    <div class="row q-col-gutter-sm q-col-gutter-md-md">
+                    <FTCenteredText v-if="!hasPropertyData">
+                        No Data For this property
+                    </FTCenteredText>
+
+                    <div v-else class="row q-col-gutter-sm q-col-gutter-md-md">
                         <div class="col-12">
                             <q-chip color="primary">
                                 Avg Guests per planned reservation:
