@@ -73,10 +73,10 @@ function scrollToBottom(): void {
 </script>
 
 <template>
-    <div class="AdminEventLogs">
+    <q-card class="ft-card AdminEventLogs q-pa-sm">
         <div v-if="logs.length > 0">
             <q-scroll-area ref="logsContainer" class="logs-container" @scroll="handleScroll">
-                <q-timeline color="primary">
+                <q-timeline color="primary" class="q-ml-sm q-mt-none">
                     <q-timeline-entry
                         v-for="log of logs"
                         :key="log.timestamp.toString()"
@@ -100,17 +100,12 @@ function scrollToBottom(): void {
             </q-page-sticky>
         </div>
         <FTCenteredText v-else>No logs recorded for this event.</FTCenteredText>
-    </div>
+    </q-card>
 </template>
 
 <style lang="scss">
 .logs-container {
     height: calc(100vh - 200px);
-    margin-bottom: 16px;
-
-    .q-scrollarea__container {
-        padding-left: 16px !important;
-    }
 }
 .scroll-to-bottom {
     z-index: 999999;

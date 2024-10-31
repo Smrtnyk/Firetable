@@ -337,13 +337,11 @@ onMounted(init);
 
             <!-- Logs -->
             <q-tab-panel name="logs" class="q-px-none q-py-none">
-                <AppCardSection title="">
-                    <AdminEventLogs
-                        :timezone="propertySettings.timezone"
-                        :logs-doc="logs"
-                        :is-admin="authStore.isAdmin"
-                    />
-                </AppCardSection>
+                <AdminEventLogs
+                    :timezone="propertySettings.timezone"
+                    :logs-doc="logs"
+                    :is-admin="authStore.isAdmin"
+                />
             </q-tab-panel>
         </FTTabPanels>
     </div>
