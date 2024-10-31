@@ -8,7 +8,7 @@ import { showErrorMessage } from "src/helpers/ui-helpers";
 export function useUsers(organisationId: string) {
     const { properties } = storeToRefs(usePropertiesStore());
     const users = ref<User[]>([]);
-    const isLoading = ref<boolean>(true);
+    const isLoading = ref(true);
 
     async function fetchUsers(): Promise<void> {
         try {
