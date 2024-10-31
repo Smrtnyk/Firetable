@@ -34,7 +34,7 @@ function getIconNameForLogEntry(logMessage: string): string {
         return "trash";
     }
 
-    if (logMessage.includes("transferred")) {
+    if (logMessage.includes("transferred") || logMessage.includes("swapped")) {
         return "transfer";
     }
 

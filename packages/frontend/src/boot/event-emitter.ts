@@ -3,6 +3,15 @@ import type { EventOwner } from "@firetable/backend";
 import type { BaseTable } from "@firetable/floor-creator";
 import { EventEmitter } from "@posva/event-emitter";
 
+type TransferEventData = {
+    fromTable: BaseTable;
+    toTable: BaseTable;
+    eventOwner: EventOwner;
+    fromFloor?: string;
+    toFloor?: string;
+    targetReservation: ReservationDoc | undefined;
+};
+
 type Events = {
     "reservation:created": {
         reservation: Reservation;
@@ -29,11 +38,7 @@ type Events = {
         targetTable: BaseTable;
         eventOwner: EventOwner;
     };
-    "reservation:transferred": {
-        fromTable: BaseTable;
-        toTable: BaseTable;
-        eventOwner: EventOwner;
-    };
+    "reservation:transferred": TransferEventData;
     "reservation:arrived": {
         reservation: ReservationDoc;
         eventOwner: EventOwner;

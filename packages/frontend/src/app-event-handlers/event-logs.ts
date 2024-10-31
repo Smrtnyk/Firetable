@@ -27,11 +27,33 @@ eventEmitter.on("reservation:copied", function ({ sourceReservation, targetTable
     );
 });
 
-eventEmitter.on("reservation:transferred", function ({ fromTable, toTable, eventOwner }) {
-    createEventLog(
-        `Reservation transferred from table ${fromTable.label} to table ${toTable.label}`,
-        eventOwner,
-    );
+eventEmitter.on("reservation:transferred", function (data) {
+    const { fromTable, toTable, eventOwner, fromFloor, toFloor, targetReservation } = data;
+
+    let message = "";
+
+    // Cross-floor operation
+    if (fromFloor && toFloor && fromFloor !== toFloor) {
+        message = targetReservation
+            ? `Reservation swapped between table ${fromTable.label} (${fromFloor}) and table ${toTable.label} (${toFloor})`
+            : `Reservation transferred from table ${fromTable.label} (${fromFloor}) to empty table ${toTable.label} (${toFloor})`;
+    }
+    // Same floor operation
+    else if (targetReservation) {
+        message = `Reservation swapped between table ${fromTable.label} and table ${toTable.label}`;
+    } else {
+        message = `Reservation transferred from table ${fromTable.label} to empty table ${toTable.label}`;
+    }
+
+    createEventLog(message, eventOwner);
+});
+
+eventEmitter.on("reservation:arrived", function ({ reservation, eventOwner }) {
+    createEventLog(`Guest arrived for reservation on table ${reservation.tableLabel}`, eventOwner);
+});
+
+eventEmitter.on("reservation:cancelled", function ({ reservation, eventOwner }) {
+    createEventLog(`Reservation cancelled on table ${reservation.tableLabel}`, eventOwner);
 });
 
 function createEventLog(message: string, eventOwner: EventOwner): void {

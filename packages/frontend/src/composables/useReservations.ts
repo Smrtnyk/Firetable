@@ -1,6 +1,6 @@
 import type { Ref, ShallowRef } from "vue";
 import type { BaseTable, Floor, FloorEditorElement, FloorViewer } from "@firetable/floor-creator";
-import type { EventOwner } from "@firetable/backend";
+import type { EventOwner } from "../backend-proxy";
 import type { DialogChainObject } from "quasar";
 import type { VueFirestoreDocumentData } from "vuefire";
 import type {
@@ -19,7 +19,7 @@ import {
     addReservation,
     deleteReservation,
     updateReservationDoc,
-} from "@firetable/backend";
+} from "../backend-proxy";
 import { isTable } from "@firetable/floor-creator";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import { Notify } from "quasar";
@@ -660,6 +660,7 @@ export function useReservations(
                     fromTable: table1,
                     toTable: table2,
                     eventOwner,
+                    targetReservation: reservationTable2,
                 });
             },
         });
@@ -748,8 +749,16 @@ export function useReservations(
         }
 
         await tryCatchLoadingWrapper({
-            hook() {
-                return Promise.all(promises);
+            async hook() {
+                await Promise.all(promises);
+                eventEmitter.emit("reservation:transferred", {
+                    fromTable: table1,
+                    toTable: table2,
+                    eventOwner,
+                    fromFloor: floor1.name,
+                    toFloor: floor2.name,
+                    targetReservation: reservationTable2,
+                });
             },
         });
     }
