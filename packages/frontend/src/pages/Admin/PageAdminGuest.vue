@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CreateGuestPayload, GuestDoc, Visit } from "@firetable/types";
+import { formatEventDate, getDefaultTimezone } from "src/helpers/date-utils";
 import { useFirestoreDocument } from "src/composables/useFirestore";
 import { deleteGuest, getGuestPath, updateGuestInfo } from "@firetable/backend";
 import { computed, ref, watch } from "vue";
@@ -37,7 +38,7 @@ const { createDialog } = useDialog();
 const guestsStore = useGuestsStore();
 const propertiesStore = usePropertiesStore();
 const { properties } = storeToRefs(propertiesStore);
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const { organisationId, guestId } = defineProps<PageAdminGuestProps>();
 const { data: guest } = useFirestoreDocument<GuestDoc>(getGuestPath(organisationId, guestId));
 
@@ -164,6 +165,13 @@ async function onDeleteGuest(): Promise<void> {
                 </template>
             </FTTitle>
 
+            <div class="q-mb-sm q-ml-sm" v-if="guest.lastModified">
+                <span class="text-caption"
+                    >Last modified:
+                    {{ formatEventDate(guest.lastModified, locale, getDefaultTimezone()) }}</span
+                >
+            </div>
+
             <div v-if="Object.keys(propertiesVisits).length > 0">
                 <!-- Check if there are multiple properties -->
                 <template v-if="Object.keys(propertiesVisits).length > 1">
@@ -175,6 +183,7 @@ async function onDeleteGuest(): Promise<void> {
                             :label="item.name"
                         />
                     </FTTabs>
+
                     <FTTabPanels v-model="tab">
                         <q-tab-panel
                             v-for="(item, propertyId) in propertiesVisits"
