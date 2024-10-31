@@ -11,6 +11,8 @@ import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { matchesProperty } from "es-toolkit/compat";
 import { useDialog } from "src/composables/useDialog";
+import { useGuestsStore } from "src/stores/guests-store";
+import { useAuthStore } from "src/stores/auth-store";
 
 import FTTitle from "src/components/FTTitle.vue";
 import FTTabs from "src/components/FTTabs.vue";
@@ -20,7 +22,6 @@ import FTDialog from "src/components/FTDialog.vue";
 import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
 import FTBtn from "src/components/FTBtn.vue";
 import AdminGuestVisitsTimeline from "src/components/admin/guest/AdminGuestVisitsTimeline.vue";
-import { useGuestsStore } from "src/stores/guests-store";
 
 export interface PageAdminGuestProps {
     organisationId: string;
@@ -37,6 +38,7 @@ const router = useRouter();
 const { createDialog } = useDialog();
 const guestsStore = useGuestsStore();
 const propertiesStore = usePropertiesStore();
+const { isAdmin } = storeToRefs(useAuthStore());
 const { properties } = storeToRefs(propertiesStore);
 const { t, locale } = useI18n();
 const { organisationId, guestId } = defineProps<PageAdminGuestProps>();
@@ -165,7 +167,7 @@ async function onDeleteGuest(): Promise<void> {
                 </template>
             </FTTitle>
 
-            <div class="q-mb-sm q-ml-sm" v-if="guest.lastModified">
+            <div class="q-mb-sm q-ml-sm" v-if="guest.lastModified && isAdmin">
                 <span class="text-caption"
                     >Last modified:
                     {{ formatEventDate(guest.lastModified, locale, getDefaultTimezone()) }}</span
