@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import type { GuestInGuestListData, VoidFunction } from "@firetable/types";
-import type { EventOwner } from "@firetable/backend";
+import type { EventOwner } from "../../backend-proxy";
+import {
+    addGuestToGuestList,
+    confirmGuestFromGuestList,
+    deleteGuestFromGuestList,
+} from "../../backend-proxy";
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { computed } from "vue";
 import { useEventsStore } from "src/stores/events-store";
@@ -14,11 +19,6 @@ import FTBtn from "src/components/FTBtn.vue";
 
 import { useQuasar } from "quasar";
 import { ADMIN, Role } from "@firetable/types";
-import {
-    addGuestToGuestList,
-    confirmGuestFromGuestList,
-    deleteGuestFromGuestList,
-} from "@firetable/backend";
 import { useI18n } from "vue-i18n";
 import { useAuthStore } from "src/stores/auth-store";
 

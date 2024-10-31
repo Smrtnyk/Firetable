@@ -9,7 +9,10 @@ export function confirmGuestFromGuestList(
     guestID: string,
     confirmed: boolean,
 ): Promise<void> {
-    return updateDoc(guestListDoc(owner, guestID), { confirmed });
+    return updateDoc(guestListDoc(owner, guestID), {
+        confirmed,
+        confirmedTime: confirmed ? Date.now() : null,
+    });
 }
 
 export function deleteGuestFromGuestList(owner: EventOwner, guestID: string): Promise<void> {
