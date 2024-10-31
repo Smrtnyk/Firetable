@@ -46,9 +46,10 @@ function formatSubtitleForGuestVisit(visit: Visit): string {
 </script>
 
 <template>
-    <q-card class="ft-card q-px-xs">
+    <q-card class="ft-card q-pa-xs q-pa-md-md">
         <q-timeline color="primary">
             <q-timeline-entry
+                class="q-ml-md"
                 v-for="(visit, index) in visits"
                 :key="visit.date + index"
                 :color="getVisitColor(visit)"
