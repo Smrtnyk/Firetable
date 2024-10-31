@@ -115,6 +115,8 @@ async function onOKClick(): Promise<void> {
             v-if="!props.onlyPlanned && props.mode === 'create'"
             v-model="reservationType"
             no-caps
+            rounded
+            spread
             unelevated
             :options="[
                 { label: 'Planned', value: ReservationType.PLANNED },
