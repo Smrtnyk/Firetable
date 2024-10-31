@@ -1,8 +1,8 @@
 import type { RenderResult } from "vitest-browser-vue";
 import type { AppUser, GuestDoc, PropertyDoc, Visit } from "@firetable/types";
 import type { PageAdminGuestsProps } from "./PageAdminGuests.vue";
-import type { Ref } from "vue";
 
+import type { Ref } from "vue";
 import PageAdminGuests from "./PageAdminGuests.vue";
 import { renderComponent, t } from "../../../test-helpers/render-component";
 import FTDialog from "src/components/FTDialog.vue";
@@ -13,9 +13,8 @@ import { ref } from "vue";
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 
-const { createDialogSpy, useFirestoreCollectionMock } = vi.hoisted(() => ({
+const { createDialogSpy } = vi.hoisted(() => ({
     createDialogSpy: vi.fn(),
-    useFirestoreCollectionMock: vi.fn(),
 }));
 
 vi.mock("src/composables/useDialog", () => ({
@@ -24,16 +23,17 @@ vi.mock("src/composables/useDialog", () => ({
     }),
 }));
 
-vi.mock("src/composables/useFirestore", () => ({
-    useFirestoreCollection: useFirestoreCollectionMock,
-    useFirestoreDocument: vi.fn(),
-    createQuery: vi.fn(),
-}));
+type GuestsState = {
+    data: GuestDoc[];
+    pending: boolean;
+};
 
 describe("PageAdminGuests.vue", () => {
-    let guestsData: Ref<GuestDoc[]>;
+    let guestsData: GuestDoc[];
     let propertiesData: PropertyDoc[];
     let authState: { user: AppUser };
+    let guestsRef: Ref<GuestsState>;
+    let refsMap: Map<string, Ref<GuestsState>>;
 
     beforeEach(() => {
         authState = {
@@ -49,7 +49,7 @@ describe("PageAdminGuests.vue", () => {
                 capabilities: undefined,
             },
         };
-        guestsData = ref([
+        guestsData = [
             {
                 id: "guest1",
                 name: "John Doe",
@@ -86,17 +86,21 @@ describe("PageAdminGuests.vue", () => {
                 maskedContact: "maskedContact",
                 visitedProperties: {},
             } as GuestDoc,
-        ]);
+        ];
 
         propertiesData = [
             { id: "property1", name: "Property One" } as PropertyDoc,
             { id: "property2", name: "Property Two" } as PropertyDoc,
         ];
 
-        useFirestoreCollectionMock.mockReturnValue({
+        // Initialize refs at the test level
+        guestsRef = ref<GuestsState>({
             data: guestsData,
-            pending: ref(false),
+            pending: false,
         });
+
+        refsMap = new Map();
+        refsMap.set("org1", guestsRef);
     });
 
     async function render(
@@ -109,6 +113,11 @@ describe("PageAdminGuests.vue", () => {
                         properties: propertiesData,
                     },
                     auth: authState,
+                    guests: {
+                        refsMap,
+                        unsubMap: new Map(),
+                        guestsCache: new Map(),
+                    },
                 },
             },
         });
@@ -155,11 +164,7 @@ describe("PageAdminGuests.vue", () => {
     });
 
     it("shows 'No guests data' when there are no guests", async () => {
-        guestsData = ref<GuestDoc[]>([]);
-        useFirestoreCollectionMock.mockReturnValue({
-            data: guestsData,
-            pending: ref(false),
-        });
+        guestsRef.value.data = [];
 
         const screen = await render();
 
@@ -286,10 +291,7 @@ describe("PageAdminGuests.vue", () => {
     });
 
     it("does not render search and filter controls when there are no guests", async () => {
-        useFirestoreCollectionMock.mockReturnValue({
-            data: ref([]),
-            pending: ref(false),
-        });
+        guestsRef.value.data = [];
 
         const screen = await render();
 
@@ -300,7 +302,7 @@ describe("PageAdminGuests.vue", () => {
     describe("user role-based guest filtering", () => {
         it("renders all guests for admin users", async () => {
             // Admin is default in the test setup
-            guestsData = ref([
+            guestsRef.value.data = [
                 {
                     id: "guest1",
                     name: "John Doe",
@@ -337,12 +339,7 @@ describe("PageAdminGuests.vue", () => {
                     maskedContact: "maskedContact",
                     visitedProperties: {},
                 } as GuestDoc,
-            ]);
-
-            useFirestoreCollectionMock.mockReturnValue({
-                data: guestsData,
-                pending: ref(false),
-            });
+            ];
 
             const screen = await render();
 
@@ -365,7 +362,7 @@ describe("PageAdminGuests.vue", () => {
                 },
             };
 
-            guestsData = ref([
+            guestsRef.value.data = [
                 {
                     id: "guest1",
                     name: "John Doe",
@@ -402,12 +399,7 @@ describe("PageAdminGuests.vue", () => {
                     maskedContact: "maskedContact",
                     visitedProperties: {},
                 } as GuestDoc,
-            ]);
-
-            useFirestoreCollectionMock.mockReturnValue({
-                data: guestsData,
-                pending: ref(false),
-            });
+            ];
 
             const screen = await render();
 
@@ -438,7 +430,7 @@ describe("PageAdminGuests.vue", () => {
                 },
             };
 
-            guestsData = ref([
+            guestsRef.value.data = [
                 {
                     id: "guest1",
                     name: "John Doe",
@@ -471,12 +463,7 @@ describe("PageAdminGuests.vue", () => {
                     maskedContact: "maskedContact",
                     visitedProperties: {},
                 } as GuestDoc,
-            ]);
-
-            useFirestoreCollectionMock.mockReturnValue({
-                data: guestsData,
-                pending: ref(false),
-            });
+            ];
 
             const screen = await render();
 

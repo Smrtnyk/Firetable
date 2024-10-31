@@ -236,6 +236,7 @@ export const useGuestsStore = defineStore("guests", function () {
     }
 
     return {
+        refsMap,
         cleanup,
         getGuestByHashedContact,
         invalidateGuestCache,
