@@ -7,7 +7,10 @@ export default function (): Router {
         process.env.VUE_ROUTER_MODE === "history" ? createWebHistory : createWebHashHistory;
 
     return createRouter({
-        scrollBehavior() {
+        scrollBehavior(_0, _1, savedPosition) {
+            if (savedPosition) {
+                return savedPosition;
+            }
             return { left: 0, top: 0 };
         },
         routes,
