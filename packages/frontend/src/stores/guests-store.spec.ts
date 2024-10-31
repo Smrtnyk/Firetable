@@ -8,14 +8,20 @@ import { createApp, ref } from "vue";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { useAuthStore } from "src/stores/auth-store";
 
-const { useFirestoreCollectionSpy } = vi.hoisted(() => ({
+const { useFirestoreCollectionSpy, subscribeToGuestsSpy } = vi.hoisted(() => ({
     useFirestoreCollectionSpy: vi.fn(),
+    subscribeToGuestsSpy: vi.fn(),
 }));
 
 vi.mock("src/composables/useFirestore", () => ({
     useFirestoreCollection: useFirestoreCollectionSpy,
     useFirestoreDocument: vi.fn(),
     createQuery: vi.fn(),
+}));
+
+vi.mock("../backend-proxy", () => ({
+    getGuestsPath: (orgId: string) => `organisations/${orgId}/guests`,
+    subscribeToGuests: subscribeToGuestsSpy,
 }));
 
 // Test helpers and fixtures
@@ -182,10 +188,11 @@ describe("Guests Store", () => {
             const { guestsStore } = setupTestStores();
             const result = guestsStore.getGuests("org1");
 
-            expect(result).toBeDefined();
-            expect(useFirestoreCollectionSpy).toHaveBeenCalledWith("organisations/org1/guests", {
-                wait: true,
+            expect(result.value).toEqual({
+                data: [],
+                pending: true,
             });
+            expect(subscribeToGuestsSpy).toHaveBeenCalledWith("org1", expect.any(Object));
         });
 
         it("caches the refs for the organisationId", () => {
@@ -194,8 +201,101 @@ describe("Guests Store", () => {
             const result1 = guestsStore.getGuests("org1");
             const result2 = guestsStore.getGuests("org1");
 
-            expect(result1).toBe(result2);
-            expect(useFirestoreCollectionSpy).toHaveBeenCalledTimes(1);
+            expect(result1).toStrictEqual(result2);
+            expect(subscribeToGuestsSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("creates new subscription after cleanup", () => {
+            const { guestsStore } = setupTestStores();
+            const unsubscribe = vi.fn();
+            subscribeToGuestsSpy.mockReturnValue(unsubscribe);
+
+            // First call
+            const result1 = guestsStore.getGuests("org1");
+            expect(subscribeToGuestsSpy).toHaveBeenCalledTimes(1);
+
+            // Cleanup subscriptions
+            guestsStore.cleanup();
+            expect(unsubscribe).toHaveBeenCalled();
+
+            // Second call should create new subscription
+            const result2 = guestsStore.getGuests("org1");
+            expect(subscribeToGuestsSpy).toHaveBeenCalledTimes(2);
+            expect(result2).not.toBe(result1);
+        });
+
+        it("handles subscription callbacks correctly", () => {
+            const { guestsStore } = setupTestStores();
+            const guestDoc = createTestGuest();
+
+            const result = guestsStore.getGuests("org1");
+            expect(result.value.pending).toBe(true);
+
+            // Get the callbacks that were passed to subscribeToGuests
+            const callbacks = subscribeToGuestsSpy.mock.calls[0][1];
+
+            // Test onAdd
+            callbacks.onAdd(guestDoc);
+            expect(result.value).toEqual({
+                data: [guestDoc],
+                pending: false,
+            });
+
+            // Test onModify
+            const modifiedGuest = { ...guestDoc, name: "Modified Name" };
+            callbacks.onModify(modifiedGuest);
+            expect(result.value).toEqual({
+                data: [modifiedGuest],
+                pending: false,
+            });
+
+            // Test onRemove
+            callbacks.onRemove(guestDoc.id);
+            expect(result.value).toEqual({
+                data: [],
+                pending: false,
+            });
+
+            // Test onError
+            const error = new Error("Test error");
+            callbacks.onError(error);
+            expect(result.value.pending).toBe(false);
+        });
+
+        it("maintains guest cache through subscription updates", () => {
+            const { guestsStore } = setupTestStores();
+            const guestDoc = createTestGuest();
+
+            guestsStore.getGuests("org1");
+            const callbacks = subscribeToGuestsSpy.mock.calls[0][1];
+
+            // Add guest through subscription
+            callbacks.onAdd(guestDoc);
+
+            // Check if guest is cached
+            expect(
+                guestsStore.getGuestByHashedContact("org1", guestDoc.hashedContact),
+            ).resolves.toEqual(guestDoc);
+
+            // Modify guest through subscription
+            const modifiedGuest = { ...guestDoc, name: "Modified Name" };
+            callbacks.onModify(modifiedGuest);
+
+            // Check if cache is updated
+            expect(
+                guestsStore.getGuestByHashedContact("org1", modifiedGuest.hashedContact),
+            ).resolves.toEqual(modifiedGuest);
+        });
+
+        it("cleans up subscriptions correctly", () => {
+            const { guestsStore } = setupTestStores();
+            const unsubscribe = vi.fn();
+            subscribeToGuestsSpy.mockReturnValue(unsubscribe);
+            guestsStore.getGuests("org1");
+            guestsStore.getGuests("org2");
+            guestsStore.cleanup();
+
+            expect(unsubscribe).toHaveBeenCalledTimes(2);
         });
     });
 

@@ -7,6 +7,7 @@ import { getCurrentUser, useCurrentUser, VueFire, VueFireAuth } from "vuefire";
 import { watch } from "vue";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { isFunction } from "es-toolkit";
+import { useGuestsStore } from "src/stores/guests-store";
 
 export default boot(function ({ router, app }) {
     const { firebaseApp } = initializeFirebase();
@@ -102,10 +103,12 @@ function handleOnAuthStateChanged(
                 await authStore.initUser(currentUser.value);
             } else {
                 const propertiesStore = usePropertiesStore();
+                const guestsStore = useGuestsStore();
+                authStore.cleanup();
+                guestsStore.cleanup();
+                propertiesStore.cleanup();
                 // If the user loses authentication route
                 // redirect them to the login page
-                authStore.cleanup();
-                propertiesStore.cleanup();
                 router.replace({ path: "/auth" }).catch(showErrorMessage);
             }
         },

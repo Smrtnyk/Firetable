@@ -1,10 +1,17 @@
-import type { CreateGuestPayload, GuestDataPayload } from "@firetable/types";
+import type { CreateGuestPayload, GuestDataPayload, GuestDoc } from "@firetable/types";
 import type { HttpsCallableResult } from "firebase/functions";
 import { initializeFirebase } from "./base.js";
 import { guestDoc } from "./db.js";
 import { getGuestsPath } from "./paths.js";
-import { deleteDoc, addDoc, collection } from "firebase/firestore";
+import { deleteDoc, addDoc, collection, onSnapshot } from "firebase/firestore";
 import { httpsCallable } from "firebase/functions";
+
+export type GuestsSubscriptionCallback = {
+    onAdd: (guest: GuestDoc) => void;
+    onModify: (guest: GuestDoc) => void;
+    onRemove: (guestId: string) => void;
+    onError?: (error: Error) => void;
+};
 
 export function setGuestData(guestData: GuestDataPayload): Promise<HttpsCallableResult> {
     const { functions } = initializeFirebase();
@@ -50,4 +57,37 @@ export async function updateGuestInfo(
         guestId,
         updatedData,
     });
+}
+
+export function subscribeToGuests(
+    organisationId: string,
+    callbacks: GuestsSubscriptionCallback,
+): () => void {
+    const { firestore } = initializeFirebase();
+    return onSnapshot(
+        collection(firestore, getGuestsPath(organisationId)),
+        function (snapshot) {
+            snapshot.docChanges().forEach(function (change) {
+                const guest = {
+                    ...change.doc.data(),
+                    id: change.doc.id,
+                } as GuestDoc;
+
+                switch (change.type) {
+                    case "added":
+                        callbacks.onAdd(guest);
+                        break;
+                    case "modified":
+                        callbacks.onModify(guest);
+                        break;
+                    case "removed":
+                        callbacks.onRemove(guest.id);
+                        break;
+                }
+            });
+        },
+        function (error) {
+            callbacks.onError?.(error);
+        },
+    );
 }

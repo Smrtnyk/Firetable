@@ -34,7 +34,9 @@ const { createDialog } = useDialog();
 const { t } = useI18n();
 const props = defineProps<PageAdminGuestsProps>();
 const guestsStore = useGuestsStore();
-const { data: guests, pending: isLoading } = guestsStore.getGuests(props.organisationId);
+const guestsRef = guestsStore.getGuests(props.organisationId);
+const guests = computed(() => guestsRef.value.data);
+const isLoading = computed(() => guestsRef.value.pending);
 const { isAdmin } = storeToRefs(useAuthStore());
 
 watch(

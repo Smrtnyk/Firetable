@@ -1,7 +1,10 @@
 import type { GuestDoc, PropertyDoc, Visit } from "@firetable/types";
-import type { _RefFirestore, VueFirestoreDocumentData, VueFirestoreQueryData } from "vuefire";
+import type { VueFirestoreDocumentData } from "vuefire";
+import type { Ref } from "vue";
+import type { GuestsSubscriptionCallback } from "@firetable/backend";
+import { getGuestsPath, subscribeToGuests } from "../backend-proxy";
+import { ref } from "vue";
 import { defineStore } from "pinia";
-import { getGuestsPath } from "@firetable/backend";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
 import { where } from "firebase/firestore";
 import { first, matchesProperty } from "es-toolkit/compat";
@@ -18,13 +21,19 @@ export type GuestSummary = {
     visitPercentage: string;
 };
 
+type GuestsState = {
+    data: GuestDoc[];
+    pending: boolean;
+};
+
 type PropertyEvents = Record<string, Visit | null>;
 
 export const useGuestsStore = defineStore("guests", function () {
-    const refsMap = new Map<string, _RefFirestore<VueFirestoreQueryData<GuestDoc>>>();
+    const refsMap = ref(new Map<string, Ref<GuestsState>>());
+    const unsubMap = new Map<string, () => void>();
+    const guestsCache = new Map<string, GuestDoc>();
     const authStore = useAuthStore();
     const propertiesStore = usePropertiesStore();
-    const guestsCache = new Map<string, GuestDoc>();
 
     function hasPropertyAccess(propertyId: string): boolean {
         return (
@@ -56,18 +65,55 @@ export const useGuestsStore = defineStore("guests", function () {
         };
     }
 
-    function getGuests(organisationId: string): _RefFirestore<VueFirestoreQueryData<GuestDoc>> {
-        if (!refsMap.get(organisationId)) {
-            refsMap.set(
-                organisationId,
-                useFirestoreCollection<GuestDoc>(getGuestsPath(organisationId), {
-                    wait: true,
-                }),
-            );
+    function getGuests(organisationId: string): Ref<GuestsState> {
+        const existingRef = refsMap.value.get(organisationId);
+        if (existingRef) {
+            return existingRef;
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we just set it
-        return refsMap.get(organisationId)!;
+        const state = ref<GuestsState>({
+            data: [],
+            pending: true,
+        });
+        refsMap.value.set(organisationId, state);
+
+        const callbacks: GuestsSubscriptionCallback = {
+            onAdd(guest) {
+                state.value = {
+                    data: [...state.value.data, guest],
+                    pending: false,
+                };
+                if (guest.hashedContact) {
+                    guestsCache.set(guest.hashedContact, guest);
+                }
+            },
+            onModify(guest) {
+                state.value = {
+                    data: state.value.data.map(function (existingGuest) {
+                        return existingGuest.id === guest.id ? guest : existingGuest;
+                    }),
+                    pending: false,
+                };
+                if (guest.hashedContact) {
+                    guestsCache.set(guest.hashedContact, guest);
+                }
+            },
+            onRemove(guestId) {
+                state.value = {
+                    data: state.value.data.filter(({ id }) => id !== guestId),
+                    pending: false,
+                };
+            },
+            onError(error) {
+                AppLogger.error("Error fetching guests:", error);
+                state.value.pending = false;
+            },
+        };
+
+        const unsubscribe = subscribeToGuests(organisationId, callbacks);
+        unsubMap.set(organisationId, unsubscribe);
+
+        return state;
     }
 
     function invalidateGuestCache(guestId: string): void {
@@ -85,9 +131,9 @@ export const useGuestsStore = defineStore("guests", function () {
         organisationId: string,
         hashedContact: string,
     ): Promise<VueFirestoreDocumentData<GuestDoc> | undefined> {
-        const guests = refsMap.get(organisationId);
-        if (guests?.data.value) {
-            const foundGuest = guests.data.value.find(
+        const guests = refsMap.value.get(organisationId);
+        if (guests?.value.data) {
+            const foundGuest = guests.value.data.find(
                 (guest) => guest.hashedContact === hashedContact,
             );
             if (foundGuest) {
@@ -183,7 +229,14 @@ export const useGuestsStore = defineStore("guests", function () {
         return validSummaries.length > 0 ? validSummaries : undefined;
     }
 
+    function cleanup(): void {
+        unsubMap.forEach((unsubscribe) => unsubscribe());
+        unsubMap.clear();
+        refsMap.value.clear();
+    }
+
     return {
+        cleanup,
         getGuestByHashedContact,
         invalidateGuestCache,
         getGuestSummaryForPropertyExcludingEvent,
