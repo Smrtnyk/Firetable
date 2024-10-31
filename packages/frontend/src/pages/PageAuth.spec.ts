@@ -21,7 +21,7 @@ const { loginWithEmailSpy, routerReplaceSpy, showErrorMessageSpy, tryCatchLoadin
         };
     });
 
-vi.mock("@firetable/backend", () => ({
+vi.mock("../backend-proxy", () => ({
     loginWithEmail: loginWithEmailSpy,
 }));
 
@@ -93,8 +93,7 @@ describe("PageAuth", () => {
         await expect.element(passwordInput).toHaveAttribute("type", "password");
     });
 
-    // Cannot mock @firetable/backend for some reason
-    it.skip("submits the form with valid inputs", async () => {
+    it("submits the form with valid inputs", async () => {
         const screen = renderComponent(PageAuth);
 
         await userEvent.type(screen.getByLabelText("Username *"), "testuser");
@@ -112,8 +111,7 @@ describe("PageAuth", () => {
         expect(routerReplaceSpy).toHaveBeenCalledWith("/");
     });
 
-    // Cannot mock @firetable/backend for some reason
-    it.skip("shows error when login fails", async () => {
+    it("shows error when login fails", async () => {
         // Simulate loginWithEmail throwing an error
         loginWithEmailSpy.mockImplementation(() => {
             console.log("threw");
@@ -130,16 +128,11 @@ describe("PageAuth", () => {
 
         await nextTick();
 
-        // Ensure that loginWithEmail was called
         expect(loginWithEmailSpy).toHaveBeenCalledWith("testuser", "wrongpassword");
-
-        // Ensure that router.replace was not called
         expect(routerReplaceSpy).not.toHaveBeenCalled();
-
-        // Optionally, check that an error message is displayed
-        // Assuming that your component displays an error message when login fails
-        const errorMessage = screen.getByText("Invalid credentials");
-        await expect.element(errorMessage).toBeVisible();
+        expect(showErrorMessageSpy).toHaveBeenCalledWith(
+            "An unexpected error occurred. Please try again.",
+        );
     });
 
     it("validates password length", async () => {

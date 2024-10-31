@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { loginWithEmail } from "../backend-proxy";
 import { ref, useTemplateRef } from "vue";
 import { useRouter } from "vue-router";
 import { minLength, noEmptyString } from "src/helpers/form-rules";
 import { Loading, QForm } from "quasar";
-import { loginWithEmail } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 
 const firebaseErrorMessages: Record<string, string> = {
