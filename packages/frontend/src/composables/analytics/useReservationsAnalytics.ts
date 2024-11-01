@@ -211,16 +211,16 @@ export function useReservationsAnalytics(property: Ref<PropertyDoc>, organisatio
         ];
     });
 
-    const peakHoursLabels = computed(() => {
+    const peakHoursLabels = computed(function () {
         const hourlyTotals = Object.keys(
-            plannedReservationsByActiveProperty.value.reduce<Record<string, number>>(
-                (acc, reservation) => {
-                    const hour = reservation.time.split(":")[0];
-                    acc[hour] = (acc[hour] ?? 0) + 1;
-                    return acc;
-                },
-                {},
-            ),
+            plannedReservationsByActiveProperty.value.reduce<Record<string, number>>(function (
+                acc,
+                reservation,
+            ) {
+                const hour = reservation.time.split(":")[0];
+                acc[hour] = (acc[hour] ?? 0) + 1;
+                return acc;
+            }, {}),
         ).sort((a, b) => Number.parseInt(a) - Number.parseInt(b));
 
         // Format hours to be more readable (e.g., "08:00", "14:00")
@@ -249,22 +249,20 @@ export function useReservationsAnalytics(property: Ref<PropertyDoc>, organisatio
         ];
     });
 
-    const guestDistributionLabels = computed(() => {
+    const guestDistributionLabels = computed(function () {
         return Object.keys(
-            plannedReservationsByActiveProperty.value.reduce<Record<string, number>>(
-                (acc, { numberOfGuests }) => {
-                    const key = numberOfGuests.toString();
-                    acc[key] = (acc[key] ?? 0) + 1;
-                    return acc;
-                },
-                {},
-            ),
+            plannedReservationsByActiveProperty.value.reduce<Record<string, number>>(function (
+                acc,
+                { numberOfGuests },
+            ) {
+                const key = numberOfGuests.toString();
+                acc[key] = (acc[key] ?? 0) + 1;
+                return acc;
+            }, {}),
         ).sort((a, b) => Number(a) - Number(b));
     });
 
-    const propertyLabels = computed(() => {
-        return [property.value.name];
-    });
+    const propertyLabels = computed(() => [property.value.name]);
     const guestDistributionAnalysis = computed<TimeSeriesData>(function () {
         const distribution = plannedReservationsByActiveProperty.value.reduce<
             Record<string, number>
