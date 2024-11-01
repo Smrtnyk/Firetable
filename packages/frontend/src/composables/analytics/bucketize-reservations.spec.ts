@@ -4,14 +4,8 @@ import {
     ReservationType,
     type EventDoc,
     type ReservationDocWithEventId,
-    type PropertyDoc,
 } from "@firetable/types";
 import { describe, it, expect } from "vitest";
-
-const mockProperties: PropertyDoc[] = [
-    { id: "prop1", name: "Property One", organisationId: "123" },
-    { id: "prop2", name: "Property Two", organisationId: "123" },
-];
 
 const mockEvents: EventDoc[] = [
     {
@@ -27,7 +21,7 @@ const mockEvents: EventDoc[] = [
     },
     {
         id: "event2",
-        propertyId: "prop2",
+        propertyId: "prop1",
         date: 1_690_000_100_000,
         name: "Event 2",
         guestListLimit: 200,
@@ -108,105 +102,40 @@ const mockReservations: ReservationDocWithEventId[] = [
 ];
 
 describe("bucketizeReservations", () => {
-    it("creates buckets for each property based on event's propertyId", () => {
-        const result = bucketizeReservations(mockEvents, mockReservations, mockProperties);
+    it("adds planned reservations to the bucket", () => {
+        const result = bucketizeReservations(mockEvents, mockReservations);
 
-        expect(result.length).toBe(2);
-        expect(result[0].propertyId).toBe("prop1");
-        expect(result[1].propertyId).toBe("prop2");
+        expect(result.plannedReservations.length).toBe(1);
+        expect(result.plannedReservations[0].guestName).toBe("John Doe");
     });
 
-    it("adds planned reservations to the correct bucket", () => {
-        const result = bucketizeReservations(mockEvents, mockReservations, mockProperties);
-        const prop1Bucket = result.find((bucket) => bucket.propertyId === "prop1");
+    it("adds walk-in reservations to the bucket", () => {
+        const result = bucketizeReservations(mockEvents, mockReservations);
 
-        expect(prop1Bucket?.plannedReservations.length).toBe(1);
-        expect(prop1Bucket?.plannedReservations[0].guestName).toBe("John Doe");
-    });
-
-    it("adds walk-in reservations to the correct bucket", () => {
-        const result = bucketizeReservations(mockEvents, mockReservations, mockProperties);
-        const prop1Bucket = result.find((bucket) => bucket.propertyId === "prop1");
-
-        expect(prop1Bucket?.walkInReservations.length).toBe(1);
-        expect(prop1Bucket?.walkInReservations[0].guestName).toBe("Jane Doe");
+        expect(result.walkInReservations.length).toBe(1);
+        expect(result.walkInReservations[0].guestName).toBe("Jane Doe");
     });
 
     it("excludes canceled planned reservations", () => {
-        const result = bucketizeReservations(mockEvents, mockReservations, mockProperties);
-        const prop1Bucket = result.find((bucket) => bucket.propertyId === "prop1");
-        // Only one non-canceled planned reservation
-        expect(prop1Bucket?.plannedReservations.length).toBe(1);
-        expect(prop1Bucket?.plannedReservations[0].guestName).toBe("John Doe");
-    });
+        const result = bucketizeReservations(mockEvents, mockReservations);
 
-    it("skips events with no matching properties", () => {
-        const result = bucketizeReservations(
-            [
-                ...mockEvents,
-                {
-                    id: "event3",
-                    propertyId: "prop3",
-                    date: 1_690_000_200_000,
-                    name: "Event 3",
-                    guestListLimit: 150,
-                    entryPrice: 75,
-                    creator: "user3",
-                    organisationId: "org3",
-                    _doc: {} as any,
-                },
-            ],
-            mockReservations,
-            mockProperties,
-        );
-        // Only two properties exist in mockProperties
-        expect(result.length).toBe(2);
+        expect(result.plannedReservations.length).toBe(1);
+        expect(result.plannedReservations[0].guestName).toBe("John Doe");
     });
 
     it("only includes reservations matching the eventId", () => {
         const newReservation = { ...mockReservations[0], eventId: "event2", id: "res4" };
-        const result = bucketizeReservations(mockEvents, [newReservation], mockProperties);
-        const prop2Bucket = result.find((bucket) => bucket.propertyId === "prop2");
+        const result = bucketizeReservations(mockEvents, [newReservation]);
 
-        expect(prop2Bucket?.plannedReservations.length).toBe(1);
-        expect(prop2Bucket?.plannedReservations[0].id).toBe("res4");
+        expect(result.plannedReservations.length).toBe(1);
+        expect(result.plannedReservations[0].id).toBe("res4");
     });
 
     it("handles events without any reservations", () => {
-        const result = bucketizeReservations(mockEvents, [], mockProperties);
+        const result = bucketizeReservations(mockEvents, []);
 
-        expect(result.length).toBe(2);
-        expect(result[0].plannedReservations.length).toBe(0);
-        expect(result[0].walkInReservations.length).toBe(0);
-    });
-
-    it("handles events without a matching property in properties list", () => {
-        const result = bucketizeReservations(
-            [
-                ...mockEvents,
-                {
-                    id: "event3",
-                    propertyId: "unknownProp",
-                    date: 1_690_000_200_000,
-                    name: "Event 3",
-                    guestListLimit: 150,
-                    entryPrice: 75,
-                    creator: "user3",
-                    organisationId: "org3",
-                    _doc: {} as any,
-                },
-            ],
-            mockReservations,
-            mockProperties,
-        );
-
-        // Only two valid properties exist, so "unknownProp" should be skipped
-        expect(result.length).toBe(2);
-    });
-
-    it("returns an empty array when events, reservations, and properties are empty", () => {
-        const result = bucketizeReservations([], [], []);
-        expect(result.length).toBe(0);
+        expect(result.plannedReservations.length).toBe(0);
+        expect(result.walkInReservations.length).toBe(0);
     });
 
     // TODO: need to evaluate this scenario
@@ -216,25 +145,14 @@ describe("bucketizeReservations", () => {
             status: ReservationStatus.DELETED,
         };
 
-        const result = bucketizeReservations(mockEvents, [inactiveReservation], mockProperties);
-        const prop1Bucket = result.find((bucket) => bucket.propertyId === "prop1");
+        const result = bucketizeReservations(mockEvents, [inactiveReservation]);
 
-        expect(prop1Bucket?.plannedReservations.length).toBe(0);
+        expect(result.plannedReservations.length).toBe(0);
     });
 
-    it("handles multiple events for the same property", () => {
-        const multipleEventsSameProperty: EventDoc[] = [
-            {
-                id: "event1",
-                propertyId: "prop1",
-                date: 1_690_000_000_000,
-                name: "Event 1",
-                guestListLimit: 100,
-                entryPrice: 50,
-                creator: "user1",
-                organisationId: "org1",
-                _doc: {} as any,
-            },
+    it("handles multiple events for the property", () => {
+        const multipleEvents: EventDoc[] = [
+            mockEvents[0],
             {
                 id: "event3",
                 propertyId: "prop1",
@@ -248,16 +166,10 @@ describe("bucketizeReservations", () => {
             },
         ];
 
-        const result = bucketizeReservations(
-            multipleEventsSameProperty,
-            mockReservations,
-            mockProperties,
-        );
-        const prop1Bucket = result.find((bucket) => bucket.propertyId === "prop1");
+        const result = bucketizeReservations(multipleEvents, mockReservations);
 
-        expect(prop1Bucket).toBeDefined();
-        expect(prop1Bucket?.plannedReservations.length).toBe(1);
-        expect(prop1Bucket?.walkInReservations.length).toBe(1);
+        expect(result.plannedReservations.length).toBe(1);
+        expect(result.walkInReservations.length).toBe(1);
     });
 
     it("correctly adds mixed planned and walk-in reservations", () => {
@@ -266,10 +178,9 @@ describe("bucketizeReservations", () => {
             mockReservations[1],
         ];
 
-        const result = bucketizeReservations(mockEvents, mixedReservations, mockProperties);
-        const prop1Bucket = result.find((bucket) => bucket.propertyId === "prop1");
+        const result = bucketizeReservations(mockEvents, mixedReservations);
 
-        expect(prop1Bucket?.plannedReservations.length).toBe(1);
-        expect(prop1Bucket?.walkInReservations.length).toBe(1);
+        expect(result.plannedReservations.length).toBe(1);
+        expect(result.walkInReservations.length).toBe(1);
     });
 });

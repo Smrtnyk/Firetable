@@ -216,7 +216,7 @@ export const routes: RouteRecordRaw[] = [
                 component: () => import("src/pages/Admin/PageAdminProperties.vue"),
             },
             {
-                path: "/admin/:organisationId/analytics",
+                path: "/admin/:organisationId/:propertyId/analytics",
                 name: "adminAnalytics",
                 meta: {
                     requiresAuth: true,

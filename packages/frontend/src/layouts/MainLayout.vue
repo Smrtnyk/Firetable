@@ -4,13 +4,13 @@ import AppTopMenu from "src/components/AppTopMenu.vue";
 import NetworkOverlay from "src/components/NetworkOverlay.vue";
 
 import { useAuthStore } from "src/stores/auth-store";
-import { storeToRefs } from "pinia";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
 
-const { isLoggedIn } = storeToRefs(useAuthStore());
+const authStore = useAuthStore();
+const isLoggedIn = computed(() => authStore.isLoggedIn);
 const isDrawerVisible = ref(false);
 </script>
 

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import FTTitle from "src/components/FTTitle.vue";
-import FTCenteredText from "src/components/FTCenteredText.vue";
 import PieChart from "src/components/admin/analytics/PieChart.vue";
 import BarChart from "src/components/admin/analytics/BarChart.vue";
 import AdminEventReservationsByPerson from "src/components/admin/event/AdminEventReservationsByPerson.vue";
@@ -9,7 +8,7 @@ import FTTabs from "src/components/FTTabs.vue";
 import FTCard from "src/components/FTCard.vue";
 import FTTabPanels from "src/components/FTTabPanels.vue";
 
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { format, subMonths } from "date-fns";
 import {
@@ -19,18 +18,17 @@ import {
 
 interface Props {
     organisationId: string;
+    propertyId: string;
 }
 
 const props = defineProps<Props>();
 const propertiesStore = usePropertiesStore();
-const properties = computed(function () {
-    return propertiesStore.getPropertiesByOrganisationId(props.organisationId);
+const property = computed(function () {
+    return propertiesStore.getPropertyById(props.propertyId);
 });
-const selectedTab = ref("");
 const {
     guestDistributionLabels,
     peakHoursLabels,
-    reservationBuckets,
     selectedMonth,
     selectedDay,
     plannedReservationsByActiveProperty,
@@ -43,7 +41,7 @@ const {
     guestDistributionAnalysis,
     reservationsByDayOfWeek,
     plannedVsWalkInReservations,
-} = useReservationsAnalytics(properties, props.organisationId, selectedTab);
+} = useReservationsAnalytics(property, props.organisationId);
 
 const monthOptions = computed(function () {
     const options = [];
@@ -85,22 +83,6 @@ const chartInfos = computed(function () {
         },
     ] as const;
 });
-
-const hasPropertyData = computed(function (): boolean {
-    if (!selectedTab.value) {
-        return false;
-    }
-
-    const bucket = reservationBuckets.value.find(function (b) {
-        return b.propertyId === selectedTab.value;
-    });
-    return (
-        bucket !== undefined &&
-        Object.values(bucket).some((value) =>
-            Array.isArray(value) ? value.length > 0 : value !== null && value !== undefined,
-        )
-    );
-});
 </script>
 
 <template>
@@ -118,103 +100,78 @@ const hasPropertyData = computed(function (): boolean {
             class="q-mb-md"
         />
 
-        <div v-if="reservationBuckets.length > 0">
+        <div>
             <FTCard class="q-mb-md">
                 <BarChart
                     :chart-data="plannedReservationsByProperty"
-                    chart-title="Reservations by Property"
+                    chart-title="Total Planned Reservations"
                 />
             </FTCard>
+            <div class="row q-col-gutter-sm q-col-gutter-md-md">
+                <div class="col-12">
+                    <q-chip color="primary">
+                        Avg Guests per planned reservation:
+                        {{ avgGuestsPerReservation.averagePlannedGuests.toFixed(2) }}
+                    </q-chip>
 
-            <FTTabs v-model="selectedTab">
-                <q-tab
-                    v-for="property in properties"
-                    :key="property.id"
-                    :name="property.id"
-                    :label="property.name"
-                />
-            </FTTabs>
+                    <q-chip color="primary">
+                        Avg Guests per walk-in reservation:
+                        {{ avgGuestsPerReservation.averageWalkInGuests.toFixed(2) }}
+                    </q-chip>
+                </div>
 
-            <FTTabPanels v-model="selectedTab" class="bg-transparent">
-                <q-tab-panel
-                    v-for="property in properties"
-                    :key="property.id"
-                    :name="property.id"
-                    class="q-pa-none"
-                >
-                    <FTCenteredText v-if="!hasPropertyData">
-                        No Data For this property
-                    </FTCenteredText>
+                <FTCard class="col-sm-12 col-md-6">
+                    <PieChart
+                        :chart-data="plannedArrivedVsNoShow"
+                        chart-title="Arrived vs. No-Show"
+                    />
+                </FTCard>
 
-                    <div v-else class="row q-col-gutter-sm q-col-gutter-md-md">
-                        <div class="col-12">
-                            <q-chip color="primary">
-                                Avg Guests per planned reservation:
-                                {{ avgGuestsPerReservation.averagePlannedGuests.toFixed(2) }}
-                            </q-chip>
+                <FTCard class="col-sm-12 col-md-6">
+                    <PieChart
+                        :chart-data="plannedVsWalkInReservations"
+                        chart-title="Planned vs. Walk-In"
+                    />
+                </FTCard>
 
-                            <q-chip color="primary">
-                                Avg Guests per walk-in reservation:
-                                {{ avgGuestsPerReservation.averageWalkInGuests.toFixed(2) }}
-                            </q-chip>
-                        </div>
+                <div class="col-12 q-my-md">
+                    <FTTabs v-model="selectedDay">
+                        <q-tab
+                            v-for="day in [...Object.keys(plannedReservationsByDay), 'ALL']"
+                            :key="day"
+                            :name="day"
+                            :label="day"
+                        />
+                    </FTTabs>
 
-                        <FTCard class="col-sm-12 col-md-6">
-                            <PieChart
-                                :chart-data="plannedArrivedVsNoShow"
-                                chart-title="Arrived vs. No-Show"
-                            />
-                        </FTCard>
-
-                        <FTCard class="col-sm-12 col-md-6">
-                            <PieChart
-                                :chart-data="plannedVsWalkInReservations"
-                                chart-title="Planned vs. Walk-In"
-                            />
-                        </FTCard>
-
-                        <div class="col-12 q-my-md">
-                            <FTTabs v-model="selectedDay">
-                                <q-tab
-                                    v-for="day in [...Object.keys(plannedReservationsByDay), 'ALL']"
-                                    :key="day"
-                                    :name="day"
-                                    :label="day"
-                                />
-                            </FTTabs>
-
-                            <FTTabPanels v-model="selectedDay" class="q-mt-md">
-                                <q-tab-panel
-                                    class="q-pa-none"
-                                    v-for="(reservations, day) in {
-                                        ...plannedReservationsByDay,
-                                        ALL: plannedReservationsByActiveProperty,
-                                    }"
-                                    :key="day"
-                                    :name="day"
-                                >
-                                    <AdminEventReservationsByPerson :reservations="reservations" />
-                                </q-tab-panel>
-                            </FTTabPanels>
-                        </div>
-
-                        <FTCard
-                            class="col-sm-12 col-md-6"
-                            v-for="chartInfo in chartInfos"
-                            :key="chartInfo.title"
+                    <FTTabPanels v-model="selectedDay" class="q-mt-md">
+                        <q-tab-panel
+                            class="q-pa-none"
+                            v-for="(reservations, day) in {
+                                ...plannedReservationsByDay,
+                                ALL: plannedReservationsByActiveProperty,
+                            }"
+                            :key="day"
+                            :name="day"
                         >
-                            <ReservationAnalyticsCharts
-                                :chart-data="chartInfo.data"
-                                :chart-title="chartInfo.title"
-                                :chart-type="chartInfo.type"
-                                :labels="chartInfo.labels"
-                            />
-                        </FTCard>
-                    </div>
-                </q-tab-panel>
-            </FTTabPanels>
-        </div>
+                            <AdminEventReservationsByPerson :reservations="reservations" />
+                        </q-tab-panel>
+                    </FTTabPanels>
+                </div>
 
-        <FTCenteredText v-else> No Data For this month </FTCenteredText>
+                <FTCard
+                    class="col-sm-12 col-md-6"
+                    v-for="chartInfo in chartInfos"
+                    :key="chartInfo.title"
+                >
+                    <ReservationAnalyticsCharts
+                        :chart-data="chartInfo.data"
+                        :chart-title="chartInfo.title"
+                        :chart-type="chartInfo.type"
+                        :labels="chartInfo.labels"
+                    />
+                </FTCard>
+            </div>
+        </div>
     </div>
 </template>

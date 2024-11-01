@@ -3,19 +3,14 @@ import type {
     AugmentedWalkInReservation,
     ReservationBucket,
 } from "src/stores/analytics-store.js";
-import type { EventDoc, ReservationDocWithEventId, PropertyDoc } from "@firetable/types";
+import type { EventDoc, ReservationDocWithEventId } from "@firetable/types";
 import { isAWalkInReservation, isPlannedReservation } from "@firetable/types";
 import { matchesProperty } from "es-toolkit/compat";
 
 export function bucketizeReservations(
     events: EventDoc[],
     fetchedReservations: ReservationDocWithEventId[],
-    properties: PropertyDoc[],
-): ReservationBucket[] {
-    function getPropertyName(event: EventDoc): string | undefined {
-        return properties.find(matchesProperty("id", event.propertyId))?.name;
-    }
-
+): ReservationBucket {
     function augmentReservation(
         event: EventDoc,
         reservation: ReservationDocWithEventId,
@@ -27,20 +22,12 @@ export function bucketizeReservations(
         };
     }
 
-    const buckets = events.reduce<Record<string, ReservationBucket>>(function (acc, event) {
-        const propertyName = getPropertyName(event);
-        // Skip if property name is not found
-        if (!propertyName) {
-            return acc;
-        }
+    const bucket: ReservationBucket = {
+        plannedReservations: [],
+        walkInReservations: [],
+    };
 
-        const bucket = acc[event.propertyId] || {
-            propertyId: event.propertyId,
-            propertyName,
-            plannedReservations: [],
-            walkInReservations: [],
-        };
-
+    events.forEach(function (event) {
         // Filter and categorize reservations for the current event
         const eventReservations = fetchedReservations
             .filter(matchesProperty("eventId", event.id))
@@ -59,10 +46,7 @@ export function bucketizeReservations(
                 bucket.walkInReservations.push(reservationData);
             }
         });
+    });
 
-        acc[event.propertyId] = bucket;
-        return acc;
-    }, {});
-
-    return Object.values(buckets);
+    return bucket;
 }

@@ -14,7 +14,7 @@ import { noop } from "es-toolkit/function";
 export const useAuthStore = defineStore("auth", function () {
     const isAuthenticated = ref(false);
     const isReady = ref(false);
-    const user = ref<AppUser | null>(null);
+    const user = ref<AppUser | undefined>();
     const unsubscribers: (typeof noop)[] = [];
     const initInProgress = ref(false);
 
@@ -103,7 +103,7 @@ export const useAuthStore = defineStore("auth", function () {
         isAuthenticated.value = false;
         isReady.value = false;
         initInProgress.value = false;
-        user.value = null;
+        user.value = undefined;
     }
 
     function setAuthState(isAuthenticatedVal: boolean): void {

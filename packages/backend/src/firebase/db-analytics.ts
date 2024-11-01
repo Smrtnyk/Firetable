@@ -10,9 +10,9 @@ import { getDocs, query, where } from "firebase/firestore";
 export async function fetchAnalyticsData(
     monthKey: string,
     organisationId: string,
-    properties: PropertyDoc[],
+    property: PropertyDoc,
 ): Promise<{ reservations: ReservationDocWithEventId[]; events: EventDoc[] }> {
-    const allEvents = await getEventsForProperties(properties, monthKey, organisationId);
+    const allEvents = await getEventsForProperty(property, monthKey, organisationId);
     return {
         events: allEvents,
         reservations: await getReservationFromEvents(allEvents, organisationId),
@@ -46,8 +46,8 @@ async function getReservationFromEvents(
     return reservations;
 }
 
-async function getEventsForProperties(
-    propertyDocs: PropertyDoc[],
+async function getEventsForProperty(
+    property: PropertyDoc,
     month: string,
     organisationId: string,
 ): Promise<EventDoc[]> {
@@ -70,23 +70,19 @@ async function getEventsForProperties(
         endDate.getUTCDate(),
     );
 
-    const allEvents = await Promise.all(
-        propertyDocs.map((property) => {
-            return getDocs(
-                query(
-                    eventsCollection({
-                        organisationId,
-                        propertyId: property.id,
-                        id: "",
-                    }),
-                    where("date", ">=", startTimestamp),
-                    where("date", "<", endTimestamp),
-                ),
-            );
-        }),
+    const allEvents = await getDocs(
+        query(
+            eventsCollection({
+                organisationId,
+                propertyId: property.id,
+                id: "",
+            }),
+            where("date", ">=", startTimestamp),
+            where("date", "<", endTimestamp),
+        ),
     );
 
-    return allEvents
-        .flatMap((snapshot) => snapshot.docs)
-        .map((doc) => ({ ...doc.data(), id: doc.id }) as EventDoc);
+    return allEvents.docs.map(function (doc) {
+        return { ...doc.data(), id: doc.id } as EventDoc;
+    });
 }

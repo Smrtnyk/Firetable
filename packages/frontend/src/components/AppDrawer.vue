@@ -63,6 +63,19 @@ const manageFloorsLink = computed(function () {
     });
 });
 
+const manageAnalyticsLink = computed(function () {
+    if (isAdmin.value) {
+        return;
+    }
+
+    return buildExpandableLink({
+        icon: "line-chart",
+        routeName: "adminAnalytics",
+        label: t("AppDrawer.links.manageAnalytics"),
+        isVisible: true,
+    });
+});
+
 const manageEventsLink = computed(function () {
     if (isAdmin.value || !canCreateEvents.value) {
         return;
@@ -89,6 +102,9 @@ const links = computed<(GuardedLink | LinkWithChildren)[]>(function () {
             isVisible: isAdmin.value,
         },
         manageEventsLink.value,
+        manageFloorsLink.value,
+        inventoryLink.value,
+        manageAnalyticsLink.value,
         {
             icon: "users",
             route: { name: "adminUsers", params: { organisationId } },
@@ -102,10 +118,10 @@ const links = computed<(GuardedLink | LinkWithChildren)[]>(function () {
             isVisible: canSeeGuestbook.value && !isAdmin.value,
         },
         {
-            icon: "line-chart",
-            route: { name: "adminAnalytics", params: { organisationId } },
-            label: t("AppDrawer.links.manageAnalytics"),
-            isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
+            icon: "home",
+            route: { name: "adminProperties", params: { organisationId } },
+            label: t("AppDrawer.links.manageProperties"),
+            isVisible: role === Role.PROPERTY_OWNER,
         },
         {
             icon: "cog-wheel",
@@ -113,15 +129,6 @@ const links = computed<(GuardedLink | LinkWithChildren)[]>(function () {
             label: t("AppDrawer.links.settings"),
             isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
         },
-        {
-            icon: "home",
-            route: { name: "adminProperties", params: { organisationId } },
-            label: t("AppDrawer.links.manageProperties"),
-            isVisible: role === Role.PROPERTY_OWNER,
-        },
-
-        manageFloorsLink.value,
-        inventoryLink.value,
     ];
 
     return allLinks.filter(function (link): link is NonNullable<GuardedLink | LinkWithChildren> {
@@ -248,6 +255,7 @@ function isLinkWithChildren(link: GuardedLink | LinkWithChildren): link is LinkW
                     :label="link.label"
                     :icon="link.icon"
                     expand-separator
+                    :aria-label="link.label"
                     expand-icon="arrow_drop_down"
                 >
                     <AppDrawerLink

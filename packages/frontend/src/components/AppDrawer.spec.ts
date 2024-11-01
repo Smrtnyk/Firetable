@@ -72,7 +72,7 @@ describe("AppDrawer", () => {
             },
         );
 
-        const expectedLinks = ["Manage Users", "Manage Analytics", "Settings"];
+        const expectedLinks = ["Manage Users", "Guestbook", "Settings", "Logout"];
 
         const allLinks = document.querySelectorAll(".q-item__section--main");
         const visibleLinks = Array.from(allLinks).map((link) => link.textContent);
@@ -210,12 +210,13 @@ describe("AppDrawer", () => {
             },
         );
 
+        const manageInventoryItem = screen.getByLabelText("Manage Inventory");
         // Simulate expanding the expandable item
         await userEvent.click(screen.getByText("Manage Inventory"));
 
         // Check that property links are displayed
-        await expect.element(screen.getByText("Property 1")).toBeVisible();
-        await expect.element(screen.getByText("Property 2")).toBeVisible();
+        await expect.element(manageInventoryItem.getByText("Property 1")).toBeVisible();
+        await expect.element(manageInventoryItem.getByText("Property 2")).toBeVisible();
     });
 
     it("uses custom capabilities over default capabilities", async () => {

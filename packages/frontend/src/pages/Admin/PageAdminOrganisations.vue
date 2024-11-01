@@ -44,11 +44,6 @@ function createLinks(organisationId: string): Link[] {
             icon: "cog-wheel",
             route: { name: "adminOrganisationSettings", params },
         },
-        {
-            label: "Manage Analytics",
-            icon: "line-chart",
-            route: { name: "adminAnalytics", params },
-        },
     ];
 }
 

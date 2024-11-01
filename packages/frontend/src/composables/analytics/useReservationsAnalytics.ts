@@ -2,16 +2,15 @@ import type { PropertyDoc } from "@firetable/types";
 import type { Ref } from "vue";
 import type { AugmentedPlannedReservation, ReservationBucket } from "src/stores/analytics-store.js";
 import type { PieChartData, TimeSeriesData } from "src/components/admin/analytics/types.js";
+import { bucketizeReservations } from "./bucketize-reservations.js";
+import { fetchAnalyticsData } from "../../backend-proxy";
 import { computed, onUnmounted, ref, watch } from "vue";
 import { useAnalyticsStore } from "src/stores/analytics-store.js";
 
-import { fetchAnalyticsData } from "@firetable/backend";
 import { Loading } from "quasar";
 import { showErrorMessage } from "src/helpers/ui-helpers.js";
 import { format } from "date-fns";
 import { getColors } from "src/helpers/colors.js";
-import { matchesProperty } from "es-toolkit/compat";
-import { bucketizeReservations } from "src/composables/analytics/bucketize-reservations.js";
 
 export const DAYS_OF_WEEK = [
     "Sunday",
@@ -25,20 +24,15 @@ export const DAYS_OF_WEEK = [
 const DEFAULT_SELECTED_DAY = "ALL";
 const SELECTED_MONTH_FORMAT = "yyyy-MM";
 
-export function useReservationsAnalytics(
-    properties: Ref<PropertyDoc[]>,
-    organisationId: string,
-    selectedTab: Ref<string>,
-) {
+export function useReservationsAnalytics(property: Ref<PropertyDoc>, organisationId: string) {
     const analyticsStore = useAnalyticsStore();
-    const reservationBuckets = ref<ReservationBucket[]>([]);
+    const reservationBucket = ref<ReservationBucket>();
     const selectedMonth = ref(format(new Date(), SELECTED_MONTH_FORMAT));
     const selectedDay = ref(DEFAULT_SELECTED_DAY);
 
     const currentPropertyReservations = computed(function () {
-        // Find the bucket for the selected property
         return (
-            reservationBuckets.value.find(matchesProperty("propertyId", selectedTab.value)) ?? {
+            reservationBucket.value ?? {
                 plannedReservations: [],
                 walkInReservations: [],
             }
@@ -153,20 +147,12 @@ export function useReservationsAnalytics(
     });
 
     const plannedReservationsByProperty = computed<TimeSeriesData>(function () {
-        const propertyTotals = reservationBuckets.value.reduce<Record<string, number>>(function (
-            acc,
-            { propertyName, plannedReservations: res },
-        ) {
-            acc[propertyName] = res.length;
-            return acc;
-        }, {});
-
         const { backgroundColors } = getColors(1);
 
         return [
             {
-                name: "Reservations by Property",
-                data: Object.values(propertyTotals),
+                name: "Reservations",
+                data: [reservationBucket.value?.plannedReservations.length ?? 0],
                 itemStyle: { color: backgroundColors[0] },
             },
         ];
@@ -277,7 +263,7 @@ export function useReservationsAnalytics(
     });
 
     const propertyLabels = computed(() => {
-        return reservationBuckets.value.map((bucket) => bucket.propertyName);
+        return [property.value.name];
     });
     const guestDistributionAnalysis = computed<TimeSeriesData>(function () {
         const distribution = plannedReservationsByActiveProperty.value.reduce<
@@ -323,17 +309,7 @@ export function useReservationsAnalytics(
         ];
     });
 
-    const stopWatch = watch(
-        [properties, selectedMonth],
-        async function () {
-            if (properties.value.length === 0) {
-                return;
-            }
-            selectedTab.value = properties.value[0].id;
-            await fetchData();
-        },
-        { immediate: true },
-    );
+    const stopWatch = watch([selectedMonth], fetchData, { immediate: true });
 
     onUnmounted(function () {
         analyticsStore.clearData();
@@ -345,29 +321,24 @@ export function useReservationsAnalytics(
         const cacheKey = monthKey + organisationId;
 
         // Check if data for the month is already in the store
-        const cachedData = analyticsStore.getDataForMonth(cacheKey);
+        const cachedData = analyticsStore.getDataForMonth(cacheKey, property.value.id);
         if (cachedData) {
-            reservationBuckets.value = cachedData;
+            reservationBucket.value = cachedData;
             return;
         }
 
         // If not in store, fetch data
-        reservationBuckets.value = [];
+        reservationBucket.value = undefined;
         Loading.show();
 
         try {
-            const fetchedData = await fetchAnalyticsData(
-                monthKey,
-                organisationId,
-                properties.value,
-            );
+            const fetchedData = await fetchAnalyticsData(monthKey, organisationId, property.value);
 
-            reservationBuckets.value = bucketizeReservations(
+            reservationBucket.value = bucketizeReservations(
                 fetchedData.events,
                 fetchedData.reservations,
-                properties.value,
             );
-            analyticsStore.cacheData(cacheKey, reservationBuckets.value);
+            analyticsStore.cacheData(cacheKey, reservationBucket.value, property.value.id);
 
             // Set the active tab to the first day with reservations
             const firstDayWithReservations = Object.keys(plannedReservationsByDay.value)[0];
@@ -385,7 +356,7 @@ export function useReservationsAnalytics(
         propertyLabels,
         peakHoursLabels,
         guestDistributionLabels,
-        reservationBuckets,
+        reservationBucket,
         plannedReservationsByActiveProperty,
         plannedReservationsByDay,
         selectedMonth,

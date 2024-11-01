@@ -76,6 +76,14 @@ export const usePropertiesStore = defineStore("properties", function () {
         return properties.value.find(matchesProperty("id", propertyId))?.name ?? "";
     }
 
+    function getPropertyById(propertyId: string): PropertyDoc {
+        const property = properties.value.find(matchesProperty("id", propertyId));
+        if (!property) {
+            throw new Error("No property found for the given property id");
+        }
+        return property;
+    }
+
     function getOrganisationSettingsById(organisationId: string): OrganisationSettings {
         const settings = getOrganisationById(organisationId)?.settings ?? {};
         return merge(DEFAULT_ORGANISATION_SETTINGS, settings);
@@ -177,6 +185,7 @@ export const usePropertiesStore = defineStore("properties", function () {
         properties,
         organisations,
         arePropertiesLoading,
+        getPropertyById,
         getPropertySettingsById,
         getOrganisationById,
         getPropertiesByOrganisationId,

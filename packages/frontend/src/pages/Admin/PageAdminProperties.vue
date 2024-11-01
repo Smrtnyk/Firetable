@@ -147,6 +147,12 @@ function createLinks(propertyId: string): Link[] {
             route: { name: "adminFloors", params },
             visible: true,
         },
+        {
+            label: t("AppDrawer.links.manageAnalytics"),
+            icon: "line-chart",
+            route: { name: "adminAnalytics", params },
+            visible: true,
+        },
     ].filter(function (link) {
         return link.visible;
     });
