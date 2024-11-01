@@ -315,6 +315,7 @@ export default tseslint.config(
                         "ry",
                         "fs",
                         "$",
+                        "ms",
                     ],
                 },
             ],

@@ -1,9 +1,8 @@
 import type { Floor } from "../Floor.js";
-import type { CommandInvoker } from "../command/CommandInvoker.js";
 import type { Transform, TEvent, ModifiedEvent } from "fabric";
+import type { CanvasHistory } from "../CanvasHistory.js";
 import { EventManager } from "./EventManager.js";
 import { RESOLUTION } from "../constants.js";
-import { MoveCommand } from "../command/MoveCommand.js";
 
 export class EditorEventManager extends EventManager {
     ctrlPressedDuringSelection = false;
@@ -15,7 +14,7 @@ export class EditorEventManager extends EventManager {
 
     constructor(
         floor: Floor,
-        private readonly commandInvoker: CommandInvoker,
+        private readonly history: CanvasHistory,
     ) {
         super(floor);
         this.initializeCanvasEventHandlers();
@@ -56,11 +55,6 @@ export class EditorEventManager extends EventManager {
         if (!this.movingObjectStartPosition || !options.target) {
             return;
         }
-        const moveCommand = new MoveCommand(options.target, this.movingObjectStartPosition, {
-            left: options.target.left,
-            top: options.target.top,
-        });
-        this.commandInvoker.execute(moveCommand);
 
         // Reset the starting position for the next move operation
         this.movingObjectStartPosition = null;
@@ -105,16 +99,10 @@ export class EditorEventManager extends EventManager {
         this.floor.canvas.requestRenderAll();
 
         if (e.key === "z") {
-            if (e.shiftKey) {
-                this.commandInvoker.redo();
-            } else {
-                this.commandInvoker.undo();
-            }
-            this.floor.canvas.requestRenderAll();
+            this.history.undo();
             e.preventDefault();
         } else if (e.key === "y") {
-            this.commandInvoker.redo();
-            this.floor.canvas.requestRenderAll();
+            this.history.redo();
             e.preventDefault();
         }
     };

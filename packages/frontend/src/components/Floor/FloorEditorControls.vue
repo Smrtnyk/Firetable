@@ -26,7 +26,7 @@ const undoRedoState = reactive({
 });
 
 onMounted(function () {
-    floorInstance.on("commandChange", function () {
+    floorInstance.on("historyChange", function () {
         undoRedoState.canUndo = floorInstance.canUndo();
         undoRedoState.canRedo = floorInstance.canRedo();
     });
