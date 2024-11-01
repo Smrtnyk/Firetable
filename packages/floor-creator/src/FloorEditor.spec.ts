@@ -51,7 +51,6 @@ describe("FloorEditor", () => {
         });
 
         it("updates floor dimensions without resetting the floor state", () => {
-            // Add an element to the floor
             floorEditor.addElement({
                 tag: FloorElementTypes.RECT_TABLE,
                 x: 100,
@@ -144,10 +143,8 @@ describe("FloorEditor", () => {
 
     describe("toggleGridVisibility()", () => {
         it("toggles grid visibility", () => {
-            // @ts-expect-error -- private prop
             const initialVisibility = floorEditor.gridDrawer.isGridVisible;
             floorEditor.toggleGridVisibility();
-            // @ts-expect-error -- private prop
             expect(floorEditor.gridDrawer.isGridVisible).toBe(!initialVisibility);
         });
 
