@@ -9,6 +9,7 @@ import FTDialog from "src/components/FTDialog.vue";
 import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
 import { ref } from "vue";
 import { UTC } from "src/helpers/date-utils";
+import { ADMIN } from "@firetable/types";
 
 const { createDialogSpy, showConfirmMock, useFirestoreDocumentMock, tryCatchLoadingWrapperSpy } =
     vi.hoisted(() => ({
@@ -112,6 +113,12 @@ describe("PageAdminGuest.vue", () => {
         return renderComponent(PageAdminGuest, props, {
             piniaStoreOptions: {
                 initialState: {
+                    auth: {
+                        user: {
+                            organisationId: "org1",
+                            role: ADMIN,
+                        },
+                    },
                     properties: {
                         properties: propertiesData,
                     },
