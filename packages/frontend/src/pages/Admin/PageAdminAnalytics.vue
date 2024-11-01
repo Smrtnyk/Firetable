@@ -11,22 +11,22 @@ import FTTabPanels from "src/components/FTTabPanels.vue";
 import { computed } from "vue";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { format, subMonths } from "date-fns";
-import {
-    DAYS_OF_WEEK,
-    useReservationsAnalytics,
-} from "src/composables/analytics/useReservationsAnalytics.js";
+import { useReservationsAnalytics } from "src/composables/analytics/useReservationsAnalytics.js";
+import { useI18n } from "vue-i18n";
 
 interface Props {
     organisationId: string;
     propertyId: string;
 }
 
+const { locale } = useI18n();
 const props = defineProps<Props>();
 const propertiesStore = usePropertiesStore();
 const property = computed(function () {
     return propertiesStore.getPropertyById(props.propertyId);
 });
 const {
+    DAYS_OF_WEEK,
     guestDistributionLabels,
     peakHoursLabels,
     selectedMonth,
@@ -41,7 +41,7 @@ const {
     guestDistributionAnalysis,
     reservationsByDayOfWeek,
     plannedVsWalkInReservations,
-} = useReservationsAnalytics(property, props.organisationId);
+} = useReservationsAnalytics(property, props.organisationId, locale.value);
 
 const monthOptions = computed(function () {
     const options = [];
@@ -79,7 +79,7 @@ const chartInfos = computed(function () {
             data: reservationsByDayOfWeek.value,
             title: "Reservations by Day of Week",
             type: "bar",
-            labels: DAYS_OF_WEEK,
+            labels: DAYS_OF_WEEK.value,
         },
     ] as const;
 });

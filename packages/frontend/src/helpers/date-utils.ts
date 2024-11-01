@@ -166,3 +166,12 @@ export function getFormatedDateFromTimestamp(
 export function getDefaultTimezone(): string {
     return Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
+
+export function getLocalizedDaysOfWeek(locale: string): string[] {
+    const format = new Intl.DateTimeFormat(locale, { weekday: "long" });
+    // Create dates for each day of the week (using 2024-01-07 as it was a Sunday)
+    return Array.from({ length: 7 }, (_, i) => {
+        const date = new Date(2024, 0, 7 + i);
+        return format.format(date);
+    });
+}

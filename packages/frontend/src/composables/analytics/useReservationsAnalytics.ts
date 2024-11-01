@@ -11,8 +11,11 @@ import { Loading } from "quasar";
 import { showErrorMessage } from "src/helpers/ui-helpers.js";
 import { format } from "date-fns";
 import { getColors } from "src/helpers/colors.js";
+import { getLocalizedDaysOfWeek } from "src/helpers/date-utils";
+const DEFAULT_SELECTED_DAY = "ALL";
+const SELECTED_MONTH_FORMAT = "yyyy-MM";
 
-export const DAYS_OF_WEEK = [
+const ENG_DAYS_OF_WEEK = [
     "Sunday",
     "Monday",
     "Tuesday",
@@ -21,14 +24,18 @@ export const DAYS_OF_WEEK = [
     "Friday",
     "Saturday",
 ];
-const DEFAULT_SELECTED_DAY = "ALL";
-const SELECTED_MONTH_FORMAT = "yyyy-MM";
 
-export function useReservationsAnalytics(property: Ref<PropertyDoc>, organisationId: string) {
+export function useReservationsAnalytics(
+    property: Ref<PropertyDoc>,
+    organisationId: string,
+    locale: string,
+) {
     const analyticsStore = useAnalyticsStore();
     const reservationBucket = ref<ReservationBucket>();
     const selectedMonth = ref(format(new Date(), SELECTED_MONTH_FORMAT));
     const selectedDay = ref(DEFAULT_SELECTED_DAY);
+
+    const DAYS_OF_WEEK = computed(() => getLocalizedDaysOfWeek(locale));
 
     const currentPropertyReservations = computed(function () {
         return (
@@ -70,7 +77,7 @@ export function useReservationsAnalytics(property: Ref<PropertyDoc>, organisatio
         >(function (bucket, reservation) {
             const date = new Date(reservation.date);
             const dayIndex = date.getUTCDay();
-            const dayName = DAYS_OF_WEEK[dayIndex];
+            const dayName = DAYS_OF_WEEK.value[dayIndex];
 
             if (!bucket[dayName]) {
                 bucket[dayName] = [];
@@ -301,7 +308,7 @@ export function useReservationsAnalytics(property: Ref<PropertyDoc>, organisatio
         return [
             {
                 name: "Reservations by Day",
-                data: DAYS_OF_WEEK.map((day) => dayOfWeekTotals[day] ?? 0),
+                data: ENG_DAYS_OF_WEEK.map((day) => dayOfWeekTotals[day] ?? 0),
                 itemStyle: { color: backgroundColors[0] },
             },
         ];
@@ -351,6 +358,7 @@ export function useReservationsAnalytics(property: Ref<PropertyDoc>, organisatio
     }
 
     return {
+        DAYS_OF_WEEK,
         propertyLabels,
         peakHoursLabels,
         guestDistributionLabels,
