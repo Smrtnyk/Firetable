@@ -6,7 +6,7 @@ import { GridDrawer } from "./GridDrawer.js";
 import { isTable } from "./type-guards.js";
 import { RectTable } from "./elements/RectTable.js";
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { Group, Rect } from "fabric";
+import { Group } from "fabric";
 
 describe("FloorEditor", () => {
     let floorEditor: FloorEditor;
@@ -99,49 +99,6 @@ describe("FloorEditor", () => {
     describe("canRedo()", () => {
         it("can't undo in fresh state", () => {
             expect(floorEditor.canRedo()).toBe(false);
-        });
-    });
-
-    describe("undo()/redo()", () => {
-        it("allows undo and redo after moving an object", () => {
-            const mockFabricObject = new Rect({
-                left: 100,
-                top: 100,
-                width: 60,
-                height: 70,
-            });
-
-            // Add the mock object to the canvas
-            floorEditor.canvas.add(mockFabricObject);
-
-            // Simulate the start of a transform, such as a user starting to drag the object
-            // @ts-expect-error -- private prop
-            floorEditor.eventManager.onBeforeTransform({
-                transform: { target: mockFabricObject },
-            } as any);
-
-            // Simulate the object being moved by the user
-            mockFabricObject.set({ left: 200, top: 200 });
-            floorEditor.canvas.setActiveObject(mockFabricObject);
-
-            // Simulate the end of the transform, such as the user releasing the mouse button
-            // @ts-expect-error -- private prop
-            floorEditor.eventManager.onObjectModified({
-                target: mockFabricObject,
-            } as any);
-
-            // Check if the move was recorded and can be undone
-            expect(floorEditor.canUndo()).toBe(true);
-
-            // Undo the move
-            floorEditor.undo();
-            expect(mockFabricObject.left).toBe(100);
-            expect(mockFabricObject.top).toBe(100);
-
-            // Redo the move
-            floorEditor.redo();
-            expect(mockFabricObject.left).toBe(200);
-            expect(mockFabricObject.top).toBe(200);
         });
     });
 

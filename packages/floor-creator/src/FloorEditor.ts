@@ -14,7 +14,7 @@ import { Floor } from "./Floor.js";
 import { GridDrawer } from "./GridDrawer.js";
 import { EditorEventManager } from "./event-manager/EditorEventManager.js";
 import { calculateCanvasScale } from "./utils.js";
-import { CommandInvoker } from "./command/CommandInvoker.js";
+import { CanvasHistory } from "./CanvasHistory.js";
 import { ActiveSelection } from "fabric";
 import { initAligningGuidelines } from "fabric/extensions";
 import { EventEmitter } from "@posva/event-emitter";
@@ -22,51 +22,59 @@ import { EventEmitter } from "@posva/event-emitter";
 type FloorEditorEvents = {
     elementClicked: [FloorEditor, FloorEditorElement];
     doubleClick: [FloorEditor, NumberTuple];
-    commandChange: [];
+    historyChange: [];
     rendered: [undefined];
     drop: [FloorEditor, FloorDropEvent];
 };
 
 export class FloorEditor extends Floor {
+    readonly gridDrawer: GridDrawer;
+    readonly history: CanvasHistory;
     protected eventManager: EventManager;
     private readonly elementManager: ElementManager;
-    private readonly gridDrawer: GridDrawer;
     private readonly eventEmitter: EventEmitter<FloorEditorEvents>;
-    private readonly commandInvoker = new CommandInvoker();
 
     constructor(options: FloorCreationOptions) {
         super(options);
         this.eventEmitter = new EventEmitter<FloorEditorEvents>();
         this.gridDrawer = new GridDrawer(this.canvas);
-        this.eventManager = new EditorEventManager(this, this.commandInvoker);
+        this.history = new CanvasHistory(this, { maxStackSize: 20 });
+        this.eventManager = new EditorEventManager(this, this.history);
         this.elementManager = new ElementManager();
 
-        this.commandInvoker.on("change", () => {
-            this.emit("commandChange");
-        });
-
-        this.on("rendered", this.renderGrid.bind(this));
-        if (!options.floorDoc.json) {
+        if (options.floorDoc.json) {
+            this.on("rendered", () => {
+                this.renderGrid();
+                this.history.initialize();
+                this.history.on("stateChange", () => {
+                    this.emit("historyChange");
+                });
+            });
+        } else {
             this.renderGrid();
+            this.history.initialize();
+            this.history.on("stateChange", () => {
+                this.emit("historyChange");
+            });
         }
 
         initAligningGuidelines(this.canvas);
     }
 
     canUndo(): boolean {
-        return this.commandInvoker.canUndo();
+        return this.history.canUndo();
     }
 
     canRedo(): boolean {
-        return this.commandInvoker.canRedo();
+        return this.history.canRedo();
     }
 
-    undo(): void {
-        return this.commandInvoker.undo();
+    async undo(): Promise<void> {
+        await this.history.undo();
     }
 
-    redo(): void {
-        return this.commandInvoker.redo();
+    async redo(): Promise<void> {
+        await this.history.redo();
     }
 
     emit<T extends keyof FloorEditorEvents>(
@@ -146,6 +154,7 @@ export class FloorEditor extends Floor {
         this.eventManager.destroy();
         this.zoomManager.destroy();
         this.touchManager.destroy();
+        this.history.destroy();
         await this.canvas.dispose();
     }
 
@@ -157,10 +166,17 @@ export class FloorEditor extends Floor {
         await super.renderData(jsonData);
     }
 
-    async importFloor(jsonImport: { width: number; height: number; json: string }): Promise<void> {
+    async importFloor(
+        jsonImport: { width: number; height: number; json: string },
+        preserveZoom = false,
+    ): Promise<void> {
         this.width = jsonImport.width;
         this.height = jsonImport.height;
-        super.resize(this.containerWidth);
+
+        if (!preserveZoom) {
+            super.resize(this.containerWidth);
+        }
+
         await this.renderData(JSON.parse(jsonImport.json));
     }
 

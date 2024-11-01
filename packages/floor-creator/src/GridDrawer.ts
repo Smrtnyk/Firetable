@@ -10,11 +10,14 @@ declare module "fabric" {
     interface Group {
         isGridLine?: boolean;
     }
+    interface FabricObject {
+        isGridLine?: boolean;
+    }
 }
 
 export class GridDrawer {
+    isGridVisible = true;
     private readonly canvas: Canvas;
-    private isGridVisible = true;
 
     constructor(canvas: Canvas) {
         this.canvas = canvas;
