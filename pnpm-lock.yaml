@@ -139,6 +139,9 @@ importers:
       '@quasar/extras':
         specifier: 1.16.12
         version: 1.16.12
+      '@sentry/vue':
+        specifier: 8.36.0
+        version: 8.36.0(pinia@2.2.5(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3)))(vue@3.5.12(typescript@5.6.3))
       '@types/pako':
         specifier: 2.0.3
         version: 2.0.3
@@ -1777,6 +1780,48 @@ packages:
     resolution: {integrity: sha512-fbMkAF7fufku0N2dE5TBXcNlg0pt0cJue4xBRE2Qc5Vqikxr4VCgKj/ht6SMdFcOacVA9rqF70APJ8RN/4vMJw==}
     cpu: [x64]
     os: [win32]
+
+  '@sentry-internal/browser-utils@8.36.0':
+    resolution: {integrity: sha512-AVJ9GmQW7jYxaal6hjQnnktsDNype01ajVC4q1RyOn1SfzSnXg6mXwj4xm4ovuJV+aBI7fAZJ55vEX5ASuP0ZA==}
+    engines: {node: '>=14.18'}
+
+  '@sentry-internal/feedback@8.36.0':
+    resolution: {integrity: sha512-aAMTm3uDBj8Ta7FwoohpLmJOpWzpWXvvtTbtmSgkeCtPJLUS8DZDCTZ9uCILUkpuYrv2savRUHsdPkxNjgL8FA==}
+    engines: {node: '>=14.18'}
+
+  '@sentry-internal/replay-canvas@8.36.0':
+    resolution: {integrity: sha512-KJPLf+qYdrQdmouoAqIPZ2KeapIBlHWbzNdQqNxJFWLHFFjpLUtt0b+87ruvbA/q3NYy2fDwD7EB0tGS1RHBaA==}
+    engines: {node: '>=14.18'}
+
+  '@sentry-internal/replay@8.36.0':
+    resolution: {integrity: sha512-lbic98GsSkDeinQDix54tBFEgHUlmBtO+HjXECk9jIE0vOzR4As20/s5ta46t1rKMLlnxOtJuT5jKXeUYogBUw==}
+    engines: {node: '>=14.18'}
+
+  '@sentry/browser@8.36.0':
+    resolution: {integrity: sha512-bLrQNe+wD4DkCfB8OD5TF3Rr8KA2+aTo5wF3t3Bf6KVn8//iX1ia1hhtptYiRnbRkG/0AEPxlqL6XfPZYVPQ5A==}
+    engines: {node: '>=14.18'}
+
+  '@sentry/core@8.36.0':
+    resolution: {integrity: sha512-cbq1WQyRqc/+YpPhjwQxfniUM3ZxmO3Pm1oisTB8dw6mlbgQfGD6aznEIjXWWJY6k6acewJlMUx09N7DnprtBw==}
+    engines: {node: '>=14.18'}
+
+  '@sentry/types@8.36.0':
+    resolution: {integrity: sha512-K1pVFfdGHw115RzGHpwSOqoEPeayn4N1F9IfM0kxrYpQSbFT1X29eak88GBfC8gPiLEF0iFGlSaQ4ERmF7oRcA==}
+    engines: {node: '>=14.18'}
+
+  '@sentry/utils@8.36.0':
+    resolution: {integrity: sha512-oJ3EDPj0I00z+AwC3EWBpSidXYUoKW0Id8MfMQP5Hflniz3gif7UEReblT+FJgPEVo6+6uNzAncY0MuNMxmDKQ==}
+    engines: {node: '>=14.18'}
+
+  '@sentry/vue@8.36.0':
+    resolution: {integrity: sha512-ymbqhQx0IX9K2fpGs5O+vctnZi95Pygesk3d8+MX85p0PpN2x+ppQ5lgZrVTSczG5BMMwfgKBF+YRkHew2lIIg==}
+    engines: {node: '>=14.18'}
+    peerDependencies:
+      pinia: 2.x
+      vue: 2.x || 3.x
+    peerDependenciesMeta:
+      pinia:
+        optional: true
 
   '@sindresorhus/is@4.6.0':
     resolution: {integrity: sha512-t09vSN3MdfsyCHoFcTRCH/iUtG7OJ0CsjzB8cjAmKc/va/kIgeDI/TxsigdncE/4be734m0cvIYwNaV4i2XqAw==}
@@ -8060,6 +8105,63 @@ snapshots:
 
   '@rollup/rollup-win32-x64-msvc@4.24.0':
     optional: true
+
+  '@sentry-internal/browser-utils@8.36.0':
+    dependencies:
+      '@sentry/core': 8.36.0
+      '@sentry/types': 8.36.0
+      '@sentry/utils': 8.36.0
+
+  '@sentry-internal/feedback@8.36.0':
+    dependencies:
+      '@sentry/core': 8.36.0
+      '@sentry/types': 8.36.0
+      '@sentry/utils': 8.36.0
+
+  '@sentry-internal/replay-canvas@8.36.0':
+    dependencies:
+      '@sentry-internal/replay': 8.36.0
+      '@sentry/core': 8.36.0
+      '@sentry/types': 8.36.0
+      '@sentry/utils': 8.36.0
+
+  '@sentry-internal/replay@8.36.0':
+    dependencies:
+      '@sentry-internal/browser-utils': 8.36.0
+      '@sentry/core': 8.36.0
+      '@sentry/types': 8.36.0
+      '@sentry/utils': 8.36.0
+
+  '@sentry/browser@8.36.0':
+    dependencies:
+      '@sentry-internal/browser-utils': 8.36.0
+      '@sentry-internal/feedback': 8.36.0
+      '@sentry-internal/replay': 8.36.0
+      '@sentry-internal/replay-canvas': 8.36.0
+      '@sentry/core': 8.36.0
+      '@sentry/types': 8.36.0
+      '@sentry/utils': 8.36.0
+
+  '@sentry/core@8.36.0':
+    dependencies:
+      '@sentry/types': 8.36.0
+      '@sentry/utils': 8.36.0
+
+  '@sentry/types@8.36.0': {}
+
+  '@sentry/utils@8.36.0':
+    dependencies:
+      '@sentry/types': 8.36.0
+
+  '@sentry/vue@8.36.0(pinia@2.2.5(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3)))(vue@3.5.12(typescript@5.6.3))':
+    dependencies:
+      '@sentry/browser': 8.36.0
+      '@sentry/core': 8.36.0
+      '@sentry/types': 8.36.0
+      '@sentry/utils': 8.36.0
+      vue: 3.5.12(typescript@5.6.3)
+    optionalDependencies:
+      pinia: 2.2.5(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3))
 
   '@sindresorhus/is@4.6.0': {}
 

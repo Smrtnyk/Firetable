@@ -21,6 +21,7 @@ coverage
 .firebaserc
 
 /packages/backend/src/firebase/fb-config.json
+sentry.json
 cypress.env.json
 cypress.json
 **/jest/coverage/
