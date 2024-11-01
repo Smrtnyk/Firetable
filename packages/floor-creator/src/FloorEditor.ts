@@ -3,7 +3,6 @@ import type { EventManager } from "./event-manager/EventManager.js";
 import type {
     CreateElementOptions,
     FloorCreationOptions,
-    FloorData,
     FloorDropEvent,
     FloorEditorElement,
     NumberTuple,
@@ -160,10 +159,6 @@ export class FloorEditor extends Floor {
 
     renderGrid(): void {
         this.gridDrawer.drawGrid(this.width, this.height);
-    }
-
-    override async renderData(jsonData?: FloorData["json"]): Promise<void> {
-        await super.renderData(jsonData);
     }
 
     async importFloor(
