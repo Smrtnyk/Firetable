@@ -3,11 +3,11 @@ import { boot } from "quasar/wrappers";
 import { useAuthStore } from "src/stores/auth-store";
 import { initializeFirebase } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import { getCurrentUser, useCurrentUser, VueFire, VueFireAuth } from "vuefire";
+import { useCurrentUser, VueFire, VueFireAuth } from "vuefire";
 import { watch } from "vue";
 import { usePropertiesStore } from "src/stores/properties-store";
-import { isFunction } from "es-toolkit";
 import { useGuestsStore } from "src/stores/guests-store";
+import { createAuthGuard } from "src/router/auth-guard";
 
 export default boot(function ({ router, app }) {
     const { firebaseApp } = initializeFirebase();
@@ -17,71 +17,13 @@ export default boot(function ({ router, app }) {
     });
 
     const authStore = useAuthStore();
+
+    // Set up auth guard
+    router.beforeEach(createAuthGuard(authStore));
+
+    // Handle auth state changes
     handleOnAuthStateChanged(router, authStore);
-    routerBeforeEach(router, authStore);
 });
-
-/**
- * Set up the router to be intercepted on each route.
- * This allows the application to halt rendering until
- * Firebase is finished with its initialization process,
- * and handle the user accordingly
- */
-function routerBeforeEach(router: Router, authStore: ReturnType<typeof useAuthStore>): void {
-    router.beforeEach(async function (to) {
-        try {
-            // Force the app to wait until Firebase has
-            // finished its initialization, and handle the
-            // authentication state of the user properly
-            if (!authStore.isReady) {
-                const currUser = await getCurrentUser();
-                if (currUser) {
-                    await authStore.initUser(currUser);
-                }
-            }
-            const requiresAuth = to.meta.requiresAuth;
-
-            if (requiresAuth && !authStore.isAuthenticated) {
-                return { name: "auth" };
-            }
-
-            if (!authStore.isAuthenticated) {
-                return true;
-            }
-
-            const token = await (await getCurrentUser())?.getIdTokenResult();
-            const role = token?.claims.role as string;
-
-            const allowedRoles = to.meta.allowedRoles;
-
-            if (!allowedRoles) {
-                return true;
-            }
-
-            const isAllowed = isFunction(allowedRoles)
-                ? allowedRoles(authStore)
-                : (allowedRoles as string[]).includes(role);
-            if (isAllowed) {
-                return true;
-            }
-
-            if (allowedRoles && !isAllowed) {
-                return {
-                    name: "home",
-                };
-            }
-
-            if (to.path === "/auth") {
-                return { name: "home" };
-            }
-
-            return true;
-        } catch (err) {
-            showErrorMessage(err);
-            return false;
-        }
-    });
-}
 
 function handleOnAuthStateChanged(
     router: Router,
