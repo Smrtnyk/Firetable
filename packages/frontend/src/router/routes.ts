@@ -220,7 +220,9 @@ export const routes: RouteRecordRaw[] = [
                 name: "adminAnalytics",
                 meta: {
                     requiresAuth: true,
-                    allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN],
+                    allowedRoles(authStore) {
+                        return authStore.canSeeAnalytics;
+                    },
                 },
                 props: true,
                 component: () => import("src/pages/Admin/PageAdminAnalytics.vue"),

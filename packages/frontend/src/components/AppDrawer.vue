@@ -23,6 +23,7 @@ const {
     canEditFloorPlans,
     canCreateEvents,
     canSeeGuestbook,
+    canSeeAnalytics,
 } = storeToRefs(useAuthStore());
 const propertiesStore = usePropertiesStore();
 const props = defineProps<AppDrawerProps>();
@@ -64,7 +65,7 @@ const manageFloorsLink = computed(function () {
 });
 
 const manageAnalyticsLink = computed(function () {
-    if (isAdmin.value) {
+    if (isAdmin.value || !canSeeAnalytics.value) {
         return;
     }
 

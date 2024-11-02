@@ -44,6 +44,14 @@ export const useAuthStore = defineStore("auth", function () {
         return user.value?.email;
     });
 
+    const canSeeAnalytics = computed(function () {
+        const userRole = user.value?.role;
+        if (!userRole) {
+            return false;
+        }
+        return [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN].includes(userRole);
+    });
+
     const canCreateEvents = computed(function () {
         return Boolean(capabilities.value[UserCapability.CAN_CREATE_EVENTS]);
     });
@@ -236,6 +244,7 @@ export const useAuthStore = defineStore("auth", function () {
         canSeeGuestContact,
         canDeleteReservation,
         canSeeGuestbook,
+        canSeeAnalytics,
         user,
         isAuthenticated,
         isReady,
