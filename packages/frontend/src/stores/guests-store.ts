@@ -108,6 +108,9 @@ export const useGuestsStore = defineStore("guests", function () {
                 AppLogger.error("Error fetching guests:", error);
                 state.value.pending = false;
             },
+            onReady() {
+                state.value.pending = false;
+            },
         };
 
         const unsubscribe = subscribeToGuests(organisationId, callbacks);

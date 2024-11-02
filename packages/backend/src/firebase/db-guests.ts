@@ -11,6 +11,7 @@ export type GuestsSubscriptionCallback = {
     onModify: (guest: GuestDoc) => void;
     onRemove: (guestId: string) => void;
     onError?: (error: Error) => void;
+    onReady?: () => void;
 };
 
 export function setGuestData(guestData: GuestDataPayload): Promise<HttpsCallableResult> {
@@ -67,6 +68,8 @@ export function subscribeToGuests(
     return onSnapshot(
         collection(firestore, getGuestsPath(organisationId)),
         function (snapshot) {
+            callbacks.onReady?.();
+
             snapshot.docChanges().forEach(function (change) {
                 const guest = {
                     ...change.doc.data(),
