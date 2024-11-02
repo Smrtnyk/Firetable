@@ -4,7 +4,7 @@ import type { AuthGuard } from "./auth-guard";
 import { createAuthGuard } from "./auth-guard";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { getCurrentUser } from "vuefire";
-import { Loading, Notify } from "quasar";
+import { Loading } from "quasar";
 import { AppLogger } from "src/logger/FTLogger";
 import { ADMIN, Role } from "@firetable/types";
 
@@ -224,25 +224,6 @@ describe("Auth Guard", () => {
 
             expect(await guard(to)).toBe(false);
             expect(AppLogger.error).toHaveBeenCalled();
-        });
-
-        it("identifies version mismatch errors", async () => {
-            const to = createMockRoute("/test", {
-                requiresAuth: true,
-            });
-
-            // Simulate chunk loading error
-            vi.mocked(getCurrentUser).mockRejectedValueOnce(new Error("Loading chunk failed"));
-
-            await guard(to);
-
-            expect(AppLogger.error).toHaveBeenCalled();
-            expect(Notify.create).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    type: "negative",
-                    message: expect.stringContaining("new version"),
-                }),
-            );
         });
 
         it("identifies permission errors", async () => {

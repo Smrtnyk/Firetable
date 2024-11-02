@@ -3,11 +3,11 @@ import type { useAuthStore } from "src/stores/auth-store";
 import { getCurrentUser } from "vuefire";
 import { isFunction } from "es-toolkit";
 import { AppLogger } from "src/logger/FTLogger";
-import { Loading, Notify } from "quasar";
+import { Loading } from "quasar";
 import { refreshApp } from "src/helpers/utils";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 
-type NavigationErrorType = "CHUNK_LOAD_ERROR" | "TIMEOUT" | "UNKNOWN" | "VERSION_MISMATCH";
+type NavigationErrorType = "TIMEOUT" | "UNKNOWN";
 
 interface NavigationError extends Error {
     type: NavigationErrorType;
@@ -23,19 +23,9 @@ function createNavigationError(error: unknown): NavigationError {
         name: "NavigationError",
     };
 
-    if (error instanceof Error) {
-        if (
-            error.message.includes("MIME type") ||
-            error.message.includes("Failed to fetch dynamically imported module") ||
-            error.message.includes("Loading chunk") ||
-            error.name === "ChunkLoadError"
-        ) {
-            navigationError.type = "VERSION_MISMATCH";
-            navigationError.message = "A new version of the application is available.";
-        } else if (error.message.includes("timeout")) {
-            navigationError.type = "TIMEOUT";
-            navigationError.message = "Navigation timeout";
-        }
+    if (error instanceof Error && error.message.includes("timeout")) {
+        navigationError.type = "TIMEOUT";
+        navigationError.message = "Navigation timeout";
     }
 
     navigationError.original = error;
@@ -156,24 +146,6 @@ export function createAuthGuard(authStore: ReturnType<typeof useAuthStore>): Aut
             AppLogger.error("[Auth Guard] Error:", navigationError);
 
             switch (navigationError.type) {
-                case "VERSION_MISMATCH":
-                    Notify.create({
-                        type: "negative",
-                        message: "A new version is available. Please refresh to update.",
-                        position: "top",
-                        timeout: 0,
-                        actions: [
-                            {
-                                label: "Update Now",
-                                color: "white",
-                                handler: refreshApp,
-                            },
-                        ],
-                    });
-                    break;
-                case "CHUNK_LOAD_ERROR":
-                    showErrorMessage("Failed to load page. Please try again.");
-                    break;
                 case "TIMEOUT":
                     showErrorMessage("Navigation timeout. Please try again.");
                     break;
