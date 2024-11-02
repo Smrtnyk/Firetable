@@ -11,6 +11,7 @@ export class DJBooth extends Group implements FloorEditorElement {
             width: 120,
             height: 60,
             fill: "#1C1C1C",
+            evented: false,
         });
 
         const turntable1 = new Circle({
@@ -21,6 +22,7 @@ export class DJBooth extends Group implements FloorEditorElement {
             stroke: "#2F2F2F",
             strokeWidth: 2,
             strokeUniform: true,
+            evented: false,
         });
 
         const turntable2 = new Circle({
@@ -31,6 +33,7 @@ export class DJBooth extends Group implements FloorEditorElement {
             stroke: "#2F2F2F",
             strokeWidth: 2,
             strokeUniform: true,
+            evented: false,
         });
 
         const djSign = new FabricText("DJ", {
@@ -40,6 +43,7 @@ export class DJBooth extends Group implements FloorEditorElement {
             fontSize: 20,
             fill: "#FFFFFF",
             fontWeight: "bold",
+            evented: false,
         });
 
         // dividing by total LEDs + 1 for even spacing
@@ -50,10 +54,15 @@ export class DJBooth extends Group implements FloorEditorElement {
                 top: 57,
                 radius: 2,
                 fill: "#3498DB",
+                evented: false,
             });
         });
 
-        super([body, turntable1, turntable2, djSign, ...leds], { left, top });
+        super([body, turntable1, turntable2, djSign, ...leds], {
+            left,
+            top,
+            subTargetCheck: false,
+        });
     }
 
     getBaseFill(): string {
