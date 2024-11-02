@@ -8,6 +8,7 @@ import { watch } from "vue";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { useGuestsStore } from "src/stores/guests-store";
 import { createAuthGuard } from "src/router/auth-guard";
+import { refreshApp } from "src/helpers/utils";
 
 export default boot(function ({ router, app }) {
     const { firebaseApp } = initializeFirebase();
@@ -18,8 +19,16 @@ export default boot(function ({ router, app }) {
 
     const authStore = useAuthStore();
 
-    // Set up auth guard
     router.beforeEach(createAuthGuard(authStore));
+
+    router.onError(function (error) {
+        const isChunkLoadFailed =
+            /loading chunk \d* failed./i.test(error.message) ||
+            error.message.includes("dynamically imported module");
+        if (isChunkLoadFailed && navigator.onLine) {
+            showErrorMessage("New version is available, press ok to download.", refreshApp);
+        }
+    });
 
     // Handle auth state changes
     handleOnAuthStateChanged(router, authStore);

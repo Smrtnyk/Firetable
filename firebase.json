@@ -35,6 +35,10 @@
                 "source": "**/*.html",
                 "headers": [
                     {
+                        "key": "expires",
+                        "value": "0"
+                    },
+                    {
                         "key": "Cache-Control",
                         "value": "no-cache, no-store, must-revalidate"
                     }

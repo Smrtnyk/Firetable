@@ -147,7 +147,7 @@ export function createAuthGuard(authStore: ReturnType<typeof useAuthStore>): Aut
 
             switch (navigationError.type) {
                 case "TIMEOUT":
-                    showErrorMessage("Navigation timeout. Please try again.");
+                    showErrorMessage("Navigation timeout. Please try again.", refreshApp);
                     break;
                 default:
                     showErrorMessage(navigationError.message, refreshApp);
