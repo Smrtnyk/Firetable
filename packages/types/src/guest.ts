@@ -46,13 +46,40 @@ interface VisitedProperties {
     };
 }
 
+type GuestTags = string[];
+
 export interface GuestDoc {
+    /**
+     * Firestore document ID
+     */
     id: string;
+    /**
+     * Guest name
+     */
     name: string;
+    /**
+     * Guest contact
+     */
     contact: string;
+    /**
+     * Hashed contact using SHA-256 algorithm
+     */
     hashedContact: string;
+    /**
+     * Masked contact
+     */
     maskedContact: string;
+    /**
+     * Timestamp of the last modification
+     */
     lastModified?: number;
+    /**
+     * Tags for the guest
+     */
+    tags?: GuestTags;
+    /**
+     * Visited properties
+     */
     visitedProperties: VisitedProperties;
 }
 

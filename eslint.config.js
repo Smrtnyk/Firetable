@@ -91,7 +91,6 @@ export default tseslint.config(
             "unicorn/prefer-array-flat-map": "error",
             "unicorn/prefer-array-index-of": "error",
             "unicorn/prefer-array-some": "error",
-            "unicorn/prefer-dom-node-text-content": "error",
             "unicorn/prefer-json-parse-buffer": "error",
             "unicorn/prefer-logical-operator-over-ternary": "error",
             "unicorn/prefer-math-trunc": "error",

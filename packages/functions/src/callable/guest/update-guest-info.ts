@@ -5,7 +5,10 @@ import { getGuestsPath } from "../../paths.js";
 import { HttpsError } from "firebase-functions/v2/https";
 
 export interface UpdateGuestInfo {
-    updatedData: Pick<GuestDoc, "contact" | "hashedContact" | "maskedContact" | "name">;
+    updatedData: Pick<
+        GuestDoc,
+        "contact" | "hashedContact" | "lastModified" | "maskedContact" | "name" | "tags"
+    >;
     guestId: string;
     organisationId: string;
 }
@@ -42,13 +45,18 @@ export async function updateGuestDataFn(
             }
         }
 
-        await oldDocRef.update({
+        const dataToUpdate: UpdateGuestInfo["updatedData"] = {
             lastModified: Date.now(),
             contact: updatedData.contact,
             hashedContact: updatedData.hashedContact,
             maskedContact: updatedData.maskedContact,
             name: updatedData.name,
-        });
+        };
+        if (updatedData.tags) {
+            dataToUpdate.tags = updatedData.tags;
+        }
+
+        await oldDocRef.update(dataToUpdate);
 
         return { success: true };
     } catch (error: any) {

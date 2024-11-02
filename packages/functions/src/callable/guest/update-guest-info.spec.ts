@@ -24,7 +24,7 @@ describe("updateGuestDataFn", () => {
         vi.spyOn(Init, "db", "get").mockReturnValue(mockFirestore as any);
     });
 
-    it("should update guest name when contact remains the same", async () => {
+    it("updates guest name when contact remains the same", async () => {
         const guestsCollectionRef = mockFirestore.collection(getGuestsPath(organisationId));
         const oldDocRef = guestsCollectionRef.doc(guestId);
 
@@ -59,7 +59,7 @@ describe("updateGuestDataFn", () => {
         expect(updatedData.lastModified).toBeGreaterThan(0);
     });
 
-    it("should update guest contact and name when contact changes", async () => {
+    it("updates guest contact and name when contact changes", async () => {
         const guestsCollectionRef = mockFirestore.collection(getGuestsPath(organisationId));
         const oldDocRef = guestsCollectionRef.doc(guestId);
 
@@ -95,7 +95,7 @@ describe("updateGuestDataFn", () => {
         expect(updatedData.lastModified).toBeGreaterThan(0);
     });
 
-    it("should throw an error if guest does not exist", async () => {
+    it("throws an error if guest does not exist", async () => {
         const req = {
             data: {
                 updatedData: {
@@ -113,7 +113,7 @@ describe("updateGuestDataFn", () => {
         );
     });
 
-    it("should throw an error if updated contact already exists", async () => {
+    it("throws an error if updated contact already exists", async () => {
         const guestsCollectionRef = mockFirestore.collection(getGuestsPath(organisationId));
         const oldDocRef = guestsCollectionRef.doc(guestId);
 
@@ -143,5 +143,116 @@ describe("updateGuestDataFn", () => {
         await expect(updateGuestDataFn(req)).rejects.toThrowError(
             new HttpsError("already-exists", "A guest with the updated contact already exists."),
         );
+    });
+
+    it("updates guest tags when tags are provided", async () => {
+        const guestsCollectionRef = mockFirestore.collection(getGuestsPath(organisationId));
+        const oldDocRef = guestsCollectionRef.doc(guestId);
+
+        // Set up initial guest document with existing tags
+        await oldDocRef.set({
+            contact: initialContact,
+            name: guestName,
+            tags: ["Existing Tag"],
+        });
+
+        const newTags = ["Updated Tag 1", "Updated Tag 2"];
+
+        const req = {
+            data: {
+                updatedData: {
+                    contact: initialContact,
+                    hashedContact: "hashedContact",
+                    maskedContact: "maskedContact",
+                    name: updatedName,
+                    tags: newTags,
+                },
+                guestId,
+                organisationId,
+            },
+        } as CallableRequest<UpdateGuestInfo>;
+
+        const result = await updateGuestDataFn(req);
+
+        expect(result.success).toBe(true);
+
+        const updatedDocSnapshot = await oldDocRef.get();
+        const updatedData = updatedDocSnapshot.data();
+
+        expect(updatedData.name).toBe(updatedName);
+        expect(updatedData.contact).toBe(initialContact);
+        expect(updatedData.tags).toEqual(newTags);
+        expect(updatedData.lastModified).toBeGreaterThan(0);
+    });
+
+    it("removes guest tags when tags are set to an empty array", async () => {
+        const guestsCollectionRef = mockFirestore.collection(getGuestsPath(organisationId));
+        const oldDocRef = guestsCollectionRef.doc(guestId);
+
+        // Set up initial guest document with existing tags
+        await oldDocRef.set({
+            contact: initialContact,
+            name: guestName,
+            tags: ["Existing Tag"],
+        });
+
+        const req = {
+            data: {
+                updatedData: {
+                    contact: initialContact,
+                    hashedContact: "hashedContact",
+                    maskedContact: "maskedContact",
+                    name: updatedName,
+                    tags: [],
+                },
+                guestId,
+                organisationId,
+            },
+        } as CallableRequest<UpdateGuestInfo>;
+
+        const result = await updateGuestDataFn(req);
+
+        expect(result.success).toBe(true);
+
+        const updatedDocSnapshot = await oldDocRef.get();
+        const updatedData = updatedDocSnapshot.data();
+
+        expect(updatedData.tags).toEqual([]);
+    });
+
+    it("retains existing tags when tags are not provided in the update", async () => {
+        const guestsCollectionRef = mockFirestore.collection(getGuestsPath(organisationId));
+        const oldDocRef = guestsCollectionRef.doc(guestId);
+
+        // Set up initial guest document with existing tags
+        await oldDocRef.set({
+            contact: initialContact,
+            name: guestName,
+            tags: ["Existing Tag"],
+        });
+
+        const req = {
+            data: {
+                updatedData: {
+                    contact: initialContact,
+                    hashedContact: "hashedContact",
+                    maskedContact: "maskedContact",
+                    name: updatedName,
+                    // Note: tags are not provided here
+                },
+                guestId,
+                organisationId,
+            },
+        } as CallableRequest<UpdateGuestInfo>;
+
+        const result = await updateGuestDataFn(req);
+
+        expect(result.success).toBe(true);
+
+        const updatedDocSnapshot = await oldDocRef.get();
+        const updatedData = updatedDocSnapshot.data();
+
+        // The tags remain unchanged
+        expect(updatedData.tags).toEqual(["Existing Tag"]);
     });
 });

@@ -102,12 +102,15 @@ export interface Visit {
     isVIPVisit?: boolean;
 }
 
+type GuestTags = string[];
+
 export interface GuestDoc {
     lastModified: number;
     name: string;
     contact: string;
     hashedContact: string;
     maskedContact: string;
+    tags?: GuestTags;
     visitedProperties: {
         [propertyId: string]: {
             [eventId: string]: Visit | null;

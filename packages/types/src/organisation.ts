@@ -23,5 +23,6 @@ export interface OrganisationSettings {
     };
     guest: {
         collectGuestData: boolean;
+        globalGuestTags?: string[];
     };
 }

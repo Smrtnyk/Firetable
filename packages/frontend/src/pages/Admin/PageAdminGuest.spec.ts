@@ -350,4 +350,26 @@ describe("PageAdminGuest.vue", () => {
         await expect.element(screen.getByText("Event A")).toBeInTheDocument();
         await expect.element(screen.getByText("Event B")).toBeInTheDocument();
     });
+
+    it("renders guest tags when they exist", async () => {
+        guestData.tags = ["VIP", "Frequent Visitor", "Newsletter Subscriber"];
+
+        const screen = render();
+
+        await expect.element(screen.getByText("Tags:")).toBeVisible();
+
+        for (const tag of guestData.tags) {
+            const tagLocator = screen.getByLabelText(`Guest tag ${tag}`);
+            await expect.element(tagLocator).toHaveTextContent(tag);
+            await expect.element(tagLocator).toBeVisible();
+        }
+    });
+
+    it("does not render tags when guest has no tags", async () => {
+        guestData.tags = [];
+        const screen = render();
+
+        const tagsLabel = screen.getByText("Tags:");
+        await expect.element(tagsLabel).not.toBeInTheDocument();
+    });
 });

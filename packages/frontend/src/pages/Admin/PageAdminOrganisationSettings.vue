@@ -9,6 +9,7 @@ import SettingsSection from "src/components/admin/organisation-settings/Settings
 import FTTitle from "src/components/FTTitle.vue";
 import AppCardSection from "src/components/AppCardSection.vue";
 import FTBtn from "src/components/FTBtn.vue";
+
 import { timezones } from "src/helpers/date-utils";
 
 export interface PageAdminOrganisationSettingsProps {

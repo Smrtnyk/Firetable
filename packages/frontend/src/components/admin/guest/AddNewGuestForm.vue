@@ -15,6 +15,7 @@ export interface AddNewGuestFormProps {
     initialData?: {
         name: string;
         contact: string;
+        tags?: string[];
     };
 }
 
@@ -25,12 +26,14 @@ const { t } = useI18n();
 
 const guestName = ref("");
 const guestContact = ref("");
+const guestTags = ref<string[]>([]);
 const createGuestForm = useTemplateRef<QForm>("createGuestForm");
 const guestNameRules = [minLength("Guest name must be at least 3 characters long", 3)];
 
 if (mode === "edit" && initialData) {
     guestName.value = initialData.name;
     guestContact.value = initialData.contact;
+    guestTags.value = initialData.tags ?? [];
 }
 
 function capitalizeGuestName(): void {
@@ -48,6 +51,7 @@ async function submit(): Promise<void> {
         hashedContact: await hashString(guestContact.value),
         maskedContact: maskPhoneNumber(guestContact.value),
         visitedProperties: {},
+        tags: guestTags.value,
     };
 
     if (mode === "create") {
@@ -55,6 +59,15 @@ async function submit(): Promise<void> {
     } else if (mode === "edit") {
         emit("update", payload);
     }
+}
+
+function onNewTag(inputValue: string, done: (item?: any) => void): void {
+    const trimmedValue = inputValue.trim();
+    if (trimmedValue === "") {
+        done();
+        return;
+    }
+    done(trimmedValue.toLowerCase());
 }
 </script>
 
@@ -71,6 +84,25 @@ async function submit(): Promise<void> {
                 :rules="guestNameRules"
             />
             <TelNumberInput required v-model="guestContact" />
+
+            <q-select
+                v-model="guestTags"
+                :label="t('Global.tagsLabel')"
+                rounded
+                standout
+                use-input
+                use-chips
+                multiple
+                emit-value
+                map-options
+                input-debounce="0"
+                hide-dropdown-icon
+                fill-input
+                clear-icon="close"
+                @new-value="onNewTag"
+                new-value-mode="add-unique"
+                :options="[]"
+            />
         </q-form>
     </q-card-section>
 

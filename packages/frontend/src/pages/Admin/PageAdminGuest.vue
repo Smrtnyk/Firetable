@@ -169,9 +169,23 @@ async function onDeleteGuest(): Promise<void> {
 
             <div class="q-mb-sm q-ml-sm" v-if="guest.lastModified && isAdmin">
                 <span class="text-caption"
-                    >Last modified:
+                    >{{ t("PageAdminGuest.lastModified") }}:
                     {{ formatEventDate(guest.lastModified, locale, getDefaultTimezone()) }}</span
                 >
+            </div>
+
+            <div v-if="guest.tags && guest.tags.length > 0" class="q-mt-sm q-mb-sm q-ml-sm">
+                <div class="row content-center items-center vertical-middle">
+                    <p class="q-ma-none q-mr-sm">{{ t("Global.tagsLabel") }}:</p>
+                    <q-chip
+                        v-for="(tag, index) in guest.tags"
+                        :key="index"
+                        class="q-mr-xs"
+                        :aria-label="'Guest tag ' + tag"
+                    >
+                        {{ tag }}
+                    </q-chip>
+                </div>
             </div>
 
             <div v-if="Object.keys(propertiesVisits).length > 0">

@@ -42,6 +42,7 @@ export const DEFAULT_ORGANISATION_SETTINGS: DeepRequired<OrganisationSettings> =
     },
     guest: {
         collectGuestData: false,
+        globalGuestTags: [],
     },
 };
 
