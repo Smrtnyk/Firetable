@@ -8,7 +8,6 @@ import { watch } from "vue";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { useGuestsStore } from "src/stores/guests-store";
 import { createAuthGuard } from "src/router/auth-guard";
-import { trackChunkFailures } from "src/app-event-handlers/unhandled-rejection";
 
 export default boot(function ({ router, app }) {
     const { firebaseApp } = initializeFirebase();
@@ -18,8 +17,6 @@ export default boot(function ({ router, app }) {
     });
 
     const authStore = useAuthStore();
-
-    trackChunkFailures();
 
     // Set up auth guard
     router.beforeEach(createAuthGuard(authStore));
