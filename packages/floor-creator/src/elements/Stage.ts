@@ -14,6 +14,7 @@ export class Stage extends Group implements FloorEditorElement {
             stroke: "#111",
             strokeWidth: 1,
             strokeUniform: true,
+            evented: false,
         });
 
         const decor = new Rect({
@@ -22,6 +23,7 @@ export class Stage extends Group implements FloorEditorElement {
             width: 80,
             height: 20,
             fill: "#6247aa",
+            evented: false,
         });
 
         const stageLabel = new FabricText("STAGE", {
@@ -33,6 +35,7 @@ export class Stage extends Group implements FloorEditorElement {
             fontWeight: "bold",
             originX: "center",
             originY: "center",
+            evented: false,
         });
 
         // LEDs for the stage front
@@ -45,12 +48,14 @@ export class Stage extends Group implements FloorEditorElement {
                 top: 2,
                 radius: 2,
                 fill: "#3498DB",
+                evented: false,
             });
         });
 
         super([stageBody, decor, stageLabel, ...ledsFront], {
             left,
             top,
+            subTargetCheck: false,
         });
     }
 
