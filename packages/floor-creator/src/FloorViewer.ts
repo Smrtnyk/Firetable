@@ -53,6 +53,18 @@ export class FloorViewer extends Floor {
         this.eventManager.destroy();
         this.zoomManager.destroy();
         this.touchManager.destroy();
+        // This is an ugly hack to work around the fact that fabric does not clear the mouseDownTimeout
+        // during dispose. This causes an exception to be thrown if the canvas is disposed while the mouse
+        // is down. Reported this issue https://github.com/fabricjs/fabric.js/issues/10248
+        // @ts-expect-error -- private property
+        // eslint-disable-next-line no-underscore-dangle -- fabric naming
+        const mouseDownTimeout = this.canvas._willAddMouseDown;
+        if (mouseDownTimeout) {
+            clearTimeout(mouseDownTimeout);
+            // @ts-expect-error -- private property
+            // eslint-disable-next-line no-underscore-dangle -- fabric naming
+            this.canvas._willAddMouseDown = 0;
+        }
         await this.canvas.dispose();
     }
 
