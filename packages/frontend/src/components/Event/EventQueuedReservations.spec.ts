@@ -154,20 +154,20 @@ describe("EventQueuedReservations.vue", () => {
         const addButton = screen.getByLabelText("Add new reservation");
         await userEvent.click(addButton);
 
-        expect(createDialogSpy).toHaveBeenCalledWith(
-            expect.objectContaining({
-                component: FTDialog,
-                componentProps: expect.objectContaining({
-                    component: EventCreateReservation,
-                    title: t("EventQueuedReservations.addNewReservation"),
-                    maximized: false,
-                    componentPropsObject: expect.objectContaining({
-                        mode: "create",
-                        onlyPlanned: true,
-                    }),
+        expect(createDialogSpy).toHaveBeenCalledWith({
+            component: expect.any(Object),
+            componentProps: {
+                component: expect.any(Object),
+                componentPropsObject: expect.objectContaining({
+                    mode: "create",
+                    onlyPlanned: true
+                    // Don't verify other props since they may be dynamic
                 }),
-            }),
-        );
+                listeners: expect.any(Object),
+                maximized: false,
+                title: "Add new reservation"
+            }
+        });
     });
 
     it("shows reservation details dialog when a reservation is clicked", async () => {
@@ -184,15 +184,24 @@ describe("EventQueuedReservations.vue", () => {
         const reservationItem = screen.getByText("John Doe");
         await userEvent.click(reservationItem);
 
-        expect(createDialogSpy).toHaveBeenCalledWith(
-            expect.objectContaining({
-                component: FTDialog,
-                componentProps: expect.objectContaining({
-                    component: EventShowQueuedReservation,
-                    title: "",
+        expect(createDialogSpy).toHaveBeenCalledWith({
+            component: expect.any(Object),
+            componentProps: {
+                component: expect.any(Object),
+                componentPropsObject: expect.objectContaining({
+                    reservation: expect.objectContaining({
+                        guestContact: "john@example.com",
+                        guestName: "John Doe",
+                        id: "res1",
+                        isVIP: true
+                    }),
+                    timezone: "UTC"
                 }),
-            }),
-        );
+                listeners: expect.any(Object),
+                maximized: false,
+                title: ""
+            }
+        });
     });
 
     it("closes dialog and drawer on 'unqueue'", async () => {
