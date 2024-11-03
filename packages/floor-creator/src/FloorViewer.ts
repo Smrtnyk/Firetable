@@ -7,6 +7,7 @@ import { EventEmitter } from "@posva/event-emitter";
 
 type FloorViewerEvents = {
     elementClicked: [FloorViewer, FloorEditorElement];
+    rendered: [];
 };
 
 export class FloorViewer extends Floor {
@@ -30,14 +31,14 @@ export class FloorViewer extends Floor {
 
     on<T extends keyof FloorViewerEvents>(
         event: T,
-        listener: (...args: FloorViewerEvents[T]) => void,
+        listener: (...args: ToTuple<FloorViewerEvents[T]>) => void,
     ): void {
         this.eventEmitter.on(event, listener);
     }
 
     off<T extends keyof FloorViewerEvents>(
         event: T,
-        listener: (...args: FloorViewerEvents[T]) => void,
+        listener: (...args: ToTuple<FloorViewerEvents[T]>) => void,
     ): void {
         this.eventEmitter.off(event, listener);
     }

@@ -419,6 +419,7 @@ export default tseslint.config(
     {
         files: ["**/*.spec.ts"],
         rules: {
+            "func-style": "off",
             "@typescript-eslint/no-non-null-assertion": "off",
             "unicorn/consistent-function-scoping": "off",
             "unicorn/no-useless-undefined": "off",

@@ -61,6 +61,11 @@ type OpenDialog = {
 
 type UseReservations = {
     initiateTableOperation: (operation: TableOperation) => void;
+    tableClickHandler: (
+        floor: FloorViewer,
+        element: FloorEditorElement | undefined,
+    ) => Promise<void>;
+    currentTableOperation: Ref<TableOperation | undefined>;
 };
 
 export const enum TableOperationType {
@@ -911,6 +916,8 @@ export function useReservations(
     });
 
     return {
+        currentTableOperation,
+        tableClickHandler,
         initiateTableOperation,
     };
 }
