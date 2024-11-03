@@ -6,9 +6,6 @@ import { mockedStore, renderComponent, t } from "../../../test-helpers/render-co
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 import { DEFAULT_ORGANISATION_SETTINGS, usePropertiesStore } from "src/stores/properties-store";
-import FTDialog from "src/components/FTDialog.vue";
-import EventCreateReservation from "src/components/Event/reservation/EventCreateReservation.vue";
-import EventShowQueuedReservation from "src/components/Event/reservation/EventShowQueuedReservation.vue";
 import { useEventsStore } from "src/stores/events-store";
 import { noop } from "es-toolkit";
 import { ADMIN } from "@firetable/types";
@@ -160,13 +157,13 @@ describe("EventQueuedReservations.vue", () => {
                 component: expect.any(Object),
                 componentPropsObject: expect.objectContaining({
                     mode: "create",
-                    onlyPlanned: true
+                    onlyPlanned: true,
                     // Don't verify other props since they may be dynamic
                 }),
                 listeners: expect.any(Object),
                 maximized: false,
-                title: "Add new reservation"
-            }
+                title: "Add new reservation",
+            },
         });
     });
 
@@ -193,14 +190,14 @@ describe("EventQueuedReservations.vue", () => {
                         guestContact: "john@example.com",
                         guestName: "John Doe",
                         id: "res1",
-                        isVIP: true
+                        isVIP: true,
                     }),
-                    timezone: "UTC"
+                    timezone: "UTC",
                 }),
                 listeners: expect.any(Object),
                 maximized: false,
-                title: ""
-            }
+                title: "",
+            },
         });
     });
 
