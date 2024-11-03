@@ -50,6 +50,10 @@ function getIconNameForLogEntry(logMessage: string): string {
         return "copy";
     }
 
+    if (logMessage.includes("arrived")) {
+        return "check";
+    }
+
     return "";
 }
 
