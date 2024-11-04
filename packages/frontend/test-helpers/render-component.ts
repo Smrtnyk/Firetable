@@ -29,6 +29,7 @@ import {
     QToggle,
     Quasar,
     IconSet,
+    BottomSheet,
 } from "quasar";
 import { h, defineComponent } from "vue";
 import { render } from "vitest-browser-vue";
@@ -95,7 +96,7 @@ export function renderComponent(
                     ...options?.piniaStoreOptions,
                     createSpy: vi.fn,
                 }),
-                Quasar,
+                [Quasar, { plugins: { BottomSheet } }],
                 i18n,
             ],
             provide: options?.provide,

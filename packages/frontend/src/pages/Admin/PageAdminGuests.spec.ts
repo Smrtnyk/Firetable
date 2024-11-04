@@ -344,7 +344,7 @@ describe("PageAdminGuests.vue", () => {
             // Change to percentage sort
             const sortButton = screen.getByLabelText("filter guests");
             await userEvent.click(sortButton);
-            const percentageOption = screen.getByText("Sort by Percentage");
+            const percentageOption = screen.getByText("Percentage");
             await userEvent.click(percentageOption);
 
             const guestItems = screen.getByRole("listitem");
@@ -398,7 +398,7 @@ describe("PageAdminGuests.vue", () => {
             // Change to percentage sort
             const sortButton = screen.getByLabelText("filter guests");
             await userEvent.click(sortButton);
-            const percentageOption = screen.getByText("Sort by Percentage");
+            const percentageOption = screen.getByText("Percentage");
             await userEvent.click(percentageOption);
 
             const guestItems = screen.getByRole("listitem");
@@ -450,7 +450,7 @@ describe("PageAdminGuests.vue", () => {
             // Change to percentage sort
             const sortButton = screen.getByLabelText("filter guests");
             await userEvent.click(sortButton);
-            const percentageOption = screen.getByText("Sort by Percentage");
+            const percentageOption = screen.getByText("Percentage");
             await userEvent.click(percentageOption);
 
             const guestItems = screen.getByRole("listitem");
@@ -582,7 +582,7 @@ describe("PageAdminGuests.vue", () => {
                 // Switch to percentage sort (still descending)
                 const sortButton = screen.getByRole("button", { name: "filter guests" });
                 await userEvent.click(sortButton);
-                await userEvent.click(screen.getByText("Sort by Percentage"));
+                await userEvent.click(screen.getByText("Percentage"));
 
                 guestItems = screen.getByRole("listitem");
 
