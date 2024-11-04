@@ -30,6 +30,9 @@ import {
     Quasar,
     IconSet,
     BottomSheet,
+    Loading,
+    Dialog,
+    Notify,
 } from "quasar";
 import { h, defineComponent } from "vue";
 import { render } from "vitest-browser-vue";
@@ -96,7 +99,7 @@ export function renderComponent(
                     ...options?.piniaStoreOptions,
                     createSpy: vi.fn,
                 }),
-                [Quasar, { plugins: { BottomSheet } }],
+                [Quasar, { plugins: { BottomSheet, Loading, Dialog, Notify } }],
                 i18n,
             ],
             provide: options?.provide,
