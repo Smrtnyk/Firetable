@@ -1,5 +1,4 @@
 import type { Ref, ShallowRef } from "vue";
-import type { BaseTable, Floor, FloorEditorElement, FloorViewer } from "@firetable/floor-creator";
 import type { EventOwner } from "../backend-proxy";
 import type { DialogChainObject } from "quasar";
 import type { VueFirestoreDocumentData } from "vuefire";
@@ -13,6 +12,13 @@ import type {
     User,
 } from "@firetable/types";
 import type { GuestSummary } from "src/stores/guests-store";
+import type {
+    BaseTable,
+    Floor,
+    FloorEditorElement,
+    FloorElementClickHandler,
+    FloorViewer,
+} from "@firetable/floor-creator";
 import {
     moveReservationFromQueue,
     moveReservationToQueue,
@@ -61,10 +67,7 @@ type OpenDialog = {
 
 type UseReservations = {
     initiateTableOperation: (operation: TableOperation) => void;
-    tableClickHandler: (
-        floor: FloorViewer,
-        element: FloorEditorElement | undefined,
-    ) => Promise<void>;
+    tableClickHandler: FloorElementClickHandler;
     currentTableOperation: Ref<TableOperation | undefined>;
 };
 
