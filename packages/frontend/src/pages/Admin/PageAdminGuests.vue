@@ -22,6 +22,9 @@ export interface PageAdminGuestsProps {
     organisationId: string;
 }
 
+/**
+ * When sorting by bookings try to prioritize guests with most bookings and then guests with the highest percentage of fulfilled visits.
+ */
 type SortOption = "bookings" | "percentage";
 
 const sortOption = ref<SortOption>("bookings");
@@ -104,7 +107,12 @@ const sortedGuests = computed(function () {
 
     if (sortOption.value === "bookings") {
         guestsWithRes.sort(function (a, b) {
-            return b.totalReservations - a.totalReservations;
+            // First compare by total reservations
+            if (b.totalReservations !== a.totalReservations) {
+                return b.totalReservations - a.totalReservations;
+            }
+            // If total reservations are equal, sort by percentage
+            return Number.parseFloat(b.overallPercentage) - Number.parseFloat(a.overallPercentage);
         });
     }
 
