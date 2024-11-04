@@ -33,6 +33,8 @@ export interface FloorEditorElement extends FabricObject {
 
     changeToOutlinedMode?(): void;
     changeToFilledMode?(): void;
+
+    setDimensions(width: number, height: number): void;
 }
 
 export type CreateElementOptions = {

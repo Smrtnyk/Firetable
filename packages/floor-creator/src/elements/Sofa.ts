@@ -52,6 +52,13 @@ export class Sofa extends Group implements FloorEditorElement {
         return Promise.resolve(new Sofa(object));
     }
 
+    setDimensions(width: number, height: number): void {
+        this.scaleX = width / this.width;
+        this.scaleY = height / this.height;
+        this.setCoords();
+        this.canvas?.requestRenderAll();
+    }
+
     getBaseFill(): string {
         return this.sofaBase.get("fill") as string;
     }

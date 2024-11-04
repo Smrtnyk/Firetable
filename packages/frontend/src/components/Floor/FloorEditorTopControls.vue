@@ -52,18 +52,14 @@ watch(localWidth, function (newWidth) {
     if (!selectedFloorElement) {
         return;
     }
-    selectedFloorElement.scaleX = newWidth / selectedFloorElement.width;
-    selectedFloorElement.setCoords();
-    selectedFloorElement.canvas?.renderAll();
+    selectedFloorElement?.setDimensions?.(newWidth, localHeight.value);
 });
 
 watch(localHeight, function (newHeight) {
     if (!selectedFloorElement) {
         return;
     }
-    selectedFloorElement.scaleY = newHeight / selectedFloorElement.height;
-    selectedFloorElement.setCoords();
-    selectedFloorElement.canvas?.renderAll();
+    selectedFloorElement?.setDimensions?.(localWidth.value, newHeight);
 });
 
 function sendBack(): void {
