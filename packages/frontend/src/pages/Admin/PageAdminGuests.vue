@@ -214,10 +214,9 @@ function showCreateGuestDialog(): void {
             rounded
             v-model="searchQuery"
             debounce="300"
-            placeholder="Search by name or contact"
             clearable
             clear-icon="close"
-            label="Search guests"
+            label="Search by name or contact"
             class="q-mb-sm"
         >
             <template #prepend>
