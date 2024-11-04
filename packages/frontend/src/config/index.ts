@@ -57,6 +57,8 @@ export const myIcons: Record<string, string> = {
     "dashed-outline": "svguse:/svg-icons/ft-icons.svg#dashed-outline",
     fill: "svguse:/svg-icons/ft-icons.svg#fill",
     filter: "svguse:/svg-icons/ft-icons.svg#filter",
+    "arrow-sort-up": "svguse:/svg-icons/ft-icons.svg#arrow-sort-up",
+    "arrow-sort-down": "svguse:/svg-icons/ft-icons.svg#arrow-sort-down",
 };
 
 export function getDarkMode(): boolean {

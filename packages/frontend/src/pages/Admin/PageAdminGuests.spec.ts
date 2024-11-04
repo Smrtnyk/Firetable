@@ -461,6 +461,138 @@ describe("PageAdminGuests.vue", () => {
             expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
             expect(guestItems.elements()[2]).toHaveTextContent("Alice Johnson");
         });
+
+        describe("sort direction", () => {
+            it("toggles between ascending and descending order", async () => {
+                guestsRef.value.data = [
+                    {
+                        id: "guest1",
+                        name: "John Doe",
+                        contact: "+434324",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        visitedProperties: {
+                            property1: {
+                                visit1: {
+                                    date: new Date("2023-10-01").getTime(),
+                                    arrived: true,
+                                } as Visit,
+                                visit2: {
+                                    date: new Date("2023-10-05").getTime(),
+                                    arrived: true,
+                                } as Visit,
+                            },
+                        },
+                    },
+                    {
+                        id: "guest2",
+                        name: "Jane Smith",
+                        contact: "+434324",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        visitedProperties: {
+                            property1: {
+                                visit3: {
+                                    date: new Date("2023-08-20").getTime(),
+                                    arrived: true,
+                                } as Visit,
+                            },
+                        },
+                    },
+                ];
+
+                const screen = await render();
+
+                // Open sort menu
+                const sortButton = screen.getByRole("button", { name: "filter guests" });
+                await userEvent.click(sortButton);
+
+                // Toggle to ascending
+                const directionButton = screen.getByText("Descending");
+                await userEvent.click(directionButton);
+
+                let guestItems = screen.getByRole("listitem");
+
+                // In ascending order, Jane (1 visit) should be first
+                expect(guestItems.elements()[0]).toHaveTextContent("Jane Smith");
+                expect(guestItems.elements()[1]).toHaveTextContent("John Doe");
+
+                // Toggle back to descending
+                await userEvent.click(sortButton);
+                await userEvent.click(screen.getByText("Ascending"));
+
+                guestItems = screen.getByRole("listitem");
+
+                // Back in descending order, John (2 visits) should be first
+                expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
+                expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
+            });
+
+            it("maintains sort direction when changing sort option", async () => {
+                // John: 2 bookings, 50% arrival (1/2)
+                // Jane: 1 booking, 100% arrival (1/1)
+                guestsRef.value.data = [
+                    {
+                        id: "guest1",
+                        name: "John Doe",
+                        contact: "+434324",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        visitedProperties: {
+                            property1: {
+                                visit1: {
+                                    date: new Date("2023-10-01").getTime(),
+                                    arrived: true,
+                                } as Visit,
+                                visit2: {
+                                    date: new Date("2023-10-05").getTime(),
+                                    arrived: false,
+                                } as Visit,
+                            },
+                        },
+                    } as GuestDoc,
+                    {
+                        id: "guest2",
+                        name: "Jane Smith",
+                        contact: "+434324",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        visitedProperties: {
+                            property1: {
+                                visit3: {
+                                    date: new Date("2023-08-20").getTime(),
+                                    arrived: true,
+                                } as Visit,
+                            },
+                        },
+                    } as GuestDoc,
+                ];
+
+                const screen = await render();
+
+                // Default state: descending order, sort by bookings
+                let guestItems = screen.getByRole("listitem");
+
+                // Verify descending order by bookings
+                // John should be first (2 bookings)
+                // Jane should be second (1 booking)
+                expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
+                expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
+
+                // Switch to percentage sort (still descending)
+                const sortButton = screen.getByRole("button", { name: "filter guests" });
+                await userEvent.click(sortButton);
+                await userEvent.click(screen.getByText("Sort by Percentage"));
+
+                guestItems = screen.getByRole("listitem");
+
+                // Verify descending order by percentage
+                // Jane should be first (100% arrival rate)
+                // John should be second (50% arrival rate)
+                expect(guestItems.elements()[0]).toHaveTextContent("Jane Smith");
+                expect(guestItems.elements()[1]).toHaveTextContent("John Doe");
+            });
+        });
     });
 
     describe("search", () => {

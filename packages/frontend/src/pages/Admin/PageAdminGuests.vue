@@ -32,7 +32,10 @@ type SortOption =
      */
     | "percentage";
 
+type SortDirection = "asc" | "desc";
+
 const sortOption = ref<SortOption>("bookings");
+const sortDirection = ref<SortDirection>("desc");
 const sortOptions = [
     { label: "Sort by Bookings", value: "bookings" },
     { label: "Sort by Percentage", value: "percentage" },
@@ -103,39 +106,34 @@ const guestsWithSummaries = computed(function () {
 });
 
 const sortedGuests = computed(function () {
-    const guestsWithRes = guestsWithSummaries.value.filter(function (guest) {
-        return guest.totalReservations > 0;
-    });
-    const guestsWithoutRes = guestsWithSummaries.value.filter(function (guest) {
-        return guest.totalReservations === 0;
-    });
+    return [...guestsWithSummaries.value].sort(function (a, b) {
+        let comparison = 0;
 
-    if (sortOption.value === "bookings") {
-        guestsWithRes.sort(function (a, b) {
+        if (sortOption.value === "bookings") {
             // First compare by total reservations
-            if (b.totalReservations !== a.totalReservations) {
-                return b.totalReservations - a.totalReservations;
+            if (b.totalReservations === a.totalReservations) {
+                // If total reservations are equal, sort by percentage
+                comparison =
+                    Number.parseFloat(b.overallPercentage) - Number.parseFloat(a.overallPercentage);
+            } else {
+                comparison = b.totalReservations - a.totalReservations;
             }
-            // If total reservations are equal, sort by percentage
-            return Number.parseFloat(b.overallPercentage) - Number.parseFloat(a.overallPercentage);
-        });
-    }
-
-    if (sortOption.value === "percentage") {
-        guestsWithRes.sort(function (a, b) {
+        } else {
+            // percentage
             // First compare by percentage
             const percentageDiff =
                 Number.parseFloat(b.overallPercentage) - Number.parseFloat(a.overallPercentage);
-            if (percentageDiff !== 0) {
-                return percentageDiff;
+            if (percentageDiff === 0) {
+                // If percentages are equal, sort by total reservations
+                comparison = b.totalReservations - a.totalReservations;
+            } else {
+                comparison = percentageDiff;
             }
-            // If percentages are equal, sort by total reservations
-            return b.totalReservations - a.totalReservations;
-        });
-    }
+        }
 
-    // Append guests without reservations at the end
-    return [...guestsWithRes, ...guestsWithoutRes];
+        // Apply sort direction
+        return sortDirection.value === "asc" ? -comparison : comparison;
+    });
 });
 
 const filteredGuests = computed(function () {
@@ -156,6 +154,10 @@ const pageTitle = computed(function () {
 
 function setSortOption(option: SortOption): void {
     sortOption.value = option;
+}
+
+function toggleSortDirection(): void {
+    sortDirection.value = sortDirection.value === "desc" ? "asc" : "desc";
 }
 
 function showCreateGuestDialog(): void {
@@ -213,24 +215,42 @@ function showCreateGuestDialog(): void {
                 <q-icon name="search" />
             </template>
             <template #append>
-                <!-- Sort Select -->
+                <!-- Sort Controls -->
                 <q-btn dense flat icon="filter" aria-label="filter guests">
                     <q-menu auto-close>
                         <q-list>
+                            <!-- Sort Options -->
+                            <q-item-label header>Sort by</q-item-label>
                             <q-item
-                                clickable
                                 v-for="option in sortOptions"
                                 :key="option.value"
+                                clickable
                                 @click="setSortOption(option.value)"
                             >
-                                <q-item-section>
-                                    {{ option.label }}
-                                </q-item-section>
+                                <q-item-section>{{ option.label }}</q-item-section>
                                 <q-item-section side>
                                     <q-icon
                                         v-if="sortOption === option.value"
                                         name="check"
                                         color="primary"
+                                    />
+                                </q-item-section>
+                            </q-item>
+
+                            <!-- Direction Options -->
+                            <q-separator />
+                            <q-item-label header>Direction</q-item-label>
+                            <q-item clickable @click="toggleSortDirection">
+                                <q-item-section>
+                                    {{ sortDirection === "desc" ? "Descending" : "Ascending" }}
+                                </q-item-section>
+                                <q-item-section side>
+                                    <q-icon
+                                        :name="
+                                            sortDirection === 'desc'
+                                                ? 'arrow-sort-down'
+                                                : 'arrow-sort-up'
+                                        "
                                     />
                                 </q-item-section>
                             </q-item>
