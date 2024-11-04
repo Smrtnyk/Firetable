@@ -607,7 +607,7 @@ describe("PageAdminGuests.vue", () => {
         it("filters guests by name based on search input", async () => {
             const screen = await render();
 
-            const searchInput = screen.getByLabelText("Search guests");
+            const searchInput = screen.getByLabelText("Search by name or contact");
             await userEvent.type(searchInput, "Jane");
             // Debounced search
             await vi.advanceTimersByTimeAsync(301);
@@ -621,7 +621,7 @@ describe("PageAdminGuests.vue", () => {
         it("filters guests by contact based on search input", async () => {
             const screen = await render();
 
-            const searchInput = screen.getByLabelText("Search guests");
+            const searchInput = screen.getByLabelText("Search by name or contact");
             await userEvent.type(searchInput, "alice@example.com");
             await vi.advanceTimersByTimeAsync(301);
 
@@ -634,7 +634,7 @@ describe("PageAdminGuests.vue", () => {
         it("is case-insensitive when filtering guests", async () => {
             const screen = await render();
 
-            const searchInput = screen.getByLabelText("Search guests");
+            const searchInput = screen.getByLabelText("Search by name or contact");
             await userEvent.type(searchInput, "jOhN d");
             await vi.advanceTimersByTimeAsync(301);
 
@@ -647,7 +647,7 @@ describe("PageAdminGuests.vue", () => {
         it("shows multiple guests when search matches multiple entries", async () => {
             const screen = await render();
 
-            const searchInput = screen.getByLabelText("Search guests");
+            const searchInput = screen.getByLabelText("Search by name or contact");
             await userEvent.type(searchInput, "example.com");
             await vi.advanceTimersByTimeAsync(301);
 
@@ -662,7 +662,7 @@ describe("PageAdminGuests.vue", () => {
         it("shows 'No guests data' when search yields no results", async () => {
             const screen = await render();
 
-            const searchInput = screen.getByLabelText("Search guests");
+            const searchInput = screen.getByLabelText("Search by name or contact");
             await userEvent.type(searchInput, "NonExistentGuest");
             await vi.advanceTimersByTimeAsync(301);
 
@@ -675,7 +675,7 @@ describe("PageAdminGuests.vue", () => {
         it("clears search input and shows all guests", async () => {
             const screen = await render();
 
-            const searchInput = screen.getByLabelText("Search guests");
+            const searchInput = screen.getByLabelText("Search by name or contact");
             await userEvent.type(searchInput, "Jane");
             await vi.advanceTimersByTimeAsync(301);
 
@@ -700,7 +700,9 @@ describe("PageAdminGuests.vue", () => {
 
         const screen = await render();
 
-        await expect.element(screen.getByLabelText("Search guests")).not.toBeInTheDocument();
+        await expect
+            .element(screen.getByLabelText("Search by name or contact"))
+            .not.toBeInTheDocument();
         await expect.element(screen.getByLabelText("Sort Guests")).not.toBeInTheDocument();
     });
 
