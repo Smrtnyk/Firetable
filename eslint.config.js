@@ -128,7 +128,6 @@ export default tseslint.config(
             "unicorn/prefer-modern-math-apis": "error",
             "unicorn/prefer-node-protocol": "error",
             "unicorn/prefer-number-properties": "error",
-            "unicorn/prefer-ternary": "error",
             "unicorn/throw-new-error": "error",
             //
             "@regru/prefer-early-return/prefer-early-return": [
