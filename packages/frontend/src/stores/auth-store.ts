@@ -1,15 +1,16 @@
 import type { AppUser, User, VoidFunction } from "@firetable/types";
 import type { User as FBUser } from "firebase/auth";
+import { getUserPath, logoutUser } from "../backend-proxy";
 import { Role, ADMIN, DEFAULT_CAPABILITIES_BY_ROLE, UserCapability } from "@firetable/types";
 import { defineStore } from "pinia";
 import { computed, ref, watch } from "vue";
-import { getUserPath, logoutUser } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useFirestoreDocument } from "src/composables/useFirestore";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { Loading } from "quasar";
 import { isNotNil } from "es-toolkit/predicate";
 import { noop } from "es-toolkit/function";
+import { AppLogger } from "src/logger/FTLogger";
 
 export const useAuthStore = defineStore("auth", function () {
     const isAuthenticated = ref(false);
@@ -41,7 +42,7 @@ export const useAuthStore = defineStore("auth", function () {
     });
 
     const isLoggedIn = computed(function () {
-        return user.value?.email;
+        return Boolean(user.value?.email);
     });
 
     const canSeeAnalytics = computed(function () {
@@ -115,7 +116,7 @@ export const useAuthStore = defineStore("auth", function () {
     }
 
     function setAuthState(isAuthenticatedVal: boolean): void {
-        if (isNotNil(isAuthenticated)) {
+        if (isNotNil(isAuthenticatedVal)) {
             isAuthenticated.value = isAuthenticatedVal;
         } else {
             isReady.value = false;
@@ -153,7 +154,12 @@ export const useAuthStore = defineStore("auth", function () {
                     }),
                 ]);
             }
+        } catch (error) {
+            handleError(noop, {
+                message: error instanceof Error ? error.message : "Unknown error occurred",
+            });
         } finally {
+            initInProgress.value = false;
             Loading.hide();
         }
     }
@@ -219,14 +225,19 @@ export const useAuthStore = defineStore("auth", function () {
 
     function handleError(stop: VoidFunction, errorObj: { message: string }): void {
         stop();
+        cleanup();
         showErrorMessage(errorObj.message);
-        logoutUser().catch(noop);
+        logoutUser().catch(AppLogger.error.bind(AppLogger));
     }
 
     return {
         cleanup,
         setAuthState,
         initUser,
+        assignAdmin,
+        capabilities,
+        unsubscribers,
+        initInProgress,
         nonNullableUser,
         isLoggedIn,
         isAdmin,

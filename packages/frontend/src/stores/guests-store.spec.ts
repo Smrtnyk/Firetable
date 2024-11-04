@@ -22,6 +22,8 @@ vi.mock("src/composables/useFirestore", () => ({
 vi.mock("../backend-proxy", () => ({
     getGuestsPath: (orgId: string) => `organisations/${orgId}/guests`,
     subscribeToGuests: subscribeToGuestsSpy,
+    getUserPath: vi.fn(),
+    logoutUser: vi.fn(),
 }));
 
 // Test helpers and fixtures
