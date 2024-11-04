@@ -111,7 +111,7 @@ const breadcrumbLinks = computed<Link[]>(function () {
 .AppBreadcrumbs {
     max-width: 100%;
     overflow: hidden;
-    margin-top: 1px;
+    background: $dark;
 
     .q-breadcrumbs__separator {
         display: none;
