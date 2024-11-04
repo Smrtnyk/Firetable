@@ -5,7 +5,7 @@ import { useI18n } from "vue-i18n";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { storeToRefs } from "pinia";
 import { useDialog } from "src/composables/useDialog";
-import { computed, ref, watch } from "vue";
+import { computed, onUnmounted, ref, watch } from "vue";
 import { isMobile } from "src/global-reactives/screen-detection";
 import { Loading } from "quasar";
 import { useAuthStore } from "src/stores/auth-store";
@@ -59,7 +59,12 @@ watch(
             Loading.hide();
         }
     },
+    { immediate: true },
 );
+
+onUnmounted(() => {
+    Loading.hide();
+});
 
 const searchQuery = ref<string>("");
 
@@ -149,6 +154,9 @@ const filteredGuests = computed(function () {
 });
 
 const pageTitle = computed(function () {
+    if (isLoading.value) {
+        return t("PageAdminGuests.title");
+    }
     return `${t("PageAdminGuests.title")} (${guestsWithSummaries.value.length})`;
 });
 
@@ -188,6 +196,7 @@ function showCreateGuestDialog(): void {
         <FTTitle :title="pageTitle">
             <template #right>
                 <FTBtn
+                    v-if="!isLoading"
                     rounded
                     icon="plus"
                     class="button-gradient"

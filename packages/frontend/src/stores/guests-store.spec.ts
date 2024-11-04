@@ -238,7 +238,7 @@ describe("Guests Store", () => {
             callbacks.onAdd(guestDoc);
             expect(result.value).toEqual({
                 data: [guestDoc],
-                pending: false,
+                pending: true,
             });
 
             // Test onModify
@@ -246,19 +246,23 @@ describe("Guests Store", () => {
             callbacks.onModify(modifiedGuest);
             expect(result.value).toEqual({
                 data: [modifiedGuest],
-                pending: false,
+                pending: true,
             });
 
             // Test onRemove
             callbacks.onRemove(guestDoc.id);
             expect(result.value).toEqual({
                 data: [],
-                pending: false,
+                pending: true,
             });
 
             // Test onError
             const error = new Error("Test error");
             callbacks.onError(error);
+            expect(result.value.pending).toBe(false);
+
+            // Test onReady
+            callbacks.onReady();
             expect(result.value.pending).toBe(false);
         });
 
