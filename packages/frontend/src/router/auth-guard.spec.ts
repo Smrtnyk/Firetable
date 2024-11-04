@@ -1,6 +1,7 @@
 import type { useAuthStore } from "src/stores/auth-store";
 import type { RouteLocationNormalizedGeneric, RouteMeta } from "vue-router";
 import type { AuthGuard } from "./auth-guard";
+import type { usePermissionsStore } from "src/stores/permissions-store";
 import { createAuthGuard } from "./auth-guard";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { getCurrentUser } from "vuefire";
@@ -53,6 +54,7 @@ function createMockRoute(
 
 describe("Auth Guard", () => {
     let mockAuthStore: ReturnType<typeof useAuthStore>;
+    let mockPermissionsStore: ReturnType<typeof usePermissionsStore>;
     let guard: AuthGuard;
 
     beforeEach(() => {
@@ -62,7 +64,8 @@ describe("Auth Guard", () => {
             isAuthenticated: false,
             initUser: vi.fn(),
         } as unknown as ReturnType<typeof useAuthStore>;
-        guard = createAuthGuard(mockAuthStore);
+        mockPermissionsStore = {} as unknown as ReturnType<typeof usePermissionsStore>;
+        guard = createAuthGuard(mockAuthStore, mockPermissionsStore);
     });
 
     afterEach(() => {
@@ -134,7 +137,7 @@ describe("Auth Guard", () => {
             } as any);
 
             expect(await guard(to)).toStrictEqual(true);
-            expect(mockRoleCheck).toHaveBeenCalledWith(mockAuthStore);
+            expect(mockRoleCheck).toHaveBeenCalledWith(mockPermissionsStore);
         });
 
         it("handles array-based role checks", async () => {

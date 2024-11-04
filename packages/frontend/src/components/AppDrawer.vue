@@ -12,19 +12,14 @@ import { useAuthStore } from "src/stores/auth-store";
 import { usePropertiesStore } from "src/stores/properties-store";
 import AppDrawerLink from "src/components/AppDrawerLink.vue";
 import { dynamicallySwitchLang } from "src/config";
+import { usePermissionsStore } from "src/stores/permissions-store";
 
 export interface AppDrawerProps {
     modelValue: boolean;
 }
-const {
-    nonNullableUser,
-    isAdmin,
-    canSeeInventory,
-    canEditFloorPlans,
-    canCreateEvents,
-    canSeeGuestbook,
-    canSeeAnalytics,
-} = storeToRefs(useAuthStore());
+const { nonNullableUser, isAdmin } = storeToRefs(useAuthStore());
+const { canSeeInventory, canEditFloorPlans, canCreateEvents, canSeeGuestbook, canSeeAnalytics } =
+    storeToRefs(usePermissionsStore());
 const propertiesStore = usePropertiesStore();
 const props = defineProps<AppDrawerProps>();
 const emit = defineEmits<(e: "update:modelValue", value: boolean) => void>();

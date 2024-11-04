@@ -8,6 +8,7 @@ import ReservationLabelChips from "src/components/Event/reservation/ReservationL
 import FTBtn from "src/components/FTBtn.vue";
 
 import { useAuthStore } from "src/stores/auth-store";
+import { usePermissionsStore } from "src/stores/permissions-store";
 
 interface Props {
     reservation: QueuedReservationDoc;
@@ -18,9 +19,10 @@ const props = defineProps<Props>();
 const emit = defineEmits<(e: "delete" | "unqueue") => void>();
 
 const authStore = useAuthStore();
+const permissionsStore = usePermissionsStore();
 
 const canModify = computed(function () {
-    return authStore.canReserve || isOwnReservation(props.reservation);
+    return permissionsStore.canReserve || isOwnReservation(props.reservation);
 });
 
 function isOwnReservation(reservation: QueuedReservation): boolean {

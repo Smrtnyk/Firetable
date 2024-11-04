@@ -58,6 +58,7 @@ import { eventEmitter } from "src/boot/event-emitter";
 import { hashString } from "src/helpers/hash-string";
 import { useGuestsStore } from "src/stores/guests-store";
 import { useRouter } from "vue-router";
+import { usePermissionsStore } from "src/stores/permissions-store";
 
 type OpenDialog = {
     label: string;
@@ -108,7 +109,8 @@ export function useReservations(
 ): UseReservations {
     const { createDialog } = useDialog();
     const { t } = useI18n();
-    const { canReserve, nonNullableUser, canSeeGuestbook } = storeToRefs(useAuthStore());
+    const { nonNullableUser } = storeToRefs(useAuthStore());
+    const { canReserve, canSeeGuestbook } = storeToRefs(usePermissionsStore());
     const router = useRouter();
     const propertiesStore = usePropertiesStore();
     const guestsStore = useGuestsStore();

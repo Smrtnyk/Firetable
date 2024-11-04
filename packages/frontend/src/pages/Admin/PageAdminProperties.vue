@@ -23,6 +23,7 @@ import { usePropertiesStore } from "src/stores/properties-store";
 import { useFirestoreCollection } from "src/composables/useFirestore";
 import { useAuthStore } from "src/stores/auth-store";
 import { matchesProperty } from "es-toolkit/compat";
+import { usePermissionsStore } from "src/stores/permissions-store";
 
 interface Props {
     organisationId: string;
@@ -30,6 +31,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const authStore = useAuthStore();
+const permissionStore = usePermissionsStore();
 const propertiesStore = usePropertiesStore();
 const quasar = useQuasar();
 const { t } = useI18n();
@@ -133,13 +135,13 @@ function createLinks(propertyId: string): Link[] {
             label: t("AppDrawer.links.manageEvents"),
             icon: "calendar",
             route: { name: "adminEvents", params },
-            visible: authStore.canCreateEvents,
+            visible: permissionStore.canCreateEvents,
         },
         {
             label: t("Global.manageInventoryLink"),
             icon: "grid",
             route: { name: "adminInventory", params },
-            visible: authStore.canSeeInventory,
+            visible: permissionStore.canSeeInventory,
         },
         {
             label: t("AppDrawer.links.manageFloors"),
