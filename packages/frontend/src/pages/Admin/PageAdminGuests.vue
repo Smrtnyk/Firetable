@@ -7,7 +7,7 @@ import { storeToRefs } from "pinia";
 import { useDialog } from "src/composables/useDialog";
 import { computed, onUnmounted, ref, watch } from "vue";
 import { isMobile } from "src/global-reactives/screen-detection";
-import { Loading } from "quasar";
+import { Loading, useQuasar } from "quasar";
 import { useAuthStore } from "src/stores/auth-store";
 import { useGuestsStore } from "src/stores/guests-store";
 
@@ -37,12 +37,13 @@ type SortDirection = "asc" | "desc";
 const sortOption = ref<SortOption>("bookings");
 const sortDirection = ref<SortDirection>("desc");
 const sortOptions = [
-    { label: "Sort by Bookings", value: "bookings" },
-    { label: "Sort by Percentage", value: "percentage" },
+    { label: "Bookings", value: "bookings" },
+    { label: "Percentage", value: "percentage" },
 ] as const;
 
 const { createDialog } = useDialog();
 const { t } = useI18n();
+const quasar = useQuasar();
 const props = defineProps<PageAdminGuestsProps>();
 const guestsStore = useGuestsStore();
 const guestsRef = guestsStore.getGuests(props.organisationId);
@@ -112,7 +113,7 @@ const guestsWithSummaries = computed(function () {
 
 const sortedGuests = computed(function () {
     return [...guestsWithSummaries.value].sort(function (a, b) {
-        let comparison = 0;
+        let comparison: number;
 
         if (sortOption.value === "bookings") {
             // First compare by total reservations
@@ -159,6 +160,46 @@ const pageTitle = computed(function () {
     }
     return `${t("PageAdminGuests.title")} (${guestsWithSummaries.value.length})`;
 });
+
+function showBottomSheet(): void {
+    quasar
+        .bottomSheet({
+            class: "ft-card",
+            persistent: false,
+            actions: [
+                {
+                    label: "Sort by",
+                    classes: "text-weight-bolder",
+                },
+                ...sortOptions.map((option) => ({
+                    label: option.label,
+                    icon: sortOption.value === option.value ? "check" : "",
+                    value: option.value,
+                    classes: "text-weight-regular",
+                })),
+
+                {},
+                {
+                    label: "Direction",
+                    classes: "text-weight-bolder",
+                },
+                {
+                    label: sortDirection.value === "desc" ? "Descending" : "Ascending",
+                    icon: sortDirection.value === "desc" ? "arrow-sort-down" : "arrow-sort-up",
+                    // Use a special value for direction toggle
+                    value: "toggle-direction",
+                    classes: "text-weight-regular",
+                },
+            ],
+        })
+        .onOk(function (action) {
+            if (action.value === "toggle-direction") {
+                toggleSortDirection();
+            } else if (action.value) {
+                setSortOption(action.value as SortOption);
+            }
+        });
+}
 
 function setSortOption(option: SortOption): void {
     sortOption.value = option;
@@ -224,47 +265,13 @@ function showCreateGuestDialog(): void {
             </template>
             <template #append>
                 <!-- Sort Controls -->
-                <q-btn dense flat icon="filter" aria-label="filter guests">
-                    <q-menu auto-close>
-                        <q-list>
-                            <!-- Sort Options -->
-                            <q-item-label header>Sort by</q-item-label>
-                            <q-item
-                                v-for="option in sortOptions"
-                                :key="option.value"
-                                clickable
-                                @click="setSortOption(option.value)"
-                            >
-                                <q-item-section>{{ option.label }}</q-item-section>
-                                <q-item-section side>
-                                    <q-icon
-                                        v-if="sortOption === option.value"
-                                        name="check"
-                                        color="primary"
-                                    />
-                                </q-item-section>
-                            </q-item>
-
-                            <!-- Direction Options -->
-                            <q-separator />
-                            <q-item-label header>Direction</q-item-label>
-                            <q-item clickable @click="toggleSortDirection">
-                                <q-item-section>
-                                    {{ sortDirection === "desc" ? "Descending" : "Ascending" }}
-                                </q-item-section>
-                                <q-item-section side>
-                                    <q-icon
-                                        :name="
-                                            sortDirection === 'desc'
-                                                ? 'arrow-sort-down'
-                                                : 'arrow-sort-up'
-                                        "
-                                    />
-                                </q-item-section>
-                            </q-item>
-                        </q-list>
-                    </q-menu>
-                </q-btn>
+                <q-btn
+                    dense
+                    flat
+                    icon="filter"
+                    aria-label="filter guests"
+                    @click="showBottomSheet"
+                />
             </template>
         </q-input>
 

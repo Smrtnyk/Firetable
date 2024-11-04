@@ -39,6 +39,10 @@ export default defineConfig({
             headless: true,
             name: "chromium",
             provider: "playwright",
+            viewport: {
+                width: 400,
+                height: 600,
+            }
         },
     },
 });
