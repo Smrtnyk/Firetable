@@ -6,6 +6,7 @@ export function showConfirm(title: string, message = ""): Promise<boolean> {
     const options = {
         title,
         message,
+        class: "ft-card",
         persistent: true,
         ok: {
             size: "md",
@@ -38,7 +39,7 @@ export function showErrorMessage(e: unknown, onCloseCallback?: VoidFunction): vo
     const dialog = Dialog.create({
         title: "Error",
         message,
-        class: "error-dialog",
+        class: ["error-dialog", "ft-card"],
     });
 
     if (onCloseCallback) {
