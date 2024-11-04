@@ -65,6 +65,13 @@ export class DJBooth extends Group implements FloorEditorElement {
         });
     }
 
+    setDimensions(width: number, height: number): void {
+        this.scaleX = width / this.width;
+        this.scaleY = height / this.height;
+        this.setCoords();
+        this.canvas?.requestRenderAll();
+    }
+
     getBaseFill(): string {
         return "";
     }
