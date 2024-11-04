@@ -64,7 +64,9 @@ vi.mock("../backend-proxy", () => ({
     moveReservationFromQueue: moveReservationFromQueueMock,
     moveReservationToQueue: moveReservationToQueueMock,
     getGuestsPath: vi.fn(),
+    getUserPath: vi.fn(),
     subscribeToGuests: vi.fn(),
+    logoutUser: vi.fn(),
 }));
 
 vi.mock("src/helpers/ui-helpers", () => ({
