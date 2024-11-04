@@ -1,5 +1,6 @@
 import type { RouteLocationNormalized, RouteLocationRaw } from "vue-router";
 import type { useAuthStore } from "src/stores/auth-store";
+import type { usePermissionsStore } from "src/stores/permissions-store";
 import { getCurrentUser } from "vuefire";
 import { isFunction } from "es-toolkit";
 import { AppLogger } from "src/logger/FTLogger";
@@ -40,7 +41,10 @@ export type AuthGuard = (to: RouteLocationNormalized) => Promise<RouteLocationRa
  * Firebase is finished with its initialization process,
  * and handle the user accordingly
  */
-export function createAuthGuard(authStore: ReturnType<typeof useAuthStore>): AuthGuard {
+export function createAuthGuard(
+    authStore: ReturnType<typeof useAuthStore>,
+    permissionsStore: ReturnType<typeof usePermissionsStore>,
+): AuthGuard {
     /**
      * Checks if user is authenticated and initializes if needed
      */
@@ -79,7 +83,7 @@ export function createAuthGuard(authStore: ReturnType<typeof useAuthStore>): Aut
         const role = token?.claims.role as string;
 
         return isFunction(allowedRoles)
-            ? Boolean(allowedRoles(authStore))
+            ? Boolean(allowedRoles(permissionsStore))
             : (allowedRoles as string[]).includes(role);
     }
 

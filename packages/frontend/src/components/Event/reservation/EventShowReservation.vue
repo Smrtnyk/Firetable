@@ -11,6 +11,7 @@ import ReservationGeneralInfo from "src/components/Event/reservation/Reservation
 import ReservationLabelChips from "src/components/Event/reservation/ReservationLabelChips.vue";
 import FTBtn from "src/components/FTBtn.vue";
 import GuestSummaryChips from "src/components/guest/GuestSummaryChips.vue";
+import { usePermissionsStore } from "src/stores/permissions-store";
 
 export interface EventShowReservationProps {
     reservation: ReservationDoc;
@@ -19,6 +20,7 @@ export interface EventShowReservationProps {
 }
 
 const authStore = useAuthStore();
+const permissionsStore = usePermissionsStore();
 const props = defineProps<EventShowReservationProps>();
 const emit = defineEmits<{
     (e: "copy" | "delete" | "edit" | "queue" | "transfer"): void;
@@ -39,20 +41,20 @@ const waitingForResponse = ref(
 const { state: guestSummaryData } = useAsyncState(props.guestSummaryPromise, void 0);
 const canDeleteReservation = computed(function () {
     return (
-        authStore.canDeleteReservation ||
-        (isOwnReservation(props.reservation) && authStore.canDeleteOwnReservation)
+        permissionsStore.canDeleteReservation ||
+        (isOwnReservation(props.reservation) && permissionsStore.canDeleteOwnReservation)
     );
 });
 const canEditReservation = computed(function () {
     return (
-        authStore.canEditReservation ||
-        (isOwnReservation(props.reservation) && authStore.canEditOwnReservation)
+        permissionsStore.canEditReservation ||
+        (isOwnReservation(props.reservation) && permissionsStore.canEditOwnReservation)
     );
 });
 
 const canMoveToQueue = computed(function () {
     return (
-        (authStore.canReserve || isOwnReservation(props.reservation)) &&
+        (permissionsStore.canReserve || isOwnReservation(props.reservation)) &&
         !isCancelled.value &&
         !isGuestArrived.value
     );
@@ -107,7 +109,7 @@ function onWaitingForResponse(): void {
             v-if="
                 !isCancelled &&
                 isPlannedReservation(props.reservation) &&
-                authStore.canConfirmReservation
+                permissionsStore.canConfirmReservation
             "
         >
             <template v-if="!isGuestArrived && !reservationConfirmed">
@@ -208,7 +210,7 @@ function onWaitingForResponse(): void {
                 @click="() => emit('queue')"
                 v-close-popup
             />
-            <template v-if="authStore.canReserve && !isCancelled">
+            <template v-if="permissionsStore.canReserve && !isCancelled">
                 <FTBtn
                     :title="t('Global.transfer')"
                     icon="transfer"
@@ -229,7 +231,7 @@ function onWaitingForResponse(): void {
         <template
             v-if="
                 isPlannedReservation(props.reservation) &&
-                authStore.canCancelReservation &&
+                permissionsStore.canCancelReservation &&
                 !isGuestArrived
             "
         >

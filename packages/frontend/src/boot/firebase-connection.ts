@@ -9,6 +9,7 @@ import { usePropertiesStore } from "src/stores/properties-store";
 import { useGuestsStore } from "src/stores/guests-store";
 import { createAuthGuard } from "src/router/auth-guard";
 import { refreshApp } from "src/helpers/utils";
+import { usePermissionsStore } from "src/stores/permissions-store";
 
 export default boot(function ({ router, app }) {
     const { firebaseApp } = initializeFirebase();
@@ -18,8 +19,9 @@ export default boot(function ({ router, app }) {
     });
 
     const authStore = useAuthStore();
+    const permissionsStore = usePermissionsStore();
 
-    router.beforeEach(createAuthGuard(authStore));
+    router.beforeEach(createAuthGuard(authStore, permissionsStore));
 
     router.onError(function (error) {
         const isChunkLoadFailed =

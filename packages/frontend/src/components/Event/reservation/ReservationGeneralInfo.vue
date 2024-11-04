@@ -4,14 +4,14 @@ import { isAWalkInReservation } from "@firetable/types";
 import { getFormatedDateFromTimestamp } from "src/helpers/date-utils";
 import { useI18n } from "vue-i18n";
 import { computed } from "vue";
-import { useAuthStore } from "src/stores/auth-store";
+import { usePermissionsStore } from "src/stores/permissions-store";
 
 const props = defineProps<{
     reservation: QueuedReservation | Reservation;
     timezone: string;
 }>();
 const { t, locale } = useI18n();
-const authStore = useAuthStore();
+const permissionsStore = usePermissionsStore();
 
 const createdAt = computed(() => {
     const createdAtValue = props.reservation.creator.createdAt;
@@ -43,7 +43,7 @@ function createdByText(creator: Reservation["creator"]): string {
         <div class="col-6">{{ t("EventShowReservation.numberOfPeopleLabel") }}</div>
         <div class="col-6 font-black">{{ props.reservation.numberOfGuests }}</div>
 
-        <template v-if="props.reservation.guestContact && authStore.canSeeGuestContact">
+        <template v-if="props.reservation.guestContact && permissionsStore.canSeeGuestContact">
             <div class="col-6">{{ t("EventShowReservation.contactLabel") }}</div>
             <div class="col-6 font-black">{{ props.reservation.guestContact }}</div>
         </template>
@@ -63,7 +63,7 @@ function createdByText(creator: Reservation["creator"]): string {
             <div class="col-6 font-black">{{ reservedByText(props.reservation.reservedBy) }}</div>
         </template>
 
-        <template v-if="authStore.canSeeReservationCreator">
+        <template v-if="permissionsStore.canSeeReservationCreator">
             <div class="col-6">{{ t("EventShowReservation.createdByLabel") }}</div>
             <div class="col-6 font-black">{{ createdByText(props.reservation.creator) }}</div>
 

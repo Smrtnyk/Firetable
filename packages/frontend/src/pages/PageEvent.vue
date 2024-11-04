@@ -30,7 +30,6 @@ import {
 } from "src/composables/useFirestore";
 import { useFloorsPageEvent } from "src/composables/useFloorsPageEvent";
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { useAuthStore } from "src/stores/auth-store";
 import { where } from "firebase/firestore";
 import { useUsers } from "src/composables/useUsers";
 
@@ -45,6 +44,7 @@ import EventFloorCanvasList from "src/components/Event/EventFloorCanvasList.vue"
 import { TableOperationType, useReservations } from "src/composables/useReservations";
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
+import { usePermissionsStore } from "src/stores/permissions-store";
 
 interface Props {
     organisationId: string;
@@ -60,7 +60,7 @@ const eventOwner: EventOwner = {
     id: eventId,
 };
 
-const authStore = useAuthStore();
+const permissionStore = usePermissionsStore();
 const eventsStore = useEventsStore();
 const router = useRouter();
 const { t } = useI18n();
@@ -226,7 +226,7 @@ onUnmounted(function () {
                 :active-floor="activeFloor"
                 :floors="floorInstances"
                 :has-multiple-floor-plans="hasMultipleFloorPlans"
-                :can-see-admin-event="authStore.canCreateEvents"
+                :can-see-admin-event="permissionStore.canCreateEvents"
                 :is-active-floor="isActiveFloor"
                 @navigate-to-admin-event="navigateToAdminEvent"
                 @toggle-event-guest-list-drawer-visibility="

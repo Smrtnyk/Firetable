@@ -1,5 +1,5 @@
 import type { RouteLocationNormalized, RouteRecordRaw } from "vue-router";
-import type { useAuthStore } from "src/stores/auth-store";
+import type { usePermissionsStore } from "src/stores/permissions-store";
 import { ADMIN, Role } from "@firetable/types";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { useEventsStore } from "src/stores/events-store";
@@ -10,7 +10,7 @@ declare module "vue-router" {
         breadcrumb?: string | ((route: RouteLocationNormalized, isAdmin?: boolean) => string);
         allowedRoles?:
             | (Role | typeof ADMIN)[]
-            | ((authStore: ReturnType<typeof useAuthStore>) => boolean);
+            | ((permissionsStore: ReturnType<typeof usePermissionsStore>) => boolean);
         parent?: string;
     }
 }
@@ -122,8 +122,8 @@ export const routes: RouteRecordRaw[] = [
                 name: "adminGuests",
                 meta: {
                     requiresAuth: true,
-                    allowedRoles(authStore) {
-                        return authStore.canSeeGuestbook;
+                    allowedRoles(permissionsStore) {
+                        return permissionsStore.canSeeGuestbook;
                     },
                 },
                 props: true,
@@ -134,8 +134,8 @@ export const routes: RouteRecordRaw[] = [
                 name: "adminGuest",
                 meta: {
                     requiresAuth: true,
-                    allowedRoles(authStore) {
-                        return authStore.canSeeGuestbook;
+                    allowedRoles(permissionsStore) {
+                        return permissionsStore.canSeeGuestbook;
                     },
                 },
                 props: true,
@@ -166,8 +166,8 @@ export const routes: RouteRecordRaw[] = [
                 name: "adminInventory",
                 meta: {
                     requiresAuth: true,
-                    allowedRoles(authStore) {
-                        return authStore.canSeeInventory;
+                    allowedRoles(permissionsStore) {
+                        return permissionsStore.canSeeInventory;
                     },
                 },
                 props: true,
@@ -188,8 +188,8 @@ export const routes: RouteRecordRaw[] = [
                 name: "adminFloors",
                 meta: {
                     requiresAuth: true,
-                    allowedRoles(authStore) {
-                        return authStore.canEditFloorPlans;
+                    allowedRoles(permissionsStore) {
+                        return permissionsStore.canEditFloorPlans;
                     },
                 },
                 props: true,
@@ -220,8 +220,8 @@ export const routes: RouteRecordRaw[] = [
                 name: "adminAnalytics",
                 meta: {
                     requiresAuth: true,
-                    allowedRoles(authStore) {
-                        return authStore.canSeeAnalytics;
+                    allowedRoles(permissionsStore) {
+                        return permissionsStore.canSeeAnalytics;
                     },
                 },
                 props: true,

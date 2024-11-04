@@ -1,7 +1,7 @@
 import type { AppUser, User, VoidFunction } from "@firetable/types";
 import type { User as FBUser } from "firebase/auth";
 import { getUserPath, logoutUser } from "../backend-proxy";
-import { Role, ADMIN, DEFAULT_CAPABILITIES_BY_ROLE, UserCapability } from "@firetable/types";
+import { Role, ADMIN } from "@firetable/types";
 import { defineStore } from "pinia";
 import { computed, ref, watch } from "vue";
 import { showErrorMessage } from "src/helpers/ui-helpers";
@@ -34,75 +34,8 @@ export const useAuthStore = defineStore("auth", function () {
         return user.value?.role === Role.PROPERTY_OWNER;
     });
 
-    const capabilities = computed(function () {
-        if (!user.value) {
-            throw new Error("User is not defined!");
-        }
-        return user.value?.capabilities ?? DEFAULT_CAPABILITIES_BY_ROLE[user.value.role];
-    });
-
     const isLoggedIn = computed(function () {
         return Boolean(user.value?.email);
-    });
-
-    const canSeeAnalytics = computed(function () {
-        const userRole = user.value?.role;
-        if (!userRole) {
-            return false;
-        }
-        return [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN].includes(userRole);
-    });
-
-    const canCreateEvents = computed(function () {
-        return Boolean(capabilities.value[UserCapability.CAN_CREATE_EVENTS]);
-    });
-
-    const canEditFloorPlans = computed(function () {
-        return Boolean(capabilities.value[UserCapability.CAN_EDIT_FLOOR_PLANS]);
-    });
-
-    const canSeeInventory = computed(function () {
-        return Boolean(capabilities.value[UserCapability.CAN_SEE_INVENTORY]);
-    });
-
-    const canReserve = computed(function () {
-        return Boolean(capabilities.value[UserCapability.CAN_RESERVE]);
-    });
-
-    const canSeeReservationCreator = computed(function () {
-        return Boolean(capabilities.value[UserCapability.CAN_SEE_RESERVATION_CREATOR]);
-    });
-
-    const canSeeGuestContact = computed(function () {
-        return Boolean(capabilities.value[UserCapability.CAN_SEE_GUEST_CONTACT]);
-    });
-
-    const canDeleteReservation = computed(function () {
-        return Boolean(capabilities.value[UserCapability.CAN_DELETE_RESERVATION]);
-    });
-
-    const canDeleteOwnReservation = computed(function () {
-        return Boolean(capabilities.value[UserCapability.CAN_DELETE_OWN_RESERVATION]);
-    });
-
-    const canConfirmReservation = computed(function () {
-        return Boolean(capabilities.value[UserCapability.CAN_CONFIRM_RESERVATION]);
-    });
-
-    const canCancelReservation = computed(function () {
-        return Boolean(capabilities.value[UserCapability.CAN_CANCEL_RESERVATION]);
-    });
-
-    const canEditReservation = computed(function () {
-        return Boolean(capabilities.value[UserCapability.CAN_EDIT_RESERVATION]);
-    });
-
-    const canEditOwnReservation = computed(function () {
-        return Boolean(capabilities.value[UserCapability.CAN_EDIT_OWN_RESERVATION]);
-    });
-
-    const canSeeGuestbook = computed(function () {
-        return Boolean(capabilities.value[UserCapability.CAN_SEE_GUESTBOOK]);
     });
 
     function cleanup(): void {
@@ -235,27 +168,12 @@ export const useAuthStore = defineStore("auth", function () {
         setAuthState,
         initUser,
         assignAdmin,
-        capabilities,
         unsubscribers,
         initInProgress,
         nonNullableUser,
         isLoggedIn,
         isAdmin,
         isPropertyOwner,
-        canEditOwnReservation,
-        canEditReservation,
-        canSeeInventory,
-        canCreateEvents,
-        canEditFloorPlans,
-        canSeeReservationCreator,
-        canConfirmReservation,
-        canCancelReservation,
-        canDeleteOwnReservation,
-        canReserve,
-        canSeeGuestContact,
-        canDeleteReservation,
-        canSeeGuestbook,
-        canSeeAnalytics,
         user,
         isAuthenticated,
         isReady,
