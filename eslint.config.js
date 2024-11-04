@@ -418,6 +418,7 @@ export default tseslint.config(
     {
         files: ["**/*.spec.ts"],
         rules: {
+            "no-underscore-dangle": "off",
             "func-style": "off",
             "@typescript-eslint/no-non-null-assertion": "off",
             "unicorn/consistent-function-scoping": "off",

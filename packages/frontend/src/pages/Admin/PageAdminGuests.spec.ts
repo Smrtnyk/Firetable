@@ -5,8 +5,6 @@ import type { PageAdminGuestsProps } from "./PageAdminGuests.vue";
 import type { Ref } from "vue";
 import PageAdminGuests from "./PageAdminGuests.vue";
 import { renderComponent, t } from "../../../test-helpers/render-component";
-import FTDialog from "src/components/FTDialog.vue";
-import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
 import { ADMIN, Role } from "@firetable/types";
 import { ref } from "vue";
 
@@ -162,17 +160,16 @@ describe("PageAdminGuests.vue", () => {
         const addButton = screen.getByLabelText("Add new guest");
         await userEvent.click(addButton);
 
-        expect(createDialogSpy).toHaveBeenCalledWith(
-            expect.objectContaining({
-                component: FTDialog,
-                componentProps: expect.objectContaining({
-                    title: t("PageAdminGuests.createNewGuestDialogTitle"),
-                    maximized: false,
-                    component: AddNewGuestForm,
-                    listeners: expect.any(Object),
-                }),
-            }),
-        );
+        // call arguments
+        const callArg = createDialogSpy.mock.calls[0][0];
+        // Check that FTDialog is the component
+        expect(callArg.component.__name).toBe("FTDialog");
+        // Check the componentProps
+        const props = callArg.componentProps;
+        expect(props.title).toBe(t("PageAdminGuests.createNewGuestDialogTitle"));
+        expect(props.maximized).toBe(false);
+        expect(props.component.__name).toBe("AddNewGuestForm");
+        expect(typeof props.listeners.create).toBe("function");
     });
 
     describe("guest sorting", () => {
