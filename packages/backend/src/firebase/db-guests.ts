@@ -68,8 +68,6 @@ export function subscribeToGuests(
     return onSnapshot(
         collection(firestore, getGuestsPath(organisationId)),
         function (snapshot) {
-            callbacks.onReady?.();
-
             snapshot.docChanges().forEach(function (change) {
                 const guest = {
                     ...change.doc.data(),
@@ -88,6 +86,8 @@ export function subscribeToGuests(
                         break;
                 }
             });
+
+            callbacks.onReady?.();
         },
         function (error) {
             callbacks.onError?.(error);

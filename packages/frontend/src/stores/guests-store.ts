@@ -81,7 +81,7 @@ export const useGuestsStore = defineStore("guests", function () {
             onAdd(guest) {
                 state.value = {
                     data: [...state.value.data, guest],
-                    pending: false,
+                    pending: state.value.pending,
                 };
                 if (guest.hashedContact) {
                     guestsCache.set(guest.hashedContact, guest);
@@ -92,7 +92,7 @@ export const useGuestsStore = defineStore("guests", function () {
                     data: state.value.data.map(function (existingGuest) {
                         return existingGuest.id === guest.id ? guest : existingGuest;
                     }),
-                    pending: false,
+                    pending: state.value.pending,
                 };
                 if (guest.hashedContact) {
                     guestsCache.set(guest.hashedContact, guest);
@@ -101,7 +101,7 @@ export const useGuestsStore = defineStore("guests", function () {
             onRemove(guestId) {
                 state.value = {
                     data: state.value.data.filter(({ id }) => id !== guestId),
-                    pending: false,
+                    pending: state.value.pending,
                 };
             },
             onError(error) {
