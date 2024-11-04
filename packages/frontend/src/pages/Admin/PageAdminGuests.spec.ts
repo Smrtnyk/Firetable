@@ -300,6 +300,167 @@ describe("PageAdminGuests.vue", () => {
             expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
             expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
         });
+
+        it("sorts guests by percentage when percentage sort option is selected", async () => {
+            guestsRef.value.data = [
+                {
+                    id: "guest1",
+                    name: "John Doe",
+                    contact: "john@example.com",
+                    hashedContact: "hashedContact",
+                    maskedContact: "maskedContact",
+                    visitedProperties: {
+                        property1: {
+                            visit1: {
+                                date: new Date("2023-10-01").getTime(),
+                                arrived: true,
+                            } as Visit,
+                            visit2: {
+                                date: new Date("2023-10-05").getTime(),
+                                arrived: false,
+                            } as Visit,
+                        },
+                    },
+                } as GuestDoc,
+                {
+                    id: "guest2",
+                    name: "Jane Smith",
+                    contact: "jane@example.com",
+                    hashedContact: "hashedContact",
+                    maskedContact: "maskedContact",
+                    visitedProperties: {
+                        property1: {
+                            visit3: {
+                                date: new Date("2023-08-20").getTime(),
+                                arrived: true,
+                            } as Visit,
+                        },
+                    },
+                } as GuestDoc,
+            ];
+
+            const screen = await render();
+
+            // Change to percentage sort
+            const sortButton = screen.getByLabelText("filter guests");
+            await userEvent.click(sortButton);
+            const percentageOption = screen.getByText("Sort by Percentage");
+            await userEvent.click(percentageOption);
+
+            const guestItems = screen.getByRole("listitem");
+
+            // Jane Smith should be first (100% arrival - 1/1)
+            // John Doe should be second (50% arrival - 1/2)
+            expect(guestItems.elements()[0]).toHaveTextContent("Jane Smith");
+            expect(guestItems.elements()[1]).toHaveTextContent("John Doe");
+        });
+
+        it("uses number of bookings as secondary sort when percentages are equal", async () => {
+            guestsRef.value.data = [
+                {
+                    id: "guest1",
+                    name: "John Doe",
+                    contact: "john@example.com",
+                    hashedContact: "hashedContact",
+                    maskedContact: "maskedContact",
+                    visitedProperties: {
+                        property1: {
+                            visit1: {
+                                date: new Date("2023-10-01").getTime(),
+                                arrived: true,
+                            } as Visit,
+                            visit2: {
+                                date: new Date("2023-10-05").getTime(),
+                                arrived: true,
+                            } as Visit,
+                        },
+                    },
+                } as GuestDoc,
+                {
+                    id: "guest2",
+                    name: "Jane Smith",
+                    contact: "jane@example.com",
+                    hashedContact: "hashedContact",
+                    maskedContact: "maskedContact",
+                    visitedProperties: {
+                        property1: {
+                            visit3: {
+                                date: new Date("2023-08-20").getTime(),
+                                arrived: true,
+                            } as Visit,
+                        },
+                    },
+                } as GuestDoc,
+            ];
+
+            const screen = await render();
+
+            // Change to percentage sort
+            const sortButton = screen.getByLabelText("filter guests");
+            await userEvent.click(sortButton);
+            const percentageOption = screen.getByText("Sort by Percentage");
+            await userEvent.click(percentageOption);
+
+            const guestItems = screen.getByRole("listitem");
+
+            // Both have 100% arrival rate
+            // John Doe should be first (100% with 2 visits)
+            // Jane Smith should be second (100% with 1 visit)
+            expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
+            expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
+        });
+
+        it("places guests with no bookings at the end when sorting by percentage", async () => {
+            guestsRef.value.data = [
+                {
+                    id: "guest1",
+                    name: "John Doe",
+                    contact: "john@example.com",
+                    hashedContact: "hashedContact",
+                    maskedContact: "maskedContact",
+                    visitedProperties: {
+                        property1: {
+                            visit1: {
+                                date: new Date("2023-10-01").getTime(),
+                                arrived: true,
+                            } as Visit,
+                        },
+                    },
+                } as GuestDoc,
+                {
+                    id: "guest2",
+                    name: "Jane Smith",
+                    contact: "jane@example.com",
+                    hashedContact: "hashedContact",
+                    maskedContact: "maskedContact",
+                    visitedProperties: {},
+                } as GuestDoc,
+                {
+                    id: "guest3",
+                    name: "Alice Johnson",
+                    contact: "alice@example.com",
+                    hashedContact: "hashedContact",
+                    maskedContact: "maskedContact",
+                    visitedProperties: {},
+                } as GuestDoc,
+            ];
+
+            const screen = await render();
+
+            // Change to percentage sort
+            const sortButton = screen.getByLabelText("filter guests");
+            await userEvent.click(sortButton);
+            const percentageOption = screen.getByText("Sort by Percentage");
+            await userEvent.click(percentageOption);
+
+            const guestItems = screen.getByRole("listitem");
+
+            // John Doe should be first (has visits)
+            // Jane and Alice (no visits) should be after, in their original order
+            expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
+            expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
+            expect(guestItems.elements()[2]).toHaveTextContent("Alice Johnson");
+        });
     });
 
     describe("search", () => {

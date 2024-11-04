@@ -22,10 +22,15 @@ export interface PageAdminGuestsProps {
     organisationId: string;
 }
 
-/**
- * When sorting by bookings try to prioritize guests with most bookings and then guests with the highest percentage of fulfilled visits.
- */
-type SortOption = "bookings" | "percentage";
+type SortOption =
+    /**
+     * When sorting by bookings try to prioritize guests with most bookings and then guests with the highest percentage of fulfilled visits.
+     */
+    | "bookings"
+    /**
+     * When sorting by percentage try to prioritize guests with most percentage of fulfilled bookings and then guests with the highest number of bookings.
+     */
+    | "percentage";
 
 const sortOption = ref<SortOption>("bookings");
 const sortOptions = [
@@ -118,7 +123,14 @@ const sortedGuests = computed(function () {
 
     if (sortOption.value === "percentage") {
         guestsWithRes.sort(function (a, b) {
-            return Number.parseFloat(b.overallPercentage) - Number.parseFloat(a.overallPercentage);
+            // First compare by percentage
+            const percentageDiff =
+                Number.parseFloat(b.overallPercentage) - Number.parseFloat(a.overallPercentage);
+            if (percentageDiff !== 0) {
+                return percentageDiff;
+            }
+            // If percentages are equal, sort by total reservations
+            return b.totalReservations - a.totalReservations;
         });
     }
 
@@ -202,7 +214,7 @@ function showCreateGuestDialog(): void {
             </template>
             <template #append>
                 <!-- Sort Select -->
-                <q-btn dense flat icon="filter">
+                <q-btn dense flat icon="filter" aria-label="filter guests">
                     <q-menu auto-close>
                         <q-list>
                             <q-item
