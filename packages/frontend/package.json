@@ -15,7 +15,7 @@
         "test": "vitest"
     },
     "devDependencies": {
-        "@pinia/testing": "0.1.6",
+        "@pinia/testing": "0.1.7",
         "@playwright/test": "1.48.2",
         "@quasar/app-vite": "2.0.0-beta.24",
         "@quasar/vite-plugin": "1.8.0",
@@ -23,7 +23,7 @@
         "@vitest/browser": "catalog:",
         "@vitest/ui": "catalog:",
         "@vue/test-utils": "2.4.6",
-        "vite-tsconfig-paths": "5.0.1",
+        "vite-tsconfig-paths": "5.1.0",
         "vitest": "catalog:",
         "vitest-browser-vue": "0.0.1",
         "vue-component-type-helpers": "2.1.10",
@@ -45,7 +45,7 @@
         "firebase": "catalog:",
         "libphonenumber-js": "1.11.12",
         "pako": "2.1.0",
-        "pinia": "2.2.5",
+        "pinia": "2.2.6",
         "quasar": "2.17.1",
         "register-service-worker": "1.7.2",
         "vue": "3.5.12",

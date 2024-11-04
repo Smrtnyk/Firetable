@@ -17,7 +17,7 @@
         "firebase-functions": "6.1.0"
     },
     "devDependencies": {
-        "@faker-js/faker": "9.1.0",
+        "@faker-js/faker": "9.2.0",
         "@firebase/app-types": "0.9.2",
         "es-toolkit": "1.26.1",
         "vitest": "https://pkg.pr.new/vitest@270f99c"
