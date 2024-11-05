@@ -226,11 +226,13 @@ async function onUserSlideRight(user: User): Promise<void> {
         await onDeleteUser(user);
     }
 }
+
+const uniqueUsersCount = computed(() => users.value.length);
 </script>
 
 <template>
     <div class="PageAdminUsers">
-        <FTTitle :title="t('PageAdminUsers.title')">
+        <FTTitle :title="`${t('PageAdminUsers.title')} (${uniqueUsersCount})`">
             <template #right>
                 <FTBtn rounded icon="plus" class="button-gradient" @click="showCreateUserDialog" />
             </template>
