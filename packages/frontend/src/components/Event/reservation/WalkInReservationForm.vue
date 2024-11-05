@@ -32,14 +32,11 @@ const { t, locale } = useI18n();
 
 type State = Omit<WalkInReservation, "creator" | "floorId" | "tableLabel">;
 
-const initialState =
-    props.mode === "update" && props.reservationData
-        ? props.reservationData
-        : generateInitialState();
-const state = ref<State>(initialState);
-const reservationForm = useTemplateRef<QForm>("reservationForm");
-
 function generateInitialState(): State {
+    if (props.mode === "update" && props.reservationData) {
+        return { ...props.reservationData };
+    }
+
     const eventStart = props.eventStartTimestamp;
     const now = Date.now();
     // Set the initial time to either the current hour or the event start hour
@@ -60,13 +57,22 @@ function generateInitialState(): State {
     };
 }
 
+const state = ref<State>(generateInitialState());
+const reservationForm = useTemplateRef<QForm>("reservationForm");
+
 function capitalizeGuestName(): void {
     state.value.guestName = capitalizeName(state.value.guestName);
+}
+
+function reset(): void {
+    state.value = { ...generateInitialState() };
+    reservationForm.value?.resetValidation();
 }
 
 defineExpose({
     reservationForm,
     state,
+    reset,
 });
 </script>
 
