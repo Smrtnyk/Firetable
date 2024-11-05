@@ -4,16 +4,20 @@ import type { TestingOptions } from "@pinia/testing";
 import { TableOperationType, useReservations } from "../composables/useReservations";
 import { Role, UserCapability, ADMIN, ReservationStatus, ReservationType } from "@firetable/types";
 import { shallowRef, nextTick, createApp, ref } from "vue";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { FloorEditor, FloorElementTypes, FloorViewer } from "@firetable/floor-creator";
 import EventCreateReservation from "src/components/Event/reservation/EventCreateReservation.vue";
 import EventShowReservation from "src/components/Event/reservation/EventShowReservation.vue";
 import messages from "src/i18n";
-import { Quasar } from "quasar";
+import { BottomSheet, Dialog, Loading, Notify, Quasar } from "quasar";
 import { noop } from "es-toolkit";
 import { createI18n } from "vue-i18n";
 import { createTestingPinia } from "@pinia/testing";
-import { showErrorMessage } from "src/helpers/ui-helpers";
+
+import "quasar/dist/quasar.css";
+import "src/css/app.scss";
+import { page, userEvent } from "@vitest/browser/context";
+import { flushPromises } from "@vue/test-utils";
 
 const {
     createDialogMock,
@@ -22,10 +26,6 @@ const {
     deleteReservationMock,
     moveReservationFromQueueMock,
     moveReservationToQueueMock,
-    showConfirmMock,
-    showErrorMessageMock,
-    notifyPositiveMock,
-    notifyCreateMock,
     eventEmitMock,
 } = vi.hoisted(() => ({
     createDialogMock: vi.fn().mockReturnValue({
@@ -37,10 +37,7 @@ const {
     deleteReservationMock: vi.fn().mockResolvedValue(undefined),
     moveReservationFromQueueMock: vi.fn().mockResolvedValue(undefined),
     moveReservationToQueueMock: vi.fn().mockResolvedValue(undefined),
-    showConfirmMock: vi.fn().mockResolvedValue(true),
-    showErrorMessageMock: vi.fn(),
     notifyPositiveMock: vi.fn(),
-    notifyCreateMock: vi.fn().mockReturnValue(vi.fn()),
 
     eventEmitMock: vi.fn(),
 }));
@@ -69,32 +66,31 @@ vi.mock("../backend-proxy", () => ({
     logoutUser: vi.fn(),
 }));
 
-vi.mock("src/helpers/ui-helpers", () => ({
-    showConfirm: showConfirmMock,
-    showErrorMessage: showErrorMessageMock,
-    notifyPositive: notifyPositiveMock,
-    tryCatchLoadingWrapper: vi.fn(async ({ hook }) => {
-        try {
-            await hook();
-        } catch (error: any) {
-            showErrorMessage(error.message);
-        }
-    }),
-}));
-
-vi.mock("quasar", async (importOriginal) => ({
-    ...(await importOriginal()),
-    Notify: {
-        create: notifyCreateMock,
-    },
-}));
+let app: App<Element>;
 
 describe("useReservations", () => {
+    afterEach(async () => {
+        app?.unmount();
+
+        // Clean up any remaining dialogs
+        const dialogs = document.querySelectorAll(".q-dialog");
+        dialogs.forEach((dialog) => dialog.remove());
+
+        // Clean up any remaining notifications
+        const notifications = document.querySelectorAll(".q-notification");
+        notifications.forEach((notification) => notification.remove());
+
+        const canvases = document.querySelectorAll("canvas");
+        canvases.forEach((canvas) => canvas.remove());
+
+        await flushPromises();
+    });
+
     describe("basic table interactions", () => {
         it("creates reservation when clicking empty table", async () => {
             const { floor, event } = await setupTestEnvironment();
 
-            const { result } = withSetup(() =>
+            const result = withSetup(() =>
                 useReservations(
                     ref([]),
                     ref([]),
@@ -144,7 +140,7 @@ describe("useReservations", () => {
                 },
             } as ReservationDoc;
 
-            const { result } = withSetup(() =>
+            const result = withSetup(() =>
                 useReservations(
                     ref([]),
                     ref([existingReservation]),
@@ -175,7 +171,7 @@ describe("useReservations", () => {
         it("prevents interactions when user cannot reserve", async () => {
             const { floor, event } = await setupTestEnvironment();
 
-            const { result } = withSetup(
+            const result = withSetup(
                 () =>
                     useReservations(
                         ref([]),
@@ -226,7 +222,7 @@ describe("useReservations", () => {
                 },
             } as ReservationDoc;
 
-            const { result } = withSetup(() =>
+            const result = withSetup(() =>
                 useReservations(
                     ref([]),
                     ref([sourceReservation]),
@@ -248,7 +244,13 @@ describe("useReservations", () => {
             await nextTick();
 
             const targetTable = floor.getTableByLabel("T2");
-            await result.tableClickHandler(floor, targetTable);
+            const secondTableClickResult = result.tableClickHandler(floor, targetTable);
+
+            const okBtn = page.getByRole("button", { name: "OK" });
+            await expect.element(okBtn).toBeVisible();
+            await userEvent.click(okBtn);
+
+            await secondTableClickResult;
 
             expect(updateReservationDocMock).toHaveBeenCalledWith(
                 { id: "1", propertyId: "1", organisationId: "1" },
@@ -276,15 +278,12 @@ describe("useReservations", () => {
             const floor1 = await createTestFloor("Floor 1", "1");
             const floor2 = await createTestFloor("Floor 2", "2");
 
-            console.log(floor2.name);
-            console.log(floor1.name);
-
             const sourceReservation = createTestReservation({
                 floorId: floor1.id,
                 tableLabel: "T1",
             });
 
-            const { result } = withSetup(() =>
+            const result = withSetup(() =>
                 useReservations(
                     ref([]),
                     ref([sourceReservation]),
@@ -304,10 +303,14 @@ describe("useReservations", () => {
 
             await nextTick();
 
-            showConfirmMock.mockResolvedValueOnce(true);
-
             const targetTable = floor2.getTableByLabel("T2");
-            await result.tableClickHandler(floor2, targetTable);
+            const floor2TableClickResult = result.tableClickHandler(floor2, targetTable);
+
+            const okBtn = page.getByRole("button", { name: "OK" });
+            await expect.element(okBtn).toBeVisible();
+            await userEvent.click(okBtn);
+
+            await floor2TableClickResult;
 
             expect(updateReservationDocMock).toHaveBeenCalledWith(
                 { id: "1", propertyId: "1", organisationId: "1" },
@@ -342,7 +345,7 @@ describe("useReservations", () => {
                 tableLabel: "T2",
             });
 
-            const { result } = withSetup(() =>
+            const result = withSetup(() =>
                 useReservations(
                     ref([]),
                     ref([sourceReservation, targetReservation]),
@@ -363,10 +366,14 @@ describe("useReservations", () => {
 
             await nextTick();
 
-            showConfirmMock.mockResolvedValueOnce(true);
-
             const targetTable = floor.getTableByLabel("T2");
-            await result.tableClickHandler(floor, targetTable);
+            const secondTableClickResult = result.tableClickHandler(floor, targetTable);
+
+            const okBtn = page.getByRole("button", { name: "OK" });
+            await expect.element(okBtn).toBeVisible();
+            await userEvent.click(okBtn);
+
+            await secondTableClickResult;
 
             expect(updateReservationDocMock).toHaveBeenCalledTimes(2);
 
@@ -421,7 +428,7 @@ describe("useReservations", () => {
                 },
             } as ReservationDoc;
 
-            const { result } = withSetup(() =>
+            const result = withSetup(() =>
                 useReservations(
                     ref([]),
                     ref([sourceReservation]),
@@ -440,7 +447,9 @@ describe("useReservations", () => {
 
             await result.tableClickHandler(floor, sourceTable);
 
-            expect(showErrorMessageMock).toHaveBeenCalled();
+            await expect
+                .element(page.getByText("Cannot transfer reservation to the same table!"))
+                .toBeVisible();
             expect(updateReservationDocMock).not.toHaveBeenCalled();
         });
     });
@@ -460,8 +469,7 @@ describe("useReservations", () => {
                     cancelled: true,
                 } as ReservationDoc;
 
-                showConfirmMock.mockResolvedValue(true);
-                const { result } = withSetup(() =>
+                const result = withSetup(() =>
                     useReservations(
                         ref([]),
                         ref([existingReservation]),
@@ -481,9 +489,10 @@ describe("useReservations", () => {
                 });
 
                 const table = floor.getTableByLabel("T1");
-                await result.tableClickHandler(floor, table);
+                const tableClickResult = result.tableClickHandler(floor, table);
                 await deleteHandler();
-
+                await userEvent.click(page.getByRole("button", { name: "OK" }));
+                await tableClickResult;
                 await nextTick();
 
                 expect(updateReservationDocMock).toHaveBeenCalledWith(
@@ -518,8 +527,8 @@ describe("useReservations", () => {
                     cancelled: false,
                 } as ReservationDoc;
                 const futureDate = Date.now() + 24 * 60 * 60 * 1000;
-                showConfirmMock.mockResolvedValue(true);
-                const { result } = withSetup(() =>
+
+                const result = withSetup(() =>
                     useReservations(
                         ref([]),
                         ref([existingReservation]),
@@ -543,9 +552,10 @@ describe("useReservations", () => {
                 });
 
                 const table = floor.getTableByLabel("T1");
-                await result.tableClickHandler(floor, table);
-
+                const tableClickResult = result.tableClickHandler(floor, table);
                 await deleteHandler();
+                await userEvent.click(page.getByRole("button", { name: "OK" }));
+                await tableClickResult;
 
                 await nextTick();
 
@@ -568,9 +578,7 @@ describe("useReservations", () => {
                 const { floor, event } = await setupTestEnvironment();
                 const existingReservation = createTestReservation();
 
-                showConfirmMock.mockResolvedValueOnce(false);
-
-                const { result } = withSetup(() =>
+                const result = withSetup(() =>
                     useReservations(
                         ref([]),
                         ref([existingReservation]),
@@ -587,8 +595,10 @@ describe("useReservations", () => {
                 });
 
                 const table = floor.getTableByLabel("T1");
-                await result.tableClickHandler(floor, table);
+                const tableClickResult = result.tableClickHandler(floor, table);
                 await deleteHandler();
+                await userEvent.click(page.getByRole("button", { name: "CANCEL" }));
+                await tableClickResult;
 
                 expect(deleteReservationMock).not.toHaveBeenCalled();
                 expect(updateReservationDocMock).not.toHaveBeenCalled();
@@ -608,7 +618,7 @@ describe("useReservations", () => {
                     type: ReservationType.PLANNED,
                 } as ReservationDoc;
 
-                const { result } = withSetup(() =>
+                const result = withSetup(() =>
                     useReservations(
                         ref([]),
                         ref([existingReservation]),
@@ -670,7 +680,7 @@ describe("useReservations", () => {
         describe("creation", () => {
             it("emits event when creating reservation", async () => {
                 const { floor, event } = await setupTestEnvironment();
-                const { result } = withSetup(() =>
+                const result = withSetup(() =>
                     useReservations(
                         ref([]),
                         ref([]),
@@ -721,7 +731,7 @@ describe("useReservations", () => {
                 const { floor, event } = await setupTestEnvironment();
                 addReservationMock.mockRejectedValueOnce(new Error("API Error"));
 
-                const { result } = withSetup(() =>
+                const result = withSetup(() =>
                     useReservations(
                         ref([]),
                         ref([]),
@@ -741,7 +751,7 @@ describe("useReservations", () => {
                 });
 
                 const table = floor.getTableByLabel("T1");
-                await result.tableClickHandler(floor, table);
+                const tableClickHandlerResult = result.tableClickHandler(floor, table);
 
                 const newReservation = {
                     guestName: "New Guest",
@@ -751,9 +761,10 @@ describe("useReservations", () => {
                 };
 
                 await createHandler(newReservation);
+                await tableClickHandlerResult;
                 await nextTick();
 
-                expect(showErrorMessageMock).toHaveBeenCalledWith("API Error");
+                await expect.element(page.getByText("API Error")).toBeVisible();
                 expect(eventEmitMock).not.toHaveBeenCalled();
             });
         });
@@ -771,7 +782,7 @@ describe("useReservations", () => {
                     type: ReservationType.PLANNED,
                 } as ReservationDoc;
 
-                const { result } = withSetup(() =>
+                const result = withSetup(() =>
                     useReservations(
                         ref([]),
                         ref([sourceReservation]),
@@ -789,7 +800,9 @@ describe("useReservations", () => {
                 });
 
                 const targetTable = floor.getTableByLabel("T2");
-                await result.tableClickHandler(floor, targetTable);
+                const table2ClickResult = result.tableClickHandler(floor, targetTable);
+                await userEvent.click(page.getByRole("button", { name: "OK" }));
+                await table2ClickResult;
 
                 expect(addReservationMock).toHaveBeenCalledWith(
                     { id: "1", propertyId: "1", organisationId: "1" },
@@ -825,7 +838,7 @@ describe("useReservations", () => {
                 arrived: false,
             } as ReservationDoc;
 
-            const { result } = withSetup(() =>
+            const result = withSetup(() =>
                 useReservations(
                     ref([]),
                     ref([existingReservation]),
@@ -885,7 +898,7 @@ describe("useReservations", () => {
                 arrived: false,
             } as ReservationDoc;
 
-            const { result } = withSetup(() =>
+            const result = withSetup(() =>
                 useReservations(
                     ref([]),
                     ref([existingReservation]),
@@ -936,7 +949,7 @@ describe("useReservations", () => {
 
             updateReservationDocMock.mockRejectedValueOnce(new Error("API Error"));
 
-            const { result } = withSetup(() =>
+            const result = withSetup(() =>
                 useReservations(
                     ref([]),
                     ref([existingReservation]),
@@ -958,7 +971,7 @@ describe("useReservations", () => {
 
             await nextTick();
 
-            expect(showErrorMessageMock).toHaveBeenCalled();
+            await expect.element(page.getByText("API Error")).toBeVisible();
             expect(eventEmitMock).not.toHaveBeenCalled();
         });
     });
@@ -976,7 +989,7 @@ describe("useReservations", () => {
                 type: ReservationType.PLANNED,
             } as ReservationDoc;
 
-            const { result } = withSetup(() =>
+            const result = withSetup(() =>
                 useReservations(
                     ref([]),
                     ref([existingReservation]),
@@ -996,8 +1009,10 @@ describe("useReservations", () => {
             });
 
             const table = floor.getTableByLabel("T1");
-            await result.tableClickHandler(floor, table);
+            const tableClickResult = result.tableClickHandler(floor, table);
             await queueHandler();
+            await userEvent.click(page.getByRole("button", { name: "OK" }));
+            await tableClickResult;
 
             expect(moveReservationToQueueMock).toHaveBeenCalled();
         });
@@ -1012,7 +1027,7 @@ describe("useReservations", () => {
                 tableLabel: undefined,
             }) as unknown as QueuedReservationDoc;
 
-            const { result } = withSetup(() =>
+            const result = withSetup(() =>
                 useReservations(
                     ref([]),
                     ref([]),
@@ -1051,22 +1066,15 @@ describe("useReservations", () => {
             status: ReservationStatus.ACTIVE,
         } as ReservationDoc;
 
-        const { result } = withSetup(() =>
+        const result = withSetup(() =>
             useReservations(
                 ref([]),
                 ref([sourceReservation]),
-                ref([]),
+                shallowRef([floor]),
                 { id: "1", propertyId: "1", organisationId: "1" },
                 ref(event),
             ),
         );
-
-        // Mock notify to store the notification handler
-        let notificationActions;
-        notifyCreateMock.mockImplementation((config) => {
-            notificationActions = config.actions;
-            return vi.fn();
-        });
 
         const sourceTable = floor.getTableByLabel("T1")!;
         result.initiateTableOperation({
@@ -1074,25 +1082,18 @@ describe("useReservations", () => {
             sourceFloor: floor,
             sourceTable,
         });
-
+        await nextTick();
+        await flushPromises();
+        // Cancel in notification
+        await userEvent.click(page.getByRole("button", { name: "CANCEL" }), {
+            force: true,
+            timeout: 2000,
+        });
+        await nextTick();
+        // Ok in confirm dialog
+        await userEvent.click(page.getByRole("button", { name: "OK" }));
         await nextTick();
 
-        expect(notifyCreateMock).toHaveBeenCalledWith(
-            expect.objectContaining({
-                type: "ongoing",
-                timeout: 0,
-                position: "top",
-                actions: expect.arrayContaining([
-                    expect.objectContaining({
-                        color: "white",
-                        noDismiss: true,
-                    }),
-                ]),
-            }),
-        );
-
-        expect(notificationActions).toBeDefined();
-        await notificationActions![0].handler();
         expect(result.currentTableOperation.value).toBeUndefined();
     });
 });
@@ -1121,10 +1122,7 @@ function createTestReservation(overrides = {}): ReservationDoc {
 function withSetup(
     composable: () => ReturnType<typeof useReservations>,
     initialState: Partial<TestingOptions["initialState"]> = {},
-): {
-    result: ReturnType<typeof useReservations>;
-    app: App<Element>;
-} {
+): ReturnType<typeof useReservations> {
     let result: ReturnType<typeof useReservations>;
     const defaultInitialState = {
         auth: {
@@ -1166,21 +1164,26 @@ function withSetup(
         messages,
         legacy: false,
     });
-    const app = createApp({
+    app = createApp({
         setup() {
             result = composable();
             return noop;
         },
     });
     app.use(Quasar);
+    Quasar.install(app, { plugins: { BottomSheet, Loading, Dialog, Notify } });
     app.use(i18n);
     app.use(testingPinia);
-    app.mount(document.createElement("div"));
-    // @ts-expect-error -- ignore this error
-    return { result, app };
+
+    const container = document.createElement("div");
+    container.id = "app";
+    document.body.appendChild(container);
+    app.mount(container);
+
+    return result!;
 }
 
-async function setupTestEnvironment() {
+async function setupTestEnvironment(): Promise<{ floor: FloorViewer; event: EventDoc }> {
     const floor = await createTestFloor();
     const event: EventDoc = {
         id: "1",
@@ -1202,8 +1205,9 @@ async function setupTestEnvironment() {
 
 async function createTestFloor(name = "Test floor", id = "1"): Promise<FloorViewer> {
     const canvas = document.createElement("canvas");
-    canvas.width = 500;
-    canvas.height = 500;
+    canvas.width = 400;
+    canvas.height = 600;
+    document.body.appendChild(canvas);
 
     const editor = new FloorEditor({
         canvas: document.createElement("canvas"),
@@ -1235,15 +1239,15 @@ async function createTestFloor(name = "Test floor", id = "1"): Promise<FloorView
         propertyId: "1",
         id,
         name,
-        width: 500,
-        height: 500,
+        width: 400,
+        height: 600,
         json: editor.json,
     };
 
     const floorViewer = new FloorViewer({
         canvas,
         floorDoc,
-        containerWidth: 500,
+        containerWidth: 400,
     });
 
     await new Promise<void>((resolve) => {

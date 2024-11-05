@@ -26,9 +26,9 @@ import {
     deleteReservation,
     updateReservationDoc,
 } from "../backend-proxy";
+import { useQuasar } from "quasar";
 import { isTable } from "@firetable/floor-creator";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
-import { Notify } from "quasar";
 import { isPlannedReservation, ReservationStatus } from "@firetable/types";
 import {
     notifyPositive,
@@ -111,6 +111,7 @@ export function useReservations(
     const { t } = useI18n();
     const { nonNullableUser } = storeToRefs(useAuthStore());
     const { canReserve, canSeeGuestbook } = storeToRefs(usePermissionsStore());
+    const quasar = useQuasar();
     const router = useRouter();
     const propertiesStore = usePropertiesStore();
     const guestsStore = useGuestsStore();
@@ -129,7 +130,7 @@ export function useReservations(
 
     let currentOpenCreateReservationDialog: OpenDialog | undefined;
 
-    watch(currentTableOperation, (newOperation) => {
+    const tableOperationWatcher = watch(currentTableOperation, (newOperation) => {
         if (newOperation) {
             showOperationNotification(newOperation);
         } else if (operationNotification) {
@@ -171,7 +172,7 @@ export function useReservations(
                 throw new Error("Invalid table operation type!");
         }
 
-        operationNotification = Notify.create({
+        operationNotification = quasar.notify({
             message,
             type: "ongoing",
             timeout: 0,
@@ -918,6 +919,12 @@ export function useReservations(
 
     onBeforeUnmount(function () {
         clearInterval(intervalID);
+        tableOperationWatcher();
+        // Clean up any remaining notification
+        if (operationNotification) {
+            operationNotification();
+            operationNotification = undefined;
+        }
     });
 
     return {
