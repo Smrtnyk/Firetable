@@ -459,6 +459,142 @@ describe("PageAdminGuests.vue", () => {
             expect(guestItems.elements()[2]).toHaveTextContent("Alice Johnson");
         });
 
+        describe("lastModified sorting", () => {
+            it("sorts guests by lastModified timestamp in descending order", async () => {
+                const now = Date.now();
+                guestsRef.value.data = [
+                    {
+                        id: "guest1",
+                        name: "John Doe",
+                        contact: "john@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        // 1 second ago
+                        lastModified: now - 1000,
+                        visitedProperties: {},
+                    } as GuestDoc,
+                    {
+                        id: "guest2",
+                        name: "Jane Smith",
+                        contact: "jane@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        // most recent
+                        lastModified: now,
+                        visitedProperties: {},
+                    } as GuestDoc,
+                    {
+                        id: "guest3",
+                        name: "Bob Wilson",
+                        contact: "bob@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        // 2 seconds ago
+                        lastModified: now - 2000,
+                        visitedProperties: {},
+                    } as GuestDoc,
+                ];
+
+                const screen = await render();
+
+                // Switch to lastModified sort
+                const sortButton = screen.getByLabelText("filter guests");
+                await userEvent.click(sortButton);
+                await userEvent.click(screen.getByText("Last Modified"));
+
+                const guestItems = screen.getByRole("listitem");
+
+                // Should be sorted by lastModified (most recent first)
+                expect(guestItems.elements()[0]).toHaveTextContent("Jane Smith");
+                expect(guestItems.elements()[1]).toHaveTextContent("John Doe");
+                expect(guestItems.elements()[2]).toHaveTextContent("Bob Wilson");
+            });
+
+            it("handles guests without lastModified timestamp", async () => {
+                const now = Date.now();
+                guestsRef.value.data = [
+                    {
+                        id: "guest1",
+                        name: "John Doe",
+                        contact: "john@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        lastModified: now,
+                        visitedProperties: {},
+                    } as GuestDoc,
+                    {
+                        id: "guest2",
+                        name: "Jane Smith",
+                        contact: "jane@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        // No lastModified
+                        visitedProperties: {},
+                    } as GuestDoc,
+                    {
+                        id: "guest3",
+                        name: "Bob Wilson",
+                        contact: "bob@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        lastModified: now - 1000,
+                        visitedProperties: {},
+                    } as GuestDoc,
+                ];
+
+                const screen = await render();
+
+                // Switch to lastModified sort
+                const sortButton = screen.getByLabelText("filter guests");
+                await userEvent.click(sortButton);
+                await userEvent.click(screen.getByText("Last Modified"));
+
+                const guestItems = screen.getByRole("listitem");
+
+                // Should be sorted with undefined lastModified at the end
+                expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
+                expect(guestItems.elements()[1]).toHaveTextContent("Bob Wilson");
+                expect(guestItems.elements()[2]).toHaveTextContent("Jane Smith");
+            });
+
+            it("maintains sort direction when switching to lastModified sort", async () => {
+                const now = Date.now();
+                guestsRef.value.data = [
+                    {
+                        id: "guest1",
+                        name: "John Doe",
+                        lastModified: now,
+                        visitedProperties: {},
+                    } as GuestDoc,
+                    {
+                        id: "guest2",
+                        name: "Jane Smith",
+                        lastModified: now - 1000,
+                        visitedProperties: {},
+                    } as GuestDoc,
+                ];
+
+                const screen = await render();
+
+                const sortButton = screen.getByLabelText("filter guests");
+                await userEvent.click(sortButton);
+
+                // Click "Descending" to toggle to ascending
+                await userEvent.click(screen.getByText("Descending"));
+
+                await userEvent.click(sortButton);
+
+                await userEvent.click(screen.getByText("Last Modified"));
+
+                // Should maintain ascending order with lastModified sort
+                const guestItems = screen.getByRole("listitem");
+                // older timestamp
+                expect(guestItems.elements()[0]).toHaveTextContent("Jane Smith");
+                // newer timestamp
+                expect(guestItems.elements()[1]).toHaveTextContent("John Doe");
+            });
+        });
+
         describe("sort direction", () => {
             it("toggles between ascending and descending order", async () => {
                 guestsRef.value.data = [

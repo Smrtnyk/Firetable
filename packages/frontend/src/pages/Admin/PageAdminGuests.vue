@@ -24,11 +24,15 @@ export interface PageAdminGuestsProps {
 
 type SortOption =
     /**
-     * When sorting by bookings try to prioritize guests with most bookings and then guests with the highest percentage of fulfilled visits.
+     * When sorting by bookings try to prioritize guests with the highest percentage of fulfilled visits.
      */
     | "bookings"
     /**
-     * When sorting by percentage try to prioritize guests with most percentage of fulfilled bookings and then guests with the highest number of bookings.
+     * When sorting by last modified try to prioritize guests with the highest number of bookings.
+     */
+    | "lastModified"
+    /**
+     * When sorting by percentage try to prioritize guests with the highest number of bookings.
      */
     | "percentage";
 
@@ -39,6 +43,7 @@ const sortDirection = ref<SortDirection>("desc");
 const sortOptions = [
     { label: "Bookings", value: "bookings" },
     { label: "Percentage", value: "percentage" },
+    { label: "Last Modified", value: "lastModified" },
 ] as const;
 
 const { createDialog } = useDialog();
@@ -115,29 +120,44 @@ const sortedGuests = computed(function () {
     return [...guestsWithSummaries.value].sort(function (a, b) {
         let comparison: number;
 
-        if (sortOption.value === "bookings") {
-            // First compare by total reservations
-            if (b.totalReservations === a.totalReservations) {
-                // If total reservations are equal, sort by percentage
-                comparison =
-                    Number.parseFloat(b.overallPercentage) - Number.parseFloat(a.overallPercentage);
-            } else {
-                comparison = b.totalReservations - a.totalReservations;
-            }
-        } else {
-            // percentage
-            // First compare by percentage
-            const percentageDiff =
-                Number.parseFloat(b.overallPercentage) - Number.parseFloat(a.overallPercentage);
-            if (percentageDiff === 0) {
-                // If percentages are equal, sort by total reservations
-                comparison = b.totalReservations - a.totalReservations;
-            } else {
-                comparison = percentageDiff;
-            }
+        switch (sortOption.value) {
+            case "lastModified":
+                {
+                    // Use 0 as default if lastModified is not set
+                    const aTime = a.lastModified || 0;
+                    const bTime = b.lastModified || 0;
+                    comparison = bTime - aTime;
+                }
+                break;
+
+            case "bookings":
+                // Existing bookings logic
+                if (b.totalReservations === a.totalReservations) {
+                    comparison =
+                        Number.parseFloat(b.overallPercentage) -
+                        Number.parseFloat(a.overallPercentage);
+                } else {
+                    comparison = b.totalReservations - a.totalReservations;
+                }
+                break;
+
+            case "percentage":
+                {
+                    const percentageDiff =
+                        Number.parseFloat(b.overallPercentage) -
+                        Number.parseFloat(a.overallPercentage);
+                    if (percentageDiff === 0) {
+                        comparison = b.totalReservations - a.totalReservations;
+                    } else {
+                        comparison = percentageDiff;
+                    }
+                }
+                break;
+
+            default:
+                comparison = 0;
         }
 
-        // Apply sort direction
         return sortDirection.value === "asc" ? -comparison : comparison;
     });
 });
