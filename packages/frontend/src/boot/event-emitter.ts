@@ -21,6 +21,16 @@ export interface TransferEventData {
     targetReservation: ReservationDoc | undefined;
 }
 
+interface LinkEventData extends BaseEventData {
+    sourceReservation: ReservationDoc;
+    linkedTableLabel: string;
+}
+
+interface UnlinkEventData extends BaseEventData {
+    sourceReservation: ReservationDoc;
+    unlinkedTableLabels: string[];
+}
+
 type Events = {
     "reservation:created": BaseEventData & {
         reservation: Reservation;
@@ -36,6 +46,8 @@ type Events = {
     "reservation:transferred": TransferEventData;
     "reservation:arrived": BaseReservationEventData;
     "reservation:cancelled": BaseReservationEventData;
+    "reservation:linked": LinkEventData;
+    "reservation:unlinked": UnlinkEventData;
 };
 
 export const eventEmitter = new EventEmitter<Events>();

@@ -17,6 +17,9 @@ export default defineConfig({
         }),
     ],
     test: {
+        onConsoleLog (log) {
+            return !log.includes("fabric Setting type has no effect");
+        },
         setupFiles: ['vitest-browser-vue'],
         cache: false,
         alias: {

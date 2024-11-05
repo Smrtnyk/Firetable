@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import type { Reservation, ReservationDoc } from "@firetable/types";
+import type { ReservationDoc } from "@firetable/types";
 import type { GuestSummary } from "src/stores/guests-store";
 import { isPlannedReservation } from "@firetable/types";
-import { computed, ref } from "vue";
+import { ref, toRef } from "vue";
 import { useI18n } from "vue-i18n";
-import { useAuthStore } from "src/stores/auth-store";
 import { useAsyncState } from "@vueuse/core";
+import { usePermissionsStore } from "src/stores/permissions-store";
+import { buttonSize } from "src/global-reactives/screen-detection";
+import { useReservationPermissions } from "src/composables/useReservationPermissions";
 
 import ReservationGeneralInfo from "src/components/Event/reservation/ReservationGeneralInfo.vue";
 import ReservationLabelChips from "src/components/Event/reservation/ReservationLabelChips.vue";
 import FTBtn from "src/components/FTBtn.vue";
 import GuestSummaryChips from "src/components/guest/GuestSummaryChips.vue";
-import { usePermissionsStore } from "src/stores/permissions-store";
 
 export interface EventShowReservationProps {
     reservation: ReservationDoc;
@@ -19,77 +20,55 @@ export interface EventShowReservationProps {
     timezone: string;
 }
 
-const authStore = useAuthStore();
 const permissionsStore = usePermissionsStore();
-const props = defineProps<EventShowReservationProps>();
+const { reservation, guestSummaryPromise, timezone } = defineProps<EventShowReservationProps>();
 const emit = defineEmits<{
-    (e: "copy" | "delete" | "edit" | "queue" | "transfer"): void;
+    (e: "copy" | "delete" | "edit" | "link" | "queue" | "transfer" | "unlink"): void;
     (e: "goToGuestProfile", guestId: string): void;
     (e: "arrived" | "cancel" | "reservationConfirmed" | "waitingForResponse", value: boolean): void;
 }>();
 const { t } = useI18n();
-const isGuestArrived = ref<boolean>(props.reservation.arrived);
-const isCancelled = ref<boolean>(
-    isPlannedReservation(props.reservation) && props.reservation.cancelled,
-);
+
 const reservationConfirmed = ref(
-    isPlannedReservation(props.reservation) && props.reservation.reservationConfirmed,
+    isPlannedReservation(reservation) && reservation.reservationConfirmed,
 );
 const waitingForResponse = ref(
-    isPlannedReservation(props.reservation) && Boolean(props.reservation.waitingForResponse),
+    isPlannedReservation(reservation) && Boolean(reservation.waitingForResponse),
 );
-const { state: guestSummaryData } = useAsyncState(props.guestSummaryPromise, void 0);
-const canDeleteReservation = computed(function () {
-    return (
-        permissionsStore.canDeleteReservation ||
-        (isOwnReservation(props.reservation) && permissionsStore.canDeleteOwnReservation)
-    );
-});
-const canEditReservation = computed(function () {
-    return (
-        permissionsStore.canEditReservation ||
-        (isOwnReservation(props.reservation) && permissionsStore.canEditOwnReservation)
-    );
-});
+const { state: guestSummaryData } = useAsyncState(guestSummaryPromise, void 0);
 
-const canMoveToQueue = computed(function () {
-    return (
-        (permissionsStore.canReserve || isOwnReservation(props.reservation)) &&
-        !isCancelled.value &&
-        !isGuestArrived.value
-    );
-});
-
-function isOwnReservation(reservation: Reservation): boolean {
-    return authStore.user?.id === reservation.creator?.id;
-}
+const {
+    canEditReservation,
+    canDeleteReservation,
+    canMoveToQueue,
+    canCancel,
+    isGuestArrived,
+    isCancelled,
+    isLinkedReservation,
+} = useReservationPermissions(toRef(() => reservation));
 
 function onGuestArrived(): void {
     emit("arrived", !isGuestArrived.value);
-    isGuestArrived.value = !isGuestArrived.value;
 }
 
 function onReservationCancel(): void {
     emit("cancel", !isCancelled.value);
-    isCancelled.value = !isCancelled.value;
 }
 
 function onReservationConfirmed(): void {
     emit("reservationConfirmed", !reservationConfirmed.value);
-    reservationConfirmed.value = !reservationConfirmed.value;
 }
 
 function onWaitingForResponse(): void {
     emit("waitingForResponse", !waitingForResponse.value);
-    waitingForResponse.value = !waitingForResponse.value;
 }
 </script>
 
 <template>
-    <ReservationLabelChips :reservation="props.reservation" />
+    <ReservationLabelChips :reservation="reservation" />
 
     <q-card-section>
-        <ReservationGeneralInfo :timezone="props.timezone" :reservation="props.reservation" />
+        <ReservationGeneralInfo :timezone="timezone" :reservation="reservation" />
 
         <q-item
             clickable
@@ -108,7 +87,7 @@ function onWaitingForResponse(): void {
         <template
             v-if="
                 !isCancelled &&
-                isPlannedReservation(props.reservation) &&
+                isPlannedReservation(reservation) &&
                 permissionsStore.canConfirmReservation
             "
         >
@@ -163,7 +142,7 @@ function onWaitingForResponse(): void {
             <q-item tag="label" class="q-pa-none">
                 <q-item-section>
                     <q-item-label>
-                        {{ t("EventShowReservation.guestArrivedLabel") }}
+                        {{ t("EventShowReservation.reservationGuestArrivedLabel") }}
                     </q-item-label>
                 </q-item-section>
                 <q-item-section avatar>
@@ -180,18 +159,9 @@ function onWaitingForResponse(): void {
             </q-item>
         </template>
 
-        <q-separator class="q-mb-md" />
+        <q-separator v-if="!isCancelled" class="q-mb-md" />
 
-        <q-item class="q-pa-sm-none q-pa-xs-none q-gutter-xs q-ml-none">
-            <FTBtn
-                v-if="canDeleteReservation"
-                :title="t('Global.delete')"
-                class="no-wrap q-ml-none"
-                icon="trash"
-                color="negative"
-                @click="() => emit('delete')"
-                v-close-popup
-            />
+        <q-item v-if="!isCancelled" class="q-pa-sm-none q-pa-xs-none q-gutter-xs q-ml-none">
             <FTBtn
                 v-if="canEditReservation && !isCancelled"
                 :title="t('Global.edit')"
@@ -200,8 +170,6 @@ function onWaitingForResponse(): void {
                 @click="() => emit('edit')"
                 v-close-popup
             />
-
-            <q-space />
             <FTBtn
                 v-if="canMoveToQueue"
                 title="Move to queue"
@@ -210,6 +178,26 @@ function onWaitingForResponse(): void {
                 @click="() => emit('queue')"
                 v-close-popup
             />
+
+            <q-space />
+
+            <FTBtn
+                v-if="isLinkedReservation"
+                :title="t('EventShowReservation.unlinkTablesLabel')"
+                icon="unlink"
+                color="warning"
+                @click="() => emit('unlink')"
+                v-close-popup
+            />
+            <FTBtn
+                v-if="permissionsStore.canReserve && !isCancelled"
+                :title="t('EventShowReservation.linkTablesLabel')"
+                icon="link"
+                color="primary"
+                @click="() => emit('link')"
+                v-close-popup
+            />
+
             <template v-if="permissionsStore.canReserve && !isCancelled">
                 <FTBtn
                     :title="t('Global.transfer')"
@@ -228,33 +216,28 @@ function onWaitingForResponse(): void {
             </template>
         </q-item>
 
-        <template
-            v-if="
-                isPlannedReservation(props.reservation) &&
-                permissionsStore.canCancelReservation &&
-                !isGuestArrived
-            "
-        >
-            <q-separator class="q-mt-md" />
-            <!-- Cancel reservation -->
-            <q-item tag="label" class="q-pa-none">
-                <q-item-section>
-                    <q-item-label>
-                        {{ t("Global.cancel") }}
-                    </q-item-label>
-                </q-item-section>
-                <q-item-section avatar>
-                    <q-toggle
-                        :model-value="isCancelled"
-                        @update:model-value="onReservationCancel"
-                        size="lg"
-                        unchecked-icon="close"
-                        checked-icon="close"
-                        color="warning"
-                        v-close-popup
-                    />
-                </q-item-section>
-            </q-item>
-        </template>
+        <q-separator class="q-my-md" v-if="canDeleteReservation || canCancel" />
+
+        <q-item class="q-pa-sm-none q-pa-xs-none q-gutter-xs q-ml-none">
+            <FTBtn
+                v-if="canDeleteReservation"
+                :title="t('Global.delete')"
+                icon="trash"
+                color="negative"
+                @click="() => emit('delete')"
+                v-close-popup
+            />
+
+            <q-space />
+
+            <FTBtn
+                v-if="canCancel"
+                @click="onReservationCancel"
+                :size="buttonSize"
+                :color="isCancelled ? 'positive' : 'warning'"
+                v-close-popup
+                >{{ isCancelled ? t("Global.reactivate") : t("Global.cancel") }}</FTBtn
+            >
+        </q-item>
     </q-card-section>
 </template>

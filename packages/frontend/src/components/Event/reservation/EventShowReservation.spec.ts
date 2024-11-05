@@ -61,93 +61,118 @@ describe("EventShowReservation", () => {
         };
     });
 
-    it('renders the "Waiting for Response" toggle when conditions are met', async () => {
-        const screen = renderComponent(EventShowReservation, props, {
-            piniaStoreOptions: {
-                initialState: {
-                    auth: {
-                        user: {
-                            id: "user1",
-                            role: Role.PROPERTY_OWNER,
+    describe("toggle states", () => {
+        it('renders the "Waiting for Response" toggle when conditions are met', async () => {
+            const screen = renderComponent(EventShowReservation, props, {
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: {
+                            user: {
+                                id: "user1",
+                                role: Role.PROPERTY_OWNER,
+                            },
                         },
                     },
                 },
-            },
+            });
+
+            const toggle = screen.getByText(t("EventShowReservation.waitingForResponse"));
+            await expect.element(toggle).toBeVisible();
+
+            await userEvent.click(toggle);
+
+            expect(screen.emitted().waitingForResponse).toBeTruthy();
+            expect(screen.emitted().waitingForResponse[0]).toEqual([true]);
         });
 
-        const toggle = screen.getByText(t("EventShowReservation.waitingForResponse"));
-        await expect.element(toggle).toBeVisible();
+        it('does not render the "Waiting for Response" toggle when reservation is confirmed', async () => {
+            reservation.reservationConfirmed = true;
 
-        await userEvent.click(toggle);
-
-        expect(screen.emitted().waitingForResponse).toBeTruthy();
-        expect(screen.emitted().waitingForResponse[0]).toEqual([true]);
-    });
-
-    it('does not render the "Waiting for Response" toggle when reservation is confirmed', async () => {
-        reservation.reservationConfirmed = true;
-
-        const screen = renderComponent(EventShowReservation, props, {
-            piniaStoreOptions: {
-                initialState: {
-                    auth: {
-                        user: {
-                            id: "user1",
-                            role: Role.PROPERTY_OWNER,
+            const screen = renderComponent(EventShowReservation, props, {
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: {
+                            user: {
+                                id: "user1",
+                                role: Role.PROPERTY_OWNER,
+                            },
                         },
                     },
                 },
-            },
+            });
+
+            const label = screen.getByText(t("EventShowReservation.waitingForResponse"));
+            await expect.element(label).not.toBeInTheDocument();
         });
 
-        const label = screen.getByText(t("EventShowReservation.waitingForResponse"));
-        await expect.element(label).not.toBeInTheDocument();
-    });
+        it('does not render the "Waiting for Response" toggle when guest has arrived', async () => {
+            reservation.arrived = true;
 
-    it('renders the "Reservation Confirmed" toggle when conditions are met', async () => {
-        const screen = renderComponent(EventShowReservation, props, {
-            piniaStoreOptions: {
-                initialState: {
-                    auth: {
-                        user: {
-                            id: "user1",
-                            role: Role.PROPERTY_OWNER,
+            const screen = renderComponent(EventShowReservation, props, {
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: {
+                            user: {
+                                id: "user1",
+                                role: Role.PROPERTY_OWNER,
+                                capabilities: {
+                                    [UserCapability.CAN_CONFIRM_RESERVATION]: true,
+                                },
+                            },
                         },
                     },
                 },
-            },
+            });
+
+            const label = screen.getByText(t("EventShowReservation.waitingForResponse"));
+            await expect.element(label).not.toBeInTheDocument();
         });
 
-        const toggle = screen.getByText(t("EventShowReservation.reservationConfirmedLabel"));
-        await expect.element(toggle).toBeVisible();
-
-        await userEvent.click(toggle);
-
-        expect(screen.emitted().reservationConfirmed).toBeTruthy();
-        expect(screen.emitted().reservationConfirmed[0]).toEqual([true]);
-    });
-
-    it('renders the "Guest Arrived" toggle when conditions are met', async () => {
-        const screen = renderComponent(EventShowReservation, props, {
-            piniaStoreOptions: {
-                initialState: {
-                    auth: {
-                        user: {
-                            id: "user1",
-                            role: Role.PROPERTY_OWNER,
+        it('renders the "Reservation Confirmed" toggle when conditions are met', async () => {
+            const screen = renderComponent(EventShowReservation, props, {
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: {
+                            user: {
+                                id: "user1",
+                                role: Role.PROPERTY_OWNER,
+                            },
                         },
                     },
                 },
-            },
+            });
+
+            const toggle = screen.getByText(t("EventShowReservation.reservationConfirmedLabel"));
+            await expect.element(toggle).toBeVisible();
+
+            await userEvent.click(toggle);
+
+            expect(screen.emitted().reservationConfirmed).toBeTruthy();
+            expect(screen.emitted().reservationConfirmed[0]).toEqual([true]);
         });
 
-        const toggle = screen.getByText(t("EventShowReservation.guestArrivedLabel"));
-        await expect.element(toggle).toBeVisible();
+        it('renders the "Guest Arrived" toggle when conditions are met', async () => {
+            const screen = renderComponent(EventShowReservation, props, {
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: {
+                            user: {
+                                id: "user1",
+                                role: Role.PROPERTY_OWNER,
+                            },
+                        },
+                    },
+                },
+            });
 
-        await userEvent.click(toggle);
+            const toggle = screen.getByText(t("EventShowReservation.reservationGuestArrivedLabel"));
+            await expect.element(toggle).toBeVisible();
 
-        expect(screen.emitted().arrived).toBeTruthy();
-        expect(screen.emitted().arrived[0]).toEqual([true]);
+            await userEvent.click(toggle);
+
+            expect(screen.emitted().arrived).toBeTruthy();
+            expect(screen.emitted().arrived[0]).toEqual([true]);
+        });
     });
 
     describe("transfer and copy buttons", () => {
@@ -391,6 +416,46 @@ describe("EventShowReservation", () => {
     });
 
     describe("cancel reservation button", () => {
+        it("does not render cancel button when user does not have cancel permission", async () => {
+            const screen = renderComponent(EventShowReservation, props, {
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: {
+                            user: {
+                                id: "user1",
+                                capabilities: {
+                                    [UserCapability.CAN_CANCEL_RESERVATION]: false,
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+
+            const cancelButton = screen.getByRole("button", { name: t("Global.cancel") });
+            await expect.element(cancelButton).not.toBeInTheDocument();
+        });
+
+        it("does not render cancel/reactivate button for non-planned reservations", async () => {
+            (reservation as any).type = ReservationType.QUEUED;
+
+            const screen = renderComponent(EventShowReservation, props, {
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: {
+                            user: {
+                                id: "user1",
+                                role: Role.PROPERTY_OWNER,
+                            },
+                        },
+                    },
+                },
+            });
+
+            const cancelButton = screen.getByRole("button", { name: t("Global.cancel") });
+            await expect.element(cancelButton).not.toBeInTheDocument();
+        });
+
         it('does not render the "Cancel Reservation" toggle when guest has arrived', async () => {
             props.reservation.arrived = true;
 
@@ -409,6 +474,81 @@ describe("EventShowReservation", () => {
 
             const label = screen.getByText(t("Global.cancel"));
             await expect.element(label).not.toBeInTheDocument();
+        });
+
+        it('shows "Cancel" button with warning color when reservation is not cancelled', async () => {
+            const screen = renderComponent(EventShowReservation, props, {
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: {
+                            user: {
+                                id: "user1",
+                                role: Role.PROPERTY_OWNER,
+                            },
+                        },
+                    },
+                },
+            });
+
+            const cancelButton = screen.getByRole("button", { name: t("Global.cancel") });
+            await expect.element(cancelButton).toBeVisible();
+            expect(cancelButton.element().classList.contains("bg-warning")).toBe(true);
+        });
+
+        it('shows "Reactivate" button with positive color when reservation is cancelled', async () => {
+            reservation.cancelled = true;
+
+            const screen = renderComponent(EventShowReservation, props, {
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: {
+                            user: {
+                                id: "user1",
+                                role: Role.PROPERTY_OWNER,
+                            },
+                        },
+                    },
+                },
+            });
+
+            const reactivateButton = screen.getByRole("button", { name: t("Global.reactivate") });
+            await expect.element(reactivateButton).toBeVisible();
+            expect(reactivateButton.element().classList.contains("bg-positive")).toBe(true);
+        });
+
+        it("emits cancel event with correct value when toggling cancelled state", async () => {
+            const screen = renderComponent(EventShowReservation, props, {
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: {
+                            user: {
+                                id: "user1",
+                                role: Role.PROPERTY_OWNER,
+                            },
+                        },
+                    },
+                },
+            });
+
+            // Initial state: not cancelled
+            const cancelButton = screen.getByRole("button", { name: t("Global.cancel") });
+            await userEvent.click(cancelButton);
+            expect(screen.emitted().cancel[0]).toEqual([true]);
+
+            const newProps = {
+                ...props,
+                reservation: {
+                    ...reservation,
+                    cancelled: true,
+                },
+            };
+            screen.rerender(newProps);
+            await nextTick();
+
+            // Cancelled state: show reactivate
+            const reactivateButton = screen.getByRole("button", { name: t("Global.reactivate") });
+            await userEvent.click(reactivateButton);
+            expect(screen.emitted().cancel[1]).toEqual([false]);
         });
     });
 
@@ -646,6 +786,126 @@ describe("EventShowReservation", () => {
 
             // At this point, the promise is pending
             // There is no loading indicator but when we add one we could assert here
+        });
+    });
+
+    describe("link/unlink buttons", () => {
+        it("renders unlink button when reservation is linked to multiple tables", async () => {
+            props.reservation.tableLabel = ["table1", "table2"];
+
+            const screen = renderComponent(EventShowReservation, props, {
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: {
+                            user: {
+                                id: "user1",
+                                role: Role.PROPERTY_OWNER,
+                            },
+                        },
+                    },
+                },
+            });
+
+            const unlinkButton = screen.getByRole("button", {
+                name: t("EventShowReservation.unlinkTablesLabel"),
+            });
+            await expect.element(unlinkButton).toBeVisible();
+
+            await userEvent.click(unlinkButton);
+            expect(screen.emitted().unlink).toBeTruthy();
+        });
+
+        it("does not render unlink button when reservation has single table", async () => {
+            props.reservation.tableLabel = ["table1"];
+
+            const screen = renderComponent(EventShowReservation, props, {
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: {
+                            user: {
+                                id: "user1",
+                                role: Role.PROPERTY_OWNER,
+                            },
+                        },
+                    },
+                },
+            });
+
+            const unlinkButton = screen.getByRole("button", {
+                name: t("EventShowReservation.unlinkTablesLabel"),
+            });
+            await expect.element(unlinkButton).not.toBeInTheDocument();
+        });
+
+        it("renders link button when user can reserve and reservation is not cancelled", async () => {
+            const screen = renderComponent(EventShowReservation, props, {
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: {
+                            user: {
+                                id: "user1",
+                                capabilities: {
+                                    [UserCapability.CAN_RESERVE]: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+
+            const linkButton = screen.getByRole("button", {
+                name: t("EventShowReservation.linkTablesLabel"),
+            });
+            await expect.element(linkButton).toBeVisible();
+
+            await userEvent.click(linkButton);
+            expect(screen.emitted().link).toBeTruthy();
+        });
+
+        it("does not render link button when user cannot reserve", async () => {
+            const screen = renderComponent(EventShowReservation, props, {
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: {
+                            user: {
+                                id: "user1",
+                                capabilities: {
+                                    [UserCapability.CAN_RESERVE]: false,
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+
+            const linkButton = screen.getByRole("button", {
+                name: t("EventShowReservation.linkTablesLabel"),
+            });
+            await expect.element(linkButton).not.toBeInTheDocument();
+        });
+
+        it("does not render link button when reservation is cancelled", async () => {
+            reservation.cancelled = true;
+
+            const screen = renderComponent(EventShowReservation, props, {
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: {
+                            user: {
+                                id: "user1",
+                                capabilities: {
+                                    [UserCapability.CAN_RESERVE]: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+
+            const linkButton = screen.getByRole("button", {
+                name: t("EventShowReservation.linkTablesLabel"),
+            });
+            await expect.element(linkButton).not.toBeInTheDocument();
         });
     });
 });

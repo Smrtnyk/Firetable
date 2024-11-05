@@ -822,6 +822,267 @@ describe("useReservations", () => {
                 );
             });
         });
+
+        describe("linking/unlinking", () => {
+            it("handles linking tables to reservation", async () => {
+                const { floor, event } = await setupTestEnvironment();
+                const sourceReservation = createTestReservation({
+                    tableLabel: "T1",
+                });
+
+                const result = withSetup(() =>
+                    useReservations(
+                        ref([]),
+                        ref([sourceReservation]),
+                        shallowRef([floor]),
+                        { id: "1", propertyId: "1", organisationId: "1" },
+                        ref(event),
+                    ),
+                );
+
+                let linkHandler: () => Promise<void> = () => Promise.resolve();
+                createDialogMock.mockImplementationOnce((config) => {
+                    linkHandler = config.componentProps.listeners.link;
+                    return {
+                        onDismiss: vi.fn().mockReturnThis(),
+                        hide: vi.fn(),
+                    };
+                });
+
+                const sourceTable = floor.getTableByLabel("T1");
+                await result.tableClickHandler(floor, sourceTable);
+                await linkHandler();
+
+                const targetTable = floor.getTableByLabel("T2");
+                const targetTableClickResult = result.tableClickHandler(floor, targetTable);
+                await userEvent.click(page.getByRole("button", { name: "OK" }));
+                await targetTableClickResult;
+
+                expect(updateReservationDocMock).toHaveBeenCalledWith(
+                    { id: "1", propertyId: "1", organisationId: "1" },
+                    expect.objectContaining({
+                        id: sourceReservation.id,
+                        tableLabel: ["T1", "T2"],
+                    }),
+                );
+            });
+
+            it("prevents linking to already reserved table", async () => {
+                const { floor, event } = await setupTestEnvironment();
+                const sourceReservation = createTestReservation({
+                    tableLabel: "T1",
+                });
+                const targetReservation = createTestReservation({
+                    id: "2",
+                    tableLabel: "T2",
+                });
+
+                const result = withSetup(() =>
+                    useReservations(
+                        ref([]),
+                        ref([sourceReservation, targetReservation]),
+                        shallowRef([floor]),
+                        { id: "1", propertyId: "1", organisationId: "1" },
+                        ref(event),
+                    ),
+                );
+
+                let linkHandler: () => Promise<void> = () => Promise.resolve();
+                createDialogMock.mockImplementationOnce((config) => {
+                    linkHandler = config.componentProps.listeners.link;
+                    return {
+                        onDismiss: vi.fn().mockReturnThis(),
+                        hide: vi.fn(),
+                    };
+                });
+
+                const sourceTable = floor.getTableByLabel("T1");
+                await result.tableClickHandler(floor, sourceTable);
+                await linkHandler();
+
+                const targetTable = floor.getTableByLabel("T2");
+                await result.tableClickHandler(floor, targetTable);
+
+                await expect
+                    .element(
+                        page.getByText("Cannot link to a table that already has a reservation"),
+                    )
+                    .toBeVisible();
+                expect(updateReservationDocMock).not.toHaveBeenCalled();
+            });
+
+            it("prevents linking to already linked table", async () => {
+                const { floor, event } = await setupTestEnvironment();
+                const sourceReservation = createTestReservation({
+                    tableLabel: ["T1", "T2"],
+                });
+
+                const result = withSetup(() =>
+                    useReservations(
+                        ref([]),
+                        ref([sourceReservation]),
+                        ref([]),
+                        { id: "1", propertyId: "1", organisationId: "1" },
+                        ref(event),
+                    ),
+                );
+
+                let linkHandler: () => Promise<void> = () => Promise.resolve();
+                createDialogMock.mockImplementationOnce((config) => {
+                    linkHandler = config.componentProps.listeners.link;
+                    return {
+                        onDismiss: vi.fn().mockReturnThis(),
+                        hide: vi.fn(),
+                    };
+                });
+
+                const sourceTable = floor.getTableByLabel("T1");
+                await result.tableClickHandler(floor, sourceTable);
+                await linkHandler();
+
+                const targetTable = floor.getTableByLabel("T2");
+                await result.tableClickHandler(floor, targetTable);
+
+                await expect
+                    .element(
+                        page.getByText("Cannot link to a table that already has a reservation"),
+                    )
+                    .toBeVisible();
+                expect(updateReservationDocMock).not.toHaveBeenCalled();
+            });
+
+            it("handles unlinking table from reservation", async () => {
+                const { floor, event } = await setupTestEnvironment();
+                const sourceReservation = createTestReservation({
+                    tableLabel: ["T1", "T2"],
+                });
+
+                const result = withSetup(() =>
+                    useReservations(
+                        ref([]),
+                        ref([sourceReservation]),
+                        ref([]),
+                        { id: "1", propertyId: "1", organisationId: "1" },
+                        ref(event),
+                    ),
+                );
+
+                let unlinkHandler: () => Promise<void> = () => Promise.resolve();
+                createDialogMock.mockImplementationOnce((config) => {
+                    unlinkHandler = config.componentProps.listeners.unlink;
+                    return {
+                        onDismiss: vi.fn().mockReturnThis(),
+                        hide: vi.fn(),
+                    };
+                });
+
+                const table = floor.getTableByLabel("T2");
+                await result.tableClickHandler(floor, table);
+                await unlinkHandler();
+
+                // Confirm unlink
+                await userEvent.click(page.getByRole("button", { name: "OK" }));
+
+                expect(updateReservationDocMock).toHaveBeenCalledWith(
+                    { id: "1", propertyId: "1", organisationId: "1" },
+                    expect.objectContaining({
+                        id: sourceReservation.id,
+                        tableLabel: ["T1"],
+                    }),
+                );
+
+                expect(eventEmitMock).toHaveBeenCalledWith(
+                    "reservation:unlinked",
+                    expect.objectContaining({
+                        eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
+                        event,
+                        sourceReservation,
+                        unlinkedTableLabels: ["T2"],
+                    }),
+                );
+            });
+
+            it("cancels unlinking when user declines confirmation", async () => {
+                const { floor, event } = await setupTestEnvironment();
+                const sourceReservation = createTestReservation({
+                    tableLabel: ["T1", "T2"],
+                });
+
+                const result = withSetup(() =>
+                    useReservations(
+                        ref([]),
+                        ref([sourceReservation]),
+                        ref([]),
+                        { id: "1", propertyId: "1", organisationId: "1" },
+                        ref(event),
+                    ),
+                );
+
+                let unlinkHandler: () => Promise<void> = () => Promise.resolve();
+                createDialogMock.mockImplementationOnce((config) => {
+                    unlinkHandler = config.componentProps.listeners.unlink;
+                    return {
+                        onDismiss: vi.fn().mockReturnThis(),
+                        hide: vi.fn(),
+                    };
+                });
+
+                const table = floor.getTableByLabel("T2");
+                await result.tableClickHandler(floor, table);
+                await unlinkHandler();
+
+                // Cancel unlink
+                await userEvent.click(page.getByRole("button", { name: "CANCEL" }));
+
+                expect(updateReservationDocMock).not.toHaveBeenCalled();
+                expect(eventEmitMock).not.toHaveBeenCalled();
+            });
+
+            it("prevents linking tables across different floors", async () => {
+                const { event } = await setupTestEnvironment();
+
+                const floor1 = await createTestFloor("Floor 1", "1");
+                const floor2 = await createTestFloor("Floor 2", "2");
+
+                const sourceReservation = createTestReservation({
+                    floorId: floor1.id,
+                    tableLabel: "T1",
+                });
+
+                const result = withSetup(() =>
+                    useReservations(
+                        ref([]),
+                        ref([sourceReservation]),
+                        shallowRef([floor1, floor2]),
+                        { id: "1", propertyId: "1", organisationId: "1" },
+                        ref(event),
+                    ),
+                );
+
+                let linkHandler: () => Promise<void> = () => Promise.resolve();
+                createDialogMock.mockImplementationOnce((config) => {
+                    linkHandler = config.componentProps.listeners.link;
+                    return {
+                        onDismiss: vi.fn().mockReturnThis(),
+                        hide: vi.fn(),
+                    };
+                });
+
+                // Show reservation dialog for table on floor1 and click link
+                const sourceTable = floor1.getTableByLabel("T1");
+                await result.tableClickHandler(floor1, sourceTable);
+                await linkHandler();
+
+                // Try to link to table on floor2
+                const targetTable = floor2.getTableByLabel("T2");
+                await result.tableClickHandler(floor2, targetTable);
+
+                await expect
+                    .element(page.getByText("Cannot link tables across different floors!"))
+                    .toBeVisible();
+                expect(updateReservationDocMock).not.toHaveBeenCalled();
+            });
+        });
     });
 
     describe("status updates", () => {
