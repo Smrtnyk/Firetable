@@ -298,11 +298,19 @@ export function useReservations(
         if (!confirm) return;
 
         await tryCatchLoadingWrapper({
-            hook() {
-                return updateReservationDoc(eventOwner, {
+            async hook() {
+                await updateReservationDoc(eventOwner, {
                     ...sourceReservation,
                     id: sourceReservation.id,
                     tableLabel: [...currentLabels, targetTable.label],
+                });
+
+                eventEmitter.emit("reservation:linked", {
+                    sourceReservation,
+                    linkedTableLabel: targetTable.label,
+                    eventOwner,
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
+                    event: event.value!,
                 });
             },
         });

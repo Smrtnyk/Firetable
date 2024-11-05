@@ -30,6 +30,13 @@ const showScrollButton = ref(false);
 const logsContainer = useTemplateRef<QScrollArea>("logsContainer");
 
 function getIconNameForLogEntry(logMessage: string): string {
+    if (logMessage.includes("unlinked")) {
+        return "unlink";
+    }
+
+    if (logMessage.includes("linked")) {
+        return "link";
+    }
     if (logMessage.includes("deleted")) {
         return "trash";
     }
