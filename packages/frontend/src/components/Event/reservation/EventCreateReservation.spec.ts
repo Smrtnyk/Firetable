@@ -181,6 +181,42 @@ describe("EventCreateReservation", () => {
             await expect.element(isVIPCheckbox).toBeChecked();
         });
 
+        it("shows reset button only in update mode and resets form values", async () => {
+            const screen = renderComponent(EventCreateReservation, props);
+            const resetBtn = screen.getByRole("button", { name: t("Global.reset") });
+            await expect.element(resetBtn).not.toBeInTheDocument();
+
+            props.mode = "update";
+            props.reservationData = {
+                id: "foo",
+                ...generateUpdateState(),
+                creator: {
+                    id: "user1",
+                    name: "Alice",
+                    email: "example@mail.com",
+                    createdAt: Date.now(),
+                },
+            };
+
+            screen.rerender(props);
+
+            const guestNameInput = screen.getByLabelText("Optional Guest Name");
+            await userEvent.clear(guestNameInput);
+            await userEvent.type(guestNameInput, "Modified Name");
+
+            const numberOfGuestsInput = screen.getByLabelText(
+                t("EventCreateReservation.reservationNumberOfGuests"),
+            );
+            await userEvent.clear(numberOfGuestsInput);
+            await userEvent.type(numberOfGuestsInput, "8");
+
+            const resetButton = screen.getByRole("button", { name: t("Global.reset") });
+            await userEvent.click(resetButton);
+
+            await expect.element(guestNameInput).toHaveValue("John Doe");
+            await expect.element(numberOfGuestsInput).toHaveValue(4);
+        });
+
         it("validates guest name length", async () => {
             const screen = renderComponent(EventCreateReservation, props);
 
@@ -226,6 +262,38 @@ describe("EventCreateReservation", () => {
             await userEvent.click(closeBtn);
 
             await expect.element(timeInput).toHaveValue(format(newTime, "HH:mm"));
+        });
+
+        it("disables reset button when no changes are made and enables it when changes exist", async () => {
+            props.mode = "update";
+            props.reservationData = {
+                id: "foo",
+                ...generateUpdateState(),
+                creator: {
+                    id: "user1",
+                    name: "Alice",
+                    email: "example@mail.com",
+                    createdAt: Date.now(),
+                },
+            };
+
+            const screen = renderComponent(EventCreateReservation, props);
+
+            // Reset button should be disabled initially
+            const resetButton = screen.getByRole("button", { name: t("Global.reset") });
+            await expect.element(resetButton).toBeDisabled();
+
+            // Make a change to the form
+            const guestNameInput = screen.getByLabelText("Optional Guest Name");
+            await userEvent.clear(guestNameInput);
+            await userEvent.type(guestNameInput, "Modified Name");
+
+            // Reset button should be enabled after changes
+            await expect.element(resetButton).toBeEnabled();
+            // Reset the form
+            await userEvent.click(resetButton);
+            // Reset button should be disabled again after reset
+            await expect.element(resetButton).toBeDisabled();
         });
     });
 
@@ -431,6 +499,44 @@ describe("EventCreateReservation", () => {
                 .toHaveValue(plannedProps.reservationData?.reservedBy?.name);
         });
 
+        it("shows reset button only in update mode and resets form values", async () => {
+            const screen = renderComponent(EventCreateReservation, plannedProps);
+
+            const resetBtn = screen.getByRole("button", { name: t("Global.reset") });
+            await expect.element(resetBtn).not.toBeInTheDocument();
+
+            plannedProps.mode = "update";
+            plannedProps.reservationData = {
+                ...generateUpdatePlannedState(),
+                creator: {
+                    id: "user1",
+                    name: "Alice",
+                    email: "",
+                    createdAt: Date.now(),
+                },
+            } as unknown as PlannedReservationDoc;
+
+            screen.rerender(plannedProps);
+
+            const guestNameInput = screen.getByLabelText(
+                t("EventCreateReservation.reservationGuestName"),
+            );
+            await userEvent.clear(guestNameInput);
+            await userEvent.type(guestNameInput, "Modified Name");
+
+            const numberOfGuestsInput = screen.getByLabelText(
+                t("EventCreateReservation.reservationNumberOfGuests"),
+            );
+            await userEvent.clear(numberOfGuestsInput);
+            await userEvent.type(numberOfGuestsInput, "8");
+
+            const resetButton = screen.getByRole("button", { name: t("Global.reset") });
+            await userEvent.click(resetButton);
+
+            await expect.element(guestNameInput).toHaveValue("Charlie");
+            await expect.element(numberOfGuestsInput).toHaveValue(5);
+        });
+
         it("validates guest name and reservedBy selection", async () => {
             const screen = renderComponent(EventCreateReservation, plannedProps);
 
@@ -563,6 +669,54 @@ describe("EventCreateReservation", () => {
             expect(emittedPayload.reservedBy.email).toBe("social-1");
             expect(emittedPayload.reservedBy.name).toBe("SMS");
             expect(emittedPayload.reservedBy.id).toBe("");
+        });
+
+        it("disables reset button when no changes are made and enables it when changes exist", async () => {
+            plannedProps.mode = "update";
+            plannedProps.reservationData = {
+                ...generateUpdatePlannedState(),
+                creator: {
+                    id: "user1",
+                    name: "Alice",
+                    email: "",
+                    createdAt: Date.now(),
+                },
+            } as unknown as PlannedReservationDoc;
+
+            const screen = renderComponent(EventCreateReservation, plannedProps);
+
+            // Reset button should be disabled initially
+            const resetButton = screen.getByRole("button", { name: t("Global.reset") });
+            await expect.element(resetButton).toBeDisabled();
+            // Make a change to the form
+            const guestNameInput = screen.getByLabelText(
+                t("EventCreateReservation.reservationGuestName"),
+            );
+            await userEvent.clear(guestNameInput);
+            await userEvent.type(guestNameInput, "Modified Name");
+            // Reset button should be enabled after changes
+            await expect.element(resetButton).toBeEnabled();
+            // Reset the form
+            await userEvent.click(resetButton);
+            // Reset button should be disabled again after reset
+            await expect.element(resetButton).toBeDisabled();
+
+            // Make multiple changes
+            await userEvent.clear(guestNameInput);
+            await userEvent.type(guestNameInput, "Another Name");
+
+            const numberOfGuestsInput = screen.getByLabelText(
+                t("EventCreateReservation.reservationNumberOfGuests"),
+            );
+            await userEvent.clear(numberOfGuestsInput);
+            await userEvent.type(numberOfGuestsInput, "8");
+
+            // Reset button should still be enabled
+            await expect.element(resetButton).toBeEnabled();
+            // Reset the form again
+            await userEvent.click(resetButton);
+            // Reset button should be disabled after reset
+            await expect.element(resetButton).toBeDisabled();
         });
     });
 });

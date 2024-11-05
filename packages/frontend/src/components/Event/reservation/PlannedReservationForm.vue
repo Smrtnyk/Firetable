@@ -32,9 +32,10 @@ const socials = ["Whatsapp", "SMS", "Instagram", "Facebook", "Phone"].map(functi
 const props = defineProps<PlannedReservationFormProps>();
 const { t } = useI18n();
 
-const initialState =
-    props.mode === "update" && props.reservationData
-        ? props.reservationData
+// Move initial state logic into a function
+function generateInitialState() {
+    return props.mode === "update" && props.reservationData
+        ? { ...props.reservationData }
         : {
               type: ReservationType.PLANNED as const,
               guestName: "",
@@ -50,7 +51,11 @@ const initialState =
               status: ReservationStatus.ACTIVE,
               isVIP: false,
           };
-const state = ref<Omit<PlannedReservation, "creator" | "floorId" | "tableLabel">>(initialState);
+}
+
+// Initialize state with the initial values
+const state =
+    ref<Omit<PlannedReservation, "creator" | "floorId" | "tableLabel">>(generateInitialState());
 const reservationForm = useTemplateRef<QForm>("reservationForm");
 const formattedUsers = computed<PlannedReservation["reservedBy"][]>(function () {
     return props.users.map(function (user) {
@@ -88,9 +93,20 @@ function capitalizeGuestName(): void {
     state.value.guestName = capitalizeName(state.value.guestName);
 }
 
+function reset(): void {
+    // Get fresh initial state
+    const freshInitialState = generateInitialState();
+    // Reset to initial state
+    state.value = { ...freshInitialState };
+    // Reset selection type based on fresh initial state
+    selectionType.value = freshInitialState.reservedBy?.id ? "user" : "social";
+    reservationForm.value?.resetValidation();
+}
+
 defineExpose({
     reservationForm,
     state,
+    reset,
 });
 </script>
 

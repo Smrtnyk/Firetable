@@ -107,6 +107,19 @@ async function onOKClick(): Promise<void> {
 
     emit(props.mode, valueToEmit);
 }
+
+function resetForm(): void {
+    currentlyActiveRef.value?.reset();
+}
+
+const hasChanges = computed(() => {
+    if (!currentlyActiveRef.value?.state || !props.reservationData) {
+        return false;
+    }
+
+    // Deep compare the current state with the original data
+    return JSON.stringify(currentlyActiveRef.value.state) !== JSON.stringify(props.reservationData);
+});
 </script>
 
 <template>
@@ -147,9 +160,18 @@ async function onOKClick(): Promise<void> {
         <q-btn
             rounded
             size="md"
-            class="button-gradient q-mt-md"
+            class="button-gradient q-mt-md q-mr-md"
             @click="onOKClick"
             :label="t(`Global.submit`)"
+        />
+        <q-btn
+            v-if="props.mode === 'update'"
+            rounded
+            size="md"
+            class="q-mt-md"
+            @click="resetForm"
+            :disable="!hasChanges"
+            :label="t(`Global.reset`)"
         />
     </q-card-section>
 </template>
