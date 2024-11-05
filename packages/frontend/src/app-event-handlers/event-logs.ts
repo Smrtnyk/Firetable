@@ -56,6 +56,34 @@ eventEmitter.on("reservation:cancelled", function ({ reservation, eventOwner }) 
     createEventLog(`Reservation cancelled on table ${reservation.tableLabel}`, eventOwner);
 });
 
+eventEmitter.on(
+    "reservation:linked",
+    function ({ sourceReservation, linkedTableLabel, eventOwner }) {
+        createEventLog(
+            `Table ${linkedTableLabel} linked to reservation on table ${
+                Array.isArray(sourceReservation.tableLabel)
+                    ? sourceReservation.tableLabel[0]
+                    : sourceReservation.tableLabel
+            }`,
+            eventOwner,
+        );
+    },
+);
+
+eventEmitter.on(
+    "reservation:unlinked",
+    function ({ sourceReservation, unlinkedTableLabels, eventOwner }) {
+        createEventLog(
+            `Tables ${unlinkedTableLabels.join(", ")} unlinked from reservation on table ${
+                Array.isArray(sourceReservation.tableLabel)
+                    ? sourceReservation.tableLabel[0]
+                    : sourceReservation.tableLabel
+            }`,
+            eventOwner,
+        );
+    },
+);
+
 function createEventLog(message: string, eventOwner: EventOwner): void {
     const authStore = useAuthStore();
     const user = authStore.nonNullableUser;

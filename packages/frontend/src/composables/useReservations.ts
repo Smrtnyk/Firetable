@@ -76,6 +76,13 @@ export const enum TableOperationType {
     RESERVATION_COPY = 1,
     RESERVATION_TRANSFER = 2,
     RESERVATION_DEQUEUE = 3,
+    RESERVATION_LINK = 4,
+}
+
+interface ReservationLinkOperation {
+    type: TableOperationType.RESERVATION_LINK;
+    sourceFloor: FloorViewer;
+    sourceReservation: ReservationDoc;
 }
 
 interface ReservationCopyOperation {
@@ -98,6 +105,7 @@ interface ReservationDequeueOperation {
 type TableOperation =
     | ReservationCopyOperation
     | ReservationDequeueOperation
+    | ReservationLinkOperation
     | ReservationTransferOperation;
 
 export function useReservations(
@@ -168,6 +176,13 @@ export function useReservations(
                     tableLabel: operation.sourceTable.label,
                 });
                 break;
+            case TableOperationType.RESERVATION_LINK:
+                message = t("useReservations.linkingTableOperationMsg", {
+                    tableLabels: Array.isArray(operation.sourceReservation.tableLabel)
+                        ? operation.sourceReservation.tableLabel.join(", ")
+                        : operation.sourceReservation.tableLabel,
+                });
+                break;
             default:
                 throw new Error("Invalid table operation type!");
         }
@@ -209,8 +224,15 @@ export function useReservations(
         for (const floor of newFloorInstances) {
             floor.clearAllReservations();
             for (const reservation of newReservations) {
-                if (reservation.floorId === floor.id) {
-                    const table = floor.getTableByLabel(reservation.tableLabel);
+                if (reservation.floorId !== floor.id) {
+                    continue;
+                }
+                const tableLabels = Array.isArray(reservation.tableLabel)
+                    ? reservation.tableLabel
+                    : [reservation.tableLabel];
+
+                for (const label of tableLabels) {
+                    const table = floor.getTableByLabel(label);
                     if (table) {
                         setReservation(table, reservation);
                     }
@@ -239,6 +261,53 @@ export function useReservations(
         }
     }
 
+    async function handleReservationLink(
+        operation: ReservationLinkOperation,
+        targetTable: BaseTable,
+        targetReservation: ReservationDoc | undefined,
+        targetFloor: FloorViewer,
+    ): Promise<void> {
+        if (targetReservation) {
+            showErrorMessage(t("useReservations.linkToReservedTableErrorMsg"));
+            return;
+        }
+
+        const { sourceReservation, sourceFloor } = operation;
+        const currentLabels = Array.isArray(sourceReservation.tableLabel)
+            ? sourceReservation.tableLabel
+            : [sourceReservation.tableLabel];
+
+        if (currentLabels.includes(targetTable.label)) {
+            showErrorMessage(t("useReservations.tableAlreadyLinkedErrorMsg"));
+            return;
+        }
+
+        // Add check for cross-floor linking
+        if (sourceFloor.id !== targetFloor.id) {
+            showErrorMessage(t("useReservations.crossFloorLinkErrorMsg"));
+            return;
+        }
+
+        const confirm = await showConfirm(
+            t("useReservations.linkTableTitle"),
+            t("useReservations.linkTableConfirmMsg", {
+                tablesToLink: [...currentLabels, targetTable.label].join(", "),
+            }),
+        );
+
+        if (!confirm) return;
+
+        await tryCatchLoadingWrapper({
+            hook() {
+                return updateReservationDoc(eventOwner, {
+                    ...sourceReservation,
+                    id: sourceReservation.id,
+                    tableLabel: [...currentLabels, targetTable.label],
+                });
+            },
+        });
+    }
+
     function handleReservationCreation(reservationData: Reservation): void {
         void tryCatchLoadingWrapper({
             async hook() {
@@ -265,6 +334,46 @@ export function useReservations(
                     eventOwner,
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
                     event: event.value!,
+                });
+            },
+        });
+    }
+
+    async function onUnlinkTables(
+        reservation: ReservationDoc,
+        tableToUnlink: BaseTable,
+    ): Promise<void> {
+        if (!Array.isArray(reservation.tableLabel)) {
+            return;
+        }
+
+        const confirm = await showConfirm(
+            t("useReservations.unlinkConfirmTitle"),
+            t("useReservations.unlinkConfirmMessage", {
+                table: tableToUnlink.label,
+            }),
+        );
+
+        if (!confirm) {
+            return;
+        }
+
+        const updatedTableLabels = reservation.tableLabel.filter(function (label) {
+            return label !== tableToUnlink.label;
+        });
+
+        await tryCatchLoadingWrapper({
+            async hook() {
+                await updateReservationDoc(eventOwner, {
+                    ...reservation,
+                    tableLabel: updatedTableLabels,
+                });
+                eventEmitter.emit("reservation:unlinked", {
+                    eventOwner,
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
+                    event: event.value!,
+                    sourceReservation: reservation,
+                    unlinkedTableLabels: [tableToUnlink.label],
                 });
             },
         });
@@ -426,11 +535,15 @@ export function useReservations(
         reservation: ReservationDoc,
         element: BaseTable,
     ): void {
+        const tableLabels = Array.isArray(reservation.tableLabel)
+            ? reservation.tableLabel
+            : [reservation.tableLabel];
+
         createDialog({
             component: FTDialog,
             componentProps: {
                 component: EventShowReservation,
-                title: `${t("EventShowReservation.title")} ${element.label}`,
+                title: `${t("EventShowReservation.title")} ${tableLabels.join(", ")}`,
                 maximized: false,
                 componentPropsObject: {
                     reservation,
@@ -446,6 +559,12 @@ export function useReservations(
                                 guestId,
                             },
                         });
+                    },
+                    link() {
+                        initiateReservationLink(floor, reservation);
+                    },
+                    unlink() {
+                        onUnlinkTables(reservation, element).catch(showErrorMessage);
                     },
                     delete() {
                         onDeleteReservation(reservation).catch(showErrorMessage);
@@ -677,9 +796,9 @@ export function useReservations(
         });
     }
 
-    function markReservationAsExpired(reservation: ReservationDoc): void {
-        const floor = floorInstances.value.find(matchesProperty("id", reservation.floorId));
-        floor?.getTableByLabel(reservation.tableLabel)?.setFill("red");
+    function markReservationAsExpired(floorId: string, tableLabel: string): void {
+        const floor = floorInstances.value.find(matchesProperty("id", floorId));
+        floor?.getTableByLabel(tableLabel)?.setFill("red");
     }
 
     function checkReservationsForTimeAndMarkTableIfNeeded(): void {
@@ -700,7 +819,15 @@ export function useReservations(
                     )
                 );
             })
-            .forEach(markReservationAsExpired);
+            .forEach(function (reservation) {
+                if (Array.isArray(reservation.tableLabel)) {
+                    reservation.tableLabel.forEach(function (label) {
+                        markReservationAsExpired(reservation.floorId, label);
+                    });
+                } else {
+                    markReservationAsExpired(reservation.floorId, reservation.tableLabel);
+                }
+            });
     }
 
     async function swapOrTransferReservationsBetweenFloorPlans(
@@ -785,6 +912,9 @@ export function useReservations(
         }
 
         switch (operation.type) {
+            case TableOperationType.RESERVATION_LINK:
+                await handleReservationLink(operation, targetTable, targetReservation, targetFloor);
+                break;
             case TableOperationType.RESERVATION_COPY:
                 await handleReservationCopy(operation, targetFloor, targetTable, targetReservation);
                 break;
@@ -876,6 +1006,14 @@ export function useReservations(
               ));
     }
 
+    function initiateReservationLink(floor: FloorViewer, reservation: ReservationDoc): void {
+        currentTableOperation.value = {
+            type: TableOperationType.RESERVATION_LINK,
+            sourceFloor: floor,
+            sourceReservation: reservation,
+        };
+    }
+
     function initiateReservationCopy(floor: FloorViewer, table: BaseTable): void {
         currentTableOperation.value = {
             type: TableOperationType.RESERVATION_COPY,
@@ -900,9 +1038,14 @@ export function useReservations(
             return;
         }
 
-        const reservation = reservations.value.find(
-            (res) => res.tableLabel === element.label && res.floorId === floor.id,
-        );
+        const reservation = reservations.value.find((res) => {
+            if (res.floorId !== floor.id) return false;
+
+            // Handle both string and string[] tableLabel
+            const tableLabels = Array.isArray(res.tableLabel) ? res.tableLabel : [res.tableLabel];
+
+            return tableLabels.includes(element.label);
+        });
 
         if (currentTableOperation.value) {
             await handleTableOperation(floor, element, reservation);

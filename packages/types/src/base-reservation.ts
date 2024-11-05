@@ -22,7 +22,7 @@ export interface BaseReservation {
     /**
      * The id of the table where the reservation is located
      */
-    tableLabel: string;
+    tableLabel: string[] | string;
     /**
      * Optional telephone number of the guest
      */

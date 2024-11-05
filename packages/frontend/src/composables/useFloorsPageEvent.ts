@@ -81,8 +81,17 @@ export function useFloorsPageEvent(
         }
         for (const reservation of foundReservations) {
             const floor = floorInstances.value.find(matchesProperty("id", reservation.floorId));
-            const table = floor?.getTableByLabel(reservation.tableLabel);
-            table?.startAnimation();
+            if (floor) {
+                // Handle both string and string[] tableLabel
+                const tableLabels = Array.isArray(reservation.tableLabel)
+                    ? reservation.tableLabel
+                    : [reservation.tableLabel];
+
+                for (const label of tableLabels) {
+                    const table = floor.getTableByLabel(label);
+                    table?.startAnimation();
+                }
+            }
         }
     }
 
