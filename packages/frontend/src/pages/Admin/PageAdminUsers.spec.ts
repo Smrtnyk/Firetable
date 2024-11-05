@@ -235,4 +235,52 @@ describe("PageAdminUsers.vue", () => {
         const userItem = screen.getByText("John Doe");
         await expect.element(userItem).toBeVisible();
     });
+
+    it("renders title with correct user count", async () => {
+        const screen = render();
+
+        await expect
+            .element(screen.getByRole("heading", { level: 3 }))
+            .toHaveTextContent(`${t("PageAdminUsers.title")} (3)`);
+    });
+
+    it("updates user count when users change", async () => {
+        const users = ref(usersData);
+        useUsersMock.mockReturnValue({
+            users,
+            isLoading: ref(false),
+            fetchUsers: vi.fn(),
+        });
+
+        const screen = render();
+
+        // Initial count
+        await expect
+            .element(screen.getByRole("heading", { level: 3 }))
+            .toHaveTextContent(`${t("PageAdminUsers.title")} (3)`);
+
+        // Add a new user
+        users.value = [
+            ...usersData,
+            {
+                id: "user4",
+                name: "New User",
+                username: "newuser",
+                organisationId,
+                email: "new@example.com",
+                role: Role.STAFF,
+                relatedProperties: [],
+                capabilities: {
+                    [UserCapability.CAN_RESERVE]: true,
+                },
+            },
+        ];
+
+        await nextTick();
+
+        // Check updated count
+        await expect
+            .element(screen.getByRole("heading", { level: 3 }))
+            .toHaveTextContent(`${t("PageAdminUsers.title")} (4)`);
+    });
 });
