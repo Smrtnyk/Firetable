@@ -26,7 +26,8 @@ export default boot(function ({ router, app }) {
     router.onError(function (error) {
         const isChunkLoadFailed =
             /loading chunk \d* failed./i.test(error.message) ||
-            error.message.includes("dynamically imported module");
+            error.message.includes("dynamically imported module") ||
+            error.message.includes("is not a valid JavaScript MIME type");
         if (isChunkLoadFailed && navigator.onLine) {
             showErrorMessage("New version is available, press ok to download.", refreshApp);
         }
