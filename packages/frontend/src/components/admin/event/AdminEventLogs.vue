@@ -54,6 +54,10 @@ function getIconNameForLogEntry(logMessage: string): string {
         return "check";
     }
 
+    if (logMessage.includes("cancelled")) {
+        return "close";
+    }
+
     return "";
 }
 
