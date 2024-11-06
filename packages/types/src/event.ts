@@ -1,6 +1,6 @@
 import type { QueryDocumentSnapshot, Timestamp } from "firebase/firestore";
 import type { FloorDoc } from "./floor.js";
-import type { ADMIN, Role } from "./auth.js";
+import type { AppUser } from "./auth.js";
 import type { UserIdentifier } from "./base-reservation.js";
 
 export type CreateEventForm = Pick<
@@ -96,7 +96,7 @@ export interface EventLog {
      * creator of the log
      *
      */
-    creator: UserIdentifier & { role: Role | typeof ADMIN };
+    creator: UserIdentifier & { role: AppUser["role"] };
     /**
      * Remove Timestamp after some time has passed
      * due to compat support for old logs

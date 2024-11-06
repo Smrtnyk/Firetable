@@ -5,7 +5,7 @@ import type { PageAdminGuestsProps } from "./PageAdminGuests.vue";
 import type { Ref } from "vue";
 import PageAdminGuests from "./PageAdminGuests.vue";
 import { renderComponent, t } from "../../../test-helpers/render-component";
-import { ADMIN, Role } from "@firetable/types";
+import { AdminRole, Role } from "@firetable/types";
 import { ref } from "vue";
 
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
@@ -40,7 +40,7 @@ describe("PageAdminGuests.vue", () => {
                 name: "Admin User",
                 email: "admin@example.com",
                 username: "adminuser",
-                role: ADMIN,
+                role: AdminRole.ADMIN,
                 // Irrelevant for admin
                 relatedProperties: [],
                 organisationId: "org1",

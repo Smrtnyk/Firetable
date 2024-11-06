@@ -1,8 +1,8 @@
 import * as Init from "../../init.js";
 import { MockCollection, MockFirestore } from "../../../test-helpers/MockFirestore.js";
-import { Collection } from "../../../types/types.js";
 import { getEventPath } from "../../paths.js";
 import { clearOldEvents } from "./index.js";
+import { Collection } from "@shared-types";
 import { describe, it, beforeEach, expect, vi } from "vitest";
 
 describe("clearOldEvents Function", () => {

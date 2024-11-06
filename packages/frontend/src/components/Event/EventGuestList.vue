@@ -18,7 +18,7 @@ import FTDialog from "src/components/FTDialog.vue";
 import FTBtn from "src/components/FTBtn.vue";
 
 import { useQuasar } from "quasar";
-import { ADMIN, Role } from "@firetable/types";
+import { AdminRole, Role } from "@firetable/types";
 import { useI18n } from "vue-i18n";
 import { useAuthStore } from "src/stores/auth-store";
 
@@ -41,7 +41,7 @@ const isGuestListFull = computed(function () {
 });
 
 const canInteract = computed(function () {
-    return [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN, Role.HOSTESS].includes(
+    return [Role.PROPERTY_OWNER, Role.MANAGER, AdminRole.ADMIN, Role.HOSTESS].includes(
         nonNullableUser.value.role,
     );
 });

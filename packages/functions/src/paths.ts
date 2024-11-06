@@ -1,4 +1,4 @@
-import { Collection } from "../types/types.js";
+import { Collection } from "@shared-types";
 
 export function getEventsPath(organisationId: string, propertyId: string): string {
     return [

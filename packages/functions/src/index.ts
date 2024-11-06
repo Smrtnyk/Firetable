@@ -15,7 +15,7 @@ import { deleteGuestVisitFn } from "./callable/guest/delete-guest-visit.js";
 import { updateGuestDataFn } from "./callable/guest/update-guest-info.js";
 import { moveReservationToQueueFn } from "./callable/reservation/move-reservation-to-queue.js";
 import { moveReservationFromQueueFn } from "./callable/reservation/move-reservation-from-queue.js";
-import { Collection } from "../types/types.js";
+import { Collection } from "@shared-types";
 
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import { onCall } from "firebase-functions/v2/https";

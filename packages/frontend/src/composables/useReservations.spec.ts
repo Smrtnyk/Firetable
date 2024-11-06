@@ -2,7 +2,13 @@ import type { FloorDoc, ReservationDoc, EventDoc, QueuedReservationDoc } from "@
 import type { App } from "vue";
 import type { TestingOptions } from "@pinia/testing";
 import { TableOperationType, useReservations } from "../composables/useReservations";
-import { Role, UserCapability, ADMIN, ReservationStatus, ReservationType } from "@firetable/types";
+import {
+    Role,
+    UserCapability,
+    AdminRole,
+    ReservationStatus,
+    ReservationType,
+} from "@firetable/types";
 import { shallowRef, nextTick, createApp, ref } from "vue";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { FloorEditor, FloorElementTypes, FloorViewer } from "@firetable/floor-creator";
@@ -1390,7 +1396,7 @@ function withSetup(
             user: {
                 id: "1",
                 email: "test@mail.com",
-                role: ADMIN,
+                role: AdminRole.ADMIN,
             },
         },
         properties: {

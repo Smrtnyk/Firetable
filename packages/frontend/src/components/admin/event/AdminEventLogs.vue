@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { EventLog, EventLogsDoc } from "@firetable/types";
 import type { QScrollAreaProps } from "quasar";
-import { ADMIN } from "@firetable/types";
+import { AdminRole } from "@firetable/types";
 import { computed, ref, useTemplateRef } from "vue";
 import { QScrollArea } from "quasar";
 import { getFormatedDateFromTimestamp } from "src/helpers/date-utils";
@@ -23,7 +23,7 @@ const logs = computed(function () {
         return props.logsDoc.logs;
     }
     return props.logsDoc.logs.filter(function (log) {
-        return log.creator.role !== ADMIN;
+        return log.creator.role !== AdminRole.ADMIN;
     });
 });
 const showScrollButton = ref(false);

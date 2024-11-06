@@ -1,6 +1,6 @@
-import type { GuestData } from "./set-guest-data.js";
+import type { GuestData, PreparedGuestData } from "./set-guest-data.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
-import type { GuestDoc, PreparedGuestData } from "../../../types/types.js";
+import type { GuestDoc } from "@shared-types";
 import { setGuestDataFn } from "./set-guest-data.js";
 import * as Init from "../../init.js";
 import { getGuestsPath } from "../../paths.js";
@@ -40,7 +40,7 @@ describe("setGuestDataFn", () => {
 
     beforeEach(() => {
         mockFirestore = new MockFirestore();
-        vi.spyOn(Init, "db", "get").mockReturnValue(mockFirestore);
+        vi.spyOn(Init, "db", "get").mockReturnValue(mockFirestore as any);
         vi.setSystemTime(mockTimestamp);
     });
 
@@ -53,7 +53,7 @@ describe("setGuestDataFn", () => {
 
         expect(querySnapshot.empty).toBe(false);
         const guestDoc = querySnapshot.docs[0];
-        const guestData = guestDoc.data();
+        const guestData = guestDoc!.data();
 
         expect(guestData).toBeDefined();
         const guestVisits =
@@ -71,7 +71,7 @@ describe("setGuestDataFn", () => {
     });
 
     it("should update an existing guest with new visit information", async () => {
-        const initialGuestData: GuestDoc = {
+        const initialGuestData: Omit<GuestDoc, "id"> = {
             lastModified: 1,
             name: "guestName",
             contact,
@@ -100,7 +100,7 @@ describe("setGuestDataFn", () => {
 
         expect(querySnapshot.empty).toBe(false);
         const guestDoc = querySnapshot.docs[0];
-        const guestData = guestDoc.data();
+        const guestData = guestDoc!.data();
 
         const guestVisits = guestData.visitedProperties[requestData.propertyId];
         expect(guestVisits).toStrictEqual({
@@ -118,7 +118,7 @@ describe("setGuestDataFn", () => {
     });
 
     it("should update lastModified when adding a new visit to an existing guest", async () => {
-        const initialGuestData: GuestDoc = {
+        const initialGuestData: Omit<GuestDoc, "id"> = {
             name: "guestName",
             contact,
             hashedContact,
@@ -156,7 +156,7 @@ describe("setGuestDataFn", () => {
 
         expect(querySnapshot.empty).toBe(false);
         const guestDoc = querySnapshot.docs[0];
-        const guestData = guestDoc.data();
+        const guestData = guestDoc!.data();
 
         const guestVisits = guestData.visitedProperties[requestData.propertyId];
         expect(guestVisits).toHaveProperty("existingEventId");

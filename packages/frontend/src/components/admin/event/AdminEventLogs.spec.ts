@@ -2,8 +2,8 @@ import type { EventLog, EventLogsDoc } from "@firetable/types";
 import type { RenderResult } from "vitest-browser-vue";
 import type { AdminEventLogsProps } from "./AdminEventLogs.vue";
 import AdminEventLogs from "./AdminEventLogs.vue";
-import { renderComponent, locale } from "../../../../test-helpers/render-component";
-import { ADMIN, Role } from "@firetable/types";
+import { locale, renderComponent } from "../../../../test-helpers/render-component";
+import { AdminRole, Role } from "@firetable/types";
 import { formatEventDate, getDefaultTimezone } from "src/helpers/date-utils";
 import { beforeEach, describe, expect, it } from "vitest";
 import { page } from "@vitest/browser/context";
@@ -25,7 +25,7 @@ const sampleLogs: EventLog[] = [
             id: "bar",
             name: "Admin",
             email: "admin@example.com",
-            role: ADMIN,
+            role: AdminRole.ADMIN,
         },
         timestamp: 1_633_104_000_000,
     },
@@ -133,7 +133,7 @@ describe("AdminEventLogs", () => {
         });
 
         it("filters out logs created by admins", async () => {
-            const nonAdminLogs = sampleLogs.filter((log) => log.creator.role !== ADMIN);
+            const nonAdminLogs = sampleLogs.filter((log) => log.creator.role !== AdminRole.ADMIN);
 
             // Verify that non-admin logs are displayed
             for (const log of nonAdminLogs) {
@@ -143,7 +143,7 @@ describe("AdminEventLogs", () => {
 
             // Verify that admin logs are not displayed
             const adminLog = sampleLogs.find(function (log) {
-                return log.creator.role === ADMIN;
+                return log.creator.role === AdminRole.ADMIN;
             });
             const adminMessage = adminLog!.message;
 

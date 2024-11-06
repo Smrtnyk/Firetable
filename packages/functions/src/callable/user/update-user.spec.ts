@@ -1,15 +1,15 @@
-import type { EditUserPayload, User } from "../../../types/types";
+import type { EditUserPayload, User } from "@shared-types";
 import type { CallableRequest } from "firebase-functions/v2/https";
-import { updateUserFn } from "./update-user";
-import { Role } from "../../../types/types";
-import * as Init from "../../init";
-import { MockAuth } from "../../../test-helpers/MockAuth";
+import { updateUserFn } from "./update-user.js";
+import * as Init from "../../init.js";
+import { MockAuth } from "../../../test-helpers/MockAuth.js";
 import {
     MockDocumentReference,
     MockFieldValue,
     MockFirestore,
-} from "../../../test-helpers/MockFirestore";
-import { getUserPath } from "../../paths";
+} from "../../../test-helpers/MockFirestore.js";
+import { getUserPath } from "../../paths.js";
+import { Role } from "@shared-types/index.js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as Firestore from "firebase-admin/firestore";
 
@@ -82,7 +82,7 @@ describe("updateUserFn", () => {
             expect(result).toEqual({ success: true, message: "User updated successfully." });
 
             // Verify user details updated in Firestore
-            const userDoc = mockFirestore.getDataAtPath(getUserPath(organisationId, uid)).data;
+            const userDoc = mockFirestore.getDataAtPath(getUserPath(organisationId, uid))!.data;
 
             expect(userDoc.name).toBe(updatedUser.name);
             expect(userDoc.email).toBe(updatedUser.email);
@@ -129,7 +129,7 @@ describe("updateUserFn", () => {
         expect(result).toEqual({ success: true, message: "User updated successfully." });
 
         // Verify user details updated in Firestore
-        const userDoc = mockFirestore.getDataAtPath(getUserPath(organisationId, uid)).data;
+        const userDoc = mockFirestore.getDataAtPath(getUserPath(organisationId, uid))!.data;
 
         expect(userDoc.name).toBe(updatedUser.name);
         expect(userDoc.email).toBe(updatedUser.email);
@@ -217,7 +217,7 @@ describe("updateUserFn", () => {
             // Verify password update in MockAuth
             const user = await mockAuth.getUserByEmail("test@example.com");
 
-            // @ts-expect-error -- We shouldn't store the password, but it is a mock auth object
+            // @ts-expect-error -- we hijacked this method to return the password
             expect(user?.password).toBe(newPassword);
         });
 

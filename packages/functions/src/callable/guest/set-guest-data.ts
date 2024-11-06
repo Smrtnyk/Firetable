@@ -1,9 +1,19 @@
 import type { CallableRequest } from "firebase-functions/v2/https";
-import type { GuestDoc, PreparedGuestData, Visit } from "../../../types/types.js";
+import type { GuestDoc, Visit } from "@shared-types";
 import { db } from "../../init.js";
 import { getGuestsPath } from "../../paths.js";
 import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
+
+export interface PreparedGuestData {
+    arrived: boolean;
+    cancelled: boolean | undefined;
+    contact: string;
+    maskedContact: string;
+    hashedContact: string;
+    guestName: string;
+    isVIP: boolean;
+}
 
 export type GuestData = {
     preparedGuestData: PreparedGuestData;
@@ -66,7 +76,7 @@ export async function setGuestDataFn(req: CallableRequest<GuestData>): Promise<v
 
         if (querySnapshot.empty) {
             logger.info("Creating new guest document with name:", guestName);
-            const guestData: GuestDoc = {
+            const guestData: Omit<GuestDoc, "id"> = {
                 lastModified: Date.now(),
                 contact,
                 hashedContact,

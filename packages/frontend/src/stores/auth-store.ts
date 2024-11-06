@@ -1,7 +1,7 @@
 import type { AppUser, User, VoidFunction } from "@firetable/types";
 import type { User as FBUser } from "firebase/auth";
 import { getUserPath, logoutUser } from "../backend-proxy";
-import { Role, ADMIN } from "@firetable/types";
+import { Role, AdminRole } from "@firetable/types";
 import { defineStore } from "pinia";
 import { computed, ref, watch } from "vue";
 import { showErrorMessage } from "src/helpers/ui-helpers";
@@ -27,7 +27,7 @@ export const useAuthStore = defineStore("auth", function () {
     });
 
     const isAdmin = computed(function () {
-        return user.value?.role === ADMIN;
+        return user.value?.role === AdminRole.ADMIN;
     });
 
     const isPropertyOwner = computed(function () {
@@ -69,7 +69,7 @@ export const useAuthStore = defineStore("auth", function () {
             const organisationId = token?.claims.organisationId as string;
             const propertiesStore = usePropertiesStore();
 
-            if (role === ADMIN) {
+            if (role === AdminRole.ADMIN) {
                 assignAdmin(authUser);
                 await propertiesStore.initOrganisations();
                 await propertiesStore.initAdminProperties();
@@ -106,7 +106,7 @@ export const useAuthStore = defineStore("auth", function () {
             name: "Admin",
             username: "admin",
             id: authUser.uid,
-            role: ADMIN,
+            role: AdminRole.ADMIN,
             email: authUser.email,
             relatedProperties: [],
             organisationId: "",

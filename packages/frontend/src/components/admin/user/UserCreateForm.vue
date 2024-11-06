@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CreateUserPayload, OrganisationDoc, PropertyDoc } from "@firetable/types";
 import { computed, ref, useTemplateRef } from "vue";
-import { ADMIN, Role } from "@firetable/types";
+import { AdminRole, Role } from "@firetable/types";
 import { QForm } from "quasar";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";
@@ -79,11 +79,12 @@ function userSkeleton(): CreateUserPayload {
     };
 }
 
+const roleValues: Role[] = [Role.PROPERTY_OWNER, Role.STAFF, Role.HOSTESS, Role.MANAGER];
 function availableRolesBasedOn(roleVal: string): Role[] {
-    if (roleVal === ADMIN) {
-        return Object.values(Role);
+    if (roleVal === AdminRole.ADMIN) {
+        return roleValues;
     }
-    return Object.values(Role).filter(function (role) {
+    return roleValues.filter(function (role) {
         return role !== Role.PROPERTY_OWNER;
     });
 }

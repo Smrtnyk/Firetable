@@ -3,7 +3,7 @@ import type { User as FBUser } from "firebase/auth";
 import { useAuthStore } from "./auth-store";
 import { usePropertiesStore } from "./properties-store";
 import { mockedStore } from "../../test-helpers/render-component";
-import { ADMIN, Role } from "@firetable/types";
+import { AdminRole, Role } from "@firetable/types";
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createApp, nextTick, ref } from "vue";
@@ -84,7 +84,7 @@ describe("auth-store.ts", () => {
             const fbUser = createTestFBUser({
                 getIdTokenResult: vi.fn().mockResolvedValue({
                     claims: {
-                        role: ADMIN,
+                        role: AdminRole.ADMIN,
                         organisationId: "org1",
                     },
                 }),
@@ -99,7 +99,7 @@ describe("auth-store.ts", () => {
             expect(authStore.isAdmin).toBe(true);
             expect(authStore.user).toEqual(
                 expect.objectContaining({
-                    role: ADMIN,
+                    role: AdminRole.ADMIN,
                     email: fbUser.email,
                 }),
             );
@@ -289,7 +289,7 @@ describe("auth-store.ts", () => {
         it("calculates isAdmin correctly", () => {
             const authStore = mockedStore(useAuthStore);
 
-            authStore.user = createTestUser({ role: ADMIN });
+            authStore.user = createTestUser({ role: AdminRole.ADMIN });
             expect(authStore.isAdmin).toBe(true);
 
             authStore.user = createTestUser({ role: Role.STAFF });
@@ -333,7 +333,7 @@ describe("auth-store.ts", () => {
                 name: "Admin",
                 username: "admin",
                 id: fbUser.uid,
-                role: ADMIN,
+                role: AdminRole.ADMIN,
                 email: fbUser.email,
                 relatedProperties: [],
                 organisationId: "",

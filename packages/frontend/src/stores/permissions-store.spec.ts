@@ -2,7 +2,7 @@ import type { AppUser } from "@firetable/types";
 import { usePermissionsStore } from "./permissions-store";
 import { useAuthStore } from "./auth-store";
 import { mockedStore } from "../../test-helpers/render-component";
-import { ADMIN, DEFAULT_CAPABILITIES_BY_ROLE, Role, UserCapability } from "@firetable/types";
+import { AdminRole, DEFAULT_CAPABILITIES_BY_ROLE, Role, UserCapability } from "@firetable/types";
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it } from "vitest";
 import { createApp } from "vue";
@@ -34,7 +34,7 @@ describe("permissions-store.ts", () => {
         const permissionsStore = mockedStore(usePermissionsStore);
 
         // Should have access
-        authStore.user = createTestUser({ role: ADMIN });
+        authStore.user = createTestUser({ role: AdminRole.ADMIN });
         expect(permissionsStore.canSeeAnalytics).toBe(true);
 
         authStore.user = createTestUser({ role: Role.PROPERTY_OWNER });

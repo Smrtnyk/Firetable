@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment -- this is intentional
+// @ts-nocheck
 import type { Auth, UserRecord } from "firebase-admin/auth";
 import { generateRandomId } from "./utils.js";
 

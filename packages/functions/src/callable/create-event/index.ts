@@ -1,8 +1,8 @@
-import type { CreateEventPayload } from "../../../types/types.js";
+import type { CreateEventPayload } from "@shared-types";
 import type { CallableRequest } from "firebase-functions/v2/https";
 import { db } from "../../init.js";
-import { Collection } from "../../../types/types.js";
 import { getEventsPath } from "../../paths.js";
+import { Collection } from "@shared-types";
 import { logger } from "firebase-functions/v2";
 import { HttpsError } from "firebase-functions/v2/https";
 

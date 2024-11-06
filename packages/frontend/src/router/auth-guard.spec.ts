@@ -7,7 +7,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { getCurrentUser } from "vuefire";
 import { Loading } from "quasar";
 import { AppLogger } from "src/logger/FTLogger";
-import { ADMIN, Role } from "@firetable/types";
+import { AdminRole, Role } from "@firetable/types";
 
 // Mock implementations
 vi.mock("vuefire", () => ({
@@ -132,7 +132,7 @@ describe("Auth Guard", () => {
             vi.mocked(getCurrentUser).mockResolvedValueOnce({
                 getIdTokenResult: () =>
                     Promise.resolve({
-                        claims: { role: ADMIN },
+                        claims: { role: AdminRole.ADMIN },
                     }),
             } as any);
 
@@ -143,13 +143,13 @@ describe("Auth Guard", () => {
         it("handles array-based role checks", async () => {
             const to = createMockRoute("/admin", {
                 requiresAuth: true,
-                allowedRoles: [ADMIN, Role.PROPERTY_OWNER],
+                allowedRoles: [AdminRole.ADMIN, Role.PROPERTY_OWNER],
             });
 
             mockAuthStore.isAuthenticated = true;
             mockAuthStore.isReady = true;
             vi.mocked(getCurrentUser).mockResolvedValueOnce({
-                getIdTokenResult: () => Promise.resolve({ claims: { role: ADMIN } }),
+                getIdTokenResult: () => Promise.resolve({ claims: { role: AdminRole.ADMIN } }),
             } as any);
 
             expect(await guard(to)).toBe(true);
@@ -158,7 +158,7 @@ describe("Auth Guard", () => {
         it("redirects on role check failure", async () => {
             const to = createMockRoute("/admin", {
                 requiresAuth: true,
-                allowedRoles: [ADMIN],
+                allowedRoles: [AdminRole.ADMIN],
             });
 
             mockAuthStore.isAuthenticated = true;
@@ -218,7 +218,7 @@ describe("Auth Guard", () => {
         it("handles role check errors", async () => {
             const to = createMockRoute("/admin", {
                 requiresAuth: true,
-                allowedRoles: [ADMIN],
+                allowedRoles: [AdminRole.ADMIN],
             });
 
             mockAuthStore.isAuthenticated = true;
@@ -232,7 +232,7 @@ describe("Auth Guard", () => {
         it("identifies permission errors", async () => {
             const to = createMockRoute("/test", {
                 requiresAuth: true,
-                allowedRoles: [ADMIN],
+                allowedRoles: [AdminRole.ADMIN],
             });
 
             mockAuthStore.isAuthenticated = true;
@@ -318,7 +318,7 @@ describe("Auth Guard", () => {
         it("handles undefined token result", async () => {
             const to = createMockRoute("/admin", {
                 requiresAuth: true,
-                allowedRoles: [ADMIN],
+                allowedRoles: [AdminRole.ADMIN],
             });
 
             mockAuthStore.isAuthenticated = true;
@@ -333,7 +333,7 @@ describe("Auth Guard", () => {
         it("handles undefined role claims", async () => {
             const to = createMockRoute("/admin", {
                 requiresAuth: true,
-                allowedRoles: [ADMIN],
+                allowedRoles: [AdminRole.ADMIN],
             });
 
             mockAuthStore.isAuthenticated = true;

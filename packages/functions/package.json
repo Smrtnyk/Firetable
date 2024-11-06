@@ -1,10 +1,11 @@
 {
     "name": "@firetable/functions",
     "version": "0.0.1",
-    "main": "lib/src/index.js",
+    "main": "lib/functions/src/index.js",
     "type": "module",
     "scripts": {
-        "build": "tsc",
+        "build": "npm run typecheck && tsc -p tsconfig.prod.json",
+        "typecheck": "tsc --noEmit",
         "test": "vitest",
         "dev": "tsc --watch",
         "deploy": "firebase deploy --only functions",

@@ -1,5 +1,5 @@
 import type { CallableRequest } from "firebase-functions/https";
-import type { GuestDoc } from "../../../types/types.js";
+import type { GuestDoc } from "@shared-types";
 import { db } from "../../init.js";
 import { getGuestsPath } from "../../paths.js";
 import { HttpsError } from "firebase-functions/v2/https";

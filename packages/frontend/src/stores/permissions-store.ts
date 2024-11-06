@@ -1,5 +1,5 @@
 import { useAuthStore } from "./auth-store";
-import { Role, ADMIN, DEFAULT_CAPABILITIES_BY_ROLE, UserCapability } from "@firetable/types";
+import { Role, AdminRole, DEFAULT_CAPABILITIES_BY_ROLE, UserCapability } from "@firetable/types";
 import { defineStore } from "pinia";
 import { computed } from "vue";
 
@@ -18,7 +18,7 @@ export const usePermissionsStore = defineStore("permissions", function () {
         if (!userRole) {
             return false;
         }
-        return [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN].includes(userRole);
+        return [Role.PROPERTY_OWNER, Role.MANAGER, AdminRole.ADMIN].includes(userRole);
     });
 
     const canCreateEvents = computed(function () {
