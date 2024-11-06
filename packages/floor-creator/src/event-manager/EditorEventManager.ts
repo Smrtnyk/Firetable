@@ -1,5 +1,5 @@
 import type { Floor } from "../Floor.js";
-import type { Transform, TEvent, ModifiedEvent } from "fabric";
+import type { Transform, TEvent, ModifiedEvent, BasicTransformEvent, FabricObject } from "fabric";
 import type { CanvasHistory } from "../CanvasHistory.js";
 import { EventManager } from "./EventManager.js";
 import { RESOLUTION } from "../constants.js";
@@ -21,7 +21,9 @@ export class EditorEventManager extends EventManager {
         this.initializeCtrlEventListeners();
     }
 
-    handleObjectMoving = (options: any): void => {
+    handleObjectMoving = (
+        options: BasicTransformEvent<MouseEvent> & { target: FabricObject },
+    ): void => {
         if (!this.ctrlPressedDuringSelection) {
             return;
         }
@@ -83,6 +85,8 @@ export class EditorEventManager extends EventManager {
                 data: e.dataTransfer?.getData("text/plain"),
             });
         });
+
+        this.floor.canvas.on("object:moving", this.enforceObjectBoundaries);
     }
 
     private initializeCtrlEventListeners(): void {
@@ -176,5 +180,60 @@ export class EditorEventManager extends EventManager {
         }
 
         this.floor.canvas.requestRenderAll();
+    };
+
+    private readonly enforceObjectBoundaries = (
+        e: BasicTransformEvent<MouseEvent> & { target: FabricObject },
+    ): void => {
+        const obj = e.target;
+        if (!obj) {
+            return;
+        }
+
+        // Get the current zoom level and viewport transform
+        const zoom = this.floor.canvas.getZoom();
+        const vpt = this.floor.canvas.viewportTransform;
+        if (!vpt) {
+            return;
+        }
+
+        // Get object bounds including rotation
+        const objBounds = obj.getBoundingRect();
+
+        // Calculate proposed movement
+        const movementX = e.e.movementX / zoom;
+        const movementY = e.e.movementY / zoom;
+
+        // Calculate proposed new position for the bounds
+        let newBoundsLeft = objBounds.left + movementX;
+        let newBoundsTop = objBounds.top + movementY;
+
+        // Enforce boundaries considering the entire bounding box
+        if (newBoundsLeft < 0) {
+            newBoundsLeft = 0;
+        } else if (newBoundsLeft + objBounds.width > this.floor.width) {
+            newBoundsLeft = this.floor.width - objBounds.width;
+        }
+
+        if (newBoundsTop < 0) {
+            newBoundsTop = 0;
+        } else if (newBoundsTop + objBounds.height > this.floor.height) {
+            newBoundsTop = this.floor.height - objBounds.height;
+        }
+
+        // Calculate the offset from bounds to object position
+        const offsetLeft = objBounds.left - obj.left;
+        const offsetTop = objBounds.top - obj.top;
+
+        obj.set({
+            left: newBoundsLeft - offsetLeft,
+            top: newBoundsTop - offsetTop,
+        });
+
+        obj.setCoords();
+        this.floor.canvas.requestRenderAll();
+
+        // Prevent default to maintain control
+        e.e.preventDefault();
     };
 }

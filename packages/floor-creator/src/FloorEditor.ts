@@ -35,6 +35,8 @@ export class FloorEditor extends Floor {
 
     constructor(options: FloorCreationOptions) {
         super(options);
+
+        initAligningGuidelines(this.canvas);
         this.eventEmitter = new EventEmitter<FloorEditorEvents>();
         this.gridDrawer = new GridDrawer(this.canvas);
         this.history = new CanvasHistory(this, { maxStackSize: 20 });
@@ -56,8 +58,6 @@ export class FloorEditor extends Floor {
                 this.emit("historyChange");
             });
         }
-
-        initAligningGuidelines(this.canvas);
     }
 
     canUndo(): boolean {
