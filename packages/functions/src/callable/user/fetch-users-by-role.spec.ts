@@ -131,6 +131,12 @@ describe("fetchUsersByRoleFn", () => {
                 role: "Staff",
                 relatedProperties: ["prop1", "prop2"],
             },
+            {
+                id: "user2",
+                name: "user2",
+                relatedProperties: ["prop2", "prop3"],
+                role: "Hostess",
+            },
         ]);
     });
 
