@@ -1,13 +1,15 @@
-export const ADMIN = "Administrator";
+export const enum AdminRole {
+    ADMIN = "Administrator",
+}
 
-export enum Role {
+export const enum Role {
     PROPERTY_OWNER = "Property Owner",
     MANAGER = "Manager",
     STAFF = "Staff",
     HOSTESS = "Hostess",
 }
 
-export type AdminUser = Omit<User, "role"> & { role: typeof ADMIN };
+export type AdminUser = Omit<User, "role"> & { role: AdminRole.ADMIN };
 
 export interface User {
     id: string;
@@ -65,8 +67,8 @@ export const enum UserCapability {
     CAN_SEE_GUESTBOOK = "Can see guestbook",
 }
 
-export const DEFAULT_CAPABILITIES_BY_ROLE: Record<Role | typeof ADMIN, UserCapabilities> = {
-    [ADMIN]: {
+export const DEFAULT_CAPABILITIES_BY_ROLE: Record<AdminRole.ADMIN | Role, UserCapabilities> = {
+    [AdminRole.ADMIN]: {
         [UserCapability.CAN_RESERVE]: true,
         [UserCapability.CAN_SEE_RESERVATION_CREATOR]: true,
         [UserCapability.CAN_SEE_GUEST_CONTACT]: true,

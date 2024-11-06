@@ -1,9 +1,9 @@
 import type { CallableRequest } from "firebase-functions/v2/https";
-import type { MoveReservationFromQueueReqPayload } from "./move-reservation-from-queue";
-import { moveReservationFromQueueFn } from "./move-reservation-from-queue";
+import type { MoveReservationFromQueueReqPayload } from "./move-reservation-from-queue.js";
+import { moveReservationFromQueueFn } from "./move-reservation-from-queue.js";
 import * as Init from "../../init.js";
-import { MockFirestore, MockTransaction } from "../../../test-helpers/MockFirestore";
-import { getQueuedReservationsPath, getReservationsPath } from "../../paths";
+import { MockFirestore, MockTransaction } from "../../../test-helpers/MockFirestore.js";
+import { getQueuedReservationsPath, getReservationsPath } from "../../paths.js";
 import { HttpsError } from "firebase-functions/v2/https";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
@@ -29,7 +29,7 @@ describe("moveReservationFromQueueFn", () => {
                 preparedPlannedReservation: {},
             },
             rawRequest: {},
-        } as CallableRequest<MoveReservationFromQueueReqPayload>;
+        } as unknown as CallableRequest<MoveReservationFromQueueReqPayload>;
 
         await expect(moveReservationFromQueueFn(req)).rejects.toThrow(
             new HttpsError(

@@ -1,7 +1,7 @@
 import type { CallableRequest } from "firebase-functions/v2/https";
 import { db } from "../../init.js";
-import { ADMIN } from "../../../types/types.js";
 import { getPropertiesPath, getUsersPath } from "../../paths.js";
+import { AdminRole } from "@shared-types";
 import { FieldValue } from "firebase-admin/firestore";
 import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
@@ -39,7 +39,7 @@ export async function createPropertyFn(req: CallableRequest<Data>): Promise<stri
         const userClaims = req.auth.token;
 
         // If user is not an admin, associate the property with the user
-        if (userClaims.role !== ADMIN) {
+        if (userClaims.role !== AdminRole.ADMIN) {
             const userRef = db.collection(getUsersPath(organisationId)).doc(req.auth.uid);
             await userRef.update({
                 relatedProperties: FieldValue.arrayUnion(propertyId),

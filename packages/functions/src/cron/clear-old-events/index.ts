@@ -1,8 +1,8 @@
 import type { QuerySnapshot } from "firebase-admin/firestore";
 import { deleteDocument } from "../../delete-document/index.js";
 import { db } from "../../init.js";
-import { Collection } from "../../../types/types.js";
 import { getEventsPath } from "../../paths.js";
+import { Collection } from "@shared-types";
 import { logger } from "firebase-functions/v2";
 
 // Number of years after which events are considered old

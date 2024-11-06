@@ -1,10 +1,11 @@
 import type { CallableRequest } from "firebase-functions/v2/https";
-import type { CreateUserPayload } from "../../../types/types";
-import { createUser } from "./create-user";
-import { MockAuth } from "../../../test-helpers/MockAuth";
-import { MockDocumentReference, MockFirestore } from "../../../test-helpers/MockFirestore";
-import * as Init from "../../init";
-import { getUserPath } from "../../paths";
+import type { CreateUserPayload } from "@shared-types";
+import { createUser } from "./create-user.js";
+import { MockAuth } from "../../../test-helpers/MockAuth.js";
+import { MockDocumentReference, MockFirestore } from "../../../test-helpers/MockFirestore.js";
+import * as Init from "../../init.js";
+import { getUserPath } from "../../paths.js";
+import { Role } from "@shared-types";
 import { HttpsError } from "firebase-functions/v2/https";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
@@ -12,7 +13,7 @@ const testUserData = {
     name: "Test User",
     password: "testpassword",
     email: "test@example.com",
-    role: "ADMIN",
+    role: Role.STAFF,
     relatedProperties: ["property1", "property2"],
     organisationId: "org1",
     username: "testuser",
@@ -60,7 +61,7 @@ describe("createUser", () => {
         const userDoc = mockFirestore.getDataAtPath(
             getUserPath(testUserData.organisationId, result.uid),
         );
-        expect(userDoc.data).toEqual(
+        expect(userDoc!.data).toEqual(
             expect.objectContaining({
                 name: "Test User",
                 email: "test@example.com",

@@ -1,4 +1,4 @@
-import type { CreateUserPayload } from "../../../types/types.js";
+import type { CreateUserPayload } from "@shared-types";
 import type { CallableRequest } from "firebase-functions/v2/https";
 import { auth, db } from "../../init.js";
 import { getUsersPath } from "../../paths.js";

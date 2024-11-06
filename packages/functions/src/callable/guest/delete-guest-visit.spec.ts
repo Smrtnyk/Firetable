@@ -1,6 +1,6 @@
 import type { DeleteGuestVisitData } from "./delete-guest-visit.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
-import type { PreparedGuestData } from "../../../types/types";
+import type { PreparedGuestData } from "./set-guest-data.js";
 import { deleteGuestVisitFn } from "./delete-guest-visit.js";
 import * as Init from "../../init.js";
 import { MockDocumentReference, MockFirestore } from "../../../test-helpers/MockFirestore.js";

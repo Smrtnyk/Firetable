@@ -41,5 +41,6 @@
         "node_modules",
         "lib",
         "dist",
+        "**/*.spec.ts"
     ]
 }

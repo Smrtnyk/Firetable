@@ -1,5 +1,5 @@
-import type { PreparedGuestData } from "../../../types/types.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
+import type { PreparedGuestData } from "./set-guest-data.js";
 import { db } from "../../init.js";
 import { getGuestsPath } from "../../paths.js";
 import { HttpsError } from "firebase-functions/v2/https";

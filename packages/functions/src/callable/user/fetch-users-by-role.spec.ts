@@ -1,10 +1,10 @@
-import type { FetchUsersByRoleRequestData } from "./fetch-users-by-role";
+import type { FetchUsersByRoleRequestData } from "./fetch-users-by-role.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
-import { fetchUsersByRoleFn } from "./fetch-users-by-role";
-import * as Init from "../../init";
-import { ADMIN, Role } from "../../../types/types";
-import { MockFirestore } from "../../../test-helpers/MockFirestore";
+import { fetchUsersByRoleFn } from "./fetch-users-by-role.js";
+import * as Init from "../../init.js";
+import { MockFirestore } from "../../../test-helpers/MockFirestore.js";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { Role, AdminRole } from "@shared-types";
 
 vi.mock("firebase-admin/firestore");
 
@@ -54,7 +54,7 @@ describe("fetchUsersByRoleFn", () => {
 
     it("fetches all users for Admin", async () => {
         const mockReq = {
-            auth: { uid: "adminUser", token: { role: ADMIN } as any },
+            auth: { uid: "adminUser", token: { role: AdminRole.ADMIN } as any },
             data: { organisationId: "org1" },
         } as CallableRequest<FetchUsersByRoleRequestData>;
 

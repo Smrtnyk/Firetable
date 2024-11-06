@@ -1,10 +1,10 @@
 import type { CallableRequest } from "firebase-functions/v2/https";
-import { deleteUser } from "./delete-user";
-import { getUserPath, getUsersPath } from "../../paths";
-import * as Init from "../../init";
-import { ADMIN } from "../../../types/types";
-import { MockAuth } from "../../../test-helpers/MockAuth";
-import { MockFirestore } from "../../../test-helpers/MockFirestore";
+import { deleteUser } from "./delete-user.js";
+import { getUserPath, getUsersPath } from "../../paths.js";
+import * as Init from "../../init.js";
+import { MockAuth } from "../../../test-helpers/MockAuth.js";
+import { MockFirestore } from "../../../test-helpers/MockFirestore.js";
+import { AdminRole } from "@shared-types";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 describe("deleteUser", () => {
@@ -32,7 +32,7 @@ describe("deleteUser", () => {
             email,
             organisationId: testOrgId,
             name: "Test User",
-            role: ADMIN,
+            role: AdminRole.ADMIN,
             username: "test",
         });
 

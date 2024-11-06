@@ -1,6 +1,7 @@
 import type { RouteLocationNormalized, RouteRecordRaw } from "vue-router";
 import type { usePermissionsStore } from "src/stores/permissions-store";
-import { ADMIN, Role } from "@firetable/types";
+import type { AppUser } from "@firetable/types";
+import { AdminRole, Role } from "@firetable/types";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { useEventsStore } from "src/stores/events-store";
 
@@ -9,7 +10,7 @@ declare module "vue-router" {
         requiresAuth: boolean;
         breadcrumb?: string | ((route: RouteLocationNormalized, isAdmin?: boolean) => string);
         allowedRoles?:
-            | (Role | typeof ADMIN)[]
+            | AppUser["role"][]
             | ((permissionsStore: ReturnType<typeof usePermissionsStore>) => boolean);
         parent?: string;
     }
@@ -34,7 +35,7 @@ export const routes: RouteRecordRaw[] = [
                 name: "organisations",
                 meta: {
                     requiresAuth: true,
-                    allowedRoles: [ADMIN],
+                    allowedRoles: [AdminRole.ADMIN],
                     breadcrumb: "Home",
                 },
                 component: () => import("src/pages/PageOrganisations.vue"),
@@ -103,7 +104,7 @@ export const routes: RouteRecordRaw[] = [
                 name: "adminOrganisations",
                 meta: {
                     requiresAuth: true,
-                    allowedRoles: [ADMIN],
+                    allowedRoles: [AdminRole.ADMIN],
                 },
                 component: () => import("src/pages/Admin/PageAdminOrganisations.vue"),
             },
@@ -112,7 +113,7 @@ export const routes: RouteRecordRaw[] = [
                 name: "adminOrganisationSettings",
                 meta: {
                     requiresAuth: true,
-                    allowedRoles: [ADMIN, Role.PROPERTY_OWNER, Role.MANAGER],
+                    allowedRoles: [AdminRole.ADMIN, Role.PROPERTY_OWNER, Role.MANAGER],
                 },
                 component: () => import("src/pages/Admin/PageAdminOrganisationSettings.vue"),
                 props: true,
@@ -146,7 +147,7 @@ export const routes: RouteRecordRaw[] = [
                 name: "adminEvents",
                 meta: {
                     requiresAuth: true,
-                    allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN],
+                    allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, AdminRole.ADMIN],
                 },
                 props: true,
                 component: () => import("src/pages/Admin/PageAdminEvents.vue"),
@@ -156,7 +157,7 @@ export const routes: RouteRecordRaw[] = [
                 name: "adminEvent",
                 meta: {
                     requiresAuth: true,
-                    allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN],
+                    allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, AdminRole.ADMIN],
                 },
                 props: true,
                 component: () => import("src/pages/Admin/PageAdminEvent.vue"),
@@ -178,7 +179,7 @@ export const routes: RouteRecordRaw[] = [
                 name: "adminUsers",
                 meta: {
                     requiresAuth: true,
-                    allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN],
+                    allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, AdminRole.ADMIN],
                 },
                 props: true,
                 component: () => import("src/pages/Admin/PageAdminUsers.vue"),
@@ -200,7 +201,7 @@ export const routes: RouteRecordRaw[] = [
                 name: "adminFloorEdit",
                 meta: {
                     requiresAuth: true,
-                    allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, ADMIN],
+                    allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, AdminRole.ADMIN],
                 },
                 props: true,
                 component: () => import("src/pages/Admin/PageAdminFloorEdit.vue"),
@@ -210,7 +211,7 @@ export const routes: RouteRecordRaw[] = [
                 name: "adminProperties",
                 meta: {
                     requiresAuth: true,
-                    allowedRoles: [Role.PROPERTY_OWNER, ADMIN],
+                    allowedRoles: [Role.PROPERTY_OWNER, AdminRole.ADMIN],
                 },
                 props: true,
                 component: () => import("src/pages/Admin/PageAdminProperties.vue"),

@@ -1,4 +1,4 @@
-import type { CreateEventPayload } from "../../../types/types.js";
+import type { CreateEventPayload } from "@shared-types";
 import type { CallableRequest } from "firebase-functions/v2/https";
 import { MockFirestore } from "../../../test-helpers/MockFirestore.js";
 import * as Init from "../../init.js";
@@ -49,7 +49,7 @@ describe("create-event", () => {
         const pathToEvent = getEventPath(ORGANISATION_ID, PROPERTY_ID, result.id);
 
         // Check if the data is correctly stored in the mock Firestore
-        const eventData = db.getDataAtPath(pathToEvent).data;
+        const eventData = db.getDataAtPath(pathToEvent)!.data;
 
         expect(eventData).toStrictEqual({
             creator: AUTH_USER_EMAIL,

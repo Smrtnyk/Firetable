@@ -1,6 +1,6 @@
 import { deleteDocument } from "../delete-document/index.js";
-import { Collection } from "../../types/types.js";
 import { auth, db } from "../init.js";
+import { Collection } from "@shared-types";
 import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
 

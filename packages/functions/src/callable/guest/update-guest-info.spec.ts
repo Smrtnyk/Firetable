@@ -1,9 +1,9 @@
 import type { CallableRequest } from "firebase-functions/v2/https";
-import type { UpdateGuestInfo } from "./update-guest-info";
-import { updateGuestDataFn } from "./update-guest-info";
-import { MockFirestore } from "../../../test-helpers/MockFirestore";
-import * as Init from "../../init";
-import { getGuestsPath } from "../../paths";
+import type { UpdateGuestInfo } from "./update-guest-info.js";
+import { updateGuestDataFn } from "./update-guest-info.js";
+import { MockFirestore } from "../../../test-helpers/MockFirestore.js";
+import * as Init from "../../init.js";
+import { getGuestsPath } from "../../paths.js";
 import { HttpsError } from "firebase-functions/v2/https";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
@@ -208,7 +208,7 @@ describe("updateGuestDataFn", () => {
                 guestId,
                 organisationId,
             },
-        } as CallableRequest<UpdateGuestInfo>;
+        } as unknown as CallableRequest<UpdateGuestInfo>;
 
         const result = await updateGuestDataFn(req);
 

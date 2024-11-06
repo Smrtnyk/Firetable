@@ -9,7 +9,7 @@ import FTDialog from "src/components/FTDialog.vue";
 import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
 import { ref } from "vue";
 import { UTC } from "src/helpers/date-utils";
-import { ADMIN } from "@firetable/types";
+import { AdminRole } from "@firetable/types";
 
 const { createDialogSpy, showConfirmMock, useFirestoreDocumentMock, tryCatchLoadingWrapperSpy } =
     vi.hoisted(() => ({
@@ -116,7 +116,7 @@ describe("PageAdminGuest.vue", () => {
                     auth: {
                         user: {
                             organisationId: "org1",
-                            role: ADMIN,
+                            role: AdminRole.ADMIN,
                         },
                     },
                     properties: {

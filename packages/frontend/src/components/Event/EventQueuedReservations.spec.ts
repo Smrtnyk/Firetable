@@ -8,7 +8,7 @@ import { userEvent } from "@vitest/browser/context";
 import { DEFAULT_ORGANISATION_SETTINGS, usePropertiesStore } from "src/stores/properties-store";
 import { useEventsStore } from "src/stores/events-store";
 import { noop } from "es-toolkit";
-import { ADMIN } from "@firetable/types";
+import { AdminRole } from "@firetable/types";
 import { UTC } from "src/helpers/date-utils";
 
 const { createDialogSpy } = vi.hoisted(() => {
@@ -41,7 +41,7 @@ describe("EventQueuedReservations.vue", () => {
             user: {
                 id: "user1",
                 email: "",
-                role: ADMIN,
+                role: AdminRole.ADMIN,
             },
         };
         eventsStoreState = {

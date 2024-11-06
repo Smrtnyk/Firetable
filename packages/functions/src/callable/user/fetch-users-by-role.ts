@@ -1,13 +1,13 @@
-import type { User } from "../../../types/types.js";
+import type { AppUser, User } from "@shared-types";
 import type { CallableRequest } from "firebase-functions/v2/https";
 import { db } from "../../init.js";
-import { Role, ADMIN } from "../../../types/types.js";
 import { getUsersPath } from "../../paths.js";
+import { Role, AdminRole } from "@shared-types";
 import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
 
 type RoleFilter = {
-    [key in Role | typeof ADMIN | "default"]: (user: User) => boolean;
+    [key in AdminRole.ADMIN | Role | "default"]: (user: User) => boolean;
 };
 
 export type FetchUsersByRoleRequestData = {
@@ -45,7 +45,7 @@ export async function fetchUsersByRoleFn(
 
     const { organisationId } = req.data;
     const uid = req.auth.uid;
-    const userRole = req.auth.token.role as Role | typeof ADMIN;
+    const userRole = req.auth.token.role as AdminRole.ADMIN | Role;
 
     if (!userRole) {
         logger.error(`Role not found in custom claims for UID: ${uid}`);
@@ -55,7 +55,7 @@ export async function fetchUsersByRoleFn(
     let users: User[] = [];
     const baseQuery = db.collection(getUsersPath(organisationId));
 
-    if (userRole === ADMIN || userRole === Role.PROPERTY_OWNER) {
+    if (userRole === AdminRole.ADMIN || userRole === Role.PROPERTY_OWNER) {
         // Admins and Property Owners can fetch all users
         const usersSnapshot = await baseQuery.get();
         users = usersSnapshot.docs.map(function (doc) {
@@ -102,16 +102,17 @@ export async function fetchUsersByRoleFn(
     }
 
     const roleFilters: RoleFilter = {
-        [ADMIN]: () => true,
-        [Role.PROPERTY_OWNER]: (user: User) => user.role !== ADMIN,
-        [Role.MANAGER]: (user: User) => user.role !== ADMIN && user.role !== Role.PROPERTY_OWNER,
-        [Role.STAFF]: (user: User) => user.role === Role.STAFF || user.role === Role.HOSTESS,
-        [Role.HOSTESS]: (user: User) =>
+        [AdminRole.ADMIN]: () => true,
+        [Role.PROPERTY_OWNER]: (user: AppUser) => user.role !== AdminRole.ADMIN,
+        [Role.MANAGER]: (user: AppUser) =>
+            user.role !== AdminRole.ADMIN && user.role !== Role.PROPERTY_OWNER,
+        [Role.STAFF]: (user: AppUser) => user.role === Role.STAFF || user.role === Role.HOSTESS,
+        [Role.HOSTESS]: (user: AppUser) =>
             [Role.HOSTESS, Role.STAFF, Role.MANAGER].includes(user.role as Role),
-        default: (user: User) => user.role === Role.STAFF,
+        default: (user: AppUser) => user.role === Role.STAFF,
     };
 
-    const filterFunction = roleFilters[userRole] || roleFilters.default;
+    const filterFunction = roleFilters[userRole] ?? roleFilters.default;
     users = users.filter(filterFunction);
 
     logger.log(`Returning ${users.length} users for user ${uid}`);

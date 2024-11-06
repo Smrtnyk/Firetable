@@ -1,7 +1,7 @@
 import type { AdminUser, AppUser, GuestDoc, PropertyDoc, Visit } from "@firetable/types";
 import { useGuestsStore } from "./guests-store";
 import { mockedStore } from "../../test-helpers/render-component";
-import { Role, ADMIN } from "@firetable/types";
+import { Role, AdminRole } from "@firetable/types";
 import { setActivePinia, createPinia } from "pinia";
 import { vi, describe, it, beforeEach, expect } from "vitest";
 import { createApp, ref } from "vue";
@@ -331,7 +331,7 @@ describe("Guests Store", () => {
 
             mockReturnGuestData([guestDoc]);
             propertiesStore.properties = [createTestProperty("property1")];
-            setupAuthUser(authStore, ADMIN, ["property1"]);
+            setupAuthUser(authStore, AdminRole.ADMIN, ["property1"]);
 
             const result = await guestsStore.getGuestSummaryForPropertyExcludingEvent(
                 "org1",
@@ -366,7 +366,7 @@ describe("Guests Store", () => {
 
             mockReturnGuestData([guestDoc]);
             propertiesStore.properties = [createTestProperty("property1")];
-            setupAuthUser(authStore, ADMIN, ["property1"]);
+            setupAuthUser(authStore, AdminRole.ADMIN, ["property1"]);
 
             const result = await guestsStore.getGuestSummaryForPropertyExcludingEvent(
                 "org1",
@@ -398,7 +398,7 @@ describe("Guests Store", () => {
 
             mockReturnGuestData([guestDoc]);
             propertiesStore.properties = [createTestProperty("property1")];
-            setupAuthUser(authStore, ADMIN, ["property1"]);
+            setupAuthUser(authStore, AdminRole.ADMIN, ["property1"]);
 
             const result = await guestsStore.getGuestSummaryForPropertyExcludingEvent(
                 "org1",
@@ -431,7 +431,7 @@ describe("Guests Store", () => {
 
             mockReturnGuestData([guestDoc]);
             propertiesStore.properties = [createTestProperty("property1")];
-            setupAuthUser(authStore, ADMIN, ["property1"]);
+            setupAuthUser(authStore, AdminRole.ADMIN, ["property1"]);
 
             const result = await guestsStore.getGuestSummaryForPropertyExcludingEvent(
                 "org1",
@@ -703,7 +703,7 @@ describe("Guests Store", () => {
                 createTestProperty("property3"),
             ];
 
-            setupAuthUser(authStore, ADMIN, []);
+            setupAuthUser(authStore, AdminRole.ADMIN, []);
 
             const result = guestsStore.guestReservationsSummary(guestDoc);
 
