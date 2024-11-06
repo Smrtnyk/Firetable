@@ -8,6 +8,8 @@ export interface EventViewControlsProps {
     floors: { id: string; name: string }[];
     canSeeAdminEvent: boolean;
     isActiveFloor: (floorId: string) => boolean;
+    queuedReservationsCount: number;
+    guestListCount: number;
 }
 
 const emit = defineEmits<{
@@ -21,7 +23,8 @@ const emit = defineEmits<{
     (e: "set-active-floor", value: { id: string; name: string }): void;
 }>();
 
-const { floors, isActiveFloor, canSeeAdminEvent } = defineProps<EventViewControlsProps>();
+const { floors, isActiveFloor, canSeeAdminEvent, queuedReservationsCount, guestListCount } =
+    defineProps<EventViewControlsProps>();
 
 const currentActiveIndex = computed(() => {
     return floors.findIndex(function (floor) {
@@ -72,7 +75,11 @@ function showNextFloor(): void {
             v-close-popup
             @click="emit('toggle-queued-reservations-drawer-visibility')"
             aria-label="Toggle queued reservations drawer visibility"
-        />
+        >
+            <q-badge floating color="red" v-if="queuedReservationsCount > 0">
+                {{ queuedReservationsCount }}
+            </q-badge>
+        </FTBtn>
         <FTBtn
             dense
             outline
@@ -81,7 +88,11 @@ function showNextFloor(): void {
             v-close-popup
             @click="emit('toggle-event-guest-list-drawer-visibility')"
             aria-label="Toggle event guest list drawer visibility"
-        />
+        >
+            <q-badge floating color="red" v-if="guestListCount > 0">
+                {{ guestListCount }}
+            </q-badge>
+        </FTBtn>
         <FTBtn
             dense
             outline

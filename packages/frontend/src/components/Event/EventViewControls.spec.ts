@@ -27,6 +27,8 @@ describe("EventViewControls.vue", () => {
             isActiveFloor,
             hasMultipleFloorPlans: true,
             canSeeAdminEvent: true,
+            queuedReservationsCount: 0,
+            guestListCount: 0,
             ...props,
         });
     }
@@ -161,5 +163,50 @@ describe("EventViewControls.vue", () => {
         await userEvent.click(navigateToAdminBtn);
 
         expect(screen.emitted()["navigate-to-admin-event"]).toHaveLength(1);
+    });
+
+    describe("Badges", () => {
+        it("displays correct count in queued reservations badge", async () => {
+            const screen = render({
+                queuedReservationsCount: 5,
+            });
+
+            const badge = screen
+                .getByLabelText("Toggle queued reservations drawer visibility")
+                .getByRole("status");
+
+            await expect.element(badge!).toBeVisible();
+            await expect.element(badge!).toHaveTextContent("5");
+        });
+
+        it("displays correct count in guest list badge", async () => {
+            const screen = render({
+                guestListCount: 10,
+            });
+
+            const badge = screen
+                .getByLabelText("Toggle event guest list drawer visibility")
+                .getByRole("status");
+
+            await expect.element(badge!).toBeVisible();
+            await expect.element(badge!).toHaveTextContent("10");
+        });
+
+        it("shows badges only when counts are greater than 0", async () => {
+            const screen = render({
+                queuedReservationsCount: 0,
+                guestListCount: 0,
+            });
+
+            const queuedBadge = screen
+                .getByLabelText("Toggle queued reservations drawer visibility")
+                .getByRole("status");
+            const guestListBadge = screen
+                .getByLabelText("Toggle event guest list drawer visibility")
+                .getByRole("status");
+
+            await expect.element(queuedBadge).not.toBeInTheDocument();
+            await expect.element(guestListBadge).not.toBeInTheDocument();
+        });
     });
 });

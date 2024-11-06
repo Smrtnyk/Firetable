@@ -228,6 +228,8 @@ onUnmounted(function () {
                 :has-multiple-floor-plans="hasMultipleFloorPlans"
                 :can-see-admin-event="permissionStore.canCreateEvents"
                 :is-active-floor="isActiveFloor"
+                :queued-reservations-count="queuedResData.length"
+                :guest-list-count="guestList.length"
                 @navigate-to-admin-event="navigateToAdminEvent"
                 @toggle-event-guest-list-drawer-visibility="
                     eventsStore.toggleEventGuestListDrawerVisibility
