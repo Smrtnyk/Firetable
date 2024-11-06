@@ -14,8 +14,8 @@ import { GridDrawer } from "./GridDrawer.js";
 import { EditorEventManager } from "./event-manager/EditorEventManager.js";
 import { calculateCanvasScale } from "./utils.js";
 import { CanvasHistory } from "./CanvasHistory.js";
+import { initAligningGuidelines } from "./fabric-patches/aligning-guidelines/index.js";
 import { ActiveSelection } from "fabric";
-import { initAligningGuidelines } from "fabric/extensions";
 import { EventEmitter } from "@posva/event-emitter";
 
 type FloorEditorEvents = {
