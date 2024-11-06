@@ -105,7 +105,7 @@ export async function fetchUsersByRoleFn(
         [ADMIN]: () => true,
         [Role.PROPERTY_OWNER]: (user: User) => user.role !== ADMIN,
         [Role.MANAGER]: (user: User) => user.role !== ADMIN && user.role !== Role.PROPERTY_OWNER,
-        [Role.STAFF]: (user: User) => user.role === Role.STAFF,
+        [Role.STAFF]: (user: User) => user.role === Role.STAFF || user.role === Role.HOSTESS,
         [Role.HOSTESS]: (user: User) =>
             [Role.HOSTESS, Role.STAFF, Role.MANAGER].includes(user.role as Role),
         default: (user: User) => user.role === Role.STAFF,
