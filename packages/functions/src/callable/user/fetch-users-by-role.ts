@@ -1,10 +1,11 @@
 import type { AppUser, User } from "@shared-types";
 import type { CallableRequest } from "firebase-functions/v2/https";
-import { db } from "../../init.js";
+import { auth, db } from "../../init.js";
 import { getUsersPath } from "../../paths.js";
 import { Role, AdminRole } from "@shared-types";
 import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
+import { chunk } from "es-toolkit";
 
 type RoleFilter = {
     [key in AdminRole.ADMIN | Role | "default"]: (user: User) => boolean;
@@ -13,13 +14,6 @@ type RoleFilter = {
 export type FetchUsersByRoleRequestData = {
     organisationId: string;
 };
-
-// Function to split array into chunks
-function chunkArray(arr: string[], size: number): string[][] {
-    return Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
-        arr.slice(i * size, i * size + size),
-    );
-}
 
 /**
  * Fetches users from the Firestore database based on the role of the authenticated user.
@@ -37,7 +31,6 @@ function chunkArray(arr: string[], size: number): string[][] {
 export async function fetchUsersByRoleFn(
     req: CallableRequest<FetchUsersByRoleRequestData>,
 ): Promise<User[]> {
-    // Ensure authentication
     if (!req.auth) {
         logger.warn("Unauthorized access attempt.");
         throw new HttpsError("unauthenticated", "User must be authenticated.");
@@ -82,7 +75,7 @@ export async function fetchUsersByRoleFn(
 
         // Firestore limitations: 'array-contains-any' supports up to 10 elements
         const MAX_ARRAY_CONTAINS_ANY = 10;
-        const propertyChunks = chunkArray(userRelatedProperties, MAX_ARRAY_CONTAINS_ANY);
+        const propertyChunks = chunk(userRelatedProperties, MAX_ARRAY_CONTAINS_ANY);
 
         // Use a Map to avoid duplicate users
         const usersMap = new Map<string, User>();
@@ -114,6 +107,49 @@ export async function fetchUsersByRoleFn(
 
     const filterFunction = roleFilters[userRole] ?? roleFilters.default;
     users = users.filter(filterFunction);
+
+    // Only fetch last sign-in times for Admin and Property Owner roles
+    if (userRole === AdminRole.ADMIN || userRole === Role.PROPERTY_OWNER) {
+        try {
+            const userIds = users.map(function (user) {
+                return user.id;
+            });
+
+            // Firebase Auth getUsers has a limitation of 100 users per request
+            const MAX_BATCH_SIZE = 100;
+            const userIdChunks = chunk(userIds, MAX_BATCH_SIZE);
+
+            const authUsersMap = new Map<string, number | null>();
+
+            for (const userIdChunk of userIdChunks) {
+                const authUsers = await auth.getUsers(
+                    userIdChunk.map(function (id) {
+                        return { uid: id };
+                    }),
+                );
+
+                authUsers.users.forEach(function (authUser) {
+                    authUsersMap.set(
+                        authUser.uid,
+                        authUser.metadata.lastSignInTime
+                            ? Date.parse(authUser.metadata.lastSignInTime)
+                            : null,
+                    );
+                });
+            }
+
+            return users.map(function (user) {
+                return {
+                    ...user,
+                    lastSignInTime: authUsersMap.get(user.id) ?? null,
+                };
+            });
+        } catch (error) {
+            logger.error("Error fetching auth user data:", error);
+            // Return users without lastSignInTime if there's an error
+            return users;
+        }
+    }
 
     logger.log(`Returning ${users.length} users for user ${uid}`);
 

@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { User, VoidFunction } from "@firetable/types";
+import { formatEventDate, getDefaultTimezone } from "src/helpers/date-utils";
+import { useI18n } from "vue-i18n";
 
 interface Props {
     users: BucketizedUser[];
@@ -13,6 +15,7 @@ export interface BucketizedUsers {
     };
 }
 
+const { locale } = useI18n();
 const props = defineProps<Props>();
 const emit = defineEmits<(e: "delete" | "edit", value: User) => void>();
 
@@ -50,6 +53,10 @@ function showEditUserDialog(user: BucketizedUser, reset: VoidFunction): void {
                     <q-item-label caption> Role: {{ user.role }} </q-item-label>
                     <q-item-label caption v-if="user.memberOf && user.memberOf.length > 0">
                         Member of: {{ user.memberOf.join(", ") }}
+                    </q-item-label>
+                    <q-item-label caption v-if="user.lastSignInTime">
+                        Last sign-in:
+                        {{ formatEventDate(user.lastSignInTime, locale, getDefaultTimezone()) }}
                     </q-item-label>
                 </q-item-section>
             </q-item>

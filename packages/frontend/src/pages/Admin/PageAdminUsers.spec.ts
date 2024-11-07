@@ -278,7 +278,6 @@ describe("PageAdminUsers.vue", () => {
 
         await nextTick();
 
-        // Check updated count
         await expect
             .element(screen.getByRole("heading", { level: 3 }))
             .toHaveTextContent(`${t("PageAdminUsers.title")} (4)`);

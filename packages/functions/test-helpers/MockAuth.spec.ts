@@ -100,4 +100,80 @@ describe("MockAuth", () => {
             );
         });
     });
+
+    describe("getUsers method", () => {
+        it("should return exactly matching notFound entries for non-existent users", async () => {
+            const user = await mockAuth.createUser({
+                email: "exists@example.com",
+                password: "password123",
+            });
+
+            // Using same non-existent identifiers multiple times
+            const result = await mockAuth.getUsers([
+                { uid: user.uid },
+                { uid: "nonexistent-uid" },
+                // Duplicate request
+                { uid: "nonexistent-uid" },
+                { email: "nonexistent@example.com" },
+                { phoneNumber: "+1234567890" },
+            ]);
+
+            expect(result.users).toHaveLength(1);
+            expect(result.users[0].uid).toBe(user.uid);
+            // Should have 4 entries in notFound, including the duplicate
+            expect(result.notFound).toHaveLength(4);
+            expect(result.notFound).toEqual(
+                expect.arrayContaining([
+                    { uid: "nonexistent-uid" },
+                    // Duplicate preserved
+                    { uid: "nonexistent-uid" },
+                    { email: "nonexistent@example.com" },
+                    { phoneNumber: "+1234567890" },
+                ]),
+            );
+        });
+
+        it("should deduplicate found users but preserve input order in notFound", async () => {
+            const user = await mockAuth.createUser({
+                email: "test@example.com",
+                phoneNumber: "+1234567890",
+                password: "password123",
+            });
+
+            const result = await mockAuth.getUsers([
+                { email: "nonexistent1@example.com" },
+                { uid: user.uid },
+                // Same user as uid
+                { email: "test@example.com" },
+                // Same user again
+                { phoneNumber: "+1234567890" },
+                { email: "nonexistent2@example.com" },
+            ]);
+
+            // Should only return one user instance
+            expect(result.users).toHaveLength(1);
+            expect(result.users[0].uid).toBe(user.uid);
+
+            // notFound should preserve original order of non-existent requests
+            expect(result.notFound).toEqual([
+                { email: "nonexistent1@example.com" },
+                { email: "nonexistent2@example.com" },
+            ]);
+        });
+
+        it("should handle empty identifiers list", async () => {
+            const result = await mockAuth.getUsers([]);
+
+            expect(result.users).toHaveLength(0);
+            expect(result.notFound).toHaveLength(0);
+        });
+
+        it("should handle invalid identifier objects", async () => {
+            const result = await mockAuth.getUsers([{} as any, { invalidField: "test" } as any]);
+
+            expect(result.users).toHaveLength(0);
+            expect(result.notFound).toHaveLength(2);
+            expect(result.notFound).toEqual([{}, { invalidField: "test" }]);
+        });
+    });
 });
