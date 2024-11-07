@@ -6,6 +6,7 @@ import {
     ELEMENT_DEFAULT_FILL_COLOR,
     ELEMENT_DEFAULT_STROKE_COLOR,
     ELEMENT_DEFAULT_STROKE_WIDTH,
+    DEFAULT_FONT,
 } from "../constants.js";
 import { FloorElementTypes } from "../types.js";
 import { Rect, FabricText } from "fabric";
@@ -37,6 +38,7 @@ export class RectTable extends Table {
         const textLabel = new FabricText(options.groupOptions.label, {
             ...options.textOptions,
             fontSize: FONT_SIZE,
+            fontFamily: DEFAULT_FONT,
             fill: TABLE_TEXT_FILL_COLOR,
             textAlign: "center",
             originX: "center",
