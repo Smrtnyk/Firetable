@@ -22,7 +22,7 @@ const { organisations } = storeToRefs(usePropertiesStore());
                         },
                     }"
                 >
-                    <q-card>
+                    <q-card class="ft-card">
                         <q-card-section>
                             <h2 class="text-h3 q-mb-sm q-ml-none q-mt-none">
                                 {{ organisation.name }}
