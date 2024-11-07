@@ -10,6 +10,7 @@ import { isMobile } from "src/global-reactives/screen-detection";
 import { Loading, useQuasar } from "quasar";
 import { useAuthStore } from "src/stores/auth-store";
 import { useGuestsStore } from "src/stores/guests-store";
+import { useLocalStorage } from "@vueuse/core";
 
 import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
@@ -38,8 +39,8 @@ type SortOption =
 
 type SortDirection = "asc" | "desc";
 
-const sortOption = ref<SortOption>("bookings");
-const sortDirection = ref<SortDirection>("desc");
+const sortOption = useLocalStorage<SortOption>("guest-list-sort-option", "bookings");
+const sortDirection = useLocalStorage<SortDirection>("guest-list-sort-direction", "desc");
 const sortOptions = [
     { label: "Bookings", value: "bookings" },
     { label: "Percentage", value: "percentage" },
