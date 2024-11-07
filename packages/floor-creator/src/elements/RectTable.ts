@@ -33,6 +33,8 @@ export class RectTable extends Table {
             stroke: ELEMENT_DEFAULT_STROKE_COLOR,
             strokeWidth: ELEMENT_DEFAULT_STROKE_WIDTH,
             strokeUniform: true,
+            rx: 2,
+            ry: 2,
         });
 
         const textLabel = new FabricText(options.groupOptions.label, {
