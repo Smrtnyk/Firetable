@@ -12,7 +12,8 @@
         "build:pwa": "quasar build -m pwa",
         "build": "pnpm run typecheck && quasar build -m pwa",
         "typecheck": "vue-tsc --noEmit",
-        "test": "vitest"
+        "test": "vitest",
+        "test:coverage": "vitest run --coverage"
     },
     "devDependencies": {
         "@pinia/testing": "0.1.7",
@@ -21,6 +22,7 @@
         "@quasar/vite-plugin": "1.8.0",
         "@vitejs/plugin-vue": "5.1.4",
         "@vitest/browser": "catalog:",
+        "@vitest/coverage-v8": "catalog:",
         "@vitest/ui": "catalog:",
         "@vue/test-utils": "2.4.6",
         "vite-tsconfig-paths": "5.1.0",
