@@ -10,11 +10,13 @@ export interface EventViewControlsProps {
     isActiveFloor: (floorId: string) => boolean;
     queuedReservationsCount: number;
     guestListCount: number;
+    canExportReservations: boolean;
 }
 
 const emit = defineEmits<{
     (
         e:
+            | "export-reservations"
             | "navigate-to-admin-event"
             | "show-event-info"
             | "toggle-event-guest-list-drawer-visibility"
@@ -23,8 +25,14 @@ const emit = defineEmits<{
     (e: "set-active-floor", value: { id: string; name: string }): void;
 }>();
 
-const { floors, isActiveFloor, canSeeAdminEvent, queuedReservationsCount, guestListCount } =
-    defineProps<EventViewControlsProps>();
+const {
+    floors,
+    isActiveFloor,
+    canSeeAdminEvent,
+    queuedReservationsCount,
+    guestListCount,
+    canExportReservations,
+} = defineProps<EventViewControlsProps>();
 
 const currentActiveIndex = computed(() => {
     return floors.findIndex(function (floor) {
@@ -113,6 +121,16 @@ function showNextFloor(): void {
             color="grey"
             icon="eye-open"
             aria-label="Navigate to admin event"
+        />
+        <FTBtn
+            v-if="canExportReservations"
+            dense
+            outline
+            color="grey"
+            icon="download"
+            v-close-popup
+            @click="() => emit('export-reservations')"
+            aria-label="Export reservations"
         />
 
         <q-space />

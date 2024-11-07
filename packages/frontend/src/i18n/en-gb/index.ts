@@ -103,6 +103,7 @@ export default {
         eventInfoTitle: "Event info",
         showFloorPlansExpanded: "Floor plans",
         deleteQueuedReservationConfirmMsg: "Are you sure you want to delete this reservation?",
+        exportReservationsConfirmMsg: "This will export reservations to a CSV file",
     },
     EventGuestSearch: {
         label: "Search tables by guest name...",

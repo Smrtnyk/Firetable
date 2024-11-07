@@ -61,6 +61,7 @@ export const myIcons: Record<string, string> = {
     "arrow-sort-down": "svguse:/svg-icons/ft-icons.svg#arrow-sort-down",
     link: "svguse:/svg-icons/ft-icons.svg#link",
     unlink: "svguse:/svg-icons/ft-icons.svg#unlink",
+    download: "svguse:/svg-icons/ft-icons.svg#download",
 };
 
 export function getDarkMode(): boolean {

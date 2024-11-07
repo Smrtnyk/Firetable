@@ -106,6 +106,7 @@ export default {
         eventInfoTitle: "Veranstaltungsinformationen",
         showFloorPlansExpanded: "Grundrisse anzeigen",
         deleteQueuedReservationConfirmMsg: "Reservierung aus der Warteschlange löschen?",
+        exportReservationsConfirmMsg: "Reservierungen exportieren?",
     },
     EventGuestSearch: {
         label: "Tische nach Gastnamen durchsuchen...",

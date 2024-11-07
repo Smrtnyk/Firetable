@@ -45,6 +45,7 @@ import { TableOperationType, useReservations } from "src/composables/useReservat
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
 import { usePermissionsStore } from "src/stores/permissions-store";
+import { exportReservations } from "src/helpers/reservation/export-reservations";
 
 interface Props {
     organisationId: string;
@@ -120,6 +121,10 @@ const { initiateTableOperation } = useReservations(
     eventOwner,
     event,
 );
+
+const canExportReservations = computed(function () {
+    return permissionStore.canExportReservations;
+});
 
 function showEventInfo(): void {
     createDialog({
@@ -201,6 +206,23 @@ async function onDeleteQueuedReservation(reservation: QueuedReservationDoc): Pro
     });
 }
 
+async function onExportReservations(): Promise<void> {
+    if (!event.value) {
+        return;
+    }
+    const confirmed = await showConfirm(t("PageEvent.exportReservationsConfirmMsg"));
+
+    if (!confirmed) {
+        return;
+    }
+
+    exportReservations({
+        reservations: reservations.value,
+        eventName: event.value.name,
+        floors: eventFloors.value,
+    });
+}
+
 onMounted(init);
 
 onUnmounted(function () {
@@ -227,6 +249,7 @@ onUnmounted(function () {
                 :floors="floorInstances"
                 :has-multiple-floor-plans="hasMultipleFloorPlans"
                 :can-see-admin-event="permissionStore.canCreateEvents"
+                :can-export-reservations="canExportReservations"
                 :is-active-floor="isActiveFloor"
                 :queued-reservations-count="queuedResData.length"
                 :guest-list-count="guestList.length"
@@ -239,6 +262,7 @@ onUnmounted(function () {
                 "
                 @show-event-info="showEventInfo"
                 @set-active-floor="setActiveFloor"
+                @export-reservations="onExportReservations"
             />
         </div>
 
