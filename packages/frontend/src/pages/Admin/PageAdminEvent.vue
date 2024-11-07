@@ -128,7 +128,7 @@ async function init(): Promise<void> {
     }
 }
 
-async function onFloorUpdate(floor: FloorEditor): Promise<void> {
+async function saveFloor(floor: FloorEditor): Promise<void> {
     await tryCatchLoadingWrapper({
         hook() {
             const { width, height, json, id } = floor;
@@ -185,7 +185,7 @@ function showFloorEditDialog(floor: FloorDoc): void {
             AdminEventFloorViewer,
             `Editing Floor: ${floor.name}`,
             { floor, eventId: event.value.id },
-            { update: onFloorUpdate },
+            { save: saveFloor },
             true,
         );
     }
