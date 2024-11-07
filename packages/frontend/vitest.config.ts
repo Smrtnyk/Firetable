@@ -37,6 +37,22 @@ export default defineConfig({
         reporters: ["basic"],
         watch: false,
         includeTaskLocation: true,
+        coverage: {
+            provider: 'v8',
+            reporter: ['text', 'json', 'html'],
+            exclude: [
+                'node_modules/**',
+                'dist/**',
+                '**/*.d.ts',
+                '**/*.config.ts',
+                'test-helpers/**',
+                '**/*.spec.ts',
+                '**/index.ts',
+                ".quasar/**",
+                "src-pwa/**",
+            ],
+            all: true,
+        },
         browser: {
             enabled: true,
             headless: true,
