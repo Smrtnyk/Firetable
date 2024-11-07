@@ -14,6 +14,55 @@ export class MockAuth implements Partial<Auth> {
         return Promise.resolve(user);
     }
 
+    getUsers(identifiers: { uid?: string; email?: string; phoneNumber?: string }[]): Promise<{
+        users: UserRecord[];
+        notFound: { uid?: string; email?: string; phoneNumber?: string }[];
+    }> {
+        // Process each identifier independently
+        const foundUsers = new Set<UserRecord>();
+        const notFound: Array<{ uid?: string; email?: string; phoneNumber?: string }> = [];
+
+        // Process each identifier, including duplicates
+        for (const identifier of identifiers) {
+            let isFound = false;
+
+            // Check if user exists
+            if (identifier.uid) {
+                const user = this.users[identifier.uid];
+                if (user) {
+                    foundUsers.add(user);
+                    isFound = true;
+                }
+            } else if (identifier.email) {
+                const user = Object.values(this.users).find(
+                    ({ email }) => email === identifier.email,
+                );
+                if (user) {
+                    foundUsers.add(user);
+                    isFound = true;
+                }
+            } else if (identifier.phoneNumber) {
+                const user = Object.values(this.users).find(
+                    ({ phoneNumber }) => phoneNumber === identifier.phoneNumber,
+                );
+                if (user) {
+                    foundUsers.add(user);
+                    isFound = true;
+                }
+            }
+
+            // If not found, add to notFound array (including duplicates)
+            if (!isFound) {
+                notFound.push({ ...identifier });
+            }
+        }
+
+        return Promise.resolve({
+            users: Array.from(foundUsers),
+            notFound,
+        });
+    }
+
     createUser(userDetails: {
         email?: string;
         password?: string;
@@ -86,8 +135,10 @@ export class MockAuth implements Partial<Auth> {
             return Promise.reject(new UserNotFoundError(`No user found for UID: ${uid}`));
         }
 
-        // @ts-expect-error -- this is intentional
-        user.customClaims = customClaims;
+        if (!user.customClaims) {
+            Object.assign(user, { customClaims: {} });
+        }
+        Object.assign(user.customClaims, { ...user.customClaims, ...customClaims });
 
         return Promise.resolve();
     }

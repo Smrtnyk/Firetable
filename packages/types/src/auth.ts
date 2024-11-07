@@ -20,6 +20,7 @@ export interface User {
     relatedProperties: string[];
     organisationId: string;
     capabilities: UserCapabilities | undefined;
+    lastSignInTime?: number | null;
 }
 
 export type AppUser = AdminUser | User;
