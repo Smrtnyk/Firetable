@@ -5,7 +5,7 @@ import type { AnyFunction, FloorDoc, ReservationDoc } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
 import { isActiveReservation } from "@firetable/types";
 import { deleteReservation, updateEventFloorData } from "@firetable/backend";
-import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, watch } from "vue";
 import { getTablesFromFloorDoc } from "@firetable/floor-creator";
 import { useRouter } from "vue-router";
 import { formatEventDate } from "src/helpers/date-utils";
@@ -22,6 +22,7 @@ import FTTabs from "src/components/FTTabs.vue";
 import FTTabPanels from "src/components/FTTabPanels.vue";
 import AdminEventReturningGuestsList from "src/components/admin/event/AdminEventReturningGuestsList.vue";
 import AppCardSection from "src/components/AppCardSection.vue";
+import FTBtn from "src/components/FTBtn.vue";
 
 import { Loading } from "quasar";
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
@@ -35,7 +36,7 @@ import { property } from "es-toolkit/compat";
 import { useAuthStore } from "src/stores/auth-store";
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
-import FTBtn from "src/components/FTBtn.vue";
+import { useLocalStorage } from "@vueuse/core";
 
 interface Props {
     organisationId: string;
@@ -53,8 +54,8 @@ const { locale } = useI18n();
 const { createDialog } = useDialog();
 const propertiesStore = usePropertiesStore();
 
-const tab = ref("info");
-const reservationsTab = ref("arrivedReservations");
+const tab = useLocalStorage<string>("admin-event-active-tab", "info");
+const reservationsTab = useLocalStorage("admin-event-guests-active-tab", "arrivedReservations");
 const settings = computed(function () {
     return propertiesStore.getOrganisationSettingsById(props.organisationId);
 });
