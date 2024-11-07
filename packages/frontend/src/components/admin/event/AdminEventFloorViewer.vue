@@ -7,8 +7,8 @@
                     class="col-xs-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3 justify-center column"
                 >
                     <FloorEditorTopControls
-                        v-if="floorInstance && selectedFloorElement && !isTablet"
-                        :selected-floor-element="selectedFloorElement"
+                        v-if="floorInstance && selectedElement && !isTablet"
+                        :selected-floor-element="selectedElement"
                         :floor-instance="floorInstance"
                         :existing-labels="
                             new Set(extractAllTablesLabels(floorInstance as FloorEditor))
@@ -31,12 +31,11 @@
 </template>
 
 <script setup lang="ts">
-import type { Floor, FloorEditorElement } from "@firetable/floor-creator";
+import type { FloorEditor } from "@firetable/floor-creator";
 import type { FloorDoc } from "@firetable/types";
-import { extractAllTablesLabels, FloorEditor } from "@firetable/floor-creator";
-import { nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch, useTemplateRef } from "vue";
+import { extractAllTablesLabels } from "@firetable/floor-creator";
+import { onMounted, watch, useTemplateRef } from "vue";
 import { useFloorEditor } from "src/composables/useFloorEditor";
-import { AppLogger } from "src/logger/FTLogger.js";
 import { isTablet } from "src/global-reactives/screen-detection";
 
 import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
@@ -48,72 +47,34 @@ interface Props {
     eventId: string;
 }
 
-const selectedFloorElement = ref<FloorEditorElement | undefined>();
+type Emits = (e: "save", value: FloorEditor) => void;
+
 const props = defineProps<Props>();
-const emit = defineEmits(["update"]);
+const emit = defineEmits<Emits>();
 const floorContainerRef = useTemplateRef<HTMLCanvasElement>("floorContainerRef");
 const viewerContainerRef = useTemplateRef<HTMLDivElement>("viewerContainerRef");
-const floorInstance = shallowRef<FloorEditor | undefined>();
-const { onFloorDrop, resizeFloor } = useFloorEditor(floorInstance, viewerContainerRef);
+const { resizeFloor, initializeFloor, onFloorChange, floorInstance, selectedElement } =
+    useFloorEditor(viewerContainerRef);
 
 onMounted(function () {
     useEventListener("resize", resizeFloor);
 });
 
-onBeforeUnmount(function () {
-    floorInstance.value?.destroy().catch(AppLogger.error.bind(AppLogger));
-});
-
-function onFloorChange({
-    name,
-    width,
-    height,
-}: {
-    width?: number;
-    height?: number;
-    name?: string;
-}): void {
-    if (name) {
-        floorInstance.value?.setFloorName(String(name));
-        return;
-    }
-
-    if (width && !Number.isNaN(width)) {
-        floorInstance.value?.updateDimensions(width, floorInstance.value.height);
-    }
-
-    if (height && !Number.isNaN(height)) {
-        floorInstance.value?.updateDimensions(floorInstance.value.width, Number(height));
-    }
-}
-
 function saveFloorState(): void {
     if (!floorInstance.value) {
         return;
     }
-    emit("update", floorInstance.value);
-}
-
-async function onElementClick(
-    _floor: Floor,
-    element: FloorEditorElement | undefined,
-): Promise<void> {
-    selectedFloorElement.value = undefined;
-    await nextTick();
-    selectedFloorElement.value = element;
+    emit("save", floorInstance.value);
 }
 
 watch(floorContainerRef, function () {
     if (!floorContainerRef.value || !viewerContainerRef.value) {
         return;
     }
-
-    floorInstance.value = new FloorEditor({
+    initializeFloor({
         floorDoc: props.floor,
-        canvas: floorContainerRef.value,
+        canvasElement: floorContainerRef.value,
         containerWidth: viewerContainerRef.value.clientWidth,
     });
-    floorInstance.value.on("drop", onFloorDrop);
-    floorInstance.value.on("elementClicked", onElementClick);
 });
 </script>

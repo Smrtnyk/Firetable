@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type { Floor, FloorEditorElement } from "@firetable/floor-creator";
+import type { FloorEditorElement, FloorEditor } from "@firetable/floor-creator";
 import type { FloorDoc } from "@firetable/types";
 import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
 import FloorEditorTopControls from "src/components/Floor/FloorEditorTopControls.vue";
 
-import { nextTick, onMounted, ref, shallowRef, useTemplateRef } from "vue";
+import { onMounted, useTemplateRef } from "vue";
 import { useRouter } from "vue-router";
 import { Loading } from "quasar";
-import { extractAllTablesLabels, FloorEditor, hasFloorTables } from "@firetable/floor-creator";
+import { extractAllTablesLabels, hasFloorTables } from "@firetable/floor-creator";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import {
     getFirestoreDocument,
@@ -28,10 +28,8 @@ interface Props {
 
 const props = defineProps<Props>();
 const router = useRouter();
-const floorInstance = shallowRef<FloorEditor | undefined>();
 const canvasRef = useTemplateRef<HTMLCanvasElement | undefined>("canvasRef");
 const pageRef = useTemplateRef<HTMLDivElement>("pageRef");
-const selectedElement = ref<FloorEditorElement | undefined>();
 
 const floorPath = getFloorPath(props.organisationId, props.propertyId, props.floorId);
 const {
@@ -39,7 +37,8 @@ const {
     promise: floorDataPromise,
     pending: isFloorLoading,
 } = useFirestoreDocument<FloorDoc>(floorPath, { once: true });
-const { onFloorDrop, resizeFloor } = useFloorEditor(floorInstance, pageRef);
+const { resizeFloor, initializeFloor, onFloorChange, selectedElement, floorInstance } =
+    useFloorEditor(pageRef);
 
 function onKeyDown(event: KeyboardEvent): void {
     if (event.ctrlKey && event.key === "s") {
@@ -67,15 +66,11 @@ function instantiateFloor(floorDoc: FloorDoc): void {
         return;
     }
 
-    const floorEditor = new FloorEditor({
-        canvas: canvasRef.value,
+    initializeFloor({
+        canvasElement: canvasRef.value,
         floorDoc: decompressFloorDoc(floorDoc),
         containerWidth: pageRef.value.clientWidth,
     });
-    floorInstance.value = floorEditor;
-
-    floorEditor.on("elementClicked", elementClickHandler);
-    floorEditor.on("drop", onFloorDrop);
 }
 
 async function onFloorSave(): Promise<void> {
@@ -95,38 +90,6 @@ async function onFloorSave(): Promise<void> {
             });
         },
     });
-}
-
-function onFloorChange({
-    name,
-    width,
-    height,
-}: {
-    width?: number;
-    height?: number;
-    name?: string;
-}): void {
-    if (name) {
-        floorInstance.value?.setFloorName(String(name));
-        return;
-    }
-
-    if (width && !Number.isNaN(width)) {
-        floorInstance.value?.updateDimensions(width, floorInstance.value.height);
-    }
-
-    if (height && !Number.isNaN(height)) {
-        floorInstance.value?.updateDimensions(floorInstance.value.width, Number(height));
-    }
-}
-
-async function elementClickHandler(
-    _: Floor,
-    element: FloorEditorElement | undefined,
-): Promise<void> {
-    selectedElement.value = undefined;
-    await nextTick();
-    selectedElement.value = element;
 }
 
 function onDeleteElement(element: FloorEditorElement): void {
