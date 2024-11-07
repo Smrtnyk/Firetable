@@ -1,6 +1,6 @@
 import type { CircleProps, FabricObject, GroupProps, RectProps } from "fabric";
 import type { FloorEditorElement } from "../types.js";
-import { FONT_SIZE, TABLE_TEXT_FILL_COLOR } from "../constants.js";
+import { DEFAULT_FONT, FONT_SIZE, TABLE_TEXT_FILL_COLOR } from "../constants.js";
 import { Group, Rect, Circle, IText } from "fabric";
 
 type Editable = "circle" | "rect";
@@ -46,6 +46,7 @@ export class EditableShape extends Group implements FloorEditorElement {
             originX: "center",
             originY: "center",
             fontSize: FONT_SIZE,
+            fontFamily: DEFAULT_FONT,
             textAlign: "center",
             fill: TABLE_TEXT_FILL_COLOR,
             left: shape.left + shape.width / 2,

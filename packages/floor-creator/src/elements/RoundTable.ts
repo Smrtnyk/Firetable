@@ -1,6 +1,7 @@
 import type { GroupProps } from "fabric";
 import { Table } from "./Table.js";
 import {
+    DEFAULT_FONT,
     ELEMENT_DEFAULT_FILL_COLOR,
     ELEMENT_DEFAULT_STROKE_COLOR,
     FONT_SIZE,
@@ -29,6 +30,7 @@ export class RoundTable extends Table {
             ...options.shapeOptions,
             originX: "center",
             originY: "center",
+            fontFamily: DEFAULT_FONT,
             fill: options.groupOptions.baseFill ?? ELEMENT_DEFAULT_FILL_COLOR,
             stroke: ELEMENT_DEFAULT_STROKE_COLOR,
             strokeWidth: 0.5,

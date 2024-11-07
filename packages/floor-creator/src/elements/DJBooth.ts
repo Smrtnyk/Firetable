@@ -1,4 +1,5 @@
 import type { FloorEditorElement } from "../types.js";
+import { DEFAULT_FONT } from "../constants.js";
 import { Circle, Group, Rect, FabricText } from "fabric";
 
 export class DJBooth extends Group implements FloorEditorElement {
@@ -39,7 +40,7 @@ export class DJBooth extends Group implements FloorEditorElement {
         const djSign = new FabricText("DJ", {
             left: 50,
             top: 5,
-            fontFamily: "Arial",
+            fontFamily: DEFAULT_FONT,
             fontSize: 20,
             fill: "#FFFFFF",
             fontWeight: "bold",
