@@ -29,6 +29,7 @@ describe("EventViewControls.vue", () => {
             canSeeAdminEvent: true,
             queuedReservationsCount: 0,
             guestListCount: 0,
+            canExportReservations: false,
             ...props,
         });
     }
@@ -163,6 +164,29 @@ describe("EventViewControls.vue", () => {
         await userEvent.click(navigateToAdminBtn);
 
         expect(screen.emitted()["navigate-to-admin-event"]).toHaveLength(1);
+    });
+
+    it("emits export-reservations event when export button is clicked", async () => {
+        const screen = render({
+            queuedReservationsCount: 0,
+            guestListCount: 0,
+            canExportReservations: true,
+        });
+
+        const exportButton = screen.getByLabelText("Export reservations");
+
+        await userEvent.click(exportButton);
+        expect(screen.emitted("export-reservations")).toBeTruthy();
+        expect(screen.emitted("export-reservations")?.length).toBe(1);
+    });
+
+    it("doesn't render export button when canExportReservations is false", async () => {
+        const screen = render({
+            canExportReservations: false,
+        });
+
+        const exportButton = screen.getByLabelText("Export reservations");
+        await expect.element(exportButton).not.toBeInTheDocument();
     });
 
     describe("Badges", () => {

@@ -73,6 +73,10 @@ export const usePermissionsStore = defineStore("permissions", function () {
         return Boolean(capabilities.value[UserCapability.CAN_SEE_GUESTBOOK]);
     });
 
+    const canExportReservations = computed(function () {
+        return canReserve.value && canSeeGuestContact.value;
+    });
+
     return {
         capabilities,
         canEditOwnReservation,
@@ -89,5 +93,6 @@ export const usePermissionsStore = defineStore("permissions", function () {
         canDeleteReservation,
         canSeeGuestbook,
         canSeeAnalytics,
+        canExportReservations,
     };
 });
