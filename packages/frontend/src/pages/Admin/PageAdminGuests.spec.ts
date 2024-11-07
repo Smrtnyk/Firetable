@@ -5,8 +5,8 @@ import type { PageAdminGuestsProps } from "./PageAdminGuests.vue";
 import type { Ref } from "vue";
 import PageAdminGuests from "./PageAdminGuests.vue";
 import { renderComponent, t } from "../../../test-helpers/render-component";
-import { AdminRole, Role } from "@firetable/types";
 import { ref } from "vue";
+import { AdminRole, Role } from "@firetable/types";
 
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { userEvent } from "@vitest/browser/context";
@@ -34,6 +34,9 @@ describe("PageAdminGuests.vue", () => {
     let refsMap: Map<string, Ref<GuestsState>>;
 
     beforeEach(() => {
+        // Clear because filters are persisted
+        localStorage.clear();
+
         authState = {
             user: {
                 id: "admin1",
@@ -1012,6 +1015,157 @@ describe("PageAdminGuests.vue", () => {
             await expect.element(screen.getByText("Alice Johnson")).not.toBeInTheDocument();
 
             await expect.element(screen.getByText("No guests data")).toBeInTheDocument();
+        });
+    });
+
+    describe("filter persistence", () => {
+        beforeEach(() => {
+            // Set up guests with clear sorting differences
+            guestsRef.value.data = [
+                {
+                    id: "guest1",
+                    name: "John Doe",
+                    contact: "john@example.com",
+                    hashedContact: "hashedContact",
+                    maskedContact: "maskedContact",
+                    visitedProperties: {
+                        property1: {
+                            visit1: {
+                                date: new Date("2023-10-01").getTime(),
+                                arrived: true,
+                            } as Visit,
+                            visit2: {
+                                date: new Date("2023-10-05").getTime(),
+                                arrived: false,
+                            } as Visit,
+                        },
+                    },
+                    // 1 second ago
+                    lastModified: Date.now() - 1000,
+                },
+                {
+                    id: "guest2",
+                    name: "Jane Smith",
+                    contact: "jane@example.com",
+                    hashedContact: "hashedContact",
+                    maskedContact: "maskedContact",
+                    visitedProperties: {
+                        property1: {
+                            visit3: {
+                                date: new Date("2023-08-20").getTime(),
+                                arrived: true,
+                            } as Visit,
+                        },
+                    },
+                    // most recent
+                    lastModified: Date.now(),
+                },
+                {
+                    id: "guest3",
+                    name: "Bob Wilson",
+                    contact: "bob@example.com",
+                    hashedContact: "hashedContact",
+                    maskedContact: "maskedContact",
+                    visitedProperties: {
+                        property1: {
+                            visit4: {
+                                date: new Date("2023-07-01").getTime(),
+                                arrived: true,
+                            } as Visit,
+                            visit5: {
+                                date: new Date("2023-07-02").getTime(),
+                                arrived: true,
+                            } as Visit,
+                            visit6: {
+                                date: new Date("2023-07-03").getTime(),
+                                arrived: true,
+                            } as Visit,
+                        },
+                    },
+                    // 2 seconds ago
+                    lastModified: Date.now() - 2000,
+                },
+            ];
+        });
+
+        it("persists and loads sort option changes", async () => {
+            // First render - change sort option
+            let screen = await render();
+            const sortButton = screen.getByLabelText("filter guests");
+            await userEvent.click(sortButton);
+            await userEvent.click(screen.getByText("Percentage"));
+
+            // Unmount and remount component
+            screen.unmount();
+            screen = await render();
+
+            const guestItems = screen.getByRole("listitem");
+            expect(guestItems.elements()).toHaveLength(3);
+
+            // Should be sorted by percentage in descending order:
+            // Bob: 100% (3/3 visits)
+            // Jane: 100% (1/1 visit)
+            // John: 50% (1/2 visits)
+            expect(guestItems.elements()[0]).toHaveTextContent("Bob Wilson");
+            expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
+            expect(guestItems.elements()[2]).toHaveTextContent("John Doe");
+        });
+
+        it("persists and loads sort direction changes", async () => {
+            // First render - change sort direction
+            let screen = await render();
+            const sortButton = screen.getByLabelText("filter guests");
+            await userEvent.click(sortButton);
+            await userEvent.click(screen.getByText("Descending"));
+
+            // Unmount and remount component
+            screen.unmount();
+            screen = await render();
+
+            // Verify persisted sort direction
+            await userEvent.click(screen.getByLabelText("filter guests"));
+            await expect.element(screen.getByText("Ascending")).toBeInTheDocument();
+            await userEvent.click(screen.getByText("Sort by"));
+
+            const guestItems = screen.getByRole("listitem");
+            expect(guestItems.elements()).toHaveLength(3);
+
+            // Should be sorted by bookings in ascending order:
+            // Jane: 1 booking
+            // John: 2 bookings
+            // Bob: 3 bookings
+            expect(guestItems.elements()[0]).toHaveTextContent("Jane Smith");
+            expect(guestItems.elements()[1]).toHaveTextContent("John Doe");
+            expect(guestItems.elements()[2]).toHaveTextContent("Bob Wilson");
+        });
+
+        it("maintains filter state across multiple changes", async () => {
+            // First render - set multiple filters
+            let screen = await render();
+
+            // Change sort to lastModified
+            const sortButton = screen.getByLabelText("filter guests");
+            await userEvent.click(sortButton);
+            await userEvent.click(screen.getByText("Last Modified"));
+
+            // Change direction to ascending
+            await userEvent.click(sortButton);
+            await userEvent.click(screen.getByText("Descending"));
+
+            // Unmount and remount component
+            screen.unmount();
+            screen = await render();
+
+            const guestItems = screen.getByRole("listitem");
+            expect(guestItems.elements()).toHaveLength(3);
+
+            // Should be sorted by lastModified in ascending order:
+            // Bob (oldest)
+            // John
+            // Jane (newest)
+            expect(guestItems.elements()[0]).toHaveTextContent("Bob Wilson");
+            expect(guestItems.elements()[1]).toHaveTextContent("John Doe");
+            expect(guestItems.elements()[2]).toHaveTextContent("Jane Smith");
         });
     });
 });
