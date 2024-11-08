@@ -7,5 +7,5 @@ export interface PropertyDoc {
     name: string;
     organisationId: string;
     img?: string;
-    settings?: PropertySettings;
+    settings?: PropertySettings | undefined;
 }

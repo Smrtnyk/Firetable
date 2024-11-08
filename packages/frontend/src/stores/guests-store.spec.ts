@@ -24,6 +24,11 @@ vi.mock("../backend-proxy", () => ({
     subscribeToGuests: subscribeToGuestsSpy,
     getUserPath: vi.fn(),
     logoutUser: vi.fn(),
+    fetchOrganisationById: vi.fn(),
+    fetchOrganisationsForAdmin: vi.fn(),
+    fetchPropertiesForAdmin: vi.fn(),
+    propertiesCollectionPath: vi.fn(),
+    propertiesCollection: vi.fn(),
 }));
 
 // Test helpers and fixtures

@@ -76,6 +76,10 @@ vi.mock("../backend-proxy", () => ({
     getUserPath: vi.fn(),
     subscribeToGuests: vi.fn(),
     logoutUser: vi.fn(),
+    fetchOrganisationById: vi.fn(),
+    fetchOrganisationsForAdmin: vi.fn(),
+    fetchPropertiesForAdmin: vi.fn(),
+    propertiesCollection: vi.fn(),
 }));
 
 let app: App<Element>;

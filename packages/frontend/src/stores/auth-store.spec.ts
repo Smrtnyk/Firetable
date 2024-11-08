@@ -29,6 +29,11 @@ vi.mock("src/composables/useFirestore", () => ({
 vi.mock("../backend-proxy", () => ({
     getUserPath: (orgId: string, uid: string) => `organisations/${orgId}/users/${uid}`,
     logoutUser: logoutUserSpy,
+    fetchOrganisationById: vi.fn(),
+    fetchOrganisationsForAdmin: vi.fn(),
+    fetchPropertiesForAdmin: vi.fn(),
+    propertiesCollectionPath: vi.fn(),
+    propertiesCollection: vi.fn(),
 }));
 
 vi.mock("src/helpers/ui-helpers", () => ({

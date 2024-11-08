@@ -4,7 +4,7 @@ export interface OrganisationDoc {
     id: string;
     name: string;
     maxAllowedProperties: number;
-    settings?: OrganisationSettings;
+    settings?: OrganisationSettings | undefined;
 }
 
 export interface OrganisationSettings {

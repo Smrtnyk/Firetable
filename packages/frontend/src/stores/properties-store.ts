@@ -7,18 +7,18 @@ import type {
     User,
 } from "@firetable/types";
 import type { noop } from "es-toolkit";
-import { Role } from "@firetable/types";
-import { merge } from "es-toolkit";
-import { defineStore } from "pinia";
 import {
     fetchOrganisationById,
     fetchOrganisationsForAdmin,
     fetchPropertiesForAdmin,
     propertiesCollection,
-} from "@firetable/backend";
+} from "../backend-proxy";
+import { Role } from "@firetable/types";
+import { merge } from "es-toolkit";
+import { defineStore } from "pinia";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
 import { documentId, query, where } from "firebase/firestore";
-import { nextTick, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import { matchesProperty } from "es-toolkit/compat";
 import { getDefaultTimezone } from "src/helpers/date-utils";
 
@@ -167,9 +167,12 @@ export const usePropertiesStore = defineStore("properties", function () {
         const stopWatch = watch(
             () => data.value,
             function (newProperties) {
+                if (newProperties.length === 0) {
+                    return;
+                }
                 setProperties(newProperties as unknown as PropertyDoc[]);
             },
-            { deep: true },
+            { deep: true, immediate: true },
         );
 
         addUnsub(function () {
@@ -179,10 +182,10 @@ export const usePropertiesStore = defineStore("properties", function () {
         });
 
         await promise.value;
-        await nextTick();
     }
 
     return {
+        unsubs,
         properties,
         organisations,
         arePropertiesLoading,
