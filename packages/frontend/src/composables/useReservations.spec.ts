@@ -48,6 +48,12 @@ const {
     eventEmitMock: vi.fn(),
 }));
 
+vi.mock("vue-router", () => {
+    return {
+        useRouter: vi.fn(),
+    };
+});
+
 vi.mock("src/boot/event-emitter", () => ({
     eventEmitter: {
         emit: eventEmitMock,
