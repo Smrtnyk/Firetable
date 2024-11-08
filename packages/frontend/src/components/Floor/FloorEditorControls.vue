@@ -180,7 +180,7 @@ function onFloorSave(): void {
             />
             <q-btn
                 round
-                icon="export"
+                icon="download"
                 title="Export floor plan"
                 @click="exportFloor(floorInstance as FloorEditor)"
             />
