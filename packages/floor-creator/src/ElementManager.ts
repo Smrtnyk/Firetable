@@ -82,7 +82,7 @@ export class ElementManager {
     }
 
     private addDJBooth({ x, y }: CreateElementOptions): DJBooth {
-        return new DJBooth(x, y);
+        return new DJBooth({ left: x, top: y });
     }
 
     private addSofaElement({ x, y }: CreateElementOptions): Sofa {
@@ -90,7 +90,7 @@ export class ElementManager {
     }
 
     private addStageElement({ x, y }: CreateElementOptions): Stage {
-        return new Stage(x, y);
+        return new Stage({ left: x, top: y });
     }
 
     private addSpiralStaircaseElement({ x, y }: CreateElementOptions): SpiralStaircase {
