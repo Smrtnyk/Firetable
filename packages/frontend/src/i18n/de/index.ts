@@ -92,6 +92,8 @@ export default {
             manageOrganisations: "Organisationen verwalten",
             manageAnalytics: "Analytics verwalten",
             settings: "Einstellungen",
+            issueReportsOverview: "Fehlerberichte",
+            reportIssue: "Fehler melden",
         },
         toggles: {
             darkMode: "Dunkelmodus umschalten",
@@ -276,5 +278,40 @@ export default {
     GuestSummaryChips: {
         reservations: "Reservierungen",
         arrived: "Angekommen",
+    },
+    PageIssueReport: {
+        title: "Fehlerberichte",
+        createNewIssue: "Fehler melden",
+        categoryLabel: "Fehlerkategorie",
+        descriptionLabel: "Beschreibung",
+        descriptionHint: "Bitte beschreibe den Fehler in der gewünschten Tiefe",
+        categories: {
+            bug: "Fehler",
+            featureRequest: "Feature-Anfrage",
+        },
+        tooManyReports:
+            "Sie können nur {count} Fehlerberichte alle {minutes} Minuten einreichen. Bitte versuchen Sie es später erneut.",
+        issueReportedSuccess: "Fehlerbericht erfolgreich eingereicht",
+        myIssues: "Meine Fehlerberichte",
+        noIssuesMessage: "Sie haben noch keine Fehlerberichte gemeldet",
+        editIssue: "Fehlerbericht bearbeiten",
+        issueUpdateSuccess: "Fehlerbericht erfolgreich aktualisiert",
+        deleteConfirmation: "Fehlerbericht wirklich löschen?",
+        issueDeleted: "Fehlerbericht erfolgreich gelöscht",
+    },
+    PageAdminIssueReports: {
+        title: "Fehlerberichte",
+        noIssuesMessage: "No issues have been reported",
+        status: {
+            new: "New",
+            in_progress: "In Progress",
+            resolved: "Gelöst",
+            wont_fix: "Nicht beheben",
+        },
+        updateStatus: "Status aktualisieren",
+        statusUpdated: "Fehlerstatus aktualisiert",
+        issueMarkedAsResolved: "Fehler als gelöst markiert",
+        issueMarkedAsUnresolved: "Fehler als nicht gelöst markiert",
+        deleteConfirmation: "Fehlerbericht löschen?",
     },
 };

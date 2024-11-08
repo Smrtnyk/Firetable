@@ -89,6 +89,8 @@ export default {
             manageOrganisations: "Manage Organisations",
             manageAnalytics: "Manage Analytics",
             settings: "Settings",
+            issueReportsOverview: "Issue Reports Overview",
+            reportIssue: "Report an Issue",
         },
         toggles: {
             darkMode: "Toggle dark mode",
@@ -270,5 +272,40 @@ export default {
     GuestSummaryChips: {
         reservations: "Reservations",
         arrived: "Arrived",
+    },
+    PageIssueReport: {
+        title: "Issue Reports",
+        createNewIssue: "Report New Issue",
+        categoryLabel: "Issue Category",
+        descriptionLabel: "Description",
+        descriptionHint: "Please describe the issue in detail",
+        categories: {
+            bug: "Bug",
+            feature_request: "Feature Request",
+        },
+        tooManyReports:
+            "You can only submit {count} reports every {minutes} minutes. Please try again later.",
+        issueReportedSuccess: "Issue has been reported successfully",
+        myIssues: "My Issues",
+        noIssuesMessage: "You haven't reported any issues yet",
+        editIssue: "Edit Issue",
+        issueUpdateSuccess: "Issue updated successfully",
+        deleteConfirmation: "Are you sure you want to delete this issue?",
+        issueDeleted: "Issue has been deleted successfully",
+    },
+    PageAdminIssueReports: {
+        title: "Issue Reports",
+        noIssuesMessage: "No issues have been reported",
+        status: {
+            new: "New",
+            in_progress: "In Progress",
+            resolved: "Resolved",
+            wont_fix: "Won't Fix",
+        },
+        updateStatus: "Update Status",
+        statusUpdated: "Issue status updated",
+        issueMarkedAsResolved: "Issue marked as resolved",
+        issueMarkedAsUnresolved: "Issue marked as unresolved",
+        deleteConfirmation: "Delete Issue",
     },
 };

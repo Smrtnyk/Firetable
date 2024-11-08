@@ -65,3 +65,7 @@ export function getFloorsPath(organisationId: string, propertyId: string): strin
 export function getFloorPath(organisationId: string, propertyId: string, floorId: string): string {
     return [getFloorsPath(organisationId, propertyId), floorId].join("/");
 }
+
+export function getIssueReportsPath(): string {
+    return Collection.ISSUE_REPORTS;
+}

@@ -62,6 +62,8 @@ export const myIcons: Record<string, string> = {
     link: "svguse:/svg-icons/ft-icons.svg#link",
     unlink: "svguse:/svg-icons/ft-icons.svg#unlink",
     download: "svguse:/svg-icons/ft-icons.svg#download",
+    bug: "svguse:/svg-icons/ft-icons.svg#bug",
+    more: "svguse:/svg-icons/ft-icons.svg#more",
 };
 
 export function getDarkMode(): boolean {

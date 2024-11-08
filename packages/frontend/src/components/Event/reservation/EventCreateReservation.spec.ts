@@ -6,7 +6,7 @@ import type {
 } from "@firetable/types";
 import type { EventCreateReservationProps } from "./EventCreateReservation.vue";
 import EventCreateReservation from "./EventCreateReservation.vue";
-import { renderComponent, t, locale } from "../../../../test-helpers/render-component";
+import { renderComponent, t, getLocaleForTest } from "../../../../test-helpers/render-component";
 import { getDefaultTimezone, hourFromTimestamp } from "src/helpers/date-utils";
 import { ONE_HOUR } from "src/constants";
 import { ReservationStatus, ReservationType } from "@firetable/types";
@@ -42,7 +42,7 @@ describe("EventCreateReservation", () => {
             const initialTime = Math.max(now, eventStart);
             const formattedTime = hourFromTimestamp(
                 initialTime,
-                locale.value,
+                getLocaleForTest().value,
                 getDefaultTimezone(),
             );
             return {

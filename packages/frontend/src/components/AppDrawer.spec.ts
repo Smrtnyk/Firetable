@@ -1,15 +1,17 @@
 import type { RenderResult } from "vitest-browser-vue";
-import type { User } from "@firetable/types";
+import type { AppUser } from "@firetable/types";
 import type { AppDrawerProps } from "./AppDrawer.vue";
+
 import AppDrawer from "./AppDrawer.vue";
+
 import { getLocaleForTest, renderComponent } from "../../test-helpers/render-component";
-import { UserCapability, Role } from "@firetable/types";
-import { describe, it, expect, beforeEach } from "vitest";
+import { UserCapability, Role, AdminRole } from "@firetable/types";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 import { Dark } from "quasar";
 
 describe("AppDrawer", () => {
-    let user: User;
+    let user: AppUser;
     let modelValue: boolean;
     let screen: RenderResult<AppDrawerProps>;
 
@@ -26,6 +28,11 @@ describe("AppDrawer", () => {
         };
         // Drawer is visible
         modelValue = true;
+    });
+
+    afterEach(() => {
+        screen.unmount();
+        localStorage.clear();
     });
 
     it("displays user avatar, name, and email", async () => {
@@ -274,5 +281,49 @@ describe("AppDrawer", () => {
         await userEvent.click(screen.getByRole("option", { name: "German" }));
 
         expect(getLocaleForTest().value).toBe("de");
+    });
+
+    describe("Issue Reports Links", () => {
+        it("displays admin issue reports link for admin users", async () => {
+            user.role = AdminRole.ADMIN;
+
+            screen = renderComponent(
+                AppDrawer,
+                { modelValue },
+                {
+                    wrapInLayout: true,
+                    piniaStoreOptions: {
+                        initialState: {
+                            auth: { user },
+                        },
+                    },
+                },
+            );
+
+            await expect.element(screen.getByText("Issue Reports Overview")).toBeVisible();
+            await expect.element(screen.getByText("Report an Issue")).not.toBeInTheDocument();
+        });
+
+        it("displays report issue link for non-admin users", async () => {
+            user.role = Role.MANAGER;
+
+            screen = renderComponent(
+                AppDrawer,
+                { modelValue },
+                {
+                    wrapInLayout: true,
+                    piniaStoreOptions: {
+                        initialState: {
+                            auth: { user },
+                        },
+                    },
+                },
+            );
+
+            await expect.element(screen.getByText("Report an Issue")).toBeVisible();
+            await expect
+                .element(screen.getByText("Issue Reports Overview"))
+                .not.toBeInTheDocument();
+        });
     });
 });
