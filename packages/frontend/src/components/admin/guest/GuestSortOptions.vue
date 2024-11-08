@@ -48,15 +48,26 @@ const sortOptions = [
         <div class="text-weight-bolder q-mb-sm">Sort by</div>
         <q-list>
             <q-item
+                tag="label"
                 v-for="option in sortOptions"
                 :key="option.value"
                 clickable
                 @click="emit('update:sortOption', option.value)"
+                class="q-pa-none"
             >
-                <q-item-section>{{ option.label }}</q-item-section>
-                <q-item-section side v-if="currentSortOption === option.value">
-                    <q-icon name="check" />
+                <q-item-section avatar>
+                    <q-radio
+                        :model-value="currentSortOption"
+                        :val="option.value"
+                        color="primary"
+                        @update:model-value="emit('update:sortOption', option.value)"
+                    />
                 </q-item-section>
+                <q-item-section>
+                    <q-item-label>{{ option.label }}</q-item-label>
+                </q-item-section>
+
+                <q-item-section> </q-item-section>
             </q-item>
         </q-list>
 
