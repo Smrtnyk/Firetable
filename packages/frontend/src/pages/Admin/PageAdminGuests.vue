@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { CreateGuestPayload } from "@firetable/types";
+import type { SortDirection, SortOption } from "src/components/admin/guest/GuestSortOptions.vue";
+import GuestSortOptions from "src/components/admin/guest/GuestSortOptions.vue";
 import { createGuest } from "@firetable/backend";
 import { useI18n } from "vue-i18n";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
@@ -7,7 +9,7 @@ import { storeToRefs } from "pinia";
 import { useDialog } from "src/composables/useDialog";
 import { computed, onUnmounted, ref, watch } from "vue";
 import { isMobile } from "src/global-reactives/screen-detection";
-import { Loading, useQuasar } from "quasar";
+import { Loading } from "quasar";
 import { useAuthStore } from "src/stores/auth-store";
 import { useGuestsStore } from "src/stores/guests-store";
 import { useLocalStorage } from "@vueuse/core";
@@ -23,36 +25,15 @@ export interface PageAdminGuestsProps {
     organisationId: string;
 }
 
-type SortOption =
-    /**
-     * When sorting by bookings try to prioritize guests with the highest percentage of fulfilled visits.
-     */
-    | "bookings"
-    /**
-     * When sorting by last modified try to prioritize guests with the highest number of bookings.
-     */
-    | "lastModified"
-    /**
-     * When sorting by percentage try to prioritize guests with the highest number of bookings.
-     */
-    | "percentage";
-
-type SortDirection = "asc" | "desc";
-
 const sortOption = useLocalStorage<SortOption>("guest-list-sort-option", "bookings");
 const sortDirection = useLocalStorage<SortDirection>("guest-list-sort-direction", "desc");
-const sortOptions = [
-    { label: "Bookings", value: "bookings" },
-    { label: "Percentage", value: "percentage" },
-    { label: "Last Modified", value: "lastModified" },
-] as const;
 
 const { createDialog } = useDialog();
 const { t } = useI18n();
-const quasar = useQuasar();
 const props = defineProps<PageAdminGuestsProps>();
 const guestsStore = useGuestsStore();
 const guestsRef = guestsStore.getGuests(props.organisationId);
+const sortDialog = ref(false);
 const guests = computed(() => guestsRef.value.data);
 const isLoading = computed(() => guestsRef.value.pending);
 const { isAdmin } = storeToRefs(useAuthStore());
@@ -182,44 +163,8 @@ const pageTitle = computed(function () {
     return `${t("PageAdminGuests.title")} (${guestsWithSummaries.value.length})`;
 });
 
-function showBottomSheet(): void {
-    quasar
-        .bottomSheet({
-            class: "ft-card",
-            persistent: false,
-            actions: [
-                {
-                    label: "Sort by",
-                    classes: "text-weight-bolder",
-                },
-                ...sortOptions.map((option) => ({
-                    label: option.label,
-                    icon: sortOption.value === option.value ? "check" : "",
-                    value: option.value,
-                    classes: "text-weight-regular",
-                })),
-
-                {},
-                {
-                    label: "Direction",
-                    classes: "text-weight-bolder",
-                },
-                {
-                    label: sortDirection.value === "desc" ? "Descending" : "Ascending",
-                    icon: sortDirection.value === "desc" ? "arrow-sort-down" : "arrow-sort-up",
-                    // Use a special value for direction toggle
-                    value: "toggle-direction",
-                    classes: "text-weight-regular",
-                },
-            ],
-        })
-        .onOk(function (action) {
-            if (action.value === "toggle-direction") {
-                toggleSortDirection();
-            } else if (action.value) {
-                setSortOption(action.value as SortOption);
-            }
-        });
+function showSortDialog(): void {
+    sortDialog.value = true;
 }
 
 function setSortOption(option: SortOption): void {
@@ -291,7 +236,7 @@ function showCreateGuestDialog(): void {
                     flat
                     icon="filter"
                     aria-label="filter guests"
-                    @click="showBottomSheet"
+                    @click="showSortDialog"
                 />
             </template>
         </q-input>
@@ -345,5 +290,15 @@ function showCreateGuestDialog(): void {
         <FTCenteredText v-if="!isLoading && filteredGuests.length === 0">{{
             t("PageAdminGuests.noGuestsData")
         }}</FTCenteredText>
+
+        <q-dialog v-model="sortDialog" position="bottom">
+            <GuestSortOptions
+                :current-sort-option="sortOption"
+                :current-sort-direction="sortDirection"
+                @close="sortDialog = false"
+                @update:sort-option="setSortOption"
+                @toggle-direction="toggleSortDirection"
+            />
+        </q-dialog>
     </div>
 </template>

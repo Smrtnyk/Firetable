@@ -584,9 +584,6 @@ describe("PageAdminGuests.vue", () => {
 
                 // Click "Descending" to toggle to ascending
                 await userEvent.click(screen.getByText("Descending"));
-
-                await userEvent.click(sortButton);
-
                 await userEvent.click(screen.getByText("Last Modified"));
 
                 // Should maintain ascending order with lastModified sort
@@ -654,7 +651,6 @@ describe("PageAdminGuests.vue", () => {
                 expect(guestItems.elements()[1]).toHaveTextContent("John Doe");
 
                 // Toggle back to descending
-                await userEvent.click(sortButton);
                 await userEvent.click(screen.getByText("Ascending"));
 
                 guestItems = screen.getByRole("listitem");
@@ -1125,7 +1121,7 @@ describe("PageAdminGuests.vue", () => {
             // Verify persisted sort direction
             await userEvent.click(screen.getByLabelText("filter guests"));
             await expect.element(screen.getByText("Ascending")).toBeInTheDocument();
-            await userEvent.click(screen.getByText("Sort by"));
+            await userEvent.click(screen.getByLabelText("Close dialog"));
 
             const guestItems = screen.getByRole("listitem");
             expect(guestItems.elements()).toHaveLength(3);
@@ -1147,9 +1143,7 @@ describe("PageAdminGuests.vue", () => {
             const sortButton = screen.getByLabelText("filter guests");
             await userEvent.click(sortButton);
             await userEvent.click(screen.getByText("Last Modified"));
-
             // Change direction to ascending
-            await userEvent.click(sortButton);
             await userEvent.click(screen.getByText("Descending"));
 
             // Unmount and remount component
