@@ -17,10 +17,10 @@ import FTTitle from "src/components/FTTitle.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import FTBtn from "src/components/FTBtn.vue";
 
-import { useQuasar } from "quasar";
 import { AdminRole, Role } from "@firetable/types";
 import { useI18n } from "vue-i18n";
 import { useAuthStore } from "src/stores/auth-store";
+import { useDialog } from "src/composables/useDialog";
 
 interface Props {
     guestListLimit: number;
@@ -29,7 +29,7 @@ interface Props {
 }
 
 const { guestListLimit, eventOwner, guestList = [] } = defineProps<Props>();
-const quasar = useQuasar();
+const { createDialog } = useDialog();
 const eventsStore = useEventsStore();
 const { nonNullableUser } = storeToRefs(useAuthStore());
 const { t } = useI18n();
@@ -60,7 +60,7 @@ function onCreate(newGuestData: GuestInGuestListData): Promise<void> | void {
 }
 
 function showAddNewGuestForm(): void {
-    const dialog = quasar.dialog({
+    const dialog = createDialog({
         component: FTDialog,
         componentProps: {
             title: t("EventGuestList.addGuestLabel"),

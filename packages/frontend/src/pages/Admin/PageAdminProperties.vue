@@ -24,6 +24,7 @@ import { useFirestoreCollection } from "src/composables/useFirestore";
 import { useAuthStore } from "src/stores/auth-store";
 import { matchesProperty } from "es-toolkit/compat";
 import { usePermissionsStore } from "src/stores/permissions-store";
+import { useDialog } from "src/composables/useDialog";
 
 interface Props {
     organisationId: string;
@@ -34,6 +35,7 @@ const authStore = useAuthStore();
 const permissionStore = usePermissionsStore();
 const propertiesStore = usePropertiesStore();
 const quasar = useQuasar();
+const { createDialog } = useDialog();
 const { t } = useI18n();
 const { data: properties } = useFirestoreCollection<PropertyDoc>(
     getPropertiesPath(props.organisationId),
@@ -102,7 +104,7 @@ async function showUpdatePropertyDialog(property: PropertyDoc): Promise<void> {
 }
 
 function createProperty(property?: PropertyDoc): void {
-    const dialog = quasar.dialog({
+    const dialog = createDialog({
         component: FTDialog,
         componentProps: {
             title: property

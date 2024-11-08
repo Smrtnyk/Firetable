@@ -8,7 +8,7 @@ import { useI18n } from "vue-i18n";
 
 interface Props {
     organisationId: string;
-    propertyDoc?: PropertyDoc;
+    propertyDoc?: PropertyDoc | undefined;
 }
 
 const props = defineProps<Props>();
