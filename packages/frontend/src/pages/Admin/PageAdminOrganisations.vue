@@ -14,9 +14,11 @@ import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { storeToRefs } from "pinia";
 import { usePropertiesStore } from "src/stores/properties-store";
+import { useDialog } from "src/composables/useDialog";
 
 const { t } = useI18n();
 const quasar = useQuasar();
+const { createDialog } = useDialog();
 const isLoading = ref(false);
 const { organisations } = storeToRefs(usePropertiesStore());
 const propertiesStore = usePropertiesStore();
@@ -73,7 +75,7 @@ async function deleteOrganisationAsync(organisationId: string): Promise<void> {
 }
 
 function createOrganisation(): void {
-    const dialog = quasar.dialog({
+    const dialog = createDialog({
         component: FTDialog,
         componentProps: {
             title: "Add new Organisation",
