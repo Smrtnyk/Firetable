@@ -56,11 +56,11 @@ async function onDeleteIssue(issueId: string): Promise<void> {
 </script>
 
 <template>
-    <div>
+    <div class="PageAdminIssueReports">
         <FTTitle :title="t('PageAdminIssueReports.title')" />
 
-        <q-list bordered separator v-if="issueReports.length > 0">
-            <q-item v-for="issue in issueReports" :key="issue.id">
+        <q-list bordered separator v-if="issueReports.length > 0" role="list">
+            <q-item v-for="issue in issueReports" :key="issue.id" role="listitem">
                 <q-item-section>
                     <q-item-label>
                         <q-badge
@@ -85,7 +85,13 @@ async function onDeleteIssue(issueId: string): Promise<void> {
                 </q-item-section>
 
                 <q-item-section side>
-                    <q-btn flat round color="grey" icon="more">
+                    <q-btn
+                        flat
+                        round
+                        color="grey"
+                        icon="more"
+                        :aria-label="`Actions for issue ${issue.description}`"
+                    >
                         <q-menu>
                             <q-list style="min-width: 150px">
                                 <q-item-label header>{{
@@ -98,6 +104,7 @@ async function onDeleteIssue(issueId: string): Promise<void> {
                                     clickable
                                     v-close-popup
                                     @click="updateIssueStatus(issue.id, option.value)"
+                                    :aria-label="`Set status to ${option.label}`"
                                 >
                                     <q-item-section>
                                         <q-item-label>{{ option.label }}</q-item-label>
