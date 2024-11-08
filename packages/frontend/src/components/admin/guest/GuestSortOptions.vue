@@ -18,12 +18,20 @@ export type SortDirection = "asc" | "desc";
 interface GuestSortOptionsProps {
     currentSortOption: SortOption;
     currentSortDirection: SortDirection;
+    availableTags: string[];
+    selectedTags: string[];
 }
 
-const { currentSortOption, currentSortDirection } = defineProps<GuestSortOptionsProps>();
+const {
+    currentSortOption,
+    currentSortDirection,
+    availableTags = [],
+    selectedTags = [],
+} = defineProps<GuestSortOptionsProps>();
 
 const emit = defineEmits<{
     (e: "update:sortOption", value: SortOption): void;
+    (e: "update:selectedTags", value: string[]): void;
     (e: "close" | "toggleDirection"): void;
 }>();
 
@@ -32,6 +40,10 @@ const sortOptions = [
     { label: "Percentage", value: "percentage" },
     { label: "Last Modified", value: "lastModified" },
 ] as const;
+
+function updateSelectedTags(value: string[]): void {
+    emit("update:selectedTags", value);
+}
 </script>
 
 <template>
@@ -44,6 +56,23 @@ const sortOptions = [
                 @click="$emit('close')"
             />
         </div>
+
+        <template v-if="availableTags.length > 0">
+            <q-select
+                :model-value="selectedTags"
+                :options="availableTags"
+                clear-icon="close"
+                multiple
+                use-chips
+                standout
+                rounded
+                dense
+                label="Filter by tags"
+                @update:model-value="updateSelectedTags"
+            />
+
+            <q-separator class="q-my-md" />
+        </template>
 
         <div class="text-weight-bolder q-mb-sm">Sort by</div>
         <q-list>
