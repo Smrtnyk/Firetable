@@ -315,14 +315,3 @@ function isLinkWithChildren(link: GuardedLink | LinkWithChildren): link is LinkW
         </q-list>
     </q-drawer>
 </template>
-
-<style lang="scss">
-.q-item.q-router-link--active {
-    width: 95%;
-    margin: auto;
-    background: $gradient-primary;
-    box-shadow: 0 0 10px 1px rgba($primary, 0.7);
-    color: white;
-    border-radius: $border-radius;
-}
-</style>
