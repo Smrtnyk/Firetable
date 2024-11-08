@@ -158,7 +158,7 @@ const { data: myIssues } = useFirestoreCollection<IssueReportDoc>(
         <FTTitle :title="t('PageIssueReport.title')">
             <template #right>
                 <FTBtn
-                    aria-label="Add new reservation"
+                    aria-label="Report new issue"
                     rounded
                     icon="plus"
                     class="button-gradient"
@@ -168,7 +168,9 @@ const { data: myIssues } = useFirestoreCollection<IssueReportDoc>(
         </FTTitle>
 
         <q-card class="q-pa-md ft-card">
-            <div class="text-h6 q-mb-md">{{ t("PageIssueReport.myIssues") }}</div>
+            <div class="text-h6 q-mb-md" role="heading" aria-level="2">
+                {{ t("PageIssueReport.myIssues") }}
+            </div>
 
             <q-list bordered separator v-if="myIssues?.length">
                 <q-item v-for="issue in myIssues" :key="issue.id">
@@ -196,11 +198,18 @@ const { data: myIssues } = useFirestoreCollection<IssueReportDoc>(
                     </q-item-section>
 
                     <q-item-section side>
-                        <q-btn flat round color="grey" icon="more">
-                            <q-menu>
+                        <q-btn
+                            flat
+                            round
+                            color="grey"
+                            icon="more"
+                            :aria-label="`Actions for issue ${issue.description}`"
+                        >
+                            <q-menu class="ft-card">
                                 <q-list style="min-width: 150px">
                                     <q-item
                                         clickable
+                                        aria-label="Edit issue"
                                         v-close-popup
                                         @click="showEditIssueForm(issue)"
                                         :disable="
