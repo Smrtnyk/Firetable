@@ -30,7 +30,6 @@ export class RoundTable extends Table {
             ...options.shapeOptions,
             originX: "center",
             originY: "center",
-            fontFamily: DEFAULT_FONT,
             fill: options.groupOptions.baseFill ?? ELEMENT_DEFAULT_FILL_COLOR,
             stroke: ELEMENT_DEFAULT_STROKE_COLOR,
             strokeWidth: 0.5,
@@ -39,6 +38,7 @@ export class RoundTable extends Table {
         const textLabel = new FabricText(options.groupOptions.label, {
             ...options.textOptions,
             fontSize: FONT_SIZE,
+            fontFamily: DEFAULT_FONT,
             fill: TABLE_TEXT_FILL_COLOR,
             left: tableCircle.left,
             top: tableCircle.top,
