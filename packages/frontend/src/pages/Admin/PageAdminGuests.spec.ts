@@ -175,7 +175,7 @@ describe("PageAdminGuests.vue", () => {
         expect(typeof props.listeners.create).toBe("function");
     });
 
-    describe("guest sorting", () => {
+    describe("guest sorting and filtering", () => {
         it("renders guests sorted by number of visits", async () => {
             const screen = await render();
 
@@ -460,6 +460,57 @@ describe("PageAdminGuests.vue", () => {
             expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
             expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
             expect(guestItems.elements()[2]).toHaveTextContent("Alice Johnson");
+        });
+
+        describe("filtering by tag", () => {
+            it("persists and loads tag filter selections", async () => {
+                guestsRef.value.data = guestsRef.value.data.map((guest, index) => ({
+                    ...guest,
+                    tags: index === 0 ? ["vip", "regular"] : index === 1 ? ["vip"] : ["regular"],
+                }));
+
+                let screen = await render();
+                const sortButton = screen.getByLabelText("filter guests");
+                await userEvent.click(sortButton);
+                await userEvent.click(screen.getByLabelText("Filter by tags"));
+                // Select VIP tag
+                await userEvent.click(screen.getByText("vip"));
+
+                screen.unmount();
+                screen = await render();
+
+                const guestItems = screen.getByRole("listitem");
+                expect(guestItems.elements()).toHaveLength(2);
+
+                // Should only show guests with VIP tag
+                expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
+                expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
+                await expect.element(screen.getByText("Bob Wilson")).not.toBeInTheDocument();
+            });
+
+            it("filters guests with multiple selected tags", async () => {
+                guestsRef.value.data = guestsRef.value.data.map((guest, index) => ({
+                    ...guest,
+                    tags: index === 0 ? ["vip", "regular"] : index === 1 ? ["vip"] : ["regular"],
+                }));
+
+                const screen = await render();
+                const sortButton = screen.getByLabelText("filter guests");
+                await userEvent.click(sortButton);
+                await userEvent.click(screen.getByLabelText("Filter by tags"));
+                await userEvent.click(screen.getByText("vip"));
+                await userEvent.click(screen.getByText("regular"));
+
+                await userEvent.click(screen.getByLabelText("Close dialog"));
+
+                const guestItems = screen.getByRole("listitem");
+                expect(guestItems.elements()).toHaveLength(1);
+
+                // Should only show guest with both VIP and Regular tags
+                expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
+                await expect.element(screen.getByText("Jane Smith")).not.toBeInTheDocument();
+                await expect.element(screen.getByText("Bob Wilson")).not.toBeInTheDocument();
+            });
         });
 
         describe("lastModified sorting", () => {

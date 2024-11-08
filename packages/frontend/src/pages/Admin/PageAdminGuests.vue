@@ -144,16 +144,41 @@ const sortedGuests = computed(function () {
     });
 });
 
-const filteredGuests = computed(function () {
-    if (!searchQuery.value?.trim()) {
-        return sortedGuests.value;
-    }
-    const query = searchQuery.value.trim().toLowerCase();
-    return sortedGuests.value.filter(function (guest) {
-        return (
-            guest.name.toLowerCase().includes(query) || guest.contact.toLowerCase().includes(query)
-        );
+const selectedTags = useLocalStorage<string[]>("guest-list-selected-tags", []);
+
+const availableTags = computed(() => {
+    const tagSet = new Set<string>();
+    guests.value?.forEach((guest) => {
+        if (guest.tags?.length) {
+            guest.tags.forEach((tag) => tagSet.add(tag.toLowerCase()));
+        }
     });
+    return Array.from(tagSet).sort();
+});
+
+const filteredGuests = computed(function () {
+    let filtered = sortedGuests.value;
+
+    // Apply search filter
+    if (searchQuery.value?.trim()) {
+        const query = searchQuery.value.trim().toLowerCase();
+        filtered = filtered.filter(
+            (guest) =>
+                guest.name.toLowerCase().includes(query) ||
+                guest.contact.toLowerCase().includes(query),
+        );
+    }
+
+    // Apply tag filter
+    if (selectedTags.value.length > 0) {
+        filtered = filtered.filter((guest) => {
+            if (!guest.tags) return false;
+            const guestTagsLower = guest.tags.map((tag) => tag.toLowerCase());
+            return selectedTags.value.every((tag) => guestTagsLower.includes(tag.toLowerCase()));
+        });
+    }
+
+    return filtered;
 });
 
 const pageTitle = computed(function () {
@@ -295,8 +320,11 @@ function showCreateGuestDialog(): void {
             <GuestSortOptions
                 :current-sort-option="sortOption"
                 :current-sort-direction="sortDirection"
+                :available-tags="availableTags"
+                :selected-tags="selectedTags"
                 @close="sortDialog = false"
                 @update:sort-option="setSortOption"
+                @update:selected-tags="selectedTags = $event"
                 @toggle-direction="toggleSortDirection"
             />
         </q-dialog>
