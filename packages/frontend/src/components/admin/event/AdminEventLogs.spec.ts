@@ -2,7 +2,7 @@ import type { EventLog, EventLogsDoc } from "@firetable/types";
 import type { RenderResult } from "vitest-browser-vue";
 import type { AdminEventLogsProps } from "./AdminEventLogs.vue";
 import AdminEventLogs from "./AdminEventLogs.vue";
-import { locale, renderComponent } from "../../../../test-helpers/render-component";
+import { getLocaleForTest, renderComponent } from "../../../../test-helpers/render-component";
 import { AdminRole, Role } from "@firetable/types";
 import { formatEventDate, getDefaultTimezone } from "src/helpers/date-utils";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -111,7 +111,7 @@ describe("AdminEventLogs", () => {
             for (const log of sampleLogs) {
                 const datePart = formatEventDate(
                     log.timestamp as number,
-                    locale.value,
+                    getLocaleForTest().value,
                     getDefaultTimezone(),
                 );
                 const userPart = `${log.creator.name} (${log.creator.email})`;

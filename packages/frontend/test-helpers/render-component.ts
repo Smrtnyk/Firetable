@@ -46,7 +46,7 @@ import { createTestingPinia } from "@pinia/testing";
 document.body.style.height = "100vh";
 document.body.style.width = "100vw";
 
-const i18n = createI18n({
+let i18n = createI18n({
     locale: "en-GB",
     fallbackLocale: "en-GB",
     messages,
@@ -54,7 +54,6 @@ const i18n = createI18n({
 });
 
 export const t = i18n.global.t;
-export const locale = i18n.global.locale;
 export function getLocaleForTest(): WritableComputedRef<"de" | "en-GB", "de" | "en-GB"> {
     return i18n.global.locale;
 }
@@ -73,6 +72,12 @@ export function renderComponent(
     },
 ): RenderResult<any> {
     const wrapInLayout = options?.wrapInLayout ?? false;
+    i18n = createI18n({
+        locale: "en-GB",
+        fallbackLocale: "en-GB",
+        messages,
+        legacy: false,
+    });
 
     const componentToRender = wrapInLayout
         ? defineComponent({

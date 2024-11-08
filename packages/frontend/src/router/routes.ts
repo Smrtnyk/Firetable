@@ -97,7 +97,15 @@ export const routes: RouteRecordRaw[] = [
                 },
                 component: () => import("src/pages/PageProfile.vue"),
             },
-
+            {
+                path: "/report-issue",
+                name: "reportIssue",
+                meta: {
+                    requiresAuth: true,
+                    breadcrumb: "Report Issue",
+                },
+                component: () => import("src/pages/PageIssueReport.vue"),
+            },
             // Protected routes
             {
                 path: "/admin/organisations",
@@ -227,6 +235,16 @@ export const routes: RouteRecordRaw[] = [
                 },
                 props: true,
                 component: () => import("src/pages/Admin/PageAdminAnalytics.vue"),
+            },
+            {
+                path: "/issue-reports",
+                name: "adminIssueReports",
+                meta: {
+                    requiresAuth: true,
+                    allowedRoles: [AdminRole.ADMIN],
+                },
+                props: true,
+                component: () => import("src/pages/Admin/PageAdminIssueReports.vue"),
             },
         ],
     },

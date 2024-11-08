@@ -97,6 +97,12 @@ const links = computed<(GuardedLink | LinkWithChildren)[]>(function () {
             label: t("AppDrawer.links.manageOrganisations"),
             isVisible: isAdmin.value,
         },
+        {
+            icon: "bug",
+            route: { name: "adminIssueReports" },
+            label: t("AppDrawer.links.issueReportsOverview"),
+            isVisible: isAdmin.value,
+        },
         manageEventsLink.value,
         manageFloorsLink.value,
         inventoryLink.value,
@@ -124,6 +130,12 @@ const links = computed<(GuardedLink | LinkWithChildren)[]>(function () {
             route: { name: "adminOrganisationSettings", params: { organisationId } },
             label: t("AppDrawer.links.settings"),
             isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
+        },
+        {
+            icon: "bug",
+            route: { name: "reportIssue", params: { organisationId } },
+            label: t("AppDrawer.links.reportIssue"),
+            isVisible: !isAdmin.value,
         },
     ];
 

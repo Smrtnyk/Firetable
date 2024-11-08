@@ -1,7 +1,7 @@
 import type { QueuedReservationDoc, UserCapabilities, WalkInReservation } from "@firetable/types";
 import type { RenderResult } from "vitest-browser-vue";
 import ReservationGeneralInfo from "./ReservationGeneralInfo.vue";
-import { renderComponent, locale } from "../../../../test-helpers/render-component";
+import { renderComponent, getLocaleForTest } from "../../../../test-helpers/render-component";
 import { ReservationStatus, ReservationType, Role, UserCapability } from "@firetable/types";
 import { formatEventDate, getDefaultTimezone } from "src/helpers/date-utils";
 import { describe, expect, it } from "vitest";
@@ -306,7 +306,11 @@ describe("ReservationGeneralInfo", () => {
         await expect
             .element(
                 screen.getByText(
-                    formatEventDate(1_600_000_000_000, locale.value, getDefaultTimezone()),
+                    formatEventDate(
+                        1_600_000_000_000,
+                        getLocaleForTest().value,
+                        getDefaultTimezone(),
+                    ),
                 ),
             )
             .toBeVisible();
