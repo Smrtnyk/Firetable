@@ -1,4 +1,10 @@
-# FIRETABLE
+<p align="center">
+  <img src="packages/frontend/public/icons/icon-256x256.png" alt="Firetable Logo" width="256" height="256">
+</p>
+
+<h1 align="center">
+FIRETABLE
+</h1>
 
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=Smrtnyk_Firetable&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=Smrtnyk_Firetable)
 
