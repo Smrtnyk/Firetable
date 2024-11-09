@@ -9,6 +9,7 @@ import type {
     ReservationDoc,
 } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
+import { isPlannedReservation, ReservationStatus } from "@firetable/types";
 import {
     deleteQueuedReservation,
     saveQueuedReservation,
@@ -18,7 +19,6 @@ import {
     queuedReservationsCollection,
     reservationsCollection,
 } from "@firetable/backend";
-import { isPlannedReservation, ReservationStatus } from "@firetable/types";
 import { Loading } from "quasar";
 import { useRouter } from "vue-router";
 import { computed, onMounted, onUnmounted, useTemplateRef } from "vue";
@@ -46,6 +46,7 @@ import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
 import { usePermissionsStore } from "src/stores/permissions-store";
 import { exportReservations } from "src/helpers/reservation/export-reservations";
+import { useGuestsForEvent } from "src/composables/useGuestsForEvent";
 
 interface Props {
     organisationId: string;
@@ -102,6 +103,7 @@ const plannedReservations = computed(function () {
         return isPlannedReservation(reservation);
     });
 });
+const { returningGuests } = useGuestsForEvent(eventOwner, plannedReservations);
 
 const {
     animateTables,
@@ -127,14 +129,20 @@ const canExportReservations = computed(function () {
 });
 
 function showEventInfo(): void {
+    if (!event.value) {
+        return;
+    }
     createDialog({
         component: FTDialog,
         componentProps: {
             component: EventInfo,
-            title: t("PageEvent.eventInfoTitle"),
+            title: event.value.name,
             maximized: false,
             componentPropsObject: {
-                eventInfo: event.value?.info ?? "",
+                eventInfo: event.value.info,
+                floors: eventFloors.value,
+                activeReservations: reservations.value,
+                returningGuests: returningGuests.value,
             },
             listeners: {},
         },
