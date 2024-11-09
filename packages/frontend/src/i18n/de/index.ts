@@ -305,10 +305,10 @@ export default {
     },
     PageAdminIssueReports: {
         title: "Fehlerberichte",
-        noIssuesMessage: "No issues have been reported",
+        noIssuesMessage: "Es gibt keine Fehlerberichte.",
         status: {
-            new: "New",
-            in_progress: "In Progress",
+            new: "Neu",
+            in_progress: "In Bearbeitung",
             resolved: "Gelöst",
             wont_fix: "Nicht beheben",
         },
