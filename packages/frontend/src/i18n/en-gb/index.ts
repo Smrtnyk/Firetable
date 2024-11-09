@@ -17,6 +17,8 @@ export default {
         manageInventoryLink: "Manage Inventory",
         tagsLabel: "Tags",
         reactivate: "Reactivate",
+        arrived: "Arrived",
+        cancelled: "Cancelled",
     },
     useReservations: {
         cancelTableOperationTitle: "Cancel Operation",
@@ -185,6 +187,7 @@ export default {
         deleteGuestConfirmMessage: "Are you sure you want to delete guest {name}?",
         noVisitsMessage: "There are no visits recorded for this guest.",
         lastModified: "Last modified",
+        editVisitTitle: "Edit Visit Details",
     },
     PageAdminGuests: {
         title: "Guests",

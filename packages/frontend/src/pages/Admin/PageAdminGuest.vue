@@ -212,6 +212,10 @@ async function onDeleteGuest(): Promise<void> {
                                         .timezone
                                 "
                                 :visits="item.visits"
+                                :organisation-id="organisationId"
+                                :property-id="String(propertyId)"
+                                :guest-id="guestId"
+                                @visit-updated="guestsStore.invalidateGuestCache(guestId)"
                             />
                         </q-tab-panel>
                     </FTTabPanels>
@@ -226,6 +230,10 @@ async function onDeleteGuest(): Promise<void> {
                             ).timezone
                         "
                         :visits="singlePropertyVisits"
+                        :organisation-id="organisationId"
+                        :property-id="Object.keys(guest.visitedProperties)[0]"
+                        :guest-id="guestId"
+                        @visit-updated="guestsStore.invalidateGuestCache(guestId)"
                     />
                 </template>
             </div>

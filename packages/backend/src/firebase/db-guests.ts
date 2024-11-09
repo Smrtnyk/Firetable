@@ -1,9 +1,17 @@
-import type { CreateGuestPayload, GuestDataPayload, GuestDoc } from "@firetable/types";
+import type { CreateGuestPayload, GuestDataPayload, GuestDoc, Visit } from "@firetable/types";
 import type { HttpsCallableResult } from "firebase/functions";
 import { initializeFirebase } from "./base.js";
 import { guestDoc } from "./db.js";
-import { getGuestsPath } from "./paths.js";
-import { deleteDoc, addDoc, collection, onSnapshot } from "firebase/firestore";
+import { getGuestPath, getGuestsPath } from "./paths.js";
+import {
+    deleteDoc,
+    addDoc,
+    collection,
+    onSnapshot,
+    doc,
+    getDoc,
+    updateDoc,
+} from "firebase/firestore";
 import { httpsCallable } from "firebase/functions";
 
 export type GuestsSubscriptionCallback = {
@@ -93,4 +101,35 @@ export function subscribeToGuests(
             callbacks.onError?.(error);
         },
     );
+}
+
+export async function updateGuestVisit(
+    organisationId: string,
+    propertyId: string,
+    guestId: string,
+    visit: Visit,
+): Promise<void> {
+    const { firestore } = initializeFirebase();
+    const guestRef = doc(firestore, getGuestPath(organisationId, guestId));
+
+    // Find the event ID by matching the date and event name
+    const guestData = (await getDoc(guestDoc(organisationId, guestId))).data() as GuestDoc;
+
+    if (!guestData?.visitedProperties?.[propertyId]) {
+        throw new Error("Property or visit not found");
+    }
+
+    const events = guestData.visitedProperties[propertyId];
+    const eventId = Object.entries(events).find(function ([, visitVal]) {
+        return visitVal && visitVal.date === visit.date && visitVal.eventName === visit.eventName;
+    })?.[0];
+
+    if (!eventId) {
+        throw new Error("Visit not found");
+    }
+
+    return updateDoc(guestRef, {
+        [`visitedProperties.${propertyId}.${eventId}`]: visit,
+        lastModified: Date.now(),
+    });
 }
