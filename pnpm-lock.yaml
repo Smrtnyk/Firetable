@@ -63,8 +63,8 @@ importers:
         specifier: 9.30.0
         version: 9.30.0(eslint@9.14.0)
       firebase-tools:
-        specifier: 13.24.1
-        version: 13.24.1(encoding@0.1.13)
+        specifier: 13.24.2
+        version: 13.24.2(encoding@0.1.13)
       globals:
         specifier: 15.12.0
         version: 15.12.0
@@ -170,8 +170,8 @@ importers:
         specifier: 'catalog:'
         version: 11.0.1
       libphonenumber-js:
-        specifier: 1.11.13
-        version: 1.11.13
+        specifier: 1.11.14
+        version: 1.11.14
       pako:
         specifier: 2.1.0
         version: 2.1.0
@@ -216,8 +216,8 @@ importers:
         specifier: 2.0.0-beta.24
         version: 2.0.0-beta.24(@types/node@22.9.0)(eslint@9.14.0)(pinia@2.2.6(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3)))(quasar@2.17.2)(rollup@2.79.2)(sass@1.79.4)(terser@5.34.1)(typescript@5.6.3)(vue-router@4.4.5(vue@3.5.12(typescript@5.6.3)))(vue@3.5.12(typescript@5.6.3))(workbox-build@7.3.0)
       '@quasar/vite-plugin':
-        specifier: 1.8.0
-        version: 1.8.0(@vitejs/plugin-vue@5.1.4(vite@5.4.8(@types/node@22.9.0)(sass-embedded@1.80.3)(sass@1.79.4)(terser@5.34.1))(vue@3.5.12(typescript@5.6.3)))(quasar@2.17.2)(vite@5.4.8(@types/node@22.9.0)(sass-embedded@1.80.3)(sass@1.79.4)(terser@5.34.1))(vue@3.5.12(typescript@5.6.3))
+        specifier: 1.8.1
+        version: 1.8.1(@vitejs/plugin-vue@5.1.4(vite@5.4.8(@types/node@22.9.0)(sass-embedded@1.80.3)(sass@1.79.4)(terser@5.34.1))(vue@3.5.12(typescript@5.6.3)))(quasar@2.17.2)(vite@5.4.8(@types/node@22.9.0)(sass-embedded@1.80.3)(sass@1.79.4)(terser@5.34.1))(vue@3.5.12(typescript@5.6.3))
       '@vitejs/plugin-vue':
         specifier: 5.1.4
         version: 5.1.4(vite@5.4.8(@types/node@22.9.0)(sass-embedded@1.80.3)(sass@1.79.4)(terser@5.34.1))(vue@3.5.12(typescript@5.6.3))
@@ -1660,13 +1660,13 @@ packages:
     resolution: {integrity: sha512-RhZF7rO76T7Ywer1/5lCe7xl3CIiXxSAH1xgwOj0wcHTityDxJqIN/5YIj6BxMvlFw8XkJDoB1udEQafoVFA4g==}
     engines: {node: '>= 16'}
 
-  '@quasar/vite-plugin@1.8.0':
-    resolution: {integrity: sha512-+LC+y29R7dV7Y7GuCZyuC7MZ7E2Qz8r1ViUFQbJEV4+sx3561d/kDKTM7ZS4UQlrGgU22/LCOUrTC07N7g3JGg==}
+  '@quasar/vite-plugin@1.8.1':
+    resolution: {integrity: sha512-uaws342JRToH+6TMJRA4/oxuzzEM8K68y0C1xYlBYaCll/FoS9rIx9kDpuu5bYHA51Y3q7yRGN01EsUaAq9vCA==}
     engines: {node: '>=18'}
     peerDependencies:
       '@vitejs/plugin-vue': ^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0
       quasar: ^2.16.0
-      vite: ^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0
+      vite: ^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0-beta.9
       vue: ^3.0.0
 
   '@regru/eslint-plugin-prefer-early-return@1.0.0':
@@ -3378,8 +3378,8 @@ packages:
     peerDependencies:
       firebase-admin: ^11.10.0 || ^12.0.0
 
-  firebase-tools@13.24.1:
-    resolution: {integrity: sha512-diyFquC0A+njoVK5+h6y5I+2eEo/APzD92RmC8O4tGROIg9DuUsmBu8pHWsQ4TqkAGUhi6HyF85zrFXxFAaw5w==}
+  firebase-tools@13.24.2:
+    resolution: {integrity: sha512-KGugaP6LfhXLecMxCXWTQK2l+MDxL+bp7yYvGQ/7MTAavPBWefzR9bz6q7td1GUUlY33PBiyjxweOq9xTtzX8w==}
     engines: {node: '>=18.0.0 || >=20.0.0'}
     hasBin: true
 
@@ -4171,8 +4171,8 @@ packages:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
 
-  libphonenumber-js@1.11.13:
-    resolution: {integrity: sha512-LIJmXxgs7o1njVZPcX5fkbtcFgDnXXPvJQQBH5Ho/8+r6BFlJaEbJ+bAiaUGaChWUhFtvawwdmXIOz4wZBANCg==}
+  libphonenumber-js@1.11.14:
+    resolution: {integrity: sha512-sexvAfwcW1Lqws4zFp8heAtAEXbEDnvkYCEGzvOoMgZR7JhXo/IkE9MkkGACgBed5fWqh3ShBGnJBdDnU9N8EQ==}
 
   libsodium-wrappers@0.7.15:
     resolution: {integrity: sha512-E4anqJQwcfiC6+Yrl01C1m8p99wEhLmJSs0VQqST66SbQXXBoaJY0pF4BNjRYa/sOQAxx6lXAaAFIlx+15tXJQ==}
@@ -7989,7 +7989,7 @@ snapshots:
     dependencies:
       '@quasar/render-ssr-error': 1.0.3
       '@quasar/ssl-certificate': 1.0.0
-      '@quasar/vite-plugin': 1.8.0(@vitejs/plugin-vue@5.1.4(vite@5.4.8(@types/node@22.9.0)(sass-embedded@1.80.3)(sass@1.79.4)(terser@5.34.1))(vue@3.5.12(typescript@5.6.3)))(quasar@2.17.2)(vite@5.4.8(@types/node@22.9.0)(sass-embedded@1.80.3)(sass@1.79.4)(terser@5.34.1))(vue@3.5.12(typescript@5.6.3))
+      '@quasar/vite-plugin': 1.8.1(@vitejs/plugin-vue@5.1.4(vite@5.4.8(@types/node@22.9.0)(sass-embedded@1.80.3)(sass@1.79.4)(terser@5.34.1))(vue@3.5.12(typescript@5.6.3)))(quasar@2.17.2)(vite@5.4.8(@types/node@22.9.0)(sass-embedded@1.80.3)(sass@1.79.4)(terser@5.34.1))(vue@3.5.12(typescript@5.6.3))
       '@types/chrome': 0.0.262
       '@types/compression': 1.7.5
       '@types/cordova': 11.0.3
@@ -8052,7 +8052,7 @@ snapshots:
       fs-extra: 11.2.0
       selfsigned: 2.4.1
 
-  '@quasar/vite-plugin@1.8.0(@vitejs/plugin-vue@5.1.4(vite@5.4.8(@types/node@22.9.0)(sass-embedded@1.80.3)(sass@1.79.4)(terser@5.34.1))(vue@3.5.12(typescript@5.6.3)))(quasar@2.17.2)(vite@5.4.8(@types/node@22.9.0)(sass-embedded@1.80.3)(sass@1.79.4)(terser@5.34.1))(vue@3.5.12(typescript@5.6.3))':
+  '@quasar/vite-plugin@1.8.1(@vitejs/plugin-vue@5.1.4(vite@5.4.8(@types/node@22.9.0)(sass-embedded@1.80.3)(sass@1.79.4)(terser@5.34.1))(vue@3.5.12(typescript@5.6.3)))(quasar@2.17.2)(vite@5.4.8(@types/node@22.9.0)(sass-embedded@1.80.3)(sass@1.79.4)(terser@5.34.1))(vue@3.5.12(typescript@5.6.3))':
     dependencies:
       '@vitejs/plugin-vue': 5.1.4(vite@5.4.8(@types/node@22.9.0)(sass-embedded@1.80.3)(sass@1.79.4)(terser@5.34.1))(vue@3.5.12(typescript@5.6.3))
       quasar: 2.17.2
@@ -10141,7 +10141,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  firebase-tools@13.24.1(encoding@0.1.13):
+  firebase-tools@13.24.2(encoding@0.1.13):
     dependencies:
       '@electric-sql/pglite': 0.2.11
       '@google-cloud/cloud-sql-connector': 1.4.0(encoding@0.1.13)
@@ -11117,7 +11117,7 @@ snapshots:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
-  libphonenumber-js@1.11.13: {}
+  libphonenumber-js@1.11.14: {}
 
   libsodium-wrappers@0.7.15:
     dependencies:
