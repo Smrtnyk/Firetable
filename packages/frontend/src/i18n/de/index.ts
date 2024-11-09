@@ -17,6 +17,8 @@ export default {
         manageInventoryLink: "Inventar verwalten",
         tagsLabel: "Schlagworte",
         reactivate: "Wiederherstellen",
+        arrived: "Eingetroffen",
+        cancelled: "Storniert",
     },
     useReservations: {
         cancelTableOperationTitle: "Vorgang abbrechen",
@@ -189,6 +191,7 @@ export default {
         deleteGuestConfirmMessage: "Sind Sie sicher, dass Sie den Gast {name} löschen möchten?",
         noVisitsMessage: "Es gibt keine Besuche für diesen Gast.",
         lastModifiedLabel: "Zuletzt geändert",
+        editVisitTitle: "Besuchsdetails bearbeiten",
     },
     PageAdminGuests: {
         title: "Gäste",

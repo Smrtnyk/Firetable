@@ -1,17 +1,29 @@
 <script setup lang="ts">
 import type { Visit } from "@firetable/types";
-import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPChip.vue";
 import { formatEventDate } from "src/helpers/date-utils";
 import { useI18n } from "vue-i18n";
+import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { updateGuestVisit } from "@firetable/backend";
+import { useDialog } from "src/composables/useDialog";
+import { buttonSize } from "src/global-reactives/screen-detection";
+
+import FTDialog from "src/components/FTDialog.vue";
+import EditVisitDialog from "src/components/admin/guest/EditVisitDialog.vue";
+import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPChip.vue";
 
 interface Props {
     visits: Visit[];
     timezone: string;
+    organisationId: string;
+    propertyId: string;
+    guestId: string;
 }
 
-const { visits, timezone } = defineProps<Props>();
+const emit = defineEmits<(e: "visit-updated") => void>();
 
 const { t, locale } = useI18n();
+const { createDialog } = useDialog();
+const { visits, timezone, propertyId, organisationId, guestId } = defineProps<Props>();
 
 function isUpcomingVisit(visit: Visit): boolean {
     const now = Date.now();
@@ -43,6 +55,36 @@ function getVisitIcon(visit: Visit): string {
 function formatSubtitleForGuestVisit(visit: Visit): string {
     return formatEventDate(visit.date, locale.value, timezone);
 }
+
+function openEditDialog(visit: Visit): void {
+    const dialog = createDialog({
+        component: FTDialog,
+        componentProps: {
+            title: t("PageAdminGuest.editVisitTitle"),
+            component: EditVisitDialog,
+            maximized: false,
+            componentPropsObject: {
+                visit: { ...visit },
+            },
+            listeners: {
+                update(updatedVisit: Visit) {
+                    tryCatchLoadingWrapper({
+                        async hook() {
+                            await updateGuestVisit(
+                                organisationId,
+                                propertyId,
+                                guestId,
+                                updatedVisit,
+                            );
+                            emit("visit-updated");
+                            dialog.hide();
+                        },
+                    });
+                },
+            },
+        },
+    });
+}
 </script>
 
 <template>
@@ -57,11 +99,22 @@ function formatSubtitleForGuestVisit(visit: Visit): string {
                 :title="visit.eventName"
                 :subtitle="formatSubtitleForGuestVisit(visit)"
             >
-                <div class="row">
-                    <ReservationVIPChip v-if="visit.isVIPVisit" />
-                    <q-chip v-if="isUpcomingVisit(visit)" color="orange">
-                        {{ t("PageAdminGuest.upcomingChipLabel") }}
-                    </q-chip>
+                <div class="row items-center">
+                    <div class="col">
+                        <ReservationVIPChip v-if="visit.isVIPVisit" />
+                        <q-chip v-if="isUpcomingVisit(visit)" color="orange">
+                            {{ t("PageAdminGuest.upcomingChipLabel") }}
+                        </q-chip>
+                    </div>
+                    <div class="col-auto">
+                        <q-btn
+                            flat
+                            round
+                            :size="buttonSize"
+                            icon="pencil"
+                            @click="openEditDialog(visit)"
+                        />
+                    </div>
                 </div>
             </q-timeline-entry>
         </q-timeline>
