@@ -6,6 +6,7 @@ export const myIcons: Record<string, string> = {
     chevron_right: "svguse:/svg-icons/ft-icons.svg#chevron-right",
     chevron_double_right: "svguse:/svg-icons/ft-icons.svg#chevron-double-right",
     chevron_down: "svguse:/svg-icons/ft-icons.svg#chevron-down",
+    chevron_up: "svguse:/svg-icons/ft-icons.svg#chevron-up",
     arrow_drop_down: "svguse:/svg-icons/ft-icons.svg#chevron-down",
     close: "svguse:/svg-icons/ft-icons.svg#close",
     save: "svguse:/svg-icons/ft-icons.svg#save",

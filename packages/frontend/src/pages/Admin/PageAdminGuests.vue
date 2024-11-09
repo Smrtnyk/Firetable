@@ -226,15 +226,26 @@ const virtualListRef = useTemplateRef<QVirtualScroll>("virtualListRef");
 const showScrollButton = ref(false);
 const lastGuestIndex = computed(() => filteredGuests.value.length - 1);
 
+const scrollDirection = ref<"down" | "up">("down");
+const lastScrollIndex = ref(0);
+
 function onVirtualScroll({
     index,
 }: Parameters<NonNullable<QVirtualScroll["onVirtualScroll"]>>[0]): void {
     const scrollPercentage = index / filteredGuests.value.length;
+
+    scrollDirection.value = index > lastScrollIndex.value ? "down" : "up";
+    lastScrollIndex.value = index;
+
     showScrollButton.value = scrollPercentage > 0.1 && scrollPercentage < 0.9;
 }
 
-function scrollToBottom(): void {
-    virtualListRef.value?.scrollTo(lastGuestIndex.value, "end");
+function handleScroll(): void {
+    if (scrollDirection.value === "down") {
+        virtualListRef.value?.scrollTo(lastGuestIndex.value, "end");
+    } else {
+        virtualListRef.value?.scrollTo(0, "start");
+    }
 }
 </script>
 
@@ -352,7 +363,12 @@ function scrollToBottom(): void {
             :offset="[18, 18]"
             class="scroll-to-bottom"
         >
-            <q-btn @click="scrollToBottom" fab icon="chevron_down" color="secondary" />
+            <q-btn
+                @click="handleScroll"
+                fab
+                :icon="scrollDirection === 'down' ? 'chevron_down' : 'chevron_up'"
+                color="secondary"
+            />
         </q-page-sticky>
     </div>
 </template>
