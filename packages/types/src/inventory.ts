@@ -16,23 +16,45 @@ export type CreateInventoryItemPayload = Pick<
     "alcoholContent" | "category" | "name" | "price" | "quantity" | "supplier" | "type" | "volume"
 >;
 
+/**
+ * Represents an inventory item document in Firestore
+ * Used to track stock items like drinks, food, and other supplies
+ */
 export interface InventoryItemDoc {
-    // Unique identifier (can be the document ID)
+    /**
+     * Firestore document ID
+     */
     id: string;
-    // Name of the item
+    /**
+     * Display name of the item
+     */
     name: string;
-    // Type of item
+    /**
+     * Classification of the item (drink, food, or other)
+     */
     type: InventoryItemType;
-    // e.g., 'beer', 'wine', 'snack' (optional)
+    /**
+     * Specific category for drinks (beer, wine, etc.)
+     */
     category?: DrinkCategory;
-    // Price per unit
+    /**
+     * Price per unit in the default currency
+     */
     price: number;
-    // Quantity in stock
+    /**
+     * Current quantity in stock
+     */
     quantity: number;
-    // Alcohol percentage (if applicable)
+    /**
+     * Alcohol percentage for alcoholic beverages
+     */
     alcoholContent?: number;
-    // Volume in ml or l (if applicable)
+    /**
+     * Volume in milliliters or liters for liquid items
+     */
     volume?: number;
-    // Supplier name or ID (optional)
+    /**
+     * Name or identifier of the supplier
+     */
     supplier?: string;
 }

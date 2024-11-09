@@ -2,27 +2,35 @@ import type { PlannedReservation } from "./planned-reservation.js";
 import type { WalkInReservation } from "./walk-in-reservation.js";
 import { ReservationType } from "./base-reservation.js";
 
-export type QueuedReservationDoc = QueuedReservation & {
+/**
+ * Represents a queued reservation document in Firestore
+ * Used for managing waiting lists when tables aren't immediately available
+ */
+export interface QueuedReservation
+    extends Omit<
+        PlannedReservation,
+        | "arrived"
+        | "cancelled"
+        | "floorId"
+        | "reservationConfirmed"
+        | "tableLabel"
+        | "type"
+        | "waitingForResponse"
+    > {
     /**
-     * The id of the document
-     */
-    id: string;
-};
-
-export type QueuedReservation = Omit<
-    PlannedReservation,
-    | "arrived"
-    | "cancelled"
-    | "floorId"
-    | "reservationConfirmed"
-    | "tableLabel"
-    | "type"
-    | "waitingForResponse"
-> & {
-    /**
-     * The type of the reservation
+     * Identifies this as a queued reservation
      */
     type: ReservationType.QUEUED;
+}
+
+/**
+ * Queued reservation with Firestore document ID
+ */
+export type QueuedReservationDoc = QueuedReservation & {
+    /**
+     * Firestore document ID
+     */
+    id: string;
 };
 
 export function isQueuedReservation(

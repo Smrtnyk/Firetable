@@ -19,51 +19,55 @@ export type EditEventPayload = CreateEventForm & {
     organisationId: string;
 };
 
+/**
+ * Represents an event document in Firestore
+ * Contains details about a scheduled event at a property
+ */
 export interface EventDoc {
     /**
-     * id is the same as the document id in firestore
+     * Firestore document ID
      */
     id: string;
     /**
-     * user mail of the event creator
+     * Firebase Auth email of the event creator
      */
     creator: string;
     /**
-     * date as a timestamp of the event
+     * Unix timestamp of the event date
      */
     date: number;
     /**
-     * entry price for the event
-     * if 0, then the event is free
+     * Entry price in default currency
+     * Zero indicates a free event
      */
     entryPrice: number;
     /**
-     * name of the event
+     * Display name of the event
      */
     name: string;
     /**
-     * limit of guests that can be on the guest list
+     * Maximum number of guests allowed on the guest list
      */
     guestListLimit: number;
     /**
-     * id of the property where the event is hosted
+     * Reference to the parent property's Firestore document ID
      */
     propertyId: string;
     /**
-     * id of the organisation where the event is hosted
+     * Reference to the parent organisation's Firestore document ID
      */
     organisationId: string;
     /**
-     * if provided, any kind of info regarding the event
-     * visible to the user
+     * Additional public information about the event
      */
     info?: string;
     /**
-     * image url of the event if provided
+     * URL to the event's image if set
      */
     img?: string;
     /**
-     * document snapshot of the event document
+     * Firestore QueryDocumentSnapshot reference
+     * Used for real-time updates and pagination
      */
     _doc: QueryDocumentSnapshot<EventDoc>;
 }
