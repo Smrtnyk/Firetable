@@ -234,6 +234,28 @@ describe("EventCreateReservation", () => {
             await expect.element(errorMessage).toBeVisible();
         });
 
+        it("sets initial time to current hour when event is in progress", async () => {
+            const now = Date.now();
+            const oneHourAgo = now - ONE_HOUR;
+            // Event started an hour ago
+            props.eventStartTimestamp = oneHourAgo;
+
+            const screen = renderComponent(EventCreateReservation, props);
+
+            const walkInBtn = screen.getByRole("button", { name: "Walk-In" });
+            await userEvent.click(walkInBtn);
+
+            const timeInput = screen.getByLabelText(t("EventCreateReservation.reservationTime"));
+
+            const expectedTime = hourFromTimestamp(
+                now,
+                getLocaleForTest().value,
+                getDefaultTimezone(),
+            );
+
+            await expect.element(timeInput).toHaveValue(expectedTime);
+        });
+
         it("opens the time picker and selects a time correctly", async () => {
             const screen = renderComponent(EventCreateReservation, props);
 
