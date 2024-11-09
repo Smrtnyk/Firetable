@@ -25,7 +25,7 @@ const reservationColor = computed(function () {
 </script>
 
 <template>
-    <q-chip text-color="white" color="tertiary" size="sm"
+    <q-chip text-color="white" color="tertiary" size="sm" class="q-ml-none"
         >{{ t("GuestSummaryChips.reservations") }}: {{ summary.totalReservations }}</q-chip
     >
     <q-chip size="sm">{{ t("GuestSummaryChips.arrived") }}: {{ summary.fulfilledVisits }} </q-chip>

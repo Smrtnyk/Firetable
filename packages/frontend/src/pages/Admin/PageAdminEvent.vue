@@ -6,7 +6,6 @@ import type { EventOwner } from "@firetable/backend";
 import { isActiveReservation } from "@firetable/types";
 import { deleteReservation, updateEventFloorData } from "@firetable/backend";
 import { computed, onMounted, onUnmounted, watch } from "vue";
-import { getTablesFromFloorDoc } from "@firetable/floor-creator";
 import { useRouter } from "vue-router";
 import { formatEventDate } from "src/helpers/date-utils";
 
@@ -32,7 +31,6 @@ import { truncateText } from "src/helpers/string-utils";
 import { compressFloorDoc } from "src/helpers/compress-floor-doc";
 import { useGuestsForEvent } from "src/composables/useGuestsForEvent";
 import { usePropertiesStore } from "src/stores/properties-store";
-import { property } from "es-toolkit/compat";
 import { useAuthStore } from "src/stores/auth-store";
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
@@ -81,28 +79,9 @@ const {
     logs,
 } = useAdminEvent(eventOwner);
 const { returningGuests } = useGuestsForEvent(eventOwner, allReservations);
-const allTables = computed(function () {
-    return eventFloors.value.flatMap(getTablesFromFloorDoc);
-});
 const logsLabelWithCount = computed(function () {
     const logsLength = logs.value?.logs.length ?? 0;
     return logsLength > 0 ? `Logs (${logsLength})` : "Logs";
-});
-
-const reservationsStatus = computed(function () {
-    const activeReservations = allReservations.value.filter(isActiveReservation);
-    const currentlyOccupied = activeReservations.filter(property("arrived")).length;
-    const pending = activeReservations.length - currentlyOccupied;
-    const totalGuests = activeReservations.reduce(function (acc, reservation) {
-        return acc + Number(reservation.numberOfGuests || 0);
-    }, 0);
-
-    return {
-        total: allTables.value.length,
-        currentlyOccupied,
-        pending,
-        totalGuests,
-    };
 });
 
 watch(
@@ -240,8 +219,12 @@ onMounted(init);
         <FTTabPanels v-model="tab" class="bg-transparent">
             <!-- General info area -->
             <q-tab-panel name="info" class="q-px-none q-py-none">
-                <AppCardSection title="Tables status">
-                    <AdminEventRTInfo :reservations-status="reservationsStatus" />
+                <AppCardSection>
+                    <AdminEventRTInfo
+                        :floors="eventFloors"
+                        :active-reservations="allReservations.filter(isActiveReservation)"
+                        :returning-guests="returningGuests"
+                    />
                 </AppCardSection>
 
                 <AppCardSection title="Reserved by status">

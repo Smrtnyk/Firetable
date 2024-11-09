@@ -8,15 +8,25 @@ import { createApp, ref } from "vue";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { useAuthStore } from "src/stores/auth-store";
 
-const { useFirestoreCollectionSpy, subscribeToGuestsSpy } = vi.hoisted(() => ({
-    useFirestoreCollectionSpy: vi.fn(),
-    subscribeToGuestsSpy: vi.fn(),
+const { useFirestoreCollectionSpy, subscribeToGuestsSpy, createQuerySpy, whereSpy } = vi.hoisted(
+    () => ({
+        useFirestoreCollectionSpy: vi.fn(),
+        subscribeToGuestsSpy: vi.fn(),
+        createQuerySpy: vi.fn(),
+        whereSpy: vi.fn(),
+    }),
+);
+
+vi.mock("firebase/firestore", () => ({
+    where: whereSpy,
+    query: vi.fn(),
+    documentId: vi.fn(),
 }));
 
 vi.mock("src/composables/useFirestore", () => ({
     useFirestoreCollection: useFirestoreCollectionSpy,
     useFirestoreDocument: vi.fn(),
-    createQuery: vi.fn(),
+    createQuery: createQuerySpy,
 }));
 
 vi.mock("../backend-proxy", () => ({
@@ -138,6 +148,128 @@ describe("Guests Store", () => {
             );
             expect(cachedResult).toEqual(guestDoc);
             expect(useFirestoreCollectionSpy).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("getGuestsByHashedContacts", () => {
+        it("returns empty array for empty input", async () => {
+            const { guestsStore } = setupTestStores();
+            const result = await guestsStore.getGuestsByHashedContacts("org1", []);
+            expect(result).toEqual([]);
+            expect(useFirestoreCollectionSpy).not.toHaveBeenCalled();
+        });
+
+        it("returns guests from cache when all are available", async () => {
+            const { guestsStore } = setupTestStores();
+            const guest1 = createTestGuest();
+            const guest2 = createTestGuest({
+                id: "guest2",
+                hashedContact: "hashedContact2",
+            });
+
+            guestsStore.refsMap.set(
+                "org1",
+                ref({
+                    data: [guest1, guest2],
+                    pending: false,
+                }),
+            );
+
+            const result = await guestsStore.getGuestsByHashedContacts("org1", [
+                "hashedContact1",
+                "hashedContact2",
+            ]);
+
+            expect(result).toEqual([guest1, guest2]);
+            expect(useFirestoreCollectionSpy).not.toHaveBeenCalled();
+        });
+
+        it("fetches only missing guests when partial cache hit", async () => {
+            const { guestsStore } = setupTestStores();
+            const guest1 = createTestGuest();
+            const guest2 = createTestGuest({
+                id: "guest2",
+                hashedContact: "hashedContact2",
+            });
+
+            // Populate cache with only one guest
+            guestsStore.refsMap.set(
+                "org1",
+                ref({
+                    data: [guest1],
+                    pending: false,
+                }),
+            );
+            mockReturnGuestData([guest2]);
+
+            const result = await guestsStore.getGuestsByHashedContacts("org1", [
+                "hashedContact1",
+                "hashedContact2",
+            ]);
+
+            expect(result).toEqual([guest1, guest2]);
+            expect(useFirestoreCollectionSpy).toHaveBeenCalledTimes(1);
+            expect(useFirestoreCollectionSpy).toHaveBeenCalledWith(
+                // mockQuery spy returns undefined, so we can't check the query directly
+                undefined,
+                {
+                    once: true,
+                    wait: true,
+                },
+            );
+            expect(createQuerySpy).toHaveBeenCalledTimes(1);
+            expect(whereSpy).toHaveBeenCalledWith("hashedContact", "in", ["hashedContact2"]);
+        });
+
+        it("handles empty results for non-existent contacts", async () => {
+            const { guestsStore } = setupTestStores();
+            mockReturnGuestData([]);
+
+            const result = await guestsStore.getGuestsByHashedContacts("org1", [
+                "nonexistent1",
+                "nonexistent2",
+            ]);
+
+            expect(result).toEqual([]);
+            expect(useFirestoreCollectionSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("chunks large contact arrays into multiple queries", async () => {
+            const { guestsStore } = setupTestStores();
+            const contacts = Array.from({ length: 35 }, (_, i) => `hashedContact${i}`);
+
+            mockReturnGuestData([]);
+
+            await guestsStore.getGuestsByHashedContacts("org1", contacts);
+
+            expect(useFirestoreCollectionSpy).toHaveBeenCalledTimes(2);
+            expect(whereSpy).toHaveBeenNthCalledWith(
+                1,
+                "hashedContact",
+                "in",
+                expect.arrayContaining(contacts.slice(0, 30)),
+            );
+            expect(whereSpy).toHaveBeenNthCalledWith(
+                2,
+                "hashedContact",
+                "in",
+                expect.arrayContaining(contacts.slice(30)),
+            );
+        });
+
+        it("handles cache invalidation correctly", async () => {
+            const { guestsStore } = setupTestStores();
+            const guest = createTestGuest();
+
+            mockReturnGuestData([guest]);
+            // 1st fetch
+            await guestsStore.getGuestsByHashedContacts("org1", ["hashedContact1"]);
+
+            guestsStore.invalidateGuestCache(guest.id);
+
+            // 2nd fetch
+            await guestsStore.getGuestsByHashedContacts("org1", ["hashedContact1"]);
+            expect(useFirestoreCollectionSpy).toHaveBeenCalledTimes(2);
         });
     });
 

@@ -1,16 +1,29 @@
 <script setup lang="ts">
-import FTCenteredText from "src/components/FTCenteredText.vue";
-import { useI18n } from "vue-i18n";
+import type { FloorDoc, ReservationDoc } from "@firetable/types";
+import AdminEventRTInfo from "src/components/admin/event/AdminEventRTInfo.vue";
 
 interface Props {
-    eventInfo: string;
+    eventInfo: string | undefined;
+    floors: FloorDoc[];
+    activeReservations: ReservationDoc[];
+    returningGuests: { id: string }[];
 }
 
 const props = defineProps<Props>();
-const { t } = useI18n();
 </script>
 
 <template>
-    <div v-if="props.eventInfo">{{ props.eventInfo }}</div>
-    <FTCenteredText v-else>{{ t("EventInfo.eventInfoEmptyMsg") }}</FTCenteredText>
+    <div>
+        <!-- Event Info -->
+        <q-card v-if="props.eventInfo" class="q-mt-md ft-card">
+            <div>{{ props.eventInfo }}</div>
+        </q-card>
+
+        <!-- Overview Stats -->
+        <AdminEventRTInfo
+            :floors="props.floors"
+            :active-reservations="props.activeReservations"
+            :returning-guests="props.returningGuests"
+        />
+    </div>
 </template>

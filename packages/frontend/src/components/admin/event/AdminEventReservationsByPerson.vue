@@ -93,7 +93,7 @@ function generateTableData(reservations: PlannedReservationDoc[]): TableData {
 </script>
 
 <template>
-    <div>
+    <div class="q-pa-none">
         <q-table
             dense
             v-if="tableData.length > 0"

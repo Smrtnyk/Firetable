@@ -11,6 +11,7 @@ import { first, matchesProperty } from "es-toolkit/compat";
 import { AppLogger } from "src/logger/FTLogger";
 import { useAuthStore } from "src/stores/auth-store";
 import { usePropertiesStore } from "src/stores/properties-store";
+import { chunk } from "es-toolkit";
 
 export type GuestSummary = {
     guestId: string;
@@ -130,6 +131,82 @@ export const useGuestsStore = defineStore("guests", function () {
         AppLogger.info(`No cached guest found with id ${guestId}`);
     }
 
+    async function getGuestsByHashedContacts(
+        organisationId: string,
+        hashedContacts: string[],
+    ): Promise<GuestDoc[]> {
+        if (hashedContacts.length === 0) {
+            return [];
+        }
+        const guests = refsMap.value.get(organisationId);
+        let hashedContactsToFetch = [...hashedContacts];
+        let foundGuests: GuestDoc[] = [];
+        if (guests?.value.data) {
+            foundGuests = guests.value.data.filter(function (guest) {
+                return hashedContacts.includes(guest.hashedContact);
+            });
+
+            if (foundGuests.length === hashedContactsToFetch.length) {
+                AppLogger.info("All guests found in all guests cache");
+                return foundGuests;
+            }
+
+            hashedContactsToFetch = hashedContacts.filter(function (hashedContact) {
+                return !foundGuests.some(function (guest) {
+                    return guest.hashedContact === hashedContact;
+                });
+            });
+        }
+
+        // check cachedGuest cache if it has some guests
+        for (const missingHashedContact of hashedContactsToFetch) {
+            const cachedGuest = guestsCache.get(missingHashedContact);
+            if (cachedGuest) {
+                AppLogger.info("Guest found in guests cache");
+                foundGuests.push(cachedGuest);
+                hashedContactsToFetch = hashedContactsToFetch.filter(function (hashedContact) {
+                    return hashedContact !== missingHashedContact;
+                });
+            }
+        }
+
+        if (hashedContactsToFetch.length === 0) {
+            AppLogger.info("All guests found in cache");
+            return foundGuests;
+        }
+
+        const chunkedHashedContactsToFirestoreLimit = chunk(hashedContactsToFetch, 30);
+
+        AppLogger.info(
+            "Guests remaining to be fetched from firestore",
+            chunkedHashedContactsToFirestoreLimit.flat().join(",\n"),
+        );
+
+        const resultPromises = await Promise.all(
+            chunkedHashedContactsToFirestoreLimit.flatMap(function (chunkedHashedContacts) {
+                return useFirestoreCollection<GuestDoc>(
+                    createQuery(
+                        getGuestsPath(organisationId),
+                        where("hashedContact", "in", chunkedHashedContacts),
+                    ),
+                    { once: true, wait: true },
+                );
+            }),
+        );
+
+        await Promise.all(resultPromises.map((result) => result.promise.value));
+
+        const fetchedGuests = resultPromises.flatMap(function (result) {
+            return result.data.value;
+        });
+
+        for (const fetchedGuest of fetchedGuests) {
+            guestsCache.set(fetchedGuest.hashedContact, fetchedGuest);
+        }
+
+        return [...foundGuests, ...fetchedGuests];
+    }
+
     async function getGuestByHashedContact(
         organisationId: string,
         hashedContact: string,
@@ -241,6 +318,7 @@ export const useGuestsStore = defineStore("guests", function () {
     return {
         refsMap,
         cleanup,
+        getGuestsByHashedContacts,
         getGuestByHashedContact,
         invalidateGuestCache,
         getGuestSummaryForPropertyExcludingEvent,
