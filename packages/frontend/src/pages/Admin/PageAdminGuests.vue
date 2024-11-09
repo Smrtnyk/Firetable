@@ -7,9 +7,9 @@ import { useI18n } from "vue-i18n";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { storeToRefs } from "pinia";
 import { useDialog } from "src/composables/useDialog";
-import { computed, onUnmounted, ref, watch } from "vue";
+import { computed, onUnmounted, ref, useTemplateRef, watch } from "vue";
 import { isMobile } from "src/global-reactives/screen-detection";
-import { Loading } from "quasar";
+import { Loading, QVirtualScroll } from "quasar";
 import { useAuthStore } from "src/stores/auth-store";
 import { useGuestsStore } from "src/stores/guests-store";
 import { useLocalStorage } from "@vueuse/core";
@@ -221,6 +221,21 @@ function showCreateGuestDialog(): void {
         },
     });
 }
+
+const virtualListRef = useTemplateRef<QVirtualScroll>("virtualListRef");
+const showScrollButton = ref(false);
+const lastGuestIndex = computed(() => filteredGuests.value.length - 1);
+
+function onVirtualScroll({
+    index,
+}: Parameters<NonNullable<QVirtualScroll["onVirtualScroll"]>>[0]): void {
+    const scrollPercentage = index / filteredGuests.value.length;
+    showScrollButton.value = scrollPercentage > 0.1 && scrollPercentage < 0.9;
+}
+
+function scrollToBottom(): void {
+    virtualListRef.value?.scrollTo(lastGuestIndex.value, "end");
+}
 </script>
 
 <template>
@@ -272,6 +287,8 @@ function showCreateGuestDialog(): void {
             :items="filteredGuests"
             v-if="filteredGuests.length > 0 && !isLoading"
             v-slot="{ item }"
+            ref="virtualListRef"
+            @virtual-scroll="onVirtualScroll"
         >
             <q-item
                 :key="item.id"
@@ -328,5 +345,20 @@ function showCreateGuestDialog(): void {
                 @toggle-direction="toggleSortDirection"
             />
         </q-dialog>
+
+        <q-page-sticky
+            v-if="showScrollButton"
+            position="bottom"
+            :offset="[18, 18]"
+            class="scroll-to-bottom"
+        >
+            <q-btn @click="scrollToBottom" fab icon="chevron_down" color="secondary" />
+        </q-page-sticky>
     </div>
 </template>
+
+<style lang="scss">
+.scroll-to-bottom {
+    z-index: 999999;
+}
+</style>
