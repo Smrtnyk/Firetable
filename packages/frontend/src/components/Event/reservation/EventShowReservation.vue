@@ -172,7 +172,7 @@ function onWaitingForResponse(): void {
             />
             <FTBtn
                 v-if="canMoveToQueue"
-                title="Move to queue"
+                :title="t('EventShowReservation.moveToQueueLabel')"
                 icon="bookmark"
                 color="secondary"
                 @click="() => emit('queue')"

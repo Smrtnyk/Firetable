@@ -160,6 +160,7 @@ export default {
         guestHistoryLabel: "Gästehistorie",
         unlinkTablesLabel: "Tischverbindung aufheben",
         linkTablesLabel: "Tische verbinden",
+        moveToQueueLabel: "In die Warteschlange verschieben",
     },
     PlannedReservationForm: {
         reservedByStaffRadioBtnLabel: "Personal",
