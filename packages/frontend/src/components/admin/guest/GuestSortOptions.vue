@@ -49,9 +49,8 @@ function updateSelectedTags(value: string[]): void {
 <template>
     <q-card class="q-pa-md">
         <div class="row justify-center q-mb-md">
-            <div
+            <button
                 class="dialog-pill cursor-pointer"
-                role="button"
                 aria-label="Close dialog"
                 @click="$emit('close')"
             />

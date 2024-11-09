@@ -168,9 +168,9 @@ const { data: myIssues } = useFirestoreCollection<IssueReportDoc>(
         </FTTitle>
 
         <q-card class="q-pa-md ft-card">
-            <div class="text-h6 q-mb-md" role="heading" aria-level="2">
+            <h6 class="text-h6 q-mb-md">
                 {{ t("PageIssueReport.myIssues") }}
-            </div>
+            </h6>
 
             <q-list bordered separator v-if="myIssues?.length">
                 <q-item v-for="issue in myIssues" :key="issue.id">

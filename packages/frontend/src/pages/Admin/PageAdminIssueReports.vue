@@ -59,8 +59,8 @@ async function onDeleteIssue(issueId: string): Promise<void> {
     <div class="PageAdminIssueReports">
         <FTTitle :title="t('PageAdminIssueReports.title')" />
 
-        <q-list bordered separator v-if="issueReports.length > 0" role="list">
-            <q-item v-for="issue in issueReports" :key="issue.id" role="listitem">
+        <q-list bordered separator v-if="issueReports.length > 0">
+            <q-item v-for="issue in issueReports" :key="issue.id">
                 <q-item-section>
                     <q-item-label>
                         <q-badge

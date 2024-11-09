@@ -11,7 +11,7 @@ interface StageOptions {
 }
 
 export class Stage extends Group implements FloorEditorElement {
-    static override type = FloorElementTypes.STAGE;
+    static override readonly type = FloorElementTypes.STAGE;
 
     constructor(options: StageOptions) {
         const stageBodyOpts = options.objects?.[0] ?? {};

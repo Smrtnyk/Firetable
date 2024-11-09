@@ -11,7 +11,7 @@ interface DJBoothOptions {
 }
 
 export class DJBooth extends Group implements FloorEditorElement {
-    static override type = FloorElementTypes.DJ_BOOTH;
+    static override readonly type = FloorElementTypes.DJ_BOOTH;
 
     constructor(options: DJBoothOptions) {
         const bodyOpts = options.objects?.[0] ?? {};
