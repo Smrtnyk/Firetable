@@ -156,6 +156,7 @@ export default {
         guestHistoryLabel: "Guest history",
         unlinkTablesLabel: "Unlink tables",
         linkTablesLabel: "Link tables",
+        moveToQueueLabel: "Move to queue",
     },
     PlannedReservationForm: {
         reservedByStaffRadioBtnLabel: "Staff",
