@@ -147,7 +147,9 @@ const contactRate = computed(() => {
                 <q-card class="ft-card">
                     <q-card-section>
                         <div class="text-subtitle2">Avg. Consumption</div>
-                        <div class="text-h5">{{ reservationsStatus.averageConsumption }}</div>
+                        <div class="text-h5">
+                            {{ reservationsStatus.averageConsumption.toFixed(2) }}
+                        </div>
                     </q-card-section>
                 </q-card>
             </div>
