@@ -3,42 +3,52 @@ import type { WalkInReservation } from "./walk-in-reservation.js";
 import type { QueuedReservation } from "./queued-reservation.js";
 import { ReservationType } from "./base-reservation.js";
 
+/**
+ * Represents a planned reservation document in Firestore
+ * Used for advance bookings with specific requirements
+ */
 export interface PlannedReservation extends BaseReservation {
     /**
-     * The type of reservation.
+     * Identifies this as a planned reservation
      */
     type: ReservationType.PLANNED;
     /**
-     * If the reservation has been confirmed by the guest
+     * Whether the guest has confirmed their attendance
      */
     reservationConfirmed: boolean;
     /**
-     * If the reservation has been cancelled
+     * Whether the reservation has been cancelled
      */
     cancelled: boolean;
     /**
-     * If the guest has physically arrived
+     * Whether the guest has physically arrived
      */
     arrived: boolean;
     /**
-     * If the reservation is waiting for a response from the guest
+     * Whether we're waiting for the guest to respond
      */
     waitingForResponse?: boolean;
     /**
-     * The minimum consumption required for the reservation
+     * Minimum consumption requirement, can be in any currency or in amount of bottles
      */
     consumption: number;
     /**
-     * The name of the guest
+     * Name of the guest making the reservation
      */
     guestName: string;
     /**
-     * The contact information of the guest
+     * Contact details of the person who made the reservation
      */
     reservedBy: UserIdentifier;
 }
 
+/**
+ * Planned reservation with Firestore document ID
+ */
 export type PlannedReservationDoc = PlannedReservation & {
+    /**
+     * Firestore document ID
+     */
     id: string;
 };
 

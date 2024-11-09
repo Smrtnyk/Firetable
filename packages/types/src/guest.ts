@@ -17,70 +17,73 @@ export type GuestDataPayload = {
     eventDate: number;
 };
 
-export interface Visit {
-    /**
-     * Timestamp of the visit, which is event date
-     */
-    date: number;
-    /**
-     * Name of the event
-     */
-    eventName: string;
-    /**
-     * If the guest arrived at the event
-     */
-    arrived: boolean;
-    /**
-     * If the guest cancelled the visit
-     */
-    cancelled: boolean;
-    /**
-     * If the guest visit was a VIP
-     */
-    isVIPVisit?: boolean;
-}
-
-interface VisitedProperties {
-    [propertyId: string]: {
-        [eventId: string]: Visit | null;
-    };
-}
-
-type GuestTags = string[];
-
+/**
+ * Represents a guest document in Firestore
+ * Tracks guest information and their visit history
+ */
 export interface GuestDoc {
     /**
      * Firestore document ID
      */
     id: string;
     /**
-     * Guest name
+     * Guest's full name
      */
     name: string;
     /**
-     * Guest contact
+     * Guest's contact information (usually phone number)
      */
     contact: string;
     /**
-     * Hashed contact using SHA-256 algorithm
+     * SHA-256 hashed contact information for privacy
      */
     hashedContact: string;
     /**
-     * Masked contact
+     * Partially masked contact information for display
      */
     maskedContact: string;
     /**
-     * Timestamp of the last modification
+     * Unix timestamp of the last modification
      */
     lastModified?: number;
     /**
-     * Tags for the guest
+     * Custom tags assigned to the guest
      */
-    tags?: GuestTags;
+    tags?: string[];
     /**
-     * Visited properties
+     * History of properties and events visited by the guest
      */
-    visitedProperties: VisitedProperties;
+    visitedProperties: {
+        [propertyId: string]: {
+            [eventId: string]: Visit | null;
+        };
+    };
+}
+
+/**
+ * Represents a single visit record in the guest document
+ */
+export interface Visit {
+    /**
+     * Unix timestamp of the event date
+     */
+    date: number;
+    /**
+     * Name of the event attended
+     */
+    eventName: string;
+    /**
+     * Whether the guest physically arrived at the event
+     */
+    arrived: boolean;
+    /**
+     * Whether the guest cancelled their reservation
+     */
+    cancelled: boolean;
+    /**
+     * Whether this was a VIP visit
+     */
+    isVIPVisit?: boolean;
 }
 
 export type CreateGuestPayload = Omit<GuestDoc, "id">;

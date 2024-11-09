@@ -1,55 +1,86 @@
 import type { Timestamp } from "firebase/firestore";
 import type { User } from "./auth.js";
 
+/**
+ * Enum for different types of reservations
+ */
 export const enum ReservationType {
+    /**
+     * Guest arrived without prior reservation
+     */
     WALK_IN = 0,
+    /**
+     * Guest made a reservation in advance
+     */
     PLANNED = 1,
+    /**
+     * Guest is on waiting list
+     */
     QUEUED = 2,
 }
 
+/**
+ * Enum for reservation status in Firestore
+ */
 export const enum ReservationStatus {
+    /**
+     * Soft-deleted reservation
+     * Kept for analytics purposes
+     */
     DELETED = "Deleted",
+    /**
+     * Active reservation
+     */
     ACTIVE = "Active",
 }
 
+/**
+ * Basic user information needed for identification
+ */
 export type UserIdentifier = Pick<User, "email" | "id" | "name">;
 
+/**
+ * Base interface for all reservation types in Firestore
+ * Contains common fields shared across reservation types
+ */
 export interface BaseReservation {
     /**
-     * The id of the floor where the table is located
+     * Reference to the Firestore document ID of the floor
      */
     floorId: string;
     /**
-     * The id of the table where the reservation is located
+     * Table identifier(s) for the reservation
+     * Can be a single table or multiple linked tables
      */
     tableLabel: string[] | string;
     /**
-     * Optional telephone number of the guest
+     * Guest's contact information (usually phone number)
+     * Optional for privacy reasons
      */
     guestContact?: string;
     /**
-     * The number of guests in the reservation
+     * Number of guests in the party
      */
     numberOfGuests: number;
     /**
-     * Reservation note in case the guest has any special requests
+     * Special requests or notes for the reservation
      */
     reservationNote?: string;
     /**
-     * The time the reservation was created
-     * In string format of HH:mm
+     * Reservation time in 24-hour format (HH:mm)
      */
     time: string;
     /**
-     * The time the reservation was last cleared
-     * Remove Timestamp after some time has passed
-     * due to compat support for old reservations
+     * Unix timestamp when the reservation was cleared/completed
+     * @deprecated Remove Timestamp type after migration period
      */
     clearedAt?: Timestamp | number;
     /**
-     * Identifier of the user who created the reservation
+     * Information about who created the reservation and when
      */
-    creator: UserIdentifier & { createdAt: Timestamp | number };
+    creator: UserIdentifier & {
+        createdAt: Timestamp | number;
+    };
     /**
      * The status of the reservation
      * Either active or deleted
@@ -58,7 +89,7 @@ export interface BaseReservation {
      */
     status: ReservationStatus;
     /**
-     * If the guest is a VIP
+     * Indicates if this is a VIP reservation
      */
     isVIP: boolean;
 }
