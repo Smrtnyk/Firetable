@@ -60,7 +60,7 @@ export default defineConfig({
             provider: "playwright",
             viewport: {
                 width: 400,
-                height: 600,
+                height: 700,
             }
         },
     },

@@ -186,7 +186,7 @@ export class MockFirestore {
     }
 }
 
-class MockQuery {
+export class MockQuery {
     docs: MockQueryDocumentSnapshot[] = [];
     protected path: string;
     protected firestore: MockFirestore;

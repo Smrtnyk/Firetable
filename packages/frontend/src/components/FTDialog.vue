@@ -1,7 +1,7 @@
 <template>
     <q-dialog ref="dialogRef" :maximized="maximized || isMobile" persistent>
         <q-card
-            class="q-pt-none"
+            class="q-pt-none ft-card"
             :class="{
                 'limited-width': !maximized,
             }"

@@ -94,3 +94,9 @@ export function validOptionalURL(msg = "Not a valid url"): (val: string) => bool
         return (val && isValidUrl(val)) || msg;
     };
 }
+
+export function validEmail(msg = "Invalid email format"): (val: string) => boolean | string {
+    return function (val: string): boolean | string {
+        return /.+@.+\..+/.test(val) || msg;
+    };
+}
