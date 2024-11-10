@@ -5,6 +5,7 @@ import { Role } from "@firetable/types";
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createApp, ref } from "vue";
+import { getDefaultTimezone } from "src/helpers/date-utils";
 
 const {
     useFirestoreCollectionSpy,
@@ -124,8 +125,7 @@ describe("properties-store.ts", () => {
 
             const settings = store.getPropertySettingsById("property1");
             expect(settings).toEqual({
-                // Default timezone
-                timezone: expect.any(String),
+                timezone: getDefaultTimezone(),
             });
         });
 

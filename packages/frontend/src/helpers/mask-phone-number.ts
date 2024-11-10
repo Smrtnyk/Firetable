@@ -26,7 +26,6 @@ export function maskPhoneNumber(phoneNumber: string): string {
         throw new Error("National number too short to mask");
     }
 
-    // Mask all but the last four digits
     const maskedNationalNumber =
         nationalNumber.slice(0, -4).replaceAll(/\d/g, "X") + nationalNumber.slice(-4);
 

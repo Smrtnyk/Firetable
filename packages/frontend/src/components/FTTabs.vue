@@ -12,7 +12,6 @@ const emit = defineEmits<{
 
 const selectedTab = ref(props.modelValue);
 
-// Watch for external changes to modelValue and update selectedTab
 watch(
     () => props.modelValue,
     function (newValue) {
@@ -20,13 +19,11 @@ watch(
     },
 );
 
-// Emit update event when selectedTab changes
 watch(selectedTab, function (newValue) {
     emit("update:modelValue", newValue);
 });
 
 function handleInput(event: any): void {
-    // Directly emit the input event
     emit("input", event);
 }
 </script>

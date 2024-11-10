@@ -42,15 +42,8 @@ describe("PageAuth", () => {
     it("renders the form with initial values", async () => {
         const screen = renderComponent(PageAuth);
 
-        // Check that the username input is empty
-        const usernameInput = screen.getByLabelText("Username *");
-        await expect.element(usernameInput).toHaveValue("");
-
-        // Check that the password input is empty
-        const passwordInput = screen.getByLabelText("Password *");
-        await expect.element(passwordInput).toHaveValue("");
-
-        // Check that the password is of type 'password'
+        await expect.element(screen.getByLabelText("Username *")).toHaveValue("");
+        await expect.element(screen.getByLabelText("Password *")).toHaveValue("");
         await expect.element(passwordInput).toHaveAttribute("type", "password");
     });
 
@@ -60,16 +53,13 @@ describe("PageAuth", () => {
         const loginButton = screen.getByRole("button", { name: "Login" });
         await userEvent.click(loginButton);
 
-        // Check for validation errors
-        const usernameError = screen.getByText("Please type something");
-        await expect.element(usernameError).toBeVisible();
+        await expect.element(screen.getByText("Please type something")).toBeVisible();
 
         const passwordError = screen.getByText(
             "Please enter your password, it has to contain minimum 5 characters.",
         );
         await expect.element(passwordError).toBeVisible();
 
-        // Ensure that loginWithEmail was not called
         expect(loginWithEmailSpy).not.toHaveBeenCalled();
     });
 
@@ -79,7 +69,6 @@ describe("PageAuth", () => {
         // Initially, password type should be 'password'
         await expect.element(passwordInput).toHaveAttribute("type", "password");
 
-        // Click the eye icon to toggle visibility
         const eyeIcon = screen.getByLabelText("Toggle password visibility");
         await userEvent.click(eyeIcon);
 
@@ -104,15 +93,11 @@ describe("PageAuth", () => {
 
         await nextTick();
 
-        // Ensure that loginWithEmail was called with correct arguments
         expect(loginWithEmailSpy).toHaveBeenCalledWith("testuser", "password123");
-
-        // Ensure that router.replace was called to navigate to "/"
         expect(routerReplaceSpy).toHaveBeenCalledWith("/");
     });
 
     it("shows error when login fails", async () => {
-        // Simulate loginWithEmail throwing an error
         loginWithEmailSpy.mockImplementation(() => {
             console.log("threw");
             throw new Error("Invalid credentials");
@@ -145,13 +130,10 @@ describe("PageAuth", () => {
         const loginButton = screen.getByRole("button", { name: "Login" });
         await userEvent.click(loginButton);
 
-        // Check for validation error
         const passwordError = screen.getByText(
             "Please enter your password, it has to contain minimum 5 characters.",
         );
         await expect.element(passwordError).toBeVisible();
-
-        // Ensure that loginWithEmail was not called
         expect(loginWithEmailSpy).not.toHaveBeenCalled();
     });
 });

@@ -9,7 +9,6 @@ import { Loading } from "quasar";
 import { AppLogger } from "src/logger/FTLogger";
 import { AdminRole, Role } from "@firetable/types";
 
-// Mock implementations
 vi.mock("vuefire", () => ({
     getCurrentUser: vi.fn(),
 }));

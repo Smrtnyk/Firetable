@@ -33,7 +33,6 @@ export default boot(function ({ router, app }) {
         }
     });
 
-    // Handle auth state changes
     handleOnAuthStateChanged(router, authStore);
 });
 
@@ -41,8 +40,6 @@ function handleOnAuthStateChanged(
     router: Router,
     authStore: ReturnType<typeof useAuthStore>,
 ): void {
-    // Tell the application what to do when the
-    // authentication state has changed
     let isFirstCall = true;
     const currentUser = useCurrentUser();
     watch(

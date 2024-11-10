@@ -7,7 +7,6 @@ export function capitalizeName(name: string): string {
         return "";
     }
 
-    // Step 1: Capitalize first letter of each word and each hyphenated sub-word
     const capitalized = name
         .split(" ")
         .filter(Boolean)
@@ -22,7 +21,6 @@ export function capitalizeName(name: string): string {
         })
         .join(" ");
 
-    // Step 2: Capitalize letters following apostrophes
     return capitalized.replaceAll(/'(\w)/g, function (_, letter) {
         return `'${letter.toUpperCase()}`;
     });

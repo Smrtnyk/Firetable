@@ -44,18 +44,14 @@ export abstract class BaseLogger {
      * @param args - Additional arguments for logging.
      */
     public errorAndAddToBody(message: unknown, ...args: unknown[]): void {
-        // First, log the error using the existing error method
         this.error(message, ...args);
 
-        // Create a new DOM element for the error message
         const errorElement = document.createElement("div");
 
-        // Style the error element (optional)
         errorElement.style.color = "red";
         errorElement.style.fontWeight = "bold";
         errorElement.style.margin = "10px 0";
 
-        // Determine if the message is an Error object or a string, and include args
         let errorText = `${this.prefix} [ERROR]: `;
 
         if (this.#isError(message)) {
@@ -66,16 +62,13 @@ export abstract class BaseLogger {
             errorText += `An unknown error occurred`;
         }
 
-        // Append all additional arguments
         if (args.length > 0) {
             const formattedArgs = args.map((arg) => this.#formatArg(arg)).join(" ");
             errorText += ` | Additional Info: ${formattedArgs}`;
         }
 
-        // Set the content of the error element
         errorElement.textContent = errorText;
 
-        // Append the error element to the body of the HTML document
         document.body.appendChild(errorElement);
     }
 

@@ -39,7 +39,6 @@ describe("capitalizeName", () => {
     });
 
     it("handles names with special characters gracefully", () => {
-        // Non-alphabetic characters
         expect(capitalizeName("milan@keser")).toBe("Milan@keser");
         expect(capitalizeName("milan-keser123")).toBe("Milan-Keser123");
     });

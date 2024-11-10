@@ -61,7 +61,6 @@ describe("hashString", () => {
 
     it("handles long strings efficiently", async () => {
         const longString = "a".repeat(1000);
-        // Precomputed hash
         const expectedHash = "41edece42d63e8d9bf515a9ba6932e1c20cbc9f5a5d134645adb5db1b9737ea3";
         expect(await hashString(longString)).toBe(expectedHash);
     });

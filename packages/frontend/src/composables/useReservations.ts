@@ -282,7 +282,7 @@ export function useReservations(
             return;
         }
 
-        // Add check for cross-floor linking
+        // cross floor linking not supported
         if (sourceFloor.id !== targetFloor.id) {
             showErrorMessage(t("useReservations.crossFloorLinkErrorMsg"));
             return;

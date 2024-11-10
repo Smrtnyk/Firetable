@@ -41,7 +41,6 @@ vi.mock("../backend-proxy", () => ({
     propertiesCollection: vi.fn(),
 }));
 
-// Test helpers and fixtures
 type TestStores = {
     guestsStore: ReturnType<typeof useGuestsStore>;
     propertiesStore: ReturnType<typeof usePropertiesStore>;
@@ -373,14 +372,12 @@ describe("Guests Store", () => {
             // Get the callbacks that were passed to subscribeToGuests
             const callbacks = subscribeToGuestsSpy.mock.calls[0][1];
 
-            // Test onAdd
             callbacks.onAdd(guestDoc);
             expect(result.value).toEqual({
                 data: [guestDoc],
                 pending: true,
             });
 
-            // Test onModify
             const modifiedGuest = { ...guestDoc, name: "Modified Name" };
             callbacks.onModify(modifiedGuest);
             expect(result.value).toEqual({
@@ -388,19 +385,16 @@ describe("Guests Store", () => {
                 pending: true,
             });
 
-            // Test onRemove
             callbacks.onRemove(guestDoc.id);
             expect(result.value).toEqual({
                 data: [],
                 pending: true,
             });
 
-            // Test onError
             const error = new Error("Test error");
             callbacks.onError(error);
             expect(result.value.pending).toBe(false);
 
-            // Test onReady
             callbacks.onReady();
             expect(result.value.pending).toBe(false);
         });
@@ -444,7 +438,7 @@ describe("Guests Store", () => {
 
     describe("getGuestSummaryForPropertyExcludingEvent", () => {
         beforeEach(() => {
-            // Mock current date to be fixed for consistent testing
+            // for consistent testing
             vi.setSystemTime(new Date("2024-01-01"));
         });
 

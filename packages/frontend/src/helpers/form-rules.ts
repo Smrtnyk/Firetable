@@ -62,7 +62,6 @@ export function greaterThanZero(
 
 export function noNegativeNumber(msg: string): (val: unknown) => boolean | string {
     return function (val: unknown): boolean | string {
-        // Check if val is a number or a string that can be converted to a number
         const isNumberType = typeof val === "number";
         const isStringWithNumber = isString(val) && val.trim() !== "" && !Number.isNaN(Number(val));
 
