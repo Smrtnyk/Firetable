@@ -27,19 +27,26 @@ export abstract class Floor {
     readonly canvas: Canvas;
     width: number;
     containerWidth: number;
+    containerHeight: number;
     touchManager: TouchManager;
     zoomManager: FloorZoomManager;
 
     protected abstract eventManager: EventManager;
 
     protected constructor(options: FloorCreationOptions) {
-        const { canvas, floorDoc, containerWidth } = options;
+        const { canvas, floorDoc, containerWidth, containerHeight } = options;
 
-        this.scale = calculateCanvasScale(containerWidth, floorDoc.width);
+        this.scale = calculateCanvasScale(
+            containerWidth,
+            containerHeight,
+            floorDoc.width,
+            floorDoc.height,
+        );
         this.id = floorDoc.id;
         this.name = floorDoc.name;
         this.width = floorDoc.width;
         this.containerWidth = containerWidth;
+        this.containerHeight = containerHeight;
         this.height = floorDoc.height;
         this.floorDoc = floorDoc;
 
@@ -115,9 +122,15 @@ export abstract class Floor {
         this.canvas.requestRenderAll();
     }
 
-    resize(pageContainerWidth: number): void {
+    resize(pageContainerWidth: number, pageContainerHeight: number): void {
         this.containerWidth = pageContainerWidth;
-        this.scale = calculateCanvasScale(this.containerWidth, this.floorDoc.width);
+        this.containerHeight = pageContainerHeight;
+        this.scale = calculateCanvasScale(
+            this.containerWidth,
+            this.containerHeight,
+            this.floorDoc.width,
+            this.floorDoc.height,
+        );
         this.setScaling();
         this.zoomManager.setScale(this.scale);
     }

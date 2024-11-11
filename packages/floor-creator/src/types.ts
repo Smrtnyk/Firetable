@@ -13,6 +13,7 @@ export interface FloorCreationOptions {
     canvas: HTMLCanvasElement;
     floorDoc: FloorData;
     containerWidth: number;
+    containerHeight: number;
 }
 
 export interface FloorData {

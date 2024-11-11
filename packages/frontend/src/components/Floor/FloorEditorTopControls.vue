@@ -197,10 +197,3 @@ onMounted(function () {
         </div>
     </q-card>
 </template>
-
-<style lang="scss">
-.FloorEditorTopControls {
-    position: absolute;
-    top: 0.5%;
-}
-</style>

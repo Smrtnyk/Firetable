@@ -3,7 +3,6 @@ import type { FloorEditorElement, FloorEditor } from "@firetable/floor-creator";
 import type { FloorDoc } from "@firetable/types";
 import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
 import FloorEditorTopControls from "src/components/Floor/FloorEditorTopControls.vue";
-
 import { onMounted, useTemplateRef } from "vue";
 import { useRouter } from "vue-router";
 import { Loading } from "quasar";
@@ -14,11 +13,11 @@ import {
     updateFirestoreDocument,
     useFirestoreDocument,
 } from "src/composables/useFirestore";
-import { isTablet } from "src/global-reactives/screen-detection";
 import { getFloorPath } from "@firetable/backend";
 import { compressFloorDoc, decompressFloorDoc } from "src/helpers/compress-floor-doc";
 import { useFloorEditor } from "src/composables/useFloorEditor";
 import { useEventListener } from "@vueuse/core";
+import { isTablet } from "src/global-reactives/screen-detection";
 
 interface Props {
     floorId: string;
@@ -69,7 +68,6 @@ function instantiateFloor(floorDoc: FloorDoc): void {
     initializeFloor({
         canvasElement: canvasRef.value,
         floorDoc: decompressFloorDoc(floorDoc),
-        containerWidth: pageRef.value.clientWidth,
     });
 }
 
@@ -103,24 +101,100 @@ function onDeleteElement(element: FloorEditorElement): void {
 </script>
 
 <template>
-    <div class="PageAdminFloorEdit flex column justify-center" ref="pageRef">
-        <FloorEditorTopControls
-            v-if="selectedElement && !isTablet && floorInstance"
-            :selected-floor-element="selectedElement"
-            :floor-instance="floorInstance"
-            :existing-labels="new Set(extractAllTablesLabels(floorInstance as FloorEditor))"
-            @delete="onDeleteElement"
-        />
-
-        <FloorEditorControls
-            v-if="floorInstance && !isTablet"
-            :floor-instance="floorInstance"
-            @floor-save="onFloorSave"
-            @floor-update="onFloorChange"
-        />
-
-        <div class="ft-card ft-border ft-no-border-radius">
-            <canvas v-if="floor && !isFloorLoading" ref="canvasRef" />
+    <div class="PageAdminFloorEdit floor-editor-page">
+        <div :class="['grid-container', { 'is-tablet': isTablet }]">
+            <div class="left-controls" v-if="!isTablet">
+                <FloorEditorControls
+                    v-if="floorInstance"
+                    :floor-instance="floorInstance"
+                    @floor-save="onFloorSave"
+                    @floor-update="onFloorChange"
+                />
+            </div>
+            <div class="main-content" ref="pageRef">
+                <div class="top-controls" v-if="selectedElement && floorInstance && !isTablet">
+                    <FloorEditorTopControls
+                        :selected-floor-element="selectedElement"
+                        :floor-instance="floorInstance"
+                        :existing-labels="
+                            new Set(extractAllTablesLabels(floorInstance as FloorEditor))
+                        "
+                        @delete="onDeleteElement"
+                    />
+                </div>
+                <div class="floor-editor ft-card ft-border">
+                    <canvas v-if="floor && !isFloorLoading" ref="canvasRef" />
+                </div>
+            </div>
         </div>
     </div>
 </template>
+
+<style lang="scss" scoped>
+.floor-editor-page {
+    width: 100%;
+    height: 100%;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    grid-template-rows: 100%;
+    grid-template-areas: "left main";
+    width: 100%;
+    height: 100vh;
+}
+
+.left-controls {
+    grid-area: left;
+    overflow-y: auto;
+    margin: auto auto auto 10px;
+}
+
+.main-content {
+    grid-area: main;
+    display: grid;
+    grid-template-rows: 8% 94%;
+    grid-template-areas:
+        "top"
+        "editor";
+    width: calc(100vw - 270px);
+    height: calc(100vh - 140px);
+}
+
+.top-controls {
+    width: 90%;
+    margin: auto;
+    grid-area: top;
+    overflow-y: auto;
+}
+
+.floor-editor {
+    margin: auto;
+    grid-area: editor;
+    position: relative;
+}
+
+/*  for tablet and smaller screens */
+.grid-container.is-tablet {
+    grid-template-columns: 1fr; /* Only one column */
+    grid-template-areas: "main"; /* Only main area */
+}
+
+.grid-container.is-tablet .main-content {
+    grid-template-rows: 1fr; /* Only one row */
+    grid-template-areas: "editor"; /* Only editor area */
+    width: 100%;
+    height: 100vh;
+}
+
+.grid-container.is-tablet .top-controls {
+    display: none; /* Hide top-controls if present */
+}
+
+.grid-container.is-tablet .floor-editor {
+    grid-area: editor;
+    width: 100%;
+    height: 100%;
+}
+</style>

@@ -209,11 +209,6 @@ function onFloorSave(): void {
 
 <style lang="scss">
 .FloorEditorControls {
-    max-width: 15%;
-    position: absolute;
-    left: 0.5%;
-    top: 0.5%;
-
     .element-container {
         display: grid;
         grid-template-columns: 1fr;

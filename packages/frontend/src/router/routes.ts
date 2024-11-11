@@ -260,6 +260,23 @@ export const routes: RouteRecordRaw[] = [
         ],
     },
     {
+        path: "/admin/floors/:organisationId/:propertyId/:floorId",
+        component: () => import("layouts/FloorEditorLayout.vue"),
+        meta: {
+            requiresAuth: true,
+            allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, AdminRole.ADMIN],
+        },
+        props: true,
+        children: [
+            {
+                path: "",
+                name: "adminFloorEdit",
+                component: () => import("src/pages/Admin/PageAdminFloorEdit.vue"),
+                props: true,
+            },
+        ],
+    },
+    {
         path: "/auth",
         name: "auth",
         meta: { requiresAuth: false },

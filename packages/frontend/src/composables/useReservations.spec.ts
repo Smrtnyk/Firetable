@@ -1496,6 +1496,7 @@ async function createTestFloor(name = "Test floor", id = "1"): Promise<FloorView
             json: "",
         },
         containerWidth: 500,
+        containerHeight: 500,
     });
 
     editor.addElement({
@@ -1525,6 +1526,7 @@ async function createTestFloor(name = "Test floor", id = "1"): Promise<FloorView
         canvas,
         floorDoc,
         containerWidth: 400,
+        containerHeight: 600,
     });
 
     await new Promise<void>((resolve) => {

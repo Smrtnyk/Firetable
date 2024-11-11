@@ -62,7 +62,10 @@ export function useFloorEditor(containerRef: ShallowRef<HTMLElement | null>) {
         if (!containerRef.value) {
             return;
         }
-        floorInstance.value?.resize(containerRef.value.clientWidth);
+        floorInstance.value?.resize(
+            containerRef.value.clientWidth,
+            containerRef.value.clientHeight,
+        );
     }, 100);
 
     async function onElementClick(
@@ -100,16 +103,18 @@ export function useFloorEditor(containerRef: ShallowRef<HTMLElement | null>) {
     function initializeFloor({
         canvasElement,
         floorDoc,
-        containerWidth,
     }: {
         canvasElement: HTMLCanvasElement;
         floorDoc: FloorDoc;
-        containerWidth: number;
     }): void {
+        if (!containerRef.value) {
+            throw new Error("Container is not defined!");
+        }
         const floorEditor = new FloorEditor({
             canvas: canvasElement,
             floorDoc,
-            containerWidth,
+            containerWidth: containerRef.value.clientWidth,
+            containerHeight: containerRef.value.clientHeight,
         });
 
         floorInstance.value = floorEditor;
