@@ -77,6 +77,10 @@ const state = ref<State>({
 });
 
 function validDates(calendarDate: string): boolean {
+    if (isEditMode.value) {
+        // In edit mode, allow all dates
+        return true;
+    }
     const today = new Date();
     const formatter = new Intl.DateTimeFormat("en-US", {
         timeZone: props.propertyTimezone,
@@ -252,7 +256,7 @@ function onReset(): void {
             class="q-mb-lg"
         >
             <template #prepend>
-                <q-icon name="calendar" class="cursor-pointer" />
+                <q-icon aria-label="Open date calendar" name="calendar" class="cursor-pointer" />
                 <q-popup-proxy transition-show="scale" transition-hide="scale">
                     <q-date
                         :no-unset="true"
@@ -274,7 +278,7 @@ function onReset(): void {
                 </q-popup-proxy>
             </template>
             <template #append>
-                <q-icon name="clock" class="cursor-pointer" />
+                <q-icon name="clock" aria-label="Open time picker" class="cursor-pointer" />
                 <q-popup-proxy transition-show="scale" transition-hide="scale">
                     <q-time
                         v-model="state.selectedTime"

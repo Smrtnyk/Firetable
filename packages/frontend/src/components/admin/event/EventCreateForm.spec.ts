@@ -220,5 +220,30 @@ describe("EventCreateForm", () => {
                 organisationId: props.organisationId,
             });
         });
+
+        it("allows selecting past dates in edit mode", async () => {
+            const screen = renderComponent(EventCreateForm, props);
+
+            const calendarIcon = screen.getByLabelText("Open date calendar");
+            await userEvent.click(calendarIcon);
+
+            // yesterday's date
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+            const yesterdayDay = yesterday.getDate().toString();
+
+            // find the date cell for yesterday
+            const dateCell = screen.getByRole("button", { name: yesterdayDay });
+            await userEvent.click(dateCell);
+
+            const closeButton = screen.getByRole("button", { name: "Close" });
+            await userEvent.click(closeButton);
+
+            const dateValue = screen
+                .getByLabelText("Event date and time")
+                .query() as HTMLInputElement;
+            expect(dateValue.value).toStrictEqual(expect.stringContaining(yesterdayDay));
+        });
     });
 });
