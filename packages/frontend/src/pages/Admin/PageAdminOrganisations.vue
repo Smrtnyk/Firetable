@@ -8,8 +8,8 @@ import FTCenteredText from "src/components/FTCenteredText.vue";
 import FTBtn from "src/components/FTBtn.vue";
 
 import { useQuasar } from "quasar";
-import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { createNewOrganisation, deleteOrganisation } from "@firetable/backend";
+import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { createNewOrganisation } from "@firetable/backend";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { storeToRefs } from "pinia";
@@ -46,6 +46,11 @@ function createLinks(organisationId: string): Link[] {
             icon: "cog-wheel",
             route: { name: "adminOrganisationSettings", params },
         },
+        {
+            label: "Go to Organisation Page",
+            icon: "link",
+            route: { name: "adminOrganisation", params },
+        },
     ];
 }
 
@@ -57,21 +62,6 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
             return propertiesStore.initOrganisations();
         },
     });
-}
-
-async function onDeleteOrganisation(id: string): Promise<void> {
-    await tryCatchLoadingWrapper({
-        async hook() {
-            await deleteOrganisation(id);
-            await propertiesStore.initOrganisations();
-        },
-    });
-}
-
-async function deleteOrganisationAsync(organisationId: string): Promise<void> {
-    if (await showConfirm("Delete organisation?")) {
-        return onDeleteOrganisation(organisationId);
-    }
 }
 
 function createOrganisation(): void {
@@ -121,12 +111,6 @@ function createOrganisation(): void {
                         <q-item-section>
                             {{ item.label }}
                         </q-item-section>
-                    </q-item>
-                    <q-item clickable @click="deleteOrganisationAsync(organisation.id)">
-                        <q-item-section avatar>
-                            <q-icon name="trash" color="red" />
-                        </q-item-section>
-                        <q-item-section> Delete Organisation </q-item-section>
                     </q-item>
                 </q-list>
             </q-expansion-item>

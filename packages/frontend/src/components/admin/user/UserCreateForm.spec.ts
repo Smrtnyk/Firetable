@@ -2,8 +2,8 @@ import type { UserCreateFormProps } from "./UserCreateForm.vue";
 import type { PropertyDoc } from "@firetable/types";
 import UserCreateForm from "./UserCreateForm.vue";
 import { renderComponent, t } from "../../../../test-helpers/render-component";
-import { vi, describe, it, beforeEach, expect } from "vitest";
-import { AdminRole, Role } from "@firetable/types";
+import { AdminRole, OrganisationStatus, Role } from "@firetable/types";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 import { first } from "es-toolkit/compat";
 
@@ -31,9 +31,9 @@ describe("UserCreateForm", () => {
                 id: "org1",
                 name: "TestOrg",
                 maxAllowedProperties: 2,
+                status: OrganisationStatus.ACTIVE,
             },
         };
-        showErrorMessageSpy.mockClear();
     });
 
     it("renders the form with initial values", async () => {

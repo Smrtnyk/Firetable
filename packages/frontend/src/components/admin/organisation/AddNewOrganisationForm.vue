@@ -4,6 +4,7 @@ import { ref, useTemplateRef } from "vue";
 import { greaterThanZero, minLength, requireNumber } from "src/helpers/form-rules";
 import { QForm } from "quasar";
 import { useI18n } from "vue-i18n";
+import { OrganisationStatus } from "@firetable/types";
 
 const { t } = useI18n();
 
@@ -23,6 +24,7 @@ async function submit(): Promise<void> {
     emit("create", {
         name: organisationName.value,
         maxAllowedProperties: Number(maxAllowedProperties.value),
+        status: OrganisationStatus.PENDING,
     });
 }
 </script>

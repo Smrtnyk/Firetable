@@ -43,7 +43,8 @@ describe("PageAuth", () => {
         const screen = renderComponent(PageAuth);
 
         await expect.element(screen.getByLabelText("Username *")).toHaveValue("");
-        await expect.element(screen.getByLabelText("Password *")).toHaveValue("");
+        const passwordInput = screen.getByLabelText("Password *");
+        await expect.element(passwordInput).toHaveValue("");
         await expect.element(passwordInput).toHaveAttribute("type", "password");
     });
 

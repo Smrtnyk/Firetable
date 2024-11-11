@@ -1,5 +1,12 @@
 export type AspectRatio = "1" | "16:9";
 
+export const enum OrganisationStatus {
+    ACTIVE = "active",
+    DISABLED = "disabled",
+    PENDING = "pending",
+    SUSPENDED = "suspended",
+}
+
 /**
  * Represents an organisation document in Firestore
  * An organisation is the top-level entity that owns properties
@@ -21,6 +28,10 @@ export interface OrganisationDoc {
      * Organisation-wide settings
      */
     settings?: OrganisationSettings | undefined;
+    /**
+     * Status of the organisation
+     */
+    status?: OrganisationStatus;
 }
 
 /**

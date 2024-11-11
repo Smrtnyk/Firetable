@@ -2,8 +2,13 @@ import type { UserEditFormProps } from "./UserEditForm.vue";
 import type { PropertyDoc } from "@firetable/types";
 import UserEditForm from "./UserEditForm.vue";
 import { renderComponent } from "../../../../test-helpers/render-component";
-import { Role, DEFAULT_CAPABILITIES_BY_ROLE, UserCapability } from "@firetable/types";
-import { describe, it, beforeEach, expect } from "vitest";
+import {
+    DEFAULT_CAPABILITIES_BY_ROLE,
+    OrganisationStatus,
+    Role,
+    UserCapability,
+} from "@firetable/types";
+import { beforeEach, describe, expect, it } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 import { first } from "es-toolkit/compat";
 
@@ -31,6 +36,7 @@ describe("UserEditForm", () => {
                 id: "org1",
                 name: "TestOrg",
                 maxAllowedProperties: 2,
+                status: OrganisationStatus.ACTIVE,
             },
         };
     });

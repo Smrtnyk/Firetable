@@ -116,6 +116,17 @@ export const routes: RouteRecordRaw[] = [
                 },
                 component: () => import("src/pages/Admin/PageAdminOrganisations.vue"),
             },
+
+            {
+                path: "organisation/:organisationId",
+                name: "adminOrganisation",
+                component: () => import("src/pages/Admin/PageAdminOrganisation.vue"),
+                props: true,
+                meta: {
+                    requiresAuth: true,
+                    allowedRoles: [AdminRole.ADMIN],
+                },
+            },
             {
                 path: "/admin/organisations/:organisationId/settings",
                 name: "adminOrganisationSettings",

@@ -1,10 +1,11 @@
-import type { OrganisationDoc, OrganisationSettings } from "@firetable/types";
+import type { OrganisationDoc, OrganisationSettings, OrganisationStatus } from "@firetable/types";
 import { organisationDoc, organisationsCollection } from "./db.js";
 import { deleteDoc, getDocs, getDoc, addDoc, updateDoc } from "firebase/firestore";
 
 export interface CreateOrganisationPayload {
     name: string;
     maxAllowedProperties: number;
+    status: OrganisationStatus;
 }
 
 export async function createNewOrganisation(
@@ -20,7 +21,9 @@ export function deleteOrganisation(organisationId: string): Promise<void> {
 
 export async function fetchOrganisationsForAdmin(): Promise<OrganisationDoc[]> {
     const propertiesSnapshot = await getDocs(organisationsCollection());
-    return propertiesSnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }) as OrganisationDoc);
+    return propertiesSnapshot.docs.map(function (document) {
+        return { ...document.data(), id: document.id } as OrganisationDoc;
+    });
 }
 
 export async function fetchOrganisationById(
