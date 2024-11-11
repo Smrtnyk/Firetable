@@ -16,7 +16,7 @@
         "@google-cloud/functions-framework": "3.4.2",
         "firebase-admin": "12.7.0",
         "firebase-functions": "6.1.0",
-        "es-toolkit": "1.26.1"
+        "es-toolkit": "1.27.0"
     },
     "devDependencies": {
         "@faker-js/faker": "9.2.0",
