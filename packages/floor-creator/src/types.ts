@@ -36,6 +36,7 @@ export interface FloorEditorElement extends FabricObject {
     changeToFilledMode?(): void;
 
     setDimensions(width: number, height: number): void;
+    nextDesign?(): void;
 }
 
 export type CreateElementOptions = {
@@ -56,6 +57,7 @@ export enum FloorElementTypes {
     DOOR = "Door",
     EDITABLE_RECT = "EditableRect",
     EDITABLE_CIRCLE = "EditableCircle",
+    BAR = "Bar",
 }
 
 export type NumberTuple = [number, number];

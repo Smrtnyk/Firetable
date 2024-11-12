@@ -194,6 +194,14 @@ onMounted(function () {
                 icon="fill"
                 @click="selectedFloorElement.changeToFilledMode()"
             />
+
+            <q-btn
+                v-if="'nextDesign' in selectedFloorElement"
+                title="Switch to fill element"
+                round
+                icon="chevron_right"
+                @click="selectedFloorElement.nextDesign()"
+            />
         </div>
     </q-card>
 </template>

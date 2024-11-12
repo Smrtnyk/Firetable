@@ -46,4 +46,9 @@ export const ELEMENTS_TO_ADD_COLLECTION = [
         img: "/svg-images/door.svg",
         tag: FloorElementTypes.DOOR,
     },
+    {
+        label: "Bar",
+        img: "/svg-images/cocktail.svg",
+        tag: FloorElementTypes.BAR,
+    },
 ];

@@ -189,12 +189,12 @@ function onFloorSave(): void {
         <!-- Add Element -->
         <q-separator inset />
 
-        <div class="row items-center">
+        <div class="row items-center justify-around">
             <div
                 draggable="true"
                 v-for="element in ELEMENTS_TO_ADD_COLLECTION"
                 :key="element.tag"
-                class="col-6 justify-center text-center q-my-md"
+                class="col-5 justify-even text-center q-my-sm ft-border q-py-sm"
                 @dragstart="onDragStart($event, element.tag)"
             >
                 <p>{{ element.label }}</p>

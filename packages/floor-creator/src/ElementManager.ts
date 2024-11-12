@@ -11,6 +11,7 @@ import { RectTable } from "./elements/RectTable.js";
 import { Stage } from "./elements/Stage.js";
 import { SpiralStaircase } from "./elements/SpiralStaircase.js";
 import { Door } from "./elements/Door.js";
+import { Bar } from "./elements/Bar.js";
 
 export class ElementManager {
     addElement(options: CreateElementOptions): FabricObject {
@@ -35,6 +36,8 @@ export class ElementManager {
                 return this.addEditableRect(options);
             case FloorElementTypes.EDITABLE_CIRCLE:
                 return this.addEditableCircle(options);
+            case FloorElementTypes.BAR:
+                return this.addBar(options);
             default:
                 throw new Error(`Unknown floor element type: ${options.tag}`);
         }
@@ -128,6 +131,10 @@ export class ElementManager {
                 label,
             },
         });
+    }
+
+    private addBar({ x, y }: CreateElementOptions): Bar {
+        return new Bar({ left: x, top: y });
     }
 
     private verifyLabel(label: string | undefined): asserts label {
