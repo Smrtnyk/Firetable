@@ -332,13 +332,18 @@ export function useReservations(
         });
     }
 
-    function handleReservationUpdate(reservationData: ReservationDoc): void {
+    function handleReservationUpdate(
+        reservationData: ReservationDoc,
+        oldReservation: ReservationDoc,
+    ): void {
         void tryCatchLoadingWrapper({
             async hook() {
                 await updateReservationDoc(eventOwner, reservationData);
                 notifyPositive(t("useReservations.reservationUpdatedMsg"));
+
                 eventEmitter.emit("reservation:updated", {
                     reservation: reservationData,
+                    oldReservation,
                     eventOwner,
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
                     event: event.value!,
@@ -499,7 +504,8 @@ export function useReservations(
                         dialog.hide();
                     },
                     update(reservationData: ReservationDoc) {
-                        handleReservationUpdate(reservationData);
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if reservation was undefined
+                        handleReservationUpdate(reservationData, reservation!);
                         dialog.hide();
                     },
                 },

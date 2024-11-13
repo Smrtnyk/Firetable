@@ -38,6 +38,30 @@ eventEmitter.on("reservation:deleted", function ({ reservation, eventOwner, even
     );
 });
 
+eventEmitter.on(
+    "reservation:updated",
+    function ({ reservation, oldReservation, eventOwner, event }) {
+        const contactAdded = !oldReservation.guestContact && reservation.guestContact;
+        const contactChanged = oldReservation.guestContact !== reservation.guestContact;
+
+        if (contactAdded) {
+            handleGuestDataForReservation(reservation, event, eventOwner, GuestDataMode.SET).catch(
+                AppLogger.error.bind(AppLogger),
+            );
+        } else if (contactChanged) {
+            handleGuestDataForReservation(
+                oldReservation,
+                event,
+                eventOwner,
+                GuestDataMode.DELETE,
+            ).catch(AppLogger.error.bind(AppLogger));
+            handleGuestDataForReservation(reservation, event, eventOwner, GuestDataMode.SET).catch(
+                AppLogger.error.bind(AppLogger),
+            );
+        }
+    },
+);
+
 async function handleGuestDataForReservation(
     reservationData: Reservation,
     event: EventDoc,

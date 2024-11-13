@@ -31,11 +31,16 @@ interface UnlinkEventData extends BaseEventData {
     unlinkedTableLabels: string[];
 }
 
+interface UpdateReservationEventData extends BaseEventData {
+    reservation: ReservationDoc;
+    oldReservation: ReservationDoc;
+}
+
 type Events = {
     "reservation:created": BaseEventData & {
         reservation: Reservation;
     };
-    "reservation:updated": BaseReservationEventData;
+    "reservation:updated": UpdateReservationEventData;
     "reservation:deleted": BaseReservationEventData;
     "reservation:deleted:soft": BaseReservationEventData;
     "reservation:copied": {

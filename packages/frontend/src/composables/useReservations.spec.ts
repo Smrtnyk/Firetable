@@ -1373,6 +1373,71 @@ describe("useReservations", () => {
 
         expect(result.currentTableOperation.value).toBeUndefined();
     });
+
+    describe("guest data handling", () => {
+        it("triggers guest data update when guest contact is added during reservation update", async () => {
+            const { floor, event } = await setupTestEnvironment();
+            const existingReservation = createTestReservation({
+                id: "1",
+                guestContact: undefined,
+                guestName: undefined,
+            });
+
+            const result = withSetup(() =>
+                useReservations(
+                    ref([]),
+                    ref([existingReservation]),
+                    shallowRef([floor]),
+                    { id: "1", propertyId: "1", organisationId: "1" },
+                    ref(event),
+                ),
+            );
+
+            let editHandler: () => Promise<void> = () => Promise.resolve();
+            let updateHandler: (reservation: ReservationDoc) => Promise<void> = () =>
+                Promise.resolve();
+
+            // First dialog (show reservation)
+            createDialogMock.mockImplementationOnce((config) => {
+                editHandler = config.componentProps.listeners.edit;
+                return {
+                    onDismiss: vi.fn().mockReturnThis(),
+                    hide: vi.fn(),
+                };
+            });
+
+            // Second dialog (edit reservation)
+            createDialogMock.mockImplementationOnce((config) => {
+                updateHandler = config.componentProps.listeners.update;
+                return {
+                    onDismiss: vi.fn().mockReturnThis(),
+                    hide: vi.fn(),
+                };
+            });
+
+            const table = floor.getTableByLabel("T1");
+            await result.tableClickHandler(floor, table);
+            await editHandler();
+
+            const updatedReservation = {
+                ...existingReservation,
+                guestContact: "+1234567890",
+                guestName: "John Doe",
+            };
+            await updateHandler(updatedReservation);
+
+            expect(eventEmitMock).toHaveBeenCalledTimes(1);
+            expect(eventEmitMock).toHaveBeenCalledWith(
+                "reservation:updated",
+                expect.objectContaining({
+                    reservation: updatedReservation,
+                    oldReservation: existingReservation,
+                    eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
+                    event,
+                }),
+            );
+        });
+    });
 });
 
 function createTestReservation(overrides = {}): ReservationDoc {
