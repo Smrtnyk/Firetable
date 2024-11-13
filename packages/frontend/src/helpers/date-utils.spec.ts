@@ -4,21 +4,21 @@ import {
     formatEventDate,
     hourFromTimestamp,
 } from "./date-utils";
-import { test, describe, expect } from "vitest";
+import { it, describe, expect } from "vitest";
 
 const DEFAULT_LOCALE = "en-GB";
 const DEFAULT_TIMEZONE = "UTC";
 
 describe("Date Formatting Functions", () => {
-    const testTimestamp = new Date("2024-01-15T12:30:45Z").getTime();
+    const itTimestamp = new Date("2024-01-15T12:30:45Z").getTime();
 
     describe("createUTCTimestamp", () => {
-        test("converts Vienna time to correct UTC timestamp", () => {
-            const dateStr = "15.01.2024";
+        it("converts Vienna time to correct UTC timestamp", () => {
+            const daitr = "15.01.2024";
             const timeStr = "22:00";
             const timezone = "Europe/Vienna";
 
-            const timestamp = createUTCTimestamp(dateStr, timeStr, timezone);
+            const timestamp = createUTCTimestamp(daitr, timeStr, timezone);
 
             // Convert back to check if we get the same time in Vienna
             const formattedTime = hourFromTimestamp(timestamp, DEFAULT_LOCALE, timezone);
@@ -32,13 +32,13 @@ describe("Date Formatting Functions", () => {
             expect(utcTime).toBe("21:00");
         });
 
-        test("handles daylight saving time correctly", () => {
+        it("handles daylight saving time correctly", () => {
             // Summer time
-            const dateStr = "15.07.2024";
+            const daitr = "15.07.2024";
             const timeStr = "22:00";
             const timezone = "Europe/Vienna";
 
-            const timestamp = createUTCTimestamp(dateStr, timeStr, timezone);
+            const timestamp = createUTCTimestamp(daitr, timeStr, timezone);
 
             // Check local time is preserved
             const formattedTime = hourFromTimestamp(timestamp, DEFAULT_LOCALE, timezone);
@@ -49,8 +49,8 @@ describe("Date Formatting Functions", () => {
             expect(utcTime).toBe("20:00");
         });
 
-        test("handles different timezones correctly", () => {
-            const dateStr = "15.01.2024";
+        it("handles different timezones correctly", () => {
+            const daitr = "15.01.2024";
             const timeStr = "22:00";
             const timezones = {
                 // Next day in UTC
@@ -60,7 +60,7 @@ describe("Date Formatting Functions", () => {
             };
 
             for (const [timezone, expectedUTCTime] of Object.entries(timezones)) {
-                const timestamp = createUTCTimestamp(dateStr, timeStr, timezone);
+                const timestamp = createUTCTimestamp(daitr, timeStr, timezone);
 
                 // Check if local time is preserved
                 const localTime = hourFromTimestamp(timestamp, DEFAULT_LOCALE, timezone);
@@ -72,12 +72,12 @@ describe("Date Formatting Functions", () => {
             }
         });
 
-        test("handles date change across timezone boundaries", () => {
-            const dateStr = "31.12.2024";
+        it("handles date change across timezone boundaries", () => {
+            const daitr = "31.12.2024";
             const timeStr = "22:00";
             const timezone = "America/New_York";
 
-            const timestamp = createUTCTimestamp(dateStr, timeStr, timezone);
+            const timestamp = createUTCTimestamp(daitr, timeStr, timezone);
 
             // Check local date/time is preserved
             const nyDate = dateFromTimestamp(timestamp, DEFAULT_LOCALE, timezone);
@@ -92,7 +92,7 @@ describe("Date Formatting Functions", () => {
             expect(utcTime).toBe("03:00");
         });
 
-        test("handles late night (23:00) creation and next day edit correctly", () => {
+        it("handles late night (23:00) creation and next day edit correctly", () => {
             const timezone = "Europe/Vienna";
 
             // Create event at 23:00
@@ -134,7 +134,7 @@ describe("Date Formatting Functions", () => {
             expect(editedUtcDate).toBe("17/11/2024");
         });
 
-        test("handles late night (23:00) creation and same day edit correctly", () => {
+        it("handles late night (23:00) creation and same day edit correctly", () => {
             const timezone = "Europe/Vienna";
 
             // Create event at 23:00
@@ -152,10 +152,10 @@ describe("Date Formatting Functions", () => {
             expect(dateFromTimestamp(editedTimestamp, DEFAULT_LOCALE, timezone)).toBe("16/11/2024");
         });
 
-        test("handles late night (23:00) during DST transition", () => {
+        it("handles late night (23:00) during DST transition", () => {
             const timezone = "Europe/Vienna";
 
-            // Test during DST transition (Last Sunday of October 2024 - October 27)
+            // it during DST transition (Last Sunday of October 2024 - October 27)
             const originalTimestamp = createUTCTimestamp("26.10.2024", "23:00", timezone);
             const nextDayTimestamp = createUTCTimestamp("27.10.2024", "23:00", timezone);
 
@@ -176,7 +176,7 @@ describe("Date Formatting Functions", () => {
             expect(hourFromTimestamp(nextDayTimestamp, DEFAULT_LOCALE, "UTC")).toBe("22:00");
         });
 
-        test("handles late night edit across months", () => {
+        it("handles late night edit across months", () => {
             const timezone = "Europe/Vienna";
 
             // Create event at last day of month at 23:00
@@ -196,7 +196,7 @@ describe("Date Formatting Functions", () => {
             expect(dateFromTimestamp(editedTimestamp, DEFAULT_LOCALE, timezone)).toBe("01/11/2024");
         });
 
-        test("handles late night edit across years", () => {
+        it("handles late night edit across years", () => {
             const timezone = "Europe/Vienna";
 
             // Create event at last day of year at 23:00
@@ -217,7 +217,7 @@ describe("Date Formatting Functions", () => {
     });
 
     describe("locale handling", () => {
-        const testCases = [
+        const itCases = [
             {
                 locale: "de-DE",
                 expectedDate: "15.01.2024",
@@ -235,12 +235,10 @@ describe("Date Formatting Functions", () => {
             },
         ];
 
-        testCases.forEach(({ locale, expectedDate, expectedDateTime }) => {
-            test(`formats dates correctly for ${locale}`, () => {
-                expect(dateFromTimestamp(testTimestamp, locale, DEFAULT_TIMEZONE)).toBe(
-                    expectedDate,
-                );
-                expect(formatEventDate(testTimestamp, locale, DEFAULT_TIMEZONE)).toBe(
+        itCases.forEach(({ locale, expectedDate, expectedDateTime }) => {
+            it(`formats dates correctly for ${locale}`, () => {
+                expect(dateFromTimestamp(itTimestamp, locale, DEFAULT_TIMEZONE)).toBe(expectedDate);
+                expect(formatEventDate(itTimestamp, locale, DEFAULT_TIMEZONE)).toBe(
                     expectedDateTime,
                 );
             });
@@ -248,36 +246,28 @@ describe("Date Formatting Functions", () => {
     });
 
     describe("formatEventDate", () => {
-        test("formats correctly in UTC", () => {
-            const formattedDate = formatEventDate(testTimestamp, DEFAULT_LOCALE, DEFAULT_TIMEZONE);
+        it("formats correctly in UTC", () => {
+            const formattedDate = formatEventDate(itTimestamp, DEFAULT_LOCALE, DEFAULT_TIMEZONE);
             expect(formattedDate).toBe("15/01/2024, 12:30:45");
         });
 
-        test("formats correctly in America/New_York time zone", () => {
-            const formattedDate = formatEventDate(
-                testTimestamp,
-                DEFAULT_LOCALE,
-                "America/New_York",
-            );
+        it("formats correctly in America/New_York time zone", () => {
+            const formattedDate = formatEventDate(itTimestamp, DEFAULT_LOCALE, "America/New_York");
             // Adjusting for -5 hours
             expect(formattedDate).toBe("15/01/2024, 07:30:45");
         });
     });
 
     describe("dateFromTimestamp", () => {
-        test("formats date correctly in UTC", () => {
-            const formattedDate = dateFromTimestamp(
-                testTimestamp,
-                DEFAULT_LOCALE,
-                DEFAULT_TIMEZONE,
-            );
+        it("formats date correctly in UTC", () => {
+            const formattedDate = dateFromTimestamp(itTimestamp, DEFAULT_LOCALE, DEFAULT_TIMEZONE);
             // Expected format in de-DE locale
             expect(formattedDate).toBe("15/01/2024");
         });
 
-        test("formats date correctly in America/New_York time zone", () => {
+        it("formats date correctly in America/New_York time zone", () => {
             const formattedDate = dateFromTimestamp(
-                testTimestamp,
+                itTimestamp,
                 DEFAULT_LOCALE,
                 "America/New_York",
             );
@@ -287,19 +277,15 @@ describe("Date Formatting Functions", () => {
     });
 
     describe("hourFromTimestamp", () => {
-        test("formats hour correctly in UTC", () => {
-            const formattedTime = hourFromTimestamp(
-                testTimestamp,
-                DEFAULT_LOCALE,
-                DEFAULT_TIMEZONE,
-            );
+        it("formats hour correctly in UTC", () => {
+            const formattedTime = hourFromTimestamp(itTimestamp, DEFAULT_LOCALE, DEFAULT_TIMEZONE);
             // Time in UTC
             expect(formattedTime).toBe("12:30");
         });
 
-        test("formats hour correctly in America/New_York time zone", () => {
+        it("formats hour correctly in America/New_York time zone", () => {
             const formattedTime = hourFromTimestamp(
-                testTimestamp,
+                itTimestamp,
                 DEFAULT_LOCALE,
                 "America/New_York",
             );
@@ -307,7 +293,7 @@ describe("Date Formatting Functions", () => {
             expect(formattedTime).toBe("07:30");
         });
 
-        test("formats boundary time correctly in UTC", () => {
+        it("formats boundary time correctly in UTC", () => {
             const boundaryTimestamp = new Date("2024-01-01T00:00:00Z").getTime();
             const formattedTime = hourFromTimestamp(
                 boundaryTimestamp,

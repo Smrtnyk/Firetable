@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { omit } from "es-toolkit";
 
 describe("plannedToQueuedReservation", () => {
-    it("should correctly transform a full PlannedReservation to QueuedReservation", () => {
+    it("correctly transforms a full PlannedReservation to QueuedReservation", () => {
         const planned: PlannedReservation = {
             arrived: false,
             cancelled: false,
@@ -51,7 +51,7 @@ describe("plannedToQueuedReservation", () => {
         expect(queued).toEqual(expectedQueued);
     });
 
-    it("should omit the specified fields from the PlannedReservation", () => {
+    it("omits the specified fields from the PlannedReservation", () => {
         const fixedTimestamp = 1_680_000_000_000;
         vi.setSystemTime(new Date(fixedTimestamp));
 
@@ -93,7 +93,7 @@ describe("plannedToQueuedReservation", () => {
         expect(queued).not.toHaveProperty("waitingForResponse");
     });
 
-    it("should add createdAt timestamp correctly", () => {
+    it("adds createdAt timestamp correctly", () => {
         const fixedTimestamp = 1_680_000_000_000;
         vi.setSystemTime(new Date(fixedTimestamp));
 
@@ -129,7 +129,7 @@ describe("plannedToQueuedReservation", () => {
         expect(queued.creator.createdAt).toBe(fixedTimestamp);
     });
 
-    it("should handle missing optional fields in PlannedReservation", () => {
+    it("handles missing optional fields in PlannedReservation", () => {
         const fixedTimestamp = 1_680_000_000_000;
         vi.setSystemTime(new Date(fixedTimestamp));
 
@@ -177,7 +177,7 @@ describe("plannedToQueuedReservation", () => {
         expect(queued).toEqual(expectedQueued);
     });
 
-    it("should not mutate the original PlannedReservation", () => {
+    it("doesn't mutate the original PlannedReservation", () => {
         const fixedTimestamp = 1_680_000_000_000;
         vi.setSystemTime(new Date(fixedTimestamp));
 
@@ -215,7 +215,7 @@ describe("plannedToQueuedReservation", () => {
         expect(planned).toStrictEqual(plannedCopy);
     });
 
-    it("should handle empty PlannedReservation", () => {
+    it("handles empty PlannedReservation", () => {
         const fixedTimestamp = 1_680_000_000_000;
         vi.setSystemTime(new Date(fixedTimestamp));
 
@@ -263,7 +263,7 @@ describe("plannedToQueuedReservation", () => {
         expect(queued).toEqual(expectedQueued);
     });
 
-    it("should include additional fields not in omit list", () => {
+    it("includes additional fields not in omit list", () => {
         const fixedTimestamp = 1_680_000_000_000;
         vi.setSystemTime(new Date(fixedTimestamp));
 

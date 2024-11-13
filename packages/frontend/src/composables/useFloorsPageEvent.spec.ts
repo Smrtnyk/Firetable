@@ -34,7 +34,7 @@ describe("useFloorsPageEvent", () => {
         pageRef = shallowRef(null);
     });
 
-    it("should initialize with default values", () => {
+    it("initializes with default values", () => {
         const { result } = withSetup(() => useFloorsPageEvent(eventFloors, pageRef));
 
         expect(result.activeFloor.value).toBeUndefined();
@@ -42,21 +42,21 @@ describe("useFloorsPageEvent", () => {
         expect(result.hasMultipleFloorPlans.value).toBe(false);
     });
 
-    it("should compute hasMultipleFloorPlans correctly", () => {
+    it("computes hasMultipleFloorPlans correctly", () => {
         eventFloors.value = [{ id: "floor1" } as FloorDoc, { id: "floor2" } as FloorDoc];
         const { result } = withSetup(() => useFloorsPageEvent(eventFloors, pageRef));
 
         expect(result.hasMultipleFloorPlans.value).toBe(true);
     });
 
-    it("should set active floor correctly", () => {
+    it("sets active floor correctly", () => {
         const { result } = withSetup(() => useFloorsPageEvent(eventFloors, pageRef));
 
         result.setActiveFloor({ id: "floor1", name: "Floor 1" });
         expect(result.activeFloor.value).toEqual({ id: "floor1", name: "Floor 1" });
     });
 
-    it("should check if a floor is active", () => {
+    it("checks if a floor is active", () => {
         const { result } = withSetup(() => useFloorsPageEvent(eventFloors, pageRef));
 
         result.setActiveFloor({ id: "floor1", name: "Floor 1" });
@@ -64,7 +64,7 @@ describe("useFloorsPageEvent", () => {
         expect(result.isActiveFloor("floor2")).toBe(false);
     });
 
-    it("should instantiate floor instances when eventFloors change", async () => {
+    it("instantiates floor instances when eventFloors change", async () => {
         const { result } = withSetup(() => useFloorsPageEvent(eventFloors, pageRef));
 
         // Create a div to simulate the pageRef
