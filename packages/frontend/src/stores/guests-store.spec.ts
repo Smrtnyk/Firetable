@@ -399,7 +399,7 @@ describe("Guests Store", () => {
             expect(result.value.pending).toBe(false);
         });
 
-        it("maintains guest cache through subscription updates", () => {
+        it("maintains guest cache through subscription updates", async () => {
             const { guestsStore } = setupTestStores();
             const guestDoc = createTestGuest();
 
@@ -410,7 +410,7 @@ describe("Guests Store", () => {
             callbacks.onAdd(guestDoc);
 
             // Check if guest is cached
-            expect(
+            await expect(
                 guestsStore.getGuestByHashedContact("org1", guestDoc.hashedContact),
             ).resolves.toEqual(guestDoc);
 
@@ -419,7 +419,7 @@ describe("Guests Store", () => {
             callbacks.onModify(modifiedGuest);
 
             // Check if cache is updated
-            expect(
+            await expect(
                 guestsStore.getGuestByHashedContact("org1", modifiedGuest.hashedContact),
             ).resolves.toEqual(modifiedGuest);
         });

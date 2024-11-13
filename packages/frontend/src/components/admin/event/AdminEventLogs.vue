@@ -98,7 +98,7 @@ function scrollToBottom(): void {
                         :subtitle="formatSubtitleForEventLog(log)"
                         :icon="getIconNameForLogEntry(log.message)"
                     >
-                        <div>
+                        <div class="whitespace-pre-line">
                             {{ log.message }}
                         </div>
                     </q-timeline-entry>
@@ -124,5 +124,8 @@ function scrollToBottom(): void {
 }
 .scroll-to-bottom {
     z-index: 999999;
+}
+.whitespace-pre-line {
+    white-space: pre-line;
 }
 </style>
