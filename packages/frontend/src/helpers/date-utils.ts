@@ -53,45 +53,30 @@ export function createTodayUTCTimestamp(time: string, timezone: string): number 
  */
 export function createUTCTimestamp(dateStr: string, timeStr: string, timezone: string): number {
     const [dayVal, monthVal, yearVal] = dateStr.split(".");
+    const [hours, minutes] = timeStr.split(":");
 
-    // First create date in UTC
-    const utcDate = Date.UTC(
+    // Create the date in UTC first to avoid local timezone interpretation
+    const timestamp = Date.UTC(
         Number(yearVal),
         Number(monthVal) - 1,
         Number(dayVal),
-        Number(timeStr.split(":")[0]),
-        Number(timeStr.split(":")[1]),
+        Number(hours),
+        Number(minutes),
     );
 
-    // Create formatters for both UTC and target timezone
-    const targetFormatter = new Intl.DateTimeFormat("en-US", {
-        timeZone: timezone,
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-    });
+    // Get the offset between UTC and target timezone at this time
+    const utcDate = new Date(timestamp).toLocaleString("en-US", { timeZone: "UTC" });
+    const tzDate = new Date(timestamp).toLocaleString("en-US", { timeZone: timezone });
 
-    const parts = targetFormatter.formatToParts(utcDate);
-    const targetObj = parts.reduce<Record<string, string>>((acc, part) => {
-        if (["year", "month", "day", "hour", "minute"].includes(part.type)) {
-            acc[part.type] = part.value;
-        }
-        return acc;
-    }, {});
+    // Convert strings back to dates to compare
+    const utcCompare = new Date(utcDate);
+    const tzCompare = new Date(tzDate);
 
-    // Calculate the offset needed to make target time match desired time
-    const targetHour = Number(targetObj.hour);
-    const desiredHour = Number(timeStr.split(":")[0]);
-    const hourOffset = desiredHour - targetHour;
+    // Calculate the offset in minutes
+    const tzOffset = (tzCompare.getTime() - utcCompare.getTime()) / 1000 / 60;
 
-    // Adjust UTC time by the offset
-    const adjustedUtc = new Date(utcDate);
-    adjustedUtc.setUTCHours(adjustedUtc.getUTCHours() + hourOffset);
-
-    return adjustedUtc.getTime();
+    // Apply the offset to get the correct UTC timestamp
+    return timestamp - tzOffset * 60 * 1000;
 }
 
 /**

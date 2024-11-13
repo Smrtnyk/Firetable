@@ -91,6 +91,129 @@ describe("Date Formatting Functions", () => {
             expect(utcDate).toBe("01/01/2025");
             expect(utcTime).toBe("03:00");
         });
+
+        test("handles late night (23:00) creation and next day edit correctly", () => {
+            const timezone = "Europe/Vienna";
+
+            // Create event at 23:00
+            const originalTimestamp = createUTCTimestamp("16.11.2024", "23:00", timezone);
+
+            // Verify original time in Vienna
+            const originalViennaTime = hourFromTimestamp(
+                originalTimestamp,
+                DEFAULT_LOCALE,
+                timezone,
+            );
+            const originalViennaDate = dateFromTimestamp(
+                originalTimestamp,
+                DEFAULT_LOCALE,
+                timezone,
+            );
+            expect(originalViennaTime).toBe("23:00");
+            expect(originalViennaDate).toBe("16/11/2024");
+
+            // Check UTC conversion (Vienna is UTC+1 in winter)
+            const originalUtcTime = hourFromTimestamp(originalTimestamp, DEFAULT_LOCALE, "UTC");
+            const originalUtcDate = dateFromTimestamp(originalTimestamp, DEFAULT_LOCALE, "UTC");
+            expect(originalUtcTime).toBe("22:00");
+            expect(originalUtcDate).toBe("16/11/2024");
+
+            // Edit event to next day 11:00
+            const editedTimestamp = createUTCTimestamp("17.11.2024", "11:00", timezone);
+
+            // Verify edited time in Vienna
+            const editedViennaTime = hourFromTimestamp(editedTimestamp, DEFAULT_LOCALE, timezone);
+            const editedViennaDate = dateFromTimestamp(editedTimestamp, DEFAULT_LOCALE, timezone);
+            expect(editedViennaTime).toBe("11:00");
+            expect(editedViennaDate).toBe("17/11/2024");
+
+            // Check UTC conversion
+            const editedUtcTime = hourFromTimestamp(editedTimestamp, DEFAULT_LOCALE, "UTC");
+            const editedUtcDate = dateFromTimestamp(editedTimestamp, DEFAULT_LOCALE, "UTC");
+            expect(editedUtcTime).toBe("10:00");
+            expect(editedUtcDate).toBe("17/11/2024");
+        });
+
+        test("handles late night (23:00) creation and same day edit correctly", () => {
+            const timezone = "Europe/Vienna";
+
+            // Create event at 23:00
+            const originalTimestamp = createUTCTimestamp("16.11.2024", "23:00", timezone);
+
+            // Edit event to same day 22:00
+            const editedTimestamp = createUTCTimestamp("16.11.2024", "22:00", timezone);
+
+            // Verify both times in Vienna
+            expect(hourFromTimestamp(originalTimestamp, DEFAULT_LOCALE, timezone)).toBe("23:00");
+            expect(dateFromTimestamp(originalTimestamp, DEFAULT_LOCALE, timezone)).toBe(
+                "16/11/2024",
+            );
+            expect(hourFromTimestamp(editedTimestamp, DEFAULT_LOCALE, timezone)).toBe("22:00");
+            expect(dateFromTimestamp(editedTimestamp, DEFAULT_LOCALE, timezone)).toBe("16/11/2024");
+        });
+
+        test("handles late night (23:00) during DST transition", () => {
+            const timezone = "Europe/Vienna";
+
+            // Test during DST transition (Last Sunday of October 2024 - October 27)
+            const originalTimestamp = createUTCTimestamp("26.10.2024", "23:00", timezone);
+            const nextDayTimestamp = createUTCTimestamp("27.10.2024", "23:00", timezone);
+
+            // Verify times in Vienna
+            expect(hourFromTimestamp(originalTimestamp, DEFAULT_LOCALE, timezone)).toBe("23:00");
+            expect(dateFromTimestamp(originalTimestamp, DEFAULT_LOCALE, timezone)).toBe(
+                "26/10/2024",
+            );
+            expect(hourFromTimestamp(nextDayTimestamp, DEFAULT_LOCALE, timezone)).toBe("23:00");
+            expect(dateFromTimestamp(nextDayTimestamp, DEFAULT_LOCALE, timezone)).toBe(
+                "27/10/2024",
+            );
+
+            // Check UTC conversions
+            // Before DST change (UTC+2)
+            expect(hourFromTimestamp(originalTimestamp, DEFAULT_LOCALE, "UTC")).toBe("21:00");
+            // After DST change (UTC+1)
+            expect(hourFromTimestamp(nextDayTimestamp, DEFAULT_LOCALE, "UTC")).toBe("22:00");
+        });
+
+        test("handles late night edit across months", () => {
+            const timezone = "Europe/Vienna";
+
+            // Create event at last day of month at 23:00
+            const originalTimestamp = createUTCTimestamp("31.10.2024", "23:00", timezone);
+
+            // Edit to next month
+            const editedTimestamp = createUTCTimestamp("01.11.2024", "11:00", timezone);
+
+            // Verify original time
+            expect(hourFromTimestamp(originalTimestamp, DEFAULT_LOCALE, timezone)).toBe("23:00");
+            expect(dateFromTimestamp(originalTimestamp, DEFAULT_LOCALE, timezone)).toBe(
+                "31/10/2024",
+            );
+
+            // Verify edited time
+            expect(hourFromTimestamp(editedTimestamp, DEFAULT_LOCALE, timezone)).toBe("11:00");
+            expect(dateFromTimestamp(editedTimestamp, DEFAULT_LOCALE, timezone)).toBe("01/11/2024");
+        });
+
+        test("handles late night edit across years", () => {
+            const timezone = "Europe/Vienna";
+
+            // Create event at last day of year at 23:00
+            const originalTimestamp = createUTCTimestamp("31.12.2024", "23:00", timezone);
+
+            // Edit to next year
+            const editedTimestamp = createUTCTimestamp("01.01.2025", "11:00", timezone);
+
+            // Verify original time
+            expect(hourFromTimestamp(originalTimestamp, DEFAULT_LOCALE, timezone)).toBe("23:00");
+            expect(dateFromTimestamp(originalTimestamp, DEFAULT_LOCALE, timezone)).toBe(
+                "31/12/2024",
+            );
+            // Verify edited time
+            expect(hourFromTimestamp(editedTimestamp, DEFAULT_LOCALE, timezone)).toBe("11:00");
+            expect(dateFromTimestamp(editedTimestamp, DEFAULT_LOCALE, timezone)).toBe("01/01/2025");
+        });
     });
 
     describe("locale handling", () => {
