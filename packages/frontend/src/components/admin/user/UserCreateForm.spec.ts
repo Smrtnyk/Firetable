@@ -285,7 +285,7 @@ describe("UserCreateForm", () => {
         const submitButton = screen.getByRole("button", { name: t("Global.submit") });
         await userEvent.click(submitButton);
 
-        expect
+        await expect
             .element(screen.getByText("Password must be at least 6 characters long."))
             .toBeVisible();
     });

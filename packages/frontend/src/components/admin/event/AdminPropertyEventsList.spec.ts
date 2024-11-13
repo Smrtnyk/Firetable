@@ -57,7 +57,7 @@ describe("PageAdminEventsList", () => {
         vi.useRealTimers();
     });
 
-    it("displays a message when there are no events", () => {
+    it("displays a message when there are no events", async () => {
         renderComponent(AdminPropertyEventsList, {
             propertyId,
             events: [],
@@ -65,7 +65,7 @@ describe("PageAdminEventsList", () => {
             timezone: getDefaultTimezone(),
         });
 
-        expect.element(page.getByText(t("PageAdminEvents.noEventsMessage"))).toBeVisible();
+        await expect.element(page.getByText(t("PageAdminEvents.noEventsMessage"))).toBeVisible();
     });
 
     it("displays events grouped by upcoming and past events with a marker", async () => {
