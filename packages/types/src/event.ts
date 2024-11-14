@@ -11,7 +11,7 @@ export type CreateEventForm = Pick<
 export type CreateEventPayload = CreateEventForm & {
     propertyId: string;
     organisationId: string;
-    floors: FloorDoc[];
+    floors: EventFloorDoc[];
 };
 
 export type EditEventPayload = CreateEventForm & {
@@ -70,6 +70,13 @@ export interface EventDoc {
      * Used for real-time updates and pagination
      */
     _doc: QueryDocumentSnapshot<EventDoc>;
+}
+
+export interface EventFloorDoc extends FloorDoc {
+    /**
+     * Floors are sortable and this is the order of the floor in the UI
+     */
+    order?: number;
 }
 
 export interface CreateGuestInGuestListPayload {

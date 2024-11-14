@@ -40,15 +40,13 @@ describe("EventCreateForm", () => {
             await expect.element(screen.getByLabelText("Event name*")).toHaveValue("");
             await expect.element(screen.getByLabelText("Guest List Limit")).toHaveValue(100);
             await expect.element(screen.getByLabelText("Entry Price")).toHaveValue(0);
-            const floorCheckboxes = screen.getByRole("checkbox");
 
             expect(
                 screen.getByLabelText("Event date and time").query()?.getAttribute("value"),
             ).toContain("22:00");
 
-            for (const element of floorCheckboxes.elements()) {
-                await expect.element(element).not.toBeChecked();
-            }
+            const addFloorBtn = screen.getByLabelText("Add floor plan");
+            await expect.element(addFloorBtn).toBeVisible();
         });
 
         it("validates required fields", async () => {
@@ -68,12 +66,39 @@ describe("EventCreateForm", () => {
             await userEvent.fill(screen.getByLabelText("Entry Price"), "50");
 
             const submitButton = screen.getByRole("button", { name: "Submit" });
-
             await userEvent.click(submitButton);
 
             expect(showErrorMessageSpy).toHaveBeenCalledWith(
                 "You need to choose at least one floor plan",
             );
+        });
+
+        it("allows adding multiple instances of the same floor", async () => {
+            const screen = renderComponent(EventCreateForm, props);
+
+            const addFloorBtn = screen.getByLabelText("Add floor plan");
+            await userEvent.click(addFloorBtn);
+
+            const floor1Option = screen.getByLabelText("Add Floor 1 floor plan");
+            await userEvent.click(floor1Option);
+            await userEvent.click(addFloorBtn);
+            await userEvent.click(floor1Option);
+
+            const floorItems = screen.getByText("Floor 1");
+            expect(floorItems.elements().length).toBe(2);
+        });
+
+        it("allows removing floors", async () => {
+            const screen = renderComponent(EventCreateForm, props);
+
+            const addFloorBtn = screen.getByLabelText("Add floor plan");
+            await userEvent.click(addFloorBtn);
+            await userEvent.click(screen.getByLabelText("Add Floor 1 floor plan"));
+
+            const removeFloorBtn = screen.getByLabelText("Remove Floor 1 floor plan");
+            await userEvent.click(removeFloorBtn);
+
+            await expect.element(screen.getByText("Floor 1")).not.toBeInTheDocument();
         });
 
         it("emits create event with correct payload", async () => {
@@ -88,8 +113,12 @@ describe("EventCreateForm", () => {
                 "https://example.com/image.jpg",
             );
 
-            const floorCheckboxes = screen.getByRole("checkbox");
-            await userEvent.click(floorCheckboxes.elements()[0]);
+            const addFloorBtn = screen.getByLabelText("Add floor plan");
+            await userEvent.click(addFloorBtn);
+            await userEvent.click(screen.getByLabelText("Add Floor 1 floor plan"));
+            await userEvent.click(addFloorBtn);
+            await userEvent.click(screen.getByLabelText("Add Floor 2 floor plan"));
+
             const submitButton = screen.getByRole("button", { name: "Submit" });
             await userEvent.click(submitButton);
             await nextTick();
@@ -104,7 +133,10 @@ describe("EventCreateForm", () => {
                 img: "https://example.com/image.jpg",
                 propertyId: props.propertyId,
                 organisationId: props.organisationId,
-                floors: [{ id: "floor1", name: "Floor 1" }],
+                floors: [
+                    { id: "floor1", name: "Floor 1" },
+                    { id: "floor2", name: "Floor 2" },
+                ],
             });
         });
 
@@ -120,12 +152,11 @@ describe("EventCreateForm", () => {
                 "https://example.com/image.jpg",
             );
 
-            const floorCheckboxes = screen.getByRole("checkbox");
-            const firstCheckbox = floorCheckboxes.elements()[0];
-            await userEvent.click(firstCheckbox);
+            const addFloorBtn = screen.getByLabelText("Add floor plan");
+            await userEvent.click(addFloorBtn);
+            await userEvent.click(screen.getByLabelText("Add Floor 1 floor plan"));
 
             const resetButton = screen.getByRole("button", { name: "Reset" });
-
             await userEvent.click(resetButton);
 
             // Check that the form fields are reset
@@ -133,7 +164,108 @@ describe("EventCreateForm", () => {
             await expect.element(screen.getByLabelText("Guest List Limit")).toHaveValue(100);
             await expect.element(screen.getByLabelText("Entry Price")).toHaveValue(0);
             await expect.element(screen.getByLabelText("Event Image URL")).toHaveValue("");
-            await expect.element(firstCheckbox).not.toBeChecked();
+            await expect.element(screen.getByText("Floor 1")).not.toBeInTheDocument();
+        });
+
+        describe("floor ordering", () => {
+            beforeEach(() => {
+                props = {
+                    propertyTimezone: "Europe/Vienna",
+                    propertyId: "property1",
+                    organisationId: "org1",
+                    propertyName: "Test Property",
+                    floors: [
+                        { id: "floor1", name: "Floor 1" } as FloorDoc,
+                        { id: "floor2", name: "Floor 2" } as FloorDoc,
+                        { id: "floor3", name: "Floor 3" } as FloorDoc,
+                    ],
+                    eventStartHours: "22:00",
+                };
+            });
+
+            it("assigns correct order when adding floors", async () => {
+                const screen = renderComponent(EventCreateForm, props);
+
+                const addFloorBtn = screen.getByLabelText("Add floor plan");
+
+                await userEvent.click(addFloorBtn);
+                await userEvent.click(screen.getByLabelText("Add Floor 1 floor plan"));
+
+                await userEvent.click(addFloorBtn);
+                await userEvent.click(screen.getByLabelText("Add Floor 2 floor plan"));
+
+                await userEvent.fill(screen.getByLabelText("Event Name"), "Test Event");
+                const submitButton = screen.getByRole("button", { name: "Submit" });
+                await userEvent.click(submitButton);
+
+                const emitted = screen.emitted().create as any[];
+                expect(emitted[0][0].floors).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({ id: "floor1", order: 0 }),
+                        expect.objectContaining({ id: "floor2", order: 1 }),
+                    ]),
+                );
+            });
+
+            it("reorders floors correctly when removing a floor", async () => {
+                const screen = renderComponent(EventCreateForm, props);
+                const addFloorBtn = screen.getByLabelText("Add floor plan");
+
+                // Add three floors
+                await userEvent.click(addFloorBtn);
+                await userEvent.click(screen.getByLabelText("Add Floor 1 floor plan"));
+                await userEvent.click(addFloorBtn);
+                await userEvent.click(screen.getByLabelText("Add Floor 2 floor plan"));
+                await userEvent.click(addFloorBtn);
+                await userEvent.click(screen.getByLabelText("Add Floor 3 floor plan"));
+
+                // Remove middle floor
+                const removeFloor2Btn = screen.getByLabelText("Remove Floor 2 floor plan");
+                await userEvent.click(removeFloor2Btn);
+
+                // Submit and verify order was updated
+                await userEvent.fill(screen.getByLabelText("Event Name"), "Test Event");
+                const submitButton = screen.getByRole("button", { name: "Submit" });
+                await userEvent.click(submitButton);
+
+                const emitted = screen.emitted().create as any[];
+                expect(emitted[0][0].floors).toEqual([
+                    expect.objectContaining({ id: "floor1", order: 0 }),
+                    expect.objectContaining({ id: "floor3", order: 1 }),
+                ]);
+            });
+
+            it("maintains order when resetting the form", async () => {
+                const screen = renderComponent(EventCreateForm, props);
+                const addFloorBtn = screen.getByLabelText("Add floor plan");
+
+                // Add floors
+                await userEvent.click(addFloorBtn);
+                await userEvent.click(screen.getByLabelText("Add Floor 1 floor plan"));
+                await userEvent.click(addFloorBtn);
+                await userEvent.click(screen.getByLabelText("Add Floor 2 floor plan"));
+
+                // Reset form
+                const resetButton = screen.getByRole("button", { name: "Reset" });
+                await userEvent.click(resetButton);
+
+                // Add floors again
+                await userEvent.click(addFloorBtn);
+                await userEvent.click(screen.getByLabelText("Add Floor 1 floor plan"));
+                await userEvent.click(addFloorBtn);
+                await userEvent.click(screen.getByLabelText("Add Floor 2 floor plan"));
+
+                // Submit and verify order
+                await userEvent.fill(screen.getByLabelText("Event Name"), "Test Event");
+                const submitButton = screen.getByRole("button", { name: "Submit" });
+                await userEvent.click(submitButton);
+
+                const emitted = screen.emitted().create as any[];
+                expect(emitted[0][0].floors).toEqual([
+                    expect.objectContaining({ id: "floor1", order: 0 }),
+                    expect.objectContaining({ id: "floor2", order: 1 }),
+                ]);
+            });
         });
     });
 

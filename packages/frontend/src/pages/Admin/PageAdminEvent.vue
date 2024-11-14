@@ -3,8 +3,14 @@ import type { Component } from "vue";
 import type { FloorEditor } from "@firetable/floor-creator";
 import type { AnyFunction, FloorDoc, ReservationDoc } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
+import {
+    deleteEventFloor,
+    deleteReservation,
+    updateEventFloorData,
+    addEventFloor,
+    updateEventFloorsOrder,
+} from "@firetable/backend";
 import { isActiveReservation } from "@firetable/types";
-import { deleteReservation, updateEventFloorData } from "@firetable/backend";
 import { computed, onMounted, onUnmounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import { formatEventDate } from "src/helpers/date-utils";
@@ -24,7 +30,7 @@ import AppCardSection from "src/components/AppCardSection.vue";
 import FTBtn from "src/components/FTBtn.vue";
 
 import { Loading } from "quasar";
-import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useAdminEvent } from "src/composables/useAdminEvent";
 import { isMobile } from "src/global-reactives/screen-detection";
 import { truncateText } from "src/helpers/string-utils";
@@ -35,6 +41,8 @@ import { useAuthStore } from "src/stores/auth-store";
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
 import { useLocalStorage } from "@vueuse/core";
+import AdminEventFloorManager from "src/components/admin/event/AdminEventFloorManager.vue";
+import { useFloors } from "src/composables/useFloors";
 
 interface Props {
     organisationId: string;
@@ -83,6 +91,7 @@ const logsLabelWithCount = computed(function () {
     const logsLength = logs.value?.logs.length ?? 0;
     return logsLength > 0 ? `Logs (${logsLength})` : "Logs";
 });
+const { floors } = useFloors(eventOwner.propertyId, eventOwner.organisationId);
 
 watch(
     isLoading,
@@ -182,6 +191,41 @@ async function deleteReservationPermanently(reservation: ReservationDoc): Promis
     await tryCatchLoadingWrapper({
         hook() {
             return deleteReservation(eventOwner, reservation);
+        },
+    });
+}
+
+async function addFloor(floor: FloorDoc): Promise<void> {
+    await tryCatchLoadingWrapper({
+        hook() {
+            return addEventFloor(eventOwner, floor);
+        },
+    });
+}
+
+async function removeFloor(index: number): Promise<void> {
+    const floor = eventFloors.value[index];
+    // Check if floor has reservations
+    if (
+        allReservations.value.some(function ({ floorId }) {
+            return floorId === floor.id;
+        })
+    ) {
+        showErrorMessage("Cannot remove floor with active reservations");
+        return;
+    }
+
+    await tryCatchLoadingWrapper({
+        hook() {
+            return deleteEventFloor(eventOwner, floor.id);
+        },
+    });
+}
+
+async function handleFloorReorder(reorderedFloors: FloorDoc[]): Promise<void> {
+    await tryCatchLoadingWrapper({
+        hook() {
+            return updateEventFloorsOrder(eventOwner, reorderedFloors);
         },
     });
 }
@@ -299,23 +343,16 @@ onMounted(init);
                 </AppCardSection>
 
                 <AppCardSection title="Event Floors">
-                    <q-item :key="floor.id" v-for="floor in eventFloors" clickable v-ripple>
-                        <q-item-section>
-                            <q-item-label>
-                                {{ floor.name }}
-                            </q-item-label>
-                        </q-item-section>
-
-                        <q-item-section side>
-                            <FTBtn
-                                class="button-gradient"
-                                icon="pencil"
-                                rounded
-                                @click="() => showFloorEditDialog(floor)"
-                            >
-                            </FTBtn>
-                        </q-item-section>
-                    </q-item>
+                    <AdminEventFloorManager
+                        :floors="eventFloors"
+                        :available-floors="floors"
+                        :reservations="allReservations"
+                        :show-edit-button="true"
+                        @add="addFloor"
+                        @remove="removeFloor"
+                        @edit="showFloorEditDialog"
+                        @reorder="handleFloorReorder"
+                    />
                 </AppCardSection>
             </q-tab-panel>
 

@@ -51,6 +51,16 @@ export function createEvent(
         throw new HttpsError("invalid-argument", "Floors data is required.");
     }
 
+    // Validate floor data
+    for (const floor of floors) {
+        if (!floor.json) {
+            throw new HttpsError(
+                "invalid-argument",
+                "Invalid floor data provided - missing floor plan.",
+            );
+        }
+    }
+
     const id = db.collection(Collection.EVENTS).doc().id;
     logger.info(`Creating event with ID: ${id}`);
 
@@ -71,14 +81,10 @@ export function createEvent(
             organisationId,
         });
 
-        floors.forEach((floor) => {
-            if (floor.id) {
-                const floorRef = eventRef.collection(Collection.FLOORS).doc(floor.id);
-                transaction.set(floorRef, floor);
-            } else {
-                throw new HttpsError("invalid-argument", "Invalid floor data provided.");
-            }
-        });
+        for (const floor of floors) {
+            const floorRef = eventRef.collection(Collection.FLOORS).doc();
+            transaction.set(floorRef, floor);
+        }
 
         return { id, propertyId, organisationId };
     });

@@ -12,7 +12,6 @@ interface Props {
 
 const props = defineProps<Props>();
 
-// Reuse the floor calculation functions
 function getUniqueFloorNames(floors: FloorDoc[]): Map<string, FloorDoc[]> {
     const floorGroups = new Map<string, FloorDoc[]>();
 
@@ -32,9 +31,11 @@ function calculateTotalTables(floors: FloorDoc[]): number {
     const floorGroups = getUniqueFloorNames(floors);
     let totalTables = 0;
 
-    floorGroups.forEach((groupedFloors) => {
+    floorGroups.forEach(function (groupedFloors) {
         const mainFloor =
-            groupedFloors.find((floor) => !floor.name.endsWith("_copy")) ?? groupedFloors[0];
+            groupedFloors.find(function (floor) {
+                return !floor.name.endsWith("_copy");
+            }) ?? groupedFloors[0];
         totalTables += getTablesFromFloorDoc(mainFloor).length;
     });
 

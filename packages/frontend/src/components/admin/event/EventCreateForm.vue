@@ -4,6 +4,7 @@ import type {
     CreateEventPayload,
     EditEventPayload,
     EventDoc,
+    EventFloorDoc,
     FloorDoc,
 } from "@firetable/types";
 import { computed, ref, watch, watchEffect, useTemplateRef } from "vue";
@@ -25,9 +26,11 @@ import {
     hourFromTimestamp,
 } from "src/helpers/date-utils";
 
+import AdminEventFloorManager from "src/components/admin/event/AdminEventFloorManager.vue";
+
 interface State {
     form: CreateEventForm;
-    chosenFloors: string[];
+    selectedFloors: EventFloorDoc[];
     showDateModal: boolean;
     showTimeModal: boolean;
     selectedDate: string;
@@ -69,7 +72,7 @@ const isEditMode = computed(function () {
 const form = useTemplateRef<QForm>("form");
 const state = ref<State>({
     form: { ...eventObj },
-    chosenFloors: [],
+    selectedFloors: [],
     showDateModal: false,
     showTimeModal: false,
     selectedDate: dateFromTimestamp(Date.now(), locale.value, props.propertyTimezone),
@@ -149,18 +152,26 @@ const displayedDate = computed(function () {
     return `${dateFromTimestamp(state.value.form.date, locale.value, props.propertyTimezone)} ${hourFromTimestamp(state.value.form.date, locale.value, props.propertyTimezone)}`;
 });
 
-function validateAndEmitCreate(): void {
-    if (state.value.chosenFloors.length === 0) {
-        showErrorMessage(t("EventCreateForm.noChosenFloorsMessage"));
-        return;
-    }
-
-    const selectedFloors = Object.values(props.floors).filter(function (floor) {
-        return state.value.chosenFloors.includes(floor.id);
+function addFloor(floor: EventFloorDoc): void {
+    state.value.selectedFloors.push({
+        ...floor,
+        order: state.value.selectedFloors.length,
     });
+}
 
-    if (selectedFloors.length === 0) {
-        showErrorMessage(t("EventCreateForm.selectedFloorNotFoundMessage"));
+function removeFloor(index: number): void {
+    state.value.selectedFloors.splice(index, 1);
+    state.value.selectedFloors = state.value.selectedFloors.map(function (floor, idx) {
+        return {
+            ...floor,
+            order: idx,
+        };
+    });
+}
+
+function validateAndEmitCreate(): void {
+    if (state.value.selectedFloors.length === 0) {
+        showErrorMessage(t("EventCreateForm.noChosenFloorsMessage"));
         return;
     }
 
@@ -169,7 +180,7 @@ function validateAndEmitCreate(): void {
         guestListLimit: Number(state.value.form.guestListLimit),
         propertyId: props.propertyId,
         organisationId: props.organisationId,
-        floors: selectedFloors.map(function (floor) {
+        floors: state.value.selectedFloors.map(function (floor) {
             return { ...floor, id: floor.id };
         }),
     });
@@ -197,7 +208,16 @@ async function onSubmit(): Promise<void> {
 
 function onReset(): void {
     state.value.form = { ...eventObj };
-    state.value.chosenFloors.length = 0;
+    state.value.selectedFloors = [];
+}
+
+function reorderFloors(newFloors: EventFloorDoc[]): void {
+    state.value.selectedFloors = newFloors.map(function (floor, idx) {
+        return {
+            ...floor,
+            order: idx,
+        };
+    });
 }
 </script>
 
@@ -299,19 +319,14 @@ function onReset(): void {
             </template>
         </q-input>
 
-        <div class="q-gutter-sm q-mb-lg" v-if="!isEditMode">
-            <div class="text-h6">{{ props.propertyName }}</div>
-            <div>
-                <q-checkbox
-                    v-for="floor in props.floors"
-                    :key="floor.id"
-                    v-model="state.chosenFloors"
-                    :val="floor.id"
-                    :label="floor.name"
-                    color="accent"
-                />
-            </div>
-        </div>
+        <AdminEventFloorManager
+            v-if="!isEditMode"
+            :floors="state.selectedFloors"
+            :available-floors="props.floors"
+            @add="addFloor"
+            @remove="removeFloor"
+            @reorder="reorderFloors"
+        />
 
         <div>
             <q-btn
