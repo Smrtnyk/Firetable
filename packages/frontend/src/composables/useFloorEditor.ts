@@ -14,6 +14,15 @@ export function useFloorEditor(containerRef: ShallowRef<HTMLElement | null>) {
     const floorInstance = shallowRef<FloorEditor | undefined>();
     const selectedElement = ref<FloorEditorElement | undefined>();
 
+    function onDeleteElement(element: FloorEditorElement): void {
+        const elementToDelete = element.canvas?.getActiveObject();
+        if (!elementToDelete) {
+            return;
+        }
+        element.canvas?.remove(elementToDelete);
+        selectedElement.value = undefined;
+    }
+
     function getNextTableLabel(): string {
         if (!floorInstance.value) {
             showErrorMessage("Floor instance is not defined");
@@ -130,6 +139,7 @@ export function useFloorEditor(containerRef: ShallowRef<HTMLElement | null>) {
         floorInstance,
         selectedElement,
         resizeFloor,
+        onDeleteElement,
         onElementClick,
         onFloorChange,
         initializeFloor,

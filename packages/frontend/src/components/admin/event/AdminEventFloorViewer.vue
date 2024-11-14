@@ -15,11 +15,10 @@
                     <div class="top-controls" v-if="selectedElement && floorInstance">
                         <FloorEditorTopControls
                             v-if="floorInstance && selectedElement && !isTablet"
+                            @delete="onDeleteElement"
                             :selected-floor-element="selectedElement"
                             :floor-instance="floorInstance"
-                            :existing-labels="
-                                new Set(extractAllTablesLabels(floorInstance as FloorEditor))
-                            "
+                            :existing-labels="new Set(extractAllTablesLabels(floorInstance))"
                         />
                     </div>
                     <div class="floor-editor ft-card ft-border">
@@ -54,8 +53,14 @@ const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 const floorContainerRef = useTemplateRef<HTMLCanvasElement>("floorContainerRef");
 const viewerContainerRef = useTemplateRef<HTMLDivElement>("viewerContainerRef");
-const { resizeFloor, initializeFloor, onFloorChange, floorInstance, selectedElement } =
-    useFloorEditor(viewerContainerRef);
+const {
+    resizeFloor,
+    initializeFloor,
+    onFloorChange,
+    onDeleteElement,
+    floorInstance,
+    selectedElement,
+} = useFloorEditor(viewerContainerRef);
 
 onMounted(function () {
     useEventListener("resize", resizeFloor);

@@ -36,8 +36,14 @@ const {
     promise: floorDataPromise,
     pending: isFloorLoading,
 } = useFirestoreDocument<FloorDoc>(floorPath, { once: true });
-const { resizeFloor, initializeFloor, onFloorChange, selectedElement, floorInstance } =
-    useFloorEditor(pageRef);
+const {
+    resizeFloor,
+    initializeFloor,
+    onFloorChange,
+    onDeleteElement,
+    selectedElement,
+    floorInstance,
+} = useFloorEditor(pageRef);
 
 function onKeyDown(event: KeyboardEvent): void {
     if (event.ctrlKey && event.key === "s") {
@@ -88,15 +94,6 @@ async function onFloorSave(): Promise<void> {
             });
         },
     });
-}
-
-function onDeleteElement(element: FloorEditorElement): void {
-    const elementToDelete = element.canvas?.getActiveObject();
-    if (!elementToDelete) {
-        return;
-    }
-    element.canvas?.remove(elementToDelete);
-    selectedElement.value = undefined;
 }
 </script>
 
