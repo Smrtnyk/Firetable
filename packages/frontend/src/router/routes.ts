@@ -245,6 +245,19 @@ export const routes: RouteRecordRaw[] = [
                 props: true,
                 component: () => import("src/pages/Admin/PageAdminIssueReports.vue"),
             },
+            {
+                path: "/admin/:organisationId/:propertyId/drink-cards",
+                name: "adminPropertyDrinkCards",
+                meta: {
+                    requiresAuth: true,
+                    allowedRoles(permissionsStore) {
+                        return permissionsStore.canSeeInventory;
+                    },
+                    breadcrumb: "Drink Cards",
+                },
+                props: true,
+                component: () => import("src/pages/Admin/PageAdminPropertyDrinkCards.vue"),
+            },
         ],
     },
     {
@@ -281,6 +294,15 @@ export const routes: RouteRecordRaw[] = [
         name: "auth",
         meta: { requiresAuth: false },
         component: () => import("src/pages/PageAuth.vue"),
+    },
+    {
+        path: "/:organisationId/:propertyId/drink-cards",
+        name: "publicDrinkCards",
+        meta: {
+            requiresAuth: false,
+        },
+        props: true,
+        component: () => import("src/pages/PagePublicDrinkCards.vue"),
     },
     // Always leave this as last one
     {

@@ -51,6 +51,10 @@ export const enum Collection {
      * Collection of issue report documents
      */
     ISSUE_REPORTS = "issueReports",
+    /**
+     * Collection of drink card documents
+     */
+    DRINK_CARDS = "drinkCards",
 }
 
 /**

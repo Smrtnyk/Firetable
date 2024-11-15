@@ -19,6 +19,11 @@ export default {
         reactivate: "Wiederherstellen",
         arrived: "Eingetroffen",
         cancelled: "Storniert",
+        active: "Aktiv",
+        inactive: "Inaktiv",
+        noDescription: "Keine Beschreibung",
+        valueMustBePositive: "Der Wert muss positiv sein",
+        invalidPriceStep: "Der Preis muss in 0,50-Schritten angegeben werden",
     },
     useReservations: {
         cancelTableOperationTitle: "Vorgang abbrechen",
@@ -329,5 +334,30 @@ export default {
         issueMarkedAsResolved: "Fehler als gelöst markiert",
         issueMarkedAsUnresolved: "Fehler als nicht gelöst markiert",
         deleteConfirmation: "Fehlerbericht löschen?",
+    },
+    PageAdminPropertyDrinkCards: {
+        title: "Digitale Getränkekarten",
+        noCardsMessage:
+            "Noch keine Getränkekarten erstellt. Klicken Sie auf +, um Ihre erste Getränkekarte zu erstellen.",
+        createCardDialogTitle: "Neue Getränkekarte erstellen",
+        editCardDialogTitle: "Getränkekarte bearbeiten",
+        cardCreatedMessage: "Getränkekarte erfolgreich erstellt",
+        cardUpdatedMessage: "Getränkekarte erfolgreich aktualisiert",
+        cardDeletedMessage: "Getränkekarte erfolgreich gelöscht",
+        deleteCardConfirmation: "Möchten Sie diese Getränkekarte wirklich löschen?",
+        sectionsLabel: "Bereiche",
+        sectionsCount: "Bereiche: {count}",
+        itemsLabel: "Artikel",
+        sectionAlreadyExists: "Ein Bereich mit dieser Kategorie existiert bereits",
+        noSectionsMessage:
+            "Noch keine Bereiche hinzugefügt. Klicken Sie auf +, um einen Bereich hinzuzufügen.",
+        noItemsMessage:
+            "In diesem Bereich sind noch keine Artikel hinzugefügt. Klicken Sie auf +, um einen Artikel hinzuzufügen.",
+        noAvailableItems: "Für diese Kategorie sind keine Artikel verfügbar",
+        deleteSection: "Bereich löschen",
+        deleteSectionConfirmation: "Möchten Sie diesen Bereich wirklich löschen?",
+        cardNameLabel: "Kartenname",
+        cardDescriptionLabel: "Beschreibung (optional)",
+        isActiveLabel: "Aktiv",
     },
 };
