@@ -9,6 +9,10 @@ export type SortOption =
      */
     | "lastModified"
     /**
+     * When sorting by name, sort alphabetically by guest name
+     */
+    | "name"
+    /**
      * When sorting by percentage try to prioritize guests with the highest number of bookings.
      */
     | "percentage";
@@ -39,6 +43,7 @@ const sortOptions = [
     { label: "Bookings", value: "bookings" },
     { label: "Percentage", value: "percentage" },
     { label: "Last Modified", value: "lastModified" },
+    { label: "Name", value: "name" },
 ] as const;
 
 function updateSelectedTags(value: string[]): void {

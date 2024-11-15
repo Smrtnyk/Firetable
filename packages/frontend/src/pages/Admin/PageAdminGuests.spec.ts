@@ -176,290 +176,292 @@ describe("PageAdminGuests.vue", () => {
     });
 
     describe("guest sorting and filtering", () => {
-        it("renders guests sorted by number of visits", async () => {
-            const screen = await render();
+        describe("filtering by number of bookings and percentage", () => {
+            it("renders guests sorted by number of visits", async () => {
+                const screen = await render();
 
-            const guestItems = screen.getByRole("listitem");
+                const guestItems = screen.getByRole("listitem");
 
-            expect(guestItems.elements()).toHaveLength(3);
+                expect(guestItems.elements()).toHaveLength(3);
 
-            // First guest should be John Doe (3 visits)
-            expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
-            // Second guest should be Jane Smith (1 visit)
-            expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
-            // Third guest should be Alice Johnson (0 visits)
-            expect(guestItems.elements()[2]).toHaveTextContent("Alice Johnson");
-        });
+                // First guest should be John Doe (3 visits)
+                expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
+                // Second guest should be Jane Smith (1 visit)
+                expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
+                // Third guest should be Alice Johnson (0 visits)
+                expect(guestItems.elements()[2]).toHaveTextContent("Alice Johnson");
+            });
 
-        it("sorts guests by number of visits and percentage when they have the same number of visits", async () => {
-            guestsRef.value.data = [
-                {
-                    id: "guest1",
-                    name: "John Doe",
-                    contact: "john@example.com",
-                    hashedContact: "hashedContact",
-                    maskedContact: "maskedContact",
-                    visitedProperties: {
-                        property1: {
-                            visit1: {
-                                date: new Date("2023-10-01").getTime(),
-                                arrived: true,
-                            } as Visit,
-                            visit2: {
-                                date: new Date("2023-10-05").getTime(),
-                                arrived: false,
-                            } as Visit,
+            it("sorts guests by number of visits and percentage when they have the same number of visits", async () => {
+                guestsRef.value.data = [
+                    {
+                        id: "guest1",
+                        name: "John Doe",
+                        contact: "john@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        visitedProperties: {
+                            property1: {
+                                visit1: {
+                                    date: new Date("2023-10-01").getTime(),
+                                    arrived: true,
+                                } as Visit,
+                                visit2: {
+                                    date: new Date("2023-10-05").getTime(),
+                                    arrived: false,
+                                } as Visit,
+                            },
                         },
-                    },
-                } as GuestDoc,
-                {
-                    id: "guest2",
-                    name: "Jane Smith",
-                    contact: "jane@example.com",
-                    hashedContact: "hashedContact",
-                    maskedContact: "maskedContact",
-                    visitedProperties: {
-                        property1: {
-                            visit3: {
-                                date: new Date("2023-08-20").getTime(),
-                                arrived: true,
-                            } as Visit,
-                            visit4: {
-                                date: new Date("2023-08-21").getTime(),
-                                arrived: true,
-                            } as Visit,
+                    } as GuestDoc,
+                    {
+                        id: "guest2",
+                        name: "Jane Smith",
+                        contact: "jane@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        visitedProperties: {
+                            property1: {
+                                visit3: {
+                                    date: new Date("2023-08-20").getTime(),
+                                    arrived: true,
+                                } as Visit,
+                                visit4: {
+                                    date: new Date("2023-08-21").getTime(),
+                                    arrived: true,
+                                } as Visit,
+                            },
                         },
-                    },
-                } as GuestDoc,
-            ];
+                    } as GuestDoc,
+                ];
 
-            const screen = await render();
+                const screen = await render();
 
-            const guestItems = screen.getByRole("listitem");
-            expect(guestItems.elements()).toHaveLength(2);
+                const guestItems = screen.getByRole("listitem");
+                expect(guestItems.elements()).toHaveLength(2);
 
-            // Jane Smith should be first (2 visits, 100% arrival rate)
-            // John Doe should be second (2 visits, 50% arrival rate)
-            expect(guestItems.elements()[0]).toHaveTextContent("Jane Smith");
-            expect(guestItems.elements()[1]).toHaveTextContent("John Doe");
-        });
+                // Jane Smith should be first (2 visits, 100% arrival rate)
+                // John Doe should be second (2 visits, 50% arrival rate)
+                expect(guestItems.elements()[0]).toHaveTextContent("Jane Smith");
+                expect(guestItems.elements()[1]).toHaveTextContent("John Doe");
+            });
 
-        it("prioritizes number of visits over percentage when different number of visits", async () => {
-            guestsRef.value.data = [
-                {
-                    id: "guest1",
-                    name: "John Doe",
-                    contact: "john@example.com",
-                    hashedContact: "hashedContact",
-                    maskedContact: "maskedContact",
-                    visitedProperties: {
-                        property1: {
-                            visit1: {
-                                date: new Date("2023-10-01").getTime(),
-                                arrived: true,
-                            } as Visit,
-                            visit2: {
-                                date: new Date("2023-10-05").getTime(),
-                                arrived: false,
-                            } as Visit,
-                            visit3: {
-                                date: new Date("2023-10-06").getTime(),
-                                arrived: false,
-                            } as Visit,
+            it("prioritizes number of visits over percentage when different number of visits", async () => {
+                guestsRef.value.data = [
+                    {
+                        id: "guest1",
+                        name: "John Doe",
+                        contact: "john@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        visitedProperties: {
+                            property1: {
+                                visit1: {
+                                    date: new Date("2023-10-01").getTime(),
+                                    arrived: true,
+                                } as Visit,
+                                visit2: {
+                                    date: new Date("2023-10-05").getTime(),
+                                    arrived: false,
+                                } as Visit,
+                                visit3: {
+                                    date: new Date("2023-10-06").getTime(),
+                                    arrived: false,
+                                } as Visit,
+                            },
                         },
-                    },
-                } as GuestDoc,
-                {
-                    id: "guest2",
-                    name: "Jane Smith",
-                    contact: "jane@example.com",
-                    hashedContact: "hashedContact",
-                    maskedContact: "maskedContact",
-                    visitedProperties: {
-                        property1: {
-                            visit4: {
-                                date: new Date("2023-08-20").getTime(),
-                                arrived: true,
-                            } as Visit,
-                            visit5: {
-                                date: new Date("2023-08-21").getTime(),
-                                arrived: true,
-                            } as Visit,
+                    } as GuestDoc,
+                    {
+                        id: "guest2",
+                        name: "Jane Smith",
+                        contact: "jane@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        visitedProperties: {
+                            property1: {
+                                visit4: {
+                                    date: new Date("2023-08-20").getTime(),
+                                    arrived: true,
+                                } as Visit,
+                                visit5: {
+                                    date: new Date("2023-08-21").getTime(),
+                                    arrived: true,
+                                } as Visit,
+                            },
                         },
-                    },
-                } as GuestDoc,
-            ];
+                    } as GuestDoc,
+                ];
 
-            const screen = await render();
+                const screen = await render();
 
-            const guestItems = screen.getByRole("listitem");
-            expect(guestItems.elements()).toHaveLength(2);
+                const guestItems = screen.getByRole("listitem");
+                expect(guestItems.elements()).toHaveLength(2);
 
-            // John Doe should be first (3 visits, 33% arrival rate)
-            // Jane Smith should be second (2 visits, 100% arrival rate)
-            expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
-            expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
-        });
+                // John Doe should be first (3 visits, 33% arrival rate)
+                // Jane Smith should be second (2 visits, 100% arrival rate)
+                expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
+                expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
+            });
 
-        it("sorts guests by percentage when percentage sort option is selected", async () => {
-            guestsRef.value.data = [
-                {
-                    id: "guest1",
-                    name: "John Doe",
-                    contact: "john@example.com",
-                    hashedContact: "hashedContact",
-                    maskedContact: "maskedContact",
-                    visitedProperties: {
-                        property1: {
-                            visit1: {
-                                date: new Date("2023-10-01").getTime(),
-                                arrived: true,
-                            } as Visit,
-                            visit2: {
-                                date: new Date("2023-10-05").getTime(),
-                                arrived: false,
-                            } as Visit,
+            it("sorts guests by percentage when percentage sort option is selected", async () => {
+                guestsRef.value.data = [
+                    {
+                        id: "guest1",
+                        name: "John Doe",
+                        contact: "john@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        visitedProperties: {
+                            property1: {
+                                visit1: {
+                                    date: new Date("2023-10-01").getTime(),
+                                    arrived: true,
+                                } as Visit,
+                                visit2: {
+                                    date: new Date("2023-10-05").getTime(),
+                                    arrived: false,
+                                } as Visit,
+                            },
                         },
-                    },
-                } as GuestDoc,
-                {
-                    id: "guest2",
-                    name: "Jane Smith",
-                    contact: "jane@example.com",
-                    hashedContact: "hashedContact",
-                    maskedContact: "maskedContact",
-                    visitedProperties: {
-                        property1: {
-                            visit3: {
-                                date: new Date("2023-08-20").getTime(),
-                                arrived: true,
-                            } as Visit,
+                    } as GuestDoc,
+                    {
+                        id: "guest2",
+                        name: "Jane Smith",
+                        contact: "jane@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        visitedProperties: {
+                            property1: {
+                                visit3: {
+                                    date: new Date("2023-08-20").getTime(),
+                                    arrived: true,
+                                } as Visit,
+                            },
                         },
-                    },
-                } as GuestDoc,
-            ];
+                    } as GuestDoc,
+                ];
 
-            const screen = await render();
+                const screen = await render();
 
-            // Change to percentage sort
-            const sortButton = screen.getByLabelText("filter guests");
-            await userEvent.click(sortButton);
-            const percentageOption = screen.getByText("Percentage");
-            await userEvent.click(percentageOption);
+                // Change to percentage sort
+                const sortButton = screen.getByLabelText("filter guests");
+                await userEvent.click(sortButton);
+                const percentageOption = screen.getByText("Percentage");
+                await userEvent.click(percentageOption);
 
-            const guestItems = screen.getByRole("listitem");
+                const guestItems = screen.getByRole("listitem");
 
-            // Jane Smith should be first (100% arrival - 1/1)
-            // John Doe should be second (50% arrival - 1/2)
-            expect(guestItems.elements()[0]).toHaveTextContent("Jane Smith");
-            expect(guestItems.elements()[1]).toHaveTextContent("John Doe");
-        });
+                // Jane Smith should be first (100% arrival - 1/1)
+                // John Doe should be second (50% arrival - 1/2)
+                expect(guestItems.elements()[0]).toHaveTextContent("Jane Smith");
+                expect(guestItems.elements()[1]).toHaveTextContent("John Doe");
+            });
 
-        it("uses number of bookings as secondary sort when percentages are equal", async () => {
-            guestsRef.value.data = [
-                {
-                    id: "guest1",
-                    name: "John Doe",
-                    contact: "john@example.com",
-                    hashedContact: "hashedContact",
-                    maskedContact: "maskedContact",
-                    visitedProperties: {
-                        property1: {
-                            visit1: {
-                                date: new Date("2023-10-01").getTime(),
-                                arrived: true,
-                            } as Visit,
-                            visit2: {
-                                date: new Date("2023-10-05").getTime(),
-                                arrived: true,
-                            } as Visit,
+            it("uses number of bookings as secondary sort when percentages are equal", async () => {
+                guestsRef.value.data = [
+                    {
+                        id: "guest1",
+                        name: "John Doe",
+                        contact: "john@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        visitedProperties: {
+                            property1: {
+                                visit1: {
+                                    date: new Date("2023-10-01").getTime(),
+                                    arrived: true,
+                                } as Visit,
+                                visit2: {
+                                    date: new Date("2023-10-05").getTime(),
+                                    arrived: true,
+                                } as Visit,
+                            },
                         },
-                    },
-                } as GuestDoc,
-                {
-                    id: "guest2",
-                    name: "Jane Smith",
-                    contact: "jane@example.com",
-                    hashedContact: "hashedContact",
-                    maskedContact: "maskedContact",
-                    visitedProperties: {
-                        property1: {
-                            visit3: {
-                                date: new Date("2023-08-20").getTime(),
-                                arrived: true,
-                            } as Visit,
+                    } as GuestDoc,
+                    {
+                        id: "guest2",
+                        name: "Jane Smith",
+                        contact: "jane@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        visitedProperties: {
+                            property1: {
+                                visit3: {
+                                    date: new Date("2023-08-20").getTime(),
+                                    arrived: true,
+                                } as Visit,
+                            },
                         },
-                    },
-                } as GuestDoc,
-            ];
+                    } as GuestDoc,
+                ];
 
-            const screen = await render();
+                const screen = await render();
 
-            // Change to percentage sort
-            const sortButton = screen.getByLabelText("filter guests");
-            await userEvent.click(sortButton);
-            const percentageOption = screen.getByText("Percentage");
-            await userEvent.click(percentageOption);
+                // Change to percentage sort
+                const sortButton = screen.getByLabelText("filter guests");
+                await userEvent.click(sortButton);
+                const percentageOption = screen.getByText("Percentage");
+                await userEvent.click(percentageOption);
 
-            const guestItems = screen.getByRole("listitem");
+                const guestItems = screen.getByRole("listitem");
 
-            // Both have 100% arrival rate
-            // John Doe should be first (100% with 2 visits)
-            // Jane Smith should be second (100% with 1 visit)
-            expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
-            expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
-        });
+                // Both have 100% arrival rate
+                // John Doe should be first (100% with 2 visits)
+                // Jane Smith should be second (100% with 1 visit)
+                expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
+                expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
+            });
 
-        it("places guests with no bookings at the end when sorting by percentage", async () => {
-            guestsRef.value.data = [
-                {
-                    id: "guest1",
-                    name: "John Doe",
-                    contact: "john@example.com",
-                    hashedContact: "hashedContact",
-                    maskedContact: "maskedContact",
-                    visitedProperties: {
-                        property1: {
-                            visit1: {
-                                date: new Date("2023-10-01").getTime(),
-                                arrived: true,
-                            } as Visit,
+            it("places guests with no bookings at the end when sorting by percentage", async () => {
+                guestsRef.value.data = [
+                    {
+                        id: "guest1",
+                        name: "John Doe",
+                        contact: "john@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        visitedProperties: {
+                            property1: {
+                                visit1: {
+                                    date: new Date("2023-10-01").getTime(),
+                                    arrived: true,
+                                } as Visit,
+                            },
                         },
-                    },
-                } as GuestDoc,
-                {
-                    id: "guest2",
-                    name: "Jane Smith",
-                    contact: "jane@example.com",
-                    hashedContact: "hashedContact",
-                    maskedContact: "maskedContact",
-                    visitedProperties: {},
-                } as GuestDoc,
-                {
-                    id: "guest3",
-                    name: "Alice Johnson",
-                    contact: "alice@example.com",
-                    hashedContact: "hashedContact",
-                    maskedContact: "maskedContact",
-                    visitedProperties: {},
-                } as GuestDoc,
-            ];
+                    } as GuestDoc,
+                    {
+                        id: "guest2",
+                        name: "Jane Smith",
+                        contact: "jane@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        visitedProperties: {},
+                    } as GuestDoc,
+                    {
+                        id: "guest3",
+                        name: "Alice Johnson",
+                        contact: "alice@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        visitedProperties: {},
+                    } as GuestDoc,
+                ];
 
-            const screen = await render();
+                const screen = await render();
 
-            // Change to percentage sort
-            const sortButton = screen.getByLabelText("filter guests");
-            await userEvent.click(sortButton);
-            const percentageOption = screen.getByText("Percentage");
-            await userEvent.click(percentageOption);
+                // Change to percentage sort
+                const sortButton = screen.getByLabelText("filter guests");
+                await userEvent.click(sortButton);
+                const percentageOption = screen.getByText("Percentage");
+                await userEvent.click(percentageOption);
 
-            const guestItems = screen.getByRole("listitem");
+                const guestItems = screen.getByRole("listitem");
 
-            // John Doe should be first (has visits)
-            // Jane and Alice (no visits) should be after, in their original order
-            expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
-            expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
-            expect(guestItems.elements()[2]).toHaveTextContent("Alice Johnson");
+                // John Doe should be first (has visits)
+                // Jane and Alice (no visits) should be after, in their original order
+                expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
+                expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
+                expect(guestItems.elements()[2]).toHaveTextContent("Alice Johnson");
+            });
         });
 
         describe("filtering by tag", () => {
@@ -774,6 +776,112 @@ describe("PageAdminGuests.vue", () => {
                 // John should be second (50% arrival rate)
                 expect(guestItems.elements()[0]).toHaveTextContent("Jane Smith");
                 expect(guestItems.elements()[1]).toHaveTextContent("John Doe");
+            });
+        });
+
+        describe("name sorting", () => {
+            it("sorts guests alphabetically by name", async () => {
+                guestsRef.value.data = [
+                    {
+                        id: "guest1",
+                        name: "Charlie Brown",
+                        contact: "charlie@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        visitedProperties: {},
+                    } as GuestDoc,
+                    {
+                        id: "guest2",
+                        name: "Alice Smith",
+                        contact: "alice@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        visitedProperties: {},
+                    } as GuestDoc,
+                    {
+                        id: "guest3",
+                        name: "Bob Johnson",
+                        contact: "bob@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        visitedProperties: {},
+                    } as GuestDoc,
+                ];
+
+                const screen = await render();
+
+                // Change to name sort
+                const sortButton = screen.getByLabelText("filter guests");
+                await userEvent.click(sortButton);
+                await userEvent.click(screen.getByText("Name", { exact: true }));
+
+                const guestItems = screen.getByRole("listitem");
+
+                // Should be sorted by name in descending order by default
+                expect(guestItems.elements()[0]).toHaveTextContent("Charlie Brown");
+                expect(guestItems.elements()[1]).toHaveTextContent("Bob Johnson");
+                expect(guestItems.elements()[2]).toHaveTextContent("Alice Smith");
+
+                // Toggle to ascending order
+                await userEvent.click(screen.getByText("Descending"));
+
+                // Should now be in ascending order
+                expect(guestItems.elements()[0]).toHaveTextContent("Alice Smith");
+                expect(guestItems.elements()[1]).toHaveTextContent("Bob Johnson");
+                expect(guestItems.elements()[2]).toHaveTextContent("Charlie Brown");
+            });
+
+            it("maintains name sort when applying filters", async () => {
+                guestsRef.value.data = [
+                    {
+                        id: "guest1",
+                        name: "Charlie Brown",
+                        contact: "charlie@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        visitedProperties: {},
+                        tags: ["vip"],
+                    } as GuestDoc,
+                    {
+                        id: "guest2",
+                        name: "Alice Smith",
+                        contact: "alice@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        visitedProperties: {},
+                        tags: ["vip"],
+                    } as GuestDoc,
+                    {
+                        id: "guest3",
+                        name: "Bob Johnson",
+                        contact: "bob@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "maskedContact",
+                        visitedProperties: {},
+                    } as GuestDoc,
+                ];
+
+                const screen = await render();
+
+                // Set name sort
+                const sortButton = screen.getByLabelText("filter guests");
+                await userEvent.click(sortButton);
+                await userEvent.click(screen.getByText("Name", { exact: true }));
+                // Switch to ascending
+                await userEvent.click(screen.getByText("Descending"));
+
+                // Apply VIP tag filter
+                await userEvent.click(screen.getByLabelText("Filter by tags"));
+                await userEvent.click(screen.getByText("vip"));
+
+                await userEvent.click(screen.getByLabelText("Close dialog"));
+
+                const guestItems = screen.getByRole("listitem");
+
+                // Should show only VIP guests, still sorted by name
+                expect(guestItems.elements()).toHaveLength(2);
+                expect(guestItems.elements()[0]).toHaveTextContent("Alice Smith");
+                expect(guestItems.elements()[1]).toHaveTextContent("Charlie Brown");
             });
         });
     });

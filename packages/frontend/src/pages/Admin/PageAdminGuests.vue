@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { CreateGuestPayload } from "@firetable/types";
 import type { SortDirection, SortOption } from "src/components/admin/guest/GuestSortOptions.vue";
-import GuestSortOptions from "src/components/admin/guest/GuestSortOptions.vue";
 import { createGuest } from "@firetable/backend";
 import { useI18n } from "vue-i18n";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
@@ -20,6 +19,7 @@ import FTCenteredText from "src/components/FTCenteredText.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import FTBtn from "src/components/FTBtn.vue";
 import GuestSummaryChips from "src/components/guest/GuestSummaryChips.vue";
+import GuestSortOptions from "src/components/admin/guest/GuestSortOptions.vue";
 
 export interface PageAdminGuestsProps {
     organisationId: string;
@@ -103,6 +103,10 @@ const sortedGuests = computed(function () {
         let comparison: number;
 
         switch (sortOption.value) {
+            case "name":
+                comparison = b.name.localeCompare(a.name);
+                break;
+
             case "lastModified":
                 {
                     // Use 0 as default if lastModified is not set
