@@ -80,8 +80,6 @@ export default {
     InventoryTable: {
         quantity: "Menge",
         drink: "Getränk",
-        food: "Essen",
-        other: "Andere",
     },
     AppDrawer: {
         links: {

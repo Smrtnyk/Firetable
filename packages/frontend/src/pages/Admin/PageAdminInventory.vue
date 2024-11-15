@@ -15,10 +15,8 @@ import { useRouter } from "vue-router";
 import { useDialog } from "src/composables/useDialog.js";
 import { AppLogger } from "src/logger/FTLogger.js";
 import { omit } from "es-toolkit";
-import { parseProductData } from "src/helpers/inventory/parse-product-data";
 
 import FTTitle from "src/components/FTTitle.vue";
-import BarcodeScanner from "src/components/admin/inventory/BarcodeScanner.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import InventoryTable from "src/components/admin/inventory/InventoryTable.vue";
 import FTDialog from "src/components/FTDialog.vue";
@@ -140,56 +138,6 @@ async function init(): Promise<void> {
     }
 }
 
-function scanBarcode(): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: BarcodeScanner,
-            maximized: false,
-            title: t("PageAdminInventory.scanBarcodeDialogTitle"),
-            listeners: {
-                barcodeScanned(barcode: string) {
-                    dialog.hide();
-                    fetchProductDetails(barcode);
-                },
-            },
-        },
-    });
-}
-
-async function fetchProductDetails(barcode: string): Promise<void> {
-    await tryCatchLoadingWrapper({
-        async hook() {
-            const url = `https://world.openfoodfacts.net/api/v2/product/${barcode}.json`;
-            const response = await fetch(url, {
-                mode: "cors",
-            });
-
-            if (!response.ok) {
-                throw new Error(
-                    "There was an error fetching the product, please enter the details manually.",
-                );
-            }
-
-            const { product, status } = await response.json();
-
-            if (status !== 1) {
-                throw new Error("Product not found, please enter the details manually.");
-            }
-
-            populateProductForm(product);
-            AppLogger.info(product);
-        },
-        errorHook() {
-            showCreateInventoryItemDialog();
-        },
-    });
-}
-
-function populateProductForm(product: Record<string, any>): void {
-    showCreateInventoryItemDialog(parseProductData(product));
-}
-
 onMounted(init);
 </script>
 
@@ -203,7 +151,6 @@ onMounted(init);
                     class="button-gradient"
                     @click="showCreateInventoryItemDialog()"
                 />
-                <FTBtn rounded icon="camera" @click="scanBarcode" />
             </template>
         </FTTitle>
 

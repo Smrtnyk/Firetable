@@ -67,7 +67,7 @@ const columns = [
         label: t("Global.type"),
         field: "type",
         sortable: true,
-        format: (val: InventoryItemType) => getTypeLabel(val),
+        format: getTypeLabel,
     },
     { name: "category", label: t("Global.category"), field: "category", sortable: true },
     {
@@ -81,16 +81,7 @@ const columns = [
     { name: "actions", label: t("Global.actions"), field: "actions" },
 ];
 
-function getTypeLabel(type: InventoryItemType): string {
-    switch (type) {
-        case InventoryItemType.DRINK:
-            return t("InventoryTable.drink");
-        case InventoryItemType.FOOD:
-            return t("InventoryTable.food");
-        case InventoryItemType.OTHER:
-            return t("InventoryTable.other");
-        default:
-            return type;
-    }
+function getTypeLabel(): InventoryItemType {
+    return InventoryItemType.DRINK;
 }
 </script>

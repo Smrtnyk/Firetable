@@ -18,7 +18,7 @@ const sampleItems: InventoryItemDoc[] = [
     {
         id: "2",
         name: "Chocolate Bar",
-        type: InventoryItemType.FOOD,
+        type: InventoryItemType.DRINK,
         category: DrinkCategory.BEER,
         price: 1.49,
         quantity: 100,
@@ -42,7 +42,7 @@ describe("InventoryTable.vue", () => {
             const nameCell = page.getByText(item.name);
             expect(nameCell.elements().length).toBeGreaterThan(0);
 
-            const typeLabel = getTypeLabel(item.type);
+            const typeLabel = InventoryItemType.DRINK;
             const typeCell = page.getByText(typeLabel);
             expect(typeCell.elements().length).toBeGreaterThan(0);
 
@@ -94,16 +94,3 @@ describe("InventoryTable.vue", () => {
         expect(emittedEvents[0][0]).toStrictEqual(sampleItems[1]);
     });
 });
-
-function getTypeLabel(type: InventoryItemType): string {
-    switch (type) {
-        case InventoryItemType.DRINK:
-            return "Drink";
-        case InventoryItemType.FOOD:
-            return "Food";
-        case InventoryItemType.OTHER:
-            return "Other";
-        default:
-            return type;
-    }
-}

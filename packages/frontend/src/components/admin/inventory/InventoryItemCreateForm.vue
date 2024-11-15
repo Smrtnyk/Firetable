@@ -14,7 +14,7 @@ const { t } = useI18n();
 const props = defineProps<InventoryItemCreateFormProps>();
 const formRef = useTemplateRef<QForm>("formRef");
 const form = ref<CreateInventoryItemPayload>(getInitialForm());
-const typeOptions = [InventoryItemType.DRINK, InventoryItemType.FOOD, InventoryItemType.OTHER];
+const typeOptions = [InventoryItemType.DRINK];
 const emit = defineEmits<(e: "submit", item: CreateInventoryItemPayload) => void>();
 const isDrinkType = computed(function () {
     return form.value.type === InventoryItemType.DRINK;

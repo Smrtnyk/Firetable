@@ -77,8 +77,6 @@ export default {
     InventoryTable: {
         quantity: "Quantity",
         drink: "Drink",
-        food: "Food",
-        other: "Other",
     },
     AppDrawer: {
         links: {

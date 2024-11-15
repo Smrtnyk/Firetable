@@ -64,13 +64,7 @@ describe("InventoryItemCreateForm.vue", () => {
                 includeHidden: false,
                 expanded: false,
             });
-
-            await userEvent.click(options);
-
-            const foodOption = screen.getByText(InventoryItemType.FOOD);
-
-            await userEvent.click(foodOption!);
-            await expect.element(options).toHaveValue(InventoryItemType.FOOD);
+            await expect.element(options).toHaveValue(InventoryItemType.DRINK);
 
             const priceInput = screen.getByLabelText("Price");
             await userEvent.type(priceInput, "10");
@@ -96,57 +90,13 @@ describe("InventoryItemCreateForm.vue", () => {
             // Check that form values have been reset
             await expect.element(nameInput).toHaveValue("");
         });
-
-        it("conditionally shows alcohol content and volume fields when type is drink", async () => {
-            const alcoholContentInput = screen.getByLabelText("Alcohol Content");
-            const volumeInput = screen.getByLabelText("Volume");
-
-            await expect.element(alcoholContentInput).toBeVisible();
-            await expect.element(volumeInput).toBeVisible();
-
-            const options = screen.getByRole("combobox", {
-                includeHidden: false,
-                expanded: false,
-            });
-
-            {
-                // Change type to 'food'
-                await userEvent.click(options);
-
-                const foodOption = screen.getByText(InventoryItemType.FOOD);
-
-                // Select 'Food' from the dropdown options
-                await userEvent.click(foodOption);
-
-                // Check that 'Alcohol Content' and 'Volume' inputs are no longer present
-                const alcoholContentInputAfter = screen.getByLabelText("Alcohol Content");
-                const volumeInputAfter = screen.getByLabelText("Volume");
-
-                await expect.element(alcoholContentInputAfter).not.toBeInTheDocument();
-                await expect.element(volumeInputAfter).not.toBeInTheDocument();
-            }
-
-            {
-                // Change type back to 'drink'
-                await userEvent.click(options);
-                const drinkOption = screen.getByText(InventoryItemType.DRINK);
-
-                await userEvent.click(drinkOption);
-                // Check that 'Alcohol Content' and 'Volume' inputs are present again
-                const alcoholContentInputAgain = screen.getByLabelText("Alcohol Content");
-                const volumeInputAgain = screen.getByLabelText("Volume");
-
-                await expect.element(alcoholContentInputAgain).toBeVisible();
-                await expect.element(volumeInputAgain).toBeVisible();
-            }
-        });
     });
 
     describe("edit", () => {
         it("prefills form when itemToEdit prop is provided", async () => {
             const itemToEdit = {
                 name: "Existing Item",
-                type: InventoryItemType.FOOD,
+                type: InventoryItemType.DRINK,
                 category: "Snacks",
                 price: 5.99,
                 quantity: 10,
@@ -171,7 +121,7 @@ describe("InventoryItemCreateForm.vue", () => {
                 includeHidden: false,
                 expanded: false,
             });
-            await expect.element(options).toHaveValue(InventoryItemType.FOOD);
+            await expect.element(options).toHaveValue(InventoryItemType.DRINK);
 
             const categoryInput = screen.getByLabelText("Category");
             await expect.element(categoryInput).toHaveValue("Snacks");
@@ -180,8 +130,8 @@ describe("InventoryItemCreateForm.vue", () => {
         it("emits submit event with updated item including id when editing", async () => {
             const itemToEdit = {
                 name: "Existing Item",
-                type: InventoryItemType.FOOD,
-                category: "Snacks",
+                type: InventoryItemType.DRINK,
+                category: "Beer",
                 price: 5.99,
                 quantity: 10,
                 supplier: "Supplier A",
@@ -212,7 +162,7 @@ describe("InventoryItemCreateForm.vue", () => {
         it("resets form to initial item when reset button is clicked while editing", async () => {
             const itemToEdit = {
                 name: "Existing Item",
-                type: InventoryItemType.FOOD,
+                type: InventoryItemType.DRINK,
                 category: "Snacks",
                 price: 5.99,
                 quantity: 10,

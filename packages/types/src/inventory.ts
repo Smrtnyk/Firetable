@@ -1,7 +1,5 @@
 export const enum InventoryItemType {
     DRINK = "drink",
-    FOOD = "food",
-    OTHER = "other",
 }
 
 export const enum DrinkCategory {
@@ -18,7 +16,7 @@ export type CreateInventoryItemPayload = Pick<
 
 /**
  * Represents an inventory item document in Firestore
- * Used to track stock items like drinks, food, and other supplies
+ * Used to track stock items for drinks
  */
 export interface InventoryItemDoc {
     /**
@@ -30,7 +28,7 @@ export interface InventoryItemDoc {
      */
     name: string;
     /**
-     * Classification of the item (drink, food, or other)
+     * Classification of the drink item
      */
     type: InventoryItemType;
     /**

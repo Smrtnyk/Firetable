@@ -40,7 +40,6 @@
         "@sentry/vue": "8.41.0",
         "@types/pako": "2.0.3",
         "@vueuse/core": "12.0.0",
-        "@zxing/browser": "0.1.5",
         "date-fns": "4.1.0",
         "echarts": "5.5.1",
         "es-toolkit": "catalog:",
