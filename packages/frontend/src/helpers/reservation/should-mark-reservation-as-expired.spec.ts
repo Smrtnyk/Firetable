@@ -1,5 +1,8 @@
 import { shouldMarkReservationAsExpired } from "./should-mark-reservation-as-expired";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { ONE_MINUTE } from "src/constants";
+
+const DEFAULT_LATE_CRITERIA = 30 * ONE_MINUTE;
 
 describe("shouldMarkReservationAsExpired", () => {
     beforeEach(() => {
@@ -20,7 +23,12 @@ describe("shouldMarkReservationAsExpired", () => {
         const currentDate = new Date("2023-10-14T22:31:00Z");
         vi.setSystemTime(currentDate);
 
-        const result = shouldMarkReservationAsExpired(reservationTime, eventDate, viennaTimezone);
+        const result = shouldMarkReservationAsExpired(
+            reservationTime,
+            eventDate,
+            viennaTimezone,
+            DEFAULT_LATE_CRITERIA,
+        );
 
         expect(result).toBe(true);
     });
@@ -54,6 +62,7 @@ describe("shouldMarkReservationAsExpired", () => {
                 // Using current time as event date for simplicity
                 currentTime,
                 timezone,
+                DEFAULT_LATE_CRITERIA,
             );
             expect(result, `Failed for ${timezone}: ${description}`).toBe(expected);
         }
@@ -67,7 +76,12 @@ describe("shouldMarkReservationAsExpired", () => {
         const currentDate = new Date("2023-10-14T21:50:00.000Z");
         vi.setSystemTime(currentDate);
 
-        const result = shouldMarkReservationAsExpired(reservationTime, eventDate, viennaTimezone);
+        const result = shouldMarkReservationAsExpired(
+            reservationTime,
+            eventDate,
+            viennaTimezone,
+            DEFAULT_LATE_CRITERIA,
+        );
 
         expect(result).toBe(false);
     });
@@ -82,7 +96,12 @@ describe("shouldMarkReservationAsExpired", () => {
 
         vi.setSystemTime(currentTime);
 
-        const result = shouldMarkReservationAsExpired(reservationTime, eventDate, viennaTimezone);
+        const result = shouldMarkReservationAsExpired(
+            reservationTime,
+            eventDate,
+            viennaTimezone,
+            DEFAULT_LATE_CRITERIA,
+        );
 
         expect(result).toBe(true);
     });
@@ -94,7 +113,12 @@ describe("shouldMarkReservationAsExpired", () => {
         const currentDate = new Date("2023-10-15T00:46:00");
         vi.setSystemTime(currentDate);
 
-        const result = shouldMarkReservationAsExpired(reservationTime, eventDate, viennaTimezone);
+        const result = shouldMarkReservationAsExpired(
+            reservationTime,
+            eventDate,
+            viennaTimezone,
+            DEFAULT_LATE_CRITERIA,
+        );
 
         expect(result).toBe(true);
     });
@@ -107,7 +131,12 @@ describe("shouldMarkReservationAsExpired", () => {
         const currentDate = new Date("2023-10-14T22:40:00.000Z");
         vi.setSystemTime(currentDate);
 
-        const result = shouldMarkReservationAsExpired(reservationTime, eventDate, viennaTimezone);
+        const result = shouldMarkReservationAsExpired(
+            reservationTime,
+            eventDate,
+            viennaTimezone,
+            DEFAULT_LATE_CRITERIA,
+        );
 
         expect(result).toBe(false);
     });
@@ -119,7 +148,12 @@ describe("shouldMarkReservationAsExpired", () => {
         const currentDate = new Date("2023-10-14T12:30:00");
         vi.setSystemTime(currentDate);
 
-        const result = shouldMarkReservationAsExpired(reservationTime, eventDate, viennaTimezone);
+        const result = shouldMarkReservationAsExpired(
+            reservationTime,
+            eventDate,
+            viennaTimezone,
+            DEFAULT_LATE_CRITERIA,
+        );
 
         expect(result).toBe(true);
     });

@@ -830,6 +830,7 @@ export function useReservations(
                         reservation.time,
                         baseEventDate,
                         propertySettings.value.timezone,
+                        propertySettings.value.markGuestAsLateAfterMinutes * ONE_MINUTE,
                     )
                 );
             })

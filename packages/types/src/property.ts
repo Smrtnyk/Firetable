@@ -7,6 +7,13 @@ export interface PropertySettings {
      * Used for date/time calculations
      */
     timezone: string;
+
+    /**
+     * After configured amount of minutes the guest will be marked as late
+     * on the floor plan
+     * Value is in minutes
+     */
+    markGuestAsLateAfterMinutes: number;
 }
 
 /**

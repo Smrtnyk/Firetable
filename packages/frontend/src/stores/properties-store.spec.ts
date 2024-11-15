@@ -107,13 +107,14 @@ describe("properties-store.ts", () => {
         it("returns merged settings with defaults", () => {
             const store = mockedStore(usePropertiesStore);
             const property = createTestProperty({
-                settings: { timezone: "Europe/London" },
+                settings: { timezone: "Europe/London", markGuestAsLateAfterMinutes: 10 },
             });
             store.properties = [property];
 
             const settings = store.getPropertySettingsById("property1");
             expect(settings).toEqual({
                 timezone: "Europe/London",
+                markGuestAsLateAfterMinutes: 10,
             });
         });
 
@@ -125,6 +126,7 @@ describe("properties-store.ts", () => {
             const settings = store.getPropertySettingsById("property1");
             expect(settings).toEqual({
                 timezone: expect.any(String),
+                markGuestAsLateAfterMinutes: 10,
             });
         });
 

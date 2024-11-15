@@ -4,7 +4,8 @@ import type { PageAdminOrganisationSettingsProps } from "./PageAdminOrganisation
 import PageAdminOrganisationSettings from "./PageAdminOrganisationSettings.vue";
 import { renderComponent } from "../../../test-helpers/render-component";
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { userEvent } from "@vitest/browser/context";
+import { page, userEvent } from "@vitest/browser/context";
+import { nextTick } from "vue";
 
 const { tryCatchLoadingWrapperSpy, updateOrganisationSettingsMock, updatePropertySettingsMock } =
     vi.hoisted(() => ({
@@ -58,6 +59,7 @@ describe("PageAdminOrganisationSettings.vue", () => {
                 organisationId: "org1",
                 settings: {
                     timezone: "Europe/Vienna",
+                    markGuestAsLateAfterMinutes: 15,
                 },
             },
             {
@@ -66,6 +68,7 @@ describe("PageAdminOrganisationSettings.vue", () => {
                 organisationId: "org1",
                 settings: {
                     timezone: "Europe/Athens",
+                    markGuestAsLateAfterMinutes: 30,
                 },
             },
         ] as PropertyDoc[];
@@ -86,9 +89,7 @@ describe("PageAdminOrganisationSettings.vue", () => {
         });
 
         // Wait for initial render
-        await vi.waitUntil(() =>
-            document.querySelector('[role="region"][aria-label="Property One"]'),
-        );
+        await vi.waitUntil(() => page.getByText("Property One"));
 
         return screen;
     }
@@ -96,8 +97,8 @@ describe("PageAdminOrganisationSettings.vue", () => {
     it("renders all properties with their timezone settings", async () => {
         const screen = await render();
 
-        const propertyOneSection = screen.getByRole("region", { name: "Property One" });
-        const propertyTwoSection = screen.getByRole("region", { name: "Property Two" });
+        const propertyOneSection = screen.getByLabelText("Property One settings card");
+        const propertyTwoSection = screen.getByLabelText("Property Two settings card");
 
         await expect.element(propertyOneSection).toBeInTheDocument();
         await expect.element(propertyTwoSection).toBeInTheDocument();
@@ -112,8 +113,10 @@ describe("PageAdminOrganisationSettings.vue", () => {
     it("detects changes in property timezone settings", async () => {
         const screen = await render();
 
-        const propertySection = screen.getByRole("region", { name: "Property One" });
+        const propertySection = screen.getByLabelText("Property One settings card");
         propertySection.query()!.scrollIntoView();
+
+        await nextTick();
 
         const timezoneSelect = propertySection.getByRole("combobox");
         await userEvent.click(timezoneSelect);

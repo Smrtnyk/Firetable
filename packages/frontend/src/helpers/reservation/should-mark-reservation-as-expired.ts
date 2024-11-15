@@ -1,5 +1,4 @@
 import { AppLogger } from "src/logger/FTLogger";
-import { HALF_HOUR } from "src/constants";
 import { addDays } from "date-fns";
 
 /**
@@ -10,17 +9,19 @@ import { addDays } from "date-fns";
  * @param eventDate - The date of the event as a Date object created from UTC timestamp
  *                   (created by createUTCTimestamp)
  * @param propertyTimezone - The timezone of the property where the event takes place
+ * @param lateCriteria - The number of minutes after the reservation time when the reservation should be marked as expired (in ms)
  * @returns - Returns `true` if the reservation should be marked as expired; otherwise, `false`
  *
  * @example
  * // Event date was saved using createUTCTimestamp:
  * const eventDate = new Date(event.date); // UTC timestamp from createUTCTimestamp
- * shouldMarkReservationAsExpired("23:00", eventDate, "Europe/Vienna");
+ * shouldMarkReservationAsExpired("23:00", eventDate, "Europe/Vienna", 30 * 60 * 1000);
  */
 export function shouldMarkReservationAsExpired(
     reservationTime: string,
     eventDate: Date,
     propertyTimezone: string,
+    lateCriteria: number,
 ): boolean {
     const [hoursStr, minutesStr] = reservationTime.split(":");
     const reservationHour = Number.parseInt(hoursStr);
@@ -102,5 +103,5 @@ export function shouldMarkReservationAsExpired(
     //     isExpired: timeDifference >= HALF_HOUR,
     // });
 
-    return timeDifference >= HALF_HOUR;
+    return timeDifference >= lateCriteria;
 }

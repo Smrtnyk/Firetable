@@ -82,11 +82,12 @@ function reset(): void {
 }
 
 function initPropertySettings(): void {
-    properties.value.forEach((property) => {
+    properties.value.forEach(function (property) {
         const propertySettings = propertiesStore.getPropertySettingsById(property.id);
 
         editableSettings.value.properties[property.id] = {
             timezone: propertySettings.timezone,
+            markGuestAsLateAfterMinutes: propertySettings.markGuestAsLateAfterMinutes,
         };
     });
 }
@@ -238,21 +239,35 @@ onMounted(initPropertySettings);
             </SettingsSection>
         </AppCardSection>
 
-        <AppCardSection title="Properties">
-            <div v-for="property in properties" :key="property.id">
-                <SettingsSection
-                    :title="property.name"
-                    v-if="editableSettings.properties[property.id]"
-                >
-                    <q-select
-                        rounded
-                        standout
-                        v-model="editableSettings.properties[property.id].timezone"
-                        :options="timezones"
-                        label="Timezone"
-                    />
-                </SettingsSection>
-            </div>
+        <AppCardSection
+            :aria-label="property.name + ' settings card'"
+            v-for="property in properties"
+            :key="property.id"
+            :title="property.name"
+        >
+            <SettingsSection title="Timezone" v-if="editableSettings.properties[property.id]">
+                <q-select
+                    rounded
+                    standout
+                    v-model="editableSettings.properties[property.id].timezone"
+                    :options="timezones"
+                    label="Property timezone"
+                />
+            </SettingsSection>
+
+            <SettingsSection
+                title="Guest late criteria"
+                v-if="editableSettings.properties[property.id]"
+            >
+                <q-input
+                    rounded
+                    standout
+                    type="number"
+                    min="1"
+                    label="In minutes"
+                    v-model="editableSettings.properties[property.id].markGuestAsLateAfterMinutes"
+                />
+            </SettingsSection>
         </AppCardSection>
     </div>
 </template>

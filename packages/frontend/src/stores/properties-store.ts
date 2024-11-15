@@ -25,6 +25,7 @@ import { getDefaultTimezone } from "src/helpers/date-utils";
 
 const DEFAULT_PROPERTY_SETTINGS = {
     timezone: getDefaultTimezone(),
+    markGuestAsLateAfterMinutes: 30,
 };
 
 export const DEFAULT_ORGANISATION_SETTINGS: DeepRequired<OrganisationSettings> = {
