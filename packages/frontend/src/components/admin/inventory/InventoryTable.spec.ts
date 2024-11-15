@@ -2,7 +2,12 @@ import type { InventoryItemDoc } from "@firetable/types";
 import type { RenderResult } from "vitest-browser-vue";
 import InventoryTable from "./InventoryTable.vue";
 import { renderComponent } from "../../../../test-helpers/render-component";
-import { DrinkCategory, InventoryItemType } from "@firetable/types";
+import {
+    DrinkMainCategory,
+    InventoryItemType,
+    SpiritSubCategory,
+    NonAlcoholicCategory,
+} from "@firetable/types";
 import { beforeEach, describe, expect, it } from "vitest";
 import { page, userEvent } from "@vitest/browser/context";
 
@@ -11,17 +16,24 @@ const sampleItems: InventoryItemDoc[] = [
         id: "1",
         name: "Red Bull 250ml",
         type: InventoryItemType.DRINK,
-        category: DrinkCategory.SPIRIT,
-        price: 2.99,
+        mainCategory: DrinkMainCategory.NON_ALCOHOLIC,
+        subCategory: NonAlcoholicCategory.ENERGY_DRINK,
         quantity: 50,
+        supplier: "Red Bull GmbH",
+        volume: 250,
+        isActive: true,
     },
     {
         id: "2",
-        name: "Chocolate Bar",
+        name: "Absolut Vodka",
         type: InventoryItemType.DRINK,
-        category: DrinkCategory.BEER,
-        price: 1.49,
+        mainCategory: DrinkMainCategory.SPIRITS,
+        subCategory: SpiritSubCategory.VODKA,
         quantity: 100,
+        supplier: "Pernod Ricard",
+        volume: 700,
+        alcoholContent: 40,
+        isActive: true,
     },
 ];
 
@@ -29,7 +41,11 @@ describe("InventoryTable.vue", () => {
     let screen: RenderResult<{ rows: InventoryItemDoc[] }>;
 
     beforeEach(() => {
-        screen = renderComponent(InventoryTable, { rows: sampleItems });
+        screen = renderComponent(InventoryTable, { rows: sampleItems, title: "Title" });
+    });
+
+    it("displays title", async () => {
+        await expect.element(screen.getByText("Title")).toBeVisible();
     });
 
     it("displays all sample items in the table", () => {
@@ -42,16 +58,11 @@ describe("InventoryTable.vue", () => {
             const nameCell = page.getByText(item.name);
             expect(nameCell.elements().length).toBeGreaterThan(0);
 
-            const typeLabel = InventoryItemType.DRINK;
-            const typeCell = page.getByText(typeLabel);
-            expect(typeCell.elements().length).toBeGreaterThan(0);
+            const mainCategoryCell = page.getByText(item.mainCategory);
+            expect(mainCategoryCell.elements().length).toBeGreaterThan(0);
 
-            const categoryCell = page.getByText(item.category as string);
-            expect(categoryCell.elements().length).toBeGreaterThan(0);
-
-            const priceText = `$${item.price.toFixed(2)}`;
-            const priceCell = page.getByText(priceText);
-            expect(priceCell.elements().length).toBeGreaterThan(0);
+            const subCategoryCell = page.getByText(item.subCategory);
+            expect(subCategoryCell.elements().length).toBeGreaterThan(0);
 
             const quantityCell = page.getByText(item.quantity.toString());
             expect(quantityCell.elements().length).toBeGreaterThan(0);
@@ -62,12 +73,11 @@ describe("InventoryTable.vue", () => {
         const searchInput = page.getByPlaceholder("Search");
         await userEvent.type(searchInput, "Red Bull");
 
-        // Only the 'Red Bull 250ml' item should be visible
         const redBullRow = page.getByText("Red Bull 250ml");
         expect(redBullRow.elements().length).toBe(1);
 
-        const chocolateBarRow = page.getByText("Chocolate Bar");
-        expect(chocolateBarRow.elements().length).toBe(0);
+        const vodkaRow = page.getByText("Absolut Vodka");
+        expect(vodkaRow.elements().length).toBe(0);
     });
 
     it(`emits "edit-item" event when edit button is clicked`, async () => {
@@ -83,7 +93,7 @@ describe("InventoryTable.vue", () => {
     });
 
     it(`emits "delete-item" event when delete button is clicked`, async () => {
-        const deleteButton = page.getByAltText("Delete Chocolate Bar");
+        const deleteButton = page.getByAltText("Delete Absolut Vodka");
         expect(deleteButton.elements().length).toBe(1);
 
         await userEvent.click(deleteButton);

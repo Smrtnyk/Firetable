@@ -15,5 +15,6 @@ export * from "./walk-in-reservation.js";
 export * from "./planned-reservation.js";
 export * from "./inventory.js";
 export * from "./issue-report.js";
+export * from "./drink-cards.js";
 
 export type FirestoreTimestamp = Timestamp;

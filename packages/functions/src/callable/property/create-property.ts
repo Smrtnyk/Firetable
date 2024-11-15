@@ -49,7 +49,6 @@ export async function createPropertyFn(
         });
 
         const userClaims = req.auth.token;
-
         // If user is not an admin, associate the property with the user
         if (userClaims.role !== AdminRole.ADMIN) {
             const userRef = db.collection(getUsersPath(organisationId)).doc(req.auth.uid);

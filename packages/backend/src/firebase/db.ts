@@ -8,6 +8,7 @@ import {
     getGuestsPath,
     getInventoryPath,
     getPropertiesPath,
+    getDrinkCardsPath,
 } from "./paths.js";
 import { EVENT_LOGS_DOCUMENT, Collection } from "@firetable/types";
 import { httpsCallable } from "firebase/functions";
@@ -69,6 +70,13 @@ export function queuedReservationDoc(owner: EventOwner, reservationId: string): 
 
 export function usersCollection(organisationId: string): CollectionReference {
     return getCollection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`);
+}
+
+export function drinkCardsCollection(
+    organisationId: string,
+    propertyId: string,
+): CollectionReference {
+    return getCollection(getDrinkCardsPath(organisationId, propertyId));
 }
 
 /**

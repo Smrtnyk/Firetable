@@ -182,18 +182,6 @@ export const routes: RouteRecordRaw[] = [
                 component: () => import("src/pages/Admin/PageAdminEvent.vue"),
             },
             {
-                path: "/admin/:organisationId/:propertyId/inventory",
-                name: "adminInventory",
-                meta: {
-                    requiresAuth: true,
-                    allowedRoles(permissionsStore) {
-                        return permissionsStore.canSeeInventory;
-                    },
-                },
-                props: true,
-                component: () => import("src/pages/Admin/PageAdminInventory.vue"),
-            },
-            {
                 path: "/admin/:organisationId/users",
                 name: "adminUsers",
                 meta: {
@@ -257,10 +245,23 @@ export const routes: RouteRecordRaw[] = [
                 props: true,
                 component: () => import("src/pages/Admin/PageAdminIssueReports.vue"),
             },
+            {
+                path: "/admin/:organisationId/:propertyId/drink-cards",
+                name: "adminPropertyDrinkCards",
+                meta: {
+                    requiresAuth: true,
+                    allowedRoles(permissionsStore) {
+                        return permissionsStore.canSeeInventory;
+                    },
+                    breadcrumb: "Drink Cards",
+                },
+                props: true,
+                component: () => import("src/pages/Admin/PageAdminPropertyDrinkCards.vue"),
+            },
         ],
     },
     {
-        path: "/admin/floors/:organisationId/:propertyId/:floorId",
+        path: "/admin/:organisationId/:propertyId/",
         component: () => import("layouts/FloorEditorLayout.vue"),
         meta: {
             requiresAuth: true,
@@ -269,7 +270,19 @@ export const routes: RouteRecordRaw[] = [
         props: true,
         children: [
             {
-                path: "",
+                path: "inventory",
+                name: "adminInventory",
+                meta: {
+                    requiresAuth: true,
+                    allowedRoles(permissionsStore) {
+                        return permissionsStore.canSeeInventory;
+                    },
+                },
+                props: true,
+                component: () => import("src/pages/Admin/PageAdminInventory.vue"),
+            },
+            {
+                path: "floors/:floorId",
                 name: "adminFloorEdit",
                 component: () => import("src/pages/Admin/PageAdminFloorEdit.vue"),
                 props: true,
@@ -281,6 +294,15 @@ export const routes: RouteRecordRaw[] = [
         name: "auth",
         meta: { requiresAuth: false },
         component: () => import("src/pages/PageAuth.vue"),
+    },
+    {
+        path: "/:organisationId/:propertyId/drink-cards",
+        name: "publicDrinkCards",
+        meta: {
+            requiresAuth: false,
+        },
+        props: true,
+        component: () => import("src/pages/PagePublicDrinkCards.vue"),
     },
     // Always leave this as last one
     {
