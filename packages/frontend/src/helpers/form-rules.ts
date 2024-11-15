@@ -94,7 +94,11 @@ export function validOptionalURL(msg = "Not a valid url"): (val: string) => bool
     };
 }
 
-function numberInRange(min: number, max: number, msg: string): (val: unknown) => boolean | string {
+export function numberInRange(
+    min: number,
+    max: number,
+    msg: string,
+): (val: unknown) => boolean | string {
     return function (val: unknown): boolean | string {
         if (typeof val !== "number" && typeof val !== "string") return msg;
         const num = Number(val);

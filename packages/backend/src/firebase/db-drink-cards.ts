@@ -1,4 +1,4 @@
-import type { CreateDrinkCardPayload, PDFDrinkCardDoc } from "@firetable/types";
+import type { CreateDrinkCardPayload, CustomDrinkCardDoc, PDFDrinkCardDoc } from "@firetable/types";
 import { initializeFirebase } from "./base.js";
 import { getDrinkCardPath } from "./paths.js";
 import { drinkCardsCollection } from "./db.js";
@@ -49,7 +49,7 @@ export async function updateDrinkCard(
     organisationId: string,
     propertyId: string,
     cardId: string,
-    card: Partial<PDFDrinkCardDoc>,
+    card: Partial<CustomDrinkCardDoc | PDFDrinkCardDoc>,
 ): Promise<void> {
     const { firestore } = initializeFirebase();
     const cardRef = doc(firestore, getDrinkCardPath(organisationId, propertyId, cardId));
