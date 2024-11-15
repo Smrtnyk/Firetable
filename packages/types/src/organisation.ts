@@ -24,6 +24,13 @@ export interface OrganisationDoc {
      * Maximum number of properties this organisation can create
      */
     maxAllowedProperties: number;
+
+    /**
+     * Subscription settings
+     * These settings are used to enforce subscription limits and are not configurable by the user
+     * They are set by the backend based on the subscription plan the organisation is on (TBD)
+     */
+    subscriptionSettings?: SubscriptionSettings;
     /**
      * Organisation-wide settings
      */
@@ -32,6 +39,13 @@ export interface OrganisationDoc {
      * Status of the organisation
      */
     status?: OrganisationStatus;
+}
+
+export interface SubscriptionSettings {
+    /**
+     * Maximum number of floor plans that can be set per event
+     */
+    maxFloorPlansPerEvent: number;
 }
 
 /**

@@ -4,6 +4,7 @@ import type {
     OrganisationSettings,
     PropertyDoc,
     PropertySettings,
+    SubscriptionSettings,
     User,
 } from "@firetable/types";
 import type { noop } from "es-toolkit";
@@ -46,6 +47,10 @@ export const DEFAULT_ORGANISATION_SETTINGS: DeepRequired<OrganisationSettings> =
     },
 };
 
+export const DEFAULT_SUBSCRIPTION_SETTINGS = {
+    maxFloorPlansPerEvent: 3,
+};
+
 export const usePropertiesStore = defineStore("properties", function () {
     const properties = ref<PropertyDoc[]>([]);
     const arePropertiesLoading = ref(false);
@@ -83,6 +88,11 @@ export const usePropertiesStore = defineStore("properties", function () {
             throw new Error("No property found for the given property id");
         }
         return property;
+    }
+
+    function getOrganisationSubscriptionSettingsById(organisationId: string): SubscriptionSettings {
+        const settings = getOrganisationById(organisationId)?.subscriptionSettings ?? {};
+        return merge(DEFAULT_SUBSCRIPTION_SETTINGS, settings);
     }
 
     function getOrganisationSettingsById(organisationId: string): OrganisationSettings {
@@ -193,6 +203,7 @@ export const usePropertiesStore = defineStore("properties", function () {
         getPropertySettingsById,
         getOrganisationById,
         getPropertiesByOrganisationId,
+        getOrganisationSubscriptionSettingsById,
         getOrganisationSettingsById,
         initUserOrganisation,
         initNonAdminProperties,

@@ -68,6 +68,9 @@ const settings = computed(function () {
 const propertySettings = computed(function () {
     return propertiesStore.getPropertySettingsById(props.propertyId);
 });
+const subscriptionSettings = computed(function () {
+    return propertiesStore.getOrganisationSubscriptionSettingsById(props.organisationId);
+});
 
 const eventOwner: EventOwner = {
     propertyId: props.propertyId,
@@ -344,6 +347,7 @@ onMounted(init);
 
                 <AppCardSection title="Event Floors">
                     <AdminEventFloorManager
+                        :max-floors="subscriptionSettings.maxFloorPlansPerEvent"
                         :floors="eventFloors"
                         :available-floors="floors"
                         :reservations="allReservations"

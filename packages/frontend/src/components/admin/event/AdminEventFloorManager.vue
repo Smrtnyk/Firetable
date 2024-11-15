@@ -5,7 +5,7 @@ import { computed } from "vue";
 import { vDraggable } from "vue-draggable-plus";
 import { isMobile } from "src/global-reactives/screen-detection";
 
-interface Props {
+export interface AdminEventFloorManagerProps {
     /** List of current floors */
     floors: EventFloorDoc[];
     /** Floors that can be added (for edit mode) */
@@ -13,6 +13,8 @@ interface Props {
     /** Used to check if floor can be deleted */
     reservations?: ReservationDoc[];
     showEditButton?: boolean;
+    /** Maximum number of floors allowed */
+    maxFloors: number;
 }
 
 interface Emits {
@@ -21,7 +23,7 @@ interface Emits {
     (event: "reorder", floors: EventFloorDoc[]): void;
 }
 
-const props = defineProps<Props>();
+const props = defineProps<AdminEventFloorManagerProps>();
 const emit = defineEmits<Emits>();
 const draggableFloors = computed(() => [...props.floors]);
 const draggableOptions = computed(() => ({
@@ -46,7 +48,17 @@ function canDeleteFloor(floorId: string): boolean {
     return !floorsWithReservations.value.has(floorId);
 }
 
+const remainingFloors = computed(() => {
+    if (!props.maxFloors) {
+        return;
+    }
+    return props.maxFloors - props.floors.length;
+});
+
 function onAddFloor(floor: EventFloorDoc): void {
+    if (remainingFloors.value === 0) {
+        return;
+    }
     emit("add", {
         ...floor,
         id: floor.id,
@@ -90,7 +102,12 @@ function onDrop(event: SortableEvent): void {
 <template>
     <div class="EventFloorManager">
         <div v-if="availableFloors?.length" class="row items-center justify-between q-mb-md">
-            <div class="text-h6">Floor plans</div>
+            <div>
+                <div class="text-h6">Floor plans</div>
+                <div v-if="maxFloors" class="text-caption text-grey-7">
+                    {{ floors.length }}/{{ maxFloors }} floors used
+                </div>
+            </div>
             <q-btn
                 flat
                 round
@@ -98,7 +115,11 @@ function onDrop(event: SortableEvent): void {
                 icon="plus"
                 class="q-ml-sm"
                 aria-label="Add floor plan"
+                :disabled="remainingFloors === 0"
             >
+                <q-tooltip v-if="remainingFloors === 0">
+                    Maximum number of floors ({{ maxFloors }}) reached
+                </q-tooltip>
                 <q-menu class="ft-card">
                     <q-list>
                         <q-item

@@ -28,6 +28,7 @@ describe("EventCreateForm", () => {
                     { id: "floor1", name: "Floor 1" } as FloorDoc,
                     { id: "floor2", name: "Floor 2" } as FloorDoc,
                 ],
+                maxFloors: 3,
                 eventStartHours: "22:00",
             };
         });
@@ -180,6 +181,7 @@ describe("EventCreateForm", () => {
                         { id: "floor3", name: "Floor 3" } as FloorDoc,
                     ],
                     eventStartHours: "22:00",
+                    maxFloors: 3,
                 };
             });
 
@@ -282,6 +284,7 @@ describe("EventCreateForm", () => {
                     { id: "floor1", name: "Floor 1" } as FloorDoc,
                     { id: "floor2", name: "Floor 2" } as FloorDoc,
                 ],
+                maxFloors: 3,
                 eventStartHours: "22:00",
                 event: {
                     id: "event1",

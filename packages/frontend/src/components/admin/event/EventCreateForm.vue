@@ -45,6 +45,7 @@ export interface EventCreateFormProps {
     event?: EventDoc | undefined;
     eventStartHours: string;
     propertyTimezone: string;
+    maxFloors: number;
 }
 
 const props = defineProps<EventCreateFormProps>();
@@ -321,6 +322,7 @@ function reorderFloors(newFloors: EventFloorDoc[]): void {
 
         <AdminEventFloorManager
             v-if="!isEditMode"
+            :max-floors="props.maxFloors"
             :floors="state.selectedFloors"
             :available-floors="props.floors"
             @add="addFloor"

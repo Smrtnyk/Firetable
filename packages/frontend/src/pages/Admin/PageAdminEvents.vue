@@ -50,6 +50,9 @@ const isAnyLoading = computed(function () {
 const settings = computed(function () {
     return propertiesStore.getOrganisationSettingsById(organisationId);
 });
+const subscriptionSettings = computed(function () {
+    return propertiesStore.getOrganisationSubscriptionSettingsById(organisationId);
+});
 
 const propertySettings = computed(function () {
     return propertiesStore.getPropertySettingsById(propertyId);
@@ -144,6 +147,7 @@ function showEventForm(event?: EventDoc): void {
             componentPropsObject: {
                 propertyId,
                 floors: floors.value,
+                maxFloors: subscriptionSettings.value.maxFloorPlansPerEvent,
                 organisationId,
                 propertyName: propertiesStore.getPropertyNameById(propertyId),
                 event,
