@@ -3,7 +3,7 @@ import type { EventFloorDoc, FloorDoc, ReservationDoc } from "@firetable/types";
 import type { SortableEvent } from "vue-draggable-plus";
 import { computed } from "vue";
 import { vDraggable } from "vue-draggable-plus";
-import { isMobile } from "src/global-reactives/screen-detection";
+import { buttonSize, isMobile } from "src/global-reactives/screen-detection";
 
 export interface AdminEventFloorManagerProps {
     /** List of current floors */
@@ -110,10 +110,11 @@ function onDrop(event: SortableEvent): void {
             </div>
             <q-btn
                 flat
-                round
+                rounded
+                :size="buttonSize"
                 color="primary"
                 icon="plus"
-                class="q-ml-sm"
+                class="button-gradient"
                 aria-label="Add floor plan"
                 :disabled="remainingFloors === 0"
             >
