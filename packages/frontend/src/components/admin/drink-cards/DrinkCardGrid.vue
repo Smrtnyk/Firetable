@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { DrinkCardDoc } from "@firetable/types";
+import { isCustomDrinkCard } from "@firetable/types";
 import { useI18n } from "vue-i18n";
 
 interface Props {
@@ -45,6 +46,16 @@ const { t } = useI18n();
                             class="text-subtitle2 q-mt-sm"
                             v-html="card.description ?? t('Global.noDescription')"
                         />
+                    </q-card-section>
+
+                    <q-card-section v-if="isCustomDrinkCard(card)">
+                        <div class="text-caption">
+                            {{
+                                t("PageAdminPropertyDrinkCards.sectionsCount", {
+                                    count: card.elements.length,
+                                })
+                            }}
+                        </div>
                     </q-card-section>
 
                     <q-card-actions align="right">
