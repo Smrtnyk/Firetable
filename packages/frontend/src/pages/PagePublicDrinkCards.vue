@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import type { DrinkCardDoc } from "@firetable/types";
-import { isPDFDrinkCard } from "@firetable/types";
-import { useFirestoreCollection, createQuery } from "src/composables/useFirestore.js";
-import { getDrinkCardsPath } from "@firetable/backend";
+import type { DrinkCardDoc, PropertyDoc } from "@firetable/types";
+import { isCustomDrinkCard, isPDFDrinkCard } from "@firetable/types";
+import {
+    useFirestoreCollection,
+    createQuery,
+    useFirestoreDocument,
+} from "src/composables/useFirestore.js";
+import { getDrinkCardsPath, getPropertyPath } from "@firetable/backend";
 import { computed, onMounted, ref } from "vue";
 import { Loading } from "quasar";
 import { where } from "firebase/firestore";
+import CustomDrinkCardDisplay from "src/components/admin/drink-cards/CustomDrinkCardDisplay.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 
 interface Props {
@@ -26,6 +31,13 @@ const {
     ),
     { wait: true },
 );
+const { data: propertyDoc } = useFirestoreDocument<PropertyDoc>(
+    getPropertyPath(props.organisationId, props.propertyId),
+);
+
+const logoImgUrl = computed(() => {
+    return propertyDoc.value?.img ?? "";
+});
 
 const activeCard = computed(() => {
     return drinkCards.value?.[0];
@@ -55,6 +67,9 @@ onMounted(init);
                     loading="lazy"
                     referrerpolicy="no-referrer"
                 />
+            </template>
+            <template v-if="isCustomDrinkCard(activeCard)">
+                <CustomDrinkCardDisplay :card="activeCard" :logo-img-url="logoImgUrl" />
             </template>
         </template>
         <FTCenteredText v-if="!isLoadingDrinkCards && !activeCard">

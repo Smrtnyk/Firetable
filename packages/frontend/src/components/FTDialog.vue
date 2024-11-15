@@ -28,7 +28,7 @@ import { isMobile } from "src/global-reactives/screen-detection";
 interface Props {
     component: ComponentPublicInstance;
     maximized?: boolean;
-    componentPropsObject: Record<string, any>;
+    componentPropsObject?: Record<string, any>;
     listeners: Record<string, (...args: any) => any>;
     title?: string;
 }
