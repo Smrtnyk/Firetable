@@ -884,6 +884,60 @@ describe("PageAdminGuests.vue", () => {
                 expect(guestItems.elements()[1]).toHaveTextContent("Charlie Brown");
             });
         });
+
+        describe("land sorting", () => {
+            it("sorts guests by landcode from maskedContact", async () => {
+                guestsRef.value.data = [
+                    {
+                        id: "guest1",
+                        name: "John Doe",
+                        contact: "john@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "+44xxxx1234",
+                        visitedProperties: {},
+                    } as GuestDoc,
+                    {
+                        id: "guest2",
+                        name: "Jane Smith",
+                        contact: "jane@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "+1xxxx5678",
+                        visitedProperties: {},
+                    } as GuestDoc,
+                    {
+                        id: "guest3",
+                        name: "Alice Johnson",
+                        contact: "alice@example.com",
+                        hashedContact: "hashedContact",
+                        maskedContact: "+33xxxx9012",
+                        visitedProperties: {},
+                    } as GuestDoc,
+                ];
+
+                const screen = await render();
+
+                // Change to land sort
+                const sortButton = screen.getByLabelText("filter guests");
+                await userEvent.click(sortButton);
+                await userEvent.click(screen.getByText("Land"));
+
+                const guestItems = screen.getByRole("listitem");
+
+                // Should be sorted by landcode in ascending order by default
+                expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
+                expect(guestItems.elements()[1]).toHaveTextContent("Alice Johnson");
+                expect(guestItems.elements()[2]).toHaveTextContent("Jane Smith");
+
+                // Toggle to ascending order
+                await userEvent.click(screen.getByText("Descending"));
+
+                // Should now be in ascending order
+                // +1 (US), +33 (France), +44 (UK)
+                expect(guestItems.elements()[0]).toHaveTextContent("Jane Smith");
+                expect(guestItems.elements()[1]).toHaveTextContent("Alice Johnson");
+                expect(guestItems.elements()[2]).toHaveTextContent("John Doe");
+            });
+        });
     });
 
     describe("search", () => {

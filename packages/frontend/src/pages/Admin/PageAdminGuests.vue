@@ -103,6 +103,10 @@ const sortedGuests = computed(function () {
         let comparison: number;
 
         switch (sortOption.value) {
+            case "land":
+                comparison = (b.maskedContact || "").localeCompare(a.maskedContact || "");
+                break;
+
             case "name":
                 comparison = b.name.localeCompare(a.name);
                 break;

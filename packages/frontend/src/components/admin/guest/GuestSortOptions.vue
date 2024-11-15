@@ -5,6 +5,10 @@ export type SortOption =
      */
     | "bookings"
     /**
+     * When sorting by land, sort by the landcode in the maskedContact
+     */
+    | "land"
+    /**
      * When sorting by last modified try to prioritize guests with the highest number of bookings.
      */
     | "lastModified"
@@ -44,6 +48,7 @@ const sortOptions = [
     { label: "Percentage", value: "percentage" },
     { label: "Last Modified", value: "lastModified" },
     { label: "Name", value: "name" },
+    { label: "Land", value: "land" },
 ] as const;
 
 function updateSelectedTags(value: string[]): void {
