@@ -1,11 +1,15 @@
 import type { CallableRequest } from "firebase-functions/v2/https";
+import type { CreatePropertyPayload } from "@shared-types/property.js";
 import { createPropertyFn } from "./create-property.js";
 import { getPropertyPath, getUserPath, getUsersPath } from "../../paths.js";
 import { db } from "../../init.js";
 import { describe, expect, it } from "vitest";
 
 describe("createPropertyFn", () => {
-    function mockRequest<T>(data: T, auth: any): CallableRequest<T> {
+    function mockRequest(
+        data: CreatePropertyPayload,
+        auth: any,
+    ): CallableRequest<CreatePropertyPayload> {
         return {
             data,
             auth,
@@ -14,15 +18,21 @@ describe("createPropertyFn", () => {
     }
 
     it("should throw error if user is not authenticated", async () => {
-        const request = mockRequest({ name: "Test Property", organisationId: "org1" }, null);
+        const request = mockRequest(
+            { name: "Test Property", organisationId: "org1", img: "" },
+            null,
+        );
 
         await expect(createPropertyFn(request)).rejects.toThrow("User must be authenticated");
     });
 
     it("should throw error if organisationId is missing", async () => {
-        const request = mockRequest({ name: "Test Property" }, { uid: "user123", token: {} });
+        const request = mockRequest(
+            // @ts-expect-error -- not passing organisationId
+            { name: "Test Property", img: "" },
+            { uid: "user123", token: {} },
+        );
 
-        // @ts-expect-error -- not passing organisationId
         await expect(createPropertyFn(request)).rejects.toThrow(
             "organisationId is missing in property payload",
         );
@@ -43,7 +53,7 @@ describe("createPropertyFn", () => {
         await db.collection(getUsersPath(organisationId)).doc(userId).set(userData);
 
         const request = mockRequest(
-            { name: propertyName, organisationId },
+            { name: propertyName, organisationId, img: "" },
             { uid: userId, token: { role: roleName } },
         );
         const propertyId = await createPropertyFn(request);
@@ -56,6 +66,7 @@ describe("createPropertyFn", () => {
             name: propertyName,
             organisationId,
             creatorId: userId,
+            img: "",
         });
 
         // Check if the user's related properties are updated

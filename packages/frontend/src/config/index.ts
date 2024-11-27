@@ -43,8 +43,6 @@ export const myIcons: Record<string, string> = {
     "color-picker": "svguse:/svg-icons/ft-icons.svg#color-picker",
     undo: "svguse:/svg-icons/ft-icons.svg#undo",
     redo: "svguse:/svg-icons/ft-icons.svg#redo",
-    export: "svguse:/svg-icons/ft-icons.svg#export",
-    import: "svguse:/svg-icons/ft-icons.svg#import",
     "full-screen": "svguse:/svg-icons/ft-icons.svg#full-screen",
     transfer: "svguse:/svg-icons/ft-icons.svg#transfer",
     "line-chart": "svguse:/svg-icons/ft-icons.svg#line-chart",
@@ -66,6 +64,14 @@ export const myIcons: Record<string, string> = {
     bug: "svguse:/svg-icons/ft-icons.svg#bug",
     more: "svguse:/svg-icons/ft-icons.svg#more",
     drag: "svguse:/svg-icons/ft-icons.svg#drag",
+    "qr-code": "svguse:/svg-icons/ft-icons.svg#qr-code",
+    "external-link": "svguse:/svg-icons/ft-icons.svg#external-link",
+    import: "svguse:/svg-icons/ft-icons.svg#import",
+    format_bold: "svguse:/svg-icons/ft-icons.svg#bold",
+    format_italic: "svguse:/svg-icons/ft-icons.svg#italic",
+    format_underlined: "svguse:/svg-icons/ft-icons.svg#underline",
+    pdf: "svguse:/svg-icons/ft-icons.svg#pdf",
+    drink: "svguse:/svg-icons/ft-icons.svg#drink",
 };
 
 export function getDarkMode(): boolean {

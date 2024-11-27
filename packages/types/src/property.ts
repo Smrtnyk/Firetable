@@ -1,3 +1,17 @@
+export interface ImageUploadData {
+    dataUrl: string;
+    type: string;
+}
+
+export type CreatePropertyPayload = {
+    name: string;
+    organisationId: string;
+    img: ImageUploadData | string;
+};
+
+export type UpdatePropertyPayload = CreatePropertyPayload & {
+    id: string;
+};
 /**
  * Property-specific settings stored in Firestore
  */

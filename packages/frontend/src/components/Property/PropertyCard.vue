@@ -16,12 +16,13 @@ const backgroundImageUrl = computed(function () {
 
 <template>
     <div
-        class="PropertyCard ft-card"
+        class="PropertyCard ft-card ft-border"
         :style="{
             backgroundImage: `url(${backgroundImageUrl})`,
             backgroundPosition: 'center',
             backgroundSize: 'cover',
             backgroundRepeat: 'no-repeat',
+            backgroundColor: 'rgba(0, 0, 0, 1)',
         }"
     >
         <router-link
@@ -58,7 +59,6 @@ const backgroundImageUrl = computed(function () {
         text-decoration: none !important;
         padding: 1rem;
         border-radius: 0.5rem;
-        background: rgba(0, 0, 0, 0.5);
     }
 }
 </style>

@@ -1,57 +1,145 @@
 <script setup lang="ts">
-import type { CreatePropertyPayload, UpdatePropertyPayload } from "@firetable/backend";
-import type { PropertyDoc } from "@firetable/types";
-import { ref, watch, useTemplateRef } from "vue";
+import type { CreatePropertyPayload, PropertyDoc, UpdatePropertyPayload } from "@firetable/types";
+import { ref, watch, useTemplateRef, computed } from "vue";
 import { minLength, validOptionalURL } from "src/helpers/form-rules";
 import { QForm } from "quasar";
 import { useI18n } from "vue-i18n";
+import { showErrorMessage } from "src/helpers/ui-helpers";
+import { processImage } from "src/helpers/process-image";
+import { isString } from "es-toolkit";
+import FTBtn from "src/components/FTBtn.vue";
 
 interface Props {
     organisationId: string;
     propertyDoc?: PropertyDoc | undefined;
 }
 
-const props = defineProps<Props>();
-const emit = defineEmits<{
+interface Emits {
     (eventName: "create", payload: CreatePropertyPayload): void;
     (eventName: "update", payload: UpdatePropertyPayload): void;
-}>();
+}
+
+const enum InputMethod {
+    FILE = "file",
+    URL = "url",
+}
+
+const props = defineProps<Props>();
+const emit = defineEmits<Emits>();
 const { t } = useI18n();
-const propertyName = ref("");
-const propertyImgUrl = ref("");
+const inputMethod = ref<InputMethod>(InputMethod.FILE);
+
+const form = ref<CreatePropertyPayload>({
+    name: "",
+    organisationId: props.organisationId,
+    img: "",
+});
+const imageUrl = computed({
+    get() {
+        return isString(form.value.img) ? form.value.img : "";
+    },
+    set(val: string) {
+        form.value.img = val || "";
+    },
+});
 const createPropertyForm = useTemplateRef<QForm>("createPropertyForm");
+const fileInput = ref<HTMLInputElement>();
+const showUrlInput = ref(false);
+
+const imageProcessingOptions = {
+    maxWidth: 300,
+    maxHeight: 300,
+    quality: 0.9,
+    maxFileSize: 100 * 1024,
+    acceptedTypes: ["image/png", "image/jpeg", "image/svg+xml"],
+    preserveTransparency: true,
+};
+
 const propertyRules = [minLength(t("AddNewPropertyForm.propertyNameLengthValidationMessage"), 3)];
 const imgUrlRules = [validOptionalURL()];
 
 watch(
     () => props.propertyDoc,
     function (newVal) {
-        if (newVal) {
-            propertyName.value = newVal.name;
-            propertyImgUrl.value = newVal.img ?? "";
+        if (!newVal) {
+            return;
         }
+
+        form.value = {
+            name: newVal.name,
+            organisationId: props.organisationId,
+            // This will be a URL string for existing properties
+            img: newVal.img ?? "",
+        };
+        showUrlInput.value = Boolean(newVal.img);
     },
     { immediate: true },
 );
+
+async function handleImageUpload(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    try {
+        const processedImage = await processImage(file, imageProcessingOptions);
+
+        form.value.img = {
+            dataUrl: processedImage,
+            type: file.type,
+        };
+        showUrlInput.value = false;
+    } catch (error) {
+        showErrorMessage("Error processing image. Please try another file.");
+    } finally {
+        if (input) {
+            input.value = "";
+        }
+    }
+}
+
+function removeImage(): void {
+    form.value.img = "";
+    showUrlInput.value = false;
+}
+
+function triggerFileInput(): void {
+    fileInput.value?.click();
+}
+
+function handleFileDrop(event: DragEvent): void {
+    event.preventDefault();
+    const files = event.dataTransfer?.files;
+    if (files && files.length > 0) {
+        const file = files[0];
+        processDroppedFile(file);
+    }
+}
+
+async function processDroppedFile(file: File): Promise<void> {
+    try {
+        const processedImage = await processImage(file, imageProcessingOptions);
+        form.value.img = {
+            dataUrl: processedImage,
+            type: file.type,
+        };
+    } catch (error) {
+        showErrorMessage("Error processing image. Please try another file.");
+    }
+}
 
 async function submit(): Promise<void> {
     if (!(await createPropertyForm.value?.validate())) {
         return;
     }
 
-    const payload = {
-        name: propertyName.value,
-        img: propertyImgUrl.value,
-        organisationId: props.organisationId,
-    };
-
     if (props.propertyDoc) {
         emit("update", {
-            ...payload,
+            ...form.value,
             id: props.propertyDoc.id,
         });
     } else {
-        emit("create", payload);
+        emit("create", form.value);
     }
 }
 </script>
@@ -60,21 +148,90 @@ async function submit(): Promise<void> {
     <q-card-section>
         <q-form ref="createPropertyForm" greedy class="q-gutter-md">
             <q-input
+                v-model="form.name"
                 label="Property name"
-                v-model="propertyName"
                 rounded
                 standout
                 autofocus
                 :rules="propertyRules"
             />
-            <q-input
-                label="Optional property image url"
-                v-model="propertyImgUrl"
-                rounded
-                standout
-                autofocus
-                :rules="imgUrlRules"
-            />
+
+            <div class="brand-image q-mt-md">
+                <div class="text-subtitle2 q-mb-sm">
+                    Property Brand Image
+                    <q-btn flat round dense icon="help" class="q-ml-xs">
+                        <q-tooltip>
+                            For best results, use a PNG or SVG with transparent background. Maximum
+                            dimensions: 300x300px
+                        </q-tooltip>
+                    </q-btn>
+                </div>
+
+                <div class="row q-gutter-sm q-mb-md">
+                    <q-btn-toggle
+                        class="full-width"
+                        v-model="inputMethod"
+                        no-caps
+                        rounded
+                        spread
+                        unelevated
+                        :options="[
+                            { label: 'Upload File', value: InputMethod.FILE },
+                            { label: 'Paste external URL', value: InputMethod.URL },
+                        ]"
+                    />
+                </div>
+
+                <!-- URL Input -->
+                <q-input
+                    v-if="inputMethod === InputMethod.URL"
+                    v-model="imageUrl"
+                    label="Image URL"
+                    rounded
+                    standout
+                    :rules="imgUrlRules"
+                >
+                    <template v-if="imageUrl" #append>
+                        <q-icon name="clear" class="cursor-pointer" @click="removeImage" />
+                    </template>
+                </q-input>
+
+                <!-- Image Preview and Drop Area -->
+                <div
+                    v-if="inputMethod === InputMethod.FILE"
+                    class="preview-container q-mt-md ft-border ft-card"
+                    @click="triggerFileInput"
+                    @dragover.prevent
+                    @drop.prevent="handleFileDrop"
+                >
+                    <q-responsive :ratio="1">
+                        <q-img
+                            v-if="form.img"
+                            :src="isString(form.img) ? form.img : form.img.dataUrl"
+                            class="preview-image"
+                        >
+                            <div class="absolute-top-right">
+                                <FTBtn flat round icon="close" @click.stop="removeImage" />
+                            </div>
+                        </q-img>
+                        <div
+                            v-else
+                            class="row upload-placeholder text-center align-center content-center justify-center"
+                        >
+                            <q-icon name="import" size="md" />
+                            <div>Click or drag and drop to upload an image</div>
+                        </div>
+                    </q-responsive>
+                </div>
+
+                <input
+                    ref="fileInput"
+                    type="file"
+                    accept=".png,.svg"
+                    class="hidden"
+                    @change="handleImageUpload"
+                />
+            </div>
         </q-form>
     </q-card-section>
 
@@ -88,3 +245,29 @@ async function submit(): Promise<void> {
         />
     </q-card-actions>
 </template>
+
+<style lang="scss" scoped>
+.hidden {
+    display: none;
+}
+
+.preview-container {
+    max-width: 200px;
+    cursor: pointer;
+
+    .upload-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        border: 2px dashed var(--q-separator-color);
+        border-radius: 8px;
+        text-align: center;
+
+        q-icon {
+            margin-bottom: 10px;
+        }
+    }
+}
+</style>

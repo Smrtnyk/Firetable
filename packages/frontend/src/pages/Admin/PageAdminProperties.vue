@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { CreatePropertyPayload, UpdatePropertyPayload } from "@firetable/backend";
-import type { PropertyDoc } from "@firetable/types";
+import type { CreatePropertyPayload, PropertyDoc, UpdatePropertyPayload } from "@firetable/types";
 import type { Link } from "src/types";
 import {
     updateProperty,
@@ -156,6 +155,12 @@ function createLinks(propertyId: string): Link[] {
             icon: "line-chart",
             route: { name: "adminAnalytics", params },
             visible: true,
+        },
+        {
+            label: t("AppDrawer.links.manageDrinkCards"),
+            icon: "drink",
+            route: { name: "adminPropertyDrinkCards", params },
+            visible: permissionStore.canSeeInventory,
         },
     ].filter(function (link) {
         return link.visible;

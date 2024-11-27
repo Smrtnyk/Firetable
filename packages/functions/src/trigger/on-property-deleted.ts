@@ -1,5 +1,7 @@
+import type { FirestoreEvent, QueryDocumentSnapshot } from "firebase-functions/firestore";
 import { db } from "../init.js";
 import { deleteDocument } from "../delete-document/index.js";
+import { deletePropertyImage } from "../utils/property/delete-property-image.js";
 import { FieldValue } from "firebase-admin/firestore";
 import { logger } from "firebase-functions/v2";
 import { HttpsError } from "firebase-functions/v2/https";
@@ -9,17 +11,25 @@ import { Collection } from "@shared-types";
  * Cleans up associated user-property mappings when a property is deleted.
  * Removes all subcollections of the property.
  *
- * @param params - Context of the event that triggered the function.
+ * @param event - Firestore event object, containing the organisation ID and property ID in the params
  * @throws Throws error if there's an issue cleaning up the user-property mappings.
  */
-export async function onPropertyDeletedFn(params: {
-    propertyId: string;
-    organisationId: string;
-}): Promise<void> {
-    const { organisationId, propertyId } = params;
+export async function onPropertyDeletedFn(
+    event: FirestoreEvent<
+        QueryDocumentSnapshot | undefined,
+        { organisationId: string; propertyId: string }
+    >,
+): Promise<void> {
+    const { organisationId, propertyId } = event.params;
 
     try {
-        // 1. Cleanup associated user-property mappings
+        const propertyData = event.data?.data();
+        // 1. Delete property image if exists
+        if (propertyData?.img) {
+            await deletePropertyImage(organisationId, propertyId, propertyData.img);
+        }
+
+        // 2. Cleanup associated user-property mappings
         const usersSnapshot = await db
             .collection(`${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`)
             .where("relatedProperties", "array-contains", propertyId)
@@ -38,11 +48,9 @@ export async function onPropertyDeletedFn(params: {
                 });
             });
         }
-
-        // Commit batched operations
         await batch.commit();
 
-        // 2. Delete all the subcollections of the property
+        // 3. Delete all the subcollections of the property
         await deleteDocument({
             col: `${Collection.ORGANISATIONS}/${organisationId}/${Collection.PROPERTIES}`,
             id: propertyId,
