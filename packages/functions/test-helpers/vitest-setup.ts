@@ -1,6 +1,5 @@
-import type { Auth } from "firebase-admin/auth";
 import { initializeTestEnvironment } from "@firebase/rules-unit-testing";
-import { afterAll, afterEach, beforeAll } from "vitest";
+import { afterAll, afterEach } from "vitest";
 
 const TEST_PROJECT_ID = `demo-test-project`;
 process.env.FIRESTORE_EMULATOR_HOST = "localhost:4000";
@@ -26,32 +25,3 @@ afterAll(async () => {
         console.error(e);
     }
 });
-
-beforeAll(async () => {
-    await checkEmulators();
-});
-
-async function areEmulatorsRunning(): Promise<boolean> {
-    try {
-        // Try to connect to emulator UI port
-        await fetch("http://localhost:3000");
-        return true;
-    } catch {
-        return false;
-    }
-}
-
-async function checkEmulators(): Promise<void> {
-    const emulatorsRunning = await areEmulatorsRunning();
-
-    if (emulatorsRunning) {
-        console.log("Using existing emulator instance");
-    } else {
-        throw new Error("Emulators are not running");
-    }
-}
-
-export async function clearAuth(auth: Auth): Promise<void> {
-    const users = await auth.listUsers();
-    await Promise.all(users.users.map((user) => auth.deleteUser(user.uid)));
-}
