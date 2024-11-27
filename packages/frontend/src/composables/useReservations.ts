@@ -134,7 +134,7 @@ export function useReservations(
         return propertiesStore.getPropertySettingsById(eventOwner.propertyId);
     });
 
-    const intervalID = setInterval(checkReservationsForTimeAndMarkTableIfNeeded, ONE_MINUTE);
+    let intervalID: ReturnType<typeof globalThis.setInterval> | undefined;
 
     let currentOpenCreateReservationDialog: OpenDialog | undefined;
 
@@ -147,6 +147,25 @@ export function useReservations(
             operationNotification = undefined;
         }
     });
+
+    watch(
+        propertySettings,
+        function (settingsValue) {
+            if (intervalID !== undefined) {
+                globalThis.clearInterval(intervalID);
+                intervalID = undefined;
+            }
+
+            // Enabled only if greater than 0
+            if (settingsValue.markGuestAsLateAfterMinutes > 0) {
+                intervalID = globalThis.setInterval(
+                    checkReservationsForTimeAndMarkTableIfNeeded,
+                    ONE_MINUTE,
+                );
+            }
+        },
+        { immediate: true },
+    );
 
     watch([reservations, floorInstances], handleFloorUpdates, {
         deep: true,
@@ -812,7 +831,8 @@ export function useReservations(
 
     function markReservationAsExpired(floorId: string, tableLabel: string): void {
         const floor = floorInstances.value.find(matchesProperty("id", floorId));
-        floor?.getTableByLabel(tableLabel)?.setFill("red");
+        const table = floor?.getTableByLabel(tableLabel);
+        table?.setFill("red");
     }
 
     function checkReservationsForTimeAndMarkTableIfNeeded(): void {
@@ -1076,7 +1096,11 @@ export function useReservations(
     }
 
     onBeforeUnmount(function () {
-        clearInterval(intervalID);
+        if (intervalID !== undefined) {
+            globalThis.clearInterval(intervalID);
+            intervalID = undefined;
+        }
+
         tableOperationWatcher();
         // Clean up any remaining notification
         if (operationNotification) {

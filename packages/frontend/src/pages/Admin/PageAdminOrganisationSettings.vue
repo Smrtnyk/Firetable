@@ -265,6 +265,7 @@ onMounted(initPropertySettings);
                     type="number"
                     min="1"
                     label="In minutes"
+                    hint="Set to 0 to disable"
                     v-model="editableSettings.properties[property.id].markGuestAsLateAfterMinutes"
                 />
             </SettingsSection>

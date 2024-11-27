@@ -1,6 +1,7 @@
 import type { FloorDoc, ReservationDoc, EventDoc, QueuedReservationDoc } from "@firetable/types";
 import type { App } from "vue";
 import type { TestingOptions } from "@pinia/testing";
+import type { MockInstance } from "vitest";
 import { TableOperationType, useReservations } from "../composables/useReservations";
 import {
     Role,
@@ -10,7 +11,7 @@ import {
     ReservationType,
 } from "@firetable/types";
 import { shallowRef, nextTick, createApp, ref } from "vue";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { FloorEditor, FloorElementTypes, FloorViewer } from "@firetable/floor-creator";
 import EventCreateReservation from "src/components/Event/reservation/EventCreateReservation.vue";
 import EventShowReservation from "src/components/Event/reservation/EventShowReservation.vue";
@@ -1436,6 +1437,212 @@ describe("useReservations", () => {
                     event,
                 }),
             );
+        });
+    });
+
+    describe("expired reservations", () => {
+        let clearIntervalSpy: MockInstance;
+        let setIntervalSpy: MockInstance;
+
+        beforeEach(() => {
+            vi.useFakeTimers();
+            clearIntervalSpy = vi.spyOn(globalThis, "clearInterval");
+            setIntervalSpy = vi.spyOn(globalThis, "setInterval");
+        });
+
+        afterEach(() => {
+            vi.useRealTimers();
+            clearIntervalSpy.mockRestore();
+            setIntervalSpy.mockRestore();
+        });
+
+        it("doesn't set up interval when markGuestAsLateAfterMinutes is 0", async () => {
+            const { event } = await setupTestEnvironment();
+
+            withSetup(
+                () =>
+                    useReservations(
+                        ref([]),
+                        ref([]),
+                        ref([]),
+                        { id: "1", propertyId: "1", organisationId: "1" },
+                        ref(event),
+                    ),
+                {
+                    properties: {
+                        properties: [
+                            {
+                                id: "1",
+                                name: "Test Property",
+                                organisationId: "1",
+                                settings: {
+                                    timezone: "Europe/Vienna",
+                                    markGuestAsLateAfterMinutes: 0,
+                                },
+                            },
+                        ],
+                        organisations: [{ id: "1" }],
+                    },
+                },
+            );
+
+            expect(setIntervalSpy).not.toHaveBeenCalled();
+        });
+
+        it("sets up interval only when markGuestAsLateAfterMinutes > 0", async () => {
+            const { event } = await setupTestEnvironment();
+
+            withSetup(
+                () =>
+                    useReservations(
+                        ref([]),
+                        ref([]),
+                        ref([]),
+                        { id: "1", propertyId: "1", organisationId: "1" },
+                        ref(event),
+                    ),
+                {
+                    properties: {
+                        properties: [
+                            {
+                                id: "1",
+                                name: "Test Property",
+                                organisationId: "1",
+                                settings: {
+                                    timezone: "Europe/Vienna",
+                                    markGuestAsLateAfterMinutes: 15,
+                                },
+                            },
+                        ],
+                        organisations: [{ id: "1" }],
+                    },
+                },
+            );
+
+            expect(setIntervalSpy).toHaveBeenCalled();
+        });
+
+        it("cleans up interval on unmount", async () => {
+            const { event } = await setupTestEnvironment();
+
+            withSetup(
+                () =>
+                    useReservations(
+                        ref([]),
+                        ref([]),
+                        ref([]),
+                        { id: "1", propertyId: "1", organisationId: "1" },
+                        ref(event),
+                    ),
+                {
+                    properties: {
+                        properties: [
+                            {
+                                id: "1",
+                                name: "Test Property",
+                                organisationId: "1",
+                                settings: {
+                                    timezone: "Europe/Vienna",
+                                    markGuestAsLateAfterMinutes: 15,
+                                },
+                            },
+                        ],
+                        organisations: [{ id: "1" }],
+                    },
+                },
+            );
+
+            app.unmount();
+            await nextTick();
+
+            expect(clearIntervalSpy).toHaveBeenCalled();
+        });
+
+        it("handles missing property settings gracefully", async () => {
+            const { event } = await setupTestEnvironment();
+
+            withSetup(
+                () =>
+                    useReservations(
+                        ref([]),
+                        ref([]),
+                        ref([]),
+                        { id: "1", propertyId: "1", organisationId: "1" },
+                        ref(event),
+                    ),
+                {
+                    properties: {
+                        properties: [
+                            {
+                                id: "1",
+                                settings: undefined,
+                            },
+                        ],
+                        organisations: [{ id: "1" }],
+                    },
+                },
+            );
+
+            // Should use default setting (30 minutes) and set up interval
+            expect(setIntervalSpy).toHaveBeenCalled();
+        });
+
+        it("marks tables as expired when interval triggers", async () => {
+            const baseTime = new Date("2024-01-01T19:00:00");
+            vi.setSystemTime(baseTime);
+
+            const { floor } = await setupTestEnvironment();
+
+            // Create event starting at our base time
+            const event = {
+                id: "1",
+                date: baseTime.getTime(),
+                name: "Test Event",
+                propertyId: "1",
+                organisationId: "1",
+                creator: "test@mail.com",
+                entryPrice: 0,
+                guestListLimit: 100,
+                _doc: {} as any,
+            };
+
+            const reservation = createTestReservation({
+                time: "19:00",
+                arrived: false,
+            });
+
+            withSetup(
+                () =>
+                    useReservations(
+                        ref([]),
+                        ref([reservation]),
+                        shallowRef([floor]),
+                        { id: "1", propertyId: "1", organisationId: "1" },
+                        ref(event),
+                    ),
+                {
+                    properties: {
+                        properties: [
+                            {
+                                id: "1",
+                                settings: {
+                                    timezone: "Europe/Vienna",
+                                    markGuestAsLateAfterMinutes: 1,
+                                },
+                            },
+                        ],
+                        organisations: [{ id: "1" }],
+                    },
+                },
+            );
+
+            await nextTick();
+
+            // Advance time by 2 minutes (beyond the 1 minute late threshold)
+            vi.advanceTimersByTime(120_000);
+
+            const table = floor.getTableByLabel("T1");
+            expect(table?.getBaseFill()).toBe("red");
         });
     });
 });
