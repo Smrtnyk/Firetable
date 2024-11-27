@@ -34,7 +34,7 @@ export default defineConfig({
             }
         },
         clearMocks: true,
-        reporters: ["basic"],
+        reporters: ["default"],
         watch: false,
         includeTaskLocation: true,
         coverage: {

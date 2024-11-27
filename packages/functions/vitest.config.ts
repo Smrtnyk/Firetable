@@ -8,7 +8,7 @@ export default defineConfig({
         globals: true,
         include: ["**/*.spec.ts"],
         clearMocks: true,
-        reporters: ["basic"],
+        reporters: ["default"],
         watch: false,
     },
     resolve: {

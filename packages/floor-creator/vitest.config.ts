@@ -4,7 +4,7 @@ export default defineConfig({
     test: {
         dir: "./src",
         clearMocks: true,
-        reporters: ["basic"],
+        reporters: ["default"],
         watch: false,
         browser: {
             enabled: true,
