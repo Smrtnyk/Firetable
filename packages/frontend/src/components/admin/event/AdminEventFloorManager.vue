@@ -15,6 +15,8 @@ export interface AdminEventFloorManagerProps {
     showEditButton?: boolean;
     /** Maximum number of floors allowed */
     maxFloors: number;
+
+    animationDuration?: number;
 }
 
 interface Emits {
@@ -27,7 +29,7 @@ const props = defineProps<AdminEventFloorManagerProps>();
 const emit = defineEmits<Emits>();
 const draggableFloors = computed(() => [...props.floors]);
 const draggableOptions = computed(() => ({
-    animation: 150,
+    animation: props.animationDuration ?? 150,
     onEnd: onDrop,
     ...(isMobile.value
         ? {

@@ -8,10 +8,10 @@ import { nextTick } from "vue";
 
 vi.mock("src/global-reactives/screen-detection");
 
-describe("AdminEventFloorManager", function () {
+describe("AdminEventFloorManager", () => {
     let props: AdminEventFloorManagerProps;
 
-    beforeEach(function () {
+    beforeEach(() => {
         props = {
             floors: [
                 { id: "floor1", name: "Floor 1", order: 0 },
@@ -19,11 +19,12 @@ describe("AdminEventFloorManager", function () {
                 { id: "floor3", name: "Floor 3", order: 2 },
             ] as EventFloorDoc[],
             maxFloors: 3,
+            animationDuration: 0,
         };
     });
 
-    describe("drag and drop functionality", function () {
-        it("emits reorder event when dragging floor to a new position", async function () {
+    describe("drag and drop functionality", () => {
+        it("emits reorder event when dragging floor to a new position", async () => {
             const screen = renderComponent(AdminEventFloorManager, props);
 
             const sourceFloor = screen.getByLabelText("floor1 draggable floor plan item");
@@ -41,7 +42,7 @@ describe("AdminEventFloorManager", function () {
             ]);
         });
 
-        it("maintains floor data integrity after multiple reorders", async function () {
+        it("maintains floor data integrity after multiple reorders", async () => {
             const screen = renderComponent(AdminEventFloorManager, props);
 
             // First reorder: Move Floor 1 to end
@@ -72,7 +73,7 @@ describe("AdminEventFloorManager", function () {
             ]);
         });
 
-        it("does not emit reorder event when dropping on the same position", async function () {
+        it("does not emit reorder event when dropping on the same position", async () => {
             const screen = renderComponent(AdminEventFloorManager, props);
 
             const sourceFloor = screen.getByLabelText("floor1 draggable floor plan item");

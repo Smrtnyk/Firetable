@@ -369,7 +369,7 @@ describe("EventCreateForm", () => {
             const yesterdayDay = yesterday.getDate().toString();
 
             // find the date cell for yesterday
-            const dateCell = screen.getByRole("button", { name: yesterdayDay });
+            const dateCell = screen.getByRole("button", { name: yesterdayDay, exact: true });
             await userEvent.click(dateCell);
 
             const closeButton = screen.getByRole("button", { name: "Close" });
