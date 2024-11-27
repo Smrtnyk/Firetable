@@ -293,6 +293,7 @@ function setupTestFloor(): TestContext {
             json: "",
         },
         containerWidth: 500,
+        containerHeight: 500,
     });
 
     return { floor, canvas };
