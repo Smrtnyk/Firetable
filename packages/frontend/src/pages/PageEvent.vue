@@ -30,7 +30,7 @@ import {
 } from "src/composables/useFirestore";
 import { useFloorsPageEvent } from "src/composables/useFloorsPageEvent";
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { orderBy, where } from "firebase/firestore";
+import { where } from "firebase/firestore";
 import { useUsers } from "src/composables/useUsers";
 
 import EventGuestList from "src/components/Event/EventGuestList.vue";
@@ -77,7 +77,7 @@ const { data: event, promise: eventDataPromise } = useFirestoreDocument<EventDoc
     getEventPath(eventOwner),
 );
 const { data: eventFloors } = useFirestoreCollection<EventFloorDoc>(
-    createQuery(getEventFloorsPath(eventOwner), orderBy("order", "asc")),
+    createQuery(getEventFloorsPath(eventOwner)),
 );
 const {
     data: reservations,

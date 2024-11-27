@@ -25,34 +25,30 @@ import {
 import { decompressFloorDoc } from "src/helpers/compress-floor-doc";
 import { property } from "es-toolkit/compat";
 import { AppLogger } from "src/logger/FTLogger.js";
-import { orderBy } from "firebase/firestore";
 
 export function useAdminEvent(eventOwner: EventOwner) {
     const router = useRouter();
 
     const { data: eventFloorsData, pending: eventFloorsIsPending } =
-        useFirestoreCollection<EventFloorDoc>(
-            createQuery(getEventFloorsPath(eventOwner), orderBy("order", "asc")),
-            {
-                wait: true,
-                converter: {
-                    fromFirestore(snapshot) {
-                        const data = snapshot.data() as EventFloorDoc;
-                        return {
-                            ...decompressFloorDoc(data),
-                            id: snapshot.id,
-                            // Default to end if no order is set
-                            order: data.order ?? 999_999,
-                        };
-                    },
-                    toFirestore: (floor: EventFloorDoc) => ({
-                        ...floor,
-                        id: floor.id,
-                        order: floor.order ?? 999_999,
-                    }),
+        useFirestoreCollection<EventFloorDoc>(createQuery(getEventFloorsPath(eventOwner)), {
+            wait: true,
+            converter: {
+                fromFirestore(snapshot) {
+                    const data = snapshot.data() as EventFloorDoc;
+                    return {
+                        ...decompressFloorDoc(data),
+                        id: snapshot.id,
+                        // Default to end if no order is set
+                        order: data.order ?? 999_999,
+                    };
                 },
+                toFirestore: (floor: EventFloorDoc) => ({
+                    ...floor,
+                    id: floor.id,
+                    order: floor.order ?? 999_999,
+                }),
             },
-        );
+        });
 
     const reservations = useFirestoreCollection<ReservationDoc>(getReservationsPath(eventOwner));
     const { data: logs } = useFirestoreDocument<EventLogsDoc>(getEventLogsPath(eventOwner));
