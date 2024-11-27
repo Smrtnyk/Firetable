@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FloorEditorElement, FloorEditor } from "@firetable/floor-creator";
+import type { FloorEditor } from "@firetable/floor-creator";
 import type { FloorDoc } from "@firetable/types";
 import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
 import FloorEditorTopControls from "src/components/Floor/FloorEditorTopControls.vue";
