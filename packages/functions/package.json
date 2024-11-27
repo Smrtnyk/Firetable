@@ -4,7 +4,7 @@
     "main": "lib/functions/src/index.js",
     "type": "module",
     "scripts": {
-        "build": "npm run typecheck && tsc -p tsconfig.prod.json",
+        "build": "pnpm run typecheck && tsc -p tsconfig.prod.json",
         "typecheck": "tsc --noEmit",
         "test": "vitest",
         "dev": "tsc --watch",
