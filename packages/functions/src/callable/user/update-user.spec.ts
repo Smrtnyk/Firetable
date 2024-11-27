@@ -3,20 +3,13 @@ import type { CallableRequest } from "firebase-functions/v2/https";
 import { updateUserFn } from "./update-user.js";
 import * as Init from "../../init.js";
 import { MockAuth } from "../../../test-helpers/MockAuth.js";
-import {
-    MockDocumentReference,
-    MockFieldValue,
-    MockFirestore,
-} from "../../../test-helpers/MockFirestore.js";
 import { getUserPath } from "../../paths.js";
+import { db } from "../../init.js";
 import { Role } from "@shared-types/index.js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import * as Firestore from "firebase-admin/firestore";
-
-vi.mock("firebase-admin/firestore");
+import { DocumentReference } from "firebase-admin/firestore";
 
 let mockAuth: MockAuth;
-let mockFirestore: MockFirestore;
 
 async function createUser({
     email,
@@ -38,11 +31,7 @@ describe("updateUserFn", () => {
         vi.restoreAllMocks();
 
         mockAuth = new MockAuth();
-        mockFirestore = new MockFirestore();
-
-        vi.spyOn(Firestore, "FieldValue", "get").mockReturnValue(MockFieldValue as any);
         vi.spyOn(Init, "auth", "get").mockReturnValue(mockAuth as any);
-        vi.spyOn(Init, "db", "get").mockReturnValue(mockFirestore as any);
     });
 
     describe("Successful updates", () => {
@@ -66,7 +55,7 @@ describe("updateUserFn", () => {
             });
 
             // Setting up existing user in Mock Firestore
-            await mockFirestore
+            await db
                 .collection(`organisations/${organisationId}/users`)
                 .doc(uid)
                 .set({
@@ -82,11 +71,11 @@ describe("updateUserFn", () => {
             expect(result).toEqual({ success: true, message: "User updated successfully." });
 
             // Verify user details updated in Firestore
-            const userDoc = mockFirestore.getDataAtPath(getUserPath(organisationId, uid))!.data;
-
-            expect(userDoc.name).toBe(updatedUser.name);
-            expect(userDoc.email).toBe(updatedUser.email);
-            expect(userDoc.relatedProperties).toEqual(updatedUser.relatedProperties);
+            const userDocRef = await db.doc(getUserPath(organisationId, uid)).get();
+            const userDoc = userDocRef.data();
+            expect(userDoc?.name).toBe(updatedUser.name);
+            expect(userDoc?.email).toBe(updatedUser.email);
+            expect(userDoc?.relatedProperties).toEqual(updatedUser.relatedProperties);
         });
     });
 
@@ -110,7 +99,7 @@ describe("updateUserFn", () => {
         });
 
         // Set up existing user in Mock Firestore with capabilities
-        await mockFirestore
+        await db
             .collection(`organisations/${organisationId}/users`)
             .doc(uid)
             .set({
@@ -129,12 +118,13 @@ describe("updateUserFn", () => {
         expect(result).toEqual({ success: true, message: "User updated successfully." });
 
         // Verify user details updated in Firestore
-        const userDoc = mockFirestore.getDataAtPath(getUserPath(organisationId, uid))!.data;
+        const userDocRef = await db.doc(getUserPath(organisationId, uid)).get();
+        const userDoc = userDocRef.data();
 
-        expect(userDoc.name).toBe(updatedUser.name);
-        expect(userDoc.email).toBe(updatedUser.email);
-        expect(userDoc.relatedProperties).toEqual(updatedUser.relatedProperties);
-        expect(userDoc.capabilities).toEqual(["cap2"]);
+        expect(userDoc?.name).toBe(updatedUser.name);
+        expect(userDoc?.email).toBe(updatedUser.email);
+        expect(userDoc?.relatedProperties).toEqual(updatedUser.relatedProperties);
+        expect(userDoc?.capabilities).toEqual(["cap2"]);
     });
 
     describe("Handling errors", () => {
@@ -168,9 +158,7 @@ describe("updateUserFn", () => {
             vi.spyOn(MockAuth.prototype, "getUser").mockResolvedValue({} as any);
 
             // Mock Firestore transaction to throw an error
-            vi.spyOn(MockDocumentReference.prototype, "update").mockRejectedValue(
-                new Error("Failed"),
-            );
+            vi.spyOn(DocumentReference.prototype, "update").mockRejectedValue(new Error("Failed"));
 
             await expect(updateUserFn(request)).rejects.toThrow(
                 "Failed to update user. Details: Failed",
@@ -189,7 +177,7 @@ describe("updateUserFn", () => {
             });
 
             // Create user doc
-            await mockFirestore.doc(getUserPath("org1", uid)).set({
+            await db.doc(getUserPath("org1", uid)).set({
                 name: "Test User",
                 email: "",
             });
@@ -250,7 +238,7 @@ describe("updateUserFn", () => {
                 password: "password",
             });
             // Create user doc
-            await mockFirestore.doc(getUserPath(organisationId, uid)).set({
+            await db.doc(getUserPath(organisationId, uid)).set({
                 name: "Test User",
                 email: "",
             });

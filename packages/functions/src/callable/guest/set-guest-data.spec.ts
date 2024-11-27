@@ -2,9 +2,8 @@ import type { GuestData, PreparedGuestData } from "./set-guest-data.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
 import type { GuestDoc } from "@shared-types";
 import { setGuestDataFn } from "./set-guest-data.js";
-import * as Init from "../../init.js";
 import { getGuestsPath } from "../../paths.js";
-import { MockFirestore } from "../../../test-helpers/MockFirestore.js";
+import { db } from "../../init.js";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const organisationId = "orgId";
@@ -36,11 +35,7 @@ const testRequestData = {
 };
 
 describe("setGuestDataFn", () => {
-    let mockFirestore: MockFirestore;
-
     beforeEach(() => {
-        mockFirestore = new MockFirestore();
-        vi.spyOn(Init, "db", "get").mockReturnValue(mockFirestore as any);
         vi.setSystemTime(mockTimestamp);
     });
 
@@ -48,7 +43,7 @@ describe("setGuestDataFn", () => {
         await setGuestDataFn({ data: testRequestData } as CallableRequest<GuestData>);
 
         // Query the guests collection for the guest with contact == guestContact
-        const guestsCollectionRef = mockFirestore.collection(getGuestsPath(organisationId));
+        const guestsCollectionRef = db.collection(getGuestsPath(organisationId));
         const querySnapshot = await guestsCollectionRef.where("contact", "==", contact).get();
 
         expect(querySnapshot.empty).toBe(false);
@@ -81,7 +76,7 @@ describe("setGuestDataFn", () => {
         };
 
         // Add a guest document to the guests collection
-        const guestsCollectionRef = mockFirestore.collection(getGuestsPath(organisationId));
+        const guestsCollectionRef = db.collection(getGuestsPath(organisationId));
         await guestsCollectionRef.add(initialGuestData);
 
         const requestData = {
@@ -138,7 +133,7 @@ describe("setGuestDataFn", () => {
         };
 
         // Add a guest document to the guests collection
-        const guestsCollectionRef = mockFirestore.collection(getGuestsPath(organisationId));
+        const guestsCollectionRef = db.collection(getGuestsPath(organisationId));
         await guestsCollectionRef.add(initialGuestData);
 
         const requestData = {

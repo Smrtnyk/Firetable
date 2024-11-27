@@ -1,33 +1,30 @@
-import * as Init from "../../init.js";
-import { MockCollection, MockFirestore } from "../../../test-helpers/MockFirestore.js";
 import { getEventPath } from "../../paths.js";
+import { db } from "../../init.js";
 import { clearOldEvents } from "./index.js";
-import { Collection } from "@shared-types";
+import { CollectionReference } from "firebase-admin/firestore";
 import { describe, it, beforeEach, expect, vi } from "vitest";
+import { Collection } from "@shared-types";
 
 describe("clearOldEvents Function", () => {
-    let db: MockFirestore;
-
-    beforeEach(() => {
-        db = new MockFirestore();
-        vi.spyOn(Init, "db", "get").mockReturnValue(db as any);
+    beforeEach(async () => {
+        vi.restoreAllMocks();
 
         // Create Mock Organizations
         const orgsRef = db.collection(Collection.ORGANISATIONS);
         const org1Ref = orgsRef.doc("org1");
-        org1Ref.set({ name: "Organization 1" });
+        await org1Ref.set({ name: "Organization 1" });
 
         // Create Mock Properties for Organization
         const propertiesCollectionRef = org1Ref.collection(Collection.PROPERTIES);
         const property1Ref = propertiesCollectionRef.doc("property1");
-        property1Ref.set({ name: "Property 1" });
+        await property1Ref.set({ name: "Property 1" });
 
         // Create Mock Events for Property
         const eventsCollectionRef = property1Ref.collection(Collection.EVENTS);
-        eventsCollectionRef
+        await eventsCollectionRef
             .doc("oldEvent")
             .set(createEventMock(getDateOneYearAgo(), "org1", "property1"));
-        eventsCollectionRef
+        await eventsCollectionRef
             .doc("recentEvent")
             .set(createEventMock(new Date(), "org1", "property1"));
     });
@@ -57,7 +54,7 @@ describe("clearOldEvents Function", () => {
 
     it("should handle errors during data fetching and deletion", async () => {
         // Simulate an error
-        vi.spyOn(MockCollection.prototype, "get").mockRejectedValue(
+        vi.spyOn(CollectionReference.prototype, "get").mockRejectedValue(
             new Error("Database fetch error"),
         );
 

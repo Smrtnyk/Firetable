@@ -1,16 +1,10 @@
 import type { CallableRequest } from "firebase-functions/v2/https";
 import { createPropertyFn } from "./create-property.js";
-import { MockFieldValue, MockFirestore } from "../../../test-helpers/MockFirestore.js";
-import * as Init from "../../init.js";
 import { getPropertyPath, getUserPath, getUsersPath } from "../../paths.js";
-import * as Firestore from "firebase-admin/firestore";
-import { beforeEach, vi, describe, expect, it } from "vitest";
-
-vi.mock("firebase-admin/firestore");
+import { db } from "../../init.js";
+import { describe, expect, it } from "vitest";
 
 describe("createPropertyFn", () => {
-    let mockFirestore: MockFirestore;
-
     function mockRequest<T>(data: T, auth: any): CallableRequest<T> {
         return {
             data,
@@ -18,13 +12,6 @@ describe("createPropertyFn", () => {
             rawRequest: {} as any,
         };
     }
-
-    beforeEach(() => {
-        mockFirestore = new MockFirestore();
-
-        vi.spyOn(Init, "db", "get").mockReturnValue(mockFirestore as any);
-        vi.spyOn(Firestore, "FieldValue", "get").mockReturnValue(MockFieldValue as any);
-    });
 
     it("should throw error if user is not authenticated", async () => {
         const request = mockRequest({ name: "Test Property", organisationId: "org1" }, null);
@@ -53,7 +40,7 @@ describe("createPropertyFn", () => {
             role: roleName,
             relatedProperties: [],
         };
-        await mockFirestore.collection(getUsersPath(organisationId)).doc(userId).set(userData);
+        await db.collection(getUsersPath(organisationId)).doc(userId).set(userData);
 
         const request = mockRequest(
             { name: propertyName, organisationId },
@@ -64,17 +51,15 @@ describe("createPropertyFn", () => {
         expect(propertyId).toBeDefined();
 
         // Check if the property data is correctly stored
-        const propertyData = mockFirestore.getDataAtPath(
-            getPropertyPath(organisationId, propertyId),
-        );
-        expect(propertyData!.data).toStrictEqual({
+        const propertyData = await db.doc(getPropertyPath(organisationId, propertyId)).get();
+        expect(propertyData.data()).toStrictEqual({
             name: propertyName,
             organisationId,
             creatorId: userId,
         });
 
         // Check if the user's related properties are updated
-        const updatedUserData = mockFirestore.getDataAtPath(getUserPath(organisationId, userId));
-        expect(updatedUserData!.data.relatedProperties).toContain(propertyId);
+        const updatedUserData = await db.doc(getUserPath(organisationId, userId)).get();
+        expect(updatedUserData.data()?.relatedProperties).toContain(propertyId);
     });
 });

@@ -2,10 +2,10 @@ import type { DeleteGuestVisitData } from "./delete-guest-visit.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
 import type { PreparedGuestData } from "./set-guest-data.js";
 import { deleteGuestVisitFn } from "./delete-guest-visit.js";
-import * as Init from "../../init.js";
-import { MockDocumentReference, MockFirestore } from "../../../test-helpers/MockFirestore.js";
 import { getGuestsPath } from "../../paths.js";
+import { db } from "../../init.js";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { DocumentReference } from "firebase-admin/firestore";
 
 const preparedGuestData: PreparedGuestData = {
     contact: "guest1",
@@ -22,16 +22,12 @@ const eventId = "event1";
 const date = Date.now();
 
 describe("deleteGuestVisitFn", () => {
-    let mockFirestore: MockFirestore;
-
     beforeEach(() => {
         vi.restoreAllMocks();
-        mockFirestore = new MockFirestore();
-        vi.spyOn(Init, "db", "get").mockReturnValue(mockFirestore as any);
     });
 
     it("should handle errors", async () => {
-        const guestsCollectionRef = mockFirestore.collection(getGuestsPath(organisationId));
+        const guestsCollectionRef = db.collection(getGuestsPath(organisationId));
         const guestData = {
             contact: preparedGuestData.contact,
             visitedProperties: {
@@ -48,7 +44,7 @@ describe("deleteGuestVisitFn", () => {
         await guestsCollectionRef.add(guestData);
 
         // Simulate an error when calling the update method
-        vi.spyOn(MockDocumentReference.prototype, "update").mockRejectedValue(
+        vi.spyOn(DocumentReference.prototype, "update").mockRejectedValue(
             new Error("Update failed"),
         );
 
@@ -77,7 +73,7 @@ describe("deleteGuestVisitFn", () => {
         ).resolves.not.toThrow();
 
         // Verify that no guest document exists for 'nonexistentGuest'
-        const guestsCollectionRef = mockFirestore.collection(getGuestsPath(organisationId));
+        const guestsCollectionRef = db.collection(getGuestsPath(organisationId));
         const querySnapshot = await guestsCollectionRef
             .where("contact", "==", "nonexistentGuest")
             .get();
@@ -85,7 +81,7 @@ describe("deleteGuestVisitFn", () => {
     });
 
     it("should delete a guest visit", async () => {
-        const guestsCollectionRef = mockFirestore.collection(getGuestsPath(organisationId));
+        const guestsCollectionRef = db.collection(getGuestsPath(organisationId));
         const guestData = {
             contact: preparedGuestData.contact,
             visitedProperties: {
@@ -113,6 +109,6 @@ describe("deleteGuestVisitFn", () => {
         const updatedGuestDocSnapshot = await guestDocRef.get();
         const updatedGuestDoc = updatedGuestDocSnapshot.data();
 
-        expect(updatedGuestDoc.visitedProperties[propertyId][eventId]).toBeNull();
+        expect(updatedGuestDoc?.visitedProperties[propertyId][eventId]).toBeNull();
     });
 });

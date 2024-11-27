@@ -3,6 +3,9 @@ import { resolve } from "path";
 
 export default defineConfig({
     test: {
+        isolate: false,
+        fileParallelism: false,
+        setupFiles: [resolve(__dirname, "./test-helpers/vitest-setup.ts")],
         environment: "node",
         cache: false,
         globals: true,
@@ -10,6 +13,7 @@ export default defineConfig({
         clearMocks: true,
         reporters: ["default"],
         watch: false,
+        silent: true
     },
     resolve: {
         alias: {

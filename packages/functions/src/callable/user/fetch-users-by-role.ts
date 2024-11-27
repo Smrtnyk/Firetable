@@ -138,12 +138,16 @@ export async function fetchUsersByRoleFn(
                 });
             }
 
-            return users.map(function (user) {
-                return {
-                    ...user,
-                    lastSignInTime: authUsersMap.get(user.id) ?? null,
-                };
-            });
+            return users
+                .map(function (user) {
+                    return {
+                        ...user,
+                        lastSignInTime: authUsersMap.get(user.id) ?? null,
+                    };
+                })
+                .toSorted(function (a, b) {
+                    return a.name.localeCompare(b.name);
+                });
         } catch (error) {
             logger.error("Error fetching auth user data:", error);
             // Return users without lastSignInTime if there's an error
@@ -153,5 +157,7 @@ export async function fetchUsersByRoleFn(
 
     logger.log(`Returning ${users.length} users for user ${uid}`);
 
-    return users;
+    return users.toSorted(function (a, b) {
+        return a.name.localeCompare(b.name);
+    });
 }

@@ -2,7 +2,7 @@ import { createEvent as createEventFn } from "./callable/create-event/index.js";
 import { createUser as createUserFn } from "./callable/user/create-user.js";
 import { deleteUser as deleteUserFn } from "./callable/user/delete-user.js";
 import { clearOldEvents as clearOldEventsFn } from "./cron/clear-old-events/index.js";
-import { createPropertyFn } from "./callable/create-property/create-property.js";
+import { createPropertyFn } from "./callable/property/create-property.js";
 import { deleteDocument } from "./delete-document/index.js";
 import { updateUserFn } from "./callable/user/update-user.js";
 import { fetchUsersByRoleFn } from "./callable/user/fetch-users-by-role.js";

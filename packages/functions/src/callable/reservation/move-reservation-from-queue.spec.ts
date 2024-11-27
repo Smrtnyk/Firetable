@@ -1,19 +1,15 @@
 import type { CallableRequest } from "firebase-functions/v2/https";
 import type { MoveReservationFromQueueReqPayload } from "./move-reservation-from-queue.js";
 import { moveReservationFromQueueFn } from "./move-reservation-from-queue.js";
-import * as Init from "../../init.js";
-import { MockFirestore, MockTransaction } from "../../../test-helpers/MockFirestore.js";
 import { getQueuedReservationsPath, getReservationsPath } from "../../paths.js";
+import { db } from "../../init.js";
 import { HttpsError } from "firebase-functions/v2/https";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { Transaction } from "firebase-admin/firestore";
 
 describe("moveReservationFromQueueFn", () => {
-    let mockFirestore: MockFirestore;
-
     beforeEach(() => {
         vi.restoreAllMocks();
-        mockFirestore = new MockFirestore();
-        vi.spyOn(Init, "db", "get").mockReturnValue(mockFirestore as any);
     });
 
     it("should throw an error if the user is unauthenticated", async () => {
@@ -141,7 +137,7 @@ describe("moveReservationFromQueueFn", () => {
         } as unknown as CallableRequest<MoveReservationFromQueueReqPayload>;
 
         // Add the queued reservation to MockFirestore
-        const reservationRef = mockFirestore
+        const reservationRef = db
             .collection(getQueuedReservationsPath("org123", "prop456", "event789"))
             .doc("reservation1");
 
@@ -157,7 +153,7 @@ describe("moveReservationFromQueueFn", () => {
         });
 
         // Verify that the reservation is now in planned reservations
-        const plannedReservationRef = mockFirestore
+        const plannedReservationRef = db
             .collection(getReservationsPath("org123", "prop456", "event789"))
             .doc("reservation1");
 
@@ -258,14 +254,14 @@ describe("moveReservationFromQueueFn", () => {
         } as unknown as CallableRequest<MoveReservationFromQueueReqPayload>;
 
         // Add the reservation to MockFirestore
-        const queuedReservationRef = mockFirestore
+        const queuedReservationRef = db
             .collection(getQueuedReservationsPath("org123", "prop456", "event789"))
             .doc("reservation1");
 
         await queuedReservationRef.set(reservation);
 
         // Mock the set operation to throw an error to simulate transaction failure
-        vi.spyOn(MockTransaction.prototype, "set").mockImplementation(() => {
+        vi.spyOn(Transaction.prototype, "set").mockImplementation(() => {
             throw new Error("Firestore set failed");
         });
 
@@ -282,7 +278,7 @@ describe("moveReservationFromQueueFn", () => {
         expect(originalReservationSnapshot.exists).toBe(true);
 
         // Verify that the queued reservation was not set
-        const plannedReservationRef = mockFirestore
+        const plannedReservationRef = db
             .collection(getReservationsPath("org123", "prop456", "event789"))
             .doc("reservation1");
 

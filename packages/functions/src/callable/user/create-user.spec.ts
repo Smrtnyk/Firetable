@@ -2,12 +2,13 @@ import type { CallableRequest } from "firebase-functions/v2/https";
 import type { CreateUserPayload } from "@shared-types";
 import { createUser } from "./create-user.js";
 import { MockAuth } from "../../../test-helpers/MockAuth.js";
-import { MockDocumentReference, MockFirestore } from "../../../test-helpers/MockFirestore.js";
 import * as Init from "../../init.js";
 import { getUserPath } from "../../paths.js";
+import { db } from "../../init.js";
 import { Role } from "@shared-types";
 import { HttpsError } from "firebase-functions/v2/https";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { DocumentReference } from "firebase-admin/firestore";
 
 const testUserData = {
     name: "Test User",
@@ -21,13 +22,10 @@ const testUserData = {
 
 describe("createUser", () => {
     let mockAuth: MockAuth;
-    let mockFirestore: MockFirestore;
 
     beforeEach(() => {
         mockAuth = new MockAuth();
-        mockFirestore = new MockFirestore();
 
-        vi.spyOn(Init, "db", "get").mockReturnValue(mockFirestore as any);
         vi.spyOn(Init, "auth", "get").mockReturnValue(mockAuth as any);
     });
 
@@ -44,7 +42,7 @@ describe("createUser", () => {
     it("creates a new user and store their data in Firestore", async () => {
         // create related properties
         for (const propertyId of testUserData.relatedProperties) {
-            await mockFirestore
+            await db
                 .collection(`organisations/${testUserData.organisationId}/properties`)
                 .doc(propertyId)
                 .set({ id: propertyId });
@@ -57,11 +55,8 @@ describe("createUser", () => {
         expect(result.uid).toBeDefined();
         expect(result.message).toBe("User created successfully!");
 
-        // Verify Firestore data
-        const userDoc = mockFirestore.getDataAtPath(
-            getUserPath(testUserData.organisationId, result.uid),
-        );
-        expect(userDoc!.data).toEqual(
+        const userDoc = await db.doc(getUserPath(testUserData.organisationId, result.uid)).get();
+        expect(userDoc.data()).toEqual(
             expect.objectContaining({
                 name: "Test User",
                 email: "test@example.com",
@@ -79,11 +74,11 @@ describe("createUser", () => {
         ).rejects.toThrow("Auth creation failed");
 
         // Verify that no data was written to Firestore
-        expect(mockFirestore.data.size).toBe(0);
+        expect((await db.listCollections()).length).toBe(0);
     });
 
     it("cleans up by deleting the user from Auth if there's an exception after user creation", async () => {
-        vi.spyOn(MockDocumentReference.prototype, "set").mockRejectedValue(
+        vi.spyOn(DocumentReference.prototype, "set").mockRejectedValue(
             new Error("Some post-creation error"),
         );
 

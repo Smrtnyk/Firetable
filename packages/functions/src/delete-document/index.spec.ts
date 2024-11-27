@@ -1,16 +1,14 @@
-import { MockDocumentReference, MockFirestore } from "../../test-helpers/MockFirestore.js";
-import * as Init from "../init.js";
+import { db } from "../init.js";
 import { deleteDocument, MAX_DEPTH } from "./index.js";
-import { describe, it, beforeEach, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { DocumentReference } from "firebase-admin/firestore";
 
 describe("deleteDocument Function", () => {
-    let db: MockFirestore;
     const collectionName = "testCollection";
     const documentId = "testDoc";
 
     beforeEach(() => {
-        db = new MockFirestore();
-        vi.spyOn(Init, "db", "get").mockReturnValue(db as any);
+        vi.restoreAllMocks();
     });
 
     it("should delete a document without subcollections", async () => {
@@ -74,7 +72,7 @@ describe("deleteDocument Function", () => {
         await docRef.set({ field: "value" });
 
         // Mock deletion failure
-        vi.spyOn(MockDocumentReference.prototype, "delete").mockRejectedValue(
+        vi.spyOn(DocumentReference.prototype, "delete").mockRejectedValue(
             new Error("Mocked deletion failure"),
         );
 

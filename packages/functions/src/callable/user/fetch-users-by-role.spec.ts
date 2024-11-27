@@ -1,24 +1,21 @@
 import type { FetchUsersByRoleRequestData } from "./fetch-users-by-role.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
+import type { UserRecord } from "firebase-admin/auth";
 import { fetchUsersByRoleFn } from "./fetch-users-by-role.js";
 import * as Init from "../../init.js";
-import { MockFirestore } from "../../../test-helpers/MockFirestore.js";
 import { MockAuth } from "../../../test-helpers/MockAuth.js";
+import { db } from "../../init.js";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Role, AdminRole } from "@shared-types";
 
-vi.mock("firebase-admin/firestore");
-
 describe("fetchUsersByRoleFn", () => {
-    let mockFirestore: MockFirestore;
     let mockAuth: MockAuth;
     let authUsers: Record<string, { uid: string; email: string }> = {};
 
     beforeEach(async () => {
-        mockFirestore = new MockFirestore();
         mockAuth = new MockAuth();
 
-        const createTestUser = async (email: string, lastSignInTime?: string) => {
+        async function createTestUser(email: string, lastSignInTime?: string): Promise<UserRecord> {
             const user = await mockAuth.createUser({
                 email,
                 password: "password123",
@@ -29,7 +26,7 @@ describe("fetchUsersByRoleFn", () => {
             }
 
             return user;
-        };
+        }
 
         // Create all users with their specific lastSignInTimes
         const [authUser1, authUser2, authUser3, authUser4, authUser5, authUser6] =
@@ -54,41 +51,40 @@ describe("fetchUsersByRoleFn", () => {
         };
 
         // Users with relatedProperties
-        mockFirestore.doc(`organisations/org1/users/${authUser1.uid}`).set({
+        await db.doc(`organisations/org1/users/${authUser1.uid}`).set({
             role: Role.STAFF,
             name: "user1",
             relatedProperties: ["prop1", "prop2"],
         });
-        mockFirestore.doc(`organisations/org1/users/${authUser2.uid}`).set({
+        await db.doc(`organisations/org1/users/${authUser2.uid}`).set({
             role: Role.HOSTESS,
             name: "user2",
             relatedProperties: ["prop2", "prop3"],
         });
-        mockFirestore.doc(`organisations/org1/users/${authUser3.uid}`).set({
+        await db.doc(`organisations/org1/users/${authUser3.uid}`).set({
             role: Role.STAFF,
             name: "user3",
             relatedProperties: ["prop3"],
         });
-        mockFirestore.doc(`organisations/org1/users/${authUser4.uid}`).set({
+        await db.doc(`organisations/org1/users/${authUser4.uid}`).set({
             role: Role.PROPERTY_OWNER,
             name: "user4",
             relatedProperties: ["prop1", "prop4"],
         });
 
         // No related properties user
-        mockFirestore.doc(`organisations/org1/users/${authUser5.uid}`).set({
+        await db.doc(`organisations/org1/users/${authUser5.uid}`).set({
             role: Role.STAFF,
             name: "user5",
             relatedProperties: [],
         });
 
-        mockFirestore.doc(`organisations/org1/users/${authUser6.uid}`).set({
+        await db.doc(`organisations/org1/users/${authUser6.uid}`).set({
             role: Role.MANAGER,
             name: "user6",
             relatedProperties: ["prop2", "prop5"],
         });
 
-        vi.spyOn(Init, "db", "get").mockReturnValue(mockFirestore as any);
         vi.spyOn(Init, "auth", "get").mockReturnValue(mockAuth as any);
     });
 
