@@ -44,8 +44,8 @@ describe("EventGuestSearch.vue", () => {
         const screen = createComponent();
 
         const input = screen.getByRole("combobox");
-        await userEvent.fill(input, "John");
         await userEvent.click(input);
+        await userEvent.fill(input, "John");
 
         const johnOption = screen.getByText("John Doe (Table 1) on First Floor");
         await expect.element(johnOption).toBeVisible();
