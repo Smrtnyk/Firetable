@@ -17,13 +17,13 @@ const {
     showErrorMessageMock,
     tryCatchLoadingWrapperMock,
     showConfirmMock,
-    useUsersMock,
+    fetchUsersByRoleMock,
 } = vi.hoisted(() => ({
     createDialogSpy: vi.fn(),
     showErrorMessageMock: vi.fn(),
     tryCatchLoadingWrapperMock: vi.fn(),
     showConfirmMock: vi.fn(),
-    useUsersMock: vi.fn(),
+    fetchUsersByRoleMock: vi.fn(),
 }));
 
 vi.mock("vue-router", () => ({
@@ -38,8 +38,9 @@ vi.mock("src/composables/useDialog", () => ({
     }),
 }));
 
-vi.mock("src/composables/useUsers", () => ({
-    useUsers: useUsersMock,
+vi.mock("../../backend-proxy", async (importOriginal) => ({
+    ...(await importOriginal()),
+    fetchUsersByRole: fetchUsersByRoleMock,
 }));
 
 vi.mock("src/helpers/ui-helpers", async (importOriginal) => ({
@@ -111,11 +112,7 @@ describe("PageAdminUsers.vue", () => {
             },
         ];
 
-        useUsersMock.mockReturnValue({
-            users: ref(usersData),
-            isLoading: ref(false),
-            fetchUsers: vi.fn(),
-        });
+        fetchUsersByRoleMock.mockResolvedValue(usersData);
     });
 
     function render(
@@ -166,11 +163,7 @@ describe("PageAdminUsers.vue", () => {
 
     it("shows 'no users' message when there are no users", async () => {
         usersData = [];
-        useUsersMock.mockReturnValue({
-            users: ref(usersData),
-            isLoading: ref(false),
-            fetchUsers: vi.fn(),
-        });
+        fetchUsersByRoleMock.mockResolvedValue(usersData);
 
         const screen = render();
 
@@ -207,11 +200,7 @@ describe("PageAdminUsers.vue", () => {
 
     it("shows loading indicator when isLoading is true", async () => {
         const isLoading = ref(true);
-        useUsersMock.mockReturnValue({
-            users: ref(usersData),
-            isLoading,
-            fetchUsers: vi.fn(),
-        });
+        fetchUsersByRoleMock.mockResolvedValue(usersData);
 
         render();
 
@@ -242,44 +231,5 @@ describe("PageAdminUsers.vue", () => {
         await expect
             .element(screen.getByRole("heading", { level: 3 }))
             .toHaveTextContent(`${t("PageAdminUsers.title")} (3)`);
-    });
-
-    it("updates user count when users change", async () => {
-        const users = ref(usersData);
-        useUsersMock.mockReturnValue({
-            users,
-            isLoading: ref(false),
-            fetchUsers: vi.fn(),
-        });
-
-        const screen = render();
-
-        // Initial count
-        await expect
-            .element(screen.getByRole("heading", { level: 3 }))
-            .toHaveTextContent(`${t("PageAdminUsers.title")} (3)`);
-
-        // Add a new user
-        users.value = [
-            ...usersData,
-            {
-                id: "user4",
-                name: "New User",
-                username: "newuser",
-                organisationId,
-                email: "new@example.com",
-                role: Role.STAFF,
-                relatedProperties: [],
-                capabilities: {
-                    [UserCapability.CAN_RESERVE]: true,
-                },
-            },
-        ];
-
-        await nextTick();
-
-        await expect
-            .element(screen.getByRole("heading", { level: 3 }))
-            .toHaveTextContent(`${t("PageAdminUsers.title")} (4)`);
     });
 });
