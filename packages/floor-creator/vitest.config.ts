@@ -6,6 +6,7 @@ export default defineConfig({
         clearMocks: true,
         reporters: ["default"],
         watch: false,
+        silent: !!process.env.CI,
         browser: {
             enabled: true,
             headless: true,
