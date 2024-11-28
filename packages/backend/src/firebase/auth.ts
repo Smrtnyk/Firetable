@@ -36,12 +36,14 @@ export function loginWithEmail(email: string, password: string): Promise<UserCre
 type FetchUsersByRoleRequestData = {
     organisationId: string;
 };
-export function fetchUsersByRole(organisationId: string): Promise<HttpsCallableResult<User[]>> {
+export async function fetchUsersByRole(organisationId: string): Promise<User[]> {
     const { functions } = initializeFirebase();
-    return httpsCallable<FetchUsersByRoleRequestData, User[]>(
+    const result = await httpsCallable<FetchUsersByRoleRequestData, User[]>(
         functions,
         "fetchUsersByRole",
     )({ organisationId });
+
+    return result.data;
 }
 
 export function submitNewPassword(

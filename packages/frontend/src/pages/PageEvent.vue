@@ -9,8 +9,8 @@ import type {
     ReservationDoc,
 } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
-import { isPlannedReservation, ReservationStatus } from "@firetable/types";
 import {
+    fetchUsersByRole,
     deleteQueuedReservation,
     saveQueuedReservation,
     getEventFloorsPath,
@@ -19,6 +19,7 @@ import {
     queuedReservationsCollection,
     reservationsCollection,
 } from "@firetable/backend";
+import { isPlannedReservation, ReservationStatus } from "@firetable/types";
 import { Loading } from "quasar";
 import { useRouter } from "vue-router";
 import { computed, onMounted, onUnmounted, useTemplateRef } from "vue";
@@ -31,7 +32,6 @@ import {
 import { useFloorsPageEvent } from "src/composables/useFloorsPageEvent";
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { where } from "firebase/firestore";
-import { useUsers } from "src/composables/useUsers";
 
 import EventGuestList from "src/components/Event/EventGuestList.vue";
 import EventGuestSearch from "src/components/Event/EventGuestSearch.vue";
@@ -47,6 +47,7 @@ import { useI18n } from "vue-i18n";
 import { usePermissionsStore } from "src/stores/permissions-store";
 import { exportReservations } from "src/helpers/reservation/export-reservations";
 import { useGuestsForEvent } from "src/composables/useGuestsForEvent";
+import { useAsyncState } from "@vueuse/core";
 
 interface Props {
     organisationId: string;
@@ -69,7 +70,16 @@ const { t } = useI18n();
 const { createDialog } = useDialog();
 const pageRef = useTemplateRef<HTMLDivElement>("pageRef");
 
-const { users } = useUsers(eventOwner.organisationId);
+const { state: users, execute: loadUsersPromise } = useAsyncState(
+    fetchUsersByRole(organisationId),
+    [],
+);
+
+const filteredUsersPerProperty = computed(function () {
+    return users.value.filter(function (user) {
+        return user.relatedProperties.includes(eventOwner.propertyId);
+    });
+});
 const guestList = useFirestoreCollection<GuestInGuestListData>(getEventGuestListPath(eventOwner), {
     wait: true,
 });
@@ -119,7 +129,7 @@ const {
 } = useFloorsPageEvent(eventFloors, pageRef);
 
 const { initiateTableOperation } = useReservations(
-    users,
+    filteredUsersPerProperty,
     reservations,
     floorInstances,
     eventOwner,
@@ -157,6 +167,7 @@ async function init(): Promise<void> {
         eventDataPromise.value,
         reservationsDataPromise.value,
         queuedResPromise.value,
+        loadUsersPromise(),
     ]);
     Loading.hide();
 
@@ -289,7 +300,7 @@ onUnmounted(function () {
             :data="queuedResData"
             :error="queuedResListenerError"
             :event-owner="eventOwner"
-            :users="users"
+            :users="filteredUsersPerProperty"
             :event-data="event"
             @unqueue="onReservationUnqueue"
             @create="onCreateQueuedReservation"

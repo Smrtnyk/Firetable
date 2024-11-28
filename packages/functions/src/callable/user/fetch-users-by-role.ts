@@ -56,7 +56,6 @@ export async function fetchUsersByRoleFn(
         });
     } else {
         // For other roles, fetch users based on relatedProperties
-        // Get the user's document
         const userDocRef = baseQuery.doc(uid);
         const userSnapshot = await userDocRef.get();
 
@@ -67,7 +66,6 @@ export async function fetchUsersByRoleFn(
         const userData = userSnapshot.data() as User;
         const userRelatedProperties = userData.relatedProperties as string[] | undefined;
 
-        // Return empty array if no related properties
         if (!userRelatedProperties || userRelatedProperties.length === 0) {
             logger.log(`User ${uid} has no related properties.`);
             return [];
@@ -85,7 +83,7 @@ export async function fetchUsersByRoleFn(
                 .where("relatedProperties", "array-contains-any", propertyChunk)
                 .get();
 
-            querySnapshot.docs.forEach((doc) => {
+            querySnapshot.docs.forEach(function (doc) {
                 const user = { id: doc.id, ...doc.data() } as User;
                 usersMap.set(user.id, user);
             });

@@ -13,7 +13,7 @@ export function useUsers(organisationId: string) {
     async function fetchUsers(): Promise<void> {
         try {
             isLoading.value = true;
-            users.value = (await fetchUsersByRole(organisationId)).data;
+            users.value = await fetchUsersByRole(organisationId);
         } catch (error) {
             showErrorMessage(error);
         } finally {

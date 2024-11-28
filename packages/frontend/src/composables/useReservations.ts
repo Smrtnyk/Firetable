@@ -477,12 +477,6 @@ export function useReservations(
         showErrorMessage(t("useReservations.reservationAlreadyReserved"));
     }
 
-    function filterUsersPerProperty(usersArray: User[], propertyId: string): User[] {
-        return usersArray.filter(function (user) {
-            return user.relatedProperties.includes(propertyId);
-        });
-    }
-
     function showCreateReservationDialog(
         floor: Floor,
         element: BaseTable,
@@ -503,7 +497,7 @@ export function useReservations(
                 componentPropsObject: {
                     timezone: propertySettings.value.timezone,
                     currentUser: nonNullableUser.value,
-                    users: filterUsersPerProperty(users.value, eventOwner.propertyId),
+                    users: users.value,
                     mode,
                     reservationData:
                         mode === "update" && reservation
