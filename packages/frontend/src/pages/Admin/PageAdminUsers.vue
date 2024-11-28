@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { CreateUserPayload, EditUserPayload, PropertyDoc, User } from "@firetable/types";
 import type { BucketizedUser, BucketizedUsers } from "src/components/admin/user/AdminUsersList.vue";
+import { createUserWithEmail, deleteUser, updateUser, fetchUsersByRole } from "../../backend-proxy";
 import { Role } from "@firetable/types";
 
 import UserCreateForm from "src/components/admin/user/UserCreateForm.vue";
@@ -16,14 +17,13 @@ import FTBtn from "src/components/FTBtn.vue";
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { computed, onBeforeMount, onUnmounted, ref, watch } from "vue";
 import { Loading, useQuasar } from "quasar";
-import { createUserWithEmail, deleteUser, updateUser } from "@firetable/backend";
 import { usePropertiesStore } from "src/stores/properties-store";
-import { useUsers } from "src/composables/useUsers";
 import { useAuthStore } from "src/stores/auth-store";
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { matchesProperty } from "es-toolkit/compat";
+import { useAsyncState } from "@vueuse/core";
 
 export interface PageAdminUsersProps {
     organisationId: string;
@@ -37,7 +37,15 @@ const quasar = useQuasar();
 const authStore = useAuthStore();
 const propertiesStore = usePropertiesStore();
 
-const { users, isLoading, fetchUsers } = useUsers(props.organisationId);
+const {
+    state: users,
+    isLoading,
+    execute: executeFetchUsers,
+} = useAsyncState(() => fetchUsersByRole(props.organisationId), [], {
+    immediate: true,
+    onError: showErrorMessage,
+});
+
 const { createDialog } = useDialog();
 
 const activeTab = ref(0);
@@ -98,7 +106,7 @@ async function onUpdateUser(updatedUser: EditUserPayload): Promise<void> {
     await tryCatchLoadingWrapper({
         async hook() {
             await updateUser(updatedUser);
-            await fetchUsers();
+            await executeFetchUsers();
             quasar.notify("User updated successfully!");
         },
     });
@@ -113,7 +121,7 @@ async function onDeleteUser(user: User): Promise<void> {
     await tryCatchLoadingWrapper({
         async hook() {
             await deleteUser(user);
-            await fetchUsers();
+            await executeFetchUsers();
         },
     });
 }
@@ -155,7 +163,7 @@ async function onCreateUserFormSubmit(newUser: CreateUserPayload): Promise<void>
     await tryCatchLoadingWrapper({
         async hook() {
             await createUserWithEmail(newUser);
-            await fetchUsers();
+            await executeFetchUsers();
         },
     });
 }

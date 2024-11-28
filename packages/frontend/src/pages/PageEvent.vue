@@ -71,7 +71,7 @@ const { createDialog } = useDialog();
 const pageRef = useTemplateRef<HTMLDivElement>("pageRef");
 
 const { state: users, execute: loadUsersPromise } = useAsyncState(
-    fetchUsersByRole(organisationId),
+    () => fetchUsersByRole(organisationId),
     [],
 );
 
