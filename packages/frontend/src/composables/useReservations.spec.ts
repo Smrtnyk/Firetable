@@ -433,6 +433,7 @@ describe("useReservations", () => {
                 id: "1",
                 floorId: "1",
                 tableLabel: "T1",
+                time: "19:00",
                 status: ReservationStatus.ACTIVE,
                 type: ReservationType.PLANNED,
                 reservationConfirmed: false,
@@ -1342,6 +1343,7 @@ describe("useReservations", () => {
             tableLabel: "T1",
             type: ReservationType.PLANNED,
             status: ReservationStatus.ACTIVE,
+            time: "19:00",
         } as ReservationDoc;
 
         const result = withSetup(() =>
@@ -1443,6 +1445,16 @@ describe("useReservations", () => {
     describe("expired reservations", () => {
         let clearIntervalSpy: MockInstance;
         let setIntervalSpy: MockInstance;
+        const reservation = {
+            id: "1",
+            floorId: "1",
+            tableLabel: "T1",
+            guestName: "John Doe",
+            time: "19:00",
+            status: ReservationStatus.ACTIVE,
+            type: ReservationType.PLANNED,
+            cancelled: true,
+        } as ReservationDoc;
 
         beforeEach(() => {
             vi.useFakeTimers();
@@ -1457,14 +1469,14 @@ describe("useReservations", () => {
         });
 
         it("doesn't set up interval when markGuestAsLateAfterMinutes is 0", async () => {
-            const { event } = await setupTestEnvironment();
+            const { event, floor } = await setupTestEnvironment();
 
             withSetup(
                 () =>
                     useReservations(
                         ref([]),
-                        ref([]),
-                        ref([]),
+                        ref([{ ...reservation }]),
+                        shallowRef([floor]),
                         { id: "1", propertyId: "1", organisationId: "1" },
                         ref(event),
                     ),
@@ -1490,14 +1502,14 @@ describe("useReservations", () => {
         });
 
         it("sets up interval only when markGuestAsLateAfterMinutes > 0", async () => {
-            const { event } = await setupTestEnvironment();
+            const { event, floor } = await setupTestEnvironment();
 
             withSetup(
                 () =>
                     useReservations(
                         ref([]),
-                        ref([]),
-                        ref([]),
+                        ref([{ ...reservation }]),
+                        shallowRef([floor]),
                         { id: "1", propertyId: "1", organisationId: "1" },
                         ref(event),
                     ),
@@ -1523,14 +1535,14 @@ describe("useReservations", () => {
         });
 
         it("cleans up interval on unmount", async () => {
-            const { event } = await setupTestEnvironment();
+            const { event, floor } = await setupTestEnvironment();
 
             withSetup(
                 () =>
                     useReservations(
                         ref([]),
-                        ref([]),
-                        ref([]),
+                        ref([{ ...reservation }]),
+                        shallowRef([floor]),
                         { id: "1", propertyId: "1", organisationId: "1" },
                         ref(event),
                     ),
@@ -1606,7 +1618,7 @@ describe("useReservations", () => {
                 _doc: {} as any,
             };
 
-            const reservation = createTestReservation({
+            const reservationWithTime = createTestReservation({
                 time: "19:00",
                 arrived: false,
             });
@@ -1615,7 +1627,7 @@ describe("useReservations", () => {
                 () =>
                     useReservations(
                         ref([]),
-                        ref([reservation]),
+                        ref([reservationWithTime]),
                         shallowRef([floor]),
                         { id: "1", propertyId: "1", organisationId: "1" },
                         ref(event),

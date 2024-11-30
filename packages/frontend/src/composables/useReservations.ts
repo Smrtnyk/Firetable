@@ -158,6 +158,7 @@ export function useReservations(
 
             // Enabled only if greater than 0
             if (settingsValue.markGuestAsLateAfterMinutes > 0) {
+                checkReservationsForTimeAndMarkTableIfNeeded();
                 intervalID = globalThis.setInterval(
                     checkReservationsForTimeAndMarkTableIfNeeded,
                     ONE_MINUTE,
@@ -258,7 +259,6 @@ export function useReservations(
                 }
             }
         }
-        checkReservationsForTimeAndMarkTableIfNeeded();
     }
 
     function registerTableClickHandlers(floorInstancesArray: FloorViewer[]): void {
