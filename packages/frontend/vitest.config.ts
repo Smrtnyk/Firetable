@@ -23,8 +23,7 @@ export default defineConfig({
         onConsoleLog (log) {
             return !log.includes("fabric Setting type has no effect");
         },
-        pool: "threads",
-        setupFiles: ['vitest-browser-vue'],
+        setupFiles: ["vitest-browser-vue"],
         alias: {
             "src/": new URL("./src/", import.meta.url).pathname,
         },
@@ -40,7 +39,7 @@ export default defineConfig({
         reporters: ["default"],
         watch: false,
         includeTaskLocation: true,
-        silent: true,
+        silent: !!process.env.CI,
         coverage: {
             provider: 'v8',
             reporter: ['text', 'json', 'html'],

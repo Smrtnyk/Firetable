@@ -37,7 +37,7 @@ function onDeleteOrganisation(): void {
                 organisation,
             },
             listeners: {
-                delete: async () => {
+                async delete() {
                     await tryCatchLoadingWrapper({
                         async hook() {
                             await deleteOrganisation(props.organisationId);
