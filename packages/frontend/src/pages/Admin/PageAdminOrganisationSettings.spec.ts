@@ -7,16 +7,10 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { page, userEvent } from "@vitest/browser/context";
 import { nextTick } from "vue";
 
-const { tryCatchLoadingWrapperSpy, updateOrganisationSettingsMock, updatePropertySettingsMock } =
-    vi.hoisted(() => ({
-        tryCatchLoadingWrapperSpy: vi.fn(),
-        updateOrganisationSettingsMock: vi.fn(),
-        updatePropertySettingsMock: vi.fn(),
-    }));
-
-vi.mock("src/helpers/ui-helpers", async (importOriginal) => ({
-    ...(await importOriginal()),
-    tryCatchLoadingWrapper: tryCatchLoadingWrapperSpy,
+const { updateOrganisationSettingsMock, updatePropertySettingsMock } = vi.hoisted(() => ({
+    tryCatchLoadingWrapperSpy: vi.fn(),
+    updateOrganisationSettingsMock: vi.fn(),
+    updatePropertySettingsMock: vi.fn(),
 }));
 
 vi.mock("@firetable/backend", () => ({
