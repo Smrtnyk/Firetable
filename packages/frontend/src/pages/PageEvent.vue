@@ -41,7 +41,7 @@ import EventQueuedReservations from "src/components/Event/EventQueuedReservation
 import EventViewControls from "src/components/Event/EventViewControls.vue";
 import EventFloorCanvasList from "src/components/Event/EventFloorCanvasList.vue";
 
-import { TableOperationType, useReservations } from "src/composables/useReservations";
+import { TableOperationType, useReservations } from "src/composables/reservations/useReservations";
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
 import { usePermissionsStore } from "src/stores/permissions-store";

@@ -1,5 +1,5 @@
 import type { Ref, ShallowRef } from "vue";
-import type { EventOwner } from "../backend-proxy";
+import type { EventOwner } from "../../backend-proxy";
 import type { DialogChainObject } from "quasar";
 import type { VueFirestoreDocumentData } from "vuefire";
 import type {
@@ -25,7 +25,7 @@ import {
     addReservation,
     deleteReservation,
     updateReservationDoc,
-} from "../backend-proxy";
+} from "../../backend-proxy";
 import { useQuasar } from "quasar";
 import { isTable } from "@firetable/floor-creator";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
@@ -45,7 +45,7 @@ import EventShowReservation from "src/components/Event/reservation/EventShowRese
 
 import { determineTableColor } from "src/helpers/floor";
 import { usePropertiesStore } from "src/stores/properties-store";
-import { AppLogger } from "src/logger/FTLogger.js";
+import { AppLogger } from "src/logger/FTLogger";
 import { storeToRefs } from "pinia";
 import { matchesProperty } from "es-toolkit/compat";
 import { ONE_MINUTE } from "src/constants";

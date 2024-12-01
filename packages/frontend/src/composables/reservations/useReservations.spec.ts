@@ -2,7 +2,7 @@ import type { FloorDoc, ReservationDoc, EventDoc, QueuedReservationDoc } from "@
 import type { App } from "vue";
 import type { TestingOptions } from "@pinia/testing";
 import type { MockInstance } from "vitest";
-import { TableOperationType, useReservations } from "../composables/useReservations";
+import { TableOperationType, useReservations } from "./useReservations.js";
 import {
     Role,
     UserCapability,
@@ -67,7 +67,7 @@ vi.mock("src/composables/useDialog", () => ({
     }),
 }));
 
-vi.mock("../backend-proxy", () => ({
+vi.mock("../../backend-proxy", () => ({
     updateReservationDoc: updateReservationDocMock,
     addReservation: addReservationMock,
     deleteReservation: deleteReservationMock,

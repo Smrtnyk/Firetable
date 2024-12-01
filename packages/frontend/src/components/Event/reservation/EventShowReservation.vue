@@ -7,7 +7,7 @@ import { useI18n } from "vue-i18n";
 import { useAsyncState } from "@vueuse/core";
 import { usePermissionsStore } from "src/stores/permissions-store";
 import { buttonSize } from "src/global-reactives/screen-detection";
-import { useReservationPermissions } from "src/composables/useReservationPermissions";
+import { useReservationPermissions } from "src/composables/reservations/useReservationPermissions";
 
 import ReservationGeneralInfo from "src/components/Event/reservation/ReservationGeneralInfo.vue";
 import ReservationLabelChips from "src/components/Event/reservation/ReservationLabelChips.vue";

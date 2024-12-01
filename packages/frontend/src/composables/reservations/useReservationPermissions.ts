@@ -1,6 +1,6 @@
 import type { ReservationDoc } from "@firetable/types";
 import type { Ref } from "vue";
-import { useAuthStore } from "../stores/auth-store";
+import { useAuthStore } from "src/stores/auth-store";
 import { isPlannedReservation } from "@firetable/types";
 import { computed } from "vue";
 import { usePermissionsStore } from "src/stores/permissions-store";
