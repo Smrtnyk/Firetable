@@ -28,14 +28,14 @@
     },
     "devDependencies": {
         "@regru/eslint-plugin-prefer-early-return": "1.0.0",
-        "eslint": "9.15.0",
+        "eslint": "9.16.0",
         "eslint-config-prettier": "9.1.0",
         "eslint-plugin-import-x": "4.1.1",
         "eslint-plugin-prettier": "5.2.1",
         "eslint-plugin-promise": "7.2.1",
         "eslint-plugin-quasar": "1.1.0",
         "eslint-plugin-unicorn": "56.0.1",
-        "eslint-plugin-vue": "9.31.0",
+        "eslint-plugin-vue": "9.32.0",
         "firebase-tools": "13.27.0",
         "globals": "15.12.0",
         "prettier": "3.4.1",
@@ -46,7 +46,7 @@
     "engines": {
         "node": ">= 22.9.0"
     },
-    "packageManager": "pnpm@9.14.2",
+    "packageManager": "pnpm@9.14.4",
     "pnpm": {
         "overrides": {
             "jsdom": "25.0.1"

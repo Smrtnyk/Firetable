@@ -36,7 +36,7 @@
         "@firetable/floor-creator": "workspace:*",
         "@firetable/types": "workspace:*",
         "@posva/event-emitter": "catalog:",
-        "@quasar/extras": "1.16.13",
+        "@quasar/extras": "1.16.14",
         "@sentry/vue": "8.41.0",
         "@types/pako": "2.0.3",
         "@vueuse/core": "12.0.0",
