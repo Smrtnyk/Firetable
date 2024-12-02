@@ -41,13 +41,14 @@ import EventQueuedReservations from "src/components/Event/EventQueuedReservation
 import EventViewControls from "src/components/Event/EventViewControls.vue";
 import EventFloorCanvasList from "src/components/Event/EventFloorCanvasList.vue";
 
-import { TableOperationType, useReservations } from "src/composables/reservations/useReservations";
+import { useReservations } from "src/composables/reservations/useReservations";
 import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
 import { usePermissionsStore } from "src/stores/permissions-store";
 import { exportReservations } from "src/helpers/reservation/export-reservations";
 import { useGuestsForEvent } from "src/composables/useGuestsForEvent";
 import { useAsyncState } from "@vueuse/core";
+import { TableOperationType } from "src/composables/reservations/useTableOperations";
 
 interface Props {
     organisationId: string;

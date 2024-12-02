@@ -2,7 +2,8 @@ import type { FloorDoc, ReservationDoc, EventDoc, QueuedReservationDoc } from "@
 import type { App } from "vue";
 import type { TestingOptions } from "@pinia/testing";
 import type { MockInstance } from "vitest";
-import { TableOperationType, useReservations } from "./useReservations.js";
+import { useReservations } from "./useReservations.js";
+import { TableOperationType } from "./useTableOperations.js";
 import {
     Role,
     UserCapability,
@@ -1374,7 +1375,7 @@ describe("useReservations", () => {
         await userEvent.click(page.getByRole("button", { name: "OK" }));
         await nextTick();
 
-        expect(result.currentTableOperation.value).toBeUndefined();
+        expect(result.ongoingTableOperation.value).toBeUndefined();
     });
 
     describe("guest data handling", () => {

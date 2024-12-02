@@ -1,12 +1,10 @@
-import type { Ref, ShallowRef } from "vue";
+import type { Ref, ShallowRef, ComputedRef } from "vue";
 import type { EventOwner } from "../../backend-proxy";
 import type { DialogChainObject } from "quasar";
 import type { VueFirestoreDocumentData } from "vuefire";
 import type {
-    AnyFunction,
     EventDoc,
     PlannedReservationDoc,
-    QueuedReservationDoc,
     Reservation,
     ReservationDoc,
     User,
@@ -19,7 +17,15 @@ import type {
     FloorElementClickHandler,
     FloorViewer,
 } from "@firetable/floor-creator";
+import type {
+    ReservationCopyOperation,
+    ReservationDequeueOperation,
+    ReservationLinkOperation,
+    ReservationTransferOperation,
+    TableOperation,
+} from "./useTableOperations.js";
 import { useReservationsLifecycle } from "./useReservationsLifecycle.js";
+import { TableOperationType, useTableOperations } from "./useTableOperations.js";
 import {
     moveReservationFromQueue,
     moveReservationToQueue,
@@ -27,9 +33,8 @@ import {
     deleteReservation,
     updateReservationDoc,
 } from "../../backend-proxy";
-import { useQuasar } from "quasar";
 import { isTable } from "@firetable/floor-creator";
-import { computed, onBeforeUnmount, ref, watch } from "vue";
+import { computed, watch } from "vue";
 import { isPlannedReservation, ReservationStatus } from "@firetable/types";
 import {
     notifyPositive,
@@ -67,44 +72,8 @@ type OpenDialog = {
 type UseReservations = {
     initiateTableOperation: (operation: TableOperation) => void;
     tableClickHandler: FloorElementClickHandler;
-    currentTableOperation: Ref<TableOperation | undefined>;
+    ongoingTableOperation: ComputedRef<TableOperation | undefined>;
 };
-
-export const enum TableOperationType {
-    RESERVATION_COPY = 1,
-    RESERVATION_TRANSFER = 2,
-    RESERVATION_DEQUEUE = 3,
-    RESERVATION_LINK = 4,
-}
-
-interface ReservationLinkOperation {
-    type: TableOperationType.RESERVATION_LINK;
-    sourceFloor: FloorViewer;
-    sourceReservation: ReservationDoc;
-}
-
-interface ReservationCopyOperation {
-    type: TableOperationType.RESERVATION_COPY;
-    sourceFloor: FloorViewer;
-    sourceTable: BaseTable;
-}
-
-interface ReservationTransferOperation {
-    type: TableOperationType.RESERVATION_TRANSFER;
-    sourceFloor: FloorViewer;
-    sourceTable: BaseTable;
-}
-
-interface ReservationDequeueOperation {
-    type: TableOperationType.RESERVATION_DEQUEUE;
-    reservation: QueuedReservationDoc;
-}
-
-type TableOperation =
-    | ReservationCopyOperation
-    | ReservationDequeueOperation
-    | ReservationLinkOperation
-    | ReservationTransferOperation;
 
 export function useReservations(
     users: Ref<User[]>,
@@ -117,13 +86,10 @@ export function useReservations(
     const { t } = useI18n();
     const { nonNullableUser } = storeToRefs(useAuthStore());
     const { canReserve, canSeeGuestbook } = storeToRefs(usePermissionsStore());
-    const quasar = useQuasar();
+
     const router = useRouter();
     const propertiesStore = usePropertiesStore();
     const guestsStore = useGuestsStore();
-
-    const currentTableOperation = ref<TableOperation | undefined>();
-    let operationNotification: AnyFunction | undefined;
 
     const settings = computed(function () {
         return propertiesStore.getOrganisationSettingsById(eventOwner.organisationId);
@@ -137,84 +103,19 @@ export function useReservations(
 
     let currentOpenCreateReservationDialog: OpenDialog | undefined;
 
-    const tableOperationWatcher = watch(currentTableOperation, (newOperation) => {
-        if (newOperation) {
-            showOperationNotification(newOperation);
-        } else if (operationNotification) {
-            // Dismiss the notification if the operation is cleared
-            operationNotification();
-            operationNotification = undefined;
-        }
-    });
-
+    const {
+        ongoingTableOperation,
+        initiateTableOperation,
+        cancelCurrentOperation,
+        initiateReservationLink,
+        initiateReservationTransfer,
+        initiateReservationCopy,
+    } = useTableOperations();
     useReservationsLifecycle(eventDate, reservations, floorInstances, eventOwner);
 
     watch([reservations, floorInstances], handleFloorUpdates, {
         deep: true,
     });
-
-    function cancelCurrentOperation(): void {
-        currentTableOperation.value = undefined;
-    }
-
-    function initiateTableOperation(operation: TableOperation): void {
-        currentTableOperation.value = operation;
-    }
-
-    function showOperationNotification(operation: TableOperation): void {
-        let message;
-        switch (operation.type) {
-            case TableOperationType.RESERVATION_DEQUEUE:
-                message = t("useReservations.movingReservationOperationMsg");
-                break;
-            case TableOperationType.RESERVATION_COPY:
-                message = t("useReservations.copyingReservationOperationMsg", {
-                    tableLabel: operation.sourceTable.label,
-                });
-                break;
-            case TableOperationType.RESERVATION_TRANSFER:
-                message = t("useReservations.transferringReservationOperationMsg", {
-                    tableLabel: operation.sourceTable.label,
-                });
-                break;
-            case TableOperationType.RESERVATION_LINK:
-                message = t("useReservations.linkingTableOperationMsg", {
-                    tableLabels: Array.isArray(operation.sourceReservation.tableLabel)
-                        ? operation.sourceReservation.tableLabel.join(", ")
-                        : operation.sourceReservation.tableLabel,
-                });
-                break;
-            default:
-                throw new Error("Invalid table operation type!");
-        }
-
-        operationNotification = quasar.notify({
-            message,
-            type: "ongoing",
-            timeout: 0,
-            position: "top",
-            actions: [
-                {
-                    label: t("Global.cancel"),
-                    color: "white",
-                    noDismiss: true,
-                    handler: onCancelOperation,
-                },
-            ],
-        });
-    }
-
-    async function onCancelOperation(): Promise<void> {
-        const confirm = await showConfirm(
-            t("useReservations.cancelTableOperationTitle"),
-            t("useReservations.cancelTableOperationMsg"),
-        );
-
-        if (confirm) {
-            // This will also dismiss the notification
-            cancelCurrentOperation();
-        }
-    }
 
     function handleFloorUpdates([newReservations, newFloorInstances]: [
         ReservationDoc[],
@@ -880,7 +781,7 @@ export function useReservations(
         targetTable: BaseTable,
         targetReservation: ReservationDoc | undefined,
     ): Promise<void> {
-        const operation = currentTableOperation.value;
+        const operation = ongoingTableOperation.value;
         if (!operation) {
             return;
         }
@@ -980,30 +881,6 @@ export function useReservations(
               ));
     }
 
-    function initiateReservationLink(floor: FloorViewer, reservation: ReservationDoc): void {
-        currentTableOperation.value = {
-            type: TableOperationType.RESERVATION_LINK,
-            sourceFloor: floor,
-            sourceReservation: reservation,
-        };
-    }
-
-    function initiateReservationCopy(floor: FloorViewer, table: BaseTable): void {
-        currentTableOperation.value = {
-            type: TableOperationType.RESERVATION_COPY,
-            sourceFloor: floor,
-            sourceTable: table,
-        };
-    }
-
-    function initiateReservationTransfer(floor: FloorViewer, table: BaseTable): void {
-        currentTableOperation.value = {
-            type: TableOperationType.RESERVATION_TRANSFER,
-            sourceFloor: floor,
-            sourceTable: table,
-        };
-    }
-
     async function tableClickHandler(
         floor: FloorViewer,
         element: FloorEditorElement | undefined,
@@ -1021,7 +898,7 @@ export function useReservations(
             return tableLabels.includes(element.label);
         });
 
-        if (currentTableOperation.value) {
+        if (ongoingTableOperation.value) {
             await handleTableOperation(floor, element, reservation);
             cancelCurrentOperation();
             return;
@@ -1034,17 +911,8 @@ export function useReservations(
         }
     }
 
-    onBeforeUnmount(function () {
-        tableOperationWatcher();
-        // Clean up any remaining notification
-        if (operationNotification) {
-            operationNotification();
-            operationNotification = undefined;
-        }
-    });
-
     return {
-        currentTableOperation,
+        ongoingTableOperation,
         tableClickHandler,
         initiateTableOperation,
     };
