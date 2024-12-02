@@ -19,6 +19,7 @@ import type {
     FloorElementClickHandler,
     FloorViewer,
 } from "@firetable/floor-creator";
+import { useReservationsLifecycle } from "./useReservationsLifecycle.js";
 import {
     moveReservationFromQueue,
     moveReservationToQueue,
@@ -47,12 +48,9 @@ import { determineTableColor } from "src/helpers/floor";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { AppLogger } from "src/logger/FTLogger";
 import { storeToRefs } from "pinia";
-import { matchesProperty } from "es-toolkit/compat";
-import { ONE_MINUTE } from "src/constants";
 import { useDialog } from "src/composables/useDialog";
 import { plannedToQueuedReservation } from "src/helpers/reservation/planned-to-queued-reservation";
 import { queuedToPlannedReservation } from "src/helpers/reservation/queued-to-planned-reservation";
-import { shouldMarkReservationAsExpired } from "src/helpers/reservation/should-mark-reservation-as-expired";
 import { isEventInProgress } from "src/helpers/event/is-event-in-progress";
 import { eventEmitter } from "src/boot/event-emitter";
 import { hashString } from "src/helpers/hash-string";
@@ -133,8 +131,9 @@ export function useReservations(
     const propertySettings = computed(function () {
         return propertiesStore.getPropertySettingsById(eventOwner.propertyId);
     });
-
-    let intervalID: ReturnType<typeof globalThis.setInterval> | undefined;
+    const eventDate = computed(function () {
+        return event.value?.date;
+    });
 
     let currentOpenCreateReservationDialog: OpenDialog | undefined;
 
@@ -148,25 +147,7 @@ export function useReservations(
         }
     });
 
-    watch(
-        propertySettings,
-        function (settingsValue) {
-            if (intervalID !== undefined) {
-                globalThis.clearInterval(intervalID);
-                intervalID = undefined;
-            }
-
-            // Enabled only if greater than 0
-            if (settingsValue.markGuestAsLateAfterMinutes > 0) {
-                checkReservationsForTimeAndMarkTableIfNeeded();
-                intervalID = globalThis.setInterval(
-                    checkReservationsForTimeAndMarkTableIfNeeded,
-                    ONE_MINUTE,
-                );
-            }
-        },
-        { immediate: true },
-    );
+    useReservationsLifecycle(eventDate, reservations, floorInstances, eventOwner);
 
     watch([reservations, floorInstances], handleFloorUpdates, {
         deep: true,
@@ -823,42 +804,6 @@ export function useReservations(
         });
     }
 
-    function markReservationAsExpired(floorId: string, tableLabel: string): void {
-        const floor = floorInstances.value.find(matchesProperty("id", floorId));
-        const table = floor?.getTableByLabel(tableLabel);
-        table?.setFill("red");
-    }
-
-    function checkReservationsForTimeAndMarkTableIfNeeded(): void {
-        if (!event.value?.date) {
-            return;
-        }
-
-        const baseEventDate = new Date(event.value.date);
-
-        reservations.value
-            .filter(function (reservation) {
-                return (
-                    !reservation.arrived &&
-                    shouldMarkReservationAsExpired(
-                        reservation.time,
-                        baseEventDate,
-                        propertySettings.value.timezone,
-                        propertySettings.value.markGuestAsLateAfterMinutes * ONE_MINUTE,
-                    )
-                );
-            })
-            .forEach(function (reservation) {
-                if (Array.isArray(reservation.tableLabel)) {
-                    reservation.tableLabel.forEach(function (label) {
-                        markReservationAsExpired(reservation.floorId, label);
-                    });
-                } else {
-                    markReservationAsExpired(reservation.floorId, reservation.tableLabel);
-                }
-            });
-    }
-
     async function swapOrTransferReservationsBetweenFloorPlans(
         floor1: FloorViewer,
         table1: BaseTable,
@@ -1090,11 +1035,6 @@ export function useReservations(
     }
 
     onBeforeUnmount(function () {
-        if (intervalID !== undefined) {
-            globalThis.clearInterval(intervalID);
-            intervalID = undefined;
-        }
-
         tableOperationWatcher();
         // Clean up any remaining notification
         if (operationNotification) {
