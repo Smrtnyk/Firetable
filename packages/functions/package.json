@@ -20,7 +20,7 @@
         "es-toolkit": "1.29.0"
     },
     "devDependencies": {
-        "@faker-js/faker": "9.2.0",
+        "@faker-js/faker": "9.3.0",
         "@firebase/app-types": "0.9.3",
         "@firebase/rules-unit-testing": "4.0.1",
         "vitest": "https://pkg.pr.new/vitest@fe2a187"

@@ -2,11 +2,10 @@ import { FlatCompat } from "@eslint/eslintrc";
 import importX from "eslint-plugin-import-x";
 import unicorn from "eslint-plugin-unicorn";
 import promise from "eslint-plugin-promise";
-import tseslint from "typescript-eslint";
+import { config, configs, parser } from "typescript-eslint";
 import eslint from "@eslint/js";
 import vue from "eslint-plugin-vue";
 import vueParser from "vue-eslint-parser";
-import tsParser from "@typescript-eslint/parser";
 import globals from "globals";
 import { join } from "node:path";
 
@@ -17,12 +16,20 @@ const compat = new FlatCompat({
     resolvePluginsRelativeTo: import.meta.filename,
 });
 
-export default tseslint.config(
+export default config(
     eslint.configs.recommended,
-    ...tseslint.configs.strict,
+    ...configs.strict,
     importX.flatConfigs.recommended,
     importX.flatConfigs.typescript,
     ...compat.plugins("@regru/eslint-plugin-prefer-early-return"),
+    {
+        settings: {
+            "import-x/resolver": {
+                typescript: true,
+                node: true,
+            },
+        },
+    },
     {
         plugins: {
             promise,
@@ -47,7 +54,7 @@ export default tseslint.config(
             },
             parser: vueParser,
             parserOptions: {
-                parser: tsParser,
+                parser,
                 project: tsconfig,
                 tsconfigDirName: import.meta.dirname,
                 extraFileExtensions: [".vue"],
