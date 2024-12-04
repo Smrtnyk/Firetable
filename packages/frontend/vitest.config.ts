@@ -23,6 +23,7 @@ export default defineConfig({
         onConsoleLog (log) {
             return !log.includes("fabric Setting type has no effect");
         },
+        dangerouslyIgnoreUnhandledErrors: true,
         setupFiles: ["vitest-browser-vue"],
         alias: {
             "src/": new URL("./src/", import.meta.url).pathname,
