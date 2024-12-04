@@ -1,11 +1,10 @@
 /* eslint-env node */
 
 // Configuration for your app
-// https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
-import { configure } from "quasar/wrappers";
+import { defineConfig } from "#q-app/wrappers";
 
 // eslint-disable-next-line no-inline-comments -- for api
-export default configure(function (/* ctx */) {
+export default defineConfig(function (/* ctx */) {
     return {
         // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
         // preFetch: true,
@@ -33,6 +32,10 @@ export default configure(function (/* ctx */) {
             target: {
                 browser: ["esnext"],
                 node: "node20",
+            },
+
+            typescript: {
+                vueShim: true,
             },
 
             vueRouterMode: "history",

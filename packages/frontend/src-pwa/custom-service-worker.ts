@@ -6,5 +6,5 @@ declare const self: ServiceWorkerGlobalScope &
     typeof globalThis & { skipWaiting: () => void };
 
 // This is required for Workbox's `injectManifest` mode to work.
-// We're not going to use it for anything, though.
+// @ts-expect-error -- We're not going to use it for anything, though.
 self.__WB_MANIFEST;

@@ -5,3 +5,12 @@ declare namespace NodeJS {
         VUE_ROUTER_BASE: string | undefined;
     }
 }
+
+interface ImportMetaEnv {
+    readonly PROD: boolean;
+    readonly DEV: boolean;
+}
+
+interface ImportMeta {
+    readonly env: ImportMetaEnv;
+}

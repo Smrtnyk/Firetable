@@ -1,29 +1,14 @@
 {
+    "extends": "./.quasar/tsconfig.json",
     "compilerOptions": {
-        "esModuleInterop": true,
-        "module": "ESNext",
-        "moduleResolution": "bundler",
-        "isolatedModules": false,
-        "noEmit": true,
-        "baseUrl": ".",
         "resolveJsonModule": true,
         "skipLibCheck": true,
         "skipDefaultLibCheck": true,
         "sourceMap": true,
         "forceConsistentCasingInFileNames": true,
         "useDefineForClassFields": true,
-        "jsx": "preserve",
-        "lib": [
-            "esnext",
-            "dom"
-        ],
         "target": "ESNext",
         "types": ["vitest", "vitest-browser-vue", "@vitest/browser/providers/playwright"],
-        "paths": {
-            "src/*": [
-                "src/*"
-            ]
-        },
         "strict": true,
         "noImplicitAny": true,
         /* Enable error reporting for expressions and declarations with an implied `any` type.. */
@@ -41,16 +26,6 @@
         // "noUncheckedIndexedAccess": true,
         "noImplicitOverride": true
     },
-    "include": [
-        "src",
-        "vitest.config.ts"
-    ],
-    "exclude": [
-        "src-pwa",
-        "dist",
-        ".quasar",
-        "node_modules",
-    ],
     "references": [
         {
             "path": "../backend"
