@@ -1,13 +1,9 @@
 {
     "extends": "./.quasar/tsconfig.json",
     "compilerOptions": {
-        "resolveJsonModule": true,
-        "skipLibCheck": true,
-        "skipDefaultLibCheck": true,
         "sourceMap": true,
         "forceConsistentCasingInFileNames": true,
         "useDefineForClassFields": true,
-        "target": "ESNext",
         "types": ["vitest", "vitest-browser-vue", "@vitest/browser/providers/playwright"],
         "strict": true,
         "noImplicitAny": true,
@@ -24,7 +20,15 @@
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
         // "noUncheckedIndexedAccess": true,
-        "noImplicitOverride": true
+        "noImplicitOverride": true,
+        "paths": {
+            "src/*": [
+                "./src/*"
+            ],
+            "#q-app/wrappers": [
+                "./../../node_modules/.pnpm/@quasar+app-vite@2.0.0_@types+node@22.10.1_eslint@9.16.0_pinia@2.2.8_typescript@5.6.3_vue@3.5_rzkkgwp5pmmct6zxzgdp5m25ze/node_modules/@quasar/app-vite/types/app-wrappers.d.ts"
+            ]
+        }
     },
     "references": [
         {

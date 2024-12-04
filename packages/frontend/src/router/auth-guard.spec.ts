@@ -1,25 +1,29 @@
-import type { useAuthStore } from "src/stores/auth-store";
 import type { RouteLocationNormalizedGeneric, RouteMeta } from "vue-router";
 import type { AuthGuard } from "./auth-guard";
 import type { usePermissionsStore } from "src/stores/permissions-store";
 import { createAuthGuard } from "./auth-guard";
+import { mockedStore } from "../../test-helpers/render-component";
+import { useAuthStore, AuthState } from "src/stores/auth-store";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { getCurrentUser } from "vuefire";
 import { Loading } from "quasar";
 import { AppLogger } from "src/logger/FTLogger";
 import { AdminRole, Role } from "@firetable/types";
+import { createApp } from "vue";
+import { setActivePinia } from "pinia";
+import { createTestingPinia } from "@pinia/testing";
 
 vi.mock("vuefire", () => ({
     getCurrentUser: vi.fn(),
+    useCollection: vi.fn(),
+    useDocument: vi.fn(),
 }));
 
-vi.mock("quasar", () => ({
+vi.mock("quasar", async (importOriginal) => ({
+    ...(await importOriginal()),
     Loading: {
         show: vi.fn(),
         hide: vi.fn(),
-    },
-    Notify: {
-        create: vi.fn(),
     },
     Dialog: {
         create: vi.fn(() => ({
@@ -52,19 +56,22 @@ function createMockRoute(
 }
 
 describe("Auth Guard", () => {
-    let mockAuthStore: ReturnType<typeof useAuthStore>;
+    let mockedAuthStore: ReturnType<typeof useAuthStore>;
     let mockPermissionsStore: ReturnType<typeof usePermissionsStore>;
     let guard: AuthGuard;
 
     beforeEach(() => {
         vi.useFakeTimers();
-        mockAuthStore = {
-            isReady: false,
-            isAuthenticated: false,
-            initUser: vi.fn(),
-        } as unknown as ReturnType<typeof useAuthStore>;
+        const app = createApp({});
+        const pinia = createTestingPinia({
+            stubActions: false,
+            createSpy: vi.fn,
+        });
+        app.use(pinia);
+        setActivePinia(pinia);
+        mockedAuthStore = mockedStore(useAuthStore) as any;
         mockPermissionsStore = {} as unknown as ReturnType<typeof usePermissionsStore>;
-        guard = createAuthGuard(mockAuthStore, mockPermissionsStore);
+        guard = createAuthGuard(mockedAuthStore, mockPermissionsStore);
     });
 
     afterEach(() => {
@@ -75,8 +82,7 @@ describe("Auth Guard", () => {
         it("allows access to public routes when not authenticated", async () => {
             const to = createMockRoute("/public");
 
-            mockAuthStore.isAuthenticated = false;
-            mockAuthStore.isReady = true;
+            mockedAuthStore.setAuthState(AuthState.UNAUTHENTICATED);
 
             expect(await guard(to)).toBe(true);
         });
@@ -84,8 +90,7 @@ describe("Auth Guard", () => {
         it("allows access to public routes when authenticated", async () => {
             const to = createMockRoute("/public");
 
-            mockAuthStore.isAuthenticated = true;
-            mockAuthStore.isReady = true;
+            mockedAuthStore.setAuthState(AuthState.READY);
 
             expect(await guard(to)).toBe(true);
         });
@@ -93,8 +98,7 @@ describe("Auth Guard", () => {
         it("allows navigation to auth page when not authenticated", async () => {
             const to = createMockRoute("/auth");
 
-            mockAuthStore.isAuthenticated = false;
-            mockAuthStore.isReady = true;
+            mockedAuthStore.setAuthState(AuthState.UNAUTHENTICATED);
 
             expect(await guard(to)).toBe(true);
         });
@@ -102,8 +106,7 @@ describe("Auth Guard", () => {
         it("redirects to home if authenticated and trying to access /auth", async () => {
             const to = createMockRoute("/auth");
 
-            mockAuthStore.isAuthenticated = true;
-            mockAuthStore.isReady = true;
+            mockedAuthStore.setAuthState(AuthState.READY);
 
             expect(await guard(to)).toStrictEqual({ name: "home" });
         });
@@ -111,8 +114,7 @@ describe("Auth Guard", () => {
         it("redirects to auth for protected routes when not authenticated", async () => {
             const to = createMockRoute("/protected", { requiresAuth: true });
 
-            mockAuthStore.isAuthenticated = false;
-            mockAuthStore.isReady = true;
+            mockedAuthStore.setAuthState(AuthState.UNAUTHENTICATED);
 
             expect(await guard(to)).toStrictEqual({ name: "auth" });
         });
@@ -126,8 +128,7 @@ describe("Auth Guard", () => {
                 allowedRoles: mockRoleCheck,
             });
 
-            mockAuthStore.isAuthenticated = true;
-            mockAuthStore.isReady = true;
+            mockedAuthStore.setAuthState(AuthState.READY);
             vi.mocked(getCurrentUser).mockResolvedValueOnce({
                 getIdTokenResult: () =>
                     Promise.resolve({
@@ -145,8 +146,7 @@ describe("Auth Guard", () => {
                 allowedRoles: [AdminRole.ADMIN, Role.PROPERTY_OWNER],
             });
 
-            mockAuthStore.isAuthenticated = true;
-            mockAuthStore.isReady = true;
+            mockedAuthStore.setAuthState(AuthState.READY);
             vi.mocked(getCurrentUser).mockResolvedValueOnce({
                 getIdTokenResult: () => Promise.resolve({ claims: { role: AdminRole.ADMIN } }),
             } as any);
@@ -160,8 +160,7 @@ describe("Auth Guard", () => {
                 allowedRoles: [AdminRole.ADMIN],
             });
 
-            mockAuthStore.isAuthenticated = true;
-            mockAuthStore.isReady = true;
+            mockedAuthStore.setAuthState(AuthState.READY);
             vi.mocked(getCurrentUser).mockResolvedValueOnce({
                 getIdTokenResult: () => Promise.resolve({ claims: { role: Role.STAFF } }),
             } as any);
@@ -174,24 +173,23 @@ describe("Auth Guard", () => {
         it("initializes auth when not ready", async () => {
             const to = createMockRoute("/protected", { requiresAuth: true });
 
-            mockAuthStore.isReady = false;
+            mockedAuthStore.setAuthState(AuthState.UNAUTHENTICATED);
             const mockUser = { uid: "test-uid" };
             vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser as any);
 
             await guard(to);
 
-            expect(mockAuthStore.initUser).toHaveBeenCalledWith(mockUser);
+            expect(mockedAuthStore.initUser).toHaveBeenCalledWith(mockUser);
         });
 
         it("skips initialization when ready", async () => {
             const to = createMockRoute("/protected", { requiresAuth: true });
 
-            mockAuthStore.isReady = true;
-            mockAuthStore.isAuthenticated = true;
+            mockedAuthStore.setAuthState(AuthState.READY);
 
             await guard(to);
 
-            expect(mockAuthStore.initUser).not.toHaveBeenCalled();
+            expect(mockedAuthStore.initUser).not.toHaveBeenCalled();
         });
     });
 
@@ -199,7 +197,7 @@ describe("Auth Guard", () => {
         it("handles auth initialization errors", async () => {
             const to = createMockRoute("/protected", { requiresAuth: true });
 
-            mockAuthStore.isReady = false;
+            mockedAuthStore.setAuthState(AuthState.UNAUTHENTICATED);
             const error = new Error("Auth initialization failed");
             vi.mocked(getCurrentUser).mockRejectedValueOnce(error);
 
@@ -220,8 +218,7 @@ describe("Auth Guard", () => {
                 allowedRoles: [AdminRole.ADMIN],
             });
 
-            mockAuthStore.isAuthenticated = true;
-            mockAuthStore.isReady = true;
+            mockedAuthStore.setAuthState(AuthState.READY);
             vi.mocked(getCurrentUser).mockRejectedValueOnce(new Error("Token fetch failed"));
 
             expect(await guard(to)).toBe(false);
@@ -234,7 +231,7 @@ describe("Auth Guard", () => {
                 allowedRoles: [AdminRole.ADMIN],
             });
 
-            mockAuthStore.isAuthenticated = true;
+            mockedAuthStore.setAuthState(AuthState.READY);
             vi.mocked(getCurrentUser).mockResolvedValueOnce({
                 getIdTokenResult: () =>
                     Promise.resolve({
@@ -320,8 +317,7 @@ describe("Auth Guard", () => {
                 allowedRoles: [AdminRole.ADMIN],
             });
 
-            mockAuthStore.isAuthenticated = true;
-            mockAuthStore.isReady = true;
+            mockedAuthStore.setAuthState(AuthState.READY);
             vi.mocked(getCurrentUser).mockResolvedValueOnce({
                 getIdTokenResult: () => Promise.resolve(undefined) as any,
             } as any);
@@ -335,8 +331,7 @@ describe("Auth Guard", () => {
                 allowedRoles: [AdminRole.ADMIN],
             });
 
-            mockAuthStore.isAuthenticated = true;
-            mockAuthStore.isReady = true;
+            mockedAuthStore.setAuthState(AuthState.READY);
             vi.mocked(getCurrentUser).mockResolvedValueOnce({
                 getIdTokenResult: () => Promise.resolve({ claims: {} }),
             } as any);

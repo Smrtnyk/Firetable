@@ -8,16 +8,22 @@ import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useFirestoreDocument } from "src/composables/useFirestore";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { Loading } from "quasar";
-import { isNotNil } from "es-toolkit/predicate";
 import { noop } from "es-toolkit/function";
 import { AppLogger } from "src/logger/FTLogger";
 
+export const enum AuthState {
+    UNAUTHENTICATED = "unauthenticated",
+    INITIALIZING = "initializing",
+    READY = "ready",
+}
+
 export const useAuthStore = defineStore("auth", function () {
-    const isAuthenticated = ref(false);
-    const isReady = ref(false);
+    const state = ref<AuthState>(AuthState.UNAUTHENTICATED);
     const user = ref<AppUser | undefined>();
-    const unsubscribers: (typeof noop)[] = [];
-    const initInProgress = ref(false);
+    const unsubscribers: VoidFunction[] = [];
+
+    const isInitializing = computed(() => state.value === AuthState.INITIALIZING);
+    const isReady = computed(() => state.value === AuthState.READY);
 
     const nonNullableUser = computed(function () {
         if (!user.value) {
@@ -38,30 +44,24 @@ export const useAuthStore = defineStore("auth", function () {
         return Boolean(user.value?.email);
     });
 
+    function setAuthState(newState: AuthState): void {
+        state.value = newState;
+    }
+
     function cleanup(): void {
         unsubscribers.forEach(function (unsub) {
             unsub();
         });
-        isAuthenticated.value = false;
-        isReady.value = false;
-        initInProgress.value = false;
+        setAuthState(AuthState.UNAUTHENTICATED);
         user.value = undefined;
     }
 
-    function setAuthState(isAuthenticatedVal: boolean): void {
-        if (isNotNil(isAuthenticatedVal)) {
-            isAuthenticated.value = isAuthenticatedVal;
-        } else {
-            isReady.value = false;
-            initInProgress.value = false;
-        }
-    }
-
     async function initUser(authUser: FBUser): Promise<void> {
-        if (initInProgress.value) {
+        if (state.value === AuthState.INITIALIZING) {
             return;
         }
-        initInProgress.value = true;
+
+        setAuthState(AuthState.INITIALIZING);
         try {
             Loading.show();
             const token = await authUser?.getIdTokenResult();
@@ -87,12 +87,12 @@ export const useAuthStore = defineStore("auth", function () {
                     }),
                 ]);
             }
-        } catch (error) {
+            setAuthState(AuthState.READY);
+        } catch (e) {
             handleError(noop, {
-                message: error instanceof Error ? error.message : "Unknown error occurred",
+                message: e instanceof Error ? e.message : "Unknown error occurred",
             });
         } finally {
-            initInProgress.value = false;
             Loading.hide();
         }
     }
@@ -112,8 +112,7 @@ export const useAuthStore = defineStore("auth", function () {
             organisationId: "",
             capabilities: undefined,
         };
-        isAuthenticated.value = true;
-        isReady.value = true;
+        setAuthState(AuthState.READY);
     }
 
     async function watchAndAssignUser(
@@ -149,8 +148,7 @@ export const useAuthStore = defineStore("auth", function () {
         }
 
         user.value = userRef.value;
-        isAuthenticated.value = true;
-        isReady.value = true;
+        setAuthState(AuthState.READY);
         unsubscribers.push(stop);
 
         return user.value;
@@ -169,13 +167,12 @@ export const useAuthStore = defineStore("auth", function () {
         initUser,
         assignAdmin,
         unsubscribers,
-        initInProgress,
         nonNullableUser,
         isLoggedIn,
         isAdmin,
         isPropertyOwner,
         user,
-        isAuthenticated,
+        isInitializing,
         isReady,
     };
 });

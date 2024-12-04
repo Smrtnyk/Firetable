@@ -49,18 +49,18 @@ export function createAuthGuard(
      * Checks if user is authenticated and initializes if needed
      */
     async function checkAndInitAuth(): Promise<{
-        isAuthenticated: boolean;
+        isReady: boolean;
         user: Awaited<ReturnType<typeof getCurrentUser>>;
     }> {
         if (!authStore.isReady) {
             const currUser = await getCurrentUser();
             if (currUser) {
                 await authStore.initUser(currUser);
-                return { isAuthenticated: true, user: currUser };
+                return { isReady: true, user: currUser };
             }
-            return { isAuthenticated: false, user: null };
+            return { isReady: false, user: null };
         }
-        return { isAuthenticated: authStore.isAuthenticated, user: await getCurrentUser() };
+        return { isReady: authStore.isReady, user: await getCurrentUser() };
     }
 
     /**
@@ -106,29 +106,29 @@ export function createAuthGuard(
 
             await Promise.race([
                 (async () => {
-                    const { isAuthenticated, user } = await checkAndInitAuth();
+                    const { isReady, user } = await checkAndInitAuth();
                     const requiresAuth = to.meta.requiresAuth;
 
                     if (import.meta.env.DEV) {
                         AppLogger.info("[Auth Guard]", {
                             path: to.path,
-                            isAuthenticated,
+                            isReady,
                             requiresAuth,
                             allowedRoles: to.meta.allowedRoles,
                         });
                     }
 
-                    if (requiresAuth && !isAuthenticated) {
+                    if (requiresAuth && !isReady) {
                         navigationResult = { name: "auth" };
                         return;
                     }
 
                     if (to.path === "/auth") {
-                        navigationResult = isAuthenticated ? { name: "home" } : true;
+                        navigationResult = isReady ? { name: "home" } : true;
                         return;
                     }
 
-                    if (!isAuthenticated) {
+                    if (!isReady) {
                         navigationResult = true;
                         return;
                     }

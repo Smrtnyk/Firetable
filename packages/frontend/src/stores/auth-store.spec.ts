@@ -1,6 +1,6 @@
 import type { AppUser } from "@firetable/types";
 import type { User as FBUser } from "firebase/auth";
-import { useAuthStore } from "./auth-store";
+import { AuthState, useAuthStore } from "./auth-store";
 import { usePropertiesStore } from "./properties-store";
 import { mockedStore } from "../../test-helpers/render-component";
 import { AdminRole, Role } from "@firetable/types";
@@ -175,11 +175,8 @@ describe("auth-store.ts", () => {
             expect(logoutUserSpy).toHaveBeenCalled();
             expect(loadingSpy.hide).toHaveBeenCalled();
 
-            expect(authStore.isAuthenticated).toBe(false);
             expect(authStore.isReady).toBe(false);
             expect(authStore.user).toBeUndefined();
-
-            expect(authStore.initInProgress).toBe(false);
         });
 
         it("prevents multiple simultaneous initializations", async () => {
@@ -211,9 +208,7 @@ describe("auth-store.ts", () => {
             await Promise.all([firstInit, secondInit]);
 
             expect(loadingSpy.show).toHaveBeenCalledTimes(1);
-            expect(authStore.isAuthenticated).toBe(true);
             expect(authStore.isReady).toBe(true);
-            expect(authStore.initInProgress).toBe(false);
         });
 
         it("cleans up properly when initialization fails", async () => {
@@ -236,9 +231,7 @@ describe("auth-store.ts", () => {
 
             await authStore.initUser(fbUser);
 
-            expect(authStore.isAuthenticated).toBe(false);
             expect(authStore.isReady).toBe(false);
-            expect(authStore.initInProgress).toBe(false);
             expect(authStore.user).toBeUndefined();
             expect(loadingSpy.hide).toHaveBeenCalled();
         });
@@ -248,23 +241,11 @@ describe("auth-store.ts", () => {
         it("updates authentication state correctly", () => {
             const authStore = mockedStore(useAuthStore);
 
-            authStore.setAuthState(true);
-            expect(authStore.isAuthenticated).toBe(true);
+            authStore.setAuthState(AuthState.READY);
+            expect(authStore.isReady).toBe(true);
 
-            authStore.setAuthState(false);
-            expect(authStore.isAuthenticated).toBe(false);
-        });
-
-        it("resets ready state when authentication is invalid", () => {
-            const authStore = mockedStore(useAuthStore);
-
-            authStore.isReady = true;
-            authStore.initInProgress = true;
-
-            authStore.setAuthState(undefined as any);
-
+            authStore.setAuthState(AuthState.UNAUTHENTICATED);
             expect(authStore.isReady).toBe(false);
-            expect(authStore.initInProgress).toBe(false);
         });
     });
 
@@ -274,18 +255,15 @@ describe("auth-store.ts", () => {
             const unsubSpy = vi.fn();
 
             authStore.user = createTestUser();
-            authStore.isAuthenticated = true;
-            authStore.isReady = true;
-            authStore.initInProgress = true;
+            authStore.setAuthState(AuthState.READY);
+            expect(authStore.isReady).toBe(true);
 
             authStore.unsubscribers.push(unsubSpy);
 
             authStore.cleanup();
 
             expect(authStore.user).toBeUndefined();
-            expect(authStore.isAuthenticated).toBe(false);
             expect(authStore.isReady).toBe(false);
-            expect(authStore.initInProgress).toBe(false);
             expect(unsubSpy).toHaveBeenCalled();
         });
     });
@@ -344,7 +322,6 @@ describe("auth-store.ts", () => {
                 organisationId: "",
                 capabilities: undefined,
             });
-            expect(authStore.isAuthenticated).toBe(true);
             expect(authStore.isReady).toBe(true);
         });
 
@@ -429,11 +406,11 @@ describe("auth-store.ts", () => {
 
             const initPromise = authStore.initUser(fbUser);
             expect(loadingSpy.show).toHaveBeenCalled();
-            expect(authStore.initInProgress).toBe(true);
+            expect(authStore.isInitializing).toBe(true);
 
             await initPromise;
             expect(loadingSpy.hide).toHaveBeenCalled();
-            expect(authStore.initInProgress).toBe(false);
+            expect(authStore.isInitializing).toBe(false);
         });
 
         it("ensures loading is hidden even when errors occur", async () => {
@@ -449,7 +426,7 @@ describe("auth-store.ts", () => {
 
             await authStore.initUser(fbUser);
             expect(loadingSpy.hide).toHaveBeenCalled();
-            expect(authStore.initInProgress).toBe(false);
+            expect(authStore.isReady).toBe(false);
         });
     });
 });

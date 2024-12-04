@@ -1,6 +1,6 @@
 import type { Router } from "vue-router";
 import { boot } from "quasar/wrappers";
-import { useAuthStore } from "src/stores/auth-store";
+import { AuthState, useAuthStore } from "src/stores/auth-store";
 import { initializeFirebase } from "@firetable/backend";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { useCurrentUser, VueFire, VueFireAuth } from "vuefire";
@@ -50,7 +50,9 @@ function handleOnAuthStateChanged(
                     isFirstCall = false;
                     return;
                 }
-                authStore.setAuthState(Boolean(currentUser.value));
+                authStore.setAuthState(
+                    currentUser.value ? AuthState.READY : AuthState.UNAUTHENTICATED,
+                );
                 await authStore.initUser(currentUser.value);
             } else {
                 const propertiesStore = usePropertiesStore();
