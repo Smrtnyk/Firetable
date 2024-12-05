@@ -1,10 +1,8 @@
 /* eslint-env node */
 
-// Configuration for your app
-import { defineConfig } from "#q-app/wrappers";
+import { configure } from "quasar/wrappers";
 
-// eslint-disable-next-line no-inline-comments -- for api
-export default defineConfig(function (/* ctx */) {
+export default configure(function () {
     return {
         // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
         // preFetch: true,

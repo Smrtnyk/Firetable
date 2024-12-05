@@ -10,7 +10,7 @@
         "dev:pwa": "quasar dev -m pwa",
         "build:spa": "quasar build",
         "build:pwa": "quasar build -m pwa",
-        "build": "quasar build -m pwa && pnpm run typecheck",
+        "build": "pnpm run typecheck && quasar build -m pwa",
         "typecheck": "vue-tsc --noEmit",
         "test": "vitest",
         "test:coverage": "vitest run --coverage"
