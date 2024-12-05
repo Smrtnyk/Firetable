@@ -5,16 +5,13 @@ import vue from "@vitejs/plugin-vue";
 
 export default defineConfig({
     plugins: [
-        // @ts-expect-error -- will fix when vite6 is stable
         tsconfigPaths({
             // This is needed to avoid Vitest picking up tsconfig.json files from other unrelated projects in the monorepo
             ignoreConfigErrors: true,
         }),
-        // @ts-expect-error -- will fix when vite6 is stable
         vue({
             template: { transformAssetUrls },
         }),
-        // @ts-expect-error -- will fix when vite6 is stable
         quasar({
             sassVariables: "src/css/quasar.variables.scss",
         }),
