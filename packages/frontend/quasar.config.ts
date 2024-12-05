@@ -1,8 +1,8 @@
 /* eslint-env node */
 
-import { configure } from "quasar/wrappers";
+import { defineConfig } from "@quasar/app-vite/wrappers";
 
-export default configure(function () {
+export default defineConfig(function () {
     return {
         // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
         // preFetch: true,
