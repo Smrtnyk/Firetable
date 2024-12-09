@@ -174,19 +174,24 @@ describe("PageAdminUsers.vue", () => {
 
     it("opens create user dialog when plus button is clicked", async () => {
         const screen = render();
-
         const addButton = screen.getByRole("button", { name: "" });
         await userEvent.click(addButton);
 
-        expect(createDialogSpy).toHaveBeenCalledWith(
-            expect.objectContaining({
-                component: FTDialog,
-                componentProps: expect.objectContaining({
-                    component: UserCreateForm,
-                    title: t("PageAdminUsers.createNewUserDialogTitle"),
-                }),
-            }),
+        const [[dialogArg]] = createDialogSpy.mock.calls;
+        expect(dialogArg.component).toBe(FTDialog);
+        expect(dialogArg.componentProps).toMatchObject({
+            component: UserCreateForm,
+            title: t("PageAdminUsers.createNewUserDialogTitle"),
+        });
+        expect(dialogArg.componentProps).toHaveProperty("componentPropsObject.organisation", {
+            id: "org1",
+            name: "Organisation One",
+        });
+        expect(dialogArg.componentProps).toHaveProperty(
+            "componentPropsObject.properties",
+            expect.any(Array),
         );
+        expect(dialogArg.componentProps).toHaveProperty("listeners.submit", expect.any(Function));
     });
 
     it("shows 'no properties' message when there are no properties", async () => {
