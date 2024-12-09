@@ -21,6 +21,7 @@
         "@quasar/app-vite": "2.0.1",
         "@quasar/vite-plugin": "1.8.1",
         "@vitejs/plugin-vue": "5.2.1",
+        "@types/papaparse": "5.3.15",
         "@vitest/browser": "catalog:",
         "@vitest/coverage-v8": "catalog:",
         "@vitest/ui": "catalog:",
@@ -29,7 +30,7 @@
         "vitest": "catalog:",
         "vitest-browser-vue": "0.0.1",
         "vue-component-type-helpers": "2.1.10",
-        "vue-tsc": "2.1.10"
+        "vue-tsc": "https://pkg.pr.new/vuejs/language-tools/vue-tsc@3fb59af"
     },
     "dependencies": {
         "@firetable/backend": "workspace:*",
@@ -48,6 +49,7 @@
         "pako": "2.1.0",
         "pinia": "2.3.0",
         "quasar": "2.17.4",
+        "papaparse": "5.4.1",
         "register-service-worker": "1.7.2",
         "vue": "3.5.13",
         "vue-draggable-plus": "0.6.0",

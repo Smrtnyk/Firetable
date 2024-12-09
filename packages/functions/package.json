@@ -23,7 +23,7 @@
         "@faker-js/faker": "9.3.0",
         "@firebase/app-types": "0.9.3",
         "@firebase/rules-unit-testing": "4.0.1",
-        "vitest": "https://pkg.pr.new/vitest@d93989e"
+        "vitest": "https://pkg.pr.new/vitest@2fb585a"
     },
     "private": true
 }
