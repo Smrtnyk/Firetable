@@ -16,14 +16,14 @@
     "dependencies": {
         "@google-cloud/functions-framework": "3.4.2",
         "firebase-admin": "13.0.1",
-        "firebase-functions": "6.1.1",
+        "firebase-functions": "6.1.2",
         "es-toolkit": "1.29.0"
     },
     "devDependencies": {
         "@faker-js/faker": "9.3.0",
         "@firebase/app-types": "0.9.3",
         "@firebase/rules-unit-testing": "4.0.1",
-        "vitest": "https://pkg.pr.new/vitest@2fb585a"
+        "vitest": "https://pkg.pr.new/vitest@96f47d3"
     },
     "private": true
 }
