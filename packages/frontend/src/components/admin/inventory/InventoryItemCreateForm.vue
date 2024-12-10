@@ -1,9 +1,23 @@
 <script setup lang="ts">
 import type { CreateInventoryItemPayload } from "@firetable/types";
-import { DrinkCategory, InventoryItemType } from "@firetable/types";
-import { computed, ref, useTemplateRef, watch } from "vue";
+import {
+    TobaccoSubCategory,
+    isRetailItem,
+    RetailMainCategory,
+    isDrinkItem,
+    DrinkMainCategory,
+    InventoryItemType,
+    SpiritSubCategory,
+    WineSubCategory,
+    BeerSubCategory,
+    NonAlcoholicCategory,
+    CocktailComponentCategory,
+} from "@firetable/types";
+import { ref, useTemplateRef, watch, computed } from "vue";
 import { QForm } from "quasar";
 import { useI18n } from "vue-i18n";
+import { noEmptyString, noNegativeNumber, optionalNumberInRange } from "src/helpers/form-rules";
+import { getEnumValues } from "src/helpers/get-enum-values";
 
 export interface InventoryItemCreateFormProps {
     itemToEdit?: CreateInventoryItemPayload;
@@ -14,11 +28,78 @@ const { t } = useI18n();
 const props = defineProps<InventoryItemCreateFormProps>();
 const formRef = useTemplateRef<QForm>("formRef");
 const form = ref<CreateInventoryItemPayload>(getInitialForm());
-const typeOptions = [InventoryItemType.DRINK];
 const emit = defineEmits<(e: "submit", item: CreateInventoryItemPayload) => void>();
-const isDrinkType = computed(function () {
-    return form.value.type === InventoryItemType.DRINK;
+
+const typeOptions = getEnumValues(InventoryItemType);
+
+const mainCategoryOptions = computed(() => {
+    if (isDrinkItem(form.value)) {
+        return getEnumValues(DrinkMainCategory);
+    }
+
+    if (isRetailItem(form.value)) {
+        return getEnumValues(RetailMainCategory);
+    }
+
+    return [];
 });
+
+const subCategoryOptions = computed(() => {
+    if (form.value.type === InventoryItemType.DRINK) {
+        switch (form.value.mainCategory) {
+            case DrinkMainCategory.SPIRITS:
+                // @ts-expect-error -- works fine
+                return Object.values(SpiritSubCategory);
+            case DrinkMainCategory.WINE:
+                // @ts-expect-error -- works fine
+                return Object.values(WineSubCategory);
+            case DrinkMainCategory.BEER:
+                // @ts-expect-error -- works fine
+                return Object.values(BeerSubCategory);
+            case DrinkMainCategory.NON_ALCOHOLIC:
+                // @ts-expect-error -- works fine
+                return Object.values(NonAlcoholicCategory);
+            case DrinkMainCategory.COCKTAIL_COMPONENTS:
+                // @ts-expect-error -- works fine
+                return Object.values(CocktailComponentCategory);
+            default:
+                return [];
+        }
+    } else if (form.value.type === InventoryItemType.RETAIL) {
+        switch (form.value.mainCategory) {
+            case RetailMainCategory.TOBACCO:
+                // @ts-expect-error -- works fine
+                return Object.values(TobaccoSubCategory);
+            default:
+                return [];
+        }
+    }
+    return [];
+});
+
+const nameRules = [noEmptyString(t("validation.nameRequired"))];
+const typeRules = [noEmptyString(t("validation.typeRequired"))];
+const mainCategoryRules = [noEmptyString(t("InventoryItemCreateForm.mainCategoryRequired"))];
+const subCategoryRules = [noEmptyString(t("InventoryItemCreateForm.subCategoryRequired"))];
+const quantityRules = [noNegativeNumber(t("InventoryItemCreateForm.quantityNonNegative"))];
+const alcoholContentRules = [
+    optionalNumberInRange(0, 100, t("InventoryItemCreateForm.alcoholContentRange")),
+];
+const volumeRules = [noNegativeNumber(t("InventoryItemCreateForm.volumePositive"))];
+
+watch(
+    () => form.value.type,
+    function (newType) {
+        if (newType === InventoryItemType.DRINK) {
+            form.value.mainCategory = DrinkMainCategory.SPIRITS;
+        }
+        if (newType === InventoryItemType.RETAIL) {
+            form.value.mainCategory = RetailMainCategory.TOBACCO;
+        }
+
+        onMainCategoryChange();
+    },
+);
 
 function getInitialForm(): CreateInventoryItemPayload {
     if (props.itemToEdit) {
@@ -27,12 +108,18 @@ function getInitialForm(): CreateInventoryItemPayload {
     return {
         name: "",
         type: InventoryItemType.DRINK,
-        category: DrinkCategory.SPIRIT,
-        price: 0,
+        mainCategory: DrinkMainCategory.SPIRITS,
+        subCategory: SpiritSubCategory.VODKA,
         quantity: 0,
         supplier: "",
+        isActive: true,
         ...props.initialData,
     };
+}
+
+function onMainCategoryChange(): void {
+    // Reset subCategory when mainCategory changes
+    form.value.subCategory = subCategoryOptions.value[0];
 }
 
 async function onSubmit(): Promise<void> {
@@ -41,7 +128,6 @@ async function onSubmit(): Promise<void> {
     }
 
     emit("submit", form.value);
-
     onReset();
 }
 
@@ -60,52 +146,55 @@ watch(
 <template>
     <div class="InventoryItemCreateForm">
         <q-form greedy class="q-gutter-md q-pt-md q-pa-md" ref="formRef">
-            <!-- Name -->
             <q-input
                 v-model="form.name"
                 label="Name"
                 standout
                 rounded
                 required
-                :rules="[(val) => !!val || 'Name is required']"
-                aria-label="Name"
+                :rules="nameRules"
             />
 
-            <!-- Type -->
             <q-select
                 v-model="form.type"
                 :options="typeOptions"
-                emit-value
                 label="Type"
                 standout
                 rounded
                 required
-                :rules="[(val) => !!val || 'Type is required']"
-                aria-label="Type"
+                emit-value
+                :rules="typeRules"
             />
 
-            <!-- Category -->
-            <q-input
-                v-model="form.category"
-                label="Category"
-                standout
-                rounded
-                aria-label="Category"
-            />
-
-            <!-- Price -->
-            <q-input
-                v-model.number="form.price"
-                label="Price"
-                type="number"
+            <q-select
+                v-model="form.mainCategory"
+                :options="mainCategoryOptions"
+                label="Main Category"
                 standout
                 rounded
                 required
-                :rules="[(val) => val > 0 || 'Price must be positive']"
-                aria-label="Price"
+                emit-value
+                @update:model-value="onMainCategoryChange"
+                :rules="mainCategoryRules"
             />
 
-            <!-- Quantity -->
+            <q-select
+                v-model="form.subCategory"
+                :options="subCategoryOptions"
+                label="Sub Category"
+                standout
+                rounded
+                required
+                emit-value
+                :rules="subCategoryRules"
+            />
+
+            <q-input v-model="form.brand" label="Brand" standout rounded />
+
+            <q-input v-model="form.style" label="Style" standout rounded />
+
+            <q-input v-model="form.region" label="Region" standout rounded />
+
             <q-input
                 v-model.number="form.quantity"
                 label="Quantity"
@@ -113,48 +202,41 @@ watch(
                 standout
                 rounded
                 required
-                :rules="[(val) => val > 0 || 'Quantity must be positive']"
-                aria-label="Quantity"
+                :rules="quantityRules"
             />
 
-            <!-- Alcohol Content (only for drinks) -->
             <q-input
-                v-if="isDrinkType"
+                v-if="isDrinkItem(form)"
                 v-model.number="form.alcoholContent"
                 label="Alcohol Content (%)"
                 type="number"
                 standout
                 rounded
-                :rules="[
-                    (val) =>
-                        val === undefined ||
-                        (val >= 0 && val <= 100) ||
-                        'Must be between 0 and 100',
-                ]"
-                aria-label="Alcohol Content"
+                :rules="alcoholContentRules"
             />
 
-            <!-- Volume (only for drinks) -->
             <q-input
-                v-if="isDrinkType"
+                v-if="isDrinkItem(form)"
                 v-model.number="form.volume"
                 label="Volume (ml)"
                 type="number"
                 standout
                 rounded
-                :rules="[(val) => val === undefined || val >= 0 || 'Volume must be positive']"
-                aria-label="Volume"
+                :rules="volumeRules"
             />
+
+            <q-input v-model="form.supplier" label="Supplier" standout rounded />
+
+            <q-toggle v-model="form.isActive" label="Active" />
 
             <q-input
-                v-model="form.supplier"
-                label="Supplier"
+                v-model="form.description"
+                label="Description"
+                type="textarea"
                 standout
                 rounded
-                aria-label="Supplier"
             />
 
-            <!-- Buttons -->
             <div class="row q-gutter-md">
                 <q-btn
                     rounded

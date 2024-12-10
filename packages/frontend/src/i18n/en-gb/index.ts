@@ -77,6 +77,12 @@ export default {
     InventoryTable: {
         quantity: "Quantity",
         drink: "Drink",
+        mainCategory: "Main Category",
+        subCategory: "Sub Category",
+        supplier: "Supplier",
+        actions: "Actions",
+        volume: "Volume",
+        deleteSelected: "Delete Selected",
     },
     AppDrawer: {
         links: {
@@ -270,6 +276,26 @@ export default {
         noItemsMessage: "There are no items in the inventory.",
         editInventoryItemDialogTitle: "Editing inventory item: {name}",
         deleteItemConfirmMessage: "Delete inventory item: {name}?",
+        importMergeSuccess: "Items imported successfully. {count} items added, {updated} updated",
+        importError: "Error importing items. Please check the file format and try again.",
+        itemMainCategory: {
+            spirits: "Spirits",
+            wine: "Wine",
+            beer: "Beer",
+            "non-alcoholic": "Non-alcoholic",
+            "cocktail-components": "Cocktail Components",
+            tobacco: "Tobacco",
+        },
+        bulkDeleteSuccess: "Items deleted successfully",
+        bulkDeleteConfirmMessage: "Are you sure you want to delete {count} items?",
+    },
+    InventoryItemCreateForm: {
+        subCategoryRequired: "Sub category is required",
+        mainCategoryRequired: "Main category is required",
+        alcoholContentRange: "Alcohol content must be between 0 and 100",
+        volumePositive: "Volume must be positive",
+        minimumStockNonNegative: "Minimum stock must be non-negative",
+        quantityNonNegative: "Quantity must be non-negative",
     },
     GuestSummaryChips: {
         reservations: "Reservations",

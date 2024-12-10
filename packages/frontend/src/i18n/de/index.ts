@@ -272,10 +272,24 @@ export default {
     },
     PageAdminInventory: {
         title: "Inventar",
-        createNewInventoryItemDialogTitle: "Neues Inventar hinzufügen",
-        noItemsMessage: "Es gibt keine Artikel im Inventar.",
-        editInventoryItemDialogTitle: "Inventar bearbeiten: {name}",
+        createNewInventoryItemDialogTitle: "Neuen Inventarartikel erstellen",
+        noItemsMessage: "Es sind keine Artikel im Inventar vorhanden.",
+        editInventoryItemDialogTitle: "Inventarartikel bearbeiten: {name}",
         deleteItemConfirmMessage: "Inventarartikel löschen: {name}?",
+        importMergeSuccess:
+            "Artikel erfolgreich importiert. {count} Artikel hinzugefügt, {updated} aktualisiert",
+        importError:
+            "Fehler beim Importieren der Artikel. Bitte überprüfen Sie das Dateiformat und versuchen Sie es erneut.",
+        itemMainCategory: {
+            spirits: "Spirituosen",
+            wine: "Wein",
+            beer: "Bier",
+            "non-alcoholic": "Alkoholfrei",
+            "cocktail-components": "Cocktail-Zutaten",
+            tobacco: "Tabak",
+        },
+        bulkDeleteSuccess: "Artikel erfolgreich gelöscht",
+        bulkDeleteConfirmMessage: "Sind Sie sicher, dass Sie {count} Artikel löschen möchten?",
     },
     GuestSummaryChips: {
         reservations: "Reservierungen",

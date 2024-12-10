@@ -6,6 +6,7 @@ import {
     noEmptyString,
     noNegativeNumber,
     noWhiteSpaces,
+    optionalNumberInRange,
 } from "./form-rules";
 import { describe, it, expect } from "vitest";
 
@@ -138,6 +139,52 @@ describe("form-rules.ts", () => {
             expect(validator([])).toBe(customMessage);
             expect(validator(null)).toBe(customMessage);
             expect(validator("   ")).toBe(customMessage);
+        });
+    });
+
+    describe("optionalNumberInRange", () => {
+        const errorMessage = "If provided, number must be between 1 and 10";
+        const validator = optionalNumberInRange(1, 10, errorMessage);
+
+        describe("valid inputs", () => {
+            it("returns true for numbers within range", () => {
+                expect(validator(5)).toBe(true);
+                expect(validator(1)).toBe(true);
+                expect(validator(10)).toBe(true);
+            });
+
+            it("returns true for string numbers within range", () => {
+                expect(validator("3")).toBe(true);
+                expect(validator("7")).toBe(true);
+            });
+
+            it("returns true for optional empty values", () => {
+                expect(validator(undefined)).toBe(true);
+                expect(validator(null)).toBe(true);
+                expect(validator("")).toBe(true);
+            });
+        });
+
+        describe("invalid inputs", () => {
+            it("returns error message for numbers below range", () => {
+                expect(validator(0)).toBe(errorMessage);
+                expect(validator(-1)).toBe(errorMessage);
+            });
+
+            it("returns error message for numbers above range", () => {
+                expect(validator(11)).toBe(errorMessage);
+                expect(validator(100)).toBe(errorMessage);
+            });
+
+            it("returns error message for non-numeric strings", () => {
+                expect(validator("abc")).toBe(errorMessage);
+                expect(validator("   ")).toBe(errorMessage);
+            });
+
+            it("returns error message for invalid types", () => {
+                expect(validator({})).toBe(errorMessage);
+                expect(validator([])).toBe(errorMessage);
+            });
         });
     });
 });

@@ -94,8 +94,24 @@ export function validOptionalURL(msg = "Not a valid url"): (val: string) => bool
     };
 }
 
-export function validEmail(msg = "Invalid email format"): (val: string) => boolean | string {
-    return function (val: string): boolean | string {
-        return /.+@.+\..+/.test(val) || msg;
+function numberInRange(min: number, max: number, msg: string): (val: unknown) => boolean | string {
+    return function (val: unknown): boolean | string {
+        if (typeof val !== "number" && typeof val !== "string") return msg;
+        const num = Number(val);
+        if (Number.isNaN(num)) return msg;
+        return (num >= min && num <= max) || msg;
+    };
+}
+
+export function optionalNumberInRange(
+    min: number,
+    max: number,
+    msg: string,
+): (val: unknown) => boolean | string {
+    return function (val: unknown): boolean | string {
+        if (val === undefined || val === null || val === "") {
+            return true;
+        }
+        return numberInRange(min, max, msg)(val);
     };
 }
