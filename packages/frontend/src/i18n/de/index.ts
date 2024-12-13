@@ -19,6 +19,9 @@ export default {
         reactivate: "Wiederherstellen",
         arrived: "Eingetroffen",
         cancelled: "Storniert",
+        active: "Aktiv",
+        inactive: "Inaktiv",
+        noDescription: "Keine Beschreibung",
     },
     useReservations: {
         cancelTableOperationTitle: "Vorgang abbrechen",
@@ -66,6 +69,8 @@ export default {
         nameMustBeLongerErrorMsg: "Der Name muss mindestens 2 Zeichen lang sein!",
         negativeReservationConsumptionErrorMsg: "Der Mindestverzehr darf nicht negativ sein",
         greaterThanZeroErrorMsg: "Der Wert muss größer als 0 sein",
+        nameRequired: "Name ist erforderlich",
+        typeRequired: "Typ ist erforderlich",
     },
     TelNumberInput: {
         countryCodeLabel: "Ländervorwahl",
@@ -94,6 +99,7 @@ export default {
             settings: "Einstellungen",
             issueReportsOverview: "Fehlerberichte",
             reportIssue: "Fehler melden",
+            manageDrinkCards: "Digitale Getränkekarten",
         },
         toggles: {
             darkMode: "Dunkelmodus umschalten",
@@ -329,5 +335,21 @@ export default {
         issueMarkedAsResolved: "Fehler als gelöst markiert",
         issueMarkedAsUnresolved: "Fehler als nicht gelöst markiert",
         deleteConfirmation: "Fehlerbericht löschen?",
+    },
+    PageAdminPropertyDrinkCards: {
+        title: "Digitale Getränkekarten",
+        noCardsMessage:
+            "Noch keine Getränkekarten erstellt. Klicken Sie auf +, um Ihre erste Getränkekarte zu erstellen.",
+        createCardDialogTitle: "Neue Getränkekarte erstellen",
+        editCardDialogTitle: "Getränkekarte bearbeiten",
+        cardCreatedMessage: "Getränkekarte erfolgreich erstellt",
+        cardUpdatedMessage: "Getränkekarte erfolgreich aktualisiert",
+        cardDeletedMessage: "Getränkekarte erfolgreich gelöscht",
+        deleteCardConfirmation: "Möchten Sie diese Getränkekarte wirklich löschen?",
+        cardNameLabel: "Kartenname",
+        isActiveLabel: "Aktiv",
+        qrCodeTitle: "QR Code",
+        qrCodeAlt: "Digitale Getränkekarte QR Code",
+        downloadQRCode: "QR Code herunterladen",
     },
 };

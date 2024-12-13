@@ -19,6 +19,9 @@ export default {
         reactivate: "Reactivate",
         arrived: "Arrived",
         cancelled: "Cancelled",
+        active: "Active",
+        inactive: "Inactive",
+        noDescription: "No description",
     },
     useReservations: {
         cancelTableOperationTitle: "Cancel Operation",
@@ -63,6 +66,8 @@ export default {
         nameMustBeLongerErrorMsg: "Name must be at least 2 characters long!",
         negativeReservationConsumptionErrorMsg: "Consumption cannot be negative",
         greaterThanZeroErrorMsg: "Value must be greater than 0",
+        nameRequired: "Name is required",
+        typeRequired: "Type is required",
     },
     TelNumberInput: {
         countryCodeLabel: "Country Code",
@@ -97,6 +102,7 @@ export default {
             settings: "Settings",
             issueReportsOverview: "Issue Reports Overview",
             reportIssue: "Report an Issue",
+            manageDrinkCards: "Manage Drink Cards",
         },
         toggles: {
             darkMode: "Toggle dark mode",
@@ -335,5 +341,21 @@ export default {
         issueMarkedAsResolved: "Issue marked as resolved",
         issueMarkedAsUnresolved: "Issue marked as unresolved",
         deleteConfirmation: "Delete Issue",
+    },
+    PageAdminPropertyDrinkCards: {
+        title: "Digital Drink Cards",
+        noCardsMessage:
+            "No drink cards created yet. Click the + button to create your first drink card.",
+        createCardDialogTitle: "Create New Drink Card",
+        editCardDialogTitle: "Edit Drink Card",
+        cardCreatedMessage: "Drink card created successfully",
+        cardUpdatedMessage: "Drink card updated successfully",
+        cardDeletedMessage: "Drink card deleted successfully",
+        deleteCardConfirmation: "Are you sure you want to delete this drink card?",
+        cardNameLabel: "Card Name",
+        isActiveLabel: "Active",
+        qrCodeTitle: "QR Code",
+        qrCodeAlt: "Drink Card QR Code",
+        downloadQRCode: "Download QR Code",
     },
 };

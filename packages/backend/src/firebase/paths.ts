@@ -69,3 +69,16 @@ export function getFloorPath(organisationId: string, propertyId: string, floorId
 export function getIssueReportsPath(): string {
     return Collection.ISSUE_REPORTS;
 }
+
+// DRINK CARDS
+export function getDrinkCardsPath(organisationId: string, propertyId: string): string {
+    return [getPropertyPath(organisationId, propertyId), Collection.DRINK_CARDS].join("/");
+}
+
+export function getDrinkCardPath(
+    organisationId: string,
+    propertyId: string,
+    drinkCardId: string,
+): string {
+    return [getDrinkCardsPath(organisationId, propertyId), drinkCardId].join("/");
+}
