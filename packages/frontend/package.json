@@ -38,7 +38,7 @@
         "@firetable/types": "workspace:*",
         "@posva/event-emitter": "catalog:",
         "@quasar/extras": "1.16.15",
-        "@sentry/vue": "8.43.0",
+        "@sentry/vue": "8.45.0",
         "@types/pako": "2.0.3",
         "@vueuse/core": "12.0.0",
         "date-fns": "4.1.0",
