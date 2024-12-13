@@ -48,31 +48,25 @@ const subCategoryOptions = computed(() => {
     if (form.value.type === InventoryItemType.DRINK) {
         switch (form.value.mainCategory) {
             case DrinkMainCategory.SPIRITS:
-                // @ts-expect-error -- works fine
-                return Object.values(SpiritSubCategory);
+                return getEnumValues(SpiritSubCategory);
             case DrinkMainCategory.WINE:
-                // @ts-expect-error -- works fine
-                return Object.values(WineSubCategory);
+                return getEnumValues(WineSubCategory);
             case DrinkMainCategory.BEER:
-                // @ts-expect-error -- works fine
-                return Object.values(BeerSubCategory);
+                return getEnumValues(BeerSubCategory);
             case DrinkMainCategory.NON_ALCOHOLIC:
-                // @ts-expect-error -- works fine
-                return Object.values(NonAlcoholicCategory);
+                return getEnumValues(NonAlcoholicCategory);
             case DrinkMainCategory.COCKTAIL_COMPONENTS:
-                // @ts-expect-error -- works fine
-                return Object.values(CocktailComponentCategory);
+                return getEnumValues(CocktailComponentCategory);
             default:
                 return [];
         }
-    } else if (form.value.type === InventoryItemType.RETAIL) {
-        switch (form.value.mainCategory) {
-            case RetailMainCategory.TOBACCO:
-                // @ts-expect-error -- works fine
-                return Object.values(TobaccoSubCategory);
-            default:
-                return [];
+    }
+
+    if (form.value.type === InventoryItemType.RETAIL) {
+        if (form.value.mainCategory === RetailMainCategory.TOBACCO) {
+            return getEnumValues(TobaccoSubCategory);
         }
+        return [];
     }
     return [];
 });

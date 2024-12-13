@@ -7,7 +7,7 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <section class="row" role="region" :aria-label="props.title">
+    <section class="row" :aria-label="props.title">
         <div class="col-6 column justify-center">
             {{ props.title }}
         </div>

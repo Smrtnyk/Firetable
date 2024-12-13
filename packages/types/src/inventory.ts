@@ -119,7 +119,7 @@ export enum RetailMainCategory {
     TOBACCO = "tobacco",
 }
 
-export const enum TobaccoSubCategory {
+export enum TobaccoSubCategory {
     CIGARETTES = "cigarettes",
 }
 
@@ -131,7 +131,7 @@ export enum DrinkMainCategory {
     COCKTAIL_COMPONENTS = "cocktail-components",
 }
 
-export const enum SpiritSubCategory {
+export enum SpiritSubCategory {
     VODKA = "vodka",
     WHISKEY = "whiskey",
     GIN = "gin",
@@ -142,7 +142,7 @@ export const enum SpiritSubCategory {
     LIQUEUR = "liqueur",
 }
 
-export const enum WineSubCategory {
+export enum WineSubCategory {
     RED = "red",
     WHITE = "white",
     ROSE = "rose",
@@ -150,7 +150,7 @@ export const enum WineSubCategory {
     FORTIFIED = "fortified",
 }
 
-export const enum BeerSubCategory {
+export enum BeerSubCategory {
     LAGER = "lager",
     ALE = "ale",
     STOUT = "stout",
@@ -160,7 +160,7 @@ export const enum BeerSubCategory {
     IMPORTED = "imported",
 }
 
-export const enum NonAlcoholicCategory {
+export enum NonAlcoholicCategory {
     SOFT_DRINK = "soft-drink",
     ENERGY_DRINK = "energy-drink",
     WATER = "water",
@@ -170,7 +170,7 @@ export const enum NonAlcoholicCategory {
     MOCKTAIL = "mocktail",
 }
 
-export const enum CocktailComponentCategory {
+export enum CocktailComponentCategory {
     MIXER = "mixer",
     SYRUP = "syrup",
     BITTER = "bitter",

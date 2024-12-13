@@ -149,14 +149,12 @@ export function createAuthGuard(
             const navigationError = createNavigationError(error);
             AppLogger.error("[Auth Guard] Error:", navigationError);
 
-            switch (navigationError.type) {
-                case "TIMEOUT":
-                    showErrorMessage("Navigation timeout. Please try again.", refreshApp);
-                    break;
-                default:
-                    showErrorMessage(navigationError.message, refreshApp);
-                    break;
+            if (navigationError.type === "TIMEOUT") {
+                showErrorMessage("Navigation timeout. Please try again.", refreshApp);
+            } else {
+                showErrorMessage(navigationError.message, refreshApp);
             }
+
             return false;
         } finally {
             Loading.hide();

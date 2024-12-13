@@ -1,6 +1,7 @@
 import type { Ref } from "vue";
 import { ref, onMounted } from "vue";
 import { useEventListener } from "@vueuse/core";
+import { AppLogger } from "src/logger/FTLogger";
 
 const onlineCheckUrl = "https://www.google.com/favicon.ico";
 
@@ -26,7 +27,7 @@ export function useNetworkStatus(): {
         isOnline.value = navigator.onLine;
         if (navigator.onLine) {
             // Perform an additional check to verify true connectivity
-            void verifyConnectivity();
+            verifyConnectivity().catch(AppLogger.error.bind(AppLogger));
         }
     }
 
@@ -34,7 +35,7 @@ export function useNetworkStatus(): {
         useEventListener("online", updateOnlineStatus);
         useEventListener("offline", updateOnlineStatus);
         // Perform an initial connectivity check when the component is mounted
-        void verifyConnectivity();
+        verifyConnectivity().catch(AppLogger.error.bind(AppLogger));
     });
 
     return { isOnline };

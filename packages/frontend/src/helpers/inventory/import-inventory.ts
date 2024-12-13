@@ -37,11 +37,13 @@ function isValidItem(item: CreateInventoryItemPayload): boolean {
         return false;
     }
 
-    return isDrinkItem(item)
-        ? drinkMainCategoryEnumValues.includes(item.mainCategory)
-        : isRetailItem(item)
-          ? retailMainCategoryEnumValues.includes(item.mainCategory)
-          : false;
+    if (isDrinkItem(item)) {
+        return drinkMainCategoryEnumValues.includes(item.mainCategory);
+    }
+    if (isRetailItem(item)) {
+        return retailMainCategoryEnumValues.includes(item.mainCategory);
+    }
+    return false;
 }
 
 export async function importInventory({
@@ -120,11 +122,14 @@ export async function importInventory({
                     style: newItem.style ?? existingItem.style,
                 };
 
-                const alcoholContent = isDrinkItem(newItem)
-                    ? newItem.alcoholContent
-                    : isDrinkItem(existingItem)
-                      ? existingItem.alcoholContent
-                      : undefined;
+                let alcoholContent: number | undefined;
+
+                if (isDrinkItem(newItem)) {
+                    alcoholContent = newItem.alcoholContent;
+                } else if (isDrinkItem(existingItem)) {
+                    alcoholContent = existingItem.alcoholContent;
+                }
+
                 if (alcoholContent) {
                     Object.assign(mergedItem, { alcoholContent });
                 }

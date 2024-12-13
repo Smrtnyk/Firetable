@@ -124,20 +124,24 @@ export function useReservations(
         checkIfReservedTableAndCloseCreateReservationDialog();
         registerTableClickHandlers(newFloorInstances);
         for (const floor of newFloorInstances) {
-            floor.clearAllReservations();
-            for (const reservation of newReservations) {
-                if (reservation.floorId !== floor.id) {
-                    continue;
-                }
-                const tableLabels = Array.isArray(reservation.tableLabel)
-                    ? reservation.tableLabel
-                    : [reservation.tableLabel];
+            updateFloorReservations(floor, newReservations);
+        }
+    }
 
-                for (const label of tableLabels) {
-                    const table = floor.getTableByLabel(label);
-                    if (table) {
-                        setReservation(table, reservation);
-                    }
+    function updateFloorReservations(floor: FloorViewer, newReservations: ReservationDoc[]): void {
+        floor.clearAllReservations();
+        for (const reservation of newReservations) {
+            if (reservation.floorId !== floor.id) {
+                continue;
+            }
+            const tableLabels = Array.isArray(reservation.tableLabel)
+                ? reservation.tableLabel
+                : [reservation.tableLabel];
+
+            for (const label of tableLabels) {
+                const table = floor.getTableByLabel(label);
+                if (table) {
+                    setReservation(table, reservation);
                 }
             }
         }
@@ -217,8 +221,8 @@ export function useReservations(
         });
     }
 
-    function handleReservationCreation(reservationData: Reservation): void {
-        void tryCatchLoadingWrapper({
+    async function handleReservationCreation(reservationData: Reservation): Promise<void> {
+        await tryCatchLoadingWrapper({
             async hook() {
                 await addReservation(eventOwner, reservationData);
                 notifyPositive("Reservation created");
@@ -233,11 +237,11 @@ export function useReservations(
         });
     }
 
-    function handleReservationUpdate(
+    async function handleReservationUpdate(
         reservationData: ReservationDoc,
         oldReservation: ReservationDoc,
-    ): void {
-        void tryCatchLoadingWrapper({
+    ): Promise<void> {
+        await tryCatchLoadingWrapper({
             async hook() {
                 await updateReservationDoc(eventOwner, reservationData);
                 notifyPositive(t("useReservations.reservationUpdatedMsg"));
@@ -389,18 +393,18 @@ export function useReservations(
                     eventDurationInHours: settings.value.event.eventDurationInHours,
                 },
                 listeners: {
-                    create(reservationData: Omit<Reservation, "floorId" | "tableLabel">) {
+                    async create(reservationData: Omit<Reservation, "floorId" | "tableLabel">) {
                         resetCurrentOpenCreateReservationDialog();
-                        handleReservationCreation({
+                        await handleReservationCreation({
                             ...reservationData,
                             floorId: floor.id,
                             tableLabel: label,
                         } as Reservation);
                         dialog.hide();
                     },
-                    update(reservationData: ReservationDoc) {
+                    async update(reservationData: ReservationDoc) {
                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if reservation was undefined
-                        handleReservationUpdate(reservationData, reservation!);
+                        await handleReservationUpdate(reservationData, reservation!);
                         dialog.hide();
                     },
                 },

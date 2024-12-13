@@ -47,10 +47,10 @@ onMounted(init);
         <template v-if="!isLoadingDrinkCards && activeCard">
             <template v-if="isPDFDrinkCard(activeCard) && activeCard.pdfUrl">
                 <iframe
+                    title="Drink Card"
                     :src="activeCard.pdfUrl"
                     :style="{ height: `${pdfHeight}px` }"
                     class="pdf-viewer"
-                    frameborder="0"
                     allowfullscreen
                     loading="lazy"
                     referrerpolicy="no-referrer"
@@ -65,5 +65,6 @@ onMounted(init);
 .pdf-viewer {
     width: 100%;
     border: none;
+    border: 0;
 }
 </style>

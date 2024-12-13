@@ -13,7 +13,7 @@ export async function uploadPropertyImage(
         const extension = img.type === "image/svg+xml" ? "svg" : "png";
         const filePath = `organisations/${organisationId}/properties/${propertyId}/logo.${extension}`;
 
-        const matches = img.dataUrl.match(/^data:image\/(png|svg\+xml);base64,(.+)$/);
+        const matches = /^data:image\/(png|svg\+xml);base64,(.+)$/.exec(img.dataUrl);
 
         if (!matches?.[2]) {
             logger.error("Invalid image data format");
