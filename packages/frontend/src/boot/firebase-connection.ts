@@ -60,9 +60,15 @@ function handleOnAuthStateChanged(
                 authStore.cleanup();
                 guestsStore.cleanup();
                 propertiesStore.cleanup();
-                // If the user loses authentication route
-                // redirect them to the login page
-                router.replace({ path: "/auth" }).catch(showErrorMessage);
+
+                // Check if the current route requires authentication
+                const currentRoute = router.currentRoute.value;
+                const requiresAuth = currentRoute.meta.requiresAuth;
+
+                if (requiresAuth) {
+                    // Redirect to the auth page only if the route requires authentication
+                    router.replace({ path: "/auth" }).catch(showErrorMessage);
+                }
             }
         },
     );

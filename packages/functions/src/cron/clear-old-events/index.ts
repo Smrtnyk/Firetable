@@ -13,7 +13,7 @@ const DELETION_AGE_YEARS = 1;
  */
 export async function clearOldEvents(): Promise<void> {
     try {
-        // Step 1: Retrieve all organizations
+        // Step 1: Retrieve all organisations
         const orgsSnapshot = await db.collection(Collection.ORGANISATIONS).get();
 
         const allDeletePromises = [];
@@ -21,7 +21,7 @@ export async function clearOldEvents(): Promise<void> {
         for (const orgDoc of orgsSnapshot.docs) {
             const orgId = orgDoc.id;
 
-            // Step 2: For each organization, retrieve all properties.
+            // Step 2: For each organisation, retrieve all properties.
             const propertiesSnapshot = await db
                 .collection(`${Collection.ORGANISATIONS}/${orgId}/${Collection.PROPERTIES}`)
                 .get();
@@ -29,7 +29,7 @@ export async function clearOldEvents(): Promise<void> {
             for (const propertyDoc of propertiesSnapshot.docs) {
                 const propertyId = propertyDoc.id;
 
-                // Step 3: For each property under an organization, retrieve and delete the old events.
+                // Step 3: For each property under an organisation, retrieve and delete the old events.
                 const oldEvents = await getOldEvents(orgId, propertyId);
 
                 if (oldEvents && !oldEvents.empty) {

@@ -7,14 +7,19 @@ service cloud.firestore {
             allow read, write: if request.auth != null;
         }
 
-        // Specific rules for the organizations collection
-        match /organizations/{organisationId} {
-            // Only Administrator can create or modify organizations
+        // Specific rules for the organisations collection
+        match /organisations/{organisationId} {
+            // Only Administrator can create or modify organisations
             allow write: if request.auth.token.role == 'Administrator';
 
-            // Allow read if the user is an administrator or belongs to the organization
+            // Allow read if the user is an administrator or belongs to the organisation
             allow read: if request.auth.token.role == 'Administrator'
-                || request.auth.token.organizationId == organisationId;
+                || request.auth.token.organisationId == organisationId;
+
+            // Public drink cards: Allow read access to active drink cards without authentication
+            match /properties/{propertyId}/drinkCards/{drinkCardId} {
+                allow read: if true;
+            }
         }
     }
 }

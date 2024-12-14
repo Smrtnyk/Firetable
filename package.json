@@ -15,6 +15,7 @@
     "scripts": {
         "deploy:hosting": "firebase deploy --only hosting",
         "deploy:functions": "firebase deploy --only functions",
+        "deploy:firestore-rules": "firebase deploy --only firestore:rules",
         "deploy": "firebase deploy",
         "start:emulators": "firebase emulators:start --import=./local-db --export-on-exit=./local-db",
         "dev:frontend": "pnpm --filter frontend dev:pwa",

@@ -20,8 +20,8 @@ Demo credentials:
 
 ## Core Features
 
-- Organization & Property Management
-  - Create and manage multiple organizations and their properties
+- Organisation & Property Management
+  - Create and manage multiple organisations and their properties
   - Role-based access control for users
 
 - Event Planning

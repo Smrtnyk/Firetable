@@ -24,7 +24,7 @@ export async function addInventoryItem(
 
 /**
  * Deletes an inventory item from the Firestore database.
- * @param organisationId - The ID of the organization.
+ * @param organisationId - The ID of the organisation.
  * @param propertyId - The ID of the property.
  * @param itemId - The ID of the inventory item to delete.
  * @throws Will throw an error if the operation fails.
@@ -43,7 +43,7 @@ export async function deleteInventoryItem(
 
 /**
  * Updates an existing inventory item in the Firestore database.
- * @param organisationId - The ID of the organization.
+ * @param organisationId - The ID of the organisation.
  * @param propertyId - The ID of the property.
  * @param itemId - The ID of the inventory item to update.
  * @param itemPayload - The inventory item data to update.

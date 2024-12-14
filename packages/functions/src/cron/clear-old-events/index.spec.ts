@@ -9,12 +9,12 @@ describe("clearOldEvents Function", () => {
     beforeEach(async () => {
         vi.restoreAllMocks();
 
-        // Create Mock Organizations
+        // Create Mock Organisations
         const orgsRef = db.collection(Collection.ORGANISATIONS);
         const org1Ref = orgsRef.doc("org1");
-        await org1Ref.set({ name: "Organization 1" });
+        await org1Ref.set({ name: "Organisation 1" });
 
-        // Create Mock Properties for Organization
+        // Create Mock Properties for Organisation
         const propertiesCollectionRef = org1Ref.collection(Collection.PROPERTIES);
         const property1Ref = propertiesCollectionRef.doc("property1");
         await property1Ref.set({ name: "Property 1" });
