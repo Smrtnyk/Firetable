@@ -14,7 +14,7 @@ import { describe, expect, it, beforeEach } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 import { addHours, format } from "date-fns";
 
-const eventStartTimestamp = Date.now() + ONE_HOUR;
+const eventStartTimestamp = Date.now();
 
 describe("EventCreateReservation", () => {
     let props: EventCreateReservationProps;
@@ -269,7 +269,7 @@ describe("EventCreateReservation", () => {
             const clockIcon = document.querySelector(".q-icon");
             await userEvent.click(clockIcon!);
 
-            const newTime = addHours(eventStartTimestamp, 1);
+            const newTime = addHours(eventStartTimestamp, 2);
 
             let formattedNewTime = format(newTime, "H");
             // Quasar shows 00 and then goes 1, 2, 3, ..., 9, 10, 11, 12
