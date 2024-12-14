@@ -50,6 +50,7 @@ export interface UserCapabilities {
     [UserCapability.CAN_EDIT_FLOOR_PLANS]?: boolean;
     [UserCapability.CAN_CREATE_EVENTS]?: boolean;
     [UserCapability.CAN_SEE_GUESTBOOK]?: boolean;
+    [UserCapability.CAN_SEE_DIGITAL_DRINK_CARDS]?: boolean;
 }
 
 export const enum UserCapability {
@@ -66,6 +67,7 @@ export const enum UserCapability {
     CAN_EDIT_FLOOR_PLANS = "Can edit floor plans",
     CAN_CREATE_EVENTS = "Can create events",
     CAN_SEE_GUESTBOOK = "Can see guestbook",
+    CAN_SEE_DIGITAL_DRINK_CARDS = "Can see digital drink cards",
 }
 
 export const DEFAULT_CAPABILITIES_BY_ROLE: Record<AdminRole.ADMIN | Role, UserCapabilities> = {
@@ -83,6 +85,7 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<AdminRole.ADMIN | Role, UserCa
         [UserCapability.CAN_EDIT_FLOOR_PLANS]: true,
         [UserCapability.CAN_CREATE_EVENTS]: true,
         [UserCapability.CAN_SEE_GUESTBOOK]: true,
+        [UserCapability.CAN_SEE_DIGITAL_DRINK_CARDS]: true,
     },
     [Role.PROPERTY_OWNER]: {
         [UserCapability.CAN_RESERVE]: true,
@@ -98,6 +101,7 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<AdminRole.ADMIN | Role, UserCa
         [UserCapability.CAN_EDIT_FLOOR_PLANS]: true,
         [UserCapability.CAN_CREATE_EVENTS]: true,
         [UserCapability.CAN_SEE_GUESTBOOK]: true,
+        [UserCapability.CAN_SEE_DIGITAL_DRINK_CARDS]: true,
     },
     [Role.MANAGER]: {
         [UserCapability.CAN_RESERVE]: true,
@@ -113,6 +117,7 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<AdminRole.ADMIN | Role, UserCa
         [UserCapability.CAN_EDIT_FLOOR_PLANS]: true,
         [UserCapability.CAN_CREATE_EVENTS]: true,
         [UserCapability.CAN_SEE_GUESTBOOK]: true,
+        [UserCapability.CAN_SEE_DIGITAL_DRINK_CARDS]: true,
     },
     [Role.HOSTESS]: {
         [UserCapability.CAN_RESERVE]: true,
@@ -128,6 +133,7 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<AdminRole.ADMIN | Role, UserCa
         [UserCapability.CAN_EDIT_FLOOR_PLANS]: false,
         [UserCapability.CAN_CREATE_EVENTS]: false,
         [UserCapability.CAN_SEE_GUESTBOOK]: true,
+        [UserCapability.CAN_SEE_DIGITAL_DRINK_CARDS]: false,
     },
     [Role.STAFF]: {
         [UserCapability.CAN_RESERVE]: false,
@@ -143,5 +149,6 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<AdminRole.ADMIN | Role, UserCa
         [UserCapability.CAN_EDIT_FLOOR_PLANS]: false,
         [UserCapability.CAN_CREATE_EVENTS]: false,
         [UserCapability.CAN_SEE_GUESTBOOK]: false,
+        [UserCapability.CAN_SEE_DIGITAL_DRINK_CARDS]: false,
     },
 };

@@ -77,6 +77,10 @@ export const usePermissionsStore = defineStore("permissions", function () {
         return canReserve.value && canSeeGuestContact.value;
     });
 
+    const canSeeDigitalDrinkCards = computed(function () {
+        return Boolean(capabilities.value[UserCapability.CAN_SEE_DIGITAL_DRINK_CARDS]);
+    });
+
     return {
         capabilities,
         canEditOwnReservation,
@@ -94,5 +98,6 @@ export const usePermissionsStore = defineStore("permissions", function () {
         canSeeGuestbook,
         canSeeAnalytics,
         canExportReservations,
+        canSeeDigitalDrinkCards,
     };
 });

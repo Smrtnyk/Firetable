@@ -18,8 +18,14 @@ export interface AppDrawerProps {
     modelValue: boolean;
 }
 const { nonNullableUser, isAdmin } = storeToRefs(useAuthStore());
-const { canSeeInventory, canEditFloorPlans, canCreateEvents, canSeeGuestbook, canSeeAnalytics } =
-    storeToRefs(usePermissionsStore());
+const {
+    canSeeInventory,
+    canEditFloorPlans,
+    canCreateEvents,
+    canSeeGuestbook,
+    canSeeAnalytics,
+    canSeeDigitalDrinkCards,
+} = storeToRefs(usePermissionsStore());
 const propertiesStore = usePropertiesStore();
 const props = defineProps<AppDrawerProps>();
 const emit = defineEmits<(e: "update:modelValue", value: boolean) => void>();
@@ -86,6 +92,20 @@ const manageEventsLink = computed(function () {
     });
 });
 
+const digitalDrinkCardsLink = computed(function () {
+    if (isAdmin.value || !canSeeDigitalDrinkCards.value) {
+        return;
+    }
+
+    return buildExpandableLink({
+        label: t("AppDrawer.links.manageDrinkCards"),
+        icon: "drink",
+        routeName: "adminPropertyDrinkCards",
+        isVisible: true,
+        childIcon: "home",
+    });
+});
+
 const links = computed<(GuardedLink | LinkWithChildren)[]>(function () {
     const role = nonNullableUser.value.role;
     const organisationId = nonNullableUser.value.organisationId;
@@ -105,6 +125,7 @@ const links = computed<(GuardedLink | LinkWithChildren)[]>(function () {
         },
         manageEventsLink.value,
         manageFloorsLink.value,
+        digitalDrinkCardsLink.value,
         inventoryLink.value,
         manageAnalyticsLink.value,
         {

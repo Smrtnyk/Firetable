@@ -1,11 +1,11 @@
 import type { RenderResult } from "vitest-browser-vue";
-import type { AppUser } from "@firetable/types";
+import type { AppUser, PropertyDoc } from "@firetable/types";
 import type { AppDrawerProps } from "./AppDrawer.vue";
 
 import AppDrawer from "./AppDrawer.vue";
 
 import { getLocaleForTest, renderComponent } from "../../test-helpers/render-component";
-import { UserCapability, Role, AdminRole } from "@firetable/types";
+import { DEFAULT_CAPABILITIES_BY_ROLE, UserCapability, Role, AdminRole } from "@firetable/types";
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 import { Dark } from "quasar";
@@ -26,7 +26,6 @@ describe("AppDrawer", () => {
             organisationId: "org1",
             capabilities: undefined,
         };
-        // Drawer is visible
         modelValue = true;
     });
 
@@ -35,295 +34,267 @@ describe("AppDrawer", () => {
         localStorage.clear();
     });
 
-    it("displays user avatar, name, and email", async () => {
-        screen = renderComponent(
-            AppDrawer,
-            {
-                modelValue,
+    function renderAppDrawer(
+        userOverrides = {},
+        capabilities = {},
+        properties: PropertyDoc[] = [],
+    ): void {
+        const mergedUser = { ...user, ...userOverrides, capabilities };
+        const piniaStoreOptions = {
+            initialState: {
+                auth: { user: mergedUser },
+                properties: { properties },
             },
-            {
-                wrapInLayout: true,
-                piniaStoreOptions: {
-                    initialState: {
-                        auth: { user },
-                    },
-                },
-            },
-        );
-
-        await expect.element(screen.getByText(user.name)).toBeVisible();
-        await expect.element(screen.getByText(user.email)).toBeVisible();
-
-        const avatarText = user.name
-            .split(" ")
-            .map((n) => n[0])
-            .join("");
-        await expect.element(screen.getByText(avatarText)).toBeVisible();
-    });
-
-    it("displays correct links for MANAGER role with no properties assigned", () => {
-        user.role = Role.MANAGER;
-
-        screen = renderComponent(
-            AppDrawer,
-            {
-                modelValue,
-            },
-            {
-                wrapInLayout: true,
-                piniaStoreOptions: {
-                    initialState: {
-                        auth: { user },
-                    },
-                },
-            },
-        );
-
-        const expectedLinks = ["Manage Users", "Guestbook", "Settings", "Logout"];
-
-        const allLinks = document.querySelectorAll(".q-item__section--main");
-        const visibleLinks = Array.from(allLinks).map((link) => link.textContent);
-
-        expect(visibleLinks).toEqual(expect.arrayContaining(expectedLinks));
-    });
-
-    it("renders logout button", async () => {
-        screen = renderComponent(
-            AppDrawer,
-            {
-                modelValue,
-            },
-            {
-                wrapInLayout: true,
-                piniaStoreOptions: {
-                    initialState: {
-                        auth: { user },
-                    },
-                },
-            },
-        );
-
-        await expect.element(screen.getByText("Logout")).toBeVisible();
-    });
-
-    it("toggles dark mode when the toggle is clicked", async () => {
-        screen = renderComponent(
-            AppDrawer,
-            {
-                modelValue,
-            },
-            {
-                wrapInLayout: true,
-                piniaStoreOptions: {
-                    initialState: {
-                        auth: { user },
-                    },
-                },
-            },
-        );
-
-        expect(Dark.isActive).toBe(false);
-
-        const initialDarkModeInStorage = localStorage.getItem("FTDarkMode");
-        await userEvent.click(screen.getByText("Toggle dark mode"));
-
-        expect(Dark.isActive).toBe(true);
-        expect(localStorage.getItem("FTDarkMode")).not.toBe(initialDarkModeInStorage);
-    });
-
-    it("does not display inventory links when user lacks CAN_SEE_INVENTORY capability", async () => {
-        user.capabilities = {
-            [UserCapability.CAN_SEE_INVENTORY]: false,
         };
-
         screen = renderComponent(
             AppDrawer,
             { modelValue },
-            {
-                wrapInLayout: true,
-                piniaStoreOptions: {
-                    initialState: {
-                        auth: { user },
-                    },
-                },
-            },
+            { wrapInLayout: true, piniaStoreOptions },
         );
+    }
 
-        await expect.element(screen.getByText("Manage Inventory")).not.toBeInTheDocument();
-    });
+    function getVisibleLinks(): string[] {
+        const allLinks = screen.container.querySelectorAll(".q-item__section--main");
+        return Array.from(allLinks).map((link) => link.textContent!.trim());
+    }
 
-    it("displays single Manage Inventory link when user has CAN_SEE_INVENTORY and one property", async () => {
-        user.capabilities = {
-            [UserCapability.CAN_SEE_INVENTORY]: true,
-        };
+    function formatSnapshot(snapshot: string): string {
+        return snapshot
+            .split("\n")
+            .map((line) => line.trim())
+            .filter(Boolean)
+            .join("\n");
+    }
 
-        screen = renderComponent(
-            AppDrawer,
-            { modelValue },
-            {
-                wrapInLayout: true,
-                piniaStoreOptions: {
-                    initialState: {
-                        auth: { user },
-                        properties: {
-                            properties: [
-                                {
-                                    id: "property1",
-                                    name: "Property 1",
-                                    organisationId: user.organisationId,
-                                },
-                            ],
-                        },
-                    },
-                },
-            },
-        );
+    describe("feature tests", () => {
+        it("toggles dark mode when the toggle is clicked", async () => {
+            renderAppDrawer();
 
-        await expect.element(screen.getByText("Manage Inventory")).toBeVisible();
+            expect(Dark.isActive).toBe(false);
 
-        // Ensure it's a single link, not an expandable item
-        await expect.element(screen.getByText("Property 1")).not.toBeInTheDocument();
-    });
+            const initialDarkModeInStorage = localStorage.getItem("FTDarkMode");
+            await userEvent.click(screen.getByText("Toggle dark mode"));
 
-    it("displays expandable Manage Inventory link when user has CAN_SEE_INVENTORY and multiple properties", async () => {
-        user.capabilities = {
-            [UserCapability.CAN_SEE_INVENTORY]: true,
-        };
-
-        screen = renderComponent(
-            AppDrawer,
-            { modelValue },
-            {
-                wrapInLayout: true,
-                piniaStoreOptions: {
-                    initialState: {
-                        auth: { user },
-                        properties: {
-                            properties: [
-                                {
-                                    id: "property1",
-                                    name: "Property 1",
-                                    organisationId: user.organisationId,
-                                },
-                                {
-                                    id: "property2",
-                                    name: "Property 2",
-                                    organisationId: user.organisationId,
-                                },
-                            ],
-                        },
-                    },
-                },
-            },
-        );
-
-        const manageInventoryItem = screen.getByLabelText("Manage Inventory");
-        // Simulate expanding the expandable item
-        await userEvent.click(screen.getByText("Manage Inventory"));
-
-        // Check that property links are displayed
-        await expect.element(manageInventoryItem.getByText("Property 1")).toBeVisible();
-        await expect.element(manageInventoryItem.getByText("Property 2")).toBeVisible();
-    });
-
-    it("uses custom capabilities over default capabilities", async () => {
-        user.role = Role.MANAGER;
-        user.capabilities = {
-            [UserCapability.CAN_SEE_INVENTORY]: false,
-        };
-
-        screen = renderComponent(
-            AppDrawer,
-            { modelValue },
-            {
-                wrapInLayout: true,
-                piniaStoreOptions: {
-                    initialState: {
-                        auth: { user },
-                        properties: {
-                            properties: [
-                                {
-                                    id: "property1",
-                                    name: "Property 1",
-                                    organisationId: user.organisationId,
-                                },
-                            ],
-                        },
-                    },
-                },
-            },
-        );
-
-        // Even though MANAGER role has CAN_SEE_INVENTORY by default,
-        // the custom capabilities should override it
-        await expect.element(screen.getByText("Manage Inventory")).not.toBeInTheDocument();
-    });
-
-    it("changes language when a new language is selected", async () => {
-        screen = renderComponent(
-            AppDrawer,
-            {
-                modelValue,
-            },
-            {
-                wrapInLayout: true,
-                piniaStoreOptions: {
-                    initialState: {
-                        auth: { user },
-                    },
-                },
-            },
-        );
-
-        expect(getLocaleForTest().value).toBe("en-GB");
-
-        await userEvent.click(screen.getByLabelText("Language"));
-        await userEvent.click(screen.getByRole("option", { name: "German" }));
-
-        expect(getLocaleForTest().value).toBe("de");
-    });
-
-    describe("Issue Reports Links", () => {
-        it("displays admin issue reports link for admin users", async () => {
-            user.role = AdminRole.ADMIN;
-
-            screen = renderComponent(
-                AppDrawer,
-                { modelValue },
-                {
-                    wrapInLayout: true,
-                    piniaStoreOptions: {
-                        initialState: {
-                            auth: { user },
-                        },
-                    },
-                },
-            );
-
-            await expect.element(screen.getByText("Issue Reports Overview")).toBeVisible();
-            await expect.element(screen.getByText("Report an Issue")).not.toBeInTheDocument();
+            expect(Dark.isActive).toBe(true);
+            expect(localStorage.getItem("FTDarkMode")).not.toBe(initialDarkModeInStorage);
         });
 
-        it("displays report issue link for non-admin users", async () => {
-            user.role = Role.MANAGER;
+        it("displays user avatar, name, and email", async () => {
+            renderAppDrawer();
 
-            screen = renderComponent(
-                AppDrawer,
-                { modelValue },
-                {
-                    wrapInLayout: true,
-                    piniaStoreOptions: {
-                        initialState: {
-                            auth: { user },
-                        },
-                    },
-                },
-            );
+            await expect.element(screen.getByText(user.name)).toBeVisible();
+            await expect.element(screen.getByText(user.email)).toBeVisible();
 
-            await expect.element(screen.getByText("Report an Issue")).toBeVisible();
-            await expect
-                .element(screen.getByText("Issue Reports Overview"))
-                .not.toBeInTheDocument();
+            const avatarText = user.name
+                .split(" ")
+                .map((n) => n[0])
+                .join("");
+            await expect.element(screen.getByText(avatarText)).toBeVisible();
         });
+
+        it("displays expandable Manage Inventory link when user has CAN_SEE_INVENTORY and multiple properties", async () => {
+            user.capabilities = {
+                [UserCapability.CAN_SEE_INVENTORY]: true,
+            };
+            renderAppDrawer({}, user.capabilities, [
+                {
+                    id: "property1",
+                    name: "Property 1",
+                    organisationId: user.organisationId,
+                },
+                {
+                    id: "property2",
+                    name: "Property 2",
+                    organisationId: user.organisationId,
+                },
+            ]);
+
+            const manageInventoryItem = screen.getByLabelText("Manage Inventory");
+            await userEvent.click(screen.getByText("Manage Inventory"));
+
+            await expect.element(manageInventoryItem.getByText("Property 1")).toBeVisible();
+            await expect.element(manageInventoryItem.getByText("Property 2")).toBeVisible();
+        });
+
+        it("does not display property-dependent links when no properties are assigned", () => {
+            renderAppDrawer({ role: Role.MANAGER }, { [UserCapability.CAN_SEE_INVENTORY]: true });
+
+            const visibleLinks = getVisibleLinks();
+            expect(visibleLinks).not.toContain("Manage Inventory");
+        });
+
+        it("changes language when a new language is selected", async () => {
+            renderAppDrawer();
+
+            expect(getLocaleForTest().value).toBe("en-GB");
+
+            await userEvent.click(screen.getByLabelText("Language"));
+            await userEvent.click(screen.getByRole("option", { name: "German" }));
+
+            expect(getLocaleForTest().value).toBe("de");
+        });
+    });
+
+    describe("AppDrawer Snapshot Testing", () => {
+        const testCases = [
+            {
+                description: "Admin user (Admin view)",
+                role: AdminRole.ADMIN,
+                capabilities: {},
+                expectedSnapshot: `
+                - Manage Organisations
+                - Issue Reports Overview
+                - Logout
+                `,
+            },
+            {
+                description: "Property Owner",
+                role: Role.PROPERTY_OWNER,
+                capabilities: DEFAULT_CAPABILITIES_BY_ROLE[Role.PROPERTY_OWNER],
+                expectedSnapshot: `
+                - Manage Events
+                - Manage Floors
+                - Manage Drink Cards
+                - Manage Inventory
+                - Manage Analytics
+                - Manage Users
+                - Guestbook
+                - Manage Properties
+                - Settings
+                - Report an Issue
+                - Logout
+                `,
+            },
+            {
+                description: "Manager",
+                role: Role.MANAGER,
+                capabilities: DEFAULT_CAPABILITIES_BY_ROLE[Role.MANAGER],
+                expectedSnapshot: `
+                - Manage Events
+                - Manage Floors
+                - Manage Drink Cards
+                - Manage Inventory
+                - Manage Analytics
+                - Manage Users
+                - Guestbook
+                - Settings
+                - Report an Issue
+                - Logout
+                `,
+            },
+            {
+                description: "Hostess",
+                role: Role.HOSTESS,
+                capabilities: DEFAULT_CAPABILITIES_BY_ROLE[Role.HOSTESS],
+                expectedSnapshot: `
+                - Guestbook
+                - Report an Issue
+                - Logout
+                `,
+            },
+        ];
+
+        it.each(testCases)(
+            `renders the correct menu for $description`,
+            ({ role, expectedSnapshot, capabilities }) => {
+                renderAppDrawer({ role }, capabilities, [
+                    {
+                        id: "property1",
+                        name: "Property 1",
+                        organisationId: user.organisationId,
+                    } as PropertyDoc,
+                ]);
+
+                const visibleLinks = getVisibleLinks()
+                    .map((link) => `- ${link}`)
+                    .join("\n");
+                expect(visibleLinks).toBe(formatSnapshot(expectedSnapshot));
+            },
+        );
+    });
+
+    describe("AppDrawer STAFF Role Testing", () => {
+        const staffTestCases = [
+            {
+                description: "Staff with no special permissions",
+                capabilities: DEFAULT_CAPABILITIES_BY_ROLE[Role.STAFF],
+                expectedSnapshot: `
+                - Report an Issue
+                - Logout
+                `,
+            },
+            {
+                description: "Staff with inventory access",
+                capabilities: {
+                    ...DEFAULT_CAPABILITIES_BY_ROLE[Role.STAFF],
+                    [UserCapability.CAN_SEE_INVENTORY]: true,
+                },
+                expectedSnapshot: `
+                - Manage Inventory
+                - Report an Issue
+                - Logout
+                `,
+            },
+            {
+                description: "Staff with inventory and floor plans access",
+                capabilities: {
+                    ...DEFAULT_CAPABILITIES_BY_ROLE[Role.STAFF],
+                    [UserCapability.CAN_SEE_INVENTORY]: true,
+                    [UserCapability.CAN_EDIT_FLOOR_PLANS]: true,
+                },
+                expectedSnapshot: `
+                - Manage Floors
+                - Manage Inventory
+                - Report an Issue
+                - Logout
+                `,
+            },
+            {
+                description: "Staff with full permissions",
+                capabilities: {
+                    [UserCapability.CAN_RESERVE]: true,
+                    [UserCapability.CAN_SEE_RESERVATION_CREATOR]: true,
+                    [UserCapability.CAN_SEE_GUEST_CONTACT]: true,
+                    [UserCapability.CAN_DELETE_RESERVATION]: true,
+                    [UserCapability.CAN_DELETE_OWN_RESERVATION]: true,
+                    [UserCapability.CAN_CONFIRM_RESERVATION]: true,
+                    [UserCapability.CAN_CANCEL_RESERVATION]: true,
+                    [UserCapability.CAN_EDIT_RESERVATION]: true,
+                    [UserCapability.CAN_EDIT_OWN_RESERVATION]: true,
+                    [UserCapability.CAN_SEE_INVENTORY]: true,
+                    [UserCapability.CAN_EDIT_FLOOR_PLANS]: true,
+                    [UserCapability.CAN_CREATE_EVENTS]: true,
+                    [UserCapability.CAN_SEE_GUESTBOOK]: true,
+                    [UserCapability.CAN_SEE_DIGITAL_DRINK_CARDS]: true,
+                },
+                expectedSnapshot: `
+                - Manage Events
+                - Manage Floors
+                - Manage Drink Cards
+                - Manage Inventory
+                - Guestbook
+                - Report an Issue
+                - Logout
+                `,
+            },
+        ];
+
+        it.each(staffTestCases)(
+            "renders the correct menu for $description",
+            ({ capabilities, expectedSnapshot }) => {
+                renderAppDrawer({ role: Role.STAFF }, capabilities, [
+                    {
+                        id: "property1",
+                        name: "Property 1",
+                        organisationId: user.organisationId,
+                    } as PropertyDoc,
+                ]);
+
+                const visibleLinks = getVisibleLinks()
+                    .map((link) => `- ${link}`)
+                    .join("\n");
+                expect(visibleLinks).toBe(formatSnapshot(expectedSnapshot));
+            },
+        );
     });
 });
