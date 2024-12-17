@@ -61,6 +61,9 @@ export async function createPropertyFn(
         return propertyDocRef.id;
     } catch (error) {
         logger.error("Error adding property:", error);
-        throw new HttpsError("internal", "Internal error occurred");
+        if (error instanceof HttpsError) {
+            throw error;
+        }
+        throw new HttpsError("internal", "Internal error occurred while creating property.");
     }
 }

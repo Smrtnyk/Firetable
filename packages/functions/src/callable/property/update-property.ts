@@ -47,6 +47,9 @@ export async function updatePropertyFn(req: CallableRequest<UpdatePropertyPayloa
         }
     } catch (error) {
         logger.error("Error updating property:", error);
-        throw new HttpsError("internal", "Failed to update property");
+        if (error instanceof HttpsError) {
+            throw error;
+        }
+        throw new HttpsError("internal", "Failed to update property due to an unexpected error.");
     }
 }

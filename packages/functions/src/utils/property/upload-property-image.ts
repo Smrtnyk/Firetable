@@ -8,6 +8,14 @@ export async function uploadPropertyImage(
     propertyId: string,
     img: ImageUploadData,
 ): Promise<string> {
+    const supportedTypes = ["image/png", "image/svg+xml"];
+    if (!supportedTypes.includes(img.type)) {
+        throw new HttpsError(
+            "invalid-argument",
+            `Unsupported image format (${img.type}). Please upload a PNG or SVG image.`,
+        );
+    }
+
     try {
         const bucket = storage.bucket();
         const extension = img.type === "image/svg+xml" ? "svg" : "png";
@@ -16,8 +24,10 @@ export async function uploadPropertyImage(
         const matches = /^data:image\/(png|svg\+xml);base64,(.+)$/.exec(img.dataUrl);
 
         if (!matches?.[2]) {
-            logger.error("Invalid image data format");
-            throw new HttpsError("invalid-argument", "Invalid image data format");
+            throw new HttpsError(
+                "invalid-argument",
+                "Invalid image data format. Make sure you're providing a valid base64-encoded PNG or SVG image.",
+            );
         }
 
         const base64Data = matches[2];
@@ -35,7 +45,10 @@ export async function uploadPropertyImage(
         await file.makePublic();
         return file.publicUrl();
     } catch (error) {
-        logger.error("Error uploading property image:", error);
-        throw new HttpsError("internal", "Failed to upload property image");
+        if (error instanceof HttpsError) {
+            throw error;
+        }
+        logger.error("Unexpected error uploading property image:", error);
+        throw new HttpsError("internal", "An unexpected error occurred while uploading the image.");
     }
 }
