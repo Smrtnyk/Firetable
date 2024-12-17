@@ -2,15 +2,15 @@ import type { CreateGuestPayload, GuestDataPayload, GuestDoc, Visit } from "@fir
 import type { HttpsCallableResult } from "firebase/functions";
 import { initializeFirebase } from "./base.js";
 import { guestDoc } from "./db.js";
-import { getGuestPath, getGuestsPath } from "./paths.js";
+import { getGuestsPath } from "./paths.js";
 import {
     deleteDoc,
     addDoc,
     collection,
     onSnapshot,
-    doc,
     getDoc,
     updateDoc,
+    writeBatch,
 } from "firebase/firestore";
 import { httpsCallable } from "firebase/functions";
 
@@ -34,6 +34,18 @@ export function deleteGuestVisit(guestData: GuestDataPayload): Promise<HttpsCall
 
 export function deleteGuest(organisationId: string, guestId: string): Promise<void> {
     return deleteDoc(guestDoc(organisationId, guestId));
+}
+
+export async function batchDeleteGuests(organisationId: string, guestIds: string[]): Promise<void> {
+    const { firestore } = initializeFirebase();
+    const batch = writeBatch(firestore);
+
+    for (const guestId of guestIds) {
+        const guestRef = guestDoc(organisationId, guestId);
+        batch.delete(guestRef);
+    }
+
+    await batch.commit();
 }
 
 export async function createGuest(
@@ -109,8 +121,7 @@ export async function updateGuestVisit(
     guestId: string,
     visit: Visit,
 ): Promise<void> {
-    const { firestore } = initializeFirebase();
-    const guestRef = doc(firestore, getGuestPath(organisationId, guestId));
+    const guestRef = guestDoc(organisationId, guestId);
 
     // Find the event ID by matching the date and event name
     const guestData = (await getDoc(guestDoc(organisationId, guestId))).data() as GuestDoc;

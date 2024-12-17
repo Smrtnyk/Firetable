@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { CreateGuestPayload } from "@firetable/types";
 import type { SortDirection, SortOption } from "src/components/admin/guest/GuestSortOptions.vue";
-import { createGuest } from "@firetable/backend";
+import { batchDeleteGuests, createGuest } from "@firetable/backend";
 import { useI18n } from "vue-i18n";
-import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { storeToRefs } from "pinia";
 import { useDialog } from "src/composables/useDialog";
 import { computed, onUnmounted, ref, useTemplateRef, watch } from "vue";
@@ -12,6 +12,7 @@ import { Loading, QVirtualScroll } from "quasar";
 import { useAuthStore } from "src/stores/auth-store";
 import { useGuestsStore } from "src/stores/guests-store";
 import { useLocalStorage } from "@vueuse/core";
+import { useRouter } from "vue-router";
 
 import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
@@ -20,6 +21,7 @@ import FTDialog from "src/components/FTDialog.vue";
 import FTBtn from "src/components/FTBtn.vue";
 import GuestSummaryChips from "src/components/guest/GuestSummaryChips.vue";
 import GuestSortOptions from "src/components/admin/guest/GuestSortOptions.vue";
+import { property } from "es-toolkit/compat";
 
 export interface PageAdminGuestsProps {
     organisationId: string;
@@ -37,6 +39,7 @@ const sortDialog = ref(false);
 const guests = computed(() => guestsRef.value.data);
 const isLoading = computed(() => guestsRef.value.pending);
 const { isAdmin } = storeToRefs(useAuthStore());
+const router = useRouter();
 
 watch(
     () => isLoading.value,
@@ -255,6 +258,80 @@ function handleScroll(): void {
         virtualListRef.value?.scrollTo(0, "start");
     }
 }
+
+// Guests selection
+const selectedGuests = ref<string[]>([]);
+const selectionMode = ref(false);
+const allSelected = computed(function () {
+    return (
+        filteredGuests.value.length > 0 &&
+        filteredGuests.value.every(({ id }) => selectedGuests.value.includes(id))
+    );
+});
+
+function toggleGuestSelection(id: string): void {
+    const idx = selectedGuests.value.indexOf(id);
+    if (idx === -1) {
+        selectedGuests.value.push(id);
+    } else {
+        selectedGuests.value.splice(idx, 1);
+    }
+}
+
+function toggleSelectAll(): void {
+    if (allSelected.value) {
+        selectedGuests.value = [];
+    } else {
+        selectedGuests.value = filteredGuests.value.map(property("id"));
+    }
+}
+
+function onItemHold(item: any): void {
+    if (!selectionMode.value) {
+        selectionMode.value = true;
+        if (!selectedGuests.value.includes(item.id)) {
+            selectedGuests.value.push(item.id);
+        }
+    }
+}
+
+function cancelSelectionMode(): void {
+    selectionMode.value = false;
+    selectedGuests.value = [];
+}
+
+function onItemClick(item: any): void {
+    if (selectionMode.value) {
+        toggleGuestSelection(item.id);
+    } else {
+        router.push({
+            name: "adminGuest",
+            params: {
+                organisationId: props.organisationId,
+                guestId: item.id,
+            },
+        });
+    }
+}
+
+async function bulkDeleteSelected(): Promise<void> {
+    if (selectedGuests.value.length === 0) {
+        return;
+    }
+    const shouldDelete = await showConfirm(
+        `Are you sure you want to delete ${selectedGuests.value.length} guests?`,
+    );
+    if (!shouldDelete) {
+        return;
+    }
+
+    await tryCatchLoadingWrapper({
+        async hook() {
+            await batchDeleteGuests(props.organisationId, selectedGuests.value);
+            selectedGuests.value = [];
+        },
+    });
+}
 </script>
 
 <template>
@@ -300,6 +377,35 @@ function handleScroll(): void {
             </template>
         </q-input>
 
+        <q-slide-transition>
+            <div v-show="selectionMode" class="row items-center q-pa-sm full-width">
+                <q-checkbox
+                    v-model="allSelected"
+                    @update:model-value="toggleSelectAll"
+                    toggle-indeterminate
+                    dense
+                    class="q-mr-sm"
+                />
+                <span>{{ `Selected items ${selectedGuests.length}` }}</span>
+                <q-space />
+                <q-btn
+                    icon="trash"
+                    color="negative"
+                    flat
+                    class="q-ml-sm"
+                    @click="bulkDeleteSelected"
+                    aria-label="Bulk delete"
+                />
+                <q-btn
+                    icon="close"
+                    flat
+                    class="q-ml-sm"
+                    @click="cancelSelectionMode"
+                    aria-label="Cancel bulk action"
+                />
+            </div>
+        </q-slide-transition>
+
         <!-- Guest List -->
         <q-virtual-scroll
             style="max-height: 75vh"
@@ -310,19 +416,22 @@ function handleScroll(): void {
             @virtual-scroll="onVirtualScroll"
         >
             <q-item
+                v-touch-hold:2000.mouse="() => onItemHold(item)"
                 :key="item.id"
                 clickable
-                :to="{
-                    name: 'adminGuest',
-                    params: {
-                        organisationId: props.organisationId,
-                        guestId: item.id,
-                    },
-                }"
+                @click="onItemClick(item)"
             >
                 <q-item-section>
                     <q-item-label>
-                        <div class="row">
+                        <div class="row items-center">
+                            <q-checkbox
+                                size="xs"
+                                v-if="selectionMode"
+                                class="q-mr-sm"
+                                :model-value="selectedGuests.includes(item.id)"
+                                @update:model-value="() => toggleGuestSelection(item.id)"
+                                @click.stop
+                            />
                             <span>{{ item.name }}</span>
                             <q-space />
                             <span class="text-grey-6" v-if="item.maskedContact">{{
