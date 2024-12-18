@@ -20,6 +20,7 @@ export class Wall extends Group implements FloorEditorElement {
             fill: ELEMENT_DEFAULT_FILL_COLOR,
             strokeUniform: true,
             ...wallRectOpts,
+            strokeWidth: 0,
         });
 
         wallRect.evented = false;
