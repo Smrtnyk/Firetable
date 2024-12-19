@@ -15,7 +15,7 @@
     },
     "dependencies": {
         "@google-cloud/functions-framework": "3.4.3",
-        "firebase-admin": "13.0.1",
+        "firebase-admin": "13.0.2",
         "firebase-functions": "6.1.2",
         "es-toolkit": "1.30.1"
     },
