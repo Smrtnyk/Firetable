@@ -57,7 +57,9 @@ onMounted(init);
                 />
             </template>
         </template>
-        <FTCenteredText v-else> No active drink cards found. </FTCenteredText>
+        <FTCenteredText v-if="!isLoadingDrinkCards && !activeCard">
+            No active drink cards found.
+        </FTCenteredText>
     </div>
 </template>
 
