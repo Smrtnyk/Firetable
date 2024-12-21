@@ -51,4 +51,9 @@ export const ELEMENTS_TO_ADD_COLLECTION = [
         img: "/svg-images/cocktail.svg",
         tag: FloorElementTypes.BAR,
     },
+    {
+        label: "Cloakroom",
+        img: "/svg-images/jacket.svg",
+        tag: FloorElementTypes.CLOAKROOM,
+    },
 ];

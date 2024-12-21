@@ -12,6 +12,7 @@ import { Stage } from "./elements/Stage.js";
 import { SpiralStaircase } from "./elements/SpiralStaircase.js";
 import { Door } from "./elements/Door.js";
 import { Bar } from "./elements/Bar.js";
+import { Cloakroom } from "./elements/Cloakroom.js";
 
 export class ElementManager {
     addElement(options: CreateElementOptions): FabricObject {
@@ -38,6 +39,8 @@ export class ElementManager {
                 return this.addEditableCircle(options);
             case FloorElementTypes.BAR:
                 return this.addBar(options);
+            case FloorElementTypes.CLOAKROOM:
+                return this.addCloakroom(options);
             default:
                 throw new Error(`Unknown floor element type: ${options.tag}`);
         }
@@ -74,6 +77,10 @@ export class ElementManager {
             },
             text: "Editable on dbl click",
         });
+    }
+
+    private addCloakroom({ x, y }: CreateElementOptions): Cloakroom {
+        return new Cloakroom({ left: x, top: y });
     }
 
     private addDoor({ x, y }: CreateElementOptions): Door {
