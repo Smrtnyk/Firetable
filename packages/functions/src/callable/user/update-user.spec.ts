@@ -261,6 +261,7 @@ describe("updateUserFn", () => {
                     userId: uid,
                     organisationId,
                 },
+                acceptsStreaming: false,
                 rawRequest: {} as any,
             } as CallableRequest<EditUserPayload>;
 

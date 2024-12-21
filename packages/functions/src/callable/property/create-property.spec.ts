@@ -14,6 +14,7 @@ describe("createPropertyFn", () => {
             data,
             auth,
             rawRequest: {} as any,
+            acceptsStreaming: false,
         };
     }
 

@@ -34,6 +34,7 @@ describe("deleteUser", () => {
         });
 
         const req: CallableRequest = {
+            acceptsStreaming: false,
             auth: { uid } as any,
             data: { id: uid, organisationId: testOrgId },
             rawRequest: {} as any,
@@ -57,6 +58,7 @@ describe("deleteUser", () => {
 
         // Mocking CallableRequest for a user that doesn't exist in Firestore
         const req: CallableRequest = {
+            acceptsStreaming: false,
             auth: { uid } as any,
             data: { id: uid, organisationId: testOrgId },
             rawRequest: {} as any,
