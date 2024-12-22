@@ -1,3 +1,5 @@
+/// <reference types="@vitest/browser/providers/playwright" />
+
 import { defineConfig } from "vitest/config";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { quasar, transformAssetUrls } from "@quasar/vite-plugin";
@@ -64,9 +66,6 @@ export default defineConfig({
             },
             instances: [{
                 browser: "chromium",
-                providerOptions: {
-                    channel: "chromium"
-                }
             }]
         },
     },
