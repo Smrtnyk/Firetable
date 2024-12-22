@@ -37,7 +37,7 @@ export default defineConfig({
         reporters: ["default"],
         watch: false,
         includeTaskLocation: true,
-        silent: !!process.env.CI,
+        silent: true,
         coverage: {
             provider: 'v8',
             reporter: ['text', 'json', 'html'],
@@ -56,13 +56,18 @@ export default defineConfig({
         },
         browser: {
             enabled: true,
-            headless: true,
-            name: "chromium",
             provider: "playwright",
+            headless: true,
             viewport: {
                 width: 400,
                 height: 700,
-            }
+            },
+            instances: [{
+                browser: "chromium",
+                providerOptions: {
+                    channel: "chromium"
+                }
+            }]
         },
     },
 });
