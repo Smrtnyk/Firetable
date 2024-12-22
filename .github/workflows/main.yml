@@ -32,7 +32,6 @@ jobs:
             # Install Playwright Browsers in all packages that use Playwright
             -   name: Install Playwright Browsers
                 run: |
-                    pnpm --filter floor-creator exec playwright install
                     pnpm --filter frontend exec playwright install
 
             - name: Prepare Firebase Config
