@@ -4,6 +4,7 @@
         "baseUrl": ".",
         "lib": ["ESNext", "DOM"],
         "esModuleInterop": true,
+        "types": ["@vitest/browser/providers/playwright"]
     },
     "include": [
         "vitest.config.ts",

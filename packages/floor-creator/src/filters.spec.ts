@@ -27,6 +27,7 @@ describe("Table Management Functions", () => {
                 json: {},
             },
             containerWidth: 1000,
+            containerHeight: 1000,
         });
     });
 
