@@ -21,6 +21,7 @@ export default config(
     ...configs.strict,
     importX.flatConfigs.recommended,
     importX.flatConfigs.typescript,
+    promise.configs["flat/recommended"],
     ...compat.plugins("@regru/eslint-plugin-prefer-early-return"),
     {
         settings: {
@@ -35,12 +36,6 @@ export default config(
             promise,
             unicorn,
             vue,
-        },
-    },
-    {
-        files: ["**/*.vue", "**/*.ts"],
-        rules: {
-            ...promise.configs["flat/recommended"].rules,
         },
     },
     {
