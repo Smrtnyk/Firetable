@@ -471,6 +471,58 @@ describe("useReservations", () => {
                 .toBeVisible();
             expect(updateReservationDocMock).not.toHaveBeenCalled();
         });
+
+        it("transfers reservation with linked tables", async () => {
+            const { floor, event } = await setupTestEnvironment();
+            const sourceReservation = createTestReservation({
+                tableLabel: ["T1", "T2"],
+            });
+
+            const result = withSetup(() =>
+                useReservations(
+                    ref([]),
+                    ref([sourceReservation]),
+                    shallowRef([floor]),
+                    { id: "1", propertyId: "1", organisationId: "1" },
+                    ref(event),
+                ),
+            );
+
+            const sourceTable = floor.getTableByLabel("T1")!;
+            await result.tableClickHandler(floor, sourceTable);
+
+            result.initiateTableOperation({
+                type: TableOperationType.RESERVATION_TRANSFER,
+                sourceFloor: floor,
+                sourceTable,
+            });
+
+            await nextTick();
+
+            const targetTable = floor.getTableByLabel("T3");
+            const transferResult = result.tableClickHandler(floor, targetTable);
+            await userEvent.click(page.getByRole("button", { name: "OK" }));
+            await transferResult;
+
+            expect(updateReservationDocMock).toHaveBeenNthCalledWith(
+                1,
+                { id: "1", propertyId: "1", organisationId: "1" },
+                expect.objectContaining({
+                    id: sourceReservation.id,
+                    tableLabel: "T3",
+                    floorId: floor.id,
+                }),
+            );
+
+            expect(eventEmitMock).toHaveBeenCalledWith(
+                "reservation:transferred",
+                expect.objectContaining({
+                    fromTable: sourceTable,
+                    toTable: targetTable,
+                    eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
+                }),
+            );
+        });
     });
 
     describe("reservation management", () => {
@@ -1796,6 +1848,13 @@ async function createTestFloor(name = "Test floor", id = "1"): Promise<FloorView
         label: "T2",
         x: 200,
         y: 200,
+    });
+
+    editor.addElement({
+        tag: FloorElementTypes.RECT_TABLE,
+        label: "T3",
+        x: 300,
+        y: 300,
     });
 
     const floorDoc: FloorDoc = {

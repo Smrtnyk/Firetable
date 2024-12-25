@@ -649,8 +649,13 @@ export function useReservations(
             return;
         }
 
-        const reservationTable1 = reservations.value.find((reservation) => {
-            return reservation.floorId === floor.id && reservation.tableLabel === table1.label;
+        const reservationTable1 = reservations.value.find(function (reservation) {
+            return (
+                reservation.floorId === floor.id &&
+                (Array.isArray(reservation.tableLabel)
+                    ? reservation.tableLabel.includes(table1.label)
+                    : reservation.tableLabel === table1.label)
+            );
         });
 
         if (!reservationTable1) {
