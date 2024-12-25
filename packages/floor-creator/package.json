@@ -11,7 +11,8 @@
     },
     "scripts": {
         "test": "vitest",
-        "build": "tsc -b",
+        "typecheck:all": "tsc --noEmit --project tsconfig.spec.json",
+        "build": "pnpm run typecheck:all && tsc -b",
         "find-dead-code": "npx ts-prune -p tsconfig.json --ignore 'src/index.ts|dist'",
         "lint": "eslint ./src"
     },

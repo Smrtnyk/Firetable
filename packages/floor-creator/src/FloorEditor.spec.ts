@@ -25,6 +25,7 @@ describe("FloorEditor", () => {
                 json: {},
             },
             containerWidth: 1000,
+            containerHeight: 1000,
         };
 
         gridDrawerSpy = vi.spyOn(GridDrawer.prototype, "drawGrid");

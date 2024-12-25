@@ -2,7 +2,7 @@ import type { Canvas } from "fabric";
 import { EditorEventManager } from "./EditorEventManager.js";
 import { RESOLUTION } from "../constants.js";
 import { FloorEditor } from "../FloorEditor.js";
-import { CanvasHistory } from "../CanvasHistory";
+import { CanvasHistory } from "../CanvasHistory.js";
 import { expect, it, describe, beforeEach, vi } from "vitest";
 import { FabricObject, Group } from "fabric";
 
@@ -27,6 +27,7 @@ describe("EditorEventManager", () => {
                 json: {},
             },
             containerWidth: 1000,
+            containerHeight: 1000,
         });
 
         history = new CanvasHistory(floor);
