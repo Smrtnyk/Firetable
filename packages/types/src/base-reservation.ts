@@ -1,6 +1,13 @@
 import type { Timestamp } from "firebase/firestore";
 import type { User } from "./auth.js";
 
+export enum ReservationState {
+    PENDING = "PENDING",
+    WAITING_FOR_RESPONSE = "WAITING_FOR_RESPONSE",
+    CONFIRMED = "CONFIRMED",
+    ARRIVED = "ARRIVED",
+}
+
 /**
  * Enum for different types of reservations
  */
@@ -88,6 +95,12 @@ export interface BaseReservation {
      * it is treated as soft delete, for later inclusion in the logs and analytics
      */
     status: ReservationStatus;
+
+    /**
+     * The state of the reservation
+     */
+    state: ReservationState;
+
     /**
      * Indicates if this is a VIP reservation
      */

@@ -13,6 +13,7 @@ export interface QueuedReservation
         | "cancelled"
         | "floorId"
         | "reservationConfirmed"
+        | "state"
         | "tableLabel"
         | "type"
         | "waitingForResponse"

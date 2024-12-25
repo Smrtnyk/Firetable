@@ -2,13 +2,6 @@ import type { Ref, ShallowRef, ComputedRef } from "vue";
 import type { EventOwner } from "../../backend-proxy";
 import type { DialogChainObject } from "quasar";
 import type { VueFirestoreDocumentData } from "vuefire";
-import type {
-    EventDoc,
-    PlannedReservationDoc,
-    Reservation,
-    ReservationDoc,
-    User,
-} from "@firetable/types";
 import type { GuestSummary } from "src/stores/guests-store";
 import type {
     BaseTable,
@@ -24,6 +17,14 @@ import type {
     ReservationTransferOperation,
     TableOperation,
 } from "./useTableOperations.js";
+import type {
+    EventDoc,
+    PlannedReservationDoc,
+    Reservation,
+    ReservationDoc,
+    ReservationState,
+    User,
+} from "@firetable/types";
 import { useReservationsLifecycle } from "./useReservationsLifecycle.js";
 import { TableOperationType, useTableOperations } from "./useTableOperations.js";
 import {
@@ -452,7 +453,7 @@ export function useReservations(
             ? reservation.tableLabel
             : [reservation.tableLabel];
 
-        createDialog({
+        const dialog = createDialog({
             component: FTDialog,
             componentProps: {
                 component: EventShowReservation,
@@ -470,6 +471,16 @@ export function useReservations(
                             params: {
                                 organisationId: eventOwner.organisationId,
                                 guestId,
+                            },
+                        });
+                    },
+                    stateChange(newState: ReservationState) {
+                        return tryCatchLoadingWrapper({
+                            async hook() {
+                                await updateReservationDoc(eventOwner, {
+                                    id: reservation.id,
+                                    state: newState,
+                                });
                             },
                         });
                     },
@@ -492,12 +503,14 @@ export function useReservations(
                         initiateReservationCopy(floor, element);
                     },
                     arrived(val: boolean) {
+                        dialog.hide();
                         if (!isPlannedReservation(reservation)) {
                             return;
                         }
                         onGuestArrived(reservation, val).catch(showErrorMessage);
                     },
                     waitingForResponse(val: boolean) {
+                        dialog.hide();
                         if (!isPlannedReservation(reservation)) {
                             return;
                         }
@@ -505,6 +518,7 @@ export function useReservations(
                         reservationWaitingForResponse(val, reservation).catch(showErrorMessage);
                     },
                     reservationConfirmed(val: boolean) {
+                        dialog.hide();
                         if (!isPlannedReservation(reservation)) {
                             return;
                         }
@@ -534,6 +548,7 @@ export function useReservations(
                     id: reservation.id,
                     arrived: val,
                     waitingForResponse: false,
+                    reservationConfirmed: false,
                 });
 
                 eventEmitter.emit("reservation:arrived", {
@@ -556,6 +571,7 @@ export function useReservations(
                     id: reservation.id,
                     reservationConfirmed: val,
                     waitingForResponse: false,
+                    arrived: false,
                 });
             },
         });
@@ -571,6 +587,7 @@ export function useReservations(
                     id: reservation.id,
                     waitingForResponse: val,
                     reservationConfirmed: false,
+                    arrived: false,
                 });
             },
         });
@@ -898,10 +915,11 @@ export function useReservations(
             return;
         }
 
-        const reservation = reservations.value.find((res) => {
-            if (res.floorId !== floor.id) return false;
+        const reservation = reservations.value.find(function (res) {
+            if (res.floorId !== floor.id) {
+                return false;
+            }
 
-            // Handle both string and string[] tableLabel
             const tableLabels = Array.isArray(res.tableLabel) ? res.tableLabel : [res.tableLabel];
 
             return tableLabels.includes(element.label);

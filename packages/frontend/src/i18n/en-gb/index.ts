@@ -158,6 +158,7 @@ export default {
         createdByLabel: "Creator",
         createdAtLabel: "Created at",
         groupedWithLabel: "Grouped with",
+        pendingLabel: "Pending",
         reservationGuestArrivedLabel: "Arrived",
         reservationConfirmedLabel: "Confirmed",
         reservationConsumption: "Consumption",

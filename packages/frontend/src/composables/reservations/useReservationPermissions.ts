@@ -1,7 +1,8 @@
 import type { ReservationDoc } from "@firetable/types";
 import type { Ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { ReservationState, isPlannedReservation } from "@firetable/types";
 import { useAuthStore } from "src/stores/auth-store";
-import { isPlannedReservation } from "@firetable/types";
 import { computed } from "vue";
 import { usePermissionsStore } from "src/stores/permissions-store";
 
@@ -9,6 +10,26 @@ export function useReservationPermissions(reservation: Ref<ReservationDoc>) {
     const authStore = useAuthStore();
     const permissionsStore = usePermissionsStore();
     const user = computed(() => authStore.nonNullableUser);
+    const { t } = useI18n();
+
+    const reservationStateWithTranslationMap = {
+        [ReservationState.PENDING]: {
+            value: ReservationState.PENDING,
+            label: t("EventShowReservation.pendingLabel"),
+        },
+        [ReservationState.CONFIRMED]: {
+            value: ReservationState.CONFIRMED,
+            label: t("EventShowReservation.reservationConfirmedLabel"),
+        },
+        [ReservationState.ARRIVED]: {
+            value: ReservationState.ARRIVED,
+            label: t("EventShowReservation.reservationGuestArrivedLabel"),
+        },
+        [ReservationState.WAITING_FOR_RESPONSE]: {
+            value: ReservationState.WAITING_FOR_RESPONSE,
+            label: t("EventShowReservation.waitingForResponse"),
+        },
+    } as const;
 
     const isOwnReservation = computed(function () {
         return user.value.id === reservation.value.creator.id;
@@ -22,10 +43,33 @@ export function useReservationPermissions(reservation: Ref<ReservationDoc>) {
         return reservation.value.arrived;
     });
 
+    const reservationConfirmed = computed(
+        () => isPlannedReservation(reservation.value) && reservation.value.reservationConfirmed,
+    );
+
+    const waitingForResponse = computed(
+        () =>
+            isPlannedReservation(reservation.value) &&
+            Boolean(reservation.value.waitingForResponse),
+    );
+
     const isLinkedReservation = computed(function () {
         return (
             Array.isArray(reservation.value.tableLabel) && reservation.value.tableLabel.length > 1
         );
+    });
+
+    const reservationMappedState = computed(function () {
+        if (isGuestArrived.value) {
+            return reservationStateWithTranslationMap[ReservationState.ARRIVED];
+        }
+        if (reservationConfirmed.value) {
+            return reservationStateWithTranslationMap[ReservationState.CONFIRMED];
+        }
+        if (waitingForResponse.value) {
+            return reservationStateWithTranslationMap[ReservationState.WAITING_FOR_RESPONSE];
+        }
+        return reservationStateWithTranslationMap[ReservationState.PENDING];
     });
 
     const canDeleteReservation = computed(function () {
@@ -58,6 +102,8 @@ export function useReservationPermissions(reservation: Ref<ReservationDoc>) {
     });
 
     return {
+        reservationStateWithTranslationMap,
+        reservationMappedState,
         isLinkedReservation,
         isGuestArrived,
         isCancelled,

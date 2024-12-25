@@ -4,6 +4,7 @@ import {
     ReservationType,
     type EventDoc,
     type ReservationDocWithEventId,
+    ReservationState,
 } from "@firetable/types";
 import { describe, it, expect } from "vitest";
 
@@ -38,6 +39,7 @@ const mockReservations: ReservationDocWithEventId[] = [
         eventId: "event1",
         type: ReservationType.PLANNED,
         status: ReservationStatus.ACTIVE,
+        state: ReservationState.PENDING,
         floorId: "floor1",
         tableLabel: "Table 1",
         guestName: "John Doe",
@@ -61,6 +63,7 @@ const mockReservations: ReservationDocWithEventId[] = [
         eventId: "event1",
         type: ReservationType.WALK_IN,
         status: ReservationStatus.ACTIVE,
+        state: ReservationState.ARRIVED,
         floorId: "floor1",
         tableLabel: "Table 2",
         guestName: "Jane Doe",
@@ -81,6 +84,7 @@ const mockReservations: ReservationDocWithEventId[] = [
         eventId: "event1",
         type: ReservationType.PLANNED,
         status: ReservationStatus.ACTIVE,
+        state: ReservationState.PENDING,
         floorId: "floor2",
         tableLabel: "Table 3",
         guestName: "Alice",

@@ -1,8 +1,14 @@
 import type { QueuedReservationDoc, UserCapabilities, WalkInReservation } from "@firetable/types";
 import type { RenderResult } from "vitest-browser-vue";
 import ReservationGeneralInfo from "./ReservationGeneralInfo.vue";
-import { renderComponent, getLocaleForTest } from "../../../../test-helpers/render-component";
-import { ReservationStatus, ReservationType, Role, UserCapability } from "@firetable/types";
+import { getLocaleForTest, renderComponent } from "../../../../test-helpers/render-component";
+import {
+    ReservationState,
+    ReservationStatus,
+    ReservationType,
+    Role,
+    UserCapability,
+} from "@firetable/types";
 import { formatEventDate, getDefaultTimezone } from "src/helpers/date-utils";
 import { describe, expect, it } from "vitest";
 
@@ -241,6 +247,7 @@ describe("ReservationGeneralInfo", () => {
             arrived: true,
             tableLabel: "Table 1",
             floorId: "floor1",
+            state: ReservationState.ARRIVED,
         };
 
         const screen = renderComponent(
