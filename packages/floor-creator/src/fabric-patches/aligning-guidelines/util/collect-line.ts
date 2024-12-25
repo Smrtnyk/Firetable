@@ -1,4 +1,4 @@
-/* eslint-disable id-length */
+/* eslint-disable id-length -- patched from fabric repo */
 import type { FabricObject, TOriginX, TOriginY, Point } from "fabric";
 import type { LineProps } from "../typedefs.js";
 import { getDistanceList } from "./basic.js";

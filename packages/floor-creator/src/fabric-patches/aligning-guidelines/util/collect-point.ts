@@ -12,10 +12,12 @@ type CollectPointProps = {
     diagonalPoint: Point;
     /** Set of points to consider for alignment: [tl, tr, br, bl, center] */
     list: Point[];
-    /** Change the zoom or change the size, determine by whether e.transform .action starts with the string "scale" */
+    /** Change the zoom or change the size, determine by whether e.transform.action starts with the string "scale" */
     isScale: boolean;
     /** Whether to change uniformly is determined by canvas.uniformScaling and canvas.uniScaleKey. */
     isUniform: boolean;
+    /** When holding the centerKey (default is altKey), the shape will scale based on the center point, with the reference point being the center. */
+    isCenter: boolean;
     /** tl、tr、br、bl、mt、mr、mb、ml */
     corner: string;
 };
@@ -31,7 +33,7 @@ const originMap: { [props: string]: [TOriginX, TOriginY] } = {
     ml: ["right", "center"],
 };
 export function collectVerticalPoint(props: CollectPointProps): LineProps[] {
-    const { target, isScale, isUniform, corner, point, diagonalPoint, list } = props;
+    const { target, isScale, isUniform, corner, point, diagonalPoint, list, isCenter } = props;
     const { dis, arr } = getDistanceList(point, list, "x");
     const margin = aligningLineConfig.margin / (target.canvas?.getZoom() ?? 1);
     if (dis > margin) return [];
@@ -46,6 +48,7 @@ export function collectVerticalPoint(props: CollectPointProps): LineProps[] {
     const dStrokeWidth = strokeUniform ? 0 : strokeWidth;
     const scaleWidth = scaleX * width + dStrokeWidth;
     const sx = (v + scaleWidth) / scaleWidth;
+    // When v equals -scaleWidth, sx equals 0.
     if (sx === 0) {
         return [];
     }
@@ -56,14 +59,18 @@ export function collectVerticalPoint(props: CollectPointProps): LineProps[] {
         target.set("width", width * sx);
         if (isUniform) target.set("height", height * sx);
     }
-    const originArr = aligningLineConfig.contraryOriginMap ?? originMap;
-    target.setRelativeXY(diagonalPoint, ...originArr[corner]);
+    if (isCenter) {
+        target.setRelativeXY(diagonalPoint, "center", "center");
+    } else {
+        const originArr = aligningLineConfig.contraryOriginMap ?? originMap;
+        target.setRelativeXY(diagonalPoint, ...originArr[corner]);
+    }
     target.setCoords();
     return arr.map((targetVal) => ({ origin: point, target: targetVal }));
 }
 
 export function collectHorizontalPoint(props: CollectPointProps): LineProps[] {
-    const { target, isScale, isUniform, corner, point, diagonalPoint, list } = props;
+    const { target, isScale, isUniform, corner, point, diagonalPoint, list, isCenter } = props;
     const { dis, arr } = getDistanceList(point, list, "y");
     const margin = aligningLineConfig.margin / (target.canvas?.getZoom() ?? 1);
     if (dis > margin) return [];
@@ -78,6 +85,7 @@ export function collectHorizontalPoint(props: CollectPointProps): LineProps[] {
     const dStrokeWidth = strokeUniform ? 0 : strokeWidth;
     const scaleHeight = scaleY * height + dStrokeWidth;
     const sy = (v + scaleHeight) / scaleHeight;
+    // When v equals -scaleHeight, sy equals 0.
     if (sy === 0) {
         return [];
     }
@@ -88,8 +96,12 @@ export function collectHorizontalPoint(props: CollectPointProps): LineProps[] {
         target.set("height", height * sy);
         if (isUniform) target.set("width", width * sy);
     }
-    const originArr = aligningLineConfig.contraryOriginMap ?? originMap;
-    target.setRelativeXY(diagonalPoint, ...originArr[corner]);
+    if (isCenter) {
+        target.setRelativeXY(diagonalPoint, "center", "center");
+    } else {
+        const originArr = aligningLineConfig.contraryOriginMap ?? originMap;
+        target.setRelativeXY(diagonalPoint, ...originArr[corner]);
+    }
     target.setCoords();
     return arr.map((targetVal) => ({ origin: point, target: targetVal }));
 }

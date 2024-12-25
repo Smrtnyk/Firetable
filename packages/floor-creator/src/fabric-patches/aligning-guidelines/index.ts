@@ -67,6 +67,7 @@ export function initAligningGuidelines(canvas: Canvas, options: Partial<Aligning
         });
     }
 
+    // eslint-disable-next-line complexity -- patched from fabric
     function scalingOrResizing(e: TransformEvent): void {
         const target = e.target;
         // We need to obtain the real-time coordinates of the current object, so we need to update them in real-time
@@ -82,8 +83,15 @@ export function initAligningGuidelines(canvas: Canvas, options: Partial<Aligning
         // When the shape is flipped, the tl obtained through getCoords is actually tr,
         // and tl is actually tr. We need to make correction adjustments.
         // tr <-> tl、 bl <-> br、  mb <-> mt、 ml <-> mr
-        if (target.flipX) corner = corner.replace("l", "r").replace("r", "l");
-        if (target.flipY) corner = corner.replace("t", "b").replace("b", "t");
+        if (target.flipX) {
+            if (corner.includes("l")) corner = corner.replace("l", "r");
+            else if (corner.includes("r")) corner = corner.replace("r", "l");
+        }
+        if (target.flipY) {
+            if (corner.includes("t")) corner = corner.replace("t", "b");
+            else if (corner.includes("b")) corner = corner.replace("b", "t");
+        }
+
         // Obtain the coordinates of the current operation point through the value of corner.
         // users can be allowed to customize and pass in custom corners.
         const pointMap = options.getPointMap?.(target) ?? getPointMap(target);
@@ -100,7 +108,11 @@ export function initAligningGuidelines(canvas: Canvas, options: Partial<Aligning
         const contraryMap = options.getContraryMap?.(target) ?? getContraryMap(target);
 
         const point = pointMap[corner];
-        const diagonalPoint = contraryMap[corner];
+        let diagonalPoint = contraryMap[corner];
+        // When holding the centerKey (default is altKey), the shape will scale based on the center point, with the reference point being the center.
+        const isCenter = e.transform.altKey;
+        if (isCenter) diagonalPoint = diagonalPoint.add(point).scalarDivide(2);
+
         const uniformIsToggled = e.e[canvas.uniScaleKey!];
         let isUniform =
             (canvas.uniformScaling && !uniformIsToggled) ||
@@ -110,7 +122,10 @@ export function initAligningGuidelines(canvas: Canvas, options: Partial<Aligning
         if (onlyDrawPoint) isUniform = false;
 
         const list: Point[] = [];
-        for (const object of objects) list.push(...getCaCheMapValue(object));
+        for (const object of objects) {
+            const d = getCaCheMapValue(object);
+            list.push(...d);
+        }
 
         const props = {
             target,
@@ -120,10 +135,13 @@ export function initAligningGuidelines(canvas: Canvas, options: Partial<Aligning
             list,
             isScale,
             isUniform,
+            isCenter,
         };
         // Obtain horizontal and vertical reference lines.
-        const vLines = collectVerticalPoint(props);
-        const hLines = collectHorizontalPoint(props);
+        const noNeedToCollectV = onlyDrawPoint && (corner.includes("t") || corner.includes("b"));
+        const noNeedToCollectH = onlyDrawPoint && (corner.includes("l") || corner.includes("r"));
+        const vLines = noNeedToCollectV ? [] : collectVerticalPoint(props);
+        const hLines = noNeedToCollectH ? [] : collectHorizontalPoint(props);
         vLines.forEach((o) => {
             // Objects cannot be deduplicated; convert them to strings for deduplication.
             verticalLines.add(JSON.stringify(o));

@@ -1,7 +1,7 @@
 import type { FabricObject } from "fabric";
-import { FloorEditor } from "./FloorEditor";
-import { RectTable } from "./elements/RectTable";
-import { FloorElementTypes } from "./types";
+import { FloorEditor } from "./FloorEditor.js";
+import { RectTable } from "./elements/RectTable.js";
+import { FloorElementTypes } from "./types.js";
 import { describe, expect, it } from "vitest";
 import { ActiveSelection } from "fabric";
 import { last } from "es-toolkit";
@@ -137,7 +137,7 @@ describe("CanvasHistory", () => {
             await floor.redo();
         }
 
-        expect(table.left).toBe(last(positions).left);
+        expect(table.left).toBe(last(positions)!.left);
     });
 
     it("maintains reasonable stack size", async () => {
@@ -177,7 +177,7 @@ describe("CanvasHistory", () => {
         floor.canvas.setActiveObject(
             new ActiveSelection([table1, table2], { canvas: floor.canvas }),
         );
-        await moveTable(floor, floor.canvas.getActiveObject(), {
+        await moveTable(floor, floor.canvas.getActiveObject()!, {
             left: 300,
             top: 300,
         });
@@ -224,7 +224,7 @@ describe("CanvasHistory", () => {
 
         await Promise.all(movements.map((pos) => moveTable(floor, table, pos)));
 
-        expect(table.left).toBe(last(movements).left);
+        expect(table.left).toBe(last(movements)!.left);
     });
 });
 
@@ -255,7 +255,7 @@ async function waitForCanvasRender(floor: FloorEditor): Promise<void> {
 function findTable(floor: FloorEditor, label?: string): RectTable {
     return floor.canvas.getObjects().find(function (object): object is RectTable {
         return object instanceof RectTable && (!label || object.label === label);
-    });
+    })!;
 }
 
 async function addTable(

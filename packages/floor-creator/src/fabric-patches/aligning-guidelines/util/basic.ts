@@ -1,4 +1,4 @@
-/* eslint-disable id-length */
+/* eslint-disable id-length -- patched from fabric */
 import type { FabricObject, Point } from "fabric";
 import type { PointMap } from "../typedefs.js";
 
