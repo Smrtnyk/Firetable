@@ -8,7 +8,9 @@ FIRETABLE
 
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=Smrtnyk_Firetable&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=Smrtnyk_Firetable)
 
-Event management system built as a mono-repo using [pnpm](https://pnpm.io/). Functions as a Progressive Web App (PWA) for desktop-like experience.
+Event management system built as a mono-repo using [pnpm](https://pnpm.io/).
+Functions as a Progressive Web App (PWA) for desktop-like experience.
+Features a powerful custom floor plan editor that allows creating and managing dynamic floor layouts for each property, with the ability to customize plans per event and modify them in real-time.
 
 ## Demo
 Available at: [https://firetable-eu.web.app](https://firetable-eu.web.app)
@@ -25,7 +27,11 @@ Demo credentials:
   - Role-based access control for users
 
 - Event Planning
-  - Floor plan designer with customizable elements (DJ booths, sofas, tables and much more)
+    - Floor plan designer with customizable elements (DJ booths, sofas, tables and much more)
+        - Create unique layouts for each property
+        - Customize floor plans for specific events
+        - Real-time editing and adjustment capabilities
+        - Rich selection of venue elements and furnishings
   - Event scheduling and management
   - Guest list creation and management
 
