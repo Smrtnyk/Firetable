@@ -25,7 +25,7 @@ Demo credentials:
   - Role-based access control for users
 
 - Event Planning
-  - Floor plan designer with customizable elements (DJ booths, sofas, tables)
+  - Floor plan designer with customizable elements (DJ booths, sofas, tables and much more)
   - Event scheduling and management
   - Guest list creation and management
 
@@ -33,6 +33,12 @@ Demo credentials:
   - Handle immediate and wait list reservations
   - Track guest information and visit history
   - Monitor consumption data
+
+- Digital Drink Cards
+    - Upload existing drink cards as PDFs
+    - Create custom cards using inventory items
+    - Generate QR code for easy access
+    - Web-hosted for seamless guest access
 
 - Analytics
   - Track key metrics for reservations and events
