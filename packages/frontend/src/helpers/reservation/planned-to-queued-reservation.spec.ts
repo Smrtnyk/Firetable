@@ -1,12 +1,13 @@
 import type { PlannedReservation, QueuedReservation } from "@firetable/types";
 import { plannedToQueuedReservation } from "./planned-to-queued-reservation";
-import { ReservationStatus, ReservationType } from "@firetable/types";
+import { ReservationState, ReservationStatus, ReservationType } from "@firetable/types";
 import { describe, expect, it, vi } from "vitest";
 import { omit } from "es-toolkit";
 
 describe("plannedToQueuedReservation", () => {
     it("correctly transforms a full PlannedReservation to QueuedReservation", () => {
         const planned: PlannedReservation = {
+            state: ReservationState.PENDING,
             arrived: false,
             cancelled: false,
             floorId: "floor1",
@@ -56,6 +57,7 @@ describe("plannedToQueuedReservation", () => {
         vi.setSystemTime(new Date(fixedTimestamp));
 
         const planned: PlannedReservation = {
+            state: ReservationState.PENDING,
             arrived: true,
             cancelled: true,
             floorId: "floor2",
@@ -98,6 +100,7 @@ describe("plannedToQueuedReservation", () => {
         vi.setSystemTime(new Date(fixedTimestamp));
 
         const planned: PlannedReservation = {
+            state: ReservationState.PENDING,
             arrived: false,
             cancelled: false,
             floorId: "floor3",
@@ -134,6 +137,7 @@ describe("plannedToQueuedReservation", () => {
         vi.setSystemTime(new Date(fixedTimestamp));
 
         const planned: PlannedReservation = {
+            state: ReservationState.PENDING,
             arrived: false,
             cancelled: false,
             floorId: "floor4",
@@ -182,6 +186,7 @@ describe("plannedToQueuedReservation", () => {
         vi.setSystemTime(new Date(fixedTimestamp));
 
         const planned: PlannedReservation = {
+            state: ReservationState.PENDING,
             arrived: false,
             cancelled: false,
             floorId: "floor5",
@@ -220,6 +225,7 @@ describe("plannedToQueuedReservation", () => {
         vi.setSystemTime(new Date(fixedTimestamp));
 
         const planned: PlannedReservation = {
+            state: ReservationState.PENDING,
             arrived: false,
             cancelled: false,
             floorId: "",
@@ -268,6 +274,7 @@ describe("plannedToQueuedReservation", () => {
         vi.setSystemTime(new Date(fixedTimestamp));
 
         const planned: PlannedReservation & { extraField: string } = {
+            state: ReservationState.PENDING,
             arrived: false,
             cancelled: false,
             floorId: "floor6",

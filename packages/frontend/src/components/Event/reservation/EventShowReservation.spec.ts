@@ -3,7 +3,13 @@ import type { EventShowReservationProps } from "./EventShowReservation.vue";
 import type { GuestSummary } from "src/stores/guests-store";
 import EventShowReservation from "./EventShowReservation.vue";
 import { renderComponent, t } from "../../../../test-helpers/render-component";
-import { ReservationStatus, ReservationType, Role, UserCapability } from "@firetable/types";
+import {
+    ReservationState,
+    ReservationStatus,
+    ReservationType,
+    Role,
+    UserCapability,
+} from "@firetable/types";
 import { beforeEach, describe, expect, it } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 import { nextTick } from "vue";
@@ -36,6 +42,7 @@ describe("EventShowReservation", () => {
             reservationConfirmed: false,
             waitingForResponse: false,
             type: ReservationType.PLANNED,
+            state: ReservationState.PENDING,
             consumption: 0,
             time: "22:00",
             status: ReservationStatus.ACTIVE,
@@ -61,8 +68,8 @@ describe("EventShowReservation", () => {
         };
     });
 
-    describe("toggle states", () => {
-        it('renders the "Waiting for Response" toggle when conditions are met', async () => {
+    describe("reservation state select", () => {
+        it("renders the state select when conditions are met", async () => {
             const screen = renderComponent(EventShowReservation, props, {
                 piniaStoreOptions: {
                     initialState: {
@@ -76,18 +83,57 @@ describe("EventShowReservation", () => {
                 },
             });
 
-            const toggle = screen.getByText(t("EventShowReservation.waitingForResponse"));
-            await expect.element(toggle).toBeVisible();
+            const select = screen.getByRole("combobox", { name: "Reservation state" });
+            await expect.element(select).toHaveValue(t("EventShowReservation.pendingLabel"));
+        });
 
-            await userEvent.click(toggle);
+        it("does not render the state select when reservation is cancelled", async () => {
+            reservation.cancelled = true;
+
+            const screen = renderComponent(EventShowReservation, props, {
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: {
+                            user: {
+                                id: "user1",
+                                role: Role.PROPERTY_OWNER,
+                            },
+                        },
+                    },
+                },
+            });
+
+            await expect.element(screen.getByRole("combobox")).not.toBeInTheDocument();
+        });
+
+        it("emits correct events when state changes to WAITING_FOR_RESPONSE", async () => {
+            const screen = renderComponent(EventShowReservation, props, {
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: {
+                            user: {
+                                id: "user1",
+                                role: Role.PROPERTY_OWNER,
+                            },
+                        },
+                    },
+                },
+            });
+
+            const select = screen.getByRole("combobox");
+            await userEvent.click(select);
+
+            const waitingOption = screen.getByText(t("EventShowReservation.waitingForResponse"));
+            await userEvent.click(waitingOption);
 
             expect(screen.emitted().waitingForResponse).toBeTruthy();
             expect(screen.emitted().waitingForResponse[0]).toEqual([true]);
+            expect(screen.emitted().stateChange[0]).toEqual([
+                ReservationState.WAITING_FOR_RESPONSE,
+            ]);
         });
 
-        it('does not render the "Waiting for Response" toggle when reservation is confirmed', async () => {
-            reservation.reservationConfirmed = true;
-
+        it("emits correct events when state changes to CONFIRMED", async () => {
             const screen = renderComponent(EventShowReservation, props, {
                 piniaStoreOptions: {
                     initialState: {
@@ -101,11 +147,46 @@ describe("EventShowReservation", () => {
                 },
             });
 
-            const label = screen.getByText(t("EventShowReservation.waitingForResponse"));
-            await expect.element(label).not.toBeInTheDocument();
+            const select = screen.getByRole("combobox");
+            await userEvent.click(select);
+
+            const confirmedOption = screen.getByText(
+                t("EventShowReservation.reservationConfirmedLabel"),
+            );
+            await userEvent.click(confirmedOption);
+
+            expect(screen.emitted().reservationConfirmed).toBeTruthy();
+            expect(screen.emitted().reservationConfirmed[0]).toEqual([true]);
+            expect(screen.emitted().stateChange[0]).toEqual([ReservationState.CONFIRMED]);
         });
 
-        it('does not render the "Waiting for Response" toggle when guest has arrived', async () => {
+        it("emits correct events when state changes to ARRIVED", async () => {
+            const screen = renderComponent(EventShowReservation, props, {
+                piniaStoreOptions: {
+                    initialState: {
+                        auth: {
+                            user: {
+                                id: "user1",
+                                role: Role.PROPERTY_OWNER,
+                            },
+                        },
+                    },
+                },
+            });
+
+            await userEvent.click(screen.getByRole("combobox"));
+
+            const arrivedOption = screen.getByText(
+                t("EventShowReservation.reservationGuestArrivedLabel"),
+            );
+            await userEvent.click(arrivedOption);
+
+            expect(screen.emitted().arrived).toBeTruthy();
+            expect(screen.emitted().arrived[0]).toEqual([true]);
+            expect(screen.emitted().stateChange[0]).toEqual([ReservationState.ARRIVED]);
+        });
+
+        it("shows correct initial state based on reservation props", async () => {
             reservation.arrived = true;
 
             const screen = renderComponent(EventShowReservation, props, {
@@ -115,63 +196,16 @@ describe("EventShowReservation", () => {
                             user: {
                                 id: "user1",
                                 role: Role.PROPERTY_OWNER,
-                                capabilities: {
-                                    [UserCapability.CAN_CONFIRM_RESERVATION]: true,
-                                },
                             },
                         },
                     },
                 },
             });
 
-            const label = screen.getByText(t("EventShowReservation.waitingForResponse"));
-            await expect.element(label).not.toBeInTheDocument();
-        });
-
-        it('renders the "Reservation Confirmed" toggle when conditions are met', async () => {
-            const screen = renderComponent(EventShowReservation, props, {
-                piniaStoreOptions: {
-                    initialState: {
-                        auth: {
-                            user: {
-                                id: "user1",
-                                role: Role.PROPERTY_OWNER,
-                            },
-                        },
-                    },
-                },
-            });
-
-            const toggle = screen.getByText(t("EventShowReservation.reservationConfirmedLabel"));
-            await expect.element(toggle).toBeVisible();
-
-            await userEvent.click(toggle);
-
-            expect(screen.emitted().reservationConfirmed).toBeTruthy();
-            expect(screen.emitted().reservationConfirmed[0]).toEqual([true]);
-        });
-
-        it('renders the "Guest Arrived" toggle when conditions are met', async () => {
-            const screen = renderComponent(EventShowReservation, props, {
-                piniaStoreOptions: {
-                    initialState: {
-                        auth: {
-                            user: {
-                                id: "user1",
-                                role: Role.PROPERTY_OWNER,
-                            },
-                        },
-                    },
-                },
-            });
-
-            const toggle = screen.getByText(t("EventShowReservation.reservationGuestArrivedLabel"));
-            await expect.element(toggle).toBeVisible();
-
-            await userEvent.click(toggle);
-
-            expect(screen.emitted().arrived).toBeTruthy();
-            expect(screen.emitted().arrived[0]).toEqual([true]);
+            const select = screen.getByRole("combobox", { name: "Reservation state" });
+            await expect
+                .element(select)
+                .toHaveValue(t("EventShowReservation.reservationGuestArrivedLabel"));
         });
     });
 

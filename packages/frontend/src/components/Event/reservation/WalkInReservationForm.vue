@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { WalkInReservation } from "@firetable/types";
 import { isTimeWithinEventDuration } from "./reservation-form-utils";
-import { ReservationStatus, ReservationType } from "@firetable/types";
+import { ReservationState, ReservationStatus, ReservationType } from "@firetable/types";
 import { ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
@@ -45,6 +45,7 @@ function generateInitialState(): State {
     const formattedTime = hourFromTimestamp(initialTime, locale.value, props.timezone);
     return {
         type: ReservationType.WALK_IN as const,
+        state: ReservationState.ARRIVED,
         guestName: "",
         numberOfGuests: 2,
         guestContact: "",

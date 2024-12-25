@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { AppUser, PlannedReservation, User } from "@firetable/types";
 import { isTimeWithinEventDuration } from "./reservation-form-utils";
-import { ReservationStatus, ReservationType } from "@firetable/types";
+import { ReservationState, ReservationStatus, ReservationType } from "@firetable/types";
 import { computed, ref, watch, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
@@ -38,6 +38,7 @@ function generateInitialState() {
         ? { ...props.reservationData }
         : {
               type: ReservationType.PLANNED as const,
+              state: ReservationState.PENDING,
               guestName: "",
               numberOfGuests: 2,
               guestContact: "",

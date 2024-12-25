@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { ReservationDoc } from "@firetable/types";
 import type { GuestSummary } from "src/stores/guests-store";
-import { isPlannedReservation } from "@firetable/types";
-import { ref, toRef } from "vue";
+import { ReservationState, isPlannedReservation } from "@firetable/types";
+import { toRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { useAsyncState } from "@vueuse/core";
 import { usePermissionsStore } from "src/stores/permissions-store";
@@ -26,41 +26,43 @@ const emit = defineEmits<{
     (e: "copy" | "delete" | "edit" | "link" | "queue" | "transfer" | "unlink"): void;
     (e: "goToGuestProfile", guestId: string): void;
     (e: "arrived" | "cancel" | "reservationConfirmed" | "waitingForResponse", value: boolean): void;
+    (e: "stateChange", value: ReservationState): void;
 }>();
 const { t } = useI18n();
 
-const reservationConfirmed = ref(
-    isPlannedReservation(reservation) && reservation.reservationConfirmed,
-);
-const waitingForResponse = ref(
-    isPlannedReservation(reservation) && Boolean(reservation.waitingForResponse),
-);
 const { state: guestSummaryData } = useAsyncState(guestSummaryPromise, void 0);
 
 const {
+    reservationStateWithTranslationMap,
     canEditReservation,
     canDeleteReservation,
     canMoveToQueue,
     canCancel,
-    isGuestArrived,
+    reservationMappedState,
     isCancelled,
     isLinkedReservation,
 } = useReservationPermissions(toRef(() => reservation));
-
-function onGuestArrived(): void {
-    emit("arrived", !isGuestArrived.value);
-}
 
 function onReservationCancel(): void {
     emit("cancel", !isCancelled.value);
 }
 
-function onReservationConfirmed(): void {
-    emit("reservationConfirmed", !reservationConfirmed.value);
-}
-
-function onWaitingForResponse(): void {
-    emit("waitingForResponse", !waitingForResponse.value);
+function onStateChange(newState: ReservationState): void {
+    switch (newState) {
+        case ReservationState.ARRIVED:
+            emit("arrived", true);
+            break;
+        case ReservationState.CONFIRMED:
+            emit("reservationConfirmed", true);
+            break;
+        case ReservationState.WAITING_FOR_RESPONSE:
+            emit("waitingForResponse", true);
+            break;
+        case ReservationState.PENDING:
+            emit("waitingForResponse", false);
+            break;
+    }
+    emit("stateChange", newState);
 }
 </script>
 
@@ -91,75 +93,24 @@ function onWaitingForResponse(): void {
                 permissionsStore.canConfirmReservation
             "
         >
-            <template v-if="!isGuestArrived && !reservationConfirmed">
-                <q-separator />
-                <!-- waiting for response -->
-                <q-item tag="label" class="q-pa-none">
-                    <q-item-section>
-                        <q-item-label>
-                            {{ t("EventShowReservation.waitingForResponse") }}
-                        </q-item-label>
-                    </q-item-section>
-                    <q-item-section avatar>
-                        <q-toggle
-                            :model-value="waitingForResponse"
-                            @update:model-value="onWaitingForResponse"
-                            size="lg"
-                            unchecked-icon="close"
-                            checked-icon="check"
-                            color="yellow"
-                            v-close-popup
-                        />
-                    </q-item-section>
-                </q-item>
-            </template>
-
-            <!-- reservation confirmed -->
-            <template v-if="!isGuestArrived">
-                <q-separator />
-                <q-item tag="label" class="q-pa-none">
-                    <q-item-section>
-                        <q-item-label>
-                            {{ t("EventShowReservation.reservationConfirmedLabel") }}
-                        </q-item-label>
-                    </q-item-section>
-                    <q-item-section avatar>
-                        <q-toggle
-                            :model-value="reservationConfirmed"
-                            @update:model-value="onReservationConfirmed"
-                            size="lg"
-                            unchecked-icon="close"
-                            checked-icon="check"
-                            color="primary"
-                            v-close-popup
-                        />
-                    </q-item-section>
-                </q-item>
-            </template>
-
-            <!-- guest arrived -->
-            <q-separator class="q-ma-none" />
-            <q-item tag="label" class="q-pa-none">
-                <q-item-section>
-                    <q-item-label>
-                        {{ t("EventShowReservation.reservationGuestArrivedLabel") }}
-                    </q-item-label>
-                </q-item-section>
-                <q-item-section avatar>
-                    <q-toggle
-                        :model-value="isGuestArrived"
-                        @update:model-value="onGuestArrived"
-                        size="lg"
-                        unchecked-icon="close"
-                        checked-icon="check"
-                        color="green"
-                        v-close-popup
-                    />
-                </q-item-section>
-            </q-item>
+            <q-select
+                class="q-mb-md"
+                standout
+                rounded
+                :model-value="reservationMappedState"
+                :options="Object.values(reservationStateWithTranslationMap)"
+                option-label="label"
+                option-value="value"
+                emit-value
+                @update:model-value="onStateChange"
+                v-if="
+                    !isCancelled &&
+                    isPlannedReservation(reservation) &&
+                    permissionsStore.canConfirmReservation
+                "
+                aria-label="Reservation state"
+            />
         </template>
-
-        <q-separator v-if="!isCancelled" class="q-mb-md" />
 
         <q-item v-if="!isCancelled" class="q-pa-sm-none q-pa-xs-none q-gutter-xs q-ml-none">
             <FTBtn

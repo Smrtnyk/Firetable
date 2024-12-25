@@ -2,7 +2,7 @@ import type { AdminEventRTInfoProps } from "src/components/admin/event/AdminEven
 import type { PlannedReservationDoc } from "@firetable/types";
 import AdminEventRTInfo from "./AdminEventRTInfo.vue";
 import { renderComponent } from "../../../../test-helpers/render-component";
-import { ReservationStatus, ReservationType } from "@firetable/types";
+import { ReservationState, ReservationStatus, ReservationType } from "@firetable/types";
 import { beforeEach, describe, expect, it } from "vitest";
 import { FloorElementTypes } from "@firetable/floor-creator";
 
@@ -153,6 +153,7 @@ function createTestReservation(params: Partial<PlannedReservationDoc> = {}): Pla
     return {
         id: `res${Math.random()}`,
         type: ReservationType.PLANNED,
+        state: ReservationState.PENDING,
         guestName: "Guest",
         arrived: false,
         guestContact: "",

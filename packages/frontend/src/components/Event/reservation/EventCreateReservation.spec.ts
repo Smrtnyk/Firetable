@@ -7,9 +7,9 @@ import type {
 import type { EventCreateReservationProps } from "./EventCreateReservation.vue";
 import EventCreateReservation from "./EventCreateReservation.vue";
 import { renderComponent, t, getLocaleForTest } from "../../../../test-helpers/render-component";
+import { ReservationState, ReservationStatus, ReservationType } from "@firetable/types";
 import { getDefaultTimezone, hourFromTimestamp } from "src/helpers/date-utils";
 import { ONE_HOUR } from "src/constants";
-import { ReservationStatus, ReservationType } from "@firetable/types";
 import { describe, expect, it, beforeEach } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 import { addHours, format } from "date-fns";
@@ -47,6 +47,7 @@ describe("EventCreateReservation", () => {
             );
             return {
                 type: ReservationType.WALK_IN,
+                state: ReservationState.ARRIVED,
                 guestName: "",
                 numberOfGuests: 2,
                 guestContact: "",
@@ -65,6 +66,7 @@ describe("EventCreateReservation", () => {
         function generateUpdateState(): Omit<WalkInReservation, "creator"> {
             return {
                 type: ReservationType.WALK_IN,
+                state: ReservationState.ARRIVED,
                 guestName: "John Doe",
                 numberOfGuests: 4,
                 guestContact: "+43666666666",
@@ -345,6 +347,7 @@ describe("EventCreateReservation", () => {
         function generateInitialPlannedState(): Omit<PlannedReservation, "creator"> {
             return {
                 type: ReservationType.PLANNED,
+                state: ReservationState.PENDING,
                 guestName: "",
                 numberOfGuests: 2,
                 guestContact: "",
@@ -366,6 +369,7 @@ describe("EventCreateReservation", () => {
         function generateUpdatePlannedState(): Omit<PlannedReservation, "creator"> {
             return {
                 type: ReservationType.PLANNED,
+                state: ReservationState.PENDING,
                 guestName: "Charlie",
                 numberOfGuests: 5,
                 guestContact: "+432313213",

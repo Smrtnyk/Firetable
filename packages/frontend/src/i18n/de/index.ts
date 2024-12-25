@@ -156,6 +156,7 @@ export default {
         createdByLabel: "Ersteller",
         createdAtLabel: "Erstellt am",
         groupedWithLabel: "Gruppiert mit",
+        pendingLabel: "Ausstehend",
         reservationGuestArrivedLabel: "Gast ist eingetroffen",
         reservationConfirmedLabel: "Reservierung bestätigt",
         reservationConsumption: "Flaschenkonsum",

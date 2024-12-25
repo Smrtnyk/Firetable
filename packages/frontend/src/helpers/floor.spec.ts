@@ -1,7 +1,7 @@
 import type { BaseReservation, PlannedReservation, WalkInReservation } from "@firetable/types";
 import { determineTableColor } from "./floor.js";
+import { ReservationState, ReservationStatus, ReservationType } from "@firetable/types";
 import { describe, it, expect } from "vitest";
-import { ReservationStatus, ReservationType } from "@firetable/types";
 
 const colorPalette = {
     reservationArrivedColor: "#1a7722",
@@ -34,6 +34,7 @@ const plannedReservation: PlannedReservation = {
     status: ReservationStatus.ACTIVE,
     isVIP: false,
     creator: mockUser,
+    state: ReservationState.PENDING,
 };
 
 const walkInReservation: WalkInReservation = {
@@ -48,6 +49,7 @@ const walkInReservation: WalkInReservation = {
     status: ReservationStatus.ACTIVE,
     isVIP: true,
     creator: mockUser,
+    state: ReservationState.ARRIVED,
 };
 
 describe("determineTableColor", () => {

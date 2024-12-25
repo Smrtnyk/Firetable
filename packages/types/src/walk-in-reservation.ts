@@ -1,6 +1,6 @@
-import type { BaseReservation } from "./base-reservation.js";
 import type { PlannedReservation } from "./planned-reservation.js";
 import type { QueuedReservation } from "./queued-reservation.js";
+import type { BaseReservation, ReservationState } from "./base-reservation.js";
 import { ReservationType } from "./base-reservation.js";
 
 /**
@@ -24,6 +24,11 @@ export interface WalkInReservation extends BaseReservation {
      * Always true for walk-ins as they're already present
      */
     arrived: true;
+
+    /**
+     * Walk-in reservations are always ARRIVED
+     */
+    state: ReservationState.ARRIVED;
 }
 
 /**
