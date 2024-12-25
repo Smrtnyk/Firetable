@@ -60,7 +60,7 @@ function handleSelect(item: DrinkCardItem | InventoryItemDoc): void {
 
 <template>
     <!-- Category Pills -->
-    <q-card-section>
+    <q-card-section class="q-pa-none">
         <div class="q-gutter-sm q-mb-md flex-wrap justify-center">
             <q-chip
                 clickable
@@ -76,7 +76,7 @@ function handleSelect(item: DrinkCardItem | InventoryItemDoc): void {
         </div>
     </q-card-section>
 
-    <q-card-section>
+    <q-card-section class="q-pa-none">
         <q-input
             v-model="searchQuery"
             standout

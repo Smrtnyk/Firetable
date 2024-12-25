@@ -1,11 +1,11 @@
 <template>
-    <q-dialog position="bottom" ref="dialogRef">
-        <q-card class="ft-card item-selection-bottom-dialog">
-            <div class="row justify-center q-mb-md q-pt-md">
+    <q-dialog position="bottom" ref="dialogRef" no-backdrop-dismiss>
+        <q-card class="ft-card item-selection-bottom-dialog q-pa-md">
+            <div class="row justify-center q-mb-md">
                 <button
                     class="dialog-pill cursor-pointer"
-                    aria-label="Close dialog"
-                    @click="onDialogOK"
+                    aria-label="Close bottom dialog"
+                    @click="onDialogHide"
                 />
             </div>
 
@@ -25,7 +25,7 @@ interface Props {
 }
 
 const { component, listeners, componentPropsObject } = defineProps<Props>();
-const { dialogRef, onDialogOK } = useDialogPluginComponent();
+const { dialogRef, onDialogHide } = useDialogPluginComponent();
 
 defineEmits(useDialogPluginComponent.emits);
 </script>

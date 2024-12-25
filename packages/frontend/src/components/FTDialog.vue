@@ -8,7 +8,13 @@
         >
             <q-banner inline-actions>
                 <template #action>
-                    <q-btn round flat icon="close" @click="onDialogOK" />
+                    <q-btn
+                        round
+                        flat
+                        icon="close"
+                        @click="onDialogHide"
+                        aria-label="Close dialog"
+                    />
                 </template>
                 <h6 class="text-h6 q-ma-none q-ml-sm" v-if="title">{{ title }}</h6>
             </q-banner>
@@ -40,7 +46,7 @@ const {
     listeners,
     componentPropsObject,
 } = defineProps<Props>();
-const { dialogRef, onDialogOK } = useDialogPluginComponent();
+const { dialogRef, onDialogHide } = useDialogPluginComponent();
 
 defineEmits(useDialogPluginComponent.emits);
 </script>

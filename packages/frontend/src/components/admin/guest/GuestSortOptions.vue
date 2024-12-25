@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { Ref } from "vue";
+
 export type SortOption =
     /**
      * When sorting by bookings try to prioritize guests with the highest percentage of fulfilled visits.
@@ -24,18 +26,13 @@ export type SortOption =
 export type SortDirection = "asc" | "desc";
 
 interface GuestSortOptionsProps {
-    currentSortOption: SortOption;
-    currentSortDirection: SortDirection;
-    availableTags: string[];
-    selectedTags: string[];
+    currentSortOption: Ref<SortOption>;
+    currentSortDirection: Ref<SortDirection>;
+    availableTags: Ref<string[]>;
+    selectedTags: Ref<string[]>;
 }
 
-const {
-    currentSortOption,
-    currentSortDirection,
-    availableTags = [],
-    selectedTags = [],
-} = defineProps<GuestSortOptionsProps>();
+const props = defineProps<GuestSortOptionsProps>();
 
 const emit = defineEmits<{
     (e: "update:sortOption", value: SortOption): void;
@@ -57,84 +54,60 @@ function updateSelectedTags(value: string[]): void {
 </script>
 
 <template>
-    <q-card class="q-pa-md">
-        <div class="row justify-center q-mb-md">
-            <button
-                class="dialog-pill cursor-pointer"
-                aria-label="Close dialog"
-                @click="$emit('close')"
-            />
-        </div>
-
-        <template v-if="availableTags.length > 0">
-            <q-select
-                :model-value="selectedTags"
-                :options="availableTags"
-                clear-icon="close"
-                multiple
-                use-chips
-                standout
-                rounded
-                dense
-                label="Filter by tags"
-                @update:model-value="updateSelectedTags"
-            />
-
-            <q-separator class="q-my-md" />
-        </template>
-
-        <div class="text-weight-bolder q-mb-sm">Sort by</div>
-        <q-list>
-            <q-item
-                tag="label"
-                v-for="option in sortOptions"
-                :key="option.value"
-                clickable
-                @click="emit('update:sortOption', option.value)"
-                class="q-pa-none"
-            >
-                <q-item-section avatar>
-                    <q-radio
-                        :model-value="currentSortOption"
-                        :val="option.value"
-                        color="primary"
-                        @update:model-value="emit('update:sortOption', option.value)"
-                    />
-                </q-item-section>
-                <q-item-section>
-                    <q-item-label>{{ option.label }}</q-item-label>
-                </q-item-section>
-
-                <q-item-section> </q-item-section>
-            </q-item>
-        </q-list>
+    <template v-if="props.availableTags.value.length > 0">
+        <q-select
+            :model-value="selectedTags.value"
+            :options="props.availableTags.value"
+            clear-icon="close"
+            multiple
+            use-chips
+            standout
+            rounded
+            dense
+            label="Filter by tags"
+            @update:model-value="updateSelectedTags"
+        />
 
         <q-separator class="q-my-md" />
+    </template>
 
-        <div class="text-weight-bolder q-mb-sm">Direction</div>
-        <q-item clickable @click="emit('toggleDirection')">
-            <q-item-section>
-                {{ currentSortDirection === "desc" ? "Descending" : "Ascending" }}
-            </q-item-section>
-            <q-item-section side>
-                <q-icon
-                    :name="currentSortDirection === 'desc' ? 'arrow-sort-down' : 'arrow-sort-up'"
+    <div class="text-weight-bolder q-mb-sm">Sort by</div>
+    <q-list>
+        <q-item
+            tag="label"
+            v-for="option in sortOptions"
+            :key="option.value"
+            clickable
+            @click="emit('update:sortOption', option.value)"
+            class="q-pa-none"
+        >
+            <q-item-section avatar>
+                <q-radio
+                    :model-value="currentSortOption.value"
+                    :val="option.value"
+                    color="primary"
+                    @update:model-value="emit('update:sortOption', option.value)"
                 />
             </q-item-section>
+            <q-item-section>
+                <q-item-label>{{ option.label }}</q-item-label>
+            </q-item-section>
+
+            <q-item-section> </q-item-section>
         </q-item>
-    </q-card>
+    </q-list>
+
+    <q-separator class="q-my-md" />
+
+    <div class="text-weight-bolder q-mb-sm">Direction</div>
+    <q-item clickable @click="emit('toggleDirection')">
+        <q-item-section>
+            {{ currentSortDirection.value === "desc" ? "Descending" : "Ascending" }}
+        </q-item-section>
+        <q-item-section side>
+            <q-icon
+                :name="currentSortDirection.value === 'desc' ? 'arrow-sort-down' : 'arrow-sort-up'"
+            />
+        </q-item-section>
+    </q-item>
 </template>
-
-<style scoped>
-.dialog-pill {
-    width: 36px;
-    height: 4px;
-    background-color: #e0e0e0;
-    border-radius: 4px;
-    transition: background-color 0.3s;
-}
-
-.dialog-pill:hover {
-    background-color: #bdbdbd;
-}
-</style>

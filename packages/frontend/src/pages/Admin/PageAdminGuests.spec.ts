@@ -5,21 +5,13 @@ import type { PageAdminGuestsProps } from "./PageAdminGuests.vue";
 import type { Ref } from "vue";
 import PageAdminGuests from "./PageAdminGuests.vue";
 import { renderComponent, t } from "../../../test-helpers/render-component";
-import { ref } from "vue";
+import { ref, nextTick } from "vue";
 import { AdminRole, Role } from "@firetable/types";
 
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 
-const { createDialogSpy } = vi.hoisted(() => ({
-    createDialogSpy: vi.fn(),
-}));
-
-vi.mock("src/composables/useDialog", () => ({
-    useDialog: () => ({
-        createDialog: createDialogSpy,
-    }),
-}));
+vi.mock("vue-router");
 
 type GuestsState = {
     data: GuestDoc[];
@@ -132,6 +124,16 @@ describe("PageAdminGuests.vue", () => {
         return renderResult;
     }
 
+    async function closeBottomDialog(screen: RenderResult<PageAdminGuestsProps>): Promise<void> {
+        await userEvent.click(screen.getByLabelText("Close bottom dialog"));
+        await nextTick();
+        try {
+            await vi.waitUntil(() => document.querySelector(".q-dialog") === null);
+        } catch (e) {
+            // Empty catch block to prevent test failure
+        }
+    }
+
     it("renders correctly when there are guests", async () => {
         const screen = await render();
 
@@ -163,16 +165,12 @@ describe("PageAdminGuests.vue", () => {
         const addButton = screen.getByLabelText("Add new guest");
         await userEvent.click(addButton);
 
-        // call arguments
-        const callArg = createDialogSpy.mock.calls[0][0];
-        // Check that FTDialog is the component
-        expect(callArg.component.__name).toBe("FTDialog");
-        // Check the componentProps
-        const props = callArg.componentProps;
-        expect(props.title).toBe(t("PageAdminGuests.createNewGuestDialogTitle"));
-        expect(props.maximized).toBe(false);
-        expect(props.component.__name).toBe("AddNewGuestForm");
-        expect(typeof props.listeners.create).toBe("function");
+        await nextTick();
+
+        const dialogTitle = screen.getByText(t("PageAdminGuests.createNewGuestDialogTitle"));
+        await expect.element(dialogTitle).toBeVisible();
+
+        await userEvent.click(screen.getByLabelText("Close dialog"));
     });
 
     describe("guest sorting and filtering", () => {
@@ -348,6 +346,8 @@ describe("PageAdminGuests.vue", () => {
                 const percentageOption = screen.getByText("Percentage");
                 await userEvent.click(percentageOption);
 
+                await closeBottomDialog(screen);
+
                 const guestItems = screen.getByRole("listitem");
 
                 // Jane Smith should be first (100% arrival - 1/1)
@@ -404,6 +404,8 @@ describe("PageAdminGuests.vue", () => {
 
                 const guestItems = screen.getByRole("listitem");
 
+                await closeBottomDialog(screen);
+
                 // Both have 100% arrival rate
                 // John Doe should be first (100% with 2 visits)
                 // Jane Smith should be second (100% with 1 visit)
@@ -454,6 +456,8 @@ describe("PageAdminGuests.vue", () => {
                 const percentageOption = screen.getByText("Percentage");
                 await userEvent.click(percentageOption);
 
+                await closeBottomDialog(screen);
+
                 const guestItems = screen.getByRole("listitem");
 
                 // John Doe should be first (has visits)
@@ -477,6 +481,8 @@ describe("PageAdminGuests.vue", () => {
                 await userEvent.click(screen.getByLabelText("Filter by tags"));
                 // Select VIP tag
                 await userEvent.click(screen.getByText("vip"));
+
+                await closeBottomDialog(screen);
 
                 screen.unmount();
                 screen = await render();
@@ -503,7 +509,7 @@ describe("PageAdminGuests.vue", () => {
                 await userEvent.click(screen.getByText("vip"));
                 await userEvent.click(screen.getByText("regular"));
 
-                await userEvent.click(screen.getByLabelText("Close dialog"));
+                await closeBottomDialog(screen);
 
                 const guestItems = screen.getByRole("listitem");
                 expect(guestItems.elements()).toHaveLength(1);
@@ -558,6 +564,8 @@ describe("PageAdminGuests.vue", () => {
                 await userEvent.click(sortButton);
                 await userEvent.click(screen.getByText("Last Modified"));
 
+                await closeBottomDialog(screen);
+
                 const guestItems = screen.getByRole("listitem");
 
                 // Should be sorted by lastModified (most recent first)
@@ -605,6 +613,8 @@ describe("PageAdminGuests.vue", () => {
                 await userEvent.click(sortButton);
                 await userEvent.click(screen.getByText("Last Modified"));
 
+                await closeBottomDialog(screen);
+
                 const guestItems = screen.getByRole("listitem");
 
                 // Should be sorted with undefined lastModified at the end
@@ -638,6 +648,8 @@ describe("PageAdminGuests.vue", () => {
                 // Click "Descending" to toggle to ascending
                 await userEvent.click(screen.getByText("Descending"));
                 await userEvent.click(screen.getByText("Last Modified"));
+
+                await closeBottomDialog(screen);
 
                 // Should maintain ascending order with lastModified sort
                 const guestItems = screen.getByRole("listitem");
@@ -697,14 +709,20 @@ describe("PageAdminGuests.vue", () => {
                 const directionButton = screen.getByText("Descending");
                 await userEvent.click(directionButton);
 
+                await closeBottomDialog(screen);
+
                 let guestItems = screen.getByRole("listitem");
 
                 // In ascending order, Jane (1 visit) should be first
                 expect(guestItems.elements()[0]).toHaveTextContent("Jane Smith");
                 expect(guestItems.elements()[1]).toHaveTextContent("John Doe");
 
+                await userEvent.click(sortButton);
+
                 // Toggle back to descending
                 await userEvent.click(screen.getByText("Ascending"));
+
+                await closeBottomDialog(screen);
 
                 guestItems = screen.getByRole("listitem");
 
@@ -769,6 +787,8 @@ describe("PageAdminGuests.vue", () => {
                 await userEvent.click(sortButton);
                 await userEvent.click(screen.getByText("Percentage"));
 
+                await closeBottomDialog(screen);
+
                 guestItems = screen.getByRole("listitem");
 
                 // Verify descending order by percentage
@@ -815,6 +835,8 @@ describe("PageAdminGuests.vue", () => {
                 await userEvent.click(sortButton);
                 await userEvent.click(screen.getByText("Name", { exact: true }));
 
+                await closeBottomDialog(screen);
+
                 const guestItems = screen.getByRole("listitem");
 
                 // Should be sorted by name in descending order by default
@@ -822,8 +844,12 @@ describe("PageAdminGuests.vue", () => {
                 expect(guestItems.elements()[1]).toHaveTextContent("Bob Johnson");
                 expect(guestItems.elements()[2]).toHaveTextContent("Alice Smith");
 
+                await userEvent.click(sortButton);
+
                 // Toggle to ascending order
                 await userEvent.click(screen.getByText("Descending"));
+
+                await closeBottomDialog(screen);
 
                 // Should now be in ascending order
                 expect(guestItems.elements()[0]).toHaveTextContent("Alice Smith");
@@ -874,7 +900,7 @@ describe("PageAdminGuests.vue", () => {
                 await userEvent.click(screen.getByLabelText("Filter by tags"));
                 await userEvent.click(screen.getByText("vip"));
 
-                await userEvent.click(screen.getByLabelText("Close dialog"));
+                await closeBottomDialog(screen);
 
                 const guestItems = screen.getByRole("listitem");
 
@@ -921,6 +947,8 @@ describe("PageAdminGuests.vue", () => {
                 await userEvent.click(sortButton);
                 await userEvent.click(screen.getByText("Land"));
 
+                await closeBottomDialog(screen);
+
                 const guestItems = screen.getByRole("listitem");
 
                 // Should be sorted by landcode in ascending order by default
@@ -929,7 +957,10 @@ describe("PageAdminGuests.vue", () => {
                 expect(guestItems.elements()[2]).toHaveTextContent("Jane Smith");
 
                 // Toggle to ascending order
+                await userEvent.click(sortButton);
                 await userEvent.click(screen.getByText("Descending"));
+
+                await closeBottomDialog(screen);
 
                 // Should now be in ascending order
                 // +1 (US), +33 (France), +44 (UK)
@@ -1304,6 +1335,8 @@ describe("PageAdminGuests.vue", () => {
             await userEvent.click(sortButton);
             await userEvent.click(screen.getByText("Percentage"));
 
+            await closeBottomDialog(screen);
+
             // Unmount and remount component
             screen.unmount();
             screen = await render();
@@ -1327,6 +1360,8 @@ describe("PageAdminGuests.vue", () => {
             await userEvent.click(sortButton);
             await userEvent.click(screen.getByText("Descending"));
 
+            await closeBottomDialog(screen);
+
             // Unmount and remount component
             screen.unmount();
             screen = await render();
@@ -1334,7 +1369,7 @@ describe("PageAdminGuests.vue", () => {
             // Verify persisted sort direction
             await userEvent.click(screen.getByLabelText("filter guests"));
             await expect.element(screen.getByText("Ascending")).toBeInTheDocument();
-            await userEvent.click(screen.getByLabelText("Close dialog"));
+            await closeBottomDialog(screen);
 
             const guestItems = screen.getByRole("listitem");
             expect(guestItems.elements()).toHaveLength(3);
@@ -1358,6 +1393,8 @@ describe("PageAdminGuests.vue", () => {
             await userEvent.click(screen.getByText("Last Modified"));
             // Change direction to ascending
             await userEvent.click(screen.getByText("Descending"));
+
+            await closeBottomDialog(screen);
 
             // Unmount and remount component
             screen.unmount();

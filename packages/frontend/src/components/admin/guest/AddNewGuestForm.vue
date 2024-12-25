@@ -11,7 +11,7 @@ import { useI18n } from "vue-i18n";
 import { capitalizeName } from "src/helpers/capitalize-name";
 
 export interface AddNewGuestFormProps {
-    mode: "create" | "edit";
+    mode?: "create" | "edit";
     initialData?: {
         name: string;
         contact: string;

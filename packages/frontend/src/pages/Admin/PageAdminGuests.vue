@@ -13,6 +13,7 @@ import { useAuthStore } from "src/stores/auth-store";
 import { useGuestsStore } from "src/stores/guests-store";
 import { useLocalStorage } from "@vueuse/core";
 import { useRouter } from "vue-router";
+import { property } from "es-toolkit/compat";
 
 import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
@@ -21,7 +22,7 @@ import FTDialog from "src/components/FTDialog.vue";
 import FTBtn from "src/components/FTBtn.vue";
 import GuestSummaryChips from "src/components/guest/GuestSummaryChips.vue";
 import GuestSortOptions from "src/components/admin/guest/GuestSortOptions.vue";
-import { property } from "es-toolkit/compat";
+import FTBottomDialog from "src/components/FTBottomDialog.vue";
 
 export interface PageAdminGuestsProps {
     organisationId: string;
@@ -35,7 +36,6 @@ const { t } = useI18n();
 const props = defineProps<PageAdminGuestsProps>();
 const guestsStore = useGuestsStore();
 const guestsRef = guestsStore.getGuests(props.organisationId);
-const sortDialog = ref(false);
 const guests = computed(() => guestsRef.value.data);
 const isLoading = computed(() => guestsRef.value.pending);
 const { isAdmin } = storeToRefs(useAuthStore());
@@ -200,7 +200,29 @@ const pageTitle = computed(function () {
 });
 
 function showSortDialog(): void {
-    sortDialog.value = true;
+    createDialog({
+        component: FTBottomDialog,
+        componentProps: {
+            component: GuestSortOptions,
+            componentPropsObject: {
+                currentSortOption: sortOption,
+                currentSortDirection: sortDirection,
+                availableTags,
+                selectedTags,
+            },
+            listeners: {
+                "update:sortOption"(payload) {
+                    setSortOption(payload);
+                },
+                "update:selectedTags"(payload) {
+                    selectedTags.value = payload;
+                },
+                toggleDirection() {
+                    toggleSortDirection();
+                },
+            },
+        },
+    });
 }
 
 function setSortOption(option: SortOption): void {
@@ -460,19 +482,6 @@ async function bulkDeleteSelected(): Promise<void> {
         <FTCenteredText v-if="!isLoading && filteredGuests.length === 0">{{
             t("PageAdminGuests.noGuestsData")
         }}</FTCenteredText>
-
-        <q-dialog v-model="sortDialog" position="bottom">
-            <GuestSortOptions
-                :current-sort-option="sortOption"
-                :current-sort-direction="sortDirection"
-                :available-tags="availableTags"
-                :selected-tags="selectedTags"
-                @close="sortDialog = false"
-                @update:sort-option="setSortOption"
-                @update:selected-tags="selectedTags = $event"
-                @toggle-direction="toggleSortDirection"
-            />
-        </q-dialog>
 
         <q-page-sticky
             v-if="showScrollButton"

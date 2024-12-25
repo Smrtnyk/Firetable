@@ -27,6 +27,8 @@ import {
     QTimeline,
     QTimelineEntry,
     QToggle,
+    QRadio,
+    QMenu,
     Quasar,
     IconSet,
     BottomSheet,
@@ -130,6 +132,8 @@ export function renderComponent(
                 QToggle,
                 QList,
                 QDialog,
+                QRadio,
+                QMenu,
             },
         },
     };
