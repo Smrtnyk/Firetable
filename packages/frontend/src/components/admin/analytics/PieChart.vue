@@ -39,7 +39,7 @@ const chartOption = computed<ECPieOption>(() => ({
             color: "#1A1A1A",
             fontSize: 14,
         },
-        formatter: (params: any) => {
+        formatter(params: any) {
             const { name, value, percent } = params;
             return `${name}<br/>Value: ${value}<br/>Percentage: ${percent}%`;
         },

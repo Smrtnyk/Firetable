@@ -45,7 +45,7 @@ const currentReservationType = computed(function () {
     return props.reservationData?.type ?? ReservationType.PLANNED;
 });
 
-const showPlannedReservationForm = computed(() => {
+const showPlannedReservationForm = computed(function () {
     return (
         props.onlyPlanned ||
         reservationType.value === ReservationType.PLANNED ||
@@ -53,7 +53,7 @@ const showPlannedReservationForm = computed(() => {
     );
 });
 
-const showWalkInReservationForm = computed(() => {
+const showWalkInReservationForm = computed(function () {
     // Only show Walk-In form if not in 'onlyPlanned' mode
     return (
         !props.onlyPlanned &&
@@ -112,7 +112,7 @@ function resetForm(): void {
     currentlyActiveRef.value?.reset();
 }
 
-const hasChanges = computed(() => {
+const hasChanges = computed(function () {
     if (!currentlyActiveRef.value?.state || !props.reservationData) {
         return false;
     }

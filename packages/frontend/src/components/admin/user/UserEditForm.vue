@@ -50,7 +50,7 @@ const form = ref<EditUserPayload["updatedUser"]>({
 });
 const chosenProperties = ref<string[]>(props.selectedProperties.map(property("id")));
 
-const capabilitiesToDisplay = computed(() => {
+const capabilitiesToDisplay = computed(function () {
     if (form.value.role === Role.STAFF) {
         return Object.entries(form.value.capabilities ?? {}) as [UserCapability, boolean][];
     }
@@ -73,7 +73,7 @@ const previousCapabilities: Partial<Record<Role, UserCapabilities>> = {
 
 watch(
     () => form.value.role,
-    (newRole, oldRole) => {
+    function (newRole, oldRole) {
         // Store the current capabilities for the old role
         previousCapabilities[oldRole] = { ...form.value.capabilities };
 

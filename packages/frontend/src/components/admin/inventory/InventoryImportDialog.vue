@@ -84,7 +84,7 @@ const isDragging = ref(false);
 const fileInput = ref<HTMLInputElement>();
 const selectedFile = ref<File | null>(null);
 
-const canImport = computed(() => {
+const canImport = computed(function () {
     if (activeTab.value === "file") {
         return selectedFile.value !== null;
     }

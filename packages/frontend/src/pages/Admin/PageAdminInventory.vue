@@ -54,7 +54,7 @@ const {
 
 const drinkMainCategoryEnumValues = getEnumValues({ ...DrinkMainCategory, ...RetailMainCategory });
 
-const categorizedInventory = computed(() => {
+const categorizedInventory = computed(function () {
     if (!inventoryData.value) {
         return {};
     }

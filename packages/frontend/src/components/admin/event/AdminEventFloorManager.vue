@@ -4,6 +4,7 @@ import type { SortableEvent } from "vue-draggable-plus";
 import { computed } from "vue";
 import { vDraggable } from "vue-draggable-plus";
 import { buttonSize, isMobile } from "src/global-reactives/screen-detection";
+import { property } from "es-toolkit/compat";
 
 export interface AdminEventFloorManagerProps {
     /** List of current floors */
@@ -38,19 +39,19 @@ const draggableOptions = computed(() => ({
         : {}),
 }));
 
-const floorsWithReservations = computed(function (): Set<string> {
+const floorsWithReservations = computed(function () {
     if (!props.reservations) {
         return new Set<string>();
     }
 
-    return new Set(props.reservations.map((reservation) => reservation.floorId));
+    return new Set(props.reservations.map(property("floorId")));
 });
 
 function canDeleteFloor(floorId: string): boolean {
     return !floorsWithReservations.value.has(floorId);
 }
 
-const remainingFloors = computed(() => {
+const remainingFloors = computed(function () {
     if (!props.maxFloors) {
         return;
     }

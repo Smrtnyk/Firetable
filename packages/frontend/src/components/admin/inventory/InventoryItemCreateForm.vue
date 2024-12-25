@@ -32,7 +32,7 @@ const emit = defineEmits<(e: "submit", item: CreateInventoryItemPayload) => void
 
 const typeOptions = getEnumValues(InventoryItemType);
 
-const mainCategoryOptions = computed(() => {
+const mainCategoryOptions = computed(function () {
     if (isDrinkItem(form.value)) {
         return getEnumValues(DrinkMainCategory);
     }
@@ -44,7 +44,7 @@ const mainCategoryOptions = computed(() => {
     return [];
 });
 
-const subCategoryOptions = computed(() => {
+const subCategoryOptions = computed(function () {
     if (form.value.type === InventoryItemType.DRINK) {
         switch (form.value.mainCategory) {
             case DrinkMainCategory.SPIRITS:

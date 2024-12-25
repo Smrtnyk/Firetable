@@ -14,6 +14,7 @@ import { useGuestsStore } from "src/stores/guests-store";
 import { useLocalStorage } from "@vueuse/core";
 import { useRouter } from "vue-router";
 import { property } from "es-toolkit/compat";
+import { lowerCase, uniq } from "es-toolkit";
 
 import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
@@ -157,14 +158,9 @@ const sortedGuests = computed(function () {
 
 const selectedTags = useLocalStorage<string[]>("guest-list-selected-tags", []);
 
-const availableTags = computed(() => {
-    const tagSet = new Set<string>();
-    guests.value?.forEach((guest) => {
-        if (guest.tags?.length) {
-            guest.tags.forEach((tag) => tagSet.add(tag.toLowerCase()));
-        }
-    });
-    return Array.from(tagSet).sort();
+const availableTags = computed(function () {
+    const guestsWithTags = guests.value?.map(({ tags }) => tags ?? []) ?? [];
+    return uniq(guestsWithTags.flat()).sort();
 });
 
 const filteredGuests = computed(function () {
@@ -182,10 +178,14 @@ const filteredGuests = computed(function () {
 
     // Apply tag filter
     if (selectedTags.value.length > 0) {
-        filtered = filtered.filter((guest) => {
-            if (!guest.tags) return false;
-            const guestTagsLower = guest.tags.map((tag) => tag.toLowerCase());
-            return selectedTags.value.every((tag) => guestTagsLower.includes(tag.toLowerCase()));
+        filtered = filtered.filter(function (guest) {
+            if (!guest.tags) {
+                return false;
+            }
+            const guestTagsLower = guest.tags.map(lowerCase);
+            return selectedTags.value.every(function (tag) {
+                return guestTagsLower.includes(tag.toLowerCase());
+            });
         });
     }
 
@@ -287,7 +287,9 @@ const selectionMode = ref(false);
 const allSelected = computed(function () {
     return (
         filteredGuests.value.length > 0 &&
-        filteredGuests.value.every(({ id }) => selectedGuests.value.includes(id))
+        filteredGuests.value.every(function ({ id }) {
+            return selectedGuests.value.includes(id);
+        })
     );
 });
 

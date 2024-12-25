@@ -16,7 +16,7 @@ const deleteForm = useTemplateRef<QForm>("deleteForm");
 
 const nameRules = [
     noEmptyString("Organisation name is required"),
-    (value: string) => {
+    function (value: string) {
         return value === props.organisation.name || "Organisation name doesn't match";
     },
 ];

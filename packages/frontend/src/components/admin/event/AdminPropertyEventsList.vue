@@ -22,7 +22,7 @@ const { events, timezone, done } = defineProps<Props>();
 const eventsLength = computed(function () {
     return events.length;
 });
-const bucketizedEvents = computed(() => {
+const bucketizedEvents = computed(function () {
     const upcomingEvents = new Map<string, Map<string, EventDoc[]>>();
     const pastEvents = new Map<string, Map<string, EventDoc[]>>();
     const now = new Date();

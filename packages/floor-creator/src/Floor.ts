@@ -78,7 +78,7 @@ export abstract class Floor {
     };
 
     setObjectCoords(): void {
-        this.canvas.forEachObject((object) => {
+        this.canvas.forEachObject(function (object) {
             object.setCoords();
         });
     }

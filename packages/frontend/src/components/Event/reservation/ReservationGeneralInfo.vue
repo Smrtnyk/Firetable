@@ -13,7 +13,7 @@ const props = defineProps<{
 const { t, locale } = useI18n();
 const permissionsStore = usePermissionsStore();
 
-const createdAt = computed(() => {
+const createdAt = computed(function () {
     const createdAtValue = props.reservation.creator.createdAt;
     return getFormatedDateFromTimestamp(createdAtValue, locale.value, props.timezone);
 });

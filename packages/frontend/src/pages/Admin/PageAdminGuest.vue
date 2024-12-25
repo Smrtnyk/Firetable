@@ -69,7 +69,7 @@ const propertiesVisits = computed(function () {
     return visitsByProperty;
 });
 
-const singlePropertyVisits = computed(() => {
+const singlePropertyVisits = computed(function () {
     const propertiesKeys = Object.keys(propertiesVisits.value);
     if (propertiesKeys.length === 1) {
         const singleProperty = propertiesVisits.value[propertiesKeys[0]];

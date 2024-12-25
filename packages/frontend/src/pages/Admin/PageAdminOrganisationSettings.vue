@@ -60,14 +60,14 @@ const editableSettings = ref<EditableSettings>({
 
 const aspectRatioOptions = ["1", "16:9"];
 
-const hasSettingsChanged = computed(() => {
+const hasSettingsChanged = computed(function () {
     // Check if organisation settings changed
     const organisationChanged =
         JSON.stringify(editableSettings.value.organisation) !==
         JSON.stringify(organisationSettings.value);
 
     // Check if any property settings changed
-    const propertiesChanged = properties.value.some((property) => {
+    const propertiesChanged = properties.value.some(function (property) {
         const currentSettings = propertiesStore.getPropertySettingsById(property.id);
         const editedSettings = editableSettings.value.properties[property.id];
         return JSON.stringify(currentSettings) !== JSON.stringify(editedSettings);

@@ -4,18 +4,18 @@ import { computed } from "vue";
 import { getTablesFromFloorDoc } from "@firetable/floor-creator";
 import { property } from "es-toolkit/compat";
 
-interface Props {
+export interface AdminEventRTInfoProps {
     floors: FloorDoc[];
     activeReservations: ReservationDoc[];
     returningGuests: { id: string }[];
 }
 
-const props = defineProps<Props>();
+const props = defineProps<AdminEventRTInfoProps>();
 
 function getUniqueFloorNames(floors: FloorDoc[]): Map<string, FloorDoc[]> {
     const floorGroups = new Map<string, FloorDoc[]>();
 
-    floors.forEach((floor) => {
+    floors.forEach(function (floor) {
         const baseName = floor.name.replace(/_copy$/, "");
         if (!floorGroups.has(baseName)) {
             floorGroups.set(baseName, []);
@@ -42,20 +42,22 @@ function calculateTotalTables(floors: FloorDoc[]): number {
     return totalTables;
 }
 
-const reservationsStatus = computed(() => {
-    const currentlyOccupied = props.activeReservations.filter(property("arrived")).length;
+const reservationsStatus = computed(function () {
+    const currentlyOccupied = props.activeReservations
+        .map(property("arrived"))
+        .filter(Boolean).length;
     const pending = props.activeReservations.length - currentlyOccupied;
 
-    const guestsWithContacts = props.activeReservations.filter(
-        ({ guestContact }) => guestContact,
-    ).length;
-    const vipGuests = props.activeReservations.filter(({ isVIP }) => isVIP).length;
+    const guestsWithContacts = props.activeReservations
+        .map(property("guestContact"))
+        .filter(Boolean).length;
+    const vipGuests = props.activeReservations.map(property("isVIP")).filter(Boolean).length;
 
-    const totalGuests = props.activeReservations.reduce((acc, reservation) => {
+    const totalGuests = props.activeReservations.reduce(function (acc, reservation) {
         return acc + Number(reservation.numberOfGuests || 0);
     }, 0);
 
-    const totalConsumption = props.activeReservations.reduce((acc, reservation) => {
+    const totalConsumption = props.activeReservations.reduce(function (acc, reservation) {
         return acc + Number(reservation.consumption || 0);
     }, 0);
 
@@ -71,14 +73,18 @@ const reservationsStatus = computed(() => {
     };
 });
 
-const occupancyRate = computed(() => {
+const occupancyRate = computed(function () {
+    // If total is 0, return 0 rate to avoid division by zero
+    if (reservationsStatus.value.total === 0) {
+        return "0.0";
+    }
     return (
         (reservationsStatus.value.currentlyOccupied / reservationsStatus.value.total) *
         100
     ).toFixed(1);
 });
 
-const contactRate = computed(() => {
+const contactRate = computed(function () {
     return (
         (reservationsStatus.value.guestsWithContacts / reservationsStatus.value.totalGuests) *
         100
@@ -96,13 +102,17 @@ const contactRate = computed(() => {
                     <q-card-section>
                         <div class="text-h6">Capacity Overview</div>
                         <div class="row items-center q-gutter-x-md">
-                            <div class="text-h3">{{ occupancyRate }}%</div>
+                            <div class="text-h3" aria-label="occupancy rate">
+                                {{ occupancyRate }}%
+                            </div>
                             <div class="column">
-                                <div>
+                                <div aria-label="tables occupied">
                                     {{ reservationsStatus.currentlyOccupied }} /
                                     {{ reservationsStatus.total }} tables
                                 </div>
-                                <div>{{ reservationsStatus.pending }} pending</div>
+                                <div aria-label="pending reservations">
+                                    {{ reservationsStatus.pending }} pending
+                                </div>
                             </div>
                         </div>
                     </q-card-section>
@@ -115,10 +125,14 @@ const contactRate = computed(() => {
                     <q-card-section>
                         <div class="text-h6">Guest Statistics</div>
                         <div class="row items-center q-gutter-x-md">
-                            <div class="text-h3">{{ reservationsStatus.totalGuests }}</div>
+                            <div class="text-h3" aria-label="total guests">
+                                {{ reservationsStatus.totalGuests }}
+                            </div>
                             <div class="column">
                                 <div>Total Guests</div>
-                                <div>{{ contactRate }}% with contacts</div>
+                                <div aria-label="guest contact rate">
+                                    {{ contactRate }}% with contacts
+                                </div>
                             </div>
                         </div>
                     </q-card-section>
@@ -130,7 +144,9 @@ const contactRate = computed(() => {
                 <q-card class="ft-card">
                     <q-card-section>
                         <div class="text-subtitle2">VIP Guests</div>
-                        <div class="text-h5">{{ reservationsStatus.vipGuests }}</div>
+                        <div class="text-h5" aria-label="vip guest count">
+                            {{ reservationsStatus.vipGuests }}
+                        </div>
                     </q-card-section>
                 </q-card>
             </div>
@@ -139,7 +155,9 @@ const contactRate = computed(() => {
                 <q-card class="ft-card">
                     <q-card-section>
                         <div class="text-subtitle2">Returning Guests</div>
-                        <div class="text-h5">{{ reservationsStatus.returningGuests }}</div>
+                        <div class="text-h5" aria-label="returning guest count">
+                            {{ reservationsStatus.returningGuests }}
+                        </div>
                     </q-card-section>
                 </q-card>
             </div>
@@ -148,7 +166,7 @@ const contactRate = computed(() => {
                 <q-card class="ft-card">
                     <q-card-section>
                         <div class="text-subtitle2">Avg. Consumption</div>
-                        <div class="text-h5">
+                        <div class="text-h5" aria-label="average consumption">
                             {{ reservationsStatus.averageConsumption.toFixed(2) }}
                         </div>
                     </q-card-section>

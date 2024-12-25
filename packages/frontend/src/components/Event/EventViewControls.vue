@@ -34,7 +34,7 @@ const {
     canExportReservations,
 } = defineProps<EventViewControlsProps>();
 
-const currentActiveIndex = computed(() => {
+const currentActiveIndex = computed(function () {
     return floors.findIndex(function (floor) {
         return isActiveFloor(floor.id);
     });

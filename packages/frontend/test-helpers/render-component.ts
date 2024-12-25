@@ -64,7 +64,7 @@ export function getLocaleForTest(): WritableComputedRef<"de" | "en-GB", "de" | "
  * Function to render a component with Quasar plugins and components.
  * Also registers the i18n plugin with messages.
  */
-export function renderComponent(
+export function renderComponent<T>(
     component: Parameters<typeof render>[0],
     props?: any,
     options?: {
@@ -72,7 +72,7 @@ export function renderComponent(
         piniaStoreOptions?: Partial<TestingOptions>;
         provide?: Record<PropertyKey, unknown>;
     },
-): RenderResult<any> {
+): RenderResult<T> {
     const wrapInLayout = options?.wrapInLayout ?? false;
     i18n = createI18n({
         locale: "en-GB",

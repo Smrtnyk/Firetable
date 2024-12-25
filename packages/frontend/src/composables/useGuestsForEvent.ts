@@ -5,13 +5,14 @@ import { computed, ref, watch } from "vue";
 import { matchesProperty, property } from "es-toolkit/compat";
 import { useGuestsStore } from "src/stores/guests-store";
 import { hashString } from "src/helpers/hash-string";
+import { uniq } from "es-toolkit";
 
 export function useGuestsForEvent(eventOwner: EventOwner, reservations: Ref<ReservationDoc[]>) {
     const guestsStore = useGuestsStore();
 
     const guestContacts = computed<string[]>(() => {
         const values = reservations.value.map(property("guestContact")).filter(Boolean);
-        return Array.from(new Set(values));
+        return uniq(values);
     });
 
     const guests = ref<GuestDoc[]>([]);
@@ -19,9 +20,7 @@ export function useGuestsForEvent(eventOwner: EventOwner, reservations: Ref<Rese
     watch(
         guestContacts,
         async function (contacts) {
-            const hashedContacts = await Promise.all(
-                contacts.map((contact) => hashString(contact)),
-            );
+            const hashedContacts = await Promise.all(contacts.map(hashString));
 
             const guestsFromStore = await guestsStore.getGuestsByHashedContacts(
                 eventOwner.organisationId,
@@ -35,7 +34,7 @@ export function useGuestsForEvent(eventOwner: EventOwner, reservations: Ref<Rese
 
     const returningGuests = computed(() => {
         return guests.value
-            .map((guest) => {
+            .map(function (guest) {
                 const currentPropertyVisits = guest.visitedProperties[eventOwner.propertyId] ?? {};
                 const visitsWithoutCurrentEvent = Object.entries(currentPropertyVisits)
                     .filter(([eventId, visitDetails]) => {

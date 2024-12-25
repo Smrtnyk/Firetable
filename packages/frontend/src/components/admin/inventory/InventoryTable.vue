@@ -119,7 +119,9 @@ const columns = [
         label: t("InventoryTable.volume"),
         field: "volume",
         sortable: true,
-        format: (val: number) => (val ? `${val}ml` : "-"),
+        format(val: number) {
+            return val ? `${val}ml` : "-";
+        },
     },
     { name: "supplier", label: t("InventoryTable.supplier"), field: "supplier", sortable: true },
     { name: "actions", label: t("Global.actions"), field: "actions" },
