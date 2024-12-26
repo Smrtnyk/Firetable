@@ -2,7 +2,7 @@ import type { FloorEditor } from "./FloorEditor.js";
 import type { FabricObject, TFiller } from "fabric";
 import { Group } from "fabric";
 import { EventEmitter } from "@posva/event-emitter";
-import { isEqual, once } from "es-toolkit";
+import { delay, isEqual, once } from "es-toolkit";
 
 export interface HistoryState {
     width: number;
@@ -240,9 +240,7 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
             });
 
             // Additional wait to ensure all object events have fired
-            await new Promise<void>((resolve) => {
-                setTimeout(resolve, 0);
-            });
+            await delay(0);
         } finally {
             this.isHistoryProcessing = false;
             this.emit("stateChange");
@@ -253,11 +251,9 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
         const obj1 = JSON.parse(json1);
         const obj2 = JSON.parse(json2);
 
-        // Normalize the objects by removing irrelevant properties
         const objects1 = CanvasHistory.normalize(obj1.objects);
         const objects2 = CanvasHistory.normalize(obj2.objects);
 
-        // Compare the normalized objects
         return isEqual(objects1, objects2);
     }
 }

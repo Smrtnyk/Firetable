@@ -31,7 +31,6 @@ export class TouchManager {
         const pinch = new Pinch({ enable: true, direction: DIRECTION_ALL });
         const pan = new Pan({ direction: DIRECTION_ALL, threshold: 50 });
 
-        // Add the recognizers to the hammerManager instance
         this.hammerManager.add([pinch, pan, doubleTap]);
 
         this.hammerManager.on("pinch", this.onPinch);
