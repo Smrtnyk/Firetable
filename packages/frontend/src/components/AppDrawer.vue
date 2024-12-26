@@ -106,6 +106,21 @@ const digitalDrinkCardsLink = computed(function () {
     });
 });
 
+const propertySettingsLink = computed(function () {
+    if (isAdmin.value) {
+        return;
+    }
+    const role = nonNullableUser.value.role;
+
+    return buildExpandableLink({
+        label: t("AppDrawer.links.settings"),
+        icon: "cog-wheel",
+        routeName: "adminPropertySettings",
+        isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
+        childIcon: "home",
+    });
+});
+
 const links = computed<(GuardedLink | LinkWithChildren)[]>(function () {
     const role = nonNullableUser.value.role;
     const organisationId = nonNullableUser.value.organisationId;
@@ -147,17 +162,12 @@ const links = computed<(GuardedLink | LinkWithChildren)[]>(function () {
             isVisible: role === Role.PROPERTY_OWNER,
         },
         {
-            icon: "cog-wheel",
-            route: { name: "adminOrganisationSettings", params: { organisationId } },
-            label: t("AppDrawer.links.settings"),
-            isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
-        },
-        {
             icon: "bug",
             route: { name: "reportIssue", params: { organisationId } },
             label: t("AppDrawer.links.reportIssue"),
             isVisible: !isAdmin.value,
         },
+        propertySettingsLink.value,
     ];
 
     return allLinks.filter(function (link): link is NonNullable<GuardedLink | LinkWithChildren> {

@@ -62,9 +62,7 @@ const propertiesStore = usePropertiesStore();
 
 const tab = useLocalStorage<string>("admin-event-active-tab", "info");
 const reservationsTab = useLocalStorage("admin-event-guests-active-tab", "arrivedReservations");
-const settings = computed(function () {
-    return propertiesStore.getOrganisationSettingsById(props.organisationId);
-});
+
 const propertySettings = computed(function () {
     return propertiesStore.getPropertySettingsById(props.propertyId);
 });
@@ -137,7 +135,7 @@ async function saveFloor(floor: FloorEditor): Promise<void> {
 function isEventFinished(eventTime: number): boolean {
     const eventFinishedLimit = new Date(eventTime);
     eventFinishedLimit.setHours(
-        eventFinishedLimit.getHours() + settings.value.event.eventDurationInHours,
+        eventFinishedLimit.getHours() + propertySettings.value.event.eventDurationInHours,
     );
     const currentTime = new Date().getTime();
     return currentTime > eventFinishedLimit.getTime();

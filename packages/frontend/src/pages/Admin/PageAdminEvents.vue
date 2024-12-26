@@ -47,9 +47,6 @@ const isAnyLoading = computed(function () {
     return isFloorsLoading.value || isLoadingEvents.value;
 });
 
-const settings = computed(function () {
-    return propertiesStore.getOrganisationSettingsById(organisationId);
-});
 const subscriptionSettings = computed(function () {
     return propertiesStore.getOrganisationSubscriptionSettingsById(organisationId);
 });
@@ -151,7 +148,7 @@ function showEventForm(event?: EventDoc): void {
                 organisationId,
                 propertyName: propertiesStore.getPropertyNameById(propertyId),
                 event,
-                eventStartHours: settings.value.event.eventStartTime24HFormat,
+                eventStartHours: propertySettings.value.event.eventStartTime24HFormat,
                 propertyTimezone: propertySettings.value.timezone,
             },
             listeners: {

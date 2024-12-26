@@ -46,9 +46,7 @@ const { t } = useI18n();
 const { createDialog } = useDialog();
 const eventsStore = useEventsStore();
 const propertiesStore = usePropertiesStore();
-const settings = computed(function () {
-    return propertiesStore.getOrganisationSettingsById(eventOwner.organisationId);
-});
+
 const propertiesSettings = computed(function () {
     return propertiesStore.getPropertySettingsById(eventOwner.propertyId);
 });
@@ -66,7 +64,7 @@ function addNewQueuedReservation(): void {
                 currentUser: nonNullableUser.value,
                 users,
                 eventStartTimestamp: eventData.date,
-                eventDurationInHours: settings.value.event.eventDurationInHours,
+                eventDurationInHours: propertiesSettings.value.event.eventDurationInHours,
                 onlyPlanned: true,
             },
             listeners: {

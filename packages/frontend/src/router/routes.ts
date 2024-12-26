@@ -128,13 +128,13 @@ export const routes: RouteRecordRaw[] = [
                 },
             },
             {
-                path: "/admin/organisations/:organisationId/settings",
-                name: "adminOrganisationSettings",
+                path: "/admin/organisations/:organisationId/:propertyId/settings",
+                name: "adminPropertySettings",
                 meta: {
                     requiresAuth: true,
                     allowedRoles: [AdminRole.ADMIN, Role.PROPERTY_OWNER, Role.MANAGER],
                 },
-                component: () => import("src/pages/Admin/PageAdminOrganisationSettings.vue"),
+                component: () => import("src/pages/Admin/PageAdminPropertySettings.vue"),
                 props: true,
             },
             {

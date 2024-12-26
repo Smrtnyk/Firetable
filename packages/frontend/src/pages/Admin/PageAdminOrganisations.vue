@@ -42,11 +42,6 @@ function createLinks(organisationId: string): Link[] {
             route: { name: "adminProperties", params },
         },
         {
-            label: t("AppDrawer.links.settings"),
-            icon: "cog-wheel",
-            route: { name: "adminOrganisationSettings", params },
-        },
-        {
             label: "Go to Organisation Page",
             icon: "link",
             route: { name: "adminOrganisation", params },

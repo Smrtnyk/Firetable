@@ -160,8 +160,8 @@ describe("AppDrawer", () => {
                 - Manage Users
                 - Guestbook
                 - Manage Properties
-                - Settings
                 - Report an Issue
+                - Settings
                 - Logout
                 `,
             },
@@ -177,8 +177,8 @@ describe("AppDrawer", () => {
                 - Manage Analytics
                 - Manage Users
                 - Guestbook
-                - Settings
                 - Report an Issue
+                - Settings
                 - Logout
                 `,
             },

@@ -113,8 +113,22 @@ describe("properties-store.ts", () => {
 
             const settings = store.getPropertySettingsById("property1");
             expect(settings).toEqual({
-                timezone: "Europe/London",
+                event: {
+                    eventCardAspectRatio: "16:9",
+                    eventDurationInHours: 10,
+                    eventStartTime24HFormat: "22:00",
+                    reservationArrivedColor: "#1a7722",
+                    reservationCancelledColor: "#ff9f43",
+                    reservationConfirmedColor: "#6247aa",
+                    reservationPendingColor: "#2ab7ca",
+                    reservationWaitingForResponseColor: "#b5a22c",
+                },
+                guest: {
+                    collectGuestData: false,
+                    globalGuestTags: [],
+                },
                 markGuestAsLateAfterMinutes: 10,
+                timezone: expect.any(String),
             });
         });
 
@@ -126,6 +140,20 @@ describe("properties-store.ts", () => {
             const settings = store.getPropertySettingsById("property1");
             expect(settings).toEqual({
                 timezone: expect.any(String),
+                event: {
+                    eventCardAspectRatio: "16:9",
+                    eventDurationInHours: 10,
+                    eventStartTime24HFormat: "22:00",
+                    reservationArrivedColor: "#1a7722",
+                    reservationCancelledColor: "#ff9f43",
+                    reservationConfirmedColor: "#6247aa",
+                    reservationPendingColor: "#2ab7ca",
+                    reservationWaitingForResponseColor: "#b5a22c",
+                },
+                guest: {
+                    collectGuestData: false,
+                    globalGuestTags: [],
+                },
                 markGuestAsLateAfterMinutes: 10,
             });
         });
@@ -146,18 +174,15 @@ describe("properties-store.ts", () => {
             const organisation = createTestOrganisation({
                 settings: {
                     ...DEFAULT_ORGANISATION_SETTINGS,
-                    event: {
-                        ...DEFAULT_ORGANISATION_SETTINGS.event,
-                        eventDurationInHours: 12,
+                    property: {
+                        propertyCardAspectRatio: "16:9",
                     },
                 },
             });
             store.organisations = [organisation];
 
             const settings = store.getOrganisationSettingsById("org1");
-            expect(settings.event.eventDurationInHours).toBe(12);
-            expect(settings.event.eventStartTime24HFormat).toBe("22:00");
-            expect(settings.property.propertyCardAspectRatio).toBe("1");
+            expect(settings.property.propertyCardAspectRatio).toBe("16:9");
         });
 
         it("returns default settings when organisation has no settings", () => {
@@ -168,9 +193,7 @@ describe("properties-store.ts", () => {
             const settings = store.getOrganisationSettingsById("org1");
             expect(settings).toEqual(
                 expect.objectContaining({
-                    event: expect.any(Object),
                     property: expect.any(Object),
-                    guest: expect.any(Object),
                 }),
             );
         });

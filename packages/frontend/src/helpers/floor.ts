@@ -1,14 +1,13 @@
-import type { OrganisationSettings, Reservation } from "@firetable/types";
+import type { Reservation } from "@firetable/types";
 import { isPlannedReservation } from "@firetable/types";
 
-type ColorPalette = Pick<
-    OrganisationSettings["event"],
-    | "reservationArrivedColor"
-    | "reservationCancelledColor"
-    | "reservationConfirmedColor"
-    | "reservationPendingColor"
-    | "reservationWaitingForResponseColor"
->;
+type ColorPalette = {
+    reservationArrivedColor: string;
+    reservationCancelledColor: string;
+    reservationConfirmedColor: string;
+    reservationPendingColor: string;
+    reservationWaitingForResponseColor: string;
+};
 
 export function determineTableColor(
     reservation: Reservation | undefined,
