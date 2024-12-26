@@ -1,5 +1,5 @@
 <template>
-    <q-dialog position="bottom" ref="dialogRef" no-backdrop-dismiss>
+    <q-dialog position="bottom" ref="dialogRef" no-backdrop-dismiss @hide="onDialogHide">
         <q-card class="ft-card item-selection-bottom-dialog q-pa-md">
             <div class="row justify-center q-mb-md">
                 <button
