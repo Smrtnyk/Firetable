@@ -15,13 +15,14 @@ import {
     propertiesCollection,
 } from "../backend-proxy";
 import { Role } from "@firetable/types";
-import { merge } from "es-toolkit";
+import { merge, cloneDeep } from "es-toolkit";
 import { defineStore } from "pinia";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
 import { documentId, query, where } from "firebase/firestore";
 import { ref, watch } from "vue";
 import { matchesProperty } from "es-toolkit/compat";
 import { getDefaultTimezone } from "src/helpers/date-utils";
+import { AppLogger } from "src/logger/FTLogger";
 
 const DEFAULT_PROPERTY_SETTINGS = {
     timezone: getDefaultTimezone(),
@@ -195,6 +196,25 @@ export const usePropertiesStore = defineStore("properties", function () {
         await promise.value;
     }
 
+    function setOrganisationSettings(organisationId: string, settings: OrganisationSettings): void {
+        const orgIndex = organisations.value.findIndex(matchesProperty("id", organisationId));
+
+        if (orgIndex === -1) {
+            AppLogger.warn(`Organisation with ID ${organisationId} not found in the store.`);
+        } else {
+            organisations.value[orgIndex].settings = cloneDeep(settings);
+        }
+    }
+
+    function setPropertySettings(propertyId: string, settings: PropertySettings): void {
+        const propIndex = properties.value.findIndex(matchesProperty("id", propertyId));
+        if (propIndex === -1) {
+            AppLogger.warn(`Property with ID ${propertyId} not found in the store.`);
+        } else {
+            properties.value[propIndex].settings = cloneDeep(settings);
+        }
+    }
+
     return {
         unsubs,
         properties,
@@ -212,6 +232,8 @@ export const usePropertiesStore = defineStore("properties", function () {
         getPropertyNameById,
         initAdminProperties,
         initOrganisations,
+        setOrganisationSettings,
+        setPropertySettings,
         cleanup,
     };
 });
