@@ -92,9 +92,6 @@ export function useReservations(
     const propertiesStore = usePropertiesStore();
     const guestsStore = useGuestsStore();
 
-    const settings = computed(function () {
-        return propertiesStore.getOrganisationSettingsById(eventOwner.organisationId);
-    });
     const propertySettings = computed(function () {
         return propertiesStore.getPropertySettingsById(eventOwner.propertyId);
     });
@@ -161,7 +158,7 @@ export function useReservations(
             table.setVIPStatus(true);
         }
 
-        const fill = determineTableColor(reservation, settings.value.event);
+        const fill = determineTableColor(reservation, propertySettings.value.event);
         if (fill) {
             table.setFill(fill);
         }
@@ -391,7 +388,7 @@ export function useReservations(
                             ? { ...reservation, id: reservation.id }
                             : void 0,
                     eventStartTimestamp,
-                    eventDurationInHours: settings.value.event.eventDurationInHours,
+                    eventDurationInHours: propertySettings.value.event.eventDurationInHours,
                 },
                 listeners: {
                     async create(reservationData: Omit<Reservation, "floorId" | "tableLabel">) {

@@ -1,7 +1,7 @@
 import type { RenderResult } from "vitest-browser-vue";
 import type { OrganisationDoc, PropertyDoc } from "@firetable/types";
-import type { PageAdminOrganisationSettingsProps } from "./PageAdminOrganisationSettings.vue";
-import PageAdminOrganisationSettings from "./PageAdminOrganisationSettings.vue";
+import type { PageAdminPropertySettingsProps } from "./PageAdminPropertySettings.vue";
+import PageAdminPropertySettings from "./PageAdminPropertySettings.vue";
 import { renderComponent } from "../../../test-helpers/render-component";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { page, userEvent } from "@vitest/browser/context";
@@ -21,7 +21,7 @@ vi.mock("../../backend-proxy", () => ({
     propertiesCollection: vi.fn(),
 }));
 
-describe("PageAdminOrganisationSettings.vue", () => {
+describe("PageAdminPropertySettings.vue", () => {
     let propertiesData: PropertyDoc[];
     let organisationData: OrganisationDoc;
 
@@ -30,21 +30,8 @@ describe("PageAdminOrganisationSettings.vue", () => {
             id: "org1",
             name: "Test Organisation",
             settings: {
-                event: {
-                    eventStartTime24HFormat: "22:00",
-                    eventDurationInHours: 10,
-                    eventCardAspectRatio: "16:9",
-                    reservationArrivedColor: "#1a7722",
-                    reservationConfirmedColor: "#6247aa",
-                    reservationCancelledColor: "#ff9f43",
-                    reservationPendingColor: "#2ab7ca",
-                    reservationWaitingForResponseColor: "#b5a22c",
-                },
                 property: {
                     propertyCardAspectRatio: "1",
-                },
-                guest: {
-                    collectGuestData: false,
                 },
             },
         } as OrganisationDoc;
@@ -57,6 +44,19 @@ describe("PageAdminOrganisationSettings.vue", () => {
                 settings: {
                     timezone: "Europe/Vienna",
                     markGuestAsLateAfterMinutes: 15,
+                    event: {
+                        eventStartTime24HFormat: "22:00",
+                        eventDurationInHours: 10,
+                        eventCardAspectRatio: "16:9",
+                        reservationArrivedColor: "#1a7722",
+                        reservationConfirmedColor: "#6247aa",
+                        reservationCancelledColor: "#ff9f43",
+                        reservationPendingColor: "#2ab7ca",
+                        reservationWaitingForResponseColor: "#b5a22c",
+                    },
+                    guest: {
+                        collectGuestData: false,
+                    },
                 },
             },
             {
@@ -66,15 +66,28 @@ describe("PageAdminOrganisationSettings.vue", () => {
                 settings: {
                     timezone: "Europe/Athens",
                     markGuestAsLateAfterMinutes: 30,
+                    event: {
+                        eventStartTime24HFormat: "22:00",
+                        eventDurationInHours: 10,
+                        eventCardAspectRatio: "16:9",
+                        reservationArrivedColor: "#1a7722",
+                        reservationConfirmedColor: "#6247aa",
+                        reservationCancelledColor: "#ff9f43",
+                        reservationPendingColor: "#2ab7ca",
+                        reservationWaitingForResponseColor: "#b5a22c",
+                    },
+                    guest: {
+                        collectGuestData: false,
+                    },
                 },
             },
         ] as PropertyDoc[];
     });
 
     async function render(
-        props = { organisationId: "org1" },
-    ): Promise<RenderResult<PageAdminOrganisationSettingsProps>> {
-        const screen = renderComponent(PageAdminOrganisationSettings, props, {
+        props = { organisationId: "org1", propertyId: "property1" },
+    ): Promise<RenderResult<PageAdminPropertySettingsProps>> {
+        const screen = renderComponent(PageAdminPropertySettings, props, {
             piniaStoreOptions: {
                 initialState: {
                     properties: {
@@ -94,17 +107,13 @@ describe("PageAdminOrganisationSettings.vue", () => {
     it("renders all properties with their timezone settings", async () => {
         const screen = await render();
 
-        const propertyOneSection = screen.getByLabelText("Property One settings card");
-        const propertyTwoSection = screen.getByLabelText("Property Two settings card");
+        const propertySection = screen.getByLabelText("Property One settings card");
 
-        await expect.element(propertyOneSection).toBeInTheDocument();
-        await expect.element(propertyTwoSection).toBeInTheDocument();
+        await expect.element(propertySection).toBeInTheDocument();
 
-        const propertyOneSelect = propertyOneSection.getByLabelText("Property timezone");
-        const propertyTwoSelect = propertyTwoSection.getByLabelText("Property timezone");
+        const propertySelect = propertySection.getByLabelText("Property timezone");
 
-        await expect.element(propertyOneSelect).toHaveValue("Europe/Vienna");
-        await expect.element(propertyTwoSelect).toHaveValue("Europe/Athens");
+        await expect.element(propertySelect).toHaveValue("Europe/Vienna");
     });
 
     it("detects changes in property timezone settings", async () => {

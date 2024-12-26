@@ -24,12 +24,13 @@ import { matchesProperty } from "es-toolkit/compat";
 import { getDefaultTimezone } from "src/helpers/date-utils";
 import { AppLogger } from "src/logger/FTLogger";
 
-const DEFAULT_PROPERTY_SETTINGS = {
-    timezone: getDefaultTimezone(),
-    markGuestAsLateAfterMinutes: 0,
+export const DEFAULT_ORGANISATION_SETTINGS: OrganisationSettings = {
+    property: {
+        propertyCardAspectRatio: "1",
+    },
 };
 
-export const DEFAULT_ORGANISATION_SETTINGS: DeepRequired<OrganisationSettings> = {
+const DEFAULT_PROPERTY_SETTINGS: DeepRequired<PropertySettings> = {
     event: {
         eventStartTime24HFormat: "22:00",
         eventDurationInHours: 10,
@@ -40,13 +41,12 @@ export const DEFAULT_ORGANISATION_SETTINGS: DeepRequired<OrganisationSettings> =
         reservationPendingColor: "#2ab7ca",
         reservationWaitingForResponseColor: "#b5a22c",
     },
-    property: {
-        propertyCardAspectRatio: "1",
-    },
     guest: {
         collectGuestData: false,
         globalGuestTags: [],
     },
+    timezone: getDefaultTimezone(),
+    markGuestAsLateAfterMinutes: 0,
 };
 
 export const DEFAULT_SUBSCRIPTION_SETTINGS = {
@@ -97,12 +97,14 @@ export const usePropertiesStore = defineStore("properties", function () {
         return merge(DEFAULT_SUBSCRIPTION_SETTINGS, settings);
     }
 
-    function getOrganisationSettingsById(organisationId: string): OrganisationSettings {
+    function getOrganisationSettingsById(
+        organisationId: string,
+    ): DeepRequired<OrganisationSettings> {
         const settings = getOrganisationById(organisationId)?.settings ?? {};
         return merge(DEFAULT_ORGANISATION_SETTINGS, settings);
     }
 
-    function getPropertySettingsById(propertyId: string): PropertySettings {
+    function getPropertySettingsById(propertyId: string): DeepRequired<PropertySettings> {
         const property = properties.value.find(matchesProperty("id", propertyId));
         if (!property) {
             throw new Error("No property found for the given property id");
@@ -196,16 +198,6 @@ export const usePropertiesStore = defineStore("properties", function () {
         await promise.value;
     }
 
-    function setOrganisationSettings(organisationId: string, settings: OrganisationSettings): void {
-        const orgIndex = organisations.value.findIndex(matchesProperty("id", organisationId));
-
-        if (orgIndex === -1) {
-            AppLogger.warn(`Organisation with ID ${organisationId} not found in the store.`);
-        } else {
-            organisations.value[orgIndex].settings = cloneDeep(settings);
-        }
-    }
-
     function setPropertySettings(propertyId: string, settings: PropertySettings): void {
         const propIndex = properties.value.findIndex(matchesProperty("id", propertyId));
         if (propIndex === -1) {
@@ -232,7 +224,6 @@ export const usePropertiesStore = defineStore("properties", function () {
         getPropertyNameById,
         initAdminProperties,
         initOrganisations,
-        setOrganisationSettings,
         setPropertySettings,
         cleanup,
     };

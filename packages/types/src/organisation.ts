@@ -58,36 +58,4 @@ export interface OrganisationSettings {
          */
         propertyCardAspectRatio: AspectRatio;
     };
-    event: {
-        /**
-         * Aspect ratio for event cards in the UI
-         */
-        eventCardAspectRatio: AspectRatio;
-        /**
-         * Default start time for new events in 24h format
-         */
-        eventStartTime24HFormat: string;
-        /**
-         * Default duration for new events in hours
-         */
-        eventDurationInHours: number;
-        /**
-         * Color codes for different reservation states
-         */
-        reservationArrivedColor: string;
-        reservationConfirmedColor: string;
-        reservationCancelledColor: string;
-        reservationPendingColor: string;
-        reservationWaitingForResponseColor: string;
-    };
-    guest: {
-        /**
-         * Whether to collect the guest information
-         */
-        collectGuestData: boolean;
-        /**
-         * Organisation-wide tags that can be applied to guests
-         */
-        globalGuestTags?: string[];
-    };
 }

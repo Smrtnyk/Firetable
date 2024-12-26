@@ -70,7 +70,7 @@ async function handleGuestDataForReservation(
 ): Promise<void> {
     const propertiesStore = usePropertiesStore();
     const guestsStore = useGuestsStore();
-    const settings = propertiesStore.getOrganisationSettingsById(eventOwner.organisationId);
+    const settings = propertiesStore.getPropertySettingsById(eventOwner.propertyId);
 
     if (!settings.guest.collectGuestData) {
         return;

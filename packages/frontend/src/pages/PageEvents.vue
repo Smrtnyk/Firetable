@@ -29,22 +29,22 @@ const eventOwner: EventOwner = {
     id: "",
 };
 
-const settings = computed(function () {
-    return propertiesStore.getOrganisationSettingsById(props.organisationId);
-});
-
 const propertySettings = computed(function () {
     return propertiesStore.getPropertySettingsById(props.propertyId);
 });
 
 const cardsAspectRatio = computed(function () {
-    return parseAspectRatio(settings.value.event.eventCardAspectRatio);
+    return parseAspectRatio(propertySettings.value.event.eventCardAspectRatio);
 });
 
 const { data: events, pending: isLoading } = useFirestoreCollection<EventDoc>(
     createQuery<EventDoc>(
         eventsCollection(eventOwner),
-        where("date", ">=", Date.now() - ONE_HOUR * settings.value.event.eventDurationInHours),
+        where(
+            "date",
+            ">=",
+            Date.now() - ONE_HOUR * propertySettings.value.event.eventDurationInHours,
+        ),
         where("propertyId", "==", props.propertyId),
         orderBy("date"),
         limit(10),

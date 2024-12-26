@@ -162,6 +162,13 @@ function createLinks(propertyId: string): Link[] {
             route: { name: "adminPropertyDrinkCards", params },
             visible: permissionStore.canSeeInventory,
         },
+
+        {
+            label: t("AppDrawer.links.settings"),
+            icon: "cog-wheel",
+            route: { name: "adminPropertySettings", params },
+            visible: true,
+        },
     ].filter(function (link) {
         return link.visible;
     });
