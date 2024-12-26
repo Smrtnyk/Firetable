@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import type { OrganisationSettings, PropertySettings } from "@firetable/types";
+import { updateOrganisationSettings, updatePropertySettings } from "../../backend-proxy";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { computed, onMounted, ref } from "vue";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { updateOrganisationSettings, updatePropertySettings } from "@firetable/backend";
+import { useDialog } from "src/composables/useDialog";
 
 import SettingsSection from "src/components/admin/organisation-settings/SettingsSection.vue";
+import FTDialogTimezoneSelector from "src/components/FTDialogTimezoneSelector.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import AppCardSection from "src/components/AppCardSection.vue";
 import FTBtn from "src/components/FTBtn.vue";
-
-import { timezones } from "src/helpers/date-utils";
+import FTBottomDialog from "src/components/FTBottomDialog.vue";
 
 export interface PageAdminOrganisationSettingsProps {
     organisationId: string;
@@ -41,6 +42,8 @@ const colorsSettings = [
 
 const props = defineProps<PageAdminOrganisationSettingsProps>();
 const propertiesStore = usePropertiesStore();
+const { createDialog } = useDialog();
+
 const properties = computed(() =>
     propertiesStore.getPropertiesByOrganisationId(props.organisationId),
 );
@@ -125,6 +128,21 @@ async function saveSettings(): Promise<void> {
 
             // Wait for all updates to complete
             await Promise.all(savePromises);
+        },
+    });
+}
+
+function openTimezoneSelector(propertyId: string): void {
+    const dialog = createDialog({
+        component: FTBottomDialog,
+        componentProps: {
+            component: FTDialogTimezoneSelector,
+            listeners: {
+                timezoneSelected(timezone: string) {
+                    dialog.hide();
+                    editableSettings.value.properties[propertyId].timezone = timezone;
+                },
+            },
         },
     });
 }
@@ -246,11 +264,12 @@ onMounted(initPropertySettings);
             :title="property.name"
         >
             <SettingsSection title="Timezone" v-if="editableSettings.properties[property.id]">
-                <q-select
+                <q-input
                     rounded
                     standout
+                    readonly
                     v-model="editableSettings.properties[property.id].timezone"
-                    :options="timezones"
+                    @click="openTimezoneSelector(property.id)"
                     label="Property timezone"
                 />
             </SettingsSection>

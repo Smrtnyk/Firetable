@@ -8,14 +8,17 @@ import { page, userEvent } from "@vitest/browser/context";
 import { nextTick } from "vue";
 
 const { updateOrganisationSettingsMock, updatePropertySettingsMock } = vi.hoisted(() => ({
-    tryCatchLoadingWrapperSpy: vi.fn(),
     updateOrganisationSettingsMock: vi.fn(),
     updatePropertySettingsMock: vi.fn(),
 }));
 
-vi.mock("@firetable/backend", () => ({
+vi.mock("../../backend-proxy", () => ({
     updateOrganisationSettings: updateOrganisationSettingsMock,
     updatePropertySettings: updatePropertySettingsMock,
+    fetchOrganisationById: vi.fn(),
+    fetchOrganisationsForAdmin: vi.fn(),
+    fetchPropertiesForAdmin: vi.fn(),
+    propertiesCollection: vi.fn(),
 }));
 
 describe("PageAdminOrganisationSettings.vue", () => {
@@ -97,8 +100,8 @@ describe("PageAdminOrganisationSettings.vue", () => {
         await expect.element(propertyOneSection).toBeInTheDocument();
         await expect.element(propertyTwoSection).toBeInTheDocument();
 
-        const propertyOneSelect = propertyOneSection.getByRole("combobox");
-        const propertyTwoSelect = propertyTwoSection.getByRole("combobox");
+        const propertyOneSelect = propertyOneSection.getByLabelText("Property timezone");
+        const propertyTwoSelect = propertyTwoSection.getByLabelText("Property timezone");
 
         await expect.element(propertyOneSelect).toHaveValue("Europe/Vienna");
         await expect.element(propertyTwoSelect).toHaveValue("Europe/Athens");
@@ -112,8 +115,10 @@ describe("PageAdminOrganisationSettings.vue", () => {
 
         await nextTick();
 
-        const timezoneSelect = propertySection.getByRole("combobox");
+        const timezoneSelect = propertySection.getByLabelText("Property timezone");
         await userEvent.click(timezoneSelect);
+        const search = screen.getByRole("textbox", { name: "Search timezones" });
+        await userEvent.fill(search, "Vilnius");
         const vilniusOption = screen.getByText("Europe/Vilnius");
         await userEvent.click(vilniusOption);
 
