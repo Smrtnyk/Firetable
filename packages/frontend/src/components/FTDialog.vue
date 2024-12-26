@@ -1,5 +1,5 @@
 <template>
-    <q-dialog ref="dialogRef" :maximized="maximized || isMobile" persistent>
+    <q-dialog ref="dialogRef" :maximized="maximized || isMobile" persistent @hide="onDialogHide">
         <q-card
             class="q-pt-none ft-card"
             :class="{
