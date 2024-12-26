@@ -30,6 +30,7 @@ catalogs:
 
 overrides:
   jsdom: 25.0.1
+  uri-js: npm:uri-js-replace
 
 importers:
 
@@ -5968,8 +5969,8 @@ packages:
     resolution: {integrity: sha512-wgxdSBWv3x/YpMzsWz5G4p4ec7JWD0HCl8W6bmNB6E5Gwo+1ym5oN4hiXpLf0mPySVEJEIsYlkshnplkg2OP9A==}
     engines: {node: '>=14'}
 
-  uri-js@4.4.1:
-    resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
+  uri-js-replace@1.0.1:
+    resolution: {integrity: sha512-W+C9NWNLFOoBI2QWDp4UT9pv65r2w5Cx+3sTYFvtMdDBxkKt1syCqsUdSFAChbEe1uK5TfS04wt/nGwmaeIQ0g==}
 
   url-join@0.0.1:
     resolution: {integrity: sha512-H6dnQ/yPAAVzMQRvEvyz01hhfQL5qRWSEt7BX8t9DqnPw9BjMb64fjIRq76Uvf1hkHp+mTZvEVJ5guXOT0Xqaw==}
@@ -8743,7 +8744,7 @@ snapshots:
       fast-deep-equal: 3.1.3
       fast-json-stable-stringify: 2.1.0
       json-schema-traverse: 0.4.1
-      uri-js: 4.4.1
+      uri-js: uri-js-replace@1.0.1
 
   ajv@8.17.1:
     dependencies:
@@ -12987,9 +12988,7 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  uri-js@4.4.1:
-    dependencies:
-      punycode: 2.3.1
+  uri-js-replace@1.0.1: {}
 
   url-join@0.0.1: {}
 
