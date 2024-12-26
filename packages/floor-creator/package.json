@@ -26,7 +26,6 @@
         "@types/hammerjs": "2.0.46",
         "@types/node": "22.10.2",
         "@vitest/browser": "catalog:",
-        "cheerio": "1.0.0",
         "vitest": "catalog:"
     },
     "keywords": [
