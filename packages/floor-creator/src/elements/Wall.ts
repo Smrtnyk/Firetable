@@ -49,12 +49,6 @@ export class Wall extends Group implements FloorEditorElement {
         this.canvas?.requestRenderAll();
     }
 
-    setAngle(angle: number): void {
-        this.angle = angle;
-        this.setCoords();
-        this.canvas?.requestRenderAll();
-    }
-
     changeToOutlinedMode(): void {
         this.wallRect.set({
             // Makes the background transparent

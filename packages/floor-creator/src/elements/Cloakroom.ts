@@ -113,12 +113,6 @@ export class Cloakroom extends Group implements FloorEditorElement {
         this.canvas?.requestRenderAll();
     }
 
-    setAngle(angle: number): void {
-        this.angle = angle;
-        this.setCoords();
-        this.canvas?.requestRenderAll();
-    }
-
     getBaseFill(): string {
         return this.counterBody.get("fill") as string;
     }
