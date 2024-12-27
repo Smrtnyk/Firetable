@@ -6,6 +6,7 @@ import { useAuthStore } from "src/stores/auth-store";
 import { computed } from "vue";
 import { usePermissionsStore } from "src/stores/permissions-store";
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- pretty verbose
 export function useReservationPermissions(reservation: Ref<ReservationDoc>) {
     const authStore = useAuthStore();
     const permissionsStore = usePermissionsStore();

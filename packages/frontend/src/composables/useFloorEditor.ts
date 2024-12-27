@@ -10,6 +10,7 @@ import { isNumber } from "es-toolkit/compat";
 
 export const TABLE_EL_TO_ADD = [FloorElementTypes.RECT_TABLE, FloorElementTypes.ROUND_TABLE];
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- pretty verbose
 export function useFloorEditor(containerRef: ShallowRef<HTMLElement | null>) {
     const floorInstance = shallowRef<FloorEditor | undefined>();
     const selectedElement = ref<FloorEditorElement | undefined>();

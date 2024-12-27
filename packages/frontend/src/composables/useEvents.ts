@@ -26,6 +26,7 @@ const EVENTS_PER_PAGE = 50;
  * @property isLoading - A ref that indicates the loading state. It's initially set to `true`
  * and becomes `false` after the first fetch completes. It remains unchanged for subsequent fetches.
  */
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- pretty verbose
 export function useEvents(eventOwner: EventOwner) {
     const events = ref<EventDoc[]>([]);
     const lastFetchedDoc = ref<QueryDocumentSnapshot | undefined>();

@@ -41,6 +41,7 @@ export type TableOperation =
     | ReservationLinkOperation
     | ReservationTransferOperation;
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- pretty verbose
 export function useTableOperations() {
     const quasar = useQuasar();
 

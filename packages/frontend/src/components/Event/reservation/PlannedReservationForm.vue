@@ -33,7 +33,7 @@ const props = defineProps<PlannedReservationFormProps>();
 const { t } = useI18n();
 
 // Move initial state logic into a function
-function generateInitialState() {
+function generateInitialState(): Omit<PlannedReservation, "creator" | "floorId" | "tableLabel"> {
     return props.mode === "update" && props.reservationData
         ? { ...props.reservationData }
         : {
