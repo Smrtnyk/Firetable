@@ -88,16 +88,6 @@ export abstract class Table extends Group implements FloorEditorElement {
         };
     }
 
-    setDimensions(width: number, height: number): void {
-        this.scaleX = width / this.width;
-        this.scaleY = height / this.height;
-
-        this.enforceMinimumDimensions();
-        this.adjustTextScaling();
-        this.setCoords();
-        this.canvas?.requestRenderAll();
-    }
-
     private handleScaling(): void {
         this.enforceMinimumDimensions();
         this.adjustTextScaling();
