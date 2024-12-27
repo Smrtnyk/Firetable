@@ -32,7 +32,6 @@ const socials = ["Whatsapp", "SMS", "Instagram", "Facebook", "Phone"].map(functi
 const props = defineProps<PlannedReservationFormProps>();
 const { t } = useI18n();
 
-// Move initial state logic into a function
 function generateInitialState(): Omit<PlannedReservation, "creator" | "floorId" | "tableLabel"> {
     return props.mode === "update" && props.reservationData
         ? { ...props.reservationData }
@@ -54,7 +53,6 @@ function generateInitialState(): Omit<PlannedReservation, "creator" | "floorId" 
           };
 }
 
-// Initialize state with the initial values
 const state =
     ref<Omit<PlannedReservation, "creator" | "floorId" | "tableLabel">>(generateInitialState());
 const reservationForm = useTemplateRef<QForm>("reservationForm");
@@ -79,10 +77,7 @@ const reservedByLabel = computed(function () {
         : t(`EventCreateReservation.reservedByLabel`);
 });
 
-// Watcher that resets state.reservedBy when selectionType changes
 watch(selectionType, function (newVal) {
-    // When selectionType changes to 'social', reset reservedBy to the first social option
-    // When changing to 'user', reset reservedBy to the first user option
     state.value.reservedBy = newVal === "social" ? socials[0] : formattedUsers.value[0];
 });
 
@@ -95,11 +90,8 @@ function capitalizeGuestName(): void {
 }
 
 function reset(): void {
-    // Get fresh initial state
     const freshInitialState = generateInitialState();
-    // Reset to initial state
     state.value = { ...freshInitialState };
-    // Reset selection type based on fresh initial state
     selectionType.value = freshInitialState.reservedBy?.id ? "user" : "social";
     reservationForm.value?.resetValidation();
 }
