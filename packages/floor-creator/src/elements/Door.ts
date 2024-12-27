@@ -48,6 +48,12 @@ export class Door extends Group implements FloorEditorElement {
         this.canvas?.requestRenderAll();
     }
 
+    setAngle(angle: number): void {
+        this.angle = angle;
+        this.setCoords();
+        this.canvas?.requestRenderAll();
+    }
+
     flip(): void {
         // Store the current bounding rectangle before flipping
         const boundingRectBefore = this.getBoundingRect();

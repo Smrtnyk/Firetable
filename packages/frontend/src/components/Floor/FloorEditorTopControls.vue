@@ -32,8 +32,11 @@ const getElementHeight = computed(function () {
         ? Math.round(selectedFloorElement.height * selectedFloorElement.scaleY)
         : 0;
 });
+const getElementAngle = computed(() => (selectedFloorElement ? selectedFloorElement.angle : 0));
+
 const localWidth = ref(getElementWidth.value);
 const localHeight = ref(getElementHeight.value);
+const localAngle = ref(getElementAngle.value);
 const elementColor = ref(selectedFloorElement?.getBaseFill?.() ?? "");
 
 watch(
@@ -41,12 +44,19 @@ watch(
     function (newEl) {
         localWidth.value = newEl ? Math.round(newEl.width * newEl.scaleX) : 0;
         localHeight.value = newEl ? Math.round(newEl.height * newEl.scaleY) : 0;
+        localAngle.value = newEl ? newEl.angle : 0;
 
         if (newEl?.getBaseFill) {
             elementColor.value = newEl.getBaseFill();
         }
     },
+    { immediate: true },
 );
+
+watch(localAngle, (newAngle) => {
+    if (!selectedFloorElement) return;
+    selectedFloorElement.setAngle(newAngle);
+});
 
 watch(localWidth, function (newWidth) {
     if (!selectedFloorElement) {
@@ -113,32 +123,38 @@ onMounted(function () {
 </script>
 
 <template>
-    <q-card class="row FloorEditorTopControls ft-card q-pa-sm justify-evenly">
-        <div class="col-2">
-            <q-input v-model.number="localWidth" standout rounded type="number" label="Width" />
+    <q-card class="row FloorEditorTopControls ft-card q-pa-sm q-gutter-xs">
+        <div class="col-1">
+            <q-input standout v-model.number="localWidth" type="number" label="Width" />
         </div>
-        <div class="col-2">
-            <q-input rounded v-model.number="localHeight" standout type="number" label="Height" />
+        <div class="col-1">
+            <q-input standout v-model.number="localHeight" type="number" label="Height" />
         </div>
-        <div class="col-3" v-if="isTable(selectedFloorElement)">
+
+        <!-- Angle Control -->
+        <div class="col-1">
+            <q-input standout v-model.number="localAngle" type="number" label="Angle°" />
+        </div>
+
+        <div class="col-2" v-if="isTable(selectedFloorElement)">
             <q-input
                 :debounce="500"
                 :model-value="selectedFloorElement.label"
                 @update:model-value="(newLabel) => updateTableLabel(selectedFloorElement, newLabel)"
                 type="text"
                 standout
-                rounded
                 label="Table label"
             />
         </div>
 
-        <div class="col-auto content-center q-gutter-md">
+        <q-space />
+
+        <div class="col-auto flex q-gutter-xs q-ma-none">
             <q-btn
                 title="Change element fill color"
                 v-if="elementColor"
                 :style="{ 'background-color': elementColor }"
                 @click="openColorPicker"
-                round
             >
                 <q-icon name="color-picker" class="cursor-pointer" />
                 <q-popup-proxy
@@ -151,46 +167,23 @@ onMounted(function () {
                     <q-color :model-value="elementColor" @update:model-value="setElementColor" />
                 </q-popup-proxy>
             </q-btn>
-            <q-btn
-                title="Delete element"
-                v-if="deleteAllowed"
-                round
-                icon="trash"
-                color="negative"
-                @click="deleteElement"
-            />
-            <q-btn
-                title="Send back"
-                v-if="deleteAllowed"
-                round
-                icon="send-backward"
-                @click="sendBack"
-            />
-
-            <q-btn
-                title="Copy element"
-                round
-                icon="copy"
-                @click="floorInstance.copySelectedElement()"
-            />
+            <q-btn title="Send back" v-if="deleteAllowed" icon="send-backward" @click="sendBack" />
+            <q-btn title="Copy element" icon="copy" @click="floorInstance.copySelectedElement()" />
             <q-btn
                 v-if="'flip' in selectedFloorElement"
                 title="Flip element"
-                round
                 icon="transfer"
                 @click="selectedFloorElement.flip()"
             />
             <q-btn
                 v-if="'changeToOutlinedMode' in selectedFloorElement"
                 title="Switch to outline element"
-                round
                 icon="dashed-outline"
                 @click="selectedFloorElement.changeToOutlinedMode()"
             />
             <q-btn
                 v-if="'changeToFilledMode' in selectedFloorElement"
                 title="Switch to fill element"
-                round
                 icon="fill"
                 @click="selectedFloorElement.changeToFilledMode()"
             />
@@ -198,9 +191,16 @@ onMounted(function () {
             <q-btn
                 v-if="'nextDesign' in selectedFloorElement"
                 title="Switch to fill element"
-                round
                 icon="chevron_right"
                 @click="selectedFloorElement.nextDesign()"
+            />
+
+            <q-btn
+                title="Delete element"
+                v-if="deleteAllowed"
+                icon="trash"
+                color="negative"
+                @click="deleteElement"
             />
         </div>
     </q-card>
