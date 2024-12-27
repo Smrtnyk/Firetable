@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { QPopupProxy } from "quasar";
 import type { FloorEditor, FloorEditorElement } from "@firetable/floor-creator";
-import { isTable } from "@firetable/floor-creator";
+import { setElementAngle, isTable } from "@firetable/floor-creator";
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed, onMounted, ref, useTemplateRef, watch } from "vue";
 import { useEventListener } from "@vueuse/core";
@@ -53,9 +53,9 @@ watch(
     { immediate: true },
 );
 
-watch(localAngle, (newAngle) => {
+watch(localAngle, function (newAngle) {
     if (!selectedFloorElement) return;
-    selectedFloorElement.setAngle(newAngle);
+    setElementAngle(selectedFloorElement, newAngle);
 });
 
 watch(localWidth, function (newWidth) {

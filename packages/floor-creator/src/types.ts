@@ -36,7 +36,6 @@ export interface FloorEditorElement extends FabricObject {
     changeToFilledMode?(): void;
 
     setDimensions(width: number, height: number): void;
-    setAngle(angle: number): void;
     nextDesign?(): void;
 }
 
