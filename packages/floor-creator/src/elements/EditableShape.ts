@@ -63,6 +63,12 @@ export class EditableShape extends Group implements FloorEditorElement {
         this.canvas?.requestRenderAll();
     }
 
+    setAngle(angle: number): void {
+        this.angle = angle;
+        this.setCoords();
+        this.canvas?.requestRenderAll();
+    }
+
     setBaseFill(val: string): void {
         this.shape.set("fill", val);
         this.canvas?.requestRenderAll();
