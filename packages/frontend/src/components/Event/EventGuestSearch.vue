@@ -61,7 +61,6 @@ function createTableLabel(reservation: PlannedReservation): string {
 }
 
 function findSearchedTable(inputVal: string | { value: PlannedReservation }): PlannedReservation[] {
-    // Determine the value to match against
     const val = typeof inputVal === "string" ? inputVal : inputVal.value.guestName;
     const normalizedVal = val.toLowerCase().trim();
 

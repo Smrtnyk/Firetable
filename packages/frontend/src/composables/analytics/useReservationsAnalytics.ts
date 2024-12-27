@@ -326,14 +326,12 @@ export function useReservationsAnalytics(
         const monthKey = selectedMonth.value;
         const cacheKey = monthKey + organisationId;
 
-        // Check if data for the month is already in the store
         const cachedData = analyticsStore.getDataForMonth(cacheKey, property.value.id);
         if (cachedData) {
             reservationBucket.value = cachedData;
             return;
         }
 
-        // If not in store, fetch data
         reservationBucket.value = undefined;
         Loading.show();
 
@@ -346,7 +344,6 @@ export function useReservationsAnalytics(
             );
             analyticsStore.cacheData(cacheKey, reservationBucket.value, property.value.id);
 
-            // Set the active tab to the first day with reservations
             const firstDayWithReservations = Object.keys(plannedReservationsByDay.value)[0];
             if (firstDayWithReservations) {
                 selectedDay.value = firstDayWithReservations;

@@ -16,7 +16,6 @@ export function isTimeWithinEventDuration(
     hours: number,
     minutes: number | null = 0,
 ): boolean {
-    // Validate inputs
     if (
         hours < 0 ||
         hours > 23 ||

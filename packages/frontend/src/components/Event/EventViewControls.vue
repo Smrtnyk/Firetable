@@ -65,7 +65,6 @@ function showPrevFloor(): void {
     }
 }
 
-// Handle "Show Next Floor" button click
 function showNextFloor(): void {
     if (nextFloor.value) {
         emit("set-active-floor", nextFloor.value);

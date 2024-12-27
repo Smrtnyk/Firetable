@@ -63,7 +63,6 @@ const unassignedUsers = computed(function () {
 const bucketizedUsers = computed<BucketizedUsers>(function () {
     const buckets: BucketizedUsers = {};
 
-    // Helper function to add users to buckets
     function addUserToBucket(bucketizedUser: BucketizedUser, property: PropertyDoc): void {
         bucketizedUser.memberOf?.push(property.name);
         if (!buckets[property.id]) {
@@ -86,7 +85,6 @@ const bucketizedUsers = computed<BucketizedUsers>(function () {
             return;
         }
 
-        // Process user-related properties
         bucketizedUser.relatedProperties.forEach(function (propertyId) {
             const property = findPropertyById(propertyId);
             if (property) {

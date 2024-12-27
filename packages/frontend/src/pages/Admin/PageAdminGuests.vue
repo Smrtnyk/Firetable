@@ -125,7 +125,6 @@ const sortedGuests = computed(function () {
                 break;
 
             case "bookings":
-                // Existing bookings logic
                 if (b.totalReservations === a.totalReservations) {
                     comparison =
                         Number.parseFloat(b.overallPercentage) -
@@ -166,7 +165,6 @@ const availableTags = computed(function () {
 const filteredGuests = computed(function () {
     let filtered = sortedGuests.value;
 
-    // Apply search filter
     if (searchQuery.value?.trim()) {
         const query = searchQuery.value.trim().toLowerCase();
         filtered = filtered.filter(
@@ -176,7 +174,6 @@ const filteredGuests = computed(function () {
         );
     }
 
-    // Apply tag filter
     if (selectedTags.value.length > 0) {
         filtered = filtered.filter(function (guest) {
             if (!guest.tags) {
@@ -281,7 +278,6 @@ function handleScroll(): void {
     }
 }
 
-// Guests selection
 const selectedGuests = ref<string[]>([]);
 const selectionMode = ref(false);
 const allSelected = computed(function () {

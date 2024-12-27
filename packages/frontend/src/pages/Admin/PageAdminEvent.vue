@@ -14,6 +14,7 @@ import { isActiveReservation } from "@firetable/types";
 import { computed, onMounted, onUnmounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import { formatEventDate } from "src/helpers/date-utils";
+import { matchesProperty } from "es-toolkit/compat";
 
 import FTTitle from "src/components/FTTitle.vue";
 import AdminEventRTInfo from "src/components/admin/event/AdminEventRTInfo.vue";
@@ -207,11 +208,7 @@ async function addFloor(floor: FloorDoc): Promise<void> {
 async function removeFloor(index: number): Promise<void> {
     const floor = eventFloors.value[index];
     // Check if floor has reservations
-    if (
-        allReservations.value.some(function ({ floorId }) {
-            return floorId === floor.id;
-        })
-    ) {
+    if (allReservations.value.some(matchesProperty("floorId", floor.id))) {
         showErrorMessage("Cannot remove floor with active reservations");
         return;
     }

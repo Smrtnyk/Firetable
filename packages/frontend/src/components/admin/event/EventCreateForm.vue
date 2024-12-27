@@ -56,7 +56,6 @@ const emit = defineEmits<{
 
 const { t, locale } = useI18n();
 
-// Set to eventStartHours in property timezone
 const initialDate = createTodayUTCTimestamp(props.eventStartHours, props.propertyTimezone);
 
 const eventObj: CreateEventForm = {

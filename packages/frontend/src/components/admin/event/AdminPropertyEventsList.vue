@@ -31,7 +31,6 @@ const bucketizedEvents = computed(function () {
         const eventDate = new Date(event.date);
         const isPastEvent = eventDate < now;
 
-        // Decide which bucket to put the event in
         const targetBucket = isPastEvent ? pastEvents : upcomingEvents;
 
         const year = eventDate.getUTCFullYear().toString();
