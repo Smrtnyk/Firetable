@@ -90,13 +90,6 @@ export class DJBooth extends Group implements FloorEditorElement {
         return Promise.resolve(new DJBooth(object));
     }
 
-    setDimensions(width: number, height: number): void {
-        this.scaleX = width / this.width;
-        this.scaleY = height / this.height;
-        this.setCoords();
-        this.canvas?.requestRenderAll();
-    }
-
     getBaseFill(): string {
         return "";
     }

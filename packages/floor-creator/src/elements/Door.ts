@@ -41,13 +41,6 @@ export class Door extends Group implements FloorEditorElement {
         return Promise.resolve(new Door(object));
     }
 
-    setDimensions(width: number, height: number): void {
-        this.scaleX = width / this.width;
-        this.scaleY = height / this.height;
-        this.setCoords();
-        this.canvas?.requestRenderAll();
-    }
-
     flip(): void {
         // Store the current bounding rectangle before flipping
         const boundingRectBefore = this.getBoundingRect();

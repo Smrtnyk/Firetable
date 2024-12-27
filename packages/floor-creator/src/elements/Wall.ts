@@ -42,13 +42,6 @@ export class Wall extends Group implements FloorEditorElement {
         return super.toObject();
     }
 
-    setDimensions(width: number, height: number): void {
-        this.scaleX = width / this.width;
-        this.scaleY = height / this.height;
-        this.setCoords();
-        this.canvas?.requestRenderAll();
-    }
-
     changeToOutlinedMode(): void {
         this.wallRect.set({
             // Makes the background transparent

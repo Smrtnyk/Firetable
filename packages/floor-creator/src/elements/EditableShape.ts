@@ -56,13 +56,6 @@ export class EditableShape extends Group implements FloorEditorElement {
         return new EditableShape([shape, textObj], {});
     }
 
-    setDimensions(width: number, height: number): void {
-        this.scaleX = width / this.width;
-        this.scaleY = height / this.height;
-        this.setCoords();
-        this.canvas?.requestRenderAll();
-    }
-
     setBaseFill(val: string): void {
         this.shape.set("fill", val);
         this.canvas?.requestRenderAll();

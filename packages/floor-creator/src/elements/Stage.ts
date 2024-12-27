@@ -82,13 +82,6 @@ export class Stage extends Group implements FloorEditorElement {
         return Promise.resolve(new Stage(object));
     }
 
-    setDimensions(width: number, height: number): void {
-        this.scaleX = width / this.width;
-        this.scaleY = height / this.height;
-        this.setCoords();
-        this.canvas?.requestRenderAll();
-    }
-
     getBaseFill(): string {
         return "";
     }

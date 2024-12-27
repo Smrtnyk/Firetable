@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { QPopupProxy } from "quasar";
 import type { FloorEditor, FloorEditorElement } from "@firetable/floor-creator";
-import { setElementAngle, isTable } from "@firetable/floor-creator";
+import { setDimensions, setElementAngle, isTable } from "@firetable/floor-creator";
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed, onMounted, ref, useTemplateRef, watch } from "vue";
 import { useEventListener } from "@vueuse/core";
@@ -62,14 +62,14 @@ watch(localWidth, function (newWidth) {
     if (!selectedFloorElement) {
         return;
     }
-    selectedFloorElement?.setDimensions?.(newWidth, localHeight.value);
+    setDimensions(selectedFloorElement, { width: newWidth, height: localHeight.value });
 });
 
 watch(localHeight, function (newHeight) {
     if (!selectedFloorElement) {
         return;
     }
-    selectedFloorElement?.setDimensions?.(localWidth.value, newHeight);
+    setDimensions(selectedFloorElement, { width: localWidth.value, height: newHeight });
 });
 
 function sendBack(): void {

@@ -17,3 +17,13 @@ export function setElementAngle(object: FabricObject, angle: number): void {
     object.setCoords();
     object.canvas?.requestRenderAll();
 }
+
+export function setDimensions(
+    object: FabricObject,
+    dimensions: { width: number; height: number },
+): void {
+    object.scaleX = dimensions.width / object.width;
+    object.scaleY = dimensions.height / object.height;
+    object.setCoords();
+    object.canvas?.requestRenderAll();
+}
