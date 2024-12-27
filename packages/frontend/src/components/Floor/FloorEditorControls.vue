@@ -124,7 +124,6 @@ function onFloorSave(): void {
 
             <q-input
                 standout
-                rounded
                 label="Floor name"
                 @update:model-value="(event) => onFloorChange('name', event)"
                 :model-value="floorInstance.name"
@@ -139,7 +138,6 @@ function onFloorSave(): void {
                 :model-value="floorInstance.width"
                 @update:model-value="(event) => onFloorChange('width', event)"
                 standout
-                rounded
                 type="number"
                 label="Floor width"
                 class="q-ma-xs full-width"
@@ -152,39 +150,46 @@ function onFloorSave(): void {
                 @update:model-value="(event) => onFloorChange('height', event)"
                 :model-value="floorInstance.height"
                 standout
-                rounded
                 type="number"
                 label="Floor height"
                 class="q-ma-xs full-width"
             />
-            <q-btn
-                title="Undo"
-                round
-                :disabled="!undoRedoState.canUndo"
-                @click="undoAction"
-                icon="undo"
-            />
-            <q-btn
-                title="Redo"
-                round
-                :disabled="!undoRedoState.canRedo"
-                @click="redoAction"
-                icon="redo"
-            />
 
-            <q-btn
-                round
-                title="Toggle grid"
-                @click="floorInstance.toggleGridVisibility"
-                icon="grid"
-            />
-            <q-btn
-                round
-                icon="download"
-                title="Export floor plan"
-                @click="exportFloor(floorInstance as FloorEditor)"
-            />
-            <q-btn round title="Import floor plan" icon="import" @click="triggerFileInput" />
+            <div class="row justify-between">
+                <q-btn
+                    padding="md"
+                    title="Undo"
+                    :disabled="!undoRedoState.canUndo"
+                    @click="undoAction"
+                    icon="undo"
+                />
+                <q-btn
+                    padding="md"
+                    title="Redo"
+                    :disabled="!undoRedoState.canRedo"
+                    @click="redoAction"
+                    icon="redo"
+                />
+
+                <q-btn
+                    padding="md"
+                    title="Toggle grid"
+                    @click="floorInstance.toggleGridVisibility"
+                    icon="grid"
+                />
+                <q-btn
+                    padding="md"
+                    icon="download"
+                    title="Export floor plan"
+                    @click="exportFloor(floorInstance as FloorEditor)"
+                />
+                <q-btn
+                    padding="md"
+                    title="Import floor plan"
+                    icon="import"
+                    @click="triggerFileInput"
+                />
+            </div>
         </div>
         <!-- Add Element -->
         <q-separator inset />
