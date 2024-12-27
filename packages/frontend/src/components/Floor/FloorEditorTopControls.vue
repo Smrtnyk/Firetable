@@ -175,18 +175,6 @@ onMounted(function () {
                 icon="transfer"
                 @click="selectedFloorElement.flip()"
             />
-            <q-btn
-                v-if="'changeToOutlinedMode' in selectedFloorElement"
-                title="Switch to outline element"
-                icon="dashed-outline"
-                @click="selectedFloorElement.changeToOutlinedMode()"
-            />
-            <q-btn
-                v-if="'changeToFilledMode' in selectedFloorElement"
-                title="Switch to fill element"
-                icon="fill"
-                @click="selectedFloorElement.changeToFilledMode()"
-            />
 
             <q-btn
                 v-if="'nextDesign' in selectedFloorElement"
