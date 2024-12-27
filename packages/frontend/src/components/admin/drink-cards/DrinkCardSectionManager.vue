@@ -21,6 +21,7 @@ import {
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import DrinkCardBuilderAddDragElementsDropdown from "src/components/admin/drink-cards/DrinkCardBuilderAddDragElementsDropdown.vue";
+import { matchesProperty } from "es-toolkit/compat";
 
 interface Props {
     elements: DrinkCardElement[];
@@ -72,9 +73,7 @@ function emitUpdatedElements(): void {
 
 function updateSectionItems(sectionId: string, items: DrinkCardItem[]): void {
     const elements = [...draggableElements.value];
-    const rootSection = elements.filter(isSection).find(function ({ id }) {
-        return id === sectionId;
-    });
+    const rootSection = elements.filter(isSection).find(matchesProperty("id", sectionId));
     if (rootSection) {
         rootSection.items = items;
     }

@@ -152,9 +152,7 @@ export const useGuestsStore = defineStore("guests", function () {
             }
 
             hashedContactsToFetch = hashedContacts.filter(function (hashedContact) {
-                return !foundGuests.some(function (guest) {
-                    return guest.hashedContact === hashedContact;
-                });
+                return !foundGuests.some(matchesProperty("hashedContact", hashedContact));
             });
         }
 
