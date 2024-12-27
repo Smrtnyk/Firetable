@@ -32,8 +32,6 @@ export interface FloorEditorElement extends FabricObject {
     getBaseFill(): string;
     setBaseFill(fill: string): void;
 
-    changeToOutlinedMode?(): void;
-    changeToFilledMode?(): void;
     nextDesign?(): void;
 }
 
