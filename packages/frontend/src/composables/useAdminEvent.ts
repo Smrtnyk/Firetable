@@ -26,6 +26,7 @@ import { decompressFloorDoc } from "src/helpers/compress-floor-doc";
 import { property } from "es-toolkit/compat";
 import { AppLogger } from "src/logger/FTLogger.js";
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- pretty verbose
 export function useAdminEvent(eventOwner: EventOwner) {
     const router = useRouter();
 

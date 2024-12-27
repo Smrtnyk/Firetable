@@ -25,6 +25,7 @@ const ENG_DAYS_OF_WEEK = [
     "Saturday",
 ];
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- pretty verbose
 export function useReservationsAnalytics(
     property: Ref<PropertyDoc>,
     organisationId: string,

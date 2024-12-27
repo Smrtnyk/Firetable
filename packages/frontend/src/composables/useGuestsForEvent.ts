@@ -7,6 +7,7 @@ import { useGuestsStore } from "src/stores/guests-store";
 import { hashString } from "src/helpers/hash-string";
 import { uniq } from "es-toolkit";
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- pretty verbose
 export function useGuestsForEvent(eventOwner: EventOwner, reservations: Ref<ReservationDoc[]>) {
     const guestsStore = useGuestsStore();
 
