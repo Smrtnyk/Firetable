@@ -6,29 +6,17 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 import { ref } from "vue";
 import { IssueCategory, IssueStatus, Role } from "@firetable/types";
-import FTDialog from "src/components/FTDialog.vue";
-import IssueCreateForm from "src/components/issue/IssueCreateForm.vue";
 
 const {
-    createDialogSpy,
     useFirestoreCollectionMock,
     createIssueReportMock,
     updateIssueReportMock,
     deleteIssueReportMock,
-    notifyMock,
 } = vi.hoisted(() => ({
-    createDialogSpy: vi.fn(),
     useFirestoreCollectionMock: vi.fn(),
     createIssueReportMock: vi.fn(),
     updateIssueReportMock: vi.fn(),
     deleteIssueReportMock: vi.fn(),
-    notifyMock: vi.fn(),
-}));
-
-vi.mock("src/composables/useDialog", () => ({
-    useDialog: () => ({
-        createDialog: createDialogSpy,
-    }),
 }));
 
 vi.mock("src/composables/useFirestore", () => ({
@@ -48,17 +36,6 @@ vi.mock("../backend-proxy", () => ({
     getUserPath: vi.fn(),
     logoutUser: vi.fn(),
     getIssueReportsPath: vi.fn(),
-}));
-
-vi.mock("quasar", async (importOriginal) => ({
-    ...(await importOriginal()),
-    useQuasar: () => ({
-        notify: notifyMock,
-    }),
-    Loading: {
-        show: vi.fn(),
-        hide: vi.fn(),
-    },
 }));
 
 describe("PageIssueReport.vue", () => {
@@ -150,15 +127,11 @@ describe("PageIssueReport.vue", () => {
             const addButton = screen.getByLabelText("Report new issue");
             await userEvent.click(addButton);
 
-            expect(createDialogSpy).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    component: FTDialog,
-                    componentProps: expect.objectContaining({
-                        component: IssueCreateForm,
-                        title: t("PageIssueReport.createNewIssue"),
-                    }),
-                }),
-            );
+            await expect
+                .element(screen.getByText(t("PageIssueReport.createNewIssue")))
+                .toBeVisible();
+
+            await userEvent.click(screen.getByLabelText("Close dialog"));
         });
     });
 
@@ -170,18 +143,9 @@ describe("PageIssueReport.vue", () => {
             await userEvent.click(actionsButton);
             await userEvent.click(screen.getByText(t("Global.edit")));
 
-            expect(createDialogSpy).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    component: FTDialog,
-                    componentProps: expect.objectContaining({
-                        component: IssueCreateForm,
-                        title: t("PageIssueReport.editIssue"),
-                        componentPropsObject: {
-                            issueToEdit: mockIssues[0],
-                        },
-                    }),
-                }),
-            );
+            await expect.element(screen.getByText(t("PageIssueReport.editIssue"))).toBeVisible();
+
+            await userEvent.click(screen.getByLabelText("Close dialog"));
         });
 
         it("disables edit for resolved issues", async () => {
@@ -216,7 +180,7 @@ describe("PageIssueReport.vue", () => {
 
             const actionsButton = screen.getByLabelText("Actions for issue My Test Issue");
             await userEvent.click(actionsButton);
-            await userEvent.click(screen.getByText(t("Global.delete")));
+            await userEvent.click(screen.getByText(t("Global.delete"), { exact: true }));
             await userEvent.click(screen.getByText("cancel"));
 
             expect(deleteIssueReportMock).not.toHaveBeenCalled();
