@@ -56,6 +56,13 @@ Demo credentials:
   - Multi-language interface
   - Inventory management across properties
 
+## Floor Plan Editor
+
+Here’s what the Floor Plan Editor looks like:
+
+![Floor Editor Screenshot](screenshots/floor-editor.png)
+
+
 ## Project Structure
 
 - frontend: Main web application
