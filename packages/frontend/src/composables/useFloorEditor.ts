@@ -6,7 +6,8 @@ import { onBeforeUnmount, ref, shallowRef, nextTick } from "vue";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { debounce } from "quasar";
 import { AppLogger } from "src/logger/FTLogger.js";
-import { isNumber } from "es-toolkit/compat";
+import { isNumber, toNumber, isNaN } from "es-toolkit/compat";
+import { negate } from "es-toolkit";
 
 export const TABLE_EL_TO_ADD = [FloorElementTypes.RECT_TABLE, FloorElementTypes.ROUND_TABLE];
 
@@ -31,13 +32,7 @@ export function useFloorEditor(containerRef: ShallowRef<HTMLElement | null>) {
         }
         let label: number;
         const labels = extractAllTablesLabels(floorInstance.value);
-        const numericLabels = labels
-            .map(function (val) {
-                return Number.parseInt(val);
-            })
-            .filter(function (val) {
-                return !Number.isNaN(val);
-            });
+        const numericLabels = labels.map(toNumber).filter(negate(isNaN));
         if (numericLabels.length === 0) {
             label = 0;
         } else {
