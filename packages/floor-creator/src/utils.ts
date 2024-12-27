@@ -15,6 +15,8 @@ export function calculateCanvasScale(
 export function setElementAngle(object: FabricObject, angle: number): void {
     object.angle = angle;
     object.setCoords();
+    object.fire("modified");
+    object.canvas?.fire("object:modified", { target: object });
     object.canvas?.requestRenderAll();
 }
 
@@ -25,5 +27,10 @@ export function setDimensions(
     object.scaleX = dimensions.width / object.width;
     object.scaleY = dimensions.height / object.height;
     object.setCoords();
+
+    object.fire("scaling");
+    object.fire("modified");
+    object.canvas?.fire("object:modified", { target: object });
+
     object.canvas?.requestRenderAll();
 }
