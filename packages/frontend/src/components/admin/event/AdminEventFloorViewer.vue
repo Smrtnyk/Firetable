@@ -21,7 +21,7 @@
                             :existing-labels="new Set(extractAllTablesLabels(floorInstance))"
                         />
                     </div>
-                    <div class="floor-editor ft-card ft-border">
+                    <div class="floor-editor">
                         <canvas id="floor-container" ref="floorContainerRef" />
                     </div>
                 </div>
