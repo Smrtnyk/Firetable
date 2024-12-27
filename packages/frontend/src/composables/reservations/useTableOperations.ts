@@ -51,7 +51,7 @@ export function useTableOperations() {
 
     const ongoingTableOperation = computed(() => currentTableOperation.value);
 
-    const tableOperationWatcher = watch(currentTableOperation, (newOperation) => {
+    const tableOperationWatcher = watch(currentTableOperation, function (newOperation) {
         if (newOperation) {
             showOperationNotification(newOperation);
         } else if (operationNotification) {

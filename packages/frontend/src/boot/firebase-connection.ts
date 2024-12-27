@@ -61,12 +61,10 @@ function handleOnAuthStateChanged(
                 guestsStore.cleanup();
                 propertiesStore.cleanup();
 
-                // Check if the current route requires authentication
                 const currentRoute = router.currentRoute.value;
                 const requiresAuth = currentRoute.meta.requiresAuth;
 
                 if (requiresAuth) {
-                    // Redirect to the auth page only if the route requires authentication
                     router.replace({ path: "/auth" }).catch(showErrorMessage);
                 }
             }

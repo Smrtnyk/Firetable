@@ -28,7 +28,6 @@ export function bucketizeReservations(
     };
 
     events.forEach(function (event) {
-        // Filter and categorize reservations for the current event
         const eventReservations = fetchedReservations
             .filter(matchesProperty("eventId", event.id))
             // Skip cancelled planned reservations

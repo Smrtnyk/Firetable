@@ -41,7 +41,6 @@ const currentlyActiveRef = computed(function () {
 });
 
 const currentReservationType = computed(function () {
-    // Default to PLANNED type if reservationData is not provided
     return props.reservationData?.type ?? ReservationType.PLANNED;
 });
 

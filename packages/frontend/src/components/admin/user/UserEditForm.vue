@@ -66,7 +66,6 @@ const emailSuffix = computed(function () {
     return `@${props.organisation.name}.org`;
 });
 
-// Store custom capabilities per role
 const previousCapabilities: Partial<Record<Role, UserCapabilities>> = {
     [props.user.role]: { ...form.value.capabilities },
 };

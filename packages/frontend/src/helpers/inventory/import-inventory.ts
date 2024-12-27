@@ -52,7 +52,6 @@ export async function importInventory({
     organisationId,
     propertyId,
 }: ImportInventoryParams): Promise<ImportResult> {
-    // Parse CSV content
     const parseResults = await new Promise<Papa.ParseResult<CreateInventoryItemPayload>>(
         (resolve, reject) => {
             parse(fileContent, {
