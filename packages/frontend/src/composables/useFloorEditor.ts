@@ -3,10 +3,9 @@ import type { ShallowRef } from "vue";
 import type { FloorDoc } from "@firetable/types";
 import { FloorEditor, FloorElementTypes, extractAllTablesLabels } from "@firetable/floor-creator";
 import { onBeforeUnmount, ref, shallowRef, nextTick } from "vue";
-import { showErrorMessage } from "src/helpers/ui-helpers";
 import { debounce } from "quasar";
 import { AppLogger } from "src/logger/FTLogger.js";
-import { isNumber, toNumber, isNaN } from "es-toolkit/compat";
+import { toNumber, isNaN, toInteger } from "es-toolkit/compat";
 import { negate } from "es-toolkit";
 
 export const TABLE_EL_TO_ADD = [FloorElementTypes.RECT_TABLE, FloorElementTypes.ROUND_TABLE];
@@ -25,19 +24,13 @@ export function useFloorEditor(containerRef: ShallowRef<HTMLElement | null>) {
         selectedElement.value = undefined;
     }
 
-    function getNextTableLabel(): string {
-        if (!floorInstance.value) {
-            showErrorMessage("Floor instance is not defined");
-            return "";
-        }
-        let label: number;
-        const labels = extractAllTablesLabels(floorInstance.value);
+    function getNextTableLabel(floorEditor: FloorEditor): string {
+        let label = 0;
+        const labels = extractAllTablesLabels(floorEditor);
         const numericLabels = labels.map(toNumber).filter(negate(isNaN));
-        if (numericLabels.length === 0) {
-            label = 0;
-        } else {
+        if (numericLabels.length > 0) {
             const maxLabel = Math.max(...numericLabels);
-            label = isNumber(maxLabel) ? maxLabel : 0;
+            label = toInteger(maxLabel);
         }
         label += 1;
         return String(label);
@@ -55,7 +48,7 @@ export function useFloorEditor(containerRef: ShallowRef<HTMLElement | null>) {
         }
 
         if (TABLE_EL_TO_ADD.includes(item)) {
-            const label = getNextTableLabel();
+            const label = getNextTableLabel(floorEditor);
             floorEditor.addElement({ x, y, tag: item, label });
             return;
         }
