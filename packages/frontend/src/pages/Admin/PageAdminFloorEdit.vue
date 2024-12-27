@@ -100,7 +100,7 @@ async function onFloorSave(): Promise<void> {
 <template>
     <div class="PageAdminFloorEdit floor-editor-page">
         <div :class="['grid-container', { 'is-tablet': isTablet }]">
-            <div class="left-controls" v-if="!isTablet">
+            <div class="left-controls full-height" v-if="!isTablet">
                 <FloorEditorControls
                     v-if="floorInstance"
                     :floor-instance="floorInstance"
@@ -109,8 +109,11 @@ async function onFloorSave(): Promise<void> {
                 />
             </div>
             <div class="main-content" ref="pageRef">
-                <div class="top-controls" v-if="selectedElement && floorInstance && !isTablet">
+                <q-card
+                    class="top-controls full-width full-height content-center ft-card ft-no-border-radius q-px-xs"
+                >
                     <FloorEditorTopControls
+                        v-if="selectedElement && floorInstance && !isTablet"
                         :selected-floor-element="selectedElement"
                         :floor-instance="floorInstance"
                         :existing-labels="
@@ -118,8 +121,8 @@ async function onFloorSave(): Promise<void> {
                         "
                         @delete="onDeleteElement"
                     />
-                </div>
-                <div class="floor-editor ft-card ft-border">
+                </q-card>
+                <div class="floor-editor">
                     <canvas v-if="floor && !isFloorLoading" ref="canvasRef" />
                 </div>
             </div>

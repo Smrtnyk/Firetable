@@ -123,7 +123,7 @@ onMounted(function () {
 </script>
 
 <template>
-    <q-card class="row FloorEditorTopControls ft-card q-pa-sm q-gutter-xs">
+    <div class="row FloorEditorTopControls q-gutter-xs">
         <div class="col-1">
             <q-input standout v-model.number="localWidth" type="number" label="Width" />
         </div>
@@ -203,5 +203,5 @@ onMounted(function () {
                 @click="deleteElement"
             />
         </div>
-    </q-card>
+    </div>
 </template>
