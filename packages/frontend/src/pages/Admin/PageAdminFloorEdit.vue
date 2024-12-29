@@ -82,7 +82,8 @@ async function onFloorSave(): Promise<void> {
         return showErrorMessage("You need to add at least one table!");
     }
 
-    const { name, width, height, json } = floorInstance.value;
+    const { name } = floorInstance.value;
+    const { json, width, height } = floorInstance.value.export();
 
     await tryCatchLoadingWrapper({
         async hook() {

@@ -36,9 +36,7 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
     initialize = once((): void => {
         // Save initial state without triggering events
         const initialState: HistoryState = {
-            width: this.floor.width,
-            height: this.floor.height,
-            json: this.floor.json,
+            ...this.floor.export(),
             timestamp: Date.now(),
         };
         this.undoStack = [initialState];

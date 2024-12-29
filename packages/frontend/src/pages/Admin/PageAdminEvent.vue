@@ -122,7 +122,8 @@ async function init(): Promise<void> {
 async function saveFloor(floor: FloorEditor): Promise<void> {
     await tryCatchLoadingWrapper({
         hook() {
-            const { width, height, json, id } = floor;
+            const { id } = floor;
+            const { width, height, json } = floor.export();
             return updateEventFloorData(eventOwner, {
                 id,
                 json: compressFloorDoc(json),
