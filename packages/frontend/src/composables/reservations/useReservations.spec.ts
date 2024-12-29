@@ -1857,13 +1857,14 @@ async function createTestFloor(name = "Test floor", id = "1"): Promise<FloorView
         y: 300,
     });
 
+    const { json } = editor.export();
     const floorDoc: FloorDoc = {
         propertyId: "1",
         id,
         name,
         width: 400,
         height: 600,
-        json: editor.json,
+        json,
     };
 
     const floorViewer = new FloorViewer({

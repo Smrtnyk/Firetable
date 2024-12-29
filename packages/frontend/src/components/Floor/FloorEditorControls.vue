@@ -36,14 +36,7 @@ async function exportFloor(floorVal: FloorEditor): Promise<void> {
     if (!(await showConfirm("Do you want to export this floor plan?"))) {
         return;
     }
-    exportFile(
-        `${floorVal.name}.json`,
-        JSON.stringify({
-            json: floorVal.json,
-            width: floorVal.width,
-            height: floorVal.height,
-        }),
-    );
+    exportFile(`${floorVal.name}.json`, JSON.stringify(floorVal.export()));
 }
 
 function undoAction(): void {

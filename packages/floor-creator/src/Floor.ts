@@ -65,11 +65,6 @@ export abstract class Floor {
         this.touchManager = new TouchManager(this);
     }
 
-    get json(): string {
-        const json = this.canvas.toDatalessJSON(["label", "name", "type"]);
-        return JSON.stringify(json);
-    }
-
     elementReviver = (_: Record<string, unknown>, object: FabricObject): void => {
         object.on("mouseup", () => {
             this.onElementClick(object);
