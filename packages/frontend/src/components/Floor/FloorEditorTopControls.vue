@@ -151,6 +151,7 @@ onMounted(function () {
 
         <div class="col-auto flex q-gutter-xs q-ma-none">
             <q-btn
+                flat
                 title="Change element fill color"
                 v-if="elementColor"
                 :style="{ 'background-color': elementColor }"
@@ -167,9 +168,21 @@ onMounted(function () {
                     <q-color :model-value="elementColor" @update:model-value="setElementColor" />
                 </q-popup-proxy>
             </q-btn>
-            <q-btn title="Send back" v-if="deleteAllowed" icon="send-backward" @click="sendBack" />
-            <q-btn title="Copy element" icon="copy" @click="floorInstance.copySelectedElement()" />
             <q-btn
+                flat
+                title="Send back"
+                v-if="deleteAllowed"
+                icon="send-backward"
+                @click="sendBack"
+            />
+            <q-btn
+                flat
+                title="Copy element"
+                icon="copy"
+                @click="floorInstance.copySelectedElement()"
+            />
+            <q-btn
+                flat
                 v-if="'flip' in selectedFloorElement"
                 title="Flip element"
                 icon="transfer"
@@ -177,6 +190,7 @@ onMounted(function () {
             />
 
             <q-btn
+                flat
                 v-if="'nextDesign' in selectedFloorElement"
                 title="Switch to fill element"
                 icon="chevron_right"
@@ -184,6 +198,7 @@ onMounted(function () {
             />
 
             <q-btn
+                unelevated
                 title="Delete element"
                 v-if="deleteAllowed"
                 icon="trash"
