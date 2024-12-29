@@ -43,10 +43,13 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
 
         this.attachEventListeners();
         this.isInitializing = false;
+        this.markAsSaved();
     });
 
     private readonly floor: FloorEditor;
     private readonly maxStackSize: number;
+    private lastSavedJson: string;
+    private isDirty: boolean;
     private undoStack: HistoryState[];
     private redoStack: HistoryState[];
     private isHistoryProcessing: boolean;
@@ -65,6 +68,8 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
         this.redoStack = [];
         this.isHistoryProcessing = false;
         this.isInitializing = true;
+        this.lastSavedJson = this.getCanvasState();
+        this.isDirty = false;
 
         this.handlers = {
             "object:modified": this.onCanvasModified.bind(this),
@@ -75,10 +80,8 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
 
     static normalize(canvasObjects: FabricObject[]): NormalizedCanvasObject[] {
         return canvasObjects.map((obj) => {
-            const { left, top, width, height, scaleX, scaleY, angle, fill, stroke } = obj;
-
-            // If the object has nested objects (e.g., groups), normalize them as well
-            if (obj instanceof Group && obj.getObjects()) {
+            const { left, top, width, height, scaleX, scaleY, angle, fill, stroke, type } = obj;
+            if (obj instanceof Group) {
                 return {
                     left,
                     top,
@@ -89,12 +92,22 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
                     angle,
                     fill,
                     stroke,
+                    type,
                     objects: CanvasHistory.normalize(obj.getObjects()),
                 };
             }
-
-            return { left, top, width, height, scaleX, scaleY, angle, fill, stroke };
+            return { left, top, width, height, scaleX, scaleY, angle, fill, stroke, type };
         });
+    }
+
+    markAsSaved(): void {
+        this.lastSavedJson = this.getCanvasState();
+        this.isDirty = false;
+        this.emit("stateChange");
+    }
+
+    hasUnsavedChanges(): boolean {
+        return this.isDirty;
     }
 
     destroy(): void {
@@ -211,6 +224,7 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
             this.undoStack.shift();
         }
 
+        this.isDirty = !this.areStatesEqual(this.lastSavedJson, currentJson);
         this.emit("stateChange");
     }
 
@@ -241,6 +255,7 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
             await delay(0);
         } finally {
             this.isHistoryProcessing = false;
+            this.isDirty = !this.areStatesEqual(this.lastSavedJson, state.json);
             this.emit("stateChange");
         }
     }

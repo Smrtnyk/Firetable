@@ -121,15 +121,16 @@ async function init(): Promise<void> {
 
 async function saveFloor(floor: FloorEditor): Promise<void> {
     await tryCatchLoadingWrapper({
-        hook() {
+        async hook() {
             const { id } = floor;
             const { width, height, json } = floor.export();
-            return updateEventFloorData(eventOwner, {
+            await updateEventFloorData(eventOwner, {
                 id,
                 json: compressFloorDoc(json),
                 width,
                 height,
             });
+            floor.markAsSaved();
         },
     });
 }

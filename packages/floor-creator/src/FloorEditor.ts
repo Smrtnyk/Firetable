@@ -60,6 +60,14 @@ export class FloorEditor extends Floor {
         }
     }
 
+    isDirty(): boolean {
+        return this.history.hasUnsavedChanges();
+    }
+
+    markAsSaved(): void {
+        this.history.markAsSaved();
+    }
+
     export(): { width: number; height: number; json: string } {
         const json = this.canvas.toDatalessJSON(["label", "name", "type"]);
         return {

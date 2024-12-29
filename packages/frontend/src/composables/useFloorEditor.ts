@@ -14,6 +14,7 @@ export const TABLE_EL_TO_ADD = [FloorElementTypes.RECT_TABLE, FloorElementTypes.
 export function useFloorEditor(containerRef: ShallowRef<HTMLElement | null>) {
     const floorInstance = shallowRef<FloorEditor | undefined>();
     const selectedElement = ref<FloorEditorElement | undefined>();
+    const hasChanges = ref(false);
 
     function onDeleteElement(element: FloorEditorElement): void {
         const elementToDelete = element.canvas?.getActiveObject();
@@ -118,6 +119,9 @@ export function useFloorEditor(containerRef: ShallowRef<HTMLElement | null>) {
         floorInstance.value = floorEditor;
         floorEditor.on("elementClicked", onElementClick);
         floorEditor.on("drop", onFloorDrop);
+        floorEditor.on("historyChange", function () {
+            hasChanges.value = floorEditor.isDirty();
+        });
     }
 
     onBeforeUnmount(function () {
@@ -125,6 +129,7 @@ export function useFloorEditor(containerRef: ShallowRef<HTMLElement | null>) {
     });
 
     return {
+        hasChanges,
         floorInstance,
         selectedElement,
         resizeFloor,
