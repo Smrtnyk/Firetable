@@ -152,6 +152,7 @@ function onFloorSave(): void {
 
             <div class="row justify-between">
                 <q-btn
+                    flat
                     padding="md"
                     title="Undo"
                     :disabled="!undoRedoState.canUndo"
@@ -159,6 +160,7 @@ function onFloorSave(): void {
                     icon="undo"
                 />
                 <q-btn
+                    flat
                     padding="md"
                     title="Redo"
                     :disabled="!undoRedoState.canRedo"
@@ -167,18 +169,21 @@ function onFloorSave(): void {
                 />
 
                 <q-btn
+                    flat
                     padding="md"
                     title="Toggle grid"
                     @click="floorInstance.toggleGridVisibility"
                     icon="grid"
                 />
                 <q-btn
+                    flat
                     padding="md"
                     icon="download"
                     title="Export floor plan"
                     @click="exportFloor(floorInstance as FloorEditor)"
                 />
                 <q-btn
+                    flat
                     padding="md"
                     title="Import floor plan"
                     icon="import"
