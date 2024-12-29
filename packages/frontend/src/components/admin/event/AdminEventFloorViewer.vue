@@ -7,6 +7,7 @@
                         @floor-save="saveFloorState"
                         @floor-update="onFloorChange"
                         v-if="floorInstance && !isTablet"
+                        :can-save="hasChanges"
                         :floor-instance="floorInstance"
                         class="q-mb-sm"
                     />
@@ -54,6 +55,7 @@ const emit = defineEmits<Emits>();
 const floorContainerRef = useTemplateRef<HTMLCanvasElement>("floorContainerRef");
 const viewerContainerRef = useTemplateRef<HTMLDivElement>("viewerContainerRef");
 const {
+    hasChanges,
     resizeFloor,
     initializeFloor,
     onFloorChange,

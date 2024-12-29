@@ -37,6 +37,7 @@ const {
     pending: isFloorLoading,
 } = useFirestoreDocument<FloorDoc>(floorPath, { once: true });
 const {
+    hasChanges,
     resizeFloor,
     initializeFloor,
     onFloorChange,
@@ -93,6 +94,7 @@ async function onFloorSave(): Promise<void> {
                 width,
                 height,
             });
+            floorInstance.value?.markAsSaved();
         },
     });
 }
@@ -104,6 +106,7 @@ async function onFloorSave(): Promise<void> {
             <div class="left-controls full-height" v-if="!isTablet">
                 <FloorEditorControls
                     v-if="floorInstance"
+                    :can-save="hasChanges"
                     :floor-instance="floorInstance"
                     @floor-save="onFloorSave"
                     @floor-update="onFloorChange"

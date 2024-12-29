@@ -9,6 +9,7 @@ import { AppLogger } from "src/logger/FTLogger.js";
 
 interface Props {
     floorInstance: FloorEditor;
+    canSave: boolean;
 }
 
 interface EmitEvents {
@@ -17,7 +18,7 @@ interface EmitEvents {
     (e: "floorSave"): void;
 }
 
-const { floorInstance } = defineProps<Props>();
+const { floorInstance, canSave } = defineProps<Props>();
 const emit = defineEmits<EmitEvents>();
 
 const undoRedoState = reactive({
@@ -101,6 +102,7 @@ function onFloorSave(): void {
     >
         <div class="row items-center justify-around">
             <q-btn
+                :disabled="!canSave"
                 class="button-gradient q-mb-md"
                 icon="save"
                 @click="onFloorSave"
