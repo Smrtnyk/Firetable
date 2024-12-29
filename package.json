@@ -48,7 +48,7 @@
     "engines": {
         "node": ">= 22.9.0"
     },
-    "packageManager": "pnpm@9.15.1",
+    "packageManager": "pnpm@9.15.2",
     "pnpm": {
         "overrides": {
             "jsdom": "25.0.1",
