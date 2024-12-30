@@ -2,9 +2,10 @@ import type { PropertyDoc } from "@firetable/types";
 import type { Ref } from "vue";
 import type { AugmentedPlannedReservation, ReservationBucket } from "src/stores/analytics-store.js";
 import type { PieChartData, TimeSeriesData } from "src/components/admin/analytics/types.js";
+import type { DateRange } from "src/types";
 import { bucketizeReservations } from "./bucketize-reservations.js";
 import { fetchAnalyticsData } from "../../backend-proxy";
-import { computed, onUnmounted, ref, watch } from "vue";
+import { computed, onUnmounted, ref } from "vue";
 import { useAnalyticsStore } from "src/stores/analytics-store.js";
 
 import { Loading } from "quasar";
@@ -13,7 +14,6 @@ import { format } from "date-fns";
 import { getColors } from "src/helpers/colors.js";
 import { getLocalizedDaysOfWeek } from "src/helpers/date-utils";
 const DEFAULT_SELECTED_DAY = "ALL";
-const SELECTED_MONTH_FORMAT = "yyyy-MM";
 
 const ENG_DAYS_OF_WEEK = [
     "Sunday",
@@ -33,7 +33,6 @@ export function useReservationsAnalytics(
 ) {
     const analyticsStore = useAnalyticsStore();
     const reservationBucket = ref<ReservationBucket>();
-    const selectedMonth = ref(format(new Date(), SELECTED_MONTH_FORMAT));
     const selectedDay = ref(DEFAULT_SELECTED_DAY);
 
     const DAYS_OF_WEEK = computed(() => getLocalizedDaysOfWeek(locale));
@@ -315,18 +314,18 @@ export function useReservationsAnalytics(
         ];
     });
 
-    const stopWatch = watch([selectedMonth], fetchData, { immediate: true });
-
     onUnmounted(function () {
         analyticsStore.clearData();
-        stopWatch();
     });
 
-    async function fetchData(): Promise<void> {
-        const monthKey = selectedMonth.value;
-        const cacheKey = monthKey + organisationId;
+    async function fetchData(dateRange: DateRange): Promise<void> {
+        if (!dateRange.startDate || !dateRange.endDate) {
+            return;
+        }
 
-        const cachedData = analyticsStore.getDataForMonth(cacheKey, property.value.id);
+        const cacheKey = `${dateRange.startDate}_${dateRange.endDate}_${organisationId}`;
+
+        const cachedData = analyticsStore.getDataForRange(cacheKey, property.value.id);
         if (cachedData) {
             reservationBucket.value = cachedData;
             return;
@@ -336,7 +335,12 @@ export function useReservationsAnalytics(
         Loading.show();
 
         try {
-            const fetchedData = await fetchAnalyticsData(monthKey, organisationId, property.value);
+            const fetchedData = await fetchAnalyticsData(
+                dateRange.startDate,
+                dateRange.endDate,
+                organisationId,
+                property.value,
+            );
 
             reservationBucket.value = bucketizeReservations(
                 fetchedData.events,
@@ -356,6 +360,7 @@ export function useReservationsAnalytics(
     }
 
     return {
+        fetchData,
         DAYS_OF_WEEK,
         propertyLabels,
         peakHoursLabels,
@@ -363,7 +368,6 @@ export function useReservationsAnalytics(
         reservationBucket,
         plannedReservationsByActiveProperty,
         plannedReservationsByDay,
-        selectedMonth,
         selectedDay,
         plannedArrivedVsNoShow,
         avgGuestsPerReservation,
