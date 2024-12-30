@@ -106,4 +106,8 @@ Required before first use:
 Currently supports English with partial German translations
 
 ## Contributing
-Contributions welcome - feel free to fork and submit PRs!
+Contributions are welcome! Please take a moment to review our [Contributing Guidelines](CONTRIBUTING.md) and ensure you understand our [Code of Conduct](CODE_OF_CONDUCT.md) before getting started.
+
+## Code of Conduct
+By participating in this project, you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md), ensuring a respectful and collaborative environment for all contributors.
+
