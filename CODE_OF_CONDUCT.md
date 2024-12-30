@@ -43,7 +43,7 @@ This Code of Conduct applies both within project spaces and in public spaces whe
 - Acting as a project representative at online or offline events
 
 ## Enforcement
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project team at **[INSERT CONTACT EMAIL OR OTHER METHOD]**. All complaints will be reviewed and investigated promptly and fairly.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project team at **[milankeser@outlook.de](mailto:milankeser@outlook.de)**. All complaints will be reviewed and investigated promptly and fairly.
 
 Project maintainers have the right and responsibility to take appropriate action, which may include but is not limited to:
 - Giving warnings
