@@ -6,3 +6,8 @@ export type Link = {
 
 export type GuardedLink = Link & { isVisible: boolean };
 export type LinkWithChildren = Omit<Link, "route"> & { children: Link[]; isVisible: boolean };
+
+export interface DateRange {
+    startDate: string;
+    endDate: string;
+}

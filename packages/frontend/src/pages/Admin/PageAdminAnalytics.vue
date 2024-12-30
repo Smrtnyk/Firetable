@@ -7,10 +7,10 @@ import ReservationAnalyticsCharts from "src/components/admin/analytics/Reservati
 import FTTabs from "src/components/FTTabs.vue";
 import FTCard from "src/components/FTCard.vue";
 import FTTabPanels from "src/components/FTTabPanels.vue";
+import FTTimeframeSelector from "src/components/FTTimeframeSelector.vue";
 
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
 import { usePropertiesStore } from "src/stores/properties-store";
-import { format, subMonths } from "date-fns";
 import { useReservationsAnalytics } from "src/composables/analytics/useReservationsAnalytics.js";
 import { useI18n } from "vue-i18n";
 
@@ -22,6 +22,13 @@ interface Props {
 const { locale } = useI18n();
 const props = defineProps<Props>();
 const propertiesStore = usePropertiesStore();
+const today = new Date();
+const thirtyDaysAgo = new Date();
+thirtyDaysAgo.setDate(today.getDate() - 30);
+const selected = ref({
+    startDate: thirtyDaysAgo.toISOString().split("T")[0],
+    endDate: today.toISOString().split("T")[0],
+});
 const property = computed(function () {
     return propertiesStore.getPropertyById(props.propertyId);
 });
@@ -29,7 +36,6 @@ const {
     DAYS_OF_WEEK,
     guestDistributionLabels,
     peakHoursLabels,
-    selectedMonth,
     selectedDay,
     plannedReservationsByActiveProperty,
     plannedReservationsByDay,
@@ -41,19 +47,17 @@ const {
     guestDistributionAnalysis,
     reservationsByDayOfWeek,
     plannedVsWalkInReservations,
+    fetchData,
 } = useReservationsAnalytics(property, props.organisationId, locale.value);
 
-const monthOptions = computed(function () {
-    const options = [];
-    for (let i = 11; i >= 0; i -= 1) {
-        const date = subMonths(new Date(), i);
-        options.push({
-            label: format(date, "MMMM yyyy"),
-            value: format(date, "yyyy-MM"),
-        });
-    }
-    return options.reverse();
-});
+watch(
+    () => selected.value,
+    function (newValue) {
+        if (newValue.startDate && newValue.endDate) {
+            fetchData(newValue);
+        }
+    },
+);
 
 const chartInfos = computed(function () {
     return [
@@ -89,16 +93,7 @@ const chartInfos = computed(function () {
     <div class="PageAdminAnalytics">
         <FTTitle title="Analytics" />
 
-        <q-select
-            v-model="selectedMonth"
-            :options="monthOptions"
-            label="Select Month"
-            emit-value
-            map-options
-            rounded
-            standout
-            class="q-mb-md"
-        />
+        <FTTimeframeSelector v-model="selected" />
 
         <div>
             <FTCard class="q-mb-md">

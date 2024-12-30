@@ -12,22 +12,25 @@ export interface ReservationBucket {
 
 type DataCache = {
     [propertyId: string]: {
-        [month: string]: ReservationBucket;
+        [dateRange: string]: ReservationBucket;
     };
 };
 
 export const useAnalyticsStore = defineStore("analytics", function () {
     const dataCache = ref<DataCache>({});
 
-    function cacheData(month: string, data: ReservationBucket, propertyId: string): void {
+    function cacheData(dateRangeKey: string, data: ReservationBucket, propertyId: string): void {
         if (!dataCache.value[propertyId]) {
             dataCache.value[propertyId] = {};
         }
-        dataCache.value[propertyId][month] = data;
+        dataCache.value[propertyId][dateRangeKey] = data;
     }
 
-    function getDataForMonth(month: string, propertyId: string): ReservationBucket | undefined {
-        return dataCache.value[propertyId]?.[month];
+    function getDataForRange(
+        dateRangeKey: string,
+        propertyId: string,
+    ): ReservationBucket | undefined {
+        return dataCache.value[propertyId]?.[dateRangeKey];
     }
 
     function clearData(): void {
@@ -37,7 +40,7 @@ export const useAnalyticsStore = defineStore("analytics", function () {
     return {
         dataCache,
         cacheData,
-        getDataForMonth,
+        getDataForRange,
         clearData,
     };
 });

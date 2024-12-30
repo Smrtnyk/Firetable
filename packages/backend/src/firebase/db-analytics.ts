@@ -8,11 +8,12 @@ import { eventsCollection, reservationsCollection } from "./db.js";
 import { getDocs, query, where } from "firebase/firestore";
 
 export async function fetchAnalyticsData(
-    monthKey: string,
+    startDate: string,
+    endDate: string,
     organisationId: string,
     property: PropertyDoc,
 ): Promise<{ reservations: ReservationDocWithEventId[]; events: EventDoc[] }> {
-    const allEvents = await getEventsForProperty(property, monthKey, organisationId);
+    const allEvents = await getEventsForProperty(property, startDate, endDate, organisationId);
     return {
         events: allEvents,
         reservations: await getReservationFromEvents(allEvents, organisationId),
@@ -48,17 +49,13 @@ async function getReservationFromEvents(
 
 async function getEventsForProperty(
     property: PropertyDoc,
-    month: string,
+    startDateStr: string,
+    endDateStr: string,
     organisationId: string,
 ): Promise<EventDoc[]> {
-    // Create a Date object based on the provided month string
-    const startDate = new Date(month);
+    const startDate = new Date(startDateStr);
+    const endDate = new Date(endDateStr);
 
-    // Create a Date object for the end date (start date + 1 month)
-    const endDate = new Date(month);
-    endDate.setUTCMonth(endDate.getUTCMonth() + 1);
-
-    // Convert start and end dates to UTC timestamps
     const startTimestamp = Date.UTC(
         startDate.getUTCFullYear(),
         startDate.getUTCMonth(),
@@ -67,7 +64,7 @@ async function getEventsForProperty(
     const endTimestamp = Date.UTC(
         endDate.getUTCFullYear(),
         endDate.getUTCMonth(),
-        endDate.getUTCDate(),
+        endDate.getUTCDate() + 1,
     );
 
     const allEvents = await getDocs(
