@@ -1,58 +1,57 @@
-import type { EventDoc, Reservation, ReservationDoc } from "@firetable/types";
+import type { AppUser, EventDoc, ReservationDoc } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
-import type { BaseTable } from "@firetable/floor-creator";
+import type { BaseTable, Floor } from "@firetable/floor-creator";
 import { EventEmitter } from "@posva/event-emitter";
 
-interface BaseEventData {
+export interface BaseEventData {
     eventOwner: EventOwner;
     event: EventDoc;
+    user: AppUser;
 }
 
-interface BaseReservationEventData extends BaseEventData {
-    reservation: ReservationDoc;
-}
-
-export interface TransferEventData {
-    fromTable: BaseTable;
-    toTable: BaseTable;
-    eventOwner: EventOwner;
-    fromFloor?: string;
-    toFloor?: string;
+export interface TransferEventData extends BaseEventData {
+    sourceTableLabel: string;
+    targetTableLabel: string;
+    sourceFloor: { id: string; name: string };
+    targetFloor: { id: string; name: string };
     targetReservation: ReservationDoc | undefined;
-}
-
-interface LinkEventData extends BaseEventData {
     sourceReservation: ReservationDoc;
-    linkedTableLabel: string;
-}
-
-interface UnlinkEventData extends BaseEventData {
-    sourceReservation: ReservationDoc;
-    unlinkedTableLabels: string[];
-}
-
-interface UpdateReservationEventData extends BaseEventData {
-    reservation: ReservationDoc;
-    oldReservation: ReservationDoc;
 }
 
 type Events = {
     "reservation:created": BaseEventData & {
-        reservation: Reservation;
+        sourceReservation: ReservationDoc;
     };
-    "reservation:updated": UpdateReservationEventData;
-    "reservation:deleted": BaseReservationEventData;
-    "reservation:deleted:soft": BaseReservationEventData;
-    "reservation:copied": {
-        sourceReservation: Reservation;
+    "reservation:updated": BaseEventData & {
+        sourceReservation: ReservationDoc;
+        newReservation: ReservationDoc;
+    };
+    "reservation:deleted": BaseEventData & {
+        sourceReservation: ReservationDoc;
+    };
+    "reservation:deleted:soft": BaseEventData & {
+        sourceReservation: ReservationDoc;
+    };
+    "reservation:copied": BaseEventData & {
+        sourceReservation: ReservationDoc;
         targetTable: BaseTable;
-        eventOwner: EventOwner;
+        targetFloor: Floor;
     };
     "reservation:transferred": TransferEventData;
-    "reservation:arrived": BaseReservationEventData;
-    "reservation:cancelled": BaseReservationEventData;
-    "reservation:linked": LinkEventData;
-    "reservation:unlinked": UnlinkEventData;
+    "reservation:arrived": BaseEventData & {
+        sourceReservation: ReservationDoc;
+    };
+    "reservation:cancelled": BaseEventData & {
+        sourceReservation: ReservationDoc;
+    };
+    "reservation:linked": BaseEventData & {
+        sourceReservation: ReservationDoc;
+        linkedTableLabel: string;
+    };
+    "reservation:unlinked": BaseEventData & {
+        sourceReservation: ReservationDoc;
+        unlinkedTableLabels: string[];
+    };
 };
 
 export const eventEmitter = new EventEmitter<Events>();

@@ -14,50 +14,56 @@ const enum GuestDataMode {
     DELETE = "delete",
 }
 
-eventEmitter.on("reservation:created", function ({ reservation, eventOwner, event }) {
-    handleGuestDataForReservation(reservation, event, eventOwner, GuestDataMode.SET).catch(
+eventEmitter.on("reservation:created", function ({ sourceReservation, eventOwner, event }) {
+    handleGuestDataForReservation(sourceReservation, event, eventOwner, GuestDataMode.SET).catch(
         AppLogger.error.bind(AppLogger),
     );
 });
 
-eventEmitter.on("reservation:arrived", function ({ reservation, eventOwner, event }) {
-    handleGuestDataForReservation(reservation, event, eventOwner, GuestDataMode.SET).catch(
+eventEmitter.on("reservation:arrived", function ({ sourceReservation, eventOwner, event }) {
+    handleGuestDataForReservation(sourceReservation, event, eventOwner, GuestDataMode.SET).catch(
         AppLogger.error.bind(AppLogger),
     );
 });
 
-eventEmitter.on("reservation:cancelled", function ({ reservation, eventOwner, event }) {
-    handleGuestDataForReservation(reservation, event, eventOwner, GuestDataMode.SET).catch(
+eventEmitter.on("reservation:cancelled", function ({ sourceReservation, eventOwner, event }) {
+    handleGuestDataForReservation(sourceReservation, event, eventOwner, GuestDataMode.SET).catch(
         AppLogger.error.bind(AppLogger),
     );
 });
 
-eventEmitter.on("reservation:deleted", function ({ reservation, eventOwner, event }) {
-    handleGuestDataForReservation(reservation, event, eventOwner, GuestDataMode.DELETE).catch(
+eventEmitter.on("reservation:deleted", function ({ sourceReservation, eventOwner, event }) {
+    handleGuestDataForReservation(sourceReservation, event, eventOwner, GuestDataMode.DELETE).catch(
         AppLogger.error.bind(AppLogger),
     );
 });
 
 eventEmitter.on(
     "reservation:updated",
-    function ({ reservation, oldReservation, eventOwner, event }) {
-        const contactAdded = !oldReservation.guestContact && reservation.guestContact;
-        const contactChanged = oldReservation.guestContact !== reservation.guestContact;
+    function ({ newReservation, sourceReservation, eventOwner, event }) {
+        const contactAdded = !sourceReservation.guestContact && newReservation.guestContact;
+        const contactChanged = sourceReservation.guestContact !== newReservation.guestContact;
 
         if (contactAdded) {
-            handleGuestDataForReservation(reservation, event, eventOwner, GuestDataMode.SET).catch(
-                AppLogger.error.bind(AppLogger),
-            );
+            handleGuestDataForReservation(
+                newReservation,
+                event,
+                eventOwner,
+                GuestDataMode.SET,
+            ).catch(AppLogger.error.bind(AppLogger));
         } else if (contactChanged) {
             handleGuestDataForReservation(
-                oldReservation,
+                sourceReservation,
                 event,
                 eventOwner,
                 GuestDataMode.DELETE,
             ).catch(AppLogger.error.bind(AppLogger));
-            handleGuestDataForReservation(reservation, event, eventOwner, GuestDataMode.SET).catch(
-                AppLogger.error.bind(AppLogger),
-            );
+            handleGuestDataForReservation(
+                newReservation,
+                event,
+                eventOwner,
+                GuestDataMode.SET,
+            ).catch(AppLogger.error.bind(AppLogger));
         }
     },
 );

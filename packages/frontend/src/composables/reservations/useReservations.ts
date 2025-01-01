@@ -58,11 +58,11 @@ import { useDialog } from "src/composables/useDialog";
 import { plannedToQueuedReservation } from "src/helpers/reservation/planned-to-queued-reservation";
 import { queuedToPlannedReservation } from "src/helpers/reservation/queued-to-planned-reservation";
 import { isEventInProgress } from "src/helpers/event/is-event-in-progress";
-import { eventEmitter } from "src/boot/event-emitter";
 import { hashString } from "src/helpers/hash-string";
 import { useGuestsStore } from "src/stores/guests-store";
 import { useRouter } from "vue-router";
 import { usePermissionsStore } from "src/stores/permissions-store";
+import { eventEmitter, type BaseEventData } from "src/boot/event-emitter";
 
 type OpenDialog = {
     label: string;
@@ -114,6 +114,15 @@ export function useReservations(
     watch([reservations, floorInstances], handleFloorUpdates, {
         deep: true,
     });
+
+    function createBaseEventDataForEmit(): BaseEventData {
+        return {
+            eventOwner,
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- it is defined
+            event: event.value!,
+            user: nonNullableUser.value,
+        };
+    }
 
     function handleFloorUpdates([newReservations, newFloorInstances]: [
         ReservationDoc[],
@@ -207,13 +216,10 @@ export function useReservations(
                     id: sourceReservation.id,
                     tableLabel: [...currentLabels, targetTable.label],
                 });
-
                 eventEmitter.emit("reservation:linked", {
                     sourceReservation,
                     linkedTableLabel: targetTable.label,
-                    eventOwner,
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
-                    event: event.value!,
+                    ...createBaseEventDataForEmit(),
                 });
             },
         });
@@ -222,14 +228,15 @@ export function useReservations(
     async function handleReservationCreation(reservationData: Reservation): Promise<void> {
         await tryCatchLoadingWrapper({
             async hook() {
-                await addReservation(eventOwner, reservationData);
+                const { id } = await addReservation(eventOwner, reservationData);
                 notifyPositive("Reservation created");
 
                 eventEmitter.emit("reservation:created", {
-                    reservation: reservationData,
-                    eventOwner,
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
-                    event: event.value!,
+                    sourceReservation: {
+                        ...reservationData,
+                        id,
+                    },
+                    ...createBaseEventDataForEmit(),
                 });
             },
         });
@@ -245,11 +252,9 @@ export function useReservations(
                 notifyPositive(t("useReservations.reservationUpdatedMsg"));
 
                 eventEmitter.emit("reservation:updated", {
-                    reservation: reservationData,
-                    oldReservation,
-                    eventOwner,
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
-                    event: event.value!,
+                    sourceReservation: oldReservation,
+                    newReservation: reservationData,
+                    ...createBaseEventDataForEmit(),
                 });
             },
         });
@@ -285,11 +290,9 @@ export function useReservations(
                     tableLabel: updatedTableLabels,
                 });
                 eventEmitter.emit("reservation:unlinked", {
-                    eventOwner,
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
-                    event: event.value!,
                     sourceReservation: reservation,
                     unlinkedTableLabels: [tableToUnlink.label],
+                    ...createBaseEventDataForEmit(),
                 });
             },
         });
@@ -320,18 +323,14 @@ export function useReservations(
                         clearedAt: Date.now(),
                     });
                     eventEmitter.emit("reservation:deleted:soft", {
-                        reservation,
-                        eventOwner,
-                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
-                        event: event.value!,
+                        sourceReservation: reservation,
+                        ...createBaseEventDataForEmit(),
                     });
                 } else {
                     await deleteReservation(eventOwner, reservation);
                     eventEmitter.emit("reservation:deleted", {
-                        reservation,
-                        eventOwner,
-                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
-                        event: event.value!,
+                        sourceReservation: reservation,
+                        ...createBaseEventDataForEmit(),
                     });
                 }
             },
@@ -541,22 +540,22 @@ export function useReservations(
     function onGuestArrived(reservation: PlannedReservationDoc, val: boolean): Promise<void> {
         return tryCatchLoadingWrapper({
             async hook() {
-                await updateReservationDoc(eventOwner, {
+                const updatedReservation = {
+                    ...reservation,
                     id: reservation.id,
                     arrived: val,
                     waitingForResponse: false,
                     reservationConfirmed: false,
-                });
+                };
+                await updateReservationDoc(eventOwner, updatedReservation);
 
-                eventEmitter.emit("reservation:arrived", {
-                    reservation: {
-                        ...reservation,
-                        arrived: val,
-                    },
-                    eventOwner,
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
-                    event: event.value!,
-                });
+                // Only log when guest arrives, not when status is removed
+                if (val) {
+                    eventEmitter.emit("reservation:arrived", {
+                        sourceReservation: updatedReservation,
+                        ...createBaseEventDataForEmit(),
+                    });
+                }
             },
         });
     }
@@ -596,21 +595,21 @@ export function useReservations(
     ): Promise<void> {
         return tryCatchLoadingWrapper({
             async hook() {
-                await updateReservationDoc(eventOwner, {
+                const updatedReservation = {
+                    ...reservation,
                     id: reservation.id,
                     cancelled: val,
                     waitingForResponse: false,
-                });
+                };
+                await updateReservationDoc(eventOwner, updatedReservation);
 
-                eventEmitter.emit("reservation:cancelled", {
-                    reservation: {
-                        ...reservation,
-                        cancelled: val,
-                    },
-                    eventOwner,
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
-                    event: event.value!,
-                });
+                // Only log when cancelled, not when uncancelled
+                if (val) {
+                    eventEmitter.emit("reservation:cancelled", {
+                        sourceReservation: updatedReservation,
+                        ...createBaseEventDataForEmit(),
+                    });
+                }
             },
         });
     }
@@ -632,7 +631,7 @@ export function useReservations(
     }
 
     async function copyReservation(
-        sourceReservation: Reservation,
+        sourceReservation: ReservationDoc,
         targetTable: BaseTable,
         targetFloor: Floor,
     ): Promise<void> {
@@ -648,7 +647,8 @@ export function useReservations(
                 eventEmitter.emit("reservation:copied", {
                     sourceReservation,
                     targetTable,
-                    eventOwner,
+                    targetFloor,
+                    ...createBaseEventDataForEmit(),
                 });
             },
         });
@@ -718,11 +718,15 @@ export function useReservations(
         await tryCatchLoadingWrapper({
             async hook() {
                 await Promise.all(promises);
+
                 eventEmitter.emit("reservation:transferred", {
-                    fromTable: table1,
-                    toTable: table2,
-                    eventOwner,
+                    sourceTableLabel: table1.label,
+                    targetTableLabel: table2.label,
+                    sourceFloor: { id: floor.id, name: floor.name },
+                    targetFloor: { id: floor.id, name: floor.name },
+                    sourceReservation: reservationTable1,
                     targetReservation: reservationTable2,
+                    ...createBaseEventDataForEmit(),
                 });
             },
         });
@@ -788,12 +792,13 @@ export function useReservations(
             async hook() {
                 await Promise.all(promises);
                 eventEmitter.emit("reservation:transferred", {
-                    fromTable: table1,
-                    toTable: table2,
-                    eventOwner,
-                    fromFloor: floor1.name,
-                    toFloor: floor2.name,
+                    sourceTableLabel: table1.label,
+                    targetTableLabel: table2.label,
+                    sourceFloor: { id: floor1.id, name: floor1.name },
+                    targetFloor: { id: floor2.id, name: floor2.name },
+                    sourceReservation: reservationTable1,
                     targetReservation: reservationTable2,
+                    ...createBaseEventDataForEmit(),
                 });
             },
         });
