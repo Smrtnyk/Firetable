@@ -104,8 +104,8 @@ importers:
         specifier: 'catalog:'
         version: 1.31.0
       fabric:
-        specifier: 6.5.3
-        version: 6.5.3(encoding@0.1.13)
+        specifier: 6.5.4
+        version: 6.5.4(encoding@0.1.13)
       hammerjs:
         specifier: 2.0.8
         version: 2.0.8
@@ -3298,8 +3298,8 @@ packages:
     resolution: {integrity: sha512-hMQ4CX1p1izmuLYyZqLMO/qGNw10wSv9QDCPfzXfyFrOaCSSoRfqE1Kf1s5an66J5JZC62NewG+mK49jOCtQew==}
     engines: {node: '>=4'}
 
-  fabric@6.5.3:
-    resolution: {integrity: sha512-3ICPF9rB4klffHhJNvdJBo+gomxzf2v3MtZKartRI7mm9d2nSsxrXCO2qJKCPMEflTRJb1//smJCGPKiT9xtYA==}
+  fabric@6.5.4:
+    resolution: {integrity: sha512-X+O8G+3aDQSp3lxRekvIy/gMwtzcjAG7IvGXjb4PeUD6+nUJfSfGnaEWpni9aAcXuGz8zXhpMQQELV+4FfRTwA==}
     engines: {node: '>=16.20.0'}
 
   farmhash-modern@1.1.0:
@@ -10061,7 +10061,7 @@ snapshots:
       iconv-lite: 0.4.24
       tmp: 0.0.33
 
-  fabric@6.5.3(encoding@0.1.13):
+  fabric@6.5.4(encoding@0.1.13):
     optionalDependencies:
       canvas: 2.11.2(encoding@0.1.13)
       jsdom: 25.0.1(canvas@2.11.2(encoding@0.1.13))
