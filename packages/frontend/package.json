@@ -40,7 +40,7 @@
         "@posva/event-emitter": "catalog:",
         "@quasar/extras": "1.16.15",
         "@sentry/vue": "8.47.0",
-        "@vueuse/core": "12.2.0",
+        "@vueuse/core": "12.3.0",
         "date-fns": "4.1.0",
         "echarts": "5.6.0",
         "es-toolkit": "catalog:",
