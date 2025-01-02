@@ -431,15 +431,20 @@ export default config(
         },
     },
     {
-        files: ["**/functions/src/**/*.ts", "**/functions/test-helpers/**/*.ts"],
+        files: [
+            "**/functions/src/**/*.ts",
+            "**/functions/test-helpers/**/*.ts",
+            "**/seeds/**/*.ts",
+        ],
         rules: {
             "no-await-in-loop": "off",
         },
     },
     {
-        files: ["**/functions/test-helpers/**/*.ts"],
+        files: ["**/functions/test-helpers/**/*.ts", "**/seeds/**/*.ts"],
         rules: {
             "no-console": "off",
+            "@typescript-eslint/no-non-null-assertion": "off",
         },
     },
     ...compat.extends("plugin:prettier/recommended"),

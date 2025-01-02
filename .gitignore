@@ -4,9 +4,9 @@
 .thumbs.db
 .firebase
 firebase.config.js
-algolia.config.js
+cert.json
 node_modules
-packages/frontend/dist
+packages/functions/seeds/cert.json
 /src-cordova/node_modules
 /src-cordova/platforms
 /src-cordova/plugins
