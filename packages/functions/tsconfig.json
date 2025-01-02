@@ -31,11 +31,13 @@
             "@shared-types": ["../types/src/index.js"]
         },
         "baseUrl": ".",
-        "preserveConstEnums": false
+        "preserveConstEnums": false,
+        "types": ["node"]
     },
     "compileOnSave": true,
     "include": [
-        "./src"
+        "./src",
+        "./seeds"
     ],
     "exclude": [
         "node_modules",

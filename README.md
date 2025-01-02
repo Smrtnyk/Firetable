@@ -102,6 +102,35 @@ Required before first use:
 2. Add new user with custom claim: `{ "role": "Administrator" }`
 3. Use these credentials to log in
 
+### Database Seeding
+Or rather than starting from scratch and creating admin user manually, you can seed the database with sample data.
+For development and testing, you can populate the emulators with sample data:
+
+1. Ensure emulators are running: `pnpm run start:emulators`
+2. Run the seed script:
+```bash
+cd packages/functions
+pnpm run seed
+```
+
+This will create:
+- Admin user: `admin@firetable.at` / `ADMIN123`
+- Multiple organizations with properties
+- Users with various roles (all using password: `USER123`)
+- Sample events with floor plans
+- Guest data with visit history
+
+The seeding script automatically:
+- Creates organization hierarchies
+- Assigns properties to organizations
+- Sets up users with appropriate roles and permissions
+- Generates realistic event data
+- Creates guest records with visit history
+
+This makes it easy to start development with a fully populated database instead of an empty state.
+To clear the database and start fresh, you have to do it manually in the emulators UI.
+Emulators UI provides buttons to clear the database and authentication state.
+
 ## Language Support
 Currently supports English with partial German translations
 
