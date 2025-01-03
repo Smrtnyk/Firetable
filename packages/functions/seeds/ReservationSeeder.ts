@@ -2,6 +2,7 @@ import type { EventDoc } from "@shared-types/event.js";
 import type {
     PlannedReservation,
     PlannedReservationDoc,
+    User,
     WalkInReservation,
     WalkInReservationDoc,
 } from "@shared-types/index.js";
@@ -19,7 +20,7 @@ import {
 import { faker } from "@faker-js/faker";
 
 export class ReservationSeeder extends BaseSeeder {
-    async seed(events: Omit<EventDoc, "_doc">[]): Promise<void> {
+    async seedForEvents(events: Omit<EventDoc, "_doc">[], users: User[]): Promise<void> {
         for (const event of events) {
             const floorsSnapshot = await db
                 .collection(
@@ -49,13 +50,26 @@ export class ReservationSeeder extends BaseSeeder {
 
                 // Generate reservations for this floor
                 for (let i = 0; i < reservationCount; i++) {
+                    // Pick random users for creator / reservedBy
+                    const randomCreator = faker.helpers.arrayElement(users);
+                    const randomReservedBy = faker.helpers.arrayElement(users);
+
                     if (faker.number.int({ min: 1, max: 100 }) <= 70) {
                         allReservations.push(
-                            this.generatePlannedReservation(floorTableLabels, floorDoc.id),
+                            this.generatePlannedReservation(
+                                floorTableLabels,
+                                floorDoc.id,
+                                randomCreator,
+                                randomReservedBy,
+                            ),
                         );
                     } else {
                         allReservations.push(
-                            this.generateWalkInReservation(floorTableLabels, floorDoc.id),
+                            this.generateWalkInReservation(
+                                floorTableLabels,
+                                floorDoc.id,
+                                randomCreator,
+                            ),
                         );
                     }
                 }
@@ -71,6 +85,8 @@ export class ReservationSeeder extends BaseSeeder {
     private generatePlannedReservation(
         tableLabels: string[],
         floorId: string,
+        creatorUser: User,
+        reservedByUser: User,
     ): PlannedReservationDoc {
         const table = faker.helpers.arrayElement(tableLabels);
         const isVIP = faker.datatype.boolean();
@@ -88,9 +104,9 @@ export class ReservationSeeder extends BaseSeeder {
                 }) ?? "",
             time: faker.helpers.arrayElement(["20:00", "21:00", "22:00", "23:00"]),
             creator: {
-                id: faker.string.uuid(),
-                name: faker.person.fullName(),
-                email: faker.internet.email(),
+                id: creatorUser.id,
+                name: creatorUser.name,
+                email: creatorUser.email,
                 createdAt: faker.date.recent().getTime(),
             },
             status: ReservationStatus.ACTIVE,
@@ -109,9 +125,9 @@ export class ReservationSeeder extends BaseSeeder {
                 : faker.number.int({ min: 50, max: 500 }),
             guestName: faker.person.fullName(),
             reservedBy: {
-                id: faker.string.uuid(),
-                name: faker.person.fullName(),
-                email: faker.internet.email(),
+                id: reservedByUser.id,
+                name: reservedByUser.name,
+                email: reservedByUser.email,
             },
             isVIP,
         };
@@ -120,6 +136,7 @@ export class ReservationSeeder extends BaseSeeder {
     private generateWalkInReservation(
         tableLabels: string[],
         floorId: string,
+        creatorUser: User,
     ): WalkInReservationDoc {
         const table = faker.helpers.arrayElement(tableLabels);
         const isVIP = faker.datatype.boolean();
@@ -137,9 +154,9 @@ export class ReservationSeeder extends BaseSeeder {
                 }) ?? "",
             time: faker.helpers.arrayElement(["20:00", "21:00", "22:00", "23:00"]),
             creator: {
-                id: faker.string.uuid(),
-                name: faker.person.fullName(),
-                email: faker.internet.email(),
+                id: creatorUser.id,
+                name: creatorUser.name,
+                email: creatorUser.email,
                 createdAt: faker.date.recent().getTime(),
             },
             status: ReservationStatus.ACTIVE,

@@ -1,4 +1,3 @@
-import type { PropertyDoc } from "@shared-types/property.js";
 import { OrganisationSeeder } from "../OrganisationSeeder.js";
 import { UserSeeder } from "../UserSeeder.js";
 import { PropertySeeder } from "../PropertySeeder.js";
@@ -7,6 +6,7 @@ import { EventSeeder } from "../EventSeeder.js";
 import { GuestSeeder } from "../GuestSeeder.js";
 import { verifyEmulatorConnection } from "../config.js";
 import { ReservationSeeder } from "../ReservationSeeder.js";
+import { faker } from "@faker-js/faker";
 
 await verifyEmulatorConnection();
 
@@ -15,37 +15,31 @@ async function seed(): Promise<void> {
 
     try {
         const organisationSeeder = new OrganisationSeeder();
-        const organisations = await organisationSeeder.seed();
-
         const propertySeeder = new PropertySeeder();
-        const properties = await propertySeeder.seed(organisations);
-
-        // Group properties by org for user seeding
-        const propertiesByOrg = properties.reduce<Record<string, PropertyDoc[]>>(
-            (acc, property) => {
-                if (!acc[property.organisationId]) {
-                    acc[property.organisationId] = [];
-                }
-                acc[property.organisationId]?.push(property);
-                return acc;
-            },
-            {},
-        );
-
         const userSeeder = new UserSeeder();
-        await userSeeder.seed(organisations, propertiesByOrg);
-
         const floorSeeder = new FloorSeeder();
-        await floorSeeder.seed(properties);
-
         const eventSeeder = new EventSeeder();
-        const events = await eventSeeder.seed(properties);
-
         const guestSeeder = new GuestSeeder();
-        await guestSeeder.seed(organisations, properties, events);
-
         const reservationSeeder = new ReservationSeeder();
-        await reservationSeeder.seed(events);
+
+        for (let i = 0; i < 20; i++) {
+            const orgId = `org-${(i + 1).toString().padStart(2, "0")}`;
+            const organisation = await organisationSeeder.seedOne(orgId);
+            console.log(`✓ Created organisation: ${organisation.name}`);
+
+            const propertyCount = faker.number.int({ min: 1, max: 5 });
+            const properties = await propertySeeder.seedForOrganisation(
+                organisation,
+                propertyCount,
+            );
+            const users = await userSeeder.seedForOrganisation(organisation, properties);
+            await floorSeeder.seedForProperties(properties);
+            const events = await eventSeeder.seedForProperties(properties);
+            await guestSeeder.seedForOrganisation(organisation, properties, events);
+            await reservationSeeder.seedForEvents(events, users);
+        }
+
+        await userSeeder.createAdminUser();
 
         console.log("✨ Seeding completed successfully!");
     } catch (error) {
