@@ -2,6 +2,7 @@ import type { Timestamp } from "firebase/firestore";
 
 export * from "./firebase.js";
 export type * from "./event.js";
+export * from "./reservation-logs.js";
 export type * from "./floor.js";
 export * from "./auth.js";
 export type * from "./property.js";

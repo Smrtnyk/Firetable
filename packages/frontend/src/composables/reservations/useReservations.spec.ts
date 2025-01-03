@@ -41,7 +41,7 @@ const {
         hide: vi.fn(),
     }),
     updateReservationDocMock: vi.fn().mockResolvedValue(undefined),
-    addReservationMock: vi.fn().mockResolvedValue(undefined),
+    addReservationMock: vi.fn().mockResolvedValue(1),
     deleteReservationMock: vi.fn().mockResolvedValue(undefined),
     moveReservationFromQueueMock: vi.fn().mockResolvedValue(undefined),
     moveReservationToQueueMock: vi.fn().mockResolvedValue(undefined),
@@ -50,17 +50,17 @@ const {
     eventEmitMock: vi.fn(),
 }));
 
-vi.mock("vue-router", () => {
-    return {
-        useRouter: vi.fn(),
-    };
-});
-
 vi.mock("src/boot/event-emitter", () => ({
     eventEmitter: {
         emit: eventEmitMock,
     },
 }));
+
+vi.mock("vue-router", () => {
+    return {
+        useRouter: vi.fn(),
+    };
+});
 
 vi.mock("src/composables/useDialog", () => ({
     useDialog: () => ({
@@ -279,15 +279,14 @@ describe("useReservations", () => {
                 }),
             );
 
-            expect(eventEmitMock).toHaveBeenCalledWith(
-                "reservation:transferred",
-                expect.objectContaining({
-                    fromTable: sourceTable,
-                    toTable: targetTable,
-                    eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
-                    targetReservation: undefined,
-                }),
-            );
+            expect(eventEmitMock).toHaveBeenCalledWith("reservation:transferred", {
+                sourceTableLabel: sourceTable.label,
+                targetTableLabel: targetTable?.label,
+                sourceFloor: { id: floor.id, name: floor.name },
+                targetFloor: { id: floor.id, name: floor.name },
+                sourceReservation,
+                targetReservation: undefined,
+            });
         });
 
         it("transfers reservation between different floors", async () => {
@@ -339,16 +338,14 @@ describe("useReservations", () => {
                 }),
             );
 
-            expect(eventEmitMock).toHaveBeenCalledWith(
-                "reservation:transferred",
-                expect.objectContaining({
-                    fromTable: sourceTable,
-                    toTable: targetTable,
-                    fromFloor: "Floor 1",
-                    toFloor: "Floor 2",
-                    eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
-                }),
-            );
+            expect(eventEmitMock).toHaveBeenCalledWith("reservation:transferred", {
+                sourceTableLabel: sourceTable.label,
+                targetTableLabel: targetTable?.label,
+                sourceFloor: { id: floor1.id, name: floor1.name },
+                targetFloor: { id: floor2.id, name: floor2.name },
+                sourceReservation,
+                targetReservation: undefined,
+            });
         });
 
         it("allows transfer when target table is reserved by swapping reservations", async () => {
@@ -417,15 +414,14 @@ describe("useReservations", () => {
                 }),
             );
 
-            expect(eventEmitMock).toHaveBeenCalledWith(
-                "reservation:transferred",
-                expect.objectContaining({
-                    fromTable: sourceTable,
-                    toTable: targetTable,
-                    eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
-                    targetReservation,
-                }),
-            );
+            expect(eventEmitMock).toHaveBeenCalledWith("reservation:transferred", {
+                sourceTableLabel: sourceTable.label,
+                targetTableLabel: targetTable?.label,
+                sourceFloor: { id: floor.id, name: floor.name },
+                targetFloor: { id: floor.id, name: floor.name },
+                sourceReservation,
+                targetReservation,
+            });
         });
 
         it("prevents transfer to same table", async () => {
@@ -514,14 +510,14 @@ describe("useReservations", () => {
                 }),
             );
 
-            expect(eventEmitMock).toHaveBeenCalledWith(
-                "reservation:transferred",
-                expect.objectContaining({
-                    fromTable: sourceTable,
-                    toTable: targetTable,
-                    eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
-                }),
-            );
+            expect(eventEmitMock).toHaveBeenCalledWith("reservation:transferred", {
+                sourceTableLabel: sourceTable.label,
+                targetTableLabel: targetTable?.label,
+                sourceFloor: { id: floor.id, name: floor.name },
+                targetFloor: { id: floor.id, name: floor.name },
+                sourceReservation,
+                targetReservation: undefined,
+            });
         });
     });
 
@@ -575,14 +571,9 @@ describe("useReservations", () => {
                     }),
                 );
 
-                expect(eventEmitMock).toHaveBeenCalledWith(
-                    "reservation:deleted:soft",
-                    expect.objectContaining({
-                        reservation: existingReservation,
-                        eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
-                        event,
-                    }),
-                );
+                expect(eventEmitMock).toHaveBeenCalledWith("reservation:deleted:soft", {
+                    sourceReservation: existingReservation,
+                });
             });
 
             it("handles hard deletion of active reservation", async () => {
@@ -635,14 +626,9 @@ describe("useReservations", () => {
                     existingReservation,
                 );
 
-                expect(eventEmitMock).toHaveBeenCalledWith(
-                    "reservation:deleted",
-                    expect.objectContaining({
-                        reservation: existingReservation,
-                        eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
-                        event: expect.any(Object),
-                    }),
-                );
+                expect(eventEmitMock).toHaveBeenCalledWith("reservation:deleted", {
+                    sourceReservation: existingReservation,
+                });
             });
 
             it("cancels deletion when user declines confirmation", async () => {
@@ -737,14 +723,10 @@ describe("useReservations", () => {
                     updatedReservation,
                 );
 
-                expect(eventEmitMock).toHaveBeenCalledWith(
-                    "reservation:updated",
-                    expect.objectContaining({
-                        reservation: updatedReservation,
-                        eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
-                        event,
-                    }),
-                );
+                expect(eventEmitMock).toHaveBeenCalledWith("reservation:updated", {
+                    sourceReservation: existingReservation,
+                    newReservation: updatedReservation,
+                });
             });
         });
 
@@ -784,18 +766,14 @@ describe("useReservations", () => {
                 await createHandler(newReservation);
 
                 expect(addReservationMock).toHaveBeenCalled();
-                expect(eventEmitMock).toHaveBeenCalledWith(
-                    "reservation:created",
-                    expect.objectContaining({
-                        reservation: expect.objectContaining({
-                            ...newReservation,
-                            floorId: floor.id,
-                            tableLabel: "T1",
-                        }),
-                        eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
-                        event: expect.any(Object),
+                expect(eventEmitMock).toHaveBeenCalledWith("reservation:created", {
+                    sourceReservation: expect.objectContaining({
+                        ...newReservation,
+                        floorId: floor.id,
+                        tableLabel: "T1",
                     }),
-                );
+                    event,
+                });
             });
 
             it("handles API errors during reservation creation", async () => {
@@ -836,7 +814,7 @@ describe("useReservations", () => {
                 await nextTick();
 
                 await expect.element(page.getByText("API Error")).toBeVisible();
-                expect(eventEmitMock).not.toHaveBeenCalled();
+                expect(createReservationLoggerMock().logCreation).not.toHaveBeenCalled();
             });
         });
 
@@ -883,12 +861,11 @@ describe("useReservations", () => {
                     }),
                 );
 
-                expect(eventEmitMock).toHaveBeenCalledWith(
-                    "reservation:copied",
+                expect(createReservationLoggerMock().logCopy).toHaveBeenCalledWith(
                     expect.objectContaining({
                         sourceReservation,
                         targetTable,
-                        eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
+                        targetFloor: floor,
                     }),
                 );
             });
@@ -1062,15 +1039,10 @@ describe("useReservations", () => {
                     }),
                 );
 
-                expect(eventEmitMock).toHaveBeenCalledWith(
-                    "reservation:unlinked",
-                    expect.objectContaining({
-                        eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
-                        event,
-                        sourceReservation,
-                        unlinkedTableLabels: ["T2"],
-                    }),
-                );
+                expect(createReservationLoggerMock().logUnlink).toHaveBeenCalledWith({
+                    sourceReservation,
+                    unlinkedTableLabels: ["T2"],
+                });
             });
 
             it("cancels unlinking when user declines confirmation", async () => {
@@ -1106,7 +1078,7 @@ describe("useReservations", () => {
                 await userEvent.click(page.getByRole("button", { name: "CANCEL" }));
 
                 expect(updateReservationDocMock).not.toHaveBeenCalled();
-                expect(eventEmitMock).not.toHaveBeenCalled();
+                expect(createReservationLoggerMock().logUnlink).not.toHaveBeenCalled();
             });
 
             it("prevents linking tables across different floors", async () => {
@@ -1203,15 +1175,12 @@ describe("useReservations", () => {
                 }),
             );
 
-            expect(eventEmitMock).toHaveBeenCalledWith(
-                "reservation:arrived",
+            expect(createReservationLoggerMock().logGuestArrived).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    reservation: expect.objectContaining({
-                        ...existingReservation,
-                        arrived: true,
-                    }),
-                    eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
-                    event: expect.any(Object),
+                    ...existingReservation,
+                    arrived: true,
+                    waitingForResponse: false,
+                    reservationConfirmed: false,
                 }),
             );
         });
@@ -1262,15 +1231,11 @@ describe("useReservations", () => {
                 }),
             );
 
-            expect(eventEmitMock).toHaveBeenCalledWith(
-                "reservation:cancelled",
+            expect(createReservationLoggerMock().logCancel).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    reservation: expect.objectContaining({
-                        ...existingReservation,
-                        cancelled: true,
-                    }),
-                    eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
-                    event,
+                    ...existingReservation,
+                    cancelled: true,
+                    waitingForResponse: false,
                 }),
             );
         });
@@ -1304,7 +1269,7 @@ describe("useReservations", () => {
             await nextTick();
 
             await expect.element(page.getByText("API Error")).toBeVisible();
-            expect(eventEmitMock).not.toHaveBeenCalled();
+            expect(createReservationLoggerMock().logGuestArrived).not.toHaveBeenCalled();
         });
     });
 
@@ -1482,15 +1447,10 @@ describe("useReservations", () => {
             };
             await updateHandler(updatedReservation);
 
-            expect(eventEmitMock).toHaveBeenCalledTimes(1);
-            expect(eventEmitMock).toHaveBeenCalledWith(
-                "reservation:updated",
-                expect.objectContaining({
-                    reservation: updatedReservation,
-                    oldReservation: existingReservation,
-                    eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
-                    event,
-                }),
+            expect(createReservationLoggerMock().logUpdate).toHaveBeenCalledTimes(1);
+            expect(createReservationLoggerMock().logUpdate).toHaveBeenCalledWith(
+                existingReservation,
+                updatedReservation,
             );
         });
     });

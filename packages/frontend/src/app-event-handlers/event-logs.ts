@@ -1,101 +1,288 @@
+import type { ReservationDoc, ReservationLogEntry, TransferDetails } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
-import type { ReservationDoc } from "@firetable/types";
-import { eventEmitter } from "src/boot/event-emitter";
-import { addLogToEvent } from "@firetable/backend";
+import { ReservationAction, TransferType } from "@firetable/types";
+import { addStructuredLogToEvent } from "@firetable/backend";
 import { AppLogger } from "src/logger/FTLogger";
-import { useAuthStore } from "src/stores/auth-store";
+import { eventEmitter } from "src/boot/event-emitter";
 
-eventEmitter.on("reservation:created", function ({ reservation, eventOwner }) {
-    createEventLog(`Reservation created on table ${reservation.tableLabel}`, eventOwner);
-});
+eventEmitter.on("reservation:transferred", function (params) {
+    const {
+        sourceTableLabel,
+        targetTableLabel,
+        sourceFloor,
+        targetFloor,
+        targetReservation,
+        sourceReservation,
+        user,
+        eventOwner,
+    } = params;
 
-eventEmitter.on("reservation:updated", function ({ reservation, oldReservation, eventOwner }) {
-    const diff = generateReservationDiff(oldReservation, reservation);
-    createEventLog(`Reservation edited on table ${reservation.tableLabel}${diff}`, eventOwner);
-});
+    const transferDetails: TransferDetails = {
+        type: targetReservation ? TransferType.SWAP : TransferType.EMPTY_TABLE,
+        isCrossFloor: sourceFloor.id !== targetFloor.id,
+        sourceTable: {
+            label: sourceTableLabel,
+            floorId: sourceFloor.id,
+            floorName: sourceFloor.name,
+        },
+        targetTable: {
+            label: targetTableLabel,
+            floorId: targetFloor.id,
+            floorName: targetFloor.name,
+        },
+        ...(targetReservation && {
+            targetReservation: {
+                id: targetReservation.id,
+                guestName: targetReservation.guestName,
+            },
+        }),
+    };
 
-eventEmitter.on("reservation:deleted", function ({ reservation, eventOwner }) {
-    createEventLog(`Reservation deleted on table ${reservation.tableLabel}`, eventOwner);
-});
-
-eventEmitter.on("reservation:deleted:soft", function ({ reservation, eventOwner }) {
-    createEventLog(`Reservation soft deleted on table ${reservation.tableLabel}`, eventOwner);
-});
-
-eventEmitter.on("reservation:copied", function ({ sourceReservation, targetTable, eventOwner }) {
-    createEventLog(
-        `Reservation copied from table ${sourceReservation.tableLabel} to table ${targetTable.label}`,
+    createLog(
+        {
+            action: ReservationAction.TRANSFER,
+            creator: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            },
+            reservationId: sourceReservation.id,
+            floorId: sourceFloor.id,
+            tableLabel: sourceTableLabel,
+            transferDetails,
+        },
         eventOwner,
     );
 });
 
-eventEmitter.on("reservation:transferred", function (data) {
-    const { fromTable, toTable, eventOwner, fromFloor, toFloor, targetReservation } = data;
+eventEmitter.on("reservation:created", function (data) {
+    const { sourceReservation, user, eventOwner } = data;
 
-    let message = "";
-
-    // Cross-floor operation
-    if (fromFloor && toFloor && fromFloor !== toFloor) {
-        message = targetReservation
-            ? `Reservation swapped between table ${fromTable.label} (${fromFloor}) and table ${toTable.label} (${toFloor})`
-            : `Reservation transferred from table ${fromTable.label} (${fromFloor}) to empty table ${toTable.label} (${toFloor})`;
-    }
-    // Same floor operation
-    else if (targetReservation) {
-        message = `Reservation swapped between table ${fromTable.label} and table ${toTable.label}`;
-    } else {
-        message = `Reservation transferred from table ${fromTable.label} to empty table ${toTable.label}`;
-    }
-
-    createEventLog(message, eventOwner);
-});
-
-eventEmitter.on("reservation:arrived", function ({ reservation, eventOwner }) {
-    createEventLog(`Guest arrived for reservation on table ${reservation.tableLabel}`, eventOwner);
-});
-
-eventEmitter.on("reservation:cancelled", function ({ reservation, eventOwner }) {
-    createEventLog(`Reservation cancelled on table ${reservation.tableLabel}`, eventOwner);
+    createLog(
+        {
+            action: ReservationAction.CREATE,
+            creator: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            },
+            reservationId: sourceReservation.id,
+            floorId: sourceReservation.floorId,
+            tableLabel: sourceReservation.tableLabel,
+            guestName: sourceReservation.guestName,
+            numberOfGuests: sourceReservation.numberOfGuests,
+        },
+        eventOwner,
+    );
 });
 
 eventEmitter.on(
-    "reservation:linked",
-    function ({ sourceReservation, linkedTableLabel, eventOwner }) {
-        createEventLog(
-            `Table ${linkedTableLabel} linked to reservation on table ${
-                Array.isArray(sourceReservation.tableLabel)
-                    ? sourceReservation.tableLabel[0]
-                    : sourceReservation.tableLabel
-            }`,
+    "reservation:updated",
+    function ({ newReservation, sourceReservation, user, eventOwner }) {
+        const changes = generateReservationDiff(sourceReservation, newReservation);
+
+        createLog(
+            {
+                action: ReservationAction.UPDATE,
+                creator: {
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role,
+                },
+                reservationId: newReservation.id,
+                floorId: newReservation.floorId,
+                tableLabel: newReservation.tableLabel,
+                guestName: newReservation.guestName,
+                numberOfGuests: newReservation.numberOfGuests,
+                changes: changes.structuredDiff,
+            },
             eventOwner,
         );
     },
 );
 
-eventEmitter.on(
-    "reservation:unlinked",
-    function ({ sourceReservation, unlinkedTableLabels, eventOwner }) {
-        createEventLog(
-            `Tables ${unlinkedTableLabels.join(", ")} unlinked from reservation on table ${
-                Array.isArray(sourceReservation.tableLabel)
-                    ? sourceReservation.tableLabel[0]
-                    : sourceReservation.tableLabel
-            }`,
-            eventOwner,
-        );
-    },
-);
+eventEmitter.on("reservation:deleted", function ({ sourceReservation, user, eventOwner }) {
+    createLog(
+        {
+            action: ReservationAction.DELETE,
+            creator: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            },
+            reservationId: sourceReservation.id,
+            floorId: sourceReservation.floorId,
+            tableLabel: sourceReservation.tableLabel,
+            guestName: sourceReservation.guestName,
+            numberOfGuests: sourceReservation.numberOfGuests,
+        },
+        eventOwner,
+    );
+});
 
-function createEventLog(message: string, eventOwner: EventOwner): void {
-    const authStore = useAuthStore();
-    const user = authStore.nonNullableUser;
-    addLogToEvent(eventOwner, message, user).catch(AppLogger.error.bind(AppLogger));
+eventEmitter.on("reservation:deleted:soft", function ({ sourceReservation, user, eventOwner }) {
+    createLog(
+        {
+            action: ReservationAction.SOFT_DELETE,
+            creator: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            },
+            reservationId: sourceReservation.id,
+            floorId: sourceReservation.floorId,
+            tableLabel: sourceReservation.tableLabel,
+            guestName: sourceReservation.guestName,
+            numberOfGuests: sourceReservation.numberOfGuests,
+        },
+        eventOwner,
+    );
+});
+
+eventEmitter.on("reservation:copied", function (params) {
+    const { sourceReservation, targetTable, targetFloor, user, eventOwner } = params;
+
+    createLog(
+        {
+            action: ReservationAction.COPY,
+            creator: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            },
+            reservationId: sourceReservation.id,
+            floorId: sourceReservation.floorId,
+            tableLabel: sourceReservation.tableLabel,
+            guestName: sourceReservation.guestName,
+            numberOfGuests: sourceReservation.numberOfGuests,
+            transferDetails: {
+                type: TransferType.EMPTY_TABLE,
+                isCrossFloor: sourceReservation.floorId !== targetFloor.id,
+                sourceTable: {
+                    label: sourceReservation.tableLabel as string,
+                    floorId: sourceReservation.floorId,
+                    // Currently copy only allowed on same floors
+                    floorName: targetFloor.name,
+                },
+                targetTable: {
+                    label: targetTable.label,
+                    floorId: targetFloor.id,
+                    floorName: targetFloor.name,
+                },
+            },
+        },
+        eventOwner,
+    );
+});
+
+eventEmitter.on("reservation:linked", function (params) {
+    const { sourceReservation, linkedTableLabel, eventOwner, user } = params;
+
+    createLog(
+        {
+            action: ReservationAction.LINK,
+            creator: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            },
+            reservationId: sourceReservation.id,
+            floorId: sourceReservation.floorId,
+            tableLabel: sourceReservation.tableLabel,
+            guestName: sourceReservation.guestName,
+            numberOfGuests: sourceReservation.numberOfGuests,
+            linkedTableLabel,
+        },
+        eventOwner,
+    );
+});
+
+eventEmitter.on("reservation:unlinked", function (params) {
+    const { sourceReservation, user, eventOwner } = params;
+
+    createLog(
+        {
+            action: ReservationAction.UNLINK,
+            creator: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            },
+            reservationId: sourceReservation.id,
+            floorId: sourceReservation.floorId,
+            tableLabel: sourceReservation.tableLabel,
+            guestName: sourceReservation.guestName,
+            numberOfGuests: sourceReservation.numberOfGuests,
+        },
+        eventOwner,
+    );
+});
+
+eventEmitter.on("reservation:arrived", function (data) {
+    const { sourceReservation, user, eventOwner } = data;
+
+    createLog(
+        {
+            action: ReservationAction.GUEST_ARRIVED,
+            creator: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            },
+            reservationId: sourceReservation.id,
+            floorId: sourceReservation.floorId,
+            tableLabel: sourceReservation.tableLabel,
+            guestName: sourceReservation.guestName,
+            numberOfGuests: sourceReservation.numberOfGuests,
+        },
+        eventOwner,
+    );
+});
+
+eventEmitter.on("reservation:cancelled", function (data) {
+    const { sourceReservation, user, eventOwner } = data;
+
+    createLog(
+        {
+            action: ReservationAction.CANCEL,
+            creator: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            },
+            reservationId: sourceReservation.id,
+            floorId: sourceReservation.floorId,
+            tableLabel: sourceReservation.tableLabel,
+            guestName: sourceReservation.guestName,
+            numberOfGuests: sourceReservation.numberOfGuests,
+        },
+        eventOwner,
+    );
+});
+
+function createLog(logEntry: Omit<ReservationLogEntry, "timestamp">, eventOwner: EventOwner): void {
+    addStructuredLogToEvent(eventOwner, logEntry).catch(function (error) {
+        AppLogger.error("Error creating log entry:", error);
+    });
 }
 
 function generateReservationDiff(
     oldReservation: ReservationDoc,
     newReservation: ReservationDoc,
-): string {
+): {
+    textDiff: string;
+    structuredDiff: { field: string; oldValue: any; newValue: any }[];
+} {
     const relevantFields: (keyof ReservationDoc)[] = [
         "guestName",
         "guestContact",
@@ -105,6 +292,7 @@ function generateReservationDiff(
         "isVIP",
     ];
 
+    const structuredDiff: { field: string; oldValue: any; newValue: any }[] = [];
     const changes: string[] = [];
 
     for (const field of relevantFields) {
@@ -114,9 +302,18 @@ function generateReservationDiff(
         if (oldValue !== newValue) {
             const oldDisplay = oldValue ?? "none";
             const newDisplay = newValue ?? "none";
+
             changes.push(`• ${field}: ${oldDisplay} → ${newDisplay}`);
+            structuredDiff.push({
+                field,
+                oldValue: oldDisplay,
+                newValue: newDisplay,
+            });
         }
     }
 
-    return changes.length > 0 ? `\nChanges:\n${changes.join("\n")}` : "";
+    return {
+        textDiff: changes.length > 0 ? `\nChanges:\n${changes.join("\n")}` : "",
+        structuredDiff,
+    };
 }
