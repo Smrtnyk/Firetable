@@ -6,6 +6,7 @@ import { FloorSeeder } from "../FloorSeeder.js";
 import { EventSeeder } from "../EventSeeder.js";
 import { GuestSeeder } from "../GuestSeeder.js";
 import { verifyEmulatorConnection } from "../config.js";
+import { ReservationSeeder } from "../ReservationSeeder.js";
 
 await verifyEmulatorConnection();
 
@@ -42,6 +43,9 @@ async function seed(): Promise<void> {
 
         const guestSeeder = new GuestSeeder();
         await guestSeeder.seed(organisations, properties, events);
+
+        const reservationSeeder = new ReservationSeeder();
+        await reservationSeeder.seed(events);
 
         console.log("✨ Seeding completed successfully!");
     } catch (error) {
