@@ -7,16 +7,13 @@ import vue from "@vitejs/plugin-vue";
 
 export default defineConfig({
     plugins: [
-        // @ts-expect-error -- something is wrong with the types
         tsconfigPaths({
             // This is needed to avoid Vitest picking up tsconfig.json files from other unrelated projects in the monorepo
             ignoreConfigErrors: true,
         }),
-        // @ts-expect-error -- something is wrong with the types
         vue({
             template: { transformAssetUrls },
         }),
-        // @ts-expect-error -- something is wrong with the types
         quasar({
             sassVariables: "src/css/quasar.variables.scss",
         }),
