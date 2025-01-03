@@ -10,7 +10,7 @@ import { faker } from "@faker-js/faker";
 import { Role } from "@shared-types/auth.js";
 
 export class EventSeeder extends BaseSeeder {
-    async seed(properties: PropertyDoc[]): Promise<Omit<EventDoc, "_doc">[]> {
+    async seedForProperties(properties: PropertyDoc[]): Promise<Omit<EventDoc, "_doc">[]> {
         const events: Omit<EventDoc, "_doc">[] = [];
 
         for (const property of properties) {

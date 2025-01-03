@@ -4,18 +4,11 @@ import { DataGenerator } from "./DataGenerator.js";
 import { Collection } from "@shared-types/firebase.js";
 
 export class OrganisationSeeder extends BaseSeeder {
-    async seed(): Promise<OrganisationDoc[]> {
-        const organisations: OrganisationDoc[] = [];
+    async seedOne(id: string): Promise<OrganisationDoc> {
+        const organisation = DataGenerator.generateOrganisation(id);
 
-        for (let i = 0; i < 20; i++) {
-            const id = `org-${(i + 1).toString().padStart(2, "0")}`;
-            organisations.push(DataGenerator.generateOrganisation(id));
-        }
+        await this.batchWrite([organisation], Collection.ORGANISATIONS);
 
-        await this.batchWrite(organisations, Collection.ORGANISATIONS);
-
-        console.log(`✓ Seeded ${organisations.length} organisations`);
-
-        return organisations;
+        return organisation;
     }
 }

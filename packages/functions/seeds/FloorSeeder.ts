@@ -16,7 +16,7 @@ export class FloorSeeder extends BaseSeeder {
         };
     } = {};
 
-    async seed(properties: PropertyDoc[]): Promise<void> {
+    async seedForProperties(properties: PropertyDoc[]): Promise<void> {
         await this.loadFloorPlans();
         const floorPlanKeys = Object.keys(this.floorPlans);
 
