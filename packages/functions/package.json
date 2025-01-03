@@ -15,7 +15,7 @@
         "seed": "npx tsx seeds/scripts/seed.ts"
     },
     "dependencies": {
-        "@google-cloud/functions-framework": "3.4.4",
+        "@google-cloud/functions-framework": "3.4.5",
         "es-toolkit": "1.31.0",
         "firebase-admin": "13.0.2",
         "firebase-functions": "6.2.0"
@@ -24,8 +24,8 @@
         "@faker-js/faker": "9.3.0",
         "@firebase/app-types": "0.9.3",
         "@firebase/rules-unit-testing": "4.0.1",
-        "@types/node": "22.10.3",
-        "vitest": "https://pkg.pr.new/vitest@bfea79f"
+        "@types/node": "22.10.5",
+        "vitest": "https://pkg.pr.new/vitest@010e7b2"
     },
     "private": true
 }
