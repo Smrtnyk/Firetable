@@ -126,10 +126,14 @@ export const DataGenerator = {
         };
     },
 
-    generateGuest(): GuestDoc {
-        const contact = faker.phone.number({
+    generatePhoneNumber(): string {
+        return faker.phone.number({
             style: "international",
         });
+    },
+
+    generateGuest(): GuestDoc {
+        const contact = DataGenerator.generatePhoneNumber();
         const hashedContact = hashPhoneNumber(contact);
         const maskedContact = contact.replaceAll(/\d(?=\d{4})/g, "*");
 
