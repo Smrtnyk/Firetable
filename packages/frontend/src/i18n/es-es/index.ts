@@ -6,7 +6,7 @@ export default {
         copy: "Copiar",
         delete: "Eliminar",
         cancel: "Cancelar",
-        link: "Vincular", 
+        link: "Vincular",
         name: "Nombre",
         type: "Tipo",
         category: "Categoría",
@@ -37,7 +37,7 @@ export default {
         transferReservationConfirmTitle: "Está seguro de que quieres transferir esta reservación?",
         transferReservationConfirmMessage:
             "Esto transferirá la reservación de la mesa {table1Label} a la mesa {table2Label}",
-        crossFloorTransferReservationConfirmMessage: `Esto transferirá la reservación de la mesa {table1Label} en piso "{floor1Name} a la mesa {table2Label} en piso "{floor2Name}`, 
+        crossFloorTransferReservationConfirmMessage: `Esto transferirá la reservación de la mesa {table1Label} en piso "{floor1Name} a la mesa {table2Label} en piso "{floor2Name}`,
         transferToSameTableErrorMsg: "No se puede transferir la reservación a la misma mesa!",
         copyToSameTableErrorMsg: "No se puede copiar la reservación a la misma mesa!",
         copyToReservedTableErrorMsg: "No se puede copiar a una mesa que ya tiene una reservación!",
@@ -230,15 +230,15 @@ export default {
         deletePropertyDialogTitle: "¿Eliminar propiedad?",
         deletePropertyDialogMessage: "¡Esto eliminará todos los eventos asociados!",
         noPropertiesCreatedMessage: "No hay propiedades creadas",
-        maxAmountOfPropertiesReachedMessage:
-            "¡Ha alcanzado el máximo de propiedades creadas!",
+        maxAmountOfPropertiesReachedMessage: "¡Ha alcanzado el máximo de propiedades creadas!",
         noPropertiesWithoutOrganisationMessage:
             "Para crear propiedades, debe primero crear una organización.",
         createPropertyDialogTitle: "Añadir nueva propiedad",
         editPropertyDialogTitle: "Editando propiedad: {name}",
     },
     AddNewPropertyForm: {
-        propertyNameLengthValidationMessage: "¡El nombre de la propiedad debe tener al menos 3 caracteres!",
+        propertyNameLengthValidationMessage:
+            "¡El nombre de la propiedad debe tener al menos 3 caracteres!",
         organisationsRadioBoxLabel: "Organizaciones:",
     },
     PageAdminFloors: {
@@ -263,8 +263,7 @@ export default {
     PageAdminUsers: {
         title: "Usuarios",
         noUsersCreatedMessage: "No hay usuarios creados.",
-        maxAmountUsersCreationMessage:
-            "¡Ha alcanzado el máximo de usuarios, que es {limit}!",
+        maxAmountUsersCreationMessage: "¡Ha alcanzado el máximo de usuarios, que es {limit}!",
         createNewUserDialogTitle: "Crear nuevo usuario",
         editUserDialogTitle: "Editando usuario: {name}",
         editUserConfirmationMessage: "Esta seguro que desea editar al usuario {name}?",
@@ -275,7 +274,8 @@ export default {
         userNameInputLabel: "Nombre *",
         userNameInputHint: "Nombre de la persona, ejemplo, Max Mustermann",
         userMailInputLabel: "Email *",
-        userMailInputHint: "Nombre de usuario email sin espacios y caracteres especiales, ejemplo, max123",
+        userMailInputHint:
+            "Nombre de usuario email sin espacios y caracteres especiales, ejemplo, max123",
         userPasswordInputLabel: "Contraseña *",
         userPasswordInputHint: "Contraseña del usuario",
         userRoleSelectLabel: "Rol",
@@ -299,8 +299,10 @@ export default {
         noItemsMessage: "No hay artículos en el inventario.",
         editInventoryItemDialogTitle: "Editando artículo de inventario: {name}",
         deleteItemConfirmMessage: "¿Eliminar artículo de inventario: {name}?",
-        importMergeSuccess: "Artículos importados correctamente. {Count} artículos añadidos, {updated} actualizados.",
-        importError: "Error al importar artículos. Por favor, revise el formato del archivo e intente nuevamente.",
+        importMergeSuccess:
+            "Artículos importados correctamente. {Count} artículos añadidos, {updated} actualizados.",
+        importError:
+            "Error al importar artículos. Por favor, revise el formato del archivo e intente nuevamente.",
         itemMainCategory: {
             spirits: "Licor",
             wine: "Vino",

@@ -35,7 +35,7 @@ const lang = ref(locale);
 const langOptions = [
     { value: "en-GB", label: "English" },
     { value: "de", label: "German" },
-    { value: "es-ES", label: "Spanish"}
+    { value: "es-ES", label: "Spanish" },
 ];
 
 const inventoryLink = computed(function () {
