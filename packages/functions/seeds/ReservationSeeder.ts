@@ -10,6 +10,7 @@ import { BaseSeeder } from "./BaseSeeder.js";
 import { db } from "./init.js";
 import { decompressJson, extractTableLabels, generateFirestoreId } from "./utils.js";
 import { DataGenerator } from "./DataGenerator.js";
+import { logger } from "./logger.js";
 import { getEventPath, getReservationsPath } from "../src/paths.js";
 import {
     ReservationState,
@@ -21,6 +22,36 @@ import { faker } from "@faker-js/faker";
 
 export class ReservationSeeder extends BaseSeeder {
     async seedForEvents(events: Omit<EventDoc, "_doc">[], users: User[]): Promise<void> {
+        let totalReservations = 0;
+        let currentReservation = 0;
+        let totalPlanned = 0;
+        let totalWalkIn = 0;
+        let totalTablesUsed = 0;
+        let totalFloorsWithReservations = 0;
+
+        // First pass to calculate total reservations
+        for (const event of events) {
+            const floorsSnapshot = await db
+                .collection(
+                    `${getEventPath(event.organisationId, event.propertyId, event.id)}/${Collection.FLOORS}`,
+                )
+                .get();
+
+            for (const floorDoc of floorsSnapshot.docs) {
+                const decompressedJson = await decompressJson(floorDoc.data().json);
+                const floorTableLabels = extractTableLabels(decompressedJson);
+                if (floorTableLabels.length === 0) continue;
+
+                const minReservations = Math.ceil(floorTableLabels.length * 0.3);
+                const maxReservations = floorTableLabels.length;
+                totalReservations += faker.number.int({
+                    min: minReservations,
+                    max: maxReservations,
+                });
+            }
+        }
+
+        // Second pass to create reservations with progress tracking
         for (const event of events) {
             const floorsSnapshot = await db
                 .collection(
@@ -40,7 +71,6 @@ export class ReservationSeeder extends BaseSeeder {
                 const floorTableLabels = extractTableLabels(decompressedJson);
                 if (floorTableLabels.length === 0) continue;
 
-                // Calculate reservations for this floor (30-100% of tables)
                 const minReservations = Math.ceil(floorTableLabels.length * 0.3);
                 const maxReservations = floorTableLabels.length;
                 const reservationCount = faker.number.int({
@@ -48,9 +78,7 @@ export class ReservationSeeder extends BaseSeeder {
                     max: maxReservations,
                 });
 
-                // Generate reservations for this floor
                 for (let i = 0; i < reservationCount; i++) {
-                    // Pick random users for creator / reservedBy
                     const randomCreator = faker.helpers.arrayElement(users);
                     const randomReservedBy = faker.helpers.arrayElement(users);
 
@@ -63,6 +91,7 @@ export class ReservationSeeder extends BaseSeeder {
                                 randomReservedBy,
                             ),
                         );
+                        totalPlanned++;
                     } else {
                         allReservations.push(
                             this.generateWalkInReservation(
@@ -71,15 +100,29 @@ export class ReservationSeeder extends BaseSeeder {
                                 randomCreator,
                             ),
                         );
+                        totalWalkIn++;
                     }
+
+                    currentReservation++;
+                    logger.progress(currentReservation, totalReservations, "Creating reservations");
                 }
+
+                totalTablesUsed += floorTableLabels.length;
+                totalFloorsWithReservations++;
             }
 
             if (allReservations.length > 0) {
                 await this.batchWrite(allReservations, reservationsPath);
             }
         }
-        console.log("✓ Seeded reservations");
+
+        logger.stats({
+            "Total Reservations": totalReservations,
+            "Planned Reservations": totalPlanned,
+            "Walk-in Reservations": totalWalkIn,
+            "Tables Used": totalTablesUsed,
+            "Floors With Reservations": totalFloorsWithReservations,
+        });
     }
 
     private generatePlannedReservation(

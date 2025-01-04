@@ -3,6 +3,7 @@ import type { PropertyDoc } from "@shared-types/property.js";
 import { BaseSeeder } from "./BaseSeeder.js";
 import { DataGenerator } from "./DataGenerator.js";
 import { compressJson } from "./utils.js";
+import { logger } from "./logger.js";
 import { getPropertyPath } from "../src/paths.js";
 import { Collection } from "@shared-types/firebase.js";
 import { join } from "node:path";
@@ -57,7 +58,7 @@ export class FloorSeeder extends BaseSeeder {
                 });
             }
 
-            console.log("✓ Loaded floor plan templates");
+            logger.success("Loaded floor plan templates");
         } catch (error) {
             console.error("Error loading floor plan templates:", error);
             throw error;

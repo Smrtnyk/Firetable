@@ -4,6 +4,7 @@ import type { PropertyDoc } from "@shared-types/property.js";
 import { db } from "./init.js";
 import { BaseSeeder } from "./BaseSeeder.js";
 import { DataGenerator } from "./DataGenerator.js";
+import { logger } from "./logger.js";
 import { getEventPath, getEventsPath, getPropertyPath, getUsersPath } from "../src/paths.js";
 import { Collection } from "@shared-types/firebase.js";
 import { faker } from "@faker-js/faker";
@@ -13,6 +14,10 @@ export class EventSeeder extends BaseSeeder {
     async seedForProperties(properties: PropertyDoc[]): Promise<Omit<EventDoc, "_doc">[]> {
         const events: Omit<EventDoc, "_doc">[] = [];
 
+        let totalEventCount = 0;
+        let propertiesWithEvents = 0;
+        let totalFloorsCreated = 0;
+
         for (const property of properties) {
             const usersSnapshot = await db
                 .collection(getUsersPath(property.organisationId))
@@ -20,7 +25,10 @@ export class EventSeeder extends BaseSeeder {
                 .get();
 
             const managers = usersSnapshot.docs.map((doc) => doc.data().email);
-            if (managers.length === 0) continue;
+            if (managers.length === 0) {
+                logger.warn(`No managers found for property "${property.name}", skipping...`);
+                continue;
+            }
 
             const floorsSnapshot = await db
                 .collection(
@@ -30,6 +38,11 @@ export class EventSeeder extends BaseSeeder {
             const propertyFloors = floorsSnapshot.docs.map((doc) => doc.data() as FloorDoc);
 
             const numEvents = faker.number.int({ min: 20, max: 100 });
+            logger.info(`Creating ${numEvents} events for property "${property.name}"`);
+
+            const propertyStart = Date.now();
+            let eventFloorsCreated = 0;
+
             const today = new Date();
 
             for (let i = 0; i < numEvents; i++) {
@@ -65,11 +78,32 @@ export class EventSeeder extends BaseSeeder {
                         eventFloors,
                         `${getEventPath(property.organisationId, property.id, eventId)}/${Collection.FLOORS}`,
                     );
+
+                    eventFloorsCreated += eventFloors.length;
                 }
             }
+
+            totalEventCount += numEvents;
+            totalFloorsCreated += eventFloorsCreated;
+            propertiesWithEvents++;
+
+            const propertyDuration = ((Date.now() - propertyStart) / 1000).toFixed(2);
+            logger.stats(
+                {
+                    "Events Created": numEvents,
+                    "Event Floors": eventFloorsCreated,
+                    Time: `${propertyDuration}s`,
+                },
+                2,
+            );
         }
 
-        console.log(`✓ Seeded ${events.length} events with floors`);
+        logger.stats({
+            "Total Events": totalEventCount,
+            "Total Event Floors": totalFloorsCreated,
+            "Properties Processed": propertiesWithEvents,
+        });
+
         return events;
     }
 }

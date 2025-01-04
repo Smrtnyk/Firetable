@@ -6,12 +6,16 @@ import { EventSeeder } from "../EventSeeder.js";
 import { GuestSeeder } from "../GuestSeeder.js";
 import { verifyEmulatorConnection } from "../config.js";
 import { ReservationSeeder } from "../ReservationSeeder.js";
+import { logger } from "../logger.js";
 import { faker } from "@faker-js/faker";
 
 await verifyEmulatorConnection();
 
+const TOTAL_ORGANISATIONS = 20;
+
 async function seed(): Promise<void> {
-    console.log("🌱 Starting seeding process...");
+    const startTime = Date.now();
+    logger.info(`🌱 Starting seeding process (Creating ${TOTAL_ORGANISATIONS} organisations)...`);
 
     try {
         const organisationSeeder = new OrganisationSeeder();
@@ -22,10 +26,10 @@ async function seed(): Promise<void> {
         const guestSeeder = new GuestSeeder();
         const reservationSeeder = new ReservationSeeder();
 
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < TOTAL_ORGANISATIONS; i++) {
             const orgId = `org-${(i + 1).toString().padStart(2, "0")}`;
             const organisation = await organisationSeeder.seedOne(orgId);
-            console.log(`✓ Created organisation: ${organisation.name}`);
+            logger.organization(i + 1, TOTAL_ORGANISATIONS, organisation.name);
 
             const propertyCount = faker.number.int({ min: 1, max: 5 });
             const properties = await propertySeeder.seedForOrganisation(
@@ -37,11 +41,22 @@ async function seed(): Promise<void> {
             const events = await eventSeeder.seedForProperties(properties);
             await guestSeeder.seedForOrganisation(organisation, properties, events);
             await reservationSeeder.seedForEvents(events, users);
+
+            logger.stats(
+                {
+                    Properties: properties.length,
+                    Users: users.length,
+                    Events: events.length,
+                },
+                2,
+            );
         }
 
         await userSeeder.createAdminUser();
 
-        console.log("✨ Seeding completed successfully!");
+        const duration = Date.now() - startTime;
+        logger.timing(duration);
+        logger.success("Seeding completed successfully!");
     } catch (error) {
         console.error("❌ Error during seeding:", error);
         process.exit(1);

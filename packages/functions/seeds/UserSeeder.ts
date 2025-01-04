@@ -3,6 +3,7 @@ import { DataGenerator } from "./DataGenerator.js";
 import { BaseSeeder } from "./BaseSeeder.js";
 import { auth } from "./init.js";
 import { generateFirestoreId } from "./utils.js";
+import { logger } from "./logger.js";
 import { getUsersPath } from "../src/paths.js";
 import { AdminRole, Role } from "@shared-types/index.js";
 import { faker } from "@faker-js/faker";
@@ -12,6 +13,7 @@ export class UserSeeder extends BaseSeeder {
         organisation: OrganisationDoc,
         properties: PropertyDoc[],
     ): Promise<User[]> {
+        const startTime = Date.now();
         const usersByOrg: Record<string, User[]> = {};
 
         const users: User[] = [];
@@ -83,11 +85,14 @@ export class UserSeeder extends BaseSeeder {
         );
 
         await Promise.all(authOperations);
-        console.log(`✓ Seeded ${allUsers.length} users with auth claims`);
+
+        const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+        logger.success(`Created ${users.length} users in ${duration}s`);
         return users;
     }
 
     async createAdminUser(): Promise<void> {
+        logger.info("Creating admin user...");
         await auth
             .createUser({
                 uid: generateFirestoreId(),
@@ -99,5 +104,6 @@ export class UserSeeder extends BaseSeeder {
                     role: AdminRole.ADMIN,
                 });
             });
+        logger.success("Admin user created");
     }
 }
