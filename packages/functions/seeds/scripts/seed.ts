@@ -11,7 +11,7 @@ import { faker } from "@faker-js/faker";
 
 await verifyEmulatorConnection();
 
-const TOTAL_ORGANISATIONS = 20;
+const TOTAL_ORGANISATIONS = 5;
 
 async function seed(): Promise<void> {
     const startTime = Date.now();

@@ -29,7 +29,7 @@ export class ReservationSeeder extends BaseSeeder {
         let totalTablesUsed = 0;
         let totalFloorsWithReservations = 0;
 
-        // First pass to calculate total reservations
+        // First pass: estimate how many total reservations we'll generate
         for (const event of events) {
             const floorsSnapshot = await db
                 .collection(
@@ -42,8 +42,10 @@ export class ReservationSeeder extends BaseSeeder {
                 const floorTableLabels = extractTableLabels(decompressedJson);
                 if (floorTableLabels.length === 0) continue;
 
+                // We'll pick random # of reservations for each floor
                 const minReservations = Math.ceil(floorTableLabels.length * 0.3);
                 const maxReservations = floorTableLabels.length;
+
                 totalReservations += faker.number.int({
                     min: minReservations,
                     max: maxReservations,
@@ -51,7 +53,7 @@ export class ReservationSeeder extends BaseSeeder {
             }
         }
 
-        // Second pass to create reservations with progress tracking
+        // Second pass: actually create reservations
         for (const event of events) {
             const floorsSnapshot = await db
                 .collection(
@@ -64,6 +66,7 @@ export class ReservationSeeder extends BaseSeeder {
                 event.propertyId,
                 event.id,
             );
+
             const allReservations: (PlannedReservation | WalkInReservation)[] = [];
 
             for (const floorDoc of floorsSnapshot.docs) {
@@ -71,21 +74,27 @@ export class ReservationSeeder extends BaseSeeder {
                 const floorTableLabels = extractTableLabels(decompressedJson);
                 if (floorTableLabels.length === 0) continue;
 
-                const minReservations = Math.ceil(floorTableLabels.length * 0.3);
-                const maxReservations = floorTableLabels.length;
+                // Shuffle table labels so we don’t reuse the same ones multiple times
+                const shuffledLabels = faker.helpers.shuffle(floorTableLabels);
+                // Decide how many tables will get reservations in this floor
+                const minReservations = Math.ceil(shuffledLabels.length * 0.3);
+                const maxReservations = shuffledLabels.length;
                 const reservationCount = faker.number.int({
                     min: minReservations,
                     max: maxReservations,
                 });
 
-                for (let i = 0; i < reservationCount; i++) {
+                const usedTableLabels = shuffledLabels.slice(0, reservationCount);
+
+                for (const tableLabel of usedTableLabels) {
                     const randomCreator = faker.helpers.arrayElement(users);
                     const randomReservedBy = faker.helpers.arrayElement(users);
 
                     if (faker.number.int({ min: 1, max: 100 }) <= 70) {
+                        // 70% chance of planned
                         allReservations.push(
                             this.generatePlannedReservation(
-                                floorTableLabels,
+                                tableLabel,
                                 floorDoc.id,
                                 randomCreator,
                                 randomReservedBy,
@@ -93,12 +102,9 @@ export class ReservationSeeder extends BaseSeeder {
                         );
                         totalPlanned++;
                     } else {
+                        // 30% chance of walk-in
                         allReservations.push(
-                            this.generateWalkInReservation(
-                                floorTableLabels,
-                                floorDoc.id,
-                                randomCreator,
-                            ),
+                            this.generateWalkInReservation(tableLabel, floorDoc.id, randomCreator),
                         );
                         totalWalkIn++;
                     }
@@ -126,19 +132,24 @@ export class ReservationSeeder extends BaseSeeder {
     }
 
     private generatePlannedReservation(
-        tableLabels: string[],
+        tableLabel: string,
         floorId: string,
         creatorUser: User,
         reservedByUser: User,
     ): PlannedReservationDoc {
-        const table = faker.helpers.arrayElement(tableLabels);
         const isVIP = faker.datatype.boolean();
         const hasContact = faker.number.int({ min: 1, max: 100 }) <= 20;
+        const randomState = faker.helpers.arrayElement([
+            ReservationState.PENDING,
+            ReservationState.CONFIRMED,
+            ReservationState.ARRIVED,
+        ]);
+        const flags = this.getReservationFlags(randomState);
 
         return {
             id: generateFirestoreId(),
             floorId,
-            tableLabel: table,
+            tableLabel,
             guestContact: hasContact ? DataGenerator.generatePhoneNumber() : "",
             numberOfGuests: faker.number.int({ min: 1, max: 10 }),
             reservationNote:
@@ -153,16 +164,10 @@ export class ReservationSeeder extends BaseSeeder {
                 createdAt: faker.date.recent().getTime(),
             },
             status: ReservationStatus.ACTIVE,
-            state: faker.helpers.arrayElement([
-                ReservationState.PENDING,
-                ReservationState.CONFIRMED,
-                ReservationState.ARRIVED,
-            ]),
+            state: randomState,
+            ...flags,
             type: ReservationType.PLANNED,
-            reservationConfirmed: true,
             cancelled: false,
-            arrived: faker.datatype.boolean(),
-            waitingForResponse: false,
             consumption: isVIP
                 ? faker.number.int({ min: 500, max: 2000 })
                 : faker.number.int({ min: 50, max: 500 }),
@@ -177,18 +182,17 @@ export class ReservationSeeder extends BaseSeeder {
     }
 
     private generateWalkInReservation(
-        tableLabels: string[],
+        tableLabel: string,
         floorId: string,
         creatorUser: User,
     ): WalkInReservationDoc {
-        const table = faker.helpers.arrayElement(tableLabels);
         const isVIP = faker.datatype.boolean();
         const hasContact = faker.number.int({ min: 1, max: 100 }) <= 20;
 
         return {
             id: generateFirestoreId(),
             floorId,
-            tableLabel: table,
+            tableLabel,
             guestContact: hasContact ? DataGenerator.generatePhoneNumber() : "",
             numberOfGuests: faker.number.int({ min: 1, max: 10 }),
             reservationNote:
@@ -212,5 +216,33 @@ export class ReservationSeeder extends BaseSeeder {
             arrived: true,
             isVIP,
         };
+    }
+
+    private getReservationFlags(state: ReservationState): {
+        reservationConfirmed: boolean;
+        arrived: boolean;
+        waitingForResponse: boolean;
+    } {
+        switch (state) {
+            case ReservationState.PENDING:
+                return {
+                    reservationConfirmed: false,
+                    arrived: false,
+                    waitingForResponse: true,
+                };
+            case ReservationState.CONFIRMED:
+                return {
+                    reservationConfirmed: true,
+                    arrived: false,
+                    waitingForResponse: false,
+                };
+            case ReservationState.ARRIVED:
+                return {
+                    reservationConfirmed: false,
+                    arrived: true,
+                    waitingForResponse: false,
+                };
+        }
+        throw new Error("Invalid reservation state");
     }
 }
