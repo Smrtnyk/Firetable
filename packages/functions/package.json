@@ -12,7 +12,8 @@
         "deploy": "firebase deploy --only functions",
         "logs": "firebase functions:log",
         "find-dead-code": "npx ts-prune",
-        "seed": "npx tsx seeds/scripts/seed.ts"
+        "seed": "npx tsx seeds/scripts/seed.ts",
+        "seed:admin": "npx tsx seeds/scripts/seed.ts --with-admin"
     },
     "dependencies": {
         "@google-cloud/functions-framework": "3.4.5",
@@ -25,8 +26,11 @@
         "@firebase/app-types": "0.9.3",
         "@firebase/rules-unit-testing": "4.0.1",
         "@types/node": "22.10.5",
+        "@types/yargs": "17.0.33",
         "chalk": "5.4.1",
-        "vitest": "https://pkg.pr.new/vitest@6a09cc3"
+        "vitest": "https://pkg.pr.new/vitest@6a09cc3",
+        "yargs": "17.7.2",
+        "yargs-parser": "21.1.1"
     },
     "private": true
 }

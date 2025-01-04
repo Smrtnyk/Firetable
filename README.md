@@ -107,14 +107,23 @@ Or rather than starting from scratch and creating admin user manually, you can s
 For development and testing, you can populate the emulators with sample data:
 
 1. Ensure emulators are running: `pnpm run start:emulators`
-2. Run the seed script:
+2. run one of the seed scripts:
 ```bash
 cd packages/functions
-pnpm run seed
+pnpm run seed        # Creates 1 organization without admin user
+pnpm run seed:admin  # Creates 1 organization with admin user
 ```
 
+The seeder supports the following command line arguments:
+
+* -o, --organisations - Number of organizations to seed (default: 1)
+* -a, --with-admin - Create an admin user (default: false)
+* -h, --help - Show help information
+
+When admin user is created, following credentials are available:
+* Admin: admin@firetable.at / ADMIN123
+
 This will create:
-- Admin user: `admin@firetable.at` / `ADMIN123`
 - Multiple organizations with properties
 - Users with various roles (all using password: `USER123`)
 - Sample events with floor plans
