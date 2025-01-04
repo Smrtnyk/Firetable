@@ -1,11 +1,11 @@
 import type { FloorDoc } from "@shared-types/floor.js";
 import type { EventDoc } from "@shared-types/event.js";
 import type { PropertyDoc } from "@shared-types/property.js";
-import { db } from "./init.js";
 import { BaseSeeder } from "./BaseSeeder.js";
-import { DataGenerator } from "./DataGenerator.js";
-import { logger } from "./logger.js";
-import { getEventPath, getEventsPath, getPropertyPath, getUsersPath } from "../src/paths.js";
+import { db } from "../init.js";
+import { DataGenerator } from "../DataGenerator.js";
+import { logger } from "../logger.js";
+import { getEventPath, getEventsPath, getPropertyPath, getUsersPath } from "../../src/paths.js";
 import { Collection } from "@shared-types/firebase.js";
 import { faker } from "@faker-js/faker";
 import { Role } from "@shared-types/auth.js";

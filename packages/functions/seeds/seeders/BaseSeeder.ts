@@ -1,4 +1,4 @@
-import { db } from "./init.js";
+import { db } from "../init.js";
 
 export abstract class BaseSeeder {
     protected async batchWrite(docs: any[], basePath: string): Promise<void> {

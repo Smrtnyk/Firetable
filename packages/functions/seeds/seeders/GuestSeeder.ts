@@ -3,9 +3,9 @@ import type { GuestDoc } from "@shared-types/guest.js";
 import type { OrganisationDoc } from "@shared-types/organisation.js";
 import type { PropertyDoc } from "@shared-types/index.js";
 import { BaseSeeder } from "./BaseSeeder.js";
-import { DataGenerator } from "./DataGenerator.js";
-import { logger } from "./logger.js";
-import { getGuestsPath } from "../src/paths.js";
+import { DataGenerator } from "../DataGenerator.js";
+import { logger } from "../logger.js";
+import { getGuestsPath } from "../../src/paths.js";
 import { faker } from "@faker-js/faker";
 
 export class GuestSeeder extends BaseSeeder {

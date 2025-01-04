@@ -1,6 +1,6 @@
 import type { OrganisationDoc } from "@shared-types/organisation.js";
 import { BaseSeeder } from "./BaseSeeder.js";
-import { DataGenerator } from "./DataGenerator.js";
+import { DataGenerator } from "../DataGenerator.js";
 import { Collection } from "@shared-types/firebase.js";
 
 export class OrganisationSeeder extends BaseSeeder {

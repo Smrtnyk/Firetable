@@ -1,10 +1,10 @@
 import type { OrganisationDoc, PropertyDoc, User } from "@shared-types/index.js";
-import { DataGenerator } from "./DataGenerator.js";
 import { BaseSeeder } from "./BaseSeeder.js";
-import { auth } from "./init.js";
-import { generateFirestoreId } from "./utils.js";
-import { logger } from "./logger.js";
-import { getUsersPath } from "../src/paths.js";
+import { DataGenerator } from "../DataGenerator.js";
+import { auth } from "../init.js";
+import { generateFirestoreId } from "../utils.js";
+import { logger } from "../logger.js";
+import { getUsersPath } from "../../src/paths.js";
 import { AdminRole, Role } from "@shared-types/index.js";
 import { faker } from "@faker-js/faker";
 

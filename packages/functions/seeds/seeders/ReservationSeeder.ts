@@ -7,11 +7,11 @@ import type {
     WalkInReservationDoc,
 } from "@shared-types/index.js";
 import { BaseSeeder } from "./BaseSeeder.js";
-import { db } from "./init.js";
-import { decompressJson, extractTableLabels, generateFirestoreId } from "./utils.js";
-import { DataGenerator } from "./DataGenerator.js";
-import { logger } from "./logger.js";
-import { getEventPath, getReservationsPath } from "../src/paths.js";
+import { db } from "../init.js";
+import { decompressJson, extractTableLabels, generateFirestoreId } from "../utils.js";
+import { DataGenerator } from "../DataGenerator.js";
+import { logger } from "../logger.js";
+import { getEventPath, getReservationsPath } from "../../src/paths.js";
 import {
     ReservationState,
     ReservationStatus,
