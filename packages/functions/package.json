@@ -26,11 +26,9 @@
         "@firebase/app-types": "0.9.3",
         "@firebase/rules-unit-testing": "4.0.1",
         "@types/node": "22.10.5",
-        "@types/yargs": "17.0.33",
+        "cac": "6.7.14",
         "tinyrainbow": "1.2.0",
-        "vitest": "https://pkg.pr.new/vitest@6a09cc3",
-        "yargs": "17.7.2",
-        "yargs-parser": "21.1.1"
+        "vitest": "https://pkg.pr.new/vitest@6a09cc3"
     },
     "private": true
 }
