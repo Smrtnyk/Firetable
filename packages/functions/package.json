@@ -25,6 +25,7 @@
         "@firebase/app-types": "0.9.3",
         "@firebase/rules-unit-testing": "4.0.1",
         "@types/node": "22.10.5",
+        "chalk": "5.4.1",
         "vitest": "https://pkg.pr.new/vitest@6a09cc3"
     },
     "private": true

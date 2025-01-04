@@ -2,6 +2,7 @@ import type { PropertyDoc } from "@shared-types/property.js";
 import type { OrganisationDoc } from "@shared-types/organisation.js";
 import { BaseSeeder } from "./BaseSeeder.js";
 import { DataGenerator } from "./DataGenerator.js";
+import { logger } from "./logger.js";
 import { getPropertiesPath } from "../src/paths.js";
 
 export class PropertySeeder extends BaseSeeder {
@@ -19,7 +20,7 @@ export class PropertySeeder extends BaseSeeder {
             await this.batchWrite([property], getPropertiesPath(organisation.id));
         }
 
-        console.log(`✓ Seeded ${properties.length} properties`);
+        logger.success(`Seeded ${properties.length} properties`);
         return properties;
     }
 }
