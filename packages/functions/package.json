@@ -27,7 +27,7 @@
         "@firebase/rules-unit-testing": "4.0.1",
         "@types/node": "22.10.5",
         "@types/yargs": "17.0.33",
-        "chalk": "5.4.1",
+        "tinyrainbow": "1.2.0",
         "vitest": "https://pkg.pr.new/vitest@6a09cc3",
         "yargs": "17.7.2",
         "yargs-parser": "21.1.1"

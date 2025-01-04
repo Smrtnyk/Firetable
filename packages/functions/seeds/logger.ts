@@ -1,4 +1,6 @@
-import chalk from "chalk";
+import type { Formatter } from "tinyrainbow";
+// eslint-disable-next-line id-length -- this is just logging symbols
+import c from "tinyrainbow";
 
 type LogLevel = "error" | "info" | "success" | "warn";
 type LogSymbol = "⏱" | "⚠" | "✓" | "✖" | "📦" | "ℹ";
@@ -8,7 +10,7 @@ interface LoggerConfig {
     // ms between progress updates
     progressUpdateInterval: number;
     symbols: Record<LogSymbol, string>;
-    colors: Record<LogLevel, typeof chalk>;
+    colors: Record<LogLevel, Formatter>;
 }
 
 class Logger {
@@ -27,10 +29,10 @@ class Logger {
             "⏱": "⏱",
         },
         colors: {
-            info: chalk.blue,
-            success: chalk.green,
-            warn: chalk.yellow,
-            error: chalk.red,
+            info: c.blue,
+            success: c.green,
+            warn: c.yellow,
+            error: c.red,
         },
     };
 
@@ -71,9 +73,9 @@ class Logger {
     organization(current: number, total: number, name: string): void {
         this.clearProgress();
         console.log(
-            chalk.blue(`\n${this.config.symbols["📦"]} Organization`),
-            chalk.blue(`${current}/${total}`),
-            chalk.white(`"${name}"`),
+            c.blue(`\n${this.config.symbols["📦"]} Organization`),
+            c.blue(`${current}/${total}`),
+            c.white(`"${name}"`),
         );
     }
 
@@ -81,14 +83,14 @@ class Logger {
         this.clearProgress();
         const padding = " ".repeat(indent);
         Object.entries(stats).forEach(([key, value]) => {
-            console.log(chalk.gray(`${padding}• ${key}:`), chalk.white(value));
+            console.log(c.gray(`${padding}• ${key}:`), c.white(value));
         });
     }
 
     timing(ms: number): void {
         this.clearProgress();
         const seconds = (ms / 1000).toFixed(2);
-        console.log(chalk.gray(`${this.config.symbols["⏱"]} Completed in ${seconds}s`));
+        console.log(c.gray(`${this.config.symbols["⏱"]} Completed in ${seconds}s`));
     }
 
     private clearProgress(): void {
