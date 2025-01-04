@@ -92,11 +92,11 @@ describe("PageAdminOrganisation.vue", () => {
         const screen = render();
         await userEvent.click(screen.getByLabelText("Open delete organisation dialog"));
 
-        const input = screen.getByLabelText("Organisation Name");
+        const input = screen.getByRole("textbox");
         await userEvent.type(input, "Wrong Name");
-        await userEvent.click(
-            screen.getByRole("button", { name: "Delete Organisation", exact: true }),
-        );
+        await expect
+            .element(screen.getByRole("button", { name: "Delete", exact: true }))
+            .toBeDisabled();
 
         expect(deleteOrganisationMock).not.toHaveBeenCalled();
     });
@@ -105,11 +105,9 @@ describe("PageAdminOrganisation.vue", () => {
         const screen = render();
         await userEvent.click(screen.getByLabelText("Open delete organisation dialog"));
 
-        const input = screen.getByLabelText("Organisation Name");
+        const input = screen.getByRole("textbox");
         await userEvent.type(input, "Test Organisation");
-        await userEvent.click(
-            screen.getByRole("button", { name: "Delete Organisation", exact: true }),
-        );
+        await userEvent.click(screen.getByRole("button", { name: "Delete", exact: true }));
 
         expect(deleteOrganisationMock).toHaveBeenCalledWith("org1");
     });
