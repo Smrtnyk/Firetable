@@ -15,7 +15,7 @@ import FTCenteredText from "src/components/FTCenteredText.vue";
 import FTBtn from "src/components/FTBtn.vue";
 
 import { useQuasar } from "quasar";
-import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { showConfirm, showDeleteConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { usePropertiesStore } from "src/stores/properties-store";
@@ -75,6 +75,14 @@ async function onPropertyUpdate(payload: UpdatePropertyPayload): Promise<void> {
 }
 
 async function onDeleteProperty(property: PropertyDoc): Promise<void> {
+    const shouldDelete = await showDeleteConfirm(
+        t("PageAdminProperties.deletePropertyDialogTitle"),
+        t("PageAdminProperties.deletePropertyDialogMessage"),
+        property.name,
+    );
+
+    if (!shouldDelete) return;
+
     await tryCatchLoadingWrapper({
         async hook() {
             await deleteProperty(property);
@@ -83,17 +91,6 @@ async function onDeleteProperty(property: PropertyDoc): Promise<void> {
             }
         },
     });
-}
-
-async function deletePropertyAsync(property: PropertyDoc): Promise<void> {
-    if (
-        await showConfirm(
-            t("PageAdminProperties.deletePropertyDialogTitle"),
-            t("PageAdminProperties.deletePropertyDialogMessage"),
-        )
-    ) {
-        return onDeleteProperty(property);
-    }
 }
 
 async function showUpdatePropertyDialog(property: PropertyDoc): Promise<void> {
@@ -213,7 +210,7 @@ function createLinks(propertyId: string): Link[] {
                                 unelevated
                                 icon="trash"
                                 color="negative"
-                                @click.stop="deletePropertyAsync(property)"
+                                @click.stop="onDeleteProperty(property)"
                             />
                         </div>
                     </q-item-section>

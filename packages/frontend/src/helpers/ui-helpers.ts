@@ -28,6 +28,44 @@ export function showConfirm(title: string, message = ""): Promise<boolean> {
     });
 }
 
+export function showDeleteConfirm(
+    title: string,
+    message: string,
+    confirmText: string,
+): Promise<boolean> {
+    return new Promise(function (resolve) {
+        Dialog.create({
+            title,
+            message,
+            class: "ft-card",
+            persistent: true,
+            prompt: {
+                model: "",
+                type: "text",
+                placeholder: `Please type "${confirmText}" to confirm`,
+                isValid: (val: string) => val === confirmText,
+                standout: true,
+                rounded: true,
+            },
+            ok: {
+                label: "Delete",
+                size: "md",
+                rounded: true,
+                color: "primary",
+            },
+            cancel: {
+                label: "Cancel",
+                size: "md",
+                outline: true,
+                rounded: true,
+                color: "negative",
+            },
+        })
+            .onOk(() => resolve(true))
+            .onCancel(() => resolve(false));
+    });
+}
+
 export function showErrorMessage(e: unknown, onCloseCallback?: VoidFunction): void {
     let message = "An unexpected error occurred.";
     if (isString(e)) {
