@@ -75,7 +75,8 @@ describe("AppDrawer", () => {
             const initialDarkModeInStorage = localStorage.getItem("FTDarkMode");
             await userEvent.click(screen.getByText("Toggle dark mode"));
 
-            expect(Dark.isActive).toBe(true);
+            await expect.poll(() => Dark.isActive).toBe(true);
+
             expect(localStorage.getItem("FTDarkMode")).not.toBe(initialDarkModeInStorage);
         });
 
