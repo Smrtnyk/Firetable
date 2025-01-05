@@ -3,17 +3,9 @@ import type { PropertyDoc } from "@firetable/types";
 import UserCreateForm from "./UserCreateForm.vue";
 import { renderComponent, t } from "../../../../test-helpers/render-component";
 import { AdminRole, OrganisationStatus, Role } from "@firetable/types";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 import { first } from "es-toolkit/compat";
-
-const { showErrorMessageSpy } = vi.hoisted(() => {
-    return { showErrorMessageSpy: vi.fn() };
-});
-
-vi.mock("src/helpers/ui-helpers", () => ({
-    showErrorMessage: showErrorMessageSpy,
-}));
 
 describe("UserCreateForm", () => {
     let props: UserCreateFormProps;
@@ -114,8 +106,11 @@ describe("UserCreateForm", () => {
         const submitButton = screen.getByRole("button", { name: t("Global.submit") });
         await userEvent.click(submitButton);
 
-        // Check that showErrorMessage is called for properties selection
-        expect(showErrorMessageSpy).toHaveBeenCalledWith("You must select at least one property!");
+        await expect
+            .element(screen.getByText("You must select at least one property!"))
+            .toBeVisible();
+
+        await userEvent.click(screen.getByRole("button", { name: "OK" }));
     });
 
     it("emits submit event with correct payload", async () => {

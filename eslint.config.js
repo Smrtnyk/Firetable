@@ -291,6 +291,7 @@ export default config(
                 {
                     min: 3,
                     exceptions: [
+                        "es",
                         "hr",
                         "e",
                         "i",

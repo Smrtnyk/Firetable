@@ -11,8 +11,8 @@ import { storeToRefs } from "pinia";
 import { useAuthStore } from "src/stores/auth-store";
 import { usePropertiesStore } from "src/stores/properties-store";
 import AppDrawerLink from "src/components/AppDrawerLink.vue";
-import { dynamicallySwitchLang } from "src/config";
 import { usePermissionsStore } from "src/stores/permissions-store";
+import { dynamicallySwitchLang } from "src/boot/i18n";
 
 export interface AppDrawerProps {
     modelValue: boolean;
@@ -35,7 +35,7 @@ const lang = ref(locale);
 const langOptions = [
     { value: "en-GB", label: "English" },
     { value: "de", label: "German" },
-    { value: "es-ES", label: "Spanish" },
+    { value: "es", label: "Spanish" },
     { value: "hr", label: "Croatian" },
 ];
 
@@ -257,12 +257,6 @@ async function onLogoutUser(): Promise<void> {
     });
 }
 
-function setAppLanguage(val: string): void {
-    LocalStorage.set("FTLang", val);
-    locale.value = val;
-    dynamicallySwitchLang(val);
-}
-
 function isLinkWithChildren(link: GuardedLink | LinkWithChildren): link is LinkWithChildren {
     return "children" in link;
 }
@@ -330,7 +324,7 @@ function isLinkWithChildren(link: GuardedLink | LinkWithChildren): link is LinkW
                     emit-value
                     map-options
                     options-dense
-                    @update:model-value="setAppLanguage"
+                    @update:model-value="dynamicallySwitchLang"
                 />
             </q-item>
             <q-separator spaced />

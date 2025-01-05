@@ -2,17 +2,9 @@ import type { EventCreateFormProps } from "./EventCreateForm.vue";
 import type { FloorDoc } from "@firetable/types";
 import EventCreateForm from "./EventCreateForm.vue";
 import { renderComponent } from "../../../../test-helpers/render-component";
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 import { nextTick } from "vue";
-
-const { showErrorMessageSpy } = vi.hoisted(() => {
-    return { showErrorMessageSpy: vi.fn() };
-});
-
-vi.mock("src/helpers/ui-helpers", () => ({
-    showErrorMessage: showErrorMessageSpy,
-}));
 
 describe("EventCreateForm", () => {
     describe("create", () => {
@@ -69,9 +61,11 @@ describe("EventCreateForm", () => {
             const submitButton = screen.getByRole("button", { name: "Submit" });
             await userEvent.click(submitButton);
 
-            expect(showErrorMessageSpy).toHaveBeenCalledWith(
-                "You need to choose at least one floor plan",
-            );
+            await expect
+                .element(screen.getByText("You need to choose at least one floor plan"))
+                .toBeVisible();
+
+            await userEvent.click(screen.getByRole("button", { name: "OK" }));
         });
 
         it("allows adding multiple instances of the same floor", async () => {

@@ -3,7 +3,6 @@ import type { RenderResult } from "vitest-browser-vue";
 import type { TestingOptions } from "@pinia/testing";
 import type { Store, StoreDefinition } from "pinia";
 import type { Mock } from "vitest";
-import messages from "../src/i18n";
 import { myIcons } from "src/config";
 import {
     QDialog,
@@ -38,8 +37,8 @@ import {
 } from "quasar";
 import { h, defineComponent } from "vue";
 import { render } from "vitest-browser-vue";
-import { createI18n } from "vue-i18n";
 import { vi } from "vitest";
+import { i18n, loadLanguage } from "src/boot/i18n";
 
 import "quasar/dist/quasar.css";
 import "../src/css/app.scss";
@@ -48,18 +47,12 @@ import { createTestingPinia } from "@pinia/testing";
 document.body.style.height = "100vh";
 document.body.style.width = "100vw";
 
-let i18n = createI18n({
-    locale: "en-GB",
-    fallbackLocale: "en-GB",
-    messages,
-    legacy: false,
-});
+const languageStrings = await loadLanguage("en-GB");
+i18n.global.locale.value = "en-GB";
+i18n.global.setLocaleMessage("en-GB", languageStrings.default);
 
 export const t = i18n.global.t;
-export function getLocaleForTest(): WritableComputedRef<
-    "de" | "en-GB" | "es-ES",
-    "de" | "en-GB" | "es-ES"
-> {
+export function getLocaleForTest(): WritableComputedRef<string, string> {
     return i18n.global.locale;
 }
 
@@ -77,12 +70,8 @@ export function renderComponent<T>(
     },
 ): RenderResult<T> {
     const wrapInLayout = options?.wrapInLayout ?? false;
-    i18n = createI18n({
-        locale: "en-GB",
-        fallbackLocale: "en-GB",
-        messages,
-        legacy: false,
-    });
+    i18n.global.setLocaleMessage("en-GB", languageStrings.default);
+    i18n.global.locale.value = "en-GB";
 
     const componentToRender = wrapInLayout
         ? defineComponent({

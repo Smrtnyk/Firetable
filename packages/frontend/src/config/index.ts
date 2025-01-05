@@ -1,5 +1,4 @@
-import { LocalStorage, Lang } from "quasar";
-import { AppLogger } from "src/logger/FTLogger";
+import { LocalStorage } from "quasar";
 
 export const myIcons: Record<string, string> = {
     chevron_left: "svguse:/svg-icons/ft-icons.svg#chevron-left",
@@ -79,18 +78,4 @@ export function getDarkMode(): boolean {
         LocalStorage.getItem("FTDarkMode") ??
         globalThis.matchMedia("(prefers-color-scheme: dark)").matches
     );
-}
-
-export function getPersistedLang(): string | undefined {
-    return (LocalStorage.getItem("FTLang") as string) ?? undefined;
-}
-
-export function dynamicallySwitchLang(langIso: string): void {
-    if (langIso) {
-        import(`../../node_modules/quasar/lang/${langIso}.js`)
-            .then(function (langModule) {
-                return Lang.set(langModule.default);
-            })
-            .catch(AppLogger.error.bind(AppLogger));
-    }
 }

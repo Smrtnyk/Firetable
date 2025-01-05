@@ -1,11 +1,11 @@
-import enGB from "./en-gb";
+import enGB from "./en-GB";
 import de from "./de";
-import esES from "./es-es";
+import es from "./es";
 import hr from "./hr";
 
 export default {
     de,
     "en-GB": enGB,
-    "es-ES": esES,
+    es,
     hr,
 };

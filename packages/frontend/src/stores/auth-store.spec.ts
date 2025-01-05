@@ -38,6 +38,7 @@ vi.mock("../backend-proxy", () => ({
 
 vi.mock("src/helpers/ui-helpers", () => ({
     showErrorMessage: showErrorMessageSpy,
+    tryCatchLoadingWrapper: vi.fn(),
 }));
 
 vi.mock("quasar", async (importOriginal) => ({

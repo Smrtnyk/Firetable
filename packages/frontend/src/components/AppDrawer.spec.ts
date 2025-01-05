@@ -4,7 +4,7 @@ import type { AppDrawerProps } from "./AppDrawer.vue";
 
 import AppDrawer from "./AppDrawer.vue";
 
-import { getLocaleForTest, renderComponent } from "../../test-helpers/render-component";
+import { renderComponent } from "../../test-helpers/render-component";
 import { DEFAULT_CAPABILITIES_BY_ROLE, UserCapability, Role, AdminRole } from "@firetable/types";
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { userEvent } from "@vitest/browser/context";
@@ -126,12 +126,16 @@ describe("AppDrawer", () => {
         it("changes language when a new language is selected", async () => {
             renderAppDrawer();
 
-            expect(getLocaleForTest().value).toBe("en-GB");
+            await expect
+                .element(screen.getByText("Logout", { exact: true }), { timeout: 2000 })
+                .toBeVisible();
 
             await userEvent.click(screen.getByLabelText("Language"));
             await userEvent.click(screen.getByRole("option", { name: "German" }));
 
-            expect(getLocaleForTest().value).toBe("de");
+            await expect
+                .element(screen.getByText("Abmelden", { exact: true }), { timeout: 2000 })
+                .toBeVisible();
         });
     });
 

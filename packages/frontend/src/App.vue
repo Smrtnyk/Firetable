@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import { useQuasar } from "quasar";
-import { dynamicallySwitchLang, getDarkMode, getPersistedLang, myIcons } from "src/config";
+import { getDarkMode, myIcons } from "src/config";
 
 const quasar = useQuasar();
 
@@ -16,9 +16,4 @@ quasar.iconMapFn = function (iconName) {
     return { icon: myIcons[iconName] };
 };
 quasar.dark.set(getDarkMode());
-
-const persistedLang = getPersistedLang();
-if (persistedLang) {
-    dynamicallySwitchLang(persistedLang);
-}
 </script>
