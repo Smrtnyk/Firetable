@@ -32,16 +32,16 @@ export default {
         reservationUpdatedMsg: "Rezervacija ažurirana!",
         deleteReservationTitle: "Izbrisati rezervaciju?",
         reservationAlreadyReserved: "Netko drugi je već rezervirao ovaj stol.",
-        moveReservationToQueueConfirmTitle: 
+        moveReservationToQueueConfirmTitle:
             "Jeste li sigurni da želite premjestiti ovu rezervaciju u stanje čekanja?",
         transferReservationConfirmTitle: "Jeste li sigurni da želite prenijeti ovu rezervaciju?",
-        transferReservationConfirmMessage: 
+        transferReservationConfirmMessage:
             "Ovo će prenijeti rezervaciju sa stola {table1Label} na stol {table2Label}",
         crossFloorTransferReservationConfirmMessage: `Ovo će prenijeti rezervaciju između tlocrta "{floor1Name}" stol "{table1Label}" na tlocrt "{floor2Name}" stol "{table2Label}"`,
         transferToSameTableErrorMsg: "Ne može se prenijeti rezervacija na isti stol!",
         copyToSameTableErrorMsg: "Ne može se kopirati rezervacija na isti stol!",
         copyToReservedTableErrorMsg: "Ne može se kopirati rezervacija na već rezervirani stol!",
-        copyReservationConfirmMsg: 
+        copyReservationConfirmMsg:
             "Kopirati rezervaciju sa stola {sourceTableLabel} na stol {targetTableLabel}?",
         reservationCopyErrorMsg: "Pogreška pri kopiranju rezervacije! Molimo pokušajte ponovno.",
         linkTableTitle: "Poveži stol",
@@ -60,8 +60,7 @@ export default {
         passwordMinLength: "Lozinka mora imati najmanje 6 znakova.",
         passwordHasUpperCase: "Lozinka mora sadržavati barem jedno veliko slovo.",
         passwordHasNumbers: "Lozinka mora sadržavati barem jedan broj.",
-        passwordHasSymbols: 
-            "Lozinka mora sadržavati barem jedan poseban znak (npr., !, #, itd...)",
+        passwordHasSymbols: "Lozinka mora sadržavati barem jedan poseban znak (npr., !, #, itd...)",
         selectAtLeastOneProperty: "Morate odabrati barem jednu opciju!",
         nameMustBeLongerErrorMsg: "Ime mora imati najmanje 2 znaka!",
         negativeReservationConsumptionErrorMsg: "Potrošnja ne može biti negativna",
@@ -220,8 +219,7 @@ export default {
     PageAdminGuests: {
         title: "Gosti",
         noGuestsData: "Nema podataka o gostima.",
-        maxAmountGuestsCreationMessage: 
-            "Dosegnuli ste maksimalan broj gostiju koji je {limit}!",
+        maxAmountGuestsCreationMessage: "Dosegnuli ste maksimalan broj gostiju koji je {limit}!",
         createNewGuestDialogTitle: "Kreiraj novog gosta",
     },
     PageAdminProperties: {
@@ -230,9 +228,8 @@ export default {
         deletePropertyDialogTitle: "Izbrisati nekretninu?",
         deletePropertyDialogMessage: "Ovo će također izbrisati sve povezane događaje!",
         noPropertiesCreatedMessage: "Nema kreiranih nekretnina.",
-        maxAmountOfPropertiesReachedMessage: 
-            "Dosegnuli ste maksimalan broj kreiranih nekretnina!",
-        noPropertiesWithoutOrganisationMessage: 
+        maxAmountOfPropertiesReachedMessage: "Dosegnuli ste maksimalan broj kreiranih nekretnina!",
+        noPropertiesWithoutOrganisationMessage:
             "Kako biste kreirali nekretnine, prvo morate kreirati organizaciju.",
         createPropertyDialogTitle: "Dodaj novu nekretninu",
         editPropertyDialogTitle: "Uređivanje nekretnine: {name}",
@@ -244,7 +241,7 @@ export default {
     PageAdminFloors: {
         title: "Tlocrti",
         noFloorPlansMessage: "Ova nekretnina nema tlocrte.",
-        noPropertiesMessage: 
+        noPropertiesMessage:
             "Nemate kreiranih nekretnina, kako biste kreirali tlocrte prvo morate kreirati barem jednu nekretninu.",
         deleteFloorMessage: "Izbrisati kat?",
         duplicateFloorPlanMessage: "Jeste li sigurni da želite duplicirati tlocrt {floorName}?",
@@ -263,14 +260,13 @@ export default {
     PageAdminUsers: {
         title: "Korisnici",
         noUsersCreatedMessage: "Nema kreiranih korisnika.",
-        maxAmountUsersCreationMessage: 
-            "Dosegnuli ste maksimalan broj korisnika koji je {limit}!",
+        maxAmountUsersCreationMessage: "Dosegnuli ste maksimalan broj korisnika koji je {limit}!",
         createNewUserDialogTitle: "Kreiraj novog korisnika",
         editUserDialogTitle: "Uređivanje korisnika: {name}",
         editUserConfirmationMessage: "Jeste li sigurni da želite urediti korisnika {name}?",
     },
     UserCreateForm: {
-        noOrganisationsMessage: 
+        noOrganisationsMessage:
             "Morate imati barem jednu organizaciju kreiranu prije kreiranja vlasnika nekretnine!",
         userNameInputLabel: "Ime *",
         userNameInputHint: "Ime osobe, npr. Max Mustermann",
@@ -299,8 +295,10 @@ export default {
         noItemsMessage: "Nema artikala u zalihama.",
         editInventoryItemDialogTitle: "Uređivanje artikla zaliha: {name}",
         deleteItemConfirmMessage: "Izbrisati artikl zaliha: {name}?",
-        importMergeSuccess: "Artikli uspješno uvezeni. {count} artikala dodano, {updated} ažurirano",
-        importError: "Pogreška pri uvozu artikala. Molimo provjerite format datoteke i pokušajte ponovno.",
+        importMergeSuccess:
+            "Artikli uspješno uvezeni. {count} artikala dodano, {updated} ažurirano",
+        importError:
+            "Pogreška pri uvozu artikala. Molimo provjerite format datoteke i pokušajte ponovno.",
         itemMainCategory: {
             spirits: "Žestoka pića",
             wine: "Vino",
@@ -334,7 +332,7 @@ export default {
             bug: "Greška",
             feature_request: "Zahtjev za značajkom",
         },
-        tooManyReports: 
+        tooManyReports:
             "Možete poslati samo {count} prijava svakih {minutes} minuta. Molimo pokušajte kasnije.",
         issueReportedSuccess: "Problem je uspješno prijavljen",
         myIssues: "Moji problemi",
@@ -345,46 +343,46 @@ export default {
         issueDeleted: "Problem je uspješno izbrisan",
     },
     PageAdminIssueReports: {
-    title: "Prijave problema",
-    noIssuesMessage: "Nema prijavljenih problema",
-    status: {
-        new: "Novi",
-        in_progress: "U tijeku",
-        resolved: "Riješeno",
-        wont_fix: "Neće se popraviti",
+        title: "Prijave problema",
+        noIssuesMessage: "Nema prijavljenih problema",
+        status: {
+            new: "Novi",
+            in_progress: "U tijeku",
+            resolved: "Riješeno",
+            wont_fix: "Neće se popraviti",
+        },
+        updateStatus: "Ažuriraj status",
+        statusUpdated: "Status problema ažuriran",
+        issueMarkedAsResolved: "Problem označen kao riješen",
+        issueMarkedAsUnresolved: "Problem označen kao neriješen",
+        deleteConfirmation: "Izbrisati problem",
     },
-    updateStatus: "Ažuriraj status",
-    statusUpdated: "Status problema ažuriran",
-    issueMarkedAsResolved: "Problem označen kao riješen",
-    issueMarkedAsUnresolved: "Problem označen kao neriješen",
-    deleteConfirmation: "Izbrisati problem",
-},
-PageAdminPropertyDrinkCards: {
-    title: "Digitalne kartice pića",
-    noCardsMessage: 
-        "Nema kreiranih kartica pića. Kliknite na + gumb za kreiranje prve kartice pića.",
-    createCardDialogTitle: "Kreiraj novu karticu pića",
-    editCardDialogTitle: "Uredi karticu pića",
-    cardCreatedMessage: "Kartica pića uspješno kreirana",
-    cardUpdatedMessage: "Kartica pića uspješno ažurirana",
-    cardDeletedMessage: "Kartica pića uspješno izbrisana",
-    deleteCardConfirmation: "Jeste li sigurni da želite izbrisati ovu karticu pića?",
-    sectionsLabel: "Sekcije",
-    sectionsCount: "Sekcije: {count}",
-    noItemsMessage: "Nema artikala u ovoj sekciji. Kliknite + za dodavanje artikala.",
-    cardNameLabel: "Naziv kartice",
-    cardDescriptionLabel: "Opis (opcionalno)",
-    isActiveLabel: "Aktivno",
-    servingSize: "Veličina porcije",
-    amount: "Količina",
-    unit: "Jedinica",
-    displayName: "Prikazani naziv",
-    addSection: "Dodaj sekciju",
-    sectionNameLabel: "Naziv sekcije",
-    categoryLabel: "Kategorija",
-    servingSizeOptional: "Veličina porcije (opcionalno)",
-    qrCodeTitle: "QR kod",
-    qrCodeAlt: "QR kod kartice pića",
-    downloadQRCode: "Preuzmi QR kod",
-},
+    PageAdminPropertyDrinkCards: {
+        title: "Digitalne kartice pića",
+        noCardsMessage:
+            "Nema kreiranih kartica pića. Kliknite na + gumb za kreiranje prve kartice pića.",
+        createCardDialogTitle: "Kreiraj novu karticu pića",
+        editCardDialogTitle: "Uredi karticu pića",
+        cardCreatedMessage: "Kartica pića uspješno kreirana",
+        cardUpdatedMessage: "Kartica pića uspješno ažurirana",
+        cardDeletedMessage: "Kartica pića uspješno izbrisana",
+        deleteCardConfirmation: "Jeste li sigurni da želite izbrisati ovu karticu pića?",
+        sectionsLabel: "Sekcije",
+        sectionsCount: "Sekcije: {count}",
+        noItemsMessage: "Nema artikala u ovoj sekciji. Kliknite + za dodavanje artikala.",
+        cardNameLabel: "Naziv kartice",
+        cardDescriptionLabel: "Opis (opcionalno)",
+        isActiveLabel: "Aktivno",
+        servingSize: "Veličina porcije",
+        amount: "Količina",
+        unit: "Jedinica",
+        displayName: "Prikazani naziv",
+        addSection: "Dodaj sekciju",
+        sectionNameLabel: "Naziv sekcije",
+        categoryLabel: "Kategorija",
+        servingSizeOptional: "Veličina porcije (opcionalno)",
+        qrCodeTitle: "QR kod",
+        qrCodeAlt: "QR kod kartice pića",
+        downloadQRCode: "Preuzmi QR kod",
+    },
 };

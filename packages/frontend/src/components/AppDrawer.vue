@@ -36,7 +36,7 @@ const langOptions = [
     { value: "en-GB", label: "English" },
     { value: "de", label: "German" },
     { value: "es-ES", label: "Spanish" },
-    { value: "hr", label: "Croatian" }
+    { value: "hr", label: "Croatian" },
 ];
 
 const inventoryLink = computed(function () {
