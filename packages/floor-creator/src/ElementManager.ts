@@ -6,13 +6,20 @@ import { Wall } from "./elements/Wall.js";
 import { DJBooth } from "./elements/DJBooth.js";
 import { Sofa } from "./elements/Sofa.js";
 import { RoundTable } from "./elements/RoundTable.js";
-import { ELEMENT_DEFAULT_FILL_COLOR, RESOLUTION, TABLE_HEIGHT, TABLE_WIDTH } from "./constants.js";
+import {
+    DEFAULT_FONT,
+    ELEMENT_DEFAULT_FILL_COLOR,
+    RESOLUTION,
+    TABLE_HEIGHT,
+    TABLE_WIDTH,
+} from "./constants.js";
 import { RectTable } from "./elements/RectTable.js";
 import { Stage } from "./elements/Stage.js";
 import { SpiralStaircase } from "./elements/SpiralStaircase.js";
 import { Door } from "./elements/Door.js";
 import { Bar } from "./elements/Bar.js";
 import { Cloakroom } from "./elements/Cloakroom.js";
+import { TextElement } from "./elements/TextElement.js";
 
 export class ElementManager {
     addElement(options: CreateElementOptions): FabricObject {
@@ -41,9 +48,23 @@ export class ElementManager {
                 return this.addBar(options);
             case FloorElementTypes.CLOAKROOM:
                 return this.addCloakroom(options);
+            case FloorElementTypes.TEXT:
+                return this.addTextElement(options);
             default:
                 throw new Error(`Unknown floor element type: ${options.tag}`);
         }
+    }
+
+    private addTextElement({ x, y }: CreateElementOptions): TextElement {
+        return new TextElement({
+            left: x,
+            top: y,
+            text: "Text",
+            fill: "#ccc",
+            fontSize: 36,
+            fontFamily: DEFAULT_FONT,
+            strokeWidth: 0,
+        });
     }
 
     private addEditableCircle({ x, y }: CreateElementOptions): EditableShape {

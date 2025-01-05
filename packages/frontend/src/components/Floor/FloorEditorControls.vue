@@ -205,7 +205,8 @@ function onFloorSave(): void {
                 <p>{{ element.label }}</p>
 
                 <q-avatar square size="42px">
-                    <img :src="element.img ?? ''" alt="Floor element" />
+                    <img v-if="element.img" :src="element.img" alt="Floor element" />
+                    <p v-else>{{ element.label }}</p>
                 </q-avatar>
             </div>
         </div>

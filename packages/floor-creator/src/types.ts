@@ -55,6 +55,7 @@ export enum FloorElementTypes {
     EDITABLE_CIRCLE = "EditableCircle",
     BAR = "Bar",
     CLOAKROOM = "Cloakroom",
+    TEXT = "Text",
 }
 
 export type NumberTuple = [number, number];
