@@ -24,6 +24,7 @@
         "build:functions": "pnpm --filter functions build",
         "test": "pnpm -r test",
         "lint": "eslint .",
+        "lint:fix": "eslint --fix .",
         "build": "pnpm -r build",
         "build:clean": "rm -rf ./packages/*/dist && pnpm -r build"
     },
