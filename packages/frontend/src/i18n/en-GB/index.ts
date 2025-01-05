@@ -1,4 +1,4 @@
-export default {
+const enGB = {
     Global: {
         fullScreen: "Full Screen",
         edit: "Edit",
@@ -388,3 +388,7 @@ export default {
         downloadQRCode: "Download QR Code",
     },
 };
+
+export type TranslationStructure = typeof enGB;
+
+export default enGB;

@@ -1,4 +1,6 @@
-export default {
+import type { TranslationStructure } from "src/i18n/en-GB";
+
+const hr: TranslationStructure = {
     Global: {
         fullScreen: "Puni saslon",
         edit: "Uredi",
@@ -386,3 +388,5 @@ export default {
         downloadQRCode: "Preuzmi QR kod",
     },
 };
+
+export default hr;

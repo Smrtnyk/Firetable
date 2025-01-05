@@ -1,4 +1,6 @@
-export default {
+import type { TranslationStructure } from "src/i18n/en-GB";
+
+const de: TranslationStructure = {
     Global: {
         fullScreen: "Vollbild",
         edit: "Bearbeiten",
@@ -101,6 +103,12 @@ export default {
     InventoryTable: {
         quantity: "Menge",
         drink: "Getränk",
+        mainCategory: "Hauptkategorie",
+        subCategory: "Unterkategorie",
+        supplier: "Lieferant",
+        actions: "Aktionen",
+        volume: "Volumen",
+        deleteSelected: "Ausgewählte löschen",
     },
     AppDrawer: {
         links: {
@@ -212,7 +220,7 @@ export default {
         deleteGuestConfirmTitle: "Gast löschen?",
         deleteGuestConfirmMessage: "Sind Sie sicher, dass Sie den Gast {name} löschen möchten?",
         noVisitsMessage: "Es gibt keine Besuche für diesen Gast.",
-        lastModifiedLabel: "Zuletzt geändert",
+        lastModified: "Zuletzt geändert",
         editVisitTitle: "Besuchsdetails bearbeiten",
     },
     PageAdminGuests: {
@@ -314,6 +322,14 @@ export default {
         bulkDeleteSuccess: "Artikel erfolgreich gelöscht",
         bulkDeleteConfirmMessage: "Sind Sie sicher, dass Sie {count} Artikel löschen möchten?",
     },
+    InventoryItemCreateForm: {
+        subCategoryRequired: "Unterkategorie ist erforderlich",
+        mainCategoryRequired: "Hauptkategorie ist erforderlich",
+        alcoholContentRange: "Alkoholgehalt muss zwischen 0 und 100 liegen",
+        volumePositive: "Volumen muss positiv sein",
+        minimumStockNonNegative: "Mindestbestand muss nicht negativ sein",
+        quantityNonNegative: "Menge muss nicht negativ sein",
+    },
     GuestSummaryChips: {
         reservations: "Reservierungen",
         arrived: "Angekommen",
@@ -326,7 +342,7 @@ export default {
         descriptionHint: "Bitte beschreibe den Fehler in der gewünschten Tiefe",
         categories: {
             bug: "Fehler",
-            featureRequest: "Feature-Anfrage",
+            feature_request: "Feature-Anfrage",
         },
         tooManyReports:
             "Sie können nur {count} Fehlerberichte alle {minutes} Minuten einreichen. Bitte versuchen Sie es später erneut.",
@@ -383,3 +399,5 @@ export default {
         downloadQRCode: "QR-Code herunterladen",
     },
 };
+
+export default de;

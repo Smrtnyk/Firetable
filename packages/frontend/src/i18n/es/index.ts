@@ -1,4 +1,6 @@
-export default {
+import type { TranslationStructure } from "src/i18n/en-GB";
+
+const es: TranslationStructure = {
     Global: {
         fullScreen: "Pantalla Completa",
         edit: "Editar",
@@ -390,3 +392,5 @@ export default {
         downloadQRCode: "Descargar código QR",
     },
 };
+
+export default es;
