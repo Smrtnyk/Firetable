@@ -49,7 +49,7 @@ export class FloorSeeder extends BaseSeeder {
 
     private async loadFloorPlans(): Promise<void> {
         try {
-            const floorPlansDir = join(import.meta.dirname, "floor-plans");
+            const floorPlansDir = join(import.meta.dirname, "..", "floor-plans");
 
             for (let i = 1; i <= 3; i++) {
                 const filePath = join(floorPlansDir, `floor-${i}.json`);
