@@ -141,7 +141,7 @@ To clear the database and start fresh, you have to do it manually in the emulato
 Emulators UI provides buttons to clear the database and authentication state.
 
 ## Language Support
-Currently supports English with partial German translations
+Currently, supports English with partial German, Spanish and Croatian translations
 
 ## Contributing
 Contributions are welcome! Please take a moment to review our [Contributing Guidelines](CONTRIBUTING.md) and ensure you understand our [Code of Conduct](CODE_OF_CONDUCT.md) before getting started.
