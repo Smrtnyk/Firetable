@@ -4,9 +4,11 @@ import type { FloorEditorElement } from "../types.js";
 import { SmoothBlinkAnimation } from "./animation/SmoothBlinkAnimation.js";
 import { TABLE_WIDTH, TABLE_HEIGHT } from "../constants.js";
 import { Group, LayoutManager } from "fabric";
+import { omit } from "es-toolkit";
 
 interface TableElementOptions {
     groupOptions: Partial<GroupProps> & {
+        [key: string]: unknown;
         baseFill?: string;
         label: string;
     };
@@ -26,8 +28,9 @@ export abstract class Table extends Group implements FloorEditorElement {
     private readonly animationStrategy: AnimationStrategy;
 
     protected constructor(elements: [Circle | Rect, FabricText], options: TableElementOptions) {
+        const groupOptions = omit(options.groupOptions, ["type"]);
         super(elements, {
-            ...options.groupOptions,
+            ...groupOptions,
             layoutManager: new LayoutManager(),
         });
         const [shape, textLabel] = elements;

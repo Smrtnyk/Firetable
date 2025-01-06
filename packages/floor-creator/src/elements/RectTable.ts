@@ -10,6 +10,7 @@ import {
 } from "../constants.js";
 import { FloorElementTypes } from "../types.js";
 import { Rect, FabricText } from "fabric";
+import { omit } from "es-toolkit";
 
 interface RectTableElementOptions {
     groupOptions: Partial<GroupProps> & {
@@ -17,6 +18,7 @@ interface RectTableElementOptions {
         label: string;
     };
     textOptions: {
+        [key: string]: unknown;
         label: string;
     };
     shapeOptions: Record<string, unknown>;
@@ -27,8 +29,9 @@ export class RectTable extends Table {
     static override readonly type = FloorElementTypes.RECT_TABLE;
 
     constructor(options: RectTableElementOptions) {
+        const shapeOptions = omit(options.shapeOptions, ["type"]);
         const tableRect = new Rect({
-            ...options.shapeOptions,
+            ...shapeOptions,
             fill: options.groupOptions.baseFill ?? ELEMENT_DEFAULT_FILL_COLOR,
             stroke: ELEMENT_DEFAULT_STROKE_COLOR,
             strokeWidth: ELEMENT_DEFAULT_STROKE_WIDTH,
@@ -38,8 +41,9 @@ export class RectTable extends Table {
             strokeLineJoin: "round",
         });
 
+        const textOptions = omit(options.textOptions, ["type"]);
         const textLabel = new FabricText(options.groupOptions.label, {
-            ...options.textOptions,
+            ...textOptions,
             fontSize: FONT_SIZE,
             fontFamily: DEFAULT_FONT,
             fill: TABLE_TEXT_FILL_COLOR,

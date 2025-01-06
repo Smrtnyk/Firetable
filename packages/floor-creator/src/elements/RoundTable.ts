@@ -9,6 +9,7 @@ import {
 } from "../constants.js";
 import { FloorElementTypes } from "../types.js";
 import { Circle, FabricText } from "fabric";
+import { omit } from "es-toolkit";
 
 interface CircleTableElementOptions {
     groupOptions: Partial<GroupProps> & {
@@ -17,6 +18,7 @@ interface CircleTableElementOptions {
     };
     textOptions: {
         label: string;
+        type?: string;
     };
     shapeOptions: Record<string, unknown>;
 }
@@ -26,8 +28,9 @@ export class RoundTable extends Table {
     static override readonly type = FloorElementTypes.ROUND_TABLE;
 
     constructor(options: CircleTableElementOptions) {
+        const shapeOptions = omit(options.shapeOptions, ["type"]);
         const tableCircle = new Circle({
-            ...options.shapeOptions,
+            ...shapeOptions,
             originX: "center",
             originY: "center",
             fill: options.groupOptions.baseFill ?? ELEMENT_DEFAULT_FILL_COLOR,
@@ -36,7 +39,7 @@ export class RoundTable extends Table {
             strokeUniform: true,
         });
         const textLabel = new FabricText(options.groupOptions.label, {
-            ...options.textOptions,
+            ...omit(options.textOptions, ["type"]),
             fontSize: FONT_SIZE,
             fontFamily: DEFAULT_FONT,
             fill: TABLE_TEXT_FILL_COLOR,

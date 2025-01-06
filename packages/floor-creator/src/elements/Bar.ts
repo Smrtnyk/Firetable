@@ -3,11 +3,13 @@ import type { FabricObject } from "fabric";
 import { FloorElementTypes } from "../types.js";
 import { DEFAULT_FONT, FONT_SIZE } from "../constants.js";
 import { Circle, classRegistry, Group, IText, LayoutManager, Rect, util } from "fabric";
+import { omit } from "es-toolkit";
 
 interface BarOptions {
     left: number;
     top: number;
     objects?: FabricObject[];
+    type?: string;
 }
 
 type BarDesign = {
@@ -215,7 +217,7 @@ export class Bar extends Group implements FloorEditorElement {
         }
 
         super(objects, {
-            ...options,
+            ...omit(options, ["type"]),
             layoutManager: new LayoutManager(),
             interactive: true,
             subTargetCheck: true,

@@ -2,10 +2,12 @@ import type { FloorEditorElement } from "../types.js";
 import { FloorElementTypes } from "../types.js";
 import { ELEMENT_DEFAULT_STROKE_COLOR } from "../constants.js";
 import { classRegistry, Group, LayoutManager, Line, Path } from "fabric";
+import { omit } from "es-toolkit";
 
 interface DoorOptions {
     left: number;
     top: number;
+    type?: string;
 }
 
 export class Door extends Group implements FloorEditorElement {
@@ -31,7 +33,7 @@ export class Door extends Group implements FloorEditorElement {
         doorArc.evented = false;
 
         super([doorLine, doorArc], {
-            ...options,
+            ...omit(options, ["type"]),
             layoutManager: new LayoutManager(),
             subTargetCheck: false,
         });
