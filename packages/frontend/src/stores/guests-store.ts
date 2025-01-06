@@ -11,7 +11,8 @@ import { first, matchesProperty } from "es-toolkit/compat";
 import { AppLogger } from "src/logger/FTLogger";
 import { useAuthStore } from "src/stores/auth-store";
 import { usePropertiesStore } from "src/stores/properties-store";
-import { chunk } from "es-toolkit";
+import { chunk, omit, omitBy } from "es-toolkit";
+import { isNotNil } from "es-toolkit/predicate";
 
 export type GuestSummary = {
     guestId: string;
@@ -48,7 +49,7 @@ export const useGuestsStore = defineStore("guests", function () {
 
     function createPropertySummary(
         propertyId: string,
-        events: PropertyEvents,
+        events: Partial<PropertyEvents>,
     ): Omit<GuestSummary, "guestId"> | undefined {
         const property = findProperty(propertyId);
         if (!property) {
@@ -264,19 +265,14 @@ export const useGuestsStore = defineStore("guests", function () {
             AppLogger.info("No events found for the property");
             return undefined;
         }
-
-        const eventsExcludingSpecified = { ...events };
-        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- just for now
-        delete eventsExcludingSpecified[eventIdToExclude];
-
         // Filter out future visits
         const currentTimestamp = Date.now();
-        for (const [eventId, visit] of Object.entries(eventsExcludingSpecified)) {
-            if (visit && visit.date > currentTimestamp) {
-                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- just for now
-                delete eventsExcludingSpecified[eventId];
-            }
-        }
+        const eventsExcludingSpecified = omitBy<PropertyEvents>(
+            omit(events, [eventIdToExclude]),
+            function (visit) {
+                return isNotNil(visit) && visit.date > currentTimestamp;
+            },
+        );
 
         const summary = createPropertySummary(propertyId, eventsExcludingSpecified);
         if (!summary) {
@@ -325,12 +321,12 @@ export const useGuestsStore = defineStore("guests", function () {
     };
 });
 
-function calculateVisitStats(events: PropertyEvents): {
+function calculateVisitStats(events: Partial<PropertyEvents>): {
     totalReservations: number;
     fulfilledVisits: number;
     visitPercentage: string;
 } {
-    const nonNullEvents = Object.values(events).filter((event): event is Visit => event !== null);
+    const nonNullEvents = Object.values(events).filter((event): event is Visit => isNotNil(event));
 
     const totalReservations = nonNullEvents.length;
 
