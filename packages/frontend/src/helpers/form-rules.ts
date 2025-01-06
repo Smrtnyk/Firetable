@@ -1,5 +1,6 @@
 import { isNil } from "es-toolkit/predicate";
 import { isString } from "es-toolkit";
+import { isNumber } from "es-toolkit/compat";
 
 export function noEmptyString(msg = "Please type something"): (val: string) => boolean | string {
     return function (val: string): boolean | string {
@@ -62,7 +63,7 @@ export function greaterThanZero(
 
 export function noNegativeNumber(msg: string): (val: unknown) => boolean | string {
     return function (val: unknown): boolean | string {
-        const isNumberType = typeof val === "number";
+        const isNumberType = isNumber(val);
         const isStringWithNumber = isString(val) && val.trim() !== "" && !Number.isNaN(Number(val));
 
         if (isNumberType || isStringWithNumber) {
@@ -100,9 +101,13 @@ export function numberInRange(
     msg: string,
 ): (val: unknown) => boolean | string {
     return function (val: unknown): boolean | string {
-        if (typeof val !== "number" && typeof val !== "string") return msg;
+        if (!isNumber(val) && !isString(val)) {
+            return msg;
+        }
         const num = Number(val);
-        if (Number.isNaN(num)) return msg;
+        if (Number.isNaN(num)) {
+            return msg;
+        }
         return (num >= min && num <= max) || msg;
     };
 }

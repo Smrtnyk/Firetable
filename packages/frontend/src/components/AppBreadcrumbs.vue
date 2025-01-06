@@ -25,7 +25,7 @@ interface Link {
 }
 
 function isAnyFunction(value: unknown): value is AnyFunction {
-    return typeof value === "function";
+    return isFunction(value);
 }
 
 const route = useRoute();

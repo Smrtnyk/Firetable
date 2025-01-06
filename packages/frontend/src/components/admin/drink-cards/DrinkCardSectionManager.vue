@@ -21,7 +21,7 @@ import {
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import DrinkCardBuilderAddDragElementsDropdown from "src/components/admin/drink-cards/DrinkCardBuilderAddDragElementsDropdown.vue";
-import { matchesProperty } from "es-toolkit/compat";
+import { isNumber, matchesProperty } from "es-toolkit/compat";
 
 interface Props {
     elements: DrinkCardElement[];
@@ -56,8 +56,8 @@ useDraggable(draggableListRef, draggableElements, {
     onEnd(event: SortableEvent): void {
         const { oldDraggableIndex, newDraggableIndex, item } = event;
         if (
-            typeof oldDraggableIndex !== "number" ||
-            typeof newDraggableIndex !== "number" ||
+            !isNumber(oldDraggableIndex) ||
+            !isNumber(newDraggableIndex) ||
             oldDraggableIndex === newDraggableIndex ||
             !item
         ) {

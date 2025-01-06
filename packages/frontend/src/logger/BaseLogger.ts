@@ -1,4 +1,7 @@
 /* eslint-disable no-console -- this file is fine to use this */
+import { isObject } from "es-toolkit/compat";
+import { isString } from "es-toolkit";
+
 type LogLevel = "debug" | "error" | "info" | "warn";
 
 interface LoggerOptions {
@@ -30,7 +33,7 @@ export abstract class BaseLogger {
                 .catch(console.error);
             const errorMessage = `${this.prefix} [ERROR]: ${message.message}\nStack: ${message.stack}`;
             console.error(errorMessage, ...args);
-        } else if (typeof message === "string") {
+        } else if (isString(message)) {
             this.#log("error", message, ...args);
         } else {
             this.#log("error", "An unknown error occurred", ...args);
@@ -56,7 +59,7 @@ export abstract class BaseLogger {
 
         if (this.#isError(message)) {
             errorText += `${message.message}`;
-        } else if (typeof message === "string") {
+        } else if (isString(message)) {
             errorText += `${message}`;
         } else {
             errorText += `An unknown error occurred`;
@@ -81,7 +84,7 @@ export abstract class BaseLogger {
      * Converts objects, arrays, etc., into a string.
      */
     #formatArg(arg: unknown): string {
-        if (typeof arg === "object") {
+        if (isObject(arg)) {
             try {
                 return JSON.stringify(arg);
             } catch {

@@ -6,7 +6,8 @@ import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPC
 import { nextTick, ref, watch, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { QSelect } from "quasar";
-import { matchesProperty } from "es-toolkit/compat";
+import { isObject, matchesProperty } from "es-toolkit/compat";
+import { isString } from "es-toolkit";
 
 export interface EventGuestSearchProps {
     floors: FloorDoc[];
@@ -61,11 +62,11 @@ function createTableLabel(reservation: PlannedReservation): string {
 }
 
 function findSearchedTable(inputVal: string | { value: PlannedReservation }): PlannedReservation[] {
-    const val = typeof inputVal === "string" ? inputVal : inputVal.value.guestName;
+    const val = isString(inputVal) ? inputVal : inputVal.value.guestName;
     const normalizedVal = val.toLowerCase().trim();
 
     // If inputVal is an object, we assume a specific item was selected
-    if (typeof inputVal === "object") {
+    if (isObject(inputVal)) {
         // Remove focus when item is selected to not keep virtual keyboard which is annoying on mobile
         if (normalizedVal.length > 0) {
             removeFocus();
