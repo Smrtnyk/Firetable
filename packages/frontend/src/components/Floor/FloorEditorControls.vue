@@ -2,10 +2,13 @@
 import type { FloorEditor, FloorEditorElement, FloorElementTypes } from "@firetable/floor-creator";
 import { MAX_FLOOR_HEIGHT, MAX_FLOOR_WIDTH, RESOLUTION } from "@firetable/floor-creator";
 import { showConfirm } from "src/helpers/ui-helpers";
-import { onMounted, reactive, useTemplateRef } from "vue";
+import { ref, onMounted, reactive, useTemplateRef } from "vue";
 import { exportFile } from "quasar";
 import { ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
 import { AppLogger } from "src/logger/FTLogger.js";
+import { isString } from "es-toolkit";
+import { isNumber } from "es-toolkit/compat";
+import FTBtn from "src/components/FTBtn.vue";
 
 interface Props {
     floorInstance: FloorEditor;
@@ -93,6 +96,61 @@ function onFloorChange(prop: keyof FloorEditor, event: number | string | null): 
 
 function onFloorSave(): void {
     emit("floorSave");
+}
+
+const isDrawingMode = ref(false);
+const lineWidth = ref(2);
+const drawingColor = ref("#000000");
+const selectedBrushType = ref<"circle" | "pencil" | "spray">("pencil");
+const brushSettingsOpen = ref(false);
+
+const brushOptions = [
+    { label: "Pencil", value: "pencil" },
+    { label: "Spray", value: "spray" },
+    { label: "Circle", value: "circle" },
+];
+
+function toggleDrawingMode(): void {
+    isDrawingMode.value = !isDrawingMode.value;
+    floorInstance.setDrawingMode(isDrawingMode.value);
+}
+
+function openBrushSettings(): void {
+    brushSettingsOpen.value = true;
+}
+
+function closeBrushSettings(): void {
+    brushSettingsOpen.value = false;
+}
+
+function updateBrushColor(color: unknown): void {
+    if (!isString(color)) {
+        return;
+    }
+    drawingColor.value = color;
+    floorInstance.setBrushColor(color);
+}
+
+function updateLineWidth(width: unknown): void {
+    if (!isNumber(width)) {
+        return;
+    }
+
+    floorInstance.setBrushWidth(width);
+}
+
+function updateBrushType(newBrushType: "circle" | "pencil" | "spray"): void {
+    floorInstance.setBrushType(newBrushType);
+}
+
+const isColorPickerOpen = ref(false);
+
+function openColorPicker(): void {
+    isColorPickerOpen.value = true;
+}
+
+function closeColorPicker(): void {
+    isColorPickerOpen.value = false;
 }
 </script>
 
@@ -191,6 +249,116 @@ function onFloorSave(): void {
                 />
             </div>
         </div>
+
+        <!-- Drawing Controls -->
+        <div class="q-pa-md row items-center">
+            <q-btn
+                flat
+                round
+                icon="pencil"
+                :color="isDrawingMode ? 'negative' : ''"
+                @click="toggleDrawingMode"
+                class="q-mr-sm"
+            />
+
+            <q-btn
+                round
+                flat
+                icon="cog-wheel"
+                @click="openBrushSettings"
+                :disabled="!isDrawingMode"
+            />
+
+            <!-- Popup with brush controls -->
+            <q-popup-proxy
+                v-model="brushSettingsOpen"
+                transition-show="scale"
+                transition-hide="scale"
+                no-parent-event
+                cover
+            >
+                <q-card style="min-width: 280px">
+                    <q-card-section class="q-pa-sm">
+                        <div class="text-h6">Brush Settings</div>
+                    </q-card-section>
+
+                    <q-separator />
+
+                    <q-card-section class="q-pa-sm">
+                        <q-select
+                            v-model="selectedBrushType"
+                            :options="brushOptions"
+                            @update:model-value="updateBrushType"
+                            label="Brush Type"
+                            standout
+                            rounded
+                            dense
+                            emit-value
+                        />
+                    </q-card-section>
+
+                    <!-- Color Picker -->
+                    <q-card-section class="q-pa-sm">
+                        <div class="column items-start q-gutter-sm">
+                            <span class="text-caption">Color</span>
+                            <FTBtn
+                                flat
+                                round
+                                icon="color-picker"
+                                :style="{ backgroundColor: drawingColor }"
+                                @click="openColorPicker"
+                            />
+                        </div>
+                    </q-card-section>
+
+                    <!-- Line Width -->
+                    <q-card-section class="q-pa-sm">
+                        <div class="row items-center q-col-gutter-sm">
+                            <span class="text-caption">Brush Size</span>
+                            <q-slider
+                                v-model.number="lineWidth"
+                                :min="1"
+                                :max="50"
+                                :step="1"
+                                label
+                                @update:model-value="updateLineWidth"
+                            />
+                        </div>
+                    </q-card-section>
+
+                    <q-separator />
+
+                    <q-card-actions align="right">
+                        <q-btn flat label="Close" icon="close" @click="closeBrushSettings" />
+                    </q-card-actions>
+                </q-card>
+            </q-popup-proxy>
+
+            <q-popup-proxy
+                v-model="isColorPickerOpen"
+                transition-show="scale"
+                transition-hide="scale"
+                cover
+                no-parent-event
+            >
+                <q-card style="min-width: 250px">
+                    <q-card-section>
+                        <div class="text-h6">Select Color</div>
+                    </q-card-section>
+                    <q-card-section>
+                        <q-color
+                            v-model="drawingColor"
+                            @change="updateBrushColor"
+                            style="width: 200px; height: 200px"
+                        />
+                    </q-card-section>
+                    <q-card-actions align="right">
+                        <q-btn flat label="Close" icon="close" @click="closeColorPicker" />
+                    </q-card-actions>
+                </q-card>
+            </q-popup-proxy>
+        </div>
+
         <!-- Add Element -->
         <q-separator inset />
 

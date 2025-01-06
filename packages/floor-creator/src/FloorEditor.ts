@@ -8,6 +8,8 @@ import type {
     NumberTuple,
     ToTuple,
 } from "./types.js";
+import type { DrawingOptions } from "./DrawingManager.js";
+import { DrawingManager } from "./DrawingManager.js";
 import { ElementManager } from "./ElementManager.js";
 import { Floor } from "./Floor.js";
 import { GridDrawer } from "./GridDrawer.js";
@@ -30,6 +32,7 @@ export class FloorEditor extends Floor {
     readonly gridDrawer: GridDrawer;
     readonly history: CanvasHistory;
     protected eventManager: EventManager;
+    protected drawingManager: DrawingManager;
     private readonly elementManager: ElementManager;
     private readonly eventEmitter: EventEmitter<FloorEditorEvents>;
 
@@ -42,6 +45,7 @@ export class FloorEditor extends Floor {
         this.history = new CanvasHistory(this, { maxStackSize: 20 });
         this.eventManager = new EditorEventManager(this, this.history);
         this.elementManager = new ElementManager();
+        this.drawingManager = new DrawingManager(this.canvas);
 
         if (options.floorDoc.json) {
             this.on("rendered", () => {
@@ -91,6 +95,30 @@ export class FloorEditor extends Floor {
 
     async redo(): Promise<void> {
         await this.history.redo();
+    }
+
+    setDrawingMode(enabled: boolean, options?: DrawingOptions): void {
+        if (enabled) {
+            this.drawingManager.enable(options);
+        } else {
+            this.drawingManager.disable();
+        }
+    }
+
+    setBrushType(type: "circle" | "pencil" | "spray"): void {
+        this.drawingManager.setBrushType(type);
+    }
+
+    setBrushColor(color: string): void {
+        this.drawingManager.setBrushColor(color);
+    }
+
+    setBrushWidth(width: number): void {
+        this.drawingManager.setBrushWidth(width);
+    }
+
+    clearDrawings(): void {
+        this.drawingManager.clearDrawings();
     }
 
     emit<T extends keyof FloorEditorEvents>(
@@ -175,6 +203,7 @@ export class FloorEditor extends Floor {
         this.eventManager.destroy();
         this.zoomManager.destroy();
         this.touchManager.destroy();
+        this.drawingManager.destroy();
         this.history.destroy();
         await this.canvas.dispose();
     }
