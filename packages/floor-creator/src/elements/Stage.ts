@@ -1,7 +1,6 @@
 import type { FloorEditorElement } from "../types.js";
 import type { FabricObject } from "fabric";
 import { FloorElementTypes } from "../types.js";
-import { DEFAULT_FONT } from "../constants.js";
 import { LayoutManager, Group, Rect, FabricText, Circle, classRegistry } from "fabric";
 
 interface StageOptions {
@@ -45,7 +44,6 @@ export class Stage extends Group implements FloorEditorElement {
         const stageLabel = new FabricText("STAGE", {
             left: stageBody.width / 2,
             top: stageBody.height / 2,
-            fontFamily: DEFAULT_FONT,
             fontSize: 20,
             fill: "#FFFFFF",
             fontWeight: "bold",

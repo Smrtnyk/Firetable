@@ -1,7 +1,6 @@
 import type { FabricObject } from "fabric";
 import { FloorElementTypes, type FloorEditorElement } from "../types.js";
 import {
-    DEFAULT_FONT,
     ELEMENT_DEFAULT_FILL_COLOR,
     ELEMENT_DEFAULT_STROKE_COLOR,
     ELEMENT_DEFAULT_STROKE_WIDTH,
@@ -70,7 +69,6 @@ export class Cloakroom extends Group implements FloorEditorElement {
             left: iTextInstance?.left ?? 0,
             top: iTextInstance?.top ?? 0,
             fontSize: FONT_SIZE,
-            fontFamily: DEFAULT_FONT,
             fill: TABLE_TEXT_FILL_COLOR,
             textAlign: "center",
         });

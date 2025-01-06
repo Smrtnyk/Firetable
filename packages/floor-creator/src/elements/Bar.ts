@@ -1,7 +1,7 @@
 import type { FloorEditorElement } from "../types.js";
 import type { FabricObject } from "fabric";
 import { FloorElementTypes } from "../types.js";
-import { DEFAULT_FONT, FONT_SIZE } from "../constants.js";
+import { FONT_SIZE } from "../constants.js";
 import { Circle, classRegistry, Group, IText, LayoutManager, Rect, util } from "fabric";
 import { omit } from "es-toolkit";
 
@@ -276,7 +276,6 @@ export class Bar extends Group implements FloorEditorElement {
         const textLabel = new IText(label, {
             left: barBody.width / 2,
             top: barBody.height / 2,
-            fontFamily: DEFAULT_FONT,
             fontSize: FONT_SIZE,
             fill: "#ffffff",
             fontWeight: "bold",

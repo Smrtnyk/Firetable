@@ -1,7 +1,6 @@
 import type { GroupProps } from "fabric";
 import { Table } from "./Table.js";
 import {
-    DEFAULT_FONT,
     ELEMENT_DEFAULT_FILL_COLOR,
     ELEMENT_DEFAULT_STROKE_COLOR,
     FONT_SIZE,
@@ -41,7 +40,6 @@ export class RoundTable extends Table {
         const textLabel = new FabricText(options.groupOptions.label, {
             ...omit(options.textOptions, ["type"]),
             fontSize: FONT_SIZE,
-            fontFamily: DEFAULT_FONT,
             fill: TABLE_TEXT_FILL_COLOR,
             left: tableCircle.left,
             top: tableCircle.top,

@@ -1,7 +1,7 @@
 import type { FabricObject } from "fabric";
 import type { BaseTable, FloorCreationOptions, FloorData } from "./types.js";
 import type { EventManager } from "./event-manager/EventManager.js";
-import { CANVAS_BG_COLOR } from "./constants.js";
+import { CANVAS_BG_COLOR, DEFAULT_FONT } from "./constants.js";
 import { TouchManager } from "./TouchManager.js";
 import { FloorZoomManager } from "./FloorZoomManager.js";
 import { calculateCanvasScale } from "./utils.js";
@@ -11,12 +11,14 @@ import { RectTable } from "./elements/RectTable.js";
 import { Wall } from "./elements/Wall.js";
 import { RoundTable } from "./elements/RoundTable.js";
 import { EditableShape } from "./elements/EditableShape.js";
-import { Canvas, classRegistry } from "fabric";
+import { FabricText, Canvas, classRegistry } from "fabric";
 
 classRegistry.setClass(RectTable);
 classRegistry.setClass(RoundTable);
 classRegistry.setClass(Wall);
 classRegistry.setClass(EditableShape);
+
+FabricText.ownDefaults.fontFamily = DEFAULT_FONT;
 
 export abstract class Floor {
     readonly id: string;
