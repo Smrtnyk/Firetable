@@ -1,4 +1,3 @@
-import type { FabricObject } from "fabric";
 import type { EventManager } from "./event-manager/EventManager.js";
 import type {
     CreateElementOptions,
@@ -9,6 +8,7 @@ import type {
     ToTuple,
 } from "./types.js";
 import type { DrawingOptions } from "./DrawingManager.js";
+import type { FabricObject } from "fabric";
 import { DrawingManager } from "./DrawingManager.js";
 import { ElementManager } from "./ElementManager.js";
 import { Floor } from "./Floor.js";
@@ -17,7 +17,7 @@ import { EditorEventManager } from "./event-manager/EditorEventManager.js";
 import { calculateCanvasScale } from "./utils.js";
 import { CanvasHistory } from "./CanvasHistory.js";
 import { initAligningGuidelines } from "./fabric-patches/aligning-guidelines/index.js";
-import { ActiveSelection } from "fabric";
+import { InteractiveFabricObject, ActiveSelection } from "fabric";
 import { EventEmitter } from "@posva/event-emitter";
 
 type FloorEditorEvents = {
@@ -28,6 +28,14 @@ type FloorEditorEvents = {
     drop: [FloorEditor, FloorDropEvent];
 };
 
+InteractiveFabricObject.ownDefaults = {
+    ...InteractiveFabricObject.ownDefaults,
+    cornerStrokeColor: "blue",
+    cornerColor: "lightblue",
+    cornerStyle: "circle",
+    transparentCorners: false,
+    borderColor: "orange",
+};
 export class FloorEditor extends Floor {
     readonly gridDrawer: GridDrawer;
     readonly history: CanvasHistory;
