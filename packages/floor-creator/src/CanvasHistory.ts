@@ -3,14 +3,14 @@ import type { FabricObject, TFiller } from "fabric";
 import { EventEmitter } from "@posva/event-emitter";
 import { delay, isEqual, once } from "es-toolkit";
 
-export interface HistoryState {
+interface HistoryState {
     width: number;
     height: number;
     json: string;
     timestamp: number;
 }
 
-export interface CanvasHistoryOptions {
+interface CanvasHistoryOptions {
     maxStackSize?: number;
 }
 
