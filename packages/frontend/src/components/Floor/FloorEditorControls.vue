@@ -148,10 +148,6 @@ const isColorPickerOpen = ref(false);
 function openColorPicker(): void {
     isColorPickerOpen.value = true;
 }
-
-function closeColorPicker(): void {
-    isColorPickerOpen.value = false;
-}
 </script>
 
 <template>
@@ -276,12 +272,12 @@ function closeColorPicker(): void {
                 transition-hide="scale"
                 no-parent-event
                 cover
+                class="ft-card"
             >
-                <q-card style="min-width: 280px">
-                    <q-card-section class="q-pa-sm">
-                        <div class="text-h6">Brush Settings</div>
-                    </q-card-section>
-
+                <div style="min-width: 280px">
+                    <q-card-actions align="right">
+                        <q-btn flat label="Close" icon="close" @click="closeBrushSettings" />
+                    </q-card-actions>
                     <q-separator />
 
                     <q-card-section class="q-pa-sm">
@@ -325,13 +321,7 @@ function closeColorPicker(): void {
                             />
                         </div>
                     </q-card-section>
-
-                    <q-separator />
-
-                    <q-card-actions align="right">
-                        <q-btn flat label="Close" icon="close" @click="closeBrushSettings" />
-                    </q-card-actions>
-                </q-card>
+                </div>
             </q-popup-proxy>
 
             <q-popup-proxy
@@ -340,22 +330,13 @@ function closeColorPicker(): void {
                 transition-hide="scale"
                 cover
                 no-parent-event
+                class="ft-card"
             >
-                <q-card style="min-width: 250px">
-                    <q-card-section>
-                        <div class="text-h6">Select Color</div>
-                    </q-card-section>
-                    <q-card-section>
-                        <q-color
-                            v-model="drawingColor"
-                            @change="updateBrushColor"
-                            style="width: 200px; height: 200px"
-                        />
-                    </q-card-section>
-                    <q-card-actions align="right">
-                        <q-btn flat label="Close" icon="close" @click="closeColorPicker" />
-                    </q-card-actions>
-                </q-card>
+                <q-color
+                    style="min-width: 250px"
+                    v-model="drawingColor"
+                    @change="updateBrushColor"
+                />
             </q-popup-proxy>
         </div>
 
