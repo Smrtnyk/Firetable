@@ -42,7 +42,7 @@ export class TouchManager {
     onPanMove = (e: HammerInput): void => {
         this.isInteracting = true;
         // prevent panning if ctrl is pressed
-        if (e.srcEvent.ctrlKey) {
+        if (e.srcEvent.ctrlKey || this.floor.canvas.isDrawingMode) {
             return;
         }
         const activeObject = this.floor.canvas.getActiveObject();
