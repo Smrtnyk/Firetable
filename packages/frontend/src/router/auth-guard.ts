@@ -96,8 +96,8 @@ export function createAuthGuard(
         });
 
         try {
-            const timeoutPromise = new Promise<never>((_resolve, reject) => {
-                setTimeout(() => {
+            const timeoutPromise = new Promise<never>(function (_resolve, reject) {
+                setTimeout(function () {
                     reject(new Error("Navigation timeout"));
                 }, NAVIGATION_TIMEOUT);
             });
@@ -105,7 +105,7 @@ export function createAuthGuard(
             let navigationResult: RouteLocationRaw | boolean = false;
 
             await Promise.race([
-                (async () => {
+                (async function () {
                     const { isReady, user } = await checkAndInitAuth();
                     const requiresAuth = to.meta.requiresAuth;
 

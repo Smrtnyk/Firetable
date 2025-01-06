@@ -12,6 +12,7 @@ import { AdminRole, Role } from "@firetable/types";
 import { createApp } from "vue";
 import { setActivePinia } from "pinia";
 import { createTestingPinia } from "@pinia/testing";
+import { delay } from "es-toolkit";
 
 vi.mock("vuefire", () => ({
     getCurrentUser: vi.fn(),
@@ -245,12 +246,7 @@ describe("Auth Guard", () => {
         it("handles timeouts", async () => {
             const to = createMockRoute("/test");
 
-            vi.mocked(getCurrentUser).mockImplementationOnce(
-                () =>
-                    new Promise((resolve) => {
-                        setTimeout(resolve, 11_000);
-                    }),
-            );
+            vi.mocked(getCurrentUser).mockImplementationOnce(() => delay(11_000) as any);
 
             const guardPromise = guard(to);
             vi.advanceTimersByTime(11_000);

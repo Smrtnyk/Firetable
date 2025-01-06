@@ -1,9 +1,9 @@
 import type { App, Ref, ShallowRef } from "vue";
 import type { FloorDoc } from "@firetable/types";
 import { useFloorsPageEvent } from "./useFloorsPageEvent";
-import { nextTick, ref, shallowRef, createApp } from "vue";
+import { ref, shallowRef, createApp } from "vue";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { noop } from "es-toolkit";
+import { delay, noop } from "es-toolkit";
 
 vi.mock("src/helpers/compress-floor-doc", () => ({
     decompressFloorDoc: vi.fn().mockImplementation((doc) => doc),
@@ -93,10 +93,7 @@ describe("useFloorsPageEvent", () => {
         ];
 
         // Wait for nextTick and watchers
-        await nextTick();
-        await new Promise((resolve) => {
-            setTimeout(resolve, 0);
-        });
+        await delay(0);
 
         expect(result.floorInstances.value.length).toBe(2);
         expect(result.floorInstances.value[0].id).toBe("floor1");

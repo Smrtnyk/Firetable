@@ -7,6 +7,7 @@ import { AdminRole, Role } from "@firetable/types";
 import { formatEventDate, getDefaultTimezone } from "src/helpers/date-utils";
 import { beforeEach, describe, expect, it } from "vitest";
 import { page } from "@vitest/browser/context";
+import { delay } from "es-toolkit";
 
 const sampleLogs: EventLog[] = [
     {
@@ -201,9 +202,7 @@ describe("AdminEventLogs", () => {
         // Dispatch a scroll event to trigger handleScroll
         scrollContentElement!.dispatchEvent(new Event("scroll"));
 
-        await new Promise((resolve) => {
-            setTimeout(resolve, 222);
-        });
+        await delay(222);
 
         // Assert that the "Scroll to Bottom" button appears
         const scrollButton = document.querySelector<HTMLButtonElement>(".q-btn--fab");
@@ -211,9 +210,7 @@ describe("AdminEventLogs", () => {
         scrollButton!.click();
 
         // Wait for the scroll animation to complete (animation duration is 1000ms)
-        await new Promise((resolve) => {
-            setTimeout(resolve, 1100);
-        });
+        await delay(1100);
 
         // Dispatch a scroll event to update the component's state
         scrollContentElement!.dispatchEvent(new Event("scroll"));
