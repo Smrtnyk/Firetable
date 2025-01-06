@@ -158,10 +158,10 @@ function closeColorPicker(): void {
     <q-card
         class="FloorEditorControls row q-gutter-xs q-pa-xs q-pt-md q-pb-md justify-around ft-card"
     >
-        <div class="row items-center justify-around">
+        <div class="row items-center justify-around q-col-gutter-xs q-pa-xs">
             <q-btn
                 :disabled="!canSave"
-                class="button-gradient q-mb-md"
+                class="button-gradient"
                 icon="save"
                 @click="onFloorSave"
                 label="save"
@@ -180,7 +180,7 @@ function closeColorPicker(): void {
                 label="Floor name"
                 @update:model-value="(event) => onFloorChange('name', event)"
                 :model-value="floorInstance.name"
-                class="q-ma-xs full-width"
+                class="full-width"
             />
 
             <q-input
@@ -193,7 +193,7 @@ function closeColorPicker(): void {
                 standout
                 type="number"
                 label="Floor width"
-                class="q-ma-xs full-width"
+                class="col-6"
             />
             <q-input
                 @keydown.prevent
@@ -205,7 +205,7 @@ function closeColorPicker(): void {
                 standout
                 type="number"
                 label="Floor height"
-                class="q-ma-xs full-width"
+                class="col-6"
             />
 
             <div class="row justify-between">
