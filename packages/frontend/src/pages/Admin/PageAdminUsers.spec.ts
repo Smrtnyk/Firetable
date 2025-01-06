@@ -149,8 +149,8 @@ describe("PageAdminUsers.vue", () => {
         expect(propertyTabs.elements().length).toBe(2);
 
         // Verify the tab labels include property names and user counts
-        expect(propertyTabs.elements()[0]).toHaveTextContent("Property One (2)");
-        expect(propertyTabs.elements()[1]).toHaveTextContent("Property Two (1)");
+        await expect.element(propertyTabs.first()).toHaveTextContent("Property One (2)");
+        await expect.element(propertyTabs.nth(1)).toHaveTextContent("Property Two (1)");
 
         // Check for unassigned users
         const unassignedText = screen.getByText(/Unassigned users/);

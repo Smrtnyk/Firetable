@@ -279,8 +279,8 @@ describe("EventCreateReservation", () => {
                 formattedNewTime = "00";
             }
 
-            const timeOption = screen.getByText(formattedNewTime, { exact: true }).elements()[0];
-            await userEvent.click(timeOption);
+            const timeOption = screen.getByText(formattedNewTime, { exact: true });
+            await userEvent.click(timeOption.first());
 
             const closeBtn = screen.getByRole("button", { name: "Close" });
             await userEvent.click(closeBtn);

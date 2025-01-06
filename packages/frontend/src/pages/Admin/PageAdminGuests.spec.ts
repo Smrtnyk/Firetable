@@ -183,11 +183,11 @@ describe("PageAdminGuests.vue", () => {
                 expect(guestItems.elements()).toHaveLength(3);
 
                 // First guest should be John Doe (3 visits)
-                expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
+                await expect.element(guestItems.first()).toHaveTextContent("John Doe");
                 // Second guest should be Jane Smith (1 visit)
-                expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
+                await expect.element(guestItems.nth(1)).toHaveTextContent("Jane Smith");
                 // Third guest should be Alice Johnson (0 visits)
-                expect(guestItems.elements()[2]).toHaveTextContent("Alice Johnson");
+                await expect.element(guestItems.nth(2)).toHaveTextContent("Alice Johnson");
             });
 
             it("sorts guests by number of visits and percentage when they have the same number of visits", async () => {
@@ -239,8 +239,8 @@ describe("PageAdminGuests.vue", () => {
 
                 // Jane Smith should be first (2 visits, 100% arrival rate)
                 // John Doe should be second (2 visits, 50% arrival rate)
-                expect(guestItems.elements()[0]).toHaveTextContent("Jane Smith");
-                expect(guestItems.elements()[1]).toHaveTextContent("John Doe");
+                await expect.element(guestItems.first()).toHaveTextContent("Jane Smith");
+                await expect.element(guestItems.nth(1)).toHaveTextContent("John Doe");
             });
 
             it("prioritizes number of visits over percentage when different number of visits", async () => {
@@ -296,8 +296,8 @@ describe("PageAdminGuests.vue", () => {
 
                 // John Doe should be first (3 visits, 33% arrival rate)
                 // Jane Smith should be second (2 visits, 100% arrival rate)
-                expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
-                expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
+                await expect.element(guestItems.first()).toHaveTextContent("John Doe");
+                await expect.element(guestItems.nth(1)).toHaveTextContent("Jane Smith");
             });
 
             it("sorts guests by percentage when percentage sort option is selected", async () => {
@@ -352,8 +352,8 @@ describe("PageAdminGuests.vue", () => {
 
                 // Jane Smith should be first (100% arrival - 1/1)
                 // John Doe should be second (50% arrival - 1/2)
-                expect(guestItems.elements()[0]).toHaveTextContent("Jane Smith");
-                expect(guestItems.elements()[1]).toHaveTextContent("John Doe");
+                await expect.element(guestItems.first()).toHaveTextContent("Jane Smith");
+                await expect.element(guestItems.nth(1)).toHaveTextContent("John Doe");
             });
 
             it("uses number of bookings as secondary sort when percentages are equal", async () => {
@@ -409,8 +409,8 @@ describe("PageAdminGuests.vue", () => {
                 // Both have 100% arrival rate
                 // John Doe should be first (100% with 2 visits)
                 // Jane Smith should be second (100% with 1 visit)
-                expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
-                expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
+                await expect.element(guestItems.first()).toHaveTextContent("John Doe");
+                await expect.element(guestItems.nth(1)).toHaveTextContent("Jane Smith");
             });
 
             it("places guests with no bookings at the end when sorting by percentage", async () => {
@@ -462,9 +462,9 @@ describe("PageAdminGuests.vue", () => {
 
                 // John Doe should be first (has visits)
                 // Jane and Alice (no visits) should be after, in their original order
-                expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
-                expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
-                expect(guestItems.elements()[2]).toHaveTextContent("Alice Johnson");
+                await expect.element(guestItems.first()).toHaveTextContent("John Doe");
+                await expect.element(guestItems.nth(1)).toHaveTextContent("Jane Smith");
+                await expect.element(guestItems.last()).toHaveTextContent("Alice Johnson");
             });
         });
 
@@ -491,8 +491,8 @@ describe("PageAdminGuests.vue", () => {
                 expect(guestItems.elements()).toHaveLength(2);
 
                 // Should only show guests with VIP tag
-                expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
-                expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
+                await expect.element(guestItems.first()).toHaveTextContent("John Doe");
+                await expect.element(guestItems.last()).toHaveTextContent("Jane Smith");
                 await expect.element(screen.getByText("Bob Wilson")).not.toBeInTheDocument();
             });
 
@@ -515,7 +515,7 @@ describe("PageAdminGuests.vue", () => {
                 expect(guestItems.elements()).toHaveLength(1);
 
                 // Should only show guest with both VIP and Regular tags
-                expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
+                await expect.element(guestItems.first()).toHaveTextContent("John Doe");
                 await expect.element(screen.getByText("Jane Smith")).not.toBeInTheDocument();
                 await expect.element(screen.getByText("Bob Wilson")).not.toBeInTheDocument();
             });
@@ -569,9 +569,9 @@ describe("PageAdminGuests.vue", () => {
                 const guestItems = screen.getByRole("listitem");
 
                 // Should be sorted by lastModified (most recent first)
-                expect(guestItems.elements()[0]).toHaveTextContent("Jane Smith");
-                expect(guestItems.elements()[1]).toHaveTextContent("John Doe");
-                expect(guestItems.elements()[2]).toHaveTextContent("Bob Wilson");
+                await expect.element(guestItems.first()).toHaveTextContent("Jane Smith");
+                await expect.element(guestItems.nth(1)).toHaveTextContent("John Doe");
+                await expect.element(guestItems.last()).toHaveTextContent("Bob Wilson");
             });
 
             it("handles guests without lastModified timestamp", async () => {
@@ -618,9 +618,9 @@ describe("PageAdminGuests.vue", () => {
                 const guestItems = screen.getByRole("listitem");
 
                 // Should be sorted with undefined lastModified at the end
-                expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
-                expect(guestItems.elements()[1]).toHaveTextContent("Bob Wilson");
-                expect(guestItems.elements()[2]).toHaveTextContent("Jane Smith");
+                await expect.element(guestItems.first()).toHaveTextContent("John Doe");
+                await expect.element(guestItems.nth(1)).toHaveTextContent("Bob Wilson");
+                await expect.element(guestItems.last()).toHaveTextContent("Jane Smith");
             });
 
             it("maintains sort direction when switching to lastModified sort", async () => {
@@ -654,9 +654,9 @@ describe("PageAdminGuests.vue", () => {
                 // Should maintain ascending order with lastModified sort
                 const guestItems = screen.getByRole("listitem");
                 // older timestamp
-                expect(guestItems.elements()[0]).toHaveTextContent("Jane Smith");
+                await expect.element(guestItems.first()).toHaveTextContent("Jane Smith");
                 // newer timestamp
-                expect(guestItems.elements()[1]).toHaveTextContent("John Doe");
+                await expect.element(guestItems.last()).toHaveTextContent("John Doe");
             });
         });
 
@@ -714,8 +714,8 @@ describe("PageAdminGuests.vue", () => {
                 let guestItems = screen.getByRole("listitem");
 
                 // In ascending order, Jane (1 visit) should be first
-                expect(guestItems.elements()[0]).toHaveTextContent("Jane Smith");
-                expect(guestItems.elements()[1]).toHaveTextContent("John Doe");
+                await expect.element(guestItems.first()).toHaveTextContent("Jane Smith");
+                await expect.element(guestItems.last()).toHaveTextContent("John Doe");
 
                 await userEvent.click(sortButton);
 
@@ -727,8 +727,8 @@ describe("PageAdminGuests.vue", () => {
                 guestItems = screen.getByRole("listitem");
 
                 // Back in descending order, John (2 visits) should be first
-                expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
-                expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
+                await expect.element(guestItems.first()).toHaveTextContent("John Doe");
+                await expect.element(guestItems.last()).toHaveTextContent("Jane Smith");
             });
 
             it("maintains sort direction when changing sort option", async () => {
@@ -779,8 +779,8 @@ describe("PageAdminGuests.vue", () => {
                 // Verify descending order by bookings
                 // John should be first (2 bookings)
                 // Jane should be second (1 booking)
-                expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
-                expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
+                await expect.element(guestItems.first()).toHaveTextContent("John Doe");
+                await expect.element(guestItems.last()).toHaveTextContent("Jane Smith");
 
                 // Switch to percentage sort (still descending)
                 const sortButton = screen.getByRole("button", { name: "filter guests" });
@@ -794,8 +794,8 @@ describe("PageAdminGuests.vue", () => {
                 // Verify descending order by percentage
                 // Jane should be first (100% arrival rate)
                 // John should be second (50% arrival rate)
-                expect(guestItems.elements()[0]).toHaveTextContent("Jane Smith");
-                expect(guestItems.elements()[1]).toHaveTextContent("John Doe");
+                await expect.element(guestItems.first()).toHaveTextContent("Jane Smith");
+                await expect.element(guestItems.last()).toHaveTextContent("John Doe");
             });
         });
 
@@ -840,9 +840,9 @@ describe("PageAdminGuests.vue", () => {
                 const guestItems = screen.getByRole("listitem");
 
                 // Should be sorted by name in descending order by default
-                expect(guestItems.elements()[0]).toHaveTextContent("Charlie Brown");
-                expect(guestItems.elements()[1]).toHaveTextContent("Bob Johnson");
-                expect(guestItems.elements()[2]).toHaveTextContent("Alice Smith");
+                await expect.element(guestItems.first()).toHaveTextContent("Charlie Brown");
+                await expect.element(guestItems.nth(1)).toHaveTextContent("Bob Johnson");
+                await expect.element(guestItems.last()).toHaveTextContent("Alice Smith");
 
                 await userEvent.click(sortButton);
 
@@ -852,9 +852,9 @@ describe("PageAdminGuests.vue", () => {
                 await closeBottomDialog(screen);
 
                 // Should now be in ascending order
-                expect(guestItems.elements()[0]).toHaveTextContent("Alice Smith");
-                expect(guestItems.elements()[1]).toHaveTextContent("Bob Johnson");
-                expect(guestItems.elements()[2]).toHaveTextContent("Charlie Brown");
+                await expect.element(guestItems.first()).toHaveTextContent("Alice Smith");
+                await expect.element(guestItems.nth(1)).toHaveTextContent("Bob Johnson");
+                await expect.element(guestItems.last()).toHaveTextContent("Charlie Brown");
             });
 
             it("maintains name sort when applying filters", async () => {
@@ -906,8 +906,8 @@ describe("PageAdminGuests.vue", () => {
 
                 // Should show only VIP guests, still sorted by name
                 expect(guestItems.elements()).toHaveLength(2);
-                expect(guestItems.elements()[0]).toHaveTextContent("Alice Smith");
-                expect(guestItems.elements()[1]).toHaveTextContent("Charlie Brown");
+                await expect.element(guestItems.first()).toHaveTextContent("Alice Smith");
+                await expect.element(guestItems.last()).toHaveTextContent("Charlie Brown");
             });
         });
 
@@ -952,9 +952,9 @@ describe("PageAdminGuests.vue", () => {
                 const guestItems = screen.getByRole("listitem");
 
                 // Should be sorted by landcode in ascending order by default
-                expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
-                expect(guestItems.elements()[1]).toHaveTextContent("Alice Johnson");
-                expect(guestItems.elements()[2]).toHaveTextContent("Jane Smith");
+                await expect.element(guestItems.first()).toHaveTextContent("John Doe");
+                await expect.element(guestItems.nth(1)).toHaveTextContent("Alice Johnson");
+                await expect.element(guestItems.last()).toHaveTextContent("Jane Smith");
 
                 // Toggle to ascending order
                 await userEvent.click(sortButton);
@@ -964,9 +964,9 @@ describe("PageAdminGuests.vue", () => {
 
                 // Should now be in ascending order
                 // +1 (US), +33 (France), +44 (UK)
-                expect(guestItems.elements()[0]).toHaveTextContent("Jane Smith");
-                expect(guestItems.elements()[1]).toHaveTextContent("Alice Johnson");
-                expect(guestItems.elements()[2]).toHaveTextContent("John Doe");
+                await expect.element(guestItems.first()).toHaveTextContent("Jane Smith");
+                await expect.element(guestItems.nth(1)).toHaveTextContent("Alice Johnson");
+                await expect.element(guestItems.last()).toHaveTextContent("John Doe");
             });
         });
     });
@@ -991,7 +991,7 @@ describe("PageAdminGuests.vue", () => {
             // Only Jane Smith should be visible
             const guestItems = screen.getByRole("listitem");
             expect(guestItems.elements()).toHaveLength(1);
-            expect(guestItems.elements()[0]).toHaveTextContent("Jane Smith");
+            await expect.element(guestItems.last()).toHaveTextContent("Jane Smith");
         });
 
         it("filters guests by contact based on search input", async () => {
@@ -1004,7 +1004,7 @@ describe("PageAdminGuests.vue", () => {
             // Only Alice Johnson should be visible
             const guestItems = screen.getByRole("listitem");
             expect(guestItems.elements()).toHaveLength(1);
-            expect(guestItems.elements()[0]).toHaveTextContent("Alice Johnson");
+            await expect.element(guestItems.last()).toHaveTextContent("Alice Johnson");
         });
 
         it("is case-insensitive when filtering guests", async () => {
@@ -1017,7 +1017,7 @@ describe("PageAdminGuests.vue", () => {
             // Only John Doe should be visible
             const guestItems = screen.getByRole("listitem");
             expect(guestItems.elements()).toHaveLength(1);
-            expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
+            await expect.element(guestItems.last()).toHaveTextContent("John Doe");
         });
 
         it("shows multiple guests when search matches multiple entries", async () => {
@@ -1030,9 +1030,9 @@ describe("PageAdminGuests.vue", () => {
             // All guests should be visible since all have contacts ending with example.com
             const guestItems = screen.getByRole("listitem");
             expect(guestItems.elements()).toHaveLength(3);
-            expect(guestItems.elements()[0]).toHaveTextContent("John Doe");
-            expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
-            expect(guestItems.elements()[2]).toHaveTextContent("Alice Johnson");
+            await expect.element(guestItems.first()).toHaveTextContent("John Doe");
+            await expect.element(guestItems.nth(1)).toHaveTextContent("Jane Smith");
+            await expect.element(guestItems.last()).toHaveTextContent("Alice Johnson");
         });
 
         it("shows 'No guests data' when search yields no results", async () => {
@@ -1058,7 +1058,7 @@ describe("PageAdminGuests.vue", () => {
             // Only Jane Smith should be visible
             let guestItems = screen.getByRole("listitem");
             expect(guestItems.elements()).toHaveLength(1);
-            expect(guestItems.elements()[0]).toHaveTextContent("Jane Smith");
+            await expect.element(guestItems.last()).toHaveTextContent("Jane Smith");
 
             // Clear the search input
             const clearButton = screen.getByLabelText("Clear");
@@ -1348,9 +1348,9 @@ describe("PageAdminGuests.vue", () => {
             // Bob: 100% (3/3 visits)
             // Jane: 100% (1/1 visit)
             // John: 50% (1/2 visits)
-            expect(guestItems.elements()[0]).toHaveTextContent("Bob Wilson");
-            expect(guestItems.elements()[1]).toHaveTextContent("Jane Smith");
-            expect(guestItems.elements()[2]).toHaveTextContent("John Doe");
+            await expect.element(guestItems.first()).toHaveTextContent("Bob Wilson");
+            await expect.element(guestItems.nth(1)).toHaveTextContent("Jane Smith");
+            await expect.element(guestItems.last()).toHaveTextContent("John Doe");
         });
 
         it("persists and loads sort direction changes", async () => {
@@ -1378,9 +1378,9 @@ describe("PageAdminGuests.vue", () => {
             // Jane: 1 booking
             // John: 2 bookings
             // Bob: 3 bookings
-            expect(guestItems.elements()[0]).toHaveTextContent("Jane Smith");
-            expect(guestItems.elements()[1]).toHaveTextContent("John Doe");
-            expect(guestItems.elements()[2]).toHaveTextContent("Bob Wilson");
+            await expect.element(guestItems.first()).toHaveTextContent("Jane Smith");
+            await expect.element(guestItems.nth(1)).toHaveTextContent("John Doe");
+            await expect.element(guestItems.last()).toHaveTextContent("Bob Wilson");
         });
 
         it("maintains filter state across multiple changes", async () => {
@@ -1407,9 +1407,9 @@ describe("PageAdminGuests.vue", () => {
             // Bob (oldest)
             // John
             // Jane (newest)
-            expect(guestItems.elements()[0]).toHaveTextContent("Bob Wilson");
-            expect(guestItems.elements()[1]).toHaveTextContent("John Doe");
-            expect(guestItems.elements()[2]).toHaveTextContent("Jane Smith");
+            await expect.element(guestItems.first()).toHaveTextContent("Bob Wilson");
+            await expect.element(guestItems.nth(1)).toHaveTextContent("John Doe");
+            await expect.element(guestItems.last()).toHaveTextContent("Jane Smith");
         });
     });
 });

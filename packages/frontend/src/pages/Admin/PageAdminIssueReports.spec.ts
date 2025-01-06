@@ -175,7 +175,7 @@ describe("PageAdminIssueReports.vue", () => {
 
         await expect.element(screen.getByText("John Doe")).toBeVisible();
         await expect.element(screen.getByText("john@example.com")).toBeVisible();
-        await expect.element(screen.getByText("Org 1").elements()[0]).toBeVisible();
+        await expect.element(screen.getByText("Org 1").first()).toBeVisible();
     });
 
     it("displays correct status badges", async () => {

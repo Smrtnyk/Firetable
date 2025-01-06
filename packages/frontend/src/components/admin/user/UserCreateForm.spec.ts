@@ -145,7 +145,7 @@ describe("UserCreateForm", () => {
         // Select properties
         const propertyCheckboxes = screen.getByRole("checkbox");
         // Select first property
-        await userEvent.click(propertyCheckboxes.elements()[0]);
+        await userEvent.click(propertyCheckboxes.first());
 
         const submitButton = screen.getByRole("button", { name: t("Global.submit") });
         await userEvent.click(submitButton);
@@ -189,7 +189,7 @@ describe("UserCreateForm", () => {
         );
 
         const propertyCheckboxes = screen.getByRole("checkbox");
-        await userEvent.click(propertyCheckboxes.elements()[0]);
+        await userEvent.click(propertyCheckboxes.first());
 
         const resetButton = screen.getByRole("button", { name: t("Global.reset") });
         await userEvent.click(resetButton);
@@ -376,7 +376,7 @@ describe("UserCreateForm", () => {
         // Select properties
         const propertyCheckboxes = screen.getByRole("checkbox");
         // Select first property
-        await userEvent.click(propertyCheckboxes.elements()[0]);
+        await userEvent.click(propertyCheckboxes.first());
 
         const submitButton = screen.getByRole("button", { name: t("Global.submit") });
         await userEvent.click(submitButton);
