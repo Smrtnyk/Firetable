@@ -52,6 +52,5 @@ export class Wall extends Group implements FloorEditorElement {
 
     setBaseFill(val: string): void {
         this.wallRect.set("fill", val);
-        this.canvas?.requestRenderAll();
     }
 }

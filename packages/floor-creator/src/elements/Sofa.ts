@@ -63,7 +63,6 @@ export class Sofa extends Group implements FloorEditorElement {
 
     setBaseFill(val: string): void {
         this.sofaBase.set("fill", val);
-        this.canvas?.requestRenderAll();
     }
 }
 

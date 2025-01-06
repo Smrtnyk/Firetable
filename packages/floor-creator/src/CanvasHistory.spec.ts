@@ -4,7 +4,7 @@ import { RectTable } from "./elements/RectTable.js";
 import { FloorElementTypes } from "./types.js";
 import { describe, expect, it } from "vitest";
 import { ActiveSelection } from "fabric";
-import { last } from "es-toolkit";
+import { delay, last } from "es-toolkit";
 
 interface TablePosition {
     left: number;
@@ -45,7 +45,7 @@ describe("CanvasHistory", () => {
             y: 100,
         });
 
-        await wait(0);
+        await delay(0);
 
         expect(floor.canUndo()).toBe(true);
         expect(floor.canRedo()).toBe(false);
@@ -66,7 +66,7 @@ describe("CanvasHistory", () => {
         table.set({ left: 200 });
         floor.canvas.fire("object:modified", { target: table });
 
-        await wait(0);
+        await delay(0);
 
         expect(floor.canUndo()).toBe(true);
 
@@ -91,13 +91,13 @@ describe("CanvasHistory", () => {
             y: 200,
         });
 
-        await wait(0);
+        await delay(0);
 
         const table1 = findTable(floor, "T1");
         table1.set({ left: 300 });
         floor.canvas.fire("object:modified", { target: table1 });
 
-        await wait(0);
+        await delay(0);
 
         let undoCount = 0;
         while (floor.canUndo()) {
@@ -124,7 +124,7 @@ describe("CanvasHistory", () => {
         for (const pos of positions) {
             table.set(pos);
             floor.canvas.fire("object:modified", { target: table });
-            await wait(0);
+            await delay(0);
         }
 
         // Undo all moves
@@ -154,7 +154,7 @@ describe("CanvasHistory", () => {
         for (let i = 0; i < 30; i++) {
             table.set({ left: 100 + i * 10 });
             floor.canvas.fire("object:modified", { target: table });
-            await wait(0);
+            await delay(0);
         }
 
         // Check that stack size is limited
@@ -409,13 +409,35 @@ describe("CanvasHistory", () => {
         // Because that matches the lastSavedJson again, isDirty should be false
         expect(floor.isDirty()).toBe(false);
     });
-});
 
-function wait(ms: number): Promise<void> {
-    return new Promise((resolve) => {
-        setTimeout(resolve, ms);
+    it("handles element fill changes", async () => {
+        const { floor } = setupTestFloor();
+
+        // 1) Add a table and mark the current state as saved
+        const table = await addTable(floor, { left: 100, top: 100 }, "T1");
+        floor.markAsSaved();
+        expect(floor.isDirty()).toBe(false);
+
+        // 2) Change the fill using setElementFill
+        floor.setElementFill(table, "red");
+        await waitForCanvasRender(floor);
+
+        // Changing the fill should mark the floor as dirty
+        expect(floor.isDirty()).toBe(true);
+        expect(floor.canUndo()).toBe(true);
+
+        // 3) Undo => fill should revert back to the original color
+        await floor.undo();
+        await waitForCanvasRender(floor);
+        // If the table had no fill originally, expect(table.fill).toBe(undefined) or whatever default is
+        expect(floor.isDirty()).toBe(false);
+
+        // 4) Redo => fill should become red again
+        await floor.redo();
+        await waitForCanvasRender(floor);
+        expect(floor.isDirty()).toBe(true);
     });
-}
+});
 
 async function moveTable(
     floor: FloorEditor,
@@ -432,7 +454,7 @@ async function waitForCanvasRender(floor: FloorEditor): Promise<void> {
         floor.canvas.requestRenderAll();
         floor.canvas.once("after:render", () => resolve());
     });
-    await wait(0);
+    await delay(0);
 }
 
 function findTable(floor: FloorEditor, label?: string): RectTable {

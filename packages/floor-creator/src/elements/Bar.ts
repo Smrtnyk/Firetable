@@ -405,7 +405,6 @@ export class Bar extends Group implements FloorEditorElement {
 
     setBaseFill(val: string): void {
         this.barBody.set("fill", val);
-        this.canvas?.requestRenderAll();
     }
 
     flip(): void {

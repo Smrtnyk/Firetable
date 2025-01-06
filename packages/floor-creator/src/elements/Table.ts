@@ -64,7 +64,6 @@ export abstract class Table extends Group implements FloorEditorElement {
 
     setFill(val: string): void {
         this.shape.set("fill", val);
-        this.canvas?.requestRenderAll();
     }
 
     setLabel(newLabel: string): void {

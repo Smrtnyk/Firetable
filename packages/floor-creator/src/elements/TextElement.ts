@@ -1,7 +1,7 @@
 import type { FloorEditorElement } from "../types.js";
 import type { ITextProps } from "fabric";
 import { IText, classRegistry } from "fabric";
-import { debounce, omit } from "es-toolkit";
+import { omit } from "es-toolkit";
 
 type TextElementOptions = Partial<ITextProps> & {
     text: string;
@@ -10,12 +10,6 @@ type TextElementOptions = Partial<ITextProps> & {
 
 export class TextElement extends IText implements FloorEditorElement {
     label: string;
-
-    setBaseFill = debounce((val: string) => {
-        this.set("fill", val);
-        this.canvas?.fire("object:modified", { target: this });
-        this.canvas?.requestRenderAll();
-    }, 300);
 
     constructor(options: TextElementOptions) {
         const { text, ...rest } = omit(options, ["type"]);
@@ -26,6 +20,10 @@ export class TextElement extends IText implements FloorEditorElement {
 
     static override fromObject(options: any): Promise<any> {
         return Promise.resolve(new TextElement(options));
+    }
+
+    setBaseFill(val: string): void {
+        this.set("fill", val);
     }
 
     getBaseFill(): string {

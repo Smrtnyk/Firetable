@@ -1,6 +1,5 @@
 import type { FloorEditor } from "./FloorEditor.js";
 import type { FabricObject, TFiller } from "fabric";
-import { Group } from "fabric";
 import { EventEmitter } from "@posva/event-emitter";
 import { delay, isEqual, once } from "es-toolkit";
 
@@ -81,7 +80,8 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
     static normalize(canvasObjects: FabricObject[]): NormalizedCanvasObject[] {
         return canvasObjects.map((obj) => {
             const { left, top, width, height, scaleX, scaleY, angle, fill, stroke, type } = obj;
-            if (obj instanceof Group) {
+
+            if ("objects" in obj) {
                 return {
                     left,
                     top,
@@ -93,7 +93,7 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
                     fill,
                     stroke,
                     type,
-                    objects: CanvasHistory.normalize(obj.getObjects()),
+                    objects: CanvasHistory.normalize(obj["objects"] as FabricObject[]),
                 };
             }
             return { left, top, width, height, scaleX, scaleY, angle, fill, stroke, type };
@@ -181,6 +181,7 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
             "angle",
             "fill",
             "stroke",
+            "baseFill",
         ]);
         return JSON.stringify(json);
     }

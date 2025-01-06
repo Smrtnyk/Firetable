@@ -5,6 +5,7 @@ import { setDimensions, setElementAngle, isTable } from "@firetable/floor-creato
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed, onMounted, ref, useTemplateRef, watch } from "vue";
 import { useEventListener } from "@vueuse/core";
+import { debounce, isString } from "es-toolkit";
 
 interface Props {
     selectedFloorElement: FloorEditorElement;
@@ -76,23 +77,20 @@ function sendBack(): void {
     selectedFloorElement?.canvas?.sendObjectBackwards(selectedFloorElement);
 }
 
-function setElementColor(newVal: string | null): void {
-    if (!newVal) {
+const setElementColor = debounce(function (newVal: unknown): void {
+    if (!isString(newVal)) {
         return;
     }
     elementColor.value = newVal;
-    selectedFloorElement?.setBaseFill?.(newVal);
-}
+    floorInstance.setElementFill(selectedFloorElement, newVal);
+}, 300);
 
 function openColorPicker(): void {
     colorPickerProxy.value?.show();
 }
 
-function updateTableLabel(
-    tableEl: FloorEditorElement | undefined,
-    newLabel: number | string | null,
-): void {
-    if (typeof newLabel !== "string" || !isTable(tableEl)) {
+function updateTableLabel(tableEl: FloorEditorElement | undefined, newLabel: unknown): void {
+    if (!isString(newLabel) || !isTable(tableEl)) {
         return;
     }
     if (existingLabels.has(newLabel)) {

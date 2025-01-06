@@ -112,7 +112,6 @@ export class Cloakroom extends Group implements FloorEditorElement {
 
     setBaseFill(val: string): void {
         this.counterBody.set("fill", val);
-        this.canvas?.requestRenderAll();
     }
 }
 

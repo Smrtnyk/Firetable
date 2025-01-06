@@ -58,7 +58,6 @@ export class EditableShape extends Group implements FloorEditorElement {
 
     setBaseFill(val: string): void {
         this.shape.set("fill", val);
-        this.canvas?.requestRenderAll();
     }
 
     getBaseFill(): string {

@@ -147,6 +147,12 @@ export class FloorEditor extends Floor {
         this.emit("doubleClick", this, coordinates);
     }
 
+    setElementFill(element: FloorEditorElement, fill: string): void {
+        element.setBaseFill(fill);
+        this.canvas.fire("object:modified", { target: element });
+        this.canvas.requestRenderAll();
+    }
+
     addElement(options: CreateElementOptions): void {
         const element = this.elementManager.addElement(options);
         element.on("mouseup", () => {
