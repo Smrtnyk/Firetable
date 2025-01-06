@@ -20,8 +20,7 @@ describe("ReturningGuestsList", () => {
         await expect.element(screen.getByText("No returning guests")).toBeVisible();
 
         // Ensure that no guest items are rendered
-        const guestItems = screen.getByRole("listitem").elements();
-        expect(guestItems.length).toBe(0);
+        await expect.element(screen.getByRole("listitem").first()).not.toBeInTheDocument();
     });
 
     it("renders a list of returning guests", async () => {
@@ -55,8 +54,7 @@ describe("ReturningGuestsList", () => {
         await expect.element(noGuestsMessage).not.toBeInTheDocument();
 
         // Check that the correct number of guest items are rendered
-        const guestItems = screen.getByRole("listitem").elements();
-        expect(guestItems.length).toBe(2);
+        expect(screen.getByRole("listitem").all()).toHaveLength(2);
 
         // Check that guest details are displayed correctly
         const firstGuestVisits = screen.getByText("1 previous visits");

@@ -145,10 +145,10 @@ describe("PageAdminGuests.vue", () => {
         await expect.element(screen.getByText("Alice Johnson")).toBeVisible();
 
         const percentage = screen.getByText("0.00%");
-        expect(percentage.elements()).toHaveLength(3);
+        expect(percentage.all()).toHaveLength(3);
 
         const arrived = screen.getByText("Arrived: 0");
-        expect(arrived.elements()).toHaveLength(3);
+        expect(arrived.all()).toHaveLength(3);
     });
 
     it("shows 'No guests data' when there are no guests", async () => {
@@ -180,7 +180,7 @@ describe("PageAdminGuests.vue", () => {
 
                 const guestItems = screen.getByRole("listitem");
 
-                expect(guestItems.elements()).toHaveLength(3);
+                expect(guestItems.all()).toHaveLength(3);
 
                 // First guest should be John Doe (3 visits)
                 await expect.element(guestItems.first()).toHaveTextContent("John Doe");
@@ -235,7 +235,7 @@ describe("PageAdminGuests.vue", () => {
                 const screen = await render();
 
                 const guestItems = screen.getByRole("listitem");
-                expect(guestItems.elements()).toHaveLength(2);
+                expect(guestItems.all()).toHaveLength(2);
 
                 // Jane Smith should be first (2 visits, 100% arrival rate)
                 // John Doe should be second (2 visits, 50% arrival rate)
@@ -292,7 +292,7 @@ describe("PageAdminGuests.vue", () => {
                 const screen = await render();
 
                 const guestItems = screen.getByRole("listitem");
-                expect(guestItems.elements()).toHaveLength(2);
+                expect(guestItems.all()).toHaveLength(2);
 
                 // John Doe should be first (3 visits, 33% arrival rate)
                 // Jane Smith should be second (2 visits, 100% arrival rate)
@@ -488,7 +488,7 @@ describe("PageAdminGuests.vue", () => {
                 screen = await render();
 
                 const guestItems = screen.getByRole("listitem");
-                expect(guestItems.elements()).toHaveLength(2);
+                expect(guestItems.all()).toHaveLength(2);
 
                 // Should only show guests with VIP tag
                 await expect.element(guestItems.first()).toHaveTextContent("John Doe");
@@ -512,7 +512,7 @@ describe("PageAdminGuests.vue", () => {
                 await closeBottomDialog(screen);
 
                 const guestItems = screen.getByRole("listitem");
-                expect(guestItems.elements()).toHaveLength(1);
+                expect(guestItems.all()).toHaveLength(1);
 
                 // Should only show guest with both VIP and Regular tags
                 await expect.element(guestItems.first()).toHaveTextContent("John Doe");
@@ -905,7 +905,7 @@ describe("PageAdminGuests.vue", () => {
                 const guestItems = screen.getByRole("listitem");
 
                 // Should show only VIP guests, still sorted by name
-                expect(guestItems.elements()).toHaveLength(2);
+                expect(guestItems.all()).toHaveLength(2);
                 await expect.element(guestItems.first()).toHaveTextContent("Alice Smith");
                 await expect.element(guestItems.last()).toHaveTextContent("Charlie Brown");
             });
@@ -990,7 +990,7 @@ describe("PageAdminGuests.vue", () => {
 
             // Only Jane Smith should be visible
             const guestItems = screen.getByRole("listitem");
-            expect(guestItems.elements()).toHaveLength(1);
+            expect(guestItems.all()).toHaveLength(1);
             await expect.element(guestItems.last()).toHaveTextContent("Jane Smith");
         });
 
@@ -1003,7 +1003,7 @@ describe("PageAdminGuests.vue", () => {
 
             // Only Alice Johnson should be visible
             const guestItems = screen.getByRole("listitem");
-            expect(guestItems.elements()).toHaveLength(1);
+            expect(guestItems.all()).toHaveLength(1);
             await expect.element(guestItems.last()).toHaveTextContent("Alice Johnson");
         });
 
@@ -1016,7 +1016,7 @@ describe("PageAdminGuests.vue", () => {
 
             // Only John Doe should be visible
             const guestItems = screen.getByRole("listitem");
-            expect(guestItems.elements()).toHaveLength(1);
+            expect(guestItems.all()).toHaveLength(1);
             await expect.element(guestItems.last()).toHaveTextContent("John Doe");
         });
 
@@ -1029,7 +1029,7 @@ describe("PageAdminGuests.vue", () => {
 
             // All guests should be visible since all have contacts ending with example.com
             const guestItems = screen.getByRole("listitem");
-            expect(guestItems.elements()).toHaveLength(3);
+            expect(guestItems.all()).toHaveLength(3);
             await expect.element(guestItems.first()).toHaveTextContent("John Doe");
             await expect.element(guestItems.nth(1)).toHaveTextContent("Jane Smith");
             await expect.element(guestItems.last()).toHaveTextContent("Alice Johnson");
@@ -1057,7 +1057,7 @@ describe("PageAdminGuests.vue", () => {
 
             // Only Jane Smith should be visible
             let guestItems = screen.getByRole("listitem");
-            expect(guestItems.elements()).toHaveLength(1);
+            expect(guestItems.all()).toHaveLength(1);
             await expect.element(guestItems.last()).toHaveTextContent("Jane Smith");
 
             // Clear the search input
@@ -1067,7 +1067,7 @@ describe("PageAdminGuests.vue", () => {
 
             // All guests should be visible again
             guestItems = screen.getByRole("listitem");
-            expect(guestItems.elements()).toHaveLength(3);
+            expect(guestItems.all()).toHaveLength(3);
         });
     });
 
@@ -1189,7 +1189,7 @@ describe("PageAdminGuests.vue", () => {
             // Check that John Doe is visible
             await expect.element(screen.getByText("John Doe")).toBeVisible();
             // Ensure that only property1 summary is displayed for John Doe
-            expect(screen.getByText("Property One").elements()).toHaveLength(2);
+            expect(screen.getByText("Property One").all()).toHaveLength(2);
             await expect.element(screen.getByText("Property Two:")).not.toBeInTheDocument();
 
             // Check that Jane Smith is visible
@@ -1342,7 +1342,7 @@ describe("PageAdminGuests.vue", () => {
             screen = await render();
 
             const guestItems = screen.getByRole("listitem");
-            expect(guestItems.elements()).toHaveLength(3);
+            expect(guestItems.all()).toHaveLength(3);
 
             // Should be sorted by percentage in descending order:
             // Bob: 100% (3/3 visits)
@@ -1372,7 +1372,7 @@ describe("PageAdminGuests.vue", () => {
             await closeBottomDialog(screen);
 
             const guestItems = screen.getByRole("listitem");
-            expect(guestItems.elements()).toHaveLength(3);
+            expect(guestItems.all()).toHaveLength(3);
 
             // Should be sorted by bookings in ascending order:
             // Jane: 1 booking
@@ -1401,7 +1401,7 @@ describe("PageAdminGuests.vue", () => {
             screen = await render();
 
             const guestItems = screen.getByRole("listitem");
-            expect(guestItems.elements()).toHaveLength(3);
+            expect(guestItems.all()).toHaveLength(3);
 
             // Should be sorted by lastModified in ascending order:
             // Bob (oldest)

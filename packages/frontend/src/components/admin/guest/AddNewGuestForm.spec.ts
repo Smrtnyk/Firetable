@@ -1,4 +1,5 @@
 import type { AddNewGuestFormProps } from "./AddNewGuestForm.vue";
+import type { Locator } from "@vitest/browser/locator";
 import AddNewGuestForm from "./AddNewGuestForm.vue";
 import { renderComponent } from "../../../../test-helpers/render-component";
 import { describe, it, expect, beforeEach } from "vitest";
@@ -9,8 +10,8 @@ describe("AddNewGuestForm", () => {
         return screen.getByRole("combobox", { name: "Tags" }).element();
     }
 
-    function getTagRemoveButtons(screen: any): HTMLElement[] {
-        return screen.getByLabelText("Remove").elements();
+    function getTagRemoveButtons(screen: any): Locator {
+        return screen.getByLabelText("Remove");
     }
 
     describe("create", () => {
@@ -205,8 +206,8 @@ describe("AddNewGuestForm", () => {
 
             // Get remove buttons and click the first one
             const removeButtons = getTagRemoveButtons(screen);
-            expect(removeButtons).toHaveLength(2);
-            await userEvent.click(removeButtons[0]);
+            expect(removeButtons.all()).toHaveLength(2);
+            await userEvent.click(removeButtons.first());
 
             // Verify first tag is removed but second remains
             await expect.element(screen.getByText("VIP")).not.toBeInTheDocument();
@@ -490,8 +491,8 @@ describe("AddNewGuestForm", () => {
             await userEvent.keyboard("{Enter}");
 
             // Remove existing tag
-            const removeButton = getTagRemoveButtons(screen)[0];
-            await userEvent.click(removeButton);
+            const removeButton = getTagRemoveButtons(screen);
+            await userEvent.click(removeButton.first());
 
             const submitButton = screen.getByRole("button", { name: "Submit" });
             await userEvent.click(submitButton);

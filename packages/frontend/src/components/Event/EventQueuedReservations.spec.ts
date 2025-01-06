@@ -137,10 +137,10 @@ describe("EventQueuedReservations.vue", () => {
         const screen = render();
 
         const listItems = screen.getByRole("listitem");
-        expect(listItems.elements()).toHaveLength(2);
+        expect(listItems.all()).toHaveLength(2);
 
         await expect.element(screen.getByText("VIP")).toBeVisible();
-        expect(screen.getByText("VIP").elements()).toHaveLength(1);
+        expect(screen.getByText("VIP").all()).toHaveLength(1);
     });
 
     it("opens the add new reservation dialog when plus button is clicked", async () => {
@@ -265,6 +265,6 @@ describe("EventQueuedReservations.vue", () => {
         const screen = render();
 
         const reservationItems = screen.getByRole("listitem");
-        expect(reservationItems.elements()).toHaveLength(3);
+        expect(reservationItems.all()).toHaveLength(3);
     });
 });

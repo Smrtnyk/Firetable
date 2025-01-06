@@ -84,7 +84,7 @@ describe("AdminEventLogs", () => {
         it("renders all logs", () => {
             sampleLogs.forEach((log) => {
                 const messageElement = page.getByText(log.message);
-                expect(messageElement.elements().length).toBeTruthy();
+                expect(messageElement.all().length).toBeGreaterThan(0);
             });
         });
 

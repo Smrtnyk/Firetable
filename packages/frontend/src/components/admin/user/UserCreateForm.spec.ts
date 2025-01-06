@@ -55,10 +55,10 @@ describe("UserCreateForm", () => {
 
         // Properties checkboxes should be rendered (since we have properties and role is not PROPERTY_OWNER)
         const propertyCheckboxes = screen.getByRole("checkbox");
-        expect(propertyCheckboxes.elements().length).toBe(2);
+        expect(propertyCheckboxes.all()).toHaveLength(2);
 
         // Ensure checkboxes are unchecked
-        for (const checkbox of propertyCheckboxes.elements()) {
+        for (const checkbox of propertyCheckboxes.all()) {
             await expect.element(checkbox).not.toBeChecked();
         }
     });
@@ -75,9 +75,7 @@ describe("UserCreateForm", () => {
         const submitButton = screen.getByRole("button", { name: t("Global.submit") });
         await userEvent.click(submitButton);
 
-        expect(screen.getByText("Please type something").elements().length).toBeGreaterThanOrEqual(
-            2,
-        );
+        expect(screen.getByText("Please type something").all().length).toBeGreaterThanOrEqual(2);
     });
 
     it("shows error when no properties are selected", async () => {
@@ -205,7 +203,7 @@ describe("UserCreateForm", () => {
             .toHaveValue("");
 
         // Check that properties are reset
-        for (const checkbox of propertyCheckboxes.elements()) {
+        for (const checkbox of propertyCheckboxes.all()) {
             await expect.element(checkbox).not.toBeChecked();
         }
     });
@@ -227,7 +225,7 @@ describe("UserCreateForm", () => {
 
         // Check that properties selection is not displayed
         const propertyCheckboxes = screen.getByRole("checkbox");
-        expect(propertyCheckboxes.elements().length).toBe(0);
+        expect(propertyCheckboxes.all()).toHaveLength(0);
     });
 
     it("validates that password is not empty", async () => {

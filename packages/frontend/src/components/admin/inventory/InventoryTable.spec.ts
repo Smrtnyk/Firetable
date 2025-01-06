@@ -56,16 +56,16 @@ describe("InventoryTable.vue", () => {
     it("displays the correct data for each item", () => {
         for (const item of sampleItems) {
             const nameCell = page.getByText(item.name);
-            expect(nameCell.elements().length).toBeGreaterThan(0);
+            expect(nameCell.all().length).toBeGreaterThan(0);
 
             const mainCategoryCell = page.getByText(item.mainCategory);
-            expect(mainCategoryCell.elements().length).toBeGreaterThan(0);
+            expect(mainCategoryCell.all().length).toBeGreaterThan(0);
 
             const subCategoryCell = page.getByText(item.subCategory);
-            expect(subCategoryCell.elements().length).toBeGreaterThan(0);
+            expect(subCategoryCell.all().length).toBeGreaterThan(0);
 
             const quantityCell = page.getByText(item.quantity.toString());
-            expect(quantityCell.elements().length).toBeGreaterThan(0);
+            expect(quantityCell.all().length).toBeGreaterThan(0);
         }
     });
 
@@ -74,15 +74,15 @@ describe("InventoryTable.vue", () => {
         await userEvent.type(searchInput, "Red Bull");
 
         const redBullRow = page.getByText("Red Bull 250ml");
-        expect(redBullRow.elements().length).toBe(1);
+        expect(redBullRow.all()).toHaveLength(1);
 
         const vodkaRow = page.getByText("Absolut Vodka");
-        expect(vodkaRow.elements().length).toBe(0);
+        expect(vodkaRow.all()).toHaveLength(0);
     });
 
     it(`emits "edit-item" event when edit button is clicked`, async () => {
         const editButton = page.getByAltText("Edit Red Bull 250ml");
-        expect(editButton.elements().length).toBe(1);
+        expect(editButton.all()).toHaveLength(1);
 
         await userEvent.click(editButton);
 
@@ -94,7 +94,7 @@ describe("InventoryTable.vue", () => {
 
     it(`emits "delete-item" event when delete button is clicked`, async () => {
         const deleteButton = page.getByAltText("Delete Absolut Vodka");
-        expect(deleteButton.elements().length).toBe(1);
+        expect(deleteButton.all()).toHaveLength(1);
 
         await userEvent.click(deleteButton);
 

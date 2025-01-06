@@ -80,7 +80,7 @@ describe("EventCreateForm", () => {
             await userEvent.click(floor1Option);
 
             const floorItems = screen.getByText("Floor 1");
-            expect(floorItems.elements().length).toBe(2);
+            expect(floorItems.all()).toHaveLength(2);
         });
 
         it("allows removing floors", async () => {
@@ -316,12 +316,11 @@ describe("EventCreateForm", () => {
             ).toContain("22:00");
         });
 
-        it("does not display floor selection in edit mode", () => {
+        it("does not display floor selection in edit mode", async () => {
             const screen = renderComponent(EventCreateForm, props);
 
-            // Ensure that floor checkboxes are not rendered
             const floorCheckboxes = screen.getByRole("checkbox");
-            expect(floorCheckboxes.elements().length).toBe(0);
+            await expect.element(floorCheckboxes.first()).not.toBeInTheDocument();
         });
 
         it("emits update event with correct payload", async () => {

@@ -113,7 +113,7 @@ describe("PageAdminIssueReports.vue", () => {
             .toBeVisible();
 
         const issueItems = screen.getByRole("listitem");
-        expect(issueItems.elements()).toHaveLength(2);
+        expect(issueItems.all()).toHaveLength(2);
 
         await expect.element(screen.getByText("Test Bug")).toBeVisible();
         await expect.element(screen.getByText("Feature Request")).toBeVisible();

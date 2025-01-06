@@ -146,7 +146,7 @@ describe("PageAdminUsers.vue", () => {
 
         // Check that the users are rendered under their respective properties
         const propertyTabs = screen.getByRole("tab");
-        expect(propertyTabs.elements().length).toBe(2);
+        expect(propertyTabs.all()).toHaveLength(2);
 
         // Verify the tab labels include property names and user counts
         await expect.element(propertyTabs.first()).toHaveTextContent("Property One (2)");

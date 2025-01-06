@@ -62,7 +62,7 @@ describe("UserEditForm", () => {
         const propertyCheckboxes = screen.getByRole("checkbox", {
             name: /Property/,
         });
-        expect(propertyCheckboxes.elements().length).toBe(props.properties.length);
+        expect(propertyCheckboxes.all()).toHaveLength(props.properties.length);
 
         // Check that selected properties are checked
         for (const checkbox of propertyCheckboxes.elements()) {
@@ -190,7 +190,7 @@ describe("UserEditForm", () => {
         const propertyCheckboxes = screen.getByRole("checkbox", {
             name: /Property/,
         });
-        expect(propertyCheckboxes.elements().length).toBe(0);
+        expect(propertyCheckboxes.all()).toHaveLength(0);
     });
 
     it("shows capabilities checkboxes only for STAFF role", async () => {
