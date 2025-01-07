@@ -245,11 +245,9 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
             this.floor.renderGrid();
 
             // Wait for the canvas to finish rendering
-            await new Promise<void>((resolve) => {
+            await new Promise<unknown>((resolve) => {
                 this.floor.canvas.requestRenderAll();
-                this.floor.canvas.once("after:render", function () {
-                    resolve();
-                });
+                this.floor.canvas.once("after:render", resolve);
             });
 
             // Additional wait to ensure all object events have fired
