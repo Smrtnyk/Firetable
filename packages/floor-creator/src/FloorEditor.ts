@@ -72,6 +72,17 @@ export class FloorEditor extends Floor {
         }
     }
 
+    setBackgroundColor(color: string): void {
+        this.canvas.backgroundColor = color;
+        this.canvas.fire("object:modified");
+        this.canvas.requestRenderAll();
+    }
+
+    getBackgroundColor(): string {
+        const bgColor = this.canvas.backgroundColor;
+        return bgColor.toString();
+    }
+
     isDirty(): boolean {
         return this.history.hasUnsavedChanges();
     }

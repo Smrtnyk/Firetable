@@ -99,6 +99,7 @@ function onFloorSave(): void {
     emit("floorSave");
 }
 
+const bgColor = ref(floorInstance.getBackgroundColor());
 const isDrawingMode = ref(false);
 const lineWidth = ref(2);
 const drawingColor = ref("#000000");
@@ -138,6 +139,11 @@ function updateLineWidth(width: unknown): void {
 
 function updateBrushType(newBrushType: "circle" | "pencil" | "spray"): void {
     floorInstance.setBrushType(newBrushType);
+}
+
+function updateBgColor(color: string): void {
+    bgColor.value = color;
+    floorInstance.setBackgroundColor(color);
 }
 </script>
 
@@ -239,6 +245,14 @@ function updateBrushType(newBrushType: "circle" | "pencil" | "spray"): void {
 
         <!-- Drawing Controls -->
         <div class="q-pa-md row items-center">
+            <div class="q-mr-sm">
+                <FTColorPickerButton
+                    round
+                    :model-value="bgColor"
+                    @update:model-value="updateBgColor"
+                />
+            </div>
+
             <q-btn
                 flat
                 round

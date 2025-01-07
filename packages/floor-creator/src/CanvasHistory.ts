@@ -265,9 +265,15 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
         const obj1 = JSON.parse(json1);
         const obj2 = JSON.parse(json2);
 
-        const objects1 = CanvasHistory.normalize(obj1.objects);
-        const objects2 = CanvasHistory.normalize(obj2.objects);
+        const normalized1 = {
+            background: obj1.background,
+            objects: CanvasHistory.normalize(obj1.objects),
+        };
+        const normalized2 = {
+            background: obj2.background,
+            objects: CanvasHistory.normalize(obj2.objects),
+        };
 
-        return isEqual(objects1, objects2);
+        return isEqual(normalized1, normalized2);
     }
 }

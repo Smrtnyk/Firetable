@@ -437,6 +437,26 @@ describe("CanvasHistory", () => {
         await waitForCanvasRender(floor);
         expect(floor.isDirty()).toBe(true);
     });
+
+    it("detects changes to the background color in the canvas JSON", async () => {
+        const { floor } = setupTestFloor();
+
+        floor.setBackgroundColor("#333");
+        await waitForCanvasRender(floor);
+
+        floor.markAsSaved();
+        expect(floor.isDirty()).toBe(false);
+
+        floor.setBackgroundColor("#444");
+        await waitForCanvasRender(floor);
+
+        expect(floor.isDirty()).toBe(true);
+
+        await floor.undo();
+        await waitForCanvasRender(floor);
+
+        expect(floor.isDirty()).toBe(false);
+    });
 });
 
 async function moveTable(
