@@ -8,6 +8,9 @@ import type {
 import type { ComposeOption } from "echarts/core";
 import type { BarSeriesOption, PieSeriesOption } from "echarts/charts";
 
+type BarItemStyleOption = NonNullable<BarSeriesOption["itemStyle"]>;
+type BarItemStackOption = NonNullable<BarSeriesOption["stack"]>;
+
 export type PieChartData = {
     name: string;
     value: number;
@@ -23,10 +26,8 @@ export type ECPieOption = ComposeOption<
 export type TimeSeriesData = {
     name: string;
     data: number[];
-    itemStyle?: {
-        color?: string;
-    };
-    stack?: string;
+    itemStyle: BarItemStyleOption;
+    stack?: BarItemStackOption;
 }[];
 
 export type ECBarOption = ComposeOption<

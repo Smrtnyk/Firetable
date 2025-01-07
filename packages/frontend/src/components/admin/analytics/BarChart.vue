@@ -34,7 +34,6 @@ const props = defineProps<{
 
 const backgroundColor = computed(() => (isDark.value ? "#1A1A1A" : "#FFFFFF"));
 const textColor = computed(() => (isDark.value ? "#cccccc" : "#1A1A1A"));
-// @ts-expect-error -- FIXME: figure this type issue out
 const chartOption = computed<ECBarOption>(() => ({
     backgroundColor: backgroundColor.value,
     title: {
@@ -108,7 +107,7 @@ const chartOption = computed<ECBarOption>(() => ({
     series: props.chartData.map((series) => ({
         name: series.name,
         type: "bar",
-        stack: props.stacked ? "total" : undefined,
+        stack: props.stacked ? "total" : "",
         emphasis: {
             focus: "series",
         },
