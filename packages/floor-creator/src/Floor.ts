@@ -82,8 +82,10 @@ export abstract class Floor {
 
     setScaling(): void {
         this.canvas.setZoom(this.scale);
-        this.canvas.setWidth(this.width * this.canvas.getZoom());
-        this.canvas.setHeight(this.height * this.canvas.getZoom());
+        this.canvas.setDimensions({
+            width: this.width * this.canvas.getZoom(),
+            height: this.height * this.canvas.getZoom(),
+        });
         this.setObjectCoords();
     }
 
