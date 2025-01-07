@@ -71,6 +71,9 @@ export const myIcons: Record<string, string> = {
     format_underlined: "svguse:/svg-icons/ft-icons.svg#underline",
     pdf: "svguse:/svg-icons/ft-icons.svg#pdf",
     drink: "svguse:/svg-icons/ft-icons.svg#drink",
+    gradient: "svguse:/svg-icons/ft-icons.svg#spectrum",
+    style: "svguse:/svg-icons/ft-icons.svg#style",
+    tune: "svguse:/svg-icons/ft-icons.svg#tune",
 };
 
 export function getDarkMode(): boolean {
