@@ -21,7 +21,8 @@ import { useDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { usePropertiesStore } from "src/stores/properties-store";
-import { refreshApp } from "src/helpers/utils";
+import { matchesProperty } from "es-toolkit/compat";
+import { negate } from "es-toolkit";
 
 interface Props {
     organisationId: string;
@@ -103,8 +104,10 @@ async function onUpdateEvent(eventData: EditEventPayload & { id: string }): Prom
                 },
                 eventData,
             );
-            // FIXME: An ugly hack to force data reload
-            refreshApp();
+            const updatedEvent = events.value.find(matchesProperty("id", eventData.id));
+            if (updatedEvent) {
+                Object.assign(updatedEvent, eventData);
+            }
         },
     });
 }
@@ -124,8 +127,7 @@ async function deleteEvent(event: EventDoc): Promise<void> {
                 }),
                 event.id,
             );
-            // FIXME: An ugly hack to force data reload
-            refreshApp();
+            events.value = events.value.filter(negate(matchesProperty("id", event.id)));
         },
     });
 }
