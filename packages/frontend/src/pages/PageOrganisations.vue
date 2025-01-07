@@ -2,32 +2,16 @@
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { storeToRefs } from "pinia";
-import { OrganisationStatus } from "@firetable/types";
 import { isTablet } from "src/global-reactives/screen-detection";
 import { computed } from "vue";
+import {
+    formatOrganisationStatus,
+    getOrganisationStatusColor,
+} from "src/helpers/organisation/organisation";
 
 const { organisations } = storeToRefs(usePropertiesStore());
 
 const titleClass = computed(() => (isTablet.value ? "text-h6" : "text-h5"));
-
-function getStatusColor(status?: OrganisationStatus): string {
-    switch (status) {
-        case OrganisationStatus.ACTIVE:
-            return "positive";
-        case OrganisationStatus.DISABLED:
-            return "grey";
-        case OrganisationStatus.PENDING:
-            return "warning";
-        case OrganisationStatus.SUSPENDED:
-            return "negative";
-        default:
-            return "grey";
-    }
-}
-
-function formatStatus(status?: OrganisationStatus): string {
-    return status ? status.charAt(0).toUpperCase() + status.slice(1) : "No Status";
-}
 </script>
 
 <template>
@@ -82,12 +66,12 @@ function formatStatus(status?: OrganisationStatus): string {
 
                                 <div class="col-2">
                                     <q-chip
-                                        :color="getStatusColor(organisation.status)"
+                                        :color="getOrganisationStatusColor(organisation.status)"
                                         text-color="white"
                                         size="sm"
                                         class="q-ml-sm"
                                     >
-                                        {{ formatStatus(organisation.status) }}
+                                        {{ formatOrganisationStatus(organisation.status) }}
                                     </q-chip>
                                 </div>
                             </div>

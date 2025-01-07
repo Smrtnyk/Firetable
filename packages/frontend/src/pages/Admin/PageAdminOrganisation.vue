@@ -2,6 +2,10 @@
 import { deleteOrganisation } from "../../backend-proxy";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { showDeleteConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import {
+    getOrganisationStatusColor,
+    formatOrganisationStatus,
+} from "src/helpers/organisation/organisation";
 import { useRouter } from "vue-router";
 
 import FTTitle from "src/components/FTTitle.vue";
@@ -49,10 +53,10 @@ async function onDeleteOrganisation(): Promise<void> {
                 <q-chip
                     aria-label="Organisation status"
                     class="q-mr-md"
-                    :color="organisation.status === 'active' ? 'positive' : 'warning'"
+                    :color="getOrganisationStatusColor(organisation.status)"
                     text-color="white"
                 >
-                    {{ organisation.status ?? "no status set" }}
+                    {{ formatOrganisationStatus(organisation.status) }}
                 </q-chip>
                 <FTBtn
                     icon="trash"

@@ -48,13 +48,11 @@ export function showDeleteConfirm(
                 rounded: true,
             },
             ok: {
-                label: "Delete",
                 size: "md",
                 rounded: true,
                 color: "primary",
             },
             cancel: {
-                label: "Cancel",
                 size: "md",
                 outline: true,
                 rounded: true,

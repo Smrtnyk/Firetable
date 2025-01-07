@@ -76,8 +76,8 @@ describe("PageAdminOrganisation.vue", () => {
         const screen = render();
 
         const statusChip = screen.getByLabelText("Organisation status");
-        await expect.element(statusChip).toHaveClass("bg-warning");
-        await expect.element(statusChip).toHaveTextContent("suspended");
+        await expect.element(statusChip).toHaveClass("bg-negative");
+        await expect.element(statusChip).toHaveTextContent("Suspended");
     });
 
     it("shows delete confirmation dialog when delete button is clicked", async () => {
@@ -95,7 +95,7 @@ describe("PageAdminOrganisation.vue", () => {
         const input = screen.getByRole("textbox");
         await userEvent.type(input, "Wrong Name");
         await expect
-            .element(screen.getByRole("button", { name: "Delete", exact: true }))
+            .element(screen.getByRole("button", { name: "OK", exact: true }))
             .toBeDisabled();
 
         expect(deleteOrganisationMock).not.toHaveBeenCalled();
@@ -107,7 +107,7 @@ describe("PageAdminOrganisation.vue", () => {
 
         const input = screen.getByRole("textbox");
         await userEvent.type(input, "Test Organisation");
-        await userEvent.click(screen.getByRole("button", { name: "Delete", exact: true }));
+        await userEvent.click(screen.getByRole("button", { name: "OK", exact: true }));
 
         expect(deleteOrganisationMock).toHaveBeenCalledWith("org1");
     });
