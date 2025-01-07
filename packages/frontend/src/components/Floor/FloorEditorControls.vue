@@ -119,10 +119,6 @@ function openBrushSettings(): void {
     brushSettingsOpen.value = true;
 }
 
-function closeBrushSettings(): void {
-    brushSettingsOpen.value = false;
-}
-
 function updateBrushColor(color: unknown): void {
     if (!isString(color)) {
         return;
@@ -275,11 +271,6 @@ function openColorPicker(): void {
                 class="ft-card"
             >
                 <div style="min-width: 280px">
-                    <q-card-actions align="right">
-                        <q-btn flat label="Close" icon="close" @click="closeBrushSettings" />
-                    </q-card-actions>
-                    <q-separator />
-
                     <q-card-section class="q-pa-sm">
                         <q-select
                             v-model="selectedBrushType"
