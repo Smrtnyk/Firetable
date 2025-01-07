@@ -31,6 +31,7 @@ function showReservation(reservation: ReservationDoc): void {
                 reservation,
                 timezone: props.timezone,
             },
+            listeners: {},
         },
     });
 }

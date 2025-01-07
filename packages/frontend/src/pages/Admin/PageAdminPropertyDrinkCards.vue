@@ -214,6 +214,7 @@ function showQRCode(): void {
             componentPropsObject: {
                 url: getPublicUrForDrinkCard(props.organisationId, props.propertyId),
             },
+            listeners: {},
         },
     });
 }

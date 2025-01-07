@@ -10,7 +10,7 @@ type CreateOptions<C> = {
         component: C;
         maximized?: boolean;
         componentPropsObject?: ComponentProps<C>;
-        listeners?: Record<string, AnyFunction>;
+        listeners: Record<string, AnyFunction>;
         title?: string;
     };
 };
