@@ -43,13 +43,13 @@
         "globals": "15.14.0",
         "prettier": "3.4.2",
         "typescript": "5.7.2",
-        "typescript-eslint": "8.19.0"
+        "typescript-eslint": "8.19.1"
     },
     "private": true,
     "engines": {
         "node": ">= 22.9.0"
     },
-    "packageManager": "pnpm@9.15.2",
+    "packageManager": "pnpm@9.15.3",
     "pnpm": {
         "overrides": {
             "jsdom": "25.0.1",
