@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { QPopupProxy } from "quasar";
 import type { FloorEditor, FloorEditorElement } from "@firetable/floor-creator";
 import { setDimensions, setElementAngle, isTable } from "@firetable/floor-creator";
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
-import { computed, onMounted, ref, useTemplateRef, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useEventListener } from "@vueuse/core";
 import { debounce, isString } from "es-toolkit";
+import FTColorPickerButton from "src/components/FTColorPickerButton.vue";
 
 interface Props {
     selectedFloorElement: FloorEditorElement;
@@ -22,7 +22,7 @@ const {
     selectedFloorElement,
     floorInstance,
 } = defineProps<Props>();
-const colorPickerProxy = useTemplateRef<QPopupProxy>("colorPickerProxy");
+
 const getElementWidth = computed(function () {
     return selectedFloorElement
         ? Math.round(selectedFloorElement.width * selectedFloorElement.scaleX)
@@ -85,10 +85,6 @@ const setElementColor = debounce(function (newVal: unknown): void {
     floorInstance.setElementFill(selectedFloorElement, newVal);
 }, 300);
 
-function openColorPicker(): void {
-    colorPickerProxy.value?.show();
-}
-
 function updateTableLabel(tableEl: FloorEditorElement | undefined, newLabel: unknown): void {
     if (!isString(newLabel) || !isTable(tableEl)) {
         return;
@@ -148,24 +144,11 @@ onMounted(function () {
         <q-space />
 
         <div class="col-auto flex q-gutter-xs q-ma-none">
-            <q-btn
-                flat
-                title="Change element fill color"
-                v-if="elementColor"
-                :style="{ 'background-color': elementColor }"
-                @click="openColorPicker"
-            >
-                <q-icon name="color-picker" class="cursor-pointer" />
-                <q-popup-proxy
-                    no-parent-event
-                    ref="colorPickerProxy"
-                    cover
-                    transition-show="scale"
-                    transition-hide="scale"
-                >
-                    <q-color :model-value="elementColor" @update:model-value="setElementColor" />
-                </q-popup-proxy>
-            </q-btn>
+            <FTColorPickerButton
+                :model-value="elementColor"
+                @update:model-value="setElementColor"
+            />
+
             <q-btn
                 flat
                 title="Send back"

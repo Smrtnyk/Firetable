@@ -8,7 +8,8 @@ import { ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
 import { AppLogger } from "src/logger/FTLogger.js";
 import { isString } from "es-toolkit";
 import { isNumber } from "es-toolkit/compat";
-import FTBtn from "src/components/FTBtn.vue";
+
+import FTColorPickerButton from "src/components/FTColorPickerButton.vue";
 
 interface Props {
     floorInstance: FloorEditor;
@@ -137,12 +138,6 @@ function updateLineWidth(width: unknown): void {
 
 function updateBrushType(newBrushType: "circle" | "pencil" | "spray"): void {
     floorInstance.setBrushType(newBrushType);
-}
-
-const isColorPickerOpen = ref(false);
-
-function openColorPicker(): void {
-    isColorPickerOpen.value = true;
 }
 </script>
 
@@ -288,12 +283,11 @@ function openColorPicker(): void {
                     <q-card-section class="q-pa-sm">
                         <div class="column items-start q-gutter-sm">
                             <span class="text-caption">Color</span>
-                            <FTBtn
-                                flat
+
+                            <FTColorPickerButton
+                                :model-value="drawingColor"
+                                @update:model-value="updateBrushColor"
                                 round
-                                icon="color-picker"
-                                :style="{ backgroundColor: drawingColor }"
-                                @click="openColorPicker"
                             />
                         </div>
                     </q-card-section>
@@ -313,21 +307,6 @@ function openColorPicker(): void {
                         </div>
                     </q-card-section>
                 </div>
-            </q-popup-proxy>
-
-            <q-popup-proxy
-                v-model="isColorPickerOpen"
-                transition-show="scale"
-                transition-hide="scale"
-                cover
-                no-parent-event
-                class="ft-card"
-            >
-                <q-color
-                    style="min-width: 250px"
-                    v-model="drawingColor"
-                    @change="updateBrushColor"
-                />
             </q-popup-proxy>
         </div>
 
