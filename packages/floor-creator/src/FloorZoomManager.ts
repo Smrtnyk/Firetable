@@ -30,33 +30,33 @@ export class FloorZoomManager {
     }
 
     adjustZoom(scaleFactor: number, point: Point): void {
-        let newZoom = this.canvas.getZoom() * scaleFactor;
-        if (newZoom > this.maxZoom) {
-            newZoom = this.maxZoom;
+        const { canvas, floor, maxZoom, minZoom } = this;
+        let newZoom = canvas.getZoom() * scaleFactor;
+        if (newZoom > maxZoom) {
+            newZoom = maxZoom;
         }
-        if (newZoom < this.minZoom) {
-            newZoom = this.minZoom;
+        if (newZoom < minZoom) {
+            newZoom = minZoom;
         }
         this.isZooming = true;
-        this.canvas.zoomToPoint(point, newZoom);
-        const canvas = this.canvas;
-        const vpt = this.canvas.viewportTransform;
+        canvas.zoomToPoint(point, newZoom);
+        const vpt = canvas.viewportTransform;
         if (newZoom < 400 / 1000) {
             vpt[4] = 200 - (1000 * newZoom) / 2;
             vpt[5] = 200 - (1000 * newZoom) / 2;
         } else {
             if (vpt[4] >= 0) {
                 vpt[4] = 0;
-            } else if (vpt[4] < canvas.getWidth() - this.floor.width * newZoom) {
-                vpt[4] = canvas.getWidth() - this.floor.width * newZoom;
+            } else if (vpt[4] < canvas.getWidth() - floor.width * newZoom) {
+                vpt[4] = canvas.getWidth() - floor.width * newZoom;
             }
             if (vpt[5] >= 0) {
                 vpt[5] = 0;
-            } else if (vpt[5] < canvas.getHeight() - this.floor.height * newZoom) {
-                vpt[5] = canvas.getHeight() - this.floor.height * newZoom;
+            } else if (vpt[5] < canvas.getHeight() - floor.height * newZoom) {
+                vpt[5] = canvas.getHeight() - floor.height * newZoom;
             }
         }
-        this.floor.setObjectCoords();
+        floor.setObjectCoords();
         this.isZooming = false;
     }
 
