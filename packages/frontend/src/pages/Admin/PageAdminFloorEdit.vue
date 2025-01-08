@@ -6,7 +6,7 @@ import FloorEditorTopControls from "src/components/Floor/FloorEditorTopControls.
 import { onMounted, useTemplateRef } from "vue";
 import { useRouter } from "vue-router";
 import { Loading } from "quasar";
-import { extractAllTablesLabels, hasFloorTables } from "@firetable/floor-creator";
+import { extractAllTablesLabels } from "@firetable/floor-creator";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import {
     getFirestoreDocument,
@@ -79,8 +79,8 @@ function instantiateFloor(floorDoc: FloorDoc): void {
 }
 
 async function onFloorSave(): Promise<void> {
-    if (!floorInstance.value || !hasFloorTables(floorInstance.value as FloorEditor)) {
-        return showErrorMessage("You need to add at least one table!");
+    if (!floorInstance.value) {
+        return;
     }
 
     const { name } = floorInstance.value;

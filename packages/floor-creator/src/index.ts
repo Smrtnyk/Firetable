@@ -3,7 +3,6 @@ export * from "./FloorEditor.js";
 export * from "./FloorViewer.js";
 export * from "./filters.js";
 export * from "./constants.js";
-export * from "./factories.js";
 export * from "./elements/RoundTable.js";
 export * from "./elements/RectTable.js";
 export * from "./elements/Sofa.js";

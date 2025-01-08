@@ -40,22 +40,23 @@ export class TouchManager {
     }
 
     onPanMove = (e: HammerInput): void => {
+        const { floor } = this;
         this.isInteracting = true;
-        // prevent panning if ctrl is pressed
-        if (e.srcEvent.ctrlKey || this.floor.canvas.isDrawingMode) {
+        // prevent panning if ctrl is pressed or drawing mode is active
+        if (e.srcEvent.ctrlKey || floor.canvas.isDrawingMode) {
             return;
         }
-        const activeObject = this.floor.canvas.getActiveObject();
+        const activeObject = floor.canvas.getActiveObject();
         // If an object is selected, don't pan the canvas
         if (activeObject) {
             return;
         }
 
-        const zoom = this.floor.canvas.getZoom();
-        const canvasWidth = this.floor.canvas.getWidth();
-        const canvasHeight = this.floor.canvas.getHeight();
-        const viewportWidth = this.floor.width * zoom;
-        const viewportHeight = this.floor.height * zoom;
+        const zoom = floor.canvas.getZoom();
+        const canvasWidth = floor.canvas.getWidth();
+        const canvasHeight = floor.canvas.getHeight();
+        const viewportWidth = floor.width * zoom;
+        const viewportHeight = floor.height * zoom;
 
         const minX = canvasWidth - viewportWidth;
         const minY = canvasHeight - viewportHeight;
@@ -65,17 +66,15 @@ export class TouchManager {
 
         // Calculate the new x and y values after the pan
         let newX =
-            (this.floor.canvas.viewportTransform ? this.floor.canvas.viewportTransform[4] : 0) +
-            deltaX;
+            (floor.canvas.viewportTransform ? floor.canvas.viewportTransform[4] : 0) + deltaX;
         let newY =
-            (this.floor.canvas.viewportTransform ? this.floor.canvas.viewportTransform[5] : 0) +
-            deltaY;
+            (floor.canvas.viewportTransform ? floor.canvas.viewportTransform[5] : 0) + deltaY;
 
         // Clamp the new x and y values to the boundaries
         newX = Math.min(0, Math.max(minX, newX));
         newY = Math.min(0, Math.max(minY, newY));
 
-        this.floor.canvas.setViewportTransform([zoom, 0, 0, zoom, newX, newY]);
+        floor.canvas.setViewportTransform([zoom, 0, 0, zoom, newX, newY]);
     };
 
     destroy(): void {

@@ -8,7 +8,11 @@ import FTCenteredText from "src/components/FTCenteredText.vue";
 
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { Loading } from "quasar";
-import { makeRawFloor } from "@firetable/floor-creator";
+import {
+    FLOOR_DEFAULT_HEIGHT,
+    FLOOR_DEFAULT_WIDTH,
+    type FloorData,
+} from "@firetable/floor-creator";
 import { addFloor, deleteFloor } from "@firetable/backend";
 import { useFloors } from "src/composables/useFloors";
 import { watch } from "vue";
@@ -36,6 +40,14 @@ watch(isLoading, function (loadingVal) {
         Loading.hide();
     }
 });
+
+function makeRawFloor(name: string): Omit<FloorData, "id" | "json"> {
+    return {
+        name,
+        height: FLOOR_DEFAULT_HEIGHT,
+        width: FLOOR_DEFAULT_WIDTH,
+    };
+}
 
 function showAddNewFloorForm(floorDocs: FloorDoc[]): void {
     const dialog = createDialog({

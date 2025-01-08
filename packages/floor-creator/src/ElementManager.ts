@@ -22,37 +22,33 @@ import { Cloakroom } from "./elements/Cloakroom.js";
 import { TextElement } from "./elements/TextElement.js";
 
 export class ElementManager {
-    addElement(options: CreateElementOptions): FabricObject {
-        switch (options.tag) {
-            case FloorElementTypes.RECT_TABLE:
-                return this.addRectTableElement(options);
-            case FloorElementTypes.ROUND_TABLE:
-                return this.addRoundTableElement(options);
-            case FloorElementTypes.SOFA:
-                return this.addSofaElement(options);
-            case FloorElementTypes.DJ_BOOTH:
-                return this.addDJBooth(options);
-            case FloorElementTypes.WALL:
-                return this.addWall(options);
-            case FloorElementTypes.STAGE:
-                return this.addStageElement(options);
-            case FloorElementTypes.SPIRAL_STAIRCASE:
-                return this.addSpiralStaircaseElement(options);
-            case FloorElementTypes.DOOR:
-                return this.addDoor(options);
-            case FloorElementTypes.EDITABLE_RECT:
-                return this.addEditableRect(options);
-            case FloorElementTypes.EDITABLE_CIRCLE:
-                return this.addEditableCircle(options);
-            case FloorElementTypes.BAR:
-                return this.addBar(options);
-            case FloorElementTypes.CLOAKROOM:
-                return this.addCloakroom(options);
-            case FloorElementTypes.TEXT:
-                return this.addTextElement(options);
-            default:
-                throw new Error(`Unknown floor element type: ${options.tag}`);
+    private readonly elementFactories: Record<
+        FloorElementTypes,
+        (opts: CreateElementOptions) => FabricObject
+    > = {
+        [FloorElementTypes.RECT_TABLE]: this.addRectTableElement.bind(this),
+        [FloorElementTypes.ROUND_TABLE]: this.addRoundTableElement.bind(this),
+        [FloorElementTypes.SOFA]: this.addSofaElement.bind(this),
+        [FloorElementTypes.DJ_BOOTH]: this.addDJBooth.bind(this),
+        [FloorElementTypes.WALL]: this.addWall.bind(this),
+        [FloorElementTypes.STAGE]: this.addStageElement.bind(this),
+        [FloorElementTypes.SPIRAL_STAIRCASE]: this.addSpiralStaircaseElement.bind(this),
+        [FloorElementTypes.DOOR]: this.addDoor.bind(this),
+        [FloorElementTypes.EDITABLE_RECT]: this.addEditableRect.bind(this),
+        [FloorElementTypes.EDITABLE_CIRCLE]: this.addEditableCircle.bind(this),
+        [FloorElementTypes.BAR]: this.addBar.bind(this),
+        [FloorElementTypes.CLOAKROOM]: this.addCloakroom.bind(this),
+        [FloorElementTypes.TEXT]: this.addTextElement.bind(this),
+    };
+
+    public addElement(options: CreateElementOptions): FabricObject {
+        const factoryFn = this.elementFactories[options.tag];
+
+        if (!factoryFn) {
+            throw new Error(`Unknown floor element type: ${options.tag}`);
         }
+
+        return factoryFn(options);
     }
 
     private addTextElement({ x, y }: CreateElementOptions): TextElement {

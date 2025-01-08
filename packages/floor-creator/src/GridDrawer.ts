@@ -2,6 +2,7 @@ import type { Canvas } from "fabric";
 import { RESOLUTION } from "./constants.js";
 import { Line, Group } from "fabric";
 import { has } from "es-toolkit/compat";
+import { range } from "es-toolkit";
 
 declare module "fabric" {
     interface GroupProps {
@@ -15,6 +16,15 @@ declare module "fabric" {
     }
 }
 
+const LINE_OPTION = {
+    stroke: "#000",
+    strokeUniform: true,
+    strokeWidth: 0.5,
+    selectable: false,
+    evented: false,
+    strokeDashArray: [3, 3],
+};
+
 export class GridDrawer {
     isGridVisible = true;
     private readonly canvas: Canvas;
@@ -25,31 +35,33 @@ export class GridDrawer {
 
     drawGrid(width: number, height: number): void {
         this.clearGrid();
-        const gridSize = RESOLUTION;
-        const left = (width % gridSize) / 2;
-        const top = (height % gridSize) / 2;
+        const left = (width % RESOLUTION) / 2;
+        const top = (height % RESOLUTION) / 2;
 
-        const lines = this.createGridLines(width, height, gridSize, left, top);
+        const lines = this.createGridLines(width, height, RESOLUTION, left, top);
         this.addGridToCanvas(lines);
     }
 
-    toggleGridVisibility = (width: number, height: number): void => {
+    toggleGridVisibility(width: number, height: number): void {
         if (this.isGridVisible) {
             this.clearGrid();
         } else {
             this.drawGrid(width, height);
         }
         this.isGridVisible = !this.isGridVisible;
-    };
+    }
 
     clearGrid(): void {
-        this.canvas
+        const { canvas } = this;
+        canvas
             .getObjects()
-            .filter((obj) => has(obj, "isGridLine"))
-            .forEach((obj) => {
-                this.canvas.remove(obj);
+            .filter(function (obj) {
+                return has(obj, "isGridLine");
+            })
+            .forEach(function (obj) {
+                canvas.remove(obj);
             });
-        this.canvas.requestRenderAll();
+        canvas.requestRenderAll();
     }
 
     private createGridLines(
@@ -59,24 +71,18 @@ export class GridDrawer {
         left: number,
         top: number,
     ): Line[] {
-        const lineOption = {
-            stroke: "#000",
-            strokeUniform: true,
-            strokeWidth: 0.5,
-            selectable: false,
-            evented: false,
-            strokeDashArray: [3, 3],
-        };
-        const lines: Line[] = [];
+        const wCount = Math.ceil(width / gridSize);
+        const hCount = Math.ceil(height / gridSize);
 
-        for (let i = Math.ceil(width / gridSize); i--; ) {
-            lines.push(new Line([gridSize * i, -top, gridSize * i, height], lineOption));
-        }
-        for (let i = Math.ceil(height / gridSize); i--; ) {
-            lines.push(new Line([-left, gridSize * i, width, gridSize * i], lineOption));
-        }
+        const verticalLines = range(wCount).map(
+            (i) => new Line([gridSize * i, -top, gridSize * i, height], LINE_OPTION),
+        );
 
-        return lines;
+        const horizontalLines = range(hCount).map(
+            (i) => new Line([-left, gridSize * i, width, gridSize * i], LINE_OPTION),
+        );
+
+        return [...verticalLines, ...horizontalLines];
     }
 
     private addGridToCanvas(lines: Line[]): void {
