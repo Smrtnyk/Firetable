@@ -7,12 +7,12 @@ export class FloorZoomManager {
 
     private minZoom: number;
     private readonly maxZoom = DEFAULT_ZOOM * 3;
+    private readonly canvas: Canvas;
+    private initialScale: number;
 
-    constructor(
-        private readonly floor: Floor,
-        private readonly canvas: Canvas,
-        private initialScale: number,
-    ) {
+    constructor(private readonly floor: Floor) {
+        this.canvas = floor.canvas;
+        this.initialScale = this.canvas.getZoom();
         this.minZoom = this.initialScale;
     }
 

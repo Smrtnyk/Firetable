@@ -57,19 +57,19 @@ export class FloorEditor extends Floor {
 
         if (options.floorDoc.json) {
             this.on("rendered", () => {
-                this.renderGrid();
-                this.history.initialize();
-                this.history.on("stateChange", () => {
-                    this.emit("historyChange");
-                });
+                this.setupOnRendered();
             });
         } else {
-            this.renderGrid();
-            this.history.initialize();
-            this.history.on("stateChange", () => {
-                this.emit("historyChange");
-            });
+            this.setupOnRendered();
         }
+    }
+
+    setupOnRendered(): void {
+        this.renderGrid();
+        this.history.initialize();
+        this.history.on("stateChange", () => {
+            this.emit("historyChange");
+        });
     }
 
     setBackgroundColor(color: string): void {

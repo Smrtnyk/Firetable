@@ -62,7 +62,7 @@ export abstract class Floor {
         this.setScaling();
         this.renderData(this.floorDoc.json);
 
-        this.zoomManager = new FloorZoomManager(this, this.canvas, this.canvas.getZoom());
+        this.zoomManager = new FloorZoomManager(this);
 
         this.touchManager = new TouchManager(this);
     }

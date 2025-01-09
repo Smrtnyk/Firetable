@@ -1,4 +1,5 @@
 import type { Floor } from "./Floor.js";
+import type { Canvas } from "fabric";
 import { Manager, Pinch, Pan, Tap, DIRECTION_ALL } from "hammerjs";
 import { Point } from "fabric";
 import { throttle } from "es-toolkit";
@@ -10,6 +11,7 @@ export class TouchManager {
     isInteracting = false;
 
     private readonly floor: Floor;
+    private readonly canvas: Canvas;
     private readonly hammerManager: HammerManager;
     private readonly onPinch = throttle((ev: HammerInput) => {
         this.isInteracting = true;
@@ -22,8 +24,9 @@ export class TouchManager {
 
     constructor(floor: Floor) {
         this.floor = floor;
+        this.canvas = floor.canvas;
 
-        const upperCanvasEl = this.floor.canvas.upperCanvasEl;
+        const upperCanvasEl = this.canvas.upperCanvasEl;
         this.hammerManager = new Manager(upperCanvasEl);
 
         // Create recognizers for pinch and pan gestures
@@ -40,21 +43,20 @@ export class TouchManager {
     }
 
     onPanMove = (e: HammerInput): void => {
-        const { floor } = this;
+        const { floor, canvas } = this;
         this.isInteracting = true;
         // prevent panning if ctrl is pressed or drawing mode is active
-        if (e.srcEvent.ctrlKey || floor.canvas.isDrawingMode) {
+        if (e.srcEvent.ctrlKey || canvas.isDrawingMode) {
             return;
         }
-        const activeObject = floor.canvas.getActiveObject();
         // If an object is selected, don't pan the canvas
-        if (activeObject) {
+        if (canvas.getActiveObject()) {
             return;
         }
 
-        const zoom = floor.canvas.getZoom();
-        const canvasWidth = floor.canvas.getWidth();
-        const canvasHeight = floor.canvas.getHeight();
+        const zoom = canvas.getZoom();
+        const canvasWidth = canvas.getWidth();
+        const canvasHeight = canvas.getHeight();
         const viewportWidth = floor.width * zoom;
         const viewportHeight = floor.height * zoom;
 
@@ -65,16 +67,14 @@ export class TouchManager {
         const deltaY = e.deltaY * PAN_DAMPENING_FACTOR;
 
         // Calculate the new x and y values after the pan
-        let newX =
-            (floor.canvas.viewportTransform ? floor.canvas.viewportTransform[4] : 0) + deltaX;
-        let newY =
-            (floor.canvas.viewportTransform ? floor.canvas.viewportTransform[5] : 0) + deltaY;
+        let newX = (canvas.viewportTransform ? canvas.viewportTransform[4] : 0) + deltaX;
+        let newY = (canvas.viewportTransform ? canvas.viewportTransform[5] : 0) + deltaY;
 
         // Clamp the new x and y values to the boundaries
         newX = Math.min(0, Math.max(minX, newX));
         newY = Math.min(0, Math.max(minY, newY));
 
-        floor.canvas.setViewportTransform([zoom, 0, 0, zoom, newX, newY]);
+        canvas.setViewportTransform([zoom, 0, 0, zoom, newX, newY]);
     };
 
     destroy(): void {
@@ -89,7 +89,7 @@ export class TouchManager {
     };
 
     private readonly onDoubleTap = (ev: HammerInput): void => {
-        const { x, y } = this.floor.canvas.getScenePoint(ev.srcEvent);
+        const { x, y } = this.canvas.getScenePoint(ev.srcEvent);
         this.floor.onFloorDoubleTap([x, y]);
     };
 }
