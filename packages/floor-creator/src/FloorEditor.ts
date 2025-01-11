@@ -70,11 +70,6 @@ export class FloorEditor extends Floor {
         this.history.on("stateChange", () => {
             this.emit("historyChange");
         });
-        this.canvas.on("object:added", (e) => {
-            e.target.on("mouseup", () => {
-                this.onElementClick(e.target);
-            });
-        });
     }
 
     setBackgroundColor(color: string): void {
@@ -248,7 +243,7 @@ export class FloorEditor extends Floor {
             super.resize(this.containerWidth, this.containerHeight);
         }
 
-        await this.renderData(JSON.parse(jsonImport.json));
+        await this.renderJSONData(JSON.parse(jsonImport.json));
     }
 
     protected onElementClick = (obj: FabricObject): void => {

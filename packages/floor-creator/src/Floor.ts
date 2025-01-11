@@ -60,19 +60,18 @@ export abstract class Floor {
             skipOffscreen: true,
         });
         this.setScaling();
-        this.renderData(this.floorDoc.json);
+        this.renderJSONData(this.floorDoc.json);
 
         this.zoomManager = new FloorZoomManager(this);
 
         this.touchManager = new TouchManager(this);
-    }
 
-    elementReviver = (_: Record<string, unknown>, object: FabricObject): void => {
-        object.on("mouseup", () => {
-            this.onElementClick(object);
+        this.canvas.on("object:added", (e) => {
+            e.target.on("mouseup", () => {
+                this.onElementClick(e.target);
+            });
         });
-        this.setElementProperties(object);
-    };
+    }
 
     setObjectCoords(): void {
         this.canvas.forEachObject(function (object) {
@@ -89,19 +88,16 @@ export abstract class Floor {
         this.setObjectCoords();
     }
 
-    renderData(jsonData?: FloorData["json"]): Promise<void> {
+    async renderJSONData(jsonData?: FloorData["json"]): Promise<void> {
         if (!jsonData) {
-            return Promise.resolve();
+            return;
         }
-        return (
-            this.canvas
-                // @ts-expect-error -- figure this out, our type might not be accurate
-                .loadFromJSON(jsonData, this.elementReviver)
-                .then(() => {
-                    this.emit("rendered");
-                    return this.canvas.requestRenderAll();
-                })
-        );
+        const canvas = await this.canvas.loadFromJSON(jsonData, (_, object) => {
+            this.setElementProperties(object as FabricObject);
+        });
+
+        this.emit("rendered");
+        return canvas.requestRenderAll();
     }
 
     getTableByLabel(tableLabel: string): BaseTable | undefined {

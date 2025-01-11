@@ -82,7 +82,7 @@ describe("FloorEditor", () => {
         });
 
         it("does not call renderData when updating dimensions", () => {
-            const renderDataSpy = vi.spyOn(floorEditor, "renderData");
+            const renderDataSpy = vi.spyOn(floorEditor, "renderJSONData");
 
             floorEditor.updateDimensions(800, 800);
 
