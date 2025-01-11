@@ -70,6 +70,11 @@ export class FloorEditor extends Floor {
         this.history.on("stateChange", () => {
             this.emit("historyChange");
         });
+        this.canvas.on("object:added", (e) => {
+            e.target.on("mouseup", () => {
+                this.onElementClick(e.target);
+            });
+        });
     }
 
     setBackgroundColor(color: string): void {
@@ -166,9 +171,7 @@ export class FloorEditor extends Floor {
 
     addElement(options: CreateElementOptions): void {
         const element = this.elementManager.addElement(options);
-        element.on("mouseup", () => {
-            this.onElementClick(element);
-        });
+
         this.setElementProperties(element);
         this.canvas.add(element);
     }
@@ -181,9 +184,6 @@ export class FloorEditor extends Floor {
             cloned.set({
                 left: cloned.left + 10,
                 top: cloned.top + 10,
-            });
-            cloned.on("mouseup", () => {
-                this.onElementClick(cloned);
             });
             if (cloned instanceof ActiveSelection) {
                 cloned.canvas = this.canvas;
