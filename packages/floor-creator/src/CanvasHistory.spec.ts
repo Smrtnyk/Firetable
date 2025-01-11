@@ -4,7 +4,7 @@ import { RectTable } from "./elements/RectTable.js";
 import { FloorElementTypes } from "./types.js";
 import { describe, expect, it } from "vitest";
 import { ActiveSelection } from "fabric";
-import { delay, last } from "es-toolkit";
+import { delay, last, range } from "es-toolkit";
 
 interface TablePosition {
     left: number;
@@ -216,15 +216,24 @@ describe("CanvasHistory", () => {
         const { floor } = setupTestFloor();
         const table = await addTable(floor, { left: 100, top: 100 }, "T1");
 
-        // Simulate rapid movements
-        const movements = Array.from({ length: 5 }, (_, i) => ({
+        const movements = range(5).map((i) => ({
             left: 100 + i * 50,
             top: 100,
         }));
 
-        await Promise.all(movements.map((pos) => moveTable(floor, table, pos)));
+        await Promise.all(
+            movements.map(function (pos) {
+                return moveTable(floor, table, pos);
+            }),
+        );
 
-        expect(table.left).toBe(last(movements)!.left);
+        expect(table.left).toBe(movements.at(-1)!.left);
+        let undoCount = 0;
+        while (floor.canUndo()) {
+            await floor.undo();
+            undoCount++;
+        }
+        expect(undoCount).toBe(5);
     });
 
     it("treats the loaded initial state as saved when initialize calls markAsSaved()", async () => {

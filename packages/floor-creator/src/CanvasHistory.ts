@@ -2,6 +2,7 @@ import type { FloorEditor } from "./FloorEditor.js";
 import type { FabricObject, TFiller } from "fabric";
 import { EventEmitter } from "@posva/event-emitter";
 import { delay, isEqual, once } from "es-toolkit";
+import { Mutex } from "async-mutex";
 
 interface HistoryState {
     width: number;
@@ -45,6 +46,7 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
         this.markAsSaved();
     });
 
+    private readonly mutex = new Mutex();
     private readonly floor: FloorEditor;
     private readonly maxStackSize: number;
     private lastSavedJson: string;
@@ -123,42 +125,46 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
         return this.redoStack.length > 0;
     }
 
-    async undo(): Promise<void> {
-        if (!this.canUndo()) {
-            return;
-        }
+    undo(): Promise<void> {
+        return this.mutex.runExclusive(async () => {
+            if (!this.canUndo()) {
+                return;
+            }
 
-        const currentState = this.undoStack.pop();
-        if (!currentState) {
-            return;
-        }
+            const currentState = this.undoStack.pop();
+            if (!currentState) {
+                return;
+            }
 
-        this.redoStack.push(currentState);
-        if (this.redoStack.length > this.maxStackSize) {
-            this.redoStack.shift();
-        }
+            this.redoStack.push(currentState);
+            if (this.redoStack.length > this.maxStackSize) {
+                this.redoStack.shift();
+            }
 
-        const previousState = this.undoStack[this.undoStack.length - 1];
+            const previousState = this.undoStack[this.undoStack.length - 1];
 
-        await this.loadState(previousState);
+            await this.loadState(previousState);
+        });
     }
 
-    async redo(): Promise<void> {
-        if (!this.canRedo()) {
-            return;
-        }
+    redo(): Promise<void> {
+        return this.mutex.runExclusive(async () => {
+            if (!this.canRedo()) {
+                return;
+            }
 
-        const nextState = this.redoStack.pop();
-        if (!nextState) {
-            return;
-        }
+            const nextState = this.redoStack.pop();
+            if (!nextState) {
+                return;
+            }
 
-        this.undoStack.push(nextState);
-        if (this.undoStack.length > this.maxStackSize) {
-            this.undoStack.shift();
-        }
+            this.undoStack.push(nextState);
+            if (this.undoStack.length > this.maxStackSize) {
+                this.undoStack.shift();
+            }
 
-        await this.loadState(nextState);
+            await this.loadState(nextState);
+        });
     }
 
     clear(): void {
