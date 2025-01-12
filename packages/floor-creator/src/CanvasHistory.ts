@@ -1,5 +1,6 @@
 import type { FloorEditor } from "./FloorEditor.js";
 import type { FabricObject, TFiller } from "fabric";
+import { canvasToRender } from "./utils.js";
 import { EventEmitter } from "@posva/event-emitter";
 import { delay, isEqual, once } from "es-toolkit";
 import { Mutex } from "async-mutex";
@@ -247,12 +248,7 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
 
             this.floor.renderGrid();
 
-            // Wait for the canvas to finish rendering
-            await new Promise<unknown>((resolve) => {
-                this.floor.canvas.requestRenderAll();
-                this.floor.canvas.once("after:render", resolve);
-            });
-
+            await canvasToRender(this.floor.canvas);
             // Additional wait to ensure all object events have fired
             await delay(0);
         } finally {

@@ -97,7 +97,7 @@ export abstract class Floor {
         });
 
         this.emit("rendered");
-        return canvas.requestRenderAll();
+        canvas.requestRenderAll();
     }
 
     getTableByLabel(tableLabel: string): BaseTable | undefined {

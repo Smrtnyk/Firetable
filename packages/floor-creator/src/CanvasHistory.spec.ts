@@ -2,6 +2,7 @@ import type { FabricObject } from "fabric";
 import { FloorEditor } from "./FloorEditor.js";
 import { RectTable } from "./elements/RectTable.js";
 import { FloorElementTypes } from "./types.js";
+import { canvasToRender } from "./utils";
 import { describe, expect, it } from "vitest";
 import { ActiveSelection } from "fabric";
 import { delay, last, range } from "es-toolkit";
@@ -479,10 +480,7 @@ async function moveTable(
 }
 
 async function waitForCanvasRender(floor: FloorEditor): Promise<void> {
-    await new Promise<void>((resolve) => {
-        floor.canvas.requestRenderAll();
-        floor.canvas.once("after:render", () => resolve());
-    });
+    await canvasToRender(floor.canvas);
     await delay(0);
 }
 

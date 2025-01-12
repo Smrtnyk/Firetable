@@ -1,4 +1,4 @@
-import type { FabricObject } from "fabric";
+import type { Canvas, FabricObject } from "fabric";
 
 export function calculateCanvasScale(
     containerWidth: number,
@@ -33,4 +33,11 @@ export function setDimensions(
     object.canvas?.fire("object:modified", { target: object });
 
     object.canvas?.requestRenderAll();
+}
+
+export async function canvasToRender(canvas: Canvas): Promise<void> {
+    await new Promise<unknown>(function (resolve) {
+        canvas.requestRenderAll();
+        canvas.once("after:render", resolve);
+    });
 }
