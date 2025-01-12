@@ -239,14 +239,11 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
         this.isHistoryProcessing = true;
 
         try {
-            await this.floor.importFloor(
-                {
-                    width: state.width,
-                    height: state.height,
-                    json: state.json,
-                },
-                true,
-            );
+            await this.floor.importFloor({
+                width: state.width,
+                height: state.height,
+                json: state.json,
+            });
 
             this.floor.renderGrid();
 

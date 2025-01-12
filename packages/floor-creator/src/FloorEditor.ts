@@ -240,16 +240,11 @@ export class FloorEditor extends Floor {
         this.gridDrawer.drawGrid(this.width, this.height);
     }
 
-    async importFloor(
-        jsonImport: { width: number; height: number; json: string },
-        preserveZoom = false,
-    ): Promise<void> {
+    async importFloor(jsonImport: { width: number; height: number; json: string }): Promise<void> {
         this.width = jsonImport.width;
         this.height = jsonImport.height;
 
-        if (!preserveZoom) {
-            super.resize(this.containerWidth, this.containerHeight);
-        }
+        super.resize(this.containerWidth, this.containerHeight);
 
         await this.renderJSONData(JSON.parse(jsonImport.json));
     }

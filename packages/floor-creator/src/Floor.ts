@@ -128,6 +128,7 @@ export abstract class Floor {
         );
         this.setScaling();
         this.zoomManager.setScale(this.scale);
+        this.zoomManager.resetZoom();
     }
 
     abstract onFloorDoubleTap(coordinates: [x: number, y: number]): void;
