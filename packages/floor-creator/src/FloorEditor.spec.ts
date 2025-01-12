@@ -59,25 +59,18 @@ describe("FloorEditor", () => {
                 label: "Test Table",
             });
 
-            // Modify the element (optional)
             const table = floorEditor.canvas.getObjects().find(isTable);
             if (table) {
                 table.set("angle", 45);
             }
 
-            // Get the initial state of the canvas
             const initialObjects = floorEditor.canvas.getObjects().map((obj) => obj.toObject());
 
-            // Update dimensions
             floorEditor.updateDimensions(800, 800);
 
-            // Get the state of the canvas after updating dimensions
             const updatedObjects = floorEditor.canvas.getObjects().map((obj) => obj.toObject());
 
-            // The number of objects should be the same
             expect(updatedObjects.length).toBe(initialObjects.length);
-
-            // make sure added table element is unchanged
             expect(updatedObjects[1]).toEqual(initialObjects[1]);
         });
 

@@ -1,6 +1,12 @@
-import type { Canvas, Point } from "fabric";
+import type { Canvas } from "fabric";
 import type { Floor } from "./Floor.js";
 import { DEFAULT_ZOOM, ZOOM_INCREMENT } from "./constants.js";
+import { Point } from "fabric";
+
+enum AbsoluteScale {
+    YES = 0,
+    NO = 1,
+}
 
 export class FloorZoomManager {
     isZooming = false;
@@ -29,9 +35,9 @@ export class FloorZoomManager {
         this.adjustZoom(1 - ZOOM_INCREMENT, point);
     }
 
-    adjustZoom(scaleFactor: number, point: Point): void {
+    adjustZoom(scale: number, point: Point, isAbsolute = AbsoluteScale.NO): void {
         const { canvas, floor, maxZoom, minZoom } = this;
-        let newZoom = canvas.getZoom() * scaleFactor;
+        let newZoom = isAbsolute === AbsoluteScale.YES ? scale : canvas.getZoom() * scale;
         if (newZoom > maxZoom) {
             newZoom = maxZoom;
         }
@@ -58,6 +64,11 @@ export class FloorZoomManager {
         }
         floor.setObjectCoords();
         this.isZooming = false;
+    }
+
+    resetZoom(): void {
+        const center = new Point(this.canvas.getWidth() / 2, this.canvas.getHeight() / 2);
+        this.adjustZoom(this.minZoom, center, AbsoluteScale.YES);
     }
 
     destroy(): void {

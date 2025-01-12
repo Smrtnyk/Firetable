@@ -199,8 +199,13 @@ export class FloorEditor extends Floor {
     };
 
     updateDimensions(newWidth: number, newHeight: number): void {
+        if (this.width === newWidth && this.height === newHeight) {
+            return;
+        }
+
         this.width = newWidth;
         this.height = newHeight;
+
         this.scale = calculateCanvasScale(
             this.containerWidth,
             this.containerHeight,
@@ -208,6 +213,9 @@ export class FloorEditor extends Floor {
             this.height,
         );
         this.setScaling();
+
+        this.zoomManager.resetZoom();
+
         this.canvas.requestRenderAll();
         this.renderGrid();
     }
