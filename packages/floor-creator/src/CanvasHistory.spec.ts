@@ -2,7 +2,7 @@ import type { FabricObject } from "fabric";
 import { FloorEditor } from "./FloorEditor.js";
 import { RectTable } from "./elements/RectTable.js";
 import { FloorElementTypes } from "./types.js";
-import { canvasToRender } from "./utils";
+import { canvasToRender } from "./utils.js";
 import { describe, expect, it } from "vitest";
 import { ActiveSelection } from "fabric";
 import { delay, last, range } from "es-toolkit";
