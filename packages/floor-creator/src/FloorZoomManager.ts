@@ -67,8 +67,7 @@ export class FloorZoomManager {
     }
 
     resetZoom(): void {
-        const center = new Point(this.canvas.getWidth() / 2, this.canvas.getHeight() / 2);
-        this.adjustZoom(this.minZoom, center, AbsoluteScale.YES);
+        this.adjustZoom(this.minZoom, new Point(0, 0), AbsoluteScale.YES);
     }
 
     destroy(): void {
