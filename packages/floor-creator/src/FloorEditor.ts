@@ -92,7 +92,7 @@ export class FloorEditor extends Floor {
     }
 
     export(): { width: number; height: number; json: string } {
-        const json = this.canvas.toDatalessJSON(["label", "name", "type"]);
+        const json = this.canvas.toDatalessJSON(["label", "name", "type", "width", "height"]);
         return {
             width: this.width,
             height: this.height,

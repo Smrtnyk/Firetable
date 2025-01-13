@@ -25,15 +25,19 @@ interface EmitEvents {
 const { floorInstance, canSave } = defineProps<Props>();
 const emit = defineEmits<EmitEvents>();
 
-const undoRedoState = reactive({
+const floorInstanceState = reactive({
     canUndo: false,
     canRedo: false,
+    width: floorInstance.width,
+    height: floorInstance.height,
 });
 
 onMounted(function () {
     floorInstance.on("historyChange", function () {
-        undoRedoState.canUndo = floorInstance.canUndo();
-        undoRedoState.canRedo = floorInstance.canRedo();
+        floorInstanceState.canUndo = floorInstance.canUndo();
+        floorInstanceState.canRedo = floorInstance.canRedo();
+        floorInstanceState.width = floorInstance.width;
+        floorInstanceState.height = floorInstance.height;
     });
 });
 
@@ -181,7 +185,7 @@ function updateBgColor(color: string): void {
                 :min="300"
                 :max="MAX_FLOOR_WIDTH"
                 :step="RESOLUTION"
-                :model-value="floorInstance.width"
+                :model-value="floorInstanceState.width"
                 @update:model-value="(event) => onFloorChange('width', event)"
                 standout
                 type="number"
@@ -194,7 +198,7 @@ function updateBgColor(color: string): void {
                 :max="MAX_FLOOR_HEIGHT"
                 :step="RESOLUTION"
                 @update:model-value="(event) => onFloorChange('height', event)"
-                :model-value="floorInstance.height"
+                :model-value="floorInstanceState.height"
                 standout
                 type="number"
                 label="Floor height"
@@ -206,7 +210,7 @@ function updateBgColor(color: string): void {
                     flat
                     padding="md"
                     title="Undo"
-                    :disabled="!undoRedoState.canUndo"
+                    :disabled="!floorInstanceState.canUndo"
                     @click="undoAction"
                     icon="undo"
                 />
@@ -214,7 +218,7 @@ function updateBgColor(color: string): void {
                     flat
                     padding="md"
                     title="Redo"
-                    :disabled="!undoRedoState.canRedo"
+                    :disabled="!floorInstanceState.canRedo"
                     @click="redoAction"
                     icon="redo"
                 />

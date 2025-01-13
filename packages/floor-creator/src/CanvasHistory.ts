@@ -142,7 +142,10 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
                 this.redoStack.shift();
             }
 
-            const previousState = this.undoStack[this.undoStack.length - 1];
+            const previousState = this.undoStack.at(-1);
+            if (!previousState) {
+                return;
+            }
 
             await this.loadState(previousState);
         });
@@ -207,7 +210,7 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
         }
 
         const currentJson = this.getCanvasState();
-        const lastState = this.undoStack[this.undoStack.length - 1];
+        const lastState = this.undoStack.at(-1);
 
         if (lastState && this.areStatesEqual(lastState.json, currentJson)) {
             // Don't save if nothing has changed
@@ -263,10 +266,14 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
         const obj2 = JSON.parse(json2);
 
         const normalized1 = {
+            width: obj1.width,
+            height: obj1.height,
             background: obj1.background,
             objects: CanvasHistory.normalize(obj1.objects),
         };
         const normalized2 = {
+            width: obj2.width,
+            height: obj2.height,
             background: obj2.background,
             objects: CanvasHistory.normalize(obj2.objects),
         };
