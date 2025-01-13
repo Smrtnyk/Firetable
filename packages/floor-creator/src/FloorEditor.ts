@@ -91,8 +91,8 @@ export class FloorEditor extends Floor {
         this.history.markAsSaved();
     }
 
-    export(): { width: number; height: number; json: string } {
-        const json = this.canvas.toDatalessJSON(["label", "name", "type"]);
+    export(additionalFields: string[] = []): { width: number; height: number; json: string } {
+        const json = this.canvas.toDatalessJSON(["label", "name", "type", ...additionalFields]);
         return {
             width: this.width,
             height: this.height,

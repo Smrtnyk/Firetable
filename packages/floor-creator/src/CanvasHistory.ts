@@ -33,13 +33,23 @@ interface NormalizedCanvasObject {
     objects?: NormalizedCanvasObject[];
 }
 
+const ADDITIONAL_FIELDS_TO_TRACK = [
+    "left",
+    "top",
+    "width",
+    "height",
+    "scaleX",
+    "scaleY",
+    "angle",
+    "fill",
+    "stroke",
+    "baseFill",
+];
+
 export class CanvasHistory extends EventEmitter<HistoryEvents> {
     initialize = once((): void => {
         // Save initial state without triggering events
-        const initialState: HistoryState = {
-            ...this.floor.export(),
-            timestamp: Date.now(),
-        };
+        const initialState: HistoryState = this.getCanvasState();
         this.undoStack = [initialState];
 
         this.attachEventListeners();
@@ -178,26 +188,8 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
     }
 
     private getCanvasState(): HistoryState {
-        const json = this.floor.canvas.toDatalessJSON([
-            "label",
-            "name",
-            "type",
-            "left",
-            "top",
-            "width",
-            "height",
-            "scaleX",
-            "scaleY",
-            "angle",
-            "fill",
-            "stroke",
-            "baseFill",
-        ]);
-
         return {
-            json: JSON.stringify(json),
-            width: this.floor.width,
-            height: this.floor.height,
+            ...this.floor.export(ADDITIONAL_FIELDS_TO_TRACK),
             timestamp: Date.now(),
         };
     }
