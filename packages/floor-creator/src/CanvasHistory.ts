@@ -50,7 +50,7 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
     private readonly mutex = new Mutex();
     private readonly floor: FloorEditor;
     private readonly maxStackSize: number;
-    private lastSavedJson: string;
+    private lastSavedJson: HistoryState;
     private isDirty: boolean;
     private undoStack: HistoryState[];
     private redoStack: HistoryState[];
@@ -177,7 +177,7 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
         this.emit("stateChange");
     }
 
-    private getCanvasState(): string {
+    private getCanvasState(): HistoryState {
         const json = this.floor.canvas.toDatalessJSON([
             "label",
             "name",
@@ -193,7 +193,13 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
             "stroke",
             "baseFill",
         ]);
-        return JSON.stringify(json);
+
+        return {
+            json: JSON.stringify(json),
+            width: this.floor.width,
+            height: this.floor.height,
+            timestamp: Date.now(),
+        };
     }
 
     private attachEventListeners(): void {
@@ -209,26 +215,19 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
             return;
         }
 
-        const currentJson = this.getCanvasState();
+        const currentState: HistoryState = this.getCanvasState();
         const lastState = this.undoStack.at(-1);
 
-        if (lastState && this.areStatesEqual(lastState.json, currentJson)) {
+        if (lastState && this.areStatesEqual(lastState, currentState)) {
             // Don't save if nothing has changed
             return;
         }
 
-        this.saveState(currentJson);
+        this.saveState(currentState);
     }
 
-    private saveState(currentJson: string): void {
-        const state: HistoryState = {
-            width: this.floor.width,
-            height: this.floor.height,
-            json: currentJson,
-            timestamp: Date.now(),
-        };
-
-        this.undoStack.push(state);
+    private saveState(currentJson: HistoryState): void {
+        this.undoStack.push(currentJson);
         this.redoStack = [];
 
         if (this.undoStack.length > this.maxStackSize) {
@@ -256,26 +255,26 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
             await delay(0);
         } finally {
             this.isHistoryProcessing = false;
-            this.isDirty = !this.areStatesEqual(this.lastSavedJson, state.json);
+            this.isDirty = !this.areStatesEqual(this.lastSavedJson, state);
             this.emit("stateChange");
         }
     }
 
-    private areStatesEqual(json1: string, json2: string): boolean {
-        const obj1 = JSON.parse(json1);
-        const obj2 = JSON.parse(json2);
+    private areStatesEqual(state1: HistoryState, state2: HistoryState): boolean {
+        const json1 = JSON.parse(state1.json);
+        const json2 = JSON.parse(state2.json);
 
         const normalized1 = {
-            width: obj1.width,
-            height: obj1.height,
-            background: obj1.background,
-            objects: CanvasHistory.normalize(obj1.objects),
+            width: state1.width,
+            height: state1.height,
+            background: json1.background,
+            objects: CanvasHistory.normalize(json1.objects),
         };
         const normalized2 = {
-            width: obj2.width,
-            height: obj2.height,
-            background: obj2.background,
-            objects: CanvasHistory.normalize(obj2.objects),
+            width: state2.width,
+            height: state2.height,
+            background: json2.background,
+            objects: CanvasHistory.normalize(json2.objects),
         };
 
         return isEqual(normalized1, normalized2);
