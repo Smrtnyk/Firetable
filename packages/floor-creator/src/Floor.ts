@@ -12,6 +12,7 @@ import { Wall } from "./elements/Wall.js";
 import { RoundTable } from "./elements/RoundTable.js";
 import { EditableShape } from "./elements/EditableShape.js";
 import { FabricText, Canvas, classRegistry } from "fabric";
+import { matchesProperty } from "es-toolkit/compat";
 
 classRegistry.setClass(RectTable);
 classRegistry.setClass(RoundTable);
@@ -101,12 +102,7 @@ export abstract class Floor {
     }
 
     getTableByLabel(tableLabel: string): BaseTable | undefined {
-        return this.canvas.getObjects().find(function (object): object is BaseTable {
-            if (!isTable(object)) {
-                return false;
-            }
-            return object.label === tableLabel;
-        });
+        return this.canvas.getObjects().filter(isTable).find(matchesProperty("label", tableLabel));
     }
 
     clearAllReservations(): void {
