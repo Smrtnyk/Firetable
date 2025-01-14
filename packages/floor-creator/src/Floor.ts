@@ -5,7 +5,6 @@ import { CANVAS_BG_COLOR, DEFAULT_FONT } from "./constants.js";
 import { TouchManager } from "./TouchManager.js";
 import { FloorZoomManager } from "./FloorZoomManager.js";
 import { calculateCanvasScale } from "./utils.js";
-import { isTable } from "./type-guards.js";
 import { getTables } from "./filters.js";
 import { RectTable } from "./elements/RectTable.js";
 import { Wall } from "./elements/Wall.js";
@@ -102,7 +101,7 @@ export abstract class Floor {
     }
 
     getTableByLabel(tableLabel: string): BaseTable | undefined {
-        return this.canvas.getObjects().filter(isTable).find(matchesProperty("label", tableLabel));
+        return getTables(this).find(matchesProperty("label", tableLabel));
     }
 
     clearAllReservations(): void {
