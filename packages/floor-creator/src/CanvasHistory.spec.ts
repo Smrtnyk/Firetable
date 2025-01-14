@@ -467,6 +467,59 @@ describe("CanvasHistory", () => {
 
         expect(floor.isDirty()).toBe(false);
     });
+
+    it("handles floor dimension changes in undo/redo", async () => {
+        const { floor } = setupTestFloor();
+        floor.markAsSaved();
+        expect(floor.isDirty()).toBe(false);
+
+        floor.updateDimensions(600, 400);
+        await waitForCanvasRender(floor);
+
+        expect(floor.isDirty()).toBe(true);
+        expect(floor.width).toBe(600);
+        expect(floor.height).toBe(400);
+
+        await floor.undo();
+        expect(floor.width).toBe(500);
+        expect(floor.height).toBe(500);
+        expect(floor.isDirty()).toBe(false);
+
+        await floor.redo();
+        expect(floor.width).toBe(600);
+        expect(floor.height).toBe(400);
+        expect(floor.isDirty()).toBe(true);
+    });
+
+    it("does not create new history if dimensions are unchanged", async () => {
+        const { floor } = setupTestFloor();
+        floor.markAsSaved();
+        expect(floor.isDirty()).toBe(false);
+
+        floor.updateDimensions(500, 500);
+        await waitForCanvasRender(floor);
+
+        expect(floor.isDirty()).toBe(false);
+        expect(floor.canUndo()).toBe(false);
+    });
+
+    it("handles partial dimension changes (e.g., just width)", async () => {
+        const { floor } = setupTestFloor();
+        floor.markAsSaved();
+        expect(floor.isDirty()).toBe(false);
+
+        floor.updateDimensions(600, 500);
+        await waitForCanvasRender(floor);
+
+        expect(floor.isDirty()).toBe(true);
+        expect(floor.width).toBe(600);
+        expect(floor.height).toBe(500);
+
+        await floor.undo();
+        expect(floor.width).toBe(500);
+        expect(floor.height).toBe(500);
+        expect(floor.isDirty()).toBe(false);
+    });
 });
 
 async function moveTable(
