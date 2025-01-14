@@ -3,7 +3,6 @@ import type { RectTable } from "./elements/RectTable.js";
 import { FloorEditor } from "./FloorEditor.js";
 import { FloorElementTypes } from "./types.js";
 import { canvasToRender } from "./utils.js";
-import { getTables } from "./filters.js";
 import { describe, expect, it } from "vitest";
 import { ActiveSelection } from "fabric";
 import { delay, last, range } from "es-toolkit";
@@ -62,7 +61,7 @@ describe("CanvasHistory", () => {
             y: 100,
         });
 
-        const table = findTable(floor, "T1");
+        const table = floor.getTableByLabel("T1");
         const originalLeft = table.left;
 
         table.set({ left: 200 });
@@ -74,7 +73,7 @@ describe("CanvasHistory", () => {
 
         await floor.undo();
 
-        const tableAfterUndo = findTable(floor, "T1");
+        const tableAfterUndo = floor.getTableByLabel("T1");
         expect(tableAfterUndo.left).toBe(originalLeft);
     });
 
@@ -95,7 +94,7 @@ describe("CanvasHistory", () => {
 
         await delay(0);
 
-        const table1 = findTable(floor, "T1");
+        const table1 = floor.getTableByLabel("T1");
         table1.set({ left: 300 });
         floor.canvas.fire("object:modified", { target: table1 });
 
@@ -119,7 +118,7 @@ describe("CanvasHistory", () => {
             y: 100,
         });
 
-        const table = findTable(floor, "T1");
+        const table = floor.getTableByLabel("T1");
         const positions = [200, 300, 400].map((x) => ({ left: x, top: table.top }));
 
         // Move table to different positions
@@ -150,7 +149,7 @@ describe("CanvasHistory", () => {
             x: 100,
             y: 100,
         });
-        const table = findTable(floor, "T1");
+        const table = floor.getTableByLabel("T1");
 
         for (const i of range(30)) {
             table.set({ left: 100 + i * 10 });
@@ -183,8 +182,8 @@ describe("CanvasHistory", () => {
         });
 
         await floor.undo();
-        expect(findTable(floor, "T1").left).toBe(100);
-        expect(findTable(floor, "T2").left).toBe(200);
+        expect(floor.getTableByLabel("T1").left).toBe(100);
+        expect(floor.getTableByLabel("T2").left).toBe(200);
     });
 
     it("handles element rotation", async () => {
@@ -208,7 +207,7 @@ describe("CanvasHistory", () => {
         table.setCoords();
         await waitForCanvasRender(floor);
 
-        expect(findTable(floor, "T1").angle).toBe(originalAngle);
+        expect(floor.getTableByLabel("T1").angle).toBe(originalAngle);
     });
 
     it("handles rapid state changes", async () => {
@@ -268,7 +267,7 @@ describe("CanvasHistory", () => {
         expect(floor.isDirty()).toBe(false);
 
         // Now let's move that pre-existing table from (100, 100) to (120, 120)
-        const table = findTable(floor, "T1");
+        const table = floor.getTableByLabel("T1");
         table.set({ left: 120, top: 120 });
         floor.canvas.fire("object:modified", { target: table });
         await waitForCanvasRender(floor);
@@ -396,7 +395,7 @@ describe("CanvasHistory", () => {
         expect(floor.isDirty()).toBe(false);
 
         // Re-query the T1 object from the canvas, because the old reference is stale
-        const table1 = findTable(floor, "T1");
+        const table1 = floor.getTableByLabel("T1");
         table1.set({ left: 150 });
         table1.setCoords();
         floor.canvas.fire("object:modified", { target: table1 });
@@ -521,12 +520,6 @@ async function waitForCanvasRender(floor: FloorEditor): Promise<void> {
     await delay(0);
 }
 
-function findTable(floor: FloorEditor, label: string): RectTable {
-    return getTables(floor).find(function (object) {
-        return object.label === label;
-    })!;
-}
-
 async function addTable(
     floor: FloorEditor,
     position: TablePosition,
@@ -539,7 +532,7 @@ async function addTable(
         y: position.top,
     });
     await waitForCanvasRender(floor);
-    return findTable(floor, label);
+    return floor.getTableByLabel(label);
 }
 
 function setupTestFloor(): TestContext {
