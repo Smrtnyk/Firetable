@@ -152,8 +152,7 @@ describe("CanvasHistory", () => {
         });
         const table = findTable(floor, "T1");
 
-        // Create many states
-        for (let i = 0; i < 30; i++) {
+        for (const i of range(30)) {
             table.set({ left: 100 + i * 10 });
             floor.canvas.fire("object:modified", { target: table });
             await delay(0);
@@ -175,7 +174,6 @@ describe("CanvasHistory", () => {
         const table1 = await addTable(floor, { left: 100, top: 100 }, "T1");
         const table2 = await addTable(floor, { left: 200, top: 200 }, "T2");
 
-        // Select both and move
         floor.canvas.setActiveObject(
             new ActiveSelection([table1, table2], { canvas: floor.canvas }),
         );
@@ -184,7 +182,6 @@ describe("CanvasHistory", () => {
             top: 300,
         });
 
-        // Verify undo/redo works for group operations
         await floor.undo();
         expect(findTable(floor, "T1").left).toBe(100);
         expect(findTable(floor, "T2").left).toBe(200);
@@ -239,14 +236,12 @@ describe("CanvasHistory", () => {
     });
 
     it("treats the loaded initial state as saved when initialize calls markAsSaved()", async () => {
-        // Step 1: Set up a brand-new floor
         const { floor } = setupTestFloor();
 
         // Because we've put `markAsSaved()` inside `initialize()`,
         // the new floor is automatically considered 'clean'.
         expect(floor.isDirty()).toBe(false);
 
-        // Step 2: Make a change (add a table)
         floor.addElement({
             tag: FloorElementTypes.RECT_TABLE,
             label: "T1",
@@ -255,10 +250,8 @@ describe("CanvasHistory", () => {
         });
         await waitForCanvasRender(floor);
 
-        // After adding the table, isDirty should be true
         expect(floor.isDirty()).toBe(true);
 
-        // Step 3: Undo the addition
         await floor.undo();
 
         // Now we should be back to the initial state,
@@ -268,7 +261,6 @@ describe("CanvasHistory", () => {
     });
 
     it("treats the loaded non-empty floor as the saved baseline if initialize calls markAsSaved()", async () => {
-        // Set up a floor with an *existing* table in the JSON
         const { floor } = await setupTestFloorWithTableInJSON();
 
         // Right after constructor + initialize(), we expect isDirty=false
@@ -295,7 +287,6 @@ describe("CanvasHistory", () => {
     it("sets isDirty to true after an element is added", async () => {
         const { floor } = setupTestFloor();
 
-        // Initially, no changes
         expect(floor.isDirty()).toBe(false);
 
         floor.addElement({
@@ -332,12 +323,10 @@ describe("CanvasHistory", () => {
         floor.markAsSaved();
         expect(floor.isDirty()).toBe(false);
 
-        // Remove the table
         floor.canvas.remove(table);
         floor.canvas.fire("object:removed", { target: table });
         await waitForCanvasRender(floor);
 
-        // Should now be dirty again
         expect(floor.isDirty()).toBe(true);
     });
 
@@ -424,26 +413,20 @@ describe("CanvasHistory", () => {
     it("handles element fill changes", async () => {
         const { floor } = setupTestFloor();
 
-        // 1) Add a table and mark the current state as saved
         const table = await addTable(floor, { left: 100, top: 100 }, "T1");
         floor.markAsSaved();
         expect(floor.isDirty()).toBe(false);
 
-        // 2) Change the fill using setElementFill
         floor.setElementFill(table, "red");
         await waitForCanvasRender(floor);
 
-        // Changing the fill should mark the floor as dirty
         expect(floor.isDirty()).toBe(true);
         expect(floor.canUndo()).toBe(true);
 
-        // 3) Undo => fill should revert back to the original color
         await floor.undo();
         await waitForCanvasRender(floor);
-        // If the table had no fill originally, expect(table.fill).toBe(undefined) or whatever default is
         expect(floor.isDirty()).toBe(false);
 
-        // 4) Redo => fill should become red again
         await floor.redo();
         await waitForCanvasRender(floor);
         expect(floor.isDirty()).toBe(true);
