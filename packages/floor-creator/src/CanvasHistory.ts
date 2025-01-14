@@ -64,6 +64,8 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
     private isDirty: boolean;
     private undoStack: HistoryState[];
     private redoStack: HistoryState[];
+    // This flag is used to prevent new history entries from being added while
+    // undo or redo is in progress (e.g., to avoid infinite loops of state changes).
     private isHistoryProcessing: boolean;
     private isInitializing: boolean;
     private readonly handlers: {
