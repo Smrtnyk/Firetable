@@ -1,8 +1,9 @@
 import type { FabricObject } from "fabric";
+import type { RectTable } from "./elements/RectTable.js";
 import { FloorEditor } from "./FloorEditor.js";
-import { RectTable } from "./elements/RectTable.js";
 import { FloorElementTypes } from "./types.js";
 import { canvasToRender } from "./utils.js";
+import { getTables } from "./filters.js";
 import { describe, expect, it } from "vitest";
 import { ActiveSelection } from "fabric";
 import { delay, last, range } from "es-toolkit";
@@ -537,9 +538,9 @@ async function waitForCanvasRender(floor: FloorEditor): Promise<void> {
     await delay(0);
 }
 
-function findTable(floor: FloorEditor, label?: string): RectTable {
-    return floor.canvas.getObjects().find(function (object): object is RectTable {
-        return object instanceof RectTable && (!label || object.label === label);
+function findTable(floor: FloorEditor, label: string): RectTable {
+    return getTables(floor).find(function (object) {
+        return object.label === label;
     })!;
 }
 
