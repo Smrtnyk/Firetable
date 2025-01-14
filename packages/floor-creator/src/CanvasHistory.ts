@@ -1,5 +1,5 @@
 import type { FloorEditor } from "./FloorEditor.js";
-import type { FabricObject, TFiller } from "fabric";
+import type { FabricObject } from "fabric";
 import { canvasToRender } from "./utils.js";
 import { EventEmitter } from "@posva/event-emitter";
 import { delay, isEqual, once } from "es-toolkit";
@@ -28,23 +28,10 @@ interface NormalizedCanvasObject {
     scaleX: number;
     scaleY: number;
     angle: number;
-    fill: TFiller | string | null;
-    stroke: TFiller | string | null;
+    fill: FabricObject["fill"];
+    stroke: FabricObject["stroke"];
     objects?: NormalizedCanvasObject[];
 }
-
-const ADDITIONAL_FIELDS_TO_TRACK = [
-    "left",
-    "top",
-    "width",
-    "height",
-    "scaleX",
-    "scaleY",
-    "angle",
-    "fill",
-    "stroke",
-    "baseFill",
-];
 
 export class CanvasHistory extends EventEmitter<HistoryEvents> {
     initialize = once((): void => {
@@ -191,7 +178,18 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
 
     private getCanvasState(): HistoryState {
         return {
-            ...this.floor.export(ADDITIONAL_FIELDS_TO_TRACK),
+            ...this.floor.export([
+                "left",
+                "top",
+                "width",
+                "height",
+                "scaleX",
+                "scaleY",
+                "angle",
+                "fill",
+                "stroke",
+                "baseFill",
+            ]),
             timestamp: Date.now(),
         };
     }
