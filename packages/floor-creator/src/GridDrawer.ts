@@ -1,4 +1,4 @@
-import type { Canvas } from "fabric";
+import type { Canvas, FabricObject } from "fabric";
 import { RESOLUTION } from "./constants.js";
 import { Line, Group } from "fabric";
 import { has } from "es-toolkit/compat";
@@ -9,9 +9,6 @@ declare module "fabric" {
         isGridLine?: boolean;
     }
     interface Group {
-        isGridLine?: boolean;
-    }
-    interface FabricObject {
         isGridLine?: boolean;
     }
 }
@@ -51,6 +48,12 @@ export class GridDrawer {
         this.isGridVisible = !this.isGridVisible;
     }
 
+    requestGridDraw(width: number, height: number): void {
+        if (this.isGridVisible && this.getGridLines().length === 0) {
+            this.drawGrid(width, height);
+        }
+    }
+
     clearGrid(): void {
         const { canvas } = this;
         canvas
@@ -62,6 +65,12 @@ export class GridDrawer {
                 canvas.remove(obj);
             });
         canvas.requestRenderAll();
+    }
+
+    private getGridLines(): FabricObject[] {
+        return this.canvas.getObjects().filter(function (obj) {
+            return has(obj, "isGridLine");
+        });
     }
 
     private createGridLines(

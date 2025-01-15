@@ -9,7 +9,7 @@ export function getObjectsByTarget(target: FabricObject): Set<FabricObject> {
     const children = target instanceof ActiveSelection ? target.getObjects() : [target];
 
     canvas.forEachObject((o) => {
-        if (o.isGridLine) {
+        if ((o as any).isGridLine) {
             return;
         }
         if (!o.isOnScreen()) return;

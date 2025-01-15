@@ -22,13 +22,13 @@
         "firebase-functions": "6.2.0"
     },
     "devDependencies": {
-        "@faker-js/faker": "9.3.0",
+        "@faker-js/faker": "9.4.0",
         "@firebase/app-types": "0.9.3",
         "@firebase/rules-unit-testing": "4.0.1",
-        "@types/node": "22.10.5",
+        "@types/node": "22.10.6",
         "cac": "6.7.14",
         "tinyrainbow": "2.0.0",
-        "vitest": "https://pkg.pr.new/vitest@e89c369"
+        "vitest": "https://pkg.pr.new/vitest@b526896"
     },
     "private": true
 }
