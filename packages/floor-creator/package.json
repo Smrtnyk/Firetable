@@ -25,7 +25,7 @@
     },
     "devDependencies": {
         "@types/hammerjs": "2.0.46",
-        "@types/node": "22.10.6",
+        "@types/node": "22.10.7",
         "@vitest/browser": "catalog:",
         "vitest": "catalog:"
     },
