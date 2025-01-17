@@ -11,6 +11,7 @@ export * from "./db-inventory.js";
 
 export * from "./db-events/guest-list.js";
 export * from "./db-events/logs.js";
+export * from "./db-events/structured-logs.js";
 export * from "./db-events/events.js";
 export * from "./db-events/reservations.js";
 export * from "./db-drink-cards.js";
