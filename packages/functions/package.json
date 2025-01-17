@@ -28,7 +28,7 @@
         "@types/node": "22.10.7",
         "cac": "6.7.14",
         "tinyrainbow": "2.0.0",
-        "vitest": "https://pkg.pr.new/vitest@537fa5e"
+        "vitest": "https://pkg.pr.new/vitest@f17918a"
     },
     "private": true
 }
