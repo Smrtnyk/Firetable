@@ -1,8 +1,6 @@
-import type { MockInstance } from "vitest";
 import type { FloorCreationOptions } from "./types.js";
 import { FloorElementTypes } from "./types.js";
 import { FloorEditor } from "./FloorEditor.js";
-import { GridDrawer } from "./GridDrawer.js";
 import { isTable } from "./type-guards.js";
 import { RectTable } from "./elements/RectTable.js";
 import { describe, it, expect, beforeEach, vi } from "vitest";
@@ -11,7 +9,6 @@ import { Group } from "fabric";
 describe("FloorEditor", () => {
     let floorEditor: FloorEditor;
     let canvasElement: HTMLCanvasElement;
-    let gridDrawerSpy: MockInstance<typeof GridDrawer.prototype.drawGrid>;
 
     beforeEach(async () => {
         canvasElement = document.createElement("canvas");
@@ -28,18 +25,10 @@ describe("FloorEditor", () => {
             containerHeight: 1000,
         };
 
-        gridDrawerSpy = vi.spyOn(GridDrawer.prototype, "drawGrid");
-
         floorEditor = new FloorEditor(options);
 
         await new Promise((resolve) => {
             floorEditor.on("rendered", resolve);
-        });
-    });
-
-    describe("constructor()", () => {
-        it("should render the initial grid", () => {
-            expect(gridDrawerSpy).toHaveBeenCalled();
         });
     });
 
@@ -142,8 +131,8 @@ describe("FloorEditor", () => {
             expect(floorEditor.gridDrawer.isGridVisible).toBe(!initialVisibility);
         });
 
-        it("re-renders grid after updating dimensions", () => {
-            const spy = vi.spyOn(floorEditor, "renderGrid");
+        it("re-renders grid if needed after updating dimensions", () => {
+            const spy = vi.spyOn(floorEditor, "requestGridRender");
             floorEditor.updateDimensions(500, 500);
             expect(spy).toHaveBeenCalled();
         });

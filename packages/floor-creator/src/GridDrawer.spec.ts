@@ -11,8 +11,8 @@ describe("GridDrawer", () => {
         gridDrawer = new GridDrawer(canvas);
     });
 
-    it("should be initialized with grid visibility set to true", () => {
-        expect(gridDrawer.isGridVisible).toBe(true);
+    it("should be initialized with grid visibility set to false", () => {
+        expect(gridDrawer.isGridVisible).toBe(false);
     });
 
     it("should draw grid lines on the canvas", () => {
@@ -25,12 +25,12 @@ describe("GridDrawer", () => {
     describe("Grid Toggling", () => {
         it("should toggle the grid visibility", () => {
             gridDrawer.toggleGridVisibility(1000, 1000);
-            expect(gridDrawer.isGridVisible).toBe(false);
-            expect(canvas.getObjects().length).toBe(0);
-
-            gridDrawer.toggleGridVisibility(1000, 1000);
             expect(gridDrawer.isGridVisible).toBe(true);
             expect(canvas.getObjects().length).toBe(1);
+
+            gridDrawer.toggleGridVisibility(1000, 1000);
+            expect(gridDrawer.isGridVisible).toBe(false);
+            expect(canvas.getObjects().length).toBe(0);
         });
     });
 

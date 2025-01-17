@@ -1,7 +1,6 @@
 import type { FloorEditor } from "./FloorEditor.js";
 import type { FabricObject } from "fabric";
 import { canvasToRender } from "./utils.js";
-import { EventEmitter } from "@posva/event-emitter";
 import { delay, isEqual, once } from "es-toolkit";
 import { Mutex } from "async-mutex";
 
@@ -16,10 +15,6 @@ interface CanvasHistoryOptions {
     maxStackSize?: number;
 }
 
-type HistoryEvents = {
-    stateChange: [];
-};
-
 interface NormalizedCanvasObject {
     left: number;
     top: number;
@@ -33,7 +28,7 @@ interface NormalizedCanvasObject {
     objects?: NormalizedCanvasObject[];
 }
 
-export class CanvasHistory extends EventEmitter<HistoryEvents> {
+export class CanvasHistory {
     initialize = once((): void => {
         // Save initial state without triggering events
         const initialState: HistoryState = this.getCanvasState();
@@ -62,7 +57,6 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
     };
 
     constructor(floor: FloorEditor, options: CanvasHistoryOptions = {}) {
-        super();
         this.floor = floor;
         this.maxStackSize = options.maxStackSize ?? 20;
         this.undoStack = [];
@@ -105,7 +99,7 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
     markAsSaved(): void {
         this.lastSavedJson = this.getCanvasState();
         this.isDirty = false;
-        this.emit("stateChange");
+        this.floor.emit("historyChange");
     }
 
     hasUnsavedChanges(): boolean {
@@ -173,7 +167,7 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
     clear(): void {
         this.undoStack = [];
         this.redoStack = [];
-        this.emit("stateChange");
+        this.floor.emit("historyChange");
     }
 
     private getCanvasState(): HistoryState {
@@ -227,7 +221,7 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
         }
 
         this.isDirty = !this.areStatesEqual(this.lastSavedJson, currentJson);
-        this.emit("stateChange");
+        this.floor.emit("historyChange");
     }
 
     private async loadState(state: HistoryState): Promise<void> {
@@ -240,7 +234,7 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
                 json: state.json,
             });
 
-            this.floor.renderGrid();
+            this.floor.requestGridRender();
 
             await canvasToRender(this.floor.canvas);
             // Additional wait to ensure all object events have fired
@@ -248,7 +242,7 @@ export class CanvasHistory extends EventEmitter<HistoryEvents> {
         } finally {
             this.isHistoryProcessing = false;
             this.isDirty = !this.areStatesEqual(this.lastSavedJson, state);
-            this.emit("stateChange");
+            this.floor.emit("historyChange");
         }
     }
 

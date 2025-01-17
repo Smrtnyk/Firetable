@@ -23,7 +23,7 @@ const LINE_OPTION = {
 };
 
 export class GridDrawer {
-    isGridVisible = true;
+    isGridVisible = false;
     private readonly canvas: Canvas;
 
     constructor(canvas: Canvas) {
@@ -56,14 +56,9 @@ export class GridDrawer {
 
     clearGrid(): void {
         const { canvas } = this;
-        canvas
-            .getObjects()
-            .filter(function (obj) {
-                return has(obj, "isGridLine");
-            })
-            .forEach(function (obj) {
-                canvas.remove(obj);
-            });
+        this.getGridLines().forEach(function (obj) {
+            canvas.remove(obj);
+        });
         canvas.requestRenderAll();
     }
 

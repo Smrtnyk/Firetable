@@ -31,10 +31,10 @@ describe("CanvasHistory", () => {
         await moveTable(floor, table, { left: 200, top: 200 });
 
         await floor.undo();
-        expect(floor.gridDrawer.isGridVisible).toBe(true);
+        expect(floor.gridDrawer.isGridVisible).toBe(false);
 
         await floor.redo();
-        expect(floor.gridDrawer.isGridVisible).toBe(true);
+        expect(floor.gridDrawer.isGridVisible).toBe(false);
     });
 
     it("tracks element addition", async () => {

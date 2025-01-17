@@ -65,11 +65,7 @@ export class FloorEditor extends Floor {
     }
 
     setupOnRendered(): void {
-        this.renderGrid();
         this.history.initialize();
-        this.history.on("stateChange", () => {
-            this.emit("historyChange");
-        });
     }
 
     setBackgroundColor(color: string): void {
@@ -216,8 +212,9 @@ export class FloorEditor extends Floor {
 
         this.zoomManager.resetZoom();
 
+        this.canvas.fire("object:modified");
         this.canvas.requestRenderAll();
-        this.renderGrid();
+        this.requestGridRender();
     }
 
     setFloorName(newName: string): void {
@@ -236,8 +233,8 @@ export class FloorEditor extends Floor {
         await this.canvas.dispose();
     }
 
-    renderGrid(): void {
-        this.gridDrawer.drawGrid(this.width, this.height);
+    requestGridRender(): void {
+        this.gridDrawer.requestGridDraw(this.width, this.height);
     }
 
     async importFloor(jsonImport: { width: number; height: number; json: string }): Promise<void> {
