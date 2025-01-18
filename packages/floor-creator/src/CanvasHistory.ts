@@ -8,7 +8,6 @@ interface HistoryState {
     width: number;
     height: number;
     json: string;
-    timestamp: number;
 }
 
 interface CanvasHistoryOptions {
@@ -184,7 +183,6 @@ export class CanvasHistory {
                 "stroke",
                 "baseFill",
             ]),
-            timestamp: Date.now(),
         };
     }
 
