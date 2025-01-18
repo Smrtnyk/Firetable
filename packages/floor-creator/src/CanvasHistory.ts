@@ -27,12 +27,12 @@ interface NormalizedCanvasObject {
     objects?: NormalizedCanvasObject[];
 }
 
+const DEFAULT_MAX_STACK_SIZE = 20;
+
 export class CanvasHistory {
     initialize = once((): void => {
-        // Save initial state without triggering events
-        const initialState: HistoryState = this.getCanvasState();
+        const initialState = this.getCanvasState();
         this.undoStack = [initialState];
-
         this.attachEventListeners();
         this.isInitializing = false;
         this.markAsSaved();
@@ -57,7 +57,7 @@ export class CanvasHistory {
 
     constructor(floor: FloorEditor, options: CanvasHistoryOptions = {}) {
         this.floor = floor;
-        this.maxStackSize = options.maxStackSize ?? 20;
+        this.maxStackSize = options.maxStackSize ?? DEFAULT_MAX_STACK_SIZE;
         this.undoStack = [];
         this.redoStack = [];
         this.isHistoryProcessing = false;
@@ -73,8 +73,8 @@ export class CanvasHistory {
     }
 
     static normalize(canvasObjects: FabricObject[]): NormalizedCanvasObject[] {
-        return canvasObjects.map((obj) => {
-            const { left, top, width, height, scaleX, scaleY, angle, fill, stroke, type } = obj;
+        return canvasObjects.map(function (obj) {
+            const { left, top, width, height, scaleX, scaleY, angle, fill, stroke } = obj;
 
             if ("objects" in obj) {
                 return {
@@ -87,11 +87,10 @@ export class CanvasHistory {
                     angle,
                     fill,
                     stroke,
-                    type,
                     objects: CanvasHistory.normalize(obj["objects"] as FabricObject[]),
                 };
             }
-            return { left, top, width, height, scaleX, scaleY, angle, fill, stroke, type };
+            return { left, top, width, height, scaleX, scaleY, angle, fill, stroke };
         });
     }
 
