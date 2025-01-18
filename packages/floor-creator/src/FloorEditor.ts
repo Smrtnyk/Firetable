@@ -50,7 +50,7 @@ export class FloorEditor extends Floor {
         initAligningGuidelines(this.canvas);
         this.eventEmitter = new EventEmitter<FloorEditorEvents>();
         this.gridDrawer = new GridDrawer(this.canvas);
-        this.history = new CanvasHistory(this, { maxStackSize: 20 });
+        this.history = new CanvasHistory(this);
         this.eventManager = new EditorEventManager(this, this.history);
         this.elementManager = new ElementManager();
         this.drawingManager = new DrawingManager(this.canvas);
