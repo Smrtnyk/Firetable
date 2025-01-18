@@ -1,7 +1,7 @@
 import type { FloorEditor } from "./FloorEditor.js";
 import type { FabricObject } from "fabric";
 import { canvasToRender } from "./utils.js";
-import { delay, isEqual, once } from "es-toolkit";
+import { isEqual, once } from "es-toolkit";
 import { Mutex } from "async-mutex";
 
 interface HistoryState {
@@ -234,8 +234,6 @@ export class CanvasHistory {
             this.floor.requestGridRender();
 
             await canvasToRender(this.floor.canvas);
-            // Additional wait to ensure all object events have fired
-            await delay(0);
         } finally {
             this.isHistoryProcessing = false;
             this.isDirty = !this.areStatesEqual(this.lastSavedJson, state);

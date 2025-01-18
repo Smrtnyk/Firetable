@@ -190,14 +190,14 @@ describe("CanvasHistory", () => {
         const { floor } = setupTestFloor();
 
         const table = await addTable(floor, { left: 100, top: 100 }, "T1");
-        await waitForCanvasRender(floor);
+        await canvasToRender(floor.canvas);
         const originalAngle = table.angle;
 
         table.rotate(45);
         table.setCoords();
         floor.canvas.requestRenderAll();
         floor.canvas.fire("object:modified", { target: table });
-        await waitForCanvasRender(floor);
+        await canvasToRender(floor.canvas);
 
         expect(table.angle).toBe(45);
         expect(floor.canUndo()).toBe(true);
@@ -205,7 +205,7 @@ describe("CanvasHistory", () => {
         // Undo creates new state so table reference is no longer valid
         await floor.undo();
         table.setCoords();
-        await waitForCanvasRender(floor);
+        await canvasToRender(floor.canvas);
 
         expect(floor.getTableByLabel("T1")?.angle).toBe(originalAngle);
     });
@@ -247,7 +247,7 @@ describe("CanvasHistory", () => {
             x: 100,
             y: 100,
         });
-        await waitForCanvasRender(floor);
+        await canvasToRender(floor.canvas);
 
         expect(floor.isDirty()).toBe(true);
 
@@ -270,7 +270,7 @@ describe("CanvasHistory", () => {
         const table = floor.getTableByLabel("T1")!;
         table.set({ left: 120, top: 120 });
         floor.canvas.fire("object:modified", { target: table });
-        await waitForCanvasRender(floor);
+        await canvasToRender(floor.canvas);
 
         // isDirty should be true
         expect(floor.isDirty()).toBe(true);
@@ -294,7 +294,7 @@ describe("CanvasHistory", () => {
             x: 100,
             y: 100,
         });
-        await waitForCanvasRender(floor);
+        await canvasToRender(floor.canvas);
 
         expect(floor.isDirty()).toBe(true);
     });
@@ -307,7 +307,7 @@ describe("CanvasHistory", () => {
             x: 100,
             y: 100,
         });
-        await waitForCanvasRender(floor);
+        await canvasToRender(floor.canvas);
 
         expect(floor.isDirty()).toBe(true);
 
@@ -324,7 +324,7 @@ describe("CanvasHistory", () => {
 
         floor.canvas.remove(table);
         floor.canvas.fire("object:removed", { target: table });
-        await waitForCanvasRender(floor);
+        await canvasToRender(floor.canvas);
 
         expect(floor.isDirty()).toBe(true);
     });
@@ -340,7 +340,7 @@ describe("CanvasHistory", () => {
         // 2) Move the table -> isDirty=true
         table.set({ left: 200 });
         floor.canvas.fire("object:modified", { target: table });
-        await waitForCanvasRender(floor);
+        await canvasToRender(floor.canvas);
         expect(floor.isDirty()).toBe(true);
 
         // 3) Undo -> if we revert to the lastSavedJson, isDirty=false
@@ -365,7 +365,7 @@ describe("CanvasHistory", () => {
         table.set({ left: 100 });
         floor.canvas.fire("object:modified", { target: table });
 
-        await waitForCanvasRender(floor);
+        await canvasToRender(floor.canvas);
 
         // Because the final JSON is the same as the lastSavedJson,
         // CanvasHistory won't push a new state
@@ -386,7 +386,7 @@ describe("CanvasHistory", () => {
         // Move table2 from 200 -> 300
         table2.set({ left: 300 });
         floor.canvas.fire("object:modified", { target: table2 });
-        await waitForCanvasRender(floor);
+        await canvasToRender(floor.canvas);
         expect(floor.isDirty()).toBe(true);
 
         // Undo once => removes the move of table2, returning it to 200
@@ -399,7 +399,7 @@ describe("CanvasHistory", () => {
         table1.set({ left: 150 });
         table1.setCoords();
         floor.canvas.fire("object:modified", { target: table1 });
-        await waitForCanvasRender(floor);
+        await canvasToRender(floor.canvas);
 
         expect(floor.isDirty()).toBe(true);
 
@@ -417,17 +417,17 @@ describe("CanvasHistory", () => {
         expect(floor.isDirty()).toBe(false);
 
         floor.setElementFill(table, "red");
-        await waitForCanvasRender(floor);
+        await canvasToRender(floor.canvas);
 
         expect(floor.isDirty()).toBe(true);
         expect(floor.canUndo()).toBe(true);
 
         await floor.undo();
-        await waitForCanvasRender(floor);
+        await canvasToRender(floor.canvas);
         expect(floor.isDirty()).toBe(false);
 
         await floor.redo();
-        await waitForCanvasRender(floor);
+        await canvasToRender(floor.canvas);
         expect(floor.isDirty()).toBe(true);
     });
 
@@ -435,18 +435,18 @@ describe("CanvasHistory", () => {
         const { floor } = setupTestFloor();
 
         floor.setBackgroundColor("#333");
-        await waitForCanvasRender(floor);
+        await canvasToRender(floor.canvas);
 
         floor.markAsSaved();
         expect(floor.isDirty()).toBe(false);
 
         floor.setBackgroundColor("#444");
-        await waitForCanvasRender(floor);
+        await canvasToRender(floor.canvas);
 
         expect(floor.isDirty()).toBe(true);
 
         await floor.undo();
-        await waitForCanvasRender(floor);
+        await canvasToRender(floor.canvas);
 
         expect(floor.isDirty()).toBe(false);
     });
@@ -457,7 +457,7 @@ describe("CanvasHistory", () => {
         expect(floor.isDirty()).toBe(false);
 
         floor.updateDimensions(600, 400);
-        await waitForCanvasRender(floor);
+        await canvasToRender(floor.canvas);
 
         expect(floor.isDirty()).toBe(true);
         expect(floor.width).toBe(600);
@@ -480,7 +480,7 @@ describe("CanvasHistory", () => {
         expect(floor.isDirty()).toBe(false);
 
         floor.updateDimensions(500, 500);
-        await waitForCanvasRender(floor);
+        await canvasToRender(floor.canvas);
 
         expect(floor.isDirty()).toBe(false);
         expect(floor.canUndo()).toBe(false);
@@ -492,7 +492,7 @@ describe("CanvasHistory", () => {
         expect(floor.isDirty()).toBe(false);
 
         floor.updateDimensions(600, 500);
-        await waitForCanvasRender(floor);
+        await canvasToRender(floor.canvas);
 
         expect(floor.isDirty()).toBe(true);
         expect(floor.width).toBe(600);
@@ -512,12 +512,7 @@ async function moveTable(
 ): Promise<void> {
     table.set(position);
     floor.canvas.fire("object:modified", { target: table });
-    await waitForCanvasRender(floor);
-}
-
-async function waitForCanvasRender(floor: FloorEditor): Promise<void> {
     await canvasToRender(floor.canvas);
-    await delay(0);
 }
 
 async function addTable(
@@ -531,7 +526,7 @@ async function addTable(
         x: position.left,
         y: position.top,
     });
-    await waitForCanvasRender(floor);
+    await canvasToRender(floor.canvas);
     return floor.getTableByLabel(label)!;
 }
 
@@ -571,7 +566,7 @@ async function setupTestFloorWithTableInJSON(): Promise<TestContext> {
         y: 100,
     });
 
-    await waitForCanvasRender(srcFloor);
+    await canvasToRender(srcFloor.canvas);
     const exported = srcFloor.export();
 
     const newCanvas = document.createElement("canvas");
@@ -590,7 +585,7 @@ async function setupTestFloorWithTableInJSON(): Promise<TestContext> {
         containerHeight: 500,
     });
 
-    await waitForCanvasRender(floor);
+    await canvasToRender(floor.canvas);
 
     return { floor, canvas: newCanvas };
 }
