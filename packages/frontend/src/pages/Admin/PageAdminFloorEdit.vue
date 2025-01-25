@@ -126,7 +126,7 @@ async function onFloorSave(): Promise<void> {
                         @delete="onDeleteElement"
                     />
                 </q-card>
-                <div class="floor-editor">
+                <div class="floor-editor ft-card">
                     <canvas v-if="floor && !isFloorLoading" ref="canvasRef" />
                 </div>
             </div>

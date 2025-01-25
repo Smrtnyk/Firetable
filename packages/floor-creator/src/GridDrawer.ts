@@ -75,8 +75,8 @@ export class GridDrawer {
         left: number,
         top: number,
     ): Line[] {
-        const wCount = Math.ceil(width / gridSize);
-        const hCount = Math.ceil(height / gridSize);
+        const wCount = Math.ceil(width / gridSize) + 1;
+        const hCount = Math.ceil(height / gridSize) + 1;
 
         const verticalLines = range(wCount).map(
             (i) => new Line([gridSize * i, -top, gridSize * i, height], LINE_OPTION),
@@ -91,8 +91,8 @@ export class GridDrawer {
 
     private addGridToCanvas(lines: Line[]): void {
         const oGridGroup = new Group(lines, {
-            left: 0,
-            top: 0,
+            left: -0.25,
+            top: -0.25,
             selectable: false,
             excludeFromExport: true,
             evented: false,
