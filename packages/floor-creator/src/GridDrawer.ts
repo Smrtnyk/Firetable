@@ -75,8 +75,8 @@ export class GridDrawer {
         left: number,
         top: number,
     ): Line[] {
-        const wCount = Math.ceil(width / gridSize) + 1;
-        const hCount = Math.ceil(height / gridSize) + 1;
+        const wCount = Math.ceil(width / gridSize);
+        const hCount = Math.ceil(height / gridSize);
 
         const verticalLines = range(wCount).map(
             (i) => new Line([gridSize * i, -top, gridSize * i, height], LINE_OPTION),
@@ -85,6 +85,10 @@ export class GridDrawer {
         const horizontalLines = range(hCount).map(
             (i) => new Line([-left, gridSize * i, width, gridSize * i], LINE_OPTION),
         );
+
+        // Remove edge lines
+        verticalLines.shift();
+        horizontalLines.shift();
 
         return [...verticalLines, ...horizontalLines];
     }
