@@ -1,8 +1,7 @@
 import type { FloorEditor } from "./FloorEditor.js";
 import type { FabricObject } from "fabric";
 import { canvasToRender } from "./utils.js";
-import { isEqual, once } from "es-toolkit";
-import { Mutex } from "async-mutex";
+import { isEqual, Mutex, once } from "es-toolkit";
 
 interface HistoryState {
     width: number;
@@ -117,8 +116,9 @@ export class CanvasHistory {
         return this.redoStack.length > 0;
     }
 
-    undo(): Promise<void> {
-        return this.mutex.runExclusive(async () => {
+    async undo(): Promise<void> {
+        try {
+            await this.mutex.acquire();
             if (!this.canUndo()) {
                 return;
             }
@@ -139,11 +139,14 @@ export class CanvasHistory {
             }
 
             await this.loadState(previousState);
-        });
+        } finally {
+            this.mutex.release();
+        }
     }
 
-    redo(): Promise<void> {
-        return this.mutex.runExclusive(async () => {
+    async redo(): Promise<void> {
+        try {
+            await this.mutex.acquire();
             if (!this.canRedo()) {
                 return;
             }
@@ -159,7 +162,9 @@ export class CanvasHistory {
             }
 
             await this.loadState(nextState);
-        });
+        } finally {
+            this.mutex.release();
+        }
     }
 
     clear(): void {

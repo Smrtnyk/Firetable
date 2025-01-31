@@ -100,9 +100,6 @@ importers:
       '@posva/event-emitter':
         specifier: 'catalog:'
         version: 1.0.2
-      async-mutex:
-        specifier: 0.5.0
-        version: 0.5.0
       es-toolkit:
         specifier: 'catalog:'
         version: 1.32.0
@@ -2266,9 +2263,6 @@ packages:
 
   async-lock@1.4.1:
     resolution: {integrity: sha512-Az2ZTpuytrtqENulXwO3GGv1Bztugx6TT37NIo7imr/Qo0gsYiGtSdBa2B6fsXhTpVZDNfu1Qn3pk531e3q+nQ==}
-
-  async-mutex@0.5.0:
-    resolution: {integrity: sha512-1A94B18jkJ3DYq284ohPxoXbfTA5HsQ7/Mf4DEhcyLx3Bz27Rh59iScbB6EPiP+B+joue6YCxcMXSbFC1tZKwA==}
 
   async-retry@1.3.3:
     resolution: {integrity: sha512-wfr/jstw9xNi/0teMHrRW7dsz3Lt5ARhYNZ2ewpadnhaIp5mbALhOAP+EAdsC7t4Z6wqsDVv9+W6gm1Dk9mEyw==}
@@ -8779,10 +8773,6 @@ snapshots:
       tslib: 2.7.0
 
   async-lock@1.4.1: {}
-
-  async-mutex@0.5.0:
-    dependencies:
-      tslib: 2.7.0
 
   async-retry@1.3.3:
     dependencies:
