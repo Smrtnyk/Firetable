@@ -37,6 +37,58 @@ describe("CanvasHistory", () => {
         expect(floor.gridDrawer.isGridVisible).toBe(false);
     });
 
+    it("records a history entry even if the net change is zero", async () => {
+        const { floor } = setupTestFloor();
+        const table = await addTable(floor, { left: 100, top: 100 }, "T1");
+        floor.markAsSaved();
+
+        table.set({ left: 200 });
+        floor.canvas.fire("object:modified", { target: table });
+        table.set({ left: 100 });
+        floor.canvas.fire("object:modified", { target: table });
+        await canvasToRender(floor.canvas);
+
+        // Although the final state is equal to the saved state (so isDirty() is false),
+        // the discrete actions are still recorded, so undo should be available.
+        expect(floor.isDirty()).toBe(false);
+        expect(floor.canUndo()).toBe(true);
+    });
+
+    it("handles long undo/redo cycles without losing state", async () => {
+        const { floor } = setupTestFloor();
+        floor.addElement({
+            tag: FloorElementTypes.RECT_TABLE,
+            label: "T1",
+            x: 100,
+            y: 100,
+        });
+        const table = floor.getTableByLabel("T1")!;
+
+        for (let pos = 150; pos <= 300; pos += 50) {
+            table.set({ left: pos });
+            floor.canvas.fire("object:modified", { target: table });
+            await canvasToRender(floor.canvas);
+        }
+
+        while (floor.canUndo()) {
+            await floor.undo();
+        }
+
+        while (floor.canRedo()) {
+            await floor.redo();
+        }
+
+        expect(table.left).toBe(300);
+    });
+
+    it("handles undo/redo calls gracefully when no history is available", async () => {
+        const { floor } = setupTestFloor();
+        await floor.undo();
+        await floor.redo();
+        expect(floor.canUndo()).toBe(false);
+        expect(floor.canRedo()).toBe(false);
+    });
+
     it("tracks element addition", async () => {
         const { floor } = setupTestFloor();
         floor.addElement({
