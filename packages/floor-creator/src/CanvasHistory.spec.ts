@@ -141,7 +141,7 @@ describe("CanvasHistory", () => {
         expect(table.left).toBe(last(positions)!.left);
     });
 
-    it("maintains reasonable stack size", async () => {
+    it("maintains max default stack size", async () => {
         const { floor } = setupTestFloor();
         floor.addElement({
             tag: FloorElementTypes.RECT_TABLE,
@@ -151,7 +151,7 @@ describe("CanvasHistory", () => {
         });
         const table = floor.getTableByLabel("T1")!;
 
-        for (const i of range(30)) {
+        for (const i of range(60)) {
             table.set({ left: 100 + i * 10 });
             floor.canvas.fire("object:modified", { target: table });
             await delay(0);
@@ -164,7 +164,7 @@ describe("CanvasHistory", () => {
             undoCount++;
         }
         // Default max size
-        expect(undoCount).toBeLessThanOrEqual(20);
+        expect(undoCount).toBeLessThanOrEqual(50);
     });
 
     it("handles group operations", async () => {

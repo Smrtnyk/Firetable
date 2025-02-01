@@ -119,6 +119,9 @@ importers:
       '@vitest/browser':
         specifier: 'catalog:'
         version: https://pkg.pr.new/@vitest/browser@9e40437(@types/node@22.12.0)(playwright@1.50.0)(typescript@5.7.3)(vite@6.0.7(@types/node@22.12.0)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vitest@3.0.4)
+      jsondiffpatch:
+        specifier: 0.6.0
+        version: 0.6.0
       vitest:
         specifier: 'catalog:'
         version: https://pkg.pr.new/vitest@9e40437(@types/node@22.12.0)(@vitest/browser@3.0.4)(@vitest/ui@3.0.4)(jsdom@25.0.1(canvas@2.11.2(encoding@0.1.13)))(msw@2.7.0(@types/node@22.12.0)(typescript@5.7.3))(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
@@ -1782,6 +1785,9 @@ packages:
   '@types/cors@2.8.17':
     resolution: {integrity: sha512-8CGDvrBj1zgo2qE+oS3pOCyYNqCPryMWY2bGfwA0dcfopWGgxs+78df0Rs3rc9THP4JkOhLsAa+15VdpAqkcUA==}
 
+  '@types/diff-match-patch@1.0.36':
+    resolution: {integrity: sha512-xFdR6tkm0MWvBfO8xXCSsinYxHcqkQUlcHeSpMC2ukzOb6lwQAfDmW+Qt0AvlGd8HpsS28qKsB+oPeJn9I39jg==}
+
   '@types/doctrine@0.0.9':
     resolution: {integrity: sha512-eOIHzCUSH7SMfonMG1LsC2f8vxBFtho6NGBznK41R84YzPuvSBzrhEps33IsQiOW9+VL6NQ9DbjQJznk/S4uRA==}
 
@@ -2844,6 +2850,9 @@ packages:
   detect-libc@2.0.3:
     resolution: {integrity: sha512-bwy0MGW55bG41VqxxypOsdSdGqLwXPI/focwgTYCFMbdUiBAxLg9CFzG08sz2aqzknwiX7Hkl0bQENjg8iLByw==}
     engines: {node: '>=8'}
+
+  diff-match-patch@1.0.5:
+    resolution: {integrity: sha512-IayShXAgj/QMXgB0IWmKx+rOPuGMhqm5w6jvFxmVenXKIzRqTAAsbBPT3kWQeGANj3jGgvcvv4yK6SxqYmikgw==}
 
   dijkstrajs@1.0.3:
     resolution: {integrity: sha512-qiSlmBq9+BCdCA/L46dw8Uy93mloxsPSbwnm5yrKn2vMPiy8KyAskTF6zuV/j5BMsmOGZDPs7KjU+mjb670kfA==}
@@ -4034,6 +4043,11 @@ packages:
   json5@2.2.3:
     resolution: {integrity: sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==}
     engines: {node: '>=6'}
+    hasBin: true
+
+  jsondiffpatch@0.6.0:
+    resolution: {integrity: sha512-3QItJOXp2AP1uv7waBkao5nCvhEv+QmJAd38Ybq7wNI74Q+BBmnLn4EDKz6yI9xGAIQoUF87qHt+kc1IVxB4zQ==}
+    engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
 
   jsonfile@6.1.0:
@@ -8157,6 +8171,8 @@ snapshots:
     dependencies:
       '@types/node': 22.12.0
 
+  '@types/diff-match-patch@1.0.36': {}
+
   '@types/doctrine@0.0.9': {}
 
   '@types/estree@0.0.39': {}
@@ -9413,6 +9429,8 @@ snapshots:
 
   detect-libc@2.0.3:
     optional: true
+
+  diff-match-patch@1.0.5: {}
 
   dijkstrajs@1.0.3: {}
 
@@ -10959,6 +10977,12 @@ snapshots:
   json-stable-stringify-without-jsonify@1.0.1: {}
 
   json5@2.2.3: {}
+
+  jsondiffpatch@0.6.0:
+    dependencies:
+      '@types/diff-match-patch': 1.0.36
+      chalk: 5.3.0
+      diff-match-patch: 1.0.5
 
   jsonfile@6.1.0:
     dependencies:

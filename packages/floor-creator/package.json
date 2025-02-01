@@ -26,6 +26,7 @@
         "@types/hammerjs": "2.0.46",
         "@types/node": "22.12.0",
         "@vitest/browser": "catalog:",
+        "jsondiffpatch": "0.6.0",
         "vitest": "catalog:"
     },
     "keywords": [

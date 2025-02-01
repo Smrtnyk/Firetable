@@ -1,16 +1,33 @@
 import type { FloorEditor } from "./FloorEditor.js";
 import type { FabricObject } from "fabric";
 import { canvasToRender } from "./utils.js";
-import { isEqual, Mutex, once } from "es-toolkit";
+import { cloneDeep, isEqual, Mutex, once } from "es-toolkit";
+import { patch, diff } from "jsondiffpatch";
 
-interface HistoryState {
+export interface HistoryState {
     width: number;
     height: number;
     json: string;
 }
 
-interface CanvasHistoryOptions {
-    maxStackSize?: number;
+interface InternalState {
+    width: number;
+    height: number;
+    /**
+     * parsed canvas state
+     */
+    canvas: Record<string, unknown>;
+}
+
+interface DeltaEntry {
+    /**
+     * computed as: diff(lastInternalState, currentInternalState)
+     */
+    patched: any;
+    /**
+     * computed as: diff(currentInternalState, lastInternalState)
+     */
+    inversePatch: any;
 }
 
 interface NormalizedCanvasObject {
@@ -26,12 +43,19 @@ interface NormalizedCanvasObject {
     objects?: NormalizedCanvasObject[];
 }
 
-const DEFAULT_MAX_STACK_SIZE = 20;
+export interface CanvasHistoryOptions {
+    maxStackSize?: number;
+}
+
+const DEFAULT_MAX_STACK_SIZE = 50;
 
 export class CanvasHistory {
+    /**
+     * The one-time initializer that sets up the baseline state.
+     */
     initialize = once((): void => {
         const initialState = this.getCanvasState();
-        this.undoStack = [initialState];
+        this.lastInternalState = this.toInternalState(initialState);
         this.attachEventListeners();
         this.isInitializing = false;
         this.markAsSaved();
@@ -42,10 +66,15 @@ export class CanvasHistory {
     private readonly maxStackSize: number;
     private lastSavedJson: HistoryState;
     private isDirty: boolean;
-    private undoStack: HistoryState[];
-    private redoStack: HistoryState[];
-    // This flag is used to prevent new history entries from being added while
-    // undo or redo is in progress (e.g., to avoid infinite loops of state changes).
+    private undoStack: DeltaEntry[];
+    private redoStack: DeltaEntry[];
+    /**
+     * The last known internal state (used for computing deltas)
+     */
+    private lastInternalState: InternalState;
+    /**
+     * This flag prevents history recordings while an undo/redo is in progress.
+     */
     private isHistoryProcessing: boolean;
     private isInitializing: boolean;
     private readonly handlers: {
@@ -61,7 +90,9 @@ export class CanvasHistory {
         this.redoStack = [];
         this.isHistoryProcessing = false;
         this.isInitializing = true;
-        this.lastSavedJson = this.getCanvasState();
+        const initialState = this.getCanvasState();
+        this.lastSavedJson = initialState;
+        this.lastInternalState = this.toInternalState(initialState);
         this.isDirty = false;
 
         this.handlers = {
@@ -93,6 +124,9 @@ export class CanvasHistory {
         });
     }
 
+    /**
+     * Marks the current state as saved (e.g. after a save operation).
+     */
     markAsSaved(): void {
         this.lastSavedJson = this.getCanvasState();
         this.isDirty = false;
@@ -109,7 +143,8 @@ export class CanvasHistory {
     }
 
     canUndo(): boolean {
-        return this.undoStack.length > 1;
+        // If there’s at least one delta recorded, we can undo.
+        return this.undoStack.length > 0;
     }
 
     canRedo(): boolean {
@@ -122,22 +157,22 @@ export class CanvasHistory {
             if (!this.canUndo()) {
                 return;
             }
-
-            const currentState = this.undoStack.pop();
-            if (!currentState) {
-                return;
-            }
-
-            this.redoStack.push(currentState);
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we know it is here otherwise canUndo would return false
+            const deltaEntry = this.undoStack.pop()!;
+            // 1. Apply the inverse patch to the last known internal state.
+            const currentInternal = this.lastInternalState;
+            // 2. Create a deep copy to avoid side effects.
+            let revertedInternal = cloneDeep(currentInternal);
+            revertedInternal = patch(revertedInternal, deltaEntry.inversePatch) as InternalState;
+            // 3. Update our last known internal state.
+            this.lastInternalState = revertedInternal;
+            // 4. Push this delta entry onto the redo stack.
+            this.redoStack.push(deltaEntry);
             if (this.redoStack.length > this.maxStackSize) {
                 this.redoStack.shift();
             }
-
-            const previousState = this.undoStack.at(-1);
-            if (!previousState) {
-                return;
-            }
-
+            // 5. Load the previous state into the canvas.
+            const previousState = this.fromInternalState(revertedInternal);
             await this.loadState(previousState);
         } finally {
             this.mutex.release();
@@ -150,18 +185,20 @@ export class CanvasHistory {
             if (!this.canRedo()) {
                 return;
             }
-
-            const nextState = this.redoStack.pop();
-            if (!nextState) {
-                return;
-            }
-
-            this.undoStack.push(nextState);
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we know it is here otherwise canRedo would return false
+            const deltaEntry = this.redoStack.pop()!;
+            const currentInternal = this.lastInternalState;
+            let redoneInternal = cloneDeep(currentInternal);
+            redoneInternal = patch(redoneInternal, deltaEntry.patched) as InternalState;
+            // 1. Update our last known internal state.
+            this.lastInternalState = redoneInternal;
+            // 2. Push this delta entry back to the undo stack.
+            this.undoStack.push(deltaEntry);
             if (this.undoStack.length > this.maxStackSize) {
                 this.undoStack.shift();
             }
-
-            await this.loadState(nextState);
+            const newState = this.fromInternalState(redoneInternal);
+            await this.loadState(newState);
         } finally {
             this.mutex.release();
         }
@@ -173,6 +210,32 @@ export class CanvasHistory {
         this.floor.emit("historyChange");
     }
 
+    /**
+     * Converts a HistoryState (which contains a JSON string) into an InternalState
+     * that we can diff.
+     */
+    private toInternalState(state: HistoryState): InternalState {
+        return {
+            width: state.width,
+            height: state.height,
+            canvas: JSON.parse(state.json),
+        };
+    }
+
+    /**
+     * Converts an InternalState back to a HistoryState.
+     */
+    private fromInternalState(internal: InternalState): HistoryState {
+        return {
+            width: internal.width,
+            height: internal.height,
+            json: JSON.stringify(internal.canvas),
+        };
+    }
+
+    /**
+     * Captures the full state of the canvas (including dimensions and JSON data).
+     */
     private getCanvasState(): HistoryState {
         return {
             ...this.floor.export([
@@ -198,34 +261,52 @@ export class CanvasHistory {
         this.floor.canvas.off(this.handlers);
     }
 
+    /**
+     * Called when the canvas is modified.
+     * Computes the diff between the last known internal state and the new state,
+     * then stores that delta.
+     */
     private onCanvasModified(): void {
         if (this.isHistoryProcessing || this.isInitializing) {
             return;
         }
 
         const currentState: HistoryState = this.getCanvasState();
-        const lastState = this.undoStack.at(-1);
+        const currentInternal = this.toInternalState(currentState);
 
-        if (lastState && this.areStatesEqual(lastState, currentState)) {
-            // Don't save if nothing has changed
+        // 1. Compute the patch (delta) from the last internal state to the current one.
+        const patched = diff(this.lastInternalState, currentInternal);
+        // 2. If nothing changed, do not record a delta.
+        if (!patched) {
             return;
         }
+        // 3. Compute the inverse patch (from current back to previous).
+        const inversePatch = diff(currentInternal, this.lastInternalState);
 
-        this.saveState(currentState);
-    }
+        const deltaEntry: DeltaEntry = {
+            patched,
+            inversePatch,
+        };
 
-    private saveState(currentJson: HistoryState): void {
-        this.undoStack.push(currentJson);
+        // 4. Push the new delta entry onto the undo stack.
+        this.undoStack.push(deltaEntry);
+        // 5. Clear the redo stack.
         this.redoStack = [];
-
+        // 6. Limit the undo stack size.
         if (this.undoStack.length > this.maxStackSize) {
             this.undoStack.shift();
         }
 
-        this.isDirty = !this.areStatesEqual(this.lastSavedJson, currentJson);
+        // 7. Update the last known internal state.
+        this.lastInternalState = currentInternal;
+        // 8. Update the dirty flag.
+        this.isDirty = !this.areStatesEqual(this.lastSavedJson, currentState);
         this.floor.emit("historyChange");
     }
 
+    /**
+     * Loads a given HistoryState onto the canvas.
+     */
     private async loadState(state: HistoryState): Promise<void> {
         this.isHistoryProcessing = true;
 
@@ -237,7 +318,6 @@ export class CanvasHistory {
             });
 
             this.floor.requestGridRender();
-
             await canvasToRender(this.floor.canvas);
         } finally {
             this.isHistoryProcessing = false;
@@ -246,6 +326,9 @@ export class CanvasHistory {
         }
     }
 
+    /**
+     * Compares two HistoryStates (after normalizing them) to see if they are equal.
+     */
     private areStatesEqual(state1: HistoryState, state2: HistoryState): boolean {
         const json1 = JSON.parse(state1.json);
         const json2 = JSON.parse(state2.json);
