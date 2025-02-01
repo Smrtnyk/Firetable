@@ -70,11 +70,11 @@ export class GridDrawer {
         const hCount = Math.ceil(height / gridSize);
 
         const verticalLines = range(wCount).map(
-            (i) => new Line([gridSize * i, -0, gridSize * i, height], LINE_OPTION),
+            (i) => new Line([gridSize * i, 0, gridSize * i, height], LINE_OPTION),
         );
 
         const horizontalLines = range(hCount).map(
-            (i) => new Line([-0, gridSize * i, width, gridSize * i], LINE_OPTION),
+            (i) => new Line([0, gridSize * i, width, gridSize * i], LINE_OPTION),
         );
 
         // Remove edge lines
