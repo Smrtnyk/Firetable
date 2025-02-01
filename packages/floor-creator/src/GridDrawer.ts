@@ -32,10 +32,7 @@ export class GridDrawer {
 
     drawGrid(width: number, height: number): void {
         this.clearGrid();
-        const left = (width % RESOLUTION) / 2;
-        const top = (height % RESOLUTION) / 2;
-
-        const lines = this.createGridLines(width, height, RESOLUTION, left, top);
+        const lines = this.createGridLines(width, height, RESOLUTION);
         this.addGridToCanvas(lines);
     }
 
@@ -68,22 +65,16 @@ export class GridDrawer {
         });
     }
 
-    private createGridLines(
-        width: number,
-        height: number,
-        gridSize: number,
-        left: number,
-        top: number,
-    ): Line[] {
+    private createGridLines(width: number, height: number, gridSize: number): Line[] {
         const wCount = Math.ceil(width / gridSize);
         const hCount = Math.ceil(height / gridSize);
 
         const verticalLines = range(wCount).map(
-            (i) => new Line([gridSize * i, -top, gridSize * i, height], LINE_OPTION),
+            (i) => new Line([gridSize * i, -0, gridSize * i, height], LINE_OPTION),
         );
 
         const horizontalLines = range(hCount).map(
-            (i) => new Line([-left, gridSize * i, width, gridSize * i], LINE_OPTION),
+            (i) => new Line([-0, gridSize * i, width, gridSize * i], LINE_OPTION),
         );
 
         // Remove edge lines
