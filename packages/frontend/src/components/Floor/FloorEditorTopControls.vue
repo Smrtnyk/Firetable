@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import type { FloorEditor, FloorEditorElement } from "@firetable/floor-creator";
-import { setDimensions, setElementAngle, isTable } from "@firetable/floor-creator";
+import {
+    setDimensions,
+    setElementAngle,
+    isTable,
+    setElementPosition,
+} from "@firetable/floor-creator";
 import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
 import { computed, onMounted, ref, watch } from "vue";
 import { useEventListener } from "@vueuse/core";
@@ -38,6 +43,8 @@ const getElementAngle = computed(() => (selectedFloorElement ? selectedFloorElem
 const localWidth = ref(getElementWidth.value);
 const localHeight = ref(getElementHeight.value);
 const localAngle = ref(getElementAngle.value);
+const localLeft = ref(selectedFloorElement ? Math.round(selectedFloorElement.left) : 0);
+const localTop = ref(selectedFloorElement ? Math.round(selectedFloorElement.top) : 0);
 const elementColor = ref(selectedFloorElement?.getBaseFill?.() ?? "");
 
 watch(
@@ -46,6 +53,8 @@ watch(
         localWidth.value = newEl ? Math.round(newEl.width * newEl.scaleX) : 0;
         localHeight.value = newEl ? Math.round(newEl.height * newEl.scaleY) : 0;
         localAngle.value = newEl ? newEl.angle : 0;
+        localLeft.value = newEl ? Math.round(newEl.left) : 0;
+        localTop.value = newEl ? Math.round(newEl.top) : 0;
 
         if (newEl?.getBaseFill) {
             elementColor.value = newEl.getBaseFill();
@@ -53,6 +62,11 @@ watch(
     },
     { immediate: true },
 );
+
+watch([localLeft, localTop], ([newLeft, newTop]) => {
+    if (!selectedFloorElement) return;
+    setElementPosition(selectedFloorElement, newLeft, newTop);
+});
 
 watch(localAngle, function (newAngle) {
     if (!selectedFloorElement) return;
@@ -118,6 +132,14 @@ onMounted(function () {
 
 <template>
     <div class="row FloorEditorTopControls q-gutter-xs">
+        <!-- Position Coordinates -->
+        <div class="col-1">
+            <q-input standout v-model.number="localLeft" type="number" label="X" />
+        </div>
+        <div class="col-1">
+            <q-input standout v-model.number="localTop" type="number" label="Y" />
+        </div>
+
         <div class="col-1">
             <q-input standout v-model.number="localWidth" type="number" label="Width" />
         </div>

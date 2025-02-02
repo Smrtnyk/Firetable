@@ -35,6 +35,15 @@ export function setDimensions(
     object.canvas?.requestRenderAll();
 }
 
+export function setElementPosition(object: FabricObject, left: number, top: number): void {
+    object.left = left;
+    object.top = top;
+    object.setCoords();
+    object.fire("modified");
+    object.canvas?.fire("object:modified", { target: object });
+    object.canvas?.requestRenderAll();
+}
+
 export async function canvasToRender(canvas: Canvas): Promise<void> {
     await new Promise<unknown>(function (resolve) {
         canvas.requestRenderAll();
