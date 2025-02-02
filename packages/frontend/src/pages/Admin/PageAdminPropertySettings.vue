@@ -8,7 +8,7 @@ import { useHasChanged } from "src/composables/useHasChanged";
 import { cloneDeep } from "es-toolkit";
 
 import SettingsSection from "src/components/admin/organisation-settings/SettingsSection.vue";
-import FTDialogTimezoneSelector from "src/components/FTDialogTimezoneSelector.vue";
+import FTTimezoneList from "src/components/FTTimezoneList.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import AppCardSection from "src/components/AppCardSection.vue";
 import FTBtn from "src/components/FTBtn.vue";
@@ -87,7 +87,7 @@ function openTimezoneSelector(): void {
     const dialog = createDialog({
         component: FTBottomDialog,
         componentProps: {
-            component: FTDialogTimezoneSelector,
+            component: FTTimezoneList,
             listeners: {
                 timezoneSelected(timezone: string) {
                     dialog.hide();
