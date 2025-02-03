@@ -1,20 +1,22 @@
 import type { EditUserPayload, User } from "@shared-types";
 import type { CallableRequest } from "firebase-functions/v2/https";
-import { updateUserFn } from "./update-user.js";
-import * as Init from "../../init.js";
-import { MockAuth } from "../../../test-helpers/MockAuth.js";
-import { getUserPath } from "../../paths.js";
-import { db } from "../../init.js";
+
 import { Role } from "@shared-types/index.js";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DocumentReference } from "firebase-admin/firestore";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { MockAuth } from "../../../test-helpers/MockAuth.js";
+import * as Init from "../../init.js";
+import { db } from "../../init.js";
+import { getUserPath } from "../../paths.js";
+import { updateUserFn } from "./update-user.js";
 
 let mockAuth: MockAuth;
 
 async function createUser({
     email,
-    password,
     organisationId,
+    password,
     role,
 }: Pick<User, "email" | "organisationId" | "role"> & { password: string }): Promise<string> {
     const { uid } = await mockAuth.createUser({
@@ -22,7 +24,7 @@ async function createUser({
         password,
     });
 
-    await mockAuth.setCustomUserClaims(uid, { role, organisationId });
+    await mockAuth.setCustomUserClaims(uid, { organisationId, role });
     return uid;
 }
 
@@ -40,17 +42,17 @@ describe("updateUserFn", () => {
             const email = "original@example.com";
             const role = Role.STAFF;
             const updatedUser = {
-                name: "Updated Name",
                 email: "updated@example.com",
+                name: "Updated Name",
                 relatedProperties: ["property1", "property2"],
-                username: "updateduser",
                 role,
+                username: "updateduser",
             };
 
             const uid = await createUser({
                 email,
-                password: "password",
                 organisationId,
+                password: "password",
                 role,
             });
 
@@ -59,16 +61,16 @@ describe("updateUserFn", () => {
                 .collection(`organisations/${organisationId}/users`)
                 .doc(uid)
                 .set({
-                    name: "Original Name",
                     email,
+                    name: "Original Name",
                     relatedProperties: ["property1"],
                 });
 
             const result = await updateUserFn({
-                data: { updatedUser, userId: uid, organisationId },
+                data: { organisationId, updatedUser, userId: uid },
             } as CallableRequest<EditUserPayload>);
 
-            expect(result).toEqual({ success: true, message: "User updated successfully." });
+            expect(result).toEqual({ message: "User updated successfully.", success: true });
 
             // Verify user details updated in Firestore
             const userDocRef = await db.doc(getUserPath(organisationId, uid)).get();
@@ -83,18 +85,18 @@ describe("updateUserFn", () => {
         const organisationId = "org1";
         const email = "user2@example.com";
         const updatedUser = {
-            name: "Updated Name",
             email: "updated2@example.com",
+            name: "Updated Name",
             relatedProperties: ["property3", "property4"],
-            username: "updateduser2",
             role: Role.STAFF,
+            username: "updateduser2",
             // capabilities is intentionally omitted
         };
 
         const uid = await createUser({
             email,
-            password: "password456",
             organisationId,
+            password: "password456",
             role: Role.STAFF,
         });
 
@@ -103,19 +105,19 @@ describe("updateUserFn", () => {
             .collection(`organisations/${organisationId}/users`)
             .doc(uid)
             .set({
-                name: "Original Name",
-                email,
-                relatedProperties: ["property3"],
                 capabilities: ["cap2"],
+                email,
+                name: "Original Name",
+                relatedProperties: ["property3"],
             });
 
         const request = {
-            data: { updatedUser, userId: uid, organisationId },
+            data: { organisationId, updatedUser, userId: uid },
         } as CallableRequest<EditUserPayload>;
 
         const result = await updateUserFn(request);
 
-        expect(result).toEqual({ success: true, message: "User updated successfully." });
+        expect(result).toEqual({ message: "User updated successfully.", success: true });
 
         // Verify user details updated in Firestore
         const userDocRef = await db.doc(getUserPath(organisationId, uid)).get();
@@ -130,7 +132,7 @@ describe("updateUserFn", () => {
     describe("Handling errors", () => {
         it("should throw an error if user ID is not provided", async () => {
             const request = {
-                data: { updatedUser: { name: "New Name" }, userId: "", organisationId: "org1" },
+                data: { organisationId: "org1", updatedUser: { name: "New Name" }, userId: "" },
             } as CallableRequest<EditUserPayload>;
 
             await expect(updateUserFn(request)).rejects.toThrow("User ID must be provided.");
@@ -138,7 +140,7 @@ describe("updateUserFn", () => {
 
         it("should throw an error if user data to update is not provided", async () => {
             const request = {
-                data: { userId: "user123", organisationId: "org1" },
+                data: { organisationId: "org1", userId: "user123" },
             } as CallableRequest<EditUserPayload>;
 
             await expect(updateUserFn(request)).rejects.toThrow(
@@ -149,9 +151,9 @@ describe("updateUserFn", () => {
         it("should handle errors during update", async () => {
             const request = {
                 data: {
+                    organisationId: "org1",
                     updatedUser: { name: "New Name", relatedProperties: ["property1"] },
                     userId: "user123",
-                    organisationId: "org1",
                 },
             } as CallableRequest<EditUserPayload>;
 
@@ -178,24 +180,24 @@ describe("updateUserFn", () => {
 
             // Create user doc
             await db.doc(getUserPath("org1", uid)).set({
-                name: "Test User",
                 email: "",
+                name: "Test User",
             });
 
             const request = {
                 auth: { uid },
                 data: {
+                    organisationId: "org1",
                     updatedUser: {
+                        capabilities: {},
+                        email: "test@example.com",
+                        name: "Test User",
                         password: newPassword,
                         relatedProperties: [],
-                        name: "Test User",
-                        username: "TestUser",
-                        email: "test@example.com",
                         role: "Staff",
-                        capabilities: {},
+                        username: "TestUser",
                     } as any,
                     userId: uid,
-                    organisationId: "org1",
                 },
                 rawRequest: {} as any,
             } as CallableRequest<EditUserPayload>;
@@ -218,9 +220,9 @@ describe("updateUserFn", () => {
             const request = {
                 auth: { uid: userId },
                 data: {
+                    organisationId: "org1",
                     updatedUser: { password: "newPassword", relatedProperties: [] } as any,
                     userId,
-                    organisationId: "org1",
                 },
             } as CallableRequest<EditUserPayload>;
 
@@ -239,29 +241,29 @@ describe("updateUserFn", () => {
             });
             // Create user doc
             await db.doc(getUserPath(organisationId, uid)).set({
-                name: "Test User",
                 email: "",
+                name: "Test User",
             });
 
-            await mockAuth.setCustomUserClaims(uid, { role: Role.MANAGER, organisationId });
+            await mockAuth.setCustomUserClaims(uid, { organisationId, role: Role.MANAGER });
 
             const request = {
+                acceptsStreaming: false,
                 data: {
+                    organisationId,
                     updatedUser: {
-                        role: newRole,
-                        relatedProperties: [],
-                        name: "Test User",
-                        username: "TestUser",
-                        email: "test@example.com",
                         capabilities: {},
+                        email: "test@example.com",
+                        id: uid,
+                        name: "Test User",
                         organisationId,
                         password: "password",
-                        id: uid,
+                        relatedProperties: [],
+                        role: newRole,
+                        username: "TestUser",
                     },
                     userId: uid,
-                    organisationId,
                 },
-                acceptsStreaming: false,
                 rawRequest: {} as any,
             } as CallableRequest<EditUserPayload>;
 
@@ -269,7 +271,7 @@ describe("updateUserFn", () => {
 
             // Verify custom claim update in MockAuth
             const user = await mockAuth.getUserByEmail("test@example.com");
-            expect(user.customClaims).toStrictEqual({ role: newRole, organisationId });
+            expect(user.customClaims).toStrictEqual({ organisationId, role: newRole });
         });
     });
 });

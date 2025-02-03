@@ -1,14 +1,16 @@
 import type { FabricObject, FabricObjectProps, GroupProps } from "fabric";
-import { type FloorEditorElement, FloorElementTypes } from "../types.js";
-import { ELEMENT_DEFAULT_FILL_COLOR } from "../constants.js";
-import { classRegistry, Group, LayoutManager, Rect } from "fabric";
+
 import { omit } from "es-toolkit";
+import { classRegistry, Group, LayoutManager, Rect } from "fabric";
+
+import { ELEMENT_DEFAULT_FILL_COLOR } from "../constants.js";
+import { type FloorEditorElement, FloorElementTypes } from "../types.js";
 
 type SofaGroupCreationOpts = Partial<GroupProps> & {
     [key: string]: unknown;
-    top: number;
     left: number;
     objects?: FabricObject[];
+    top: number;
 };
 
 export class Sofa extends Group implements FloorEditorElement {
@@ -20,29 +22,29 @@ export class Sofa extends Group implements FloorEditorElement {
             sofaGroupOpts.objects?.[0] ?? {};
         const sofaBaseOptsWithoutType = omit(sofaBaseOpts, ["type"]);
         const base = new Rect({
-            width: 25 * 4,
-            height: 25 / 1.5,
             fill: ELEMENT_DEFAULT_FILL_COLOR,
+            height: 25 / 1.5,
             stroke: "#222",
             strokeUniform: true,
             strokeWidth: 0.5,
+            width: 25 * 4,
             ...sofaBaseOptsWithoutType,
             // Needs to stay like this all the time, otherwise element gets distorted
             left: 0,
-            top: 0,
-            ry: 4,
             rx: 4,
+            ry: 4,
+            top: 0,
         });
 
         const backrest = new Rect({
-            left: 0,
-            top: -25 / 4,
-            width: 25 * 4,
-            height: 25 / 4,
             fill: ELEMENT_DEFAULT_FILL_COLOR,
+            height: 25 / 4,
+            left: 0,
             stroke: "#222",
             strokeUniform: true,
             strokeWidth: 0.5,
+            top: -25 / 4,
+            width: 25 * 4,
         });
 
         const sofaGroupOptsWithoutType = omit(sofaGroupOpts, ["type"]);

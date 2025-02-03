@@ -15,8 +15,8 @@
 </template>
 
 <script setup lang="ts">
-import { useNetworkStatus } from "src/composables/useNetworkStatus";
 import FTCenteredText from "src/components/FTCenteredText.vue";
+import { useNetworkStatus } from "src/composables/useNetworkStatus";
 import { refreshApp } from "src/helpers/utils";
 
 const { isOnline } = useNetworkStatus();

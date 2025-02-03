@@ -1,16 +1,15 @@
 <script setup lang="ts">
+import FTBtn from "src/components/FTBtn.vue";
 import { computed } from "vue";
 
-import FTBtn from "src/components/FTBtn.vue";
-
 export interface EventViewControlsProps {
-    activeFloor: { id: string; name: string } | undefined;
-    floors: { id: string; name: string }[];
+    activeFloor: undefined | { id: string; name: string };
+    canExportReservations: boolean;
     canSeeAdminEvent: boolean;
+    floors: { id: string; name: string }[];
+    guestListCount: number;
     isActiveFloor: (floorId: string) => boolean;
     queuedReservationsCount: number;
-    guestListCount: number;
-    canExportReservations: boolean;
 }
 
 const emit = defineEmits<{
@@ -26,12 +25,12 @@ const emit = defineEmits<{
 }>();
 
 const {
-    floors,
-    isActiveFloor,
-    canSeeAdminEvent,
-    queuedReservationsCount,
-    guestListCount,
     canExportReservations,
+    canSeeAdminEvent,
+    floors,
+    guestListCount,
+    isActiveFloor,
+    queuedReservationsCount,
 } = defineProps<EventViewControlsProps>();
 
 const currentActiveIndex = computed(function () {
@@ -59,15 +58,15 @@ const shouldShowButtons = computed(function () {
     return floors.length > 1;
 });
 
-function showPrevFloor(): void {
-    if (previousFloor.value) {
-        emit("set-active-floor", previousFloor.value);
-    }
-}
-
 function showNextFloor(): void {
     if (nextFloor.value) {
         emit("set-active-floor", nextFloor.value);
+    }
+}
+
+function showPrevFloor(): void {
+    if (previousFloor.value) {
+        emit("set-active-floor", previousFloor.value);
     }
 }
 </script>

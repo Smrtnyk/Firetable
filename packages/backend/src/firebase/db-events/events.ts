@@ -1,41 +1,43 @@
-import type { DocumentData } from "firebase/firestore";
-import type { EventOwner } from "../db.js";
 import type { CreateEventPayload, EventDoc, EventFloorDoc, FloorDoc } from "@firetable/types";
+import type { DocumentData } from "firebase/firestore";
 import type { HttpsCallableResult } from "firebase/functions";
-import { eventFloorDoc, eventDoc, eventsCollection } from "../db.js";
-import { initializeFirebase } from "../base.js";
+
 import { Collection } from "@firetable/types";
 import {
+    addDoc,
+    collection,
     deleteDoc,
-    updateDoc,
     getDocs,
     limit,
     orderBy,
     query,
     startAfter,
+    updateDoc,
     where,
-    addDoc,
-    collection,
     writeBatch,
 } from "firebase/firestore";
 import { httpsCallable } from "firebase/functions";
 
-export function updateEventFloorData(
-    owner: EventOwner,
-    floorData: Pick<FloorDoc, "height" | "id" | "json" | "width">,
-): Promise<void> {
-    return updateDoc(eventFloorDoc(owner, floorData.id), {
-        json: floorData.json,
-        width: floorData.width,
-        height: floorData.height,
-    });
-}
+import type { EventOwner } from "../db.js";
+
+import { initializeFirebase } from "../base.js";
+import { eventDoc, eventFloorDoc, eventsCollection } from "../db.js";
 
 type CreateNewEventReturn = {
     id: string;
     organisationId: string;
     propertyId: string;
 };
+
+/**
+ * Adds a new floor to an event's floors subcollection
+ * @param owner Event owner information
+ * @param floorData Floor data to add
+ * @returns Promise that resolves when the floor is added
+ */
+export function addEventFloor(owner: EventOwner, floorData: FloorDoc): Promise<DocumentData> {
+    return addDoc(collection(eventDoc(owner), Collection.FLOORS), floorData);
+}
 export function createNewEvent(
     eventPayload: CreateEventPayload,
 ): Promise<HttpsCallableResult<CreateNewEventReturn>> {
@@ -46,10 +48,14 @@ export function createNewEvent(
     )(eventPayload);
 }
 
-export function updateEvent(owner: EventOwner, data: Partial<EventDoc>): Promise<void> {
-    return updateDoc(eventDoc(owner), {
-        ...data,
-    });
+/**
+ * Deletes a floor from an event's floors subcollection
+ * @param owner Event owner information
+ * @param floorId ID of the floor to delete
+ * @returns Promise that resolves when the floor is deleted
+ */
+export function deleteEventFloor(owner: EventOwner, floorId: string): Promise<void> {
+    return deleteDoc(eventFloorDoc(owner, floorId));
 }
 
 export async function getEvents(
@@ -81,32 +87,21 @@ export async function getEvents(
     return eventsDocs.docs.map(toEventDoc);
 }
 
-function toEventDoc(doc: DocumentData): EventDoc {
-    return {
-        ...doc.data(),
-        id: doc.id,
-        _doc: doc,
-    };
+export function updateEvent(owner: EventOwner, data: Partial<EventDoc>): Promise<void> {
+    return updateDoc(eventDoc(owner), {
+        ...data,
+    });
 }
 
-/**
- * Adds a new floor to an event's floors subcollection
- * @param owner Event owner information
- * @param floorData Floor data to add
- * @returns Promise that resolves when the floor is added
- */
-export function addEventFloor(owner: EventOwner, floorData: FloorDoc): Promise<DocumentData> {
-    return addDoc(collection(eventDoc(owner), Collection.FLOORS), floorData);
-}
-
-/**
- * Deletes a floor from an event's floors subcollection
- * @param owner Event owner information
- * @param floorId ID of the floor to delete
- * @returns Promise that resolves when the floor is deleted
- */
-export function deleteEventFloor(owner: EventOwner, floorId: string): Promise<void> {
-    return deleteDoc(eventFloorDoc(owner, floorId));
+export function updateEventFloorData(
+    owner: EventOwner,
+    floorData: Pick<FloorDoc, "height" | "id" | "json" | "width">,
+): Promise<void> {
+    return updateDoc(eventFloorDoc(owner, floorData.id), {
+        height: floorData.height,
+        json: floorData.json,
+        width: floorData.width,
+    });
 }
 
 /**
@@ -127,4 +122,12 @@ export async function updateEventFloorsOrder(
     });
 
     await batch.commit();
+}
+
+function toEventDoc(doc: DocumentData): EventDoc {
+    return {
+        ...doc.data(),
+        _doc: doc,
+        id: doc.id,
+    };
 }

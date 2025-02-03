@@ -1,20 +1,12 @@
-interface PreparedGuestData {
-    arrived: boolean;
-    cancelled: boolean | undefined;
-    contact: string;
-    maskedContact: string;
-    hashedContact: string;
-    guestName: string;
-    isVIP: boolean;
-}
+export type CreateGuestPayload = Omit<GuestDoc, "id">;
 
 export type GuestDataPayload = {
-    preparedGuestData: PreparedGuestData;
-    propertyId: string;
-    organisationId: string;
+    eventDate: number;
     eventId: string;
     eventName: string;
-    eventDate: number;
+    organisationId: string;
+    preparedGuestData: PreparedGuestData;
+    propertyId: string;
 };
 
 /**
@@ -22,14 +14,6 @@ export type GuestDataPayload = {
  * Tracks guest information and their visit history
  */
 export interface GuestDoc {
-    /**
-     * Firestore document ID
-     */
-    id: string;
-    /**
-     * Guest's full name
-     */
-    name: string;
     /**
      * Guest's contact information (usually phone number)
      */
@@ -39,13 +23,21 @@ export interface GuestDoc {
      */
     hashedContact: string;
     /**
-     * Partially masked contact information for display
+     * Firestore document ID
      */
-    maskedContact: string;
+    id: string;
     /**
      * Unix timestamp of the last modification
      */
     lastModified?: number;
+    /**
+     * Partially masked contact information for display
+     */
+    maskedContact: string;
+    /**
+     * Guest's full name
+     */
+    name: string;
     /**
      * Custom tags assigned to the guest
      */
@@ -55,7 +47,7 @@ export interface GuestDoc {
      */
     visitedProperties: {
         [propertyId: string]: {
-            [eventId: string]: Visit | null;
+            [eventId: string]: null | Visit;
         };
     };
 }
@@ -65,14 +57,6 @@ export interface GuestDoc {
  */
 export interface Visit {
     /**
-     * Unix timestamp of the event date
-     */
-    date: number;
-    /**
-     * Name of the event attended
-     */
-    eventName: string;
-    /**
      * Whether the guest physically arrived at the event
      */
     arrived: boolean;
@@ -81,9 +65,25 @@ export interface Visit {
      */
     cancelled: boolean;
     /**
+     * Unix timestamp of the event date
+     */
+    date: number;
+    /**
+     * Name of the event attended
+     */
+    eventName: string;
+    /**
      * Whether this was a VIP visit
      */
     isVIPVisit?: boolean;
 }
 
-export type CreateGuestPayload = Omit<GuestDoc, "id">;
+interface PreparedGuestData {
+    arrived: boolean;
+    cancelled: boolean | undefined;
+    contact: string;
+    guestName: string;
+    hashedContact: string;
+    isVIP: boolean;
+    maskedContact: string;
+}

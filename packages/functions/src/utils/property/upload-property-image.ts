@@ -1,7 +1,9 @@
 import type { ImageUploadData } from "@shared-types/property.js";
-import { storage } from "../../init.js";
+
 import { logger } from "firebase-functions";
 import { HttpsError } from "firebase-functions/https";
+
+import { storage } from "../../init.js";
 
 export async function uploadPropertyImage(
     organisationId: string,

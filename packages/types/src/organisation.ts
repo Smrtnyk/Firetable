@@ -1,11 +1,11 @@
-export type AspectRatio = "1" | "16:9";
-
 export const enum OrganisationStatus {
     ACTIVE = "active",
     DISABLED = "disabled",
     PENDING = "pending",
     SUSPENDED = "suspended",
 }
+
+export type AspectRatio = "1" | "16:9";
 
 /**
  * Represents an organisation document in Firestore
@@ -17,20 +17,14 @@ export interface OrganisationDoc {
      */
     id: string;
     /**
-     * Display name of the organisation
-     */
-    name: string;
-    /**
      * Maximum number of properties this organisation can create
      */
     maxAllowedProperties: number;
-
     /**
-     * Subscription settings
-     * These settings are used to enforce subscription limits and are not configurable by the user
-     * They are set by the backend based on the subscription plan the organisation is on (TBD)
+     * Display name of the organisation
      */
-    subscriptionSettings?: SubscriptionSettings;
+    name: string;
+
     /**
      * Organisation-wide settings
      */
@@ -39,13 +33,12 @@ export interface OrganisationDoc {
      * Status of the organisation
      */
     status?: OrganisationStatus;
-}
-
-export interface SubscriptionSettings {
     /**
-     * Maximum number of floor plans that can be set per event
+     * Subscription settings
+     * These settings are used to enforce subscription limits and are not configurable by the user
+     * They are set by the backend based on the subscription plan the organisation is on (TBD)
      */
-    maxFloorPlansPerEvent: number;
+    subscriptionSettings?: SubscriptionSettings;
 }
 
 /**
@@ -58,4 +51,11 @@ export interface OrganisationSettings {
          */
         propertyCardAspectRatio: AspectRatio;
     };
+}
+
+export interface SubscriptionSettings {
+    /**
+     * Maximum number of floor plans that can be set per event
+     */
+    maxFloorPlansPerEvent: number;
 }

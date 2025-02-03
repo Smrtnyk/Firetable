@@ -1,38 +1,40 @@
 import type { PlannedReservation, QueuedReservation } from "@firetable/types";
-import { plannedToQueuedReservation } from "./planned-to-queued-reservation";
+
 import { ReservationState, ReservationStatus, ReservationType } from "@firetable/types";
-import { describe, expect, it, vi } from "vitest";
 import { omit } from "es-toolkit";
+import { describe, expect, it, vi } from "vitest";
+
+import { plannedToQueuedReservation } from "./planned-to-queued-reservation";
 
 describe("plannedToQueuedReservation", () => {
     it("correctly transforms a full PlannedReservation to QueuedReservation", () => {
         const planned: PlannedReservation = {
-            state: ReservationState.PENDING,
             arrived: false,
             cancelled: false,
-            floorId: "floor1",
-            reservationConfirmed: false,
-            tableLabel: "A1",
-            waitingForResponse: false,
-            reservedBy: {
-                email: "guest@example.com",
-                name: "Guest Name",
-                id: "guest1",
-            },
+            consumption: 0,
             creator: {
-                id: "creator1",
-                email: "creator@example.com",
-                name: "Creator Name",
                 // Some past timestamp
                 createdAt: 1_670_000_000_000,
+                email: "creator@example.com",
+                id: "creator1",
+                name: "Creator Name",
             },
+            floorId: "floor1",
             guestName: "John Doe",
-            consumption: 0,
             isVIP: false,
             numberOfGuests: 2,
+            reservationConfirmed: false,
+            reservedBy: {
+                email: "guest@example.com",
+                id: "guest1",
+                name: "Guest Name",
+            },
+            state: ReservationState.PENDING,
+            status: ReservationStatus.ACTIVE,
+            tableLabel: "A1",
             time: "18:00",
             type: ReservationType.PLANNED,
-            status: ReservationStatus.ACTIVE,
+            waitingForResponse: false,
         };
 
         const queued = plannedToQueuedReservation(planned);
@@ -57,31 +59,31 @@ describe("plannedToQueuedReservation", () => {
         vi.setSystemTime(new Date(fixedTimestamp));
 
         const planned: PlannedReservation = {
-            state: ReservationState.PENDING,
             arrived: true,
             cancelled: true,
-            floorId: "floor2",
-            reservationConfirmed: true,
-            tableLabel: "B2",
-            waitingForResponse: true,
-            reservedBy: {
-                email: "anotherguest@example.com",
-                name: "Another Guest",
-                id: "guest2",
-            },
-            creator: {
-                id: "creator2",
-                email: "creator2@example.com",
-                name: "Creator Two",
-                createdAt: 1_670_000_000_000,
-            },
-            guestName: "Jane Smith",
             consumption: 5,
+            creator: {
+                createdAt: 1_670_000_000_000,
+                email: "creator2@example.com",
+                id: "creator2",
+                name: "Creator Two",
+            },
+            floorId: "floor2",
+            guestName: "Jane Smith",
             isVIP: true,
             numberOfGuests: 4,
+            reservationConfirmed: true,
+            reservedBy: {
+                email: "anotherguest@example.com",
+                id: "guest2",
+                name: "Another Guest",
+            },
+            state: ReservationState.PENDING,
+            status: ReservationStatus.ACTIVE,
+            tableLabel: "B2",
             time: "20:00",
             type: ReservationType.PLANNED,
-            status: ReservationStatus.ACTIVE,
+            waitingForResponse: true,
         };
 
         const queued = plannedToQueuedReservation(planned);
@@ -100,31 +102,31 @@ describe("plannedToQueuedReservation", () => {
         vi.setSystemTime(new Date(fixedTimestamp));
 
         const planned: PlannedReservation = {
-            state: ReservationState.PENDING,
             arrived: false,
             cancelled: false,
-            floorId: "floor3",
-            reservationConfirmed: false,
-            tableLabel: "C3",
-            waitingForResponse: false,
-            reservedBy: {
-                email: "vipguest@example.com",
-                name: "VIP Guest",
-                id: "guest3",
-            },
-            creator: {
-                id: "creator3",
-                email: "creator3@example.com",
-                name: "Creator Three",
-                createdAt: fixedTimestamp,
-            },
-            guestName: "Alice Johnson",
             consumption: 10,
+            creator: {
+                createdAt: fixedTimestamp,
+                email: "creator3@example.com",
+                id: "creator3",
+                name: "Creator Three",
+            },
+            floorId: "floor3",
+            guestName: "Alice Johnson",
             isVIP: true,
             numberOfGuests: 5,
+            reservationConfirmed: false,
+            reservedBy: {
+                email: "vipguest@example.com",
+                id: "guest3",
+                name: "VIP Guest",
+            },
+            state: ReservationState.PENDING,
+            status: ReservationStatus.ACTIVE,
+            tableLabel: "C3",
             time: "19:00",
             type: ReservationType.PLANNED,
-            status: ReservationStatus.ACTIVE,
+            waitingForResponse: false,
         };
 
         const queued = plannedToQueuedReservation(planned);
@@ -137,31 +139,31 @@ describe("plannedToQueuedReservation", () => {
         vi.setSystemTime(new Date(fixedTimestamp));
 
         const planned: PlannedReservation = {
-            state: ReservationState.PENDING,
             arrived: false,
             cancelled: false,
-            floorId: "floor4",
-            reservationConfirmed: false,
-            tableLabel: "D4",
-            waitingForResponse: false,
-            reservedBy: {
-                email: "minimalguest@example.com",
-                name: "Minimal Guest",
-                id: "guest4",
-            },
-            creator: {
-                id: "creator4",
-                email: "creator4@example.com",
-                name: "Creator Four",
-                createdAt: 1_670_000_000_000,
-            },
-            guestName: "Bob Brown",
             consumption: 1,
+            creator: {
+                createdAt: 1_670_000_000_000,
+                email: "creator4@example.com",
+                id: "creator4",
+                name: "Creator Four",
+            },
+            floorId: "floor4",
+            guestName: "Bob Brown",
             isVIP: false,
             numberOfGuests: 1,
+            reservationConfirmed: false,
+            reservedBy: {
+                email: "minimalguest@example.com",
+                id: "guest4",
+                name: "Minimal Guest",
+            },
+            state: ReservationState.PENDING,
+            status: ReservationStatus.ACTIVE,
+            tableLabel: "D4",
             time: "17:00",
             type: ReservationType.PLANNED,
-            status: ReservationStatus.ACTIVE,
+            waitingForResponse: false,
         };
 
         const queued = plannedToQueuedReservation(planned);
@@ -186,31 +188,31 @@ describe("plannedToQueuedReservation", () => {
         vi.setSystemTime(new Date(fixedTimestamp));
 
         const planned: PlannedReservation = {
-            state: ReservationState.PENDING,
             arrived: false,
             cancelled: false,
-            floorId: "floor5",
-            reservationConfirmed: false,
-            tableLabel: "E5",
-            waitingForResponse: false,
-            reservedBy: {
-                email: "immutable@example.com",
-                name: "Immutable Guest",
-                id: "guest5",
-            },
-            creator: {
-                id: "creator5",
-                email: "creator5@example.com",
-                name: "Creator Five",
-                createdAt: 1_670_000_000_000,
-            },
-            guestName: "Charlie Davis",
             consumption: 0,
+            creator: {
+                createdAt: 1_670_000_000_000,
+                email: "creator5@example.com",
+                id: "creator5",
+                name: "Creator Five",
+            },
+            floorId: "floor5",
+            guestName: "Charlie Davis",
             isVIP: false,
             numberOfGuests: 3,
+            reservationConfirmed: false,
+            reservedBy: {
+                email: "immutable@example.com",
+                id: "guest5",
+                name: "Immutable Guest",
+            },
+            state: ReservationState.PENDING,
+            status: ReservationStatus.ACTIVE,
+            tableLabel: "E5",
             time: "18:00",
             type: ReservationType.PLANNED,
-            status: ReservationStatus.ACTIVE,
+            waitingForResponse: false,
         };
 
         const plannedCopy = { ...planned };
@@ -225,31 +227,31 @@ describe("plannedToQueuedReservation", () => {
         vi.setSystemTime(new Date(fixedTimestamp));
 
         const planned: PlannedReservation = {
-            state: ReservationState.PENDING,
             arrived: false,
             cancelled: false,
-            floorId: "",
-            reservationConfirmed: false,
-            tableLabel: "",
-            waitingForResponse: false,
-            reservedBy: {
-                email: "",
-                name: "",
-                id: "",
-            },
-            creator: {
-                id: "",
-                email: "",
-                name: "",
-                createdAt: 0,
-            },
-            guestName: "",
             consumption: 0,
+            creator: {
+                createdAt: 0,
+                email: "",
+                id: "",
+                name: "",
+            },
+            floorId: "",
+            guestName: "",
             isVIP: false,
             numberOfGuests: 0,
+            reservationConfirmed: false,
+            reservedBy: {
+                email: "",
+                id: "",
+                name: "",
+            },
+            state: ReservationState.PENDING,
+            status: ReservationStatus.ACTIVE,
+            tableLabel: "",
             time: "",
             type: ReservationType.PLANNED,
-            status: ReservationStatus.ACTIVE,
+            waitingForResponse: false,
         };
 
         const queued = plannedToQueuedReservation(planned);
@@ -274,33 +276,33 @@ describe("plannedToQueuedReservation", () => {
         vi.setSystemTime(new Date(fixedTimestamp));
 
         const planned: PlannedReservation & { extraField: string } = {
-            state: ReservationState.PENDING,
             arrived: false,
             cancelled: false,
-            floorId: "floor6",
-            reservationConfirmed: false,
-            tableLabel: "F6",
-            waitingForResponse: false,
-            reservedBy: {
-                email: "extra@example.com",
-                name: "Extra Guest",
-                id: "guest6",
-            },
-            creator: {
-                id: "creator6",
-                email: "creator6@example.com",
-                name: "Creator Six",
-                createdAt: 1_670_000_000_000,
-            },
-            guestName: "Diana Evans",
             consumption: 3,
-            isVIP: true,
-            numberOfGuests: 4,
-            time: "16:00",
-            type: ReservationType.PLANNED,
-            status: ReservationStatus.ACTIVE,
+            creator: {
+                createdAt: 1_670_000_000_000,
+                email: "creator6@example.com",
+                id: "creator6",
+                name: "Creator Six",
+            },
             // Additional field not in omit list
             extraField: "extraValue",
+            floorId: "floor6",
+            guestName: "Diana Evans",
+            isVIP: true,
+            numberOfGuests: 4,
+            reservationConfirmed: false,
+            reservedBy: {
+                email: "extra@example.com",
+                id: "guest6",
+                name: "Extra Guest",
+            },
+            state: ReservationState.PENDING,
+            status: ReservationStatus.ACTIVE,
+            tableLabel: "F6",
+            time: "16:00",
+            type: ReservationType.PLANNED,
+            waitingForResponse: false,
         };
 
         const queued = plannedToQueuedReservation(planned);

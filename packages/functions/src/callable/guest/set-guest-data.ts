@@ -1,28 +1,30 @@
-import type { CallableRequest } from "firebase-functions/v2/https";
 import type { GuestDoc, Visit } from "@shared-types";
+import type { CallableRequest } from "firebase-functions/v2/https";
+
+import { logger } from "firebase-functions/v2";
+import { HttpsError } from "firebase-functions/v2/https";
+
 import { db } from "../../init.js";
 import { getGuestsPath } from "../../paths.js";
-import { HttpsError } from "firebase-functions/v2/https";
-import { logger } from "firebase-functions/v2";
+
+export type GuestData = {
+    eventDate: number;
+    eventId: string;
+    eventName: string;
+    organisationId: string;
+    preparedGuestData: PreparedGuestData;
+    propertyId: string;
+};
 
 export interface PreparedGuestData {
     arrived: boolean;
     cancelled: boolean | undefined;
     contact: string;
-    maskedContact: string;
-    hashedContact: string;
     guestName: string;
+    hashedContact: string;
     isVIP: boolean;
+    maskedContact: string;
 }
-
-export type GuestData = {
-    preparedGuestData: PreparedGuestData;
-    propertyId: string;
-    organisationId: string;
-    eventId: string;
-    eventName: string;
-    eventDate: number;
-};
 
 /**
  * Handles the creation of a reservation and updates a guest's visit history in Firestore.
@@ -44,7 +46,7 @@ export type GuestData = {
  * @returns {Promise<void>} A promise that resolves when the operation is complete.
  */
 export async function setGuestDataFn(req: CallableRequest<GuestData>): Promise<void> {
-    const { preparedGuestData, propertyId, organisationId, eventId, eventDate, eventName } =
+    const { eventDate, eventId, eventName, organisationId, preparedGuestData, propertyId } =
         req.data;
 
     if (!preparedGuestData) {
@@ -52,7 +54,7 @@ export async function setGuestDataFn(req: CallableRequest<GuestData>): Promise<v
         throw new HttpsError("invalid-argument", "Guest data is not provided");
     }
 
-    const { contact, maskedContact, hashedContact, guestName, arrived, cancelled, isVIP } =
+    const { arrived, cancelled, contact, guestName, hashedContact, isVIP, maskedContact } =
         preparedGuestData;
 
     if (!contact) {
@@ -64,10 +66,10 @@ export async function setGuestDataFn(req: CallableRequest<GuestData>): Promise<v
 
     const guestsCollectionRef = db.collection(getGuestsPath(organisationId));
     const visit: Visit = {
-        eventName,
-        date: eventDate,
         arrived,
         cancelled: Boolean(cancelled),
+        date: eventDate,
+        eventName,
         isVIPVisit: isVIP,
     };
 
@@ -77,9 +79,9 @@ export async function setGuestDataFn(req: CallableRequest<GuestData>): Promise<v
         if (querySnapshot.empty) {
             logger.info("Creating new guest document with name:", guestName);
             const guestData: Omit<GuestDoc, "id"> = {
-                lastModified: Date.now(),
                 contact,
                 hashedContact,
+                lastModified: Date.now(),
                 maskedContact,
                 name: guestName,
                 visitedProperties: {
@@ -105,8 +107,8 @@ export async function setGuestDataFn(req: CallableRequest<GuestData>): Promise<v
 
             logger.info("Updating existing guest document with name:", guestName);
             await guestRef.update({
-                lastModified: Date.now(),
                 [`visitedProperties.${propertyId}.${eventId}`]: visit,
+                lastModified: Date.now(),
             });
         }
     } catch (error) {

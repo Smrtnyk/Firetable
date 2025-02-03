@@ -1,6 +1,7 @@
-import { db } from "../init.js";
-import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
+import { HttpsError } from "firebase-functions/v2/https";
+
+import { db } from "../init.js";
 
 export const MAX_DEPTH = 10;
 // Firestore batch limit is 500 operations

@@ -1,5 +1,6 @@
 import type { PlannedReservation } from "./planned-reservation.js";
 import type { WalkInReservation } from "./walk-in-reservation.js";
+
 import { ReservationType } from "./base-reservation.js";
 
 /**

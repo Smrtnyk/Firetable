@@ -1,75 +1,61 @@
 import type { AdminUser, AppUser, GuestDoc, PropertyDoc, Visit } from "@firetable/types";
-import { useGuestsStore } from "./guests-store";
-import { mockedStore } from "../../test-helpers/render-component";
-import { Role, AdminRole } from "@firetable/types";
-import { setActivePinia, createPinia } from "pinia";
-import { vi, describe, it, beforeEach, expect } from "vitest";
-import { createApp, ref } from "vue";
-import { usePropertiesStore } from "src/stores/properties-store";
-import { useAuthStore } from "src/stores/auth-store";
 
-const { useFirestoreCollectionSpy, subscribeToGuestsSpy, createQuerySpy, whereSpy } = vi.hoisted(
+import { AdminRole, Role } from "@firetable/types";
+import { createPinia, setActivePinia } from "pinia";
+import { useAuthStore } from "src/stores/auth-store";
+import { usePropertiesStore } from "src/stores/properties-store";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { createApp, ref } from "vue";
+
+import { mockedStore } from "../../test-helpers/render-component";
+import { useGuestsStore } from "./guests-store";
+
+const { createQuerySpy, subscribeToGuestsSpy, useFirestoreCollectionSpy, whereSpy } = vi.hoisted(
     () => ({
-        useFirestoreCollectionSpy: vi.fn(),
-        subscribeToGuestsSpy: vi.fn(),
         createQuerySpy: vi.fn(),
+        subscribeToGuestsSpy: vi.fn(),
+        useFirestoreCollectionSpy: vi.fn(),
         whereSpy: vi.fn(),
     }),
 );
 
 vi.mock("firebase/firestore", () => ({
-    where: whereSpy,
-    query: vi.fn(),
     documentId: vi.fn(),
+    query: vi.fn(),
+    where: whereSpy,
 }));
 
 vi.mock("src/composables/useFirestore", () => ({
+    createQuery: createQuerySpy,
     useFirestoreCollection: useFirestoreCollectionSpy,
     useFirestoreDocument: vi.fn(),
-    createQuery: createQuerySpy,
 }));
 
 vi.mock("../backend-proxy", () => ({
-    getGuestsPath: (orgId: string) => `organisations/${orgId}/guests`,
-    subscribeToGuests: subscribeToGuestsSpy,
-    getUserPath: vi.fn(),
-    logoutUser: vi.fn(),
     fetchOrganisationById: vi.fn(),
     fetchOrganisationsForAdmin: vi.fn(),
     fetchPropertiesForAdmin: vi.fn(),
-    propertiesCollectionPath: vi.fn(),
+    getGuestsPath: (orgId: string) => `organisations/${orgId}/guests`,
+    getUserPath: vi.fn(),
+    logoutUser: vi.fn(),
     propertiesCollection: vi.fn(),
+    propertiesCollectionPath: vi.fn(),
+    subscribeToGuests: subscribeToGuestsSpy,
 }));
 
 type TestStores = {
+    authStore: ReturnType<typeof useAuthStore>;
     guestsStore: ReturnType<typeof useGuestsStore>;
     propertiesStore: ReturnType<typeof usePropertiesStore>;
-    authStore: ReturnType<typeof useAuthStore>;
 };
-
-function setupTestStores(): TestStores {
-    const guestsStore = mockedStore(useGuestsStore);
-    const propertiesStore = mockedStore(usePropertiesStore);
-    const authStore = mockedStore(useAuthStore) as any;
-    return { guestsStore, propertiesStore, authStore };
-}
-
-function createTestVisit(options: Partial<Visit> = {}): Visit {
-    return {
-        arrived: false,
-        cancelled: false,
-        date: new Date("2023-12-25").getTime(),
-        ...options,
-    } as Visit;
-}
 
 function createTestGuest(options: Partial<GuestDoc> = {}): GuestDoc {
     return {
-        id: "guest1",
-        name: "Guest 1",
         contact: "+4323524323",
         hashedContact: "hashedContact1",
+        id: "guest1",
         maskedContact: "maskedContact1",
+        name: "Guest 1",
         visitedProperties: {},
         ...options,
     } as GuestDoc;
@@ -80,6 +66,15 @@ function createTestProperty(id: string): PropertyDoc {
         id,
         name: `Property ${id}`,
     } as PropertyDoc;
+}
+
+function createTestVisit(options: Partial<Visit> = {}): Visit {
+    return {
+        arrived: false,
+        cancelled: false,
+        date: new Date("2023-12-25").getTime(),
+        ...options,
+    } as Visit;
 }
 
 function mockReturnGuestData(guestData: GuestDoc[]): void {
@@ -98,6 +93,13 @@ function setupAuthUser(
         relatedProperties: properties,
         role,
     } as AdminUser | AppUser;
+}
+
+function setupTestStores(): TestStores {
+    const guestsStore = mockedStore(useGuestsStore);
+    const propertiesStore = mockedStore(usePropertiesStore);
+    const authStore = mockedStore(useAuthStore) as any;
+    return { authStore, guestsStore, propertiesStore };
 }
 
 describe("Guests Store", () => {
@@ -162,8 +164,8 @@ describe("Guests Store", () => {
             const { guestsStore } = setupTestStores();
             const guest1 = createTestGuest();
             const guest2 = createTestGuest({
-                id: "guest2",
                 hashedContact: "hashedContact2",
+                id: "guest2",
             });
 
             guestsStore.refsMap.set(
@@ -187,8 +189,8 @@ describe("Guests Store", () => {
             const { guestsStore } = setupTestStores();
             const guest1 = createTestGuest();
             const guest2 = createTestGuest({
-                id: "guest2",
                 hashedContact: "hashedContact2",
+                id: "guest2",
             });
 
             // Populate cache with only one guest
@@ -301,8 +303,8 @@ describe("Guests Store", () => {
             const { guestsStore } = setupTestStores();
             const guest1 = createTestGuest();
             const guest2 = createTestGuest({
-                id: "guest2",
                 hashedContact: "hashedContact2",
+                id: "guest2",
             });
 
             mockReturnGuestData([guest1]);
@@ -443,7 +445,7 @@ describe("Guests Store", () => {
         });
 
         it("excludes future visits from the summary", async () => {
-            const { guestsStore, propertiesStore, authStore } = setupTestStores();
+            const { authStore, guestsStore, propertiesStore } = setupTestStores();
             const guestDoc = createTestGuest({
                 visitedProperties: {
                     property1: {
@@ -472,17 +474,17 @@ describe("Guests Store", () => {
             );
 
             expect(result).toEqual({
+                fulfilledVisits: 1,
                 guestId: "guest1",
                 propertyId: "property1",
                 propertyName: "Property property1",
                 totalReservations: 1,
-                fulfilledVisits: 1,
                 visitPercentage: "100.00",
             });
         });
 
         it("returns zeroes when all past visits are excluded and remaining visits are in future", async () => {
-            const { guestsStore, propertiesStore, authStore } = setupTestStores();
+            const { authStore, guestsStore, propertiesStore } = setupTestStores();
             const guestDoc = createTestGuest({
                 visitedProperties: {
                     property1: {
@@ -507,17 +509,17 @@ describe("Guests Store", () => {
             );
 
             expect(result).toEqual({
+                fulfilledVisits: 0,
                 guestId: "guest1",
                 propertyId: "property1",
                 propertyName: "Property property1",
                 totalReservations: 0,
-                fulfilledVisits: 0,
                 visitPercentage: "0.00",
             });
         });
 
         it("handles visits on current day correctly", async () => {
-            const { guestsStore, propertiesStore, authStore } = setupTestStores();
+            const { authStore, guestsStore, propertiesStore } = setupTestStores();
             const currentTimestamp = new Date("2024-01-01").getTime();
             const guestDoc = createTestGuest({
                 visitedProperties: {
@@ -539,17 +541,17 @@ describe("Guests Store", () => {
             );
 
             expect(result).toEqual({
+                fulfilledVisits: 1,
                 guestId: "guest1",
                 propertyId: "property1",
                 propertyName: "Property property1",
                 totalReservations: 1,
-                fulfilledVisits: 1,
                 visitPercentage: "100.00",
             });
         });
 
         it("returns guest summary excluding the specified event", async () => {
-            const { guestsStore, propertiesStore, authStore } = setupTestStores();
+            const { authStore, guestsStore, propertiesStore } = setupTestStores();
             const guestDoc = createTestGuest({
                 visitedProperties: {
                     property1: {
@@ -572,11 +574,11 @@ describe("Guests Store", () => {
             );
 
             expect(result).toEqual({
+                fulfilledVisits: 1,
                 guestId: "guest1",
                 propertyId: "property1",
                 propertyName: "Property property1",
                 totalReservations: 2,
-                fulfilledVisits: 1,
                 visitPercentage: "50.00",
             });
         });
@@ -596,7 +598,7 @@ describe("Guests Store", () => {
         });
 
         it("returns undefined if user does not have access to the property", async () => {
-            const { guestsStore, authStore } = setupTestStores();
+            const { authStore, guestsStore } = setupTestStores();
             const guestDoc = createTestGuest({
                 visitedProperties: {
                     property2: {
@@ -619,7 +621,7 @@ describe("Guests Store", () => {
         });
 
         it("returns undefined if property not found", async () => {
-            const { guestsStore, propertiesStore, authStore } = setupTestStores();
+            const { authStore, guestsStore, propertiesStore } = setupTestStores();
             const guestDoc = createTestGuest({
                 visitedProperties: {
                     property1: {
@@ -643,7 +645,7 @@ describe("Guests Store", () => {
         });
 
         it("returns undefined if no events for the property", async () => {
-            const { guestsStore, propertiesStore, authStore } = setupTestStores();
+            const { authStore, guestsStore, propertiesStore } = setupTestStores();
             const guestDoc = createTestGuest();
 
             mockReturnGuestData([guestDoc]);
@@ -661,7 +663,7 @@ describe("Guests Store", () => {
         });
 
         it("returns 0 reservations summary if no events after excluding the specified event", async () => {
-            const { guestsStore, propertiesStore, authStore } = setupTestStores();
+            const { authStore, guestsStore, propertiesStore } = setupTestStores();
             const guestDoc = createTestGuest({
                 visitedProperties: {
                     property1: {
@@ -682,17 +684,17 @@ describe("Guests Store", () => {
             );
 
             expect(result).toEqual({
+                fulfilledVisits: 0,
                 guestId: "guest1",
                 propertyId: "property1",
                 propertyName: "Property property1",
                 totalReservations: 0,
-                fulfilledVisits: 0,
                 visitPercentage: "0.00",
             });
         });
 
         it("handles null events correctly when excluding events", async () => {
-            const { guestsStore, propertiesStore, authStore } = setupTestStores();
+            const { authStore, guestsStore, propertiesStore } = setupTestStores();
             const guestDoc = createTestGuest({
                 visitedProperties: {
                     property1: {
@@ -714,17 +716,17 @@ describe("Guests Store", () => {
             );
             // Should not count null events in totals
             expect(result).toEqual({
+                fulfilledVisits: 0,
                 guestId: "guest1",
                 propertyId: "property1",
                 propertyName: "Property property1",
                 totalReservations: 0,
-                fulfilledVisits: 0,
                 visitPercentage: "0.00",
             });
         });
 
         it("handles case when all events are excluded", async () => {
-            const { guestsStore, propertiesStore, authStore } = setupTestStores();
+            const { authStore, guestsStore, propertiesStore } = setupTestStores();
             const guestDoc = createTestGuest({
                 visitedProperties: {
                     property1: {
@@ -745,11 +747,11 @@ describe("Guests Store", () => {
             );
 
             expect(result).toEqual({
+                fulfilledVisits: 0,
                 guestId: "guest1",
                 propertyId: "property1",
                 propertyName: "Property property1",
                 totalReservations: 0,
-                fulfilledVisits: 0,
                 visitPercentage: "0.00",
             });
         });
@@ -769,7 +771,7 @@ describe("Guests Store", () => {
         });
 
         it("returns summaries for properties the user has access to", () => {
-            const { guestsStore, propertiesStore, authStore } = setupTestStores();
+            const { authStore, guestsStore, propertiesStore } = setupTestStores();
             const guestDoc = createTestGuest({
                 visitedProperties: {
                     property1: {
@@ -796,24 +798,24 @@ describe("Guests Store", () => {
 
             expect(result).toEqual([
                 {
+                    fulfilledVisits: 1,
                     propertyId: "property1",
                     propertyName: "Property property1",
                     totalReservations: 1,
-                    fulfilledVisits: 1,
                     visitPercentage: "100.00",
                 },
                 {
+                    fulfilledVisits: 0,
                     propertyId: "property2",
                     propertyName: "Property property2",
                     totalReservations: 1,
-                    fulfilledVisits: 0,
                     visitPercentage: "0.00",
                 },
             ]);
         });
 
         it("includes all properties when user is admin", () => {
-            const { guestsStore, propertiesStore, authStore } = setupTestStores();
+            const { authStore, guestsStore, propertiesStore } = setupTestStores();
             const guestDoc = createTestGuest({
                 visitedProperties: {
                     property1: {
@@ -840,31 +842,31 @@ describe("Guests Store", () => {
 
             expect(result).toEqual([
                 {
+                    fulfilledVisits: 1,
                     propertyId: "property1",
                     propertyName: "Property property1",
                     totalReservations: 1,
-                    fulfilledVisits: 1,
                     visitPercentage: "100.00",
                 },
                 {
+                    fulfilledVisits: 0,
                     propertyId: "property2",
                     propertyName: "Property property2",
                     totalReservations: 1,
-                    fulfilledVisits: 0,
                     visitPercentage: "0.00",
                 },
                 {
+                    fulfilledVisits: 0,
                     propertyId: "property3",
                     propertyName: "Property property3",
                     totalReservations: 1,
-                    fulfilledVisits: 0,
                     visitPercentage: "0.00",
                 },
             ]);
         });
 
         it("filters out properties that are not found in propertiesStore", () => {
-            const { guestsStore, propertiesStore, authStore } = setupTestStores();
+            const { authStore, guestsStore, propertiesStore } = setupTestStores();
             const guestDoc = createTestGuest({
                 visitedProperties: {
                     property1: {
@@ -883,16 +885,16 @@ describe("Guests Store", () => {
             const result = guestsStore.guestReservationsSummary(guestDoc);
             expect(result).toHaveLength(1);
             expect(result?.[0]).toEqual({
+                fulfilledVisits: 1,
                 propertyId: "property1",
                 propertyName: "Property property1",
                 totalReservations: 1,
-                fulfilledVisits: 1,
                 visitPercentage: "100.00",
             });
         });
 
         it("correctly calculates visit percentage with mixed event statuses", () => {
-            const { guestsStore, propertiesStore, authStore } = setupTestStores();
+            const { authStore, guestsStore, propertiesStore } = setupTestStores();
             const guestDoc = createTestGuest({
                 visitedProperties: {
                     property1: {
@@ -909,12 +911,12 @@ describe("Guests Store", () => {
 
             const result = guestsStore.guestReservationsSummary(guestDoc);
             expect(result?.[0]).toEqual({
+                // Should only count event1 (arrived true, cancelled false)
+                fulfilledVisits: 1,
                 propertyId: "property1",
                 propertyName: "Property property1",
                 // Should count 3 events (excluding null)
                 totalReservations: 3,
-                // Should only count event1 (arrived true, cancelled false)
-                fulfilledVisits: 1,
                 visitPercentage: "33.33",
             });
         });

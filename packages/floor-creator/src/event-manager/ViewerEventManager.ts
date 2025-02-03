@@ -1,4 +1,5 @@
 import type { Floor } from "../Floor.js";
+
 import { EventManager } from "./EventManager.js";
 
 export class ViewerEventManager extends EventManager {

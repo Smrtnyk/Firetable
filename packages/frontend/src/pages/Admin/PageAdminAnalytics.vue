@@ -1,17 +1,16 @@
 <script setup lang="ts">
-import FTTitle from "src/components/FTTitle.vue";
-import PieChart from "src/components/admin/analytics/PieChart.vue";
 import BarChart from "src/components/admin/analytics/BarChart.vue";
-import AdminEventReservationsByPerson from "src/components/admin/event/AdminEventReservationsByPerson.vue";
+import PieChart from "src/components/admin/analytics/PieChart.vue";
 import ReservationAnalyticsCharts from "src/components/admin/analytics/ReservationAnalyticsCharts.vue";
-import FTTabs from "src/components/FTTabs.vue";
+import AdminEventReservationsByPerson from "src/components/admin/event/AdminEventReservationsByPerson.vue";
 import FTCard from "src/components/FTCard.vue";
 import FTTabPanels from "src/components/FTTabPanels.vue";
+import FTTabs from "src/components/FTTabs.vue";
 import FTTimeframeSelector from "src/components/FTTimeframeSelector.vue";
-
-import { computed, ref, watch } from "vue";
-import { usePropertiesStore } from "src/stores/properties-store";
+import FTTitle from "src/components/FTTitle.vue";
 import { useReservationsAnalytics } from "src/composables/analytics/useReservationsAnalytics.js";
+import { usePropertiesStore } from "src/stores/properties-store";
+import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 interface Props {
@@ -26,28 +25,28 @@ const today = new Date();
 const thirtyDaysAgo = new Date();
 thirtyDaysAgo.setDate(today.getDate() - 30);
 const selected = ref({
-    startDate: thirtyDaysAgo.toISOString().split("T")[0],
     endDate: today.toISOString().split("T")[0],
+    startDate: thirtyDaysAgo.toISOString().split("T")[0],
 });
 const property = computed(function () {
     return propertiesStore.getPropertyById(props.propertyId);
 });
 const {
+    avgGuestsPerReservation,
+    consumptionAnalysisCombined,
     DAYS_OF_WEEK,
+    fetchData,
+    guestDistributionAnalysis,
     guestDistributionLabels,
     peakHoursLabels,
-    selectedDay,
+    peakReservationHours,
+    plannedArrivedVsNoShow,
     plannedReservationsByActiveProperty,
     plannedReservationsByDay,
-    plannedArrivedVsNoShow,
-    avgGuestsPerReservation,
     plannedReservationsByProperty,
-    consumptionAnalysisCombined,
-    peakReservationHours,
-    guestDistributionAnalysis,
-    reservationsByDayOfWeek,
     plannedVsWalkInReservations,
-    fetchData,
+    reservationsByDayOfWeek,
+    selectedDay,
 } = useReservationsAnalytics(property, props.organisationId, locale.value);
 
 watch(
@@ -63,27 +62,27 @@ const chartInfos = computed(function () {
     return [
         {
             data: peakReservationHours.value,
-            title: "Peak Reservation Hours",
             labels: peakHoursLabels.value,
+            title: "Peak Reservation Hours",
             type: "bar",
         },
         {
             data: consumptionAnalysisCombined.value,
+            labels: ["Consumption"] as string[],
             title: "Consumption Data",
             type: "bar",
-            labels: ["Consumption"] as string[],
         },
         {
             data: guestDistributionAnalysis.value,
+            labels: guestDistributionLabels.value,
             title: "Guest Distribution",
             type: "bar",
-            labels: guestDistributionLabels.value,
         },
         {
             data: reservationsByDayOfWeek.value,
+            labels: DAYS_OF_WEEK.value,
             title: "Reservations by Day of Week",
             type: "bar",
-            labels: DAYS_OF_WEEK.value,
         },
     ] as const;
 });

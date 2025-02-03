@@ -1,10 +1,12 @@
 import type { Visit } from "@firetable/types";
-import type { RenderResult } from "vitest-browser-vue";
 import type { EditVisitDialogProps } from "src/components/admin/guest/EditVisitDialog.vue";
-import EditVisitDialog from "./EditVisitDialog.vue";
-import { renderComponent, t } from "../../../../test-helpers/render-component";
-import { describe, it, expect, beforeEach } from "vitest";
+import type { RenderResult } from "vitest-browser-vue";
+
 import { userEvent } from "@vitest/browser/context";
+import { beforeEach, describe, expect, it } from "vitest";
+
+import { renderComponent, t } from "../../../../test-helpers/render-component";
+import EditVisitDialog from "./EditVisitDialog.vue";
 
 describe("EditVisitDialog", () => {
     let props: EditVisitDialogProps;
@@ -12,10 +14,10 @@ describe("EditVisitDialog", () => {
     beforeEach(() => {
         props = {
             visit: {
-                date: Date.now(),
-                eventName: "Test Event",
                 arrived: false,
                 cancelled: false,
+                date: Date.now(),
+                eventName: "Test Event",
                 isVIPVisit: false,
             },
         };
@@ -101,10 +103,10 @@ describe("EditVisitDialog", () => {
     describe("initial state", () => {
         it("correctly displays initial visit state", async () => {
             props.visit = {
-                date: Date.now(),
-                eventName: "Test Event",
                 arrived: true,
                 cancelled: false,
+                date: Date.now(),
+                eventName: "Test Event",
                 isVIPVisit: true,
             };
 

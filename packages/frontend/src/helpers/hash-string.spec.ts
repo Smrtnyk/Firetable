@@ -1,5 +1,6 @@
+import { describe, expect, it } from "vitest";
+
 import { hashString } from "./hash-string";
-import { describe, it, expect } from "vitest";
 
 describe("hashString", () => {
     it("returns the correct hash for a given string", async () => {

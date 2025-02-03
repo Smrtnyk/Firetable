@@ -8,21 +8,23 @@ import type {
     User,
 } from "@firetable/types";
 import type { noop } from "es-toolkit";
+
+import { Role } from "@firetable/types";
+import { cloneDeep, merge } from "es-toolkit";
+import { matchesProperty } from "es-toolkit/compat";
+import { documentId, query, where } from "firebase/firestore";
+import { defineStore } from "pinia";
+import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
+import { getDefaultTimezone } from "src/helpers/date-utils";
+import { AppLogger } from "src/logger/FTLogger";
+import { ref, watch } from "vue";
+
 import {
     fetchOrganisationById,
     fetchOrganisationsForAdmin,
     fetchPropertiesForAdmin,
     propertiesCollection,
 } from "../backend-proxy";
-import { Role } from "@firetable/types";
-import { merge, cloneDeep } from "es-toolkit";
-import { defineStore } from "pinia";
-import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
-import { documentId, query, where } from "firebase/firestore";
-import { ref, watch } from "vue";
-import { matchesProperty } from "es-toolkit/compat";
-import { getDefaultTimezone } from "src/helpers/date-utils";
-import { AppLogger } from "src/logger/FTLogger";
 
 export const DEFAULT_ORGANISATION_SETTINGS: OrganisationSettings = {
     property: {
@@ -32,12 +34,12 @@ export const DEFAULT_ORGANISATION_SETTINGS: OrganisationSettings = {
 
 const DEFAULT_PROPERTY_SETTINGS: DeepRequired<PropertySettings> = {
     event: {
-        eventStartTime24HFormat: "22:00",
-        eventDurationInHours: 10,
         eventCardAspectRatio: "16:9",
+        eventDurationInHours: 10,
+        eventStartTime24HFormat: "22:00",
         reservationArrivedColor: "#1a7722",
-        reservationConfirmedColor: "#6247aa",
         reservationCancelledColor: "#ff9f43",
+        reservationConfirmedColor: "#6247aa",
         reservationPendingColor: "#2ab7ca",
         reservationWaitingForResponseColor: "#b5a22c",
     },
@@ -45,8 +47,8 @@ const DEFAULT_PROPERTY_SETTINGS: DeepRequired<PropertySettings> = {
         collectGuestData: false,
         globalGuestTags: [],
     },
-    timezone: getDefaultTimezone(),
     markGuestAsLateAfterMinutes: 0,
+    timezone: getDefaultTimezone(),
 };
 
 export const DEFAULT_SUBSCRIPTION_SETTINGS = {
@@ -151,9 +153,9 @@ export const usePropertiesStore = defineStore("properties", function () {
     }
 
     async function initNonAdminProperties({
-        role,
         organisationId,
         relatedProperties,
+        role,
     }: Pick<User, "organisationId" | "relatedProperties" | "role">): Promise<void> {
         if (role !== Role.PROPERTY_OWNER && relatedProperties.length === 0) {
             setProperties([]);
@@ -166,7 +168,7 @@ export const usePropertiesStore = defineStore("properties", function () {
                 ? query(propertiesRef)
                 : query(propertiesRef, where(documentId(), "in", relatedProperties));
 
-        const { data, stop, pending, promise } = useFirestoreCollection<PropertyDoc[]>(
+        const { data, pending, promise, stop } = useFirestoreCollection<PropertyDoc[]>(
             createQuery(userPropertiesQuery),
         );
 
@@ -208,23 +210,23 @@ export const usePropertiesStore = defineStore("properties", function () {
     }
 
     return {
-        unsubs,
-        properties,
-        organisations,
         arePropertiesLoading,
-        getPropertyById,
-        getPropertySettingsById,
-        getOrganisationById,
-        getPropertiesByOrganisationId,
-        getOrganisationSubscriptionSettingsById,
-        getOrganisationSettingsById,
-        initUserOrganisation,
-        initNonAdminProperties,
-        getOrganisationNameById,
-        getPropertyNameById,
-        initAdminProperties,
-        initOrganisations,
-        setPropertySettings,
         cleanup,
+        getOrganisationById,
+        getOrganisationNameById,
+        getOrganisationSettingsById,
+        getOrganisationSubscriptionSettingsById,
+        getPropertiesByOrganisationId,
+        getPropertyById,
+        getPropertyNameById,
+        getPropertySettingsById,
+        initAdminProperties,
+        initNonAdminProperties,
+        initOrganisations,
+        initUserOrganisation,
+        organisations,
+        properties,
+        setPropertySettings,
+        unsubs,
     };
 });

@@ -1,26 +1,28 @@
-import type { AdminEventRTInfoProps } from "src/components/admin/event/AdminEventRTInfo.vue";
 import type { PlannedReservationDoc } from "@firetable/types";
-import AdminEventRTInfo from "./AdminEventRTInfo.vue";
-import { renderComponent } from "../../../../test-helpers/render-component";
+import type { AdminEventRTInfoProps } from "src/components/admin/event/AdminEventRTInfo.vue";
+
+import { FloorElementTypes } from "@firetable/floor-creator";
 import { ReservationState, ReservationStatus, ReservationType } from "@firetable/types";
 import { beforeEach, describe, expect, it } from "vitest";
-import { FloorElementTypes } from "@firetable/floor-creator";
+
+import { renderComponent } from "../../../../test-helpers/render-component";
+import AdminEventRTInfo from "./AdminEventRTInfo.vue";
 
 describe("AdminEventRTInfo.spec", () => {
     let props: AdminEventRTInfoProps;
 
     beforeEach(() => {
         const tableObject = {
-            type: FloorElementTypes.RECT_TABLE,
-            left: 100,
-            top: 100,
-            width: 50,
-            height: 50,
-            label: "T1",
-            capacity: 4,
             angle: 0,
+            capacity: 4,
+            height: 50,
             isCircular: false,
             isLocked: false,
+            label: "T1",
+            left: 100,
+            top: 100,
+            type: FloorElementTypes.RECT_TABLE,
+            width: 50,
         };
 
         const floorJsonData = {
@@ -32,34 +34,49 @@ describe("AdminEventRTInfo.spec", () => {
         };
 
         props = {
+            activeReservations: [
+                createTestReservation({
+                    arrived: true,
+                    consumption: 100,
+                    guestContact: "test@email.com",
+                    isVIP: true,
+                    numberOfGuests: 4,
+                }),
+                createTestReservation({
+                    arrived: true,
+                    consumption: 50,
+                    numberOfGuests: 2,
+                }),
+                createTestReservation({
+                    guestContact: "guest@email.com",
+                    numberOfGuests: 3,
+                }),
+            ],
             floors: [
                 {
-                    id: "floor1",
-                    name: "Main Floor",
-                    width: 800,
                     height: 600,
-                    propertyId: "prop1",
+                    id: "floor1",
                     json: JSON.stringify(floorJsonData),
+                    name: "Main Floor",
+                    propertyId: "prop1",
+                    width: 800,
                 },
                 {
-                    id: "floor2",
-                    name: "Main Floor_copy",
-                    width: 800,
                     height: 600,
-                    propertyId: "prop1",
+                    id: "floor2",
                     json: JSON.stringify({
                         objects: [
                             { ...tableObject, id: "t4", left: 400 },
                             { ...tableObject, id: "t5", left: 500 },
                         ],
                     }),
+                    name: "Main Floor_copy",
+                    propertyId: "prop1",
+                    width: 800,
                 },
                 {
-                    id: "floor3",
-                    name: "Outdoor",
-                    width: 800,
                     height: 600,
-                    propertyId: "prop1",
+                    id: "floor3",
                     json: JSON.stringify({
                         objects: [
                             { ...tableObject, id: "t6", left: 100 },
@@ -67,25 +84,10 @@ describe("AdminEventRTInfo.spec", () => {
                             { ...tableObject, id: "t8", left: 300 },
                         ],
                     }),
+                    name: "Outdoor",
+                    propertyId: "prop1",
+                    width: 800,
                 },
-            ],
-            activeReservations: [
-                createTestReservation({
-                    arrived: true,
-                    guestContact: "test@email.com",
-                    isVIP: true,
-                    numberOfGuests: 4,
-                    consumption: 100,
-                }),
-                createTestReservation({
-                    arrived: true,
-                    numberOfGuests: 2,
-                    consumption: 50,
-                }),
-                createTestReservation({
-                    guestContact: "guest@email.com",
-                    numberOfGuests: 3,
-                }),
             ],
             returningGuests: [{ id: "guest1" }, { id: "guest2" }],
         };
@@ -129,8 +131,8 @@ describe("AdminEventRTInfo.spec", () => {
     it("handles edge cases gracefully", async () => {
         // Empty data
         const screen = renderComponent<AdminEventRTInfoProps>(AdminEventRTInfo, {
-            floors: [],
             activeReservations: [],
+            floors: [],
             returningGuests: [],
         });
 
@@ -151,23 +153,23 @@ describe("AdminEventRTInfo.spec", () => {
 
 function createTestReservation(params: Partial<PlannedReservationDoc> = {}): PlannedReservationDoc {
     return {
-        id: `res${Math.random()}`,
-        type: ReservationType.PLANNED,
-        state: ReservationState.PENDING,
-        guestName: "Guest",
         arrived: false,
+        cancelled: false,
+        consumption: 0,
+        creator: expect.anything(),
+        floorId: "floor1",
         guestContact: "",
+        guestName: "Guest",
+        id: `res${Math.random()}`,
         isVIP: false,
         numberOfGuests: 0,
-        consumption: 0,
-        reservedBy: expect.anything(),
-        creator: expect.anything(),
         reservationConfirmed: true,
-        cancelled: false,
-        tableLabel: "t1",
-        floorId: "floor1",
-        time: "13:00",
+        reservedBy: expect.anything(),
+        state: ReservationState.PENDING,
         status: ReservationStatus.ACTIVE,
+        tableLabel: "t1",
+        time: "13:00",
+        type: ReservationType.PLANNED,
         ...params,
     };
 }

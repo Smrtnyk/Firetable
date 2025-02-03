@@ -4,41 +4,25 @@
  */
 export const enum Collection {
     /**
-     * Collection of event documents
+     * Collection of drink card documents
      */
-    EVENTS = "events",
+    DRINK_CARDS = "drinkCards",
     /**
      * Collection of event log documents
      */
     EVENT_LOGS = "eventLogs",
     /**
-     * Collection of reservation documents
+     * Collection of event documents
      */
-    RESERVATIONS = "reservations",
-    /**
-     * Collection of queued reservation documents
-     */
-    QUEUED_RESERVATIONS = "queuedReservations",
-    /**
-     * Collection of guest list documents
-     */
-    GUEST_LIST = "guestList",
-    /**
-     * Collection of user documents
-     */
-    USERS = "users",
+    EVENTS = "events",
     /**
      * Collection of floor plan documents
      */
     FLOORS = "floors",
     /**
-     * Collection of organisation documents
+     * Collection of guest list documents
      */
-    ORGANISATIONS = "organisations",
-    /**
-     * Collection of property documents
-     */
-    PROPERTIES = "properties",
+    GUEST_LIST = "guestList",
     /**
      * Collection of guest documents
      */
@@ -52,9 +36,25 @@ export const enum Collection {
      */
     ISSUE_REPORTS = "issueReports",
     /**
-     * Collection of drink card documents
+     * Collection of organisation documents
      */
-    DRINK_CARDS = "drinkCards",
+    ORGANISATIONS = "organisations",
+    /**
+     * Collection of property documents
+     */
+    PROPERTIES = "properties",
+    /**
+     * Collection of queued reservation documents
+     */
+    QUEUED_RESERVATIONS = "queuedReservations",
+    /**
+     * Collection of reservation documents
+     */
+    RESERVATIONS = "reservations",
+    /**
+     * Collection of user documents
+     */
+    USERS = "users",
 }
 
 /**

@@ -1,5 +1,5 @@
-import { computed } from "vue";
 import { Screen } from "quasar";
+import { computed } from "vue";
 
 export const isMobile = computed(function () {
     return Screen.lt.sm;

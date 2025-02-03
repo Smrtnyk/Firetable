@@ -1,10 +1,13 @@
 import type { Canvas } from "fabric";
-import type { LineProps } from "../typedefs.js";
-import { aligningLineConfig } from "../constant.js";
+
 import { Point } from "fabric";
 
+import type { LineProps } from "../typedefs.js";
+
+import { aligningLineConfig } from "../constant.js";
+
 function drawLine(canvas: Canvas, origin: Point, target: Point): void {
-    const { width, color } = aligningLineConfig;
+    const { color, width } = aligningLineConfig;
     const ctx = canvas.getSelectionContext();
     const viewportTransform = canvas.viewportTransform;
     const zoom = canvas.getZoom();
@@ -22,6 +25,34 @@ function drawLine(canvas: Canvas, origin: Point, target: Point): void {
 }
 
 const xSize = 2.4;
+export function drawHorizontalLine(canvas: Canvas, options: LineProps): void {
+    const { origin, target } = options;
+    const obj = new Point(origin.x, target.y);
+    drawLine(canvas, obj, target);
+}
+export function drawPointList(canvas: Canvas, list: LineProps[]): void {
+    const arr = list.map((item) => item.target);
+    drawPoint(canvas, arr);
+}
+export function drawVerticalLine(canvas: Canvas, options: LineProps): void {
+    const { origin, target } = options;
+    const obj = new Point(target.x, origin.y);
+    drawLine(canvas, obj, target);
+}
+
+function drawPoint(canvas: Canvas, arr: Point[]): void {
+    const { color, width } = aligningLineConfig;
+    const ctx = canvas.getSelectionContext();
+    const viewportTransform = canvas.viewportTransform;
+    const zoom = canvas.getZoom();
+    ctx.save();
+    ctx.transform(...viewportTransform);
+    ctx.lineWidth = width / zoom;
+    ctx.strokeStyle = color;
+    for (const item of arr) drawX(ctx, zoom, item);
+    ctx.restore();
+}
+
 function drawX(ctx: CanvasRenderingContext2D, zoom: number, point: Point): void {
     const size = xSize / zoom;
     ctx.save();
@@ -33,32 +64,4 @@ function drawX(ctx: CanvasRenderingContext2D, zoom: number, point: Point): void 
     ctx.lineTo(-size, size);
     ctx.stroke();
     ctx.restore();
-}
-function drawPoint(canvas: Canvas, arr: Point[]): void {
-    const { width, color } = aligningLineConfig;
-    const ctx = canvas.getSelectionContext();
-    const viewportTransform = canvas.viewportTransform;
-    const zoom = canvas.getZoom();
-    ctx.save();
-    ctx.transform(...viewportTransform);
-    ctx.lineWidth = width / zoom;
-    ctx.strokeStyle = color;
-    for (const item of arr) drawX(ctx, zoom, item);
-    ctx.restore();
-}
-export function drawPointList(canvas: Canvas, list: LineProps[]): void {
-    const arr = list.map((item) => item.target);
-    drawPoint(canvas, arr);
-}
-
-export function drawVerticalLine(canvas: Canvas, options: LineProps): void {
-    const { origin, target } = options;
-    const obj = new Point(target.x, origin.y);
-    drawLine(canvas, obj, target);
-}
-
-export function drawHorizontalLine(canvas: Canvas, options: LineProps): void {
-    const { origin, target } = options;
-    const obj = new Point(origin.x, target.y);
-    drawLine(canvas, obj, target);
 }

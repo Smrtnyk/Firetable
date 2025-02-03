@@ -1,11 +1,14 @@
-import type { UserCreateFormProps } from "./UserCreateForm.vue";
 import type { PropertyDoc } from "@firetable/types";
-import UserCreateForm from "./UserCreateForm.vue";
-import { renderComponent, t } from "../../../../test-helpers/render-component";
+
 import { AdminRole, OrganisationStatus, Role } from "@firetable/types";
-import { beforeEach, describe, expect, it } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 import { first } from "es-toolkit/compat";
+import { beforeEach, describe, expect, it } from "vitest";
+
+import type { UserCreateFormProps } from "./UserCreateForm.vue";
+
+import { renderComponent, t } from "../../../../test-helpers/render-component";
+import UserCreateForm from "./UserCreateForm.vue";
 
 describe("UserCreateForm", () => {
     let props: UserCreateFormProps;
@@ -15,16 +18,16 @@ describe("UserCreateForm", () => {
 
     beforeEach(() => {
         props = {
+            organisation: {
+                id: "org1",
+                maxAllowedProperties: 2,
+                name: "TestOrg",
+                status: OrganisationStatus.ACTIVE,
+            },
             properties: [
                 { id: "property1", name: "Property 1" } as PropertyDoc,
                 { id: "property2", name: "Property 2" } as PropertyDoc,
             ],
-            organisation: {
-                id: "org1",
-                name: "TestOrg",
-                maxAllowedProperties: 2,
-                status: OrganisationStatus.ACTIVE,
-            },
         };
     });
 
@@ -152,14 +155,14 @@ describe("UserCreateForm", () => {
         expect(screen.emitted().submit).toBeTruthy();
         const [emittedPayload] = first(screen.emitted().submit as any[]);
         expect(emittedPayload).toMatchObject({
-            name: "Test User",
-            username: "testuser",
-            password: "Passwor!d123",
-            role: Role.MANAGER,
             // emailSuffix is '@TestOrg.org'
             email: "testuser@TestOrg.org",
+            name: "Test User",
             organisationId: "org1",
+            password: "Passwor!d123",
             relatedProperties: ["property1"],
+            role: Role.MANAGER,
+            username: "testuser",
         });
     });
 
@@ -383,14 +386,14 @@ describe("UserCreateForm", () => {
         expect(screen.emitted().submit).toBeTruthy();
         const [emittedPayload] = first(screen.emitted().submit as any[]);
         expect(emittedPayload).toMatchObject({
-            name: "Test User",
-            username: "testuser",
-            password: "Password123!",
-            role: Role.MANAGER,
             // emailSuffix is '@TestOrg.org'
             email: "testuser@TestOrg.org",
+            name: "Test User",
             organisationId: "org1",
+            password: "Password123!",
             relatedProperties: ["property1"],
+            role: Role.MANAGER,
+            username: "testuser",
         });
     });
 });

@@ -1,13 +1,13 @@
 <script setup lang="ts">
+import { QColor, QPopupProxy } from "quasar";
 import { ref, watch } from "vue";
-import { QPopupProxy, QColor } from "quasar";
+
+type EmitEvents = (e: "update:modelValue", newColor: string) => void;
 
 interface Props {
     modelValue: string;
     round?: boolean;
 }
-
-type EmitEvents = (e: "update:modelValue", newColor: string) => void;
 
 const { modelValue, round = false } = defineProps<Props>();
 

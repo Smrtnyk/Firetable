@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import type { EventDoc } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
+import type { EventDoc } from "@firetable/types";
+
+import { eventsCollection } from "@firetable/backend";
+import { limit, orderBy, where } from "firebase/firestore";
+import { Loading } from "quasar";
 import EventCardList from "src/components/Event/EventCardList.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
-
-import { where, orderBy, limit } from "firebase/firestore";
-import { ONE_HOUR } from "src/constants";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
-import { useRouter } from "vue-router";
-import { eventsCollection } from "@firetable/backend";
-import { watch, onMounted, computed } from "vue";
-import { Loading } from "quasar";
-import { usePropertiesStore } from "src/stores/properties-store";
+import { ONE_HOUR } from "src/constants";
 import { parseAspectRatio } from "src/helpers/utils";
+import { usePropertiesStore } from "src/stores/properties-store";
+import { computed, onMounted, watch } from "vue";
+import { useRouter } from "vue-router";
 
 interface Props {
     organisationId: string;
@@ -24,9 +24,9 @@ const props = defineProps<Props>();
 const propertiesStore = usePropertiesStore();
 
 const eventOwner: EventOwner = {
-    propertyId: props.propertyId,
-    organisationId: props.organisationId,
     id: "",
+    organisationId: props.organisationId,
+    propertyId: props.propertyId,
 };
 
 const propertySettings = computed(function () {

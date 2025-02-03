@@ -1,10 +1,12 @@
-import type { TelNumberInputProps } from "./TelNumberInput.vue";
-import TelNumberInput from "./TelNumberInput.vue";
-import { renderComponent } from "../../../test-helpers/render-component";
-import { describe, it, expect, beforeEach } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 import { last } from "es-toolkit";
 import { first } from "es-toolkit/compat";
+import { beforeEach, describe, expect, it } from "vitest";
+
+import type { TelNumberInputProps } from "./TelNumberInput.vue";
+
+import { renderComponent } from "../../../test-helpers/render-component";
+import TelNumberInput from "./TelNumberInput.vue";
 
 const AUSTRIA_OPTION = "Austria";
 

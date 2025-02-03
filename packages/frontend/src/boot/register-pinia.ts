@@ -1,5 +1,5 @@
-import { boot } from "quasar/wrappers";
 import { createPinia } from "pinia";
+import { boot } from "quasar/wrappers";
 import { AppLogger } from "src/logger/FTLogger";
 
 export default boot(async function ({ app }) {

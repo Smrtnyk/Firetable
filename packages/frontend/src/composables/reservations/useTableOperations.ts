@@ -1,38 +1,39 @@
 import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
 import type { AnyFunction, QueuedReservationDoc, ReservationDoc } from "@firetable/types";
-import { showConfirm } from "src/helpers/ui-helpers";
+
 import { useQuasar } from "quasar";
-import { watch, ref, onBeforeUnmount, computed } from "vue";
+import { showConfirm } from "src/helpers/ui-helpers";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 export const enum TableOperationType {
     RESERVATION_COPY = 1,
-    RESERVATION_TRANSFER = 2,
     RESERVATION_DEQUEUE = 3,
     RESERVATION_LINK = 4,
-}
-
-export interface ReservationLinkOperation {
-    type: TableOperationType.RESERVATION_LINK;
-    sourceFloor: FloorViewer;
-    sourceReservation: ReservationDoc;
+    RESERVATION_TRANSFER = 2,
 }
 
 export interface ReservationCopyOperation {
+    sourceFloor: FloorViewer;
+    sourceTable: BaseTable;
     type: TableOperationType.RESERVATION_COPY;
-    sourceFloor: FloorViewer;
-    sourceTable: BaseTable;
-}
-
-export interface ReservationTransferOperation {
-    type: TableOperationType.RESERVATION_TRANSFER;
-    sourceFloor: FloorViewer;
-    sourceTable: BaseTable;
 }
 
 export interface ReservationDequeueOperation {
-    type: TableOperationType.RESERVATION_DEQUEUE;
     reservation: QueuedReservationDoc;
+    type: TableOperationType.RESERVATION_DEQUEUE;
+}
+
+export interface ReservationLinkOperation {
+    sourceFloor: FloorViewer;
+    sourceReservation: ReservationDoc;
+    type: TableOperationType.RESERVATION_LINK;
+}
+
+export interface ReservationTransferOperation {
+    sourceFloor: FloorViewer;
+    sourceTable: BaseTable;
+    type: TableOperationType.RESERVATION_TRANSFER;
 }
 
 export type TableOperation =
@@ -81,18 +82,13 @@ export function useTableOperations() {
     function showOperationNotification(operation: TableOperation): void {
         let message;
         switch (operation.type) {
-            case TableOperationType.RESERVATION_DEQUEUE:
-                message = t("useReservations.movingReservationOperationMsg");
-                break;
             case TableOperationType.RESERVATION_COPY:
                 message = t("useReservations.copyingReservationOperationMsg", {
                     tableLabel: operation.sourceTable.label,
                 });
                 break;
-            case TableOperationType.RESERVATION_TRANSFER:
-                message = t("useReservations.transferringReservationOperationMsg", {
-                    tableLabel: operation.sourceTable.label,
-                });
+            case TableOperationType.RESERVATION_DEQUEUE:
+                message = t("useReservations.movingReservationOperationMsg");
                 break;
             case TableOperationType.RESERVATION_LINK:
                 message = t("useReservations.linkingTableOperationMsg", {
@@ -101,23 +97,28 @@ export function useTableOperations() {
                         : operation.sourceReservation.tableLabel,
                 });
                 break;
+            case TableOperationType.RESERVATION_TRANSFER:
+                message = t("useReservations.transferringReservationOperationMsg", {
+                    tableLabel: operation.sourceTable.label,
+                });
+                break;
             default:
                 throw new Error("Invalid table operation type!");
         }
 
         operationNotification = quasar.notify({
-            message,
-            type: "ongoing",
-            timeout: 0,
-            position: "top",
             actions: [
                 {
-                    label: t("Global.cancel"),
                     color: "white",
-                    noDismiss: true,
                     handler: onCancelOperation,
+                    label: t("Global.cancel"),
+                    noDismiss: true,
                 },
             ],
+            message,
+            position: "top",
+            timeout: 0,
+            type: "ongoing",
         });
     }
 
@@ -135,34 +136,34 @@ export function useTableOperations() {
 
     function initiateReservationLink(floor: FloorViewer, reservation: ReservationDoc): void {
         currentTableOperation.value = {
-            type: TableOperationType.RESERVATION_LINK,
             sourceFloor: floor,
             sourceReservation: reservation,
+            type: TableOperationType.RESERVATION_LINK,
         };
     }
 
     function initiateReservationCopy(floor: FloorViewer, table: BaseTable): void {
         currentTableOperation.value = {
-            type: TableOperationType.RESERVATION_COPY,
             sourceFloor: floor,
             sourceTable: table,
+            type: TableOperationType.RESERVATION_COPY,
         };
     }
 
     function initiateReservationTransfer(floor: FloorViewer, table: BaseTable): void {
         currentTableOperation.value = {
-            type: TableOperationType.RESERVATION_TRANSFER,
             sourceFloor: floor,
             sourceTable: table,
+            type: TableOperationType.RESERVATION_TRANSFER,
         };
     }
 
     return {
-        ongoingTableOperation,
-        initiateTableOperation,
         cancelCurrentOperation,
+        initiateReservationCopy,
         initiateReservationLink,
         initiateReservationTransfer,
-        initiateReservationCopy,
+        initiateTableOperation,
+        ongoingTableOperation,
     };
 }

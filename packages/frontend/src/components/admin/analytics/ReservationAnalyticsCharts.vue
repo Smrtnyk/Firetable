@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { PieChartData, TimeSeriesData } from "src/components/admin/analytics/types";
-import PieChart from "./PieChart.vue";
+
 import BarChart from "./BarChart.vue";
+import PieChart from "./PieChart.vue";
 
 interface Props {
     chartData: PieChartData | TimeSeriesData;

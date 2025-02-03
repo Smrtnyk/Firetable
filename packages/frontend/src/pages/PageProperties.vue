@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import PropertyCardList from "src/components/Property/PropertyCardList.vue";
-import { computed, onMounted, ref } from "vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
-import { useRouter } from "vue-router";
-import { usePropertiesStore } from "src/stores/properties-store";
+import PropertyCardList from "src/components/Property/PropertyCardList.vue";
 import { parseAspectRatio } from "src/helpers/utils";
+import { usePropertiesStore } from "src/stores/properties-store";
+import { computed, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 
 interface Props {
     organisationId: string;

@@ -1,34 +1,12 @@
+import type { BarSeriesOption, PieSeriesOption } from "echarts/charts";
 import type {
+    DatasetComponentOption,
+    GridComponentOption,
     LegendComponentOption,
     TitleComponentOption,
     TooltipComponentOption,
-    DatasetComponentOption,
-    GridComponentOption,
 } from "echarts/components";
 import type { ComposeOption } from "echarts/core";
-import type { BarSeriesOption, PieSeriesOption } from "echarts/charts";
-
-type BarItemStyleOption = NonNullable<BarSeriesOption["itemStyle"]>;
-type BarItemStackOption = NonNullable<BarSeriesOption["stack"]>;
-
-export type PieChartData = {
-    name: string;
-    value: number;
-    itemStyle?: {
-        color?: string;
-    };
-}[];
-
-export type ECPieOption = ComposeOption<
-    LegendComponentOption | PieSeriesOption | TitleComponentOption | TooltipComponentOption
->;
-
-export type TimeSeriesData = {
-    name: string;
-    data: number[];
-    itemStyle: BarItemStyleOption;
-    stack?: BarItemStackOption;
-}[];
 
 export type ECBarOption = ComposeOption<
     | BarSeriesOption
@@ -38,3 +16,25 @@ export type ECBarOption = ComposeOption<
     | TitleComponentOption
     | TooltipComponentOption
 >;
+export type ECPieOption = ComposeOption<
+    LegendComponentOption | PieSeriesOption | TitleComponentOption | TooltipComponentOption
+>;
+
+export type PieChartData = {
+    itemStyle?: {
+        color?: string;
+    };
+    name: string;
+    value: number;
+}[];
+
+export type TimeSeriesData = {
+    data: number[];
+    itemStyle: BarItemStyleOption;
+    name: string;
+    stack?: BarItemStackOption;
+}[];
+
+type BarItemStackOption = NonNullable<BarSeriesOption["stack"]>;
+
+type BarItemStyleOption = NonNullable<BarSeriesOption["itemStyle"]>;

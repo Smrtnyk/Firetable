@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { Ref } from "vue";
 
+export type SortDirection = "asc" | "desc";
+
 export type SortOption =
     /**
      * When sorting by bookings try to prioritize guests with the highest percentage of fulfilled visits.
@@ -23,12 +25,10 @@ export type SortOption =
      */
     | "percentage";
 
-export type SortDirection = "asc" | "desc";
-
 interface GuestSortOptionsProps {
-    currentSortOption: Ref<SortOption>;
-    currentSortDirection: Ref<SortDirection>;
     availableTags: Ref<string[]>;
+    currentSortDirection: Ref<SortDirection>;
+    currentSortOption: Ref<SortOption>;
     selectedTags: Ref<string[]>;
 }
 

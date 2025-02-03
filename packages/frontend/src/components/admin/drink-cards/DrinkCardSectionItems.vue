@@ -6,24 +6,25 @@ import type {
     SpecialPrice,
 } from "@firetable/types";
 import type { SortableEvent } from "vue-draggable-plus";
+
 import { isDrinkItem } from "@firetable/types";
-import { computed } from "vue";
-import { vDraggable } from "vue-draggable-plus";
-import { useI18n } from "vue-i18n";
-import { buttonSize } from "src/global-reactives/screen-detection";
-import FTCenteredText from "src/components/FTCenteredText.vue";
-import { showConfirm } from "src/helpers/ui-helpers";
-import { useDialog } from "src/composables/useDialog";
 import DrinkCardBuilderItemSelectionDialog from "src/components/admin/drink-cards/DrinkCardBuilderItemSelectionDialog.vue";
 import DrinkCardBuilderSectionListItem from "src/components/admin/drink-cards/DrinkCardBuilderSectionListItem.vue";
 import FTBottomDialog from "src/components/FTBottomDialog.vue";
-
-interface Props {
-    section: DrinkCardSection;
-    inventoryItems: InventoryItemDoc[];
-}
+import FTCenteredText from "src/components/FTCenteredText.vue";
+import { useDialog } from "src/composables/useDialog";
+import { buttonSize } from "src/global-reactives/screen-detection";
+import { showConfirm } from "src/helpers/ui-helpers";
+import { computed } from "vue";
+import { vDraggable } from "vue-draggable-plus";
+import { useI18n } from "vue-i18n";
 
 type Emits = (event: "update:items", items: DrinkCardItem[]) => void;
+
+interface Props {
+    inventoryItems: InventoryItemDoc[];
+    section: DrinkCardSection;
+}
 
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
@@ -36,15 +37,118 @@ const draggableItems = computed(function () {
 const draggableOptions = computed(function () {
     return {
         animation: 150,
-        onEnd: onDrop,
-        ghostClass: "draggable-ghost",
         chosenClass: "draggable-chosen",
         dragClass: "draggable-drag",
+        ghostClass: "draggable-ghost",
+        onEnd: onDrop,
     };
 });
 
+function createEmptySpecialPrice(): DrinkCardItem["specialPrice"] {
+    return {
+        amount: 0,
+        description: "",
+        label: "",
+    };
+}
+
+function formatItemName(item: DrinkCardItem): string {
+    const displayName = item.servingSize.displayName;
+
+    if (displayName) {
+        return `${item.name} (${displayName})`;
+    }
+    return item.name;
+}
+
+function handleAddItem(inventoryItem: InventoryItemDoc): void {
+    const servingSize = {
+        amount: 0,
+        displayName: "",
+        unit: "ml" as const,
+    };
+
+    const newItem: DrinkCardItem = {
+        brand: inventoryItem.brand,
+        description: inventoryItem.description,
+        displayAlcoholContent:
+            isDrinkItem(inventoryItem) && inventoryItem.alcoholContent !== undefined,
+        displayOrigin: inventoryItem.region !== undefined,
+        inventoryItemId: inventoryItem.id,
+        // Default display settings
+        isHighlighted: false,
+
+        isVisible: true,
+        mainCategory: inventoryItem.mainCategory,
+        // Copy relevant inventory fields
+        name: inventoryItem.name,
+        order: props.section.items.length,
+        price: 0,
+        region: inventoryItem.region,
+        servingSize,
+        specialPrice: createEmptySpecialPrice(),
+        style: inventoryItem.style,
+
+        subCategory: inventoryItem.subCategory,
+        tags: [],
+        type: inventoryItem.type,
+        volume: inventoryItem.volume,
+    };
+
+    if (isDrinkItem(inventoryItem)) {
+        Object.assign(newItem, {
+            alcoholContent: inventoryItem.alcoholContent,
+        });
+    }
+
+    emit("update:items", [...props.section.items, newItem]);
+}
+
+function handleItemUpdate(index: number, updates: Partial<DrinkCardItem>): void {
+    const newItems = Array.from(props.section.items);
+    newItems[index] = {
+        ...newItems[index],
+        ...updates,
+    };
+    emit("update:items", newItems);
+}
+
+async function handleRemoveItem(index: number): Promise<void> {
+    const confirm = await showConfirm("Are you sure you want to remove this item?");
+    if (!confirm) return;
+
+    const newItems = Array.from(props.section.items);
+    newItems.splice(index, 1);
+    emit("update:items", newItems);
+}
+
+function handleSpecialPriceUpdate<K extends keyof SpecialPrice>(
+    index: number,
+    { field, value }: { field: K; value: SpecialPrice[K] },
+): void {
+    const newItems = Array.from(props.section.items);
+    const item = newItems[index];
+
+    if (!item.specialPrice) {
+        item.specialPrice = {
+            amount: 0,
+            description: "",
+            label: "Happy Hour",
+        };
+    }
+
+    item.specialPrice[field] = value;
+
+    // Remove special price if amount is 0 or not set
+    if (field === "amount" && !value) {
+        item.specialPrice = createEmptySpecialPrice();
+    }
+
+    emit("update:items", newItems);
+}
+
 function onDrop(event: SortableEvent): void {
-    const { oldDraggableIndex, newDraggableIndex } = event;
+    const { newDraggableIndex, oldDraggableIndex } = event;
     if (
         oldDraggableIndex === newDraggableIndex ||
         oldDraggableIndex === undefined ||
@@ -67,23 +171,6 @@ function onDrop(event: SortableEvent): void {
     emit("update:items", reorderedItems);
 }
 
-function createEmptySpecialPrice(): DrinkCardItem["specialPrice"] {
-    return {
-        amount: 0,
-        label: "",
-        description: "",
-    };
-}
-
-function formatItemName(item: DrinkCardItem): string {
-    const displayName = item.servingSize.displayName;
-
-    if (displayName) {
-        return `${item.name} (${displayName})`;
-    }
-    return item.name;
-}
-
 function showItemSelectionDialog(): void {
     const dialog = createDialog({
         component: FTBottomDialog,
@@ -100,92 +187,6 @@ function showItemSelectionDialog(): void {
             },
         },
     });
-}
-
-function handleAddItem(inventoryItem: InventoryItemDoc): void {
-    const servingSize = {
-        amount: 0,
-        unit: "ml" as const,
-        displayName: "",
-    };
-
-    const newItem: DrinkCardItem = {
-        inventoryItemId: inventoryItem.id,
-        price: 0,
-        specialPrice: createEmptySpecialPrice(),
-        order: props.section.items.length,
-        isVisible: true,
-        servingSize,
-
-        // Copy relevant inventory fields
-        name: inventoryItem.name,
-        type: inventoryItem.type,
-        mainCategory: inventoryItem.mainCategory,
-        subCategory: inventoryItem.subCategory,
-        style: inventoryItem.style,
-        brand: inventoryItem.brand,
-        region: inventoryItem.region,
-        volume: inventoryItem.volume,
-        description: inventoryItem.description,
-
-        // Default display settings
-        isHighlighted: false,
-        displayAlcoholContent:
-            isDrinkItem(inventoryItem) && inventoryItem.alcoholContent !== undefined,
-        displayOrigin: inventoryItem.region !== undefined,
-        tags: [],
-    };
-
-    if (isDrinkItem(inventoryItem)) {
-        Object.assign(newItem, {
-            alcoholContent: inventoryItem.alcoholContent,
-        });
-    }
-
-    emit("update:items", [...props.section.items, newItem]);
-}
-
-function handleItemUpdate(index: number, updates: Partial<DrinkCardItem>): void {
-    const newItems = Array.from(props.section.items);
-    newItems[index] = {
-        ...newItems[index],
-        ...updates,
-    };
-    emit("update:items", newItems);
-}
-
-function handleSpecialPriceUpdate<K extends keyof SpecialPrice>(
-    index: number,
-    { field, value }: { field: K; value: SpecialPrice[K] },
-): void {
-    const newItems = Array.from(props.section.items);
-    const item = newItems[index];
-
-    if (!item.specialPrice) {
-        item.specialPrice = {
-            amount: 0,
-            label: "Happy Hour",
-            description: "",
-        };
-    }
-
-    item.specialPrice[field] = value;
-
-    // Remove special price if amount is 0 or not set
-    if (field === "amount" && !value) {
-        item.specialPrice = createEmptySpecialPrice();
-    }
-
-    emit("update:items", newItems);
-}
-
-async function handleRemoveItem(index: number): Promise<void> {
-    const confirm = await showConfirm("Are you sure you want to remove this item?");
-    if (!confirm) return;
-
-    const newItems = Array.from(props.section.items);
-    newItems.splice(index, 1);
-    emit("update:items", newItems);
 }
 </script>
 

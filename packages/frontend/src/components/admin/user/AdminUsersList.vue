@@ -1,18 +1,19 @@
 <script setup lang="ts">
 import type { User, VoidFunction } from "@firetable/types";
+
 import { formatEventDate, getDefaultTimezone } from "src/helpers/date-utils";
 import { useI18n } from "vue-i18n";
 
-interface Props {
-    users: BucketizedUser[];
-}
-
 export type BucketizedUser = User & { memberOf?: string[] };
+
 export interface BucketizedUsers {
     [propertyId: string]: {
         propertyName: string;
         users: BucketizedUser[];
     };
+}
+interface Props {
+    users: BucketizedUser[];
 }
 
 const { locale } = useI18n();

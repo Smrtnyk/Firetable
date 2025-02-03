@@ -60,14 +60,17 @@
 </template>
 
 <script setup lang="ts">
-import type { Country } from "./european-countries";
 import type { AnyFunction } from "@firetable/types";
 import type { CountryCode } from "libphonenumber-js";
-import europeanCountries from "./european-countries";
+
+import { AsYouType, parsePhoneNumberFromString } from "libphonenumber-js";
+import { QInput, QSelect } from "quasar";
 import { computed, ref, watch } from "vue";
-import { parsePhoneNumberFromString, AsYouType } from "libphonenumber-js";
-import { QSelect, QInput } from "quasar";
 import { useI18n } from "vue-i18n";
+
+import type { Country } from "./european-countries";
+
+import europeanCountries from "./european-countries";
 
 export interface TelNumberInputProps {
     modelValue: string | undefined;
@@ -109,6 +112,19 @@ watch(
     { immediate: true },
 );
 
+function emitPhoneNumber(): void {
+    if (!selectedCountry.value && !phoneNumber.value) {
+        emit("update:modelValue", "");
+        return;
+    }
+
+    if (validatePhoneNumber() === true && selectedCountry.value) {
+        emit("update:modelValue", fullNumber.value);
+    } else {
+        emit("update:modelValue", "");
+    }
+}
+
 function onFilterCountries(val: string, update: AnyFunction): void {
     if (val === "") {
         update(function () {
@@ -127,6 +143,19 @@ function onFilterCountries(val: string, update: AnyFunction): void {
             );
         });
     });
+}
+
+function onPhoneNumberBlur(): void {
+    if (!validatePhoneNumber() || !selectedCountry.value || !phoneNumber.value) {
+        return;
+    }
+    const asYouType = new AsYouType(selectedCountry.value.iso2.toUpperCase() as CountryCode);
+    asYouType.input(phoneNumber.value);
+    const output = asYouType.getNumber();
+    if (output) {
+        phoneNumber.value = output.nationalNumber;
+    }
+    emitPhoneNumber();
 }
 
 function validateCountrySelection(): boolean | string {
@@ -171,32 +200,6 @@ function validatePhoneNumber(): boolean | string {
     }
 
     return true;
-}
-
-function emitPhoneNumber(): void {
-    if (!selectedCountry.value && !phoneNumber.value) {
-        emit("update:modelValue", "");
-        return;
-    }
-
-    if (validatePhoneNumber() === true && selectedCountry.value) {
-        emit("update:modelValue", fullNumber.value);
-    } else {
-        emit("update:modelValue", "");
-    }
-}
-
-function onPhoneNumberBlur(): void {
-    if (!validatePhoneNumber() || !selectedCountry.value || !phoneNumber.value) {
-        return;
-    }
-    const asYouType = new AsYouType(selectedCountry.value.iso2.toUpperCase() as CountryCode);
-    asYouType.input(phoneNumber.value);
-    const output = asYouType.getNumber();
-    if (output) {
-        phoneNumber.value = output.nationalNumber;
-    }
-    emitPhoneNumber();
 }
 
 watch([selectedCountry, phoneNumber], emitPhoneNumber);

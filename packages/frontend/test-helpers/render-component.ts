@@ -1,13 +1,19 @@
-import type { UnwrapRef, WritableComputedRef } from "vue";
-import type { RenderResult } from "vitest-browser-vue";
 import type { TestingOptions } from "@pinia/testing";
 import type { Store, StoreDefinition } from "pinia";
 import type { Mock } from "vitest";
-import { myIcons } from "src/config";
+import type { RenderResult } from "vitest-browser-vue";
+import type { UnwrapRef, WritableComputedRef } from "vue";
+
+import { createTestingPinia } from "@pinia/testing";
 import {
-    QDialog,
+    BottomSheet,
+    Dialog,
+    IconSet,
+    Loading,
+    Notify,
     QAvatar,
     QBtn,
+    QDialog,
     QDrawer,
     QIcon,
     QInput,
@@ -16,7 +22,9 @@ import {
     QItemSection,
     QLayout,
     QList,
+    QMenu,
     QPageSticky,
+    QRadio,
     QScrollArea,
     QSelect,
     QSeparator,
@@ -26,23 +34,17 @@ import {
     QTimeline,
     QTimelineEntry,
     QToggle,
-    QRadio,
-    QMenu,
     Quasar,
-    IconSet,
-    BottomSheet,
-    Loading,
-    Dialog,
-    Notify,
 } from "quasar";
-import { h, defineComponent } from "vue";
-import { render } from "vitest-browser-vue";
-import { vi } from "vitest";
 import { i18n, loadLanguage } from "src/boot/i18n";
-
+import { myIcons } from "src/config";
+import { vi } from "vitest";
+import { render } from "vitest-browser-vue";
 import "quasar/dist/quasar.css";
+
 import "../src/css/app.scss";
-import { createTestingPinia } from "@pinia/testing";
+
+import { defineComponent, h } from "vue";
 
 document.body.style.height = "100vh";
 document.body.style.width = "100vw";
@@ -56,6 +58,25 @@ export function getLocaleForTest(): WritableComputedRef<string, string> {
     return i18n.global.locale;
 }
 
+export function mockedStore<TStoreDef extends () => unknown>(
+    useStore: TStoreDef,
+): TStoreDef extends StoreDefinition<infer Id, infer State, infer Getters, infer Actions>
+    ? Store<
+          Id,
+          State,
+          Record<string, never>,
+          {
+              [K in keyof Actions]: Actions[K] extends (...args: any[]) => any
+                  ? Mock<Actions[K]>
+                  : Actions[K];
+          }
+      > & {
+          [K in keyof Getters]: UnwrapRef<Getters[K]>;
+      }
+    : ReturnType<TStoreDef> {
+    return useStore() as any;
+}
+
 /**
  * Function to render a component with Quasar plugins and components.
  * Also registers the i18n plugin with messages.
@@ -64,9 +85,9 @@ export function renderComponent<T>(
     component: Parameters<typeof render>[0],
     props?: any,
     options?: {
-        wrapInLayout?: boolean;
         piniaStoreOptions?: Partial<TestingOptions>;
         provide?: Record<PropertyKey, unknown>;
+        wrapInLayout?: boolean;
     },
 ): RenderResult<T> {
     const wrapInLayout = options?.wrapInLayout ?? false;
@@ -92,41 +113,41 @@ export function renderComponent<T>(
 
     const renderOptions: any = {
         global: {
+            components: {
+                QAvatar,
+                QBtn,
+                QDialog,
+                QDrawer,
+                QIcon,
+                QInput,
+                QItem,
+                QItemLabel,
+                QItemSection,
+                QLayout,
+                QList,
+                QMenu,
+                QPageSticky,
+                QRadio,
+                QScrollArea,
+                QSelect,
+                QSeparator,
+                QSlideItem,
+                QTable,
+                QTd,
+                QTimeline,
+                QTimelineEntry,
+                QToggle,
+            },
             plugins: [
                 createTestingPinia({
                     stubActions: false,
                     ...options?.piniaStoreOptions,
                     createSpy: vi.fn,
                 }),
-                [Quasar, { plugins: { BottomSheet, Loading, Dialog, Notify } }],
+                [Quasar, { plugins: { BottomSheet, Dialog, Loading, Notify } }],
                 i18n,
             ],
             provide: options?.provide,
-            components: {
-                QInput,
-                QSelect,
-                QBtn,
-                QTable,
-                QTd,
-                QIcon,
-                QScrollArea,
-                QPageSticky,
-                QTimeline,
-                QTimelineEntry,
-                QLayout,
-                QItem,
-                QItemSection,
-                QSlideItem,
-                QItemLabel,
-                QAvatar,
-                QSeparator,
-                QDrawer,
-                QToggle,
-                QList,
-                QDialog,
-                QRadio,
-                QMenu,
-            },
         },
     };
     if (props && !wrapInLayout) {
@@ -142,23 +163,4 @@ export function renderComponent<T>(
     IconSet.props.name = "line-awesome";
 
     return result;
-}
-
-export function mockedStore<TStoreDef extends () => unknown>(
-    useStore: TStoreDef,
-): TStoreDef extends StoreDefinition<infer Id, infer State, infer Getters, infer Actions>
-    ? Store<
-          Id,
-          State,
-          Record<string, never>,
-          {
-              [K in keyof Actions]: Actions[K] extends (...args: any[]) => any
-                  ? Mock<Actions[K]>
-                  : Actions[K];
-          }
-      > & {
-          [K in keyof Getters]: UnwrapRef<Getters[K]>;
-      }
-    : ReturnType<TStoreDef> {
-    return useStore() as any;
 }

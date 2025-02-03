@@ -1,7 +1,9 @@
+import { beforeEach, describe, expect, it } from "vitest";
+
 import type { AdminEventReturningGuestsListProps } from "./AdminEventReturningGuestsList.vue";
-import AdminEventReturningGuestsList from "./AdminEventReturningGuestsList.vue";
+
 import { renderComponent } from "../../../../test-helpers/render-component";
-import { describe, it, expect, beforeEach } from "vitest";
+import AdminEventReturningGuestsList from "./AdminEventReturningGuestsList.vue";
 
 describe("ReturningGuestsList", () => {
     let props: AdminEventReturningGuestsListProps;
@@ -25,25 +27,25 @@ describe("ReturningGuestsList", () => {
 
     it("renders a list of returning guests", async () => {
         const sampleVisit = {
-            date: Date.now(),
             arrived: true,
-            eventName: "Event 1",
             cancelled: false,
+            date: Date.now(),
+            eventName: "Event 1",
         };
         props.returningGuests = [
             {
+                contact: "john@example.com",
                 id: "guest1",
                 name: "John Doe",
-                contact: "john@example.com",
-                visits: [sampleVisit],
                 tableLabels: ["Table 1", "Table 2"],
+                visits: [sampleVisit],
             },
             {
+                contact: "jane@example.com",
                 id: "guest2",
                 name: "Jane Smith",
-                contact: "jane@example.com",
-                visits: [sampleVisit, sampleVisit],
                 tableLabels: ["Table 3"],
+                visits: [sampleVisit, sampleVisit],
             },
         ];
 
@@ -73,11 +75,11 @@ describe("ReturningGuestsList", () => {
     it("handles guests with no visits gracefully", async () => {
         props.returningGuests = [
             {
+                contact: "guest@example.com",
                 id: "guest1",
                 name: "Guest With No Visits",
-                contact: "guest@example.com",
-                visits: [],
                 tableLabels: [],
+                visits: [],
             },
         ];
 
@@ -95,11 +97,11 @@ describe("ReturningGuestsList", () => {
     it("handles guests with null visits", async () => {
         props.returningGuests = [
             {
+                contact: "nullguest@example.com",
                 id: "guest1",
                 name: "Guest With Null Visits",
-                contact: "nullguest@example.com",
-                visits: [null, null],
                 tableLabels: ["Table A"],
+                visits: [null, null],
             },
         ];
 

@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import type { IssueReportDoc } from "@firetable/types";
-import { getIssueReportsPath, updateIssueReport, deleteIssueReport } from "../../backend-proxy";
-import FTTitle from "src/components/FTTitle.vue";
-import FTCenteredText from "src/components/FTCenteredText.vue";
-import { useFirestoreCollection } from "src/composables/useFirestore";
-import { tryCatchLoadingWrapper, showConfirm } from "src/helpers/ui-helpers";
-import { useI18n } from "vue-i18n";
-import { useQuasar } from "quasar";
+
 import { IssueCategory, IssueStatus } from "@firetable/types";
+import { useQuasar } from "quasar";
+import FTCenteredText from "src/components/FTCenteredText.vue";
+import FTTitle from "src/components/FTTitle.vue";
+import { useFirestoreCollection } from "src/composables/useFirestore";
 import { getIssueStatusColor } from "src/helpers/issue-helpers";
+import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { useI18n } from "vue-i18n";
+
+import { deleteIssueReport, getIssueReportsPath, updateIssueReport } from "../../backend-proxy";
 
 const { t } = useI18n();
 const quasar = useQuasar();
@@ -16,32 +18,23 @@ const quasar = useQuasar();
 const { data: issueReports } = useFirestoreCollection<IssueReportDoc>(getIssueReportsPath());
 
 const statusOptions = [
-    { label: t("PageAdminIssueReports.status.new"), value: IssueStatus.NEW, color: "warning" },
+    { color: "warning", label: t("PageAdminIssueReports.status.new"), value: IssueStatus.NEW },
     {
+        color: "info",
         label: t("PageAdminIssueReports.status.in_progress"),
         value: IssueStatus.IN_PROGRESS,
-        color: "info",
     },
     {
+        color: "positive",
         label: t("PageAdminIssueReports.status.resolved"),
         value: IssueStatus.RESOLVED,
-        color: "positive",
     },
     {
+        color: "negative",
         label: t("PageAdminIssueReports.status.wont_fix"),
         value: IssueStatus.WONT_FIX,
-        color: "negative",
     },
 ];
-
-async function updateIssueStatus(issueId: string, status: IssueStatus): Promise<void> {
-    await tryCatchLoadingWrapper({
-        async hook() {
-            await updateIssueReport(issueId, { status });
-            quasar.notify(t("PageAdminIssueReports.statusUpdated"));
-        },
-    });
-}
 
 async function onDeleteIssue(issueId: string): Promise<void> {
     if (await showConfirm(t("PageAdminIssueReports.deleteConfirmation"))) {
@@ -52,6 +45,15 @@ async function onDeleteIssue(issueId: string): Promise<void> {
             },
         });
     }
+}
+
+async function updateIssueStatus(issueId: string, status: IssueStatus): Promise<void> {
+    await tryCatchLoadingWrapper({
+        async hook() {
+            await updateIssueReport(issueId, { status });
+            quasar.notify(t("PageAdminIssueReports.statusUpdated"));
+        },
+    });
 }
 </script>
 

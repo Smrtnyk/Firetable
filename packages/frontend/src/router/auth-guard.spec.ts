@@ -1,18 +1,21 @@
-import type { RouteLocationNormalizedGeneric, RouteMeta } from "vue-router";
-import type { AuthGuard } from "./auth-guard";
 import type { usePermissionsStore } from "src/stores/permissions-store";
-import { createAuthGuard } from "./auth-guard";
-import { mockedStore } from "../../test-helpers/render-component";
-import { useAuthStore, AuthState } from "src/stores/auth-store";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { getCurrentUser } from "vuefire";
-import { Loading } from "quasar";
-import { AppLogger } from "src/logger/FTLogger";
+import type { RouteLocationNormalizedGeneric, RouteMeta } from "vue-router";
+
 import { AdminRole, Role } from "@firetable/types";
-import { createApp } from "vue";
-import { setActivePinia } from "pinia";
 import { createTestingPinia } from "@pinia/testing";
 import { delay } from "es-toolkit";
+import { setActivePinia } from "pinia";
+import { Loading } from "quasar";
+import { AppLogger } from "src/logger/FTLogger";
+import { AuthState, useAuthStore } from "src/stores/auth-store";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { createApp } from "vue";
+import { getCurrentUser } from "vuefire";
+
+import type { AuthGuard } from "./auth-guard";
+
+import { mockedStore } from "../../test-helpers/render-component";
+import { createAuthGuard } from "./auth-guard";
 
 vi.mock("vuefire", () => ({
     getCurrentUser: vi.fn(),
@@ -22,14 +25,14 @@ vi.mock("vuefire", () => ({
 
 vi.mock("quasar", async (importOriginal) => ({
     ...(await importOriginal()),
-    Loading: {
-        show: vi.fn(),
-        hide: vi.fn(),
-    },
     Dialog: {
         create: vi.fn(() => ({
             onOk: vi.fn(),
         })),
+    },
+    Loading: {
+        hide: vi.fn(),
+        show: vi.fn(),
     },
 }));
 
@@ -45,14 +48,14 @@ function createMockRoute(
     meta: Partial<RouteMeta> = {},
 ): RouteLocationNormalizedGeneric {
     return {
-        path,
-        meta,
         fullPath: path,
         hash: "",
-        query: {},
-        params: {},
-        name: undefined,
         matched: [],
+        meta,
+        name: undefined,
+        params: {},
+        path,
+        query: {},
     } as unknown as RouteLocationNormalizedGeneric;
 }
 
@@ -65,8 +68,8 @@ describe("Auth Guard", () => {
         vi.useFakeTimers();
         const app = createApp({});
         const pinia = createTestingPinia({
-            stubActions: false,
             createSpy: vi.fn,
+            stubActions: false,
         });
         app.use(pinia);
         setActivePinia(pinia);
@@ -125,8 +128,8 @@ describe("Auth Guard", () => {
         it("checks function-based role permissions", async () => {
             const mockRoleCheck = vi.fn().mockReturnValue(true);
             const to = createMockRoute("/admin", {
-                requiresAuth: true,
                 allowedRoles: mockRoleCheck,
+                requiresAuth: true,
             });
 
             mockedAuthStore.setAuthState(AuthState.READY);
@@ -143,8 +146,8 @@ describe("Auth Guard", () => {
 
         it("handles array-based role checks", async () => {
             const to = createMockRoute("/admin", {
-                requiresAuth: true,
                 allowedRoles: [AdminRole.ADMIN, Role.PROPERTY_OWNER],
+                requiresAuth: true,
             });
 
             mockedAuthStore.setAuthState(AuthState.READY);
@@ -157,8 +160,8 @@ describe("Auth Guard", () => {
 
         it("redirects on role check failure", async () => {
             const to = createMockRoute("/admin", {
-                requiresAuth: true,
                 allowedRoles: [AdminRole.ADMIN],
+                requiresAuth: true,
             });
 
             mockedAuthStore.setAuthState(AuthState.READY);
@@ -215,8 +218,8 @@ describe("Auth Guard", () => {
 
         it("handles role check errors", async () => {
             const to = createMockRoute("/admin", {
-                requiresAuth: true,
                 allowedRoles: [AdminRole.ADMIN],
+                requiresAuth: true,
             });
 
             mockedAuthStore.setAuthState(AuthState.READY);
@@ -228,8 +231,8 @@ describe("Auth Guard", () => {
 
         it("identifies permission errors", async () => {
             const to = createMockRoute("/test", {
-                requiresAuth: true,
                 allowedRoles: [AdminRole.ADMIN],
+                requiresAuth: true,
             });
 
             mockedAuthStore.setAuthState(AuthState.READY);
@@ -268,8 +271,8 @@ describe("Auth Guard", () => {
             await guard(to);
 
             expect(Loading.show).toHaveBeenCalledWith({
-                message: "Loading...",
                 delay: 200,
+                message: "Loading...",
             });
             expect(Loading.hide).toHaveBeenCalled();
         });
@@ -309,8 +312,8 @@ describe("Auth Guard", () => {
     describe("Edge Cases", () => {
         it("handles undefined token result", async () => {
             const to = createMockRoute("/admin", {
-                requiresAuth: true,
                 allowedRoles: [AdminRole.ADMIN],
+                requiresAuth: true,
             });
 
             mockedAuthStore.setAuthState(AuthState.READY);
@@ -323,8 +326,8 @@ describe("Auth Guard", () => {
 
         it("handles undefined role claims", async () => {
             const to = createMockRoute("/admin", {
-                requiresAuth: true,
                 allowedRoles: [AdminRole.ADMIN],
+                requiresAuth: true,
             });
 
             mockedAuthStore.setAuthState(AuthState.READY);

@@ -1,15 +1,18 @@
 import type { CallableRequest } from "firebase-functions/v2/https";
+
+import { logger } from "firebase-functions/v2";
+import { HttpsError } from "firebase-functions/v2/https";
+
 import type { PreparedGuestData } from "./set-guest-data.js";
+
 import { db } from "../../init.js";
 import { getGuestsPath } from "../../paths.js";
-import { HttpsError } from "firebase-functions/v2/https";
-import { logger } from "firebase-functions/v2";
 
 export type DeleteGuestVisitData = {
+    eventId: string;
+    organisationId: string;
     preparedGuestData: PreparedGuestData;
     propertyId: string;
-    organisationId: string;
-    eventId: string;
 };
 
 export async function deleteGuestVisitFn(
@@ -19,7 +22,7 @@ export async function deleteGuestVisitFn(
         logger.info("Prepared guest data is not provided");
         return;
     }
-    const { organisationId, propertyId, eventId, preparedGuestData } = req.data;
+    const { eventId, organisationId, preparedGuestData, propertyId } = req.data;
     const { contact } = preparedGuestData;
 
     if (!contact) {

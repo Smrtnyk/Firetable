@@ -1,7 +1,8 @@
+import { DocumentReference } from "firebase-admin/firestore";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { db } from "../init.js";
 import { deleteDocument, MAX_DEPTH } from "./index.js";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { DocumentReference } from "firebase-admin/firestore";
 
 describe("deleteDocument Function", () => {
     const collectionName = "testCollection";

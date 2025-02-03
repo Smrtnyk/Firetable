@@ -1,29 +1,29 @@
 <script setup lang="ts">
 import type { CreateUserPayload, EditUserPayload, PropertyDoc, User } from "@firetable/types";
 import type { BucketizedUser, BucketizedUsers } from "src/components/admin/user/AdminUsersList.vue";
-import { createUserWithEmail, deleteUser, updateUser, fetchUsersByRole } from "../../backend-proxy";
-import { Role } from "@firetable/types";
 
+import { Role } from "@firetable/types";
+import { useAsyncState } from "@vueuse/core";
+import { matchesProperty } from "es-toolkit/compat";
+import { Loading, useQuasar } from "quasar";
+import AdminUsersList from "src/components/admin/user/AdminUsersList.vue";
 import UserCreateForm from "src/components/admin/user/UserCreateForm.vue";
 import UserEditForm from "src/components/admin/user/UserEditForm.vue";
-import FTTitle from "src/components/FTTitle.vue";
+import FTBtn from "src/components/FTBtn.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import FTDialog from "src/components/FTDialog.vue";
-import AdminUsersList from "src/components/admin/user/AdminUsersList.vue";
-import FTTabs from "src/components/FTTabs.vue";
 import FTTabPanels from "src/components/FTTabPanels.vue";
-import FTBtn from "src/components/FTBtn.vue";
-
-import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { computed, onBeforeMount, onUnmounted, ref, watch } from "vue";
-import { Loading, useQuasar } from "quasar";
-import { usePropertiesStore } from "src/stores/properties-store";
-import { useAuthStore } from "src/stores/auth-store";
+import FTTabs from "src/components/FTTabs.vue";
+import FTTitle from "src/components/FTTitle.vue";
 import { useDialog } from "src/composables/useDialog";
+import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { useAuthStore } from "src/stores/auth-store";
+import { usePropertiesStore } from "src/stores/properties-store";
+import { computed, onBeforeMount, onUnmounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
-import { matchesProperty } from "es-toolkit/compat";
-import { useAsyncState } from "@vueuse/core";
+
+import { createUserWithEmail, deleteUser, fetchUsersByRole, updateUser } from "../../backend-proxy";
 
 export interface PageAdminUsersProps {
     organisationId: string;
@@ -38,9 +38,9 @@ const authStore = useAuthStore();
 const propertiesStore = usePropertiesStore();
 
 const {
-    state: users,
-    isLoading,
     execute: executeFetchUsers,
+    isLoading,
+    state: users,
 } = useAsyncState(() => fetchUsersByRole(props.organisationId), [], {
     immediate: true,
     onError: showErrorMessage,
@@ -100,14 +100,8 @@ const properties = computed(function () {
     return propertiesStore.getPropertiesByOrganisationId(props.organisationId);
 });
 
-async function onUpdateUser(updatedUser: EditUserPayload): Promise<void> {
-    await tryCatchLoadingWrapper({
-        async hook() {
-            await updateUser(updatedUser);
-            await executeFetchUsers();
-            quasar.notify("User updated successfully!");
-        },
-    });
+function findPropertyById(propertyId: string): PropertyDoc | undefined {
+    return properties.value.find(matchesProperty("id", propertyId));
 }
 
 async function onDeleteUser(user: User): Promise<void> {
@@ -124,8 +118,14 @@ async function onDeleteUser(user: User): Promise<void> {
     });
 }
 
-function findPropertyById(propertyId: string): PropertyDoc | undefined {
-    return properties.value.find(matchesProperty("id", propertyId));
+async function onUpdateUser(updatedUser: EditUserPayload): Promise<void> {
+    await tryCatchLoadingWrapper({
+        async hook() {
+            await updateUser(updatedUser);
+            await executeFetchUsers();
+            quasar.notify("User updated successfully!");
+        },
+    });
 }
 
 onBeforeMount(function () {
@@ -166,16 +166,20 @@ async function onCreateUserFormSubmit(newUser: CreateUserPayload): Promise<void>
     });
 }
 
+async function onUserSlideRight(user: User): Promise<void> {
+    if (await showConfirm("Delete user?")) {
+        await onDeleteUser(user);
+    }
+}
+
 function showCreateUserDialog(): void {
     const dialog = createDialog({
         component: FTDialog,
         componentProps: {
             component: UserCreateForm,
-            maximized: false,
-            title: t("PageAdminUsers.createNewUserDialogTitle"),
             componentPropsObject: {
-                properties: properties.value,
                 organisation: organisation.value,
+                properties: properties.value,
             },
             listeners: {
                 submit(userPayload: CreateUserPayload) {
@@ -183,6 +187,8 @@ function showCreateUserDialog(): void {
                     dialog.hide();
                 },
             },
+            maximized: false,
+            title: t("PageAdminUsers.createNewUserDialogTitle"),
         },
     });
 }
@@ -204,33 +210,27 @@ async function showEditUserDialog(user: User): Promise<void> {
         component: FTDialog,
         componentProps: {
             component: UserEditForm,
-            maximized: false,
-            title: t("PageAdminUsers.editUserDialogTitle", { name: user.name }),
             componentPropsObject: {
-                user: { ...user },
+                organisation: organisation.value,
                 properties: properties.value,
                 selectedProperties,
-                organisation: organisation.value,
+                user: { ...user },
             },
             listeners: {
                 async submit(userPayload: EditUserPayload["updatedUser"]) {
                     await onUpdateUser({
-                        userId: userPayload.id,
                         organisationId: userPayload.organisationId,
                         updatedUser: userPayload,
+                        userId: userPayload.id,
                     });
 
                     dialog.hide();
                 },
             },
+            maximized: false,
+            title: t("PageAdminUsers.editUserDialogTitle", { name: user.name }),
         },
     });
-}
-
-async function onUserSlideRight(user: User): Promise<void> {
-    if (await showConfirm("Delete user?")) {
-        await onDeleteUser(user);
-    }
 }
 
 const uniqueUsersCount = computed(() => users.value.length);

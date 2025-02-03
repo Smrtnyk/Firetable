@@ -1,18 +1,20 @@
 import type { AppUser, User } from "@shared-types";
 import type { CallableRequest } from "firebase-functions/v2/https";
+
+import { AdminRole, Role } from "@shared-types";
+import { chunk } from "es-toolkit";
+import { logger } from "firebase-functions/v2";
+import { HttpsError } from "firebase-functions/v2/https";
+
 import { auth, db } from "../../init.js";
 import { getUsersPath } from "../../paths.js";
-import { Role, AdminRole } from "@shared-types";
-import { HttpsError } from "firebase-functions/v2/https";
-import { logger } from "firebase-functions/v2";
-import { chunk } from "es-toolkit";
-
-type RoleFilter = {
-    [key in AdminRole.ADMIN | Role | "default"]: (user: User) => boolean;
-};
 
 export type FetchUsersByRoleRequestData = {
     organisationId: string;
+};
+
+type RoleFilter = {
+    [key in "default" | AdminRole.ADMIN | Role]: (user: User) => boolean;
 };
 
 /**
@@ -94,13 +96,13 @@ export async function fetchUsersByRoleFn(
 
     const roleFilters: RoleFilter = {
         [AdminRole.ADMIN]: () => true,
-        [Role.PROPERTY_OWNER]: (user: AppUser) => user.role !== AdminRole.ADMIN,
+        default: (user: AppUser) => user.role === Role.STAFF,
+        [Role.HOSTESS]: (user: AppUser) =>
+            [Role.HOSTESS, Role.MANAGER, Role.STAFF].includes(user.role as Role),
         [Role.MANAGER]: (user: AppUser) =>
             user.role !== AdminRole.ADMIN && user.role !== Role.PROPERTY_OWNER,
+        [Role.PROPERTY_OWNER]: (user: AppUser) => user.role !== AdminRole.ADMIN,
         [Role.STAFF]: (user: AppUser) => user.role === Role.STAFF || user.role === Role.HOSTESS,
-        [Role.HOSTESS]: (user: AppUser) =>
-            [Role.HOSTESS, Role.STAFF, Role.MANAGER].includes(user.role as Role),
-        default: (user: AppUser) => user.role === Role.STAFF,
     };
 
     const filterFunction = roleFilters[userRole] ?? roleFilters.default;
@@ -117,7 +119,7 @@ export async function fetchUsersByRoleFn(
             const MAX_BATCH_SIZE = 100;
             const userIdChunks = chunk(userIds, MAX_BATCH_SIZE);
 
-            const authUsersMap = new Map<string, number | null>();
+            const authUsersMap = new Map<string, null | number>();
 
             for (const userIdChunk of userIdChunks) {
                 const authUsers = await auth.getUsers(

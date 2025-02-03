@@ -1,10 +1,12 @@
 import type { OrganisationDoc, OrganisationSettings, OrganisationStatus } from "@firetable/types";
+
+import { addDoc, deleteDoc, getDoc, getDocs, updateDoc } from "firebase/firestore";
+
 import { organisationDoc, organisationsCollection } from "./db.js";
-import { deleteDoc, getDocs, getDoc, addDoc, updateDoc } from "firebase/firestore";
 
 export interface CreateOrganisationPayload {
-    name: string;
     maxAllowedProperties: number;
+    name: string;
     status: OrganisationStatus;
 }
 
@@ -19,16 +21,9 @@ export function deleteOrganisation(organisationId: string): Promise<void> {
     return deleteDoc(organisationDoc(organisationId));
 }
 
-export async function fetchOrganisationsForAdmin(): Promise<OrganisationDoc[]> {
-    const propertiesSnapshot = await getDocs(organisationsCollection());
-    return propertiesSnapshot.docs.map(function (document) {
-        return { ...document.data(), id: document.id } as OrganisationDoc;
-    });
-}
-
 export async function fetchOrganisationById(
     organisationId: string,
-): Promise<OrganisationDoc | null> {
+): Promise<null | OrganisationDoc> {
     const organisationDocSnapshot = await getDoc(organisationDoc(organisationId));
 
     if (!organisationDocSnapshot.exists()) {
@@ -39,6 +34,13 @@ export async function fetchOrganisationById(
         id: organisationDocSnapshot.id,
         ...organisationDocSnapshot.data(),
     } as OrganisationDoc;
+}
+
+export async function fetchOrganisationsForAdmin(): Promise<OrganisationDoc[]> {
+    const propertiesSnapshot = await getDocs(organisationsCollection());
+    return propertiesSnapshot.docs.map(function (document) {
+        return { ...document.data(), id: document.id } as OrganisationDoc;
+    });
 }
 
 export function updateOrganisationSettings(

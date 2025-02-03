@@ -3,14 +3,13 @@ import type { EventDoc, VoidFunction } from "@firetable/types";
 
 import PageAdminEventsListItem from "src/components/admin/event/PageAdminEventsListItem.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
-
-import { useI18n } from "vue-i18n";
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 interface Props {
+    done: boolean;
     events: EventDoc[];
     timezone: string;
-    done: boolean;
 }
 
 const emit = defineEmits<{
@@ -18,7 +17,7 @@ const emit = defineEmits<{
     (e: "load"): void;
 }>();
 const { locale, t } = useI18n();
-const { events, timezone, done } = defineProps<Props>();
+const { done, events, timezone } = defineProps<Props>();
 const eventsLength = computed(function () {
     return events.length;
 });
@@ -55,8 +54,8 @@ const bucketizedEvents = computed(function () {
     }
 
     return {
-        upcomingEvents,
         pastEvents,
+        upcomingEvents,
     };
 });
 
@@ -68,10 +67,6 @@ const hasPastEvents = computed(() => {
     return bucketizedEvents.value.pastEvents.size > 0;
 });
 
-function handleLoad(): void {
-    emit("load");
-}
-
 function emitDelete(event: EventDoc, reset: VoidFunction): void {
     emit("delete", event);
     reset();
@@ -80,6 +75,10 @@ function emitDelete(event: EventDoc, reset: VoidFunction): void {
 function emitEdit(event: EventDoc, reset: VoidFunction): void {
     emit("edit", event);
     reset();
+}
+
+function handleLoad(): void {
+    emit("load");
 }
 </script>
 

@@ -1,8 +1,10 @@
 import type { CallableRequest } from "firebase-functions/v2/https";
-import { changePasswordFn } from "./change-password.js";
-import * as Init from "../../init.js";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { MockAuth } from "../../../test-helpers/MockAuth.js";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import * as Init from "../../init.js";
+import { changePasswordFn } from "./change-password.js";
 
 describe("changePasswordFn", () => {
     let mockAuth: MockAuth;

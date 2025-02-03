@@ -1,33 +1,35 @@
 import type { QueuedReservationDoc } from "@firetable/types";
 import type { RenderResult } from "vitest-browser-vue";
-import EventShowQueuedReservation from "./EventShowQueuedReservation.vue";
-import { renderComponent } from "../../../../test-helpers/render-component";
+
 import { ReservationStatus, ReservationType, Role } from "@firetable/types";
-import { useAuthStore } from "src/stores/auth-store";
-import { describe, expect, it } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 import { getDefaultTimezone } from "src/helpers/date-utils";
+import { useAuthStore } from "src/stores/auth-store";
+import { describe, expect, it } from "vitest";
+
+import { renderComponent } from "../../../../test-helpers/render-component";
+import EventShowQueuedReservation from "./EventShowQueuedReservation.vue";
 
 describe("EventShowQueuedReservation", () => {
     const mockReservation: QueuedReservationDoc = {
-        id: "reservation1",
-        guestName: "John Doe",
         consumption: 50,
+        creator: {
+            createdAt: 1_600_000_000_000,
+            email: "creator@example.com",
+            id: "creator456",
+            name: "Creator Name",
+        },
+        guestName: "John Doe",
+        id: "reservation1",
         isVIP: true,
         numberOfGuests: 4,
-        time: "18:00",
         reservedBy: {
             email: "john.doe@example.com",
-            name: "John Doe",
             id: "user123",
-        },
-        creator: {
-            id: "creator456",
-            email: "creator@example.com",
-            name: "Creator Name",
-            createdAt: 1_600_000_000_000,
+            name: "John Doe",
         },
         status: ReservationStatus.ACTIVE,
+        time: "18:00",
         type: ReservationType.QUEUED,
     };
 
@@ -50,8 +52,8 @@ describe("EventShowQueuedReservation", () => {
                     initialState: {
                         auth: {
                             user: {
-                                id: currentUserId,
                                 email: "current.user@example.com",
+                                id: currentUserId,
                                 name: "Current User",
                                 role: canReserve ? Role.MANAGER : Role.STAFF,
                             },
@@ -122,8 +124,8 @@ describe("EventShowQueuedReservation", () => {
                     initialState: {
                         auth: {
                             user: {
-                                id: "user789",
                                 email: "user789@example.com",
+                                id: "user789",
                                 name: "User 789",
                                 role: Role.STAFF,
                             },
@@ -159,8 +161,8 @@ describe("EventShowQueuedReservation", () => {
                     initialState: {
                         auth: {
                             user: {
-                                id: "user789",
                                 email: "user789@example.com",
+                                id: "user789",
                                 name: "User 789",
                                 role: Role.STAFF,
                             },

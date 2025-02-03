@@ -1,19 +1,21 @@
 <script setup lang="ts">
-import type { DrinkBundle, DrinkCardSection, DrinkCardItem } from "@firetable/types";
+import type { DrinkBundle, DrinkCardItem, DrinkCardSection } from "@firetable/types";
+
+import FTDialog from "src/components/FTDialog.vue";
+import { useDialog } from "src/composables/useDialog";
+import { useI18n } from "vue-i18n";
+
 import DrinkBundleDialog from "./DrinkBundleDialog.vue";
 import DrinkCardBuilderCustomSectionDialog from "./DrinkCardBuilderCustomSectionDialog.vue";
-import { useI18n } from "vue-i18n";
-import { useDialog } from "src/composables/useDialog";
-import FTDialog from "src/components/FTDialog.vue";
+
+interface Emits {
+    (event: "add-header" | "add-header-end"): void;
+    (event: "add-bundle" | "update-bundle", bundle: DrinkBundle): void;
+    (event: "add-section", section: DrinkCardSection): void;
+}
 
 interface Props {
     availableItems: DrinkCardItem[];
-}
-
-interface Emits {
-    (event: "add-header-end" | "add-header"): void;
-    (event: "add-bundle" | "update-bundle", bundle: DrinkBundle): void;
-    (event: "add-section", section: DrinkCardSection): void;
 }
 
 const props = defineProps<Props>();
@@ -26,21 +28,21 @@ function showBundleDialog(bundleToEdit?: DrinkBundle): void {
         component: FTDialog,
         componentProps: {
             component: DrinkBundleDialog,
-            title: bundleToEdit ? "Edit Bundle" : "Create Bundle",
             componentPropsObject: {
                 availableItems: props.availableItems,
                 bundleToEdit,
             },
             listeners: {
-                update(updatedBundle: DrinkBundle) {
-                    emit("update-bundle", updatedBundle);
-                    dialog.hide();
-                },
                 submit(bundle: DrinkBundle) {
                     emit("add-bundle", bundle);
                     dialog.hide();
                 },
+                update(updatedBundle: DrinkBundle) {
+                    emit("update-bundle", updatedBundle);
+                    dialog.hide();
+                },
             },
+            title: bundleToEdit ? "Edit Bundle" : "Create Bundle",
         },
     });
 }
@@ -50,13 +52,13 @@ function showCustomSectionDialog(): void {
         component: FTDialog,
         componentProps: {
             component: DrinkCardBuilderCustomSectionDialog,
-            title: t("PageAdminPropertyDrinkCards.addSection"),
             listeners: {
                 add(section: DrinkCardSection) {
                     emit("add-section", section);
                     dialog.hide();
                 },
             },
+            title: t("PageAdminPropertyDrinkCards.addSection"),
         },
     });
 }

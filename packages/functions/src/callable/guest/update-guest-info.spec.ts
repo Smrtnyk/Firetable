@@ -1,10 +1,13 @@
 import type { CallableRequest } from "firebase-functions/v2/https";
-import type { UpdateGuestInfo } from "./update-guest-info.js";
-import { updateGuestDataFn } from "./update-guest-info.js";
-import { getGuestsPath } from "../../paths.js";
-import { db } from "../../init.js";
+
 import { HttpsError } from "firebase-functions/v2/https";
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { UpdateGuestInfo } from "./update-guest-info.js";
+
+import { db } from "../../init.js";
+import { getGuestsPath } from "../../paths.js";
+import { updateGuestDataFn } from "./update-guest-info.js";
 
 describe("updateGuestDataFn", () => {
     const organisationId = "orgId";
@@ -30,14 +33,14 @@ describe("updateGuestDataFn", () => {
 
         const req = {
             data: {
+                guestId,
+                organisationId,
                 updatedData: {
                     contact: initialContact,
                     hashedContact: "hashedContact",
                     maskedContact: "maskedContact",
                     name: updatedName,
                 },
-                guestId,
-                organisationId,
             },
         } as CallableRequest<UpdateGuestInfo>;
 
@@ -65,15 +68,15 @@ describe("updateGuestDataFn", () => {
 
         const req = {
             data: {
+                guestId,
+                organisationId,
                 updatedData: {
+                    contact: updatedContact,
                     // New contact
                     hashedContact: "hashedContact",
                     maskedContact: "maskedContact",
-                    contact: updatedContact,
                     name: updatedName,
                 },
-                guestId,
-                organisationId,
             },
         } as CallableRequest<UpdateGuestInfo>;
 
@@ -92,13 +95,13 @@ describe("updateGuestDataFn", () => {
     it("throws an error if guest does not exist", async () => {
         const req = {
             data: {
+                // This guestId does not exist
+                guestId,
+                organisationId,
                 updatedData: {
                     contact: updatedContact,
                     name: updatedName,
                 },
-                // This guestId does not exist
-                guestId,
-                organisationId,
             },
         } as CallableRequest<UpdateGuestInfo>;
 
@@ -125,12 +128,12 @@ describe("updateGuestDataFn", () => {
 
         const req = {
             data: {
+                guestId,
+                organisationId,
                 updatedData: {
                     contact: updatedContact,
                     name: updatedName,
                 },
-                guestId,
-                organisationId,
             },
         } as CallableRequest<UpdateGuestInfo>;
 
@@ -154,6 +157,8 @@ describe("updateGuestDataFn", () => {
 
         const req = {
             data: {
+                guestId,
+                organisationId,
                 updatedData: {
                     contact: initialContact,
                     hashedContact: "hashedContact",
@@ -161,8 +166,6 @@ describe("updateGuestDataFn", () => {
                     name: updatedName,
                     tags: newTags,
                 },
-                guestId,
-                organisationId,
             },
         } as CallableRequest<UpdateGuestInfo>;
 
@@ -192,6 +195,8 @@ describe("updateGuestDataFn", () => {
 
         const req = {
             data: {
+                guestId,
+                organisationId,
                 updatedData: {
                     contact: initialContact,
                     hashedContact: "hashedContact",
@@ -199,8 +204,6 @@ describe("updateGuestDataFn", () => {
                     name: updatedName,
                     tags: [],
                 },
-                guestId,
-                organisationId,
             },
         } as unknown as CallableRequest<UpdateGuestInfo>;
 
@@ -227,6 +230,8 @@ describe("updateGuestDataFn", () => {
 
         const req = {
             data: {
+                guestId,
+                organisationId,
                 updatedData: {
                     contact: initialContact,
                     hashedContact: "hashedContact",
@@ -234,8 +239,6 @@ describe("updateGuestDataFn", () => {
                     name: updatedName,
                     // Note: tags are not provided here
                 },
-                guestId,
-                organisationId,
             },
         } as CallableRequest<UpdateGuestInfo>;
 

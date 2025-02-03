@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
 import { isMobile } from "src/global-reactives/screen-detection";
+import { ref, watch } from "vue";
 
 const props = defineProps<{
     modelValue: number | string;

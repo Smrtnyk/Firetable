@@ -1,189 +1,192 @@
-import type { FloorEditorElement } from "../types.js";
 import type { FabricObject } from "fabric";
-import { FloorElementTypes } from "../types.js";
-import { FONT_SIZE } from "../constants.js";
-import { Circle, classRegistry, Group, IText, LayoutManager, Rect, util } from "fabric";
-import { omit } from "es-toolkit";
 
-interface BarOptions {
-    left: number;
-    top: number;
-    objects?: FabricObject[];
-    type?: string;
-}
+import { omit } from "es-toolkit";
+import { Circle, classRegistry, Group, IText, LayoutManager, Rect, util } from "fabric";
+
+import type { FloorEditorElement } from "../types.js";
+
+import { FONT_SIZE } from "../constants.js";
+import { FloorElementTypes } from "../types.js";
 
 type BarDesign = {
-    mainBody: Record<string, unknown>;
-    extension?: Record<string, unknown>;
     accents: Record<string, unknown>[];
+    extension?: Record<string, unknown>;
     glassDisplays?: boolean;
     leds?: {
         colors: string[];
         count: number;
     };
+    mainBody: Record<string, unknown>;
 };
+
+interface BarOptions {
+    left: number;
+    objects?: FabricObject[];
+    top: number;
+    type?: string;
+}
 
 const BAR_DESIGNS: BarDesign[] = [
     {
-        // Center Island Circle Bar
-        mainBody: {
-            width: 200,
-            height: 200,
-            fill: "#202020",
-            rx: 100,
-            ry: 100,
-            circle: true,
-        },
         accents: [
             // Large service well
             {
-                left: 40,
-                top: 40,
-                width: 120,
-                height: 120,
                 fill: "#282828",
+                height: 120,
+                left: 40,
                 rx: 60,
                 ry: 60,
+                top: 40,
+                width: 120,
             },
             // Three speed rails at 120° intervals
             {
+                fill: "#181818",
+                height: 15,
                 left: 85,
                 top: 30,
                 width: 30,
-                height: 15,
-                fill: "#181818",
             },
             {
+                fill: "#181818",
+                height: 15,
                 left: 40,
                 top: 140,
                 width: 30,
-                height: 15,
-                fill: "#181818",
             },
             {
+                fill: "#181818",
+                height: 15,
                 left: 130,
                 top: 140,
                 width: 30,
-                height: 15,
-                fill: "#181818",
             },
         ],
         leds: {
             colors: ["#ff3838"],
             count: 12,
         },
+        // Center Island Circle Bar
+        mainBody: {
+            circle: true,
+            fill: "#202020",
+            height: 200,
+            rx: 100,
+            ry: 100,
+            width: 200,
+        },
     },
     {
-        // Compact Corner Rectangle
-        mainBody: {
-            width: 180,
-            height: 70,
-            fill: "#202020",
-        },
         accents: [
             // Main service area
             {
+                fill: "#282828",
+                height: 40,
                 left: 15,
                 top: 15,
                 width: 150,
-                height: 40,
-                fill: "#282828",
             },
             // Large speed rail
             {
+                fill: "#181818",
+                height: 12,
                 left: 20,
                 top: 5,
                 width: 140,
-                height: 12,
-                fill: "#181818",
             },
             // Ice well
             {
+                fill: "#181818",
+                height: 30,
                 left: 25,
                 top: 20,
                 width: 35,
-                height: 30,
-                fill: "#181818",
             },
         ],
+        // Compact Corner Rectangle
+        mainBody: {
+            fill: "#202020",
+            height: 70,
+            width: 180,
+        },
     },
     {
-        // Rounded VIP Bar
-        mainBody: {
-            width: 200,
-            height: 75,
-            fill: "#202020",
-            rx: 37.5,
-            ry: 37.5,
-        },
         accents: [
             // Curved service area
             {
-                left: 20,
-                top: 15,
-                width: 160,
-                height: 45,
                 fill: "#282828",
+                height: 45,
+                left: 20,
                 rx: 22.5,
                 ry: 22.5,
+                top: 15,
+                width: 160,
             },
             // Elegant speed rail
             {
+                fill: "#181818",
+                height: 10,
                 left: 25,
                 top: 5,
                 width: 150,
-                height: 10,
-                fill: "#181818",
             },
             // Central ice well
             {
+                fill: "#181818",
+                height: 35,
                 left: 85,
                 top: 20,
                 width: 30,
-                height: 35,
-                fill: "#181818",
             },
         ],
         leds: {
             colors: ["#ffedbc"],
             count: 10,
         },
+        // Rounded VIP Bar
+        mainBody: {
+            fill: "#202020",
+            height: 75,
+            rx: 37.5,
+            ry: 37.5,
+            width: 200,
+        },
     },
     {
-        // L-Shaped Bar - maximizes corner space
-        mainBody: {
-            width: 160,
-            height: 60,
-            fill: "#202020",
-        },
-        extension: {
-            left: 120,
-            top: -50,
-            width: 40,
-            height: 110,
-            fill: "#202020",
-        },
         accents: [
             // Main service well
             {
+                fill: "#282828",
+                height: 35,
                 left: 15,
                 top: 15,
                 width: 95,
-                height: 35,
-                fill: "#282828",
             },
             // L-shaped speed rail
             {
+                fill: "#181818",
+                height: 10,
                 left: 20,
                 top: 5,
                 width: 90,
-                height: 10,
-                fill: "#181818",
             },
         ],
+        extension: {
+            fill: "#202020",
+            height: 110,
+            left: 120,
+            top: -50,
+            width: 40,
+        },
         leds: {
             colors: ["#7d5fff"],
             count: 10,
+        },
+        // L-Shaped Bar - maximizes corner space
+        mainBody: {
+            fill: "#202020",
+            height: 60,
+            width: 160,
         },
     },
 ];
@@ -192,9 +195,9 @@ export class Bar extends Group implements FloorEditorElement {
     static override readonly type = FloorElementTypes.BAR;
     label = "BAR";
     private barBody: Rect;
-    private textLabel: IText;
     private currentDesignIndex = 0;
     private readonly ledAnimationFrame = -1;
+    private textLabel: IText;
 
     constructor(options: BarOptions) {
         let objects: FabricObject[];
@@ -218,8 +221,8 @@ export class Bar extends Group implements FloorEditorElement {
 
         super(objects, {
             ...omit(options, ["type"]),
-            layoutManager: new LayoutManager(),
             interactive: true,
+            layoutManager: new LayoutManager(),
             subTargetCheck: true,
         });
 
@@ -239,16 +242,39 @@ export class Bar extends Group implements FloorEditorElement {
         });
     }
 
+    private static createGlassDisplays(barBody: Rect): FabricObject[] {
+        // Calculate spacing based on bar width
+        const displayCount = 5;
+        // Use 80% of bar width
+        const spacing = (barBody.width * 0.8) / (displayCount - 1);
+        // Start at 10% of bar width
+        const startX = barBody.width * 0.1;
+
+        return Array.from({ length: displayCount }).map((_, index) => {
+            return new Circle({
+                evented: false,
+                fill: "#333333",
+                left: startX + index * spacing,
+                radius: 3,
+                stroke: "#444444",
+                strokeUniform: true,
+                strokeWidth: 1,
+                // Position at 20% from top
+                top: barBody.height * 0.2,
+            });
+        });
+    }
+
     private static createInitialDesign(design: BarDesign, label = "BAR"): FabricObject[] {
         const objects: FabricObject[] = [];
 
         const barBody = new Rect({
-            left: 0,
-            top: 0,
-            stroke: "#333333",
-            strokeWidth: 1,
-            strokeUniform: true,
             evented: false,
+            left: 0,
+            stroke: "#333333",
+            strokeUniform: true,
+            strokeWidth: 1,
+            top: 0,
             ...design.mainBody,
         });
         objects.push(barBody);
@@ -256,10 +282,10 @@ export class Bar extends Group implements FloorEditorElement {
         if (design.extension) {
             const extension = new Rect({
                 ...design.extension,
-                stroke: "#333333",
-                strokeWidth: 1,
-                strokeUniform: true,
                 evented: false,
+                stroke: "#333333",
+                strokeUniform: true,
+                strokeWidth: 1,
             });
             objects.push(extension);
         }
@@ -267,21 +293,21 @@ export class Bar extends Group implements FloorEditorElement {
         design.accents.forEach((accent: any) => {
             const accentObj = new Rect({
                 ...accent,
-                strokeWidth: 0,
                 evented: false,
+                strokeWidth: 0,
             });
             objects.push(accentObj);
         });
 
         const textLabel = new IText(label, {
-            left: barBody.width / 2,
-            top: barBody.height / 2,
-            fontSize: FONT_SIZE,
             fill: "#ffffff",
+            fontSize: FONT_SIZE,
             fontWeight: "bold",
+            left: barBody.width / 2,
             originX: "center",
             originY: "center",
             textAlign: "center",
+            top: barBody.height / 2,
         });
         objects.push(textLabel);
 
@@ -294,29 +320,6 @@ export class Bar extends Group implements FloorEditorElement {
         }
 
         return objects;
-    }
-
-    private static createGlassDisplays(barBody: Rect): FabricObject[] {
-        // Calculate spacing based on bar width
-        const displayCount = 5;
-        // Use 80% of bar width
-        const spacing = (barBody.width * 0.8) / (displayCount - 1);
-        // Start at 10% of bar width
-        const startX = barBody.width * 0.1;
-
-        return Array.from({ length: displayCount }).map((_, index) => {
-            return new Circle({
-                left: startX + index * spacing,
-                // Position at 20% from top
-                top: barBody.height * 0.2,
-                radius: 3,
-                fill: "#333333",
-                stroke: "#444444",
-                strokeWidth: 1,
-                strokeUniform: true,
-                evented: false,
-            });
-        });
     }
 
     private static createLeds(
@@ -337,13 +340,13 @@ export class Bar extends Group implements FloorEditorElement {
 
                 const color = ledConfig.colors[index % ledConfig.colors.length];
                 return new Circle({
-                    left: x,
-                    top: y,
-                    radius: 1.5,
-                    fill: color,
-                    opacity: 0.8,
-                    strokeWidth: 0,
                     evented: false,
+                    fill: color,
+                    left: x,
+                    opacity: 0.8,
+                    radius: 1.5,
+                    strokeWidth: 0,
+                    top: y,
                 });
             });
         }
@@ -360,13 +363,13 @@ export class Bar extends Group implements FloorEditorElement {
                 const color = ledConfig.colors[i % ledConfig.colors.length];
                 leds.push(
                     new Circle({
-                        left: x,
-                        top: height - 2,
-                        radius: 1.5,
-                        fill: color,
-                        opacity: 0.8,
-                        strokeWidth: 0,
                         evented: false,
+                        fill: color,
+                        left: x,
+                        opacity: 0.8,
+                        radius: 1.5,
+                        strokeWidth: 0,
+                        top: height - 2,
                     }),
                 );
             }
@@ -379,31 +382,15 @@ export class Bar extends Group implements FloorEditorElement {
         return Array.from({ length: ledConfig.count }).map((_, index) => {
             const color = ledConfig.colors[index % ledConfig.colors.length];
             return new Circle({
-                left: index * spacing,
-                top: height - 2,
-                radius: 1.5,
-                fill: color,
-                opacity: 0.8,
-                strokeWidth: 0,
                 evented: false,
+                fill: color,
+                left: index * spacing,
+                opacity: 0.8,
+                radius: 1.5,
+                strokeWidth: 0,
+                top: height - 2,
             });
         });
-    }
-
-    override toObject(propertiesToInclude: any[] = []): any {
-        return {
-            ...super.toObject(propertiesToInclude),
-            currentDesignIndex: this.currentDesignIndex,
-            label: this.label,
-        };
-    }
-
-    getBaseFill(): string {
-        return this.barBody.get("fill") as string;
-    }
-
-    setBaseFill(val: string): void {
-        this.barBody.set("fill", val);
     }
 
     flip(): void {
@@ -412,23 +399,27 @@ export class Bar extends Group implements FloorEditorElement {
         this.canvas?.requestRenderAll();
     }
 
+    getBaseFill(): string {
+        return this.barBody.get("fill") as string;
+    }
+
     nextDesign(): void {
         cancelAnimationFrame(this.ledAnimationFrame);
         this.currentDesignIndex = (this.currentDesignIndex + 1) % BAR_DESIGNS.length;
         const design = BAR_DESIGNS[this.currentDesignIndex];
         // Store current transformations and properties
         const groupTransformations = {
-            left: this.left,
-            top: this.top,
-            scaleX: this.scaleX,
-            scaleY: this.scaleY,
             angle: this.angle,
             flipX: this.flipX,
             flipY: this.flipY,
-            skewX: this.skewX,
-            skewY: this.skewY,
+            left: this.left,
             originX: this.originX,
             originY: this.originY,
+            scaleX: this.scaleX,
+            scaleY: this.scaleY,
+            skewX: this.skewX,
+            skewY: this.skewY,
+            top: this.top,
         };
         const currentText = this.textLabel.get("text");
 
@@ -446,6 +437,18 @@ export class Bar extends Group implements FloorEditorElement {
         this.handleScaling();
         this.setCoords();
         this.canvas?.requestRenderAll();
+    }
+
+    setBaseFill(val: string): void {
+        this.barBody.set("fill", val);
+    }
+
+    override toObject(propertiesToInclude: any[] = []): any {
+        return {
+            ...super.toObject(propertiesToInclude),
+            currentDesignIndex: this.currentDesignIndex,
+            label: this.label,
+        };
     }
 
     private handleScaling(): void {

@@ -1,11 +1,13 @@
 import type { FirestoreEvent, QueryDocumentSnapshot } from "firebase-functions/firestore";
-import { db } from "../init.js";
-import { deleteDocument } from "../delete-document/index.js";
-import { deletePropertyImage } from "../utils/property/delete-property-image.js";
+
+import { Collection } from "@shared-types";
 import { FieldValue } from "firebase-admin/firestore";
 import { logger } from "firebase-functions/v2";
 import { HttpsError } from "firebase-functions/v2/https";
-import { Collection } from "@shared-types";
+
+import { deleteDocument } from "../delete-document/index.js";
+import { db } from "../init.js";
+import { deletePropertyImage } from "../utils/property/delete-property-image.js";
 
 /**
  * Cleans up associated user-property mappings when a property is deleted.

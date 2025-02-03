@@ -1,12 +1,15 @@
-import type { FloorEditorElement } from "../types.js";
 import type { FabricObject } from "fabric";
+
+import { Circle, classRegistry, FabricText, Group, LayoutManager, Rect } from "fabric";
+
+import type { FloorEditorElement } from "../types.js";
+
 import { FloorElementTypes } from "../types.js";
-import { LayoutManager, Group, Rect, FabricText, Circle, classRegistry } from "fabric";
 
 interface StageOptions {
     left: number;
-    top: number;
     objects?: FabricObject[];
+    top: number;
 }
 
 export class Stage extends Group implements FloorEditorElement {
@@ -15,41 +18,41 @@ export class Stage extends Group implements FloorEditorElement {
     constructor(options: StageOptions) {
         const stageBodyOpts = options.objects?.[0] ?? {};
         const stageBody = new Rect({
+            evented: false,
+            fill: "#222",
+            height: 25 * 4,
             left: 0,
-            top: 0,
             rx: 10,
             ry: 10,
-            width: 150,
-            height: 25 * 4,
-            fill: "#222",
             stroke: "#111",
-            strokeWidth: 1,
             strokeUniform: true,
-            evented: false,
+            strokeWidth: 1,
+            top: 0,
+            width: 150,
             ...stageBodyOpts,
         });
 
         const decorOpts = options.objects?.[1] ?? {};
         const decor = new Rect({
+            evented: false,
+            fill: "#6247aa",
+            height: 20,
             left: 35,
             top: stageBody.height - 25,
             width: 80,
-            height: 20,
-            fill: "#6247aa",
-            evented: false,
             ...decorOpts,
         });
 
         const stageLabelOpts = options.objects?.[2] ?? {};
         const stageLabel = new FabricText("STAGE", {
-            left: stageBody.width / 2,
-            top: stageBody.height / 2,
-            fontSize: 20,
+            evented: false,
             fill: "#FFFFFF",
+            fontSize: 20,
             fontWeight: "bold",
+            left: stageBody.width / 2,
             originX: "center",
             originY: "center",
-            evented: false,
+            top: stageBody.height / 2,
             ...stageLabelOpts,
         });
 
@@ -60,11 +63,11 @@ export class Stage extends Group implements FloorEditorElement {
         const ledsFront = Array.from({ length: 4 }).map(function (_, index) {
             const ledOpts = options.objects?.[index + 3] ?? {};
             return new Circle({
-                left: ledSpacingWidth * (index + 1),
-                top: 2,
-                radius: 2,
-                fill: "#3498DB",
                 evented: false,
+                fill: "#3498DB",
+                left: ledSpacingWidth * (index + 1),
+                radius: 2,
+                top: 2,
                 ...ledOpts,
             });
         });

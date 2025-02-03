@@ -1,42 +1,42 @@
 <script setup lang="ts">
 import type { GuardedLink, LinkWithChildren } from "src/types";
+
+import { logoutUser } from "@firetable/backend";
 import { Role } from "@firetable/types";
+import { storeToRefs } from "pinia";
+import { Dark, LocalStorage } from "quasar";
+import { dynamicallySwitchLang } from "src/boot/i18n";
+import AppDrawerLink from "src/components/AppDrawerLink.vue";
+import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { useAuthStore } from "src/stores/auth-store";
+import { usePermissionsStore } from "src/stores/permissions-store";
+import { usePropertiesStore } from "src/stores/properties-store";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
-
-import { LocalStorage, Dark } from "quasar";
-import { logoutUser } from "@firetable/backend";
-import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { storeToRefs } from "pinia";
-import { useAuthStore } from "src/stores/auth-store";
-import { usePropertiesStore } from "src/stores/properties-store";
-import AppDrawerLink from "src/components/AppDrawerLink.vue";
-import { usePermissionsStore } from "src/stores/permissions-store";
-import { dynamicallySwitchLang } from "src/boot/i18n";
 
 export interface AppDrawerProps {
     modelValue: boolean;
 }
-const { nonNullableUser, isAdmin } = storeToRefs(useAuthStore());
+const { isAdmin, nonNullableUser } = storeToRefs(useAuthStore());
 const {
-    canSeeInventory,
-    canEditFloorPlans,
     canCreateEvents,
-    canSeeGuestbook,
+    canEditFloorPlans,
     canSeeAnalytics,
     canSeeDigitalDrinkCards,
+    canSeeGuestbook,
+    canSeeInventory,
 } = storeToRefs(usePermissionsStore());
 const propertiesStore = usePropertiesStore();
 const props = defineProps<AppDrawerProps>();
 const emit = defineEmits<(e: "update:modelValue", value: boolean) => void>();
-const { t, locale } = useI18n();
+const { locale, t } = useI18n();
 
 const lang = ref(locale);
 const langOptions = [
-    { value: "en-GB", label: "English" },
-    { value: "de", label: "German" },
-    { value: "es", label: "Spanish" },
-    { value: "hr", label: "Croatian" },
+    { label: "English", value: "en-GB" },
+    { label: "German", value: "de" },
+    { label: "Spanish", value: "es" },
+    { label: "Croatian", value: "hr" },
 ];
 
 const inventoryLink = computed(function () {
@@ -45,11 +45,11 @@ const inventoryLink = computed(function () {
     }
 
     return buildExpandableLink({
-        label: t("Global.manageInventoryLink"),
-        icon: "grid",
-        routeName: "adminInventory",
-        isVisible: true,
         childIcon: "home",
+        icon: "grid",
+        isVisible: true,
+        label: t("Global.manageInventoryLink"),
+        routeName: "adminInventory",
     });
 });
 
@@ -59,11 +59,11 @@ const manageFloorsLink = computed(function () {
     }
 
     return buildExpandableLink({
-        label: t("AppDrawer.links.manageFloors"),
-        icon: "arrow-expand",
-        routeName: "adminFloors",
-        isVisible: true,
         childIcon: "home",
+        icon: "arrow-expand",
+        isVisible: true,
+        label: t("AppDrawer.links.manageFloors"),
+        routeName: "adminFloors",
     });
 });
 
@@ -74,9 +74,9 @@ const manageAnalyticsLink = computed(function () {
 
     return buildExpandableLink({
         icon: "line-chart",
-        routeName: "adminAnalytics",
-        label: t("AppDrawer.links.manageAnalytics"),
         isVisible: true,
+        label: t("AppDrawer.links.manageAnalytics"),
+        routeName: "adminAnalytics",
     });
 });
 
@@ -86,11 +86,11 @@ const manageEventsLink = computed(function () {
     }
 
     return buildExpandableLink({
-        label: t("AppDrawer.links.manageEvents"),
-        icon: "calendar",
-        routeName: "adminEvents",
-        isVisible: true,
         childIcon: "home",
+        icon: "calendar",
+        isVisible: true,
+        label: t("AppDrawer.links.manageEvents"),
+        routeName: "adminEvents",
     });
 });
 
@@ -100,11 +100,11 @@ const digitalDrinkCardsLink = computed(function () {
     }
 
     return buildExpandableLink({
-        label: t("AppDrawer.links.manageDrinkCards"),
-        icon: "drink",
-        routeName: "adminPropertyDrinkCards",
-        isVisible: true,
         childIcon: "home",
+        icon: "drink",
+        isVisible: true,
+        label: t("AppDrawer.links.manageDrinkCards"),
+        routeName: "adminPropertyDrinkCards",
     });
 });
 
@@ -115,11 +115,11 @@ const propertySettingsLink = computed(function () {
     const role = nonNullableUser.value.role;
 
     return buildExpandableLink({
-        label: t("AppDrawer.links.settings"),
-        icon: "cog-wheel",
-        routeName: "adminPropertySettings",
-        isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
         childIcon: "home",
+        icon: "cog-wheel",
+        isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
+        label: t("AppDrawer.links.settings"),
+        routeName: "adminPropertySettings",
     });
 });
 
@@ -130,15 +130,15 @@ const links = computed<(GuardedLink | LinkWithChildren)[]>(function () {
     const allLinks: (GuardedLink | LinkWithChildren | undefined)[] = [
         {
             icon: "home",
-            route: { name: "adminOrganisations" },
-            label: t("AppDrawer.links.manageOrganisations"),
             isVisible: isAdmin.value,
+            label: t("AppDrawer.links.manageOrganisations"),
+            route: { name: "adminOrganisations" },
         },
         {
             icon: "bug",
-            route: { name: "adminIssueReports" },
-            label: t("AppDrawer.links.issueReportsOverview"),
             isVisible: isAdmin.value,
+            label: t("AppDrawer.links.issueReportsOverview"),
+            route: { name: "adminIssueReports" },
         },
         manageEventsLink.value,
         manageFloorsLink.value,
@@ -147,27 +147,27 @@ const links = computed<(GuardedLink | LinkWithChildren)[]>(function () {
         manageAnalyticsLink.value,
         {
             icon: "users",
-            route: { name: "adminUsers", params: { organisationId } },
-            label: t("AppDrawer.links.manageUsers"),
             isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
+            label: t("AppDrawer.links.manageUsers"),
+            route: { name: "adminUsers", params: { organisationId } },
         },
         {
             icon: "users-list",
-            route: { name: "adminGuests", params: { organisationId } },
-            label: t("AppDrawer.links.manageGuests"),
             isVisible: canSeeGuestbook.value && !isAdmin.value,
+            label: t("AppDrawer.links.manageGuests"),
+            route: { name: "adminGuests", params: { organisationId } },
         },
         {
             icon: "home",
-            route: { name: "adminProperties", params: { organisationId } },
-            label: t("AppDrawer.links.manageProperties"),
             isVisible: role === Role.PROPERTY_OWNER,
+            label: t("AppDrawer.links.manageProperties"),
+            route: { name: "adminProperties", params: { organisationId } },
         },
         {
             icon: "bug",
-            route: { name: "reportIssue", params: { organisationId } },
-            label: t("AppDrawer.links.reportIssue"),
             isVisible: !isAdmin.value,
+            label: t("AppDrawer.links.reportIssue"),
+            route: { name: "reportIssue", params: { organisationId } },
         },
         propertySettingsLink.value,
     ];
@@ -186,13 +186,13 @@ const avatar = computed(function () {
 });
 
 function buildExpandableLink(options: {
-    label: string;
-    icon: string;
-    routeName: string;
-    isVisible: boolean;
     childIcon?: string;
+    icon: string;
+    isVisible: boolean;
+    label: string;
+    routeName: string;
 }): GuardedLink | LinkWithChildren | undefined {
-    const { label, icon, routeName, isVisible, childIcon } = options;
+    const { childIcon, icon, isVisible, label, routeName } = options;
 
     if (!isVisible) {
         return;
@@ -220,9 +220,9 @@ function buildExpandableLink(options: {
         const property = properties[0];
         return {
             icon,
-            route: toRoute(property.id),
-            label,
             isVisible,
+            label,
+            route: toRoute(property.id),
         };
     }
 
@@ -230,23 +230,22 @@ function buildExpandableLink(options: {
     const children = properties.map(function (property) {
         return {
             icon: childIcon ?? "home",
-            route: toRoute(property.id),
-            label: property.name,
             isVisible: true,
+            label: property.name,
+            route: toRoute(property.id),
         };
     });
 
     return {
-        icon,
-        label,
-        isVisible,
         children,
+        icon,
+        isVisible,
+        label,
     };
 }
 
-function setDarkMode(newValue: boolean): void {
-    Dark.set(newValue);
-    LocalStorage.set("FTDarkMode", newValue);
+function isLinkWithChildren(link: GuardedLink | LinkWithChildren): link is LinkWithChildren {
+    return "children" in link;
 }
 
 async function onLogoutUser(): Promise<void> {
@@ -257,8 +256,9 @@ async function onLogoutUser(): Promise<void> {
     });
 }
 
-function isLinkWithChildren(link: GuardedLink | LinkWithChildren): link is LinkWithChildren {
-    return "children" in link;
+function setDarkMode(newValue: boolean): void {
+    Dark.set(newValue);
+    LocalStorage.set("FTDarkMode", newValue);
 }
 </script>
 

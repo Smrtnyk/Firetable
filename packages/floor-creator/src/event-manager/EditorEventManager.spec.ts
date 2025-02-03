@@ -1,10 +1,12 @@
 import type { Canvas } from "fabric";
-import { EditorEventManager } from "./EditorEventManager.js";
+
+import { FabricObject, Group } from "fabric";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { CanvasHistory } from "../CanvasHistory.js";
 import { RESOLUTION } from "../constants.js";
 import { FloorEditor } from "../FloorEditor.js";
-import { CanvasHistory } from "../CanvasHistory.js";
-import { expect, it, describe, beforeEach, vi } from "vitest";
-import { FabricObject, Group } from "fabric";
+import { EditorEventManager } from "./EditorEventManager.js";
 
 describe("EditorEventManager", () => {
     let manager: EditorEventManager;
@@ -19,15 +21,15 @@ describe("EditorEventManager", () => {
         canvasEl.height = 1000;
         floor = new FloorEditor({
             canvas: canvasEl,
+            containerHeight: 1000,
+            containerWidth: 1000,
             floorDoc: {
+                height: 1000,
                 id: "test-id",
+                json: {},
                 name: "test floor",
                 width: 1000,
-                height: 1000,
-                json: {},
             },
-            containerWidth: 1000,
-            containerHeight: 1000,
         });
 
         history = new CanvasHistory(floor);
@@ -136,7 +138,7 @@ describe("EditorEventManager", () => {
 
     describe("EditorEventManager - Keyboard Event Handling", () => {
         it("should enable canvas selection when Control key is pressed", () => {
-            const mockEvent = new KeyboardEvent("keydown", { key: "Control", ctrlKey: true });
+            const mockEvent = new KeyboardEvent("keydown", { ctrlKey: true, key: "Control" });
             document.dispatchEvent(mockEvent);
             expect(canvas.selection).toBe(true);
         });
@@ -150,7 +152,7 @@ describe("EditorEventManager", () => {
 
         it("should trigger undo when 'z' is pressed with Control key", () => {
             const spyUndo = vi.spyOn(history, "undo");
-            const mockEvent = new KeyboardEvent("keydown", { key: "z", ctrlKey: true });
+            const mockEvent = new KeyboardEvent("keydown", { ctrlKey: true, key: "z" });
             // @ts-expect-error -- private method invocation
             manager.handleKeyDown(mockEvent);
             expect(spyUndo).toHaveBeenCalled();
@@ -158,7 +160,7 @@ describe("EditorEventManager", () => {
 
         it("should trigger redo when 'y' is pressed with Control key", () => {
             const spyRedo = vi.spyOn(history, "redo");
-            const mockEvent = new KeyboardEvent("keydown", { key: "y", ctrlKey: true });
+            const mockEvent = new KeyboardEvent("keydown", { ctrlKey: true, key: "y" });
             document.dispatchEvent(mockEvent);
             expect(spyRedo).toHaveBeenCalled();
         });

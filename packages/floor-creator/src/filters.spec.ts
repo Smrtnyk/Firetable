@@ -1,14 +1,16 @@
+import { beforeEach, describe, expect, it } from "vitest";
+
 import type { FloorData } from "./types.js";
-import { FloorEditor } from "./FloorEditor.js";
+
+import { RectTable } from "./elements/RectTable.js";
 import {
     extractAllTablesLabels,
     getTables,
     getTablesFromFloorDoc,
     hasFloorTables,
 } from "./filters.js";
-import { RectTable } from "./elements/RectTable.js";
+import { FloorEditor } from "./FloorEditor.js";
 import { FloorElementTypes } from "./types.js";
-import { expect, it, describe, beforeEach } from "vitest";
 
 describe("Table Management Functions", () => {
     let floor: FloorEditor;
@@ -19,15 +21,15 @@ describe("Table Management Functions", () => {
         canvas.height = 1000;
         floor = new FloorEditor({
             canvas,
+            containerHeight: 1000,
+            containerWidth: 1000,
             floorDoc: {
+                height: 1000,
                 id: "test-id",
+                json: {},
                 name: "test floor",
                 width: 1000,
-                height: 1000,
-                json: {},
             },
-            containerWidth: 1000,
-            containerHeight: 1000,
         });
     });
 
@@ -38,10 +40,10 @@ describe("Table Management Functions", () => {
 
         it("should return true when there are tables on the floor", () => {
             floor.addElement({
+                label: "1",
                 tag: FloorElementTypes.RECT_TABLE,
                 x: 1,
                 y: 1,
-                label: "1",
             });
             expect(hasFloorTables(floor)).toBe(true);
         });
@@ -54,16 +56,16 @@ describe("Table Management Functions", () => {
 
         it("should return an array of tables on the floor", () => {
             floor.addElement({
+                label: "1",
                 tag: FloorElementTypes.RECT_TABLE,
                 x: 1,
                 y: 1,
-                label: "1",
             });
             floor.addElement({
+                label: "1",
                 tag: FloorElementTypes.ROUND_TABLE,
                 x: 1,
                 y: 1,
-                label: "1",
             });
             expect(getTables(floor).length).toEqual(2);
         });
@@ -76,19 +78,19 @@ describe("Table Management Functions", () => {
 
         it("should return an array of labels of all tables on the floor", () => {
             const table1 = new RectTable({
-                shapeOptions: {},
                 groupOptions: {
                     label: "1",
                 },
+                shapeOptions: {},
                 textOptions: {
                     label: "1",
                 },
             });
             const table2 = new RectTable({
-                shapeOptions: {},
                 groupOptions: {
                     label: "2",
                 },
+                shapeOptions: {},
                 textOptions: {
                     label: "2",
                 },
@@ -102,10 +104,10 @@ describe("Table Management Functions", () => {
     describe("getTablesFromFloorDoc function", () => {
         it("should return an array of BaseTable objects from a FloorDoc", () => {
             const table1 = new RectTable({
-                shapeOptions: {},
                 groupOptions: {
                     label: "1",
                 },
+                shapeOptions: {},
                 textOptions: {
                     label: "1",
                 },

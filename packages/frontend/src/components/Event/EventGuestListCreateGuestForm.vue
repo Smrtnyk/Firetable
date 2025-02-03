@@ -1,13 +1,17 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from "vue";
-import { minLength } from "src/helpers/form-rules";
-import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
+import { minLength } from "src/helpers/form-rules";
+import { ref, useTemplateRef } from "vue";
+import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 const emit = defineEmits(["create"]);
 const form = useTemplateRef<QForm>("form");
 const guestName = ref("");
+
+function onReset(): void {
+    guestName.value = "";
+}
 
 function onSubmit(): void {
     if (!form.value?.validate()) {
@@ -18,10 +22,6 @@ function onSubmit(): void {
         confirmedTime: null,
         name: guestName.value,
     });
-}
-
-function onReset(): void {
-    guestName.value = "";
 }
 </script>
 

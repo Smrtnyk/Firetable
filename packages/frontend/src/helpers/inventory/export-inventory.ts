@@ -1,4 +1,5 @@
 import type { InventoryItemDoc } from "@firetable/types";
+
 import { isDrinkItem } from "@firetable/types";
 import { exportFile } from "quasar";
 

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import type { IssueReportDoc } from "@firetable/types";
-import { ref, useTemplateRef } from "vue";
-import { QForm } from "quasar";
-import { useI18n } from "vue-i18n";
-import { minLength } from "src/helpers/form-rules";
+
 import { IssueCategory } from "@firetable/types";
+import { QForm } from "quasar";
+import { minLength } from "src/helpers/form-rules";
+import { ref, useTemplateRef } from "vue";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps<{
     issueToEdit?: IssueReportDoc;
@@ -15,7 +16,7 @@ const emit =
     defineEmits<
         (
             event: "create" | "update",
-            payload: { description: string; category: IssueCategory },
+            payload: { category: IssueCategory; description: string },
         ) => void
     >();
 
@@ -42,8 +43,8 @@ async function submit(): Promise<void> {
     }
 
     const payload = {
-        description: issueDescription.value,
         category: selectedCategory.value,
+        description: issueDescription.value,
     };
 
     if (props.issueToEdit) {

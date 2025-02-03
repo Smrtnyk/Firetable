@@ -102,31 +102,32 @@
 
 <script setup lang="ts">
 import type { DateRange } from "src/types";
-import { ref, useTemplateRef, computed, watch } from "vue";
+
+import { isNil } from "es-toolkit/predicate";
 import { QPopupProxy } from "quasar";
-import { useI18n } from "vue-i18n";
-import { ONE_HOUR } from "src/constants";
 import FTBtn from "src/components/FTBtn.vue";
 import { useHasChanged } from "src/composables/useHasChanged";
-import { isNil } from "es-toolkit/predicate";
+import { ONE_HOUR } from "src/constants";
+import { computed, ref, useTemplateRef, watch } from "vue";
+import { useI18n } from "vue-i18n";
+
+export interface FTTimeframeSelectorProps {
+    maxDate?: string;
+    maxDays?: number;
+    minDate?: string;
+    modelValue?: DateRange;
+    presets?: PresetOption[];
+}
 
 interface PresetOption {
     label: string;
     value: string;
 }
 
-export interface FTTimeframeSelectorProps {
-    modelValue?: DateRange;
-    maxDays?: number;
-    minDate?: string;
-    maxDate?: string;
-    presets?: PresetOption[];
-}
-
 const {
+    maxDate = "2050-12-31",
     maxDays = 365,
     minDate = "2000-01-01",
-    maxDate = "2050-12-31",
 } = defineProps<FTTimeframeSelectorProps>();
 
 const emit = defineEmits<{
@@ -134,7 +135,7 @@ const emit = defineEmits<{
     (e: "error", message: string): void;
 }>();
 
-const { t, locale } = useI18n();
+const { locale, t } = useI18n();
 
 const presets = ref([
     { label: t("FTTimeframeSelector.today"), value: "today" },
@@ -172,26 +173,11 @@ watch(dateRange, function (newVal) {
     }
 });
 
-function toggleDateRangePicker(): void {
-    datePickerProxy.value?.toggle();
-    if (pendingPreset.value === "custom") {
-        pendingPreset.value = "";
-    } else {
-        pendingPreset.value = selectedPreset.value;
-    }
-}
-
 function closeDateRangePicker(): void {
     datePickerProxy.value?.hide();
     if (pendingPreset.value === "custom" && !isValidDateRange.value) {
         pendingPreset.value = selectedPreset.value;
     }
-}
-
-function formatDateDisplay(dateStr: string): string {
-    const options: Intl.DateTimeFormatOptions = { year: "numeric", month: "short", day: "numeric" };
-    const date = new Date(dateStr);
-    return date.toLocaleDateString(locale.value, options);
 }
 
 function dateOptions(date: string): boolean {
@@ -204,6 +190,21 @@ function dateOptions(date: string): boolean {
     const diffDays = Math.ceil((current.getTime() - start.getTime()) / (ONE_HOUR * 24));
 
     return diffDays <= maxDays;
+}
+
+function formatDateDisplay(dateStr: string): string {
+    const options: Intl.DateTimeFormatOptions = { day: "numeric", month: "short", year: "numeric" };
+    const date = new Date(dateStr);
+    return date.toLocaleDateString(locale.value, options);
+}
+
+function toggleDateRangePicker(): void {
+    datePickerProxy.value?.toggle();
+    if (pendingPreset.value === "custom") {
+        pendingPreset.value = "";
+    } else {
+        pendingPreset.value = selectedPreset.value;
+    }
 }
 
 const isValidDateRange = computed(() => {
@@ -222,20 +223,36 @@ const isValidDateRange = computed(() => {
     return diffDays >= 0 && diffDays <= maxDays;
 });
 
-function handleRangeStart(from: { year: number; month: number; day: number } | null): void {
-    if (!from) {
-        return;
+function applyCurrentSelection(): void {
+    if (pendingPreset.value === "custom") {
+        if (!isValidDateRange.value) {
+            const message =
+                !dateRange.value.from || !dateRange.value.to
+                    ? t("FTTimeframeSelector.errorSelectDates")
+                    : t("FTTimeframeSelector.errorMaxDays", { maxDays });
+            emit("error", message);
+            return;
+        }
+
+        selectedPreset.value = "custom";
+        emitValue({
+            endDate: dateRange.value.to,
+            startDate: dateRange.value.from,
+        });
+    } else if (pendingPreset.value) {
+        try {
+            const range = calculatePresetDates(pendingPreset.value);
+            selectedPreset.value = pendingPreset.value;
+            emitValue(range);
+        } catch (err) {
+            error.value =
+                err instanceof Error ? err.message : t("FTTimeframeSelector.invalidPreset");
+            pendingPreset.value = selectedPreset.value;
+        }
     }
-    rangeStartDate.value = new Date(from.year, from.month - 1, from.day).toISOString();
-}
 
-function handleRangeEnd(): void {
-    rangeStartDate.value = "";
-}
-
-function clearDateRange(): void {
-    dateRange.value = { from: "", to: "" };
-    rangeStartDate.value = "";
+    resetPresetHasChanged();
+    resetDateRangeHasChanged();
 }
 
 function applyDateRange(): void {
@@ -260,23 +277,10 @@ function calculatePresetDates(preset: string): DateRange {
         "0",
     )}-${String(today.getDate()).padStart(2, "0")}`;
 
-    let startDate: string | null = null;
+    let startDate: null | string = null;
     let endDate: string = todayStr;
 
     switch (preset) {
-        case "today":
-            startDate = todayStr;
-            break;
-        case "yesterday": {
-            const yesterday = new Date(today);
-            yesterday.setDate(today.getDate() - 1);
-            startDate = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(
-                2,
-                "0",
-            )}-${String(yesterday.getDate()).padStart(2, "0")}`;
-            endDate = startDate;
-            break;
-        }
         case "last7": {
             const weekAgo = new Date(today);
             weekAgo.setDate(today.getDate() - 6);
@@ -295,6 +299,19 @@ function calculatePresetDates(preset: string): DateRange {
             )}-${String(monthAgo.getDate()).padStart(2, "0")}`;
             break;
         }
+        case "today":
+            startDate = todayStr;
+            break;
+        case "yesterday": {
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+            startDate = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(
+                2,
+                "0",
+            )}-${String(yesterday.getDate()).padStart(2, "0")}`;
+            endDate = startDate;
+            break;
+        }
         default:
             throw new Error(`Invalid preset: ${preset}`);
     }
@@ -304,9 +321,18 @@ function calculatePresetDates(preset: string): DateRange {
     }
 
     return {
-        startDate,
         endDate,
+        startDate,
     };
+}
+
+function clearDateRange(): void {
+    dateRange.value = { from: "", to: "" };
+    rangeStartDate.value = "";
+}
+
+function emitValue(value: DateRange): void {
+    emit("update:modelValue", value);
 }
 
 function handlePresetChange(value: string): void {
@@ -318,46 +344,21 @@ function handlePresetChange(value: string): void {
     }
 }
 
-function applyCurrentSelection(): void {
-    if (pendingPreset.value === "custom") {
-        if (!isValidDateRange.value) {
-            const message =
-                !dateRange.value.from || !dateRange.value.to
-                    ? t("FTTimeframeSelector.errorSelectDates")
-                    : t("FTTimeframeSelector.errorMaxDays", { maxDays });
-            emit("error", message);
-            return;
-        }
+function handleRangeEnd(): void {
+    rangeStartDate.value = "";
+}
 
-        selectedPreset.value = "custom";
-        emitValue({
-            startDate: dateRange.value.from,
-            endDate: dateRange.value.to,
-        });
-    } else if (pendingPreset.value) {
-        try {
-            const range = calculatePresetDates(pendingPreset.value);
-            selectedPreset.value = pendingPreset.value;
-            emitValue(range);
-        } catch (err) {
-            error.value =
-                err instanceof Error ? err.message : t("FTTimeframeSelector.invalidPreset");
-            pendingPreset.value = selectedPreset.value;
-        }
+function handleRangeStart(from: null | { day: number; month: number; year: number }): void {
+    if (!from) {
+        return;
     }
-
-    resetPresetHasChanged();
-    resetDateRangeHasChanged();
+    rangeStartDate.value = new Date(from.year, from.month - 1, from.day).toISOString();
 }
 
 function resetCustomSelection(): void {
     if (pendingPreset.value === "custom" && !isValidDateRange.value) {
         pendingPreset.value = selectedPreset.value;
     }
-}
-
-function emitValue(value: DateRange): void {
-    emit("update:modelValue", value);
 }
 </script>
 

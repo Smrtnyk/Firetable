@@ -1,38 +1,39 @@
-import type { EventDoc, GuestDataPayload, Reservation } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
-import { AppLogger } from "src/logger/FTLogger";
-import { eventEmitter } from "src/boot/event-emitter";
+import type { EventDoc, GuestDataPayload, Reservation } from "@firetable/types";
+
+import { deleteGuestVisit, setGuestData } from "@firetable/backend";
 import { isPlannedReservation } from "@firetable/types";
+import { eventEmitter } from "src/boot/event-emitter";
 import { hashString } from "src/helpers/hash-string";
 import { maskPhoneNumber } from "src/helpers/mask-phone-number";
-import { deleteGuestVisit, setGuestData } from "@firetable/backend";
-import { usePropertiesStore } from "src/stores/properties-store";
+import { AppLogger } from "src/logger/FTLogger";
 import { useGuestsStore } from "src/stores/guests-store";
+import { usePropertiesStore } from "src/stores/properties-store";
 
 const enum GuestDataMode {
-    SET = "set",
     DELETE = "delete",
+    SET = "set",
 }
 
-eventEmitter.on("reservation:created", function ({ reservation, eventOwner, event }) {
+eventEmitter.on("reservation:created", function ({ event, eventOwner, reservation }) {
     handleGuestDataForReservation(reservation, event, eventOwner, GuestDataMode.SET).catch(
         AppLogger.error.bind(AppLogger),
     );
 });
 
-eventEmitter.on("reservation:arrived", function ({ reservation, eventOwner, event }) {
+eventEmitter.on("reservation:arrived", function ({ event, eventOwner, reservation }) {
     handleGuestDataForReservation(reservation, event, eventOwner, GuestDataMode.SET).catch(
         AppLogger.error.bind(AppLogger),
     );
 });
 
-eventEmitter.on("reservation:cancelled", function ({ reservation, eventOwner, event }) {
+eventEmitter.on("reservation:cancelled", function ({ event, eventOwner, reservation }) {
     handleGuestDataForReservation(reservation, event, eventOwner, GuestDataMode.SET).catch(
         AppLogger.error.bind(AppLogger),
     );
 });
 
-eventEmitter.on("reservation:deleted", function ({ reservation, eventOwner, event }) {
+eventEmitter.on("reservation:deleted", function ({ event, eventOwner, reservation }) {
     handleGuestDataForReservation(reservation, event, eventOwner, GuestDataMode.DELETE).catch(
         AppLogger.error.bind(AppLogger),
     );
@@ -40,7 +41,7 @@ eventEmitter.on("reservation:deleted", function ({ reservation, eventOwner, even
 
 eventEmitter.on(
     "reservation:updated",
-    function ({ reservation, oldReservation, eventOwner, event }) {
+    function ({ event, eventOwner, oldReservation, reservation }) {
         const contactAdded = !oldReservation.guestContact && reservation.guestContact;
         const contactChanged = oldReservation.guestContact !== reservation.guestContact;
 
@@ -81,20 +82,20 @@ async function handleGuestDataForReservation(
     }
 
     const data: GuestDataPayload = {
-        preparedGuestData: {
-            contact: reservationData.guestContact,
-            hashedContact: await hashString(reservationData.guestContact),
-            maskedContact: maskPhoneNumber(reservationData.guestContact),
-            guestName: reservationData.guestName,
-            arrived: reservationData.arrived,
-            cancelled: isPlannedReservation(reservationData) ? reservationData.cancelled : false,
-            isVIP: reservationData.isVIP,
-        },
-        propertyId: eventOwner.propertyId,
-        organisationId: eventOwner.organisationId,
+        eventDate: event.date,
         eventId: eventOwner.id,
         eventName: event.name,
-        eventDate: event.date,
+        organisationId: eventOwner.organisationId,
+        preparedGuestData: {
+            arrived: reservationData.arrived,
+            cancelled: isPlannedReservation(reservationData) ? reservationData.cancelled : false,
+            contact: reservationData.guestContact,
+            guestName: reservationData.guestName,
+            hashedContact: await hashString(reservationData.guestContact),
+            isVIP: reservationData.isVIP,
+            maskedContact: maskPhoneNumber(reservationData.guestContact),
+        },
+        propertyId: eventOwner.propertyId,
     };
 
     function invalidateCache(): void {

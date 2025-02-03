@@ -2,13 +2,15 @@ import type { Auth } from "firebase/auth";
 import type { Firestore } from "firebase/firestore";
 import type { Functions } from "firebase/functions";
 import type { FirebaseStorage } from "firebase/storage";
-import fbConfig from "./fb-config.json" with { type: "json" };
-import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
-import { initializeApp } from "firebase/app";
-import { getAuth, connectAuthEmulator } from "firebase/auth";
-import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
+
 import { memoize } from "es-toolkit";
+import { initializeApp } from "firebase/app";
+import { connectAuthEmulator, getAuth } from "firebase/auth";
+import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
+import { connectFunctionsEmulator, getFunctions } from "firebase/functions";
 import { connectStorageEmulator, getStorage } from "firebase/storage";
+
+import fbConfig from "./fb-config.json" with { type: "json" };
 
 const ipAddressPattern =
     /^((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)$/;
@@ -22,7 +24,7 @@ export const initializeFirebase = memoize(() => {
     if (location.hostname === "localhost" || ipAddressPattern.test(location.hostname)) {
         initEmulators(firestore, auth, functions, storage);
     }
-    return { firestore, auth, functions, firebaseApp, storage };
+    return { auth, firebaseApp, firestore, functions, storage };
 });
 
 function initEmulators(

@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import type { CreateUserPayload, OrganisationDoc, PropertyDoc } from "@firetable/types";
-import { computed, ref, useTemplateRef } from "vue";
+
 import { AdminRole, Role } from "@firetable/types";
 import { QForm } from "quasar";
-import { showErrorMessage } from "src/helpers/ui-helpers";
-import { useAuthStore } from "src/stores/auth-store";
 import {
     hasNumbers,
     hasSymbols,
@@ -13,11 +11,14 @@ import {
     noEmptyString,
     noWhiteSpaces,
 } from "src/helpers/form-rules";
+import { showErrorMessage } from "src/helpers/ui-helpers";
+import { useAuthStore } from "src/stores/auth-store";
+import { computed, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 
 export interface UserCreateFormProps {
-    properties: PropertyDoc[];
     organisation: OrganisationDoc;
+    properties: PropertyDoc[];
 }
 
 type Emits = (event: "submit", payload: CreateUserPayload) => void;
@@ -54,28 +55,28 @@ const shouldShowPropertiesSelection = computed(function () {
     return props.properties.length > 0 && form.value.role !== Role.PROPERTY_OWNER;
 });
 
+function onReset(): void {
+    form.value = { ...userSkeleton() };
+    resetProperties();
+}
+
 async function onSubmit(): Promise<void> {
     if (await validateForm()) {
         prepareAndEmitSubmission();
     }
 }
 
-function onReset(): void {
-    form.value = { ...userSkeleton() };
-    resetProperties();
-}
-
 function userSkeleton(): CreateUserPayload {
     return {
+        capabilities: undefined,
+        email: "",
         id: "",
         name: "",
-        username: "",
-        email: "",
-        password: "",
-        role: Role.STAFF,
-        relatedProperties: [],
         organisationId: "",
-        capabilities: undefined,
+        password: "",
+        relatedProperties: [],
+        role: Role.STAFF,
+        username: "",
     };
 }
 
@@ -87,20 +88,6 @@ function availableRolesBasedOn(roleVal: string): Role[] {
     return roleValues.filter(function (role) {
         return role !== Role.PROPERTY_OWNER;
     });
-}
-
-async function validateForm(): Promise<boolean> {
-    if (!(await userCreateForm.value?.validate())) {
-        return false;
-    }
-    const chosenRole = form.value.role;
-
-    if (chosenRole !== Role.PROPERTY_OWNER && chosenProperties.value.length === 0) {
-        showErrorMessage("You must select at least one property!");
-        return false;
-    }
-
-    return true;
 }
 
 function prepareAndEmitSubmission(): void {
@@ -115,6 +102,20 @@ function prepareAndEmitSubmission(): void {
 
 function resetProperties(): void {
     chosenProperties.value = [];
+}
+
+async function validateForm(): Promise<boolean> {
+    if (!(await userCreateForm.value?.validate())) {
+        return false;
+    }
+    const chosenRole = form.value.role;
+
+    if (chosenRole !== Role.PROPERTY_OWNER && chosenProperties.value.length === 0) {
+        showErrorMessage("You must select at least one property!");
+        return false;
+    }
+
+    return true;
 }
 </script>
 

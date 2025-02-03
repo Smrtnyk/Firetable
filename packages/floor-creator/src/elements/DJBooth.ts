@@ -1,12 +1,15 @@
-import type { FloorEditorElement } from "../types.js";
 import type { FabricObject } from "fabric";
+
+import { Circle, classRegistry, FabricText, Group, LayoutManager, Rect } from "fabric";
+
+import type { FloorEditorElement } from "../types.js";
+
 import { FloorElementTypes } from "../types.js";
-import { LayoutManager, Circle, Group, Rect, FabricText, classRegistry } from "fabric";
 
 interface DJBoothOptions {
     left: number;
-    top: number;
     objects?: FabricObject[];
+    top: number;
 }
 
 export class DJBooth extends Group implements FloorEditorElement {
@@ -15,51 +18,51 @@ export class DJBooth extends Group implements FloorEditorElement {
     constructor(options: DJBoothOptions) {
         const bodyOpts = options.objects?.[0] ?? {};
         const body = new Rect({
+            evented: false,
+            fill: "#1C1C1C",
+            height: 60,
             left: 0,
-            top: 0,
             rx: 15,
             ry: 15,
+            top: 0,
             width: 120,
-            height: 60,
-            fill: "#1C1C1C",
-            evented: false,
             ...bodyOpts,
         });
 
         const turntable1Opts = options.objects?.[1] ?? {};
         const turntable1 = new Circle({
-            left: 20,
-            top: 20,
-            radius: 15,
-            fill: "#1C1C1C",
-            stroke: "#2F2F2F",
-            strokeWidth: 2,
-            strokeUniform: true,
             evented: false,
+            fill: "#1C1C1C",
+            left: 20,
+            radius: 15,
+            stroke: "#2F2F2F",
+            strokeUniform: true,
+            strokeWidth: 2,
+            top: 20,
             ...turntable1Opts,
         });
 
         const turntable2Opts = options.objects?.[2] ?? {};
         const turntable2 = new Circle({
-            left: body.width - 20 - turntable1.width,
-            top: 20,
-            radius: 15,
-            fill: "#1C1C1C",
-            stroke: "#2F2F2F",
-            strokeWidth: 2,
-            strokeUniform: true,
             evented: false,
+            fill: "#1C1C1C",
+            left: body.width - 20 - turntable1.width,
+            radius: 15,
+            stroke: "#2F2F2F",
+            strokeUniform: true,
+            strokeWidth: 2,
+            top: 20,
             ...turntable2Opts,
         });
 
         const djSignOpts = options.objects?.[3] ?? {};
         const djSign = new FabricText("DJ", {
+            evented: false,
+            fill: "#FFFFFF",
+            fontSize: 20,
+            fontWeight: "bold",
             left: 50,
             top: 5,
-            fontSize: 20,
-            fill: "#FFFFFF",
-            fontWeight: "bold",
-            evented: false,
             ...djSignOpts,
         });
 
@@ -68,11 +71,11 @@ export class DJBooth extends Group implements FloorEditorElement {
         const leds = Array.from({ length: 6 }).map(function (_, index) {
             const ledOpts = options.objects?.[index + 4] ?? {};
             return new Circle({
-                left: ledSpacing * (index + 1),
-                top: 57,
-                radius: 2,
-                fill: "#3498DB",
                 evented: false,
+                fill: "#3498DB",
+                left: ledSpacing * (index + 1),
+                radius: 2,
+                top: 57,
                 ...ledOpts,
             });
         });

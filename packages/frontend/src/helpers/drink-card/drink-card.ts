@@ -6,38 +6,19 @@ import type {
     DrinkCardSection,
 } from "@firetable/types";
 
-export function getPublicUrForDrinkCard(organisationId: string, propertyId: string): string {
-    return `${globalThis.location.origin}/${organisationId}/${propertyId}/drink-cards`;
-}
+type ElementGroup = {
+    element: DrinkCardElement;
+    headerId?: string | undefined;
+    isGrouped: boolean;
+};
 
 export function formatPrice(price: number): string {
     return new Intl.NumberFormat("de-DE", {
-        style: "currency",
         currency: "EUR",
+        style: "currency",
     }).format(price);
 }
 
-export function isSection(element: DrinkCardElement): element is DrinkCardSection {
-    return element.type === "section";
-}
-
-export function isHeader(element: DrinkCardElement): element is DrinkCardHeader {
-    return element.type === "header";
-}
-
-export function isHeaderEnd(element: DrinkCardElement): element is DrinkCardHeaderEnd {
-    return element.type === "header-end";
-}
-
-export function isBundle(element: DrinkCardElement): element is DrinkBundle {
-    return element.type === "bundle";
-}
-
-type ElementGroup = {
-    element: DrinkCardElement;
-    isGrouped: boolean;
-    headerId?: string | undefined;
-};
 export function getElementGroups(elements: DrinkCardElement[]): ElementGroup[] {
     const result: ElementGroup[] = [];
 
@@ -62,11 +43,30 @@ export function getElementGroups(elements: DrinkCardElement[]): ElementGroup[] {
         } else {
             result.push({
                 element,
-                isGrouped: isInGroup,
                 headerId: currentHeader?.id,
+                isGrouped: isInGroup,
             });
         }
     });
 
     return result;
+}
+
+export function getPublicUrForDrinkCard(organisationId: string, propertyId: string): string {
+    return `${globalThis.location.origin}/${organisationId}/${propertyId}/drink-cards`;
+}
+
+export function isBundle(element: DrinkCardElement): element is DrinkBundle {
+    return element.type === "bundle";
+}
+
+export function isHeader(element: DrinkCardElement): element is DrinkCardHeader {
+    return element.type === "header";
+}
+
+export function isHeaderEnd(element: DrinkCardElement): element is DrinkCardHeaderEnd {
+    return element.type === "header-end";
+}
+export function isSection(element: DrinkCardElement): element is DrinkCardSection {
+    return element.type === "section";
 }

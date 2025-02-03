@@ -1,6 +1,7 @@
-import { GridDrawer } from "./GridDrawer.js";
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import { Canvas } from "fabric";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { GridDrawer } from "./GridDrawer.js";
 
 describe("GridDrawer", () => {
     let gridDrawer: GridDrawer;

@@ -1,5 +1,13 @@
-import type { Ref, ShallowRef } from "vue";
 import type { FloorDoc, Reservation } from "@firetable/types";
+import type { Ref, ShallowRef } from "vue";
+
+import { FloorViewer, getTables } from "@firetable/floor-creator";
+import { useEventListener } from "@vueuse/core";
+import { matchesProperty } from "es-toolkit/compat";
+import { debounce } from "quasar";
+import { decompressFloorDoc } from "src/helpers/compress-floor-doc";
+import { isTouchDevice } from "src/helpers/is-touch-device";
+import { AppLogger } from "src/logger/FTLogger.js";
 import {
     computed,
     nextTick,
@@ -10,25 +18,18 @@ import {
     shallowRef,
     watch,
 } from "vue";
-import { FloorViewer, getTables } from "@firetable/floor-creator";
-import { debounce } from "quasar";
-import { decompressFloorDoc } from "src/helpers/compress-floor-doc";
-import { isTouchDevice } from "src/helpers/is-touch-device";
-import { AppLogger } from "src/logger/FTLogger.js";
-import { matchesProperty } from "es-toolkit/compat";
-import { useEventListener } from "@vueuse/core";
 
 type ActiveFloor = { id: string; name: string };
 type UseFloorsPageEvent = {
-    animateTables: (foundReservations: Reservation[]) => void;
-    stopAllTableAnimations: () => void;
-    mapFloorToCanvas: (floor: FloorDoc) => (element: any) => void;
-    isActiveFloor: (floorId: string) => boolean;
-    setActiveFloor: (floor?: ActiveFloor) => void;
-    resizeFloor: () => void;
-    hasMultipleFloorPlans: Ref<boolean>;
     activeFloor: Ref<ActiveFloor | undefined>;
+    animateTables: (foundReservations: Reservation[]) => void;
     floorInstances: ShallowRef<FloorViewer[]>;
+    hasMultipleFloorPlans: Ref<boolean>;
+    isActiveFloor: (floorId: string) => boolean;
+    mapFloorToCanvas: (floor: FloorDoc) => (element: any) => void;
+    resizeFloor: () => void;
+    setActiveFloor: (floor?: ActiveFloor) => void;
+    stopAllTableAnimations: () => void;
 };
 
 export function useFloorsPageEvent(
@@ -129,9 +130,9 @@ export function useFloorsPageEvent(
         }
         return new FloorViewer({
             canvas,
-            floorDoc: decompressFloorDoc(floorDoc),
-            containerWidth: pageRef.value.clientWidth,
             containerHeight: pageRef.value.clientHeight,
+            containerWidth: pageRef.value.clientWidth,
+            floorDoc: decompressFloorDoc(floorDoc),
         });
     }
 
@@ -155,14 +156,14 @@ export function useFloorsPageEvent(
     }
 
     return {
-        animateTables,
-        stopAllTableAnimations,
-        mapFloorToCanvas,
-        isActiveFloor,
-        setActiveFloor,
-        resizeFloor,
-        hasMultipleFloorPlans,
         activeFloor,
+        animateTables,
         floorInstances,
+        hasMultipleFloorPlans,
+        isActiveFloor,
+        mapFloorToCanvas,
+        resizeFloor,
+        setActiveFloor,
+        stopAllTableAnimations,
     };
 }

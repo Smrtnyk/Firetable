@@ -1,28 +1,30 @@
 import type { IssueCategory } from "@firetable/types";
+
+import { IssueStatus } from "@firetable/types";
+import { addDoc, collection, deleteDoc, doc, updateDoc } from "firebase/firestore";
+
 import { initializeFirebase } from "./base.js";
 import { getIssueReportsPath } from "./paths.js";
-import { collection, addDoc, updateDoc, doc, deleteDoc } from "firebase/firestore";
-import { IssueStatus } from "@firetable/types";
 
 export interface CreateIssueReportPayload {
-    description: string;
+    category: IssueCategory;
     createdAt: number;
     createdBy: string;
-    category: IssueCategory;
-    user: {
-        name: string;
-        email: string;
-    };
+    description: string;
     organisation: {
         id: string;
+        name: string;
+    };
+    user: {
+        email: string;
         name: string;
     };
 }
 
 export interface UpdateIssueReportPayload {
-    status?: IssueStatus;
-    description?: string;
     category?: IssueCategory;
+    description?: string;
+    status?: IssueStatus;
 }
 
 export async function createIssueReport(payload: CreateIssueReportPayload): Promise<string> {
@@ -35,6 +37,12 @@ export async function createIssueReport(payload: CreateIssueReportPayload): Prom
     return docRef.id;
 }
 
+export async function deleteIssueReport(issueId: string): Promise<void> {
+    const { firestore } = initializeFirebase();
+    const issueDoc = doc(firestore, getIssueReportsPath(), issueId);
+    await deleteDoc(issueDoc);
+}
+
 export async function updateIssueReport(
     issueId: string,
     payload: UpdateIssueReportPayload,
@@ -42,10 +50,4 @@ export async function updateIssueReport(
     const { firestore } = initializeFirebase();
     const issueDoc = doc(firestore, getIssueReportsPath(), issueId);
     await updateDoc(issueDoc, { ...payload });
-}
-
-export async function deleteIssueReport(issueId: string): Promise<void> {
-    const { firestore } = initializeFirebase();
-    const issueDoc = doc(firestore, getIssueReportsPath(), issueId);
-    await deleteDoc(issueDoc);
 }

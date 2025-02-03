@@ -1,10 +1,13 @@
-import type { GroupProps, Rect, FabricText, Circle } from "fabric";
-import type { AnimationStrategy } from "./animation/AnimationStrategy.js";
-import type { FloorEditorElement } from "../types.js";
-import { SmoothBlinkAnimation } from "./animation/SmoothBlinkAnimation.js";
-import { TABLE_WIDTH, TABLE_HEIGHT } from "../constants.js";
-import { Group, LayoutManager } from "fabric";
+import type { Circle, FabricText, GroupProps, Rect } from "fabric";
+
 import { omit } from "es-toolkit";
+import { Group, LayoutManager } from "fabric";
+
+import type { FloorEditorElement } from "../types.js";
+import type { AnimationStrategy } from "./animation/AnimationStrategy.js";
+
+import { TABLE_HEIGHT, TABLE_WIDTH } from "../constants.js";
+import { SmoothBlinkAnimation } from "./animation/SmoothBlinkAnimation.js";
 
 interface TableElementOptions {
     groupOptions: Partial<GroupProps> & {
@@ -12,20 +15,20 @@ interface TableElementOptions {
         baseFill?: string;
         label: string;
     };
+    shapeOptions: Record<string, unknown>;
     textOptions: {
         label: string;
     };
-    shapeOptions: Record<string, unknown>;
 }
 
 export abstract class Table extends Group implements FloorEditorElement {
-    label: string;
     baseFill: string;
-    private readonly initialWidth: number;
+    label: string;
+    private readonly animationStrategy: AnimationStrategy;
     private readonly initialHeight: number;
+    private readonly initialWidth: number;
     private readonly shape: Circle | Rect;
     private readonly textLabel: FabricText;
-    private readonly animationStrategy: AnimationStrategy;
 
     protected constructor(elements: [Circle | Rect, FabricText], options: TableElementOptions) {
         const groupOptions = omit(options.groupOptions, ["type"]);
@@ -43,14 +46,6 @@ export abstract class Table extends Group implements FloorEditorElement {
         this.baseFill = shape.get("fill");
 
         this.on("scaling", this.handleScaling.bind(this));
-    }
-
-    startAnimation(): void {
-        this.animationStrategy.animate();
-    }
-
-    stopAnimation(): void {
-        this.animationStrategy.stop();
     }
 
     getBaseFill(): string {
@@ -80,19 +75,22 @@ export abstract class Table extends Group implements FloorEditorElement {
         this.canvas?.requestRenderAll();
     }
 
+    startAnimation(): void {
+        this.animationStrategy.animate();
+    }
+
+    stopAnimation(): void {
+        this.animationStrategy.stop();
+    }
+
     // @ts-expect-error -- seems like having proper return type here is a bit tricky
     toObject(): Record<string, unknown> {
         return {
             ...super.toObject(),
-            opacity: 1,
             baseFill: this.baseFill,
             label: this.label,
+            opacity: 1,
         };
-    }
-
-    private handleScaling(): void {
-        this.enforceMinimumDimensions();
-        this.adjustTextScaling();
     }
 
     private adjustTextScaling(): void {
@@ -112,5 +110,10 @@ export abstract class Table extends Group implements FloorEditorElement {
         if (this.scaleY * this.initialHeight < TABLE_HEIGHT) {
             this.scaleY = TABLE_HEIGHT / this.initialHeight;
         }
+    }
+
+    private handleScaling(): void {
+        this.enforceMinimumDimensions();
+        this.adjustTextScaling();
     }
 }

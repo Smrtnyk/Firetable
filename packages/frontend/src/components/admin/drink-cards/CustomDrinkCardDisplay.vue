@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { CustomDrinkCardDoc, DrinkBundle, DrinkCardItem } from "@firetable/types";
+
+import { isMobile } from "src/global-reactives/screen-detection";
 import {
     formatPrice,
     getElementGroups,
@@ -9,7 +11,6 @@ import {
     isSection,
 } from "src/helpers/drink-card/drink-card";
 import { computed } from "vue";
-import { isMobile } from "src/global-reactives/screen-detection";
 
 interface Props {
     card: CustomDrinkCardDoc;
@@ -37,6 +38,24 @@ const itemsMap = computed(function () {
     return map;
 });
 
+function calculateRegularPrice(bundle: DrinkBundle): number {
+    return bundle.items.reduce(function (total, bundleItem) {
+        const item = itemsMap.value.get(bundleItem.inventoryItemId);
+        return total + (item?.price ?? 0) * bundleItem.quantity;
+    }, 0);
+}
+
+function formatServingSize(servingSize: {
+    amount: number;
+    displayName?: string;
+    unit: string;
+}): string {
+    if (servingSize.displayName) {
+        return servingSize.displayName;
+    }
+    return `${servingSize.amount}${servingSize.unit}`;
+}
+
 function formatSubCategory(subCategory: string): string {
     return subCategory
         .split("-")
@@ -46,27 +65,9 @@ function formatSubCategory(subCategory: string): string {
         .join(" ");
 }
 
-function formatServingSize(servingSize: {
-    amount: number;
-    unit: string;
-    displayName?: string;
-}): string {
-    if (servingSize.displayName) {
-        return servingSize.displayName;
-    }
-    return `${servingSize.amount}${servingSize.unit}`;
-}
-
 function getItemName(itemId: string): string {
     const item = itemsMap.value.get(itemId);
     return item ? item.name : "Unknown Item";
-}
-
-function calculateRegularPrice(bundle: DrinkBundle): number {
-    return bundle.items.reduce(function (total, bundleItem) {
-        const item = itemsMap.value.get(bundleItem.inventoryItemId);
-        return total + (item?.price ?? 0) * bundleItem.quantity;
-    }, 0);
 }
 
 function groupItemsBySubcategory(items: DrinkCardItem[]): Map<string, DrinkCardItem[]> {

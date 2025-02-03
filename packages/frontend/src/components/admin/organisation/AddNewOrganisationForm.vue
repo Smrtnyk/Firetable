@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import type { CreateOrganisationPayload } from "@firetable/backend";
-import { ref, useTemplateRef } from "vue";
-import { greaterThanZero, minLength, requireNumber } from "src/helpers/form-rules";
-import { QForm } from "quasar";
-import { useI18n } from "vue-i18n";
+
 import { OrganisationStatus } from "@firetable/types";
+import { QForm } from "quasar";
+import { greaterThanZero, minLength, requireNumber } from "src/helpers/form-rules";
+import { ref, useTemplateRef } from "vue";
+import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 
@@ -13,7 +14,7 @@ const organisationRules = [minLength("organisation name needs to have at least 3
 const maxAllowedPropertiesRules = [requireNumber(), greaterThanZero()];
 
 const organisationName = ref("");
-const maxAllowedProperties = ref<number | null>(null);
+const maxAllowedProperties = ref<null | number>(null);
 const createOrganisationForm = useTemplateRef<QForm>("createOrganisationForm");
 
 async function submit(): Promise<void> {
@@ -22,8 +23,8 @@ async function submit(): Promise<void> {
     }
 
     emit("create", {
-        name: organisationName.value,
         maxAllowedProperties: Number(maxAllowedProperties.value),
+        name: organisationName.value,
         status: OrganisationStatus.PENDING,
     });
 }

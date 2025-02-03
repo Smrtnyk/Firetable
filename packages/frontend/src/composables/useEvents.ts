@@ -1,9 +1,10 @@
-import type { QueryDocumentSnapshot } from "firebase/firestore";
-import type { EventDoc } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
-import { ref } from "vue";
+import type { EventDoc } from "@firetable/types";
+import type { QueryDocumentSnapshot } from "firebase/firestore";
+
 import { getEvents } from "@firetable/backend";
 import { last } from "es-toolkit";
+import { ref } from "vue";
 
 const EVENTS_PER_PAGE = 50;
 
@@ -56,8 +57,8 @@ export function useEvents(eventOwner: EventOwner) {
     }
 
     return {
-        events,
         done,
+        events,
         fetchMoreEvents,
         isLoading,
     };

@@ -1,29 +1,29 @@
 <script setup lang="ts">
 import type { CreateGuestPayload } from "@firetable/types";
 import type { SortDirection, SortOption } from "src/components/admin/guest/GuestSortOptions.vue";
-import { batchDeleteGuests, createGuest } from "@firetable/backend";
-import { useI18n } from "vue-i18n";
-import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { storeToRefs } from "pinia";
-import { useDialog } from "src/composables/useDialog";
-import { computed, onUnmounted, ref, useTemplateRef, watch } from "vue";
-import { isMobile } from "src/global-reactives/screen-detection";
-import { Loading, QVirtualScroll } from "quasar";
-import { useAuthStore } from "src/stores/auth-store";
-import { useGuestsStore } from "src/stores/guests-store";
-import { useLocalStorage } from "@vueuse/core";
-import { useRouter } from "vue-router";
-import { property } from "es-toolkit/compat";
-import { lowerCase, uniq } from "es-toolkit";
 
+import { batchDeleteGuests, createGuest } from "@firetable/backend";
+import { useLocalStorage } from "@vueuse/core";
+import { lowerCase, uniq } from "es-toolkit";
+import { property } from "es-toolkit/compat";
+import { storeToRefs } from "pinia";
+import { Loading, QVirtualScroll } from "quasar";
 import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
-import FTTitle from "src/components/FTTitle.vue";
-import FTCenteredText from "src/components/FTCenteredText.vue";
-import FTDialog from "src/components/FTDialog.vue";
-import FTBtn from "src/components/FTBtn.vue";
-import GuestSummaryChips from "src/components/guest/GuestSummaryChips.vue";
 import GuestSortOptions from "src/components/admin/guest/GuestSortOptions.vue";
 import FTBottomDialog from "src/components/FTBottomDialog.vue";
+import FTBtn from "src/components/FTBtn.vue";
+import FTCenteredText from "src/components/FTCenteredText.vue";
+import FTDialog from "src/components/FTDialog.vue";
+import FTTitle from "src/components/FTTitle.vue";
+import GuestSummaryChips from "src/components/guest/GuestSummaryChips.vue";
+import { useDialog } from "src/composables/useDialog";
+import { isMobile } from "src/global-reactives/screen-detection";
+import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { useAuthStore } from "src/stores/auth-store";
+import { useGuestsStore } from "src/stores/guests-store";
+import { computed, onUnmounted, ref, useTemplateRef, watch } from "vue";
+import { useI18n } from "vue-i18n";
+import { useRouter } from "vue-router";
 
 export interface PageAdminGuestsProps {
     organisationId: string;
@@ -85,11 +85,11 @@ const guestsWithSummaries = computed(function () {
 
             return {
                 ...guest,
+                fulfilledVisits,
                 id: guest.id,
+                overallPercentage,
                 summary: summaries,
                 totalReservations,
-                fulfilledVisits,
-                overallPercentage,
             };
         })
         .filter(function (guest) {
@@ -111,10 +111,6 @@ const sortedGuests = computed(function () {
                 comparison = (b.maskedContact || "").localeCompare(a.maskedContact || "");
                 break;
 
-            case "name":
-                comparison = b.name.localeCompare(a.name);
-                break;
-
             case "lastModified":
                 {
                     // Use 0 as default if lastModified is not set
@@ -132,6 +128,10 @@ const sortedGuests = computed(function () {
                 } else {
                     comparison = b.totalReservations - a.totalReservations;
                 }
+                break;
+
+            case "name":
+                comparison = b.name.localeCompare(a.name);
                 break;
 
             case "percentage":
@@ -196,46 +196,14 @@ const pageTitle = computed(function () {
     return `${t("PageAdminGuests.title")} (${guestsWithSummaries.value.length})`;
 });
 
-function showSortDialog(): void {
-    createDialog({
-        component: FTBottomDialog,
-        componentProps: {
-            component: GuestSortOptions,
-            componentPropsObject: {
-                currentSortOption: sortOption,
-                currentSortDirection: sortDirection,
-                availableTags,
-                selectedTags,
-            },
-            listeners: {
-                "update:sortOption"(payload) {
-                    setSortOption(payload);
-                },
-                "update:selectedTags"(payload) {
-                    selectedTags.value = payload;
-                },
-                toggleDirection() {
-                    toggleSortDirection();
-                },
-            },
-        },
-    });
-}
-
 function setSortOption(option: SortOption): void {
     sortOption.value = option;
-}
-
-function toggleSortDirection(): void {
-    sortDirection.value = sortDirection.value === "desc" ? "asc" : "desc";
 }
 
 function showCreateGuestDialog(): void {
     const dialog = createDialog({
         component: FTDialog,
         componentProps: {
-            title: t("PageAdminGuests.createNewGuestDialogTitle"),
-            maximized: false,
             component: AddNewGuestForm,
             listeners: {
                 create(payload: CreateGuestPayload) {
@@ -248,8 +216,40 @@ function showCreateGuestDialog(): void {
                     });
                 },
             },
+            maximized: false,
+            title: t("PageAdminGuests.createNewGuestDialogTitle"),
         },
     });
+}
+
+function showSortDialog(): void {
+    createDialog({
+        component: FTBottomDialog,
+        componentProps: {
+            component: GuestSortOptions,
+            componentPropsObject: {
+                availableTags,
+                currentSortDirection: sortDirection,
+                currentSortOption: sortOption,
+                selectedTags,
+            },
+            listeners: {
+                toggleDirection() {
+                    toggleSortDirection();
+                },
+                "update:selectedTags"(payload) {
+                    selectedTags.value = payload;
+                },
+                "update:sortOption"(payload) {
+                    setSortOption(payload);
+                },
+            },
+        },
+    });
+}
+
+function toggleSortDirection(): void {
+    sortDirection.value = sortDirection.value === "desc" ? "asc" : "desc";
 }
 
 const virtualListRef = useTemplateRef<QVirtualScroll>("virtualListRef");
@@ -258,6 +258,14 @@ const lastGuestIndex = computed(() => filteredGuests.value.length - 1);
 
 const scrollDirection = ref<"down" | "up">("down");
 const lastScrollIndex = ref(0);
+
+function handleScroll(): void {
+    if (scrollDirection.value === "down") {
+        virtualListRef.value?.scrollTo(lastGuestIndex.value, "end");
+    } else {
+        virtualListRef.value?.scrollTo(0, "start");
+    }
+}
 
 function onVirtualScroll({
     index,
@@ -270,14 +278,6 @@ function onVirtualScroll({
     showScrollButton.value = scrollPercentage > 0.1 && scrollPercentage < 0.9;
 }
 
-function handleScroll(): void {
-    if (scrollDirection.value === "down") {
-        virtualListRef.value?.scrollTo(lastGuestIndex.value, "end");
-    } else {
-        virtualListRef.value?.scrollTo(0, "start");
-    }
-}
-
 const selectedGuests = ref<string[]>([]);
 const selectionMode = ref(false);
 const allSelected = computed(function () {
@@ -288,51 +288,6 @@ const allSelected = computed(function () {
         })
     );
 });
-
-function toggleGuestSelection(id: string): void {
-    const idx = selectedGuests.value.indexOf(id);
-    if (idx === -1) {
-        selectedGuests.value.push(id);
-    } else {
-        selectedGuests.value.splice(idx, 1);
-    }
-}
-
-function toggleSelectAll(): void {
-    if (allSelected.value) {
-        selectedGuests.value = [];
-    } else {
-        selectedGuests.value = filteredGuests.value.map(property("id"));
-    }
-}
-
-function onItemHold(item: any): void {
-    if (!selectionMode.value) {
-        selectionMode.value = true;
-        if (!selectedGuests.value.includes(item.id)) {
-            selectedGuests.value.push(item.id);
-        }
-    }
-}
-
-function cancelSelectionMode(): void {
-    selectionMode.value = false;
-    selectedGuests.value = [];
-}
-
-function onItemClick(item: any): void {
-    if (selectionMode.value) {
-        toggleGuestSelection(item.id);
-    } else {
-        router.push({
-            name: "adminGuest",
-            params: {
-                organisationId: props.organisationId,
-                guestId: item.id,
-            },
-        });
-    }
-}
 
 async function bulkDeleteSelected(): Promise<void> {
     if (selectedGuests.value.length === 0) {
@@ -351,6 +306,51 @@ async function bulkDeleteSelected(): Promise<void> {
             selectedGuests.value = [];
         },
     });
+}
+
+function cancelSelectionMode(): void {
+    selectionMode.value = false;
+    selectedGuests.value = [];
+}
+
+function onItemClick(item: any): void {
+    if (selectionMode.value) {
+        toggleGuestSelection(item.id);
+    } else {
+        router.push({
+            name: "adminGuest",
+            params: {
+                guestId: item.id,
+                organisationId: props.organisationId,
+            },
+        });
+    }
+}
+
+function onItemHold(item: any): void {
+    if (!selectionMode.value) {
+        selectionMode.value = true;
+        if (!selectedGuests.value.includes(item.id)) {
+            selectedGuests.value.push(item.id);
+        }
+    }
+}
+
+function toggleGuestSelection(id: string): void {
+    const idx = selectedGuests.value.indexOf(id);
+    if (idx === -1) {
+        selectedGuests.value.push(id);
+    } else {
+        selectedGuests.value.splice(idx, 1);
+    }
+}
+
+function toggleSelectAll(): void {
+    if (allSelected.value) {
+        selectedGuests.value = [];
+    } else {
+        selectedGuests.value = filteredGuests.value.map(property("id"));
+    }
 }
 </script>
 

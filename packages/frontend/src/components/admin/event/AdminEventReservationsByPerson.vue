@@ -1,70 +1,49 @@
 <script setup lang="ts">
 import type { PlannedReservationDoc } from "@firetable/types";
-import { computed } from "vue";
+
 import { matchesProperty } from "es-toolkit/compat";
 import FTCenteredText from "src/components/FTCenteredText.vue";
+import { computed } from "vue";
 
 interface Props {
     reservations: PlannedReservationDoc[];
 }
 
+type Res = Record<string, ReservationObject>;
+
 interface ReservationObject {
+    arrived: number;
     name: string;
     reservations: number;
-    arrived: number;
 }
-
-type Res = Record<string, ReservationObject>;
 type TableData = {
-    labels: string[];
     datasets: any[];
+    labels: string[];
 };
 
 const tableColumns = [
-    { name: "name", required: true, label: "Name", align: "left", field: "name", sortable: true },
-    { name: "arrived", label: "Arrived", field: "arrived", sortable: true },
-    { name: "pending", label: "Pending", field: "pending", sortable: true },
-    { name: "total", label: "Total", field: "total", sortable: true },
+    { align: "left", field: "name", label: "Name", name: "name", required: true, sortable: true },
+    { field: "arrived", label: "Arrived", name: "arrived", sortable: true },
+    { field: "pending", label: "Pending", name: "pending", sortable: true },
+    { field: "total", label: "Total", name: "total", sortable: true },
 ] as any;
 
 const props = defineProps<Props>();
 
 const tableData = computed(function () {
-    const { labels, datasets } = generateTableData(props.reservations);
+    const { datasets, labels } = generateTableData(props.reservations);
     const arrivedData = datasets.find(matchesProperty("label", "Arrived")).data;
     const pendingData = datasets.find(matchesProperty("label", "Pending")).data;
 
     return labels.map(function (label, index) {
         return {
-            name: label,
             arrived: arrivedData[index],
+            name: label,
             pending: pendingData[index],
             total: arrivedData[index] + pendingData[index],
         };
     });
 });
-
-function reservationsReducer(acc: Res, reservation: PlannedReservationDoc): Res {
-    if (!reservation) {
-        return acc;
-    }
-    const { reservedBy, arrived } = reservation;
-    const { email, name } = reservedBy;
-    const hash = name + email;
-    if (acc[hash]) {
-        acc[hash].reservations += 1;
-    } else {
-        acc[hash] = {
-            name,
-            reservations: 1,
-            arrived: 0,
-        };
-    }
-    if (arrived) {
-        acc[hash].arrived += 1;
-    }
-    return acc;
-}
 
 function generateTableData(reservations: PlannedReservationDoc[]): TableData {
     const data = reservations.reduce(reservationsReducer, {});
@@ -79,16 +58,38 @@ function generateTableData(reservations: PlannedReservationDoc[]): TableData {
     });
 
     const pendingDataset = {
-        label: "Pending",
         data: pendingCounts,
+        label: "Pending",
     };
 
     const arrivedDataset = {
-        label: "Arrived",
         data: arrivedCounts,
+        label: "Arrived",
     };
 
-    return { labels, datasets: [pendingDataset, arrivedDataset] };
+    return { datasets: [pendingDataset, arrivedDataset], labels };
+}
+
+function reservationsReducer(acc: Res, reservation: PlannedReservationDoc): Res {
+    if (!reservation) {
+        return acc;
+    }
+    const { arrived, reservedBy } = reservation;
+    const { email, name } = reservedBy;
+    const hash = name + email;
+    if (acc[hash]) {
+        acc[hash].reservations += 1;
+    } else {
+        acc[hash] = {
+            arrived: 0,
+            name,
+            reservations: 1,
+        };
+    }
+    if (arrived) {
+        acc[hash].arrived += 1;
+    }
+    return acc;
 }
 </script>
 

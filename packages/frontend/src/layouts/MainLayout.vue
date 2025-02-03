@@ -2,7 +2,6 @@
 import AppDrawer from "src/components/AppDrawer.vue";
 import AppTopMenu from "src/components/AppTopMenu.vue";
 import NetworkOverlay from "src/components/NetworkOverlay.vue";
-
 import { useAuthStore } from "src/stores/auth-store";
 import { computed, ref } from "vue";
 import { useRoute } from "vue-router";

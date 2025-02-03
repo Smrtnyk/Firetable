@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { QueuedReservationDoc, ReservationDoc } from "@firetable/types";
+
 import { isAWalkInReservation } from "@firetable/types";
 import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPChip.vue";
 

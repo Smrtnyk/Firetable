@@ -12,12 +12,13 @@
 </template>
 
 <script setup lang="ts">
-import type { RouteRecordName, RouteRecordNormalized, RouteRecordRaw } from "vue-router";
 import type { AnyFunction, AppUser } from "@firetable/types";
-import { useRoute, useRouter } from "vue-router";
-import { computed } from "vue";
-import { useAuthStore } from "src/stores/auth-store";
+import type { RouteRecordName, RouteRecordNormalized, RouteRecordRaw } from "vue-router";
+
 import { isFunction } from "es-toolkit";
+import { useAuthStore } from "src/stores/auth-store";
+import { computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 interface Link {
     name: string;
@@ -31,10 +32,6 @@ function isAnyFunction(value: unknown): value is AnyFunction {
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
-
-function isRoot(routeName: string): boolean {
-    return routeName === "Home";
-}
 
 function findRouteByName(
     name: RouteRecordName,
@@ -54,6 +51,20 @@ function findRouteByName(
     return undefined;
 }
 
+function getBreadcrumbName(
+    currentRoute: RouteRecordNormalized | RouteRecordRaw,
+    isAdmin: boolean,
+): string | undefined {
+    if (isAnyFunction(currentRoute.meta?.breadcrumb)) {
+        return currentRoute.meta.breadcrumb(route, isAdmin);
+    }
+    return currentRoute.meta?.breadcrumb;
+}
+
+function isRoot(routeName: string): boolean {
+    return routeName === "Home";
+}
+
 function isRouteAllowed(
     currentRoute: RouteRecordNormalized | RouteRecordRaw,
     userRole: AppUser["role"],
@@ -65,16 +76,6 @@ function isRouteAllowed(
     return isFunction(currentRoute.meta.allowedRoles)
         ? (currentRoute.meta.allowedRoles(authStore) as boolean)
         : ((currentRoute.meta.allowedRoles as string[]) ?? ([] as string[])).includes(userRole);
-}
-
-function getBreadcrumbName(
-    currentRoute: RouteRecordNormalized | RouteRecordRaw,
-    isAdmin: boolean,
-): string | undefined {
-    if (isAnyFunction(currentRoute.meta?.breadcrumb)) {
-        return currentRoute.meta.breadcrumb(route, isAdmin);
-    }
-    return currentRoute.meta?.breadcrumb;
 }
 
 const breadcrumbLinks = computed<Link[]>(function () {

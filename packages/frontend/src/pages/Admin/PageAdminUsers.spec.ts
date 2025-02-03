@@ -1,29 +1,31 @@
-import type { PageAdminUsersProps } from "./PageAdminUsers.vue";
-import type { User, PropertyDoc } from "@firetable/types";
+import type { PropertyDoc, User } from "@firetable/types";
 import type { RenderResult } from "vitest-browser-vue";
-import PageAdminUsers from "./PageAdminUsers.vue";
-import { renderComponent, t } from "../../../test-helpers/render-component";
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { userEvent } from "@vitest/browser/context";
-import { ref, nextTick } from "vue";
-import { Role, UserCapability } from "@firetable/types";
 
-import FTDialog from "src/components/FTDialog.vue";
-import UserCreateForm from "src/components/admin/user/UserCreateForm.vue";
+import { Role, UserCapability } from "@firetable/types";
+import { userEvent } from "@vitest/browser/context";
 import { Loading } from "quasar";
+import UserCreateForm from "src/components/admin/user/UserCreateForm.vue";
+import FTDialog from "src/components/FTDialog.vue";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { nextTick, ref } from "vue";
+
+import type { PageAdminUsersProps } from "./PageAdminUsers.vue";
+
+import { renderComponent, t } from "../../../test-helpers/render-component";
+import PageAdminUsers from "./PageAdminUsers.vue";
 
 const {
     createDialogSpy,
+    fetchUsersByRoleMock,
+    showConfirmMock,
     showErrorMessageMock,
     tryCatchLoadingWrapperMock,
-    showConfirmMock,
-    fetchUsersByRoleMock,
 } = vi.hoisted(() => ({
     createDialogSpy: vi.fn(),
+    fetchUsersByRoleMock: vi.fn(),
+    showConfirmMock: vi.fn(),
     showErrorMessageMock: vi.fn(),
     tryCatchLoadingWrapperMock: vi.fn(),
-    showConfirmMock: vi.fn(),
-    fetchUsersByRoleMock: vi.fn(),
 }));
 
 vi.mock("vue-router", () => ({
@@ -45,18 +47,18 @@ vi.mock("../../backend-proxy", async (importOriginal) => ({
 
 vi.mock("src/helpers/ui-helpers", async (importOriginal) => ({
     ...(await importOriginal()),
+    showConfirm: showConfirmMock,
     showErrorMessage: showErrorMessageMock,
     tryCatchLoadingWrapper: tryCatchLoadingWrapperMock,
-    showConfirm: showConfirmMock,
 }));
 
 vi.mock("quasar", async (importOriginal) => {
     return {
         ...(await importOriginal()),
         Loading: {
-            show: vi.fn(),
             hide: vi.fn(),
             isActive: false,
+            show: vi.fn(),
         },
     };
 });
@@ -75,40 +77,40 @@ describe("PageAdminUsers.vue", () => {
 
         usersData = [
             {
+                capabilities: {
+                    [UserCapability.CAN_RESERVE]: true,
+                },
+                email: "john@example.com",
                 id: "user1",
                 name: "John Doe",
-                username: "john",
                 organisationId,
-                email: "john@example.com",
-                role: Role.PROPERTY_OWNER,
                 relatedProperties: ["property1", "property2"],
+                role: Role.PROPERTY_OWNER,
+                username: "john",
+            },
+            {
                 capabilities: {
                     [UserCapability.CAN_RESERVE]: true,
                 },
-            },
-            {
+                email: "jane@example.com",
                 id: "user2",
                 name: "Jane Smith",
-                username: "jane",
-                email: "jane@example.com",
                 organisationId,
-                role: Role.STAFF,
                 relatedProperties: ["property1"],
-                capabilities: {
-                    [UserCapability.CAN_RESERVE]: true,
-                },
+                role: Role.STAFF,
+                username: "jane",
             },
             {
-                id: "user3",
-                name: "Bob Brown",
-                username: "bob",
-                organisationId,
-                email: "bob@example.com",
-                role: Role.STAFF,
-                relatedProperties: [],
                 capabilities: {
                     [UserCapability.CAN_RESERVE]: false,
                 },
+                email: "bob@example.com",
+                id: "user3",
+                name: "Bob Brown",
+                organisationId,
+                relatedProperties: [],
+                role: Role.STAFF,
+                username: "bob",
             },
         ];
 
@@ -128,8 +130,8 @@ describe("PageAdminUsers.vue", () => {
                         },
                     },
                     properties: {
-                        properties: propertiesData,
                         organisations: [{ id: organisationId, name: "Organisation One" }],
+                        properties: propertiesData,
                     },
                 },
             },

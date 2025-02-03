@@ -1,8 +1,10 @@
 import type { CreateUserPayload } from "@shared-types";
 import type { CallableRequest } from "firebase-functions/v2/https";
+
+import { HttpsError } from "firebase-functions/v2/https";
+
 import { auth, db } from "../../init.js";
 import { getUsersPath } from "../../paths.js";
-import { HttpsError } from "firebase-functions/v2/https";
 
 /**
  * Creates a new user in Firebase Authentication and stores associated user information in Firestore.
@@ -31,8 +33,8 @@ import { HttpsError } from "firebase-functions/v2/https";
  */
 export async function createUser(
     req: CallableRequest<CreateUserPayload>,
-): Promise<{ uid: string; message: string }> {
-    const { name, password, email, role, relatedProperties, organisationId, username } = req.data;
+): Promise<{ message: string; uid: string }> {
+    const { email, name, organisationId, password, relatedProperties, role, username } = req.data;
 
     let createdUserUid: string | undefined;
 
@@ -53,20 +55,20 @@ export async function createUser(
     try {
         const createdUser = await auth.createUser({ email, password });
         createdUserUid = createdUser.uid;
-        await auth.setCustomUserClaims(createdUser.uid, { role, organisationId });
+        await auth.setCustomUserClaims(createdUser.uid, { organisationId, role });
 
         const userDoc = {
-            name,
             email,
+            name,
+            organisationId,
+            relatedProperties,
             role,
             username,
-            relatedProperties,
-            organisationId,
         };
 
         await db.collection(getUsersPath(organisationId)).doc(createdUser.uid).set(userDoc);
 
-        return { uid: createdUser.uid, message: "User created successfully!" };
+        return { message: "User created successfully!", uid: createdUser.uid };
     } catch (e: any) {
         if (createdUserUid) {
             await auth.deleteUser(createdUserUid);
@@ -77,11 +79,6 @@ export async function createUser(
         let errorMessage: string;
 
         switch (e.code) {
-            case "auth/invalid-password":
-                errorCode = "invalid-argument";
-                errorMessage =
-                    "The provided password is invalid. It must be at least 6 characters long and contain a mix of characters.";
-                break;
             case "auth/email-already-exists":
                 errorCode = "already-exists";
                 errorMessage = "A user with this email already exists.";
@@ -89,6 +86,11 @@ export async function createUser(
             case "auth/invalid-email":
                 errorCode = "invalid-argument";
                 errorMessage = "The provided email is invalid.";
+                break;
+            case "auth/invalid-password":
+                errorCode = "invalid-argument";
+                errorMessage =
+                    "The provided password is invalid. It must be at least 6 characters long and contain a mix of characters.";
                 break;
             default:
                 errorCode = "internal";

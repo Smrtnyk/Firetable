@@ -1,10 +1,12 @@
 import type { CreateDrinkCardPayload, CustomDrinkCardDoc, PDFDrinkCardDoc } from "@firetable/types";
-import { initializeFirebase } from "./base.js";
-import { getDrinkCardPath } from "./paths.js";
-import { drinkCardsCollection } from "./db.js";
+
 import { isPDFDrinkCard } from "@firetable/types";
-import { addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { addDoc, deleteDoc, doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
+
+import { initializeFirebase } from "./base.js";
+import { drinkCardsCollection } from "./db.js";
+import { getDrinkCardPath } from "./paths.js";
 
 /**
  * Adds a new drink card to the Firestore database.
@@ -43,24 +45,6 @@ export async function createDrinkCard(
 }
 
 /**
- * Updates an existing drink card in the Firestore database.
- */
-export async function updateDrinkCard(
-    organisationId: string,
-    propertyId: string,
-    cardId: string,
-    card: Partial<CustomDrinkCardDoc | PDFDrinkCardDoc>,
-): Promise<void> {
-    const { firestore } = initializeFirebase();
-    const cardRef = doc(firestore, getDrinkCardPath(organisationId, propertyId, cardId));
-
-    await updateDoc(cardRef, {
-        ...card,
-        updatedAt: serverTimestamp(),
-    });
-}
-
-/**
  * Deletes a drink card and its associated PDF if it exists.
  */
 export async function deleteDrinkCard(
@@ -78,6 +62,24 @@ export async function deleteDrinkCard(
     }
 
     await deleteDoc(cardRef);
+}
+
+/**
+ * Updates an existing drink card in the Firestore database.
+ */
+export async function updateDrinkCard(
+    organisationId: string,
+    propertyId: string,
+    cardId: string,
+    card: Partial<CustomDrinkCardDoc | PDFDrinkCardDoc>,
+): Promise<void> {
+    const { firestore } = initializeFirebase();
+    const cardRef = doc(firestore, getDrinkCardPath(organisationId, propertyId, cardId));
+
+    await updateDoc(cardRef, {
+        ...card,
+        updatedAt: serverTimestamp(),
+    });
 }
 
 export async function uploadPDF(

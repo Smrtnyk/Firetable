@@ -1,11 +1,12 @@
 import type { EventOwner } from "@firetable/backend";
 import type { GuestDoc, ReservationDoc } from "@firetable/types";
 import type { Ref } from "vue";
-import { computed, ref, watch } from "vue";
-import { matchesProperty, property } from "es-toolkit/compat";
-import { useGuestsStore } from "src/stores/guests-store";
-import { hashString } from "src/helpers/hash-string";
+
 import { uniq } from "es-toolkit";
+import { matchesProperty, property } from "es-toolkit/compat";
+import { hashString } from "src/helpers/hash-string";
+import { useGuestsStore } from "src/stores/guests-store";
+import { computed, ref, watch } from "vue";
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- pretty verbose
 export function useGuestsForEvent(eventOwner: EventOwner, reservations: Ref<ReservationDoc[]>) {
@@ -49,11 +50,11 @@ export function useGuestsForEvent(eventOwner: EventOwner, reservations: Ref<Rese
                 const tableLabels = matchingReservations.map(property("tableLabel"));
 
                 return {
+                    contact: guest.contact,
                     id: guest.id,
                     name: guest.name,
-                    contact: guest.contact,
-                    visits: visitsWithoutCurrentEvent,
                     tableLabels,
+                    visits: visitsWithoutCurrentEvent,
                 };
             })
             .filter((guest) => guest.visits.length > 0);

@@ -28,16 +28,17 @@
 
 <script setup lang="ts">
 import type { Visit } from "@firetable/types";
+
 import FTCenteredText from "src/components/FTCenteredText.vue";
 
 export interface AdminEventReturningGuestsListProps {
     organisationId: string;
     returningGuests: {
+        contact: string;
         id: string;
         name: string;
-        contact: string;
-        visits: (Visit | null)[];
         tableLabels: any[];
+        visits: (null | Visit)[];
     }[];
 }
 

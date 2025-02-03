@@ -1,5 +1,6 @@
-import { parseAspectRatio } from "./utils";
 import { describe, expect, it } from "vitest";
+
+import { parseAspectRatio } from "./utils";
 
 describe("helpers/utils", () => {
     describe("parseAspectRatio()", () => {

@@ -1,68 +1,14 @@
 import type { AspectRatio } from "./organisation.js";
 
+export type CreatePropertyPayload = {
+    img: ImageUploadData | string;
+    name: string;
+    organisationId: string;
+};
+
 export interface ImageUploadData {
     dataUrl: string;
     type: string;
-}
-
-export type CreatePropertyPayload = {
-    name: string;
-    organisationId: string;
-    img: ImageUploadData | string;
-};
-
-export type UpdatePropertyPayload = CreatePropertyPayload & {
-    id: string;
-};
-/**
- * Property-specific settings stored in Firestore
- */
-export interface PropertySettings {
-    /**
-     * IANA timezone identifier for the property location
-     * Used for date/time calculations
-     */
-    timezone?: string;
-
-    /**
-     * After configured amount of minutes the guest will be marked as late
-     * on the floor plan
-     * Value is in minutes
-     */
-    markGuestAsLateAfterMinutes?: number;
-
-    event?: Partial<{
-        /**
-         * Aspect ratio for event cards in the UI
-         */
-        eventCardAspectRatio: AspectRatio;
-        /**
-         * Default start time for new events in 24h format
-         */
-        eventStartTime24HFormat: string;
-        /**
-         * Default duration for new events in hours
-         */
-        eventDurationInHours: number;
-        /**
-         * Color codes for different reservation states
-         */
-        reservationArrivedColor: string;
-        reservationConfirmedColor: string;
-        reservationCancelledColor: string;
-        reservationPendingColor: string;
-        reservationWaitingForResponseColor: string;
-    }>;
-    guest?: Partial<{
-        /**
-         * Whether to collect the guest information
-         */
-        collectGuestData: boolean;
-        /**
-         * Organisation-wide tags that can be applied to guests
-         */
-        globalGuestTags?: string[];
-    }>;
 }
 
 /**
@@ -75,6 +21,10 @@ export interface PropertyDoc {
      */
     id: string;
     /**
+     * URL to the property's image
+     */
+    img?: string;
+    /**
      * Display name of the property
      */
     name: string;
@@ -83,11 +33,61 @@ export interface PropertyDoc {
      */
     organisationId: string;
     /**
-     * URL to the property's image
-     */
-    img?: string;
-    /**
      * Property-specific settings
      */
     settings?: PropertySettings | undefined;
 }
+/**
+ * Property-specific settings stored in Firestore
+ */
+export interface PropertySettings {
+    event?: Partial<{
+        /**
+         * Aspect ratio for event cards in the UI
+         */
+        eventCardAspectRatio: AspectRatio;
+        /**
+         * Default duration for new events in hours
+         */
+        eventDurationInHours: number;
+        /**
+         * Default start time for new events in 24h format
+         */
+        eventStartTime24HFormat: string;
+        /**
+         * Color codes for different reservation states
+         */
+        reservationArrivedColor: string;
+        reservationCancelledColor: string;
+        reservationConfirmedColor: string;
+        reservationPendingColor: string;
+        reservationWaitingForResponseColor: string;
+    }>;
+
+    guest?: Partial<{
+        /**
+         * Whether to collect the guest information
+         */
+        collectGuestData: boolean;
+        /**
+         * Organisation-wide tags that can be applied to guests
+         */
+        globalGuestTags?: string[];
+    }>;
+
+    /**
+     * After configured amount of minutes the guest will be marked as late
+     * on the floor plan
+     * Value is in minutes
+     */
+    markGuestAsLateAfterMinutes?: number;
+    /**
+     * IANA timezone identifier for the property location
+     * Used for date/time calculations
+     */
+    timezone?: string;
+}
+
+export type UpdatePropertyPayload = CreatePropertyPayload & {
+    id: string;
+};

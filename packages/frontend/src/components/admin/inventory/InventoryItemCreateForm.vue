@@ -1,27 +1,28 @@
 <script setup lang="ts">
 import type { CreateInventoryItemPayload } from "@firetable/types";
+
 import {
-    TobaccoSubCategory,
-    isRetailItem,
-    RetailMainCategory,
-    isDrinkItem,
+    BeerSubCategory,
+    CocktailComponentCategory,
     DrinkMainCategory,
     InventoryItemType,
-    SpiritSubCategory,
-    WineSubCategory,
-    BeerSubCategory,
+    isDrinkItem,
+    isRetailItem,
     NonAlcoholicCategory,
-    CocktailComponentCategory,
+    RetailMainCategory,
+    SpiritSubCategory,
+    TobaccoSubCategory,
+    WineSubCategory,
 } from "@firetable/types";
-import { ref, useTemplateRef, watch, computed } from "vue";
 import { QForm } from "quasar";
-import { useI18n } from "vue-i18n";
 import { noEmptyString, noNegativeNumber, optionalNumberInRange } from "src/helpers/form-rules";
 import { getEnumValues } from "src/helpers/get-enum-values";
+import { computed, ref, useTemplateRef, watch } from "vue";
+import { useI18n } from "vue-i18n";
 
 export interface InventoryItemCreateFormProps {
-    itemToEdit?: CreateInventoryItemPayload;
     initialData?: CreateInventoryItemPayload | undefined;
+    itemToEdit?: CreateInventoryItemPayload;
 }
 
 const { t } = useI18n();
@@ -47,16 +48,16 @@ const mainCategoryOptions = computed(function () {
 const subCategoryOptions = computed(function () {
     if (form.value.type === InventoryItemType.DRINK) {
         switch (form.value.mainCategory) {
+            case DrinkMainCategory.BEER:
+                return getEnumValues(BeerSubCategory);
+            case DrinkMainCategory.COCKTAIL_COMPONENTS:
+                return getEnumValues(CocktailComponentCategory);
+            case DrinkMainCategory.NON_ALCOHOLIC:
+                return getEnumValues(NonAlcoholicCategory);
             case DrinkMainCategory.SPIRITS:
                 return getEnumValues(SpiritSubCategory);
             case DrinkMainCategory.WINE:
                 return getEnumValues(WineSubCategory);
-            case DrinkMainCategory.BEER:
-                return getEnumValues(BeerSubCategory);
-            case DrinkMainCategory.NON_ALCOHOLIC:
-                return getEnumValues(NonAlcoholicCategory);
-            case DrinkMainCategory.COCKTAIL_COMPONENTS:
-                return getEnumValues(CocktailComponentCategory);
             default:
                 return [];
         }
@@ -100,13 +101,13 @@ function getInitialForm(): CreateInventoryItemPayload {
         return { ...props.itemToEdit };
     }
     return {
-        name: "",
-        type: InventoryItemType.DRINK,
-        mainCategory: DrinkMainCategory.SPIRITS,
-        subCategory: SpiritSubCategory.VODKA,
-        quantity: 0,
-        supplier: "",
         isActive: true,
+        mainCategory: DrinkMainCategory.SPIRITS,
+        name: "",
+        quantity: 0,
+        subCategory: SpiritSubCategory.VODKA,
+        supplier: "",
+        type: InventoryItemType.DRINK,
         ...props.initialData,
     };
 }
@@ -116,6 +117,10 @@ function onMainCategoryChange(): void {
     form.value.subCategory = subCategoryOptions.value[0];
 }
 
+function onReset(): void {
+    form.value = { ...getInitialForm() };
+}
+
 async function onSubmit(): Promise<void> {
     if (!(await formRef.value?.validate())) {
         return;
@@ -123,10 +128,6 @@ async function onSubmit(): Promise<void> {
 
     emit("submit", form.value);
     onReset();
-}
-
-function onReset(): void {
-    form.value = { ...getInitialForm() };
 }
 
 watch(

@@ -1,5 +1,6 @@
+import { beforeEach, describe, expect, it } from "vitest";
+
 import { MockAuth } from "./MockAuth.js";
-import { describe, it, expect, beforeEach } from "vitest";
 
 describe("MockAuth", () => {
     let mockAuth: MockAuth;
@@ -88,10 +89,10 @@ describe("MockAuth", () => {
         it("should set custom user claims", async () => {
             const user = await mockAuth.createUser({ email: "test@example.com", password: "123" });
 
-            await mockAuth.setCustomUserClaims(user.uid, { role: "ADMIN", organisationId: "org1" });
+            await mockAuth.setCustomUserClaims(user.uid, { organisationId: "org1", role: "ADMIN" });
 
             const updatedUser = await mockAuth.getUserByEmail("test@example.com");
-            expect(updatedUser?.customClaims).toEqual({ role: "ADMIN", organisationId: "org1" });
+            expect(updatedUser?.customClaims).toEqual({ organisationId: "org1", role: "ADMIN" });
         });
 
         it("should throw an error if user does not exist", async () => {
@@ -136,8 +137,8 @@ describe("MockAuth", () => {
         it("should deduplicate found users but preserve input order in notFound", async () => {
             const user = await mockAuth.createUser({
                 email: "test@example.com",
-                phoneNumber: "+1234567890",
                 password: "password123",
+                phoneNumber: "+1234567890",
             });
 
             const result = await mockAuth.getUsers([

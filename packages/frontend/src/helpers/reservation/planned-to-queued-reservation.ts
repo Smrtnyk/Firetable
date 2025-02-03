@@ -1,4 +1,5 @@
 import type { PlannedReservation, QueuedReservation } from "@firetable/types";
+
 import { ReservationType } from "@firetable/types";
 import { omit } from "es-toolkit";
 

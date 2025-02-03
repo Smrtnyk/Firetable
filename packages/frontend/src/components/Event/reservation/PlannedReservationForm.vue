@@ -1,32 +1,33 @@
 <script setup lang="ts">
 import type { AppUser, PlannedReservation, User } from "@firetable/types";
-import { isTimeWithinEventDuration } from "./reservation-form-utils";
-import { ReservationState, ReservationStatus, ReservationType } from "@firetable/types";
-import { computed, ref, watch, useTemplateRef } from "vue";
-import { useI18n } from "vue-i18n";
-import { QForm } from "quasar";
-import { greaterThanZero, minLength, noEmptyString, requireNumber } from "src/helpers/form-rules";
 
+import { ReservationState, ReservationStatus, ReservationType } from "@firetable/types";
+import { QForm } from "quasar";
 import TelNumberInput from "src/components/TelNumberInput/TelNumberInput.vue";
 import { capitalizeName } from "src/helpers/capitalize-name";
+import { greaterThanZero, minLength, noEmptyString, requireNumber } from "src/helpers/form-rules";
+import { computed, ref, useTemplateRef, watch } from "vue";
+import { useI18n } from "vue-i18n";
+
+import { isTimeWithinEventDuration } from "./reservation-form-utils";
 
 export interface PlannedReservationFormProps {
     currentUser: AppUser;
-    users: User[];
-    mode: "create" | "update";
+    eventDurationInHours: number;
     eventStartTimestamp: number;
+    mode: "create" | "update";
     /**
      *  Optional data for editing
      */
     reservationData: PlannedReservation | undefined;
-    eventDurationInHours: number;
+    users: User[];
 }
 
 const socials = ["Whatsapp", "SMS", "Instagram", "Facebook", "Phone"].map(function (social, index) {
     return {
-        name: social,
         email: `social-${index}`,
         id: "",
+        name: social,
     };
 });
 const props = defineProps<PlannedReservationFormProps>();
@@ -36,20 +37,20 @@ function generateInitialState(): Omit<PlannedReservation, "creator" | "floorId" 
     return props.mode === "update" && props.reservationData
         ? { ...props.reservationData }
         : {
-              type: ReservationType.PLANNED as const,
-              state: ReservationState.PENDING,
-              guestName: "",
-              numberOfGuests: 2,
-              guestContact: "",
-              reservationNote: "",
-              consumption: 1,
               arrived: false,
-              reservationConfirmed: false,
-              time: "00:00",
-              reservedBy: null as unknown as User,
               cancelled: false,
-              status: ReservationStatus.ACTIVE,
+              consumption: 1,
+              guestContact: "",
+              guestName: "",
               isVIP: false,
+              numberOfGuests: 2,
+              reservationConfirmed: false,
+              reservationNote: "",
+              reservedBy: null as unknown as User,
+              state: ReservationState.PENDING,
+              status: ReservationStatus.ACTIVE,
+              time: "00:00",
+              type: ReservationType.PLANNED as const,
           };
 }
 
@@ -59,9 +60,9 @@ const reservationForm = useTemplateRef<QForm>("reservationForm");
 const formattedUsers = computed<PlannedReservation["reservedBy"][]>(function () {
     return props.users.map(function (user) {
         return {
-            name: user.name,
             email: user.email,
             id: user.id,
+            name: user.name,
         };
     });
 });
@@ -81,12 +82,12 @@ watch(selectionType, function (newVal) {
     state.value.reservedBy = newVal === "social" ? socials[0] : formattedUsers.value[0];
 });
 
-function requireReservedBySelection(val: PlannedReservation["reservedBy"]): boolean | string {
-    return Boolean(val?.email) || t(`EventCreateReservation.requireReservedBySelectionError`);
-}
-
 function capitalizeGuestName(): void {
     state.value.guestName = capitalizeName(state.value.guestName);
+}
+
+function requireReservedBySelection(val: PlannedReservation["reservedBy"]): boolean | string {
+    return Boolean(val?.email) || t(`EventCreateReservation.requireReservedBySelectionError`);
 }
 
 function reset(): void {
@@ -98,8 +99,8 @@ function reset(): void {
 
 defineExpose({
     reservationForm,
-    state,
     reset,
+    state,
 });
 </script>
 

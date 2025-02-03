@@ -1,8 +1,9 @@
-import PageAuth from "./PageAuth.vue";
-import { renderComponent } from "../../test-helpers/render-component";
-import { describe, it, expect, vi } from "vitest";
 import { userEvent } from "@vitest/browser/context";
+import { describe, expect, it, vi } from "vitest";
 import { nextTick } from "vue";
+
+import { renderComponent } from "../../test-helpers/render-component";
+import PageAuth from "./PageAuth.vue";
 
 const { loginWithEmailSpy, routerReplaceSpy, showErrorMessageSpy, tryCatchLoadingWrapperSpy } =
     vi.hoisted(() => {
@@ -33,8 +34,8 @@ vi.mock("vue-router", () => ({
 
 vi.mock("src/helpers/ui-helpers", () => {
     return {
-        tryCatchLoadingWrapper: tryCatchLoadingWrapperSpy,
         showErrorMessage: showErrorMessageSpy,
+        tryCatchLoadingWrapper: tryCatchLoadingWrapperSpy,
     };
 });
 

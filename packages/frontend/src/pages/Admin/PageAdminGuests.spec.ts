@@ -1,15 +1,16 @@
-import type { RenderResult } from "vitest-browser-vue";
 import type { AppUser, GuestDoc, PropertyDoc, Visit } from "@firetable/types";
+import type { RenderResult } from "vitest-browser-vue";
+import type { Ref } from "vue";
+
+import { AdminRole, Role } from "@firetable/types";
+import { userEvent } from "@vitest/browser/context";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { nextTick, ref } from "vue";
+
 import type { PageAdminGuestsProps } from "./PageAdminGuests.vue";
 
-import type { Ref } from "vue";
-import PageAdminGuests from "./PageAdminGuests.vue";
 import { renderComponent, t } from "../../../test-helpers/render-component";
-import { ref, nextTick } from "vue";
-import { AdminRole, Role } from "@firetable/types";
-
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
-import { userEvent } from "@vitest/browser/context";
+import PageAdminGuests from "./PageAdminGuests.vue";
 
 vi.mock("vue-router");
 
@@ -31,24 +32,24 @@ describe("PageAdminGuests.vue", () => {
 
         authState = {
             user: {
+                capabilities: undefined,
+                email: "admin@example.com",
                 id: "admin1",
                 name: "Admin User",
-                email: "admin@example.com",
-                username: "adminuser",
-                role: AdminRole.ADMIN,
+                organisationId: "org1",
                 // Irrelevant for admin
                 relatedProperties: [],
-                organisationId: "org1",
-                capabilities: undefined,
+                role: AdminRole.ADMIN,
+                username: "adminuser",
             },
         };
         guestsData = [
             {
-                id: "guest1",
-                name: "John Doe",
                 contact: "john@example.com",
                 hashedContact: "hashedContact",
+                id: "guest1",
                 maskedContact: "maskedContact",
+                name: "John Doe",
                 visitedProperties: {
                     property1: {
                         visit1: { date: new Date("2023-10-01").getTime() } as Visit,
@@ -60,11 +61,11 @@ describe("PageAdminGuests.vue", () => {
                 },
             } as GuestDoc,
             {
-                id: "guest2",
-                name: "Jane Smith",
                 contact: "jane@example.com",
                 hashedContact: "hashedContact",
+                id: "guest2",
                 maskedContact: "maskedContact",
+                name: "Jane Smith",
                 visitedProperties: {
                     property1: {
                         visit4: { date: new Date("2023-08-20").getTime() } as Visit,
@@ -72,11 +73,11 @@ describe("PageAdminGuests.vue", () => {
                 },
             } as GuestDoc,
             {
-                id: "guest3",
-                name: "Alice Johnson",
                 contact: "alice@example.com",
                 hashedContact: "hashedContact",
+                id: "guest3",
                 maskedContact: "maskedContact",
+                name: "Alice Johnson",
                 visitedProperties: {},
             } as GuestDoc,
         ];
@@ -102,14 +103,14 @@ describe("PageAdminGuests.vue", () => {
         const renderResult = renderComponent(PageAdminGuests, props, {
             piniaStoreOptions: {
                 initialState: {
-                    properties: {
-                        properties: propertiesData,
-                    },
                     auth: authState,
                     guests: {
+                        guestsCache: new Map(),
                         refsMap,
                         unsubMap: new Map(),
-                        guestsCache: new Map(),
+                    },
+                    properties: {
+                        properties: propertiesData,
                     },
                 },
             },
@@ -138,7 +139,7 @@ describe("PageAdminGuests.vue", () => {
         const screen = await render();
 
         await expect
-            .element(screen.getByRole("heading", { name: "Guests (3)", exact: true }))
+            .element(screen.getByRole("heading", { exact: true, name: "Guests (3)" }))
             .toBeVisible();
         await expect.element(screen.getByText("John Doe")).toBeVisible();
         await expect.element(screen.getByText("Jane Smith")).toBeVisible();
@@ -193,39 +194,39 @@ describe("PageAdminGuests.vue", () => {
             it("sorts guests by number of visits and percentage when they have the same number of visits", async () => {
                 guestsRef.value.data = [
                     {
-                        id: "guest1",
-                        name: "John Doe",
                         contact: "john@example.com",
                         hashedContact: "hashedContact",
+                        id: "guest1",
                         maskedContact: "maskedContact",
+                        name: "John Doe",
                         visitedProperties: {
                             property1: {
                                 visit1: {
-                                    date: new Date("2023-10-01").getTime(),
                                     arrived: true,
+                                    date: new Date("2023-10-01").getTime(),
                                 } as Visit,
                                 visit2: {
-                                    date: new Date("2023-10-05").getTime(),
                                     arrived: false,
+                                    date: new Date("2023-10-05").getTime(),
                                 } as Visit,
                             },
                         },
                     } as GuestDoc,
                     {
-                        id: "guest2",
-                        name: "Jane Smith",
                         contact: "jane@example.com",
                         hashedContact: "hashedContact",
+                        id: "guest2",
                         maskedContact: "maskedContact",
+                        name: "Jane Smith",
                         visitedProperties: {
                             property1: {
                                 visit3: {
-                                    date: new Date("2023-08-20").getTime(),
                                     arrived: true,
+                                    date: new Date("2023-08-20").getTime(),
                                 } as Visit,
                                 visit4: {
-                                    date: new Date("2023-08-21").getTime(),
                                     arrived: true,
+                                    date: new Date("2023-08-21").getTime(),
                                 } as Visit,
                             },
                         },
@@ -246,43 +247,43 @@ describe("PageAdminGuests.vue", () => {
             it("prioritizes number of visits over percentage when different number of visits", async () => {
                 guestsRef.value.data = [
                     {
-                        id: "guest1",
-                        name: "John Doe",
                         contact: "john@example.com",
                         hashedContact: "hashedContact",
+                        id: "guest1",
                         maskedContact: "maskedContact",
+                        name: "John Doe",
                         visitedProperties: {
                             property1: {
                                 visit1: {
-                                    date: new Date("2023-10-01").getTime(),
                                     arrived: true,
+                                    date: new Date("2023-10-01").getTime(),
                                 } as Visit,
                                 visit2: {
-                                    date: new Date("2023-10-05").getTime(),
                                     arrived: false,
+                                    date: new Date("2023-10-05").getTime(),
                                 } as Visit,
                                 visit3: {
-                                    date: new Date("2023-10-06").getTime(),
                                     arrived: false,
+                                    date: new Date("2023-10-06").getTime(),
                                 } as Visit,
                             },
                         },
                     } as GuestDoc,
                     {
-                        id: "guest2",
-                        name: "Jane Smith",
                         contact: "jane@example.com",
                         hashedContact: "hashedContact",
+                        id: "guest2",
                         maskedContact: "maskedContact",
+                        name: "Jane Smith",
                         visitedProperties: {
                             property1: {
                                 visit4: {
-                                    date: new Date("2023-08-20").getTime(),
                                     arrived: true,
+                                    date: new Date("2023-08-20").getTime(),
                                 } as Visit,
                                 visit5: {
-                                    date: new Date("2023-08-21").getTime(),
                                     arrived: true,
+                                    date: new Date("2023-08-21").getTime(),
                                 } as Visit,
                             },
                         },
@@ -303,35 +304,35 @@ describe("PageAdminGuests.vue", () => {
             it("sorts guests by percentage when percentage sort option is selected", async () => {
                 guestsRef.value.data = [
                     {
-                        id: "guest1",
-                        name: "John Doe",
                         contact: "john@example.com",
                         hashedContact: "hashedContact",
+                        id: "guest1",
                         maskedContact: "maskedContact",
+                        name: "John Doe",
                         visitedProperties: {
                             property1: {
                                 visit1: {
-                                    date: new Date("2023-10-01").getTime(),
                                     arrived: true,
+                                    date: new Date("2023-10-01").getTime(),
                                 } as Visit,
                                 visit2: {
-                                    date: new Date("2023-10-05").getTime(),
                                     arrived: false,
+                                    date: new Date("2023-10-05").getTime(),
                                 } as Visit,
                             },
                         },
                     } as GuestDoc,
                     {
-                        id: "guest2",
-                        name: "Jane Smith",
                         contact: "jane@example.com",
                         hashedContact: "hashedContact",
+                        id: "guest2",
                         maskedContact: "maskedContact",
+                        name: "Jane Smith",
                         visitedProperties: {
                             property1: {
                                 visit3: {
-                                    date: new Date("2023-08-20").getTime(),
                                     arrived: true,
+                                    date: new Date("2023-08-20").getTime(),
                                 } as Visit,
                             },
                         },
@@ -359,35 +360,35 @@ describe("PageAdminGuests.vue", () => {
             it("uses number of bookings as secondary sort when percentages are equal", async () => {
                 guestsRef.value.data = [
                     {
-                        id: "guest1",
-                        name: "John Doe",
                         contact: "john@example.com",
                         hashedContact: "hashedContact",
+                        id: "guest1",
                         maskedContact: "maskedContact",
+                        name: "John Doe",
                         visitedProperties: {
                             property1: {
                                 visit1: {
-                                    date: new Date("2023-10-01").getTime(),
                                     arrived: true,
+                                    date: new Date("2023-10-01").getTime(),
                                 } as Visit,
                                 visit2: {
-                                    date: new Date("2023-10-05").getTime(),
                                     arrived: true,
+                                    date: new Date("2023-10-05").getTime(),
                                 } as Visit,
                             },
                         },
                     } as GuestDoc,
                     {
-                        id: "guest2",
-                        name: "Jane Smith",
                         contact: "jane@example.com",
                         hashedContact: "hashedContact",
+                        id: "guest2",
                         maskedContact: "maskedContact",
+                        name: "Jane Smith",
                         visitedProperties: {
                             property1: {
                                 visit3: {
-                                    date: new Date("2023-08-20").getTime(),
                                     arrived: true,
+                                    date: new Date("2023-08-20").getTime(),
                                 } as Visit,
                             },
                         },
@@ -416,34 +417,34 @@ describe("PageAdminGuests.vue", () => {
             it("places guests with no bookings at the end when sorting by percentage", async () => {
                 guestsRef.value.data = [
                     {
-                        id: "guest1",
-                        name: "John Doe",
                         contact: "john@example.com",
                         hashedContact: "hashedContact",
+                        id: "guest1",
                         maskedContact: "maskedContact",
+                        name: "John Doe",
                         visitedProperties: {
                             property1: {
                                 visit1: {
-                                    date: new Date("2023-10-01").getTime(),
                                     arrived: true,
+                                    date: new Date("2023-10-01").getTime(),
                                 } as Visit,
                             },
                         },
                     } as GuestDoc,
                     {
-                        id: "guest2",
-                        name: "Jane Smith",
                         contact: "jane@example.com",
                         hashedContact: "hashedContact",
+                        id: "guest2",
                         maskedContact: "maskedContact",
+                        name: "Jane Smith",
                         visitedProperties: {},
                     } as GuestDoc,
                     {
-                        id: "guest3",
-                        name: "Alice Johnson",
                         contact: "alice@example.com",
                         hashedContact: "hashedContact",
+                        id: "guest3",
                         maskedContact: "maskedContact",
+                        name: "Alice Johnson",
                         visitedProperties: {},
                     } as GuestDoc,
                 ];
@@ -526,33 +527,33 @@ describe("PageAdminGuests.vue", () => {
                 const now = Date.now();
                 guestsRef.value.data = [
                     {
-                        id: "guest1",
-                        name: "John Doe",
                         contact: "john@example.com",
                         hashedContact: "hashedContact",
-                        maskedContact: "maskedContact",
+                        id: "guest1",
                         // 1 second ago
                         lastModified: now - 1000,
+                        maskedContact: "maskedContact",
+                        name: "John Doe",
                         visitedProperties: {},
                     } as GuestDoc,
                     {
-                        id: "guest2",
-                        name: "Jane Smith",
                         contact: "jane@example.com",
                         hashedContact: "hashedContact",
-                        maskedContact: "maskedContact",
+                        id: "guest2",
                         // most recent
                         lastModified: now,
+                        maskedContact: "maskedContact",
+                        name: "Jane Smith",
                         visitedProperties: {},
                     } as GuestDoc,
                     {
-                        id: "guest3",
-                        name: "Bob Wilson",
                         contact: "bob@example.com",
                         hashedContact: "hashedContact",
-                        maskedContact: "maskedContact",
+                        id: "guest3",
                         // 2 seconds ago
                         lastModified: now - 2000,
+                        maskedContact: "maskedContact",
+                        name: "Bob Wilson",
                         visitedProperties: {},
                     } as GuestDoc,
                 ];
@@ -578,30 +579,30 @@ describe("PageAdminGuests.vue", () => {
                 const now = Date.now();
                 guestsRef.value.data = [
                     {
-                        id: "guest1",
-                        name: "John Doe",
                         contact: "john@example.com",
                         hashedContact: "hashedContact",
-                        maskedContact: "maskedContact",
+                        id: "guest1",
                         lastModified: now,
+                        maskedContact: "maskedContact",
+                        name: "John Doe",
                         visitedProperties: {},
                     } as GuestDoc,
                     {
-                        id: "guest2",
-                        name: "Jane Smith",
                         contact: "jane@example.com",
                         hashedContact: "hashedContact",
+                        id: "guest2",
                         maskedContact: "maskedContact",
+                        name: "Jane Smith",
                         // No lastModified
                         visitedProperties: {},
                     } as GuestDoc,
                     {
-                        id: "guest3",
-                        name: "Bob Wilson",
                         contact: "bob@example.com",
                         hashedContact: "hashedContact",
-                        maskedContact: "maskedContact",
+                        id: "guest3",
                         lastModified: now - 1000,
+                        maskedContact: "maskedContact",
+                        name: "Bob Wilson",
                         visitedProperties: {},
                     } as GuestDoc,
                 ];
@@ -628,14 +629,14 @@ describe("PageAdminGuests.vue", () => {
                 guestsRef.value.data = [
                     {
                         id: "guest1",
-                        name: "John Doe",
                         lastModified: now,
+                        name: "John Doe",
                         visitedProperties: {},
                     } as GuestDoc,
                     {
                         id: "guest2",
-                        name: "Jane Smith",
                         lastModified: now - 1000,
+                        name: "Jane Smith",
                         visitedProperties: {},
                     } as GuestDoc,
                 ];
@@ -664,35 +665,35 @@ describe("PageAdminGuests.vue", () => {
             it("toggles between ascending and descending order", async () => {
                 guestsRef.value.data = [
                     {
-                        id: "guest1",
-                        name: "John Doe",
                         contact: "+434324",
                         hashedContact: "hashedContact",
+                        id: "guest1",
                         maskedContact: "maskedContact",
+                        name: "John Doe",
                         visitedProperties: {
                             property1: {
                                 visit1: {
-                                    date: new Date("2023-10-01").getTime(),
                                     arrived: true,
+                                    date: new Date("2023-10-01").getTime(),
                                 } as Visit,
                                 visit2: {
-                                    date: new Date("2023-10-05").getTime(),
                                     arrived: true,
+                                    date: new Date("2023-10-05").getTime(),
                                 } as Visit,
                             },
                         },
                     },
                     {
-                        id: "guest2",
-                        name: "Jane Smith",
                         contact: "+434324",
                         hashedContact: "hashedContact",
+                        id: "guest2",
                         maskedContact: "maskedContact",
+                        name: "Jane Smith",
                         visitedProperties: {
                             property1: {
                                 visit3: {
-                                    date: new Date("2023-08-20").getTime(),
                                     arrived: true,
+                                    date: new Date("2023-08-20").getTime(),
                                 } as Visit,
                             },
                         },
@@ -736,35 +737,35 @@ describe("PageAdminGuests.vue", () => {
                 // Jane: 1 booking, 100% arrival (1/1)
                 guestsRef.value.data = [
                     {
-                        id: "guest1",
-                        name: "John Doe",
                         contact: "+434324",
                         hashedContact: "hashedContact",
+                        id: "guest1",
                         maskedContact: "maskedContact",
+                        name: "John Doe",
                         visitedProperties: {
                             property1: {
                                 visit1: {
-                                    date: new Date("2023-10-01").getTime(),
                                     arrived: true,
+                                    date: new Date("2023-10-01").getTime(),
                                 } as Visit,
                                 visit2: {
-                                    date: new Date("2023-10-05").getTime(),
                                     arrived: false,
+                                    date: new Date("2023-10-05").getTime(),
                                 } as Visit,
                             },
                         },
                     } as GuestDoc,
                     {
-                        id: "guest2",
-                        name: "Jane Smith",
                         contact: "+434324",
                         hashedContact: "hashedContact",
+                        id: "guest2",
                         maskedContact: "maskedContact",
+                        name: "Jane Smith",
                         visitedProperties: {
                             property1: {
                                 visit3: {
-                                    date: new Date("2023-08-20").getTime(),
                                     arrived: true,
+                                    date: new Date("2023-08-20").getTime(),
                                 } as Visit,
                             },
                         },
@@ -803,27 +804,27 @@ describe("PageAdminGuests.vue", () => {
             it("sorts guests alphabetically by name", async () => {
                 guestsRef.value.data = [
                     {
-                        id: "guest1",
-                        name: "Charlie Brown",
                         contact: "charlie@example.com",
                         hashedContact: "hashedContact",
+                        id: "guest1",
                         maskedContact: "maskedContact",
+                        name: "Charlie Brown",
                         visitedProperties: {},
                     } as GuestDoc,
                     {
-                        id: "guest2",
-                        name: "Alice Smith",
                         contact: "alice@example.com",
                         hashedContact: "hashedContact",
+                        id: "guest2",
                         maskedContact: "maskedContact",
+                        name: "Alice Smith",
                         visitedProperties: {},
                     } as GuestDoc,
                     {
-                        id: "guest3",
-                        name: "Bob Johnson",
                         contact: "bob@example.com",
                         hashedContact: "hashedContact",
+                        id: "guest3",
                         maskedContact: "maskedContact",
+                        name: "Bob Johnson",
                         visitedProperties: {},
                     } as GuestDoc,
                 ];
@@ -860,29 +861,29 @@ describe("PageAdminGuests.vue", () => {
             it("maintains name sort when applying filters", async () => {
                 guestsRef.value.data = [
                     {
-                        id: "guest1",
-                        name: "Charlie Brown",
                         contact: "charlie@example.com",
                         hashedContact: "hashedContact",
+                        id: "guest1",
                         maskedContact: "maskedContact",
-                        visitedProperties: {},
+                        name: "Charlie Brown",
                         tags: ["vip"],
+                        visitedProperties: {},
                     } as GuestDoc,
                     {
-                        id: "guest2",
-                        name: "Alice Smith",
                         contact: "alice@example.com",
                         hashedContact: "hashedContact",
+                        id: "guest2",
                         maskedContact: "maskedContact",
-                        visitedProperties: {},
+                        name: "Alice Smith",
                         tags: ["vip"],
+                        visitedProperties: {},
                     } as GuestDoc,
                     {
-                        id: "guest3",
-                        name: "Bob Johnson",
                         contact: "bob@example.com",
                         hashedContact: "hashedContact",
+                        id: "guest3",
                         maskedContact: "maskedContact",
+                        name: "Bob Johnson",
                         visitedProperties: {},
                     } as GuestDoc,
                 ];
@@ -915,27 +916,27 @@ describe("PageAdminGuests.vue", () => {
             it("sorts guests by landcode from maskedContact", async () => {
                 guestsRef.value.data = [
                     {
-                        id: "guest1",
-                        name: "John Doe",
                         contact: "john@example.com",
                         hashedContact: "hashedContact",
+                        id: "guest1",
                         maskedContact: "+44xxxx1234",
+                        name: "John Doe",
                         visitedProperties: {},
                     } as GuestDoc,
                     {
-                        id: "guest2",
-                        name: "Jane Smith",
                         contact: "jane@example.com",
                         hashedContact: "hashedContact",
+                        id: "guest2",
                         maskedContact: "+1xxxx5678",
+                        name: "Jane Smith",
                         visitedProperties: {},
                     } as GuestDoc,
                     {
-                        id: "guest3",
-                        name: "Alice Johnson",
                         contact: "alice@example.com",
                         hashedContact: "hashedContact",
+                        id: "guest3",
                         maskedContact: "+33xxxx9012",
+                        name: "Alice Johnson",
                         visitedProperties: {},
                     } as GuestDoc,
                 ];
@@ -1087,11 +1088,11 @@ describe("PageAdminGuests.vue", () => {
             // Admin is default in the test setup
             guestsRef.value.data = [
                 {
-                    id: "guest1",
-                    name: "John Doe",
                     contact: "john@example.com",
                     hashedContact: "hashedContact",
+                    id: "guest1",
                     maskedContact: "maskedContact",
+                    name: "John Doe",
                     visitedProperties: {
                         property1: {
                             visit1: { date: new Date("2023-10-01").getTime() } as Visit,
@@ -1103,11 +1104,11 @@ describe("PageAdminGuests.vue", () => {
                     },
                 } as GuestDoc,
                 {
-                    id: "guest2",
-                    name: "Jane Smith",
                     contact: "jane@example.com",
                     hashedContact: "hashedContact",
+                    id: "guest2",
                     maskedContact: "maskedContact",
+                    name: "Jane Smith",
                     visitedProperties: {
                         property1: {
                             visit4: { date: new Date("2023-08-20").getTime() } as Visit,
@@ -1115,11 +1116,11 @@ describe("PageAdminGuests.vue", () => {
                     },
                 } as GuestDoc,
                 {
-                    id: "guest3",
-                    name: "Alice Johnson",
                     contact: "alice@example.com",
                     hashedContact: "hashedContact",
+                    id: "guest3",
                     maskedContact: "maskedContact",
+                    name: "Alice Johnson",
                     visitedProperties: {},
                 } as GuestDoc,
             ];
@@ -1134,24 +1135,24 @@ describe("PageAdminGuests.vue", () => {
         it("renders only related guests for non-admin users", async () => {
             authState = {
                 user: {
+                    capabilities: undefined,
+                    email: "user@example.com",
                     id: "user1",
                     name: "Test User",
-                    email: "user@example.com",
-                    username: "testuser",
-                    role: Role.HOSTESS,
-                    relatedProperties: ["property1"],
                     organisationId: "org1",
-                    capabilities: undefined,
+                    relatedProperties: ["property1"],
+                    role: Role.HOSTESS,
+                    username: "testuser",
                 },
             };
 
             guestsRef.value.data = [
                 {
-                    id: "guest1",
-                    name: "John Doe",
                     contact: "john@example.com",
                     hashedContact: "hashedContact",
+                    id: "guest1",
                     maskedContact: "maskedContact",
+                    name: "John Doe",
                     visitedProperties: {
                         property1: {
                             visit1: { date: new Date("2023-10-01").getTime() } as Visit,
@@ -1163,11 +1164,11 @@ describe("PageAdminGuests.vue", () => {
                     },
                 } as GuestDoc,
                 {
-                    id: "guest2",
-                    name: "Jane Smith",
                     contact: "jane@example.com",
                     hashedContact: "hashedContact",
+                    id: "guest2",
                     maskedContact: "maskedContact",
+                    name: "Jane Smith",
                     visitedProperties: {
                         property1: {
                             visit4: { date: new Date("2023-08-20").getTime() } as Visit,
@@ -1175,11 +1176,11 @@ describe("PageAdminGuests.vue", () => {
                     },
                 } as GuestDoc,
                 {
-                    id: "guest3",
-                    name: "Alice Johnson",
                     contact: "alice@example.com",
                     hashedContact: "hashedContact",
+                    id: "guest3",
                     maskedContact: "maskedContact",
+                    name: "Alice Johnson",
                     visitedProperties: {},
                 } as GuestDoc,
             ];
@@ -1202,24 +1203,24 @@ describe("PageAdminGuests.vue", () => {
         it("renders no guests for non-admin users with no related properties", async () => {
             authState = {
                 user: {
+                    capabilities: undefined,
+                    email: "noproperty@example.com",
                     id: "user2",
                     name: "No Property User",
-                    email: "noproperty@example.com",
-                    username: "nopropertyuser",
-                    role: Role.HOSTESS,
-                    relatedProperties: [],
                     organisationId: "org1",
-                    capabilities: undefined,
+                    relatedProperties: [],
+                    role: Role.HOSTESS,
+                    username: "nopropertyuser",
                 },
             };
 
             guestsRef.value.data = [
                 {
-                    id: "guest1",
-                    name: "John Doe",
                     contact: "john@example.com",
                     hashedContact: "hashedContact",
+                    id: "guest1",
                     maskedContact: "maskedContact",
+                    name: "John Doe",
                     visitedProperties: {
                         property1: {
                             visit1: { date: new Date("2023-10-01").getTime() } as Visit,
@@ -1227,11 +1228,11 @@ describe("PageAdminGuests.vue", () => {
                     },
                 } as GuestDoc,
                 {
-                    id: "guest2",
-                    name: "Jane Smith",
                     contact: "jane@example.com",
                     hashedContact: "hashedContact",
+                    id: "guest2",
                     maskedContact: "maskedContact",
+                    name: "Jane Smith",
                     visitedProperties: {
                         property2: {
                             visit2: { date: new Date("2023-10-05").getTime() } as Visit,
@@ -1239,11 +1240,11 @@ describe("PageAdminGuests.vue", () => {
                     },
                 } as GuestDoc,
                 {
-                    id: "guest3",
-                    name: "Alice Johnson",
                     contact: "alice@example.com",
                     hashedContact: "hashedContact",
+                    id: "guest3",
                     maskedContact: "maskedContact",
+                    name: "Alice Johnson",
                     visitedProperties: {},
                 } as GuestDoc,
             ];
@@ -1263,67 +1264,67 @@ describe("PageAdminGuests.vue", () => {
             // Set up guests with clear sorting differences
             guestsRef.value.data = [
                 {
-                    id: "guest1",
-                    name: "John Doe",
                     contact: "john@example.com",
                     hashedContact: "hashedContact",
+                    id: "guest1",
+                    // 1 second ago
+                    lastModified: Date.now() - 1000,
                     maskedContact: "maskedContact",
+                    name: "John Doe",
                     visitedProperties: {
                         property1: {
                             visit1: {
-                                date: new Date("2023-10-01").getTime(),
                                 arrived: true,
+                                date: new Date("2023-10-01").getTime(),
                             } as Visit,
                             visit2: {
-                                date: new Date("2023-10-05").getTime(),
                                 arrived: false,
+                                date: new Date("2023-10-05").getTime(),
                             } as Visit,
                         },
                     },
-                    // 1 second ago
-                    lastModified: Date.now() - 1000,
                 },
                 {
-                    id: "guest2",
-                    name: "Jane Smith",
                     contact: "jane@example.com",
                     hashedContact: "hashedContact",
+                    id: "guest2",
+                    // most recent
+                    lastModified: Date.now(),
                     maskedContact: "maskedContact",
+                    name: "Jane Smith",
                     visitedProperties: {
                         property1: {
                             visit3: {
-                                date: new Date("2023-08-20").getTime(),
                                 arrived: true,
+                                date: new Date("2023-08-20").getTime(),
                             } as Visit,
                         },
                     },
-                    // most recent
-                    lastModified: Date.now(),
                 },
                 {
-                    id: "guest3",
-                    name: "Bob Wilson",
                     contact: "bob@example.com",
                     hashedContact: "hashedContact",
+                    id: "guest3",
+                    // 2 seconds ago
+                    lastModified: Date.now() - 2000,
                     maskedContact: "maskedContact",
+                    name: "Bob Wilson",
                     visitedProperties: {
                         property1: {
                             visit4: {
-                                date: new Date("2023-07-01").getTime(),
                                 arrived: true,
+                                date: new Date("2023-07-01").getTime(),
                             } as Visit,
                             visit5: {
-                                date: new Date("2023-07-02").getTime(),
                                 arrived: true,
+                                date: new Date("2023-07-02").getTime(),
                             } as Visit,
                             visit6: {
-                                date: new Date("2023-07-03").getTime(),
                                 arrived: true,
+                                date: new Date("2023-07-03").getTime(),
                             } as Visit,
                         },
                     },
-                    // 2 seconds ago
-                    lastModified: Date.now() - 2000,
                 },
             ];
         });

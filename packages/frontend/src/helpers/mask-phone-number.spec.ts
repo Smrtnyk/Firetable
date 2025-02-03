@@ -1,5 +1,6 @@
+import { describe, expect, it } from "vitest";
+
 import { maskPhoneNumber } from "./mask-phone-number";
-import { describe, it, expect } from "vitest";
 
 describe("maskPhoneNumber (European Numbers)", () => {
     it("masks a UK phone number correctly", () => {

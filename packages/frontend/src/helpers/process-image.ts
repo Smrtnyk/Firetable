@@ -1,10 +1,10 @@
 interface ImageProcessingOptions {
-    maxWidth: number;
-    maxHeight: number;
-    quality: number;
-    maxFileSize: number;
     acceptedTypes: string[];
+    maxFileSize: number;
+    maxHeight: number;
+    maxWidth: number;
     preserveTransparency?: boolean;
+    quality: number;
 }
 
 export function processImage(file: File, options: ImageProcessingOptions): Promise<string> {
@@ -23,7 +23,7 @@ export function processImage(file: File, options: ImageProcessingOptions): Promi
 
         img.addEventListener("load", function () {
             const canvas = document.createElement("canvas");
-            let { width, height } = img;
+            let { height, width } = img;
 
             // Calculate new dimensions while maintaining aspect ratio
             if (width > options.maxWidth) {

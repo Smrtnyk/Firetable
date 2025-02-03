@@ -1,5 +1,5 @@
-import { expect, describe, it } from "vitest";
 import { capitalizeName } from "src/helpers/capitalize-name";
+import { describe, expect, it } from "vitest";
 
 describe("capitalizeName", () => {
     it("returns an empty string when input is empty", () => {

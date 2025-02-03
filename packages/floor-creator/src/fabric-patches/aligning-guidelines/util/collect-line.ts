@@ -1,30 +1,32 @@
 /* eslint-disable id-length -- patched from fabric repo */
-import type { FabricObject, TOriginX, TOriginY, Point } from "fabric";
+import type { FabricObject, Point, TOriginX, TOriginY } from "fabric";
+
 import type { LineProps } from "../typedefs.js";
-import { getDistanceList } from "./basic.js";
+
 import { aligningLineConfig } from "../constant.js";
+import { getDistanceList } from "./basic.js";
+
+type CollectItemLineProps = {
+    list: Point[];
+    margin: number;
+    points: Point[];
+    target: FabricObject;
+    type: "x" | "y";
+};
 
 export function collectLine(
     target: FabricObject,
     points: Point[],
-): { vLines: LineProps[]; hLines: LineProps[] } {
+): { hLines: LineProps[]; vLines: LineProps[] } {
     const list = target.getCoords();
     list.push(target.getCenterPoint());
     const margin = aligningLineConfig.margin / (target.canvas?.getZoom() ?? 1);
-    const opts = { target, list, points, margin };
+    const opts = { list, margin, points, target };
     const vLines = collectPoints({ ...opts, type: "x" });
     const hLines = collectPoints({ ...opts, type: "y" });
 
-    return { vLines, hLines };
+    return { hLines, vLines };
 }
-
-type CollectItemLineProps = {
-    target: FabricObject;
-    list: Point[];
-    points: Point[];
-    margin: number;
-    type: "x" | "y";
-};
 const originArr: [TOriginX, TOriginY][] = [
     ["left", "top"],
     ["right", "top"],
@@ -33,7 +35,7 @@ const originArr: [TOriginX, TOriginY][] = [
     ["center", "center"],
 ];
 function collectPoints(props: CollectItemLineProps): LineProps[] {
-    const { target, list, points, margin, type } = props;
+    const { list, margin, points, target, type } = props;
     const res: LineProps[] = [];
     const arr: ReturnType<typeof getDistanceList>[] = [];
     let min = Infinity;

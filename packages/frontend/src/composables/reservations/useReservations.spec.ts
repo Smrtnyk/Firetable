@@ -1,53 +1,54 @@
-import type { FloorDoc, ReservationDoc, EventDoc, QueuedReservationDoc } from "@firetable/types";
-import type { App } from "vue";
+import type { EventDoc, FloorDoc, QueuedReservationDoc, ReservationDoc } from "@firetable/types";
 import type { TestingOptions } from "@pinia/testing";
 import type { MockInstance } from "vitest";
-import { useReservations } from "./useReservations.js";
-import { TableOperationType } from "./useTableOperations.js";
+import type { App } from "vue";
+
+import { FloorEditor, FloorElementTypes, FloorViewer } from "@firetable/floor-creator";
 import {
-    Role,
-    UserCapability,
     AdminRole,
     ReservationStatus,
     ReservationType,
+    Role,
+    UserCapability,
 } from "@firetable/types";
-import { shallowRef, nextTick, createApp, ref } from "vue";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { FloorEditor, FloorElementTypes, FloorViewer } from "@firetable/floor-creator";
+import { createTestingPinia } from "@pinia/testing";
+import { page, userEvent } from "@vitest/browser/context";
+import { flushPromises } from "@vue/test-utils";
+import { noop } from "es-toolkit";
+import { BottomSheet, Dialog, Loading, Notify, Quasar } from "quasar";
 import EventCreateReservation from "src/components/Event/reservation/EventCreateReservation.vue";
 import EventShowReservation from "src/components/Event/reservation/EventShowReservation.vue";
 import messages from "src/i18n";
-import { BottomSheet, Dialog, Loading, Notify, Quasar } from "quasar";
-import { noop } from "es-toolkit";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { createApp, nextTick, ref, shallowRef } from "vue";
 import { createI18n } from "vue-i18n";
-import { createTestingPinia } from "@pinia/testing";
-
 import "quasar/dist/quasar.css";
 import "src/css/app.scss";
-import { page, userEvent } from "@vitest/browser/context";
-import { flushPromises } from "@vue/test-utils";
+
+import { useReservations } from "./useReservations.js";
+import { TableOperationType } from "./useTableOperations.js";
 
 const {
-    createDialogMock,
-    updateReservationDocMock,
     addReservationMock,
+    createDialogMock,
     deleteReservationMock,
+    eventEmitMock,
     moveReservationFromQueueMock,
     moveReservationToQueueMock,
-    eventEmitMock,
+    updateReservationDocMock,
 } = vi.hoisted(() => ({
-    createDialogMock: vi.fn().mockReturnValue({
-        onDismiss: vi.fn().mockReturnThis(),
-        hide: vi.fn(),
-    }),
-    updateReservationDocMock: vi.fn().mockResolvedValue(undefined),
     addReservationMock: vi.fn().mockResolvedValue(undefined),
+    createDialogMock: vi.fn().mockReturnValue({
+        hide: vi.fn(),
+        onDismiss: vi.fn().mockReturnThis(),
+    }),
     deleteReservationMock: vi.fn().mockResolvedValue(undefined),
+    eventEmitMock: vi.fn(),
     moveReservationFromQueueMock: vi.fn().mockResolvedValue(undefined),
     moveReservationToQueueMock: vi.fn().mockResolvedValue(undefined),
     notifyPositiveMock: vi.fn(),
 
-    eventEmitMock: vi.fn(),
+    updateReservationDocMock: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock("vue-router", () => {
@@ -69,19 +70,19 @@ vi.mock("src/composables/useDialog", () => ({
 }));
 
 vi.mock("../../backend-proxy", () => ({
-    updateReservationDoc: updateReservationDocMock,
     addReservation: addReservationMock,
     deleteReservation: deleteReservationMock,
-    moveReservationFromQueue: moveReservationFromQueueMock,
-    moveReservationToQueue: moveReservationToQueueMock,
-    getGuestsPath: vi.fn(),
-    getUserPath: vi.fn(),
-    subscribeToGuests: vi.fn(),
-    logoutUser: vi.fn(),
     fetchOrganisationById: vi.fn(),
     fetchOrganisationsForAdmin: vi.fn(),
     fetchPropertiesForAdmin: vi.fn(),
+    getGuestsPath: vi.fn(),
+    getUserPath: vi.fn(),
+    logoutUser: vi.fn(),
+    moveReservationFromQueue: moveReservationFromQueueMock,
+    moveReservationToQueue: moveReservationToQueueMock,
     propertiesCollection: vi.fn(),
+    subscribeToGuests: vi.fn(),
+    updateReservationDoc: updateReservationDocMock,
 }));
 
 let app: App<Element>;
@@ -106,14 +107,14 @@ describe("useReservations", () => {
 
     describe("basic table interactions", () => {
         it("creates reservation when clicking empty table", async () => {
-            const { floor, event } = await setupTestEnvironment();
+            const { event, floor } = await setupTestEnvironment();
 
             const result = withSetup(() =>
                 useReservations(
                     ref([]),
                     ref([]),
                     ref([]),
-                    { id: "1", propertyId: "1", organisationId: "1" },
+                    { id: "1", organisationId: "1", propertyId: "1" },
                     ref(event),
                 ),
             );
@@ -126,36 +127,36 @@ describe("useReservations", () => {
                 componentProps: {
                     component: EventCreateReservation,
                     componentPropsObject: expect.objectContaining({
+                        eventDurationInHours: expect.any(Number),
+                        eventStartTimestamp: expect.any(Number),
                         mode: "create",
                         timezone: "Europe/Vienna",
-                        eventStartTimestamp: expect.any(Number),
-                        eventDurationInHours: expect.any(Number),
                     }),
-                    title: expect.stringContaining("T1"),
-                    maximized: false,
                     listeners: expect.any(Object),
+                    maximized: false,
+                    title: expect.stringContaining("T1"),
                 },
             });
         });
 
         it("shows existing reservation when clicking reserved table", async () => {
-            const { floor, event } = await setupTestEnvironment();
+            const { event, floor } = await setupTestEnvironment();
             const existingReservation = {
-                id: "1",
-                floorId: "1",
-                tableLabel: "T1",
-                guestName: "John Doe",
-                time: "19:00",
-                status: ReservationStatus.ACTIVE,
-                type: ReservationType.PLANNED,
-                reservationConfirmed: false,
-                cancelled: false,
                 arrived: false,
+                cancelled: false,
                 consumption: 0,
+                floorId: "1",
+                guestName: "John Doe",
+                id: "1",
+                reservationConfirmed: false,
                 reservedBy: {
                     id: "1",
                     name: "Test User",
                 },
+                status: ReservationStatus.ACTIVE,
+                tableLabel: "T1",
+                time: "19:00",
+                type: ReservationType.PLANNED,
             } as ReservationDoc;
 
             const result = withSetup(() =>
@@ -163,7 +164,7 @@ describe("useReservations", () => {
                     ref([]),
                     ref([existingReservation]),
                     ref([]),
-                    { id: "1", propertyId: "1", organisationId: "1" },
+                    { id: "1", organisationId: "1", propertyId: "1" },
                     ref(event),
                 ),
             );
@@ -179,15 +180,15 @@ describe("useReservations", () => {
                         reservation: existingReservation,
                         timezone: "Europe/Vienna",
                     }),
-                    title: expect.stringContaining("T1"),
-                    maximized: false,
                     listeners: expect.any(Object),
+                    maximized: false,
+                    title: expect.stringContaining("T1"),
                 },
             });
         });
 
         it("prevents interactions when user cannot reserve", async () => {
-            const { floor, event } = await setupTestEnvironment();
+            const { event, floor } = await setupTestEnvironment();
 
             const result = withSetup(
                 () =>
@@ -195,18 +196,18 @@ describe("useReservations", () => {
                         ref([]),
                         ref([]),
                         ref([]),
-                        { id: "1", propertyId: "1", organisationId: "1" },
+                        { id: "1", organisationId: "1", propertyId: "1" },
                         ref(event),
                     ),
                 {
                     auth: {
                         user: {
-                            id: "1",
-                            email: "test@mail.com",
-                            role: Role.STAFF,
                             capabilities: {
                                 [UserCapability.CAN_RESERVE]: false,
                             },
+                            email: "test@mail.com",
+                            id: "1",
+                            role: Role.STAFF,
                         },
                     },
                 },
@@ -221,23 +222,23 @@ describe("useReservations", () => {
 
     describe("reservation transfers", () => {
         it("transfers reservation between tables on same floor", async () => {
-            const { floor, event } = await setupTestEnvironment();
+            const { event, floor } = await setupTestEnvironment();
             const sourceReservation = {
-                id: "1",
-                floorId: "1",
-                tableLabel: "T1",
-                guestName: "John Doe",
-                time: "19:00",
-                status: ReservationStatus.ACTIVE,
-                type: ReservationType.PLANNED,
-                reservationConfirmed: false,
-                cancelled: false,
                 arrived: false,
+                cancelled: false,
                 consumption: 0,
+                floorId: "1",
+                guestName: "John Doe",
+                id: "1",
+                reservationConfirmed: false,
                 reservedBy: {
                     id: "1",
                     name: "Test User",
                 },
+                status: ReservationStatus.ACTIVE,
+                tableLabel: "T1",
+                time: "19:00",
+                type: ReservationType.PLANNED,
             } as ReservationDoc;
 
             const result = withSetup(() =>
@@ -245,7 +246,7 @@ describe("useReservations", () => {
                     ref([]),
                     ref([sourceReservation]),
                     ref([]),
-                    { id: "1", propertyId: "1", organisationId: "1" },
+                    { id: "1", organisationId: "1", propertyId: "1" },
                     ref(event),
                 ),
             );
@@ -254,9 +255,9 @@ describe("useReservations", () => {
             await result.tableClickHandler(floor, sourceTable);
 
             result.initiateTableOperation({
-                type: TableOperationType.RESERVATION_TRANSFER,
                 sourceFloor: floor,
                 sourceTable,
+                type: TableOperationType.RESERVATION_TRANSFER,
             });
 
             await nextTick();
@@ -271,21 +272,21 @@ describe("useReservations", () => {
             await secondTableClickResult;
 
             expect(updateReservationDocMock).toHaveBeenCalledWith(
-                { id: "1", propertyId: "1", organisationId: "1" },
+                { id: "1", organisationId: "1", propertyId: "1" },
                 expect.objectContaining({
+                    floorId: floor.id,
                     id: sourceReservation.id,
                     tableLabel: "T2",
-                    floorId: floor.id,
                 }),
             );
 
             expect(eventEmitMock).toHaveBeenCalledWith(
                 "reservation:transferred",
                 expect.objectContaining({
+                    eventOwner: { id: "1", organisationId: "1", propertyId: "1" },
                     fromTable: sourceTable,
-                    toTable: targetTable,
-                    eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
                     targetReservation: undefined,
+                    toTable: targetTable,
                 }),
             );
         });
@@ -306,7 +307,7 @@ describe("useReservations", () => {
                     ref([]),
                     ref([sourceReservation]),
                     shallowRef([floor1, floor2]),
-                    { id: "1", propertyId: "1", organisationId: "1" },
+                    { id: "1", organisationId: "1", propertyId: "1" },
                     ref(event),
                 ),
             );
@@ -314,9 +315,9 @@ describe("useReservations", () => {
             const sourceTable = floor1.getTableByLabel("T1")!;
             await result.tableClickHandler(floor1, sourceTable);
             result.initiateTableOperation({
-                type: TableOperationType.RESERVATION_TRANSFER,
                 sourceFloor: floor1,
                 sourceTable,
+                type: TableOperationType.RESERVATION_TRANSFER,
             });
 
             await nextTick();
@@ -331,28 +332,28 @@ describe("useReservations", () => {
             await floor2TableClickResult;
 
             expect(updateReservationDocMock).toHaveBeenCalledWith(
-                { id: "1", propertyId: "1", organisationId: "1" },
+                { id: "1", organisationId: "1", propertyId: "1" },
                 expect.objectContaining({
+                    floorId: floor2.id,
                     id: sourceReservation.id,
                     tableLabel: "T2",
-                    floorId: floor2.id,
                 }),
             );
 
             expect(eventEmitMock).toHaveBeenCalledWith(
                 "reservation:transferred",
                 expect.objectContaining({
-                    fromTable: sourceTable,
-                    toTable: targetTable,
+                    eventOwner: { id: "1", organisationId: "1", propertyId: "1" },
                     fromFloor: "Floor 1",
+                    fromTable: sourceTable,
                     toFloor: "Floor 2",
-                    eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
+                    toTable: targetTable,
                 }),
             );
         });
 
         it("allows transfer when target table is reserved by swapping reservations", async () => {
-            const { floor, event } = await setupTestEnvironment();
+            const { event, floor } = await setupTestEnvironment();
 
             const sourceReservation = createTestReservation({
                 id: "1",
@@ -368,7 +369,7 @@ describe("useReservations", () => {
                     ref([]),
                     ref([sourceReservation, targetReservation]),
                     shallowRef([floor]),
-                    { id: "1", propertyId: "1", organisationId: "1" },
+                    { id: "1", organisationId: "1", propertyId: "1" },
                     ref(event),
                 ),
             );
@@ -377,9 +378,9 @@ describe("useReservations", () => {
             await result.tableClickHandler(floor, sourceTable);
 
             result.initiateTableOperation({
-                type: TableOperationType.RESERVATION_TRANSFER,
                 sourceFloor: floor,
                 sourceTable,
+                type: TableOperationType.RESERVATION_TRANSFER,
             });
 
             await nextTick();
@@ -398,53 +399,53 @@ describe("useReservations", () => {
             // First call updates the source reservation to target table
             expect(updateReservationDocMock).toHaveBeenNthCalledWith(
                 1,
-                { id: "1", propertyId: "1", organisationId: "1" },
+                { id: "1", organisationId: "1", propertyId: "1" },
                 expect.objectContaining({
+                    floorId: floor.id,
                     id: sourceReservation.id,
                     tableLabel: "T2",
-                    floorId: floor.id,
                 }),
             );
 
             // Second call updates the target reservation to source table
             expect(updateReservationDocMock).toHaveBeenNthCalledWith(
                 2,
-                { id: "1", propertyId: "1", organisationId: "1" },
+                { id: "1", organisationId: "1", propertyId: "1" },
                 expect.objectContaining({
+                    floorId: floor.id,
                     id: targetReservation.id,
                     tableLabel: "T1",
-                    floorId: floor.id,
                 }),
             );
 
             expect(eventEmitMock).toHaveBeenCalledWith(
                 "reservation:transferred",
                 expect.objectContaining({
+                    eventOwner: { id: "1", organisationId: "1", propertyId: "1" },
                     fromTable: sourceTable,
-                    toTable: targetTable,
-                    eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
                     targetReservation,
+                    toTable: targetTable,
                 }),
             );
         });
 
         it("prevents transfer to same table", async () => {
-            const { floor, event } = await setupTestEnvironment();
+            const { event, floor } = await setupTestEnvironment();
             const sourceReservation = {
-                id: "1",
-                floorId: "1",
-                tableLabel: "T1",
-                time: "19:00",
-                status: ReservationStatus.ACTIVE,
-                type: ReservationType.PLANNED,
-                reservationConfirmed: false,
-                cancelled: false,
                 arrived: false,
+                cancelled: false,
                 consumption: 0,
+                floorId: "1",
+                id: "1",
+                reservationConfirmed: false,
                 reservedBy: {
                     id: "1",
                     name: "Test User",
                 },
+                status: ReservationStatus.ACTIVE,
+                tableLabel: "T1",
+                time: "19:00",
+                type: ReservationType.PLANNED,
             } as ReservationDoc;
 
             const result = withSetup(() =>
@@ -452,16 +453,16 @@ describe("useReservations", () => {
                     ref([]),
                     ref([sourceReservation]),
                     ref([]),
-                    { id: "1", propertyId: "1", organisationId: "1" },
+                    { id: "1", organisationId: "1", propertyId: "1" },
                     ref(event),
                 ),
             );
 
             const sourceTable = floor.getTableByLabel("T1")!;
             result.initiateTableOperation({
-                type: TableOperationType.RESERVATION_TRANSFER,
                 sourceFloor: floor,
                 sourceTable,
+                type: TableOperationType.RESERVATION_TRANSFER,
             });
 
             await result.tableClickHandler(floor, sourceTable);
@@ -473,7 +474,7 @@ describe("useReservations", () => {
         });
 
         it("transfers reservation with linked tables", async () => {
-            const { floor, event } = await setupTestEnvironment();
+            const { event, floor } = await setupTestEnvironment();
             const sourceReservation = createTestReservation({
                 tableLabel: ["T1", "T2"],
             });
@@ -483,7 +484,7 @@ describe("useReservations", () => {
                     ref([]),
                     ref([sourceReservation]),
                     shallowRef([floor]),
-                    { id: "1", propertyId: "1", organisationId: "1" },
+                    { id: "1", organisationId: "1", propertyId: "1" },
                     ref(event),
                 ),
             );
@@ -492,9 +493,9 @@ describe("useReservations", () => {
             await result.tableClickHandler(floor, sourceTable);
 
             result.initiateTableOperation({
-                type: TableOperationType.RESERVATION_TRANSFER,
                 sourceFloor: floor,
                 sourceTable,
+                type: TableOperationType.RESERVATION_TRANSFER,
             });
 
             await nextTick();
@@ -506,20 +507,20 @@ describe("useReservations", () => {
 
             expect(updateReservationDocMock).toHaveBeenNthCalledWith(
                 1,
-                { id: "1", propertyId: "1", organisationId: "1" },
+                { id: "1", organisationId: "1", propertyId: "1" },
                 expect.objectContaining({
+                    floorId: floor.id,
                     id: sourceReservation.id,
                     tableLabel: "T3",
-                    floorId: floor.id,
                 }),
             );
 
             expect(eventEmitMock).toHaveBeenCalledWith(
                 "reservation:transferred",
                 expect.objectContaining({
+                    eventOwner: { id: "1", organisationId: "1", propertyId: "1" },
                     fromTable: sourceTable,
                     toTable: targetTable,
-                    eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
                 }),
             );
         });
@@ -528,16 +529,16 @@ describe("useReservations", () => {
     describe("reservation management", () => {
         describe("deletion", () => {
             it("handles soft deletion of cancelled reservation", async () => {
-                const { floor, event } = await setupTestEnvironment();
+                const { event, floor } = await setupTestEnvironment();
                 const existingReservation = {
-                    id: "1",
-                    floorId: "1",
-                    tableLabel: "T1",
-                    guestName: "John Doe",
-                    time: "19:00",
-                    status: ReservationStatus.ACTIVE,
-                    type: ReservationType.PLANNED,
                     cancelled: true,
+                    floorId: "1",
+                    guestName: "John Doe",
+                    id: "1",
+                    status: ReservationStatus.ACTIVE,
+                    tableLabel: "T1",
+                    time: "19:00",
+                    type: ReservationType.PLANNED,
                 } as ReservationDoc;
 
                 const result = withSetup(() =>
@@ -545,7 +546,7 @@ describe("useReservations", () => {
                         ref([]),
                         ref([existingReservation]),
                         ref([]),
-                        { id: "1", propertyId: "1", organisationId: "1" },
+                        { id: "1", organisationId: "1", propertyId: "1" },
                         ref(event),
                     ),
                 );
@@ -554,8 +555,8 @@ describe("useReservations", () => {
                 createDialogMock.mockImplementationOnce((config) => {
                     deleteHandler = config.componentProps.listeners.delete;
                     return {
-                        onDismiss: vi.fn().mockReturnThis(),
                         hide: vi.fn(),
+                        onDismiss: vi.fn().mockReturnThis(),
                     };
                 });
 
@@ -567,35 +568,35 @@ describe("useReservations", () => {
                 await nextTick();
 
                 expect(updateReservationDocMock).toHaveBeenCalledWith(
-                    { id: "1", propertyId: "1", organisationId: "1" },
+                    { id: "1", organisationId: "1", propertyId: "1" },
                     expect.objectContaining({
+                        clearedAt: expect.any(Number),
                         id: existingReservation.id,
                         status: ReservationStatus.DELETED,
-                        clearedAt: expect.any(Number),
                     }),
                 );
 
                 expect(eventEmitMock).toHaveBeenCalledWith(
                     "reservation:deleted:soft",
                     expect.objectContaining({
-                        reservation: existingReservation,
-                        eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
                         event,
+                        eventOwner: { id: "1", organisationId: "1", propertyId: "1" },
+                        reservation: existingReservation,
                     }),
                 );
             });
 
             it("handles hard deletion of active reservation", async () => {
-                const { floor, event } = await setupTestEnvironment();
+                const { event, floor } = await setupTestEnvironment();
                 const existingReservation = {
-                    id: "1",
-                    floorId: "1",
-                    tableLabel: "T1",
-                    guestName: "John Doe",
-                    time: "19:00",
-                    status: ReservationStatus.ACTIVE,
-                    type: ReservationType.PLANNED,
                     cancelled: false,
+                    floorId: "1",
+                    guestName: "John Doe",
+                    id: "1",
+                    status: ReservationStatus.ACTIVE,
+                    tableLabel: "T1",
+                    time: "19:00",
+                    type: ReservationType.PLANNED,
                 } as ReservationDoc;
                 const futureDate = Date.now() + 24 * 60 * 60 * 1000;
 
@@ -604,7 +605,7 @@ describe("useReservations", () => {
                         ref([]),
                         ref([existingReservation]),
                         ref([]),
-                        { id: "1", propertyId: "1", organisationId: "1" },
+                        { id: "1", organisationId: "1", propertyId: "1" },
                         ref({
                             ...event,
                             // Set past date to avoid "in progress" condition
@@ -617,8 +618,8 @@ describe("useReservations", () => {
                 createDialogMock.mockImplementationOnce((config) => {
                     deleteHandler = config.componentProps.listeners.delete;
                     return {
-                        onDismiss: vi.fn().mockReturnThis(),
                         hide: vi.fn(),
+                        onDismiss: vi.fn().mockReturnThis(),
                     };
                 });
 
@@ -631,22 +632,22 @@ describe("useReservations", () => {
                 await nextTick();
 
                 expect(deleteReservationMock).toHaveBeenCalledWith(
-                    { id: "1", propertyId: "1", organisationId: "1" },
+                    { id: "1", organisationId: "1", propertyId: "1" },
                     existingReservation,
                 );
 
                 expect(eventEmitMock).toHaveBeenCalledWith(
                     "reservation:deleted",
                     expect.objectContaining({
-                        reservation: existingReservation,
-                        eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
                         event: expect.any(Object),
+                        eventOwner: { id: "1", organisationId: "1", propertyId: "1" },
+                        reservation: existingReservation,
                     }),
                 );
             });
 
             it("cancels deletion when user declines confirmation", async () => {
-                const { floor, event } = await setupTestEnvironment();
+                const { event, floor } = await setupTestEnvironment();
                 const existingReservation = createTestReservation();
 
                 const result = withSetup(() =>
@@ -654,7 +655,7 @@ describe("useReservations", () => {
                         ref([]),
                         ref([existingReservation]),
                         ref([]),
-                        { id: "1", propertyId: "1", organisationId: "1" },
+                        { id: "1", organisationId: "1", propertyId: "1" },
                         ref(event),
                     ),
                 );
@@ -662,7 +663,7 @@ describe("useReservations", () => {
                 let deleteHandler: () => Promise<void> = () => Promise.resolve();
                 createDialogMock.mockImplementationOnce((config) => {
                     deleteHandler = config.componentProps.listeners.delete;
-                    return { onDismiss: vi.fn().mockReturnThis(), hide: vi.fn() };
+                    return { hide: vi.fn(), onDismiss: vi.fn().mockReturnThis() };
                 });
 
                 const table = floor.getTableByLabel("T1");
@@ -678,14 +679,14 @@ describe("useReservations", () => {
 
         describe("editing", () => {
             it("handles editing existing reservation", async () => {
-                const { floor, event } = await setupTestEnvironment();
+                const { event, floor } = await setupTestEnvironment();
                 const existingReservation = {
-                    id: "1",
                     floorId: "1",
-                    tableLabel: "T1",
                     guestName: "John Doe",
-                    time: "19:00",
+                    id: "1",
                     status: ReservationStatus.ACTIVE,
+                    tableLabel: "T1",
+                    time: "19:00",
                     type: ReservationType.PLANNED,
                 } as ReservationDoc;
 
@@ -694,7 +695,7 @@ describe("useReservations", () => {
                         ref([]),
                         ref([existingReservation]),
                         ref([]),
-                        { id: "1", propertyId: "1", organisationId: "1" },
+                        { id: "1", organisationId: "1", propertyId: "1" },
                         ref(event),
                     ),
                 );
@@ -707,8 +708,8 @@ describe("useReservations", () => {
                 createDialogMock.mockImplementationOnce((config) => {
                     editHandler = config.componentProps.listeners.edit;
                     return {
-                        onDismiss: vi.fn().mockReturnThis(),
                         hide: vi.fn(),
+                        onDismiss: vi.fn().mockReturnThis(),
                     };
                 });
 
@@ -716,8 +717,8 @@ describe("useReservations", () => {
                 createDialogMock.mockImplementationOnce((config) => {
                     updateHandler = config.componentProps.listeners.update;
                     return {
-                        onDismiss: vi.fn().mockReturnThis(),
                         hide: vi.fn(),
+                        onDismiss: vi.fn().mockReturnThis(),
                     };
                 });
 
@@ -733,16 +734,16 @@ describe("useReservations", () => {
                 await updateHandler(updatedReservation);
 
                 expect(updateReservationDocMock).toHaveBeenCalledWith(
-                    { id: "1", propertyId: "1", organisationId: "1" },
+                    { id: "1", organisationId: "1", propertyId: "1" },
                     updatedReservation,
                 );
 
                 expect(eventEmitMock).toHaveBeenCalledWith(
                     "reservation:updated",
                     expect.objectContaining({
-                        reservation: updatedReservation,
-                        eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
                         event,
+                        eventOwner: { id: "1", organisationId: "1", propertyId: "1" },
+                        reservation: updatedReservation,
                     }),
                 );
             });
@@ -750,13 +751,13 @@ describe("useReservations", () => {
 
         describe("creation", () => {
             it("emits event when creating reservation", async () => {
-                const { floor, event } = await setupTestEnvironment();
+                const { event, floor } = await setupTestEnvironment();
                 const result = withSetup(() =>
                     useReservations(
                         ref([]),
                         ref([]),
                         ref([]),
-                        { id: "1", propertyId: "1", organisationId: "1" },
+                        { id: "1", organisationId: "1", propertyId: "1" },
                         ref(event),
                     ),
                 );
@@ -765,8 +766,8 @@ describe("useReservations", () => {
                 createDialogMock.mockImplementationOnce((config) => {
                     createHandler = config.componentProps.listeners.create;
                     return {
-                        onDismiss: vi.fn().mockReturnThis(),
                         hide: vi.fn(),
+                        onDismiss: vi.fn().mockReturnThis(),
                     };
                 });
 
@@ -776,8 +777,8 @@ describe("useReservations", () => {
 
                 const newReservation = {
                     guestName: "New Guest",
-                    time: "20:00",
                     status: ReservationStatus.ACTIVE,
+                    time: "20:00",
                     type: ReservationType.PLANNED,
                 };
 
@@ -787,19 +788,19 @@ describe("useReservations", () => {
                 expect(eventEmitMock).toHaveBeenCalledWith(
                     "reservation:created",
                     expect.objectContaining({
+                        event: expect.any(Object),
+                        eventOwner: { id: "1", organisationId: "1", propertyId: "1" },
                         reservation: expect.objectContaining({
                             ...newReservation,
                             floorId: floor.id,
                             tableLabel: "T1",
                         }),
-                        eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
-                        event: expect.any(Object),
                     }),
                 );
             });
 
             it("handles API errors during reservation creation", async () => {
-                const { floor, event } = await setupTestEnvironment();
+                const { event, floor } = await setupTestEnvironment();
                 addReservationMock.mockRejectedValueOnce(new Error("API Error"));
 
                 const result = withSetup(() =>
@@ -807,7 +808,7 @@ describe("useReservations", () => {
                         ref([]),
                         ref([]),
                         ref([]),
-                        { id: "1", propertyId: "1", organisationId: "1" },
+                        { id: "1", organisationId: "1", propertyId: "1" },
                         ref(event),
                     ),
                 );
@@ -816,8 +817,8 @@ describe("useReservations", () => {
                 createDialogMock.mockImplementationOnce((config) => {
                     createHandler = config.componentProps.listeners.create;
                     return {
-                        onDismiss: vi.fn().mockReturnThis(),
                         hide: vi.fn(),
+                        onDismiss: vi.fn().mockReturnThis(),
                     };
                 });
 
@@ -826,8 +827,8 @@ describe("useReservations", () => {
 
                 const newReservation = {
                     guestName: "New Guest",
-                    time: "20:00",
                     status: ReservationStatus.ACTIVE,
+                    time: "20:00",
                     type: ReservationType.PLANNED,
                 };
 
@@ -842,14 +843,14 @@ describe("useReservations", () => {
 
         describe("copy", () => {
             it("handles reservation copy", async () => {
-                const { floor, event } = await setupTestEnvironment();
+                const { event, floor } = await setupTestEnvironment();
                 const sourceReservation = {
-                    id: "1",
                     floorId: "1",
-                    tableLabel: "T1",
                     guestName: "John Doe",
-                    time: "19:00",
+                    id: "1",
                     status: ReservationStatus.ACTIVE,
+                    tableLabel: "T1",
+                    time: "19:00",
                     type: ReservationType.PLANNED,
                 } as ReservationDoc;
 
@@ -858,16 +859,16 @@ describe("useReservations", () => {
                         ref([]),
                         ref([sourceReservation]),
                         ref([]),
-                        { id: "1", propertyId: "1", organisationId: "1" },
+                        { id: "1", organisationId: "1", propertyId: "1" },
                         ref(event),
                     ),
                 );
 
                 const sourceTable = floor.getTableByLabel("T1")!;
                 result.initiateTableOperation({
-                    type: TableOperationType.RESERVATION_COPY,
                     sourceFloor: floor,
                     sourceTable,
+                    type: TableOperationType.RESERVATION_COPY,
                 });
 
                 const targetTable = floor.getTableByLabel("T2");
@@ -876,19 +877,19 @@ describe("useReservations", () => {
                 await table2ClickResult;
 
                 expect(addReservationMock).toHaveBeenCalledWith(
-                    { id: "1", propertyId: "1", organisationId: "1" },
+                    { id: "1", organisationId: "1", propertyId: "1" },
                     expect.objectContaining({
-                        tableLabel: "T2",
                         floorId: floor.id,
+                        tableLabel: "T2",
                     }),
                 );
 
                 expect(eventEmitMock).toHaveBeenCalledWith(
                     "reservation:copied",
                     expect.objectContaining({
+                        eventOwner: { id: "1", organisationId: "1", propertyId: "1" },
                         sourceReservation,
                         targetTable,
-                        eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
                     }),
                 );
             });
@@ -896,7 +897,7 @@ describe("useReservations", () => {
 
         describe("linking/unlinking", () => {
             it("handles linking tables to reservation", async () => {
-                const { floor, event } = await setupTestEnvironment();
+                const { event, floor } = await setupTestEnvironment();
                 const sourceReservation = createTestReservation({
                     tableLabel: "T1",
                 });
@@ -906,7 +907,7 @@ describe("useReservations", () => {
                         ref([]),
                         ref([sourceReservation]),
                         shallowRef([floor]),
-                        { id: "1", propertyId: "1", organisationId: "1" },
+                        { id: "1", organisationId: "1", propertyId: "1" },
                         ref(event),
                     ),
                 );
@@ -915,8 +916,8 @@ describe("useReservations", () => {
                 createDialogMock.mockImplementationOnce((config) => {
                     linkHandler = config.componentProps.listeners.link;
                     return {
-                        onDismiss: vi.fn().mockReturnThis(),
                         hide: vi.fn(),
+                        onDismiss: vi.fn().mockReturnThis(),
                     };
                 });
 
@@ -930,7 +931,7 @@ describe("useReservations", () => {
                 await targetTableClickResult;
 
                 expect(updateReservationDocMock).toHaveBeenCalledWith(
-                    { id: "1", propertyId: "1", organisationId: "1" },
+                    { id: "1", organisationId: "1", propertyId: "1" },
                     expect.objectContaining({
                         id: sourceReservation.id,
                         tableLabel: ["T1", "T2"],
@@ -939,7 +940,7 @@ describe("useReservations", () => {
             });
 
             it("prevents linking to already reserved table", async () => {
-                const { floor, event } = await setupTestEnvironment();
+                const { event, floor } = await setupTestEnvironment();
                 const sourceReservation = createTestReservation({
                     tableLabel: "T1",
                 });
@@ -953,7 +954,7 @@ describe("useReservations", () => {
                         ref([]),
                         ref([sourceReservation, targetReservation]),
                         shallowRef([floor]),
-                        { id: "1", propertyId: "1", organisationId: "1" },
+                        { id: "1", organisationId: "1", propertyId: "1" },
                         ref(event),
                     ),
                 );
@@ -962,8 +963,8 @@ describe("useReservations", () => {
                 createDialogMock.mockImplementationOnce((config) => {
                     linkHandler = config.componentProps.listeners.link;
                     return {
-                        onDismiss: vi.fn().mockReturnThis(),
                         hide: vi.fn(),
+                        onDismiss: vi.fn().mockReturnThis(),
                     };
                 });
 
@@ -983,7 +984,7 @@ describe("useReservations", () => {
             });
 
             it("prevents linking to already linked table", async () => {
-                const { floor, event } = await setupTestEnvironment();
+                const { event, floor } = await setupTestEnvironment();
                 const sourceReservation = createTestReservation({
                     tableLabel: ["T1", "T2"],
                 });
@@ -993,7 +994,7 @@ describe("useReservations", () => {
                         ref([]),
                         ref([sourceReservation]),
                         ref([]),
-                        { id: "1", propertyId: "1", organisationId: "1" },
+                        { id: "1", organisationId: "1", propertyId: "1" },
                         ref(event),
                     ),
                 );
@@ -1002,8 +1003,8 @@ describe("useReservations", () => {
                 createDialogMock.mockImplementationOnce((config) => {
                     linkHandler = config.componentProps.listeners.link;
                     return {
-                        onDismiss: vi.fn().mockReturnThis(),
                         hide: vi.fn(),
+                        onDismiss: vi.fn().mockReturnThis(),
                     };
                 });
 
@@ -1023,7 +1024,7 @@ describe("useReservations", () => {
             });
 
             it("handles unlinking table from reservation", async () => {
-                const { floor, event } = await setupTestEnvironment();
+                const { event, floor } = await setupTestEnvironment();
                 const sourceReservation = createTestReservation({
                     tableLabel: ["T1", "T2"],
                 });
@@ -1033,7 +1034,7 @@ describe("useReservations", () => {
                         ref([]),
                         ref([sourceReservation]),
                         ref([]),
-                        { id: "1", propertyId: "1", organisationId: "1" },
+                        { id: "1", organisationId: "1", propertyId: "1" },
                         ref(event),
                     ),
                 );
@@ -1042,8 +1043,8 @@ describe("useReservations", () => {
                 createDialogMock.mockImplementationOnce((config) => {
                     unlinkHandler = config.componentProps.listeners.unlink;
                     return {
-                        onDismiss: vi.fn().mockReturnThis(),
                         hide: vi.fn(),
+                        onDismiss: vi.fn().mockReturnThis(),
                     };
                 });
 
@@ -1055,7 +1056,7 @@ describe("useReservations", () => {
                 await userEvent.click(page.getByRole("button", { name: "OK" }));
 
                 expect(updateReservationDocMock).toHaveBeenCalledWith(
-                    { id: "1", propertyId: "1", organisationId: "1" },
+                    { id: "1", organisationId: "1", propertyId: "1" },
                     expect.objectContaining({
                         id: sourceReservation.id,
                         tableLabel: ["T1"],
@@ -1065,8 +1066,8 @@ describe("useReservations", () => {
                 expect(eventEmitMock).toHaveBeenCalledWith(
                     "reservation:unlinked",
                     expect.objectContaining({
-                        eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
                         event,
+                        eventOwner: { id: "1", organisationId: "1", propertyId: "1" },
                         sourceReservation,
                         unlinkedTableLabels: ["T2"],
                     }),
@@ -1074,7 +1075,7 @@ describe("useReservations", () => {
             });
 
             it("cancels unlinking when user declines confirmation", async () => {
-                const { floor, event } = await setupTestEnvironment();
+                const { event, floor } = await setupTestEnvironment();
                 const sourceReservation = createTestReservation({
                     tableLabel: ["T1", "T2"],
                 });
@@ -1084,7 +1085,7 @@ describe("useReservations", () => {
                         ref([]),
                         ref([sourceReservation]),
                         ref([]),
-                        { id: "1", propertyId: "1", organisationId: "1" },
+                        { id: "1", organisationId: "1", propertyId: "1" },
                         ref(event),
                     ),
                 );
@@ -1093,8 +1094,8 @@ describe("useReservations", () => {
                 createDialogMock.mockImplementationOnce((config) => {
                     unlinkHandler = config.componentProps.listeners.unlink;
                     return {
-                        onDismiss: vi.fn().mockReturnThis(),
                         hide: vi.fn(),
+                        onDismiss: vi.fn().mockReturnThis(),
                     };
                 });
 
@@ -1125,7 +1126,7 @@ describe("useReservations", () => {
                         ref([]),
                         ref([sourceReservation]),
                         shallowRef([floor1, floor2]),
-                        { id: "1", propertyId: "1", organisationId: "1" },
+                        { id: "1", organisationId: "1", propertyId: "1" },
                         ref(event),
                     ),
                 );
@@ -1134,8 +1135,8 @@ describe("useReservations", () => {
                 createDialogMock.mockImplementationOnce((config) => {
                     linkHandler = config.componentProps.listeners.link;
                     return {
-                        onDismiss: vi.fn().mockReturnThis(),
                         hide: vi.fn(),
+                        onDismiss: vi.fn().mockReturnThis(),
                     };
                 });
 
@@ -1158,16 +1159,16 @@ describe("useReservations", () => {
 
     describe("status updates", () => {
         it("marks guest as arrived", async () => {
-            const { floor, event } = await setupTestEnvironment();
+            const { event, floor } = await setupTestEnvironment();
             const existingReservation = {
-                id: "1",
-                floorId: "1",
-                tableLabel: "T1",
-                guestName: "John Doe",
-                time: "19:00",
-                status: ReservationStatus.ACTIVE,
-                type: ReservationType.PLANNED,
                 arrived: false,
+                floorId: "1",
+                guestName: "John Doe",
+                id: "1",
+                status: ReservationStatus.ACTIVE,
+                tableLabel: "T1",
+                time: "19:00",
+                type: ReservationType.PLANNED,
             } as ReservationDoc;
 
             const result = withSetup(() =>
@@ -1175,7 +1176,7 @@ describe("useReservations", () => {
                     ref([]),
                     ref([existingReservation]),
                     ref([]),
-                    { id: "1", propertyId: "1", organisationId: "1" },
+                    { id: "1", organisationId: "1", propertyId: "1" },
                     ref(event),
                 ),
             );
@@ -1184,8 +1185,8 @@ describe("useReservations", () => {
             createDialogMock.mockImplementationOnce((config) => {
                 arrivedHandler = config.componentProps.listeners.arrived;
                 return {
-                    onDismiss: vi.fn().mockReturnThis(),
                     hide: vi.fn(),
+                    onDismiss: vi.fn().mockReturnThis(),
                 };
             });
 
@@ -1195,10 +1196,10 @@ describe("useReservations", () => {
             await arrivedHandler(true);
 
             expect(updateReservationDocMock).toHaveBeenCalledWith(
-                { id: "1", propertyId: "1", organisationId: "1" },
+                { id: "1", organisationId: "1", propertyId: "1" },
                 expect.objectContaining({
-                    id: existingReservation.id,
                     arrived: true,
+                    id: existingReservation.id,
                     waitingForResponse: false,
                 }),
             );
@@ -1206,28 +1207,28 @@ describe("useReservations", () => {
             expect(eventEmitMock).toHaveBeenCalledWith(
                 "reservation:arrived",
                 expect.objectContaining({
+                    event: expect.any(Object),
+                    eventOwner: { id: "1", organisationId: "1", propertyId: "1" },
                     reservation: expect.objectContaining({
                         ...existingReservation,
                         arrived: true,
                     }),
-                    eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
-                    event: expect.any(Object),
                 }),
             );
         });
 
         it("cancels reservation", async () => {
-            const { floor, event } = await setupTestEnvironment();
+            const { event, floor } = await setupTestEnvironment();
             const existingReservation = {
-                id: "1",
-                floorId: "1",
-                tableLabel: "T1",
-                guestName: "John Doe",
-                time: "19:00",
-                status: ReservationStatus.ACTIVE,
-                type: ReservationType.PLANNED,
-                cancelled: false,
                 arrived: false,
+                cancelled: false,
+                floorId: "1",
+                guestName: "John Doe",
+                id: "1",
+                status: ReservationStatus.ACTIVE,
+                tableLabel: "T1",
+                time: "19:00",
+                type: ReservationType.PLANNED,
             } as ReservationDoc;
 
             const result = withSetup(() =>
@@ -1235,7 +1236,7 @@ describe("useReservations", () => {
                     ref([]),
                     ref([existingReservation]),
                     ref([]),
-                    { id: "1", propertyId: "1", organisationId: "1" },
+                    { id: "1", organisationId: "1", propertyId: "1" },
                     ref(event),
                 ),
             );
@@ -1244,8 +1245,8 @@ describe("useReservations", () => {
             createDialogMock.mockImplementationOnce((config) => {
                 cancelHandler = config.componentProps.listeners.cancel;
                 return {
-                    onDismiss: vi.fn().mockReturnThis(),
                     hide: vi.fn(),
+                    onDismiss: vi.fn().mockReturnThis(),
                 };
             });
 
@@ -1254,10 +1255,10 @@ describe("useReservations", () => {
             await cancelHandler(true);
 
             expect(updateReservationDocMock).toHaveBeenCalledWith(
-                { id: "1", propertyId: "1", organisationId: "1" },
+                { id: "1", organisationId: "1", propertyId: "1" },
                 expect.objectContaining({
-                    id: existingReservation.id,
                     cancelled: true,
+                    id: existingReservation.id,
                     waitingForResponse: false,
                 }),
             );
@@ -1265,18 +1266,18 @@ describe("useReservations", () => {
             expect(eventEmitMock).toHaveBeenCalledWith(
                 "reservation:cancelled",
                 expect.objectContaining({
+                    event,
+                    eventOwner: { id: "1", organisationId: "1", propertyId: "1" },
                     reservation: expect.objectContaining({
                         ...existingReservation,
                         cancelled: true,
                     }),
-                    eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
-                    event,
                 }),
             );
         });
 
         it("handles API errors during status updates", async () => {
-            const { floor, event } = await setupTestEnvironment();
+            const { event, floor } = await setupTestEnvironment();
             const existingReservation = createTestReservation();
 
             updateReservationDocMock.mockRejectedValueOnce(new Error("API Error"));
@@ -1286,7 +1287,7 @@ describe("useReservations", () => {
                     ref([]),
                     ref([existingReservation]),
                     ref([]),
-                    { id: "1", propertyId: "1", organisationId: "1" },
+                    { id: "1", organisationId: "1", propertyId: "1" },
                     ref(event),
                 ),
             );
@@ -1294,7 +1295,7 @@ describe("useReservations", () => {
             let arrivedHandler: (arrived: boolean) => Promise<void> = () => Promise.resolve();
             createDialogMock.mockImplementationOnce((config) => {
                 arrivedHandler = config.componentProps.listeners.arrived;
-                return { onDismiss: vi.fn().mockReturnThis(), hide: vi.fn() };
+                return { hide: vi.fn(), onDismiss: vi.fn().mockReturnThis() };
             });
 
             const table = floor.getTableByLabel("T1");
@@ -1310,14 +1311,14 @@ describe("useReservations", () => {
 
     describe("queue operations", () => {
         it("moves reservation to queue", async () => {
-            const { floor, event } = await setupTestEnvironment();
+            const { event, floor } = await setupTestEnvironment();
             const existingReservation = {
-                id: "1",
                 floorId: "1",
-                tableLabel: "T1",
                 guestName: "John Doe",
-                time: "19:00",
+                id: "1",
                 status: ReservationStatus.ACTIVE,
+                tableLabel: "T1",
+                time: "19:00",
                 type: ReservationType.PLANNED,
             } as ReservationDoc;
 
@@ -1326,7 +1327,7 @@ describe("useReservations", () => {
                     ref([]),
                     ref([existingReservation]),
                     ref([]),
-                    { id: "1", propertyId: "1", organisationId: "1" },
+                    { id: "1", organisationId: "1", propertyId: "1" },
                     ref(event),
                 ),
             );
@@ -1335,8 +1336,8 @@ describe("useReservations", () => {
             createDialogMock.mockImplementationOnce((config) => {
                 queueHandler = config.componentProps.listeners.queue;
                 return {
-                    onDismiss: vi.fn().mockReturnThis(),
                     hide: vi.fn(),
+                    onDismiss: vi.fn().mockReturnThis(),
                 };
             });
 
@@ -1350,13 +1351,13 @@ describe("useReservations", () => {
         });
 
         it("handles dequeue operation", async () => {
-            const { floor, event } = await setupTestEnvironment();
+            const { event, floor } = await setupTestEnvironment();
             const queuedReservation = createTestReservation({
+                floorId: undefined,
                 id: "1",
                 status: ReservationStatus.ACTIVE,
-                type: ReservationType.QUEUED,
-                floorId: undefined,
                 tableLabel: undefined,
+                type: ReservationType.QUEUED,
             }) as unknown as QueuedReservationDoc;
 
             const result = withSetup(() =>
@@ -1364,21 +1365,21 @@ describe("useReservations", () => {
                     ref([]),
                     ref([]),
                     shallowRef([floor]),
-                    { id: "1", propertyId: "1", organisationId: "1" },
+                    { id: "1", organisationId: "1", propertyId: "1" },
                     ref(event),
                 ),
             );
 
             result.initiateTableOperation({
-                type: TableOperationType.RESERVATION_DEQUEUE,
                 reservation: queuedReservation,
+                type: TableOperationType.RESERVATION_DEQUEUE,
             });
 
             const targetTable = floor.getTableByLabel("T1");
             await result.tableClickHandler(floor, targetTable);
 
             expect(moveReservationFromQueueMock).toHaveBeenCalledWith(
-                { id: "1", propertyId: "1", organisationId: "1" },
+                { id: "1", organisationId: "1", propertyId: "1" },
                 queuedReservation.id,
                 expect.objectContaining({
                     floorId: floor.id,
@@ -1389,14 +1390,14 @@ describe("useReservations", () => {
     });
 
     it("cancels operation when cancel button is clicked", async () => {
-        const { floor, event } = await setupTestEnvironment();
+        const { event, floor } = await setupTestEnvironment();
         const sourceReservation = {
-            id: "1",
             floorId: "1",
-            tableLabel: "T1",
-            type: ReservationType.PLANNED,
+            id: "1",
             status: ReservationStatus.ACTIVE,
+            tableLabel: "T1",
             time: "19:00",
+            type: ReservationType.PLANNED,
         } as ReservationDoc;
 
         const result = withSetup(() =>
@@ -1404,16 +1405,16 @@ describe("useReservations", () => {
                 ref([]),
                 ref([sourceReservation]),
                 shallowRef([floor]),
-                { id: "1", propertyId: "1", organisationId: "1" },
+                { id: "1", organisationId: "1", propertyId: "1" },
                 ref(event),
             ),
         );
 
         const sourceTable = floor.getTableByLabel("T1")!;
         result.initiateTableOperation({
-            type: TableOperationType.RESERVATION_TRANSFER,
             sourceFloor: floor,
             sourceTable,
+            type: TableOperationType.RESERVATION_TRANSFER,
         });
         await nextTick();
         await flushPromises();
@@ -1432,11 +1433,11 @@ describe("useReservations", () => {
 
     describe("guest data handling", () => {
         it("triggers guest data update when guest contact is added during reservation update", async () => {
-            const { floor, event } = await setupTestEnvironment();
+            const { event, floor } = await setupTestEnvironment();
             const existingReservation = createTestReservation({
-                id: "1",
                 guestContact: undefined,
                 guestName: undefined,
+                id: "1",
             });
 
             const result = withSetup(() =>
@@ -1444,7 +1445,7 @@ describe("useReservations", () => {
                     ref([]),
                     ref([existingReservation]),
                     shallowRef([floor]),
-                    { id: "1", propertyId: "1", organisationId: "1" },
+                    { id: "1", organisationId: "1", propertyId: "1" },
                     ref(event),
                 ),
             );
@@ -1457,8 +1458,8 @@ describe("useReservations", () => {
             createDialogMock.mockImplementationOnce((config) => {
                 editHandler = config.componentProps.listeners.edit;
                 return {
-                    onDismiss: vi.fn().mockReturnThis(),
                     hide: vi.fn(),
+                    onDismiss: vi.fn().mockReturnThis(),
                 };
             });
 
@@ -1466,8 +1467,8 @@ describe("useReservations", () => {
             createDialogMock.mockImplementationOnce((config) => {
                 updateHandler = config.componentProps.listeners.update;
                 return {
-                    onDismiss: vi.fn().mockReturnThis(),
                     hide: vi.fn(),
+                    onDismiss: vi.fn().mockReturnThis(),
                 };
             });
 
@@ -1486,10 +1487,10 @@ describe("useReservations", () => {
             expect(eventEmitMock).toHaveBeenCalledWith(
                 "reservation:updated",
                 expect.objectContaining({
-                    reservation: updatedReservation,
-                    oldReservation: existingReservation,
-                    eventOwner: { id: "1", propertyId: "1", organisationId: "1" },
                     event,
+                    eventOwner: { id: "1", organisationId: "1", propertyId: "1" },
+                    oldReservation: existingReservation,
+                    reservation: updatedReservation,
                 }),
             );
         });
@@ -1499,14 +1500,14 @@ describe("useReservations", () => {
         let clearIntervalSpy: MockInstance;
         let setIntervalSpy: MockInstance;
         const reservation = {
-            id: "1",
-            floorId: "1",
-            tableLabel: "T1",
-            guestName: "John Doe",
-            time: "19:00",
-            status: ReservationStatus.ACTIVE,
-            type: ReservationType.PLANNED,
             cancelled: true,
+            floorId: "1",
+            guestName: "John Doe",
+            id: "1",
+            status: ReservationStatus.ACTIVE,
+            tableLabel: "T1",
+            time: "19:00",
+            type: ReservationType.PLANNED,
         } as ReservationDoc;
 
         beforeEach(() => {
@@ -1530,23 +1531,23 @@ describe("useReservations", () => {
                         ref([]),
                         ref([{ ...reservation }]),
                         shallowRef([floor]),
-                        { id: "1", propertyId: "1", organisationId: "1" },
+                        { id: "1", organisationId: "1", propertyId: "1" },
                         ref(event),
                     ),
                 {
                     properties: {
+                        organisations: [{ id: "1" }],
                         properties: [
                             {
                                 id: "1",
                                 name: "Test Property",
                                 organisationId: "1",
                                 settings: {
-                                    timezone: "Europe/Vienna",
                                     markGuestAsLateAfterMinutes: 0,
+                                    timezone: "Europe/Vienna",
                                 },
                             },
                         ],
-                        organisations: [{ id: "1" }],
                     },
                 },
             );
@@ -1563,23 +1564,23 @@ describe("useReservations", () => {
                         ref([]),
                         ref([{ ...reservation }]),
                         shallowRef([floor]),
-                        { id: "1", propertyId: "1", organisationId: "1" },
+                        { id: "1", organisationId: "1", propertyId: "1" },
                         ref(event),
                     ),
                 {
                     properties: {
+                        organisations: [{ id: "1" }],
                         properties: [
                             {
                                 id: "1",
                                 name: "Test Property",
                                 organisationId: "1",
                                 settings: {
-                                    timezone: "Europe/Vienna",
                                     markGuestAsLateAfterMinutes: 15,
+                                    timezone: "Europe/Vienna",
                                 },
                             },
                         ],
-                        organisations: [{ id: "1" }],
                     },
                 },
             );
@@ -1596,23 +1597,23 @@ describe("useReservations", () => {
                         ref([]),
                         ref([{ ...reservation }]),
                         shallowRef([floor]),
-                        { id: "1", propertyId: "1", organisationId: "1" },
+                        { id: "1", organisationId: "1", propertyId: "1" },
                         ref(event),
                     ),
                 {
                     properties: {
+                        organisations: [{ id: "1" }],
                         properties: [
                             {
                                 id: "1",
                                 name: "Test Property",
                                 organisationId: "1",
                                 settings: {
-                                    timezone: "Europe/Vienna",
                                     markGuestAsLateAfterMinutes: 15,
+                                    timezone: "Europe/Vienna",
                                 },
                             },
                         ],
-                        organisations: [{ id: "1" }],
                     },
                 },
             );
@@ -1632,18 +1633,18 @@ describe("useReservations", () => {
                         ref([]),
                         ref([]),
                         ref([]),
-                        { id: "1", propertyId: "1", organisationId: "1" },
+                        { id: "1", organisationId: "1", propertyId: "1" },
                         ref(event),
                     ),
                 {
                     properties: {
+                        organisations: [{ id: "1" }],
                         properties: [
                             {
                                 id: "1",
                                 settings: undefined,
                             },
                         ],
-                        organisations: [{ id: "1" }],
                     },
                 },
             );
@@ -1660,20 +1661,20 @@ describe("useReservations", () => {
 
             // Create event starting at our base time
             const event = {
-                id: "1",
-                date: baseTime.getTime(),
-                name: "Test Event",
-                propertyId: "1",
-                organisationId: "1",
+                _doc: {} as any,
                 creator: "test@mail.com",
+                date: baseTime.getTime(),
                 entryPrice: 0,
                 guestListLimit: 100,
-                _doc: {} as any,
+                id: "1",
+                name: "Test Event",
+                organisationId: "1",
+                propertyId: "1",
             };
 
             const reservationWithTime = createTestReservation({
-                time: "19:00",
                 arrived: false,
+                time: "19:00",
             });
 
             withSetup(
@@ -1682,21 +1683,21 @@ describe("useReservations", () => {
                         ref([]),
                         ref([reservationWithTime]),
                         shallowRef([floor]),
-                        { id: "1", propertyId: "1", organisationId: "1" },
+                        { id: "1", organisationId: "1", propertyId: "1" },
                         ref(event),
                     ),
                 {
                     properties: {
+                        organisations: [{ id: "1" }],
                         properties: [
                             {
                                 id: "1",
                                 settings: {
-                                    timezone: "Europe/Vienna",
                                     markGuestAsLateAfterMinutes: 1,
+                                    timezone: "Europe/Vienna",
                                 },
                             },
                         ],
-                        organisations: [{ id: "1" }],
                     },
                 },
             );
@@ -1712,25 +1713,109 @@ describe("useReservations", () => {
     });
 });
 
+async function createTestFloor(name = "Test floor", id = "1"): Promise<FloorViewer> {
+    const canvas = document.createElement("canvas");
+    canvas.width = 400;
+    canvas.height = 600;
+    document.body.appendChild(canvas);
+
+    const editor = new FloorEditor({
+        canvas: document.createElement("canvas"),
+        containerHeight: 500,
+        containerWidth: 500,
+        floorDoc: {
+            height: 500,
+            id,
+            json: "",
+            name,
+            width: 500,
+        },
+    });
+
+    editor.addElement({
+        label: "T1",
+        tag: FloorElementTypes.RECT_TABLE,
+        x: 100,
+        y: 100,
+    });
+
+    editor.addElement({
+        label: "T2",
+        tag: FloorElementTypes.RECT_TABLE,
+        x: 200,
+        y: 200,
+    });
+
+    editor.addElement({
+        label: "T3",
+        tag: FloorElementTypes.RECT_TABLE,
+        x: 300,
+        y: 300,
+    });
+
+    const { json } = editor.export();
+    const floorDoc: FloorDoc = {
+        height: 600,
+        id,
+        json,
+        name,
+        propertyId: "1",
+        width: 400,
+    };
+
+    const floorViewer = new FloorViewer({
+        canvas,
+        containerHeight: 600,
+        containerWidth: 400,
+        floorDoc,
+    });
+
+    await new Promise<void>((resolve) => {
+        floorViewer.on("rendered", () => resolve());
+    });
+
+    return floorViewer;
+}
+
 function createTestReservation(overrides = {}): ReservationDoc {
     return {
-        id: "1",
-        floorId: "1",
-        tableLabel: "T1",
-        guestName: "John Doe",
-        time: "19:00",
-        status: ReservationStatus.ACTIVE,
-        type: ReservationType.PLANNED,
-        reservationConfirmed: false,
-        cancelled: false,
         arrived: false,
+        cancelled: false,
         consumption: 0,
+        floorId: "1",
+        guestName: "John Doe",
+        id: "1",
+        reservationConfirmed: false,
         reservedBy: {
             id: "1",
             name: "Test User",
         },
+        status: ReservationStatus.ACTIVE,
+        tableLabel: "T1",
+        time: "19:00",
+        type: ReservationType.PLANNED,
         ...overrides,
     } as ReservationDoc;
+}
+
+async function setupTestEnvironment(): Promise<{ event: EventDoc; floor: FloorViewer }> {
+    const floor = await createTestFloor();
+    const event: EventDoc = {
+        _doc: {} as any,
+        creator: "test@mail.com",
+        date: new Date().getTime(),
+        entryPrice: 0,
+        guestListLimit: 100,
+        id: "1",
+        name: "Test Event",
+        organisationId: "1",
+        propertyId: "1",
+    };
+
+    return {
+        event,
+        floor,
+    };
 }
 
 function withSetup(
@@ -1741,12 +1826,17 @@ function withSetup(
     const defaultInitialState = {
         auth: {
             user: {
-                id: "1",
                 email: "test@mail.com",
+                id: "1",
                 role: AdminRole.ADMIN,
             },
         },
         properties: {
+            organisations: [
+                {
+                    id: "1",
+                },
+            ],
             properties: [
                 {
                     id: "1",
@@ -1757,26 +1847,21 @@ function withSetup(
                     },
                 },
             ],
-            organisations: [
-                {
-                    id: "1",
-                },
-            ],
         },
     };
     const testingPinia = createTestingPinia({
         createSpy: vi.fn,
-        stubActions: false,
         initialState: {
             ...defaultInitialState,
             ...initialState,
         },
+        stubActions: false,
     });
     const i18n = createI18n({
-        locale: "en-GB",
         fallbackLocale: "en-GB",
-        messages,
         legacy: false,
+        locale: "en-GB",
+        messages,
     });
     app = createApp({
         setup() {
@@ -1785,7 +1870,7 @@ function withSetup(
         },
     });
     app.use(Quasar);
-    Quasar.install(app, { plugins: { BottomSheet, Loading, Dialog, Notify } });
+    Quasar.install(app, { plugins: { BottomSheet, Dialog, Loading, Notify } });
     app.use(i18n);
     app.use(testingPinia);
 
@@ -1795,88 +1880,4 @@ function withSetup(
     app.mount(container);
 
     return result!;
-}
-
-async function setupTestEnvironment(): Promise<{ floor: FloorViewer; event: EventDoc }> {
-    const floor = await createTestFloor();
-    const event: EventDoc = {
-        id: "1",
-        date: new Date().getTime(),
-        name: "Test Event",
-        propertyId: "1",
-        organisationId: "1",
-        creator: "test@mail.com",
-        entryPrice: 0,
-        guestListLimit: 100,
-        _doc: {} as any,
-    };
-
-    return {
-        floor,
-        event,
-    };
-}
-
-async function createTestFloor(name = "Test floor", id = "1"): Promise<FloorViewer> {
-    const canvas = document.createElement("canvas");
-    canvas.width = 400;
-    canvas.height = 600;
-    document.body.appendChild(canvas);
-
-    const editor = new FloorEditor({
-        canvas: document.createElement("canvas"),
-        floorDoc: {
-            id,
-            name,
-            width: 500,
-            height: 500,
-            json: "",
-        },
-        containerWidth: 500,
-        containerHeight: 500,
-    });
-
-    editor.addElement({
-        tag: FloorElementTypes.RECT_TABLE,
-        label: "T1",
-        x: 100,
-        y: 100,
-    });
-
-    editor.addElement({
-        tag: FloorElementTypes.RECT_TABLE,
-        label: "T2",
-        x: 200,
-        y: 200,
-    });
-
-    editor.addElement({
-        tag: FloorElementTypes.RECT_TABLE,
-        label: "T3",
-        x: 300,
-        y: 300,
-    });
-
-    const { json } = editor.export();
-    const floorDoc: FloorDoc = {
-        propertyId: "1",
-        id,
-        name,
-        width: 400,
-        height: 600,
-        json,
-    };
-
-    const floorViewer = new FloorViewer({
-        canvas,
-        floorDoc,
-        containerWidth: 400,
-        containerHeight: 600,
-    });
-
-    await new Promise<void>((resolve) => {
-        floorViewer.on("rendered", () => resolve());
-    });
-
-    return floorViewer;
 }

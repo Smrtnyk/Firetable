@@ -1,51 +1,47 @@
-import type { RouteLocationNormalized, RouteRecordRaw } from "vue-router";
-import type { usePermissionsStore } from "src/stores/permissions-store";
 import type { AppUser } from "@firetable/types";
+import type { usePermissionsStore } from "src/stores/permissions-store";
+import type { RouteLocationNormalized, RouteRecordRaw } from "vue-router";
+
 import { AdminRole, Role } from "@firetable/types";
-import { usePropertiesStore } from "src/stores/properties-store";
 import { useEventsStore } from "src/stores/events-store";
+import { usePropertiesStore } from "src/stores/properties-store";
 
 declare module "vue-router" {
     interface RouteMeta {
-        requiresAuth: boolean;
-        breadcrumb?: string | ((route: RouteLocationNormalized, isAdmin?: boolean) => string);
         allowedRoles?:
-            | AppUser["role"][]
-            | ((permissionsStore: ReturnType<typeof usePermissionsStore>) => boolean);
+            | ((permissionsStore: ReturnType<typeof usePermissionsStore>) => boolean)
+            | AppUser["role"][];
+        breadcrumb?: ((route: RouteLocationNormalized, isAdmin?: boolean) => string) | string;
         parent?: string;
+        requiresAuth: boolean;
     }
 }
 
 export const routes: RouteRecordRaw[] = [
     {
-        path: "/",
-        component: () => import("layouts/MainLayout.vue"),
         children: [
             {
-                path: "/",
-                name: "home",
-                meta: {
-                    requiresAuth: true,
-                    breadcrumb: "Home",
-                },
                 component: () => import("src/pages/PageHome.vue"),
+                meta: {
+                    breadcrumb: "Home",
+                    requiresAuth: true,
+                },
+                name: "home",
+                path: "/",
             },
             {
-                path: "/organisations",
-                name: "organisations",
+                component: () => import("src/pages/PageOrganisations.vue"),
                 meta: {
-                    requiresAuth: true,
                     allowedRoles: [AdminRole.ADMIN],
                     breadcrumb: "Home",
+                    requiresAuth: true,
                 },
-                component: () => import("src/pages/PageOrganisations.vue"),
+                name: "organisations",
+                path: "/organisations",
             },
             {
-                path: "/:organisationId/properties",
-                name: "properties",
-                props: true,
+                component: () => import("src/pages/PageProperties.vue"),
                 meta: {
-                    requiresAuth: true,
                     breadcrumb(route: RouteLocationNormalized, isAdmin) {
                         const propertiesStore = usePropertiesStore();
                         return isAdmin
@@ -55,15 +51,15 @@ export const routes: RouteRecordRaw[] = [
                             : "Home";
                     },
                     parent: "organisations",
+                    requiresAuth: true,
                 },
-                component: () => import("src/pages/PageProperties.vue"),
+                name: "properties",
+                path: "/:organisationId/properties",
+                props: true,
             },
             {
-                path: "/events/:organisationId/:propertyId",
-                name: "events",
-                props: true,
+                component: () => import("src/pages/PageEvents.vue"),
                 meta: {
-                    requiresAuth: true,
                     breadcrumb(route) {
                         const propertiesStore = usePropertiesStore();
                         return propertiesStore.getPropertyNameById(
@@ -71,243 +67,248 @@ export const routes: RouteRecordRaw[] = [
                         );
                     },
                     parent: "properties",
+                    requiresAuth: true,
                 },
-                component: () => import("src/pages/PageEvents.vue"),
+                name: "events",
+                path: "/events/:organisationId/:propertyId",
+                props: true,
             },
             {
-                path: "/events/:organisationId/:propertyId/event/:eventId",
-                name: "event",
+                component: () => import("src/pages/PageEvent.vue"),
                 meta: {
-                    requiresAuth: true,
                     breadcrumb() {
                         const eventsStore = useEventsStore();
                         return eventsStore.currentEventName;
                     },
                     parent: "events",
+                    requiresAuth: true,
                 },
+                name: "event",
+                path: "/events/:organisationId/:propertyId/event/:eventId",
                 props: true,
-                component: () => import("src/pages/PageEvent.vue"),
             },
             {
-                path: "/profile",
-                name: "userProfile",
-                meta: {
-                    requiresAuth: true,
-                    breadcrumb: "Profile",
-                },
                 component: () => import("src/pages/PageProfile.vue"),
+                meta: {
+                    breadcrumb: "Profile",
+                    requiresAuth: true,
+                },
+                name: "userProfile",
+                path: "/profile",
             },
             {
-                path: "/report-issue",
-                name: "reportIssue",
-                meta: {
-                    requiresAuth: true,
-                    breadcrumb: "Report Issue",
-                },
                 component: () => import("src/pages/PageIssueReport.vue"),
+                meta: {
+                    breadcrumb: "Report Issue",
+                    requiresAuth: true,
+                },
+                name: "reportIssue",
+                path: "/report-issue",
             },
             // Protected routes
             {
-                path: "/admin/organisations",
-                name: "adminOrganisations",
-                meta: {
-                    requiresAuth: true,
-                    allowedRoles: [AdminRole.ADMIN],
-                },
                 component: () => import("src/pages/Admin/PageAdminOrganisations.vue"),
+                meta: {
+                    allowedRoles: [AdminRole.ADMIN],
+                    requiresAuth: true,
+                },
+                name: "adminOrganisations",
+                path: "/admin/organisations",
             },
 
             {
-                path: "organisation/:organisationId",
-                name: "adminOrganisation",
                 component: () => import("src/pages/Admin/PageAdminOrganisation.vue"),
-                props: true,
                 meta: {
-                    requiresAuth: true,
                     allowedRoles: [AdminRole.ADMIN],
+                    requiresAuth: true,
                 },
+                name: "adminOrganisation",
+                path: "organisation/:organisationId",
+                props: true,
             },
             {
-                path: "/admin/organisations/:organisationId/:propertyId/settings",
-                name: "adminPropertySettings",
-                meta: {
-                    requiresAuth: true,
-                    allowedRoles: [AdminRole.ADMIN, Role.PROPERTY_OWNER, Role.MANAGER],
-                },
                 component: () => import("src/pages/Admin/PageAdminPropertySettings.vue"),
+                meta: {
+                    allowedRoles: [AdminRole.ADMIN, Role.PROPERTY_OWNER, Role.MANAGER],
+                    requiresAuth: true,
+                },
+                name: "adminPropertySettings",
+                path: "/admin/organisations/:organisationId/:propertyId/settings",
                 props: true,
             },
             {
-                path: "/admin/:organisationId/guests",
-                name: "adminGuests",
-                meta: {
-                    requiresAuth: true,
-                    allowedRoles(permissionsStore) {
-                        return permissionsStore.canSeeGuestbook;
-                    },
-                },
-                props: true,
                 component: () => import("src/pages/Admin/PageAdminGuests.vue"),
-            },
-            {
-                path: "/admin/:organisationId/guests/:guestId",
-                name: "adminGuest",
                 meta: {
-                    requiresAuth: true,
                     allowedRoles(permissionsStore) {
                         return permissionsStore.canSeeGuestbook;
                     },
+                    requiresAuth: true,
                 },
+                name: "adminGuests",
+                path: "/admin/:organisationId/guests",
                 props: true,
+            },
+            {
                 component: () => import("src/pages/Admin/PageAdminGuest.vue"),
+                meta: {
+                    allowedRoles(permissionsStore) {
+                        return permissionsStore.canSeeGuestbook;
+                    },
+                    requiresAuth: true,
+                },
+                name: "adminGuest",
+                path: "/admin/:organisationId/guests/:guestId",
+                props: true,
             },
             {
-                path: "/admin/:organisationId/:propertyId/events",
-                name: "adminEvents",
-                meta: {
-                    requiresAuth: true,
-                    allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, AdminRole.ADMIN],
-                },
-                props: true,
                 component: () => import("src/pages/Admin/PageAdminEvents.vue"),
+                meta: {
+                    allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, AdminRole.ADMIN],
+                    requiresAuth: true,
+                },
+                name: "adminEvents",
+                path: "/admin/:organisationId/:propertyId/events",
+                props: true,
             },
             {
-                path: "/admin/events/:organisationId/:propertyId/:eventId",
-                name: "adminEvent",
-                meta: {
-                    requiresAuth: true,
-                    allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, AdminRole.ADMIN],
-                },
-                props: true,
                 component: () => import("src/pages/Admin/PageAdminEvent.vue"),
-            },
-            {
-                path: "/admin/:organisationId/users",
-                name: "adminUsers",
                 meta: {
-                    requiresAuth: true,
                     allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, AdminRole.ADMIN],
+                    requiresAuth: true,
                 },
+                name: "adminEvent",
+                path: "/admin/events/:organisationId/:propertyId/:eventId",
                 props: true,
-                component: () => import("src/pages/Admin/PageAdminUsers.vue"),
             },
             {
-                path: "/admin/:organisationId/:propertyId/floors",
-                name: "adminFloors",
+                component: () => import("src/pages/Admin/PageAdminUsers.vue"),
                 meta: {
+                    allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, AdminRole.ADMIN],
                     requiresAuth: true,
+                },
+                name: "adminUsers",
+                path: "/admin/:organisationId/users",
+                props: true,
+            },
+            {
+                component: () => import("src/pages/Admin/PageAdminFloors.vue"),
+                meta: {
                     allowedRoles(permissionsStore) {
                         return permissionsStore.canEditFloorPlans;
                     },
+                    requiresAuth: true,
                 },
+                name: "adminFloors",
+                path: "/admin/:organisationId/:propertyId/floors",
                 props: true,
-                component: () => import("src/pages/Admin/PageAdminFloors.vue"),
             },
             {
-                path: "/admin/floors/:organisationId/:propertyId/:floorId",
-                name: "adminFloorEdit",
-                meta: {
-                    requiresAuth: true,
-                    allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, AdminRole.ADMIN],
-                },
-                props: true,
                 component: () => import("src/pages/Admin/PageAdminFloorEdit.vue"),
-            },
-            {
-                path: "/admin/:organisationId/properties",
-                name: "adminProperties",
                 meta: {
+                    allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, AdminRole.ADMIN],
                     requiresAuth: true,
-                    allowedRoles: [Role.PROPERTY_OWNER, AdminRole.ADMIN],
                 },
+                name: "adminFloorEdit",
+                path: "/admin/floors/:organisationId/:propertyId/:floorId",
                 props: true,
-                component: () => import("src/pages/Admin/PageAdminProperties.vue"),
             },
             {
-                path: "/admin/:organisationId/:propertyId/analytics",
-                name: "adminAnalytics",
+                component: () => import("src/pages/Admin/PageAdminProperties.vue"),
                 meta: {
+                    allowedRoles: [Role.PROPERTY_OWNER, AdminRole.ADMIN],
                     requiresAuth: true,
+                },
+                name: "adminProperties",
+                path: "/admin/:organisationId/properties",
+                props: true,
+            },
+            {
+                component: () => import("src/pages/Admin/PageAdminAnalytics.vue"),
+                meta: {
                     allowedRoles(permissionsStore) {
                         return permissionsStore.canSeeAnalytics;
                     },
+                    requiresAuth: true,
                 },
+                name: "adminAnalytics",
+                path: "/admin/:organisationId/:propertyId/analytics",
                 props: true,
-                component: () => import("src/pages/Admin/PageAdminAnalytics.vue"),
             },
             {
-                path: "/issue-reports",
-                name: "adminIssueReports",
-                meta: {
-                    requiresAuth: true,
-                    allowedRoles: [AdminRole.ADMIN],
-                },
-                props: true,
                 component: () => import("src/pages/Admin/PageAdminIssueReports.vue"),
+                meta: {
+                    allowedRoles: [AdminRole.ADMIN],
+                    requiresAuth: true,
+                },
+                name: "adminIssueReports",
+                path: "/issue-reports",
+                props: true,
             },
             {
-                path: "/admin/:organisationId/:propertyId/drink-cards",
-                name: "adminPropertyDrinkCards",
+                component: () => import("src/pages/Admin/PageAdminPropertyDrinkCards.vue"),
                 meta: {
-                    requiresAuth: true,
                     allowedRoles(permissionsStore) {
                         return permissionsStore.canSeeInventory;
                     },
                     breadcrumb: "Drink Cards",
+                    requiresAuth: true,
                 },
+                name: "adminPropertyDrinkCards",
+                path: "/admin/:organisationId/:propertyId/drink-cards",
                 props: true,
-                component: () => import("src/pages/Admin/PageAdminPropertyDrinkCards.vue"),
             },
         ],
+        component: () => import("layouts/MainLayout.vue"),
+        path: "/",
     },
     {
-        path: "/admin/:organisationId/:propertyId/",
-        component: () => import("layouts/FloorEditorLayout.vue"),
-        meta: {
-            requiresAuth: true,
-            allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, AdminRole.ADMIN],
-        },
-        props: true,
         children: [
             {
-                path: "inventory",
-                name: "adminInventory",
+                component: () => import("src/pages/Admin/PageAdminInventory.vue"),
                 meta: {
-                    requiresAuth: true,
                     allowedRoles(permissionsStore) {
                         return permissionsStore.canSeeInventory;
                     },
+                    requiresAuth: true,
                 },
+                name: "adminInventory",
+                path: "inventory",
                 props: true,
-                component: () => import("src/pages/Admin/PageAdminInventory.vue"),
             },
             {
-                path: "floors/:floorId",
-                name: "adminFloorEdit",
                 component: () => import("src/pages/Admin/PageAdminFloorEdit.vue"),
+                name: "adminFloorEdit",
+                path: "floors/:floorId",
                 props: true,
             },
         ],
+        component: () => import("layouts/FloorEditorLayout.vue"),
+        meta: {
+            allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, AdminRole.ADMIN],
+            requiresAuth: true,
+        },
+        path: "/admin/:organisationId/:propertyId/",
+        props: true,
     },
     {
-        path: "/auth",
-        name: "auth",
-        meta: { requiresAuth: false },
         component: () => import("src/pages/PageAuth.vue"),
+        meta: { requiresAuth: false },
+        name: "auth",
+        path: "/auth",
     },
     {
-        path: "/:organisationId/:propertyId/drink-cards",
-        name: "publicDrinkCards",
+        component: () => import("src/pages/PagePublicDrinkCards.vue"),
         meta: {
             requiresAuth: false,
         },
+        name: "publicDrinkCards",
+        path: "/:organisationId/:propertyId/drink-cards",
         props: true,
-        component: () => import("src/pages/PagePublicDrinkCards.vue"),
     },
     // Always leave this as last one
     {
-        path: "/:catchAll(.*)*",
-        meta: { requiresAuth: false },
         component: () => import("src/pages/Error404.vue"),
+        meta: { requiresAuth: false },
+        path: "/:catchAll(.*)*",
     },
 ];

@@ -7,18 +7,19 @@ import type {
     UserCapabilities,
     UserCapability,
 } from "@firetable/types";
-import { computed, ref, useTemplateRef, watch } from "vue";
+
 import { DEFAULT_CAPABILITIES_BY_ROLE, Role } from "@firetable/types";
+import { property } from "es-toolkit/compat";
 import { QForm } from "quasar";
 import { noEmptyString, noWhiteSpaces } from "src/helpers/form-rules";
-import { property } from "es-toolkit/compat";
+import { computed, ref, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 export interface UserEditFormProps {
-    user: User;
+    organisation: OrganisationDoc;
     properties: PropertyDoc[];
     selectedProperties: PropertyDoc[];
-    organisation: OrganisationDoc;
+    user: User;
 }
 
 type Emits = (event: "submit", payload: Partial<User>) => void;
@@ -45,8 +46,8 @@ const isStaff = computed(function () {
 
 const form = ref<EditUserPayload["updatedUser"]>({
     ...props.user,
-    password: "",
     capabilities: isStaff.value ? getUserCapabilities() : undefined,
+    password: "",
 });
 const chosenProperties = ref<string[]>(props.selectedProperties.map(property("id")));
 
@@ -84,6 +85,15 @@ watch(
     },
 );
 
+function onReset(): void {
+    form.value = {
+        ...props.user,
+        capabilities: isStaff.value ? getUserCapabilities() : undefined,
+        password: "",
+    };
+    resetProperties();
+}
+
 async function onSubmit(): Promise<void> {
     if (await userEditForm.value?.validate()) {
         prepareAndEmitSubmission();
@@ -107,15 +117,6 @@ function prepareAndEmitSubmission(): void {
     }
 
     emit("submit", filteredForm);
-}
-
-function onReset(): void {
-    form.value = {
-        ...props.user,
-        password: "",
-        capabilities: isStaff.value ? getUserCapabilities() : undefined,
-    };
-    resetProperties();
 }
 
 function resetProperties(): void {

@@ -1,29 +1,49 @@
-import type { EventDoc, Reservation, ReservationDoc } from "@firetable/types";
 import type { EventOwner } from "@firetable/backend";
 import type { BaseTable } from "@firetable/floor-creator";
+import type { EventDoc, Reservation, ReservationDoc } from "@firetable/types";
+
 import { EventEmitter } from "@posva/event-emitter";
 
-interface BaseEventData {
+export interface TransferEventData {
     eventOwner: EventOwner;
+    fromFloor?: string;
+    fromTable: BaseTable;
+    targetReservation: ReservationDoc | undefined;
+    toFloor?: string;
+    toTable: BaseTable;
+}
+
+interface BaseEventData {
     event: EventDoc;
+    eventOwner: EventOwner;
 }
 
 interface BaseReservationEventData extends BaseEventData {
     reservation: ReservationDoc;
 }
 
-export interface TransferEventData {
-    fromTable: BaseTable;
-    toTable: BaseTable;
-    eventOwner: EventOwner;
-    fromFloor?: string;
-    toFloor?: string;
-    targetReservation: ReservationDoc | undefined;
-}
+type Events = {
+    "reservation:arrived": BaseReservationEventData;
+    "reservation:cancelled": BaseReservationEventData;
+    "reservation:copied": {
+        eventOwner: EventOwner;
+        sourceReservation: Reservation;
+        targetTable: BaseTable;
+    };
+    "reservation:created": BaseEventData & {
+        reservation: Reservation;
+    };
+    "reservation:deleted": BaseReservationEventData;
+    "reservation:deleted:soft": BaseReservationEventData;
+    "reservation:linked": LinkEventData;
+    "reservation:transferred": TransferEventData;
+    "reservation:unlinked": UnlinkEventData;
+    "reservation:updated": UpdateReservationEventData;
+};
 
 interface LinkEventData extends BaseEventData {
-    sourceReservation: ReservationDoc;
     linkedTableLabel: string;
+    sourceReservation: ReservationDoc;
 }
 
 interface UnlinkEventData extends BaseEventData {
@@ -32,27 +52,8 @@ interface UnlinkEventData extends BaseEventData {
 }
 
 interface UpdateReservationEventData extends BaseEventData {
-    reservation: ReservationDoc;
     oldReservation: ReservationDoc;
+    reservation: ReservationDoc;
 }
-
-type Events = {
-    "reservation:created": BaseEventData & {
-        reservation: Reservation;
-    };
-    "reservation:updated": UpdateReservationEventData;
-    "reservation:deleted": BaseReservationEventData;
-    "reservation:deleted:soft": BaseReservationEventData;
-    "reservation:copied": {
-        sourceReservation: Reservation;
-        targetTable: BaseTable;
-        eventOwner: EventOwner;
-    };
-    "reservation:transferred": TransferEventData;
-    "reservation:arrived": BaseReservationEventData;
-    "reservation:cancelled": BaseReservationEventData;
-    "reservation:linked": LinkEventData;
-    "reservation:unlinked": UnlinkEventData;
-};
 
 export const eventEmitter = new EventEmitter<Events>();

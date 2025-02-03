@@ -1,11 +1,14 @@
 import type { CallableRequest } from "firebase-functions/v2/https";
-import type { MoveReservationFromQueueReqPayload } from "./move-reservation-from-queue.js";
-import { moveReservationFromQueueFn } from "./move-reservation-from-queue.js";
-import { getQueuedReservationsPath, getReservationsPath } from "../../paths.js";
-import { db } from "../../init.js";
-import { HttpsError } from "firebase-functions/v2/https";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+
 import { Transaction } from "firebase-admin/firestore";
+import { HttpsError } from "firebase-functions/v2/https";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { MoveReservationFromQueueReqPayload } from "./move-reservation-from-queue.js";
+
+import { db } from "../../init.js";
+import { getQueuedReservationsPath, getReservationsPath } from "../../paths.js";
+import { moveReservationFromQueueFn } from "./move-reservation-from-queue.js";
 
 describe("moveReservationFromQueueFn", () => {
     beforeEach(() => {
@@ -17,12 +20,12 @@ describe("moveReservationFromQueueFn", () => {
             auth: null,
             data: {
                 eventOwner: {
+                    id: "event789",
                     organisationId: "org123",
                     propertyId: "prop456",
-                    id: "event789",
                 },
-                reservationId: "reservation1",
                 preparedPlannedReservation: {},
+                reservationId: "reservation1",
             },
             rawRequest: {},
         } as unknown as CallableRequest<MoveReservationFromQueueReqPayload>;
@@ -55,12 +58,12 @@ describe("moveReservationFromQueueFn", () => {
             auth: { uid: "user1" },
             data: {
                 eventOwner: {
+                    id: "event789",
                     organisationId: "org123",
                     propertyId: "prop456",
-                    id: "event789",
                 },
-                reservationId: "nonexistentReservation",
                 preparedPlannedReservation: {},
+                reservationId: "nonexistentReservation",
             },
             rawRequest: {},
         } as CallableRequest<MoveReservationFromQueueReqPayload>;
@@ -74,55 +77,55 @@ describe("moveReservationFromQueueFn", () => {
         const reservation = {
             arrived: false,
             cancelled: false,
-            reservationConfirmed: false,
-            waitingForResponse: false,
-            type: 1,
-            reservedBy: {
-                email: "foo@example.com",
-                name: "Foo",
-                id: "reservedBy1",
-            },
-            creator: {
-                id: "user1",
-                email: "creator@example.com",
-                name: "Creator",
-                createdAt: Date.now(),
-            },
-            guestName: "John Doe",
             consumption: 0,
+            creator: {
+                createdAt: Date.now(),
+                email: "creator@example.com",
+                id: "user1",
+                name: "Creator",
+            },
+            floorId: "floor1",
+            guestName: "John Doe",
             isVIP: false,
             numberOfGuests: 2,
-            time: "18:00",
-            floorId: "floor1",
-            tableLabel: "A1",
+            reservationConfirmed: false,
+            reservedBy: {
+                email: "foo@example.com",
+                id: "reservedBy1",
+                name: "Foo",
+            },
             status: 1,
+            tableLabel: "A1",
+            time: "18:00",
+            type: 1,
+            waitingForResponse: false,
         };
 
         const eventOwner = {
+            id: "event789",
             organisationId: "org123",
             propertyId: "prop456",
-            id: "event789",
         };
 
         const preparedPlannedReservation = {
-            guestName: "John Doe",
             consumption: 0,
+            creator: {
+                createdAt: reservation.creator.createdAt,
+                email: "creator@example.com",
+                id: "user1",
+                name: "Creator",
+            },
+            guestName: "John Doe",
             isVIP: false,
             numberOfGuests: 2,
-            time: "18:00",
             reservedBy: {
                 email: "foo@example.com",
-                name: "Foo",
                 id: "reservedBy1",
+                name: "Foo",
             },
-            creator: {
-                id: "user1",
-                email: "creator@example.com",
-                name: "Creator",
-                createdAt: reservation.creator.createdAt,
-            },
-            status: 1,
             savedAt: 123,
+            status: 1,
+            time: "18:00",
         };
 
         const req = {
@@ -130,8 +133,8 @@ describe("moveReservationFromQueueFn", () => {
             auth: { uid: "user1" },
             data: {
                 eventOwner,
-                reservationId: "reservation1",
                 preparedPlannedReservation,
+                reservationId: "reservation1",
             },
             rawRequest: {},
         } as unknown as CallableRequest<MoveReservationFromQueueReqPayload>;
@@ -147,9 +150,9 @@ describe("moveReservationFromQueueFn", () => {
         const response = await moveReservationFromQueueFn(req);
 
         expect(response).toEqual({
-            success: true,
             message: "Queued reservation moved from the queue successfully.",
             queuedReservationId: "reservation1",
+            success: true,
         });
 
         // Verify that the reservation is now in planned reservations
@@ -162,24 +165,24 @@ describe("moveReservationFromQueueFn", () => {
         const queuedReservationData = queuedReservationSnapshot.data();
 
         expect(queuedReservationData).toMatchObject({
-            guestName: "John Doe",
             consumption: 0,
+            creator: {
+                createdAt: reservation.creator.createdAt,
+                email: "creator@example.com",
+                id: "user1",
+                name: "Creator",
+            },
+            guestName: "John Doe",
             isVIP: false,
             numberOfGuests: 2,
-            time: "18:00",
             reservedBy: {
                 email: "foo@example.com",
-                name: "Foo",
                 id: "reservedBy1",
+                name: "Foo",
             },
-            creator: {
-                id: "user1",
-                email: "creator@example.com",
-                name: "Creator",
-                createdAt: reservation.creator.createdAt,
-            },
-            status: 1,
             savedAt: expect.any(Number),
+            status: 1,
+            time: "18:00",
         });
 
         // Verify that the reservation is deleted from reservations
@@ -191,55 +194,55 @@ describe("moveReservationFromQueueFn", () => {
         const reservation = {
             arrived: false,
             cancelled: false,
-            reservationConfirmed: false,
-            waitingForResponse: false,
-            type: 1,
-            reservedBy: {
-                email: "foo@example.com",
-                name: "Foo",
-                id: "reservedBy1",
-            },
-            creator: {
-                id: "user1",
-                email: "creator@example.com",
-                name: "Creator",
-                createdAt: Date.now(),
-            },
-            guestName: "John Doe",
             consumption: 0,
+            creator: {
+                createdAt: Date.now(),
+                email: "creator@example.com",
+                id: "user1",
+                name: "Creator",
+            },
+            floorId: "floor1",
+            guestName: "John Doe",
             isVIP: false,
             numberOfGuests: 2,
-            time: "18:00",
-            floorId: "floor1",
-            tableLabel: "A1",
+            reservationConfirmed: false,
+            reservedBy: {
+                email: "foo@example.com",
+                id: "reservedBy1",
+                name: "Foo",
+            },
             status: 1,
+            tableLabel: "A1",
+            time: "18:00",
+            type: 1,
+            waitingForResponse: false,
         };
 
         const eventOwner = {
+            id: "event789",
             organisationId: "org123",
             propertyId: "prop456",
-            id: "event789",
         };
 
         const preparedPlannedReservation = {
-            guestName: "John Doe",
             consumption: 0,
-            isVIP: false,
-            numberOfGuests: 2,
-            time: "18:00",
-            reservedBy: {
-                email: "foo@example.com",
-                name: "Foo",
-                id: "reservedBy1",
-            },
             creator: {
-                id: "user1",
-                email: "creator@example.com",
-                name: "Creator",
                 createdAt: reservation.creator.createdAt,
+                email: "creator@example.com",
+                id: "user1",
+                name: "Creator",
             },
             date: 123,
+            guestName: "John Doe",
+            isVIP: false,
+            numberOfGuests: 2,
+            reservedBy: {
+                email: "foo@example.com",
+                id: "reservedBy1",
+                name: "Foo",
+            },
             status: 1,
+            time: "18:00",
         };
 
         const req = {
@@ -247,8 +250,8 @@ describe("moveReservationFromQueueFn", () => {
             auth: { uid: "user1" },
             data: {
                 eventOwner,
-                reservationId: "reservation1",
                 preparedPlannedReservation,
+                reservationId: "reservation1",
             },
             rawRequest: {},
         } as unknown as CallableRequest<MoveReservationFromQueueReqPayload>;

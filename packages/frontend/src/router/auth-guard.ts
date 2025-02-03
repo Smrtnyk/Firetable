@@ -1,39 +1,24 @@
-import type { RouteLocationNormalized, RouteLocationRaw } from "vue-router";
 import type { useAuthStore } from "src/stores/auth-store";
 import type { usePermissionsStore } from "src/stores/permissions-store";
-import { getCurrentUser } from "vuefire";
+import type { RouteLocationNormalized, RouteLocationRaw } from "vue-router";
+
 import { isFunction } from "es-toolkit";
-import { AppLogger } from "src/logger/FTLogger";
 import { Loading } from "quasar";
-import { refreshApp } from "src/helpers/utils";
 import { showErrorMessage } from "src/helpers/ui-helpers";
+import { refreshApp } from "src/helpers/utils";
+import { AppLogger } from "src/logger/FTLogger";
+import { getCurrentUser } from "vuefire";
+
+interface NavigationError extends Error {
+    original?: unknown;
+    type: NavigationErrorType;
+}
 
 type NavigationErrorType = "TIMEOUT" | "UNKNOWN";
 
-interface NavigationError extends Error {
-    type: NavigationErrorType;
-    original?: unknown;
-}
-
 const NAVIGATION_TIMEOUT = 10_000;
 
-function createNavigationError(error: unknown): NavigationError {
-    const navigationError: NavigationError = {
-        type: "UNKNOWN",
-        message: "Navigation failed",
-        name: "NavigationError",
-    };
-
-    if (error instanceof Error && error.message.includes("timeout")) {
-        navigationError.type = "TIMEOUT";
-        navigationError.message = "Navigation timeout";
-    }
-
-    navigationError.original = error;
-    return navigationError;
-}
-
-export type AuthGuard = (to: RouteLocationNormalized) => Promise<RouteLocationRaw | boolean>;
+export type AuthGuard = (to: RouteLocationNormalized) => Promise<boolean | RouteLocationRaw>;
 
 /**
  * Set up the router to be intercepted on each route.
@@ -89,10 +74,10 @@ export function createAuthGuard(
 
     return async function authGuard(
         to: RouteLocationNormalized,
-    ): Promise<RouteLocationRaw | boolean> {
+    ): Promise<boolean | RouteLocationRaw> {
         Loading.show({
-            message: "Loading...",
             delay: 200,
+            message: "Loading...",
         });
 
         try {
@@ -102,7 +87,7 @@ export function createAuthGuard(
                 }, NAVIGATION_TIMEOUT);
             });
 
-            let navigationResult: RouteLocationRaw | boolean = false;
+            let navigationResult: boolean | RouteLocationRaw = false;
 
             await Promise.race([
                 (async function () {
@@ -111,10 +96,10 @@ export function createAuthGuard(
 
                     if (import.meta.env.DEV) {
                         AppLogger.info("[Auth Guard]", {
-                            path: to.path,
-                            isReady,
-                            requiresAuth,
                             allowedRoles: to.meta.allowedRoles,
+                            isReady,
+                            path: to.path,
+                            requiresAuth,
                         });
                     }
 
@@ -160,4 +145,20 @@ export function createAuthGuard(
             Loading.hide();
         }
     };
+}
+
+function createNavigationError(error: unknown): NavigationError {
+    const navigationError: NavigationError = {
+        message: "Navigation failed",
+        name: "NavigationError",
+        type: "UNKNOWN",
+    };
+
+    if (error instanceof Error && error.message.includes("timeout")) {
+        navigationError.type = "TIMEOUT";
+        navigationError.message = "Navigation timeout";
+    }
+
+    navigationError.original = error;
+    return navigationError;
 }

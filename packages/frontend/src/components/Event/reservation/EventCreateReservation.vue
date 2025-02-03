@@ -2,27 +2,26 @@
 import type { AppUser, Reservation, ReservationDoc, User } from "@firetable/types";
 
 import { ReservationType } from "@firetable/types";
-import { computed, ref, watch, useTemplateRef } from "vue";
-import { useI18n } from "vue-i18n";
-
 import PlannedReservationForm from "src/components/Event/reservation/PlannedReservationForm.vue";
 import WalkInReservationForm from "src/components/Event/reservation/WalkInReservationForm.vue";
+import { computed, ref, useTemplateRef, watch } from "vue";
+import { useI18n } from "vue-i18n";
 
 export interface EventCreateReservationProps {
     currentUser: AppUser;
-    users: User[];
-    mode: "create" | "update";
-    eventStartTimestamp: number;
-    /**
-     *  Optional data for editing
-     */
-    reservationData?: ReservationDoc | undefined;
     eventDurationInHours: number;
+    eventStartTimestamp: number;
+    mode: "create" | "update";
     /**
      *  If true, only the Planned Reservation Form is shown
      */
     onlyPlanned?: boolean;
+    /**
+     *  Optional data for editing
+     */
+    reservationData?: ReservationDoc | undefined;
     timezone: string;
+    users: User[];
 }
 
 const props = defineProps<EventCreateReservationProps>();
@@ -97,10 +96,10 @@ async function onOKClick(): Promise<void> {
     const valueToEmit = {
         ...currentlyActiveRef.value.state,
         creator: {
-            name: props.currentUser.name,
+            createdAt: Date.now(),
             email: props.currentUser.email,
             id: props.currentUser.id,
-            createdAt: Date.now(),
+            name: props.currentUser.name,
         },
     };
 

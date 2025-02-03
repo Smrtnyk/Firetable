@@ -1,5 +1,6 @@
-import { storage } from "../../init.js";
 import { logger } from "firebase-functions";
+
+import { storage } from "../../init.js";
 
 export async function deletePropertyImage(
     organisationId: string,

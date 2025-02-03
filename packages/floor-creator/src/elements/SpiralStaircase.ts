@@ -1,5 +1,6 @@
-import { ELEMENT_DEFAULT_FILL_COLOR, ELEMENT_DEFAULT_STROKE_COLOR } from "../constants.js";
 import { Group, Path } from "fabric";
+
+import { ELEMENT_DEFAULT_FILL_COLOR, ELEMENT_DEFAULT_STROKE_COLOR } from "../constants.js";
 
 export class SpiralStaircase extends Group {
     constructor(top: number, left: number) {
@@ -49,10 +50,10 @@ export class SpiralStaircase extends Group {
 
         // Group all the steps together
         super(staircaseComponents, {
+            left,
             originX: "center",
             originY: "center",
             top,
-            left,
         });
     }
 

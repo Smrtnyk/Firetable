@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import type { DrinkCardDoc } from "@firetable/types";
+
 import { isCustomDrinkCard } from "@firetable/types";
 import { useI18n } from "vue-i18n";
+
+type Emits = (event: "delete" | "edit", card: DrinkCardDoc) => void;
 
 interface Props {
     cards: DrinkCardDoc[];
     loading?: boolean;
 }
-
-type Emits = (event: "delete" | "edit", card: DrinkCardDoc) => void;
 
 const { cards, loading = false } = defineProps<Props>();
 const emit = defineEmits<Emits>();

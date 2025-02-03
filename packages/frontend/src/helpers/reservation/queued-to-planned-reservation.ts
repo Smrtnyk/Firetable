@@ -1,4 +1,5 @@
 import type { PlannedReservation, QueuedReservation } from "@firetable/types";
+
 import { ReservationState, ReservationType } from "@firetable/types";
 
 export function queuedToPlannedReservation(
@@ -8,13 +9,13 @@ export function queuedToPlannedReservation(
 ): PlannedReservation {
     return {
         ...queuedReservation,
-        floorId,
-        tableLabel,
-        type: ReservationType.PLANNED,
         arrived: false,
         cancelled: false,
+        floorId,
         reservationConfirmed: false,
-        waitingForResponse: false,
         state: ReservationState.PENDING,
+        tableLabel,
+        type: ReservationType.PLANNED,
+        waitingForResponse: false,
     };
 }

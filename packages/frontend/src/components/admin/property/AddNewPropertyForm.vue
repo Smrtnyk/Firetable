@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import type { CreatePropertyPayload, PropertyDoc, UpdatePropertyPayload } from "@firetable/types";
-import { ref, watch, useTemplateRef, computed } from "vue";
-import { minLength, validOptionalURL } from "src/helpers/form-rules";
-import { QForm } from "quasar";
-import { useI18n } from "vue-i18n";
-import { showErrorMessage } from "src/helpers/ui-helpers";
-import { processImage } from "src/helpers/process-image";
-import { isString } from "es-toolkit";
-import FTBtn from "src/components/FTBtn.vue";
 
-interface Props {
-    organisationId: string;
-    propertyDoc?: PropertyDoc | undefined;
+import { isString } from "es-toolkit";
+import { QForm } from "quasar";
+import FTBtn from "src/components/FTBtn.vue";
+import { minLength, validOptionalURL } from "src/helpers/form-rules";
+import { processImage } from "src/helpers/process-image";
+import { showErrorMessage } from "src/helpers/ui-helpers";
+import { computed, ref, useTemplateRef, watch } from "vue";
+import { useI18n } from "vue-i18n";
+
+const enum InputMethod {
+    FILE = "file",
+    URL = "url",
 }
 
 interface Emits {
@@ -19,9 +20,9 @@ interface Emits {
     (eventName: "update", payload: UpdatePropertyPayload): void;
 }
 
-const enum InputMethod {
-    FILE = "file",
-    URL = "url",
+interface Props {
+    organisationId: string;
+    propertyDoc?: PropertyDoc | undefined;
 }
 
 const props = defineProps<Props>();
@@ -30,9 +31,9 @@ const { t } = useI18n();
 const inputMethod = ref<InputMethod>(InputMethod.FILE);
 
 const form = ref<CreatePropertyPayload>({
+    img: "",
     name: "",
     organisationId: props.organisationId,
-    img: "",
 });
 const imageUrl = computed({
     get() {
@@ -47,12 +48,12 @@ const fileInput = ref<HTMLInputElement>();
 const showUrlInput = ref(false);
 
 const imageProcessingOptions = {
-    maxWidth: 300,
-    maxHeight: 300,
-    quality: 0.9,
-    maxFileSize: 100 * 1024,
     acceptedTypes: ["image/png", "image/jpeg", "image/svg+xml"],
+    maxFileSize: 100 * 1024,
+    maxHeight: 300,
+    maxWidth: 300,
     preserveTransparency: true,
+    quality: 0.9,
 };
 
 const propertyRules = [minLength(t("AddNewPropertyForm.propertyNameLengthValidationMessage"), 3)];
@@ -66,15 +67,24 @@ watch(
         }
 
         form.value = {
-            name: newVal.name,
-            organisationId: props.organisationId,
             // This will be a URL string for existing properties
             img: newVal.img ?? "",
+            name: newVal.name,
+            organisationId: props.organisationId,
         };
         showUrlInput.value = Boolean(newVal.img);
     },
     { immediate: true },
 );
+
+function handleFileDrop(event: DragEvent): void {
+    event.preventDefault();
+    const files = event.dataTransfer?.files;
+    if (files && files.length > 0) {
+        const file = files[0];
+        processDroppedFile(file);
+    }
+}
 
 async function handleImageUpload(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
@@ -98,24 +108,6 @@ async function handleImageUpload(event: Event): Promise<void> {
     }
 }
 
-function removeImage(): void {
-    form.value.img = "";
-    showUrlInput.value = false;
-}
-
-function triggerFileInput(): void {
-    fileInput.value?.click();
-}
-
-function handleFileDrop(event: DragEvent): void {
-    event.preventDefault();
-    const files = event.dataTransfer?.files;
-    if (files && files.length > 0) {
-        const file = files[0];
-        processDroppedFile(file);
-    }
-}
-
 async function processDroppedFile(file: File): Promise<void> {
     try {
         const processedImage = await processImage(file, imageProcessingOptions);
@@ -126,6 +118,11 @@ async function processDroppedFile(file: File): Promise<void> {
     } catch (error) {
         showErrorMessage("Error processing image. Please try another file.");
     }
+}
+
+function removeImage(): void {
+    form.value.img = "";
+    showUrlInput.value = false;
 }
 
 async function submit(): Promise<void> {
@@ -141,6 +138,10 @@ async function submit(): Promise<void> {
     } else {
         emit("create", form.value);
     }
+}
+
+function triggerFileInput(): void {
+    fileInput.value?.click();
 }
 </script>
 

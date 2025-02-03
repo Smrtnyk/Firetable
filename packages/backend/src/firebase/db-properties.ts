@@ -6,10 +6,12 @@ import type {
     UpdatePropertyPayload,
 } from "@firetable/types";
 import type { HttpsCallableResult } from "firebase/functions";
-import { propertiesCollection, propertyDoc } from "./db.js";
-import { initializeFirebase } from "./base.js";
+
 import { deleteDoc, getDocs, updateDoc } from "firebase/firestore";
 import { httpsCallable } from "firebase/functions";
+
+import { initializeFirebase } from "./base.js";
+import { propertiesCollection, propertyDoc } from "./db.js";
 
 export function createNewProperty(
     propertyPayload: CreatePropertyPayload,
@@ -19,24 +21,6 @@ export function createNewProperty(
         functions,
         "createProperty",
     )(propertyPayload);
-}
-
-export function updateProperty(
-    propertyPayload: UpdatePropertyPayload,
-): Promise<HttpsCallableResult> {
-    const { functions } = initializeFirebase();
-    return httpsCallable<UpdatePropertyPayload, unknown>(
-        functions,
-        "updateProperty",
-    )(propertyPayload);
-}
-
-export async function updatePropertySettings(
-    organisationId: string,
-    propertyId: string,
-    settings: PropertySettings,
-): Promise<void> {
-    await updateDoc(propertyDoc(propertyId, organisationId), { settings });
 }
 
 export function deleteProperty(property: PropertyDoc): Promise<void> {
@@ -57,4 +41,22 @@ export async function fetchPropertiesForAdmin(
             return { ...doc.data(), id: doc.id } as PropertyDoc;
         });
     });
+}
+
+export function updateProperty(
+    propertyPayload: UpdatePropertyPayload,
+): Promise<HttpsCallableResult> {
+    const { functions } = initializeFirebase();
+    return httpsCallable<UpdatePropertyPayload, unknown>(
+        functions,
+        "updateProperty",
+    )(propertyPayload);
+}
+
+export async function updatePropertySettings(
+    organisationId: string,
+    propertyId: string,
+    settings: PropertySettings,
+): Promise<void> {
+    await updateDoc(propertyDoc(propertyId, organisationId), { settings });
 }

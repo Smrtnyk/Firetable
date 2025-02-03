@@ -1,5 +1,6 @@
 import type { FloorDoc } from "@firetable/types";
 import type { Ref } from "vue";
+
 import { floorsCollection } from "@firetable/backend";
 import { where } from "firebase/firestore";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";

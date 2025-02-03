@@ -1,10 +1,11 @@
 import type { ReservationDoc } from "@firetable/types";
 import type { Ref } from "vue";
-import { useI18n } from "vue-i18n";
-import { ReservationState, isPlannedReservation } from "@firetable/types";
+
+import { isPlannedReservation, ReservationState } from "@firetable/types";
 import { useAuthStore } from "src/stores/auth-store";
-import { computed } from "vue";
 import { usePermissionsStore } from "src/stores/permissions-store";
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- pretty verbose
 export function useReservationPermissions(reservation: Ref<ReservationDoc>) {
@@ -14,21 +15,21 @@ export function useReservationPermissions(reservation: Ref<ReservationDoc>) {
     const { t } = useI18n();
 
     const reservationStateWithTranslationMap = {
-        [ReservationState.PENDING]: {
-            value: ReservationState.PENDING,
-            label: t("EventShowReservation.pendingLabel"),
+        [ReservationState.ARRIVED]: {
+            label: t("EventShowReservation.reservationGuestArrivedLabel"),
+            value: ReservationState.ARRIVED,
         },
         [ReservationState.CONFIRMED]: {
-            value: ReservationState.CONFIRMED,
             label: t("EventShowReservation.reservationConfirmedLabel"),
+            value: ReservationState.CONFIRMED,
         },
-        [ReservationState.ARRIVED]: {
-            value: ReservationState.ARRIVED,
-            label: t("EventShowReservation.reservationGuestArrivedLabel"),
+        [ReservationState.PENDING]: {
+            label: t("EventShowReservation.pendingLabel"),
+            value: ReservationState.PENDING,
         },
         [ReservationState.WAITING_FOR_RESPONSE]: {
-            value: ReservationState.WAITING_FOR_RESPONSE,
             label: t("EventShowReservation.waitingForResponse"),
+            value: ReservationState.WAITING_FOR_RESPONSE,
         },
     } as const;
 
@@ -103,14 +104,14 @@ export function useReservationPermissions(reservation: Ref<ReservationDoc>) {
     });
 
     return {
-        reservationStateWithTranslationMap,
-        reservationMappedState,
-        isLinkedReservation,
-        isGuestArrived,
-        isCancelled,
         canCancel,
-        canMoveToQueue,
-        canEditReservation,
         canDeleteReservation,
+        canEditReservation,
+        canMoveToQueue,
+        isCancelled,
+        isGuestArrived,
+        isLinkedReservation,
+        reservationMappedState,
+        reservationStateWithTranslationMap,
     };
 }

@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import type { CreateOrganisationPayload } from "@firetable/backend";
 import type { Link } from "src/types";
-import FTTitle from "src/components/FTTitle.vue";
-import FTDialog from "src/components/FTDialog.vue";
-import AddNewOrganisationForm from "src/components/admin/organisation/AddNewOrganisationForm.vue";
-import FTCenteredText from "src/components/FTCenteredText.vue";
-import FTBtn from "src/components/FTBtn.vue";
 
-import { useQuasar } from "quasar";
-import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { createNewOrganisation } from "@firetable/backend";
+import { storeToRefs } from "pinia";
+import { useQuasar } from "quasar";
+import AddNewOrganisationForm from "src/components/admin/organisation/AddNewOrganisationForm.vue";
+import FTBtn from "src/components/FTBtn.vue";
+import FTCenteredText from "src/components/FTCenteredText.vue";
+import FTDialog from "src/components/FTDialog.vue";
+import FTTitle from "src/components/FTTitle.vue";
+import { useDialog } from "src/composables/useDialog";
+import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { usePropertiesStore } from "src/stores/properties-store";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { storeToRefs } from "pinia";
-import { usePropertiesStore } from "src/stores/properties-store";
-import { useDialog } from "src/composables/useDialog";
 
 const { t } = useI18n();
 const quasar = useQuasar();
@@ -27,44 +27,32 @@ function createLinks(organisationId: string): Link[] {
     const params = { organisationId };
     return [
         {
-            label: t("AppDrawer.links.manageUsers"),
             icon: "users",
+            label: t("AppDrawer.links.manageUsers"),
             route: { name: "adminUsers", params },
         },
         {
-            label: t("AppDrawer.links.manageGuests"),
             icon: "users",
+            label: t("AppDrawer.links.manageGuests"),
             route: { name: "adminGuests", params },
         },
         {
-            label: t("AppDrawer.links.manageProperties"),
             icon: "home",
+            label: t("AppDrawer.links.manageProperties"),
             route: { name: "adminProperties", params },
         },
         {
-            label: "Go to Organisation Page",
             icon: "link",
+            label: "Go to Organisation Page",
             route: { name: "adminOrganisation", params },
         },
     ];
-}
-
-async function onOrganisationCreate(organisationPayload: CreateOrganisationPayload): Promise<void> {
-    await tryCatchLoadingWrapper({
-        async hook() {
-            await createNewOrganisation(organisationPayload);
-            quasar.notify("organisation created!");
-            return propertiesStore.initOrganisations();
-        },
-    });
 }
 
 function createOrganisation(): void {
     const dialog = createDialog({
         component: FTDialog,
         componentProps: {
-            title: "Add new Organisation",
-            maximized: false,
             component: AddNewOrganisationForm,
             componentPropsObject: {},
             listeners: {
@@ -73,6 +61,18 @@ function createOrganisation(): void {
                     dialog.hide();
                 },
             },
+            maximized: false,
+            title: "Add new Organisation",
+        },
+    });
+}
+
+async function onOrganisationCreate(organisationPayload: CreateOrganisationPayload): Promise<void> {
+    await tryCatchLoadingWrapper({
+        async hook() {
+            await createNewOrganisation(organisationPayload);
+            quasar.notify("organisation created!");
+            return propertiesStore.initOrganisations();
         },
     });
 }

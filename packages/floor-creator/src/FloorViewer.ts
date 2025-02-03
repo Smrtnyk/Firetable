@@ -1,9 +1,12 @@
 import type { FabricObject } from "fabric";
-import type { FloorCreationOptions, FloorEditorElement, ToTuple } from "./types.js";
-import { Floor } from "./Floor.js";
-import { ViewerEventManager } from "./event-manager/ViewerEventManager.js";
-import { isTable } from "./type-guards.js";
+
 import { EventEmitter } from "@posva/event-emitter";
+
+import type { FloorCreationOptions, FloorEditorElement, ToTuple } from "./types.js";
+
+import { ViewerEventManager } from "./event-manager/ViewerEventManager.js";
+import { Floor } from "./Floor.js";
+import { isTable } from "./type-guards.js";
 
 type FloorViewerEvents = {
     elementClicked: [FloorViewer, FloorEditorElement];
@@ -22,18 +25,21 @@ export class FloorViewer extends Floor {
         this.canvas.defaultCursor = "default";
     }
 
+    /**
+     * This can throw so it should be called in a try/catch block
+     */
+    async destroy(): Promise<void> {
+        this.eventManager.destroy();
+        this.zoomManager.destroy();
+        this.touchManager.destroy();
+        await this.canvas.dispose();
+    }
+
     emit<T extends keyof FloorViewerEvents>(
         event: T,
         ...args: ToTuple<FloorViewerEvents[T]>
     ): void {
         this.eventEmitter.emit(event, ...args);
-    }
-
-    on<T extends keyof FloorViewerEvents>(
-        event: T,
-        listener: (...args: ToTuple<FloorViewerEvents[T]>) => void,
-    ): void {
-        this.eventEmitter.on(event, listener);
     }
 
     off<T extends keyof FloorViewerEvents>(
@@ -43,18 +49,15 @@ export class FloorViewer extends Floor {
         this.eventEmitter.off(event, listener);
     }
 
-    onFloorDoubleTap(): void {
-        /* empty for now */
+    on<T extends keyof FloorViewerEvents>(
+        event: T,
+        listener: (...args: ToTuple<FloorViewerEvents[T]>) => void,
+    ): void {
+        this.eventEmitter.on(event, listener);
     }
 
-    /**
-     * This can throw so it should be called in a try/catch block
-     */
-    async destroy(): Promise<void> {
-        this.eventManager.destroy();
-        this.zoomManager.destroy();
-        this.touchManager.destroy();
-        await this.canvas.dispose();
+    onFloorDoubleTap(): void {
+        /* empty for now */
     }
 
     protected onElementClick = (obj: FabricObject): void => {

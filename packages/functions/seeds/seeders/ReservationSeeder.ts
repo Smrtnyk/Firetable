@@ -6,19 +6,21 @@ import type {
     WalkInReservation,
     WalkInReservationDoc,
 } from "@shared-types/index.js";
-import { BaseSeeder } from "./BaseSeeder.js";
-import { db } from "../init.js";
-import { decompressJson, extractTableLabels, generateFirestoreId } from "../utils.js";
-import { DataGenerator } from "../DataGenerator.js";
-import { logger } from "../logger.js";
-import { getEventPath, getReservationsPath } from "../../src/paths.js";
+
+import { faker } from "@faker-js/faker";
 import {
+    Collection,
     ReservationState,
     ReservationStatus,
     ReservationType,
-    Collection,
 } from "@shared-types/index.js";
-import { faker } from "@faker-js/faker";
+
+import { getEventPath, getReservationsPath } from "../../src/paths.js";
+import { DataGenerator } from "../DataGenerator.js";
+import { db } from "../init.js";
+import { logger } from "../logger.js";
+import { decompressJson, extractTableLabels, generateFirestoreId } from "../utils.js";
+import { BaseSeeder } from "./BaseSeeder.js";
 
 export class ReservationSeeder extends BaseSeeder {
     async seedForEvents(events: Omit<EventDoc, "_doc">[], users: User[]): Promise<void> {
@@ -47,8 +49,8 @@ export class ReservationSeeder extends BaseSeeder {
                 const maxReservations = floorTableLabels.length;
 
                 totalReservations += faker.number.int({
-                    min: minReservations,
                     max: maxReservations,
+                    min: minReservations,
                 });
             }
         }
@@ -80,8 +82,8 @@ export class ReservationSeeder extends BaseSeeder {
                 const minReservations = Math.ceil(shuffledLabels.length * 0.3);
                 const maxReservations = shuffledLabels.length;
                 const reservationCount = faker.number.int({
-                    min: minReservations,
                     max: maxReservations,
+                    min: minReservations,
                 });
 
                 const usedTableLabels = shuffledLabels.slice(0, reservationCount);
@@ -90,7 +92,7 @@ export class ReservationSeeder extends BaseSeeder {
                     const randomCreator = faker.helpers.arrayElement(users);
                     const randomReservedBy = faker.helpers.arrayElement(users);
 
-                    if (faker.number.int({ min: 1, max: 100 }) <= 70) {
+                    if (faker.number.int({ max: 100, min: 1 }) <= 70) {
                         // 70% chance of planned
                         allReservations.push(
                             this.generatePlannedReservation(
@@ -123,11 +125,11 @@ export class ReservationSeeder extends BaseSeeder {
         }
 
         logger.stats({
-            "Total Reservations": totalReservations,
-            "Planned Reservations": totalPlanned,
-            "Walk-in Reservations": totalWalkIn,
-            "Tables Used": totalTablesUsed,
             "Floors With Reservations": totalFloorsWithReservations,
+            "Planned Reservations": totalPlanned,
+            "Tables Used": totalTablesUsed,
+            "Total Reservations": totalReservations,
+            "Walk-in Reservations": totalWalkIn,
         });
     }
 
@@ -138,7 +140,7 @@ export class ReservationSeeder extends BaseSeeder {
         reservedByUser: User,
     ): PlannedReservationDoc {
         const isVIP = faker.datatype.boolean();
-        const hasContact = faker.number.int({ min: 1, max: 100 }) <= 20;
+        const hasContact = faker.number.int({ max: 100, min: 1 }) <= 20;
         const randomState = faker.helpers.arrayElement([
             ReservationState.PENDING,
             ReservationState.CONFIRMED,
@@ -147,37 +149,37 @@ export class ReservationSeeder extends BaseSeeder {
         const flags = this.getReservationFlags(randomState);
 
         return {
-            id: generateFirestoreId(),
+            creator: {
+                createdAt: faker.date.recent().getTime(),
+                email: creatorUser.email,
+                id: creatorUser.id,
+                name: creatorUser.name,
+            },
             floorId,
-            tableLabel,
             guestContact: hasContact ? DataGenerator.generatePhoneNumber() : "",
-            numberOfGuests: faker.number.int({ min: 1, max: 10 }),
+            id: generateFirestoreId(),
+            numberOfGuests: faker.number.int({ max: 10, min: 1 }),
             reservationNote:
                 faker.helpers.maybe(() => faker.lorem.sentence(), {
                     probability: 0.3,
                 }) ?? "",
-            time: faker.helpers.arrayElement(["20:00", "21:00", "22:00", "23:00"]),
-            creator: {
-                id: creatorUser.id,
-                name: creatorUser.name,
-                email: creatorUser.email,
-                createdAt: faker.date.recent().getTime(),
-            },
-            status: ReservationStatus.ACTIVE,
             state: randomState,
+            status: ReservationStatus.ACTIVE,
+            tableLabel,
+            time: faker.helpers.arrayElement(["20:00", "21:00", "22:00", "23:00"]),
             ...flags,
-            type: ReservationType.PLANNED,
             cancelled: false,
             consumption: isVIP
-                ? faker.number.int({ min: 500, max: 2000 })
-                : faker.number.int({ min: 50, max: 500 }),
+                ? faker.number.int({ max: 2000, min: 500 })
+                : faker.number.int({ max: 500, min: 50 }),
             guestName: faker.person.fullName(),
+            isVIP,
             reservedBy: {
+                email: reservedByUser.email,
                 id: reservedByUser.id,
                 name: reservedByUser.name,
-                email: reservedByUser.email,
             },
-            isVIP,
+            type: ReservationType.PLANNED,
         };
     }
 
@@ -187,60 +189,60 @@ export class ReservationSeeder extends BaseSeeder {
         creatorUser: User,
     ): WalkInReservationDoc {
         const isVIP = faker.datatype.boolean();
-        const hasContact = faker.number.int({ min: 1, max: 100 }) <= 20;
+        const hasContact = faker.number.int({ max: 100, min: 1 }) <= 20;
 
         return {
-            id: generateFirestoreId(),
+            arrived: true,
+            consumption: isVIP
+                ? faker.number.int({ max: 2000, min: 500 })
+                : faker.number.int({ max: 500, min: 50 }),
+            creator: {
+                createdAt: faker.date.recent().getTime(),
+                email: creatorUser.email,
+                id: creatorUser.id,
+                name: creatorUser.name,
+            },
             floorId,
-            tableLabel,
             guestContact: hasContact ? DataGenerator.generatePhoneNumber() : "",
-            numberOfGuests: faker.number.int({ min: 1, max: 10 }),
+            guestName: faker.person.fullName(),
+            id: generateFirestoreId(),
+            isVIP,
+            numberOfGuests: faker.number.int({ max: 10, min: 1 }),
             reservationNote:
                 faker.helpers.maybe(() => faker.lorem.sentence(), {
                     probability: 0.3,
                 }) ?? "",
-            time: faker.helpers.arrayElement(["20:00", "21:00", "22:00", "23:00"]),
-            creator: {
-                id: creatorUser.id,
-                name: creatorUser.name,
-                email: creatorUser.email,
-                createdAt: faker.date.recent().getTime(),
-            },
-            status: ReservationStatus.ACTIVE,
             state: ReservationState.ARRIVED,
+            status: ReservationStatus.ACTIVE,
+            tableLabel,
+            time: faker.helpers.arrayElement(["20:00", "21:00", "22:00", "23:00"]),
             type: ReservationType.WALK_IN,
-            guestName: faker.person.fullName(),
-            consumption: isVIP
-                ? faker.number.int({ min: 500, max: 2000 })
-                : faker.number.int({ min: 50, max: 500 }),
-            arrived: true,
-            isVIP,
         };
     }
 
     private getReservationFlags(state: ReservationState): {
-        reservationConfirmed: boolean;
         arrived: boolean;
+        reservationConfirmed: boolean;
         waitingForResponse: boolean;
     } {
         switch (state) {
-            case ReservationState.PENDING:
+            case ReservationState.ARRIVED:
                 return {
+                    arrived: true,
                     reservationConfirmed: false,
-                    arrived: false,
-                    waitingForResponse: true,
+                    waitingForResponse: false,
                 };
             case ReservationState.CONFIRMED:
                 return {
-                    reservationConfirmed: true,
                     arrived: false,
+                    reservationConfirmed: true,
                     waitingForResponse: false,
                 };
-            case ReservationState.ARRIVED:
+            case ReservationState.PENDING:
                 return {
+                    arrived: false,
                     reservationConfirmed: false,
-                    arrived: true,
-                    waitingForResponse: false,
+                    waitingForResponse: true,
                 };
         }
         throw new Error("Invalid reservation state");

@@ -1,10 +1,11 @@
+import { describe, expect, it } from "vitest";
+
 import {
     createUTCTimestamp,
     dateFromTimestamp,
     formatEventDate,
     hourFromTimestamp,
 } from "./date-utils";
-import { it, describe, expect } from "vitest";
 
 const DEFAULT_LOCALE = "en-GB";
 const DEFAULT_TIMEZONE = "UTC";
@@ -219,23 +220,23 @@ describe("Date Formatting Functions", () => {
     describe("locale handling", () => {
         const itCases = [
             {
-                locale: "de-DE",
                 expectedDate: "15.01.2024",
                 expectedDateTime: "15.01.2024, 12:30:45",
+                locale: "de-DE",
             },
             {
-                locale: "en-GB",
                 expectedDate: "15/01/2024",
                 expectedDateTime: "15/01/2024, 12:30:45",
+                locale: "en-GB",
             },
             {
-                locale: "en-US",
                 expectedDate: "01/15/2024",
                 expectedDateTime: "01/15/2024, 12:30:45",
+                locale: "en-US",
             },
         ];
 
-        itCases.forEach(({ locale, expectedDate, expectedDateTime }) => {
+        itCases.forEach(({ expectedDate, expectedDateTime, locale }) => {
             it(`formats dates correctly for ${locale}`, () => {
                 expect(dateFromTimestamp(itTimestamp, locale, DEFAULT_TIMEZONE)).toBe(expectedDate);
                 expect(formatEventDate(itTimestamp, locale, DEFAULT_TIMEZONE)).toBe(

@@ -1,16 +1,19 @@
-import type { RenderResult } from "vitest-browser-vue";
 import type { CreateInventoryItemPayload } from "@firetable/types";
-import type { InventoryItemCreateFormProps } from "./InventoryItemCreateForm.vue";
-import InventoryItemCreateForm from "./InventoryItemCreateForm.vue";
-import { renderComponent, t } from "../../../../test-helpers/render-component";
+import type { RenderResult } from "vitest-browser-vue";
+
 import {
     DrinkMainCategory,
     InventoryItemType,
-    SpiritSubCategory,
     NonAlcoholicCategory,
+    SpiritSubCategory,
 } from "@firetable/types";
-import { beforeEach, describe, expect, it } from "vitest";
 import { userEvent } from "@vitest/browser/context";
+import { beforeEach, describe, expect, it } from "vitest";
+
+import type { InventoryItemCreateFormProps } from "./InventoryItemCreateForm.vue";
+
+import { renderComponent, t } from "../../../../test-helpers/render-component";
+import InventoryItemCreateForm from "./InventoryItemCreateForm.vue";
 
 describe("InventoryItemCreateForm.vue", () => {
     let screen: RenderResult<InventoryItemCreateFormProps>;
@@ -67,27 +70,27 @@ describe("InventoryItemCreateForm.vue", () => {
 
             const submittedItem = emittedEvents[0][0];
             expect(submittedItem).toStrictEqual({
-                name: "Test Vodka",
-                type: InventoryItemType.DRINK,
-                mainCategory: DrinkMainCategory.SPIRITS,
-                subCategory: SpiritSubCategory.VODKA,
-                volume: 700,
-                quantity: 50,
-                supplier: "",
                 isActive: true,
+                mainCategory: DrinkMainCategory.SPIRITS,
+                name: "Test Vodka",
+                quantity: 50,
+                subCategory: SpiritSubCategory.VODKA,
+                supplier: "",
+                type: InventoryItemType.DRINK,
+                volume: 700,
             });
         });
     });
 
     describe("edit", () => {
         const itemToEdit: CreateInventoryItemPayload = {
-            name: "Red Bull",
-            type: InventoryItemType.DRINK,
-            mainCategory: DrinkMainCategory.NON_ALCOHOLIC,
-            subCategory: NonAlcoholicCategory.ENERGY_DRINK,
-            quantity: 10,
-            supplier: "Red Bull GmbH",
             isActive: true,
+            mainCategory: DrinkMainCategory.NON_ALCOHOLIC,
+            name: "Red Bull",
+            quantity: 10,
+            subCategory: NonAlcoholicCategory.ENERGY_DRINK,
+            supplier: "Red Bull GmbH",
+            type: InventoryItemType.DRINK,
             volume: 250,
         };
 
@@ -134,14 +137,14 @@ describe("InventoryItemCreateForm.vue", () => {
 
     describe("initialData", () => {
         const initialData: CreateInventoryItemPayload = {
-            name: "Red Bull",
-            type: InventoryItemType.DRINK,
-            mainCategory: DrinkMainCategory.NON_ALCOHOLIC,
-            subCategory: NonAlcoholicCategory.ENERGY_DRINK,
-            quantity: 0,
-            supplier: "Red Bull GmbH",
-            volume: 250,
             isActive: true,
+            mainCategory: DrinkMainCategory.NON_ALCOHOLIC,
+            name: "Red Bull",
+            quantity: 0,
+            subCategory: NonAlcoholicCategory.ENERGY_DRINK,
+            supplier: "Red Bull GmbH",
+            type: InventoryItemType.DRINK,
+            volume: 250,
         };
 
         beforeEach(() => {

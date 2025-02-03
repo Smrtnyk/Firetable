@@ -1,42 +1,45 @@
-import type { UserEditFormProps } from "./UserEditForm.vue";
 import type { PropertyDoc } from "@firetable/types";
-import UserEditForm from "./UserEditForm.vue";
-import { renderComponent } from "../../../../test-helpers/render-component";
+
 import {
     DEFAULT_CAPABILITIES_BY_ROLE,
     OrganisationStatus,
     Role,
     UserCapability,
 } from "@firetable/types";
-import { beforeEach, describe, expect, it } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 import { first } from "es-toolkit/compat";
+import { beforeEach, describe, expect, it } from "vitest";
+
+import type { UserEditFormProps } from "./UserEditForm.vue";
+
+import { renderComponent } from "../../../../test-helpers/render-component";
+import UserEditForm from "./UserEditForm.vue";
 
 describe("UserEditForm", () => {
     let props: UserEditFormProps;
 
     beforeEach(() => {
         props = {
-            user: {
-                id: "user1",
-                name: "John Doe",
-                email: "johndoe@TestOrg.org",
-                username: "johndoe",
-                role: Role.STAFF,
-                relatedProperties: ["property1"],
-                organisationId: "org1",
-                capabilities: DEFAULT_CAPABILITIES_BY_ROLE[Role.STAFF],
+            organisation: {
+                id: "org1",
+                maxAllowedProperties: 2,
+                name: "TestOrg",
+                status: OrganisationStatus.ACTIVE,
             },
             properties: [
                 { id: "property1", name: "Property 1" } as PropertyDoc,
                 { id: "property2", name: "Property 2" } as PropertyDoc,
             ],
             selectedProperties: [{ id: "property1", name: "Property 1" } as PropertyDoc],
-            organisation: {
-                id: "org1",
-                name: "TestOrg",
-                maxAllowedProperties: 2,
-                status: OrganisationStatus.ACTIVE,
+            user: {
+                capabilities: DEFAULT_CAPABILITIES_BY_ROLE[Role.STAFF],
+                email: "johndoe@TestOrg.org",
+                id: "user1",
+                name: "John Doe",
+                organisationId: "org1",
+                relatedProperties: ["property1"],
+                role: Role.STAFF,
+                username: "johndoe",
             },
         };
     });
@@ -54,7 +57,7 @@ describe("UserEditForm", () => {
         await expect.element(screen.getByLabelText("User password *")).toHaveValue("");
 
         // Role select should be present for editable roles
-        if ([Role.MANAGER, Role.STAFF, Role.HOSTESS].includes(props.user.role)) {
+        if ([Role.HOSTESS, Role.MANAGER, Role.STAFF].includes(props.user.role)) {
             await expect.element(screen.getByLabelText("Role")).toBeInTheDocument();
         }
 
@@ -134,12 +137,12 @@ describe("UserEditForm", () => {
         expect(screen.emitted().submit).toBeTruthy();
         const [emittedPayload] = first(screen.emitted().submit as any[]);
         expect(emittedPayload).toMatchObject({
-            name: "Jane Doe",
-            username: "janedoe",
-            password: "newpassword123",
-            role: Role.MANAGER,
             email: "janedoe@TestOrg.org",
+            name: "Jane Doe",
+            password: "newpassword123",
             relatedProperties: ["property1", "property2"],
+            role: Role.MANAGER,
+            username: "janedoe",
         });
     });
 
@@ -238,9 +241,9 @@ describe("UserEditForm", () => {
         props.user.role = Role.STAFF;
         props.user.capabilities = {
             ...props.user.capabilities,
+            [UserCapability.CAN_DELETE_RESERVATION]: false,
             [UserCapability.CAN_RESERVE]: true,
             [UserCapability.CAN_SEE_GUEST_CONTACT]: true,
-            [UserCapability.CAN_DELETE_RESERVATION]: false,
         };
         const screen = renderComponent(UserEditForm, props);
 
@@ -297,8 +300,8 @@ describe("UserEditForm", () => {
         expect(screen.emitted().submit).toBeTruthy();
         const [emittedPayload] = first(screen.emitted().submit as any[]);
         expect(emittedPayload).toMatchObject({
-            role: Role.MANAGER,
             capabilities: DEFAULT_CAPABILITIES_BY_ROLE[Role.MANAGER],
+            role: Role.MANAGER,
         });
     });
 
@@ -327,10 +330,10 @@ describe("UserEditForm", () => {
         // Create expected capabilities by toggling the modified ones
         const expectedCapabilities = {
             ...DEFAULT_CAPABILITIES_BY_ROLE[Role.STAFF],
-            [UserCapability.CAN_RESERVE]:
-                !DEFAULT_CAPABILITIES_BY_ROLE[Role.STAFF][UserCapability.CAN_RESERVE],
             [UserCapability.CAN_EDIT_OWN_RESERVATION]:
                 !DEFAULT_CAPABILITIES_BY_ROLE[Role.STAFF][UserCapability.CAN_EDIT_OWN_RESERVATION],
+            [UserCapability.CAN_RESERVE]:
+                !DEFAULT_CAPABILITIES_BY_ROLE[Role.STAFF][UserCapability.CAN_RESERVE],
         };
 
         expect(emittedPayload.capabilities).toMatchObject(expectedCapabilities);
@@ -498,8 +501,8 @@ describe("UserEditForm", () => {
         expect(screen.emitted().submit).toBeTruthy();
         const [emittedPayload] = first(screen.emitted().submit as any[]);
         expect(emittedPayload).toMatchObject({
-            role: Role.HOSTESS,
             capabilities: DEFAULT_CAPABILITIES_BY_ROLE[Role.HOSTESS],
+            role: Role.HOSTESS,
         });
     });
 });

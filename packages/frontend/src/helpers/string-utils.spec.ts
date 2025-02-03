@@ -1,5 +1,6 @@
+import { describe, expect, it } from "vitest";
+
 import { truncateText } from "./string-utils.js";
-import { describe, it, expect } from "vitest";
 
 describe("string-utils", () => {
     describe("truncateText", () => {

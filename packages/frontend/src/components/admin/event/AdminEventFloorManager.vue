@@ -1,23 +1,24 @@
 <script setup lang="ts">
 import type { EventFloorDoc, FloorDoc, ReservationDoc } from "@firetable/types";
 import type { SortableEvent } from "vue-draggable-plus";
+
+import { property } from "es-toolkit/compat";
+import { buttonSize, isMobile } from "src/global-reactives/screen-detection";
 import { computed } from "vue";
 import { vDraggable } from "vue-draggable-plus";
-import { buttonSize, isMobile } from "src/global-reactives/screen-detection";
-import { property } from "es-toolkit/compat";
 
 export interface AdminEventFloorManagerProps {
-    /** List of current floors */
-    floors: EventFloorDoc[];
+    animationDuration?: number;
     /** Floors that can be added (for edit mode) */
     availableFloors?: FloorDoc[];
-    /** Used to check if floor can be deleted */
-    reservations?: ReservationDoc[];
-    showEditButton?: boolean;
+    /** List of current floors */
+    floors: EventFloorDoc[];
     /** Maximum number of floors allowed */
     maxFloors: number;
+    /** Used to check if floor can be deleted */
+    reservations?: ReservationDoc[];
 
-    animationDuration?: number;
+    showEditButton?: boolean;
 }
 
 interface Emits {
@@ -69,16 +70,8 @@ function onAddFloor(floor: EventFloorDoc): void {
     });
 }
 
-function onRemoveFloor(index: number): void {
-    emit("remove", index);
-}
-
-function onEditFloor(floor: EventFloorDoc): void {
-    emit("edit", floor);
-}
-
 function onDrop(event: SortableEvent): void {
-    const { oldDraggableIndex, newDraggableIndex } = event;
+    const { newDraggableIndex, oldDraggableIndex } = event;
     if (
         oldDraggableIndex === newDraggableIndex ||
         oldDraggableIndex === undefined ||
@@ -99,6 +92,14 @@ function onDrop(event: SortableEvent): void {
     });
 
     emit("reorder", reorderedFloors);
+}
+
+function onEditFloor(floor: EventFloorDoc): void {
+    emit("edit", floor);
+}
+
+function onRemoveFloor(index: number): void {
+    emit("remove", index);
 }
 </script>
 

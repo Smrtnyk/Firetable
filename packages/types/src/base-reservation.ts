@@ -1,21 +1,33 @@
 import type { Timestamp } from "firebase/firestore";
+
 import type { User } from "./auth.js";
 
 export enum ReservationState {
+    ARRIVED = "ARRIVED",
+    CONFIRMED = "CONFIRMED",
     PENDING = "PENDING",
     WAITING_FOR_RESPONSE = "WAITING_FOR_RESPONSE",
-    CONFIRMED = "CONFIRMED",
-    ARRIVED = "ARRIVED",
+}
+
+/**
+ * Enum for reservation status in Firestore
+ */
+export const enum ReservationStatus {
+    /**
+     * Active reservation
+     */
+    ACTIVE = "Active",
+    /**
+     * Soft-deleted reservation
+     * Kept for analytics purposes
+     */
+    DELETED = "Deleted",
 }
 
 /**
  * Enum for different types of reservations
  */
 export const enum ReservationType {
-    /**
-     * Guest arrived without prior reservation
-     */
-    WALK_IN = 0,
     /**
      * Guest made a reservation in advance
      */
@@ -24,27 +36,11 @@ export const enum ReservationType {
      * Guest is on waiting list
      */
     QUEUED = 2,
-}
-
-/**
- * Enum for reservation status in Firestore
- */
-export const enum ReservationStatus {
     /**
-     * Soft-deleted reservation
-     * Kept for analytics purposes
+     * Guest arrived without prior reservation
      */
-    DELETED = "Deleted",
-    /**
-     * Active reservation
-     */
-    ACTIVE = "Active",
+    WALK_IN = 0,
 }
-
-/**
- * Basic user information needed for identification
- */
-export type UserIdentifier = Pick<User, "email" | "id" | "name">;
 
 /**
  * Base interface for all reservation types in Firestore
@@ -52,19 +48,29 @@ export type UserIdentifier = Pick<User, "email" | "id" | "name">;
  */
 export interface BaseReservation {
     /**
+     * Unix timestamp when the reservation was cleared/completed
+     * @deprecated Remove Timestamp type after migration period
+     */
+    clearedAt?: number | Timestamp;
+    /**
+     * Information about who created the reservation and when
+     */
+    creator: UserIdentifier & {
+        createdAt: number | Timestamp;
+    };
+    /**
      * Reference to the Firestore document ID of the floor
      */
     floorId: string;
-    /**
-     * Table identifier(s) for the reservation
-     * Can be a single table or multiple linked tables
-     */
-    tableLabel: string[] | string;
     /**
      * Guest's contact information (usually phone number)
      * Optional for privacy reasons
      */
     guestContact?: string;
+    /**
+     * Indicates if this is a VIP reservation
+     */
+    isVIP: boolean;
     /**
      * Number of guests in the party
      */
@@ -74,20 +80,9 @@ export interface BaseReservation {
      */
     reservationNote?: string;
     /**
-     * Reservation time in 24-hour format (HH:mm)
+     * The state of the reservation
      */
-    time: string;
-    /**
-     * Unix timestamp when the reservation was cleared/completed
-     * @deprecated Remove Timestamp type after migration period
-     */
-    clearedAt?: Timestamp | number;
-    /**
-     * Information about who created the reservation and when
-     */
-    creator: UserIdentifier & {
-        createdAt: Timestamp | number;
-    };
+    state: ReservationState;
     /**
      * The status of the reservation
      * Either active or deleted
@@ -97,12 +92,18 @@ export interface BaseReservation {
     status: ReservationStatus;
 
     /**
-     * The state of the reservation
+     * Table identifier(s) for the reservation
+     * Can be a single table or multiple linked tables
      */
-    state: ReservationState;
+    tableLabel: string | string[];
 
     /**
-     * Indicates if this is a VIP reservation
+     * Reservation time in 24-hour format (HH:mm)
      */
-    isVIP: boolean;
+    time: string;
 }
+
+/**
+ * Basic user information needed for identification
+ */
+export type UserIdentifier = Pick<User, "email" | "id" | "name">;

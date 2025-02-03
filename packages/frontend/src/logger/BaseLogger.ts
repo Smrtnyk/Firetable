@@ -1,12 +1,12 @@
 /* eslint-disable no-console -- this file is fine to use this */
-import { isObject } from "es-toolkit/compat";
 import { isString } from "es-toolkit";
-
-type LogLevel = "debug" | "error" | "info" | "warn";
+import { isObject } from "es-toolkit/compat";
 
 interface LoggerOptions {
     prefix?: string;
 }
+
+type LogLevel = "debug" | "error" | "info" | "warn";
 
 export abstract class BaseLogger {
     private readonly prefix: string;
@@ -15,12 +15,8 @@ export abstract class BaseLogger {
         this.prefix = options?.prefix ? `[${options.prefix}]` : "";
     }
 
-    public info(message: string, ...args: unknown[]): void {
-        this.#log("info", message, ...args);
-    }
-
-    public warn(message: string, ...args: unknown[]): void {
-        this.#log("warn", message, ...args);
+    public debug(message: string, ...args: unknown[]): void {
+        this.#log("debug", message, ...args);
     }
 
     public error(message: unknown, ...args: unknown[]): void {
@@ -75,8 +71,12 @@ export abstract class BaseLogger {
         document.body.appendChild(errorElement);
     }
 
-    public debug(message: string, ...args: unknown[]): void {
-        this.#log("debug", message, ...args);
+    public info(message: string, ...args: unknown[]): void {
+        this.#log("info", message, ...args);
+    }
+
+    public warn(message: string, ...args: unknown[]): void {
+        this.#log("warn", message, ...args);
     }
 
     /**
@@ -94,6 +94,10 @@ export abstract class BaseLogger {
         return String(arg);
     }
 
+    #isError(value: unknown): value is Error {
+        return value instanceof Error;
+    }
+
     #log(level: LogLevel, message: string, ...args: unknown[]): void {
         const formattedMessage = `${this.prefix} [${level.toUpperCase()}]: ${message}`;
         if (level === "error") {
@@ -105,9 +109,5 @@ export abstract class BaseLogger {
         } else {
             console.info(formattedMessage, ...args);
         }
-    }
-
-    #isError(value: unknown): value is Error {
-        return value instanceof Error;
     }
 }

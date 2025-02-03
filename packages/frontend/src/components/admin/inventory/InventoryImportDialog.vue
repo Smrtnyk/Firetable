@@ -61,10 +61,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { useI18n } from "vue-i18n";
-import FTTabs from "src/components/FTTabs.vue";
 import FTTabPanels from "src/components/FTTabPanels.vue";
+import FTTabs from "src/components/FTTabs.vue";
+import { computed, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 interface Props {
     loading?: boolean;

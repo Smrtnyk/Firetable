@@ -1,16 +1,19 @@
-import type { FetchUsersByRoleRequestData } from "./fetch-users-by-role.js";
-import type { CallableRequest } from "firebase-functions/v2/https";
 import type { UserRecord } from "firebase-admin/auth";
-import { fetchUsersByRoleFn } from "./fetch-users-by-role.js";
-import * as Init from "../../init.js";
+import type { CallableRequest } from "firebase-functions/v2/https";
+
+import { AdminRole, Role } from "@shared-types";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { FetchUsersByRoleRequestData } from "./fetch-users-by-role.js";
+
 import { MockAuth } from "../../../test-helpers/MockAuth.js";
+import * as Init from "../../init.js";
 import { db } from "../../init.js";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { Role, AdminRole } from "@shared-types";
+import { fetchUsersByRoleFn } from "./fetch-users-by-role.js";
 
 describe("fetchUsersByRoleFn", () => {
     let mockAuth: MockAuth;
-    let authUsers: Record<string, { uid: string; email: string }> = {};
+    let authUsers: Record<string, { email: string; uid: string }> = {};
 
     beforeEach(async () => {
         mockAuth = new MockAuth();
@@ -42,47 +45,47 @@ describe("fetchUsersByRoleFn", () => {
 
         // Store users for easy reference in tests
         authUsers = {
-            user1: { uid: authUser1.uid, email: authUser1.email! },
-            user2: { uid: authUser2.uid, email: authUser2.email! },
-            user3: { uid: authUser3.uid, email: authUser3.email! },
-            user4: { uid: authUser4.uid, email: authUser4.email! },
-            user5: { uid: authUser5.uid, email: authUser5.email! },
-            user6: { uid: authUser6.uid, email: authUser6.email! },
+            user1: { email: authUser1.email!, uid: authUser1.uid },
+            user2: { email: authUser2.email!, uid: authUser2.uid },
+            user3: { email: authUser3.email!, uid: authUser3.uid },
+            user4: { email: authUser4.email!, uid: authUser4.uid },
+            user5: { email: authUser5.email!, uid: authUser5.uid },
+            user6: { email: authUser6.email!, uid: authUser6.uid },
         };
 
         // Users with relatedProperties
         await db.doc(`organisations/org1/users/${authUser1.uid}`).set({
-            role: Role.STAFF,
             name: "user1",
             relatedProperties: ["prop1", "prop2"],
+            role: Role.STAFF,
         });
         await db.doc(`organisations/org1/users/${authUser2.uid}`).set({
-            role: Role.HOSTESS,
             name: "user2",
             relatedProperties: ["prop2", "prop3"],
+            role: Role.HOSTESS,
         });
         await db.doc(`organisations/org1/users/${authUser3.uid}`).set({
-            role: Role.STAFF,
             name: "user3",
             relatedProperties: ["prop3"],
+            role: Role.STAFF,
         });
         await db.doc(`organisations/org1/users/${authUser4.uid}`).set({
-            role: Role.PROPERTY_OWNER,
             name: "user4",
             relatedProperties: ["prop1", "prop4"],
+            role: Role.PROPERTY_OWNER,
         });
 
         // No related properties user
         await db.doc(`organisations/org1/users/${authUser5.uid}`).set({
-            role: Role.STAFF,
             name: "user5",
             relatedProperties: [],
+            role: Role.STAFF,
         });
 
         await db.doc(`organisations/org1/users/${authUser6.uid}`).set({
-            role: Role.MANAGER,
             name: "user6",
             relatedProperties: ["prop2", "prop5"],
+            role: Role.MANAGER,
         });
 
         vi.spyOn(Init, "auth", "get").mockReturnValue(mockAuth as any);
@@ -90,7 +93,7 @@ describe("fetchUsersByRoleFn", () => {
 
     it("fetches all users for Admin", async () => {
         const mockReq = {
-            auth: { uid: "adminUser", token: { role: AdminRole.ADMIN } as any },
+            auth: { token: { role: AdminRole.ADMIN } as any, uid: "adminUser" },
             data: { organisationId: "org1" },
         } as CallableRequest<FetchUsersByRoleRequestData>;
 
@@ -98,52 +101,52 @@ describe("fetchUsersByRoleFn", () => {
         expect(users).toEqual([
             {
                 id: expect.any(String),
+                lastSignInTime: expect.anything(),
                 name: "user1",
-                role: "Staff",
                 relatedProperties: ["prop1", "prop2"],
-                lastSignInTime: expect.anything(),
-            },
-            {
-                id: expect.any(String),
-                name: "user2",
-                role: "Hostess",
-                relatedProperties: ["prop2", "prop3"],
-                lastSignInTime: expect.anything(),
-            },
-            {
-                id: expect.any(String),
-                name: "user3",
                 role: "Staff",
+            },
+            {
+                id: expect.any(String),
+                lastSignInTime: expect.anything(),
+                name: "user2",
+                relatedProperties: ["prop2", "prop3"],
+                role: "Hostess",
+            },
+            {
+                id: expect.any(String),
+                lastSignInTime: expect.anything(),
+                name: "user3",
                 relatedProperties: ["prop3"],
-                lastSignInTime: expect.anything(),
+                role: "Staff",
             },
             {
                 id: expect.any(String),
+                lastSignInTime: expect.anything(),
                 name: "user4",
-                role: "Property Owner",
                 relatedProperties: ["prop1", "prop4"],
-                lastSignInTime: expect.anything(),
+                role: "Property Owner",
             },
             {
                 id: expect.any(String),
+                lastSignInTime: null,
                 name: "user5",
                 relatedProperties: [],
                 role: "Staff",
-                lastSignInTime: null,
             },
             {
                 id: expect.any(String),
+                lastSignInTime: expect.anything(),
                 name: "user6",
                 relatedProperties: ["prop2", "prop5"],
                 role: "Manager",
-                lastSignInTime: expect.anything(),
             },
         ]);
     });
 
     it("fetches all users for Property Owner", async () => {
         const mockReq = {
-            auth: { uid: "user4", token: { role: Role.PROPERTY_OWNER } as any },
+            auth: { token: { role: Role.PROPERTY_OWNER } as any, uid: "user4" },
             data: { organisationId: "org1" },
         } as CallableRequest<FetchUsersByRoleRequestData>;
 
@@ -151,52 +154,52 @@ describe("fetchUsersByRoleFn", () => {
         expect(users).toEqual([
             {
                 id: expect.any(String),
+                lastSignInTime: expect.anything(),
                 name: "user1",
-                role: "Staff",
                 relatedProperties: ["prop1", "prop2"],
-                lastSignInTime: expect.anything(),
-            },
-            {
-                id: expect.any(String),
-                name: "user2",
-                role: "Hostess",
-                relatedProperties: ["prop2", "prop3"],
-                lastSignInTime: expect.anything(),
-            },
-            {
-                id: expect.any(String),
-                name: "user3",
                 role: "Staff",
+            },
+            {
+                id: expect.any(String),
+                lastSignInTime: expect.anything(),
+                name: "user2",
+                relatedProperties: ["prop2", "prop3"],
+                role: "Hostess",
+            },
+            {
+                id: expect.any(String),
+                lastSignInTime: expect.anything(),
+                name: "user3",
                 relatedProperties: ["prop3"],
-                lastSignInTime: expect.anything(),
+                role: "Staff",
             },
             {
                 id: expect.any(String),
+                lastSignInTime: expect.anything(),
                 name: "user4",
-                role: "Property Owner",
                 relatedProperties: ["prop1", "prop4"],
-                lastSignInTime: expect.anything(),
+                role: "Property Owner",
             },
             {
                 id: expect.any(String),
+                lastSignInTime: null,
                 name: "user5",
                 relatedProperties: [],
                 role: "Staff",
-                lastSignInTime: null,
             },
             {
                 id: expect.any(String),
+                lastSignInTime: expect.anything(),
                 name: "user6",
                 relatedProperties: ["prop2", "prop5"],
                 role: "Manager",
-                lastSignInTime: expect.anything(),
             },
         ]);
     });
 
     it("fetches users with shared relatedProperties for Staff user", async () => {
         const mockReq: CallableRequest<FetchUsersByRoleRequestData> = {
-            auth: { uid: authUsers.user1!.uid, token: { role: Role.STAFF } as any },
+            auth: { token: { role: Role.STAFF } as any, uid: authUsers.user1!.uid },
             data: { organisationId: "org1" },
             rawRequest: {} as any,
         } as CallableRequest<FetchUsersByRoleRequestData>;
@@ -206,8 +209,8 @@ describe("fetchUsersByRoleFn", () => {
             {
                 id: expect.any(String),
                 name: "user1",
-                role: "Staff",
                 relatedProperties: ["prop1", "prop2"],
+                role: "Staff",
             },
             {
                 id: expect.any(String),
@@ -220,7 +223,7 @@ describe("fetchUsersByRoleFn", () => {
 
     it("fetches users with shared relatedProperties for Hostess user", async () => {
         const mockReq: CallableRequest<FetchUsersByRoleRequestData> = {
-            auth: { uid: authUsers.user2!.uid, token: { role: Role.HOSTESS } as any },
+            auth: { token: { role: Role.HOSTESS } as any, uid: authUsers.user2!.uid },
             data: { organisationId: "org1" },
             rawRequest: {} as any,
         } as CallableRequest<FetchUsersByRoleRequestData>;
@@ -230,20 +233,20 @@ describe("fetchUsersByRoleFn", () => {
             {
                 id: expect.any(String),
                 name: "user1",
-                role: "Staff",
                 relatedProperties: ["prop1", "prop2"],
+                role: "Staff",
             },
             {
                 id: expect.any(String),
                 name: "user2",
-                role: "Hostess",
                 relatedProperties: ["prop2", "prop3"],
+                role: "Hostess",
             },
             {
                 id: expect.any(String),
                 name: "user3",
-                role: "Staff",
                 relatedProperties: ["prop3"],
+                role: "Staff",
             },
             {
                 id: expect.any(String),
@@ -256,7 +259,7 @@ describe("fetchUsersByRoleFn", () => {
 
     it("returns an empty array if the user has no related properties", async () => {
         const mockReq = {
-            auth: { uid: authUsers.user5!.uid, token: { role: Role.STAFF } as any },
+            auth: { token: { role: Role.STAFF } as any, uid: authUsers.user5!.uid },
             data: { organisationId: "org1" },
         } as CallableRequest<FetchUsersByRoleRequestData>;
 
@@ -266,7 +269,7 @@ describe("fetchUsersByRoleFn", () => {
 
     it("fetches users with shared relatedProperties for Manager user", async () => {
         const mockReq = {
-            auth: { uid: authUsers.user6!.uid, token: { role: Role.MANAGER } as any },
+            auth: { token: { role: Role.MANAGER } as any, uid: authUsers.user6!.uid },
             data: { organisationId: "org1" },
         } as CallableRequest<FetchUsersByRoleRequestData>;
 
@@ -275,20 +278,20 @@ describe("fetchUsersByRoleFn", () => {
             {
                 id: expect.any(String),
                 name: "user1",
-                role: "Staff",
                 relatedProperties: ["prop1", "prop2"],
+                role: "Staff",
             },
             {
                 id: expect.any(String),
                 name: "user2",
-                role: "Hostess",
                 relatedProperties: ["prop2", "prop3"],
+                role: "Hostess",
             },
             {
                 id: expect.any(String),
                 name: "user6",
-                role: "Manager",
                 relatedProperties: ["prop2", "prop5"],
+                role: "Manager",
             },
         ]);
     });
@@ -301,7 +304,7 @@ describe("fetchUsersByRoleFn", () => {
             });
 
             const mockReq = {
-                auth: { uid: adminUser.uid, token: { role: AdminRole.ADMIN } as any },
+                auth: { token: { role: AdminRole.ADMIN } as any, uid: adminUser.uid },
                 data: { organisationId: "org1" },
             } as CallableRequest<FetchUsersByRoleRequestData>;
 
@@ -316,7 +319,7 @@ describe("fetchUsersByRoleFn", () => {
 
         it("should include lastSignInTime for Property Owner users", async () => {
             const mockReq = {
-                auth: { uid: authUsers.user4!.uid, token: { role: Role.PROPERTY_OWNER } as any },
+                auth: { token: { role: Role.PROPERTY_OWNER } as any, uid: authUsers.user4!.uid },
                 data: { organisationId: "org1" },
             } as CallableRequest<FetchUsersByRoleRequestData>;
 
@@ -328,7 +331,7 @@ describe("fetchUsersByRoleFn", () => {
 
         it("should not include lastSignInTime for Manager role", async () => {
             const mockReq = {
-                auth: { uid: authUsers.user6!.uid, token: { role: Role.MANAGER } as any },
+                auth: { token: { role: Role.MANAGER } as any, uid: authUsers.user6!.uid },
                 data: { organisationId: "org1" },
             } as CallableRequest<FetchUsersByRoleRequestData>;
 
@@ -344,7 +347,7 @@ describe("fetchUsersByRoleFn", () => {
 
         it("should handle auth service errors gracefully", async () => {
             const mockReq = {
-                auth: { uid: authUsers.user4!.uid, token: { role: Role.PROPERTY_OWNER } as any },
+                auth: { token: { role: Role.PROPERTY_OWNER } as any, uid: authUsers.user4!.uid },
                 data: { organisationId: "org1" },
             } as CallableRequest<FetchUsersByRoleRequestData>;
 
@@ -363,7 +366,7 @@ describe("fetchUsersByRoleFn", () => {
     describe("Error Handling", () => {
         it("should throw an error if the user's document does not exist", async () => {
             const mockReq = {
-                auth: { uid: "nonExistentUser", token: { role: Role.STAFF } as any },
+                auth: { token: { role: Role.STAFF } as any, uid: "nonExistentUser" },
                 data: { organisationId: "org1" },
             } as CallableRequest<FetchUsersByRoleRequestData>;
 
@@ -384,7 +387,7 @@ describe("fetchUsersByRoleFn", () => {
 
         it("should throw an error if user role is not found in custom claims", async () => {
             const mockReq = {
-                auth: { uid: "user1", token: {} },
+                auth: { token: {}, uid: "user1" },
                 data: { organisationId: "org1" },
             } as CallableRequest<FetchUsersByRoleRequestData>;
 

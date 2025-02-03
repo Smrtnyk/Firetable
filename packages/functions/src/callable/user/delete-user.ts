@@ -1,9 +1,11 @@
 import type { User } from "@shared-types";
 import type { CallableRequest } from "firebase-functions/v2/https";
+
+import { logger } from "firebase-functions/v2";
+import { HttpsError } from "firebase-functions/v2/https";
+
 import { auth, db } from "../../init.js";
 import { getUsersPath } from "../../paths.js";
-import { HttpsError } from "firebase-functions/v2/https";
-import { logger } from "firebase-functions/v2";
 
 export async function deleteUser(req: CallableRequest<User>): Promise<void> {
     // Ensure the function is called by an authenticated user

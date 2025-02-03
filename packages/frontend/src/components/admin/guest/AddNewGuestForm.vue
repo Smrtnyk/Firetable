@@ -1,25 +1,25 @@
 <script setup lang="ts">
 import type { CreateGuestPayload } from "@firetable/types";
-import { ref, useTemplateRef } from "vue";
-import { minLength } from "src/helpers/form-rules";
-import { QForm } from "quasar";
 
+import { QForm } from "quasar";
 import TelNumberInput from "src/components/TelNumberInput/TelNumberInput.vue";
+import { capitalizeName } from "src/helpers/capitalize-name";
+import { minLength } from "src/helpers/form-rules";
 import { hashString } from "src/helpers/hash-string";
 import { maskPhoneNumber } from "src/helpers/mask-phone-number";
+import { ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
-import { capitalizeName } from "src/helpers/capitalize-name";
 
 export interface AddNewGuestFormProps {
-    mode?: "create" | "edit";
     initialData?: {
-        name: string;
         contact: string;
+        name: string;
         tags?: string[];
     };
+    mode?: "create" | "edit";
 }
 
-const { mode = "create", initialData } = defineProps<AddNewGuestFormProps>();
+const { initialData, mode = "create" } = defineProps<AddNewGuestFormProps>();
 const emit = defineEmits<(eventName: "create" | "update", payload: CreateGuestPayload) => void>();
 
 const { t } = useI18n();
@@ -40,27 +40,6 @@ function capitalizeGuestName(): void {
     guestName.value = capitalizeName(guestName.value);
 }
 
-async function submit(): Promise<void> {
-    if (!(await createGuestForm.value?.validate())) {
-        return;
-    }
-
-    const payload: CreateGuestPayload = {
-        name: guestName.value,
-        contact: guestContact.value,
-        hashedContact: await hashString(guestContact.value),
-        maskedContact: maskPhoneNumber(guestContact.value),
-        visitedProperties: {},
-        tags: guestTags.value,
-    };
-
-    if (mode === "create") {
-        emit("create", payload);
-    } else if (mode === "edit") {
-        emit("update", payload);
-    }
-}
-
 function onNewTag(inputValue: string, done: (item?: any) => void): void {
     const trimmedValue = inputValue.trim();
     if (trimmedValue === "") {
@@ -68,6 +47,27 @@ function onNewTag(inputValue: string, done: (item?: any) => void): void {
         return;
     }
     done(trimmedValue.toLowerCase());
+}
+
+async function submit(): Promise<void> {
+    if (!(await createGuestForm.value?.validate())) {
+        return;
+    }
+
+    const payload: CreateGuestPayload = {
+        contact: guestContact.value,
+        hashedContact: await hashString(guestContact.value),
+        maskedContact: maskPhoneNumber(guestContact.value),
+        name: guestName.value,
+        tags: guestTags.value,
+        visitedProperties: {},
+    };
+
+    if (mode === "create") {
+        emit("create", payload);
+    } else if (mode === "edit") {
+        emit("update", payload);
+    }
 }
 </script>
 

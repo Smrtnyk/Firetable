@@ -1,11 +1,13 @@
 import type { CallableRequest } from "firebase-functions/v2/https";
-import { deleteUser } from "./delete-user.js";
-import { getUserPath, getUsersPath } from "../../paths.js";
-import * as Init from "../../init.js";
-import { MockAuth } from "../../../test-helpers/MockAuth.js";
-import { db } from "../../init.js";
+
 import { AdminRole } from "@shared-types";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { MockAuth } from "../../../test-helpers/MockAuth.js";
+import * as Init from "../../init.js";
+import { db } from "../../init.js";
+import { getUserPath, getUsersPath } from "../../paths.js";
+import { deleteUser } from "./delete-user.js";
 
 describe("deleteUser", () => {
     let mockAuth: MockAuth;
@@ -27,8 +29,8 @@ describe("deleteUser", () => {
         const userDocRef = db.collection(usersPath).doc(uid);
         await userDocRef.set({
             email,
-            organisationId: testOrgId,
             name: "Test User",
+            organisationId: testOrgId,
             role: AdminRole.ADMIN,
             username: "test",
         });

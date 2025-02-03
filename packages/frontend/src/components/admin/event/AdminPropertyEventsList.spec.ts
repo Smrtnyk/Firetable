@@ -1,9 +1,11 @@
 import type { EventDoc } from "@firetable/types";
-import AdminPropertyEventsList from "./AdminPropertyEventsList.vue";
-import { renderComponent, t } from "../../../../test-helpers/render-component";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { userEvent, page } from "@vitest/browser/context";
+
+import { page, userEvent } from "@vitest/browser/context";
 import { getDefaultTimezone } from "src/helpers/date-utils";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { renderComponent, t } from "../../../../test-helpers/render-component";
+import AdminPropertyEventsList from "./AdminPropertyEventsList.vue";
 
 vi.mock("src/components/admin/event/PageAdminEventsListItem.vue", () => ({
     default: {
@@ -20,27 +22,27 @@ vi.mock("src/components/admin/event/PageAdminEventsListItem.vue", () => ({
 }));
 
 const eventPast1: EventDoc = {
+    date: new Date("2021-05-15").getTime(),
     id: "eventPast1",
     name: "Past Event 1",
-    date: new Date("2021-05-15").getTime(),
 } as EventDoc;
 
 const eventUpcoming1: EventDoc = {
+    date: new Date("2022-07-20").getTime(),
     id: "eventUpcoming1",
     name: "Upcoming Event 1",
-    date: new Date("2022-07-20").getTime(),
 } as EventDoc;
 
 const eventUpcoming2: EventDoc = {
+    date: new Date("2022-08-10").getTime(),
     id: "eventUpcoming2",
     name: "Upcoming Event 2",
-    date: new Date("2022-08-10").getTime(),
 } as EventDoc;
 
 const eventPast2: EventDoc = {
+    date: new Date("2021-05-05").getTime(),
     id: "eventPast2",
     name: "Past Event 2",
-    date: new Date("2021-05-05").getTime(),
 } as EventDoc;
 
 const events = [eventPast1, eventUpcoming1, eventUpcoming2, eventPast2];
@@ -59,9 +61,9 @@ describe("PageAdminEventsList", () => {
 
     it("displays a message when there are no events", async () => {
         renderComponent(AdminPropertyEventsList, {
-            propertyId,
-            events: [],
             done: false,
+            events: [],
+            propertyId,
             timezone: getDefaultTimezone(),
         });
 
@@ -70,9 +72,9 @@ describe("PageAdminEventsList", () => {
 
     it("displays events grouped by upcoming and past events with a marker", async () => {
         renderComponent(AdminPropertyEventsList, {
-            propertyId,
-            events,
             done: false,
+            events,
+            propertyId,
             timezone: getDefaultTimezone(),
         });
 
@@ -104,9 +106,9 @@ describe("PageAdminEventsList", () => {
 
     it("displays events grouped by year and month", async () => {
         renderComponent(AdminPropertyEventsList, {
-            propertyId,
-            events,
             done: false,
+            events,
+            propertyId,
             timezone: getDefaultTimezone(),
         });
 
@@ -128,9 +130,9 @@ describe("PageAdminEventsList", () => {
 
     it('emits "load" event when "Load More" button is clicked', async () => {
         const screen = renderComponent(AdminPropertyEventsList, {
-            propertyId,
-            events,
             done: false,
+            events,
+            propertyId,
             timezone: getDefaultTimezone(),
         });
 
@@ -143,14 +145,14 @@ describe("PageAdminEventsList", () => {
 
     it('emits "edit" and "delete" events when actions are triggered', async () => {
         const mockEvent = {
+            date: new Date("2021-05-15").getTime(),
             id: "event1",
             name: "Event 1",
-            date: new Date("2021-05-15").getTime(),
         };
         const screen = renderComponent(AdminPropertyEventsList, {
-            propertyId,
-            events: [mockEvent],
             done: false,
+            events: [mockEvent],
+            propertyId,
             timezone: getDefaultTimezone(),
         });
 

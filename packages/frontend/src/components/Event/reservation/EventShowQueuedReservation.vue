@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import type { QueuedReservation, QueuedReservationDoc } from "@firetable/types";
 
-import { computed } from "vue";
-
 import ReservationGeneralInfo from "src/components/Event/reservation/ReservationGeneralInfo.vue";
 import ReservationLabelChips from "src/components/Event/reservation/ReservationLabelChips.vue";
 import FTBtn from "src/components/FTBtn.vue";
-
 import { useAuthStore } from "src/stores/auth-store";
 import { usePermissionsStore } from "src/stores/permissions-store";
+import { computed } from "vue";
 
 interface Props {
     reservation: QueuedReservationDoc;

@@ -1,55 +1,57 @@
 import type { Formatter } from "tinyrainbow";
+
 // eslint-disable-next-line id-length -- this is just logging symbols
 import c from "tinyrainbow";
 
-type LogLevel = "error" | "info" | "success" | "warn";
-type LogSymbol = "⏱" | "⚠" | "✓" | "✖" | "📦" | "ℹ";
-type StatsData = Record<string, number | string>;
-
 interface LoggerConfig {
+    colors: Record<LogLevel, Formatter>;
     // ms between progress updates
     progressUpdateInterval: number;
     symbols: Record<LogSymbol, string>;
-    colors: Record<LogLevel, Formatter>;
 }
+type LogLevel = "error" | "info" | "success" | "warn";
+type LogSymbol = "⏱" | "⚠" | "✓" | "✖" | "📦" | "ℹ";
+
+type StatsData = Record<string, number | string>;
 
 class Logger {
-    private lastProgressLine = "";
-    private lastUpdateTime = 0;
     private readonly config: LoggerConfig = {
-        // Update progress max every 100ms
-        progressUpdateInterval: 100,
-        symbols: {
-            // eslint-disable-next-line id-length -- this is just logging symbols
-            ℹ: "ℹ",
-            "✓": "✓",
-            "⚠": "⚠",
-            "✖": "✖",
-            "📦": "📦",
-            "⏱": "⏱",
-        },
         colors: {
+            error: c.red,
             info: c.blue,
             success: c.green,
             warn: c.yellow,
-            error: c.red,
+        },
+        // Update progress max every 100ms
+        progressUpdateInterval: 100,
+        symbols: {
+            "⏱": "⏱",
+            "⚠": "⚠",
+            "✓": "✓",
+            "✖": "✖",
+            "📦": "📦",
+            // eslint-disable-next-line id-length -- this is just logging symbols
+            ℹ: "ℹ",
         },
     };
+    private lastProgressLine = "";
+    private lastUpdateTime = 0;
+
+    error(message: string): void {
+        this.log("error", "✖", message);
+    }
 
     info(message: string): void {
         this.log("info", "ℹ", message);
     }
 
-    success(message: string): void {
-        this.log("success", "✓", message);
-    }
-
-    warn(message: string): void {
-        this.log("warn", "⚠", message);
-    }
-
-    error(message: string): void {
-        this.log("error", "✖", message);
+    organization(current: number, total: number, name: string): void {
+        this.clearProgress();
+        console.log(
+            c.blue(`\n${this.config.symbols["📦"]} Organization`),
+            c.blue(`${current}/${total}`),
+            c.white(`"${name}"`),
+        );
     }
 
     progress(current: number, total: number, message: string): void {
@@ -70,15 +72,6 @@ class Logger {
         }
     }
 
-    organization(current: number, total: number, name: string): void {
-        this.clearProgress();
-        console.log(
-            c.blue(`\n${this.config.symbols["📦"]} Organization`),
-            c.blue(`${current}/${total}`),
-            c.white(`"${name}"`),
-        );
-    }
-
     stats(stats: StatsData, indent = 0): void {
         this.clearProgress();
         const padding = " ".repeat(indent);
@@ -87,25 +80,24 @@ class Logger {
         });
     }
 
+    success(message: string): void {
+        this.log("success", "✓", message);
+    }
+
     timing(ms: number): void {
         this.clearProgress();
         const seconds = (ms / 1000).toFixed(2);
         console.log(c.gray(`${this.config.symbols["⏱"]} Completed in ${seconds}s`));
     }
 
+    warn(message: string): void {
+        this.log("warn", "⚠", message);
+    }
+
     private clearProgress(): void {
         if (this.lastProgressLine) {
             process.stdout.write(`\r${" ".repeat(this.lastProgressLine.length)}\r`);
         }
-    }
-
-    private shouldUpdateProgress(): boolean {
-        const now = Date.now();
-        if (now - this.lastUpdateTime >= this.config.progressUpdateInterval) {
-            this.lastUpdateTime = now;
-            return true;
-        }
-        return false;
     }
 
     private formatProgress(current: number, total: number): string {
@@ -116,6 +108,15 @@ class Logger {
     private log(level: LogLevel, symbol: LogSymbol, message: string): void {
         this.clearProgress();
         console.log(this.config.colors[level](this.config.symbols[symbol]), message);
+    }
+
+    private shouldUpdateProgress(): boolean {
+        const now = Date.now();
+        if (now - this.lastUpdateTime >= this.config.progressUpdateInterval) {
+            this.lastUpdateTime = now;
+            return true;
+        }
+        return false;
     }
 }
 

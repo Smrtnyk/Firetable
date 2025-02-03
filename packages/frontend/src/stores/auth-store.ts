@@ -1,20 +1,22 @@
 import type { AppUser, User, VoidFunction } from "@firetable/types";
 import type { User as FBUser } from "firebase/auth";
-import { getUserPath, logoutUser } from "../backend-proxy";
-import { Role, AdminRole } from "@firetable/types";
-import { defineStore } from "pinia";
-import { computed, ref, watch } from "vue";
-import { showErrorMessage } from "src/helpers/ui-helpers";
-import { useFirestoreDocument } from "src/composables/useFirestore";
-import { usePropertiesStore } from "src/stores/properties-store";
-import { Loading } from "quasar";
+
+import { AdminRole, Role } from "@firetable/types";
 import { noop } from "es-toolkit/function";
+import { defineStore } from "pinia";
+import { Loading } from "quasar";
+import { useFirestoreDocument } from "src/composables/useFirestore";
+import { showErrorMessage } from "src/helpers/ui-helpers";
 import { AppLogger } from "src/logger/FTLogger";
+import { usePropertiesStore } from "src/stores/properties-store";
+import { computed, ref, watch } from "vue";
+
+import { getUserPath, logoutUser } from "../backend-proxy";
 
 export const enum AuthState {
-    UNAUTHENTICATED = "unauthenticated",
     INITIALIZING = "initializing",
     READY = "ready",
+    UNAUTHENTICATED = "unauthenticated",
 }
 
 export const useAuthStore = defineStore("auth", function () {
@@ -81,9 +83,9 @@ export const useAuthStore = defineStore("auth", function () {
                 await Promise.all([
                     propertiesStore.initUserOrganisation(organisationId),
                     propertiesStore.initNonAdminProperties({
-                        role,
-                        relatedProperties: userDocument.relatedProperties,
                         organisationId,
+                        relatedProperties: userDocument.relatedProperties,
+                        role,
                     }),
                 ]);
             }
@@ -103,14 +105,14 @@ export const useAuthStore = defineStore("auth", function () {
         }
 
         user.value = {
-            name: "Admin",
-            username: "admin",
-            id: authUser.uid,
-            role: AdminRole.ADMIN,
-            email: authUser.email,
-            relatedProperties: [],
-            organisationId: "",
             capabilities: undefined,
+            email: authUser.email,
+            id: authUser.uid,
+            name: "Admin",
+            organisationId: "",
+            relatedProperties: [],
+            role: AdminRole.ADMIN,
+            username: "admin",
         };
         setAuthState(AuthState.READY);
     }
@@ -118,12 +120,12 @@ export const useAuthStore = defineStore("auth", function () {
     async function watchAndAssignUser(
         authUser: FBUser,
         organisationId: string,
-    ): Promise<User | undefined> {
+    ): Promise<undefined | User> {
         const {
-            promise,
             data: userRef,
-            stop,
             error,
+            promise,
+            stop,
         } = useFirestoreDocument<User>(getUserPath(organisationId, authUser.uid));
         await promise.value;
 
@@ -162,17 +164,17 @@ export const useAuthStore = defineStore("auth", function () {
     }
 
     return {
-        cleanup,
-        setAuthState,
-        initUser,
         assignAdmin,
-        unsubscribers,
-        nonNullableUser,
-        isLoggedIn,
+        cleanup,
+        initUser,
         isAdmin,
-        isPropertyOwner,
-        user,
         isInitializing,
+        isLoggedIn,
+        isPropertyOwner,
         isReady,
+        nonNullableUser,
+        setAuthState,
+        unsubscribers,
+        user,
     };
 });

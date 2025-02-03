@@ -1,12 +1,13 @@
-import { useReservationsAnalytics } from "./useReservationsAnalytics";
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
-import { ref, createApp, type App, nextTick } from "vue";
-import { createTestingPinia } from "@pinia/testing";
-import { createI18n } from "vue-i18n";
-import messages from "src/i18n";
-import { noop } from "es-toolkit";
 import { ReservationType } from "@firetable/types";
-import { Quasar, Loading, Dialog } from "quasar";
+import { createTestingPinia } from "@pinia/testing";
+import { noop } from "es-toolkit";
+import { Dialog, Loading, Quasar } from "quasar";
+import messages from "src/i18n";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { type App, createApp, nextTick, ref } from "vue";
+import { createI18n } from "vue-i18n";
+
+import { useReservationsAnalytics } from "./useReservationsAnalytics";
 
 const { fetchAnalyticsDataMock } = vi.hoisted(() => ({
     fetchAnalyticsDataMock: vi.fn(),
@@ -27,6 +28,7 @@ function withSetup(
             dataCache: {},
         },
         properties: {
+            organisations: [{ id: "1" }],
             properties: [
                 {
                     id: "1",
@@ -37,24 +39,23 @@ function withSetup(
                     },
                 },
             ],
-            organisations: [{ id: "1" }],
         },
     };
 
     const testingPinia = createTestingPinia({
         createSpy: vi.fn,
-        stubActions: false,
         initialState: {
             ...defaultState,
             ...initialState,
         },
+        stubActions: false,
     });
 
     const i18n = createI18n({
-        locale: "en-GB",
         fallbackLocale: "en-GB",
-        messages,
         legacy: false,
+        locale: "en-GB",
+        messages,
     });
 
     const app = createApp({
@@ -66,7 +67,7 @@ function withSetup(
 
     app.use(testingPinia);
     app.use(i18n);
-    app.use(Quasar, { plugins: { Loading, Dialog } });
+    app.use(Quasar, { plugins: { Dialog, Loading } });
 
     const container = document.createElement("div");
     document.body.appendChild(container);
@@ -102,7 +103,7 @@ describe("useReservationsAnalytics", () => {
             const [result, mountedApp] = withSetup(() =>
                 useReservationsAnalytics(property, "org1", "en"),
             );
-            await result.fetchData({ startDate: "2024-01-01", endDate: "2024-01-31" });
+            await result.fetchData({ endDate: "2024-01-31", startDate: "2024-01-01" });
             app = mountedApp;
 
             await nextTick();
@@ -127,7 +128,7 @@ describe("useReservationsAnalytics", () => {
             const [result, mountedApp] = withSetup(() =>
                 useReservationsAnalytics(property, "1", "en"),
             );
-            await result.fetchData({ startDate: "2024-01-01", endDate: "2024-01-31" });
+            await result.fetchData({ endDate: "2024-01-31", startDate: "2024-01-01" });
             app = mountedApp;
 
             await nextTick();
@@ -144,7 +145,7 @@ describe("useReservationsAnalytics", () => {
             const [result, mountedApp] = withSetup(() =>
                 useReservationsAnalytics(property, "org1", "en"),
             );
-            await result.fetchData({ startDate: "", endDate: "" });
+            await result.fetchData({ endDate: "", startDate: "" });
             app = mountedApp;
 
             await nextTick();
@@ -161,7 +162,7 @@ describe("useReservationsAnalytics", () => {
             const [result, mountedApp] = withSetup(() =>
                 useReservationsAnalytics(property, "org1", "en"),
             );
-            await result.fetchData({ startDate: "2024-01-01", endDate: "2024-01-31" });
+            await result.fetchData({ endDate: "2024-01-31", startDate: "2024-01-01" });
             app = mountedApp;
 
             await nextTick();
@@ -183,28 +184,28 @@ describe("useReservationsAnalytics", () => {
             const [result, mountedApp] = withSetup(() =>
                 useReservationsAnalytics(property, "org1", "en"),
             );
-            await result.fetchData({ startDate: "2024-01-01", endDate: "2024-01-31" });
+            await result.fetchData({ endDate: "2024-01-31", startDate: "2024-01-01" });
             app = mountedApp;
 
             await nextTick();
 
-            await result.fetchData({ startDate: "2024-02-01", endDate: "2024-02-28" });
+            await result.fetchData({ endDate: "2024-02-28", startDate: "2024-02-01" });
             await nextTick();
 
-            await result.fetchData({ startDate: "2024-01-01", endDate: "2024-01-31" });
+            await result.fetchData({ endDate: "2024-01-31", startDate: "2024-01-01" });
             await nextTick();
 
             expect(fetchAnalyticsDataMock).toHaveBeenCalledTimes(2);
         });
 
         it("maintains separate caches for different properties", async () => {
-            const dateRange = { startDate: "2024-01-01", endDate: "2024-01-31" };
+            const dateRange = { endDate: "2024-01-31", startDate: "2024-01-01" };
             const property1 = ref({ id: "1", name: "Property 1", organisationId: "1" });
             const property2 = ref({ id: "2", name: "Property 2", organisationId: "1" });
 
             fetchAnalyticsDataMock.mockResolvedValueOnce({
-                events: [{ id: "1", propertyId: "1", date: "2024-01-15" }],
-                reservations: [{ type: ReservationType.PLANNED, id: "1", eventId: "1" }],
+                events: [{ date: "2024-01-15", id: "1", propertyId: "1" }],
+                reservations: [{ eventId: "1", id: "1", type: ReservationType.PLANNED }],
             });
 
             const [result1, mountedApp1] = withSetup(() =>
@@ -216,10 +217,10 @@ describe("useReservationsAnalytics", () => {
             await nextTick();
 
             fetchAnalyticsDataMock.mockResolvedValueOnce({
-                events: [{ id: "2", propertyId: "2", date: "2024-01-15" }],
+                events: [{ date: "2024-01-15", id: "2", propertyId: "2" }],
                 reservations: [
-                    { type: ReservationType.PLANNED, id: "2", eventId: "2" },
-                    { type: ReservationType.PLANNED, id: "3", eventId: "2" },
+                    { eventId: "2", id: "2", type: ReservationType.PLANNED },
+                    { eventId: "2", id: "3", type: ReservationType.PLANNED },
                 ],
             });
 
@@ -236,12 +237,12 @@ describe("useReservationsAnalytics", () => {
         });
 
         it("clears cache on unmount", async () => {
-            const dateRange = { startDate: "2024-01-01", endDate: "2024-01-31" };
+            const dateRange = { endDate: "2024-01-31", startDate: "2024-01-01" };
             const property = ref({ id: "1", name: "Test Property", organisationId: "1" });
 
             fetchAnalyticsDataMock.mockResolvedValueOnce({
-                events: [{ id: "1", propertyId: "1", date: "2024-01-15" }],
-                reservations: [{ type: ReservationType.PLANNED, id: "1", eventId: "1" }],
+                events: [{ date: "2024-01-15", id: "1", propertyId: "1" }],
+                reservations: [{ eventId: "1", id: "1", type: ReservationType.PLANNED }],
             });
 
             const [result, mountedApp] = withSetup(() =>
@@ -255,8 +256,8 @@ describe("useReservationsAnalytics", () => {
 
             // Create a new instance
             fetchAnalyticsDataMock.mockResolvedValueOnce({
-                events: [{ id: "1", propertyId: "1", date: "2024-01-15" }],
-                reservations: [{ type: ReservationType.PLANNED, id: "1", eventId: "1" }],
+                events: [{ date: "2024-01-15", id: "1", propertyId: "1" }],
+                reservations: [{ eventId: "1", id: "1", type: ReservationType.PLANNED }],
             });
 
             const [result2, newMountedApp] = withSetup(() =>
@@ -277,18 +278,18 @@ describe("useReservationsAnalytics", () => {
             const property = ref({ id: "1", name: "Test Property", organisationId: "1" });
 
             fetchAnalyticsDataMock.mockResolvedValueOnce({
-                events: [{ id: "1", propertyId: "1", date: "2024-01-01" }],
+                events: [{ date: "2024-01-01", id: "1", propertyId: "1" }],
                 reservations: [
-                    { type: ReservationType.PLANNED, id: "1", eventId: "1" },
-                    { type: ReservationType.PLANNED, id: "2", eventId: "1" },
-                    { type: ReservationType.WALK_IN, id: "3", eventId: "1" },
+                    { eventId: "1", id: "1", type: ReservationType.PLANNED },
+                    { eventId: "1", id: "2", type: ReservationType.PLANNED },
+                    { eventId: "1", id: "3", type: ReservationType.WALK_IN },
                 ],
             });
 
             const [result, mountedApp] = withSetup(() =>
                 useReservationsAnalytics(property, "1", "en"),
             );
-            await result.fetchData({ startDate: "2024-01-01", endDate: "2024-01-31" });
+            await result.fetchData({ endDate: "2024-01-31", startDate: "2024-01-01" });
             app = mountedApp;
 
             await nextTick();
@@ -304,18 +305,18 @@ describe("useReservationsAnalytics", () => {
             const property = ref({ id: "1", name: "Test Property", organisationId: "1" });
 
             fetchAnalyticsDataMock.mockResolvedValueOnce({
-                events: [{ id: "1", propertyId: "1", date: "2024-01-01" }],
+                events: [{ date: "2024-01-01", id: "1", propertyId: "1" }],
                 reservations: [
-                    { time: "19:00", type: ReservationType.PLANNED, eventId: "1" },
-                    { time: "19:00", type: ReservationType.PLANNED, eventId: "1" },
-                    { time: "20:00", type: ReservationType.PLANNED, eventId: "1" },
+                    { eventId: "1", time: "19:00", type: ReservationType.PLANNED },
+                    { eventId: "1", time: "19:00", type: ReservationType.PLANNED },
+                    { eventId: "1", time: "20:00", type: ReservationType.PLANNED },
                 ],
             });
 
             const [result, mountedApp] = withSetup(() =>
                 useReservationsAnalytics(property, "org1", "en"),
             );
-            await result.fetchData({ startDate: "2024-01-01", endDate: "2024-01-31" });
+            await result.fetchData({ endDate: "2024-01-31", startDate: "2024-01-01" });
             app = mountedApp;
 
             await nextTick();
@@ -328,18 +329,18 @@ describe("useReservationsAnalytics", () => {
             const property = ref({ id: "1", name: "Test Property", organisationId: "1" });
 
             fetchAnalyticsDataMock.mockResolvedValueOnce({
-                events: [{ id: "1", propertyId: "1", date: "2024-01-01" }],
+                events: [{ date: "2024-01-01", id: "1", propertyId: "1" }],
                 reservations: [
-                    { type: ReservationType.PLANNED, id: "1", eventId: "1", arrived: true },
-                    { type: ReservationType.PLANNED, id: "2", eventId: "1", arrived: true },
-                    { type: ReservationType.PLANNED, id: "3", eventId: "1", arrived: false },
+                    { arrived: true, eventId: "1", id: "1", type: ReservationType.PLANNED },
+                    { arrived: true, eventId: "1", id: "2", type: ReservationType.PLANNED },
+                    { arrived: false, eventId: "1", id: "3", type: ReservationType.PLANNED },
                 ],
             });
 
             const [result, mountedApp] = withSetup(() =>
                 useReservationsAnalytics(property, "org1", "en"),
             );
-            await result.fetchData({ startDate: "2024-01-01", endDate: "2024-01-31" });
+            await result.fetchData({ endDate: "2024-01-31", startDate: "2024-01-01" });
             app = mountedApp;
 
             await nextTick();
@@ -352,28 +353,28 @@ describe("useReservationsAnalytics", () => {
             const property = ref({ id: "1", name: "Test Property", organisationId: "1" });
 
             fetchAnalyticsDataMock.mockResolvedValueOnce({
-                events: [{ id: "1", propertyId: "1", date: "2024-01-15" }],
+                events: [{ date: "2024-01-15", id: "1", propertyId: "1" }],
                 reservations: [
                     {
-                        type: ReservationType.PLANNED,
-                        id: "1",
-                        eventId: "1",
+                        arrived: true,
                         consumption: 100,
-                        arrived: true,
+                        eventId: "1",
+                        id: "1",
+                        type: ReservationType.PLANNED,
                     },
                     {
-                        type: ReservationType.PLANNED,
-                        id: "2",
-                        eventId: "1",
+                        arrived: true,
                         consumption: 200,
-                        arrived: true,
+                        eventId: "1",
+                        id: "2",
+                        type: ReservationType.PLANNED,
                     },
                     {
-                        type: ReservationType.PLANNED,
-                        id: "3",
-                        eventId: "1",
-                        consumption: 300,
                         arrived: false,
+                        consumption: 300,
+                        eventId: "1",
+                        id: "3",
+                        type: ReservationType.PLANNED,
                     },
                 ],
             });
@@ -381,7 +382,7 @@ describe("useReservationsAnalytics", () => {
             const [result, mountedApp] = withSetup(() =>
                 useReservationsAnalytics(property, "org1", "en"),
             );
-            await result.fetchData({ startDate: "2024-01-01", endDate: "2024-01-31" });
+            await result.fetchData({ endDate: "2024-01-31", startDate: "2024-01-01" });
             app = mountedApp;
 
             await nextTick();
@@ -401,23 +402,23 @@ describe("useReservationsAnalytics", () => {
             fetchAnalyticsDataMock.mockResolvedValueOnce({
                 events: [
                     // Monday
-                    { id: "1", propertyId: "1", date: "2024-01-15" },
+                    { date: "2024-01-15", id: "1", propertyId: "1" },
                     // Tuesday
-                    { id: "2", propertyId: "1", date: "2024-01-16" },
+                    { date: "2024-01-16", id: "2", propertyId: "1" },
                     // Next Monday
-                    { id: "3", propertyId: "1", date: "2024-01-22" },
+                    { date: "2024-01-22", id: "3", propertyId: "1" },
                 ],
                 reservations: [
-                    { type: ReservationType.PLANNED, id: "1", eventId: "1", time: "19:00" },
-                    { type: ReservationType.PLANNED, id: "2", eventId: "2", time: "19:00" },
-                    { type: ReservationType.PLANNED, id: "3", eventId: "3", time: "19:00" },
+                    { eventId: "1", id: "1", time: "19:00", type: ReservationType.PLANNED },
+                    { eventId: "2", id: "2", time: "19:00", type: ReservationType.PLANNED },
+                    { eventId: "3", id: "3", time: "19:00", type: ReservationType.PLANNED },
                 ],
             });
 
             const [result, mountedApp] = withSetup(() =>
                 useReservationsAnalytics(property, "org1", "en"),
             );
-            await result.fetchData({ startDate: "2024-01-01", endDate: "2024-01-31" });
+            await result.fetchData({ endDate: "2024-01-31", startDate: "2024-01-01" });
             app = mountedApp;
 
             await nextTick();
@@ -438,19 +439,19 @@ describe("useReservationsAnalytics", () => {
 
             fetchAnalyticsDataMock.mockResolvedValueOnce({
                 events: [
-                    { id: "1", propertyId: "1", date: event1Date },
-                    { id: "2", propertyId: "1", date: event2Date },
+                    { date: event1Date, id: "1", propertyId: "1" },
+                    { date: event2Date, id: "2", propertyId: "1" },
                 ],
                 reservations: [
-                    { type: ReservationType.PLANNED, id: "1", eventId: "1" },
-                    { type: ReservationType.PLANNED, id: "2", eventId: "2" },
+                    { eventId: "1", id: "1", type: ReservationType.PLANNED },
+                    { eventId: "2", id: "2", type: ReservationType.PLANNED },
                 ],
             });
 
             const [result, mountedApp] = withSetup(() =>
                 useReservationsAnalytics(property, "org1", "en"),
             );
-            await result.fetchData({ startDate: "2024-01-01", endDate: "2024-01-31" });
+            await result.fetchData({ endDate: "2024-01-31", startDate: "2024-01-01" });
             app = mountedApp;
 
             await nextTick();
@@ -464,33 +465,33 @@ describe("useReservationsAnalytics", () => {
             const property = ref({ id: "1", name: "Test Property", organisationId: "1" });
 
             fetchAnalyticsDataMock.mockResolvedValueOnce({
-                events: [{ id: "1", propertyId: "1", date: "2024-01-01" }],
+                events: [{ date: "2024-01-01", id: "1", propertyId: "1" }],
                 reservations: [
                     // Arrived planned reservation
                     {
-                        type: ReservationType.PLANNED,
-                        id: "1",
-                        eventId: "1",
-                        consumption: 100,
                         arrived: true,
+                        consumption: 100,
+                        eventId: "1",
+                        id: "1",
+                        type: ReservationType.PLANNED,
                     },
                     // Not arrived planned reservation
                     {
-                        type: ReservationType.PLANNED,
-                        id: "2",
-                        eventId: "1",
-                        consumption: 0,
                         arrived: false,
+                        consumption: 0,
+                        eventId: "1",
+                        id: "2",
+                        type: ReservationType.PLANNED,
                     },
                     // Walk-in (should not affect consumption stats)
-                    { type: ReservationType.WALK_IN, id: "3", eventId: "1", consumption: 200 },
+                    { consumption: 200, eventId: "1", id: "3", type: ReservationType.WALK_IN },
                 ],
             });
 
             const [result, mountedApp] = withSetup(() =>
                 useReservationsAnalytics(property, "org1", "en"),
             );
-            await result.fetchData({ startDate: "2024-01-01", endDate: "2024-01-31" });
+            await result.fetchData({ endDate: "2024-01-31", startDate: "2024-01-01" });
             app = mountedApp;
 
             await nextTick();

@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import type { EventDoc } from "@firetable/types";
+
 import EventCard from "src/components/Event/EventCard.vue";
 
 interface Props {
-    events: EventDoc[];
     aspectRatio: number;
+    events: EventDoc[];
     propertyTimeZone: string;
 }
-const { propertyTimeZone, aspectRatio, events } = defineProps<Props>();
+const { aspectRatio, events, propertyTimeZone } = defineProps<Props>();
 </script>
 
 <template>

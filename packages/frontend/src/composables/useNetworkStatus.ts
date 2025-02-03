@@ -1,7 +1,8 @@
 import type { Ref } from "vue";
-import { ref, onMounted } from "vue";
+
 import { useEventListener } from "@vueuse/core";
 import { AppLogger } from "src/logger/FTLogger";
+import { onMounted, ref } from "vue";
 
 const onlineCheckUrl = "https://www.google.com/favicon.ico";
 

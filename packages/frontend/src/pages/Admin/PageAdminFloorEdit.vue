@@ -1,23 +1,24 @@
 <script setup lang="ts">
 import type { FloorEditor } from "@firetable/floor-creator";
 import type { FloorDoc } from "@firetable/types";
+
+import { getFloorPath } from "@firetable/backend";
+import { extractAllTablesLabels } from "@firetable/floor-creator";
+import { useEventListener } from "@vueuse/core";
+import { Loading } from "quasar";
 import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
 import FloorEditorTopControls from "src/components/Floor/FloorEditorTopControls.vue";
-import { onMounted, useTemplateRef } from "vue";
-import { useRouter } from "vue-router";
-import { Loading } from "quasar";
-import { extractAllTablesLabels } from "@firetable/floor-creator";
-import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import {
     getFirestoreDocument,
     updateFirestoreDocument,
     useFirestoreDocument,
 } from "src/composables/useFirestore";
-import { getFloorPath } from "@firetable/backend";
-import { compressFloorDoc, decompressFloorDoc } from "src/helpers/compress-floor-doc";
 import { useFloorEditor } from "src/composables/useFloorEditor";
-import { useEventListener } from "@vueuse/core";
 import { isTablet } from "src/global-reactives/screen-detection";
+import { compressFloorDoc, decompressFloorDoc } from "src/helpers/compress-floor-doc";
+import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { onMounted, useTemplateRef } from "vue";
+import { useRouter } from "vue-router";
 
 interface Props {
     floorId: string;
@@ -33,17 +34,17 @@ const pageRef = useTemplateRef<HTMLDivElement>("pageRef");
 const floorPath = getFloorPath(props.organisationId, props.propertyId, props.floorId);
 const {
     data: floor,
-    promise: floorDataPromise,
     pending: isFloorLoading,
+    promise: floorDataPromise,
 } = useFirestoreDocument<FloorDoc>(floorPath, { once: true });
 const {
-    hasChanges,
-    resizeFloor,
-    initializeFloor,
-    onFloorChange,
-    onDeleteElement,
-    selectedElement,
     floorInstance,
+    hasChanges,
+    initializeFloor,
+    onDeleteElement,
+    onFloorChange,
+    resizeFloor,
+    selectedElement,
 } = useFloorEditor(pageRef);
 
 function onKeyDown(event: KeyboardEvent): void {
@@ -84,15 +85,15 @@ async function onFloorSave(): Promise<void> {
     }
 
     const { name } = floorInstance.value;
-    const { json, width, height } = floorInstance.value.export();
+    const { height, json, width } = floorInstance.value.export();
 
     await tryCatchLoadingWrapper({
         async hook() {
             await updateFirestoreDocument(getFirestoreDocument(floorPath), {
+                height,
                 json: compressFloorDoc(json),
                 name,
                 width,
-                height,
             });
             floorInstance.value?.markAsSaved();
         },

@@ -1,7 +1,10 @@
-import type { EventOwner } from "../db.js";
 import type { AppUser, EventLog } from "@firetable/types";
-import { eventLogsDoc } from "../db.js";
+
 import { arrayUnion, setDoc, Timestamp } from "firebase/firestore";
+
+import type { EventOwner } from "../db.js";
+
+import { eventLogsDoc } from "../db.js";
 
 /**
  * It can throw so should be called inside a try-catch block
@@ -17,14 +20,14 @@ export async function addLogToEvent(
     const eventLogsRef = eventLogsDoc(eventOwner);
 
     const logEntry: EventLog = {
-        message: logMessage,
-        timestamp: Timestamp.now(),
         creator: {
+            email: user.email,
             id: user.id,
             name: user.name,
-            email: user.email,
             role: user.role,
         },
+        message: logMessage,
+        timestamp: Timestamp.now(),
     };
 
     await setDoc(

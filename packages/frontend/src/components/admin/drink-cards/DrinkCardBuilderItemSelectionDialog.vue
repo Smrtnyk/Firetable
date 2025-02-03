@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import type { DrinkCardItem, InventoryItemDoc } from "@firetable/types";
-import { computed, ref } from "vue";
+
 import { uniq } from "es-toolkit";
 import { property } from "es-toolkit/compat";
-
-interface Props {
-    inventoryItems: (DrinkCardItem | InventoryItemDoc)[];
-}
+import { computed, ref } from "vue";
 
 interface Emits {
     (event: "update:modelValue", value: boolean): void;
     (event: "select", item: DrinkCardItem | InventoryItemDoc): void;
+}
+
+interface Props {
+    inventoryItems: (DrinkCardItem | InventoryItemDoc)[];
 }
 
 const props = defineProps<Props>();
@@ -40,6 +41,10 @@ const filteredItems = computed(function () {
     });
 });
 
+function handleSelect(item: DrinkCardItem | InventoryItemDoc): void {
+    emit("select", item);
+}
+
 function isCategorySelected(category: string): boolean {
     return selectedCategories.value.includes(category);
 }
@@ -51,10 +56,6 @@ function toggleCategory(category: string): void {
     } else {
         selectedCategories.value.splice(index, 1);
     }
-}
-
-function handleSelect(item: DrinkCardItem | InventoryItemDoc): void {
-    emit("select", item);
 }
 </script>
 

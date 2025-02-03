@@ -1,6 +1,6 @@
+import { isBoolean } from "es-toolkit/predicate";
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { isBoolean } from "es-toolkit/predicate";
 
 export const useEventsStore = defineStore("events", function () {
     const showEventGuestListDrawer = ref(false);
@@ -28,11 +28,11 @@ export const useEventsStore = defineStore("events", function () {
     }
 
     return {
+        currentEventName,
+        setCurrentEventName,
         showEventGuestListDrawer,
         showQueuedReservationsDrawer,
-        currentEventName,
-        toggleQueuedReservationsDrawerVisibility,
         toggleEventGuestListDrawerVisibility,
-        setCurrentEventName,
+        toggleQueuedReservationsDrawerVisibility,
     };
 });

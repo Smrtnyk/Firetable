@@ -16,6 +16,7 @@
 
 <script setup lang="ts">
 import type { ComponentPublicInstance } from "vue";
+
 import { useDialogPluginComponent } from "quasar";
 
 interface Props {
@@ -24,7 +25,7 @@ interface Props {
     listeners: Record<string, (...args: any) => any>;
 }
 
-const { component, listeners, componentPropsObject } = defineProps<Props>();
+const { component, componentPropsObject, listeners } = defineProps<Props>();
 const { dialogRef, onDialogHide } = useDialogPluginComponent();
 
 defineEmits(useDialogPluginComponent.emits);

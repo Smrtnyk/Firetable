@@ -1,5 +1,6 @@
+import { describe, expect, it } from "vitest";
+
 import { isTimeWithinEventDuration } from "./reservation-form-utils";
-import { describe, it, expect } from "vitest";
 
 describe("isTimeWithinEventDuration", () => {
     it("returns true during event hours", () => {

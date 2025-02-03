@@ -1,13 +1,13 @@
+export interface DateRange {
+    endDate: string;
+    startDate: string;
+}
+
+export type GuardedLink = Link & { isVisible: boolean };
 export type Link = {
-    label: string;
     icon: string;
+    label: string;
     route: { name: string; params?: Record<string, string> };
 };
 
-export type GuardedLink = Link & { isVisible: boolean };
 export type LinkWithChildren = Omit<Link, "route"> & { children: Link[]; isVisible: boolean };
-
-export interface DateRange {
-    startDate: string;
-    endDate: string;
-}

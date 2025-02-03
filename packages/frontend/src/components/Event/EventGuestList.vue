@@ -1,34 +1,35 @@
 <script setup lang="ts">
 import type { GuestInGuestListData, VoidFunction } from "@firetable/types";
+
+import { AdminRole, Role } from "@firetable/types";
+import { storeToRefs } from "pinia";
+import EventGuestListCreateGuestForm from "src/components/Event/EventGuestListCreateGuestForm.vue";
+import FTBtn from "src/components/FTBtn.vue";
+import FTCenteredText from "src/components/FTCenteredText.vue";
+import FTDialog from "src/components/FTDialog.vue";
+import FTTitle from "src/components/FTTitle.vue";
+import { useDialog } from "src/composables/useDialog";
+import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { useAuthStore } from "src/stores/auth-store";
+import { useEventsStore } from "src/stores/events-store";
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
+
 import type { EventOwner } from "../../backend-proxy";
+
 import {
     addGuestToGuestList,
     confirmGuestFromGuestList,
     deleteGuestFromGuestList,
 } from "../../backend-proxy";
-import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { computed } from "vue";
-import { useEventsStore } from "src/stores/events-store";
-import { storeToRefs } from "pinia";
-
-import FTCenteredText from "src/components/FTCenteredText.vue";
-import EventGuestListCreateGuestForm from "src/components/Event/EventGuestListCreateGuestForm.vue";
-import FTTitle from "src/components/FTTitle.vue";
-import FTDialog from "src/components/FTDialog.vue";
-import FTBtn from "src/components/FTBtn.vue";
-
-import { AdminRole, Role } from "@firetable/types";
-import { useI18n } from "vue-i18n";
-import { useAuthStore } from "src/stores/auth-store";
-import { useDialog } from "src/composables/useDialog";
 
 interface Props {
-    guestListLimit: number;
-    guestList: GuestInGuestListData[];
     eventOwner: EventOwner;
+    guestList: GuestInGuestListData[];
+    guestListLimit: number;
 }
 
-const { guestListLimit, eventOwner, guestList = [] } = defineProps<Props>();
+const { eventOwner, guestList = [], guestListLimit } = defineProps<Props>();
 const { createDialog } = useDialog();
 const eventsStore = useEventsStore();
 const { nonNullableUser } = storeToRefs(useAuthStore());
@@ -41,7 +42,7 @@ const isGuestListFull = computed(function () {
 });
 
 const canInteract = computed(function () {
-    return [Role.PROPERTY_OWNER, Role.MANAGER, AdminRole.ADMIN, Role.HOSTESS].includes(
+    return [AdminRole.ADMIN, Role.HOSTESS, Role.MANAGER, Role.PROPERTY_OWNER].includes(
         nonNullableUser.value.role,
     );
 });
@@ -59,22 +60,15 @@ function onCreate(newGuestData: GuestInGuestListData): Promise<void> | void {
     });
 }
 
-function showAddNewGuestForm(): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            title: t("EventGuestList.addGuestLabel"),
-            component: EventGuestListCreateGuestForm,
-            maximized: false,
-            componentPropsObject: {},
-            listeners: {
-                create(newGuestData: GuestInGuestListData) {
-                    onCreate(newGuestData);
-                    dialog.hide();
-                },
-            },
+async function onSwipeLeftConfirmGuest(
+    { reset }: { reset: VoidFunction },
+    guest: GuestInGuestListData,
+): Promise<void> {
+    await tryCatchLoadingWrapper({
+        hook() {
+            return confirmGuestFromGuestList(eventOwner, guest.id, !guest.confirmed);
         },
-    });
+    }).finally(reset);
 }
 
 async function onSwipeRightDeleteGuest(
@@ -86,23 +80,30 @@ async function onSwipeRightDeleteGuest(
     }
 
     await tryCatchLoadingWrapper({
+        // Reset only on error hook, since deleting the guest causes the rerender of the list anyway
+        errorHook: reset,
         hook() {
             return deleteGuestFromGuestList(eventOwner, id);
         },
-        // Reset only on error hook, since deleting the guest causes the rerender of the list anyway
-        errorHook: reset,
     });
 }
 
-async function onSwipeLeftConfirmGuest(
-    { reset }: { reset: VoidFunction },
-    guest: GuestInGuestListData,
-): Promise<void> {
-    await tryCatchLoadingWrapper({
-        hook() {
-            return confirmGuestFromGuestList(eventOwner, guest.id, !guest.confirmed);
+function showAddNewGuestForm(): void {
+    const dialog = createDialog({
+        component: FTDialog,
+        componentProps: {
+            component: EventGuestListCreateGuestForm,
+            componentPropsObject: {},
+            listeners: {
+                create(newGuestData: GuestInGuestListData) {
+                    onCreate(newGuestData);
+                    dialog.hide();
+                },
+            },
+            maximized: false,
+            title: t("EventGuestList.addGuestLabel"),
         },
-    }).finally(reset);
+    });
 }
 </script>
 

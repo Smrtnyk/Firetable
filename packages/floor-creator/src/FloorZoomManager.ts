@@ -1,38 +1,28 @@
 import type { Canvas } from "fabric";
-import type { Floor } from "./Floor.js";
-import { DEFAULT_ZOOM, ZOOM_INCREMENT } from "./constants.js";
+
 import { Point } from "fabric";
 
+import type { Floor } from "./Floor.js";
+
+import { DEFAULT_ZOOM, ZOOM_INCREMENT } from "./constants.js";
+
 enum AbsoluteScale {
-    YES = 0,
     NO = 1,
+    YES = 0,
 }
 
 export class FloorZoomManager {
     isZooming = false;
 
-    private minZoom: number;
-    private readonly maxZoom = DEFAULT_ZOOM * 3;
     private readonly canvas: Canvas;
     private initialScale: number;
+    private readonly maxZoom = DEFAULT_ZOOM * 3;
+    private minZoom: number;
 
     constructor(private readonly floor: Floor) {
         this.canvas = floor.canvas;
         this.initialScale = this.canvas.getZoom();
         this.minZoom = this.initialScale;
-    }
-
-    setScale(newVal: number): void {
-        this.initialScale = newVal;
-        this.minZoom = this.initialScale;
-    }
-
-    zoomIn(point: Point): void {
-        this.adjustZoom(1 + ZOOM_INCREMENT, point);
-    }
-
-    zoomOut(point: Point): void {
-        this.adjustZoom(1 - ZOOM_INCREMENT, point);
     }
 
     adjustZoom(scale: number, point: Point, isAbsolute = AbsoluteScale.NO): void {
@@ -66,11 +56,24 @@ export class FloorZoomManager {
         this.isZooming = false;
     }
 
+    destroy(): void {
+        this.isZooming = false;
+    }
+
     resetZoom(): void {
         this.adjustZoom(this.minZoom, new Point(0, 0), AbsoluteScale.YES);
     }
 
-    destroy(): void {
-        this.isZooming = false;
+    setScale(newVal: number): void {
+        this.initialScale = newVal;
+        this.minZoom = this.initialScale;
+    }
+
+    zoomIn(point: Point): void {
+        this.adjustZoom(1 + ZOOM_INCREMENT, point);
+    }
+
+    zoomOut(point: Point): void {
+        this.adjustZoom(1 - ZOOM_INCREMENT, point);
     }
 }

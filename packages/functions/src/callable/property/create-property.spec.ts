@@ -1,9 +1,11 @@
-import type { CallableRequest } from "firebase-functions/v2/https";
 import type { CreatePropertyPayload } from "@shared-types/property.js";
-import { createPropertyFn } from "./create-property.js";
-import { getPropertyPath, getUserPath, getUsersPath } from "../../paths.js";
-import { db } from "../../init.js";
+import type { CallableRequest } from "firebase-functions/v2/https";
+
 import { describe, expect, it } from "vitest";
+
+import { db } from "../../init.js";
+import { getPropertyPath, getUserPath, getUsersPath } from "../../paths.js";
+import { createPropertyFn } from "./create-property.js";
 
 describe("createPropertyFn", () => {
     function mockRequest(
@@ -11,16 +13,16 @@ describe("createPropertyFn", () => {
         auth: any,
     ): CallableRequest<CreatePropertyPayload> {
         return {
-            data,
-            auth,
-            rawRequest: {} as any,
             acceptsStreaming: false,
+            auth,
+            data,
+            rawRequest: {} as any,
         };
     }
 
     it("should throw error if user is not authenticated", async () => {
         const request = mockRequest(
-            { name: "Test Property", organisationId: "org1", img: "" },
+            { img: "", name: "Test Property", organisationId: "org1" },
             null,
         );
 
@@ -30,8 +32,8 @@ describe("createPropertyFn", () => {
     it("should throw error if organisationId is missing", async () => {
         const request = mockRequest(
             // @ts-expect-error -- not passing organisationId
-            { name: "Test Property", img: "" },
-            { uid: "user123", token: {} },
+            { img: "", name: "Test Property" },
+            { token: {}, uid: "user123" },
         );
 
         await expect(createPropertyFn(request)).rejects.toThrow(
@@ -48,14 +50,14 @@ describe("createPropertyFn", () => {
         // Create the user document in Firestore
         const userData = {
             name: "Test User",
-            role: roleName,
             relatedProperties: [],
+            role: roleName,
         };
         await db.collection(getUsersPath(organisationId)).doc(userId).set(userData);
 
         const request = mockRequest(
-            { name: propertyName, organisationId, img: "" },
-            { uid: userId, token: { role: roleName } },
+            { img: "", name: propertyName, organisationId },
+            { token: { role: roleName }, uid: userId },
         );
         const propertyId = await createPropertyFn(request);
 
@@ -64,10 +66,10 @@ describe("createPropertyFn", () => {
         // Check if the property data is correctly stored
         const propertyData = await db.doc(getPropertyPath(organisationId, propertyId)).get();
         expect(propertyData.data()).toStrictEqual({
-            name: propertyName,
-            organisationId,
             creatorId: userId,
             img: "",
+            name: propertyName,
+            organisationId,
         });
 
         // Check if the user's related properties are updated

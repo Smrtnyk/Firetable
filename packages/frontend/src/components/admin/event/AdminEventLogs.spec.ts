@@ -1,43 +1,46 @@
 import type { EventLog, EventLogsDoc } from "@firetable/types";
 import type { RenderResult } from "vitest-browser-vue";
-import type { AdminEventLogsProps } from "./AdminEventLogs.vue";
-import AdminEventLogs from "./AdminEventLogs.vue";
-import { getLocaleForTest, renderComponent } from "../../../../test-helpers/render-component";
+
 import { AdminRole, Role } from "@firetable/types";
-import { formatEventDate, getDefaultTimezone } from "src/helpers/date-utils";
-import { beforeEach, describe, expect, it } from "vitest";
 import { page } from "@vitest/browser/context";
 import { delay } from "es-toolkit";
+import { formatEventDate, getDefaultTimezone } from "src/helpers/date-utils";
+import { beforeEach, describe, expect, it } from "vitest";
+
+import type { AdminEventLogsProps } from "./AdminEventLogs.vue";
+
+import { getLocaleForTest, renderComponent } from "../../../../test-helpers/render-component";
+import AdminEventLogs from "./AdminEventLogs.vue";
 
 const sampleLogs: EventLog[] = [
     {
-        message: "User John Doe created a reservation.",
         creator: {
+            email: "john@example.com",
             id: "foo",
             name: "John Doe",
-            email: "john@example.com",
             role: Role.MANAGER,
         },
+        message: "User John Doe created a reservation.",
         timestamp: 1_633_017_600_000,
     },
     {
-        message: "Admin deleted a reservation.",
         creator: {
+            email: "admin@example.com",
             id: "bar",
             name: "Admin",
-            email: "admin@example.com",
             role: AdminRole.ADMIN,
         },
+        message: "Admin deleted a reservation.",
         timestamp: 1_633_104_000_000,
     },
     {
-        message: "User Jane Smith edited a reservation.",
         creator: {
+            email: "jane@example.com",
             id: "baz",
             name: "Jane Smith",
-            email: "jane@example.com",
             role: Role.STAFF,
         },
+        message: "User Jane Smith edited a reservation.",
         timestamp: 1_633_190_400_000,
     },
 ];
@@ -76,8 +79,8 @@ describe("AdminEventLogs", () => {
     describe("when user is admin", () => {
         beforeEach(() => {
             screen = renderComponent(AdminEventLogs, {
-                logsDoc,
                 isAdmin: true,
+                logsDoc,
                 timezone: getDefaultTimezone(),
             });
         });
@@ -127,8 +130,8 @@ describe("AdminEventLogs", () => {
     describe("when user is not admin", () => {
         beforeEach(() => {
             screen = renderComponent(AdminEventLogs, {
-                logsDoc,
                 isAdmin: false,
+                logsDoc,
                 timezone: getDefaultTimezone(),
             });
         });
@@ -163,13 +166,13 @@ describe("AdminEventLogs", () => {
             { length: numberOfLogs },
             (_, i) =>
                 ({
-                    message: `Log message ${i}`,
                     creator: {
+                        email: `user${i}@example.com`,
                         id: Math.random().toString(),
                         name: `User ${i}`,
-                        email: `user${i}@example.com`,
                         role: Role.STAFF,
                     },
+                    message: `Log message ${i}`,
                     timestamp: Date.now() - i * 1000,
                 }) as EventLog,
         );
@@ -177,9 +180,9 @@ describe("AdminEventLogs", () => {
         screen = renderComponent(
             AdminEventLogs,
             {
-                timezone: getDefaultTimezone(),
-                logsDoc: { logs },
                 isAdmin: true,
+                logsDoc: { logs },
+                timezone: getDefaultTimezone(),
             },
             { wrapInLayout: true },
         );

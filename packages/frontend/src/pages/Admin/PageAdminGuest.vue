@@ -1,31 +1,31 @@
 <script setup lang="ts">
 import type { CreateGuestPayload, GuestDoc, Visit } from "@firetable/types";
-import { formatEventDate, getDefaultTimezone } from "src/helpers/date-utils";
-import { useFirestoreDocument } from "src/composables/useFirestore";
+
 import { deleteGuest, getGuestPath, updateGuestInfo } from "@firetable/backend";
-import { computed, ref, watch } from "vue";
+import { matchesProperty } from "es-toolkit/compat";
 import { storeToRefs } from "pinia";
-import { usePropertiesStore } from "src/stores/properties-store";
+import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
+import AdminGuestVisitsTimeline from "src/components/admin/guest/AdminGuestVisitsTimeline.vue";
+import FTBtn from "src/components/FTBtn.vue";
+import FTCenteredText from "src/components/FTCenteredText.vue";
+import FTDialog from "src/components/FTDialog.vue";
+import FTTabPanels from "src/components/FTTabPanels.vue";
+import FTTabs from "src/components/FTTabs.vue";
+import FTTitle from "src/components/FTTitle.vue";
+import { useDialog } from "src/composables/useDialog";
+import { useFirestoreDocument } from "src/composables/useFirestore";
+import { formatEventDate, getDefaultTimezone } from "src/helpers/date-utils";
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { useAuthStore } from "src/stores/auth-store";
+import { useGuestsStore } from "src/stores/guests-store";
+import { usePropertiesStore } from "src/stores/properties-store";
+import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
-import { matchesProperty } from "es-toolkit/compat";
-import { useDialog } from "src/composables/useDialog";
-import { useGuestsStore } from "src/stores/guests-store";
-import { useAuthStore } from "src/stores/auth-store";
-
-import FTTitle from "src/components/FTTitle.vue";
-import FTTabs from "src/components/FTTabs.vue";
-import FTCenteredText from "src/components/FTCenteredText.vue";
-import FTTabPanels from "src/components/FTTabPanels.vue";
-import FTDialog from "src/components/FTDialog.vue";
-import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
-import FTBtn from "src/components/FTBtn.vue";
-import AdminGuestVisitsTimeline from "src/components/admin/guest/AdminGuestVisitsTimeline.vue";
 
 export interface PageAdminGuestProps {
-    organisationId: string;
     guestId: string;
+    organisationId: string;
 }
 
 interface VisitsByProperty {
@@ -40,8 +40,8 @@ const guestsStore = useGuestsStore();
 const propertiesStore = usePropertiesStore();
 const { isAdmin } = storeToRefs(useAuthStore());
 const { properties } = storeToRefs(propertiesStore);
-const { t, locale } = useI18n();
-const { organisationId, guestId } = defineProps<PageAdminGuestProps>();
+const { locale, t } = useI18n();
+const { guestId, organisationId } = defineProps<PageAdminGuestProps>();
 const { data: guest } = useFirestoreDocument<GuestDoc>(getGuestPath(organisationId, guestId));
 
 const tab = ref("");
@@ -103,13 +103,9 @@ async function editGuest(guestVal: GuestDoc): Promise<void> {
         componentProps: {
             component: AddNewGuestForm,
             componentPropsObject: {
-                mode: "edit",
                 initialData: guestVal,
+                mode: "edit",
             },
-            maximized: false,
-            title: t("PageAdminGuest.editGuestDialogTitle", {
-                name: guestVal.name,
-            }),
             listeners: {
                 update(updatedData: CreateGuestPayload) {
                     dialog.hide();
@@ -121,6 +117,10 @@ async function editGuest(guestVal: GuestDoc): Promise<void> {
                     });
                 },
             },
+            maximized: false,
+            title: t("PageAdminGuest.editGuestDialogTitle", {
+                name: guestVal.name,
+            }),
         },
     });
 }

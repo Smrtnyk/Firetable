@@ -1,22 +1,24 @@
-import type { CallableRequest } from "firebase-functions/https";
 import type { GuestDoc } from "@shared-types";
-import { db } from "../../init.js";
-import { getGuestsPath } from "../../paths.js";
+import type { CallableRequest } from "firebase-functions/https";
+
 import { HttpsError } from "firebase-functions/v2/https";
 
+import { db } from "../../init.js";
+import { getGuestsPath } from "../../paths.js";
+
 export interface UpdateGuestInfo {
+    guestId: string;
+    organisationId: string;
     updatedData: Pick<
         GuestDoc,
         "contact" | "hashedContact" | "lastModified" | "maskedContact" | "name" | "tags"
     >;
-    guestId: string;
-    organisationId: string;
 }
 
 export async function updateGuestDataFn(
     req: CallableRequest<UpdateGuestInfo>,
 ): Promise<{ success: boolean }> {
-    const { updatedData, guestId, organisationId } = req.data;
+    const { guestId, organisationId, updatedData } = req.data;
 
     const guestsCollectionRef = db.collection(getGuestsPath(organisationId));
     const oldDocRef = guestsCollectionRef.doc(guestId);
@@ -46,9 +48,9 @@ export async function updateGuestDataFn(
         }
 
         const dataToUpdate: UpdateGuestInfo["updatedData"] = {
-            lastModified: Date.now(),
             contact: updatedData.contact,
             hashedContact: updatedData.hashedContact,
+            lastModified: Date.now(),
             maskedContact: updatedData.maskedContact,
             name: updatedData.name,
         };

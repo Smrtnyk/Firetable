@@ -1,31 +1,17 @@
 <script setup lang="ts">
 import type { FloorDoc, ReservationDoc } from "@firetable/types";
-import { computed } from "vue";
+
 import { getTablesFromFloorDoc } from "@firetable/floor-creator";
 import { property } from "es-toolkit/compat";
+import { computed } from "vue";
 
 export interface AdminEventRTInfoProps {
-    floors: FloorDoc[];
     activeReservations: ReservationDoc[];
+    floors: FloorDoc[];
     returningGuests: { id: string }[];
 }
 
 const props = defineProps<AdminEventRTInfoProps>();
-
-function getUniqueFloorNames(floors: FloorDoc[]): Map<string, FloorDoc[]> {
-    const floorGroups = new Map<string, FloorDoc[]>();
-
-    floors.forEach(function (floor) {
-        const baseName = floor.name.replace(/_copy$/, "");
-        if (!floorGroups.has(baseName)) {
-            floorGroups.set(baseName, []);
-        }
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we just set it
-        floorGroups.get(baseName)!.push(floor);
-    });
-
-    return floorGroups;
-}
 
 function calculateTotalTables(floors: FloorDoc[]): number {
     const floorGroups = getUniqueFloorNames(floors);
@@ -40,6 +26,21 @@ function calculateTotalTables(floors: FloorDoc[]): number {
     });
 
     return totalTables;
+}
+
+function getUniqueFloorNames(floors: FloorDoc[]): Map<string, FloorDoc[]> {
+    const floorGroups = new Map<string, FloorDoc[]>();
+
+    floors.forEach(function (floor) {
+        const baseName = floor.name.replace(/_copy$/, "");
+        if (!floorGroups.has(baseName)) {
+            floorGroups.set(baseName, []);
+        }
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we just set it
+        floorGroups.get(baseName)!.push(floor);
+    });
+
+    return floorGroups;
 }
 
 const reservationsStatus = computed(function () {
@@ -62,14 +63,14 @@ const reservationsStatus = computed(function () {
     }, 0);
 
     return {
-        total: calculateTotalTables(props.floors),
-        currentlyOccupied,
-        pending,
-        totalGuests,
-        guestsWithContacts,
-        returningGuests: props.returningGuests.length,
-        vipGuests,
         averageConsumption: totalConsumption / props.activeReservations.length || 0,
+        currentlyOccupied,
+        guestsWithContacts,
+        pending,
+        returningGuests: props.returningGuests.length,
+        total: calculateTotalTables(props.floors),
+        totalGuests,
+        vipGuests,
     };
 });
 

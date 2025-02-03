@@ -1,20 +1,23 @@
-import type { DeleteGuestVisitData } from "./delete-guest-visit.js";
 import type { CallableRequest } from "firebase-functions/v2/https";
-import type { PreparedGuestData } from "./set-guest-data.js";
-import { deleteGuestVisitFn } from "./delete-guest-visit.js";
-import { getGuestsPath } from "../../paths.js";
-import { db } from "../../init.js";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+
 import { DocumentReference } from "firebase-admin/firestore";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { DeleteGuestVisitData } from "./delete-guest-visit.js";
+import type { PreparedGuestData } from "./set-guest-data.js";
+
+import { db } from "../../init.js";
+import { getGuestsPath } from "../../paths.js";
+import { deleteGuestVisitFn } from "./delete-guest-visit.js";
 
 const preparedGuestData: PreparedGuestData = {
-    contact: "guest1",
-    maskedContact: "maskedContact",
-    hashedContact: "hashedContact",
-    guestName: "guestName",
     arrived: false,
     cancelled: false,
+    contact: "guest1",
+    guestName: "guestName",
+    hashedContact: "hashedContact",
     isVIP: true,
+    maskedContact: "maskedContact",
 };
 const propertyId = "propertyId";
 const organisationId = "orgId";
@@ -51,10 +54,10 @@ describe("deleteGuestVisitFn", () => {
         await expect(
             deleteGuestVisitFn({
                 data: {
+                    eventId,
+                    organisationId,
                     preparedGuestData,
                     propertyId,
-                    organisationId,
-                    eventId,
                 },
             } as CallableRequest<DeleteGuestVisitData>),
         ).rejects.toThrow("Error processing the request.");
@@ -64,10 +67,10 @@ describe("deleteGuestVisitFn", () => {
         await expect(
             deleteGuestVisitFn({
                 data: {
-                    preparedGuestData: { contact: "nonexistentGuest", arrived: false },
-                    propertyId,
-                    organisationId,
                     eventId,
+                    organisationId,
+                    preparedGuestData: { arrived: false, contact: "nonexistentGuest" },
+                    propertyId,
                 },
             } as CallableRequest<DeleteGuestVisitData>),
         ).resolves.not.toThrow();
@@ -99,10 +102,10 @@ describe("deleteGuestVisitFn", () => {
 
         await deleteGuestVisitFn({
             data: {
+                eventId,
+                organisationId,
                 preparedGuestData,
                 propertyId,
-                organisationId,
-                eventId,
             },
         } as CallableRequest<DeleteGuestVisitData>);
 

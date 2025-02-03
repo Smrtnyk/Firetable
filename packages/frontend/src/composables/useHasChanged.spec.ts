@@ -1,6 +1,7 @@
+import { describe, expect, it } from "vitest";
+import { computed, reactive, ref } from "vue";
+
 import { useHasChanged } from "./useHasChanged";
-import { describe, it, expect } from "vitest";
-import { ref, reactive, computed } from "vue";
 
 describe("useHasChanged", () => {
     it("returns false initially when values are equal", () => {
@@ -18,7 +19,7 @@ describe("useHasChanged", () => {
     });
 
     it("detects changes in nested objects", () => {
-        const source = reactive({ user: { name: "John", age: 30 } });
+        const source = reactive({ user: { age: 30, name: "John" } });
         const { hasChanged } = useHasChanged(source);
 
         expect(hasChanged.value).toBe(false);
@@ -137,8 +138,8 @@ describe("useHasChanged", () => {
     it("handles objects with Symbol properties correctly", () => {
         const sym = Symbol("unique");
         const source = ref<Record<PropertyKey, unknown>>({
-            [sym]: "symbolValue",
             regularProp: "value",
+            [sym]: "symbolValue",
         });
         const { hasChanged, reset } = useHasChanged(source);
 
@@ -177,7 +178,7 @@ describe("useHasChanged", () => {
     });
 
     it("handles proxied objects correctly", () => {
-        const base = { name: "ProxyTest", details: { age: 25 } };
+        const base = { details: { age: 25 }, name: "ProxyTest" };
         const source = reactive(base);
         const proxiedSource = new Proxy(source, {
             get(target, prop, receiver) {

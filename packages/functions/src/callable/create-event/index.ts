@@ -1,10 +1,12 @@
 import type { CreateEventPayload } from "@shared-types";
 import type { CallableRequest } from "firebase-functions/v2/https";
-import { db } from "../../init.js";
-import { getEventsPath } from "../../paths.js";
+
 import { Collection } from "@shared-types";
 import { logger } from "firebase-functions/v2";
 import { HttpsError } from "firebase-functions/v2/https";
+
+import { db } from "../../init.js";
+import { getEventsPath } from "../../paths.js";
 
 /**
  * Creates a new event in the Firestore database, uploads associated event images, and associates the event with specific floor plans.
@@ -34,7 +36,7 @@ import { HttpsError } from "firebase-functions/v2/https";
  */
 export function createEvent(
     req: CallableRequest<CreateEventPayload>,
-): Promise<{ id: string; propertyId: string; organisationId: string }> {
+): Promise<{ id: string; organisationId: string; propertyId: string }> {
     // Authentication check.
     if (!req.auth) {
         throw new HttpsError(
@@ -43,7 +45,7 @@ export function createEvent(
         );
     }
 
-    const { date, floors, entryPrice, guestListLimit, name, propertyId, organisationId, img } =
+    const { date, entryPrice, floors, guestListLimit, img, name, organisationId, propertyId } =
         req.data;
 
     // Check for the presence of floors.
@@ -71,14 +73,14 @@ export function createEvent(
         const eventRef = db.collection(getEventsPath(organisationId, propertyId)).doc(id);
 
         transaction.set(eventRef, {
-            name,
-            entryPrice,
-            date,
             creator,
-            img,
+            date,
+            entryPrice,
             guestListLimit,
-            propertyId,
+            img,
+            name,
             organisationId,
+            propertyId,
         });
 
         for (const floor of floors) {
@@ -86,6 +88,6 @@ export function createEvent(
             transaction.set(floorRef, floor);
         }
 
-        return { id, propertyId, organisationId };
+        return { id, organisationId, propertyId };
     });
 }

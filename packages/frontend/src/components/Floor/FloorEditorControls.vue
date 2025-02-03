@@ -1,35 +1,35 @@
 <script setup lang="ts">
 import type { FloorEditor, FloorEditorElement, FloorElementTypes } from "@firetable/floor-creator";
+
 import { MAX_FLOOR_HEIGHT, MAX_FLOOR_WIDTH, RESOLUTION } from "@firetable/floor-creator";
-import { showConfirm } from "src/helpers/ui-helpers";
-import { ref, onMounted, reactive, useTemplateRef } from "vue";
-import { exportFile } from "quasar";
-import { ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
-import { AppLogger } from "src/logger/FTLogger.js";
 import { isString } from "es-toolkit";
 import { isNumber } from "es-toolkit/compat";
-
+import { exportFile } from "quasar";
 import FTColorPickerButton from "src/components/FTColorPickerButton.vue";
-
-interface Props {
-    floorInstance: FloorEditor;
-    canSave: boolean;
-}
+import { ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
+import { showConfirm } from "src/helpers/ui-helpers";
+import { AppLogger } from "src/logger/FTLogger.js";
+import { onMounted, reactive, ref, useTemplateRef } from "vue";
 
 interface EmitEvents {
     (e: "delete", element: FloorEditorElement): void;
-    (e: "floorUpdate", value: { width?: number; height?: number; name?: string }): void;
+    (e: "floorUpdate", value: { height?: number; name?: string; width?: number }): void;
     (e: "floorSave"): void;
 }
 
-const { floorInstance, canSave } = defineProps<Props>();
+interface Props {
+    canSave: boolean;
+    floorInstance: FloorEditor;
+}
+
+const { canSave, floorInstance } = defineProps<Props>();
 const emit = defineEmits<EmitEvents>();
 
 const floorInstanceState = reactive({
-    canUndo: false,
     canRedo: false,
-    width: floorInstance.width,
+    canUndo: false,
     height: floorInstance.height,
+    width: floorInstance.width,
 });
 
 onMounted(function () {
@@ -48,14 +48,6 @@ async function exportFloor(floorVal: FloorEditor): Promise<void> {
     exportFile(`${floorVal.name}.json`, JSON.stringify(floorVal.export()));
 }
 
-function undoAction(): void {
-    if (!floorInstance) {
-        return;
-    }
-    floorInstance.undo();
-    floorInstance.canvas.renderAll();
-}
-
 function redoAction(): void {
     if (!floorInstance) {
         return;
@@ -63,7 +55,25 @@ function redoAction(): void {
     floorInstance.redo();
     floorInstance.canvas.renderAll();
 }
+
+function undoAction(): void {
+    if (!floorInstance) {
+        return;
+    }
+    floorInstance.undo();
+    floorInstance.canvas.renderAll();
+}
 const fileInputRef = useTemplateRef<HTMLInputElement>("fileInputRef");
+
+function onDragStart(event: DragEvent, item: FloorElementTypes): void {
+    event.dataTransfer?.setData(
+        "text/plain",
+        JSON.stringify({
+            item,
+            type: "floor-element",
+        }),
+    );
+}
 
 function onFileSelected(event: Event): void {
     const fileInput = event.target as HTMLInputElement;
@@ -81,26 +91,16 @@ function onFileSelected(event: Event): void {
     }
 }
 
-function triggerFileInput(): void {
-    fileInputRef.value?.click();
-}
-
-function onDragStart(event: DragEvent, item: FloorElementTypes): void {
-    event.dataTransfer?.setData(
-        "text/plain",
-        JSON.stringify({
-            item,
-            type: "floor-element",
-        }),
-    );
-}
-
-function onFloorChange(prop: keyof FloorEditor, event: number | string | null): void {
+function onFloorChange(prop: keyof FloorEditor, event: null | number | string): void {
     emit("floorUpdate", { [prop]: event });
 }
 
 function onFloorSave(): void {
     emit("floorSave");
+}
+
+function triggerFileInput(): void {
+    fileInputRef.value?.click();
 }
 
 const bgColor = ref(floorInstance.getBackgroundColor());
@@ -116,13 +116,18 @@ const brushOptions = [
     { label: "Circle", value: "circle" },
 ];
 
+function openBrushSettings(): void {
+    brushSettingsOpen.value = true;
+}
+
 function toggleDrawingMode(): void {
     isDrawingMode.value = !isDrawingMode.value;
     floorInstance.setDrawingMode(isDrawingMode.value);
 }
 
-function openBrushSettings(): void {
-    brushSettingsOpen.value = true;
+function updateBgColor(color: string): void {
+    bgColor.value = color;
+    floorInstance.setBackgroundColor(color);
 }
 
 function updateBrushColor(color: unknown): void {
@@ -133,21 +138,16 @@ function updateBrushColor(color: unknown): void {
     floorInstance.setBrushColor(color);
 }
 
+function updateBrushType(newBrushType: "circle" | "pencil" | "spray"): void {
+    floorInstance.setBrushType(newBrushType);
+}
+
 function updateLineWidth(width: unknown): void {
     if (!isNumber(width)) {
         return;
     }
 
     floorInstance.setBrushWidth(width);
-}
-
-function updateBrushType(newBrushType: "circle" | "pencil" | "spray"): void {
-    floorInstance.setBrushType(newBrushType);
-}
-
-function updateBgColor(color: string): void {
-    bgColor.value = color;
-    floorInstance.setBackgroundColor(color);
 }
 </script>
 

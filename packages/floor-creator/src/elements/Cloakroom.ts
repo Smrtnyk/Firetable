@@ -1,5 +1,7 @@
 import type { FabricObject } from "fabric";
-import { FloorElementTypes, type FloorEditorElement } from "../types.js";
+
+import { classRegistry, Group, IText, LayoutManager, Point, Rect } from "fabric";
+
 import {
     ELEMENT_DEFAULT_FILL_COLOR,
     ELEMENT_DEFAULT_STROKE_COLOR,
@@ -7,11 +9,10 @@ import {
     FONT_SIZE,
     TABLE_TEXT_FILL_COLOR,
 } from "../constants.js";
-import { Point, classRegistry, Group, IText, LayoutManager, Rect } from "fabric";
+import { type FloorEditorElement, FloorElementTypes } from "../types.js";
 
 interface CloakroomOptions {
     left: number;
-    top: number;
     objects?: [
         FabricObject,
         FabricObject,
@@ -21,6 +22,7 @@ interface CloakroomOptions {
         FabricObject,
         IText,
     ];
+    top: number;
 }
 
 export class Cloakroom extends Group implements FloorEditorElement {
@@ -35,13 +37,13 @@ export class Cloakroom extends Group implements FloorEditorElement {
         // If we have existing objects, use those, otherwise create fresh ones
         const counterOpts = options.objects?.[0] ?? {};
         const counter = new Rect({
-            width,
-            height,
-            fill: ELEMENT_DEFAULT_FILL_COLOR,
-            stroke: ELEMENT_DEFAULT_STROKE_COLOR,
-            strokeWidth: ELEMENT_DEFAULT_STROKE_WIDTH,
-            strokeUniform: true,
             evented: false,
+            fill: ELEMENT_DEFAULT_FILL_COLOR,
+            height,
+            stroke: ELEMENT_DEFAULT_STROKE_COLOR,
+            strokeUniform: true,
+            strokeWidth: ELEMENT_DEFAULT_STROKE_WIDTH,
+            width,
             ...counterOpts,
         });
 
@@ -52,13 +54,13 @@ export class Cloakroom extends Group implements FloorEditorElement {
         for (let i = 0; i < 5; i++) {
             const hookOpts = options.objects?.[i + 1] ?? {};
             const hook = new Rect({
+                evented: false,
+                fill: "#333333",
+                height: 10,
                 left: (i + 1) * hookSpacing,
+                strokeWidth: 0,
                 top: 5,
                 width: 4,
-                height: 10,
-                fill: "#333333",
-                strokeWidth: 0,
-                evented: false,
                 ...hookOpts,
             });
             hooks.push(hook);
@@ -66,11 +68,11 @@ export class Cloakroom extends Group implements FloorEditorElement {
 
         const iTextInstance = options.objects?.[6];
         const textLabel = new IText(iTextInstance?.text ?? "Cloakroom", {
-            left: iTextInstance?.left ?? 0,
-            top: iTextInstance?.top ?? 0,
-            fontSize: FONT_SIZE,
             fill: TABLE_TEXT_FILL_COLOR,
+            fontSize: FONT_SIZE,
+            left: iTextInstance?.left ?? 0,
             textAlign: "center",
+            top: iTextInstance?.top ?? 0,
         });
         if (!iTextInstance) {
             textLabel.setPositionByOrigin(
@@ -82,8 +84,8 @@ export class Cloakroom extends Group implements FloorEditorElement {
 
         super([counter, ...hooks, textLabel], {
             ...options,
-            layoutManager: new LayoutManager(),
             interactive: true,
+            layoutManager: new LayoutManager(),
             subTargetCheck: true,
         });
 
@@ -96,20 +98,20 @@ export class Cloakroom extends Group implements FloorEditorElement {
         return Promise.resolve(new Cloakroom(object));
     }
 
-    // @ts-expect-error -- seems like having proper return type here is a bit tricky
-    toObject(): Record<string, unknown> {
-        return {
-            ...super.toObject(),
-            label: this.label,
-        };
-    }
-
     getBaseFill(): string {
         return this.counterBody.get("fill") as string;
     }
 
     setBaseFill(val: string): void {
         this.counterBody.set("fill", val);
+    }
+
+    // @ts-expect-error -- seems like having proper return type here is a bit tricky
+    toObject(): Record<string, unknown> {
+        return {
+            ...super.toObject(),
+            label: this.label,
+        };
     }
 }
 

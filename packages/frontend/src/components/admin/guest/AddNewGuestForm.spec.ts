@@ -1,9 +1,12 @@
-import type { AddNewGuestFormProps } from "./AddNewGuestForm.vue";
 import type { Locator } from "@vitest/browser/locator";
-import AddNewGuestForm from "./AddNewGuestForm.vue";
-import { renderComponent } from "../../../../test-helpers/render-component";
-import { describe, it, expect, beforeEach } from "vitest";
+
 import { userEvent } from "@vitest/browser/context";
+import { beforeEach, describe, expect, it } from "vitest";
+
+import type { AddNewGuestFormProps } from "./AddNewGuestForm.vue";
+
+import { renderComponent } from "../../../../test-helpers/render-component";
+import AddNewGuestForm from "./AddNewGuestForm.vue";
 
 describe("AddNewGuestForm", () => {
     function getTagsSelect(screen: any): HTMLElement {
@@ -93,12 +96,12 @@ describe("AddNewGuestForm", () => {
             const emitted = screen.emitted().create as any[];
             expect(emitted).toBeTruthy();
             expect(emitted[0][0]).toEqual({
-                name: "John Doe",
                 contact: "+4325550123",
-                maskedContact: "+43XXXX0123",
                 hashedContact: "75bde53b8d20a110ce8d51d94345d18744e77e72ce3f8ad1d8bcd8fe60092ffc",
-                visitedProperties: {},
+                maskedContact: "+43XXXX0123",
+                name: "John Doe",
                 tags: [],
+                visitedProperties: {},
             });
         });
 
@@ -140,12 +143,12 @@ describe("AddNewGuestForm", () => {
             const emitted = screen.emitted().create as any[];
             expect(emitted).toBeTruthy();
             expect(emitted[0][0]).toEqual({
-                name: "Invalid Contact",
                 contact: "+432025550123",
-                maskedContact: "+43XXXXXX0123",
                 hashedContact: "06f34ecfe0bd145206f748116d5de65d72ffbd58ac7461d46bfb40b8053e9ec5",
-                visitedProperties: {},
+                maskedContact: "+43XXXXXX0123",
+                name: "Invalid Contact",
                 tags: [],
+                visitedProperties: {},
             });
         });
 
@@ -242,12 +245,12 @@ describe("AddNewGuestForm", () => {
             const emitted = screen.emitted().create as any[];
             expect(emitted).toBeTruthy();
             expect(emitted[0][0]).toEqual({
-                name: "John Doe",
                 contact: "+4325550123",
-                maskedContact: "+43XXXX0123",
                 hashedContact: "75bde53b8d20a110ce8d51d94345d18744e77e72ce3f8ad1d8bcd8fe60092ffc",
-                visitedProperties: {},
+                maskedContact: "+43XXXX0123",
+                name: "John Doe",
                 tags: ["vip", "regular"],
+                visitedProperties: {},
             });
         });
 
@@ -374,11 +377,11 @@ describe("AddNewGuestForm", () => {
 
         beforeEach(() => {
             props = {
-                mode: "edit",
                 initialData: {
-                    name: "Existing Guest",
                     contact: "+431234567890",
+                    name: "Existing Guest",
                 },
+                mode: "edit",
             };
         });
 
@@ -423,12 +426,12 @@ describe("AddNewGuestForm", () => {
             const emitted = screen.emitted().update as any[];
             expect(emitted).toBeTruthy();
             expect(emitted[0][0]).toEqual({
-                name: "Updated Guest",
                 contact: "+432025550123",
-                maskedContact: "+43XXXXXX0123",
                 hashedContact: "06f34ecfe0bd145206f748116d5de65d72ffbd58ac7461d46bfb40b8053e9ec5",
-                visitedProperties: {},
+                maskedContact: "+43XXXXXX0123",
+                name: "Updated Guest",
                 tags: [],
+                visitedProperties: {},
             });
         });
 
@@ -458,12 +461,12 @@ describe("AddNewGuestForm", () => {
 
         it("preserves initial tags in edit mode", async function (): Promise<void> {
             const editProps: AddNewGuestFormProps = {
-                mode: "edit",
                 initialData: {
-                    name: "Existing Guest",
                     contact: "+431234567890",
+                    name: "Existing Guest",
                     tags: ["VIP", "Regular"],
                 },
+                mode: "edit",
             };
 
             const screen = renderComponent(AddNewGuestForm, editProps);
@@ -475,12 +478,12 @@ describe("AddNewGuestForm", () => {
 
         it("allows modifying tags in edit mode", async function (): Promise<void> {
             const editProps: AddNewGuestFormProps = {
-                mode: "edit",
                 initialData: {
-                    name: "Existing Guest",
                     contact: "+431234567890",
+                    name: "Existing Guest",
                     tags: ["VIP"],
                 },
+                mode: "edit",
             };
 
             const screen = renderComponent(AddNewGuestForm, editProps);
@@ -504,12 +507,12 @@ describe("AddNewGuestForm", () => {
 
         it("maintains tag order in edit mode", function (): void {
             const editProps: AddNewGuestFormProps = {
-                mode: "edit",
                 initialData: {
-                    name: "Existing Guest",
                     contact: "+431234567890",
+                    name: "Existing Guest",
                     tags: ["First", "Second", "Third"],
                 },
+                mode: "edit",
             };
 
             renderComponent(AddNewGuestForm, editProps);

@@ -28,23 +28,24 @@
 
 <script setup lang="ts">
 import type { ComponentPublicInstance } from "vue";
+
 import { useDialogPluginComponent } from "quasar";
 import { isMobile } from "src/global-reactives/screen-detection";
 
 interface Props {
     component: ComponentPublicInstance;
-    maximized?: boolean;
     componentPropsObject?: Record<string, any>;
     listeners: Record<string, (...args: any) => any>;
+    maximized?: boolean;
     title?: string;
 }
 
 const {
+    component,
+    componentPropsObject,
+    listeners,
     maximized = true,
     title = "",
-    component,
-    listeners,
-    componentPropsObject,
 } = defineProps<Props>();
 const { dialogRef, onDialogHide } = useDialogPluginComponent();
 

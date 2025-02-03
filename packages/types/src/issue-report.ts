@@ -4,8 +4,8 @@ export const enum IssueCategory {
 }
 
 export const enum IssueStatus {
-    NEW = "NEW",
     IN_PROGRESS = "IN_PROGRESS",
+    NEW = "NEW",
     RESOLVED = "RESOLVED",
     WONT_FIX = "WONT_FIX",
 }
@@ -16,13 +16,9 @@ export const enum IssueStatus {
  */
 export interface IssueReportDoc {
     /**
-     * Firestore document ID
+     * Type of the report (bug or feature request)
      */
-    id: string;
-    /**
-     * Detailed description of the issue or feature request
-     */
-    description: string;
+    category: IssueCategory;
     /**
      * Unix timestamp when the report was created
      */
@@ -32,25 +28,29 @@ export interface IssueReportDoc {
      */
     createdBy: string;
     /**
-     * Current status of the issue
+     * Detailed description of the issue or feature request
      */
-    status: IssueStatus;
+    description: string;
     /**
-     * Type of the report (bug or feature request)
+     * Firestore document ID
      */
-    category: IssueCategory;
-    /**
-     * Information about the user who reported the issue
-     */
-    user: {
-        name: string;
-        email: string;
-    };
+    id: string;
     /**
      * Information about the organisation where the issue was reported
      */
     organisation: {
         id: string;
+        name: string;
+    };
+    /**
+     * Current status of the issue
+     */
+    status: IssueStatus;
+    /**
+     * Information about the user who reported the issue
+     */
+    user: {
+        email: string;
         name: string;
     };
 }

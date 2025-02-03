@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import { timezones } from "src/helpers/date-utils";
+import { ref } from "vue";
 
 const searchQuery = ref("");
 const emit = defineEmits<(event: "timezoneSelected", timezone: string) => void>();
+
+function emitTimezoneSelected(timezone: string): void {
+    emit("timezoneSelected", timezone);
+}
 
 function getFilteredTimezones(): string[] {
     const query = searchQuery.value.toLowerCase();
     return timezones().filter(function (timezone) {
         return timezone.toLowerCase().includes(query);
     });
-}
-
-function emitTimezoneSelected(timezone: string): void {
-    emit("timezoneSelected", timezone);
 }
 </script>
 

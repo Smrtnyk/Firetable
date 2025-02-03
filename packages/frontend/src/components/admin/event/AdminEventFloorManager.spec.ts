@@ -1,10 +1,12 @@
 import type { EventFloorDoc, FloorDoc } from "@firetable/types";
 import type { AdminEventFloorManagerProps } from "src/components/admin/event/AdminEventFloorManager.vue";
-import AdminEventFloorManager from "./AdminEventFloorManager.vue";
-import { renderComponent } from "../../../../test-helpers/render-component";
-import { describe, it, expect, beforeEach, vi } from "vitest";
+
 import { userEvent } from "@vitest/browser/context";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { nextTick } from "vue";
+
+import { renderComponent } from "../../../../test-helpers/render-component";
+import AdminEventFloorManager from "./AdminEventFloorManager.vue";
 
 vi.mock("src/global-reactives/screen-detection");
 
@@ -13,13 +15,13 @@ describe("AdminEventFloorManager", () => {
 
     beforeEach(() => {
         props = {
+            animationDuration: 0,
             floors: [
                 { id: "floor1", name: "Floor 1", order: 0 },
                 { id: "floor2", name: "Floor 2", order: 1 },
                 { id: "floor3", name: "Floor 3", order: 2 },
             ] as EventFloorDoc[],
             maxFloors: 3,
-            animationDuration: 0,
         };
     });
 
@@ -88,14 +90,14 @@ describe("AdminEventFloorManager", () => {
     describe("floor limit functionality", () => {
         beforeEach(() => {
             props = {
-                floors: [
-                    { id: "floor1", name: "Floor 1", order: 0 },
-                    { id: "floor2", name: "Floor 2", order: 1 },
-                ] as EventFloorDoc[],
                 availableFloors: [
                     { id: "floor3", name: "Floor 3" },
                     { id: "floor4", name: "Floor 4" },
                 ] as FloorDoc[],
+                floors: [
+                    { id: "floor1", name: "Floor 1", order: 0 },
+                    { id: "floor2", name: "Floor 2", order: 1 },
+                ] as EventFloorDoc[],
                 maxFloors: 3,
             };
         });

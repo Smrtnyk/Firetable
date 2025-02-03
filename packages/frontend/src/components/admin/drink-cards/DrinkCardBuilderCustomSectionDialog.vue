@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import type { DrinkCardSection } from "@firetable/types";
+
 import { noEmptyString } from "src/helpers/form-rules";
-import { useI18n } from "vue-i18n";
-import { ref } from "vue";
 import { showErrorMessage } from "src/helpers/ui-helpers";
+import { ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 const emit = defineEmits<(event: "add", value: DrinkCardSection) => void>();
@@ -12,8 +13,8 @@ const drinkSection = ref({
     name: "",
     servingSize: {
         amount: 0,
-        unit: "ml" as const,
         displayName: "",
+        unit: "ml" as const,
     },
 });
 
@@ -25,10 +26,10 @@ function handleCustomSectionSubmit(): void {
 
     const newSection: DrinkCardSection = {
         id: crypto.randomUUID(),
+        items: [],
         name: drinkSection.value.name,
         template: "custom",
         type: "section",
-        items: [],
     };
     emit("add", newSection);
 }

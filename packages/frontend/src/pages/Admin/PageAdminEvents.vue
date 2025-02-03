@@ -1,28 +1,28 @@
 <script setup lang="ts">
 import type { CreateEventPayload, EditEventPayload, EventDoc } from "@firetable/types";
-import AdminPropertyEventsList from "src/components/admin/event/AdminPropertyEventsList.vue";
-import EventCreateForm from "src/components/admin/event/EventCreateForm.vue";
-import FTTitle from "src/components/FTTitle.vue";
-import FTDialog from "src/components/FTDialog.vue";
-import FTBtn from "src/components/FTBtn.vue";
 
-import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { computed, onBeforeMount, watch, onUnmounted, onMounted } from "vue";
-import { Loading, useQuasar } from "quasar";
 import {
     createNewEvent,
     deleteDocAndAllSubCollections,
     getEventsPath,
     updateEvent,
 } from "@firetable/backend";
-import { useFloors } from "src/composables/useFloors";
-import { useEvents } from "src/composables/useEvents";
+import { negate } from "es-toolkit";
+import { matchesProperty } from "es-toolkit/compat";
+import { Loading, useQuasar } from "quasar";
+import AdminPropertyEventsList from "src/components/admin/event/AdminPropertyEventsList.vue";
+import EventCreateForm from "src/components/admin/event/EventCreateForm.vue";
+import FTBtn from "src/components/FTBtn.vue";
+import FTDialog from "src/components/FTDialog.vue";
+import FTTitle from "src/components/FTTitle.vue";
 import { useDialog } from "src/composables/useDialog";
+import { useEvents } from "src/composables/useEvents";
+import { useFloors } from "src/composables/useFloors";
+import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { usePropertiesStore } from "src/stores/properties-store";
+import { computed, onBeforeMount, onMounted, onUnmounted, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
-import { usePropertiesStore } from "src/stores/properties-store";
-import { matchesProperty } from "es-toolkit/compat";
-import { negate } from "es-toolkit";
 
 interface Props {
     organisationId: string;
@@ -37,11 +37,11 @@ const { t } = useI18n();
 const { createDialog } = useDialog();
 const propertiesStore = usePropertiesStore();
 const {
+    done,
     events,
     fetchMoreEvents,
-    done,
     isLoading: isLoadingEvents,
-} = useEvents({ organisationId, propertyId, id: "" });
+} = useEvents({ id: "", organisationId, propertyId });
 
 const { floors, isLoading: isFloorsLoading } = useFloors(propertyId, organisationId);
 const isAnyLoading = computed(function () {
@@ -80,6 +80,26 @@ onUnmounted(function () {
     }
 });
 
+async function deleteEvent(event: EventDoc): Promise<void> {
+    if (!(await showConfirm(t("PageAdminEvents.deleteEventDialogTitle")))) {
+        return;
+    }
+
+    await tryCatchLoadingWrapper({
+        async hook() {
+            await deleteDocAndAllSubCollections(
+                getEventsPath({
+                    id: "",
+                    organisationId,
+                    propertyId: event.propertyId,
+                }),
+                event.id,
+            );
+            events.value = events.value.filter(negate(matchesProperty("id", event.id)));
+        },
+    });
+}
+
 async function onCreateEvent(eventData: CreateEventPayload): Promise<void> {
     await tryCatchLoadingWrapper({
         async hook() {
@@ -87,7 +107,7 @@ async function onCreateEvent(eventData: CreateEventPayload): Promise<void> {
             quasar.notify(t("PageAdminEvents.eventCreatedNotificationMessage"));
             await router.push({
                 name: "adminEvent",
-                params: { eventId, propertyId, organisationId },
+                params: { eventId, organisationId, propertyId },
             });
         },
     });
@@ -98,9 +118,9 @@ async function onUpdateEvent(eventData: EditEventPayload & { id: string }): Prom
         async hook() {
             await updateEvent(
                 {
-                    propertyId: eventData.propertyId,
-                    organisationId,
                     id: eventData.id,
+                    organisationId,
+                    propertyId: eventData.propertyId,
                 },
                 eventData,
             );
@@ -112,45 +132,19 @@ async function onUpdateEvent(eventData: EditEventPayload & { id: string }): Prom
     });
 }
 
-async function deleteEvent(event: EventDoc): Promise<void> {
-    if (!(await showConfirm(t("PageAdminEvents.deleteEventDialogTitle")))) {
-        return;
-    }
-
-    await tryCatchLoadingWrapper({
-        async hook() {
-            await deleteDocAndAllSubCollections(
-                getEventsPath({
-                    propertyId: event.propertyId,
-                    organisationId,
-                    id: "",
-                }),
-                event.id,
-            );
-            events.value = events.value.filter(negate(matchesProperty("id", event.id)));
-        },
-    });
-}
-
 function showEventForm(event?: EventDoc): void {
     const dialog = createDialog({
         component: FTDialog,
         componentProps: {
-            title: event
-                ? t("PageAdminEvents.editEventDialogTitle", {
-                      eventName: event.name,
-                  })
-                : t("PageAdminEvents.createNewEventDialogTitle"),
-            maximized: false,
             component: EventCreateForm,
             componentPropsObject: {
-                propertyId,
+                event,
+                eventStartHours: propertySettings.value.event.eventStartTime24HFormat,
                 floors: floors.value,
                 maxFloors: subscriptionSettings.value.maxFloorPlansPerEvent,
                 organisationId,
+                propertyId,
                 propertyName: propertiesStore.getPropertyNameById(propertyId),
-                event,
-                eventStartHours: propertySettings.value.event.eventStartTime24HFormat,
                 propertyTimezone: propertySettings.value.timezone,
             },
             listeners: {
@@ -169,6 +163,12 @@ function showEventForm(event?: EventDoc): void {
                     dialog.hide();
                 },
             },
+            maximized: false,
+            title: event
+                ? t("PageAdminEvents.editEventDialogTitle", {
+                      eventName: event.name,
+                  })
+                : t("PageAdminEvents.createNewEventDialogTitle"),
         },
     });
 }

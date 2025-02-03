@@ -1,8 +1,10 @@
-import type { FTTimeframeSelectorProps } from "./FTTimeframeSelector.vue";
-import FTTimeframeSelector from "./FTTimeframeSelector.vue";
-import { renderComponent } from "../../test-helpers/render-component";
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { userEvent } from "@vitest/browser/context";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { FTTimeframeSelectorProps } from "./FTTimeframeSelector.vue";
+
+import { renderComponent } from "../../test-helpers/render-component";
+import FTTimeframeSelector from "./FTTimeframeSelector.vue";
 
 describe("TimeframeSelector.vue", () => {
     let props: FTTimeframeSelectorProps;
@@ -14,7 +16,9 @@ describe("TimeframeSelector.vue", () => {
         vi.setSystemTime(FIXED_DATE);
 
         props = {
-            modelValue: { startDate: "", endDate: "" },
+            maxDate: "2050-12-31",
+            minDate: "2000-01-01",
+            modelValue: { endDate: "", startDate: "" },
             presets: [
                 { label: "Today", value: "today" },
                 { label: "Yesterday", value: "yesterday" },
@@ -22,8 +26,6 @@ describe("TimeframeSelector.vue", () => {
                 { label: "Last 30 Days", value: "last30" },
                 { label: "Custom", value: "custom" },
             ],
-            minDate: "2000-01-01",
-            maxDate: "2050-12-31",
         };
         screen = renderComponent(FTTimeframeSelector, props);
     });
@@ -52,36 +54,36 @@ describe("TimeframeSelector.vue", () => {
     describe("Preset Selection", () => {
         it.each([
             {
-                preset: "today",
                 expectedRange: {
+                    endDate: "2024-01-15",
                     startDate: "2024-01-15",
-                    endDate: "2024-01-15",
                 },
+                preset: "today",
             },
             {
-                preset: "yesterday",
                 expectedRange: {
-                    startDate: "2024-01-14",
                     endDate: "2024-01-14",
+                    startDate: "2024-01-14",
                 },
+                preset: "yesterday",
             },
             {
-                preset: "Last 7 Days",
                 expectedRange: {
+                    endDate: "2024-01-15",
                     startDate: "2024-01-09",
-                    endDate: "2024-01-15",
                 },
+                preset: "Last 7 Days",
             },
             {
-                preset: "Last 30 Days",
                 expectedRange: {
-                    startDate: "2023-12-17",
                     endDate: "2024-01-15",
+                    startDate: "2023-12-17",
                 },
+                preset: "Last 30 Days",
             },
         ])(
             "selecting preset '$preset' emits correct date range",
-            async ({ preset, expectedRange }) => {
+            async ({ expectedRange, preset }) => {
                 const select = screen.getByLabelText("Select Timeframe");
                 await userEvent.click(select);
 
@@ -117,12 +119,12 @@ describe("TimeframeSelector.vue", () => {
         });
 
         it("allows selecting a valid date range and emits the correct event", async () => {
-            const startDate = screen.getByRole("button", { name: "1", exact: true });
+            const startDate = screen.getByRole("button", { exact: true, name: "1" });
             await userEvent.click(startDate);
 
             const endDate = screen.getByRole("button", {
-                name: "10",
                 exact: true,
+                name: "10",
             });
             await userEvent.click(endDate);
 
@@ -132,14 +134,14 @@ describe("TimeframeSelector.vue", () => {
 
             await userEvent.click(screen.getByText("Apply"));
 
-            const expectedRange = { startDate: "2024-01-01", endDate: "2024-01-10" };
+            const expectedRange = { endDate: "2024-01-10", startDate: "2024-01-01" };
             expect(screen.emitted()["update:modelValue"]).toStrictEqual([[expectedRange]]);
         });
 
         it("disables the Apply button when the date range is invalid", async () => {
             const startDate = screen.getByRole("button", {
-                name: "10",
                 exact: true,
+                name: "10",
             });
             await userEvent.click(startDate);
 
@@ -148,12 +150,12 @@ describe("TimeframeSelector.vue", () => {
         });
 
         it("clears the date range when the clear button is clicked", async () => {
-            const startDate = screen.getByRole("button", { name: "1", exact: true });
+            const startDate = screen.getByRole("button", { exact: true, name: "1" });
             await userEvent.click(startDate);
 
             const endDate = screen.getByRole("button", {
-                name: "10",
                 exact: true,
+                name: "10",
             });
             await userEvent.click(endDate);
 
@@ -165,12 +167,12 @@ describe("TimeframeSelector.vue", () => {
         });
 
         it("closes the date picker without applying changes when cancel is clicked", async () => {
-            const startDate = screen.getByRole("button", { name: "1", exact: true });
+            const startDate = screen.getByRole("button", { exact: true, name: "1" });
             await userEvent.click(startDate);
 
             const endDate = screen.getByRole("button", {
-                name: "10",
                 exact: true,
+                name: "10",
             });
             await userEvent.click(endDate);
 
@@ -216,12 +218,12 @@ describe("TimeframeSelector.vue", () => {
             const customOption = screen.getByText("Custom");
             await userEvent.click(customOption);
 
-            const startDate = screen.getByRole("button", { name: "1", exact: true });
+            const startDate = screen.getByRole("button", { exact: true, name: "1" });
             await userEvent.click(startDate);
 
             const endDate = screen.getByRole("button", {
-                name: "10",
                 exact: true,
+                name: "10",
             });
             await userEvent.click(endDate);
 

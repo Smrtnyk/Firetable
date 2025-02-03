@@ -11,14 +11,15 @@
 
 <script setup lang="ts">
 import type { EventOwner } from "@firetable/backend";
-import { ref } from "vue";
+
 import { updateEvent } from "@firetable/backend";
-import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import FTBtn from "src/components/FTBtn.vue";
+import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { ref } from "vue";
 
 interface Props {
-    eventOwner: EventOwner;
     eventInfo: string;
+    eventOwner: EventOwner;
 }
 
 const props = defineProps<Props>();

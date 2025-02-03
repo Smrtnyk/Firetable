@@ -1,3 +1,5 @@
+import { describe, expect, it } from "vitest";
+
 import {
     hasNumbers,
     hasSymbols,
@@ -8,7 +10,6 @@ import {
     noWhiteSpaces,
     optionalNumberInRange,
 } from "./form-rules";
-import { describe, it, expect } from "vitest";
 
 describe("form-rules.ts", () => {
     describe("noEmptyString", () => {

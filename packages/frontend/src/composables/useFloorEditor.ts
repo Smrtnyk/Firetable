@@ -1,12 +1,13 @@
 import type { Floor, FloorDropEvent, FloorEditorElement } from "@firetable/floor-creator";
-import type { ShallowRef } from "vue";
 import type { FloorDoc } from "@firetable/types";
-import { FloorEditor, FloorElementTypes, extractAllTablesLabels } from "@firetable/floor-creator";
-import { onBeforeUnmount, ref, shallowRef, nextTick } from "vue";
+import type { ShallowRef } from "vue";
+
+import { extractAllTablesLabels, FloorEditor, FloorElementTypes } from "@firetable/floor-creator";
+import { negate } from "es-toolkit";
+import { isNaN, toInteger, toNumber } from "es-toolkit/compat";
 import { debounce } from "quasar";
 import { AppLogger } from "src/logger/FTLogger.js";
-import { toNumber, isNaN, toInteger } from "es-toolkit/compat";
-import { negate } from "es-toolkit";
+import { nextTick, onBeforeUnmount, ref, shallowRef } from "vue";
 
 export const TABLE_EL_TO_ADD = [FloorElementTypes.RECT_TABLE, FloorElementTypes.ROUND_TABLE];
 
@@ -50,11 +51,11 @@ export function useFloorEditor(containerRef: ShallowRef<HTMLElement | null>) {
 
         if (TABLE_EL_TO_ADD.includes(item)) {
             const label = getNextTableLabel(floorEditor);
-            floorEditor.addElement({ x, y, tag: item, label });
+            floorEditor.addElement({ label, tag: item, x, y });
             return;
         }
 
-        floorEditor.addElement({ x, y, tag: item });
+        floorEditor.addElement({ tag: item, x, y });
     }
 
     const resizeFloor = debounce(function () {
@@ -77,13 +78,13 @@ export function useFloorEditor(containerRef: ShallowRef<HTMLElement | null>) {
     }
 
     function onFloorChange({
+        height,
         name,
         width,
-        height,
     }: {
-        width?: number;
         height?: number;
         name?: string;
+        width?: number;
     }): void {
         if (name) {
             floorInstance.value?.setFloorName(String(name));
@@ -111,9 +112,9 @@ export function useFloorEditor(containerRef: ShallowRef<HTMLElement | null>) {
         }
         const floorEditor = new FloorEditor({
             canvas: canvasElement,
-            floorDoc,
-            containerWidth: containerRef.value.clientWidth,
             containerHeight: containerRef.value.clientHeight,
+            containerWidth: containerRef.value.clientWidth,
+            floorDoc,
         });
 
         floorInstance.value = floorEditor;
@@ -129,13 +130,13 @@ export function useFloorEditor(containerRef: ShallowRef<HTMLElement | null>) {
     });
 
     return {
-        hasChanges,
         floorInstance,
-        selectedElement,
-        resizeFloor,
+        hasChanges,
+        initializeFloor,
         onDeleteElement,
         onElementClick,
         onFloorChange,
-        initializeFloor,
+        resizeFloor,
+        selectedElement,
     };
 }

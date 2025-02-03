@@ -1,39 +1,41 @@
 import type { AppUser } from "@firetable/types";
 import type { User as FBUser } from "firebase/auth";
-import { AuthState, useAuthStore } from "./auth-store";
-import { usePropertiesStore } from "./properties-store";
-import { mockedStore } from "../../test-helpers/render-component";
+
 import { AdminRole, Role } from "@firetable/types";
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createApp, nextTick, ref } from "vue";
 
-const { useFirestoreDocumentSpy, logoutUserSpy, showErrorMessageSpy, loadingSpy } = vi.hoisted(
+import { mockedStore } from "../../test-helpers/render-component";
+import { AuthState, useAuthStore } from "./auth-store";
+import { usePropertiesStore } from "./properties-store";
+
+const { loadingSpy, logoutUserSpy, showErrorMessageSpy, useFirestoreDocumentSpy } = vi.hoisted(
     () => ({
-        useFirestoreDocumentSpy: vi.fn(),
+        loadingSpy: {
+            hide: vi.fn(),
+            show: vi.fn(),
+        },
         logoutUserSpy: vi.fn().mockResolvedValue(undefined),
         showErrorMessageSpy: vi.fn(),
-        loadingSpy: {
-            show: vi.fn(),
-            hide: vi.fn(),
-        },
+        useFirestoreDocumentSpy: vi.fn(),
     }),
 );
 
 vi.mock("src/composables/useFirestore", () => ({
-    useFirestoreDocument: useFirestoreDocumentSpy,
     createQuery: vi.fn(),
     useFirestoreCollection: vi.fn(),
+    useFirestoreDocument: useFirestoreDocumentSpy,
 }));
 
 vi.mock("../backend-proxy", () => ({
-    getUserPath: (orgId: string, uid: string) => `organisations/${orgId}/users/${uid}`,
-    logoutUser: logoutUserSpy,
     fetchOrganisationById: vi.fn(),
     fetchOrganisationsForAdmin: vi.fn(),
     fetchPropertiesForAdmin: vi.fn(),
-    propertiesCollectionPath: vi.fn(),
+    getUserPath: (orgId: string, uid: string) => `organisations/${orgId}/users/${uid}`,
+    logoutUser: logoutUserSpy,
     propertiesCollection: vi.fn(),
+    propertiesCollectionPath: vi.fn(),
 }));
 
 vi.mock("src/helpers/ui-helpers", () => ({
@@ -46,32 +48,32 @@ vi.mock("quasar", async (importOriginal) => ({
     Loading: loadingSpy,
 }));
 
-function createTestUser(options: Partial<AppUser> = {}): AppUser {
-    return {
-        id: "user1",
-        name: "Test User",
-        username: "testuser",
-        email: "test@example.com",
-        role: Role.STAFF,
-        relatedProperties: [],
-        organisationId: "org1",
-        capabilities: undefined,
-        ...options,
-    };
-}
-
 function createTestFBUser(options: Partial<FBUser> = {}): FBUser {
     return {
-        uid: "user1",
         email: "test@example.com",
         getIdTokenResult: vi.fn().mockResolvedValue({
             claims: {
-                role: Role.STAFF,
                 organisationId: "org1",
+                role: Role.STAFF,
             },
         }),
+        uid: "user1",
         ...options,
     } as FBUser;
+}
+
+function createTestUser(options: Partial<AppUser> = {}): AppUser {
+    return {
+        capabilities: undefined,
+        email: "test@example.com",
+        id: "user1",
+        name: "Test User",
+        organisationId: "org1",
+        relatedProperties: [],
+        role: Role.STAFF,
+        username: "testuser",
+        ...options,
+    };
 }
 
 describe("auth-store.ts", () => {
@@ -90,8 +92,8 @@ describe("auth-store.ts", () => {
             const fbUser = createTestFBUser({
                 getIdTokenResult: vi.fn().mockResolvedValue({
                     claims: {
-                        role: AdminRole.ADMIN,
                         organisationId: "org1",
+                        role: AdminRole.ADMIN,
                     },
                 }),
             });
@@ -105,8 +107,8 @@ describe("auth-store.ts", () => {
             expect(authStore.isAdmin).toBe(true);
             expect(authStore.user).toEqual(
                 expect.objectContaining({
-                    role: AdminRole.ADMIN,
                     email: fbUser.email,
+                    role: AdminRole.ADMIN,
                 }),
             );
             expect(propertiesStore.initOrganisations).toHaveBeenCalled();
@@ -122,9 +124,9 @@ describe("auth-store.ts", () => {
 
             useFirestoreDocumentSpy.mockReturnValue({
                 data: ref(user),
+                error: ref(null),
                 promise: ref(Promise.resolve()),
                 stop: vi.fn(),
-                error: ref(null),
             });
 
             propertiesStore.initUserOrganisation = vi.fn();
@@ -137,9 +139,9 @@ describe("auth-store.ts", () => {
             expect(authStore.user).toEqual(user);
             expect(propertiesStore.initUserOrganisation).toHaveBeenCalledWith("org1");
             expect(propertiesStore.initNonAdminProperties).toHaveBeenCalledWith({
-                role: Role.STAFF,
-                relatedProperties: user.relatedProperties,
                 organisationId: "org1",
+                relatedProperties: user.relatedProperties,
+                role: Role.STAFF,
             });
             expect(loadingSpy.hide).toHaveBeenCalled();
         });
@@ -151,9 +153,9 @@ describe("auth-store.ts", () => {
 
             useFirestoreDocumentSpy.mockReturnValue({
                 data: ref(null),
+                error: ref(error),
                 promise: ref(Promise.resolve()),
                 stop: vi.fn(),
-                error: ref(error),
             });
 
             propertiesStore.initUserOrganisation = vi.fn();
@@ -163,8 +165,8 @@ describe("auth-store.ts", () => {
             const fbUser = createTestFBUser({
                 getIdTokenResult: vi.fn().mockResolvedValue({
                     claims: {
-                        role: Role.STAFF,
                         organisationId: "org1",
+                        role: Role.STAFF,
                     },
                 }),
             });
@@ -189,16 +191,16 @@ describe("auth-store.ts", () => {
 
             useFirestoreDocumentSpy.mockReturnValue({
                 data: ref(createTestUser()),
+                error: ref(null),
                 promise: ref(Promise.resolve()),
                 stop: vi.fn(),
-                error: ref(null),
             });
 
             const fbUser = createTestFBUser({
                 getIdTokenResult: vi.fn().mockResolvedValue({
                     claims: {
-                        role: Role.STAFF,
                         organisationId: "org1",
+                        role: Role.STAFF,
                     },
                 }),
             });
@@ -218,9 +220,9 @@ describe("auth-store.ts", () => {
 
             useFirestoreDocumentSpy.mockReturnValue({
                 data: ref(null),
+                error: ref(null),
                 promise: ref(Promise.resolve()),
                 stop: vi.fn(),
-                error: ref(null),
             });
 
             propertiesStore.initUserOrganisation = vi.fn();
@@ -314,14 +316,14 @@ describe("auth-store.ts", () => {
             authStore.assignAdmin(fbUser);
 
             expect(authStore.user).toEqual({
-                name: "Admin",
-                username: "admin",
-                id: fbUser.uid,
-                role: AdminRole.ADMIN,
-                email: fbUser.email,
-                relatedProperties: [],
-                organisationId: "",
                 capabilities: undefined,
+                email: fbUser.email,
+                id: fbUser.uid,
+                name: "Admin",
+                organisationId: "",
+                relatedProperties: [],
+                role: AdminRole.ADMIN,
+                username: "admin",
             });
             expect(authStore.isReady).toBe(true);
         });
@@ -344,16 +346,16 @@ describe("auth-store.ts", () => {
 
             useFirestoreDocumentSpy.mockReturnValue({
                 data: userRef,
+                error: ref(null),
                 promise: ref(Promise.resolve()),
                 stop: vi.fn(),
-                error: ref(null),
             });
 
             const fbUser = createTestFBUser({
                 getIdTokenResult: vi.fn().mockResolvedValue({
                     claims: {
-                        role: Role.STAFF,
                         organisationId: "org1",
+                        role: Role.STAFF,
                     },
                 }),
             });
@@ -377,9 +379,9 @@ describe("auth-store.ts", () => {
 
             useFirestoreDocumentSpy.mockReturnValue({
                 data: ref(createTestUser()),
+                error: ref(null),
                 promise: ref(Promise.resolve()),
                 stop: stopSpy,
-                error: ref(null),
             });
 
             propertiesStore.initUserOrganisation = vi.fn();
@@ -400,9 +402,9 @@ describe("auth-store.ts", () => {
 
             useFirestoreDocumentSpy.mockReturnValue({
                 data: ref(null),
+                error: ref(null),
                 promise: ref(Promise.resolve()),
                 stop: vi.fn(),
-                error: ref(null),
             });
 
             const initPromise = authStore.initUser(fbUser);
@@ -420,9 +422,9 @@ describe("auth-store.ts", () => {
 
             useFirestoreDocumentSpy.mockReturnValue({
                 data: ref(null),
+                error: ref(new Error("Test error")),
                 promise: ref(Promise.reject(new Error("Test error"))),
                 stop: vi.fn(),
-                error: ref(new Error("Test error")),
             });
 
             await authStore.initUser(fbUser);

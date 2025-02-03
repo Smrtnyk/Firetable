@@ -1,17 +1,19 @@
-import type { App, Ref, ShallowRef } from "vue";
 import type { FloorDoc } from "@firetable/types";
-import { useFloorsPageEvent } from "./useFloorsPageEvent";
-import { ref, shallowRef, createApp } from "vue";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import type { App, Ref, ShallowRef } from "vue";
+
 import { delay, noop } from "es-toolkit";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { createApp, ref, shallowRef } from "vue";
+
+import { useFloorsPageEvent } from "./useFloorsPageEvent";
 
 vi.mock("src/helpers/compress-floor-doc", () => ({
     decompressFloorDoc: vi.fn().mockImplementation((doc) => doc),
 }));
 
 export function withSetup(composable: () => ReturnType<typeof useFloorsPageEvent>): {
-    result: ReturnType<typeof useFloorsPageEvent>;
     app: App<Element>;
+    result: ReturnType<typeof useFloorsPageEvent>;
 } {
     let result: ReturnType<typeof useFloorsPageEvent>;
     const app = createApp({
@@ -22,7 +24,7 @@ export function withSetup(composable: () => ReturnType<typeof useFloorsPageEvent
     });
     app.mount(document.createElement("div"));
     // @ts-expect-error -- ignore this error
-    return { result, app };
+    return { app, result };
 }
 
 describe("useFloorsPageEvent", () => {

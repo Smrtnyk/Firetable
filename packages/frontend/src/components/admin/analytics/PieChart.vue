@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import type { PieChartData, ECPieOption } from "src/components/admin/analytics/types";
-import { computed } from "vue";
-import VChart from "vue-echarts";
+import type { ECPieOption, PieChartData } from "src/components/admin/analytics/types";
+
+import { PieChart } from "echarts/charts";
+import { LegendComponent, TitleComponent, TooltipComponent } from "echarts/components";
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
-import { PieChart } from "echarts/charts";
-import { TitleComponent, TooltipComponent, LegendComponent } from "echarts/components";
 import { isDark } from "src/global-reactives/is-dark";
+import { computed } from "vue";
+import VChart from "vue-echarts";
 
 // Register ECharts components
 use([CanvasRenderer, PieChart, TitleComponent, TooltipComponent, LegendComponent]);
@@ -21,63 +22,63 @@ const textColor = computed(() => (isDark.value ? "#cccccc" : "#1A1A1A"));
 
 const chartOption = computed<ECPieOption>(() => ({
     backgroundColor: backgroundColor.value,
+    legend: {
+        backgroundColor: backgroundColor.value,
+        bottom: 0,
+        orient: "horizontal",
+        textStyle: {
+            color: textColor.value,
+            fontSize: 14,
+        },
+    },
+    series: [
+        {
+            avoidLabelOverlap: true,
+            data: props.chartData,
+            emphasis: {
+                label: {
+                    fontSize: 16,
+                    fontWeight: "bold",
+                    show: true,
+                },
+            },
+            label: {
+                color: textColor.value,
+                fontSize: 14,
+                fontWeight: "bold",
+                formatter: "{d}%",
+                show: true,
+            },
+            labelLine: {
+                show: true,
+            },
+            radius: ["40%", "70%"],
+            type: "pie",
+        },
+    ],
     title: {
+        left: "center",
         text: props.chartTitle,
         textStyle: {
             color: textColor.value,
             fontSize: 14,
             fontWeight: "bold",
         },
-        left: "center",
     },
     tooltip: {
-        trigger: "item",
         backgroundColor: "#FFFFFF",
         borderColor: "#e1e5e8",
         borderWidth: 1,
+        formatter(params: any) {
+            const { name, percent, value } = params;
+            return `${name}<br/>Value: ${value}<br/>Percentage: ${percent}%`;
+        },
         textStyle: {
             color: "#1A1A1A",
             fontSize: 14,
         },
-        formatter(params: any) {
-            const { name, value, percent } = params;
-            return `${name}<br/>Value: ${value}<br/>Percentage: ${percent}%`;
-        },
+        trigger: "item",
     },
-    legend: {
-        orient: "horizontal",
-        bottom: 0,
-        textStyle: {
-            color: textColor.value,
-            fontSize: 14,
-        },
-        backgroundColor: backgroundColor.value,
-    },
-    series: [
-        {
-            type: "pie",
-            radius: ["40%", "70%"],
-            avoidLabelOverlap: true,
-            label: {
-                show: true,
-                formatter: "{d}%",
-                fontSize: 14,
-                fontWeight: "bold",
-                color: textColor.value,
-            },
-            emphasis: {
-                label: {
-                    show: true,
-                    fontSize: 16,
-                    fontWeight: "bold",
-                },
-            },
-            labelLine: {
-                show: true,
-            },
-            data: props.chartData,
-        },
-    ],
 }));
 </script>
 

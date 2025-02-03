@@ -1,30 +1,9 @@
+import { Collection } from "@shared-types";
+import { logger } from "firebase-functions/v2";
+import { HttpsError } from "firebase-functions/v2/https";
+
 import { deleteDocument } from "../delete-document/index.js";
 import { auth, db } from "../init.js";
-import { Collection } from "@shared-types";
-import { HttpsError } from "firebase-functions/v2/https";
-import { logger } from "firebase-functions/v2";
-
-/**
- * Deletes Firebase Authentication users associated with an organisation.
- *
- * @param organisationId - The ID of the organisation.
- */
-async function deleteAuthUsersOfOrganisation(organisationId: string): Promise<void> {
-    const usersRef = db.collection(
-        `${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`,
-    );
-    const snapshot = await usersRef.get();
-
-    const deletePromises: Promise<void>[] = [];
-    snapshot.forEach(function (doc) {
-        // Document ID is the user's UID
-        const userId = doc.id;
-        deletePromises.push(auth.deleteUser(userId));
-    });
-
-    await Promise.all(deletePromises);
-    logger.info(`Deleted all Auth users associated with organisation ID: ${organisationId}`);
-}
 
 /**
  * Function to handle the deletion of an organisation and its subcollections.
@@ -54,4 +33,26 @@ export async function onOrganisationDeletedFn(params: { organisationId: string }
             `Failed to complete deletion process for organisation with ID ${organisationId}. Error: ${error.message}`,
         );
     }
+}
+
+/**
+ * Deletes Firebase Authentication users associated with an organisation.
+ *
+ * @param organisationId - The ID of the organisation.
+ */
+async function deleteAuthUsersOfOrganisation(organisationId: string): Promise<void> {
+    const usersRef = db.collection(
+        `${Collection.ORGANISATIONS}/${organisationId}/${Collection.USERS}`,
+    );
+    const snapshot = await usersRef.get();
+
+    const deletePromises: Promise<void>[] = [];
+    snapshot.forEach(function (doc) {
+        // Document ID is the user's UID
+        const userId = doc.id;
+        deletePromises.push(auth.deleteUser(userId));
+    });
+
+    await Promise.all(deletePromises);
+    logger.info(`Deleted all Auth users associated with organisation ID: ${organisationId}`);
 }

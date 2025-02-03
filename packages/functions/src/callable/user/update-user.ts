@@ -1,9 +1,11 @@
 import type { EditUserPayload } from "@shared-types";
 import type { CallableRequest } from "firebase-functions/v2/https";
+
+import { logger } from "firebase-functions/v2";
+import { HttpsError } from "firebase-functions/v2/https";
+
 import { auth, db } from "../../init.js";
 import { getUserPath } from "../../paths.js";
-import { HttpsError } from "firebase-functions/v2/https";
-import { logger } from "firebase-functions/v2";
 
 /**
  * Updates user details in Firestore and in firebase auth.
@@ -23,8 +25,8 @@ import { logger } from "firebase-functions/v2";
  */
 export async function updateUserFn(
     req: CallableRequest<EditUserPayload>,
-): Promise<{ success: boolean; message: string }> {
-    const { updatedUser, userId, organisationId } = req.data;
+): Promise<{ message: string; success: boolean }> {
+    const { organisationId, updatedUser, userId } = req.data;
 
     if (!userId) {
         throw new HttpsError("invalid-argument", "User ID must be provided.");
@@ -70,11 +72,11 @@ export async function updateUserFn(
 
     // Prepare the data to update
     const updateData: Record<string, any> = {
-        name: updatedUser.name,
-        username: updatedUser.username,
         email: updatedUser.email,
-        role: updatedUser.role,
+        name: updatedUser.name,
         relatedProperties: updatedUser.relatedProperties,
+        role: updatedUser.role,
+        username: updatedUser.username,
     };
 
     // Conditionally include 'capabilities' if it's provided and not undefined
@@ -85,7 +87,7 @@ export async function updateUserFn(
     try {
         await db.doc(getUserPath(organisationId, userId)).update(updateData);
 
-        return { success: true, message: "User updated successfully." };
+        return { message: "User updated successfully.", success: true };
     } catch (error: any) {
         logger.error(`Failed to update user ${userId}`, error);
         throw new HttpsError("internal", `Failed to update user. Details: ${error.message}`);

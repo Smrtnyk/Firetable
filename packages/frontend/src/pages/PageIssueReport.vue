@@ -1,29 +1,30 @@
 <script setup lang="ts">
 import type { IssueReportDoc } from "@firetable/types";
-import {
-    createIssueReport,
-    getIssueReportsPath,
-    updateIssueReport,
-    deleteIssueReport,
-} from "../backend-proxy";
-import { IssueStatus, IssueCategory } from "@firetable/types";
-import { useQuasar } from "quasar";
-import { useAuthStore } from "src/stores/auth-store";
-import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { useI18n } from "vue-i18n";
-import { usePropertiesStore } from "src/stores/properties-store";
-import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
-import { where } from "firebase/firestore";
-import { ONE_MINUTE } from "src/constants";
-import { computed } from "vue";
-import { useDialog } from "src/composables/useDialog";
-import { getIssueStatusColor } from "src/helpers/issue-helpers";
 
+import { IssueCategory, IssueStatus } from "@firetable/types";
+import { where } from "firebase/firestore";
+import { useQuasar } from "quasar";
+import FTBtn from "src/components/FTBtn.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import FTDialog from "src/components/FTDialog.vue";
-import IssueCreateForm from "src/components/issue/IssueCreateForm.vue";
 import FTTitle from "src/components/FTTitle.vue";
-import FTBtn from "src/components/FTBtn.vue";
+import IssueCreateForm from "src/components/issue/IssueCreateForm.vue";
+import { useDialog } from "src/composables/useDialog";
+import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
+import { ONE_MINUTE } from "src/constants";
+import { getIssueStatusColor } from "src/helpers/issue-helpers";
+import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { useAuthStore } from "src/stores/auth-store";
+import { usePropertiesStore } from "src/stores/properties-store";
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
+
+import {
+    createIssueReport,
+    deleteIssueReport,
+    getIssueReportsPath,
+    updateIssueReport,
+} from "../backend-proxy";
 
 const { t } = useI18n();
 const { createDialog } = useDialog();
@@ -58,81 +59,6 @@ function checkReportThrottle(): boolean {
     return true;
 }
 
-function showCreateIssueForm(): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            title: t("PageIssueReport.createNewIssue"),
-            component: IssueCreateForm,
-            maximized: false,
-            componentPropsObject: {},
-            listeners: {
-                async create({ description, category }) {
-                    if (!checkReportThrottle()) {
-                        quasar.notify({
-                            type: "negative",
-                            message: t("PageIssueReport.tooManyReports", {
-                                count: MAX_REPORTS,
-                                minutes: THROTTLE_WINDOW_MS / ONE_MINUTE,
-                            }),
-                        });
-                        return;
-                    }
-
-                    await tryCatchLoadingWrapper({
-                        async hook() {
-                            await createIssueReport({
-                                description,
-                                category,
-                                createdAt: Date.now(),
-                                createdBy: authStore.nonNullableUser.id,
-                                user: {
-                                    name: authStore.nonNullableUser.name,
-                                    email: authStore.nonNullableUser.email,
-                                },
-                                organisation: {
-                                    id: organisation.value.id,
-                                    name: organisation.value.name,
-                                },
-                            });
-                            quasar.notify(t("PageIssueReport.issueReportedSuccess"));
-                            dialog.hide();
-                        },
-                    });
-                },
-            },
-        },
-    });
-}
-
-function showEditIssueForm(issue: IssueReportDoc): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            title: t("PageIssueReport.editIssue"),
-            component: IssueCreateForm,
-            maximized: false,
-            componentPropsObject: {
-                issueToEdit: issue,
-            },
-            listeners: {
-                async update({ description, category }) {
-                    await tryCatchLoadingWrapper({
-                        async hook() {
-                            await updateIssueReport(issue.id, {
-                                description,
-                                category,
-                            });
-                            quasar.notify(t("PageIssueReport.issueUpdatedSuccess"));
-                            dialog.hide();
-                        },
-                    });
-                },
-            },
-        },
-    });
-}
-
 async function onDeleteIssue(issueId: string): Promise<void> {
     if (await showConfirm(t("PageIssueReport.deleteConfirmation"))) {
         await tryCatchLoadingWrapper({
@@ -142,6 +68,81 @@ async function onDeleteIssue(issueId: string): Promise<void> {
             },
         });
     }
+}
+
+function showCreateIssueForm(): void {
+    const dialog = createDialog({
+        component: FTDialog,
+        componentProps: {
+            component: IssueCreateForm,
+            componentPropsObject: {},
+            listeners: {
+                async create({ category, description }) {
+                    if (!checkReportThrottle()) {
+                        quasar.notify({
+                            message: t("PageIssueReport.tooManyReports", {
+                                count: MAX_REPORTS,
+                                minutes: THROTTLE_WINDOW_MS / ONE_MINUTE,
+                            }),
+                            type: "negative",
+                        });
+                        return;
+                    }
+
+                    await tryCatchLoadingWrapper({
+                        async hook() {
+                            await createIssueReport({
+                                category,
+                                createdAt: Date.now(),
+                                createdBy: authStore.nonNullableUser.id,
+                                description,
+                                organisation: {
+                                    id: organisation.value.id,
+                                    name: organisation.value.name,
+                                },
+                                user: {
+                                    email: authStore.nonNullableUser.email,
+                                    name: authStore.nonNullableUser.name,
+                                },
+                            });
+                            quasar.notify(t("PageIssueReport.issueReportedSuccess"));
+                            dialog.hide();
+                        },
+                    });
+                },
+            },
+            maximized: false,
+            title: t("PageIssueReport.createNewIssue"),
+        },
+    });
+}
+
+function showEditIssueForm(issue: IssueReportDoc): void {
+    const dialog = createDialog({
+        component: FTDialog,
+        componentProps: {
+            component: IssueCreateForm,
+            componentPropsObject: {
+                issueToEdit: issue,
+            },
+            listeners: {
+                async update({ category, description }) {
+                    await tryCatchLoadingWrapper({
+                        async hook() {
+                            await updateIssueReport(issue.id, {
+                                category,
+                                description,
+                            });
+                            quasar.notify(t("PageIssueReport.issueUpdatedSuccess"));
+                            dialog.hide();
+                        },
+                    });
+                },
+            },
+            maximized: false,
+            title: t("PageIssueReport.editIssue"),
+        },
+    });
 }
 
 const { data: myIssues } = useFirestoreCollection<IssueReportDoc>(

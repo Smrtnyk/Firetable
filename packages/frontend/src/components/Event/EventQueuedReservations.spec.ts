@@ -1,15 +1,18 @@
-import type { RenderResult } from "vitest-browser-vue";
-import type { EventQueuedReservationsProps } from "./EventQueuedReservations.vue";
 import type { AnyFunction, EventDoc, QueuedReservationDoc, User } from "@firetable/types";
-import EventQueuedReservations from "./EventQueuedReservations.vue";
-import { mockedStore, renderComponent, t } from "../../../test-helpers/render-component";
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { userEvent } from "@vitest/browser/context";
-import { DEFAULT_ORGANISATION_SETTINGS, usePropertiesStore } from "src/stores/properties-store";
-import { useEventsStore } from "src/stores/events-store";
-import { noop } from "es-toolkit";
+import type { RenderResult } from "vitest-browser-vue";
+
 import { AdminRole } from "@firetable/types";
+import { userEvent } from "@vitest/browser/context";
+import { noop } from "es-toolkit";
 import { UTC } from "src/helpers/date-utils";
+import { useEventsStore } from "src/stores/events-store";
+import { DEFAULT_ORGANISATION_SETTINGS, usePropertiesStore } from "src/stores/properties-store";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { EventQueuedReservationsProps } from "./EventQueuedReservations.vue";
+
+import { mockedStore, renderComponent, t } from "../../../test-helpers/render-component";
+import EventQueuedReservations from "./EventQueuedReservations.vue";
 
 const { createDialogSpy } = vi.hoisted(() => {
     return {
@@ -39,8 +42,8 @@ describe("EventQueuedReservations.vue", () => {
     beforeEach(() => {
         authState = {
             user: {
-                id: "user1",
                 email: "",
+                id: "user1",
                 role: AdminRole.ADMIN,
             },
         };
@@ -67,8 +70,8 @@ describe("EventQueuedReservations.vue", () => {
             } as unknown as EventDoc,
             eventOwner: {
                 id: "event1",
-                propertyId: "prop1",
                 organisationId: "org1",
+                propertyId: "prop1",
             },
             users: [
                 { id: "user1", name: "User One" } as unknown as User,
@@ -79,7 +82,6 @@ describe("EventQueuedReservations.vue", () => {
 
     function render(): RenderResult<EventQueuedReservationsProps> {
         return renderComponent(EventQueuedReservations, props, {
-            wrapInLayout: true,
             piniaStoreOptions: {
                 initialState: {
                     auth: authState,
@@ -87,6 +89,7 @@ describe("EventQueuedReservations.vue", () => {
                     properties: propertiesStoreState,
                 },
             },
+            wrapInLayout: true,
         });
     }
 
@@ -122,15 +125,15 @@ describe("EventQueuedReservations.vue", () => {
     it("renders a list of reservations when data is provided", async () => {
         props.data = [
             {
-                id: "res1",
-                guestName: "John Doe",
                 guestContact: "john@example.com",
+                guestName: "John Doe",
+                id: "res1",
                 isVIP: true,
             } as unknown as QueuedReservationDoc,
             {
-                id: "res2",
-                guestName: "Jane Smith",
                 guestContact: "jane@example.com",
+                guestName: "Jane Smith",
+                id: "res2",
                 isVIP: false,
             } as unknown as QueuedReservationDoc,
         ];
@@ -170,9 +173,9 @@ describe("EventQueuedReservations.vue", () => {
     it("shows reservation details dialog when a reservation is clicked", async () => {
         props.data = [
             {
-                id: "res1",
-                guestName: "John Doe",
                 guestContact: "john@example.com",
+                guestName: "John Doe",
+                id: "res1",
                 isVIP: true,
             } as unknown as QueuedReservationDoc,
         ];
@@ -204,9 +207,9 @@ describe("EventQueuedReservations.vue", () => {
     it("closes dialog and drawer on 'unqueue'", async () => {
         props.data = [
             {
-                id: "res1",
-                guestName: "John Doe",
                 guestContact: "john@example.com",
+                guestName: "John Doe",
+                id: "res1",
                 isVIP: true,
             } as unknown as QueuedReservationDoc,
         ];
@@ -244,21 +247,21 @@ describe("EventQueuedReservations.vue", () => {
     it("renders the correct number of reservations", () => {
         props.data = [
             {
-                id: "res1",
-                guestName: "Guest 1",
                 guestContact: "g1@example.com",
+                guestName: "Guest 1",
+                id: "res1",
                 isVIP: false,
             } as QueuedReservationDoc,
             {
-                id: "res2",
-                guestName: "Guest 2",
                 guestContact: "g2@example.com",
+                guestName: "Guest 2",
+                id: "res2",
                 isVIP: true,
             } as QueuedReservationDoc,
             {
-                id: "res3",
-                guestName: "Guest 3",
                 guestContact: "g3@example.com",
+                guestName: "Guest 3",
+                id: "res3",
                 isVIP: false,
             } as QueuedReservationDoc,
         ];

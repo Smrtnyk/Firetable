@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { EventOwner } from "@firetable/backend";
 import type {
     EventDoc,
     EventFloorDoc,
@@ -8,60 +9,58 @@ import type {
     QueuedReservationDoc,
     ReservationDoc,
 } from "@firetable/types";
-import type { EventOwner } from "@firetable/backend";
+
 import {
-    fetchUsersByRole,
     deleteQueuedReservation,
-    saveQueuedReservation,
+    fetchUsersByRole,
     getEventFloorsPath,
     getEventGuestListPath,
     getEventPath,
     queuedReservationsCollection,
     reservationsCollection,
+    saveQueuedReservation,
 } from "@firetable/backend";
 import { isPlannedReservation, ReservationStatus } from "@firetable/types";
+import { useAsyncState } from "@vueuse/core";
+import { where } from "firebase/firestore";
 import { Loading } from "quasar";
-import { useRouter } from "vue-router";
-import { computed, onMounted, onUnmounted, useTemplateRef } from "vue";
-import { useEventsStore } from "src/stores/events-store";
+import EventFloorCanvasList from "src/components/Event/EventFloorCanvasList.vue";
+import EventGuestList from "src/components/Event/EventGuestList.vue";
+import EventGuestSearch from "src/components/Event/EventGuestSearch.vue";
+import EventInfo from "src/components/Event/EventInfo.vue";
+import EventQueuedReservations from "src/components/Event/EventQueuedReservations.vue";
+import EventViewControls from "src/components/Event/EventViewControls.vue";
+import FTDialog from "src/components/FTDialog.vue";
+import { useReservations } from "src/composables/reservations/useReservations";
+import { TableOperationType } from "src/composables/reservations/useTableOperations";
+import { useDialog } from "src/composables/useDialog";
 import {
     createQuery,
     useFirestoreCollection,
     useFirestoreDocument,
 } from "src/composables/useFirestore";
 import { useFloorsPageEvent } from "src/composables/useFloorsPageEvent";
-import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { where } from "firebase/firestore";
-
-import EventGuestList from "src/components/Event/EventGuestList.vue";
-import EventGuestSearch from "src/components/Event/EventGuestSearch.vue";
-import EventInfo from "src/components/Event/EventInfo.vue";
-import FTDialog from "src/components/FTDialog.vue";
-import EventQueuedReservations from "src/components/Event/EventQueuedReservations.vue";
-import EventViewControls from "src/components/Event/EventViewControls.vue";
-import EventFloorCanvasList from "src/components/Event/EventFloorCanvasList.vue";
-
-import { useReservations } from "src/composables/reservations/useReservations";
-import { useDialog } from "src/composables/useDialog";
-import { useI18n } from "vue-i18n";
-import { usePermissionsStore } from "src/stores/permissions-store";
-import { exportReservations } from "src/helpers/reservation/export-reservations";
 import { useGuestsForEvent } from "src/composables/useGuestsForEvent";
-import { useAsyncState } from "@vueuse/core";
-import { TableOperationType } from "src/composables/reservations/useTableOperations";
+import { exportReservations } from "src/helpers/reservation/export-reservations";
+import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { useEventsStore } from "src/stores/events-store";
+import { usePermissionsStore } from "src/stores/permissions-store";
+import { computed, onMounted, onUnmounted, useTemplateRef } from "vue";
+import { useI18n } from "vue-i18n";
+import { useRouter } from "vue-router";
 
 interface Props {
+    eventId: string;
     organisationId: string;
     propertyId: string;
-    eventId: string;
 }
 
-const { propertyId, eventId, organisationId } = defineProps<Props>();
+const { eventId, organisationId, propertyId } = defineProps<Props>();
 
 const eventOwner: EventOwner = {
-    propertyId,
-    organisationId,
     id: eventId,
+    organisationId,
+    propertyId,
 };
 
 const permissionStore = usePermissionsStore();
@@ -71,7 +70,7 @@ const { t } = useI18n();
 const { createDialog } = useDialog();
 const pageRef = useTemplateRef<HTMLDivElement>("pageRef");
 
-const { state: users, execute: loadUsersPromise } = useAsyncState(
+const { execute: loadUsersPromise, state: users } = useAsyncState(
     () => fetchUsersByRole(organisationId),
     [],
 );
@@ -92,8 +91,8 @@ const { data: eventFloors } = useFirestoreCollection<EventFloorDoc>(
 );
 const {
     data: reservations,
-    promise: reservationsDataPromise,
     error: reservationsDataError,
+    promise: reservationsDataPromise,
 } = useFirestoreCollection<ReservationDoc>(
     createQuery(
         reservationsCollection(eventOwner),
@@ -119,14 +118,14 @@ const plannedReservations = computed(function () {
 const { returningGuests } = useGuestsForEvent(eventOwner, plannedReservations);
 
 const {
+    activeFloor,
     animateTables,
-    setActiveFloor,
+    floorInstances,
+    hasMultipleFloorPlans,
     isActiveFloor,
     mapFloorToCanvas,
+    setActiveFloor,
     stopAllTableAnimations,
-    hasMultipleFloorPlans,
-    activeFloor,
-    floorInstances,
 } = useFloorsPageEvent(eventFloors, pageRef);
 
 const { initiateTableOperation } = useReservations(
@@ -140,27 +139,6 @@ const { initiateTableOperation } = useReservations(
 const canExportReservations = computed(function () {
     return permissionStore.canExportReservations;
 });
-
-function showEventInfo(): void {
-    if (!event.value) {
-        return;
-    }
-    createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: EventInfo,
-            title: event.value.name,
-            maximized: false,
-            componentPropsObject: {
-                eventInfo: event.value.info,
-                floors: eventFloors.value,
-                activeReservations: reservations.value,
-                returningGuests: returningGuests.value,
-            },
-            listeners: {},
-        },
-    });
-}
 
 async function init(): Promise<void> {
     Loading.show();
@@ -199,13 +177,6 @@ function navigateToAdminEvent(): void {
     });
 }
 
-function onReservationUnqueue(reservation: QueuedReservationDoc): void {
-    initiateTableOperation({
-        type: TableOperationType.RESERVATION_DEQUEUE,
-        reservation,
-    });
-}
-
 async function onCreateQueuedReservation(reservation: QueuedReservation): Promise<void> {
     await tryCatchLoadingWrapper({
         hook() {
@@ -239,9 +210,37 @@ async function onExportReservations(): Promise<void> {
     }
 
     exportReservations({
-        reservations: reservations.value,
         eventName: event.value.name,
         floors: eventFloors.value,
+        reservations: reservations.value,
+    });
+}
+
+function onReservationUnqueue(reservation: QueuedReservationDoc): void {
+    initiateTableOperation({
+        reservation,
+        type: TableOperationType.RESERVATION_DEQUEUE,
+    });
+}
+
+function showEventInfo(): void {
+    if (!event.value) {
+        return;
+    }
+    createDialog({
+        component: FTDialog,
+        componentProps: {
+            component: EventInfo,
+            componentPropsObject: {
+                activeReservations: reservations.value,
+                eventInfo: event.value.info,
+                floors: eventFloors.value,
+                returningGuests: returningGuests.value,
+            },
+            listeners: {},
+            maximized: false,
+            title: event.value.name,
+        },
     });
 }
 

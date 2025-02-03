@@ -1,12 +1,14 @@
 import type { EventDoc } from "@shared-types/event.js";
 import type { GuestDoc } from "@shared-types/guest.js";
-import type { OrganisationDoc } from "@shared-types/organisation.js";
 import type { PropertyDoc } from "@shared-types/index.js";
-import { BaseSeeder } from "./BaseSeeder.js";
+import type { OrganisationDoc } from "@shared-types/organisation.js";
+
+import { faker } from "@faker-js/faker";
+
+import { getGuestsPath } from "../../src/paths.js";
 import { DataGenerator } from "../DataGenerator.js";
 import { logger } from "../logger.js";
-import { getGuestsPath } from "../../src/paths.js";
-import { faker } from "@faker-js/faker";
+import { BaseSeeder } from "./BaseSeeder.js";
 
 export class GuestSeeder extends BaseSeeder {
     async seedForOrganisation(
@@ -33,12 +35,12 @@ export class GuestSeeder extends BaseSeeder {
         );
 
         const stats = {
-            totalGuests: 0,
-            totalVisits: 0,
             guestsWithContact: 0,
             guestsWithMultipleVisits: 0,
-            vipGuests: 0,
             propertiesWithGuests: 0,
+            totalGuests: 0,
+            totalVisits: 0,
+            vipGuests: 0,
         };
 
         for (const property of orgProperties) {
@@ -48,7 +50,7 @@ export class GuestSeeder extends BaseSeeder {
                 continue;
             }
 
-            const numGuests = faker.number.int({ min: 100, max: 1000 });
+            const numGuests = faker.number.int({ max: 1000, min: 100 });
             logger.info(`Creating ${numGuests} guests for property "${property.name}"`);
 
             const propertyStart = Date.now();
@@ -58,7 +60,7 @@ export class GuestSeeder extends BaseSeeder {
             for (let i = 0; i < numGuests; i++) {
                 const guestEvents = faker.helpers.arrayElements(
                     propertyEvents,
-                    faker.number.int({ min: 1, max: 5 }),
+                    faker.number.int({ max: 5, min: 1 }),
                 );
 
                 const guest = DataGenerator.generateGuest();
@@ -82,10 +84,10 @@ export class GuestSeeder extends BaseSeeder {
                             guest.visitedProperties[property.id] = {};
                         }
                         guest.visitedProperties[property.id]![event.id] = {
-                            date: event.date,
-                            eventName: event.name,
                             arrived: faker.datatype.boolean(),
                             cancelled: faker.datatype.boolean(),
+                            date: event.date,
+                            eventName: event.name,
                             isVIPVisit: guest.tags?.includes("VIP") || false,
                         };
                     });
@@ -104,8 +106,8 @@ export class GuestSeeder extends BaseSeeder {
                 logger.stats(
                     {
                         "Guests Created": guests.length,
-                        "Total Visits": propertyVisits,
                         Time: `${propertyDuration}s`,
+                        "Total Visits": propertyVisits,
                     },
                     2,
                 );
@@ -115,13 +117,13 @@ export class GuestSeeder extends BaseSeeder {
         const duration = ((Date.now() - startTime) / 1000).toFixed(2);
         logger.info("Guest seeding statistics:");
         logger.stats({
-            "Total Guests": stats.totalGuests,
-            "Total Visits": stats.totalVisits,
             "Guests with Contact": stats.guestsWithContact,
             "Multiple Visit Guests": stats.guestsWithMultipleVisits,
-            "VIP Guests": stats.vipGuests,
             "Properties with Guests": stats.propertiesWithGuests,
+            "Total Guests": stats.totalGuests,
             "Total Time": `${duration}s`,
+            "Total Visits": stats.totalVisits,
+            "VIP Guests": stats.vipGuests,
         });
     }
 }

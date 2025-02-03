@@ -1,9 +1,10 @@
+import type { EventDoc, ReservationDocWithEventId } from "@firetable/types";
 import type {
     AugmentedPlannedReservation,
     AugmentedWalkInReservation,
     ReservationBucket,
 } from "src/stores/analytics-store.js";
-import type { EventDoc, ReservationDocWithEventId } from "@firetable/types";
+
 import { isAWalkInReservation, isPlannedReservation } from "@firetable/types";
 import { matchesProperty } from "es-toolkit/compat";
 
@@ -17,8 +18,8 @@ export function bucketizeReservations(
     ): AugmentedPlannedReservation | AugmentedWalkInReservation {
         return {
             ...reservation,
-            id: reservation.id,
             date: event.date,
+            id: reservation.id,
         };
     }
 

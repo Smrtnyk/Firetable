@@ -1,7 +1,8 @@
 /* eslint-disable id-length -- patched from fabric */
-import { getContraryMap, getDistance, getDistanceList, getPointMap } from "./basic.js";
-import { describe, expect, it } from "vitest";
 import { Point, Rect } from "fabric";
+import { describe, expect, it } from "vitest";
+
+import { getContraryMap, getDistance, getDistanceList, getPointMap } from "./basic.js";
 
 describe("getDistance", () => {
     it("returns the distance between the 2 numbers", () => {
@@ -30,10 +31,10 @@ describe("getDistanceList", () => {
 describe("getPointMap", () => {
     it("returns the pointMap", () => {
         const target = new Rect({
+            height: rnd(100),
             left: rnd(-100, 100),
             top: rnd(-100, 100),
             width: rnd(100),
-            height: rnd(100),
         });
         const coords = target.getCoords();
         const pointMap = getPointMap(target);
@@ -50,14 +51,14 @@ describe("getPointMap", () => {
 describe("getContraryMap", () => {
     it("returns the contraryMap", () => {
         const target = new Rect({
+            height: rnd(100),
             left: rnd(-100, 100),
             top: rnd(-100, 100),
             width: rnd(100),
-            height: rnd(100),
         });
         const aCoords = target.calcACoords();
         const pointMap = getContraryMap(target);
-        const { tl, tr, br, bl, mt, mr, ml, mb } = pointMap;
+        const { bl, br, mb, ml, mr, mt, tl, tr } = pointMap;
         expect(tl).toEqual(aCoords.br);
         expect(tr).toEqual(aCoords.bl);
         expect(br).toEqual(aCoords.tl);

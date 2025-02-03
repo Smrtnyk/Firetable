@@ -1,17 +1,20 @@
 import type { FabricObject } from "fabric";
-import type { BaseTable, FloorCreationOptions, FloorData } from "./types.js";
-import type { EventManager } from "./event-manager/EventManager.js";
-import { CANVAS_BG_COLOR, DEFAULT_FONT } from "./constants.js";
-import { TouchManager } from "./TouchManager.js";
-import { FloorZoomManager } from "./FloorZoomManager.js";
-import { calculateCanvasScale } from "./utils.js";
-import { getTables } from "./filters.js";
-import { RectTable } from "./elements/RectTable.js";
-import { Wall } from "./elements/Wall.js";
-import { RoundTable } from "./elements/RoundTable.js";
-import { EditableShape } from "./elements/EditableShape.js";
-import { FabricText, Canvas, classRegistry } from "fabric";
+
 import { matchesProperty } from "es-toolkit/compat";
+import { Canvas, classRegistry, FabricText } from "fabric";
+
+import type { EventManager } from "./event-manager/EventManager.js";
+import type { BaseTable, FloorCreationOptions, FloorData } from "./types.js";
+
+import { CANVAS_BG_COLOR, DEFAULT_FONT } from "./constants.js";
+import { EditableShape } from "./elements/EditableShape.js";
+import { RectTable } from "./elements/RectTable.js";
+import { RoundTable } from "./elements/RoundTable.js";
+import { Wall } from "./elements/Wall.js";
+import { getTables } from "./filters.js";
+import { FloorZoomManager } from "./FloorZoomManager.js";
+import { TouchManager } from "./TouchManager.js";
+import { calculateCanvasScale } from "./utils.js";
 
 classRegistry.setClass(RectTable);
 classRegistry.setClass(RoundTable);
@@ -21,22 +24,22 @@ classRegistry.setClass(EditableShape);
 FabricText.ownDefaults.fontFamily = DEFAULT_FONT;
 
 export abstract class Floor {
+    readonly canvas: Canvas;
+    containerHeight: number;
+    containerWidth: number;
+    readonly floorDoc: FloorData;
+    height: number;
     readonly id: string;
     name: string;
     scale: number;
-    height: number;
-    readonly floorDoc: FloorData;
-    readonly canvas: Canvas;
-    width: number;
-    containerWidth: number;
-    containerHeight: number;
     touchManager: TouchManager;
+    width: number;
     zoomManager: FloorZoomManager;
 
     protected abstract eventManager: EventManager;
 
     protected constructor(options: FloorCreationOptions) {
-        const { canvas, floorDoc, containerWidth, containerHeight } = options;
+        const { canvas, containerHeight, containerWidth, floorDoc } = options;
 
         this.scale = calculateCanvasScale(
             containerWidth,
@@ -53,11 +56,11 @@ export abstract class Floor {
         this.floorDoc = floorDoc;
 
         this.canvas = new Canvas(canvas, {
-            width: this.width,
-            height: this.height,
             backgroundColor: CANVAS_BG_COLOR,
+            height: this.height,
             selection: false,
             skipOffscreen: true,
+            width: this.width,
         });
         this.setScaling();
         this.renderJSONData(this.floorDoc.json);
@@ -73,20 +76,25 @@ export abstract class Floor {
         });
     }
 
-    setObjectCoords(): void {
-        this.canvas.forEachObject(function (object) {
-            object.setCoords();
+    clearAllReservations(): void {
+        getTables(this).forEach((table) => {
+            table.setFill(table.baseFill);
+            table.setVIPStatus(false);
         });
+        this.canvas.requestRenderAll();
     }
 
-    setScaling(): void {
-        this.canvas.setZoom(this.scale);
-        this.canvas.setDimensions({
-            width: this.width * this.canvas.getZoom(),
-            height: this.height * this.canvas.getZoom(),
-        });
-        this.setObjectCoords();
+    abstract destroy(): void;
+
+    abstract emit(event: string, ...args: unknown[]): void;
+
+    getTableByLabel(tableLabel: string): BaseTable | undefined {
+        return getTables(this).find(matchesProperty("label", tableLabel));
     }
+
+    abstract on(event: string, listener: any): void;
+
+    abstract onFloorDoubleTap(coordinates: [x: number, y: number]): void;
 
     async renderJSONData(jsonData?: FloorData["json"]): Promise<void> {
         if (!jsonData) {
@@ -99,19 +107,6 @@ export abstract class Floor {
         this.emit("rendered");
         canvas.requestRenderAll();
     }
-
-    getTableByLabel(tableLabel: string): BaseTable | undefined {
-        return getTables(this).find(matchesProperty("label", tableLabel));
-    }
-
-    clearAllReservations(): void {
-        getTables(this).forEach((table) => {
-            table.setFill(table.baseFill);
-            table.setVIPStatus(false);
-        });
-        this.canvas.requestRenderAll();
-    }
-
     resize(pageContainerWidth: number, pageContainerHeight: number): void {
         this.containerWidth = pageContainerWidth;
         this.containerHeight = pageContainerHeight;
@@ -125,11 +120,19 @@ export abstract class Floor {
         this.zoomManager.setScale(this.scale);
         this.zoomManager.resetZoom();
     }
-
-    abstract onFloorDoubleTap(coordinates: [x: number, y: number]): void;
-    abstract emit(event: string, ...args: unknown[]): void;
-    abstract on(event: string, listener: any): void;
-    abstract destroy(): void;
+    setObjectCoords(): void {
+        this.canvas.forEachObject(function (object) {
+            object.setCoords();
+        });
+    }
+    setScaling(): void {
+        this.canvas.setZoom(this.scale);
+        this.canvas.setDimensions({
+            height: this.height * this.canvas.getZoom(),
+            width: this.width * this.canvas.getZoom(),
+        });
+        this.setObjectCoords();
+    }
     protected abstract onElementClick(ev: FabricObject): void;
     protected abstract setElementProperties(element: FabricObject): void;
 }

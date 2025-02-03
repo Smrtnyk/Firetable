@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import type { DrinkCardItem, DrinkBundle } from "@firetable/types";
-import { ref, computed, watch } from "vue";
-import { useI18n } from "vue-i18n";
-import { greaterThanZero, noEmptyString, numberInRange } from "src/helpers/form-rules";
-import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
-import { formatPrice } from "src/helpers/drink-card/drink-card";
-import { isNotNil } from "es-toolkit/predicate";
-import { useDialog } from "src/composables/useDialog";
+import type { DrinkBundle, DrinkCardItem } from "@firetable/types";
 
-import FTBtn from "src/components/FTBtn.vue";
+import { isNotNil } from "es-toolkit/predicate";
 import DrinkCardBuilderItemSelectionDialog from "src/components/admin/drink-cards/DrinkCardBuilderItemSelectionDialog.vue";
 import FTBottomDialog from "src/components/FTBottomDialog.vue";
-
-interface Props {
-    availableItems: DrinkCardItem[];
-    bundleToEdit: DrinkBundle | undefined;
-}
+import FTBtn from "src/components/FTBtn.vue";
+import { useDialog } from "src/composables/useDialog";
+import { formatPrice } from "src/helpers/drink-card/drink-card";
+import { greaterThanZero, noEmptyString, numberInRange } from "src/helpers/form-rules";
+import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
+import { computed, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 
 interface Emits {
     (event: "update:show", value: boolean): void;
     (event: "submit" | "update", bundle: DrinkBundle): void;
+}
+
+interface Props {
+    availableItems: DrinkCardItem[];
+    bundleToEdit: DrinkBundle | undefined;
 }
 
 const props = defineProps<Props>();
@@ -31,18 +31,18 @@ const { t } = useI18n();
 const isEditMode = computed(() => isNotNil(props.bundleToEdit));
 
 const bundle = ref({
-    name: "",
     description: "",
-    price: 0,
     items: [] as DrinkBundle["items"],
+    name: "",
+    price: 0,
 });
 
 const availableItemOptions = computed(function () {
     return props.availableItems.map(function (item) {
         return {
+            item,
             label: `${item.name} (${formatPrice(item.price)})`,
             value: item.inventoryItemId,
-            item,
         };
     });
 });
@@ -52,46 +52,21 @@ watch(
     function (newBundle) {
         if (newBundle) {
             bundle.value = {
-                name: newBundle.name,
                 description: newBundle.description ?? "",
-                price: newBundle.price,
                 items: [...newBundle.items],
+                name: newBundle.name,
+                price: newBundle.price,
             };
         }
     },
     { immediate: true },
 );
 
-function openItemSelectionDialog(index: number): void {
-    const dialog = createDialog({
-        component: FTBottomDialog,
-        componentProps: {
-            component: DrinkCardBuilderItemSelectionDialog,
-            componentPropsObject: {
-                inventoryItems: props.availableItems,
-            },
-            listeners: {
-                select(selectedItem) {
-                    dialog.hide();
-
-                    handleItemSelect(selectedItem, index);
-                },
-            },
-        },
+function addBundleItem(): void {
+    bundle.value.items.push({
+        inventoryItemId: "",
+        quantity: 1,
     });
-}
-
-function handleItemSelect(selectedItem: DrinkCardItem, index: number): void {
-    if (index !== null) {
-        bundle.value.items[index].inventoryItemId = selectedItem.inventoryItemId;
-    }
-}
-
-function getItemName(itemId: string): string {
-    const item = props.availableItems.find(function ({ inventoryItemId }) {
-        return inventoryItemId === itemId;
-    });
-    return item?.name ?? "Unknown Item";
 }
 
 function calculateRegularPrice(items: typeof bundle.value.items): number {
@@ -113,19 +88,21 @@ function calculateSavings(bundleData: typeof bundle.value): string {
     return savings.toFixed(1);
 }
 
-function addBundleItem(): void {
-    bundle.value.items.push({
-        inventoryItemId: "",
-        quantity: 1,
-    });
+function closeDialog(): void {
+    emit("update:show", false);
+    bundle.value = {
+        description: "",
+        items: [],
+        name: "",
+        price: 0,
+    };
 }
 
-async function removeBundleItem(index: number): Promise<void> {
-    const confirmed = await showConfirm("Are you sure you want to remove this item?");
-
-    if (!confirmed) return;
-
-    bundle.value.items.splice(index, 1);
+function getItemName(itemId: string): string {
+    const item = props.availableItems.find(function ({ inventoryItemId }) {
+        return inventoryItemId === itemId;
+    });
+    return item?.name ?? "Unknown Item";
 }
 
 function handleBundleSubmit(): void {
@@ -140,9 +117,9 @@ function handleBundleSubmit(): void {
         // Update existing bundle
         const updatedBundle: DrinkBundle = {
             ...props.bundleToEdit,
-            name: bundle.value.name,
             description: bundle.value.description,
             items: bundle.value.items,
+            name: bundle.value.name,
             price: bundle.value.price,
             savings: {
                 amount: regularPrice - bundle.value.price,
@@ -153,32 +130,55 @@ function handleBundleSubmit(): void {
     } else {
         // Create new bundle
         const newBundle: DrinkBundle = {
+            description: bundle.value.description,
             id: crypto.randomUUID(),
-            name: bundle.value.name,
-            type: "bundle",
+            isHighlighted: true,
+            isVisible: true,
             items: bundle.value.items,
+            name: bundle.value.name,
             price: bundle.value.price,
             savings: {
                 amount: regularPrice - bundle.value.price,
                 percentage: Number.parseFloat(calculateSavings(bundle.value)),
             },
-            description: bundle.value.description,
-            isVisible: true,
-            isHighlighted: true,
+            type: "bundle",
         };
         emit("submit", newBundle);
     }
     closeDialog();
 }
 
-function closeDialog(): void {
-    emit("update:show", false);
-    bundle.value = {
-        name: "",
-        description: "",
-        price: 0,
-        items: [],
-    };
+function handleItemSelect(selectedItem: DrinkCardItem, index: number): void {
+    if (index !== null) {
+        bundle.value.items[index].inventoryItemId = selectedItem.inventoryItemId;
+    }
+}
+
+function openItemSelectionDialog(index: number): void {
+    const dialog = createDialog({
+        component: FTBottomDialog,
+        componentProps: {
+            component: DrinkCardBuilderItemSelectionDialog,
+            componentPropsObject: {
+                inventoryItems: props.availableItems,
+            },
+            listeners: {
+                select(selectedItem) {
+                    dialog.hide();
+
+                    handleItemSelect(selectedItem, index);
+                },
+            },
+        },
+    });
+}
+
+async function removeBundleItem(index: number): Promise<void> {
+    const confirmed = await showConfirm("Are you sure you want to remove this item?");
+
+    if (!confirmed) return;
+
+    bundle.value.items.splice(index, 1);
 }
 </script>
 

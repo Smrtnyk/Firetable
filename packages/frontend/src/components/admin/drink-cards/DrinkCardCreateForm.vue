@@ -1,22 +1,24 @@
 <script setup lang="ts">
 import type { CreateDrinkCardPayload, DrinkCardElement, InventoryItemDoc } from "@firetable/types";
-import DrinkCardSectionManager from "./DrinkCardSectionManager.vue";
-import { isCustomDrinkCard, isPDFDrinkCard } from "@firetable/types";
-import { ref } from "vue";
-import { QForm } from "quasar";
-import { useI18n } from "vue-i18n";
-import { noEmptyString } from "src/helpers/form-rules";
-import { showErrorMessage } from "src/helpers/ui-helpers";
-import { processImage } from "src/helpers/process-image";
 
-interface Props {
-    cardToEdit?: CreateDrinkCardPayload;
-    inventoryItems: InventoryItemDoc[];
-}
+import { isCustomDrinkCard, isPDFDrinkCard } from "@firetable/types";
+import { QForm } from "quasar";
+import { noEmptyString } from "src/helpers/form-rules";
+import { processImage } from "src/helpers/process-image";
+import { showErrorMessage } from "src/helpers/ui-helpers";
+import { ref } from "vue";
+import { useI18n } from "vue-i18n";
+
+import DrinkCardSectionManager from "./DrinkCardSectionManager.vue";
 
 interface FormSubmitData {
     card: CreateDrinkCardPayload;
     pdfFile?: File | undefined;
+}
+
+interface Props {
+    cardToEdit?: CreateDrinkCardPayload;
+    inventoryItems: InventoryItemDoc[];
 }
 
 const props = defineProps<Props>();
@@ -36,14 +38,14 @@ function getInitialForm(): CreateDrinkCardPayload {
     }
 
     return {
-        name: "",
         description: "",
-        isActive: true,
-        propertyId: "",
-        organisationId: "",
-        type: "custom",
         elements: [],
+        isActive: true,
+        name: "",
+        organisationId: "",
+        propertyId: "",
         showLogo: true,
+        type: "custom",
     };
 }
 
@@ -70,22 +72,23 @@ async function onSubmit(): Promise<void> {
 }
 
 const imageProcessingOptions = {
-    maxWidth: 1920,
-    maxHeight: 1080,
-    quality: 0.8,
+    acceptedTypes: ["image/jpeg", "image/png"],
     // 300KB
     maxFileSize: 300 * 1024,
-    acceptedTypes: ["image/jpeg", "image/png"],
+    maxHeight: 1080,
+    maxWidth: 1920,
+    quality: 0.8,
 };
 
-function triggerFileInput(): void {
-    fileInput.value?.click();
+function handleElementAdd(element: DrinkCardElement): void {
+    if (isCustomDrinkCard(form.value)) {
+        form.value.elements.push(element);
+    }
 }
 
-function removeImage(): void {
+function handleElementRemove(index: number): void {
     if (isCustomDrinkCard(form.value)) {
-        form.value.backgroundImage = "";
-        backgroundFile.value = undefined;
+        form.value.elements.splice(index, 1);
     }
 }
 
@@ -127,16 +130,15 @@ function handlePDFUpload(file: File | null): void {
     pdfFile.value = file;
 }
 
-function handleElementAdd(element: DrinkCardElement): void {
+function removeImage(): void {
     if (isCustomDrinkCard(form.value)) {
-        form.value.elements.push(element);
+        form.value.backgroundImage = "";
+        backgroundFile.value = undefined;
     }
 }
 
-function handleElementRemove(index: number): void {
-    if (isCustomDrinkCard(form.value)) {
-        form.value.elements.splice(index, 1);
-    }
+function triggerFileInput(): void {
+    fileInput.value?.click();
 }
 </script>
 

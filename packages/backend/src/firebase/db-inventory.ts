@@ -1,7 +1,9 @@
 import type { CreateInventoryItemPayload } from "@firetable/types";
+
+import { addDoc, collection, deleteDoc, doc, updateDoc } from "firebase/firestore";
+
 import { initializeFirebase } from "./base.js";
 import { getInventoryPath } from "./paths.js";
-import { addDoc, collection, deleteDoc, doc, updateDoc } from "firebase/firestore";
 
 /**
  * Adds a new inventory item to the Firestore database.

@@ -1,8 +1,6 @@
 import type { PlannedReservationDoc, User } from "@firetable/types";
-import type { EventShowReservationProps } from "./EventShowReservation.vue";
 import type { GuestSummary } from "src/stores/guests-store";
-import EventShowReservation from "./EventShowReservation.vue";
-import { renderComponent, t } from "../../../../test-helpers/render-component";
+
 import {
     ReservationState,
     ReservationStatus,
@@ -10,10 +8,15 @@ import {
     Role,
     UserCapability,
 } from "@firetable/types";
-import { beforeEach, describe, expect, it } from "vitest";
 import { userEvent } from "@vitest/browser/context";
-import { nextTick } from "vue";
 import { getDefaultTimezone } from "src/helpers/date-utils";
+import { beforeEach, describe, expect, it } from "vitest";
+import { nextTick } from "vue";
+
+import type { EventShowReservationProps } from "./EventShowReservation.vue";
+
+import { renderComponent, t } from "../../../../test-helpers/render-component";
+import EventShowReservation from "./EventShowReservation.vue";
 
 describe("EventShowReservation", () => {
     let props: EventShowReservationProps;
@@ -34,37 +37,37 @@ describe("EventShowReservation", () => {
             },
         };
         reservation = {
-            id: "reservation1",
             arrived: false,
+            cancelled: false,
+            consumption: 0,
+            creator: {
+                createdAt: 123_455,
+                email: "foo",
+                id: "user1",
+                name: "bar",
+            },
+            floorId: "floor1",
+            guestName: "John Doe",
+            id: "reservation1",
             isVIP: false,
             numberOfGuests: 2,
-            cancelled: false,
             reservationConfirmed: false,
-            waitingForResponse: false,
-            type: ReservationType.PLANNED,
-            state: ReservationState.PENDING,
-            consumption: 0,
-            time: "22:00",
-            status: ReservationStatus.ACTIVE,
-            floorId: "floor1",
-            tableLabel: "table1",
-            guestName: "John Doe",
             reservedBy: {
-                id: "user1",
                 email: "foo",
+                id: "user1",
                 name: "bar",
             },
-            creator: {
-                id: "user1",
-                email: "foo",
-                name: "bar",
-                createdAt: 123_455,
-            },
+            state: ReservationState.PENDING,
+            status: ReservationStatus.ACTIVE,
+            tableLabel: "table1",
+            time: "22:00",
+            type: ReservationType.PLANNED,
+            waitingForResponse: false,
         };
         props = {
+            guestSummaryPromise: Promise.resolve(void 0),
             reservation,
             timezone: getDefaultTimezone(),
-            guestSummaryPromise: Promise.resolve(void 0),
         };
     });
 
@@ -290,10 +293,10 @@ describe("EventShowReservation", () => {
                     initialState: {
                         auth: {
                             user: {
-                                id: "user2",
                                 capabilities: {
                                     [UserCapability.CAN_DELETE_RESERVATION]: true,
                                 },
+                                id: "user2",
                             },
                         },
                     },
@@ -310,10 +313,10 @@ describe("EventShowReservation", () => {
                     initialState: {
                         auth: {
                             user: {
-                                id: "user1",
                                 capabilities: {
                                     [UserCapability.CAN_DELETE_OWN_RESERVATION]: true,
                                 },
+                                id: "user1",
                             },
                         },
                     },
@@ -330,10 +333,10 @@ describe("EventShowReservation", () => {
                     initialState: {
                         auth: {
                             user: {
-                                id: "user1",
                                 capabilities: {
                                     [UserCapability.CAN_DELETE_RESERVATION]: false,
                                 },
+                                id: "user1",
                             },
                         },
                     },
@@ -374,10 +377,10 @@ describe("EventShowReservation", () => {
                     initialState: {
                         auth: {
                             user: {
-                                id: "user2",
                                 capabilities: {
                                     [UserCapability.CAN_EDIT_RESERVATION]: true,
                                 },
+                                id: "user2",
                             },
                         },
                     },
@@ -394,10 +397,10 @@ describe("EventShowReservation", () => {
                     initialState: {
                         auth: {
                             user: {
-                                id: "user1",
                                 capabilities: {
                                     [UserCapability.CAN_EDIT_OWN_RESERVATION]: true,
                                 },
+                                id: "user1",
                             },
                         },
                     },
@@ -434,10 +437,10 @@ describe("EventShowReservation", () => {
                     initialState: {
                         auth: {
                             user: {
-                                id: "user2",
                                 capabilities: {
                                     [UserCapability.CAN_EDIT_RESERVATION]: false,
                                 },
+                                id: "user2",
                             },
                         },
                     },
@@ -456,10 +459,10 @@ describe("EventShowReservation", () => {
                     initialState: {
                         auth: {
                             user: {
-                                id: "user1",
                                 capabilities: {
                                     [UserCapability.CAN_CANCEL_RESERVATION]: false,
                                 },
+                                id: "user1",
                             },
                         },
                     },
@@ -595,11 +598,11 @@ describe("EventShowReservation", () => {
                     initialState: {
                         auth: {
                             user: {
-                                id: "user1",
-                                role: Role.PROPERTY_OWNER,
                                 capabilities: {
                                     [UserCapability.CAN_RESERVE]: true,
                                 },
+                                id: "user1",
+                                role: Role.PROPERTY_OWNER,
                             },
                         },
                     },
@@ -616,13 +619,13 @@ describe("EventShowReservation", () => {
                     initialState: {
                         auth: {
                             user: {
-                                // Same as reservation.creator.id
-                                id: "user1",
-                                role: Role.PROPERTY_OWNER,
                                 capabilities: {
                                     // Global reserve not allowed
                                     [UserCapability.CAN_RESERVE]: false,
                                 },
+                                // Same as reservation.creator.id
+                                id: "user1",
+                                role: Role.PROPERTY_OWNER,
                             },
                         },
                     },
@@ -641,11 +644,11 @@ describe("EventShowReservation", () => {
                     initialState: {
                         auth: {
                             user: {
-                                id: "user1",
-                                role: Role.PROPERTY_OWNER,
                                 capabilities: {
                                     [UserCapability.CAN_RESERVE]: true,
                                 },
+                                id: "user1",
+                                role: Role.PROPERTY_OWNER,
                             },
                         },
                     },
@@ -664,11 +667,11 @@ describe("EventShowReservation", () => {
                     initialState: {
                         auth: {
                             user: {
-                                id: "user1",
-                                role: Role.PROPERTY_OWNER,
                                 capabilities: {
                                     [UserCapability.CAN_RESERVE]: true,
                                 },
+                                id: "user1",
+                                role: Role.PROPERTY_OWNER,
                             },
                         },
                     },
@@ -685,12 +688,12 @@ describe("EventShowReservation", () => {
                     initialState: {
                         auth: {
                             user: {
-                                // Different user
-                                id: "user2",
-                                role: Role.STAFF,
                                 capabilities: {
                                     [UserCapability.CAN_RESERVE]: false,
                                 },
+                                // Different user
+                                id: "user2",
+                                role: Role.STAFF,
                             },
                         },
                     },
@@ -707,11 +710,11 @@ describe("EventShowReservation", () => {
                     initialState: {
                         auth: {
                             user: {
-                                id: "user1",
-                                role: Role.PROPERTY_OWNER,
                                 capabilities: {
                                     [UserCapability.CAN_RESERVE]: true,
                                 },
+                                id: "user1",
+                                role: Role.PROPERTY_OWNER,
                             },
                         },
                     },
@@ -729,11 +732,11 @@ describe("EventShowReservation", () => {
     describe("guest history", () => {
         it("displays guest summary when promise resolves with data", async () => {
             const guestSummaryData: GuestSummary = {
+                fulfilledVisits: 3,
                 guestId: "guest1",
                 propertyId: "prop1",
                 propertyName: "Property 1",
                 totalReservations: 5,
-                fulfilledVisits: 3,
                 visitPercentage: "60.00",
             };
 
@@ -781,11 +784,11 @@ describe("EventShowReservation", () => {
 
         it("does not display guest summary when totalReservations is zero", async () => {
             const guestSummaryData: GuestSummary = {
+                fulfilledVisits: 0,
                 guestId: "guest1",
                 propertyId: "prop1",
                 propertyName: "Property 1",
                 totalReservations: 0,
-                fulfilledVisits: 0,
                 visitPercentage: "0.00",
             };
 
@@ -877,10 +880,10 @@ describe("EventShowReservation", () => {
                     initialState: {
                         auth: {
                             user: {
-                                id: "user1",
                                 capabilities: {
                                     [UserCapability.CAN_RESERVE]: true,
                                 },
+                                id: "user1",
                             },
                         },
                     },
@@ -902,10 +905,10 @@ describe("EventShowReservation", () => {
                     initialState: {
                         auth: {
                             user: {
-                                id: "user1",
                                 capabilities: {
                                     [UserCapability.CAN_RESERVE]: false,
                                 },
+                                id: "user1",
                             },
                         },
                     },
@@ -926,10 +929,10 @@ describe("EventShowReservation", () => {
                     initialState: {
                         auth: {
                             user: {
-                                id: "user1",
                                 capabilities: {
                                     [UserCapability.CAN_RESERVE]: true,
                                 },
+                                id: "user1",
                             },
                         },
                     },

@@ -1,40 +1,51 @@
 import type { OrganisationDoc, PropertyDoc } from "@firetable/types";
-import { DEFAULT_ORGANISATION_SETTINGS, usePropertiesStore } from "./properties-store";
-import { mockedStore } from "../../test-helpers/render-component";
+
 import { Role } from "@firetable/types";
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createApp, ref } from "vue";
 
+import { mockedStore } from "../../test-helpers/render-component";
+import { DEFAULT_ORGANISATION_SETTINGS, usePropertiesStore } from "./properties-store";
+
 const {
-    useFirestoreCollectionSpy,
     createQuerySpy,
-    fetchPropertiesForAdminSpy,
     fetchOrganisationsForAdminSpy,
+    fetchPropertiesForAdminSpy,
+    useFirestoreCollectionSpy,
 } = vi.hoisted(() => ({
-    useFirestoreCollectionSpy: vi.fn(),
     createQuerySpy: vi.fn(),
-    fetchPropertiesForAdminSpy: vi.fn(),
     fetchOrganisationsForAdminSpy: vi.fn(),
+    fetchPropertiesForAdminSpy: vi.fn(),
+    useFirestoreCollectionSpy: vi.fn(),
 }));
 
 vi.mock("src/composables/useFirestore", () => ({
-    useFirestoreCollection: useFirestoreCollectionSpy,
     createQuery: createQuerySpy,
+    useFirestoreCollection: useFirestoreCollectionSpy,
 }));
 
 vi.mock("../backend-proxy", () => ({
     fetchOrganisationById: vi.fn(),
     fetchOrganisationsForAdmin: fetchOrganisationsForAdminSpy,
-    propertiesCollection: vi.fn(),
     fetchPropertiesForAdmin: fetchPropertiesForAdminSpy,
+    propertiesCollection: vi.fn(),
 }));
 
 vi.mock("firebase/firestore", () => ({
-    query: vi.fn(),
     documentId: vi.fn(),
+    query: vi.fn(),
     where: vi.fn(),
 }));
+
+function createTestOrganisation(options: Partial<OrganisationDoc> = {}): OrganisationDoc {
+    return {
+        id: "org1",
+        name: "Test Organisation",
+        settings: {},
+        ...options,
+    } as OrganisationDoc;
+}
 
 function createTestProperty(options: Partial<PropertyDoc> = {}): PropertyDoc {
     return {
@@ -44,15 +55,6 @@ function createTestProperty(options: Partial<PropertyDoc> = {}): PropertyDoc {
         settings: {},
         ...options,
     } as PropertyDoc;
-}
-
-function createTestOrganisation(options: Partial<OrganisationDoc> = {}): OrganisationDoc {
-    return {
-        id: "org1",
-        name: "Test Organisation",
-        settings: {},
-        ...options,
-    } as OrganisationDoc;
 }
 
 describe("properties-store.ts", () => {
@@ -107,7 +109,7 @@ describe("properties-store.ts", () => {
         it("returns merged settings with defaults", () => {
             const store = mockedStore(usePropertiesStore);
             const property = createTestProperty({
-                settings: { timezone: "Europe/London", markGuestAsLateAfterMinutes: 10 },
+                settings: { markGuestAsLateAfterMinutes: 10, timezone: "Europe/London" },
             });
             store.properties = [property];
 
@@ -139,7 +141,6 @@ describe("properties-store.ts", () => {
 
             const settings = store.getPropertySettingsById("property1");
             expect(settings).toEqual({
-                timezone: expect.any(String),
                 event: {
                     eventCardAspectRatio: "16:9",
                     eventDurationInHours: 10,
@@ -155,6 +156,7 @@ describe("properties-store.ts", () => {
                     globalGuestTags: [],
                 },
                 markGuestAsLateAfterMinutes: 10,
+                timezone: expect.any(String),
             });
         });
 
@@ -251,16 +253,16 @@ describe("properties-store.ts", () => {
             const properties = [createTestProperty()];
             useFirestoreCollectionSpy.mockReturnValue({
                 data: ref(properties),
-                stop: vi.fn(),
                 pending: ref(false),
                 promise: ref(Promise.resolve()),
+                stop: vi.fn(),
             });
             const store = mockedStore(usePropertiesStore);
 
             await store.initNonAdminProperties({
-                role: Role.PROPERTY_OWNER,
                 organisationId: "org1",
                 relatedProperties: [],
+                role: Role.PROPERTY_OWNER,
             });
 
             expect(store.properties).toEqual(properties);
@@ -272,15 +274,15 @@ describe("properties-store.ts", () => {
 
             useFirestoreCollectionSpy.mockReturnValue({
                 data: ref(properties),
-                stop: vi.fn(),
                 pending: ref(false),
                 promise: ref(Promise.resolve()),
+                stop: vi.fn(),
             });
 
             await store.initNonAdminProperties({
-                role: Role.STAFF,
                 organisationId: "org1",
                 relatedProperties: ["property1"],
+                role: Role.STAFF,
             });
 
             expect(store.properties).toEqual(properties);
@@ -290,9 +292,9 @@ describe("properties-store.ts", () => {
             const store = mockedStore(usePropertiesStore);
 
             await store.initNonAdminProperties({
-                role: Role.STAFF,
                 organisationId: "org1",
                 relatedProperties: [],
+                role: Role.STAFF,
             });
 
             expect(store.properties).toEqual([]);

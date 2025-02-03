@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { Visit } from "@firetable/types";
-import { useI18n } from "vue-i18n";
+
 import { ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 
 export interface EditVisitDialogProps {
     visit: Visit;

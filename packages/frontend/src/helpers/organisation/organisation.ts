@@ -1,5 +1,9 @@
 import { OrganisationStatus } from "@firetable/types";
 
+export function formatOrganisationStatus(status?: OrganisationStatus): string {
+    return status ? status.charAt(0).toUpperCase() + status.slice(1) : "No Status";
+}
+
 export function getOrganisationStatusColor(status?: OrganisationStatus): string {
     switch (status) {
         case OrganisationStatus.ACTIVE:
@@ -13,8 +17,4 @@ export function getOrganisationStatusColor(status?: OrganisationStatus): string 
         default:
             return "grey";
     }
-}
-
-export function formatOrganisationStatus(status?: OrganisationStatus): string {
-    return status ? status.charAt(0).toUpperCase() + status.slice(1) : "No Status";
 }

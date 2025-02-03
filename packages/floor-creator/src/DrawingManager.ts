@@ -1,5 +1,6 @@
 import type { Canvas } from "fabric";
-import { CircleBrush, SprayBrush, Shadow, FabricObject, PencilBrush } from "fabric";
+
+import { CircleBrush, FabricObject, PencilBrush, Shadow, SprayBrush } from "fabric";
 
 export interface DrawingOptions {
     color?: string;
@@ -7,10 +8,10 @@ export interface DrawingOptions {
 }
 
 export class DrawingManager {
-    private isEnabled = true;
     private readonly canvas: Canvas;
     private currentColor = "#000000";
     private currentWidth = 2;
+    private isEnabled = true;
 
     constructor(canvas: Canvas) {
         this.canvas = canvas;
@@ -21,8 +22,22 @@ export class DrawingManager {
         FabricObject.prototype.transparentCorners = false;
     }
 
-    getIsEnabled(): boolean {
-        return this.isEnabled;
+    clearDrawings(): void {
+        const objects = this.canvas.getObjects();
+        const paths = objects.filter((obj) => obj.type === "path");
+        paths.forEach((path) => this.canvas.remove(path));
+        this.canvas.requestRenderAll();
+    }
+
+    destroy(): void {
+        this.disable();
+    }
+
+    disable(): void {
+        this.isEnabled = false;
+        this.canvas.isDrawingMode = false;
+
+        this.canvas.requestRenderAll();
     }
 
     enable(options?: DrawingOptions): void {
@@ -41,20 +56,22 @@ export class DrawingManager {
         this.canvas.requestRenderAll();
     }
 
-    disable(): void {
-        this.isEnabled = false;
-        this.canvas.isDrawingMode = false;
+    getIsEnabled(): boolean {
+        return this.isEnabled;
+    }
 
-        this.canvas.requestRenderAll();
+    setBrushColor(color: string): void {
+        this.currentColor = color;
+        this.applyBrushSettings();
     }
 
     setBrushType(type: "circle" | "pencil" | "spray"): void {
         switch (type) {
-            case "spray":
-                this.canvas.freeDrawingBrush = new SprayBrush(this.canvas);
-                break;
             case "circle":
                 this.canvas.freeDrawingBrush = new CircleBrush(this.canvas);
+                break;
+            case "spray":
+                this.canvas.freeDrawingBrush = new SprayBrush(this.canvas);
                 break;
             default:
                 this.canvas.freeDrawingBrush = new PencilBrush(this.canvas);
@@ -64,25 +81,9 @@ export class DrawingManager {
         this.applyBrushSettings();
     }
 
-    setBrushColor(color: string): void {
-        this.currentColor = color;
-        this.applyBrushSettings();
-    }
-
     setBrushWidth(width: number): void {
         this.currentWidth = width;
         this.applyBrushSettings();
-    }
-
-    clearDrawings(): void {
-        const objects = this.canvas.getObjects();
-        const paths = objects.filter((obj) => obj.type === "path");
-        paths.forEach((path) => this.canvas.remove(path));
-        this.canvas.requestRenderAll();
-    }
-
-    destroy(): void {
-        this.disable();
     }
 
     private applyBrushSettings(): void {
@@ -92,11 +93,11 @@ export class DrawingManager {
         this.canvas.freeDrawingBrush.width = this.currentWidth;
 
         this.canvas.freeDrawingBrush.shadow = new Shadow({
+            affectStroke: true,
             blur: 0,
+            color: this.currentColor,
             offsetX: 0,
             offsetY: 0,
-            affectStroke: true,
-            color: this.currentColor,
         });
 
         this.canvas.requestRenderAll();

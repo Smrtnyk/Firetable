@@ -1,5 +1,8 @@
 import type { GroupProps } from "fabric";
-import { Table } from "./Table.js";
+
+import { omit } from "es-toolkit";
+import { Circle, FabricText } from "fabric";
+
 import {
     ELEMENT_DEFAULT_FILL_COLOR,
     ELEMENT_DEFAULT_STROKE_COLOR,
@@ -7,19 +10,18 @@ import {
     TABLE_TEXT_FILL_COLOR,
 } from "../constants.js";
 import { FloorElementTypes } from "../types.js";
-import { Circle, FabricText } from "fabric";
-import { omit } from "es-toolkit";
+import { Table } from "./Table.js";
 
 interface CircleTableElementOptions {
     groupOptions: Partial<GroupProps> & {
         baseFill?: string;
         label: string;
     };
+    shapeOptions: Record<string, unknown>;
     textOptions: {
         label: string;
         type?: string;
     };
-    shapeOptions: Record<string, unknown>;
 }
 
 // @ts-expect-error -- not sure why this is an error
@@ -30,22 +32,22 @@ export class RoundTable extends Table {
         const shapeOptions = omit(options.shapeOptions, ["type"]);
         const tableCircle = new Circle({
             ...shapeOptions,
+            fill: options.groupOptions.baseFill ?? ELEMENT_DEFAULT_FILL_COLOR,
             originX: "center",
             originY: "center",
-            fill: options.groupOptions.baseFill ?? ELEMENT_DEFAULT_FILL_COLOR,
             stroke: ELEMENT_DEFAULT_STROKE_COLOR,
-            strokeWidth: 0.5,
             strokeUniform: true,
+            strokeWidth: 0.5,
         });
         const textLabel = new FabricText(options.groupOptions.label, {
             ...omit(options.textOptions, ["type"]),
-            fontSize: FONT_SIZE,
             fill: TABLE_TEXT_FILL_COLOR,
+            fontSize: FONT_SIZE,
             left: tableCircle.left,
-            top: tableCircle.top,
-            textAlign: "center",
             originX: "center",
             originY: "center",
+            textAlign: "center",
+            top: tableCircle.top,
         });
         super([tableCircle, textLabel], options);
     }

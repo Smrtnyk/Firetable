@@ -1,6 +1,20 @@
 import type { FloorDoc } from "@firetable/types";
-import { gzipSync, gunzipSync } from "fflate";
+
+import { gunzipSync, gzipSync } from "fflate";
 import { DevLogger } from "src/logger/DevFTLogger.js";
+
+export function compressFloorDoc(json: string): string {
+    const start: number = performance.now();
+
+    const textEncoder = new TextEncoder();
+    const uint8Array: Uint8Array = textEncoder.encode(json);
+    const compressed: Uint8Array = gzipSync(uint8Array);
+    const numbersArray: number[] = Array.from(compressed);
+    const res: string = btoa(String.fromCharCode.apply(null, numbersArray));
+
+    DevLogger.logPerformance("floor compression", performance.now() - start);
+    return res;
+}
 
 export function decompressFloorDoc(floorDoc: FloorDoc): FloorDoc {
     if (!floorDoc.json) {
@@ -18,17 +32,4 @@ export function decompressFloorDoc(floorDoc: FloorDoc): FloorDoc {
 
     DevLogger.logPerformance("floor decompression", performance.now() - start);
     return floorDoc;
-}
-
-export function compressFloorDoc(json: string): string {
-    const start: number = performance.now();
-
-    const textEncoder = new TextEncoder();
-    const uint8Array: Uint8Array = textEncoder.encode(json);
-    const compressed: Uint8Array = gzipSync(uint8Array);
-    const numbersArray: number[] = Array.from(compressed);
-    const res: string = btoa(String.fromCharCode.apply(null, numbersArray));
-
-    DevLogger.logPerformance("floor compression", performance.now() - start);
-    return res;
 }

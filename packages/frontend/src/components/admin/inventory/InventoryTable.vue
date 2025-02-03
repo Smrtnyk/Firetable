@@ -71,10 +71,11 @@
 
 <script setup lang="ts">
 import type { InventoryItemDoc } from "@firetable/types";
-import { ref, computed } from "vue";
-import { useI18n } from "vue-i18n";
-import { isMobile } from "src/global-reactives/screen-detection";
+
 import FTBtn from "src/components/FTBtn.vue";
+import { isMobile } from "src/global-reactives/screen-detection";
+import { computed, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 interface Props {
     rows: InventoryItemDoc[];
@@ -95,36 +96,36 @@ const hasSelection = computed(() => selected.value.length > 0);
 
 const columns = [
     {
-        name: "selection",
-        label: "",
         field: "selection",
+        label: "",
+        name: "selection",
         sortable: false,
     },
-    { name: "name", label: t("Global.name"), field: "name", sortable: true },
+    { field: "name", label: t("Global.name"), name: "name", sortable: true },
     {
-        name: "mainCategory",
-        label: t("InventoryTable.mainCategory"),
         field: "mainCategory",
+        label: t("InventoryTable.mainCategory"),
+        name: "mainCategory",
         sortable: true,
     },
     {
-        name: "subCategory",
-        label: t("InventoryTable.subCategory"),
         field: "subCategory",
+        label: t("InventoryTable.subCategory"),
+        name: "subCategory",
         sortable: true,
     },
-    { name: "quantity", label: t("InventoryTable.quantity"), field: "quantity", sortable: true },
+    { field: "quantity", label: t("InventoryTable.quantity"), name: "quantity", sortable: true },
     {
-        name: "volume",
-        label: t("InventoryTable.volume"),
         field: "volume",
-        sortable: true,
         format(val: number) {
             return val ? `${val}ml` : "-";
         },
+        label: t("InventoryTable.volume"),
+        name: "volume",
+        sortable: true,
     },
-    { name: "supplier", label: t("InventoryTable.supplier"), field: "supplier", sortable: true },
-    { name: "actions", label: t("Global.actions"), field: "actions" },
+    { field: "supplier", label: t("InventoryTable.supplier"), name: "supplier", sortable: true },
+    { field: "actions", label: t("Global.actions"), name: "actions" },
 ];
 
 function handleBulkDelete(): void {

@@ -34,33 +34,33 @@
 <script setup lang="ts">
 import type { FloorEditor } from "@firetable/floor-creator";
 import type { FloorDoc } from "@firetable/types";
-import { extractAllTablesLabels } from "@firetable/floor-creator";
-import { onMounted, watch, useTemplateRef } from "vue";
-import { useFloorEditor } from "src/composables/useFloorEditor";
-import { isTablet } from "src/global-reactives/screen-detection";
 
+import { extractAllTablesLabels } from "@firetable/floor-creator";
+import { useEventListener } from "@vueuse/core";
 import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
 import FloorEditorTopControls from "src/components/Floor/FloorEditorTopControls.vue";
-import { useEventListener } from "@vueuse/core";
-
-interface Props {
-    floor: FloorDoc;
-    eventId: string;
-}
+import { useFloorEditor } from "src/composables/useFloorEditor";
+import { isTablet } from "src/global-reactives/screen-detection";
+import { onMounted, useTemplateRef, watch } from "vue";
 
 type Emits = (e: "save", value: FloorEditor) => void;
+
+interface Props {
+    eventId: string;
+    floor: FloorDoc;
+}
 
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 const floorContainerRef = useTemplateRef<HTMLCanvasElement>("floorContainerRef");
 const viewerContainerRef = useTemplateRef<HTMLDivElement>("viewerContainerRef");
 const {
-    hasChanges,
-    resizeFloor,
-    initializeFloor,
-    onFloorChange,
-    onDeleteElement,
     floorInstance,
+    hasChanges,
+    initializeFloor,
+    onDeleteElement,
+    onFloorChange,
+    resizeFloor,
     selectedElement,
 } = useFloorEditor(viewerContainerRef);
 
@@ -80,8 +80,8 @@ watch(floorContainerRef, function () {
         return;
     }
     initializeFloor({
-        floorDoc: props.floor,
         canvasElement: floorContainerRef.value,
+        floorDoc: props.floor,
     });
 });
 </script>

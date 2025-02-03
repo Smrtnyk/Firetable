@@ -1,10 +1,13 @@
 import type { RenderResult } from "vitest-browser-vue";
-import type { EventViewControlsProps } from "./EventViewControls.vue";
-import EventViewControls from "./EventViewControls.vue";
-import { renderComponent } from "../../../test-helpers/render-component";
-import { describe, it, expect, beforeEach } from "vitest";
-import { userEvent, page } from "@vitest/browser/context";
+
+import { page, userEvent } from "@vitest/browser/context";
 import { last } from "es-toolkit";
+import { beforeEach, describe, expect, it } from "vitest";
+
+import type { EventViewControlsProps } from "./EventViewControls.vue";
+
+import { renderComponent } from "../../../test-helpers/render-component";
+import EventViewControls from "./EventViewControls.vue";
 
 describe("EventViewControls.vue", () => {
     const floors: EventViewControlsProps["floors"] = [
@@ -23,13 +26,13 @@ describe("EventViewControls.vue", () => {
     ): RenderResult<EventViewControlsProps> {
         return renderComponent(EventViewControls, {
             activeFloor: floors[0],
-            floors,
-            isActiveFloor,
-            hasMultipleFloorPlans: true,
-            canSeeAdminEvent: true,
-            queuedReservationsCount: 0,
-            guestListCount: 0,
             canExportReservations: false,
+            canSeeAdminEvent: true,
+            floors,
+            guestListCount: 0,
+            hasMultipleFloorPlans: true,
+            isActiveFloor,
+            queuedReservationsCount: 0,
             ...props,
         });
     }
@@ -168,9 +171,9 @@ describe("EventViewControls.vue", () => {
 
     it("emits export-reservations event when export button is clicked", async () => {
         const screen = render({
-            queuedReservationsCount: 0,
-            guestListCount: 0,
             canExportReservations: true,
+            guestListCount: 0,
+            queuedReservationsCount: 0,
         });
 
         const exportButton = screen.getByLabelText("Export reservations");
@@ -218,8 +221,8 @@ describe("EventViewControls.vue", () => {
 
         it("shows badges only when counts are greater than 0", async () => {
             const screen = render({
-                queuedReservationsCount: 0,
                 guestListCount: 0,
+                queuedReservationsCount: 0,
             });
 
             const queuedBadge = screen

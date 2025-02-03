@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { computed } from "vue";
 import { isMobile } from "src/global-reactives/screen-detection";
+import { computed } from "vue";
 
 interface Props {
-    title: string;
     subtitle?: string;
+    title: string;
 }
-const { title, subtitle } = defineProps<Props>();
+const { subtitle, title } = defineProps<Props>();
 
 const titleClass = computed(() => {
     return isMobile.value ? "text-h6" : "text-h4";

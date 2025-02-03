@@ -1,25 +1,27 @@
-import type { GuestDoc, PropertyDoc, Visit } from "@firetable/types";
-import type { VueFirestoreDocumentData } from "vuefire";
-import type { Ref } from "vue";
 import type { GuestsSubscriptionCallback } from "@firetable/backend";
-import { getGuestsPath, subscribeToGuests } from "../backend-proxy";
-import { ref } from "vue";
+import type { GuestDoc, PropertyDoc, Visit } from "@firetable/types";
+import type { Ref } from "vue";
+import type { VueFirestoreDocumentData } from "vuefire";
+
+import { chunk, omit, omitBy } from "es-toolkit";
+import { first, matchesProperty } from "es-toolkit/compat";
+import { isNotNil } from "es-toolkit/predicate";
+import { where } from "firebase/firestore";
 import { defineStore } from "pinia";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
-import { where } from "firebase/firestore";
-import { first, matchesProperty } from "es-toolkit/compat";
 import { AppLogger } from "src/logger/FTLogger";
 import { useAuthStore } from "src/stores/auth-store";
 import { usePropertiesStore } from "src/stores/properties-store";
-import { chunk, omit, omitBy } from "es-toolkit";
-import { isNotNil } from "es-toolkit/predicate";
+import { ref } from "vue";
+
+import { getGuestsPath, subscribeToGuests } from "../backend-proxy";
 
 export type GuestSummary = {
+    fulfilledVisits: number;
     guestId: string;
     propertyId: string;
     propertyName: string;
     totalReservations: number;
-    fulfilledVisits: number;
     visitPercentage: string;
 };
 
@@ -28,7 +30,7 @@ type GuestsState = {
     pending: boolean;
 };
 
-type PropertyEvents = Record<string, Visit | null>;
+type PropertyEvents = Record<string, null | Visit>;
 
 export const useGuestsStore = defineStore("guests", function () {
     const refsMap = ref(new Map<string, Ref<GuestsState>>());
@@ -56,13 +58,13 @@ export const useGuestsStore = defineStore("guests", function () {
             return undefined;
         }
 
-        const { totalReservations, fulfilledVisits, visitPercentage } = calculateVisitStats(events);
+        const { fulfilledVisits, totalReservations, visitPercentage } = calculateVisitStats(events);
 
         return {
+            fulfilledVisits,
             propertyId: property.id,
             propertyName: property.name,
             totalReservations,
-            fulfilledVisits,
             visitPercentage,
         };
     }
@@ -89,6 +91,10 @@ export const useGuestsStore = defineStore("guests", function () {
                     guestsCache.set(guest.hashedContact, guest);
                 }
             },
+            onError(error) {
+                AppLogger.error("Error fetching guests:", error);
+                state.value.pending = false;
+            },
             onModify(guest) {
                 state.value = {
                     data: state.value.data.map(function (existingGuest) {
@@ -100,18 +106,14 @@ export const useGuestsStore = defineStore("guests", function () {
                     guestsCache.set(guest.hashedContact, guest);
                 }
             },
+            onReady() {
+                state.value.pending = false;
+            },
             onRemove(guestId) {
                 state.value = {
                     data: state.value.data.filter(({ id }) => id !== guestId),
                     pending: state.value.pending,
                 };
-            },
-            onError(error) {
-                AppLogger.error("Error fetching guests:", error);
-                state.value.pending = false;
-            },
-            onReady() {
-                state.value.pending = false;
             },
         };
 
@@ -209,7 +211,7 @@ export const useGuestsStore = defineStore("guests", function () {
     async function getGuestByHashedContact(
         organisationId: string,
         hashedContact: string,
-    ): Promise<VueFirestoreDocumentData<GuestDoc> | undefined> {
+    ): Promise<undefined | VueFirestoreDocumentData<GuestDoc>> {
         const guests = refsMap.value.get(organisationId);
         if (guests?.value.data) {
             const foundGuest = guests.value.data.find(
@@ -310,20 +312,20 @@ export const useGuestsStore = defineStore("guests", function () {
     }
 
     return {
-        refsMap,
         cleanup,
-        getGuestsByHashedContacts,
         getGuestByHashedContact,
-        invalidateGuestCache,
-        getGuestSummaryForPropertyExcludingEvent,
         getGuests,
+        getGuestsByHashedContacts,
+        getGuestSummaryForPropertyExcludingEvent,
         guestReservationsSummary,
+        invalidateGuestCache,
+        refsMap,
     };
 });
 
 function calculateVisitStats(events: Partial<PropertyEvents>): {
-    totalReservations: number;
     fulfilledVisits: number;
+    totalReservations: number;
     visitPercentage: string;
 } {
     const nonNullEvents = Object.values(events).filter((event): event is Visit => isNotNil(event));
@@ -337,5 +339,5 @@ function calculateVisitStats(events: Partial<PropertyEvents>): {
     const visitPercentage =
         totalReservations > 0 ? ((fulfilledVisits / totalReservations) * 100).toFixed(2) : "0.00";
 
-    return { totalReservations, fulfilledVisits, visitPercentage };
+    return { fulfilledVisits, totalReservations, visitPercentage };
 }

@@ -4,15 +4,18 @@ import type {
     User,
     WalkInReservation,
 } from "@firetable/types";
-import type { EventCreateReservationProps } from "./EventCreateReservation.vue";
-import EventCreateReservation from "./EventCreateReservation.vue";
-import { renderComponent, t, getLocaleForTest } from "../../../../test-helpers/render-component";
+
 import { ReservationState, ReservationStatus, ReservationType } from "@firetable/types";
-import { getDefaultTimezone, hourFromTimestamp } from "src/helpers/date-utils";
-import { ONE_HOUR } from "src/constants";
-import { describe, expect, it, beforeEach } from "vitest";
 import { userEvent } from "@vitest/browser/context";
 import { addHours, format } from "date-fns";
+import { ONE_HOUR } from "src/constants";
+import { getDefaultTimezone, hourFromTimestamp } from "src/helpers/date-utils";
+import { beforeEach, describe, expect, it } from "vitest";
+
+import type { EventCreateReservationProps } from "./EventCreateReservation.vue";
+
+import { getLocaleForTest, renderComponent, t } from "../../../../test-helpers/render-component";
+import EventCreateReservation from "./EventCreateReservation.vue";
 
 const eventStartTimestamp = Date.now();
 
@@ -22,16 +25,16 @@ describe("EventCreateReservation", () => {
     describe("WalkIn", () => {
         beforeEach(() => {
             props = {
-                timezone: getDefaultTimezone(),
-                mode: "create",
-                eventStartTimestamp,
-                eventDurationInHours: 8,
-                users: [],
                 currentUser: {
+                    email: "example@mail.com",
                     id: "user1",
                     name: "Alice",
-                    email: "example@mail.com",
                 } as User,
+                eventDurationInHours: 8,
+                eventStartTimestamp,
+                mode: "create",
+                timezone: getDefaultTimezone(),
+                users: [],
             };
         });
 
@@ -46,38 +49,38 @@ describe("EventCreateReservation", () => {
                 getDefaultTimezone(),
             );
             return {
-                type: ReservationType.WALK_IN,
-                state: ReservationState.ARRIVED,
-                guestName: "",
-                numberOfGuests: 2,
-                guestContact: "",
-                reservationNote: "",
-                consumption: 0,
                 arrived: true,
-                time: formattedTime,
-                status: ReservationStatus.ACTIVE,
-                isVIP: false,
+                consumption: 0,
                 floorId: "",
+                guestContact: "",
+                guestName: "",
+                isVIP: false,
+                numberOfGuests: 2,
+                reservationNote: "",
+                state: ReservationState.ARRIVED,
+                status: ReservationStatus.ACTIVE,
                 tableLabel: "",
+                time: formattedTime,
+                type: ReservationType.WALK_IN,
             };
         }
 
         // Helper function to generate initial state for "update" mode
         function generateUpdateState(): Omit<WalkInReservation, "creator"> {
             return {
-                type: ReservationType.WALK_IN,
-                state: ReservationState.ARRIVED,
-                guestName: "John Doe",
-                numberOfGuests: 4,
-                guestContact: "+43666666666",
-                reservationNote: "Birthday celebration",
-                consumption: 50,
                 arrived: true,
-                time: "19:00",
-                status: ReservationStatus.ACTIVE,
-                isVIP: true,
+                consumption: 50,
                 floorId: "",
+                guestContact: "+43666666666",
+                guestName: "John Doe",
+                isVIP: true,
+                numberOfGuests: 4,
+                reservationNote: "Birthday celebration",
+                state: ReservationState.ARRIVED,
+                status: ReservationStatus.ACTIVE,
                 tableLabel: "",
+                time: "19:00",
+                type: ReservationType.WALK_IN,
             };
         }
 
@@ -130,10 +133,10 @@ describe("EventCreateReservation", () => {
                 id: "foo",
                 ...generateUpdateState(),
                 creator: {
+                    createdAt: Date.now(),
+                    email: "example@mail.com",
                     id: "user1",
                     name: "Alice",
-                    email: "example@mail.com",
-                    createdAt: Date.now(),
                 },
             };
 
@@ -193,10 +196,10 @@ describe("EventCreateReservation", () => {
                 id: "foo",
                 ...generateUpdateState(),
                 creator: {
+                    createdAt: Date.now(),
+                    email: "example@mail.com",
                     id: "user1",
                     name: "Alice",
-                    email: "example@mail.com",
-                    createdAt: Date.now(),
                 },
             };
 
@@ -294,10 +297,10 @@ describe("EventCreateReservation", () => {
                 id: "foo",
                 ...generateUpdateState(),
                 creator: {
+                    createdAt: Date.now(),
+                    email: "example@mail.com",
                     id: "user1",
                     name: "Alice",
-                    email: "example@mail.com",
-                    createdAt: Date.now(),
                 },
             };
 
@@ -326,68 +329,68 @@ describe("EventCreateReservation", () => {
 
         beforeEach(() => {
             plannedProps = {
-                timezone: getDefaultTimezone(),
                 currentUser: {
+                    email: "alice@example.com",
                     id: "user1",
                     name: "Alice",
-                    email: "alice@example.com",
                 } as User,
-                users: [
-                    { id: "user1", name: "Alice", email: "alice@example.com" } as User,
-                    { id: "user2", name: "Bob", email: "bob@example.com" } as User,
-                ],
-                mode: "create",
-                eventStartTimestamp,
-                reservationData: undefined,
                 eventDurationInHours: 8,
+                eventStartTimestamp,
+                mode: "create",
+                reservationData: undefined,
+                timezone: getDefaultTimezone(),
+                users: [
+                    { email: "alice@example.com", id: "user1", name: "Alice" } as User,
+                    { email: "bob@example.com", id: "user2", name: "Bob" } as User,
+                ],
             };
         });
 
         // Helper function to generate initial state for "create" mode
         function generateInitialPlannedState(): Omit<PlannedReservation, "creator"> {
             return {
-                type: ReservationType.PLANNED,
-                state: ReservationState.PENDING,
-                guestName: "",
-                numberOfGuests: 2,
-                guestContact: "",
-                reservationNote: "",
-                consumption: 1,
                 arrived: false,
-                reservationConfirmed: false,
-                time: "00:00",
-                reservedBy: null as unknown as User,
                 cancelled: false,
-                status: ReservationStatus.ACTIVE,
-                isVIP: false,
+                consumption: 1,
                 floorId: "",
+                guestContact: "",
+                guestName: "",
+                isVIP: false,
+                numberOfGuests: 2,
+                reservationConfirmed: false,
+                reservationNote: "",
+                reservedBy: null as unknown as User,
+                state: ReservationState.PENDING,
+                status: ReservationStatus.ACTIVE,
                 tableLabel: "",
+                time: "00:00",
+                type: ReservationType.PLANNED,
             };
         }
 
         // Helper function to generate initial state for "update" mode
         function generateUpdatePlannedState(): Omit<PlannedReservation, "creator"> {
             return {
-                type: ReservationType.PLANNED,
-                state: ReservationState.PENDING,
-                guestName: "Charlie",
-                numberOfGuests: 5,
-                guestContact: "+432313213",
-                reservationNote: "Anniversary party",
-                consumption: 100,
                 arrived: false,
+                cancelled: false,
+                consumption: 100,
+                floorId: "",
+                guestContact: "+432313213",
+                guestName: "Charlie",
+                isVIP: true,
+                numberOfGuests: 5,
                 reservationConfirmed: true,
-                time: "20:00",
+                reservationNote: "Anniversary party",
                 reservedBy: {
-                    name: "Bob",
                     email: "bob@example.com",
                     id: "user2",
+                    name: "Bob",
                 },
-                cancelled: false,
+                state: ReservationState.PENDING,
                 status: ReservationStatus.ACTIVE,
-                isVIP: true,
-                floorId: "",
                 tableLabel: "",
+                time: "20:00",
+                type: ReservationType.PLANNED,
             };
         }
 
@@ -454,10 +457,10 @@ describe("EventCreateReservation", () => {
             plannedProps.reservationData = {
                 ...generateUpdatePlannedState(),
                 creator: {
+                    createdAt: Date.now(),
+                    email: "",
                     id: "user1",
                     name: "Alice",
-                    email: "",
-                    createdAt: Date.now(),
                 },
             } as unknown as PlannedReservationDoc;
 
@@ -535,10 +538,10 @@ describe("EventCreateReservation", () => {
             plannedProps.reservationData = {
                 ...generateUpdatePlannedState(),
                 creator: {
+                    createdAt: Date.now(),
+                    email: "",
                     id: "user1",
                     name: "Alice",
-                    email: "",
-                    createdAt: Date.now(),
                 },
             } as unknown as PlannedReservationDoc;
 
@@ -654,10 +657,10 @@ describe("EventCreateReservation", () => {
             plannedProps.reservationData = {
                 ...generateUpdatePlannedState(),
                 creator: {
+                    createdAt: Date.now(),
+                    email: "",
                     id: "user1",
                     name: "Alice",
-                    email: "",
-                    createdAt: Date.now(),
                 },
             } as unknown as PlannedReservationDoc;
 
@@ -702,10 +705,10 @@ describe("EventCreateReservation", () => {
             plannedProps.reservationData = {
                 ...generateUpdatePlannedState(),
                 creator: {
+                    createdAt: Date.now(),
+                    email: "",
                     id: "user1",
                     name: "Alice",
-                    email: "",
-                    createdAt: Date.now(),
                 },
             } as unknown as PlannedReservationDoc;
 

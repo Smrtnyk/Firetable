@@ -1,14 +1,16 @@
 import type { GroupProps } from "fabric";
-import { type FloorEditorElement, FloorElementTypes } from "../types.js";
-import { ELEMENT_DEFAULT_FILL_COLOR } from "../constants.js";
-import { Group, LayoutManager, Rect } from "fabric";
+
 import { omit } from "es-toolkit";
+import { Group, LayoutManager, Rect } from "fabric";
+
+import { ELEMENT_DEFAULT_FILL_COLOR } from "../constants.js";
+import { type FloorEditorElement, FloorElementTypes } from "../types.js";
 
 type WallCreationOptions = Record<string, unknown>;
 type WalLGroupCreationOptions = Partial<GroupProps> & {
-    type?: string;
     left: number;
     top: number;
+    type?: string;
 };
 
 export class Wall extends Group implements FloorEditorElement {
@@ -18,10 +20,10 @@ export class Wall extends Group implements FloorEditorElement {
     constructor(groupOpts: WalLGroupCreationOptions, wallRectOpts: WallCreationOptions = {}) {
         const wallRectOptionsWithoutType = omit(wallRectOpts, ["type"]);
         const wallRect = new Rect({
-            width: 10,
-            height: 100,
             fill: ELEMENT_DEFAULT_FILL_COLOR,
+            height: 100,
             strokeUniform: true,
+            width: 10,
             ...wallRectOptionsWithoutType,
             strokeWidth: 0,
         });
@@ -31,8 +33,8 @@ export class Wall extends Group implements FloorEditorElement {
         const groupOptionsWithoutType = omit(groupOpts, ["type"]);
         super([wallRect], {
             ...groupOptionsWithoutType,
-            subTargetCheck: false,
             layoutManager: new LayoutManager(),
+            subTargetCheck: false,
         });
         this.wallRect = wallRect;
     }
@@ -42,15 +44,15 @@ export class Wall extends Group implements FloorEditorElement {
         return Promise.resolve(new Wall(object, wallRect));
     }
 
-    override toObject(): any {
-        return super.toObject();
-    }
-
     getBaseFill(): string {
         return this.wallRect.get("fill") as string;
     }
 
     setBaseFill(val: string): void {
         this.wallRect.set("fill", val);
+    }
+
+    override toObject(): any {
+        return super.toObject();
     }
 }

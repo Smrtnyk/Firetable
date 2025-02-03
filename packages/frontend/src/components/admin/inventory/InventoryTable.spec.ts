@@ -1,39 +1,41 @@
 import type { InventoryItemDoc } from "@firetable/types";
 import type { RenderResult } from "vitest-browser-vue";
-import InventoryTable from "./InventoryTable.vue";
-import { renderComponent } from "../../../../test-helpers/render-component";
+
 import {
     DrinkMainCategory,
     InventoryItemType,
-    SpiritSubCategory,
     NonAlcoholicCategory,
+    SpiritSubCategory,
 } from "@firetable/types";
-import { beforeEach, describe, expect, it } from "vitest";
 import { page, userEvent } from "@vitest/browser/context";
+import { beforeEach, describe, expect, it } from "vitest";
+
+import { renderComponent } from "../../../../test-helpers/render-component";
+import InventoryTable from "./InventoryTable.vue";
 
 const sampleItems: InventoryItemDoc[] = [
     {
         id: "1",
-        name: "Red Bull 250ml",
-        type: InventoryItemType.DRINK,
-        mainCategory: DrinkMainCategory.NON_ALCOHOLIC,
-        subCategory: NonAlcoholicCategory.ENERGY_DRINK,
-        quantity: 50,
-        supplier: "Red Bull GmbH",
-        volume: 250,
         isActive: true,
+        mainCategory: DrinkMainCategory.NON_ALCOHOLIC,
+        name: "Red Bull 250ml",
+        quantity: 50,
+        subCategory: NonAlcoholicCategory.ENERGY_DRINK,
+        supplier: "Red Bull GmbH",
+        type: InventoryItemType.DRINK,
+        volume: 250,
     },
     {
-        id: "2",
-        name: "Absolut Vodka",
-        type: InventoryItemType.DRINK,
-        mainCategory: DrinkMainCategory.SPIRITS,
-        subCategory: SpiritSubCategory.VODKA,
-        quantity: 100,
-        supplier: "Pernod Ricard",
-        volume: 700,
         alcoholContent: 40,
+        id: "2",
         isActive: true,
+        mainCategory: DrinkMainCategory.SPIRITS,
+        name: "Absolut Vodka",
+        quantity: 100,
+        subCategory: SpiritSubCategory.VODKA,
+        supplier: "Pernod Ricard",
+        type: InventoryItemType.DRINK,
+        volume: 700,
     },
 ];
 

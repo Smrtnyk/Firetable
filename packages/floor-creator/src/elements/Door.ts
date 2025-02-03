@@ -1,8 +1,10 @@
-import type { FloorEditorElement } from "../types.js";
-import { FloorElementTypes } from "../types.js";
-import { ELEMENT_DEFAULT_STROKE_COLOR } from "../constants.js";
-import { classRegistry, Group, LayoutManager, Line, Path } from "fabric";
 import { omit } from "es-toolkit";
+import { classRegistry, Group, LayoutManager, Line, Path } from "fabric";
+
+import type { FloorEditorElement } from "../types.js";
+
+import { ELEMENT_DEFAULT_STROKE_COLOR } from "../constants.js";
+import { FloorElementTypes } from "../types.js";
 
 interface DoorOptions {
     left: number;
@@ -21,12 +23,12 @@ export class Door extends Group implements FloorEditorElement {
 
         const doorArcPath = "M 0,0 Q 50,0, 50,50";
         const doorArc = new Path(doorArcPath, {
-            stroke: ELEMENT_DEFAULT_STROKE_COLOR,
-            strokeWidth: 1,
             fill: null,
+            stroke: ELEMENT_DEFAULT_STROKE_COLOR,
             strokeDashArray: [3, 3],
             strokeLineCap: "round",
             strokeLineJoin: "round",
+            strokeWidth: 1,
         });
 
         doorLine.evented = false;

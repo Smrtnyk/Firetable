@@ -1,12 +1,9 @@
 <script setup lang="ts">
 import type { DrinkCardItem, ServingSize } from "@firetable/types";
-import DrinkCardBuilderItemSettings from "./DrinkCardBuilderItemSettings.vue";
+
 import { formatPrice } from "src/helpers/drink-card/drink-card";
 
-interface Props {
-    item: DrinkCardItem;
-    formattedName: string;
-}
+import DrinkCardBuilderItemSettings from "./DrinkCardBuilderItemSettings.vue";
 
 interface Emits {
     (event: "update:price", value: number): void;
@@ -18,7 +15,12 @@ interface Emits {
     (event: "remove" | "toggle-visibility"): void;
 }
 
-const { item, formattedName } = defineProps<Props>();
+interface Props {
+    formattedName: string;
+    item: DrinkCardItem;
+}
+
+const { formattedName, item } = defineProps<Props>();
 const emit = defineEmits<Emits>();
 </script>
 

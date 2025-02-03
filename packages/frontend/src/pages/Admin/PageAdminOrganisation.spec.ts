@@ -1,12 +1,15 @@
-import type { RenderResult } from "vitest-browser-vue";
 import type { OrganisationDoc } from "@firetable/types";
-import type { PageAdminOrganisationProps } from "./PageAdminOrganisation.vue";
-import PageAdminOrganisation from "./PageAdminOrganisation.vue";
-import { renderComponent } from "../../../test-helpers/render-component";
+import type { RenderResult } from "vitest-browser-vue";
+
 import { OrganisationStatus } from "@firetable/types";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { userEvent } from "@vitest/browser/context";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ref } from "vue";
+
+import type { PageAdminOrganisationProps } from "./PageAdminOrganisation.vue";
+
+import { renderComponent } from "../../../test-helpers/render-component";
+import PageAdminOrganisation from "./PageAdminOrganisation.vue";
 
 const { deleteOrganisationMock, useFirestoreDocumentMock } = vi.hoisted(() => ({
     deleteOrganisationMock: vi.fn(),
@@ -14,9 +17,9 @@ const { deleteOrganisationMock, useFirestoreDocumentMock } = vi.hoisted(() => ({
 }));
 
 vi.mock("src/composables/useFirestore", () => ({
-    useFirestoreDocument: useFirestoreDocumentMock,
-    useFirestoreCollection: vi.fn(),
     createQuery: vi.fn(),
+    useFirestoreCollection: vi.fn(),
+    useFirestoreDocument: useFirestoreDocumentMock,
 }));
 
 vi.mock("../../backend-proxy", () => ({
@@ -44,9 +47,9 @@ describe("PageAdminOrganisation.vue", () => {
 
         organisationData = {
             id: "org1",
+            maxAllowedProperties: 10,
             name: "Test Organisation",
             status: OrganisationStatus.ACTIVE,
-            maxAllowedProperties: 10,
         } as OrganisationDoc;
 
         useFirestoreDocumentMock.mockReturnValue({
@@ -95,7 +98,7 @@ describe("PageAdminOrganisation.vue", () => {
         const input = screen.getByRole("textbox");
         await userEvent.type(input, "Wrong Name");
         await expect
-            .element(screen.getByRole("button", { name: "OK", exact: true }))
+            .element(screen.getByRole("button", { exact: true, name: "OK" }))
             .toBeDisabled();
 
         expect(deleteOrganisationMock).not.toHaveBeenCalled();
@@ -107,7 +110,7 @@ describe("PageAdminOrganisation.vue", () => {
 
         const input = screen.getByRole("textbox");
         await userEvent.type(input, "Test Organisation");
-        await userEvent.click(screen.getByRole("button", { name: "OK", exact: true }));
+        await userEvent.click(screen.getByRole("button", { exact: true, name: "OK" }));
 
         expect(deleteOrganisationMock).toHaveBeenCalledWith("org1");
     });

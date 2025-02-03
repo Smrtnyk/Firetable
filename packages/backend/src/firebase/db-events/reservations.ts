@@ -1,4 +1,3 @@
-import type { EventOwner } from "../db.js";
 import type {
     PlannedReservation,
     QueuedReservation,
@@ -6,15 +5,57 @@ import type {
     ReservationDoc,
 } from "@firetable/types";
 import type { HttpsCallableResult } from "firebase/functions";
+
+import { addDoc, deleteDoc, type DocumentReference, updateDoc } from "firebase/firestore";
+import { httpsCallable } from "firebase/functions";
+
+import type { EventOwner } from "../db.js";
+
+import { initializeFirebase } from "../base.js";
 import {
     queuedReservationDoc,
     queuedReservationsCollection,
-    reservationsCollection,
     reservationDoc,
+    reservationsCollection,
 } from "../db.js";
-import { initializeFirebase } from "../base.js";
-import { httpsCallable } from "firebase/functions";
-import { addDoc, deleteDoc, type DocumentReference, updateDoc } from "firebase/firestore";
+
+export function addReservation(
+    owner: EventOwner,
+    reservation: Reservation,
+): Promise<DocumentReference> {
+    return addDoc(reservationsCollection(owner), reservation);
+}
+
+export function deleteQueuedReservation(
+    eventOwner: EventOwner,
+    queuedReservationId: string,
+): Promise<void> {
+    return deleteDoc(queuedReservationDoc(eventOwner, queuedReservationId));
+}
+
+export function deleteReservation(owner: EventOwner, reservation: ReservationDoc): Promise<void> {
+    return deleteDoc(reservationDoc(owner, reservation.id));
+}
+
+export function moveReservationFromQueue(
+    eventOwner: EventOwner,
+    reservationId: string,
+    preparedPlannedReservation: PlannedReservation,
+): Promise<HttpsCallableResult> {
+    const { functions } = initializeFirebase();
+    const moveReservationFromQueueFn = httpsCallable(functions, "moveReservationFromQueue");
+    return moveReservationFromQueueFn({ eventOwner, preparedPlannedReservation, reservationId });
+}
+
+export function moveReservationToQueue(
+    eventOwner: EventOwner,
+    reservationId: string,
+    preparedQueuedReservation: QueuedReservation,
+): Promise<HttpsCallableResult> {
+    const { functions } = initializeFirebase();
+    const moveReservationToQueueFn = httpsCallable(functions, "moveReservationToQueue");
+    return moveReservationToQueueFn({ eventOwner, preparedQueuedReservation, reservationId });
+}
 
 /**
  * Saves a queued reservation to Firestore.
@@ -30,40 +71,6 @@ export function saveQueuedReservation(
     return addDoc(queuedReservationsCollection(eventOwner), queuedReservation);
 }
 
-export function moveReservationToQueue(
-    eventOwner: EventOwner,
-    reservationId: string,
-    preparedQueuedReservation: QueuedReservation,
-): Promise<HttpsCallableResult> {
-    const { functions } = initializeFirebase();
-    const moveReservationToQueueFn = httpsCallable(functions, "moveReservationToQueue");
-    return moveReservationToQueueFn({ eventOwner, reservationId, preparedQueuedReservation });
-}
-
-export function moveReservationFromQueue(
-    eventOwner: EventOwner,
-    reservationId: string,
-    preparedPlannedReservation: PlannedReservation,
-): Promise<HttpsCallableResult> {
-    const { functions } = initializeFirebase();
-    const moveReservationFromQueueFn = httpsCallable(functions, "moveReservationFromQueue");
-    return moveReservationFromQueueFn({ eventOwner, reservationId, preparedPlannedReservation });
-}
-
-export function deleteQueuedReservation(
-    eventOwner: EventOwner,
-    queuedReservationId: string,
-): Promise<void> {
-    return deleteDoc(queuedReservationDoc(eventOwner, queuedReservationId));
-}
-
-export function addReservation(
-    owner: EventOwner,
-    reservation: Reservation,
-): Promise<DocumentReference> {
-    return addDoc(reservationsCollection(owner), reservation);
-}
-
 export function updateReservationDoc(
     owner: EventOwner,
     newReservationData: Partial<ReservationDoc> & Pick<ReservationDoc, "id">,
@@ -71,8 +78,4 @@ export function updateReservationDoc(
     return updateDoc(reservationDoc(owner, newReservationData.id), {
         ...newReservationData,
     });
-}
-
-export function deleteReservation(owner: EventOwner, reservation: ReservationDoc): Promise<void> {
-    return deleteDoc(reservationDoc(owner, reservation.id));
 }

@@ -1,12 +1,13 @@
-import type { Ref, ComputedRef } from "vue";
-import type { EventDoc, ReservationDoc } from "@firetable/types";
-import type { FloorViewer } from "@firetable/floor-creator";
 import type { EventOwner } from "@firetable/backend";
-import { ONE_MINUTE } from "src/constants";
-import { watch, onBeforeUnmount, computed } from "vue";
-import { shouldMarkReservationAsExpired } from "src/helpers/reservation/should-mark-reservation-as-expired";
+import type { FloorViewer } from "@firetable/floor-creator";
+import type { EventDoc, ReservationDoc } from "@firetable/types";
+import type { ComputedRef, Ref } from "vue";
+
 import { matchesProperty } from "es-toolkit/compat";
+import { ONE_MINUTE } from "src/constants";
+import { shouldMarkReservationAsExpired } from "src/helpers/reservation/should-mark-reservation-as-expired";
 import { usePropertiesStore } from "src/stores/properties-store";
+import { computed, onBeforeUnmount, watch } from "vue";
 
 export function useReservationsLifecycle(
     eventDate: ComputedRef<EventDoc["date"] | undefined>,

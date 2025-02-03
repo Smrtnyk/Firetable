@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { updatePropertySettings } from "../../backend-proxy";
-import { usePropertiesStore } from "src/stores/properties-store";
-import { computed, ref } from "vue";
-import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { useDialog } from "src/composables/useDialog";
-import { useHasChanged } from "src/composables/useHasChanged";
 import { cloneDeep } from "es-toolkit";
-
 import SettingsSection from "src/components/admin/organisation-settings/SettingsSection.vue";
+import AppCardSection from "src/components/AppCardSection.vue";
+import FTBottomDialog from "src/components/FTBottomDialog.vue";
+import FTBtn from "src/components/FTBtn.vue";
 import FTTimezoneList from "src/components/FTTimezoneList.vue";
 import FTTitle from "src/components/FTTitle.vue";
-import AppCardSection from "src/components/AppCardSection.vue";
-import FTBtn from "src/components/FTBtn.vue";
-import FTBottomDialog from "src/components/FTBottomDialog.vue";
+import { useDialog } from "src/composables/useDialog";
+import { useHasChanged } from "src/composables/useHasChanged";
+import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { usePropertiesStore } from "src/stores/properties-store";
+import { computed, ref } from "vue";
+
+import { updatePropertySettings } from "../../backend-proxy";
 
 export interface PageAdminPropertySettingsProps {
     organisationId: string;
@@ -21,24 +21,24 @@ export interface PageAdminPropertySettingsProps {
 
 const colorsSettings = [
     {
-        title: "Reservation pending color",
         key: "reservationPendingColor",
+        title: "Reservation pending color",
     },
     {
-        title: "Reservation arrived color",
         key: "reservationArrivedColor",
+        title: "Reservation arrived color",
     },
     {
-        title: "Reservation confirmed color",
         key: "reservationConfirmedColor",
+        title: "Reservation confirmed color",
     },
     {
-        title: "Reservation cancelled color",
         key: "reservationCancelledColor",
+        title: "Reservation cancelled color",
     },
     {
-        title: "Reservation waiting for response color",
         key: "reservationWaitingForResponseColor",
+        title: "Reservation waiting for response color",
     },
 ] as const;
 
@@ -60,13 +60,23 @@ const { hasChanged, reset: resetPropertiesChangedTracking } = useHasChanged(
 
 const aspectRatioOptions = ["1", "16:9"];
 
-function reset(): void {
-    editableSettings.value = cloneDeep(propertySettings.value);
+function openTimezoneSelector(): void {
+    const dialog = createDialog({
+        component: FTBottomDialog,
+        componentProps: {
+            component: FTTimezoneList,
+            listeners: {
+                timezoneSelected(timezone: string) {
+                    dialog.hide();
+                    editableSettings.value.timezone = timezone;
+                },
+            },
+        },
+    });
 }
 
-async function synchroniseNewPropertySettings(propertyId: string): Promise<void> {
-    await updatePropertySettings(props.organisationId, propertyId, editableSettings.value);
-    propertiesStore.setPropertySettings(propertyId, editableSettings.value);
+function reset(): void {
+    editableSettings.value = cloneDeep(propertySettings.value);
 }
 
 async function saveSettings(): Promise<void> {
@@ -83,19 +93,9 @@ async function saveSettings(): Promise<void> {
     });
 }
 
-function openTimezoneSelector(): void {
-    const dialog = createDialog({
-        component: FTBottomDialog,
-        componentProps: {
-            component: FTTimezoneList,
-            listeners: {
-                timezoneSelected(timezone: string) {
-                    dialog.hide();
-                    editableSettings.value.timezone = timezone;
-                },
-            },
-        },
-    });
+async function synchroniseNewPropertySettings(propertyId: string): Promise<void> {
+    await updatePropertySettings(props.organisationId, propertyId, editableSettings.value);
+    propertiesStore.setPropertySettings(propertyId, editableSettings.value);
 }
 </script>
 

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import type { CreateDrinkCardPayload, DrinkCardDoc, InventoryItemDoc } from "@firetable/types";
-import { isPDFDrinkCard } from "@firetable/types";
-import { useI18n } from "vue-i18n";
-import { useFirestoreCollection } from "src/composables/useFirestore.js";
+
 import {
     createDrinkCard,
     deleteDrinkCard,
@@ -11,24 +9,27 @@ import {
     updateDrinkCard,
     uploadPDF,
 } from "@firetable/backend";
+import { isPDFDrinkCard } from "@firetable/types";
 import { Loading } from "quasar";
+import DrinkCardCreateForm from "src/components/admin/drink-cards/DrinkCardCreateForm.vue";
+import DrinkCardGrid from "src/components/admin/drink-cards/DrinkCardGrid.vue";
+import DrinkCardQRCode from "src/components/admin/drink-cards/DrinkCardQRCode.vue";
+import FTBtn from "src/components/FTBtn.vue";
+import FTCenteredText from "src/components/FTCenteredText.vue";
+import FTDialog from "src/components/FTDialog.vue";
+import FTTitle from "src/components/FTTitle.vue";
+import { useDialog } from "src/composables/useDialog.js";
+import { useFirestoreCollection } from "src/composables/useFirestore.js";
+import { getPublicUrForDrinkCard } from "src/helpers/drink-card/drink-card";
 import {
     notifyPositive,
     showConfirm,
     showErrorMessage,
     tryCatchLoadingWrapper,
 } from "src/helpers/ui-helpers.js";
-import { useDialog } from "src/composables/useDialog.js";
-import { getPublicUrForDrinkCard } from "src/helpers/drink-card/drink-card";
 import { onMounted } from "vue";
+import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
-import FTTitle from "src/components/FTTitle.vue";
-import FTBtn from "src/components/FTBtn.vue";
-import FTCenteredText from "src/components/FTCenteredText.vue";
-import DrinkCardCreateForm from "src/components/admin/drink-cards/DrinkCardCreateForm.vue";
-import FTDialog from "src/components/FTDialog.vue";
-import DrinkCardGrid from "src/components/admin/drink-cards/DrinkCardGrid.vue";
-import DrinkCardQRCode from "src/components/admin/drink-cards/DrinkCardQRCode.vue";
 
 interface Props {
     organisationId: string;
@@ -46,31 +47,71 @@ const { data: drinkCards, pending: isLoadingDrinkCards } = useFirestoreCollectio
 
 const {
     data: inventoryData,
-    promise: inventoryDataPromise,
     error: inventoryDataError,
     pending: isLoadingInventory,
+    promise: inventoryDataPromise,
 } = useFirestoreCollection<InventoryItemDoc>(
     getInventoryPath(props.organisationId, props.propertyId),
     { wait: true },
 );
 
-async function init(): Promise<void> {
-    Loading.show();
-    await inventoryDataPromise.value;
-    Loading.hide();
+function createNewDrinkCard(): void {
+    const dialog = createDialog({
+        component: FTDialog,
+        componentProps: {
+            component: DrinkCardCreateForm,
+            componentPropsObject: {
+                inventoryItems: inventoryData.value || [],
+            },
+            listeners: {
+                async submit({ card, pdfFile }: { card: CreateDrinkCardPayload; pdfFile?: File }) {
+                    await handleSubmit(card, pdfFile);
+                    dialog.hide();
+                },
+            },
+            maximized: true,
+            title: t("PageAdminPropertyDrinkCards.createCardDialogTitle"),
+        },
+    });
+}
 
-    if (!inventoryData.value) {
-        showErrorMessage("Inventory data not found", function () {
-            router.replace("/");
-        });
-        return;
-    }
+async function handleDelete(card: DrinkCardDoc): Promise<void> {
+    const confirmed = await showConfirm(t("PageAdminPropertyDrinkCards.deleteCardConfirmation"));
+    if (!confirmed) return;
 
-    if (inventoryDataError.value) {
-        showErrorMessage(inventoryDataError.value, function () {
-            router.replace("/");
-        });
-    }
+    await tryCatchLoadingWrapper({
+        async hook() {
+            await deleteDrinkCard(props.organisationId, props.propertyId, card.id, card.type);
+            notifyPositive(t("PageAdminPropertyDrinkCards.cardDeletedMessage"));
+        },
+    });
+}
+
+function handleEdit(card: DrinkCardDoc): void {
+    const dialog = createDialog({
+        component: FTDialog,
+        componentProps: {
+            component: DrinkCardCreateForm,
+            componentPropsObject: {
+                cardToEdit: card,
+                inventoryItems: inventoryData.value || [],
+            },
+            listeners: {
+                async submit({
+                    card: updatedCard,
+                    pdfFile,
+                }: {
+                    card: CreateDrinkCardPayload;
+                    pdfFile?: File;
+                }) {
+                    await handleUpdate(card.id, updatedCard, pdfFile);
+                    dialog.hide();
+                },
+            },
+            maximized: true,
+            title: t("PageAdminPropertyDrinkCards.editCardDialogTitle"),
+        },
+    });
 }
 
 async function handleSubmit(card: CreateDrinkCardPayload, pdfFile?: File): Promise<void> {
@@ -78,8 +119,8 @@ async function handleSubmit(card: CreateDrinkCardPayload, pdfFile?: File): Promi
         async hook() {
             const cardWithIds: CreateDrinkCardPayload = {
                 ...card,
-                propertyId: props.propertyId,
                 organisationId: props.organisationId,
+                propertyId: props.propertyId,
             };
 
             // If this new card is active, deactivate all others
@@ -110,14 +151,14 @@ async function handleUpdate(
         async hook() {
             const cardWithIds: CreateDrinkCardPayload = {
                 ...card,
-                propertyId: props.propertyId,
                 organisationId: props.organisationId,
+                propertyId: props.propertyId,
             };
 
             // If activating this card, deactivate all others
             if (card.isActive && drinkCards.value) {
                 const updatePromises = drinkCards.value
-                    .filter(function ({ isActive, id }) {
+                    .filter(function ({ id, isActive }) {
                         return id !== cardId && isActive;
                     })
                     .map(function ({ id }) {
@@ -145,76 +186,36 @@ async function handleUpdate(
     });
 }
 
-function createNewDrinkCard(): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: DrinkCardCreateForm,
-            componentPropsObject: {
-                inventoryItems: inventoryData.value || [],
-            },
-            maximized: true,
-            title: t("PageAdminPropertyDrinkCards.createCardDialogTitle"),
-            listeners: {
-                async submit({ card, pdfFile }: { card: CreateDrinkCardPayload; pdfFile?: File }) {
-                    await handleSubmit(card, pdfFile);
-                    dialog.hide();
-                },
-            },
-        },
-    });
-}
+async function init(): Promise<void> {
+    Loading.show();
+    await inventoryDataPromise.value;
+    Loading.hide();
 
-function handleEdit(card: DrinkCardDoc): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: DrinkCardCreateForm,
-            componentPropsObject: {
-                cardToEdit: card,
-                inventoryItems: inventoryData.value || [],
-            },
-            maximized: true,
-            title: t("PageAdminPropertyDrinkCards.editCardDialogTitle"),
-            listeners: {
-                async submit({
-                    card: updatedCard,
-                    pdfFile,
-                }: {
-                    card: CreateDrinkCardPayload;
-                    pdfFile?: File;
-                }) {
-                    await handleUpdate(card.id, updatedCard, pdfFile);
-                    dialog.hide();
-                },
-            },
-        },
-    });
-}
+    if (!inventoryData.value) {
+        showErrorMessage("Inventory data not found", function () {
+            router.replace("/");
+        });
+        return;
+    }
 
-async function handleDelete(card: DrinkCardDoc): Promise<void> {
-    const confirmed = await showConfirm(t("PageAdminPropertyDrinkCards.deleteCardConfirmation"));
-    if (!confirmed) return;
-
-    await tryCatchLoadingWrapper({
-        async hook() {
-            await deleteDrinkCard(props.organisationId, props.propertyId, card.id, card.type);
-            notifyPositive(t("PageAdminPropertyDrinkCards.cardDeletedMessage"));
-        },
-    });
+    if (inventoryDataError.value) {
+        showErrorMessage(inventoryDataError.value, function () {
+            router.replace("/");
+        });
+    }
 }
 
 function showQRCode(): void {
     createDialog({
         component: FTDialog,
         componentProps: {
-            maximized: false,
             component: DrinkCardQRCode,
-            title: t("PageAdminPropertyDrinkCards.qrCodeTitle"),
             componentPropsObject: {
                 url: getPublicUrForDrinkCard(props.organisationId, props.propertyId),
             },
             listeners: {},
+            maximized: false,
+            title: t("PageAdminPropertyDrinkCards.qrCodeTitle"),
         },
     });
 }

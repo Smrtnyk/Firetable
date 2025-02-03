@@ -1,18 +1,20 @@
-import type { CallableRequest } from "firebase-functions/v2/https";
 import type { UpdatePropertyPayload } from "@shared-types";
-import { uploadPropertyImage } from "../../utils/property/upload-property-image.js";
-import { deletePropertyImage } from "../../utils/property/delete-property-image.js";
+import type { CallableRequest } from "firebase-functions/v2/https";
+
+import { logger } from "firebase-functions/v2";
+import { HttpsError } from "firebase-functions/v2/https";
+
 import { db } from "../../init.js";
 import { getPropertiesPath } from "../../paths.js";
-import { HttpsError } from "firebase-functions/v2/https";
-import { logger } from "firebase-functions/v2";
+import { deletePropertyImage } from "../../utils/property/delete-property-image.js";
+import { uploadPropertyImage } from "../../utils/property/upload-property-image.js";
 
 export async function updatePropertyFn(req: CallableRequest<UpdatePropertyPayload>): Promise<void> {
     if (!req.auth) {
         throw new HttpsError("unauthenticated", "User must be authenticated");
     }
 
-    const { id, organisationId, img, ...propertyData } = req.data;
+    const { id, img, organisationId, ...propertyData } = req.data;
 
     try {
         const docRef = db.collection(getPropertiesPath(organisationId)).doc(id);

@@ -1,35 +1,32 @@
 <script setup lang="ts">
 import type { Visit } from "@firetable/types";
-import { formatEventDate } from "src/helpers/date-utils";
-import { useI18n } from "vue-i18n";
-import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { updateGuestVisit } from "@firetable/backend";
-import { useDialog } from "src/composables/useDialog";
-import { buttonSize } from "src/global-reactives/screen-detection";
 
-import FTDialog from "src/components/FTDialog.vue";
+import { updateGuestVisit } from "@firetable/backend";
 import EditVisitDialog from "src/components/admin/guest/EditVisitDialog.vue";
 import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPChip.vue";
+import FTDialog from "src/components/FTDialog.vue";
+import { useDialog } from "src/composables/useDialog";
+import { buttonSize } from "src/global-reactives/screen-detection";
+import { formatEventDate } from "src/helpers/date-utils";
+import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { useI18n } from "vue-i18n";
 
 interface Props {
-    visits: Visit[];
-    timezone: string;
+    guestId: string;
     organisationId: string;
     propertyId: string;
-    guestId: string;
+    timezone: string;
+    visits: Visit[];
 }
 
 const emit = defineEmits<(e: "visit-updated") => void>();
 
-const { t, locale } = useI18n();
+const { locale, t } = useI18n();
 const { createDialog } = useDialog();
-const { visits, timezone, propertyId, organisationId, guestId } = defineProps<Props>();
+const { guestId, organisationId, propertyId, timezone, visits } = defineProps<Props>();
 
-function isUpcomingVisit(visit: Visit): boolean {
-    const now = Date.now();
-    const visitDate = new Date(visit.date).getTime();
-    // Consider the visit upcoming if it's today or in the future and not cancelled
-    return visitDate >= now && !visit.cancelled;
+function formatSubtitleForGuestVisit(visit: Visit): string {
+    return formatEventDate(visit.date, locale.value, timezone);
 }
 
 function getVisitColor(visit: Visit): string {
@@ -52,17 +49,18 @@ function getVisitIcon(visit: Visit): string {
     return "dash";
 }
 
-function formatSubtitleForGuestVisit(visit: Visit): string {
-    return formatEventDate(visit.date, locale.value, timezone);
+function isUpcomingVisit(visit: Visit): boolean {
+    const now = Date.now();
+    const visitDate = new Date(visit.date).getTime();
+    // Consider the visit upcoming if it's today or in the future and not cancelled
+    return visitDate >= now && !visit.cancelled;
 }
 
 function openEditDialog(visit: Visit): void {
     const dialog = createDialog({
         component: FTDialog,
         componentProps: {
-            title: t("PageAdminGuest.editVisitTitle"),
             component: EditVisitDialog,
-            maximized: false,
             componentPropsObject: {
                 visit: { ...visit },
             },
@@ -82,6 +80,8 @@ function openEditDialog(visit: Visit): void {
                     });
                 },
             },
+            maximized: false,
+            title: t("PageAdminGuest.editVisitTitle"),
         },
     });
 }

@@ -1,18 +1,19 @@
 <script setup lang="ts">
 import type { EventDoc } from "@firetable/types";
+
 import { dateFromTimestamp, hourFromTimestamp } from "src/helpers/date-utils";
-import { useI18n } from "vue-i18n";
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 interface Props {
+    aspectRatio: number;
     event: EventDoc;
     index: number;
-    aspectRatio: number;
     propertyTimezone: string;
 }
 
-const { event, index, aspectRatio, propertyTimezone } = defineProps<Props>();
-const { t, locale } = useI18n();
+const { aspectRatio, event, index, propertyTimezone } = defineProps<Props>();
+const { locale, t } = useI18n();
 
 const backgroundImageUrl = computed(function () {
     const imageIndex = (index % 3) + 1;

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { EventDoc, VoidFunction } from "@firetable/types";
+
 import { formatEventDate } from "src/helpers/date-utils";
 import { useI18n } from "vue-i18n";
 
@@ -11,12 +12,12 @@ const { event, timezone } = defineProps<Props>();
 const emit = defineEmits(["right", "left"]);
 const { locale } = useI18n();
 
-function emitOnRight({ reset }: { reset: VoidFunction }): void {
-    emit("right", { event, reset });
-}
-
 function emitEdit({ reset }: { reset: VoidFunction }): void {
     emit("left", { event, reset });
+}
+
+function emitOnRight({ reset }: { reset: VoidFunction }): void {
+    emit("right", { event, reset });
 }
 </script>
 

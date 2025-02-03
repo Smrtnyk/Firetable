@@ -1,6 +1,8 @@
 import type { TPointerEventInfo } from "fabric";
-import type { Floor } from "../Floor.js";
+
 import { Point } from "fabric";
+
+import type { Floor } from "../Floor.js";
 
 export abstract class EventManager {
     protected readonly floor: Floor;
@@ -8,6 +10,8 @@ export abstract class EventManager {
     protected constructor(floor: Floor) {
         this.floor = floor;
     }
+
+    abstract destroy(): void;
 
     initializeCanvasEventHandlers(): void {
         this.floor.canvas.on("mouse:wheel", this.onMouseWheelHandler);
@@ -29,6 +33,4 @@ export abstract class EventManager {
         opt.e.preventDefault();
         opt.e.stopPropagation();
     };
-
-    abstract destroy(): void;
 }

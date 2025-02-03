@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import type { PropertyDoc } from "@firetable/types";
+
 import PropertyCard from "src/components/Property/PropertyCard.vue";
 
 interface Props {
-    properties: PropertyDoc[];
     aspectRatio: number;
+    properties: PropertyDoc[];
 }
 const props = defineProps<Props>();
 </script>

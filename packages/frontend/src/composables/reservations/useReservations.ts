@@ -1,8 +1,3 @@
-import type { Ref, ShallowRef, ComputedRef } from "vue";
-import type { EventOwner } from "../../backend-proxy";
-import type { DialogChainObject } from "quasar";
-import type { VueFirestoreDocumentData } from "vuefire";
-import type { GuestSummary } from "src/stores/guests-store";
 import type {
     BaseTable,
     Floor,
@@ -11,13 +6,6 @@ import type {
     FloorViewer,
 } from "@firetable/floor-creator";
 import type {
-    ReservationCopyOperation,
-    ReservationDequeueOperation,
-    ReservationLinkOperation,
-    ReservationTransferOperation,
-    TableOperation,
-} from "./useTableOperations.js";
-import type {
     EventDoc,
     PlannedReservationDoc,
     Reservation,
@@ -25,55 +13,68 @@ import type {
     ReservationState,
     User,
 } from "@firetable/types";
-import { useReservationsLifecycle } from "./useReservationsLifecycle.js";
-import { TableOperationType, useTableOperations } from "./useTableOperations.js";
-import {
-    moveReservationFromQueue,
-    moveReservationToQueue,
-    addReservation,
-    deleteReservation,
-    updateReservationDoc,
-} from "../../backend-proxy";
+import type { DialogChainObject } from "quasar";
+import type { GuestSummary } from "src/stores/guests-store";
+import type { ComputedRef, Ref, ShallowRef } from "vue";
+import type { VueFirestoreDocumentData } from "vuefire";
+
 import { isTable } from "@firetable/floor-creator";
-import { computed, watch } from "vue";
 import { isPlannedReservation, ReservationStatus } from "@firetable/types";
+import { storeToRefs } from "pinia";
+import { eventEmitter } from "src/boot/event-emitter";
+import EventCreateReservation from "src/components/Event/reservation/EventCreateReservation.vue";
+import EventShowReservation from "src/components/Event/reservation/EventShowReservation.vue";
+import FTDialog from "src/components/FTDialog.vue";
+import { useDialog } from "src/composables/useDialog";
+import { isEventInProgress } from "src/helpers/event/is-event-in-progress";
+import { determineTableColor } from "src/helpers/floor";
+import { hashString } from "src/helpers/hash-string";
+import { plannedToQueuedReservation } from "src/helpers/reservation/planned-to-queued-reservation";
+import { queuedToPlannedReservation } from "src/helpers/reservation/queued-to-planned-reservation";
 import {
     notifyPositive,
     showConfirm,
     showErrorMessage,
     tryCatchLoadingWrapper,
 } from "src/helpers/ui-helpers";
-import { useI18n } from "vue-i18n";
-import { useAuthStore } from "src/stores/auth-store";
-
-import FTDialog from "src/components/FTDialog.vue";
-import EventCreateReservation from "src/components/Event/reservation/EventCreateReservation.vue";
-import EventShowReservation from "src/components/Event/reservation/EventShowReservation.vue";
-
-import { determineTableColor } from "src/helpers/floor";
-import { usePropertiesStore } from "src/stores/properties-store";
 import { AppLogger } from "src/logger/FTLogger";
-import { storeToRefs } from "pinia";
-import { useDialog } from "src/composables/useDialog";
-import { plannedToQueuedReservation } from "src/helpers/reservation/planned-to-queued-reservation";
-import { queuedToPlannedReservation } from "src/helpers/reservation/queued-to-planned-reservation";
-import { isEventInProgress } from "src/helpers/event/is-event-in-progress";
-import { eventEmitter } from "src/boot/event-emitter";
-import { hashString } from "src/helpers/hash-string";
+import { useAuthStore } from "src/stores/auth-store";
 import { useGuestsStore } from "src/stores/guests-store";
-import { useRouter } from "vue-router";
 import { usePermissionsStore } from "src/stores/permissions-store";
+import { usePropertiesStore } from "src/stores/properties-store";
+import { computed, watch } from "vue";
+import { useI18n } from "vue-i18n";
+import { useRouter } from "vue-router";
+
+import type { EventOwner } from "../../backend-proxy";
+import type {
+    ReservationCopyOperation,
+    ReservationDequeueOperation,
+    ReservationLinkOperation,
+    ReservationTransferOperation,
+    TableOperation,
+} from "./useTableOperations.js";
+
+import {
+    addReservation,
+    deleteReservation,
+    moveReservationFromQueue,
+    moveReservationToQueue,
+    updateReservationDoc,
+} from "../../backend-proxy";
+import { useReservationsLifecycle } from "./useReservationsLifecycle.js";
+import { TableOperationType, useTableOperations } from "./useTableOperations.js";
 
 type OpenDialog = {
-    label: string;
     dialog: DialogChainObject;
     floorId: string;
+    label: string;
 };
 
 type UseReservations = {
     initiateTableOperation: (operation: TableOperation) => void;
-    tableClickHandler: FloorElementClickHandler;
     ongoingTableOperation: ComputedRef<TableOperation | undefined>;
+    tableClickHandler: FloorElementClickHandler;
 };
 
 export function useReservations(
@@ -81,7 +82,7 @@ export function useReservations(
     reservations: Ref<ReservationDoc[]>,
     floorInstances: ShallowRef<FloorViewer[]>,
     eventOwner: EventOwner,
-    event: Ref<VueFirestoreDocumentData<EventDoc> | undefined>,
+    event: Ref<undefined | VueFirestoreDocumentData<EventDoc>>,
 ): UseReservations {
     const { createDialog } = useDialog();
     const { t } = useI18n();
@@ -102,12 +103,12 @@ export function useReservations(
     let currentOpenCreateReservationDialog: OpenDialog | undefined;
 
     const {
-        ongoingTableOperation,
-        initiateTableOperation,
         cancelCurrentOperation,
+        initiateReservationCopy,
         initiateReservationLink,
         initiateReservationTransfer,
-        initiateReservationCopy,
+        initiateTableOperation,
+        ongoingTableOperation,
     } = useTableOperations();
     useReservationsLifecycle(eventDate, reservations, floorInstances, eventOwner);
 
@@ -175,7 +176,7 @@ export function useReservations(
             return;
         }
 
-        const { sourceReservation, sourceFloor } = operation;
+        const { sourceFloor, sourceReservation } = operation;
         const currentLabels = Array.isArray(sourceReservation.tableLabel)
             ? sourceReservation.tableLabel
             : [sourceReservation.tableLabel];
@@ -209,11 +210,11 @@ export function useReservations(
                 });
 
                 eventEmitter.emit("reservation:linked", {
-                    sourceReservation,
-                    linkedTableLabel: targetTable.label,
-                    eventOwner,
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
                     event: event.value!,
+                    eventOwner,
+                    linkedTableLabel: targetTable.label,
+                    sourceReservation,
                 });
             },
         });
@@ -226,10 +227,10 @@ export function useReservations(
                 notifyPositive("Reservation created");
 
                 eventEmitter.emit("reservation:created", {
-                    reservation: reservationData,
-                    eventOwner,
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
                     event: event.value!,
+                    eventOwner,
+                    reservation: reservationData,
                 });
             },
         });
@@ -245,11 +246,11 @@ export function useReservations(
                 notifyPositive(t("useReservations.reservationUpdatedMsg"));
 
                 eventEmitter.emit("reservation:updated", {
-                    reservation: reservationData,
-                    oldReservation,
-                    eventOwner,
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
                     event: event.value!,
+                    eventOwner,
+                    oldReservation,
+                    reservation: reservationData,
                 });
             },
         });
@@ -285,9 +286,9 @@ export function useReservations(
                     tableLabel: updatedTableLabels,
                 });
                 eventEmitter.emit("reservation:unlinked", {
-                    eventOwner,
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
                     event: event.value!,
+                    eventOwner,
                     sourceReservation: reservation,
                     unlinkedTableLabels: [tableToUnlink.label],
                 });
@@ -315,23 +316,23 @@ export function useReservations(
                     (isPlannedReservation(reservation) && reservation.cancelled)
                 ) {
                     await updateReservationDoc(eventOwner, {
-                        status: ReservationStatus.DELETED,
-                        id: reservation.id,
                         clearedAt: Date.now(),
+                        id: reservation.id,
+                        status: ReservationStatus.DELETED,
                     });
                     eventEmitter.emit("reservation:deleted:soft", {
-                        reservation,
-                        eventOwner,
                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
                         event: event.value!,
+                        eventOwner,
+                        reservation,
                     });
                 } else {
                     await deleteReservation(eventOwner, reservation);
                     eventEmitter.emit("reservation:deleted", {
-                        reservation,
-                        eventOwner,
                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
                         event: event.value!,
+                        eventOwner,
+                        reservation,
                     });
                 }
             },
@@ -347,7 +348,7 @@ export function useReservations(
             return;
         }
 
-        const { dialog, label, floorId } = currentOpenCreateReservationDialog;
+        const { dialog, floorId, label } = currentOpenCreateReservationDialog;
         const isTableStillFree = reservations.value.find((reservation) => {
             return reservation.tableLabel === label && reservation.floorId === floorId;
         });
@@ -376,19 +377,17 @@ export function useReservations(
             component: FTDialog,
             componentProps: {
                 component: EventCreateReservation,
-                title: `${t("EventCreateReservation.title")} ${label}`,
-                maximized: false,
                 componentPropsObject: {
-                    timezone: propertySettings.value.timezone,
                     currentUser: nonNullableUser.value,
-                    users: users.value,
+                    eventDurationInHours: propertySettings.value.event.eventDurationInHours,
+                    eventStartTimestamp,
                     mode,
                     reservationData:
                         mode === "update" && reservation
                             ? { ...reservation, id: reservation.id }
                             : void 0,
-                    eventStartTimestamp,
-                    eventDurationInHours: propertySettings.value.event.eventDurationInHours,
+                    timezone: propertySettings.value.timezone,
+                    users: users.value,
                 },
                 listeners: {
                     async create(reservationData: Omit<Reservation, "floorId" | "tableLabel">) {
@@ -406,14 +405,16 @@ export function useReservations(
                         dialog.hide();
                     },
                 },
+                maximized: false,
+                title: `${t("EventCreateReservation.title")} ${label}`,
             },
         }).onDismiss(resetCurrentOpenCreateReservationDialog);
 
         if (mode === "create") {
             currentOpenCreateReservationDialog = {
-                label,
                 dialog,
                 floorId: floor.id,
+                label,
             };
         }
     }
@@ -454,22 +455,58 @@ export function useReservations(
             component: FTDialog,
             componentProps: {
                 component: EventShowReservation,
-                title: `${t("EventShowReservation.title")} ${tableLabels.join(", ")}`,
-                maximized: false,
                 componentPropsObject: {
+                    guestSummaryPromise: getGuestSummary(reservation),
                     reservation,
                     timezone: propertySettings.value.timezone,
-                    guestSummaryPromise: getGuestSummary(reservation),
                 },
                 listeners: {
+                    arrived(val: boolean) {
+                        dialog.hide();
+                        if (!isPlannedReservation(reservation)) {
+                            return;
+                        }
+                        onGuestArrived(reservation, val).catch(showErrorMessage);
+                    },
+                    cancel(val: boolean) {
+                        if (!isPlannedReservation(reservation)) {
+                            return;
+                        }
+                        onReservationCancelled(reservation, val).catch(showErrorMessage);
+                    },
+                    copy() {
+                        initiateReservationCopy(floor, element);
+                    },
+                    delete() {
+                        onDeleteReservation(reservation).catch(showErrorMessage);
+                    },
+                    edit() {
+                        showCreateReservationDialog(floor, element, reservation, "update");
+                    },
                     goToGuestProfile(guestId: string) {
                         router.push({
                             name: "adminGuest",
                             params: {
-                                organisationId: eventOwner.organisationId,
                                 guestId,
+                                organisationId: eventOwner.organisationId,
                             },
                         });
+                    },
+                    link() {
+                        initiateReservationLink(floor, reservation);
+                    },
+                    queue() {
+                        if (!isPlannedReservation(reservation)) {
+                            return;
+                        }
+                        onMoveReservationToQueue(reservation).catch(showErrorMessage);
+                    },
+                    reservationConfirmed(val: boolean) {
+                        dialog.hide();
+                        if (!isPlannedReservation(reservation)) {
+                            return;
+                        }
+                        reservationConfirmed(val, reservation).catch(showErrorMessage);
                     },
                     stateChange(newState: ReservationState) {
                         return tryCatchLoadingWrapper({
@@ -481,30 +518,11 @@ export function useReservations(
                             },
                         });
                     },
-                    link() {
-                        initiateReservationLink(floor, reservation);
-                    },
-                    unlink() {
-                        onUnlinkTables(reservation, element).catch(showErrorMessage);
-                    },
-                    delete() {
-                        onDeleteReservation(reservation).catch(showErrorMessage);
-                    },
-                    edit() {
-                        showCreateReservationDialog(floor, element, reservation, "update");
-                    },
                     transfer() {
                         initiateReservationTransfer(floor, element);
                     },
-                    copy() {
-                        initiateReservationCopy(floor, element);
-                    },
-                    arrived(val: boolean) {
-                        dialog.hide();
-                        if (!isPlannedReservation(reservation)) {
-                            return;
-                        }
-                        onGuestArrived(reservation, val).catch(showErrorMessage);
+                    unlink() {
+                        onUnlinkTables(reservation, element).catch(showErrorMessage);
                     },
                     waitingForResponse(val: boolean) {
                         dialog.hide();
@@ -514,26 +532,9 @@ export function useReservations(
 
                         reservationWaitingForResponse(val, reservation).catch(showErrorMessage);
                     },
-                    reservationConfirmed(val: boolean) {
-                        dialog.hide();
-                        if (!isPlannedReservation(reservation)) {
-                            return;
-                        }
-                        reservationConfirmed(val, reservation).catch(showErrorMessage);
-                    },
-                    cancel(val: boolean) {
-                        if (!isPlannedReservation(reservation)) {
-                            return;
-                        }
-                        onReservationCancelled(reservation, val).catch(showErrorMessage);
-                    },
-                    queue() {
-                        if (!isPlannedReservation(reservation)) {
-                            return;
-                        }
-                        onMoveReservationToQueue(reservation).catch(showErrorMessage);
-                    },
                 },
+                maximized: false,
+                title: `${t("EventShowReservation.title")} ${tableLabels.join(", ")}`,
             },
         });
     }
@@ -542,20 +543,20 @@ export function useReservations(
         return tryCatchLoadingWrapper({
             async hook() {
                 await updateReservationDoc(eventOwner, {
-                    id: reservation.id,
                     arrived: val,
-                    waitingForResponse: false,
+                    id: reservation.id,
                     reservationConfirmed: false,
+                    waitingForResponse: false,
                 });
 
                 eventEmitter.emit("reservation:arrived", {
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
+                    event: event.value!,
+                    eventOwner,
                     reservation: {
                         ...reservation,
                         arrived: val,
                     },
-                    eventOwner,
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
-                    event: event.value!,
                 });
             },
         });
@@ -565,10 +566,10 @@ export function useReservations(
         return tryCatchLoadingWrapper({
             hook() {
                 return updateReservationDoc(eventOwner, {
+                    arrived: false,
                     id: reservation.id,
                     reservationConfirmed: val,
                     waitingForResponse: false,
-                    arrived: false,
                 });
             },
         });
@@ -581,10 +582,10 @@ export function useReservations(
         return tryCatchLoadingWrapper({
             hook() {
                 return updateReservationDoc(eventOwner, {
-                    id: reservation.id,
-                    waitingForResponse: val,
-                    reservationConfirmed: false,
                     arrived: false,
+                    id: reservation.id,
+                    reservationConfirmed: false,
+                    waitingForResponse: val,
                 });
             },
         });
@@ -597,19 +598,19 @@ export function useReservations(
         return tryCatchLoadingWrapper({
             async hook() {
                 await updateReservationDoc(eventOwner, {
-                    id: reservation.id,
                     cancelled: val,
+                    id: reservation.id,
                     waitingForResponse: false,
                 });
 
                 eventEmitter.emit("reservation:cancelled", {
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
+                    event: event.value!,
+                    eventOwner,
                     reservation: {
                         ...reservation,
                         cancelled: val,
                     },
-                    eventOwner,
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
-                    event: event.value!,
                 });
             },
         });
@@ -638,17 +639,17 @@ export function useReservations(
     ): Promise<void> {
         const newReservation = {
             ...sourceReservation,
-            tableLabel: targetTable.label,
             floorId: targetFloor.id,
+            tableLabel: targetTable.label,
         };
 
         await tryCatchLoadingWrapper({
             async hook() {
                 await addReservation(eventOwner, newReservation);
                 eventEmitter.emit("reservation:copied", {
+                    eventOwner,
                     sourceReservation,
                     targetTable,
-                    eventOwner,
                 });
             },
         });
@@ -719,10 +720,10 @@ export function useReservations(
             async hook() {
                 await Promise.all(promises);
                 eventEmitter.emit("reservation:transferred", {
-                    fromTable: table1,
-                    toTable: table2,
                     eventOwner,
+                    fromTable: table1,
                     targetReservation: reservationTable2,
+                    toTable: table2,
                 });
             },
         });
@@ -788,12 +789,12 @@ export function useReservations(
             async hook() {
                 await Promise.all(promises);
                 eventEmitter.emit("reservation:transferred", {
-                    fromTable: table1,
-                    toTable: table2,
                     eventOwner,
                     fromFloor: floor1.name,
-                    toFloor: floor2.name,
+                    fromTable: table1,
                     targetReservation: reservationTable2,
+                    toFloor: floor2.name,
+                    toTable: table2,
                 });
             },
         });
@@ -810,17 +811,17 @@ export function useReservations(
         }
 
         switch (operation.type) {
-            case TableOperationType.RESERVATION_LINK:
-                await handleReservationLink(operation, targetTable, targetReservation, targetFloor);
-                break;
             case TableOperationType.RESERVATION_COPY:
                 await handleReservationCopy(operation, targetFloor, targetTable, targetReservation);
                 break;
-            case TableOperationType.RESERVATION_TRANSFER:
-                await handleReservationTransfer(operation, targetFloor, targetTable);
-                break;
             case TableOperationType.RESERVATION_DEQUEUE:
                 await handleReservationDequeue(operation, targetFloor.id, targetTable.label);
+                break;
+            case TableOperationType.RESERVATION_LINK:
+                await handleReservationLink(operation, targetTable, targetReservation, targetFloor);
+                break;
+            case TableOperationType.RESERVATION_TRANSFER:
+                await handleReservationTransfer(operation, targetFloor, targetTable);
                 break;
         }
     }
@@ -936,8 +937,8 @@ export function useReservations(
     }
 
     return {
+        initiateTableOperation,
         ongoingTableOperation,
         tableClickHandler,
-        initiateTableOperation,
     };
 }

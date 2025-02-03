@@ -1,12 +1,14 @@
-import type { CallableRequest } from "firebase-functions/v2/https";
 import type { CreatePropertyPayload } from "@shared-types";
-import { uploadPropertyImage } from "../../utils/property/upload-property-image.js";
-import { db } from "../../init.js";
-import { getPropertiesPath, getUsersPath } from "../../paths.js";
+import type { CallableRequest } from "firebase-functions/v2/https";
+
 import { AdminRole } from "@shared-types";
 import { FieldValue } from "firebase-admin/firestore";
-import { HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
+import { HttpsError } from "firebase-functions/v2/https";
+
+import { db } from "../../init.js";
+import { getPropertiesPath, getUsersPath } from "../../paths.js";
+import { uploadPropertyImage } from "../../utils/property/upload-property-image.js";
 
 export async function createPropertyFn(
     req: CallableRequest<CreatePropertyPayload>,
@@ -15,7 +17,7 @@ export async function createPropertyFn(
         throw new HttpsError("unauthenticated", "User must be authenticated");
     }
 
-    const { organisationId, img, ...propertyData } = req.data;
+    const { img, organisationId, ...propertyData } = req.data;
 
     if (!organisationId) {
         throw new HttpsError("invalid-argument", "organisationId is missing in property payload");
@@ -25,8 +27,8 @@ export async function createPropertyFn(
         // Initial property data without img
         const initialData = {
             ...propertyData,
-            organisationId,
             creatorId: req.auth.uid,
+            organisationId,
         };
 
         // If img is provided as an object, it's upload data

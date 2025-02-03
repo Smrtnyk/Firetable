@@ -1,28 +1,29 @@
 import type { EventOwner } from "@firetable/backend";
 import type { ReservationDoc } from "@firetable/types";
-import { eventEmitter } from "src/boot/event-emitter";
+
 import { addLogToEvent } from "@firetable/backend";
+import { eventEmitter } from "src/boot/event-emitter";
 import { AppLogger } from "src/logger/FTLogger";
 import { useAuthStore } from "src/stores/auth-store";
 
-eventEmitter.on("reservation:created", function ({ reservation, eventOwner }) {
+eventEmitter.on("reservation:created", function ({ eventOwner, reservation }) {
     createEventLog(`Reservation created on table ${reservation.tableLabel}`, eventOwner);
 });
 
-eventEmitter.on("reservation:updated", function ({ reservation, oldReservation, eventOwner }) {
+eventEmitter.on("reservation:updated", function ({ eventOwner, oldReservation, reservation }) {
     const diff = generateReservationDiff(oldReservation, reservation);
     createEventLog(`Reservation edited on table ${reservation.tableLabel}${diff}`, eventOwner);
 });
 
-eventEmitter.on("reservation:deleted", function ({ reservation, eventOwner }) {
+eventEmitter.on("reservation:deleted", function ({ eventOwner, reservation }) {
     createEventLog(`Reservation deleted on table ${reservation.tableLabel}`, eventOwner);
 });
 
-eventEmitter.on("reservation:deleted:soft", function ({ reservation, eventOwner }) {
+eventEmitter.on("reservation:deleted:soft", function ({ eventOwner, reservation }) {
     createEventLog(`Reservation soft deleted on table ${reservation.tableLabel}`, eventOwner);
 });
 
-eventEmitter.on("reservation:copied", function ({ sourceReservation, targetTable, eventOwner }) {
+eventEmitter.on("reservation:copied", function ({ eventOwner, sourceReservation, targetTable }) {
     createEventLog(
         `Reservation copied from table ${sourceReservation.tableLabel} to table ${targetTable.label}`,
         eventOwner,
@@ -30,7 +31,7 @@ eventEmitter.on("reservation:copied", function ({ sourceReservation, targetTable
 });
 
 eventEmitter.on("reservation:transferred", function (data) {
-    const { fromTable, toTable, eventOwner, fromFloor, toFloor, targetReservation } = data;
+    const { eventOwner, fromFloor, fromTable, targetReservation, toFloor, toTable } = data;
 
     let message = "";
 
@@ -50,17 +51,17 @@ eventEmitter.on("reservation:transferred", function (data) {
     createEventLog(message, eventOwner);
 });
 
-eventEmitter.on("reservation:arrived", function ({ reservation, eventOwner }) {
+eventEmitter.on("reservation:arrived", function ({ eventOwner, reservation }) {
     createEventLog(`Guest arrived for reservation on table ${reservation.tableLabel}`, eventOwner);
 });
 
-eventEmitter.on("reservation:cancelled", function ({ reservation, eventOwner }) {
+eventEmitter.on("reservation:cancelled", function ({ eventOwner, reservation }) {
     createEventLog(`Reservation cancelled on table ${reservation.tableLabel}`, eventOwner);
 });
 
 eventEmitter.on(
     "reservation:linked",
-    function ({ sourceReservation, linkedTableLabel, eventOwner }) {
+    function ({ eventOwner, linkedTableLabel, sourceReservation }) {
         createEventLog(
             `Table ${linkedTableLabel} linked to reservation on table ${
                 Array.isArray(sourceReservation.tableLabel)
@@ -74,7 +75,7 @@ eventEmitter.on(
 
 eventEmitter.on(
     "reservation:unlinked",
-    function ({ sourceReservation, unlinkedTableLabels, eventOwner }) {
+    function ({ eventOwner, sourceReservation, unlinkedTableLabels }) {
         createEventLog(
             `Tables ${unlinkedTableLabels.join(", ")} unlinked from reservation on table ${
                 Array.isArray(sourceReservation.tableLabel)

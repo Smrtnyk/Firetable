@@ -1,8 +1,10 @@
-import type { Floor } from "./Floor.js";
 import type { Canvas } from "fabric";
-import { Manager, Pinch, Pan, Tap, DIRECTION_ALL } from "hammerjs";
-import { Point } from "fabric";
+
 import { throttle } from "es-toolkit";
+import { Point } from "fabric";
+import { DIRECTION_ALL, Manager, Pan, Pinch, Tap } from "hammerjs";
+
+import type { Floor } from "./Floor.js";
 
 const DAMPENING_FACTOR = 0.2;
 const PAN_DAMPENING_FACTOR = 0.1;
@@ -10,8 +12,8 @@ const PAN_DAMPENING_FACTOR = 0.1;
 export class TouchManager {
     isInteracting = false;
 
-    private readonly floor: Floor;
     private readonly canvas: Canvas;
+    private readonly floor: Floor;
     private readonly hammerManager: HammerManager;
     private readonly onPinch = throttle((ev: HammerInput) => {
         this.isInteracting = true;
@@ -31,7 +33,7 @@ export class TouchManager {
 
         // Create recognizers for pinch and pan gestures
         const doubleTap = new Tap({ event: "doubletap", taps: 2 });
-        const pinch = new Pinch({ enable: true, direction: DIRECTION_ALL });
+        const pinch = new Pinch({ direction: DIRECTION_ALL, enable: true });
         const pan = new Pan({ direction: DIRECTION_ALL, threshold: 50 });
 
         this.hammerManager.add([pinch, pan, doubleTap]);
@@ -42,8 +44,19 @@ export class TouchManager {
         this.hammerManager.on("pinchend pinchcancel panend", this.onGestureEnd);
     }
 
+    destroy(): void {
+        this.hammerManager.destroy();
+        this.isInteracting = false;
+    }
+
+    onGestureEnd = (): void => {
+        setTimeout(() => {
+            this.isInteracting = false;
+        }, 100);
+    };
+
     onPanMove = (e: HammerInput): void => {
-        const { floor, canvas } = this;
+        const { canvas, floor } = this;
         this.isInteracting = true;
         // prevent panning if ctrl is pressed or drawing mode is active
         if (e.srcEvent.ctrlKey || canvas.isDrawingMode) {
@@ -75,17 +88,6 @@ export class TouchManager {
         newY = Math.min(0, Math.max(minY, newY));
 
         canvas.setViewportTransform([zoom, 0, 0, zoom, newX, newY]);
-    };
-
-    destroy(): void {
-        this.hammerManager.destroy();
-        this.isInteracting = false;
-    }
-
-    onGestureEnd = (): void => {
-        setTimeout(() => {
-            this.isInteracting = false;
-        }, 100);
     };
 
     private readonly onDoubleTap = (ev: HammerInput): void => {

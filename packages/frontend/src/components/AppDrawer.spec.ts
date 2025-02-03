@@ -1,14 +1,15 @@
-import type { RenderResult } from "vitest-browser-vue";
 import type { AppUser, PropertyDoc } from "@firetable/types";
-import type { AppDrawerProps } from "./AppDrawer.vue";
+import type { RenderResult } from "vitest-browser-vue";
 
-import AppDrawer from "./AppDrawer.vue";
-
-import { renderComponent } from "../../test-helpers/render-component";
-import { DEFAULT_CAPABILITIES_BY_ROLE, UserCapability, Role, AdminRole } from "@firetable/types";
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { AdminRole, DEFAULT_CAPABILITIES_BY_ROLE, Role, UserCapability } from "@firetable/types";
 import { userEvent } from "@vitest/browser/context";
 import { Dark } from "quasar";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+
+import type { AppDrawerProps } from "./AppDrawer.vue";
+
+import { renderComponent } from "../../test-helpers/render-component";
+import AppDrawer from "./AppDrawer.vue";
 
 describe("AppDrawer", () => {
     let user: AppUser;
@@ -17,14 +18,14 @@ describe("AppDrawer", () => {
 
     beforeEach(() => {
         user = {
+            capabilities: undefined,
+            email: "john.doe@example.com",
             id: "user1",
             name: "John Doe",
-            email: "john.doe@example.com",
-            username: "johndoe",
-            role: Role.MANAGER,
-            relatedProperties: [],
             organisationId: "org1",
-            capabilities: undefined,
+            relatedProperties: [],
+            role: Role.MANAGER,
+            username: "johndoe",
         };
         modelValue = true;
     });
@@ -49,7 +50,7 @@ describe("AppDrawer", () => {
         screen = renderComponent(
             AppDrawer,
             { modelValue },
-            { wrapInLayout: true, piniaStoreOptions },
+            { piniaStoreOptions, wrapInLayout: true },
         );
     }
 
@@ -143,19 +144,18 @@ describe("AppDrawer", () => {
     describe("AppDrawer Snapshot Testing", () => {
         const testCases = [
             {
-                description: "Admin user (Admin view)",
-                role: AdminRole.ADMIN,
                 capabilities: {},
+                description: "Admin user (Admin view)",
                 expectedSnapshot: `
                 - Manage Organisations
                 - Issue Reports Overview
                 - Logout
                 `,
+                role: AdminRole.ADMIN,
             },
             {
-                description: "Property Owner",
-                role: Role.PROPERTY_OWNER,
                 capabilities: DEFAULT_CAPABILITIES_BY_ROLE[Role.PROPERTY_OWNER],
+                description: "Property Owner",
                 expectedSnapshot: `
                 - Manage Events
                 - Manage Floors
@@ -169,11 +169,11 @@ describe("AppDrawer", () => {
                 - Settings
                 - Logout
                 `,
+                role: Role.PROPERTY_OWNER,
             },
             {
-                description: "Manager",
-                role: Role.MANAGER,
                 capabilities: DEFAULT_CAPABILITIES_BY_ROLE[Role.MANAGER],
+                description: "Manager",
                 expectedSnapshot: `
                 - Manage Events
                 - Manage Floors
@@ -186,22 +186,23 @@ describe("AppDrawer", () => {
                 - Settings
                 - Logout
                 `,
+                role: Role.MANAGER,
             },
             {
-                description: "Hostess",
-                role: Role.HOSTESS,
                 capabilities: DEFAULT_CAPABILITIES_BY_ROLE[Role.HOSTESS],
+                description: "Hostess",
                 expectedSnapshot: `
                 - Guestbook
                 - Report an Issue
                 - Logout
                 `,
+                role: Role.HOSTESS,
             },
         ];
 
         it.each(testCases)(
             `renders the correct menu for $description`,
-            ({ role, expectedSnapshot, capabilities }) => {
+            ({ capabilities, expectedSnapshot, role }) => {
                 renderAppDrawer({ role }, capabilities, [
                     {
                         id: "property1",
@@ -221,19 +222,19 @@ describe("AppDrawer", () => {
     describe("AppDrawer STAFF Role Testing", () => {
         const staffTestCases = [
             {
-                description: "Staff with no special permissions",
                 capabilities: DEFAULT_CAPABILITIES_BY_ROLE[Role.STAFF],
+                description: "Staff with no special permissions",
                 expectedSnapshot: `
                 - Report an Issue
                 - Logout
                 `,
             },
             {
-                description: "Staff with inventory access",
                 capabilities: {
                     ...DEFAULT_CAPABILITIES_BY_ROLE[Role.STAFF],
                     [UserCapability.CAN_SEE_INVENTORY]: true,
                 },
+                description: "Staff with inventory access",
                 expectedSnapshot: `
                 - Manage Inventory
                 - Report an Issue
@@ -241,12 +242,12 @@ describe("AppDrawer", () => {
                 `,
             },
             {
-                description: "Staff with inventory and floor plans access",
                 capabilities: {
                     ...DEFAULT_CAPABILITIES_BY_ROLE[Role.STAFF],
-                    [UserCapability.CAN_SEE_INVENTORY]: true,
                     [UserCapability.CAN_EDIT_FLOOR_PLANS]: true,
+                    [UserCapability.CAN_SEE_INVENTORY]: true,
                 },
+                description: "Staff with inventory and floor plans access",
                 expectedSnapshot: `
                 - Manage Floors
                 - Manage Inventory
@@ -255,23 +256,23 @@ describe("AppDrawer", () => {
                 `,
             },
             {
-                description: "Staff with full permissions",
                 capabilities: {
-                    [UserCapability.CAN_RESERVE]: true,
-                    [UserCapability.CAN_SEE_RESERVATION_CREATOR]: true,
-                    [UserCapability.CAN_SEE_GUEST_CONTACT]: true,
-                    [UserCapability.CAN_DELETE_RESERVATION]: true,
-                    [UserCapability.CAN_DELETE_OWN_RESERVATION]: true,
-                    [UserCapability.CAN_CONFIRM_RESERVATION]: true,
                     [UserCapability.CAN_CANCEL_RESERVATION]: true,
-                    [UserCapability.CAN_EDIT_RESERVATION]: true,
-                    [UserCapability.CAN_EDIT_OWN_RESERVATION]: true,
-                    [UserCapability.CAN_SEE_INVENTORY]: true,
-                    [UserCapability.CAN_EDIT_FLOOR_PLANS]: true,
+                    [UserCapability.CAN_CONFIRM_RESERVATION]: true,
                     [UserCapability.CAN_CREATE_EVENTS]: true,
-                    [UserCapability.CAN_SEE_GUESTBOOK]: true,
+                    [UserCapability.CAN_DELETE_OWN_RESERVATION]: true,
+                    [UserCapability.CAN_DELETE_RESERVATION]: true,
+                    [UserCapability.CAN_EDIT_FLOOR_PLANS]: true,
+                    [UserCapability.CAN_EDIT_OWN_RESERVATION]: true,
+                    [UserCapability.CAN_EDIT_RESERVATION]: true,
+                    [UserCapability.CAN_RESERVE]: true,
                     [UserCapability.CAN_SEE_DIGITAL_DRINK_CARDS]: true,
+                    [UserCapability.CAN_SEE_GUEST_CONTACT]: true,
+                    [UserCapability.CAN_SEE_GUESTBOOK]: true,
+                    [UserCapability.CAN_SEE_INVENTORY]: true,
+                    [UserCapability.CAN_SEE_RESERVATION_CREATOR]: true,
                 },
+                description: "Staff with full permissions",
                 expectedSnapshot: `
                 - Manage Events
                 - Manage Floors

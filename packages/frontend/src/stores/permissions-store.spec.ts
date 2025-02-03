@@ -1,22 +1,24 @@
 import type { AppUser } from "@firetable/types";
-import { usePermissionsStore } from "./permissions-store";
-import { useAuthStore } from "./auth-store";
-import { mockedStore } from "../../test-helpers/render-component";
+
 import { AdminRole, DEFAULT_CAPABILITIES_BY_ROLE, Role, UserCapability } from "@firetable/types";
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it } from "vitest";
 import { createApp } from "vue";
 
+import { mockedStore } from "../../test-helpers/render-component";
+import { useAuthStore } from "./auth-store";
+import { usePermissionsStore } from "./permissions-store";
+
 function createTestUser(options: Partial<AppUser> = {}): AppUser {
     return {
+        capabilities: undefined,
+        email: "test@example.com",
         id: "user1",
         name: "Test User",
-        username: "testuser",
-        email: "test@example.com",
-        role: Role.STAFF,
-        relatedProperties: [],
         organisationId: "org1",
-        capabilities: undefined,
+        relatedProperties: [],
+        role: Role.STAFF,
+        username: "testuser",
         ...options,
     };
 }
@@ -55,11 +57,11 @@ describe("permissions-store.ts", () => {
         const authStore = mockedStore(useAuthStore);
         const permissionsStore = mockedStore(usePermissionsStore);
         authStore.user = createTestUser({
-            role: Role.STAFF,
             capabilities: {
                 [UserCapability.CAN_CREATE_EVENTS]: true,
                 [UserCapability.CAN_EDIT_FLOOR_PLANS]: false,
             },
+            role: Role.STAFF,
         });
 
         expect(permissionsStore.canCreateEvents).toBe(true);
@@ -81,9 +83,9 @@ describe("permissions-store.ts", () => {
 
         // Test staff user with default capabilities
         authStore.user = createTestUser({
-            role: Role.STAFF,
             // force default capabilities
             capabilities: undefined,
+            role: Role.STAFF,
         });
 
         expect(permissionsStore.canCreateEvents).toBe(
@@ -100,11 +102,11 @@ describe("permissions-store.ts", () => {
 
         // Test user with custom capabilities that override defaults
         authStore.user = createTestUser({
-            role: Role.STAFF,
             capabilities: {
                 [UserCapability.CAN_CREATE_EVENTS]: true,
                 [UserCapability.CAN_EDIT_FLOOR_PLANS]: false,
             },
+            role: Role.STAFF,
         });
 
         expect(permissionsStore.canCreateEvents).toBe(true);
@@ -116,13 +118,13 @@ describe("permissions-store.ts", () => {
         const permissionsStore = mockedStore(usePermissionsStore);
 
         authStore.user = createTestUser({
-            role: Role.STAFF,
             capabilities: {
                 [UserCapability.CAN_CREATE_EVENTS]: true,
                 [UserCapability.CAN_EDIT_FLOOR_PLANS]: false,
-                [UserCapability.CAN_SEE_INVENTORY]: true,
                 [UserCapability.CAN_RESERVE]: false,
+                [UserCapability.CAN_SEE_INVENTORY]: true,
             },
+            role: Role.STAFF,
         });
 
         expect(permissionsStore.canCreateEvents).toBe(true);
@@ -136,15 +138,15 @@ describe("permissions-store.ts", () => {
         const permissionsStore = mockedStore(usePermissionsStore);
 
         authStore.user = createTestUser({
-            role: Role.STAFF,
             capabilities: {
-                [UserCapability.CAN_EDIT_RESERVATION]: true,
-                [UserCapability.CAN_EDIT_OWN_RESERVATION]: true,
-                [UserCapability.CAN_DELETE_RESERVATION]: false,
-                [UserCapability.CAN_DELETE_OWN_RESERVATION]: true,
-                [UserCapability.CAN_CONFIRM_RESERVATION]: true,
                 [UserCapability.CAN_CANCEL_RESERVATION]: true,
+                [UserCapability.CAN_CONFIRM_RESERVATION]: true,
+                [UserCapability.CAN_DELETE_OWN_RESERVATION]: true,
+                [UserCapability.CAN_DELETE_RESERVATION]: false,
+                [UserCapability.CAN_EDIT_OWN_RESERVATION]: true,
+                [UserCapability.CAN_EDIT_RESERVATION]: true,
             },
+            role: Role.STAFF,
         });
 
         expect(permissionsStore.canEditReservation).toBe(true);
@@ -161,8 +163,8 @@ describe("permissions-store.ts", () => {
         const role = Role.STAFF;
 
         authStore.user = createTestUser({
-            role,
             capabilities: undefined,
+            role,
         });
 
         // Check that each capability matches the default for the role

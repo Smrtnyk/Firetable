@@ -1,17 +1,18 @@
 import type { Router } from "vue-router";
-import { boot } from "quasar/wrappers";
-import { AuthState, useAuthStore } from "src/stores/auth-store";
-import { initializeFirebase } from "@firetable/backend";
-import { showErrorMessage } from "src/helpers/ui-helpers";
-import { useCurrentUser, VueFire, VueFireAuth } from "vuefire";
-import { watch } from "vue";
-import { usePropertiesStore } from "src/stores/properties-store";
-import { useGuestsStore } from "src/stores/guests-store";
-import { createAuthGuard } from "src/router/auth-guard";
-import { refreshApp } from "src/helpers/utils";
-import { usePermissionsStore } from "src/stores/permissions-store";
 
-export default boot(function ({ router, app }) {
+import { initializeFirebase } from "@firetable/backend";
+import { boot } from "quasar/wrappers";
+import { showErrorMessage } from "src/helpers/ui-helpers";
+import { refreshApp } from "src/helpers/utils";
+import { createAuthGuard } from "src/router/auth-guard";
+import { AuthState, useAuthStore } from "src/stores/auth-store";
+import { useGuestsStore } from "src/stores/guests-store";
+import { usePermissionsStore } from "src/stores/permissions-store";
+import { usePropertiesStore } from "src/stores/properties-store";
+import { watch } from "vue";
+import { useCurrentUser, VueFire, VueFireAuth } from "vuefire";
+
+export default boot(function ({ app, router }) {
     const { firebaseApp } = initializeFirebase();
     app.use(VueFire, {
         firebaseApp,

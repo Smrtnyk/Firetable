@@ -1,6 +1,8 @@
-import type { AnimationStrategy } from "./AnimationStrategy.js";
 import type { FabricObject } from "fabric";
+
 import { noop } from "es-toolkit";
+
+import type { AnimationStrategy } from "./AnimationStrategy.js";
 
 const ANIMATION_DURATION = 500;
 
@@ -12,12 +14,6 @@ export class SmoothBlinkAnimation implements AnimationStrategy {
         this.target = target;
     }
 
-    stop(): void {
-        this.isAnimating = false;
-        this.target.set({ opacity: 1 });
-        this.target.canvas?.requestRenderAll();
-    }
-
     animate(): void {
         if (this.isAnimating) {
             return;
@@ -25,6 +21,12 @@ export class SmoothBlinkAnimation implements AnimationStrategy {
 
         this.isAnimating = true;
         this.smoothBlink();
+    }
+
+    stop(): void {
+        this.isAnimating = false;
+        this.target.set({ opacity: 1 });
+        this.target.canvas?.requestRenderAll();
     }
 
     private smoothBlink(): void {

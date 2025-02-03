@@ -1,16 +1,17 @@
+import type { AnyFunction } from "@firetable/types";
 import type { DialogChainObject } from "quasar";
 import type { Component } from "vue";
 import type { ComponentProps } from "vue-component-type-helpers";
-import type { AnyFunction } from "@firetable/types";
+
 import { useQuasar } from "quasar";
 
 type CreateOptions<C> = {
     component: Component;
     componentProps: {
         component: C;
-        maximized?: boolean;
         componentPropsObject?: ComponentProps<C>;
         listeners: Record<string, AnyFunction>;
+        maximized?: boolean;
         title?: string;
     };
 };

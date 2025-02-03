@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import type { PlannedReservation, QueuedReservation, Reservation } from "@firetable/types";
+
 import { isAWalkInReservation } from "@firetable/types";
 import { getFormatedDateFromTimestamp } from "src/helpers/date-utils";
-import { useI18n } from "vue-i18n";
-import { computed } from "vue";
 import { usePermissionsStore } from "src/stores/permissions-store";
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps<{
     reservation: QueuedReservation | Reservation;
     timezone: string;
 }>();
-const { t, locale } = useI18n();
+const { locale, t } = useI18n();
 const permissionsStore = usePermissionsStore();
 
 const createdAt = computed(function () {
@@ -18,15 +19,15 @@ const createdAt = computed(function () {
     return getFormatedDateFromTimestamp(createdAtValue, locale.value, props.timezone);
 });
 
-function reservedByText(reservedBy: PlannedReservation["reservedBy"]): string {
-    const { name, email } = reservedBy;
-    const isSocial = email.startsWith("social");
-    return isSocial ? name : `${name} - ${email}`;
+function createdByText(creator: Reservation["creator"]): string {
+    const { email, name } = creator;
+    return `${name} - ${email}`;
 }
 
-function createdByText(creator: Reservation["creator"]): string {
-    const { name, email } = creator;
-    return `${name} - ${email}`;
+function reservedByText(reservedBy: PlannedReservation["reservedBy"]): string {
+    const { email, name } = reservedBy;
+    const isSocial = email.startsWith("social");
+    return isSocial ? name : `${name} - ${email}`;
 }
 </script>
 

@@ -7,45 +7,43 @@ import type {
     EventFloorDoc,
     FloorDoc,
 } from "@firetable/types";
-import { computed, ref, watch, watchEffect, useTemplateRef } from "vue";
-
-import { useI18n } from "vue-i18n";
-import {
-    greaterThanZero,
-    noEmptyString,
-    requireNumber,
-    validOptionalURL,
-} from "src/helpers/form-rules";
 
 import { QForm } from "quasar";
-import { showErrorMessage } from "src/helpers/ui-helpers";
+import AdminEventFloorManager from "src/components/admin/event/AdminEventFloorManager.vue";
 import {
     createTodayUTCTimestamp,
     createUTCTimestamp,
     dateFromTimestamp,
     hourFromTimestamp,
 } from "src/helpers/date-utils";
+import {
+    greaterThanZero,
+    noEmptyString,
+    requireNumber,
+    validOptionalURL,
+} from "src/helpers/form-rules";
+import { showErrorMessage } from "src/helpers/ui-helpers";
+import { computed, ref, useTemplateRef, watch, watchEffect } from "vue";
+import { useI18n } from "vue-i18n";
 
-import AdminEventFloorManager from "src/components/admin/event/AdminEventFloorManager.vue";
+export interface EventCreateFormProps {
+    event?: EventDoc | undefined;
+    eventStartHours: string;
+    floors: FloorDoc[];
+    maxFloors: number;
+    organisationId: string;
+    propertyId: string;
+    propertyName: string;
+    propertyTimezone: string;
+}
 
 interface State {
     form: CreateEventForm;
+    selectedDate: string;
     selectedFloors: EventFloorDoc[];
+    selectedTime: string;
     showDateModal: boolean;
     showTimeModal: boolean;
-    selectedDate: string;
-    selectedTime: string;
-}
-
-export interface EventCreateFormProps {
-    propertyId: string;
-    organisationId: string;
-    propertyName: string;
-    floors: FloorDoc[];
-    event?: EventDoc | undefined;
-    eventStartHours: string;
-    propertyTimezone: string;
-    maxFloors: number;
 }
 
 const props = defineProps<EventCreateFormProps>();
@@ -54,16 +52,16 @@ const emit = defineEmits<{
     (event: "update", payload: EditEventPayload): void;
 }>();
 
-const { t, locale } = useI18n();
+const { locale, t } = useI18n();
 
 const initialDate = createTodayUTCTimestamp(props.eventStartHours, props.propertyTimezone);
 
 const eventObj: CreateEventForm = {
-    name: "",
     date: initialDate,
-    guestListLimit: 100,
     entryPrice: 0,
+    guestListLimit: 100,
     img: "",
+    name: "",
 };
 
 const isEditMode = computed(function () {
@@ -72,11 +70,11 @@ const isEditMode = computed(function () {
 const form = useTemplateRef<QForm>("form");
 const state = ref<State>({
     form: { ...eventObj },
+    selectedDate: dateFromTimestamp(Date.now(), locale.value, props.propertyTimezone),
     selectedFloors: [],
+    selectedTime: props.eventStartHours,
     showDateModal: false,
     showTimeModal: false,
-    selectedDate: dateFromTimestamp(Date.now(), locale.value, props.propertyTimezone),
-    selectedTime: props.eventStartHours,
 });
 
 function validDates(calendarDate: string): boolean {
@@ -101,11 +99,11 @@ watchEffect(function () {
         // Use event data if in edit mode
         const editDate = new Date(props.event.date);
         state.value.form = {
-            name: props.event.name,
-            guestListLimit: props.event.guestListLimit,
-            entryPrice: props.event.entryPrice,
-            img: props.event.img ?? "",
             date: props.event.date,
+            entryPrice: props.event.entryPrice,
+            guestListLimit: props.event.guestListLimit,
+            img: props.event.img ?? "",
+            name: props.event.name,
         };
         state.value.selectedDate = dateFromTimestamp(
             editDate.getTime(),
@@ -159,9 +157,33 @@ function addFloor(floor: EventFloorDoc): void {
     });
 }
 
+function onReset(): void {
+    state.value.form = { ...eventObj };
+    state.value.selectedFloors = [];
+}
+
+async function onSubmit(): Promise<void> {
+    if (!(await form.value?.validate())) {
+        return;
+    }
+    if (isEditMode.value) {
+        return validateAndEmitEdit();
+    }
+    return validateAndEmitCreate();
+}
+
 function removeFloor(index: number): void {
     state.value.selectedFloors.splice(index, 1);
     state.value.selectedFloors = state.value.selectedFloors.map(function (floor, idx) {
+        return {
+            ...floor,
+            order: idx,
+        };
+    });
+}
+
+function reorderFloors(newFloors: EventFloorDoc[]): void {
+    state.value.selectedFloors = newFloors.map(function (floor, idx) {
         return {
             ...floor,
             order: idx,
@@ -177,12 +199,12 @@ function validateAndEmitCreate(): void {
 
     emit("create", {
         ...state.value.form,
-        guestListLimit: Number(state.value.form.guestListLimit),
-        propertyId: props.propertyId,
-        organisationId: props.organisationId,
         floors: state.value.selectedFloors.map(function (floor) {
             return { ...floor, id: floor.id };
         }),
+        guestListLimit: Number(state.value.form.guestListLimit),
+        organisationId: props.organisationId,
+        propertyId: props.propertyId,
     });
     state.value.form = eventObj;
 }
@@ -191,32 +213,8 @@ function validateAndEmitEdit(): void {
     emit("update", {
         ...state.value.form,
         guestListLimit: Number(state.value.form.guestListLimit),
-        propertyId: props.propertyId,
         organisationId: props.organisationId,
-    });
-}
-
-async function onSubmit(): Promise<void> {
-    if (!(await form.value?.validate())) {
-        return;
-    }
-    if (isEditMode.value) {
-        return validateAndEmitEdit();
-    }
-    return validateAndEmitCreate();
-}
-
-function onReset(): void {
-    state.value.form = { ...eventObj };
-    state.value.selectedFloors = [];
-}
-
-function reorderFloors(newFloors: EventFloorDoc[]): void {
-    state.value.selectedFloors = newFloors.map(function (floor, idx) {
-        return {
-            ...floor,
-            order: idx,
-        };
+        propertyId: props.propertyId,
     });
 }
 </script>

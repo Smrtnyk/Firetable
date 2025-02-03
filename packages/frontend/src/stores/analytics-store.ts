@@ -1,4 +1,5 @@
 import type { PlannedReservationDoc, WalkInReservationDoc } from "@firetable/types";
+
 import { defineStore } from "pinia";
 import { ref } from "vue";
 
@@ -38,9 +39,9 @@ export const useAnalyticsStore = defineStore("analytics", function () {
     }
 
     return {
-        dataCache,
         cacheData,
-        getDataForRange,
         clearData,
+        dataCache,
+        getDataForRange,
     };
 });

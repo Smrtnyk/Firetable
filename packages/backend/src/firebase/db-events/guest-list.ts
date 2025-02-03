@@ -1,8 +1,18 @@
-import type { EventOwner } from "../db.js";
 import type { GuestInGuestListData } from "@firetable/types";
 import type { DocumentReference } from "firebase/firestore";
-import { guestListDoc, guestListCollection } from "../db.js";
-import { updateDoc, deleteDoc, addDoc } from "firebase/firestore";
+
+import { addDoc, deleteDoc, updateDoc } from "firebase/firestore";
+
+import type { EventOwner } from "../db.js";
+
+import { guestListCollection, guestListDoc } from "../db.js";
+
+export function addGuestToGuestList(
+    owner: EventOwner,
+    payload: GuestInGuestListData,
+): Promise<DocumentReference> {
+    return addDoc(guestListCollection(owner), payload);
+}
 
 export function confirmGuestFromGuestList(
     owner: EventOwner,
@@ -17,11 +27,4 @@ export function confirmGuestFromGuestList(
 
 export function deleteGuestFromGuestList(owner: EventOwner, guestID: string): Promise<void> {
     return deleteDoc(guestListDoc(owner, guestID));
-}
-
-export function addGuestToGuestList(
-    owner: EventOwner,
-    payload: GuestInGuestListData,
-): Promise<DocumentReference> {
-    return addDoc(guestListCollection(owner), payload);
 }

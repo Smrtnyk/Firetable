@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import { noEmptyString } from "src/helpers/form-rules";
+import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 interface Props {
@@ -16,12 +16,12 @@ function noSameFloorName(val: string): boolean | string {
     return !props.allFloorNames.has(val) || "Floor with the same name already exists!";
 }
 
-function onSubmit(): void {
-    emit("create", floorName.value);
-}
-
 function onReset(): void {
     floorName.value = "";
+}
+
+function onSubmit(): void {
+    emit("create", floorName.value);
 }
 </script>
 

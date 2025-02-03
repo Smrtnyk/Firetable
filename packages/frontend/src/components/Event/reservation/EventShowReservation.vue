@@ -1,27 +1,27 @@
 <script setup lang="ts">
 import type { ReservationDoc } from "@firetable/types";
 import type { GuestSummary } from "src/stores/guests-store";
-import { ReservationState, isPlannedReservation } from "@firetable/types";
-import { toRef } from "vue";
-import { useI18n } from "vue-i18n";
-import { useAsyncState } from "@vueuse/core";
-import { usePermissionsStore } from "src/stores/permissions-store";
-import { buttonSize } from "src/global-reactives/screen-detection";
-import { useReservationPermissions } from "src/composables/reservations/useReservationPermissions";
 
+import { isPlannedReservation, ReservationState } from "@firetable/types";
+import { useAsyncState } from "@vueuse/core";
 import ReservationGeneralInfo from "src/components/Event/reservation/ReservationGeneralInfo.vue";
 import ReservationLabelChips from "src/components/Event/reservation/ReservationLabelChips.vue";
 import FTBtn from "src/components/FTBtn.vue";
 import GuestSummaryChips from "src/components/guest/GuestSummaryChips.vue";
+import { useReservationPermissions } from "src/composables/reservations/useReservationPermissions";
+import { buttonSize } from "src/global-reactives/screen-detection";
+import { usePermissionsStore } from "src/stores/permissions-store";
+import { toRef } from "vue";
+import { useI18n } from "vue-i18n";
 
 export interface EventShowReservationProps {
-    reservation: ReservationDoc;
     guestSummaryPromise: Promise<GuestSummary | undefined>;
+    reservation: ReservationDoc;
     timezone: string;
 }
 
 const permissionsStore = usePermissionsStore();
-const { reservation, guestSummaryPromise, timezone } = defineProps<EventShowReservationProps>();
+const { guestSummaryPromise, reservation, timezone } = defineProps<EventShowReservationProps>();
 const emit = defineEmits<{
     (e: "copy" | "delete" | "edit" | "link" | "queue" | "transfer" | "unlink"): void;
     (e: "goToGuestProfile", guestId: string): void;
@@ -33,14 +33,14 @@ const { t } = useI18n();
 const { state: guestSummaryData } = useAsyncState(guestSummaryPromise, void 0);
 
 const {
-    reservationStateWithTranslationMap,
-    canEditReservation,
-    canDeleteReservation,
-    canMoveToQueue,
     canCancel,
-    reservationMappedState,
+    canDeleteReservation,
+    canEditReservation,
+    canMoveToQueue,
     isCancelled,
     isLinkedReservation,
+    reservationMappedState,
+    reservationStateWithTranslationMap,
 } = useReservationPermissions(toRef(() => reservation));
 
 function onReservationCancel(): void {
@@ -55,11 +55,11 @@ function onStateChange(newState: ReservationState): void {
         case ReservationState.CONFIRMED:
             emit("reservationConfirmed", true);
             break;
-        case ReservationState.WAITING_FOR_RESPONSE:
-            emit("waitingForResponse", true);
-            break;
         case ReservationState.PENDING:
             emit("waitingForResponse", false);
+            break;
+        case ReservationState.WAITING_FOR_RESPONSE:
+            emit("waitingForResponse", true);
             break;
     }
     emit("stateChange", newState);

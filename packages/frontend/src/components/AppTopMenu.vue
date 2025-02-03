@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { useAuthStore } from "src/stores/auth-store";
-
 import AppBreadcrumbs from "src/components/AppBreadcrumbs.vue";
 import { refreshApp } from "src/helpers/utils";
+import { useAuthStore } from "src/stores/auth-store";
 
 const emit = defineEmits<(e: "toggle-drawer") => void>();
 const authStore = useAuthStore();

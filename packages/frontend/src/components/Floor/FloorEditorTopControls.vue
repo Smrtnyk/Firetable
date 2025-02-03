@@ -1,31 +1,32 @@
 <script setup lang="ts">
 import type { FloorEditor, FloorEditorElement } from "@firetable/floor-creator";
+
 import {
+    isTable,
     setDimensions,
     setElementAngle,
-    isTable,
     setElementPosition,
 } from "@firetable/floor-creator";
-import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
-import { computed, onMounted, ref, watch } from "vue";
 import { useEventListener } from "@vueuse/core";
 import { debounce, isString } from "es-toolkit";
 import FTColorPickerButton from "src/components/FTColorPickerButton.vue";
-
-interface Props {
-    selectedFloorElement: FloorEditorElement;
-    floorInstance: FloorEditor;
-    deleteAllowed?: boolean;
-    existingLabels: Set<string>;
-}
+import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
+import { computed, onMounted, ref, watch } from "vue";
 
 type EmitEvents = (e: "delete", element: FloorEditorElement) => void;
+
+interface Props {
+    deleteAllowed?: boolean;
+    existingLabels: Set<string>;
+    floorInstance: FloorEditor;
+    selectedFloorElement: FloorEditorElement;
+}
 const emit = defineEmits<EmitEvents>();
 const {
     deleteAllowed = true,
     existingLabels,
-    selectedFloorElement,
     floorInstance,
+    selectedFloorElement,
 } = defineProps<Props>();
 
 const getElementWidth = computed(function () {
@@ -77,14 +78,14 @@ watch(localWidth, function (newWidth) {
     if (!selectedFloorElement) {
         return;
     }
-    setDimensions(selectedFloorElement, { width: newWidth, height: localHeight.value });
+    setDimensions(selectedFloorElement, { height: localHeight.value, width: newWidth });
 });
 
 watch(localHeight, function (newHeight) {
     if (!selectedFloorElement) {
         return;
     }
-    setDimensions(selectedFloorElement, { width: localWidth.value, height: newHeight });
+    setDimensions(selectedFloorElement, { height: newHeight, width: localWidth.value });
 });
 
 function sendBack(): void {
@@ -99,6 +100,21 @@ const setElementColor = debounce(function (newVal: unknown): void {
     floorInstance.setElementFill(selectedFloorElement, newVal);
 }, 300);
 
+async function deleteElement(): Promise<void> {
+    if (!selectedFloorElement) {
+        return;
+    }
+    if (await showConfirm("Do you really want to delete this element?")) {
+        emit("delete", selectedFloorElement);
+    }
+}
+
+function onKeyDownListener(event: KeyboardEvent): void {
+    if (event.key === "Delete" && selectedFloorElement) {
+        deleteElement();
+    }
+}
+
 function updateTableLabel(tableEl: FloorEditorElement | undefined, newLabel: unknown): void {
     if (!isString(newLabel) || !isTable(tableEl)) {
         return;
@@ -108,21 +124,6 @@ function updateTableLabel(tableEl: FloorEditorElement | undefined, newLabel: unk
         return;
     }
     tableEl.setLabel(newLabel);
-}
-
-function onKeyDownListener(event: KeyboardEvent): void {
-    if (event.key === "Delete" && selectedFloorElement) {
-        deleteElement();
-    }
-}
-
-async function deleteElement(): Promise<void> {
-    if (!selectedFloorElement) {
-        return;
-    }
-    if (await showConfirm("Do you really want to delete this element?")) {
-        emit("delete", selectedFloorElement);
-    }
 }
 
 onMounted(function () {

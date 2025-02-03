@@ -1,5 +1,6 @@
 /* eslint-disable id-length -- patched from fabric*/
 import type { FabricObject } from "fabric";
+
 import { ActiveSelection, Group } from "fabric";
 
 export function getObjectsByTarget(target: FabricObject): Set<FabricObject> {
@@ -25,16 +26,6 @@ export function getObjectsByTarget(target: FabricObject): Set<FabricObject> {
     return objects;
 }
 
-function deleteObjectsByList(objects: Set<FabricObject>, list: FabricObject[]): void {
-    for (const target of list) {
-        if (target.constructor === Group) {
-            deleteObjectsByList(objects, (target as Group).getObjects());
-        } else {
-            objects.delete(target);
-        }
-    }
-}
-
 function collectObjectsByGroup(objects: Set<FabricObject>, g: Group): void {
     const children = g.getObjects();
     for (const child of children) {
@@ -44,5 +35,15 @@ function collectObjectsByGroup(objects: Set<FabricObject>, g: Group): void {
             continue;
         }
         objects.add(child);
+    }
+}
+
+function deleteObjectsByList(objects: Set<FabricObject>, list: FabricObject[]): void {
+    for (const target of list) {
+        if (target.constructor === Group) {
+            deleteObjectsByList(objects, (target as Group).getObjects());
+        } else {
+            objects.delete(target);
+        }
     }
 }

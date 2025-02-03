@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { deleteOrganisation } from "../../backend-proxy";
-import { usePropertiesStore } from "src/stores/properties-store";
-import { showDeleteConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import FTBtn from "src/components/FTBtn.vue";
+import FTTitle from "src/components/FTTitle.vue";
 import {
-    getOrganisationStatusColor,
     formatOrganisationStatus,
+    getOrganisationStatusColor,
 } from "src/helpers/organisation/organisation";
+import { showDeleteConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { usePropertiesStore } from "src/stores/properties-store";
 import { useRouter } from "vue-router";
 
-import FTTitle from "src/components/FTTitle.vue";
-import FTBtn from "src/components/FTBtn.vue";
+import { deleteOrganisation } from "../../backend-proxy";
 
 export interface PageAdminOrganisationProps {
     organisationId: string;

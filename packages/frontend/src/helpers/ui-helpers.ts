@@ -1,24 +1,38 @@
 import type { VoidFunction } from "@firetable/types";
-import { Dialog, Loading, Notify } from "quasar";
+
 import { isString, noop } from "es-toolkit";
+import { Dialog, Loading, Notify } from "quasar";
+
+type TryCatchLoadingWrapperOptions<T> = {
+    args?: unknown[];
+    errorHook?: (...args: unknown[]) => void;
+    hook: (...args: unknown[]) => Promise<T>;
+};
+
+export function notifyPositive(message: string): void {
+    Notify.create({
+        color: "positive",
+        message,
+    });
+}
 
 export function showConfirm(title: string, message = ""): Promise<boolean> {
     const options = {
-        title,
-        message,
-        class: "ft-card",
-        persistent: true,
-        ok: {
-            size: "md",
-            rounded: true,
-            color: "primary",
-        },
         cancel: {
-            size: "md",
+            color: "negative",
             outline: true,
             rounded: true,
-            color: "negative",
+            size: "md",
         },
+        class: "ft-card",
+        message,
+        ok: {
+            color: "primary",
+            rounded: true,
+            size: "md",
+        },
+        persistent: true,
+        title,
     };
 
     return new Promise(function (resolve) {
@@ -35,29 +49,29 @@ export function showDeleteConfirm(
 ): Promise<boolean> {
     return new Promise(function (resolve) {
         Dialog.create({
-            title,
-            message,
-            class: "ft-card",
-            persistent: true,
-            prompt: {
-                model: "",
-                type: "text",
-                placeholder: `Please type "${confirmText}" to confirm`,
-                isValid: (val: string) => val === confirmText,
-                standout: true,
-                rounded: true,
-            },
-            ok: {
-                size: "md",
-                rounded: true,
-                color: "primary",
-            },
             cancel: {
-                size: "md",
+                color: "negative",
                 outline: true,
                 rounded: true,
-                color: "negative",
+                size: "md",
             },
+            class: "ft-card",
+            message,
+            ok: {
+                color: "primary",
+                rounded: true,
+                size: "md",
+            },
+            persistent: true,
+            prompt: {
+                isValid: (val: string) => val === confirmText,
+                model: "",
+                placeholder: `Please type "${confirmText}" to confirm`,
+                rounded: true,
+                standout: true,
+                type: "text",
+            },
+            title,
         })
             .onOk(() => resolve(true))
             .onCancel(() => resolve(false));
@@ -73,21 +87,15 @@ export function showErrorMessage(e: unknown, onCloseCallback?: VoidFunction): vo
     }
 
     const dialog = Dialog.create({
-        title: "Error",
-        message,
         class: ["error-dialog", "ft-card"],
+        message,
+        title: "Error",
     });
 
     if (onCloseCallback) {
         dialog.onOk(onCloseCallback);
     }
 }
-
-type TryCatchLoadingWrapperOptions<T> = {
-    hook: (...args: unknown[]) => Promise<T>;
-    args?: unknown[];
-    errorHook?: (...args: unknown[]) => void;
-};
 
 /**
  * Immediately executes passed in hook
@@ -98,9 +106,9 @@ type TryCatchLoadingWrapperOptions<T> = {
  * @param errorHook In case hook throws, errorHook will be executed
  */
 export async function tryCatchLoadingWrapper<T>({
-    hook,
     args,
     errorHook,
+    hook,
 }: TryCatchLoadingWrapperOptions<T>): Promise<T | undefined> {
     try {
         Loading.show();
@@ -113,11 +121,4 @@ export async function tryCatchLoadingWrapper<T>({
     }
 
     return undefined;
-}
-
-export function notifyPositive(message: string): void {
-    Notify.create({
-        message,
-        color: "positive",
-    });
 }

@@ -1,27 +1,26 @@
+import { Collection } from "@shared-types";
+import { setGlobalOptions } from "firebase-functions/v2";
+import { onDocumentDeleted } from "firebase-functions/v2/firestore";
+import { onCall } from "firebase-functions/v2/https";
+import { onSchedule } from "firebase-functions/v2/scheduler";
+
 import { createEvent as createEventFn } from "./callable/create-event/index.js";
+import { deleteGuestVisitFn } from "./callable/guest/delete-guest-visit.js";
+import { setGuestDataFn } from "./callable/guest/set-guest-data.js";
+import { updateGuestDataFn } from "./callable/guest/update-guest-info.js";
+import { createPropertyFn } from "./callable/property/create-property.js";
+import { updatePropertyFn } from "./callable/property/update-property.js";
+import { moveReservationFromQueueFn } from "./callable/reservation/move-reservation-from-queue.js";
+import { moveReservationToQueueFn } from "./callable/reservation/move-reservation-to-queue.js";
+import { changePasswordFn } from "./callable/user/change-password.js";
 import { createUser as createUserFn } from "./callable/user/create-user.js";
 import { deleteUser as deleteUserFn } from "./callable/user/delete-user.js";
-import { clearOldEvents as clearOldEventsFn } from "./cron/clear-old-events/index.js";
-import { createPropertyFn } from "./callable/property/create-property.js";
-import { deleteDocument } from "./delete-document/index.js";
-import { updateUserFn } from "./callable/user/update-user.js";
 import { fetchUsersByRoleFn } from "./callable/user/fetch-users-by-role.js";
-import { onPropertyDeletedFn } from "./trigger/on-property-deleted.js";
-
-import { changePasswordFn } from "./callable/user/change-password.js";
+import { updateUserFn } from "./callable/user/update-user.js";
+import { clearOldEvents as clearOldEventsFn } from "./cron/clear-old-events/index.js";
+import { deleteDocument } from "./delete-document/index.js";
 import { onOrganisationDeletedFn } from "./trigger/on-organisation-deleted.js";
-import { setGuestDataFn } from "./callable/guest/set-guest-data.js";
-import { deleteGuestVisitFn } from "./callable/guest/delete-guest-visit.js";
-import { updateGuestDataFn } from "./callable/guest/update-guest-info.js";
-import { moveReservationToQueueFn } from "./callable/reservation/move-reservation-to-queue.js";
-import { moveReservationFromQueueFn } from "./callable/reservation/move-reservation-from-queue.js";
-import { updatePropertyFn } from "./callable/property/update-property.js";
-import { Collection } from "@shared-types";
-
-import { onSchedule } from "firebase-functions/v2/scheduler";
-import { onCall } from "firebase-functions/v2/https";
-import { onDocumentDeleted } from "firebase-functions/v2/firestore";
-import { setGlobalOptions } from "firebase-functions/v2";
+import { onPropertyDeletedFn } from "./trigger/on-property-deleted.js";
 
 setGlobalOptions({ region: "europe-west3" });
 

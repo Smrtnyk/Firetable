@@ -1,6 +1,7 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { DevLogger } from "./DevFTLogger";
 import { AppLogger } from "./FTLogger";
-import { describe, it, expect, vi, beforeEach } from "vitest";
 
 beforeEach(() => {
     vi.spyOn(console, "info").mockImplementation(vi.fn());

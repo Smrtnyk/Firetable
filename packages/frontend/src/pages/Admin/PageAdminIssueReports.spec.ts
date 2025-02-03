@@ -1,24 +1,26 @@
-import type { RenderResult } from "vitest-browser-vue";
 import type { IssueReportDoc } from "@firetable/types";
-import PageAdminIssueReports from "./PageAdminIssueReports.vue";
-import { renderComponent, t } from "../../../test-helpers/render-component";
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import type { RenderResult } from "vitest-browser-vue";
+
+import { AdminRole, IssueCategory, IssueStatus } from "@firetable/types";
 import { userEvent } from "@vitest/browser/context";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ref } from "vue";
-import { IssueCategory, IssueStatus, AdminRole } from "@firetable/types";
+
+import { renderComponent, t } from "../../../test-helpers/render-component";
+import PageAdminIssueReports from "./PageAdminIssueReports.vue";
 
 const {
     createDialogSpy,
-    useFirestoreCollectionMock,
-    updateIssueReportMock,
     deleteIssueReportMock,
     notifyMock,
+    updateIssueReportMock,
+    useFirestoreCollectionMock,
 } = vi.hoisted(() => ({
     createDialogSpy: vi.fn(),
-    useFirestoreCollectionMock: vi.fn(),
-    updateIssueReportMock: vi.fn(),
     deleteIssueReportMock: vi.fn(),
     notifyMock: vi.fn(),
+    updateIssueReportMock: vi.fn(),
+    useFirestoreCollectionMock: vi.fn(),
 }));
 
 vi.mock("src/composables/useDialog", () => ({
@@ -32,9 +34,9 @@ vi.mock("src/composables/useFirestore", () => ({
 }));
 
 vi.mock("../../backend-proxy", () => ({
-    updateIssueReport: updateIssueReportMock,
     deleteIssueReport: deleteIssueReportMock,
     getIssueReportsPath: vi.fn(),
+    updateIssueReport: updateIssueReportMock,
 }));
 
 vi.mock("quasar", async (importOriginal) => ({
@@ -47,24 +49,24 @@ vi.mock("quasar", async (importOriginal) => ({
 describe("PageAdminIssueReports.vue", () => {
     const mockIssues: IssueReportDoc[] = [
         {
-            id: "issue1",
-            description: "Test Bug",
             category: IssueCategory.BUG,
-            status: IssueStatus.NEW,
             createdAt: Date.now(),
             createdBy: "user1",
-            user: { name: "John Doe", email: "john@example.com" },
+            description: "Test Bug",
+            id: "issue1",
             organisation: { id: "org1", name: "Org 1" },
+            status: IssueStatus.NEW,
+            user: { email: "john@example.com", name: "John Doe" },
         },
         {
-            id: "issue2",
-            description: "Feature Request",
             category: IssueCategory.FEATURE_REQUEST,
-            status: IssueStatus.IN_PROGRESS,
             createdAt: Date.now(),
             createdBy: "user2",
-            user: { name: "Jane Doe", email: "jane@example.com" },
+            description: "Feature Request",
+            id: "issue2",
             organisation: { id: "org1", name: "Org 1" },
+            status: IssueStatus.IN_PROGRESS,
+            user: { email: "jane@example.com", name: "Jane Doe" },
         },
     ];
 
@@ -81,17 +83,17 @@ describe("PageAdminIssueReports.vue", () => {
                             },
                         },
                         properties: {
+                            organisations: [
+                                {
+                                    id: "org1",
+                                    name: "Org 1",
+                                },
+                            ],
                             properties: [
                                 {
                                     id: "prop1",
                                     name: "Property 1",
                                     organisationId: "org1",
-                                },
-                            ],
-                            organisations: [
-                                {
-                                    id: "org1",
-                                    name: "Org 1",
                                 },
                             ],
                         },

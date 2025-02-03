@@ -9,8 +9,9 @@ import type {
     InventoryItemDoc,
 } from "@firetable/types";
 import type { SortableEvent } from "vue-draggable-plus";
-import DrinkCardSectionItems from "./DrinkCardSectionItems.vue";
-import { useDraggable } from "vue-draggable-plus";
+
+import { isNumber, matchesProperty } from "es-toolkit/compat";
+import DrinkCardBuilderAddDragElementsDropdown from "src/components/admin/drink-cards/DrinkCardBuilderAddDragElementsDropdown.vue";
 import {
     formatPrice,
     isBundle,
@@ -19,19 +20,20 @@ import {
     isSection,
 } from "src/helpers/drink-card/drink-card";
 import { computed, ref } from "vue";
+import { useDraggable } from "vue-draggable-plus";
 import { useI18n } from "vue-i18n";
-import DrinkCardBuilderAddDragElementsDropdown from "src/components/admin/drink-cards/DrinkCardBuilderAddDragElementsDropdown.vue";
-import { isNumber, matchesProperty } from "es-toolkit/compat";
 
-interface Props {
-    elements: DrinkCardElement[];
-    inventoryItems: InventoryItemDoc[];
-}
+import DrinkCardSectionItems from "./DrinkCardSectionItems.vue";
 
 interface Emits {
     (event: "update:elements", elements: DrinkCardElement[]): void;
     (event: "add", element: DrinkCardElement): void;
     (event: "remove", index: number): void;
+}
+
+interface Props {
+    elements: DrinkCardElement[];
+    inventoryItems: InventoryItemDoc[];
 }
 
 const { t } = useI18n();
@@ -51,10 +53,10 @@ const availableItems = computed(() => {
 
 useDraggable(draggableListRef, draggableElements, {
     animation: 150,
-    handle: ".drag-handle",
     draggable: ".drag-item",
+    handle: ".drag-handle",
     onEnd(event: SortableEvent): void {
-        const { oldDraggableIndex, newDraggableIndex, item } = event;
+        const { item, newDraggableIndex, oldDraggableIndex } = event;
         if (
             !isNumber(oldDraggableIndex) ||
             !isNumber(newDraggableIndex) ||
@@ -71,25 +73,9 @@ function emitUpdatedElements(): void {
     emit("update:elements", draggableElements.value);
 }
 
-function updateSectionItems(sectionId: string, items: DrinkCardItem[]): void {
-    const elements = [...draggableElements.value];
-    const rootSection = elements.filter(isSection).find(matchesProperty("id", sectionId));
-    if (rootSection) {
-        rootSection.items = items;
-    }
-    draggableElements.value = elements;
+function handleAddBundle(bundle: DrinkBundle): void {
+    draggableElements.value.push(bundle);
     emitUpdatedElements();
-}
-
-function removeElement(elementId: string): void {
-    draggableElements.value = draggableElements.value.filter(function ({ id }) {
-        return id !== elementId;
-    });
-    emitUpdatedElements();
-}
-
-function handleEditBundle(bundle: DrinkBundle): void {
-    dropdownRef.value?.showBundleDialog(bundle);
 }
 
 function handleAddHeader(): void {
@@ -112,9 +98,13 @@ function handleAddHeaderEnd(): void {
     emitUpdatedElements();
 }
 
-function handleAddBundle(bundle: DrinkBundle): void {
-    draggableElements.value.push(bundle);
+function handleAddSection(section: DrinkCardSection): void {
+    draggableElements.value.push(section);
     emitUpdatedElements();
+}
+
+function handleEditBundle(bundle: DrinkBundle): void {
+    dropdownRef.value?.showBundleDialog(bundle);
 }
 
 function handleUpdateBundle(updatedBundle: DrinkBundle): void {
@@ -125,8 +115,20 @@ function handleUpdateBundle(updatedBundle: DrinkBundle): void {
     }
 }
 
-function handleAddSection(section: DrinkCardSection): void {
-    draggableElements.value.push(section);
+function removeElement(elementId: string): void {
+    draggableElements.value = draggableElements.value.filter(function ({ id }) {
+        return id !== elementId;
+    });
+    emitUpdatedElements();
+}
+
+function updateSectionItems(sectionId: string, items: DrinkCardItem[]): void {
+    const elements = [...draggableElements.value];
+    const rootSection = elements.filter(isSection).find(matchesProperty("id", sectionId));
+    if (rootSection) {
+        rootSection.items = items;
+    }
+    draggableElements.value = elements;
     emitUpdatedElements();
 }
 </script>

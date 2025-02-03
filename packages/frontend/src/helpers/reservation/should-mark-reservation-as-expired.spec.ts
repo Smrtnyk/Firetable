@@ -1,6 +1,7 @@
-import { shouldMarkReservationAsExpired } from "./should-mark-reservation-as-expired";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { ONE_MINUTE } from "src/constants";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { shouldMarkReservationAsExpired } from "./should-mark-reservation-as-expired";
 
 const DEFAULT_LATE_CRITERIA = 30 * ONE_MINUTE;
 
@@ -36,24 +37,24 @@ describe("shouldMarkReservationAsExpired", () => {
     it("handles different timezones correctly", () => {
         const testCases = [
             {
-                timezone: "Europe/Vienna",
-                reservationTime: "16:00",
                 // 16:31 Vienna time
                 currentTime: new Date("2023-10-14T14:31:00Z"),
-                expected: true,
                 description: "Vienna - 16:31 is 31 minutes after 16:00",
+                expected: true,
+                reservationTime: "16:00",
+                timezone: "Europe/Vienna",
             },
             {
-                timezone: "America/New_York",
-                reservationTime: "16:00",
                 // 16:31 NY time
                 currentTime: new Date("2023-10-14T20:31:00Z"),
-                expected: true,
                 description: "NY - 16:31 is 31 minutes after 16:00",
+                expected: true,
+                reservationTime: "16:00",
+                timezone: "America/New_York",
             },
         ];
 
-        for (const { timezone, reservationTime, currentTime, expected, description } of testCases) {
+        for (const { currentTime, description, expected, reservationTime, timezone } of testCases) {
             console.log(`\nTesting ${description}`);
             vi.setSystemTime(currentTime);
 

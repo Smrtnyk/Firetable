@@ -2,58 +2,58 @@ import { FloorElementTypes } from "@firetable/floor-creator";
 
 export const ELEMENTS_TO_ADD_COLLECTION = [
     {
-        label: "Rectangle",
         img: "/svg-images/rectangle.svg",
+        label: "Rectangle",
         tag: FloorElementTypes.EDITABLE_RECT,
     },
     {
-        label: "Circle",
         img: "/svg-images/circle.svg",
+        label: "Circle",
         tag: FloorElementTypes.EDITABLE_CIRCLE,
     },
     {
-        label: "Square table",
         img: "/svg-images/square-table.svg",
+        label: "Square table",
         tag: FloorElementTypes.RECT_TABLE,
     },
     {
-        label: "Round table",
         img: "/svg-images/round-table.svg",
+        label: "Round table",
         tag: FloorElementTypes.ROUND_TABLE,
     },
     {
-        label: "Wall",
         img: "/svg-images/wall.svg",
+        label: "Wall",
         tag: FloorElementTypes.WALL,
     },
     {
-        label: "Sofa",
         img: "/svg-images/double-sofa.svg",
+        label: "Sofa",
         tag: FloorElementTypes.SOFA,
     },
     {
-        label: "DJ Booth",
         img: "/svg-images/dj-booth.svg",
+        label: "DJ Booth",
         tag: FloorElementTypes.DJ_BOOTH,
     },
     {
-        label: "Stage",
         img: "/svg-images/disco-stage.svg",
+        label: "Stage",
         tag: FloorElementTypes.STAGE,
     },
     {
-        label: "Door",
         img: "/svg-images/door.svg",
+        label: "Door",
         tag: FloorElementTypes.DOOR,
     },
     {
-        label: "Bar",
         img: "/svg-images/cocktail.svg",
+        label: "Bar",
         tag: FloorElementTypes.BAR,
     },
     {
-        label: "Cloakroom",
         img: "/svg-images/jacket.svg",
+        label: "Cloakroom",
         tag: FloorElementTypes.CLOAKROOM,
     },
     {

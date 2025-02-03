@@ -1,7 +1,8 @@
-import { db } from "./init.js";
-import { gzip, gunzip } from "node:zlib";
-import { promisify } from "node:util";
 import { createHash } from "node:crypto";
+import { promisify } from "node:util";
+import { gunzip, gzip } from "node:zlib";
+
+import { db } from "./init.js";
 
 const gzipAsync = promisify(gzip);
 const gunzipAsync = promisify(gunzip);
@@ -17,14 +18,6 @@ export async function decompressJson(compressedString: string): Promise<string> 
     return decompressed.toString();
 }
 
-export function generateFirestoreId(): string {
-    return db.collection("temp").doc().id;
-}
-
-export function hashPhoneNumber(phoneNumber: string): string {
-    return createHash("sha256").update(phoneNumber).digest("hex");
-}
-
 export function extractTableLabels(floorPlan: string): string[] {
     const floorData = JSON.parse(floorPlan);
 
@@ -35,4 +28,12 @@ export function extractTableLabels(floorPlan: string): string[] {
         .map(function (obj: any) {
             return obj.label;
         });
+}
+
+export function generateFirestoreId(): string {
+    return db.collection("temp").doc().id;
+}
+
+export function hashPhoneNumber(phoneNumber: string): string {
+    return createHash("sha256").update(phoneNumber).digest("hex");
 }

@@ -1,5 +1,6 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { isEventInProgress } from "./is-event-in-progress";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 describe("isEventInProgress", () => {
     beforeEach(() => {

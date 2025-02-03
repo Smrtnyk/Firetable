@@ -1,7 +1,8 @@
-import { useAuthStore } from "./auth-store";
-import { Role, AdminRole, DEFAULT_CAPABILITIES_BY_ROLE, UserCapability } from "@firetable/types";
+import { AdminRole, DEFAULT_CAPABILITIES_BY_ROLE, Role, UserCapability } from "@firetable/types";
 import { defineStore } from "pinia";
 import { computed } from "vue";
+
+import { useAuthStore } from "./auth-store";
 
 export const usePermissionsStore = defineStore("permissions", function () {
     const authStore = useAuthStore();
@@ -18,7 +19,7 @@ export const usePermissionsStore = defineStore("permissions", function () {
         if (!userRole) {
             return false;
         }
-        return [Role.PROPERTY_OWNER, Role.MANAGER, AdminRole.ADMIN].includes(userRole);
+        return [AdminRole.ADMIN, Role.MANAGER, Role.PROPERTY_OWNER].includes(userRole);
     });
 
     const canCreateEvents = computed(function () {
@@ -82,22 +83,22 @@ export const usePermissionsStore = defineStore("permissions", function () {
     });
 
     return {
-        capabilities,
+        canCancelReservation,
+        canConfirmReservation,
+        canCreateEvents,
+        canDeleteOwnReservation,
+        canDeleteReservation,
+        canEditFloorPlans,
         canEditOwnReservation,
         canEditReservation,
-        canSeeInventory,
-        canCreateEvents,
-        canEditFloorPlans,
-        canSeeReservationCreator,
-        canConfirmReservation,
-        canCancelReservation,
-        canDeleteOwnReservation,
-        canReserve,
-        canSeeGuestContact,
-        canDeleteReservation,
-        canSeeGuestbook,
-        canSeeAnalytics,
         canExportReservations,
+        canReserve,
+        canSeeAnalytics,
         canSeeDigitalDrinkCards,
+        canSeeGuestbook,
+        canSeeGuestContact,
+        canSeeInventory,
+        canSeeReservationCreator,
+        capabilities,
     };
 });

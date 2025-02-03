@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import FTCenteredText from "src/components/FTCenteredText.vue";
-import { usePropertiesStore } from "src/stores/properties-store";
 import { storeToRefs } from "pinia";
+import FTCenteredText from "src/components/FTCenteredText.vue";
 import { isTablet } from "src/global-reactives/screen-detection";
-import { computed } from "vue";
 import {
     formatOrganisationStatus,
     getOrganisationStatusColor,
 } from "src/helpers/organisation/organisation";
+import { usePropertiesStore } from "src/stores/properties-store";
+import { computed } from "vue";
 
 const { organisations } = storeToRefs(usePropertiesStore());
 

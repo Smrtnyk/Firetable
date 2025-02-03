@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import type { EventLog, EventLogsDoc } from "@firetable/types";
 import type { QScrollAreaProps } from "quasar";
+
 import { AdminRole } from "@firetable/types";
-import { computed, ref, useTemplateRef } from "vue";
 import { QScrollArea } from "quasar";
-import { getFormatedDateFromTimestamp } from "src/helpers/date-utils";
-import { useI18n } from "vue-i18n";
 import FTCenteredText from "src/components/FTCenteredText.vue";
+import { getFormatedDateFromTimestamp } from "src/helpers/date-utils";
+import { computed, ref, useTemplateRef } from "vue";
+import { useI18n } from "vue-i18n";
 
 export interface AdminEventLogsProps {
-    logsDoc: EventLogsDoc | null | undefined;
     isAdmin: boolean;
+    logsDoc: EventLogsDoc | null | undefined;
     timezone: string;
 }
 const props = defineProps<AdminEventLogsProps>();
@@ -28,6 +29,12 @@ const logs = computed(function () {
 });
 const showScrollButton = ref(false);
 const logsContainer = useTemplateRef<QScrollArea>("logsContainer");
+
+function formatSubtitleForEventLog({ creator, timestamp }: EventLog): string {
+    const datePart = getFormatedDateFromTimestamp(timestamp, locale.value, props.timezone);
+    const userPart = `${creator.name} (${creator.email})`;
+    return `${datePart}, by ${userPart}`;
+}
 
 function getIconNameForLogEntry(logMessage: string): string {
     if (logMessage.includes("unlinked")) {
@@ -66,12 +73,6 @@ function getIconNameForLogEntry(logMessage: string): string {
     }
 
     return "";
-}
-
-function formatSubtitleForEventLog({ creator, timestamp }: EventLog): string {
-    const datePart = getFormatedDateFromTimestamp(timestamp, locale.value, props.timezone);
-    const userPart = `${creator.name} (${creator.email})`;
-    return `${datePart}, by ${userPart}`;
 }
 
 function handleScroll(ev: Parameters<NonNullable<QScrollAreaProps["onScroll"]>>[0]): void {

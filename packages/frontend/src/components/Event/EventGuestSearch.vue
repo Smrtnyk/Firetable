@@ -1,25 +1,24 @@
 <script setup lang="ts">
 import type { AnyFunction, FloorDoc, PlannedReservation } from "@firetable/types";
 
-import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPChip.vue";
-
-import { nextTick, ref, watch, useTemplateRef } from "vue";
-import { useI18n } from "vue-i18n";
-import { QSelect } from "quasar";
-import { isObject, matchesProperty } from "es-toolkit/compat";
 import { isString } from "es-toolkit";
+import { isObject, matchesProperty } from "es-toolkit/compat";
+import { QSelect } from "quasar";
+import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPChip.vue";
+import { nextTick, ref, useTemplateRef, watch } from "vue";
+import { useI18n } from "vue-i18n";
 
 export interface EventGuestSearchProps {
-    floors: FloorDoc[];
     allReservedTables: PlannedReservation[];
+    floors: FloorDoc[];
     showFloorNameInOption: boolean;
 }
 
 interface Option {
+    arrived: boolean;
+    isVip: boolean;
     label: string;
     value: PlannedReservation;
-    isVip: boolean;
-    arrived: boolean;
 }
 
 const props = defineProps<EventGuestSearchProps>();
@@ -31,27 +30,6 @@ const options = ref(getNamesFromReservations(props.allReservedTables));
 const searchTerm = ref("");
 const hideArrived = ref(false);
 
-function removeFocus(): void {
-    nextTick(function () {
-        selectEl.value?.blur();
-    });
-}
-
-function mapReservationToOption(reservation: PlannedReservation): Option {
-    return {
-        label: createTableLabel(reservation),
-        value: reservation,
-        isVip: reservation.isVIP,
-        arrived: reservation.arrived,
-    };
-}
-
-function getNamesFromReservations(
-    reservations: PlannedReservation[],
-): { label: string; value: PlannedReservation }[] {
-    return reservations.map(mapReservationToOption);
-}
-
 function createTableLabel(reservation: PlannedReservation): string {
     const label = `${reservation.guestName} (${reservation.tableLabel})`;
     if (props.showFloorNameInOption) {
@@ -59,6 +37,19 @@ function createTableLabel(reservation: PlannedReservation): string {
         return `${label} on ${floorName?.name}`;
     }
     return label;
+}
+
+function filterFn(val: string, update: any): void {
+    update(function () {
+        const loweredVal = val.toLowerCase();
+        const filteredTables = findSearchedTable(val).filter(function (reservation) {
+            // Exclude arrived reservations if hideArrived is true
+            return !(hideArrived.value && reservation.arrived);
+        });
+        options.value = filteredTables.map(mapReservationToOption).filter(function (option) {
+            return option.value.guestName.toLowerCase().includes(loweredVal);
+        });
+    });
 }
 
 function findSearchedTable(inputVal: string | { value: PlannedReservation }): PlannedReservation[] {
@@ -95,16 +86,24 @@ function findSearchedTable(inputVal: string | { value: PlannedReservation }): Pl
     });
 }
 
-function filterFn(val: string, update: any): void {
-    update(function () {
-        const loweredVal = val.toLowerCase();
-        const filteredTables = findSearchedTable(val).filter(function (reservation) {
-            // Exclude arrived reservations if hideArrived is true
-            return !(hideArrived.value && reservation.arrived);
-        });
-        options.value = filteredTables.map(mapReservationToOption).filter(function (option) {
-            return option.value.guestName.toLowerCase().includes(loweredVal);
-        });
+function getNamesFromReservations(
+    reservations: PlannedReservation[],
+): { label: string; value: PlannedReservation }[] {
+    return reservations.map(mapReservationToOption);
+}
+
+function mapReservationToOption(reservation: PlannedReservation): Option {
+    return {
+        arrived: reservation.arrived,
+        isVip: reservation.isVIP,
+        label: createTableLabel(reservation),
+        value: reservation,
+    };
+}
+
+function removeFocus(): void {
+    nextTick(function () {
+        selectEl.value?.blur();
     });
 }
 

@@ -1,34 +1,36 @@
 <script setup lang="ts">
 import type { WalkInReservation } from "@firetable/types";
-import { isTimeWithinEventDuration } from "./reservation-form-utils";
+
 import { ReservationState, ReservationStatus, ReservationType } from "@firetable/types";
-import { ref, useTemplateRef } from "vue";
-import { useI18n } from "vue-i18n";
 import { QForm } from "quasar";
+import TelNumberInput from "src/components/TelNumberInput/TelNumberInput.vue";
+import { capitalizeName } from "src/helpers/capitalize-name";
+import { hourFromTimestamp } from "src/helpers/date-utils";
 import {
     greaterThanZero,
     noNegativeNumber,
     optionalMinLength,
     requireNumber,
 } from "src/helpers/form-rules";
-import { hourFromTimestamp } from "src/helpers/date-utils";
-import TelNumberInput from "src/components/TelNumberInput/TelNumberInput.vue";
-import { capitalizeName } from "src/helpers/capitalize-name";
+import { ref, useTemplateRef } from "vue";
+import { useI18n } from "vue-i18n";
+
+import { isTimeWithinEventDuration } from "./reservation-form-utils";
 
 interface Props {
-    mode: "create" | "update";
+    eventDurationInHours: number;
     eventStartTimestamp: number;
+    mode: "create" | "update";
     /**
      *  Optional data for editing
      */
-    reservationData: WalkInReservation | undefined;
-    eventDurationInHours: number;
+    reservationData: undefined | WalkInReservation;
     timezone: string;
 }
 
 const props = defineProps<Props>();
 
-const { t, locale } = useI18n();
+const { locale, t } = useI18n();
 
 type State = Omit<WalkInReservation, "creator" | "floorId" | "tableLabel">;
 
@@ -43,17 +45,17 @@ function generateInitialState(): State {
     const initialTime = Math.max(now, eventStart);
     const formattedTime = hourFromTimestamp(initialTime, locale.value, props.timezone);
     return {
-        type: ReservationType.WALK_IN as const,
-        state: ReservationState.ARRIVED,
-        guestName: "",
-        numberOfGuests: 2,
-        guestContact: "",
-        reservationNote: "",
-        consumption: 0,
         arrived: true as const,
-        time: formattedTime,
-        status: ReservationStatus.ACTIVE,
+        consumption: 0,
+        guestContact: "",
+        guestName: "",
         isVIP: false,
+        numberOfGuests: 2,
+        reservationNote: "",
+        state: ReservationState.ARRIVED,
+        status: ReservationStatus.ACTIVE,
+        time: formattedTime,
+        type: ReservationType.WALK_IN as const,
     };
 }
 
@@ -71,8 +73,8 @@ function reset(): void {
 
 defineExpose({
     reservationForm,
-    state,
     reset,
+    state,
 });
 </script>
 

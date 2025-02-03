@@ -1,9 +1,10 @@
-import { getEventPath } from "../../paths.js";
-import { db } from "../../init.js";
-import { clearOldEvents } from "./index.js";
-import { CollectionReference } from "firebase-admin/firestore";
-import { describe, it, beforeEach, expect, vi } from "vitest";
 import { Collection } from "@shared-types";
+import { CollectionReference } from "firebase-admin/firestore";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { db } from "../../init.js";
+import { getEventPath } from "../../paths.js";
+import { clearOldEvents } from "./index.js";
 
 describe("clearOldEvents Function", () => {
     beforeEach(async () => {
@@ -62,23 +63,23 @@ describe("clearOldEvents Function", () => {
     });
 });
 
-function getDateOneYearAgo(): Date {
-    const date = new Date();
-    date.setFullYear(date.getFullYear() - 1);
-    return date;
-}
-
 function createEventMock(
     date: Date,
     organisationId: string,
     propertyId: string,
 ): Record<string, any> {
     return {
-        name: "Event Name",
         date: date.getTime(),
         guestListLimit: 100,
         img: "image_url",
-        propertyId,
+        name: "Event Name",
         organisationId,
+        propertyId,
     };
+}
+
+function getDateOneYearAgo(): Date {
+    const date = new Date();
+    date.setFullYear(date.getFullYear() - 1);
+    return date;
 }

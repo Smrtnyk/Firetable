@@ -1,19 +1,21 @@
 import type { FloorDoc } from "@shared-types/floor.js";
 import type { PropertyDoc } from "@shared-types/property.js";
-import { BaseSeeder } from "./BaseSeeder.js";
-import { DataGenerator } from "../DataGenerator.js";
-import { compressJson } from "../utils.js";
-import { logger } from "../logger.js";
-import { getPropertyPath } from "../../src/paths.js";
+
 import { Collection } from "@shared-types/firebase.js";
 import { join } from "node:path";
+
+import { getPropertyPath } from "../../src/paths.js";
+import { DataGenerator } from "../DataGenerator.js";
+import { logger } from "../logger.js";
+import { compressJson } from "../utils.js";
+import { BaseSeeder } from "./BaseSeeder.js";
 
 export class FloorSeeder extends BaseSeeder {
     private floorPlans: {
         [key: string]: {
+            height: number;
             json: string;
             width: number;
-            height: number;
         };
     } = {};
 
@@ -34,9 +36,9 @@ export class FloorSeeder extends BaseSeeder {
 
                 floors.push({
                     ...DataGenerator.generateFloor(id, property.id, floorNumber),
+                    height: floorPlanJson.height,
                     json: compressedJson,
                     width: floorPlanJson.width,
-                    height: floorPlanJson.height,
                 });
             }
 

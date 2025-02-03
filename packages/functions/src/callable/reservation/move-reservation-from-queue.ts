@@ -1,23 +1,25 @@
 import type { CallableRequest } from "firebase-functions/https";
+
+import { logger } from "firebase-functions/v2";
+import { HttpsError } from "firebase-functions/v2/https";
+
 import { db } from "../../init.js";
 import { getQueuedReservationsPath, getReservationsPath } from "../../paths.js";
-import { HttpsError } from "firebase-functions/v2/https";
-import { logger } from "firebase-functions/v2";
 
 export interface MoveReservationFromQueueReqPayload {
     eventOwner: {
+        id: string;
         organisationId: string;
         propertyId: string;
-        id: string;
     };
-    reservationId: string;
     preparedPlannedReservation: Record<string, unknown>;
+    reservationId: string;
 }
 
 interface MoveReservationToQueueResponse {
-    success: boolean;
     message: string;
     queuedReservationId?: string;
+    success: boolean;
 }
 
 export async function moveReservationFromQueueFn(
@@ -32,7 +34,7 @@ export async function moveReservationFromQueueFn(
         );
     }
 
-    const { eventOwner, reservationId, preparedPlannedReservation } = data;
+    const { eventOwner, preparedPlannedReservation, reservationId } = data;
 
     // 2. Validate the payload
     if (
@@ -45,7 +47,7 @@ export async function moveReservationFromQueueFn(
         throw new HttpsError("invalid-argument", "Missing required fields in the request payload.");
     }
 
-    const { organisationId, propertyId, id: eventId } = eventOwner;
+    const { id: eventId, organisationId, propertyId } = eventOwner;
 
     // 3. Define Firestore references
     const queuedReservationsRef = db
@@ -76,9 +78,9 @@ export async function moveReservationFromQueueFn(
         logger.info(`Queued reservation ${result} moved from the queue successfully.`);
 
         return {
-            success: true,
             message: "Queued reservation moved from the queue successfully.",
             queuedReservationId: result,
+            success: true,
         };
     } catch (error: any) {
         logger.error("Error moving reservation from queue:", error);

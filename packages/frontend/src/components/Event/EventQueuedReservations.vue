@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { EventOwner } from "@firetable/backend";
 import type {
     EventDoc,
     PlannedReservation,
@@ -6,30 +7,28 @@ import type {
     QueuedReservationDoc,
     User,
 } from "@firetable/types";
-import type { EventOwner } from "@firetable/backend";
-import { useEventsStore } from "src/stores/events-store";
-import { useI18n } from "vue-i18n";
-import { computed } from "vue";
 
-import FTTitle from "src/components/FTTitle.vue";
-import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPChip.vue";
-import FTDialog from "src/components/FTDialog.vue";
-import EventCreateReservation from "src/components/Event/reservation/EventCreateReservation.vue";
-import FTCenteredText from "src/components/FTCenteredText.vue";
-import EventShowQueuedReservation from "src/components/Event/reservation/EventShowQueuedReservation.vue";
-
-import { useDialog } from "src/composables/useDialog";
-import { useAuthStore } from "src/stores/auth-store";
 import { storeToRefs } from "pinia";
-import { usePropertiesStore } from "src/stores/properties-store";
-import { plannedToQueuedReservation } from "src/helpers/reservation/planned-to-queued-reservation";
+import EventCreateReservation from "src/components/Event/reservation/EventCreateReservation.vue";
+import EventShowQueuedReservation from "src/components/Event/reservation/EventShowQueuedReservation.vue";
+import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPChip.vue";
 import FTBtn from "src/components/FTBtn.vue";
+import FTCenteredText from "src/components/FTCenteredText.vue";
+import FTDialog from "src/components/FTDialog.vue";
+import FTTitle from "src/components/FTTitle.vue";
+import { useDialog } from "src/composables/useDialog";
+import { plannedToQueuedReservation } from "src/helpers/reservation/planned-to-queued-reservation";
+import { useAuthStore } from "src/stores/auth-store";
+import { useEventsStore } from "src/stores/events-store";
+import { usePropertiesStore } from "src/stores/properties-store";
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 export interface EventQueuedReservationsProps {
     data: QueuedReservationDoc[];
-    error: unknown | undefined;
-    eventOwner: EventOwner;
+    error: undefined | unknown;
     eventData: EventDoc;
+    eventOwner: EventOwner;
     users: User[];
 }
 
@@ -39,7 +38,7 @@ interface Emits {
 }
 
 const emit = defineEmits<Emits>();
-const { data, error, eventOwner, users, eventData } = defineProps<EventQueuedReservationsProps>();
+const { data, error, eventData, eventOwner, users } = defineProps<EventQueuedReservationsProps>();
 
 const { nonNullableUser } = storeToRefs(useAuthStore());
 const { t } = useI18n();
@@ -56,16 +55,14 @@ function addNewQueuedReservation(): void {
         component: FTDialog,
         componentProps: {
             component: EventCreateReservation,
-            title: `${t("EventQueuedReservations.addNewReservation")}`,
-            maximized: false,
             componentPropsObject: {
-                timezone: propertiesSettings.value.timezone,
-                mode: "create",
                 currentUser: nonNullableUser.value,
-                users,
-                eventStartTimestamp: eventData.date,
                 eventDurationInHours: propertiesSettings.value.event.eventDurationInHours,
+                eventStartTimestamp: eventData.date,
+                mode: "create",
                 onlyPlanned: true,
+                timezone: propertiesSettings.value.timezone,
+                users,
             },
             listeners: {
                 create(reservationData: PlannedReservation) {
@@ -73,6 +70,8 @@ function addNewQueuedReservation(): void {
                     dialog.hide();
                 },
             },
+            maximized: false,
+            title: `${t("EventQueuedReservations.addNewReservation")}`,
         },
     });
 }
@@ -82,23 +81,23 @@ function showReservation(reservation: QueuedReservationDoc): void {
         component: FTDialog,
         componentProps: {
             component: EventShowQueuedReservation,
-            title: "",
-            maximized: false,
             componentPropsObject: {
-                timezone: propertiesSettings.value.timezone,
                 reservation,
+                timezone: propertiesSettings.value.timezone,
             },
             listeners: {
+                delete() {
+                    emit("delete", reservation);
+                    dialog.hide();
+                },
                 unqueue() {
                     emit("unqueue", reservation);
                     dialog.hide();
                     eventsStore.toggleQueuedReservationsDrawerVisibility();
                 },
-                delete() {
-                    emit("delete", reservation);
-                    dialog.hide();
-                },
             },
+            maximized: false,
+            title: "",
         },
     });
 }

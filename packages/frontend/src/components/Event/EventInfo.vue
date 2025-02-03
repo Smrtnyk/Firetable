@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { FloorDoc, ReservationDoc } from "@firetable/types";
+
 import AdminEventRTInfo from "src/components/admin/event/AdminEventRTInfo.vue";
 
 interface Props {
+    activeReservations: ReservationDoc[];
     eventInfo: string | undefined;
     floors: FloorDoc[];
-    activeReservations: ReservationDoc[];
     returningGuests: { id: string }[];
 }
 

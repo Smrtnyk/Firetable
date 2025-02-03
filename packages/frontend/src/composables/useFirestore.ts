@@ -1,4 +1,5 @@
-import type { Query, DocumentData, DocumentReference, QueryConstraint } from "firebase/firestore";
+import type { DocumentData, DocumentReference, Query, QueryConstraint } from "firebase/firestore";
+import type { ComputedRef } from "vue";
 import type {
     _RefFirestore,
     UseCollectionOptions,
@@ -6,14 +7,42 @@ import type {
     VueFirestoreDocumentData,
     VueFirestoreQueryData,
 } from "vuefire";
-import type { ComputedRef } from "vue";
-import { collection, doc, query, setDoc } from "firebase/firestore";
+
 import { initializeFirebase } from "@firetable/backend";
-import { useCollection, useDocument } from "vuefire";
 import { isString } from "es-toolkit";
+import { collection, doc, query, setDoc } from "firebase/firestore";
+import { useCollection, useDocument } from "vuefire";
+
+export function createQuery<T>(
+    collectionRefOrPath: any,
+    ...queryConstraints: QueryConstraint[]
+): Query<T> {
+    if (isString(collectionRefOrPath)) {
+        const { firestore } = initializeFirebase();
+        const collectionRef = collection(firestore, collectionRefOrPath);
+        // @ts-expect-error -- not sure why it complains, but it works like this
+        return query<T, DocumentData>(collectionRef, ...queryConstraints);
+    }
+
+    return query<T, DocumentData>(collectionRefOrPath, ...queryConstraints);
+}
+
+export function getFirestoreDocument(path: string): DocumentReference {
+    const { firestore } = initializeFirebase();
+    return doc(firestore, path);
+}
+
+export function updateFirestoreDocument<T>(
+    documentRef: DocumentReference<T>,
+    updates: Partial<T>,
+): Promise<void> {
+    return setDoc<T, DocumentData>(documentRef, updates, {
+        merge: true,
+    });
+}
 
 export function useFirestoreCollection<T extends DocumentData>(
-    path: ComputedRef<Query<T> | null> | Query<T> | string,
+    path: ComputedRef<null | Query<T>> | Query<T> | string,
     options: UseCollectionOptions<T[]> = {},
 ): _RefFirestore<VueFirestoreQueryData<T>> {
     const mergedOpts = {
@@ -30,35 +59,7 @@ export function useFirestoreCollection<T extends DocumentData>(
 export function useFirestoreDocument<T>(
     path: string,
     options: UseDocumentOptions<T> = {},
-): _RefFirestore<VueFirestoreDocumentData<T> | undefined> {
+): _RefFirestore<undefined | VueFirestoreDocumentData<T>> {
     const { firestore } = initializeFirebase();
     return useDocument<T>(doc(firestore, path), options);
-}
-
-export function updateFirestoreDocument<T>(
-    documentRef: DocumentReference<T>,
-    updates: Partial<T>,
-): Promise<void> {
-    return setDoc<T, DocumentData>(documentRef, updates, {
-        merge: true,
-    });
-}
-
-export function getFirestoreDocument(path: string): DocumentReference {
-    const { firestore } = initializeFirebase();
-    return doc(firestore, path);
-}
-
-export function createQuery<T>(
-    collectionRefOrPath: any,
-    ...queryConstraints: QueryConstraint[]
-): Query<T> {
-    if (isString(collectionRefOrPath)) {
-        const { firestore } = initializeFirebase();
-        const collectionRef = collection(firestore, collectionRefOrPath);
-        // @ts-expect-error -- not sure why it complains, but it works like this
-        return query<T, DocumentData>(collectionRef, ...queryConstraints);
-    }
-
-    return query<T, DocumentData>(collectionRefOrPath, ...queryConstraints);
 }

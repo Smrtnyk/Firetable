@@ -1,11 +1,14 @@
-import type { RenderResult } from "vitest-browser-vue";
 import type { OrganisationDoc, PropertyDoc } from "@firetable/types";
-import type { PageAdminPropertySettingsProps } from "./PageAdminPropertySettings.vue";
-import PageAdminPropertySettings from "./PageAdminPropertySettings.vue";
-import { renderComponent } from "../../../test-helpers/render-component";
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import type { RenderResult } from "vitest-browser-vue";
+
 import { page, userEvent } from "@vitest/browser/context";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { nextTick } from "vue";
+
+import type { PageAdminPropertySettingsProps } from "./PageAdminPropertySettings.vue";
+
+import { renderComponent } from "../../../test-helpers/render-component";
+import PageAdminPropertySettings from "./PageAdminPropertySettings.vue";
 
 const { updateOrganisationSettingsMock, updatePropertySettingsMock } = vi.hoisted(() => ({
     updateOrganisationSettingsMock: vi.fn(),
@@ -13,12 +16,12 @@ const { updateOrganisationSettingsMock, updatePropertySettingsMock } = vi.hoiste
 }));
 
 vi.mock("../../backend-proxy", () => ({
-    updateOrganisationSettings: updateOrganisationSettingsMock,
-    updatePropertySettings: updatePropertySettingsMock,
     fetchOrganisationById: vi.fn(),
     fetchOrganisationsForAdmin: vi.fn(),
     fetchPropertiesForAdmin: vi.fn(),
     propertiesCollection: vi.fn(),
+    updateOrganisationSettings: updateOrganisationSettingsMock,
+    updatePropertySettings: updatePropertySettingsMock,
 }));
 
 describe("PageAdminPropertySettings.vue", () => {
@@ -42,21 +45,21 @@ describe("PageAdminPropertySettings.vue", () => {
                 name: "Property One",
                 organisationId: "org1",
                 settings: {
-                    timezone: "Europe/Vienna",
-                    markGuestAsLateAfterMinutes: 15,
                     event: {
-                        eventStartTime24HFormat: "22:00",
-                        eventDurationInHours: 10,
                         eventCardAspectRatio: "16:9",
+                        eventDurationInHours: 10,
+                        eventStartTime24HFormat: "22:00",
                         reservationArrivedColor: "#1a7722",
-                        reservationConfirmedColor: "#6247aa",
                         reservationCancelledColor: "#ff9f43",
+                        reservationConfirmedColor: "#6247aa",
                         reservationPendingColor: "#2ab7ca",
                         reservationWaitingForResponseColor: "#b5a22c",
                     },
                     guest: {
                         collectGuestData: false,
                     },
+                    markGuestAsLateAfterMinutes: 15,
+                    timezone: "Europe/Vienna",
                 },
             },
             {
@@ -64,21 +67,21 @@ describe("PageAdminPropertySettings.vue", () => {
                 name: "Property Two",
                 organisationId: "org1",
                 settings: {
-                    timezone: "Europe/Athens",
-                    markGuestAsLateAfterMinutes: 30,
                     event: {
-                        eventStartTime24HFormat: "22:00",
-                        eventDurationInHours: 10,
                         eventCardAspectRatio: "16:9",
+                        eventDurationInHours: 10,
+                        eventStartTime24HFormat: "22:00",
                         reservationArrivedColor: "#1a7722",
-                        reservationConfirmedColor: "#6247aa",
                         reservationCancelledColor: "#ff9f43",
+                        reservationConfirmedColor: "#6247aa",
                         reservationPendingColor: "#2ab7ca",
                         reservationWaitingForResponseColor: "#b5a22c",
                     },
                     guest: {
                         collectGuestData: false,
                     },
+                    markGuestAsLateAfterMinutes: 30,
+                    timezone: "Europe/Athens",
                 },
             },
         ] as PropertyDoc[];
@@ -91,8 +94,8 @@ describe("PageAdminPropertySettings.vue", () => {
             piniaStoreOptions: {
                 initialState: {
                     properties: {
-                        properties: propertiesData,
                         organisations: [organisationData],
+                        properties: propertiesData,
                     },
                 },
             },

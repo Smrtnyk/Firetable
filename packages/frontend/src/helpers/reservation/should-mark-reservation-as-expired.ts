@@ -1,5 +1,5 @@
-import { AppLogger } from "src/logger/FTLogger";
 import { addDays } from "date-fns";
+import { AppLogger } from "src/logger/FTLogger";
 
 /**
  * Determines whether a reservation should be marked as expired based on the reservation time,
@@ -35,21 +35,21 @@ export function shouldMarkReservationAsExpired(
     }
 
     const formatter = new Intl.DateTimeFormat("en-US", {
-        timeZone: propertyTimezone,
-        year: "numeric",
-        month: "numeric",
         day: "numeric",
         hour: "numeric",
-        minute: "numeric",
-        second: "numeric",
         hour12: false,
+        minute: "numeric",
+        month: "numeric",
+        second: "numeric",
+        timeZone: propertyTimezone,
+        year: "numeric",
     });
 
     // Get current time in property timezone
     const now = new Date();
     const currentParts = formatter.formatToParts(now);
     const currentObj = currentParts.reduce<Record<string, number>>((acc, part) => {
-        if (["year", "month", "day", "hour", "minute", "second"].includes(part.type)) {
+        if (["day", "hour", "minute", "month", "second", "year"].includes(part.type)) {
             acc[part.type] = Number(part.value);
         }
         return acc;
@@ -58,7 +58,7 @@ export function shouldMarkReservationAsExpired(
     // Get event date in property timezone
     const eventParts = formatter.formatToParts(eventDate);
     const eventObj = eventParts.reduce<Record<string, number>>((acc, part) => {
-        if (["year", "month", "day", "hour"].includes(part.type)) {
+        if (["day", "hour", "month", "year"].includes(part.type)) {
             acc[part.type] = Number(part.value);
         }
         return acc;

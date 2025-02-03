@@ -1,9 +1,12 @@
-import type { EventGuestSearchProps } from "./EventGuestSearch.vue";
 import type { RenderResult } from "vitest-browser-vue";
-import EventGuestSearch from "./EventGuestSearch.vue";
-import { renderComponent } from "../../../test-helpers/render-component";
-import { describe, it, expect } from "vitest";
+
 import { userEvent } from "@vitest/browser/context";
+import { describe, expect, it } from "vitest";
+
+import type { EventGuestSearchProps } from "./EventGuestSearch.vue";
+
+import { renderComponent } from "../../../test-helpers/render-component";
+import EventGuestSearch from "./EventGuestSearch.vue";
 
 describe("EventGuestSearch.vue", () => {
     const floors = [
@@ -13,20 +16,20 @@ describe("EventGuestSearch.vue", () => {
 
     const reservations = [
         {
-            guestName: "John Doe",
-            tableLabel: "Table 1",
-            floorId: "floor1",
-            isVIP: false,
             // Guest has arrived
             arrived: true,
+            floorId: "floor1",
+            guestName: "John Doe",
+            isVIP: false,
+            tableLabel: "Table 1",
         },
         {
-            guestName: "Jane Smith",
-            tableLabel: "Table 2",
-            floorId: "floor2",
-            isVIP: true,
             // Guest has not arrived
             arrived: false,
+            floorId: "floor2",
+            guestName: "Jane Smith",
+            isVIP: true,
+            tableLabel: "Table 2",
         },
     ];
 
@@ -34,8 +37,8 @@ describe("EventGuestSearch.vue", () => {
 
     function createComponent(): RenderResult<EventGuestSearchProps> {
         return renderComponent(EventGuestSearch, {
-            floors,
             allReservedTables: reservations,
+            floors,
             showFloorNameInOption,
         });
     }

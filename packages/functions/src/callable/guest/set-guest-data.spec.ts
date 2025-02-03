@@ -1,10 +1,13 @@
-import type { GuestData, PreparedGuestData } from "./set-guest-data.js";
-import type { CallableRequest } from "firebase-functions/v2/https";
 import type { GuestDoc } from "@shared-types";
-import { setGuestDataFn } from "./set-guest-data.js";
-import { getGuestsPath } from "../../paths.js";
+import type { CallableRequest } from "firebase-functions/v2/https";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { GuestData, PreparedGuestData } from "./set-guest-data.js";
+
 import { db } from "../../init.js";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { getGuestsPath } from "../../paths.js";
+import { setGuestDataFn } from "./set-guest-data.js";
 
 const organisationId = "orgId";
 const contact = "guestContact";
@@ -12,13 +15,13 @@ const maskedContact = "maskedContact";
 const hashedContact = "hashedContact";
 
 const preparedGuestData: PreparedGuestData = {
-    contact,
-    maskedContact,
-    hashedContact,
-    guestName: "guestName",
-    cancelled: false,
     arrived: false,
+    cancelled: false,
+    contact,
+    guestName: "guestName",
+    hashedContact,
     isVIP: true,
+    maskedContact,
 };
 
 const mockTimestamp = 1_699_999_999_999;
@@ -26,12 +29,12 @@ const mockTimestamp = 1_699_999_999_999;
 const date = Date.now();
 
 const testRequestData = {
-    preparedGuestData,
-    propertyId: "propertyId",
-    organisationId,
+    eventDate: date,
     eventId: "eventId",
     eventName: "eventName",
-    eventDate: date,
+    organisationId,
+    preparedGuestData,
+    propertyId: "propertyId",
 };
 
 describe("setGuestDataFn", () => {
@@ -67,11 +70,11 @@ describe("setGuestDataFn", () => {
 
     it("should update an existing guest with new visit information", async () => {
         const initialGuestData: Omit<GuestDoc, "id"> = {
-            lastModified: 1,
-            name: "guestName",
             contact,
             hashedContact,
+            lastModified: 1,
             maskedContact,
+            name: "guestName",
             visitedProperties: {},
         };
 
@@ -80,12 +83,12 @@ describe("setGuestDataFn", () => {
         await guestsCollectionRef.add(initialGuestData);
 
         const requestData = {
-            preparedGuestData: { ...preparedGuestData, arrived: true },
-            propertyId: "propertyId",
-            organisationId,
+            eventDate: date,
             eventId: "eventId",
             eventName: "eventName",
-            eventDate: date,
+            organisationId,
+            preparedGuestData: { ...preparedGuestData, arrived: true },
+            propertyId: "propertyId",
         };
 
         await setGuestDataFn({ data: requestData } as CallableRequest<GuestData>);
@@ -114,10 +117,11 @@ describe("setGuestDataFn", () => {
 
     it("should update lastModified when adding a new visit to an existing guest", async () => {
         const initialGuestData: Omit<GuestDoc, "id"> = {
-            name: "guestName",
             contact,
             hashedContact,
+            lastModified: 1,
             maskedContact,
+            name: "guestName",
             visitedProperties: {
                 propertyId: {
                     existingEventId: {
@@ -129,7 +133,6 @@ describe("setGuestDataFn", () => {
                     },
                 },
             },
-            lastModified: 1,
         };
 
         // Add a guest document to the guests collection
@@ -137,12 +140,12 @@ describe("setGuestDataFn", () => {
         await guestsCollectionRef.add(initialGuestData);
 
         const requestData = {
-            preparedGuestData: { ...preparedGuestData, arrived: true },
-            propertyId: "propertyId",
-            organisationId,
+            eventDate: date,
             eventId: "newEventId",
             eventName: "newEventName",
-            eventDate: date,
+            organisationId,
+            preparedGuestData: { ...preparedGuestData, arrived: true },
+            propertyId: "propertyId",
         };
 
         await setGuestDataFn({ data: requestData } as CallableRequest<GuestData>);
@@ -170,14 +173,14 @@ describe("setGuestDataFn", () => {
 
     it("should handle errors gracefully", async () => {
         const requestData = {
+            eventDate: date,
+            eventId: "eventId",
+            eventName: "eventName",
+            organisationId: "orgId",
             preparedGuestData: {
                 // Invalid reservation data
             },
             propertyId: "propertyId",
-            organisationId: "orgId",
-            eventId: "eventId",
-            eventName: "eventName",
-            eventDate: date,
         };
 
         // Expect the function to throw an error due to invalid data

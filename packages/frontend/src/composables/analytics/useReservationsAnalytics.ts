@@ -1,18 +1,19 @@
 import type { PropertyDoc } from "@firetable/types";
-import type { Ref } from "vue";
-import type { AugmentedPlannedReservation, ReservationBucket } from "src/stores/analytics-store.js";
 import type { PieChartData, TimeSeriesData } from "src/components/admin/analytics/types.js";
+import type { AugmentedPlannedReservation, ReservationBucket } from "src/stores/analytics-store.js";
 import type { DateRange } from "src/types";
-import { bucketizeReservations } from "./bucketize-reservations.js";
-import { fetchAnalyticsData } from "../../backend-proxy";
-import { computed, onUnmounted, ref } from "vue";
-import { useAnalyticsStore } from "src/stores/analytics-store.js";
+import type { Ref } from "vue";
 
-import { Loading } from "quasar";
-import { showErrorMessage } from "src/helpers/ui-helpers.js";
 import { format } from "date-fns";
+import { Loading } from "quasar";
 import { getColors } from "src/helpers/colors.js";
 import { getLocalizedDaysOfWeek } from "src/helpers/date-utils";
+import { showErrorMessage } from "src/helpers/ui-helpers.js";
+import { useAnalyticsStore } from "src/stores/analytics-store.js";
+import { computed, onUnmounted, ref } from "vue";
+
+import { fetchAnalyticsData } from "../../backend-proxy";
+import { bucketizeReservations } from "./bucketize-reservations.js";
 const DEFAULT_SELECTED_DAY = "ALL";
 
 const ENG_DAYS_OF_WEEK = [
@@ -59,14 +60,14 @@ export function useReservationsAnalytics(
 
         return [
             {
+                itemStyle: { color: backgroundColors[0] },
                 name: "Planned",
                 value: planned,
-                itemStyle: { color: backgroundColors[0] },
             },
             {
+                itemStyle: { color: backgroundColors[1] },
                 name: "Walk-In",
                 value: walkIn,
-                itemStyle: { color: backgroundColors[1] },
             },
         ];
     });
@@ -112,14 +113,14 @@ export function useReservationsAnalytics(
 
         return [
             {
+                itemStyle: { color: backgroundColors[0] },
                 name: "Arrived",
                 value: arrived,
-                itemStyle: { color: backgroundColors[0] },
             },
             {
+                itemStyle: { color: backgroundColors[1] },
                 name: "No-Show",
                 value: pending,
-                itemStyle: { color: backgroundColors[1] },
             },
         ];
     });
@@ -158,15 +159,15 @@ export function useReservationsAnalytics(
 
         return [
             {
-                name: "Reservations",
                 data: [reservationBucket.value?.plannedReservations.length ?? 0],
                 itemStyle: { color: backgroundColors[0] },
+                name: "Reservations",
             },
         ];
     });
 
     const consumptionAnalysisCombined = computed<TimeSeriesData>(function () {
-        const { totalConsumption, arrivedConsumption, arrivedCount, pendingCount } =
+        const { arrivedConsumption, arrivedCount, pendingCount, totalConsumption } =
             plannedReservationsByActiveProperty.value.reduce(
                 function (acc, reservation) {
                     const consumption = reservation.consumption;
@@ -182,10 +183,10 @@ export function useReservationsAnalytics(
                     return acc;
                 },
                 {
-                    totalConsumption: 0,
                     arrivedConsumption: 0,
                     arrivedCount: 0,
                     pendingCount: 0,
+                    totalConsumption: 0,
                 },
             );
 
@@ -198,21 +199,21 @@ export function useReservationsAnalytics(
 
         return [
             {
-                name: "Total",
                 data: [toTwoDecimals(averageTotal)],
                 itemStyle: { color: backgroundColors[0] },
+                name: "Total",
                 stack: "consumption",
             },
             {
-                name: "Arrived",
                 data: [toTwoDecimals(averageArrived)],
                 itemStyle: { color: backgroundColors[1] },
+                name: "Arrived",
                 stack: "consumption",
             },
             {
-                name: "Pending",
                 data: [toTwoDecimals(averagePending)],
                 itemStyle: { color: backgroundColors[2] },
+                name: "Pending",
                 stack: "consumption",
             },
         ];
@@ -249,9 +250,9 @@ export function useReservationsAnalytics(
 
         return [
             {
-                name: "Reservations per Hour",
                 data: sortedHours.map((hour) => hourlyTotals[hour]),
                 itemStyle: { color: backgroundColors[0] },
+                name: "Reservations per Hour",
             },
         ];
     });
@@ -284,9 +285,9 @@ export function useReservationsAnalytics(
 
         return [
             {
-                name: "Guest Distribution",
                 data: labels.map((key) => distribution[key]),
                 itemStyle: { color: backgroundColors[0] },
+                name: "Guest Distribution",
             },
         ];
     });
@@ -307,9 +308,9 @@ export function useReservationsAnalytics(
 
         return [
             {
-                name: "Reservations by Day",
                 data: ENG_DAYS_OF_WEEK.map((day) => dayOfWeekTotals[day] ?? 0),
                 itemStyle: { color: backgroundColors[0] },
+                name: "Reservations by Day",
             },
         ];
     });
@@ -360,30 +361,30 @@ export function useReservationsAnalytics(
     }
 
     return {
-        fetchData,
+        avgGuestsPerReservation,
+        consumptionAnalysisCombined,
         DAYS_OF_WEEK,
-        propertyLabels,
-        peakHoursLabels,
+        fetchData,
+        guestDistributionAnalysis,
         guestDistributionLabels,
-        reservationBucket,
+        peakHoursLabels,
+        peakReservationHours,
+        plannedArrivedVsNoShow,
         plannedReservationsByActiveProperty,
         plannedReservationsByDay,
-        selectedDay,
-        plannedArrivedVsNoShow,
-        avgGuestsPerReservation,
         plannedReservationsByProperty,
-        consumptionAnalysisCombined,
-        peakReservationHours,
-        guestDistributionAnalysis,
-        reservationsByDayOfWeek,
         plannedVsWalkInReservations,
+        propertyLabels,
+        reservationBucket,
+        reservationsByDayOfWeek,
+        selectedDay,
     };
-}
-
-function toTwoDecimals(num: number): number {
-    return Number.parseFloat(num.toFixed(2));
 }
 
 function sortNumericStrings(strings: string[]): string[] {
     return strings.sort((a, b) => Number(a) - Number(b));
+}
+
+function toTwoDecimals(num: number): number {
+    return Number.parseFloat(num.toFixed(2));
 }

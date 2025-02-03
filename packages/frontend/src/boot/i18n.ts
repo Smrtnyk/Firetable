@@ -1,22 +1,17 @@
-import { createI18n } from "vue-i18n";
+import { Lang, LocalStorage } from "quasar";
 import { boot } from "quasar/wrappers";
-import { LocalStorage, Lang } from "quasar";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { createI18n } from "vue-i18n";
 
 const DEFAULT_LANG = "en-GB";
 const savedLanguage = LocalStorage.getItem<string>("FTLang") ?? DEFAULT_LANG;
 
 export const i18n = createI18n({
-    locale: savedLanguage,
     fallbackLocale: "en-GB",
-    messages: {},
     legacy: false,
+    locale: savedLanguage,
+    messages: {},
 });
-
-export function loadLanguage(langIso: string): Promise<{ default: Record<string, unknown> }> {
-    // eslint-disable-next-line no-inline-comments -- needed for Vite
-    return import(/* @vite-ignore */ `../i18n/${langIso}`);
-}
 
 export async function dynamicallySwitchLang(langIso: string): Promise<void> {
     if (!langIso) return;
@@ -34,6 +29,11 @@ export async function dynamicallySwitchLang(langIso: string): Promise<void> {
             LocalStorage.set("FTLang", langIso);
         },
     });
+}
+
+export function loadLanguage(langIso: string): Promise<{ default: Record<string, unknown> }> {
+    // eslint-disable-next-line no-inline-comments -- needed for Vite
+    return import(/* @vite-ignore */ `../i18n/${langIso}`);
 }
 
 export default boot(async function ({ app }) {

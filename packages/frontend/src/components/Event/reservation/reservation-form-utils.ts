@@ -14,7 +14,7 @@ export function isTimeWithinEventDuration(
     eventStartTimestamp: number,
     eventDurationHours: number,
     hours: number,
-    minutes: number | null = 0,
+    minutes: null | number = 0,
 ): boolean {
     if (
         hours < 0 ||

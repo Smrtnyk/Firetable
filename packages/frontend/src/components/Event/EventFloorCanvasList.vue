@@ -3,11 +3,11 @@ import type { FloorDoc } from "@firetable/types";
 
 export interface EventFloorCanvasListProps {
     eventFloors: FloorDoc[];
-    mapFloorToCanvas: (floor: FloorDoc) => (element: any) => void;
     isActiveFloor: (floorId: string) => boolean;
+    mapFloorToCanvas: (floor: FloorDoc) => (element: any) => void;
 }
 
-const { eventFloors, mapFloorToCanvas, isActiveFloor } = defineProps<EventFloorCanvasListProps>();
+const { eventFloors, isActiveFloor, mapFloorToCanvas } = defineProps<EventFloorCanvasListProps>();
 </script>
 
 <template>

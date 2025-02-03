@@ -1,4 +1,5 @@
 import type { Reservation } from "@firetable/types";
+
 import { isPlannedReservation } from "@firetable/types";
 
 type ColorPalette = {

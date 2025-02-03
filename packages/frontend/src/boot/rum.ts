@@ -1,5 +1,5 @@
-import { boot } from "quasar/wrappers";
 import * as Sentry from "@sentry/vue";
+import { boot } from "quasar/wrappers";
 import { AppLogger } from "src/logger/FTLogger";
 
 export default boot(async function ({ app, router }) {
@@ -10,11 +10,11 @@ export default boot(async function ({ app, router }) {
         Sentry.init({
             app,
             dsn,
-            tracesSampleRate: 1,
             environment: import.meta.env.PROD ? "production" : "development",
-            integrations: [Sentry.browserTracingIntegration({ router })],
-            trackComponents: true,
             hooks: ["mount", "update", "unmount"],
+            integrations: [Sentry.browserTracingIntegration({ router })],
+            tracesSampleRate: 1,
+            trackComponents: true,
         });
     } catch (error) {
         AppLogger.error("Failed to initialize Sentry - continuing without monitoring", error);

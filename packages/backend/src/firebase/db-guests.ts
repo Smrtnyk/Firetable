@@ -1,40 +1,28 @@
 import type { CreateGuestPayload, GuestDataPayload, GuestDoc, Visit } from "@firetable/types";
 import type { HttpsCallableResult } from "firebase/functions";
-import { initializeFirebase } from "./base.js";
-import { guestDoc } from "./db.js";
-import { getGuestsPath } from "./paths.js";
+
 import {
-    deleteDoc,
     addDoc,
     collection,
-    onSnapshot,
+    deleteDoc,
     getDoc,
+    onSnapshot,
     updateDoc,
     writeBatch,
 } from "firebase/firestore";
 import { httpsCallable } from "firebase/functions";
 
+import { initializeFirebase } from "./base.js";
+import { guestDoc } from "./db.js";
+import { getGuestsPath } from "./paths.js";
+
 export type GuestsSubscriptionCallback = {
     onAdd: (guest: GuestDoc) => void;
-    onModify: (guest: GuestDoc) => void;
-    onRemove: (guestId: string) => void;
     onError?: (error: Error) => void;
+    onModify: (guest: GuestDoc) => void;
     onReady?: () => void;
+    onRemove: (guestId: string) => void;
 };
-
-export function setGuestData(guestData: GuestDataPayload): Promise<HttpsCallableResult> {
-    const { functions } = initializeFirebase();
-    return httpsCallable(functions, "setGuestData")(guestData);
-}
-
-export function deleteGuestVisit(guestData: GuestDataPayload): Promise<HttpsCallableResult> {
-    const { functions } = initializeFirebase();
-    return httpsCallable(functions, "deleteGuestVisit")(guestData);
-}
-
-export function deleteGuest(organisationId: string, guestId: string): Promise<void> {
-    return deleteDoc(guestDoc(organisationId, guestId));
-}
 
 export async function batchDeleteGuests(organisationId: string, guestIds: string[]): Promise<void> {
     const { firestore } = initializeFirebase();
@@ -57,27 +45,18 @@ export async function createGuest(
     await addDoc(guestsCollectionRef, guestData);
 }
 
-/**
- * Updates a guest's contact and/or name via Cloud Function.
- *
- * @param organisationId - The ID of the organisation.
- * @param guestId - The current guest ID (current contact information).
- * @param updatedData - The updated guest data (name and contact).
- * @returns A promise that resolves when the update is complete.
- */
-export async function updateGuestInfo(
-    organisationId: string,
-    guestId: string,
-    updatedData: CreateGuestPayload,
-): Promise<void> {
-    const { functions } = initializeFirebase();
-    const updateGuestInfoFn = httpsCallable(functions, "updateGuestData");
+export function deleteGuest(organisationId: string, guestId: string): Promise<void> {
+    return deleteDoc(guestDoc(organisationId, guestId));
+}
 
-    await updateGuestInfoFn({
-        organisationId,
-        guestId,
-        updatedData,
-    });
+export function deleteGuestVisit(guestData: GuestDataPayload): Promise<HttpsCallableResult> {
+    const { functions } = initializeFirebase();
+    return httpsCallable(functions, "deleteGuestVisit")(guestData);
+}
+
+export function setGuestData(guestData: GuestDataPayload): Promise<HttpsCallableResult> {
+    const { functions } = initializeFirebase();
+    return httpsCallable(functions, "setGuestData")(guestData);
 }
 
 export function subscribeToGuests(
@@ -113,6 +92,29 @@ export function subscribeToGuests(
             callbacks.onError?.(error);
         },
     );
+}
+
+/**
+ * Updates a guest's contact and/or name via Cloud Function.
+ *
+ * @param organisationId - The ID of the organisation.
+ * @param guestId - The current guest ID (current contact information).
+ * @param updatedData - The updated guest data (name and contact).
+ * @returns A promise that resolves when the update is complete.
+ */
+export async function updateGuestInfo(
+    organisationId: string,
+    guestId: string,
+    updatedData: CreateGuestPayload,
+): Promise<void> {
+    const { functions } = initializeFirebase();
+    const updateGuestInfoFn = httpsCallable(functions, "updateGuestData");
+
+    await updateGuestInfoFn({
+        guestId,
+        organisationId,
+        updatedData,
+    });
 }
 
 export async function updateGuestVisit(

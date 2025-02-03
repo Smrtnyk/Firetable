@@ -1,12 +1,14 @@
 /* eslint-disable func-style,@typescript-eslint/no-non-null-assertion,id-length */
 import type { BasicTransformEvent, Canvas, FabricObject, Point } from "fabric";
+
 import type { AligningLineConfig, LineProps } from "./typedefs.js";
+
+import { aligningLineConfig } from "./constant.js";
+import { getContraryMap, getPointMap } from "./util/basic.js";
+import { collectLine } from "./util/collect-line.js";
 import { collectHorizontalPoint, collectVerticalPoint } from "./util/collect-point.js";
 import { drawHorizontalLine, drawPointList, drawVerticalLine } from "./util/draw.js";
-import { collectLine } from "./util/collect-line.js";
-import { aligningLineConfig } from "./constant.js";
 import { getObjectsByTarget } from "./util/get-objects-by-target.js";
-import { getContraryMap, getPointMap } from "./util/basic.js";
 
 type TransformEvent = BasicTransformEvent & {
     target: FabricObject;
@@ -56,7 +58,7 @@ export function initAligningGuidelines(canvas: Canvas, options: Partial<Aligning
         for (const object of objects) points.push(...getCaCheMapValue(object));
 
         // Obtain horizontal and vertical reference lines.
-        const { vLines, hLines } = collectLine(target, points);
+        const { hLines, vLines } = collectLine(target, points);
         vLines.forEach((o) => {
             // Objects cannot be deduplicated; convert them to strings for deduplication.
             verticalLines.add(JSON.stringify(o));
@@ -128,14 +130,14 @@ export function initAligningGuidelines(canvas: Canvas, options: Partial<Aligning
         }
 
         const props = {
-            target,
-            point,
-            diagonalPoint,
             corner,
-            list,
+            diagonalPoint,
+            isCenter,
             isScale,
             isUniform,
-            isCenter,
+            list,
+            point,
+            target,
         };
         // Obtain horizontal and vertical reference lines.
         const noNeedToCollectV = onlyDrawPoint && (corner.includes("t") || corner.includes("b"));

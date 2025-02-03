@@ -1,25 +1,24 @@
 <script setup lang="ts">
 import type { FloorDoc, VoidFunction } from "@firetable/types";
 
-import AddNewFloorForm from "src/components/Floor/AddNewFloorForm.vue";
-import FTTitle from "src/components/FTTitle.vue";
-import FTDialog from "src/components/FTDialog.vue";
-import FTCenteredText from "src/components/FTCenteredText.vue";
-
-import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { Loading } from "quasar";
+import { addFloor, deleteFloor } from "@firetable/backend";
 import {
     FLOOR_DEFAULT_HEIGHT,
     FLOOR_DEFAULT_WIDTH,
     type FloorData,
 } from "@firetable/floor-creator";
-import { addFloor, deleteFloor } from "@firetable/backend";
+import { property } from "es-toolkit/compat";
+import { Loading } from "quasar";
+import AddNewFloorForm from "src/components/Floor/AddNewFloorForm.vue";
+import FTBtn from "src/components/FTBtn.vue";
+import FTCenteredText from "src/components/FTCenteredText.vue";
+import FTDialog from "src/components/FTDialog.vue";
+import FTTitle from "src/components/FTTitle.vue";
+import { useDialog } from "src/composables/useDialog";
 import { useFloors } from "src/composables/useFloors";
+import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { watch } from "vue";
 import { useI18n } from "vue-i18n";
-import { property } from "es-toolkit/compat";
-import { useDialog } from "src/composables/useDialog";
-import FTBtn from "src/components/FTBtn.vue";
 
 interface Props {
     organisationId: string;
@@ -41,48 +40,6 @@ watch(isLoading, function (loadingVal) {
     }
 });
 
-function makeRawFloor(name: string): Omit<FloorData, "id" | "json"> {
-    return {
-        name,
-        height: FLOOR_DEFAULT_HEIGHT,
-        width: FLOOR_DEFAULT_WIDTH,
-    };
-}
-
-function showAddNewFloorForm(floorDocs: FloorDoc[]): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            title: "Add New Floor",
-            component: AddNewFloorForm,
-            maximized: false,
-            listeners: {
-                create(name: string) {
-                    tryCatchLoadingWrapper({
-                        hook() {
-                            const rawFloor = {
-                                ...makeRawFloor(name),
-                                propertyId,
-                            };
-
-                            return addFloor(
-                                {
-                                    organisationId,
-                                    id: propertyId,
-                                },
-                                rawFloor,
-                            ).then(dialog.hide);
-                        },
-                    });
-                },
-            },
-            componentPropsObject: {
-                allFloorNames: new Set(floorDocs.map(property("name"))),
-            },
-        },
-    });
-}
-
 async function duplicateFloor(floor: FloorDoc, reset: VoidFunction): Promise<void> {
     const isConfirmed = await showConfirm(
         t("PageAdminFloors.duplicateFloorPlanMessage", { floorName: floor.name }),
@@ -97,13 +54,21 @@ async function duplicateFloor(floor: FloorDoc, reset: VoidFunction): Promise<voi
         hook() {
             return addFloor(
                 {
-                    organisationId,
                     id: propertyId,
+                    organisationId,
                 },
                 duplicatedFloor,
             );
         },
     }).finally(reset);
+}
+
+function makeRawFloor(name: string): Omit<FloorData, "id" | "json"> {
+    return {
+        height: FLOOR_DEFAULT_HEIGHT,
+        name,
+        width: FLOOR_DEFAULT_WIDTH,
+    };
 }
 
 async function onFloorDelete(id: string, reset: VoidFunction): Promise<void> {
@@ -112,16 +77,50 @@ async function onFloorDelete(id: string, reset: VoidFunction): Promise<void> {
     }
 
     await tryCatchLoadingWrapper({
+        errorHook: reset,
         hook() {
             return deleteFloor(
                 {
-                    organisationId,
                     id: propertyId,
+                    organisationId,
                 },
                 id,
             );
         },
-        errorHook: reset,
+    });
+}
+
+function showAddNewFloorForm(floorDocs: FloorDoc[]): void {
+    const dialog = createDialog({
+        component: FTDialog,
+        componentProps: {
+            component: AddNewFloorForm,
+            componentPropsObject: {
+                allFloorNames: new Set(floorDocs.map(property("name"))),
+            },
+            listeners: {
+                create(name: string) {
+                    tryCatchLoadingWrapper({
+                        hook() {
+                            const rawFloor = {
+                                ...makeRawFloor(name),
+                                propertyId,
+                            };
+
+                            return addFloor(
+                                {
+                                    id: propertyId,
+                                    organisationId,
+                                },
+                                rawFloor,
+                            ).then(dialog.hide);
+                        },
+                    });
+                },
+            },
+            maximized: false,
+            title: "Add New Floor",
+        },
     });
 }
 </script>

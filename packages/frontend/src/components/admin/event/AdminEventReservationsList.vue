@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import type { ReservationDoc, VoidFunction } from "@firetable/types";
+
+import ReservationGeneralInfo from "src/components/Event/reservation/ReservationGeneralInfo.vue";
+import ReservationLabelChips from "src/components/Event/reservation/ReservationLabelChips.vue";
+import FTCenteredText from "src/components/FTCenteredText.vue";
+import FTDialog from "src/components/FTDialog.vue";
 import { useDialog } from "src/composables/useDialog";
 import { getFormatedDateFromTimestamp } from "src/helpers/date-utils";
 import { useI18n } from "vue-i18n";
 
-import FTDialog from "src/components/FTDialog.vue";
-import ReservationGeneralInfo from "src/components/Event/reservation/ReservationGeneralInfo.vue";
-import FTCenteredText from "src/components/FTCenteredText.vue";
-import ReservationLabelChips from "src/components/Event/reservation/ReservationLabelChips.vue";
-
 interface Props {
-    reservations: ReservationDoc[];
     emptyMessage: string;
+    reservations: ReservationDoc[];
     timezone: string;
 }
 
@@ -20,25 +20,25 @@ const props = defineProps<Props>();
 const { locale } = useI18n();
 const { createDialog } = useDialog();
 
+function emitDelete(reservation: ReservationDoc, reset: VoidFunction): void {
+    reset();
+    emit("delete", reservation);
+}
+
 function showReservation(reservation: ReservationDoc): void {
     createDialog({
         component: FTDialog,
         componentProps: {
-            title: "Reservation Details",
-            maximized: false,
             component: ReservationGeneralInfo,
             componentPropsObject: {
                 reservation,
                 timezone: props.timezone,
             },
             listeners: {},
+            maximized: false,
+            title: "Reservation Details",
         },
     });
-}
-
-function emitDelete(reservation: ReservationDoc, reset: VoidFunction): void {
-    reset();
-    emit("delete", reservation);
 }
 </script>
 

@@ -1,3 +1,4 @@
+import type { EventOwner } from "@firetable/backend";
 import type {
     EventDoc,
     EventFloorDoc,
@@ -6,8 +7,7 @@ import type {
     ReservationDoc,
     User,
 } from "@firetable/types";
-import type { EventOwner } from "@firetable/backend";
-import { isPlannedReservation } from "@firetable/types";
+
 import {
     getEventFloorsPath,
     getEventLogsPath,
@@ -15,16 +15,17 @@ import {
     getReservationsPath,
     usersCollection,
 } from "@firetable/backend";
-import { computed, watch } from "vue";
-import { useRouter } from "vue-router";
+import { isPlannedReservation } from "@firetable/types";
+import { property } from "es-toolkit/compat";
 import {
     createQuery,
     useFirestoreCollection,
     useFirestoreDocument,
 } from "src/composables/useFirestore";
 import { decompressFloorDoc } from "src/helpers/compress-floor-doc";
-import { property } from "es-toolkit/compat";
 import { AppLogger } from "src/logger/FTLogger.js";
+import { computed, watch } from "vue";
+import { useRouter } from "vue-router";
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- pretty verbose
 export function useAdminEvent(eventOwner: EventOwner) {
@@ -32,7 +33,6 @@ export function useAdminEvent(eventOwner: EventOwner) {
 
     const { data: eventFloorsData, pending: eventFloorsIsPending } =
         useFirestoreCollection<EventFloorDoc>(createQuery(getEventFloorsPath(eventOwner)), {
-            wait: true,
             converter: {
                 fromFirestore(snapshot) {
                     const data = snapshot.data() as EventFloorDoc;
@@ -49,6 +49,7 @@ export function useAdminEvent(eventOwner: EventOwner) {
                     order: floor.order ?? 999_999,
                 }),
             },
+            wait: true,
         });
 
     const reservations = useFirestoreCollection<ReservationDoc>(getReservationsPath(eventOwner));
@@ -92,14 +93,14 @@ export function useAdminEvent(eventOwner: EventOwner) {
     });
 
     return {
-        eventFloors: eventFloorsData,
-        users: usersHook.data,
-        event: eventHook.data,
-        allReservations: reservations.data,
         allPlannedReservations,
-        cancelledReservations,
+        allReservations: reservations.data,
         arrivedReservations,
+        cancelledReservations,
+        event: eventHook.data,
+        eventFloors: eventFloorsData,
         isLoading,
         logs,
+        users: usersHook.data,
     };
 }

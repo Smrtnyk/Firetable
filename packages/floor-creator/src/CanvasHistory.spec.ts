@@ -1,11 +1,14 @@
 import type { FabricObject } from "fabric";
+
+import { delay, last, range } from "es-toolkit";
+import { ActiveSelection } from "fabric";
+import { describe, expect, it } from "vitest";
+
 import type { RectTable } from "./elements/RectTable.js";
+
 import { FloorEditor } from "./FloorEditor.js";
 import { FloorElementTypes } from "./types.js";
 import { canvasToRender } from "./utils.js";
-import { describe, expect, it } from "vitest";
-import { ActiveSelection } from "fabric";
-import { delay, last, range } from "es-toolkit";
 
 interface TablePosition {
     left: number;
@@ -13,8 +16,8 @@ interface TablePosition {
 }
 
 interface TestContext {
-    floor: FloorEditor;
     canvas: HTMLCanvasElement;
+    floor: FloorEditor;
 }
 
 describe("CanvasHistory", () => {
@@ -57,8 +60,8 @@ describe("CanvasHistory", () => {
     it("handles long undo/redo cycles without losing state", async () => {
         const { floor } = setupTestFloor();
         floor.addElement({
-            tag: FloorElementTypes.RECT_TABLE,
             label: "T1",
+            tag: FloorElementTypes.RECT_TABLE,
             x: 100,
             y: 100,
         });
@@ -92,8 +95,8 @@ describe("CanvasHistory", () => {
     it("tracks element addition", async () => {
         const { floor } = setupTestFloor();
         floor.addElement({
-            tag: FloorElementTypes.RECT_TABLE,
             label: "T1",
+            tag: FloorElementTypes.RECT_TABLE,
             x: 100,
             y: 100,
         });
@@ -107,8 +110,8 @@ describe("CanvasHistory", () => {
     it("handles undo/redo of element movement", async () => {
         const { floor } = setupTestFloor();
         floor.addElement({
-            tag: FloorElementTypes.RECT_TABLE,
             label: "T1",
+            tag: FloorElementTypes.RECT_TABLE,
             x: 100,
             y: 100,
         });
@@ -132,14 +135,14 @@ describe("CanvasHistory", () => {
     it("handles multiple state changes", async () => {
         const { floor } = setupTestFloor();
         floor.addElement({
-            tag: FloorElementTypes.RECT_TABLE,
             label: "T1",
+            tag: FloorElementTypes.RECT_TABLE,
             x: 100,
             y: 100,
         });
         floor.addElement({
-            tag: FloorElementTypes.RECT_TABLE,
             label: "T2",
+            tag: FloorElementTypes.RECT_TABLE,
             x: 200,
             y: 200,
         });
@@ -164,8 +167,8 @@ describe("CanvasHistory", () => {
     it("maintains state consistency through undo/redo cycles", async () => {
         const { floor } = setupTestFloor();
         floor.addElement({
-            tag: FloorElementTypes.RECT_TABLE,
             label: "T1",
+            tag: FloorElementTypes.RECT_TABLE,
             x: 100,
             y: 100,
         });
@@ -196,8 +199,8 @@ describe("CanvasHistory", () => {
     it("maintains max default stack size", async () => {
         const { floor } = setupTestFloor();
         floor.addElement({
-            tag: FloorElementTypes.RECT_TABLE,
             label: "T1",
+            tag: FloorElementTypes.RECT_TABLE,
             x: 100,
             y: 100,
         });
@@ -294,8 +297,8 @@ describe("CanvasHistory", () => {
         expect(floor.isDirty()).toBe(false);
 
         floor.addElement({
-            tag: FloorElementTypes.RECT_TABLE,
             label: "T1",
+            tag: FloorElementTypes.RECT_TABLE,
             x: 100,
             y: 100,
         });
@@ -341,8 +344,8 @@ describe("CanvasHistory", () => {
         expect(floor.isDirty()).toBe(false);
 
         floor.addElement({
-            tag: FloorElementTypes.RECT_TABLE,
             label: "T1",
+            tag: FloorElementTypes.RECT_TABLE,
             x: 100,
             y: 100,
         });
@@ -354,8 +357,8 @@ describe("CanvasHistory", () => {
     it("resets isDirty to false after markAsSaved()", async () => {
         const { floor } = setupTestFloor();
         floor.addElement({
-            tag: FloorElementTypes.RECT_TABLE,
             label: "T1",
+            tag: FloorElementTypes.RECT_TABLE,
             x: 100,
             y: 100,
         });
@@ -557,6 +560,21 @@ describe("CanvasHistory", () => {
     });
 });
 
+async function addTable(
+    floor: FloorEditor,
+    position: TablePosition,
+    label: string,
+): Promise<RectTable> {
+    floor.addElement({
+        label,
+        tag: FloorElementTypes.RECT_TABLE,
+        x: position.left,
+        y: position.top,
+    });
+    await canvasToRender(floor.canvas);
+    return floor.getTableByLabel(label)!;
+}
+
 async function moveTable(
     floor: FloorEditor,
     table: FabricObject,
@@ -565,21 +583,6 @@ async function moveTable(
     table.set(position);
     floor.canvas.fire("object:modified", { target: table });
     await canvasToRender(floor.canvas);
-}
-
-async function addTable(
-    floor: FloorEditor,
-    position: TablePosition,
-    label: string,
-): Promise<RectTable> {
-    floor.addElement({
-        tag: FloorElementTypes.RECT_TABLE,
-        label,
-        x: position.left,
-        y: position.top,
-    });
-    await canvasToRender(floor.canvas);
-    return floor.getTableByLabel(label)!;
 }
 
 function setupTestFloor(): TestContext {
@@ -594,26 +597,26 @@ function setupTestFloor(): TestContext {
     document.body.appendChild(canvas);
     const floor = new FloorEditor({
         canvas,
+        containerHeight: 500,
+        containerWidth: 500,
         floorDoc: {
+            height: 500,
             id: "1",
+            json: "",
             name: "Test Floor",
             width: 500,
-            height: 500,
-            json: "",
         },
-        containerWidth: 500,
-        containerHeight: 500,
     });
 
-    return { floor, canvas };
+    return { canvas, floor };
 }
 
 async function setupTestFloorWithTableInJSON(): Promise<TestContext> {
     const { floor: srcFloor } = setupTestFloor();
 
     srcFloor.addElement({
-        tag: FloorElementTypes.RECT_TABLE,
         label: "T1",
+        tag: FloorElementTypes.RECT_TABLE,
         x: 100,
         y: 100,
     });
@@ -628,16 +631,16 @@ async function setupTestFloorWithTableInJSON(): Promise<TestContext> {
 
     const floor = new FloorEditor({
         canvas: newCanvas,
+        containerHeight: 500,
+        containerWidth: 500,
         floorDoc: {
             id: "1",
             name: "Test Floor",
             ...exported,
         },
-        containerWidth: 500,
-        containerHeight: 500,
     });
 
     await canvasToRender(floor.canvas);
 
-    return { floor, canvas: newCanvas };
+    return { canvas: newCanvas, floor };
 }

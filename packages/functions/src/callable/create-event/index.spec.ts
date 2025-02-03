@@ -1,9 +1,11 @@
 import type { CreateEventPayload } from "@shared-types";
 import type { CallableRequest } from "firebase-functions/v2/https";
-import { getEventPath } from "../../paths.js";
+
+import { describe, expect, it } from "vitest";
+
 import { db } from "../../init.js";
+import { getEventPath } from "../../paths.js";
 import { createEvent } from "./index.js";
-import { describe, it, expect } from "vitest";
 
 const AUTH_USER_EMAIL = "test@example.com";
 const ORGANISATION_ID = "org456";
@@ -17,16 +19,16 @@ describe("create-event", () => {
             auth: { token: { email: AUTH_USER_EMAIL } },
             data: {
                 date: Date.now(),
+                entryPrice,
                 floors: [
                     { id: "floor1", json: "some json" },
                     { id: "floor2", json: "some json" },
                 ],
-                entryPrice,
                 guestListLimit: 100,
-                name: "Test Event",
-                propertyId: PROPERTY_ID,
-                organisationId: ORGANISATION_ID,
                 img: "image_url",
+                name: "Test Event",
+                organisationId: ORGANISATION_ID,
+                propertyId: PROPERTY_ID,
             },
             rawRequest: {} as any,
         } as CallableRequest<CreateEventPayload>;
@@ -37,8 +39,8 @@ describe("create-event", () => {
         // Assert the results
         expect(result).toEqual({
             id: expect.any(String),
-            propertyId: "property123",
             organisationId: "org456",
+            propertyId: "property123",
         });
 
         const pathToEvent = getEventPath(ORGANISATION_ID, PROPERTY_ID, result.id);
@@ -62,22 +64,22 @@ describe("create-event", () => {
         const entryPrice = 10;
         const mockFloor = {
             id: "floor1",
-            name: "Test Floor",
             json: "some compressed json",
+            name: "Test Floor",
         };
 
         const mockRequest = {
             auth: { token: { email: AUTH_USER_EMAIL } },
             data: {
                 date: Date.now(),
+                entryPrice,
                 // Same floor added twice
                 floors: [mockFloor, mockFloor],
-                entryPrice,
                 guestListLimit: 100,
-                name: "Test Event",
-                propertyId: PROPERTY_ID,
-                organisationId: ORGANISATION_ID,
                 img: "image_url",
+                name: "Test Event",
+                organisationId: ORGANISATION_ID,
+                propertyId: PROPERTY_ID,
             },
             rawRequest: {} as any,
         } as CallableRequest<CreateEventPayload>;
@@ -115,12 +117,12 @@ describe("create-event", () => {
             auth: { token: { email: AUTH_USER_EMAIL } },
             data: {
                 date: Date.now(),
-                floors: [{ id: "floor1", name: "Invalid Floor" }],
                 entryPrice: 10,
+                floors: [{ id: "floor1", name: "Invalid Floor" }],
                 guestListLimit: 100,
                 name: "Test Event",
-                propertyId: PROPERTY_ID,
                 organisationId: ORGANISATION_ID,
+                propertyId: PROPERTY_ID,
             },
             rawRequest: {} as any,
         } as CallableRequest<CreateEventPayload>;

@@ -1,11 +1,8 @@
 <script setup lang="ts">
 import type { DrinkCardItem, ServingSize } from "@firetable/types";
-import { useI18n } from "vue-i18n";
-import { noNegativeNumber } from "src/helpers/form-rules";
 
-interface Props {
-    item: DrinkCardItem;
-}
+import { noNegativeNumber } from "src/helpers/form-rules";
+import { useI18n } from "vue-i18n";
 
 interface Emits {
     (event: "update:serving-size", value: ServingSize): void;
@@ -14,6 +11,10 @@ interface Emits {
         value: { field: "amount" | "description" | "label"; value: number | string },
     ): void;
     (event: "update:price", value: number): void;
+}
+
+interface Props {
+    item: DrinkCardItem;
 }
 
 const props = defineProps<Props>();
@@ -29,7 +30,7 @@ function updateServingSize(updates: Partial<ServingSize>): void {
 
 function updateSpecialPrice(
     field: "amount" | "description" | "label",
-    value: number | string | null,
+    value: null | number | string,
 ): void {
     if (value === null) {
         return;

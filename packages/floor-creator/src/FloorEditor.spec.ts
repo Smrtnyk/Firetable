@@ -1,10 +1,12 @@
+import { Group } from "fabric";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import type { FloorCreationOptions } from "./types.js";
-import { FloorElementTypes } from "./types.js";
+
+import { RectTable } from "./elements/RectTable.js";
 import { FloorEditor } from "./FloorEditor.js";
 import { isTable } from "./type-guards.js";
-import { RectTable } from "./elements/RectTable.js";
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { Group } from "fabric";
+import { FloorElementTypes } from "./types.js";
 
 describe("FloorEditor", () => {
     let floorEditor: FloorEditor;
@@ -14,15 +16,15 @@ describe("FloorEditor", () => {
         canvasElement = document.createElement("canvas");
         const options: FloorCreationOptions = {
             canvas: canvasElement,
+            containerHeight: 1000,
+            containerWidth: 1000,
             floorDoc: {
+                height: 1000,
                 id: "test-id",
+                json: {},
                 name: "test floor",
                 width: 1000,
-                height: 1000,
-                json: {},
             },
-            containerWidth: 1000,
-            containerHeight: 1000,
         };
 
         floorEditor = new FloorEditor(options);
@@ -42,10 +44,10 @@ describe("FloorEditor", () => {
 
         it("updates floor dimensions without resetting the floor state", () => {
             floorEditor.addElement({
+                label: "Test Table",
                 tag: FloorElementTypes.RECT_TABLE,
                 x: 100,
                 y: 100,
-                label: "Test Table",
             });
 
             const table = floorEditor.canvas.getObjects().find(isTable);
@@ -88,10 +90,10 @@ describe("FloorEditor", () => {
         it("emits elementClicked event on element click", () => {
             const spy = vi.spyOn(floorEditor, "emit");
             const table = new RectTable({
-                shapeOptions: {},
                 groupOptions: {
                     label: "1",
                 },
+                shapeOptions: {},
                 textOptions: {
                     label: "1",
                 },
@@ -112,10 +114,10 @@ describe("FloorEditor", () => {
     describe("addElement()", () => {
         it("should add an element to the canvas", () => {
             floorEditor.addElement({
+                label: "1",
                 tag: FloorElementTypes.RECT_TABLE,
                 x: 1,
                 y: 1,
-                label: "1",
             });
             // Check if the element was added to the canvas
             const table = floorEditor.canvas.getObjects().find(isTable);

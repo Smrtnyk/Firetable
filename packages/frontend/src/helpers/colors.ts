@@ -1,6 +1,6 @@
 import { colors } from "quasar";
 
-const { changeAlpha, rgbToHex, hexToRgb, rgbToHsv, hsvToRgb } = colors;
+const { changeAlpha, hexToRgb, hsvToRgb, rgbToHex, rgbToHsv } = colors;
 
 const baseColors = [
     "#e60049",
@@ -13,24 +13,6 @@ const baseColors = [
     "#b3d4ff",
     "#00bfa0",
 ];
-
-function rotateHue(hexColor: string, angle: number): string {
-    const rgb = hexToRgb(hexColor);
-
-    // eslint-disable-next-line id-length -- quasar built-in function
-    const { h, s, v } = rgbToHsv(rgb);
-
-    let newH = (h + angle) % 360;
-    newH = newH < 0 ? 360 + newH : newH;
-
-    // eslint-disable-next-line id-length -- quasar built-in function
-    const newRgb = hsvToRgb({ h: newH, s, v });
-    return rgbToHex(newRgb);
-}
-
-function adjustColorOpacity(hexColor: string, opacity: number): string {
-    return changeAlpha(hexColor, opacity);
-}
 
 export function getColors(count: number): { backgroundColors: string[]; borderColors: string[] } {
     const backgroundColors: string[] = [];
@@ -52,4 +34,22 @@ export function getColors(count: number): { backgroundColors: string[]; borderCo
     }
 
     return { backgroundColors, borderColors };
+}
+
+function adjustColorOpacity(hexColor: string, opacity: number): string {
+    return changeAlpha(hexColor, opacity);
+}
+
+function rotateHue(hexColor: string, angle: number): string {
+    const rgb = hexToRgb(hexColor);
+
+    // eslint-disable-next-line id-length -- quasar built-in function
+    const { h, s, v } = rgbToHsv(rgb);
+
+    let newH = (h + angle) % 360;
+    newH = newH < 0 ? 360 + newH : newH;
+
+    // eslint-disable-next-line id-length -- quasar built-in function
+    const newRgb = hsvToRgb({ h: newH, s, v });
+    return rgbToHex(newRgb);
 }

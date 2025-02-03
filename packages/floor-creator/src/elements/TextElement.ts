@@ -1,7 +1,9 @@
-import type { FloorEditorElement } from "../types.js";
 import type { ITextProps } from "fabric";
-import { IText, classRegistry } from "fabric";
+
 import { omit } from "es-toolkit";
+import { classRegistry, IText } from "fabric";
+
+import type { FloorEditorElement } from "../types.js";
 
 type TextElementOptions = Partial<ITextProps> & {
     text: string;
@@ -22,12 +24,12 @@ export class TextElement extends IText implements FloorEditorElement {
         return Promise.resolve(new TextElement(options));
     }
 
-    setBaseFill(val: string): void {
-        this.set("fill", val);
-    }
-
     getBaseFill(): string {
         return this.fill as string;
+    }
+
+    setBaseFill(val: string): void {
+        this.set("fill", val);
     }
 }
 

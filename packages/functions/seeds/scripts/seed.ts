@@ -1,14 +1,15 @@
-import { OrganisationSeeder } from "../seeders/OrganisationSeeder.js";
-import { UserSeeder } from "../seeders/UserSeeder.js";
-import { PropertySeeder } from "../seeders/PropertySeeder.js";
-import { FloorSeeder } from "../seeders/FloorSeeder.js";
-import { EventSeeder } from "../seeders/EventSeeder.js";
-import { GuestSeeder } from "../seeders/GuestSeeder.js";
-import { verifyEmulatorConnection } from "../config.js";
-import { ReservationSeeder } from "../seeders/ReservationSeeder.js";
-import { logger } from "../logger.js";
 import { faker } from "@faker-js/faker";
 import { cac } from "cac";
+
+import { verifyEmulatorConnection } from "../config.js";
+import { logger } from "../logger.js";
+import { EventSeeder } from "../seeders/EventSeeder.js";
+import { FloorSeeder } from "../seeders/FloorSeeder.js";
+import { GuestSeeder } from "../seeders/GuestSeeder.js";
+import { OrganisationSeeder } from "../seeders/OrganisationSeeder.js";
+import { PropertySeeder } from "../seeders/PropertySeeder.js";
+import { ReservationSeeder } from "../seeders/ReservationSeeder.js";
+import { UserSeeder } from "../seeders/UserSeeder.js";
 
 await verifyEmulatorConnection();
 
@@ -42,7 +43,7 @@ async function seed(): Promise<void> {
             const organisation = await organisationSeeder.seedOne(orgId);
             logger.organization(i + 1, options.organisations, organisation.name);
 
-            const propertyCount = faker.number.int({ min: 1, max: 5 });
+            const propertyCount = faker.number.int({ max: 5, min: 1 });
             const properties = await propertySeeder.seedForOrganisation(
                 organisation,
                 propertyCount,
@@ -55,9 +56,9 @@ async function seed(): Promise<void> {
 
             logger.stats(
                 {
+                    Events: events.length,
                     Properties: properties.length,
                     Users: users.length,
-                    Events: events.length,
                 },
                 2,
             );

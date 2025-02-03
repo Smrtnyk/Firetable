@@ -1,22 +1,24 @@
-import type { CallableRequest } from "firebase-functions/v2/https";
 import type { CreateUserPayload } from "@shared-types";
-import { createUser } from "./create-user.js";
+import type { CallableRequest } from "firebase-functions/v2/https";
+
+import { Role } from "@shared-types";
+import { DocumentReference } from "firebase-admin/firestore";
+import { HttpsError } from "firebase-functions/v2/https";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { MockAuth } from "../../../test-helpers/MockAuth.js";
 import * as Init from "../../init.js";
-import { getUserPath } from "../../paths.js";
 import { db } from "../../init.js";
-import { Role } from "@shared-types";
-import { HttpsError } from "firebase-functions/v2/https";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { DocumentReference } from "firebase-admin/firestore";
+import { getUserPath } from "../../paths.js";
+import { createUser } from "./create-user.js";
 
 const testUserData = {
-    name: "Test User",
-    password: "testpassword",
     email: "test@example.com",
-    role: Role.STAFF,
-    relatedProperties: ["property1", "property2"],
+    name: "Test User",
     organisationId: "org1",
+    password: "testpassword",
+    relatedProperties: ["property1", "property2"],
+    role: Role.STAFF,
     username: "testuser",
 };
 
@@ -58,8 +60,8 @@ describe("createUser", () => {
         const userDoc = await db.doc(getUserPath(testUserData.organisationId, result.uid)).get();
         expect(userDoc.data()).toEqual(
             expect.objectContaining({
-                name: "Test User",
                 email: "test@example.com",
+                name: "Test User",
             }),
         );
     });

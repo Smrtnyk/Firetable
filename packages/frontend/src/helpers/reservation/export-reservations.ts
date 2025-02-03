@@ -1,14 +1,15 @@
-import type { ReservationDoc, FloorDoc } from "@firetable/types";
+import type { FloorDoc, ReservationDoc } from "@firetable/types";
+
 import { isAWalkInReservation } from "@firetable/types";
 import { exportFile } from "quasar";
 
 interface ExportReservationsParams {
-    reservations: ReservationDoc[];
     eventName: string;
     floors: FloorDoc[];
+    reservations: ReservationDoc[];
 }
 
-export function exportReservations({ reservations, eventName }: ExportReservationsParams): void {
+export function exportReservations({ eventName, reservations }: ExportReservationsParams): void {
     // Create CSV content
     const headers = ["Table", "Guest Name", "Guest Contact", "Time", "Status", "Notes"].join(",");
 

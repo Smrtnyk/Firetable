@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { GuestSummary } from "src/stores/guests-store";
+
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 

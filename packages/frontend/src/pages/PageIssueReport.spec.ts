@@ -1,61 +1,63 @@
-import type { RenderResult } from "vitest-browser-vue";
 import type { IssueReportDoc } from "@firetable/types";
-import PageIssueReport from "./PageIssueReport.vue";
-import { renderComponent, t } from "../../test-helpers/render-component";
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { userEvent } from "@vitest/browser/context";
-import { ref } from "vue";
+import type { RenderResult } from "vitest-browser-vue";
+
 import { IssueCategory, IssueStatus, Role } from "@firetable/types";
+import { userEvent } from "@vitest/browser/context";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ref } from "vue";
+
+import { renderComponent, t } from "../../test-helpers/render-component";
+import PageIssueReport from "./PageIssueReport.vue";
 
 const {
-    useFirestoreCollectionMock,
     createIssueReportMock,
-    updateIssueReportMock,
     deleteIssueReportMock,
+    updateIssueReportMock,
+    useFirestoreCollectionMock,
 } = vi.hoisted(() => ({
-    useFirestoreCollectionMock: vi.fn(),
     createIssueReportMock: vi.fn(),
-    updateIssueReportMock: vi.fn(),
     deleteIssueReportMock: vi.fn(),
+    updateIssueReportMock: vi.fn(),
+    useFirestoreCollectionMock: vi.fn(),
 }));
 
 vi.mock("src/composables/useFirestore", () => ({
-    useFirestoreCollection: useFirestoreCollectionMock,
     createQuery: vi.fn(),
+    useFirestoreCollection: useFirestoreCollectionMock,
     useFirestoreDocument: vi.fn(),
 }));
 
 vi.mock("../backend-proxy", () => ({
     createIssueReport: createIssueReportMock,
-    updateIssueReport: updateIssueReportMock,
     deleteIssueReport: deleteIssueReportMock,
     fetchOrganisationById: vi.fn(),
     fetchOrganisationsForAdmin: vi.fn(),
     fetchPropertiesForAdmin: vi.fn(),
-    propertiesCollection: vi.fn(),
+    getIssueReportsPath: vi.fn(),
     getUserPath: vi.fn(),
     logoutUser: vi.fn(),
-    getIssueReportsPath: vi.fn(),
+    propertiesCollection: vi.fn(),
+    updateIssueReport: updateIssueReportMock,
 }));
 
 describe("PageIssueReport.vue", () => {
     const mockIssues: IssueReportDoc[] = [
         {
-            id: "issue1",
-            description: "My Test Issue",
             category: IssueCategory.BUG,
-            status: IssueStatus.NEW,
             createdAt: Date.now(),
             createdBy: "user1",
-            user: { name: "John Doe", email: "john@example.com" },
+            description: "My Test Issue",
+            id: "issue1",
             organisation: { id: "org1", name: "Org 1" },
+            status: IssueStatus.NEW,
+            user: { email: "john@example.com", name: "John Doe" },
         },
     ];
 
     const user = {
         id: "user1",
-        role: Role.MANAGER,
         organisationId: "org1",
+        role: Role.MANAGER,
     };
 
     function render(): RenderResult<unknown> {
@@ -64,8 +66,8 @@ describe("PageIssueReport.vue", () => {
             name: "Test Organisation",
             settings: {
                 event: {
-                    eventStartTime24HFormat: "22:00",
                     eventDurationInHours: 10,
+                    eventStartTime24HFormat: "22:00",
                 },
             },
         };
@@ -80,6 +82,7 @@ describe("PageIssueReport.vue", () => {
                             user,
                         },
                         properties: {
+                            organisations: [organisation],
                             properties: [
                                 {
                                     id: "property1",
@@ -87,7 +90,6 @@ describe("PageIssueReport.vue", () => {
                                     organisationId: "org1",
                                 },
                             ],
-                            organisations: [organisation],
                         },
                     },
                 },

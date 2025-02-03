@@ -1,10 +1,13 @@
-import type { EventCreateFormProps } from "./EventCreateForm.vue";
 import type { FloorDoc } from "@firetable/types";
-import EventCreateForm from "./EventCreateForm.vue";
-import { renderComponent } from "../../../../test-helpers/render-component";
-import { describe, it, expect, beforeEach } from "vitest";
+
 import { userEvent } from "@vitest/browser/context";
+import { beforeEach, describe, expect, it } from "vitest";
 import { nextTick } from "vue";
+
+import type { EventCreateFormProps } from "./EventCreateForm.vue";
+
+import { renderComponent } from "../../../../test-helpers/render-component";
+import EventCreateForm from "./EventCreateForm.vue";
 
 describe("EventCreateForm", () => {
     describe("create", () => {
@@ -12,16 +15,16 @@ describe("EventCreateForm", () => {
 
         beforeEach(() => {
             props = {
-                propertyTimezone: "Europe/Vienna",
-                propertyId: "property1",
-                organisationId: "org1",
-                propertyName: "Test Property",
+                eventStartHours: "22:00",
                 floors: [
                     { id: "floor1", name: "Floor 1" } as FloorDoc,
                     { id: "floor2", name: "Floor 2" } as FloorDoc,
                 ],
                 maxFloors: 3,
-                eventStartHours: "22:00",
+                organisationId: "org1",
+                propertyId: "property1",
+                propertyName: "Test Property",
+                propertyTimezone: "Europe/Vienna",
             };
         });
 
@@ -122,16 +125,16 @@ describe("EventCreateForm", () => {
             const emitted = screen.emitted().create as any[];
             expect(emitted).toBeTruthy();
             expect(emitted[0][0]).toMatchObject({
-                name: "Test Event",
-                guestListLimit: 100,
                 entryPrice: 50,
-                img: "https://example.com/image.jpg",
-                propertyId: props.propertyId,
-                organisationId: props.organisationId,
                 floors: [
                     { id: "floor1", name: "Floor 1" },
                     { id: "floor2", name: "Floor 2" },
                 ],
+                guestListLimit: 100,
+                img: "https://example.com/image.jpg",
+                name: "Test Event",
+                organisationId: props.organisationId,
+                propertyId: props.propertyId,
             });
         });
 
@@ -165,17 +168,17 @@ describe("EventCreateForm", () => {
         describe("floor ordering", () => {
             beforeEach(() => {
                 props = {
-                    propertyTimezone: "Europe/Vienna",
-                    propertyId: "property1",
-                    organisationId: "org1",
-                    propertyName: "Test Property",
+                    eventStartHours: "22:00",
                     floors: [
                         { id: "floor1", name: "Floor 1" } as FloorDoc,
                         { id: "floor2", name: "Floor 2" } as FloorDoc,
                         { id: "floor3", name: "Floor 3" } as FloorDoc,
                     ],
-                    eventStartHours: "22:00",
                     maxFloors: 3,
+                    organisationId: "org1",
+                    propertyId: "property1",
+                    propertyName: "Test Property",
+                    propertyTimezone: "Europe/Vienna",
                 };
             });
 
@@ -270,28 +273,28 @@ describe("EventCreateForm", () => {
 
         beforeEach(() => {
             props = {
-                propertyId: "property1",
-                organisationId: "org1",
-                propertyName: "Test Property",
-                propertyTimezone: "Europe/London",
+                event: {
+                    _doc: {} as any,
+                    creator: "user1",
+                    date: new Date("2023-12-31T22:00:00Z").getTime(),
+                    entryPrice: 75,
+                    guestListLimit: 150,
+                    id: "event1",
+                    img: "https://example.com/old-image.jpg",
+                    name: "Existing Event",
+                    organisationId: "org1",
+                    propertyId: "property1",
+                },
+                eventStartHours: "22:00",
                 floors: [
                     { id: "floor1", name: "Floor 1" } as FloorDoc,
                     { id: "floor2", name: "Floor 2" } as FloorDoc,
                 ],
                 maxFloors: 3,
-                eventStartHours: "22:00",
-                event: {
-                    id: "event1",
-                    name: "Existing Event",
-                    date: new Date("2023-12-31T22:00:00Z").getTime(),
-                    guestListLimit: 150,
-                    entryPrice: 75,
-                    img: "https://example.com/old-image.jpg",
-                    propertyId: "property1",
-                    organisationId: "org1",
-                    creator: "user1",
-                    _doc: {} as any,
-                },
+                organisationId: "org1",
+                propertyId: "property1",
+                propertyName: "Test Property",
+                propertyTimezone: "Europe/London",
             };
         });
 
@@ -338,14 +341,14 @@ describe("EventCreateForm", () => {
             const emitted = screen.emitted().update as any[];
             expect(emitted).toBeTruthy();
             expect(emitted[0][0]).toMatchObject({
-                name: "Updated Event",
+                entryPrice: 80,
                 // Should remain unchanged
                 guestListLimit: props.event!.guestListLimit,
-                entryPrice: 80,
                 // Should remain unchanged unless updated
                 img: props.event!.img,
-                propertyId: props.propertyId,
+                name: "Updated Event",
                 organisationId: props.organisationId,
+                propertyId: props.propertyId,
             });
         });
 
@@ -362,7 +365,7 @@ describe("EventCreateForm", () => {
             const yesterdayDay = yesterday.getDate().toString();
 
             // find the date cell for yesterday
-            const dateCell = screen.getByRole("button", { name: yesterdayDay, exact: true });
+            const dateCell = screen.getByRole("button", { exact: true, name: yesterdayDay });
             await userEvent.click(dateCell);
 
             const closeButton = screen.getByRole("button", { name: "Close" });
