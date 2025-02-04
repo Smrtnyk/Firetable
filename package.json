@@ -29,6 +29,8 @@
         "build:clean": "rm -rf ./packages/*/dist && pnpm -r build"
     },
     "devDependencies": {
+        "@eslint/eslintrc": "3.2.0",
+        "@eslint/js": "9.19.0",
         "@regru/eslint-plugin-prefer-early-return": "1.0.0",
         "eslint": "9.19.0",
         "eslint-config-prettier": "10.0.1",
@@ -44,7 +46,8 @@
         "globals": "15.14.0",
         "prettier": "3.4.2",
         "typescript": "5.8.0-dev.20250131",
-        "typescript-eslint": "8.23.0"
+        "typescript-eslint": "8.23.0",
+        "vue-eslint-parser": "9.4.3"
     },
     "private": true,
     "engines": {

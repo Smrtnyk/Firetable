@@ -1,11 +1,10 @@
 <script setup lang="ts">
+import { loginWithEmail } from "@firetable/backend";
 import { Loading, QForm } from "quasar";
 import { minLength, noEmptyString } from "src/helpers/form-rules";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { ref, useTemplateRef } from "vue";
 import { useRouter } from "vue-router";
-
-import { loginWithEmail } from "../backend-proxy";
 
 const firebaseErrorMessages: Record<string, string> = {
     "auth/invalid-email": "The email address you entered is invalid.",

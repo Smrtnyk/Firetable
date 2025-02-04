@@ -13,7 +13,7 @@ const { fetchAnalyticsDataMock } = vi.hoisted(() => ({
     fetchAnalyticsDataMock: vi.fn(),
 }));
 
-vi.mock("../../backend-proxy", () => ({
+vi.mock("@firetable/backend", () => ({
     fetchAnalyticsData: fetchAnalyticsDataMock,
 }));
 

@@ -1,6 +1,7 @@
 import type { AppUser, User, VoidFunction } from "@firetable/types";
 import type { User as FBUser } from "firebase/auth";
 
+import { getUserPath, logoutUser } from "@firetable/backend";
 import { AdminRole, Role } from "@firetable/types";
 import { noop } from "es-toolkit/function";
 import { defineStore } from "pinia";
@@ -10,8 +11,6 @@ import { showErrorMessage } from "src/helpers/ui-helpers";
 import { AppLogger } from "src/logger/FTLogger";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { computed, ref, watch } from "vue";
-
-import { getUserPath, logoutUser } from "../backend-proxy";
 
 export const enum AuthState {
     INITIALIZING = "initializing",

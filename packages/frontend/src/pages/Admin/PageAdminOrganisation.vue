@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { deleteOrganisation } from "@firetable/backend";
 import FTBtn from "src/components/FTBtn.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import {
@@ -8,8 +9,6 @@ import {
 import { showDeleteConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { useRouter } from "vue-router";
-
-import { deleteOrganisation } from "../../backend-proxy";
 
 export interface PageAdminOrganisationProps {
     organisationId: string;

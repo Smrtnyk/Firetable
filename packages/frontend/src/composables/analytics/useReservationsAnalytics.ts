@@ -4,6 +4,7 @@ import type { AugmentedPlannedReservation, ReservationBucket } from "src/stores/
 import type { DateRange } from "src/types";
 import type { Ref } from "vue";
 
+import { fetchAnalyticsData } from "@firetable/backend";
 import { format } from "date-fns";
 import { Loading } from "quasar";
 import { getColors } from "src/helpers/colors.js";
@@ -12,7 +13,6 @@ import { showErrorMessage } from "src/helpers/ui-helpers.js";
 import { useAnalyticsStore } from "src/stores/analytics-store.js";
 import { computed, onUnmounted, ref } from "vue";
 
-import { fetchAnalyticsData } from "../../backend-proxy";
 import { bucketizeReservations } from "./bucketize-reservations.js";
 const DEFAULT_SELECTED_DAY = "ALL";
 

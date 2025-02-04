@@ -9,6 +9,12 @@ import type {
 } from "@firetable/types";
 import type { noop } from "es-toolkit";
 
+import {
+    fetchOrganisationById,
+    fetchOrganisationsForAdmin,
+    fetchPropertiesForAdmin,
+    propertiesCollection,
+} from "@firetable/backend";
 import { Role } from "@firetable/types";
 import { cloneDeep, merge } from "es-toolkit";
 import { matchesProperty } from "es-toolkit/compat";
@@ -18,13 +24,6 @@ import { createQuery, useFirestoreCollection } from "src/composables/useFirestor
 import { getDefaultTimezone } from "src/helpers/date-utils";
 import { AppLogger } from "src/logger/FTLogger";
 import { ref, watch } from "vue";
-
-import {
-    fetchOrganisationById,
-    fetchOrganisationsForAdmin,
-    fetchPropertiesForAdmin,
-    propertiesCollection,
-} from "../backend-proxy";
 
 export const DEFAULT_ORGANISATION_SETTINGS: OrganisationSettings = {
     property: {

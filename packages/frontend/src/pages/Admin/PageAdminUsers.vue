@@ -2,6 +2,7 @@
 import type { CreateUserPayload, EditUserPayload, PropertyDoc, User } from "@firetable/types";
 import type { BucketizedUser, BucketizedUsers } from "src/components/admin/user/AdminUsersList.vue";
 
+import { createUserWithEmail, deleteUser, fetchUsersByRole, updateUser } from "@firetable/backend";
 import { Role } from "@firetable/types";
 import { useAsyncState } from "@vueuse/core";
 import { matchesProperty } from "es-toolkit/compat";
@@ -22,8 +23,6 @@ import { usePropertiesStore } from "src/stores/properties-store";
 import { computed, onBeforeMount, onUnmounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
-
-import { createUserWithEmail, deleteUser, fetchUsersByRole, updateUser } from "../../backend-proxy";
 
 export interface PageAdminUsersProps {
     organisationId: string;

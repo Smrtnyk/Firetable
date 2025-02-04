@@ -1,3 +1,4 @@
+import type { EventOwner } from "@firetable/backend";
 import type {
     BaseTable,
     Floor,
@@ -18,6 +19,13 @@ import type { GuestSummary } from "src/stores/guests-store";
 import type { ComputedRef, Ref, ShallowRef } from "vue";
 import type { VueFirestoreDocumentData } from "vuefire";
 
+import {
+    addReservation,
+    deleteReservation,
+    moveReservationFromQueue,
+    moveReservationToQueue,
+    updateReservationDoc,
+} from "@firetable/backend";
 import { isTable } from "@firetable/floor-creator";
 import { isPlannedReservation, ReservationStatus } from "@firetable/types";
 import { storeToRefs } from "pinia";
@@ -46,7 +54,6 @@ import { computed, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 
-import type { EventOwner } from "../../backend-proxy";
 import type {
     ReservationCopyOperation,
     ReservationDequeueOperation,
@@ -55,13 +62,6 @@ import type {
     TableOperation,
 } from "./useTableOperations.js";
 
-import {
-    addReservation,
-    deleteReservation,
-    moveReservationFromQueue,
-    moveReservationToQueue,
-    updateReservationDoc,
-} from "../../backend-proxy";
 import { useReservationsLifecycle } from "./useReservationsLifecycle.js";
 import { TableOperationType, useTableOperations } from "./useTableOperations.js";
 

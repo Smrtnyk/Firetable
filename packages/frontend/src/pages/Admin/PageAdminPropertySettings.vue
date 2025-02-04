@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { updatePropertySettings } from "@firetable/backend";
 import { cloneDeep } from "es-toolkit";
 import SettingsSection from "src/components/admin/organisation-settings/SettingsSection.vue";
 import AppCardSection from "src/components/AppCardSection.vue";
@@ -11,8 +12,6 @@ import { useHasChanged } from "src/composables/useHasChanged";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { computed, ref } from "vue";
-
-import { updatePropertySettings } from "../../backend-proxy";
 
 export interface PageAdminPropertySettingsProps {
     organisationId: string;

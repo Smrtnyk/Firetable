@@ -1,6 +1,12 @@
 <script setup lang="ts">
+import type { EventOwner } from "@firetable/backend";
 import type { GuestInGuestListData, VoidFunction } from "@firetable/types";
 
+import {
+    addGuestToGuestList,
+    confirmGuestFromGuestList,
+    deleteGuestFromGuestList,
+} from "@firetable/backend";
 import { AdminRole, Role } from "@firetable/types";
 import { storeToRefs } from "pinia";
 import EventGuestListCreateGuestForm from "src/components/Event/EventGuestListCreateGuestForm.vue";
@@ -14,14 +20,6 @@ import { useAuthStore } from "src/stores/auth-store";
 import { useEventsStore } from "src/stores/events-store";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
-
-import type { EventOwner } from "../../backend-proxy";
-
-import {
-    addGuestToGuestList,
-    confirmGuestFromGuestList,
-    deleteGuestFromGuestList,
-} from "../../backend-proxy";
 
 interface Props {
     eventOwner: EventOwner;

@@ -3,6 +3,7 @@ import type { GuestDoc, PropertyDoc, Visit } from "@firetable/types";
 import type { Ref } from "vue";
 import type { VueFirestoreDocumentData } from "vuefire";
 
+import { getGuestsPath, subscribeToGuests } from "@firetable/backend";
 import { chunk, omit, omitBy } from "es-toolkit";
 import { first, matchesProperty } from "es-toolkit/compat";
 import { isNotNil } from "es-toolkit/predicate";
@@ -13,8 +14,6 @@ import { AppLogger } from "src/logger/FTLogger";
 import { useAuthStore } from "src/stores/auth-store";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { ref } from "vue";
-
-import { getGuestsPath, subscribeToGuests } from "../backend-proxy";
 
 export type GuestSummary = {
     fulfilledVisits: number;

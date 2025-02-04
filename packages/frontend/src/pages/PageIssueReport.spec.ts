@@ -27,7 +27,7 @@ vi.mock("src/composables/useFirestore", () => ({
     useFirestoreDocument: vi.fn(),
 }));
 
-vi.mock("../backend-proxy", () => ({
+vi.mock("@firetable/backend", () => ({
     createIssueReport: createIssueReportMock,
     deleteIssueReport: deleteIssueReportMock,
     fetchOrganisationById: vi.fn(),

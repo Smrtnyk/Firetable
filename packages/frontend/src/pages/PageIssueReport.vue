@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import type { IssueReportDoc } from "@firetable/types";
 
+import {
+    createIssueReport,
+    deleteIssueReport,
+    getIssueReportsPath,
+    updateIssueReport,
+} from "@firetable/backend";
 import { IssueCategory, IssueStatus } from "@firetable/types";
 import { where } from "firebase/firestore";
 import { useQuasar } from "quasar";
@@ -18,13 +24,6 @@ import { useAuthStore } from "src/stores/auth-store";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
-
-import {
-    createIssueReport,
-    deleteIssueReport,
-    getIssueReportsPath,
-    updateIssueReport,
-} from "../backend-proxy";
 
 const { t } = useI18n();
 const { createDialog } = useDialog();

@@ -40,7 +40,7 @@ vi.mock("src/composables/useDialog", () => ({
     }),
 }));
 
-vi.mock("../../backend-proxy", async (importOriginal) => ({
+vi.mock("@firetable/backend", async (importOriginal) => ({
     ...(await importOriginal()),
     fetchUsersByRole: fetchUsersByRoleMock,
 }));
