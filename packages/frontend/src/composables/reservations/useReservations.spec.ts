@@ -21,9 +21,9 @@ import EventShowReservation from "src/components/Event/reservation/EventShowRese
 import messages from "src/i18n";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createApp, nextTick, ref, shallowRef } from "vue";
-import { createI18n } from "vue-i18n";
 import "quasar/dist/quasar.css";
 import "src/css/app.scss";
+import { createI18n } from "vue-i18n";
 
 import { useReservations } from "./useReservations.js";
 import { TableOperationType } from "./useTableOperations.js";
@@ -77,6 +77,7 @@ vi.mock("@firetable/backend", () => ({
     fetchPropertiesForAdmin: vi.fn(),
     getGuestsPath: vi.fn(),
     getUserPath: vi.fn(),
+    initializeFirebase: vi.fn(),
     logoutUser: vi.fn(),
     moveReservationFromQueue: moveReservationFromQueueMock,
     moveReservationToQueue: moveReservationToQueueMock,
