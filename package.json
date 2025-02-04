@@ -34,7 +34,7 @@
         "eslint-config-prettier": "10.0.1",
         "eslint-import-resolver-typescript": "3.7.0",
         "eslint-plugin-import-x": "4.6.1",
-        "eslint-plugin-perfectionist": "4.7.0",
+        "eslint-plugin-perfectionist": "4.8.0",
         "eslint-plugin-prettier": "5.2.3",
         "eslint-plugin-promise": "7.2.1",
         "eslint-plugin-quasar": "1.1.0",
@@ -44,13 +44,13 @@
         "globals": "15.14.0",
         "prettier": "3.4.2",
         "typescript": "5.8.0-dev.20250131",
-        "typescript-eslint": "8.22.0"
+        "typescript-eslint": "8.23.0"
     },
     "private": true,
     "engines": {
         "node": ">= 22.9.0"
     },
-    "packageManager": "pnpm@9.15.4",
+    "packageManager": "pnpm@10.2.0",
     "pnpm": {
         "overrides": {
             "jsdom": "25.0.1",
