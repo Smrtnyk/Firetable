@@ -19,6 +19,7 @@ vi.mock("@firetable/backend", () => ({
     fetchOrganisationById: vi.fn(),
     fetchOrganisationsForAdmin: vi.fn(),
     fetchPropertiesForAdmin: vi.fn(),
+    initializeFirebase: vi.fn(),
     propertiesCollection: vi.fn(),
     updateOrganisationSettings: updateOrganisationSettingsMock,
     updatePropertySettings: updatePropertySettingsMock,
