@@ -5,6 +5,6 @@ catalog:
     '@vitest/browser': https://pkg.pr.new/@vitest/browser@9542b69
     '@vitest/ui': https://pkg.pr.new/@vitest/ui@9542b69
     '@vitest/coverage-v8': https://pkg.pr.new/@vitest/coverage-v8@9542b69
-    firebase: 11.2.0
+    firebase: 11.3.0
     es-toolkit: 1.32.0
     '@posva/event-emitter': 1.0.2
