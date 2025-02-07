@@ -91,6 +91,10 @@ let app: App<Element>;
 describe("useReservations", () => {
     afterEach(async () => {
         app?.unmount();
+        const container = document.getElementById("app");
+        if (container) {
+            container.remove();
+        }
 
         // Clean up any remaining dialogs -- not sure what is happening with quasar to leak these dom nodes
         const dialogs = document.querySelectorAll(".q-dialog");
