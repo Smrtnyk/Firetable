@@ -14,14 +14,7 @@ export default defineConfig(function () {
         // app boot file (/src/boot)
         // --> boot files are part of "main.js"
         // https://v2.quasar.dev/quasar-cli-vite/boot-files
-        boot: [
-            "rum",
-            "event-emitter",
-            "event-handlers",
-            "register-pinia",
-            "i18n",
-            "firebase-connection",
-        ],
+        boot: ["event-emitter", "event-handlers", "register-pinia", "i18n", "firebase-connection"],
 
         // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
         build: {

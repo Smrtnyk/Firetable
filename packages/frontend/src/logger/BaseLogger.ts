@@ -21,12 +21,6 @@ export abstract class BaseLogger {
 
     public error(message: unknown, ...args: unknown[]): void {
         if (this.#isError(message)) {
-            import("@sentry/vue")
-                .then(function (Sentry) {
-                    Sentry.captureException(message);
-                    return void 0;
-                })
-                .catch(console.error);
             const errorMessage = `${this.prefix} [ERROR]: ${message.message}\nStack: ${message.stack}`;
             console.error(errorMessage, ...args);
         } else if (isString(message)) {
