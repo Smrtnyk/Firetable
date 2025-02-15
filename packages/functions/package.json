@@ -19,13 +19,13 @@
         "@google-cloud/functions-framework": "3.4.5",
         "es-toolkit": "1.32.0",
         "firebase-admin": "13.1.0",
-        "firebase-functions": "6.3.1"
+        "firebase-functions": "6.3.2"
     },
     "devDependencies": {
-        "@faker-js/faker": "9.4.0",
+        "@faker-js/faker": "9.5.0",
         "@firebase/app-types": "0.9.3",
         "@firebase/rules-unit-testing": "4.0.1",
-        "@types/node": "22.13.1",
+        "@types/node": "22.13.4",
         "cac": "6.7.14",
         "tinyrainbow": "2.0.0",
         "vitest": "https://pkg.pr.new/vitest@12eaf3e"
