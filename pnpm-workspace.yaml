@@ -1,10 +1,10 @@
 packages:
     - 'packages/*'
 catalog:
-    vitest: https://pkg.pr.new/vitest@12eaf3e
-    '@vitest/browser': https://pkg.pr.new/@vitest/browser@12eaf3e
-    '@vitest/ui': https://pkg.pr.new/@vitest/ui@12eaf3e
-    '@vitest/coverage-v8': https://pkg.pr.new/@vitest/coverage-v8@12eaf3e
+    vitest: https://pkg.pr.new/vitest@fee90d8
+    '@vitest/browser': https://pkg.pr.new/@vitest/browser@fee90d8
+    '@vitest/ui': https://pkg.pr.new/@vitest/ui@fee90d8
+    '@vitest/coverage-v8': https://pkg.pr.new/@vitest/coverage-v8@fee90d8
     firebase: 11.3.1
     es-toolkit: 1.32.0
     '@posva/event-emitter': 1.0.2

@@ -18,7 +18,7 @@
     "devDependencies": {
         "@pinia/testing": "1.0.0",
         "@playwright/test": "1.50.1",
-        "@quasar/app-vite": "2.1.0",
+        "@quasar/app-vite": "2.1.1",
         "@quasar/vite-plugin": "1.9.0",
         "@types/papaparse": "5.3.15",
         "@types/qrcode": "1.5.5",
@@ -29,9 +29,9 @@
         "@vue/test-utils": "2.4.6",
         "vite-tsconfig-paths": "5.1.4",
         "vitest": "catalog:",
-        "vitest-browser-vue": "0.1.0",
-        "vue-component-type-helpers": "2.2.2",
-        "vue-tsc": "2.2.2"
+        "vitest-browser-vue": "0.2.0",
+        "vue-component-type-helpers": "2.2.4",
+        "vue-tsc": "2.2.4"
     },
     "dependencies": {
         "@firetable/backend": "workspace:*",
@@ -45,7 +45,7 @@
         "es-toolkit": "catalog:",
         "fflate": "0.8.2",
         "firebase": "catalog:",
-        "libphonenumber-js": "1.11.19",
+        "libphonenumber-js": "1.11.20",
         "papaparse": "5.5.2",
         "pinia": "3.0.1",
         "qrcode": "1.5.4",

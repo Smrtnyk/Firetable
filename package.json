@@ -29,31 +29,31 @@
         "build:clean": "rm -rf ./packages/*/dist && pnpm -r build"
     },
     "devDependencies": {
-        "@eslint/eslintrc": "3.2.0",
-        "@eslint/js": "9.20.0",
+        "@eslint/eslintrc": "3.3.0",
+        "@eslint/js": "9.21.0",
         "@regru/eslint-plugin-prefer-early-return": "1.0.0",
-        "eslint": "9.20.1",
-        "eslint-config-prettier": "10.0.1",
-        "eslint-import-resolver-typescript": "3.8.0",
+        "eslint": "9.21.0",
+        "eslint-config-prettier": "10.0.2",
+        "eslint-import-resolver-typescript": "3.8.3",
         "eslint-plugin-import-x": "4.6.1",
         "eslint-plugin-perfectionist": "4.9.0",
         "eslint-plugin-prettier": "5.2.3",
         "eslint-plugin-promise": "7.2.1",
         "eslint-plugin-quasar": "1.1.0",
-        "eslint-plugin-unicorn": "56.0.1",
+        "eslint-plugin-unicorn": "57.0.0",
         "eslint-plugin-vue": "9.32.0",
-        "firebase-tools": "13.31.1",
-        "globals": "15.15.0",
-        "prettier": "3.5.1",
+        "firebase-tools": "13.31.2",
+        "globals": "16.0.0",
+        "prettier": "3.5.2",
         "typescript": "5.8.0-dev.20250131",
-        "typescript-eslint": "8.24.0",
+        "typescript-eslint": "8.25.0",
         "vue-eslint-parser": "9.4.3"
     },
     "private": true,
     "engines": {
         "node": ">= 22.9.0"
     },
-    "packageManager": "pnpm@10.4.0",
+    "packageManager": "pnpm@10.5.2",
     "pnpm": {
         "overrides": {
             "jsdom": "25.0.1",

@@ -25,10 +25,10 @@
         "@faker-js/faker": "9.5.0",
         "@firebase/app-types": "0.9.3",
         "@firebase/rules-unit-testing": "4.0.1",
-        "@types/node": "22.13.4",
+        "@types/node": "22.13.5",
         "cac": "6.7.14",
         "tinyrainbow": "2.0.0",
-        "vitest": "https://pkg.pr.new/vitest@12eaf3e"
+        "vitest": "https://pkg.pr.new/vitest@fee90d8"
     },
     "private": true
 }
