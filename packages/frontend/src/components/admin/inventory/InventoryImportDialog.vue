@@ -17,7 +17,7 @@
                         @dragleave.prevent="isDragging = false"
                         @dragover.prevent
                         @drop.prevent="handleFileDrop"
-                        @click="$refs.fileInput?.click()"
+                        @click="fileInput?.click()"
                     >
                         <q-icon name="import" size="48px" color="primary" />
                         <div class="text-h6 q-mt-md">Drop your CSV file here</div>
@@ -63,7 +63,7 @@
 <script setup lang="ts">
 import FTTabPanels from "src/components/FTTabPanels.vue";
 import FTTabs from "src/components/FTTabs.vue";
-import { computed, ref } from "vue";
+import { computed, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 
 interface Props {
@@ -81,7 +81,7 @@ const { t } = useI18n();
 const activeTab = ref("file");
 const pastedContent = ref("");
 const isDragging = ref(false);
-const fileInput = ref<HTMLInputElement>();
+const fileInput = useTemplateRef<HTMLInputElement>("fileInput");
 const selectedFile = ref<File | null>(null);
 
 const canImport = computed(function () {
