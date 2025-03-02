@@ -22,8 +22,8 @@ catalogs:
       specifier: 1.32.0
       version: 1.32.0
     firebase:
-      specifier: 11.3.1
-      version: 11.3.1
+      specifier: 11.4.0
+      version: 11.4.0
     vitest:
       specifier: https://pkg.pr.new/vitest@fee90d8
       version: 3.0.7
@@ -53,13 +53,13 @@ importers:
         version: 10.0.2(eslint@9.21.0)
       eslint-import-resolver-typescript:
         specifier: 3.8.3
-        version: 3.8.3(eslint-plugin-import-x@4.6.1(eslint@9.21.0)(typescript@5.8.0-dev.20250131))(eslint@9.21.0)
+        version: 3.8.3(eslint-plugin-import-x@4.6.1(eslint@9.21.0)(typescript@5.8.2))(eslint@9.21.0)
       eslint-plugin-import-x:
         specifier: 4.6.1
-        version: 4.6.1(eslint@9.21.0)(typescript@5.8.0-dev.20250131)
+        version: 4.6.1(eslint@9.21.0)(typescript@5.8.2)
       eslint-plugin-perfectionist:
         specifier: 4.9.0
-        version: 4.9.0(eslint@9.21.0)(typescript@5.8.0-dev.20250131)
+        version: 4.9.0(eslint@9.21.0)(typescript@5.8.2)
       eslint-plugin-prettier:
         specifier: 5.2.3
         version: 5.2.3(eslint-config-prettier@10.0.2(eslint@9.21.0))(eslint@9.21.0)(prettier@3.5.2)
@@ -76,8 +76,8 @@ importers:
         specifier: 9.32.0
         version: 9.32.0(eslint@9.21.0)
       firebase-tools:
-        specifier: 13.31.2
-        version: 13.31.2(encoding@0.1.13)
+        specifier: 13.32.0
+        version: 13.32.0(encoding@0.1.13)
       globals:
         specifier: 16.0.0
         version: 16.0.0
@@ -85,11 +85,11 @@ importers:
         specifier: 3.5.2
         version: 3.5.2
       typescript:
-        specifier: 5.8.0-dev.20250131
-        version: 5.8.0-dev.20250131
+        specifier: 5.8.2
+        version: 5.8.2
       typescript-eslint:
         specifier: 8.25.0
-        version: 8.25.0(eslint@9.21.0)(typescript@5.8.0-dev.20250131)
+        version: 8.25.0(eslint@9.21.0)(typescript@5.8.2)
       vue-eslint-parser:
         specifier: 9.4.3
         version: 9.4.3(eslint@9.21.0)
@@ -101,7 +101,7 @@ importers:
         version: 1.32.0
       firebase:
         specifier: 'catalog:'
-        version: 11.3.1
+        version: 11.4.0
     devDependencies:
       '@firetable/types':
         specifier: workspace:*
@@ -126,17 +126,17 @@ importers:
         specifier: 2.0.46
         version: 2.0.46
       '@types/node':
-        specifier: 22.13.5
-        version: 22.13.5
+        specifier: 22.13.8
+        version: 22.13.8
       '@vitest/browser':
         specifier: 'catalog:'
-        version: https://pkg.pr.new/@vitest/browser@fee90d8(@testing-library/dom@10.4.0)(@types/node@22.13.5)(playwright@1.50.1)(typescript@5.7.3)(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vitest@3.0.7)
+        version: https://pkg.pr.new/@vitest/browser@fee90d8(@testing-library/dom@10.4.0)(@types/node@22.13.8)(playwright@1.50.1)(typescript@5.8.2)(vite@6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vitest@3.0.7)
       jsondiffpatch:
         specifier: 0.6.0
         version: 0.6.0
       vitest:
         specifier: 'catalog:'
-        version: https://pkg.pr.new/vitest@fee90d8(@types/node@22.13.5)(@vitest/browser@3.0.7)(@vitest/ui@3.0.7)(jsdom@25.0.1(canvas@2.11.2(encoding@0.1.13)))(msw@2.7.3(@types/node@22.13.5)(typescript@5.7.3))(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
+        version: https://pkg.pr.new/vitest@fee90d8(@types/node@22.13.8)(@vitest/browser@3.0.7)(@vitest/ui@3.0.7)(jsdom@25.0.1(canvas@2.11.2(encoding@0.1.13)))(msw@2.7.3(@types/node@22.13.8)(typescript@5.8.2))(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
 
   packages/frontend:
     dependencies:
@@ -157,7 +157,7 @@ importers:
         version: 1.16.17
       '@vueuse/core':
         specifier: 12.7.0
-        version: 12.7.0(typescript@5.8.0-dev.20250131)
+        version: 12.7.0(typescript@5.8.2)
       date-fns:
         specifier: 4.1.0
         version: 4.1.0
@@ -172,43 +172,43 @@ importers:
         version: 0.8.2
       firebase:
         specifier: 'catalog:'
-        version: 11.3.1
+        version: 11.4.0
       libphonenumber-js:
-        specifier: 1.11.20
-        version: 1.11.20
+        specifier: 1.12.4
+        version: 1.12.4
       papaparse:
         specifier: 5.5.2
         version: 5.5.2
       pinia:
         specifier: 3.0.1
-        version: 3.0.1(typescript@5.8.0-dev.20250131)(vue@3.5.13(typescript@5.8.0-dev.20250131))
+        version: 3.0.1(typescript@5.8.2)(vue@3.5.13(typescript@5.8.2))
       qrcode:
         specifier: 1.5.4
         version: 1.5.4
       quasar:
-        specifier: 2.17.7
-        version: 2.17.7
+        specifier: 2.18.0
+        version: 2.18.0
       register-service-worker:
         specifier: 1.7.2
         version: 1.7.2
       vue:
         specifier: 3.5.13
-        version: 3.5.13(typescript@5.8.0-dev.20250131)
+        version: 3.5.13(typescript@5.8.2)
       vue-draggable-plus:
         specifier: 0.6.0
         version: 0.6.0(@types/sortablejs@1.15.8)
       vue-echarts:
         specifier: 7.0.3
-        version: 7.0.3(@vue/runtime-core@3.5.13)(echarts@5.6.0)(vue@3.5.13(typescript@5.8.0-dev.20250131))
+        version: 7.0.3(@vue/runtime-core@3.5.13)(echarts@5.6.0)(vue@3.5.13(typescript@5.8.2))
       vue-i18n:
         specifier: 11.1.1
-        version: 11.1.1(vue@3.5.13(typescript@5.8.0-dev.20250131))
+        version: 11.1.1(vue@3.5.13(typescript@5.8.2))
       vue-router:
         specifier: 4.5.0
-        version: 4.5.0(vue@3.5.13(typescript@5.8.0-dev.20250131))
+        version: 4.5.0(vue@3.5.13(typescript@5.8.2))
       vuefire:
         specifier: 3.2.1
-        version: 3.2.1(firebase@11.3.1)(vue@3.5.13(typescript@5.8.0-dev.20250131))
+        version: 3.2.1(firebase@11.4.0)(vue@3.5.13(typescript@5.8.2))
       workbox-build:
         specifier: 7.3.0
         version: 7.3.0
@@ -218,16 +218,16 @@ importers:
     devDependencies:
       '@pinia/testing':
         specifier: 1.0.0
-        version: 1.0.0(pinia@3.0.1(typescript@5.8.0-dev.20250131)(vue@3.5.13(typescript@5.8.0-dev.20250131)))
+        version: 1.0.0(pinia@3.0.1(typescript@5.8.2)(vue@3.5.13(typescript@5.8.2)))
       '@playwright/test':
         specifier: 1.50.1
         version: 1.50.1
       '@quasar/app-vite':
         specifier: 2.1.1
-        version: 2.1.1(@types/node@22.13.5)(eslint@9.21.0)(pinia@3.0.1(typescript@5.8.0-dev.20250131)(vue@3.5.13(typescript@5.8.0-dev.20250131)))(quasar@2.17.7)(rollup@2.79.2)(sass@1.79.4)(terser@5.34.1)(typescript@5.8.0-dev.20250131)(vue-router@4.5.0(vue@3.5.13(typescript@5.8.0-dev.20250131)))(vue@3.5.13(typescript@5.8.0-dev.20250131))(workbox-build@7.3.0)(yaml@2.5.1)
+        version: 2.1.1(@types/node@22.13.8)(eslint@9.21.0)(pinia@3.0.1(typescript@5.8.2)(vue@3.5.13(typescript@5.8.2)))(quasar@2.18.0)(rollup@2.79.2)(sass@1.79.4)(terser@5.34.1)(typescript@5.8.2)(vue-router@4.5.0(vue@3.5.13(typescript@5.8.2)))(vue@3.5.13(typescript@5.8.2))(workbox-build@7.3.0)(yaml@2.5.1)
       '@quasar/vite-plugin':
         specifier: 1.9.0
-        version: 1.9.0(@vitejs/plugin-vue@5.2.1(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vue@3.5.13(typescript@5.8.0-dev.20250131)))(quasar@2.17.7)(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vue@3.5.13(typescript@5.8.0-dev.20250131))
+        version: 1.9.0(@vitejs/plugin-vue@5.2.1(vite@6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vue@3.5.13(typescript@5.8.2)))(quasar@2.18.0)(vite@6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vue@3.5.13(typescript@5.8.2))
       '@types/papaparse':
         specifier: 5.3.15
         version: 5.3.15
@@ -236,10 +236,10 @@ importers:
         version: 1.5.5
       '@vitejs/plugin-vue':
         specifier: 5.2.1
-        version: 5.2.1(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vue@3.5.13(typescript@5.8.0-dev.20250131))
+        version: 5.2.1(vite@6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vue@3.5.13(typescript@5.8.2))
       '@vitest/browser':
         specifier: 'catalog:'
-        version: https://pkg.pr.new/@vitest/browser@fee90d8(@testing-library/dom@10.4.0)(@types/node@22.13.5)(playwright@1.50.1)(typescript@5.8.0-dev.20250131)(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vitest@3.0.7)
+        version: https://pkg.pr.new/@vitest/browser@fee90d8(@testing-library/dom@10.4.0)(@types/node@22.13.8)(playwright@1.50.1)(typescript@5.8.2)(vite@6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vitest@3.0.7)
       '@vitest/coverage-v8':
         specifier: 'catalog:'
         version: https://pkg.pr.new/@vitest/coverage-v8@fee90d8(@vitest/browser@3.0.7)(vitest@3.0.7)
@@ -251,19 +251,19 @@ importers:
         version: 2.4.6
       vite-tsconfig-paths:
         specifier: 5.1.4
-        version: 5.1.4(typescript@5.8.0-dev.20250131)(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))
+        version: 5.1.4(typescript@5.8.2)(vite@6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))
       vitest:
         specifier: 'catalog:'
-        version: https://pkg.pr.new/vitest@fee90d8(@types/node@22.13.5)(@vitest/browser@3.0.7)(@vitest/ui@3.0.7)(jsdom@25.0.1(canvas@2.11.2(encoding@0.1.13)))(msw@2.7.3(@types/node@22.13.5)(typescript@5.8.0-dev.20250131))(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
+        version: https://pkg.pr.new/vitest@fee90d8(@types/node@22.13.8)(@vitest/browser@3.0.7)(@vitest/ui@3.0.7)(jsdom@25.0.1(canvas@2.11.2(encoding@0.1.13)))(msw@2.7.3(@types/node@22.13.8)(typescript@5.8.2))(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
       vitest-browser-vue:
         specifier: 0.2.0
-        version: 0.2.0(@vitest/browser@3.0.7)(vitest@3.0.7)(vue@3.5.13(typescript@5.8.0-dev.20250131))
+        version: 0.2.0(@vitest/browser@3.0.7)(vitest@3.0.7)(vue@3.5.13(typescript@5.8.2))
       vue-component-type-helpers:
-        specifier: 2.2.4
-        version: 2.2.4
+        specifier: 2.2.8
+        version: 2.2.8
       vue-tsc:
-        specifier: 2.2.4
-        version: 2.2.4(typescript@5.8.0-dev.20250131)
+        specifier: 2.2.8
+        version: 2.2.8(typescript@5.8.2)
 
   packages/functions:
     dependencies:
@@ -281,17 +281,17 @@ importers:
         version: 6.3.2(firebase-admin@13.1.0(encoding@0.1.13))
     devDependencies:
       '@faker-js/faker':
-        specifier: 9.5.0
-        version: 9.5.0
+        specifier: 9.5.1
+        version: 9.5.1
       '@firebase/app-types':
         specifier: 0.9.3
         version: 0.9.3
       '@firebase/rules-unit-testing':
         specifier: 4.0.1
-        version: 4.0.1(firebase@11.3.1)
+        version: 4.0.1(firebase@11.4.0)
       '@types/node':
-        specifier: 22.13.5
-        version: 22.13.5
+        specifier: 22.13.8
+        version: 22.13.8
       cac:
         specifier: 6.7.14
         version: 6.7.14
@@ -300,13 +300,13 @@ importers:
         version: 2.0.0
       vitest:
         specifier: https://pkg.pr.new/vitest@fee90d8
-        version: https://pkg.pr.new/vitest@fee90d8(@types/node@22.13.5)(@vitest/browser@3.0.7)(@vitest/ui@3.0.7)(jsdom@25.0.1(canvas@2.11.2(encoding@0.1.13)))(msw@2.7.3(@types/node@22.13.5)(typescript@5.7.3))(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
+        version: https://pkg.pr.new/vitest@fee90d8(@types/node@22.13.8)(@vitest/browser@3.0.7)(@vitest/ui@3.0.7)(jsdom@25.0.1(canvas@2.11.2(encoding@0.1.13)))(msw@2.7.3(@types/node@22.13.8)(typescript@5.8.2))(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
 
   packages/types:
     dependencies:
       firebase:
         specifier: 'catalog:'
-        version: 11.3.1
+        version: 11.4.0
 
 packages:
 
@@ -1188,28 +1188,28 @@ packages:
     resolution: {integrity: sha512-JubJ5B2pJ4k4yGxaNLdbjrnk9d/iDz6/q8wOilpIowd6PJPgaxCuHBnBszq7Ce2TyMrywm5r4PnKm6V3iiZF+g==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@faker-js/faker@9.5.0':
-    resolution: {integrity: sha512-3qbjLv+fzuuCg3umxc9/7YjrEXNaKwHgmig949nfyaTx8eL4FAsvFbu+1JcFUj1YAXofhaDn6JdEUBTYuk0Ssw==}
+  '@faker-js/faker@9.5.1':
+    resolution: {integrity: sha512-0fzMEDxkExR2cn731kpDaCCnBGBUOIXEi2S1N5l8Hltp6aPf4soTMJ+g4k8r2sI5oB+rpwIW8Uy/6jkwGpnWPg==}
     engines: {node: '>=18.0.0', npm: '>=9.0.0'}
 
   '@fastify/busboy@3.0.0':
     resolution: {integrity: sha512-83rnH2nCvclWaPQQKvkJ2pdOjG4TZyEVuFDnlOF6KP08lDaaceVyw/W63mDuafQT+MKHCvXIPpE5uYWeM0rT4w==}
 
-  '@firebase/analytics-compat@0.2.17':
-    resolution: {integrity: sha512-SJNVOeTvzdqZQvXFzj7yAirXnYcLDxh57wBFROfeowq/kRN1AqOw1tG6U4OiFOEhqi7s3xLze/LMkZatk2IEww==}
+  '@firebase/analytics-compat@0.2.18':
+    resolution: {integrity: sha512-Hw9mzsSMZaQu6wrTbi3kYYwGw9nBqOHr47pVLxfr5v8CalsdrG5gfs9XUlPOZjHRVISp3oQrh1j7d3E+ulHPjQ==}
     peerDependencies:
       '@firebase/app-compat': 0.x
 
   '@firebase/analytics-types@0.8.3':
     resolution: {integrity: sha512-VrIp/d8iq2g501qO46uGz3hjbDb8xzYMrbu8Tp0ovzIzrvJZ2fvmj649gTjge/b7cCCcjT0H37g1gVtlNhnkbg==}
 
-  '@firebase/analytics@0.10.11':
-    resolution: {integrity: sha512-zwuPiRE0+hgcS95JZbJ6DFQN4xYFO8IyGxpeePTV51YJMwCf3lkBa6FnZ/iXIqDKcBPMgMuuEZozI0BJWaLEYg==}
+  '@firebase/analytics@0.10.12':
+    resolution: {integrity: sha512-iDCGnw6qdFqwI5ywkgece99WADJNoymu+nLIQI4fZM/vCZ3bEo4wlpEetW71s1HqGpI0hQStiPhqVjFxDb2yyw==}
     peerDependencies:
       '@firebase/app': 0.x
 
-  '@firebase/app-check-compat@0.3.18':
-    resolution: {integrity: sha512-qjozwnwYmAIdrsVGrJk+hnF1WBois54IhZR6gO0wtZQoTvWL/GtiA2F31TIgAhF0ayUiZhztOv1RfC7YyrZGDQ==}
+  '@firebase/app-check-compat@0.3.19':
+    resolution: {integrity: sha512-G8FMiqhrKc4gEEujrBDBBrbRav8MGqoLObWj1hy/riCSg4XlRYhpnq3ev8E9HTirqU1tAGH6oJl7vr+jfM7YNA==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       '@firebase/app-compat': 0.x
@@ -1220,25 +1220,25 @@ packages:
   '@firebase/app-check-types@0.5.3':
     resolution: {integrity: sha512-hyl5rKSj0QmwPdsAxrI5x1otDlByQ7bvNvVt8G/XPO2CSwE++rmSVf3VEhaeOR4J8ZFaF0Z0NDSmLejPweZ3ng==}
 
-  '@firebase/app-check@0.8.11':
-    resolution: {integrity: sha512-42zIfRI08/7bQqczAy7sY2JqZYEv3a1eNa4fLFdtJ54vNevbBIRSEA3fZgRqWFNHalh5ohsBXdrYgFqaRIuCcQ==}
+  '@firebase/app-check@0.8.12':
+    resolution: {integrity: sha512-LxjcoIFOU4sgK07ZWb8XDHxuVB+UKs41vPK+Sg9PeZMvEoz84fndFAx8Nz2nipiya2EmyxBgVhff8Hi6GBt+XA==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       '@firebase/app': 0.x
 
-  '@firebase/app-compat@0.2.50':
-    resolution: {integrity: sha512-7yD362icKgjoNvFxwth420TNZgqCfuTJ28yQCdpyjC2fXyaZHhAbxVKnHEXGTAaUKSHWxsIy46lBKGi/x/Mflw==}
+  '@firebase/app-compat@0.2.51':
+    resolution: {integrity: sha512-pxF1+coABt+ugqNI0YXDlmkKv4kh3pjI5BqIJJ1VXBo42OZbKMsQbFeos14YBrWwiqqSjUvQ70FBNsv5E2wuxg==}
     engines: {node: '>=18.0.0'}
 
   '@firebase/app-types@0.9.3':
     resolution: {integrity: sha512-kRVpIl4vVGJ4baogMDINbyrIOtOxqhkZQg4jTq3l8Lw6WSk0xfpEYzezFu+Kl4ve4fbPl79dvwRtaFqAC/ucCw==}
 
-  '@firebase/app@0.11.1':
-    resolution: {integrity: sha512-Vz4DrNLPfDx3RwQf+4klXtu7OUYDO6xz2hlRyFawWskS7YqdtNzkDDxrqH20KDfjCF1lib46/NgchIj1+8h4wQ==}
+  '@firebase/app@0.11.2':
+    resolution: {integrity: sha512-bFee0hPJZBzNtiizRxdgsu8C9DW3mn1y0OJJ4zHQsccjDYzGOfvN0G3CMGyBIiwNctsFpQa8orbp2IKywoUeqA==}
     engines: {node: '>=18.0.0'}
 
-  '@firebase/auth-compat@0.5.18':
-    resolution: {integrity: sha512-dFBev8AMNb2AgIt9afwf/Ku4/0Wq9R9OFSeBB/xjyJt+RfQ9PnNWqU2oFphews23byLg6jle8twRA7iOYfRGRw==}
+  '@firebase/auth-compat@0.5.19':
+    resolution: {integrity: sha512-v898POphOIBJliKF76SiGOXh4EdhO5fM6S9a2ZKf/8wHdBea/qwxwZoVVya4DW6Mi7vWyp1lIzHbFgwRz8G9TA==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       '@firebase/app-compat': 0.x
@@ -1252,8 +1252,8 @@ packages:
       '@firebase/app-types': 0.x
       '@firebase/util': 1.x
 
-  '@firebase/auth@1.9.0':
-    resolution: {integrity: sha512-Xz2mbEYauF689qXG/4HppS2+/yGo9R7B6eNUBh3H2+XpAZTGdx8d8TFsW/BMTAK9Q95NB0pb1Bbvfx0lwofq8Q==}
+  '@firebase/auth@1.9.1':
+    resolution: {integrity: sha512-9KKo5SNVkyJzftsW+daS+PGDbeJ+MFJWXQFHDqqPPH3acWHtiNnGHH5HGpIJErEELrsm9xMPie5zfZ0XpGU8+w==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       '@firebase/app': 0.x
@@ -1266,8 +1266,12 @@ packages:
     resolution: {integrity: sha512-YnxqjtohLbnb7raXt2YuA44cC1wA9GiehM/cmxrsoxKlFxBLy2V0OkRSj9gpngAE0UoJ421Wlav9ycO7lTPAUw==}
     engines: {node: '>=18.0.0'}
 
-  '@firebase/data-connect@0.3.0':
-    resolution: {integrity: sha512-inbLq0JyQD/d02Al3Lso0Hc8z1BVpB3dYSMFcQkeKhYyjn5bspLczLdasPbCOEUp8MOkLblLZhJuRs7Q/spFnw==}
+  '@firebase/component@0.6.13':
+    resolution: {integrity: sha512-I/Eg1NpAtZ8AAfq8mpdfXnuUpcLxIDdCDtTzWSh+FXnp/9eCKJ3SNbOCKrUCyhLzNa2SiPJYruei0sxVjaOTeg==}
+    engines: {node: '>=18.0.0'}
+
+  '@firebase/data-connect@0.3.1':
+    resolution: {integrity: sha512-PNlfAJ2mcbyRlWfm41nfk8EksTuvMFTFIX+puNzeUa6OTIDtyp1IX1NJVc7n6WpfbErN7tNqcOEMe6BMtpcjVA==}
     peerDependencies:
       '@firebase/app': 0.x
 
@@ -1275,15 +1279,26 @@ packages:
     resolution: {integrity: sha512-uHGQrSUeJvsDfA+IyHW5O4vdRPsCksEzv4T4Jins+bmQgYy20ZESU4x01xrQCn/nzqKHuQMEW99CoCO7D+5NiQ==}
     engines: {node: '>=18.0.0'}
 
+  '@firebase/database-compat@2.0.4':
+    resolution: {integrity: sha512-4qsptwZ3DTGNBje56ETItZQyA/HMalOelnLmkC3eR0M6+zkzOHjNHyWUWodW2mqxRKAM0sGkn+aIwYHKZFJXug==}
+    engines: {node: '>=18.0.0'}
+
   '@firebase/database-types@1.0.8':
     resolution: {integrity: sha512-6lPWIGeufhUq1heofZULyVvWFhD01TUrkkB9vyhmksjZ4XF7NaivQp9rICMk7QNhqwa+uDCaj4j+Q8qqcSVZ9g==}
+
+  '@firebase/database-types@1.0.9':
+    resolution: {integrity: sha512-uCntrxPbJHhZsNRpMhxNCm7GzhYWX+7J2e57wq1ZZ4NJrQw5DORgkAzJMByYZcVAjgADnCxxhK/GkoypH+XpvQ==}
 
   '@firebase/database@1.0.12':
     resolution: {integrity: sha512-psFl5t6rSFHq3i3fnU1QQlc4BB9Hnhh8TgEqvQlPPm8kDLw8gYxvjqYw3c5CZW0+zKR837nwT6im/wtJUivMKw==}
     engines: {node: '>=18.0.0'}
 
-  '@firebase/firestore-compat@0.3.43':
-    resolution: {integrity: sha512-zxg7YS07XQnTetGs3GADM/eA6HB4vWUp+Av4iugmTbft0fQxuTSnGm7ifctaYuR7VMTPckU9CW+oFC9QUNSYvg==}
+  '@firebase/database@1.0.13':
+    resolution: {integrity: sha512-cdc+LuseKdJXzlrCx8ePMXyctSWtYS9SsP3y7EeA85GzNh/IL0b7HOq0eShridL935iQ0KScZCj5qJtKkGE53g==}
+    engines: {node: '>=18.0.0'}
+
+  '@firebase/firestore-compat@0.3.44':
+    resolution: {integrity: sha512-4Lv2TyHEW+FugXPgmQ0ZylSbh9uFuKDP0lCL1hX9cbxXaafhC/Nww+DWokUQ2zZcynjc8fxFunw6Xbd3QHAlgA==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       '@firebase/app-compat': 0.x
@@ -1294,14 +1309,14 @@ packages:
       '@firebase/app-types': 0.x
       '@firebase/util': 1.x
 
-  '@firebase/firestore@4.7.8':
-    resolution: {integrity: sha512-eDvVJ/I5vSmIdGmLHJAK1OcviigIxjjia6i5/AkMFq6vZMt7CBXA0B5Xz9pGRCZ7WewFcsCbK1ZUQoYJ91+Cew==}
+  '@firebase/firestore@4.7.9':
+    resolution: {integrity: sha512-uq/bUtHDqJ5ZqPHAJIlNzHpXUtcVYcASz2V6y7UmP1WLlRKEt1yf1OcQW5u8pY2yq7162OnCl5J5mkOdMTMLZw==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       '@firebase/app': 0.x
 
-  '@firebase/functions-compat@0.3.19':
-    resolution: {integrity: sha512-uw4tR8NcJCDu86UD63Za8A8SgFgmAVFb1XsGlkuBY7gpLyZWEFavWnwRkZ/8cUwpqUhp/SptXFZ1WFJSnOokLw==}
+  '@firebase/functions-compat@0.3.20':
+    resolution: {integrity: sha512-iIudmYDAML6n3c7uXO2YTlzra2/J6lnMzmJTXNthvrKVMgNMaseNoQP1wKfchK84hMuSF8EkM4AvufwbJ+Juew==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       '@firebase/app-compat': 0.x
@@ -1309,14 +1324,14 @@ packages:
   '@firebase/functions-types@0.6.3':
     resolution: {integrity: sha512-EZoDKQLUHFKNx6VLipQwrSMh01A1SaL3Wg6Hpi//x6/fJ6Ee4hrAeswK99I5Ht8roiniKHw4iO0B1Oxj5I4plg==}
 
-  '@firebase/functions@0.12.2':
-    resolution: {integrity: sha512-iKpFDoCYk/Qm+Qwv5ynRb9/yq64QOt0A0+t9NuekyAZnSoV56kSNq/PmsVmBauar5SlmEjhHk6QKdMBP9S0gXA==}
+  '@firebase/functions@0.12.3':
+    resolution: {integrity: sha512-Wv7JZMUkKLb1goOWRtsu3t7m97uK6XQvjQLPvn8rncY91+VgdU72crqnaYCDI/ophNuBEmuK8mn0/pAnjUeA6A==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       '@firebase/app': 0.x
 
-  '@firebase/installations-compat@0.2.12':
-    resolution: {integrity: sha512-RhcGknkxmFu92F6Jb3rXxv6a4sytPjJGifRZj8MSURPuv2Xu+/AispCXEfY1ZraobhEHTG5HLGsP6R4l9qB5aA==}
+  '@firebase/installations-compat@0.2.13':
+    resolution: {integrity: sha512-f/o6MqCI7LD/ulY9gvgkv6w5k6diaReD8BFHd/y/fEdpsXmFWYS/g28GXCB72bRVBOgPpkOUNl+VsMvDwlRKmw==}
     peerDependencies:
       '@firebase/app-compat': 0.x
 
@@ -1325,8 +1340,8 @@ packages:
     peerDependencies:
       '@firebase/app-types': 0.x
 
-  '@firebase/installations@0.6.12':
-    resolution: {integrity: sha512-ES/WpuAV2k2YtBTvdaknEo7IY8vaGjIjS3zhnHSAIvY9KwTR8XZFXOJoZ3nSkjN1A5R4MtEh+07drnzPDg9vaw==}
+  '@firebase/installations@0.6.13':
+    resolution: {integrity: sha512-6ZpkUiaygPFwgVneYxuuOuHnSPnTA4KefLEaw/sKk/rNYgC7X6twaGfYb0sYLpbi9xV4i5jXsqZ3WO+yaguNgg==}
     peerDependencies:
       '@firebase/app': 0.x
 
@@ -1334,42 +1349,42 @@ packages:
     resolution: {integrity: sha512-mH0PEh1zoXGnaR8gD1DeGeNZtWFKbnz9hDO91dIml3iou1gpOnLqXQ2dJfB71dj6dpmUjcQ6phY3ZZJbjErr9g==}
     engines: {node: '>=18.0.0'}
 
-  '@firebase/messaging-compat@0.2.16':
-    resolution: {integrity: sha512-9HZZ88Ig3zQ0ok/Pwt4gQcNsOhoEy8hDHoGsV1am6ulgMuGuDVD2gl11Lere2ksL+msM12Lddi2x/7TCqmODZw==}
+  '@firebase/messaging-compat@0.2.17':
+    resolution: {integrity: sha512-5Q+9IG7FuedusdWHVQRjpA3OVD9KUWp/IPegcv0s5qSqRLBjib7FlAeWxN+VL0Ew43tuPJBY2HKhEecuizmO1Q==}
     peerDependencies:
       '@firebase/app-compat': 0.x
 
   '@firebase/messaging-interop-types@0.2.3':
     resolution: {integrity: sha512-xfzFaJpzcmtDjycpDeCUj0Ge10ATFi/VHVIvEEjDNc3hodVBQADZ7BWQU7CuFpjSHE+eLuBI13z5F/9xOoGX8Q==}
 
-  '@firebase/messaging@0.12.16':
-    resolution: {integrity: sha512-VJ8sCEIeP3+XkfbJA7410WhYGHdloYFZXoHe/vt+vNVDGw8JQPTQSVTRvjrUprEf5I4Tbcnpr2H34lS6zhCHSA==}
+  '@firebase/messaging@0.12.17':
+    resolution: {integrity: sha512-W3CnGhTm6Nx8XGb6E5/+jZTuxX/EK8Vur4QXvO1DwZta/t0xqWMRgO9vNsZFMYBqFV4o3j4F9qK/iddGYwWS6g==}
     peerDependencies:
       '@firebase/app': 0.x
 
-  '@firebase/performance-compat@0.2.13':
-    resolution: {integrity: sha512-pB0SMQj2TLQ6roDcX0YQDWvUnVgsVOl0VnUvyT/VBdCUuQYDHobZsPEuQsoEqmPA44KS/Gl0oyKqf+I8UPtRgw==}
+  '@firebase/performance-compat@0.2.14':
+    resolution: {integrity: sha512-/crPg0fDqHIx+FjFoEqWxNp+lJSF40ZG7x43AAJGRaUaWLJDncQm3UJB5/mABaRZb7obs1CQAcRtd4phZFkmZg==}
     peerDependencies:
       '@firebase/app-compat': 0.x
 
   '@firebase/performance-types@0.2.3':
     resolution: {integrity: sha512-IgkyTz6QZVPAq8GSkLYJvwSLr3LS9+V6vNPQr0x4YozZJiLF5jYixj0amDtATf1X0EtYHqoPO48a9ija8GocxQ==}
 
-  '@firebase/performance@0.7.0':
-    resolution: {integrity: sha512-L91PwYuiJdKXKSRqsWNicvTppAJVzKjye03UlegeD6TkpKjb93T8AmJ9B0Mt0bcWHCNtnnRBCdSCvD2U9GZDjw==}
+  '@firebase/performance@0.7.1':
+    resolution: {integrity: sha512-SkEUurawojCjav2V2AXo6BQLDtv02NxgXPLCiAvrkn95IAKI4W/UbLKYQvMbEez/nqvmnucLyklcMlB0Q5a1iw==}
     peerDependencies:
       '@firebase/app': 0.x
 
-  '@firebase/remote-config-compat@0.2.12':
-    resolution: {integrity: sha512-91jLWPtubIuPBngg9SzwvNCWzhMLcyBccmt7TNZP+y1cuYFNOWWHKUXQ3IrxCLB7WwLqQaEu7fTDAjHsTyBsSw==}
+  '@firebase/remote-config-compat@0.2.13':
+    resolution: {integrity: sha512-UmHoO7TxAEJPIZf8e1Hy6CeFGMeyjqSCpgoBkQZYXFI2JHhzxIyDpr8jVKJJN1dmAePKZ5EX7dC13CmcdTOl7Q==}
     peerDependencies:
       '@firebase/app-compat': 0.x
 
   '@firebase/remote-config-types@0.4.0':
     resolution: {integrity: sha512-7p3mRE/ldCNYt8fmWMQ/MSGRmXYlJ15Rvs9Rk17t8p0WwZDbeK7eRmoI1tvCPaDzn9Oqh+yD6Lw+sGLsLg4kKg==}
 
-  '@firebase/remote-config@0.5.0':
-    resolution: {integrity: sha512-weiEbpBp5PBJTHUWR4GwI7ZacaAg68BKha5QnZ8Go65W4oQjEWqCW/rfskABI/OkrGijlL3CUmCB/SA6mVo0qA==}
+  '@firebase/remote-config@0.6.0':
+    resolution: {integrity: sha512-Yrk4l5+6FJLPHC6irNHMzgTtJ3NfHXlAXVChCBdNFtgmzyGmufNs/sr8oA0auEfIJ5VpXCaThRh3P4OdQxiAlQ==}
     peerDependencies:
       '@firebase/app': 0.x
 
@@ -1379,8 +1394,8 @@ packages:
     peerDependencies:
       firebase: ^11.0.0
 
-  '@firebase/storage-compat@0.3.16':
-    resolution: {integrity: sha512-EeMuok/s0r938lEomia8XILEqSYULm7HcYZ/GTZLDWur0kMf2ktuPVZiTdRiwEV3Iki7FtQO5txrQ/0pLRVLAw==}
+  '@firebase/storage-compat@0.3.17':
+    resolution: {integrity: sha512-CBlODWEZ5b6MJWVh21VZioxwxNwVfPA9CAdsk+ZgVocJQQbE2oDW1XJoRcgthRY1HOitgbn4cVrM+NlQtuUYhw==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       '@firebase/app-compat': 0.x
@@ -1391,8 +1406,8 @@ packages:
       '@firebase/app-types': 0.x
       '@firebase/util': 1.x
 
-  '@firebase/storage@0.13.6':
-    resolution: {integrity: sha512-BEJLYQzVgAoglRl5VRIRZ91RRBZgS/O37/PSGQJBYNuoLmFZUrtwrlLTOAwG776NlO9VQR+K2j15/36Lr2EqHA==}
+  '@firebase/storage@0.13.7':
+    resolution: {integrity: sha512-FkRyc24rK+Y6EaQ1tYFm3TevBnnfSNA0VyTfew2hrYyL/aYfatBg7HOgktUdB4kWMHNA9VoTotzZTGoLuK92wg==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       '@firebase/app': 0.x
@@ -1401,8 +1416,12 @@ packages:
     resolution: {integrity: sha512-wfoF5LTy0m2ufUapV0ZnpcGQvuavTbJ5Qr1Ze9OJGL70cSMvhDyjS4w2121XdA3lGZSTOsDOyGhpoDtYwck85A==}
     engines: {node: '>=18.0.0'}
 
-  '@firebase/vertexai@1.0.4':
-    resolution: {integrity: sha512-Nkf/r4u166b4Id6zrrW0Qtg1KyZpQvvYchtkebamnHtIfY+Qnt51I/sx4Saos/WrmO8SnrSU850LfmJ7pehYXg==}
+  '@firebase/util@1.11.0':
+    resolution: {integrity: sha512-PzSrhIr++KI6y4P6C/IdgBNMkEx0Ex6554/cYd0Hm+ovyFSJtJXqb/3OSIdnBoa2cpwZT1/GW56EmRc5qEc5fQ==}
+    engines: {node: '>=18.0.0'}
+
+  '@firebase/vertexai@1.1.0':
+    resolution: {integrity: sha512-K8CgIFKJrfrf5lYhKnDXOu08FEmIzVExK+ApUZx4Bw2GAmLEA3wDVrsjuupuvpXZSp8QlzvEiXwqshqqc4v0pA==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       '@firebase/app': 0.x
@@ -1970,8 +1989,8 @@ packages:
   '@types/node-forge@1.3.11':
     resolution: {integrity: sha512-FQx220y22OKNTqaByeBGqHWYz4cl94tpcxeFdvBo3wjG6XPBuZ0BNgNZRV5J5TFmmcsJ4IzsLkmGRiQbnYsBEQ==}
 
-  '@types/node@22.13.5':
-    resolution: {integrity: sha512-+lTU0PxZXn0Dr1NBtC7Y8cR21AJr87dLLU953CWA6pMxxv/UDc7jYAY90upcrie1nRcD6XNG5HOYEDtgW5TxAg==}
+  '@types/node@22.13.8':
+    resolution: {integrity: sha512-G3EfaZS+iOGYWLLRCEAXdWK9my08oHNZ+FHluRiggIYJPOXzhOiDgpVCUHaUvyIC5/fj7C/p637jdzC666AOKQ==}
 
   '@types/normalize-package-data@2.4.4':
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
@@ -2212,8 +2231,8 @@ packages:
   '@vue/devtools-shared@7.7.2':
     resolution: {integrity: sha512-uBFxnp8gwW2vD6FrJB8JZLUzVb6PNRG0B0jBnHsOH8uKyva2qINY8PTF5Te4QlTbMDqU5K6qtJDr6cNsKWhbOA==}
 
-  '@vue/language-core@2.2.4':
-    resolution: {integrity: sha512-eGGdw7eWUwdIn9Fy/irJ7uavCGfgemuHQABgJ/hU1UgZFnbTg9VWeXvHQdhY+2SPQZWJqWXvRWIg67t4iWEa+Q==}
+  '@vue/language-core@2.2.8':
+    resolution: {integrity: sha512-rrzB0wPGBvcwaSNRriVWdNAbHQWSf0NlGqgKHK5mEkXpefjUlVRP62u03KvwZpvKVjRnBIQ/Lwre+Mx9N6juUQ==}
     peerDependencies:
       typescript: '*'
     peerDependenciesMeta:
@@ -3475,13 +3494,13 @@ packages:
     peerDependencies:
       firebase-admin: ^11.10.0 || ^12.0.0 || ^13.0.0
 
-  firebase-tools@13.31.2:
-    resolution: {integrity: sha512-y88vAQ8L2Bm5kkYKUyiXmUlvOs/kikE7pbVgEsoX/0CiwFqqoN8+TAi7ZwsOkB/dRlNlR4WztAa7Od6LQ0GhuQ==}
+  firebase-tools@13.32.0:
+    resolution: {integrity: sha512-KkrZ4+Mlj4aV81cJsgXmabWfbanmYSiSONv2B0m/bVpMcVhKCcT0DupBYcD7WOTyNA6f6M8m6E8yPOO/acwchA==}
     engines: {node: '>=18.0.0 || >=20.0.0 || >=22.0.0'}
     hasBin: true
 
-  firebase@11.3.1:
-    resolution: {integrity: sha512-P4YVFM0Bm2d8aO61SCEMF8E1pYgieGLrmr/LFw7vs6sAMebwuwHt+Wug+1qL2fhAHWPwpWbCLsdJH8NQ+4Sw8Q==}
+  firebase@11.4.0:
+    resolution: {integrity: sha512-Z6kwhWIPDgIm0+NUEQxwjH14hMP7t42WSFnf/78R0Vh59VovLYTOCTM3MIdY3jlSZ9uKz56FhXrvsNXNhAn/Xg==}
 
   flat-cache@4.0.1:
     resolution: {integrity: sha512-f7ccFPK3SXFHpx15UIGyRJ/FJQctuKZ0zVuN3frBo4HnK3cay9VEW0R6yPYFHC0AgqhukPzKjq22t5DmAyqGyw==}
@@ -4310,8 +4329,8 @@ packages:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
 
-  libphonenumber-js@1.11.20:
-    resolution: {integrity: sha512-/ipwAMvtSZRdiQBHqW1qxqeYiBMzncOQLVA+62MWYr7N4m7Q2jqpJ0WgT7zlOEOpyLRSqrMXidbJpC0J77AaKA==}
+  libphonenumber-js@1.12.4:
+    resolution: {integrity: sha512-vLmhg7Gan7idyAKfc6pvCtNzvar4/eIzrVVk3hjNFH5+fGqyjD0gQRovdTrDl20wsmZhBtmZpcsR0tOfquwb8g==}
 
   libsodium-wrappers@0.7.15:
     resolution: {integrity: sha512-E4anqJQwcfiC6+Yrl01C1m8p99wEhLmJSs0VQqST66SbQXXBoaJY0pF4BNjRYa/sOQAxx6lXAaAFIlx+15tXJQ==}
@@ -5117,8 +5136,8 @@ packages:
     resolution: {integrity: sha512-+38qI9SOr8tfZ4QmJNplMUxqjbe7LKvvZgWdExBOmd+egZTtjLB67Gu0HRX3u/XOq7UU2Nx6nsjvS16Z9uwfpg==}
     engines: {node: '>=0.6'}
 
-  quasar@2.17.7:
-    resolution: {integrity: sha512-nPJdHoONlcW7WEU2Ody907Wx945Zfyuea/KP4LBaEn5AcL95PUWp8Gz/0zDYNnFw0aCWRtye3SUAdQl5tmrn5w==}
+  quasar@2.18.0:
+    resolution: {integrity: sha512-poaTNL9afzxieIE1D6G8AQB9gGCHhmQsCQTMCwkcd/FFZBQqqhKREWzgO7rEo6REDyPHLKBuBJ9QxLAahE55YA==}
     engines: {node: '>= 10.18.1', npm: '>= 6.13.4', yarn: '>= 1.21.1'}
 
   querystringify@2.2.0:
@@ -6064,13 +6083,8 @@ packages:
       eslint: ^8.57.0 || ^9.0.0
       typescript: '>=4.8.4 <5.8.0'
 
-  typescript@5.7.3:
-    resolution: {integrity: sha512-84MVSjMEHP+FQRPy3pX9sTVV/INIex71s9TL2Gm5FG/WG1SqXeKyZ0k7/blY/4FdOzI12CBy1vGc4og/eus0fw==}
-    engines: {node: '>=14.17'}
-    hasBin: true
-
-  typescript@5.8.0-dev.20250131:
-    resolution: {integrity: sha512-q7nLABAsnnq3BdqOdWnRGVhe7Gv3QkditzT6YMfWpKHsZoJ1TVo+C4ZCZHK4fCuu2vHYUwV0zUUsEZZXdnxB2w==}
+  typescript@5.8.2:
+    resolution: {integrity: sha512-aJn6wq13/afZp/jT9QZmwEjDqqvSGp1VT5GVg+f/t6/oVyrgXM6BY1h9BRh/O5p3PlUPAe+WuiEZOmb/49RqoQ==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -6287,8 +6301,8 @@ packages:
   vscode-uri@3.0.8:
     resolution: {integrity: sha512-AyFQ0EVmsOZOlAnxoFOGOq1SQDWAB7C6aqMGS23svWAllfOaxbuFvcT8D1i8z3Gyn8fraVeZNNmN6e9bxxXkKw==}
 
-  vue-component-type-helpers@2.2.4:
-    resolution: {integrity: sha512-F66p0XLbAu92BRz6kakHyAcaUSF7HWpWX/THCqL0TxySSj7z/nok5UUMohfNkkCm1pZtawsdzoJ4p1cjNqCx0Q==}
+  vue-component-type-helpers@2.2.8:
+    resolution: {integrity: sha512-4bjIsC284coDO9om4HPA62M7wfsTvcmZyzdfR0aUlFXqq4tXxM1APyXpNVxPC8QazKw9OhmZNHBVDA6ODaZsrA==}
 
   vue-demi@0.13.11:
     resolution: {integrity: sha512-IR8HoEEGM65YY3ZJYAjMlKygDQn25D5ajNFNoKh9RSDMQtlzCxtfQjdQgv9jjK+m3377SsJXY8ysq8kLCZL25A==}
@@ -6348,8 +6362,8 @@ packages:
     peerDependencies:
       vue: ^3.2.0
 
-  vue-tsc@2.2.4:
-    resolution: {integrity: sha512-3EVHlxtpMXcb5bCaK7QDFTbEkMusDfVk0HVRrkv5hEb+Clpu9a96lKUXJAeD/akRlkoA4H8MCHgBDN19S6FnzA==}
+  vue-tsc@2.2.8:
+    resolution: {integrity: sha512-jBYKBNFADTN+L+MdesNX/TB3XuDSyaWynKMDgR+yCSln0GQ9Tfb7JS2lr46s2LiFUT1WsmfWsSvIElyxzOPqcQ==}
     hasBin: true
     peerDependencies:
       typescript: '>=5.0.0'
@@ -7564,40 +7578,40 @@ snapshots:
       '@eslint/core': 0.12.0
       levn: 0.4.1
 
-  '@faker-js/faker@9.5.0': {}
+  '@faker-js/faker@9.5.1': {}
 
   '@fastify/busboy@3.0.0': {}
 
-  '@firebase/analytics-compat@0.2.17(@firebase/app-compat@0.2.50)(@firebase/app@0.11.1)':
+  '@firebase/analytics-compat@0.2.18(@firebase/app-compat@0.2.51)(@firebase/app@0.11.2)':
     dependencies:
-      '@firebase/analytics': 0.10.11(@firebase/app@0.11.1)
+      '@firebase/analytics': 0.10.12(@firebase/app@0.11.2)
       '@firebase/analytics-types': 0.8.3
-      '@firebase/app-compat': 0.2.50
-      '@firebase/component': 0.6.12
-      '@firebase/util': 1.10.3
+      '@firebase/app-compat': 0.2.51
+      '@firebase/component': 0.6.13
+      '@firebase/util': 1.11.0
       tslib: 2.7.0
     transitivePeerDependencies:
       - '@firebase/app'
 
   '@firebase/analytics-types@0.8.3': {}
 
-  '@firebase/analytics@0.10.11(@firebase/app@0.11.1)':
+  '@firebase/analytics@0.10.12(@firebase/app@0.11.2)':
     dependencies:
-      '@firebase/app': 0.11.1
-      '@firebase/component': 0.6.12
-      '@firebase/installations': 0.6.12(@firebase/app@0.11.1)
+      '@firebase/app': 0.11.2
+      '@firebase/component': 0.6.13
+      '@firebase/installations': 0.6.13(@firebase/app@0.11.2)
       '@firebase/logger': 0.4.4
-      '@firebase/util': 1.10.3
+      '@firebase/util': 1.11.0
       tslib: 2.7.0
 
-  '@firebase/app-check-compat@0.3.18(@firebase/app-compat@0.2.50)(@firebase/app@0.11.1)':
+  '@firebase/app-check-compat@0.3.19(@firebase/app-compat@0.2.51)(@firebase/app@0.11.2)':
     dependencies:
-      '@firebase/app-check': 0.8.11(@firebase/app@0.11.1)
+      '@firebase/app-check': 0.8.12(@firebase/app@0.11.2)
       '@firebase/app-check-types': 0.5.3
-      '@firebase/app-compat': 0.2.50
-      '@firebase/component': 0.6.12
+      '@firebase/app-compat': 0.2.51
+      '@firebase/component': 0.6.13
       '@firebase/logger': 0.4.4
-      '@firebase/util': 1.10.3
+      '@firebase/util': 1.11.0
       tslib: 2.7.0
     transitivePeerDependencies:
       - '@firebase/app'
@@ -7606,39 +7620,39 @@ snapshots:
 
   '@firebase/app-check-types@0.5.3': {}
 
-  '@firebase/app-check@0.8.11(@firebase/app@0.11.1)':
+  '@firebase/app-check@0.8.12(@firebase/app@0.11.2)':
     dependencies:
-      '@firebase/app': 0.11.1
-      '@firebase/component': 0.6.12
+      '@firebase/app': 0.11.2
+      '@firebase/component': 0.6.13
       '@firebase/logger': 0.4.4
-      '@firebase/util': 1.10.3
+      '@firebase/util': 1.11.0
       tslib: 2.7.0
 
-  '@firebase/app-compat@0.2.50':
+  '@firebase/app-compat@0.2.51':
     dependencies:
-      '@firebase/app': 0.11.1
-      '@firebase/component': 0.6.12
+      '@firebase/app': 0.11.2
+      '@firebase/component': 0.6.13
       '@firebase/logger': 0.4.4
-      '@firebase/util': 1.10.3
+      '@firebase/util': 1.11.0
       tslib: 2.7.0
 
   '@firebase/app-types@0.9.3': {}
 
-  '@firebase/app@0.11.1':
+  '@firebase/app@0.11.2':
     dependencies:
-      '@firebase/component': 0.6.12
+      '@firebase/component': 0.6.13
       '@firebase/logger': 0.4.4
-      '@firebase/util': 1.10.3
+      '@firebase/util': 1.11.0
       idb: 7.1.1
       tslib: 2.7.0
 
-  '@firebase/auth-compat@0.5.18(@firebase/app-compat@0.2.50)(@firebase/app-types@0.9.3)(@firebase/app@0.11.1)':
+  '@firebase/auth-compat@0.5.19(@firebase/app-compat@0.2.51)(@firebase/app-types@0.9.3)(@firebase/app@0.11.2)':
     dependencies:
-      '@firebase/app-compat': 0.2.50
-      '@firebase/auth': 1.9.0(@firebase/app@0.11.1)
-      '@firebase/auth-types': 0.13.0(@firebase/app-types@0.9.3)(@firebase/util@1.10.3)
-      '@firebase/component': 0.6.12
-      '@firebase/util': 1.10.3
+      '@firebase/app-compat': 0.2.51
+      '@firebase/auth': 1.9.1(@firebase/app@0.11.2)
+      '@firebase/auth-types': 0.13.0(@firebase/app-types@0.9.3)(@firebase/util@1.11.0)
+      '@firebase/component': 0.6.13
+      '@firebase/util': 1.11.0
       tslib: 2.7.0
     transitivePeerDependencies:
       - '@firebase/app'
@@ -7647,17 +7661,17 @@ snapshots:
 
   '@firebase/auth-interop-types@0.2.4': {}
 
-  '@firebase/auth-types@0.13.0(@firebase/app-types@0.9.3)(@firebase/util@1.10.3)':
+  '@firebase/auth-types@0.13.0(@firebase/app-types@0.9.3)(@firebase/util@1.11.0)':
     dependencies:
       '@firebase/app-types': 0.9.3
-      '@firebase/util': 1.10.3
+      '@firebase/util': 1.11.0
 
-  '@firebase/auth@1.9.0(@firebase/app@0.11.1)':
+  '@firebase/auth@1.9.1(@firebase/app@0.11.2)':
     dependencies:
-      '@firebase/app': 0.11.1
-      '@firebase/component': 0.6.12
+      '@firebase/app': 0.11.2
+      '@firebase/component': 0.6.13
       '@firebase/logger': 0.4.4
-      '@firebase/util': 1.10.3
+      '@firebase/util': 1.11.0
       tslib: 2.7.0
 
   '@firebase/component@0.6.12':
@@ -7665,13 +7679,18 @@ snapshots:
       '@firebase/util': 1.10.3
       tslib: 2.7.0
 
-  '@firebase/data-connect@0.3.0(@firebase/app@0.11.1)':
+  '@firebase/component@0.6.13':
     dependencies:
-      '@firebase/app': 0.11.1
+      '@firebase/util': 1.11.0
+      tslib: 2.7.0
+
+  '@firebase/data-connect@0.3.1(@firebase/app@0.11.2)':
+    dependencies:
+      '@firebase/app': 0.11.2
       '@firebase/auth-interop-types': 0.2.4
-      '@firebase/component': 0.6.12
+      '@firebase/component': 0.6.13
       '@firebase/logger': 0.4.4
-      '@firebase/util': 1.10.3
+      '@firebase/util': 1.11.0
       tslib: 2.7.0
 
   '@firebase/database-compat@2.0.3':
@@ -7683,10 +7702,24 @@ snapshots:
       '@firebase/util': 1.10.3
       tslib: 2.7.0
 
+  '@firebase/database-compat@2.0.4':
+    dependencies:
+      '@firebase/component': 0.6.13
+      '@firebase/database': 1.0.13
+      '@firebase/database-types': 1.0.9
+      '@firebase/logger': 0.4.4
+      '@firebase/util': 1.11.0
+      tslib: 2.7.0
+
   '@firebase/database-types@1.0.8':
     dependencies:
       '@firebase/app-types': 0.9.3
       '@firebase/util': 1.10.3
+
+  '@firebase/database-types@1.0.9':
+    dependencies:
+      '@firebase/app-types': 0.9.3
+      '@firebase/util': 1.11.0
 
   '@firebase/database@1.0.12':
     dependencies:
@@ -7698,64 +7731,74 @@ snapshots:
       faye-websocket: 0.11.4
       tslib: 2.7.0
 
-  '@firebase/firestore-compat@0.3.43(@firebase/app-compat@0.2.50)(@firebase/app-types@0.9.3)(@firebase/app@0.11.1)':
+  '@firebase/database@1.0.13':
     dependencies:
-      '@firebase/app-compat': 0.2.50
-      '@firebase/component': 0.6.12
-      '@firebase/firestore': 4.7.8(@firebase/app@0.11.1)
-      '@firebase/firestore-types': 3.0.3(@firebase/app-types@0.9.3)(@firebase/util@1.10.3)
-      '@firebase/util': 1.10.3
+      '@firebase/app-check-interop-types': 0.3.3
+      '@firebase/auth-interop-types': 0.2.4
+      '@firebase/component': 0.6.13
+      '@firebase/logger': 0.4.4
+      '@firebase/util': 1.11.0
+      faye-websocket: 0.11.4
+      tslib: 2.7.0
+
+  '@firebase/firestore-compat@0.3.44(@firebase/app-compat@0.2.51)(@firebase/app-types@0.9.3)(@firebase/app@0.11.2)':
+    dependencies:
+      '@firebase/app-compat': 0.2.51
+      '@firebase/component': 0.6.13
+      '@firebase/firestore': 4.7.9(@firebase/app@0.11.2)
+      '@firebase/firestore-types': 3.0.3(@firebase/app-types@0.9.3)(@firebase/util@1.11.0)
+      '@firebase/util': 1.11.0
       tslib: 2.7.0
     transitivePeerDependencies:
       - '@firebase/app'
       - '@firebase/app-types'
 
-  '@firebase/firestore-types@3.0.3(@firebase/app-types@0.9.3)(@firebase/util@1.10.3)':
+  '@firebase/firestore-types@3.0.3(@firebase/app-types@0.9.3)(@firebase/util@1.11.0)':
     dependencies:
       '@firebase/app-types': 0.9.3
-      '@firebase/util': 1.10.3
+      '@firebase/util': 1.11.0
 
-  '@firebase/firestore@4.7.8(@firebase/app@0.11.1)':
+  '@firebase/firestore@4.7.9(@firebase/app@0.11.2)':
     dependencies:
-      '@firebase/app': 0.11.1
-      '@firebase/component': 0.6.12
+      '@firebase/app': 0.11.2
+      '@firebase/component': 0.6.13
       '@firebase/logger': 0.4.4
-      '@firebase/util': 1.10.3
+      '@firebase/util': 1.11.0
       '@firebase/webchannel-wrapper': 1.0.3
       '@grpc/grpc-js': 1.9.15
       '@grpc/proto-loader': 0.7.13
       tslib: 2.7.0
 
-  '@firebase/functions-compat@0.3.19(@firebase/app-compat@0.2.50)(@firebase/app@0.11.1)':
+  '@firebase/functions-compat@0.3.20(@firebase/app-compat@0.2.51)(@firebase/app@0.11.2)':
     dependencies:
-      '@firebase/app-compat': 0.2.50
-      '@firebase/component': 0.6.12
-      '@firebase/functions': 0.12.2(@firebase/app@0.11.1)
+      '@firebase/app-compat': 0.2.51
+      '@firebase/component': 0.6.13
+      '@firebase/functions': 0.12.3(@firebase/app@0.11.2)
       '@firebase/functions-types': 0.6.3
-      '@firebase/util': 1.10.3
+      '@firebase/util': 1.11.0
       tslib: 2.7.0
     transitivePeerDependencies:
       - '@firebase/app'
 
   '@firebase/functions-types@0.6.3': {}
 
-  '@firebase/functions@0.12.2(@firebase/app@0.11.1)':
+  '@firebase/functions@0.12.3(@firebase/app@0.11.2)':
     dependencies:
-      '@firebase/app': 0.11.1
+      '@firebase/app': 0.11.2
       '@firebase/app-check-interop-types': 0.3.3
       '@firebase/auth-interop-types': 0.2.4
-      '@firebase/component': 0.6.12
+      '@firebase/component': 0.6.13
       '@firebase/messaging-interop-types': 0.2.3
-      '@firebase/util': 1.10.3
+      '@firebase/util': 1.11.0
       tslib: 2.7.0
 
-  '@firebase/installations-compat@0.2.12(@firebase/app-compat@0.2.50)(@firebase/app-types@0.9.3)(@firebase/app@0.11.1)':
+  '@firebase/installations-compat@0.2.13(@firebase/app-compat@0.2.51)(@firebase/app-types@0.9.3)(@firebase/app@0.11.2)':
     dependencies:
-      '@firebase/app-compat': 0.2.50
-      '@firebase/component': 0.6.12
-      '@firebase/installations': 0.6.12(@firebase/app@0.11.1)
+      '@firebase/app-compat': 0.2.51
+      '@firebase/component': 0.6.13
+      '@firebase/installations': 0.6.13(@firebase/app@0.11.2)
       '@firebase/installations-types': 0.5.3(@firebase/app-types@0.9.3)
-      '@firebase/util': 1.10.3
+      '@firebase/util': 1.11.0
       tslib: 2.7.0
     transitivePeerDependencies:
       - '@firebase/app'
@@ -7765,11 +7808,11 @@ snapshots:
     dependencies:
       '@firebase/app-types': 0.9.3
 
-  '@firebase/installations@0.6.12(@firebase/app@0.11.1)':
+  '@firebase/installations@0.6.13(@firebase/app@0.11.2)':
     dependencies:
-      '@firebase/app': 0.11.1
-      '@firebase/component': 0.6.12
-      '@firebase/util': 1.10.3
+      '@firebase/app': 0.11.2
+      '@firebase/component': 0.6.13
+      '@firebase/util': 1.11.0
       idb: 7.1.1
       tslib: 2.7.0
 
@@ -7777,115 +7820,119 @@ snapshots:
     dependencies:
       tslib: 2.7.0
 
-  '@firebase/messaging-compat@0.2.16(@firebase/app-compat@0.2.50)(@firebase/app@0.11.1)':
+  '@firebase/messaging-compat@0.2.17(@firebase/app-compat@0.2.51)(@firebase/app@0.11.2)':
     dependencies:
-      '@firebase/app-compat': 0.2.50
-      '@firebase/component': 0.6.12
-      '@firebase/messaging': 0.12.16(@firebase/app@0.11.1)
-      '@firebase/util': 1.10.3
+      '@firebase/app-compat': 0.2.51
+      '@firebase/component': 0.6.13
+      '@firebase/messaging': 0.12.17(@firebase/app@0.11.2)
+      '@firebase/util': 1.11.0
       tslib: 2.7.0
     transitivePeerDependencies:
       - '@firebase/app'
 
   '@firebase/messaging-interop-types@0.2.3': {}
 
-  '@firebase/messaging@0.12.16(@firebase/app@0.11.1)':
+  '@firebase/messaging@0.12.17(@firebase/app@0.11.2)':
     dependencies:
-      '@firebase/app': 0.11.1
-      '@firebase/component': 0.6.12
-      '@firebase/installations': 0.6.12(@firebase/app@0.11.1)
+      '@firebase/app': 0.11.2
+      '@firebase/component': 0.6.13
+      '@firebase/installations': 0.6.13(@firebase/app@0.11.2)
       '@firebase/messaging-interop-types': 0.2.3
-      '@firebase/util': 1.10.3
+      '@firebase/util': 1.11.0
       idb: 7.1.1
       tslib: 2.7.0
 
-  '@firebase/performance-compat@0.2.13(@firebase/app-compat@0.2.50)(@firebase/app@0.11.1)':
+  '@firebase/performance-compat@0.2.14(@firebase/app-compat@0.2.51)(@firebase/app@0.11.2)':
     dependencies:
-      '@firebase/app-compat': 0.2.50
-      '@firebase/component': 0.6.12
+      '@firebase/app-compat': 0.2.51
+      '@firebase/component': 0.6.13
       '@firebase/logger': 0.4.4
-      '@firebase/performance': 0.7.0(@firebase/app@0.11.1)
+      '@firebase/performance': 0.7.1(@firebase/app@0.11.2)
       '@firebase/performance-types': 0.2.3
-      '@firebase/util': 1.10.3
+      '@firebase/util': 1.11.0
       tslib: 2.7.0
     transitivePeerDependencies:
       - '@firebase/app'
 
   '@firebase/performance-types@0.2.3': {}
 
-  '@firebase/performance@0.7.0(@firebase/app@0.11.1)':
+  '@firebase/performance@0.7.1(@firebase/app@0.11.2)':
     dependencies:
-      '@firebase/app': 0.11.1
-      '@firebase/component': 0.6.12
-      '@firebase/installations': 0.6.12(@firebase/app@0.11.1)
+      '@firebase/app': 0.11.2
+      '@firebase/component': 0.6.13
+      '@firebase/installations': 0.6.13(@firebase/app@0.11.2)
       '@firebase/logger': 0.4.4
-      '@firebase/util': 1.10.3
+      '@firebase/util': 1.11.0
       tslib: 2.7.0
       web-vitals: 4.2.4
 
-  '@firebase/remote-config-compat@0.2.12(@firebase/app-compat@0.2.50)(@firebase/app@0.11.1)':
+  '@firebase/remote-config-compat@0.2.13(@firebase/app-compat@0.2.51)(@firebase/app@0.11.2)':
     dependencies:
-      '@firebase/app-compat': 0.2.50
-      '@firebase/component': 0.6.12
+      '@firebase/app-compat': 0.2.51
+      '@firebase/component': 0.6.13
       '@firebase/logger': 0.4.4
-      '@firebase/remote-config': 0.5.0(@firebase/app@0.11.1)
+      '@firebase/remote-config': 0.6.0(@firebase/app@0.11.2)
       '@firebase/remote-config-types': 0.4.0
-      '@firebase/util': 1.10.3
+      '@firebase/util': 1.11.0
       tslib: 2.7.0
     transitivePeerDependencies:
       - '@firebase/app'
 
   '@firebase/remote-config-types@0.4.0': {}
 
-  '@firebase/remote-config@0.5.0(@firebase/app@0.11.1)':
+  '@firebase/remote-config@0.6.0(@firebase/app@0.11.2)':
     dependencies:
-      '@firebase/app': 0.11.1
-      '@firebase/component': 0.6.12
-      '@firebase/installations': 0.6.12(@firebase/app@0.11.1)
+      '@firebase/app': 0.11.2
+      '@firebase/component': 0.6.13
+      '@firebase/installations': 0.6.13(@firebase/app@0.11.2)
       '@firebase/logger': 0.4.4
-      '@firebase/util': 1.10.3
+      '@firebase/util': 1.11.0
       tslib: 2.7.0
 
-  '@firebase/rules-unit-testing@4.0.1(firebase@11.3.1)':
+  '@firebase/rules-unit-testing@4.0.1(firebase@11.4.0)':
     dependencies:
-      firebase: 11.3.1
+      firebase: 11.4.0
 
-  '@firebase/storage-compat@0.3.16(@firebase/app-compat@0.2.50)(@firebase/app-types@0.9.3)(@firebase/app@0.11.1)':
+  '@firebase/storage-compat@0.3.17(@firebase/app-compat@0.2.51)(@firebase/app-types@0.9.3)(@firebase/app@0.11.2)':
     dependencies:
-      '@firebase/app-compat': 0.2.50
-      '@firebase/component': 0.6.12
-      '@firebase/storage': 0.13.6(@firebase/app@0.11.1)
-      '@firebase/storage-types': 0.8.3(@firebase/app-types@0.9.3)(@firebase/util@1.10.3)
-      '@firebase/util': 1.10.3
+      '@firebase/app-compat': 0.2.51
+      '@firebase/component': 0.6.13
+      '@firebase/storage': 0.13.7(@firebase/app@0.11.2)
+      '@firebase/storage-types': 0.8.3(@firebase/app-types@0.9.3)(@firebase/util@1.11.0)
+      '@firebase/util': 1.11.0
       tslib: 2.7.0
     transitivePeerDependencies:
       - '@firebase/app'
       - '@firebase/app-types'
 
-  '@firebase/storage-types@0.8.3(@firebase/app-types@0.9.3)(@firebase/util@1.10.3)':
+  '@firebase/storage-types@0.8.3(@firebase/app-types@0.9.3)(@firebase/util@1.11.0)':
     dependencies:
       '@firebase/app-types': 0.9.3
-      '@firebase/util': 1.10.3
+      '@firebase/util': 1.11.0
 
-  '@firebase/storage@0.13.6(@firebase/app@0.11.1)':
+  '@firebase/storage@0.13.7(@firebase/app@0.11.2)':
     dependencies:
-      '@firebase/app': 0.11.1
-      '@firebase/component': 0.6.12
-      '@firebase/util': 1.10.3
+      '@firebase/app': 0.11.2
+      '@firebase/component': 0.6.13
+      '@firebase/util': 1.11.0
       tslib: 2.7.0
 
   '@firebase/util@1.10.3':
     dependencies:
       tslib: 2.7.0
 
-  '@firebase/vertexai@1.0.4(@firebase/app-types@0.9.3)(@firebase/app@0.11.1)':
+  '@firebase/util@1.11.0':
     dependencies:
-      '@firebase/app': 0.11.1
+      tslib: 2.7.0
+
+  '@firebase/vertexai@1.1.0(@firebase/app-types@0.9.3)(@firebase/app@0.11.2)':
+    dependencies:
+      '@firebase/app': 0.11.2
       '@firebase/app-check-interop-types': 0.3.3
       '@firebase/app-types': 0.9.3
-      '@firebase/component': 0.6.12
+      '@firebase/component': 0.6.13
       '@firebase/logger': 0.4.4
-      '@firebase/util': 1.10.3
+      '@firebase/util': 1.11.0
       tslib: 2.7.0
 
   '@firebase/webchannel-wrapper@1.0.3': {}
@@ -7993,7 +8040,7 @@ snapshots:
   '@grpc/grpc-js@1.9.15':
     dependencies:
       '@grpc/proto-loader': 0.7.13
-      '@types/node': 22.13.5
+      '@types/node': 22.13.8
 
   '@grpc/proto-loader@0.7.13':
     dependencies:
@@ -8015,16 +8062,16 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.2': {}
 
-  '@inquirer/confirm@5.0.1(@types/node@22.13.5)':
+  '@inquirer/confirm@5.0.1(@types/node@22.13.8)':
     dependencies:
-      '@inquirer/core': 10.0.1(@types/node@22.13.5)
-      '@inquirer/type': 3.0.0(@types/node@22.13.5)
-      '@types/node': 22.13.5
+      '@inquirer/core': 10.0.1(@types/node@22.13.8)
+      '@inquirer/type': 3.0.0(@types/node@22.13.8)
+      '@types/node': 22.13.8
 
-  '@inquirer/core@10.0.1(@types/node@22.13.5)':
+  '@inquirer/core@10.0.1(@types/node@22.13.8)':
     dependencies:
       '@inquirer/figures': 1.0.7
-      '@inquirer/type': 3.0.0(@types/node@22.13.5)
+      '@inquirer/type': 3.0.0(@types/node@22.13.8)
       ansi-escapes: 4.3.2
       cli-width: 4.1.0
       mute-stream: 2.0.0
@@ -8037,9 +8084,9 @@ snapshots:
 
   '@inquirer/figures@1.0.7': {}
 
-  '@inquirer/type@3.0.0(@types/node@22.13.5)':
+  '@inquirer/type@3.0.0(@types/node@22.13.8)':
     dependencies:
-      '@types/node': 22.13.5
+      '@types/node': 22.13.8
 
   '@intlify/core-base@11.1.1':
     dependencies:
@@ -8142,7 +8189,7 @@ snapshots:
 
   '@npmcli/fs@3.1.1':
     dependencies:
-      semver: 7.6.3
+      semver: 7.7.1
     optional: true
 
   '@one-ini/wasm@0.1.1': {}
@@ -8160,9 +8207,9 @@ snapshots:
 
   '@opentelemetry/semantic-conventions@1.26.0': {}
 
-  '@pinia/testing@1.0.0(pinia@3.0.1(typescript@5.8.0-dev.20250131)(vue@3.5.13(typescript@5.8.0-dev.20250131)))':
+  '@pinia/testing@1.0.0(pinia@3.0.1(typescript@5.8.2)(vue@3.5.13(typescript@5.8.2)))':
     dependencies:
-      pinia: 3.0.1(typescript@5.8.0-dev.20250131)(vue@3.5.13(typescript@5.8.0-dev.20250131))
+      pinia: 3.0.1(typescript@5.8.2)(vue@3.5.13(typescript@5.8.2))
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
@@ -8212,16 +8259,16 @@ snapshots:
 
   '@protobufjs/utf8@1.1.0': {}
 
-  '@quasar/app-vite@2.1.1(@types/node@22.13.5)(eslint@9.21.0)(pinia@3.0.1(typescript@5.8.0-dev.20250131)(vue@3.5.13(typescript@5.8.0-dev.20250131)))(quasar@2.17.7)(rollup@2.79.2)(sass@1.79.4)(terser@5.34.1)(typescript@5.8.0-dev.20250131)(vue-router@4.5.0(vue@3.5.13(typescript@5.8.0-dev.20250131)))(vue@3.5.13(typescript@5.8.0-dev.20250131))(workbox-build@7.3.0)(yaml@2.5.1)':
+  '@quasar/app-vite@2.1.1(@types/node@22.13.8)(eslint@9.21.0)(pinia@3.0.1(typescript@5.8.2)(vue@3.5.13(typescript@5.8.2)))(quasar@2.18.0)(rollup@2.79.2)(sass@1.79.4)(terser@5.34.1)(typescript@5.8.2)(vue-router@4.5.0(vue@3.5.13(typescript@5.8.2)))(vue@3.5.13(typescript@5.8.2))(workbox-build@7.3.0)(yaml@2.5.1)':
     dependencies:
       '@quasar/render-ssr-error': 1.0.3
       '@quasar/ssl-certificate': 1.0.0
-      '@quasar/vite-plugin': 1.9.0(@vitejs/plugin-vue@5.2.1(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vue@3.5.13(typescript@5.8.0-dev.20250131)))(quasar@2.17.7)(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vue@3.5.13(typescript@5.8.0-dev.20250131))
+      '@quasar/vite-plugin': 1.9.0(@vitejs/plugin-vue@5.2.1(vite@6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vue@3.5.13(typescript@5.8.2)))(quasar@2.18.0)(vite@6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vue@3.5.13(typescript@5.8.2))
       '@types/chrome': 0.0.262
       '@types/compression': 1.7.5
       '@types/cordova': 11.0.3
       '@types/express': 4.17.21
-      '@vitejs/plugin-vue': 5.2.1(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vue@3.5.13(typescript@5.8.0-dev.20250131))
+      '@vitejs/plugin-vue': 5.2.1(vite@6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vue@3.5.13(typescript@5.8.2))
       archiver: 7.0.1
       chokidar: 3.6.0
       ci-info: 4.0.0
@@ -8242,21 +8289,21 @@ snapshots:
       lodash: 4.17.21
       minimist: 1.2.8
       open: 10.1.0
-      quasar: 2.17.7
+      quasar: 2.18.0
       rollup-plugin-visualizer: 5.13.1(rollup@2.79.2)
       sass-embedded: 1.83.0
       semver: 7.6.3
       serialize-javascript: 6.0.2
       tinyglobby: 0.2.10
-      ts-essentials: 9.4.2(typescript@5.8.0-dev.20250131)
-      vite: 6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
-      vue: 3.5.13(typescript@5.8.0-dev.20250131)
-      vue-router: 4.5.0(vue@3.5.13(typescript@5.8.0-dev.20250131))
+      ts-essentials: 9.4.2(typescript@5.8.2)
+      vite: 6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
+      vue: 3.5.13(typescript@5.8.2)
+      vue-router: 4.5.0(vue@3.5.13(typescript@5.8.2))
       webpack-merge: 6.0.1
     optionalDependencies:
       eslint: 9.21.0
-      pinia: 3.0.1(typescript@5.8.0-dev.20250131)(vue@3.5.13(typescript@5.8.0-dev.20250131))
-      typescript: 5.8.0-dev.20250131
+      pinia: 3.0.1(typescript@5.8.2)(vue@3.5.13(typescript@5.8.2))
+      typescript: 5.8.2
       workbox-build: 7.3.0
     transitivePeerDependencies:
       - '@types/node'
@@ -8284,12 +8331,12 @@ snapshots:
       fs-extra: 11.2.0
       selfsigned: 2.4.1
 
-  '@quasar/vite-plugin@1.9.0(@vitejs/plugin-vue@5.2.1(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vue@3.5.13(typescript@5.8.0-dev.20250131)))(quasar@2.17.7)(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vue@3.5.13(typescript@5.8.0-dev.20250131))':
+  '@quasar/vite-plugin@1.9.0(@vitejs/plugin-vue@5.2.1(vite@6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vue@3.5.13(typescript@5.8.2)))(quasar@2.18.0)(vite@6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vue@3.5.13(typescript@5.8.2))':
     dependencies:
-      '@vitejs/plugin-vue': 5.2.1(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vue@3.5.13(typescript@5.8.0-dev.20250131))
-      quasar: 2.17.7
-      vite: 6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
-      vue: 3.5.13(typescript@5.8.0-dev.20250131)
+      '@vitejs/plugin-vue': 5.2.1(vite@6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vue@3.5.13(typescript@5.8.2))
+      quasar: 2.18.0
+      vite: 6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
+      vue: 3.5.13(typescript@5.8.2)
 
   '@regru/eslint-plugin-prefer-early-return@1.0.0': {}
 
@@ -8431,7 +8478,7 @@ snapshots:
   '@types/body-parser@1.19.5':
     dependencies:
       '@types/connect': 3.4.38
-      '@types/node': 22.13.5
+      '@types/node': 22.13.8
 
   '@types/caseless@0.12.5': {}
 
@@ -8446,7 +8493,7 @@ snapshots:
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 22.13.5
+      '@types/node': 22.13.8
 
   '@types/cookie@0.6.0': {}
 
@@ -8454,7 +8501,7 @@ snapshots:
 
   '@types/cors@2.8.17':
     dependencies:
-      '@types/node': 22.13.5
+      '@types/node': 22.13.8
 
   '@types/diff-match-patch@1.0.36': {}
 
@@ -8466,14 +8513,14 @@ snapshots:
 
   '@types/express-serve-static-core@4.19.6':
     dependencies:
-      '@types/node': 22.13.5
+      '@types/node': 22.13.8
       '@types/qs': 6.9.16
       '@types/range-parser': 1.2.7
       '@types/send': 0.17.4
 
   '@types/express-serve-static-core@5.0.2':
     dependencies:
-      '@types/node': 22.13.5
+      '@types/node': 22.13.8
       '@types/qs': 6.9.16
       '@types/range-parser': 1.2.7
       '@types/send': 0.17.4
@@ -8508,7 +8555,7 @@ snapshots:
 
   '@types/jsonwebtoken@9.0.7':
     dependencies:
-      '@types/node': 22.13.5
+      '@types/node': 22.13.8
 
   '@types/long@4.0.2': {}
 
@@ -8516,9 +8563,9 @@ snapshots:
 
   '@types/node-forge@1.3.11':
     dependencies:
-      '@types/node': 22.13.5
+      '@types/node': 22.13.8
 
-  '@types/node@22.13.5':
+  '@types/node@22.13.8':
     dependencies:
       undici-types: 6.20.0
 
@@ -8526,11 +8573,11 @@ snapshots:
 
   '@types/papaparse@5.3.15':
     dependencies:
-      '@types/node': 22.13.5
+      '@types/node': 22.13.8
 
   '@types/qrcode@1.5.5':
     dependencies:
-      '@types/node': 22.13.5
+      '@types/node': 22.13.8
 
   '@types/qs@6.9.16': {}
 
@@ -8539,7 +8586,7 @@ snapshots:
   '@types/request@2.48.12':
     dependencies:
       '@types/caseless': 0.12.5
-      '@types/node': 22.13.5
+      '@types/node': 22.13.8
       '@types/tough-cookie': 4.0.5
       form-data: 2.5.2
 
@@ -8548,12 +8595,12 @@ snapshots:
   '@types/send@0.17.4':
     dependencies:
       '@types/mime': 1.3.5
-      '@types/node': 22.13.5
+      '@types/node': 22.13.8
 
   '@types/serve-static@1.15.7':
     dependencies:
       '@types/http-errors': 2.0.4
-      '@types/node': 22.13.5
+      '@types/node': 22.13.8
       '@types/send': 0.17.4
 
   '@types/sortablejs@1.15.8': {}
@@ -8568,32 +8615,32 @@ snapshots:
 
   '@types/web-bluetooth@0.0.20': {}
 
-  '@typescript-eslint/eslint-plugin@8.25.0(@typescript-eslint/parser@8.25.0(eslint@9.21.0)(typescript@5.8.0-dev.20250131))(eslint@9.21.0)(typescript@5.8.0-dev.20250131)':
+  '@typescript-eslint/eslint-plugin@8.25.0(@typescript-eslint/parser@8.25.0(eslint@9.21.0)(typescript@5.8.2))(eslint@9.21.0)(typescript@5.8.2)':
     dependencies:
       '@eslint-community/regexpp': 4.12.1
-      '@typescript-eslint/parser': 8.25.0(eslint@9.21.0)(typescript@5.8.0-dev.20250131)
+      '@typescript-eslint/parser': 8.25.0(eslint@9.21.0)(typescript@5.8.2)
       '@typescript-eslint/scope-manager': 8.25.0
-      '@typescript-eslint/type-utils': 8.25.0(eslint@9.21.0)(typescript@5.8.0-dev.20250131)
-      '@typescript-eslint/utils': 8.25.0(eslint@9.21.0)(typescript@5.8.0-dev.20250131)
+      '@typescript-eslint/type-utils': 8.25.0(eslint@9.21.0)(typescript@5.8.2)
+      '@typescript-eslint/utils': 8.25.0(eslint@9.21.0)(typescript@5.8.2)
       '@typescript-eslint/visitor-keys': 8.25.0
       eslint: 9.21.0
       graphemer: 1.4.0
       ignore: 5.3.2
       natural-compare: 1.4.0
-      ts-api-utils: 2.0.1(typescript@5.8.0-dev.20250131)
-      typescript: 5.8.0-dev.20250131
+      ts-api-utils: 2.0.1(typescript@5.8.2)
+      typescript: 5.8.2
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/parser@8.25.0(eslint@9.21.0)(typescript@5.8.0-dev.20250131)':
+  '@typescript-eslint/parser@8.25.0(eslint@9.21.0)(typescript@5.8.2)':
     dependencies:
       '@typescript-eslint/scope-manager': 8.25.0
       '@typescript-eslint/types': 8.25.0
-      '@typescript-eslint/typescript-estree': 8.25.0(typescript@5.8.0-dev.20250131)
+      '@typescript-eslint/typescript-estree': 8.25.0(typescript@5.8.2)
       '@typescript-eslint/visitor-keys': 8.25.0
       debug: 4.4.0
       eslint: 9.21.0
-      typescript: 5.8.0-dev.20250131
+      typescript: 5.8.2
     transitivePeerDependencies:
       - supports-color
 
@@ -8607,14 +8654,14 @@ snapshots:
       '@typescript-eslint/types': 8.25.0
       '@typescript-eslint/visitor-keys': 8.25.0
 
-  '@typescript-eslint/type-utils@8.25.0(eslint@9.21.0)(typescript@5.8.0-dev.20250131)':
+  '@typescript-eslint/type-utils@8.25.0(eslint@9.21.0)(typescript@5.8.2)':
     dependencies:
-      '@typescript-eslint/typescript-estree': 8.25.0(typescript@5.8.0-dev.20250131)
-      '@typescript-eslint/utils': 8.25.0(eslint@9.21.0)(typescript@5.8.0-dev.20250131)
+      '@typescript-eslint/typescript-estree': 8.25.0(typescript@5.8.2)
+      '@typescript-eslint/utils': 8.25.0(eslint@9.21.0)(typescript@5.8.2)
       debug: 4.4.0
       eslint: 9.21.0
-      ts-api-utils: 2.0.1(typescript@5.8.0-dev.20250131)
-      typescript: 5.8.0-dev.20250131
+      ts-api-utils: 2.0.1(typescript@5.8.2)
+      typescript: 5.8.2
     transitivePeerDependencies:
       - supports-color
 
@@ -8622,7 +8669,7 @@ snapshots:
 
   '@typescript-eslint/types@8.25.0': {}
 
-  '@typescript-eslint/typescript-estree@8.24.0(typescript@5.8.0-dev.20250131)':
+  '@typescript-eslint/typescript-estree@8.24.0(typescript@5.8.2)':
     dependencies:
       '@typescript-eslint/types': 8.24.0
       '@typescript-eslint/visitor-keys': 8.24.0
@@ -8631,12 +8678,12 @@ snapshots:
       is-glob: 4.0.3
       minimatch: 9.0.5
       semver: 7.6.3
-      ts-api-utils: 2.0.1(typescript@5.8.0-dev.20250131)
-      typescript: 5.8.0-dev.20250131
+      ts-api-utils: 2.0.1(typescript@5.8.2)
+      typescript: 5.8.2
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/typescript-estree@8.25.0(typescript@5.8.0-dev.20250131)':
+  '@typescript-eslint/typescript-estree@8.25.0(typescript@5.8.2)':
     dependencies:
       '@typescript-eslint/types': 8.25.0
       '@typescript-eslint/visitor-keys': 8.25.0
@@ -8645,30 +8692,30 @@ snapshots:
       is-glob: 4.0.3
       minimatch: 9.0.5
       semver: 7.6.3
-      ts-api-utils: 2.0.1(typescript@5.8.0-dev.20250131)
-      typescript: 5.8.0-dev.20250131
+      ts-api-utils: 2.0.1(typescript@5.8.2)
+      typescript: 5.8.2
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@8.24.0(eslint@9.21.0)(typescript@5.8.0-dev.20250131)':
+  '@typescript-eslint/utils@8.24.0(eslint@9.21.0)(typescript@5.8.2)':
     dependencies:
       '@eslint-community/eslint-utils': 4.4.0(eslint@9.21.0)
       '@typescript-eslint/scope-manager': 8.24.0
       '@typescript-eslint/types': 8.24.0
-      '@typescript-eslint/typescript-estree': 8.24.0(typescript@5.8.0-dev.20250131)
+      '@typescript-eslint/typescript-estree': 8.24.0(typescript@5.8.2)
       eslint: 9.21.0
-      typescript: 5.8.0-dev.20250131
+      typescript: 5.8.2
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@8.25.0(eslint@9.21.0)(typescript@5.8.0-dev.20250131)':
+  '@typescript-eslint/utils@8.25.0(eslint@9.21.0)(typescript@5.8.2)':
     dependencies:
       '@eslint-community/eslint-utils': 4.4.0(eslint@9.21.0)
       '@typescript-eslint/scope-manager': 8.25.0
       '@typescript-eslint/types': 8.25.0
-      '@typescript-eslint/typescript-estree': 8.25.0(typescript@5.8.0-dev.20250131)
+      '@typescript-eslint/typescript-estree': 8.25.0(typescript@5.8.2)
       eslint: 9.21.0
-      typescript: 5.8.0-dev.20250131
+      typescript: 5.8.2
     transitivePeerDependencies:
       - supports-color
 
@@ -8682,42 +8729,21 @@ snapshots:
       '@typescript-eslint/types': 8.25.0
       eslint-visitor-keys: 4.2.0
 
-  '@vitejs/plugin-vue@5.2.1(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vue@3.5.13(typescript@5.8.0-dev.20250131))':
+  '@vitejs/plugin-vue@5.2.1(vite@6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vue@3.5.13(typescript@5.8.2))':
     dependencies:
-      vite: 6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
-      vue: 3.5.13(typescript@5.8.0-dev.20250131)
+      vite: 6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
+      vue: 3.5.13(typescript@5.8.2)
 
-  '@vitest/browser@https://pkg.pr.new/@vitest/browser@fee90d8(@testing-library/dom@10.4.0)(@types/node@22.13.5)(playwright@1.50.1)(typescript@5.7.3)(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vitest@3.0.7)':
+  '@vitest/browser@https://pkg.pr.new/@vitest/browser@fee90d8(@testing-library/dom@10.4.0)(@types/node@22.13.8)(playwright@1.50.1)(typescript@5.8.2)(vite@6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vitest@3.0.7)':
     dependencies:
       '@testing-library/user-event': 14.6.1(@testing-library/dom@10.4.0)
-      '@vitest/mocker': https://pkg.pr.new/vitest-dev/vitest/@vitest/mocker@fee90d855b046786418c666354425d8649bc8b76(msw@2.7.3(@types/node@22.13.5)(typescript@5.7.3))(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))
+      '@vitest/mocker': https://pkg.pr.new/vitest-dev/vitest/@vitest/mocker@fee90d855b046786418c666354425d8649bc8b76(msw@2.7.3(@types/node@22.13.8)(typescript@5.8.2))(vite@6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))
       '@vitest/utils': https://pkg.pr.new/vitest-dev/vitest/@vitest/utils@fee90d855b046786418c666354425d8649bc8b76
       magic-string: 0.30.17
-      msw: 2.7.3(@types/node@22.13.5)(typescript@5.7.3)
+      msw: 2.7.3(@types/node@22.13.8)(typescript@5.8.2)
       sirv: 3.0.1
       tinyrainbow: 2.0.0
-      vitest: https://pkg.pr.new/vitest@fee90d8(@types/node@22.13.5)(@vitest/browser@3.0.7)(@vitest/ui@3.0.7)(jsdom@25.0.1(canvas@2.11.2(encoding@0.1.13)))(msw@2.7.3(@types/node@22.13.5)(typescript@5.7.3))(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
-      ws: 8.18.1
-    optionalDependencies:
-      playwright: 1.50.1
-    transitivePeerDependencies:
-      - '@testing-library/dom'
-      - '@types/node'
-      - bufferutil
-      - typescript
-      - utf-8-validate
-      - vite
-
-  '@vitest/browser@https://pkg.pr.new/@vitest/browser@fee90d8(@testing-library/dom@10.4.0)(@types/node@22.13.5)(playwright@1.50.1)(typescript@5.8.0-dev.20250131)(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vitest@3.0.7)':
-    dependencies:
-      '@testing-library/user-event': 14.6.1(@testing-library/dom@10.4.0)
-      '@vitest/mocker': https://pkg.pr.new/vitest-dev/vitest/@vitest/mocker@fee90d855b046786418c666354425d8649bc8b76(msw@2.7.3(@types/node@22.13.5)(typescript@5.8.0-dev.20250131))(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))
-      '@vitest/utils': https://pkg.pr.new/vitest-dev/vitest/@vitest/utils@fee90d855b046786418c666354425d8649bc8b76
-      magic-string: 0.30.17
-      msw: 2.7.3(@types/node@22.13.5)(typescript@5.8.0-dev.20250131)
-      sirv: 3.0.1
-      tinyrainbow: 2.0.0
-      vitest: https://pkg.pr.new/vitest@fee90d8(@types/node@22.13.5)(@vitest/browser@3.0.7)(@vitest/ui@3.0.7)(jsdom@25.0.1(canvas@2.11.2(encoding@0.1.13)))(msw@2.7.3(@types/node@22.13.5)(typescript@5.8.0-dev.20250131))(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
+      vitest: https://pkg.pr.new/vitest@fee90d8(@types/node@22.13.8)(@vitest/browser@3.0.7)(@vitest/ui@3.0.7)(jsdom@25.0.1(canvas@2.11.2(encoding@0.1.13)))(msw@2.7.3(@types/node@22.13.8)(typescript@5.8.2))(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
       ws: 8.18.1
     optionalDependencies:
       playwright: 1.50.1
@@ -8743,9 +8769,9 @@ snapshots:
       std-env: 3.8.0
       test-exclude: 7.0.1
       tinyrainbow: 2.0.0
-      vitest: https://pkg.pr.new/vitest@fee90d8(@types/node@22.13.5)(@vitest/browser@3.0.7)(@vitest/ui@3.0.7)(jsdom@25.0.1(canvas@2.11.2(encoding@0.1.13)))(msw@2.7.3(@types/node@22.13.5)(typescript@5.8.0-dev.20250131))(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
+      vitest: https://pkg.pr.new/vitest@fee90d8(@types/node@22.13.8)(@vitest/browser@3.0.7)(@vitest/ui@3.0.7)(jsdom@25.0.1(canvas@2.11.2(encoding@0.1.13)))(msw@2.7.3(@types/node@22.13.8)(typescript@5.8.2))(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
     optionalDependencies:
-      '@vitest/browser': https://pkg.pr.new/@vitest/browser@fee90d8(@testing-library/dom@10.4.0)(@types/node@22.13.5)(playwright@1.50.1)(typescript@5.8.0-dev.20250131)(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vitest@3.0.7)
+      '@vitest/browser': https://pkg.pr.new/@vitest/browser@fee90d8(@testing-library/dom@10.4.0)(@types/node@22.13.8)(playwright@1.50.1)(typescript@5.8.2)(vite@6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vitest@3.0.7)
     transitivePeerDependencies:
       - supports-color
 
@@ -8756,23 +8782,14 @@ snapshots:
       chai: 5.2.0
       tinyrainbow: 2.0.0
 
-  '@vitest/mocker@https://pkg.pr.new/vitest-dev/vitest/@vitest/mocker@fee90d855b046786418c666354425d8649bc8b76(msw@2.7.3(@types/node@22.13.5)(typescript@5.7.3))(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))':
+  '@vitest/mocker@https://pkg.pr.new/vitest-dev/vitest/@vitest/mocker@fee90d855b046786418c666354425d8649bc8b76(msw@2.7.3(@types/node@22.13.8)(typescript@5.8.2))(vite@6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))':
     dependencies:
       '@vitest/spy': https://pkg.pr.new/vitest-dev/vitest/@vitest/spy@fee90d855b046786418c666354425d8649bc8b76
       estree-walker: 3.0.3
       magic-string: 0.30.17
     optionalDependencies:
-      msw: 2.7.3(@types/node@22.13.5)(typescript@5.7.3)
-      vite: 6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
-
-  '@vitest/mocker@https://pkg.pr.new/vitest-dev/vitest/@vitest/mocker@fee90d855b046786418c666354425d8649bc8b76(msw@2.7.3(@types/node@22.13.5)(typescript@5.8.0-dev.20250131))(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))':
-    dependencies:
-      '@vitest/spy': https://pkg.pr.new/vitest-dev/vitest/@vitest/spy@fee90d855b046786418c666354425d8649bc8b76
-      estree-walker: 3.0.3
-      magic-string: 0.30.17
-    optionalDependencies:
-      msw: 2.7.3(@types/node@22.13.5)(typescript@5.8.0-dev.20250131)
-      vite: 6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
+      msw: 2.7.3(@types/node@22.13.8)(typescript@5.8.2)
+      vite: 6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
 
   '@vitest/pretty-format@3.0.7':
     dependencies:
@@ -8807,7 +8824,7 @@ snapshots:
       sirv: 3.0.1
       tinyglobby: 0.2.12
       tinyrainbow: 2.0.0
-      vitest: https://pkg.pr.new/vitest@fee90d8(@types/node@22.13.5)(@vitest/browser@3.0.7)(@vitest/ui@3.0.7)(jsdom@25.0.1(canvas@2.11.2(encoding@0.1.13)))(msw@2.7.3(@types/node@22.13.5)(typescript@5.7.3))(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
+      vitest: https://pkg.pr.new/vitest@fee90d8(@types/node@22.13.8)(@vitest/browser@3.0.7)(@vitest/ui@3.0.7)(jsdom@25.0.1(canvas@2.11.2(encoding@0.1.13)))(msw@2.7.3(@types/node@22.13.8)(typescript@5.8.2))(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
     optional: true
 
   '@vitest/ui@https://pkg.pr.new/@vitest/ui@fee90d8(vitest@3.0.7)':
@@ -8819,7 +8836,7 @@ snapshots:
       sirv: 3.0.1
       tinyglobby: 0.2.12
       tinyrainbow: 2.0.0
-      vitest: https://pkg.pr.new/vitest@fee90d8(@types/node@22.13.5)(@vitest/browser@3.0.7)(@vitest/ui@3.0.7)(jsdom@25.0.1(canvas@2.11.2(encoding@0.1.13)))(msw@2.7.3(@types/node@22.13.5)(typescript@5.8.0-dev.20250131))(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
+      vitest: https://pkg.pr.new/vitest@fee90d8(@types/node@22.13.8)(@vitest/browser@3.0.7)(@vitest/ui@3.0.7)(jsdom@25.0.1(canvas@2.11.2(encoding@0.1.13)))(msw@2.7.3(@types/node@22.13.8)(typescript@5.8.2))(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
 
   '@vitest/utils@3.0.7':
     dependencies:
@@ -8901,7 +8918,7 @@ snapshots:
     dependencies:
       rfdc: 1.4.1
 
-  '@vue/language-core@2.2.4(typescript@5.8.0-dev.20250131)':
+  '@vue/language-core@2.2.8(typescript@5.8.2)':
     dependencies:
       '@volar/language-core': 2.4.11
       '@vue/compiler-dom': 3.5.13
@@ -8912,7 +8929,7 @@ snapshots:
       muggle-string: 0.4.1
       path-browserify: 1.0.1
     optionalDependencies:
-      typescript: 5.8.0-dev.20250131
+      typescript: 5.8.2
 
   '@vue/reactivity@3.5.13':
     dependencies:
@@ -8930,33 +8947,33 @@ snapshots:
       '@vue/shared': 3.5.13
       csstype: 3.1.3
 
-  '@vue/server-renderer@3.5.13(vue@3.5.13(typescript@5.8.0-dev.20250131))':
+  '@vue/server-renderer@3.5.13(vue@3.5.13(typescript@5.8.2))':
     dependencies:
       '@vue/compiler-ssr': 3.5.13
       '@vue/shared': 3.5.13
-      vue: 3.5.13(typescript@5.8.0-dev.20250131)
+      vue: 3.5.13(typescript@5.8.2)
 
   '@vue/shared@3.5.13': {}
 
   '@vue/test-utils@2.4.6':
     dependencies:
       js-beautify: 1.15.1
-      vue-component-type-helpers: 2.2.4
+      vue-component-type-helpers: 2.2.8
 
-  '@vueuse/core@12.7.0(typescript@5.8.0-dev.20250131)':
+  '@vueuse/core@12.7.0(typescript@5.8.2)':
     dependencies:
       '@types/web-bluetooth': 0.0.20
       '@vueuse/metadata': 12.7.0
-      '@vueuse/shared': 12.7.0(typescript@5.8.0-dev.20250131)
-      vue: 3.5.13(typescript@5.8.0-dev.20250131)
+      '@vueuse/shared': 12.7.0(typescript@5.8.2)
+      vue: 3.5.13(typescript@5.8.2)
     transitivePeerDependencies:
       - typescript
 
   '@vueuse/metadata@12.7.0': {}
 
-  '@vueuse/shared@12.7.0(typescript@5.8.0-dev.20250131)':
+  '@vueuse/shared@12.7.0(typescript@5.8.2)':
     dependencies:
-      vue: 3.5.13(typescript@5.8.0-dev.20250131)
+      vue: 3.5.13(typescript@5.8.2)
     transitivePeerDependencies:
       - typescript
 
@@ -10019,7 +10036,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.8.3(eslint-plugin-import-x@4.6.1(eslint@9.21.0)(typescript@5.8.0-dev.20250131))(eslint@9.21.0):
+  eslint-import-resolver-typescript@3.8.3(eslint-plugin-import-x@4.6.1(eslint@9.21.0)(typescript@5.8.2))(eslint@9.21.0):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
       debug: 4.4.0
@@ -10030,15 +10047,15 @@ snapshots:
       stable-hash: 0.0.4
       tinyglobby: 0.2.12
     optionalDependencies:
-      eslint-plugin-import-x: 4.6.1(eslint@9.21.0)(typescript@5.8.0-dev.20250131)
+      eslint-plugin-import-x: 4.6.1(eslint@9.21.0)(typescript@5.8.2)
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import-x@4.6.1(eslint@9.21.0)(typescript@5.8.0-dev.20250131):
+  eslint-plugin-import-x@4.6.1(eslint@9.21.0)(typescript@5.8.2):
     dependencies:
       '@types/doctrine': 0.0.9
       '@typescript-eslint/scope-manager': 8.24.0
-      '@typescript-eslint/utils': 8.24.0(eslint@9.21.0)(typescript@5.8.0-dev.20250131)
+      '@typescript-eslint/utils': 8.24.0(eslint@9.21.0)(typescript@5.8.2)
       debug: 4.4.0
       doctrine: 3.0.0
       enhanced-resolve: 5.17.1
@@ -10054,10 +10071,10 @@ snapshots:
       - supports-color
       - typescript
 
-  eslint-plugin-perfectionist@4.9.0(eslint@9.21.0)(typescript@5.8.0-dev.20250131):
+  eslint-plugin-perfectionist@4.9.0(eslint@9.21.0)(typescript@5.8.2):
     dependencies:
       '@typescript-eslint/types': 8.24.0
-      '@typescript-eslint/utils': 8.24.0(eslint@9.21.0)(typescript@5.8.0-dev.20250131)
+      '@typescript-eslint/utils': 8.24.0(eslint@9.21.0)(typescript@5.8.2)
       eslint: 9.21.0
       natural-orderby: 5.0.0
     transitivePeerDependencies:
@@ -10236,7 +10253,7 @@ snapshots:
       pump: 3.0.2
       qs: 6.13.0
       raw-body: 2.5.2
-      semver: 7.6.3
+      semver: 7.7.1
     transitivePeerDependencies:
       - supports-color
 
@@ -10405,7 +10422,7 @@ snapshots:
       '@fastify/busboy': 3.0.0
       '@firebase/database-compat': 2.0.3
       '@firebase/database-types': 1.0.8
-      '@types/node': 22.13.5
+      '@types/node': 22.13.8
       farmhash-modern: 1.1.0
       google-auth-library: 9.14.2(encoding@0.1.13)
       jsonwebtoken: 9.0.2
@@ -10430,7 +10447,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  firebase-tools@13.31.2(encoding@0.1.13):
+  firebase-tools@13.32.0(encoding@0.1.13):
     dependencies:
       '@electric-sql/pglite': 0.2.16
       '@google-cloud/cloud-sql-connector': 1.4.0(encoding@0.1.13)
@@ -10484,7 +10501,7 @@ snapshots:
       progress: 2.0.3
       proxy-agent: 6.4.0
       retry: 0.13.1
-      semver: 7.6.3
+      semver: 7.7.1
       sql-formatter: 15.4.3
       stream-chain: 2.2.5
       stream-json: 1.8.0
@@ -10507,36 +10524,36 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  firebase@11.3.1:
+  firebase@11.4.0:
     dependencies:
-      '@firebase/analytics': 0.10.11(@firebase/app@0.11.1)
-      '@firebase/analytics-compat': 0.2.17(@firebase/app-compat@0.2.50)(@firebase/app@0.11.1)
-      '@firebase/app': 0.11.1
-      '@firebase/app-check': 0.8.11(@firebase/app@0.11.1)
-      '@firebase/app-check-compat': 0.3.18(@firebase/app-compat@0.2.50)(@firebase/app@0.11.1)
-      '@firebase/app-compat': 0.2.50
+      '@firebase/analytics': 0.10.12(@firebase/app@0.11.2)
+      '@firebase/analytics-compat': 0.2.18(@firebase/app-compat@0.2.51)(@firebase/app@0.11.2)
+      '@firebase/app': 0.11.2
+      '@firebase/app-check': 0.8.12(@firebase/app@0.11.2)
+      '@firebase/app-check-compat': 0.3.19(@firebase/app-compat@0.2.51)(@firebase/app@0.11.2)
+      '@firebase/app-compat': 0.2.51
       '@firebase/app-types': 0.9.3
-      '@firebase/auth': 1.9.0(@firebase/app@0.11.1)
-      '@firebase/auth-compat': 0.5.18(@firebase/app-compat@0.2.50)(@firebase/app-types@0.9.3)(@firebase/app@0.11.1)
-      '@firebase/data-connect': 0.3.0(@firebase/app@0.11.1)
-      '@firebase/database': 1.0.12
-      '@firebase/database-compat': 2.0.3
-      '@firebase/firestore': 4.7.8(@firebase/app@0.11.1)
-      '@firebase/firestore-compat': 0.3.43(@firebase/app-compat@0.2.50)(@firebase/app-types@0.9.3)(@firebase/app@0.11.1)
-      '@firebase/functions': 0.12.2(@firebase/app@0.11.1)
-      '@firebase/functions-compat': 0.3.19(@firebase/app-compat@0.2.50)(@firebase/app@0.11.1)
-      '@firebase/installations': 0.6.12(@firebase/app@0.11.1)
-      '@firebase/installations-compat': 0.2.12(@firebase/app-compat@0.2.50)(@firebase/app-types@0.9.3)(@firebase/app@0.11.1)
-      '@firebase/messaging': 0.12.16(@firebase/app@0.11.1)
-      '@firebase/messaging-compat': 0.2.16(@firebase/app-compat@0.2.50)(@firebase/app@0.11.1)
-      '@firebase/performance': 0.7.0(@firebase/app@0.11.1)
-      '@firebase/performance-compat': 0.2.13(@firebase/app-compat@0.2.50)(@firebase/app@0.11.1)
-      '@firebase/remote-config': 0.5.0(@firebase/app@0.11.1)
-      '@firebase/remote-config-compat': 0.2.12(@firebase/app-compat@0.2.50)(@firebase/app@0.11.1)
-      '@firebase/storage': 0.13.6(@firebase/app@0.11.1)
-      '@firebase/storage-compat': 0.3.16(@firebase/app-compat@0.2.50)(@firebase/app-types@0.9.3)(@firebase/app@0.11.1)
-      '@firebase/util': 1.10.3
-      '@firebase/vertexai': 1.0.4(@firebase/app-types@0.9.3)(@firebase/app@0.11.1)
+      '@firebase/auth': 1.9.1(@firebase/app@0.11.2)
+      '@firebase/auth-compat': 0.5.19(@firebase/app-compat@0.2.51)(@firebase/app-types@0.9.3)(@firebase/app@0.11.2)
+      '@firebase/data-connect': 0.3.1(@firebase/app@0.11.2)
+      '@firebase/database': 1.0.13
+      '@firebase/database-compat': 2.0.4
+      '@firebase/firestore': 4.7.9(@firebase/app@0.11.2)
+      '@firebase/firestore-compat': 0.3.44(@firebase/app-compat@0.2.51)(@firebase/app-types@0.9.3)(@firebase/app@0.11.2)
+      '@firebase/functions': 0.12.3(@firebase/app@0.11.2)
+      '@firebase/functions-compat': 0.3.20(@firebase/app-compat@0.2.51)(@firebase/app@0.11.2)
+      '@firebase/installations': 0.6.13(@firebase/app@0.11.2)
+      '@firebase/installations-compat': 0.2.13(@firebase/app-compat@0.2.51)(@firebase/app-types@0.9.3)(@firebase/app@0.11.2)
+      '@firebase/messaging': 0.12.17(@firebase/app@0.11.2)
+      '@firebase/messaging-compat': 0.2.17(@firebase/app-compat@0.2.51)(@firebase/app@0.11.2)
+      '@firebase/performance': 0.7.1(@firebase/app@0.11.2)
+      '@firebase/performance-compat': 0.2.14(@firebase/app-compat@0.2.51)(@firebase/app@0.11.2)
+      '@firebase/remote-config': 0.6.0(@firebase/app@0.11.2)
+      '@firebase/remote-config-compat': 0.2.13(@firebase/app-compat@0.2.51)(@firebase/app@0.11.2)
+      '@firebase/storage': 0.13.7(@firebase/app@0.11.2)
+      '@firebase/storage-compat': 0.3.17(@firebase/app-compat@0.2.51)(@firebase/app-types@0.9.3)(@firebase/app@0.11.2)
+      '@firebase/util': 1.11.0
+      '@firebase/vertexai': 1.1.0(@firebase/app-types@0.9.3)(@firebase/app@0.11.2)
     transitivePeerDependencies:
       - '@react-native-async-storage/async-storage'
 
@@ -11439,7 +11456,7 @@ snapshots:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
-  libphonenumber-js@1.11.20: {}
+  libphonenumber-js@1.12.4: {}
 
   libsodium-wrappers@0.7.15:
     dependencies:
@@ -11722,12 +11739,12 @@ snapshots:
 
   ms@2.1.3: {}
 
-  msw@2.7.3(@types/node@22.13.5)(typescript@5.7.3):
+  msw@2.7.3(@types/node@22.13.8)(typescript@5.8.2):
     dependencies:
       '@bundled-es-modules/cookie': 2.0.1
       '@bundled-es-modules/statuses': 1.0.1
       '@bundled-es-modules/tough-cookie': 0.1.6
-      '@inquirer/confirm': 5.0.1(@types/node@22.13.5)
+      '@inquirer/confirm': 5.0.1(@types/node@22.13.8)
       '@mswjs/interceptors': 0.37.3
       '@open-draft/deferred-promise': 2.2.0
       '@open-draft/until': 2.1.0
@@ -11743,32 +11760,7 @@ snapshots:
       type-fest: 4.26.1
       yargs: 17.7.2
     optionalDependencies:
-      typescript: 5.7.3
-    transitivePeerDependencies:
-      - '@types/node'
-
-  msw@2.7.3(@types/node@22.13.5)(typescript@5.8.0-dev.20250131):
-    dependencies:
-      '@bundled-es-modules/cookie': 2.0.1
-      '@bundled-es-modules/statuses': 1.0.1
-      '@bundled-es-modules/tough-cookie': 0.1.6
-      '@inquirer/confirm': 5.0.1(@types/node@22.13.5)
-      '@mswjs/interceptors': 0.37.3
-      '@open-draft/deferred-promise': 2.2.0
-      '@open-draft/until': 2.1.0
-      '@types/cookie': 0.6.0
-      '@types/statuses': 2.0.5
-      graphql: 16.9.0
-      headers-polyfill: 4.0.3
-      is-node-process: 1.2.0
-      outvariant: 1.4.3
-      path-to-regexp: 6.3.0
-      picocolors: 1.1.1
-      strict-event-emitter: 0.5.1
-      type-fest: 4.26.1
-      yargs: 17.7.2
-    optionalDependencies:
-      typescript: 5.8.0-dev.20250131
+      typescript: 5.8.2
     transitivePeerDependencies:
       - '@types/node'
 
@@ -11837,7 +11829,7 @@ snapshots:
       make-fetch-happen: 13.0.1
       nopt: 7.2.1
       proc-log: 4.2.0
-      semver: 7.6.3
+      semver: 7.7.1
       tar: 6.2.1
       which: 4.0.0
     transitivePeerDependencies:
@@ -12133,12 +12125,12 @@ snapshots:
 
   picomatch@4.0.2: {}
 
-  pinia@3.0.1(typescript@5.8.0-dev.20250131)(vue@3.5.13(typescript@5.8.0-dev.20250131)):
+  pinia@3.0.1(typescript@5.8.2)(vue@3.5.13(typescript@5.8.2)):
     dependencies:
       '@vue/devtools-api': 7.7.2
-      vue: 3.5.13(typescript@5.8.0-dev.20250131)
+      vue: 3.5.13(typescript@5.8.2)
     optionalDependencies:
-      typescript: 5.8.0-dev.20250131
+      typescript: 5.8.2
 
   playwright-core@1.50.1: {}
 
@@ -12234,7 +12226,7 @@ snapshots:
       '@protobufjs/path': 1.1.2
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
-      '@types/node': 22.13.5
+      '@types/node': 22.13.8
       long: 5.2.3
 
   proxy-addr@2.0.7:
@@ -12280,7 +12272,7 @@ snapshots:
     dependencies:
       side-channel: 1.0.6
 
-  quasar@2.17.7: {}
+  quasar@2.18.0: {}
 
   querystringify@2.2.0: {}
 
@@ -13202,17 +13194,17 @@ snapshots:
 
   triple-beam@1.4.1: {}
 
-  ts-api-utils@2.0.1(typescript@5.8.0-dev.20250131):
+  ts-api-utils@2.0.1(typescript@5.8.2):
     dependencies:
-      typescript: 5.8.0-dev.20250131
+      typescript: 5.8.2
 
-  ts-essentials@9.4.2(typescript@5.8.0-dev.20250131):
+  ts-essentials@9.4.2(typescript@5.8.2):
     optionalDependencies:
-      typescript: 5.8.0-dev.20250131
+      typescript: 5.8.2
 
-  tsconfck@3.1.4(typescript@5.8.0-dev.20250131):
+  tsconfck@3.1.4(typescript@5.8.2):
     optionalDependencies:
-      typescript: 5.8.0-dev.20250131
+      typescript: 5.8.2
 
   tslib@2.3.0: {}
 
@@ -13277,20 +13269,17 @@ snapshots:
     dependencies:
       is-typedarray: 1.0.0
 
-  typescript-eslint@8.25.0(eslint@9.21.0)(typescript@5.8.0-dev.20250131):
+  typescript-eslint@8.25.0(eslint@9.21.0)(typescript@5.8.2):
     dependencies:
-      '@typescript-eslint/eslint-plugin': 8.25.0(@typescript-eslint/parser@8.25.0(eslint@9.21.0)(typescript@5.8.0-dev.20250131))(eslint@9.21.0)(typescript@5.8.0-dev.20250131)
-      '@typescript-eslint/parser': 8.25.0(eslint@9.21.0)(typescript@5.8.0-dev.20250131)
-      '@typescript-eslint/utils': 8.25.0(eslint@9.21.0)(typescript@5.8.0-dev.20250131)
+      '@typescript-eslint/eslint-plugin': 8.25.0(@typescript-eslint/parser@8.25.0(eslint@9.21.0)(typescript@5.8.2))(eslint@9.21.0)(typescript@5.8.2)
+      '@typescript-eslint/parser': 8.25.0(eslint@9.21.0)(typescript@5.8.2)
+      '@typescript-eslint/utils': 8.25.0(eslint@9.21.0)(typescript@5.8.2)
       eslint: 9.21.0
-      typescript: 5.8.0-dev.20250131
+      typescript: 5.8.2
     transitivePeerDependencies:
       - supports-color
 
-  typescript@5.7.3:
-    optional: true
-
-  typescript@5.8.0-dev.20250131: {}
+  typescript@5.8.2: {}
 
   unbox-primitive@1.0.2:
     dependencies:
@@ -13372,7 +13361,7 @@ snapshots:
       pupa: 2.1.1
       registry-auth-token: 5.0.2
       registry-url: 5.1.0
-      semver: 7.6.3
+      semver: 7.7.1
       semver-diff: 3.1.1
       xdg-basedir: 4.0.0
     transitivePeerDependencies:
@@ -13418,13 +13407,13 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vite-node@https://pkg.pr.new/vitest-dev/vitest/vite-node@fee90d855b046786418c666354425d8649bc8b76(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1):
+  vite-node@https://pkg.pr.new/vitest-dev/vitest/vite-node@fee90d855b046786418c666354425d8649bc8b76(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1):
     dependencies:
       cac: 6.7.14
       debug: 4.4.0
       es-module-lexer: 1.6.0
       pathe: 2.0.3
-      vite: 6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
+      vite: 6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -13439,41 +13428,41 @@ snapshots:
       - tsx
       - yaml
 
-  vite-tsconfig-paths@5.1.4(typescript@5.8.0-dev.20250131)(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)):
+  vite-tsconfig-paths@5.1.4(typescript@5.8.2)(vite@6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)):
     dependencies:
       debug: 4.4.0
       globrex: 0.1.2
-      tsconfck: 3.1.4(typescript@5.8.0-dev.20250131)
+      tsconfck: 3.1.4(typescript@5.8.2)
     optionalDependencies:
-      vite: 6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
+      vite: 6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1):
+  vite@6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1):
     dependencies:
       esbuild: 0.24.2
       postcss: 8.5.2
       rollup: 4.34.7
     optionalDependencies:
-      '@types/node': 22.13.5
+      '@types/node': 22.13.8
       fsevents: 2.3.3
       sass: 1.79.4
       sass-embedded: 1.83.0
       terser: 5.34.1
       yaml: 2.5.1
 
-  vitest-browser-vue@0.2.0(@vitest/browser@3.0.7)(vitest@3.0.7)(vue@3.5.13(typescript@5.8.0-dev.20250131)):
+  vitest-browser-vue@0.2.0(@vitest/browser@3.0.7)(vitest@3.0.7)(vue@3.5.13(typescript@5.8.2)):
     dependencies:
-      '@vitest/browser': https://pkg.pr.new/@vitest/browser@fee90d8(@testing-library/dom@10.4.0)(@types/node@22.13.5)(playwright@1.50.1)(typescript@5.8.0-dev.20250131)(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vitest@3.0.7)
+      '@vitest/browser': https://pkg.pr.new/@vitest/browser@fee90d8(@testing-library/dom@10.4.0)(@types/node@22.13.8)(playwright@1.50.1)(typescript@5.8.2)(vite@6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vitest@3.0.7)
       '@vue/test-utils': 2.4.6
-      vitest: https://pkg.pr.new/vitest@fee90d8(@types/node@22.13.5)(@vitest/browser@3.0.7)(@vitest/ui@3.0.7)(jsdom@25.0.1(canvas@2.11.2(encoding@0.1.13)))(msw@2.7.3(@types/node@22.13.5)(typescript@5.8.0-dev.20250131))(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
-      vue: 3.5.13(typescript@5.8.0-dev.20250131)
+      vitest: https://pkg.pr.new/vitest@fee90d8(@types/node@22.13.8)(@vitest/browser@3.0.7)(@vitest/ui@3.0.7)(jsdom@25.0.1(canvas@2.11.2(encoding@0.1.13)))(msw@2.7.3(@types/node@22.13.8)(typescript@5.8.2))(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
+      vue: 3.5.13(typescript@5.8.2)
 
-  vitest@https://pkg.pr.new/vitest@fee90d8(@types/node@22.13.5)(@vitest/browser@3.0.7)(@vitest/ui@3.0.7)(jsdom@25.0.1(canvas@2.11.2(encoding@0.1.13)))(msw@2.7.3(@types/node@22.13.5)(typescript@5.7.3))(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1):
+  vitest@https://pkg.pr.new/vitest@fee90d8(@types/node@22.13.8)(@vitest/browser@3.0.7)(@vitest/ui@3.0.7)(jsdom@25.0.1(canvas@2.11.2(encoding@0.1.13)))(msw@2.7.3(@types/node@22.13.8)(typescript@5.8.2))(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1):
     dependencies:
       '@vitest/expect': https://pkg.pr.new/vitest-dev/vitest/@vitest/expect@fee90d855b046786418c666354425d8649bc8b76
-      '@vitest/mocker': https://pkg.pr.new/vitest-dev/vitest/@vitest/mocker@fee90d855b046786418c666354425d8649bc8b76(msw@2.7.3(@types/node@22.13.5)(typescript@5.7.3))(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))
+      '@vitest/mocker': https://pkg.pr.new/vitest-dev/vitest/@vitest/mocker@fee90d855b046786418c666354425d8649bc8b76(msw@2.7.3(@types/node@22.13.8)(typescript@5.8.2))(vite@6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))
       '@vitest/pretty-format': https://pkg.pr.new/vitest-dev/vitest/@vitest/pretty-format@fee90d855b046786418c666354425d8649bc8b76
       '@vitest/runner': https://pkg.pr.new/vitest-dev/vitest/@vitest/runner@fee90d855b046786418c666354425d8649bc8b76
       '@vitest/snapshot': https://pkg.pr.new/vitest-dev/vitest/@vitest/snapshot@fee90d855b046786418c666354425d8649bc8b76
@@ -13489,54 +13478,13 @@ snapshots:
       tinyexec: 0.3.2
       tinypool: 1.0.2
       tinyrainbow: 2.0.0
-      vite: 6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
-      vite-node: https://pkg.pr.new/vitest-dev/vitest/vite-node@fee90d855b046786418c666354425d8649bc8b76(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
+      vite: 6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
+      vite-node: https://pkg.pr.new/vitest-dev/vitest/vite-node@fee90d855b046786418c666354425d8649bc8b76(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
       why-is-node-running: 2.3.0
     optionalDependencies:
-      '@types/node': 22.13.5
-      '@vitest/browser': https://pkg.pr.new/@vitest/browser@fee90d8(@testing-library/dom@10.4.0)(@types/node@22.13.5)(playwright@1.50.1)(typescript@5.7.3)(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vitest@3.0.7)
+      '@types/node': 22.13.8
+      '@vitest/browser': https://pkg.pr.new/@vitest/browser@fee90d8(@testing-library/dom@10.4.0)(@types/node@22.13.8)(playwright@1.50.1)(typescript@5.8.2)(vite@6.1.0(@types/node@22.13.8)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vitest@3.0.7)
       '@vitest/ui': 3.0.7(vitest@3.0.7)
-      jsdom: 25.0.1(canvas@2.11.2(encoding@0.1.13))
-    transitivePeerDependencies:
-      - jiti
-      - less
-      - lightningcss
-      - msw
-      - sass
-      - sass-embedded
-      - stylus
-      - sugarss
-      - supports-color
-      - terser
-      - tsx
-      - yaml
-
-  vitest@https://pkg.pr.new/vitest@fee90d8(@types/node@22.13.5)(@vitest/browser@3.0.7)(@vitest/ui@3.0.7)(jsdom@25.0.1(canvas@2.11.2(encoding@0.1.13)))(msw@2.7.3(@types/node@22.13.5)(typescript@5.8.0-dev.20250131))(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1):
-    dependencies:
-      '@vitest/expect': https://pkg.pr.new/vitest-dev/vitest/@vitest/expect@fee90d855b046786418c666354425d8649bc8b76
-      '@vitest/mocker': https://pkg.pr.new/vitest-dev/vitest/@vitest/mocker@fee90d855b046786418c666354425d8649bc8b76(msw@2.7.3(@types/node@22.13.5)(typescript@5.8.0-dev.20250131))(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))
-      '@vitest/pretty-format': https://pkg.pr.new/vitest-dev/vitest/@vitest/pretty-format@fee90d855b046786418c666354425d8649bc8b76
-      '@vitest/runner': https://pkg.pr.new/vitest-dev/vitest/@vitest/runner@fee90d855b046786418c666354425d8649bc8b76
-      '@vitest/snapshot': https://pkg.pr.new/vitest-dev/vitest/@vitest/snapshot@fee90d855b046786418c666354425d8649bc8b76
-      '@vitest/spy': https://pkg.pr.new/vitest-dev/vitest/@vitest/spy@fee90d855b046786418c666354425d8649bc8b76
-      '@vitest/utils': https://pkg.pr.new/vitest-dev/vitest/@vitest/utils@fee90d855b046786418c666354425d8649bc8b76
-      chai: 5.2.0
-      debug: 4.4.0
-      expect-type: 1.1.0
-      magic-string: 0.30.17
-      pathe: 2.0.3
-      std-env: 3.8.0
-      tinybench: 2.9.0
-      tinyexec: 0.3.2
-      tinypool: 1.0.2
-      tinyrainbow: 2.0.0
-      vite: 6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
-      vite-node: https://pkg.pr.new/vitest-dev/vitest/vite-node@fee90d855b046786418c666354425d8649bc8b76(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1)
-      why-is-node-running: 2.3.0
-    optionalDependencies:
-      '@types/node': 22.13.5
-      '@vitest/browser': https://pkg.pr.new/@vitest/browser@fee90d8(@testing-library/dom@10.4.0)(@types/node@22.13.5)(playwright@1.50.1)(typescript@5.8.0-dev.20250131)(vite@6.1.0(@types/node@22.13.5)(sass-embedded@1.83.0)(sass@1.79.4)(terser@5.34.1)(yaml@2.5.1))(vitest@3.0.7)
-      '@vitest/ui': https://pkg.pr.new/@vitest/ui@fee90d8(vitest@3.0.7)
       jsdom: 25.0.1(canvas@2.11.2(encoding@0.1.13))
     transitivePeerDependencies:
       - jiti
@@ -13554,25 +13502,25 @@ snapshots:
 
   vscode-uri@3.0.8: {}
 
-  vue-component-type-helpers@2.2.4: {}
+  vue-component-type-helpers@2.2.8: {}
 
-  vue-demi@0.13.11(vue@3.5.13(typescript@5.8.0-dev.20250131)):
+  vue-demi@0.13.11(vue@3.5.13(typescript@5.8.2)):
     dependencies:
-      vue: 3.5.13(typescript@5.8.0-dev.20250131)
+      vue: 3.5.13(typescript@5.8.2)
 
-  vue-demi@0.14.10(vue@3.5.13(typescript@5.8.0-dev.20250131)):
+  vue-demi@0.14.10(vue@3.5.13(typescript@5.8.2)):
     dependencies:
-      vue: 3.5.13(typescript@5.8.0-dev.20250131)
+      vue: 3.5.13(typescript@5.8.2)
 
   vue-draggable-plus@0.6.0(@types/sortablejs@1.15.8):
     dependencies:
       '@types/sortablejs': 1.15.8
 
-  vue-echarts@7.0.3(@vue/runtime-core@3.5.13)(echarts@5.6.0)(vue@3.5.13(typescript@5.8.0-dev.20250131)):
+  vue-echarts@7.0.3(@vue/runtime-core@3.5.13)(echarts@5.6.0)(vue@3.5.13(typescript@5.8.2)):
     dependencies:
       echarts: 5.6.0
-      vue: 3.5.13(typescript@5.8.0-dev.20250131)
-      vue-demi: 0.13.11(vue@3.5.13(typescript@5.8.0-dev.20250131))
+      vue: 3.5.13(typescript@5.8.2)
+      vue-demi: 0.13.11(vue@3.5.13(typescript@5.8.2))
     optionalDependencies:
       '@vue/runtime-core': 3.5.13
     transitivePeerDependencies:
@@ -13591,40 +13539,40 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vue-i18n@11.1.1(vue@3.5.13(typescript@5.8.0-dev.20250131)):
+  vue-i18n@11.1.1(vue@3.5.13(typescript@5.8.2)):
     dependencies:
       '@intlify/core-base': 11.1.1
       '@intlify/shared': 11.1.1
       '@vue/devtools-api': 6.6.4
-      vue: 3.5.13(typescript@5.8.0-dev.20250131)
+      vue: 3.5.13(typescript@5.8.2)
 
-  vue-router@4.5.0(vue@3.5.13(typescript@5.8.0-dev.20250131)):
+  vue-router@4.5.0(vue@3.5.13(typescript@5.8.2)):
     dependencies:
       '@vue/devtools-api': 6.6.4
-      vue: 3.5.13(typescript@5.8.0-dev.20250131)
+      vue: 3.5.13(typescript@5.8.2)
 
-  vue-tsc@2.2.4(typescript@5.8.0-dev.20250131):
+  vue-tsc@2.2.8(typescript@5.8.2):
     dependencies:
       '@volar/typescript': 2.4.11
-      '@vue/language-core': 2.2.4(typescript@5.8.0-dev.20250131)
-      typescript: 5.8.0-dev.20250131
+      '@vue/language-core': 2.2.8(typescript@5.8.2)
+      typescript: 5.8.2
 
-  vue@3.5.13(typescript@5.8.0-dev.20250131):
+  vue@3.5.13(typescript@5.8.2):
     dependencies:
       '@vue/compiler-dom': 3.5.13
       '@vue/compiler-sfc': 3.5.13
       '@vue/runtime-dom': 3.5.13
-      '@vue/server-renderer': 3.5.13(vue@3.5.13(typescript@5.8.0-dev.20250131))
+      '@vue/server-renderer': 3.5.13(vue@3.5.13(typescript@5.8.2))
       '@vue/shared': 3.5.13
     optionalDependencies:
-      typescript: 5.8.0-dev.20250131
+      typescript: 5.8.2
 
-  vuefire@3.2.1(firebase@11.3.1)(vue@3.5.13(typescript@5.8.0-dev.20250131)):
+  vuefire@3.2.1(firebase@11.4.0)(vue@3.5.13(typescript@5.8.2)):
     dependencies:
-      vue: 3.5.13(typescript@5.8.0-dev.20250131)
-      vue-demi: 0.14.10(vue@3.5.13(typescript@5.8.0-dev.20250131))
+      vue: 3.5.13(typescript@5.8.2)
+      vue-demi: 0.14.10(vue@3.5.13(typescript@5.8.2))
     optionalDependencies:
-      firebase: 11.3.1
+      firebase: 11.4.0
 
   w3c-xmlserializer@5.0.0:
     dependencies:
