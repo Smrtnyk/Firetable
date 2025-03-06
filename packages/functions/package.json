@@ -16,19 +16,19 @@
         "seed:admin": "npx tsx seeds/scripts/seed.ts --with-admin"
     },
     "dependencies": {
-        "@google-cloud/functions-framework": "3.4.5",
+        "@google-cloud/functions-framework": "3.4.6",
         "es-toolkit": "1.32.0",
-        "firebase-admin": "13.1.0",
+        "firebase-admin": "13.2.0",
         "firebase-functions": "6.3.2"
     },
     "devDependencies": {
         "@faker-js/faker": "9.5.1",
         "@firebase/app-types": "0.9.3",
         "@firebase/rules-unit-testing": "4.0.1",
-        "@types/node": "22.13.8",
+        "@types/node": "22.13.9",
         "cac": "6.7.14",
         "tinyrainbow": "2.0.0",
-        "vitest": "https://pkg.pr.new/vitest@fee90d8"
+        "vitest": "3.0.8"
     },
     "private": true
 }

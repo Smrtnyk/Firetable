@@ -400,7 +400,7 @@ export default config(
 
             "valid-typeof": "error",
 
-            ...vue.configs["vue3-strongly-recommended"].rules,
+            ...vue.configs["flat/strongly-recommended"].rules,
             "import/no-default-export": "off",
 
             "import/no-unresolved": "off",
