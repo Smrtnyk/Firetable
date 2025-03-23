@@ -1,10 +1,10 @@
 packages:
     - 'packages/*'
 catalog:
-    vitest: 3.0.8
-    '@vitest/browser': 3.0.8
-    '@vitest/ui': 3.0.8
-    '@vitest/coverage-v8': 3.0.8
-    firebase: 11.4.0
-    es-toolkit: 1.32.0
+    vitest: 3.0.9
+    '@vitest/browser': 3.0.9
+    '@vitest/ui': 3.0.9
+    '@vitest/coverage-v8': 3.0.9
+    firebase: 11.5.0
+    es-toolkit: 1.33.0
     '@posva/event-emitter': 1.0.2
