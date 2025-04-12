@@ -53,7 +53,7 @@ const propertiesVisits = computed(function () {
             continue;
         }
 
-        const sortedVisits = (Object.values(events || {}).filter(Boolean) as Visit[]).sort(
+        const sortedVisits = (Object.values(events ?? {}).filter(Boolean) as Visit[]).sort(
             function (a, b) {
                 return new Date(b.date).getTime() - new Date(a.date).getTime();
             },

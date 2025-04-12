@@ -129,9 +129,7 @@ export const DataGenerator = {
 
         // Generate unique counter for this role+org combination
         const roleOrgKey = `${role}-${cleanOrgName}`;
-        if (!this.userCounters[roleOrgKey]) {
-            this.userCounters[roleOrgKey] = 0;
-        }
+        this.userCounters[roleOrgKey] ??= 0;
         this.userCounters[roleOrgKey]++;
 
         const emailPrefix = role.toLowerCase().replaceAll(/\s+/g, "");

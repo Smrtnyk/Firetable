@@ -80,10 +80,7 @@ export function useReservationsAnalytics(
             const dayIndex = date.getUTCDay();
             const dayName = DAYS_OF_WEEK.value[dayIndex];
 
-            if (!bucket[dayName]) {
-                bucket[dayName] = [];
-            }
-
+            bucket[dayName] ??= [];
             bucket[dayName].push(reservation);
             return bucket;
         }, {});

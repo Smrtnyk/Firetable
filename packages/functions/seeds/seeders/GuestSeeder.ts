@@ -21,9 +21,7 @@ export class GuestSeeder extends BaseSeeder {
 
         const eventsByProperty = events.reduce<Record<string, Omit<EventDoc, "_doc">[]>>(
             (acc, event) => {
-                if (!acc[event.propertyId]) {
-                    acc[event.propertyId] = [];
-                }
+                acc[event.propertyId] ??= [];
                 acc[event.propertyId]?.push(event);
                 return acc;
             },
@@ -80,15 +78,13 @@ export class GuestSeeder extends BaseSeeder {
                     propertyVisits += guestEvents.length;
 
                     guestEvents.forEach((event) => {
-                        if (!guest.visitedProperties[property.id]) {
-                            guest.visitedProperties[property.id] = {};
-                        }
+                        guest.visitedProperties[property.id] ??= {};
                         guest.visitedProperties[property.id]![event.id] = {
                             arrived: faker.datatype.boolean(),
                             cancelled: faker.datatype.boolean(),
                             date: event.date,
                             eventName: event.name,
-                            isVIPVisit: guest.tags?.includes("VIP") || false,
+                            isVIPVisit: guest.tags?.includes("VIP") ?? false,
                         };
                     });
                 }

@@ -94,7 +94,7 @@ export async function createUser(
                 break;
             default:
                 errorCode = "internal";
-                errorMessage = e.message || "An internal error occurred.";
+                errorMessage = e.message ?? "An internal error occurred.";
         }
 
         throw new HttpsError(errorCode, errorMessage);

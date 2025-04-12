@@ -21,9 +21,7 @@ export const useAnalyticsStore = defineStore("analytics", function () {
     const dataCache = ref<DataCache>({});
 
     function cacheData(dateRangeKey: string, data: ReservationBucket, propertyId: string): void {
-        if (!dataCache.value[propertyId]) {
-            dataCache.value[propertyId] = {};
-        }
+        dataCache.value[propertyId] ??= {};
         dataCache.value[propertyId][dateRangeKey] = data;
     }
 

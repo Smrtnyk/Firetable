@@ -45,7 +45,7 @@ const {
 
 const { floors, isLoading: isFloorsLoading } = useFloors(propertyId, organisationId);
 const isAnyLoading = computed(function () {
-    return isFloorsLoading.value || isLoadingEvents.value;
+    return isFloorsLoading.value ?? isLoadingEvents.value;
 });
 
 const subscriptionSettings = computed(function () {

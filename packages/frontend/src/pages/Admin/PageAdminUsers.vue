@@ -64,9 +64,7 @@ const bucketizedUsers = computed<BucketizedUsers>(function () {
 
     function addUserToBucket(bucketizedUser: BucketizedUser, property: PropertyDoc): void {
         bucketizedUser.memberOf?.push(property.name);
-        if (!buckets[property.id]) {
-            buckets[property.id] = { propertyName: property.name, users: [] };
-        }
+        buckets[property.id] ??= { propertyName: property.name, users: [] };
         buckets[property.id].users.push(bucketizedUser);
     }
 
@@ -76,9 +74,7 @@ const bucketizedUsers = computed<BucketizedUsers>(function () {
         // If user is property owner, add them to all buckets
         if (bucketizedUser.role === Role.PROPERTY_OWNER) {
             properties.value.forEach(function (property) {
-                if (!buckets[property.id]) {
-                    buckets[property.id] = { propertyName: property.name, users: [] };
-                }
+                buckets[property.id] ??= { propertyName: property.name, users: [] };
                 buckets[property.id].users.push(bucketizedUser);
             });
             return;

@@ -1,6 +1,6 @@
 import { FlatCompat } from "@eslint/eslintrc";
 import eslint from "@eslint/js";
-import importX from "eslint-plugin-import-x";
+import { flatConfigs } from "eslint-plugin-import-x";
 import perfectionist from "eslint-plugin-perfectionist";
 import promise from "eslint-plugin-promise";
 import unicorn from "eslint-plugin-unicorn";
@@ -20,8 +20,8 @@ const compat = new FlatCompat({
 export default config(
     eslint.configs.recommended,
     ...configs.strict,
-    importX.flatConfigs.recommended,
-    importX.flatConfigs.typescript,
+    flatConfigs.recommended,
+    flatConfigs.typescript,
     promise.configs["flat/recommended"],
     perfectionist.configs["recommended-natural"],
     ...compat.plugins("@regru/eslint-plugin-prefer-early-return"),

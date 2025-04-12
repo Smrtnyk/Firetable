@@ -85,9 +85,9 @@ export function useAdminEvent(eventOwner: EventOwner) {
 
     const isLoading = computed(function () {
         return (
-            eventFloorsIsPending.value ||
-            usersHook.pending.value ||
-            eventHook.pending.value ||
+            eventFloorsIsPending.value ??
+            usersHook.pending.value ??
+            eventHook.pending.value ??
             reservations.pending.value
         );
     });

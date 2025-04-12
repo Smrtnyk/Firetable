@@ -108,14 +108,14 @@ const sortedGuests = computed(function () {
 
         switch (sortOption.value) {
             case "land":
-                comparison = (b.maskedContact || "").localeCompare(a.maskedContact || "");
+                comparison = (b.maskedContact ?? "").localeCompare(a.maskedContact ?? "");
                 break;
 
             case "lastModified":
                 {
                     // Use 0 as default if lastModified is not set
-                    const aTime = a.lastModified || 0;
-                    const bTime = b.lastModified || 0;
+                    const aTime = a.lastModified ?? 0;
+                    const bTime = b.lastModified ?? 0;
                     comparison = bTime - aTime;
                 }
                 break;
@@ -169,7 +169,7 @@ const filteredGuests = computed(function () {
         const query = searchQuery.value.trim().toLowerCase();
         filtered = filtered.filter(
             (guest) =>
-                guest.name.toLowerCase().includes(query) ||
+                guest.name.toLowerCase().includes(query) ??
                 guest.contact.toLowerCase().includes(query),
         );
     }

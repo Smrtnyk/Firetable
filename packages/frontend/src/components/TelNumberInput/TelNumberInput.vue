@@ -137,8 +137,8 @@ function onFilterCountries(val: string, update: AnyFunction): void {
         const needle = val.toLowerCase();
         countryOptions.value = europeanCountries.filter(function (country) {
             return (
-                country.name.toLowerCase().includes(needle) ||
-                country.dialCode.includes(needle) ||
+                country.name.toLowerCase().includes(needle) ??
+                country.dialCode.includes(needle) ??
                 country.iso2.toLowerCase().includes(needle)
             );
         });

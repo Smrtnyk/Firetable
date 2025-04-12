@@ -61,7 +61,7 @@ function createNewDrinkCard(): void {
         componentProps: {
             component: DrinkCardCreateForm,
             componentPropsObject: {
-                inventoryItems: inventoryData.value || [],
+                inventoryItems: inventoryData.value ?? [],
             },
             listeners: {
                 async submit({ card, pdfFile }: { card: CreateDrinkCardPayload; pdfFile?: File }) {
@@ -94,7 +94,7 @@ function handleEdit(card: DrinkCardDoc): void {
             component: DrinkCardCreateForm,
             componentPropsObject: {
                 cardToEdit: card,
-                inventoryItems: inventoryData.value || [],
+                inventoryItems: inventoryData.value ?? [],
             },
             listeners: {
                 async submit({

@@ -62,9 +62,7 @@ const categorizedInventory = computed(function () {
     return inventoryData.value.reduce<
         Partial<Record<DrinkMainCategory | RetailMainCategory, InventoryItemDoc[]>>
     >(function (acc, item) {
-        if (!acc[item.mainCategory]) {
-            acc[item.mainCategory] = [];
-        }
+        acc[item.mainCategory] ??= [];
         acc[item.mainCategory]?.push(item);
         return acc;
     }, {});
