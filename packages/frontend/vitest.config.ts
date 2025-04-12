@@ -35,6 +35,7 @@ export default defineConfig({
                 }
             }
         },
+        pool: "threads",
         clearMocks: true,
         reporters: ["default"],
         watch: false,

@@ -19,14 +19,14 @@
     "dependencies": {
         "@posva/event-emitter": "catalog:",
         "es-toolkit": "catalog:",
-        "fabric": "6.6.1",
+        "fabric": "6.6.2",
         "hammerjs": "2.0.8"
     },
     "devDependencies": {
         "@types/hammerjs": "2.0.46",
-        "@types/node": "22.13.14",
+        "@types/node": "22.14.1",
         "@vitest/browser": "catalog:",
-        "jsondiffpatch": "0.6.2",
+        "jsondiffpatch": "0.7.3",
         "vitest": "catalog:"
     },
     "keywords": [
