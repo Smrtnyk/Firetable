@@ -56,7 +56,7 @@
     "packageManager": "pnpm@10.8.0",
     "pnpm": {
         "overrides": {
-            "jsdom": "25.0.1",
+            "jsdom": "26.0.0",
             "uri-js": "npm:uri-js-replace"
         }
     }
