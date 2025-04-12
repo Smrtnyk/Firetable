@@ -117,7 +117,7 @@ export function initAligningGuidelines(canvas: Canvas, options: Partial<Aligning
 
         const uniformIsToggled = e.e[canvas.uniScaleKey!];
         let isUniform =
-            (canvas.uniformScaling && !uniformIsToggled) ||
+            (canvas.uniformScaling && !uniformIsToggled) ??
             (!canvas.uniformScaling && uniformIsToggled);
         // When controlling through the center point,
         // if isUniform is true, it actually changes the skew, so it is meaningless.
@@ -140,8 +140,8 @@ export function initAligningGuidelines(canvas: Canvas, options: Partial<Aligning
             target,
         };
         // Obtain horizontal and vertical reference lines.
-        const noNeedToCollectV = onlyDrawPoint && (corner.includes("t") || corner.includes("b"));
-        const noNeedToCollectH = onlyDrawPoint && (corner.includes("l") || corner.includes("r"));
+        const noNeedToCollectV = onlyDrawPoint && (corner.includes("t") ?? corner.includes("b"));
+        const noNeedToCollectH = onlyDrawPoint && (corner.includes("l") ?? corner.includes("r"));
         const vLines = noNeedToCollectV ? [] : collectVerticalPoint(props);
         const hLines = noNeedToCollectH ? [] : collectHorizontalPoint(props);
         vLines.forEach((o) => {
