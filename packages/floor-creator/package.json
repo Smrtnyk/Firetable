@@ -19,7 +19,7 @@
     "dependencies": {
         "@posva/event-emitter": "catalog:",
         "es-toolkit": "catalog:",
-        "fabric": "6.6.2",
+        "fabric": "6.6.4",
         "hammerjs": "2.0.8"
     },
     "devDependencies": {

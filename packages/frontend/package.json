@@ -17,7 +17,7 @@
     },
     "devDependencies": {
         "@pinia/testing": "1.0.1",
-        "@playwright/test": "1.51.1",
+        "@playwright/test": "1.52.0",
         "@quasar/app-vite": "2.2.0",
         "@quasar/vite-plugin": "1.9.0",
         "@types/papaparse": "5.3.15",
@@ -45,7 +45,7 @@
         "es-toolkit": "catalog:",
         "fflate": "0.8.2",
         "firebase": "catalog:",
-        "libphonenumber-js": "1.12.6",
+        "libphonenumber-js": "1.12.7",
         "papaparse": "5.5.2",
         "pinia": "3.0.2",
         "qrcode": "1.5.4",
