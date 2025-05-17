@@ -13,14 +13,14 @@ jobs:
         runs-on: ${{ matrix.os }}
         strategy:
             matrix:
-                node_version: ['22']
+                node_version: ['22', '24']
                 os: [ubuntu-latest, macos-latest]
 
         steps:
             - uses: actions/checkout@v4
             - uses: pnpm/action-setup@v4
               with:
-                  version: 10.8.0
+                  version: 10.11.0
             - uses: actions/setup-node@v4
               with:
                   node-version: ${{ matrix.node_version }}
