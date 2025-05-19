@@ -36,6 +36,12 @@ export default defineConfig({
             }
         },
         pool: "threads",
+        poolOptions: {
+            threads: {
+                useAtomics: true,
+                minThreads: "80%"
+            }
+        },
         clearMocks: true,
         reporters: ["default"],
         watch: false,
