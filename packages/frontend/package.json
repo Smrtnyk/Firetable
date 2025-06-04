@@ -16,7 +16,7 @@
         "test:coverage": "vitest run --coverage"
     },
     "devDependencies": {
-        "@pinia/testing": "1.0.1",
+        "@pinia/testing": "1.0.2",
         "@playwright/test": "1.52.0",
         "@quasar/app-vite": "2.2.0",
         "@quasar/vite-plugin": "1.9.0",
@@ -47,7 +47,7 @@
         "firebase": "catalog:",
         "libphonenumber-js": "1.12.8",
         "papaparse": "5.5.3",
-        "pinia": "3.0.2",
+        "pinia": "3.0.3",
         "qrcode": "1.5.4",
         "quasar": "2.18.1",
         "register-service-worker": "1.7.2",
