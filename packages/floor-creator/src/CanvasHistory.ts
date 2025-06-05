@@ -7,14 +7,8 @@ import type { FloorEditor } from "./FloorEditor.js";
 
 import { canvasToRender } from "./utils.js";
 
-export interface CanvasHistoryOptions {
+interface CanvasHistoryOptions {
     maxStackSize?: number;
-}
-
-export interface HistoryState {
-    height: number;
-    json: string;
-    width: number;
 }
 
 interface DeltaEntry {
@@ -26,6 +20,12 @@ interface DeltaEntry {
      * computed as: diff(lastInternalState, currentInternalState)
      */
     patched: any;
+}
+
+interface HistoryState {
+    height: number;
+    json: string;
+    width: number;
 }
 
 interface InternalState {

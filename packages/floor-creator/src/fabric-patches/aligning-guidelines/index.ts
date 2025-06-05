@@ -14,8 +14,6 @@ type TransformEvent = BasicTransformEvent & {
     target: FabricObject;
 };
 
-export type { AligningLineConfig } from "./typedefs.js";
-
 export function initAligningGuidelines(canvas: Canvas, options: Partial<AligningLineConfig> = {}) {
     Object.assign(aligningLineConfig, options);
 

@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import AppBreadcrumbs from "src/components/AppBreadcrumbs.vue";
 import { refreshApp } from "src/helpers/utils";
-import { useAuthStore } from "src/stores/auth-store";
 
 const emit = defineEmits<(e: "toggle-drawer") => void>();
-const authStore = useAuthStore();
 const menuLinks = [
     {
         icon: "home",
@@ -40,8 +37,6 @@ const menuLinks = [
                 <q-icon size="2rem" name="menu" />
             </q-btn>
         </q-tabs>
-
-        <AppBreadcrumbs v-if="authStore.isAdmin" />
     </q-header>
 </template>
 

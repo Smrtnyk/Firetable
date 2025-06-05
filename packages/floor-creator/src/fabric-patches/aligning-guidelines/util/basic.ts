@@ -17,10 +17,6 @@ export function getContraryMap(target: FabricObject): PointMap {
     };
 }
 
-export function getDistance(a: number, b: number): number {
-    return Math.abs(a - b);
-}
-
 export function getDistanceList(
     point: Point,
     list: Point[],
@@ -53,4 +49,8 @@ export function getPointMap(target: FabricObject): PointMap {
         tl: coords[0],
         tr: coords[1],
     };
+}
+
+function getDistance(a: number, b: number): number {
+    return Math.abs(a - b);
 }

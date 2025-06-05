@@ -17,7 +17,6 @@ const { locale, t } = useI18n();
 
 const backgroundImageUrl = computed(function () {
     const imageIndex = (index % 3) + 1;
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- it can be empty string
     return event.img || `/images/default-event-img-${imageIndex}.jpg`;
 });
 </script>

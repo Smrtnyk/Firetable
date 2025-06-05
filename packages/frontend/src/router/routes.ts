@@ -1,17 +1,14 @@
 import type { AppUser } from "@firetable/types";
 import type { usePermissionsStore } from "src/stores/permissions-store";
-import type { RouteLocationNormalized, RouteRecordRaw } from "vue-router";
+import type { RouteRecordRaw } from "vue-router";
 
 import { AdminRole, Role } from "@firetable/types";
-import { useEventsStore } from "src/stores/events-store";
-import { usePropertiesStore } from "src/stores/properties-store";
 
 declare module "vue-router" {
     interface RouteMeta {
         allowedRoles?:
             | ((permissionsStore: ReturnType<typeof usePermissionsStore>) => boolean)
             | AppUser["role"][];
-        breadcrumb?: ((route: RouteLocationNormalized, isAdmin?: boolean) => string) | string;
         parent?: string;
         requiresAuth: boolean;
     }
@@ -23,7 +20,6 @@ export const routes: RouteRecordRaw[] = [
             {
                 component: () => import("src/pages/PageHome.vue"),
                 meta: {
-                    breadcrumb: "Home",
                     requiresAuth: true,
                 },
                 name: "home",
@@ -33,7 +29,6 @@ export const routes: RouteRecordRaw[] = [
                 component: () => import("src/pages/PageOrganisations.vue"),
                 meta: {
                     allowedRoles: [AdminRole.ADMIN],
-                    breadcrumb: "Home",
                     requiresAuth: true,
                 },
                 name: "organisations",
@@ -42,14 +37,6 @@ export const routes: RouteRecordRaw[] = [
             {
                 component: () => import("src/pages/PageProperties.vue"),
                 meta: {
-                    breadcrumb(route: RouteLocationNormalized, isAdmin) {
-                        const propertiesStore = usePropertiesStore();
-                        return isAdmin
-                            ? propertiesStore.getOrganisationNameById(
-                                  route.params.organisationId as string,
-                              )
-                            : "Home";
-                    },
                     parent: "organisations",
                     requiresAuth: true,
                 },
@@ -60,12 +47,6 @@ export const routes: RouteRecordRaw[] = [
             {
                 component: () => import("src/pages/PageEvents.vue"),
                 meta: {
-                    breadcrumb(route) {
-                        const propertiesStore = usePropertiesStore();
-                        return propertiesStore.getPropertyNameById(
-                            route.params.propertyId as string,
-                        );
-                    },
                     parent: "properties",
                     requiresAuth: true,
                 },
@@ -76,10 +57,6 @@ export const routes: RouteRecordRaw[] = [
             {
                 component: () => import("src/pages/PageEvent.vue"),
                 meta: {
-                    breadcrumb() {
-                        const eventsStore = useEventsStore();
-                        return eventsStore.currentEventName;
-                    },
                     parent: "events",
                     requiresAuth: true,
                 },
@@ -90,7 +67,6 @@ export const routes: RouteRecordRaw[] = [
             {
                 component: () => import("src/pages/PageProfile.vue"),
                 meta: {
-                    breadcrumb: "Profile",
                     requiresAuth: true,
                 },
                 name: "userProfile",
@@ -99,7 +75,6 @@ export const routes: RouteRecordRaw[] = [
             {
                 component: () => import("src/pages/PageIssueReport.vue"),
                 meta: {
-                    breadcrumb: "Report Issue",
                     requiresAuth: true,
                 },
                 name: "reportIssue",
@@ -250,7 +225,6 @@ export const routes: RouteRecordRaw[] = [
                     allowedRoles(permissionsStore) {
                         return permissionsStore.canSeeInventory;
                     },
-                    breadcrumb: "Drink Cards",
                     requiresAuth: true,
                 },
                 name: "adminPropertyDrinkCards",

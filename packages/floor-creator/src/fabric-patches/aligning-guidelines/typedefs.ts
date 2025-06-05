@@ -26,6 +26,6 @@ export type LineProps = {
     target: Point;
 };
 
-export type OriginMap = { [props: string]: [TOriginX, TOriginY] };
-
 export type PointMap = { [props: string]: Point };
+
+type OriginMap = { [props: string]: [TOriginX, TOriginY] };
