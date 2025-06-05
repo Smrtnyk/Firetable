@@ -45,7 +45,7 @@
         "es-toolkit": "catalog:",
         "fflate": "0.8.2",
         "firebase": "catalog:",
-        "libphonenumber-js": "1.12.8",
+        "libphonenumber-js": "1.12.9",
         "papaparse": "5.5.3",
         "pinia": "3.0.3",
         "qrcode": "1.5.4",
