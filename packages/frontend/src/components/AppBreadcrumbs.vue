@@ -75,7 +75,7 @@ function isRouteAllowed(
 
     return isFunction(currentRoute.meta.allowedRoles)
         ? (currentRoute.meta.allowedRoles(authStore) as boolean)
-        : ((currentRoute.meta.allowedRoles as string[]) ?? ([] as string[])).includes(userRole);
+        : ((currentRoute.meta.allowedRoles as string[]) || ([] as string[])).includes(userRole);
 }
 
 const breadcrumbLinks = computed<Link[]>(function () {

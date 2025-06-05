@@ -4,6 +4,8 @@ export default defineConfig({
     test: {
         dir: "./src",
         clearMocks: true,
+        mockReset: true,
+        restoreMocks: true,
         reporters: ["default"],
         watch: false,
         silent: !!process.env.CI,

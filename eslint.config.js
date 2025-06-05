@@ -130,7 +130,7 @@ export default config(
             "@typescript-eslint/prefer-function-type": "error",
             "@typescript-eslint/prefer-includes": "error",
             "@typescript-eslint/prefer-literal-enum-member": "error",
-            "@typescript-eslint/prefer-nullish-coalescing": "error",
+            "@typescript-eslint/prefer-nullish-coalescing": "off",
             "@typescript-eslint/prefer-optional-chain": "error",
             "@typescript-eslint/prefer-readonly": "error",
             "@typescript-eslint/prefer-reduce-type-parameter": "error",

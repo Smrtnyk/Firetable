@@ -20,7 +20,7 @@ const authStore = useAuthStore();
 const permissionsStore = usePermissionsStore();
 
 const canModify = computed(function () {
-    return permissionsStore.canReserve ?? isOwnReservation(props.reservation);
+    return permissionsStore.canReserve === true || isOwnReservation(props.reservation);
 });
 
 function isOwnReservation(reservation: QueuedReservation): boolean {

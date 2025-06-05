@@ -76,20 +76,20 @@ export function useReservationPermissions(reservation: Ref<ReservationDoc>) {
 
     const canDeleteReservation = computed(function () {
         return (
-            permissionsStore.canDeleteReservation ??
+            permissionsStore.canDeleteReservation === true ||
             (isOwnReservation.value && permissionsStore.canDeleteOwnReservation)
         );
     });
     const canEditReservation = computed(function () {
         return (
-            permissionsStore.canEditReservation ??
+            permissionsStore.canEditReservation === true ||
             (isOwnReservation.value && permissionsStore.canEditOwnReservation)
         );
     });
 
     const canMoveToQueue = computed(function () {
         return (
-            (permissionsStore.canReserve ?? isOwnReservation.value) &&
+            (permissionsStore.canReserve === true || isOwnReservation.value) &&
             !isCancelled.value &&
             !isGuestArrived.value
         );

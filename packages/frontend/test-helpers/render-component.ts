@@ -143,6 +143,7 @@ export function renderComponent<T>(
                     stubActions: false,
                     ...options?.piniaStoreOptions,
                     createSpy: vi.fn,
+                    fakeApp: true,
                 }),
                 [Quasar, { plugins: { BottomSheet, Dialog, Loading, Notify } }],
                 i18n,

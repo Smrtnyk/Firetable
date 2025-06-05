@@ -169,7 +169,7 @@ const filteredGuests = computed(function () {
         const query = searchQuery.value.trim().toLowerCase();
         filtered = filtered.filter(
             (guest) =>
-                guest.name.toLowerCase().includes(query) ??
+                guest.name.toLowerCase().includes(query) ||
                 guest.contact.toLowerCase().includes(query),
         );
     }

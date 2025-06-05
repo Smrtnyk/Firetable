@@ -40,7 +40,8 @@ export const useGuestsStore = defineStore("guests", function () {
 
     function hasPropertyAccess(propertyId: string): boolean {
         return (
-            authStore.isAdmin ?? authStore.nonNullableUser.relatedProperties.includes(propertyId)
+            authStore.isAdmin === true ||
+            authStore.nonNullableUser.relatedProperties.includes(propertyId)
         );
     }
 
