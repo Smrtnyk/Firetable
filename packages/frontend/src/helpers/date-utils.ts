@@ -123,12 +123,30 @@ export function getLocalizedDaysOfWeek(locale: string): string[] {
 }
 
 /**
+ * Pass null as timeZone to show time in current time zone
+ *
+ * @param timestamp Timestamp in milliseconds
+ * @param locale
+ * @param timeZone Time zone to use
+ */
+export function hourFromTimestamp(timestamp: number, locale: string, timeZone: string): string {
+    const date = new Date(timestamp);
+    const formatter = new Intl.DateTimeFormat(locale, {
+        hour: "2-digit",
+        hour12: false,
+        minute: "2-digit",
+        timeZone: timeZone ?? void 0,
+    });
+    return formatter.format(date);
+}
+
+/**
  * Gets today's date in specified timezone formatted as DD.MM.YYYY
  *
  * @param timezone - Timezone to use for the date
  * @returns Date string in DD.MM.YYYY format
  */
-export function getTodayInTimezone(timezone: string): string {
+function getTodayInTimezone(timezone: string): string {
     const formatter = new Intl.DateTimeFormat("en-US", {
         day: "2-digit",
         month: "2-digit",
@@ -145,22 +163,4 @@ export function getTodayInTimezone(timezone: string): string {
     }, {});
 
     return `${dateObj.day}.${dateObj.month}.${dateObj.year}`;
-}
-
-/**
- * Pass null as timeZone to show time in current time zone
- *
- * @param timestamp Timestamp in milliseconds
- * @param locale
- * @param timeZone Time zone to use
- */
-export function hourFromTimestamp(timestamp: number, locale: string, timeZone: string): string {
-    const date = new Date(timestamp);
-    const formatter = new Intl.DateTimeFormat(locale, {
-        hour: "2-digit",
-        hour12: false,
-        minute: "2-digit",
-        timeZone: timeZone ?? void 0,
-    });
-    return formatter.format(date);
 }

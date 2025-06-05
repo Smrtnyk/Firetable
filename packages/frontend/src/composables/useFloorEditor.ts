@@ -9,7 +9,7 @@ import { debounce } from "quasar";
 import { AppLogger } from "src/logger/FTLogger.js";
 import { nextTick, onBeforeUnmount, ref, shallowRef } from "vue";
 
-export const TABLE_EL_TO_ADD = [FloorElementTypes.RECT_TABLE, FloorElementTypes.ROUND_TABLE];
+const TABLE_EL_TO_ADD = [FloorElementTypes.RECT_TABLE, FloorElementTypes.ROUND_TABLE];
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- pretty verbose
 export function useFloorEditor(containerRef: ShallowRef<HTMLElement | null>) {

@@ -13,7 +13,7 @@
         "test": "vitest",
         "typecheck:all": "tsc --noEmit --project tsconfig.spec.json",
         "build": "pnpm run typecheck:all && tsc -b",
-        "find-dead-code": "npx ts-prune -p tsconfig.json --ignore 'src/index.ts|dist'",
+        "find-dead-code": "pnpm knip",
         "lint": "eslint ./src"
     },
     "dependencies": {
@@ -27,7 +27,10 @@
         "@types/node": "22.15.29",
         "@vitest/browser": "catalog:",
         "jsondiffpatch": "0.7.3",
-        "vitest": "catalog:"
+        "vitest": "catalog:",
+        "typescript": "catalog:",
+        "knip": "catalog:",
+        "eslint": "catalog:"
     },
     "keywords": [
         "floor",

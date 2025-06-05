@@ -13,7 +13,8 @@
         "build": "quasar build -m pwa && pnpm run typecheck",
         "typecheck": "vue-tsc --noEmit",
         "test": "vitest",
-        "test:coverage": "vitest run --coverage"
+        "test:coverage": "vitest run --coverage",
+        "find-dead-code": "knip -c ./config/knip.json"
     },
     "devDependencies": {
         "@pinia/testing": "1.0.2",
@@ -31,7 +32,8 @@
         "vitest": "catalog:",
         "vitest-browser-vue": "0.2.0",
         "vue-component-type-helpers": "2.2.10",
-        "vue-tsc": "2.2.10"
+        "vue-tsc": "2.2.10",
+        "knip": "catalog:"
     },
     "dependencies": {
         "@firetable/backend": "workspace:*",

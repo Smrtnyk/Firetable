@@ -50,7 +50,7 @@ const DEFAULT_PROPERTY_SETTINGS: DeepRequired<PropertySettings> = {
     timezone: getDefaultTimezone(),
 };
 
-export const DEFAULT_SUBSCRIPTION_SETTINGS = {
+const DEFAULT_SUBSCRIPTION_SETTINGS = {
     maxFloorPlansPerEvent: 3,
 };
 
