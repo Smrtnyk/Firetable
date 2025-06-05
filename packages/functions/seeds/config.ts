@@ -1,6 +1,6 @@
-export const EMULATOR_HOST = "localhost";
-export const FIRESTORE_PORT = 4000;
-export const AUTH_PORT = 9099;
+const EMULATOR_HOST = "localhost";
+const FIRESTORE_PORT = 4000;
+const AUTH_PORT = 9099;
 
 export async function verifyEmulatorConnection(): Promise<void> {
     const firestoreUrl = `http://${EMULATOR_HOST}:${FIRESTORE_PORT}/`;

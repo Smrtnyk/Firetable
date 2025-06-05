@@ -9,26 +9,25 @@
         "test:local": "vitest",
         "test": "bash run-tests.sh",
         "dev": "tsc --watch",
-        "deploy": "firebase deploy --only functions",
-        "logs": "firebase functions:log",
-        "find-dead-code": "npx ts-prune",
+        "find-dead-code": "knip",
         "seed": "npx tsx seeds/scripts/seed.ts",
         "seed:admin": "npx tsx seeds/scripts/seed.ts --with-admin"
     },
     "dependencies": {
-        "@google-cloud/functions-framework": "4.0.0",
         "es-toolkit": "1.39.0",
         "firebase-admin": "13.4.0",
         "firebase-functions": "6.3.2"
     },
     "devDependencies": {
         "@faker-js/faker": "9.8.0",
-        "@firebase/app-types": "0.9.3",
         "@firebase/rules-unit-testing": "4.0.1",
         "@types/node": "22.15.29",
         "cac": "6.7.14",
         "tinyrainbow": "2.0.0",
-        "vitest": "3.2.2"
+        "vitest": "3.2.2",
+        "knip": "5.60.2",
+        "typescript": "5.8.3",
+        "tsx": "4.19.4"
     },
     "private": true
 }

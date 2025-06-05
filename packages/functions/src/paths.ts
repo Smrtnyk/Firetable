@@ -14,10 +14,6 @@ export function getEventsPath(organisationId: string, propertyId: string): strin
     ].join("/");
 }
 
-export function getGuestPath(organisationId: string, guestId: string): string {
-    return [getGuestsPath(organisationId), guestId].join("/");
-}
-
 // Guest
 export function getGuestsPath(organisationId: string): string {
     return [Collection.ORGANISATIONS, organisationId, Collection.GUESTS].join("/");

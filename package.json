@@ -26,13 +26,14 @@
         "lint": "eslint .",
         "lint:fix": "eslint --fix .",
         "build": "pnpm -r build",
-        "build:clean": "rm -rf ./packages/*/dist && pnpm -r build"
+        "build:clean": "rm -rf ./packages/*/dist && pnpm -r build",
+        "find-dead-code": "pnpm -r find-dead-code"
     },
     "devDependencies": {
         "@eslint/eslintrc": "3.3.1",
         "@eslint/js": "9.28.0",
         "@regru/eslint-plugin-prefer-early-return": "1.0.0",
-        "eslint": "9.28.0",
+        "eslint": "catalog:",
         "eslint-config-prettier": "10.1.5",
         "eslint-import-resolver-typescript": "4.4.2",
         "eslint-plugin-import-x": "4.15.1",
@@ -45,7 +46,7 @@
         "firebase-tools": "14.6.0",
         "globals": "16.2.0",
         "prettier": "3.5.3",
-        "typescript": "5.8.3",
+        "typescript": "catalog:",
         "typescript-eslint": "8.33.1",
         "vue-eslint-parser": "10.1.3"
     },
