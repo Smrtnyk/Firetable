@@ -29,8 +29,12 @@ describe("AdminEventFloorManager", () => {
         it("emits reorder event when dragging floor to a new position", async () => {
             const screen = renderComponent(AdminEventFloorManager, props);
 
-            const sourceFloor = screen.getByLabelText("floor1 draggable floor plan item");
-            const targetFloor = screen.getByLabelText("floor3 draggable floor plan item");
+            const sourceFloor = screen.getByLabelText(
+                "floor1 draggable floor plan item drag handle",
+            );
+            const targetFloor = screen.getByLabelText(
+                "floor3 draggable floor plan item drag handle",
+            );
 
             await userEvent.dragAndDrop(sourceFloor, targetFloor);
             await nextTick();
@@ -48,15 +52,19 @@ describe("AdminEventFloorManager", () => {
             const screen = renderComponent(AdminEventFloorManager, props);
 
             // First reorder: Move Floor 1 to end
-            const floor1 = screen.getByLabelText("floor1 draggable floor plan item");
-            const floor3 = screen.getByLabelText("floor3 draggable floor plan item");
+            const floor1 = screen.getByLabelText("floor1 draggable floor plan item drag handle");
+            const floor3 = screen.getByLabelText("floor3 draggable floor plan item drag handle");
             await userEvent.dragAndDrop(floor1, floor3);
 
             await nextTick();
 
             // Get fresh references after first reorder
-            const floor2AfterFirstMove = screen.getByLabelText("floor2 draggable floor plan item");
-            const floor1AfterFirstMove = screen.getByLabelText("floor1 draggable floor plan item");
+            const floor2AfterFirstMove = screen.getByLabelText(
+                "floor2 draggable floor plan item drag handle",
+            );
+            const floor1AfterFirstMove = screen.getByLabelText(
+                "floor1 draggable floor plan item drag handle",
+            );
 
             // Second reorder: Move Floor 2 to end
             await userEvent.dragAndDrop(floor2AfterFirstMove, floor1AfterFirstMove);

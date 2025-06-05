@@ -150,7 +150,11 @@ function onRemoveFloor(index: number): void {
                 :aria-label="`${floor.id} draggable floor plan item`"
             >
                 <q-item-section avatar>
-                    <q-icon name="drag" class="drag-handle cursor-move" />
+                    <q-icon
+                        name="drag"
+                        class="drag-handle cursor-move"
+                        :aria-label="`${floor.id} draggable floor plan item drag handle`"
+                    />
                 </q-item-section>
 
                 <q-item-section>
