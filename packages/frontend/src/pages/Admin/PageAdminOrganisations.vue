@@ -127,7 +127,6 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
         <!-- Empty State -->
         <FTCenteredText v-if="organisations.length === 0">
             <q-icon name="business" size="64px" color="grey-5" class="q-mb-md" />
-            <div class="text-h6 q-mb-sm">No organisations yet</div>
             <div class="text-grey-6 q-mb-lg">Create your first organisation to get started</div>
             <FTBtn
                 label="Create Organisation"

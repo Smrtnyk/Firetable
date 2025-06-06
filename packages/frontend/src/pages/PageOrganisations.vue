@@ -1,17 +1,61 @@
 <script setup lang="ts">
+import type { CreateOrganisationPayload } from "src/db";
+
 import { storeToRefs } from "pinia";
+import { useQuasar } from "quasar";
+import AddNewOrganisationForm from "src/components/admin/organisation/AddNewOrganisationForm.vue";
+import FTBtn from "src/components/FTBtn.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
+import FTDialog from "src/components/FTDialog.vue";
+import { useDialog } from "src/composables/useDialog";
+import { createNewOrganisation } from "src/db";
 import { isTablet } from "src/global-reactives/screen-detection";
 import {
     formatOrganisationStatus,
     getOrganisationStatusColor,
 } from "src/helpers/organisation/organisation";
+import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { computed } from "vue";
 
+const propertiesStore = usePropertiesStore();
 const { organisations } = storeToRefs(usePropertiesStore());
+const quasar = useQuasar();
 
 const titleClass = computed(() => (isTablet.value ? "text-h6" : "text-h5"));
+
+const { createDialog } = useDialog();
+
+function createOrganisation(): void {
+    const dialog = createDialog({
+        component: FTDialog,
+        componentProps: {
+            component: AddNewOrganisationForm,
+            componentPropsObject: {},
+            listeners: {
+                create(organisationPayload: CreateOrganisationPayload) {
+                    onOrganisationCreate(organisationPayload);
+                    dialog.hide();
+                },
+            },
+            maximized: false,
+            title: "Add new Organisation",
+        },
+    });
+}
+
+async function onOrganisationCreate(organisationPayload: CreateOrganisationPayload): Promise<void> {
+    await tryCatchLoadingWrapper({
+        async hook() {
+            await createNewOrganisation(organisationPayload);
+            quasar.notify({
+                message: "Organisation created successfully!",
+                type: "success",
+            });
+            return propertiesStore.initOrganisations();
+        },
+    });
+}
 </script>
 
 <template>
@@ -81,6 +125,17 @@ const titleClass = computed(() => (isTablet.value ? "text-h6" : "text-h5"));
             </div>
         </div>
 
-        <FTCenteredText v-else>No Organisations have been created</FTCenteredText>
+        <div v-else>
+            <FTCenteredText>
+                <q-icon name="crown" size="64px" color="grey-5" class="q-mb-md" />
+                <div class="text-grey-6 q-mb-lg">Create your first organisation to get started</div>
+                <FTBtn
+                    label="Create Organisation"
+                    icon="plus"
+                    class="button-gradient"
+                    @click="createOrganisation"
+                />
+            </FTCenteredText>
+        </div>
     </div>
 </template>

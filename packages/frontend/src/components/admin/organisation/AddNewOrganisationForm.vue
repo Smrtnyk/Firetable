@@ -36,8 +36,7 @@ async function submit(): Promise<void> {
             <q-input
                 v-model="organisationName"
                 label="Enter organisation name..."
-                rounded
-                standout
+                outlined
                 autofocus
                 :rules="organisationRules"
             />
@@ -45,8 +44,7 @@ async function submit(): Promise<void> {
             <q-input
                 v-model.number="maxAllowedProperties"
                 label="Add maximum number of allowed properties..."
-                rounded
-                standout
+                outlined
                 type="number"
                 :rules="maxAllowedPropertiesRules"
             />
