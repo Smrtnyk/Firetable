@@ -267,11 +267,12 @@ const uniqueUsersCount = computed(() => users.value.length);
                     />
                 </FTTabs>
 
-                <FTTabPanels v-model="activeTab">
+                <FTTabPanels v-model="activeTab" class="bg-transparent q-mt-md">
                     <q-tab-panel
                         v-for="(bucket, index) in Object.values(bucketizedUsers)"
                         :key="bucket.propertyName"
                         :name="index"
+                        class="q-pa-none"
                     >
                         <AdminUsersList
                             @edit="showEditUserDialog"
