@@ -316,6 +316,7 @@ function setDarkMode(newValue: boolean): void {
             <q-separator spaced />
             <q-item>
                 <q-select
+                    class="full-width"
                     :model-value="lang"
                     :options="langOptions"
                     :label="t('AppDrawer.languageSelectorLabel')"
