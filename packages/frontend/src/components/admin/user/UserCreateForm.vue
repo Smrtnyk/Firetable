@@ -130,8 +130,7 @@ async function validateForm(): Promise<boolean> {
         >
             <q-input
                 v-model="form.name"
-                standout
-                rounded
+                outlined
                 :label="t('UserCreateForm.userNameInputLabel')"
                 :hint="t('UserCreateForm.userNameInputHint')"
                 lazy-rules
@@ -140,9 +139,8 @@ async function validateForm(): Promise<boolean> {
 
             <q-input
                 v-model="form.username"
-                standout
+                outlined
                 prefix="Email:"
-                rounded
                 :label="t('UserCreateForm.userMailInputLabel')"
                 :hint="t('UserCreateForm.userMailInputHint')"
                 :rules="userNameRules"
@@ -156,8 +154,7 @@ async function validateForm(): Promise<boolean> {
             <q-input
                 v-if="'password' in form"
                 v-model="form.password as string"
-                standout
-                rounded
+                outlined
                 :label="t('UserCreateForm.userPasswordInputLabel')"
                 :hint="t('UserCreateForm.userPasswordInputHint')"
                 lazy-rules
@@ -171,8 +168,7 @@ async function validateForm(): Promise<boolean> {
             <q-select
                 v-model="form.role"
                 :hint="t('UserCreateForm.userRoleSelectHint')"
-                standout
-                rounded
+                outlined
                 :options="availableRoles"
                 :label="t('UserCreateForm.userRoleSelectLabel')"
             />

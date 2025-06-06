@@ -13,6 +13,7 @@ export const enum UserCapability {
     CAN_CANCEL_RESERVATION = "Can cancel reservation",
     CAN_CONFIRM_RESERVATION = "Can confirm reservation",
     CAN_CREATE_EVENTS = "Can create events",
+    CAN_CREATE_PROPERTIES = "Can create properties",
     CAN_DELETE_OWN_RESERVATION = "Can delete own reservation",
     CAN_DELETE_RESERVATION = "Can delete reservation",
     CAN_EDIT_FLOOR_PLANS = "Can edit floor plans",
@@ -57,6 +58,7 @@ export interface UserCapabilities {
     [UserCapability.CAN_CANCEL_RESERVATION]?: boolean;
     [UserCapability.CAN_CONFIRM_RESERVATION]?: boolean;
     [UserCapability.CAN_CREATE_EVENTS]?: boolean;
+    [UserCapability.CAN_CREATE_PROPERTIES]?: boolean;
     [UserCapability.CAN_DELETE_OWN_RESERVATION]?: boolean;
     [UserCapability.CAN_DELETE_RESERVATION]?: boolean;
     [UserCapability.CAN_EDIT_FLOOR_PLANS]?: boolean;
@@ -75,6 +77,7 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<AdminRole.ADMIN | Role, UserCa
         [UserCapability.CAN_CANCEL_RESERVATION]: true,
         [UserCapability.CAN_CONFIRM_RESERVATION]: true,
         [UserCapability.CAN_CREATE_EVENTS]: true,
+        [UserCapability.CAN_CREATE_PROPERTIES]: true,
         [UserCapability.CAN_DELETE_OWN_RESERVATION]: true,
         [UserCapability.CAN_DELETE_RESERVATION]: true,
         [UserCapability.CAN_EDIT_FLOOR_PLANS]: true,
@@ -91,6 +94,7 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<AdminRole.ADMIN | Role, UserCa
         [UserCapability.CAN_CANCEL_RESERVATION]: false,
         [UserCapability.CAN_CONFIRM_RESERVATION]: true,
         [UserCapability.CAN_CREATE_EVENTS]: false,
+        [UserCapability.CAN_CREATE_PROPERTIES]: false,
         [UserCapability.CAN_DELETE_OWN_RESERVATION]: true,
         [UserCapability.CAN_DELETE_RESERVATION]: true,
         [UserCapability.CAN_EDIT_FLOOR_PLANS]: false,
@@ -107,6 +111,7 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<AdminRole.ADMIN | Role, UserCa
         [UserCapability.CAN_CANCEL_RESERVATION]: true,
         [UserCapability.CAN_CONFIRM_RESERVATION]: true,
         [UserCapability.CAN_CREATE_EVENTS]: true,
+        [UserCapability.CAN_CREATE_PROPERTIES]: false,
         [UserCapability.CAN_DELETE_OWN_RESERVATION]: true,
         [UserCapability.CAN_DELETE_RESERVATION]: true,
         [UserCapability.CAN_EDIT_FLOOR_PLANS]: true,
@@ -123,6 +128,7 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<AdminRole.ADMIN | Role, UserCa
         [UserCapability.CAN_CANCEL_RESERVATION]: true,
         [UserCapability.CAN_CONFIRM_RESERVATION]: true,
         [UserCapability.CAN_CREATE_EVENTS]: true,
+        [UserCapability.CAN_CREATE_PROPERTIES]: true,
         [UserCapability.CAN_DELETE_OWN_RESERVATION]: true,
         [UserCapability.CAN_DELETE_RESERVATION]: true,
         [UserCapability.CAN_EDIT_FLOOR_PLANS]: true,
@@ -139,6 +145,7 @@ export const DEFAULT_CAPABILITIES_BY_ROLE: Record<AdminRole.ADMIN | Role, UserCa
         [UserCapability.CAN_CANCEL_RESERVATION]: false,
         [UserCapability.CAN_CONFIRM_RESERVATION]: false,
         [UserCapability.CAN_CREATE_EVENTS]: false,
+        [UserCapability.CAN_CREATE_PROPERTIES]: false,
         [UserCapability.CAN_DELETE_OWN_RESERVATION]: true,
         [UserCapability.CAN_DELETE_RESERVATION]: false,
         [UserCapability.CAN_EDIT_FLOOR_PLANS]: false,

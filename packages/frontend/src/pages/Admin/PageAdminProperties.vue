@@ -16,7 +16,7 @@ import { showConfirm, showDeleteConfirm, tryCatchLoadingWrapper } from "src/help
 import { useAuthStore } from "src/stores/auth-store";
 import { usePermissionsStore } from "src/stores/permissions-store";
 import { usePropertiesStore } from "src/stores/properties-store";
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 
 interface Props {
@@ -33,8 +33,6 @@ const { t } = useI18n();
 const { data: properties } = useFirestoreCollection<PropertyDoc>(
     getPropertiesPath(props.organisationId),
 );
-
-const organisationsIsLoading = ref(false);
 
 const canCreateProperty = computed(function () {
     const maxAllowedProperties =
@@ -89,7 +87,7 @@ function createLinks(propertyId: string): Link[] {
     });
 }
 
-function createProperty(property?: PropertyDoc): void {
+function createVenue(property?: PropertyDoc): void {
     const dialog = createDialog({
         component: FTDialog,
         componentProps: {
@@ -161,7 +159,7 @@ async function onPropertyUpdate(payload: UpdatePropertyPayload): Promise<void> {
 
 async function showUpdatePropertyDialog(property: PropertyDoc): Promise<void> {
     if (await showConfirm("Edit property?")) {
-        createProperty(property);
+        createVenue(property);
     }
 }
 </script>
@@ -171,11 +169,11 @@ async function showUpdatePropertyDialog(property: PropertyDoc): Promise<void> {
         <FTTitle :title="t('PageAdminProperties.properties')">
             <template #right>
                 <FTBtn
-                    v-if="!organisationsIsLoading && canCreateProperty"
+                    v-if="properties.length > 0 && canCreateProperty"
                     rounded
                     icon="plus"
                     class="button-gradient"
-                    @click="createProperty()"
+                    @click="createVenue()"
                 />
             </template>
         </FTTitle>
@@ -229,14 +227,18 @@ async function showUpdatePropertyDialog(property: PropertyDoc): Promise<void> {
             </q-expansion-item>
         </q-list>
 
-        <div v-else-if="!canCreateProperty && !organisationsIsLoading">
+        <div v-else-if="!canCreateProperty">
             <h6 class="q-ma-sm text-weight-bolder underline">
                 {{ t("PageAdminProperties.maxAmountOfPropertiesReachedMessage") }}
             </h6>
         </div>
 
         <FTCenteredText v-else-if="properties.length === 0">
-            {{ t("PageAdminProperties.noPropertiesCreatedMessage") }}
+            <q-icon name="home" size="64px" color="grey-5" class="q-mb-md" />
+            <div class="text-grey-6 q-mb-lg">
+                {{ t("PageAdminProperties.noPropertiesCreatedMessage") }}
+            </div>
+            <FTBtn label="Create venue" icon="plus" class="button-gradient" @click="createVenue" />
         </FTCenteredText>
     </div>
 </template>

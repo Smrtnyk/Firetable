@@ -245,7 +245,7 @@ const de: TranslationStructure = {
         editPropertyDialogTitle: "Immobilie bearbeiten: {name}",
         maxAmountOfPropertiesReachedMessage:
             "Sie haben die maximale Anzahl an erstellten Immobilien erreicht!",
-        noPropertiesCreatedMessage: "Es wurden keine Immobilien erstellt.",
+        noPropertiesCreatedMessage: "Es wurden keine Immobilien erstellt",
         noPropertiesWithoutOrganisationMessage:
             "Sie müssen zuerst eine Organisation erstellen, bevor Sie Immobilien anlegen können.",
         properties: "Immobilien",

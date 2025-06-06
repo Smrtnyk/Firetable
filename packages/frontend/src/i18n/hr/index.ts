@@ -241,7 +241,7 @@ const hr: TranslationStructure = {
         deletePropertyDialogTitle: "Izbrisati nekretninu?",
         editPropertyDialogTitle: "Uređivanje nekretnine: {name}",
         maxAmountOfPropertiesReachedMessage: "Dosegnuli ste maksimalan broj kreiranih nekretnina!",
-        noPropertiesCreatedMessage: "Nema kreiranih nekretnina.",
+        noPropertiesCreatedMessage: "Nema kreiranih nekretnina",
         noPropertiesWithoutOrganisationMessage:
             "Kako biste kreirali nekretnine, prvo morate kreirati organizaciju.",
         properties: "Nekretnine",

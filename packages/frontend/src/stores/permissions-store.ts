@@ -22,6 +22,10 @@ export const usePermissionsStore = defineStore("permissions", function () {
         return [AdminRole.ADMIN, Role.MANAGER, Role.PROPERTY_OWNER].includes(userRole);
     });
 
+    const canCreateProperties = computed(function () {
+        return Boolean(capabilities.value[UserCapability.CAN_CREATE_PROPERTIES]);
+    });
+
     const canCreateEvents = computed(function () {
         return Boolean(capabilities.value[UserCapability.CAN_CREATE_EVENTS]);
     });
@@ -86,6 +90,7 @@ export const usePermissionsStore = defineStore("permissions", function () {
         canCancelReservation,
         canConfirmReservation,
         canCreateEvents,
+        canCreateProperties,
         canDeleteOwnReservation,
         canDeleteReservation,
         canEditFloorPlans,

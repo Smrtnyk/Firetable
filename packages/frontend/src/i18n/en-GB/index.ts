@@ -239,7 +239,7 @@ const enGB = {
         editPropertyDialogTitle: "Editing property: {name}",
         maxAmountOfPropertiesReachedMessage:
             "You have reached the maximum amount of created properties!",
-        noPropertiesCreatedMessage: "There are no properties created.",
+        noPropertiesCreatedMessage: "There are no venues created",
         noPropertiesWithoutOrganisationMessage:
             "In order to create properties, you must first create an organisation.",
         properties: "Properties",

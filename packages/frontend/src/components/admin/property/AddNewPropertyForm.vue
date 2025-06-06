@@ -151,8 +151,7 @@ function triggerFileInput(): void {
             <q-input
                 v-model="form.name"
                 label="Property name"
-                rounded
-                standout
+                outlined
                 autofocus
                 :rules="propertyRules"
             />
@@ -188,8 +187,7 @@ function triggerFileInput(): void {
                     v-if="inputMethod === InputMethod.URL"
                     v-model="imageUrl"
                     label="Image URL"
-                    rounded
-                    standout
+                    outlined
                     :rules="imgUrlRules"
                 >
                     <template v-if="imageUrl" #append>
@@ -200,7 +198,7 @@ function triggerFileInput(): void {
                 <!-- Image Preview and Drop Area -->
                 <div
                     v-if="inputMethod === InputMethod.FILE"
-                    class="preview-container q-mt-md ft-border ft-card"
+                    class="preview-container q-mt-md ft-card full-width"
                     @click="triggerFileInput"
                     @dragover.prevent
                     @drop.prevent="handleFileDrop"
@@ -253,7 +251,6 @@ function triggerFileInput(): void {
 }
 
 .preview-container {
-    max-width: 200px;
     cursor: pointer;
 
     .upload-placeholder {
@@ -262,7 +259,6 @@ function triggerFileInput(): void {
         align-items: center;
         justify-content: center;
         height: 100%;
-        border: 2px dashed var(--q-separator-color);
         border-radius: 8px;
         text-align: center;
 

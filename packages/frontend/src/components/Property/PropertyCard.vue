@@ -11,7 +11,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const backgroundImageUrl = computed(function () {
-    return props.property.img ?? `/images/default-property-img.jpg`;
+    return props.property.img || `/images/default-property-img.jpg`;
 });
 </script>
 
