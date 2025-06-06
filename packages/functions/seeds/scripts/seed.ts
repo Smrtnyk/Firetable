@@ -21,6 +21,9 @@ cli.option("-o, --organisations <number>", "Number of organisations to seed", {
     .option("-a, --with-admin", "Create an admin user", {
         default: false,
     })
+    .option("-ao, --only-admin", "Create admin only", {
+        default: false,
+    })
     .help();
 
 const { options } = cli.parse();
@@ -37,6 +40,14 @@ async function seed(): Promise<void> {
         const eventSeeder = new EventSeeder();
         const guestSeeder = new GuestSeeder();
         const reservationSeeder = new ReservationSeeder();
+
+        if (options.onlyAdmin) {
+            await userSeeder.createAdminUser();
+            const duration = Date.now() - startTime;
+            logger.timing(duration);
+            logger.success("Seeding completed successfully!");
+            return;
+        }
 
         for (let i = 0; i < options.organisations; i++) {
             const orgId = `org-${(i + 1).toString().padStart(2, "0")}`;

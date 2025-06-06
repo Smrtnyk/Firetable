@@ -11,7 +11,8 @@
         "dev": "tsc --watch",
         "find-dead-code": "knip",
         "seed": "npx tsx seeds/scripts/seed.ts",
-        "seed:admin": "npx tsx seeds/scripts/seed.ts --with-admin"
+        "seed:admin": "npx tsx seeds/scripts/seed.ts --with-admin",
+        "seed:admin:only": "npx tsx seeds/scripts/seed.ts --only-admin"
     },
     "dependencies": {
         "es-toolkit": "1.39.0",
