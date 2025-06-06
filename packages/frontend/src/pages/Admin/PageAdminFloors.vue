@@ -174,7 +174,6 @@ function showAddNewFloorForm(floorDocs: FloorDoc[]): void {
             </q-slide-item>
         </q-list>
 
-        <!-- If the property doesn't have floors, display a standout message -->
         <FTCenteredText v-else>
             {{ t("PageAdminFloors.noFloorPlansMessage") }}
         </FTCenteredText>

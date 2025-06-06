@@ -29,8 +29,7 @@ function onSubmit(): void {
     <q-form class="q-gutter-md q-pt-md q-pa-md" @submit="onSubmit" @reset="onReset">
         <q-input
             v-model="floorName"
-            standout
-            rounded
+            outlined
             label="Floor name *"
             lazy-rules
             :rules="[noEmptyString(), noSameFloorName]"

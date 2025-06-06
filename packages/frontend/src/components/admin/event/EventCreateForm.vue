@@ -229,8 +229,7 @@ function validateAndEmitEdit(): void {
     >
         <q-input
             v-model="state.form.img"
-            rounded
-            standout
+            outlined
             :label="t('EventCreateForm.eventImgInputLabel')"
             lazy-rules
             :rules="[validOptionalURL()]"
@@ -238,8 +237,7 @@ function validateAndEmitEdit(): void {
 
         <q-input
             v-model="state.form.name"
-            rounded
-            standout
+            outlined
             :label="t('EventCreateForm.eventNameInputLabel')"
             lazy-rules
             :rules="[noEmptyString()]"
@@ -247,8 +245,7 @@ function validateAndEmitEdit(): void {
 
         <q-input
             v-model.number="state.form.guestListLimit"
-            rounded
-            standout
+            outlined
             type="number"
             :label="t('EventCreateForm.guestListLimitInputLabel')"
             lazy-rules
@@ -257,8 +254,7 @@ function validateAndEmitEdit(): void {
 
         <q-input
             v-model.number="state.form.entryPrice"
-            rounded
-            standout
+            outlined
             type="number"
             :label="t('EventCreateForm.entryPriceInputLabel')"
             lazy-rules
@@ -268,8 +264,7 @@ function validateAndEmitEdit(): void {
         <q-input
             :label="t('EventCreateForm.inputDateTimeLabel')"
             v-model="displayedDate"
-            rounded
-            standout
+            outlined
             readonly
             class="q-mb-lg"
         >

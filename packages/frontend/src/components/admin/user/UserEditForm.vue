@@ -134,8 +134,7 @@ function resetProperties(): void {
         >
             <q-input
                 v-model="form.name"
-                standout
-                rounded
+                outlined
                 label="Name *"
                 hint="Name of the person, e.g. Max Mustermann"
                 lazy-rules
@@ -144,9 +143,8 @@ function resetProperties(): void {
 
             <q-input
                 v-model="form.username"
-                standout
+                outlined
                 prefix="Email:"
-                rounded
                 label="Username *"
                 hint="Username without spaces and special characters, e.g. max123"
                 :rules="userNameRules"
@@ -156,8 +154,7 @@ function resetProperties(): void {
             <q-input
                 v-if="'password' in form"
                 v-model="form.password"
-                standout
-                rounded
+                outlined
                 label="User password *"
                 hint="Password of the user"
                 lazy-rules
@@ -168,8 +165,7 @@ function resetProperties(): void {
                 v-if="isEditableRole"
                 v-model="form.role"
                 hint="Assign role to user, default is Staff."
-                standout
-                rounded
+                outlined
                 :options="editableRoles"
                 label="Role"
             />

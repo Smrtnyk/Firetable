@@ -108,9 +108,8 @@ defineExpose({
     <q-form ref="reservationForm" class="q-gutter-md q-pt-md" greedy>
         <q-input
             v-model="state.guestName"
-            rounded
             hide-bottom-space
-            standout
+            outlined
             @blur="capitalizeGuestName"
             :label="t(`EventCreateReservation.reservationGuestName`)"
             :rules="[
@@ -121,8 +120,7 @@ defineExpose({
 
         <q-input
             :model-value="state.time"
-            rounded
-            standout
+            outlined
             readonly
             :label="t(`EventCreateReservation.reservationTime`)"
         >
@@ -156,8 +154,7 @@ defineExpose({
         <q-input
             v-model.number="state.numberOfGuests"
             hide-bottom-space
-            rounded
-            standout
+            outlined
             type="number"
             :label="t(`EventCreateReservation.reservationNumberOfGuests`)"
             :rules="[requireNumber(), greaterThanZero(t('validation.greaterThanZeroErrorMsg'))]"
@@ -166,8 +163,7 @@ defineExpose({
         <q-input
             v-model.number="state.consumption"
             hide-bottom-space
-            rounded
-            standout
+            outlined
             type="number"
             :label="t(`EventCreateReservation.reservationConsumption`)"
             lazy-rules="ondemand"
@@ -182,8 +178,7 @@ defineExpose({
 
         <q-input
             v-model="state.reservationNote"
-            rounded
-            standout
+            outlined
             :label="t('EventCreateReservation.reservationNote')"
         />
 
@@ -207,7 +202,7 @@ defineExpose({
 
         <!-- Select input for choosing the user or social -->
         <q-select
-            standout
+            outlined
             v-model="state.reservedBy"
             :options="selectableOptions"
             option-label="name"

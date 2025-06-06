@@ -41,8 +41,7 @@ function handleCustomSectionSubmit(): void {
             <q-input
                 v-model="drinkSection.name"
                 :label="t('PageAdminPropertyDrinkCards.sectionNameLabel')"
-                standout
-                rounded
+                outlined
                 :rules="[noEmptyString('Name is required')]"
             />
 
@@ -55,8 +54,7 @@ function handleCustomSectionSubmit(): void {
                         v-model.number="drinkSection.servingSize.amount"
                         type="number"
                         :label="t('PageAdminPropertyDrinkCards.amount')"
-                        standout
-                        rounded
+                        outlined
                     />
                 </div>
                 <div class="col">
@@ -64,16 +62,14 @@ function handleCustomSectionSubmit(): void {
                         v-model="drinkSection.servingSize.unit"
                         :options="['ml', 'cl', 'bottle']"
                         :label="t('PageAdminPropertyDrinkCards.unit')"
-                        standout
-                        rounded
+                        outlined
                     />
                 </div>
             </div>
             <q-input
                 v-model="drinkSection.servingSize.displayName"
                 :label="t('PageAdminPropertyDrinkCards.displayName')"
-                standout
-                rounded
+                outlined
             />
         </q-card-section>
 

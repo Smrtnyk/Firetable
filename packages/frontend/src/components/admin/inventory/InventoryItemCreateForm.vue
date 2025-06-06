@@ -141,21 +141,13 @@ watch(
 <template>
     <div class="InventoryItemCreateForm">
         <q-form greedy class="q-gutter-md q-pt-md q-pa-md" ref="formRef">
-            <q-input
-                v-model="form.name"
-                label="Name"
-                standout
-                rounded
-                required
-                :rules="nameRules"
-            />
+            <q-input v-model="form.name" label="Name" outlined required :rules="nameRules" />
 
             <q-select
                 v-model="form.type"
                 :options="typeOptions"
                 label="Type"
-                standout
-                rounded
+                outlined
                 required
                 emit-value
                 :rules="typeRules"
@@ -165,8 +157,7 @@ watch(
                 v-model="form.mainCategory"
                 :options="mainCategoryOptions"
                 label="Main Category"
-                standout
-                rounded
+                outlined
                 required
                 emit-value
                 @update:model-value="onMainCategoryChange"
@@ -177,25 +168,23 @@ watch(
                 v-model="form.subCategory"
                 :options="subCategoryOptions"
                 label="Sub Category"
-                standout
-                rounded
+                outlined
                 required
                 emit-value
                 :rules="subCategoryRules"
             />
 
-            <q-input v-model="form.brand" label="Brand" standout rounded />
+            <q-input v-model="form.brand" label="Brand" outlined />
 
-            <q-input v-model="form.style" label="Style" standout rounded />
+            <q-input v-model="form.style" label="Style" outlined />
 
-            <q-input v-model="form.region" label="Region" standout rounded />
+            <q-input v-model="form.region" label="Region" outlined />
 
             <q-input
                 v-model.number="form.quantity"
                 label="Quantity"
                 type="number"
-                standout
-                rounded
+                outlined
                 required
                 :rules="quantityRules"
             />
@@ -205,8 +194,7 @@ watch(
                 v-model.number="form.alcoholContent"
                 label="Alcohol Content (%)"
                 type="number"
-                standout
-                rounded
+                outlined
                 :rules="alcoholContentRules"
             />
 
@@ -215,22 +203,15 @@ watch(
                 v-model.number="form.volume"
                 label="Volume (ml)"
                 type="number"
-                standout
-                rounded
+                outlined
                 :rules="volumeRules"
             />
 
-            <q-input v-model="form.supplier" label="Supplier" standout rounded />
+            <q-input v-model="form.supplier" label="Supplier" outlined />
 
             <q-toggle v-model="form.isActive" label="Active" />
 
-            <q-input
-                v-model="form.description"
-                label="Description"
-                type="textarea"
-                standout
-                rounded
-            />
+            <q-input v-model="form.description" label="Description" type="textarea" outlined />
 
             <div class="row q-gutter-md">
                 <q-btn

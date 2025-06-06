@@ -23,8 +23,7 @@
 
                     <q-input
                         clear-icon="fa fa-close"
-                        standout
-                        rounded
+                        outlined
                         v-model="localFilter"
                         clearable
                         placeholder="Search"

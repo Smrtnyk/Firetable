@@ -80,8 +80,7 @@ function toggleCategory(category: string): void {
     <q-card-section class="q-pa-none">
         <q-input
             v-model="searchQuery"
-            standout
-            rounded
+            outlined
             debounce="300"
             placeholder="Search items"
             class="q-mb-md"

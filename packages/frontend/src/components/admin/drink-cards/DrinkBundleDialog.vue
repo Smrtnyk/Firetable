@@ -189,16 +189,14 @@ async function removeBundleItem(index: number): Promise<void> {
                 v-model="bundle.name"
                 label="Bundle Name"
                 :rules="[noEmptyString('Name is required')]"
-                standout
-                rounded
+                outlined
             />
 
             <q-input
                 v-model="bundle.description"
                 label="Description (Optional)"
                 type="textarea"
-                standout
-                rounded
+                outlined
             />
 
             <!-- Item Selection -->
@@ -211,8 +209,7 @@ async function removeBundleItem(index: number): Promise<void> {
                             :model-value="getItemName(item.inventoryItemId)"
                             readonly
                             @click="openItemSelectionDialog(index)"
-                            standout
-                            rounded
+                            outlined
                             :rules="[noEmptyString('Please select a drink')]"
                             class="cursor-pointer"
                         />
@@ -222,8 +219,7 @@ async function removeBundleItem(index: number): Promise<void> {
                             v-model.number="item.quantity"
                             type="number"
                             label="Qty"
-                            standout
-                            rounded
+                            outlined
                             :rules="[greaterThanZero('Quantity must be greater than 0')]"
                         />
                     </div>
@@ -252,8 +248,7 @@ async function removeBundleItem(index: number): Promise<void> {
                         type="number"
                         label="Bundle Price"
                         prefix="€"
-                        standout
-                        rounded
+                        outlined
                         :rules="[
                             greaterThanZero('Price is required and must be greater than 0'),
                             numberInRange(

@@ -135,22 +135,22 @@ onMounted(function () {
     <div class="row FloorEditorTopControls q-gutter-xs">
         <!-- Position Coordinates -->
         <div class="col-1">
-            <q-input standout v-model.number="localLeft" type="number" label="X" />
+            <q-input outlined v-model.number="localLeft" type="number" label="X" />
         </div>
         <div class="col-1">
-            <q-input standout v-model.number="localTop" type="number" label="Y" />
+            <q-input outlined v-model.number="localTop" type="number" label="Y" />
         </div>
 
         <div class="col-1">
-            <q-input standout v-model.number="localWidth" type="number" label="Width" />
+            <q-input outlined v-model.number="localWidth" type="number" label="Width" />
         </div>
         <div class="col-1">
-            <q-input standout v-model.number="localHeight" type="number" label="Height" />
+            <q-input outlined v-model.number="localHeight" type="number" label="Height" />
         </div>
 
         <!-- Angle Control -->
         <div class="col-1">
-            <q-input standout v-model.number="localAngle" type="number" label="Angle°" />
+            <q-input outlined v-model.number="localAngle" type="number" label="Angle°" />
         </div>
 
         <div class="col-2" v-if="isTable(selectedFloorElement)">
@@ -159,7 +159,7 @@ onMounted(function () {
                 :model-value="selectedFloorElement.label"
                 @update:model-value="(newLabel) => updateTableLabel(selectedFloorElement, newLabel)"
                 type="text"
-                standout
+                outlined
                 label="Table label"
             />
         </div>

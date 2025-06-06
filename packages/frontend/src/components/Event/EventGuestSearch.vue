@@ -137,7 +137,7 @@ function setModel(val: string): void {
             clearable
             clear-icon="fa fa-close"
             dense
-            standout
+            outlined
             :debounce="300"
             @input-value="setModel"
             @filter="filterFn"

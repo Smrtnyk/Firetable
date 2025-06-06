@@ -95,8 +95,7 @@ function onStateChange(newState: ReservationState): void {
         >
             <q-select
                 class="q-mb-md"
-                standout
-                rounded
+                outlined
                 :model-value="reservationMappedState"
                 :options="Object.values(reservationStateWithTranslationMap)"
                 option-label="label"

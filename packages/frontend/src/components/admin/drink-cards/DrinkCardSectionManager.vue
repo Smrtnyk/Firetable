@@ -163,7 +163,7 @@ function updateSectionItems(sectionId: string, items: DrinkCardItem[]): void {
                                 v-model="element.name"
                                 @change="emitUpdatedElements()"
                                 dense
-                                standout
+                                outlined
                             />
                         </q-item-section>
                         <q-item-section side>

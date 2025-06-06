@@ -121,8 +121,7 @@ async function synchroniseNewPropertySettings(propertyId: string): Promise<void>
                 <q-input
                     :model-value="editableSettings.event.eventStartTime24HFormat"
                     rounded
-                    standout
-                    readonly
+                    outlined
                 >
                     <template #append>
                         <q-icon name="fa fa-clock" class="cursor-pointer" />
@@ -138,8 +137,7 @@ async function synchroniseNewPropertySettings(propertyId: string): Promise<void>
 
             <SettingsSection title="Event duration in hours">
                 <q-input
-                    rounded
-                    standout
+                    outlined
                     label="Event duration in hours"
                     v-model.number="editableSettings.event.eventDurationInHours"
                 />
@@ -147,8 +145,7 @@ async function synchroniseNewPropertySettings(propertyId: string): Promise<void>
 
             <SettingsSection title="Event card aspect ratio">
                 <q-select
-                    rounded
-                    standout
+                    outlined
                     v-model="editableSettings.event.eventCardAspectRatio"
                     :options="aspectRatioOptions"
                 />
@@ -190,8 +187,7 @@ async function synchroniseNewPropertySettings(propertyId: string): Promise<void>
         <AppCardSection :aria-label="property.name + ' settings card'">
             <SettingsSection title="Timezone">
                 <q-input
-                    rounded
-                    standout
+                    outlined
                     readonly
                     v-model="editableSettings.timezone"
                     @click="openTimezoneSelector()"
@@ -201,8 +197,7 @@ async function synchroniseNewPropertySettings(propertyId: string): Promise<void>
 
             <SettingsSection title="Guest late criteria" v-if="editableSettings">
                 <q-input
-                    rounded
-                    standout
+                    outlined
                     type="number"
                     min="1"
                     label="In minutes"

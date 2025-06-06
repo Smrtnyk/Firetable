@@ -37,7 +37,7 @@
                     <q-input
                         v-model="pastedContent"
                         type="textarea"
-                        standout
+                        outlined
                         class="w-full"
                         placeholder="Paste your CSV text here"
                         :disable="loading"

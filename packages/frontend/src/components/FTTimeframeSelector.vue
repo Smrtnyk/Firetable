@@ -7,8 +7,7 @@
             @update:model-value="handlePresetChange"
             :error="!!error"
             :error-message="error"
-            standout
-            rounded
+            outlined
             emit-value
             map-options
             hide-dropdown-icon

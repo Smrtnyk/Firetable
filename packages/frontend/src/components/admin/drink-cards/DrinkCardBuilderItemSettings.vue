@@ -48,7 +48,7 @@ function updateSpecialPrice(
                 :model-value="item.price"
                 type="number"
                 dense
-                standout
+                outlined
                 prefix="€"
                 :rules="[noNegativeNumber('Value must be positive')]"
                 @update:model-value="emit('update:price', $event as number)"
@@ -65,7 +65,7 @@ function updateSpecialPrice(
                         :model-value="item.servingSize.amount"
                         type="number"
                         dense
-                        standout
+                        outlined
                         :label="t('PageAdminPropertyDrinkCards.amount')"
                         @update:model-value="updateServingSize({ amount: $event as number })"
                     />
@@ -75,7 +75,7 @@ function updateSpecialPrice(
                         :model-value="item.servingSize.unit"
                         :options="['ml', 'cl', 'bottle']"
                         dense
-                        standout
+                        outlined
                         :label="t('PageAdminPropertyDrinkCards.unit')"
                         @update:model-value="updateServingSize({ unit: $event })"
                     />
@@ -85,7 +85,7 @@ function updateSpecialPrice(
                 :model-value="item.servingSize.displayName"
                 :label="t('PageAdminPropertyDrinkCards.displayName')"
                 dense
-                standout
+                outlined
                 class="q-mt-sm"
                 @update:model-value="updateServingSize({ displayName: $event as string })"
             />
@@ -99,7 +99,7 @@ function updateSpecialPrice(
                         :model-value="item.specialPrice.amount"
                         type="number"
                         dense
-                        standout
+                        outlined
                         prefix="€"
                         :step="0.5"
                         :min="0"
@@ -120,7 +120,7 @@ function updateSpecialPrice(
                         use-input
                         input-debounce="0"
                         dense
-                        standout
+                        outlined
                         label="Label"
                         @update:model-value="updateSpecialPrice('label', $event)"
                         clearable
@@ -133,7 +133,7 @@ function updateSpecialPrice(
                     <q-input
                         :model-value="item.specialPrice.description"
                         dense
-                        standout
+                        outlined
                         label="Description (e.g. Every day 4-6pm)"
                         @update:model-value="updateSpecialPrice('description', $event)"
                     />

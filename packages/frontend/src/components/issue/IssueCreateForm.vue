@@ -62,8 +62,7 @@ async function submit(): Promise<void> {
             :options="categoryOptions"
             :label="t('PageIssueReport.categoryLabel')"
             class="q-mb-md"
-            rounded
-            standout
+            outlined
             emit-value
             map-options
         />
@@ -76,8 +75,7 @@ async function submit(): Promise<void> {
             :rules="descriptionRules"
             rows="6"
             class="q-mb-md"
-            rounded
-            standout
+            outlined
         />
 
         <div class="row justify-end">
