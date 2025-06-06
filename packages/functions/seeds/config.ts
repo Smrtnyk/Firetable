@@ -1,4 +1,4 @@
-const EMULATOR_HOST = "localhost";
+export const EMULATOR_HOST = "127.0.0.1";
 const FIRESTORE_PORT = 4000;
 const AUTH_PORT = 9099;
 
