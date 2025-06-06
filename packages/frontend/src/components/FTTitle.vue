@@ -20,6 +20,10 @@ const subtitleClass = computed(() => {
 <template>
     <q-card class="ft-card q-pa-sm q-mb-md">
         <div class="FTTitle items-center">
+            <div class="text-left ft-title__left">
+                <slot name="left" />
+            </div>
+
             <div>
                 <h3 aria-level="3" :class="['ft-title', 'q-ma-none', titleClass]">
                     {{ title }}
@@ -39,16 +43,11 @@ const subtitleClass = computed(() => {
 <style lang="scss">
 .FTTitle {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: auto 1fr auto;
 }
 .ft-title {
     color: #2d3748;
     font-weight: 900;
-    padding-left: 0.75rem;
-
-    &__right {
-        padding-right: 0.75rem;
-    }
 }
 .ft-subtitle {
     color: #8795a4;

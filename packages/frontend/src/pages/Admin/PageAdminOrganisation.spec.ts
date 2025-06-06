@@ -71,7 +71,7 @@ describe("PageAdminOrganisation.vue", () => {
 
     it("renders organisation name as title", async () => {
         const screen = render();
-        await expect.element(screen.getByText("Test Organisation")).toBeInTheDocument();
+        await expect.element(screen.getByText("Test Organisation", { exact: true })).toBeVisible();
     });
 
     it("displays organisation status with correct color", async () => {
@@ -85,7 +85,7 @@ describe("PageAdminOrganisation.vue", () => {
 
     it("shows delete confirmation dialog when delete button is clicked", async () => {
         const screen = render();
-        await userEvent.click(screen.getByLabelText("Open delete organisation dialog"));
+        await userEvent.click(screen.getByLabelText("Delete organisation"));
 
         await expect.element(screen.getByRole("dialog")).toBeInTheDocument();
         await expect.element(screen.getByText(/This action cannot be undone/)).toBeInTheDocument();
@@ -93,7 +93,7 @@ describe("PageAdminOrganisation.vue", () => {
 
     it("prevents deletion when organisation name doesn't match", async () => {
         const screen = render();
-        await userEvent.click(screen.getByLabelText("Open delete organisation dialog"));
+        await userEvent.click(screen.getByLabelText("Delete organisation"));
 
         const input = screen.getByRole("textbox");
         await userEvent.type(input, "Wrong Name");
@@ -106,7 +106,7 @@ describe("PageAdminOrganisation.vue", () => {
 
     it("deletes organisation when name matches", async () => {
         const screen = render();
-        await userEvent.click(screen.getByLabelText("Open delete organisation dialog"));
+        await userEvent.click(screen.getByLabelText("Delete organisation"));
 
         const input = screen.getByRole("textbox");
         await userEvent.type(input, "Test Organisation");

@@ -66,9 +66,8 @@ export function showDeleteConfirm(
             prompt: {
                 isValid: (val: string) => val === confirmText,
                 model: "",
+                outlined: true,
                 placeholder: `Please type "${confirmText}" to confirm`,
-                rounded: true,
-                standout: true,
                 type: "text",
             },
             title,

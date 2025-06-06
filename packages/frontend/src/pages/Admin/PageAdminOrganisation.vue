@@ -37,6 +37,13 @@ function getActionCards(): ActionCard[] {
     const params = { organisationId: props.organisationId };
     return [
         {
+            color: "accent",
+            description: "Add, edit, or remove properties belonging to this organisation",
+            icon: "home",
+            route: { name: "adminProperties", params },
+            title: t("AppDrawer.links.manageProperties"),
+        },
+        {
             color: "primary",
             description: "Add, edit, or remove users who can access this organisation",
             icon: "users",
@@ -49,13 +56,6 @@ function getActionCards(): ActionCard[] {
             icon: "users-list",
             route: { name: "adminGuests", params },
             title: t("AppDrawer.links.manageGuests"),
-        },
-        {
-            color: "accent",
-            description: "Add, edit, or remove properties belonging to this organisation",
-            icon: "home",
-            route: { name: "adminProperties", params },
-            title: t("AppDrawer.links.manageProperties"),
         },
     ];
 }
@@ -93,16 +93,18 @@ async function onDeleteOrganisation(): Promise<void> {
 <template>
     <div v-if="organisation" class="organisation-detail-container">
         <!-- Header Section -->
-        <FTTitle :title="organisation.name">
-            <template #right>
+        <FTTitle title="">
+            <template #left>
+                Status:
                 <q-chip
-                    square
-                    class="q-mr-md"
                     :color="getOrganisationStatusColor(organisation.status)"
                     text-color="white"
+                    aria-label="Organisation status"
                 >
                     {{ formatOrganisationStatus(organisation.status) }}
                 </q-chip>
+            </template>
+            <template #right>
                 <FTBtn
                     icon="trash"
                     aria-label="Delete organisation"
@@ -121,7 +123,7 @@ async function onDeleteOrganisation(): Promise<void> {
                         <div class="col-12 col-md-8">
                             <div class="info-header q-mb-md">
                                 <q-avatar color="primary" text-color="white" size="56px">
-                                    <q-icon name="business" size="32px" />
+                                    <q-icon name="crown" size="32px" />
                                 </q-avatar>
                                 <div class="info-content">
                                     <h5 class="text-h5 q-my-none">{{ organisation.name }}</h5>
