@@ -232,7 +232,7 @@ async function removeBundleItem(index: number): Promise<void> {
                             flat
                             round
                             color="negative"
-                            icon="close"
+                            icon="fa fa-close"
                             @click="removeBundleItem(index)"
                         />
                     </div>
@@ -240,7 +240,7 @@ async function removeBundleItem(index: number): Promise<void> {
             </div>
 
             <div class="text-center">
-                <FTBtn class="button-gradient" icon="plus" rounded @click="addBundleItem" />
+                <FTBtn class="button-gradient" icon="fa fa-plus" rounded @click="addBundleItem" />
             </div>
 
             <q-separator />

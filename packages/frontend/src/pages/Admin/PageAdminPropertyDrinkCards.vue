@@ -227,13 +227,18 @@ onMounted(init);
     <div class="PageAdminPropertyDrinkCards">
         <FTTitle :title="t('PageAdminPropertyDrinkCards.title')">
             <template #right>
-                <FTBtn rounded icon="plus" class="button-gradient" @click="createNewDrinkCard" />
-                <FTBtn rounded icon="qr-code" flat round @click="showQRCode" />
+                <FTBtn
+                    rounded
+                    icon="fa fa-plus"
+                    class="button-gradient"
+                    @click="createNewDrinkCard"
+                />
+                <FTBtn rounded icon="fa fa-qrcode" flat round @click="showQRCode" />
                 <FTBtn
                     flat
                     round
                     color="primary"
-                    icon="external-link"
+                    icon="fa fa-external-link-alt"
                     :href="getPublicUrForDrinkCard(props.organisationId, props.propertyId)"
                     target="_blank"
                 />

@@ -198,7 +198,7 @@ function showItemSelectionDialog(): void {
                 rounded
                 :size="buttonSize"
                 color="primary"
-                icon="plus"
+                icon="fa fa-plus"
                 class="button-gradient"
                 :disable="props.inventoryItems.length === 0"
                 @click="showItemSelectionDialog"

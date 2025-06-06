@@ -159,7 +159,7 @@ function triggerFileInput(): void {
             <div class="brand-image q-mt-md">
                 <div class="text-subtitle2 q-mb-sm">
                     Property Brand Image
-                    <q-btn flat round dense icon="help" class="q-ml-xs">
+                    <q-btn flat round dense icon="fa fa-circle-info" class="q-ml-xs">
                         <q-tooltip>
                             For best results, use a PNG or SVG with transparent background. Maximum
                             dimensions: 300x300px
@@ -191,7 +191,7 @@ function triggerFileInput(): void {
                     :rules="imgUrlRules"
                 >
                     <template v-if="imageUrl" #append>
-                        <q-icon name="clear" class="cursor-pointer" @click="removeImage" />
+                        <q-icon name="fa fa-clear" class="cursor-pointer" @click="removeImage" />
                     </template>
                 </q-input>
 
@@ -210,14 +210,14 @@ function triggerFileInput(): void {
                             class="preview-image"
                         >
                             <div class="absolute-top-right">
-                                <FTBtn flat round icon="close" @click.stop="removeImage" />
+                                <FTBtn flat round icon="fa fa-close" @click.stop="removeImage" />
                             </div>
                         </q-img>
                         <div
                             v-else
                             class="row upload-placeholder text-center align-center content-center justify-center"
                         >
-                            <q-icon name="import" size="md" />
+                            <q-icon name="fa fa-file-import" size="md" />
                             <div>Click or drag and drop to upload an image</div>
                         </div>
                     </q-responsive>

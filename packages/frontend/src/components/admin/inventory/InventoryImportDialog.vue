@@ -19,7 +19,7 @@
                         @drop.prevent="handleFileDrop"
                         @click="fileInput?.click()"
                     >
-                        <q-icon name="import" size="48px" color="primary" />
+                        <q-icon name="fa fa-file-import" size="48px" color="primary" />
                         <div class="text-h6 q-mt-md">Drop your CSV file here</div>
                         <div class="text-caption q-mt-sm">Or click to upload</div>
                         <input

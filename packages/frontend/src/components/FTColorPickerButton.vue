@@ -38,7 +38,7 @@ function openColorPicker(): void {
     <q-btn
         :round="round"
         flat
-        icon="color-picker"
+        icon="fa fa-palette"
         :style="{ backgroundColor: localColor }"
         @click="openColorPicker"
     />

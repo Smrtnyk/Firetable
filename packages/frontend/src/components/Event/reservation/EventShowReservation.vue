@@ -116,7 +116,7 @@ function onStateChange(newState: ReservationState): void {
             <FTBtn
                 v-if="canEditReservation && !isCancelled"
                 :title="t('Global.edit')"
-                icon="pencil"
+                icon="fa fa-pencil"
                 color="positive"
                 @click="() => emit('edit')"
                 v-close-popup
@@ -124,7 +124,7 @@ function onStateChange(newState: ReservationState): void {
             <FTBtn
                 v-if="canMoveToQueue"
                 :title="t('EventShowReservation.moveToQueueLabel')"
-                icon="bookmark"
+                icon="fa fa-list-ol"
                 color="secondary"
                 @click="() => emit('queue')"
                 v-close-popup
@@ -135,7 +135,7 @@ function onStateChange(newState: ReservationState): void {
             <FTBtn
                 v-if="isLinkedReservation"
                 :title="t('EventShowReservation.unlinkTablesLabel')"
-                icon="unlink"
+                icon="fa fa-unlink"
                 color="warning"
                 @click="() => emit('unlink')"
                 v-close-popup
@@ -143,7 +143,7 @@ function onStateChange(newState: ReservationState): void {
             <FTBtn
                 v-if="permissionsStore.canReserve && !isCancelled"
                 :title="t('EventShowReservation.linkTablesLabel')"
-                icon="link"
+                icon="fa fa-link"
                 color="primary"
                 @click="() => emit('link')"
                 v-close-popup
@@ -152,14 +152,14 @@ function onStateChange(newState: ReservationState): void {
             <template v-if="permissionsStore.canReserve && !isCancelled">
                 <FTBtn
                     :title="t('Global.transfer')"
-                    icon="transfer"
+                    icon="fa fa-exchange-alt"
                     color="primary"
                     @click="() => emit('transfer')"
                     v-close-popup
                 />
                 <FTBtn
                     :title="t('Global.copy')"
-                    icon="copy"
+                    icon="fa fa-copy"
                     color="primary"
                     @click="() => emit('copy')"
                     v-close-popup
@@ -173,7 +173,7 @@ function onStateChange(newState: ReservationState): void {
             <FTBtn
                 v-if="canDeleteReservation"
                 :title="t('Global.delete')"
-                icon="trash"
+                icon="fa fa-trash"
                 color="negative"
                 @click="() => emit('delete')"
                 v-close-popup

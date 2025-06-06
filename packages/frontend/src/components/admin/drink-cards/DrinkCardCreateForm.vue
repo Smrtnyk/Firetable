@@ -148,8 +148,8 @@ function triggerFileInput(): void {
             <q-btn-toggle
                 v-model="form.type"
                 :options="[
-                    { label: 'Custom', value: 'custom', icon: 'pencil' },
-                    { label: 'Pdf', value: 'pdf', icon: 'pdf' },
+                    { label: 'Custom', value: 'custom', icon: 'fa fa-pencil' },
+                    { label: 'Pdf', value: 'pdf', icon: 'fa fa-file-pdf' },
                 ]"
                 no-caps
                 rounded
@@ -207,12 +207,22 @@ function triggerFileInput(): void {
                     <template v-if="form.backgroundImage">
                         <q-img :src="form.backgroundImage" class="preview-image" alt="" />
                         <div>
-                            <q-btn flat round color="negative" icon="close" @click="removeImage" />
+                            <q-btn
+                                flat
+                                round
+                                color="negative"
+                                icon="fa fa-close"
+                                @click="removeImage"
+                            />
                         </div>
                     </template>
                     <template v-else>
                         <div class="upload-placeholder">
-                            <q-btn color="secondary" rounded icon="import" @click="triggerFileInput"
+                            <q-btn
+                                color="secondary"
+                                rounded
+                                icon="fa fa-file-import"
+                                @click="triggerFileInput"
                                 >Click to upload</q-btn
                             >
                         </div>
@@ -254,7 +264,7 @@ function triggerFileInput(): void {
                     drop-area
                 >
                     <template #prepend>
-                        <q-icon name="pdf" />
+                        <q-icon name="fa fa-file-pdf" />
                     </template>
                 </q-file>
 
@@ -262,7 +272,7 @@ function triggerFileInput(): void {
                     <q-btn
                         flat
                         label="View current PDF"
-                        icon="eye-open"
+                        icon="fa fa-eye"
                         :href="form.pdfUrl"
                         target="_blank"
                     />

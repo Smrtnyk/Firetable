@@ -24,10 +24,10 @@ function emitOnRight({ reset }: { reset: VoidFunction }): void {
 <template>
     <q-slide-item right-color="warning" @right="emitOnRight" @left="emitEdit" class="fa-card">
         <template #right>
-            <q-icon name="trash" />
+            <q-icon name="fa fa-trash" />
         </template>
         <template #left>
-            <q-icon name="pencil" />
+            <q-icon name="fa fa-pencil" />
         </template>
         <q-item
             :to="{

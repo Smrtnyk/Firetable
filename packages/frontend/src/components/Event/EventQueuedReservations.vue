@@ -117,7 +117,7 @@ function showReservation(reservation: QueuedReservationDoc): void {
                     <FTBtn
                         aria-label="Add new reservation"
                         rounded
-                        icon="plus"
+                        icon="fa fa-plus"
                         class="button-gradient"
                         @click="addNewQueuedReservation"
                     />

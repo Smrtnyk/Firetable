@@ -39,21 +39,21 @@ function getActionCards(): ActionCard[] {
         {
             color: "accent",
             description: "Add, edit, or remove properties belonging to this organisation",
-            icon: "home",
+            icon: "fa fa-home",
             route: { name: "adminProperties", params },
             title: t("AppDrawer.links.manageProperties"),
         },
         {
             color: "primary",
             description: "Add, edit, or remove users who can access this organisation",
-            icon: "users",
+            icon: "fa fa-users",
             route: { name: "adminUsers", params },
             title: t("AppDrawer.links.manageUsers"),
         },
         {
             color: "secondary",
             description: "Manage guest access and permissions for this organisation",
-            icon: "users-list",
+            icon: "fa fa-user-friends",
             route: { name: "adminGuests", params },
             title: t("AppDrawer.links.manageGuests"),
         },
@@ -106,7 +106,7 @@ async function onDeleteOrganisation(): Promise<void> {
             </template>
             <template #right>
                 <FTBtn
-                    icon="trash"
+                    icon="fa fa-trash"
                     aria-label="Delete organisation"
                     rounded
                     color="negative"
@@ -123,7 +123,7 @@ async function onDeleteOrganisation(): Promise<void> {
                         <div class="col-12 col-md-8">
                             <div class="info-header q-mb-md">
                                 <q-avatar color="primary" text-color="white" size="56px">
-                                    <q-icon name="crown" size="32px" />
+                                    <q-icon name="fa fa-briefcase" size="32px" />
                                 </q-avatar>
                                 <div class="info-content">
                                     <h5 class="text-h5 q-my-none">{{ organisation.name }}</h5>
@@ -167,7 +167,7 @@ async function onDeleteOrganisation(): Promise<void> {
                         <q-btn
                             flat
                             :color="card.color"
-                            icon-right="arrow_forward"
+                            icon-right="fa fa-chevron-right"
                             label="Manage"
                             no-caps
                         />
@@ -175,21 +175,6 @@ async function onDeleteOrganisation(): Promise<void> {
                 </FTCard>
             </div>
         </div>
-    </div>
-
-    <!-- Not Found State -->
-    <div v-else class="text-center q-pa-lg">
-        <q-icon name="business_center" size="64px" color="grey-5" />
-        <h5 class="text-h5 q-mt-md q-mb-sm">Organisation Not Found</h5>
-        <p class="text-body1 text-grey-6">
-            The organisation you're looking for doesn't exist or has been deleted.
-        </p>
-        <FTBtn
-            label="Back to Organisations"
-            icon="arrow_back"
-            color="primary"
-            @click="router.push({ name: 'adminOrganisations' })"
-        />
     </div>
 </template>
 

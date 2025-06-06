@@ -3,7 +3,7 @@
     <FTBtn
         rounded
         class="button-gradient q-mt-sm"
-        icon="save"
+        icon="fa fa-save"
         @click="saveEventInfo"
         label="Save"
     />

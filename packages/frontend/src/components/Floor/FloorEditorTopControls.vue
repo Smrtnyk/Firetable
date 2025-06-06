@@ -176,20 +176,20 @@ onMounted(function () {
                 flat
                 title="Send back"
                 v-if="deleteAllowed"
-                icon="send-backward"
+                icon="fa fa-level-down"
                 @click="sendBack"
             />
             <q-btn
                 flat
                 title="Copy element"
-                icon="copy"
+                icon="fa fa-copy"
                 @click="floorInstance.copySelectedElement()"
             />
             <q-btn
                 flat
                 v-if="'flip' in selectedFloorElement"
                 title="Flip element"
-                icon="transfer"
+                icon="fa fa-arrows-alt-h"
                 @click="selectedFloorElement.flip()"
             />
 
@@ -197,7 +197,7 @@ onMounted(function () {
                 flat
                 v-if="'nextDesign' in selectedFloorElement"
                 title="Switch to fill element"
-                icon="chevron_right"
+                icon="fa fa-chevron-right"
                 @click="selectedFloorElement.nextDesign()"
             />
 
@@ -205,7 +205,7 @@ onMounted(function () {
                 unelevated
                 title="Delete element"
                 v-if="deleteAllowed"
-                icon="trash"
+                icon="fa fa-trash"
                 color="negative"
                 @click="deleteElement"
             />

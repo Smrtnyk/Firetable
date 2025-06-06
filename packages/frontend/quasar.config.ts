@@ -64,17 +64,17 @@ export default defineConfig(function () {
         },
 
         // https://github.com/quasarframework/quasar/tree/dev/extras
-        extras: ["roboto-font"],
+        extras: ["roboto-font", "fontawesome-v6"],
 
         // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
         framework: {
             config: {},
 
             cssAddon: true,
+            // Quasar icon set
+            iconSet: "fontawesome-v6",
 
             lang: "de",
-
-            // iconSet: 'material-icons', // Quasar icon set
             // lang: 'en-US', // Quasar language pack
 
             // For special cases outside of where the auto-import strategy can have an impact

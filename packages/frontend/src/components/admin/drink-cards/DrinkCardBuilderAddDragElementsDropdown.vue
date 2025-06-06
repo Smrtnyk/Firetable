@@ -67,7 +67,7 @@ defineExpose({ showBundleDialog });
 </script>
 
 <template>
-    <q-btn-dropdown flat rounded color="primary" icon="plus" class="button-gradient">
+    <q-btn-dropdown flat rounded color="primary" icon="fa fa-plus" class="button-gradient">
         <q-list>
             <q-item clickable v-close-popup @click="$emit('add-header')">
                 <q-item-section>Add Header</q-item-section>

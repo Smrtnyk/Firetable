@@ -159,7 +159,7 @@ function updateLineWidth(width: unknown): void {
             <q-btn
                 :disabled="!canSave"
                 class="button-gradient"
-                icon="save"
+                icon="fa fa-save"
                 @click="onFloorSave"
                 label="save"
                 rounded
@@ -212,7 +212,7 @@ function updateLineWidth(width: unknown): void {
                     title="Undo"
                     :disabled="!floorInstanceState.canUndo"
                     @click="undoAction"
-                    icon="undo"
+                    icon="fa fa-undo"
                 />
                 <q-btn
                     flat
@@ -220,7 +220,7 @@ function updateLineWidth(width: unknown): void {
                     title="Redo"
                     :disabled="!floorInstanceState.canRedo"
                     @click="redoAction"
-                    icon="redo"
+                    icon="fa fa-redo"
                 />
 
                 <q-btn
@@ -228,12 +228,12 @@ function updateLineWidth(width: unknown): void {
                     padding="md"
                     title="Toggle grid"
                     @click="floorInstance.toggleGridVisibility"
-                    icon="grid"
+                    icon="fa fa-th"
                 />
                 <q-btn
                     flat
                     padding="md"
-                    icon="download"
+                    icon="fa fa-file-export"
                     title="Export floor plan"
                     @click="exportFloor(floorInstance as FloorEditor)"
                 />
@@ -241,7 +241,7 @@ function updateLineWidth(width: unknown): void {
                     flat
                     padding="md"
                     title="Import floor plan"
-                    icon="import"
+                    icon="fa fa-file-import"
                     @click="triggerFileInput"
                 />
             </div>
@@ -260,7 +260,7 @@ function updateLineWidth(width: unknown): void {
             <q-btn
                 flat
                 round
-                icon="pencil"
+                icon="fa fa-paint-brush"
                 :color="isDrawingMode ? 'negative' : ''"
                 @click="toggleDrawingMode"
                 class="q-mr-sm"
@@ -269,7 +269,7 @@ function updateLineWidth(width: unknown): void {
             <q-btn
                 round
                 flat
-                icon="cog-wheel"
+                icon="fa fa-cog"
                 @click="openBrushSettings"
                 :disabled="!isDrawingMode"
             />

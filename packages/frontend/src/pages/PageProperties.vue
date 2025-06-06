@@ -100,13 +100,18 @@ async function onVenueCreate(payload: CreatePropertyPayload): Promise<void> {
         />
 
         <FTCenteredText v-if="showOwnerAdminNoPropertiesMessage">
-            <q-icon name="home" size="64px" color="grey-5" class="q-mb-md" />
+            <q-icon name="fa fa-home" size="64px" color="grey-5" class="q-mb-md" />
             <div class="text-grey-6 q-mb-lg">Create your first venue to get started</div>
-            <FTBtn label="Create venue" icon="plus" class="button-gradient" @click="createVenue" />
+            <FTBtn
+                label="Create venue"
+                icon="fa fa-plus"
+                class="button-gradient"
+                @click="createVenue"
+            />
         </FTCenteredText>
 
         <FTCenteredText v-if="showRegularUserNoPropertiesMessage">
-            <q-icon name="home" size="64px" color="grey-5" class="q-mb-md" />
+            <q-icon name="fa fa-home" size="64px" color="grey-5" class="q-mb-md" />
             <div class="text-grey-6 q-mb-lg">No venues available</div>
         </FTCenteredText>
     </div>

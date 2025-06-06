@@ -117,7 +117,7 @@ function onRemoveFloor(index: number): void {
                 rounded
                 :size="buttonSize"
                 color="primary"
-                icon="plus"
+                icon="fa fa-plus"
                 class="button-gradient"
                 aria-label="Add floor plan"
                 :disabled="remainingFloors === 0"
@@ -151,7 +151,7 @@ function onRemoveFloor(index: number): void {
             >
                 <q-item-section avatar>
                     <q-icon
-                        name="drag"
+                        name="fa fa-bars"
                         class="drag-handle cursor-move"
                         :aria-label="`${floor.id} draggable floor plan item drag handle`"
                     />
@@ -170,7 +170,7 @@ function onRemoveFloor(index: number): void {
                         flat
                         round
                         color="primary"
-                        icon="pencil"
+                        icon="fa fa-pencil"
                         size="sm"
                         @click="onEditFloor(floor)"
                         :aria-label="`Edit ${floor.name} floor plan`"
@@ -179,7 +179,7 @@ function onRemoveFloor(index: number): void {
                         flat
                         round
                         color="negative"
-                        icon="trash"
+                        icon="fa fa-trash"
                         size="sm"
                         @click="onRemoveFloor(index)"
                         :disabled="!canDeleteFloor(floor.id)"

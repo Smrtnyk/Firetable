@@ -274,7 +274,11 @@ function validateAndEmitEdit(): void {
             class="q-mb-lg"
         >
             <template #prepend>
-                <q-icon aria-label="Open date calendar" name="calendar" class="cursor-pointer" />
+                <q-icon
+                    aria-label="Open date calendar"
+                    name="fa fa-calendar"
+                    class="cursor-pointer"
+                />
                 <q-popup-proxy transition-show="scale" transition-hide="scale">
                     <q-date
                         :no-unset="true"
@@ -296,7 +300,7 @@ function validateAndEmitEdit(): void {
                 </q-popup-proxy>
             </template>
             <template #append>
-                <q-icon name="clock" aria-label="Open time picker" class="cursor-pointer" />
+                <q-icon name="fa fa-clock" aria-label="Open time picker" class="cursor-pointer" />
                 <q-popup-proxy transition-show="scale" transition-hide="scale">
                     <q-time
                         v-model="state.selectedTime"
@@ -327,7 +331,7 @@ function validateAndEmitEdit(): void {
             @reorder="reorderFloors"
         />
 
-        <div>
+        <div class="q-mt-md">
             <q-btn
                 rounded
                 size="md"

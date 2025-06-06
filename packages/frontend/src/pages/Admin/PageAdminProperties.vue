@@ -46,38 +46,38 @@ function createLinks(propertyId: string): Link[] {
     const params = { organisationId: props.organisationId, propertyId };
     return [
         {
-            icon: "calendar",
+            icon: "fa fa-calendar",
             label: t("AppDrawer.links.manageEvents"),
             route: { name: "adminEvents", params },
             visible: permissionStore.canCreateEvents,
         },
         {
-            icon: "grid",
+            icon: "fa fa-warehouse",
             label: t("Global.manageInventoryLink"),
             route: { name: "adminInventory", params },
             visible: permissionStore.canSeeInventory,
         },
         {
-            icon: "arrow-expand",
+            icon: "fa fa-map",
             label: t("AppDrawer.links.manageFloors"),
             route: { name: "adminFloors", params },
             visible: true,
         },
         {
-            icon: "line-chart",
+            icon: "fa fa-chart-bar",
             label: t("AppDrawer.links.manageAnalytics"),
             route: { name: "adminAnalytics", params },
             visible: true,
         },
         {
-            icon: "drink",
+            icon: "fa fa-cocktail",
             label: t("AppDrawer.links.manageDrinkCards"),
             route: { name: "adminPropertyDrinkCards", params },
             visible: permissionStore.canSeeInventory,
         },
 
         {
-            icon: "cog-wheel",
+            icon: "fa fa-gear",
             label: t("AppDrawer.links.settings"),
             route: { name: "adminPropertySettings", params },
             visible: true,
@@ -171,7 +171,7 @@ async function showUpdatePropertyDialog(property: PropertyDoc): Promise<void> {
                 <FTBtn
                     v-if="properties.length > 0 && canCreateProperty"
                     rounded
-                    icon="plus"
+                    icon="fa fa-plus"
                     class="button-gradient"
                     @click="createVenue()"
                 />
@@ -179,12 +179,7 @@ async function showUpdatePropertyDialog(property: PropertyDoc): Promise<void> {
         </FTTitle>
 
         <q-list bordered v-if="properties.length > 0" class="rounded-borders">
-            <q-expansion-item
-                v-for="property in properties"
-                :key="property.id"
-                expand-icon="arrow_drop_down"
-                expand-separator
-            >
+            <q-expansion-item v-for="property in properties" :key="property.id" expand-separator>
                 <template #header>
                     <q-item-section>
                         <q-item-label>{{ property.name }}</q-item-label>
@@ -194,13 +189,13 @@ async function showUpdatePropertyDialog(property: PropertyDoc): Promise<void> {
                         <div class="row q-gutter-sm items-center">
                             <FTBtn
                                 unelevated
-                                icon="pencil"
+                                icon="fa fa-pencil"
                                 color="positive"
                                 @click.stop="showUpdatePropertyDialog(property)"
                             />
                             <FTBtn
                                 unelevated
-                                icon="trash"
+                                icon="fa fa-trash"
                                 color="negative"
                                 @click.stop="onDeleteProperty(property)"
                             />
@@ -234,11 +229,16 @@ async function showUpdatePropertyDialog(property: PropertyDoc): Promise<void> {
         </div>
 
         <FTCenteredText v-else-if="properties.length === 0">
-            <q-icon name="home" size="64px" color="grey-5" class="q-mb-md" />
+            <q-icon name="fa fa-home" size="64px" color="grey-5" class="q-mb-md" />
             <div class="text-grey-6 q-mb-lg">
                 {{ t("PageAdminProperties.noPropertiesCreatedMessage") }}
             </div>
-            <FTBtn label="Create venue" icon="plus" class="button-gradient" @click="createVenue" />
+            <FTBtn
+                label="Create venue"
+                icon="fa fa-plus"
+                class="button-gradient"
+                @click="createVenue"
+            />
         </FTCenteredText>
     </div>
 </template>

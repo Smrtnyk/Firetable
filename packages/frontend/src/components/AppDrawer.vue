@@ -46,7 +46,7 @@ const inventoryLink = computed(function () {
 
     return buildExpandableLink({
         childIcon: "home",
-        icon: "grid",
+        icon: "fa fa-warehouse",
         isVisible: true,
         label: t("Global.manageInventoryLink"),
         routeName: "adminInventory",
@@ -60,7 +60,7 @@ const manageFloorsLink = computed(function () {
 
     return buildExpandableLink({
         childIcon: "home",
-        icon: "arrow-expand",
+        icon: "fa fa-map",
         isVisible: true,
         label: t("AppDrawer.links.manageFloors"),
         routeName: "adminFloors",
@@ -73,7 +73,7 @@ const manageAnalyticsLink = computed(function () {
     }
 
     return buildExpandableLink({
-        icon: "line-chart",
+        icon: "fa fa-chart-bar",
         isVisible: true,
         label: t("AppDrawer.links.manageAnalytics"),
         routeName: "adminAnalytics",
@@ -87,7 +87,7 @@ const manageEventsLink = computed(function () {
 
     return buildExpandableLink({
         childIcon: "home",
-        icon: "calendar",
+        icon: "fa fa-calendar",
         isVisible: true,
         label: t("AppDrawer.links.manageEvents"),
         routeName: "adminEvents",
@@ -101,7 +101,7 @@ const digitalDrinkCardsLink = computed(function () {
 
     return buildExpandableLink({
         childIcon: "home",
-        icon: "drink",
+        icon: "fa fa-cocktail",
         isVisible: true,
         label: t("AppDrawer.links.manageDrinkCards"),
         routeName: "adminPropertyDrinkCards",
@@ -116,7 +116,7 @@ const propertySettingsLink = computed(function () {
 
     return buildExpandableLink({
         childIcon: "home",
-        icon: "cog-wheel",
+        icon: "fa fa-gears",
         isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
         label: t("AppDrawer.links.settings"),
         routeName: "adminPropertySettings",
@@ -129,13 +129,13 @@ const links = computed<(GuardedLink | LinkWithChildren)[]>(function () {
 
     const allLinks: (GuardedLink | LinkWithChildren | undefined)[] = [
         {
-            icon: "home",
+            icon: "fa fa-home",
             isVisible: isAdmin.value,
             label: t("AppDrawer.links.manageOrganisations"),
             route: { name: "adminOrganisations" },
         },
         {
-            icon: "bug",
+            icon: "fa fa-bug",
             isVisible: isAdmin.value,
             label: t("AppDrawer.links.issueReportsOverview"),
             route: { name: "adminIssueReports" },
@@ -146,25 +146,25 @@ const links = computed<(GuardedLink | LinkWithChildren)[]>(function () {
         inventoryLink.value,
         manageAnalyticsLink.value,
         {
-            icon: "users",
+            icon: "fa fa-users",
             isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
             label: t("AppDrawer.links.manageUsers"),
             route: { name: "adminUsers", params: { organisationId } },
         },
         {
-            icon: "users-list",
+            icon: "fa fa-user-friends",
             isVisible: canSeeGuestbook.value && !isAdmin.value,
             label: t("AppDrawer.links.manageGuests"),
             route: { name: "adminGuests", params: { organisationId } },
         },
         {
-            icon: "home",
+            icon: "fa fa-building",
             isVisible: role === Role.PROPERTY_OWNER,
             label: t("AppDrawer.links.manageProperties"),
             route: { name: "adminProperties", params: { organisationId } },
         },
         {
-            icon: "bug",
+            icon: "fa fa-question-circle",
             isVisible: !isAdmin.value,
             label: t("AppDrawer.links.reportIssue"),
             route: { name: "reportIssue", params: { organisationId } },
@@ -291,7 +291,6 @@ function setDarkMode(newValue: boolean): void {
                     :icon="link.icon"
                     expand-separator
                     :aria-label="link.label"
-                    expand-icon="arrow_drop_down"
                 >
                     <AppDrawerLink
                         v-for="(childLink, childIndex) in link.children"
@@ -307,7 +306,7 @@ function setDarkMode(newValue: boolean): void {
 
             <q-item clickable @click="onLogoutUser" aria-label="Logout">
                 <q-item-section avatar>
-                    <q-icon name="logout" />
+                    <q-icon name="fa fa-sign-out" />
                 </q-item-section>
 
                 <q-item-section>{{ t("AppDrawer.links.logout") }}</q-item-section>
@@ -333,10 +332,10 @@ function setDarkMode(newValue: boolean): void {
                 <q-toggle
                     :model-value="Dark.isActive"
                     @update:model-value="setDarkMode"
-                    checked-icon="moon"
+                    checked-icon="fa fa-moon"
                     color="red"
                     :label="t('AppDrawer.toggles.darkMode')"
-                    unchecked-icon="sun"
+                    unchecked-icon="fa fa-sun"
                     size="lg"
                 />
             </q-item>

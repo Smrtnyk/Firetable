@@ -131,7 +131,7 @@ function showAddNewFloorForm(floorDocs: FloorDoc[]): void {
             <template #right>
                 <FTBtn
                     rounded
-                    icon="plus"
+                    icon="fa fa-plus"
                     class="button-gradient"
                     @click="showAddNewFloorForm(floors)"
                 />
@@ -150,10 +150,10 @@ function showAddNewFloorForm(floorDocs: FloorDoc[]): void {
                 class="fa-card"
             >
                 <template #right>
-                    <q-icon name="trash" />
+                    <q-icon name="fa fa-trash" />
                 </template>
                 <template #left>
-                    <q-icon name="copy" />
+                    <q-icon name="fa fa-copy" />
                 </template>
                 <q-item
                     v-ripple

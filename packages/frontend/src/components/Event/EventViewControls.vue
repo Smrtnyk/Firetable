@@ -77,7 +77,7 @@ function showPrevFloor(): void {
             dense
             outline
             color="grey"
-            icon="list"
+            icon="fa fa-bars"
             v-close-popup
             @click="emit('toggle-queued-reservations-drawer-visibility')"
             aria-label="Toggle queued reservations drawer visibility"
@@ -90,7 +90,7 @@ function showPrevFloor(): void {
             dense
             outline
             color="grey"
-            icon="users-list"
+            icon="fa fa-users"
             v-close-popup
             @click="emit('toggle-event-guest-list-drawer-visibility')"
             aria-label="Toggle event guest list drawer visibility"
@@ -103,7 +103,7 @@ function showPrevFloor(): void {
             dense
             outline
             color="grey"
-            icon="info"
+            icon="fa fa-info-circle"
             v-close-popup
             @click="() => emit('show-event-info')"
             aria-label="Show event info"
@@ -117,7 +117,7 @@ function showPrevFloor(): void {
             dense
             outline
             color="grey"
-            icon="eye-open"
+            icon="fa fa-eye"
             aria-label="Navigate to admin event"
         />
         <FTBtn
@@ -125,7 +125,7 @@ function showPrevFloor(): void {
             dense
             outline
             color="grey"
-            icon="download"
+            icon="fa fa-file-export"
             v-close-popup
             @click="() => emit('export-reservations')"
             aria-label="Export reservations"
@@ -138,7 +138,7 @@ function showPrevFloor(): void {
                 outline
                 color="grey"
                 dense
-                icon="chevron_left"
+                icon="fa fa-chevron-left"
                 @click="showPrevFloor"
                 :disabled="!previousFloor"
                 aria-label="Show previous floor"
@@ -148,7 +148,7 @@ function showPrevFloor(): void {
                 outline
                 color="grey"
                 dense
-                icon="chevron_right"
+                icon="fa fa-chevron-right"
                 @click="showNextFloor"
                 :disabled="!nextFloor"
                 aria-label="Show next floor"

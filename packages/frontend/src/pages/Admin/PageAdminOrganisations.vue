@@ -70,7 +70,12 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
     <div>
         <FTTitle title="Organisations">
             <template #right>
-                <FTBtn rounded icon="plus" class="button-gradient" @click="createOrganisation" />
+                <FTBtn
+                    rounded
+                    icon="fa fa-plus"
+                    class="button-gradient"
+                    @click="createOrganisation"
+                />
             </template>
         </FTTitle>
 
@@ -84,10 +89,10 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
                 class="search-input"
             >
                 <template v-slot:prepend>
-                    <q-icon name="search" />
+                    <q-icon name="fa fa-search" />
                 </template>
                 <template v-slot:append v-if="searchQuery">
-                    <q-icon name="close" class="cursor-pointer" @click="searchQuery = ''" />
+                    <q-icon name="fa fa-close" class="cursor-pointer" @click="searchQuery = ''" />
                 </template>
             </q-input>
         </div>
@@ -111,7 +116,7 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
                             size="40px"
                             class="org-avatar"
                         >
-                            <q-icon name="home" size="24px" />
+                            <q-icon name="fa fa-briefcase" size="24px" />
                         </q-avatar>
                         <div class="org-info">
                             <h6 class="org-name text-h6 q-my-none">{{ organisation.name }}</h6>
@@ -126,11 +131,11 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
 
         <!-- Empty State -->
         <FTCenteredText v-if="organisations.length === 0">
-            <q-icon name="business" size="64px" color="grey-5" class="q-mb-md" />
+            <q-icon name="fa fa-briefcase" size="64px" color="grey-5" class="q-mb-md" />
             <div class="text-grey-6 q-mb-lg">Create your first organisation to get started</div>
             <FTBtn
                 label="Create Organisation"
-                icon="plus"
+                icon="fa fa-plus"
                 class="button-gradient"
                 @click="createOrganisation"
             />
@@ -138,7 +143,12 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
 
         <!-- No Search Results -->
         <FTCenteredText v-if="organisations.length > 0 && filteredOrganisations.length === 0">
-            <q-icon name="search_off" size="64px" color="grey-5" class="q-mb-md" />
+            <q-icon
+                name="fa fa-magnifying-glass-minus"
+                size="64px"
+                color="grey-5"
+                class="q-mb-md"
+            />
             <div class="text-h6 q-mb-sm">No organisations found</div>
             <div class="text-grey-6">Try adjusting your search criteria</div>
         </FTCenteredText>

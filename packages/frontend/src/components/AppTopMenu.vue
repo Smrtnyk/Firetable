@@ -4,11 +4,11 @@ import { refreshApp } from "src/helpers/utils";
 const emit = defineEmits<(e: "toggle-drawer") => void>();
 const menuLinks = [
     {
-        icon: "home",
+        icon: "fa fa-home",
         routeName: "home",
     },
     {
-        icon: "user-circle",
+        icon: "fa fa-user-circle",
         routeName: "userProfile",
     },
 ];
@@ -23,7 +23,7 @@ const menuLinks = [
             active-color="white"
             :breakpoint="0"
         >
-            <q-btn icon="redo" rounded @click="refreshApp" flat />
+            <q-btn icon="fa fa-redo" rounded @click="refreshApp" flat />
             <q-space />
             <q-route-tab
                 v-for="menu in menuLinks"
@@ -34,7 +34,7 @@ const menuLinks = [
             />
             <q-space />
             <q-btn flat aria-label="Menu" @click="emit('toggle-drawer')">
-                <q-icon size="2rem" name="menu" />
+                <q-icon size="2rem" name="fa fa-bars" />
             </q-btn>
         </q-tabs>
     </q-header>

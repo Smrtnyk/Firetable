@@ -30,7 +30,7 @@ function getFilteredTimezones(): string[] {
             aria-label="Search timezones"
         >
             <template #prepend>
-                <q-icon name="search" />
+                <q-icon name="fa fa-search" />
             </template>
         </q-input>
 

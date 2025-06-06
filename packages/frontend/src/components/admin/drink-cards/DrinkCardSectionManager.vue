@@ -156,7 +156,7 @@ function updateSectionItems(sectionId: string, items: DrinkCardItem[]): void {
                 <template v-if="isHeader(element)">
                     <q-item class="ft-card ft-border drag-item">
                         <q-item-section avatar>
-                            <q-icon name="drag" class="cursor-move drag-handle" />
+                            <q-icon name="fa fa-bars" class="cursor-move drag-handle" />
                         </q-item-section>
                         <q-item-section>
                             <q-input
@@ -171,7 +171,7 @@ function updateSectionItems(sectionId: string, items: DrinkCardItem[]): void {
                                 flat
                                 round
                                 color="negative"
-                                icon="trash"
+                                icon="fa fa-trash"
                                 size="sm"
                                 @click="removeElement(element.id)"
                             />
@@ -183,7 +183,7 @@ function updateSectionItems(sectionId: string, items: DrinkCardItem[]): void {
                 <template v-else-if="isHeaderEnd(element)">
                     <q-item class="ft-card ft-border drag-item">
                         <q-item-section avatar>
-                            <q-icon name="drag" class="cursor-move drag-handle" />
+                            <q-icon name="fa fa-bars" class="cursor-move drag-handle" />
                         </q-item-section>
                         <q-item-section>
                             <div class="text-weight-medium">Header End</div>
@@ -193,7 +193,7 @@ function updateSectionItems(sectionId: string, items: DrinkCardItem[]): void {
                                 flat
                                 round
                                 color="negative"
-                                icon="trash"
+                                icon="fa fa-trash"
                                 size="sm"
                                 @click="removeElement(element.id)"
                             />
@@ -205,7 +205,7 @@ function updateSectionItems(sectionId: string, items: DrinkCardItem[]): void {
                 <template v-else-if="isBundle(element)">
                     <q-item class="ft-card ft-border drag-item">
                         <q-item-section avatar>
-                            <q-icon name="drag" class="cursor-move drag-handle" />
+                            <q-icon name="fa fa-bars" class="cursor-move drag-handle" />
                         </q-item-section>
                         <q-item-section>
                             <div class="text-weight-medium">{{ element.name }}</div>
@@ -218,7 +218,7 @@ function updateSectionItems(sectionId: string, items: DrinkCardItem[]): void {
                                 flat
                                 round
                                 color="primary"
-                                icon="pencil"
+                                icon="fa fa-pencil"
                                 size="sm"
                                 @click="handleEditBundle(element)"
                             />
@@ -226,7 +226,7 @@ function updateSectionItems(sectionId: string, items: DrinkCardItem[]): void {
                                 flat
                                 round
                                 color="negative"
-                                icon="trash"
+                                icon="fa fa-trash"
                                 size="sm"
                                 @click="removeElement(element.id)"
                             />
@@ -239,11 +239,10 @@ function updateSectionItems(sectionId: string, items: DrinkCardItem[]): void {
                     <q-expansion-item
                         class="ft-card ft-border drag-item"
                         :data-section-id="element.id"
-                        expand-icon="arrow_drop_down"
                     >
                         <template #header>
                             <q-item-section avatar>
-                                <q-icon name="drag" class="cursor-move drag-handle" />
+                                <q-icon name="fa fa-bars" class="cursor-move drag-handle" />
                             </q-item-section>
                             <q-item-section>{{ element.name }}</q-item-section>
                             <q-item-section side>
@@ -251,7 +250,7 @@ function updateSectionItems(sectionId: string, items: DrinkCardItem[]): void {
                                     flat
                                     round
                                     color="negative"
-                                    icon="trash"
+                                    icon="fa fa-trash"
                                     size="sm"
                                     @click.stop="removeElement(element.id)"
                                 />

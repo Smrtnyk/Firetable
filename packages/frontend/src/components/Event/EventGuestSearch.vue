@@ -135,7 +135,7 @@ function setModel(val: string): void {
             v-model="searchTerm"
             :label="t(`EventGuestSearch.label`)"
             clearable
-            clear-icon="close"
+            clear-icon="fa fa-close"
             dense
             standout
             :debounce="300"
@@ -145,7 +145,7 @@ function setModel(val: string): void {
             :options="options"
         >
             <template #prepend>
-                <q-icon name="search" />
+                <q-icon name="fa fa-search" />
             </template>
 
             <template #before-options>

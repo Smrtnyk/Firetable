@@ -12,7 +12,7 @@
                 :use-input="!selectedCountry"
                 @filter="onFilterCountries"
                 clearable
-                clear-icon="close"
+                clear-icon="fa fa-close"
                 clear-icon-label="Clear"
                 :rules="[validateCountrySelection]"
             >

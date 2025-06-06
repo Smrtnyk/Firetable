@@ -147,7 +147,7 @@ async function validateForm(): Promise<boolean> {
                 :suffix="emailSuffix"
             >
                 <template #prepend>
-                    <q-icon name="at-symbol" />
+                    <q-icon name="fa fa-at" />
                 </template>
             </q-input>
 
@@ -161,7 +161,7 @@ async function validateForm(): Promise<boolean> {
                 :rules="passwordRules"
             >
                 <template #prepend>
-                    <q-icon name="key" />
+                    <q-icon name="fa fa-key" />
                 </template>
             </q-input>
 

@@ -83,7 +83,7 @@ async function changePassword(): Promise<void> {
                     <q-btn
                         flat
                         dense
-                        icon="pencil"
+                        icon="fa fa-pencil"
                         @click="toggleInput"
                         :color="isInputEnabled ? 'primary' : 'grey'"
                         :title="

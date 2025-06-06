@@ -51,23 +51,23 @@ const logsDoc: EventLogsDoc = {
 
 function getIconNameForLogEntry(logMessage: string): string {
     if (logMessage.includes("deleted")) {
-        return "trash";
+        return "fa fa-trash";
     }
 
     if (logMessage.includes("transferred")) {
-        return "transfer";
+        return "fa fa-exchange";
     }
 
     if (logMessage.includes("created")) {
-        return "plus";
+        return "fa fa-plus";
     }
 
     if (logMessage.includes("edited")) {
-        return "pencil";
+        return "fa fa-pencil";
     }
 
     if (logMessage.includes("copied")) {
-        return "copy";
+        return "fa fa-copy";
     }
 
     return "";
@@ -101,10 +101,9 @@ describe("AdminEventLogs", () => {
 
                 const timelineEntryHandle = messageElement.element().closest(".q-timeline__entry");
                 const iconHandle = timelineEntryHandle!.querySelector(".q-icon");
-
                 if (expectedIconName) {
-                    const iconName = iconHandle!.innerHTML;
-                    expect(iconName).toContain(expectedIconName);
+                    const hasName = iconHandle!.className.includes(expectedIconName);
+                    expect(hasName).toBe(true);
                 } else {
                     expect(iconHandle).toBeNull();
                 }

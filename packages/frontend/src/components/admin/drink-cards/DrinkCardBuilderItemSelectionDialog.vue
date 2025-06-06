@@ -87,7 +87,7 @@ function toggleCategory(category: string): void {
             class="q-mb-md"
         >
             <template #prepend>
-                <q-icon name="search" />
+                <q-icon name="fa fa-search" />
             </template>
         </q-input>
 

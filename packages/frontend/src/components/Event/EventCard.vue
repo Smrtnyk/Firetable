@@ -44,13 +44,13 @@ const backgroundImageUrl = computed(function () {
             <q-responsive :ratio="aspectRatio">
                 <div class="EventCard__content column">
                     <div class="row items-center">
-                        <q-icon name="calendar" color="white" class="q-mr-xs" size="xs" />
+                        <q-icon name="fa fa-calendar" color="white" class="q-mr-xs" size="xs" />
 
                         {{ dateFromTimestamp(event.date, locale, propertyTimezone) }}
 
                         <q-space />
 
-                        <q-icon name="clock" color="white" class="q-mr-xs" size="xs" />
+                        <q-icon name="fa fa-clock" color="white" class="q-mr-xs" size="xs" />
 
                         {{ hourFromTimestamp(event.date, locale, propertyTimezone) }}
                     </div>
@@ -58,7 +58,7 @@ const backgroundImageUrl = computed(function () {
                     <q-space />
 
                     <div class="row">
-                        <q-icon name="euro" color="white" class="q-mr-xs" size="xs" />
+                        <q-icon name="fa fa-euro" color="white" class="q-mr-xs" size="xs" />
 
                         {{ event.entryPrice || t("EventCard.freeLabel") }}
                     </div>

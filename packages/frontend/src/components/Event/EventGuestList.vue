@@ -118,7 +118,7 @@ function showAddNewGuestForm(): void {
                     <FTBtn
                         v-if="canInteract"
                         rounded
-                        icon="plus"
+                        icon="fa fa-plus"
                         class="button-gradient"
                         @click="showAddNewGuestForm"
                         :disabled="isGuestListFull"
@@ -151,7 +151,7 @@ function showAddNewGuestForm(): void {
                     @left="onSwipeLeftConfirmGuest($event, guest)"
                 >
                     <template v-if="canInteract" #right>
-                        <q-icon name="trash" />
+                        <q-icon name="fa fa-trash" />
                     </template>
                     <template v-if="canInteract" #left>
                         <q-icon color="white" :name="guest.confirmed ? 'close' : 'check'" />

@@ -8,7 +8,6 @@ import { createTestingPinia } from "@pinia/testing";
 import {
     BottomSheet,
     Dialog,
-    IconSet,
     Loading,
     Notify,
     QAvatar,
@@ -36,15 +35,15 @@ import {
     QToggle,
     Quasar,
 } from "quasar";
+import fontAwesomeV6 from "quasar/icon-set/fontawesome-v6";
 import { i18n, loadLanguage } from "src/boot/i18n";
-import { myIcons } from "src/config";
 import { vi } from "vitest";
 import { render } from "vitest-browser-vue";
+import { defineComponent, h } from "vue";
 import "quasar/dist/quasar.css";
+import "@quasar/extras/fontawesome-v6/fontawesome-v6.css";
 
 import "../src/css/app.scss";
-
-import { defineComponent, h } from "vue";
 
 document.body.style.height = "100vh";
 document.body.style.width = "100vw";
@@ -145,7 +144,13 @@ export function renderComponent<T>(
                     createSpy: vi.fn,
                     fakeApp: true,
                 }),
-                [Quasar, { plugins: { BottomSheet, Dialog, Loading, Notify } }],
+                [
+                    Quasar,
+                    {
+                        iconSet: fontAwesomeV6,
+                        plugins: { BottomSheet, Dialog, Loading, Notify },
+                    },
+                ],
                 i18n,
             ],
             provide: options?.provide,
@@ -155,13 +160,5 @@ export function renderComponent<T>(
         renderOptions.props = props;
     }
 
-    Quasar.iconSet.iconMapFn = function (iconName) {
-        return { icon: myIcons[iconName] };
-    };
-
-    const result = render(componentToRender, renderOptions);
-
-    IconSet.props.name = "line-awesome";
-
-    return result;
+    return render(componentToRender, renderOptions);
 }

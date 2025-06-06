@@ -40,7 +40,7 @@ function isOwnReservation(reservation: QueuedReservation): boolean {
             <div class="row q-gutter-sm full-width">
                 <FTBtn
                     title="Move to Floor Plan"
-                    icon="transfer"
+                    icon="fa fa-arrow-right"
                     color="secondary"
                     @click="() => emit('unqueue')"
                     v-close-popup
@@ -48,7 +48,7 @@ function isOwnReservation(reservation: QueuedReservation): boolean {
 
                 <FTBtn
                     title="Delete"
-                    icon="trash"
+                    icon="fa fa-trash"
                     color="negative"
                     v-close-popup
                     @click="() => emit('delete')"

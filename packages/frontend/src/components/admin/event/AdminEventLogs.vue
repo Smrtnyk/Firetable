@@ -38,38 +38,38 @@ function formatSubtitleForEventLog({ creator, timestamp }: EventLog): string {
 
 function getIconNameForLogEntry(logMessage: string): string {
     if (logMessage.includes("unlinked")) {
-        return "unlink";
+        return "fa fa-unlink";
     }
 
     if (logMessage.includes("linked")) {
-        return "link";
+        return "fa fa-link";
     }
     if (logMessage.includes("deleted")) {
-        return "trash";
+        return "fa fa-trash";
     }
 
     if (logMessage.includes("transferred") || logMessage.includes("swapped")) {
-        return "transfer";
+        return "fa fa-exchange-alt";
     }
 
     if (logMessage.includes("created")) {
-        return "plus";
+        return "fa fa-plus";
     }
 
     if (logMessage.includes("edited")) {
-        return "pencil";
+        return "fa fa-pencil";
     }
 
     if (logMessage.includes("copied")) {
-        return "copy";
+        return "fa fa-copy";
     }
 
     if (logMessage.includes("arrived")) {
-        return "check";
+        return "fa fa-check";
     }
 
     if (logMessage.includes("cancelled")) {
-        return "close";
+        return "fa fa-close";
     }
 
     return "";
@@ -112,7 +112,7 @@ function scrollToBottom(): void {
                 :offset="[18, 18]"
                 class="scroll-to-bottom"
             >
-                <q-btn @click="scrollToBottom" fab icon="chevron_down" color="secondary" />
+                <q-btn @click="scrollToBottom" fab icon="fa fa-chevron-down" color="secondary" />
             </q-page-sticky>
         </div>
         <FTCenteredText v-else>No logs recorded for this event.</FTCenteredText>

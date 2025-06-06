@@ -98,7 +98,7 @@ async function submit(): Promise<void> {
                 input-debounce="0"
                 hide-dropdown-icon
                 fill-input
-                clear-icon="close"
+                clear-icon="fa fa-close"
                 @new-value="onNewTag"
                 new-value-mode="add-unique"
                 :options="[]"

@@ -51,7 +51,7 @@ function showReservation(reservation: ReservationDoc): void {
                 :key="reservation.id"
             >
                 <template #right>
-                    <q-icon name="trash" />
+                    <q-icon name="fa fa-trash" />
                 </template>
                 <q-item clickable>
                     <q-item-section @click="showReservation(reservation)">

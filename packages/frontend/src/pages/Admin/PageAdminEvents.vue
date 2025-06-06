@@ -175,7 +175,7 @@ onMounted(fetchMoreEvents);
     <div class="PageAdminEvents">
         <FTTitle :title="t('PageAdminEvents.title')">
             <template #right>
-                <FTBtn rounded icon="plus" class="button-gradient" @click="showEventForm()" />
+                <FTBtn rounded icon="fa fa-plus" class="button-gradient" @click="showEventForm()" />
             </template>
         </FTTitle>
 

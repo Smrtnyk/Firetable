@@ -127,11 +127,11 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
 
         <div v-else>
             <FTCenteredText>
-                <q-icon name="crown" size="64px" color="grey-5" class="q-mb-md" />
+                <q-icon name="fa fa-briefcase" size="64px" color="grey-5" class="q-mb-md" />
                 <div class="text-grey-6 q-mb-lg">Create your first organisation to get started</div>
                 <FTBtn
                     label="Create Organisation"
-                    icon="plus"
+                    icon="fa fa-plus"
                     class="button-gradient"
                     @click="createOrganisation"
                 />

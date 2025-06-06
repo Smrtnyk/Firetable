@@ -72,7 +72,7 @@
                 <div class="row items-center justify-end q-gutter-sm">
                     <FTBtn
                         padding="sm"
-                        icon="trash"
+                        icon="fa fa-trash"
                         color="negative"
                         aria-label="Clear custom date range"
                         @click="clearDateRange"

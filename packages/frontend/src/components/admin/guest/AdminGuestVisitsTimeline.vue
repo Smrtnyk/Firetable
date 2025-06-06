@@ -41,12 +41,12 @@ function getVisitColor(visit: Visit): string {
 
 function getVisitIcon(visit: Visit): string {
     if (visit.cancelled) {
-        return "close";
+        return "fa fa-close";
     }
     if (visit.arrived) {
-        return "check";
+        return "fa fa-check";
     }
-    return "dash";
+    return "fa fa-minus";
 }
 
 function isUpcomingVisit(visit: Visit): boolean {
@@ -111,7 +111,7 @@ function openEditDialog(visit: Visit): void {
                             flat
                             round
                             :size="buttonSize"
-                            icon="pencil"
+                            icon="fa fa-pencil"
                             @click="openEditDialog(visit)"
                         />
                     </div>

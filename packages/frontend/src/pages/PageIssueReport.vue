@@ -160,7 +160,7 @@ const { data: myIssues } = useFirestoreCollection<IssueReportDoc>(
                 <FTBtn
                     aria-label="Report new issue"
                     rounded
-                    icon="plus"
+                    icon="fa fa-plus"
                     class="button-gradient"
                     @click="showCreateIssueForm"
                 />
@@ -202,7 +202,7 @@ const { data: myIssues } = useFirestoreCollection<IssueReportDoc>(
                             flat
                             round
                             color="grey"
-                            icon="more"
+                            icon="fa fa-ellipsis-v"
                             :aria-label="`Actions for issue ${issue.description}`"
                         >
                             <q-menu class="ft-card">

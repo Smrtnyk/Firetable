@@ -41,11 +41,11 @@ function showEditUserDialog(user: BucketizedUser, reset: VoidFunction): void {
             class="fa-card"
         >
             <template #right>
-                <q-icon name="trash" />
+                <q-icon name="fa fa-trash" />
             </template>
 
             <template #left>
-                <q-icon name="pencil" />
+                <q-icon name="fa fa-pencil" />
             </template>
 
             <q-item clickable class="ft-card">

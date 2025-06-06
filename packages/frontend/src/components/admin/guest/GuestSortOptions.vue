@@ -58,7 +58,7 @@ function updateSelectedTags(value: string[]): void {
         <q-select
             :model-value="selectedTags.value"
             :options="props.availableTags.value"
-            clear-icon="close"
+            clear-icon="fa fa-close"
             multiple
             use-chips
             standout
@@ -106,7 +106,7 @@ function updateSelectedTags(value: string[]): void {
         </q-item-section>
         <q-item-section side>
             <q-icon
-                :name="currentSortDirection.value === 'desc' ? 'arrow-sort-down' : 'arrow-sort-up'"
+                :name="currentSortDirection.value === 'desc' ? 'fa fa-sort-down' : 'fa fa-sort-up'"
             />
         </q-item-section>
     </q-item>

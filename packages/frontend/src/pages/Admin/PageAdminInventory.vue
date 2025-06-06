@@ -290,20 +290,20 @@ onMounted(init);
                 <div class="row q-gutter-sm">
                     <FTBtn
                         rounded
-                        icon="download"
+                        icon="fa fa-download"
                         class="button-gradient"
                         @click="handleExport"
                         :disable="!inventoryData?.length"
                     />
                     <FTBtn
                         rounded
-                        icon="import"
+                        icon="fa fa-file-import"
                         class="button-gradient"
                         @click="showImportDialog"
                     />
                     <FTBtn
                         rounded
-                        icon="plus"
+                        icon="fa fa-plus"
                         class="button-gradient"
                         @click="showCreateInventoryItemDialog()"
                     />

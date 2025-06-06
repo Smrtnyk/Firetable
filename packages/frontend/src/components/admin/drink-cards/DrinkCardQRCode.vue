@@ -52,7 +52,7 @@ onMounted(generateQRCode);
             rounded
             color="primary"
             :label="t('PageAdminPropertyDrinkCards.downloadQRCode')"
-            icon="download"
+            icon="fa fa-download"
             @click="downloadQRCode"
         />
     </div>

@@ -361,7 +361,7 @@ function toggleSelectAll(): void {
                 <FTBtn
                     v-if="!isLoading"
                     rounded
-                    icon="plus"
+                    icon="fa fa-plus"
                     class="button-gradient"
                     @click="showCreateGuestDialog"
                     aria-label="Add new guest"
@@ -373,24 +373,23 @@ function toggleSelectAll(): void {
         <q-input
             v-if="guestsWithSummaries.length > 0 && !isLoading"
             :dense="isMobile"
-            standout
-            rounded
+            outlined
             v-model="searchQuery"
             debounce="300"
             clearable
-            clear-icon="close"
+            clear-icon="fa fa-close"
             label="Search by name or contact"
             class="q-mb-sm"
         >
             <template #prepend>
-                <q-icon name="search" />
+                <q-icon name="fa fa-search" />
             </template>
             <template #append>
                 <!-- Sort Controls -->
                 <q-btn
                     dense
                     flat
-                    icon="filter"
+                    icon="fa fa-sort"
                     aria-label="filter guests"
                     @click="showSortDialog"
                 />
@@ -409,7 +408,7 @@ function toggleSelectAll(): void {
                 <span>{{ `Selected items ${selectedGuests.length}` }}</span>
                 <q-space />
                 <q-btn
-                    icon="trash"
+                    icon="fa fa-trash"
                     color="negative"
                     flat
                     class="q-ml-sm"
@@ -417,7 +416,7 @@ function toggleSelectAll(): void {
                     aria-label="Bulk delete"
                 />
                 <q-btn
-                    icon="close"
+                    icon="fa fa-close"
                     flat
                     class="q-ml-sm"
                     @click="cancelSelectionMode"
@@ -490,7 +489,7 @@ function toggleSelectAll(): void {
             <q-btn
                 @click="handleScroll"
                 fab
-                :icon="scrollDirection === 'down' ? 'chevron_down' : 'chevron_up'"
+                :icon="scrollDirection === 'down' ? 'fa fa-chevron-down' : 'fa fa-chevron-up'"
                 color="secondary"
             />
         </q-page-sticky>

@@ -64,7 +64,7 @@ const { t } = useI18n();
                             flat
                             round
                             color="primary"
-                            icon="pencil"
+                            icon="fa fa-pencil"
                             @click="emit('edit', card)"
                             :tabindex="0"
                             @keyup.enter="emit('edit', card)"
@@ -75,7 +75,7 @@ const { t } = useI18n();
                             flat
                             round
                             color="negative"
-                            icon="trash"
+                            icon="fa fa-trash"
                             @click="emit('delete', card)"
                         >
                             <q-tooltip>{{ t("Global.delete") }}</q-tooltip>

@@ -235,7 +235,12 @@ const uniqueUsersCount = computed(() => users.value.length);
     <div class="PageAdminUsers">
         <FTTitle :title="`${t('PageAdminUsers.title')} (${uniqueUsersCount})`">
             <template #right>
-                <FTBtn rounded icon="plus" class="button-gradient" @click="showCreateUserDialog" />
+                <FTBtn
+                    rounded
+                    icon="fa fa-plus"
+                    class="button-gradient"
+                    @click="showCreateUserDialog"
+                />
             </template>
         </FTTitle>
 

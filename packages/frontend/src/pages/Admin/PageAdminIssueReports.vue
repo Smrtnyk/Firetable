@@ -90,7 +90,7 @@ async function updateIssueStatus(issueId: string, status: IssueStatus): Promise<
                         flat
                         round
                         color="grey"
-                        icon="more"
+                        icon="fa fa-ellipsis-v"
                         :aria-label="`Actions for issue ${issue.description}`"
                     >
                         <q-menu>

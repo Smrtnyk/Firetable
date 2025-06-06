@@ -27,7 +27,7 @@ const emit = defineEmits<Emits>();
 <template>
     <q-item class="ft-border ft-card">
         <q-item-section avatar class="q-ml-lg">
-            <q-icon name="drag" class="cursor-move" />
+            <q-icon name="fa fa-bars" class="cursor-move" />
         </q-item-section>
 
         <q-item-section>
@@ -59,14 +59,21 @@ const emit = defineEmits<Emits>();
                 flat
                 round
                 :color="item.isVisible ? 'primary' : 'grey'"
-                :icon="item.isVisible ? 'eye-open' : 'eye-closed'"
+                :icon="item.isVisible ? 'fa fa-eye' : 'fa fa-eye-slash'"
                 size="sm"
                 @click="emit('toggle-visibility')"
             />
         </q-item-section>
 
         <q-item-section side>
-            <q-btn flat round color="negative" icon="trash" size="sm" @click="emit('remove')" />
+            <q-btn
+                flat
+                round
+                color="negative"
+                icon="fa fa-trash"
+                size="sm"
+                @click="emit('remove')"
+            />
         </q-item-section>
     </q-item>
 </template>

@@ -125,7 +125,7 @@ async function synchroniseNewPropertySettings(propertyId: string): Promise<void>
                     readonly
                 >
                     <template #append>
-                        <q-icon name="clock" class="cursor-pointer" />
+                        <q-icon name="fa fa-clock" class="cursor-pointer" />
                         <q-popup-proxy transition-show="scale" transition-hide="scale">
                             <q-time
                                 v-model="editableSettings.event.eventStartTime24HFormat"
@@ -166,7 +166,7 @@ async function synchroniseNewPropertySettings(propertyId: string): Promise<void>
                     :style="{
                         'background-color': editableSettings.event[colorSetting.key],
                     }"
-                    icon="color-picker"
+                    icon="fa fa-palette"
                     push
                     :label="editableSettings.event[colorSetting.key]"
                     stack

@@ -11,7 +11,7 @@
                     <q-btn
                         round
                         flat
-                        icon="close"
+                        icon="fa fa-close"
                         @click="onDialogHide"
                         aria-label="Close dialog"
                     />

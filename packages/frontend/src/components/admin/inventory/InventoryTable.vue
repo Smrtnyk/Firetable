@@ -18,11 +18,11 @@
             <template #top-right>
                 <div class="row items-center justify-between q-gutter-xs">
                     <div v-if="hasSelection">
-                        <FTBtn color="negative" icon="trash" @click="handleBulkDelete" />
+                        <FTBtn color="negative" icon="fa fa-trash" @click="handleBulkDelete" />
                     </div>
 
                     <q-input
-                        clear-icon="close"
+                        clear-icon="fa fa-close"
                         standout
                         rounded
                         v-model="localFilter"
@@ -32,7 +32,7 @@
                         dense
                     >
                         <template #append>
-                            <q-icon name="search" />
+                            <q-icon name="fa fa-search" />
                         </template>
                     </q-input>
                 </div>
@@ -43,14 +43,14 @@
                     <FTBtn
                         flat
                         round
-                        icon="pencil"
+                        icon="fa fa-pencil"
                         @click="emit('edit-item', row)"
                         :alt="`Edit ${row.name}`"
                     />
                     <FTBtn
                         flat
                         round
-                        icon="copy"
+                        icon="fa fa-copy"
                         color="primary"
                         @click="emit('copy-item', row)"
                         :alt="`Copy ${row.name}`"
@@ -58,7 +58,7 @@
                     <FTBtn
                         flat
                         round
-                        icon="trash"
+                        icon="fa fa-trash"
                         color="negative"
                         @click="emit('delete-item', row)"
                         :alt="`Delete ${row.name}`"

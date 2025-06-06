@@ -152,14 +152,14 @@ async function onDeleteGuest(): Promise<void> {
                     <FTBtn
                         class="q-mr-sm"
                         rounded
-                        icon="pencil"
+                        icon="fa fa-pencil"
                         color="secondary"
                         @click="editGuest(guest)"
                         aria-label="Edit guest"
                     />
                     <FTBtn
                         rounded
-                        icon="trash"
+                        icon="fa fa-trash"
                         color="negative"
                         @click="onDeleteGuest()"
                         aria-label="Delete guest"

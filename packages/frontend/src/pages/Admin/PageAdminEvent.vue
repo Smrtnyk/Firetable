@@ -333,7 +333,7 @@ onMounted(init);
                         <q-item-section side>
                             <FTBtn
                                 rounded
-                                icon="pencil"
+                                icon="fa fa-pencil"
                                 class="button-gradient"
                                 @click="showEventInfoEditDialog"
                             />
