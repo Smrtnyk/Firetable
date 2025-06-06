@@ -9,24 +9,6 @@ import { drinkCardsCollection } from "./db.js";
 import { getDrinkCardPath } from "./paths.js";
 
 /**
- * Adds a new drink card to the Firestore database.
- * Returns the ID of the created document.
- */
-export async function addDrinkCard(
-    organisationId: string,
-    propertyId: string,
-    card: CreateDrinkCardPayload,
-): Promise<string> {
-    const docRef = await addDoc(drinkCardsCollection(organisationId, propertyId), {
-        ...card,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-    });
-
-    return docRef.id;
-}
-
-/**
  * Creates a drink card with an optional PDF attachment.
  * Handles both document creation and PDF upload in a single operation.
  */
@@ -93,6 +75,24 @@ export async function uploadPDF(
 
     await uploadBytes(pdfRef, file);
     return getDownloadURL(pdfRef);
+}
+
+/**
+ * Adds a new drink card to the Firestore database.
+ * Returns the ID of the created document.
+ */
+async function addDrinkCard(
+    organisationId: string,
+    propertyId: string,
+    card: CreateDrinkCardPayload,
+): Promise<string> {
+    const docRef = await addDoc(drinkCardsCollection(organisationId, propertyId), {
+        ...card,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+    });
+
+    return docRef.id;
 }
 
 async function deletePDF(

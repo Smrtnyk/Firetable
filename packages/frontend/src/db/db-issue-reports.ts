@@ -6,7 +6,7 @@ import { addDoc, collection, deleteDoc, doc, updateDoc } from "firebase/firestor
 import { initializeFirebase } from "./base.js";
 import { getIssueReportsPath } from "./paths.js";
 
-export interface CreateIssueReportPayload {
+interface CreateIssueReportPayload {
     category: IssueCategory;
     createdAt: number;
     createdBy: string;
@@ -21,7 +21,7 @@ export interface CreateIssueReportPayload {
     };
 }
 
-export interface UpdateIssueReportPayload {
+interface UpdateIssueReportPayload {
     category?: IssueCategory;
     description?: string;
     status?: IssueStatus;

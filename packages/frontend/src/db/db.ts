@@ -12,7 +12,6 @@ import {
     getEventsPath,
     getFloorsPath,
     getGuestsPath,
-    getInventoryPath,
     getPropertiesPath,
 } from "./paths.js";
 
@@ -65,13 +64,6 @@ export function floorsCollection(organisationId: string, propertyId: string): Co
     return getCollection(getFloorsPath(organisationId, propertyId));
 }
 
-export function getInventoryCollection(
-    organisationId: string,
-    propertyId: string,
-): CollectionReference {
-    return getCollection(getInventoryPath(organisationId, propertyId));
-}
-
 export function guestDoc(organisationId: string, guestId: string): DocumentReference {
     return doc(guestsCollection(organisationId), guestId);
 }
@@ -84,10 +76,6 @@ export function guestListDoc(owner: EventOwner, guestId: string): DocumentRefere
     return doc(guestListCollection(owner), guestId);
 }
 
-export function guestsCollection(organisationId: string): CollectionReference {
-    return getCollection(getGuestsPath(organisationId));
-}
-
 export function organisationDoc(id: string): DocumentReference {
     return doc(organisationsCollection(), id);
 }
@@ -96,11 +84,11 @@ export function organisationsCollection(): CollectionReference {
     return getCollection(Collection.ORGANISATIONS);
 }
 
-// DOCS
-
 export function propertiesCollection(organisationId: string): CollectionReference {
     return getCollection(getPropertiesPath(organisationId));
 }
+
+// DOCS
 
 export function propertyDoc(id: string, organisationId: string): DocumentReference {
     return doc(propertiesCollection(organisationId), id);
@@ -129,4 +117,8 @@ export function usersCollection(organisationId: string): CollectionReference {
 function getCollection(collectionName: string): CollectionReference {
     const { firestore } = initializeFirebase();
     return collection(firestore, collectionName);
+}
+
+function guestsCollection(organisationId: string): CollectionReference {
+    return getCollection(getGuestsPath(organisationId));
 }

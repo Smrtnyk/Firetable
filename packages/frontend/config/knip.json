@@ -1,23 +1,22 @@
 {
-  "entry": [
-    "**/*.vue"
-  ],
-  "ignore": [
-    "**/src-pwa/**/*",
-    "**/src/boot/**/*",
-    "quasar.config.ts",
-    "src/app-event-handlers/event-logs.ts",
-    "src/app-event-handlers/guest-data.ts",
-    "src/router/index.ts",
-    "src/router/routes.ts"
-  ],
-  "ignoreDependencies": [
-    "@firetable/backend",
-    "@firetable/floor-creator",
-    "@firetable/types",
-    "@quasar/extras",
-    "register-service-worker",
-    "workbox-core",
-    "@playwright/test"
-  ]
+    "entry": [
+        "**/*.vue",
+        "src/app-event-handlers/guest-data.ts",
+        "src/app-event-handlers/event-logs.ts"
+    ],
+    "ignore": [
+        "**/src-pwa/**/*",
+        "**/src/boot/**/*",
+        "quasar.config.ts",
+        "src/router/index.ts",
+        "src/router/routes.ts"
+    ],
+    "ignoreDependencies": [
+        "@firetable/floor-creator",
+        "@firetable/types",
+        "@quasar/extras",
+        "register-service-worker",
+        "workbox-core",
+        "@playwright/test"
+    ]
 }

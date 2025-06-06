@@ -80,6 +80,6 @@ export function getUserPath(organisationId: string, userId: string): string {
 }
 
 // USERS
-export function getUsersPath(organisationId: string): string {
+function getUsersPath(organisationId: string): string {
     return [Collection.ORGANISATIONS, organisationId, Collection.USERS].join("/");
 }
