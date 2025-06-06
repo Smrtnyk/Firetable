@@ -22,8 +22,7 @@ function getFilteredTimezones(): string[] {
         <q-input
             v-model="searchQuery"
             placeholder="Search timezones..."
-            rounded
-            standout
+            outlined
             dense
             class="q-mb-md"
             :debounce="300"

@@ -61,8 +61,7 @@ function updateSelectedTags(value: string[]): void {
             clear-icon="fa fa-close"
             multiple
             use-chips
-            standout
-            rounded
+            outlined
             dense
             label="Filter by tags"
             @update:model-value="updateSelectedTags"

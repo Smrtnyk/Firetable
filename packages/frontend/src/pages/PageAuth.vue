@@ -51,9 +51,8 @@ async function onSubmit(): Promise<void> {
                     <h1 class="text-h5 text-center">Welcome to Firetable</h1>
                     <q-input
                         v-model="username"
-                        rounded
                         class="q-mb-md"
-                        standout
+                        outlined
                         label="Username *"
                         hint="Enter username"
                         lazy-rules
@@ -63,8 +62,7 @@ async function onSubmit(): Promise<void> {
                     <q-input
                         v-model="password"
                         class="q-mb-md"
-                        rounded
-                        standout
+                        outlined
                         label="Password *"
                         :type="isPwd ? 'password' : 'text'"
                         hint="Enter your password"

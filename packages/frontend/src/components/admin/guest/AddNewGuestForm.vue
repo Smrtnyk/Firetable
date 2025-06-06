@@ -77,8 +77,7 @@ async function submit(): Promise<void> {
             <q-input
                 :label="t('AddNewGuestForm.guestNameInputLabel')"
                 v-model="guestName"
-                rounded
-                standout
+                outlined
                 autofocus
                 @blur="capitalizeGuestName"
                 :rules="guestNameRules"
@@ -88,8 +87,7 @@ async function submit(): Promise<void> {
             <q-select
                 v-model="guestTags"
                 :label="t('Global.tagsLabel')"
-                rounded
-                standout
+                outlined
                 use-input
                 use-chips
                 multiple

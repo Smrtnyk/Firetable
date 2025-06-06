@@ -29,8 +29,7 @@ function onSubmit(): void {
     <q-form ref="form" class="q-gutter-md q-pt-md q-pa-md" @submit="onSubmit" @reset="onReset">
         <q-input
             v-model="guestName"
-            standout
-            rounded
+            outlined
             :label="t('EventGuestListCreateGuestForm.guestNameLabel')"
             lazy-rules
             :rules="[minLength(t('EventGuestListCreateGuestForm.guestNameValidationLength'), 3)]"

@@ -3,8 +3,7 @@
         <div class="row items-start q-gutter-sm justify-between">
             <q-select
                 class="col-4"
-                rounded
-                standout
+                outlined
                 v-model="selectedCountry"
                 :options="countryOptions"
                 option-label="name"
@@ -50,8 +49,7 @@
                 v-model="phoneNumber"
                 :label="t('TelNumberInput.phoneNumberLabel')"
                 type="tel"
-                rounded
-                standout
+                outlined
                 :rules="[validatePhoneNumber]"
                 @blur="onPhoneNumberBlur"
             />

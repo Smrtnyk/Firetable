@@ -173,7 +173,7 @@ function updateLineWidth(width: unknown): void {
             />
 
             <q-input
-                standout
+                outlined
                 label="Floor name"
                 @update:model-value="(event) => onFloorChange('name', event)"
                 :model-value="floorInstance.name"
@@ -187,7 +187,7 @@ function updateLineWidth(width: unknown): void {
                 :step="RESOLUTION"
                 :model-value="floorInstanceState.width"
                 @update:model-value="(event) => onFloorChange('width', event)"
-                standout
+                outlined
                 type="number"
                 label="Floor width"
                 class="col-6"
@@ -199,7 +199,7 @@ function updateLineWidth(width: unknown): void {
                 :step="RESOLUTION"
                 @update:model-value="(event) => onFloorChange('height', event)"
                 :model-value="floorInstanceState.height"
-                standout
+                outlined
                 type="number"
                 label="Floor height"
                 class="col-6"
@@ -290,7 +290,7 @@ function updateLineWidth(width: unknown): void {
                             :options="brushOptions"
                             @update:model-value="updateBrushType"
                             label="Brush Type"
-                            standout
+                            outlined
                             rounded
                             dense
                             emit-value

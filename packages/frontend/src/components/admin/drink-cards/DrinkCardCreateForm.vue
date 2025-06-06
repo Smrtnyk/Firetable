@@ -169,8 +169,7 @@ function triggerFileInput(): void {
             <q-input
                 v-model="form.name"
                 :label="t('PageAdminPropertyDrinkCards.cardNameLabel')"
-                standout
-                rounded
+                outlined
                 :rules="[noEmptyString('Drink card name is required')]"
             />
         </div>
@@ -196,8 +195,7 @@ function triggerFileInput(): void {
                         ['undo', 'redo'],
                     ]"
                     content-class="editor-content"
-                    standout
-                    rounded
+                    outlined
                 />
             </div>
 
@@ -258,8 +256,7 @@ function triggerFileInput(): void {
                     accept=".pdf"
                     label="Choose a PDF file"
                     @update:model-value="handlePDFUpload"
-                    standout
-                    rounded
+                    outlined
                     use-chips
                     drop-area
                 >
