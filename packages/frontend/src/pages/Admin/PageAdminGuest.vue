@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { CreateGuestPayload, GuestDoc, Visit } from "@firetable/types";
 
-import { deleteGuest, getGuestPath, updateGuestInfo } from "@firetable/backend";
 import { matchesProperty } from "es-toolkit/compat";
 import { storeToRefs } from "pinia";
 import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
@@ -14,6 +13,7 @@ import FTTabs from "src/components/FTTabs.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import { useDialog } from "src/composables/useDialog";
 import { useFirestoreDocument } from "src/composables/useFirestore";
+import { deleteGuest, getGuestPath, updateGuestInfo } from "src/db";
 import { formatEventDate, getDefaultTimezone } from "src/helpers/date-utils";
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";

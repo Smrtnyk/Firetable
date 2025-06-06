@@ -22,7 +22,7 @@ const { loginWithEmailSpy, routerReplaceSpy, showErrorMessageSpy, tryCatchLoadin
         };
     });
 
-vi.mock("@firetable/backend", () => ({
+vi.mock("src/db", () => ({
     loginWithEmail: loginWithEmailSpy,
 }));
 

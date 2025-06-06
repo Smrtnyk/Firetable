@@ -1,9 +1,9 @@
-import type { EventOwner } from "@firetable/backend";
 import type { EventDoc } from "@firetable/types";
 import type { QueryDocumentSnapshot } from "firebase/firestore";
+import type { EventOwner } from "src/db";
 
-import { getEvents } from "@firetable/backend";
 import { last } from "es-toolkit";
+import { getEvents } from "src/db";
 import { ref } from "vue";
 
 const EVENTS_PER_PAGE = 50;

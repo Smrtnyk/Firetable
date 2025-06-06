@@ -1,16 +1,9 @@
 <script setup lang="ts">
-import type { EventOwner } from "@firetable/backend";
 import type { FloorEditor } from "@firetable/floor-creator";
 import type { AnyFunction, FloorDoc, ReservationDoc } from "@firetable/types";
+import type { EventOwner } from "src/db";
 import type { Component } from "vue";
 
-import {
-    addEventFloor,
-    deleteEventFloor,
-    deleteReservation,
-    updateEventFloorData,
-    updateEventFloorsOrder,
-} from "@firetable/backend";
 import { isActiveReservation } from "@firetable/types";
 import { useLocalStorage } from "@vueuse/core";
 import { matchesProperty } from "es-toolkit/compat";
@@ -33,6 +26,13 @@ import { useAdminEvent } from "src/composables/useAdminEvent";
 import { useDialog } from "src/composables/useDialog";
 import { useFloors } from "src/composables/useFloors";
 import { useGuestsForEvent } from "src/composables/useGuestsForEvent";
+import {
+    addEventFloor,
+    deleteEventFloor,
+    deleteReservation,
+    updateEventFloorData,
+    updateEventFloorsOrder,
+} from "src/db";
 import { isMobile } from "src/global-reactives/screen-detection";
 import { compressFloorDoc } from "src/helpers/compress-floor-doc";
 import { formatEventDate } from "src/helpers/date-utils";

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { deleteOrganisation } from "@firetable/backend";
 import FTBtn from "src/components/FTBtn.vue";
 import FTTitle from "src/components/FTTitle.vue";
+import { deleteOrganisation } from "src/db";
 import {
     formatOrganisationStatus,
     getOrganisationStatusColor,

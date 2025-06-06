@@ -2,7 +2,6 @@
 import type { FloorEditor } from "@firetable/floor-creator";
 import type { FloorDoc } from "@firetable/types";
 
-import { getFloorPath } from "@firetable/backend";
 import { extractAllTablesLabels } from "@firetable/floor-creator";
 import { useEventListener } from "@vueuse/core";
 import { Loading } from "quasar";
@@ -14,6 +13,7 @@ import {
     useFirestoreDocument,
 } from "src/composables/useFirestore";
 import { useFloorEditor } from "src/composables/useFloorEditor";
+import { getFloorPath } from "src/db";
 import { isTablet } from "src/global-reactives/screen-detection";
 import { compressFloorDoc, decompressFloorDoc } from "src/helpers/compress-floor-doc";
 import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";

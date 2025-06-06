@@ -2,12 +2,6 @@
 import type { CreatePropertyPayload, PropertyDoc, UpdatePropertyPayload } from "@firetable/types";
 import type { Link } from "src/types";
 
-import {
-    createNewProperty,
-    deleteProperty,
-    getPropertiesPath,
-    updateProperty,
-} from "@firetable/backend";
 import { matchesProperty } from "es-toolkit/compat";
 import { useQuasar } from "quasar";
 import AddNewPropertyForm from "src/components/admin/property/AddNewPropertyForm.vue";
@@ -17,6 +11,7 @@ import FTDialog from "src/components/FTDialog.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import { useDialog } from "src/composables/useDialog";
 import { useFirestoreCollection } from "src/composables/useFirestore";
+import { createNewProperty, deleteProperty, getPropertiesPath, updateProperty } from "src/db";
 import { showConfirm, showDeleteConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";
 import { usePermissionsStore } from "src/stores/permissions-store";

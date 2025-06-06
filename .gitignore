@@ -21,7 +21,7 @@ coverage
 .env
 .firebaserc
 
-/packages/backend/src/firebase/fb-config.json
+/packages/frontend/src/db/fb-config.json
 packages/frontend/src/boot/sentry.json
 cypress.env.json
 cypress.json

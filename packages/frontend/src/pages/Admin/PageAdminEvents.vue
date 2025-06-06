@@ -1,12 +1,6 @@
 <script setup lang="ts">
 import type { CreateEventPayload, EditEventPayload, EventDoc } from "@firetable/types";
 
-import {
-    createNewEvent,
-    deleteDocAndAllSubCollections,
-    getEventsPath,
-    updateEvent,
-} from "@firetable/backend";
 import { negate } from "es-toolkit";
 import { matchesProperty } from "es-toolkit/compat";
 import { Loading, useQuasar } from "quasar";
@@ -18,6 +12,7 @@ import FTTitle from "src/components/FTTitle.vue";
 import { useDialog } from "src/composables/useDialog";
 import { useEvents } from "src/composables/useEvents";
 import { useFloors } from "src/composables/useFloors";
+import { createNewEvent, deleteDocAndAllSubCollections, getEventsPath, updateEvent } from "src/db";
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { computed, onBeforeMount, onMounted, onUnmounted, watch } from "vue";

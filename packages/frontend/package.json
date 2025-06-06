@@ -36,7 +36,6 @@
         "knip": "catalog:"
     },
     "dependencies": {
-        "@firetable/backend": "workspace:*",
         "@firetable/floor-creator": "workspace:*",
         "@firetable/types": "workspace:*",
         "@posva/event-emitter": "catalog:",

@@ -69,7 +69,7 @@ vi.mock("src/composables/useDialog", () => ({
     }),
 }));
 
-vi.mock("@firetable/backend", () => ({
+vi.mock("src/db", () => ({
     addReservation: addReservationMock,
     deleteReservation: deleteReservationMock,
     fetchOrganisationById: vi.fn(),

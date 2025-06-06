@@ -2,7 +2,6 @@
 import type { CreateUserPayload, EditUserPayload, PropertyDoc, User } from "@firetable/types";
 import type { BucketizedUser, BucketizedUsers } from "src/components/admin/user/AdminUsersList.vue";
 
-import { createUserWithEmail, deleteUser, fetchUsersByRole, updateUser } from "@firetable/backend";
 import { Role } from "@firetable/types";
 import { useAsyncState } from "@vueuse/core";
 import { matchesProperty } from "es-toolkit/compat";
@@ -17,6 +16,7 @@ import FTTabPanels from "src/components/FTTabPanels.vue";
 import FTTabs from "src/components/FTTabs.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import { useDialog } from "src/composables/useDialog";
+import { createUserWithEmail, deleteUser, fetchUsersByRole, updateUser } from "src/db";
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";
 import { usePropertiesStore } from "src/stores/properties-store";

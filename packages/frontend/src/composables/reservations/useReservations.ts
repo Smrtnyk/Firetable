@@ -1,4 +1,3 @@
-import type { EventOwner } from "@firetable/backend";
 import type {
     BaseTable,
     Floor,
@@ -15,17 +14,11 @@ import type {
     User,
 } from "@firetable/types";
 import type { DialogChainObject } from "quasar";
+import type { EventOwner } from "src/db";
 import type { GuestSummary } from "src/stores/guests-store";
 import type { ComputedRef, Ref, ShallowRef } from "vue";
 import type { VueFirestoreDocumentData } from "vuefire";
 
-import {
-    addReservation,
-    deleteReservation,
-    moveReservationFromQueue,
-    moveReservationToQueue,
-    updateReservationDoc,
-} from "@firetable/backend";
 import { isTable } from "@firetable/floor-creator";
 import { isPlannedReservation, ReservationStatus } from "@firetable/types";
 import { storeToRefs } from "pinia";
@@ -34,6 +27,13 @@ import EventCreateReservation from "src/components/Event/reservation/EventCreate
 import EventShowReservation from "src/components/Event/reservation/EventShowReservation.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import { useDialog } from "src/composables/useDialog";
+import {
+    addReservation,
+    deleteReservation,
+    moveReservationFromQueue,
+    moveReservationToQueue,
+    updateReservationDoc,
+} from "src/db";
 import { isEventInProgress } from "src/helpers/event/is-event-in-progress";
 import { determineTableColor } from "src/helpers/floor";
 import { hashString } from "src/helpers/hash-string";

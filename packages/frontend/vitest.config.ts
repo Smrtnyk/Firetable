@@ -31,7 +31,7 @@ export default defineConfig({
             optimizer: {
                 web: {
                     enabled: true,
-                    include: ["@vue/test-utils", "quasar", "vue-i18n", "pinia", "@firetable/backend", "@pinia/testing", "vue"],
+                    include: ["@vue/test-utils", "quasar", "vue-i18n", "pinia", "@pinia/testing", "vue"],
                 }
             }
         },

@@ -33,7 +33,7 @@ vi.mock("src/composables/useFirestore", () => ({
     useFirestoreCollection: useFirestoreCollectionMock,
 }));
 
-vi.mock("@firetable/backend", () => ({
+vi.mock("src/db", () => ({
     deleteIssueReport: deleteIssueReportMock,
     getIssueReportsPath: vi.fn(),
     updateIssueReport: updateIssueReportMock,

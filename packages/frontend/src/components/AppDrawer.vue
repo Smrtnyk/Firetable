@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { GuardedLink, LinkWithChildren } from "src/types";
 
-import { logoutUser } from "@firetable/backend";
 import { Role } from "@firetable/types";
 import { storeToRefs } from "pinia";
 import { Dark, LocalStorage } from "quasar";
 import { dynamicallySwitchLang } from "src/boot/i18n";
 import AppDrawerLink from "src/components/AppDrawerLink.vue";
+import { logoutUser } from "src/db";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";
 import { usePermissionsStore } from "src/stores/permissions-store";

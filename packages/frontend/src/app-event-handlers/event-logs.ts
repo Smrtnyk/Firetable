@@ -1,8 +1,8 @@
-import type { EventOwner } from "@firetable/backend";
 import type { ReservationDoc } from "@firetable/types";
+import type { EventOwner } from "src/db";
 
-import { addLogToEvent } from "@firetable/backend";
 import { eventEmitter } from "src/boot/event-emitter";
+import { addLogToEvent } from "src/db";
 import { AppLogger } from "src/logger/FTLogger";
 import { useAuthStore } from "src/stores/auth-store";
 

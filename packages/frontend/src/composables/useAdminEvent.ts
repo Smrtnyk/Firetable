@@ -1,4 +1,3 @@
-import type { EventOwner } from "@firetable/backend";
 import type {
     EventDoc,
     EventFloorDoc,
@@ -7,14 +6,8 @@ import type {
     ReservationDoc,
     User,
 } from "@firetable/types";
+import type { EventOwner } from "src/db";
 
-import {
-    getEventFloorsPath,
-    getEventLogsPath,
-    getEventPath,
-    getReservationsPath,
-    usersCollection,
-} from "@firetable/backend";
 import { isPlannedReservation } from "@firetable/types";
 import { property } from "es-toolkit/compat";
 import {
@@ -22,6 +15,13 @@ import {
     useFirestoreCollection,
     useFirestoreDocument,
 } from "src/composables/useFirestore";
+import {
+    getEventFloorsPath,
+    getEventLogsPath,
+    getEventPath,
+    getReservationsPath,
+    usersCollection,
+} from "src/db";
 import { decompressFloorDoc } from "src/helpers/compress-floor-doc";
 import { AppLogger } from "src/logger/FTLogger.js";
 import { computed, watch } from "vue";

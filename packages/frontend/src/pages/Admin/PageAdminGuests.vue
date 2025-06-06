@@ -2,7 +2,6 @@
 import type { CreateGuestPayload } from "@firetable/types";
 import type { SortDirection, SortOption } from "src/components/admin/guest/GuestSortOptions.vue";
 
-import { batchDeleteGuests, createGuest } from "@firetable/backend";
 import { useLocalStorage } from "@vueuse/core";
 import { lowerCase, uniq } from "es-toolkit";
 import { property } from "es-toolkit/compat";
@@ -17,6 +16,7 @@ import FTDialog from "src/components/FTDialog.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import GuestSummaryChips from "src/components/guest/GuestSummaryChips.vue";
 import { useDialog } from "src/composables/useDialog";
+import { batchDeleteGuests, createGuest } from "src/db";
 import { isMobile } from "src/global-reactives/screen-detection";
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";

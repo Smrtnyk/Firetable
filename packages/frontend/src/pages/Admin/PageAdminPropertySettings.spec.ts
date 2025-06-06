@@ -15,7 +15,7 @@ const { updateOrganisationSettingsMock, updatePropertySettingsMock } = vi.hoiste
     updatePropertySettingsMock: vi.fn(),
 }));
 
-vi.mock("@firetable/backend", () => ({
+vi.mock("src/db", () => ({
     fetchOrganisationById: vi.fn(),
     fetchOrganisationsForAdmin: vi.fn(),
     fetchPropertiesForAdmin: vi.fn(),

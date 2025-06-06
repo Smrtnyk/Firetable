@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { CreateOrganisationPayload } from "@firetable/backend";
+import type { CreateOrganisationPayload } from "src/db";
 import type { Link } from "src/types";
 
-import { createNewOrganisation } from "@firetable/backend";
 import { storeToRefs } from "pinia";
 import { useQuasar } from "quasar";
 import AddNewOrganisationForm from "src/components/admin/organisation/AddNewOrganisationForm.vue";
@@ -11,6 +10,7 @@ import FTCenteredText from "src/components/FTCenteredText.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import { useDialog } from "src/composables/useDialog";
+import { createNewOrganisation } from "src/db";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { ref } from "vue";

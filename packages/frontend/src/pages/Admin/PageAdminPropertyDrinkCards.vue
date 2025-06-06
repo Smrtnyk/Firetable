@@ -1,14 +1,6 @@
 <script setup lang="ts">
 import type { CreateDrinkCardPayload, DrinkCardDoc, InventoryItemDoc } from "@firetable/types";
 
-import {
-    createDrinkCard,
-    deleteDrinkCard,
-    getDrinkCardsPath,
-    getInventoryPath,
-    updateDrinkCard,
-    uploadPDF,
-} from "@firetable/backend";
 import { isPDFDrinkCard } from "@firetable/types";
 import { Loading } from "quasar";
 import DrinkCardCreateForm from "src/components/admin/drink-cards/DrinkCardCreateForm.vue";
@@ -20,6 +12,14 @@ import FTDialog from "src/components/FTDialog.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import { useDialog } from "src/composables/useDialog.js";
 import { useFirestoreCollection } from "src/composables/useFirestore.js";
+import {
+    createDrinkCard,
+    deleteDrinkCard,
+    getDrinkCardsPath,
+    getInventoryPath,
+    updateDrinkCard,
+    uploadPDF,
+} from "src/db";
 import { getPublicUrForDrinkCard } from "src/helpers/drink-card/drink-card";
 import {
     notifyPositive,

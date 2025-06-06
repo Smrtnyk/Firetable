@@ -1,12 +1,7 @@
 <script setup lang="ts">
-import type { EventOwner } from "@firetable/backend";
 import type { GuestInGuestListData, VoidFunction } from "@firetable/types";
+import type { EventOwner } from "src/db";
 
-import {
-    addGuestToGuestList,
-    confirmGuestFromGuestList,
-    deleteGuestFromGuestList,
-} from "@firetable/backend";
 import { AdminRole, Role } from "@firetable/types";
 import { storeToRefs } from "pinia";
 import EventGuestListCreateGuestForm from "src/components/Event/EventGuestListCreateGuestForm.vue";
@@ -15,6 +10,7 @@ import FTCenteredText from "src/components/FTCenteredText.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import { useDialog } from "src/composables/useDialog";
+import { addGuestToGuestList, confirmGuestFromGuestList, deleteGuestFromGuestList } from "src/db";
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";
 import { useEventsStore } from "src/stores/events-store";

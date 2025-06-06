@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { FloorDoc, VoidFunction } from "@firetable/types";
 
-import { addFloor, deleteFloor } from "@firetable/backend";
 import {
     FLOOR_DEFAULT_HEIGHT,
     FLOOR_DEFAULT_WIDTH,
@@ -16,6 +15,7 @@ import FTDialog from "src/components/FTDialog.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import { useDialog } from "src/composables/useDialog";
 import { useFloors } from "src/composables/useFloors";
+import { addFloor, deleteFloor } from "src/db";
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { watch } from "vue";
 import { useI18n } from "vue-i18n";

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { updatePropertySettings } from "@firetable/backend";
 import { cloneDeep } from "es-toolkit";
 import SettingsSection from "src/components/admin/organisation-settings/SettingsSection.vue";
 import AppCardSection from "src/components/AppCardSection.vue";
@@ -9,6 +8,7 @@ import FTTimezoneList from "src/components/FTTimezoneList.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import { useDialog } from "src/composables/useDialog";
 import { useHasChanged } from "src/composables/useHasChanged";
+import { updatePropertySettings } from "src/db";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { computed, ref } from "vue";

@@ -1,12 +1,12 @@
 import type { AppUser, User, VoidFunction } from "@firetable/types";
 import type { User as FBUser } from "firebase/auth";
 
-import { getUserPath, logoutUser } from "@firetable/backend";
 import { AdminRole, Role } from "@firetable/types";
 import { noop } from "es-toolkit/function";
 import { defineStore } from "pinia";
 import { Loading } from "quasar";
 import { useFirestoreDocument } from "src/composables/useFirestore";
+import { getUserPath, logoutUser } from "src/db";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { AppLogger } from "src/logger/FTLogger";
 import { usePropertiesStore } from "src/stores/properties-store";

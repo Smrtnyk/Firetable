@@ -35,7 +35,7 @@ jobs:
                     pnpm --filter frontend exec playwright install
 
             - name: Prepare Firebase Config
-              run: cp packages/backend/src/firebase/fb-config-template.json packages/backend/src/firebase/fb-config.json
+              run: cp packages/frontend/src/db/fb-config-template.json packages/frontend/src/db/fb-config.json
 
             - name: Lint
               run: pnpm run lint

@@ -1,6 +1,6 @@
-import type { EventOwner } from "@firetable/backend";
 import type { FloorViewer } from "@firetable/floor-creator";
 import type { EventDoc, ReservationDoc } from "@firetable/types";
+import type { EventOwner } from "src/db";
 import type { ComputedRef, Ref } from "vue";
 
 import { matchesProperty } from "es-toolkit/compat";

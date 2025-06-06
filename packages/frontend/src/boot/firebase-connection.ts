@@ -1,7 +1,7 @@
 import type { Router } from "vue-router";
 
-import { initializeFirebase } from "@firetable/backend";
 import { boot } from "quasar/wrappers";
+import { initializeFirebase } from "src/db";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { refreshApp } from "src/helpers/utils";
 import { createAuthGuard } from "src/router/auth-guard";
