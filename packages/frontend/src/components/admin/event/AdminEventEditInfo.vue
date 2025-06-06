@@ -10,10 +10,10 @@
 </template>
 
 <script setup lang="ts">
-import type { EventOwner } from "@firetable/backend";
+import type { EventOwner } from "src/db";
 
-import { updateEvent } from "@firetable/backend";
 import FTBtn from "src/components/FTBtn.vue";
+import { updateEvent } from "src/db";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { ref } from "vue";
 

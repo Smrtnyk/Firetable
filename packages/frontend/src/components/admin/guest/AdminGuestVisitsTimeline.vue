@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { Visit } from "@firetable/types";
 
-import { updateGuestVisit } from "@firetable/backend";
 import EditVisitDialog from "src/components/admin/guest/EditVisitDialog.vue";
 import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPChip.vue";
 import FTDialog from "src/components/FTDialog.vue";
 import { useDialog } from "src/composables/useDialog";
+import { updateGuestVisit } from "src/db";
 import { buttonSize } from "src/global-reactives/screen-detection";
 import { formatEventDate } from "src/helpers/date-utils";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";

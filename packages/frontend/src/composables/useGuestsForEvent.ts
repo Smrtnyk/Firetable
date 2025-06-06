@@ -1,5 +1,5 @@
-import type { EventOwner } from "@firetable/backend";
 import type { GuestDoc, ReservationDoc } from "@firetable/types";
+import type { EventOwner } from "src/db";
 import type { Ref } from "vue";
 
 import { uniq } from "es-toolkit";

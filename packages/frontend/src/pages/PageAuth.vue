@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { loginWithEmail } from "@firetable/backend";
 import { Loading, QForm } from "quasar";
+import { loginWithEmail } from "src/db";
 import { minLength, noEmptyString } from "src/helpers/form-rules";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { ref, useTemplateRef } from "vue";

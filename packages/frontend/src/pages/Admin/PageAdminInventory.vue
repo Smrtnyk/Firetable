@@ -1,12 +1,6 @@
 <script setup lang="ts">
 import type { CreateInventoryItemPayload, InventoryItemDoc } from "@firetable/types";
 
-import {
-    addInventoryItem,
-    deleteInventoryItem,
-    getInventoryPath,
-    updateInventoryItem,
-} from "@firetable/backend";
 import { DrinkMainCategory, RetailMainCategory } from "@firetable/types";
 import { omit } from "es-toolkit";
 import { Loading } from "quasar";
@@ -19,6 +13,12 @@ import FTDialog from "src/components/FTDialog.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import { useDialog } from "src/composables/useDialog.js";
 import { useFirestoreCollection } from "src/composables/useFirestore.js";
+import {
+    addInventoryItem,
+    deleteInventoryItem,
+    getInventoryPath,
+    updateInventoryItem,
+} from "src/db";
 import { getEnumValues } from "src/helpers/get-enum-values";
 import { exportInventory } from "src/helpers/inventory/export-inventory";
 import { importInventory } from "src/helpers/inventory/import-inventory";

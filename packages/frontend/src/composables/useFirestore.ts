@@ -8,9 +8,9 @@ import type {
     VueFirestoreQueryData,
 } from "vuefire";
 
-import { initializeFirebase } from "@firetable/backend";
 import { isString } from "es-toolkit";
 import { collection, doc, query, setDoc } from "firebase/firestore";
+import { initializeFirebase } from "src/db";
 import { useCollection, useDocument } from "vuefire";
 
 export function createQuery<T>(

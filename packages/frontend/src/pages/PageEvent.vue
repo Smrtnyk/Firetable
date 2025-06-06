@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { EventOwner } from "@firetable/backend";
 import type {
     EventDoc,
     EventFloorDoc,
@@ -9,17 +8,8 @@ import type {
     QueuedReservationDoc,
     ReservationDoc,
 } from "@firetable/types";
+import type { EventOwner } from "src/db";
 
-import {
-    deleteQueuedReservation,
-    fetchUsersByRole,
-    getEventFloorsPath,
-    getEventGuestListPath,
-    getEventPath,
-    queuedReservationsCollection,
-    reservationsCollection,
-    saveQueuedReservation,
-} from "@firetable/backend";
 import { isPlannedReservation, ReservationStatus } from "@firetable/types";
 import { useAsyncState } from "@vueuse/core";
 import { where } from "firebase/firestore";
@@ -41,6 +31,16 @@ import {
 } from "src/composables/useFirestore";
 import { useFloorsPageEvent } from "src/composables/useFloorsPageEvent";
 import { useGuestsForEvent } from "src/composables/useGuestsForEvent";
+import {
+    deleteQueuedReservation,
+    fetchUsersByRole,
+    getEventFloorsPath,
+    getEventGuestListPath,
+    getEventPath,
+    queuedReservationsCollection,
+    reservationsCollection,
+    saveQueuedReservation,
+} from "src/db";
 import { exportReservations } from "src/helpers/reservation/export-reservations";
 import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useEventsStore } from "src/stores/events-store";

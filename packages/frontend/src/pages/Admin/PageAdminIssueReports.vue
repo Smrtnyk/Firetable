@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { IssueReportDoc } from "@firetable/types";
 
-import { deleteIssueReport, getIssueReportsPath, updateIssueReport } from "@firetable/backend";
 import { IssueCategory, IssueStatus } from "@firetable/types";
 import { useQuasar } from "quasar";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import { useFirestoreCollection } from "src/composables/useFirestore";
+import { deleteIssueReport, getIssueReportsPath, updateIssueReport } from "src/db";
 import { getIssueStatusColor } from "src/helpers/issue-helpers";
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useI18n } from "vue-i18n";

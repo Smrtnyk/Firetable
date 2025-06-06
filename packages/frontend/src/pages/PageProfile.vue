@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { submitNewPassword } from "@firetable/backend";
 import { storeToRefs } from "pinia";
 import FTTitle from "src/components/FTTitle.vue";
+import { submitNewPassword } from "src/db";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";
 import { computed, nextTick, ref, useTemplateRef } from "vue";

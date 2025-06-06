@@ -25,7 +25,7 @@ vi.mock("src/composables/useFirestore", () => ({
     useFirestoreCollection: useFirestoreCollectionSpy,
 }));
 
-vi.mock("@firetable/backend", () => ({
+vi.mock("src/db", () => ({
     fetchOrganisationById: vi.fn(),
     fetchOrganisationsForAdmin: fetchOrganisationsForAdminSpy,
     fetchPropertiesForAdmin: fetchPropertiesForAdminSpy,

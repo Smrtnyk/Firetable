@@ -1,9 +1,9 @@
-import type { EventOwner } from "@firetable/backend";
 import type { EventDoc, GuestDataPayload, Reservation } from "@firetable/types";
+import type { EventOwner } from "src/db";
 
-import { deleteGuestVisit, setGuestData } from "@firetable/backend";
 import { isPlannedReservation } from "@firetable/types";
 import { eventEmitter } from "src/boot/event-emitter";
+import { deleteGuestVisit, setGuestData } from "src/db";
 import { hashString } from "src/helpers/hash-string";
 import { maskPhoneNumber } from "src/helpers/mask-phone-number";
 import { AppLogger } from "src/logger/FTLogger";

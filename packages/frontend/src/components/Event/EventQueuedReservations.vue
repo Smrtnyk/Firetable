@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { EventOwner } from "@firetable/backend";
 import type {
     EventDoc,
     PlannedReservation,
@@ -7,6 +6,7 @@ import type {
     QueuedReservationDoc,
     User,
 } from "@firetable/types";
+import type { EventOwner } from "src/db";
 
 import { storeToRefs } from "pinia";
 import EventCreateReservation from "src/components/Event/reservation/EventCreateReservation.vue";

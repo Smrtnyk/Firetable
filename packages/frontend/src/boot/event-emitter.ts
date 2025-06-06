@@ -1,6 +1,6 @@
-import type { EventOwner } from "@firetable/backend";
 import type { BaseTable } from "@firetable/floor-creator";
 import type { EventDoc, Reservation, ReservationDoc } from "@firetable/types";
+import type { EventOwner } from "src/db";
 
 import { EventEmitter } from "@posva/event-emitter";
 

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { DrinkCardDoc, PropertyDoc } from "@firetable/types";
 
-import { getDrinkCardsPath, getPropertyPath } from "@firetable/backend";
 import { isCustomDrinkCard, isPDFDrinkCard } from "@firetable/types";
 import { where } from "firebase/firestore";
 import { Loading } from "quasar";
@@ -12,6 +11,7 @@ import {
     useFirestoreCollection,
     useFirestoreDocument,
 } from "src/composables/useFirestore.js";
+import { getDrinkCardsPath, getPropertyPath } from "src/db";
 import { computed, onMounted, ref } from "vue";
 
 interface Props {

@@ -9,18 +9,18 @@ import type {
 } from "@firetable/types";
 import type { noop } from "es-toolkit";
 
-import {
-    fetchOrganisationById,
-    fetchOrganisationsForAdmin,
-    fetchPropertiesForAdmin,
-    propertiesCollection,
-} from "@firetable/backend";
 import { Role } from "@firetable/types";
 import { cloneDeep, merge } from "es-toolkit";
 import { matchesProperty } from "es-toolkit/compat";
 import { documentId, query, where } from "firebase/firestore";
 import { defineStore } from "pinia";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
+import {
+    fetchOrganisationById,
+    fetchOrganisationsForAdmin,
+    fetchPropertiesForAdmin,
+    propertiesCollection,
+} from "src/db";
 import { getDefaultTimezone } from "src/helpers/date-utils";
 import { AppLogger } from "src/logger/FTLogger";
 import { ref, watch } from "vue";

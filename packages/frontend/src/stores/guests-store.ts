@@ -1,15 +1,15 @@
-import type { GuestsSubscriptionCallback } from "@firetable/backend";
 import type { GuestDoc, PropertyDoc, Visit } from "@firetable/types";
+import type { GuestsSubscriptionCallback } from "src/db";
 import type { Ref } from "vue";
 import type { VueFirestoreDocumentData } from "vuefire";
 
-import { getGuestsPath, subscribeToGuests } from "@firetable/backend";
 import { chunk, omit, omitBy } from "es-toolkit";
 import { first, matchesProperty } from "es-toolkit/compat";
 import { isNotNil } from "es-toolkit/predicate";
 import { where } from "firebase/firestore";
 import { defineStore } from "pinia";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
+import { getGuestsPath, subscribeToGuests } from "src/db";
 import { AppLogger } from "src/logger/FTLogger";
 import { useAuthStore } from "src/stores/auth-store";
 import { usePropertiesStore } from "src/stores/properties-store";
@@ -40,8 +40,7 @@ export const useGuestsStore = defineStore("guests", function () {
 
     function hasPropertyAccess(propertyId: string): boolean {
         return (
-            authStore.isAdmin === true ||
-            authStore.nonNullableUser.relatedProperties.includes(propertyId)
+            authStore.isAdmin || authStore.nonNullableUser.relatedProperties.includes(propertyId)
         );
     }
 

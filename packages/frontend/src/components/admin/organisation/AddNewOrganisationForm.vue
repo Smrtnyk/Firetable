@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CreateOrganisationPayload } from "@firetable/backend";
+import type { CreateOrganisationPayload } from "src/db";
 
 import { OrganisationStatus } from "@firetable/types";
 import { QForm } from "quasar";

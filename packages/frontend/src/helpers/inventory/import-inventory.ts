@@ -1,6 +1,5 @@
 import type { CreateInventoryItemPayload, InventoryItemDoc } from "@firetable/types";
 
-import { addInventoryItem, updateInventoryItem } from "@firetable/backend";
 import {
     DrinkMainCategory,
     InventoryItemType,
@@ -9,6 +8,7 @@ import {
     RetailMainCategory,
 } from "@firetable/types";
 import { parse } from "papaparse";
+import { addInventoryItem, updateInventoryItem } from "src/db";
 import { getEnumValues } from "src/helpers/get-enum-values";
 
 interface ImportInventoryParams {

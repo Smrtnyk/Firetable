@@ -1,12 +1,6 @@
 <script setup lang="ts">
 import type { IssueReportDoc } from "@firetable/types";
 
-import {
-    createIssueReport,
-    deleteIssueReport,
-    getIssueReportsPath,
-    updateIssueReport,
-} from "@firetable/backend";
 import { IssueCategory, IssueStatus } from "@firetable/types";
 import { where } from "firebase/firestore";
 import { useQuasar } from "quasar";
@@ -18,6 +12,12 @@ import IssueCreateForm from "src/components/issue/IssueCreateForm.vue";
 import { useDialog } from "src/composables/useDialog";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
 import { ONE_MINUTE } from "src/constants";
+import {
+    createIssueReport,
+    deleteIssueReport,
+    getIssueReportsPath,
+    updateIssueReport,
+} from "src/db";
 import { getIssueStatusColor } from "src/helpers/issue-helpers";
 import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";
