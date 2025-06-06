@@ -1,9 +1,9 @@
 {
     "apiKey": "any-string",
     "authDomain": "localhost",
-    "databaseURL": "http://localhost:9000?ns=test-project",
-    "projectId": "test-project",
-    "storageBucket": "test-project.appspot.com",
+    "databaseURL": "http://localhost:9000?ns=demo-project",
+    "projectId": "demo-project",
+    "storageBucket": "demo-project.appspot.com",
     "messagingSenderId": "any-string",
     "appId": "any-string"
 }

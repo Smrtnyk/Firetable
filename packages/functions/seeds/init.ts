@@ -5,7 +5,7 @@ import { getFirestore } from "firebase-admin/firestore";
 import { EMULATOR_HOST } from "./config.js";
 
 initializeApp({
-    projectId: "test-project",
+    projectId: "demo-project",
 });
 
 const firestore = getFirestore();
