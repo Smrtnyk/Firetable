@@ -4,7 +4,7 @@
             <div class="row justify-center q-mb-md">
                 <button
                     class="dialog-pill cursor-pointer"
-                    aria-label="Close bottom dialog"
+                    :aria-label="t('FTBottomDialog.closeBottomDialogAriaLabel')"
                     @click="onDialogHide"
                 />
             </div>
@@ -18,6 +18,7 @@
 import type { ComponentPublicInstance } from "vue";
 
 import { useDialogPluginComponent } from "quasar";
+import { useI18n } from "vue-i18n";
 
 interface Props {
     component: ComponentPublicInstance;
@@ -27,6 +28,7 @@ interface Props {
 
 const { component, componentPropsObject, listeners } = defineProps<Props>();
 const { dialogRef, onDialogHide } = useDialogPluginComponent();
+const { t } = useI18n();
 
 defineEmits(useDialogPluginComponent.emits);
 </script>

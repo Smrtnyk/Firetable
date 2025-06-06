@@ -1,6 +1,10 @@
 import type { TranslationStructure } from "src/i18n/en-GB";
 
 const hr: TranslationStructure = {
+    AddNewFloorForm: {
+        floorNameLabel: "Naziv kata *",
+        floorNameExistsError: "Kat s istim nazivom već postoji!",
+    },
     AddNewGuestForm: {
         guestNameInputLabel: "Ime gosta *",
     },
@@ -10,6 +14,13 @@ const hr: TranslationStructure = {
     },
     AppDrawer: {
         languageSelectorLabel: "Jezik",
+        logoutAriaLabel: "Odjavi se",
+        languages: {
+            english: "Engleski",
+            german: "Njemački",
+            spanish: "Španjolski",
+            croatian: "Hrvatski",
+        },
         links: {
             issueReportsOverview: "Pregled prijava problema",
             logout: "Odjava",
@@ -28,6 +39,9 @@ const hr: TranslationStructure = {
             darkMode: "Prebaci na tamni način",
             onlineStatus: "Prebaci status online",
         },
+    },
+    AppTopMenu: {
+        menuAriaLabel: "Izbornik",
     },
     EventCard: {
         freeLabel: "Besplatno",
@@ -70,6 +84,10 @@ const hr: TranslationStructure = {
     },
     EventGuestSearch: {
         label: "Pretraži stolove po imenu gosta...",
+        hideArrivedLabel: "Sakrij pristigle",
+        guestArrivedIconAriaLabel: "Ikona oznake dolaska gosta",
+        noResultsText: "Nema rezultata",
+        onFloorConnector: "na",
     },
     EventInfo: {
         eventInfoEmptyMsg: "Nema opisa događaja za ovaj događaj!",
@@ -101,6 +119,12 @@ const hr: TranslationStructure = {
         unlinkTablesLabel: "Odvoji stolove",
         waitingForResponse: "Čekanje na odgovor",
     },
+    FTBottomDialog: {
+        closeBottomDialogAriaLabel: "Zatvori donji dijalog",
+    },
+    FTDialog: {
+        closeDialogAriaLabel: "Zatvori dijalog",
+    },
     FTTimeframeSelector: {
         apply: "Primijeni",
         cancel: "Otkaži",
@@ -116,6 +140,62 @@ const hr: TranslationStructure = {
         selectTimeframe: "Odaberite vremenski okvir",
         today: "Danas",
         yesterday: "Jučer",
+        to: "do",
+        customDateRangePickerAriaLabel: "Prilagođeni birač raspona datuma",
+        clearCustomDateRangeAriaLabel: "Očisti prilagođeni raspon datuma",
+        cancelCustomDateRangeAriaLabel: "Otkaži prilagođeni raspon datuma",
+        applyCustomDateRangeAriaLabel: "Primijeni prilagođeni raspon datuma",
+    },
+    FTTimezoneList: {
+        searchTimezonesPlaceholder: "Pretraži vremenske zone...",
+        searchTimezonesAriaLabel: "Pretraži vremenske zone",
+    },
+    NetworkOverlay: {
+        noInternetConnectionText: "Nema internetske veze",
+        waitOrReloadText: "Pričekajte ili pokušajte ponovno učitati stranicu",
+        reloadButtonLabel: "Ponovno učitaj",
+    },
+    TelNumberInput: {
+        clearButtonLabel: "Očisti",
+        selectCountryCodeValidationMsg: "Molimo odaberite pozivni broj zemlje",
+        provideCountryAndNumberValidationMsg: "Molimo unesite i pozivni broj zemlje i broj telefona",
+        invalidPhoneNumberValidationMsg: "Nevažeći telefonski broj",
+    },
+    PieChart: {
+        tooltipValue: "Vrijednost",
+        tooltipPercentage: "Postotak",
+    },
+    DrinkBundleDialog: {
+        bundleNameLabel: "Naziv Paketa",
+        descriptionOptionalLabel: "Opis (Neobavezno)",
+        selectDrinkLabel: "Odaberi Piće",
+        qtyLabel: "Kol.",
+        bundlePriceLabel: "Cijena Paketa",
+        nameIsRequiredError: "Naziv je obavezan",
+        pleaseSelectDrinkError: "Molimo odaberite piće",
+        quantityGreaterThanZeroError: "Količina mora biti veća od 0",
+        priceGreaterThanZeroError: "Cijena je obavezna i mora biti veća od 0",
+        bundlePriceLowerThanRegularError: "Cijena paketa treba biti niža od redovne cijene",
+        fillRequiredFieldsError: "Molimo ispunite sva obavezna polja",
+        savePercentageText: "Uštedi {percentage}%",
+        createBundleButtonLabel: "Kreiraj Paket",
+        removeItemConfirmMsg: "Jeste li sigurni da želite ukloniti ovu stavku?",
+        unknownItemText: "Nepoznata Stavka",
+        cancelButtonLabel: "Odustani",
+    },
+    DrinkCardBuilderAddDragElementsDropdown: {
+        addHeaderLabel: "Dodaj Zaglavlje",
+        addHeaderEndLabel: "Dodaj Kraj Zaglavlja",
+        addBundleLabel: "Dodaj Paket",
+        editBundleDialogTitle: "Uredi Paket",
+        createBundleDialogTitle: "Kreiraj Paket",
+    },
+    DrinkCardBuilderCustomSectionDialog: {
+        nameIsRequiredError: "Naziv je obavezan",
+    },
+    DrinkCardBuilderItemSelectionDialog: {
+        searchItemsPlaceholder: "Pretraži stavke",
+        noItemsFoundText: "Nema pronađenih stavki",
     },
     Global: {
         actions: "Radnje",

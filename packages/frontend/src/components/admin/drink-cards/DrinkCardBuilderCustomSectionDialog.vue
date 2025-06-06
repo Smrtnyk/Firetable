@@ -43,7 +43,7 @@ function handleCustomSectionSubmit(): void {
                 :label="t('PageAdminPropertyDrinkCards.sectionNameLabel')"
                 standout
                 rounded
-                :rules="[noEmptyString('Name is required')]"
+                :rules="[noEmptyString(t('DrinkCardBuilderCustomSectionDialog.nameIsRequiredError'))]"
             />
 
             <div class="text-caption">

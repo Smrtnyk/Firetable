@@ -34,7 +34,7 @@ function createTableLabel(reservation: PlannedReservation): string {
     const label = `${reservation.guestName} (${reservation.tableLabel})`;
     if (props.showFloorNameInOption) {
         const floorName = props.floors.find(matchesProperty("id", reservation.floorId));
-        return `${label} on ${floorName?.name}`;
+        return `${label} ${t('EventGuestSearch.onFloorConnector')} ${floorName?.name}`;
     }
     return label;
 }
@@ -151,7 +151,7 @@ function setModel(val: string): void {
             <template #before-options>
                 <q-item>
                     <q-item-section>
-                        <q-checkbox v-model="hideArrived" label="Hide arrived" dense @click.stop />
+                        <q-checkbox v-model="hideArrived" :label="t('EventGuestSearch.hideArrivedLabel')" dense @click.stop />
                     </q-item-section>
                 </q-item>
             </template>
@@ -168,7 +168,7 @@ function setModel(val: string): void {
                         <q-icon
                             name="check"
                             color="green"
-                            aria-label="Guest arrived checkmark icon"
+                            :aria-label="t('EventGuestSearch.guestArrivedIconAriaLabel')"
                         />
                     </q-item-section>
                     <q-item-section v-if="scope.opt.isVip" side>
@@ -179,7 +179,7 @@ function setModel(val: string): void {
 
             <template #no-option>
                 <q-item>
-                    <q-item-section class="text-grey"> No results </q-item-section>
+                    <q-item-section class="text-grey"> {{ t('EventGuestSearch.noResultsText') }} </q-item-section>
                 </q-item>
             </template>
         </q-select>

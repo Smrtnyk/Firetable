@@ -42,7 +42,7 @@ function showBundleDialog(bundleToEdit?: DrinkBundle): void {
                     dialog.hide();
                 },
             },
-            title: bundleToEdit ? "Edit Bundle" : "Create Bundle",
+            title: bundleToEdit ? t('DrinkCardBuilderAddDragElementsDropdown.editBundleDialogTitle') : t('DrinkCardBuilderAddDragElementsDropdown.createBundleDialogTitle'),
         },
     });
 }
@@ -70,15 +70,15 @@ defineExpose({ showBundleDialog });
     <q-btn-dropdown flat rounded color="primary" icon="fa fa-plus" class="button-gradient">
         <q-list>
             <q-item clickable v-close-popup @click="$emit('add-header')">
-                <q-item-section>Add Header</q-item-section>
+                <q-item-section>{{ t('DrinkCardBuilderAddDragElementsDropdown.addHeaderLabel') }}</q-item-section>
             </q-item>
 
             <q-item clickable v-close-popup @click="$emit('add-header-end')">
-                <q-item-section>Add Header End</q-item-section>
+                <q-item-section>{{ t('DrinkCardBuilderAddDragElementsDropdown.addHeaderEndLabel') }}</q-item-section>
             </q-item>
 
             <q-item clickable v-close-popup @click="showBundleDialog()">
-                <q-item-section>Add Bundle</q-item-section>
+                <q-item-section>{{ t('DrinkCardBuilderAddDragElementsDropdown.addBundleLabel') }}</q-item-section>
             </q-item>
 
             <q-item clickable v-close-popup @click="showCustomSectionDialog">

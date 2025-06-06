@@ -102,12 +102,12 @@ function getItemName(itemId: string): string {
     const item = props.availableItems.find(function ({ inventoryItemId }) {
         return inventoryItemId === itemId;
     });
-    return item?.name ?? "Unknown Item";
+    return item?.name ?? t('DrinkBundleDialog.unknownItemText');
 }
 
 function handleBundleSubmit(): void {
     if (!bundle.value.name || bundle.value.items.length === 0) {
-        showErrorMessage("Please fill in all required fields");
+        showErrorMessage(t('DrinkBundleDialog.fillRequiredFieldsError'));
         return;
     }
 
@@ -174,7 +174,7 @@ function openItemSelectionDialog(index: number): void {
 }
 
 async function removeBundleItem(index: number): Promise<void> {
-    const confirmed = await showConfirm("Are you sure you want to remove this item?");
+    const confirmed = await showConfirm(t('DrinkBundleDialog.removeItemConfirmMsg'));
 
     if (!confirmed) return;
 
@@ -187,33 +187,33 @@ async function removeBundleItem(index: number): Promise<void> {
         <q-card-section class="q-gutter-y-md">
             <q-input
                 v-model="bundle.name"
-                label="Bundle Name"
-                :rules="[noEmptyString('Name is required')]"
+                :label="t('DrinkBundleDialog.bundleNameLabel')"
+                :rules="[noEmptyString(t('DrinkBundleDialog.nameIsRequiredError'))]"
                 standout
                 rounded
             />
 
             <q-input
                 v-model="bundle.description"
-                label="Description (Optional)"
+                :label="t('DrinkBundleDialog.descriptionOptionalLabel')"
                 type="textarea"
                 standout
                 rounded
             />
 
             <!-- Item Selection -->
-            <div class="text-subtitle2 q-mb-sm">Bundle Items</div>
+            <div class="text-subtitle2 q-mb-sm">{{ t('DrinkBundleDialog.bundleItemsLabel', { count: bundle.items.length }) }}</div>
             <div v-for="(item, index) in bundle.items" :key="index" class="q-mb-md">
                 <div class="row q-col-gutter-sm items-center">
                     <div class="col">
                         <q-input
-                            :label="'Select Drink'"
+                            :label="t('DrinkBundleDialog.selectDrinkLabel')"
                             :model-value="getItemName(item.inventoryItemId)"
                             readonly
                             @click="openItemSelectionDialog(index)"
                             standout
                             rounded
-                            :rules="[noEmptyString('Please select a drink')]"
+                            :rules="[noEmptyString(t('DrinkBundleDialog.pleaseSelectDrinkError'))]"
                             class="cursor-pointer"
                         />
                     </div>
@@ -221,10 +221,10 @@ async function removeBundleItem(index: number): Promise<void> {
                         <q-input
                             v-model.number="item.quantity"
                             type="number"
-                            label="Qty"
+                            :label="t('DrinkBundleDialog.qtyLabel')"
                             standout
                             rounded
-                            :rules="[greaterThanZero('Quantity must be greater than 0')]"
+                            :rules="[greaterThanZero(t('DrinkBundleDialog.quantityGreaterThanZeroError'))]"
                         />
                     </div>
                     <div class="col-auto">
@@ -250,34 +250,34 @@ async function removeBundleItem(index: number): Promise<void> {
                     <q-input
                         v-model.number="bundle.price"
                         type="number"
-                        label="Bundle Price"
+                        :label="t('DrinkBundleDialog.bundlePriceLabel')"
                         prefix="€"
                         standout
                         rounded
                         :rules="[
-                            greaterThanZero('Price is required and must be greater than 0'),
+                            greaterThanZero(t('DrinkBundleDialog.priceGreaterThanZeroError')),
                             numberInRange(
                                 0,
                                 calculateRegularPrice(bundle.items),
-                                'Bundle price should be lower than regular price',
+                                t('DrinkBundleDialog.bundlePriceLowerThanRegularError'),
                             ),
                         ]"
                     />
                 </div>
                 <div class="col-auto">
                     <div class="text-positive" v-if="bundle.price > 0">
-                        Save {{ calculateSavings(bundle) }}%
+                        {{ t('DrinkBundleDialog.savePercentageText', { percentage: calculateSavings(bundle) }) }}
                     </div>
                 </div>
             </div>
         </q-card-section>
 
         <q-card-actions align="right">
-            <q-btn flat label="Cancel" @click="closeDialog" />
+            <q-btn flat :label="t('DrinkBundleDialog.cancelButtonLabel')" @click="closeDialog" />
             <q-btn
                 rounded
                 class="button-gradient"
-                :label="isEditMode ? t('Global.submit') : 'Create Bundle'"
+                :label="isEditMode ? t('Global.submit') : t('DrinkBundleDialog.createBundleButtonLabel')"
                 @click="handleBundleSubmit"
             />
         </q-card-actions>

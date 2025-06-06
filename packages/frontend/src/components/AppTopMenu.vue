@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { refreshApp } from "src/helpers/utils";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const emit = defineEmits<(e: "toggle-drawer") => void>();
 const menuLinks = [
     {
@@ -33,7 +35,7 @@ const menuLinks = [
                 :icon="menu.icon"
             />
             <q-space />
-            <q-btn flat aria-label="Menu" @click="emit('toggle-drawer')">
+            <q-btn flat :aria-label="t('AppTopMenu.menuAriaLabel')" @click="emit('toggle-drawer')">
                 <q-icon size="2rem" name="fa fa-bars" />
             </q-btn>
         </q-tabs>

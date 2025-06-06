@@ -38,7 +38,7 @@
                 </span>
                 <span v-else>
                     <span v-if="dateRange && dateRange.from && dateRange.to">
-                        {{ formatDateDisplay(dateRange.from) }} to
+                        {{ formatDateDisplay(dateRange.from) }} {{ t('FTTimeframeSelector.to') }}
                         {{ formatDateDisplay(dateRange.to) }}
                     </span>
                     <span v-else> {{ t("FTTimeframeSelector.selectDateRange") }} </span>
@@ -67,14 +67,14 @@
                 :options="dateOptions"
                 @range-start="handleRangeStart"
                 @range-end="handleRangeEnd"
-                aria-label="Custom date range picker"
+                :aria-label="t('FTTimeframeSelector.customDateRangePickerAriaLabel')"
             >
                 <div class="row items-center justify-end q-gutter-sm">
                     <FTBtn
                         padding="sm"
                         icon="fa fa-trash"
                         color="negative"
-                        aria-label="Clear custom date range"
+                        :aria-label="t('FTTimeframeSelector.clearCustomDateRangeAriaLabel')"
                         @click="clearDateRange"
                         :disabled="!dateRange.from && !dateRange.to"
                     />
@@ -84,12 +84,12 @@
                         :label="t('FTTimeframeSelector.cancel')"
                         color="secondary"
                         @click="closeDateRangePicker"
-                        aria-label="Cancel custom date range"
+                        :aria-label="t('FTTimeframeSelector.cancelCustomDateRangeAriaLabel')"
                     />
                     <FTBtn
                         padding="sm"
                         :label="t('FTTimeframeSelector.apply')"
-                        aria-label="Apply custom date range"
+                        :aria-label="t('FTTimeframeSelector.applyCustomDateRangeAriaLabel')"
                         color="primary"
                         @click="applyDateRange"
                         :disabled="!isValidDateRange"

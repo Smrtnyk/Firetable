@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { timezones } from "src/helpers/date-utils";
 import { ref } from "vue";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const searchQuery = ref("");
 const emit = defineEmits<(event: "timezoneSelected", timezone: string) => void>();
 
@@ -21,13 +23,13 @@ function getFilteredTimezones(): string[] {
     <div class="timezone-selector">
         <q-input
             v-model="searchQuery"
-            placeholder="Search timezones..."
+            :placeholder="t('FTTimezoneList.searchTimezonesPlaceholder')"
             rounded
             standout
             dense
             class="q-mb-md"
             :debounce="300"
-            aria-label="Search timezones"
+            :aria-label="t('FTTimezoneList.searchTimezonesAriaLabel')"
         >
             <template #prepend>
                 <q-icon name="fa fa-search" />

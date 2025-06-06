@@ -1,6 +1,10 @@
 import type { TranslationStructure } from "src/i18n/en-GB";
 
 const de: TranslationStructure = {
+    AddNewFloorForm: {
+        floorNameLabel: "Etagenname *",
+        floorNameExistsError: "Etage mit diesem Namen existiert bereits!",
+    },
     AddNewGuestForm: {
         guestNameInputLabel: "Gastname *",
     },
@@ -10,6 +14,13 @@ const de: TranslationStructure = {
     },
     AppDrawer: {
         languageSelectorLabel: "Sprache",
+        logoutAriaLabel: "Abmelden",
+        languages: {
+            english: "Englisch",
+            german: "Deutsch",
+            spanish: "Spanisch",
+            croatian: "Kroatisch",
+        },
         links: {
             issueReportsOverview: "Fehlerberichte",
             logout: "Abmelden",
@@ -28,6 +39,9 @@ const de: TranslationStructure = {
             darkMode: "Dunkelmodus umschalten",
             onlineStatus: "Online-Status umschalten",
         },
+    },
+    AppTopMenu: {
+        menuAriaLabel: "Menü",
     },
     EventCard: {
         freeLabel: "Kostenlos",
@@ -71,6 +85,10 @@ const de: TranslationStructure = {
     },
     EventGuestSearch: {
         label: "Tische nach Gastnamen durchsuchen...",
+        hideArrivedLabel: "Angekommene ausblenden",
+        guestArrivedIconAriaLabel: "Symbol für angekommenen Gast",
+        noResultsText: "Keine Ergebnisse",
+        onFloorConnector: "auf",
     },
     EventInfo: {
         eventInfoEmptyMsg: "Es gibt keine Informationen zu dieser Veranstaltung.",
@@ -102,6 +120,12 @@ const de: TranslationStructure = {
         unlinkTablesLabel: "Tischverbindung aufheben",
         waitingForResponse: "Warte auf Rückmeldung",
     },
+    FTBottomDialog: {
+        closeBottomDialogAriaLabel: "Unteren Dialog schließen",
+    },
+    FTDialog: {
+        closeDialogAriaLabel: "Dialog schließen",
+    },
     FTTimeframeSelector: {
         apply: "Anwenden",
         cancel: "Abbrechen",
@@ -117,6 +141,62 @@ const de: TranslationStructure = {
         selectTimeframe: "Zeitraum auswählen",
         today: "Heute",
         yesterday: "Gestern",
+        to: "bis",
+        customDateRangePickerAriaLabel: "Benutzerdefinierter Datumsbereichswähler",
+        clearCustomDateRangeAriaLabel: "Benutzerdefinierten Datumsbereich löschen",
+        cancelCustomDateRangeAriaLabel: "Benutzerdefinierten Datumsbereich abbrechen",
+        applyCustomDateRangeAriaLabel: "Benutzerdefinierten Datumsbereich anwenden",
+    },
+    FTTimezoneList: {
+        searchTimezonesPlaceholder: "Zeitzonen suchen...",
+        searchTimezonesAriaLabel: "Zeitzonen suchen",
+    },
+    NetworkOverlay: {
+        noInternetConnectionText: "Keine Internetverbindung",
+        waitOrReloadText: "Warten Sie oder versuchen Sie, die Seite neu zu laden",
+        reloadButtonLabel: "Neu laden",
+    },
+    TelNumberInput: {
+        clearButtonLabel: "Löschen",
+        selectCountryCodeValidationMsg: "Bitte wählen Sie eine Landesvorwahl",
+        provideCountryAndNumberValidationMsg: "Bitte geben Sie sowohl Landesvorwahl als auch Telefonnummer an",
+        invalidPhoneNumberValidationMsg: "Ungültige Telefonnummer",
+    },
+    PieChart: {
+        tooltipValue: "Wert",
+        tooltipPercentage: "Prozentsatz",
+    },
+    DrinkBundleDialog: {
+        bundleNameLabel: "Paketname",
+        descriptionOptionalLabel: "Beschreibung (Optional)",
+        selectDrinkLabel: "Getränk auswählen",
+        qtyLabel: "Menge",
+        bundlePriceLabel: "Paketpreis",
+        nameIsRequiredError: "Name ist erforderlich",
+        pleaseSelectDrinkError: "Bitte wählen Sie ein Getränk aus",
+        quantityGreaterThanZeroError: "Menge muss größer als 0 sein",
+        priceGreaterThanZeroError: "Preis ist erforderlich und muss größer als 0 sein",
+        bundlePriceLowerThanRegularError: "Paketpreis sollte niedriger als der reguläre Preis sein",
+        fillRequiredFieldsError: "Bitte füllen Sie alle Pflichtfelder aus",
+        savePercentageText: "{percentage}% sparen",
+        createBundleButtonLabel: "Paket erstellen",
+        removeItemConfirmMsg: "Möchten Sie diesen Artikel wirklich entfernen?",
+        unknownItemText: "Unbekannter Artikel",
+        cancelButtonLabel: "Abbrechen",
+    },
+    DrinkCardBuilderAddDragElementsDropdown: {
+        addHeaderLabel: "Kopfzeile hinzufügen",
+        addHeaderEndLabel: "Kopfzeilenende hinzufügen",
+        addBundleLabel: "Paket hinzufügen",
+        editBundleDialogTitle: "Paket bearbeiten",
+        createBundleDialogTitle: "Paket erstellen",
+    },
+    DrinkCardBuilderCustomSectionDialog: {
+        nameIsRequiredError: "Name ist erforderlich",
+    },
+    DrinkCardBuilderItemSelectionDialog: {
+        searchItemsPlaceholder: "Artikel suchen",
+        noItemsFoundText: "Keine Artikel gefunden",
     },
     Global: {
         actions: "Aktionen",

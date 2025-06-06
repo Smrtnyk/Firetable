@@ -7,6 +7,7 @@ import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
 import { isDark } from "src/global-reactives/is-dark";
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 import VChart from "vue-echarts";
 
 // Register ECharts components
@@ -17,6 +18,7 @@ const props = defineProps<{
     chartTitle: string;
 }>();
 
+const { t } = useI18n();
 const backgroundColor = computed(() => (isDark.value ? "#1A1A1A" : "#FFFFFF"));
 const textColor = computed(() => (isDark.value ? "#cccccc" : "#1A1A1A"));
 
@@ -71,7 +73,7 @@ const chartOption = computed<ECPieOption>(() => ({
         borderWidth: 1,
         formatter(params: any) {
             const { name, percent, value } = params;
-            return `${name}<br/>Value: ${value}<br/>Percentage: ${percent}%`;
+            return `${name}<br/>${t('PieChart.tooltipValue')}: ${value}<br/>${t('PieChart.tooltipPercentage')}: ${percent}%`;
         },
         textStyle: {
             color: "#1A1A1A",

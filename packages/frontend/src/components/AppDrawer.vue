@@ -33,10 +33,10 @@ const { locale, t } = useI18n();
 
 const lang = ref(locale);
 const langOptions = [
-    { label: "English", value: "en-GB" },
-    { label: "German", value: "de" },
-    { label: "Spanish", value: "es" },
-    { label: "Croatian", value: "hr" },
+    { label: t("AppDrawer.languages.english"), value: "en-GB" },
+    { label: t("AppDrawer.languages.german"), value: "de" },
+    { label: t("AppDrawer.languages.spanish"), value: "es" },
+    { label: t("AppDrawer.languages.croatian"), value: "hr" },
 ];
 
 const inventoryLink = computed(function () {
@@ -304,7 +304,7 @@ function setDarkMode(newValue: boolean): void {
 
             <q-separator spaced />
 
-            <q-item clickable @click="onLogoutUser" aria-label="Logout">
+            <q-item clickable @click="onLogoutUser" :aria-label="t('AppDrawer.logoutAriaLabel')">
                 <q-item-section avatar>
                     <q-icon name="fa fa-sign-out" />
                 </q-item-section>

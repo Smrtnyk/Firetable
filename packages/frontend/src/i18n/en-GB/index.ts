@@ -1,4 +1,8 @@
 const enGB = {
+    AddNewFloorForm: {
+        floorNameLabel: "Floor name *",
+        floorNameExistsError: "Floor with the same name already exists!",
+    },
     AddNewGuestForm: {
         guestNameInputLabel: "Guest name *",
     },
@@ -8,6 +12,13 @@ const enGB = {
     },
     AppDrawer: {
         languageSelectorLabel: "Language",
+        logoutAriaLabel: "Logout",
+        languages: {
+            english: "English",
+            german: "German",
+            spanish: "Spanish",
+            croatian: "Croatian",
+        },
         links: {
             issueReportsOverview: "Issue Reports Overview",
             logout: "Logout",
@@ -26,6 +37,9 @@ const enGB = {
             darkMode: "Toggle dark mode",
             onlineStatus: "Toggle online status",
         },
+    },
+    AppTopMenu: {
+        menuAriaLabel: "Menu",
     },
     EventCard: {
         freeLabel: "Free",
@@ -68,6 +82,10 @@ const enGB = {
     },
     EventGuestSearch: {
         label: "Search tables by guest name...",
+        hideArrivedLabel: "Hide arrived",
+        guestArrivedIconAriaLabel: "Guest arrived checkmark icon",
+        noResultsText: "No results",
+        onFloorConnector: "on",
     },
     EventInfo: {
         eventInfoEmptyMsg: "There is no event description set for this event!",
@@ -99,6 +117,12 @@ const enGB = {
         unlinkTablesLabel: "Unlink tables",
         waitingForResponse: "Waiting for response",
     },
+    FTBottomDialog: {
+        closeBottomDialogAriaLabel: "Close bottom dialog",
+    },
+    FTDialog: {
+        closeDialogAriaLabel: "Close dialog",
+    },
     FTTimeframeSelector: {
         apply: "Apply",
         cancel: "Cancel",
@@ -114,6 +138,62 @@ const enGB = {
         selectTimeframe: "Select Timeframe",
         today: "Today",
         yesterday: "Yesterday",
+        to: "to",
+        customDateRangePickerAriaLabel: "Custom date range picker",
+        clearCustomDateRangeAriaLabel: "Clear custom date range",
+        cancelCustomDateRangeAriaLabel: "Cancel custom date range",
+        applyCustomDateRangeAriaLabel: "Apply custom date range",
+    },
+    FTTimezoneList: {
+        searchTimezonesPlaceholder: "Search timezones...",
+        searchTimezonesAriaLabel: "Search timezones",
+    },
+    NetworkOverlay: {
+        noInternetConnectionText: "No Internet Connection",
+        waitOrReloadText: "Wait or try to reload the page",
+        reloadButtonLabel: "Reload",
+    },
+    TelNumberInput: {
+        clearButtonLabel: "Clear",
+        selectCountryCodeValidationMsg: "Please select a country code",
+        provideCountryAndNumberValidationMsg: "Please provide both country code and phone number",
+        invalidPhoneNumberValidationMsg: "Invalid phone number",
+    },
+    PieChart: {
+        tooltipValue: "Value",
+        tooltipPercentage: "Percentage",
+    },
+    DrinkBundleDialog: {
+        bundleNameLabel: "Bundle Name",
+        descriptionOptionalLabel: "Description (Optional)",
+        selectDrinkLabel: "Select Drink",
+        qtyLabel: "Qty",
+        bundlePriceLabel: "Bundle Price",
+        nameIsRequiredError: "Name is required",
+        pleaseSelectDrinkError: "Please select a drink",
+        quantityGreaterThanZeroError: "Quantity must be greater than 0",
+        priceGreaterThanZeroError: "Price is required and must be greater than 0",
+        bundlePriceLowerThanRegularError: "Bundle price should be lower than regular price",
+        fillRequiredFieldsError: "Please fill in all required fields",
+        savePercentageText: "Save {percentage}%",
+        createBundleButtonLabel: "Create Bundle",
+        removeItemConfirmMsg: "Are you sure you want to remove this item?",
+        unknownItemText: "Unknown Item", // Though likely not used if items are always found
+        cancelButtonLabel: "Cancel",
+    },
+    DrinkCardBuilderAddDragElementsDropdown: {
+        addHeaderLabel: "Add Header",
+        addHeaderEndLabel: "Add Header End",
+        addBundleLabel: "Add Bundle",
+        editBundleDialogTitle: "Edit Bundle",
+        createBundleDialogTitle: "Create Bundle",
+    },
+    DrinkCardBuilderCustomSectionDialog: {
+        nameIsRequiredError: "Name is required",
+    },
+    DrinkCardBuilderItemSelectionDialog: {
+        searchItemsPlaceholder: "Search items",
+        noItemsFoundText: "No items found",
     },
     Global: {
         actions: "Actions",
