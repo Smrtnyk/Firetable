@@ -12,7 +12,7 @@
                 @filter="onFilterCountries"
                 clearable
                 clear-icon="fa fa-close"
-                clear-icon-label="Clear"
+                :clear-icon-label="t('TelNumberInput.clearButtonLabel')"
                 :rules="[validateCountrySelection]"
             >
                 <template #option="scope">
@@ -162,10 +162,10 @@ function validateCountrySelection(): boolean | string {
 
     if (required) {
         if (!country) {
-            return "Please select a country code";
+            return t("TelNumberInput.selectCountryCodeValidationMsg");
         }
     } else if (number && !country) {
-        return "Please select a country code";
+        return t("TelNumberInput.selectCountryCodeValidationMsg");
     }
     return true;
 }
@@ -176,7 +176,7 @@ function validatePhoneNumber(): boolean | string {
 
     if (required) {
         if (!country || !number) {
-            return "Please provide both country code and phone number";
+            return t("TelNumberInput.provideCountryAndNumberValidationMsg");
         }
     } else {
         if (!country && !number) {
@@ -184,17 +184,17 @@ function validatePhoneNumber(): boolean | string {
             return true;
         }
         if ((country && !number) || (!country && number)) {
-            return "Please provide both country code and phone number";
+            return t("TelNumberInput.provideCountryAndNumberValidationMsg");
         }
     }
 
     if (!country) {
-        return "Please select a country code";
+        return t("TelNumberInput.selectCountryCodeValidationMsg");
     }
 
     const phoneNumberObj = parsePhoneNumberFromString(fullNumber.value);
     if (!phoneNumberObj?.isValid()) {
-        return "Invalid phone number";
+        return t("TelNumberInput.invalidPhoneNumberValidationMsg");
     }
 
     return true;

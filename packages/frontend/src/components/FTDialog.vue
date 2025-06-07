@@ -13,7 +13,7 @@
                         flat
                         icon="fa fa-close"
                         @click="onDialogHide"
-                        aria-label="Close dialog"
+                        :aria-label="t('FTDialog.closeDialogAriaLabel')"
                     />
                 </template>
                 <h6 class="text-h6 q-ma-none q-ml-sm" v-if="title">{{ title }}</h6>
@@ -31,6 +31,7 @@ import type { ComponentPublicInstance } from "vue";
 
 import { useDialogPluginComponent } from "quasar";
 import { isMobile } from "src/global-reactives/screen-detection";
+import { useI18n } from "vue-i18n";
 
 interface Props {
     component: ComponentPublicInstance;
@@ -48,6 +49,7 @@ const {
     title = "",
 } = defineProps<Props>();
 const { dialogRef, onDialogHide } = useDialogPluginComponent();
+const { t } = useI18n();
 
 defineEmits(useDialogPluginComponent.emits);
 </script>

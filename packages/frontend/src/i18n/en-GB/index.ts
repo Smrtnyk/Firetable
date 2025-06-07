@@ -1,4 +1,8 @@
 const enGB = {
+    AddNewFloorForm: {
+        floorNameExistsError: "Floor with the same name already exists!",
+        floorNameLabel: "Floor name *",
+    },
     AddNewGuestForm: {
         guestNameInputLabel: "Guest name *",
     },
@@ -7,6 +11,12 @@ const enGB = {
         propertyNameLengthValidationMessage: "Property name needs to have at least 3 characters!",
     },
     AppDrawer: {
+        languages: {
+            croatian: "Croatian",
+            english: "English",
+            german: "German",
+            spanish: "Spanish",
+        },
         languageSelectorLabel: "Language",
         links: {
             issueReportsOverview: "Issue Reports Overview",
@@ -22,10 +32,47 @@ const enGB = {
             reportIssue: "Report an Issue",
             settings: "Settings",
         },
+        logoutAriaLabel: "Logout",
         toggles: {
             darkMode: "Toggle dark mode",
             onlineStatus: "Toggle online status",
         },
+    },
+    AppTopMenu: {
+        menuAriaLabel: "Menu",
+    },
+    DrinkBundleDialog: {
+        bundleItemsLabel: "Bundle Items ({count})",
+        bundleNameLabel: "Bundle Name",
+        bundlePriceLabel: "Bundle Price",
+        bundlePriceLowerThanRegularError: "Bundle price should be lower than regular price",
+        cancelButtonLabel: "Cancel",
+        createBundleButtonLabel: "Create Bundle",
+        descriptionOptionalLabel: "Description (Optional)",
+        fillRequiredFieldsError: "Please fill in all required fields",
+        nameIsRequiredError: "Name is required",
+        pleaseSelectDrinkError: "Please select a drink",
+        priceGreaterThanZeroError: "Price is required and must be greater than 0",
+        qtyLabel: "Qty",
+        quantityGreaterThanZeroError: "Quantity must be greater than 0",
+        removeItemConfirmMsg: "Are you sure you want to remove this item?",
+        savePercentageText: "Save {percentage}%",
+        selectDrinkLabel: "Select Drink",
+        unknownItemText: "Unknown Item",
+    },
+    DrinkCardBuilderAddDragElementsDropdown: {
+        addBundleLabel: "Add Bundle",
+        addHeaderEndLabel: "Add Header End",
+        addHeaderLabel: "Add Header",
+        createBundleDialogTitle: "Create Bundle",
+        editBundleDialogTitle: "Edit Bundle",
+    },
+    DrinkCardBuilderCustomSectionDialog: {
+        nameIsRequiredError: "Name is required",
+    },
+    DrinkCardBuilderItemSelectionDialog: {
+        noItemsFoundText: "No items found",
+        searchItemsPlaceholder: "Search items",
     },
     EventCard: {
         freeLabel: "Free",
@@ -67,7 +114,11 @@ const enGB = {
         guestNameValidationLength: "Name must have at least 3 characters!",
     },
     EventGuestSearch: {
+        guestArrivedIconAriaLabel: "Guest arrived checkmark icon",
+        hideArrivedLabel: "Hide arrived",
         label: "Search tables by guest name...",
+        noResultsText: "No results",
+        onFloorConnector: "on",
     },
     EventInfo: {
         eventInfoEmptyMsg: "There is no event description set for this event!",
@@ -99,11 +150,21 @@ const enGB = {
         unlinkTablesLabel: "Unlink tables",
         waitingForResponse: "Waiting for response",
     },
+    FTBottomDialog: {
+        closeBottomDialogAriaLabel: "Close bottom dialog",
+    },
+    FTDialog: {
+        closeDialogAriaLabel: "Close dialog",
+    },
     FTTimeframeSelector: {
         apply: "Apply",
+        applyCustomDateRangeAriaLabel: "Apply custom date range",
         cancel: "Cancel",
+        cancelCustomDateRangeAriaLabel: "Cancel custom date range",
         clear: "Clear",
+        clearCustomDateRangeAriaLabel: "Clear custom date range",
         custom: "Custom",
+        customDateRangePickerAriaLabel: "Custom date range picker",
         errorMaxDays: "Date range cannot exceed {maxDays} days.",
         errorSelectDates: "Please select both start and end dates.",
         invalidPreset: "Invalid preset selection.",
@@ -112,8 +173,13 @@ const enGB = {
         openDatePicker: "Open date picker",
         selectDateRange: "Select Date Range",
         selectTimeframe: "Select Timeframe",
+        to: "to",
         today: "Today",
         yesterday: "Yesterday",
+    },
+    FTTimezoneList: {
+        searchTimezonesAriaLabel: "Search timezones",
+        searchTimezonesPlaceholder: "Search timezones...",
     },
     Global: {
         actions: "Actions",
@@ -160,6 +226,11 @@ const enGB = {
         subCategory: "Sub Category",
         supplier: "Supplier",
         volume: "Volume",
+    },
+    NetworkOverlay: {
+        noInternetConnectionText: "No Internet Connection",
+        reloadButtonLabel: "Reload",
+        waitOrReloadText: "Wait or try to reload the page",
     },
     PageAdminEvents: {
         createNewEventDialogTitle: "Create new event",
@@ -316,12 +387,20 @@ const enGB = {
         title: "Profile of {name}",
         updatePasswordButtonLabel: "Update Password",
     },
+    PieChart: {
+        tooltipPercentage: "Percentage",
+        tooltipValue: "Value",
+    },
     PlannedReservationForm: {
         reservedByStaffRadioBtnLabel: "Staff",
     },
     TelNumberInput: {
+        clearButtonLabel: "Clear",
         countryCodeLabel: "Country Code",
+        invalidPhoneNumberValidationMsg: "Invalid phone number",
         phoneNumberLabel: "Phone Number",
+        provideCountryAndNumberValidationMsg: "Please provide both country code and phone number",
+        selectCountryCodeValidationMsg: "Please select a country code",
     },
     UserCreateForm: {
         noOrganisationsMessage:

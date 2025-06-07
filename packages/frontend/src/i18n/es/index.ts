@@ -1,6 +1,10 @@
 import type { TranslationStructure } from "src/i18n/en-GB";
 
 const es: TranslationStructure = {
+    AddNewFloorForm: {
+        floorNameExistsError: "¡Ya existe un piso con el mismo nombre!",
+        floorNameLabel: "Nombre del piso *",
+    },
     AddNewGuestForm: {
         guestNameInputLabel: "Nombre de invitado *",
     },
@@ -10,6 +14,12 @@ const es: TranslationStructure = {
             "¡El nombre de la propiedad debe tener al menos 3 caracteres!",
     },
     AppDrawer: {
+        languages: {
+            croatian: "Croata",
+            english: "Inglés",
+            german: "Alemán",
+            spanish: "Español",
+        },
         languageSelectorLabel: "Lenguaje",
         links: {
             issueReportsOverview: "Reportes de Problemas",
@@ -25,10 +35,48 @@ const es: TranslationStructure = {
             reportIssue: "Reportar un problema",
             settings: "Configuración",
         },
+        logoutAriaLabel: "Cerrar sesión",
         toggles: {
             darkMode: "Modo oscuro",
             onlineStatus: "Estado en línea",
         },
+    },
+    AppTopMenu: {
+        menuAriaLabel: "Menú",
+    },
+    DrinkBundleDialog: {
+        bundleItemsLabel: "Artículos del Paquete ({count})",
+        bundleNameLabel: "Nombre del Paquete",
+        bundlePriceLabel: "Precio del Paquete",
+        bundlePriceLowerThanRegularError:
+            "El precio del paquete debe ser inferior al precio regular",
+        cancelButtonLabel: "Cancelar",
+        createBundleButtonLabel: "Crear Paquete",
+        descriptionOptionalLabel: "Descripción (Opcional)",
+        fillRequiredFieldsError: "Por favor complete todos los campos obligatorios",
+        nameIsRequiredError: "El nombre es obligatorio",
+        pleaseSelectDrinkError: "Por favor seleccione una bebida",
+        priceGreaterThanZeroError: "El precio es obligatorio y debe ser mayor que 0",
+        qtyLabel: "Cant.",
+        quantityGreaterThanZeroError: "La cantidad debe ser mayor que 0",
+        removeItemConfirmMsg: "¿Está seguro de que desea eliminar este artículo?",
+        savePercentageText: "Ahorrar {percentage}%",
+        selectDrinkLabel: "Seleccionar Bebida",
+        unknownItemText: "Artículo Desconocido",
+    },
+    DrinkCardBuilderAddDragElementsDropdown: {
+        addBundleLabel: "Añadir Paquete",
+        addHeaderEndLabel: "Añadir Fin de Encabezado",
+        addHeaderLabel: "Añadir Encabezado",
+        createBundleDialogTitle: "Crear Paquete",
+        editBundleDialogTitle: "Editar Paquete",
+    },
+    DrinkCardBuilderCustomSectionDialog: {
+        nameIsRequiredError: "El nombre es obligatorio",
+    },
+    DrinkCardBuilderItemSelectionDialog: {
+        noItemsFoundText: "No se encontraron artículos",
+        searchItemsPlaceholder: "Buscar artículos",
     },
     EventCard: {
         freeLabel: "Gratis",
@@ -70,7 +118,11 @@ const es: TranslationStructure = {
         guestNameValidationLength: "¡El nombre debe tener al menos 3 caracteres!",
     },
     EventGuestSearch: {
+        guestArrivedIconAriaLabel: "Icono de marca de llegada de invitado",
+        hideArrivedLabel: "Ocultar llegados",
         label: "Buscar mesas por nombre de invitado...",
+        noResultsText: "No hay resultados",
+        onFloorConnector: "en",
     },
     EventInfo: {
         eventInfoEmptyMsg: "¡No hay descripción del evento!",
@@ -102,11 +154,21 @@ const es: TranslationStructure = {
         unlinkTablesLabel: "Desvincular mesas",
         waitingForResponse: "Esperando respuesta",
     },
+    FTBottomDialog: {
+        closeBottomDialogAriaLabel: "Cerrar diálogo inferior",
+    },
+    FTDialog: {
+        closeDialogAriaLabel: "Cerrar diálogo",
+    },
     FTTimeframeSelector: {
         apply: "Aplicar",
+        applyCustomDateRangeAriaLabel: "Aplicar rango de fechas personalizado",
         cancel: "Cancelar",
+        cancelCustomDateRangeAriaLabel: "Cancelar rango de fechas personalizado",
         clear: "Limpiar",
+        clearCustomDateRangeAriaLabel: "Borrar rango de fechas personalizado",
         custom: "Personalizado",
+        customDateRangePickerAriaLabel: "Selector de rango de fechas personalizado",
         errorMaxDays: "Rango de fechas no puede ser mayor a {maxDays} días",
         errorSelectDates: "Por favor, selecciona fecha de inicio y fin",
         invalidPreset: "Selección no válida",
@@ -115,8 +177,13 @@ const es: TranslationStructure = {
         openDatePicker: "Abrir selector de fecha",
         selectDateRange: "Seleccionar rango de fechas",
         selectTimeframe: "Seleccionar rango de tiempo",
+        to: "a",
         today: "Hoy",
         yesterday: "Ayer",
+    },
+    FTTimezoneList: {
+        searchTimezonesAriaLabel: "Buscar zonas horarias",
+        searchTimezonesPlaceholder: "Buscar zonas horarias...",
     },
     Global: {
         actions: "Acciones",
@@ -163,6 +230,11 @@ const es: TranslationStructure = {
         subCategory: "Subcategoría",
         supplier: "Proveedor",
         volume: "Volumen",
+    },
+    NetworkOverlay: {
+        noInternetConnectionText: "Sin conexión a Internet",
+        reloadButtonLabel: "Recargar",
+        waitOrReloadText: "Espere o intente recargar la página",
     },
     PageAdminEvents: {
         createNewEventDialogTitle: "Crear nuevo evento",
@@ -319,12 +391,21 @@ const es: TranslationStructure = {
         title: "Perfil de {name}",
         updatePasswordButtonLabel: "Actualizar Contraseña",
     },
+    PieChart: {
+        tooltipPercentage: "Porcentaje",
+        tooltipValue: "Valor",
+    },
     PlannedReservationForm: {
         reservedByStaffRadioBtnLabel: "Staff",
     },
     TelNumberInput: {
+        clearButtonLabel: "Borrar",
         countryCodeLabel: "Código de país",
+        invalidPhoneNumberValidationMsg: "Número de teléfono inválido",
         phoneNumberLabel: "Número Celular",
+        provideCountryAndNumberValidationMsg:
+            "Por favor proporcione el código de país y el número de teléfono",
+        selectCountryCodeValidationMsg: "Por favor seleccione un código de país",
     },
     UserCreateForm: {
         noOrganisationsMessage:
