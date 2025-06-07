@@ -9,7 +9,6 @@ const es: TranslationStructure = {
         guestNameInputLabel: "Nombre de invitado *",
     },
     AddNewPropertyForm: {
-        organisationsRadioBoxLabel: "Organizaciones:",
         propertyNameLengthValidationMessage:
             "¡El nombre de la propiedad debe tener al menos 3 caracteres!",
     },
@@ -38,7 +37,6 @@ const es: TranslationStructure = {
         logoutAriaLabel: "Cerrar sesión",
         toggles: {
             darkMode: "Modo oscuro",
-            onlineStatus: "Estado en línea",
         },
     },
     AppTopMenu: {
@@ -85,13 +83,10 @@ const es: TranslationStructure = {
         entryPriceInputLabel: "Precio de entrada, 0 para gratis",
         eventImgInputLabel: "URL de imagen opcional del evento",
         eventNameInputLabel: "Nombre del evento*",
-        goToFloorPlannerMessage: "Ir al planificador de pisos",
         guestListLimitInputLabel: "Limite de la lista de invitados",
         inputDateTimeLabel: "Fecha y hora del evento",
         inputDateTimePickerCloseBtnLabel: "Cerrar",
         noChosenFloorsMessage: "Seleccione al menos un plano de piso!",
-        noFloorPlansMessage: "¡No puede crear un evento sin planos de piso!",
-        selectedFloorNotFoundMessage: "Piso seleccionado no encontrado",
     },
     EventCreateReservation: {
         requireReservedBySelectionError: "Debe seleccionar al menos una opción",
@@ -124,9 +119,6 @@ const es: TranslationStructure = {
         noResultsText: "No hay resultados",
         onFloorConnector: "en",
     },
-    EventInfo: {
-        eventInfoEmptyMsg: "¡No hay descripción del evento!",
-    },
     EventQueuedReservations: {
         addNewReservation: "Añadir nueva reservación",
         emptyMessage: "No existen reservaciones en cola",
@@ -137,7 +129,6 @@ const es: TranslationStructure = {
         contactLabel: "Contacto",
         createdAtLabel: "Creado el",
         createdByLabel: "Creador",
-        groupedWithLabel: "Agrupado con",
         guestHistoryLabel: "Historial de invitados",
         guestNameLabel: "Nombre",
         linkTablesLabel: "Vincualar mesas",
@@ -165,7 +156,6 @@ const es: TranslationStructure = {
         applyCustomDateRangeAriaLabel: "Aplicar rango de fechas personalizado",
         cancel: "Cancelar",
         cancelCustomDateRangeAriaLabel: "Cancelar rango de fechas personalizado",
-        clear: "Limpiar",
         clearCustomDateRangeAriaLabel: "Borrar rango de fechas personalizado",
         custom: "Personalizado",
         customDateRangePickerAriaLabel: "Selector de rango de fechas personalizado",
@@ -191,23 +181,18 @@ const es: TranslationStructure = {
         arrived: "Llegado",
         cancel: "Cancelar",
         cancelled: "Cancelado",
-        category: "Categoría",
         copy: "Copiar",
         delete: "Eliminar",
         edit: "Editar",
-        fullScreen: "Pantalla Completa",
         inactive: "Inactivo",
-        link: "Vincular",
         manageInventoryLink: "Gestionar inventario",
         name: "Nombre",
         noDescription: "Sin descripción",
-        price: "Precio",
         reactivate: "Reactivar",
         reset: "Reiniciar",
         submit: "Enviar",
         tagsLabel: "Etiquetas",
         transfer: "Transferir",
-        type: "Tipo",
     },
     GuestSummaryChips: {
         arrived: "Llegado",
@@ -216,15 +201,11 @@ const es: TranslationStructure = {
     InventoryItemCreateForm: {
         alcoholContentRange: "Alcohol content must be between 0 and 100",
         mainCategoryRequired: "Main category is required",
-        minimumStockNonNegative: "Minimum stock must be non-negative",
         quantityNonNegative: "Quantity must be non-negative",
         subCategoryRequired: "Sub category is required",
         volumePositive: "Volume must be positive",
     },
     InventoryTable: {
-        actions: "Acciones",
-        deleteSelected: "Eliminar selecciones",
-        drink: "Bebida",
         mainCategory: "Categoría principal",
         quantity: "Cantidad",
         subCategory: "Subcategoría",
@@ -242,17 +223,13 @@ const es: TranslationStructure = {
         editEventDialogTitle: "Editando evento: {eventName}",
         eventCreatedNotificationMessage: "¡Evento creado!",
         noEventsMessage: "No hay eventos creados",
-        noPropertiesMessage: "There are no properties created, cannot create events.",
         pastEventsLabel: "Eventos anteriores",
         title: "Events",
     },
     PageAdminFloors: {
-        addNewFloorMessage: "Anadir nuevo piso a {propertyName}",
         deleteFloorMessage: "¿Eliminar piso?",
         duplicateFloorPlanMessage: "Esta seguro que desea duplicar el plano de piso {floorName}?",
         noFloorPlansMessage: "Esta propiedad no tiene planos de piso",
-        noPropertiesMessage:
-            "No tiene propiedades creadas, para crear planos de piso debe crear al menos una propiedad.",
         title: "Planos de piso",
     },
     PageAdminGuest: {
@@ -267,8 +244,6 @@ const es: TranslationStructure = {
     },
     PageAdminGuests: {
         createNewGuestDialogTitle: "Crear nuevo invitado",
-        maxAmountGuestsCreationMessage:
-            "¡Ha llegado al máximo de invitados que puede crear, que es {limit}!",
         noGuestsData: "Sin datos de invitados",
         title: "Invitados",
     },
@@ -282,21 +257,11 @@ const es: TranslationStructure = {
             "Error al importar artículos. Por favor, revise el formato del archivo e intente nuevamente.",
         importMergeSuccess:
             "Artículos importados correctamente. {Count} artículos añadidos, {updated} actualizados.",
-        itemMainCategory: {
-            beer: "Cerveza",
-            "cocktail-components": "Cocktail Components",
-            "non-alcoholic": "Non-alcoholic",
-            spirits: "Licor",
-            tobacco: "Tabaco",
-            wine: "Vino",
-        },
         noItemsMessage: "No hay artículos en el inventario.",
         title: "Inventario",
     },
     PageAdminIssueReports: {
         deleteConfirmation: "Elimnar reporte",
-        issueMarkedAsResolved: "Reporte marcado como resuelto",
-        issueMarkedAsUnresolved: "Reporte marcado como no resuelto",
         noIssuesMessage: "No se han reportado problemas",
         status: {
             in_progress: "En Progreso",
@@ -309,15 +274,12 @@ const es: TranslationStructure = {
         updateStatus: "Actualizar Estado",
     },
     PageAdminProperties: {
-        addNewProperty: "Añadir nueva propiedad",
         createPropertyDialogTitle: "Añadir nueva propiedad",
         deletePropertyDialogMessage: "¡Esto eliminará todos los eventos asociados!",
         deletePropertyDialogTitle: "¿Eliminar propiedad?",
         editPropertyDialogTitle: "Editando propiedad: {name}",
         maxAmountOfPropertiesReachedMessage: "¡Ha alcanzado el máximo de propiedades creadas!",
         noPropertiesCreatedMessage: "No hay propiedades creadas",
-        noPropertiesWithoutOrganisationMessage:
-            "Para crear propiedades, debe primero crear una organización.",
         properties: "Propiedades",
     },
     PageAdminPropertyDrinkCards: {
@@ -328,7 +290,6 @@ const es: TranslationStructure = {
         cardDescriptionLabel: "Descripción (opcional)",
         cardNameLabel: "Nombre de Tarjeta",
         cardUpdatedMessage: "Tarjeta de bebidas actualizada con éxito",
-        categoryLabel: "Categoría",
         createCardDialogTitle: "Crear Nueva Tarjeta de Bebidas",
         deleteCardConfirmation: "Are you sure you want to delete this drink card?",
         displayName: "Nombre a mostrar",
@@ -358,9 +319,7 @@ const es: TranslationStructure = {
     },
     PageEvent: {
         deleteQueuedReservationConfirmMsg: "¿Está seguro que desea eliminar esta reservación?",
-        eventInfoTitle: "Información del evento",
         exportReservationsConfirmMsg: "Esto exportará todas las reservaciones a un archivo CSV",
-        showFloorPlansExpanded: "Planos de piso",
     },
     PageIssueReport: {
         categories: {
@@ -375,7 +334,6 @@ const es: TranslationStructure = {
         editIssue: "Editar reporte",
         issueDeleted: "Reporte eliminado exitosamente",
         issueReportedSuccess: "Se ha reportado el problema exitosamente",
-        issueUpdateSuccess: "Reporte actualizado exitosamente",
         myIssues: "Mis reportes",
         noIssuesMessage: "No ha reportado ningún problema",
         title: "Reportes de Problemas",
@@ -408,16 +366,12 @@ const es: TranslationStructure = {
         selectCountryCodeValidationMsg: "Por favor seleccione un código de país",
     },
     UserCreateForm: {
-        noOrganisationsMessage:
-            "¡Debe crear al menos una organización antes de crear al dueño de la propiedad!",
         usePropertiesCheckboxesTitle: "Propiedades:",
         userMailInputHint:
             "Nombre de usuario email sin espacios y caracteres especiales, ejemplo, max123",
         userMailInputLabel: "Email *",
         userNameInputHint: "Nombre de la persona, ejemplo, Max Mustermann",
         userNameInputLabel: "Nombre *",
-        userOrganisationSelectHint: "Seleccione la organización a la que pertenece el usuario",
-        userOrganisationSelectLabel: "Organización",
         userPasswordInputHint: "Contraseña del usuario",
         userPasswordInputLabel: "Contraseña *",
         userRoleSelectHint: "Asignar rol al usuario, el predeterminado es Staff",
@@ -458,7 +412,6 @@ const es: TranslationStructure = {
         nameMustBeLongerErrorMsg: "¡El nombre debe tener al menos 2 caracteres!",
         nameRequired: "Nombre es requerido",
         negativeReservationConsumptionErrorMsg: "El consumo no puede ser negativo",
-        noWhiteSpaces: "No se permiten espacios en blanco",
         passwordHasNumbers: "La contraseña debe incluir al menos un número",
         passwordHasSymbols:
             "La contraseña debe incluir al menos un símbolo (por ejemplo, !, #, etc...)",
@@ -466,7 +419,6 @@ const es: TranslationStructure = {
         passwordMinLength: "La contraseña debe tener al menos 6 caracteres",
         passwordRequired: "Se requiere contraseña",
         required: "Por favor, rellene este campo",
-        selectAtLeastOneProperty: "¡Debes seleccionar al menos una propiedad!",
         typeRequired: "Tipo es requerido",
     },
     WalkInReservationForm: {

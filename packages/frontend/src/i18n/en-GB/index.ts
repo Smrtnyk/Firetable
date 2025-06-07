@@ -7,7 +7,6 @@ const enGB = {
         guestNameInputLabel: "Guest name *",
     },
     AddNewPropertyForm: {
-        organisationsRadioBoxLabel: "Organisations:",
         propertyNameLengthValidationMessage: "Property name needs to have at least 3 characters!",
     },
     AppDrawer: {
@@ -35,7 +34,6 @@ const enGB = {
         logoutAriaLabel: "Logout",
         toggles: {
             darkMode: "Toggle dark mode",
-            onlineStatus: "Toggle online status",
         },
     },
     AppTopMenu: {
@@ -81,13 +79,10 @@ const enGB = {
         entryPriceInputLabel: "Entry price, leave 0 if free",
         eventImgInputLabel: "Optional event image url",
         eventNameInputLabel: "Event name*",
-        goToFloorPlannerMessage: "Go to floor planner",
         guestListLimitInputLabel: "Guest list limit",
         inputDateTimeLabel: "Event date and time",
         inputDateTimePickerCloseBtnLabel: "Close",
         noChosenFloorsMessage: "You need to choose at least one floor plan",
-        noFloorPlansMessage: "You cannot create events because you have no floor plans created!",
-        selectedFloorNotFoundMessage: "Selected floor not found.",
     },
     EventCreateReservation: {
         requireReservedBySelectionError: "You need to select at least one option",
@@ -120,9 +115,6 @@ const enGB = {
         noResultsText: "No results",
         onFloorConnector: "on",
     },
-    EventInfo: {
-        eventInfoEmptyMsg: "There is no event description set for this event!",
-    },
     EventQueuedReservations: {
         addNewReservation: "Add new reservation",
         emptyMessage: "There are no reservations in the queue.",
@@ -133,7 +125,6 @@ const enGB = {
         contactLabel: "Contact",
         createdAtLabel: "Created at",
         createdByLabel: "Creator",
-        groupedWithLabel: "Grouped with",
         guestHistoryLabel: "Guest history",
         guestNameLabel: "Name",
         linkTablesLabel: "Link tables",
@@ -161,7 +152,6 @@ const enGB = {
         applyCustomDateRangeAriaLabel: "Apply custom date range",
         cancel: "Cancel",
         cancelCustomDateRangeAriaLabel: "Cancel custom date range",
-        clear: "Clear",
         clearCustomDateRangeAriaLabel: "Clear custom date range",
         custom: "Custom",
         customDateRangePickerAriaLabel: "Custom date range picker",
@@ -187,23 +177,18 @@ const enGB = {
         arrived: "Arrived",
         cancel: "Cancel",
         cancelled: "Cancelled",
-        category: "Category",
         copy: "Copy",
         delete: "Delete",
         edit: "Edit",
-        fullScreen: "Full Screen",
         inactive: "Inactive",
-        link: "Link",
         manageInventoryLink: "Manage Inventory",
         name: "Name",
         noDescription: "No description",
-        price: "Price",
         reactivate: "Reactivate",
         reset: "Reset",
         submit: "Submit",
         tagsLabel: "Tags",
         transfer: "Transfer",
-        type: "Type",
     },
     GuestSummaryChips: {
         arrived: "Arrived",
@@ -212,15 +197,11 @@ const enGB = {
     InventoryItemCreateForm: {
         alcoholContentRange: "Alcohol content must be between 0 and 100",
         mainCategoryRequired: "Main category is required",
-        minimumStockNonNegative: "Minimum stock must be non-negative",
         quantityNonNegative: "Quantity must be non-negative",
         subCategoryRequired: "Sub category is required",
         volumePositive: "Volume must be positive",
     },
     InventoryTable: {
-        actions: "Actions",
-        deleteSelected: "Delete Selected",
-        drink: "Drink",
         mainCategory: "Main Category",
         quantity: "Quantity",
         subCategory: "Sub Category",
@@ -238,17 +219,13 @@ const enGB = {
         editEventDialogTitle: "Editing event: {eventName}",
         eventCreatedNotificationMessage: "Event created!",
         noEventsMessage: "There are no events created.",
-        noPropertiesMessage: "There are no properties created, cannot create events.",
         pastEventsLabel: "Past Events",
         title: "Events",
     },
     PageAdminFloors: {
-        addNewFloorMessage: "Add New Floor to {propertyName}",
         deleteFloorMessage: "Delete floor?",
         duplicateFloorPlanMessage: "Are you sure you want to duplicate {floorName} floor plan?",
         noFloorPlansMessage: "This property has no floor plans.",
-        noPropertiesMessage:
-            "You have no properties created, in order to create floor plans you need to first create at least one property.",
         title: "Floor Plans",
     },
     PageAdminGuest: {
@@ -263,8 +240,6 @@ const enGB = {
     },
     PageAdminGuests: {
         createNewGuestDialogTitle: "Create new guest",
-        maxAmountGuestsCreationMessage:
-            "You have reached the maximum amount of guests which is {limit}!",
         noGuestsData: "No guests data.",
         title: "Guests",
     },
@@ -276,21 +251,11 @@ const enGB = {
         editInventoryItemDialogTitle: "Editing inventory item: {name}",
         importError: "Error importing items. Please check the file format and try again.",
         importMergeSuccess: "Items imported successfully. {count} items added, {updated} updated",
-        itemMainCategory: {
-            beer: "Beer",
-            "cocktail-components": "Cocktail Components",
-            "non-alcoholic": "Non-alcoholic",
-            spirits: "Spirits",
-            tobacco: "Tobacco",
-            wine: "Wine",
-        },
         noItemsMessage: "There are no items in the inventory.",
         title: "Inventory",
     },
     PageAdminIssueReports: {
         deleteConfirmation: "Delete Issue",
-        issueMarkedAsResolved: "Issue marked as resolved",
-        issueMarkedAsUnresolved: "Issue marked as unresolved",
         noIssuesMessage: "No issues have been reported",
         status: {
             in_progress: "In Progress",
@@ -303,7 +268,6 @@ const enGB = {
         updateStatus: "Update Status",
     },
     PageAdminProperties: {
-        addNewProperty: "Add new property",
         createPropertyDialogTitle: "Add new Property",
         deletePropertyDialogMessage: "This will also delete all the associated events!",
         deletePropertyDialogTitle: "Delete property?",
@@ -311,8 +275,6 @@ const enGB = {
         maxAmountOfPropertiesReachedMessage:
             "You have reached the maximum amount of created properties!",
         noPropertiesCreatedMessage: "There are no venues created",
-        noPropertiesWithoutOrganisationMessage:
-            "In order to create properties, you must first create an organisation.",
         properties: "Properties",
     },
     PageAdminPropertyDrinkCards: {
@@ -323,7 +285,6 @@ const enGB = {
         cardDescriptionLabel: "Description (optional)",
         cardNameLabel: "Card Name",
         cardUpdatedMessage: "Drink card updated successfully",
-        categoryLabel: "Category",
         createCardDialogTitle: "Create New Drink Card",
         deleteCardConfirmation: "Are you sure you want to delete this drink card?",
         displayName: "Display Name",
@@ -354,9 +315,7 @@ const enGB = {
     },
     PageEvent: {
         deleteQueuedReservationConfirmMsg: "Are you sure you want to delete this reservation?",
-        eventInfoTitle: "Event info",
         exportReservationsConfirmMsg: "This will export reservations to a CSV file",
-        showFloorPlansExpanded: "Floor plans",
     },
     PageIssueReport: {
         categories: {
@@ -371,7 +330,6 @@ const enGB = {
         editIssue: "Edit Issue",
         issueDeleted: "Issue has been deleted successfully",
         issueReportedSuccess: "Issue has been reported successfully",
-        issueUpdateSuccess: "Issue updated successfully",
         myIssues: "My Issues",
         noIssuesMessage: "You haven't reported any issues yet",
         title: "Issue Reports",
@@ -403,15 +361,11 @@ const enGB = {
         selectCountryCodeValidationMsg: "Please select a country code",
     },
     UserCreateForm: {
-        noOrganisationsMessage:
-            "You must have at least one organisation created before creating property owner!",
         usePropertiesCheckboxesTitle: "Properties:",
         userMailInputHint: "Email username without spaces and special characters, e.g. max123",
         userMailInputLabel: "Email *",
         userNameInputHint: "Name of the person, e.g. Max Mustermann",
         userNameInputLabel: "Name *",
-        userOrganisationSelectHint: "Select organisation for this user.",
-        userOrganisationSelectLabel: "Organisation",
         userPasswordInputHint: "Password of the user",
         userPasswordInputLabel: "User password *",
         userRoleSelectHint: "Assign role to user, default is Staff.",
@@ -452,7 +406,6 @@ const enGB = {
         nameMustBeLongerErrorMsg: "Name must be at least 2 characters long!",
         nameRequired: "Name is required",
         negativeReservationConsumptionErrorMsg: "Consumption cannot be negative",
-        noWhiteSpaces: "No whitespaces are allowed!",
         passwordHasNumbers: "Password must include at least one number.",
         passwordHasSymbols:
             "Password must include at least one special character (e.g., !, #, etc...)",
@@ -460,7 +413,6 @@ const enGB = {
         passwordMinLength: "Password must be at least 6 characters long.",
         passwordRequired: "Password is required.",
         required: "Please type something.",
-        selectAtLeastOneProperty: "You must select at least one property!",
         typeRequired: "Type is required",
     },
     WalkInReservationForm: {

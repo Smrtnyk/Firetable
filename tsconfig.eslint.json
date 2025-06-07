@@ -35,6 +35,7 @@
         "packages/*/test-helpers",
         "packages/frontend/src-pwa",
         "packages/frontend/quasar.config.ts",
+        "packages/frontend/tools/check-translations.ts",
     ],
     "exclude": [
         "node_modules",

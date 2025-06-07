@@ -9,7 +9,6 @@ const de: TranslationStructure = {
         guestNameInputLabel: "Gastname *",
     },
     AddNewPropertyForm: {
-        organisationsRadioBoxLabel: "Organisationen:",
         propertyNameLengthValidationMessage: "Der Immobilienname muss mindestens 3 Zeichen haben!",
     },
     AppDrawer: {
@@ -37,7 +36,6 @@ const de: TranslationStructure = {
         logoutAriaLabel: "Abmelden",
         toggles: {
             darkMode: "Dunkelmodus umschalten",
-            onlineStatus: "Online-Status umschalten",
         },
     },
     AppTopMenu: {
@@ -83,14 +81,10 @@ const de: TranslationStructure = {
         entryPriceInputLabel: "Eintrittspreis, bei kostenlosem Eintritt 0 eingeben",
         eventImgInputLabel: "Optionale URL des Veranstaltungsbildes",
         eventNameInputLabel: "Veranstaltungsname*",
-        goToFloorPlannerMessage: "Zum Grundrissplaner gehen",
         guestListLimitInputLabel: "Limit für Gästeliste",
         inputDateTimeLabel: "Datum und Uhrzeit der Veranstaltung",
         inputDateTimePickerCloseBtnLabel: "Schließen",
         noChosenFloorsMessage: "Sie müssen mindestens einen Grundriss auswählen",
-        noFloorPlansMessage:
-            "Sie können keine Veranstaltungen erstellen, da Sie keine Grundrisse erstellt haben!",
-        selectedFloorNotFoundMessage: "Ausgewählter Grundriss nicht gefunden.",
     },
     EventCreateReservation: {
         requireReservedBySelectionError: "Sie müssen mindestens eine Option auswählen",
@@ -123,9 +117,6 @@ const de: TranslationStructure = {
         noResultsText: "Keine Ergebnisse",
         onFloorConnector: "auf",
     },
-    EventInfo: {
-        eventInfoEmptyMsg: "Es gibt keine Informationen zu dieser Veranstaltung.",
-    },
     EventQueuedReservations: {
         addNewReservation: "Neue Reservierung",
         emptyMessage: "Es gibt keine Reservierungen in der Warteschlange.",
@@ -136,7 +127,6 @@ const de: TranslationStructure = {
         contactLabel: "Kontakt",
         createdAtLabel: "Erstellt am",
         createdByLabel: "Ersteller",
-        groupedWithLabel: "Gruppiert mit",
         guestHistoryLabel: "Gästehistorie",
         guestNameLabel: "Name des Gastes",
         linkTablesLabel: "Tische verbinden",
@@ -164,7 +154,6 @@ const de: TranslationStructure = {
         applyCustomDateRangeAriaLabel: "Benutzerdefinierten Datumsbereich anwenden",
         cancel: "Abbrechen",
         cancelCustomDateRangeAriaLabel: "Benutzerdefinierten Datumsbereich abbrechen",
-        clear: "Löschen",
         clearCustomDateRangeAriaLabel: "Benutzerdefinierten Datumsbereich löschen",
         custom: "Benutzerdefiniert",
         customDateRangePickerAriaLabel: "Benutzerdefinierter Datumsbereichswähler",
@@ -190,23 +179,18 @@ const de: TranslationStructure = {
         arrived: "Eingetroffen",
         cancel: "Abbrechen",
         cancelled: "Storniert",
-        category: "Kategorie",
         copy: "Kopieren",
         delete: "Löschen",
         edit: "Bearbeiten",
-        fullScreen: "Vollbild",
         inactive: "Inaktiv",
-        link: "Verknüpfen",
         manageInventoryLink: "Inventar verwalten",
         name: "Name",
         noDescription: "Keine Beschreibung",
-        price: "Preis",
         reactivate: "Wiederherstellen",
         reset: "Zurücksetzen",
         submit: "Absenden",
         tagsLabel: "Schlagworte",
         transfer: "Übertragen",
-        type: "Typ",
     },
     GuestSummaryChips: {
         arrived: "Angekommen",
@@ -215,15 +199,11 @@ const de: TranslationStructure = {
     InventoryItemCreateForm: {
         alcoholContentRange: "Alkoholgehalt muss zwischen 0 und 100 liegen",
         mainCategoryRequired: "Hauptkategorie ist erforderlich",
-        minimumStockNonNegative: "Mindestbestand muss nicht negativ sein",
         quantityNonNegative: "Menge muss nicht negativ sein",
         subCategoryRequired: "Unterkategorie ist erforderlich",
         volumePositive: "Volumen muss positiv sein",
     },
     InventoryTable: {
-        actions: "Aktionen",
-        deleteSelected: "Ausgewählte löschen",
-        drink: "Getränk",
         mainCategory: "Hauptkategorie",
         quantity: "Menge",
         subCategory: "Unterkategorie",
@@ -241,18 +221,13 @@ const de: TranslationStructure = {
         editEventDialogTitle: "Veranstaltung bearbeiten: {eventName}",
         eventCreatedNotificationMessage: "Veranstaltung erstellt!",
         noEventsMessage: "Es wurden noch keine Veranstaltungen angelegt.",
-        noPropertiesMessage:
-            "Es wurden keine Immobilien erstellt, Veranstaltungen können nicht erstellt werden.",
         pastEventsLabel: "Vergangene Veranstaltungen",
         title: "Veranstaltungen",
     },
     PageAdminFloors: {
-        addNewFloorMessage: "Neuen Grundriss zu {propertyName} hinzufügen",
         deleteFloorMessage: "Grundriss löschen?",
         duplicateFloorPlanMessage: `Möchten Sie den Grundriss "{floorName}" wirklich duplizieren?`,
         noFloorPlansMessage: "Diese Immobilie hat keine Grundrisse.",
-        noPropertiesMessage:
-            "Sie haben noch keine Immobilien angelegt. Erstellen Sie zunächst eine Immobilie, um Grundrisse anlegen zu können.",
         title: "Grundrisse",
     },
     PageAdminGuest: {
@@ -267,8 +242,6 @@ const de: TranslationStructure = {
     },
     PageAdminGuests: {
         createNewGuestDialogTitle: "Neuen Gast erstellen",
-        maxAmountGuestsCreationMessage:
-            "Sie haben die maximale Anzahl an Gästen erreicht, welche {limit} beträgt!",
         noGuestsData: "Es gibt keine Gäste.",
         title: "Gäste",
     },
@@ -282,21 +255,11 @@ const de: TranslationStructure = {
             "Fehler beim Importieren der Artikel. Bitte überprüfen Sie das Dateiformat und versuchen Sie es erneut.",
         importMergeSuccess:
             "Artikel erfolgreich importiert. {count} Artikel hinzugefügt, {updated} aktualisiert",
-        itemMainCategory: {
-            beer: "Bier",
-            "cocktail-components": "Cocktail-Zutaten",
-            "non-alcoholic": "Alkoholfrei",
-            spirits: "Spirituosen",
-            tobacco: "Tabak",
-            wine: "Wein",
-        },
         noItemsMessage: "Es sind keine Artikel im Inventar vorhanden.",
         title: "Inventar",
     },
     PageAdminIssueReports: {
         deleteConfirmation: "Fehlerbericht löschen?",
-        issueMarkedAsResolved: "Fehler als gelöst markiert",
-        issueMarkedAsUnresolved: "Fehler als nicht gelöst markiert",
         noIssuesMessage: "Es gibt keine Fehlerberichte.",
         status: {
             in_progress: "In Bearbeitung",
@@ -309,7 +272,6 @@ const de: TranslationStructure = {
         updateStatus: "Status aktualisieren",
     },
     PageAdminProperties: {
-        addNewProperty: "Neue Immobilie hinzufügen",
         createPropertyDialogTitle: "Neue Immobilie hinzufügen",
         deletePropertyDialogMessage: "Dies wird auch alle zugehörigen Veranstaltungen löschen!",
         deletePropertyDialogTitle: "Immobilie löschen?",
@@ -317,8 +279,6 @@ const de: TranslationStructure = {
         maxAmountOfPropertiesReachedMessage:
             "Sie haben die maximale Anzahl an erstellten Immobilien erreicht!",
         noPropertiesCreatedMessage: "Es wurden keine Immobilien erstellt",
-        noPropertiesWithoutOrganisationMessage:
-            "Sie müssen zuerst eine Organisation erstellen, bevor Sie Immobilien anlegen können.",
         properties: "Immobilien",
     },
     PageAdminPropertyDrinkCards: {
@@ -329,7 +289,6 @@ const de: TranslationStructure = {
         cardDescriptionLabel: "Beschreibung (optional)",
         cardNameLabel: "Kartenname",
         cardUpdatedMessage: "Getränkekarte erfolgreich aktualisiert",
-        categoryLabel: "Kategorie",
         createCardDialogTitle: "Neue Getränkekarte erstellen",
         deleteCardConfirmation: "Möchten Sie diese Getränkekarte wirklich löschen?",
         displayName: "Anzeigename",
@@ -362,9 +321,7 @@ const de: TranslationStructure = {
     },
     PageEvent: {
         deleteQueuedReservationConfirmMsg: "Reservierung aus der Warteschlange löschen?",
-        eventInfoTitle: "Veranstaltungsinformationen",
         exportReservationsConfirmMsg: "Reservierungen exportieren?",
-        showFloorPlansExpanded: "Grundrisse anzeigen",
     },
     PageIssueReport: {
         categories: {
@@ -379,7 +336,6 @@ const de: TranslationStructure = {
         editIssue: "Fehlerbericht bearbeiten",
         issueDeleted: "Fehlerbericht erfolgreich gelöscht",
         issueReportedSuccess: "Fehlerbericht erfolgreich eingereicht",
-        issueUpdateSuccess: "Fehlerbericht erfolgreich aktualisiert",
         myIssues: "Meine Fehlerberichte",
         noIssuesMessage: "Sie haben noch keine Fehlerberichte gemeldet",
         title: "Fehlerberichte",
@@ -412,15 +368,11 @@ const de: TranslationStructure = {
         selectCountryCodeValidationMsg: "Bitte wählen Sie eine Landesvorwahl",
     },
     UserCreateForm: {
-        noOrganisationsMessage:
-            "Sie müssen mindestens eine Organisation erstellt haben, bevor Sie einen Immobilieneigentümer erstellen können!",
         usePropertiesCheckboxesTitle: "Immobilien:",
         userMailInputHint: "E-Mail-Benutzername ohne Leerzeichen und Sonderzeichen, z.B. max123",
         userMailInputLabel: "E-Mail *",
         userNameInputHint: "Name der Person, z.B. Max Mustermann",
         userNameInputLabel: "Name *",
-        userOrganisationSelectHint: "Wählen Sie eine Organisation für diesen Benutzer.",
-        userOrganisationSelectLabel: "Organisation",
         userPasswordInputHint: "Passwort des Benutzers",
         userPasswordInputLabel: "Benutzerpasswort *",
         userRoleSelectHint: "Benutzer eine Rolle zuweisen, standardmäßig ist es Mitarbeiter.",
@@ -464,7 +416,6 @@ const de: TranslationStructure = {
         nameMustBeLongerErrorMsg: "Der Name muss mindestens 2 Zeichen lang sein!",
         nameRequired: "Name ist erforderlich",
         negativeReservationConsumptionErrorMsg: "Der Mindestverzehr darf nicht negativ sein",
-        noWhiteSpaces: "Keine Leerzeichen erlaubt!",
         passwordHasNumbers: "Das Passwort muss mindestens eine Zahl enthalten.",
         passwordHasSymbols:
             "Das Passwort muss mindestens ein Sonderzeichen enthalten (e.g., !, #, etc...)",
@@ -472,7 +423,6 @@ const de: TranslationStructure = {
         passwordMinLength: "Das Passwort muss mindestens 6 Zeichen lang sein.",
         passwordRequired: "Passwort ist erforderlich.",
         required: "Bitte geben Sie etwas ein.",
-        selectAtLeastOneProperty: "Sie müssen mindestens eine Immobilie auswählen!",
         typeRequired: "Typ ist erforderlich",
     },
     WalkInReservationForm: {
