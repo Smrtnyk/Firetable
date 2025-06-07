@@ -180,6 +180,7 @@ const enGB = {
         copy: "Copy",
         delete: "Delete",
         edit: "Edit",
+        fillRequiredFields: "Please fill all required fields.",
         inactive: "Inactive",
         manageInventoryLink: "Manage Inventory",
         name: "Name",
@@ -256,6 +257,7 @@ const enGB = {
     },
     PageAdminIssueReports: {
         deleteConfirmation: "Delete Issue",
+        issueDeleted: "Issue has been deleted successfully.",
         noIssuesMessage: "No issues have been reported",
         status: {
             in_progress: "In Progress",
@@ -290,6 +292,8 @@ const enGB = {
         displayName: "Display Name",
         downloadQRCode: "Download QR Code",
         editCardDialogTitle: "Edit Drink Card",
+        imageProcessingError: "Error processing image.",
+        invalidFileType: "Invalid file type.",
         isActiveLabel: "Active",
         noCardsMessage:
             "No drink cards created yet. Click the + button to create your first drink card.",
@@ -330,6 +334,7 @@ const enGB = {
         editIssue: "Edit Issue",
         issueDeleted: "Issue has been deleted successfully",
         issueReportedSuccess: "Issue has been reported successfully",
+        issueUpdatedSuccess: "Issue has been updated successfully.",
         myIssues: "My Issues",
         noIssuesMessage: "You haven't reported any issues yet",
         title: "Issue Reports",

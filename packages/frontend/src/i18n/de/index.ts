@@ -182,6 +182,7 @@ const de: TranslationStructure = {
         copy: "Kopieren",
         delete: "Löschen",
         edit: "Bearbeiten",
+        fillRequiredFields: "Bitte füllen Sie alle Pflichtfelder aus.",
         inactive: "Inaktiv",
         manageInventoryLink: "Inventar verwalten",
         name: "Name",
@@ -260,6 +261,7 @@ const de: TranslationStructure = {
     },
     PageAdminIssueReports: {
         deleteConfirmation: "Fehlerbericht löschen?",
+        issueDeleted: "Fehlerbericht erfolgreich gelöscht.",
         noIssuesMessage: "Es gibt keine Fehlerberichte.",
         status: {
             in_progress: "In Bearbeitung",
@@ -294,6 +296,8 @@ const de: TranslationStructure = {
         displayName: "Anzeigename",
         downloadQRCode: "QR-Code herunterladen",
         editCardDialogTitle: "Getränkekarte bearbeiten",
+        imageProcessingError: "Fehler bei der Bildverarbeitung.",
+        invalidFileType: "Ungültiger Dateityp.",
         isActiveLabel: "Aktiv",
         noCardsMessage:
             "Noch keine Getränkekarten erstellt. Klicken Sie auf +, um Ihre erste Getränkekarte zu erstellen.",
@@ -336,6 +340,7 @@ const de: TranslationStructure = {
         editIssue: "Fehlerbericht bearbeiten",
         issueDeleted: "Fehlerbericht erfolgreich gelöscht",
         issueReportedSuccess: "Fehlerbericht erfolgreich eingereicht",
+        issueUpdatedSuccess: "Fehlerbericht erfolgreich aktualisiert.",
         myIssues: "Meine Fehlerberichte",
         noIssuesMessage: "Sie haben noch keine Fehlerberichte gemeldet",
         title: "Fehlerberichte",

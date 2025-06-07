@@ -184,6 +184,7 @@ const es: TranslationStructure = {
         copy: "Copiar",
         delete: "Eliminar",
         edit: "Editar",
+        fillRequiredFields: "Por favor complete todos los campos obligatorios.",
         inactive: "Inactivo",
         manageInventoryLink: "Gestionar inventario",
         name: "Nombre",
@@ -262,6 +263,7 @@ const es: TranslationStructure = {
     },
     PageAdminIssueReports: {
         deleteConfirmation: "Elimnar reporte",
+        issueDeleted: "Reporte eliminado exitosamente.",
         noIssuesMessage: "No se han reportado problemas",
         status: {
             in_progress: "En Progreso",
@@ -295,6 +297,8 @@ const es: TranslationStructure = {
         displayName: "Nombre a mostrar",
         downloadQRCode: "Descargar código QR",
         editCardDialogTitle: "Editar Tarjeta de Bebidas",
+        imageProcessingError: "Error procesando imagen.",
+        invalidFileType: "Tipo de archivo inválido.",
         isActiveLabel: "Activo",
         noCardsMessage:
             "No hay tarjetas de bebida digitales creadas. Haz clic en el botón + crear tu primera tarjeta.",
@@ -334,6 +338,7 @@ const es: TranslationStructure = {
         editIssue: "Editar reporte",
         issueDeleted: "Reporte eliminado exitosamente",
         issueReportedSuccess: "Se ha reportado el problema exitosamente",
+        issueUpdatedSuccess: "Reporte actualizado exitosamente.",
         myIssues: "Mis reportes",
         noIssuesMessage: "No ha reportado ningún problema",
         title: "Reportes de Problemas",

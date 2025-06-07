@@ -182,6 +182,7 @@ const hr: TranslationStructure = {
         copy: "Kopiraj",
         delete: "Izbriši",
         edit: "Uredi",
+        fillRequiredFields: "Molimo ispunite sva obavezna polja.",
         inactive: "Neaktivno",
         manageInventoryLink: "Upravljanje zalihama",
         name: "Ime",
@@ -260,6 +261,7 @@ const hr: TranslationStructure = {
     },
     PageAdminIssueReports: {
         deleteConfirmation: "Izbrisati problem",
+        issueDeleted: "Problem je uspješno izbrisan.",
         noIssuesMessage: "Nema prijavljenih problema",
         status: {
             in_progress: "U tijeku",
@@ -293,6 +295,8 @@ const hr: TranslationStructure = {
         displayName: "Prikazani naziv",
         downloadQRCode: "Preuzmi QR kod",
         editCardDialogTitle: "Uredi karticu pića",
+        imageProcessingError: "Greška pri obradi slike.",
+        invalidFileType: "Nevažeći tip datoteke.",
         isActiveLabel: "Aktivno",
         noCardsMessage:
             "Nema kreiranih kartica pića. Kliknite na + gumb za kreiranje prve kartice pića.",
@@ -332,6 +336,7 @@ const hr: TranslationStructure = {
         editIssue: "Uredi problem",
         issueDeleted: "Problem je uspješno izbrisan",
         issueReportedSuccess: "Problem je uspješno prijavljen",
+        issueUpdatedSuccess: "Problem je uspješno ažuriran.",
         myIssues: "Moji problemi",
         noIssuesMessage: "Još niste prijavili nijedan problem",
         title: "Prijave problema",
