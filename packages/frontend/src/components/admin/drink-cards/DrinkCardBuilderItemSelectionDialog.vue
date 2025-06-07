@@ -4,6 +4,7 @@ import type { DrinkCardItem, InventoryItemDoc } from "@firetable/types";
 import { uniq } from "es-toolkit";
 import { property } from "es-toolkit/compat";
 import { computed, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 interface Emits {
     (event: "update:modelValue", value: boolean): void;
@@ -16,6 +17,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
+const { t } = useI18n();
 const searchQuery = ref("");
 const selectedCategories = ref<string[]>([]);
 
@@ -82,7 +84,7 @@ function toggleCategory(category: string): void {
             v-model="searchQuery"
             outlined
             debounce="300"
-            placeholder="Search items"
+            :placeholder="t('DrinkCardBuilderItemSelectionDialog.searchItemsPlaceholder')"
             class="q-mb-md"
         >
             <template #prepend>
@@ -104,7 +106,9 @@ function toggleCategory(category: string): void {
             </q-item>
 
             <q-item v-if="filteredItems.length === 0">
-                <q-item-section class="text-center text-grey"> No items found </q-item-section>
+                <q-item-section class="text-center text-grey">
+                    {{ t("DrinkCardBuilderItemSelectionDialog.noItemsFoundText") }}
+                </q-item-section>
             </q-item>
         </q-list>
     </q-card-section>

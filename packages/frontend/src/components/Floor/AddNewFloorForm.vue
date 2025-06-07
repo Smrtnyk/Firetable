@@ -13,7 +13,7 @@ const emit = defineEmits(["create"]);
 const floorName = ref("");
 
 function noSameFloorName(val: string): boolean | string {
-    return !props.allFloorNames.has(val) || "Floor with the same name already exists!";
+    return !props.allFloorNames.has(val) || t("AddNewFloorForm.floorNameExistsError");
 }
 
 function onReset(): void {
@@ -30,7 +30,7 @@ function onSubmit(): void {
         <q-input
             v-model="floorName"
             outlined
-            label="Floor name *"
+            :label="t('AddNewFloorForm.floorNameLabel')"
             lazy-rules
             :rules="[noEmptyString(), noSameFloorName]"
         />

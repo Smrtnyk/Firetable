@@ -42,7 +42,9 @@ function handleCustomSectionSubmit(): void {
                 v-model="drinkSection.name"
                 :label="t('PageAdminPropertyDrinkCards.sectionNameLabel')"
                 outlined
-                :rules="[noEmptyString('Name is required')]"
+                :rules="[
+                    noEmptyString(t('DrinkCardBuilderCustomSectionDialog.nameIsRequiredError')),
+                ]"
             />
 
             <div class="text-caption">

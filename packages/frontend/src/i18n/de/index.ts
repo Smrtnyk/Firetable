@@ -1,6 +1,10 @@
 import type { TranslationStructure } from "src/i18n/en-GB";
 
 const de: TranslationStructure = {
+    AddNewFloorForm: {
+        floorNameExistsError: "Etage mit diesem Namen existiert bereits!",
+        floorNameLabel: "Etagenname *",
+    },
     AddNewGuestForm: {
         guestNameInputLabel: "Gastname *",
     },
@@ -9,6 +13,12 @@ const de: TranslationStructure = {
         propertyNameLengthValidationMessage: "Der Immobilienname muss mindestens 3 Zeichen haben!",
     },
     AppDrawer: {
+        languages: {
+            croatian: "Kroatisch",
+            english: "Englisch",
+            german: "Deutsch",
+            spanish: "Spanisch",
+        },
         languageSelectorLabel: "Sprache",
         links: {
             issueReportsOverview: "Fehlerberichte",
@@ -24,10 +34,47 @@ const de: TranslationStructure = {
             reportIssue: "Fehler melden",
             settings: "Einstellungen",
         },
+        logoutAriaLabel: "Abmelden",
         toggles: {
             darkMode: "Dunkelmodus umschalten",
             onlineStatus: "Online-Status umschalten",
         },
+    },
+    AppTopMenu: {
+        menuAriaLabel: "Menü",
+    },
+    DrinkBundleDialog: {
+        bundleItemsLabel: "Paketartikel ({count})",
+        bundleNameLabel: "Paketname",
+        bundlePriceLabel: "Paketpreis",
+        bundlePriceLowerThanRegularError: "Paketpreis sollte niedriger als der reguläre Preis sein",
+        cancelButtonLabel: "Abbrechen",
+        createBundleButtonLabel: "Paket erstellen",
+        descriptionOptionalLabel: "Beschreibung (Optional)",
+        fillRequiredFieldsError: "Bitte füllen Sie alle Pflichtfelder aus",
+        nameIsRequiredError: "Name ist erforderlich",
+        pleaseSelectDrinkError: "Bitte wählen Sie ein Getränk aus",
+        priceGreaterThanZeroError: "Preis ist erforderlich und muss größer als 0 sein",
+        qtyLabel: "Menge",
+        quantityGreaterThanZeroError: "Menge muss größer als 0 sein",
+        removeItemConfirmMsg: "Möchten Sie diesen Artikel wirklich entfernen?",
+        savePercentageText: "{percentage}% sparen",
+        selectDrinkLabel: "Getränk auswählen",
+        unknownItemText: "Unbekannter Artikel",
+    },
+    DrinkCardBuilderAddDragElementsDropdown: {
+        addBundleLabel: "Paket hinzufügen",
+        addHeaderEndLabel: "Kopfzeilenende hinzufügen",
+        addHeaderLabel: "Kopfzeile hinzufügen",
+        createBundleDialogTitle: "Paket erstellen",
+        editBundleDialogTitle: "Paket bearbeiten",
+    },
+    DrinkCardBuilderCustomSectionDialog: {
+        nameIsRequiredError: "Name ist erforderlich",
+    },
+    DrinkCardBuilderItemSelectionDialog: {
+        noItemsFoundText: "Keine Artikel gefunden",
+        searchItemsPlaceholder: "Artikel suchen",
     },
     EventCard: {
         freeLabel: "Kostenlos",
@@ -70,7 +117,11 @@ const de: TranslationStructure = {
         guestNameValidationLength: "Der Name muss mindestens 3 Zeichen haben!",
     },
     EventGuestSearch: {
+        guestArrivedIconAriaLabel: "Symbol für angekommenen Gast",
+        hideArrivedLabel: "Angekommene ausblenden",
         label: "Tische nach Gastnamen durchsuchen...",
+        noResultsText: "Keine Ergebnisse",
+        onFloorConnector: "auf",
     },
     EventInfo: {
         eventInfoEmptyMsg: "Es gibt keine Informationen zu dieser Veranstaltung.",
@@ -102,11 +153,21 @@ const de: TranslationStructure = {
         unlinkTablesLabel: "Tischverbindung aufheben",
         waitingForResponse: "Warte auf Rückmeldung",
     },
+    FTBottomDialog: {
+        closeBottomDialogAriaLabel: "Unteren Dialog schließen",
+    },
+    FTDialog: {
+        closeDialogAriaLabel: "Dialog schließen",
+    },
     FTTimeframeSelector: {
         apply: "Anwenden",
+        applyCustomDateRangeAriaLabel: "Benutzerdefinierten Datumsbereich anwenden",
         cancel: "Abbrechen",
+        cancelCustomDateRangeAriaLabel: "Benutzerdefinierten Datumsbereich abbrechen",
         clear: "Löschen",
+        clearCustomDateRangeAriaLabel: "Benutzerdefinierten Datumsbereich löschen",
         custom: "Benutzerdefiniert",
+        customDateRangePickerAriaLabel: "Benutzerdefinierter Datumsbereichswähler",
         errorMaxDays: "Der Datumsbereich darf {maxDays} Tage nicht überschreiten.",
         errorSelectDates: "Bitte wählen Sie sowohl Start- als auch Enddatum aus.",
         invalidPreset: "Ungültige Preset-Auswahl.",
@@ -115,8 +176,13 @@ const de: TranslationStructure = {
         openDatePicker: "Datumsauswahl öffnen",
         selectDateRange: "Datumsbereich auswählen",
         selectTimeframe: "Zeitraum auswählen",
+        to: "bis",
         today: "Heute",
         yesterday: "Gestern",
+    },
+    FTTimezoneList: {
+        searchTimezonesAriaLabel: "Zeitzonen suchen",
+        searchTimezonesPlaceholder: "Zeitzonen suchen...",
     },
     Global: {
         actions: "Aktionen",
@@ -163,6 +229,11 @@ const de: TranslationStructure = {
         subCategory: "Unterkategorie",
         supplier: "Lieferant",
         volume: "Volumen",
+    },
+    NetworkOverlay: {
+        noInternetConnectionText: "Keine Internetverbindung",
+        reloadButtonLabel: "Neu laden",
+        waitOrReloadText: "Warten Sie oder versuchen Sie, die Seite neu zu laden",
     },
     PageAdminEvents: {
         createNewEventDialogTitle: "Neue Veranstaltung erstellen",
@@ -324,12 +395,21 @@ const de: TranslationStructure = {
         title: "Profil von {name}",
         updatePasswordButtonLabel: "Passwort aktualisieren",
     },
+    PieChart: {
+        tooltipPercentage: "Prozentsatz",
+        tooltipValue: "Wert",
+    },
     PlannedReservationForm: {
         reservedByStaffRadioBtnLabel: "Personal",
     },
     TelNumberInput: {
+        clearButtonLabel: "Löschen",
         countryCodeLabel: "Ländervorwahl",
+        invalidPhoneNumberValidationMsg: "Ungültige Telefonnummer",
         phoneNumberLabel: "Telefonnummer",
+        provideCountryAndNumberValidationMsg:
+            "Bitte geben Sie sowohl Landesvorwahl als auch Telefonnummer an",
+        selectCountryCodeValidationMsg: "Bitte wählen Sie eine Landesvorwahl",
     },
     UserCreateForm: {
         noOrganisationsMessage:
