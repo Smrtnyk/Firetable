@@ -772,6 +772,12 @@ function updateTableLabel(newLabel: unknown): void {
         .panel-title {
             font-weight: 600;
             font-size: 14px;
+            color: $grey-7;
+            text-transform: uppercase;
+
+            .body--dark & {
+                color: $grey-5;
+            }
         }
     }
 
