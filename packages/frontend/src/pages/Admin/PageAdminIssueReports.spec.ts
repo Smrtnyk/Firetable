@@ -155,7 +155,7 @@ describe("PageAdminIssueReports.vue", () => {
             const actionsButton = screen.getByLabelText("Actions for issue Test Bug");
             await userEvent.click(actionsButton);
             await userEvent.click(screen.getByText(t("Global.delete")));
-            await userEvent.click(screen.getByText(t("ok")));
+            await userEvent.click(screen.getByText("ok"));
 
             expect(deleteIssueReportMock).toHaveBeenCalledWith("issue1");
         });
@@ -166,7 +166,7 @@ describe("PageAdminIssueReports.vue", () => {
             const actionsButton = screen.getByLabelText("Actions for issue Test Bug");
             await userEvent.click(actionsButton);
             await userEvent.click(screen.getByText(t("Global.delete")));
-            await userEvent.click(screen.getByText(t("cancel")));
+            await userEvent.click(screen.getByText("cancel"));
 
             expect(deleteIssueReportMock).not.toHaveBeenCalled();
         });

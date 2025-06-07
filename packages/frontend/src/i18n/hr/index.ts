@@ -9,7 +9,6 @@ const hr: TranslationStructure = {
         guestNameInputLabel: "Ime gosta *",
     },
     AddNewPropertyForm: {
-        organisationsRadioBoxLabel: "Organizacije:",
         propertyNameLengthValidationMessage: "Naziv nekretnine mora imati najmanje 3 znaka!",
     },
     AppDrawer: {
@@ -37,7 +36,6 @@ const hr: TranslationStructure = {
         logoutAriaLabel: "Odjavi se",
         toggles: {
             darkMode: "Prebaci na tamni način",
-            onlineStatus: "Prebaci status online",
         },
     },
     AppTopMenu: {
@@ -83,13 +81,10 @@ const hr: TranslationStructure = {
         entryPriceInputLabel: "Cijena ulaza, ostavite 0 ako je besplatno",
         eventImgInputLabel: "Opcionalni URL slike događaja",
         eventNameInputLabel: "Naziv događaja*",
-        goToFloorPlannerMessage: "Idi na planer tlocrta",
         guestListLimitInputLabel: "Limit popisa gostiju",
         inputDateTimeLabel: "Datum i vrijeme događaja",
         inputDateTimePickerCloseBtnLabel: "Zatvori",
         noChosenFloorsMessage: "Morate odabrati barem jedan tlocrt",
-        noFloorPlansMessage: "Ne možete kreirati događaje jer nemate kreirane tlocrte!",
-        selectedFloorNotFoundMessage: "Odabrani tlocrt nije pronađen.",
     },
     EventCreateReservation: {
         requireReservedBySelectionError: "Morate odabrati barem jednu opciju",
@@ -122,9 +117,6 @@ const hr: TranslationStructure = {
         noResultsText: "Nema rezultata",
         onFloorConnector: "na",
     },
-    EventInfo: {
-        eventInfoEmptyMsg: "Nema opisa događaja za ovaj događaj!",
-    },
     EventQueuedReservations: {
         addNewReservation: "Dodaj novu rezervaciju",
         emptyMessage: "Nema rezervacija u redu čekanja.",
@@ -135,7 +127,6 @@ const hr: TranslationStructure = {
         contactLabel: "Kontakt",
         createdAtLabel: "Kreirano",
         createdByLabel: "Kreator",
-        groupedWithLabel: "Grupirano s",
         guestHistoryLabel: "Povijest gosta",
         guestNameLabel: "Ime",
         linkTablesLabel: "Poveži stolove",
@@ -163,7 +154,6 @@ const hr: TranslationStructure = {
         applyCustomDateRangeAriaLabel: "Primijeni prilagođeni raspon datuma",
         cancel: "Otkaži",
         cancelCustomDateRangeAriaLabel: "Otkaži prilagođeni raspon datuma",
-        clear: "Očisti",
         clearCustomDateRangeAriaLabel: "Očisti prilagođeni raspon datuma",
         custom: "Prilagođeno",
         customDateRangePickerAriaLabel: "Prilagođeni birač raspona datuma",
@@ -189,23 +179,18 @@ const hr: TranslationStructure = {
         arrived: "Stigao",
         cancel: "Otkaži",
         cancelled: "Otkazano",
-        category: "Kategorija",
         copy: "Kopiraj",
         delete: "Izbriši",
         edit: "Uredi",
-        fullScreen: "Puni saslon",
         inactive: "Neaktivno",
-        link: "Poveznica",
         manageInventoryLink: "Upravljanje zalihama",
         name: "Ime",
         noDescription: "Nema opisa",
-        price: "Cijena",
         reactivate: "Ponovno aktiviraj",
         reset: "Poništi",
         submit: "Pošalji",
         tagsLabel: "Oznake",
         transfer: "Prijenos",
-        type: "Vrsta",
     },
     GuestSummaryChips: {
         arrived: "Stigao",
@@ -214,15 +199,11 @@ const hr: TranslationStructure = {
     InventoryItemCreateForm: {
         alcoholContentRange: "Sadržaj alkohola mora biti između 0 i 100",
         mainCategoryRequired: "Glavna kategorija je obavezna",
-        minimumStockNonNegative: "Minimalne zalihe moraju biti nenegativne",
         quantityNonNegative: "Količina mora biti nenegativna",
         subCategoryRequired: "Podkategorija je obavezna",
         volumePositive: "Volumen mora biti pozitivan",
     },
     InventoryTable: {
-        actions: "Radnje",
-        deleteSelected: "Izbriši odabrano",
-        drink: "Piće",
         mainCategory: "Glavna kategorija",
         quantity: "Količina",
         subCategory: "Podkategorija",
@@ -240,17 +221,13 @@ const hr: TranslationStructure = {
         editEventDialogTitle: "Uređivanje događaja: {eventName}",
         eventCreatedNotificationMessage: "Događaj kreiran!",
         noEventsMessage: "Nema kreiranih događaja.",
-        noPropertiesMessage: "Nema kreiranih nekretnina, ne mogu se kreirati događaji.",
         pastEventsLabel: "Prošli događaji",
         title: "Događaji",
     },
     PageAdminFloors: {
-        addNewFloorMessage: "Dodaj novi kat u {propertyName}",
         deleteFloorMessage: "Izbrisati kat?",
         duplicateFloorPlanMessage: "Jeste li sigurni da želite duplicirati tlocrt {floorName}?",
         noFloorPlansMessage: "Ova nekretnina nema tlocrte.",
-        noPropertiesMessage:
-            "Nemate kreiranih nekretnina, kako biste kreirali tlocrte prvo morate kreirati barem jednu nekretninu.",
         title: "Tlocrti",
     },
     PageAdminGuest: {
@@ -265,7 +242,6 @@ const hr: TranslationStructure = {
     },
     PageAdminGuests: {
         createNewGuestDialogTitle: "Kreiraj novog gosta",
-        maxAmountGuestsCreationMessage: "Dosegnuli ste maksimalan broj gostiju koji je {limit}!",
         noGuestsData: "Nema podataka o gostima.",
         title: "Gosti",
     },
@@ -279,21 +255,11 @@ const hr: TranslationStructure = {
             "Pogreška pri uvozu artikala. Molimo provjerite format datoteke i pokušajte ponovno.",
         importMergeSuccess:
             "Artikli uspješno uvezeni. {count} artikala dodano, {updated} ažurirano",
-        itemMainCategory: {
-            beer: "Pivo",
-            "cocktail-components": "Komponente koktela",
-            "non-alcoholic": "Bezalkoholno",
-            spirits: "Žestoka pića",
-            tobacco: "Duhan",
-            wine: "Vino",
-        },
         noItemsMessage: "Nema artikala u zalihama.",
         title: "Zalihe",
     },
     PageAdminIssueReports: {
         deleteConfirmation: "Izbrisati problem",
-        issueMarkedAsResolved: "Problem označen kao riješen",
-        issueMarkedAsUnresolved: "Problem označen kao neriješen",
         noIssuesMessage: "Nema prijavljenih problema",
         status: {
             in_progress: "U tijeku",
@@ -306,15 +272,12 @@ const hr: TranslationStructure = {
         updateStatus: "Ažuriraj status",
     },
     PageAdminProperties: {
-        addNewProperty: "Dodaj novu nekretninu",
         createPropertyDialogTitle: "Dodaj novu nekretninu",
         deletePropertyDialogMessage: "Ovo će također izbrisati sve povezane događaje!",
         deletePropertyDialogTitle: "Izbrisati nekretninu?",
         editPropertyDialogTitle: "Uređivanje nekretnine: {name}",
         maxAmountOfPropertiesReachedMessage: "Dosegnuli ste maksimalan broj kreiranih nekretnina!",
         noPropertiesCreatedMessage: "Nema kreiranih nekretnina",
-        noPropertiesWithoutOrganisationMessage:
-            "Kako biste kreirali nekretnine, prvo morate kreirati organizaciju.",
         properties: "Nekretnine",
     },
     PageAdminPropertyDrinkCards: {
@@ -325,7 +288,6 @@ const hr: TranslationStructure = {
         cardDescriptionLabel: "Opis (opcionalno)",
         cardNameLabel: "Naziv kartice",
         cardUpdatedMessage: "Kartica pića uspješno ažurirana",
-        categoryLabel: "Kategorija",
         createCardDialogTitle: "Kreiraj novu karticu pića",
         deleteCardConfirmation: "Jeste li sigurni da želite izbrisati ovu karticu pića?",
         displayName: "Prikazani naziv",
@@ -355,9 +317,7 @@ const hr: TranslationStructure = {
     },
     PageEvent: {
         deleteQueuedReservationConfirmMsg: "Jeste li sigurni da želite izbrisati ovu rezervaciju?",
-        eventInfoTitle: "Informacije o događaju",
         exportReservationsConfirmMsg: "Ovo će izvesti rezervacije u CSV datoteku",
-        showFloorPlansExpanded: "Tlocrt",
     },
     PageIssueReport: {
         categories: {
@@ -372,7 +332,6 @@ const hr: TranslationStructure = {
         editIssue: "Uredi problem",
         issueDeleted: "Problem je uspješno izbrisan",
         issueReportedSuccess: "Problem je uspješno prijavljen",
-        issueUpdateSuccess: "Problem uspješno ažuriran",
         myIssues: "Moji problemi",
         noIssuesMessage: "Još niste prijavili nijedan problem",
         title: "Prijave problema",
@@ -405,15 +364,11 @@ const hr: TranslationStructure = {
         selectCountryCodeValidationMsg: "Molimo odaberite pozivni broj zemlje",
     },
     UserCreateForm: {
-        noOrganisationsMessage:
-            "Morate imati barem jednu organizaciju kreiranu prije kreiranja vlasnika nekretnine!",
         usePropertiesCheckboxesTitle: "Nekretnine:",
         userMailInputHint: "Korisničko ime emaila bez razmaka i posebnih znakova, npr. max123",
         userMailInputLabel: "Email *",
         userNameInputHint: "Ime osobe, npr. Max Mustermann",
         userNameInputLabel: "Ime *",
-        userOrganisationSelectHint: "Odaberite organizaciju za ovog korisnika.",
-        userOrganisationSelectLabel: "Organizacija",
         userPasswordInputHint: "Lozinka korisnika",
         userPasswordInputLabel: "Lozinka korisnika *",
         userRoleSelectHint: "Dodijelite ulogu korisniku, zadano je Osoblje.",
@@ -454,14 +409,12 @@ const hr: TranslationStructure = {
         nameMustBeLongerErrorMsg: "Ime mora imati najmanje 2 znaka!",
         nameRequired: "Ime je obavezno",
         negativeReservationConsumptionErrorMsg: "Potrošnja ne može biti negativna",
-        noWhiteSpaces: "Nisu dopušteni razmaci!",
         passwordHasNumbers: "Lozinka mora sadržavati barem jedan broj.",
         passwordHasSymbols: "Lozinka mora sadržavati barem jedan poseban znak (npr., !, #, itd...)",
         passwordHasUpperCase: "Lozinka mora sadržavati barem jedno veliko slovo.",
         passwordMinLength: "Lozinka mora imati najmanje 6 znakova.",
         passwordRequired: "Lozinka je obavezna.",
         required: "Molimo unesite nešto.",
-        selectAtLeastOneProperty: "Morate odabrati barem jednu opciju!",
         typeRequired: "Vrsta je obavezna",
     },
     WalkInReservationForm: {
