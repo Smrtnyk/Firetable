@@ -8,6 +8,11 @@ const es: TranslationStructure = {
     AddNewGuestForm: {
         guestNameInputLabel: "Nombre de invitado *",
     },
+    AddNewOrganisationForm: {
+        maxPropertiesLabel: "Agregar número máximo de propiedades permitidas...",
+        organisationNameError: "¡El nombre de la organización debe tener al menos 3 caracteres!",
+        organisationNameLabel: "Ingrese el nombre de la organización...",
+    },
     AddNewPropertyForm: {
         propertyNameLengthValidationMessage:
             "¡El nombre de la propiedad debe tener al menos 3 caracteres!",
@@ -75,6 +80,11 @@ const es: TranslationStructure = {
     DrinkCardBuilderItemSelectionDialog: {
         noItemsFoundText: "No se encontraron artículos",
         searchItemsPlaceholder: "Buscar artículos",
+    },
+    Error404: {
+        code: "(404)",
+        goBackButtonLabel: "Volver",
+        message: "Lo sentimos, nada por aquí...",
     },
     EventCard: {
         freeLabel: "Gratis",
@@ -275,55 +285,37 @@ const es: TranslationStructure = {
         title: "Reportes de Problemas",
         updateStatus: "Actualizar Estado",
     },
-    PageAdminProperties: {
-        createPropertyDialogTitle: "Añadir nueva propiedad",
-        deletePropertyDialogMessage: "¡Esto eliminará todos los eventos asociados!",
-        deletePropertyDialogTitle: "¿Eliminar propiedad?",
-        editPropertyDialogTitle: "Editando propiedad: {name}",
-        maxAmountOfPropertiesReachedMessage: "¡Ha alcanzado el máximo de propiedades creadas!",
-        noPropertiesCreatedMessage: "No hay propiedades creadas",
-        properties: "Propiedades",
+    PageAdminOrganisation: {
+        deleteOrganisationButtonAriaLabel: "Eliminar organización",
+        deleteOrganisationConfirmMessage:
+            "Esta acción no se puede deshacer. Todos los usuarios, propiedades y datos asociados con esta organización se eliminarán permanentemente.",
+        deleteOrganisationConfirmTitle: "¿Eliminar organización?",
+        manageButtonLabel: "Gestionar",
+        manageGuestsDescription:
+            "Gestionar el acceso y los permisos de invitados para esta organización",
+        managePropertiesDescription:
+            "Agregar, editar o eliminar propiedades que pertenecen a esta organización",
+        manageUsersDescription:
+            "Agregar, editar o eliminar usuarios que pueden acceder a esta organización",
+        organisationDeletedSuccess: "Organización eliminada exitosamente",
+        organisationIdLabel: "ID de organización:",
+        statusLabel: "Estado:",
     },
-    PageAdminPropertyDrinkCards: {
-        addSection: "Añadir sección",
-        amount: "Cantidad",
-        cardCreatedMessage: "Tarjeta de bebidas creada con éxito",
-        cardDeletedMessage: "Tarjeta de bebidas eliminada con éxito",
-        cardDescriptionLabel: "Descripción (opcional)",
-        cardNameLabel: "Nombre de Tarjeta",
-        cardUpdatedMessage: "Tarjeta de bebidas actualizada con éxito",
-        createCardDialogTitle: "Crear Nueva Tarjeta de Bebidas",
-        deleteCardConfirmation: "Are you sure you want to delete this drink card?",
-        displayName: "Nombre a mostrar",
-        downloadQRCode: "Descargar código QR",
-        editCardDialogTitle: "Editar Tarjeta de Bebidas",
-        imageProcessingError: "Error procesando imagen.",
-        invalidFileType: "Tipo de archivo inválido.",
-        isActiveLabel: "Activo",
-        noCardsMessage:
-            "No hay tarjetas de bebida digitales creadas. Haz clic en el botón + crear tu primera tarjeta.",
-        noItemsMessage: "No hay artículos en esta sección. Haz clic en el botón + para añadir uno.",
-        qrCodeAlt: "Código QR de la tarjeta de bebidas",
-        qrCodeTitle: "Código QR",
-        sectionNameLabel: "Nombre de sección",
-        sectionsCount: "Secciones: {count}",
-        sectionsLabel: "Secciones",
-        servingSize: "Tamaño de Porción",
-        servingSizeOptional: "Serving Size (Optional)",
-        title: "Tarjetas de Bebida Digitales",
-        unit: "Unidad",
-    },
-    PageAdminUsers: {
-        createNewUserDialogTitle: "Crear nuevo usuario",
-        editUserConfirmationMessage: "Esta seguro que desea editar al usuario {name}?",
-        editUserDialogTitle: "Editando usuario: {name}",
-        maxAmountUsersCreationMessage: "¡Ha alcanzado el máximo de usuarios, que es {limit}!",
-        noUsersCreatedMessage: "No hay usuarios creados.",
-        title: "Usuarios",
+    PageAdminOrganisations: {
+        addNewOrganisationTitle: "Agregar nueva organización",
+        adjustSearchCriteria: "Intente ajustar sus criterios de búsqueda",
+        createOrganisationButton: "Crear organización",
+        noOrganisationsFound: "No se encontraron organizaciones",
+        organisationCreatedSuccess: "¡Organización creada exitosamente!",
+        searchPlaceholder: "Buscar organizaciones...",
+        title: "Organizaciones",
     },
     PageEvent: {
         deleteQueuedReservationConfirmMsg: "¿Está seguro que desea eliminar esta reservación?",
         exportReservationsConfirmMsg: "Esto exportará todas las reservaciones a un archivo CSV",
+    },
+    PageEvents: {
+        noUpcomingEvents: "No hay próximos eventos",
     },
     PageIssueReport: {
         categories: {
@@ -344,6 +336,14 @@ const es: TranslationStructure = {
         title: "Reportes de Problemas",
         tooManyReports:
             "Solo puede enviar {count} reportes cada {minutes} minutos. Intentelo de nuevo más tarde.",
+    },
+    PageOrganisations: {
+        addNewOrganisationTitle: "Agregar nueva organización",
+        createOrganisationButton: "Crear organización",
+        floorPlansPerEvent: "Planos de planta/Evento",
+        noOrganisationsMessage: "Cree su primera organización para comenzar",
+        organisationCreatedSuccess: "¡Organización creada exitosamente!",
+        propertiesLimit: "Límite de propiedades",
     },
     PageProfile: {
         nameLabel: "Nombre: {name}",

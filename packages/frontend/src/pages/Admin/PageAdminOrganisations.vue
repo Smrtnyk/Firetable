@@ -15,8 +15,10 @@ import { isDark } from "src/global-reactives/is-dark";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { computed, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 
+const { t } = useI18n();
 const quasar = useQuasar();
 const router = useRouter();
 const { createDialog } = useDialog();
@@ -46,7 +48,7 @@ function createOrganisation(): void {
                 },
             },
             maximized: false,
-            title: "Add new Organisation",
+            title: t("PageAdminOrganisations.addNewOrganisationTitle"),
         },
     });
 }
@@ -59,7 +61,7 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
     await tryCatchLoadingWrapper({
         async hook() {
             await createNewOrganisation(organisationPayload);
-            quasar.notify("Organisation created successfully!");
+            quasar.notify(t("PageAdminOrganisations.organisationCreatedSuccess"));
             return propertiesStore.initOrganisations();
         },
     });
@@ -68,13 +70,14 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
 
 <template>
     <div>
-        <FTTitle title="Organisations">
+        <FTTitle :title="t('PageAdminOrganisations.title')">
             <template #right>
                 <FTBtn
                     rounded
                     icon="fa fa-plus"
                     class="button-gradient"
                     @click="createOrganisation"
+                    :aria-label="t('PageAdminOrganisations.createOrganisationButton')"
                 />
             </template>
         </FTTitle>
@@ -85,7 +88,7 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
                 v-model="searchQuery"
                 outlined
                 dense
-                placeholder="Search organisations..."
+                :placeholder="t('PageAdminOrganisations.searchPlaceholder')"
                 class="search-input"
             >
                 <template v-slot:prepend>
@@ -132,9 +135,11 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
         <!-- Empty State -->
         <FTCenteredText v-if="organisations.length === 0">
             <q-icon name="fa fa-briefcase" size="64px" color="grey-5" class="q-mb-md" />
-            <div class="text-grey-6 q-mb-lg">Create your first organisation to get started</div>
+            <div class="text-grey-6 q-mb-lg">
+                {{ t("PageOrganisations.noOrganisationsMessage") }}
+            </div>
             <FTBtn
-                label="Create Organisation"
+                :label="t('PageAdminOrganisations.createOrganisationButton')"
                 icon="fa fa-plus"
                 class="button-gradient"
                 @click="createOrganisation"
@@ -149,8 +154,10 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
                 color="grey-5"
                 class="q-mb-md"
             />
-            <div class="text-h6 q-mb-sm">No organisations found</div>
-            <div class="text-grey-6">Try adjusting your search criteria</div>
+            <div class="text-h6 q-mb-sm">
+                {{ t("PageAdminOrganisations.noOrganisationsFound") }}
+            </div>
+            <div class="text-grey-6">{{ t("PageAdminOrganisations.adjustSearchCriteria") }}</div>
         </FTCenteredText>
     </div>
 </template>

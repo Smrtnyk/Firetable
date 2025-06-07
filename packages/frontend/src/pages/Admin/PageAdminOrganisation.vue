@@ -38,21 +38,21 @@ function getActionCards(): ActionCard[] {
     return [
         {
             color: "accent",
-            description: "Add, edit, or remove properties belonging to this organisation",
+            description: t("PageAdminOrganisation.managePropertiesDescription"),
             icon: "fa fa-home",
             route: { name: "adminProperties", params },
             title: t("AppDrawer.links.manageProperties"),
         },
         {
             color: "primary",
-            description: "Add, edit, or remove users who can access this organisation",
+            description: t("PageAdminOrganisation.manageUsersDescription"),
             icon: "fa fa-users",
             route: { name: "adminUsers", params },
             title: t("AppDrawer.links.manageUsers"),
         },
         {
             color: "secondary",
-            description: "Manage guest access and permissions for this organisation",
+            description: t("PageAdminOrganisation.manageGuestsDescription"),
             icon: "fa fa-user-friends",
             route: { name: "adminGuests", params },
             title: t("AppDrawer.links.manageGuests"),
@@ -66,8 +66,8 @@ async function onDeleteOrganisation(): Promise<void> {
     }
 
     const shouldDeleteOrganisation = await showDeleteConfirm(
-        "Delete Organisation?",
-        `This action cannot be undone. All users, properties, and data associated with this organisation will be permanently deleted.`,
+        t("PageAdminOrganisation.deleteOrganisationConfirmTitle"),
+        t("PageAdminOrganisation.deleteOrganisationConfirmMessage"),
         organisation.name,
     );
 
@@ -80,7 +80,7 @@ async function onDeleteOrganisation(): Promise<void> {
             await deleteOrganisation(props.organisationId);
             await propertiesStore.initOrganisations();
             quasar.notify({
-                message: "Organisation deleted successfully",
+                message: t("PageAdminOrganisation.organisationDeletedSuccess"),
                 position: "top",
                 type: "positive",
             });
@@ -95,7 +95,7 @@ async function onDeleteOrganisation(): Promise<void> {
         <!-- Header Section -->
         <FTTitle title="">
             <template #left>
-                Status:
+                {{ t("PageAdminOrganisation.statusLabel") }}
                 <q-chip
                     :color="getOrganisationStatusColor(organisation.status)"
                     text-color="white"
@@ -107,7 +107,7 @@ async function onDeleteOrganisation(): Promise<void> {
             <template #right>
                 <FTBtn
                     icon="fa fa-trash"
-                    aria-label="Delete organisation"
+                    :aria-label="t('PageAdminOrganisation.deleteOrganisationButtonAriaLabel')"
                     rounded
                     color="negative"
                     @click="onDeleteOrganisation"
@@ -128,7 +128,8 @@ async function onDeleteOrganisation(): Promise<void> {
                                 <div class="info-content">
                                     <h5 class="text-h5 q-my-none">{{ organisation.name }}</h5>
                                     <div class="text-caption text-grey q-mt-xs">
-                                        Organisation ID: {{ organisation.id }}
+                                        {{ t("PageAdminOrganisation.organisationIdLabel") }}
+                                        {{ organisation.id }}
                                     </div>
                                 </div>
                             </div>
@@ -168,7 +169,7 @@ async function onDeleteOrganisation(): Promise<void> {
                             flat
                             :color="card.color"
                             icon-right="fa fa-chevron-right"
-                            label="Manage"
+                            :label="t('PageAdminOrganisation.manageButtonLabel')"
                             no-caps
                         />
                     </q-card-actions>

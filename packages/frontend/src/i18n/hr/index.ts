@@ -8,6 +8,11 @@ const hr: TranslationStructure = {
     AddNewGuestForm: {
         guestNameInputLabel: "Ime gosta *",
     },
+    AddNewOrganisationForm: {
+        maxPropertiesLabel: "Dodajte maksimalan broj dopuštenih nekretnina...",
+        organisationNameError: "Naziv organizacije mora imati najmanje 3 znaka!",
+        organisationNameLabel: "Unesite naziv organizacije...",
+    },
     AddNewPropertyForm: {
         propertyNameLengthValidationMessage: "Naziv nekretnine mora imati najmanje 3 znaka!",
     },
@@ -73,6 +78,11 @@ const hr: TranslationStructure = {
     DrinkCardBuilderItemSelectionDialog: {
         noItemsFoundText: "Nema pronađenih stavki",
         searchItemsPlaceholder: "Pretraži stavke",
+    },
+    Error404: {
+        code: "(404)",
+        goBackButtonLabel: "Idi natrag",
+        message: "Žao nam je, ovdje nema ničega...",
     },
     EventCard: {
         freeLabel: "Besplatno",
@@ -273,6 +283,30 @@ const hr: TranslationStructure = {
         title: "Prijave problema",
         updateStatus: "Ažuriraj status",
     },
+    PageAdminOrganisation: {
+        deleteOrganisationButtonAriaLabel: "Izbriši organizaciju",
+        deleteOrganisationConfirmMessage:
+            "Ova se radnja ne može poništiti. Svi korisnici, nekretnine i podaci povezani s ovom organizacijom bit će trajno izbrisani.",
+        deleteOrganisationConfirmTitle: "Izbrisati organizaciju?",
+        manageButtonLabel: "Upravljaj",
+        manageGuestsDescription: "Upravljajte pristupom i dopuštenjima gostiju za ovu organizaciju",
+        managePropertiesDescription:
+            "Dodajte, uredite ili uklonite nekretnine koje pripadaju ovoj organizaciji",
+        manageUsersDescription:
+            "Dodajte, uredite ili uklonite korisnike koji mogu pristupiti ovoj organizaciji",
+        organisationDeletedSuccess: "Organizacija uspješno izbrisana",
+        organisationIdLabel: "ID organizacije:",
+        statusLabel: "Status:",
+    },
+    PageAdminOrganisations: {
+        addNewOrganisationTitle: "Dodaj novu organizaciju",
+        adjustSearchCriteria: "Pokušajte prilagoditi kriterije pretraživanja",
+        createOrganisationButton: "Kreiraj organizaciju",
+        noOrganisationsFound: "Nema pronađenih organizacija",
+        organisationCreatedSuccess: "Organizacija uspješno kreirana!",
+        searchPlaceholder: "Pretražite organizacije...",
+        title: "Organizacije",
+    },
     PageAdminProperties: {
         createPropertyDialogTitle: "Dodaj novu nekretninu",
         deletePropertyDialogMessage: "Ovo će također izbrisati sve povezane događaje!",
@@ -342,6 +376,14 @@ const hr: TranslationStructure = {
         title: "Prijave problema",
         tooManyReports:
             "Možete poslati samo {count} prijava svakih {minutes} minuta. Molimo pokušajte kasnije.",
+    },
+    PageOrganisations: {
+        addNewOrganisationTitle: "Dodaj novu organizaciju",
+        createOrganisationButton: "Kreiraj organizaciju",
+        floorPlansPerEvent: "Tlocrti/Događaj",
+        noOrganisationsMessage: "Kreirajte svoju prvu organizaciju da biste započeli",
+        organisationCreatedSuccess: "Organizacija uspješno kreirana!",
+        propertiesLimit: "Ograničenje nekretnina",
     },
     PageProfile: {
         nameLabel: "Ime: {name}",

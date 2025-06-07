@@ -8,6 +8,11 @@ const de: TranslationStructure = {
     AddNewGuestForm: {
         guestNameInputLabel: "Gastname *",
     },
+    AddNewOrganisationForm: {
+        maxPropertiesLabel: "Maximale Anzahl erlaubter Immobilien hinzufügen...",
+        organisationNameError: "Der Organisationsname muss mindestens 3 Zeichen haben!",
+        organisationNameLabel: "Organisationsnamen eingeben...",
+    },
     AddNewPropertyForm: {
         propertyNameLengthValidationMessage: "Der Immobilienname muss mindestens 3 Zeichen haben!",
     },
@@ -73,6 +78,11 @@ const de: TranslationStructure = {
     DrinkCardBuilderItemSelectionDialog: {
         noItemsFoundText: "Keine Artikel gefunden",
         searchItemsPlaceholder: "Artikel suchen",
+    },
+    Error404: {
+        code: "(404)",
+        goBackButtonLabel: "Zurück",
+        message: "Entschuldigung, hier gibt es nichts...",
     },
     EventCard: {
         freeLabel: "Kostenlos",
@@ -273,6 +283,30 @@ const de: TranslationStructure = {
         title: "Fehlerberichte",
         updateStatus: "Status aktualisieren",
     },
+    PageAdminOrganisation: {
+        deleteOrganisationButtonAriaLabel: "Organisation löschen",
+        deleteOrganisationConfirmMessage:
+            "Diese Aktion kann nicht rückgängig gemacht werden. Alle Benutzer, Immobilien und Daten, die mit dieser Organisation verbunden sind, werden dauerhaft gelöscht.",
+        deleteOrganisationConfirmTitle: "Organisation löschen?",
+        manageButtonLabel: "Verwalten",
+        manageGuestsDescription: "Gastzugriff und Berechtigungen für diese Organisation verwalten",
+        managePropertiesDescription:
+            "Immobilien, die zu dieser Organisation gehören, hinzufügen, bearbeiten oder entfernen",
+        manageUsersDescription:
+            "Benutzer, die auf diese Organisation zugreifen können, hinzufügen, bearbeiten oder entfernen",
+        organisationDeletedSuccess: "Organisation erfolgreich gelöscht",
+        organisationIdLabel: "Organisations-ID:",
+        statusLabel: "Status:",
+    },
+    PageAdminOrganisations: {
+        addNewOrganisationTitle: "Neue Organisation hinzufügen",
+        adjustSearchCriteria: "Versuchen Sie, Ihre Suchkriterien anzupassen",
+        createOrganisationButton: "Organisation erstellen",
+        noOrganisationsFound: "Keine Organisationen gefunden",
+        organisationCreatedSuccess: "Organisation erfolgreich erstellt!",
+        searchPlaceholder: "Organisationen suchen...",
+        title: "Organisationen",
+    },
     PageAdminProperties: {
         createPropertyDialogTitle: "Neue Immobilie hinzufügen",
         deletePropertyDialogMessage: "Dies wird auch alle zugehörigen Veranstaltungen löschen!",
@@ -346,6 +380,14 @@ const de: TranslationStructure = {
         title: "Fehlerberichte",
         tooManyReports:
             "Sie können nur {count} Fehlerberichte alle {minutes} Minuten einreichen. Bitte versuchen Sie es später erneut.",
+    },
+    PageOrganisations: {
+        addNewOrganisationTitle: "Neue Organisation hinzufügen",
+        createOrganisationButton: "Organisation erstellen",
+        floorPlansPerEvent: "Grundrisse/Veranstaltung",
+        noOrganisationsMessage: "Erstellen Sie Ihre erste Organisation, um loszulegen",
+        organisationCreatedSuccess: "Organisation erfolgreich erstellt!",
+        propertiesLimit: "Immobilienlimit",
     },
     PageProfile: {
         nameLabel: "Name: {name}",

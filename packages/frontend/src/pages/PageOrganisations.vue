@@ -17,6 +17,9 @@ import {
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const propertiesStore = usePropertiesStore();
 const { organisations } = storeToRefs(usePropertiesStore());
@@ -39,7 +42,7 @@ function createOrganisation(): void {
                 },
             },
             maximized: false,
-            title: "Add new Organisation",
+            title: t("PageOrganisations.addNewOrganisationTitle"),
         },
     });
 }
@@ -49,7 +52,7 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
         async hook() {
             await createNewOrganisation(organisationPayload);
             quasar.notify({
-                message: "Organisation created successfully!",
+                message: t("PageOrganisations.organisationCreatedSuccess"),
                 type: "success",
             });
             return propertiesStore.initOrganisations();
@@ -89,21 +92,27 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
                                 <div class="col-5">
                                     <q-item dense>
                                         <q-item-section>
-                                            <q-item-label caption>Properties Limit</q-item-label>
-                                            <q-item-label>{{
-                                                organisation.maxAllowedProperties
-                                            }}</q-item-label>
+                                            <q-item-label caption>
+                                                {{ t("PageOrganisations.propertiesLimit") }}
+                                            </q-item-label>
+                                            <q-item-label>
+                                                {{ organisation.maxAllowedProperties }}
+                                            </q-item-label>
                                         </q-item-section>
                                     </q-item>
                                 </div>
                                 <div class="col-5">
                                     <q-item dense>
                                         <q-item-section>
-                                            <q-item-label caption>Floor Plans/Event</q-item-label>
-                                            <q-item-label>{{
-                                                organisation.subscriptionSettings
-                                                    ?.maxFloorPlansPerEvent ?? "N/A"
-                                            }}</q-item-label>
+                                            <q-item-label caption>
+                                                {{ t("PageOrganisations.floorPlansPerEvent") }}
+                                            </q-item-label>
+                                            <q-item-label>
+                                                {{
+                                                    organisation.subscriptionSettings
+                                                        ?.maxFloorPlansPerEvent ?? "N/A"
+                                                }}
+                                            </q-item-label>
                                         </q-item-section>
                                     </q-item>
                                 </div>
@@ -128,9 +137,11 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
         <div v-else>
             <FTCenteredText>
                 <q-icon name="fa fa-briefcase" size="64px" color="grey-5" class="q-mb-md" />
-                <div class="text-grey-6 q-mb-lg">Create your first organisation to get started</div>
+                <div class="text-grey-6 q-mb-lg">
+                    {{ t("PageOrganisations.noOrganisationsMessage") }}
+                </div>
                 <FTBtn
-                    label="Create Organisation"
+                    :label="t('PageOrganisations.createOrganisationButton')"
                     icon="fa fa-plus"
                     class="button-gradient"
                     @click="createOrganisation"

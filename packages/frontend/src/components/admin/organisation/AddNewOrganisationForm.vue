@@ -10,7 +10,7 @@ import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
 const emit = defineEmits<(eventName: "create", payload: CreateOrganisationPayload) => void>();
-const organisationRules = [minLength("organisation name needs to have at least 3 characters!", 3)];
+const organisationRules = [minLength(t("AddNewOrganisationForm.organisationNameError"), 3)];
 const maxAllowedPropertiesRules = [requireNumber(), greaterThanZero()];
 
 const organisationName = ref("");
@@ -35,7 +35,7 @@ async function submit(): Promise<void> {
         <q-form ref="createOrganisationForm" class="q-gutter-md">
             <q-input
                 v-model="organisationName"
-                label="Enter organisation name..."
+                :label="t('AddNewOrganisationForm.organisationNameLabel')"
                 outlined
                 autofocus
                 :rules="organisationRules"
@@ -43,7 +43,7 @@ async function submit(): Promise<void> {
 
             <q-input
                 v-model.number="maxAllowedProperties"
-                label="Add maximum number of allowed properties..."
+                :label="t('AddNewOrganisationForm.maxPropertiesLabel')"
                 outlined
                 type="number"
                 :rules="maxAllowedPropertiesRules"

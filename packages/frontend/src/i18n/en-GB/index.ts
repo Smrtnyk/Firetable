@@ -6,6 +6,11 @@ const enGB = {
     AddNewGuestForm: {
         guestNameInputLabel: "Guest name *",
     },
+    AddNewOrganisationForm: {
+        maxPropertiesLabel: "Add maximum number of allowed properties...",
+        organisationNameError: "Organisation name needs to have at least 3 characters!",
+        organisationNameLabel: "Enter organisation name...",
+    },
     AddNewPropertyForm: {
         propertyNameLengthValidationMessage: "Property name needs to have at least 3 characters!",
     },
@@ -71,6 +76,11 @@ const enGB = {
     DrinkCardBuilderItemSelectionDialog: {
         noItemsFoundText: "No items found",
         searchItemsPlaceholder: "Search items",
+    },
+    Error404: {
+        code: "(404)",
+        goBackButtonLabel: "Go back",
+        message: "Sorry, nothing here...",
     },
     EventCard: {
         freeLabel: "Free",
@@ -269,6 +279,29 @@ const enGB = {
         title: "Issue Reports",
         updateStatus: "Update Status",
     },
+    PageAdminOrganisation: {
+        deleteOrganisationButtonAriaLabel: "Delete organisation",
+        deleteOrganisationConfirmMessage:
+            "This action cannot be undone. All users, properties, and data associated with this organisation will be permanently deleted.",
+        deleteOrganisationConfirmTitle: "Delete Organisation?",
+        manageButtonLabel: "Manage",
+        manageGuestsDescription: "Manage guest access and permissions for this organisation",
+        managePropertiesDescription:
+            "Add, edit, or remove properties belonging to this organisation",
+        manageUsersDescription: "Add, edit, or remove users who can access this organisation",
+        organisationDeletedSuccess: "Organisation deleted successfully",
+        organisationIdLabel: "Organisation ID:",
+        statusLabel: "Status:",
+    },
+    PageAdminOrganisations: {
+        addNewOrganisationTitle: "Add new Organisation",
+        adjustSearchCriteria: "Try adjusting your search criteria",
+        createOrganisationButton: "Create Organisation",
+        noOrganisationsFound: "No organisations found",
+        organisationCreatedSuccess: "Organisation created successfully!",
+        searchPlaceholder: "Search organisations...",
+        title: "Organisations",
+    },
     PageAdminProperties: {
         createPropertyDialogTitle: "Add new Property",
         deletePropertyDialogMessage: "This will also delete all the associated events!",
@@ -340,6 +373,14 @@ const enGB = {
         title: "Issue Reports",
         tooManyReports:
             "You can only submit {count} reports every {minutes} minutes. Please try again later.",
+    },
+    PageOrganisations: {
+        addNewOrganisationTitle: "Add new Organisation",
+        createOrganisationButton: "Create Organisation",
+        floorPlansPerEvent: "Floor Plans/Event",
+        noOrganisationsMessage: "Create your first organisation to get started",
+        organisationCreatedSuccess: "Organisation created successfully!",
+        propertiesLimit: "Properties Limit",
     },
     PageProfile: {
         nameLabel: "Name: {name}",
