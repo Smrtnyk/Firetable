@@ -70,7 +70,7 @@ async function onSubmit(): Promise<void> {
                     >
                         <template #append>
                             <q-icon
-                                :name="isPwd ? 'eye-open' : 'eye-off'"
+                                :name="isPwd ? 'fa fa-eye' : 'fa fa-eye-slash'"
                                 class-name="cursor-pointer"
                                 @click="() => (isPwd = !isPwd)"
                                 aria-label="Toggle password visibility"
