@@ -14,6 +14,7 @@
     "type": "module",
     "scripts": {
         "deploy:hosting": "firebase deploy --only hosting",
+        "deploy:hosting:preview": "firebase hosting:channel:deploy dev --expires 14d",
         "deploy:functions": "firebase deploy --only functions",
         "deploy:firestore-rules": "firebase deploy --only firestore:rules",
         "deploy": "firebase deploy",
