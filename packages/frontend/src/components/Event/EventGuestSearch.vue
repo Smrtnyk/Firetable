@@ -171,7 +171,7 @@ function setModel(val: string): void {
 
                     <q-item-section v-if="scope.opt.arrived" side>
                         <q-icon
-                            name="check"
+                            name="fa fa-check"
                             color="green"
                             :aria-label="t('EventGuestSearch.guestArrivedIconAriaLabel')"
                         />

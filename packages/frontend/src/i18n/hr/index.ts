@@ -129,9 +129,9 @@ const hr: TranslationStructure = {
     },
     EventQueuedReservations: {
         addNewReservation: "Dodaj novu rezervaciju",
-        emptyMessage: "Nema rezervacija u redu čekanja.",
-        errorMessage: "Pogreška pri dohvaćanju rezervacija.",
-        title: "Rezervacije u redu čekanja",
+        emptyMessage: "Nema rezervacija u redu čekanja",
+        errorMessage: "Pogreška pri dohvaćanju rezervacija",
+        title: "Red čekanja",
     },
     EventShowReservation: {
         contactLabel: "Kontakt",
