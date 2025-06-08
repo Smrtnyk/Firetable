@@ -43,13 +43,11 @@ function adjustColorOpacity(hexColor: string, opacity: number): string {
 function rotateHue(hexColor: string, angle: number): string {
     const rgb = hexToRgb(hexColor);
 
-    // eslint-disable-next-line id-length -- quasar built-in function
     const { h, s, v } = rgbToHsv(rgb);
 
     let newH = (h + angle) % 360;
     newH = newH < 0 ? 360 + newH : newH;
 
-    // eslint-disable-next-line id-length -- quasar built-in function
     const newRgb = hsvToRgb({ h: newH, s, v });
     return rgbToHex(newRgb);
 }

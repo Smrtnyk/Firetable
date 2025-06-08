@@ -14,7 +14,16 @@ const hr: TranslationStructure = {
         organisationNameLabel: "Unesite naziv organizacije...",
     },
     AddNewPropertyForm: {
+        brandImageTooltip:
+            "Za najbolje rezultate koristite PNG ili SVG s prozirnom pozadinom. Maksimalne dimenzije: 300x300px",
+        imageProcessingError: "Pogreška pri obradi slike. Molimo pokušajte s drugom datotekom.",
+        imageUploadPlaceholder: "Kliknite ili povucite sliku ovdje za prijenos",
+        imageUrlLabel: "URL slike",
+        pasteUrlButtonLabel: "Zalijepi vanjsku URL adresu",
+        propertyBrandImageLabel: "Slika brenda objekta",
+        propertyNameLabel: "Naziv objekta",
         propertyNameLengthValidationMessage: "Naziv nekretnine mora imati najmanje 3 znaka!",
+        uploadFileButtonLabel: "Učitaj datoteku",
     },
     AppDrawer: {
         languages: {
@@ -167,8 +176,10 @@ const hr: TranslationStructure = {
         clearCustomDateRangeAriaLabel: "Očisti prilagođeni raspon datuma",
         custom: "Prilagođeno",
         customDateRangePickerAriaLabel: "Prilagođeni birač raspona datuma",
+        errorInvalidPreset: "Nevažeća predpostavka: {preset}",
         errorMaxDays: "Raspon datuma ne može premašiti {maxDays} dana.",
         errorSelectDates: "Molimo odaberite oba datuma početka i završetka.",
+        errorStartDateCalculation: "Izračunavanje početnog datuma nije uspjelo.",
         invalidPreset: "Nevažeći unaprijed postavljeni odabir.",
         last7Days: "Posljednjih 7 dana",
         last30Days: "Posljednjih 30 dana",
@@ -352,6 +363,19 @@ const hr: TranslationStructure = {
         maxAmountUsersCreationMessage: "Dosegnuli ste maksimalan broj korisnika koji je {limit}!",
         noUsersCreatedMessage: "Nema kreiranih korisnika.",
         title: "Korisnici",
+    },
+    PageAuth: {
+        invalidEmailError: "Unesena e-mail adresa nije važeća.",
+        loginButtonLabel: "Prijava",
+        passwordHint: "Unesite svoju lozinku",
+        passwordLabel: "Lozinka *",
+        passwordMinLengthError: "Molimo unesite svoju lozinku, mora sadržavati najmanje 5 znakova.",
+        unexpectedError: "Došlo je do neočekivane pogreške. Molimo pokušajte ponovno.",
+        usernameHint: "Unesite korisničko ime",
+        usernameLabel: "Korisničko ime *",
+        userNotFoundError: "Nije pronađen račun s ovom e-mail adresom.",
+        welcomeMessage: "Dobrodošli u Firetable",
+        wrongPasswordError: "Pogrešna lozinka. Molimo pokušajte ponovno.",
     },
     PageEvent: {
         deleteQueuedReservationConfirmMsg: "Jeste li sigurni da želite izbrisati ovu rezervaciju?",

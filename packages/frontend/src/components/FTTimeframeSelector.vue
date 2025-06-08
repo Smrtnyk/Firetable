@@ -14,7 +14,7 @@
         >
             <template #append>
                 <q-icon
-                    name="calendar"
+                    name="fa fa-calendar"
                     :aria-label="t('FTTimeframeSelector.openDatePicker')"
                     @click.stop.prevent="toggleDateRangePicker"
                     @mousedown.stop.prevent
@@ -312,11 +312,11 @@ function calculatePresetDates(preset: string): DateRange {
             break;
         }
         default:
-            throw new Error(`Invalid preset: ${preset}`);
+            throw new Error(t("FTTimeframeSelector.errorInvalidPreset", { preset }));
     }
 
     if (!startDate) {
-        throw new Error("Start date calculation failed.");
+        throw new Error(t("FTTimeframeSelector.errorStartDateCalculation"));
     }
 
     return {

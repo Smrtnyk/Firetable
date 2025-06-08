@@ -1,4 +1,3 @@
-/* eslint-disable id-length -- patched from fabric repo */
 import type { FabricObject, Point, TOriginX, TOriginY } from "fabric";
 
 import type { LineProps } from "../typedefs.js";

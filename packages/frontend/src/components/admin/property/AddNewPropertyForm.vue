@@ -100,7 +100,7 @@ async function handleImageUpload(event: Event): Promise<void> {
         };
         showUrlInput.value = false;
     } catch (error) {
-        showErrorMessage("Error processing image. Please try another file.");
+        showErrorMessage(t("AddNewPropertyForm.imageProcessingError"));
     } finally {
         if (input) {
             input.value = "";
@@ -116,7 +116,7 @@ async function processDroppedFile(file: File): Promise<void> {
             type: file.type,
         };
     } catch (error) {
-        showErrorMessage("Error processing image. Please try another file.");
+        showErrorMessage(t("AddNewPropertyForm.imageProcessingError"));
     }
 }
 
@@ -150,7 +150,7 @@ function triggerFileInput(): void {
         <q-form ref="createPropertyForm" greedy class="q-gutter-md">
             <q-input
                 v-model="form.name"
-                label="Property name"
+                :label="t('AddNewPropertyForm.propertyNameLabel')"
                 outlined
                 autofocus
                 :rules="propertyRules"
@@ -158,11 +158,10 @@ function triggerFileInput(): void {
 
             <div class="brand-image q-mt-md">
                 <div class="text-subtitle2 q-mb-sm">
-                    Property Brand Image
+                    {{ t("AddNewPropertyForm.propertyBrandImageLabel") }}
                     <q-btn flat round dense icon="fa fa-circle-info" class="q-ml-xs">
                         <q-tooltip>
-                            For best results, use a PNG or SVG with transparent background. Maximum
-                            dimensions: 300x300px
+                            {{ t("AddNewPropertyForm.brandImageTooltip") }}
                         </q-tooltip>
                     </q-btn>
                 </div>
@@ -176,8 +175,14 @@ function triggerFileInput(): void {
                         spread
                         unelevated
                         :options="[
-                            { label: 'Upload File', value: InputMethod.FILE },
-                            { label: 'Paste external URL', value: InputMethod.URL },
+                            {
+                                label: t('AddNewPropertyForm.uploadFileButtonLabel'),
+                                value: InputMethod.FILE,
+                            },
+                            {
+                                label: t('AddNewPropertyForm.pasteUrlButtonLabel'),
+                                value: InputMethod.URL,
+                            },
                         ]"
                     />
                 </div>
@@ -186,7 +191,7 @@ function triggerFileInput(): void {
                 <q-input
                     v-if="inputMethod === InputMethod.URL"
                     v-model="imageUrl"
-                    label="Image URL"
+                    :label="t('AddNewPropertyForm.imageUrlLabel')"
                     outlined
                     :rules="imgUrlRules"
                 >
@@ -218,7 +223,7 @@ function triggerFileInput(): void {
                             class="row upload-placeholder text-center align-center content-center justify-center"
                         >
                             <q-icon name="fa fa-file-import" size="md" />
-                            <div>Click or drag and drop to upload an image</div>
+                            <div>{{ t("AddNewPropertyForm.imageUploadPlaceholder") }}</div>
                         </div>
                     </q-responsive>
                 </div>

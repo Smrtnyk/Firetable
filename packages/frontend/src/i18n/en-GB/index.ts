@@ -12,7 +12,16 @@ const enGB = {
         organisationNameLabel: "Enter organisation name...",
     },
     AddNewPropertyForm: {
+        brandImageTooltip:
+            "For best results, use a PNG or SVG with transparent background. Maximum dimensions: 300x300px",
+        imageProcessingError: "Error processing image. Please try another file.",
+        imageUploadPlaceholder: "Click or drag and drop to upload an image",
+        imageUrlLabel: "Image URL",
+        pasteUrlButtonLabel: "Paste external URL",
+        propertyBrandImageLabel: "Property Brand Image",
+        propertyNameLabel: "Property name",
         propertyNameLengthValidationMessage: "Property name needs to have at least 3 characters!",
+        uploadFileButtonLabel: "Upload File",
     },
     AppDrawer: {
         languages: {
@@ -165,8 +174,10 @@ const enGB = {
         clearCustomDateRangeAriaLabel: "Clear custom date range",
         custom: "Custom",
         customDateRangePickerAriaLabel: "Custom date range picker",
+        errorInvalidPreset: "Invalid preset: {preset}",
         errorMaxDays: "Date range cannot exceed {maxDays} days.",
         errorSelectDates: "Please select both start and end dates.",
+        errorStartDateCalculation: "Start date calculation failed.",
         invalidPreset: "Invalid preset selection.",
         last7Days: "Last 7 Days",
         last30Days: "Last 30 Days",
@@ -349,6 +360,20 @@ const enGB = {
             "You have reached the maximum amount of users which is {limit}!",
         noUsersCreatedMessage: "There are no users created.",
         title: "Users",
+    },
+    PageAuth: {
+        invalidEmailError: "The email address you entered is invalid.",
+        loginButtonLabel: "Login",
+        passwordHint: "Enter your password",
+        passwordLabel: "Password *",
+        passwordMinLengthError:
+            "Please enter your password, it has to contain minimum 5 characters.",
+        unexpectedError: "An unexpected error occurred. Please try again.",
+        usernameHint: "Enter username",
+        usernameLabel: "Username *",
+        userNotFoundError: "No account found with this email.",
+        welcomeMessage: "Welcome to Firetable",
+        wrongPasswordError: "Incorrect password. Please try again.",
     },
     PageEvent: {
         deleteQueuedReservationConfirmMsg: "Are you sure you want to delete this reservation?",
