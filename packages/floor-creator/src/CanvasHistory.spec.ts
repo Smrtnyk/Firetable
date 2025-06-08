@@ -595,10 +595,12 @@ function setupTestFloor(): TestContext {
     canvas.style.top = "0";
     canvas.style.left = "0";
     document.body.appendChild(canvas);
+    const container = document.createElement("div");
+    container.style.width = "500px";
+    container.style.height = "500px";
     const floor = new FloorEditor({
         canvas,
-        containerHeight: 500,
-        containerWidth: 500,
+        container,
         floorDoc: {
             height: 500,
             id: "1",
@@ -628,11 +630,12 @@ async function setupTestFloorWithTableInJSON(): Promise<TestContext> {
     newCanvas.width = 500;
     newCanvas.height = 500;
     document.body.appendChild(newCanvas);
-
+    const container = document.createElement("div");
+    container.style.width = "500px";
+    container.style.height = "500px";
     const floor = new FloorEditor({
         canvas: newCanvas,
-        containerHeight: 500,
-        containerWidth: 500,
+        container,
         floorDoc: {
             id: "1",
             name: "Test Floor",

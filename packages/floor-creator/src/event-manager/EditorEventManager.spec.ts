@@ -16,13 +16,15 @@ describe("EditorEventManager", () => {
     let canvas: Canvas;
 
     beforeEach(() => {
+        const container = document.createElement("div");
+        container.style.width = "1000px";
+        container.style.height = "1000px";
         const canvasEl = document.createElement("canvas");
         canvasEl.width = 1000;
         canvasEl.height = 1000;
         floor = new FloorEditor({
             canvas: canvasEl,
-            containerHeight: 1000,
-            containerWidth: 1000,
+            container,
             floorDoc: {
                 height: 1000,
                 id: "test-id",

@@ -25,8 +25,7 @@ FabricText.ownDefaults.fontFamily = DEFAULT_FONT;
 
 export abstract class Floor {
     readonly canvas: Canvas;
-    containerHeight: number;
-    containerWidth: number;
+    container: HTMLElement;
     readonly floorDoc: FloorData;
     height: number;
     readonly id: string;
@@ -39,19 +38,17 @@ export abstract class Floor {
     protected abstract eventManager: EventManager;
 
     protected constructor(options: FloorCreationOptions) {
-        const { canvas, containerHeight, containerWidth, floorDoc } = options;
-
+        const { canvas, container, floorDoc } = options;
+        this.container = container;
         this.scale = calculateCanvasScale(
-            containerWidth,
-            containerHeight,
+            container.clientWidth,
+            container.clientHeight,
             floorDoc.width,
             floorDoc.height,
         );
         this.id = floorDoc.id;
         this.name = floorDoc.name;
         this.width = floorDoc.width;
-        this.containerWidth = containerWidth;
-        this.containerHeight = containerHeight;
         this.height = floorDoc.height;
         this.floorDoc = floorDoc;
 
@@ -107,12 +104,11 @@ export abstract class Floor {
         this.emit("rendered");
         canvas.requestRenderAll();
     }
-    resize(pageContainerWidth: number, pageContainerHeight: number): void {
-        this.containerWidth = pageContainerWidth;
-        this.containerHeight = pageContainerHeight;
+    resize(container: HTMLElement): void {
+        this.container = container;
         this.scale = calculateCanvasScale(
-            this.containerWidth,
-            this.containerHeight,
+            container.clientWidth,
+            container.clientHeight,
             this.floorDoc.width,
             this.floorDoc.height,
         );
@@ -127,10 +123,12 @@ export abstract class Floor {
     }
     setScaling(): void {
         this.canvas.setZoom(this.scale);
-        this.canvas.setDimensions({
+        const newDimensions = {
             height: this.height * this.canvas.getZoom(),
             width: this.width * this.canvas.getZoom(),
-        });
+        };
+        console.log("Setting canvas dimensions:", newDimensions, "Scale:", this.scale);
+        this.canvas.setDimensions(newDimensions);
         this.setObjectCoords();
     }
     protected abstract onElementClick(ev: FabricObject): void;

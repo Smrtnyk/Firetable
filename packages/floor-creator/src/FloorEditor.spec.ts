@@ -13,11 +13,13 @@ describe("FloorEditor", () => {
     let canvasElement: HTMLCanvasElement;
 
     beforeEach(async () => {
+        const container = document.createElement("div");
+        container.style.width = "1000px";
+        container.style.height = "1000px";
         canvasElement = document.createElement("canvas");
         const options: FloorCreationOptions = {
             canvas: canvasElement,
-            containerHeight: 1000,
-            containerWidth: 1000,
+            container,
             floorDoc: {
                 height: 1000,
                 id: "test-id",

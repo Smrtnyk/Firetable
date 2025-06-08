@@ -62,10 +62,7 @@ export function useFloorEditor(containerRef: ShallowRef<HTMLElement | null>) {
         if (!containerRef.value) {
             return;
         }
-        floorInstance.value?.resize(
-            containerRef.value.clientWidth,
-            containerRef.value.clientHeight,
-        );
+        floorInstance.value?.resize(containerRef.value);
     }, 100);
 
     async function onElementClick(
@@ -112,8 +109,7 @@ export function useFloorEditor(containerRef: ShallowRef<HTMLElement | null>) {
         }
         const floorEditor = new FloorEditor({
             canvas: canvasElement,
-            containerHeight: containerRef.value.clientHeight,
-            containerWidth: containerRef.value.clientWidth,
+            container: containerRef.value,
             floorDoc,
         });
 

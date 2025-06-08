@@ -680,9 +680,7 @@ function updateTableLabel(newLabel: unknown): void {
 
             <!-- Canvas Area -->
             <div class="canvas-container" ref="pageRef">
-                <div class="canvas-wrapper">
-                    <canvas v-if="floor && !isFloorLoading" ref="canvasRef" />
-                </div>
+                <canvas v-if="floor && !isFloorLoading" ref="canvasRef" />
             </div>
         </div>
     </div>
@@ -700,7 +698,7 @@ function updateTableLabel(newLabel: unknown): void {
     display: flex;
     width: 100%;
     flex-direction: column;
-    height: 100vh;
+    height: calc(100vh - 48px);
     background: $grey-2;
 
     .body--dark & {
@@ -788,7 +786,7 @@ function updateTableLabel(newLabel: unknown): void {
 
     .panel-content {
         flex: 1;
-        overflow-y: auto;
+        overflow-y: hidden;
         padding: 16px;
     }
 }
@@ -888,11 +886,19 @@ function updateTableLabel(newLabel: unknown): void {
 
 .canvas-container {
     flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: $grey-2;
     display: flex;
     align-items: center;
     justify-content: center;
 
-    .canvas-wrapper {
+    .body--dark & {
+        background: $dark;
+    }
+
+    canvas {
+        display: block;
         background: white;
         border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);

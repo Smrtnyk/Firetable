@@ -30,8 +30,7 @@ export type CreateElementOptions = {
 
 export interface FloorCreationOptions {
     canvas: HTMLCanvasElement;
-    containerHeight: number;
-    containerWidth: number;
+    container: HTMLElement;
     floorDoc: FloorData;
 }
 

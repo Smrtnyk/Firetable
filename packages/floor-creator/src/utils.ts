@@ -6,10 +6,10 @@ export function calculateCanvasScale(
     floorWidth: number,
     floorHeight: number,
 ): number {
-    if (containerWidth < containerHeight) {
-        return containerWidth / floorWidth;
-    }
-    return containerHeight / floorHeight;
+    const scaleX = containerWidth / floorWidth;
+    const scaleY = containerHeight / floorHeight;
+
+    return Math.min(scaleX, scaleY);
 }
 
 export async function canvasToRender(canvas: Canvas): Promise<void> {

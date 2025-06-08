@@ -146,7 +146,7 @@ export class FloorEditor extends Floor {
         this.width = jsonImport.width;
         this.height = jsonImport.height;
 
-        super.resize(this.containerWidth, this.containerHeight);
+        super.resize(this.container);
 
         await this.renderJSONData(JSON.parse(jsonImport.json));
     }
@@ -233,15 +233,16 @@ export class FloorEditor extends Floor {
 
         this.width = newWidth;
         this.height = newHeight;
-
         this.scale = calculateCanvasScale(
-            this.containerWidth,
-            this.containerHeight,
+            this.container.clientWidth,
+            this.container.clientHeight,
             this.width,
             this.height,
         );
         this.setScaling();
 
+        this.canvas.calcOffset();
+        this.canvas.renderAll();
         this.zoomManager.resetZoom();
 
         this.canvas.fire("object:modified");

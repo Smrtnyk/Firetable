@@ -16,13 +16,15 @@ describe("Table Management Functions", () => {
     let floor: FloorEditor;
 
     beforeEach(() => {
+        const container = document.createElement("div");
+        container.style.width = "1000px";
+        container.style.height = "1000px";
         const canvas = document.createElement("canvas");
         canvas.width = 1000;
         canvas.height = 1000;
         floor = new FloorEditor({
             canvas,
-            containerHeight: 1000,
-            containerWidth: 1000,
+            container,
             floorDoc: {
                 height: 1000,
                 id: "test-id",
