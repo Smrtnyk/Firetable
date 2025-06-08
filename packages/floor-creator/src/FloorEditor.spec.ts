@@ -1,3 +1,4 @@
+import { has } from "es-toolkit/compat";
 import { Group } from "fabric";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -140,5 +141,18 @@ describe("FloorEditor", () => {
             floorEditor.updateDimensions(500, 500);
             expect(spy).toHaveBeenCalled();
         });
+    });
+
+    it("should have grid visible by default on startup", async () => {
+        const mockElement = document.createElement("div");
+        mockElement.style.width = "1000px";
+        mockElement.style.height = "800px";
+
+        expect(floorEditor.gridDrawer.isGridVisible).toBe(true);
+
+        const gridLines = floorEditor.canvas.getObjects().filter((obj) => has(obj, "isGridLine"));
+        expect(gridLines.length).toBeGreaterThan(0);
+
+        await floorEditor.destroy();
     });
 });

@@ -25,7 +25,7 @@ const LINE_OPTION = {
 };
 
 export class GridDrawer {
-    isGridVisible = false;
+    isGridVisible = true;
     private readonly canvas: Canvas;
 
     constructor(canvas: Canvas) {

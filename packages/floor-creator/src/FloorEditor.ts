@@ -216,6 +216,7 @@ export class FloorEditor extends Floor {
 
     setupOnRendered(): void {
         this.history.initialize();
+        this.gridDrawer.drawGrid(this.width, this.height);
     }
 
     toggleGridVisibility = (): void => {
