@@ -46,6 +46,11 @@ Demo credentials:
     - Generate QR code for easy access
     - Web-hosted for seamless guest access
 
+- Inventory Management
+  - Manage inventory items across properties
+  - Track stock levels
+  - Integrate with digital drink cards
+
 - Analytics
   - Track key metrics for reservations and events
   - Analyze guest patterns and property performance
@@ -54,7 +59,6 @@ Demo credentials:
 - Additional Features
   - Dark mode support
   - Multi-language interface
-  - Inventory management across properties
 
 ## Floor Plan Editor
 
@@ -66,7 +70,6 @@ Here’s what the Floor Plan Editor looks like:
 ## Project Structure
 
 - frontend: Main web application
-- backend: Firebase project
 - functions: Cloud functions
 - types: Shared type definitions
 - floor-creator: Floor plan creation tool
@@ -84,10 +87,15 @@ pnpm install
 ```
 
 2. Configure Firebase:
-   - Rename `/backend/fb-config-template.json` to `fb-config.json`
-   - Add your Firebase credentials
+   - Copy `/packages/frontend/src/db/fb-config-template.json` in the same directory and rename to `fb-config.json`
+   - No need to change anything in `fb-config.json` if you are using Firebase emulators for local development.
 
-3. Start development:
+3. Run build:
+```bash
+pnpm run build
+```
+
+4. Start development:
    - Firebase emulators: `pnpm run start:emulators`
    - Frontend server: `pnpm run dev:frontend`
 
@@ -110,15 +118,16 @@ For development and testing, you can populate the emulators with sample data:
 2. run one of the seed scripts:
 ```bash
 cd packages/functions
-pnpm run seed        # Creates 1 organization without admin user
-pnpm run seed:admin  # Creates 1 organization with admin user
+pnpm run seed        # Creates 1 organization without admin user, if already created an admin user
+pnpm run seed:admin  # Creates 1 organization with admin user, if you haven't created one yet
 ```
 
 The seeder supports the following command line arguments:
 
-* -o, --organisations - Number of organizations to seed (default: 1)
-* -a, --with-admin - Create an admin user (default: false)
-* -h, --help - Show help information
+* `-o`, `--organisations` - Number of organizations to seed (default: 1)
+* `-a`, `--with-admin` - Same as previous command, but also creates an admin user
+* `-x`, `--only-admin` - Will only create an admin user, no organizations or other users
+* `-h`, `--help` - Show help information
 
 When admin user is created, following credentials are available:
 * Admin: admin@firetable.at / ADMIN123

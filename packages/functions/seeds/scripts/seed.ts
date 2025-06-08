@@ -21,7 +21,7 @@ cli.option("-o, --organisations <number>", "Number of organisations to seed", {
     .option("-a, --with-admin", "Create an admin user", {
         default: false,
     })
-    .option("-ao, --only-admin", "Create admin only", {
+    .option("-x, --only-admin", "Create admin only", {
         default: false,
     })
     .help();
