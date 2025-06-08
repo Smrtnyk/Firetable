@@ -104,7 +104,7 @@ function onRemoveFloor(index: number): void {
 </script>
 
 <template>
-    <div class="EventFloorManager">
+    <div class="EventFloorManager q-ma-none">
         <div v-if="availableFloors?.length" class="row items-center justify-between q-mb-md">
             <div>
                 <div class="text-h6">Floor plans</div>
@@ -151,7 +151,7 @@ function onRemoveFloor(index: number): void {
             >
                 <q-item-section avatar>
                     <q-icon
-                        name="fa fa-bars"
+                        name="fa fa-grip-lines"
                         class="drag-handle cursor-move"
                         :aria-label="`${floor.id} draggable floor plan item drag handle`"
                     />

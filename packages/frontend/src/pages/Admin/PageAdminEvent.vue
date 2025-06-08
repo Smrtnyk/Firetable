@@ -50,13 +50,9 @@ interface Props {
     propertyId: string;
 }
 
-const PERMANENTLY_DELETE_RES_TITLE = "Permanently delete reservation?";
-const PERMANENTLY_DELETE_RES_MESSAGE =
-    "This will delete the reservation permanently, excluding it from all analytics. This cannot be undone.";
-
 const props = defineProps<Props>();
 const router = useRouter();
-const { locale } = useI18n();
+const { locale, t } = useI18n();
 const { createDialog } = useDialog();
 const propertiesStore = usePropertiesStore();
 
@@ -90,7 +86,9 @@ const {
 const { returningGuests } = useGuestsForEvent(eventOwner, allReservations);
 const logsLabelWithCount = computed(function () {
     const logsLength = logs.value?.logs.length ?? 0;
-    return logsLength > 0 ? `Logs (${logsLength})` : "Logs";
+    return logsLength > 0
+        ? t("PageAdminEvent.logsTabLabelWithCount", { count: logsLength })
+        : t("PageAdminEvent.logsTabLabel");
 });
 const { floors } = useFloors(eventOwner.propertyId, eventOwner.organisationId);
 
@@ -122,8 +120,8 @@ async function addFloor(floor: FloorDoc): Promise<void> {
 
 async function deleteReservationPermanently(reservation: ReservationDoc): Promise<void> {
     const shouldDeletePermanently = await showConfirm(
-        PERMANENTLY_DELETE_RES_TITLE,
-        PERMANENTLY_DELETE_RES_MESSAGE,
+        t("PageAdminEvent.permanentlyDeleteReservationTitle"),
+        t("PageAdminEvent.permanentlyDeleteReservationMessage"),
     );
     if (!shouldDeletePermanently) {
         return;
@@ -162,7 +160,7 @@ async function removeFloor(index: number): Promise<void> {
     const floor = eventFloors.value[index];
     // Check if floor has reservations
     if (allReservations.value.some(matchesProperty("floorId", floor.id))) {
-        showErrorMessage("Cannot remove floor with active reservations");
+        showErrorMessage(t("PageAdminEvent.cannotRemoveFloorWithReservationsError"));
         return;
     }
 
@@ -210,7 +208,7 @@ function showDialog(
 
 function showEventInfoEditDialog(): void {
     if (event.value) {
-        showDialog(AdminEventEditInfo, "Edit event info", {
+        showDialog(AdminEventEditInfo, t("PageAdminEvent.editEventInfoDialogTitle"), {
             eventInfo: event.value.info ?? "",
             eventOwner,
         });
@@ -221,7 +219,7 @@ function showFloorEditDialog(floor: FloorDoc): void {
     if (event.value) {
         showDialog(
             AdminEventFloorViewer,
-            `Editing Floor: ${floor.name}`,
+            t("PageAdminEvent.editingFloorDialogTitle", { floorName: floor.name }),
             { eventId: event.value.id, floor },
             { save: saveFloor },
             true,
@@ -250,13 +248,17 @@ onMounted(init);
                         },
                     }"
                     class="button-gradient"
-                    >View
+                    >{{ t("PageAdminEvent.viewButtonLabel") }}
                 </FTBtn>
             </template>
         </FTTitle>
         <FTTabs v-model="tab">
-            <q-tab name="info" label="Info" />
-            <q-tab name="edit" label="Edit" v-if="!isEventFinished(event.date)" />
+            <q-tab name="info" :label="t('PageAdminEvent.infoTabLabel')" />
+            <q-tab
+                name="edit"
+                :label="t('PageAdminEvent.editTabLabel')"
+                v-if="!isEventFinished(event.date)"
+            />
             <q-tab name="logs" :label="logsLabelWithCount" />
         </FTTabs>
         <FTTabPanels v-model="tab" class="bg-transparent">
@@ -270,30 +272,42 @@ onMounted(init);
                     />
                 </AppCardSection>
 
-                <AppCardSection title="Reserved by status">
+                <AppCardSection :title="t('PageAdminEvent.reservedByStatusTitle')">
                     <AdminEventReservationsByPerson :reservations="allPlannedReservations" />
                 </AppCardSection>
 
-                <AppCardSection title="Guests">
+                <AppCardSection :title="t('PageAdminEvent.guestsTitle')">
                     <FTTabs v-model="reservationsTab">
                         <q-tab
                             name="arrivedReservations"
-                            :label="`Arrived (${arrivedReservations.length})`"
+                            :label="
+                                t('PageAdminEvent.arrivedReservationsTabLabel', {
+                                    count: arrivedReservations.length,
+                                })
+                            "
                         />
                         <q-tab
                             name="cancelledReservations"
-                            :label="`Cancelled (${cancelledReservations.length})`"
+                            :label="
+                                t('PageAdminEvent.cancelledReservationsTabLabel', {
+                                    count: cancelledReservations.length,
+                                })
+                            "
                         />
                         <q-tab
                             name="returningGuests"
-                            :label="`Returning (${returningGuests.length})`"
+                            :label="
+                                t('PageAdminEvent.returningGuestsTabLabel', {
+                                    count: returningGuests.length,
+                                })
+                            "
                         />
                     </FTTabs>
                     <FTTabPanels v-model="reservationsTab">
                         <q-tab-panel name="arrivedReservations" class="q-pa-none">
                             <AdminEventReservationsList
                                 :timezone="propertySettings.timezone"
-                                :empty-message="`No arrived reservations`"
+                                :empty-message="t('PageAdminEvent.noArrivedReservationsMessage')"
                                 @delete="deleteReservationPermanently"
                                 :reservations="arrivedReservations"
                             />
@@ -301,7 +315,7 @@ onMounted(init);
                         <q-tab-panel name="cancelledReservations">
                             <AdminEventReservationsList
                                 :timezone="propertySettings.timezone"
-                                :empty-message="`No cancelled reservations`"
+                                :empty-message="t('PageAdminEvent.noCancelledReservationsMessage')"
                                 @delete="deleteReservationPermanently"
                                 :reservations="cancelledReservations"
                             />
@@ -322,7 +336,7 @@ onMounted(init);
                 v-if="!isEventFinished(event.date)"
                 class="q-px-none q-py-none"
             >
-                <AppCardSection title="Event Info">
+                <AppCardSection :title="t('PageAdminEvent.eventInfoCardTitle')">
                     <q-item clickable v-ripple>
                         <q-item-section>
                             <q-item-label caption lines="2">
@@ -341,7 +355,7 @@ onMounted(init);
                     </q-item>
                 </AppCardSection>
 
-                <AppCardSection title="Event Floors">
+                <AppCardSection :title="t('PageAdminEvent.eventFloorsCardTitle')">
                     <AdminEventFloorManager
                         :max-floors="subscriptionSettings.maxFloorPlansPerEvent"
                         :floors="eventFloors"

@@ -94,7 +94,7 @@ function reservationsReducer(acc: Res, reservation: PlannedReservationDoc): Res 
 </script>
 
 <template>
-    <div class="q-pa-none">
+    <div class="q-pa-none q-ma-none">
         <q-table
             dense
             v-if="tableData.length > 0"

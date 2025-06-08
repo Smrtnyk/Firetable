@@ -101,7 +101,7 @@ function findPropertyById(propertyId: string): PropertyDoc | undefined {
 
 async function onDeleteUser(user: User): Promise<void> {
     if (user.id === authStore.user?.id) {
-        showErrorMessage("You cannot delete yourself!");
+        showErrorMessage(t("PageAdminUsers.cannotDeleteSelfError"));
         return;
     }
 
@@ -118,7 +118,7 @@ async function onUpdateUser(updatedUser: EditUserPayload): Promise<void> {
         async hook() {
             await updateUser(updatedUser);
             await executeFetchUsers();
-            quasar.notify("User updated successfully!");
+            quasar.notify(t("PageAdminUsers.userUpdatedSuccess"));
         },
     });
 }
@@ -162,7 +162,7 @@ async function onCreateUserFormSubmit(newUser: CreateUserPayload): Promise<void>
 }
 
 async function onUserSlideRight(user: User): Promise<void> {
-    if (await showConfirm("Delete user?")) {
+    if (await showConfirm(t("PageAdminUsers.deleteUserConfirmTitle"))) {
         await onDeleteUser(user);
     }
 }
@@ -190,7 +190,7 @@ function showCreateUserDialog(): void {
 
 async function showEditUserDialog(user: User): Promise<void> {
     if (user.id === authStore.user?.id) {
-        showErrorMessage("To edit your profile, go to profile page!");
+        showErrorMessage(t("PageAdminUsers.editSelfError"));
         return;
     }
     if (
@@ -245,7 +245,9 @@ const uniqueUsersCount = computed(() => users.value.length);
         </FTTitle>
 
         <template v-if="unassignedUsers.length > 0">
-            <FTCenteredText> Unassigned users ({{ unassignedUsers.length }}) </FTCenteredText>
+            <FTCenteredText>
+                {{ t("PageAdminUsers.unassignedUsersTitle", { count: unassignedUsers.length }) }}
+            </FTCenteredText>
             <AdminUsersList
                 @edit="showEditUserDialog"
                 @delete="onUserSlideRight"
@@ -263,7 +265,12 @@ const uniqueUsersCount = computed(() => users.value.length);
                         v-for="(bucket, index) in Object.values(bucketizedUsers)"
                         :key="bucket.propertyName"
                         :name="index"
-                        :label="`${bucket.propertyName} (${bucket.users.length})`"
+                        :label="
+                            t('PageAdminUsers.propertyUserCountTabLabel', {
+                                propertyName: bucket.propertyName,
+                                count: bucket.users.length,
+                            })
+                        "
                     />
                 </FTTabs>
 
@@ -294,7 +301,7 @@ const uniqueUsersCount = computed(() => users.value.length);
 
         <!-- Show no properties message if no properties are created -->
         <FTCenteredText v-if="properties.length === 0">
-            In order to list users, create some properties first
+            {{ t("PageAdminUsers.createPropertiesPrompt") }}
         </FTCenteredText>
 
         <FTCenteredText v-else-if="Object.keys(bucketizedUsers).length === 0 && !isLoading">
