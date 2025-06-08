@@ -9,7 +9,7 @@ import enGB from "../src/i18n/en-GB";
 
 const SRC_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../src");
 const FILE_EXTENSIONS = [".vue", ".ts"];
-const I18N_KEY_REGEX = /\bt\(["'`]([^"'`]+)["'`]/g;
+const I18N_KEY_REGEX = /\bt\(\s*["'`]([^"'`]+)["'`]/g;
 
 type TranslationObject = { [key: string]: string | TranslationObject };
 

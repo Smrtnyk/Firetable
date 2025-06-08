@@ -458,6 +458,7 @@ export function useReservations(
                 componentPropsObject: {
                     guestSummaryPromise: getGuestSummary(reservation),
                     reservation,
+                    tableColors: propertySettings.value.event,
                     timezone: propertySettings.value.timezone,
                 },
                 listeners: {
