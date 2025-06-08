@@ -14,24 +14,17 @@ export function useReservationPermissions(reservation: Ref<ReservationDoc>) {
     const user = computed(() => authStore.nonNullableUser);
     const { t } = useI18n();
 
-    const reservationStateWithTranslationMap = {
-        [ReservationState.ARRIVED]: {
-            label: t("EventShowReservation.reservationGuestArrivedLabel"),
-            value: ReservationState.ARRIVED,
-        },
-        [ReservationState.CONFIRMED]: {
-            label: t("EventShowReservation.reservationConfirmedLabel"),
-            value: ReservationState.CONFIRMED,
-        },
-        [ReservationState.PENDING]: {
-            label: t("EventShowReservation.pendingLabel"),
-            value: ReservationState.PENDING,
-        },
-        [ReservationState.WAITING_FOR_RESPONSE]: {
-            label: t("EventShowReservation.waitingForResponse"),
-            value: ReservationState.WAITING_FOR_RESPONSE,
-        },
-    } as const;
+    const reservationStateWithTranslationMap = computed(
+        () =>
+            ({
+                [ReservationState.ARRIVED]: t("EventShowReservation.reservationGuestArrivedLabel"),
+                [ReservationState.CONFIRMED]: t("EventShowReservation.reservationConfirmedLabel"),
+                [ReservationState.PENDING]: t("EventShowReservation.pendingLabel"),
+                [ReservationState.WAITING_FOR_RESPONSE]: t(
+                    "EventShowReservation.waitingForResponse",
+                ),
+            }) as const,
+    );
 
     const isOwnReservation = computed(function () {
         return user.value.id === reservation.value.creator.id;
@@ -63,15 +56,15 @@ export function useReservationPermissions(reservation: Ref<ReservationDoc>) {
 
     const reservationMappedState = computed(function () {
         if (isGuestArrived.value) {
-            return reservationStateWithTranslationMap[ReservationState.ARRIVED];
+            return ReservationState.ARRIVED;
         }
         if (reservationConfirmed.value) {
-            return reservationStateWithTranslationMap[ReservationState.CONFIRMED];
+            return ReservationState.CONFIRMED;
         }
         if (waitingForResponse.value) {
-            return reservationStateWithTranslationMap[ReservationState.WAITING_FOR_RESPONSE];
+            return ReservationState.WAITING_FOR_RESPONSE;
         }
-        return reservationStateWithTranslationMap[ReservationState.PENDING];
+        return ReservationState.PENDING;
     });
 
     const canDeleteReservation = computed(function () {

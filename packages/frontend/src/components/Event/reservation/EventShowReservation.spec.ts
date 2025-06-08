@@ -67,6 +67,13 @@ describe("EventShowReservation", () => {
         props = {
             guestSummaryPromise: Promise.resolve(void 0),
             reservation,
+            tableColors: {
+                reservationArrivedColor: "#00FF00",
+                reservationCancelledColor: "#FF0000",
+                reservationConfirmedColor: "#0000FF",
+                reservationPendingColor: "#FFFF00",
+                reservationWaitingForResponseColor: "#FFA500",
+            },
             timezone: getDefaultTimezone(),
         };
     });
@@ -86,8 +93,11 @@ describe("EventShowReservation", () => {
                 },
             });
 
-            const select = screen.getByRole("combobox", { name: "Reservation state" });
-            await expect.element(select).toHaveValue(t("EventShowReservation.pendingLabel"));
+            const pendingCard = screen.getByLabelText(
+                `Set reservation to ${ReservationState.PENDING}`,
+            );
+
+            await expect.element(pendingCard).toBeChecked();
         });
 
         it("does not render the state select when reservation is cancelled", async () => {
@@ -106,7 +116,7 @@ describe("EventShowReservation", () => {
                 },
             });
 
-            await expect.element(screen.getByRole("combobox")).not.toBeInTheDocument();
+            await expect.element(screen.getByRole("radiogroup")).not.toBeInTheDocument();
         });
 
         it("emits correct events when state changes to WAITING_FOR_RESPONSE", async () => {
@@ -123,11 +133,10 @@ describe("EventShowReservation", () => {
                 },
             });
 
-            const select = screen.getByRole("combobox");
-            await userEvent.click(select);
-
-            const waitingOption = screen.getByText(t("EventShowReservation.waitingForResponse"));
-            await userEvent.click(waitingOption);
+            const waitingForResponseCard = screen.getByLabelText(
+                `Set reservation to ${ReservationState.WAITING_FOR_RESPONSE}`,
+            );
+            await userEvent.click(waitingForResponseCard);
 
             expect(screen.emitted().waitingForResponse).toBeTruthy();
             expect(screen.emitted().waitingForResponse[0]).toEqual([true]);
@@ -150,13 +159,10 @@ describe("EventShowReservation", () => {
                 },
             });
 
-            const select = screen.getByRole("combobox");
-            await userEvent.click(select);
-
-            const confirmedOption = screen.getByText(
-                t("EventShowReservation.reservationConfirmedLabel"),
+            const confirmedCard = screen.getByLabelText(
+                `Set reservation to ${ReservationState.CONFIRMED}`,
             );
-            await userEvent.click(confirmedOption);
+            await userEvent.click(confirmedCard);
 
             expect(screen.emitted().reservationConfirmed).toBeTruthy();
             expect(screen.emitted().reservationConfirmed[0]).toEqual([true]);
@@ -177,12 +183,10 @@ describe("EventShowReservation", () => {
                 },
             });
 
-            await userEvent.click(screen.getByRole("combobox"));
-
-            const arrivedOption = screen.getByText(
-                t("EventShowReservation.reservationGuestArrivedLabel"),
+            const arrivedCard = screen.getByLabelText(
+                `Set reservation to ${ReservationState.ARRIVED}`,
             );
-            await userEvent.click(arrivedOption);
+            await userEvent.click(arrivedCard);
 
             expect(screen.emitted().arrived).toBeTruthy();
             expect(screen.emitted().arrived[0]).toEqual([true]);
@@ -205,10 +209,10 @@ describe("EventShowReservation", () => {
                 },
             });
 
-            const select = screen.getByRole("combobox", { name: "Reservation state" });
-            await expect
-                .element(select)
-                .toHaveValue(t("EventShowReservation.reservationGuestArrivedLabel"));
+            const arrivedCard = screen.getByLabelText(
+                `Set reservation to ${ReservationState.ARRIVED}`,
+            );
+            await expect.element(arrivedCard).toBeChecked();
         });
     });
 

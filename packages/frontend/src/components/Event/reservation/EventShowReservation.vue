@@ -17,11 +17,19 @@ import { useI18n } from "vue-i18n";
 export interface EventShowReservationProps {
     guestSummaryPromise: Promise<GuestSummary | undefined>;
     reservation: ReservationDoc;
+    tableColors: {
+        reservationArrivedColor: string;
+        reservationCancelledColor: string;
+        reservationConfirmedColor: string;
+        reservationPendingColor: string;
+        reservationWaitingForResponseColor: string;
+    };
     timezone: string;
 }
 
 const permissionsStore = usePermissionsStore();
-const { guestSummaryPromise, reservation, timezone } = defineProps<EventShowReservationProps>();
+const { guestSummaryPromise, reservation, tableColors, timezone } =
+    defineProps<EventShowReservationProps>();
 const emit = defineEmits<{
     (e: "copy" | "delete" | "edit" | "link" | "queue" | "transfer" | "unlink"): void;
     (e: "goToGuestProfile", guestId: string): void;
@@ -47,7 +55,34 @@ function onReservationCancel(): void {
     emit("cancel", !isCancelled.value);
 }
 
-function onStateChange(newState: ReservationState): void {
+const iconMap: Record<ReservationState, string> = {
+    [ReservationState.ARRIVED]: "fas fa-user-check",
+    [ReservationState.CONFIRMED]: "fas fa-check-circle",
+    [ReservationState.PENDING]: "fas fa-hourglass-empty",
+    [ReservationState.WAITING_FOR_RESPONSE]: "fas fa-hourglass-half",
+};
+
+function getStateGradient(state: ReservationState): string {
+    const base = (() => {
+        switch (state) {
+            case ReservationState.ARRIVED:
+                return tableColors.reservationArrivedColor;
+            case ReservationState.CONFIRMED:
+                return tableColors.reservationConfirmedColor;
+            case ReservationState.WAITING_FOR_RESPONSE:
+                return tableColors.reservationWaitingForResponseColor;
+            default:
+                return tableColors.reservationPendingColor;
+        }
+    })();
+    const overlay = base.endsWith(")")
+        ? base.replace(/rgba?\(([^)]+)\)/, "rgba($1, 0.6)")
+        : `${base}99`;
+    return `linear-gradient(135deg, ${base}, ${overlay})`;
+}
+
+function onStateSelect(newState: ReservationState): void {
+    if (newState === reservationMappedState.value) return;
     switch (newState) {
         case ReservationState.ARRIVED:
             emit("arrived", true);
@@ -93,22 +128,33 @@ function onStateChange(newState: ReservationState): void {
                 permissionsStore.canConfirmReservation
             "
         >
-            <q-select
-                class="q-mb-md"
-                outlined
-                :model-value="reservationMappedState"
-                :options="Object.values(reservationStateWithTranslationMap)"
-                option-label="label"
-                option-value="value"
-                emit-value
-                @update:model-value="onStateChange"
-                v-if="
-                    !isCancelled &&
-                    isPlannedReservation(reservation) &&
-                    permissionsStore.canConfirmReservation
-                "
-                aria-label="Reservation state"
-            />
+            <q-separator />
+            <div class="state-grid q-mt-md q-mb-lg" role="radiogroup">
+                <div
+                    v-for="state in Object.values(ReservationState)"
+                    :key="state"
+                    class="state-card q-pa-md"
+                    role="radio"
+                    :aria-checked="reservationMappedState === state"
+                    :aria-label="`Set reservation to ${state}`"
+                    :class="{ 'text-white': reservationMappedState === state, 'ft-card': true }"
+                    :style="{
+                        background:
+                            reservationMappedState === state
+                                ? getStateGradient(state)
+                                : 'transparent',
+                    }"
+                    @click="onStateSelect(state)"
+                >
+                    <div class="flex items-center justify-center">
+                        <q-icon :name="iconMap[state]" />
+                    </div>
+                    <div class="text-caption q-mt-xs text-center">
+                        {{ reservationStateWithTranslationMap[state] }}
+                    </div>
+                </div>
+            </div>
+            <q-separator class="q-mb-md" />
         </template>
 
         <q-item v-if="!isCancelled" class="q-pa-sm-none q-pa-xs-none q-gutter-xs q-ml-none">
@@ -191,3 +237,22 @@ function onStateChange(newState: ReservationState): void {
         </q-item>
     </q-card-section>
 </template>
+
+<style scoped>
+.state-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+.state-card {
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: 0.5s all;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.state-card:hover {
+    transform: translateY(-2px);
+}
+</style>
