@@ -241,8 +241,7 @@ export class FloorEditor extends Floor {
         );
         this.setScaling();
 
-        this.canvas.calcOffset();
-        this.canvas.renderAll();
+        this.zoomManager.setScale(this.scale);
         this.zoomManager.resetZoom();
 
         this.canvas.fire("object:modified");
