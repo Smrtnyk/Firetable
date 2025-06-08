@@ -91,11 +91,11 @@ export function useFloorEditor(containerRef: ShallowRef<HTMLElement | null>) {
             return;
         }
 
-        if (width && !Number.isNaN(width)) {
+        if (width && !Number.isNaN(width) && floorInstance.value?.width !== width) {
             floorInstance.value?.updateDimensions(width, floorInstance.value.height);
         }
 
-        if (height && !Number.isNaN(height)) {
+        if (height && !Number.isNaN(height) && floorInstance.value?.height !== height) {
             floorInstance.value?.updateDimensions(floorInstance.value.width, Number(height));
         }
     }

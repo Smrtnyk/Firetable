@@ -467,7 +467,7 @@ function updateTableLabel(newLabel: unknown): void {
                                 label="Width"
                                 :model-value="floorInstanceState.width"
                                 @update:model-value="
-                                    (event) => onFloorChange({ width: event as number })
+                                    (event) => onFloorChange({ width: Number(event) })
                                 "
                                 :min="300"
                                 :max="MAX_FLOOR_WIDTH"
@@ -481,7 +481,7 @@ function updateTableLabel(newLabel: unknown): void {
                                 label="Height"
                                 :model-value="floorInstanceState.height"
                                 @update:model-value="
-                                    (event) => onFloorChange({ height: event as number })
+                                    (event) => onFloorChange({ height: Number(event) })
                                 "
                                 :min="300"
                                 :max="MAX_FLOOR_HEIGHT"
@@ -891,14 +891,11 @@ function updateTableLabel(newLabel: unknown): void {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
-    overflow: hidden;
 
     .canvas-wrapper {
         background: white;
         border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
 
         .body--dark & {
             background: $dark-page;
