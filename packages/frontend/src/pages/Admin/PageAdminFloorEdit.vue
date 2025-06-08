@@ -338,7 +338,6 @@ function updateTableLabel(newLabel: unknown): void {
                         :color="selectedTool === 'select' ? 'primary' : ''"
                         icon="fa fa-mouse-pointer"
                         @click="selectSelectTool"
-                        size="sm"
                     >
                         <q-tooltip>Select Tool</q-tooltip>
                     </q-btn>
@@ -347,7 +346,6 @@ function updateTableLabel(newLabel: unknown): void {
                         :color="selectedTool === 'draw' ? 'primary' : ''"
                         icon="fa fa-paint-brush"
                         @click="toggleDrawingMode"
-                        size="sm"
                     >
                         <q-tooltip>Drawing Tool</q-tooltip>
                     </q-btn>
@@ -356,7 +354,6 @@ function updateTableLabel(newLabel: unknown): void {
                         :color="selectedTool === 'add' ? 'primary' : ''"
                         icon="fa fa-plus-square"
                         @click="selectAddTool"
-                        size="sm"
                     >
                         <q-tooltip>Add Elements</q-tooltip>
                     </q-btn>
@@ -370,7 +367,6 @@ function updateTableLabel(newLabel: unknown): void {
                         icon="fa fa-undo"
                         @click="undoAction"
                         :disabled="!floorInstanceState.canUndo"
-                        size="sm"
                     >
                         <q-tooltip>Undo</q-tooltip>
                     </q-btn>
@@ -379,7 +375,6 @@ function updateTableLabel(newLabel: unknown): void {
                         icon="fa fa-redo"
                         @click="redoAction"
                         :disabled="!floorInstanceState.canRedo"
-                        size="sm"
                     >
                         <q-tooltip>Redo</q-tooltip>
                     </q-btn>
@@ -387,7 +382,7 @@ function updateTableLabel(newLabel: unknown): void {
 
                 <q-separator vertical inset class="q-mx-sm" />
 
-                <q-btn flat icon="fa fa-th" @click="floorInstance?.toggleGridVisibility" size="sm">
+                <q-btn flat icon="fa fa-th" @click="floorInstance?.toggleGridVisibility">
                     <q-tooltip>Toggle Grid</q-tooltip>
                 </q-btn>
             </div>
@@ -405,10 +400,10 @@ function updateTableLabel(newLabel: unknown): void {
 
             <div class="toolbar-section">
                 <q-btn-group flat>
-                    <q-btn flat icon="fa fa-file-import" @click="triggerFileInput" size="sm">
+                    <q-btn flat icon="fa fa-file-import" @click="triggerFileInput">
                         <q-tooltip>Import Floor</q-tooltip>
                     </q-btn>
-                    <q-btn flat icon="fa fa-file-export" @click="exportFloor" size="sm">
+                    <q-btn flat icon="fa fa-file-export" @click="exportFloor">
                         <q-tooltip>Export Floor</q-tooltip>
                     </q-btn>
                 </q-btn-group>
@@ -422,7 +417,6 @@ function updateTableLabel(newLabel: unknown): void {
                     icon="fa fa-save"
                     label="Save"
                     @click="onFloorSave"
-                    size="sm"
                 />
             </div>
         </div>
@@ -609,11 +603,10 @@ function updateTableLabel(newLabel: unknown): void {
                                 dense
                                 icon="fa fa-copy"
                                 @click="floorInstance?.copySelectedElement()"
-                                size="sm"
                             >
                                 <q-tooltip>Copy</q-tooltip>
                             </q-btn>
-                            <q-btn flat dense icon="fa fa-level-down" @click="sendBack" size="sm">
+                            <q-btn flat dense icon="fa fa-level-down" @click="sendBack">
                                 <q-tooltip>Send Back</q-tooltip>
                             </q-btn>
                             <q-btn
@@ -622,7 +615,6 @@ function updateTableLabel(newLabel: unknown): void {
                                 dense
                                 icon="fa fa-arrows-alt-h"
                                 @click="selectedElement.flip()"
-                                size="sm"
                             >
                                 <q-tooltip>Flip</q-tooltip>
                             </q-btn>
@@ -632,7 +624,6 @@ function updateTableLabel(newLabel: unknown): void {
                                 dense
                                 icon="fa fa-chevron-right"
                                 @click="selectedElement.nextDesign()"
-                                size="sm"
                             >
                                 <q-tooltip>Switch Design</q-tooltip>
                             </q-btn>
@@ -643,7 +634,6 @@ function updateTableLabel(newLabel: unknown): void {
                                 icon="fa fa-trash"
                                 color="negative"
                                 @click="deleteSelectedElement"
-                                size="sm"
                             >
                                 <q-tooltip>Delete</q-tooltip>
                             </q-btn>
