@@ -94,7 +94,7 @@ const contactRate = computed(function () {
 </script>
 
 <template>
-    <div class="q-pa-sm">
+    <div class="q-pa-sm q-ma-none">
         <!-- Main Stats Grid -->
         <div class="row q-col-gutter-md">
             <!-- Capacity Section -->

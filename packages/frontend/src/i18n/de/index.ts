@@ -239,6 +239,29 @@ const de: TranslationStructure = {
         reloadButtonLabel: "Neu laden",
         waitOrReloadText: "Warten Sie oder versuchen Sie, die Seite neu zu laden",
     },
+    PageAdminEvent: {
+        arrivedReservationsTabLabel: "Angekommen ({count})",
+        cancelledReservationsTabLabel: "Storniert ({count})",
+        cannotRemoveFloorWithReservationsError:
+            "Etage mit aktiven Reservierungen kann nicht entfernt werden",
+        editEventInfoDialogTitle: "Veranstaltungsinformationen bearbeiten",
+        editingFloorDialogTitle: "Etage bearbeiten: {floorName}",
+        editTabLabel: "Bearbeiten",
+        eventFloorsCardTitle: "Veranstaltungsetagen",
+        eventInfoCardTitle: "Veranstaltungsinformationen",
+        guestsTitle: "Gäste",
+        infoTabLabel: "Info",
+        logsTabLabel: "Protokolle",
+        logsTabLabelWithCount: "Protokolle ({count})",
+        noArrivedReservationsMessage: "Keine angekommenen Reservierungen",
+        noCancelledReservationsMessage: "Keine stornierten Reservierungen",
+        permanentlyDeleteReservationMessage:
+            "Dadurch wird die Reservierung endgültig gelöscht und von allen Analysen ausgeschlossen. Dies kann nicht rückgängig gemacht werden.",
+        permanentlyDeleteReservationTitle: "Reservierung endgültig löschen?",
+        reservedByStatusTitle: "Reserviert nach Status",
+        returningGuestsTabLabel: "Wiederkehrend ({count})",
+        viewButtonLabel: "Ansehen",
+    },
     PageAdminEvents: {
         createNewEventDialogTitle: "Neue Veranstaltung erstellen",
         deleteEventDialogTitle: "Veranstaltung löschen?",
@@ -361,14 +384,21 @@ const de: TranslationStructure = {
         unit: "Einheit",
     },
     PageAdminUsers: {
+        cannotDeleteSelfError: "Sie können sich nicht selbst löschen!",
         createNewUserDialogTitle: "Neuen Benutzer erstellen",
+        createPropertiesPrompt: "Um Benutzer aufzulisten, erstellen Sie zuerst einige Immobilien",
+        deleteUserConfirmTitle: "Benutzer löschen?",
+        editSelfError: "Um Ihr Profil zu bearbeiten, gehen Sie zur Profilseite!",
         editUserConfirmationMessage:
             "Sind Sie sicher, dass Sie den Benutzer {name} bearbeiten möchten?",
         editUserDialogTitle: "Benutzer bearbeiten: {name}",
         maxAmountUsersCreationMessage:
             "Sie haben die maximale Anzahl an Benutzern erreicht, welche {limit} beträgt!",
         noUsersCreatedMessage: "Es wurden keine Benutzer erstellt.",
+        propertyUserCountTabLabel: "{propertyName} ({count})",
         title: "Benutzer",
+        unassignedUsersTitle: "Nicht zugewiesene Benutzer ({count})",
+        userUpdatedSuccess: "Benutzer erfolgreich aktualisiert!",
     },
     PageAuth: {
         invalidEmailError: "Die eingegebene E-Mail-Adresse ist ungültig.",
