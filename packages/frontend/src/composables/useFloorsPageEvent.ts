@@ -65,7 +65,7 @@ export function useFloorsPageEvent(
             if (!pageRef.value) {
                 return;
             }
-            floor.resize(pageRef.value.clientWidth, pageRef.value.clientHeight);
+            floor.resize(pageRef.value);
         });
     }, 100);
 
@@ -130,8 +130,7 @@ export function useFloorsPageEvent(
         }
         return new FloorViewer({
             canvas,
-            containerHeight: pageRef.value.clientHeight,
-            containerWidth: pageRef.value.clientWidth,
+            container: pageRef.value,
             floorDoc: decompressFloorDoc(floorDoc),
         });
     }

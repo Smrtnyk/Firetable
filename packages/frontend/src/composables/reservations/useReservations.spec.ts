@@ -1724,10 +1724,12 @@ async function createTestFloor(name = "Test floor", id = "1"): Promise<FloorView
     canvas.height = 600;
     document.body.appendChild(canvas);
 
+    const container = document.createElement("div");
+    container.style.width = "500px";
+    container.style.height = "500px";
     const editor = new FloorEditor({
         canvas: document.createElement("canvas"),
-        containerHeight: 500,
-        containerWidth: 500,
+        container,
         floorDoc: {
             height: 500,
             id,
@@ -1770,8 +1772,7 @@ async function createTestFloor(name = "Test floor", id = "1"): Promise<FloorView
 
     const floorViewer = new FloorViewer({
         canvas,
-        containerHeight: 600,
-        containerWidth: 400,
+        container,
         floorDoc,
     });
 
