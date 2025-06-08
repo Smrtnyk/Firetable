@@ -8,6 +8,15 @@ declare namespace NodeJS {
 
 interface ImportMeta {
     readonly env: ImportMetaEnv;
+
+    readonly glob: <T = unknown>(
+        pattern: string | string[],
+        options?: {
+            eager?: boolean;
+            import?: "default" | "raw";
+            query?: Record<string, boolean | number | string> | string;
+        },
+    ) => Record<string, (() => Promise<T>) | T>;
 }
 
 interface ImportMetaEnv {

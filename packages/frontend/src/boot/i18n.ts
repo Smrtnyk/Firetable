@@ -1,3 +1,5 @@
+import type { AnyFunction } from "@firetable/types";
+
 import { Lang, LocalStorage } from "quasar";
 import { boot } from "quasar/wrappers";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
@@ -5,6 +7,9 @@ import { createI18n } from "vue-i18n";
 
 const DEFAULT_LANG = "en-GB";
 const savedLanguage = LocalStorage.getItem<string>("FTLang") ?? DEFAULT_LANG;
+
+const localMessages = import.meta.glob("../i18n/*/index.ts");
+const quasarMessages = import.meta.glob("../../node_modules/quasar/lang/*.js");
 
 export const i18n = createI18n({
     fallbackLocale: "en-GB",
@@ -18,22 +23,31 @@ export async function dynamicallySwitchLang(langIso: string): Promise<void> {
 
     await tryCatchLoadingWrapper({
         async hook() {
-            // Load Quasar language pack
-            const quasarLangModule = await import(`../../node_modules/quasar/lang/${langIso}.js`);
-            Lang.set(quasarLangModule.default);
+            const quasarLangPath = `../../node_modules/quasar/lang/${langIso}.js`;
+            const localMessagesPath = `../i18n/${langIso}/index.ts`;
 
-            const messages = await loadLanguage(langIso);
-            i18n.global.setLocaleMessage(langIso, messages.default);
-            i18n.global.locale.value = langIso;
+            if (quasarMessages[quasarLangPath]) {
+                const quasarLangModule = await (quasarMessages[quasarLangPath] as AnyFunction)();
+                Lang.set(quasarLangModule.default);
+            }
 
-            LocalStorage.set("FTLang", langIso);
+            if (localMessages[localMessagesPath]) {
+                const messages = await (localMessages[localMessagesPath] as AnyFunction)();
+                i18n.global.setLocaleMessage(langIso, messages.default);
+                i18n.global.locale.value = langIso;
+                LocalStorage.set("FTLang", langIso);
+            }
         },
     });
 }
 
+/**
+ * Used in unit tests to load language files.
+ * @param langIso ISO code of the language to load.
+ */
 export function loadLanguage(langIso: string): Promise<{ default: Record<string, unknown> }> {
-    // eslint-disable-next-line no-inline-comments -- needed for Vite
-    return import(/* @vite-ignore */ `../i18n/${langIso}`);
+    const localMessagesPath = `../i18n/${langIso}/index.ts`;
+    return (localMessages[localMessagesPath] as AnyFunction)();
 }
 
 export default boot(async function ({ app }) {
