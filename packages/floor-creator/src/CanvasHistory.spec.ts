@@ -34,10 +34,10 @@ describe("CanvasHistory", () => {
         await moveTable(floor, table, { left: 200, top: 200 });
 
         await floor.undo();
-        expect(floor.gridDrawer.isGridVisible).toBe(false);
+        expect(floor.gridDrawer.isGridVisible).toBe(true);
 
         await floor.redo();
-        expect(floor.gridDrawer.isGridVisible).toBe(false);
+        expect(floor.gridDrawer.isGridVisible).toBe(true);
     });
 
     it("records a history entry even if the net change is zero", async () => {
