@@ -127,7 +127,6 @@ export abstract class Floor {
             height: this.height * this.canvas.getZoom(),
             width: this.width * this.canvas.getZoom(),
         };
-        console.log("Setting canvas dimensions:", newDimensions, "Scale:", this.scale);
         this.canvas.setDimensions(newDimensions);
         this.setObjectCoords();
     }
