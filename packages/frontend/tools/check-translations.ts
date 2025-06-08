@@ -97,8 +97,8 @@ async function main(): Promise<void> {
         console.log(r.dim("   (Used in code but not defined in the translation file)"));
 
         const table = new Table({
-            colWidths: [60, 60],
-            head: [r.bold(r.red("Missing Key")), r.bold(r.red("Found In (Example)"))],
+            colWidths: [60, 80],
+            head: [r.bold(r.red("Missing Key")), r.bold(r.red("Found In file"))],
             wordWrap: true,
         });
 
