@@ -14,7 +14,18 @@ const de: TranslationStructure = {
         organisationNameLabel: "Organisationsnamen eingeben...",
     },
     AddNewPropertyForm: {
+        brandImageTooltip:
+            "Für beste Ergebnisse verwenden Sie ein PNG oder SVG mit transparentem Hintergrund. Maximale Abmessungen: 300x300px",
+        imageProcessingError:
+            "Fehler bei der Bildverarbeitung. Bitte versuchen Sie eine andere Datei.",
+        imageUploadPlaceholder:
+            "Klicken oder ziehen Sie eine Bilddatei hierher, um sie hochzuladen",
+        imageUrlLabel: "Bild-URL",
+        pasteUrlButtonLabel: "Externe URL einfügen",
+        propertyBrandImageLabel: "Markenbild der Liegenschaft",
+        propertyNameLabel: "Name der Liegenschaft",
         propertyNameLengthValidationMessage: "Der Immobilienname muss mindestens 3 Zeichen haben!",
+        uploadFileButtonLabel: "Datei hochladen",
     },
     AppDrawer: {
         languages: {
@@ -167,8 +178,10 @@ const de: TranslationStructure = {
         clearCustomDateRangeAriaLabel: "Benutzerdefinierten Datumsbereich löschen",
         custom: "Benutzerdefiniert",
         customDateRangePickerAriaLabel: "Benutzerdefinierter Datumsbereichswähler",
+        errorInvalidPreset: "Ungültige Voreinstellung: {preset}",
         errorMaxDays: "Der Datumsbereich darf {maxDays} Tage nicht überschreiten.",
         errorSelectDates: "Bitte wählen Sie sowohl Start- als auch Enddatum aus.",
+        errorStartDateCalculation: "Berechnung des Startdatums fehlgeschlagen.",
         invalidPreset: "Ungültige Preset-Auswahl.",
         last7Days: "Letzte 7 Tage",
         last30Days: "Letzte 30 Tage",
@@ -356,6 +369,20 @@ const de: TranslationStructure = {
             "Sie haben die maximale Anzahl an Benutzern erreicht, welche {limit} beträgt!",
         noUsersCreatedMessage: "Es wurden keine Benutzer erstellt.",
         title: "Benutzer",
+    },
+    PageAuth: {
+        invalidEmailError: "Die eingegebene E-Mail-Adresse ist ungültig.",
+        loginButtonLabel: "Anmelden",
+        passwordHint: "Geben Sie Ihr Passwort ein",
+        passwordLabel: "Passwort *",
+        passwordMinLengthError:
+            "Bitte geben Sie Ihr Passwort ein, es muss mindestens 5 Zeichen enthalten.",
+        unexpectedError: "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+        usernameHint: "Benutzernamen eingeben",
+        usernameLabel: "Benutzername *",
+        userNotFoundError: "Kein Konto mit dieser E-Mail-Adresse gefunden.",
+        welcomeMessage: "Willkommen bei Firetable",
+        wrongPasswordError: "Falsches Passwort. Bitte versuchen Sie es erneut.",
     },
     PageEvent: {
         deleteQueuedReservationConfirmMsg: "Reservierung aus der Warteschlange löschen?",

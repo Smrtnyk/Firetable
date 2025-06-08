@@ -14,8 +14,17 @@ const es: TranslationStructure = {
         organisationNameLabel: "Ingrese el nombre de la organización...",
     },
     AddNewPropertyForm: {
+        brandImageTooltip:
+            "Para obtener los mejores resultados, utilice un PNG o SVG con fondo transparente. Dimensiones máximas: 300x300px",
+        imageProcessingError: "Error al procesar la imagen. Por favor, intente con otro archivo.",
+        imageUploadPlaceholder: "Haga clic o arrastre y suelte una imagen aquí para subirla",
+        imageUrlLabel: "URL de la imagen",
+        pasteUrlButtonLabel: "Pegar URL externa",
+        propertyBrandImageLabel: "Imagen de marca de la propiedad",
+        propertyNameLabel: "Nombre de la propiedad",
         propertyNameLengthValidationMessage:
             "¡El nombre de la propiedad debe tener al menos 3 caracteres!",
+        uploadFileButtonLabel: "Subir archivo",
     },
     AppDrawer: {
         languages: {
@@ -169,8 +178,10 @@ const es: TranslationStructure = {
         clearCustomDateRangeAriaLabel: "Borrar rango de fechas personalizado",
         custom: "Personalizado",
         customDateRangePickerAriaLabel: "Selector de rango de fechas personalizado",
+        errorInvalidPreset: "Preajuste no válido: {preset}",
         errorMaxDays: "Rango de fechas no puede ser mayor a {maxDays} días",
         errorSelectDates: "Por favor, selecciona fecha de inicio y fin",
+        errorStartDateCalculation: "Error en el cálculo de la fecha de inicio.",
         invalidPreset: "Selección no válida",
         last7Days: "Últimos 7 días",
         last30Days: "Últimos 30 dias",
@@ -355,6 +366,20 @@ const es: TranslationStructure = {
         maxAmountUsersCreationMessage: "¡Ha alcanzado el máximo de usuarios, que es {limit}!",
         noUsersCreatedMessage: "No hay usuarios creados.",
         title: "Usuarios",
+    },
+    PageAuth: {
+        invalidEmailError: "La dirección de correo electrónico introducida no es válida.",
+        loginButtonLabel: "Iniciar sesión",
+        passwordHint: "Introduzca su contraseña",
+        passwordLabel: "Contraseña *",
+        passwordMinLengthError:
+            "Por favor, introduzca su contraseña, debe contener un mínimo de 5 caracteres.",
+        unexpectedError: "Ocurrió un error inesperado. Por favor, inténtelo de nuevo.",
+        usernameHint: "Introducir nombre de usuario",
+        usernameLabel: "Nombre de usuario *",
+        userNotFoundError: "No se encontró ninguna cuenta con este correo electrónico.",
+        welcomeMessage: "Bienvenido a Firetable",
+        wrongPasswordError: "Contraseña incorrecta. Por favor, inténtelo de nuevo.",
     },
     PageEvent: {
         deleteQueuedReservationConfirmMsg: "¿Está seguro que desea eliminar esta reservación?",

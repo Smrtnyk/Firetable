@@ -1,4 +1,3 @@
-/* eslint-disable id-length -- patched from fabric*/
 import type { FabricObject } from "fabric";
 
 import { ActiveSelection, Group } from "fabric";

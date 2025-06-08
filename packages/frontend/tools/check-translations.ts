@@ -3,7 +3,6 @@ import { default as Table } from "cli-table3";
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-// eslint-disable-next-line id-length -- fine here
 import r from "tinyrainbow";
 
 import enGB from "../src/i18n/en-GB";

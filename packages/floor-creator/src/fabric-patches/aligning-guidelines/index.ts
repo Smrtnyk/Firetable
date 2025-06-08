@@ -1,4 +1,4 @@
-/* eslint-disable func-style,@typescript-eslint/no-non-null-assertion,id-length */
+/* eslint-disable func-style,@typescript-eslint/no-non-null-assertion */
 import type { BasicTransformEvent, Canvas, FabricObject, Point } from "fabric";
 
 import type { AligningLineConfig, LineProps } from "./typedefs.js";

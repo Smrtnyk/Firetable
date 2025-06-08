@@ -3,14 +3,17 @@ import { Loading, QForm } from "quasar";
 import { loginWithEmail } from "src/db";
 import { minLength, noEmptyString } from "src/helpers/form-rules";
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import { ref, useTemplateRef } from "vue";
+import { computed, ref, useTemplateRef } from "vue";
+import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 
-const firebaseErrorMessages: Record<string, string> = {
-    "auth/invalid-email": "The email address you entered is invalid.",
-    "auth/user-not-found": "No account found with this email.",
-    "auth/wrong-password": "Incorrect password. Please try again.",
-};
+const { t } = useI18n();
+
+const firebaseErrorMessages = computed<Record<string, string>>(() => ({
+    "auth/invalid-email": t("PageAuth.invalidEmailError"),
+    "auth/user-not-found": t("PageAuth.userNotFoundError"),
+    "auth/wrong-password": t("PageAuth.wrongPasswordError"),
+}));
 
 const router = useRouter();
 const username = ref("");
@@ -18,9 +21,7 @@ const password = ref("");
 const isPwd = ref(true);
 const authForm = useTemplateRef<QForm>("authForm");
 const usernameRule = [noEmptyString()];
-const passwordRule = [
-    minLength("Please enter your password, it has to contain minimum 5 characters."),
-];
+const passwordRule = computed(() => [minLength(t("PageAuth.passwordMinLengthError"))]);
 
 async function onSubmit(): Promise<void> {
     if (!(await authForm.value?.validate())) {
@@ -34,7 +35,7 @@ async function onSubmit(): Promise<void> {
     } catch (e: any) {
         const errorCode = e.code;
         const userFriendlyMessage =
-            firebaseErrorMessages[errorCode] ?? "An unexpected error occurred. Please try again.";
+            firebaseErrorMessages.value[errorCode as string] ?? t("PageAuth.unexpectedError");
         showErrorMessage(userFriendlyMessage);
     } finally {
         Loading.hide();
@@ -48,13 +49,13 @@ async function onSubmit(): Promise<void> {
             <div class="col">
                 <q-img class="ft-logo" src="/icons/icon-256x256.png" />
                 <q-form ref="authForm" class="PageAuth__auth-form limited-width q-mx-auto" greedy>
-                    <h1 class="text-h5 text-center">Welcome to Firetable</h1>
+                    <h1 class="text-h5 text-center">{{ t("PageAuth.welcomeMessage") }}</h1>
                     <q-input
                         v-model="username"
                         class="q-mb-md"
                         outlined
-                        label="Username *"
-                        hint="Enter username"
+                        :label="t('PageAuth.usernameLabel')"
+                        :hint="t('PageAuth.usernameHint')"
                         lazy-rules
                         :rules="usernameRule"
                     />
@@ -63,9 +64,9 @@ async function onSubmit(): Promise<void> {
                         v-model="password"
                         class="q-mb-md"
                         outlined
-                        label="Password *"
+                        :label="t('PageAuth.passwordLabel')"
                         :type="isPwd ? 'password' : 'text'"
-                        hint="Enter your password"
+                        :hint="t('PageAuth.passwordHint')"
                         :rules="passwordRule"
                     >
                         <template #append>
@@ -81,7 +82,7 @@ async function onSubmit(): Promise<void> {
                     <q-btn
                         rounded
                         size="lg"
-                        label="Login"
+                        :label="t('PageAuth.loginButtonLabel')"
                         class="button-gradient q-ml-md"
                         @click="onSubmit"
                     />

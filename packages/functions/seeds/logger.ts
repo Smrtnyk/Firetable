@@ -1,6 +1,5 @@
 import type { Formatter } from "tinyrainbow";
 
-// eslint-disable-next-line id-length -- this is just logging symbols
 import c from "tinyrainbow";
 
 interface LoggerConfig {
@@ -30,7 +29,7 @@ class Logger {
             "✓": "✓",
             "✖": "✖",
             "📦": "📦",
-            // eslint-disable-next-line id-length -- this is just logging symbols
+
             ℹ: "ℹ",
         },
     };
