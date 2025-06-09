@@ -3,9 +3,8 @@ import type { FloorDoc } from "@firetable/types";
 import type { ShallowRef } from "vue";
 
 import { extractAllTablesLabels, FloorEditor, FloorElementTypes } from "@firetable/floor-creator";
-import { negate } from "es-toolkit";
+import { debounce, negate } from "es-toolkit";
 import { isNaN, toInteger, toNumber } from "es-toolkit/compat";
-import { debounce } from "quasar";
 import { AppLogger } from "src/logger/FTLogger.js";
 import { nextTick, onBeforeUnmount, ref, shallowRef } from "vue";
 

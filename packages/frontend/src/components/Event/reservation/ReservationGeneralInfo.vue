@@ -1,42 +1,9 @@
-<script setup lang="ts">
-import type { PlannedReservation, QueuedReservation, Reservation } from "@firetable/types";
-
-import { isAWalkInReservation } from "@firetable/types";
-import { getFormatedDateFromTimestamp } from "src/helpers/date-utils";
-import { usePermissionsStore } from "src/stores/permissions-store";
-import { computed } from "vue";
-import { useI18n } from "vue-i18n";
-
-const props = defineProps<{
-    reservation: QueuedReservation | Reservation;
-    timezone: string;
-}>();
-const { locale, t } = useI18n();
-const permissionsStore = usePermissionsStore();
-
-const createdAt = computed(function () {
-    const createdAtValue = props.reservation.creator.createdAt;
-    return getFormatedDateFromTimestamp(createdAtValue, locale.value, props.timezone);
-});
-
-function createdByText(creator: Reservation["creator"]): string {
-    const { email, name } = creator;
-    return `${name} - ${email}`;
-}
-
-function reservedByText(reservedBy: PlannedReservation["reservedBy"]): string {
-    const { email, name } = reservedBy;
-    const isSocial = email.startsWith("social");
-    return isSocial ? name : `${name} - ${email}`;
-}
-</script>
-
 <template>
     <div class="ReservationGeneralInfo">
         <!-- Guest Information Section -->
         <div class="ReservationGeneralInfo__section" v-if="reservation.guestName">
             <h4 class="ReservationGeneralInfo__section-title">
-                <i class="fas fa-user" />
+                <v-icon size="small">fas fa-user</v-icon>
                 Guest Information
             </h4>
             <div class="ReservationGeneralInfo__fields">
@@ -59,7 +26,9 @@ function reservedByText(reservedBy: PlannedReservation["reservedBy"]): string {
                         {{ t("EventShowReservation.contactLabel") }}
                     </span>
                     <span class="ReservationGeneralInfo__value">
-                        <i class="fas fa-phone ReservationGeneralInfo__icon" />
+                        <v-icon size="x-small" class="ReservationGeneralInfo__icon"
+                            >fas fa-phone</v-icon
+                        >
                         {{ reservation.guestContact }}
                     </span>
                 </div>
@@ -69,30 +38,38 @@ function reservedByText(reservedBy: PlannedReservation["reservedBy"]): string {
         <!-- Reservation Details Section -->
         <div class="ReservationGeneralInfo__section">
             <h4 class="ReservationGeneralInfo__section-title">
-                <i class="fas fa-calendar-check" />
+                <v-icon size="small">fas fa-calendar-check</v-icon>
                 Reservation Details
             </h4>
             <div class="ReservationGeneralInfo__fields">
-                <div class="ReservationGeneralInfo__field">
+                <div
+                    class="ReservationGeneralInfo__field ReservationGeneralInfo__field--highlight-row"
+                >
                     <span class="ReservationGeneralInfo__label">
                         {{ t("EventShowReservation.timeLabel") }}
                     </span>
                     <span
                         class="ReservationGeneralInfo__value ReservationGeneralInfo__value--highlight"
                     >
-                        <i class="fas fa-clock ReservationGeneralInfo__icon" />
+                        <v-icon size="x-small" class="ReservationGeneralInfo__icon"
+                            >fas fa-clock</v-icon
+                        >
                         {{ reservation.time }}
                     </span>
                 </div>
 
-                <div class="ReservationGeneralInfo__field">
+                <div
+                    class="ReservationGeneralInfo__field ReservationGeneralInfo__field--highlight-row"
+                >
                     <span class="ReservationGeneralInfo__label">
                         {{ t("EventShowReservation.numberOfPeopleLabel") }}
                     </span>
                     <span
                         class="ReservationGeneralInfo__value ReservationGeneralInfo__value--highlight"
                     >
-                        <i class="fas fa-users ReservationGeneralInfo__icon" />
+                        <v-icon size="x-small" class="ReservationGeneralInfo__icon"
+                            >fas fa-users</v-icon
+                        >
                         {{ reservation.numberOfGuests }}
                     </span>
                 </div>
@@ -105,18 +82,23 @@ function reservedByText(reservedBy: PlannedReservation["reservedBy"]): string {
             v-if="reservation.consumption || reservation.reservationNote"
         >
             <h4 class="ReservationGeneralInfo__section-title">
-                <i class="fas fa-info-circle" />
+                <v-icon size="small">fas fa-info-circle</v-icon>
                 Additional Information
             </h4>
             <div class="ReservationGeneralInfo__fields">
-                <div class="ReservationGeneralInfo__field" v-if="reservation.consumption">
+                <div
+                    class="ReservationGeneralInfo__field ReservationGeneralInfo__field--highlight-row"
+                    v-if="reservation.consumption"
+                >
                     <span class="ReservationGeneralInfo__label">
                         {{ t("EventShowReservation.reservationConsumption") }}
                     </span>
                     <span
                         class="ReservationGeneralInfo__value ReservationGeneralInfo__value--highlight"
                     >
-                        <i class="fas fa-euro-sign ReservationGeneralInfo__icon" />
+                        <v-icon size="x-small" class="ReservationGeneralInfo__icon"
+                            >fas fa-euro-sign</v-icon
+                        >
                         {{ reservation.consumption }}
                     </span>
                 </div>
@@ -126,7 +108,9 @@ function reservedByText(reservedBy: PlannedReservation["reservedBy"]): string {
                         {{ t("EventShowReservation.noteLabel") }}
                     </span>
                     <span class="ReservationGeneralInfo__value ReservationGeneralInfo__value--note">
-                        <i class="fas fa-sticky-note ReservationGeneralInfo__icon" />
+                        <v-icon size="x-small" class="ReservationGeneralInfo__icon"
+                            >fas fa-sticky-note</v-icon
+                        >
                         {{ reservation.reservationNote }}
                     </span>
                 </div>
@@ -139,7 +123,7 @@ function reservedByText(reservedBy: PlannedReservation["reservedBy"]): string {
             v-if="!isAWalkInReservation(reservation) || permissionsStore.canSeeReservationCreator"
         >
             <h4 class="ReservationGeneralInfo__section-title">
-                <i class="fas fa-cog" />
+                <v-icon size="small">fas fa-cog</v-icon>
                 System Information
             </h4>
             <div class="ReservationGeneralInfo__fields">
@@ -187,7 +171,42 @@ function reservedByText(reservedBy: PlannedReservation["reservedBy"]): string {
     </div>
 </template>
 
+<script setup lang="ts">
+import type { PlannedReservation, QueuedReservation, Reservation } from "@firetable/types";
+
+import { isAWalkInReservation } from "@firetable/types";
+import { getFormatedDateFromTimestamp } from "src/helpers/date-utils";
+import { usePermissionsStore } from "src/stores/permissions-store";
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
+
+const props = defineProps<{
+    reservation: QueuedReservation | Reservation;
+    timezone: string;
+}>();
+const { locale, t } = useI18n();
+const permissionsStore = usePermissionsStore();
+
+const createdAt = computed(function () {
+    const createdAtValue = props.reservation.creator.createdAt;
+    return getFormatedDateFromTimestamp(createdAtValue, locale.value, props.timezone);
+});
+
+function createdByText(creator: Reservation["creator"]): string {
+    const { email, name } = creator;
+    return `${name} - ${email}`;
+}
+
+function reservedByText(reservedBy: PlannedReservation["reservedBy"]): string {
+    const { email, name } = reservedBy;
+    const isSocial = email.startsWith("social");
+    return isSocial ? name : `${name} - ${email}`;
+}
+</script>
+
 <style lang="scss" scoped>
+@use "src/css/variables.scss" as *;
+
 .ReservationGeneralInfo {
     display: flex;
     flex-direction: column;
@@ -211,15 +230,14 @@ function reservedByText(reservedBy: PlannedReservation["reservedBy"]): string {
         color: $text-primary;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 8px; // Match the original gap
         text-transform: uppercase;
         letter-spacing: 0.5px;
 
-        i {
+        :deep(.v-icon) {
             color: $primary;
             font-size: 14px;
             width: 16px;
-            text-align: center;
         }
     }
 
@@ -244,6 +262,23 @@ function reservedByText(reservedBy: PlannedReservation["reservedBy"]): string {
 
             .ReservationGeneralInfo__label {
                 flex-shrink: 0;
+            }
+        }
+
+        // Fixed the selector to match the original behavior
+        &--highlight-row {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+
+            .ReservationGeneralInfo__label {
+                flex-shrink: 0;
+            }
+
+            .ReservationGeneralInfo__value--highlight {
+                margin-left: auto;
+                align-self: center;
             }
         }
     }
@@ -300,26 +335,9 @@ function reservedByText(reservedBy: PlannedReservation["reservedBy"]): string {
         color: $text-tertiary;
         flex-shrink: 0;
     }
-
-    .ReservationGeneralInfo__fields
-        .ReservationGeneralInfo__field:has(.ReservationGeneralInfo__value--highlight) {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        gap: 16px;
-
-        .ReservationGeneralInfo__label {
-            flex-shrink: 0;
-        }
-
-        .ReservationGeneralInfo__value--highlight {
-            margin-left: auto;
-            align-self: center;
-        }
-    }
 }
 
-// Dark mode support
+// Dark mode support - keep the original selector structure
 .body--dark .ReservationGeneralInfo {
     &__section {
         border-color: $border-light-dark;
@@ -328,7 +346,7 @@ function reservedByText(reservedBy: PlannedReservation["reservedBy"]): string {
     &__section-title {
         color: $text-primary-dark;
 
-        i {
+        :deep(.v-icon) {
             color: $primary;
         }
     }
@@ -340,9 +358,37 @@ function reservedByText(reservedBy: PlannedReservation["reservedBy"]): string {
     &__value {
         color: $text-primary-dark;
 
-        &--primary {
-            // Removed color: $text-primary-dark since it's already the default
+        &--highlight {
+            color: $accent;
+            background: rgba($accent, 0.15);
         }
+    }
+
+    &__icon {
+        color: $text-tertiary-dark;
+    }
+}
+
+// Also add Vuetify dark mode support
+.v-theme--dark .ReservationGeneralInfo {
+    &__section {
+        border-color: $border-light-dark;
+    }
+
+    &__section-title {
+        color: $text-primary-dark;
+
+        :deep(.v-icon) {
+            color: $primary;
+        }
+    }
+
+    &__label {
+        color: $text-secondary-dark;
+    }
+
+    &__value {
+        color: $text-primary-dark;
 
         &--highlight {
             color: $accent;

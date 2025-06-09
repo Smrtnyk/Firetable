@@ -1,11 +1,9 @@
 <template>
     <div>
-        <q-list v-if="returningGuests.length > 0">
-            <q-item
+        <v-list v-if="returningGuests.length > 0" lines="two">
+            <v-list-item
                 v-for="guest in returningGuests"
                 :key="guest.contact"
-                clickable
-                v-ripple
                 :to="{
                     name: 'adminGuest',
                     params: {
@@ -14,14 +12,14 @@
                     },
                 }"
             >
-                <q-item-section>
-                    <q-item-label overline>{{ guest.visits.length }} previous visits</q-item-label>
-                    <q-item-label>
-                        {{ guest.name }} on {{ guest.tableLabels.join(", ") }}</q-item-label
-                    >
-                </q-item-section>
-            </q-item>
-        </q-list>
+                <div class="text-overline">{{ guest.visits.length }} previous visits</div>
+
+                <v-list-item-title>
+                    {{ guest.name }} on {{ guest.tableLabels.join(", ") }}
+                </v-list-item-title>
+            </v-list-item>
+        </v-list>
+
         <FTCenteredText v-else> No returning guests </FTCenteredText>
     </div>
 </template>

@@ -42,66 +42,57 @@ watch(
     },
 );
 
+// This function is now directly used by v-color-picker's update event
 function onColorChanged(newVal: string): void {
     localColor.value = newVal;
     emit("update:modelValue", newVal);
 }
-
-function openColorPicker(): void {
-    if (!disable) {
-        isOpen.value = true;
-    }
-}
 </script>
 
 <template>
-    <q-btn
-        :flat="flat"
-        :round="round"
-        :disable="disable"
-        padding="0"
-        class="ft-color-picker-button"
-        :style="{
-            width: buttonSize,
-            height: buttonSize,
-            minHeight: 'unset',
-        }"
-        @click="openColorPicker"
-    >
-        <!-- Checkered background for transparency -->
-        <div class="color-preview-container">
-            <div class="checkered-bg" v-if="!round" />
-            <div class="checkered-bg-round" v-else />
-            <div
-                class="color-preview"
-                :class="{ 'color-preview-round': round }"
-                :style="{ backgroundColor: localColor }"
-            />
-        </div>
-
-        <q-tooltip anchor="top middle" self="bottom middle" :offset="[0, 8]">
-            {{ localColor }}
-        </q-tooltip>
-    </q-btn>
-
-    <q-popup-proxy
-        v-model="isOpen"
-        transition-show="scale"
-        transition-hide="scale"
-        cover
-        no-parent-event
-        class="ft-card"
-    >
-        <q-color
-            v-model="localColor"
-            @change="onColorChanged"
-            format-model="hexa"
-            no-header
-            no-footer
-            bordered
-            style="min-width: 280px"
-        />
-    </q-popup-proxy>
+    <v-tooltip location="top" :text="localColor">
+        <template #activator="{ props: tooltipProps }">
+            <v-menu
+                v-model="isOpen"
+                transition="scale-transition"
+                :close-on-content-click="false"
+                location="bottom"
+            >
+                <template #activator="{ props: menuProps }">
+                    <v-btn
+                        v-bind="{ ...tooltipProps, ...menuProps }"
+                        :variant="flat ? 'text' : 'elevated'"
+                        :rounded="round ? 'circle' : 'lg'"
+                        :disabled="disable"
+                        class="ft-color-picker-button"
+                        :style="{
+                            width: buttonSize,
+                            height: buttonSize,
+                            minWidth: 'unset',
+                        }"
+                        padding="0"
+                    >
+                        <!-- Checkered background for transparency -->
+                        <div class="color-preview-container">
+                            <div :class="round ? 'checkered-bg-round' : 'checkered-bg'" />
+                            <div
+                                class="color-preview"
+                                :class="{ 'color-preview-round': round }"
+                                :style="{ backgroundColor: localColor }"
+                            />
+                        </div>
+                    </v-btn>
+                </template>
+                <v-color-picker
+                    v-model="localColor"
+                    @update:model-value="onColorChanged"
+                    mode="hexa"
+                    hide-inputs
+                    style="min-width: 280px"
+                />
+            </v-menu>
+        </template>
+    </v-tooltip>
 </template>
 
 <style lang="scss" scoped>
@@ -111,29 +102,27 @@ function openColorPicker(): void {
     transition: all 0.2s ease;
     overflow: visible;
 
-    .body--dark & {
+    // Vuetify's dark theme class is .v-theme--dark
+    :deep(.v-theme--dark) & {
         border-color: rgba(255, 255, 255, 0.2);
     }
 
-    &:not(.q-btn--round) {
-        border-radius: 6px;
-    }
-
-    &:hover:not(.disabled) {
+    &:hover:not(:disabled) {
         transform: scale(1.1);
-        border-color: $primary;
+        // Vuetify's theme color variable
+        border-color: rgb(var(--v-theme-primary));
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 
-        .body--dark & {
+        :deep(.v-theme--dark) & {
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
     }
 
-    &:active:not(.disabled) {
+    &:active:not(:disabled) {
         transform: scale(1.05);
     }
 
-    &.disabled {
+    &.v-btn--disabled {
         opacity: 0.6;
         cursor: not-allowed;
     }
@@ -162,7 +151,7 @@ function openColorPicker(): void {
         4px -4px,
         -4px 0;
 
-    .body--dark & {
+    :deep(.v-theme--dark) & {
         background-image:
             linear-gradient(45deg, #424242 25%, transparent 25%),
             linear-gradient(-45deg, #424242 25%, transparent 25%),
@@ -172,7 +161,7 @@ function openColorPicker(): void {
 }
 
 .checkered-bg {
-    border-radius: 4px;
+    border-radius: 8px;
 }
 
 .checkered-bg-round {
@@ -182,7 +171,7 @@ function openColorPicker(): void {
 .color-preview {
     position: absolute;
     inset: 0;
-    border-radius: 4px;
+    border-radius: 8px;
 
     &.color-preview-round {
         border-radius: 50%;

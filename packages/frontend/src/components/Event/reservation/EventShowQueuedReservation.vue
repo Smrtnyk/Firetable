@@ -14,13 +14,13 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits<(e: "delete" | "unqueue") => void>();
+const emit = defineEmits<(e: "close" | "delete" | "unqueue") => void>();
 
 const authStore = useAuthStore();
 const permissionsStore = usePermissionsStore();
 
 const canModify = computed(function () {
-    return permissionsStore.canReserve === true || isOwnReservation(props.reservation);
+    return permissionsStore.canReserve || isOwnReservation(props.reservation);
 });
 
 function isOwnReservation(reservation: QueuedReservation): boolean {
@@ -29,31 +29,39 @@ function isOwnReservation(reservation: QueuedReservation): boolean {
 </script>
 
 <template>
-    <ReservationLabelChips :reservation="props.reservation" />
+    <ReservationLabelChips :reservation="props.reservation" class="pa-4 pb-0" />
 
-    <q-card-section>
+    <v-card-text>
         <ReservationGeneralInfo :timezone="props.timezone" :reservation="props.reservation" />
 
-        <q-separator class="q-mb-md" />
+        <v-divider class="my-4" />
 
-        <q-item v-if="canModify">
-            <div class="row q-gutter-sm full-width">
+        <div v-if="canModify">
+            <div class="d-flex" style="gap: 8px">
                 <FTBtn
                     title="Move to Floor Plan"
-                    icon="fa fa-arrow-right"
+                    icon="fas fa-arrow-right"
                     color="secondary"
-                    @click="() => emit('unqueue')"
-                    v-close-popup
+                    @click="
+                        () => {
+                            emit('unqueue');
+                            emit('close');
+                        }
+                    "
                 />
 
                 <FTBtn
                     title="Delete"
-                    icon="fa fa-trash"
-                    color="negative"
-                    v-close-popup
-                    @click="() => emit('delete')"
+                    icon="fas fa-trash-alt"
+                    color="error"
+                    @click="
+                        () => {
+                            emit('delete');
+                            emit('close');
+                        }
+                    "
                 />
             </div>
-        </q-item>
-    </q-card-section>
+        </div>
+    </v-card-text>
 </template>

@@ -1,8 +1,8 @@
 <template>
-    <div class="row justify-center items-center FTCenteredText">
-        <h6 class="q-ma-sm underline text-center">
+    <div class="d-flex justify-center align-center FTCenteredText">
+        <div class="text-h6 ma-2 underline text-center">
             <slot></slot>
-        </h6>
+        </div>
     </div>
 </template>
 

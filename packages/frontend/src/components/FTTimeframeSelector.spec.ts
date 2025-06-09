@@ -20,11 +20,11 @@ describe("TimeframeSelector.vue", () => {
             minDate: "2000-01-01",
             modelValue: { endDate: "", startDate: "" },
             presets: [
-                { label: "Today", value: "today" },
-                { label: "Yesterday", value: "yesterday" },
-                { label: "Last 7 Days", value: "last7" },
-                { label: "Last 30 Days", value: "last30" },
-                { label: "Custom", value: "custom" },
+                { title: "Today", value: "today" },
+                { title: "Yesterday", value: "yesterday" },
+                { title: "Last 7 Days", value: "last7" },
+                { title: "Last 30 Days", value: "last30" },
+                { title: "Custom", value: "custom" },
             ],
         };
         screen = renderComponent(FTTimeframeSelector, props);
@@ -46,7 +46,7 @@ describe("TimeframeSelector.vue", () => {
             await userEvent.click(select);
 
             for (const preset of props.presets!) {
-                await expect.element(screen.getByText(preset.label)).toBeVisible();
+                await expect.element(screen.getByText(preset.title)).toBeVisible();
             }
         });
     });

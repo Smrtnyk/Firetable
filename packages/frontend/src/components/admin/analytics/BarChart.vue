@@ -11,7 +11,7 @@ import {
 } from "echarts/components";
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
-import { isDark } from "src/global-reactives/is-dark";
+import { useAppTheme } from "src/composables/useAppTheme";
 import { computed } from "vue";
 import VChart from "vue-echarts";
 
@@ -32,7 +32,7 @@ const props = defineProps<{
     labels?: string[] | undefined;
     stacked?: boolean;
 }>();
-
+const { isDark } = useAppTheme();
 const backgroundColor = computed(() => (isDark.value ? "#1A1A1A" : "#FFFFFF"));
 const textColor = computed(() => (isDark.value ? "#cccccc" : "#1A1A1A"));
 const chartOption = computed<ECBarOption>(() => ({

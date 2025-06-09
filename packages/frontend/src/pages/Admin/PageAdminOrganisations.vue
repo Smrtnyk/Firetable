@@ -2,29 +2,27 @@
 import type { CreateOrganisationPayload } from "src/db";
 
 import { storeToRefs } from "pinia";
-import { useQuasar } from "quasar";
 import AddNewOrganisationForm from "src/components/admin/organisation/AddNewOrganisationForm.vue";
-import FTBtn from "src/components/FTBtn.vue";
 import FTCard from "src/components/FTCard.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
-import FTDialog from "src/components/FTDialog.vue";
 import FTTitle from "src/components/FTTitle.vue";
-import { useDialog } from "src/composables/useDialog";
+import { useAppTheme } from "src/composables/useAppTheme";
+import { globalDialog } from "src/composables/useDialog";
 import { createNewOrganisation } from "src/db";
-import { isDark } from "src/global-reactives/is-dark";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { useGlobalStore } from "src/stores/global-store";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 
 const { t } = useI18n();
-const quasar = useQuasar();
 const router = useRouter();
-const { createDialog } = useDialog();
 const searchQuery = ref("");
+const globalStore = useGlobalStore();
 const { organisations } = storeToRefs(usePropertiesStore());
 const propertiesStore = usePropertiesStore();
+const { isDark } = useAppTheme();
 
 const filteredOrganisations = computed(function () {
     if (!searchQuery.value) return organisations.value;
@@ -36,21 +34,18 @@ const filteredOrganisations = computed(function () {
 });
 
 function createOrganisation(): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: AddNewOrganisationForm,
-            componentPropsObject: {},
-            listeners: {
-                create(organisationPayload: CreateOrganisationPayload) {
-                    onOrganisationCreate(organisationPayload);
-                    dialog.hide();
-                },
+    const dialog = globalDialog.openDialog(
+        AddNewOrganisationForm,
+        {
+            onCreate(organisationPayload: CreateOrganisationPayload) {
+                onOrganisationCreate(organisationPayload);
+                dialog.hide();
             },
-            maximized: false,
+        },
+        {
             title: t("PageAdminOrganisations.addNewOrganisationTitle"),
         },
-    });
+    );
 }
 
 function navigateToOrganisation(organisationId: string): void {
@@ -61,7 +56,7 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
     await tryCatchLoadingWrapper({
         async hook() {
             await createNewOrganisation(organisationPayload);
-            quasar.notify(t("PageAdminOrganisations.organisationCreatedSuccess"));
+            globalStore.notify(t("PageAdminOrganisations.organisationCreatedSuccess"));
             return propertiesStore.initOrganisations();
         },
     });
@@ -72,10 +67,13 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
     <div>
         <FTTitle :title="t('PageAdminOrganisations.title')">
             <template #right>
-                <FTBtn
-                    rounded
-                    icon="fa fa-plus"
-                    class="button-gradient"
+                <v-btn
+                    rounded="pill"
+                    icon="fa:fas fa-plus"
+                    color="primary"
+                    flat
+                    variant="elevated"
+                    density="comfortable"
                     @click="createOrganisation"
                     :aria-label="t('PageAdminOrganisations.createOrganisationButton')"
                 />
@@ -83,21 +81,20 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
         </FTTitle>
 
         <!-- Search Bar -->
-        <div class="search-section q-mb-lg" v-if="organisations.length > 0">
-            <q-input
+        <div class="search-section mb-6" v-if="organisations.length > 0">
+            <v-text-field
                 v-model="searchQuery"
-                outlined
-                dense
+                variant="outlined"
+                density="compact"
                 :placeholder="t('PageAdminOrganisations.searchPlaceholder')"
                 class="search-input"
+                clearable
+                @click:clear="searchQuery = ''"
             >
-                <template v-slot:prepend>
-                    <q-icon name="fa fa-search" />
+                <template v-slot:prepend-inner>
+                    <v-icon icon="fa:fas fa-search" />
                 </template>
-                <template v-slot:append v-if="searchQuery">
-                    <q-icon name="fa fa-close" class="cursor-pointer" @click="searchQuery = ''" />
-                </template>
-            </q-input>
+            </v-text-field>
         </div>
 
         <!-- Organisation Cards Grid -->
@@ -106,63 +103,71 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
                 v-for="organisation in filteredOrganisations"
                 :key="organisation.id"
                 class="organisation-card"
+                @click="navigateToOrganisation(organisation.id)"
+                link
             >
                 <!-- Card Header -->
-                <q-card-section
-                    class="card-header q-pa-md"
-                    @click="navigateToOrganisation(organisation.id)"
-                >
+                <v-card-text class="card-header pa-4">
                     <div class="header-content">
-                        <q-avatar
+                        <v-avatar
                             :color="isDark ? 'primary' : 'primary'"
                             text-color="white"
-                            size="40px"
+                            size="40"
                             class="org-avatar"
                         >
-                            <q-icon name="fa fa-briefcase" size="24px" />
-                        </q-avatar>
+                            <v-icon icon="fa:fas fa-briefcase" size="24" />
+                        </v-avatar>
                         <div class="org-info">
-                            <h6 class="org-name text-h6 q-my-none">{{ organisation.name }}</h6>
-                            <div class="text-caption text-grey">
+                            <h6 class="org-name text-h6 my-0">{{ organisation.name }}</h6>
+                            <div class="text-caption text-grey-darken-1">
                                 Organisation ID: {{ organisation.id.slice(0, 8) }}...
                             </div>
                         </div>
                     </div>
-                </q-card-section>
+                </v-card-text>
             </FTCard>
         </div>
 
         <!-- Empty State -->
         <FTCenteredText v-if="organisations.length === 0">
-            <q-icon name="fa fa-briefcase" size="64px" color="grey-5" class="q-mb-md" />
-            <div class="text-grey-6 q-mb-lg">
+            <v-icon icon="fa:fas fa-briefcase" size="64" color="grey-lighten-1" class="mb-4" />
+            <div class="text-grey-darken-1 mb-6">
                 {{ t("PageOrganisations.noOrganisationsMessage") }}
             </div>
-            <FTBtn
-                :label="t('PageAdminOrganisations.createOrganisationButton')"
-                icon="fa fa-plus"
-                class="button-gradient"
+            <v-btn
+                icon="fa:fas fa-plus"
+                color="primary"
+                variant="elevated"
                 @click="createOrganisation"
-            />
+            >
+                {{ t("PageAdminOrganisations.createOrganisationButton") }}
+            </v-btn>
         </FTCenteredText>
 
         <!-- No Search Results -->
         <FTCenteredText v-if="organisations.length > 0 && filteredOrganisations.length === 0">
-            <q-icon
-                name="fa fa-magnifying-glass-minus"
-                size="64px"
-                color="grey-5"
-                class="q-mb-md"
+            <v-icon
+                icon="fa:fas fa-magnifying-glass-minus"
+                size="64"
+                color="grey-lighten-1"
+                class="mb-4"
             />
-            <div class="text-h6 q-mb-sm">
+            <div class="text-h6 mb-2">
                 {{ t("PageAdminOrganisations.noOrganisationsFound") }}
             </div>
-            <div class="text-grey-6">{{ t("PageAdminOrganisations.adjustSearchCriteria") }}</div>
+            <div class="text-grey-darken-1">
+                {{ t("PageAdminOrganisations.adjustSearchCriteria") }}
+            </div>
         </FTCenteredText>
     </div>
 </template>
 
 <style scoped lang="scss">
+.search-section {
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .organisations-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
@@ -176,14 +181,13 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
 
 .organisation-card {
     transition: all 0.3s ease;
+    cursor: pointer;
 
     &:hover {
         transform: translateY(-2px);
     }
 
     .card-header {
-        position: relative;
-
         .header-content {
             display: flex;
             align-items: center;
@@ -206,5 +210,19 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
             }
         }
     }
+}
+
+.v-theme--light .text-grey-darken-1 {
+    color: #757575 !important;
+}
+.v-theme--dark .text-grey-darken-1 {
+    color: #bdbdbd !important;
+}
+
+.v-theme--light .text-grey-lighten-1 {
+    color: #bdbdbd !important;
+}
+.v-theme--dark .text-grey-lighten-1 {
+    color: #616161 !important;
 }
 </style>

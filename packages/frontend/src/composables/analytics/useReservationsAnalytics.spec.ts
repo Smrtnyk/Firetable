@@ -1,7 +1,6 @@
 import { ReservationType } from "@firetable/types";
 import { createTestingPinia } from "@pinia/testing";
 import { noop } from "es-toolkit";
-import { Dialog, Loading, Quasar } from "quasar";
 import messages from "src/i18n";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { type App, createApp, nextTick, ref } from "vue";
@@ -67,7 +66,6 @@ function withSetup(
 
     app.use(testingPinia);
     app.use(i18n);
-    app.use(Quasar, { plugins: { Dialog, Loading } });
 
     const container = document.createElement("div");
     document.body.appendChild(container);

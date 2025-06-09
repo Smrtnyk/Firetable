@@ -1,41 +1,12 @@
-@import "helpers";
-@import "gradients";
-@import "floor";
+@use "variables" as *;
 
-@font-face {
-    font-family: "Product Sans";
-    src: url("product-sans.woff");
-}
-
-@-o-viewport {
-    user-zoom: fixed;
+html {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    font-size: .9rem;
 }
 
 * {
-    font-family: "Product Sans", sans-serif;
     text-rendering: optimizeLegibility;
-}
-
-body {
-    letter-spacing: 0.8px;
-    background: #f8f8f8;
-    -webkit-transition: background-color .3s ease;
-}
-
-a {
-    text-decoration: none !important;
-    color: currentColor;
-    &:visited {
-        color: currentColor;
-    }
-}
-
-.ft-logo {
-    max-width: 256px;
-}
-
-.font-black {
-    font-weight: 900;
 }
 
 .ft-card {
@@ -43,41 +14,7 @@ a {
     box-shadow: $box-shadow;
 }
 
-
-.ft-no-border-radius {
-    border-radius: 0 !important;
-}
-
-.ft-avatar {
-    border: 1px solid #888;
-}
-
-.firebase-emulator-warning {
-    display: none;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
-}
-
 .text-tertiary {
     color: $tertiary;
 }
 
-.bg-tertiary {
-    background-color: $tertiary;
-}
-
-.text-quaternary {
-    color: $quaternary;
-}
-
-.bg-quaternary {
-    background-color: $quaternary;
-}

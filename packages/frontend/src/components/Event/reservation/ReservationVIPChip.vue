@@ -1,3 +1,3 @@
 <template>
-    <q-chip color="accent" label="VIP" icon="fa fa-crown" text-color="yellow" />
+    <v-chip prepend-icon="fa fa-crown" color="amber" variant="outlined" size="small">VIP</v-chip>
 </template>

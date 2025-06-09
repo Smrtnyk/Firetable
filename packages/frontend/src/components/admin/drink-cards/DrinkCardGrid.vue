@@ -17,39 +17,34 @@ const { t } = useI18n();
 </script>
 
 <template>
-    <div class="DrinkCardGrid row q-col-gutter-md">
+    <v-row class="drink-card-grid">
         <template v-if="loading">
-            <div v-for="n in 3" :key="n" class="col-12 col-sm-6 col-md-4">
-                <q-card class="ft-card">
-                    <q-card-section>
-                        <q-skeleton type="text" class="text-h6" />
-                        <q-skeleton type="text" class="q-mt-sm" />
-                    </q-card-section>
-                    <q-card-section>
-                        <q-skeleton type="text" width="30%" />
-                    </q-card-section>
-                </q-card>
-            </div>
+            <v-col v-for="n in 3" :key="n" cols="12" sm="6" md="4">
+                <v-card class="ft-card">
+                    <v-skeleton-loader type="article, actions"></v-skeleton-loader>
+                </v-card>
+            </v-col>
         </template>
 
         <template v-else>
-            <div v-for="card in cards" :key="card.id" class="col-12 col-sm-6 col-md-4">
-                <q-card class="ft-card">
-                    <q-card-section>
-                        <div class="row items-center justify-between">
+            <v-col v-for="card in cards" :key="card.id" cols="12" sm="6" md="4">
+                <v-card class="ft-card d-flex flex-column h-100">
+                    <v-card-text class="flex-grow-1">
+                        <div class="d-flex align-center justify-space-between">
                             <div class="text-h6">{{ card.name }}</div>
-                            <q-badge
-                                :color="card.isActive ? 'positive' : 'grey'"
-                                :label="card.isActive ? t('Global.active') : t('Global.inactive')"
+                            <v-chip
+                                :color="card.isActive ? 'success' : 'grey'"
+                                :text="card.isActive ? t('Global.active') : t('Global.inactive')"
+                                size="small"
                             />
                         </div>
                         <div
-                            class="text-subtitle2 q-mt-sm"
+                            class="text-subtitle-2 mt-2"
                             v-html="card.description ?? t('Global.noDescription')"
                         />
-                    </q-card-section>
+                    </v-card-text>
 
-                    <q-card-section v-if="isCustomDrinkCard(card)">
+                    <v-card-text v-if="isCustomDrinkCard(card)" class="pt-0">
                         <div class="text-caption">
                             {{
                                 t("PageAdminPropertyDrinkCards.sectionsCount", {
@@ -57,32 +52,38 @@ const { t } = useI18n();
                                 })
                             }}
                         </div>
-                    </q-card-section>
+                    </v-card-text>
 
-                    <q-card-actions align="right">
-                        <q-btn
-                            flat
-                            round
-                            color="primary"
-                            icon="fa fa-pencil"
-                            @click="emit('edit', card)"
-                            :tabindex="0"
-                            @keyup.enter="emit('edit', card)"
-                        >
-                            <q-tooltip>{{ t("Global.edit") }}</q-tooltip>
-                        </q-btn>
-                        <q-btn
-                            flat
-                            round
-                            color="negative"
-                            icon="fa fa-trash"
-                            @click="emit('delete', card)"
-                        >
-                            <q-tooltip>{{ t("Global.delete") }}</q-tooltip>
-                        </q-btn>
-                    </q-card-actions>
-                </q-card>
-            </div>
+                    <v-card-actions>
+                        <v-spacer />
+                        <v-tooltip location="top">
+                            <template #activator="{ props }">
+                                <v-btn
+                                    v-bind="props"
+                                    variant="text"
+                                    icon="fas fa-pencil-alt"
+                                    color="primary"
+                                    @click="emit('edit', card)"
+                                    @keyup.enter="emit('edit', card)"
+                                />
+                            </template>
+                            <span>{{ t("Global.edit") }}</span>
+                        </v-tooltip>
+                        <v-tooltip location="top">
+                            <template #activator="{ props }">
+                                <v-btn
+                                    v-bind="props"
+                                    variant="text"
+                                    icon="fas fa-trash-alt"
+                                    color="error"
+                                    @click="emit('delete', card)"
+                                />
+                            </template>
+                            <span>{{ t("Global.delete") }}</span>
+                        </v-tooltip>
+                    </v-card-actions>
+                </v-card>
+            </v-col>
         </template>
-    </div>
+    </v-row>
 </template>

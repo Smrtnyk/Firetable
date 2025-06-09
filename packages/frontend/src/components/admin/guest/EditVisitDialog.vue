@@ -41,53 +41,54 @@ function onSave(): void {
 
 <template>
     <div>
-        <q-list>
-            <q-item>
-                <q-item-section>
-                    <q-item-label>{{ t("Global.arrived") }}</q-item-label>
-                </q-item-section>
-                <q-item-section avatar>
-                    <q-toggle
+        <v-list>
+            <v-list-item>
+                <v-list-item-title>{{ t("Global.arrived") }}</v-list-item-title>
+                <template #append>
+                    <v-switch
                         :aria-label="t('Global.arrived')"
                         v-model="editingVisit.arrived"
                         color="green"
+                        inset
+                        hide-details
                     />
-                </q-item-section>
-            </q-item>
+                </template>
+            </v-list-item>
 
-            <q-item>
-                <q-item-section>
-                    <q-item-label>{{ t("Global.cancelled") }}</q-item-label>
-                </q-item-section>
-                <q-item-section avatar>
-                    <q-toggle
+            <v-list-item>
+                <v-list-item-title>{{ t("Global.cancelled") }}</v-list-item-title>
+                <template #append>
+                    <v-switch
                         :aria-label="t('Global.cancelled')"
                         v-model="editingVisit.cancelled"
                         color="red"
+                        inset
+                        hide-details
                     />
-                </q-item-section>
-            </q-item>
+                </template>
+            </v-list-item>
 
-            <q-item>
-                <q-item-section>
-                    <q-item-label>VIP</q-item-label>
-                </q-item-section>
-                <q-item-section avatar>
-                    <q-toggle aria-label="VIP" v-model="editingVisit.isVIPVisit" color="purple" />
-                </q-item-section>
-            </q-item>
-        </q-list>
+            <v-list-item>
+                <v-list-item-title>VIP</v-list-item-title>
+                <template #append>
+                    <v-switch
+                        aria-label="VIP"
+                        v-model="editingVisit.isVIPVisit as boolean"
+                        color="purple"
+                        inset
+                        hide-details
+                    />
+                </template>
+            </v-list-item>
+        </v-list>
 
-        <q-separator />
+        <v-divider class="my-2" />
 
-        <q-card-actions align="right">
-            <q-btn
-                :label="t('Global.submit')"
-                @click="onSave"
-                rounded
-                size="md"
-                class="button-gradient q-mt-sm"
-            />
-        </q-card-actions>
+        <v-card-actions>
+            <v-spacer />
+            <v-btn class="button-gradient mt-2" rounded variant="tonal" @click="onSave">
+                {{ t("Global.submit") }}
+            </v-btn>
+        </v-card-actions>
     </div>
 </template>

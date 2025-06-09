@@ -3,20 +3,18 @@ import type { CreatePropertyPayload, PropertyDoc, UpdatePropertyPayload } from "
 import type { Link } from "src/types";
 
 import { matchesProperty } from "es-toolkit/compat";
-import { useQuasar } from "quasar";
 import AddNewPropertyForm from "src/components/admin/property/AddNewPropertyForm.vue";
 import FTBtn from "src/components/FTBtn.vue";
 import FTCard from "src/components/FTCard.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
-import FTDialog from "src/components/FTDialog.vue";
 import FTTitle from "src/components/FTTitle.vue";
-import { useDialog } from "src/composables/useDialog";
+import { useAppTheme } from "src/composables/useAppTheme";
+import { globalDialog } from "src/composables/useDialog";
 import { useFirestoreCollection } from "src/composables/useFirestore";
 import { createNewProperty, deleteProperty, getPropertiesPath, updateProperty } from "src/db";
-import { isDark } from "src/global-reactives/is-dark";
-import { isMobile } from "src/global-reactives/screen-detection";
-import { showConfirm, showDeleteConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { showDeleteConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";
+import { useGlobalStore } from "src/stores/global-store";
 import { usePermissionsStore } from "src/stores/permissions-store";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { computed } from "vue";
@@ -31,10 +29,10 @@ const props = defineProps<Props>();
 const authStore = useAuthStore();
 const permissionStore = usePermissionsStore();
 const propertiesStore = usePropertiesStore();
-const quasar = useQuasar();
+const globalStore = useGlobalStore();
 const router = useRouter();
-const { createDialog } = useDialog();
 const { t } = useI18n();
+const { isDark } = useAppTheme();
 const { data: properties } = useFirestoreCollection<PropertyDoc>(
     getPropertiesPath(props.organisationId),
 );
@@ -51,38 +49,37 @@ function createLinks(propertyId: string): Link[] {
     const params = { organisationId: props.organisationId, propertyId };
     return [
         {
-            icon: "fa fa-calendar",
+            icon: formatIcon("fa fa-calendar"),
             label: t("AppDrawer.links.manageEvents"),
             route: { name: "adminEvents", params },
             visible: permissionStore.canCreateEvents,
         },
         {
-            icon: "fa fa-warehouse",
+            icon: formatIcon("fa fa-warehouse"),
             label: t("Global.manageInventoryLink"),
             route: { name: "adminInventory", params },
             visible: permissionStore.canSeeInventory,
         },
         {
-            icon: "fa fa-map",
+            icon: formatIcon("fa fa-map"),
             label: t("AppDrawer.links.manageFloors"),
             route: { name: "adminFloors", params },
             visible: true,
         },
         {
-            icon: "fa fa-chart-bar",
+            icon: formatIcon("fa fa-chart-bar"),
             label: t("AppDrawer.links.manageAnalytics"),
             route: { name: "adminAnalytics", params },
             visible: true,
         },
         {
-            icon: "fa fa-cocktail",
+            icon: formatIcon("fa fa-cocktail"),
             label: t("AppDrawer.links.manageDrinkCards"),
             route: { name: "adminPropertyDrinkCards", params },
             visible: permissionStore.canSeeInventory,
         },
-
         {
-            icon: "fa fa-gear",
+            icon: formatIcon("fa fa-gear"),
             label: t("AppDrawer.links.settings"),
             route: { name: "adminPropertySettings", params },
             visible: true,
@@ -93,30 +90,33 @@ function createLinks(propertyId: string): Link[] {
 }
 
 function createVenue(property?: PropertyDoc): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: AddNewPropertyForm,
-            componentPropsObject: {
-                organisationId: props.organisationId,
-                propertyDoc: property,
+    const dialog = globalDialog.openDialog(
+        AddNewPropertyForm,
+        {
+            onCreate(payload: CreatePropertyPayload) {
+                onPropertyCreate(payload);
+                dialog.hide();
             },
-            listeners: {
-                create(payload: CreatePropertyPayload) {
-                    onPropertyCreate(payload);
-                    dialog.hide();
-                },
-                update(payload: UpdatePropertyPayload) {
-                    onPropertyUpdate(payload);
-                    dialog.hide();
-                },
+            onUpdate(payload: UpdatePropertyPayload) {
+                onPropertyUpdate(payload);
+                dialog.hide();
             },
-            maximized: false,
+            organisationId: props.organisationId,
+            propertyDoc: property,
+        },
+        {
             title: property
                 ? t("PageAdminProperties.editPropertyDialogTitle", { name: property.name })
                 : t("PageAdminProperties.createPropertyDialogTitle"),
         },
-    });
+    );
+}
+
+function formatIcon(iconName: string): string {
+    if (iconName.startsWith("fa ")) {
+        return `fa:fas ${iconName.slice(3)}`;
+    }
+    return iconName;
 }
 
 function navigateToLink(route: any): void {
@@ -138,6 +138,7 @@ async function onDeleteProperty(property: PropertyDoc): Promise<void> {
             if (authStore.isAdmin) {
                 await propertiesStore.initAdminProperties();
             }
+            globalStore.notify(t("PageAdminProperties.propertyDeletedSuccess"), "success");
         },
     });
 }
@@ -149,7 +150,7 @@ async function onPropertyCreate(payload: CreatePropertyPayload): Promise<void> {
             if (authStore.isAdmin) {
                 await propertiesStore.initAdminProperties();
             }
-            quasar.notify("Property created!");
+            globalStore.notify(t("PageAdminProperties.propertyCreatedSuccess"), "success");
         },
     });
 }
@@ -161,191 +162,288 @@ async function onPropertyUpdate(payload: UpdatePropertyPayload): Promise<void> {
             if (authStore.isAdmin) {
                 await propertiesStore.initAdminProperties();
             }
-            quasar.notify("Property updated!");
+            globalStore.notify(t("PageAdminProperties.propertyUpdatedSuccess"), "success");
         },
     });
 }
 
 async function showUpdatePropertyDialog(property: PropertyDoc): Promise<void> {
-    if (await showConfirm("Edit property?")) {
+    // Assuming globalDialog.confirm is compatible or adapted
+    if (
+        await globalDialog.confirm({
+            message: t("PageAdminProperties.editPropertyConfirmMessage", { name: property.name }),
+            title: t("PageAdminProperties.editPropertyDialogTitle", { name: property.name }),
+        })
+    ) {
         createVenue(property);
     }
 }
 </script>
 
 <template>
-    <div>
+    <div class="PageAdminProperties">
         <FTTitle :title="t('PageAdminProperties.properties')">
             <template #right>
                 <FTBtn
                     v-if="properties.length > 0 && canCreateProperty"
-                    rounded
-                    icon="fa fa-plus"
-                    class="button-gradient"
+                    icon="fas fa-plus"
+                    :title="t('PageAdminProperties.createPropertyButtonLabel')"
+                    color="primary"
                     @click="createVenue()"
                 />
             </template>
         </FTTitle>
 
         <!-- Properties Grid -->
-        <div class="properties-grid" v-if="properties.length > 0">
+        <div class="properties-grid mt-6" v-if="properties.length > 0">
             <FTCard v-for="property in properties" :key="property.id" class="property-card">
                 <!-- Card Header -->
-                <q-card-section class="card-header q-pa-none">
+                <v-card-text class="pa-4">
                     <div class="header-content">
-                        <q-avatar
-                            :color="isDark ? 'primary' : 'primary'"
-                            text-color="white"
-                            class="property-avatar"
-                        >
-                            <q-icon name="fa fa-home" size="28px" />
-                        </q-avatar>
+                        <v-avatar color="primary" size="40" class="property-avatar">
+                            <v-icon icon="fas fa-home" size="20" color="white" />
+                        </v-avatar>
                         <div class="property-info">
-                            <h6 class="property-name text-h6 q-my-none">
+                            <h6 class="property-name text-subtitle-1 mb-1">
                                 {{ property.name }}
                             </h6>
-                            <div class="text-caption text-grey">
-                                Venue ID: {{ property.id.slice(0, 8) }}...
+                            <div class="text-caption text-grey-darken-1">
+                                {{ t("PageAdminProperties.venueIdLabel") }}
+                                {{ property.id.slice(0, 8) }}...
                             </div>
                         </div>
-                        <q-space v-if="!isMobile" />
-                        <div class="action-buttons">
-                            <q-btn
-                                flat
-                                round
-                                size="sm"
-                                icon="fa fa-pencil"
-                                color="positive"
+                        <div class="action-buttons ml-auto">
+                            <v-btn
+                                variant="text"
+                                size="small"
+                                color="success"
                                 @click.stop="showUpdatePropertyDialog(property)"
                             >
-                                <q-tooltip>{{ t("Global.edit") }}</q-tooltip>
-                            </q-btn>
-                            <q-btn
-                                flat
-                                round
-                                size="sm"
-                                icon="fa fa-trash"
-                                color="negative"
+                                <v-icon>fas fa-pencil</v-icon>
+                                <v-tooltip activator="parent" location="top">
+                                    {{ t("Global.edit") }}
+                                </v-tooltip>
+                            </v-btn>
+                            <v-btn
+                                variant="text"
+                                size="small"
+                                color="error"
                                 @click.stop="onDeleteProperty(property)"
                             >
-                                <q-tooltip>{{ t("Global.delete") }}</q-tooltip>
-                            </q-btn>
+                                <v-icon>fas fa-trash</v-icon>
+                                <v-tooltip activator="parent" location="top">
+                                    {{ t("Global.delete") }}
+                                </v-tooltip>
+                            </v-btn>
                         </div>
                     </div>
-                </q-card-section>
+                </v-card-text>
 
-                <q-separator />
+                <v-divider />
 
                 <!-- Quick Links Grid -->
-                <q-card-section class="q-pa-md">
+                <v-card-text class="pa-4">
                     <div class="links-grid">
                         <div
                             v-for="link in createLinks(property.id)"
                             :key="link.label"
                             class="link-item"
                             @click="navigateToLink(link.route)"
+                            role="button"
+                            tabindex="0"
+                            @keydown.enter="navigateToLink(link.route)"
                         >
-                            <q-avatar
-                                :color="isDark ? 'grey-9' : 'grey-2'"
-                                :text-color="isDark ? 'white' : 'grey-8'"
-                                size="56px"
+                            <v-avatar
+                                :color="isDark ? 'grey-darken-3' : 'grey-lighten-4'"
+                                size="48"
+                                class="mb-2"
                             >
-                                <q-icon :name="link.icon" size="24px" />
-                            </q-avatar>
-                            <div class="link-label text-caption text-center q-mt-sm">
+                                <v-icon :icon="link.icon" size="20" />
+                            </v-avatar>
+                            <div class="link-label text-caption text-center">
                                 {{ link.label }}
                             </div>
                         </div>
                     </div>
-                </q-card-section>
+                </v-card-text>
             </FTCard>
         </div>
 
         <!-- Max Properties Reached -->
-        <div v-else-if="!canCreateProperty && properties.length > 0">
-            <h6 class="q-ma-sm text-weight-bolder underline">
+        <div v-else-if="!canCreateProperty && properties.length > 0" class="mt-4 text-center">
+            <h6 class="ma-1 font-weight-bold text-decoration-underline">
                 {{ t("PageAdminProperties.maxAmountOfPropertiesReachedMessage") }}
             </h6>
         </div>
 
         <!-- Empty State -->
-        <FTCenteredText v-else-if="properties.length === 0">
-            <q-icon name="fa fa-home" size="64px" color="grey-5" class="q-mb-md" />
-            <div class="text-grey-6 q-mb-lg">
+        <FTCenteredText v-else-if="properties.length === 0" class="mt-10">
+            <v-icon icon="fas fa-home" size="64" color="grey-lighten-1" class="mb-4" />
+            <div class="text-grey-darken-1 mb-6">
                 {{ t("PageAdminProperties.noPropertiesCreatedMessage") }}
             </div>
             <FTBtn
-                label="Create venue"
-                icon="fa fa-plus"
-                class="button-gradient"
-                @click="() => createVenue()"
-            />
+                prepend-icon="fas fa-plus"
+                :title="t('PageAdminProperties.createVenueButtonLabel')"
+                color="primary"
+                @click="createVenue()"
+            >
+                {{ t("PageAdminProperties.createVenueButtonLabel") }}
+            </FTBtn>
         </FTCenteredText>
     </div>
 </template>
 
 <style scoped lang="scss">
-.properties-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-    gap: 24px;
-}
+.PageAdminProperties {
+    .properties-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 20px;
 
-.property-card {
-    .card-header {
-        .header-content {
-            padding: 8px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
+        .property-card {
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
 
-            .property-avatar {
-                flex-shrink: 0;
-            }
-
-            .property-info {
-                flex: 1;
-                min-width: 0;
+            .header-content {
+                display: flex;
+                align-items: center;
+                gap: 12px;
                 width: 100%;
 
-                .property-name {
-                    font-weight: 600;
+                .property-avatar {
+                    flex-shrink: 0;
+                }
+
+                .property-info {
+                    flex: 1;
+                    min-width: 0;
                     overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
+
+                    .property-name {
+                        font-weight: 600;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        margin: 0;
+                    }
+                }
+
+                .action-buttons {
+                    display: flex;
+                    gap: 4px;
+                    flex-shrink: 0;
                 }
             }
 
-            .action-buttons {
-                display: flex;
-                gap: 4px;
+            .links-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr); // Always 3 columns
+                grid-template-rows: repeat(2, 1fr); // Always 2 rows
+                gap: 12px;
+                justify-items: center;
+
+                // Responsive gap adjustments
+                @media (max-width: 768px) {
+                    gap: 8px;
+                }
+
+                @media (max-width: 480px) {
+                    gap: 6px;
+                }
+
+                .link-item {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    text-align: center;
+                    cursor: pointer;
+                    padding: 8px;
+                    border-radius: 8px;
+                    transition: all 0.2s ease;
+                    width: 100%;
+
+                    // Responsive padding
+                    @media (max-width: 768px) {
+                        padding: 6px;
+                    }
+
+                    @media (max-width: 480px) {
+                        padding: 4px;
+                    }
+
+                    &:hover {
+                        background-color: rgba(var(--v-theme-primary), 0.1);
+                        transform: translateY(-2px);
+                    }
+
+                    .v-avatar {
+                        margin-bottom: 8px;
+
+                        // Responsive avatar sizes
+                        @media (max-width: 480px) {
+                            --v-avatar-height: 36px !important;
+                            --v-avatar-width: 36px !important;
+                        }
+                    }
+
+                    .link-label {
+                        line-height: 1.2;
+                        word-break: break-word;
+                        hyphens: auto;
+                        font-size: 11px;
+
+                        // Responsive font sizes
+                        @media (max-width: 768px) {
+                            font-size: 10px;
+                        }
+
+                        @media (max-width: 480px) {
+                            font-size: 9px;
+                        }
+                    }
+                }
             }
         }
     }
 
-    .links-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-        gap: 16px;
+    // Mobile responsive fixes
+    @media (max-width: 768px) {
+        .properties-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
 
-        .link-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 8px;
-            transition: all 0.2s ease;
+        .property-card {
+            .header-content {
+                gap: 8px;
 
-            &:hover {
-                background-color: rgba(var(--q-primary-rgb), 0.1);
-                transform: translateY(-2px);
+                .action-buttons {
+                    flex-direction: row;
+                    gap: 2px;
+                }
             }
+        }
+    }
 
-            .link-label {
-                max-width: 80px;
-                word-break: break-word;
-                line-height: 1.2;
+    // Extra small mobile
+    @media (max-width: 480px) {
+        .property-card {
+            .header-content {
+                .property-info {
+                    .property-name {
+                        font-size: 14px;
+                    }
+                }
+
+                .action-buttons {
+                    .v-btn {
+                        min-width: 32px;
+                        width: 32px;
+                        height: 32px;
+                    }
+                }
             }
         }
     }

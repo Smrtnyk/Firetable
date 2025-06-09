@@ -42,9 +42,6 @@ describe("PageAdminOrganisation.vue", () => {
     let organisationData: OrganisationDoc;
 
     beforeEach(() => {
-        const dialogs = document.querySelectorAll(".q-dialog");
-        dialogs.forEach((dialog) => dialog.remove());
-
         organisationData = {
             id: "org1",
             maxAllowedProperties: 10,

@@ -39,13 +39,6 @@ vi.mock("src/db", () => ({
     updateIssueReport: updateIssueReportMock,
 }));
 
-vi.mock("quasar", async (importOriginal) => ({
-    ...(await importOriginal()),
-    useQuasar: () => ({
-        notify: notifyMock,
-    }),
-}));
-
 describe("PageAdminIssueReports.vue", () => {
     const mockIssues: IssueReportDoc[] = [
         {

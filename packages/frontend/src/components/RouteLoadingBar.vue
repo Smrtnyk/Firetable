@@ -6,8 +6,8 @@ const { isRouteLoading } = storeToRefs(useGlobalStore());
 </script>
 
 <template>
-    <q-linear-progress
-        v-show="isRouteLoading"
+    <v-progress-linear
+        v-if="isRouteLoading"
         indeterminate
         color="primary"
         class="route-loading-bar"

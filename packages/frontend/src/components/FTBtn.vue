@@ -1,9 +1,22 @@
 <script setup lang="ts">
-import { buttonSize } from "src/global-reactives/screen-detection.js";
+import { useScreenDetection } from "src/global-reactives/screen-detection.js";
+import { useSlots } from "vue";
+
+const { buttonSize } = useScreenDetection();
+const slots = useSlots();
+
+const hasSlotContent = slots.default && slots.default().length > 0;
 </script>
 
 <template>
-    <q-btn v-bind="$attrs" :size="buttonSize">
+    <v-btn
+        v-if="$attrs.icon && !$attrs.label && !hasSlotContent"
+        v-bind="$attrs"
+        :size="buttonSize"
+        flat
+    />
+
+    <v-btn v-else v-bind="$attrs" :size="buttonSize">
         <slot />
-    </q-btn>
+    </v-btn>
 </template>

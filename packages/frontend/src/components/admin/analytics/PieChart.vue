@@ -5,7 +5,7 @@ import { PieChart } from "echarts/charts";
 import { LegendComponent, TitleComponent, TooltipComponent } from "echarts/components";
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
-import { isDark } from "src/global-reactives/is-dark";
+import { useAppTheme } from "src/composables/useAppTheme";
 import { computed } from "vue";
 import VChart from "vue-echarts";
 import { useI18n } from "vue-i18n";
@@ -17,7 +17,7 @@ const props = defineProps<{
     chartData: PieChartData;
     chartTitle: string;
 }>();
-
+const { isDark } = useAppTheme();
 const { t } = useI18n();
 const backgroundColor = computed(() => (isDark.value ? "#1A1A1A" : "#FFFFFF"));
 const textColor = computed(() => (isDark.value ? "#cccccc" : "#1A1A1A"));

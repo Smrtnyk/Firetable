@@ -12,7 +12,7 @@ const { floorInstance } = defineProps<{
 
 const emit = defineEmits<(e: "done") => void>();
 const selectedAIFile = ref<File | null>(null);
-const aiFileInputRef = useTemplateRef("aiFileInputRef");
+const aiFileInputRef = useTemplateRef<HTMLInputElement>("aiFileInputRef");
 const aiImagePreview = ref("");
 const isProcessingAI = ref(false);
 
@@ -74,21 +74,27 @@ async function processAIFloorPlan(): Promise<void> {
 function removeSelectedImage(): void {
     selectedAIFile.value = null;
     aiImagePreview.value = "";
+    // Reset file input so the same file can be selected again if removed
+    if (aiFileInputRef.value) {
+        aiFileInputRef.value.value = "";
+    }
 }
 </script>
 
 <template>
     <div class="ai-dialog-card">
-        <q-card-section class="ai-dialog-content">
+        <v-card-text class="ai-dialog-content">
             <div v-if="!selectedAIFile" class="upload-area">
-                <q-btn
-                    flat
+                <v-btn
+                    variant="text"
                     color="primary"
-                    icon="fa fa-cloud-upload"
-                    label="Choose Floor Plan Image"
+                    prepend-icon="fas fa-cloud-upload-alt"
                     @click="aiFileInputRef?.click()"
                     class="upload-btn"
-                />
+                    size="large"
+                >
+                    Choose Floor Plan Image
+                </v-btn>
                 <div class="upload-hint">
                     Upload a floor plan image (hand-drawn, professional plan, or photo)
                 </div>
@@ -97,34 +103,35 @@ function removeSelectedImage(): void {
 
             <div v-else class="preview-area">
                 <img :src="aiImagePreview" alt="Floor plan preview" class="preview-image" />
-                <q-btn
-                    flat
-                    color="negative"
-                    icon="fa fa-times"
-                    label="Remove"
+                <v-btn
+                    variant="text"
+                    color="error"
+                    prepend-icon="fas fa-times"
                     @click="removeSelectedImage"
-                    class="q-mt-md"
-                />
+                    class="mt-4"
+                >
+                    Remove
+                </v-btn>
             </div>
-        </q-card-section>
+        </v-card-text>
 
-        <q-separator />
+        <v-divider />
 
-        <q-card-actions align="right">
-            <q-btn
-                unelevated
+        <v-card-actions class="justify-end pa-4">
+            <v-btn
+                variant="flat"
                 color="primary"
-                label="Generate Floor Plan"
                 :loading="isProcessingAI"
                 :disabled="!selectedAIFile || isProcessingAI"
                 @click="processAIFloorPlan"
             >
-                <template v-slot:loading>
-                    <q-spinner-gears class="on-left" />
+                <template #loader>
+                    <v-progress-circular indeterminate size="20" width="2" class="mr-2" />
                     Processing...
                 </template>
-            </q-btn>
-        </q-card-actions>
+                Generate Floor Plan
+            </v-btn>
+        </v-card-actions>
 
         <input
             ref="aiFileInputRef"
@@ -154,38 +161,26 @@ function removeSelectedImage(): void {
 .upload-area {
     text-align: center;
     padding: 60px;
-    border: 3px dashed $grey-4;
+    border: 3px dashed rgba(var(--v-border-color), var(--v-border-opacity));
     border-radius: 16px;
-    background: $grey-1;
 
-    .body--dark & {
-        border-color: $grey-8;
-        background: $dark;
+    .v-theme--dark & {
+        background-color: rgb(var(--v-theme-surface));
     }
 
     .upload-btn {
-        font-size: 18px;
-        padding: 16px 32px;
         margin-bottom: 24px;
     }
 
     .upload-hint {
         font-size: 16px;
-        color: $grey-7;
+        color: rgb(var(--v-theme-on-surface-variant));
         margin-bottom: 8px;
-
-        .body--dark & {
-            color: $grey-5;
-        }
     }
 
     .upload-formats {
         font-size: 14px;
-        color: $grey-6;
-
-        .body--dark & {
-            color: $grey-6;
-        }
+        color: rgb(var(--v-theme-on-surface-variant));
     }
 }
 
@@ -203,9 +198,13 @@ function removeSelectedImage(): void {
         border-radius: 8px;
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 
-        .body--dark & {
+        .v-theme--dark & {
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
         }
     }
+}
+
+.v-card-actions.justify-end {
+    padding: 16px;
 }
 </style>

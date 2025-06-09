@@ -14,17 +14,21 @@ import {
 import { createTestingPinia } from "@pinia/testing";
 import { page, userEvent } from "@vitest/browser/context";
 import { flushPromises } from "@vue/test-utils";
-import { noop } from "es-toolkit";
-import { BottomSheet, Dialog, Loading, Notify, Quasar } from "quasar";
 import EventCreateReservation from "src/components/Event/reservation/EventCreateReservation.vue";
 import EventShowReservation from "src/components/Event/reservation/EventShowReservation.vue";
-import messages from "src/i18n";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createApp, nextTick, ref, shallowRef } from "vue";
-import "quasar/dist/quasar.css";
+import RouteLoadingBar from "src/components/RouteLoadingBar.vue";
 import "src/css/app.scss";
+import GenericDialog from "src/components/ui/GenericDialog.vue";
+import GlobalLoadingOverlay from "src/components/ui/GlobalLoadingOverlay.vue";
+import GlobalSnackbar from "src/components/ui/GlobalSnackbar.vue";
+import messages from "src/i18n";
+import { vuetifyApp } from "src/vuetify-app";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { createApp, h, nextTick, ref, shallowRef } from "vue";
 import { createI18n } from "vue-i18n";
+import { VApp, VMain } from "vuetify/components";
 
+import { cleanupAfterTest } from "../../../test-helpers/render-component";
 import { useReservations } from "./useReservations.js";
 import { TableOperationType } from "./useTableOperations.js";
 
@@ -63,11 +67,16 @@ vi.mock("src/boot/event-emitter", () => ({
     },
 }));
 
-vi.mock("src/composables/useDialog", () => ({
-    useDialog: () => ({
-        createDialog: createDialogMock,
-    }),
-}));
+vi.mock(import("src/composables/useDialog"), async (importOriginal) => {
+    const original = await importOriginal();
+    return {
+        ...original,
+        globalDialog: {
+            ...original.globalDialog,
+            openDialog: createDialogMock,
+        },
+    };
+});
 
 vi.mock("src/db", () => ({
     addReservation: addReservationMock,
@@ -90,19 +99,12 @@ let app: App<Element>;
 
 describe("useReservations", () => {
     afterEach(async () => {
+        cleanupAfterTest();
         app?.unmount();
         const container = document.getElementById("app");
         if (container) {
             container.remove();
         }
-
-        // Clean up any remaining dialogs -- not sure what is happening with quasar to leak these dom nodes
-        const dialogs = document.querySelectorAll(".q-dialog");
-        dialogs.forEach((dialog) => dialog.remove());
-
-        // Clean up any remaining notifications
-        const notifications = document.querySelectorAll(".q-notification");
-        notifications.forEach((notification) => notification.remove());
 
         const canvases = document.querySelectorAll("canvas");
         canvases.forEach((canvas) => canvas.remove());
@@ -127,21 +129,18 @@ describe("useReservations", () => {
             const table = floor.getTableByLabel("T1");
             await result.tableClickHandler(floor, table);
 
-            expect(createDialogMock).toHaveBeenCalledWith({
-                component: expect.any(Object),
-                componentProps: {
-                    component: EventCreateReservation,
-                    componentPropsObject: expect.objectContaining({
-                        eventDurationInHours: expect.any(Number),
-                        eventStartTimestamp: expect.any(Number),
-                        mode: "create",
-                        timezone: "Europe/Vienna",
-                    }),
-                    listeners: expect.any(Object),
-                    maximized: false,
+            expect(createDialogMock).toHaveBeenCalledWith(
+                EventCreateReservation,
+                expect.objectContaining({
+                    eventDurationInHours: expect.any(Number),
+                    eventStartTimestamp: expect.any(Number),
+                    mode: "create",
+                    timezone: "Europe/Vienna",
+                }),
+                {
                     title: expect.stringContaining("T1"),
                 },
-            });
+            );
         });
 
         it("shows existing reservation when clicking reserved table", async () => {
@@ -177,19 +176,16 @@ describe("useReservations", () => {
             const table = floor.getTableByLabel("T1");
             await result.tableClickHandler(floor, table);
 
-            expect(createDialogMock).toHaveBeenCalledWith({
-                component: expect.any(Object),
-                componentProps: {
-                    component: EventShowReservation,
-                    componentPropsObject: expect.objectContaining({
-                        reservation: existingReservation,
-                        timezone: "Europe/Vienna",
-                    }),
-                    listeners: expect.any(Object),
-                    maximized: false,
+            expect(createDialogMock).toHaveBeenCalledWith(
+                EventShowReservation,
+                expect.objectContaining({
+                    reservation: existingReservation,
+                    timezone: "Europe/Vienna",
+                }),
+                {
                     title: expect.stringContaining("T1"),
                 },
-            });
+            );
         });
 
         it("prevents interactions when user cannot reserve", async () => {
@@ -270,7 +266,7 @@ describe("useReservations", () => {
             const targetTable = floor.getTableByLabel("T2");
             const secondTableClickResult = result.tableClickHandler(floor, targetTable);
 
-            const okBtn = page.getByRole("button", { name: "OK" });
+            const okBtn = page.getByRole("button", { name: "Yes" });
             await expect.element(okBtn).toBeVisible();
             await userEvent.click(okBtn);
 
@@ -330,7 +326,7 @@ describe("useReservations", () => {
             const targetTable = floor2.getTableByLabel("T2");
             const floor2TableClickResult = result.tableClickHandler(floor2, targetTable);
 
-            const okBtn = page.getByRole("button", { name: "OK" });
+            const okBtn = page.getByRole("button", { name: "Yes" });
             await expect.element(okBtn).toBeVisible();
             await userEvent.click(okBtn);
 
@@ -393,7 +389,7 @@ describe("useReservations", () => {
             const targetTable = floor.getTableByLabel("T2");
             const secondTableClickResult = result.tableClickHandler(floor, targetTable);
 
-            const okBtn = page.getByRole("button", { name: "OK" });
+            const okBtn = page.getByRole("button", { name: "Yes" });
             await expect.element(okBtn).toBeVisible();
             await userEvent.click(okBtn);
 
@@ -507,7 +503,7 @@ describe("useReservations", () => {
 
             const targetTable = floor.getTableByLabel("T3");
             const transferResult = result.tableClickHandler(floor, targetTable);
-            await userEvent.click(page.getByRole("button", { name: "OK" }));
+            await userEvent.click(page.getByRole("button", { name: "Yes" }));
             await transferResult;
 
             expect(updateReservationDocMock).toHaveBeenNthCalledWith(
@@ -557,8 +553,8 @@ describe("useReservations", () => {
                 );
 
                 let deleteHandler: () => Promise<void> = () => Promise.resolve();
-                createDialogMock.mockImplementationOnce((config) => {
-                    deleteHandler = config.componentProps.listeners.delete;
+                createDialogMock.mockImplementationOnce((component, config) => {
+                    deleteHandler = config.onDelete;
                     return {
                         hide: vi.fn(),
                         onDismiss: vi.fn().mockReturnThis(),
@@ -568,7 +564,7 @@ describe("useReservations", () => {
                 const table = floor.getTableByLabel("T1");
                 const tableClickResult = result.tableClickHandler(floor, table);
                 await deleteHandler();
-                await userEvent.click(page.getByRole("button", { name: "OK" }));
+                await userEvent.click(page.getByRole("button", { name: "Yes" }));
                 await tableClickResult;
                 await nextTick();
 
@@ -620,8 +616,8 @@ describe("useReservations", () => {
                 );
 
                 let deleteHandler: () => Promise<void> = () => Promise.resolve();
-                createDialogMock.mockImplementationOnce((config) => {
-                    deleteHandler = config.componentProps.listeners.delete;
+                createDialogMock.mockImplementationOnce((component, config) => {
+                    deleteHandler = config.onDelete;
                     return {
                         hide: vi.fn(),
                         onDismiss: vi.fn().mockReturnThis(),
@@ -631,7 +627,7 @@ describe("useReservations", () => {
                 const table = floor.getTableByLabel("T1");
                 const tableClickResult = result.tableClickHandler(floor, table);
                 await deleteHandler();
-                await userEvent.click(page.getByRole("button", { name: "OK" }));
+                await userEvent.click(page.getByRole("button", { name: "Yes" }));
                 await tableClickResult;
 
                 await nextTick();
@@ -666,15 +662,15 @@ describe("useReservations", () => {
                 );
 
                 let deleteHandler: () => Promise<void> = () => Promise.resolve();
-                createDialogMock.mockImplementationOnce((config) => {
-                    deleteHandler = config.componentProps.listeners.delete;
+                createDialogMock.mockImplementationOnce((component, config) => {
+                    deleteHandler = config.onDelete;
                     return { hide: vi.fn(), onDismiss: vi.fn().mockReturnThis() };
                 });
 
                 const table = floor.getTableByLabel("T1");
                 const tableClickResult = result.tableClickHandler(floor, table);
                 await deleteHandler();
-                await userEvent.click(page.getByRole("button", { name: "CANCEL" }));
+                await userEvent.click(page.getByRole("button", { name: "No" }));
                 await tableClickResult;
 
                 expect(deleteReservationMock).not.toHaveBeenCalled();
@@ -710,8 +706,8 @@ describe("useReservations", () => {
                     Promise.resolve();
 
                 // First dialog (show reservation)
-                createDialogMock.mockImplementationOnce((config) => {
-                    editHandler = config.componentProps.listeners.edit;
+                createDialogMock.mockImplementationOnce((component, config) => {
+                    editHandler = config.onEdit;
                     return {
                         hide: vi.fn(),
                         onDismiss: vi.fn().mockReturnThis(),
@@ -719,8 +715,8 @@ describe("useReservations", () => {
                 });
 
                 // Second dialog (edit reservation)
-                createDialogMock.mockImplementationOnce((config) => {
-                    updateHandler = config.componentProps.listeners.update;
+                createDialogMock.mockImplementationOnce((component, config) => {
+                    updateHandler = config.onUpdate;
                     return {
                         hide: vi.fn(),
                         onDismiss: vi.fn().mockReturnThis(),
@@ -768,8 +764,8 @@ describe("useReservations", () => {
                 );
 
                 let createHandler: (data: any) => Promise<void> = () => Promise.resolve();
-                createDialogMock.mockImplementationOnce((config) => {
-                    createHandler = config.componentProps.listeners.create;
+                createDialogMock.mockImplementationOnce((component, config) => {
+                    createHandler = config.onCreate;
                     return {
                         hide: vi.fn(),
                         onDismiss: vi.fn().mockReturnThis(),
@@ -819,8 +815,8 @@ describe("useReservations", () => {
                 );
 
                 let createHandler: (data: any) => Promise<void> = () => Promise.resolve();
-                createDialogMock.mockImplementationOnce((config) => {
-                    createHandler = config.componentProps.listeners.create;
+                createDialogMock.mockImplementationOnce((component, config) => {
+                    createHandler = config.onCreate;
                     return {
                         hide: vi.fn(),
                         onDismiss: vi.fn().mockReturnThis(),
@@ -878,7 +874,7 @@ describe("useReservations", () => {
 
                 const targetTable = floor.getTableByLabel("T2");
                 const table2ClickResult = result.tableClickHandler(floor, targetTable);
-                await userEvent.click(page.getByRole("button", { name: "OK" }));
+                await userEvent.click(page.getByRole("button", { name: "Yes" }));
                 await table2ClickResult;
 
                 expect(addReservationMock).toHaveBeenCalledWith(
@@ -918,8 +914,8 @@ describe("useReservations", () => {
                 );
 
                 let linkHandler: () => Promise<void> = () => Promise.resolve();
-                createDialogMock.mockImplementationOnce((config) => {
-                    linkHandler = config.componentProps.listeners.link;
+                createDialogMock.mockImplementationOnce((component, config) => {
+                    linkHandler = config.onLink;
                     return {
                         hide: vi.fn(),
                         onDismiss: vi.fn().mockReturnThis(),
@@ -932,7 +928,7 @@ describe("useReservations", () => {
 
                 const targetTable = floor.getTableByLabel("T2");
                 const targetTableClickResult = result.tableClickHandler(floor, targetTable);
-                await userEvent.click(page.getByRole("button", { name: "OK" }));
+                await userEvent.click(page.getByRole("button", { name: "Yes" }));
                 await targetTableClickResult;
 
                 expect(updateReservationDocMock).toHaveBeenCalledWith(
@@ -965,8 +961,8 @@ describe("useReservations", () => {
                 );
 
                 let linkHandler: () => Promise<void> = () => Promise.resolve();
-                createDialogMock.mockImplementationOnce((config) => {
-                    linkHandler = config.componentProps.listeners.link;
+                createDialogMock.mockImplementationOnce((component, config) => {
+                    linkHandler = config.onLink;
                     return {
                         hide: vi.fn(),
                         onDismiss: vi.fn().mockReturnThis(),
@@ -1005,8 +1001,8 @@ describe("useReservations", () => {
                 );
 
                 let linkHandler: () => Promise<void> = () => Promise.resolve();
-                createDialogMock.mockImplementationOnce((config) => {
-                    linkHandler = config.componentProps.listeners.link;
+                createDialogMock.mockImplementationOnce((component, config) => {
+                    linkHandler = config.onLink;
                     return {
                         hide: vi.fn(),
                         onDismiss: vi.fn().mockReturnThis(),
@@ -1045,8 +1041,8 @@ describe("useReservations", () => {
                 );
 
                 let unlinkHandler: () => Promise<void> = () => Promise.resolve();
-                createDialogMock.mockImplementationOnce((config) => {
-                    unlinkHandler = config.componentProps.listeners.unlink;
+                createDialogMock.mockImplementationOnce((component, config) => {
+                    unlinkHandler = config.onUnlink;
                     return {
                         hide: vi.fn(),
                         onDismiss: vi.fn().mockReturnThis(),
@@ -1058,7 +1054,7 @@ describe("useReservations", () => {
                 await unlinkHandler();
 
                 // Confirm unlink
-                await userEvent.click(page.getByRole("button", { name: "OK" }));
+                await userEvent.click(page.getByRole("button", { name: "Yes" }));
 
                 expect(updateReservationDocMock).toHaveBeenCalledWith(
                     { id: "1", organisationId: "1", propertyId: "1" },
@@ -1096,8 +1092,8 @@ describe("useReservations", () => {
                 );
 
                 let unlinkHandler: () => Promise<void> = () => Promise.resolve();
-                createDialogMock.mockImplementationOnce((config) => {
-                    unlinkHandler = config.componentProps.listeners.unlink;
+                createDialogMock.mockImplementationOnce((component, config) => {
+                    unlinkHandler = config.onUnlink;
                     return {
                         hide: vi.fn(),
                         onDismiss: vi.fn().mockReturnThis(),
@@ -1109,7 +1105,7 @@ describe("useReservations", () => {
                 await unlinkHandler();
 
                 // Cancel unlink
-                await userEvent.click(page.getByRole("button", { name: "CANCEL" }));
+                await userEvent.click(page.getByRole("button", { name: "No" }));
 
                 expect(updateReservationDocMock).not.toHaveBeenCalled();
                 expect(eventEmitMock).not.toHaveBeenCalled();
@@ -1137,8 +1133,8 @@ describe("useReservations", () => {
                 );
 
                 let linkHandler: () => Promise<void> = () => Promise.resolve();
-                createDialogMock.mockImplementationOnce((config) => {
-                    linkHandler = config.componentProps.listeners.link;
+                createDialogMock.mockImplementationOnce((component, config) => {
+                    linkHandler = config.onLink;
                     return {
                         hide: vi.fn(),
                         onDismiss: vi.fn().mockReturnThis(),
@@ -1187,8 +1183,8 @@ describe("useReservations", () => {
             );
 
             let arrivedHandler: (arrived: boolean) => Promise<void> = () => Promise.resolve();
-            createDialogMock.mockImplementationOnce((config) => {
-                arrivedHandler = config.componentProps.listeners.arrived;
+            createDialogMock.mockImplementationOnce((component, config) => {
+                arrivedHandler = config.onArrived;
                 return {
                     hide: vi.fn(),
                     onDismiss: vi.fn().mockReturnThis(),
@@ -1247,8 +1243,8 @@ describe("useReservations", () => {
             );
 
             let cancelHandler: (cancelled: boolean) => Promise<void> = () => Promise.resolve();
-            createDialogMock.mockImplementationOnce((config) => {
-                cancelHandler = config.componentProps.listeners.cancel;
+            createDialogMock.mockImplementationOnce((component, config) => {
+                cancelHandler = config.onCancel;
                 return {
                     hide: vi.fn(),
                     onDismiss: vi.fn().mockReturnThis(),
@@ -1298,8 +1294,8 @@ describe("useReservations", () => {
             );
 
             let arrivedHandler: (arrived: boolean) => Promise<void> = () => Promise.resolve();
-            createDialogMock.mockImplementationOnce((config) => {
-                arrivedHandler = config.componentProps.listeners.arrived;
+            createDialogMock.mockImplementationOnce((component, config) => {
+                arrivedHandler = config.onArrived;
                 return { hide: vi.fn(), onDismiss: vi.fn().mockReturnThis() };
             });
 
@@ -1338,8 +1334,8 @@ describe("useReservations", () => {
             );
 
             let queueHandler: () => Promise<void> = () => Promise.resolve();
-            createDialogMock.mockImplementationOnce((config) => {
-                queueHandler = config.componentProps.listeners.queue;
+            createDialogMock.mockImplementationOnce((component, config) => {
+                queueHandler = config.onQueue;
                 return {
                     hide: vi.fn(),
                     onDismiss: vi.fn().mockReturnThis(),
@@ -1349,7 +1345,7 @@ describe("useReservations", () => {
             const table = floor.getTableByLabel("T1");
             const tableClickResult = result.tableClickHandler(floor, table);
             await queueHandler();
-            await userEvent.click(page.getByRole("button", { name: "OK" }));
+            await userEvent.click(page.getByRole("button", { name: "Yes" }));
             await tableClickResult;
 
             expect(moveReservationToQueueMock).toHaveBeenCalled();
@@ -1430,7 +1426,7 @@ describe("useReservations", () => {
         });
         await nextTick();
         // Ok in confirm dialog
-        await userEvent.click(page.getByRole("button", { name: "OK" }));
+        await userEvent.click(page.getByRole("button", { name: "Yes" }));
         await nextTick();
 
         expect(result.ongoingTableOperation.value).toBeUndefined();
@@ -1460,8 +1456,8 @@ describe("useReservations", () => {
                 Promise.resolve();
 
             // First dialog (show reservation)
-            createDialogMock.mockImplementationOnce((config) => {
-                editHandler = config.componentProps.listeners.edit;
+            createDialogMock.mockImplementationOnce((component, config) => {
+                editHandler = config.onEdit;
                 return {
                     hide: vi.fn(),
                     onDismiss: vi.fn().mockReturnThis(),
@@ -1469,8 +1465,8 @@ describe("useReservations", () => {
             });
 
             // Second dialog (edit reservation)
-            createDialogMock.mockImplementationOnce((config) => {
-                updateHandler = config.componentProps.listeners.update;
+            createDialogMock.mockImplementationOnce((component, config) => {
+                updateHandler = config.onUpdate;
                 return {
                     hide: vi.fn(),
                     onDismiss: vi.fn().mockReturnThis(),
@@ -1872,13 +1868,26 @@ function withSetup(
     app = createApp({
         setup() {
             result = composable();
-            return noop;
+
+            return () =>
+                h(
+                    VApp,
+                    {},
+                    {
+                        default: () => [
+                            h(GlobalSnackbar),
+                            h(RouteLoadingBar),
+                            h(GenericDialog),
+                            h(GlobalLoadingOverlay),
+                            h(VMain, {}, {}),
+                        ],
+                    },
+                );
         },
     });
-    app.use(Quasar);
-    Quasar.install(app, { plugins: { BottomSheet, Dialog, Loading, Notify } });
     app.use(i18n);
     app.use(testingPinia);
+    app.use(vuetifyApp);
 
     const container = document.createElement("div");
     container.id = "app";

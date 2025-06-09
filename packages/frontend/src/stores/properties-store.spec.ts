@@ -5,7 +5,7 @@ import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createApp, ref } from "vue";
 
-import { mockedStore } from "../../test-helpers/render-component";
+import { mockedStore } from "../../test-helpers/mocked-store";
 import { DEFAULT_ORGANISATION_SETTINGS, usePropertiesStore } from "./properties-store";
 
 const {

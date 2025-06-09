@@ -97,21 +97,21 @@ const { t } = useI18n();
 </script>
 
 <template>
-    <div class="q-pa-sm q-ma-none">
+    <div class="pa-4 ma-0">
         <!-- Main Stats Grid -->
-        <div class="row q-col-gutter-md">
+        <v-row>
             <!-- Capacity Section -->
-            <div class="col-12 col-md-6">
-                <q-card class="bg-primary text-white ft-card">
-                    <q-card-section>
+            <v-col cols="12" md="6">
+                <v-card color="primary" class="text-white ft-card">
+                    <v-card-text>
                         <div class="text-h6">
                             {{ t("AdminEventRTInfo.titles.capacityOverview") }}
                         </div>
-                        <div class="row items-center q-gutter-x-md">
+                        <div class="d-flex align-center ga-4">
                             <div class="text-h3" aria-label="occupancy rate">
                                 {{ occupancyRate }}%
                             </div>
-                            <div class="column">
+                            <div class="d-flex flex-column">
                                 <div aria-label="tables occupied">
                                     {{ reservationsStatus.currentlyOccupied }} /
                                     {{ reservationsStatus.total }}
@@ -123,22 +123,22 @@ const { t } = useI18n();
                                 </div>
                             </div>
                         </div>
-                    </q-card-section>
-                </q-card>
-            </div>
+                    </v-card-text>
+                </v-card>
+            </v-col>
 
             <!-- Guests Section -->
-            <div class="col-12 col-md-6">
-                <q-card class="bg-secondary text-white ft-card">
-                    <q-card-section>
+            <v-col cols="12" md="6">
+                <v-card color="secondary" class="text-white ft-card">
+                    <v-card-text>
                         <div class="text-h6">
                             {{ t("AdminEventRTInfo.titles.guestStatistics") }}
                         </div>
-                        <div class="row items-center q-gutter-x-md">
+                        <div class="d-flex align-center ga-4">
                             <div class="text-h3" aria-label="total guests">
                                 {{ reservationsStatus.totalGuests }}
                             </div>
-                            <div class="column">
+                            <div class="d-flex flex-column">
                                 <div>{{ t("AdminEventRTInfo.labels.totalGuests") }}</div>
                                 <div aria-label="guest contact rate">
                                     {{ contactRate }}%
@@ -146,59 +146,59 @@ const { t } = useI18n();
                                 </div>
                             </div>
                         </div>
-                    </q-card-section>
-                </q-card>
-            </div>
+                    </v-card-text>
+                </v-card>
+            </v-col>
 
             <!-- Additional Metrics -->
-            <div class="col-12 col-md-4">
-                <q-card class="ft-card">
-                    <q-card-section>
-                        <div class="text-subtitle2">
+            <v-col cols="12" md="4">
+                <v-card class="ft-card">
+                    <v-card-text>
+                        <div class="text-subtitle-2">
                             {{ t("AdminEventRTInfo.labels.vipGuests") }}
                         </div>
                         <div class="text-h5" aria-label="vip guest count">
                             {{ reservationsStatus.vipGuests }}
                         </div>
-                    </q-card-section>
-                </q-card>
-            </div>
+                    </v-card-text>
+                </v-card>
+            </v-col>
 
-            <div class="col-12 col-md-4">
-                <q-card class="ft-card">
-                    <q-card-section>
-                        <div class="text-subtitle2">
+            <v-col cols="12" md="4">
+                <v-card class="ft-card">
+                    <v-card-text>
+                        <div class="text-subtitle-2">
                             {{ t("AdminEventRTInfo.labels.returningGuests") }}
                         </div>
                         <div class="text-h5" aria-label="returning guest count">
                             {{ reservationsStatus.returningGuests }}
                         </div>
-                    </q-card-section>
-                </q-card>
-            </div>
+                    </v-card-text>
+                </v-card>
+            </v-col>
 
-            <div class="col-12 col-md-4">
-                <q-card class="ft-card">
-                    <q-card-section>
-                        <div class="text-subtitle2">
+            <v-col cols="12" md="4">
+                <v-card class="ft-card">
+                    <v-card-text>
+                        <div class="text-subtitle-2">
                             {{ t("AdminEventRTInfo.labels.avgConsumption") }}
                         </div>
                         <div class="text-h5" aria-label="average consumption">
                             {{ reservationsStatus.averageConsumption.toFixed(2) }}
                         </div>
-                    </q-card-section>
-                </q-card>
-            </div>
-        </div>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+        </v-row>
     </div>
 </template>
 
 <style scoped>
-.q-card {
+.v-card {
     transition: transform 0.2s;
 }
 
-.q-card:hover {
+.v-card:hover {
     transform: translateY(-2px);
 }
 </style>

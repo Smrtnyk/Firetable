@@ -4,20 +4,19 @@ import type { EventOwner } from "src/db";
 
 import { limit, orderBy, where } from "firebase/firestore";
 import { storeToRefs } from "pinia";
-import { Loading, useQuasar } from "quasar";
 import EventCreateForm from "src/components/admin/event/EventCreateForm.vue";
 import EventCardList from "src/components/Event/EventCardList.vue";
 import FTBtn from "src/components/FTBtn.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
-import FTDialog from "src/components/FTDialog.vue";
 import FTTitle from "src/components/FTTitle.vue";
-import { useDialog } from "src/composables/useDialog";
+import { globalDialog } from "src/composables/useDialog";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
 import { useFloors } from "src/composables/useFloors";
 import { ONE_HOUR } from "src/constants";
 import { createNewEvent, eventsCollection } from "src/db";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { parseAspectRatio } from "src/helpers/utils";
+import { useGlobalStore } from "src/stores/global-store";
 import { usePermissionsStore } from "src/stores/permissions-store";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { computed, onMounted, watch } from "vue";
@@ -33,6 +32,7 @@ const { organisationId, propertyId } = defineProps<Props>();
 const { t } = useI18n();
 const propertiesStore = usePropertiesStore();
 const { canCreateEvents } = storeToRefs(usePermissionsStore());
+const globalStore = useGlobalStore();
 
 const eventOwner: EventOwner = {
     id: "",
@@ -40,15 +40,12 @@ const eventOwner: EventOwner = {
     propertyId,
 };
 const router = useRouter();
-const quasar = useQuasar();
 const subscriptionSettings = computed(function () {
     return propertiesStore.getOrganisationSubscriptionSettingsById(organisationId);
 });
 const propertySettings = computed(function () {
     return propertiesStore.getPropertySettingsById(propertyId);
 });
-
-const { createDialog } = useDialog();
 
 const cardsAspectRatio = computed(function () {
     return parseAspectRatio(propertySettings.value.event.eventCardAspectRatio);
@@ -76,9 +73,9 @@ watch(
     isAnyLoading,
     function (newIsLoading) {
         if (newIsLoading) {
-            Loading.show();
+            globalStore.setLoading(true);
         } else {
-            Loading.hide();
+            globalStore.setLoading(false);
         }
     },
     { immediate: true },
@@ -94,49 +91,40 @@ async function onCreateEvent(eventData: CreateEventPayload): Promise<void> {
     await tryCatchLoadingWrapper({
         async hook() {
             await createNewEvent(eventData);
-            quasar.notify(t("PageAdminEvents.eventCreatedNotificationMessage"));
+            globalStore.notify(t("PageAdminEvents.eventCreatedNotificationMessage"));
         },
     });
 }
 
 function showEventForm(event?: EventDoc): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: EventCreateForm,
-            componentPropsObject: {
-                event,
-                eventStartHours: propertySettings.value.event.eventStartTime24HFormat,
-                floors: floors.value,
-                maxFloors: subscriptionSettings.value.maxFloorPlansPerEvent,
-                organisationId,
-                propertyId,
-                propertyName: propertiesStore.getPropertyNameById(propertyId),
-                propertyTimezone: propertySettings.value.timezone,
+    const dialog = globalDialog.openDialog(
+        EventCreateForm,
+        {
+            event,
+            eventStartHours: propertySettings.value.event.eventStartTime24HFormat,
+            floors: floors.value,
+            maxFloors: subscriptionSettings.value.maxFloorPlansPerEvent,
+            onCreate(eventData: CreateEventPayload) {
+                onCreateEvent(eventData);
+                dialog.hide();
             },
-            listeners: {
-                create(eventData: CreateEventPayload) {
-                    onCreateEvent(eventData);
-                    dialog.hide();
-                },
-            },
-            maximized: false,
+            organisationId,
+            propertyId,
+            propertyName: propertiesStore.getPropertyNameById(propertyId),
+            propertyTimezone: propertySettings.value.timezone,
+        },
+        {
             title: t("PageAdminEvents.createNewEventDialogTitle"),
         },
-    });
+    );
 }
 </script>
 
 <template>
-    <div class="PageHome">
+    <div class="PageHome pa-2">
         <FTTitle :title="t('PageEvents.title')">
             <template #right v-if="canCreateEvents">
-                <FTBtn
-                    class="button-gradient"
-                    icon="fa fa-plus"
-                    rounded
-                    @click="() => showEventForm()"
-                />
+                <FTBtn color="primary" icon="fa fa-plus" rounded @click="() => showEventForm()" />
             </template>
         </FTTitle>
 

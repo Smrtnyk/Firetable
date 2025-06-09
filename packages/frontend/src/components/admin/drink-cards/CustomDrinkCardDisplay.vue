@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CustomDrinkCardDoc, DrinkBundle, DrinkCardItem } from "@firetable/types";
 
-import { isMobile } from "src/global-reactives/screen-detection";
+import { useScreenDetection } from "src/global-reactives/screen-detection";
 import {
     formatPrice,
     getElementGroups,
@@ -18,6 +18,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const { isMobile } = useScreenDetection();
 
 const organizedElements = computed(function () {
     return getElementGroups(props.card.elements);
@@ -100,11 +101,13 @@ function groupItemsBySubcategory(items: DrinkCardItem[]): Map<string, DrinkCardI
         <div class="animated-overlay"></div>
         <div class="drink-card-overlay"></div>
 
-        <div class="drink-card-content q-pa-sm q-pa-md-md">
-            <q-img
+        <div class="drink-card-content pa-2 pa-md-4">
+            <v-img
                 v-if="props.logoImgUrl && card.showLogo"
                 :src="props.logoImgUrl"
                 class="logo-img"
+                max-height="150"
+                contain
             />
 
             <template
@@ -117,9 +120,9 @@ function groupItemsBySubcategory(items: DrinkCardItem[]): Map<string, DrinkCardI
                             :class="[
                                 isMobile ? 'text-h6' : 'text-h4',
                                 'title-text',
-                                'q-mb-md',
+                                'mb-4',
                                 'text-center',
-                                'full-width',
+                                'w-100',
                                 { 'first-title': index === 0 },
                             ]"
                         >
@@ -129,16 +132,14 @@ function groupItemsBySubcategory(items: DrinkCardItem[]): Map<string, DrinkCardI
                     <!-- Skip header-end elements in display -->
                     <template v-else-if="!isHeaderEnd(element)">
                         <template v-if="isSection(element)">
-                            <div class="section glassmorphism q-pa-md q-mb-sm q-md-mb-lg">
+                            <div class="section glassmorphism pa-4 mb-2 md-mb-8">
                                 <template
                                     v-for="[subCategory, items] in groupItemsBySubcategory(
                                         element.items,
                                     )"
                                     :key="subCategory"
                                 >
-                                    <div
-                                        class="text-h6 text-white q-mb-sm q-mb-md-sm category-title"
-                                    >
+                                    <div class="text-h6 text-white mb-2 md-mb-2 category-title">
                                         {{ formatSubCategory(subCategory) }}
                                     </div>
 
@@ -151,24 +152,31 @@ function groupItemsBySubcategory(items: DrinkCardItem[]): Map<string, DrinkCardI
                                                 class="item-row"
                                                 :class="{ 'item-highlighted': item.isHighlighted }"
                                             >
-                                                <div class="row items-start justify-between">
-                                                    <div class="col-grow">
-                                                        <div class="row items-center q-gutter-x-sm">
+                                                <div
+                                                    class="d-flex align-start justify-space-between"
+                                                >
+                                                    <div class="flex-grow-1">
+                                                        <div
+                                                            class="d-flex align-center"
+                                                            style="gap: 8px"
+                                                        >
                                                             <div
-                                                                class="text-white text-weight-medium item-name"
+                                                                class="text-white font-weight-medium item-name"
                                                             >
                                                                 {{ item.name }}
                                                             </div>
 
-                                                            <q-badge
+                                                            <v-chip
                                                                 v-for="tag in item.tags"
                                                                 :key="tag"
-                                                                color="purple-3"
+                                                                color="purple-lighten-4"
                                                                 text-color="white"
-                                                                class="q-px-sm"
+                                                                class="px-2"
+                                                                label
+                                                                size="x-small"
                                                             >
                                                                 {{ tag }}
-                                                            </q-badge>
+                                                            </v-chip>
                                                         </div>
 
                                                         <div
@@ -178,7 +186,7 @@ function groupItemsBySubcategory(items: DrinkCardItem[]): Map<string, DrinkCardI
                                                                     (item.displayOrigin &&
                                                                         item.region))
                                                             "
-                                                            class="text-grey-4 text-caption q-mt-xs"
+                                                            class="text-grey-lighten-2 text-caption mt-1"
                                                         >
                                                             {{
                                                                 [
@@ -196,20 +204,21 @@ function groupItemsBySubcategory(items: DrinkCardItem[]): Map<string, DrinkCardI
                                                                 item.description &&
                                                                 card.showItemDescription
                                                             "
-                                                            class="text-grey-3 text-caption q-mt-sm description-text"
+                                                            class="text-grey-lighten-1 text-caption mt-2 description-text"
                                                         >
                                                             {{ item.description }}
                                                         </div>
 
                                                         <div
                                                             v-if="item.customNote"
-                                                            class="text-purple-3 text-caption q-mt-sm"
+                                                            class="text-purple-lighten-3 text-caption mt-2"
                                                         >
                                                             {{ item.customNote }}
                                                         </div>
 
                                                         <div
-                                                            class="row items-center q-gutter-x-md q-mt-sm text-caption text-grey-4"
+                                                            class="d-flex align-center text-caption text-grey-lighten-2 mt-2"
+                                                            style="gap: 16px"
                                                         >
                                                             <div>
                                                                 {{
@@ -233,9 +242,9 @@ function groupItemsBySubcategory(items: DrinkCardItem[]): Map<string, DrinkCardI
                                                         </div>
                                                     </div>
 
-                                                    <div class="text-right">
+                                                    <div class="text-right ml-2">
                                                         <div
-                                                            class="text-weight-bold price"
+                                                            class="font-weight-bold price"
                                                             :class="{
                                                                 'price-strikethrough':
                                                                     item.specialPrice?.amount,
@@ -273,39 +282,40 @@ function groupItemsBySubcategory(items: DrinkCardItem[]): Map<string, DrinkCardI
                             </div>
                         </template>
 
-                        <div class="row q-mb-sm q-mb-md-md" v-else-if="isBundle(element)">
-                            <div
-                                class="col-12 col-md-6 bundle glassmorphism q-pa-md q-mb-sm q-mb-md-lg"
-                            >
-                                <div class="text-h6 text-white q-mb-md">{{ element.name }}</div>
+                        <v-row class="mb-2 md-mb-4" v-else-if="isBundle(element)">
+                            <v-col cols="12" md="6">
+                                <div class="bundle glassmorphism pa-4 mb-2 md-mb-8">
+                                    <div class="text-h6 text-white mb-4">{{ element.name }}</div>
 
-                                <div class="text-white q-mb-md">{{ element.description }}</div>
+                                    <div class="text-white mb-4">{{ element.description }}</div>
 
-                                <div class="bundle-content">
-                                    <div class="bundle-items q-mb-md">
-                                        <div
-                                            v-for="item in element.items"
-                                            :key="item.inventoryItemId"
-                                        >
-                                            {{ item.quantity }}x
-                                            {{ getItemName(item.inventoryItemId) }}
+                                    <div class="bundle-content">
+                                        <div class="bundle-items mb-4">
+                                            <div
+                                                v-for="item in element.items"
+                                                :key="item.inventoryItemId"
+                                            >
+                                                {{ item.quantity }}x
+                                                {{ getItemName(item.inventoryItemId) }}
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="bundle-price">
-                                        <div class="regular-price text-grey-5">
-                                            Value: {{ formatPrice(calculateRegularPrice(element)) }}
-                                        </div>
-                                        <div class="bundle-price text-h5">
-                                            {{ formatPrice(element.price) }}
-                                        </div>
-                                        <div class="savings text-positive">
-                                            Save {{ element.savings?.percentage }}%
+                                        <div class="bundle-price">
+                                            <div class="regular-price text-grey-lighten-2">
+                                                Value:
+                                                {{ formatPrice(calculateRegularPrice(element)) }}
+                                            </div>
+                                            <div class="bundle-price text-h5">
+                                                {{ formatPrice(element.price) }}
+                                            </div>
+                                            <div class="savings text-success">
+                                                Save {{ element.savings?.percentage }}%
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
+                            </v-col>
+                        </v-row>
                     </template>
                 </div>
             </template>
@@ -314,6 +324,8 @@ function groupItemsBySubcategory(items: DrinkCardItem[]): Map<string, DrinkCardI
 </template>
 
 <style lang="scss" scoped>
+// Same styles as before, with Quasar CSS variables and deep selectors updated
+
 .bundle {
     border: 1px solid rgba(250, 82, 222, 0.3);
 
@@ -362,10 +374,9 @@ function groupItemsBySubcategory(items: DrinkCardItem[]): Map<string, DrinkCardI
     min-height: 100vh;
     width: 100%;
     background-color: #0a0a0a;
-    overflow-x: hidden; // Prevent horizontal scrollbar
+    overflow-x: hidden;
     margin-right: calc(-1 * (100vw - 100%));
 
-    // Fallback gradient when no background image
     &:not([style*="background-image"]) {
         background: linear-gradient(45deg, rgba(25, 0, 50, 1) 0%, rgba(10, 0, 20, 1) 100%);
     }
@@ -408,7 +419,7 @@ function groupItemsBySubcategory(items: DrinkCardItem[]): Map<string, DrinkCardI
     .logo-img {
         max-width: 300px;
         display: block !important;
-        margin: auto !important;
+        margin: 1rem auto !important;
     }
 }
 
@@ -610,6 +621,7 @@ function groupItemsBySubcategory(items: DrinkCardItem[]): Map<string, DrinkCardI
     transition: text-shadow 0.3s ease;
     font-size: 1.2rem;
     will-change: text-shadow;
+    color: #fff;
 
     &::before {
         content: "€";
@@ -619,8 +631,8 @@ function groupItemsBySubcategory(items: DrinkCardItem[]): Map<string, DrinkCardI
     }
 }
 
-:deep(.q-badge) {
-    background: rgba(250, 82, 222, 0.2);
+:deep(.v-chip) {
+    background: rgba(250, 82, 222, 0.2) !important;
     border: 1px solid rgba(250, 82, 222, 0.3);
     text-transform: uppercase;
     font-size: 0.7rem;

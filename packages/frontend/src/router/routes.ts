@@ -232,7 +232,7 @@ export const routes: RouteRecordRaw[] = [
                 props: true,
             },
         ],
-        component: () => import("layouts/MainLayout.vue"),
+        component: () => import("src/layouts/MainLayout.vue"),
         path: "/",
     },
     {
@@ -256,7 +256,7 @@ export const routes: RouteRecordRaw[] = [
                 props: true,
             },
         ],
-        component: () => import("layouts/FloorEditorLayout.vue"),
+        component: () => import("src/layouts/FloorEditorLayout.vue"),
         meta: {
             allowedRoles: [Role.PROPERTY_OWNER, Role.MANAGER, AdminRole.ADMIN],
             requiresAuth: true,

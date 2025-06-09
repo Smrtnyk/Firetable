@@ -87,7 +87,6 @@ describe("PageAdminGuests.vue", () => {
             { id: "property2", name: "Property Two" } as PropertyDoc,
         ];
 
-        // Initialize refs at the test level
         guestsRef = ref<GuestsState>({
             data: guestsData,
             pending: false,
@@ -97,10 +96,8 @@ describe("PageAdminGuests.vue", () => {
         refsMap.set("org1", guestsRef);
     });
 
-    async function render(
-        props = { organisationId: "org1" },
-    ): Promise<RenderResult<PageAdminGuestsProps>> {
-        const renderResult = renderComponent(PageAdminGuests, props, {
+    function render(props = { organisationId: "org1" }): RenderResult<PageAdminGuestsProps> {
+        return renderComponent(PageAdminGuests, props, {
             piniaStoreOptions: {
                 initialState: {
                     auth: authState,
@@ -115,14 +112,6 @@ describe("PageAdminGuests.vue", () => {
                 },
             },
         });
-
-        try {
-            await vi.waitUntil(() => document.querySelector(".q-virtual-scroll .q-item"));
-        } catch (e) {
-            // Empty catch block to prevent test failure
-        }
-
-        return renderResult;
     }
 
     async function closeBottomDialog(screen: RenderResult<PageAdminGuestsProps>): Promise<void> {

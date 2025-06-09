@@ -9,14 +9,14 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <q-card class="ft-card q-mb-md q-px-sm q-py-sm overflow-hidden" v-bind="$attrs">
+    <v-card class="ft-card mb-4 px-2 py-2 overflow-hidden" v-bind="$attrs">
         <template v-if="props.title">
             <FTCenteredText>{{ props.title }}</FTCenteredText>
-            <q-separator class="q-mb-md" />
+            <v-divider class="mb-4" />
         </template>
 
-        <div class="column q-gutter-md overflow-auto q-mt-none q-ml-none">
+        <div class="d-flex flex-column overflow-auto mt-0 ml-0">
             <slot />
         </div>
-    </q-card>
+    </v-card>
 </template>

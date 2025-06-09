@@ -10,8 +10,8 @@ const { t } = useI18n();
         <p class="text-faded">
             {{ t("Error404.message") }}<strong>{{ t("Error404.code") }}</strong>
         </p>
-        <q-btn rounded class="button-gradient" style="width: 200px" @click="() => router.push('/')">
+        <v-btn flat rounded color="primary" style="width: 200px" @click="() => router.push('/')">
             {{ t("Error404.goBackButtonLabel") }}
-        </q-btn>
+        </v-btn>
     </div>
 </template>

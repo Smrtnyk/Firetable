@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="packages/frontend/public/icons/icon-256x256.png" alt="Firetable Logo" width="256" height="256">
+  <img src="packages/frontend/public/logo.png" alt="Firetable Logo" width="256" height="256">
 </p>
 
 <h1 align="center">

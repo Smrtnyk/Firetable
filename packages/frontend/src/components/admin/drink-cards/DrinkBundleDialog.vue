@@ -3,12 +3,12 @@ import type { DrinkBundle, DrinkCardItem } from "@firetable/types";
 
 import { isNotNil } from "es-toolkit/predicate";
 import DrinkCardBuilderItemSelectionDialog from "src/components/admin/drink-cards/DrinkCardBuilderItemSelectionDialog.vue";
-import FTBottomDialog from "src/components/FTBottomDialog.vue";
 import FTBtn from "src/components/FTBtn.vue";
-import { useDialog } from "src/composables/useDialog";
+import { globalBottomSheet } from "src/composables/useBottomSheet";
+import { globalDialog } from "src/composables/useDialog";
 import { formatPrice } from "src/helpers/drink-card/drink-card";
 import { greaterThanZero, noEmptyString, numberInRange } from "src/helpers/form-rules";
-import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
+import { showErrorMessage } from "src/helpers/ui-helpers";
 import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -25,7 +25,6 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
-const { createDialog } = useDialog();
 const { t } = useI18n();
 
 const isEditMode = computed(() => isNotNil(props.bundleToEdit));
@@ -80,7 +79,7 @@ function calculateRegularPrice(items: typeof bundle.value.items): number {
 
 function calculateSavings(bundleData: typeof bundle.value): string {
     const regularPrice = calculateRegularPrice(bundleData.items);
-    if (regularPrice === 0 || bundleData.price === 0) {
+    if (regularPrice === 0 || bundleData.price === 0 || regularPrice <= bundleData.price) {
         return "0";
     }
 
@@ -155,26 +154,21 @@ function handleItemSelect(selectedItem: DrinkCardItem, index: number): void {
 }
 
 function openItemSelectionDialog(index: number): void {
-    const dialog = createDialog({
-        component: FTBottomDialog,
-        componentProps: {
-            component: DrinkCardBuilderItemSelectionDialog,
-            componentPropsObject: {
-                inventoryItems: props.availableItems,
-            },
-            listeners: {
-                select(selectedItem) {
-                    dialog.hide();
+    const dialog = globalBottomSheet.openBottomSheet(DrinkCardBuilderItemSelectionDialog, {
+        inventoryItems: props.availableItems,
+        // @ts-expect-error -- FIXME: inference error
+        onSelect(selectedItem) {
+            dialog.hide();
 
-                    handleItemSelect(selectedItem, index);
-                },
-            },
+            handleItemSelect(selectedItem, index);
         },
     });
 }
 
 async function removeBundleItem(index: number): Promise<void> {
-    const confirmed = await showConfirm(t("DrinkBundleDialog.removeItemConfirmMsg"));
+    const confirmed = await globalDialog.confirm({
+        title: t("DrinkBundleDialog.removeItemConfirmMsg"),
+    });
 
     if (!confirmed) return;
 
@@ -184,77 +178,78 @@ async function removeBundleItem(index: number): Promise<void> {
 
 <template>
     <div>
-        <q-card-section class="q-gutter-y-md">
-            <q-input
+        <v-card-text class="d-flex flex-column" style="gap: 1.25rem">
+            <v-text-field
                 v-model="bundle.name"
                 :label="t('DrinkBundleDialog.bundleNameLabel')"
                 :rules="[noEmptyString(t('DrinkBundleDialog.nameIsRequiredError'))]"
-                outlined
+                variant="outlined"
             />
 
-            <q-input
+            <v-textarea
                 v-model="bundle.description"
                 :label="t('DrinkBundleDialog.descriptionOptionalLabel')"
-                type="textarea"
-                outlined
+                variant="outlined"
+                rows="3"
+                auto-grow
             />
 
-            <!-- Item Selection -->
-            <div class="text-subtitle2 q-mb-sm">
+            <div class="text-subtitle-1 mb-2">
                 {{ t("DrinkBundleDialog.bundleItemsLabel", { count: bundle.items.length }) }}
             </div>
-            <div v-for="(item, index) in bundle.items" :key="index" class="q-mb-md">
-                <div class="row q-col-gutter-sm items-center">
-                    <div class="col">
-                        <q-input
+            <div v-for="(item, index) in bundle.items" :key="index" class="mb-4">
+                <v-row align="center">
+                    <v-col>
+                        <v-text-field
                             :label="t('DrinkBundleDialog.selectDrinkLabel')"
                             :model-value="getItemName(item.inventoryItemId)"
                             readonly
                             @click="openItemSelectionDialog(index)"
-                            outlined
+                            variant="outlined"
                             :rules="[noEmptyString(t('DrinkBundleDialog.pleaseSelectDrinkError'))]"
                             class="cursor-pointer"
+                            hide-details
                         />
-                    </div>
-                    <div class="col-3">
-                        <q-input
+                    </v-col>
+                    <v-col cols="3">
+                        <v-text-field
                             v-model.number="item.quantity"
                             type="number"
                             :label="t('DrinkBundleDialog.qtyLabel')"
-                            outlined
+                            variant="outlined"
                             :rules="[
                                 greaterThanZero(
                                     t('DrinkBundleDialog.quantityGreaterThanZeroError'),
                                 ),
                             ]"
+                            hide-details
                         />
-                    </div>
-                    <div class="col-auto">
-                        <q-btn
-                            flat
-                            round
-                            color="negative"
-                            icon="fa fa-close"
+                    </v-col>
+                    <v-col cols="auto">
+                        <v-btn
+                            variant="text"
+                            icon="fas fa-times"
+                            color="error"
                             @click="removeBundleItem(index)"
                         />
-                    </div>
-                </div>
+                    </v-col>
+                </v-row>
             </div>
 
             <div class="text-center">
-                <FTBtn class="button-gradient" icon="fa fa-plus" rounded @click="addBundleItem" />
+                <FTBtn color="primary" icon="fas fa-plus" rounded @click="addBundleItem" />
             </div>
 
-            <q-separator />
+            <v-divider />
 
-            <div class="row q-col-gutter-sm items-center">
-                <div class="col">
-                    <q-input
+            <v-row align="center">
+                <v-col>
+                    <v-text-field
                         v-model.number="bundle.price"
                         type="number"
                         :label="t('DrinkBundleDialog.bundlePriceLabel')"
                         prefix="€"
-                        outlined
+                        variant="outlined"
                         :rules="[
                             greaterThanZero(t('DrinkBundleDialog.priceGreaterThanZeroError')),
                             numberInRange(
@@ -264,29 +259,29 @@ async function removeBundleItem(index: number): Promise<void> {
                             ),
                         ]"
                     />
-                </div>
-                <div class="col-auto">
-                    <div class="text-positive" v-if="bundle.price > 0">
+                </v-col>
+                <v-col cols="auto">
+                    <div class="text-success" v-if="bundle.price > 0">
                         {{
                             t("DrinkBundleDialog.savePercentageText", {
                                 percentage: calculateSavings(bundle),
                             })
                         }}
                     </div>
-                </div>
-            </div>
-        </q-card-section>
+                </v-col>
+            </v-row>
+        </v-card-text>
 
-        <q-card-actions align="right">
-            <q-btn flat :label="t('DrinkBundleDialog.cancelButtonLabel')" @click="closeDialog" />
-            <q-btn
-                rounded
-                class="button-gradient"
-                :label="
-                    isEditMode ? t('Global.submit') : t('DrinkBundleDialog.createBundleButtonLabel')
-                "
-                @click="handleBundleSubmit"
-            />
-        </q-card-actions>
+        <v-card-actions class="pa-4">
+            <v-btn variant="text" @click="closeDialog">{{
+                t("DrinkBundleDialog.cancelButtonLabel")
+            }}</v-btn>
+            <v-spacer />
+            <v-btn rounded="lg" color="primary" @click="handleBundleSubmit" size="large">
+                {{
+                    isEditMode ? t("Global.submit") : t("DrinkBundleDialog.createBundleButtonLabel")
+                }}
+            </v-btn>
+        </v-card-actions>
     </div>
 </template>

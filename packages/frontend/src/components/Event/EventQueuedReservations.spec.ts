@@ -11,7 +11,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { EventQueuedReservationsProps } from "./EventQueuedReservations.vue";
 
-import { mockedStore, renderComponent, t } from "../../../test-helpers/render-component";
+import { mockedStore } from "../../../test-helpers/mocked-store";
+import { renderComponent, t } from "../../../test-helpers/render-component";
 import EventQueuedReservations from "./EventQueuedReservations.vue";
 
 const { createDialogSpy } = vi.hoisted(() => {
@@ -26,12 +27,13 @@ vi.mock("src/composables/useDialog", () => ({
     }),
 }));
 
-vi.mock("quasar", async (importOriginal) => ({
-    ...(await importOriginal()),
-    Loading: {
-        show: vi.fn(),
-    },
-}));
+// FIXME: mock global store instead
+// vi.mock("globalStore", async (importOriginal) => ({
+//     ...(await importOriginal()),
+//     Loading: {
+//         show: vi.fn(),
+//     },
+// }));
 
 describe("EventQueuedReservations.vue", () => {
     let props: EventQueuedReservationsProps;

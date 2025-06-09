@@ -3,17 +3,16 @@ import type { CreateEventPayload, EditEventPayload, EventDoc } from "@firetable/
 
 import { negate } from "es-toolkit";
 import { matchesProperty } from "es-toolkit/compat";
-import { Loading, useQuasar } from "quasar";
 import AdminPropertyEventsList from "src/components/admin/event/AdminPropertyEventsList.vue";
 import EventCreateForm from "src/components/admin/event/EventCreateForm.vue";
 import FTBtn from "src/components/FTBtn.vue";
-import FTDialog from "src/components/FTDialog.vue";
 import FTTitle from "src/components/FTTitle.vue";
-import { useDialog } from "src/composables/useDialog";
+import { globalDialog } from "src/composables/useDialog";
 import { useEvents } from "src/composables/useEvents";
 import { useFloors } from "src/composables/useFloors";
 import { createNewEvent, deleteDocAndAllSubCollections, getEventsPath, updateEvent } from "src/db";
-import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { useGlobalStore } from "src/stores/global-store";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { computed, onBeforeMount, onMounted, onUnmounted, watch } from "vue";
 import { useI18n } from "vue-i18n";
@@ -27,9 +26,8 @@ interface Props {
 const { organisationId, propertyId } = defineProps<Props>();
 
 const router = useRouter();
-const quasar = useQuasar();
+const globalStore = useGlobalStore();
 const { t } = useI18n();
-const { createDialog } = useDialog();
 const propertiesStore = usePropertiesStore();
 const {
     done,
@@ -61,22 +59,20 @@ watch(
     isAnyLoading,
     function (loading) {
         if (loading) {
-            Loading.show();
+            globalStore.setLoading(true);
         } else {
-            Loading.hide();
+            globalStore.setLoading(false);
         }
     },
     { immediate: true },
 );
 
 onUnmounted(function () {
-    if (Loading.isActive) {
-        Loading.hide();
-    }
+    globalStore.setLoading(false);
 });
 
 async function deleteEvent(event: EventDoc): Promise<void> {
-    if (!(await showConfirm(t("PageAdminEvents.deleteEventDialogTitle")))) {
+    if (!(await globalDialog.confirmTitle(t("PageAdminEvents.deleteEventDialogTitle")))) {
         return;
     }
 
@@ -99,7 +95,7 @@ async function onCreateEvent(eventData: CreateEventPayload): Promise<void> {
     await tryCatchLoadingWrapper({
         async hook() {
             const { id: eventId } = (await createNewEvent(eventData)).data;
-            quasar.notify(t("PageAdminEvents.eventCreatedNotificationMessage"));
+            globalStore.notify(t("PageAdminEvents.eventCreatedNotificationMessage"));
             await router.push({
                 name: "adminEvent",
                 params: { eventId, organisationId, propertyId },
@@ -128,44 +124,40 @@ async function onUpdateEvent(eventData: EditEventPayload & { id: string }): Prom
 }
 
 function showEventForm(event?: EventDoc): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: EventCreateForm,
-            componentPropsObject: {
-                event,
-                eventStartHours: propertySettings.value.event.eventStartTime24HFormat,
-                floors: floors.value,
-                maxFloors: subscriptionSettings.value.maxFloorPlansPerEvent,
-                organisationId,
-                propertyId,
-                propertyName: propertiesStore.getPropertyNameById(propertyId),
-                propertyTimezone: propertySettings.value.timezone,
+    const dialog = globalDialog.openDialog(
+        EventCreateForm,
+        {
+            create(eventData: CreateEventPayload) {
+                onCreateEvent(eventData);
+                dialog.hide();
             },
-            listeners: {
-                create(eventData: CreateEventPayload) {
-                    onCreateEvent(eventData);
-                    dialog.hide();
-                },
-                update(eventData: EditEventPayload) {
-                    if (!event) {
-                        return;
-                    }
-                    onUpdateEvent({
-                        ...eventData,
-                        id: event.id,
-                    });
-                    dialog.hide();
-                },
+            event,
+            eventStartHours: propertySettings.value.event.eventStartTime24HFormat,
+            floors: floors.value,
+            maxFloors: subscriptionSettings.value.maxFloorPlansPerEvent,
+            onUpdate(eventData: EditEventPayload) {
+                if (!event) {
+                    return;
+                }
+                onUpdateEvent({
+                    ...eventData,
+                    id: event.id,
+                });
+                dialog.hide();
             },
-            maximized: false,
+            organisationId,
+            propertyId,
+            propertyName: propertiesStore.getPropertyNameById(propertyId),
+            propertyTimezone: propertySettings.value.timezone,
+        },
+        {
             title: event
                 ? t("PageAdminEvents.editEventDialogTitle", {
                       eventName: event.name,
                   })
                 : t("PageAdminEvents.createNewEventDialogTitle"),
         },
-    });
+    );
 }
 
 onMounted(fetchMoreEvents);
@@ -175,7 +167,7 @@ onMounted(fetchMoreEvents);
     <div class="PageAdminEvents">
         <FTTitle :title="t('PageAdminEvents.title')">
             <template #right>
-                <FTBtn rounded icon="fa fa-plus" class="button-gradient" @click="showEventForm()" />
+                <FTBtn rounded icon="fa fa-plus" color="primary" @click="showEventForm()" />
             </template>
         </FTTitle>
 

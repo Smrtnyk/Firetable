@@ -1,7 +1,8 @@
 import type { FloorDoc, ReservationDoc } from "@firetable/types";
 
 import { isAWalkInReservation } from "@firetable/types";
-import { exportFile } from "quasar";
+
+import { exportFile } from "../export-file";
 
 interface ExportReservationsParams {
     eventName: string;
@@ -32,11 +33,9 @@ export function exportReservations({ eventName, reservations }: ExportReservatio
     const csvContent = [headers, ...rows].join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
 
-    // Generate filename with date
     const date = new Date().toISOString().split("T")[0];
     const filename = `${eventName}_reservations_${date}.csv`;
-
-    exportFile(filename, blob);
+    exportFile(blob, filename);
 }
 
 function getReservationStatus(reservation: ReservationDoc): string {

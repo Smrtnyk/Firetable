@@ -1,8 +1,7 @@
-import type { VoidFunction } from "@firetable/types";
-
-import { isString, noop } from "es-toolkit";
-import { Dialog, Loading, Notify } from "quasar";
-import { i18n } from "src/boot/i18n";
+import { isError, noop } from "es-toolkit";
+import { globalDialog } from "src/composables/useDialog";
+import { AppLogger } from "src/logger/FTLogger";
+import { useGlobalStore } from "src/stores/global-store";
 
 type TryCatchLoadingWrapperOptions<T> = {
     args?: unknown[];
@@ -10,90 +9,27 @@ type TryCatchLoadingWrapperOptions<T> = {
     hook: (...args: unknown[]) => Promise<T>;
 };
 
-export function notifyPositive(message: string): void {
-    Notify.create({
-        color: "positive",
-        message,
-    });
-}
-
-export function showConfirm(title: string, message = ""): Promise<boolean> {
-    const options = {
-        cancel: {
-            color: "negative",
-            outline: true,
-            rounded: true,
-            size: "md",
-        },
-        class: "ft-card",
-        message,
-        ok: {
-            color: "primary",
-            rounded: true,
-            size: "md",
-        },
-        persistent: true,
-        title,
-    };
-
-    return new Promise(function (resolve) {
-        Dialog.create(options)
-            .onOk(() => resolve(true))
-            .onCancel(() => resolve(false));
-    });
-}
-
 export function showDeleteConfirm(
     title: string,
     message: string,
     confirmText: string,
 ): Promise<boolean> {
-    return new Promise(function (resolve) {
-        Dialog.create({
-            cancel: {
-                color: "negative",
-                outline: true,
-                rounded: true,
-                size: "md",
-            },
-            class: "ft-card",
-            message,
-            ok: {
-                color: "primary",
-                rounded: true,
-                size: "md",
-            },
-            persistent: true,
-            prompt: {
-                isValid: (val: string) => val === confirmText,
-                model: "",
-                outlined: true,
-                placeholder: i18n.global.t("helpers.ui.deleteConfirmPlaceholder", { confirmText }),
-                type: "text",
-            },
-            title,
-        })
-            .onOk(() => resolve(true))
-            .onCancel(() => resolve(false));
+    return globalDialog.deleteConfirm({
+        confirmText,
+        message,
+        title,
     });
 }
 
-export function showErrorMessage(e: unknown, onCloseCallback?: VoidFunction): void {
-    let message = i18n.global.t("helpers.ui.unexpectedError");
-    if (isString(e)) {
-        message = e;
-    } else if (e instanceof Error) {
-        message = e.message;
-    }
-
-    const dialog = Dialog.create({
-        class: ["error-dialog", "ft-card"],
-        message,
-        title: i18n.global.t("helpers.ui.errorDialogTitle"),
+export function showErrorMessage(e: unknown, onCloseCallback = noop): void {
+    AppLogger.error(e);
+    const errorDialog = globalDialog.showError({
+        message: isError(e) ? e.message : String(e),
+        onClose: onCloseCallback,
     });
 
     if (onCloseCallback) {
-        dialog.onOk(onCloseCallback);
+        errorDialog.onDismiss(onCloseCallback);
     }
 }
 
@@ -110,14 +46,15 @@ export async function tryCatchLoadingWrapper<T>({
     errorHook,
     hook,
 }: TryCatchLoadingWrapperOptions<T>): Promise<T | undefined> {
+    const globalStore = useGlobalStore();
     try {
-        Loading.show();
+        globalStore.setLoading(true);
         return await hook(...(args ?? []));
     } catch (e) {
         const errorHookVal = (errorHook ?? noop).bind(null, ...(args ?? []));
         showErrorMessage(e, errorHookVal);
     } finally {
-        Loading.hide();
+        globalStore.setLoading(false);
     }
 
     return undefined;

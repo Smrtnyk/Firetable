@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
+import BuildInfoFooter from "src/components/BuildInfoFooter.vue";
 import { submitNewPassword } from "src/db";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";
@@ -64,115 +65,135 @@ async function changePassword(): Promise<void> {
             <!-- Profile Section -->
             <div class="PageProfile__section">
                 <div class="PageProfile__section-header">
-                    <i class="fas fa-user PageProfile__section-icon" />
+                    <v-icon class="PageProfile__section-icon">fas fa-user</v-icon>
                     <h2 class="PageProfile__section-title">
                         {{ t("PageProfile.sections.profileInformation") }}
                     </h2>
                 </div>
 
-                <div class="PageProfile__card">
-                    <div class="PageProfile__avatar-section">
-                        <div class="PageProfile__avatar">
-                            {{ avatar }}
-                        </div>
-                        <div class="PageProfile__user-info">
-                            <h3
-                                class="PageProfile__user-name"
-                                :aria-label="t('PageProfile.nameLabel')"
-                            >
-                                {{ user.name }}
-                            </h3>
-                            <p class="PageProfile__user-email">{{ user.email }}</p>
-                            <div
-                                class="PageProfile__user-role"
-                                :aria-label="t('PageProfile.roleLabel')"
-                            >
-                                <i class="fas fa-shield-alt" />
-                                <span>{{ user.role }}</span>
+                <v-card class="PageProfile__card">
+                    <v-card-text class="pa-6">
+                        <div class="PageProfile__avatar-section">
+                            <v-avatar size="80" class="PageProfile__avatar">
+                                <span class="text-h4 font-weight-bold">{{ avatar }}</span>
+                            </v-avatar>
+                            <div class="PageProfile__user-info">
+                                <h3
+                                    class="PageProfile__user-name"
+                                    :aria-label="t('PageProfile.nameLabel')"
+                                >
+                                    {{ user.name }}
+                                </h3>
+                                <p class="PageProfile__user-email">{{ user.email }}</p>
+                                <v-chip
+                                    class="PageProfile__user-role"
+                                    :aria-label="t('PageProfile.roleLabel')"
+                                    color="primary"
+                                    variant="tonal"
+                                    size="small"
+                                    prepend-icon="fas fa-shield-alt"
+                                >
+                                    {{ user.role }}
+                                </v-chip>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </v-card-text>
+                </v-card>
             </div>
 
             <!-- Security Section -->
             <div class="PageProfile__section">
                 <div class="PageProfile__section-header">
-                    <i class="fas fa-lock PageProfile__section-icon" />
+                    <v-icon class="PageProfile__section-icon">fas fa-lock</v-icon>
                     <h2 class="PageProfile__section-title">
                         {{ t("PageProfile.sections.security") }}
                     </h2>
                 </div>
 
-                <div class="PageProfile__card">
-                    <div class="PageProfile__password-section">
-                        <div class="PageProfile__field-header">
-                            <h4 class="PageProfile__field-title">
-                                {{ t("PageProfile.fields.changePassword.title") }}
-                            </h4>
-                            <p class="PageProfile__field-description">
-                                {{ t("PageProfile.fields.changePassword.description") }}
-                            </p>
-                        </div>
+                <v-card class="PageProfile__card">
+                    <v-card-text class="pa-6">
+                        <div class="PageProfile__password-section">
+                            <div class="PageProfile__field-header">
+                                <h4 class="PageProfile__field-title">
+                                    {{ t("PageProfile.fields.changePassword.title") }}
+                                </h4>
+                                <p class="PageProfile__field-description">
+                                    {{ t("PageProfile.fields.changePassword.description") }}
+                                </p>
+                            </div>
 
-                        <div class="PageProfile__password-input">
-                            <div class="PageProfile__password-field">
-                                <q-input
-                                    ref="passwordInput"
-                                    v-model="newPassword"
-                                    :disable="!isInputEnabled"
-                                    :placeholder="t('PageProfile.passwordInputPlaceholder')"
-                                    type="password"
-                                    outlined
-                                    class="PageProfile__input"
-                                    clearable
-                                />
-                                <q-btn
-                                    flat
-                                    round
-                                    dense
-                                    :icon="isInputEnabled ? 'fas fa-times' : 'fas fa-edit'"
-                                    @click="toggleInput"
-                                    :color="isInputEnabled ? 'negative' : 'primary'"
-                                    class="PageProfile__edit-btn"
+                            <div class="PageProfile__password-input">
+                                <div class="PageProfile__password-field">
+                                    <v-text-field
+                                        ref="passwordInput"
+                                        v-model="newPassword"
+                                        :disabled="!isInputEnabled"
+                                        :placeholder="t('PageProfile.passwordInputPlaceholder')"
+                                        type="password"
+                                        variant="outlined"
+                                        density="comfortable"
+                                        class="PageProfile__input"
+                                        clearable
+                                        hide-details
+                                    />
+                                    <v-btn
+                                        icon
+                                        variant="text"
+                                        density="comfortable"
+                                        @click="toggleInput"
+                                        :color="isInputEnabled ? 'error' : 'primary'"
+                                        class="PageProfile__edit-btn"
+                                    >
+                                        <v-icon>{{
+                                            isInputEnabled ? "fas fa-times" : "fas fa-edit"
+                                        }}</v-icon>
+
+                                        <v-tooltip activator="parent" location="top">
+                                            {{
+                                                isInputEnabled
+                                                    ? t("PageProfile.passwordInputEnabledTitle")
+                                                    : t("PageProfile.passwordInputDisabledTitle")
+                                            }}
+                                        </v-tooltip>
+                                    </v-btn>
+                                </div>
+                            </div>
+
+                            <div class="PageProfile__password-actions" v-if="isInputEnabled">
+                                <v-btn
+                                    @click="changePassword"
+                                    color="primary"
+                                    :disabled="!newPassword"
+                                    prepend-icon="fas fa-save"
+                                    class="PageProfile__save-btn"
                                 >
-                                    <q-tooltip>{{
-                                        isInputEnabled
-                                            ? t("PageProfile.passwordInputEnabledTitle")
-                                            : t("PageProfile.passwordInputDisabledTitle")
-                                    }}</q-tooltip>
-                                </q-btn>
+                                    {{ t("PageProfile.updatePasswordButtonLabel") }}
+                                </v-btn>
+                                <v-btn
+                                    @click="toggleInput"
+                                    variant="text"
+                                    color="grey-darken-1"
+                                    class="ml-2"
+                                >
+                                    {{ t("PageProfile.buttons.cancel") }}
+                                </v-btn>
                             </div>
                         </div>
-
-                        <div class="PageProfile__password-actions" v-if="isInputEnabled">
-                            <q-btn
-                                @click="changePassword"
-                                :label="t('PageProfile.updatePasswordButtonLabel')"
-                                color="primary"
-                                :disable="!newPassword"
-                                icon="fas fa-save"
-                                class="PageProfile__save-btn"
-                            />
-                            <q-btn
-                                @click="toggleInput"
-                                :label="t('PageProfile.buttons.cancel')"
-                                flat
-                                color="grey-7"
-                                class="q-ml-sm"
-                            />
-                        </div>
-                    </div>
-                </div>
+                    </v-card-text>
+                </v-card>
             </div>
         </div>
+
+        <BuildInfoFooter />
     </div>
 </template>
 
 <style lang="scss" scoped>
+@use "src/css/variables.scss" as *;
+
 .PageProfile {
     min-height: 100vh;
-    padding: 24px;
+    padding: 16px;
 
     &__container {
         max-width: 800px;
@@ -221,14 +242,6 @@ async function changePassword(): Promise<void> {
         }
     }
 
-    &__card {
-        background: $surface-elevated;
-        border-radius: 16px;
-        padding: 24px;
-        box-shadow: $box-shadow;
-        border: 1px solid $border-light;
-    }
-
     &__avatar-section {
         display: flex;
         align-items: center;
@@ -236,17 +249,12 @@ async function changePassword(): Promise<void> {
     }
 
     &__avatar {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
         background: $avatar-bg;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         color: white;
-        font-size: 32px;
-        font-weight: 600;
-        text-transform: uppercase;
+
+        :deep(.v-avatar__content) {
+            text-transform: uppercase;
+        }
     }
 
     &__user-info {
@@ -267,19 +275,13 @@ async function changePassword(): Promise<void> {
     }
 
     &__user-role {
-        align-items: center;
-        gap: 8px;
-        background: $surface-secondary;
-        padding: 8px 16px;
-        border-radius: 20px;
-        display: inline-flex;
         font-size: 14px;
         font-weight: 500;
-        color: $text-secondary;
 
-        i {
-            color: $icon-primary;
-            font-size: 12px;
+        :deep(.v-chip__prepend) {
+            .v-icon {
+                font-size: 12px;
+            }
         }
     }
 
@@ -314,7 +316,7 @@ async function changePassword(): Promise<void> {
     &__input {
         flex: 1;
 
-        :deep(.q-field__control) {
+        :deep(.v-field__outline) {
             border-radius: 12px;
         }
     }
@@ -335,7 +337,7 @@ async function changePassword(): Promise<void> {
 }
 
 // Dark mode support
-.body--dark .PageProfile {
+.v-theme--dark .PageProfile {
     &__title {
         color: $text-primary-dark;
     }
@@ -352,12 +354,6 @@ async function changePassword(): Promise<void> {
         color: $icon-primary-dark;
     }
 
-    &__card {
-        background: $surface-secondary-dark;
-        border-color: $border-light-dark;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-
     &__avatar {
         background: $avatar-bg-dark;
     }
@@ -370,15 +366,6 @@ async function changePassword(): Promise<void> {
         color: $text-tertiary-dark;
     }
 
-    &__user-role {
-        background: $surface-elevated-dark;
-        color: $text-secondary-dark;
-
-        i {
-            color: $icon-primary-dark;
-        }
-    }
-
     &__field-title {
         color: $text-primary-dark;
     }
@@ -388,10 +375,9 @@ async function changePassword(): Promise<void> {
     }
 }
 
-// Responsive adjustments
 @media (max-width: 768px) {
     .PageProfile {
-        padding: 16px;
+        padding: 10px;
 
         &__title {
             font-size: 24px;
@@ -408,18 +394,20 @@ async function changePassword(): Promise<void> {
         }
 
         &__card {
-            padding: 20px;
+            :deep(.v-card-text) {
+                padding: 20px;
+            }
         }
 
         &__password-actions {
             flex-direction: column;
             gap: 8px;
 
-            .q-btn {
+            .v-btn {
                 width: 100%;
             }
 
-            .q-ml-sm {
+            .ml-2 {
                 margin-left: 0 !important;
             }
         }
@@ -428,18 +416,14 @@ async function changePassword(): Promise<void> {
 
 @media (max-width: 480px) {
     .PageProfile {
-        &__avatar {
-            width: 64px;
-            height: 64px;
-            font-size: 24px;
-        }
-
         &__user-name {
             font-size: 20px;
         }
 
         &__card {
-            padding: 16px;
+            :deep(.v-card-text) {
+                padding: 16px;
+            }
         }
     }
 }

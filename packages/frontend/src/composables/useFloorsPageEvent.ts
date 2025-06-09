@@ -3,8 +3,8 @@ import type { Ref, ShallowRef } from "vue";
 
 import { FloorViewer, getTables } from "@firetable/floor-creator";
 import { useEventListener } from "@vueuse/core";
+import { debounce } from "es-toolkit";
 import { matchesProperty } from "es-toolkit/compat";
-import { debounce } from "quasar";
 import { decompressFloorDoc } from "src/helpers/compress-floor-doc";
 import { isTouchDevice } from "src/helpers/is-touch-device";
 import { AppLogger } from "src/logger/FTLogger.js";

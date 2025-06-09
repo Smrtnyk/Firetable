@@ -5,7 +5,7 @@ import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it } from "vitest";
 import { createApp } from "vue";
 
-import { mockedStore } from "../../test-helpers/render-component";
+import { mockedStore } from "../../test-helpers/mocked-store";
 import { useAuthStore } from "./auth-store";
 import { usePermissionsStore } from "./permissions-store";
 

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Loading, QForm } from "quasar";
 import { loginWithEmail } from "src/db";
-import { minLength, noEmptyString } from "src/helpers/form-rules";
+import { minLength, noEmptyString, validateForm } from "src/helpers/form-rules";
 import { showErrorMessage } from "src/helpers/ui-helpers";
+import { useGlobalStore } from "src/stores/global-store";
 import { computed, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
@@ -15,21 +15,22 @@ const firebaseErrorMessages = computed<Record<string, string>>(() => ({
     "auth/wrong-password": t("PageAuth.wrongPasswordError"),
 }));
 
+const globalStore = useGlobalStore();
 const router = useRouter();
 const username = ref("");
 const password = ref("");
 const isPwd = ref(true);
-const authForm = useTemplateRef<QForm>("authForm");
+const authForm = useTemplateRef("authForm");
 const usernameRule = [noEmptyString()];
 const passwordRule = computed(() => [minLength(t("PageAuth.passwordMinLengthError"))]);
 
 async function onSubmit(): Promise<void> {
-    if (!(await authForm.value?.validate())) {
+    if (!(await validateForm(authForm.value))) {
         return;
     }
 
     try {
-        Loading.show();
+        globalStore.setLoading(true);
         await loginWithEmail(username.value, password.value);
         await router.replace("/");
     } catch (e: any) {
@@ -38,56 +39,70 @@ async function onSubmit(): Promise<void> {
             firebaseErrorMessages.value[errorCode as string] ?? t("PageAuth.unexpectedError");
         showErrorMessage(userFriendlyMessage);
     } finally {
-        Loading.hide();
+        globalStore.setLoading(false);
     }
 }
 </script>
 
 <template>
-    <div class="PageAuth">
-        <div class="row window-height items-center q-pa-md justify-center text-center">
-            <div class="col">
-                <q-img class="ft-logo" src="/icons/icon-256x256.png" />
-                <q-form ref="authForm" class="PageAuth__auth-form limited-width q-mx-auto" greedy>
-                    <h1 class="text-h5 text-center">{{ t("PageAuth.welcomeMessage") }}</h1>
-                    <q-input
-                        v-model="username"
-                        class="q-mb-md"
-                        outlined
-                        :label="t('PageAuth.usernameLabel')"
-                        :hint="t('PageAuth.usernameHint')"
-                        lazy-rules
-                        :rules="usernameRule"
-                    />
-
-                    <q-input
-                        v-model="password"
-                        class="q-mb-md"
-                        outlined
-                        :label="t('PageAuth.passwordLabel')"
-                        :type="isPwd ? 'password' : 'text'"
-                        :hint="t('PageAuth.passwordHint')"
-                        :rules="passwordRule"
+    <div class="PageAuth d-flex justify-center align-center">
+        <v-container class="fill-height pa-4">
+            <v-row align="center" justify="center" class="text-center">
+                <v-col>
+                    <v-img class="ft-logo mx-auto" src="/logo.png" />
+                    <v-form
+                        ref="authForm"
+                        class="PageAuth__auth-form limited-width mx-auto"
+                        greedy
+                        @submit.prevent="onSubmit"
                     >
-                        <template #append>
-                            <q-icon
-                                :name="isPwd ? 'fa fa-eye' : 'fa fa-eye-slash'"
-                                class-name="cursor-pointer"
-                                @click="() => (isPwd = !isPwd)"
-                                aria-label="Toggle password visibility"
-                            />
-                        </template>
-                    </q-input>
+                        <h1 class="text-h5 text-center my-4">{{ t("PageAuth.welcomeMessage") }}</h1>
+                        <v-text-field
+                            v-model="username"
+                            class="mb-4"
+                            variant="outlined"
+                            :label="t('PageAuth.usernameLabel')"
+                            :hint="t('PageAuth.usernameHint')"
+                            lazy-rules
+                            :rules="usernameRule"
+                            autocomplete="username"
+                        />
 
-                    <q-btn
-                        rounded
-                        size="lg"
-                        :label="t('PageAuth.loginButtonLabel')"
-                        class="button-gradient q-ml-md"
-                        @click="onSubmit"
-                    />
-                </q-form>
-            </div>
-        </div>
+                        <v-text-field
+                            v-model="password"
+                            class="mb-4"
+                            variant="outlined"
+                            :label="t('PageAuth.passwordLabel')"
+                            :type="isPwd ? 'password' : 'text'"
+                            :hint="t('PageAuth.passwordHint')"
+                            :rules="passwordRule"
+                            autocomplete="current-password"
+                        >
+                            <template #append-inner>
+                                <v-icon
+                                    :icon="isPwd ? 'fa:fas fa-eye' : 'fa:fas fa-eye-slash'"
+                                    class="cursor-pointer"
+                                    @click="isPwd = !isPwd"
+                                    :aria-label="t('PageAuth.togglePasswordVisibility')"
+                                />
+                            </template>
+                        </v-text-field>
+
+                        <v-btn flat rounded size="large" type="submit" color="primary">
+                            {{ t("PageAuth.loginButtonLabel") }}
+                        </v-btn>
+                    </v-form>
+                </v-col>
+            </v-row>
+        </v-container>
     </div>
 </template>
+
+<style lang="scss" scoped>
+.PageAuth {
+    background-color: rgb(var(--v-theme-background));
+    color: rgb(var(--v-theme-on-background));
+    min-height: 100vh;
+    display: flex;
+}
+</style>

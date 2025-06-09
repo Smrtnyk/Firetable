@@ -10,7 +10,7 @@ import AddNewGuestForm from "./AddNewGuestForm.vue";
 
 describe("AddNewGuestForm", () => {
     function getTagsSelect(screen: any): HTMLElement {
-        return screen.getByRole("combobox", { name: "Tags" }).element();
+        return screen.getByRole("combobox", { name: "Tags" });
     }
 
     function getTagRemoveButtons(screen: any): Locator {
@@ -33,7 +33,7 @@ describe("AddNewGuestForm", () => {
             const guestNameInput = screen.getByLabelText("Guest name");
             await expect.element(guestNameInput).toHaveValue("");
 
-            const countryCodeSelect = screen.getByRole("combobox", { name: "Country Code" });
+            const countryCodeSelect = screen.getByRole("textbox", { name: "Country Code" });
             await expect.element(countryCodeSelect).toHaveValue("");
 
             const phoneNumberInput = screen.getByLabelText("Phone Number");
@@ -83,7 +83,7 @@ describe("AddNewGuestForm", () => {
             const phoneNumberInput = screen.getByLabelText("Phone Number");
             await userEvent.type(phoneNumberInput, "25550123");
             // Select country code
-            const countryCodeSelect = screen.getByRole("combobox", { name: "Country Code" });
+            const countryCodeSelect = screen.getByText("Country Code").first();
             await userEvent.click(countryCodeSelect);
             const countryOption = screen.getByText("Austria");
             await userEvent.click(countryOption);
@@ -517,7 +517,7 @@ describe("AddNewGuestForm", () => {
 
             renderComponent(AddNewGuestForm, editProps);
 
-            const chips = Array.from(document.querySelectorAll<HTMLElement>(".q-chip"));
+            const chips = Array.from(document.querySelectorAll<HTMLElement>(".v-chip"));
             expect(chips.map((chip) => chip.innerText)).toEqual(["First", "Second", "Third"]);
         });
     });

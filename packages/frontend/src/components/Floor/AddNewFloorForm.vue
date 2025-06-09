@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { noEmptyString } from "src/helpers/form-rules";
-import { ref } from "vue";
+import { ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 
 interface Props {
@@ -9,8 +9,10 @@ interface Props {
 
 const { t } = useI18n();
 const props = defineProps<Props>();
-const emit = defineEmits(["create"]);
+const emit = defineEmits<(event: "create", floorName: string) => void>();
+
 const floorName = ref("");
+const formRef = useTemplateRef("formRef");
 
 function noSameFloorName(val: string): boolean | string {
     return !props.allFloorNames.has(val) || t("AddNewFloorForm.floorNameExistsError");
@@ -18,40 +20,42 @@ function noSameFloorName(val: string): boolean | string {
 
 function onReset(): void {
     floorName.value = "";
+    formRef.value?.resetValidation();
 }
 
-function onSubmit(): void {
-    emit("create", floorName.value);
+async function onSubmit(): Promise<void> {
+    if ((await formRef.value?.validate())?.valid) {
+        emit("create", floorName.value);
+    }
+}
+
+function validateFloorName(value: string): boolean | string {
+    const emptyValidation = noEmptyString()(value);
+    if (emptyValidation !== true) {
+        return emptyValidation;
+    }
+    return noSameFloorName(value);
 }
 </script>
 
 <template>
-    <q-form class="q-gutter-md q-pt-md q-pa-md" @submit="onSubmit" @reset="onReset">
-        <q-input
+    <v-form ref="formRef" class="pa-4" @submit.prevent="onSubmit">
+        <v-text-field
             v-model="floorName"
-            outlined
+            variant="outlined"
             :label="t('AddNewFloorForm.floorNameLabel')"
-            lazy-rules
-            :rules="[noEmptyString(), noSameFloorName]"
+            :rules="[validateFloorName]"
+            validate-on="blur"
+            class="mb-4"
         />
 
-        <div>
-            <q-btn
-                rounded
-                size="md"
-                :label="t('Global.submit')"
-                type="submit"
-                class="button-gradient"
-            />
-            <q-btn
-                rounded
-                size="md"
-                outline
-                :label="t('Global.reset')"
-                type="reset"
-                color="primary"
-                class="q-ml-sm"
-            />
+        <div class="d-flex ga-2">
+            <v-btn rounded color="primary" type="submit" flat>
+                {{ t("Global.submit") }}
+            </v-btn>
+            <v-btn rounded variant="outlined" color="primary" @click="onReset">
+                {{ t("Global.reset") }}
+            </v-btn>
         </div>
-    </q-form>
+    </v-form>
 </template>

@@ -44,7 +44,7 @@ const backgroundImageUrl = computed(function () {
                         }"
                     />
                     <div class="EventCard__price-tag">
-                        <i class="fas fa-euro-sign" />
+                        <v-icon size="x-small">fas fa-euro-sign</v-icon>
                         <span>{{ event.entryPrice || t("EventCard.freeLabel") }}</span>
                     </div>
                 </div>
@@ -54,13 +54,13 @@ const backgroundImageUrl = computed(function () {
                     <!-- Date & Time Info -->
                     <div class="EventCard__meta">
                         <div class="EventCard__date">
-                            <i class="fas fa-calendar-alt" />
+                            <v-icon size="small">fas fa-calendar-alt</v-icon>
                             <span>{{
                                 dateFromTimestamp(event.date, locale, propertyTimezone)
                             }}</span>
                         </div>
                         <div class="EventCard__time">
-                            <i class="fas fa-clock" />
+                            <v-icon size="small">fas fa-clock</v-icon>
                             <span>{{
                                 hourFromTimestamp(event.date, locale, propertyTimezone)
                             }}</span>
@@ -76,6 +76,8 @@ const backgroundImageUrl = computed(function () {
 </template>
 
 <style lang="scss" scoped>
+@use "src/css/variables.scss" as *;
+
 .EventCard {
     background: $surface-elevated;
     border-radius: $generic-border-radius;
@@ -136,7 +138,7 @@ const backgroundImageUrl = computed(function () {
         color: $text-primary;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
-        i {
+        :deep(.v-icon) {
             color: $positive;
             font-size: 12px;
         }
@@ -164,10 +166,9 @@ const backgroundImageUrl = computed(function () {
         font-size: 14px;
         font-weight: 500;
 
-        i {
+        :deep(.v-icon) {
             color: $accent;
             width: 16px;
-            text-align: center;
         }
     }
 
@@ -184,7 +185,8 @@ const backgroundImageUrl = computed(function () {
     }
 }
 
-.body--dark .EventCard {
+// Dark mode support
+.v-theme--dark .EventCard {
     background: $surface-elevated-dark;
     box-shadow:
         0 2px 10px rgba(0, 0, 0, 0.3),
@@ -200,7 +202,7 @@ const backgroundImageUrl = computed(function () {
         background: rgba($surface-elevated-dark, 0.95);
         color: $text-primary-dark;
 
-        i {
+        :deep(.v-icon) {
             color: $positive;
         }
     }
@@ -209,9 +211,13 @@ const backgroundImageUrl = computed(function () {
     .EventCard__time {
         color: $text-secondary-dark;
 
-        i {
+        :deep(.v-icon) {
             color: $accent;
         }
+    }
+
+    .EventCard__title {
+        color: $text-primary-dark;
     }
 }
 

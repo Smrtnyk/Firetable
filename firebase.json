@@ -8,7 +8,7 @@
         "runtime": "nodejs22"
     },
     "hosting": {
-        "public": "packages/frontend/dist/pwa",
+        "public": "packages/frontend/dist",
         "ignore": [
             "firebase.json",
             "**/.*",

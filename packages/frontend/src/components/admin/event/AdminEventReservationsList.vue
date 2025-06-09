@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import type { ReservationDoc, VoidFunction } from "@firetable/types";
+import type { ReservationDoc } from "@firetable/types";
 
 import ReservationGeneralInfo from "src/components/Event/reservation/ReservationGeneralInfo.vue";
 import ReservationLabelChips from "src/components/Event/reservation/ReservationLabelChips.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
-import FTDialog from "src/components/FTDialog.vue";
-import { useDialog } from "src/composables/useDialog";
+import { globalDialog } from "src/composables/useDialog";
 import { getFormatedDateFromTimestamp } from "src/helpers/date-utils";
 import { useI18n } from "vue-i18n";
 
@@ -18,64 +17,60 @@ interface Props {
 const emit = defineEmits<(e: "delete", value: ReservationDoc) => void>();
 const props = defineProps<Props>();
 const { locale } = useI18n();
-const { createDialog } = useDialog();
 
-function emitDelete(reservation: ReservationDoc, reset: VoidFunction): void {
-    reset();
+function emitDelete(reservation: ReservationDoc): void {
     emit("delete", reservation);
 }
 
 function showReservation(reservation: ReservationDoc): void {
-    createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: ReservationGeneralInfo,
-            componentPropsObject: {
-                reservation,
-                timezone: props.timezone,
-            },
-            listeners: {},
-            maximized: false,
+    globalDialog.openDialog(
+        ReservationGeneralInfo,
+        {
+            reservation,
+            timezone: props.timezone,
+        },
+        {
             title: "Reservation Details",
         },
-    });
+    );
 }
 </script>
 
 <template>
     <div class="AdminEventReservationsList">
-        <q-list v-if="reservations.length > 0">
-            <q-slide-item
-                @right="({ reset }) => emitDelete(reservation, reset)"
+        <v-list v-if="reservations.length > 0" lines="three">
+            <v-list-item
                 v-for="reservation in props.reservations"
                 :key="reservation.id"
+                @click="showReservation(reservation)"
+                link
             >
-                <template #right>
-                    <q-icon name="fa fa-trash" />
+                <v-list-item-title>
+                    {{ reservation.guestName }} on {{ reservation.tableLabel }}</v-list-item-title
+                >
+                <v-list-item-subtitle v-if="reservation.clearedAt"
+                    >Cleared at:
+                    {{
+                        getFormatedDateFromTimestamp(reservation.clearedAt, locale, props.timezone)
+                    }}</v-list-item-subtitle
+                >
+                <v-list-item-subtitle>
+                    <ReservationLabelChips :reservation="reservation" />
+                </v-list-item-subtitle>
+
+                <template #append>
+                    <v-btn
+                        icon
+                        variant="text"
+                        size="small"
+                        @click.stop="emitDelete(reservation)"
+                        aria-label="Delete reservation"
+                    >
+                        <v-icon icon="fa fa-trash"></v-icon>
+                    </v-btn>
                 </template>
-                <q-item clickable>
-                    <q-item-section @click="showReservation(reservation)">
-                        <q-item-label>
-                            {{ reservation.guestName }} on
-                            {{ reservation.tableLabel }}</q-item-label
-                        >
-                        <q-item-label v-if="reservation.clearedAt" caption
-                            >Cleared at:
-                            {{
-                                getFormatedDateFromTimestamp(
-                                    reservation.clearedAt,
-                                    locale,
-                                    props.timezone,
-                                )
-                            }}</q-item-label
-                        >
-                        <q-item-label caption>
-                            <ReservationLabelChips :reservation="reservation" />
-                        </q-item-label>
-                    </q-item-section>
-                </q-item>
-            </q-slide-item>
-        </q-list>
+            </v-list-item>
+        </v-list>
         <FTCenteredText v-else>{{ props.emptyMessage }}</FTCenteredText>
     </div>
 </template>

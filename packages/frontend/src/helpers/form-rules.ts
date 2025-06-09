@@ -1,3 +1,5 @@
+import type { VForm } from "vuetify/components/VForm";
+
 import { isString } from "es-toolkit";
 import { isNumber } from "es-toolkit/compat";
 import { isNil } from "es-toolkit/predicate";
@@ -108,6 +110,14 @@ export function requireNumber(
     return function (val: unknown): boolean | string {
         return !Number.isNaN(Number(val)) || msg;
     };
+}
+
+export async function validateForm(form: null | VForm): Promise<boolean> {
+    if (!form) {
+        return false;
+    }
+
+    return (await form.validate()).valid;
 }
 
 export function validOptionalURL(

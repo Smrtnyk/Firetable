@@ -1,8 +1,8 @@
 <template>
     <div class="FTCard">
-        <q-card class="ft-card q-pa-sm q-pa-md-md">
+        <v-card class="ft-card pa-2 pa-md-4">
             <slot />
-        </q-card>
+        </v-card>
     </div>
 </template>
 

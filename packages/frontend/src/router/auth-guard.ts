@@ -3,10 +3,10 @@ import type { usePermissionsStore } from "src/stores/permissions-store";
 import type { RouteLocationNormalized, RouteLocationRaw } from "vue-router";
 
 import { isFunction } from "es-toolkit";
-import { Loading } from "quasar";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { refreshApp } from "src/helpers/utils";
 import { AppLogger } from "src/logger/FTLogger";
+import { useGlobalStore } from "src/stores/global-store";
 import { getCurrentUser } from "vuefire";
 
 export type AuthGuard = (to: RouteLocationNormalized) => Promise<boolean | RouteLocationRaw>;
@@ -71,10 +71,9 @@ export function createAuthGuard(
     return async function authGuard(
         to: RouteLocationNormalized,
     ): Promise<boolean | RouteLocationRaw> {
-        Loading.show({
-            delay: 200,
-            message: "Loading...",
-        });
+        const globalStore = useGlobalStore();
+
+        globalStore.setLoading(true);
 
         try {
             const { isReady, user } = await checkAndInitAuth();
@@ -112,7 +111,7 @@ export function createAuthGuard(
             showErrorMessage("Navigation failed. Please try again.", refreshApp);
             return false;
         } finally {
-            Loading.hide();
+            globalStore.setLoading(false);
         }
     };
 }
