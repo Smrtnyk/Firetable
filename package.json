@@ -19,6 +19,7 @@
         "deploy:firestore-rules": "firebase deploy --only firestore:rules",
         "deploy": "firebase deploy",
         "start:emulators": "firebase emulators:start --import=./local-db --export-on-exit=./local-db --project demo-project",
+        "start:emulators:prod": "firebase emulators:start --import=./local-db --export-on-exit=./local-db",
         "dev:frontend": "pnpm --filter frontend dev:pwa",
         "build:frontend:spa": "pnpm --filter frontend build:spa",
         "build:frontend:pwa": "pnpm --filter frontend build:pwa",

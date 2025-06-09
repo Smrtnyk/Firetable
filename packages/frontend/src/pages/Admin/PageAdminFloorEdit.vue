@@ -16,7 +16,10 @@ import { useEventListener } from "@vueuse/core";
 import { debounce, isString } from "es-toolkit";
 import { isNumber } from "es-toolkit/compat";
 import { exportFile, Loading } from "quasar";
+import FloorGeneratorAIPrompt from "src/components/Floor/FloorGeneratorAIPrompt.vue";
 import FTColorPickerButton from "src/components/FTColorPickerButton.vue";
+import FTDialog from "src/components/FTDialog.vue";
+import { useDialog } from "src/composables/useDialog";
 import {
     getFirestoreDocument,
     updateFirestoreDocument,
@@ -40,6 +43,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const router = useRouter();
+const { createDialog } = useDialog();
 const canvasRef = useTemplateRef<HTMLCanvasElement | undefined>("canvasRef");
 const pageRef = useTemplateRef<HTMLDivElement>("pageRef");
 const fileInputRef = useTemplateRef<HTMLInputElement>("fileInputRef");
@@ -301,6 +305,29 @@ function onDragStart(event: DragEvent, item: FloorElementTypes): void {
     );
 }
 
+function openAIDialog(): void {
+    if (!floorInstance.value) {
+        showErrorMessage("Floor instance is not initialized.");
+        return;
+    }
+
+    const dialog = createDialog({
+        component: FTDialog,
+        componentProps: {
+            component: FloorGeneratorAIPrompt,
+            componentPropsObject: {
+                floorInstance: floorInstance.value,
+            },
+            listeners: {
+                done() {
+                    dialog.hide();
+                },
+            },
+            title: "Read floor plan from image",
+        },
+    });
+}
+
 function selectAddTool(): void {
     selectedTool.value = "add";
     isDrawingMode.value = false;
@@ -400,6 +427,14 @@ function updateTableLabel(newLabel: unknown): void {
 
             <div class="toolbar-section">
                 <q-btn-group flat>
+                    <q-btn
+                        flat
+                        icon="fa fa-magic"
+                        label="Generate from Image"
+                        @click="openAIDialog"
+                    >
+                        <q-tooltip>Generate floor plan from image using AI</q-tooltip>
+                    </q-btn>
                     <q-btn flat icon="fa fa-file-import" @click="triggerFileInput">
                         <q-tooltip>Import Floor</q-tooltip>
                     </q-btn>
