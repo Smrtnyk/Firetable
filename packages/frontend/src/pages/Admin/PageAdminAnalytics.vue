@@ -1,14 +1,15 @@
 <script setup lang="ts">
+import type { DateRange } from "src/types";
+
 import BarChart from "src/components/admin/analytics/BarChart.vue";
 import PieChart from "src/components/admin/analytics/PieChart.vue";
 import ReservationAnalyticsCharts from "src/components/admin/analytics/ReservationAnalyticsCharts.vue";
 import AdminEventReservationsByPerson from "src/components/admin/event/AdminEventReservationsByPerson.vue";
 import FTCard from "src/components/FTCard.vue";
-import FTTabPanels from "src/components/FTTabPanels.vue";
-import FTTabs from "src/components/FTTabs.vue";
 import FTTimeframeSelector from "src/components/FTTimeframeSelector.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import { useReservationsAnalytics } from "src/composables/analytics/useReservationsAnalytics.js";
+import { formatLocalDateToISOString } from "src/helpers/date-utils";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
@@ -24,10 +25,12 @@ const propertiesStore = usePropertiesStore();
 const today = new Date();
 const thirtyDaysAgo = new Date();
 thirtyDaysAgo.setDate(today.getDate() - 30);
-const selected = ref({
-    endDate: today.toISOString().split("T")[0],
-    startDate: thirtyDaysAgo.toISOString().split("T")[0],
+
+const selected = ref<DateRange>({
+    from: formatLocalDateToISOString(thirtyDaysAgo),
+    to: formatLocalDateToISOString(today),
 });
+
 const property = computed(function () {
     return propertiesStore.getPropertyById(props.propertyId);
 });
@@ -51,11 +54,16 @@ const {
 
 watch(
     () => selected.value,
-    function (newValue) {
-        if (newValue.startDate && newValue.endDate) {
-            fetchData(newValue);
+    function (newValue, oldValue) {
+        if (newValue?.from && newValue.to) {
+            if (newValue.from !== oldValue?.from || newValue.to !== oldValue?.to) {
+                fetchData(newValue);
+            }
+        } else if (newValue && !newValue.from && !newValue.to && (oldValue?.from || oldValue?.to)) {
+            fetchData({ from: "", to: "" });
         }
     },
+    { deep: true, immediate: true },
 );
 
 const chartInfos = computed(function () {
@@ -95,77 +103,80 @@ const chartInfos = computed(function () {
         <FTTimeframeSelector v-model="selected" />
 
         <div>
-            <FTCard class="q-mb-md">
+            <FTCard class="mb-4">
                 <BarChart
                     :chart-data="plannedReservationsByProperty"
                     :chart-title="t('PageAdminAnalytics.charts.totalPlannedReservationsTitle')"
                 />
             </FTCard>
-            <div class="row q-col-gutter-sm q-col-gutter-md-md">
-                <div class="col-12">
-                    <q-chip color="primary">
+
+            <v-row>
+                <v-col cols="12">
+                    <v-chip color="primary" class="me-2">
                         {{ t("PageAdminAnalytics.chipLabels.avgGuestsPlanned") }}
                         {{ avgGuestsPerReservation.averagePlannedGuests.toFixed(2) }}
-                    </q-chip>
+                    </v-chip>
 
-                    <q-chip color="primary">
+                    <v-chip color="primary">
                         {{ t("PageAdminAnalytics.chipLabels.avgGuestsWalkIn") }}
                         {{ avgGuestsPerReservation.averageWalkInGuests.toFixed(2) }}
-                    </q-chip>
-                </div>
+                    </v-chip>
+                </v-col>
 
-                <FTCard class="col-sm-12 col-md-6">
-                    <PieChart
-                        :chart-data="plannedArrivedVsNoShow"
-                        :chart-title="t('PageAdminAnalytics.charts.arrivedVsNoShowTitle')"
-                    />
-                </FTCard>
+                <v-col cols="12" md="6">
+                    <FTCard>
+                        <PieChart
+                            :chart-data="plannedArrivedVsNoShow"
+                            :chart-title="t('PageAdminAnalytics.charts.arrivedVsNoShowTitle')"
+                        />
+                    </FTCard>
+                </v-col>
 
-                <FTCard class="col-sm-12 col-md-6">
-                    <PieChart
-                        :chart-data="plannedVsWalkInReservations"
-                        :chart-title="t('PageAdminAnalytics.charts.plannedVsWalkInTitle')"
-                    />
-                </FTCard>
+                <v-col cols="12" md="6">
+                    <FTCard>
+                        <PieChart
+                            :chart-data="plannedVsWalkInReservations"
+                            :chart-title="t('PageAdminAnalytics.charts.plannedVsWalkInTitle')"
+                        />
+                    </FTCard>
+                </v-col>
 
-                <div class="col-12 q-my-md">
-                    <FTTabs v-model="selectedDay">
-                        <q-tab
+                <v-col cols="12" class="my-4">
+                    <v-tabs v-model="selectedDay" color="primary">
+                        <v-tab
                             v-for="day in [...Object.keys(plannedReservationsByDay), 'ALL']"
                             :key="day"
-                            :name="day"
-                            :label="day === 'ALL' ? t('PageAdminAnalytics.tabs.all') : day"
-                        />
-                    </FTTabs>
+                            :value="day"
+                        >
+                            {{ day === "ALL" ? t("PageAdminAnalytics.tabs.all") : day }}
+                        </v-tab>
+                    </v-tabs>
 
-                    <FTTabPanels v-model="selectedDay" class="q-mt-md">
-                        <q-tab-panel
-                            class="q-pa-none"
+                    <v-tabs-window v-model="selectedDay" class="mt-4">
+                        <v-tabs-window-item
                             v-for="(reservations, day) in {
                                 ...plannedReservationsByDay,
                                 ALL: plannedReservationsByActiveProperty,
                             }"
                             :key="day"
-                            :name="day"
+                            :value="day"
                         >
                             <AdminEventReservationsByPerson :reservations="reservations" />
-                        </q-tab-panel>
-                    </FTTabPanels>
-                </div>
+                        </v-tabs-window-item>
+                    </v-tabs-window>
+                </v-col>
 
-                <FTCard
-                    class="col-sm-12 col-md-6"
-                    v-for="chartInfo in chartInfos"
-                    :key="chartInfo.title"
-                >
-                    <ReservationAnalyticsCharts
-                        :chart-data="chartInfo.data"
-                        :chart-title="chartInfo.title"
-                        :chart-type="chartInfo.type"
-                        :labels="chartInfo.labels"
-                    />
-                </FTCard>
-            </div>
+                <v-col cols="12" md="6" v-for="chartInfo in chartInfos" :key="chartInfo.title">
+                    <FTCard>
+                        <ReservationAnalyticsCharts
+                            :chart-data="chartInfo.data"
+                            :chart-title="chartInfo.title"
+                            :chart-type="chartInfo.type"
+                            :labels="chartInfo.labels"
+                        />
+                    </FTCard>
+                </v-col>
+            </v-row>
         </div>
     </div>
 </template>

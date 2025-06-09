@@ -1,15 +1,12 @@
 import type { AnyFunction } from "@firetable/types";
 
-import { Lang, LocalStorage } from "quasar";
-import { boot } from "quasar/wrappers";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { createI18n } from "vue-i18n";
 
+const LANG_STORAGE_KEY = "FTLangV2";
 const DEFAULT_LANG = "en-GB";
-const savedLanguage = LocalStorage.getItem<string>("FTLang") ?? DEFAULT_LANG;
-
+const savedLanguage = localStorage.getItem(LANG_STORAGE_KEY) ?? DEFAULT_LANG;
 const localMessages = import.meta.glob("../i18n/*/index.ts");
-const quasarMessages = import.meta.glob("../../node_modules/quasar/lang/*.js");
 
 export const i18n = createI18n({
     fallbackLocale: "en-GB",
@@ -23,22 +20,20 @@ export async function dynamicallySwitchLang(langIso: string): Promise<void> {
 
     await tryCatchLoadingWrapper({
         async hook() {
-            const quasarLangPath = `../../node_modules/quasar/lang/${langIso}.js`;
             const localMessagesPath = `../i18n/${langIso}/index.ts`;
-
-            if (quasarMessages[quasarLangPath]) {
-                const quasarLangModule = await (quasarMessages[quasarLangPath] as AnyFunction)();
-                Lang.set(quasarLangModule.default);
-            }
 
             if (localMessages[localMessagesPath]) {
                 const messages = await (localMessages[localMessagesPath] as AnyFunction)();
                 i18n.global.setLocaleMessage(langIso, messages.default);
                 i18n.global.locale.value = langIso;
-                LocalStorage.set("FTLang", langIso);
+                localStorage.setItem(LANG_STORAGE_KEY, langIso);
             }
         },
     });
+}
+
+export async function initLang(): Promise<void> {
+    await dynamicallySwitchLang(savedLanguage);
 }
 
 /**
@@ -49,9 +44,3 @@ export function loadLanguage(langIso: string): Promise<{ default: Record<string,
     const localMessagesPath = `../i18n/${langIso}/index.ts`;
     return (localMessages[localMessagesPath] as AnyFunction)();
 }
-
-export default boot(async function ({ app }) {
-    await dynamicallySwitchLang(savedLanguage);
-
-    app.use(i18n);
-});

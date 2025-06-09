@@ -3,16 +3,20 @@ import type { RenderResult } from "vitest-browser-vue";
 import type { Ref } from "vue";
 
 import { AdminRole, Role } from "@firetable/types";
-import { userEvent } from "@vitest/browser/context";
+import { page, userEvent } from "@vitest/browser/context";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { nextTick, ref } from "vue";
 
 import type { PageAdminGuestsProps } from "./PageAdminGuests.vue";
 
-import { renderComponent, t } from "../../../test-helpers/render-component";
+import { cleanupAfterTest, renderComponent, t } from "../../../test-helpers/render-component";
 import PageAdminGuests from "./PageAdminGuests.vue";
 
-vi.mock("vue-router");
+vi.mock("vue-router", () => ({
+    useRouter: () => ({
+        push: vi.fn(),
+    }),
+}));
 
 type GuestsState = {
     data: GuestDoc[];
@@ -26,9 +30,10 @@ describe("PageAdminGuests.vue", () => {
     let guestsRef: Ref<GuestsState>;
     let refsMap: Map<string, Ref<GuestsState>>;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         // Clear because filters are persisted
         localStorage.clear();
+        await page.viewport(1920, 1200);
 
         authState = {
             user: {
@@ -87,7 +92,6 @@ describe("PageAdminGuests.vue", () => {
             { id: "property2", name: "Property Two" } as PropertyDoc,
         ];
 
-        // Initialize refs at the test level
         guestsRef = ref<GuestsState>({
             data: guestsData,
             pending: false,
@@ -97,10 +101,14 @@ describe("PageAdminGuests.vue", () => {
         refsMap.set("org1", guestsRef);
     });
 
-    async function render(
-        props = { organisationId: "org1" },
-    ): Promise<RenderResult<PageAdminGuestsProps>> {
-        const renderResult = renderComponent(PageAdminGuests, props, {
+    afterEach(() => {
+        cleanupAfterTest();
+        document.body.innerHTML = "";
+    });
+
+    function render(props = { organisationId: "org1" }): RenderResult<PageAdminGuestsProps> {
+        return renderComponent(PageAdminGuests, props, {
+            includeGlobalComponents: true,
             piniaStoreOptions: {
                 initialState: {
                     auth: authState,
@@ -114,29 +122,12 @@ describe("PageAdminGuests.vue", () => {
                     },
                 },
             },
+            wrapInLayout: true,
         });
-
-        try {
-            await vi.waitUntil(() => document.querySelector(".q-virtual-scroll .q-item"));
-        } catch (e) {
-            // Empty catch block to prevent test failure
-        }
-
-        return renderResult;
-    }
-
-    async function closeBottomDialog(screen: RenderResult<PageAdminGuestsProps>): Promise<void> {
-        await userEvent.click(screen.getByLabelText("Close bottom dialog"));
-        await nextTick();
-        try {
-            await vi.waitUntil(() => document.querySelector(".q-dialog") === null);
-        } catch (e) {
-            // Empty catch block to prevent test failure
-        }
     }
 
     it("renders correctly when there are guests", async () => {
-        const screen = await render();
+        const screen = render();
 
         await expect
             .element(screen.getByRole("heading", { exact: true, name: "Guests (3)" }))
@@ -155,13 +146,13 @@ describe("PageAdminGuests.vue", () => {
     it("shows 'No guests data' when there are no guests", async () => {
         guestsRef.value.data = [];
 
-        const screen = await render();
+        const screen = render();
 
         await expect.element(screen.getByText("No guests data")).toBeInTheDocument();
     });
 
     it("opens the add new guest dialog when plus button is clicked", async () => {
-        const screen = await render();
+        const screen = render();
 
         const addButton = screen.getByLabelText("Add new guest");
         await userEvent.click(addButton);
@@ -170,18 +161,16 @@ describe("PageAdminGuests.vue", () => {
 
         const dialogTitle = screen.getByText(t("PageAdminGuests.createNewGuestDialogTitle"));
         await expect.element(dialogTitle).toBeVisible();
-
-        await userEvent.click(screen.getByLabelText("Close dialog"));
     });
 
     describe("guest sorting and filtering", () => {
         describe("filtering by number of bookings and percentage", () => {
             it("renders guests sorted by number of visits", async () => {
-                const screen = await render();
+                const screen = render();
 
-                const guestItems = screen.getByRole("listitem");
+                const guestItems = screen.getByLabelText("Guest name");
 
-                expect(guestItems.all()).toHaveLength(3);
+                await expect.poll(() => guestItems.all()).toHaveLength(3);
 
                 // First guest should be John Doe (3 visits)
                 await expect.element(guestItems.first()).toHaveTextContent("John Doe");
@@ -233,10 +222,10 @@ describe("PageAdminGuests.vue", () => {
                     } as GuestDoc,
                 ];
 
-                const screen = await render();
+                const screen = render();
 
-                const guestItems = screen.getByRole("listitem");
-                expect(guestItems.all()).toHaveLength(2);
+                const guestItems = screen.getByLabelText("Guest name");
+                await expect.poll(() => guestItems.all()).toHaveLength(2);
 
                 // Jane Smith should be first (2 visits, 100% arrival rate)
                 // John Doe should be second (2 visits, 50% arrival rate)
@@ -290,10 +279,10 @@ describe("PageAdminGuests.vue", () => {
                     } as GuestDoc,
                 ];
 
-                const screen = await render();
+                const screen = render();
 
-                const guestItems = screen.getByRole("listitem");
-                expect(guestItems.all()).toHaveLength(2);
+                const guestItems = screen.getByLabelText("Guest name");
+                await expect.poll(() => guestItems.all()).toHaveLength(2);
 
                 // John Doe should be first (3 visits, 33% arrival rate)
                 // Jane Smith should be second (2 visits, 100% arrival rate)
@@ -339,17 +328,16 @@ describe("PageAdminGuests.vue", () => {
                     } as GuestDoc,
                 ];
 
-                const screen = await render();
+                const screen = render();
 
                 // Change to percentage sort
                 const sortButton = screen.getByLabelText("filter guests");
                 await userEvent.click(sortButton);
                 const percentageOption = screen.getByText("Percentage");
                 await userEvent.click(percentageOption);
+                await userEvent.click(screen.getByRole("button", { name: "Close bottom sheet" }));
 
-                await closeBottomDialog(screen);
-
-                const guestItems = screen.getByRole("listitem");
+                const guestItems = screen.getByLabelText("Guest name");
 
                 // Jane Smith should be first (100% arrival - 1/1)
                 // John Doe should be second (50% arrival - 1/2)
@@ -395,7 +383,7 @@ describe("PageAdminGuests.vue", () => {
                     } as GuestDoc,
                 ];
 
-                const screen = await render();
+                const screen = render();
 
                 // Change to percentage sort
                 const sortButton = screen.getByLabelText("filter guests");
@@ -403,10 +391,9 @@ describe("PageAdminGuests.vue", () => {
                 const percentageOption = screen.getByText("Percentage");
                 await userEvent.click(percentageOption);
 
-                const guestItems = screen.getByRole("listitem");
+                await userEvent.click(screen.getByRole("button", { name: "Close bottom sheet" }));
 
-                await closeBottomDialog(screen);
-
+                const guestItems = screen.getByLabelText("Guest name");
                 // Both have 100% arrival rate
                 // John Doe should be first (100% with 2 visits)
                 // Jane Smith should be second (100% with 1 visit)
@@ -449,7 +436,7 @@ describe("PageAdminGuests.vue", () => {
                     } as GuestDoc,
                 ];
 
-                const screen = await render();
+                const screen = render();
 
                 // Change to percentage sort
                 const sortButton = screen.getByLabelText("filter guests");
@@ -457,9 +444,9 @@ describe("PageAdminGuests.vue", () => {
                 const percentageOption = screen.getByText("Percentage");
                 await userEvent.click(percentageOption);
 
-                await closeBottomDialog(screen);
+                await userEvent.click(screen.getByRole("button", { name: "Close bottom sheet" }));
 
-                const guestItems = screen.getByRole("listitem");
+                const guestItems = screen.getByLabelText("Guest name");
 
                 // John Doe should be first (has visits)
                 // Jane and Alice (no visits) should be after, in their original order
@@ -476,20 +463,20 @@ describe("PageAdminGuests.vue", () => {
                     tags: index === 0 ? ["vip", "regular"] : index === 1 ? ["vip"] : ["regular"],
                 }));
 
-                let screen = await render();
+                let screen = render();
                 const sortButton = screen.getByLabelText("filter guests");
                 await userEvent.click(sortButton);
-                await userEvent.click(screen.getByLabelText("Filter by tags"));
+                await userEvent.click(screen.getByLabelText("Filter by tags"), { force: true });
                 // Select VIP tag
                 await userEvent.click(screen.getByText("vip"));
 
-                await closeBottomDialog(screen);
+                await userEvent.click(screen.getByRole("button", { name: "Close bottom sheet" }));
 
                 screen.unmount();
-                screen = await render();
+                screen = render();
 
-                const guestItems = screen.getByRole("listitem");
-                expect(guestItems.all()).toHaveLength(2);
+                const guestItems = screen.getByLabelText("Guest name");
+                await expect.poll(() => guestItems.all()).toHaveLength(2);
 
                 // Should only show guests with VIP tag
                 await expect.element(guestItems.first()).toHaveTextContent("John Doe");
@@ -503,16 +490,16 @@ describe("PageAdminGuests.vue", () => {
                     tags: index === 0 ? ["vip", "regular"] : index === 1 ? ["vip"] : ["regular"],
                 }));
 
-                const screen = await render();
+                const screen = render();
                 const sortButton = screen.getByLabelText("filter guests");
                 await userEvent.click(sortButton);
-                await userEvent.click(screen.getByLabelText("Filter by tags"));
+                await userEvent.click(screen.getByLabelText("Filter by tags"), { force: true });
                 await userEvent.click(screen.getByText("vip"));
                 await userEvent.click(screen.getByText("regular"));
 
-                await closeBottomDialog(screen);
+                await userEvent.click(screen.getByRole("button", { name: "Close bottom sheet" }));
 
-                const guestItems = screen.getByRole("listitem");
+                const guestItems = screen.getByLabelText("Guest name");
                 expect(guestItems.all()).toHaveLength(1);
 
                 // Should only show guest with both VIP and Regular tags
@@ -558,16 +545,16 @@ describe("PageAdminGuests.vue", () => {
                     } as GuestDoc,
                 ];
 
-                const screen = await render();
+                const screen = render();
 
                 // Switch to lastModified sort
                 const sortButton = screen.getByLabelText("filter guests");
                 await userEvent.click(sortButton);
                 await userEvent.click(screen.getByText("Last Modified"));
 
-                await closeBottomDialog(screen);
+                await userEvent.click(screen.getByRole("button", { name: "Close bottom sheet" }));
 
-                const guestItems = screen.getByRole("listitem");
+                const guestItems = screen.getByLabelText("Guest name");
 
                 // Should be sorted by lastModified (most recent first)
                 await expect.element(guestItems.first()).toHaveTextContent("Jane Smith");
@@ -607,16 +594,16 @@ describe("PageAdminGuests.vue", () => {
                     } as GuestDoc,
                 ];
 
-                const screen = await render();
+                const screen = render();
 
                 // Switch to lastModified sort
                 const sortButton = screen.getByLabelText("filter guests");
                 await userEvent.click(sortButton);
                 await userEvent.click(screen.getByText("Last Modified"));
 
-                await closeBottomDialog(screen);
+                await userEvent.click(screen.getByRole("button", { name: "Close bottom sheet" }));
 
-                const guestItems = screen.getByRole("listitem");
+                const guestItems = screen.getByLabelText("Guest name");
 
                 // Should be sorted with undefined lastModified at the end
                 await expect.element(guestItems.first()).toHaveTextContent("John Doe");
@@ -641,7 +628,7 @@ describe("PageAdminGuests.vue", () => {
                     } as GuestDoc,
                 ];
 
-                const screen = await render();
+                const screen = render();
 
                 const sortButton = screen.getByLabelText("filter guests");
                 await userEvent.click(sortButton);
@@ -650,10 +637,10 @@ describe("PageAdminGuests.vue", () => {
                 await userEvent.click(screen.getByText("Descending"));
                 await userEvent.click(screen.getByText("Last Modified"));
 
-                await closeBottomDialog(screen);
+                await userEvent.click(screen.getByRole("button", { name: "Close bottom sheet" }));
 
                 // Should maintain ascending order with lastModified sort
-                const guestItems = screen.getByRole("listitem");
+                const guestItems = screen.getByLabelText("Guest name");
                 // older timestamp
                 await expect.element(guestItems.first()).toHaveTextContent("Jane Smith");
                 // newer timestamp
@@ -700,19 +687,21 @@ describe("PageAdminGuests.vue", () => {
                     },
                 ];
 
-                const screen = await render();
+                const screen = render();
 
                 // Open sort menu
                 const sortButton = screen.getByRole("button", { name: "filter guests" });
                 await userEvent.click(sortButton);
 
                 // Toggle to ascending
-                const directionButton = screen.getByText("Descending");
-                await userEvent.click(directionButton);
+                const directionButton = screen.getByText("Descending", {
+                    exact: true,
+                });
+                await userEvent.click(directionButton, { force: true });
 
-                await closeBottomDialog(screen);
+                await userEvent.click(screen.getByRole("button", { name: "Close bottom sheet" }));
 
-                let guestItems = screen.getByRole("listitem");
+                let guestItems = screen.getByLabelText("Guest name");
 
                 // In ascending order, Jane (1 visit) should be first
                 await expect.element(guestItems.first()).toHaveTextContent("Jane Smith");
@@ -721,11 +710,11 @@ describe("PageAdminGuests.vue", () => {
                 await userEvent.click(sortButton);
 
                 // Toggle back to descending
-                await userEvent.click(screen.getByText("Ascending"));
+                await userEvent.click(screen.getByRole("listbox").getByText("Ascending"));
 
-                await closeBottomDialog(screen);
+                await userEvent.click(screen.getByRole("button", { name: "Close bottom sheet" }));
 
-                guestItems = screen.getByRole("listitem");
+                guestItems = screen.getByLabelText("Guest name");
 
                 // Back in descending order, John (2 visits) should be first
                 await expect.element(guestItems.first()).toHaveTextContent("John Doe");
@@ -772,10 +761,10 @@ describe("PageAdminGuests.vue", () => {
                     } as GuestDoc,
                 ];
 
-                const screen = await render();
+                const screen = render();
 
                 // Default state: descending order, sort by bookings
-                let guestItems = screen.getByRole("listitem");
+                const guestItems = screen.getByLabelText("Guest name");
 
                 // Verify descending order by bookings
                 // John should be first (2 bookings)
@@ -788,9 +777,7 @@ describe("PageAdminGuests.vue", () => {
                 await userEvent.click(sortButton);
                 await userEvent.click(screen.getByText("Percentage"));
 
-                await closeBottomDialog(screen);
-
-                guestItems = screen.getByRole("listitem");
+                await userEvent.click(screen.getByRole("button", { name: "Close bottom sheet" }));
 
                 // Verify descending order by percentage
                 // Jane should be first (100% arrival rate)
@@ -829,16 +816,16 @@ describe("PageAdminGuests.vue", () => {
                     } as GuestDoc,
                 ];
 
-                const screen = await render();
+                const screen = render();
 
                 // Change to name sort
                 const sortButton = screen.getByLabelText("filter guests");
                 await userEvent.click(sortButton);
                 await userEvent.click(screen.getByText("Name", { exact: true }));
 
-                await closeBottomDialog(screen);
+                await userEvent.click(screen.getByRole("button", { name: "Close bottom sheet" }));
 
-                const guestItems = screen.getByRole("listitem");
+                const guestItems = screen.getByLabelText("Guest name");
 
                 // Should be sorted by name in descending order by default
                 await expect.element(guestItems.first()).toHaveTextContent("Charlie Brown");
@@ -848,9 +835,9 @@ describe("PageAdminGuests.vue", () => {
                 await userEvent.click(sortButton);
 
                 // Toggle to ascending order
-                await userEvent.click(screen.getByText("Descending"));
+                await userEvent.click(screen.getByRole("listbox").getByText("Descending"));
 
-                await closeBottomDialog(screen);
+                await userEvent.click(screen.getByRole("button", { name: "Close bottom sheet" }));
 
                 // Should now be in ascending order
                 await expect.element(guestItems.first()).toHaveTextContent("Alice Smith");
@@ -888,22 +875,24 @@ describe("PageAdminGuests.vue", () => {
                     } as GuestDoc,
                 ];
 
-                const screen = await render();
+                const screen = render();
 
                 // Set name sort
                 const sortButton = screen.getByLabelText("filter guests");
                 await userEvent.click(sortButton);
                 await userEvent.click(screen.getByText("Name", { exact: true }));
                 // Switch to ascending
-                await userEvent.click(screen.getByText("Descending"));
+                await userEvent.click(screen.getByRole("listbox").getByText("Descending"), {
+                    force: true,
+                });
 
                 // Apply VIP tag filter
-                await userEvent.click(screen.getByLabelText("Filter by tags"));
+                await userEvent.click(screen.getByLabelText("Filter by tags"), { force: true });
                 await userEvent.click(screen.getByText("vip"));
 
-                await closeBottomDialog(screen);
+                await userEvent.click(screen.getByRole("button", { name: "Close bottom sheet" }));
 
-                const guestItems = screen.getByRole("listitem");
+                const guestItems = screen.getByLabelText("Guest name");
 
                 // Should show only VIP guests, still sorted by name
                 expect(guestItems.all()).toHaveLength(2);
@@ -941,16 +930,16 @@ describe("PageAdminGuests.vue", () => {
                     } as GuestDoc,
                 ];
 
-                const screen = await render();
+                const screen = render();
 
                 // Change to land sort
                 const sortButton = screen.getByLabelText("filter guests");
                 await userEvent.click(sortButton);
                 await userEvent.click(screen.getByText("Land"));
 
-                await closeBottomDialog(screen);
+                await userEvent.click(screen.getByRole("button", { name: "Close bottom sheet" }));
 
-                const guestItems = screen.getByRole("listitem");
+                const guestItems = screen.getByLabelText("Guest name");
 
                 // Should be sorted by landcode in ascending order by default
                 await expect.element(guestItems.first()).toHaveTextContent("John Doe");
@@ -959,9 +948,9 @@ describe("PageAdminGuests.vue", () => {
 
                 // Toggle to ascending order
                 await userEvent.click(sortButton);
-                await userEvent.click(screen.getByText("Descending"));
+                await userEvent.click(screen.getByRole("listbox").getByText("Descending"));
 
-                await closeBottomDialog(screen);
+                await userEvent.click(screen.getByRole("button", { name: "Close bottom sheet" }));
 
                 // Should now be in ascending order
                 // +1 (US), +33 (France), +44 (UK)
@@ -982,54 +971,54 @@ describe("PageAdminGuests.vue", () => {
         });
 
         it("filters guests by name based on search input", async () => {
-            const screen = await render();
+            const screen = render();
 
-            const searchInput = screen.getByLabelText("Search by name or contact");
+            const searchInput = screen.getByRole("textbox", { name: "Search by name or contact" });
             await userEvent.type(searchInput, "Jane");
             // Debounced search
             await vi.advanceTimersByTimeAsync(301);
 
             // Only Jane Smith should be visible
-            const guestItems = screen.getByRole("listitem");
+            const guestItems = screen.getByLabelText("Guest name");
             expect(guestItems.all()).toHaveLength(1);
             await expect.element(guestItems.last()).toHaveTextContent("Jane Smith");
         });
 
         it("filters guests by contact based on search input", async () => {
-            const screen = await render();
+            const screen = render();
 
-            const searchInput = screen.getByLabelText("Search by name or contact");
+            const searchInput = screen.getByRole("textbox", { name: "Search by name or contact" });
             await userEvent.type(searchInput, "alice@example.com");
             await vi.advanceTimersByTimeAsync(301);
 
             // Only Alice Johnson should be visible
-            const guestItems = screen.getByRole("listitem");
+            const guestItems = screen.getByLabelText("Guest name");
             expect(guestItems.all()).toHaveLength(1);
             await expect.element(guestItems.last()).toHaveTextContent("Alice Johnson");
         });
 
         it("is case-insensitive when filtering guests", async () => {
-            const screen = await render();
+            const screen = render();
 
-            const searchInput = screen.getByLabelText("Search by name or contact");
+            const searchInput = screen.getByRole("textbox", { name: "Search by name or contact" });
             await userEvent.type(searchInput, "jOhN d");
             await vi.advanceTimersByTimeAsync(301);
 
             // Only John Doe should be visible
-            const guestItems = screen.getByRole("listitem");
+            const guestItems = screen.getByLabelText("Guest name");
             expect(guestItems.all()).toHaveLength(1);
             await expect.element(guestItems.last()).toHaveTextContent("John Doe");
         });
 
         it("shows multiple guests when search matches multiple entries", async () => {
-            const screen = await render();
+            const screen = render();
 
-            const searchInput = screen.getByLabelText("Search by name or contact");
+            const searchInput = screen.getByRole("textbox", { name: "Search by name or contact" });
             await userEvent.type(searchInput, "example.com");
             await vi.advanceTimersByTimeAsync(301);
 
             // All guests should be visible since all have contacts ending with example.com
-            const guestItems = screen.getByRole("listitem");
+            const guestItems = screen.getByLabelText("Guest name");
             expect(guestItems.all()).toHaveLength(3);
             await expect.element(guestItems.first()).toHaveTextContent("John Doe");
             await expect.element(guestItems.nth(1)).toHaveTextContent("Jane Smith");
@@ -1037,9 +1026,9 @@ describe("PageAdminGuests.vue", () => {
         });
 
         it("shows 'No guests data' when search yields no results", async () => {
-            const screen = await render();
+            const screen = render();
 
-            const searchInput = screen.getByLabelText("Search by name or contact");
+            const searchInput = screen.getByRole("textbox", { name: "Search by name or contact" });
             await userEvent.type(searchInput, "NonExistentGuest");
             await vi.advanceTimersByTimeAsync(301);
 
@@ -1050,14 +1039,14 @@ describe("PageAdminGuests.vue", () => {
         });
 
         it("clears search input and shows all guests", async () => {
-            const screen = await render();
+            const screen = render();
 
-            const searchInput = screen.getByLabelText("Search by name or contact");
+            const searchInput = screen.getByRole("textbox", { name: "Search by name or contact" });
             await userEvent.type(searchInput, "Jane");
             await vi.advanceTimersByTimeAsync(301);
 
             // Only Jane Smith should be visible
-            let guestItems = screen.getByRole("listitem");
+            let guestItems = screen.getByLabelText("Guest name");
             expect(guestItems.all()).toHaveLength(1);
             await expect.element(guestItems.last()).toHaveTextContent("Jane Smith");
 
@@ -1067,7 +1056,7 @@ describe("PageAdminGuests.vue", () => {
             await vi.advanceTimersByTimeAsync(301);
 
             // All guests should be visible again
-            guestItems = screen.getByRole("listitem");
+            guestItems = screen.getByLabelText("Guest name");
             expect(guestItems.all()).toHaveLength(3);
         });
     });
@@ -1075,10 +1064,10 @@ describe("PageAdminGuests.vue", () => {
     it("does not render search and filter controls when there are no guests", async () => {
         guestsRef.value.data = [];
 
-        const screen = await render();
+        const screen = render();
 
         await expect
-            .element(screen.getByLabelText("Search by name or contact"))
+            .element(screen.getByRole("textbox", { name: "Search by name or contact" }))
             .not.toBeInTheDocument();
         await expect.element(screen.getByLabelText("Sort Guests")).not.toBeInTheDocument();
     });
@@ -1125,7 +1114,7 @@ describe("PageAdminGuests.vue", () => {
                 } as GuestDoc,
             ];
 
-            const screen = await render();
+            const screen = render();
 
             await expect.element(screen.getByText("John Doe")).toBeVisible();
             await expect.element(screen.getByText("Jane Smith")).toBeVisible();
@@ -1185,12 +1174,12 @@ describe("PageAdminGuests.vue", () => {
                 } as GuestDoc,
             ];
 
-            const screen = await render();
+            const screen = render();
 
             // Check that John Doe is visible
             await expect.element(screen.getByText("John Doe")).toBeVisible();
             // Ensure that only property1 summary is displayed for John Doe
-            expect(screen.getByText("Property One").all()).toHaveLength(2);
+            await expect.poll(() => screen.getByText("Property One").all()).toHaveLength(2);
             await expect.element(screen.getByText("Property Two:")).not.toBeInTheDocument();
 
             // Check that Jane Smith is visible
@@ -1249,7 +1238,7 @@ describe("PageAdminGuests.vue", () => {
                 } as GuestDoc,
             ];
 
-            const screen = await render();
+            const screen = render();
 
             await expect.element(screen.getByText("John Doe")).not.toBeInTheDocument();
             await expect.element(screen.getByText("Jane Smith")).not.toBeInTheDocument();
@@ -1331,19 +1320,19 @@ describe("PageAdminGuests.vue", () => {
 
         it("persists and loads sort option changes", async () => {
             // First render - change sort option
-            let screen = await render();
+            let screen = render();
             const sortButton = screen.getByLabelText("filter guests");
             await userEvent.click(sortButton);
             await userEvent.click(screen.getByText("Percentage"));
 
-            await closeBottomDialog(screen);
+            await userEvent.click(screen.getByRole("button", { name: "Close bottom sheet" }));
 
             // Unmount and remount component
             screen.unmount();
-            screen = await render();
+            screen = render();
 
-            const guestItems = screen.getByRole("listitem");
-            expect(guestItems.all()).toHaveLength(3);
+            const guestItems = screen.getByLabelText("Guest name");
+            await expect.poll(() => guestItems.all()).toHaveLength(3);
 
             // Should be sorted by percentage in descending order:
             // Bob: 100% (3/3 visits)
@@ -1356,23 +1345,23 @@ describe("PageAdminGuests.vue", () => {
 
         it("persists and loads sort direction changes", async () => {
             // First render - change sort direction
-            let screen = await render();
+            let screen = render();
             const sortButton = screen.getByLabelText("filter guests");
             await userEvent.click(sortButton);
             await userEvent.click(screen.getByText("Descending"));
 
-            await closeBottomDialog(screen);
+            await userEvent.click(screen.getByRole("button", { name: "Close bottom sheet" }));
 
             // Unmount and remount component
             screen.unmount();
-            screen = await render();
+            screen = render();
 
             // Verify persisted sort direction
             await userEvent.click(screen.getByLabelText("filter guests"));
             await expect.element(screen.getByText("Ascending")).toBeInTheDocument();
-            await closeBottomDialog(screen);
+            await userEvent.click(screen.getByRole("button", { name: "Close bottom sheet" }));
 
-            const guestItems = screen.getByRole("listitem");
+            const guestItems = screen.getByLabelText("Guest name");
             expect(guestItems.all()).toHaveLength(3);
 
             // Should be sorted by bookings in ascending order:
@@ -1386,7 +1375,7 @@ describe("PageAdminGuests.vue", () => {
 
         it("maintains filter state across multiple changes", async () => {
             // First render - set multiple filters
-            let screen = await render();
+            let screen = render();
 
             // Change sort to lastModified
             const sortButton = screen.getByLabelText("filter guests");
@@ -1395,14 +1384,14 @@ describe("PageAdminGuests.vue", () => {
             // Change direction to ascending
             await userEvent.click(screen.getByText("Descending"));
 
-            await closeBottomDialog(screen);
+            await userEvent.click(screen.getByRole("button", { name: "Close bottom sheet" }));
 
             // Unmount and remount component
             screen.unmount();
-            screen = await render();
+            screen = render();
 
-            const guestItems = screen.getByRole("listitem");
-            expect(guestItems.all()).toHaveLength(3);
+            const guestItems = screen.getByLabelText("Guest name");
+            await expect.poll(() => guestItems.all()).toHaveLength(3);
 
             // Should be sorted by lastModified in ascending order:
             // Bob (oldest)

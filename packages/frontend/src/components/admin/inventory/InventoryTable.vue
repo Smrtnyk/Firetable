@@ -1,70 +1,77 @@
 <template>
     <div>
-        <q-table
-            flat
-            :title="props.title"
-            :rows="props.rows"
-            :columns="columns"
-            row-key="id"
-            :filter="localFilter"
-            :rows-per-page-options="[0]"
-            hide-pagination
-            wrap-cells
-            :dense="isMobile"
-            v-model:selected="selected"
-            selection="multiple"
+        <v-data-table
+            :headers="headers"
+            :items="props.rows"
+            item-value="id"
+            :search="localFilter"
+            :items-per-page="-1"
+            hide-default-footer
+            :density="isMobile ? 'compact' : 'default'"
+            v-model="selected"
+            show-select
             class="ft-card"
+            elevation="0"
         >
-            <template #top-right>
-                <div class="row items-center justify-between q-gutter-xs">
-                    <div v-if="hasSelection">
-                        <FTBtn color="negative" icon="fa fa-trash" @click="handleBulkDelete" />
+            <template #top>
+                <v-toolbar flat dense class="mb-2">
+                    <v-toolbar-title>{{ props.title }}</v-toolbar-title>
+                    <v-spacer />
+                    <div class="d-flex align-center ga-2" style="min-width: 300px">
+                        <FTBtn
+                            v-if="hasSelection"
+                            color="negative"
+                            icon="fa fa-trash"
+                            @click="handleBulkDelete"
+                        />
+                        <v-text-field
+                            v-model="localFilter"
+                            clearable
+                            clear-icon="fas fa-times"
+                            placeholder="Search"
+                            density="compact"
+                            variant="outlined"
+                            hide-details
+                            append-inner-icon="fas fa-search"
+                            class="flex-grow-1"
+                        />
                     </div>
-
-                    <q-input
-                        clear-icon="fa fa-close"
-                        outlined
-                        v-model="localFilter"
-                        clearable
-                        placeholder="Search"
-                        class="col-grow"
-                        dense
-                    >
-                        <template #append>
-                            <q-icon name="fa fa-search" />
-                        </template>
-                    </q-input>
-                </div>
+                </v-toolbar>
             </template>
 
-            <template #body-cell-actions="{ row }">
-                <q-td align="right">
+            <template #item.volume="{ item }">
+                {{ item.volume ? `${item.volume}ml` : "-" }}
+            </template>
+
+            <template #item.actions="{ item }">
+                <div class="text-end">
                     <FTBtn
-                        flat
                         round
                         icon="fa fa-pencil"
-                        @click="emit('edit-item', row)"
-                        :alt="`Edit ${row.name}`"
+                        @click="emit('edit-item', item)"
+                        :alt="`Edit ${item.name}`"
                     />
                     <FTBtn
-                        flat
                         round
                         icon="fa fa-copy"
                         color="primary"
-                        @click="emit('copy-item', row)"
-                        :alt="`Copy ${row.name}`"
+                        @click="emit('copy-item', item)"
+                        :alt="`Copy ${item.name}`"
                     />
                     <FTBtn
-                        flat
                         round
                         icon="fa fa-trash"
                         color="negative"
-                        @click="emit('delete-item', row)"
-                        :alt="`Delete ${row.name}`"
+                        @click="emit('delete-item', item)"
+                        :alt="`Delete ${item.name}`"
                     />
-                </q-td>
+                </div>
             </template>
-        </q-table>
+
+            <template #no-data>
+                <div class="text-center py-4">No data available.</div>
+            </template>
+        </v-data-table>
     </div>
 </template>
 
@@ -72,7 +79,7 @@
 import type { InventoryItemDoc } from "@firetable/types";
 
 import FTBtn from "src/components/FTBtn.vue";
-import { isMobile } from "src/global-reactives/screen-detection";
+import { useScreenDetection } from "src/global-reactives/screen-detection";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -87,45 +94,53 @@ const emit = defineEmits<{
     (e: "bulk-delete", items: InventoryItemDoc[]): void;
 }>();
 
+const { isMobile } = useScreenDetection();
+
 const { t } = useI18n();
 const localFilter = ref("");
 const selected = ref<InventoryItemDoc[]>([]);
 
 const hasSelection = computed(() => selected.value.length > 0);
 
-const columns = [
+const headers = computed(() => [
+    { align: "start" as const, key: "name", sortable: true, title: t("Global.name") },
     {
-        field: "selection",
-        label: "",
-        name: "selection",
+        align: "start" as const,
+        key: "mainCategory",
+        sortable: true,
+        title: t("InventoryTable.mainCategory"),
+    },
+    {
+        align: "start" as const,
+        key: "subCategory",
+        sortable: true,
+        title: t("InventoryTable.subCategory"),
+    },
+    {
+        align: "start" as const,
+        key: "quantity",
+        sortable: true,
+        title: t("InventoryTable.quantity"),
+    },
+    {
+        align: "start" as const,
+        key: "volume",
+        sortable: true,
+        title: t("InventoryTable.volume"),
+    },
+    {
+        align: "start" as const,
+        key: "supplier",
+        sortable: true,
+        title: t("InventoryTable.supplier"),
+    },
+    {
+        align: "end" as const,
+        key: "actions",
         sortable: false,
+        title: t("Global.actions"),
     },
-    { field: "name", label: t("Global.name"), name: "name", sortable: true },
-    {
-        field: "mainCategory",
-        label: t("InventoryTable.mainCategory"),
-        name: "mainCategory",
-        sortable: true,
-    },
-    {
-        field: "subCategory",
-        label: t("InventoryTable.subCategory"),
-        name: "subCategory",
-        sortable: true,
-    },
-    { field: "quantity", label: t("InventoryTable.quantity"), name: "quantity", sortable: true },
-    {
-        field: "volume",
-        format(val: number) {
-            return val ? `${val}ml` : "-";
-        },
-        label: t("InventoryTable.volume"),
-        name: "volume",
-        sortable: true,
-    },
-    { field: "supplier", label: t("InventoryTable.supplier"), name: "supplier", sortable: true },
-    { field: "actions", label: t("Global.actions"), name: "actions" },
-];
+]);
 
 function handleBulkDelete(): void {
     emit("bulk-delete", selected.value);

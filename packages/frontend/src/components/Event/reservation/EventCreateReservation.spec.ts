@@ -241,9 +241,8 @@ describe("EventCreateReservation", () => {
 
         it("sets initial time to current hour when event is in progress", async () => {
             const now = Date.now();
-            const oneHourAgo = now - ONE_HOUR;
             // Event started an hour ago
-            props.eventStartTimestamp = oneHourAgo;
+            props.eventStartTimestamp = now - ONE_HOUR;
 
             const screen = renderComponent(EventCreateReservation, props);
 
@@ -271,7 +270,7 @@ describe("EventCreateReservation", () => {
             await expect.element(timeInput).toHaveValue(generateInitialState().time);
 
             // Simulate clicking the clock icon to open the time picker
-            const clockIcon = document.querySelector(".q-icon");
+            const clockIcon = document.querySelector(".v-icon");
             await userEvent.click(clockIcon!);
 
             const newTime = addHours(eventStartTimestamp, 2);
@@ -285,8 +284,9 @@ describe("EventCreateReservation", () => {
             const timeOption = screen.getByText(formattedNewTime, { exact: true });
             await userEvent.click(timeOption.first());
 
-            const closeBtn = screen.getByRole("button", { name: "Close" });
-            await userEvent.click(closeBtn);
+            await userEvent.tab();
+            await userEvent.tab();
+            await userEvent.tab();
 
             await expect.element(timeInput).toHaveValue(format(newTime, "HH:mm"));
         });
@@ -346,7 +346,6 @@ describe("EventCreateReservation", () => {
             };
         });
 
-        // Helper function to generate initial state for "create" mode
         function generateInitialPlannedState(): Omit<PlannedReservation, "creator"> {
             return {
                 arrived: false,
@@ -368,7 +367,6 @@ describe("EventCreateReservation", () => {
             };
         }
 
-        // Helper function to generate initial state for "update" mode
         function generateUpdatePlannedState(): Omit<PlannedReservation, "creator"> {
             return {
                 arrived: false,
@@ -397,19 +395,16 @@ describe("EventCreateReservation", () => {
         it("renders the form with initial values in 'create' mode", async () => {
             const screen = renderComponent(EventCreateReservation, plannedProps);
 
-            // Check that guest name input is empty
             const guestNameInput = screen.getByLabelText(
                 t("EventCreateReservation.reservationGuestName"),
             );
             await expect.element(guestNameInput).toHaveValue("");
 
-            // Check that time input has the correct initial value
             const timeInput = screen.getByLabelText(t("EventCreateReservation.reservationTime"), {
                 exact: true,
             });
             await expect.element(timeInput).toHaveValue(generateInitialPlannedState().time);
 
-            // Check that number of guests input has default value
             const numberOfGuestsInput = screen.getByLabelText(
                 t("EventCreateReservation.reservationNumberOfGuests"),
             );
@@ -417,7 +412,6 @@ describe("EventCreateReservation", () => {
                 .element(numberOfGuestsInput)
                 .toHaveValue(generateInitialPlannedState().numberOfGuests);
 
-            // Check that consumption input has default value
             const consumptionInput = screen.getByLabelText(
                 t("EventCreateReservation.reservationConsumption"),
             );
@@ -425,28 +419,24 @@ describe("EventCreateReservation", () => {
                 .element(consumptionInput)
                 .toHaveValue(generateInitialPlannedState().consumption);
 
-            // Check that guest contact input is empty
             const guestContactInput = screen.getByLabelText("Phone Number");
             await expect.element(guestContactInput).toHaveValue("");
 
-            // Check that reservation note input is empty
             const reservationNoteInput = screen.getByLabelText(
                 t("EventCreateReservation.reservationNote"),
             );
             await expect.element(reservationNoteInput).toHaveValue("");
 
-            // Check that isVIP checkbox is unchecked
             const isVIPCheckbox = screen.getByLabelText(t("EventCreateReservation.reservationVIP"));
             await expect.element(isVIPCheckbox).not.toBeChecked();
 
-            // Check that selectionType is defaulted to "user"
             const userRadio = screen.getByRole("radio", { name: "Staff" });
             const socialRadio = screen.getByRole("radio", { name: "Social" });
             await expect.element(userRadio).toBeChecked();
             await expect.element(socialRadio).not.toBeChecked();
 
             // Check that reservedBy select has the first user selected
-            const reservedBySelect = screen.getByRole("combobox", {
+            const reservedBySelect = screen.getByRole("textbox", {
                 name: t("EventCreateReservation.reservedByLabel"),
             });
             await expect.element(reservedBySelect).toHaveValue("");
@@ -520,12 +510,12 @@ describe("EventCreateReservation", () => {
             await expect.element(socialRadio).not.toBeChecked();
 
             // Check that reservedBy select has the correct user selected
-            const reservedBySelect = screen.getByRole("combobox", {
+            const reservedBySelect = screen.getByRole("textbox", {
                 name: t("EventCreateReservation.reservedByLabel"),
             });
             await expect
                 .element(reservedBySelect)
-                .toHaveValue(plannedProps.reservationData?.reservedBy?.name);
+                .toHaveValue(plannedProps.reservationData?.reservedBy?.email);
         });
 
         it("shows reset button only in update mode and resets form values", async () => {
@@ -603,14 +593,13 @@ describe("EventCreateReservation", () => {
             const userRadio = screen.getByRole("radio", { name: "Staff" });
             await userEvent.click(userRadio);
 
-            const reservedBySelect = screen.getByRole("combobox", {
+            const reservedBySelect = screen.getByRole("textbox", {
                 name: t("EventCreateReservation.reservedByLabel"),
             });
-            await userEvent.click(reservedBySelect);
+            await userEvent.click(reservedBySelect, { force: true });
             const firstUserOption = screen.getByText(plannedProps.users[0].name);
             await userEvent.click(firstUserOption);
 
-            // Submit the form
             const okBtn = screen.getByRole("button", { name: t("Global.submit") });
             await userEvent.click(okBtn);
 
@@ -627,7 +616,6 @@ describe("EventCreateReservation", () => {
         it("allows user to select reservedBy as 'Social' and emits the correct payload", async () => {
             const screen = renderComponent(EventCreateReservation, plannedProps);
 
-            // Fill in guest name
             const guestNameInput = screen.getByLabelText(
                 t("EventCreateReservation.reservationGuestName"),
             );
@@ -635,13 +623,11 @@ describe("EventCreateReservation", () => {
 
             // Select reservedBy as 'Social'
             const socialRadio = screen.getByRole("radio", { name: "Social" });
-            await userEvent.click(socialRadio);
+            await userEvent.click(socialRadio, { force: true });
 
-            // Submit the form
             const okBtn = screen.getByRole("button", { name: t("Global.submit") });
             await userEvent.click(okBtn);
 
-            // Check that the 'create' event is emitted with correct payload
             const emitted = screen.emitted().create as PlannedReservation[][];
             expect(emitted).toBeTruthy();
             const emittedPayload = emitted[0][0];
@@ -674,22 +660,19 @@ describe("EventCreateReservation", () => {
             await userEvent.type(guestNameInput, "Charlie Updated");
 
             const socialRadioBtn = screen.getByRole("radio", { name: "Social" });
-            await userEvent.click(socialRadioBtn);
+            await userEvent.click(socialRadioBtn, { force: true });
 
             // Change reservedBy to another user
-            const reservedBySelect = screen.getByRole("combobox", {
+            const reservedBySelect = screen.getByRole("textbox", {
                 name: t("EventCreateReservation.reservedBySocialLabel"),
             });
-            await userEvent.click(reservedBySelect);
-            // Selecting 'SMS'
+            await userEvent.click(reservedBySelect, { force: true });
             const smsOption = screen.getByText("SMS");
             await userEvent.click(smsOption);
 
-            // Submit the form
             const okBtn = screen.getByRole("button", { name: t("Global.submit") });
             await userEvent.click(okBtn);
 
-            // Check that the 'update' event is emitted with correct payload
             const emitted = screen.emitted().update as PlannedReservation[][];
             expect(emitted).toBeTruthy();
             const emittedPayload = emitted[0][0];

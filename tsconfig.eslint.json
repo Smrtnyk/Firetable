@@ -27,6 +27,7 @@
     },
     "include": [
         "packages/*/vitest.config.ts",
+        "packages/*/vite.config.ts",
         "eslint.config.js",
         "**/esbuild-bundle.js",
         "packages/*/src",
@@ -34,7 +35,6 @@
         "packages/*/seeds",
         "packages/*/test-helpers",
         "packages/frontend/src-pwa",
-        "packages/frontend/quasar.config.ts",
         "packages/frontend/tools/check-translations.ts",
     ],
     "exclude": [

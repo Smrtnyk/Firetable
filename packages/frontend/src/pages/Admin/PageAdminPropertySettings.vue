@@ -2,11 +2,10 @@
 import { cloneDeep } from "es-toolkit";
 import SettingsSection from "src/components/admin/organisation-settings/SettingsSection.vue";
 import AppCardSection from "src/components/AppCardSection.vue";
-import FTBottomDialog from "src/components/FTBottomDialog.vue";
 import FTBtn from "src/components/FTBtn.vue";
 import FTTimezoneList from "src/components/FTTimezoneList.vue";
 import FTTitle from "src/components/FTTitle.vue";
-import { useDialog } from "src/composables/useDialog";
+import { globalBottomSheet } from "src/composables/useBottomSheet";
 import { useHasChanged } from "src/composables/useHasChanged";
 import { updatePropertySettings } from "src/db";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
@@ -43,7 +42,6 @@ const colorsSettings = [
 
 const props = defineProps<PageAdminPropertySettingsProps>();
 const propertiesStore = usePropertiesStore();
-const { createDialog } = useDialog();
 
 const property = computed(() => propertiesStore.getPropertyById(props.propertyId));
 
@@ -60,16 +58,10 @@ const { hasChanged, reset: resetPropertiesChangedTracking } = useHasChanged(
 const aspectRatioOptions = ["1", "16:9"];
 
 function openTimezoneSelector(): void {
-    const dialog = createDialog({
-        component: FTBottomDialog,
-        componentProps: {
-            component: FTTimezoneList,
-            listeners: {
-                timezoneSelected(timezone: string) {
-                    dialog.hide();
-                    editableSettings.value.timezone = timezone;
-                },
-            },
+    const dialog = globalBottomSheet.openBottomSheet(FTTimezoneList, {
+        onTimezoneSelected(timezone: string) {
+            dialog.hide();
+            editableSettings.value.timezone = timezone;
         },
     });
 }
@@ -103,14 +95,14 @@ async function synchroniseNewPropertySettings(propertyId: string): Promise<void>
         <FTTitle title="Settings">
             <template #right>
                 <FTBtn
-                    rounded
-                    class="button-gradient q-mr-sm"
-                    :disable="!hasChanged"
+                    variant="tonal"
+                    class="button-gradient mr-2"
+                    :disabled="!hasChanged"
                     @click="saveSettings"
                 >
                     Save
                 </FTBtn>
-                <FTBtn rounded class="button-gradient" :disable="!hasChanged" @click="reset">
+                <FTBtn variant="tonal" color="primary" :disabled="!hasChanged" @click="reset">
                     Reset
                 </FTBtn>
             </template>
@@ -118,36 +110,38 @@ async function synchroniseNewPropertySettings(propertyId: string): Promise<void>
 
         <AppCardSection title="Event">
             <SettingsSection title="Default event start time">
-                <q-input
-                    :model-value="editableSettings.event.eventStartTime24HFormat"
-                    rounded
-                    outlined
-                >
-                    <template #append>
-                        <q-icon name="fa fa-clock" class="cursor-pointer" />
-                        <q-popup-proxy transition-show="scale" transition-hide="scale">
-                            <q-time
-                                v-model="editableSettings.event.eventStartTime24HFormat"
-                                format="24h"
-                            />
-                        </q-popup-proxy>
+                <v-menu :close-on-content-click="false">
+                    <template #activator="{ props }">
+                        <v-text-field
+                            :model-value="editableSettings.event.eventStartTime24HFormat"
+                            label="Start time"
+                            variant="outlined"
+                            readonly
+                            v-bind="props"
+                            append-inner-icon="fas fa-clock"
+                        ></v-text-field>
                     </template>
-                </q-input>
+                    <v-time-picker
+                        v-model="editableSettings.event.eventStartTime24HFormat"
+                        format="24hr"
+                    ></v-time-picker>
+                </v-menu>
             </SettingsSection>
 
             <SettingsSection title="Event duration in hours">
-                <q-input
-                    outlined
+                <v-text-field
+                    variant="outlined"
                     label="Event duration in hours"
                     v-model.number="editableSettings.event.eventDurationInHours"
                 />
             </SettingsSection>
 
             <SettingsSection title="Event card aspect ratio">
-                <q-select
-                    outlined
+                <v-select
+                    variant="outlined"
+                    label="Aspect ratio"
                     v-model="editableSettings.event.eventCardAspectRatio"
-                    :options="aspectRatioOptions"
+                    :items="aspectRatioOptions"
                 />
             </SettingsSection>
 
@@ -156,38 +150,38 @@ async function synchroniseNewPropertySettings(propertyId: string): Promise<void>
                 :key="colorSetting.key"
                 :title="colorSetting.title"
             >
-                <q-btn
-                    class="full-width"
-                    stretch
-                    :title="colorSetting.title"
-                    :style="{
-                        'background-color': editableSettings.event[colorSetting.key],
-                    }"
-                    icon="fa fa-palette"
-                    push
-                    :label="editableSettings.event[colorSetting.key]"
-                    stack
-                >
-                    <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                        <q-color v-model="editableSettings.event[colorSetting.key]" />
-                    </q-popup-proxy>
-                </q-btn>
+                <v-menu :close-on-content-click="false">
+                    <template #activator="{ props }">
+                        <v-btn
+                            block
+                            size="x-large"
+                            :color="editableSettings.event[colorSetting.key]"
+                            v-bind="props"
+                        >
+                            {{ editableSettings.event[colorSetting.key] }}
+                            <v-icon end>fas fa-palette</v-icon>
+                        </v-btn>
+                    </template>
+                    <v-color-picker v-model="editableSettings.event[colorSetting.key]" />
+                </v-menu>
             </SettingsSection>
         </AppCardSection>
 
         <AppCardSection title="Guest">
             <SettingsSection title="Collect guest data">
-                <q-toggle
+                <v-switch
                     v-model="editableSettings.guest.collectGuestData"
                     :label="editableSettings.guest.collectGuestData ? 'On' : 'Off'"
+                    color="primary"
+                    inset
                 />
             </SettingsSection>
         </AppCardSection>
 
         <AppCardSection :aria-label="property.name + ' settings card'">
             <SettingsSection title="Timezone">
-                <q-input
-                    outlined
+                <v-text-field
+                    variant="outlined"
                     readonly
                     v-model="editableSettings.timezone"
                     @click="openTimezoneSelector()"
@@ -196,8 +190,8 @@ async function synchroniseNewPropertySettings(propertyId: string): Promise<void>
             </SettingsSection>
 
             <SettingsSection title="Guest late criteria" v-if="editableSettings">
-                <q-input
-                    outlined
+                <v-text-field
+                    variant="outlined"
                     type="number"
                     min="1"
                     label="In minutes"
@@ -208,3 +202,5 @@ async function synchroniseNewPropertySettings(propertyId: string): Promise<void>
         </AppCardSection>
     </div>
 </template>
+``` I have updated the icons for the time picker and the color palette button to their Font Awesome
+equivalents as you requested. Let me know if you need any other chang

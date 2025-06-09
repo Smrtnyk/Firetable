@@ -12,14 +12,14 @@ const { aspectRatio, events, propertyTimeZone } = defineProps<Props>();
 </script>
 
 <template>
-    <div class="EventCardList row">
-        <div v-for="(event, index) in events" class="col-12 col-sm-6 q-pa-xs" :key="event.id">
+    <v-row class="EventCardList">
+        <v-col v-for="(event, index) in events" :key="event.id" cols="12" sm="6" class="pa-1">
             <EventCard
                 :property-timezone="propertyTimeZone"
                 :index="index"
                 :event="event"
                 :aspect-ratio="aspectRatio"
             />
-        </div>
-    </div>
+        </v-col>
+    </v-row>
 </template>

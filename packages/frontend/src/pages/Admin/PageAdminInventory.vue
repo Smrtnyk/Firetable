@@ -3,15 +3,13 @@ import type { CreateInventoryItemPayload, InventoryItemDoc } from "@firetable/ty
 
 import { DrinkMainCategory, RetailMainCategory } from "@firetable/types";
 import { omit } from "es-toolkit";
-import { Loading } from "quasar";
 import InventoryImportDialog from "src/components/admin/inventory/InventoryImportDialog.vue";
 import InventoryItemCreateForm from "src/components/admin/inventory/InventoryItemCreateForm.vue";
 import InventoryTable from "src/components/admin/inventory/InventoryTable.vue";
 import FTBtn from "src/components/FTBtn.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
-import FTDialog from "src/components/FTDialog.vue";
 import FTTitle from "src/components/FTTitle.vue";
-import { useDialog } from "src/composables/useDialog.js";
+import { globalDialog } from "src/composables/useDialog";
 import { useFirestoreCollection } from "src/composables/useFirestore.js";
 import {
     addInventoryItem,
@@ -22,13 +20,9 @@ import {
 import { getEnumValues } from "src/helpers/get-enum-values";
 import { exportInventory } from "src/helpers/inventory/export-inventory";
 import { importInventory } from "src/helpers/inventory/import-inventory";
-import {
-    notifyPositive,
-    showConfirm,
-    showErrorMessage,
-    tryCatchLoadingWrapper,
-} from "src/helpers/ui-helpers.js";
+import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers.js";
 import { AppLogger } from "src/logger/FTLogger.js";
+import { useGlobalStore } from "src/stores/global-store";
 import { computed, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
@@ -40,8 +34,8 @@ interface Props {
 
 const { organisationId, propertyId } = defineProps<Props>();
 const { t } = useI18n();
-const { createDialog } = useDialog();
 const router = useRouter();
+const globalStore = useGlobalStore();
 
 const {
     data: inventoryData,
@@ -70,7 +64,10 @@ const categorizedInventory = computed(function () {
 
 async function deleteItem(item: InventoryItemDoc): Promise<void> {
     if (
-        !(await showConfirm(t("PageAdminInventory.deleteItemConfirmMessage", { name: item.name })))
+        !(await globalDialog.confirm({
+            message: "",
+            title: t("PageAdminInventory.deleteItemConfirmMessage", { name: item.name }),
+        }))
     ) {
         return;
     }
@@ -94,11 +91,12 @@ function getCategoryTitle(category: InventoryItemDoc["mainCategory"]): string {
 
 async function handleBulkDelete(items: InventoryItemDoc[]): Promise<void> {
     if (
-        !(await showConfirm(
-            t("PageAdminInventory.bulkDeleteConfirmMessage", {
+        !(await globalDialog.confirm({
+            message: "",
+            title: t("PageAdminInventory.bulkDeleteConfirmMessage", {
                 count: items.length,
             }),
-        ))
+        }))
     ) {
         return;
     }
@@ -110,7 +108,7 @@ async function handleBulkDelete(items: InventoryItemDoc[]): Promise<void> {
                     return deleteInventoryItem(organisationId, propertyId, item.id);
                 }),
             );
-            notifyPositive(
+            globalStore.notify(
                 t("PageAdminInventory.bulkDeleteSuccess", {
                     count: items.length,
                 }),
@@ -127,7 +125,7 @@ function handleExport(): void {
 
     try {
         exportInventory(inventoryData.value);
-        notifyPositive("Inventory exported successfully!");
+        globalStore.notify("Inventory exported successfully!");
     } catch (error) {
         AppLogger.error(error);
         showErrorMessage("Failed to export inventory items!");
@@ -135,7 +133,10 @@ function handleExport(): void {
 }
 
 async function handleItemCopy(item: InventoryItemDoc): Promise<void> {
-    const copyConfirmed = await showConfirm(`Are you sure you want to copy ${item.name}?`);
+    const copyConfirmed = await globalDialog.confirm({
+        message: "",
+        title: `Are you sure you want to copy ${item.name}?`,
+    });
 
     if (!copyConfirmed) {
         return;
@@ -151,15 +152,15 @@ async function handleItemCopy(item: InventoryItemDoc): Promise<void> {
             };
 
             await addInventoryItem(organisationId, propertyId, newItem);
-            notifyPositive(`Copied ${item.name}`);
+            globalStore.notify(`Copied ${item.name}`);
         },
     }).catch(AppLogger.error.bind(AppLogger));
 }
 
 async function init(): Promise<void> {
-    Loading.show();
+    globalStore.setLoading(true);
     await inventoryDataPromise.value;
-    Loading.hide();
+    globalStore.setLoading(false);
 
     if (!inventoryData.value) {
         showErrorMessage("Inventory data not found", function () {
@@ -197,133 +198,124 @@ async function onInventoryItemEditSubmit(
 }
 
 function showCreateInventoryItemDialog(initialData?: CreateInventoryItemPayload): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: InventoryItemCreateForm,
-            componentPropsObject: {
-                initialData,
+    const dialog = globalDialog.openDialog(
+        InventoryItemCreateForm,
+        {
+            initialData,
+            onSubmit(inventoryItemPayload: CreateInventoryItemPayload) {
+                onInventoryItemCreateSubmit(inventoryItemPayload);
+                dialog.hide();
             },
-            listeners: {
-                submit(inventoryItemPayload: CreateInventoryItemPayload) {
-                    onInventoryItemCreateSubmit(inventoryItemPayload);
-                    dialog.hide();
-                },
-            },
-            maximized: false,
+        },
+        {
             title: t("PageAdminInventory.createNewInventoryItemDialogTitle"),
         },
-    });
+    );
 }
 
 function showEditInventoryItemForm(item: InventoryItemDoc): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: InventoryItemCreateForm,
-            componentPropsObject: {
-                itemToEdit: omit(item, ["id"]),
+    const dialog = globalDialog.openDialog(
+        InventoryItemCreateForm,
+        {
+            itemToEdit: omit(item, ["id"]),
+            onSubmit(updatedItem: CreateInventoryItemPayload) {
+                onInventoryItemEditSubmit(item.id, updatedItem);
+                dialog.hide();
             },
-            listeners: {
-                submit(updatedItem: CreateInventoryItemPayload) {
-                    onInventoryItemEditSubmit(item.id, updatedItem);
-                    dialog.hide();
-                },
-            },
-            maximized: false,
+        },
+        {
             title: t("PageAdminInventory.editInventoryItemDialogTitle", {
                 name: item.name,
             }),
         },
-    });
+    );
 }
 
 function showImportDialog(): void {
     let isLoading = false;
 
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: InventoryImportDialog,
-            componentPropsObject: {
-                loading: isLoading,
-            },
-            listeners: {
-                async import(content: string) {
-                    isLoading = true;
-                    try {
-                        Loading.show();
-                        if (!inventoryData.value) {
-                            throw new Error("Inventory data not available");
-                        }
-
-                        const result = await importInventory({
-                            existingItems: inventoryData.value,
-                            fileContent: content,
-                            organisationId,
-                            propertyId,
-                        });
-
-                        notifyPositive(
-                            t("PageAdminInventory.importMergeSuccess", {
-                                added: result.newCount,
-                                updated: result.updatedCount,
-                            }),
-                        );
-                        dialog.hide();
-                    } catch (error) {
-                        AppLogger.error(error);
-                        showErrorMessage(t("PageAdminInventory.importError"));
-                    } finally {
-                        Loading.hide();
-                        isLoading = false;
+    const dialog = globalDialog.openDialog(
+        InventoryImportDialog,
+        {
+            loading: isLoading,
+            async onImport(content: string) {
+                isLoading = true;
+                try {
+                    globalStore.setLoading(true);
+                    if (!inventoryData.value) {
+                        throw new Error("Inventory data not available");
                     }
-                },
+
+                    const result = await importInventory({
+                        existingItems: inventoryData.value,
+                        fileContent: content,
+                        organisationId,
+                        propertyId,
+                    });
+
+                    globalStore.notify(
+                        t("PageAdminInventory.importMergeSuccess", {
+                            added: result.newCount,
+                            updated: result.updatedCount,
+                        }),
+                    );
+                    dialog.hide();
+                } catch (error) {
+                    AppLogger.error(error);
+                    showErrorMessage(t("PageAdminInventory.importError"));
+                } finally {
+                    globalStore.setLoading(false);
+                    isLoading = false;
+                }
             },
-            maximized: false,
+        },
+        {
             title: "Import Inventory",
         },
-    });
+    );
 }
 
 onMounted(init);
 </script>
 
 <template>
-    <div class="PageAdminInventory q-pa-xs-xs q-pa-sm-xs q-pa-md-md">
+    <div class="PageAdminInventory pa-1 pa-sm-1 pa-md-4">
         <FTTitle :title="t('PageAdminInventory.title')">
             <template #right>
-                <div class="row q-gutter-sm">
+                <div class="d-flex" style="gap: 8px">
                     <FTBtn
                         rounded
-                        icon="fa fa-download"
-                        class="button-gradient"
+                        icon="fas fa-download"
+                        color="primary"
                         @click="handleExport"
-                        :disable="!inventoryData?.length"
+                        :disabled="!inventoryData?.length"
                     />
                     <FTBtn
                         rounded
-                        icon="fa fa-file-import"
-                        class="button-gradient"
+                        icon="fas fa-file-import"
+                        color="primary"
                         @click="showImportDialog"
                     />
                     <FTBtn
                         rounded
-                        icon="fa fa-plus"
-                        class="button-gradient"
+                        icon="fas fa-plus"
+                        color="primary"
                         @click="showCreateInventoryItemDialog()"
                     />
                 </div>
             </template>
         </FTTitle>
 
-        <FTCenteredText v-if="inventoryData.length === 0 && !isLoadingItems">
+        <FTCenteredText v-if="inventoryData && inventoryData.length === 0 && !isLoadingItems">
             {{ t("PageAdminInventory.noItemsMessage") }}
         </FTCenteredText>
 
-        <div v-if="inventoryData.length > 0" class="q-mt-md">
-            <div v-for="category in drinkMainCategoryEnumValues" :key="category" class="q-mb-xl">
+        <div v-if="inventoryData && inventoryData.length > 0" class="mt-4">
+            <div v-for="category in drinkMainCategoryEnumValues" :key="category" class="mb-16">
                 <InventoryTable
+                    v-if="
+                        categorizedInventory[category] && categorizedInventory[category].length > 0
+                    "
                     :title="getCategoryTitle(category)"
                     :rows="categorizedInventory[category] ?? []"
                     @edit-item="showEditInventoryItemForm"

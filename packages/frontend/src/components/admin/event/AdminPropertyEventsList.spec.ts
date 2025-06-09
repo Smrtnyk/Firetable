@@ -7,20 +7,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { renderComponent, t } from "../../../../test-helpers/render-component";
 import AdminPropertyEventsList from "./AdminPropertyEventsList.vue";
 
-vi.mock("src/components/admin/event/PageAdminEventsListItem.vue", () => ({
-    default: {
-        name: "PageAdminEventsListItem",
-        props: ["event"],
-        template: `
-            <div class="event-item">
-                <div class="event-name">{{ event.name }}</div>
-                <button class="edit-button" @click="$emit('left', { reset: () => {} })">Edit</button>
-                <button class="delete-button" @click="$emit('right', { reset: () => {} })">Delete</button>
-            </div>
-        `,
-    },
-}));
-
 const eventPast1: EventDoc = {
     date: new Date("2021-05-15").getTime(),
     id: "eventPast1",
@@ -71,7 +57,7 @@ describe("PageAdminEventsList", () => {
     });
 
     it("displays events grouped by upcoming and past events with a marker", async () => {
-        renderComponent(AdminPropertyEventsList, {
+        const screen = renderComponent(AdminPropertyEventsList, {
             done: false,
             events,
             propertyId,
@@ -90,8 +76,8 @@ describe("PageAdminEventsList", () => {
         await expect.element(page.getByText("Past Event 2")).toBeVisible();
 
         // Optionally, check that the upcoming events are listed before the past events
-        const eventItems = document.querySelectorAll(".event-name");
-        const eventNames = Array.from(eventItems).map((item) => item.textContent?.trim());
+        const eventItems = screen.getByLabelText("Event name");
+        const eventNames = eventItems.elements().map((item) => item.textContent?.trim());
 
         expect(eventNames).toEqual([
             // Upcoming events first
@@ -113,8 +99,8 @@ describe("PageAdminEventsList", () => {
         });
 
         // Check for year headings
-        await expect.element(page.getByText("2021")).toBeVisible();
-        await expect.element(page.getByText("2022")).toBeVisible();
+        await expect.element(page.getByText("2021", { exact: true })).toBeVisible();
+        await expect.element(page.getByText("2022", { exact: true })).toBeVisible();
 
         // Check for month headings
         await expect.element(page.getByText("May")).toBeVisible();
@@ -156,13 +142,13 @@ describe("PageAdminEventsList", () => {
             timezone: getDefaultTimezone(),
         });
 
-        await userEvent.click(screen.getByText("Edit"));
+        await userEvent.click(screen.getByRole("button", { name: "Edit Event" }));
 
         const emitted = screen.emitted();
         expect(emitted.edit).toBeTruthy();
         expect(emitted.edit[0]).toEqual([mockEvent]);
 
-        await userEvent.click(screen.getByText("Delete"));
+        await userEvent.click(screen.getByRole("button", { name: "Delete Event" }));
         expect(emitted.delete).toBeTruthy();
         expect(emitted.delete[0]).toEqual([mockEvent]);
     });

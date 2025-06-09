@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { Ref } from "vue";
-
 export type SortDirection = "asc" | "desc";
 
 export type SortOption =
@@ -26,18 +24,18 @@ export type SortOption =
     | "percentage";
 
 interface GuestSortOptionsProps {
-    availableTags: Ref<string[]>;
-    currentSortDirection: Ref<SortDirection>;
-    currentSortOption: Ref<SortOption>;
-    selectedTags: Ref<string[]>;
+    availableTags: string[];
+    currentSortDirection: SortDirection;
+    currentSortOption: SortOption;
+    selectedTags: string[];
 }
 
 const props = defineProps<GuestSortOptionsProps>();
 
 const emit = defineEmits<{
-    (e: "update:sortOption", value: SortOption): void;
+    (e: "update:currentSortOption", value: SortOption): void;
     (e: "update:selectedTags", value: string[]): void;
-    (e: "close" | "toggleDirection"): void;
+    (e: "toggleDirection"): void;
 }>();
 
 const sortOptions = [
@@ -47,66 +45,61 @@ const sortOptions = [
     { label: "Name", value: "name" },
     { label: "Land", value: "land" },
 ] as const;
-
-function updateSelectedTags(value: string[]): void {
-    emit("update:selectedTags", value);
-}
 </script>
 
 <template>
-    <template v-if="props.availableTags.value.length > 0">
-        <q-select
-            :model-value="selectedTags.value"
-            :options="props.availableTags.value"
-            clear-icon="fa fa-close"
-            multiple
-            use-chips
-            outlined
-            dense
-            label="Filter by tags"
-            @update:model-value="updateSelectedTags"
-        />
-
-        <q-separator class="q-my-md" />
-    </template>
-
-    <div class="text-weight-bolder q-mb-sm">Sort by</div>
-    <q-list>
-        <q-item
-            tag="label"
-            v-for="option in sortOptions"
-            :key="option.value"
-            clickable
-            @click="emit('update:sortOption', option.value)"
-            class="q-pa-none"
-        >
-            <q-item-section avatar>
-                <q-radio
-                    :model-value="currentSortOption.value"
-                    :val="option.value"
-                    color="primary"
-                    @update:model-value="emit('update:sortOption', option.value)"
-                />
-            </q-item-section>
-            <q-item-section>
-                <q-item-label>{{ option.label }}</q-item-label>
-            </q-item-section>
-
-            <q-item-section> </q-item-section>
-        </q-item>
-    </q-list>
-
-    <q-separator class="q-my-md" />
-
-    <div class="text-weight-bolder q-mb-sm">Direction</div>
-    <q-item clickable @click="emit('toggleDirection')">
-        <q-item-section>
-            {{ currentSortDirection.value === "desc" ? "Descending" : "Ascending" }}
-        </q-item-section>
-        <q-item-section side>
-            <q-icon
-                :name="currentSortDirection.value === 'desc' ? 'fa fa-sort-down' : 'fa fa-sort-up'"
+    <div class="pa-2">
+        <template v-if="props.availableTags.length > 0">
+            <v-select
+                :model-value="props.selectedTags"
+                :items="props.availableTags"
+                clear-icon="fas fa-times"
+                multiple
+                chips
+                closable-chips
+                variant="outlined"
+                density="compact"
+                label="Filter by tags"
+                aria-label="Filter by tags"
+                @update:model-value="emit('update:selectedTags', $event as string[])"
             />
-        </q-item-section>
-    </q-item>
+            <v-divider class="my-4" />
+        </template>
+
+        <div class="font-weight-bold mb-2">Sort by</div>
+        <v-radio-group
+            :model-value="props.currentSortOption"
+            @update:model-value="emit('update:currentSortOption', $event as SortOption)"
+            hide-details
+            class="mt-n2"
+        >
+            <v-radio
+                v-for="option in sortOptions"
+                :key="option.value"
+                :label="option.label"
+                :value="option.value"
+                color="primary"
+            ></v-radio>
+        </v-radio-group>
+
+        <v-divider class="my-4" />
+
+        <div class="font-weight-bold mb-2">Direction</div>
+        <v-list class="py-0">
+            <v-list-item @click="emit('toggleDirection')" class="px-1">
+                <v-list-item-title>
+                    {{ props.currentSortDirection === "desc" ? "Descending" : "Ascending" }}
+                </v-list-item-title>
+                <template #append>
+                    <v-icon
+                        :icon="
+                            props.currentSortDirection === 'desc'
+                                ? 'fas fa-sort-down'
+                                : 'fas fa-sort-up'
+                        "
+                    />
+                </template>
+            </v-list-item>
+        </v-list>
+    </div>
 </template>

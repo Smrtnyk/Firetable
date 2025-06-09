@@ -13,7 +13,7 @@ import type {
     ReservationState,
     User,
 } from "@firetable/types";
-import type { DialogChainObject } from "quasar";
+import type { DialogController } from "src/composables/useDialog";
 import type { EventOwner } from "src/db";
 import type { GuestSummary } from "src/stores/guests-store";
 import type { ComputedRef, Ref, ShallowRef } from "vue";
@@ -25,8 +25,7 @@ import { storeToRefs } from "pinia";
 import { eventEmitter } from "src/boot/event-emitter";
 import EventCreateReservation from "src/components/Event/reservation/EventCreateReservation.vue";
 import EventShowReservation from "src/components/Event/reservation/EventShowReservation.vue";
-import FTDialog from "src/components/FTDialog.vue";
-import { useDialog } from "src/composables/useDialog";
+import { globalDialog } from "src/composables/useDialog";
 import {
     addReservation,
     deleteReservation,
@@ -39,14 +38,10 @@ import { determineTableColor } from "src/helpers/floor";
 import { hashString } from "src/helpers/hash-string";
 import { plannedToQueuedReservation } from "src/helpers/reservation/planned-to-queued-reservation";
 import { queuedToPlannedReservation } from "src/helpers/reservation/queued-to-planned-reservation";
-import {
-    notifyPositive,
-    showConfirm,
-    showErrorMessage,
-    tryCatchLoadingWrapper,
-} from "src/helpers/ui-helpers";
+import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { AppLogger } from "src/logger/FTLogger";
 import { useAuthStore } from "src/stores/auth-store";
+import { useGlobalStore } from "src/stores/global-store";
 import { useGuestsStore } from "src/stores/guests-store";
 import { usePermissionsStore } from "src/stores/permissions-store";
 import { usePropertiesStore } from "src/stores/properties-store";
@@ -66,7 +61,7 @@ import { useReservationsLifecycle } from "./useReservationsLifecycle.js";
 import { TableOperationType, useTableOperations } from "./useTableOperations.js";
 
 type OpenDialog = {
-    dialog: DialogChainObject;
+    dialog: DialogController;
     floorId: string;
     label: string;
 };
@@ -84,7 +79,6 @@ export function useReservations(
     eventOwner: EventOwner,
     event: Ref<undefined | VueFirestoreDocumentData<EventDoc>>,
 ): UseReservations {
-    const { createDialog } = useDialog();
     const { t } = useI18n();
     const { nonNullableUser } = storeToRefs(useAuthStore());
     const { canReserve, canSeeGuestbook } = storeToRefs(usePermissionsStore());
@@ -92,6 +86,7 @@ export function useReservations(
     const router = useRouter();
     const propertiesStore = usePropertiesStore();
     const guestsStore = useGuestsStore();
+    const globalStore = useGlobalStore();
 
     const propertySettings = computed(function () {
         return propertiesStore.getPropertySettingsById(eventOwner.propertyId);
@@ -192,12 +187,12 @@ export function useReservations(
             return;
         }
 
-        const confirm = await showConfirm(
-            t("useReservations.linkTableTitle"),
-            t("useReservations.linkTableConfirmMsg", {
+        const confirm = await globalDialog.confirm({
+            message: t("useReservations.linkTableConfirmMsg", {
                 tablesToLink: [...currentLabels, targetTable.label].join(", "),
             }),
-        );
+            title: t("useReservations.linkTableTitle"),
+        });
 
         if (!confirm) return;
 
@@ -224,7 +219,7 @@ export function useReservations(
         await tryCatchLoadingWrapper({
             async hook() {
                 await addReservation(eventOwner, reservationData);
-                notifyPositive("Reservation created");
+                globalStore.notify("Reservation created");
 
                 eventEmitter.emit("reservation:created", {
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
@@ -243,7 +238,7 @@ export function useReservations(
         await tryCatchLoadingWrapper({
             async hook() {
                 await updateReservationDoc(eventOwner, reservationData);
-                notifyPositive(t("useReservations.reservationUpdatedMsg"));
+                globalStore.notify(t("useReservations.reservationUpdatedMsg"));
 
                 eventEmitter.emit("reservation:updated", {
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
@@ -264,12 +259,12 @@ export function useReservations(
             return;
         }
 
-        const confirm = await showConfirm(
-            t("useReservations.unlinkConfirmTitle"),
-            t("useReservations.unlinkConfirmMessage", {
+        const confirm = await globalDialog.confirm({
+            message: t("useReservations.unlinkConfirmMessage", {
                 table: tableToUnlink.label,
             }),
-        );
+            title: t("useReservations.unlinkConfirmTitle"),
+        });
 
         if (!confirm) {
             return;
@@ -297,7 +292,9 @@ export function useReservations(
     }
 
     async function onDeleteReservation(reservation: ReservationDoc): Promise<void> {
-        const shouldDelete = await showConfirm(t("useReservations.deleteReservationTitle"));
+        const shouldDelete = await globalDialog.confirmTitle(
+            t("useReservations.deleteReservationTitle"),
+        );
         if (!shouldDelete) {
             return;
         }
@@ -373,42 +370,39 @@ export function useReservations(
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if event was undefined
         const eventStartTimestamp = event.value!.date;
 
-        const dialog = createDialog({
-            component: FTDialog,
-            componentProps: {
-                component: EventCreateReservation,
-                componentPropsObject: {
-                    currentUser: nonNullableUser.value,
-                    eventDurationInHours: propertySettings.value.event.eventDurationInHours,
-                    eventStartTimestamp,
-                    mode,
-                    reservationData:
-                        mode === "update" && reservation
-                            ? { ...reservation, id: reservation.id }
-                            : void 0,
-                    timezone: propertySettings.value.timezone,
-                    users: users.value,
+        const dialog = globalDialog.openDialog(
+            EventCreateReservation,
+            {
+                currentUser: nonNullableUser.value,
+                eventDurationInHours: propertySettings.value.event.eventDurationInHours,
+                eventStartTimestamp,
+                mode,
+                async onCreate(reservationData: Omit<Reservation, "floorId" | "tableLabel">) {
+                    resetCurrentOpenCreateReservationDialog();
+                    await handleReservationCreation({
+                        ...reservationData,
+                        floorId: floor.id,
+                        tableLabel: label,
+                    } as Reservation);
+                    dialog.hide();
                 },
-                listeners: {
-                    async create(reservationData: Omit<Reservation, "floorId" | "tableLabel">) {
-                        resetCurrentOpenCreateReservationDialog();
-                        await handleReservationCreation({
-                            ...reservationData,
-                            floorId: floor.id,
-                            tableLabel: label,
-                        } as Reservation);
-                        dialog.hide();
-                    },
-                    async update(reservationData: ReservationDoc) {
-                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if reservation was undefined
-                        await handleReservationUpdate(reservationData, reservation!);
-                        dialog.hide();
-                    },
+                async onUpdate(reservationData: ReservationDoc) {
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we wouldn't be here if reservation was undefined
+                    await handleReservationUpdate(reservationData, reservation!);
+                    dialog.hide();
                 },
-                maximized: false,
+                reservationData:
+                    mode === "update" && reservation
+                        ? { ...reservation, id: reservation.id }
+                        : void 0,
+                timezone: propertySettings.value.timezone,
+                users: users.value,
+            },
+            {
                 title: `${t("EventCreateReservation.title")} ${label}`,
             },
-        }).onDismiss(resetCurrentOpenCreateReservationDialog);
+        );
+        dialog.onDismiss(resetCurrentOpenCreateReservationDialog);
 
         if (mode === "create") {
             currentOpenCreateReservationDialog = {
@@ -451,93 +445,99 @@ export function useReservations(
             ? reservation.tableLabel
             : [reservation.tableLabel];
 
-        const dialog = createDialog({
-            component: FTDialog,
-            componentProps: {
-                component: EventShowReservation,
-                componentPropsObject: {
-                    guestSummaryPromise: getGuestSummary(reservation),
-                    reservation,
-                    tableColors: propertySettings.value.event,
-                    timezone: propertySettings.value.timezone,
+        const dialog = globalDialog.openDialog(
+            EventShowReservation,
+            {
+                guestSummaryPromise: getGuestSummary(reservation),
+                onArrived(val: boolean) {
+                    dialog.hide();
+                    if (!isPlannedReservation(reservation)) {
+                        return;
+                    }
+                    onGuestArrived(reservation, val).catch(showErrorMessage);
                 },
-                listeners: {
-                    arrived(val: boolean) {
-                        dialog.hide();
-                        if (!isPlannedReservation(reservation)) {
-                            return;
-                        }
-                        onGuestArrived(reservation, val).catch(showErrorMessage);
-                    },
-                    cancel(val: boolean) {
-                        if (!isPlannedReservation(reservation)) {
-                            return;
-                        }
-                        onReservationCancelled(reservation, val).catch(showErrorMessage);
-                    },
-                    copy() {
-                        initiateReservationCopy(floor, element);
-                    },
-                    delete() {
-                        onDeleteReservation(reservation).catch(showErrorMessage);
-                    },
-                    edit() {
-                        showCreateReservationDialog(floor, element, reservation, "update");
-                    },
-                    goToGuestProfile(guestId: string) {
-                        router.push({
-                            name: "adminGuest",
-                            params: {
-                                guestId,
-                                organisationId: eventOwner.organisationId,
-                            },
-                        });
-                    },
-                    link() {
-                        initiateReservationLink(floor, reservation);
-                    },
-                    queue() {
-                        if (!isPlannedReservation(reservation)) {
-                            return;
-                        }
-                        onMoveReservationToQueue(reservation).catch(showErrorMessage);
-                    },
-                    reservationConfirmed(val: boolean) {
-                        dialog.hide();
-                        if (!isPlannedReservation(reservation)) {
-                            return;
-                        }
-                        reservationConfirmed(val, reservation).catch(showErrorMessage);
-                    },
-                    stateChange(newState: ReservationState) {
-                        return tryCatchLoadingWrapper({
-                            async hook() {
-                                await updateReservationDoc(eventOwner, {
-                                    id: reservation.id,
-                                    state: newState,
-                                });
-                            },
-                        });
-                    },
-                    transfer() {
-                        initiateReservationTransfer(floor, element);
-                    },
-                    unlink() {
-                        onUnlinkTables(reservation, element).catch(showErrorMessage);
-                    },
-                    waitingForResponse(val: boolean) {
-                        dialog.hide();
-                        if (!isPlannedReservation(reservation)) {
-                            return;
-                        }
+                onCancel(val: boolean) {
+                    dialog.hide();
+                    if (!isPlannedReservation(reservation)) {
+                        return;
+                    }
+                    onReservationCancelled(reservation, val).catch(showErrorMessage);
+                },
+                onCopy() {
+                    dialog.hide();
+                    initiateReservationCopy(floor, element);
+                },
+                onDelete() {
+                    dialog.hide();
+                    onDeleteReservation(reservation).catch(showErrorMessage);
+                },
+                onEdit() {
+                    dialog.hide();
+                    showCreateReservationDialog(floor, element, reservation, "update");
+                },
+                onGoToGuestProfile(guestId: string) {
+                    dialog.hide();
+                    router.push({
+                        name: "adminGuest",
+                        params: {
+                            guestId,
+                            organisationId: eventOwner.organisationId,
+                        },
+                    });
+                },
+                onLink() {
+                    dialog.hide();
+                    initiateReservationLink(floor, reservation);
+                },
+                onQueue() {
+                    dialog.hide();
+                    if (!isPlannedReservation(reservation)) {
+                        return;
+                    }
+                    onMoveReservationToQueue(reservation).catch(showErrorMessage);
+                },
+                onReservationConfirmed(val: boolean) {
+                    dialog.hide();
+                    if (!isPlannedReservation(reservation)) {
+                        return;
+                    }
+                    reservationConfirmed(val, reservation).catch(showErrorMessage);
+                },
+                onStateChange(newState: ReservationState) {
+                    dialog.hide();
+                    return tryCatchLoadingWrapper({
+                        async hook() {
+                            await updateReservationDoc(eventOwner, {
+                                id: reservation.id,
+                                state: newState,
+                            });
+                        },
+                    });
+                },
+                onTransfer() {
+                    dialog.hide();
+                    initiateReservationTransfer(floor, element);
+                },
+                onUnlink() {
+                    dialog.hide();
+                    onUnlinkTables(reservation, element).catch(showErrorMessage);
+                },
+                onWaitingForResponse(val: boolean) {
+                    dialog.hide();
+                    if (!isPlannedReservation(reservation)) {
+                        return;
+                    }
 
-                        reservationWaitingForResponse(val, reservation).catch(showErrorMessage);
-                    },
+                    reservationWaitingForResponse(val, reservation).catch(showErrorMessage);
                 },
-                maximized: false,
+                reservation,
+                tableColors: propertySettings.value.event,
+                timezone: propertySettings.value.timezone,
+            },
+            {
                 title: `${t("EventShowReservation.title")} ${tableLabels.join(", ")}`,
             },
-        });
+        );
     }
 
     function onGuestArrived(reservation: PlannedReservationDoc, val: boolean): Promise<void> {
@@ -618,7 +618,7 @@ export function useReservations(
     }
 
     async function onMoveReservationToQueue(reservation: PlannedReservationDoc): Promise<void> {
-        const shouldMove = await showConfirm(
+        const shouldMove = await globalDialog.confirmTitle(
             t("useReservations.moveReservationToQueueConfirmTitle"),
         );
         if (!shouldMove) {
@@ -682,10 +682,10 @@ export function useReservations(
             table1Label: table1.label,
             table2Label: table2.label,
         });
-        const shouldTransfer = await showConfirm(
-            t("useReservations.transferReservationConfirmTitle"),
-            transferMessage,
-        );
+        const shouldTransfer = await globalDialog.confirm({
+            message: transferMessage,
+            title: t("useReservations.transferReservationConfirmTitle"),
+        });
 
         if (!shouldTransfer) {
             return;
@@ -754,10 +754,10 @@ export function useReservations(
             table1Label: table1.label,
             table2Label: table2.label,
         });
-        const shouldTransfer = await showConfirm(
-            t("useReservations.transferReservationConfirmTitle"),
-            transferMessage,
-        );
+        const shouldTransfer = await globalDialog.confirm({
+            message: transferMessage,
+            title: t("useReservations.transferReservationConfirmTitle"),
+        });
 
         if (!shouldTransfer) {
             return;
@@ -861,13 +861,13 @@ export function useReservations(
             return;
         }
 
-        const confirm = await showConfirm(
-            "",
-            t("useReservations.copyReservationConfirmMsg", {
+        const confirm = await globalDialog.confirm({
+            message: t("useReservations.copyReservationConfirmMsg", {
                 sourceTableLabel: sourceTable.label,
                 targetTableLabel: targetTable.label,
             }),
-        );
+            title: "",
+        });
         if (!confirm) return;
 
         const reservation = reservations.value.find(

@@ -10,8 +10,7 @@ import type {
 
 import { DEFAULT_CAPABILITIES_BY_ROLE, Role } from "@firetable/types";
 import { property } from "es-toolkit/compat";
-import { QForm } from "quasar";
-import { noEmptyString, noWhiteSpaces } from "src/helpers/form-rules";
+import { noEmptyString, noWhiteSpaces, validateForm } from "src/helpers/form-rules";
 import { computed, ref, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -31,7 +30,7 @@ const userNameRules = [noWhiteSpaces];
 const { t } = useI18n();
 const emit = defineEmits<Emits>();
 const props = defineProps<UserEditFormProps>();
-const userEditForm = useTemplateRef<QForm>("userEditForm");
+const userEditForm = useTemplateRef("userEditForm");
 
 function getUserCapabilities(): UserCapabilities {
     return {
@@ -95,7 +94,7 @@ function onReset(): void {
 }
 
 async function onSubmit(): Promise<void> {
-    if (await userEditForm.value?.validate()) {
+    if (await validateForm(userEditForm.value)) {
         prepareAndEmitSubmission();
     }
 }
@@ -126,94 +125,95 @@ function resetProperties(): void {
 
 <template>
     <div class="UserEditForm">
-        <q-form
-            class="q-gutter-md q-pt-md q-pa-md"
-            @submit="onSubmit"
-            @reset="onReset"
+        <v-form
+            class="pa-4 d-flex flex-column"
+            style="gap: 1.25rem"
+            @submit.prevent="onSubmit"
+            @reset.prevent="onReset"
             ref="userEditForm"
         >
-            <q-input
+            <v-text-field
                 v-model="form.name"
-                outlined
+                variant="outlined"
                 label="Name *"
+                aria-label="Name *"
                 hint="Name of the person, e.g. Max Mustermann"
-                lazy-rules
                 :rules="nameRules"
             />
 
-            <q-input
+            <v-text-field
                 v-model="form.username"
-                outlined
-                prefix="Email:"
+                variant="outlined"
                 label="Username *"
                 hint="Username without spaces and special characters, e.g. max123"
                 :rules="userNameRules"
                 :suffix="emailSuffix"
             />
 
-            <q-input
+            <v-text-field
                 v-if="'password' in form"
                 v-model="form.password"
-                outlined
+                variant="outlined"
                 label="User password *"
                 hint="Password of the user"
-                lazy-rules
                 :rules="stringRules"
             />
 
-            <q-select
+            <v-select
                 v-if="isEditableRole"
                 v-model="form.role"
                 hint="Assign role to user, default is Staff."
-                outlined
-                :options="editableRoles"
+                variant="outlined"
+                :items="editableRoles"
                 label="Role"
+                aria-label="Role"
             />
 
-            <div v-if="isEditableRole" class="q-gutter-sm q-mb-lg">
-                <div>Properties:</div>
+            <div v-if="isEditableRole">
+                <div class="text-subtitle-1 mb-2">Properties:</div>
                 <div v-if="properties.length > 0">
-                    <q-checkbox
+                    <v-checkbox
                         v-for="{ id, name } in props.properties"
                         :key="id"
                         v-model="chosenProperties"
-                        :val="id"
+                        :value="id"
                         :label="name"
-                        color="accent"
+                        color="secondary"
+                        density="compact"
+                        hide-details
                     />
                 </div>
                 <div v-else><p>No properties available. Please create some.</p></div>
             </div>
 
             <div v-if="capabilitiesToDisplay.length > 0 && form.capabilities">
-                <div>Capabilities:</div>
+                <div class="text-subtitle-1 mb-2">Capabilities:</div>
                 <div v-for="[capability] in capabilitiesToDisplay" :key="capability">
-                    <q-checkbox
-                        v-model="form.capabilities[capability]"
+                    <v-checkbox
+                        v-model="form.capabilities[capability] as boolean"
                         :label="capability"
-                        color="accent"
+                        color="secondary"
+                        density="compact"
+                        hide-details
                     />
                 </div>
             </div>
 
             <div>
-                <q-btn
+                <v-btn flat rounded size="large" type="submit" color="primary">
+                    {{ t("Global.submit") }}
+                </v-btn>
+                <v-btn
                     rounded
-                    size="md"
-                    :label="t('Global.submit')"
-                    type="submit"
-                    class="button-gradient"
-                />
-                <q-btn
-                    rounded
-                    size="md"
-                    outline
-                    :label="t('Global.reset')"
+                    size="large"
+                    variant="outlined"
                     type="reset"
                     color="primary"
-                    class="q-ml-sm"
-                />
+                    class="ml-4"
+                >
+                    {{ t("Global.reset") }}
+                </v-btn>
             </div>
-        </q-form>
+        </v-form>
     </div>
 </template>

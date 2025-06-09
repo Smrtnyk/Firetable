@@ -1,9 +1,10 @@
-import type { Router } from "vue-router";
+import type { App } from "vue";
 
-import { boot } from "quasar/wrappers";
 import { initializeFirebase } from "src/db";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { refreshApp } from "src/helpers/utils";
+import { AppLogger } from "src/logger/FTLogger";
+import router from "src/router";
 import { createAuthGuard } from "src/router/auth-guard";
 import { AuthState, useAuthStore } from "src/stores/auth-store";
 import { useGuestsStore } from "src/stores/guests-store";
@@ -12,7 +13,7 @@ import { usePropertiesStore } from "src/stores/properties-store";
 import { watch } from "vue";
 import { useCurrentUser, VueFire, VueFireAuth } from "vuefire";
 
-export default boot(function ({ app, router }) {
+export function initFirebaseAndAuth(app: App): void {
     const { firebaseApp } = initializeFirebase();
     app.use(VueFire, {
         firebaseApp,
@@ -25,22 +26,22 @@ export default boot(function ({ app, router }) {
     router.beforeEach(createAuthGuard(authStore, permissionsStore));
 
     router.onError(function (error) {
-        const isChunkLoadFailed =
-            (/loading chunk \d* failed./i.test(error.message) ||
-                error.message.includes("dynamically imported module")) ??
-            error.message.includes("is not a valid JavaScript MIME type");
-        if (isChunkLoadFailed && navigator.onLine) {
-            showErrorMessage("New version is available, press ok to download.", refreshApp);
+        AppLogger.error("Router error:", error);
+
+        if (
+            error.message.includes("Failed to fetch dynamically imported module") ||
+            error.message.includes("Loading chunk") ||
+            error.message.includes("ChunkLoadError")
+        ) {
+            showErrorMessage("Reloading page to fetch new version.");
+            setTimeout(refreshApp, 1000);
         }
     });
 
-    handleOnAuthStateChanged(router, authStore);
-});
+    handleOnAuthStateChanged(authStore);
+}
 
-function handleOnAuthStateChanged(
-    router: Router,
-    authStore: ReturnType<typeof useAuthStore>,
-): void {
+function handleOnAuthStateChanged(authStore: ReturnType<typeof useAuthStore>): void {
     let isFirstCall = true;
     const currentUser = useCurrentUser();
     watch(
@@ -56,18 +57,19 @@ function handleOnAuthStateChanged(
                 );
                 await authStore.initUser(currentUser.value);
             } else {
+                authStore.setAuthState(AuthState.UNAUTHENTICATED);
+                const currentRoute = router.currentRoute.value;
+                const requiresAuth = currentRoute.meta.requiresAuth;
+
+                if (requiresAuth) {
+                    await router.replace({ path: "/auth" }).catch(showErrorMessage);
+                }
+
                 const propertiesStore = usePropertiesStore();
                 const guestsStore = useGuestsStore();
                 authStore.cleanup();
                 guestsStore.cleanup();
                 propertiesStore.cleanup();
-
-                const currentRoute = router.currentRoute.value;
-                const requiresAuth = currentRoute.meta.requiresAuth;
-
-                if (requiresAuth) {
-                    router.replace({ path: "/auth" }).catch(showErrorMessage);
-                }
             }
         },
     );

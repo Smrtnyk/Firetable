@@ -1,7 +1,7 @@
 import type { FloorDoc } from "@firetable/types";
 
 import { userEvent } from "@vitest/browser/context";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { nextTick } from "vue";
 
 import type { EventCreateFormProps } from "./EventCreateForm.vue";
@@ -26,6 +26,10 @@ describe("EventCreateForm", () => {
                 propertyName: "Test Property",
                 propertyTimezone: "Europe/Vienna",
             };
+        });
+
+        afterEach(() => {
+            document.body.innerHTML = "";
         });
 
         it("renders the form with initial values", async () => {
@@ -54,9 +58,11 @@ describe("EventCreateForm", () => {
         });
 
         it("shows error when no floors are selected", async () => {
-            const screen = renderComponent(EventCreateForm, props);
+            const screen = renderComponent(EventCreateForm, props, {
+                includeGlobalComponents: true,
+                wrapInLayout: true,
+            });
 
-            // Fill out other required fields
             await userEvent.fill(screen.getByLabelText("Event Name"), "Test Event");
             await userEvent.fill(screen.getByLabelText("Guest List Limit"), "100");
             await userEvent.fill(screen.getByLabelText("Entry Price"), "50");
@@ -82,8 +88,8 @@ describe("EventCreateForm", () => {
             await userEvent.click(addFloorBtn);
             await userEvent.click(floor1Option);
 
-            const floorItems = screen.getByText("Floor 1");
-            expect(floorItems.all()).toHaveLength(2);
+            const floorItems = screen.getByLabelText("Selected floor plans").getByText("Floor 1");
+            expect(floorItems.elements()).toHaveLength(2);
         });
 
         it("allows removing floors", async () => {
@@ -93,17 +99,22 @@ describe("EventCreateForm", () => {
             await userEvent.click(addFloorBtn);
             await userEvent.click(screen.getByLabelText("Add Floor 1 floor plan"));
 
+            await expect
+                .element(screen.getByLabelText("Selected floor plans").getByText("Floor 1"))
+                .toBeVisible();
+
             const removeFloorBtn = screen.getByLabelText("Remove Floor 1 floor plan");
             await userEvent.click(removeFloorBtn);
 
-            await expect.element(screen.getByText("Floor 1")).not.toBeInTheDocument();
+            await expect
+                .element(screen.getByLabelText("Selected floor plans").getByText("Floor 1"))
+                .not.toBeInTheDocument();
         });
 
         it("emits create event with correct payload", async () => {
             const screen = renderComponent(EventCreateForm, props);
 
-            // Fill out the form fields
-            await userEvent.fill(screen.getByLabelText("Event Name"), "Test Event");
+            await userEvent.fill(screen.getByLabelText("Event Name*"), "Test Event");
             await userEvent.fill(screen.getByLabelText("Guest List Limit"), "100");
             await userEvent.fill(screen.getByLabelText("Entry Price"), "50");
             await userEvent.fill(
@@ -141,7 +152,6 @@ describe("EventCreateForm", () => {
         it("resets the form when reset button is clicked", async () => {
             const screen = renderComponent(EventCreateForm, props);
 
-            // Fill out the form fields
             await userEvent.fill(screen.getByLabelText("Event Name"), "Test Event");
             await userEvent.fill(screen.getByLabelText("Guest List Limit"), "100");
             await userEvent.fill(screen.getByLabelText("Entry Price"), "50");
@@ -157,12 +167,13 @@ describe("EventCreateForm", () => {
             const resetButton = screen.getByRole("button", { name: "Reset" });
             await userEvent.click(resetButton);
 
-            // Check that the form fields are reset
-            await expect.element(screen.getByLabelText("Event Name")).toHaveValue("");
+            await expect.element(screen.getByLabelText("Event Name*")).toHaveValue("");
             await expect.element(screen.getByLabelText("Guest List Limit")).toHaveValue(100);
             await expect.element(screen.getByLabelText("Entry Price")).toHaveValue(0);
             await expect.element(screen.getByLabelText("Event Image URL")).toHaveValue("");
-            await expect.element(screen.getByText("Floor 1")).not.toBeInTheDocument();
+            await expect
+                .element(screen.getByLabelText("Selected floor plans").getByText("Floor 1"))
+                .not.toBeInTheDocument();
         });
 
         describe("floor ordering", () => {
@@ -186,13 +197,10 @@ describe("EventCreateForm", () => {
                 const screen = renderComponent(EventCreateForm, props);
 
                 const addFloorBtn = screen.getByLabelText("Add floor plan");
-
                 await userEvent.click(addFloorBtn);
                 await userEvent.click(screen.getByLabelText("Add Floor 1 floor plan"));
-
                 await userEvent.click(addFloorBtn);
                 await userEvent.click(screen.getByLabelText("Add Floor 2 floor plan"));
-
                 await userEvent.fill(screen.getByLabelText("Event Name"), "Test Event");
                 const submitButton = screen.getByRole("button", { name: "Submit" });
                 await userEvent.click(submitButton);
@@ -300,7 +308,6 @@ describe("EventCreateForm", () => {
 
         it("renders the form with event data", async () => {
             const screen = renderComponent(EventCreateForm, props);
-            // Check that the form fields are populated with event data
             await expect
                 .element(screen.getByLabelText("Optional event image url"))
                 .toHaveValue(props.event!.img);
@@ -322,6 +329,7 @@ describe("EventCreateForm", () => {
         it("does not display floor selection in edit mode", async () => {
             const screen = renderComponent(EventCreateForm, props);
 
+            await expect.element(screen.getByLabelText("Add floor plan")).not.toBeInTheDocument();
             const floorCheckboxes = screen.getByRole("checkbox");
             await expect.element(floorCheckboxes.first()).not.toBeInTheDocument();
         });
@@ -329,7 +337,6 @@ describe("EventCreateForm", () => {
         it("emits update event with correct payload", async () => {
             const screen = renderComponent(EventCreateForm, props);
 
-            // Update some form fields
             await userEvent.fill(screen.getByLabelText("Event Name"), "Updated Event");
             await userEvent.fill(screen.getByLabelText("Entry Price"), "80");
 
@@ -337,7 +344,6 @@ describe("EventCreateForm", () => {
 
             await userEvent.click(submitButton);
 
-            // Check that the 'update' event was emitted with correct payload
             const emitted = screen.emitted().update as any[];
             expect(emitted).toBeTruthy();
             expect(emitted[0][0]).toMatchObject({
@@ -368,13 +374,8 @@ describe("EventCreateForm", () => {
             const dateCell = screen.getByRole("button", { exact: true, name: yesterdayDay });
             await userEvent.click(dateCell);
 
-            const closeButton = screen.getByRole("button", { name: "Close" });
-            await userEvent.click(closeButton);
-
-            const dateValue = screen
-                .getByLabelText("Event date and time")
-                .query() as HTMLInputElement;
-            expect(dateValue.value).toStrictEqual(expect.stringContaining(yesterdayDay));
+            const dateValue = screen.getByLabelText("Event date and time");
+            await expect.element(dateValue).toHaveValue(expect.stringContaining(yesterdayDay));
         });
     });
 });

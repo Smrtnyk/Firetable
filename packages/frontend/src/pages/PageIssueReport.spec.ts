@@ -2,11 +2,12 @@ import type { IssueReportDoc } from "@firetable/types";
 import type { RenderResult } from "vitest-browser-vue";
 
 import { IssueCategory, IssueStatus, Role } from "@firetable/types";
-import { userEvent } from "@vitest/browser/context";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { page, userEvent } from "@vitest/browser/context";
+import { globalDialog } from "src/composables/useDialog";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ref } from "vue";
 
-import { renderComponent, t } from "../../test-helpers/render-component";
+import { cleanupAfterTest, renderComponent, t } from "../../test-helpers/render-component";
 import PageIssueReport from "./PageIssueReport.vue";
 
 const {
@@ -76,6 +77,7 @@ describe("PageIssueReport.vue", () => {
             PageIssueReport,
             {},
             {
+                includeGlobalComponents: true,
                 piniaStoreOptions: {
                     initialState: {
                         auth: {
@@ -93,12 +95,17 @@ describe("PageIssueReport.vue", () => {
                         },
                     },
                 },
+                wrapInLayout: true,
             },
         );
     }
 
     beforeEach(() => {
         useFirestoreCollectionMock.mockReturnValue({ data: ref(mockIssues) });
+    });
+
+    afterEach(() => {
+        cleanupAfterTest();
     });
 
     it("renders correctly with user's issues", async () => {
@@ -132,8 +139,6 @@ describe("PageIssueReport.vue", () => {
             await expect
                 .element(screen.getByText(t("PageIssueReport.createNewIssue")))
                 .toBeVisible();
-
-            await userEvent.click(screen.getByLabelText("Close dialog"));
         });
     });
 
@@ -146,11 +151,10 @@ describe("PageIssueReport.vue", () => {
             await userEvent.click(screen.getByText(t("Global.edit")));
 
             await expect.element(screen.getByText(t("PageIssueReport.editIssue"))).toBeVisible();
-
-            await userEvent.click(screen.getByLabelText("Close dialog"));
         });
 
         it("disables edit for resolved issues", async () => {
+            const openDialogSpy = vi.spyOn(globalDialog, "openDialog");
             useFirestoreCollectionMock.mockReturnValue({
                 data: ref([{ ...mockIssues[0], status: IssueStatus.RESOLVED }]),
             });
@@ -159,20 +163,20 @@ describe("PageIssueReport.vue", () => {
 
             const actionsButton = screen.getByLabelText("Actions for issue My Test Issue");
             await userEvent.click(actionsButton);
-
-            const editButton = screen.getByLabelText("Edit issue");
-            await expect.element(editButton).toHaveAttribute("aria-disabled", "true");
+            await userEvent.click(screen.getByLabelText("Edit issue"), { force: true });
+            expect(openDialogSpy).not.toHaveBeenCalled();
         });
     });
 
     describe("delete issue", () => {
         it("confirms before deleting issue", async () => {
+            await page.viewport(1200, 800);
             const screen = render();
 
             const actionsButton = screen.getByLabelText("Actions for issue My Test Issue");
             await userEvent.click(actionsButton);
             await userEvent.click(screen.getByText(t("Global.delete")));
-            await userEvent.click(screen.getByText("ok"));
+            await userEvent.click(screen.getByRole("button", { name: "Yes" }), { force: true });
 
             expect(deleteIssueReportMock).toHaveBeenCalledWith("issue1");
         });
@@ -183,7 +187,7 @@ describe("PageIssueReport.vue", () => {
             const actionsButton = screen.getByLabelText("Actions for issue My Test Issue");
             await userEvent.click(actionsButton);
             await userEvent.click(screen.getByText(t("Global.delete"), { exact: true }));
-            await userEvent.click(screen.getByText("cancel"));
+            await userEvent.click(screen.getByText("No"));
 
             expect(deleteIssueReportMock).not.toHaveBeenCalled();
         });

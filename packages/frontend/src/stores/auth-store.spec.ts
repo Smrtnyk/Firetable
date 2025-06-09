@@ -3,24 +3,19 @@ import type { User as FBUser } from "firebase/auth";
 
 import { AdminRole, Role } from "@firetable/types";
 import { createPinia, setActivePinia } from "pinia";
+import { useGlobalStore } from "src/stores/global-store";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createApp, nextTick, ref } from "vue";
 
-import { mockedStore } from "../../test-helpers/render-component";
+import { mockedStore } from "../../test-helpers/mocked-store";
 import { AuthState, useAuthStore } from "./auth-store";
 import { usePropertiesStore } from "./properties-store";
 
-const { loadingSpy, logoutUserSpy, showErrorMessageSpy, useFirestoreDocumentSpy } = vi.hoisted(
-    () => ({
-        loadingSpy: {
-            hide: vi.fn(),
-            show: vi.fn(),
-        },
-        logoutUserSpy: vi.fn().mockResolvedValue(undefined),
-        showErrorMessageSpy: vi.fn(),
-        useFirestoreDocumentSpy: vi.fn(),
-    }),
-);
+const { logoutUserSpy, showErrorMessageSpy, useFirestoreDocumentSpy } = vi.hoisted(() => ({
+    logoutUserSpy: vi.fn().mockResolvedValue(undefined),
+    showErrorMessageSpy: vi.fn(),
+    useFirestoreDocumentSpy: vi.fn(),
+}));
 
 vi.mock("src/composables/useFirestore", () => ({
     createQuery: vi.fn(),
@@ -41,11 +36,6 @@ vi.mock("src/db", () => ({
 vi.mock("src/helpers/ui-helpers", () => ({
     showErrorMessage: showErrorMessageSpy,
     tryCatchLoadingWrapper: vi.fn(),
-}));
-
-vi.mock("quasar", async (importOriginal) => ({
-    ...(await importOriginal()),
-    Loading: loadingSpy,
 }));
 
 function createTestFBUser(options: Partial<FBUser> = {}): FBUser {
@@ -89,6 +79,8 @@ describe("auth-store.ts", () => {
         it("initializes admin user correctly", async () => {
             const authStore = mockedStore(useAuthStore);
             const propertiesStore = mockedStore(usePropertiesStore);
+            const globalStore = mockedStore(useGlobalStore);
+            globalStore.setLoading = vi.fn();
             const fbUser = createTestFBUser({
                 getIdTokenResult: vi.fn().mockResolvedValue({
                     claims: {
@@ -103,7 +95,7 @@ describe("auth-store.ts", () => {
 
             await authStore.initUser(fbUser);
 
-            expect(loadingSpy.show).toHaveBeenCalled();
+            expect(globalStore.setLoading).toHaveBeenCalledWith(true);
             expect(authStore.isAdmin).toBe(true);
             expect(authStore.user).toEqual(
                 expect.objectContaining({
@@ -113,12 +105,14 @@ describe("auth-store.ts", () => {
             );
             expect(propertiesStore.initOrganisations).toHaveBeenCalled();
             expect(propertiesStore.initAdminProperties).toHaveBeenCalled();
-            expect(loadingSpy.hide).toHaveBeenCalled();
+            expect(globalStore.setLoading).toHaveBeenCalledWith(false);
         });
 
         it("initializes non-admin user correctly", async () => {
             const authStore = mockedStore(useAuthStore);
             const propertiesStore = mockedStore(usePropertiesStore);
+            const globalStore = mockedStore(useGlobalStore);
+            globalStore.setLoading = vi.fn();
             const fbUser = createTestFBUser();
             const user = createTestUser();
 
@@ -134,7 +128,7 @@ describe("auth-store.ts", () => {
 
             await authStore.initUser(fbUser);
 
-            expect(loadingSpy.show).toHaveBeenCalled();
+            expect(globalStore.setLoading).toHaveBeenCalledWith(true);
             expect(authStore.isAdmin).toBe(false);
             expect(authStore.user).toEqual(user);
             expect(propertiesStore.initUserOrganisation).toHaveBeenCalledWith("org1");
@@ -143,12 +137,14 @@ describe("auth-store.ts", () => {
                 relatedProperties: user.relatedProperties,
                 role: Role.STAFF,
             });
-            expect(loadingSpy.hide).toHaveBeenCalled();
+            expect(globalStore.setLoading).toHaveBeenCalledWith(false);
         });
 
         it("handles errors during user initialization", async () => {
             const authStore = mockedStore(useAuthStore);
             const propertiesStore = mockedStore(usePropertiesStore);
+            const globalStore = mockedStore(useGlobalStore);
+            globalStore.setLoading = vi.fn();
             const error = new Error("Test error");
 
             useFirestoreDocumentSpy.mockReturnValue({
@@ -173,10 +169,10 @@ describe("auth-store.ts", () => {
 
             await authStore.initUser(fbUser);
 
-            expect(loadingSpy.show).toHaveBeenCalled();
+            expect(globalStore.setLoading).toHaveBeenCalledWith(true);
             expect(showErrorMessageSpy).toHaveBeenCalledWith(error.message);
             expect(logoutUserSpy).toHaveBeenCalled();
-            expect(loadingSpy.hide).toHaveBeenCalled();
+            expect(globalStore.setLoading).toHaveBeenCalledWith(false);
 
             expect(authStore.isReady).toBe(false);
             expect(authStore.user).toBeUndefined();
@@ -185,7 +181,8 @@ describe("auth-store.ts", () => {
         it("prevents multiple simultaneous initializations", async () => {
             const authStore = mockedStore(useAuthStore);
             const propertiesStore = mockedStore(usePropertiesStore);
-
+            const globalStore = mockedStore(useGlobalStore);
+            globalStore.setLoading = vi.fn();
             propertiesStore.initUserOrganisation = vi.fn();
             propertiesStore.initNonAdminProperties = vi.fn();
 
@@ -210,14 +207,16 @@ describe("auth-store.ts", () => {
 
             await Promise.all([firstInit, secondInit]);
 
-            expect(loadingSpy.show).toHaveBeenCalledTimes(1);
+            expect(globalStore.setLoading).toHaveBeenCalledTimes(2);
+            expect(globalStore.setLoading).toHaveBeenNthCalledWith(1, true);
             expect(authStore.isReady).toBe(true);
         });
 
         it("cleans up properly when initialization fails", async () => {
             const authStore = mockedStore(useAuthStore);
             const propertiesStore = mockedStore(usePropertiesStore);
-
+            const globalStore = mockedStore(useGlobalStore);
+            globalStore.setLoading = vi.fn();
             useFirestoreDocumentSpy.mockReturnValue({
                 data: ref(null),
                 error: ref(null),
@@ -236,7 +235,7 @@ describe("auth-store.ts", () => {
 
             expect(authStore.isReady).toBe(false);
             expect(authStore.user).toBeUndefined();
-            expect(loadingSpy.hide).toHaveBeenCalled();
+            expect(globalStore.setLoading).toHaveBeenCalledWith(false);
         });
     });
 
@@ -398,6 +397,8 @@ describe("auth-store.ts", () => {
     describe("loading state management", () => {
         it("handles loading states correctly during successful initialization", async () => {
             const authStore = mockedStore(useAuthStore);
+            const globalStore = mockedStore(useGlobalStore);
+            globalStore.setLoading = vi.fn();
             const fbUser = createTestFBUser();
 
             useFirestoreDocumentSpy.mockReturnValue({
@@ -408,16 +409,18 @@ describe("auth-store.ts", () => {
             });
 
             const initPromise = authStore.initUser(fbUser);
-            expect(loadingSpy.show).toHaveBeenCalled();
+            expect(globalStore.setLoading).toHaveBeenCalledWith(true);
             expect(authStore.isInitializing).toBe(true);
 
             await initPromise;
-            expect(loadingSpy.hide).toHaveBeenCalled();
+            expect(globalStore.setLoading).toHaveBeenCalledWith(false);
             expect(authStore.isInitializing).toBe(false);
         });
 
         it("ensures loading is hidden even when errors occur", async () => {
             const authStore = mockedStore(useAuthStore);
+            const globalStore = mockedStore(useGlobalStore);
+            globalStore.setLoading = vi.fn();
             const fbUser = createTestFBUser();
 
             useFirestoreDocumentSpy.mockReturnValue({
@@ -428,7 +431,7 @@ describe("auth-store.ts", () => {
             });
 
             await authStore.initUser(fbUser);
-            expect(loadingSpy.hide).toHaveBeenCalled();
+            expect(globalStore.setLoading).toHaveBeenCalledWith(false);
             expect(authStore.isReady).toBe(false);
         });
     });

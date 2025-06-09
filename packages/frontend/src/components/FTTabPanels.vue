@@ -3,15 +3,13 @@ const model = defineModel<number | string>();
 </script>
 
 <template>
-    <q-tab-panels
+    <v-window
         v-model="model"
         v-bind="$attrs"
-        animated
-        transition-next="fade"
-        transition-prev="fade"
-        transition-duration="600"
-        class="q-pa-none"
+        class="pa-0"
+        transition="fade-transition"
+        reverse-transition="fade-transition"
     >
         <slot></slot>
-    </q-tab-panels>
+    </v-window>
 </template>

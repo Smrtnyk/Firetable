@@ -29,7 +29,8 @@ describe("PageAdminPropertySettings.vue", () => {
     let propertiesData: PropertyDoc[];
     let organisationData: OrganisationDoc;
 
-    beforeEach(() => {
+    beforeEach(async () => {
+        await page.viewport(1920, 1200);
         organisationData = {
             id: "org1",
             name: "Test Organisation",
@@ -92,6 +93,7 @@ describe("PageAdminPropertySettings.vue", () => {
         props = { organisationId: "org1", propertyId: "property1" },
     ): Promise<RenderResult<PageAdminPropertySettingsProps>> {
         const screen = renderComponent(PageAdminPropertySettings, props, {
+            includeGlobalComponents: true,
             piniaStoreOptions: {
                 initialState: {
                     properties: {
@@ -100,6 +102,7 @@ describe("PageAdminPropertySettings.vue", () => {
                     },
                 },
             },
+            wrapInLayout: true,
         });
 
         // Wait for initial render
@@ -125,7 +128,8 @@ describe("PageAdminPropertySettings.vue", () => {
 
         const propertySection = screen.getByLabelText("Property One settings card");
         propertySection.query()!.scrollIntoView();
-
+        // scroll to bottom to ensure all elements are visible
+        document.body.scrollTop = document.body.scrollHeight;
         await nextTick();
 
         const timezoneSelect = propertySection.getByLabelText("Property timezone");

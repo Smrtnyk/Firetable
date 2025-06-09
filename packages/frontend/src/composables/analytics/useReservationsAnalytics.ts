@@ -5,12 +5,12 @@ import type { DateRange } from "src/types";
 import type { Ref } from "vue";
 
 import { format } from "date-fns";
-import { Loading } from "quasar";
 import { fetchAnalyticsData } from "src/db";
 import { getColors } from "src/helpers/colors.js";
 import { getLocalizedDaysOfWeek } from "src/helpers/date-utils";
 import { showErrorMessage } from "src/helpers/ui-helpers.js";
 import { useAnalyticsStore } from "src/stores/analytics-store.js";
+import { useGlobalStore } from "src/stores/global-store";
 import { computed, onUnmounted, ref } from "vue";
 
 import { bucketizeReservations } from "./bucketize-reservations.js";
@@ -32,6 +32,7 @@ export function useReservationsAnalytics(
     organisationId: string,
     locale: string,
 ) {
+    const globalStore = useGlobalStore();
     const analyticsStore = useAnalyticsStore();
     const reservationBucket = ref<ReservationBucket>();
     const selectedDay = ref(DEFAULT_SELECTED_DAY);
@@ -317,11 +318,11 @@ export function useReservationsAnalytics(
     });
 
     async function fetchData(dateRange: DateRange): Promise<void> {
-        if (!dateRange.startDate || !dateRange.endDate) {
+        if (!dateRange.from || !dateRange.to) {
             return;
         }
 
-        const cacheKey = `${dateRange.startDate}_${dateRange.endDate}_${organisationId}`;
+        const cacheKey = `${dateRange.from}_${dateRange.to}_${organisationId}`;
 
         const cachedData = analyticsStore.getDataForRange(cacheKey, property.value.id);
         if (cachedData) {
@@ -330,12 +331,12 @@ export function useReservationsAnalytics(
         }
 
         reservationBucket.value = undefined;
-        Loading.show();
+        globalStore.setLoading(true);
 
         try {
             const fetchedData = await fetchAnalyticsData(
-                dateRange.startDate,
-                dateRange.endDate,
+                dateRange.from,
+                dateRange.to,
                 organisationId,
                 property.value,
             );
@@ -353,7 +354,7 @@ export function useReservationsAnalytics(
         } catch (e) {
             showErrorMessage(e);
         } finally {
-            Loading.hide();
+            globalStore.setLoading(false);
         }
     }
 

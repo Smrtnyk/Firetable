@@ -1,6 +1,8 @@
+import type { PlannedReservationDoc } from "@firetable/types";
 import type { RenderResult } from "vitest-browser-vue";
 
 import { userEvent } from "@vitest/browser/context";
+import { last } from "es-toolkit";
 import { describe, expect, it } from "vitest";
 
 import type { EventGuestSearchProps } from "./EventGuestSearch.vue";
@@ -20,6 +22,7 @@ describe("EventGuestSearch.vue", () => {
             arrived: true,
             floorId: "floor1",
             guestName: "John Doe",
+            id: "john-doe-1",
             isVIP: false,
             tableLabel: "Table 1",
         },
@@ -28,6 +31,7 @@ describe("EventGuestSearch.vue", () => {
             arrived: false,
             floorId: "floor2",
             guestName: "Jane Smith",
+            id: "jane-smith-1",
             isVIP: true,
             tableLabel: "Table 2",
         },
@@ -35,9 +39,11 @@ describe("EventGuestSearch.vue", () => {
 
     const showFloorNameInOption = true;
 
-    function createComponent(): RenderResult<EventGuestSearchProps> {
+    function createComponent(
+        customReservations?: Partial<PlannedReservationDoc>[],
+    ): RenderResult<EventGuestSearchProps> {
         return renderComponent(EventGuestSearch, {
-            allReservedTables: reservations,
+            allReservedTables: customReservations || reservations,
             floors,
             showFloorNameInOption,
         });
@@ -46,7 +52,7 @@ describe("EventGuestSearch.vue", () => {
     it("displays checkmark icon for guests who have arrived", async () => {
         const screen = createComponent();
 
-        const input = screen.getByRole("combobox");
+        const input = screen.getByRole("textbox");
         await userEvent.click(input);
         await userEvent.fill(input, "John");
 
@@ -60,7 +66,7 @@ describe("EventGuestSearch.vue", () => {
     it("does not display checkmark icon for guests who have not arrived", async () => {
         const screen = createComponent();
 
-        const input = screen.getByRole("combobox");
+        const input = screen.getByRole("textbox");
         await userEvent.fill(input, "Jane");
         await userEvent.click(input);
 
@@ -75,7 +81,7 @@ describe("EventGuestSearch.vue", () => {
     it("displays VIP chip for VIP guests", async () => {
         const screen = createComponent();
 
-        const input = screen.getByRole("combobox");
+        const input = screen.getByRole("textbox");
         await userEvent.fill(input, "Jane");
         await userEvent.click(input);
 
@@ -91,7 +97,7 @@ describe("EventGuestSearch.vue", () => {
     it("does not display VIP chip for non-VIP guests", async () => {
         const screen = createComponent();
 
-        const input = screen.getByRole("combobox");
+        const input = screen.getByRole("textbox");
         await userEvent.fill(input, "John");
         await userEvent.click(input);
 
@@ -106,8 +112,7 @@ describe("EventGuestSearch.vue", () => {
     it("does not display arrived guests when 'Hide arrived' is checked", async () => {
         const screen = createComponent();
 
-        const input = screen.getByRole("combobox");
-        await userEvent.fill(input, "John");
+        const input = screen.getByRole("textbox");
         await userEvent.click(input);
 
         // Find the 'Hide arrived' checkbox inside the dropdown
@@ -132,6 +137,7 @@ describe("EventGuestSearch.vue", () => {
                 arrived: true,
                 floorId: "floor1",
                 guestName: "John Doe",
+                id: "john-doe-arrived-only",
                 isVIP: false,
                 tableLabel: "Table 1",
             },
@@ -143,7 +149,7 @@ describe("EventGuestSearch.vue", () => {
             showFloorNameInOption,
         });
 
-        const input = screen.getByRole("combobox");
+        const input = screen.getByRole("textbox");
         await userEvent.fill(input, "John");
         await userEvent.click(input);
 
@@ -163,5 +169,50 @@ describe("EventGuestSearch.vue", () => {
         // Verify that John Doe appears again
         const johnOption = screen.getByText("John Doe (Table 1) on First Floor");
         await expect.element(johnOption).toBeVisible();
+    });
+
+    it("emits only the selected guest when an item is clicked from multiple search results", async () => {
+        const specificReservations = [
+            {
+                arrived: false,
+                floorId: "floor1",
+                guestName: "Milan Keser",
+                id: "milan-keser-res",
+                tableLabel: "Table A",
+            },
+            {
+                arrived: false,
+                floorId: "floor1",
+                guestName: "Marko Keser",
+                id: "marko-keser-res",
+                tableLabel: "Table B",
+            },
+            {
+                arrived: false,
+                floorId: "floor2",
+                guestName: "Peter Pan",
+                id: "peter-pan-res",
+                tableLabel: "Table C",
+            },
+        ];
+        const screen = createComponent(specificReservations);
+
+        const input = screen.getByRole("textbox");
+        await userEvent.fill(input, "Keser");
+
+        const milanOptionText = "Milan Keser (Table A) on First Floor";
+        const markoOptionText = "Marko Keser (Table B) on First Floor";
+
+        const milanOption = screen.getByText(milanOptionText);
+        const markoOption = screen.getByText(markoOptionText);
+
+        await expect.element(milanOption).toBeVisible();
+        await expect.element(markoOption).toBeVisible();
+        await userEvent.click(milanOption);
+
+        const foundEvents = screen.emitted().found;
+        expect(foundEvents).toBeTruthy();
+        const lastFoundEvent = last(foundEvents) as any[];
+        expect(lastFoundEvent[0]).toEqual([specificReservations[0]]);
     });
 });

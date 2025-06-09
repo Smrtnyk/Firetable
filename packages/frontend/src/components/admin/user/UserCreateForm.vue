@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { CreateUserPayload, OrganisationDoc, PropertyDoc } from "@firetable/types";
+import type { VForm } from "vuetify/components";
 
 import { AdminRole, Role } from "@firetable/types";
-import { QForm } from "quasar";
 import {
     hasNumbers,
     hasSymbols,
@@ -27,7 +27,7 @@ const { t } = useI18n();
 const authStore = useAuthStore();
 const emit = defineEmits<Emits>();
 const props = defineProps<UserCreateFormProps>();
-const userCreateForm = useTemplateRef<QForm>("userCreateForm");
+const userCreateForm = useTemplateRef<VForm>("userCreateForm");
 
 const form = ref<CreateUserPayload>(userSkeleton());
 const chosenProperties = ref<string[]>([]);
@@ -58,6 +58,7 @@ const shouldShowPropertiesSelection = computed(function () {
 function onReset(): void {
     form.value = { ...userSkeleton() };
     resetProperties();
+    userCreateForm.value?.reset();
 }
 
 async function onSubmit(): Promise<void> {
@@ -105,13 +106,17 @@ function resetProperties(): void {
 }
 
 async function validateForm(): Promise<boolean> {
-    if (!(await userCreateForm.value?.validate())) {
+    if (!(await userCreateForm.value?.validate())?.valid) {
         return false;
     }
     const chosenRole = form.value.role;
 
-    if (chosenRole !== Role.PROPERTY_OWNER && chosenProperties.value.length === 0) {
-        showErrorMessage("You must select at least one property!");
+    if (
+        chosenRole !== Role.PROPERTY_OWNER &&
+        props.properties.length > 0 &&
+        chosenProperties.value.length === 0
+    ) {
+        showErrorMessage("You must select at least one property for this role!");
         return false;
     }
 
@@ -120,91 +125,79 @@ async function validateForm(): Promise<boolean> {
 </script>
 
 <template>
-    <div class="UserCreateForm">
-        <q-form
-            class="q-gutter-md q-pt-md q-pa-md"
-            @submit="onSubmit"
-            @reset="onReset"
+    <div class="user-create-form">
+        <v-form
             ref="userCreateForm"
+            class="pa-4 d-flex flex-column"
+            style="gap: 1.25rem"
+            @submit.prevent="onSubmit"
+            @reset.prevent="onReset"
             greedy
         >
-            <q-input
+            <v-text-field
                 v-model="form.name"
-                outlined
+                variant="outlined"
                 :label="t('UserCreateForm.userNameInputLabel')"
                 :hint="t('UserCreateForm.userNameInputHint')"
-                lazy-rules
                 :rules="stringRules"
             />
 
-            <q-input
+            <v-text-field
                 v-model="form.username"
-                outlined
-                prefix="Email:"
+                variant="outlined"
                 :label="t('UserCreateForm.userMailInputLabel')"
                 :hint="t('UserCreateForm.userMailInputHint')"
                 :rules="userNameRules"
                 :suffix="emailSuffix"
-            >
-                <template #prepend>
-                    <q-icon name="fa fa-at" />
-                </template>
-            </q-input>
-
-            <q-input
-                v-if="'password' in form"
-                v-model="form.password as string"
-                outlined
-                :label="t('UserCreateForm.userPasswordInputLabel')"
-                :hint="t('UserCreateForm.userPasswordInputHint')"
-                lazy-rules
-                :rules="passwordRules"
-            >
-                <template #prepend>
-                    <q-icon name="fa fa-key" />
-                </template>
-            </q-input>
-
-            <q-select
-                v-model="form.role"
-                :hint="t('UserCreateForm.userRoleSelectHint')"
-                outlined
-                :options="availableRoles"
-                :label="t('UserCreateForm.userRoleSelectLabel')"
+                prepend-inner-icon="fas fa-at"
             />
 
-            <div v-if="shouldShowPropertiesSelection" class="q-gutter-sm q-mb-lg">
-                <div>{{ t("UserCreateForm.usePropertiesCheckboxesTitle") }}</div>
+            <v-text-field
+                v-if="'password' in form"
+                v-model="form.password"
+                variant="outlined"
+                :label="t('UserCreateForm.userPasswordInputLabel')"
+                :hint="t('UserCreateForm.userPasswordInputHint')"
+                :rules="passwordRules"
+                type="password"
+                prepend-inner-icon="fas fa-key"
+            />
+
+            <v-select
+                v-model="form.role"
+                :hint="t('UserCreateForm.userRoleSelectHint')"
+                variant="outlined"
+                :items="availableRoles"
+                :label="t('UserCreateForm.userRoleSelectLabel')"
+                :aria-label="t('UserCreateForm.userRoleSelectLabel')"
+            />
+
+            <div v-if="shouldShowPropertiesSelection" class="mb-4">
+                <div class="text-subtitle-1 mb-2">
+                    {{ t("UserCreateForm.usePropertiesCheckboxesTitle") }}
+                </div>
                 <div>
-                    <q-checkbox
+                    <v-checkbox
                         v-for="property in props.properties"
                         :key="property.id"
                         v-model="chosenProperties"
-                        :val="property.id"
+                        :value="property.id"
                         :label="property.name"
-                        color="accent"
+                        color="secondary"
+                        density="compact"
+                        hide-details
                     />
                 </div>
             </div>
 
-            <div>
-                <q-btn
-                    rounded
-                    size="md"
-                    :label="t('Global.submit')"
-                    type="submit"
-                    class="button-gradient"
-                />
-                <q-btn
-                    rounded
-                    size="md"
-                    outline
-                    :label="t('Global.reset')"
-                    type="reset"
-                    color="primary"
-                    class="q-ml-sm"
-                />
+            <div class="d-flex" style="gap: 8px">
+                <v-btn flat rounded="lg" size="large" type="submit" color="primary">
+                    {{ t("Global.submit") }}
+                </v-btn>
+                <v-btn rounded="lg" size="large" variant="outlined" type="reset" color="primary">
+                    {{ t("Global.reset") }}
+                </v-btn>
             </div>
-        </q-form>
+        </v-form>
     </div>
 </template>

@@ -7,8 +7,9 @@ import type {
     EventFloorDoc,
     FloorDoc,
 } from "@firetable/types";
+import type { VForm } from "vuetify/components";
 
-import { QForm } from "quasar";
+import { isDate } from "es-toolkit";
 import AdminEventFloorManager from "src/components/admin/event/AdminEventFloorManager.vue";
 import {
     createTodayUTCTimestamp,
@@ -38,12 +39,10 @@ export interface EventCreateFormProps {
 }
 
 interface State {
+    datePickerValue: Date;
     form: CreateEventForm;
-    selectedDate: string;
     selectedFloors: EventFloorDoc[];
     selectedTime: string;
-    showDateModal: boolean;
-    showTimeModal: boolean;
 }
 
 const props = defineProps<EventCreateFormProps>();
@@ -64,23 +63,24 @@ const eventObj: CreateEventForm = {
     name: "",
 };
 
-const isEditMode = computed(function () {
-    return Boolean(props.event);
-});
-const form = useTemplateRef<QForm>("form");
+const isEditMode = computed(() => Boolean(props.event));
+const form = useTemplateRef<VForm>("form");
+const dateMenu = ref(false);
+const timeMenu = ref(false);
+
 const state = ref<State>({
+    datePickerValue: new Date(initialDate),
     form: { ...eventObj },
-    selectedDate: dateFromTimestamp(Date.now(), locale.value, props.propertyTimezone),
     selectedFloors: [],
     selectedTime: props.eventStartHours,
-    showDateModal: false,
-    showTimeModal: false,
 });
 
-function validDates(calendarDate: string): boolean {
+function validDates(date: unknown): boolean {
     if (isEditMode.value) {
-        // In edit mode, allow all dates
         return true;
+    }
+    if (!isDate(date)) {
+        return false;
     }
     const today = new Date();
     const formatter = new Intl.DateTimeFormat("en-US", {
@@ -88,66 +88,52 @@ function validDates(calendarDate: string): boolean {
     });
     const propertyToday = new Date(formatter.format(today));
     propertyToday.setHours(0, 0, 0, 0);
-
-    const dateToCheck = new Date(calendarDate);
-    dateToCheck.setHours(0, 0, 0, 0);
-    return dateToCheck >= propertyToday;
+    date.setHours(0, 0, 0, 0);
+    return date >= propertyToday;
 }
 
-watchEffect(function () {
+watchEffect(() => {
     if (isEditMode.value && props.event) {
-        // Use event data if in edit mode
-        const editDate = new Date(props.event.date);
+        const eventTimestamp = props.event.date;
         state.value.form = {
-            date: props.event.date,
+            date: eventTimestamp,
             entryPrice: props.event.entryPrice,
             guestListLimit: props.event.guestListLimit,
             img: props.event.img ?? "",
             name: props.event.name,
         };
-        state.value.selectedDate = dateFromTimestamp(
-            editDate.getTime(),
-            locale.value,
-            props.propertyTimezone,
-        );
+        state.value.datePickerValue = new Date(eventTimestamp);
         state.value.selectedTime = hourFromTimestamp(
-            editDate.getTime(),
+            eventTimestamp,
             locale.value,
             props.propertyTimezone,
         );
     } else {
         state.value.form = { ...eventObj };
-        state.value.selectedDate = dateFromTimestamp(
-            Date.now(),
-            locale.value,
-            props.propertyTimezone,
-        );
+        state.value.datePickerValue = new Date(initialDate);
         state.value.selectedTime = props.eventStartHours;
     }
 });
 
-watch([() => state.value.selectedDate, () => state.value.selectedTime], function () {
-    if (!state.value.selectedDate) {
-        return;
-    }
-    state.value.form.date = createUTCTimestamp(
-        state.value.selectedDate,
-        state.value.selectedTime,
-        props.propertyTimezone,
-    );
-});
+watch(
+    [() => state.value.datePickerValue, () => state.value.selectedTime],
+    ([newPickerDate, newTime]) => {
+        if (!newPickerDate) return;
+        const dateStr = new Intl.DateTimeFormat("de-DE", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+        }).format(newPickerDate);
+        state.value.form.date = createUTCTimestamp(dateStr, newTime, props.propertyTimezone);
+    },
+    { deep: true },
+);
 
-function updateDate(newDateVal: any): void {
-    state.value.selectedDate = newDateVal;
-}
-
-function updateTime(newTime: any): void {
-    state.value.selectedTime = newTime;
-}
-
-const displayedDate = computed(function () {
+const displayedDate = computed(() => {
     if (!state.value.form.date) return "";
-    return `${dateFromTimestamp(state.value.form.date, locale.value, props.propertyTimezone)} ${hourFromTimestamp(state.value.form.date, locale.value, props.propertyTimezone)}`;
+    const datePart = dateFromTimestamp(state.value.form.date, locale.value, props.propertyTimezone);
+    const timePart = hourFromTimestamp(state.value.form.date, locale.value, props.propertyTimezone);
+    return `${datePart} ${timePart}`;
 });
 
 function addFloor(floor: EventFloorDoc): void {
@@ -160,12 +146,13 @@ function addFloor(floor: EventFloorDoc): void {
 function onReset(): void {
     state.value.form = { ...eventObj };
     state.value.selectedFloors = [];
+    state.value.datePickerValue = new Date(initialDate);
+    state.value.selectedTime = props.eventStartHours;
 }
 
 async function onSubmit(): Promise<void> {
-    if (!(await form.value?.validate())) {
-        return;
-    }
+    const { valid } = (await form.value?.validate()) ?? { valid: false };
+    if (!valid) return;
     if (isEditMode.value) {
         return validateAndEmitEdit();
     }
@@ -174,21 +161,27 @@ async function onSubmit(): Promise<void> {
 
 function removeFloor(index: number): void {
     state.value.selectedFloors.splice(index, 1);
-    state.value.selectedFloors = state.value.selectedFloors.map(function (floor, idx) {
-        return {
-            ...floor,
-            order: idx,
-        };
+    state.value.selectedFloors = state.value.selectedFloors.map((floor, idx) => {
+        return { ...floor, order: idx };
     });
 }
 
 function reorderFloors(newFloors: EventFloorDoc[]): void {
-    state.value.selectedFloors = newFloors.map(function (floor, idx) {
-        return {
-            ...floor,
-            order: idx,
-        };
+    state.value.selectedFloors = newFloors.map((floor, idx) => {
+        return { ...floor, order: idx };
     });
+}
+
+function updateDate(newDate: Date | null): void {
+    if (!newDate) return;
+    state.value.datePickerValue = newDate;
+    dateMenu.value = false;
+}
+
+function updateTime(newTime: any): void {
+    if (typeof newTime !== "string") return;
+    state.value.selectedTime = newTime;
+    timeMenu.value = false;
 }
 
 function validateAndEmitCreate(): void {
@@ -196,17 +189,14 @@ function validateAndEmitCreate(): void {
         showErrorMessage(t("EventCreateForm.noChosenFloorsMessage"));
         return;
     }
-
     emit("create", {
         ...state.value.form,
-        floors: state.value.selectedFloors.map(function (floor) {
-            return { ...floor, id: floor.id };
-        }),
+        floors: state.value.selectedFloors.map((floor) => ({ ...floor, id: floor.id })),
         guestListLimit: Number(state.value.form.guestListLimit),
         organisationId: props.organisationId,
         propertyId: props.propertyId,
     });
-    state.value.form = eventObj;
+    onReset();
 }
 
 function validateAndEmitEdit(): void {
@@ -220,101 +210,86 @@ function validateAndEmitEdit(): void {
 </script>
 
 <template>
-    <q-form
+    <v-form
         ref="form"
-        class="q-gutter-xs q-pt-md q-pa-md"
-        @submit="onSubmit"
-        @reset="onReset"
+        class="pa-4 d-flex flex-column"
+        style="gap: 1rem"
+        @submit.prevent="onSubmit"
+        @reset.prevent="onReset"
         greedy
     >
-        <q-input
+        <v-text-field
             v-model="state.form.img"
-            outlined
+            variant="outlined"
             :label="t('EventCreateForm.eventImgInputLabel')"
-            lazy-rules
             :rules="[validOptionalURL()]"
         />
 
-        <q-input
+        <v-text-field
             v-model="state.form.name"
-            outlined
+            variant="outlined"
             :label="t('EventCreateForm.eventNameInputLabel')"
-            lazy-rules
             :rules="[noEmptyString()]"
         />
 
-        <q-input
+        <v-text-field
             v-model.number="state.form.guestListLimit"
-            outlined
+            variant="outlined"
             type="number"
             :label="t('EventCreateForm.guestListLimitInputLabel')"
-            lazy-rules
             :rules="[requireNumber(), greaterThanZero()]"
         />
 
-        <q-input
+        <v-text-field
             v-model.number="state.form.entryPrice"
-            outlined
+            variant="outlined"
             type="number"
             :label="t('EventCreateForm.entryPriceInputLabel')"
-            lazy-rules
             :rules="[requireNumber()]"
         />
 
-        <q-input
+        <v-text-field
             :label="t('EventCreateForm.inputDateTimeLabel')"
-            v-model="displayedDate"
-            outlined
+            :model-value="displayedDate"
+            variant="outlined"
             readonly
-            class="q-mb-lg"
+            class="mb-4"
         >
-            <template #prepend>
-                <q-icon
-                    aria-label="Open date calendar"
-                    name="fa fa-calendar"
-                    class="cursor-pointer"
-                />
-                <q-popup-proxy transition-show="scale" transition-hide="scale">
-                    <q-date
-                        :no-unset="true"
-                        v-model="state.selectedDate"
-                        mask="DD.MM.YYYY"
-                        today-btn
+            <template #prepend-inner>
+                <v-menu v-model="dateMenu" :close-on-content-click="false" location="bottom start">
+                    <template #activator="{ props: menuProps }">
+                        <v-icon
+                            aria-label="Open date calendar"
+                            icon="fas fa-calendar"
+                            class="cursor-pointer"
+                            v-bind="menuProps"
+                        />
+                    </template>
+                    <v-date-picker
+                        v-model="state.datePickerValue"
+                        :allowed-dates="validDates"
                         @update:model-value="updateDate"
-                        :options="validDates"
-                    >
-                        <div class="row items-center justify-end">
-                            <q-btn
-                                :label="t('EventCreateForm.inputDateTimePickerCloseBtnLabel')"
-                                color="primary"
-                                flat
-                                v-close-popup
-                            />
-                        </div>
-                    </q-date>
-                </q-popup-proxy>
+                    ></v-date-picker>
+                </v-menu>
             </template>
-            <template #append>
-                <q-icon name="fa fa-clock" aria-label="Open time picker" class="cursor-pointer" />
-                <q-popup-proxy transition-show="scale" transition-hide="scale">
-                    <q-time
+            <template #append-inner>
+                <v-menu v-model="timeMenu" :close-on-content-click="false" location="bottom end">
+                    <template #activator="{ props: menuProps }">
+                        <v-icon
+                            aria-label="Open time picker"
+                            icon="fas fa-clock"
+                            class="cursor-pointer"
+                            v-bind="menuProps"
+                        />
+                    </template>
+                    <v-time-picker
                         v-model="state.selectedTime"
-                        mask="HH:mm"
-                        format24h
+                        format="24hr"
                         @update:model-value="updateTime"
-                    >
-                        <div class="row items-center justify-end">
-                            <q-btn
-                                :label="t('EventCreateForm.inputDateTimePickerCloseBtnLabel')"
-                                color="primary"
-                                flat
-                                v-close-popup
-                            />
-                        </div>
-                    </q-time>
-                </q-popup-proxy>
+                    ></v-time-picker>
+                </v-menu>
             </template>
-        </q-input>
+        </v-text-field>
 
         <AdminEventFloorManager
             v-if="!isEditMode"
@@ -326,24 +301,21 @@ function validateAndEmitEdit(): void {
             @reorder="reorderFloors"
         />
 
-        <div class="q-mt-md">
-            <q-btn
-                rounded
-                size="md"
-                :label="t('Global.submit')"
-                type="submit"
-                class="button-gradient"
-            />
-            <q-btn
+        <div class="mt-4">
+            <v-btn rounded="lg" size="large" type="submit" color="primary" flat>
+                {{ t("Global.submit") }}
+            </v-btn>
+            <v-btn
                 v-if="!isEditMode"
-                rounded
-                size="md"
-                :label="t('Global.reset')"
+                rounded="lg"
+                size="large"
                 type="reset"
-                class="q-ml-sm"
-                outline
+                class="ml-2"
+                variant="outlined"
                 color="primary"
-            />
+            >
+                {{ t("Global.reset") }}
+            </v-btn>
         </div>
-    </q-form>
+    </v-form>
 </template>

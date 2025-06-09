@@ -26,9 +26,15 @@ const reservationColor = computed(function () {
 </script>
 
 <template>
-    <q-chip text-color="white" color="tertiary" size="sm" class="q-ml-none"
-        >{{ t("GuestSummaryChips.reservations") }}: {{ summary.totalReservations }}</q-chip
-    >
-    <q-chip size="sm">{{ t("GuestSummaryChips.arrived") }}: {{ summary.fulfilledVisits }} </q-chip>
-    <q-chip :color="reservationColor" size="sm">{{ summary.visitPercentage }}%</q-chip>
+    <div>
+        <v-chip color="tertiary" size="small" class="mr-2"
+            >{{ t("GuestSummaryChips.reservations") }}: {{ summary.totalReservations }}</v-chip
+        >
+        <v-chip size="small" class="mr-2"
+            >{{ t("GuestSummaryChips.arrived") }}: {{ summary.fulfilledVisits }}
+        </v-chip>
+        <v-chip :color="reservationColor" text-color="white" size="small"
+            >{{ summary.visitPercentage }}%</v-chip
+        >
+    </div>
 </template>

@@ -47,35 +47,31 @@ describe("UserEditForm", () => {
     it("renders the form with initial values", async () => {
         const screen = renderComponent(UserEditForm, props);
 
-        // Check that the name input has the user's name
         await expect.element(screen.getByLabelText(/Name */)).toHaveValue(props.user.name);
-
-        // Check that the username input has the user's username
         await expect.element(screen.getByLabelText("Username *")).toHaveValue(props.user.username);
-
-        // Password field should be empty
         await expect.element(screen.getByLabelText("User password *")).toHaveValue("");
 
         // Role select should be present for editable roles
         if ([Role.HOSTESS, Role.MANAGER, Role.STAFF].includes(props.user.role)) {
-            await expect.element(screen.getByLabelText("Role")).toBeInTheDocument();
+            const roleTextBox = screen.getByRole("textbox", { name: "Role" });
+            await expect.element(roleTextBox).toBeVisible();
         }
 
-        // Properties checkboxes should be rendered
         const propertyCheckboxes = screen.getByRole("checkbox", {
             name: /Property/,
         });
         expect(propertyCheckboxes.all()).toHaveLength(props.properties.length);
-
         // Check that selected properties are checked
         for (const checkbox of propertyCheckboxes.elements()) {
             const label = checkbox.getAttribute("aria-label");
             const isChecked = props.selectedProperties.some(function (property) {
                 return property.name === label;
             });
-            await expect
-                .element(checkbox)
-                .toHaveAttribute("aria-checked", isChecked ? "true" : "false");
+            if (isChecked) {
+                await expect.element(checkbox).toBeChecked();
+            } else {
+                await expect.element(checkbox).not.toBeChecked();
+            }
         }
 
         for (const [capability, defaultValue] of Object.entries(
@@ -83,9 +79,11 @@ describe("UserEditForm", () => {
         )) {
             const checkbox = screen.getByRole("checkbox", { name: capability });
             await expect.element(checkbox).toBeVisible();
-            await expect
-                .element(checkbox)
-                .toHaveAttribute("aria-checked", defaultValue ? "true" : "false");
+            if (defaultValue) {
+                await expect.element(checkbox).toBeChecked();
+            } else {
+                await expect.element(checkbox).not.toBeChecked();
+            }
         }
     });
 
@@ -121,8 +119,8 @@ describe("UserEditForm", () => {
         await userEvent.type(screen.getByLabelText("User password *"), "newpassword123");
 
         // Change role to MANAGER
-        const roleSelect = screen.getByLabelText("Role");
-        await userEvent.click(roleSelect);
+        const roleSelect = screen.getByRole("textbox", { name: "Role" });
+        await userEvent.click(roleSelect, { force: true });
         const managerOption = screen.getByRole("option", { name: Role.MANAGER });
         await userEvent.click(managerOption);
 
@@ -148,23 +146,21 @@ describe("UserEditForm", () => {
 
     it("resets the form when reset button is clicked", async () => {
         const screen = renderComponent(UserEditForm, props);
+        const nameField = screen.getByLabelText("Name *", { exact: true });
 
         // Modify fields
-        await userEvent.clear(screen.getByLabelText(/Name */));
-        await userEvent.type(screen.getByLabelText(/Name */), "Jane Doe");
-
+        await userEvent.clear(nameField);
+        await userEvent.type(nameField, "Jane Doe");
         await userEvent.type(screen.getByLabelText("User password *"), "newpassword123");
-
         // Deselect a property
         const propertyCheckbox = screen.getByRole("checkbox", { name: "Property 1" });
         await userEvent.click(propertyCheckbox);
 
-        // Reset the form
         const resetButton = screen.getByRole("button", { name: "Reset" });
         await userEvent.click(resetButton);
 
         // Check that fields are reset
-        await expect.element(screen.getByLabelText(/Name */)).toHaveValue(props.user.name);
+        await expect.element(nameField).toHaveValue(props.user.name);
         await expect.element(screen.getByLabelText("User password *")).toHaveValue("");
 
         // Check that properties are reset
@@ -176,9 +172,11 @@ describe("UserEditForm", () => {
             const isChecked = props.selectedProperties.some(function (property) {
                 return property.name === label;
             });
-            await expect
-                .element(checkbox)
-                .toHaveAttribute("aria-checked", isChecked ? "true" : "false");
+            if (isChecked) {
+                await expect.element(checkbox).toBeChecked();
+            } else {
+                await expect.element(checkbox).not.toBeChecked();
+            }
         }
     });
 
@@ -187,7 +185,7 @@ describe("UserEditForm", () => {
         const screen = renderComponent(UserEditForm, props);
 
         // Role select should not be present
-        await expect.element(screen.getByLabelText("Role")).not.toBeInTheDocument();
+        await expect.element(screen.getByRole("textbox", { name: "Role" })).not.toBeInTheDocument();
 
         // Properties selection should not be present
         const propertyCheckboxes = screen.getByRole("checkbox", {
@@ -217,8 +215,8 @@ describe("UserEditForm", () => {
         await expect.element(screen.getByText("Capabilities:")).not.toBeInTheDocument();
 
         // Change role to Staff
-        const roleSelect = screen.getByLabelText("Role");
-        await userEvent.click(roleSelect);
+        const roleSelect = screen.getByRole("textbox", { name: "Role" });
+        await userEvent.click(roleSelect, { force: true });
         const staffOption = screen.getByRole("option", { name: Role.STAFF });
         await userEvent.click(staffOption);
 
@@ -231,9 +229,11 @@ describe("UserEditForm", () => {
         )) {
             const checkbox = screen.getByRole("checkbox", { name: capability });
             await expect.element(checkbox).toBeVisible();
-            await expect
-                .element(checkbox)
-                .toHaveAttribute("aria-checked", defaultValue ? "true" : "false");
+            if (defaultValue) {
+                await expect.element(checkbox).toBeChecked();
+            } else {
+                await expect.element(checkbox).not.toBeChecked();
+            }
         }
     });
 
@@ -257,8 +257,8 @@ describe("UserEditForm", () => {
         await expect.element(capabilityCheckbox).not.toBeChecked();
 
         // Change role to Manager
-        const roleSelect = screen.getByLabelText("Role");
-        await userEvent.click(roleSelect);
+        const roleSelect = screen.getByRole("textbox", { name: "Role" });
+        await userEvent.click(roleSelect, { force: true });
         const managerOption = screen.getByRole("option", { name: Role.MANAGER });
         await userEvent.click(managerOption);
 
@@ -266,7 +266,7 @@ describe("UserEditForm", () => {
         await expect.element(screen.getByText("Capabilities:")).not.toBeInTheDocument();
 
         // Change role back to Staff
-        await userEvent.click(roleSelect);
+        await userEvent.click(roleSelect, { force: true });
         const staffOption = screen.getByRole("option", { name: Role.STAFF });
         await userEvent.click(staffOption);
 
@@ -289,8 +289,8 @@ describe("UserEditForm", () => {
         const screen = renderComponent(UserEditForm, props);
 
         // Change role to Manager
-        const roleSelect = screen.getByLabelText("Role");
-        await userEvent.click(roleSelect);
+        const roleSelect = screen.getByRole("textbox", { name: "Role" });
+        await userEvent.click(roleSelect, { force: true });
         const managerOption = screen.getByRole("option", { name: Role.MANAGER });
         await userEvent.click(managerOption);
 
@@ -390,16 +390,16 @@ describe("UserEditForm", () => {
 
     it("resets all fields to initial values after changing multiple fields and clicking reset", async () => {
         const screen = renderComponent(UserEditForm, props);
-
+        const nameTextbox = screen.getByLabelText("Name *", { exact: true });
+        const roleTextbox = screen.getByRole("textbox", { name: "Role" });
         // Modify multiple fields
-        await userEvent.clear(screen.getByLabelText(/Name */));
-        await userEvent.type(screen.getByLabelText(/Name */), "Jane Doe");
+        await userEvent.clear(nameTextbox);
+        await userEvent.type(nameTextbox, "Jane Doe");
 
         await userEvent.type(screen.getByLabelText("User password *"), "newpassword123");
 
         // Change role to MANAGER
-        const roleSelect = screen.getByLabelText("Role");
-        await userEvent.click(roleSelect);
+        await userEvent.click(roleTextbox, { force: true });
         const managerOption = screen.getByRole("option", { name: Role.MANAGER });
         await userEvent.click(managerOption);
 
@@ -412,15 +412,11 @@ describe("UserEditForm", () => {
         await userEvent.click(resetButton);
 
         // Check that fields are reset
-        await expect.element(screen.getByLabelText(/Name */)).toHaveValue(props.user.name);
+        await expect.element(nameTextbox).toHaveValue(props.user.name);
         await expect.element(screen.getByLabelText("User password *")).toHaveValue("");
 
         // Check that role is reset
-        const roleSelectAfterReset = screen.getByLabelText("Role");
-        // Need to simulate opening the select to check selected value
-        await userEvent.click(roleSelectAfterReset);
-        const selectedOption = screen.getByRole("option", { selected: true });
-        await expect.element(selectedOption).toHaveTextContent(props.user.role);
+        await expect.element(roleTextbox).toHaveValue(props.user.role);
 
         // Check that properties are reset
         const propertyCheckboxes = screen.getByRole("checkbox", {
@@ -431,9 +427,11 @@ describe("UserEditForm", () => {
             const isChecked = props.selectedProperties.some(function (property) {
                 return property.name === label;
             });
-            await expect
-                .element(checkbox)
-                .toHaveAttribute("aria-checked", isChecked ? "true" : "false");
+            if (isChecked) {
+                await expect.element(checkbox).toBeChecked();
+            } else {
+                await expect.element(checkbox).not.toBeChecked();
+            }
         }
     });
 
@@ -445,6 +443,7 @@ describe("UserEditForm", () => {
             [UserCapability.CAN_SEE_GUEST_CONTACT]: false,
         };
         const screen = renderComponent(UserEditForm, props);
+        const roleTextbox = screen.getByRole("textbox", { name: "Role" });
 
         // Change capabilities for Staff role
         const canReserveCheckbox = screen.getByRole("checkbox", {
@@ -454,18 +453,17 @@ describe("UserEditForm", () => {
         await userEvent.click(canReserveCheckbox);
 
         // Change role to Manager
-        const roleSelect = screen.getByLabelText("Role");
-        await userEvent.click(roleSelect);
+        await userEvent.click(roleTextbox, { force: true });
         const managerOption = screen.getByRole("option", { name: Role.MANAGER });
         await userEvent.click(managerOption);
 
         // Change role to Hostess
-        await userEvent.click(roleSelect);
+        await userEvent.click(roleTextbox, { force: true });
         const hostessOption = screen.getByRole("option", { name: Role.HOSTESS });
         await userEvent.click(hostessOption);
 
         // Change back to Staff
-        await userEvent.click(roleSelect);
+        await userEvent.click(roleTextbox, { force: true });
         const staffOption = screen.getByRole("option", { name: Role.STAFF });
         await userEvent.click(staffOption);
 
@@ -489,8 +487,8 @@ describe("UserEditForm", () => {
         const screen = renderComponent(UserEditForm, props);
 
         // Change role to Hostess
-        const roleSelect = screen.getByLabelText("Role");
-        await userEvent.click(roleSelect);
+        const roleSelect = screen.getByRole("textbox", { name: "Role" });
+        await userEvent.click(roleSelect, { force: true });
         const hostessOption = screen.getByRole("option", { name: Role.HOSTESS });
         await userEvent.click(hostessOption);
 

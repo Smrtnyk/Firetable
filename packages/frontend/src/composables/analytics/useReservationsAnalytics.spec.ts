@@ -1,7 +1,8 @@
+import type { DateRange } from "src/types";
+
 import { ReservationType } from "@firetable/types";
 import { createTestingPinia } from "@pinia/testing";
 import { noop } from "es-toolkit";
-import { Dialog, Loading, Quasar } from "quasar";
 import messages from "src/i18n";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { type App, createApp, nextTick, ref } from "vue";
@@ -67,7 +68,6 @@ function withSetup(
 
     app.use(testingPinia);
     app.use(i18n);
-    app.use(Quasar, { plugins: { Dialog, Loading } });
 
     const container = document.createElement("div");
     document.body.appendChild(container);
@@ -103,7 +103,7 @@ describe("useReservationsAnalytics", () => {
             const [result, mountedApp] = withSetup(() =>
                 useReservationsAnalytics(property, "org1", "en"),
             );
-            await result.fetchData({ endDate: "2024-01-31", startDate: "2024-01-01" });
+            await result.fetchData({ from: "2024-01-01", to: "2024-01-31" });
             app = mountedApp;
 
             await nextTick();
@@ -128,7 +128,7 @@ describe("useReservationsAnalytics", () => {
             const [result, mountedApp] = withSetup(() =>
                 useReservationsAnalytics(property, "1", "en"),
             );
-            await result.fetchData({ endDate: "2024-01-31", startDate: "2024-01-01" });
+            await result.fetchData({ from: "2024-01-31", to: "2024-01-01" });
             app = mountedApp;
 
             await nextTick();
@@ -145,7 +145,7 @@ describe("useReservationsAnalytics", () => {
             const [result, mountedApp] = withSetup(() =>
                 useReservationsAnalytics(property, "org1", "en"),
             );
-            await result.fetchData({ endDate: "", startDate: "" });
+            await result.fetchData({ from: "", to: "" });
             app = mountedApp;
 
             await nextTick();
@@ -162,7 +162,7 @@ describe("useReservationsAnalytics", () => {
             const [result, mountedApp] = withSetup(() =>
                 useReservationsAnalytics(property, "org1", "en"),
             );
-            await result.fetchData({ endDate: "2024-01-31", startDate: "2024-01-01" });
+            await result.fetchData({ from: "2024-01-31", to: "2024-01-01" });
             app = mountedApp;
 
             await nextTick();
@@ -184,22 +184,22 @@ describe("useReservationsAnalytics", () => {
             const [result, mountedApp] = withSetup(() =>
                 useReservationsAnalytics(property, "org1", "en"),
             );
-            await result.fetchData({ endDate: "2024-01-31", startDate: "2024-01-01" });
+            await result.fetchData({ from: "2024-01-31", to: "2024-01-01" });
             app = mountedApp;
 
             await nextTick();
 
-            await result.fetchData({ endDate: "2024-02-28", startDate: "2024-02-01" });
+            await result.fetchData({ from: "2024-02-28", to: "2024-02-01" });
             await nextTick();
 
-            await result.fetchData({ endDate: "2024-01-31", startDate: "2024-01-01" });
+            await result.fetchData({ from: "2024-01-31", to: "2024-01-01" });
             await nextTick();
 
             expect(fetchAnalyticsDataMock).toHaveBeenCalledTimes(2);
         });
 
         it("maintains separate caches for different properties", async () => {
-            const dateRange = { endDate: "2024-01-31", startDate: "2024-01-01" };
+            const dateRange: DateRange = { from: "2024-01-31", to: "2024-01-01" };
             const property1 = ref({ id: "1", name: "Property 1", organisationId: "1" });
             const property2 = ref({ id: "2", name: "Property 2", organisationId: "1" });
 
@@ -237,7 +237,7 @@ describe("useReservationsAnalytics", () => {
         });
 
         it("clears cache on unmount", async () => {
-            const dateRange = { endDate: "2024-01-31", startDate: "2024-01-01" };
+            const dateRange: DateRange = { from: "2024-01-31", to: "2024-01-01" };
             const property = ref({ id: "1", name: "Test Property", organisationId: "1" });
 
             fetchAnalyticsDataMock.mockResolvedValueOnce({
@@ -289,7 +289,7 @@ describe("useReservationsAnalytics", () => {
             const [result, mountedApp] = withSetup(() =>
                 useReservationsAnalytics(property, "1", "en"),
             );
-            await result.fetchData({ endDate: "2024-01-31", startDate: "2024-01-01" });
+            await result.fetchData({ from: "2024-01-31", to: "2024-01-01" });
             app = mountedApp;
 
             await nextTick();
@@ -316,7 +316,7 @@ describe("useReservationsAnalytics", () => {
             const [result, mountedApp] = withSetup(() =>
                 useReservationsAnalytics(property, "org1", "en"),
             );
-            await result.fetchData({ endDate: "2024-01-31", startDate: "2024-01-01" });
+            await result.fetchData({ from: "2024-01-31", to: "2024-01-01" });
             app = mountedApp;
 
             await nextTick();
@@ -340,7 +340,7 @@ describe("useReservationsAnalytics", () => {
             const [result, mountedApp] = withSetup(() =>
                 useReservationsAnalytics(property, "org1", "en"),
             );
-            await result.fetchData({ endDate: "2024-01-31", startDate: "2024-01-01" });
+            await result.fetchData({ from: "2024-01-31", to: "2024-01-01" });
             app = mountedApp;
 
             await nextTick();
@@ -382,7 +382,7 @@ describe("useReservationsAnalytics", () => {
             const [result, mountedApp] = withSetup(() =>
                 useReservationsAnalytics(property, "org1", "en"),
             );
-            await result.fetchData({ endDate: "2024-01-31", startDate: "2024-01-01" });
+            await result.fetchData({ from: "2024-01-31", to: "2024-01-01" });
             app = mountedApp;
 
             await nextTick();
@@ -418,7 +418,7 @@ describe("useReservationsAnalytics", () => {
             const [result, mountedApp] = withSetup(() =>
                 useReservationsAnalytics(property, "org1", "en"),
             );
-            await result.fetchData({ endDate: "2024-01-31", startDate: "2024-01-01" });
+            await result.fetchData({ from: "2024-01-31", to: "2024-01-01" });
             app = mountedApp;
 
             await nextTick();
@@ -451,7 +451,7 @@ describe("useReservationsAnalytics", () => {
             const [result, mountedApp] = withSetup(() =>
                 useReservationsAnalytics(property, "org1", "en"),
             );
-            await result.fetchData({ endDate: "2024-01-31", startDate: "2024-01-01" });
+            await result.fetchData({ from: "2024-01-31", to: "2024-01-01" });
             app = mountedApp;
 
             await nextTick();
@@ -491,7 +491,7 @@ describe("useReservationsAnalytics", () => {
             const [result, mountedApp] = withSetup(() =>
                 useReservationsAnalytics(property, "org1", "en"),
             );
-            await result.fetchData({ endDate: "2024-01-31", startDate: "2024-01-01" });
+            await result.fetchData({ from: "2024-01-31", to: "2024-01-01" });
             app = mountedApp;
 
             await nextTick();

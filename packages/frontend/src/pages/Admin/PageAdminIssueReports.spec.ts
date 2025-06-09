@@ -3,31 +3,36 @@ import type { RenderResult } from "vitest-browser-vue";
 
 import { AdminRole, IssueCategory, IssueStatus } from "@firetable/types";
 import { userEvent } from "@vitest/browser/context";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { useGlobalStore } from "src/stores/global-store";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ref } from "vue";
 
-import { renderComponent, t } from "../../../test-helpers/render-component";
+import { mockedStore } from "../../../test-helpers/mocked-store";
+import { cleanupAfterTest, renderComponent, t } from "../../../test-helpers/render-component";
 import PageAdminIssueReports from "./PageAdminIssueReports.vue";
 
 const {
     createDialogSpy,
     deleteIssueReportMock,
-    notifyMock,
     updateIssueReportMock,
     useFirestoreCollectionMock,
 } = vi.hoisted(() => ({
     createDialogSpy: vi.fn(),
     deleteIssueReportMock: vi.fn(),
-    notifyMock: vi.fn(),
     updateIssueReportMock: vi.fn(),
     useFirestoreCollectionMock: vi.fn(),
 }));
 
-vi.mock("src/composables/useDialog", () => ({
-    useDialog: () => ({
-        createDialog: createDialogSpy,
-    }),
-}));
+vi.mock(import("src/composables/useDialog"), async (importOriginal) => {
+    const original = await importOriginal();
+    return {
+        ...original,
+        globalDialog: {
+            ...original.globalDialog,
+            openDialog: createDialogSpy,
+        },
+    };
+});
 
 vi.mock("src/composables/useFirestore", () => ({
     useFirestoreCollection: useFirestoreCollectionMock,
@@ -37,13 +42,6 @@ vi.mock("src/db", () => ({
     deleteIssueReport: deleteIssueReportMock,
     getIssueReportsPath: vi.fn(),
     updateIssueReport: updateIssueReportMock,
-}));
-
-vi.mock("quasar", async (importOriginal) => ({
-    ...(await importOriginal()),
-    useQuasar: () => ({
-        notify: notifyMock,
-    }),
 }));
 
 describe("PageAdminIssueReports.vue", () => {
@@ -75,6 +73,7 @@ describe("PageAdminIssueReports.vue", () => {
             PageAdminIssueReports,
             {},
             {
+                includeGlobalComponents: true,
                 piniaStoreOptions: {
                     initialState: {
                         auth: {
@@ -99,12 +98,18 @@ describe("PageAdminIssueReports.vue", () => {
                         },
                     },
                 },
+                wrapInLayout: true,
             },
         );
     }
 
     beforeEach(() => {
         useFirestoreCollectionMock.mockReturnValue({ data: ref(mockIssues) });
+    });
+
+    afterEach(() => {
+        cleanupAfterTest();
+        document.body.innerHTML = "";
     });
 
     it("renders correctly when there are issues", async () => {
@@ -114,11 +119,13 @@ describe("PageAdminIssueReports.vue", () => {
             .element(screen.getByRole("heading", { name: t("PageAdminIssueReports.title") }))
             .toBeVisible();
 
-        const issueItems = screen.getByRole("listitem");
+        const issueItems = screen.getByLabelText("Issue report item");
         expect(issueItems.all()).toHaveLength(2);
 
-        await expect.element(screen.getByText("Test Bug")).toBeVisible();
-        await expect.element(screen.getByText("Feature Request")).toBeVisible();
+        await expect.element(screen.getByText("Test Bug", { exact: true })).toBeVisible();
+        const featureIssue = screen.getByText("Feature Request", { exact: true }).nth(1);
+        screen.debug(featureIssue);
+        await expect.element(featureIssue).toBeVisible();
     });
 
     it("shows 'no issues' message when there are no issues", async () => {
@@ -134,6 +141,7 @@ describe("PageAdminIssueReports.vue", () => {
     describe("issue status updates", () => {
         it("updates issue status successfully", async () => {
             const screen = render();
+            const globalStore = mockedStore(useGlobalStore);
 
             const actionsButton = screen.getByLabelText("Actions for issue Test Bug");
             await userEvent.click(actionsButton);
@@ -144,7 +152,9 @@ describe("PageAdminIssueReports.vue", () => {
             expect(updateIssueReportMock).toHaveBeenCalledWith("issue1", {
                 status: IssueStatus.IN_PROGRESS,
             });
-            expect(notifyMock).toHaveBeenCalledWith(t("PageAdminIssueReports.statusUpdated"));
+            expect(globalStore.notify).toHaveBeenCalledWith(
+                t("PageAdminIssueReports.statusUpdated"),
+            );
         });
     });
 
@@ -155,7 +165,7 @@ describe("PageAdminIssueReports.vue", () => {
             const actionsButton = screen.getByLabelText("Actions for issue Test Bug");
             await userEvent.click(actionsButton);
             await userEvent.click(screen.getByText(t("Global.delete")));
-            await userEvent.click(screen.getByText("ok"));
+            await userEvent.click(screen.getByText("Yes"));
 
             expect(deleteIssueReportMock).toHaveBeenCalledWith("issue1");
         });
@@ -166,7 +176,7 @@ describe("PageAdminIssueReports.vue", () => {
             const actionsButton = screen.getByLabelText("Actions for issue Test Bug");
             await userEvent.click(actionsButton);
             await userEvent.click(screen.getByText(t("Global.delete")));
-            await userEvent.click(screen.getByText("cancel"));
+            await userEvent.click(screen.getByText("No"));
 
             expect(deleteIssueReportMock).not.toHaveBeenCalled();
         });

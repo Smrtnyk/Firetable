@@ -83,11 +83,13 @@ describe("UserCreateForm", () => {
 
     it("shows error when no properties are selected", async () => {
         const screen = renderComponent(UserCreateForm, props, {
+            includeGlobalComponents: true,
             piniaStoreOptions: {
                 initialState: {
                     auth: { user },
                 },
             },
+            wrapInLayout: true,
         });
 
         // Fill out required fields
@@ -108,10 +110,8 @@ describe("UserCreateForm", () => {
         await userEvent.click(submitButton);
 
         await expect
-            .element(screen.getByText("You must select at least one property!"))
+            .element(screen.getByText("You must select at least one property for this role!"))
             .toBeVisible();
-
-        await userEvent.click(screen.getByRole("button", { name: "OK" }));
     });
 
     it("emits submit event with correct payload", async () => {
@@ -139,7 +139,7 @@ describe("UserCreateForm", () => {
 
         // Select role
         const roleSelect = screen.getByLabelText(t("UserCreateForm.userRoleSelectLabel"));
-        await userEvent.click(roleSelect);
+        await userEvent.click(roleSelect, { force: true });
         const managerOption = screen.getByRole("option", { name: Role.MANAGER });
         await userEvent.click(managerOption);
 
@@ -222,7 +222,7 @@ describe("UserCreateForm", () => {
 
         // Select role PROPERTY_OWNER
         const roleSelect = screen.getByLabelText(t("UserCreateForm.userRoleSelectLabel"));
-        await userEvent.click(roleSelect);
+        await userEvent.click(roleSelect, { force: true });
         const propertyOwnerOption = screen.getByRole("option", { name: Role.PROPERTY_OWNER });
         await userEvent.click(propertyOwnerOption);
 
@@ -370,7 +370,7 @@ describe("UserCreateForm", () => {
 
         // Select role
         const roleSelect = screen.getByLabelText(t("UserCreateForm.userRoleSelectLabel"));
-        await userEvent.click(roleSelect);
+        await userEvent.click(roleSelect, { force: true });
         const managerOption = screen.getByRole("option", { name: Role.MANAGER });
         await userEvent.click(managerOption);
 

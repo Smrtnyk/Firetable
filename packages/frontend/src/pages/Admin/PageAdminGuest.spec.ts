@@ -4,7 +4,6 @@ import type { RenderResult } from "vitest-browser-vue";
 import { AdminRole } from "@firetable/types";
 import { userEvent } from "@vitest/browser/context";
 import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
-import FTDialog from "src/components/FTDialog.vue";
 import { UTC } from "src/helpers/date-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ref } from "vue";
@@ -22,11 +21,17 @@ const { createDialogSpy, showConfirmMock, tryCatchLoadingWrapperSpy, useFirestor
         useFirestoreDocumentMock: vi.fn(),
     }));
 
-vi.mock("src/composables/useDialog", () => ({
-    useDialog: () => ({
-        createDialog: createDialogSpy,
-    }),
-}));
+vi.mock(import("src/composables/useDialog"), async (importOriginal) => {
+    const original = await importOriginal();
+    return {
+        ...original,
+        globalDialog: {
+            ...original.globalDialog,
+            confirm: showConfirmMock,
+            openDialog: createDialogSpy,
+        },
+    };
+});
 
 vi.mock("src/composables/useFirestore", () => ({
     createQuery: vi.fn(),
@@ -37,7 +42,6 @@ vi.mock("src/composables/useFirestore", () => ({
 vi.mock("src/helpers/ui-helpers", async function (importOriginal) {
     return {
         ...(await importOriginal()),
-        showConfirm: showConfirmMock,
         tryCatchLoadingWrapper: tryCatchLoadingWrapperSpy,
     };
 });
@@ -138,12 +142,12 @@ describe("PageAdminGuest.vue", () => {
     });
 
     it("renders visits sorted by date in descending order", () => {
-        render();
+        const screen = render();
 
-        // Get the list of visit event names
-        const visitEventNames = Array.from(document.querySelectorAll(".q-timeline__title")).map(
-            (element) => element.textContent,
-        );
+        const visitEventNames = screen
+            .getByLabelText("Visit event name")
+            .elements()
+            .map((element) => element.textContent);
 
         // Expected order: Most recent visit first and on first property tab
         expect(visitEventNames).toStrictEqual(["Event A", "Event B"]);
@@ -158,7 +162,7 @@ describe("PageAdminGuest.vue", () => {
         // Verify that the VIP chip is associated with the correct visit
         const vipVisitEventName = screen.getByText("Event A");
         await expect
-            .element(vipVisitEventName.element()!.closest(".q-timeline__content")!)
+            .element(vipVisitEventName.element()!.closest(".v-timeline-item")!)
             .toContainElement(vipChip.element() as HTMLElement);
     });
 
@@ -182,21 +186,16 @@ describe("PageAdminGuest.vue", () => {
         await userEvent.click(editButton);
 
         expect(createDialogSpy).toHaveBeenCalledWith(
+            AddNewGuestForm,
             expect.objectContaining({
-                component: FTDialog,
-                componentProps: expect.objectContaining({
-                    component: AddNewGuestForm,
-                    componentPropsObject: expect.objectContaining({
-                        initialData: guestData,
-                        mode: "edit",
-                    }),
-                    listeners: expect.any(Object),
-                    maximized: false,
-                    title: t("PageAdminGuest.editGuestDialogTitle", {
-                        name: guestData.name,
-                    }),
-                }),
+                initialData: guestData,
+                mode: "edit",
             }),
+            {
+                title: t("PageAdminGuest.editGuestDialogTitle", {
+                    name: guestData.name,
+                }),
+            },
         );
     });
 
@@ -208,10 +207,10 @@ describe("PageAdminGuest.vue", () => {
         const deleteButton = screen.getByLabelText("Delete guest");
         await userEvent.click(deleteButton);
 
-        expect(showConfirmMock).toHaveBeenCalledWith(
-            t("PageAdminGuest.deleteGuestConfirmTitle"),
-            t("PageAdminGuest.deleteGuestConfirmMessage"),
-        );
+        expect(showConfirmMock).toHaveBeenCalledWith({
+            message: t("PageAdminGuest.deleteGuestConfirmMessage"),
+            title: t("PageAdminGuest.deleteGuestConfirmTitle"),
+        });
         expect(tryCatchLoadingWrapperSpy).toHaveBeenCalled();
     });
 
@@ -247,11 +246,12 @@ describe("PageAdminGuest.vue", () => {
     });
 
     it("shows formatted visit dates", () => {
-        render();
+        const screen = render();
 
-        const formattedDates = Array.from(document.querySelectorAll(".q-timeline__subtitle")).map(
-            (element) => element.textContent,
-        );
+        const formattedDates = screen
+            .getByLabelText("Visit event date")
+            .elements()
+            .map((element) => element.textContent);
 
         expect(formattedDates).toEqual(["05/10/2023, 10:00:00", "03/10/2023, 15:30:00"]);
     });
@@ -303,18 +303,16 @@ describe("PageAdminGuest.vue", () => {
         const futureEventNameElement = screen.getByText("Future Event");
         await expect.element(futureEventNameElement).toBeInTheDocument();
 
-        const futureTimelineEntry = futureEventNameElement
-            .element()!
-            .closest(".q-timeline__entry")!;
-        const upcomingChip = futureTimelineEntry.querySelector(".q-chip");
+        const futureTimelineEntry = futureEventNameElement.element()!.closest(".v-timeline-item")!;
+        const upcomingChip = futureTimelineEntry.querySelector(".v-chip");
         await expect.element(upcomingChip!).toHaveTextContent("Upcoming");
 
         // Check for the past visit
         const pastEventNameElement = screen.getByText("Past Event");
         await expect.element(pastEventNameElement).toBeInTheDocument();
 
-        const pastTimelineEntry = pastEventNameElement.element()!.closest(".q-timeline__entry")!;
-        const chipsInPastEvent = pastTimelineEntry.querySelectorAll(".q-chip");
+        const pastTimelineEntry = pastEventNameElement.element()!.closest(".v-timeline-item")!;
+        const chipsInPastEvent = pastTimelineEntry.querySelectorAll(".v-chip");
         const hasUpcomingChip = Array.from(chipsInPastEvent).some(
             (chip) => chip.textContent === "Upcoming",
         );

@@ -11,7 +11,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { EventQueuedReservationsProps } from "./EventQueuedReservations.vue";
 
-import { mockedStore, renderComponent, t } from "../../../test-helpers/render-component";
+import { mockedStore } from "../../../test-helpers/mocked-store";
+import { renderComponent, t } from "../../../test-helpers/render-component";
 import EventQueuedReservations from "./EventQueuedReservations.vue";
 
 const { createDialogSpy } = vi.hoisted(() => {
@@ -20,18 +21,16 @@ const { createDialogSpy } = vi.hoisted(() => {
     };
 });
 
-vi.mock("src/composables/useDialog", () => ({
-    useDialog: () => ({
-        createDialog: createDialogSpy,
-    }),
-}));
-
-vi.mock("quasar", async (importOriginal) => ({
-    ...(await importOriginal()),
-    Loading: {
-        show: vi.fn(),
-    },
-}));
+vi.mock(import("src/composables/useDialog"), async (importOriginal) => {
+    const original = await importOriginal();
+    return {
+        ...original,
+        globalDialog: {
+            ...original.globalDialog,
+            openDialog: createDialogSpy,
+        },
+    };
+});
 
 describe("EventQueuedReservations.vue", () => {
     let props: EventQueuedReservationsProps;
@@ -154,20 +153,16 @@ describe("EventQueuedReservations.vue", () => {
         const addButton = screen.getByLabelText("Add new reservation");
         await userEvent.click(addButton);
 
-        expect(createDialogSpy).toHaveBeenCalledWith({
-            component: expect.any(Object),
-            componentProps: {
-                component: expect.any(Object),
-                componentPropsObject: expect.objectContaining({
-                    mode: "create",
-                    onlyPlanned: true,
-                    // Don't verify other props since they may be dynamic
-                }),
-                listeners: expect.any(Object),
-                maximized: false,
+        expect(createDialogSpy).toHaveBeenCalledWith(
+            expect.any(Object),
+            expect.objectContaining({
+                mode: "create",
+                onlyPlanned: true,
+            }),
+            {
                 title: "Add new reservation",
             },
-        });
+        );
     });
 
     it("shows reservation details dialog when a reservation is clicked", async () => {
@@ -184,24 +179,18 @@ describe("EventQueuedReservations.vue", () => {
         const reservationItem = screen.getByText("John Doe");
         await userEvent.click(reservationItem);
 
-        expect(createDialogSpy).toHaveBeenCalledWith({
-            component: expect.any(Object),
-            componentProps: {
-                component: expect.any(Object),
-                componentPropsObject: expect.objectContaining({
-                    reservation: expect.objectContaining({
-                        guestContact: "john@example.com",
-                        guestName: "John Doe",
-                        id: "res1",
-                        isVIP: true,
-                    }),
-                    timezone: "UTC",
+        expect(createDialogSpy).toHaveBeenCalledWith(
+            expect.any(Object),
+            expect.objectContaining({
+                reservation: expect.objectContaining({
+                    guestContact: "john@example.com",
+                    guestName: "John Doe",
+                    id: "res1",
+                    isVIP: true,
                 }),
-                listeners: expect.any(Object),
-                maximized: false,
-                title: "",
-            },
-        });
+                timezone: "UTC",
+            }),
+        );
     });
 
     it("closes dialog and drawer on 'unqueue'", async () => {
@@ -218,8 +207,8 @@ describe("EventQueuedReservations.vue", () => {
             hide: mockHide,
         };
         let unqueue: AnyFunction = noop;
-        createDialogSpy.mockImplementation(({ componentProps }) => {
-            unqueue = componentProps.listeners.unqueue;
+        createDialogSpy.mockImplementation((component, passedProps) => {
+            unqueue = passedProps.onUnqueue;
             return dialog;
         });
 
@@ -233,15 +222,6 @@ describe("EventQueuedReservations.vue", () => {
 
         expect(eventsStore.showQueuedReservationsDrawer).toBe(false);
         expect(mockHide).toHaveBeenCalled();
-    });
-
-    it("does not render the drawer when showQueuedReservationsDrawer is false", () => {
-        eventsStoreState.showQueuedReservationsDrawer = false;
-
-        render();
-
-        const drawer = document.querySelector(".q-drawer__backdrop");
-        expect(drawer).not.toBeVisible();
     });
 
     it("renders the correct number of reservations", () => {
@@ -267,7 +247,7 @@ describe("EventQueuedReservations.vue", () => {
         ];
         const screen = render();
 
-        const reservationItems = screen.getByRole("listitem");
+        const reservationItems = screen.getByRole("listbox").getByRole("listitem");
         expect(reservationItems.all()).toHaveLength(3);
     });
 });

@@ -1,4 +1,7 @@
+import type { DateRange } from "src/types";
+
 import { userEvent } from "@vitest/browser/context";
+import { last } from "es-toolkit";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { FTTimeframeSelectorProps } from "./FTTimeframeSelector.vue";
@@ -6,8 +9,8 @@ import type { FTTimeframeSelectorProps } from "./FTTimeframeSelector.vue";
 import { renderComponent } from "../../test-helpers/render-component";
 import FTTimeframeSelector from "./FTTimeframeSelector.vue";
 
-describe("TimeframeSelector.vue", () => {
-    let props: FTTimeframeSelectorProps;
+describe("FTTimeframeSelector.vue", () => {
+    let props: Partial<FTTimeframeSelectorProps>;
     let screen: ReturnType<typeof renderComponent<FTTimeframeSelectorProps>>;
 
     const FIXED_DATE = new Date("2024-01-15T00:00:00.000Z");
@@ -16,219 +19,145 @@ describe("TimeframeSelector.vue", () => {
         vi.setSystemTime(FIXED_DATE);
 
         props = {
-            maxDate: "2050-12-31",
-            minDate: "2000-01-01",
-            modelValue: { endDate: "", startDate: "" },
-            presets: [
-                { label: "Today", value: "today" },
-                { label: "Yesterday", value: "yesterday" },
-                { label: "Last 7 Days", value: "last7" },
-                { label: "Last 30 Days", value: "last30" },
-                { label: "Custom", value: "custom" },
-            ],
+            modelValue: { from: "", to: "" },
         };
-        screen = renderComponent(FTTimeframeSelector, props);
     });
 
     afterEach(() => {
         vi.useRealTimers();
+        if (screen) {
+            screen.unmount();
+        }
     });
 
     describe("Rendering", () => {
-        it("renders the component with default props", async () => {
-            const select = screen.getByText("Select Timeframe", { exact: true });
+        it("renders the component with VDateInput and preset chips", async () => {
+            screen = renderComponent(FTTimeframeSelector, props, {
+                includeGlobalComponents: true,
+                wrapInLayout: true,
+            });
+            const dateInput = screen.getByRole("textbox", { name: "Select date range" });
+            await expect.element(dateInput).toBeVisible();
 
-            await expect.element(select).toBeVisible();
-        });
-
-        it("displays all preset options", async () => {
-            const select = screen.getByLabelText("Select Timeframe");
-            await userEvent.click(select);
-
-            for (const preset of props.presets!) {
-                await expect.element(screen.getByText(preset.label)).toBeVisible();
-            }
+            await expect.element(screen.getByText("Today")).toBeVisible();
+            await expect.element(screen.getByText("Yesterday")).toBeVisible();
+            await expect.element(screen.getByText("Last 7 Days")).toBeVisible();
+            await expect.element(screen.getByText("Last 30 Days")).toBeVisible();
         });
     });
 
-    describe("Preset Selection", () => {
-        it.each([
+    describe("Preset Chip Selection", () => {
+        const presetCases = [
             {
-                expectedRange: {
-                    endDate: "2024-01-15",
-                    startDate: "2024-01-15",
-                },
-                preset: "today",
+                chipText: "Today",
+                expectedRange: { from: "2024-01-15", to: "2024-01-15" },
             },
             {
-                expectedRange: {
-                    endDate: "2024-01-14",
-                    startDate: "2024-01-14",
-                },
-                preset: "yesterday",
+                chipText: "Yesterday",
+                expectedRange: { from: "2024-01-14", to: "2024-01-14" },
             },
             {
-                expectedRange: {
-                    endDate: "2024-01-15",
-                    startDate: "2024-01-09",
-                },
-                preset: "Last 7 Days",
+                chipText: "Last 7 Days",
+                expectedRange: { from: "2024-01-09", to: "2024-01-15" },
             },
             {
-                expectedRange: {
-                    endDate: "2024-01-15",
-                    startDate: "2023-12-17",
-                },
-                preset: "Last 30 Days",
+                chipText: "Last 30 Days",
+                expectedRange: { from: "2023-12-17", to: "2024-01-15" },
             },
-        ])(
-            "selecting preset '$preset' emits correct date range",
-            async ({ expectedRange, preset }) => {
-                const select = screen.getByLabelText("Select Timeframe");
-                await userEvent.click(select);
+        ];
 
-                const option = screen.getByText(preset.charAt(0).toUpperCase() + preset.slice(1));
-                await userEvent.click(option);
+        it.each(presetCases)(
+            "selecting preset '$chipText' emits correct date range",
+            async ({ chipText, expectedRange }) => {
+                screen = renderComponent(FTTimeframeSelector, props);
+                const chip = screen.getByText(chipText);
+                await userEvent.click(chip);
 
-                const applyButton = screen.getByText("Apply");
-                await userEvent.click(applyButton);
-
-                expect(screen.emitted()["update:modelValue"]).toStrictEqual([[expectedRange]]);
+                const emitted = screen.emitted()["update:modelValue"] as DateRange[][];
+                expect(emitted).toBeTruthy();
+                expect(last(emitted)![0]).toEqual(expectedRange);
             },
         );
-
-        it("selecting 'Custom' preset opens the date range picker", async () => {
-            const select = screen.getByLabelText("Select Timeframe");
-            await userEvent.click(select);
-
-            const customOption = screen.getByText("Custom");
-            await userEvent.click(customOption);
-
-            const datePicker = screen.getByRole("dialog");
-            await expect.element(datePicker).toBeVisible();
-        });
     });
 
     describe("Custom Date Range Selection", () => {
-        beforeEach(async () => {
-            const select = screen.getByLabelText("Select Timeframe");
-            await userEvent.click(select);
-
-            const customOption = screen.getByText("Custom");
-            await userEvent.click(customOption);
+        beforeEach(() => {
+            props.modelValue = { from: "2024-01-05", to: "2024-01-07" };
+            screen = renderComponent(FTTimeframeSelector, props);
         });
 
         it("allows selecting a valid date range and emits the correct event", async () => {
-            const startDate = screen.getByRole("button", { exact: true, name: "1" });
-            await userEvent.click(startDate);
+            const dateInput = screen.getByRole("textbox", { name: "Select date range" });
+            await userEvent.click(dateInput);
 
-            const endDate = screen.getByRole("button", {
-                exact: true,
-                name: "10",
-            });
-            await userEvent.click(endDate);
+            const day1Button = screen.getByRole("button", { exact: true, name: "1" }).first();
+            await userEvent.click(day1Button);
 
-            const applyButton = screen.getByLabelText("Apply custom date range");
-            await expect.element(applyButton).not.toBeDisabled();
-            await userEvent.click(applyButton);
+            const day10Button = screen.getByRole("button", { exact: true, name: "10" }).first();
+            await userEvent.click(day10Button);
 
-            await userEvent.click(screen.getByText("Apply"));
-
-            const expectedRange = { endDate: "2024-01-10", startDate: "2024-01-01" };
-            expect(screen.emitted()["update:modelValue"]).toStrictEqual([[expectedRange]]);
+            const emitted = screen.emitted()["update:modelValue"];
+            expect(emitted).toBeTruthy();
+            expect(emitted![emitted!.length - 1]).toEqual([
+                { from: "2024-01-01", to: "2024-01-10" },
+            ]);
         });
 
-        it("disables the Apply button when the date range is invalid", async () => {
-            const startDate = screen.getByRole("button", {
-                exact: true,
-                name: "10",
-            });
-            await userEvent.click(startDate);
+        it("clears the date range when the VDateInput clear button is clicked", async () => {
+            props.modelValue = { from: "2024-01-01", to: "2024-01-10" };
+            screen.unmount();
+            screen = renderComponent(FTTimeframeSelector, props);
 
-            const applyButton = screen.getByLabelText("Apply custom date range");
-            await expect.element(applyButton).toBeDisabled();
-        });
-
-        it("clears the date range when the clear button is clicked", async () => {
-            const startDate = screen.getByRole("button", { exact: true, name: "1" });
-            await userEvent.click(startDate);
-
-            const endDate = screen.getByRole("button", {
-                exact: true,
-                name: "10",
-            });
-            await userEvent.click(endDate);
-
-            const clearButton = screen.getByRole("button", { name: "Clear custom date range" });
+            const clearButton = screen.getByRole("button", { name: /clear/i });
             await userEvent.click(clearButton);
 
-            const selectedRange = screen.getByText("Select Timeframe", { exact: true });
-            await expect.element(selectedRange).toBeVisible();
-        });
-
-        it("closes the date picker without applying changes when cancel is clicked", async () => {
-            const startDate = screen.getByRole("button", { exact: true, name: "1" });
-            await userEvent.click(startDate);
-
-            const endDate = screen.getByRole("button", {
-                exact: true,
-                name: "10",
-            });
-            await userEvent.click(endDate);
-
-            const cancelButton = screen.getByLabelText("Cancel custom date range");
-            await userEvent.click(cancelButton);
-
-            const datePicker = screen.getByLabelText("Custom date range picker");
-            await expect.element(datePicker).not.toBeInTheDocument();
-
-            expect(screen.emitted()["update:modelValue"]).toBeUndefined();
+            const emitted = screen.emitted()["update:modelValue"];
+            expect(emitted).toBeTruthy();
+            expect(emitted![emitted!.length - 1]).toEqual([{ from: "", to: "" }]);
         });
     });
 
-    describe("Apply Button State", () => {
-        it("enables the Apply button when a preset is selected and has changed", async () => {
-            const select = screen.getByLabelText("Select Timeframe");
-            await userEvent.click(select);
+    describe("Validation and Rules", () => {
+        it("disables buttons before start date", async () => {
+            screen = renderComponent(FTTimeframeSelector, props);
+            const dateInput = screen.getByRole("textbox", { name: "Select date range" });
+            await userEvent.click(dateInput);
 
-            const todayOption = screen.getByText("Today");
-            await userEvent.click(todayOption);
+            const day10Button = screen.getByRole("button", { exact: true, name: "10" }).first();
+            await userEvent.click(day10Button);
 
-            const applyButton = screen.getByText("Apply");
-            await expect.element(applyButton).not.toBeDisabled();
+            const day1Button = screen.getByRole("button", { exact: true, name: "1" }).first();
+            await expect.element(day1Button).toBeDisabled();
         });
 
-        it("disables the Apply button when the preset has not changed", async () => {
-            const select = screen.getByLabelText("Select Timeframe");
-            await userEvent.click(select);
+        it("disables buttons over date range for maxDays", async () => {
+            props.maxDays = 5;
+            screen = renderComponent(FTTimeframeSelector, props);
+            const dateInput = screen.getByRole("textbox", { name: "Select date range" });
+            await userEvent.click(dateInput);
 
-            const todayOption = screen.getByText("Today");
-            await userEvent.click(todayOption);
+            const day1Button = screen.getByRole("button", { exact: true, name: "1" }).first();
+            await userEvent.click(day1Button);
 
-            const applyButton = screen.getByRole("button", { name: "Apply" });
-            await userEvent.click(applyButton);
-
-            await expect.element(applyButton).toBeDisabled();
+            const day7Button = screen.getByRole("button", { exact: true, name: "7" }).first();
+            await expect.element(day7Button).toBeDisabled();
         });
 
-        it("enables the Apply button when a custom date range is valid and has changed", async () => {
-            const select = screen.getByLabelText("Select Timeframe");
-            await userEvent.click(select);
+        it("disables dates in picker that would exceed maxDays when selecting the second date", async () => {
+            props.maxDays = 3;
+            screen = renderComponent(FTTimeframeSelector, props);
+            const dateInput = screen.getByRole("textbox", { name: "Select date range" });
+            await userEvent.click(dateInput);
 
-            const customOption = screen.getByText("Custom");
-            await userEvent.click(customOption);
+            const day1Button = screen.getByRole("button", { exact: true, name: "1" }).first();
+            await userEvent.click(day1Button);
 
-            const startDate = screen.getByRole("button", { exact: true, name: "1" });
-            await userEvent.click(startDate);
+            // Max end date is Jan 3rd. So, Jan 4th should be disabled.
+            const day4Button = screen.getByRole("button", { exact: true, name: "4" }).first();
+            await expect.element(day4Button).toBeDisabled();
 
-            const endDate = screen.getByRole("button", {
-                exact: true,
-                name: "10",
-            });
-            await userEvent.click(endDate);
-
-            const applyButton = screen.getByRole("button", { name: "Apply custom date range" });
-            await expect.element(applyButton).not.toBeDisabled();
+            const day3Button = screen.getByRole("button", { exact: true, name: "3" }).first();
+            await expect.element(day3Button).not.toBeDisabled();
         });
     });
 });

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { EventDoc, VoidFunction } from "@firetable/types";
+import type { EventDoc } from "@firetable/types";
 
 import { formatEventDate } from "src/helpers/date-utils";
 import { useI18n } from "vue-i18n";
@@ -9,99 +9,93 @@ interface Props {
     timezone: string;
 }
 const { event, timezone } = defineProps<Props>();
-const emit = defineEmits(["right", "left"]);
+const emit = defineEmits(["edit", "delete"]);
 const { locale } = useI18n();
 
-function emitEdit({ reset }: { reset: VoidFunction }): void {
-    emit("left", { event, reset });
+function onDelete(): void {
+    emit("delete", event);
 }
 
-function emitOnRight({ reset }: { reset: VoidFunction }): void {
-    emit("right", { event, reset });
+function onEdit(): void {
+    emit("edit", event);
 }
 </script>
 
 <template>
     <div class="EventListItem">
-        <q-slide-item
-            right-color="negative"
-            left-color="primary"
-            @right="emitOnRight"
-            @left="emitEdit"
-            class="EventListItem__slide"
-        >
-            <template #right>
-                <div class="EventListItem__action EventListItem__action--delete">
-                    <i class="fas fa-trash" />
-                    <span>Delete</span>
-                </div>
-            </template>
-            <template #left>
-                <div class="EventListItem__action EventListItem__action--edit">
-                    <i class="fas fa-pencil" />
-                    <span>Edit</span>
-                </div>
-            </template>
+        <div class="EventListItem__card">
+            <router-link
+                class="EventListItem__link"
+                :to="{
+                    name: 'adminEvent',
+                    params: {
+                        eventId: event.id,
+                        organisationId: event.organisationId,
+                        propertyId: event.propertyId,
+                    },
+                }"
+            >
+                <div class="EventListItem__content">
+                    <!-- Event Icon -->
+                    <div class="EventListItem__icon">
+                        <v-icon icon="fas fa-calendar-day" />
+                    </div>
 
-            <div class="EventListItem__card">
-                <router-link
-                    class="EventListItem__link"
-                    :to="{
-                        name: 'adminEvent',
-                        params: {
-                            eventId: event.id,
-                            organisationId: event.organisationId,
-                            propertyId: event.propertyId,
-                        },
-                    }"
-                >
-                    <div class="EventListItem__content">
-                        <!-- Event Icon -->
-                        <div class="EventListItem__icon">
-                            <i class="fas fa-calendar-day" />
-                        </div>
-
-                        <!-- Event Info -->
-                        <div class="EventListItem__info">
-                            <h4 class="EventListItem__title">{{ event.name }}</h4>
-                            <div class="EventListItem__meta">
-                                <div class="EventListItem__date">
-                                    <i class="fas fa-clock" />
-                                    <span>{{ formatEventDate(event.date, locale, timezone) }}</span>
-                                </div>
-                                <div class="EventListItem__status" v-if="event.entryPrice">
-                                    <i class="fas fa-euro-sign" />
-                                    <span>{{ event.entryPrice }}</span>
-                                </div>
-                                <div
-                                    class="EventListItem__status EventListItem__status--free"
-                                    v-else
-                                >
-                                    <i class="fas fa-gift" />
-                                    <span>Free</span>
-                                </div>
+                    <!-- Event Info -->
+                    <div class="EventListItem__info">
+                        <h4 class="EventListItem__title" aria-label="Event name">
+                            {{ event.name }}
+                        </h4>
+                        <div class="EventListItem__meta">
+                            <div class="EventListItem__date">
+                                <v-icon icon="fas fa-clock" />
+                                <span>{{ formatEventDate(event.date, locale, timezone) }}</span>
+                            </div>
+                            <div class="EventListItem__status" v-if="event.entryPrice">
+                                <v-icon icon="fas fa-euro-sign" />
+                                <span>{{ event.entryPrice }}</span>
+                            </div>
+                            <div class="EventListItem__status EventListItem__status--free" v-else>
+                                <v-icon icon="fas fa-gift" />
+                                <span>Free</span>
                             </div>
                         </div>
-
-                        <!-- Arrow -->
-                        <div class="EventListItem__arrow">
-                            <i class="fas fa-chevron-right" />
-                        </div>
                     </div>
-                </router-link>
-            </div>
-        </q-slide-item>
+
+                    <!-- Action Buttons (replacing arrow) -->
+                    <div class="EventListItem__actions">
+                        <v-btn
+                            variant="text"
+                            size="small"
+                            color="primary"
+                            @click.prevent="onEdit"
+                            class="EventListItem__action-btn"
+                            aria-label="Edit event"
+                        >
+                            <v-icon size="14">fas fa-pencil</v-icon>
+                        </v-btn>
+                        <v-btn
+                            variant="text"
+                            size="small"
+                            color="error"
+                            @click.prevent="onDelete"
+                            class="EventListItem__action-btn"
+                            aria-label="Delete event"
+                        >
+                            <v-icon size="14">fas fa-trash</v-icon>
+                        </v-btn>
+                    </div>
+                </div>
+            </router-link>
+        </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
+@use "src/css/variables.scss" as *;
+
 .EventListItem {
     margin-bottom: 12px;
-
-    &__slide {
-        border-radius: $generic-border-radius;
-        overflow: hidden;
-    }
 
     &__card {
         background: $surface-elevated;
@@ -142,6 +136,11 @@ function emitOnRight({ reset }: { reset: VoidFunction }): void {
         color: white;
         font-size: 20px;
         flex-shrink: 0;
+
+        :deep(.v-icon) {
+            color: white;
+            font-size: 20px;
+        }
     }
 
     &__info {
@@ -173,49 +172,36 @@ function emitOnRight({ reset }: { reset: VoidFunction }): void {
         font-weight: 500;
         color: $text-secondary;
 
-        i {
+        :deep(.v-icon) {
             font-size: 12px;
             color: $accent;
         }
 
-        &--free i {
+        &--free :deep(.v-icon) {
             color: $positive;
         }
     }
 
-    &__arrow {
-        color: $text-tertiary;
-        font-size: 14px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    &__actions {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
         flex-shrink: 0;
     }
 
-    &__action {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 4px;
-        font-size: 12px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+    &__action-btn {
+        min-width: 32px !important;
+        width: 32px;
+        height: 32px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-        i {
-            font-size: 16px;
-        }
-
-        &--edit {
-            color: white;
-        }
-
-        &--delete {
-            color: white;
+        &:hover {
+            transform: scale(1.1);
         }
     }
 }
 
-.body--dark .EventListItem {
+.v-theme--dark .EventListItem {
     &__card {
         background: $surface-elevated-dark;
         border-color: $border-light-dark;
@@ -231,25 +217,21 @@ function emitOnRight({ reset }: { reset: VoidFunction }): void {
         }
     }
 
-    .EventListItem__title {
+    &__title {
         color: $text-primary-dark;
     }
 
-    .EventListItem__date,
-    .EventListItem__status {
+    &__date,
+    &__status {
         color: $text-secondary-dark;
 
-        i {
+        :deep(.v-icon) {
             color: $accent;
         }
 
-        &--free i {
+        &--free :deep(.v-icon) {
             color: $positive;
         }
-    }
-
-    .EventListItem__arrow {
-        color: $text-tertiary-dark;
     }
 }
 
@@ -264,7 +246,10 @@ function emitOnRight({ reset }: { reset: VoidFunction }): void {
         &__icon {
             width: 40px;
             height: 40px;
-            font-size: 18px;
+
+            :deep(.v-icon) {
+                font-size: 18px;
+            }
         }
 
         &__title {
@@ -278,6 +263,12 @@ function emitOnRight({ reset }: { reset: VoidFunction }): void {
         &__date,
         &__status {
             font-size: 13px;
+        }
+
+        &__action-btn {
+            min-width: 28px !important;
+            width: 28px;
+            height: 28px;
         }
     }
 }
@@ -293,6 +284,16 @@ function emitOnRight({ reset }: { reset: VoidFunction }): void {
         &__title {
             font-size: 15px;
             margin-bottom: 6px;
+        }
+
+        &__action-btn {
+            min-width: 26px !important;
+            width: 26px;
+            height: 26px;
+
+            :deep(.v-icon) {
+                font-size: 12px;
+            }
         }
     }
 }

@@ -1,6 +1,10 @@
 import type { FirestoreTimestamp } from "@firetable/types";
+import type { IsoDateString } from "src/types";
 
-import { isNumber, memoize } from "es-toolkit/compat";
+import { memoize } from "es-toolkit";
+import { isNumber } from "es-toolkit/compat";
+
+export const currentLocale = new Intl.DateTimeFormat().resolvedOptions().locale;
 
 export const timezones = memoize(function () {
     return Intl.supportedValuesOf("timeZone").sort(function (a, b) {
@@ -98,6 +102,13 @@ export function formatEventDate(timestamp: number, locale: string, timeZone: str
     return formatter.format(date);
 }
 
+export function formatLocalDateToISOString(date: Date): IsoDateString {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    return `${year}-${month}-${day}`;
+}
+
 export function getDefaultTimezone(): string {
     return Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
@@ -138,6 +149,11 @@ export function hourFromTimestamp(timestamp: number, locale: string, timeZone: s
         timeZone: timeZone ?? void 0,
     });
     return formatter.format(date);
+}
+
+export function parseISODateStringToLocalDate(dateString: IsoDateString | string): Date {
+    const [year, month, day] = dateString.split("-").map(Number);
+    return new Date(year, month - 1, day);
 }
 
 /**

@@ -4,7 +4,9 @@ import {
     createUTCTimestamp,
     dateFromTimestamp,
     formatEventDate,
+    formatLocalDateToISOString,
     hourFromTimestamp,
+    parseISODateStringToLocalDate,
 } from "./date-utils";
 
 const DEFAULT_LOCALE = "en-GB";
@@ -303,6 +305,47 @@ describe("Date Formatting Functions", () => {
             );
             // Beginning of the day
             expect(formattedTime).toBe("00:00");
+        });
+    });
+
+    describe("parseISODateStringToLocalDate", () => {
+        it("should correctly parse a valid YYYY-MM-DD string to a local Date object", () => {
+            const dateString = "2023-10-26";
+            const result = parseISODateStringToLocalDate(dateString);
+            expect(result.getFullYear()).toBe(2023);
+            expect(result.getMonth()).toBe(9);
+            expect(result.getDate()).toBe(26);
+            expect(result.getHours()).toBe(0);
+            expect(result.getMinutes()).toBe(0);
+            expect(result.getSeconds()).toBe(0);
+        });
+
+        it("should handle single digit months and days", () => {
+            const dateString = "2023-01-05";
+            const result = parseISODateStringToLocalDate(dateString);
+            expect(result.getFullYear()).toBe(2023);
+            expect(result.getMonth()).toBe(0);
+            expect(result.getDate()).toBe(5);
+        });
+    });
+
+    describe("formatLocalDateToISOString", () => {
+        it("should correctly format a local Date object to a YYYY-MM-DD string", () => {
+            const date = new Date(2023, 9, 26);
+            const result = formatLocalDateToISOString(date);
+            expect(result).toBe("2023-10-26");
+        });
+
+        it("should correctly format single digit months and days with padding", () => {
+            const date = new Date(2023, 0, 5);
+            const result = formatLocalDateToISOString(date);
+            expect(result).toBe("2023-01-05");
+        });
+
+        it("should handle December correctly (month 11)", () => {
+            const date = new Date(2023, 11, 31);
+            const result = formatLocalDateToISOString(date);
+            expect(result).toBe("2023-12-31");
         });
     });
 });

@@ -8,6 +8,8 @@ interface Props {
     property: PropertyDoc;
 }
 
+const ASPECT_RATIO_DEFAULT = 16 / 9;
+
 const props = defineProps<Props>();
 const { t } = useI18n();
 
@@ -28,7 +30,7 @@ const backgroundImageUrl = computed(function () {
                 },
             }"
         >
-            <q-responsive :ratio="16 / 9">
+            <v-responsive :aspect-ratio="ASPECT_RATIO_DEFAULT">
                 <div class="PropertyCard__container">
                     <!-- Background Image -->
                     <div
@@ -44,16 +46,18 @@ const backgroundImageUrl = computed(function () {
 
                         <div class="PropertyCard__action">
                             <span>{{ t("PropertyCard.viewEventsAction") }}</span>
-                            <i class="fas fa-arrow-right" />
+                            <v-icon size="small">fas fa-arrow-right</v-icon>
                         </div>
                     </div>
                 </div>
-            </q-responsive>
+            </v-responsive>
         </router-link>
     </div>
 </template>
 
 <style lang="scss" scoped>
+@use "src/css/variables.scss" as *;
+
 .PropertyCard {
     background: $surface-elevated;
     border-radius: $generic-border-radius;
@@ -74,7 +78,7 @@ const backgroundImageUrl = computed(function () {
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
 
-            i {
+            :deep(.v-icon) {
                 transform: translateX(4px);
             }
         }
@@ -160,7 +164,7 @@ const backgroundImageUrl = computed(function () {
         font-weight: 600;
         font-size: 14px;
 
-        i {
+        :deep(.v-icon) {
             transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             font-size: 14px;
         }
@@ -168,7 +172,7 @@ const backgroundImageUrl = computed(function () {
 }
 
 // Dark mode support
-.body--dark .PropertyCard {
+.v-theme--dark .PropertyCard {
     background: $surface-elevated-dark;
     box-shadow:
         0 2px 10px rgba(0, 0, 0, 0.3),

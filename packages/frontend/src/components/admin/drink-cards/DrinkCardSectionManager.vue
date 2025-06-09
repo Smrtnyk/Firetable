@@ -136,8 +136,8 @@ function updateSectionItems(sectionId: string, items: DrinkCardItem[]): void {
 <template>
     <div class="DrinkCardSectionManager">
         <!-- Add Buttons -->
-        <div class="row items-center justify-between q-mb-md q-pa-md">
-            <div class="text-h6">{{ t("PageAdminPropertyDrinkCards.sectionsLabel") }}</div>
+        <div class="d-flex align-center justify-space-between mb-4 pa-4">
+            <h6 class="text-h6">{{ t("PageAdminPropertyDrinkCards.sectionsLabel") }}</h6>
             <DrinkCardBuilderAddDragElementsDropdown
                 ref="dropdownRef"
                 :available-items="availableItems"
@@ -150,131 +150,144 @@ function updateSectionItems(sectionId: string, items: DrinkCardItem[]): void {
         </div>
 
         <!-- Root Elements List -->
-        <q-list ref="draggableListRef" class="q-gutter-y-sm">
+        <div ref="draggableListRef" class="d-flex flex-column ga-2">
             <template v-for="element in draggableElements" :key="element.id">
                 <!-- Header -->
                 <template v-if="isHeader(element)">
-                    <q-item class="ft-card drag-item">
-                        <q-item-section avatar>
-                            <q-icon name="fa fa-bars" class="cursor-move drag-handle" />
-                        </q-item-section>
-                        <q-item-section>
-                            <q-input
-                                v-model="element.name"
-                                @change="emitUpdatedElements()"
-                                dense
-                                outlined
-                            />
-                        </q-item-section>
-                        <q-item-section side>
-                            <q-btn
-                                flat
-                                round
-                                color="negative"
-                                icon="fa fa-trash"
-                                size="sm"
-                                @click="removeElement(element.id)"
-                            />
-                        </q-item-section>
-                    </q-item>
+                    <v-card class="ft-card drag-item">
+                        <v-card-text class="pa-4">
+                            <div class="d-flex align-center ga-3">
+                                <v-icon class="drag-handle" style="cursor: grab"
+                                    >fas fa-bars</v-icon
+                                >
+                                <v-text-field
+                                    v-model="element.name"
+                                    @change="emitUpdatedElements()"
+                                    variant="outlined"
+                                    density="compact"
+                                    hide-details
+                                    class="flex-grow-1"
+                                />
+                                <v-btn
+                                    variant="text"
+                                    icon
+                                    color="error"
+                                    size="small"
+                                    @click="removeElement(element.id)"
+                                >
+                                    <v-icon>fas fa-trash</v-icon>
+                                </v-btn>
+                            </div>
+                        </v-card-text>
+                    </v-card>
                 </template>
 
                 <!-- Header End -->
                 <template v-else-if="isHeaderEnd(element)">
-                    <q-item class="ft-card drag-item">
-                        <q-item-section avatar>
-                            <q-icon name="fa fa-bars" class="cursor-move drag-handle" />
-                        </q-item-section>
-                        <q-item-section>
-                            <div class="text-weight-medium">Header End</div>
-                        </q-item-section>
-                        <q-item-section side>
-                            <q-btn
-                                flat
-                                round
-                                color="negative"
-                                icon="fa fa-trash"
-                                size="sm"
-                                @click="removeElement(element.id)"
-                            />
-                        </q-item-section>
-                    </q-item>
+                    <v-card class="ft-card drag-item">
+                        <v-card-text class="pa-4">
+                            <div class="d-flex align-center ga-3">
+                                <v-icon class="drag-handle" style="cursor: grab"
+                                    >fas fa-bars</v-icon
+                                >
+                                <div class="font-weight-medium flex-grow-1">Header End</div>
+                                <v-btn
+                                    variant="text"
+                                    icon
+                                    color="error"
+                                    size="small"
+                                    @click="removeElement(element.id)"
+                                >
+                                    <v-icon>fas fa-trash</v-icon>
+                                </v-btn>
+                            </div>
+                        </v-card-text>
+                    </v-card>
                 </template>
 
                 <!-- Bundle -->
                 <template v-else-if="isBundle(element)">
-                    <q-item class="ft-card drag-item">
-                        <q-item-section avatar>
-                            <q-icon name="fa fa-bars" class="cursor-move drag-handle" />
-                        </q-item-section>
-                        <q-item-section>
-                            <div class="text-weight-medium">{{ element.name }}</div>
-                            <div class="text-caption">
-                                {{ element.items.length }} items • {{ formatPrice(element.price) }}
+                    <v-card class="ft-card drag-item">
+                        <v-card-text class="pa-4">
+                            <div class="d-flex align-center ga-3">
+                                <v-icon class="drag-handle" style="cursor: grab"
+                                    >fas fa-bars</v-icon
+                                >
+                                <div class="flex-grow-1">
+                                    <div class="font-weight-medium">{{ element.name }}</div>
+                                    <div class="text-caption">
+                                        {{ element.items.length }} items •
+                                        {{ formatPrice(element.price) }}
+                                    </div>
+                                </div>
+                                <v-btn
+                                    variant="text"
+                                    icon
+                                    color="primary"
+                                    size="small"
+                                    @click="handleEditBundle(element)"
+                                >
+                                    <v-icon>fas fa-pencil</v-icon>
+                                </v-btn>
+                                <v-btn
+                                    variant="text"
+                                    icon
+                                    color="error"
+                                    size="small"
+                                    @click="removeElement(element.id)"
+                                >
+                                    <v-icon>fas fa-trash</v-icon>
+                                </v-btn>
                             </div>
-                        </q-item-section>
-                        <q-item-section side>
-                            <q-btn
-                                flat
-                                round
-                                color="primary"
-                                icon="fa fa-pencil"
-                                size="sm"
-                                @click="handleEditBundle(element)"
-                            />
-                            <q-btn
-                                flat
-                                round
-                                color="negative"
-                                icon="fa fa-trash"
-                                size="sm"
-                                @click="removeElement(element.id)"
-                            />
-                        </q-item-section>
-                    </q-item>
+                        </v-card-text>
+                    </v-card>
                 </template>
 
                 <!-- Root Level Section -->
                 <template v-else-if="isSection(element)">
-                    <q-expansion-item class="ft-card drag-item" :data-section-id="element.id">
-                        <template #header>
-                            <q-item-section avatar>
-                                <q-icon name="fa fa-bars" class="cursor-move drag-handle" />
-                            </q-item-section>
-                            <q-item-section>{{ element.name }}</q-item-section>
-                            <q-item-section side>
-                                <q-btn
-                                    flat
-                                    round
-                                    color="negative"
-                                    icon="fa fa-trash"
-                                    size="sm"
-                                    @click.stop="removeElement(element.id)"
+                    <v-expansion-panels>
+                        <v-expansion-panel class="ft-card drag-item" :data-section-id="element.id">
+                            <v-expansion-panel-title>
+                                <div class="d-flex align-center ga-3 w-100">
+                                    <v-icon class="drag-handle" style="cursor: grab"
+                                        >fas fa-bars</v-icon
+                                    >
+                                    <span class="flex-grow-1">{{ element.name }}</span>
+                                    <v-btn
+                                        variant="text"
+                                        icon
+                                        color="error"
+                                        size="small"
+                                        @click.stop="removeElement(element.id)"
+                                    >
+                                        <v-icon>fas fa-trash</v-icon>
+                                    </v-btn>
+                                </div>
+                            </v-expansion-panel-title>
+                            <v-expansion-panel-text>
+                                <!-- Section Items -->
+                                <DrinkCardSectionItems
+                                    :section="element"
+                                    :inventory-items="inventoryItems"
+                                    @update:items="updateSectionItems(element.id, $event)"
                                 />
-                            </q-item-section>
-                        </template>
-
-                        <!-- Section Items -->
-                        <DrinkCardSectionItems
-                            :section="element"
-                            :inventory-items="inventoryItems"
-                            @update:items="updateSectionItems(element.id, $event)"
-                        />
-                    </q-expansion-item>
+                            </v-expansion-panel-text>
+                        </v-expansion-panel>
+                    </v-expansion-panels>
                 </template>
             </template>
-        </q-list>
+        </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
 .draggable-ghost {
     opacity: 0.5;
-    background: var(--q-primary);
+    background: rgb(var(--v-theme-primary));
 }
 
 .draggable-chosen {
-    background: var(--q-grey-2);
+    background: rgb(var(--v-theme-surface-variant));
 }
 
 .draggable-drag {

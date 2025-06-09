@@ -10,11 +10,11 @@ import AddNewGuestForm from "./AddNewGuestForm.vue";
 
 describe("AddNewGuestForm", () => {
     function getTagsSelect(screen: any): HTMLElement {
-        return screen.getByRole("combobox", { name: "Tags" }).element();
+        return screen.getByLabelText("Tags");
     }
 
     function getTagRemoveButtons(screen: any): Locator {
-        return screen.getByLabelText("Remove");
+        return screen.getByLabelText("Close");
     }
 
     describe("create", () => {
@@ -33,7 +33,7 @@ describe("AddNewGuestForm", () => {
             const guestNameInput = screen.getByLabelText("Guest name");
             await expect.element(guestNameInput).toHaveValue("");
 
-            const countryCodeSelect = screen.getByRole("combobox", { name: "Country Code" });
+            const countryCodeSelect = screen.getByLabelText("Country Code");
             await expect.element(countryCodeSelect).toHaveValue("");
 
             const phoneNumberInput = screen.getByLabelText("Phone Number");
@@ -79,14 +79,15 @@ describe("AddNewGuestForm", () => {
             const guestNameInput = screen.getByLabelText("Guest name");
             await userEvent.type(guestNameInput, "John Doe");
 
+            // Select country code
+            const countryCodeSelect = screen.getByLabelText("Country Code", { exact: true });
+            await userEvent.click(countryCodeSelect, { force: true });
+            const countryOption = screen.getByText("Austria");
+            await userEvent.click(countryOption);
+
             // Enter a phone number in the mocked TelNumberInput
             const phoneNumberInput = screen.getByLabelText("Phone Number");
             await userEvent.type(phoneNumberInput, "25550123");
-            // Select country code
-            const countryCodeSelect = screen.getByRole("combobox", { name: "Country Code" });
-            await userEvent.click(countryCodeSelect);
-            const countryOption = screen.getByText("Austria");
-            await userEvent.click(countryOption);
 
             // Submit the form
             const submitButton = screen.getByRole("button", { name: "Submit" });
@@ -111,33 +112,30 @@ describe("AddNewGuestForm", () => {
             const guestNameInput = screen.getByLabelText("Guest name");
             await userEvent.type(guestNameInput, "Invalid Contact");
 
-            // Enter invalid phone number
-            const phoneNumberInput = screen.getByLabelText("Phone Number");
-            await userEvent.type(phoneNumberInput, "abc");
-
             // Try to submit the form
             const submitButton = screen.getByRole("button", { name: "Submit" });
             await userEvent.click(submitButton);
 
-            const phoneError = screen.getByText(
-                "Please provide both country code and phone number",
-            );
+            const phoneError = screen.getByText("Please select a country code");
             await expect.element(phoneError).toBeVisible();
 
             // The form should not emit 'create' because of validation error
-            expect(screen.emitted().create).toBeFalsy();
+            expect(screen.emitted().create).toBeUndefined();
+
+            // Select country code
+            const countryCodeSelect = screen.getByLabelText("Country Code", { exact: true });
+            await userEvent.click(countryCodeSelect, { force: true });
+            const countryOption = screen.getByText("Austria");
+            await userEvent.click(countryOption);
+
+            // Enter invalid phone number
+            const phoneNumberInput = screen.getByLabelText("Phone Number");
+            await userEvent.type(phoneNumberInput, "abc");
 
             // Now enter a valid phone number
             await userEvent.clear(phoneNumberInput);
             await userEvent.type(phoneNumberInput, "2025550123");
 
-            // Select country code
-            const countryCodeSelect = screen.getByRole("combobox", { name: "Country Code" });
-            await userEvent.click(countryCodeSelect);
-            const countryOption = screen.getByText("Austria");
-            await userEvent.click(countryOption);
-
-            // Submit the form
             await userEvent.click(submitButton);
 
             const emitted = screen.emitted().create as any[];
@@ -158,7 +156,6 @@ describe("AddNewGuestForm", () => {
             // Fill in the guest name
             const guestNameInput = screen.getByLabelText("Guest name");
             await userEvent.type(guestNameInput, "John Doe");
-
             // Leave guest contact empty
 
             const submitButton = screen.getByRole("button", { name: "Submit" });
@@ -224,13 +221,12 @@ describe("AddNewGuestForm", () => {
             const guestNameInput = screen.getByLabelText("Guest name");
             await userEvent.type(guestNameInput, "John Doe");
 
-            const phoneNumberInput = screen.getByLabelText("Phone Number");
-            await userEvent.type(phoneNumberInput, "25550123");
-
-            const countryCodeSelect = screen.getByRole("combobox", { name: "Country Code" });
-            await userEvent.click(countryCodeSelect);
+            const countryCodeSelect = screen.getByLabelText("Country Code", { exact: true });
+            await userEvent.click(countryCodeSelect, { force: true });
             const countryOption = screen.getByText("Austria");
             await userEvent.click(countryOption);
+            const phoneNumberInput = screen.getByLabelText("Phone Number");
+            await userEvent.type(phoneNumberInput, "25550123");
 
             // Add tags
             const tagsSelect = getTagsSelect(screen);
@@ -275,7 +271,7 @@ describe("AddNewGuestForm", () => {
             await userEvent.keyboard("{Enter}");
 
             // Should only find one VIP chip
-            const vipChips = document.querySelectorAll(".q-chip");
+            const vipChips = document.querySelectorAll(".v-chip");
             expect(vipChips).toHaveLength(1);
         });
 
@@ -287,7 +283,7 @@ describe("AddNewGuestForm", () => {
             await userEvent.keyboard("{Enter}");
 
             // Should not create an empty tag
-            const tagChips = document.querySelectorAll(".q-chip");
+            const tagChips = document.querySelectorAll(".v-chip");
             expect(tagChips).toHaveLength(0);
         });
 
@@ -335,13 +331,13 @@ describe("AddNewGuestForm", () => {
             const guestNameInput = screen.getByLabelText("Guest name");
             await userEvent.type(guestNameInput, "John Doe");
 
-            const phoneNumberInput = screen.getByLabelText("Phone Number");
-            await userEvent.type(phoneNumberInput, "25550123");
-
-            const countryCodeSelect = screen.getByRole("combobox", { name: "Country Code" });
-            await userEvent.click(countryCodeSelect);
+            const countryCodeSelect = screen.getByLabelText("Country Code", { exact: true });
+            await userEvent.click(countryCodeSelect, { force: true });
             const countryOption = screen.getByText("Austria");
             await userEvent.click(countryOption);
+
+            const phoneNumberInput = screen.getByLabelText("Phone Number");
+            await userEvent.type(phoneNumberInput, "25550123");
 
             const submitButton = screen.getByRole("button", { name: "Submit" });
             await userEvent.click(submitButton);
@@ -364,7 +360,7 @@ describe("AddNewGuestForm", () => {
             await userEvent.keyboard("{Enter}");
 
             // Only one chip should exist
-            const chips = document.querySelectorAll(".q-chip");
+            const chips = document.querySelectorAll(".v-chip");
             expect(chips).toHaveLength(1);
 
             const vipChip = screen.getByText("vip");
@@ -393,8 +389,8 @@ describe("AddNewGuestForm", () => {
             await expect.element(guestNameInput).toHaveValue("Existing Guest");
 
             // Check that the TelNumberInput component is rendered with initial values
-            const countryCodeSelect = screen.getByRole("combobox", { name: "Country Code" });
-            await expect.element(countryCodeSelect).toHaveValue("Austria");
+            const countryCodeSelect = screen.getByLabelText("Country Code", { exact: true });
+            await expect.element(countryCodeSelect).toHaveValue("at");
 
             const phoneNumberInput = screen.getByLabelText("Phone Number");
             await expect.element(phoneNumberInput).toHaveValue("1234567890");
@@ -409,8 +405,8 @@ describe("AddNewGuestForm", () => {
             await userEvent.type(guestNameInput, "Updated Guest");
 
             // Modify the guest contact
-            const countryCodeSelect = screen.getByRole("combobox", { name: "Country Code" });
-            await userEvent.click(countryCodeSelect);
+            const countryCodeSelect = screen.getByLabelText("Country Code", { exact: true });
+            await userEvent.click(countryCodeSelect, { force: true });
             const countryOption = screen.getByText("Austria");
             await userEvent.click(countryOption);
 
@@ -517,7 +513,7 @@ describe("AddNewGuestForm", () => {
 
             renderComponent(AddNewGuestForm, editProps);
 
-            const chips = Array.from(document.querySelectorAll<HTMLElement>(".q-chip"));
+            const chips = Array.from(document.querySelectorAll<HTMLElement>(".v-chip"));
             expect(chips.map((chip) => chip.innerText)).toEqual(["First", "Second", "Third"]);
         });
     });
