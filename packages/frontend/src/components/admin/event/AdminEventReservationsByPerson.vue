@@ -2,7 +2,7 @@
 import type { PlannedReservationDoc } from "@firetable/types";
 
 import { matchesProperty } from "es-toolkit/compat";
-import FTCenteredText from "src/components/FTCenteredText.vue";
+import FTCenteredText from "src/components/FTCenteredText.vue"; // Assumed to be migrated
 import { computed } from "vue";
 
 interface Props {
@@ -21,26 +21,29 @@ type TableData = {
     labels: string[];
 };
 
-const tableColumns = [
-    { align: "left", field: "name", label: "Name", name: "name", required: true, sortable: true },
-    { field: "arrived", label: "Arrived", name: "arrived", sortable: true },
-    { field: "pending", label: "Pending", name: "pending", sortable: true },
-    { field: "total", label: "Total", name: "total", sortable: true },
-] as any;
+// Vuetify headers definition
+const headers = [
+    { align: "start", key: "name", sortable: true, title: "Name" },
+    { align: "start", key: "arrived", sortable: true, title: "Arrived" },
+    { align: "start", key: "pending", sortable: true, title: "Pending" },
+    { align: "start", key: "total", sortable: true, title: "Total" },
+] as const; // Using 'as const' for better type inference if needed, or define type explicitly
 
 const props = defineProps<Props>();
 
 const tableData = computed(function () {
     const { datasets, labels } = generateTableData(props.reservations);
-    const arrivedData = datasets.find(matchesProperty("label", "Arrived")).data;
-    const pendingData = datasets.find(matchesProperty("label", "Pending")).data;
+    const arrivedData = datasets.find(matchesProperty("label", "Arrived"))?.data ?? [];
+    const pendingData = datasets.find(matchesProperty("label", "Pending"))?.data ?? [];
 
     return labels.map(function (label, index) {
+        const arrived = arrivedData[index] || 0;
+        const pending = pendingData[index] || 0;
         return {
-            arrived: arrivedData[index],
+            arrived,
             name: label,
-            pending: pendingData[index],
-            total: arrivedData[index] + pendingData[index],
+            pending,
+            total: arrived + pending,
         };
     });
 });
@@ -76,7 +79,7 @@ function reservationsReducer(acc: Res, reservation: PlannedReservationDoc): Res 
     }
     const { arrived, reservedBy } = reservation;
     const { email, name } = reservedBy;
-    const hash = name + email;
+    const hash = name + email; // Consider a more robust hashing if names/emails can have special chars
     if (acc[hash]) {
         acc[hash].reservations += 1;
     } else {
@@ -94,21 +97,18 @@ function reservationsReducer(acc: Res, reservation: PlannedReservationDoc): Res 
 </script>
 
 <template>
-    <div class="q-pa-none q-ma-none">
-        <q-table
-            dense
+    <div class="pa-0 ma-0">
+        <v-data-table
             v-if="tableData.length > 0"
-            class="table-container"
-            :rows="tableData"
-            :columns="tableColumns"
-            row-key="name"
-            :rows-per-page-options="[0]"
-            card-class="ft-card"
-            hide-bottom
+            :headers="headers"
+            :items="tableData"
+            item-value="name"
+            class="table-container ft-card"
+            density="compact"
+            :hide-default-footer="true"
             flat
-            binary-state-sort
             bordered
-        ></q-table>
+        ></v-data-table>
 
         <FTCenteredText v-else>No reservations yet</FTCenteredText>
     </div>

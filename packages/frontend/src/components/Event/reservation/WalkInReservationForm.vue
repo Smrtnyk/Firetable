@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { WalkInReservation } from "@firetable/types";
+// Import VForm type for the template ref
+import type { VForm } from "vuetify/components";
 
 import { ReservationState, ReservationStatus, ReservationType } from "@firetable/types";
-import { QForm } from "quasar";
 import TelNumberInput from "src/components/TelNumberInput/TelNumberInput.vue";
 import { capitalizeName } from "src/helpers/capitalize-name";
 import { hourFromTimestamp } from "src/helpers/date-utils";
@@ -22,7 +23,7 @@ interface Props {
     eventStartTimestamp: number;
     mode: "create" | "update";
     /**
-     *  Optional data for editing
+     * Optional data for editing
      */
     reservationData: undefined | WalkInReservation;
     timezone: string;
@@ -60,7 +61,8 @@ function generateInitialState(): State {
 }
 
 const state = ref<State>(generateInitialState());
-const reservationForm = useTemplateRef<QForm>("reservationForm");
+const reservationForm = useTemplateRef<VForm>("reservationForm");
+const timeMenu = ref(false);
 
 function capitalizeGuestName(): void {
     state.value.guestName = capitalizeName(state.value.guestName);
@@ -79,62 +81,65 @@ defineExpose({
 </script>
 
 <template>
-    <q-form ref="reservationForm" class="q-gutter-md q-pt-md" greedy>
-        <q-input
+    <v-form ref="reservationForm" class="pa-4 d-flex flex-column" style="gap: 1rem" greedy>
+        <v-text-field
             v-model="state.guestName"
-            hide-bottom-space
-            outlined
+            variant="outlined"
+            hide-details="auto"
             @blur="capitalizeGuestName"
             :label="t('WalkInReservationForm.optionalGuestNameLabel')"
             :rules="[optionalMinLength(t('validation.nameMustBeLongerErrorMsg'), 2)]"
         />
 
-        <q-input
-            :model-value="state.time"
-            outlined
-            readonly
-            :label="t(`EventCreateReservation.reservationTime`)"
-        >
-            <template #append>
-                <q-icon name="fa fa-clock" class="cursor-pointer" />
-                <q-popup-proxy transition-show="scale" transition-hide="scale">
-                    <q-time
-                        :options="
-                            isTimeWithinEventDuration.bind(
-                                null,
-                                props.eventStartTimestamp,
-                                props.eventDurationInHours,
-                            )
-                        "
-                        v-model="state.time"
-                        format24h
-                    >
-                        <div class="row items-center justify-end">
-                            <q-btn
-                                :label="t('EventCreateForm.inputDateTimePickerCloseBtnLabel')"
-                                color="primary"
-                                flat
-                                v-close-popup
-                            />
-                        </div>
-                    </q-time>
-                </q-popup-proxy>
+        <v-menu v-model="timeMenu" :close-on-content-click="false" location="bottom start">
+            <template #activator="{ props }">
+                <v-text-field
+                    :model-value="state.time"
+                    variant="outlined"
+                    readonly
+                    :label="t(`EventCreateReservation.reservationTime`)"
+                    append-inner-icon="fas fa-clock"
+                    v-bind="props"
+                />
             </template>
-        </q-input>
+            <v-time-picker
+                :allowed-hours="
+                    (hour) =>
+                        isTimeWithinEventDuration(
+                            props.eventStartTimestamp,
+                            props.eventDurationInHours,
+                            hour,
+                        )
+                "
+                v-model="state.time"
+                format="24hr"
+            >
+                <v-card-actions>
+                    <v-spacer />
+                    <v-btn
+                        :label="t('EventCreateForm.inputDateTimePickerCloseBtnLabel')"
+                        color="primary"
+                        variant="text"
+                        @click="timeMenu = false"
+                        >Close</v-btn
+                    >
+                </v-card-actions>
+            </v-time-picker>
+        </v-menu>
 
-        <q-input
+        <v-text-field
             v-model.number="state.numberOfGuests"
-            hide-bottom-space
-            outlined
+            hide-details="auto"
+            variant="outlined"
             type="number"
             :label="t(`EventCreateReservation.reservationNumberOfGuests`)"
             :rules="[requireNumber(), greaterThanZero(t('validation.greaterThanZeroErrorMsg'))]"
         />
 
-        <q-input
+        <v-text-field
             v-model.number="state.consumption"
-            hide-bottom-space
-            outlined
+            hide-details="auto"
+            variant="outlined"
             type="number"
             :label="t(`EventCreateReservation.reservationConsumption`)"
             :rules="[
@@ -148,14 +153,20 @@ defineExpose({
             :label="t(`EventCreateReservation.reservationGuestContact`)"
         />
 
-        <q-input
+        <v-textarea
             v-model="state.reservationNote"
-            outlined
+            variant="outlined"
             :label="t('EventCreateReservation.reservationNote')"
+            rows="3"
+            auto-grow
         />
 
-        <div class="q-mb-md">
-            <q-checkbox v-model="state.isVIP" :label="t('EventCreateReservation.reservationVIP')" />
+        <div class="mb-4">
+            <v-checkbox
+                v-model="state.isVIP"
+                :label="t('EventCreateReservation.reservationVIP')"
+                hide-details
+            />
         </div>
-    </q-form>
+    </v-form>
 </template>

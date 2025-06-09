@@ -6,10 +6,9 @@ import { isPlannedReservation, ReservationState } from "@firetable/types";
 import { useAsyncState } from "@vueuse/core";
 import ReservationGeneralInfo from "src/components/Event/reservation/ReservationGeneralInfo.vue";
 import ReservationLabelChips from "src/components/Event/reservation/ReservationLabelChips.vue";
-import FTBtn from "src/components/FTBtn.vue";
 import GuestSummaryChips from "src/components/guest/GuestSummaryChips.vue";
 import { useReservationPermissions } from "src/composables/reservations/useReservationPermissions";
-import { buttonSize } from "src/global-reactives/screen-detection";
+import { useScreenDetection } from "src/global-reactives/screen-detection";
 import { usePermissionsStore } from "src/stores/permissions-store";
 import { toRef } from "vue";
 import { useI18n } from "vue-i18n";
@@ -27,6 +26,7 @@ export interface EventShowReservationProps {
     timezone: string;
 }
 
+const { buttonSize } = useScreenDetection();
 const permissionsStore = usePermissionsStore();
 const { guestSummaryPromise, reservation, tableColors, timezone } =
     defineProps<EventShowReservationProps>();
@@ -56,10 +56,10 @@ function onReservationCancel(): void {
 }
 
 const iconMap: Record<ReservationState, string> = {
-    [ReservationState.ARRIVED]: "fas fa-user-check",
-    [ReservationState.CONFIRMED]: "fas fa-check-circle",
-    [ReservationState.PENDING]: "fas fa-hourglass-empty",
-    [ReservationState.WAITING_FOR_RESPONSE]: "fas fa-hourglass-half",
+    [ReservationState.ARRIVED]: "fa:fas fa-user-check",
+    [ReservationState.CONFIRMED]: "fa:fas fa-check-circle",
+    [ReservationState.PENDING]: "fa:fas fa-hourglass-empty",
+    [ReservationState.WAITING_FOR_RESPONSE]: "fa:fas fa-hourglass-half",
 };
 
 function getStateGradient(state: ReservationState): string {
@@ -77,7 +77,7 @@ function getStateGradient(state: ReservationState): string {
     })();
     const overlay = base.endsWith(")")
         ? base.replace(/rgba?\(([^)]+)\)/, "rgba($1, 0.6)")
-        : `${base}99`;
+        : `${base}99`; // Assuming hex color, append alpha
     return `linear-gradient(135deg, ${base}, ${overlay})`;
 }
 
@@ -91,7 +91,7 @@ function onStateSelect(newState: ReservationState): void {
             emit("reservationConfirmed", true);
             break;
         case ReservationState.PENDING:
-            emit("waitingForResponse", false);
+            emit("waitingForResponse", false); // Assuming PENDING means not waiting for response
             break;
         case ReservationState.WAITING_FOR_RESPONSE:
             emit("waitingForResponse", true);
@@ -104,22 +104,21 @@ function onStateSelect(newState: ReservationState): void {
 <template>
     <ReservationLabelChips :reservation="reservation" />
 
-    <q-card-section>
+    <v-card-text>
         <ReservationGeneralInfo :timezone="timezone" :reservation="reservation" />
 
-        <q-item
-            clickable
-            @click="emit('goToGuestProfile', guestSummaryData.guestId)"
-            class="column q-pa-none"
+        <v-list-item
             v-if="guestSummaryData && guestSummaryData.totalReservations > 0"
-            v-close-popup
+            link
+            @click="emit('goToGuestProfile', guestSummaryData.guestId)"
+            class="d-flex flex-column pa-0"
         >
-            <q-separator />
-            <div>{{ t("EventShowReservation.guestHistoryLabel") }}:</div>
+            <v-divider />
+            <div class="pt-2">{{ t("EventShowReservation.guestHistoryLabel") }}:</div>
             <div>
                 <GuestSummaryChips :summary="guestSummaryData" />
             </div>
-        </q-item>
+        </v-list-item>
 
         <template
             v-if="
@@ -128,12 +127,12 @@ function onStateSelect(newState: ReservationState): void {
                 permissionsStore.canConfirmReservation
             "
         >
-            <q-separator />
-            <div class="state-grid q-mt-md q-mb-lg" role="radiogroup">
+            <v-divider class="mt-2" />
+            <div class="state-grid mt-4 mb-6" role="radiogroup">
                 <div
                     v-for="state in Object.values(ReservationState)"
                     :key="state"
-                    class="state-card q-pa-md"
+                    class="state-card pa-4"
                     role="radio"
                     :aria-checked="reservationMappedState === state"
                     :aria-label="`Set reservation to ${state}`"
@@ -145,97 +144,110 @@ function onStateSelect(newState: ReservationState): void {
                                 : 'transparent',
                     }"
                     @click="onStateSelect(state)"
+                    tabindex="0"
                 >
-                    <div class="flex items-center justify-center">
-                        <q-icon :name="iconMap[state]" />
+                    <div class="d-flex align-center justify-center">
+                        <v-icon :icon="iconMap[state]" />
                     </div>
-                    <div class="text-caption q-mt-xs text-center">
+                    <div class="text-caption mt-1 text-center">
                         {{ reservationStateWithTranslationMap[state] }}
                     </div>
                 </div>
             </div>
-            <q-separator class="q-mb-md" />
+            <v-divider class="mb-4" />
         </template>
 
-        <q-item v-if="!isCancelled" class="q-pa-sm-none q-pa-xs-none q-gutter-xs q-ml-none">
-            <FTBtn
+        <div v-if="!isCancelled" class="d-flex pa-sm-0 pa-xs-0 ml-0 align-center" style="gap: 4px">
+            <v-btn
                 v-if="canEditReservation && !isCancelled"
-                :title="t('Global.edit')"
-                icon="fa fa-pencil"
+                :aria-label="t('Global.edit')"
+                icon="fa:fas fa-pencil"
                 color="positive"
+                variant="text"
+                density="compact"
                 @click="() => emit('edit')"
-                v-close-popup
             />
-            <FTBtn
+            <v-btn
                 v-if="canMoveToQueue"
-                :title="t('EventShowReservation.moveToQueueLabel')"
-                icon="fa fa-list-ol"
+                :aria-label="t('EventShowReservation.moveToQueueLabel')"
+                icon="fa:fas fa-list-ol"
                 color="secondary"
+                variant="text"
+                density="compact"
                 @click="() => emit('queue')"
-                v-close-popup
             />
 
-            <q-space />
+            <v-spacer />
 
-            <FTBtn
+            <v-btn
                 v-if="isLinkedReservation"
-                :title="t('EventShowReservation.unlinkTablesLabel')"
-                icon="fa fa-unlink"
+                :aria-label="t('EventShowReservation.unlinkTablesLabel')"
+                icon="fa:fas fa-unlink"
                 color="warning"
+                variant="text"
+                density="compact"
                 @click="() => emit('unlink')"
-                v-close-popup
             />
-            <FTBtn
+            <v-btn
                 v-if="permissionsStore.canReserve && !isCancelled"
-                :title="t('EventShowReservation.linkTablesLabel')"
-                icon="fa fa-link"
+                :aria-label="t('EventShowReservation.linkTablesLabel')"
+                icon="fa:fas fa-link"
                 color="primary"
+                variant="text"
+                density="compact"
                 @click="() => emit('link')"
-                v-close-popup
             />
 
             <template v-if="permissionsStore.canReserve && !isCancelled">
-                <FTBtn
-                    :title="t('Global.transfer')"
-                    icon="fa fa-exchange-alt"
+                <v-btn
+                    :aria-label="t('Global.transfer')"
+                    icon="fa:fas fa-exchange-alt"
                     color="primary"
+                    variant="text"
+                    density="compact"
                     @click="() => emit('transfer')"
-                    v-close-popup
                 />
-                <FTBtn
-                    :title="t('Global.copy')"
-                    icon="fa fa-copy"
+                <v-btn
+                    :aria-label="t('Global.copy')"
+                    icon="fa:fas fa-copy"
                     color="primary"
+                    variant="text"
+                    density="compact"
                     @click="() => emit('copy')"
-                    v-close-popup
                 />
             </template>
-        </q-item>
+        </div>
 
-        <q-separator class="q-my-md" v-if="canDeleteReservation || canCancel" />
+        <v-divider class="my-4" v-if="canDeleteReservation || canCancel" />
 
-        <q-item class="q-pa-sm-none q-pa-xs-none q-gutter-xs q-ml-none">
-            <FTBtn
+        <div
+            v-if="canDeleteReservation || canCancel"
+            class="d-flex pa-sm-0 pa-xs-0 ml-0 align-center"
+            style="gap: 4px"
+        >
+            <v-btn
                 v-if="canDeleteReservation"
-                :title="t('Global.delete')"
-                icon="fa fa-trash"
+                :aria-label="t('Global.delete')"
+                icon="fa:fas fa-trash"
                 color="negative"
+                variant="text"
+                density="compact"
                 @click="() => emit('delete')"
-                v-close-popup
             />
 
-            <q-space />
+            <v-spacer />
 
-            <FTBtn
+            <v-btn
                 v-if="canCancel"
                 @click="onReservationCancel"
                 :size="buttonSize"
                 :color="isCancelled ? 'positive' : 'warning'"
-                v-close-popup
-                >{{ isCancelled ? t("Global.reactivate") : t("Global.cancel") }}</FTBtn
+                variant="tonal"
             >
-        </q-item>
-    </q-card-section>
+                {{ isCancelled ? t("Global.reactivate") : t("Global.cancel") }}
+            </v-btn>
+        </div>
+    </v-card-text>
 </template>
 
 <style scoped>
@@ -245,14 +257,24 @@ function onStateSelect(newState: ReservationState): void {
     gap: 1rem;
 }
 .state-card {
-    border-radius: 0.75rem;
+    border-radius: 0.75rem; /* Vuetify uses 'rounded-lg' for 8px, 'rounded-xl' for 12px. This is 12px. */
     cursor: pointer;
     transition: 0.5s all;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center; /* Added for better content centering */
+    min-height: 80px; /* Ensure cards have some min height */
 }
 .state-card:hover {
     transform: translateY(-2px);
+}
+
+/* Assuming ft-card provides border or specific background not covered by dynamic style */
+.ft-card {
+    border: 1px solid #e0e0e0; /* Example border, adjust as needed */
+}
+.v-theme--dark .ft-card {
+    border: 1px solid #424242; /* Example dark theme border */
 }
 </style>

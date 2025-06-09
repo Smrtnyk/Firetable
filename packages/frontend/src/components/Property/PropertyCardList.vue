@@ -11,13 +11,15 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <div class="EventCardList row">
-        <div
+    <v-row class="EventCardList">
+        <v-col
             v-for="property in props.properties"
-            class="col-12 col-sm-6 q-pa-xs"
             :key="property.id"
+            cols="12"
+            sm="6"
+            class="pa-1"
         >
             <PropertyCard :property="property" :aspect-ratio="props.aspectRatio" />
-        </div>
-    </div>
+        </v-col>
+    </v-row>
 </template>

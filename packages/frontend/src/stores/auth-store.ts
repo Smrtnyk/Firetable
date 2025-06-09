@@ -4,11 +4,11 @@ import type { User as FBUser } from "firebase/auth";
 import { AdminRole, Role } from "@firetable/types";
 import { noop } from "es-toolkit/function";
 import { defineStore } from "pinia";
-import { Loading } from "quasar";
 import { useFirestoreDocument } from "src/composables/useFirestore";
 import { getUserPath, logoutUser } from "src/db";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { AppLogger } from "src/logger/FTLogger";
+import { useGlobalStore } from "src/stores/global";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { computed, ref, watch } from "vue";
 
@@ -19,6 +19,7 @@ export const enum AuthState {
 }
 
 export const useAuthStore = defineStore("auth", function () {
+    const globalStore = useGlobalStore();
     const state = ref<AuthState>(AuthState.UNAUTHENTICATED);
     const user = ref<AppUser | undefined>();
     const unsubscribers: VoidFunction[] = [];
@@ -64,7 +65,7 @@ export const useAuthStore = defineStore("auth", function () {
 
         setAuthState(AuthState.INITIALIZING);
         try {
-            Loading.show();
+            globalStore.setLoading(true);
             const token = await authUser?.getIdTokenResult();
             const role = token?.claims.role as AppUser["role"];
             const organisationId = token?.claims.organisationId as string;
@@ -94,7 +95,7 @@ export const useAuthStore = defineStore("auth", function () {
                 message: e instanceof Error ? e.message : "Unknown error occurred",
             });
         } finally {
-            Loading.hide();
+            globalStore.setLoading(false);
         }
     }
 

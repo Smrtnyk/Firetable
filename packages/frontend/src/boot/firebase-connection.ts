@@ -1,9 +1,7 @@
-import type { Router } from "vue-router";
-
-import { boot } from "quasar/wrappers";
 import { initializeFirebase } from "src/db";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { refreshApp } from "src/helpers/utils";
+import router from "src/router";
 import { createAuthGuard } from "src/router/auth-guard";
 import { AuthState, useAuthStore } from "src/stores/auth-store";
 import { useGuestsStore } from "src/stores/guests-store";
@@ -12,7 +10,8 @@ import { usePropertiesStore } from "src/stores/properties-store";
 import { watch } from "vue";
 import { useCurrentUser, VueFire, VueFireAuth } from "vuefire";
 
-export default boot(function ({ app, router }) {
+// @ts-expect-error -- FIXME: type this properly
+export function initFirebaseAndAuth(app) {
     const { firebaseApp } = initializeFirebase();
     app.use(VueFire, {
         firebaseApp,
@@ -34,13 +33,10 @@ export default boot(function ({ app, router }) {
         }
     });
 
-    handleOnAuthStateChanged(router, authStore);
-});
+    handleOnAuthStateChanged(authStore);
+}
 
-function handleOnAuthStateChanged(
-    router: Router,
-    authStore: ReturnType<typeof useAuthStore>,
-): void {
+function handleOnAuthStateChanged(authStore: ReturnType<typeof useAuthStore>): void {
     let isFirstCall = true;
     const currentUser = useCurrentUser();
     watch(

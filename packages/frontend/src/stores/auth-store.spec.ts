@@ -43,11 +43,6 @@ vi.mock("src/helpers/ui-helpers", () => ({
     tryCatchLoadingWrapper: vi.fn(),
 }));
 
-vi.mock("quasar", async (importOriginal) => ({
-    ...(await importOriginal()),
-    Loading: loadingSpy,
-}));
-
 function createTestFBUser(options: Partial<FBUser> = {}): FBUser {
     return {
         email: "test@example.com",

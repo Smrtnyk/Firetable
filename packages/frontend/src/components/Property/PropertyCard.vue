@@ -27,7 +27,7 @@ const backgroundImageUrl = computed(function () {
         }"
     >
         <router-link
-            class="PropertyCard__link"
+            class="PropertyCard__link text-decoration-none"
             :to="{
                 name: 'events',
                 params: {
@@ -36,13 +36,13 @@ const backgroundImageUrl = computed(function () {
                 },
             }"
         >
-            <q-responsive :ratio="props.aspectRatio">
-                <div class="PropertyCard__content column">
-                    <q-space />
+            <v-responsive :aspect-ratio="props.aspectRatio">
+                <div class="PropertyCard__content d-flex flex-column fill-height">
+                    <v-spacer />
 
-                    <h2 class="text-h3 q-mb-sm q-ml-none q-mt-none">{{ props.property.name }}</h2>
+                    <h2 class="text-h3 mb-1 ml-0 mt-0">{{ props.property.name }}</h2>
                 </div>
-            </q-responsive>
+            </v-responsive>
         </router-link>
     </div>
 </template>
@@ -50,16 +50,22 @@ const backgroundImageUrl = computed(function () {
 <style lang="scss">
 .PropertyCard {
     border-radius: 0.5rem;
+    // The router-link should not have default text decoration
+    &__link {
+        text-decoration: none;
+    }
 
     img {
+        // This style might not be directly applicable if the image is a background
         border-radius: 0.5rem;
     }
 
     &__content {
         color: white;
-        text-decoration: none !important;
-        padding: 1rem;
+        // text-decoration: none !important; // Handled by __link class now
+        padding: 1rem; // Vuetify equivalent could be pa-4 if using spacing helpers
         border-radius: 0.5rem;
+        height: 100%; // Ensure content div takes full height of v-responsive
     }
 }
 </style>

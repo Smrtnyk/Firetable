@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import type { FloorEditor } from "@firetable/floor-creator";
-import type { AnyFunction, FloorDoc, ReservationDoc } from "@firetable/types";
+import type { FloorDoc, ReservationDoc } from "@firetable/types";
 import type { EventOwner } from "src/db";
-import type { Component } from "vue";
 
 import { isActiveReservation } from "@firetable/types";
 import { useLocalStorage } from "@vueuse/core";
 import { matchesProperty } from "es-toolkit/compat";
-import { Loading } from "quasar";
 import AdminEventEditInfo from "src/components/admin/event/AdminEventEditInfo.vue";
 import AdminEventFloorManager from "src/components/admin/event/AdminEventFloorManager.vue";
 import AdminEventFloorViewer from "src/components/admin/event/AdminEventFloorViewer.vue";
@@ -18,12 +16,11 @@ import AdminEventReturningGuestsList from "src/components/admin/event/AdminEvent
 import AdminEventRTInfo from "src/components/admin/event/AdminEventRTInfo.vue";
 import AppCardSection from "src/components/AppCardSection.vue";
 import FTBtn from "src/components/FTBtn.vue";
-import FTDialog from "src/components/FTDialog.vue";
-import FTTabPanels from "src/components/FTTabPanels.vue";
-import FTTabs from "src/components/FTTabs.vue";
+import FTTabPanels from "src/components/FTTabPanels.vue"; // Assumed to wrap v-window
+import FTTabs from "src/components/FTTabs.vue"; // Assumed to wrap v-tabs
 import FTTitle from "src/components/FTTitle.vue";
 import { useAdminEvent } from "src/composables/useAdminEvent";
-import { useDialog } from "src/composables/useDialog";
+import { globalDialog } from "src/composables/useDialog";
 import { useFloors } from "src/composables/useFloors";
 import { useGuestsForEvent } from "src/composables/useGuestsForEvent";
 import {
@@ -33,12 +30,12 @@ import {
     updateEventFloorData,
     updateEventFloorsOrder,
 } from "src/db";
-import { isMobile } from "src/global-reactives/screen-detection";
 import { compressFloorDoc } from "src/helpers/compress-floor-doc";
 import { formatEventDate } from "src/helpers/date-utils";
 import { truncateText } from "src/helpers/string-utils";
-import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";
+import { useGlobalStore } from "src/stores/global";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { computed, onMounted, onUnmounted, watch } from "vue";
 import { useI18n } from "vue-i18n";
@@ -53,7 +50,7 @@ interface Props {
 const props = defineProps<Props>();
 const router = useRouter();
 const { locale, t } = useI18n();
-const { createDialog } = useDialog();
+const globalStore = useGlobalStore();
 const propertiesStore = usePropertiesStore();
 
 const tab = useLocalStorage<string>("admin-event-active-tab", "info");
@@ -96,18 +93,16 @@ watch(
     isLoading,
     function (newIsLoading) {
         if (newIsLoading) {
-            Loading.show();
+            globalStore.setLoading(true);
         } else {
-            Loading.hide();
+            globalStore.setLoading(false);
         }
     },
     { immediate: true },
 );
 
 onUnmounted(function () {
-    if (Loading.isActive) {
-        Loading.hide();
-    }
+    globalStore.setLoading(false);
 });
 
 async function addFloor(floor: FloorDoc): Promise<void> {
@@ -119,10 +114,10 @@ async function addFloor(floor: FloorDoc): Promise<void> {
 }
 
 async function deleteReservationPermanently(reservation: ReservationDoc): Promise<void> {
-    const shouldDeletePermanently = await showConfirm(
-        t("PageAdminEvent.permanentlyDeleteReservationTitle"),
-        t("PageAdminEvent.permanentlyDeleteReservationMessage"),
-    );
+    const shouldDeletePermanently = await globalDialog.confirm({
+        message: t("PageAdminEvent.permanentlyDeleteReservationMessage"),
+        title: t("PageAdminEvent.permanentlyDeleteReservationTitle"),
+    });
     if (!shouldDeletePermanently) {
         return;
     }
@@ -158,7 +153,6 @@ function isEventFinished(eventTime: number): boolean {
 
 async function removeFloor(index: number): Promise<void> {
     const floor = eventFloors.value[index];
-    // Check if floor has reservations
     if (allReservations.value.some(matchesProperty("floorId", floor.id))) {
         showErrorMessage(t("PageAdminEvent.cannotRemoveFloorWithReservationsError"));
         return;
@@ -187,42 +181,33 @@ async function saveFloor(floor: FloorEditor): Promise<void> {
     });
 }
 
-function showDialog(
-    component: Component,
-    title: string,
-    componentPropsObject: Record<string, unknown> = {},
-    listeners: Record<string, AnyFunction> = {},
-    maximized = isMobile.value,
-): void {
-    createDialog({
-        component: FTDialog,
-        componentProps: {
-            component,
-            componentPropsObject,
-            listeners,
-            maximized,
-            title,
-        },
-    });
-}
-
 function showEventInfoEditDialog(): void {
     if (event.value) {
-        showDialog(AdminEventEditInfo, t("PageAdminEvent.editEventInfoDialogTitle"), {
-            eventInfo: event.value.info ?? "",
-            eventOwner,
-        });
+        globalDialog.openDialog(
+            AdminEventEditInfo,
+            {
+                eventInfo: event.value.info ?? "",
+                eventOwner,
+            },
+            {
+                title: t("PageAdminEvent.editEventInfoDialogTitle"),
+            },
+        );
     }
 }
 
 function showFloorEditDialog(floor: FloorDoc): void {
     if (event.value) {
-        showDialog(
+        globalDialog.openDialog(
             AdminEventFloorViewer,
-            t("PageAdminEvent.editingFloorDialogTitle", { floorName: floor.name }),
-            { eventId: event.value.id, floor },
-            { save: saveFloor },
-            true,
+            {
+                eventId: event.value.id,
+                floor,
+                onSave: saveFloor,
+            },
+            {
+                title: t("PageAdminEvent.editingFloorDialogTitle", { floorName: floor.name }),
+            },
         );
     }
 }
@@ -253,17 +238,15 @@ onMounted(init);
             </template>
         </FTTitle>
         <FTTabs v-model="tab">
-            <q-tab name="info" :label="t('PageAdminEvent.infoTabLabel')" />
-            <q-tab
-                name="edit"
-                :label="t('PageAdminEvent.editTabLabel')"
-                v-if="!isEventFinished(event.date)"
-            />
-            <q-tab name="logs" :label="logsLabelWithCount" />
+            <v-tab value="info">{{ t("PageAdminEvent.infoTabLabel") }}</v-tab>
+            <v-tab value="edit" v-if="!isEventFinished(event.date)">
+                {{ t("PageAdminEvent.editTabLabel") }}
+            </v-tab>
+            <v-tab value="logs">{{ logsLabelWithCount }}</v-tab>
         </FTTabs>
         <FTTabPanels v-model="tab" class="bg-transparent">
             <!-- General info area -->
-            <q-tab-panel name="info" class="q-px-none q-py-none">
+            <v-window-item value="info" class="pa-0">
                 <AppCardSection>
                     <AdminEventRTInfo
                         :floors="eventFloors"
@@ -278,81 +261,73 @@ onMounted(init);
 
                 <AppCardSection :title="t('PageAdminEvent.guestsTitle')">
                     <FTTabs v-model="reservationsTab">
-                        <q-tab
-                            name="arrivedReservations"
-                            :label="
-                                t('PageAdminEvent.arrivedReservationsTabLabel', {
+                        <v-tab value="arrivedReservations">
+                            {{
+                                t("PageAdminEvent.arrivedReservationsTabLabel", {
                                     count: arrivedReservations.length,
                                 })
-                            "
-                        />
-                        <q-tab
-                            name="cancelledReservations"
-                            :label="
-                                t('PageAdminEvent.cancelledReservationsTabLabel', {
+                            }}
+                        </v-tab>
+                        <v-tab value="cancelledReservations">
+                            {{
+                                t("PageAdminEvent.cancelledReservationsTabLabel", {
                                     count: cancelledReservations.length,
                                 })
-                            "
-                        />
-                        <q-tab
-                            name="returningGuests"
-                            :label="
-                                t('PageAdminEvent.returningGuestsTabLabel', {
+                            }}
+                        </v-tab>
+                        <v-tab value="returningGuests">
+                            {{
+                                t("PageAdminEvent.returningGuestsTabLabel", {
                                     count: returningGuests.length,
                                 })
-                            "
-                        />
+                            }}
+                        </v-tab>
                     </FTTabs>
                     <FTTabPanels v-model="reservationsTab">
-                        <q-tab-panel name="arrivedReservations" class="q-pa-none">
+                        <v-window-item value="arrivedReservations" class="pa-0">
                             <AdminEventReservationsList
                                 :timezone="propertySettings.timezone"
                                 :empty-message="t('PageAdminEvent.noArrivedReservationsMessage')"
                                 @delete="deleteReservationPermanently"
                                 :reservations="arrivedReservations"
                             />
-                        </q-tab-panel>
-                        <q-tab-panel name="cancelledReservations">
+                        </v-window-item>
+                        <v-window-item value="cancelledReservations" class="pa-0">
                             <AdminEventReservationsList
                                 :timezone="propertySettings.timezone"
                                 :empty-message="t('PageAdminEvent.noCancelledReservationsMessage')"
                                 @delete="deleteReservationPermanently"
                                 :reservations="cancelledReservations"
                             />
-                        </q-tab-panel>
-                        <q-tab-panel name="returningGuests">
+                        </v-window-item>
+                        <v-window-item value="returningGuests" class="pa-0">
                             <AdminEventReturningGuestsList
                                 :organisation-id="organisationId"
                                 :returning-guests="returningGuests"
                             />
-                        </q-tab-panel>
+                        </v-window-item>
                     </FTTabPanels>
                 </AppCardSection>
-            </q-tab-panel>
+            </v-window-item>
 
             <!-- Edit area -->
-            <q-tab-panel
-                name="edit"
-                v-if="!isEventFinished(event.date)"
-                class="q-px-none q-py-none"
-            >
+            <v-window-item value="edit" v-if="!isEventFinished(event.date)" class="pa-0">
                 <AppCardSection :title="t('PageAdminEvent.eventInfoCardTitle')">
-                    <q-item clickable v-ripple>
-                        <q-item-section>
-                            <q-item-label caption lines="2">
+                    <div class="d-flex align-center pa-4">
+                        <div class="flex-grow-1 mr-2">
+                            <p class="text-caption mb-0">
                                 {{ truncateText(event.info || "", 100) }}
-                            </q-item-label>
-                        </q-item-section>
-
-                        <q-item-section side>
+                            </p>
+                        </div>
+                        <div>
                             <FTBtn
                                 rounded
-                                icon="fa fa-pencil"
+                                icon="fa:fas fa-pencil"
                                 class="button-gradient"
                                 @click="showEventInfoEditDialog"
                             />
-                        </q-item-section>
-                    </q-item>
+                        </div>
+                    </div>
                 </AppCardSection>
 
                 <AppCardSection :title="t('PageAdminEvent.eventFloorsCardTitle')">
@@ -368,16 +343,16 @@ onMounted(init);
                         @reorder="handleFloorReorder"
                     />
                 </AppCardSection>
-            </q-tab-panel>
+            </v-window-item>
 
             <!-- Logs -->
-            <q-tab-panel name="logs" class="q-px-none q-py-none">
+            <v-window-item value="logs" class="pa-0">
                 <AdminEventLogs
                     :timezone="propertySettings.timezone"
                     :logs-doc="logs"
                     :is-admin="authStore.isAdmin"
                 />
-            </q-tab-panel>
+            </v-window-item>
         </FTTabPanels>
     </div>
 </template>

@@ -2,11 +2,10 @@
 import type { CreateDrinkCardPayload, DrinkCardElement, InventoryItemDoc } from "@firetable/types";
 
 import { isCustomDrinkCard, isPDFDrinkCard } from "@firetable/types";
-import { QForm } from "quasar";
 import { noEmptyString } from "src/helpers/form-rules";
 import { processImage } from "src/helpers/process-image";
 import { showErrorMessage } from "src/helpers/ui-helpers";
-import { ref } from "vue";
+import { ref, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 import DrinkCardSectionManager from "./DrinkCardSectionManager.vue";
@@ -23,14 +22,13 @@ interface Props {
 
 const props = defineProps<Props>();
 const { t } = useI18n();
-const formRef = ref<QForm | undefined>();
+const formRef = useTemplateRef("formRef");
+const fileInput = ref<HTMLInputElement | null>(null);
 const form = ref<CreateDrinkCardPayload>(getInitialForm());
 const emit = defineEmits<{
     submit: [FormSubmitData];
 }>();
-const backgroundFile = ref<File | undefined>();
-const fileInput = ref<HTMLInputElement | undefined>();
-const pdfFile = ref<File | undefined>();
+const pdfFile = ref<File[]>([]);
 
 function getInitialForm(): CreateDrinkCardPayload {
     if (props.cardToEdit) {
@@ -44,14 +42,14 @@ function getInitialForm(): CreateDrinkCardPayload {
         name: "",
         organisationId: "",
         propertyId: "",
+        showItemDescription: false,
         showLogo: true,
         type: "custom",
     };
 }
 
 async function onSubmit(): Promise<void> {
-    const isValid = await formRef.value?.validate();
-    if (!isValid) {
+    if (!(await formRef.value?.validate())?.valid) {
         return;
     }
 
@@ -60,20 +58,19 @@ async function onSubmit(): Promise<void> {
         return;
     }
 
-    if (isPDFDrinkCard(form.value) && !pdfFile.value && !form.value.pdfUrl) {
+    if (isPDFDrinkCard(form.value) && pdfFile.value.length === 0 && !form.value.pdfUrl) {
         showErrorMessage("PDF drink card requires PDF file to be uploaded!");
         return;
     }
 
     emit("submit", {
         card: form.value,
-        pdfFile: pdfFile.value,
+        pdfFile: pdfFile.value[0],
     });
 }
 
 const imageProcessingOptions = {
     acceptedTypes: ["image/jpeg", "image/png"],
-    // 300KB
     maxFileSize: 300 * 1024,
     maxHeight: 1080,
     maxWidth: 1920,
@@ -112,28 +109,27 @@ async function handleImageUpload(event: Event): Promise<void> {
     }
 }
 
-function handlePDFUpload(file: File | null): void {
+watch(pdfFile, (newFiles) => {
+    const file = newFiles[0];
     if (!file) {
         return;
     }
 
     if (file.type !== "application/pdf") {
         showErrorMessage(t("PageAdminPropertyDrinkCards.invalidFileType"));
+        pdfFile.value = [];
         return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
         showErrorMessage("PDF file is too large, 5MB is maximum size limit!");
-        return;
+        pdfFile.value = [];
     }
-
-    pdfFile.value = file;
-}
+});
 
 function removeImage(): void {
     if (isCustomDrinkCard(form.value)) {
         form.value.backgroundImage = "";
-        backgroundFile.value = undefined;
     }
 }
 
@@ -143,170 +139,178 @@ function triggerFileInput(): void {
 </script>
 
 <template>
-    <q-form ref="formRef" @submit.prevent="onSubmit" class="row q-col-gutter-md">
-        <div class="col-12">
-            <q-btn-toggle
-                v-model="form.type"
-                :options="[
-                    { label: 'Custom', value: 'custom', icon: 'fa fa-pencil' },
-                    { label: 'Pdf', value: 'pdf', icon: 'fa fa-file-pdf' },
-                ]"
-                no-caps
-                rounded
-                spread
-                unelevated
-            />
-        </div>
+    <v-form ref="formRef" @submit.prevent="onSubmit">
+        <v-row>
+            <v-col cols="12">
+                <v-btn-toggle v-model="form.type" mandatory divided class="w-100">
+                    <v-btn value="custom" class="flex-grow-1">
+                        <v-icon start>fas fa-pencil-alt</v-icon>
+                        Custom
+                    </v-btn>
+                    <v-btn value="pdf" class="flex-grow-1">
+                        <v-icon start>fas fa-file-pdf</v-icon>
+                        Pdf
+                    </v-btn>
+                </v-btn-toggle>
+            </v-col>
 
-        <div class="col-12">
-            <q-toggle
-                v-model="form.isActive"
-                :label="t('PageAdminPropertyDrinkCards.isActiveLabel')"
-            />
-        </div>
-
-        <div class="col-12">
-            <q-input
-                v-model="form.name"
-                :label="t('PageAdminPropertyDrinkCards.cardNameLabel')"
-                outlined
-                :rules="[noEmptyString('Drink card name is required')]"
-            />
-        </div>
-
-        <template v-if="isCustomDrinkCard(form)">
-            <div class="col-12">
-                <q-toggle v-model="form.showItemDescription" label="Show item description?" />
-            </div>
-
-            <div class="col-12">
-                <q-toggle v-model="form.showLogo" label="Show venue logo if exists?" />
-            </div>
-
-            <div class="col-12 col-md-6">
-                <div class="text-subtitle2 q-mb-sm">
-                    {{ t("PageAdminPropertyDrinkCards.cardDescriptionLabel") }}
-                </div>
-                <q-editor
-                    v-model="form.description"
-                    :toolbar="[
-                        ['bold', 'italic', 'underline'],
-                        ['orderedList', 'unorderedList'],
-                        ['undo', 'redo'],
-                    ]"
-                    content-class="editor-content"
-                    outlined
+            <v-col cols="12">
+                <v-switch
+                    v-model="form.isActive"
+                    :label="t('PageAdminPropertyDrinkCards.isActiveLabel')"
+                    color="primary"
+                    hide-details
                 />
-            </div>
+            </v-col>
 
-            <div class="col-12 col-md-6">
-                <div class="text-subtitle2 q-mb-sm">Optional background image</div>
-                <q-responsive class="preview-container col-12 ft-border" ratio="1">
-                    <template v-if="form.backgroundImage">
-                        <q-img :src="form.backgroundImage" class="preview-image" alt="" />
-                        <div>
-                            <q-btn
-                                flat
-                                round
-                                color="negative"
-                                icon="fa fa-close"
+            <v-col cols="12">
+                <v-text-field
+                    v-model="form.name"
+                    :label="t('PageAdminPropertyDrinkCards.cardNameLabel')"
+                    variant="outlined"
+                    :rules="[noEmptyString('Drink card name is required')]"
+                />
+            </v-col>
+
+            <template v-if="isCustomDrinkCard(form)">
+                <v-col cols="12">
+                    <v-switch
+                        v-model="form.showItemDescription as boolean"
+                        label="Show item description?"
+                        color="primary"
+                        hide-details
+                    />
+                </v-col>
+
+                <v-col cols="12">
+                    <v-switch
+                        v-model="form.showLogo"
+                        label="Show venue logo if exists?"
+                        color="primary"
+                        hide-details
+                    />
+                </v-col>
+
+                <v-col cols="12" md="6">
+                    <div class="text-subtitle-2 mb-2">
+                        {{ t("PageAdminPropertyDrinkCards.cardDescriptionLabel") }}
+                    </div>
+                    <v-textarea v-model="form.description" variant="outlined" auto-grow />
+                </v-col>
+
+                <v-col cols="12" md="6">
+                    <div class="text-subtitle-2 mb-2">Optional background image</div>
+                    <v-responsive class="preview-container ft-border" :aspect-ratio="16 / 9">
+                        <template v-if="form.backgroundImage">
+                            <v-img
+                                :src="form.backgroundImage"
+                                class="preview-image"
+                                cover
+                                alt="Background preview"
+                            />
+                            <v-btn
+                                class="remove-btn"
+                                variant="text"
+                                icon="fas fa-times"
+                                color="error"
                                 @click="removeImage"
                             />
-                        </div>
-                    </template>
-                    <template v-else>
-                        <div class="upload-placeholder">
-                            <q-btn
-                                color="secondary"
-                                rounded
-                                icon="fa fa-file-import"
-                                @click="triggerFileInput"
-                                >Click to upload</q-btn
-                            >
-                        </div>
-                    </template>
-                    <input
-                        type="file"
-                        ref="fileInput"
-                        accept="image/jpeg,image/png"
-                        class="hidden"
-                        @change="handleImageUpload"
+                        </template>
+                        <template v-else>
+                            <div class="upload-placeholder">
+                                <v-btn
+                                    color="secondary"
+                                    variant="tonal"
+                                    prepend-icon="fas fa-file-import"
+                                    @click="triggerFileInput"
+                                    >Click to upload</v-btn
+                                >
+                            </div>
+                        </template>
+                        <input
+                            type="file"
+                            ref="fileInput"
+                            accept="image/jpeg,image/png"
+                            class="hidden"
+                            @change="handleImageUpload"
+                        />
+                    </v-responsive>
+                </v-col>
+            </template>
+
+            <v-col cols="12">
+                <v-divider />
+            </v-col>
+
+            <v-col cols="12" v-if="isCustomDrinkCard(form)">
+                <DrinkCardSectionManager
+                    v-model:elements="form.elements"
+                    :inventory-items="inventoryItems"
+                    @add="handleElementAdd"
+                    @remove="handleElementRemove"
+                />
+            </v-col>
+
+            <v-col cols="12" v-if="isPDFDrinkCard(form)">
+                <div class="pdf-upload-container">
+                    <v-file-input
+                        v-model="pdfFile"
+                        accept=".pdf"
+                        label="Choose a PDF file or drop it here"
+                        variant="outlined"
+                        chips
+                        show-size
                     />
-                </q-responsive>
-            </div>
-        </template>
 
-        <div class="col-12">
-            <q-separator />
-        </div>
-
-        <div class="col-12" v-if="isCustomDrinkCard(form)">
-            <DrinkCardSectionManager
-                v-model:elements="form.elements"
-                :inventory-items="inventoryItems"
-                @add="handleElementAdd"
-                @remove="handleElementRemove"
-            />
-        </div>
-
-        <div class="col-12" v-if="isPDFDrinkCard(form)">
-            <div class="pdf-upload-container col-12">
-                <q-file
-                    v-model="pdfFile"
-                    accept=".pdf"
-                    label="Choose a PDF file"
-                    @update:model-value="handlePDFUpload"
-                    outlined
-                    use-chips
-                    drop-area
-                >
-                    <template #prepend>
-                        <q-icon name="fa fa-file-pdf" />
-                    </template>
-                </q-file>
-
-                <div v-if="form.pdfUrl" class="current-pdf q-mt-sm">
-                    <q-btn
-                        flat
-                        label="View current PDF"
-                        icon="fa fa-eye"
-                        :href="form.pdfUrl"
-                        target="_blank"
-                    />
+                    <div v-if="form.pdfUrl" class="current-pdf mt-2">
+                        <v-btn
+                            variant="text"
+                            prepend-icon="fas fa-eye"
+                            :href="form.pdfUrl"
+                            target="_blank"
+                            >View current PDF</v-btn
+                        >
+                    </div>
                 </div>
-            </div>
-        </div>
+            </v-col>
 
-        <div class="col-12">
-            <q-separator />
-        </div>
-
-        <div class="col-12 justify-end">
-            <q-btn type="submit" rounded class="button-gradient" :label="t('Global.submit')" />
-        </div>
-    </q-form>
+            <v-col cols="12" class="d-flex justify-end">
+                <v-btn type="submit" rounded="lg" size="large" class="button-gradient">
+                    {{ t("Global.submit") }}
+                </v-btn>
+            </v-col>
+        </v-row>
+    </v-form>
 </template>
 
 <style lang="scss" scoped>
 .preview-container {
-    max-width: 500px;
     position: relative;
-    min-height: 169px;
-    border-radius: 8px;
+    border-radius: 4px;
+    overflow: hidden;
 
     .preview-image {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+    }
+
+    .remove-btn {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        background-color: rgba(0, 0, 0, 0.3);
     }
 
     .upload-placeholder {
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
         height: 100%;
     }
+}
+
+.ft-border {
+    border: 1px dashed rgba(0, 0, 0, 0.2);
 }
 
 .hidden {

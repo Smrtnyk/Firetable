@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { AnyFunction, FloorDoc, PlannedReservation } from "@firetable/types";
+import type { FloorDoc, PlannedReservation } from "@firetable/types";
+import type { VAutocomplete } from "vuetify/components";
 
-import { isString } from "es-toolkit";
+import { refDebounced } from "@vueuse/core";
 import { isObject, matchesProperty } from "es-toolkit/compat";
-import { QSelect } from "quasar";
 import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPChip.vue";
 import { nextTick, ref, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
@@ -25,10 +25,18 @@ const props = defineProps<EventGuestSearchProps>();
 const emit = defineEmits(["found", "clear"]);
 const { t } = useI18n();
 
-const selectEl = useTemplateRef<QSelect | undefined>("selectEl");
-const options = ref(getNamesFromReservations(props.allReservedTables));
-const searchTerm = ref("");
+const selectEl = useTemplateRef<VAutocomplete>("selectEl");
+const options = ref<Option[]>([]);
+const selectedValue = ref<null | Option>(null);
+const searchText = ref("");
+const debouncedSearchText = refDebounced(searchText, 300);
 const hideArrived = ref(false);
+
+function clearSearch(): void {
+    searchText.value = "";
+    selectedValue.value = null;
+    emit("clear");
+}
 
 function createTableLabel(reservation: PlannedReservation): string {
     const label = `${reservation.guestName} (${reservation.tableLabel})`;
@@ -39,57 +47,18 @@ function createTableLabel(reservation: PlannedReservation): string {
     return label;
 }
 
-function filterFn(val: string, update: any): void {
-    update(function () {
-        const loweredVal = val.toLowerCase();
-        const filteredTables = findSearchedTable(val).filter(function (reservation) {
-            // Exclude arrived reservations if hideArrived is true
-            return !(hideArrived.value && reservation.arrived);
-        });
-        options.value = filteredTables.map(mapReservationToOption).filter(function (option) {
-            return option.value.guestName.toLowerCase().includes(loweredVal);
-        });
-    });
-}
+function findSearchedTable(inputVal: string): PlannedReservation[] {
+    const normalizedVal = inputVal.toLowerCase().trim();
+    if (!normalizedVal) return props.allReservedTables;
 
-function findSearchedTable(inputVal: string | { value: PlannedReservation }): PlannedReservation[] {
-    const val = isString(inputVal) ? inputVal : inputVal.value.guestName;
-    const normalizedVal = val.toLowerCase().trim();
-
-    // If inputVal is an object, we assume a specific item was selected
-    if (isObject(inputVal)) {
-        // Remove focus when item is selected to not keep virtual keyboard which is annoying on mobile
-        if (normalizedVal.length > 0) {
-            removeFocus();
-        }
-        // Return only the table that matches the guestName exactly
-        return props.allReservedTables.filter(function (reservation) {
-            return (
-                reservation.guestName.toLowerCase() === normalizedVal &&
-                reservation.floorId === inputVal.value.floorId
-            );
-        });
-    }
-
-    // If inputVal is a string, perform the original filtering logic
     const tokens = normalizedVal.split(/\s+/);
-    return props.allReservedTables.filter(function (reservation) {
-        const { guestName } = reservation;
-        const normalizedGuestName = guestName.toLowerCase();
+    return props.allReservedTables.filter((reservation) => {
+        const normalizedGuestName = reservation.guestName.toLowerCase();
         const guestNameTokens = normalizedGuestName.split(/\s+/);
-
-        return tokens.some(function (token) {
-            return guestNameTokens.some(function (nameToken) {
-                return nameToken.includes(token);
-            });
-        });
+        return tokens.some((token) =>
+            guestNameTokens.some((nameToken) => nameToken.includes(token)),
+        );
     });
-}
-
-function getNamesFromReservations(
-    reservations: PlannedReservation[],
-): { label: string; value: PlannedReservation }[] {
-    return reservations.map(mapReservationToOption);
 }
 
 function mapReservationToOption(reservation: PlannedReservation): Option {
@@ -102,93 +71,96 @@ function mapReservationToOption(reservation: PlannedReservation): Option {
 }
 
 function removeFocus(): void {
-    nextTick(function () {
-        selectEl.value?.blur();
+    nextTick(() => {
+        (selectEl.value as any)?.blur();
     });
 }
 
-watch(hideArrived, function () {
-    filterFn(searchTerm.value, (fn: AnyFunction) => fn());
-});
-
-watch(searchTerm, function (newTerm) {
-    if (newTerm) {
-        const found = findSearchedTable(newTerm);
-        emit("found", found);
-    } else {
-        emit("clear");
-    }
-});
-
-function setModel(val: string): void {
-    searchTerm.value = val;
+function updateFilteredOptions(): void {
+    const loweredVal = (debouncedSearchText.value || "").toLowerCase();
+    const filteredTables = findSearchedTable(debouncedSearchText.value).filter(
+        (reservation) => !(hideArrived.value && reservation.arrived),
+    );
+    options.value = filteredTables
+        .map(mapReservationToOption)
+        .filter((option) => option.value.guestName.toLowerCase().includes(loweredVal));
 }
+
+watch([debouncedSearchText, hideArrived], updateFilteredOptions, { immediate: true });
+
+watch(selectedValue, (newSelection) => {
+    if (!newSelection || !isObject(newSelection)) {
+        return;
+    }
+    emit("found", [newSelection.value]);
+    searchText.value = newSelection.label;
+    removeFocus();
+});
 </script>
 
 <template>
-    <div class="EventGuestSearch">
-        <q-select
+    <div class="event-guest-search">
+        <v-autocomplete
             ref="selectEl"
-            fill-input
-            hide-selected
-            use-input
-            v-model="searchTerm"
+            v-model="selectedValue"
+            v-model:search="searchText"
             :label="t(`EventGuestSearch.label`)"
-            clearable
-            clear-icon="fa fa-close"
-            dense
-            outlined
-            :debounce="300"
-            @input-value="setModel"
-            @filter="filterFn"
-            @clear="() => emit('clear')"
-            :options="options"
+            :items="options"
+            item-title="label"
+            return-object
+            density="compact"
+            variant="outlined"
+            hide-no-data
+            @focus="updateFilteredOptions"
         >
-            <template #prepend>
-                <q-icon name="fa fa-search" />
+            <template #prepend-inner>
+                <v-icon icon="fas fa-search" />
             </template>
 
-            <template #before-options>
-                <q-item>
-                    <q-item-section>
-                        <q-checkbox
-                            v-model="hideArrived"
-                            :label="t('EventGuestSearch.hideArrivedLabel')"
-                            dense
-                            @click.stop
-                        />
-                    </q-item-section>
-                </q-item>
+            <template #append-inner>
+                <v-icon
+                    v-if="searchText || selectedValue"
+                    icon="fas fa-times"
+                    size="small"
+                    @click.stop="clearSearch"
+                    style="cursor: pointer"
+                />
             </template>
 
-            <template #option="scope">
-                <q-item v-bind="scope.itemProps">
-                    <q-item-section>
-                        <q-item-label>
-                            {{ scope.opt.label }}
-                        </q-item-label>
-                    </q-item-section>
+            <template #prepend-item>
+                <v-list-item>
+                    <v-checkbox-btn
+                        v-model="hideArrived"
+                        :label="t('EventGuestSearch.hideArrivedLabel')"
+                        density="compact"
+                        @click.stop
+                    />
+                </v-list-item>
+                <v-divider />
+            </template>
 
-                    <q-item-section v-if="scope.opt.arrived" side>
-                        <q-icon
-                            name="fa fa-check"
+            <template #item="{ props: itemProps, item }">
+                <v-list-item v-bind="itemProps">
+                    <template #append>
+                        <v-icon
+                            v-if="item.raw.arrived"
+                            icon="fas fa-check"
                             color="green"
+                            class="mr-2"
                             :aria-label="t('EventGuestSearch.guestArrivedIconAriaLabel')"
                         />
-                    </q-item-section>
-                    <q-item-section v-if="scope.opt.isVip" side>
-                        <ReservationVIPChip />
-                    </q-item-section>
-                </q-item>
+                        <ReservationVIPChip v-if="item.raw.isVip" />
+                    </template>
+                </v-list-item>
             </template>
 
-            <template #no-option>
-                <q-item>
-                    <q-item-section class="text-grey">
+            <template #no-data>
+                <v-list-item>
+                    <v-list-item-title class="text-grey">
                         {{ t("EventGuestSearch.noResultsText") }}
-                    </q-item-section>
-                </q-item>
+                    </v-list-item-title>
+                </v-list-item>
             </template>
-        </q-select>
+        </v-autocomplete>
     </div>
 </template>

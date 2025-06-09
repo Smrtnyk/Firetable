@@ -2,59 +2,51 @@
 import type { CreateOrganisationPayload } from "src/db";
 
 import { storeToRefs } from "pinia";
-import { useQuasar } from "quasar";
 import AddNewOrganisationForm from "src/components/admin/organisation/AddNewOrganisationForm.vue";
 import FTBtn from "src/components/FTBtn.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
-import FTDialog from "src/components/FTDialog.vue";
-import { useDialog } from "src/composables/useDialog";
+import { globalDialog } from "src/composables/useDialog";
 import { createNewOrganisation } from "src/db";
-import { isTablet } from "src/global-reactives/screen-detection";
+import { useScreenDetection } from "src/global-reactives/screen-detection";
 import {
     formatOrganisationStatus,
     getOrganisationStatusColor,
 } from "src/helpers/organisation/organisation";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { useGlobalStore } from "src/stores/global";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 
+const { isTablet } = useScreenDetection();
+const globalStore = useGlobalStore();
 const propertiesStore = usePropertiesStore();
 const { organisations } = storeToRefs(usePropertiesStore());
-const quasar = useQuasar();
 
 const titleClass = computed(() => (isTablet.value ? "text-h6" : "text-h5"));
 
-const { createDialog } = useDialog();
-
 function createOrganisation(): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: AddNewOrganisationForm,
-            componentPropsObject: {},
-            listeners: {
-                create(organisationPayload: CreateOrganisationPayload) {
-                    onOrganisationCreate(organisationPayload);
-                    dialog.hide();
-                },
+    const dialog = globalDialog.openDialog(
+        AddNewOrganisationForm,
+        {
+            onCreate(organisationPayload: CreateOrganisationPayload) {
+                onOrganisationCreate(organisationPayload);
+                globalDialog.closeDialog(dialog);
             },
-            maximized: false,
+        },
+        {
             title: t("PageOrganisations.addNewOrganisationTitle"),
         },
-    });
+    );
 }
 
 async function onOrganisationCreate(organisationPayload: CreateOrganisationPayload): Promise<void> {
     await tryCatchLoadingWrapper({
         async hook() {
             await createNewOrganisation(organisationPayload);
-            quasar.notify({
-                message: t("PageOrganisations.organisationCreatedSuccess"),
-                type: "success",
-            });
+            globalStore.notify(t("PageOrganisations.organisationCreatedSuccess"));
             return propertiesStore.initOrganisations();
         },
     });
@@ -62,91 +54,87 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
 </script>
 
 <template>
-    <div class="PageOrganisations">
-        <div class="row" v-if="organisations.length > 0">
-            <div
-                class="col-12 col-sm-6 q-pa-sm"
-                v-for="organisation of organisations"
-                :key="organisation.id"
+    <v-row v-if="organisations.length > 0" class="ma-0">
+        <v-col
+            cols="12"
+            sm="6"
+            class="pa-2"
+            v-for="organisation of organisations"
+            :key="organisation.id"
+        >
+            <router-link
+                :to="{
+                    name: 'properties',
+                    params: { organisationId: organisation.id },
+                }"
+                class="text-decoration-none"
             >
-                <router-link
-                    :to="{
-                        name: 'properties',
-                        params: { organisationId: organisation.id },
-                    }"
-                    class="text-decoration-none"
-                >
-                    <q-card class="ft-card">
-                        <q-card-section>
-                            <div class="row items-center justify-between">
-                                <h2 :class="[titleClass, 'q-mb-sm q-ml-none q-mt-none']">
-                                    {{ organisation.name }}
-                                </h2>
-                            </div>
-                        </q-card-section>
+                <v-card class="ft-card">
+                    <v-card-text>
+                        <v-row align="center" justify="space-between" no-gutters>
+                            <h2 :class="[titleClass, 'mb-1 ml-0 mt-0']">
+                                {{ organisation.name }}
+                            </h2>
+                        </v-row>
+                    </v-card-text>
 
-                        <q-separator />
+                    <v-divider />
 
-                        <q-card-section>
-                            <div class="row q-col-gutter-sm">
-                                <div class="col-5">
-                                    <q-item dense>
-                                        <q-item-section>
-                                            <q-item-label caption>
-                                                {{ t("PageOrganisations.propertiesLimit") }}
-                                            </q-item-label>
-                                            <q-item-label>
-                                                {{ organisation.maxAllowedProperties }}
-                                            </q-item-label>
-                                        </q-item-section>
-                                    </q-item>
-                                </div>
-                                <div class="col-5">
-                                    <q-item dense>
-                                        <q-item-section>
-                                            <q-item-label caption>
-                                                {{ t("PageOrganisations.floorPlansPerEvent") }}
-                                            </q-item-label>
-                                            <q-item-label>
-                                                {{
-                                                    organisation.subscriptionSettings
-                                                        ?.maxFloorPlansPerEvent ?? "N/A"
-                                                }}
-                                            </q-item-label>
-                                        </q-item-section>
-                                    </q-item>
-                                </div>
+                    <v-card-text>
+                        <v-row>
+                            <v-col cols="5">
+                                <v-list-item density="compact" class="pa-0">
+                                    <v-list-item-subtitle>
+                                        {{ t("PageOrganisations.propertiesLimit") }}
+                                    </v-list-item-subtitle>
+                                    <v-list-item-title>
+                                        {{ organisation.maxAllowedProperties }}
+                                    </v-list-item-title>
+                                </v-list-item>
+                            </v-col>
+                            <v-col cols="5">
+                                <v-list-item density="compact" class="pa-0">
+                                    <v-list-item-subtitle>
+                                        {{ t("PageOrganisations.floorPlansPerEvent") }}
+                                    </v-list-item-subtitle>
+                                    <v-list-item-title>
+                                        {{
+                                            organisation.subscriptionSettings
+                                                ?.maxFloorPlansPerEvent ?? "N/A"
+                                        }}
+                                    </v-list-item-title>
+                                </v-list-item>
+                            </v-col>
 
-                                <div class="col-2">
-                                    <q-chip
-                                        :color="getOrganisationStatusColor(organisation.status)"
-                                        text-color="white"
-                                        size="sm"
-                                        class="q-ml-sm"
-                                    >
-                                        {{ formatOrganisationStatus(organisation.status) }}
-                                    </q-chip>
-                                </div>
-                            </div>
-                        </q-card-section>
-                    </q-card>
-                </router-link>
+                            <v-col cols="2" class="d-flex align-center justify-end">
+                                <v-chip
+                                    :color="getOrganisationStatusColor(organisation.status)"
+                                    text-color="white"
+                                    size="small"
+                                    class="ml-1"
+                                >
+                                    {{ formatOrganisationStatus(organisation.status) }}
+                                </v-chip>
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+                </v-card>
+            </router-link>
+        </v-col>
+    </v-row>
+
+    <div v-else>
+        <FTCenteredText>
+            <v-icon icon="fa:fas fa-briefcase" size="64" color="grey-lighten-1" class="mb-4" />
+            <div class="text-grey-darken-1 mb-6">
+                {{ t("PageOrganisations.noOrganisationsMessage") }}
             </div>
-        </div>
-
-        <div v-else>
-            <FTCenteredText>
-                <q-icon name="fa fa-briefcase" size="64px" color="grey-5" class="q-mb-md" />
-                <div class="text-grey-6 q-mb-lg">
-                    {{ t("PageOrganisations.noOrganisationsMessage") }}
-                </div>
-                <FTBtn
-                    :label="t('PageOrganisations.createOrganisationButton')"
-                    icon="fa fa-plus"
-                    class="button-gradient"
-                    @click="createOrganisation"
-                />
-            </FTCenteredText>
-        </div>
+            <FTBtn
+                :label="t('PageOrganisations.createOrganisationButton')"
+                icon="fa:fas fa-plus"
+                class="button-gradient"
+                @click="createOrganisation"
+            />
+        </FTCenteredText>
     </div>
 </template>

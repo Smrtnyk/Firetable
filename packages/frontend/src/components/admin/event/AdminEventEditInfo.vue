@@ -1,18 +1,20 @@
 <template>
-    <q-input v-model="localEventInfoValue" filled autogrow />
-    <FTBtn
-        rounded
-        class="button-gradient q-mt-sm"
-        icon="fa fa-save"
-        @click="saveEventInfo"
-        label="Save"
-    />
+    <div>
+        <v-textarea v-model="localEventInfoValue" variant="filled" auto-grow label="Event Info" />
+        <v-btn
+            rounded
+            class="button-gradient mt-2"
+            prepend-icon="fa fa-save"
+            @click="saveEventInfo"
+        >
+            Save
+        </v-btn>
+    </div>
 </template>
 
 <script setup lang="ts">
 import type { EventOwner } from "src/db";
 
-import FTBtn from "src/components/FTBtn.vue";
 import { updateEvent } from "src/db";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { ref } from "vue";

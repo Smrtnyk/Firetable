@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import type { CreateGuestPayload } from "@firetable/types";
+// Import VForm type for the template ref
+import type { VForm } from "vuetify/components";
 
-import { QForm } from "quasar";
 import TelNumberInput from "src/components/TelNumberInput/TelNumberInput.vue";
 import { capitalizeName } from "src/helpers/capitalize-name";
 import { minLength } from "src/helpers/form-rules";
 import { hashString } from "src/helpers/hash-string";
 import { maskPhoneNumber } from "src/helpers/mask-phone-number";
-import { ref, useTemplateRef } from "vue";
+import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 export interface AddNewGuestFormProps {
@@ -27,7 +28,7 @@ const { t } = useI18n();
 const guestName = ref("");
 const guestContact = ref("");
 const guestTags = ref<string[]>([]);
-const createGuestForm = useTemplateRef<QForm>("createGuestForm");
+const createGuestForm = ref<null | VForm>(null);
 const guestNameRules = [minLength("Guest name must be at least 3 characters long", 3)];
 
 if (mode === "edit" && initialData) {
@@ -36,21 +37,37 @@ if (mode === "edit" && initialData) {
     guestTags.value = initialData.tags ?? [];
 }
 
+watch(
+    guestTags,
+    (currentTags, oldTags) => {
+        if (currentTags.length <= oldTags.length) {
+            return;
+        }
+        const newTagIndex = currentTags.length - 1;
+        const newTag = currentTags[newTagIndex];
+
+        if (typeof newTag === "string" && newTag.trim() !== "") {
+            const processedTag = newTag.trim().toLowerCase();
+            // Update the tag in the array if it has changed
+            if (processedTag !== newTag) {
+                guestTags.value[newTagIndex] = processedTag;
+            }
+            // Ensure uniqueness after processing
+            const uniqueTags = [...new Set(guestTags.value)];
+            if (uniqueTags.length !== guestTags.value.length) {
+                guestTags.value = uniqueTags;
+            }
+        }
+    },
+    { deep: true },
+);
+
 function capitalizeGuestName(): void {
     guestName.value = capitalizeName(guestName.value);
 }
 
-function onNewTag(inputValue: string, done: (item?: any) => void): void {
-    const trimmedValue = inputValue.trim();
-    if (trimmedValue === "") {
-        done();
-        return;
-    }
-    done(trimmedValue.toLowerCase());
-}
-
 async function submit(): Promise<void> {
-    if (!(await createGuestForm.value?.validate())) {
+    if (!(await createGuestForm.value?.validate())?.valid) {
         return;
     }
 
@@ -72,45 +89,40 @@ async function submit(): Promise<void> {
 </script>
 
 <template>
-    <q-card-section>
-        <q-form ref="createGuestForm" class="q-gutter-md" greedy>
-            <q-input
+    <v-card-text>
+        <v-form
+            ref="createGuestForm"
+            class="d-flex flex-column"
+            style="gap: 1.25rem"
+            greedy
+            @submit.prevent="submit"
+        >
+            <v-text-field
                 :label="t('AddNewGuestForm.guestNameInputLabel')"
                 v-model="guestName"
-                outlined
+                variant="outlined"
                 autofocus
                 @blur="capitalizeGuestName"
                 :rules="guestNameRules"
             />
             <TelNumberInput required v-model="guestContact" />
 
-            <q-select
+            <v-combobox
                 v-model="guestTags"
                 :label="t('Global.tagsLabel')"
-                outlined
-                use-input
-                use-chips
+                variant="outlined"
+                chips
                 multiple
-                emit-value
-                map-options
-                input-debounce="0"
-                hide-dropdown-icon
-                fill-input
-                clear-icon="fa fa-close"
-                @new-value="onNewTag"
-                new-value-mode="add-unique"
-                :options="[]"
+                clearable
+                closable-chips
             />
-        </q-form>
-    </q-card-section>
+        </v-form>
+    </v-card-text>
 
-    <q-card-actions align="right">
-        <q-btn
-            rounded
-            class="button-gradient"
-            size="md"
-            :label="t('Global.submit')"
-            @click="submit"
-        />
-    </q-card-actions>
+    <v-card-actions>
+        <v-spacer />
+        <v-btn rounded class="button-gradient" size="large" @click="submit">
+            {{ t("Global.submit") }}
+        </v-btn>
+    </v-card-actions>
 </template>

@@ -11,7 +11,7 @@ const { t } = useI18n();
 const { user } = storeToRefs(useAuthStore());
 const isInputEnabled = ref(false);
 const newPassword = ref("");
-const passwordInput = useTemplateRef<HTMLElement>("passwordInput");
+const passwordInput = useTemplateRef("passwordInput");
 
 function toggleInput(): void {
     isInputEnabled.value = !isInputEnabled.value;
@@ -29,9 +29,9 @@ const avatar = computed(function () {
 
     const [first, last] = user.value.name.split(" ");
     if (!last) {
-        return first[0];
+        return first[0].toUpperCase();
     }
-    return `${first[0]}${last[0]}`;
+    return `${first[0]}${last[0]}`.toUpperCase();
 });
 
 async function changePassword(): Promise<void> {
@@ -42,6 +42,8 @@ async function changePassword(): Promise<void> {
     await tryCatchLoadingWrapper({
         async hook() {
             await submitNewPassword(newPassword.value);
+            newPassword.value = "";
+            isInputEnabled.value = false;
         },
     });
 }
@@ -50,63 +52,65 @@ async function changePassword(): Promise<void> {
 <template>
     <div class="PageProfile" v-if="user">
         <FTTitle :title="t('PageProfile.title', { name: user.name })" />
-        <q-item>
-            <q-item-section side>
-                <q-avatar size="48px" class="ft-avatar">
-                    {{ avatar }}
-                </q-avatar>
-            </q-item-section>
-            <q-item-section>
-                <q-card class="ft-card q-pa-md">
-                    <q-item-label>{{ user.email }}</q-item-label>
-                    <q-separator class="q-my-sm" />
-                    <q-item-label v-if="user.name">{{
-                        t("PageProfile.nameLabel", { name: user.name })
-                    }}</q-item-label>
-                    <q-item-label>{{
-                        t("PageProfile.roleLabel", { role: user.role })
-                    }}</q-item-label>
-                </q-card>
-            </q-item-section>
-        </q-item>
 
-        <q-item class="q-mt-md">
-            <q-item-section>
-                <div style="position: relative">
-                    <q-input
-                        ref="passwordInput"
-                        v-model="newPassword"
-                        :disable="!isInputEnabled"
-                        :placeholder="t('PageProfile.passwordInputPlaceholder')"
-                        clearable
-                    ></q-input>
-                    <q-btn
-                        flat
-                        dense
-                        icon="fa fa-pencil"
-                        @click="toggleInput"
-                        :color="isInputEnabled ? 'primary' : 'grey'"
-                        :title="
-                            isInputEnabled
-                                ? t('PageProfile.passwordInputEnabledTitle')
-                                : t('PageProfile.passwordInputDisabledTitle')
-                        "
-                        style="
-                            position: absolute;
-                            right: 8px;
-                            top: 50%;
-                            transform: translateY(-50%);
-                        "
-                    />
-                </div>
+        <v-list-item class="mb-4 px-0">
+            <template #prepend>
+                <v-avatar size="48" color="primary" class="ft-avatar mr-4">
+                    <span class="text-h6">{{ avatar }}</span>
+                </v-avatar>
+            </template>
 
-                <q-btn
+            <v-card class="ft-card">
+                <v-card-text class="pa-4">
+                    <div class="text-subtitle-1">{{ user.email }}</div>
+                    <v-divider class="my-2" />
+                    <div v-if="user.name" class="text-body-1">
+                        {{ t("PageProfile.nameLabel", { name: user.name }) }}
+                    </div>
+                    <div class="text-body-1">
+                        {{ t("PageProfile.roleLabel", { role: user.role }) }}
+                    </div>
+                </v-card-text>
+            </v-card>
+        </v-list-item>
+
+        <v-card class="ft-card mt-4">
+            <v-card-text class="pa-4">
+                <v-text-field
+                    ref="passwordInput"
+                    v-model="newPassword"
+                    :disabled="!isInputEnabled"
+                    :label="t('PageProfile.passwordInputPlaceholder')"
+                    clearable
+                    :type="isInputEnabled ? 'text' : 'password'"
+                    variant="outlined"
+                    class="mb-3"
+                >
+                    <template #append-inner>
+                        <v-icon
+                            icon="fa:fas fa-pencil"
+                            @click="toggleInput"
+                            :color="isInputEnabled ? 'primary' : 'grey'"
+                            :aria-label="
+                                isInputEnabled
+                                    ? t('PageProfile.passwordInputEnabledTitle')
+                                    : t('PageProfile.passwordInputDisabledTitle')
+                            "
+                            class="cursor-pointer"
+                        />
+                    </template>
+                </v-text-field>
+
+                <v-btn
                     @click="changePassword"
-                    :label="t('PageProfile.updatePasswordButtonLabel')"
-                    class="q-mt-sm button-gradient"
-                    :disable="!newPassword"
-                />
-            </q-item-section>
-        </q-item>
+                    :disabled="!newPassword || !isInputEnabled"
+                    class="button-gradient"
+                    color="primary"
+                    block
+                >
+                    {{ t("PageProfile.updatePasswordButtonLabel") }}
+                </v-btn>
+            </v-card-text>
+        </v-card>
     </div>
 </template>

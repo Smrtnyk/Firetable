@@ -3,10 +3,10 @@ import type { usePermissionsStore } from "src/stores/permissions-store";
 import type { RouteLocationNormalized, RouteLocationRaw } from "vue-router";
 
 import { isFunction } from "es-toolkit";
-import { Loading } from "quasar";
 import { showErrorMessage } from "src/helpers/ui-helpers";
 import { refreshApp } from "src/helpers/utils";
 import { AppLogger } from "src/logger/FTLogger";
+import { useGlobalStore } from "src/stores/global";
 import { getCurrentUser } from "vuefire";
 
 interface NavigationError extends Error {
@@ -75,10 +75,9 @@ export function createAuthGuard(
     return async function authGuard(
         to: RouteLocationNormalized,
     ): Promise<boolean | RouteLocationRaw> {
-        Loading.show({
-            delay: 200,
-            message: "Loading...",
-        });
+        const globalStore = useGlobalStore();
+
+        globalStore.setLoading(true);
 
         try {
             const timeoutPromise = new Promise<never>(function (_resolve, reject) {
@@ -142,7 +141,7 @@ export function createAuthGuard(
 
             return false;
         } finally {
-            Loading.hide();
+            globalStore.setLoading(false);
         }
     };
 }

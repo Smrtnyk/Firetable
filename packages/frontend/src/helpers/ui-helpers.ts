@@ -1,7 +1,7 @@
 import type { VoidFunction } from "@firetable/types";
 
-import { isString, noop } from "es-toolkit";
-import { Dialog, Loading, Notify } from "quasar";
+import { noop } from "es-toolkit";
+import { useGlobalStore } from "src/stores/global";
 
 type TryCatchLoadingWrapperOptions<T> = {
     args?: unknown[];
@@ -9,91 +9,21 @@ type TryCatchLoadingWrapperOptions<T> = {
     hook: (...args: unknown[]) => Promise<T>;
 };
 
-export function notifyPositive(message: string): void {
-    Notify.create({
-        color: "positive",
-        message,
-    });
-}
-
-export function showConfirm(title: string, message = ""): Promise<boolean> {
-    const options = {
-        cancel: {
-            color: "negative",
-            outline: true,
-            rounded: true,
-            size: "md",
-        },
-        class: "ft-card",
-        message,
-        ok: {
-            color: "primary",
-            rounded: true,
-            size: "md",
-        },
-        persistent: true,
-        title,
-    };
-
-    return new Promise(function (resolve) {
-        Dialog.create(options)
-            .onOk(() => resolve(true))
-            .onCancel(() => resolve(false));
-    });
-}
-
 export function showDeleteConfirm(
     title: string,
     message: string,
     confirmText: string,
 ): Promise<boolean> {
+    // FIXME: implement proper delete confirmation dialog
+    console.log(title, message, confirmText);
     return new Promise(function (resolve) {
-        Dialog.create({
-            cancel: {
-                color: "negative",
-                outline: true,
-                rounded: true,
-                size: "md",
-            },
-            class: "ft-card",
-            message,
-            ok: {
-                color: "primary",
-                rounded: true,
-                size: "md",
-            },
-            persistent: true,
-            prompt: {
-                isValid: (val: string) => val === confirmText,
-                model: "",
-                outlined: true,
-                placeholder: `Please type "${confirmText}" to confirm`,
-                type: "text",
-            },
-            title,
-        })
-            .onOk(() => resolve(true))
-            .onCancel(() => resolve(false));
+        resolve(true);
     });
 }
 
 export function showErrorMessage(e: unknown, onCloseCallback?: VoidFunction): void {
-    let message = "An unexpected error occurred.";
-    if (isString(e)) {
-        message = e;
-    } else if (e instanceof Error) {
-        message = e.message;
-    }
-
-    const dialog = Dialog.create({
-        class: ["error-dialog", "ft-card"],
-        message,
-        title: "Error",
-    });
-
-    if (onCloseCallback) {
-        dialog.onOk(onCloseCallback);
-    }
+    // FIXME: implement proper error handling
+    console.log("showErrorMessage", e, onCloseCallback);
 }
 
 /**
@@ -109,14 +39,15 @@ export async function tryCatchLoadingWrapper<T>({
     errorHook,
     hook,
 }: TryCatchLoadingWrapperOptions<T>): Promise<T | undefined> {
+    const globalStore = useGlobalStore();
     try {
-        Loading.show();
+        globalStore.setLoading(true);
         return await hook(...(args ?? []));
     } catch (e) {
         const errorHookVal = (errorHook ?? noop).bind(null, ...(args ?? []));
         showErrorMessage(e, errorHookVal);
     } finally {
-        Loading.hide();
+        globalStore.setLoading(false);
     }
 
     return undefined;

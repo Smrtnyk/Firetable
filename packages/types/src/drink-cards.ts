@@ -15,7 +15,7 @@ export interface CustomDrinkCardDoc extends DrinkCardBase {
     elements: DrinkCardElement[];
     id: string;
     pdfUrl?: never;
-    showItemDescription?: boolean;
+    showItemDescription: boolean;
     showLogo: boolean;
     type: "custom";
     updatedAt: Date;

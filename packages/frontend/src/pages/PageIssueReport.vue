@@ -3,13 +3,11 @@ import type { IssueReportDoc } from "@firetable/types";
 
 import { IssueCategory, IssueStatus } from "@firetable/types";
 import { where } from "firebase/firestore";
-import { useQuasar } from "quasar";
 import FTBtn from "src/components/FTBtn.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
-import FTDialog from "src/components/FTDialog.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import IssueCreateForm from "src/components/issue/IssueCreateForm.vue";
-import { useDialog } from "src/composables/useDialog";
+import { globalDialog } from "src/composables/useDialog";
 import { createQuery, useFirestoreCollection } from "src/composables/useFirestore";
 import { ONE_MINUTE } from "src/constants";
 import {
@@ -19,15 +17,19 @@ import {
     updateIssueReport,
 } from "src/db";
 import { getIssueStatusColor } from "src/helpers/issue-helpers";
-import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";
+import { useGlobalStore } from "src/stores/global";
 import { usePropertiesStore } from "src/stores/properties-store";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
+const MAX_REPORTS_PER_WINDOW = 5;
+const THROTTLE_WINDOW_MS = 5 * ONE_MINUTE;
+const MIN_MENU_WIDTH = 150;
+
 const { t } = useI18n();
-const { createDialog } = useDialog();
-const quasar = useQuasar();
+const globalStore = useGlobalStore();
 const authStore = useAuthStore();
 const propertiesStore = usePropertiesStore();
 
@@ -35,113 +37,130 @@ const organisation = computed(() => {
     return propertiesStore.getOrganisationById(authStore.nonNullableUser.organisationId);
 });
 
-const MAX_REPORTS = 5;
-const THROTTLE_WINDOW_MS = 5 * ONE_MINUTE;
+const menuStates = ref<Record<string, boolean>>({});
 
 function checkReportThrottle(): boolean {
     const now = Date.now();
     const reportsKey = `issue-reports-${authStore.nonNullableUser.id}`;
     const reports = JSON.parse(localStorage.getItem(reportsKey) ?? "[]");
 
-    // Clean up old reports
     const recentReports = reports.filter(
         (timestamp: number) => now - timestamp < THROTTLE_WINDOW_MS,
     );
 
-    if (recentReports.length >= MAX_REPORTS) {
+    if (recentReports.length >= MAX_REPORTS_PER_WINDOW) {
         return false;
     }
 
-    // Add new report timestamp
     recentReports.push(now);
     localStorage.setItem(reportsKey, JSON.stringify(recentReports));
     return true;
 }
 
+function closeMenu(issueId: string): void {
+    menuStates.value[issueId] = false;
+}
+
+function formatDate(timestamp: number): string {
+    return new Date(timestamp).toLocaleString();
+}
+
+function getIssueCategoryColor(category: IssueCategory): string {
+    return category === IssueCategory.BUG ? "error" : "info";
+}
+
+function isIssueEditable(status: IssueStatus): boolean {
+    return status !== IssueStatus.RESOLVED && status !== IssueStatus.WONT_FIX;
+}
+
 async function onDeleteIssue(issueId: string): Promise<void> {
-    if (await showConfirm(t("PageIssueReport.deleteConfirmation"))) {
+    closeMenu(issueId);
+
+    if (
+        await globalDialog.confirm({
+            message: "",
+            title: t("PageIssueReport.deleteConfirmation"),
+        })
+    ) {
         await tryCatchLoadingWrapper({
             async hook() {
                 await deleteIssueReport(issueId);
-                quasar.notify(t("PageIssueReport.issueDeleted"));
+                globalStore.notify(t("PageIssueReport.issueDeleted"));
             },
         });
     }
 }
 
 function showCreateIssueForm(): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: IssueCreateForm,
-            componentPropsObject: {},
-            listeners: {
-                async create({ category, description }) {
-                    if (!checkReportThrottle()) {
-                        quasar.notify({
-                            message: t("PageIssueReport.tooManyReports", {
-                                count: MAX_REPORTS,
-                                minutes: THROTTLE_WINDOW_MS / ONE_MINUTE,
-                            }),
-                            type: "negative",
-                        });
-                        return;
-                    }
+    const dialog = globalDialog.openDialog(
+        IssueCreateForm,
+        {
+            // @ts-expect-error -- FIXME: infer types properly
+            async onCreate({ category, description }) {
+                if (!checkReportThrottle()) {
+                    globalStore.notify(
+                        t("PageIssueReport.tooManyReports", {
+                            count: MAX_REPORTS_PER_WINDOW,
+                            minutes: THROTTLE_WINDOW_MS / ONE_MINUTE,
+                        }),
+                        "negative",
+                    );
+                    return;
+                }
 
-                    await tryCatchLoadingWrapper({
-                        async hook() {
-                            await createIssueReport({
-                                category,
-                                createdAt: Date.now(),
-                                createdBy: authStore.nonNullableUser.id,
-                                description,
-                                organisation: {
-                                    id: organisation.value.id,
-                                    name: organisation.value.name,
-                                },
-                                user: {
-                                    email: authStore.nonNullableUser.email,
-                                    name: authStore.nonNullableUser.name,
-                                },
-                            });
-                            quasar.notify(t("PageIssueReport.issueReportedSuccess"));
-                            dialog.hide();
-                        },
-                    });
-                },
+                await tryCatchLoadingWrapper({
+                    async hook() {
+                        await createIssueReport({
+                            category,
+                            createdAt: Date.now(),
+                            createdBy: authStore.nonNullableUser.id,
+                            description,
+                            organisation: {
+                                id: organisation.value.id,
+                                name: organisation.value.name,
+                            },
+                            user: {
+                                email: authStore.nonNullableUser.email,
+                                name: authStore.nonNullableUser.name,
+                            },
+                        });
+                        globalStore.notify(t("PageIssueReport.issueReportedSuccess"));
+                        globalDialog.closeDialog(dialog);
+                    },
+                });
             },
-            maximized: false,
+        },
+        {
             title: t("PageIssueReport.createNewIssue"),
         },
-    });
+    );
 }
 
 function showEditIssueForm(issue: IssueReportDoc): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: IssueCreateForm,
-            componentPropsObject: {
-                issueToEdit: issue,
+    closeMenu(issue.id);
+
+    const dialog = globalDialog.openDialog(
+        IssueCreateForm,
+        {
+            issueToEdit: issue,
+            // @ts-expect-error -- FIXME: infer types properly
+            async onUpdate({ category, description }) {
+                await tryCatchLoadingWrapper({
+                    async hook() {
+                        await updateIssueReport(issue.id, {
+                            category,
+                            description,
+                        });
+                        globalStore.notify(t("PageIssueReport.issueUpdatedSuccess"));
+                        globalDialog.closeDialog(dialog);
+                    },
+                });
             },
-            listeners: {
-                async update({ category, description }) {
-                    await tryCatchLoadingWrapper({
-                        async hook() {
-                            await updateIssueReport(issue.id, {
-                                category,
-                                description,
-                            });
-                            quasar.notify(t("PageIssueReport.issueUpdatedSuccess"));
-                            dialog.hide();
-                        },
-                    });
-                },
-            },
-            maximized: false,
+        },
+        {
             title: t("PageIssueReport.editIssue"),
         },
-    });
+    );
 }
 
 const { data: myIssues } = useFirestoreCollection<IssueReportDoc>(
@@ -167,82 +186,99 @@ const { data: myIssues } = useFirestoreCollection<IssueReportDoc>(
             </template>
         </FTTitle>
 
-        <q-card class="q-pa-md ft-card">
-            <h6 class="text-h6 q-mb-md">
+        <v-card class="pa-4 ft-card">
+            <h2 class="text-h6 mb-4">
                 {{ t("PageIssueReport.myIssues") }}
-            </h6>
+            </h2>
 
-            <q-list bordered separator v-if="myIssues?.length">
-                <q-item v-for="issue in myIssues" :key="issue.id">
-                    <q-item-section>
-                        <q-item-label>
-                            <q-badge
-                                :color="issue.category === IssueCategory.BUG ? 'negative' : 'info'"
-                                class="q-mr-sm"
+            <v-list v-if="myIssues?.length" lines="two">
+                <template v-for="(issue, index) in myIssues" :key="issue.id">
+                    <v-list-item>
+                        <template #prepend>
+                            <v-chip
+                                :color="getIssueCategoryColor(issue.category)"
+                                size="small"
+                                class="mr-3"
                             >
                                 {{
                                     t(`PageIssueReport.categories.${issue.category.toLowerCase()}`)
                                 }}
-                            </q-badge>
+                            </v-chip>
+                        </template>
+
+                        <v-list-item-title>
                             {{ issue.description }}
-                        </q-item-label>
-                        <q-item-label caption>
-                            {{ new Date(issue.createdAt).toLocaleString() }}
-                        </q-item-label>
-                    </q-item-section>
+                        </v-list-item-title>
 
-                    <q-item-section side>
-                        <q-badge :color="getIssueStatusColor(issue.status)">
-                            {{ t(`PageAdminIssueReports.status.${issue.status.toLowerCase()}`) }}
-                        </q-badge>
-                    </q-item-section>
+                        <v-list-item-subtitle>
+                            {{ formatDate(issue.createdAt) }}
+                        </v-list-item-subtitle>
 
-                    <q-item-section side>
-                        <q-btn
-                            flat
-                            round
-                            color="grey"
-                            icon="fa fa-ellipsis-v"
-                            :aria-label="`Actions for issue ${issue.description}`"
-                        >
-                            <q-menu class="ft-card">
-                                <q-list style="min-width: 150px">
-                                    <q-item
-                                        clickable
+                        <template #append>
+                            <v-chip
+                                :color="getIssueStatusColor(issue.status)"
+                                size="small"
+                                class="mr-2"
+                            >
+                                {{
+                                    t(`PageAdminIssueReports.status.${issue.status.toLowerCase()}`)
+                                }}
+                            </v-chip>
+
+                            <v-menu
+                                v-model="menuStates[issue.id]"
+                                location="bottom end"
+                                :close-on-content-click="false"
+                            >
+                                <template #activator="{ props }">
+                                    <v-btn
+                                        v-bind="props"
+                                        variant="text"
+                                        icon="fa fa-ellipsis-v"
+                                        size="small"
+                                        :aria-label="`Actions for issue ${issue.description}`"
+                                    />
+                                </template>
+
+                                <v-list :min-width="MIN_MENU_WIDTH" class="ft-card">
+                                    <v-list-item
                                         aria-label="Edit issue"
-                                        v-close-popup
                                         @click="showEditIssueForm(issue)"
-                                        :disable="
-                                            issue.status === IssueStatus.RESOLVED ||
-                                            issue.status === IssueStatus.WONT_FIX
-                                        "
+                                        :disabled="!isIssueEditable(issue.status)"
                                     >
-                                        <q-item-section>
+                                        <v-list-item-title>
                                             {{ t("Global.edit") }}
-                                        </q-item-section>
-                                    </q-item>
+                                        </v-list-item-title>
+                                    </v-list-item>
 
-                                    <q-separator />
+                                    <v-divider />
 
-                                    <q-item
-                                        clickable
-                                        v-close-popup
+                                    <v-list-item
                                         @click="onDeleteIssue(issue.id)"
+                                        class="text-error"
                                     >
-                                        <q-item-section class="text-negative">
+                                        <v-list-item-title>
                                             {{ t("Global.delete") }}
-                                        </q-item-section>
-                                    </q-item>
-                                </q-list>
-                            </q-menu>
-                        </q-btn>
-                    </q-item-section>
-                </q-item>
-            </q-list>
+                                        </v-list-item-title>
+                                    </v-list-item>
+                                </v-list>
+                            </v-menu>
+                        </template>
+                    </v-list-item>
+
+                    <v-divider v-if="index < myIssues.length - 1" />
+                </template>
+            </v-list>
 
             <FTCenteredText v-else>
                 {{ t("PageIssueReport.noIssuesMessage") }}
             </FTCenteredText>
-        </q-card>
+        </v-card>
     </div>
 </template>
+
+<style scoped>
+.v-list-item {
+    padding: 16px;
+}
+</style>

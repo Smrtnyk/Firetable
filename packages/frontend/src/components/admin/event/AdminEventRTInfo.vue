@@ -86,6 +86,9 @@ const occupancyRate = computed(function () {
 });
 
 const contactRate = computed(function () {
+    if (reservationsStatus.value.totalGuests === 0) {
+        return "0.0";
+    }
     return (
         (reservationsStatus.value.guestsWithContacts / reservationsStatus.value.totalGuests) *
         100
@@ -94,19 +97,19 @@ const contactRate = computed(function () {
 </script>
 
 <template>
-    <div class="q-pa-sm q-ma-none">
+    <div class="pa-2 ma-0">
         <!-- Main Stats Grid -->
-        <div class="row q-col-gutter-md">
+        <v-row>
             <!-- Capacity Section -->
-            <div class="col-12 col-md-6">
-                <q-card class="bg-primary text-white ft-card">
-                    <q-card-section>
+            <v-col cols="12" md="6">
+                <v-card color="primary" class="ft-card">
+                    <v-card-text>
                         <div class="text-h6">Capacity Overview</div>
-                        <div class="row items-center q-gutter-x-md">
-                            <div class="text-h3" aria-label="occupancy rate">
+                        <div class="d-flex align-center mt-2">
+                            <div class="text-h3 mr-4" aria-label="occupancy rate">
                                 {{ occupancyRate }}%
                             </div>
-                            <div class="column">
+                            <div class="d-flex flex-column">
                                 <div aria-label="tables occupied">
                                     {{ reservationsStatus.currentlyOccupied }} /
                                     {{ reservationsStatus.total }} tables
@@ -116,73 +119,73 @@ const contactRate = computed(function () {
                                 </div>
                             </div>
                         </div>
-                    </q-card-section>
-                </q-card>
-            </div>
+                    </v-card-text>
+                </v-card>
+            </v-col>
 
             <!-- Guests Section -->
-            <div class="col-12 col-md-6">
-                <q-card class="bg-secondary text-white ft-card">
-                    <q-card-section>
+            <v-col cols="12" md="6">
+                <v-card color="secondary" class="ft-card">
+                    <v-card-text>
                         <div class="text-h6">Guest Statistics</div>
-                        <div class="row items-center q-gutter-x-md">
-                            <div class="text-h3" aria-label="total guests">
+                        <div class="d-flex align-center mt-2">
+                            <div class="text-h3 mr-4" aria-label="total guests">
                                 {{ reservationsStatus.totalGuests }}
                             </div>
-                            <div class="column">
+                            <div class="d-flex flex-column">
                                 <div>Total Guests</div>
                                 <div aria-label="guest contact rate">
                                     {{ contactRate }}% with contacts
                                 </div>
                             </div>
                         </div>
-                    </q-card-section>
-                </q-card>
-            </div>
+                    </v-card-text>
+                </v-card>
+            </v-col>
 
             <!-- Additional Metrics -->
-            <div class="col-12 col-md-4">
-                <q-card class="ft-card">
-                    <q-card-section>
-                        <div class="text-subtitle2">VIP Guests</div>
-                        <div class="text-h5" aria-label="vip guest count">
+            <v-col cols="12" md="4">
+                <v-card class="ft-card">
+                    <v-card-text>
+                        <div class="text-subtitle-2">VIP Guests</div>
+                        <div class="text-h5 mt-1" aria-label="vip guest count">
                             {{ reservationsStatus.vipGuests }}
                         </div>
-                    </q-card-section>
-                </q-card>
-            </div>
+                    </v-card-text>
+                </v-card>
+            </v-col>
 
-            <div class="col-12 col-md-4">
-                <q-card class="ft-card">
-                    <q-card-section>
-                        <div class="text-subtitle2">Returning Guests</div>
-                        <div class="text-h5" aria-label="returning guest count">
+            <v-col cols="12" md="4">
+                <v-card class="ft-card">
+                    <v-card-text>
+                        <div class="text-subtitle-2">Returning Guests</div>
+                        <div class="text-h5 mt-1" aria-label="returning guest count">
                             {{ reservationsStatus.returningGuests }}
                         </div>
-                    </q-card-section>
-                </q-card>
-            </div>
+                    </v-card-text>
+                </v-card>
+            </v-col>
 
-            <div class="col-12 col-md-4">
-                <q-card class="ft-card">
-                    <q-card-section>
-                        <div class="text-subtitle2">Avg. Consumption</div>
-                        <div class="text-h5" aria-label="average consumption">
+            <v-col cols="12" md="4">
+                <v-card class="ft-card">
+                    <v-card-text>
+                        <div class="text-subtitle-2">Avg. Consumption</div>
+                        <div class="text-h5 mt-1" aria-label="average consumption">
                             {{ reservationsStatus.averageConsumption.toFixed(2) }}
                         </div>
-                    </q-card-section>
-                </q-card>
-            </div>
-        </div>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+        </v-row>
     </div>
 </template>
 
 <style scoped>
-.q-card {
+.ft-card {
     transition: transform 0.2s;
 }
 
-.q-card:hover {
+.ft-card:hover {
     transform: translateY(-2px);
 }
 </style>

@@ -1,17 +1,18 @@
 <template>
     <div class="InventoryImportDialog">
-        <q-card-section>
-            <FTTabs v-model="activeTab" dense :disable="loading">
-                <q-tab name="file" label="Import file" />
-                <q-tab name="paste" label="Paste CSV as text" />
+        <v-card-text>
+            <FTTabs v-model="activeTab" density="compact" :disabled="loading">
+                <v-tab value="file">Import file</v-tab>
+                <v-tab value="paste">Paste CSV as text</v-tab>
             </FTTabs>
 
-            <q-separator />
+            <v-divider />
 
-            <FTTabPanels v-model="activeTab" animated class="q-mt-md">
-                <q-tab-panel name="file">
+            <FTTabPanels v-model="activeTab" class="mt-4">
+                <v-window-item value="file">
                     <div
-                        class="upload-area q-pa-sm text-center cursor-pointer"
+                        class="upload-area pa-2 text-center"
+                        style="cursor: pointer"
                         :class="{ 'upload-area--dragging': isDragging }"
                         @dragenter.prevent="isDragging = true"
                         @dragleave.prevent="isDragging = false"
@@ -19,9 +20,9 @@
                         @drop.prevent="handleFileDrop"
                         @click="fileInput?.click()"
                     >
-                        <q-icon name="fa fa-file-import" size="48px" color="primary" />
-                        <div class="text-h6 q-mt-md">Drop your CSV file here</div>
-                        <div class="text-caption q-mt-sm">Or click to upload</div>
+                        <v-icon icon="fas fa-file-import" size="48" color="primary" />
+                        <div class="text-h6 mt-4">Drop your CSV file here</div>
+                        <div class="text-caption mt-1">Or click to upload</div>
                         <input
                             type="file"
                             ref="fileInput"
@@ -30,37 +31,37 @@
                             @change="handleFileSelect"
                         />
                     </div>
-                </q-tab-panel>
+                </v-window-item>
 
-                <!-- Paste Content Panel -->
-                <q-tab-panel name="paste" class="q-pa-none">
-                    <q-input
+                <v-window-item value="paste">
+                    <v-textarea
                         v-model="pastedContent"
-                        type="textarea"
-                        outlined
+                        variant="outlined"
                         class="w-full"
                         placeholder="Paste your CSV text here"
-                        :disable="loading"
+                        :disabled="loading"
                         :rows="10"
                     />
-                </q-tab-panel>
+                </v-window-item>
             </FTTabPanels>
-        </q-card-section>
+        </v-card-text>
 
-        <q-card-actions align="right">
-            <q-btn
-                :label="t('Global.submit')"
-                rounded
+        <v-card-actions class="justify-end">
+            <v-btn
                 class="button-gradient"
+                rounded="lg"
                 :loading="loading"
-                :disable="!canImport || loading"
+                :disabled="!canImport || loading"
                 @click="handleImport"
-            />
-        </q-card-actions>
+            >
+                {{ t("Global.submit") }}
+            </v-btn>
+        </v-card-actions>
     </div>
 </template>
 
 <script setup lang="ts">
+// Script content is untouched as per your instructions
 import FTTabPanels from "src/components/FTTabPanels.vue";
 import FTTabs from "src/components/FTTabs.vue";
 import { computed, ref, useTemplateRef } from "vue";
@@ -123,16 +124,16 @@ async function handleImport(): Promise<void> {
 
 <style lang="scss" scoped>
 .upload-area {
-    border: 2px dashed var(--q-primary);
+    border: 2px dashed rgb(var(--v-theme-primary));
     border-radius: 8px;
     transition: all 0.3s ease;
 
     &:hover {
-        background: rgba(var(--q-primary), 0.1);
+        background: rgba(var(--v-theme-primary-rgb), 0.1);
     }
 
     &--dragging {
-        background: rgba(var(--q-primary), 0.1);
+        background: rgba(var(--v-theme-primary-rgb), 0.1);
         border-style: solid;
     }
 }

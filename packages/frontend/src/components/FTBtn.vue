@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { buttonSize } from "src/global-reactives/screen-detection.js";
+import { useScreenDetection } from "src/global-reactives/screen-detection.js";
+
+const { buttonSize } = useScreenDetection();
 </script>
 
 <template>
-    <q-btn v-bind="$attrs" :size="buttonSize">
+    <v-btn v-bind="$attrs" :size="buttonSize">
         <slot />
-    </q-btn>
+    </v-btn>
 </template>

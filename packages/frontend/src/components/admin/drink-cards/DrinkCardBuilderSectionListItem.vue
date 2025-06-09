@@ -25,55 +25,61 @@ const emit = defineEmits<Emits>();
 </script>
 
 <template>
-    <q-item class="ft-border ft-card">
-        <q-item-section avatar class="q-ml-lg">
-            <q-icon name="fa fa-bars" class="cursor-move" />
-        </q-item-section>
+    <v-card variant="outlined" class="ft-card">
+        <v-list-item class="pa-2">
+            <template #prepend>
+                <div class="d-flex align-center pl-2 pr-4">
+                    <v-icon icon="fas fa-bars" class="cursor-move" />
+                </div>
+            </template>
 
-        <q-item-section>
-            {{ formattedName }}
-        </q-item-section>
+            <v-list-item-title class="font-weight-medium">
+                {{ formattedName }}
+            </v-list-item-title>
 
-        <q-item-section side>
-            <q-btn-dropdown flat dense color="primary">
-                <template #default>
-                    <DrinkCardBuilderItemSettings
-                        :item="item"
-                        @update:serving-size="emit('update:serving-size', $event)"
-                        @update:special-price="emit('update:special-price', $event)"
-                        @update:price="emit('update:price', $event)"
+            <template #append>
+                <div class="d-flex align-center" style="gap: 12px">
+                    <div class="text-right">
+                        <div class="font-weight-medium">{{ formatPrice(item.price) }}</div>
+                        <div v-if="item.specialPrice?.amount" class="text-caption text-grey">
+                            {{ formatPrice(item.specialPrice.amount) }}
+                        </div>
+                    </div>
+
+                    <v-menu location="bottom end" :close-on-content-click="false">
+                        <template #activator="{ props }">
+                            <v-btn
+                                v-bind="props"
+                                variant="text"
+                                icon="fas fa-ellipsis-v"
+                                size="small"
+                            ></v-btn>
+                        </template>
+                        <DrinkCardBuilderItemSettings
+                            :item="item"
+                            @update:serving-size="emit('update:serving-size', $event)"
+                            @update:special-price="emit('update:special-price', $event)"
+                            @update:price="emit('update:price', $event)"
+                        />
+                    </v-menu>
+
+                    <v-btn
+                        variant="text"
+                        :color="item.isVisible ? 'primary' : 'grey'"
+                        :icon="item.isVisible ? 'fas fa-eye' : 'fas fa-eye-slash'"
+                        size="small"
+                        @click="emit('toggle-visibility')"
                     />
-                </template>
-            </q-btn-dropdown>
-        </q-item-section>
 
-        <q-item-section side>
-            <div class="text-weight-medium">{{ formatPrice(item.price) }}</div>
-            <div v-if="item.specialPrice?.amount" class="text-caption text-grey">
-                {{ formatPrice(item.specialPrice.amount) }}
-            </div>
-        </q-item-section>
-
-        <q-item-section side>
-            <q-btn
-                flat
-                round
-                :color="item.isVisible ? 'primary' : 'grey'"
-                :icon="item.isVisible ? 'fa fa-eye' : 'fa fa-eye-slash'"
-                size="sm"
-                @click="emit('toggle-visibility')"
-            />
-        </q-item-section>
-
-        <q-item-section side>
-            <q-btn
-                flat
-                round
-                color="negative"
-                icon="fa fa-trash"
-                size="sm"
-                @click="emit('remove')"
-            />
-        </q-item-section>
-    </q-item>
+                    <v-btn
+                        variant="text"
+                        color="error"
+                        icon="fas fa-trash-alt"
+                        size="small"
+                        @click="emit('remove')"
+                    />
+                </div>
+            </template>
+        </v-list-item>
+    </v-card>
 </template>

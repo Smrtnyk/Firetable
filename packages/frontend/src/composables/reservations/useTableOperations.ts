@@ -1,8 +1,8 @@
 import type { BaseTable, FloorViewer } from "@firetable/floor-creator";
 import type { AnyFunction, QueuedReservationDoc, ReservationDoc } from "@firetable/types";
 
-import { useQuasar } from "quasar";
-import { showConfirm } from "src/helpers/ui-helpers";
+import { globalDialog } from "src/composables/useDialog";
+import { useGlobalStore } from "src/stores/global";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -44,8 +44,7 @@ export type TableOperation =
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- pretty verbose
 export function useTableOperations() {
-    const quasar = useQuasar();
-
+    const globalStore = useGlobalStore();
     const currentTableOperation = ref<TableOperation | undefined>();
     let operationNotification: AnyFunction | undefined;
     const { t } = useI18n();
@@ -106,7 +105,8 @@ export function useTableOperations() {
                 throw new Error("Invalid table operation type!");
         }
 
-        operationNotification = quasar.notify({
+        // @ts-expect-error -- FIXME: globalStore.notify should return a function to dismiss the notification
+        operationNotification = globalStore.notify({
             actions: [
                 {
                     color: "white",
@@ -123,10 +123,10 @@ export function useTableOperations() {
     }
 
     async function onCancelOperation(): Promise<void> {
-        const confirm = await showConfirm(
-            t("useReservations.cancelTableOperationTitle"),
-            t("useReservations.cancelTableOperationMsg"),
-        );
+        const confirm = await globalDialog.confirm({
+            message: t("useReservations.cancelTableOperationMsg"),
+            title: t("useReservations.cancelTableOperationTitle"),
+        });
 
         if (confirm) {
             // This will also dismiss the notification

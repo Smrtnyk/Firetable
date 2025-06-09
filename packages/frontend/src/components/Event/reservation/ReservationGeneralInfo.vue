@@ -32,46 +32,50 @@ function reservedByText(reservedBy: PlannedReservation["reservedBy"]): string {
 </script>
 
 <template>
-    <div class="row q-mb-md">
+    <v-row class="mb-4">
         <template v-if="reservation.guestName">
-            <div class="col-6">{{ t("EventShowReservation.guestNameLabel") }}</div>
-            <div class="col-6 font-black">{{ props.reservation.guestName }}</div>
+            <v-col cols="6">{{ t("EventShowReservation.guestNameLabel") }}</v-col>
+            <v-col cols="6" class="font-black">{{ props.reservation.guestName }}</v-col>
         </template>
 
-        <div class="col-6">{{ t("EventShowReservation.timeLabel") }}</div>
-        <div class="col-6 font-black">{{ props.reservation.time }}</div>
+        <v-col cols="6">{{ t("EventShowReservation.timeLabel") }}</v-col>
+        <v-col cols="6" class="font-black">{{ props.reservation.time }}</v-col>
 
-        <div class="col-6">{{ t("EventShowReservation.numberOfPeopleLabel") }}</div>
-        <div class="col-6 font-black">{{ props.reservation.numberOfGuests }}</div>
+        <v-col cols="6">{{ t("EventShowReservation.numberOfPeopleLabel") }}</v-col>
+        <v-col cols="6" class="font-black">{{ props.reservation.numberOfGuests }}</v-col>
 
         <template v-if="props.reservation.guestContact && permissionsStore.canSeeGuestContact">
-            <div class="col-6">{{ t("EventShowReservation.contactLabel") }}</div>
-            <div class="col-6 font-black">{{ props.reservation.guestContact }}</div>
+            <v-col cols="6">{{ t("EventShowReservation.contactLabel") }}</v-col>
+            <v-col cols="6" class="font-black">{{ props.reservation.guestContact }}</v-col>
         </template>
 
         <template v-if="props.reservation.consumption">
-            <div class="col-6">{{ t("EventShowReservation.reservationConsumption") }}</div>
-            <div class="col-6 font-black">{{ props.reservation.consumption }}</div>
+            <v-col cols="6">{{ t("EventShowReservation.reservationConsumption") }}</v-col>
+            <v-col cols="6" class="font-black">{{ props.reservation.consumption }}</v-col>
         </template>
 
         <template v-if="props.reservation.reservationNote">
-            <div class="col-6">{{ t("EventShowReservation.noteLabel") }}</div>
-            <div class="col-6 font-black">{{ props.reservation.reservationNote }}</div>
+            <v-col cols="6">{{ t("EventShowReservation.noteLabel") }}</v-col>
+            <v-col cols="6" class="font-black">{{ props.reservation.reservationNote }}</v-col>
         </template>
 
         <template v-if="!isAWalkInReservation(props.reservation)">
-            <div class="col-6">{{ t("EventShowReservation.reservedByLabel") }}</div>
-            <div class="col-6 font-black">{{ reservedByText(props.reservation.reservedBy) }}</div>
+            <v-col cols="6">{{ t("EventShowReservation.reservedByLabel") }}</v-col>
+            <v-col cols="6" class="font-black">{{
+                reservedByText(props.reservation.reservedBy)
+            }}</v-col>
         </template>
 
         <template v-if="permissionsStore.canSeeReservationCreator">
-            <div class="col-6">{{ t("EventShowReservation.createdByLabel") }}</div>
-            <div class="col-6 font-black">{{ createdByText(props.reservation.creator) }}</div>
+            <v-col cols="6">{{ t("EventShowReservation.createdByLabel") }}</v-col>
+            <v-col cols="6" class="font-black">{{
+                createdByText(props.reservation.creator)
+            }}</v-col>
 
-            <div class="col-6">{{ t("EventShowReservation.createdAtLabel") }}</div>
-            <div class="col-6 font-black">
+            <v-col cols="6">{{ t("EventShowReservation.createdAtLabel") }}</v-col>
+            <v-col cols="6" class="font-black">
                 {{ createdAt }}
-            </div>
+            </v-col>
         </template>
-    </div>
+    </v-row>
 </template>

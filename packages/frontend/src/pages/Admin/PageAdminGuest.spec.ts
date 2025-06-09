@@ -4,7 +4,6 @@ import type { RenderResult } from "vitest-browser-vue";
 import { AdminRole } from "@firetable/types";
 import { userEvent } from "@vitest/browser/context";
 import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
-import FTDialog from "src/components/FTDialog.vue";
 import { UTC } from "src/helpers/date-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ref } from "vue";
@@ -182,21 +181,16 @@ describe("PageAdminGuest.vue", () => {
         await userEvent.click(editButton);
 
         expect(createDialogSpy).toHaveBeenCalledWith(
+            AddNewGuestForm,
             expect.objectContaining({
-                component: FTDialog,
-                componentProps: expect.objectContaining({
-                    component: AddNewGuestForm,
-                    componentPropsObject: expect.objectContaining({
-                        initialData: guestData,
-                        mode: "edit",
-                    }),
-                    listeners: expect.any(Object),
-                    maximized: false,
-                    title: t("PageAdminGuest.editGuestDialogTitle", {
-                        name: guestData.name,
-                    }),
-                }),
+                initialData: guestData,
+                mode: "edit",
             }),
+            {
+                title: t("PageAdminGuest.editGuestDialogTitle", {
+                    name: guestData.name,
+                }),
+            },
         );
     });
 

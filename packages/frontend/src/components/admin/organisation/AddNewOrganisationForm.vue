@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { CreateOrganisationPayload } from "src/db";
+import type { VForm } from "vuetify/components";
 
 import { OrganisationStatus } from "@firetable/types";
-import { QForm } from "quasar";
 import { greaterThanZero, minLength, requireNumber } from "src/helpers/form-rules";
 import { ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
@@ -15,10 +15,10 @@ const maxAllowedPropertiesRules = [requireNumber(), greaterThanZero()];
 
 const organisationName = ref("");
 const maxAllowedProperties = ref<null | number>(null);
-const createOrganisationForm = useTemplateRef<QForm>("createOrganisationForm");
+const createOrganisationForm = useTemplateRef("createOrganisationForm");
 
 async function submit(): Promise<void> {
-    if (!(await createOrganisationForm.value?.validate())) {
+    if (!(await createOrganisationForm.value?.validate())?.valid) {
         return;
     }
 
@@ -31,33 +31,35 @@ async function submit(): Promise<void> {
 </script>
 
 <template>
-    <q-card-section>
-        <q-form ref="createOrganisationForm" class="q-gutter-md">
-            <q-input
+    <v-card-text>
+        <v-form
+            ref="createOrganisationForm"
+            class="d-flex flex-column"
+            style="gap: 1rem"
+            @submit.prevent="submit"
+        >
+            <v-text-field
                 v-model="organisationName"
                 :label="t('AddNewOrganisationForm.organisationNameLabel')"
-                outlined
+                variant="outlined"
                 autofocus
                 :rules="organisationRules"
             />
 
-            <q-input
+            <v-text-field
                 v-model.number="maxAllowedProperties"
                 :label="t('AddNewOrganisationForm.maxPropertiesLabel')"
-                outlined
+                variant="outlined"
                 type="number"
                 :rules="maxAllowedPropertiesRules"
             />
-        </q-form>
-    </q-card-section>
+        </v-form>
+    </v-card-text>
 
-    <q-card-actions align="right">
-        <q-btn
-            rounded
-            class="button-gradient"
-            size="md"
-            :label="t('Global.submit')"
-            @click="submit"
-        />
-    </q-card-actions>
+    <v-card-actions>
+        <v-spacer />
+        <v-btn rounded="lg" class="button-gradient" size="large" @click="submit">
+            {{ t("Global.submit") }}
+        </v-btn>
+    </v-card-actions>
 </template>

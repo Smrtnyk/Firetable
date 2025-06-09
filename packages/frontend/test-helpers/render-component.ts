@@ -5,43 +5,9 @@ import type { RenderResult } from "vitest-browser-vue";
 import type { UnwrapRef, WritableComputedRef } from "vue";
 
 import { createTestingPinia } from "@pinia/testing";
-import {
-    BottomSheet,
-    Dialog,
-    Loading,
-    Notify,
-    QAvatar,
-    QBtn,
-    QDialog,
-    QDrawer,
-    QIcon,
-    QInput,
-    QItem,
-    QItemLabel,
-    QItemSection,
-    QLayout,
-    QList,
-    QMenu,
-    QPageSticky,
-    QRadio,
-    QScrollArea,
-    QSelect,
-    QSeparator,
-    QSlideItem,
-    QTable,
-    QTd,
-    QTimeline,
-    QTimelineEntry,
-    QToggle,
-    Quasar,
-} from "quasar";
-import fontAwesomeV6 from "quasar/icon-set/fontawesome-v6";
 import { i18n, loadLanguage } from "src/boot/i18n";
 import { vi } from "vitest";
 import { render } from "vitest-browser-vue";
-import { defineComponent, h } from "vue";
-import "quasar/dist/quasar.css";
-import "@quasar/extras/fontawesome-v6/fontawesome-v6.css";
 
 import "../src/css/app.scss";
 
@@ -93,50 +59,9 @@ export function renderComponent<T>(
     i18n.global.setLocaleMessage("en-GB", languageStrings.default);
     i18n.global.locale.value = "en-GB";
 
-    const componentToRender = wrapInLayout
-        ? defineComponent({
-              components: { QLayout },
-              setup() {
-                  return () =>
-                      h(
-                          QLayout,
-                          {},
-                          {
-                              // @ts-expect-error -- not sure why this is not working
-                              default: () => h(component, props),
-                          },
-                      );
-              },
-          })
-        : component;
-
     const renderOptions: any = {
         global: {
-            components: {
-                QAvatar,
-                QBtn,
-                QDialog,
-                QDrawer,
-                QIcon,
-                QInput,
-                QItem,
-                QItemLabel,
-                QItemSection,
-                QLayout,
-                QList,
-                QMenu,
-                QPageSticky,
-                QRadio,
-                QScrollArea,
-                QSelect,
-                QSeparator,
-                QSlideItem,
-                QTable,
-                QTd,
-                QTimeline,
-                QTimelineEntry,
-                QToggle,
-            },
+            components: {},
             plugins: [
                 createTestingPinia({
                     stubActions: false,
@@ -144,13 +69,7 @@ export function renderComponent<T>(
                     createSpy: vi.fn,
                     fakeApp: true,
                 }),
-                [
-                    Quasar,
-                    {
-                        iconSet: fontAwesomeV6,
-                        plugins: { BottomSheet, Dialog, Loading, Notify },
-                    },
-                ],
+                [],
                 i18n,
             ],
             provide: options?.provide,
@@ -160,5 +79,5 @@ export function renderComponent<T>(
         renderOptions.props = props;
     }
 
-    return render(componentToRender, renderOptions);
+    return render(component, renderOptions);
 }

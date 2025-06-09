@@ -9,7 +9,7 @@
                         v-if="floorInstance && !isTablet"
                         :can-save="hasChanges"
                         :floor-instance="floorInstance"
-                        class="q-mb-sm"
+                        class="mb-2"
                     />
                 </div>
                 <div class="main-content" ref="viewerContainerRef">
@@ -40,7 +40,7 @@ import { useEventListener } from "@vueuse/core";
 import FloorEditorControls from "src/components/Floor/FloorEditorControls.vue";
 import FloorEditorTopControls from "src/components/Floor/FloorEditorTopControls.vue";
 import { useFloorEditor } from "src/composables/useFloorEditor";
-import { isTablet } from "src/global-reactives/screen-detection";
+import { useScreenDetection } from "src/global-reactives/screen-detection";
 import { onMounted, useTemplateRef, watch } from "vue";
 
 type Emits = (e: "save", value: FloorEditor) => void;
@@ -52,6 +52,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
+const { isTablet } = useScreenDetection();
 const floorContainerRef = useTemplateRef<HTMLCanvasElement>("floorContainerRef");
 const viewerContainerRef = useTemplateRef<HTMLDivElement>("viewerContainerRef");
 const {
@@ -130,7 +131,7 @@ watch(floorContainerRef, function () {
     position: relative;
 }
 
-/*  for tablet and smaller screens */
+/* for tablet and smaller screens */
 .grid-container.is-tablet {
     grid-template-columns: 1fr; /* Only one column */
     grid-template-areas: "main"; /* Only main area */

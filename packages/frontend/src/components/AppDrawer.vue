@@ -3,9 +3,9 @@ import type { GuardedLink, LinkWithChildren } from "src/types";
 
 import { Role } from "@firetable/types";
 import { storeToRefs } from "pinia";
-import { Dark, LocalStorage } from "quasar";
 import { dynamicallySwitchLang } from "src/boot/i18n";
 import AppDrawerLink from "src/components/AppDrawerLink.vue";
+import { useAppTheme } from "src/composables/useAppTheme";
 import { logoutUser } from "src/db";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";
@@ -30,7 +30,7 @@ const propertiesStore = usePropertiesStore();
 const props = defineProps<AppDrawerProps>();
 const emit = defineEmits<(e: "update:modelValue", value: boolean) => void>();
 const { locale, t } = useI18n();
-
+const { isDark, toggleTheme } = useAppTheme();
 const lang = ref(locale);
 const langOptions = computed(() => [
     { label: t("AppDrawer.languages.english"), value: "en-GB" },
@@ -39,14 +39,18 @@ const langOptions = computed(() => [
     { label: t("AppDrawer.languages.croatian"), value: "hr" },
 ]);
 
+function faIcon(iconName: string): string {
+    return `fa:fas ${iconName.startsWith("fa-") ? iconName : `fa-${iconName}`}`;
+}
+
 const inventoryLink = computed(function () {
     if (isAdmin.value || !canSeeInventory.value) {
         return;
     }
 
     return buildExpandableLink({
-        childIcon: "home",
-        icon: "fa fa-warehouse",
+        childIcon: faIcon("home"),
+        icon: faIcon("warehouse"),
         isVisible: true,
         label: t("Global.manageInventoryLink"),
         routeName: "adminInventory",
@@ -59,8 +63,8 @@ const manageFloorsLink = computed(function () {
     }
 
     return buildExpandableLink({
-        childIcon: "home",
-        icon: "fa fa-map",
+        childIcon: faIcon("home"),
+        icon: faIcon("map"),
         isVisible: true,
         label: t("AppDrawer.links.manageFloors"),
         routeName: "adminFloors",
@@ -73,7 +77,7 @@ const manageAnalyticsLink = computed(function () {
     }
 
     return buildExpandableLink({
-        icon: "fa fa-chart-bar",
+        icon: faIcon("chart-bar"),
         isVisible: true,
         label: t("AppDrawer.links.manageAnalytics"),
         routeName: "adminAnalytics",
@@ -86,8 +90,8 @@ const manageEventsLink = computed(function () {
     }
 
     return buildExpandableLink({
-        childIcon: "home",
-        icon: "fa fa-calendar",
+        childIcon: faIcon("home"),
+        icon: faIcon("calendar"),
         isVisible: true,
         label: t("AppDrawer.links.manageEvents"),
         routeName: "adminEvents",
@@ -100,8 +104,8 @@ const digitalDrinkCardsLink = computed(function () {
     }
 
     return buildExpandableLink({
-        childIcon: "home",
-        icon: "fa fa-cocktail",
+        childIcon: faIcon("home"),
+        icon: faIcon("cocktail"),
         isVisible: true,
         label: t("AppDrawer.links.manageDrinkCards"),
         routeName: "adminPropertyDrinkCards",
@@ -115,8 +119,8 @@ const propertySettingsLink = computed(function () {
     const role = nonNullableUser.value.role;
 
     return buildExpandableLink({
-        childIcon: "home",
-        icon: "fa fa-gears",
+        childIcon: faIcon("home"),
+        icon: faIcon("gears"),
         isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
         label: t("AppDrawer.links.settings"),
         routeName: "adminPropertySettings",
@@ -129,13 +133,13 @@ const links = computed<(GuardedLink | LinkWithChildren)[]>(function () {
 
     const allLinks: (GuardedLink | LinkWithChildren | undefined)[] = [
         {
-            icon: "fa fa-home",
+            icon: faIcon("home"),
             isVisible: isAdmin.value,
             label: t("AppDrawer.links.manageOrganisations"),
             route: { name: "adminOrganisations" },
         },
         {
-            icon: "fa fa-bug",
+            icon: faIcon("bug"),
             isVisible: isAdmin.value,
             label: t("AppDrawer.links.issueReportsOverview"),
             route: { name: "adminIssueReports" },
@@ -146,25 +150,25 @@ const links = computed<(GuardedLink | LinkWithChildren)[]>(function () {
         inventoryLink.value,
         manageAnalyticsLink.value,
         {
-            icon: "fa fa-users",
+            icon: faIcon("users"),
             isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
             label: t("AppDrawer.links.manageUsers"),
             route: { name: "adminUsers", params: { organisationId } },
         },
         {
-            icon: "fa fa-user-friends",
+            icon: faIcon("user-friends"),
             isVisible: canSeeGuestbook.value && !isAdmin.value,
             label: t("AppDrawer.links.manageGuests"),
             route: { name: "adminGuests", params: { organisationId } },
         },
         {
-            icon: "fa fa-building",
+            icon: faIcon("building"),
             isVisible: role === Role.PROPERTY_OWNER,
             label: t("AppDrawer.links.manageProperties"),
             route: { name: "adminProperties", params: { organisationId } },
         },
         {
-            icon: "fa fa-question-circle",
+            icon: faIcon("question-circle"),
             isVisible: !isAdmin.value,
             label: t("AppDrawer.links.reportIssue"),
             route: { name: "reportIssue", params: { organisationId } },
@@ -180,9 +184,9 @@ const links = computed<(GuardedLink | LinkWithChildren)[]>(function () {
 const avatar = computed(function () {
     const [first, last] = nonNullableUser.value.name.split(" ");
     if (!last) {
-        return first[0];
+        return first[0].toUpperCase();
     }
-    return `${first[0]}${last[0]}`;
+    return `${first[0]}${last[0]}`.toUpperCase();
 });
 
 function buildExpandableLink(options: {
@@ -226,10 +230,9 @@ function buildExpandableLink(options: {
         };
     }
 
-    // For multiple properties, return an expandable item
     const children = properties.map(function (property) {
         return {
-            icon: childIcon ?? "home",
+            icon: childIcon ?? faIcon("home"),
             isVisible: true,
             label: property.name,
             route: toRoute(property.id),
@@ -244,6 +247,10 @@ function buildExpandableLink(options: {
     };
 }
 
+function handleDrawerUpdate(value: boolean): void {
+    emit("update:modelValue", value);
+}
+
 function isLinkWithChildren(link: GuardedLink | LinkWithChildren): link is LinkWithChildren {
     return "children" in link;
 }
@@ -251,94 +258,95 @@ function isLinkWithChildren(link: GuardedLink | LinkWithChildren): link is LinkW
 async function onLogoutUser(): Promise<void> {
     await tryCatchLoadingWrapper({
         hook() {
+            emit("update:modelValue", false);
             return logoutUser();
         },
     });
 }
-
-function setDarkMode(newValue: boolean): void {
-    Dark.set(newValue);
-    LocalStorage.set("FTDarkMode", newValue);
-}
 </script>
 
 <template>
-    <q-drawer
-        no-swipe-open
+    <v-navigation-drawer
+        temporary
         :model-value="props.modelValue"
-        @update:model-value="emit('update:modelValue', $event)"
-        side="right"
-        behavior="mobile"
-        bordered
+        @update:model-value="handleDrawerUpdate"
+        location="right"
+        width="300"
+        class="border"
     >
-        <q-list>
-            <q-item class="column items-center q-pt-xl q-pb-lg">
-                <q-avatar size="6rem" class="ft-avatar">
-                    {{ avatar }}
-                </q-avatar>
-                <div class="q-mt-md text-center">
-                    <div class="text-subtitle1">{{ nonNullableUser.name }}</div>
-                    <div class="text-caption text-grey">{{ nonNullableUser.email }}</div>
-                </div>
-            </q-item>
+        <v-list nav>
+            <v-list-item class="d-flex flex-column align-center pt-10 pb-6 text-center">
+                <v-avatar size="96" color="primary" class="ft-avatar mb-4">
+                    <span class="text-h4">{{ avatar }}</span>
+                </v-avatar>
+                <v-list-item-title class="text-subtitle-1">{{
+                    nonNullableUser.name
+                }}</v-list-item-title>
+                <v-list-item-subtitle class="text-caption text-grey">{{
+                    nonNullableUser.email
+                }}</v-list-item-subtitle>
+            </v-list-item>
 
-            <q-separator v-if="links.length > 0" />
+            <v-divider v-if="links.length > 0" class="my-2" />
 
             <template v-for="(link, index) in links" :key="index">
-                <q-expansion-item
-                    v-if="isLinkWithChildren(link)"
-                    :label="link.label"
-                    :icon="link.icon"
-                    expand-separator
-                    :aria-label="link.label"
-                >
+                <v-list-group v-if="isLinkWithChildren(link)" :value="link.label">
+                    <template #activator="{ props: activatorProps }">
+                        <v-list-item
+                            v-bind="activatorProps"
+                            :prepend-icon="link.icon"
+                            :title="link.label"
+                            :aria-label="link.label"
+                        />
+                    </template>
                     <AppDrawerLink
                         v-for="(childLink, childIndex) in link.children"
                         :link="childLink"
                         :key="childIndex"
+                        is-child
                     />
-                </q-expansion-item>
+                </v-list-group>
 
                 <AppDrawerLink :link="link" v-else />
             </template>
 
-            <q-separator spaced />
+            <v-divider class="my-2" />
 
-            <q-item clickable @click="onLogoutUser" :aria-label="t('AppDrawer.logoutAriaLabel')">
-                <q-item-section avatar>
-                    <q-icon name="fa fa-sign-out" />
-                </q-item-section>
+            <v-list-item @click="onLogoutUser" :aria-label="t('AppDrawer.logoutAriaLabel')" link>
+                <template #prepend>
+                    <v-icon :icon="faIcon('sign-out')" />
+                </template>
+                <v-list-item-title>{{ t("AppDrawer.links.logout") }}</v-list-item-title>
+            </v-list-item>
 
-                <q-item-section>{{ t("AppDrawer.links.logout") }}</q-item-section>
-            </q-item>
-
-            <q-separator spaced />
-            <q-item>
-                <q-select
-                    class="full-width"
+            <v-divider class="my-2" />
+            <v-list-item>
+                <v-select
+                    class="w-100"
                     :model-value="lang"
-                    :options="langOptions"
+                    :items="langOptions"
                     :label="t('AppDrawer.languageSelectorLabel')"
-                    dense
-                    borderless
-                    emit-value
-                    map-options
-                    options-dense
+                    density="compact"
+                    variant="outlined"
+                    item-title="label"
+                    item-value="value"
+                    hide-details
                     @update:model-value="dynamicallySwitchLang"
                 />
-            </q-item>
-            <q-separator spaced />
-            <q-item>
-                <q-toggle
-                    :model-value="Dark.isActive"
-                    @update:model-value="setDarkMode"
-                    checked-icon="fa fa-moon"
-                    color="red"
+            </v-list-item>
+            <v-divider class="my-2" />
+            <v-list-item>
+                <v-switch
+                    :model-value="isDark"
+                    @update:model-value="toggleTheme"
+                    :true-icon="faIcon('moon')"
+                    :false-icon="faIcon('sun')"
+                    color="primary"
+                    inset
                     :label="t('AppDrawer.toggles.darkMode')"
-                    unchecked-icon="fa fa-sun"
-                    size="lg"
+                    hide-details
                 />
-            </q-item>
-        </q-list>
-    </q-drawer>
+            </v-list-item>
+        </v-list>
+    </v-navigation-drawer>
 </template>

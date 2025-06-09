@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import type { CreatePropertyPayload } from "@firetable/types";
 
-import { useQuasar } from "quasar";
 import AddNewPropertyForm from "src/components/admin/property/AddNewPropertyForm.vue";
 import FTBtn from "src/components/FTBtn.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
-import FTDialog from "src/components/FTDialog.vue";
 import PropertyCardList from "src/components/Property/PropertyCardList.vue";
+import { globalDialog } from "src/composables/useDialog";
+import { createNewProperty } from "src/db";
+import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { parseAspectRatio } from "src/helpers/utils";
+import { useAuthStore } from "src/stores/auth-store";
+import { useGlobalStore } from "src/stores/global";
 import { usePermissionsStore } from "src/stores/permissions-store";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { computed, onMounted } from "vue";
@@ -22,14 +25,9 @@ const props = defineProps<Props>();
 const router = useRouter();
 const propertiesStore = usePropertiesStore();
 const permissionsStore = usePermissionsStore();
-import { useDialog } from "src/composables/useDialog";
-import { createNewProperty } from "src/db";
-import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
-import { useAuthStore } from "src/stores/auth-store";
 
-const quasar = useQuasar();
+const globalStore = useGlobalStore();
 const authStore = useAuthStore();
-const { createDialog } = useDialog();
 const { t } = useI18n();
 
 const properties = computed(function () {
@@ -59,23 +57,19 @@ const showRegularUserNoPropertiesMessage = computed(function () {
 });
 
 function createVenue(): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: AddNewPropertyForm,
-            componentPropsObject: {
-                organisationId: props.organisationId,
+    const dialog = globalDialog.openDialog(
+        AddNewPropertyForm,
+        {
+            onCreate(payload: CreatePropertyPayload) {
+                onVenueCreate(payload);
+                globalDialog.closeDialog(dialog);
             },
-            listeners: {
-                create(payload: CreatePropertyPayload) {
-                    onVenueCreate(payload);
-                    dialog.hide();
-                },
-            },
-            maximized: false,
+            organisationId: props.organisationId,
+        },
+        {
             title: t("PageAdminProperties.createPropertyDialogTitle"),
         },
-    });
+    );
 }
 
 async function onVenueCreate(payload: CreatePropertyPayload): Promise<void> {
@@ -85,14 +79,14 @@ async function onVenueCreate(payload: CreatePropertyPayload): Promise<void> {
             if (authStore.isAdmin) {
                 await propertiesStore.initAdminProperties();
             }
-            quasar.notify("Venue created!");
+            globalStore.notify("Venue created!");
         },
     });
 }
 </script>
 
 <template>
-    <div class="PageHome">
+    <div class="PageHome pa-4">
         <PropertyCardList
             v-if="properties.length > 0"
             :properties="properties"
@@ -100,19 +94,19 @@ async function onVenueCreate(payload: CreatePropertyPayload): Promise<void> {
         />
 
         <FTCenteredText v-if="showOwnerAdminNoPropertiesMessage">
-            <q-icon name="fa fa-home" size="64px" color="grey-5" class="q-mb-md" />
-            <div class="text-grey-6 q-mb-lg">Create your first venue to get started</div>
+            <v-icon icon="fas fa-home" size="64" color="grey" class="mb-4" />
+            <div class="text-grey-darken-1 mb-8">Create your first venue to get started</div>
             <FTBtn
                 label="Create venue"
-                icon="fa fa-plus"
+                icon="fas fa-plus"
                 class="button-gradient"
                 @click="createVenue"
             />
         </FTCenteredText>
 
         <FTCenteredText v-if="showRegularUserNoPropertiesMessage">
-            <q-icon name="fa fa-home" size="64px" color="grey-5" class="q-mb-md" />
-            <div class="text-grey-6 q-mb-lg">No venues available</div>
+            <v-icon icon="fas fa-home" size="64" color="grey" class="mb-4" />
+            <div class="text-grey-darken-1 mb-8">No venues available</div>
         </FTCenteredText>
     </div>
 </template>

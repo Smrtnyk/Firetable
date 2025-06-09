@@ -134,9 +134,8 @@ function updateSectionItems(sectionId: string, items: DrinkCardItem[]): void {
 </script>
 
 <template>
-    <div class="DrinkCardSectionManager">
-        <!-- Add Buttons -->
-        <div class="row items-center justify-between q-mb-md q-pa-md">
+    <div class="drink-card-section-manager">
+        <div class="d-flex align-center justify-space-between mb-4 pa-4">
             <div class="text-h6">{{ t("PageAdminPropertyDrinkCards.sectionsLabel") }}</div>
             <DrinkCardBuilderAddDragElementsDropdown
                 ref="dropdownRef"
@@ -149,135 +148,118 @@ function updateSectionItems(sectionId: string, items: DrinkCardItem[]): void {
             />
         </div>
 
-        <!-- Root Elements List -->
-        <q-list ref="draggableListRef" class="q-gutter-y-sm">
-            <template v-for="element in draggableElements" :key="element.id">
-                <!-- Header -->
-                <template v-if="isHeader(element)">
-                    <q-item class="ft-card ft-border drag-item">
-                        <q-item-section avatar>
-                            <q-icon name="fa fa-bars" class="cursor-move drag-handle" />
-                        </q-item-section>
-                        <q-item-section>
-                            <q-input
-                                v-model="element.name"
-                                @change="emitUpdatedElements()"
-                                dense
-                                outlined
-                            />
-                        </q-item-section>
-                        <q-item-section side>
-                            <q-btn
-                                flat
-                                round
-                                color="negative"
-                                icon="fa fa-trash"
-                                size="sm"
+        <div ref="draggableListRef" class="d-flex flex-column" style="gap: 8px">
+            <div v-for="element in draggableElements" :key="element.id" class="drag-item">
+                <v-card v-if="isHeader(element)" variant="outlined">
+                    <v-list-item class="pr-1">
+                        <template #prepend>
+                            <v-icon icon="fas fa-bars" class="drag-handle mr-4" />
+                        </template>
+                        <v-text-field
+                            v-model="element.name"
+                            @change="emitUpdatedElements()"
+                            density="compact"
+                            variant="outlined"
+                            hide-details
+                        />
+                        <template #append>
+                            <v-btn
+                                variant="text"
+                                icon="fas fa-trash-alt"
+                                color="error"
+                                size="small"
                                 @click="removeElement(element.id)"
                             />
-                        </q-item-section>
-                    </q-item>
-                </template>
+                        </template>
+                    </v-list-item>
+                </v-card>
 
-                <!-- Header End -->
-                <template v-else-if="isHeaderEnd(element)">
-                    <q-item class="ft-card ft-border drag-item">
-                        <q-item-section avatar>
-                            <q-icon name="fa fa-bars" class="cursor-move drag-handle" />
-                        </q-item-section>
-                        <q-item-section>
-                            <div class="text-weight-medium">Header End</div>
-                        </q-item-section>
-                        <q-item-section side>
-                            <q-btn
-                                flat
-                                round
-                                color="negative"
-                                icon="fa fa-trash"
-                                size="sm"
+                <v-card v-else-if="isHeaderEnd(element)" variant="outlined">
+                    <v-list-item class="pr-1">
+                        <template #prepend>
+                            <v-icon icon="fas fa-bars" class="drag-handle mr-4" />
+                        </template>
+                        <v-list-item-title class="font-weight-medium">Header End</v-list-item-title>
+                        <template #append>
+                            <v-btn
+                                variant="text"
+                                icon="fas fa-trash-alt"
+                                color="error"
+                                size="small"
                                 @click="removeElement(element.id)"
                             />
-                        </q-item-section>
-                    </q-item>
-                </template>
+                        </template>
+                    </v-list-item>
+                </v-card>
 
-                <!-- Bundle -->
-                <template v-else-if="isBundle(element)">
-                    <q-item class="ft-card ft-border drag-item">
-                        <q-item-section avatar>
-                            <q-icon name="fa fa-bars" class="cursor-move drag-handle" />
-                        </q-item-section>
-                        <q-item-section>
-                            <div class="text-weight-medium">{{ element.name }}</div>
-                            <div class="text-caption">
+                <v-card v-else-if="isBundle(element)" variant="outlined">
+                    <v-list-item class="pr-1">
+                        <template #prepend>
+                            <v-icon icon="fas fa-bars" class="drag-handle mr-4" />
+                        </template>
+                        <div>
+                            <v-list-item-title class="font-weight-medium">{{
+                                element.name
+                            }}</v-list-item-title>
+                            <v-list-item-subtitle>
                                 {{ element.items.length }} items • {{ formatPrice(element.price) }}
-                            </div>
-                        </q-item-section>
-                        <q-item-section side>
-                            <q-btn
-                                flat
-                                round
+                            </v-list-item-subtitle>
+                        </div>
+                        <template #append>
+                            <v-btn
+                                variant="text"
+                                icon="fas fa-pencil-alt"
                                 color="primary"
-                                icon="fa fa-pencil"
-                                size="sm"
+                                size="small"
                                 @click="handleEditBundle(element)"
                             />
-                            <q-btn
-                                flat
-                                round
-                                color="negative"
-                                icon="fa fa-trash"
-                                size="sm"
+                            <v-btn
+                                variant="text"
+                                icon="fas fa-trash-alt"
+                                color="error"
+                                size="small"
                                 @click="removeElement(element.id)"
                             />
-                        </q-item-section>
-                    </q-item>
-                </template>
-
-                <!-- Root Level Section -->
-                <template v-else-if="isSection(element)">
-                    <q-expansion-item
-                        class="ft-card ft-border drag-item"
-                        :data-section-id="element.id"
-                    >
-                        <template #header>
-                            <q-item-section avatar>
-                                <q-icon name="fa fa-bars" class="cursor-move drag-handle" />
-                            </q-item-section>
-                            <q-item-section>{{ element.name }}</q-item-section>
-                            <q-item-section side>
-                                <q-btn
-                                    flat
-                                    round
-                                    color="negative"
-                                    icon="fa fa-trash"
-                                    size="sm"
-                                    @click.stop="removeElement(element.id)"
-                                />
-                            </q-item-section>
                         </template>
+                    </v-list-item>
+                </v-card>
 
-                        <!-- Section Items -->
-                        <DrinkCardSectionItems
-                            :section="element"
-                            :inventory-items="inventoryItems"
-                            @update:items="updateSectionItems(element.id, $event)"
-                        />
-                    </q-expansion-item>
-                </template>
-            </template>
-        </q-list>
+                <v-expansion-panels v-else-if="isSection(element)" :key="element.id">
+                    <v-expansion-panel class="ft-card ft-border">
+                        <v-expansion-panel-title>
+                            <v-icon icon="fas fa-bars" class="drag-handle mr-4" />
+                            {{ element.name }}
+                            <v-spacer />
+                            <v-btn
+                                variant="text"
+                                icon="fas fa-trash-alt"
+                                color="error"
+                                size="small"
+                                @click.stop="removeElement(element.id)"
+                            />
+                        </v-expansion-panel-title>
+                        <v-expansion-panel-text>
+                            <DrinkCardSectionItems
+                                :section="element"
+                                :inventory-items="inventoryItems"
+                                @update:items="updateSectionItems(element.id, $event)"
+                            />
+                        </v-expansion-panel-text>
+                    </v-expansion-panel>
+                </v-expansion-panels>
+            </div>
+        </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
 .draggable-ghost {
     opacity: 0.5;
-    background: var(--q-primary);
+    background: rgb(var(--v-theme-primary));
 }
 
 .draggable-chosen {
-    background: var(--q-grey-2);
+    background: rgb(var(--v-theme-grey-lighten-4));
 }
 
 .draggable-drag {

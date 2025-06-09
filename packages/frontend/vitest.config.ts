@@ -2,7 +2,6 @@
 
 import { defineConfig } from "vitest/config";
 import tsconfigPaths from "vite-tsconfig-paths";
-import { quasar, transformAssetUrls } from "@quasar/vite-plugin";
 import vue from "@vitejs/plugin-vue";
 
 export default defineConfig({
@@ -11,12 +10,7 @@ export default defineConfig({
             // This is needed to avoid Vitest picking up tsconfig.json files from other unrelated projects in the monorepo
             ignoreConfigErrors: true,
         }),
-        vue({
-            template: { transformAssetUrls },
-        }),
-        quasar({
-            sassVariables: "src/css/quasar.variables.scss",
-        }),
+        vue(),
     ],
     test: {
         onConsoleLog (log) {
@@ -31,7 +25,7 @@ export default defineConfig({
             optimizer: {
                 web: {
                     enabled: true,
-                    include: ["@vue/test-utils", "quasar", "vue-i18n", "pinia", "@pinia/testing", "vue"],
+                    include: ["@vue/test-utils", "vue-i18n", "pinia", "@pinia/testing", "vue"],
                 }
             }
         },

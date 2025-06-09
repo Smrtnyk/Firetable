@@ -2,17 +2,21 @@
 import type { Link } from "src/types";
 
 interface Props {
+    isChild?: boolean;
     link: Link;
 }
 
-const { link } = defineProps<Props>();
+const props = defineProps<Props>();
 </script>
 
 <template>
-    <q-item :to="link.route" clickable>
-        <q-item-section avatar>
-            <q-icon :name="link.icon" />
-        </q-item-section>
-        <q-item-section>{{ link.label }}</q-item-section>
-    </q-item>
+    <v-list-item
+        :to="props.link.route"
+        :prepend-icon="props.link.icon"
+        :title="props.link.label"
+        :aria-label="props.link.label"
+        :class="{ 'ml-4': props.isChild }"
+        link
+    >
+    </v-list-item>
 </template>

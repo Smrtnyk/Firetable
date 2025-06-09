@@ -3,7 +3,6 @@ import type { DrinkCardDoc, PropertyDoc } from "@firetable/types";
 
 import { isCustomDrinkCard, isPDFDrinkCard } from "@firetable/types";
 import { where } from "firebase/firestore";
-import { Loading } from "quasar";
 import CustomDrinkCardDisplay from "src/components/admin/drink-cards/CustomDrinkCardDisplay.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import {
@@ -12,6 +11,7 @@ import {
     useFirestoreDocument,
 } from "src/composables/useFirestore.js";
 import { getDrinkCardsPath, getPropertyPath } from "src/db";
+import { useGlobalStore } from "src/stores/global";
 import { computed, onMounted, ref } from "vue";
 
 interface Props {
@@ -20,6 +20,8 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const globalStore = useGlobalStore();
 
 const {
     data: drinkCards,
@@ -47,9 +49,9 @@ const activeCard = computed(() => {
 const pdfHeight = ref(window.innerHeight);
 
 async function init(): Promise<void> {
-    Loading.show();
+    globalStore.setLoading(true);
     await drinkCardsPromise.value;
-    Loading.hide();
+    globalStore.setLoading(false);
 }
 
 onMounted(init);

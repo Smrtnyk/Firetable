@@ -7,10 +7,12 @@
 </template>
 
 <script setup lang="ts">
-import { useQuasar } from "quasar";
-import { getDarkMode } from "src/config";
+import { useAppTheme } from "src/composables/useAppTheme";
+import { onMounted } from "vue";
 
-const quasar = useQuasar();
+const { loadTheme } = useAppTheme();
 
-quasar.dark.set(getDarkMode());
+onMounted(() => {
+    loadTheme();
+});
 </script>

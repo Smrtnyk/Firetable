@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CreateInventoryItemPayload } from "@firetable/types";
+import type { VForm } from "vuetify/components";
 
 import {
     BeerSubCategory,
@@ -14,7 +15,6 @@ import {
     TobaccoSubCategory,
     WineSubCategory,
 } from "@firetable/types";
-import { QForm } from "quasar";
 import { noEmptyString, noNegativeNumber, optionalNumberInRange } from "src/helpers/form-rules";
 import { getEnumValues } from "src/helpers/get-enum-values";
 import { computed, ref, useTemplateRef, watch } from "vue";
@@ -27,7 +27,7 @@ export interface InventoryItemCreateFormProps {
 
 const { t } = useI18n();
 const props = defineProps<InventoryItemCreateFormProps>();
-const formRef = useTemplateRef<QForm>("formRef");
+const formRef = useTemplateRef<VForm>("formRef");
 const form = ref<CreateInventoryItemPayload>(getInitialForm());
 const emit = defineEmits<(e: "submit", item: CreateInventoryItemPayload) => void>();
 
@@ -119,10 +119,12 @@ function onMainCategoryChange(): void {
 
 function onReset(): void {
     form.value = { ...getInitialForm() };
+    formRef.value?.resetValidation();
 }
 
 async function onSubmit(): Promise<void> {
-    if (!(await formRef.value?.validate())) {
+    const { valid } = (await formRef.value?.validate()) ?? { valid: false };
+    if (!valid) {
         return;
     }
 
@@ -139,99 +141,98 @@ watch(
 </script>
 
 <template>
-    <div class="InventoryItemCreateForm">
-        <q-form greedy class="q-gutter-md q-pt-md q-pa-md" ref="formRef">
-            <q-input v-model="form.name" label="Name" outlined required :rules="nameRules" />
+    <div class="inventory-item-create-form">
+        <v-form
+            ref="formRef"
+            class="pa-4 d-flex flex-column"
+            style="gap: 1rem"
+            greedy
+            @submit.prevent="onSubmit"
+        >
+            <v-text-field v-model="form.name" label="Name" variant="outlined" :rules="nameRules" />
 
-            <q-select
+            <v-select
                 v-model="form.type"
-                :options="typeOptions"
+                :items="typeOptions"
                 label="Type"
-                outlined
-                required
-                emit-value
+                variant="outlined"
                 :rules="typeRules"
             />
 
-            <q-select
+            <v-select
                 v-model="form.mainCategory"
-                :options="mainCategoryOptions"
+                :items="mainCategoryOptions"
                 label="Main Category"
-                outlined
-                required
-                emit-value
+                variant="outlined"
                 @update:model-value="onMainCategoryChange"
                 :rules="mainCategoryRules"
             />
 
-            <q-select
+            <v-select
                 v-model="form.subCategory"
-                :options="subCategoryOptions"
+                :items="subCategoryOptions"
                 label="Sub Category"
-                outlined
-                required
-                emit-value
+                variant="outlined"
                 :rules="subCategoryRules"
             />
 
-            <q-input v-model="form.brand" label="Brand" outlined />
+            <v-text-field v-model="form.brand" label="Brand" variant="outlined" />
 
-            <q-input v-model="form.style" label="Style" outlined />
+            <v-text-field v-model="form.style" label="Style" variant="outlined" />
 
-            <q-input v-model="form.region" label="Region" outlined />
+            <v-text-field v-model="form.region" label="Region" variant="outlined" />
 
-            <q-input
+            <v-text-field
                 v-model.number="form.quantity"
                 label="Quantity"
                 type="number"
-                outlined
-                required
+                variant="outlined"
                 :rules="quantityRules"
             />
 
-            <q-input
+            <v-text-field
                 v-if="isDrinkItem(form)"
                 v-model.number="form.alcoholContent"
                 label="Alcohol Content (%)"
                 type="number"
-                outlined
+                variant="outlined"
                 :rules="alcoholContentRules"
             />
 
-            <q-input
+            <v-text-field
                 v-if="isDrinkItem(form)"
                 v-model.number="form.volume"
                 label="Volume (ml)"
                 type="number"
-                outlined
+                variant="outlined"
                 :rules="volumeRules"
             />
 
-            <q-input v-model="form.supplier" label="Supplier" outlined />
+            <v-text-field v-model="form.supplier" label="Supplier" variant="outlined" />
 
-            <q-toggle v-model="form.isActive" label="Active" />
+            <v-switch
+                v-model="form.isActive as boolean"
+                label="Active"
+                color="primary"
+                hide-details
+            />
 
-            <q-input v-model="form.description" label="Description" type="textarea" outlined />
+            <v-textarea v-model="form.description" label="Description" variant="outlined" />
 
-            <div class="row q-gutter-md">
-                <q-btn
-                    rounded
-                    class="button-gradient"
-                    size="md"
-                    :label="t('Global.submit')"
-                    @click="onSubmit"
-                />
-                <q-btn
-                    rounded
-                    size="md"
-                    outline
-                    :label="t('Global.reset')"
-                    type="reset"
+            <div class="d-flex" style="gap: 8px">
+                <v-btn rounded="lg" class="button-gradient" size="large" @click="onSubmit">
+                    {{ t("Global.submit") }}
+                </v-btn>
+                <v-btn
+                    rounded="lg"
+                    size="large"
+                    variant="outlined"
                     color="primary"
-                    class="q-ml-sm"
                     @click="onReset"
-                />
+                >
+                    {{ t("Global.reset") }}
+                </v-btn>
             </div>
-        </q-form>
+        </v-form>
     </div>
 </template>

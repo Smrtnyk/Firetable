@@ -1,113 +1,11 @@
-<template>
-    <div class="timeframe-selector">
-        <q-select
-            v-model="selectedPreset"
-            :options="presets"
-            :label="t('FTTimeframeSelector.selectTimeframe')"
-            @update:model-value="handlePresetChange"
-            :error="!!error"
-            :error-message="error"
-            outlined
-            emit-value
-            map-options
-            hide-dropdown-icon
-        >
-            <template #append>
-                <q-icon
-                    name="fa fa-calendar"
-                    :aria-label="t('FTTimeframeSelector.openDatePicker')"
-                    @click.stop.prevent="toggleDateRangePicker"
-                    @mousedown.stop.prevent
-                    class="q-mr-sm"
-                />
-
-                <q-btn
-                    unelevated
-                    rounded
-                    color="primary"
-                    :label="t('FTTimeframeSelector.apply')"
-                    @click.stop="applyCurrentSelection"
-                    :disabled="!hasValidSelection"
-                />
-            </template>
-
-            <template #selected-item="scope">
-                <span v-if="scope.opt.value !== 'custom'">
-                    {{ scope.opt.label }}
-                </span>
-                <span v-else>
-                    <span v-if="dateRange && dateRange.from && dateRange.to">
-                        {{ formatDateDisplay(dateRange.from) }} {{ t("FTTimeframeSelector.to") }}
-                        {{ formatDateDisplay(dateRange.to) }}
-                    </span>
-                    <span v-else> {{ t("FTTimeframeSelector.selectDateRange") }} </span>
-                </span>
-            </template>
-        </q-select>
-
-        <q-popup-proxy
-            ref="datePickerProxy"
-            anchor="bottom right"
-            self="top right"
-            transition-show="scale"
-            transition-hide="scale"
-            class="date-range-picker"
-            @hide="resetCustomSelection"
-            :no-parent-event="true"
-            :auto-close="false"
-        >
-            <q-date
-                v-model="dateRange"
-                range
-                mask="YYYY-MM-DD"
-                today-btn
-                :min="minDate"
-                :max="maxDate"
-                :options="dateOptions"
-                @range-start="handleRangeStart"
-                @range-end="handleRangeEnd"
-                :aria-label="t('FTTimeframeSelector.customDateRangePickerAriaLabel')"
-            >
-                <div class="row items-center justify-end q-gutter-sm">
-                    <FTBtn
-                        padding="sm"
-                        icon="fa fa-trash"
-                        color="negative"
-                        :aria-label="t('FTTimeframeSelector.clearCustomDateRangeAriaLabel')"
-                        @click="clearDateRange"
-                        :disabled="!dateRange.from && !dateRange.to"
-                    />
-                    <q-space />
-                    <FTBtn
-                        padding="sm"
-                        :label="t('FTTimeframeSelector.cancel')"
-                        color="secondary"
-                        @click="closeDateRangePicker"
-                        :aria-label="t('FTTimeframeSelector.cancelCustomDateRangeAriaLabel')"
-                    />
-                    <FTBtn
-                        padding="sm"
-                        :label="t('FTTimeframeSelector.apply')"
-                        :aria-label="t('FTTimeframeSelector.applyCustomDateRangeAriaLabel')"
-                        color="primary"
-                        @click="applyDateRange"
-                        :disabled="!isValidDateRange"
-                    />
-                </div>
-            </q-date>
-        </q-popup-proxy>
-    </div>
-</template>
-
 <script setup lang="ts">
 import type { DateRange } from "src/types";
 
-import { isNil } from "es-toolkit/predicate";
-import { QPopupProxy } from "quasar";
+import { isDate } from "es-toolkit";
 import FTBtn from "src/components/FTBtn.vue";
 import { useHasChanged } from "src/composables/useHasChanged";
 import { ONE_HOUR } from "src/constants";
-import { computed, ref, useTemplateRef, watch } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
 export interface FTTimeframeSelectorProps {
@@ -119,7 +17,7 @@ export interface FTTimeframeSelectorProps {
 }
 
 interface PresetOption {
-    label: string;
+    title: string;
     value: string;
 }
 
@@ -136,108 +34,72 @@ const emit = defineEmits<{
 
 const { locale, t } = useI18n();
 
-const presets = ref([
-    { label: t("FTTimeframeSelector.today"), value: "today" },
-    { label: t("FTTimeframeSelector.yesterday"), value: "yesterday" },
-    { label: t("FTTimeframeSelector.last7Days"), value: "last7" },
-    { label: t("FTTimeframeSelector.last30Days"), value: "last30" },
-    { label: t("FTTimeframeSelector.custom"), value: "custom" },
+const presets = ref<PresetOption[]>([
+    { title: t("FTTimeframeSelector.today"), value: "today" },
+    { title: t("FTTimeframeSelector.yesterday"), value: "yesterday" },
+    { title: t("FTTimeframeSelector.last7Days"), value: "last7" },
+    { title: t("FTTimeframeSelector.last30Days"), value: "last30" },
+    { title: t("FTTimeframeSelector.custom"), value: "custom" },
 ]);
 
 const selectedPreset = ref<string>("");
 const pendingPreset = ref<string>("");
-const dateRange = ref<{ from: string; to: string }>({ from: "", to: "" });
+const dateMenu = ref(false);
 const error = ref("");
-const rangeStartDate = ref<string>("");
-const datePickerProxy = useTemplateRef("datePickerProxy");
+
+// v-date-picker (range) v-model is an array of Date objects
+const datePickerModel = ref<Date[]>([]);
+
+// A computed property to bridge Vuetify's array model and your object model
+const dateRange = computed({
+    get: () => {
+        const [from, to] = datePickerModel.value;
+        return {
+            from: from ? from.toISOString().split("T")[0] : "",
+            to: to ? to.toISOString().split("T")[0] : "",
+        };
+    },
+    set: (val) => {
+        if (val?.from && val.to) {
+            datePickerModel.value = [new Date(val.from), new Date(val.to)];
+        } else {
+            datePickerModel.value = [];
+        }
+    },
+});
 
 const { hasChanged: presetHasChanged, reset: resetPresetHasChanged } = useHasChanged(pendingPreset);
 const { hasChanged: dateRangeHasChanged, reset: resetDateRangeHasChanged } =
-    useHasChanged(dateRange);
+    useHasChanged(datePickerModel);
+
+const isValidDateRange = computed(() => {
+    const [start, end] = datePickerModel.value;
+    if (!start || !end) return false;
+    const diffDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+    return diffDays >= 0 && diffDays <= maxDays;
+});
 
 const hasValidSelection = computed(() => {
     if (pendingPreset.value && pendingPreset.value !== "custom") {
-        // For non-custom presets, enable Apply if preset has changed
         return presetHasChanged.value;
     } else if (pendingPreset.value === "custom") {
-        // For custom preset, enable Apply if date range has changed and is valid
         return dateRangeHasChanged.value && isValidDateRange.value;
     }
     return false;
-});
-
-watch(dateRange, function (newVal) {
-    if (isNil(newVal)) {
-        dateRange.value = { from: "", to: "" };
-    }
-});
-
-function closeDateRangePicker(): void {
-    datePickerProxy.value?.hide();
-    if (pendingPreset.value === "custom" && !isValidDateRange.value) {
-        pendingPreset.value = selectedPreset.value;
-    }
-}
-
-function dateOptions(date: string): boolean {
-    if (!rangeStartDate.value) {
-        return true;
-    }
-
-    const start = new Date(rangeStartDate.value);
-    const current = new Date(date);
-    const diffDays = Math.ceil((current.getTime() - start.getTime()) / (ONE_HOUR * 24));
-
-    return diffDays <= maxDays;
-}
-
-function formatDateDisplay(dateStr: string): string {
-    const options: Intl.DateTimeFormatOptions = { day: "numeric", month: "short", year: "numeric" };
-    const date = new Date(dateStr);
-    return date.toLocaleDateString(locale.value, options);
-}
-
-function toggleDateRangePicker(): void {
-    datePickerProxy.value?.toggle();
-    if (pendingPreset.value === "custom") {
-        pendingPreset.value = "";
-    } else {
-        pendingPreset.value = selectedPreset.value;
-    }
-}
-
-const isValidDateRange = computed(() => {
-    if (!dateRange.value.from || !dateRange.value.to) {
-        return false;
-    }
-
-    const start = new Date(dateRange.value.from);
-    const end = new Date(dateRange.value.to);
-
-    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
-        return false;
-    }
-
-    const diffDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-    return diffDays >= 0 && diffDays <= maxDays;
 });
 
 function applyCurrentSelection(): void {
     if (pendingPreset.value === "custom") {
         if (!isValidDateRange.value) {
             const message =
-                !dateRange.value.from || !dateRange.value.to
+                datePickerModel.value.length < 2
                     ? t("FTTimeframeSelector.errorSelectDates")
                     : t("FTTimeframeSelector.errorMaxDays", { maxDays });
             emit("error", message);
             return;
         }
-
         selectedPreset.value = "custom";
-        emitValue({
-            endDate: dateRange.value.to,
-            startDate: dateRange.value.from,
-        });
+        emitValue({ endDate: dateRange.value.to, startDate: dateRange.value.from });
     } else if (pendingPreset.value) {
         try {
             const range = calculatePresetDates(pendingPreset.value);
@@ -249,7 +111,6 @@ function applyCurrentSelection(): void {
             pendingPreset.value = selectedPreset.value;
         }
     }
-
     resetPresetHasChanged();
     resetDateRangeHasChanged();
 }
@@ -257,118 +118,162 @@ function applyCurrentSelection(): void {
 function applyDateRange(): void {
     if (!isValidDateRange.value) {
         const message =
-            !dateRange.value.from || !dateRange.value.to
+            datePickerModel.value.length < 2
                 ? t("FTTimeframeSelector.errorSelectDates")
                 : t("FTTimeframeSelector.errorMaxDays", { maxDays });
         emit("error", message);
         return;
     }
-
     selectedPreset.value = "custom";
     pendingPreset.value = "custom";
-    datePickerProxy.value?.hide();
+    dateMenu.value = false;
 }
 
 function calculatePresetDates(preset: string): DateRange {
     const today = new Date();
-    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(
-        2,
-        "0",
-    )}-${String(today.getDate()).padStart(2, "0")}`;
-
-    let startDate: null | string = null;
-    let endDate: string = todayStr;
+    today.setHours(0, 0, 0, 0);
+    const startDate = new Date(today);
+    const endDate = new Date(today);
 
     switch (preset) {
-        case "last7": {
-            const weekAgo = new Date(today);
-            weekAgo.setDate(today.getDate() - 6);
-            startDate = `${weekAgo.getFullYear()}-${String(weekAgo.getMonth() + 1).padStart(
-                2,
-                "0",
-            )}-${String(weekAgo.getDate()).padStart(2, "0")}`;
+        case "last7":
+            startDate.setDate(today.getDate() - 6);
             break;
-        }
-        case "last30": {
-            const monthAgo = new Date(today);
-            monthAgo.setDate(today.getDate() - 29);
-            startDate = `${monthAgo.getFullYear()}-${String(monthAgo.getMonth() + 1).padStart(
-                2,
-                "0",
-            )}-${String(monthAgo.getDate()).padStart(2, "0")}`;
+        case "last30":
+            startDate.setDate(today.getDate() - 29);
             break;
-        }
         case "today":
-            startDate = todayStr;
+            // No change needed
             break;
-        case "yesterday": {
-            const yesterday = new Date(today);
-            yesterday.setDate(today.getDate() - 1);
-            startDate = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(
-                2,
-                "0",
-            )}-${String(yesterday.getDate()).padStart(2, "0")}`;
-            endDate = startDate;
+        case "yesterday":
+            startDate.setDate(today.getDate() - 1);
+            endDate.setDate(today.getDate() - 1);
             break;
-        }
         default:
             throw new Error(t("FTTimeframeSelector.errorInvalidPreset", { preset }));
     }
-
-    if (!startDate) {
-        throw new Error(t("FTTimeframeSelector.errorStartDateCalculation"));
-    }
-
     return {
-        endDate,
-        startDate,
+        endDate: endDate.toISOString().split("T")[0],
+        startDate: startDate.toISOString().split("T")[0],
     };
 }
 
 function clearDateRange(): void {
-    dateRange.value = { from: "", to: "" };
-    rangeStartDate.value = "";
+    datePickerModel.value = [];
+}
+
+function dateOptions(date: unknown): boolean {
+    if (!isDate(date)) return false;
+    // If only one date is selected, check if the potential second date is within the maxDays range
+    if (datePickerModel.value.length === 1) {
+        const start = datePickerModel.value[0];
+        const diffDays = Math.ceil(Math.abs(date.getTime() - start.getTime()) / (ONE_HOUR * 24));
+        return diffDays < maxDays;
+    }
+    return true;
 }
 
 function emitValue(value: DateRange): void {
     emit("update:modelValue", value);
 }
 
+function formatDateDisplay(dateStr: string): string {
+    const options: Intl.DateTimeFormatOptions = { day: "numeric", month: "short", year: "numeric" };
+    const date = new Date(dateStr);
+    // Add time zone to prevent off-by-one day errors
+    return new Date(date.valueOf() + date.getTimezoneOffset() * 60 * 1000).toLocaleDateString(
+        locale.value,
+        options,
+    );
+}
+
 function handlePresetChange(value: string): void {
     error.value = "";
     pendingPreset.value = value;
-
     if (value === "custom") {
-        datePickerProxy.value?.show();
-    }
-}
-
-function handleRangeEnd(): void {
-    rangeStartDate.value = "";
-}
-
-function handleRangeStart(from: null | { day: number; month: number; year: number }): void {
-    if (!from) {
-        return;
-    }
-    rangeStartDate.value = new Date(from.year, from.month - 1, from.day).toISOString();
-}
-
-function resetCustomSelection(): void {
-    if (pendingPreset.value === "custom" && !isValidDateRange.value) {
-        pendingPreset.value = selectedPreset.value;
+        dateMenu.value = true;
     }
 }
 </script>
 
-<style scoped>
-.timeframe-selector {
-    position: relative;
-    width: 100%;
-}
+<template>
+    <div class="timeframe-selector">
+        <v-select
+            v-model="pendingPreset"
+            :items="presets"
+            :label="t('FTTimeframeSelector.selectTimeframe')"
+            :error-messages="error"
+            @update:model-value="handlePresetChange"
+            variant="outlined"
+            hide-details="auto"
+        >
+            <template #selection="{ item }">
+                <span v-if="item.value !== 'custom'">
+                    {{ item.title }}
+                </span>
+                <span v-else>
+                    <span v-if="dateRange && dateRange.from && dateRange.to">
+                        {{ formatDateDisplay(dateRange.from) }} {{ t("FTTimeframeSelector.to") }}
+                        {{ formatDateDisplay(dateRange.to) }}
+                    </span>
+                    <span v-else> {{ t("FTTimeframeSelector.selectDateRange") }} </span>
+                </span>
+            </template>
 
-.date-range-picker {
-    width: 100%;
-    max-width: 400px;
-}
-</style>
+            <template #append>
+                <v-menu v-model="dateMenu" :close-on-content-click="false" location="bottom end">
+                    <template #activator="{ props: menuProps }">
+                        <v-icon
+                            v-bind="menuProps"
+                            icon="fas fa-calendar"
+                            class="mr-2"
+                            :aria-label="t('FTTimeframeSelector.openDatePicker')"
+                        />
+                    </template>
+                    <v-date-picker
+                        v-model="datePickerModel"
+                        range
+                        :min="minDate"
+                        :max="maxDate"
+                        :allowed-dates="dateOptions"
+                    >
+                        <template #actions>
+                            <FTBtn
+                                icon="fas fa-trash-alt"
+                                color="error"
+                                :aria-label="t('FTTimeframeSelector.clearCustomDateRangeAriaLabel')"
+                                @click="clearDateRange"
+                                :disabled="datePickerModel.length === 0"
+                            />
+                            <v-spacer />
+                            <FTBtn
+                                :label="t('FTTimeframeSelector.cancel')"
+                                color="secondary"
+                                @click="dateMenu = false"
+                                :aria-label="
+                                    t('FTTimeframeSelector.cancelCustomDateRangeAriaLabel')
+                                "
+                            />
+                            <FTBtn
+                                :label="t('FTTimeframeSelector.apply')"
+                                :aria-label="t('FTTimeframeSelector.applyCustomDateRangeAriaLabel')"
+                                color="primary"
+                                @click="applyDateRange"
+                                :disabled="!isValidDateRange"
+                            />
+                        </template>
+                    </v-date-picker>
+                </v-menu>
+
+                <v-btn
+                    variant="tonal"
+                    rounded="lg"
+                    color="primary"
+                    @click.stop="applyCurrentSelection"
+                    :disabled="!hasValidSelection"
+                    >{{ t("FTTimeframeSelector.apply") }}</v-btn
+                >
+            </template>
+        </v-select>
+    </div>
+</template>

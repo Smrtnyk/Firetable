@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useQuasar } from "quasar";
 import FTBtn from "src/components/FTBtn.vue";
 import FTCard from "src/components/FTCard.vue";
 import FTTitle from "src/components/FTTitle.vue";
@@ -9,6 +8,7 @@ import {
     getOrganisationStatusColor,
 } from "src/helpers/organisation/organisation";
 import { showDeleteConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { useGlobalStore } from "src/stores/global";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
@@ -27,7 +27,7 @@ interface ActionCard {
 
 const props = defineProps<PageAdminOrganisationProps>();
 const { t } = useI18n();
-const quasar = useQuasar();
+const globalStore = useGlobalStore();
 const propertiesStore = usePropertiesStore();
 const router = useRouter();
 
@@ -39,21 +39,21 @@ function getActionCards(): ActionCard[] {
         {
             color: "accent",
             description: t("PageAdminOrganisation.managePropertiesDescription"),
-            icon: "fa fa-home",
+            icon: "fa:fas fa-home", // Updated for Vuetify
             route: { name: "adminProperties", params },
             title: t("AppDrawer.links.manageProperties"),
         },
         {
             color: "primary",
             description: t("PageAdminOrganisation.manageUsersDescription"),
-            icon: "fa fa-users",
+            icon: "fa:fas fa-users", // Updated for Vuetify
             route: { name: "adminUsers", params },
             title: t("AppDrawer.links.manageUsers"),
         },
         {
             color: "secondary",
             description: t("PageAdminOrganisation.manageGuestsDescription"),
-            icon: "fa fa-user-friends",
+            icon: "fa:fas fa-user-friends", // Updated for Vuetify
             route: { name: "adminGuests", params },
             title: t("AppDrawer.links.manageGuests"),
         },
@@ -79,11 +79,7 @@ async function onDeleteOrganisation(): Promise<void> {
         async hook() {
             await deleteOrganisation(props.organisationId);
             await propertiesStore.initOrganisations();
-            quasar.notify({
-                message: t("PageAdminOrganisation.organisationDeletedSuccess"),
-                position: "top",
-                type: "positive",
-            });
+            globalStore.notify(t("PageAdminOrganisation.organisationDeletedSuccess"), "success"); // Changed "positive" to "success"
             await router.replace({ name: "adminOrganisations" });
         },
     });
@@ -96,46 +92,47 @@ async function onDeleteOrganisation(): Promise<void> {
         <FTTitle title="">
             <template #left>
                 {{ t("PageAdminOrganisation.statusLabel") }}
-                <q-chip
+                <v-chip
                     :color="getOrganisationStatusColor(organisation.status)"
                     text-color="white"
                     aria-label="Organisation status"
+                    class="ml-2"
                 >
                     {{ formatOrganisationStatus(organisation.status) }}
-                </q-chip>
+                </v-chip>
             </template>
             <template #right>
                 <FTBtn
-                    icon="fa fa-trash"
+                    icon="fa:fas fa-trash"
                     :aria-label="t('PageAdminOrganisation.deleteOrganisationButtonAriaLabel')"
-                    rounded
-                    color="negative"
+                    rounded="pill"
+                    color="error"
                     @click="onDeleteOrganisation"
                 />
             </template>
         </FTTitle>
 
-        <div>
+        <div class="mt-4">
             <!-- Organisation Info Card -->
-            <FTCard class="info-card q-mb-lg">
-                <q-card-section>
-                    <div class="row q-col-gutter-lg">
-                        <div class="col-12 col-md-8">
-                            <div class="info-header q-mb-md">
-                                <q-avatar color="primary" text-color="white" size="56px">
-                                    <q-icon name="fa fa-briefcase" size="32px" />
-                                </q-avatar>
+            <FTCard class="info-card mb-6">
+                <v-card-text>
+                    <v-row>
+                        <v-col cols="12" md="8">
+                            <div class="info-header mb-4">
+                                <v-avatar color="primary" size="56">
+                                    <v-icon icon="fa:fas fa-briefcase" size="32" color="white" />
+                                </v-avatar>
                                 <div class="info-content">
-                                    <h5 class="text-h5 q-my-none">{{ organisation.name }}</h5>
-                                    <div class="text-caption text-grey q-mt-xs">
+                                    <h5 class="text-h5 my-0">{{ organisation.name }}</h5>
+                                    <div class="text-caption text-grey-darken-1 mt-1">
                                         {{ t("PageAdminOrganisation.organisationIdLabel") }}
                                         {{ organisation.id }}
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </q-card-section>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
             </FTCard>
         </div>
 
@@ -147,32 +144,29 @@ async function onDeleteOrganisation(): Promise<void> {
                     :key="card.title"
                     class="action-card cursor-pointer"
                     @click="router.push(card.route)"
+                    link
                 >
-                    <q-card-section>
+                    <v-card-text>
                         <div class="action-card-content">
-                            <q-avatar
-                                :color="card.color"
-                                text-color="white"
-                                size="48px"
-                                class="q-mb-md"
-                            >
-                                <q-icon :name="card.icon" size="28px" />
-                            </q-avatar>
-                            <h6 class="text-h6 q-my-sm">{{ card.title }}</h6>
-                            <p class="text-body2 text-grey q-mb-none">
+                            <v-avatar :color="card.color" size="48" class="mb-4">
+                                <v-icon :icon="card.icon" size="28" color="white" />
+                            </v-avatar>
+                            <h6 class="text-h6 my-2">{{ card.title }}</h6>
+                            <p class="text-body2 text-grey-darken-1 mb-0">
                                 {{ card.description }}
                             </p>
                         </div>
-                    </q-card-section>
-                    <q-card-actions align="right">
-                        <q-btn
-                            flat
+                    </v-card-text>
+                    <v-card-actions class="d-flex justify-end pa-2">
+                        <v-btn
+                            variant="text"
                             :color="card.color"
-                            icon-right="fa fa-chevron-right"
-                            :label="t('PageAdminOrganisation.manageButtonLabel')"
-                            no-caps
-                        />
-                    </q-card-actions>
+                            append-icon="fa:fas fa-chevron-right"
+                            class="text-none"
+                        >
+                            {{ t("PageAdminOrganisation.manageButtonLabel") }}
+                        </v-btn>
+                    </v-card-actions>
                 </FTCard>
             </div>
         </div>
@@ -200,7 +194,6 @@ async function onDeleteOrganisation(): Promise<void> {
 
         .action-card {
             transition: all 0.3s ease;
-            cursor: pointer;
 
             &:hover {
                 transform: translateY(-4px);
@@ -208,7 +201,7 @@ async function onDeleteOrganisation(): Promise<void> {
                 :deep(.ft-card) {
                     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 
-                    .body--dark & {
+                    .v-theme--dark & {
                         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
                     }
                 }

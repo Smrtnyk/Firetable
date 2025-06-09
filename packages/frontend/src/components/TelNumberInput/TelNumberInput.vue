@@ -1,68 +1,62 @@
 <template>
     <div>
-        <div class="row items-start q-gutter-sm justify-between">
-            <q-select
-                class="col-4"
-                outlined
-                v-model="selectedCountry"
-                :options="countryOptions"
-                option-label="name"
-                :label="t('TelNumberInput.countryCodeLabel')"
-                :use-input="!selectedCountry"
-                @filter="onFilterCountries"
-                clearable
-                clear-icon="fa fa-close"
-                :clear-icon-label="t('TelNumberInput.clearButtonLabel')"
-                :rules="[validateCountrySelection]"
-            >
-                <template #option="scope">
-                    <q-item v-bind="scope.itemProps">
-                        <q-item-section avatar>
+        <v-row>
+            <v-col cols="5" sm="4">
+                <v-autocomplete
+                    variant="outlined"
+                    v-model="selectedCountry"
+                    :items="countryOptions"
+                    item-title="name"
+                    return-object
+                    :label="t('TelNumberInput.countryCodeLabel')"
+                    @update:search="onFilterCountries"
+                    clearable
+                    clear-icon="fas fa-times"
+                    :rules="[validateCountrySelection]"
+                >
+                    <template #item="{ props, item }">
+                        <v-list-item v-bind="props" :title="false">
+                            <template #prepend>
+                                <v-avatar size="24" class="mr-3">
+                                    <img :src="item.raw.flag" :alt="item.raw.name" />
+                                </v-avatar>
+                            </template>
+                            <v-list-item-title>
+                                {{ item.raw.name }} (+{{ item.raw.dialCode }})
+                            </v-list-item-title>
+                        </v-list-item>
+                    </template>
+                    <template #selection="{ item }">
+                        <div class="d-flex align-center w-100">
                             <img
-                                :src="scope.opt.flag"
-                                alt=""
-                                class="q-mr-sm"
+                                :src="item.raw.flag"
+                                :alt="item.raw.name"
+                                class="mr-2"
                                 style="width: 20px; height: 14px"
                             />
-                        </q-item-section>
-                        <q-item-section side>
-                            {{ scope.opt.name }} (+{{ scope.opt.dialCode }})
-                        </q-item-section>
-                    </q-item>
-                </template>
-
-                <template #selected-item="{ opt }">
-                    <div class="row no-wrap items-center full-width">
-                        <img
-                            :src="opt.flag"
-                            alt=""
-                            class="q-mr-sm"
-                            style="width: 20px; height: 14px"
-                        />
-                        <div>+{{ opt.dialCode }}</div>
-                    </div>
-                </template>
-            </q-select>
-
-            <q-input
-                class="col"
-                v-model="phoneNumber"
-                :label="t('TelNumberInput.phoneNumberLabel')"
-                type="tel"
-                outlined
-                :rules="[validatePhoneNumber]"
-                @blur="onPhoneNumberBlur"
-            />
-        </div>
+                            <div>+{{ item.raw.dialCode }}</div>
+                        </div>
+                    </template>
+                </v-autocomplete>
+            </v-col>
+            <v-col cols="7" sm="8">
+                <v-text-field
+                    v-model="phoneNumber"
+                    :label="t('TelNumberInput.phoneNumberLabel')"
+                    type="tel"
+                    variant="outlined"
+                    :rules="[validatePhoneNumber]"
+                    @blur="onPhoneNumberBlur"
+                />
+            </v-col>
+        </v-row>
     </div>
 </template>
 
 <script setup lang="ts">
-import type { AnyFunction } from "@firetable/types";
 import type { CountryCode } from "libphonenumber-js";
 
 import { AsYouType, parsePhoneNumberFromString } from "libphonenumber-js";
-import { QInput, QSelect } from "quasar";
 import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -85,14 +79,13 @@ const fullNumber = computed(function () {
     }
     return "";
 });
-const selectedCountry = ref<Country | undefined>();
+const selectedCountry = ref<Country>(europeanCountries[0]);
 const phoneNumber = ref("");
 const countryOptions = ref<Country[]>(europeanCountries);
 
 watch(
     () => modelValue,
-    function (newVal) {
-        // Only update inputs if modelValue has changed and is different from current inputs
+    (newVal) => {
         if (newVal && newVal !== fullNumber.value) {
             const parsedNumber = parsePhoneNumberFromString(newVal);
             if (parsedNumber) {
@@ -105,7 +98,6 @@ watch(
                 }
             }
         }
-        // Do not reset inputs when newVal is empty (invalid input)
     },
     { immediate: true },
 );
@@ -115,7 +107,6 @@ function emitPhoneNumber(): void {
         emit("update:modelValue", "");
         return;
     }
-
     if (validatePhoneNumber() === true && selectedCountry.value) {
         emit("update:modelValue", fullNumber.value);
     } else {
@@ -123,24 +114,18 @@ function emitPhoneNumber(): void {
     }
 }
 
-function onFilterCountries(val: string, update: AnyFunction): void {
-    if (val === "") {
-        update(function () {
-            countryOptions.value = europeanCountries;
-        });
+function onFilterCountries(searchVal = ""): void {
+    if (searchVal === "") {
+        countryOptions.value = europeanCountries;
         return;
     }
-
-    update(function () {
-        const needle = val.toLowerCase();
-        countryOptions.value = europeanCountries.filter(function (country) {
-            return (
-                country.name.toLowerCase().includes(needle) ??
-                country.dialCode.includes(needle) ??
-                country.iso2.toLowerCase().includes(needle)
-            );
-        });
-    });
+    const needle = searchVal.toLowerCase();
+    countryOptions.value = europeanCountries.filter(
+        (country) =>
+            country.name.toLowerCase().includes(needle) ||
+            country.dialCode.includes(needle) ||
+            country.iso2.toLowerCase().includes(needle),
+    );
 }
 
 function onPhoneNumberBlur(): void {
@@ -159,11 +144,8 @@ function onPhoneNumberBlur(): void {
 function validateCountrySelection(): boolean | string {
     const country = selectedCountry.value;
     const number = phoneNumber.value;
-
     if (required) {
-        if (!country) {
-            return t("TelNumberInput.selectCountryCodeValidationMsg");
-        }
+        if (!country) return t("TelNumberInput.selectCountryCodeValidationMsg");
     } else if (number && !country) {
         return t("TelNumberInput.selectCountryCodeValidationMsg");
     }
@@ -173,25 +155,15 @@ function validateCountrySelection(): boolean | string {
 function validatePhoneNumber(): boolean | string {
     const country = selectedCountry.value;
     const number = phoneNumber.value;
-
     if (required) {
-        if (!country || !number) {
-            return t("TelNumberInput.provideCountryAndNumberValidationMsg");
-        }
+        if (!country || !number) return t("TelNumberInput.provideCountryAndNumberValidationMsg");
     } else {
-        if (!country && !number) {
-            // Field is optional
-            return true;
-        }
+        if (!country && !number) return true;
         if ((country && !number) || (!country && number)) {
             return t("TelNumberInput.provideCountryAndNumberValidationMsg");
         }
     }
-
-    if (!country) {
-        return t("TelNumberInput.selectCountryCodeValidationMsg");
-    }
-
+    if (!country) return t("TelNumberInput.selectCountryCodeValidationMsg");
     const phoneNumberObj = parsePhoneNumberFromString(fullNumber.value);
     if (!phoneNumberObj?.isValid()) {
         return t("TelNumberInput.invalidPhoneNumberValidationMsg");

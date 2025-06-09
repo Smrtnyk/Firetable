@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { EventDoc, VoidFunction } from "@firetable/types";
+import type { EventDoc } from "@firetable/types";
 
 import PageAdminEventsListItem from "src/components/admin/event/PageAdminEventsListItem.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
@@ -53,6 +53,15 @@ const bucketizedEvents = computed(function () {
         monthEvents.push(event);
     }
 
+    // Sort monthEvents by date within each month, ascending
+    for (const targetBucket of [upcomingEvents, pastEvents]) {
+        for (const yearMap of targetBucket.values()) {
+            for (const monthEvents of yearMap.values()) {
+                monthEvents.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+            }
+        }
+    }
+
     return {
         pastEvents,
         upcomingEvents,
@@ -67,14 +76,12 @@ const hasPastEvents = computed(() => {
     return bucketizedEvents.value.pastEvents.size > 0;
 });
 
-function emitDelete(event: EventDoc, reset: VoidFunction): void {
+function emitDelete(event: EventDoc): void {
     emit("delete", event);
-    reset();
 }
 
-function emitEdit(event: EventDoc, reset: VoidFunction): void {
+function emitEdit(event: EventDoc): void {
     emit("edit", event);
-    reset();
 }
 
 function handleLoad(): void {
@@ -83,7 +90,7 @@ function handleLoad(): void {
 </script>
 
 <template>
-    <div class="q-pa-sm">
+    <div class="pa-1">
         <FTCenteredText v-if="!eventsLength">
             {{ t("PageAdminEvents.noEventsMessage") }}
         </FTCenteredText>
@@ -94,33 +101,36 @@ function handleLoad(): void {
                     v-for="[year, yearBuckets] in [...bucketizedEvents.upcomingEvents.entries()]"
                     :key="'upcoming-' + year"
                 >
-                    <p>
-                        <b>{{ year }}</b>
-                    </p>
+                    <p class="text-subtitle-1 font-weight-bold mt-3 mb-1">{{ year }}</p>
 
                     <div
-                        class="q-mb-sm"
+                        class="mb-2"
                         v-for="[month, monthEvents] in [...yearBuckets.entries()]"
                         :key="month"
                     >
-                        <p>{{ month }}</p>
+                        <p class="text-subtitle-2 ml-2 mb-1">{{ month }}</p>
 
                         <PageAdminEventsListItem
                             v-for="event in monthEvents"
                             :key="event.id"
                             :event="event"
                             :timezone="timezone"
-                            @right="({ reset }) => emitDelete(event, reset)"
-                            @left="({ reset }) => emitEdit(event, reset)"
+                            @delete="() => emitDelete(event)"
+                            @edit="() => emitEdit(event)"
                         />
                     </div>
                 </div>
             </div>
 
             <!-- Past Events Marker -->
-            <div v-if="hasPastEvents">
-                <p>
-                    <b>{{ t("PageAdminEvents.pastEventsLabel") }}</b>
+            <div v-if="hasPastEvents && hasUpcomingEvents" class="mt-4">
+                <p class="text-subtitle-1 font-weight-bold">
+                    {{ t("PageAdminEvents.pastEventsLabel") }}
+                </p>
+            </div>
+            <div v-else-if="hasPastEvents && !hasUpcomingEvents" class="mt-2">
+                <p class="text-subtitle-1 font-weight-bold">
+                    {{ t("PageAdminEvents.pastEventsLabel") }}
                 </p>
             </div>
 
@@ -130,32 +140,45 @@ function handleLoad(): void {
                     v-for="[year, yearBuckets] in [...bucketizedEvents.pastEvents.entries()]"
                     :key="'past-' + year"
                 >
-                    <p>
-                        <b>{{ year }}</b>
+                    <p
+                        class="text-subtitle-1 font-weight-bold mt-3 mb-1"
+                        v-if="
+                            hasUpcomingEvents ||
+                            (bucketizedEvents.pastEvents.size > 1 &&
+                                [...bucketizedEvents.pastEvents.keys()][0] !== year)
+                        "
+                    >
+                        {{ year }}
+                    </p>
+                    <p
+                        class="text-subtitle-1 font-weight-bold mt-1 mb-1"
+                        v-else-if="!hasUpcomingEvents && bucketizedEvents.pastEvents.size === 1"
+                    >
+                        {{ year }}
                     </p>
 
                     <div
-                        class="q-mb-sm"
+                        class="mb-2"
                         v-for="[month, monthEvents] in [...yearBuckets.entries()]"
                         :key="month"
                     >
-                        <p>{{ month }}</p>
+                        <p class="text-subtitle-2 ml-2 mb-1">{{ month }}</p>
 
                         <PageAdminEventsListItem
                             v-for="event in monthEvents"
                             :key="event.id"
                             :event="event"
                             :timezone="timezone"
-                            @right="({ reset }) => emitDelete(event, reset)"
-                            @left="({ reset }) => emitEdit(event, reset)"
+                            @delete="() => emitDelete(event)"
+                            @edit="() => emitEdit(event)"
                         />
                     </div>
                 </div>
             </div>
 
             <!-- Load More Button -->
-            <div class="row justify-center q-my-md">
-                <q-btn v-if="!done" label="Load More" @click="handleLoad" />
+            <div class="d-flex justify-center my-4">
+                <v-btn v-if="!done" @click="handleLoad"> Load More </v-btn>
             </div>
         </template>
     </div>

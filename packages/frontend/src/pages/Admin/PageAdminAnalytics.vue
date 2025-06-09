@@ -95,77 +95,80 @@ const chartInfos = computed(function () {
         <FTTimeframeSelector v-model="selected" />
 
         <div>
-            <FTCard class="q-mb-md">
+            <FTCard class="mb-4">
                 <BarChart
                     :chart-data="plannedReservationsByProperty"
                     chart-title="Total Planned Reservations"
                 />
             </FTCard>
-            <div class="row q-col-gutter-sm q-col-gutter-md-md">
-                <div class="col-12">
-                    <q-chip color="primary">
+
+            <v-row>
+                <v-col cols="12">
+                    <v-chip color="primary" class="mr-2">
                         Avg Guests per planned reservation:
                         {{ avgGuestsPerReservation.averagePlannedGuests.toFixed(2) }}
-                    </q-chip>
+                    </v-chip>
 
-                    <q-chip color="primary">
+                    <v-chip color="primary">
                         Avg Guests per walk-in reservation:
                         {{ avgGuestsPerReservation.averageWalkInGuests.toFixed(2) }}
-                    </q-chip>
-                </div>
+                    </v-chip>
+                </v-col>
 
-                <FTCard class="col-sm-12 col-md-6">
-                    <PieChart
-                        :chart-data="plannedArrivedVsNoShow"
-                        chart-title="Arrived vs. No-Show"
-                    />
-                </FTCard>
+                <v-col cols="12" md="6">
+                    <FTCard>
+                        <PieChart
+                            :chart-data="plannedArrivedVsNoShow"
+                            chart-title="Arrived vs. No-Show"
+                        />
+                    </FTCard>
+                </v-col>
 
-                <FTCard class="col-sm-12 col-md-6">
-                    <PieChart
-                        :chart-data="plannedVsWalkInReservations"
-                        chart-title="Planned vs. Walk-In"
-                    />
-                </FTCard>
+                <v-col cols="12" md="6">
+                    <FTCard>
+                        <PieChart
+                            :chart-data="plannedVsWalkInReservations"
+                            chart-title="Planned vs. Walk-In"
+                        />
+                    </FTCard>
+                </v-col>
 
-                <div class="col-12 q-my-md">
+                <v-col cols="12" class="my-4">
                     <FTTabs v-model="selectedDay">
-                        <q-tab
+                        <v-tab
                             v-for="day in [...Object.keys(plannedReservationsByDay), 'ALL']"
                             :key="day"
-                            :name="day"
-                            :label="day"
-                        />
+                            :value="day"
+                        >
+                            {{ day }}
+                        </v-tab>
                     </FTTabs>
 
-                    <FTTabPanels v-model="selectedDay" class="q-mt-md">
-                        <q-tab-panel
-                            class="q-pa-none"
+                    <FTTabPanels v-model="selectedDay" class="mt-4">
+                        <v-window-item
                             v-for="(reservations, day) in {
                                 ...plannedReservationsByDay,
                                 ALL: plannedReservationsByActiveProperty,
                             }"
                             :key="day"
-                            :name="day"
+                            :value="day"
                         >
                             <AdminEventReservationsByPerson :reservations="reservations" />
-                        </q-tab-panel>
+                        </v-window-item>
                     </FTTabPanels>
-                </div>
+                </v-col>
 
-                <FTCard
-                    class="col-sm-12 col-md-6"
-                    v-for="chartInfo in chartInfos"
-                    :key="chartInfo.title"
-                >
-                    <ReservationAnalyticsCharts
-                        :chart-data="chartInfo.data"
-                        :chart-title="chartInfo.title"
-                        :chart-type="chartInfo.type"
-                        :labels="chartInfo.labels"
-                    />
-                </FTCard>
-            </div>
+                <v-col v-for="chartInfo in chartInfos" :key="chartInfo.title" cols="12" md="6">
+                    <FTCard>
+                        <ReservationAnalyticsCharts
+                            :chart-data="chartInfo.data"
+                            :chart-title="chartInfo.title"
+                            :chart-type="chartInfo.type"
+                            :labels="chartInfo.labels"
+                        />
+                    </FTCard>
+                </v-col>
+            </v-row>
         </div>
     </div>
 </template>

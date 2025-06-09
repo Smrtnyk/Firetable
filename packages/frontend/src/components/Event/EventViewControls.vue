@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import FTBtn from "src/components/FTBtn.vue";
 import { computed } from "vue";
 
 export interface EventViewControlsProps {
@@ -72,83 +71,78 @@ function showPrevFloor(): void {
 </script>
 
 <template>
-    <div class="row q-mb-sm q-gutter-sm" aria-label="Toggle event controls menu">
-        <FTBtn
-            dense
-            outline
+    <div class="d-flex align-center mb-2" style="gap: 8px" aria-label="Toggle event controls menu">
+        <v-btn
+            density="compact"
+            variant="outlined"
             color="grey"
-            icon="fa fa-bars"
-            v-close-popup
+            icon="fa:fas fa-bars"
             @click="emit('toggle-queued-reservations-drawer-visibility')"
             aria-label="Toggle queued reservations drawer visibility"
         >
-            <q-badge floating color="red" v-if="queuedReservationsCount > 0">
-                {{ queuedReservationsCount }}
-            </q-badge>
-        </FTBtn>
-        <FTBtn
-            dense
-            outline
+            <v-badge
+                floating
+                color="red"
+                v-if="queuedReservationsCount > 0"
+                :content="queuedReservationsCount"
+            />
+        </v-btn>
+        <v-btn
+            density="compact"
+            variant="outlined"
             color="grey"
-            icon="fa fa-users"
-            v-close-popup
+            icon="fa:fas fa-users"
             @click="emit('toggle-event-guest-list-drawer-visibility')"
             aria-label="Toggle event guest list drawer visibility"
         >
-            <q-badge floating color="red" v-if="guestListCount > 0">
-                {{ guestListCount }}
-            </q-badge>
-        </FTBtn>
-        <FTBtn
-            dense
-            outline
+            <v-badge floating color="red" v-if="guestListCount > 0" :content="guestListCount" />
+        </v-btn>
+        <v-btn
+            density="compact"
+            variant="outlined"
             color="grey"
-            icon="fa fa-info-circle"
-            v-close-popup
+            icon="fa:fas fa-info-circle"
             @click="() => emit('show-event-info')"
             aria-label="Show event info"
         />
 
-        <FTBtn
+        <v-btn
             v-if="canSeeAdminEvent"
-            clickable
-            v-close-popup
             @click="() => emit('navigate-to-admin-event')"
-            dense
-            outline
+            density="compact"
+            variant="outlined"
             color="grey"
-            icon="fa fa-eye"
+            icon="fa:fas fa-eye"
             aria-label="Navigate to admin event"
         />
-        <FTBtn
+        <v-btn
             v-if="canExportReservations"
-            dense
-            outline
+            density="compact"
+            variant="outlined"
             color="grey"
-            icon="fa fa-file-export"
-            v-close-popup
+            icon="fa:fas fa-file-export"
             @click="() => emit('export-reservations')"
             aria-label="Export reservations"
         />
 
-        <q-space />
+        <v-spacer />
         <template v-if="shouldShowButtons">
-            <FTBtn
-                unelevated
-                outline
+            <v-btn
+                flat
+                variant="outlined"
                 color="grey"
-                dense
-                icon="fa fa-chevron-left"
+                density="compact"
+                icon="fa:fas fa-chevron-left"
                 @click="showPrevFloor"
                 :disabled="!previousFloor"
                 aria-label="Show previous floor"
             />
-            <FTBtn
-                unelevated
-                outline
+            <v-btn
+                flat
+                variant="outlined"
                 color="grey"
-                dense
-                icon="fa fa-chevron-right"
+                density="compact"
+                icon="fa:fas fa-chevron-right"
                 @click="showNextFloor"
                 :disabled="!nextFloor"
                 aria-label="Show next floor"

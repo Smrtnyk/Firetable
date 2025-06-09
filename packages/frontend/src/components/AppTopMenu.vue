@@ -6,53 +6,36 @@ const { t } = useI18n();
 const emit = defineEmits<(e: "toggle-drawer") => void>();
 const menuLinks = [
     {
-        icon: "fa fa-home",
+        icon: "fa:fas fa-home",
         routeName: "home",
     },
     {
-        icon: "fa fa-user-circle",
+        icon: "fa:fas fa-user-circle",
         routeName: "userProfile",
     },
 ];
 </script>
 
 <template>
-    <q-header class="AppTopMenu">
-        <q-tabs
-            switch-indicator
-            narrow-indicator
-            class="bg-primary text-white AppTopMenu__tabs bg-primary col-xs-12 col-md-8 col-lg-6"
-            active-color="white"
-            :breakpoint="0"
+    <v-app-bar class="AppTopMenu" color="primary" height="48">
+        <v-btn icon variant="text" @click="refreshApp">
+            <v-icon icon="fa:fas fa-redo" />
+        </v-btn>
+        <v-spacer />
+
+        <v-tabs hide-slider align-tabs="center">
+            <v-tab v-for="menu in menuLinks" :key="menu.icon" :to="{ name: menu.routeName }" exact>
+                <v-icon :icon="menu.icon" />
+            </v-tab>
+        </v-tabs>
+
+        <v-spacer />
+        <v-btn
+            variant="text"
+            :aria-label="t('AppTopMenu.menuAriaLabel')"
+            @click="emit('toggle-drawer')"
         >
-            <q-btn icon="fa fa-redo" rounded @click="refreshApp" flat />
-            <q-space />
-            <q-route-tab
-                v-for="menu in menuLinks"
-                :key="menu.icon"
-                :to="{ name: menu.routeName }"
-                exact
-                :icon="menu.icon"
-            />
-            <q-space />
-            <q-btn flat :aria-label="t('AppTopMenu.menuAriaLabel')" @click="emit('toggle-drawer')">
-                <q-icon size="2rem" name="fa fa-bars" />
-            </q-btn>
-        </q-tabs>
-    </q-header>
+            <v-icon size="large" icon="fa:fas fa-bars" />
+        </v-btn>
+    </v-app-bar>
 </template>
-
-<style lang="scss">
-.AppTopMenu {
-    background-color: transparent;
-
-    &__tabs {
-        padding-left: 1rem;
-        padding-right: 1rem;
-
-        .q-tabs__content {
-            justify-content: space-evenly;
-        }
-    }
-}
-</style>

@@ -31,7 +31,7 @@ const backgroundImageUrl = computed(function () {
         }"
     >
         <router-link
-            class="EventCard__link"
+            class="EventCard__link text-decoration-none"
             :to="{
                 name: 'event',
                 params: {
@@ -41,31 +41,36 @@ const backgroundImageUrl = computed(function () {
                 },
             }"
         >
-            <q-responsive :ratio="aspectRatio">
-                <div class="EventCard__content column">
-                    <div class="row items-center">
-                        <q-icon name="fa fa-calendar" color="white" class="q-mr-xs" size="xs" />
-
+            <v-responsive :aspect-ratio="aspectRatio">
+                <div class="EventCard__content d-flex flex-column fill-height">
+                    <div class="d-flex align-center">
+                        <v-icon
+                            icon="fa:fas fa-calendar"
+                            color="white"
+                            class="mr-1"
+                            size="x-small"
+                        />
                         {{ dateFromTimestamp(event.date, locale, propertyTimezone) }}
-
-                        <q-space />
-
-                        <q-icon name="fa fa-clock" color="white" class="q-mr-xs" size="xs" />
-
+                        <v-spacer />
+                        <v-icon icon="fa:fas fa-clock" color="white" class="mr-1" size="x-small" />
                         {{ hourFromTimestamp(event.date, locale, propertyTimezone) }}
                     </div>
 
-                    <q-space />
+                    <v-spacer />
 
-                    <div class="row">
-                        <q-icon name="fa fa-euro" color="white" class="q-mr-xs" size="xs" />
-
+                    <div class="d-flex align-center">
+                        <v-icon
+                            icon="fa:fas fa-euro-sign"
+                            color="white"
+                            class="mr-1"
+                            size="x-small"
+                        />
                         {{ event.entryPrice || t("EventCard.freeLabel") }}
                     </div>
 
-                    <h4 class="text-h4 q-mb-sm q-ml-none q-mt-none">{{ event.name }}</h4>
+                    <h4 class="text-h4 mb-1 ml-0 mt-0">{{ event.name }}</h4>
                 </div>
-            </q-responsive>
+            </v-responsive>
         </router-link>
     </div>
 </template>
@@ -74,16 +79,20 @@ const backgroundImageUrl = computed(function () {
 .EventCard {
     border-radius: 0.5rem;
 
+    &__link {
+        text-decoration: none;
+    }
+
     img {
         border-radius: 0.5rem;
     }
 
     &__content {
         color: white;
-        text-decoration: none !important;
         padding: 1rem;
         border-radius: 0.5rem;
         background: rgba(0, 0, 0, 0.5);
+        height: 100%;
     }
 }
 </style>
