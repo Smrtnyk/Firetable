@@ -9,6 +9,7 @@ import { connectAuthEmulator, getAuth } from "firebase/auth";
 import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 import { connectFunctionsEmulator, getFunctions } from "firebase/functions";
 import { connectStorageEmulator, getStorage } from "firebase/storage";
+import { getAI, GoogleAIBackend } from "firebase/vertexai";
 
 import fbConfig from "./fb-config.json" with { type: "json" };
 
@@ -21,10 +22,13 @@ export const initializeFirebase = memoize(() => {
     const functions = getFunctions(firebaseApp, "europe-west3");
     const auth = getAuth(firebaseApp);
     const storage = getStorage(firebaseApp);
+    const ai = getAI(firebaseApp, {
+        backend: new GoogleAIBackend(),
+    });
     if (location.hostname === "localhost" || ipAddressPattern.test(location.hostname)) {
         initEmulators(firestore, auth, functions, storage);
     }
-    return { auth, firebaseApp, firestore, functions, storage };
+    return { ai, auth, firebaseApp, firestore, functions, storage };
 });
 
 function initEmulators(

@@ -82,6 +82,10 @@ export class FloorEditor extends Floor {
         return this.history.canUndo();
     }
 
+    clear(): void {
+        this.canvas.remove(...this.canvas.getObjects());
+    }
+
     clearDrawings(): void {
         this.drawingManager.clearDrawings();
     }

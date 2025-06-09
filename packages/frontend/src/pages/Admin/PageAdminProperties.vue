@@ -278,7 +278,7 @@ async function showUpdatePropertyDialog(property: PropertyDoc): Promise<void> {
                 label="Create venue"
                 icon="fa fa-plus"
                 class="button-gradient"
-                @click="createVenue"
+                @click="() => createVenue()"
             />
         </FTCenteredText>
     </div>
